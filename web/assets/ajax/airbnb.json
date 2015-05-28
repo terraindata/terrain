@@ -1,0 +1,13 @@
+{
+  "data": [
+    { "lat": 37.77816542086827, "long": -122.48045251661345, "name": "Walk to Golden Gate Park &amp; Beach!", "price": 180, "type": "Entire home/apt", "rating": 8, "reviews": 52 },
+    { "lat": 37.80547940587255, "long": -122.41864275311441, "name": "Russian Hill's Panoramic Penthouse!", "price": 215, "type": "Private room", "rating": 7, "reviews": 17 },
+    { "lat": 37.75508912823034, "long": -122.41652825118707, "name": "Private studio in the Mission", "price": 193, "type": "Entire home/apt", "rating": 5, "reviews": 2 },
+    { "lat": 37.79622481067421, "long": -122.4127621205569, "name": "Nob Hill room with a great view", "price": 141, "type": "Entire home/apt", "rating": 4, "reviews": 8 },
+    { "lat": 37.74703281054805, "long": -122.43494481172067, "name": "Noe Valley", "price": 140, "type": "  Private room", "rating": 7.5, "reviews": 41 },
+    { "lat": 37.74035266735406, "long": -122.45318830336936, "name": "Cozy studio with Private entrance", "price": 119, "type": "Entire home/apt", "rating": 6.5, "reviews": 12 },
+    { "lat": 37.775449180732885, "long": -122.4400540816836, "name": "Victorian Penthouse Master Suite", "price": 174, "type": "Entire home/apt", "rating": 6, "reviews": 61 },
+    { "lat": 37.788887663369096, "long": -122.43797568434313, "name": "Quaint lower pac apartment", "price": 122, "type": "Entire home/apt", "rating": 9, "reviews": 19 },
+    { "lat": 37.711811918417375, "long": -122.45916787310927, "name": "Master Bedroom near Public Transit", "price": 105, "type": "Entire home/apt", "rating": 2, "reviews": 24 }
+  ]
+}

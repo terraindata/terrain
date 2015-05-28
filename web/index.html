@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en" ng-app="terrainApp">
+<!--<![endif]-->
+<head>
+	<meta charset="utf-8" />
+	<title>Terrain Admin | Dashboard</title>
+	<link rel="icon" type="image/png" href="assets/img/Terrain_Icon.jpeg">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+	<meta content="" name="description" />
+	<meta content="" name="author" />
+	
+	<!-- ================== BEGIN BASE CSS STYLE ================== -->
+	<!-- <link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" /> -->
+	<link href="assets/color-admin/plugins/jquery-ui/themes/base/minified/jquery-ui.min.css" rel="stylesheet" />
+	<link href="assets/color-admin/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="assets/color-admin/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+	<link href="assets/color-admin/css/animate.min.css" rel="stylesheet" />
+	<link href="assets/color-admin/css/style.css" rel="stylesheet" />
+	<link href="assets/color-admin/css/style-responsive.css" rel="stylesheet" />
+	<link href="assets/color-admin/css/theme/default.css" rel="stylesheet" id="theme" />
+	<!-- ================== END BASE CSS STYLE ================== -->
+	
+	<!-- ================== BEGIN PAGE LEVEL STYLE ================== -->
+	<link href="assets/color-admin/plugins/jquery-jvectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" />
+	<link href="assets/color-admin/plugins/bootstrap-datepicker/css/datepicker.css" rel="stylesheet" />
+	<link href="assets/color-admin/plugins/bootstrap-datepicker/css/datepicker3.css" rel="stylesheet" />
+    <link href="assets/color-admin/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+	<!-- ================== END PAGE LEVEL STYLE ================== -->
+	
+	<!-- ================== BEGIN BASE JS ================== -->
+	<script src="assets/color-admin/plugins/pace/pace.min.js"></script>
+	<!-- ================== END BASE JS ================== -->
+
+	<!-- ================== BEGIN TERRAIN CUSTOM ================== -->
+	<link rel="stylesheet" href="assets/terrain.css">
+	<link rel="stylesheet" href="barline.css">
+	<link rel="stylesheet" href="slicer.css">
+	<link rel="stylesheet" href="assets/css/terrain-autocomplete.css">
+
+	<script src="jquery.js"></script>
+	<script src="assets/js/terrain-config.js"></script>
+	<script src="barline.js"></script>
+	<script src="slicer.js"></script>
+	<script src="assets/js/angular.min.js"></script>
+	<script src="assets/js/d3.angular.js"></script>
+	<script src="assets/js/node_modules/angular-route/angular-route.min.js"></script>
+	<script src="assets/js/terrain.js"></script>
+	<script src="assets/js/terrain-app.js"></script>
+	<script src="assets/js/terrain-autocomplete.angular.js"></script>
+	<script src="assets/js/terrain-barline.angular.js"></script>
+	<script src="assets/js/terrain-slicer.angular.js"></script>
+	<script src="assets/js/terrain-controllers.js"></script>
+	<script src="assets/js/terrain-directives.js"></script>
+	<!-- ================== END TERRAIN CUSTOM ================== -->
+</head>
+<body>
+	<!-- begin #page-loader -->
+	<div id="page-loader" class="fade in"><span class="spinner"></span></div>
+	<!-- end #page-loader -->
+	
+	<!-- begin #page-container -->
+	<div id="page-container" class="fade page-sidebar-fixed in page-header-fixed">
+		<!-- begin #header -->
+		<div id="header" class="header navbar navbar-default navbar-fixed-top">
+			<!-- begin container-fluid -->
+			<div class="container-fluid">
+				<!-- begin mobile sidebar expand / collapse button -->
+				<div class="navbar-header">
+					<a href="index.html" class="navbar-brand"><span class="navbar-logo"></span></a>
+					<button type="button" class="navbar-toggle" data-click="sidebar-toggled">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+				</div>
+				<!-- end mobile sidebar expand / collapse button -->
+				
+				<!-- begin header navigation right -->
+				<ul class="nav navbar-nav navbar-right">
+					<li class="dropdown navbar-user">
+						<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+							<img src="assets/img/jack-shephard.jpg" alt="" /> 
+							<span class="hidden-xs">Jack Shephard</span> <b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu animated fadeInLeft">
+							<li class="arrow"></li>
+							<li><a href="javascript:;">Edit Profile</a></li>
+							<li><a href="javascript:;"><span class="badge badge-danger pull-right">2</span> Inbox</a></li>
+							<li><a href="javascript:;">Settings</a></li>
+							<li class="divider"></li>
+							<li><a href="javascript:;">Log Out</a></li>
+						</ul>
+					</li>
+				</ul>
+				<!-- end header navigation right -->
+			</div>
+			<!-- end container-fluid -->
+		</div>
+		<!-- end #header -->
+		
+		<!-- begin #sidebar -->
+		<div id="sidebar" class="sidebar always-fixed">
+			<!-- begin sidebar scrollbar -->
+			<div data-scrollbar="true" data-height="100%">
+				<!-- begin sidebar nav -->
+				<ul class="nav">
+					<!-- <li class="nav-header">Navigation</li> -->
+					<li class="first-nav">
+						<a href="#/home">
+						    <i class="fa fa-home"></i>
+							<span class="badge pull-right">4</span>
+						    <span>Home</span>
+					    </a>
+					</li>
+					<li class="">
+						<a href="#/dashboard">
+							<i class="fa fa-dashboard"></i> 
+							<span>Dashboard</span>
+						</a>
+					</li>
+					<li class="">
+						<a href="#/builder">
+						    <i class="fa fa-area-chart"></i>
+						    <span>Query Builder</span> 
+						</a>
+					</li>
+					<li class="">
+						<a href="#/tql">
+						    <i class="fa fa-align-left"></i>
+						    <span>TQL</span> 
+						</a>
+					</li>
+					<li class="">
+						<a href="#/settings">
+						    <i class="fa fa-cogs"></i>
+						    <span>Settings</span>
+						</a>
+					</li>
+			        <!-- begin sidebar minify button -->
+					<li><a href="javascript:;" class="sidebar-minify-btn" data-click="sidebar-minify"><i class="fa fa-angle-double-left"></i></a></li>
+			        <!-- end sidebar minify button -->
+				</ul>
+				<!-- end sidebar nav -->
+			</div>
+			<!-- end sidebar scrollbar -->
+		</div>
+		<div class="sidebar-bg"></div>
+		<!-- end #sidebar -->
+		
+		<div ng-view class="content content-showing"></div>
+
+		<div id="home-content" class="content">
+			<h1 class="page-header placeholder-header">Home page goes here.</h1>
+		</div>
+		<div id="dashboard-content" class="content">
+			<h1 class="page-header placeholder-header">Dashboard page goes here.</h1>
+		</div>
+		<div id="tql-content" class="content">
+			<h1 class="page-header placeholder-header">TQL page goes here.</h1>
+		</div>
+		<div id="settings-content" class="content">
+			<h1 class="page-header placeholder-header">Settings page goes here.</h1>
+		</div>
+		
+		<!-- begin scroll to top btn -->
+		<a href="javascript:;" class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade" data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
+		<!-- end scroll to top btn -->
+	</div>
+	<!-- end page container -->
+	
+	<!-- ================== BEGIN BASE JS ================== -->
+	<script src="assets/color-admin/plugins/jquery/jquery-1.9.1.min.js"></script>
+	<script src="assets/color-admin/plugins/jquery/jquery-migrate-1.1.0.min.js"></script>
+	<script src="assets/color-admin/plugins/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+	<script src="assets/color-admin/plugins/bootstrap/js/bootstrap.min.js"></script>
+	<!--[if lt IE 9]>
+		<script src="assets/color-admin/crossbrowserjs/html5shiv.js"></script>
+		<script src="assets/color-admin/crossbrowserjs/respond.min.js"></script>
+		<script src="assets/color-admin/crossbrowserjs/excanvas.min.js"></script>
+	<![endif]-->
+	<script src="assets/color-admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+	<script src="assets/color-admin/plugins/jquery-cookie/jquery.cookie.js"></script>
+	<!-- ================== END BASE JS ================== -->
+	
+	<!-- ================== BEGIN PAGE LEVEL JS ================== -->
+	<script src="assets/color-admin/plugins/gritter/js/jquery.gritter.js"></script>
+	<script src="assets/color-admin/plugins/flot/jquery.flot.min.js"></script>
+	<script src="assets/color-admin/plugins/flot/jquery.flot.time.min.js"></script>
+	<script src="assets/color-admin/plugins/flot/jquery.flot.resize.min.js"></script>
+	<script src="assets/color-admin/plugins/flot/jquery.flot.pie.min.js"></script>
+	<script src="assets/color-admin/plugins/sparkline/jquery.sparkline.js"></script>
+	<script src="assets/color-admin/plugins/jquery-jvectormap/jquery-jvectormap-1.2.2.min.js"></script>
+	<script src="assets/color-admin/plugins/jquery-jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+	<script src="assets/color-admin/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+	<script src="assets/color-admin/js/dashboard.js"></script>
+	<script src="assets/color-admin/js/apps.min.js"></script>
+	<!-- ================== END PAGE LEVEL JS ================== -->
+	
+	<script>
+		$(document).ready(function() {
+			App.init();
+			Dashboard.init();
+			$('.sidebar-minify-btn').click();
+		});
+	</script>
+</body>
+</html>
