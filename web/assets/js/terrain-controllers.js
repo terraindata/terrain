@@ -64,47 +64,120 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		return CARD_COLORS[$scope.colorIndex ++];
 	}
 
-	// $http.get('phones/phones.json').success(function(data) {
- //      $scope.cards = data;
- //    });
+	$scope.cardForKey = function(key) {
+		return $scope.getAllCards().reduce(function(card, candidate) {
+			if(candidate.key === key)
+				return candidate;
+			return card;
+		}, null);
+	}
+
+	$scope.addRawScoreToCardWithKey = function(key, score) {
+		// there must be a better way to do this
+		var card = $scope.cardForKey(key);
+		if(!card) { console.log('ERROR adding raw score to nonexistent card'); return; }
+		card.data.raw = card.data.raw || [];
+      	card.data.raw.push(score);
+	}
+
+	$scope.search = {
+		lat: 37.782,
+		long: -122.438
+	};
+
+	$scope.getAllCards = function() {
+		// silly design decision. TODO make the cards as one variable and adjust accordingly
+		return $scope.cards.concat($scope.newCards);
+	}
+
+	$http.get('assets/ajax/airbnb.json').success(function(response) {
+      	$scope.results = response.data;
+      	$.each($scope.results, function(index) {
+      		var result = this;
+
+      		/* Locations */
+      		var locScore = latLongToDistance(this.lat, this.long, $scope.search.lat, $scope.search.long); //Math.pow(this.lat - $scope.search.lat, 2) + Math.pow(this.long - $scope.search.long, 2);
+      		// TODO make sense of the ridiculous number of different location types
+      		var locationKeys = ['location', 'location_map', 'location_radius', 'location_mapradius', 'location_latlong'];
+      		$.each(locationKeys, function(i,key) {
+      			result[key] = locScore;
+      			$scope.addRawScoreToCardWithKey(key, locScore);
+      		});
+
+      		/* add any more calculated result values here, as they come up, if they are not pre-calculated in the response */
+
+      		// sooo inefficient omg omg
+      		$.each($scope.getAllCards(), function() {
+      			var card = this;
+      			if(card.inDataResponse) {
+      				$scope.addRawScoreToCardWithKey(card.key, result[card.key]);
+      			}
+      		});
+      	});
+
+    });
 
 	$scope.cards = [{
 		id: 0,
 		name: 'Location',
+		key: 'location',
 		color: $scope.getColor(),
 		data: {
-			labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
-			bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
+			// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
+			// bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
+			xLabelFormat: function(i, value, isMaxpoint) {
+				return (isMaxpoint ? "> " : "") + (Math.floor(value * 100) / 100) + " mi";
+			},
+			domain: [0,5, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
+			numberOfBars: 9,
 			barRange: [0,20],
 			points: [1, 0.96, 0.84, 0.64, 0.3599999999999999],
+			// points: 5,
 			pointRange: [0,1],
 			barToPointRatio: 2
 		},
 		weight: 50,
-		newCardIsShowing: true
+		newCardIsShowing: true,
+		showing: true
 	}, {
 		id: 1,
 		name: 'Price',
+		key: 'price',
+		inDataResponse: true,
 		color: $scope.getColor(),
 		data: {
-			labels: ["$0", "$100", "$200", "$300", "$400", "$500", "$600", "$700", "$800", ">$800"],
-			bars: [0.44,0.65,1.0,0.58,0.68,0.38,0.24,0.12,0.22],
+			// labels: ["$0", "$50", "$100", "$150", "$200", "$250", "$300", "$350", "$400", ">$400"],
+			// bars: [0.44,0.65,1.0,0.58,0.68,0.38,0.24,0.12,0.22],
+			xLabelFormat: function(i, value, isMaxpoint) {
+				return (isMaxpoint ? "> " : "") + "$" + (Math.floor(value));
+			},
+			domain: [0,400, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
+			numberOfBars: 9,
 			barRange: [0,20],
 			points: [0.64, 0.67, 0.90, 1, 0.3599999999999999].reverse(),
+			// points: 5,
 			pointRange: [0,1],
 			barToPointRatio: 2
 		},
 		weight: 50,
-		newCardIsShowing: false
+		newCardIsShowing: false,
+		showing: true
 	}];
 
 	$scope.newCards = [
 		{
 			id: 2,
-			name: 'Rating',
+			name: 'Average Rating',
+			key: 'rating',
+			inDataResponse: true,
 			data: {
-				labels: ["0 Stars", "1 Star", "2 Stars", "3 Stars", "4 Stars", "5 Stars"],
-				bars: [0.44,0.65,1.0,0.58,0.68],
+				// labels: ["0 Stars", "1 Star", "2 Stars", "3 Stars", "4 Stars", "5 Stars"],
+				// bars: [0.44,0.65,1.0,0.58,0.68],
+				xLabelFormat: function(i, value, isMaxpoint) {
+					return (isMaxpoint ? "> " : "") + (value) + " Stars";
+				},
+				domain: [0,5, false], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
+				numberOfBars: 5,
 				barRange: [0,40],
 				points: [1, 0.96, 0.84, 0.64, 0.3599999999999999].reverse(),
 				pointRange: [0,1],
@@ -115,27 +188,20 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			suggested: true
 		},
 		{
-			name: 'Reviews',
-			id: 3,
-			data: {
-				labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-				bars: [0.07, 0.27, 0.24, 0.17, 0.47, 1.0, 0.63, 0.5, 0.35],
-				barRange: [0,20],
-				points: [0.2,0.4,0.6,0.8,1],
-				pointRange: [0,1],
-				barToPointRatio: 2
-			},
-			weight: 10,
-			newCardIsShowing: false,
-			suggested: true
-		}, {
-			name: 'Bedrooms',
+			name: 'Number of Bedrooms',
+			key: 'bedrooms',
+			inDataResponse: true,
 			id: 4,
 			data: {
-				labels: ["0", "1", "2", "3", "4+"],
-				bars: [0.27, 0.87, 1, 0.47, 0.17],
+				// labels: ["0", "1", "2", "3", "4+"],
+				// bars: [0.27, 0.87, 1, 0.47, 0.17],
+				xLabelFormat: function(i, value, isMaxpoint) {
+					return (isMaxpoint ? "> " : "") + (Math.floor(value));
+				},
+				domain: [0,3, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
+				numberOfBars: 4,
 				barRange: [0,20],
-				points: [0.75, 0.75, 0.75, 0.75, 0.75],
+				points: [0.75, 0.75, 0.75, 0.75],
 				pointRange: [0,1],
 				barToPointRatio: 1
 			},
@@ -144,12 +210,18 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			suggested: true
 		}, {
 			name: 'Number of Stays',
+			key: 'stays',
+			inDataResponse: true,
 			id: 5,
 			data: {
-				labels: ["0", "10", "25", "100", "250", "1000", "2500", ">2500"],
-				bars: [0.37, 0.47, 1, 0.87, 0.47, 0.27, 0.17],
-				barRange: [0,20],
-				points: [1, 0.96, 0.84, 0.64].reverse(),
+				// labels: ["0", "10", "25", "100", "250", "1000", "2500", ">2500"],
+				// bars: [0.37, 0.47, 1, 0.87, 0.47, 0.27, 0.17],
+				xLabelFormat: function(i, value, isMaxpoint) {
+					return (isMaxpoint ? "> " : "") + (Math.floor(value));
+				},
+				domain: [0,200, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
+				numberOfBars: 9,
+				points: [1, 0.96, 0.84, 0.64, 0.64].reverse(),
 				pointRange: [0,1],
 				barToPointRatio: 2
 			},
@@ -158,12 +230,18 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			suggested: true
 		}, {
 			name: 'Number of Reviews',
+			key: 'reviews',
+			inDataResponse: true,
 			id: 6,
 			data: {
-				labels: ["0", "10", "25", "100", "250", "1000", "2500", ">2500"],
-				bars: [0.47, 0.87, 1, 0.97, 0.39, 0.32, 0.12],
-				barRange: [0,20],
-				points: [0.4, 0.6, 0.8, 1],
+				// labels: ["0", "10", "25", "100", "250", "1000", "2500", ">2500"],
+				// bars: [0.47, 0.87, 1, 0.97, 0.39, 0.32, 0.12],
+				xLabelFormat: function(i, value, isMaxpoint) {
+					return (isMaxpoint ? "> " : "") + (Math.floor(value));
+				},
+				domain: [0,100, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
+				numberOfBars: 9,
+				points: [0.4, 0.4, 0.6, 0.8, 1],
 				pointRange: [0,1],
 				barToPointRatio: 2
 			},
@@ -172,11 +250,16 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			suggested: true
 		}, {
 			id: 7,
-			name: 'Location_Map',
+			name: 'Location (Map)',
+			key: 'location_map',
 			data: {
-				labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
-				bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
-				barRange: [0,20],
+				// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
+				// bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
+				xLabelFormat: function(i, value, isMaxpoint) {
+					return (isMaxpoint ? "> " : "") + (Math.floor(value * 100) / 100) + " mi";
+				},
+				domain: [0,5, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
+				numberOfBars: 9,
 				points: [1, 0.96, 0.84, 0.64, 0.3599999999999999],
 				pointRange: [0,1],
 				barToPointRatio: 2
@@ -186,11 +269,16 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			suggested: false
 		}, {
 			id: 8,
-			name: 'Location_MapRadius',
+			name: 'Location (MapRadius)',
+			key: 'location_mapradius',
 			data: {
-				labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
-				bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
-				barRange: [0,20],
+				// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
+				// bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
+				xLabelFormat: function(i, value, isMaxpoint) {
+					return (isMaxpoint ? "> " : "") + (Math.floor(value * 100) / 100) + " mi";
+				},
+				domain: [0,5, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
+				numberOfBars: 9,
 				points: [1, 0.96, 0.84, 0.64, 0.3599999999999999],
 				pointRange: [0,1],
 				barToPointRatio: 2
@@ -200,11 +288,16 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			suggested: false
 		}, {
 			id: 9,
-			name: 'Location_Radius',
+			name: 'Location (Radius)',
+			key: 'location_radius',
 			data: {
-				labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
-				bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
-				barRange: [0,20],
+				// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
+				// bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
+				xLabelFormat: function(i, value, isMaxpoint) {
+					return (isMaxpoint ? "> " : "") + (Math.floor(value * 100) / 100) + " mi";
+				},
+				domain: [0,5, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
+				numberOfBars: 9,
 				points: [1, 0.96, 0.84, 0.64, 0.3599999999999999],
 				pointRange: [0,1],
 				barToPointRatio: 2
@@ -214,11 +307,16 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			suggested: false
 		}, {
 			id: 10,
-			name: 'Location_LatLong',
+			name: 'Location (LatLong)',
+			key: 'location_latlong',
 			data: {
-				labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
-				bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
-				barRange: [0,20],
+				// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
+				// bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
+				xLabelFormat: function(i, value, isMaxpoint) {
+					return (isMaxpoint ? "> " : "") + (Math.floor(value * 100) / 100) + " mi";
+				},
+				domain: [0,5, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
+				numberOfBars: 9,
 				points: [1, 0.96, 0.84, 0.64, 0.3599999999999999],
 				pointRange: [0,1],
 				barToPointRatio: 2
@@ -267,6 +365,38 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 
 	$scope.handleChange = function(cardId) {
 		$scope.$apply();
+	}
+
+	$scope.scoreForResult = function(result) {
+		var total = 0;
+		$.each($scope.cards, function(index, card) {
+			var data = card.data;
+
+			// TODO replace by a better bucket getter if you redo buckets
+			var bucketStart = data.domain[0];
+			var bucketEnd = data.domain[1];
+			var bucketSize = (bucketEnd - bucketStart) / data.numberOfBars;
+			var bucket = 0;
+			while(result[card.key] > bucketStart + bucketSize * bucket && bucket < data.numberOfBars) bucket ++;
+			bucket --; // we overshot it
+
+			var pointValue = (data.points[Math.floor(bucket / data.barToPointRatio)] + data.points[Math.ceil(bucket / data.barToPointRatio)]) / 2;
+			total += pointValue * card.weight / 100;
+		});
+		return total; 
+	}
+
+	$scope.scoreForResultDisplay = function(result) {
+		var score = Math.floor($scope.scoreForResult(result) * 1000) / 1000;
+		if(score == 1) return "1.00";
+		score = ("" + score).substr(1);
+		while(score.length < 4) score = score + "0";
+		return score;
+	}
+
+	$scope.scoreForResultSort = function(result) {
+		// sorts low to hi and doesn't seem like you can control it from the template
+		return -1 * $scope.scoreForResult(result);
 	}
 }]);
 

@@ -1,43 +1,72 @@
-<div class="row">
-	<div class="col-sm-3 col-xs-12">
+<div class="row builder-row">
+	<div class="col-sm-2 col-xs-12 main-column">
 		<h1 class="page-header">Inputs</h1>
-		<small>Goes here...</small>
-	</div>
-	<div class="col-sm-6 col-xs-12">
-		<h1 class="page-header">Builder</h1>
-		<div class="all-weights" ng-show="ab('weights')">
-			<div class="weight" d3-slicer data="cards" on-change="handleChange(cardId)" card-id="-1"></div>
+		<div class="fixed-area">
+			<small>Goes here...</small>
 		</div>
-		<div ng-repeat="card in cards">
-			<div class="pre-card">
-				<div class="new-card card" ng-show="card.newCardIsShowing">
-					<div class="card-title">
-						New Card
-						<a ng-click="card.newCardIsShowing = false" class="pull-right small"> Hide </a>
+	</div>
+	<div class="col-sm-6 col-xs-12 main-column">
+		<h1 class="page-header">Builder</h1>
+		<div class="fixed-area builder-area">
+			<div class="all-weights" ng-show="ab('weights')">
+				<div class="weight" d3-slicer data="cards" on-change="handleChange(cardId)" card-id="-1"></div>
+			</div>
+			<div ng-repeat="card in cards">
+				<div class="pre-card">
+					<div class="new-card card" ng-show="card.newCardIsShowing">
+						<div class="card-title">
+							New Card
+							<a ng-click="card.newCardIsShowing = false" class="pull-right small"> Hide </a>
+						</div>
+						<div  tdb-autocomplete data="newCards" on-select="addCardAndApply(newCard, card)">
+						</div>
+						<div class="new-card-suggestions-area">
+							<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion" ng-click="addCard(suggestion, card)">
+								+ {{suggestion.name}}
+							</a>
+						</div>
 					</div>
-					<div  tdb-autocomplete data="newCards" on-select="addCardAndApply(newCard, card)">
-					</div>
-					<div class="new-card-suggestions-area">
-						<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion" ng-click="addCard(suggestion, card)">
-							+ {{suggestion.name}}
-						</a>
+					<a class="new-card-plus-area" ng-hide="card.newCardIsShowing">
+						<div ng-click="card.newCardIsShowing = true" class="new-card-plus">
+							+
+						</div>
+					</a>
+				</div>
+				<div class="card">
+					<div class="card-title">{{card.name}}</div>
+					<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}"></div>
+					<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-4 col-xs-12 results-column main-column">
+		<h1 class="page-header">Results</h1>
+		<div class="results-area fixed-area">
+			<div class="result" ng-repeat="result in results | orderBy: scoreForResultSort">
+				<div class="result-inner">
+					<div class="result-score">{{scoreForResultDisplay(result)}}</div>
+					<div class="result-img" style="background-image:url('assets/img/data/{{result.id}}.jpg');"></div>
+					<div class="result-text">
+						<div class="result-name">{{result.name}}</div>
+						<div class="result-info row">
+							<div class="result-rating col-xs-6">
+								<div class="result-stars">
+									<div ng-class="result.rating >= 1 ? 'result-star-shown' : 'result-star-hidden'"></div>
+									<div ng-class="result.rating >= 2 ? 'result-star-shown' : 'result-star-hidden'"></div>
+									<div ng-class="result.rating >= 3 ? 'result-star-shown' : 'result-star-hidden'"></div>
+									<div ng-class="result.rating >= 4 ? 'result-star-shown' : 'result-star-hidden'"></div>
+									<div ng-class="result.rating >= 5 ? 'result-star-shown' : 'result-star-hidden'"></div>
+								</div>
+								<div class="result-rating-value">({{result.rating}})</div>
+							</div>
+							<div class="result-stays col-xs-4">{{result.stays}} Stays</div>
+							<div class="result-price col-xs-2">${{result.price}}</div>
+						</div>
+						<div class="result-description">{{result.description}}</div>
 					</div>
 				</div>
-				<a class="new-card-plus-area" ng-hide="card.newCardIsShowing">
-					<div ng-click="card.newCardIsShowing = true" class="new-card-plus">
-						+
-					</div>
-				</a>
-			</div>
-			<div class="card">
-				<div class="card-title">{{card.name}}</div>
-				<div class="graph" rel="{{card.id}}" d3-bars data="card.data" color="{{card.color}}" bar-height="20" bar-padding="5"></div>
-				<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
 			</div>
 		</div>
-	</div>
-	<div class="col-sm-3 col-xs-12">
-		<h1 class="page-header">Results</h1>
-		<small>Goes here...</small>
 	</div>
 </div>

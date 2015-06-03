@@ -138,3 +138,161 @@ a {
 	/*color: #aaa;*/
 	padding-top: 150px;
 }
+
+.page-header {
+	font-size: 24px;
+  margin: 0 0 20px;
+  padding: 0;
+  border: none;
+  line-height: 28px;
+  background: #2d353c;
+  color: #e8ecf1;
+  margin: 0px -10px;
+  padding-left: 15px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  /* margin-bottom: 10px; */
+  font-weight: 200;
+  margin-top: -20px;
+  border-left: rgba(0,0,0,0.15) solid 1px;
+  border-bottom: rgba(0,0,0,0.15) solid 1px;
+}
+
+.main-column {
+
+}
+
+.fixed-area {
+	position: fixed;
+	/*right: 0;*/
+	height: 100%;
+	overflow: scroll;
+	padding-bottom: 110px;
+}
+
+.card {
+	min-width: 680px;
+}
+
+.weight, .graph {
+	width: 100%;
+}
+
+/* RESULTS */
+
+.main-column {
+	padding-right: 0px !important;
+	/*position: relative;*/
+}
+
+.builder-row {
+	margin-right: -20px !important;
+	margin-left: -25px !important;
+}
+
+.results-area {
+	line-height: 0px;
+}
+
+.builder-area {
+	padding-top: 5px;
+}
+
+.result {
+	display: inline-block;
+	height: 220px;
+	width: 50%;
+	padding: 5px;
+	overflow: hidden;
+	line-height: normal;
+	border-radius: 3px;
+}
+
+.result-inner {
+	background: #fff;
+	border-radius: 3px;
+	height: 220px;
+	padding-bottom: 10px;
+	overflow: hidden;
+	position: relative;
+}
+
+.result-img {
+	width: 100%;
+	height: 100px;
+	background-size: cover;
+	background-position-y: center;
+}
+
+.result-text {
+	padding: 10px;
+}
+
+.result-name {
+	font-size: 1.2em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	width: 100%;
+	/*height: 40px;*/
+}
+
+.result-info {
+	padding-top: 5px;
+	margin: 0px !important;
+}
+
+.result-rating, .result-stars, .result-rating-value, .result-stays, .result-price {
+	display: inline-block;
+	padding: 0px !important;
+}
+
+.result-star-shown, .result-star-hidden {
+	display: inline-block;
+	background: #ddd;
+	width: 0.8em;
+	height: 0.8em;
+	border-radius: 0.4em;
+}
+
+.result-star-shown {
+	background: #ffa747;
+}
+
+.result-rating-value {
+	/*margin-right: 5px;*/
+}
+
+.result-rating, .result-stays {
+	padding-top: 0.225em !important;
+}
+
+.result-price {
+	/*margin-left: 5px;*/
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+.result-description {
+	margin-top: 5px;
+	overflow: scroll;
+	line-height: 1em; /* standardize line height so that we can get height to clip between lines */
+	height: 4.1em; /* clip after four lines */
+}
+
+.result-score {
+	position: absolute;
+	background: rgba(0,0,0,0.5);
+	left: 0px;
+	top: 0px;
+	font-size: 18px;
+	padding: 5px;
+	color: #fff;
+	border-bottom-right-radius: 5px;
+	width: 70px;
+	text-align: right;
+	font-weight: 100;
+	letter-spacing: 1px;
+}
+
+

@@ -46,10 +46,10 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		return {
     	restrict: 'EA', // (E)lement or (A)trribute
     	scope: {
-	        data: '=' // bi-directional data-binding
+	        data: '=', // bi-directional data-binding
+	        onChange: '&'  // parent execution binding
 	    },
 	    link: function(scope, ele, attrs) {
-
 	    	var opts = $.extend( {
 	    		color: "#aaa",
 	    		strokeWidth: 3,
@@ -66,136 +66,183 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 
 	    	var data = scope.data;
 
-	// scope.$watch('data', function(newData) {
-	//     scope.render(newData);
-	//   }, true);
+	var pointColor = opts.pointColor ? opts.pointColor : "#fff",
+	barColor = d3.rgb(opts.color),
+	strokeColor = opts.strokeColor ? opts.strokeColor : d3.rgb(opts.color).darker(1.25);
 
-var pointColor = opts.pointColor ? opts.pointColor : "#fff",
-barColor = d3.rgb(opts.color),
-strokeColor = opts.strokeColor ? opts.strokeColor : d3.rgb(opts.color).darker(1.25);
+	var pointRadius = opts.pointRadius + opts.strokeWidth;
+	var bottomMargin = opts.height * 0.1,
+	topMargin = pointRadius * 2,
+	leftMargin = 30,
+	rightMargin = 40;
 
-var pointRadius = opts.pointRadius + opts.strokeWidth;
+	var workingHeight = opts.height - bottomMargin - topMargin,
+	workingWidth  = opts.width - leftMargin - rightMargin;
 
-var numPoints = data.bars.length;
-var bottomMargin = opts.height * 0.1,
-topMargin = pointRadius * 2,
-leftMargin = 30,
-rightMargin = 40;
+	var minY = topMargin,
+	maxY = topMargin + workingHeight,
+	minX = leftMargin,
+	maxX = rightMargin + workingWidth;
 
-var workingHeight = opts.height - bottomMargin - topMargin,
-workingWidth  = opts.width - leftMargin - rightMargin;
+	var numPoints = data.numberOfBars;
+	var barWidth = workingWidth / numPoints * opts.barWidth;
 
-var minY = topMargin,
-maxY = topMargin + workingHeight,
-minX = leftMargin,
-maxX = rightMargin + workingWidth;
+	var yPointScale = d3.scale.linear()
+	.domain(data.pointRange.reverse())
+	.range([0, workingHeight]);
 
-var barWidth = workingWidth / numPoints * opts.barWidth;
+	var xScale = d3.scale.linear()
+	.domain([0,numPoints])
+	.range([0, workingWidth]);
 
-var yBarScale = d3.scale.linear()
-.domain(data.barRange.reverse())
-.range([0, workingHeight]);
+	var svg = d3.select(ele[0])
+	.append("svg")
+	.attr("background", "#000")
+	.attr("width", opts.width)
+	.attr("height", opts.height);
 
-var yPointScale = d3.scale.linear()
-.domain(data.pointRange.reverse())
-.range([0, workingHeight]);
+	var scaleArea = svg.append("g");
+	var barArea = svg.append("g");
 
-var xScale = d3.scale.linear()
-.domain([0,numPoints])
-.range([0, workingWidth]);
+	function barStartingX(i) {
+		return i / numPoints * workingWidth + (workingWidth / numPoints - barWidth) / 2 + leftMargin;
+	}
 
-var svg = d3.select(ele[0])
-.append("svg")
-.attr("background", "#000")
-.attr("width", opts.width)
-.attr("height", opts.height);
+	function pointX(i) {
+		var barOffset = 0;
+		if(data.barToPointRatio > 1)
+			barOffset = barStartingX(0);
+		return barStartingX(i) * data.barToPointRatio + (barWidth) / 2 - barOffset;
+	}
 
-function barStartingX(i) {
-	return i / numPoints * workingWidth + (workingWidth / numPoints - barWidth) / 2 + leftMargin;
-}
+	function barStartingY(d) {
+		return topMargin + workingHeight * (1 - d);
+	}
 
-function pointX(i) {
-	var barOffset = 0;
-	if(data.barToPointRatio > 1)
-		barOffset = barStartingX(0);
-	return barStartingX(i) * data.barToPointRatio + (barWidth) / 2 - barOffset;
-}
+	function pointY(d) {
+		return barStartingY(d) - pointRadius / 2;
+	}
 
-function barStartingY(d) {
-	return topMargin + workingHeight * (1 - d);
-}
+	scope.$watch('data', function(newData) {
+		$(barArea).find('.bar').remove();
 
-function pointY(d) {
-	return barStartingY(d) - pointRadius / 2;
-}
+		var data = newData; // local scope
+		data.bars = [];
+		for(var i = 0; i < data.numberOfBars; i++) data.bars.push(0);
+		var bucketExtremes = data.domain.length > 2 && data.domain[2]; 
+		// if the third element in domain is 'true', leave the last bar as a 'catch-all-greater'
+		var numBuckets = bucketExtremes ? data.numberOfBars - 1 : data.numberOfBars;
+		
+		$.each(data.raw, function(i, val) {
+			// TODO use d3 domain functions
+			var bucket = Math.floor((val - data.domain[0]) / (data.domain[1] - data.domain[0]) * numBuckets);
+			if(bucket > numBuckets) {
+				if(bucketExtremes)
+					data.bars[numBuckets - 1] ++;
+				// else drop
+			} else if (bucket < 0) {
+				// TODO support lower extremes
+			} else {
+				data.bars[bucket] ++;
+			}
+		});
 
-svg.selectAll("rect")
-.data(data.bars)
-.enter()
-.append("rect")
-.attr("x", function(d, i) {
-	return barStartingX(i);
-})
-.attr("y", function(d, i) {
-	if(d)
-		return barStartingY(d);
-	return 0;
-})
-.attr("width", function(d, i) {
-	return barWidth;
-})
-.attr("height", function(d, i) {
-	if(d)
-		return workingHeight * d;
-	return 0;
-})
-.attr("fill", function(d, i) {
-	return barColor;
-})
-.attr("class", function(d, i) {
-	return "bar_" + i;
-});
+		var maxValue = d3.max(data.bars, function(d) {
+			return d;
+		});
 
-	// MARK: Axes
+		for(var i = 0; i < data.bars.length; i ++)
+			data.bars[i] /= maxValue;
+		
+	    barArea.selectAll("rect")
+			.data(data.bars)
+			.enter()
+			.append("rect")
+			.attr("x", function(d, i) {
+				return barStartingX(i);
+			})
+			.attr("y", function(d, i) {
+				if(d)
+					return barStartingY(d);
+				return 0;
+			})
+			.attr("width", function(d, i) {
+				return barWidth;
+			})
+			.attr("height", function(d, i) {
+				if(d)
+					return workingHeight * d;
+				return 0;
+			})
+			.attr("fill", function(d, i) {
+				return barColor;
+			})
+			.attr("class", function(d, i) {
+				return "bar bar_" + i;
+			});
 
-	var yBarAxis = d3.svg.axis()
-	.scale(yBarScale)
-	.orient("left")
-	.ticks(5);
-	svg.append("g")
-	.attr("class", "axis y-axis y-bar-axis")
-	.attr("transform", "translate("+leftMargin+","+topMargin+")")
-	.call(yBarAxis);
+		// TODO remove scales on update so you don't have overlapping scales
 
-	var yPointAxis = d3.svg.axis()
-	.scale(yPointScale)
-	.orient("right")
-	.ticks(5)
-	.tickFormat(opts.pointLabelFormat);
-	svg.append("g")
-	.attr("class", "axis y-axis y-point-axis")
-	.attr("transform", "translate("+(workingWidth + leftMargin)+","+topMargin+")")
-	.call(yPointAxis);
+		// MARK: Axes
 
-	var xAxis = d3.svg.axis()
-	.scale(xScale)
-	.orient("bottom")
-	.ticks(numPoints)
-	.tickFormat(function(d,i) {
-		return data.labels[i];
-	});
-	svg.append("g")
-	.attr("class", "axis xAxis")
-	.attr("transform", "translate("+leftMargin+","+(workingHeight + topMargin)+")")
-	.call(xAxis);
+		scaleArea.selectAll("*").remove();
 
+		var barXScale = d3.scale.linear()
+			.domain([0, data.numberOfBars])
+			// .domain([data.domain[0], data.domain[1]])
+			// so there's a problem where d3's axis will override the ticks argument and force a "nice" number of buckets
+			// so we can't give it the real domain but have to give it a dummy domain to force a certain number of ticks
+			// please someone figure out how to fix this please oh please
+			.range([0, workingWidth]);
+
+		var xAxis = d3.svg.axis()
+						.scale(barXScale) 
+						.orient("bottom")
+						.ticks(data.numberOfBars)
+						.tickFormat(function(d,i) {
+							return data.xLabelFormat(i, (i == data.numberOfBars && data.domain[2] ? i - 1 : i) * (data.domain[1] - data.domain[0]) / numBuckets + data.domain[0], i == data.numberOfBars && data.domain[2]);
+						});
+		scaleArea.append("g")
+			.attr("class", "axis xAxis")
+			.attr("transform", "translate("+leftMargin+","+(workingHeight + topMargin)+")")
+			.call(xAxis);
+
+		var yBarScale = d3.scale.linear()
+						.domain([0,maxValue].reverse())
+						.range([0, workingHeight]);
+
+		var yBarAxis = d3.svg.axis()
+							.scale(yBarScale)
+							.orient("left")
+							.ticks(5);
+		scaleArea.append("g")
+			.attr("class", "axis y-axis y-bar-axis")
+			.attr("transform", "translate("+leftMargin+","+topMargin+")")
+			.call(yBarAxis);
+
+
+		var yPointAxis = d3.svg.axis()
+						.scale(yPointScale)
+						.orient("right")
+						.ticks(5)
+						.tickFormat(opts.pointLabelFormat);
+		scaleArea.append("g")
+			.attr("class", "axis y-axis y-point-axis")
+			.attr("transform", "translate("+(workingWidth + leftMargin)+","+topMargin+")")
+			.call(yPointAxis);
+
+	}, true);
 
 	// MARK: Lines
 
 	var lineFunction = d3.svg.line()
 	.x(function(d,i) { return pointX(i); })
 	.y(function(d,i) { return pointY(d); })
-	.interpolate("cardinal");
+	// .interpolate("cardinal")
+	;
+
+	console.log(opts.smoothLine);
+	if(opts.smoothLine) lineFunction = lineFunction.interpolate("cardinal");
 
 	var lineGroup = svg.append('g');
 
@@ -267,11 +314,13 @@ svg.selectAll("rect")
 				var index = $(ele[0]).find("[rel=active]").attr('index');
 				data.points[index] = (workingHeight + topMargin - pos) / workingHeight; // yScale.invert(pos) / (data.barRange[1] - data.barRange[0]);
 				lineGroup.append("path")
-				.attr("d", lineFunction(data.points))
-				.attr("stroke", strokeColor)
-				.attr("stroke-width", opts.strokeWidth)
-				.attr("class", "path")
-				.attr("fill", "none");
+							.attr("d", lineFunction(data.points))
+							.attr("stroke", strokeColor)
+							.attr("stroke-width", opts.strokeWidth)
+							.attr("class", "path")
+							.attr("fill", "none");
+
+				scope.onChange({cardId: opts.cardId});
 			}
 		})
 		.on("mouseup", function() {

@@ -1,4 +1,3 @@
-var CARD_COLORS = ["#1abc9c", "#2ecc71", "#3498db", "#9b59b6", "#34495e", "#f1c40f", "#e67e22", "#e74c3c", "#16a085", "#27ae60", "#2980b9", "#8e44ad", "#2c3e50", "#f39c12", "#d35400", "#c0392b"];
 /*
 University of Illinois/NCSA Open Source License 
 
@@ -43,3 +42,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+var CARD_COLORS = ["#1abc9c", "#2ecc71", "#3498db", "#9b59b6", "#34495e", "#f1c40f", "#e67e22", "#e74c3c", "#16a085", "#27ae60", "#2980b9", "#8e44ad", "#2c3e50", "#f39c12", "#d35400", "#c0392b"];
+
+function latLongToDistance(lat1, lon1, lat2, lon2, unit) {
+	// thanks to http://www.movable-type.co.uk/scripts/latlong.html
+	var R = 3960; // miles
+	if(unit == 'km') R = 6371000; // metres
+
+	var p1 = lat1 * (Math.PI / 180);
+	var p2 = lat2 * (Math.PI / 180);
+	var dp = (lat2-lat1) * (Math.PI / 180);
+	var dL = (lon2-lon1) * (Math.PI / 180);
+
+	var a = Math.sin(dp/2) * Math.sin(dp/2) +
+	        Math.cos(p1) * Math.cos(p2) *
+	        Math.sin(dL/2) * Math.sin(dL/2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+	var d = R * c;
+	return d;
+}
