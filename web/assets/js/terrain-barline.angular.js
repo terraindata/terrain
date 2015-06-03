@@ -242,7 +242,10 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 	;
 
 	console.log(opts.smoothLine);
-	if(opts.smoothLine) lineFunction = lineFunction.interpolate("cardinal");
+	if(opts.smoothLine == 'true') {
+		console.log('yes');
+		lineFunction = lineFunction.interpolate("cardinal");
+	}
 
 	var lineGroup = svg.append('g');
 

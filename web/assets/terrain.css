@@ -1,3 +1,7 @@
+html, body, div {
+	font-family: 'Open Sans';
+}
+
 a {
 	cursor: pointer;
 }
@@ -140,7 +144,7 @@ a {
 }
 
 .page-header {
-	font-size: 24px;
+  font-size: 20px;
   margin: 0 0 20px;
   padding: 0;
   border: none;
@@ -148,14 +152,12 @@ a {
   background: #2d353c;
   color: #e8ecf1;
   margin: 0px -10px;
-  padding-left: 15px;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  /* margin-bottom: 10px; */
+  padding: 12px;
   font-weight: 200;
   margin-top: -20px;
   border-left: rgba(0,0,0,0.15) solid 1px;
   border-bottom: rgba(0,0,0,0.15) solid 1px;
+  text-transform: uppercase;
 }
 
 .main-column {
