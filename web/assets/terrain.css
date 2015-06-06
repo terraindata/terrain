@@ -297,4 +297,21 @@ a {
 	letter-spacing: 1px;
 }
 
+.result-spotlight {
+	cursor: pointer;
+	position: absolute;
+	background: rgba(0,0,0,0.5);
+	right: 5px;
+	top: 5px;
+	font-size: 14px;
+	padding: 0px 4px;
+	color: #fff;
+	border-radius: 15px;
+	font-weight: 100;
+}
+
+.result-spotlight-selected {
+	/*background: rgba(0,0,0,0.5);*/
+}
+
 

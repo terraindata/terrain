@@ -34,8 +34,21 @@
 				</div>
 				<div class="card">
 					<div class="card-title">{{card.name}}</div>
-					<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}"></div>
+					<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
 					<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
+				</div>
+			</div>
+			<!-- TODO put this into a component so that copy/paste isn't needed -->
+			<div class="new-card card">
+				<div class="card-title">
+					New Card
+				</div>
+				<div  tdb-autocomplete data="newCards" on-select="addCardAndApply(newCard, null)">
+				</div>
+				<div class="new-card-suggestions-area">
+					<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion" ng-click="addCard(suggestion, null)">
+						+ {{suggestion.name}}
+					</a>
 				</div>
 			</div>
 		</div>
@@ -46,6 +59,9 @@
 			<div class="result" ng-repeat="result in results | orderBy: scoreForResultSort">
 				<div class="result-inner">
 					<div class="result-score">{{scoreForResultDisplay(result)}}</div>
+					<div class="result-spotlight" ng-click="spotlightToggle(result)" style="{{result.spotlight ? 'background-color:' + result.spotlightColor : ''}}">
+						<i class="fa fa-dot-circle-o"></i>
+					</div>
 					<div class="result-img" style="background-image:url('assets/img/data/{{result.id}}.jpg');"></div>
 					<div class="result-text">
 						<div class="result-name">{{result.name}}</div>

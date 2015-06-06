@@ -117,29 +117,38 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 
     });
 
+	$scope.spotlightColors = ['#67b7ff', '#67ffb7', '#ffb767', '#ff67b7', '#b7ff67', '#b767ff'];
+	$scope.spotlightLabels = ["1","2","3","4","5","6"];
+	$scope.spotlightToggle = function(result) {
+		if(result.spotlight) {
+			result.spotlight = false;
+			$scope.spotlightColors.push(result.spotlightColor);
+			$scope.spotlightLabels.splice(0,0,result.spotlightLabel);
+		} else {
+			if($scope.spotlightColors.length > 0) {
+				result.spotlight = true;
+				result.spotlightColor = $scope.spotlightColors.splice(0,1)[0];
+				result.spotlightLabel = $scope.spotlightLabels.splice(0,1)[0];
+			} else {
+				alert('Maximum number of spotlights added.')
+			}
+		}
+
+		$.each($scope.cards, function(cardIndex, card) {
+			card.data.spotlights = [];
+			$.each($scope.results, function(resultIndex, result) {
+				if(result.spotlight) {
+					card.data.spotlights.push({
+						rawValue: result[card.key],
+						label: result.spotlightLabel,
+						color: result.spotlightColor
+					});
+				}
+			});
+		});
+	}
+
 	$scope.cards = [{
-		id: 0,
-		name: 'Location',
-		key: 'location',
-		color: $scope.getColor(),
-		data: {
-			// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
-			// bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
-			xLabelFormat: function(i, value, isMaxpoint) {
-				return (isMaxpoint ? "> " : "") + (Math.floor(value * 100) / 100) + " mi";
-			},
-			domain: [0,5, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
-			numberOfBars: 9,
-			barRange: [0,20],
-			points: [1, 0.96, 0.84, 0.64, 0.3599999999999999],
-			// points: 5,
-			pointRange: [0,1],
-			barToPointRatio: 2
-		},
-		weight: 50,
-		newCardIsShowing: true,
-		showing: true
-	}, {
 		id: 1,
 		name: 'Price',
 		key: 'price',
@@ -161,6 +170,28 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		},
 		weight: 50,
 		newCardIsShowing: false,
+		showing: true
+	}, {
+		id: 0,
+		name: 'Location',
+		key: 'location',
+		color: $scope.getColor(),
+		data: {
+			// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
+			// bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
+			xLabelFormat: function(i, value, isMaxpoint) {
+				return (isMaxpoint ? "> " : "") + (Math.floor(value * 100) / 100) + " mi";
+			},
+			domain: [0,5, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
+			numberOfBars: 9,
+			barRange: [0,20],
+			points: [1, 0.96, 0.84, 0.64, 0.3599999999999999],
+			// points: 5,
+			pointRange: [0,1],
+			barToPointRatio: 2
+		},
+		weight: 50,
+		newCardIsShowing: true,
 		showing: true
 	}];
 
@@ -328,6 +359,12 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	];
 
 	$scope.addCard = function(cardToAdd, cardToAddInFrontOf) {
+		var addAtEnd = false;
+		if(cardToAddInFrontOf == null) {
+			var addAtEnd = true;
+			cardToAddInFrontOf
+		}
+
 		var cardToSubtractWeightFrom = cardToAddInFrontOf;
 		while(cardToSubtractWeightFrom && cardToSubtractWeightFrom.weight < 2 * cardToAdd.weight)
 			cardToSubtractWeightFrom = $scope.cards[$scope.cards.indexOf(cardToSubtractWeightFrom) + 1];
@@ -347,8 +384,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			cardToAddInFrontOf.newCardIsShowing = false;
 		if($scope.newCards.indexOf(cardToAdd) != -1)
 			$scope.newCards.splice($scope.newCards.indexOf(cardToAdd), 1);
-		if($scope.cards.indexOf(cardToAdd) == 0)
-			cardToAdd.newCardIsShowing = true;
+		// if($scope.cards.indexOf(cardToAdd) == 0)
+		// 	cardToAdd.newCardIsShowing = true;
 	}
 
 	$scope.addCardAndApply = function(cardToAdd, cardToAddInFrontOf) {

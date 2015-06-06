@@ -126,16 +126,20 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 	scope.$watch('data', function(newData) {
 		$(barArea).find('.bar').remove();
 
-		var data = newData; // local scope
+		data = newData;
 		data.bars = [];
 		for(var i = 0; i < data.numberOfBars; i++) data.bars.push(0);
 		var bucketExtremes = data.domain.length > 2 && data.domain[2]; 
 		// if the third element in domain is 'true', leave the last bar as a 'catch-all-greater'
 		var numBuckets = bucketExtremes ? data.numberOfBars - 1 : data.numberOfBars;
+
+		function bucketForVal(val) {
+			return Math.floor((val - data.domain[0]) / (data.domain[1] - data.domain[0]) * numBuckets);
+		}
 		
 		$.each(data.raw, function(i, val) {
 			// TODO use d3 domain functions
-			var bucket = Math.floor((val - data.domain[0]) / (data.domain[1] - data.domain[0]) * numBuckets);
+			var bucket = bucketForVal(val);
 			if(bucket > numBuckets) {
 				if(bucketExtremes)
 					data.bars[numBuckets - 1] ++;
@@ -180,8 +184,6 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			.attr("class", function(d, i) {
 				return "bar bar_" + i;
 			});
-
-		// TODO remove scales on update so you don't have overlapping scales
 
 		// MARK: Axes
 
@@ -231,19 +233,50 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			.attr("transform", "translate("+(workingWidth + leftMargin)+","+topMargin+")")
 			.call(yPointAxis);
 
+		// MARK: spotlights
+
+		spotlightsArea.selectAll('*').remove();
+		if(data.spotlights) {
+			$.each(data.spotlights, function() {
+				var radius = 15;
+				var bucket = bucketForVal(this.rawValue);
+				var point1 = data.points[Math.floor(bucket / data.barToPointRatio)];
+				var point2 = data.points[Math.ceil(bucket / data.barToPointRatio)];
+				var cx = pointX(Math.floor(bucket / data.barToPointRatio)) / 2 + pointX(Math.ceil(bucket / data.barToPointRatio)) / 2;
+				var cy = pointY(point1) / 2 + pointY(point2) / 2;
+				if(opts.spotlightAbove == 'true') {
+					cy += (cy > 2 * radius + 5 ? -1.5 : 1.5) * (radius + 3);
+				}
+
+				spotlightsArea.append('circle')
+							.attr('cx', cx)
+							.attr('cy', cy)
+							.attr('r', radius)
+							.attr('fill', this.color)
+							.attr('stroke', d3.rgb(this.color).darker(0.5))
+							.attr('stroke-width', 1);
+				
+				var textSize = 16;
+				spotlightsArea.append('text')
+							.attr('x', cx)
+							.attr('y', cy + ((radius * 2 - textSize) / 2))
+							.text(this.label)
+							.attr('text-anchor', 'middle')
+							.attr('font-family', '"Open Sans", OpenSans')
+							.attr('fill', '#fff')
+							.attr('font-size', textSize * 1.15 + 'px');
+			});
+		}
 	}, true);
+
 
 	// MARK: Lines
 
 	var lineFunction = d3.svg.line()
-	.x(function(d,i) { return pointX(i); })
-	.y(function(d,i) { return pointY(d); })
-	// .interpolate("cardinal")
-	;
+						.x(function(d,i) { return pointX(i); })
+						.y(function(d,i) { return pointY(d); });
 
-	console.log(opts.smoothLine);
 	if(opts.smoothLine == 'true') {
-		console.log('yes');
 		lineFunction = lineFunction.interpolate("cardinal");
 	}
 
@@ -332,6 +365,8 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			$(ele[0]).find("[rel=active]").css("stroke-width", opts.strokeWidth);
 			$(ele[0]).find("[rel=active]").attr('rel', '');
 		});
+	var spotlightsArea = svg.append('g');
+
 
 		return; 
 
