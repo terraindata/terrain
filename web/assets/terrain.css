@@ -2,6 +2,10 @@ html, body, div {
 	font-family: 'Open Sans';
 }
 
+html, body {
+	background: #fff;
+}
+
 a {
 	cursor: pointer;
 }
@@ -38,7 +42,85 @@ a {
 	position: fixed !important;
 }
 
+.sidebar {
+	background: #fff;
+}
+
+.sidebar-minify-btn {
+	background: #00acac;
+	background: #a8acb1;
+}
+
+.sidebar .fa {
+	/*color: #00acac;*/
+}
+
+.navbar {
+	box-shadow: none;
+	border-bottom: 1px solid #ddd;
+}
+
+/* INPUTS */
+
+.pre-input {
+	/*padding-left: 5px;*/
+}
+
+.input {
+	/*width: 200px;*/
+}
+
+.inputs-area {
+	border-left: 1px solid #ddd;
+	width: 220px;
+	padding-right: 5px;
+}
+
+.input-card {
+	background: #fff;
+	padding: 5px;
+	/*border-radius: 4px;*/
+	/*margin-top: 5px;*/
+	border: 1px solid #ddd;
+	border-bottom: none;
+}
+
+.input-card:first-of-type {
+	border-top: none;
+}
+
+.input-map-img {
+	 width: 210px;
+}
+
+input {
+	padding: 5px;
+	border-radius: 4px;
+	/*width: 100%;*/
+	border: 1px solid #ddd;
+	outline: none;
+	font-size: 16px;
+}
+
+.input-lat-long {
+	display: inline-block;
+	margin-right: 5px;
+	background: #eee;
+	padding: 5px;
+	border-radius: 4px;
+	font-size: 15px;
+}
+
+.input-rating {
+	display: block;
+}
+
 /* BUILDER */
+
+.builder-area {
+	padding-top: 5px;
+	background: #fff;
+}
 
 .all-weights {
 	background: #fff;
@@ -50,20 +132,22 @@ a {
 
 /* CARDS */
 
-.card {
+.card, .input {
 	background: #fff;
 	padding: 10px;
 	border-radius: 4px;
+	border: 1px solid #ddd;
 }
 
 .card-title {
 	margin-top: 0px;
 	margin-bottom: 5px;
-	padding-bottom: 5px;
+	padding-bottom: 2px;
 	border-bottom: 1px solid #f5f5f5;
-	font-size: 22px;
-	color: #424242;
+	font-size: 16px;
+	color: #888a8f;
 	font-weight: 200;
+	text-transform: uppercase;
 }
 
 .card-title .small {
@@ -78,7 +162,7 @@ a {
 /* New card plus */
 
 .new-card-plus-area {
-	border-bottom: 2px solid #aaa;
+	border-bottom: 1px solid #aaa;
 	margin-left: 17px;
 	transition: border 0.2s;
 	display: block;
@@ -86,25 +170,31 @@ a {
 	margin-right: 1px;
 	margin-top: -15px;
   	margin-bottom: 20px;
+	color: #aaa;
 }
 
 .new-card-plus {
-	color: #aaa;
 	position: relative;
 	left: -17px;
 	font-size: 20px;
+	font-weight: 100;
 	text-decoration: none !important;
-	top: 13px;
+	top: 15px;
+	width: 20px;
 }
 
 .new-card-plus-area:hover {
 	text-decoration: none !important;
-	border-bottom: 2px solid #47a7ff;	
+	border-bottom: 1px solid #47a7ff;	
+	color: #47a7ff;
 }
 
 .new-card-plus:hover {
 	text-decoration: none !important;
-	color: #47a7ff;
+}
+
+.new-card {
+	/*transition: all 1s;*/
 }
 
 
@@ -144,18 +234,20 @@ a {
 }
 
 .page-header {
-  font-size: 20px;
+  font-size: 15px;
   margin: 0 0 20px;
   padding: 0;
   border: none;
   line-height: 28px;
   background: #2d353c;
+  background: #fff;
   color: #e8ecf1;
+  color: #a8acb1;
   margin: 0px -10px;
-  padding: 12px;
+  padding: 6px 12px;
   font-weight: 200;
   margin-top: -20px;
-  border-left: rgba(0,0,0,0.15) solid 1px;
+  /*border-left: rgba(0,0,0,0.15) solid 1px;*/
   border-bottom: rgba(0,0,0,0.15) solid 1px;
   text-transform: uppercase;
 }
@@ -168,8 +260,9 @@ a {
 	position: fixed;
 	/*right: 0;*/
 	height: 100%;
-	overflow: scroll;
+	overflow-y: scroll;
 	padding-bottom: 110px;
+	margin: 0px -10px;
 }
 
 .card {
@@ -194,25 +287,24 @@ a {
 
 .results-area {
 	line-height: 0px;
-}
-
-.builder-area {
-	padding-top: 5px;
+	padding-right: 10px; /* deals with fixed area overflow */
 }
 
 .result {
 	display: inline-block;
 	height: 220px;
 	width: 50%;
-	padding: 5px;
-	overflow: hidden;
+	/*padding: 2px;*/
 	line-height: normal;
-	border-radius: 3px;
+	/*border-radius: 3px;*/
+	/*margin-bottom: 4px;*/
+	border: 1px solid #ddd;
+	overflow: hidden;
 }
 
 .result-inner {
 	background: #fff;
-	border-radius: 3px;
+	/*border-radius: 3px;*/
 	height: 220px;
 	padding-bottom: 10px;
 	overflow: hidden;
@@ -291,27 +383,141 @@ a {
 	padding: 5px;
 	color: #fff;
 	border-bottom-right-radius: 5px;
-	width: 70px;
+	width: 80px;
 	text-align: right;
 	font-weight: 100;
 	letter-spacing: 1px;
+	white-space: nowrap;
+	cursor: pointer;
 }
 
-.result-spotlight {
+.result-score:hover {
+	background: rgba(0,0,0,0.75);
+}
+
+.result-score-img {
+	height: 24px;
+	display: inline-block;
+}
+
+.result-spotlight, .result-pin {
 	cursor: pointer;
-	position: absolute;
+	/*position: absolute;*/
 	background: rgba(0,0,0,0.5);
-	right: 5px;
-	top: 5px;
+	/*right: 5px;*/
+	/*top: 5px;*/
 	font-size: 14px;
-	padding: 0px 4px;
+	padding: 5px 9px;
 	color: #fff;
-	border-radius: 15px;
 	font-weight: 100;
+}
+
+.result-pin .result-unpin-icon {
+	display: none;
+}
+
+.result-pin:hover .result-unpin-icon {
+	display: inherit;
+}
+
+.result-pin:hover .result-pin-icon {
+	display: none;
+}
+
+.result-pin {
+	border-top: 1px solid rgba(0,0,0,0.5);
+	height: 30px;
+}
+
+.result-controls-right {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	border-top-right-radius: 3px;
+	border-bottom-left-radius: 3px;
+	overflow: hidden;
 }
 
 .result-spotlight-selected {
 	/*background: rgba(0,0,0,0.5);*/
 }
 
+/* Draggable Results */
 
+.result-inner {
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /*cursor: pointer;*/
+
+    transform: none !imporant;
+    -webkit-transform: none !imporant;
+}
+
+.result-pinned {
+	border-color: #ffa747;
+}
+
+.result-inner.drag-over {
+    border: solid 1px red;
+}
+
+.result-inner.dragging {
+    opacity: 0.75;
+    z-index: 999 !important;
+}
+
+.result.drag-enter {
+    border: solid 1px #47ffa7;
+    border-top-width: 3px;
+    /*border-radius: 3px;*/
+}
+
+.result-scores-area {
+	height: 160px;
+	padding-bottom: 20px;
+	overflow: scroll;
+}
+
+.result-flipped-name, .result-flipped-final-score, .result-score-card-name, .result-score-value, .result-score-mapped, .result-score-weight {
+	padding: 5px;
+}
+
+.result-flipped-final-score {
+	background: #2d353c;	
+	color: #fff;
+}
+
+.result-flipped-score-img {
+	height: 16px;
+}
+
+.result-flipped .pull-right {
+	font-weight: bold;
+}
+
+.result-scores-area {
+	background: #f5f5f5;
+}
+
+.result-score-card-name {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	font-size: 16px;
+	background: #4d5960;
+	color: #fff;
+}
+
+.result-score-value, .result-score-mapped, .result-score-weight {
+	border-bottom: 1px solid #eee;
+}
+
+.result-flipped-close {
+	cursor: pointer;
+}
+
+.result-flipped-close:hover {
+	color: #000;
+}

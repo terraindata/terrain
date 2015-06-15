@@ -45,11 +45,12 @@ THE SOFTWARE.
 var terrainApp = angular.module('terrainApp', [
 	'ngRoute',
 	'terrainControllers',
-	'd3'
+	'd3',
+	'ngDraggable'
 	]);
 
 terrainApp.config(['$routeProvider',
-	function($routeProvider) {
+	function($routeProvider, $ngDraggable) {
 		$routeProvider.
 		when('/builder/:abConfig', {
 			templateUrl: 'partials/builder.html',

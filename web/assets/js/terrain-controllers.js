@@ -105,6 +105,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
       		});
 
       		/* add any more calculated result values here, as they come up, if they are not pre-calculated in the response */
+      		result.overrideIndex = false;
 
       		// sooo inefficient omg omg
       		$.each($scope.getAllCards(), function() {
@@ -114,7 +115,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
       			}
       		});
       	});
-
+		$scope.resort();
     });
 
 	$scope.spotlightColors = ['#67b7ff', '#67ffb7', '#ffb767', '#ff67b7', '#b7ff67', '#b767ff'];
@@ -191,7 +192,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			barToPointRatio: 2
 		},
 		weight: 50,
-		newCardIsShowing: true,
+		newCardIsShowing: false,
 		showing: true
 	}];
 
@@ -401,39 +402,110 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 
 	$scope.handleChange = function(cardId) {
+		$scope.resort();
 		$scope.$apply();
+	}
+
+	$scope.cardValueForResult = function(card, result) {
+		return result[card.key];
+	}
+
+	$scope.cardScoreForResult = function(card, result) {
+		var data = card.data;
+
+		// TODO replace by a better bucket getter if you redo buckets
+		var bucketStart = data.domain[0];
+		var bucketEnd = data.domain[1];
+		var bucketSize = (bucketEnd - bucketStart) / data.numberOfBars;
+		var bucket = 0;
+		while($scope.cardValueForResult(card, result) > bucketStart + bucketSize * bucket && bucket < data.numberOfBars) bucket ++;
+		bucket --; // we always overshoot it
+
+		return (data.points[Math.floor(bucket / data.barToPointRatio)] + data.points[Math.ceil(bucket / data.barToPointRatio)]) / 2;
 	}
 
 	$scope.scoreForResult = function(result) {
 		var total = 0;
 		$.each($scope.cards, function(index, card) {
-			var data = card.data;
-
-			// TODO replace by a better bucket getter if you redo buckets
-			var bucketStart = data.domain[0];
-			var bucketEnd = data.domain[1];
-			var bucketSize = (bucketEnd - bucketStart) / data.numberOfBars;
-			var bucket = 0;
-			while(result[card.key] > bucketStart + bucketSize * bucket && bucket < data.numberOfBars) bucket ++;
-			bucket --; // we overshot it
-
-			var pointValue = (data.points[Math.floor(bucket / data.barToPointRatio)] + data.points[Math.ceil(bucket / data.barToPointRatio)]) / 2;
-			total += pointValue * card.weight / 100;
+			total += $scope.cardScoreForResult(card,result) * card.weight / 100;
 		});
 		return total; 
 	}
 
-	$scope.scoreForResultDisplay = function(result) {
-		var score = Math.floor($scope.scoreForResult(result) * 1000) / 1000;
+	$scope.numerToDisplay = function(val) {
+		var score = Math.floor(val * 1000) / 1000;
 		if(score == 1) return "1.00";
 		score = ("" + score).substr(1);
 		while(score.length < 4) score = score + "0";
 		return score;
 	}
 
+	$scope.scoreForResultDisplay = function(result) {
+		return $scope.numerToDisplay($scope.scoreForResult(result));
+	}
+
+	$scope.cardValueForResultDisplay = function(card, result) {
+		return $scope.numerToDisplay($scope.cardValueForResult(card, result));
+	}
+
+	$scope.cardScoreForResultDisplay = function(card, result) {
+		return $scope.numerToDisplay($scope.cardScoreForResult(card, result));
+	}
+
 	$scope.scoreForResultSort = function(result) {
 		// sorts low to hi and doesn't seem like you can control it from the template
-		return -1 * $scope.scoreForResult(result);
+		return result.index;
+	}
+
+	$scope.onDropComplete = function(index,result,event) {
+		result.overrideIndex = index;
+		$scope.resort();
+	}
+
+	$scope.unpin = function(result) {
+		result.overrideIndex = false;
+		$scope.resort();
+	}
+
+	$scope.resort = function() {
+		// since we want to allow manual overrides, we have to make our own sorting function. Fun, I know.
+		// assumes: overrideIndexes are unique
+		var overrides = $scope.results.reduce(function(overrides, result) {
+			if(result.overrideIndex !== false) {
+				overrides[result.overrideIndex] = result;
+				result.index = result.overrideIndex;
+			}
+			return overrides;
+		}, {});
+		var scores = [];
+		var normals = $scope.results.reduce(function(normals, result) {
+			if(result.overrideIndex === false) {
+				var score = $scope.scoreForResult(result);
+				if(!normals[score])
+					normals[score] = [];
+				normals[score].push(result);
+				scores.push(score);
+			}
+			return normals;
+		}, {});
+
+		scores.sort().reverse();
+		var index = 0;
+		while(index < $scope.results.length) {
+			if(!overrides[index]) {
+				normals[scores.shift()].shift().index = index;
+			}
+			index ++;
+		}
+	}
+
+	$scope.inputs = [];
+	$scope.newInput = function(index) {
+		var newInput = { name: '', value: '' };
+		if(index == -1)
+			$scope.inputs.push(newInput);
+		else
+			$scope.inputs.splice(index, 0, newInput);
 	}
 }]);
 
