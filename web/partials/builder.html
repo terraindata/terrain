@@ -31,7 +31,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-sm-6 col-xs-12 main-column">
+	<div class="col-sm-6 col-xs-12 main-column builder-column">
 		<h1 class="page-header">Builder</h1>
 		<div class="fixed-area builder-area">
 			<div class="all-weights" ng-show="ab('weights')">
@@ -206,3 +206,13 @@
 		</div>
 	</div>
 </div>
+
+<script>
+var resize = function() {
+	$('.fixed-area').css('height', ($(window).height() - $('.fixed-area').offset().top) + 'px');
+}
+
+$(window).resize(resize);
+$(document).ready(resize);
+resize();
+</script>

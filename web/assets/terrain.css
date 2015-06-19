@@ -180,7 +180,7 @@ input:focus {
 
 .inputs-area {
 	border-left: 1px solid #ddd;
-	width: 220px;
+	/*width: 220px;*/
 	padding-left: 5px;
 }
 
@@ -385,16 +385,8 @@ input:focus {
 }
 
 .fixed-area {
-	position: fixed;
-	/*right: 0;*/
-	height: 100%;
 	overflow-y: scroll;
-	padding-bottom: 110px;
-	margin: 0px -10px;
-}
-
-.card {
-	min-width: 680px;
+	padding-bottom: 10px;
 }
 
 .weight, .graph {
@@ -404,8 +396,7 @@ input:focus {
 /* RESULTS */
 
 .main-column {
-	padding-right: 0px !important;
-	/*position: relative;*/
+	padding: 0px !important;
 }
 
 .builder-row {
@@ -413,9 +404,12 @@ input:focus {
 	margin-left: -25px !important;
 }
 
+.results-column, .builder-column {
+	padding-left: 5px !important;
+}
+
 .results-area {
 	line-height: 0px;
-	padding-right: 10px; /* deals with fixed area overflow */
 }
 
 .result {

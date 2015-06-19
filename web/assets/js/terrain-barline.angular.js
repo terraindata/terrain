@@ -69,34 +69,41 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 
 	    	var data = scope.data;
 
-	var pointColor = opts.pointColor ? opts.pointColor : "#fff",
-	barColor = d3.rgb(opts.color),
-	strokeColor = opts.strokeColor ? opts.strokeColor : d3.rgb(opts.color).darker(1.25);
+	var pointColor, barColor, strokeColor,  pointRadius,  bottomMargin, topMargin, leftMargin, rightMargin,  workingHeight, workingWidth,  minY, maxY, minX, maxX,  numPoints, barWidth, yPointScale, xScale;
 
-	var pointRadius = opts.pointRadius + opts.strokeWidth;
-	var bottomMargin = opts.height * 0.1,
-	topMargin = pointRadius * 2,
-	leftMargin = 30,
-	rightMargin = 40;
+	function calcVars() {
+		opts.width = $(ele[0]).width();
+		pointColor = opts.pointColor ? opts.pointColor : "#fff";
+		barColor = d3.rgb(opts.color);
+		strokeColor = opts.strokeColor ? opts.strokeColor : d3.rgb(opts.color).darker(1.25);
 
-	var workingHeight = opts.height - bottomMargin - topMargin,
-	workingWidth  = opts.width - leftMargin - rightMargin;
+		pointRadius = opts.pointRadius + opts.strokeWidth;
 
-	var minY = topMargin,
-	maxY = topMargin + workingHeight,
-	minX = leftMargin,
-	maxX = rightMargin + workingWidth;
+		bottomMargin = opts.height * 0.1;
+		topMargin = pointRadius * 2;
+		leftMargin = 30;
+		rightMargin = 40;
 
-	var numPoints = data.numberOfBars;
-	var barWidth = workingWidth / numPoints * opts.barWidth;
+		workingHeight = opts.height - bottomMargin - topMargin;
+		workingWidth  = opts.width - leftMargin - rightMargin;
+		console.log(workingWidth);
 
-	var yPointScale = d3.scale.linear()
-	.domain(data.pointRange.reverse())
-	.range([0, workingHeight]);
+		minY = topMargin;
+		maxY = topMargin + workingHeight;
+		minX = leftMargin;
+		maxX = rightMargin + workingWidth;
 
-	var xScale = d3.scale.linear()
-	.domain([0,numPoints])
-	.range([0, workingWidth]);
+		numPoints = data.numberOfBars;
+		barWidth = workingWidth / numPoints * opts.barWidth;
+
+		yPointScale = d3.scale.linear()
+		.domain(Array.prototype.slice.call(data.pointRange).reverse())
+		.range([0, workingHeight]);
+
+		xScale = d3.scale.linear()
+		.domain([0,numPoints])
+		.range([0, workingWidth]);
+	}
 
 	var svg = d3.select(ele[0])
 	.append("svg")
@@ -126,10 +133,12 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		return barStartingY(d) - pointRadius / 2;
 	}
 
-	scope.$watch('data', function(newData) {
+	function doChart(newData, resize) {
+		data = newData;
+		calcVars();
+		svg.attr('width', opts.width);
 		$(barArea).find('.bar').remove();
 
-		data = newData;
 		data.bars = [];
 		for(var i = 0; i < data.numberOfBars; i++) data.bars.push(0);
 		var bucketExtremes = data.domain.length > 2 && data.domain[2]; 
@@ -140,6 +149,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			return Math.floor((val - data.domain[0]) / (data.domain[1] - data.domain[0]) * numBuckets);
 		}
 		
+		if(!data.raw) return;
 		$.each(data.raw, function(i, val) {
 			// TODO use d3 domain functions
 			var bucket = bucketForVal(val);
@@ -161,11 +171,13 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		for(var i = 0; i < data.bars.length; i ++)
 			data.bars[i] /= maxValue;
 		
+		if(resize == true) barArea.selectAll('*').remove(); /* deals with data not being dirty on window resize */
 	    barArea.selectAll("rect")
 			.data(data.bars)
 			.enter()
 			.append("rect")
 			.attr("x", function(d, i) {
+				console.log('x', barStartingX(i));
 				return barStartingX(i);
 			})
 			.attr("y", function(d, i) {
@@ -270,105 +282,113 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 							.attr('font-size', textSize * 1.15 + 'px');
 			});
 		}
-	}, true);
+
+		// MARK: Lines
+
+		var lineFunction = d3.svg.line()
+							.x(function(d,i) { return pointX(i); })
+							.y(function(d,i) { return pointY(d); });
+
+		if(opts.smoothLine == 'true') {
+			lineFunction = lineFunction.interpolate("cardinal");
+		}
+
+		if(resize) linesArea.selectAll('*').remove();
+		var lineGroup = linesArea.append('g');
 
 
-	// MARK: Lines
-
-	var lineFunction = d3.svg.line()
-						.x(function(d,i) { return pointX(i); })
-						.y(function(d,i) { return pointY(d); });
-
-	if(opts.smoothLine == 'true') {
-		lineFunction = lineFunction.interpolate("cardinal");
-	}
-
-	var lineGroup = svg.append('g');
-
-	lineGroup.append("path")
-	.attr("d", lineFunction(data.points))
-	.attr("stroke", strokeColor)
-	.attr("stroke-width", opts.strokeWidth)
-	.attr("class", "path")
-	.attr("fill", "none");
-        // .css('z-index', 1);
+		lineGroup.append("path")
+		.attr("d", lineFunction(data.points))
+		.attr("stroke", strokeColor)
+		.attr("stroke-width", opts.strokeWidth)
+		.attr("class", "path")
+		.attr("fill", "none");
+	        // .css('z-index', 1);
 
 
-	// MARK: Points
+		// MARK: Points
+		// var pointGroup = svg.append('g')
+		if(resize == true) svg.selectAll('circle').remove(); /* deals with data not being dirty on window resize */
+		svg //.append('g')
+			//.attr('class', 'point-group')
+			.selectAll("circle")
+			.data(data.points)
+			.enter()
+			.append("circle")
+			.attr("cx", function(d, i) {
+				return pointX(i);
+			})
+			.attr("cy", function(d, i) {
+				if(d)
+					return pointY(d);
+				return 0;
+			})
+			.attr("r", function(d, i) {
+				return pointRadius;
+			})
+			.attr("fill", function(d, i) {
+				return pointColor;
+			})
+			.attr("stroke", function(d, i) {
+				return strokeColor;
+			})
+			.attr("stroke-width", function(d, i) {
+				return opts.strokeWidth;
+			})
+			.attr("class", function(d, i) {
+				return "point point_" + i;
+			})
+			.attr('index', function(d, i) {
+				return i;
+			})
+			// .css('z-index', 999)
+			.on("mousedown", function(d, i) {
+				$(ele[0]).find(".point_" + i).attr("rel", "active");
+				$(ele[0]).find("[rel=active]").css("stroke", opts.activeColor);
+				$(ele[0]).find("[rel=active]").css("stroke-width", opts.strokeWidth * 1.5);
+			})
+			.on("mousedown", function(d, i) {
+				$(ele[0]).find(".point_" + i).attr("rel", "active");
+				$(ele[0]).find("[rel=active]").css("stroke", opts.activeColor);
+				$(ele[0]).find("[rel=active]").css("stroke-width", opts.strokeWidth * 1.5);
+			});;
 
-	svg //.append('g')
-		//.attr('class', 'point-group')
-		.selectAll("circle")
-		.data(data.points)
-		.enter()
-		.append("circle")
-		.attr("cx", function(d, i) {
-			return pointX(i);
-		})
-		.attr("cy", function(d, i) {
-			if(d)
-				return pointY(d);
-			return 0;
-		})
-		.attr("r", function(d, i) {
-			return pointRadius;
-		})
-		.attr("fill", function(d, i) {
-			return pointColor;
-		})
-		.attr("stroke", function(d, i) {
-			return strokeColor;
-		})
-		.attr("stroke-width", function(d, i) {
-			return opts.strokeWidth;
-		})
-		.attr("class", function(d, i) {
-			return "point point_" + i;
-		})
-		.attr('index', function(d, i) {
-			return i;
-		})
-		// .css('z-index', 999)
-		.on("mousedown", function(d, i) {
-			$(ele[0]).find(".point_" + i).attr("rel", "active");
-			$(ele[0]).find("[rel=active]").css("stroke", opts.activeColor);
-			$(ele[0]).find("[rel=active]").css("stroke-width", opts.strokeWidth * 1.5);
-		})
-		.on("mousedown", function(d, i) {
-			$(ele[0]).find(".point_" + i).attr("rel", "active");
-			$(ele[0]).find("[rel=active]").css("stroke", opts.activeColor);
-			$(ele[0]).find("[rel=active]").css("stroke-width", opts.strokeWidth * 1.5);
-		});;
+			svg.on("mousemove", function() {
+				if($(ele[0]).find("[rel=active]").length) {
+					var pos = d3.mouse(this)[1];
+					if(pos < minY)
+						pos = minY;
+					if(pos > maxY)
+						pos = maxY;
+					$(ele[0]).find("[rel=active]").attr("cy", pos);
 
-		svg.on("mousemove", function() {
-			if($(ele[0]).find("[rel=active]").length) {
-				var pos = d3.mouse(this)[1];
-				if(pos < minY)
-					pos = minY;
-				if(pos > maxY)
-					pos = maxY;
-				$(ele[0]).find("[rel=active]").attr("cy", pos);
+					$(ele[0]).find(".path").remove();
+					var index = $(ele[0]).find("[rel=active]").attr('index');
+					data.points[index] = (workingHeight + topMargin - pos) / workingHeight; // yScale.invert(pos) / (data.barRange[1] - data.barRange[0]);
+					lineGroup.append("path")
+								.attr("d", lineFunction(data.points))
+								.attr("stroke", strokeColor)
+								.attr("stroke-width", opts.strokeWidth)
+								.attr("class", "path")
+								.attr("fill", "none");
 
-				$(ele[0]).find(".path").remove();
-				var index = $(ele[0]).find("[rel=active]").attr('index');
-				data.points[index] = (workingHeight + topMargin - pos) / workingHeight; // yScale.invert(pos) / (data.barRange[1] - data.barRange[0]);
-				lineGroup.append("path")
-							.attr("d", lineFunction(data.points))
-							.attr("stroke", strokeColor)
-							.attr("stroke-width", opts.strokeWidth)
-							.attr("class", "path")
-							.attr("fill", "none");
+					scope.onChange({cardId: opts.cardId});
+				}
+			})
+			.on("mouseup", function() {
+				// sense mouseup here in case cursor has moved off of the point
+				$(ele[0]).find("[rel=active]").css("stroke", strokeColor);
+				$(ele[0]).find("[rel=active]").css("stroke-width", opts.strokeWidth);
+				$(ele[0]).find("[rel=active]").attr('rel', '');
+			});
+		}
 
-				scope.onChange({cardId: opts.cardId});
-			}
-		})
-		.on("mouseup", function() {
-			// sense mouseup here in case cursor has moved off of the point
-			$(ele[0]).find("[rel=active]").css("stroke", strokeColor);
-			$(ele[0]).find("[rel=active]").css("stroke-width", opts.strokeWidth);
-			$(ele[0]).find("[rel=active]").attr('rel', '');
-		});
-	var spotlightsArea = svg.append('g');
+		var linesArea = svg.append('g');
+		var spotlightsArea = svg.append('g');
+	scope.$watch('data', function(newData) { doChart(newData) }, true);
+	$(window).resize(function() {
+		doChart(data, true);
+	});
 
 
 		return; 
