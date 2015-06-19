@@ -52,6 +52,23 @@ function selectPage(page) {
 
 terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http', '$timeout', function($scope, $routeParams, $http, $timeout) {
 	selectPage('#/builder');
+
+	var isShowing = ['builder'];
+	$scope.showing = function(page, value) {
+		if($(window).width() > 767)
+			return true;
+		if(value === undefined)
+			return isShowing.indexOf(page) !== -1;
+		if(value && isShowing.indexOf(page) === -1)
+			isShowing.push(page);
+		if(!value && isShowing.indexOf(page) !== -1)
+			isShowing.splice(isShowing.indexOf(page), 1);
+	}
+
+	$(window).resize(function() {
+		$scope.$apply();
+	})
+
 	$scope.abConfig = $routeParams.abConfig;
 	$scope.ab = function(exp) {
 		if($scope.abConfig && $scope.abConfig.indexOf(exp) != -1)
@@ -135,6 +152,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		}
 
 		$.each($scope.cards, function(cardIndex, card) {
+			if(!card.data) return;
 			card.data.spotlights = [];
 			$.each($scope.results, function(resultIndex, result) {
 				if(result.spotlight) {

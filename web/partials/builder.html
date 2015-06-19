@@ -1,7 +1,12 @@
 <div class="row builder-row">
 	<div class="col-sm-2 col-xs-12 main-column">
-		<h1 class="page-header">Inputs</h1>
-		<div class="fixed-area inputs-area">
+		<h1 class="page-header" ng-click="showing('inputs', !showing('inputs'))">
+			Inputs
+			<div class="page-header-expand mobile-only pull-right">
+				{{showing('inputs') ? '-' : '+'}}
+			</div>
+		</h1>
+		<div class="fixed-area inputs-area" ng-show="showing('inputs')">
 			<div ng-repeat="input in inputs">
 				<div class="pre-input">
 					<a class="new-card-plus-area" ng-click="newInput($index)">
@@ -32,8 +37,13 @@
 		</div>
 	</div>
 	<div class="col-sm-6 col-xs-12 main-column builder-column">
-		<h1 class="page-header">Builder</h1>
-		<div class="fixed-area builder-area">
+		<h1 class="page-header builder-header" ng-click="showing('builder', !showing('builder'))">
+			Builder
+			<div class="page-header-expand mobile-only pull-right">
+				{{showing('builder') ? '-' : '+'}}
+			</div>
+		</h1>
+		<div class="fixed-area builder-area" ng-show="showing('builder')">
 			<div class="all-weights" ng-show="ab('weights')">
 				<div class="weight" d3-slicer data="cards" on-change="handleChange(cardId)" card-id="-1"></div>
 			</div>
@@ -133,8 +143,13 @@
 		</div>
 	</div>
 	<div class="col-sm-4 col-xs-12 results-column main-column">
-		<h1 class="page-header">Results</h1>
-		<div class="results-area fixed-area">
+		<h1 class="page-header results-header" ng-click="showing('results', !showing('results'))">
+			Results
+			<div class="page-header-expand mobile-only pull-right">
+				{{showing('results') ? '-' : '+'}}
+			</div>
+		</h1>
+		<div class="results-area fixed-area" ng-show="showing('results')">
 			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort" ng-drop="true" ng-drop-success="onDropComplete($index, $data,$event)">
 				<div class="result-inner" ng-drag="true" ng-drag-data="result" allow-transform="false">
 					<div class="result-main" ng-show="!result.flipped">
@@ -209,7 +224,10 @@
 
 <script>
 var resize = function() {
-	$('.fixed-area').css('height', ($(window).height() - $('.fixed-area').offset().top) + 'px');
+	if($(window).width() > 767)
+		$('.fixed-area').css('height', ($(window).height() - $('.fixed-area').offset().top) + 'px');
+	else
+		$('.fixed-area').css('height', 'auto');
 }
 
 $(window).resize(resize);

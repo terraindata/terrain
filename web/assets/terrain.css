@@ -2,10 +2,6 @@ html, body, div {
 	font-family: 'Open Sans';
 }
 
-body {
-	overflow: hidden;
-}
-
 html, body {
 	background: #fff;
 }
@@ -176,12 +172,6 @@ input:focus {
 
 .input-name-area input {
 	width: calc(100% - 24px - 4px); /* allow room for icon */
-}
-
-.inputs-area {
-	border-left: 1px solid #ddd;
-	/*width: 220px;*/
-	padding-left: 5px;
 }
 
 .input-map-img {
@@ -375,13 +365,8 @@ input:focus {
   padding: 6px 12px;
   font-weight: 200;
   margin-top: -20px;
-  /*border-left: rgba(0,0,0,0.15) solid 1px;*/
-  border-bottom: rgba(0,0,0,0.15) solid 1px;
+  border-bottom: #ddd solid 1px;
   text-transform: uppercase;
-}
-
-.main-column {
-
 }
 
 .fixed-area {
@@ -395,17 +380,9 @@ input:focus {
 
 /* RESULTS */
 
-.main-column {
-	padding: 0px !important;
-}
-
 .builder-row {
 	margin-right: -20px !important;
 	margin-left: -25px !important;
-}
-
-.results-column, .builder-column {
-	padding-left: 5px !important;
 }
 
 .results-area {
@@ -657,4 +634,96 @@ input:focus {
 
 .result-flipped-close:hover {
 	color: #000;
+}
+
+
+
+/* With great design comes great responsivity. */
+
+@media (min-width: 768px) {
+	/* desktop and tablet */
+	body {
+		overflow: hidden;
+	}
+
+	.main-column {
+		padding: 0px !important;
+	}
+
+	.inputs-area {
+		border-left: 1px solid #ddd;
+	}
+
+	.results-column, .builder-column {
+		padding-left: 5px !important;
+	}
+
+	.inputs-area {
+		padding-left: 5px;
+	}
+	
+	.mobile-only {
+		display: none;
+	}
+}
+
+@media (max-width: 767px) {
+	/* phone */
+	.navbar-header {
+		border-bottom: 0px !important;
+	}
+
+	.navbar-right {
+		display: none !important;
+	}
+
+	.page-sidebar-toggled #sidebar {
+		border-right: 1px solid #eee;
+  		box-shadow: 0px 0px 25px rgba(0,0,0,0.1);
+	}
+
+	.navbar-toggle .icon-bar {
+		background: #37df97 !important;
+	}
+
+	.navbar-toggle:hover .icon-bar {
+		background: #47ffa7 !important;
+		opacity: 1 !important;
+	}
+
+	.navbar-toggle:hover, .navbar-toggle:active {
+		opacity: 1 !important;		
+	}
+
+	.page-header-fixed {
+		padding-top: 54px !important;
+	}
+
+	.results-header, .builder-header {
+		border-top: 1px solid #ddd !important;
+		margin-top: 0px !important;
+	}
+
+	.page-header {
+		font-size: 20px !important;
+		padding: 10px 15px !important;
+		color: #777 !important;
+		margin-bottom: 10px !important;
+		cursor: pointer;
+	}
+
+	.fixed-area {
+		margin-top: -10px;
+	}
+
+	.mobile-only {
+		display: block;
+	}
+
+	.card-title-no-border-text {
+		padding-bottom: 2px;
+		margin-bottom: 5px;
+		border-bottom: 1px solid #f5f5f5;
+		padding-top: 0px !important;
+	}
 }

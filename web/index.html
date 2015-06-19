@@ -204,7 +204,8 @@
 		$(document).ready(function() {
 			App.init();
 			Dashboard.init();
-			$('.sidebar-minify-btn').click();
+			if($(window).width() > 767)
+				$('.sidebar-minify-btn').click();
 		});
 	</script>
 </body>
