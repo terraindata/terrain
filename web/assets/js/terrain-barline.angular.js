@@ -86,7 +86,6 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 
 		workingHeight = opts.height - bottomMargin - topMargin;
 		workingWidth  = opts.width - leftMargin - rightMargin;
-		console.log(workingWidth);
 
 		minY = topMargin;
 		maxY = topMargin + workingHeight;
@@ -177,7 +176,6 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			.enter()
 			.append("rect")
 			.attr("x", function(d, i) {
-				console.log('x', barStartingX(i));
 				return barStartingX(i);
 			})
 			.attr("y", function(d, i) {

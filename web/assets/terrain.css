@@ -420,17 +420,21 @@ input:focus {
 	line-height: normal;
 	/*border-radius: 3px;*/
 	/*margin-bottom: 4px;*/
-	border: 1px solid #ddd;
+	/*border: 1px solid #ddd;*/
 	overflow: hidden;
+	border-radius: 5px;
 }
 
 .result-inner {
 	background: #fff;
 	/*border-radius: 3px;*/
-	height: 220px;
+	height: 216px;
 	padding-bottom: 10px;
 	overflow: hidden;
 	position: relative;
+	margin: 2px;
+	border-radius: 5px;
+	border: 1px solid #ddd;
 }
 
 .result-img {
@@ -513,8 +517,16 @@ input:focus {
 	cursor: pointer;
 }
 
-.result-score:hover {
+.result-spotlight {
+	position: absolute;
+	left: 0px;
+	top: 36px;
+	border-bottom-right-radius: 4px;
+}
+
+.result-spotlight:hover, .result-score:hover {
 	background: rgba(0,0,0,0.75);
+	cursor: pointer;
 }
 
 .result-score-img {
@@ -576,14 +588,16 @@ input:focus {
 
     transform: none !imporant;
     -webkit-transform: none !imporant;
+
+    cursor: pointer;
 }
 
-.result-pinned {
+.result-pinned .result-inner {
 	border-color: #ffa747;
 }
 
 .result-inner.drag-over {
-    border: solid 1px red;
+    background: #fff;
 }
 
 .result-inner.dragging {
@@ -592,8 +606,9 @@ input:focus {
 }
 
 .result.drag-enter {
-    border: solid 1px #47ffa7;
+    background: #47ffa7;
     border-top-width: 3px;
+    cursor: pointer;
     /*border-radius: 3px;*/
 }
 

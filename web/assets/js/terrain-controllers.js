@@ -75,7 +75,6 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	$scope.addRawScoreToCardWithKey = function(key, score) {
 		// there must be a better way to do this
 		var card = $scope.cardForKey(key);
-		if(!card) { console.log('ERROR adding raw score to nonexistent card'); return; }
 		card.data.raw = card.data.raw || [];
       	card.data.raw.push(score);
 	}
