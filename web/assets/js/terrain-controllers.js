@@ -50,7 +50,7 @@ function selectPage(page) {
 	$(".nav li a[href='"+page+"']").parent().addClass('active');
 }
 
-terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http', function($scope, $routeParams, $http) {
+terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http', '$timeout', function($scope, $routeParams, $http, $timeout) {
 	selectPage('#/builder');
 	$scope.abConfig = $routeParams.abConfig;
 	$scope.ab = function(exp) {
@@ -149,8 +149,82 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		});
 	}
 
+	$scope.fromOptions = [
+		{ id: 1, name: 'Listings' },
+		{ id: 2, name: 'Reviews' },
+		{ id: 3, name: 'Renters' },
+		{ id: 4, name: 'Leasers' }
+		];
+	$scope.selectableFields = [
+		{ id: 1, name: 'name' },
+		{ id: 2, name: 'price' },
+		{ id: 3, name: 'rating' },
+		{ id: 4, name: 'reviews' },
+		{ id: 5, name: 'stays' },
+		{ id: 6, name: 'description'}
+		];
+
+	// $scope.setFieldForCard = function(card, fieldIndex, fieldObj) {
+
+	// }
+
+	$scope.titleForCard = function(card) {
+		if(card.from) return 'From';
+		if(card.select) return 'Select';
+		if(card.filter) return 'Filter';
+		if(card.transform) return 'Transform';
+	}
+
+	$scope.apply = function() {
+		$scope.$apply();
+	}
+
+	$scope.newSelectFieldForCard = function(card) {
+		card.select.fields.push('');
+		$timeout(function() {
+			$(".card-" + card.id + " .card-select-field-" + (card.select.fields.length - 1) + " input").focus();
+		}, 100);
+	}
+
+	$scope.removeSelectFieldFromCard = function(card, selectFieldIndex) {
+		card.select.fields.splice(selectFieldIndex, 1);
+	}
+
+	$scope.checkForNewInput = function(card) {
+		if(card.filter && card.filter.value && card.filter.value.length > 0) {
+			if(! $scope.inputs.reduce(function(value,cur) { if(cur.name == card.filter.value) return true; return value; }, false)) {
+				$scope.inputs.push({ name: card.filter.value, value: '' });
+			}
+		}
+	}
+
+	$scope.blurOnEnter = function(evt) {
+		if(evt.keyCode == 13) {
+			$(evt.currentTarget).blur();
+		}
+	}
+
 	$scope.cards = [{
+		id:24,
+		from: {
+			value: 'Listings'
+		},
+		useTitle: true
+	}, {
+		id: 17,
+		select: {
+			fields: ['name', 'price', 'rating']
+		}
+	}, {
+		id: 23,
+		filter: {field: 'price',
+				valueType: 'input',
+				value: 'MaxPrice',
+				operator: 'lt'},
+		useTitle: true
+	}, {
 		id: 1,
+		transform: true,
 		name: 'Price',
 		key: 'price',
 		inDataResponse: true,
@@ -171,9 +245,10 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		},
 		weight: 50,
 		newCardIsShowing: false,
-		showing: true
+		showing: true,
 	}, {
 		id: 0,
+		transform: true,
 		name: 'Location',
 		key: 'location',
 		color: $scope.getColor(),
@@ -407,11 +482,15 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 
 	$scope.cardValueForResult = function(card, result) {
+		if(!card.transform)
+			return false;
 		return result[card.key];
 	}
 
 	$scope.cardScoreForResult = function(card, result) {
 		var data = card.data;
+		if(!data || !card.transform)
+			return 0;
 
 		// TODO replace by a better bucket getter if you redo buckets
 		var bucketStart = data.domain[0];
@@ -427,12 +506,13 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	$scope.scoreForResult = function(result) {
 		var total = 0;
 		$.each($scope.cards, function(index, card) {
-			total += $scope.cardScoreForResult(card,result) * card.weight / 100;
+			if(card.transform)
+				total += $scope.cardScoreForResult(card,result) * card.weight / 100;
 		});
 		return total; 
 	}
 
-	$scope.numerToDisplay = function(val) {
+	$scope.numberToDisplay = function(val) {
 		var score = Math.floor(val * 1000) / 1000;
 		if(score == 1) return "1.00";
 		score = ("" + score).substr(1);
@@ -441,15 +521,15 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 
 	$scope.scoreForResultDisplay = function(result) {
-		return $scope.numerToDisplay($scope.scoreForResult(result));
+		return $scope.numberToDisplay($scope.scoreForResult(result));
 	}
 
 	$scope.cardValueForResultDisplay = function(card, result) {
-		return $scope.numerToDisplay($scope.cardValueForResult(card, result));
+		return $scope.numberToDisplay($scope.cardValueForResult(card, result));
 	}
 
 	$scope.cardScoreForResultDisplay = function(card, result) {
-		return $scope.numerToDisplay($scope.cardScoreForResult(card, result));
+		return $scope.numberToDisplay($scope.cardScoreForResult(card, result));
 	}
 
 	$scope.scoreForResultSort = function(result) {
@@ -499,7 +579,10 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		}
 	}
 
-	$scope.inputs = [];
+	$scope.inputs = [{
+		name: 'MaxPrice',
+		value: '400'
+	}];
 	$scope.newInput = function(index) {
 		var newInput = { name: '', value: '' };
 		if(index == -1)

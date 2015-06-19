@@ -47,34 +47,45 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 	    	restrict: 'EA', // (E)lement or (A)trribute
 	    	scope: {
 		        data: '=', // bi-directional data-binding
+		        model: '=',
 		        onSelect: '&'  // parent execution binding
 		    },
 		    link: function(scope, ele, attrs) {
 		    	ele.addClass('autocomplete');
-		    	ele.html('<input type="text" class="new-card-input" placeholder="Type card name here, or select from the suggetions below" /> \
+		    	ele.html('<input type="text" class="new-card-input" placeholder="'+attrs.placeholder+'" value="'+scope.model+'" /> \
 						<div class="autocomplete-results"> \
-							<div class="autocomplete-placeholder">Type a card name above.</div> \
+							<div class="autocomplete-placeholder">'+attrs.autoPlaceholder+'</div> \
 						</div>');
 		    	var input = ele.find('input');
 		    	var results = ele.find('.autocomplete-results');
+		    	results.css('top', (input.height() + parseInt(input.css('padding-top')) * 2 + 1) + 'px');
 		    	var placeholder = ele.find('.autocomplete-placeholder');
 		    	var allResultsElems, resultsObjs;
 		    	resultsObjs = [];
+		    	function select(result) {
+		    		if(scope.model)
+	    				scope.model = result.name;
+	    			input.val(result.name);
+	    			if(scope.onSelect)
+	    				scope.onSelect({ obj: result });
+	    			input.blur();
+		    	}
 		    	$.each(scope.data, function(index) {
 		    		results.append('<div class="autocomplete-result" rel="'+index+'">'+this.name+'</div>');
 		    		var obj = { result: this, elem: results.find('[rel='+index+']')};
 		    		resultsObjs.push(obj);
 
 		    		obj.elem.click(function() {
-		    			scope.onSelect({ newCard: obj.result });
-		    			input.blur();
+		    			select(obj.result);
 		    		});
 		    	});
 		    	allResultsElems = ele.find('.autocomplete-result');
 		    	allResultsElems.hide();
 		    	results.hide();
+		    	var selectedClass = 'autocomplete-result-selected';
 		    	input.focus(function() {
 		    		results.show();
+		    		results.find('.'+selectedClass).removeClass(selectedClass);
 		    	});
 		    	input.blur(function() {
 		    		setTimeout(function() {
@@ -82,7 +93,6 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 		    		}, 150); // if you hide immediately, any click events won't register
 		    	});
 		    	var showingResults = [], selectedResultIndex;
-		    	var selectedClass = 'autocomplete-result-selected';
 		    	function updateResults(evt) {
 		    		var val = input.val().toLowerCase();
 		    		$(selectedClass).removeClass(selectedClass);
@@ -101,6 +111,7 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 		    				if(selectedResultIndex < showingResults.length - 1)
 		    					selectedResultIndex ++;
 		    				showingResults[selectedResultIndex].elem.addClass(selectedClass);
+		    				evt.preventDefault();
 		    			}
 		    			if(evt.keyCode == 38) {
 		    				// up
@@ -108,11 +119,12 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 		    				if(selectedResultIndex > 0)
 		    					selectedResultIndex --;
 		    				showingResults[selectedResultIndex].elem.addClass(selectedClass);
+		    				evt.preventDefault();
 		    			}
 		    		} else if(evt.keyCode == 13) {
 		    			// enter key
-		    			scope.onSelect({ newCard: showingResults[selectedResultIndex].result });
-		    			input.blur();
+		    			if(showingResults[selectedResultIndex])
+		    				select(showingResults[selectedResultIndex].result);
 		    		} else {
 		    			placeholder.hide();
 		    			allResultsElems.show();
@@ -135,6 +147,10 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 		    	input.keypress(updateResults);
 		    	input.on('keydown', updateResults);
 		    	input.on('keyup', updateResults);
+
+		    	scope.$watch('model', function(newModel, oldModel) {
+					input.val(newModel);
+				}, true);
 		    }
 		}
 	}]);

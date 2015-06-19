@@ -10,9 +10,12 @@
 						</div>
 					</a>
 				</div>
-				<div class="input">
+				<div class="input batch-input-area">
 					<div class="input-name-area">
-						<input ng-model="input.name" type="text" class="input-name-input" placeholder="Name">
+						<input ng-model="input.name" type="text" class="input-name-input first-input" placeholder="Name">
+						<div class="pull-right more-button">
+							<i class="fa fa-ellipsis-h"></i>
+						</div>
 					</div>
 					<div class="input-value-area">
 						<input ng-model="input.value" type="text" class="input-value-input" placeholder="Value">
@@ -26,53 +29,6 @@
 					</div>
 				</a>
 			</div>
-
-			<!-- <div class="input-card">
-				<div class="card-title">Search</div>
-				<input type="text" value="San Francisco, CA">
-			</div>
-			<div class="input-card">
-				<div class="card-title">Lat/Long</div>
-				<div class="input-lat-long-area">
-					<div class="input-lat-long">-37.7883&deg; N</div>
-					<div class="input-lat-long">122.4167&deg; W</div>
-				</div>
-			</div>
-			<div class="input-card">
-				<div class="card-title">Map</div>
-				<img class="input-map-img" src="assets/img/map-placeholder.jpeg" />
-			</div>
-			<div class="input-card">
-				<div class="card-title">Ratings</div>
-				<ul class="input-ratings-list">
-					<li class="input-rating">
-						<div class="result-star-shown"></div>
-						<div class="result-star-shown"></div>
-						<div class="result-star-shown"></div>
-						<div class="result-star-shown"></div>
-						<div class="result-star-shown"></div>
-					</li>
-					<li class="input-rating">
-						<div class="result-star-shown"></div>
-						<div class="result-star-shown"></div>
-						<div class="result-star-shown"></div>
-						<div class="result-star-shown"></div>
-					</li>
-					<li class="input-rating">
-						<div class="result-star-shown"></div>
-						<div class="result-star-shown"></div>
-						<div class="result-star-shown"></div>
-					</li>
-					<li class="input-rating">
-						<div class="result-star-shown"></div>
-						<div class="result-star-shown"></div>
-					</li>
-					<li class="input-rating">
-						<div class="result-star-shown"></div>
-					</li>
-				</ul>
-			</div> -->
-
 		</div>
 	</div>
 	<div class="col-sm-6 col-xs-12 main-column">
@@ -88,7 +44,7 @@
 							New Card
 							<a ng-click="card.newCardIsShowing = false" class="pull-right small"> Hide </a>
 						</div>
-						<div  tdb-autocomplete data="newCards" on-select="addCardAndApply(newCard, card)">
+						<div tdb-autocomplete data="newCards" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
 						</div>
 						<div class="new-card-suggestions-area">
 							<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion" ng-click="addCard(suggestion, card)">
@@ -102,10 +58,63 @@
 						</div>
 					</a>
 				</div>
-				<div class="card">
-					<div class="card-title">{{card.name}}</div>
-					<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
-					<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
+				<div class="card card-{{card.id}}">
+					<div class="card-title{{ card.useTitle ? '-no-border' : ''}} row">
+						<div class="col-xs-12 {{ card.useTitle ? 'card-title-no-border-text  col-sm-3 col-md-2' : ''}}">{{card.key || ""}} {{titleForCard(card)}}</div>
+						<div class="col-xs-12 col-sm-9 col-md-10">
+							<div class="card-from-area" ng-show="card.from">
+								<div tdb-autocomplete data="fromOptions" model="card.from.value" placeholder="Table Name" auto-placeholder="Start typing to see matching table names"></div>
+							</div>
+							<div class="card-filter-area" ng-show="card.filter">
+								<div class="row">
+									<div class="col-xs-4">
+										<div tdb-autocomplete data="selectableFields" model="card.filter.field" placeholder="Field" auto-placeholder="Start typing to see matching field names" on-select="apply()"></div>
+									</div>
+									<div class="col-xs-2">
+										<div class="sign-selector">
+											<select class="sign-select" ng-model="card.filter.operator">
+												<option value="le">&le;</option>
+												<option value="lt">&lt;</option>
+												<option value="ge">&ge;</option>
+												<option value="gt">&gt;</option>
+												<option value="eq">=</option>
+												<option value="ne">&ne;</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-xs-2">
+										<div class="sign-selector">
+											<select class="from-value-select" ng-model="card.filter.valueType">
+												<option value="input">Input</option>
+												<option value="raw">Raw</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-xs-4">
+										<input ng-model="card.filter.value" ng-blur="checkForNewInput(card)" ng-keydown="blurOnEnter($event)" placeholder="Value" />
+									</div>
+								</div>
+							</div>
+							<div class="card-transform-title-area" ng-show="card.transform">
+								
+							</div>
+						</div>
+					</div>
+					<div class="card-select-area" ng-show="card.select">
+						<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields track by $index">
+							<div class="col-xs-11 card-select-col">
+								<div tdb-autocomplete data="selectableFields" model="card.select.fields[$index]" placeholder="Field Name" auto-placeholder="Start typing to see matching field names" on-select="apply()"></div>
+							</div>
+							<div class="col-xs-1 card-select-col">
+								<div class="card-select-delete clickable" ng-click="removeSelectFieldFromCard(card, $index)"><i class="fa fa-remove"></i></div>
+							</div>
+						</div>
+						<input class="new-field-input" ng-click="newSelectFieldForCard(card)" placeholder="Click to add new field" />
+					</div>
+					<div class="card-transform-area" ng-show="card.transform">
+						<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
+						<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
+					</div>
 				</div>
 			</div>
 			<!-- TODO put this into a component so that copy/paste isn't needed -->
@@ -113,7 +122,7 @@
 				<div class="card-title">
 					New Card
 				</div>
-				<div  tdb-autocomplete data="newCards" on-select="addCardAndApply(newCard, null)">
+				<div  tdb-autocomplete data="newCards" on-select="addCardAndApply(obj, null)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
 				</div>
 				<div class="new-card-suggestions-area">
 					<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion" ng-click="addCard(suggestion, null)">

@@ -50,6 +50,9 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 	        onChange: '&'  // parent execution binding
 	    },
 	    link: function(scope, ele, attrs) {
+	    	if(!scope || !scope.data)
+	    		return;
+	    	
 	    	var opts = $.extend( {
 	    		color: "#aaa",
 	    		strokeWidth: 3,

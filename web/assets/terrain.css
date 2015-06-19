@@ -2,12 +2,24 @@ html, body, div {
 	font-family: 'Open Sans';
 }
 
+body {
+	overflow: hidden;
+}
+
 html, body {
 	background: #fff;
 }
 
 a {
 	cursor: pointer;
+}
+
+.vertically-middle {
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
 }
 
 .navbar-logo {
@@ -60,7 +72,87 @@ a {
 	border-bottom: 1px solid #ddd;
 }
 
+/* ASSETS */
+
+.more-button {
+	background: #fff;
+	width: 24px;
+	height: 24px;
+	border-radius: 12px;
+	border: 1px solid #ddd;
+	text-align: center;
+  display: inline-block;
+  color: #aaa;
+  font-size: 16px;
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s;
+  cursor: pointer;
+}
+
+.more-button:hover {
+	color: #47ffa7;
+	border-color: #47ffa7;
+}
+
 /* INPUTS */
+
+input {
+	font-family: "Open Sans", OpenSans, "Helvetica Neue", Helvetica, Arial, sans;
+	color: #37df97;
+	padding: 5px;
+	border-radius: 4px;
+	width: 100%;
+	outline: none;
+	font-size: 16px;
+  	border: 1px solid rgba(0,0,0,0);
+  	-webkit-transition: all 0.25s;
+  	transition: all 0.25s;
+  	font-weight: 500;
+}
+
+.batch-input-area input {
+	border-top: 1px solid #ddd;
+	border-top-right-radius: 0px;
+	border-top-left-radius: 0px;
+}
+
+.batch-input-area .first-input {
+	border-top: 1px solid rgba(0,0,0,0);
+}
+
+input:hover {
+	border-radius: 4px !important;
+	border-color: #77ffc7 !important;
+}
+
+input:hover, input:focus {
+	border-radius: 4px !important;
+	border-color: #37df97 !important;
+}
+
+input:focus {
+	/*background: #f5fff5;*/
+}
+
+::-webkit-input-placeholder {
+   color: #57ffa7;
+   font-weight: 500;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+   color: #57ffa7;
+   font-weight: 500;  
+}
+
+::-moz-placeholder {  /* Firefox 19+ */
+   color: #57ffa7;
+   font-weight: 500;  
+}
+
+:-ms-input-placeholder {  
+   color: #57ffa7;
+   font-weight: 500;  
+}
 
 .pre-input {
 	/*padding-left: 5px;*/
@@ -68,38 +160,32 @@ a {
 
 .input {
 	/*width: 200px;*/
+	padding: 5px;
+}
+
+.input-name-area {
+	/*margin-bottom: 5px;*/
+	position: relative;
+}
+
+.input-name-area .more-button {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+}
+
+.input-name-area input {
+	width: calc(100% - 24px - 4px); /* allow room for icon */
 }
 
 .inputs-area {
 	border-left: 1px solid #ddd;
 	width: 220px;
-	padding-right: 5px;
-}
-
-.input-card {
-	background: #fff;
-	padding: 5px;
-	/*border-radius: 4px;*/
-	/*margin-top: 5px;*/
-	border: 1px solid #ddd;
-	border-bottom: none;
-}
-
-.input-card:first-of-type {
-	border-top: none;
+	padding-left: 5px;
 }
 
 .input-map-img {
 	 width: 210px;
-}
-
-input {
-	padding: 5px;
-	border-radius: 4px;
-	/*width: 100%;*/
-	border: 1px solid #ddd;
-	outline: none;
-	font-size: 16px;
 }
 
 .input-lat-long {
@@ -129,25 +215,36 @@ input {
 	border-radius: 4px;
 }
 
+.clickable {
+	cursor: pointer;
+}
+
 
 /* CARDS */
 
 .card, .input {
 	background: #fff;
-	padding: 10px;
+	padding: 5px;
 	border-radius: 4px;
 	border: 1px solid #ddd;
 }
 
-.card-title {
+.card-title, .card-title-no-border {
 	margin-top: 0px;
-	margin-bottom: 5px;
-	padding-bottom: 2px;
-	border-bottom: 1px solid #f5f5f5;
 	font-size: 16px;
 	color: #888a8f;
 	font-weight: 200;
 	text-transform: uppercase;
+}
+
+.card-title {
+	border-bottom: 1px solid #f5f5f5;
+	margin-bottom: 5px;
+	padding-bottom: 2px;
+}
+
+.card-title-no-border-text {
+	padding-top: 6px !important;
 }
 
 .card-title .small {
@@ -158,6 +255,37 @@ input {
 	margin-bottom: 10px;
 }
 
+.card-select-area {
+	padding: 0px 10px;
+}
+
+.card-select-field {
+	border-bottom: 1px solid #eee;
+}
+
+.card-select-col {
+	padding: 0px !important;
+}
+
+.card-select-delete {
+	padding: 3px;
+	padding-top: 8px;
+	text-align: center;
+}
+
+.card-select-delete:hover {
+	color: #000;
+}
+
+.new-field-input {
+	margin: 5px -10px 0px -10px;
+	border: 0px;
+}
+
+.sign-selector {
+	text-align: center;
+	padding-top: 8px;
+}
 
 /* New card plus */
 

@@ -50,6 +50,9 @@ terrainApp.directive('d3Slicer', ['$window', '$timeout', 'd3Service', function($
 		        onChange: '&'  // parent execution binding
 		    },
 		    link: function(scope, ele, attrs) {
+		    	if(!scope || !scope.data)
+		    		return;
+
 		    	var opts = $.extend( {
 		    		width: $(ele[0]).width(),
 		    		height: 40,
@@ -61,7 +64,7 @@ terrainApp.directive('d3Slicer', ['$window', '$timeout', 'd3Service', function($
 		    		opts.cardId = parseInt(opts.cardId);
 		    	}
 
-		    	var slices = scope.data;
+		    	var slices = scope.data.reduce(function(builder, card) { if(card.transform) builder.push(card); return builder; }, []);
 
 		    	function editable(slice) {
 		    		return slice.id == opts.cardId || opts.cardId === -1;
