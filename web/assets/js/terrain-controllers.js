@@ -53,7 +53,7 @@ function selectPage(page) {
 terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http', '$timeout', function($scope, $routeParams, $http, $timeout) {
 	selectPage('#/builder');
 
-	var isShowing = ['builder'];
+	var isShowing = ['builder', 'inputs', 'results'];
 	$scope.showing = function(page, value) {
 		if($(window).width() > 767)
 			return true;
@@ -108,8 +108,13 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 
 	$http.get('assets/ajax/airbnb.json').success(function(response) {
       	$scope.results = response.data;
+      	var fields = {};
       	$.each($scope.results, function(index) {
       		var result = this;
+
+      		$.each(result, function(key,val) {
+      			fields[key] = 1;
+      		});
 
       		/* Locations */
       		var locScore = latLongToDistance(this.lat, this.long, $scope.search.lat, $scope.search.long); //Math.pow(this.lat - $scope.search.lat, 2) + Math.pow(this.long - $scope.search.long, 2);
@@ -132,7 +137,19 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
       		});
       	});
 		$scope.resort();
+
+		var i = 0;
+		$scope.selectableFields = $.map(fields, function(val, key) {
+			return {
+				id: i++,
+				name: key
+			}
+		})
+
+		console.log($scope.selectableFields);
     });
+
+	
 
 	$scope.spotlightColors = ['#67b7ff', '#67ffb7', '#ffb767', '#ff67b7', '#b7ff67', '#b767ff'];
 	$scope.spotlightLabels = ["1","2","3","4","5","6"];
@@ -173,12 +190,12 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		{ id: 4, name: 'Leasers' }
 		];
 	$scope.selectableFields = [
-		{ id: 1, name: 'name' },
-		{ id: 2, name: 'price' },
-		{ id: 3, name: 'rating' },
-		{ id: 4, name: 'reviews' },
-		{ id: 5, name: 'stays' },
-		{ id: 6, name: 'description'}
+		// { id: 1, name: 'name' },
+		// { id: 2, name: 'price' },
+		// { id: 3, name: 'rating' },
+		// { id: 4, name: 'reviews' },
+		// { id: 5, name: 'stays' },
+		// { id: 6, name: 'description'}
 		];
 
 	// $scope.setFieldForCard = function(card, fieldIndex, fieldObj) {
@@ -188,16 +205,21 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	$scope.titleForCard = function(card) {
 		if(card.from) return 'From';
 		if(card.select) return 'Select';
-		if(card.filter) return 'Filter';
+		if(card.filters) return 'Filter';
 		if(card.transform) return 'Transform';
+		if(card.sort) return 'Sort';
 	}
 
 	$scope.apply = function() {
+		console.log('ap');
+		var selectCard = $scope.cards.reduce(function(prev,cur) { if(cur.select) return cur; return prev; }, null);
+		console.log(selectCard.select.fields);
 		$scope.$apply();
 	}
 
 	$scope.newSelectFieldForCard = function(card) {
-		card.select.fields.push('');
+		card.select.fields = card.select.fields.concat(['$%#@']);
+		card.select.fields[card.select.fields.length - 1] = "";
 		$timeout(function() {
 			$(".card-" + card.id + " .card-select-field-" + (card.select.fields.length - 1) + " input").focus();
 		}, 100);
@@ -208,10 +230,14 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 
 	$scope.checkForNewInput = function(card) {
-		if(card.filter && card.filter.value && card.filter.value.length > 0) {
-			if(! $scope.inputs.reduce(function(value,cur) { if(cur.name == card.filter.value) return true; return value; }, false)) {
-				$scope.inputs.push({ name: card.filter.value, value: '' });
-			}
+		if(card.filters) {
+			$.each(card.filters, function(index,filter) {
+				if(filter.value && filter.value.length > 0) {
+					if(! $scope.inputs.reduce(function(value,cur) { if(cur.name == filter.value) return true; return value; }, false)) {
+						$scope.inputs.push({ name: filter.value, value: '' });
+					}
+				}
+			});
 		}
 	}
 
@@ -219,6 +245,25 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		if(evt.keyCode == 13) {
 			$(evt.currentTarget).blur();
 		}
+	}
+
+	$scope.addFilter = function(card) {
+		card.filters.push({
+			field: '',
+			valueType: 'input',
+			value: '',
+			operator: 'le'
+		});
+	}
+
+	$scope.selectedField = function(field) {
+		var selectCard = $scope.cards.reduce(function(prev,cur) { if(cur.select) return cur; return prev; }, null);
+		if(selectCard) {
+			if(!field && selectCard.select.fields.length == 0) return true;
+			return selectCard.select.fields.indexOf(field) != -1;
+		}
+		if(!field) return true;
+		return false;
 	}
 
 	$scope.cards = [{
@@ -230,15 +275,16 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}, {
 		id: 17,
 		select: {
-			fields: ['name', 'price', 'rating']
+			fields: ['name', 'price', 'rating', 'stays', 'description']
 		}
 	}, {
 		id: 23,
-		filter: {field: 'price',
-				valueType: 'input',
-				value: 'MaxPrice',
-				operator: 'lt'},
-		useTitle: true
+		filters: [{
+			field: 'price',
+			valueType: 'input',
+			value: 'MaxPrice',
+			operator: 'le'
+		}],
 	}, {
 		id: 1,
 		transform: true,
@@ -289,9 +335,19 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}];
 
 	$scope.newCards = [
+		{ 
+			id: 0,
+			sort: {
+				field: "",
+				order: "descending"
+			},
+			name: "Sort",
+			suggested: true,
+		},
 		{
 			id: 2,
-			name: 'Average Rating',
+			transform: true,
+			name: '[Transform] Average Rating',
 			key: 'rating',
 			inDataResponse: true,
 			data: {
@@ -312,7 +368,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			suggested: true
 		},
 		{
-			name: 'Number of Bedrooms',
+			transform: true,
+			name: '[Transform] Number of Bedrooms',
 			key: 'bedrooms',
 			inDataResponse: true,
 			id: 4,
@@ -333,7 +390,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			newCardIsShowing: false,
 			suggested: true
 		}, {
-			name: 'Number of Stays',
+			transform: true,
+			name: '[Transform] Number of Stays',
 			key: 'stays',
 			inDataResponse: true,
 			id: 5,
@@ -353,7 +411,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			newCardIsShowing: false,
 			suggested: true
 		}, {
-			name: 'Number of Reviews',
+			transform: true,
+			name: '[Transform] Number of Reviews',
 			key: 'reviews',
 			inDataResponse: true,
 			id: 6,
@@ -374,7 +433,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			suggested: true
 		}, {
 			id: 7,
-			name: 'Location (Map)',
+			transform: true,
+			name: '[Transform] Location (Map)',
 			key: 'location_map',
 			data: {
 				// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
@@ -393,7 +453,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			suggested: false
 		}, {
 			id: 8,
-			name: 'Location (MapRadius)',
+			transform: true,
+			name: '[Transform] Location (MapRadius)',
 			key: 'location_mapradius',
 			data: {
 				// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
@@ -412,7 +473,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			suggested: false
 		}, {
 			id: 9,
-			name: 'Location (Radius)',
+			transform: true,
+			name: '[Transform] Location (Radius)',
 			key: 'location_radius',
 			data: {
 				// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
@@ -431,7 +493,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			suggested: false
 		}, {
 			id: 10,
-			name: 'Location (LatLong)',
+			transform: true,
+			name: '[Transform] Location (LatLong)',
 			key: 'location_latlong',
 			data: {
 				// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
@@ -451,31 +514,53 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		}
 	];
 
+	$scope.hasTransformCards = function() {
+		return $scope.cards.reduce(function(val, cur) { return val || cur.transform; }, false);
+	}
+
 	$scope.addCard = function(cardToAdd, cardToAddInFrontOf) {
 		var addAtEnd = false;
 		if(cardToAddInFrontOf == null) {
 			var addAtEnd = true;
-			cardToAddInFrontOf
+			cardToAddInFrontOf = $scope.cards[0];
 		}
 
-		var cardToSubtractWeightFrom = cardToAddInFrontOf;
-		while(cardToSubtractWeightFrom && cardToSubtractWeightFrom.weight < 2 * cardToAdd.weight)
-			cardToSubtractWeightFrom = $scope.cards[$scope.cards.indexOf(cardToSubtractWeightFrom) + 1];
-		if(!cardToSubtractWeightFrom) {
-			cardToSubtractWeightFrom = cardToAddInFrontOf;
-			while(cardToSubtractWeightFrom && cardToSubtractWeightFrom.weight < 2 * cardToAdd.weight)
-				cardToSubtractWeightFrom = $scope.cards[$scope.cards.indexOf(cardToSubtractWeightFrom) - 1];
-			if(!cardToSubtractWeightFrom) {
-				alert("There's no more space for a new card right now.");
-				return;
+		if(cardToAdd.transform) {
+			if($scope.hasTransformCards()) {
+				cardToAdd.weight = 10;
+				var cardToSubtractWeightFrom = cardToAddInFrontOf;
+				while(cardToSubtractWeightFrom && (cardToSubtractWeightFrom.weight < 2 * cardToAdd.weight || !cardToSubtractWeightFrom.transform))
+					cardToSubtractWeightFrom = $scope.cards[$scope.cards.indexOf(cardToSubtractWeightFrom) + 1];
+				if(!cardToSubtractWeightFrom) {
+					cardToSubtractWeightFrom = cardToAddInFrontOf;
+					while(cardToSubtractWeightFrom && (cardToSubtractWeightFrom.weight < 2 * cardToAdd.weight || !cardToSubtractWeightFrom.transform))
+						cardToSubtractWeightFrom = $scope.cards[$scope.cards.indexOf(cardToSubtractWeightFrom) - 1];
+					if(!cardToSubtractWeightFrom) {
+						alert("There's no more space for a new card right now.");
+						return;
+					}
+				}
+
+				cardToSubtractWeightFrom.weight -= cardToAdd.weight;
+			} else {
+				cardToAdd.weight = 100;
 			}
+			cardToAdd.color = $scope.getColor();
 		}
 
-		cardToSubtractWeightFrom.weight -= cardToAdd.weight;
-		cardToAdd.color = $scope.getColor();
-		$scope.cards.splice($scope.cards.indexOf(cardToAddInFrontOf), 0, cardToAdd);
+		// if(cardToAdd.repeated) { // doesn't work (yet)
+		// 	var first = cardToAdd;
+		// 	cardToAdd = $.extend({}, cardToAdd); // clone
+		// 	first.name = 'first';
+		// 	console.log(first, cardToAdd);
+		// 	$.each(cardToAdd, function(key,obj) { // attempt to deep clone, please upgrade
+		// 		if(typeof obj == 'object')
+		// 			cardToAdd[key] = $.extend({}, obj);
+		// 	});
+		// }
+		$scope.cards.splice(addAtEnd ? $scope.cards.length : $scope.cards.indexOf(cardToAddInFrontOf), 0, cardToAdd);
 			cardToAddInFrontOf.newCardIsShowing = false;
-		if($scope.newCards.indexOf(cardToAdd) != -1)
+		if($scope.newCards.indexOf(cardToAdd) != -1 && !cardToAdd.repeated)
 			$scope.newCards.splice($scope.newCards.indexOf(cardToAdd), 1);
 		// if($scope.cards.indexOf(cardToAdd) == 0)
 		// 	cardToAdd.newCardIsShowing = true;
@@ -603,9 +688,11 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	$scope.newInput = function(index) {
 		var newInput = { name: '', value: '' };
 		if(index == -1)
-			$scope.inputs.push(newInput);
-		else
-			$scope.inputs.splice(index, 0, newInput);
+			index = $scope.inputs.length;
+		$scope.inputs.splice(index, 0, newInput);
+		$timeout(function() {
+			$(".input-"+index+" .input-name-input").focus();
+		}, 100);
 	}
 }]);
 

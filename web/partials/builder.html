@@ -15,7 +15,7 @@
 						</div>
 					</a>
 				</div>
-				<div class="input batch-input-area">
+				<div class="input batch-input-area input-{{$index}}">
 					<div class="input-name-area">
 						<input ng-model="input.name" type="text" class="input-name-input first-input" placeholder="Name">
 						<div class="pull-right more-button">
@@ -33,6 +33,9 @@
 						+
 					</div>
 				</a>
+			</div>
+			<div class="input">
+				<input type="text" placeholder="Add an input" ng-focus="newInput(-1)">
 			</div>
 		</div>
 	</div>
@@ -54,16 +57,16 @@
 							New Card
 							<a ng-click="card.newCardIsShowing = false" class="pull-right small"> Hide </a>
 						</div>
-						<div tdb-autocomplete data="newCards" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
+						<div tdb-autocomplete data="newCards" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
 						</div>
 						<div class="new-card-suggestions-area">
 							<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion" ng-click="addCard(suggestion, card)">
-								+ {{suggestion.name}}
+								{{suggestion.name}}
 							</a>
 						</div>
 					</div>
-					<a class="new-card-plus-area" ng-hide="card.newCardIsShowing">
-						<div ng-click="card.newCardIsShowing = true" class="new-card-plus">
+					<a class="new-card-plus-area" ng-hide="card.newCardIsShowing" ng-click="card.newCardIsShowing = true">
+						<div class="new-card-plus">
 							+
 						</div>
 					</a>
@@ -75,43 +78,13 @@
 							<div class="card-from-area" ng-show="card.from">
 								<div tdb-autocomplete data="fromOptions" model="card.from.value" placeholder="Table Name" auto-placeholder="Start typing to see matching table names"></div>
 							</div>
-							<div class="card-filter-area" ng-show="card.filter">
-								<div class="row">
-									<div class="col-xs-4">
-										<div tdb-autocomplete data="selectableFields" model="card.filter.field" placeholder="Field" auto-placeholder="Start typing to see matching field names" on-select="apply()"></div>
-									</div>
-									<div class="col-xs-2">
-										<div class="sign-selector">
-											<select class="sign-select" ng-model="card.filter.operator">
-												<option value="le">&le;</option>
-												<option value="lt">&lt;</option>
-												<option value="ge">&ge;</option>
-												<option value="gt">&gt;</option>
-												<option value="eq">=</option>
-												<option value="ne">&ne;</option>
-											</select>
-										</div>
-									</div>
-									<div class="col-xs-2">
-										<div class="sign-selector">
-											<select class="from-value-select" ng-model="card.filter.valueType">
-												<option value="input">Input</option>
-												<option value="raw">Raw</option>
-											</select>
-										</div>
-									</div>
-									<div class="col-xs-4">
-										<input ng-model="card.filter.value" ng-blur="checkForNewInput(card)" ng-keydown="blurOnEnter($event)" placeholder="Value" />
-									</div>
-								</div>
-							</div>
 							<div class="card-transform-title-area" ng-show="card.transform">
 								
 							</div>
 						</div>
 					</div>
 					<div class="card-select-area" ng-show="card.select">
-						<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields track by $index">
+						<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields">
 							<div class="col-xs-11 card-select-col">
 								<div tdb-autocomplete data="selectableFields" model="card.select.fields[$index]" placeholder="Field Name" auto-placeholder="Start typing to see matching field names" on-select="apply()"></div>
 							</div>
@@ -119,7 +92,38 @@
 								<div class="card-select-delete clickable" ng-click="removeSelectFieldFromCard(card, $index)"><i class="fa fa-remove"></i></div>
 							</div>
 						</div>
-						<input class="new-field-input" ng-click="newSelectFieldForCard(card)" placeholder="Click to add new field" />
+						<input class="new-field-input" ng-focus="newSelectFieldForCard(card)" placeholder="Click to add new field" />
+					</div>
+					<div class="card-filter-area" ng-show="card.filters">
+						<div class="row" ng-repeat="f in card.filters">
+							<div class="col-xs-4">
+								<div tdb-autocomplete data="selectableFields" model="f.field" placeholder="Field" auto-placeholder="Start typing to see matching field names" on-select="apply()"></div>
+							</div>
+							<div class="col-xs-2">
+								<div class="sign-selector">
+									<select class="sign-select" ng-model="f.operator">
+										<option value="le">&le;</option>
+										<option value="lt">&lt;</option>
+										<option value="ge">&ge;</option>
+										<option value="gt">&gt;</option>
+										<option value="eq">=</option>
+										<option value="ne">&ne;</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-xs-2">
+								<div class="sign-selector">
+									<select class="from-value-select" ng-model="f.valueType">
+										<option value="input">Input</option>
+										<option value="raw">Raw</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-xs-4">
+								<input ng-model="f.value" ng-blur="checkForNewInput(card)" ng-keydown="blurOnEnter($event)" placeholder="Value" />
+							</div>
+						</div>
+						<a class="new-filter-btn" ng-click="addFilter(card)">Add a Filter</a>
 					</div>
 					<div class="card-transform-area" ng-show="card.transform">
 						<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
@@ -132,11 +136,11 @@
 				<div class="card-title">
 					New Card
 				</div>
-				<div  tdb-autocomplete data="newCards" on-select="addCardAndApply(obj, null)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
+				<div  tdb-autocomplete data="newCards" on-select="addCardAndApply(obj, null)" input-classes="bordered-input" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
 				</div>
 				<div class="new-card-suggestions-area">
 					<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion" ng-click="addCard(suggestion, null)">
-						+ {{suggestion.name}}
+						 {{suggestion.name}}
 					</a>
 				</div>
 			</div>
@@ -168,9 +172,9 @@
 						</div>
 						<div class="result-img" style="background-image:url('assets/img/data/{{result.id}}.jpg');"></div>
 						<div class="result-text">
-							<div class="result-name">{{result.name}}</div>
+							<div class="result-name" ng-show="selectedField('name')">{{result.name}}</div>
 							<div class="result-info row">
-								<div class="result-rating col-xs-6">
+								<div class="result-rating col-xs-6" ng-show="selectedField('rating')">
 									<div class="result-stars">
 										<div ng-class="result.rating >= 1 ? 'result-star-shown' : 'result-star-hidden'"></div>
 										<div ng-class="result.rating >= 2 ? 'result-star-shown' : 'result-star-hidden'"></div>
@@ -180,10 +184,11 @@
 									</div>
 									<div class="result-rating-value">({{result.rating}})</div>
 								</div>
-								<div class="result-stays col-xs-4">{{result.stays}} Stays</div>
-								<div class="result-price col-xs-2">${{result.price}}</div>
+								<div class="result-stays col-xs-4" ng-show="selectedField('stays')">{{result.stays}} Stays</div>
+								<div class="result-price col-xs-2" ng-show="selectedField('price')">${{result.price}}</div>
 							</div>
-							<div class="result-description">{{result.description}}</div>
+							<div class="result-description" ng-show="selectedField('description')">{{result.description}}</div>
+							<div class="result-nothing-selected" ng-show="selectedField(false)"s>Add fields to a <b>Select</b> card to preview result data here.</div>
 						</div>
 					</div>
 					<div class="result-flipped" ng-show="result.flipped">

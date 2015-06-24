@@ -34,7 +34,7 @@
 	<!-- ================== END BASE JS ================== -->
 
 	<!-- ================== BEGIN TERRAIN CUSTOM ================== -->
-	<link rel="stylesheet" href="assets/terrain.css">
+	<link rel="stylesheet/less" type="text/css" href="assets/terrain.less" />
 	<link rel="stylesheet" href="barline.css">
 	<link rel="stylesheet" href="slicer.css">
 	<link rel="stylesheet" href="assets/css/terrain-autocomplete.css">
@@ -55,6 +55,22 @@
 	<script src="assets/js/terrain-slicer.angular.js"></script>
 	<script src="assets/js/terrain-controllers.js"></script>
 	<script src="assets/js/terrain-directives.js"></script>
+
+	<!-- set options before less.js script -->
+	<script>
+	  less = {
+	    env: "development",
+	    async: false,
+	    fileAsync: false,
+	    poll: 1000,
+	    functions: {},
+	    dumpLineNumbers: "comments",
+	    relativeUrls: false,
+	    rootpath: ""
+	  };
+	</script>
+	<script src="assets/js/less.min.js"></script>
+
 	<!-- ================== END TERRAIN CUSTOM ================== -->
 </head>
 <body>

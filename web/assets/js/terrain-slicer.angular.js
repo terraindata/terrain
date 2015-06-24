@@ -64,7 +64,7 @@ terrainApp.directive('d3Slicer', ['$window', '$timeout', 'd3Service', function($
 		    		opts.cardId = parseInt(opts.cardId);
 		    	}
 
-		    	var slices = scope.data.reduce(function(builder, card) { if(card.transform) builder.push(card); return builder; }, []);
+		    	var slices;
 
 		    	function editable(slice) {
 		    		return slice.id == opts.cardId || opts.cardId === -1;
@@ -77,6 +77,7 @@ terrainApp.directive('d3Slicer', ['$window', '$timeout', 'd3Service', function($
 		    	var slice_area, handle_area, slicer, cardIndex;
 
 		    	function init() {
+		    		slices = scope.data.reduce(function(builder, card) { if(card.transform) builder.push(card); return builder; }, []);
 			    	$(ele[0]).html("");
 				   	slicer = $(ele[0]).append("<div>").find("div")
 				    	.addClass("slicer")
@@ -135,10 +136,17 @@ terrainApp.directive('d3Slicer', ['$window', '$timeout', 'd3Service', function($
 			    			var handle = handle_area.append("<div class='handle' rel='"+i+"'>")
 			    									.find('.handle[rel='+i+']')
 			    									.css('left', "calc(" + sum + '% - ' + $('.handle').width() / 2 + 'px)');
-			    			handle.on('mousedown', function(evt) {
+			    			var touchDown = function(evt) {
 			    				handle.addClass('handle-selected');
 			    				handle.attr('offset-x', (evt.pageX - handle.offset().left));
+			    			}
+			    			handle.on('mousedown', function(evt) {
+			    				touchDown(evt);
 			    			});
+			    			handle.on('touchstart', function(evt) {
+			    				evt.pageX = evt.originalEvent.touches[0].clientX;
+			    				touchDown(evt);
+			    			})
 			    		}
 			    	});
 				}
@@ -167,11 +175,19 @@ terrainApp.directive('d3Slicer', ['$window', '$timeout', 'd3Service', function($
 						updateSlicer();
 				}, true);
 
-				$(document).on('mouseup', function() {
+				var moveEnd = function() {
 					$(ele[0]).find('.handle-selected').removeClass('handle-selected');
+				}
+				$(document).on('mouseup', function() {
+					moveEnd();
 				});
-				$(document).on('mousemove', function(evt) {
+				$(document).on('touchend', function() {
+					moveEnd();
+				});
+
+				var touchMove = function(evt) {
 					if($(ele[0]).find('.handle-selected').length) {
+						evt.preventDefault();
 						// This code moves the handle smoothly
 						// $('.handle-selected').css('left', (evt.pageX - parseInt($('.handle-selected').attr('offset-x'))) + 'px');
 
@@ -200,6 +216,13 @@ terrainApp.directive('d3Slicer', ['$window', '$timeout', 'd3Service', function($
 							scope.onChange({cardId: opts.cardId});
 						}
 					}
+				}
+				$(document).on('mousemove', function(evt) {
+					touchMove(evt);
+				});
+				$(document).on('touchmove', function(evt) {
+					evt.pageX = evt.originalEvent.touches[0].clientX;
+					touchMove(evt);
 				});
 			}
 		}

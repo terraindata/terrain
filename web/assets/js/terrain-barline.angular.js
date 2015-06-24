@@ -251,7 +251,9 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		spotlightsArea.selectAll('*').remove();
 		if(data.spotlights) {
 			$.each(data.spotlights, function() {
-				var radius = 15;
+				var spotlightWidth = 4;
+				var spotlightSpacing = 3;
+				var radius = pointRadius + spotlightWidth + spotlightSpacing;
 				var bucket = bucketForVal(this.rawValue);
 				var point1 = data.points[Math.floor(bucket / data.barToPointRatio)];
 				var point2 = data.points[Math.ceil(bucket / data.barToPointRatio)];
@@ -265,19 +267,19 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 							.attr('cx', cx)
 							.attr('cy', cy)
 							.attr('r', radius)
-							.attr('fill', this.color)
-							.attr('stroke', d3.rgb(this.color).darker(0.5))
-							.attr('stroke-width', 1);
+							.attr('fill', 'rgba(0,0,0,0)')
+							.attr('stroke', this.color)
+							.attr('stroke-width', spotlightWidth);
 				
-				var textSize = 16;
-				spotlightsArea.append('text')
-							.attr('x', cx)
-							.attr('y', cy + ((radius * 2 - textSize) / 2))
-							.text(this.label)
-							.attr('text-anchor', 'middle')
-							.attr('font-family', '"Open Sans", OpenSans')
-							.attr('fill', '#fff')
-							.attr('font-size', textSize * 1.15 + 'px');
+				// var textSize = 16;
+				// spotlightsArea.append('text')
+				// 			.attr('x', cx)
+				// 			.attr('y', cy + ((radius * 2 - textSize) / 2))
+				// 			.text(this.label)
+				// 			.attr('text-anchor', 'middle')
+				// 			.attr('font-family', '"Open Sans", OpenSans')
+				// 			.attr('fill', '#fff')
+				// 			.attr('font-size', textSize * 1.15 + 'px');
 			});
 		}
 
@@ -307,6 +309,12 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		// MARK: Points
 		// var pointGroup = svg.append('g')
 		if(resize == true) svg.selectAll('circle').remove(); /* deals with data not being dirty on window resize */
+		var touchDown = function(d, i) {
+			console.log('td');
+			$(ele[0]).find(".point_" + i).attr("rel", "active");
+			$(ele[0]).find("[rel=active]").css("stroke", opts.activeColor);
+			$(ele[0]).find("[rel=active]").css("stroke-width", opts.strokeWidth * 1.5);
+		}
 		svg //.append('g')
 			//.attr('class', 'point-group')
 			.selectAll("circle")
@@ -341,19 +349,17 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			})
 			// .css('z-index', 999)
 			.on("mousedown", function(d, i) {
-				$(ele[0]).find(".point_" + i).attr("rel", "active");
-				$(ele[0]).find("[rel=active]").css("stroke", opts.activeColor);
-				$(ele[0]).find("[rel=active]").css("stroke-width", opts.strokeWidth * 1.5);
+				touchDown(d,i);
 			})
-			.on("mousedown", function(d, i) {
-				$(ele[0]).find(".point_" + i).attr("rel", "active");
-				$(ele[0]).find("[rel=active]").css("stroke", opts.activeColor);
-				$(ele[0]).find("[rel=active]").css("stroke-width", opts.strokeWidth * 1.5);
+			.on("touchstart", function(d, i) {
+				touchDown(d,i);
 			});;
 
-			svg.on("mousemove", function() {
+			var touchMove = function(obj, evt) {
 				if($(ele[0]).find("[rel=active]").length) {
-					var pos = d3.mouse(this)[1];
+					console.log(evt);
+					if(evt) evt.preventDefault();
+					var pos = d3.mouse(obj)[1];
 					if(pos < minY)
 						pos = minY;
 					if(pos > maxY)
@@ -372,17 +378,37 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 
 					scope.onChange({cardId: opts.cardId});
 				}
-			})
-			.on("mouseup", function() {
+			}
+			var touchEnd = function() {
+				console.log('tend');
 				// sense mouseup here in case cursor has moved off of the point
 				$(ele[0]).find("[rel=active]").css("stroke", strokeColor);
 				$(ele[0]).find("[rel=active]").css("stroke-width", opts.strokeWidth);
 				$(ele[0]).find("[rel=active]").attr('rel', '');
+			}
+
+			$(document).on('touchmove', function(evt) {
+				if($(ele[0]).find("[rel=active]").length) {
+					evt.preventDefault();
+				}
+			});
+
+			svg.on("mousemove", function() {
+				touchMove(this);
+			})
+			.on("touchmove", function() {
+				touchMove(this);
+			})
+			.on("mouseup", function() {
+				touchEnd();
+			})
+			.on("touchend", function() {
+				touchEnd();
 			});
 		}
 
-		var linesArea = svg.append('g');
 		var spotlightsArea = svg.append('g');
+		var linesArea = svg.append('g');
 	scope.$watch('data', function(newData) { doChart(newData) }, true);
 	$(window).resize(function() {
 		doChart(data, true);
