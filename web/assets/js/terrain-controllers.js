@@ -144,9 +144,10 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 				id: i++,
 				name: key
 			}
-		})
+		});
 
-		console.log($scope.selectableFields);
+		$scope.orderableFields = $scope.selectableFields.concat([{id: -1, name: '*TerrainScore'}]);
+
     });
 
 	
@@ -197,6 +198,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		// { id: 5, name: 'stays' },
 		// { id: 6, name: 'description'}
 		];
+	$scope.orderableFields = [];
 
 	// $scope.setFieldForCard = function(card, fieldIndex, fieldObj) {
 
@@ -207,13 +209,15 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		if(card.select) return 'Select';
 		if(card.filters) return 'Filter';
 		if(card.transform) return 'Transform';
-		if(card.sort) return 'Sort';
+		if(card.order) return 'Order';
+	}
+
+	$scope.cardFor = function(type) {
+		return $scope.cards.reduce(function(prev,cur) { if(cur[type]) return cur; return prev; }, null);
 	}
 
 	$scope.apply = function() {
-		console.log('ap');
-		var selectCard = $scope.cards.reduce(function(prev,cur) { if(cur.select) return cur; return prev; }, null);
-		console.log(selectCard.select.fields);
+		var selectCard = $scope.cardFor('select');
 		$scope.$apply();
 	}
 
@@ -232,7 +236,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	$scope.checkForNewInput = function(card) {
 		if(card.filters) {
 			$.each(card.filters, function(index,filter) {
-				if(filter.value && filter.value.length > 0) {
+				if(filter.value && filter.value.length > 0 && filter.valueType == 'input') {
 					if(! $scope.inputs.reduce(function(value,cur) { if(cur.name == filter.value) return true; return value; }, false)) {
 						$scope.inputs.push({ name: filter.value, value: '' });
 					}
@@ -256,8 +260,47 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		});
 	}
 
+	$scope.inputFor = function(inputName) {
+		return $scope.inputs.reduce(function(prev,cur) { return cur.name == inputName ? cur : prev; }, null);
+	}
+
+	$scope.filterResult = function(result) {
+		// return true if result should be displayed
+		var filtersCard = $scope.cardFor('filters'), passing = true;;
+		$.each(filtersCard.filters, function() {
+			if(!this.field || this.field.length == 0 || this.value.length == 0)
+				return;
+			var fieldValue = result[this.field], filterValue;
+			if(this.valueType == 'input') {
+				var input = $scope.inputFor(this.value);
+				if(!input || input.value.length == 0) return;
+				filterValue = input && input.value;
+			} else {
+				filterValue = this.value;
+			}
+			filterValue = parseFloat(filterValue);
+			fieldValue = parseFloat(fieldValue);
+			switch(this.operator) {
+				case 'le':
+					passing = passing && fieldValue <= filterValue;
+					break;
+				case 'lt':
+					passing = passing && fieldValue < filterValue;
+				case 'ge':
+					passing = passing && fieldValue >= filterValue;
+					break;
+				case 'gt':
+					passing = passing && fieldValue > filterValue;
+				case 'eq':
+					passing = passing && fieldValue == filterValue;
+					break;
+			}
+		});
+		return passing;
+	}
+
 	$scope.selectedField = function(field) {
-		var selectCard = $scope.cards.reduce(function(prev,cur) { if(cur.select) return cur; return prev; }, null);
+		var selectCard =  $scope.cardFor('select');
 		if(selectCard) {
 			if(!field && selectCard.select.fields.length == 0) return true;
 			return selectCard.select.fields.indexOf(field) != -1;
@@ -285,6 +328,15 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			value: 'MaxPrice',
 			operator: 'le'
 		}],
+	}, { 
+		id: 0,
+		order: {
+			field: "*TerrainScore",
+			direction: "descending"
+		},
+		name: "Order",
+		useTitle: true,
+		suggested: true,
 	}, {
 		id: 1,
 		transform: true,
@@ -335,15 +387,6 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}];
 
 	$scope.newCards = [
-		{ 
-			id: 0,
-			sort: {
-				field: "",
-				order: "descending"
-			},
-			name: "Sort",
-			suggested: true,
-		},
 		{
 			id: 2,
 			transform: true,
@@ -683,7 +726,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 
 	$scope.inputs = [{
 		name: 'MaxPrice',
-		value: '400'
+		value: '200'
 	}];
 	$scope.newInput = function(index) {
 		var newInput = { name: '', value: '' };

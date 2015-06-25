@@ -81,6 +81,17 @@
 							<div class="card-transform-title-area" ng-show="card.transform">
 								
 							</div>
+							<div class="card-sort-title-area row" ng-show="card.order">
+								<div class="col-xs-12 col-sm-6">
+									<div tdb-autocomplete data="orderableFields" model="card.order.field" placeholder="Field Name" auto-placeholder="Start typing to see matching field names" on-select="apply()"></div>
+								</div>
+								<div class="col-xs-12 col-sm-6">
+									<select ng-model="card.order.direction" class="card-order-select">
+										<option value="descending">Descending</option>
+										<option value="ascending">Ascending</option>
+									</select>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="card-select-area" ng-show="card.select">
@@ -92,7 +103,7 @@
 								<div class="card-select-delete clickable" ng-click="removeSelectFieldFromCard(card, $index)"><i class="fa fa-remove"></i></div>
 							</div>
 						</div>
-						<input class="new-field-input" ng-focus="newSelectFieldForCard(card)" placeholder="Click to add new field" />
+						<input class="new-field-input" ng-focus="newSelectFieldForCard(card)" placeholder="Add a new field" />
 					</div>
 					<div class="card-filter-area" ng-show="card.filters">
 						<div class="row" ng-repeat="f in card.filters">
@@ -123,7 +134,7 @@
 								<input ng-model="f.value" ng-blur="checkForNewInput(card)" ng-keydown="blurOnEnter($event)" placeholder="Value" />
 							</div>
 						</div>
-						<a class="new-filter-btn" ng-click="addFilter(card)">Add a Filter</a>
+						<a class="new-filter-btn" ng-click="addFilter(card)">Add a filter</a>
 					</div>
 					<div class="card-transform-area" ng-show="card.transform">
 						<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
@@ -154,7 +165,7 @@
 			</div>
 		</h1>
 		<div class="results-area fixed-area" ng-show="showing('results')">
-			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort" ng-drop="true" ng-drop-success="onDropComplete($index, $data,$event)">
+			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort | filter: filterResult" ng-drop="true" ng-drop-success="onDropComplete($index, $data,$event)">
 				<div class="result-inner" ng-drag="true" ng-drag-data="result" allow-transform="false">
 					<div class="result-main" ng-show="!result.flipped">
 						<div class="result-score" ng-click="result.flipped = !result.flipped">

@@ -310,7 +310,6 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		// var pointGroup = svg.append('g')
 		if(resize == true) svg.selectAll('circle').remove(); /* deals with data not being dirty on window resize */
 		var touchDown = function(d, i) {
-			console.log('td');
 			$(ele[0]).find(".point_" + i).attr("rel", "active");
 			$(ele[0]).find("[rel=active]").css("stroke", opts.activeColor);
 			$(ele[0]).find("[rel=active]").css("stroke-width", opts.strokeWidth * 1.5);
@@ -357,7 +356,6 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 
 			var touchMove = function(obj, evt) {
 				if($(ele[0]).find("[rel=active]").length) {
-					console.log(evt);
 					if(evt) evt.preventDefault();
 					var pos = d3.mouse(obj)[1];
 					if(pos < minY)
@@ -380,7 +378,6 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 				}
 			}
 			var touchEnd = function() {
-				console.log('tend');
 				// sense mouseup here in case cursor has moved off of the point
 				$(ele[0]).find("[rel=active]").css("stroke", strokeColor);
 				$(ele[0]).find("[rel=active]").css("stroke-width", opts.strokeWidth);
