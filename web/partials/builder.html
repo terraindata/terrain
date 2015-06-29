@@ -83,10 +83,10 @@
 							</div>
 							<div class="card-sort-title-area row" ng-show="card.order">
 								<div class="col-xs-12 col-sm-6">
-									<div tdb-autocomplete data="orderableFields" model="card.order.field" placeholder="Field Name" auto-placeholder="Start typing to see matching field names" on-select="apply()"></div>
+									<div tdb-autocomplete data="orderableFields" model="card.order.field" placeholder="Field Name" auto-placeholder="Start typing to see matching field names" on-select="handleChange()"></div>
 								</div>
 								<div class="col-xs-12 col-sm-6">
-									<select ng-model="card.order.direction" class="card-order-select">
+									<select ng-model="card.order.direction" ng-change="resort()" class="card-order-select">
 										<option value="descending">Descending</option>
 										<option value="ascending">Ascending</option>
 									</select>

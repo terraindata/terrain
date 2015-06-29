@@ -76,6 +76,10 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		return false;
 	}
 
+	if($scope.ab('logo')) {
+		$(".navbar-logo").addClass("navbar-logo-green");
+	}
+
 	$scope.colorIndex = 0;
 	$scope.getColor = function() {
 		return CARD_COLORS[$scope.colorIndex ++];
@@ -331,7 +335,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}, { 
 		id: 0,
 		order: {
-			field: "*TerrainScore",
+			field: "stays", // "*TerrainScore",
 			direction: "descending"
 		},
 		name: "Order",
@@ -649,6 +653,12 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 
 	$scope.scoreForResult = function(result) {
+		var orderCard = $scope.cardFor('order');
+		if(orderCard && orderCard.order.field != '*TerrainScore') {
+			return result[orderCard.order.field];
+		}
+
+		// TerrainScore
 		var total = 0;
 		$.each($scope.cards, function(index, card) {
 			if(card.transform)
@@ -659,6 +669,9 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 
 	$scope.numberToDisplay = function(val) {
 		var score = Math.floor(val * 1000) / 1000;
+		if(score > 1) {
+			return score;
+		}
 		if(score == 1) return "1.00";
 		score = ("" + score).substr(1);
 		while(score.length < 4) score = score + "0";
@@ -714,7 +727,12 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			return normals;
 		}, {});
 
-		scores.sort().reverse();
+		scores.sort(function(a,b) { return a > b; });
+
+		var orderCard = $scope.cardFor('order');
+		if(!orderCard || orderCard.order.direction == 'descending')
+			scores.reverse();
+
 		var index = 0;
 		while(index < $scope.results.length) {
 			if(!overrides[index]) {
