@@ -271,6 +271,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	$scope.filterResult = function(result) {
 		// return true if result should be displayed
 		var filtersCard = $scope.cardFor('filters'), passing = true;;
+		if(!filtersCard) return true;
 		$.each(filtersCard.filters, function() {
 			if(!this.field || this.field.length == 0 || this.value.length == 0)
 				return;
@@ -318,24 +319,27 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		from: {
 			value: 'Listings'
 		},
+		name: 'From',
 		useTitle: true
 	}, {
 		id: 17,
 		select: {
 			fields: ['name', 'price', 'rating', 'stays', 'description']
-		}
+		},
+		name: 'Select'
 	}, {
-		id: 23,
+		id: 237,
 		filters: [{
 			field: 'price',
 			valueType: 'input',
 			value: 'MaxPrice',
 			operator: 'le'
 		}],
+		name: 'Filter'
 	}, { 
 		id: 0,
 		order: {
-			field: "stays", // "*TerrainScore",
+			field: "*TerrainScore",
 			direction: "descending"
 		},
 		name: "Order",
@@ -366,7 +370,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		newCardIsShowing: false,
 		showing: true,
 	}, {
-		id: 0,
+		id: 23,
 		transform: true,
 		name: 'Location',
 		key: 'location',
@@ -565,7 +569,18 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		return $scope.cards.reduce(function(val, cur) { return val || cur.transform; }, false);
 	}
 
+	$scope.removeCard = function(card) {
+		$scope.cards.splice($scope.cards.indexOf(card), 1);
+		var newCard = $.extend({}, card);
+		newCard.suggested = true;
+		console.log(newCard['$$hashKey']);
+		delete newCard['$$hashKey'];
+		$scope.newCards = $scope.newCards.concat([newCard]);
+	}
+
 	$scope.addCard = function(cardToAdd, cardToAddInFrontOf) {
+		if($scope.cards.indexOf(cardToAdd) !== -1) return;
+		console.log('add card', cardToAdd);
 		var addAtEnd = false;
 		if(cardToAddInFrontOf == null) {
 			var addAtEnd = true;
@@ -696,6 +711,13 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 
 	$scope.onDropComplete = function(index,result,event) {
+		var indexToMove = index, resultToMove = $scope.results.reduce(function(ans,cur) { console.log(ans,cur); if(cur.overrideIndex === indexToMove) return cur; return ans; }, null);
+		while(resultToMove !== null) {
+			indexToMove ++;
+			var nextResultToMove = $scope.results.reduce(function(ans,cur) { console.log(ans,cur); if(cur.overrideIndex === indexToMove) return cur; return ans; }, null);
+			resultToMove.overrideIndex = indexToMove;
+			resultToMove = nextResultToMove;
+		}
 		result.overrideIndex = index;
 		$scope.resort();
 	}
@@ -754,6 +776,9 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		$timeout(function() {
 			$(".input-"+index+" .input-name-input").focus();
 		}, 100);
+	}
+	$scope.removeInputAtIndex = function(index) {
+		$scope.inputs.splice(index, 1);
 	}
 }]);
 

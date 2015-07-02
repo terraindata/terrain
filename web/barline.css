@@ -27,8 +27,8 @@ svg {
 
 .point {
 	cursor: pointer;
-	-webkit-transition: all 0.15s;
-	transition: all 0.15s;
+	-webkit-transition: stroke-width 0.25s, stroke 0.25s;
+	transition: stroke-width 0.25s, stroke 0.25s;
 	z-index: 999;
 }
 

@@ -265,23 +265,23 @@ angular.module("ngDraggable", [])
                     };
 
                     var reset = function() {
-                        if(allowTransform)
-                        element.css({transform:'', 'z-index':'', '-webkit-transform':'', '-ms-transform':''});
-                        else
-                        element.css({'position':'',top:'',left:''});
+                        // if(allowTransform)
+                        // element.css({transform:'', 'z-index':'', '-webkit-transform':'', '-ms-transform':''});
+                        // else
+                        // element.css({'position':'',top:'',left:''});
                     };
 
                     var moveElement = function (x, y) {
-                        if(allowTransform) {
-                            element.css({
-                                transform: 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + x + ', ' + y + ', 0, 1)',
-                                'z-index': 99999,
-                                '-webkit-transform': 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + x + ', ' + y + ', 0, 1)',
-                                '-ms-transform': 'matrix(1, 0, 0, 1, ' + x + ', ' + y + ')'
-                            });
-                        }else{
-                            element.css({'left':x+'px','top':y+'px', 'position':'fixed'});
-                        }
+                        // if(allowTransform) {
+                        //     element.css({
+                        //         transform: 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + x + ', ' + y + ', 0, 1)',
+                        //         'z-index': 99999,
+                        //         '-webkit-transform': 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + x + ', ' + y + ', 0, 1)',
+                        //         '-ms-transform': 'matrix(1, 0, 0, 1, ' + x + ', ' + y + ')'
+                        //     });
+                        // }else{
+                        //     element.css({'left':x+'px','top':y+'px', 'position':'fixed'});
+                        // }
                     };
                     initialize();
                 }
@@ -486,12 +486,12 @@ angular.module("ngDraggable", [])
                         element.css({left:0,top:0, position:'fixed', 'z-index':-1, visibility:'hidden'});
                     };
                     var moveElement = function(x,y) {
-                        element.css({
-                            transform: 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, '+x+', '+y+', 0, 1)', 'z-index': 99999, 'visibility': 'visible',
-                            '-webkit-transform': 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, '+x+', '+y+', 0, 1)',
-                            '-ms-transform': 'matrix(1, 0, 0, 1, '+x+', '+y+')'
-                            //,margin: '0'  don't monkey with the margin,
-                        });
+                        // element.css({
+                        //     transform: 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, '+x+', '+y+', 0, 1)', 'z-index': 99999, 'visibility': 'visible',
+                        //     '-webkit-transform': 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, '+x+', '+y+', 0, 1)',
+                        //     '-ms-transform': 'matrix(1, 0, 0, 1, '+x+', '+y+')'
+                        //     //,margin: '0'  don't monkey with the margin,
+                        // });
                     };
 
                     var absorbEvent_ = function (event) {

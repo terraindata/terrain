@@ -46,8 +46,8 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 	return {
 	    	restrict: 'EA', // (E)lement or (A)trribute
 	    	scope: {
-		        data: '=', // bi-directional data-binding
-		        model: '=',
+		        data: '=?', // bi-directional data-binding
+		        model: '=?',
 		        onSelect: '&'  // parent execution binding
 		    },
 		    link: function(scope, ele, attrs) {
@@ -159,6 +159,7 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 				}, true);
 
 				scope.$watch('data', function(newData, oldData) {
+					console.log('new data', newData);
 					doResults(newData);
 				});
 		    }

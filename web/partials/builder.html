@@ -18,8 +18,12 @@
 				<div class="input batch-input-area input-{{$index}}">
 					<div class="input-name-area">
 						<input ng-model="input.name" type="text" class="input-name-input first-input" placeholder="Name">
-						<div class="pull-right more-button">
-							<i class="fa fa-ellipsis-h"></i>
+						<div class="pull-right more-button more-2-items">
+							<i class="fa fa-ellipsis-h more-icon"></i>
+							<div class="more-hidden-area">
+								<a class="more-menu-item">Join</a>
+								<a class="more-menu-item" ng-click="removeInputAtIndex($index)">Remove</a>
+							</div>
 						</div>
 					</div>
 					<div class="input-value-area">
@@ -50,15 +54,14 @@
 			<div class="all-weights" ng-show="ab('weights')">
 				<div class="weight" d3-slicer data="cards" on-change="handleChange(cardId)" card-id="-1"></div>
 			</div>
-			<div ng-repeat="card in cards">
+			<div ng-repeat="card in cards track by card.id">
 				<div class="pre-card">
 					<div class="new-card card" ng-show="card.newCardIsShowing">
 						<div class="card-title">
 							New Card
 							<a ng-click="card.newCardIsShowing = false" class="pull-right small"> Hide </a>
 						</div>
-						<div tdb-autocomplete data="newCards" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
-						</div>
+						<div tdb-autocomplete data="newCards" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names"></div>
 						<div class="new-card-suggestions-area">
 							<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion" ng-click="addCard(suggestion, card)">
 								{{suggestion.name}}
@@ -73,8 +76,8 @@
 				</div>
 				<div class="card card-{{card.id}}">
 					<div class="card-title{{ card.useTitle ? '-no-border' : ''}} row">
-						<div class="col-xs-12 {{ card.useTitle ? 'card-title-no-border-text  col-sm-3 col-md-2' : ''}}">{{card.key || ""}} {{titleForCard(card)}}</div>
-						<div class="col-xs-12 col-sm-9 col-md-10">
+						<div class="col-xs-11 {{ card.useTitle ? 'card-title-no-border-text  col-sm-3 col-md-2' : ''}}">{{card.key || ""}} {{titleForCard(card)}}</div>
+						<div class="col-xs-11 col-sm-8 col-md-9">
 							<div class="card-from-area" ng-show="card.from">
 								<div tdb-autocomplete data="fromOptions" model="card.from.value" placeholder="Table Name" auto-placeholder="Start typing to see matching table names"></div>
 							</div>
@@ -93,6 +96,14 @@
 								</div>
 							</div>
 						</div>
+						<!-- <div class="col-xs-1"> -->
+							<div class="more-button more-right">
+								<i class="fa fa-ellipsis-h more-icon"></i>
+								<div class="more-hidden-area">
+									<div class="more-menu-item" ng-click="removeCard(card)">Remove</div>
+								</div>
+							</div>
+						<!-- </div> -->
 					</div>
 					<div class="card-select-area" ng-show="card.select">
 						<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields">
@@ -166,7 +177,7 @@
 		</h1>
 		<div class="results-area fixed-area" ng-show="showing('results')">
 			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort | filter: filterResult" ng-drop="true" ng-drop-success="onDropComplete($index, $data,$event)">
-				<div class="result-inner" ng-drag="true" ng-drag-data="result" allow-transform="false">
+				<div class="result-inner" ng-drag="true" ng-drag-data="result">
 					<div class="result-main" ng-show="!result.flipped">
 						<div class="result-score" ng-click="result.flipped = !result.flipped">
 							<img src="assets/img/Terrain_Icon_White.png" class="result-score-img" />
