@@ -730,21 +730,24 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	$scope.resort = function() {
 		// since we want to allow manual overrides, we have to make our own sorting function. Fun, I know.
 		// assumes: overrideIndexes are unique
+		var showingResults = 0;
 		var overrides = $scope.results.reduce(function(overrides, result) {
-			if(result.overrideIndex !== false) {
+			if(result.overrideIndex !== false && $scope.filterResult(result)) {
 				overrides[result.overrideIndex] = result;
 				result.index = result.overrideIndex;
+				showingResults ++;
 			}
 			return overrides;
 		}, {});
 		var scores = [];
 		var normals = $scope.results.reduce(function(normals, result) {
-			if(result.overrideIndex === false) {
+			if(result.overrideIndex === false && $scope.filterResult(result)) {
 				var score = $scope.scoreForResult(result);
 				if(!normals[score])
 					normals[score] = [];
 				normals[score].push(result);
 				scores.push(score);
+				showingResults ++;
 			}
 			return normals;
 		}, {});
@@ -756,12 +759,14 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			scores.reverse();
 
 		var index = 0;
-		while(index < $scope.results.length) {
+		while(index < showingResults) {
 			if(!overrides[index]) {
 				normals[scores.shift()].shift().index = index;
 			}
 			index ++;
 		}
+
+		console.log($.map($scope.results, function(v) { return v.index + " " + v.name }).sort());
 	}
 
 	$scope.inputs = [{
