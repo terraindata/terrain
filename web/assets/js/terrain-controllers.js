@@ -573,14 +573,12 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		$scope.cards.splice($scope.cards.indexOf(card), 1);
 		var newCard = $.extend({}, card);
 		newCard.suggested = true;
-		console.log(newCard['$$hashKey']);
 		delete newCard['$$hashKey'];
 		$scope.newCards = $scope.newCards.concat([newCard]);
 	}
 
 	$scope.addCard = function(cardToAdd, cardToAddInFrontOf) {
 		if($scope.cards.indexOf(cardToAdd) !== -1) return;
-		console.log('add card', cardToAdd);
 		var addAtEnd = false;
 		if(cardToAddInFrontOf == null) {
 			var addAtEnd = true;
@@ -711,15 +709,38 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 
 	$scope.onDropComplete = function(index,result,event) {
-		var indexToMove = index, resultToMove = $scope.results.reduce(function(ans,cur) { console.log(ans,cur); if(cur.overrideIndex === indexToMove) return cur; return ans; }, null);
+		var indexToMove = index, resultToMove = $scope.results.reduce(function(ans,cur) { if(cur.overrideIndex === indexToMove) return cur; return ans; }, null);
 		while(resultToMove !== null) {
 			indexToMove ++;
-			var nextResultToMove = $scope.results.reduce(function(ans,cur) { console.log(ans,cur); if(cur.overrideIndex === indexToMove) return cur; return ans; }, null);
+			var nextResultToMove = $scope.results.reduce(function(ans,cur) { if(cur.overrideIndex === indexToMove) return cur; return ans; }, null);
 			resultToMove.overrideIndex = indexToMove;
 			resultToMove = nextResultToMove;
 		}
 		result.overrideIndex = index;
 		$scope.resort();
+	}
+
+	$scope.dragIndex = -1;
+	$scope.resultMove = function(index) {
+		var index = +$(".drag-enter").attr('rel');
+		if($(".dragging").length > 0) {
+			$scope.dragIndex = index;
+		} else {
+			$scope.dragIndex = -1;
+		}
+	}
+
+	$scope.shiftedClass = function(index) {
+		var dragIndex = $scope.dragIndex;
+		if(dragIndex == -1) return "";
+		if($(".dragging").length == 0) return "";
+		var draggingIndex = +$(".dragging").attr('rel');
+		if(dragIndex < draggingIndex) {
+			return index >= dragIndex && index < draggingIndex ? "shifted" : ""
+		} else {
+			console.log('x', index, draggingIndex);
+			return index > draggingIndex && index <= dragIndex ? "shifted-backward" : ""; // should shift backward actually.
+		}
 	}
 
 	$scope.unpin = function(result) {
@@ -765,8 +786,6 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			}
 			index ++;
 		}
-
-		console.log($.map($scope.results, function(v) { return v.index + " " + v.name }).sort());
 	}
 
 	$scope.inputs = [{

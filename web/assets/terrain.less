@@ -500,6 +500,9 @@ input:focus {
 	border-radius: 5px;
 }
 
+@result-height: 216px;
+@result-inner-margin: 2px;
+
 @media (min-width: 2501px) {
 	/* largest */
 	.result {
@@ -518,6 +521,22 @@ input:focus {
 	/* mid size */
 	.result {
 		width: 50%;
+	}
+	.result-inner.shifted {
+		transform: translate(calc(-100% - @result-inner-margin), calc(100% + @result-inner-margin));
+	}
+	.result:nth-child(odd) {
+		.result-inner.shifted {
+			transform: translate(calc(100% + @result-inner-margin),0px);
+		}
+	}
+	.result-inner.shifted-backward {
+		transform: translate(calc(-100% - @result-inner-margin), 0px);
+	}
+	.result:nth-child(odd) {
+		.result-inner.shifted-backward {
+			transform: translate(calc(100% + @result-inner-margin), calc(-100% - @result-inner-margin));
+		}
 	}
 }
 
@@ -542,7 +561,6 @@ input:focus {
 	}
 }
 
-@result-height: 216px;
 
 .result-inner {
 	background: #fff;
@@ -551,12 +569,12 @@ input:focus {
 	padding-bottom: 10px;
 	overflow: hidden;
 	position: relative;
-	margin: 2px;
+	margin: @result-inner-margin;
 	border-radius: 5px;
 	border: 1px solid #ddd;
 
-    -webkit-transition: height 0.25s, margin-top 0.25s, -webkit-transform 0.25s;
-    transition: height 0.25s, margin-top 0.25s, transform 0.25s;
+    -webkit-transition: height 0.25s, margin-top 0.25s, -webkit-transform 0.25s ease-out;
+    transition: height 0.25s, margin-top 0.25s, transform 0.25s ease-out;
 }
 
 .result-img {
@@ -737,11 +755,17 @@ input:focus {
 .result-inner.dragging {
     opacity: 1;
     z-index: 999999 !important;
+    -webkit-transition: all 0.25s ease-out;
+	-moz-transition: all 0.25s ease-out;
+	-ms-transition: all 0.25s ease-out;
+	-o-transition: all 0.25s ease-out;
+	transition: all 0.25s ease-out;
+
     -webkit-transition: -webkit-transform 0s;
     transition: transform 0s;
 
-    -webkit-box-shadow: 10px 10px 7px 0 rgba(0,0,0,0.1);
-	box-shadow: 10px 10px 7px 0 rgba(0,0,0,0.1);
+    -webkit-box-shadow: 1px 1px 10px 3px rgba(200,200,200,0.5);
+	box-shadow: 1px 1px 10px 3px rgba(200,200,200,0.5);
 }
 
 .result.drag-enter {
@@ -752,19 +776,19 @@ input:focus {
     /*border-radius: 3px;*/
 
     .result-inner {
-    	@drag-offset-top: 10px;
+    	/*@drag-offset-top: 10px;
     	-moz-transform: translateX(0px) translateY(10px);
 		-webkit-transform: translateX(0px) translateY(10px);
 		-o-transform: translateX(0px) translateY(10px);
 		-ms-transform: translateX(0px) translateY(10px);
-		transform: translateX(10px) translateY(0px);
+		transform: translateX(10px) translateY(0px);*/
     	/*margin-top: @drag-offset-top;*/
 	    /*height: calc(@result-height - @drag-offset-top);*/
 	}
 
     .dragging {
-    	margin-top: 0px;
-    	height: @result-height;
+    	/*margin-top: 0px;
+    	height: @result-height;*/
     }
 }
 

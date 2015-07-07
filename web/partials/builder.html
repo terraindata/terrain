@@ -176,8 +176,8 @@
 			</div>
 		</h1>
 		<div class="results-area fixed-area" ng-show="showing('results')">
-			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort | filter: filterResult" ng-drop="true" ng-drop-success="onDropComplete($index, $data,$event)">
-				<div class="result-inner" ng-drag="true" ng-drag-data="result">
+			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort | filter: filterResult" ng-drop="true" ng-drop-success="onDropComplete($index,$data,$event)" ng-mousemove="resultMove(result.index)" rel="{{result.index}}">
+				<div class="result-inner {{shiftedClass(result.index)}}" rel="{{result.index}}" ng-drag="true" ng-drag-data="result">
 					<div class="result-main" ng-show="!result.flipped">
 						<div class="result-score" ng-click="result.flipped = !result.flipped">
 							<img src="assets/img/Terrain_Icon_White.png" class="result-score-img" />
