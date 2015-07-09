@@ -159,7 +159,6 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 				}, true);
 
 				scope.$watch('data', function(newData, oldData) {
-					console.log('new data', newData);
 					doResults(newData);
 				});
 		    }

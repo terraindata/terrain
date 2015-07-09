@@ -717,6 +717,10 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			resultToMove = nextResultToMove;
 		}
 		result.overrideIndex = index;
+		$(".result-inner").addClass("result-inner-locked");
+		$timeout(function() {
+			$(".result-inner").removeClass("result-inner-locked")
+		}, 100);
 		$scope.resort();
 	}
 
@@ -738,7 +742,6 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		if(dragIndex < draggingIndex) {
 			return index >= dragIndex && index < draggingIndex ? "shifted" : ""
 		} else {
-			console.log('x', index, draggingIndex);
 			return index > draggingIndex && index <= dragIndex ? "shifted-backward" : ""; // should shift backward actually.
 		}
 	}
