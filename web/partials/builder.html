@@ -29,7 +29,7 @@
 						</div>
 					</a>
 				</div>
-				<div class="input batch-input-area input-{{$index}}">
+				<div class="input batch-input-area input-{{$index}} has-more-button">
 					<div class="input-name-area">
 						<input ng-model="input.name" type="text" class="input-name-input first-input" placeholder="Name">
 						<div class="pull-right more-button more-2-items">
@@ -88,7 +88,7 @@
 						</div>
 					</a>
 				</div>
-				<div class="card card-{{card.id}}">
+				<div class="card card-{{card.id}} has-more-button">
 					<div class="card-title{{ card.useTitle ? '-no-border' : ''}} row">
 						<div class="col-xs-11 {{ card.useTitle ? 'card-title-no-border-text  col-sm-3 col-md-2' : ''}}">{{card.key || ""}} {{titleForCard(card)}}</div>
 						<div class="col-xs-11 col-sm-8 col-md-9">
@@ -111,10 +111,12 @@
 							</div>
 						</div>
 						<!-- <div class="col-xs-1"> -->
-							<div class="more-button more-right">
+							<div class="more-button more-3-items more-right more-button-large">
 								<i class="fa fa-ellipsis-h more-icon"></i>
 								<div class="more-hidden-area">
-									<div class="more-menu-item" ng-click="removeCard(card)">Remove</div>
+									<div class="more-menu-item" click="collapseCard(card)">Collapse</div>
+									<div class="more-menu-item" click="collapseAllCards">Collapse All</div>
+									<div class="more-menu-item" ng-click="removeCard(card)">Delete</div>
 								</div>
 							</div>
 						<!-- </div> -->
@@ -192,7 +194,7 @@
 		<div class="results-area fixed-area" ng-show="showing('results')">
 			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort | filter: filterResult" ng-drop="true" ng-drop-success="onDropComplete($index,$data,$event)" ng-mousemove="resultMove(result.index)" rel="{{result.index}}">
 				<div class="result-inner {{shiftedClass(result.index)}}" rel="{{result.index}}" ng-drag="true" ng-drag-data="result">
-					<div class="result-main" ng-show="!result.flipped">
+					<div class="result-main has-more-button" ng-show="!result.flipped">
 						<div class="result-score" ng-click="result.flipped = !result.flipped">
 							<img src="assets/img/Terrain_Icon_White.png" class="result-score-img" />
 							{{scoreForResultDisplay(result)}}
@@ -225,6 +227,14 @@
 							</div>
 							<div class="result-description" ng-show="selectedField('description')">{{result.description}}</div>
 							<div class="result-nothing-selected" ng-show="selectedField(false)"s>Add fields to a <b>Select</b> card to preview result data here.</div>
+						</div>
+						<div class="more-button more-3-items more-right more-button-large">
+							<i class="fa fa-ellipsis-h more-icon"></i>
+							<div class="more-hidden-area">
+								<div class="more-menu-item" ng-click="">View</div>
+								<div class="more-menu-item" ng-click="">Multi Scroll</div>
+								<div class="more-menu-item" ng-click="">Pin</div>
+							</div>
 						</div>
 					</div>
 					<div class="result-flipped" ng-show="result.flipped">
