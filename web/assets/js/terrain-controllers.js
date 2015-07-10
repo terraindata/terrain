@@ -567,6 +567,19 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		}
 	];
 
+
+	var ORIGINAL_CARDS = JSON.parse(JSON.stringify($scope.cards)); // supposedly the fastest way to get a deep clone
+	var ORIGINAL_NEW_CARDS = JSON.parse(JSON.stringify($scope.newCards)); 
+
+	$scope.hardReset = function() {
+		$scope.cards = JSON.parse(JSON.stringify(ORIGINAL_CARDS));
+		$scope.newCards = JSON.parse(JSON.stringify(ORIGINAL_NEW_CARDS));
+	}
+
+	$(".hard-reset").click(function() {
+		$scope.hardReset();
+	});
+
 	$scope.hasTransformCards = function() {
 		return $scope.cards.reduce(function(val, cur) { return val || cur.transform; }, false);
 	}
