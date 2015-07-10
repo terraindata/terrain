@@ -48,6 +48,8 @@ function selectPage(page) {
 	$(".nav li").removeClass('active');
 	page = page || location.hash;
 	$(".nav li a[href='"+page+"']").parent().addClass('active');
+	$(".navbar-tql").hide();
+	if(page == '#/builder') $(".navbar-tql").show();
 }
 
 terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http', '$timeout', function($scope, $routeParams, $http, $timeout) {
@@ -806,6 +808,43 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 	$scope.removeInputAtIndex = function(index) {
 		$scope.inputs.splice(index, 1);
+	}
+
+	$(".navbar-tql").click(function() {
+		$(".tql-preview").html($scope.builderToTql());
+	});
+
+	$scope.builderToTql = function() {
+		var errors = [];
+
+		// SELECT
+		var selectCard = $scope.cardFor('select');
+		var selectFields = selectCard ? selectCard.select.fields.join(', ') : '*';
+
+		// FROM
+		var fromCard = $scope.cardFor('from'), fromTable;
+		if(!fromCard) errors.push('No From card added.');
+		else fromTable = fromCard.from.value;
+
+		// FILTERS
+		var filtersCard = $scope.cardFor('filters'), filtersText = '';
+		if(filtersCard) {
+			filtersText = ' WHERE ' + filtersCard.filters.reduce(function(arr, filter) {
+				arr.push(filter.field + ' &' + filter.operator + '; ' + filter.value);
+				return arr;
+			}, []).join(' AND ') + ' ';
+		}
+
+		// ORDER
+		var orderCard = $scope.cardFor('order'), orderText = '';
+		if(orderCard) {
+			orderText = ' ORDER BY ' + orderCard.order.field + ' ' + orderCard.order.direction + ' ';
+		}
+
+		if(errors.length > 0)
+			return '<b>ERRORS<br /></b>' + errors.join('<br />');
+
+		return 'SELECT ' + selectFields + ' FROM ' + fromTable + filtersText + orderText;
 	}
 }]);
 
