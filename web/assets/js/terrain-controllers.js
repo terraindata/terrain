@@ -567,11 +567,19 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		}
 	];
 
+	$scope.collapseAllCards = function(state) {
+		$.each($scope.cards, function(index, card) {
+			card.hidden = state;
+		});
+	}
+
 
 	var ORIGINAL_CARDS = JSON.parse(JSON.stringify($scope.cards)); // supposedly the fastest way to get a deep clone
 	var ORIGINAL_NEW_CARDS = JSON.parse(JSON.stringify($scope.newCards)); 
 
 	$scope.hardReset = function() {
+		ORIGINAL_CARDS = ORIGINAL_CARDS.map(function(card) { card.id += 875; return card; }); // because track by card.id
+		ORIGINAL_NEW_CARDS = ORIGINAL_NEW_CARDS.map(function(card) { card.id += 875; return card; }); // because track by card.id
 		$scope.cards = JSON.parse(JSON.stringify(ORIGINAL_CARDS));
 		$scope.newCards = JSON.parse(JSON.stringify(ORIGINAL_NEW_CARDS));
 	}

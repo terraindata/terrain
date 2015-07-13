@@ -1,17 +1,3 @@
-<li class="dropdown navbar-user navbar-tql">
-	<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
-		<i class="fa fa-code"></i>
-		<span class="hidden-xs">TQL Preview</span> <b class="caret"></b>
-	</a>
-	<ul class="dropdown-menu animated fadeInLeft">
-		<li class="arrow"></li>
-		<li>
-			<div class="tql-preview">{{builderToTql()}}</div>
-		</li>
-		<li class="divider"></li>
-		<li><a href="javascript:;">Hard Reset</a></li>
-	</ul>
-</li>
 <div class="row builder-row">
 	<div class="col-sm-2 col-xs-12 main-column">
 		<h1 class="page-header" ng-click="showing('inputs', !showing('inputs'))">
@@ -89,7 +75,7 @@
 					</a>
 				</div>
 				<div class="card card-{{card.id}} has-more-button">
-					<div class="card-title{{ card.useTitle ? '-no-border' : ''}} row">
+					<div class="card-title{{ card.useTitle ? '-no-border' : ''}} row" ng-click="card.hidden = !card.hidden">
 						<div class="col-xs-11 {{ card.useTitle ? 'card-title-no-border-text  col-sm-3 col-md-2' : ''}}">{{card.key || ""}} {{titleForCard(card)}}</div>
 						<div class="col-xs-11 col-sm-8 col-md-9">
 							<div class="card-from-area" ng-show="card.from">
@@ -110,62 +96,64 @@
 								</div>
 							</div>
 						</div>
-						<!-- <div class="col-xs-1"> -->
-							<div class="more-button more-3-items more-right more-button-large">
+					</div>
+					<div class="more-button more-3-items more-right more-button-large">
 								<i class="fa fa-ellipsis-h more-icon"></i>
 								<div class="more-hidden-area">
-									<div class="more-menu-item" click="collapseCard(card)">Collapse</div>
-									<div class="more-menu-item" click="collapseAllCards">Collapse All</div>
+									<div class="more-menu-item" ng-click="card.hidden = true" ng-hide="card.hidden">Collapse</div>
+									<div class="more-menu-item" ng-click="card.hidden = false" ng-show="card.hidden">Reveal</div>
+									<div class="more-menu-item" ng-click="collapseAllCards(true)">Collapse All</div>
+									<div class="more-menu-item" ng-click="collapseAllCards(false)">Reveal All</div>
 									<div class="more-menu-item" ng-click="removeCard(card)">Delete</div>
 								</div>
 							</div>
-						<!-- </div> -->
-					</div>
-					<div class="card-select-area" ng-show="card.select">
-						<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields">
-							<div class="col-xs-11 card-select-col">
-								<div tdb-autocomplete data="selectableFields" model="card.select.fields[$index]" placeholder="Field Name" auto-placeholder="Start typing to see matching field names" on-select="apply()"></div>
-							</div>
-							<div class="col-xs-1 card-select-col">
-								<div class="card-select-delete clickable" ng-click="removeSelectFieldFromCard(card, $index)"><i class="fa fa-remove"></i></div>
-							</div>
-						</div>
-						<input class="new-field-input" ng-focus="newSelectFieldForCard(card)" placeholder="Add a new field" />
-					</div>
-					<div class="card-filter-area" ng-show="card.filters">
-						<div class="row" ng-repeat="f in card.filters">
-							<div class="col-xs-4">
-								<div tdb-autocomplete data="selectableFields" model="f.field" placeholder="Field" auto-placeholder="Start typing to see matching field names" on-select="apply()"></div>
-							</div>
-							<div class="col-xs-2">
-								<div class="sign-selector">
-									<select class="sign-select" ng-model="f.operator">
-										<option value="le">&le;</option>
-										<option value="lt">&lt;</option>
-										<option value="ge">&ge;</option>
-										<option value="gt">&gt;</option>
-										<option value="eq">=</option>
-										<option value="ne">&ne;</option>
-									</select>
+					<div ng-hide="card.hidden">
+						<div class="card-select-area" ng-show="card.select">
+							<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields">
+								<div class="col-xs-11 card-select-col">
+									<div tdb-autocomplete data="selectableFields" model="card.select.fields[$index]" placeholder="Field Name" auto-placeholder="Start typing to see matching field names" on-select="apply()"></div>
+								</div>
+								<div class="col-xs-1 card-select-col">
+									<div class="card-select-delete clickable" ng-click="removeSelectFieldFromCard(card, $index)"><i class="fa fa-remove"></i></div>
 								</div>
 							</div>
-							<div class="col-xs-2">
-								<div class="sign-selector">
-									<select class="from-value-select" ng-model="f.valueType">
-										<option value="input">Input</option>
-										<option value="raw">Raw</option>
-									</select>
+							<input class="new-field-input" ng-focus="newSelectFieldForCard(card)" placeholder="Add a new field" />
+						</div>
+						<div class="card-filter-area" ng-show="card.filters">
+							<div class="row" ng-repeat="f in card.filters">
+								<div class="col-xs-4">
+									<div tdb-autocomplete data="selectableFields" model="f.field" placeholder="Field" auto-placeholder="Start typing to see matching field names" on-select="apply()"></div>
+								</div>
+								<div class="col-xs-2">
+									<div class="sign-selector">
+										<select class="sign-select" ng-model="f.operator">
+											<option value="le">&le;</option>
+											<option value="lt">&lt;</option>
+											<option value="ge">&ge;</option>
+											<option value="gt">&gt;</option>
+											<option value="eq">=</option>
+											<option value="ne">&ne;</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-xs-2">
+									<div class="sign-selector">
+										<select class="from-value-select" ng-model="f.valueType">
+											<option value="input">Input</option>
+											<option value="raw">Raw</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-xs-4">
+									<input ng-model="f.value" ng-blur="checkForNewInput(card)" ng-keydown="blurOnEnter($event)" placeholder="Value" />
 								</div>
 							</div>
-							<div class="col-xs-4">
-								<input ng-model="f.value" ng-blur="checkForNewInput(card)" ng-keydown="blurOnEnter($event)" placeholder="Value" />
-							</div>
+							<a class="new-filter-btn" ng-click="addFilter(card)">Add a filter</a>
 						</div>
-						<a class="new-filter-btn" ng-click="addFilter(card)">Add a filter</a>
-					</div>
-					<div class="card-transform-area" ng-show="card.transform">
-						<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
-						<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
+						<div class="card-transform-area" ng-show="card.transform">
+							<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
+							<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -233,7 +221,8 @@
 							<div class="more-hidden-area">
 								<div class="more-menu-item" ng-click="">View</div>
 								<div class="more-menu-item" ng-click="">Multi Scroll</div>
-								<div class="more-menu-item" ng-click="">Pin</div>
+								<div class="more-menu-item" ng-click="unpin(result)" ng-show="result.overrideIndex !== false">Unpin</div>
+								<div class="more-menu-item" ng-click="onDropComplete($index,result)" ng-show="result.overrideIndex === false">Pin</div>
 							</div>
 						</div>
 					</div>
