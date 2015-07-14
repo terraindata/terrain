@@ -7,7 +7,7 @@
 			</div>
 		</h1>
 		<div class="fixed-area inputs-area" ng-show="showing('inputs')">
-			<div ng-repeat="input in inputs">
+			<div ng-repeat="input in inputs" ng-slide-down="input.showing" duration="0.25">
 				<div class="pre-input">
 					<a class="new-card-plus-area" ng-click="newInput($index)">
 						<div class="new-card-plus">

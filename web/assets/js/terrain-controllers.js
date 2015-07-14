@@ -832,7 +832,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 
 	$scope.inputs = [{
 		name: 'MaxPrice',
-		value: '200'
+		value: '200',
+		showing: true
 	}];
 	$scope.newInput = function(index) {
 		var newInput = { name: '', value: '' };
@@ -840,8 +841,11 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			index = $scope.inputs.length;
 		$scope.inputs.splice(index, 0, newInput);
 		$timeout(function() {
-			$(".input-"+index+" .input-name-input").focus();
-		}, 100);
+			newInput.showing = true;
+			$timeout(function() {
+				$(".input-"+index+" .input-name-input").focus();
+			}, 100)
+		}, 25);
 	}
 	$scope.removeInputAtIndex = function(index) {
 		$scope.inputs.splice(index, 1);
