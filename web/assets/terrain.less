@@ -19,6 +19,28 @@ a:hover {
 	text-decoration: none;
 }
 
+
+.button {
+	display: inline-block;
+	background: #fff;
+	border: 1px solid @green;
+	color: @green;
+	border-radius: 3px;
+	font-size: 14px;
+	padding: 4px 10px;
+	margin-right: 5px;
+	margin-top: 5px;
+	-webkit-transition: 0.25s all;
+	transition: 0.25s all;
+	cursor: pointer;
+}
+
+.button:hover {
+	text-decoration: none;
+	background: @green;
+	color: #fff;
+}
+
 .vertically-middle {
 	position: absolute;
     top: 50%;
@@ -324,6 +346,8 @@ input:focus {
 	color: #888a8f;
 	font-weight: 200;
 	text-transform: uppercase;
+	-webkit-transition: color 0.25s;
+	transition: color 0.25s;
 }
 
 .card-title {
@@ -432,26 +456,6 @@ input:focus {
 
 .new-card-suggestions-area {
 	margin-top: 5px;
-}
-
-.new-card-suggestion {
-	display: inline-block;
-	background: #fff;
-	border: 1px solid @green;
-	color: @green;
-	border-radius: 3px;
-	font-size: 14px;
-	padding: 4px 10px;
-	margin-right: 5px;
-	margin-top: 5px;
-	-webkit-transition: 0.25s all;
-	transition: 0.25s all;
-}
-
-.new-card-suggestion:hover {
-	text-decoration: none;
-	background: @green;
-	color: #fff;
 }
 
 /* placeholder stuff */
@@ -667,7 +671,7 @@ input:focus {
 .result-score {
 	position: absolute;
 	background: rgba(0,0,0,0.6);
-	left: 36px;
+	left: 0px;
 	top: 0px;
 	font-size: 18px;
 	padding: 5px;
@@ -761,16 +765,11 @@ input:focus {
 	-webkit-box-shadow: 0px 0px 0px 0 rgba(0,0,0,0);
 	box-shadow: 0px 0px 0px 0 rgba(0,0,0,0);
 
-	/*-moz-transition: all 0.25s ease-out;*/
-	/*-ms-transition: all 0.25s ease-out;*/
-	/*-o-transition: all 0.25s ease-out;*/
-    
-}
-
-
-.result-inner-locked {
-	-webkit-transition: -webkit-transform 0s !important;
-    transition: transform 0s !important;	
+	/*-moz-transition: all 0.25s ease-out;
+	-ms-transition: all 0.25s ease-out;
+	-o-transition: all 0.25s ease-out;
+    -webkit-transition: all 0.25s ease-out;
+    transition: all 0.25s ease-out;*/
 }
 
 
@@ -782,16 +781,31 @@ input:focus {
     background: #fff;
 }
 
+.result-inner {
+    -webkit-box-shadow: 0px 0px 0px 0px rgba(20,20,20,0.25);
+	box-shadow: 0px 0px 0px 0px rgba(20,20,20,0.25);
+}
+
 .result-inner.dragging {
     opacity: 1;
     z-index: 999999 !important;
    
-    -webkit-transition: -webkit-transform 0s;
-    transition: transform 0s;
+    -webkit-transition: -webkit-transform 0s, -webkit-box-transform 1s;
+    transition: transform 0s, box-shadow 1s;
 
-    -webkit-box-shadow: 1px 1px 10px 3px rgba(200,200,200,0.5);
-	box-shadow: 1px 1px 10px 3px rgba(200,200,200,0.5);
+    -webkit-box-shadow: 1px 1px 10px 3px rgba(20,20,20,0.25);
+	box-shadow: 1px 1px 10px 3px rgba(20,20,20,0.25);
 }
+
+
+.result-inner-locked {
+	-moz-transition: all 0s ease-out;
+	-ms-transition: all 0s ease-out;
+	-o-transition: all 0s ease-out;
+    -webkit-transition: all 0s ease-out;
+    transition: all 0s ease-out;	
+}
+
 
 .result.drag-enter {
     /*background: #47ffa7;*/
@@ -875,6 +889,21 @@ input:focus {
 .result-nothing-selected {
 	text-align: center;
 	font-style: italic;
+}
+
+
+/* other things */
+
+.empty-algorithm {
+	text-align: center;
+  font-size: 20px;
+  margin-top: 30px;
+}
+
+.empty-algorithm small {
+	display: block;
+	margin-top: 10px;
+	margin-bottom: 20px;
 }
 
 

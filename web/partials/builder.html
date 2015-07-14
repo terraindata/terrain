@@ -54,28 +54,32 @@
 			<div class="all-weights" ng-show="ab('weights')">
 				<div class="weight" d3-slicer data="cards" on-change="handleChange(cardId)" card-id="-1"></div>
 			</div>
-			<div ng-repeat="card in cards track by card.id">
+			<div ng-repeat="card in cards track by card.id" class="card-container-{{card.id}}">
 				<div class="pre-card">
-					<div class="new-card card" ng-show="card.newCardIsShowing">
-						<div class="card-title">
-							New Card
-							<a ng-click="card.newCardIsShowing = false" class="pull-right small"> Hide </a>
-						</div>
-						<div tdb-autocomplete data="newCards" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names"></div>
-						<div class="new-card-suggestions-area">
-							<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion" ng-click="addCard(suggestion, card)">
-								{{suggestion.name}}
-							</a>
+					<div ng-slide-down="card.newCardIsShowing" duration="0.25">
+						<div class="new-card card">
+							<div class="card-title">
+								New Card
+								<a ng-click="card.newCardIsShowing = false" class="pull-right small"> Hide </a>
+							</div>
+							<div tdb-autocomplete data="newCards" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names"></div>
+							<div class="new-card-suggestions-area">
+								<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion button" ng-click="addCard(suggestion, card)">
+									{{suggestion.name}}
+								</a>
+							</div>
 						</div>
 					</div>
-					<a class="new-card-plus-area" ng-hide="card.newCardIsShowing" ng-click="card.newCardIsShowing = true">
-						<div class="new-card-plus">
-							+
-						</div>
-					</a>
+					<div ng-slide-down="!card.newCardIsShowing" duration="0.25">
+						<a class="new-card-plus-area" ng-click="card.newCardIsShowing = true">
+							<div class="new-card-plus">
+								+
+							</div>
+						</a>
+					</div>
 				</div>
 				<div class="card card-{{card.id}} has-more-button">
-					<div class="card-title{{ card.useTitle ? '-no-border' : ''}} row" ng-click="card.hidden = !card.hidden">
+					<div class="card-title{{ card.useTitle ? '-no-border' : ''}} row" ng-click="cardToggle(card)">
 						<div class="col-xs-11 {{ card.useTitle ? 'card-title-no-border-text  col-sm-3 col-md-2' : ''}}">{{card.key || ""}} {{titleForCard(card)}}</div>
 						<div class="col-xs-11 col-sm-8 col-md-9">
 							<div class="card-from-area" ng-show="card.from">
@@ -97,17 +101,17 @@
 							</div>
 						</div>
 					</div>
-					<div class="more-button more-3-items more-right more-button-large">
-								<i class="fa fa-ellipsis-h more-icon"></i>
-								<div class="more-hidden-area">
-									<div class="more-menu-item" ng-click="card.hidden = true" ng-hide="card.hidden">Collapse</div>
-									<div class="more-menu-item" ng-click="card.hidden = false" ng-show="card.hidden">Reveal</div>
-									<div class="more-menu-item" ng-click="collapseAllCards(true)">Collapse All</div>
-									<div class="more-menu-item" ng-click="collapseAllCards(false)">Reveal All</div>
-									<div class="more-menu-item" ng-click="removeCard(card)">Delete</div>
-								</div>
-							</div>
-					<div ng-hide="card.hidden">
+					<div class="more-button more-4-items more-right more-button-large">
+						<i class="fa fa-ellipsis-h more-icon"></i>
+						<div class="more-hidden-area">
+							<div class="more-menu-item" ng-click="cardToggle(card)" ng-hide="card.hidden">Collapse</div>
+							<div class="more-menu-item" ng-click="cardToggle(card)" ng-show="card.hidden">Reveal</div>
+							<div class="more-menu-item" ng-click="collapseAllCards(true)">Collapse All</div>
+							<div class="more-menu-item" ng-click="collapseAllCards(false)">Reveal All</div>
+							<div class="more-menu-item" ng-click="removeCard(card)">Delete</div>
+						</div>
+					</div>
+					<div class="card-body" ng-slide-down="!card.hidden" duration="0.25">
 						<div class="card-select-area" ng-show="card.select">
 							<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields">
 								<div class="col-xs-11 card-select-col">
@@ -165,10 +169,15 @@
 				<div  tdb-autocomplete data="newCards" on-select="addCardAndApply(obj, null)" input-classes="bordered-input" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
 				</div>
 				<div class="new-card-suggestions-area">
-					<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion" ng-click="addCard(suggestion, null)">
+					<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion button" ng-click="addCard(suggestion, null)">
 						 {{suggestion.name}}
 					</a>
 				</div>
+			</div>
+			<div class="empty-algorithm" ng-show="cards.length == 0">
+				The algorithm is currently empty.
+				<small>To get started, just add an expression above.</small>
+				<div class="button">Guide Me</div>
 			</div>
 		</div>
 	</div>
@@ -181,20 +190,11 @@
 		</h1>
 		<div class="results-area fixed-area" ng-show="showing('results')">
 			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort | filter: filterResult" ng-drop="true" ng-drop-success="onDropComplete($index,$data,$event)" ng-mousemove="resultMove(result.index)" rel="{{result.index}}">
-				<div class="result-inner {{shiftedClass(result.index)}}" rel="{{result.index}}" ng-drag="true" ng-drag-data="result">
+				<div class="result-inner {{locked ? 'result-inner-locked' : ''}} {{shiftedClass(result.index)}}" rel="{{result.index}}" ng-drag="true" ng-drag-data="result">
 					<div class="result-main has-more-button" ng-show="!result.flipped">
-						<div class="result-score" ng-click="result.flipped = !result.flipped">
+						<div class="result-score" ng-click="result.flipped = !result.flipped" style="{{result.spotlight ? 'background-color:' + result.spotlightColor : ''}}">
 							<img src="assets/img/Terrain_Icon_White.png" class="result-score-img" />
 							{{scoreForResultDisplay(result)}}
-						</div>
-						<div class="result-spotlight" ng-click="spotlightToggle(result)" style="{{result.spotlight ? 'background-color:' + result.spotlightColor : ''}}">
-							<i class="fa fa-dot-circle-o"></i>
-						</div>
-						<div class="result-controls-right">
-							<div class="result-pin" ng-click="unpin(result)" ng-show="result.overrideIndex !== false">
-								<i class="fa fa-thumb-tack result-pin-icon"></i>
-								<i class="fa fa-remove result-unpin-icon"></i>
-							</div>
 						</div>
 						<div class="result-img" style="background-image:url('assets/img/data/{{result.id}}.jpg');"></div>
 						<div class="result-text">
@@ -216,13 +216,17 @@
 							<div class="result-description" ng-show="selectedField('description')">{{result.description}}</div>
 							<div class="result-nothing-selected" ng-show="selectedField(false)"s>Add fields to a <b>Select</b> card to preview result data here.</div>
 						</div>
-						<div class="more-button more-3-items more-right more-button-large">
+						<div class="more-button more-4-items more-right more-button-large">
 							<i class="fa fa-ellipsis-h more-icon"></i>
 							<div class="more-hidden-area">
-								<div class="more-menu-item" ng-click="">View</div>
-								<div class="more-menu-item" ng-click="">Multi Scroll</div>
-								<div class="more-menu-item" ng-click="unpin(result)" ng-show="result.overrideIndex !== false">Unpin</div>
 								<div class="more-menu-item" ng-click="onDropComplete($index,result)" ng-show="result.overrideIndex === false">Pin</div>
+								<div class="more-menu-item" ng-click="unpin(result)" ng-show="result.overrideIndex !== false">Unpin</div>
+								<div class="more-menu-item" ng-click="spotlightToggle(result)">
+									Spotlight
+								</div>
+								<div class="more-menu-item" ng-click="result.flipped = !result.flipped" ng-show="!result.flipped">Score View</div>
+								<div class="more-menu-item" ng-click="result.flipped = !result.flipped" ng-show="result.flipped">Product View</div>
+								<div class="more-menu-item" ng-click="">Multi Scroll</div>
 							</div>
 						</div>
 					</div>

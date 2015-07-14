@@ -567,10 +567,19 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		}
 	];
 
+	if($scope.ab('empty')) {
+		$scope.newCards = $scope.cards.concat($scope.newCards);
+		$scope.cards = [];
+	}
+
 	$scope.collapseAllCards = function(state) {
 		$.each($scope.cards, function(index, card) {
 			card.hidden = state;
 		});
+	}
+
+	$scope.cardToggle = function(card) {
+		card.hidden = !card.hidden;
 	}
 
 
@@ -641,12 +650,15 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		// 			cardToAdd[key] = $.extend({}, obj);
 		// 	});
 		// }
+		cardToAdd.allHidden = true;
 		$scope.cards.splice(addAtEnd ? $scope.cards.length : $scope.cards.indexOf(cardToAddInFrontOf), 0, cardToAdd);
 			cardToAddInFrontOf.newCardIsShowing = false;
 		if($scope.newCards.indexOf(cardToAdd) != -1 && !cardToAdd.repeated)
 			$scope.newCards.splice($scope.newCards.indexOf(cardToAdd), 1);
-		// if($scope.cards.indexOf(cardToAdd) == 0)
-		// 	cardToAdd.newCardIsShowing = true;
+		$timeout(function() {
+			$(".card-container-" + cardToAdd.id).hide();
+			$(".card-container-" + cardToAdd.id).slideDown(250);
+		}, 25);
 	}
 
 	$scope.addCardAndApply = function(cardToAdd, cardToAddInFrontOf) {
@@ -731,6 +743,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		return result.index;
 	}
 
+	$scope.locked = false;
 	$scope.onDropComplete = function(index,result,event) {
 		var indexToMove = index, resultToMove = $scope.results.reduce(function(ans,cur) { if(cur.overrideIndex === indexToMove) return cur; return ans; }, null);
 		while(resultToMove !== null) {
@@ -740,10 +753,13 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			resultToMove = nextResultToMove;
 		}
 		result.overrideIndex = index;
-		$(".result-inner").addClass("result-inner-locked");
+		$scope.locked = true;
+		// $(".result-inner").addClass("result-inner-locked");
 		$timeout(function() {
-			$(".result-inner").removeClass("result-inner-locked")
-		}, 100);
+			// console.log($(".result-inner-locked").length);
+			// $(".result-inner").removeClass("result-inner-locked")
+			$scope.locked = false;
+		}, 250);
 		$scope.resort();
 	}
 

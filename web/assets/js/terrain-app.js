@@ -46,7 +46,8 @@ var terrainApp = angular.module('terrainApp', [
 	'ngRoute',
 	'terrainControllers',
 	'd3',
-	'ngDraggable'
+	'ngDraggable',
+	'ng-slide-down'
 	]);
 
 terrainApp.config(['$routeProvider',
