@@ -179,16 +179,12 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 				return barStartingX(i);
 			})
 			.attr("y", function(d, i) {
-				if(d)
-					return barStartingY(d);
-				return 0;
+				return topMargin + workingHeight;
 			})
 			.attr("width", function(d, i) {
 				return barWidth;
 			})
 			.attr("height", function(d, i) {
-				if(d)
-					return workingHeight * d;
 				return 0;
 			})
 			.attr("fill", function(d, i) {
@@ -196,7 +192,20 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			})
 			.attr("class", function(d, i) {
 				return "bar bar_" + i;
-			});
+			})
+			.transition()
+				.duration(500)
+				.attr("height", function(d, i) {
+					if(d)
+						return workingHeight * d;
+					return 0;
+				})
+				.attr("y", function(d, i) {
+					if(d)
+						return barStartingY(d);
+					return 0;
+				})
+			;
 
 		// MARK: Axes
 
@@ -302,7 +311,15 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		.attr("stroke", strokeColor)
 		.attr("stroke-width", opts.strokeWidth)
 		.attr("class", "path")
-		.attr("fill", "none");
+		.attr("fill", "none")
+		.attr("opacity", 0)
+		.transition()
+			.duration(1000)
+			.attr("opacity", 0)
+		.transition()
+			.duration(500)
+			.attr("opacity", 1)
+		;
 	        // .css('z-index', 1);
 
 
@@ -352,7 +369,15 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			})
 			.on("touchstart", function(d, i) {
 				touchDown(d,i);
-			});;
+			})
+			.attr("opacity", 0)
+			.transition()
+				.duration(1000)
+				.attr("opacity", 0)
+			.transition()
+				.duration(500)
+				.attr("opacity", 1)
+			;
 
 			var touchMove = function(obj, evt) {
 				if($(ele[0]).find("[rel=active]").length) {

@@ -23,6 +23,12 @@ svg {
 }
 
 
+.bar {
+    -webkit-transition: height 0.25s, y 0.25s;
+    transition: height 0.25s, y 0.25s;
+}
+
+
 /* Points */
 
 .point {
