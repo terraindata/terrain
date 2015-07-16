@@ -42,71 +42,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var terrainApp = angular.module('terrainApp', [
-	'ngRoute',
-	'terrainControllers',
-	'd3',
-	'ngDraggable',
-	'ng-slide-down',
-	'ngTouch',
-	'ngTouchmove'
-	]);
+"use strict";
 
-terrainApp.config(['$routeProvider',
-	function($routeProvider, $ngDraggable) {
-		$routeProvider.
-		when('/builder/:abConfig', {
-			templateUrl: 'partials/builder.html',
-			controller: 'BuilderCtrl'
-		}).
-		when('/builder', {
-			templateUrl: 'partials/builder.html',
-			controller: 'BuilderCtrl'
-		}).
-		when('/home', {
-			templateUrl: 'partials/placeholder.html',
-			controller: 'PlaceholderCtrl'
-		}).
-		when('/settings', {
-			templateUrl: 'partials/placeholder.html',
-			controller: 'PlaceholderCtrl'
-		}).
-		when('/tql', {
-			templateUrl: 'partials/placeholder.html',
-			controller: 'PlaceholderCtrl'
-		}).
-		when('/dashboard', {
-			templateUrl: 'partials/placeholder.html',
-			controller: 'PlaceholderCtrl'
-		}).
-		otherwise({
-			redirectTo: '/builder'
-		});
-	}]);
-
-// from: http://stackoverflow.com/questions/15731634/how-do-i-handle-right-click-events-in-angular-js
-terrainApp.directive('ngRightClick', function($parse) {
-    return function(scope, element, attrs) {
-        var fn = $parse(attrs.ngRightClick);
-        element.bind('contextmenu', function(event) {
-            scope.$apply(function() {
-                event.preventDefault();
-                fn(scope, {$event:event});
-            });
-        });
-    };
-});
-
-terrainApp.directive('ngRightClickMenu', function($parse) {
-    return function(scope, element, attrs) {
-        var fn = $parse(attrs.ngRightClick);
-        element.bind('contextmenu', function(event) {
-            scope.$apply(function() {
-                event.preventDefault();
-                console.log($(element).find('.more-button'));
-        		$(element).find('.more-button').addClass('more-button-showing');
-                // fn(scope, {$event:event});
-            });
-        });
-    };
+angular.module("ngTouchmove", []).directive("ngTouchmove", function () {
+  return {
+    controller: function ($scope, $element, $attrs) {
+      $element.bind('touchstart', onTouchStart);
+      
+      function onTouchStart(event) {
+        event.preventDefault();
+        $element.bind('touchmove', onTouchMove);
+        $element.bind('touchend', onTouchEnd);
+      };
+      
+      function onTouchMove(event) {
+          var method = '$scope.' + $element.attr('ng-touchmove');
+          $scope.$apply(function () {
+              eval(method);
+          });
+      };
+      
+      function onTouchEnd(event) {
+        event.preventDefault();
+        $element.unbind('touchmove', onTouchMove);
+        $element.unbind('touchend', onTouchEnd);
+      };
+    }
+  };
 });

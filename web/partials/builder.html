@@ -78,7 +78,7 @@
 						</a>
 					</div>
 				</div>
-				<div class="card card-{{card.id}} has-more-button">
+				<div class="card card-{{card.id}} has-more-button" ng-right-click-menu>
 					<div class="card-title{{ card.useTitle ? '-no-border' : ''}} row" ng-click="cardToggle(card)">
 						<div class="col-xs-11 {{ card.useTitle ? 'card-title-no-border-text  col-sm-3 col-md-2' : ''}}">{{card.key || ""}} {{titleForCard(card)}}</div>
 						<div class="col-xs-11 col-sm-8 col-md-9">
@@ -189,7 +189,7 @@
 			</div>
 		</h1>
 		<div class="results-area fixed-area" ng-show="showing('results')">
-			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort | filter: filterResult" ng-drop="true" ng-drop-success="onDropComplete($index,$data,$event)" ng-mousemove="resultMove(result.index)" rel="{{result.index}}">
+			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort | filter: filterResult" ng-drop="true" ng-drop-success="onDropComplete($index,$data,$event)" ng-mousemove="resultMove(result.index)" ng-touchmove="resultMove({{result.index}})" rel="{{result.index}}">
 				<div class="result-inner {{locked ? 'result-inner-locked' : ''}} {{shiftedClass(result.index)}}" rel="{{result.index}}" ng-drag="true" ng-drag-data="result">
 					<div class="result-main has-more-button" ng-show="!result.flipped">
 						<div class="result-score" ng-click="result.flipped = !result.flipped" style="{{result.spotlight ? 'background-color:' + result.spotlightColor : ''}}">

@@ -194,7 +194,8 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 				return "bar bar_" + i;
 			})
 			.transition()
-				.duration(500)
+				.duration(1000)
+				.ease("cubic-out")
 				.attr("height", function(d, i) {
 					if(d)
 						return workingHeight * d;
@@ -314,9 +315,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		.attr("fill", "none")
 		.attr("opacity", 0)
 		.transition()
-			.duration(1000)
-			.attr("opacity", 0)
-		.transition()
+			.delay(1000)
 			.duration(500)
 			.attr("opacity", 1)
 		;
@@ -372,9 +371,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			})
 			.attr("opacity", 0)
 			.transition()
-				.duration(1000)
-				.attr("opacity", 0)
-			.transition()
+				.delay(1000)
 				.duration(500)
 				.attr("opacity", 1)
 			;
