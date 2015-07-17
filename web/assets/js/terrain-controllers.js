@@ -781,7 +781,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		$scope.dragIndices['card'] = -1;
 
 		console.log('lock');
-		$timeout(function() { $scope.cardDragLock = false; }, 2500);
+		$timeout(function() { $scope.cardDragLock = false; }, 250);
 	}
 
 	$scope.dragIndices = {card: -1, result: -1};
