@@ -105,6 +105,18 @@ terrainApp.directive('ngRightClickMenu', function($parse) {
                 event.preventDefault();
                 console.log($(element).find('.more-button'));
         		$(element).find('.more-button').addClass('more-button-showing');
+        		console.log(event);
+        		var prevTop = $(element).find('.more-button').css('top');
+        		$(element).find('.more-button').css('top', (event.pageY - $(element).offset().top - 5) + 'px');
+        		$(element).find('.more-button').css('left', (event.pageX - $(element).offset().left - 5) + 'px');
+	        	$(document).on('click', function(event) {
+	        		$(element).find('.more-button').removeClass('more-button-showing');
+        			setTimeout(function() {
+	        			$(element).find('.more-button').css('top', "");
+	        			$(element).find('.more-button').css('left', '');
+	        	}, 250);
+	        	});
+        		// $(element).find('.more-button').css('')
                 // fn(scope, {$event:event});
             });
         });
