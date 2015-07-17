@@ -567,6 +567,9 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		}
 	];
 
+	$.each($scope.cards, function(i,c) { c.card = true; });
+	$.each($scope.newCards, function(i,c) { c.card = true; });
+
 	if($scope.ab('empty')) {
 		$scope.newCards = $scope.cards.concat($scope.newCards);
 		$scope.cards = [];
@@ -579,6 +582,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 
 	$scope.cardToggle = function(card) {
+		if($scope.cardDragLock)
+			return;
 		card.hidden = !card.hidden;
 	}
 
@@ -763,18 +768,41 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		$scope.resort();
 	}
 
-	$scope.dragIndex = -1;
-	$scope.resultMove = function(index) {
-		var index = +$(".drag-enter").attr('rel');
-		if($(".dragging").length > 0) {
-			$scope.dragIndex = index;
-		} else {
-			$scope.dragIndex = -1;
-		}
+	$scope.cardDragLock = false;
+	$scope.onCardDropComplete = function(index,card,event) {
+		if(!card.card) return; // not a card
+		$scope.cards.splice($scope.cards.indexOf(card), 1);
+		$scope.cards.splice(index, 0, card);
+		$(".card").css('transition', 'transform 0s ease-out');
+		$timeout(function() {
+			$(".card").css('transition', '');
+		}, 250);
+		$(".card").css('transform', '');
+		$scope.dragIndices['card'] = -1;
+
+		console.log('lock');
+		$timeout(function() { $scope.cardDragLock = false; }, 2500);
 	}
 
-	$scope.shiftedClass = function(index) {
-		var dragIndex = $scope.dragIndex;
+	$scope.dragIndices = {card: -1, result: -1};
+	$scope.resultMove = function(index, type) {
+		var index = +$(".drag-enter").attr('rel');
+		if($(".dragging").length > 0) {
+			$scope.cardDragLock = true;
+			$scope.dragIndices[type] = index;
+		} else {
+			$scope.dragIndices[type] = -1;
+		}
+
+		$(".card").css('transform', '');
+		$(".card.shifted,.card.shifted-backward").each(function() {
+			var dir = $(this).hasClass('shifted-backward') ? -1 : 1;
+			$(this).css('transform', 'translate(0px,' + (dir * $('.card.dragging').parent().height()) + 'px)');
+		});
+	}
+
+	$scope.shiftedClass = function(index, type) {
+		var dragIndex = $scope.dragIndices[type];
 		if(dragIndex == -1) return "";
 		if($(".dragging").length == 0) return "";
 		var draggingIndex = +$(".dragging").attr('rel');

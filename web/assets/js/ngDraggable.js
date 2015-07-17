@@ -166,7 +166,11 @@ angular.module("ngDraggable", [])
                                 onlongpress(evt);
                             },100);
                             $document.on(_moveEvents, cancelPress);
-                            $document.on(_releaseEvents, cancelPress);
+                            $document.on(_releaseEvents, function(event) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                cancelPress();
+                            });
                         }else{
                             onlongpress(evt);
                         }

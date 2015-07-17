@@ -50,11 +50,11 @@
 				{{showing('builder') ? '-' : '+'}}
 			</div>
 		</h1>
-		<div class="fixed-area builder-area" ng-show="showing('builder')">
+		<div class="fixed-area builder-area {{dragIndices['card'] != -1 ? 'card-is-being-dragged' : ''}}" ng-show="showing('builder')">
 			<div class="all-weights" ng-show="ab('weights')">
 				<div class="weight" d3-slicer data="cards" on-change="handleChange(cardId)" card-id="-1"></div>
 			</div>
-			<div ng-repeat="card in cards track by card.id" class="card-container-{{card.id}}">
+			<div ng-repeat="card in cards track by card.id" class="card-container-{{card.id}}"  ng-drop="true" ng-drop-success="onCardDropComplete($index,$data,$event)" rel="{{$index}}" ng-mousemove="resultMove($index, 'card')" ng-touchmove="resultMove({{$index}}, 'card')">
 				<div class="pre-card">
 					<div ng-slide-down="card.newCardIsShowing" duration="0.25">
 						<div class="new-card card">
@@ -78,7 +78,7 @@
 						</a>
 					</div>
 				</div>
-				<div class="card card-{{card.id}} has-more-button" ng-right-click-menu>
+				<div class="card card-{{card.id}} has-more-button {{shiftedClass($index, 'card')}}" ng-right-click-menu ng-drag="true" ng-drag-data="card"  rel="{{$index}}">
 					<div class="card-title{{ card.useTitle ? '-no-border' : ''}} row" ng-click="cardToggle(card)">
 						<div class="col-xs-11 {{ card.useTitle ? 'card-title-no-border-text  col-sm-3 col-md-2' : ''}}">{{card.key || ""}} {{titleForCard(card)}}</div>
 						<div class="col-xs-11 col-sm-8 col-md-9">
@@ -189,8 +189,8 @@
 			</div>
 		</h1>
 		<div class="results-area fixed-area" ng-show="showing('results')">
-			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort | filter: filterResult" ng-drop="true" ng-drop-success="onDropComplete($index,$data,$event)" ng-mousemove="resultMove(result.index)" ng-touchmove="resultMove({{result.index}})" rel="{{result.index}}">
-				<div class="result-inner {{locked ? 'result-inner-locked' : ''}} {{shiftedClass(result.index)}}" rel="{{result.index}}" ng-drag="true" ng-drag-data="result">
+			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort | filter: filterResult" ng-drop="true" ng-drop-success="onDropComplete($index,$data,$event)" ng-mousemove="resultMove(result.index, 'result')" ng-touchmove="resultMove({{result.index}}, 'result')" rel="{{result.index}}">
+				<div class="result-inner {{locked ? 'result-inner-locked' : ''}} {{shiftedClass(result.index, 'result')}}" rel="{{result.index}}" ng-drag="true" ng-drag-data="result">
 					<div class="result-main has-more-button" ng-show="!result.flipped">
 						<div class="result-score" ng-click="result.flipped = !result.flipped" style="{{result.spotlight ? 'background-color:' + result.spotlightColor : ''}}">
 							<img src="assets/img/Terrain_Icon_White.png" class="result-score-img" />

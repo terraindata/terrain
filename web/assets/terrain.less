@@ -371,6 +371,18 @@ input:focus {
 
 .card, .pre-card {
 	margin-bottom: 10px;
+	-webkit-transition: -webkit-transform 0.25s ease-out, opacity 0.25s ease-out;
+	transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+	opacity: 1;
+}
+
+.card.dragging {
+	-webkit-transition: -webkit-transform 0s ease-out;
+	transition: transform 0s ease-out;
+}
+
+.card-is-being-dragged .pre-card {
+	opacity: 0;
 }
 
 .card-select-area {
@@ -531,6 +543,14 @@ input:focus {
 .shifted, .shifted-backward {
 	-webkit-transition: -webkit-transform 0.25s ease-out;
 	transition: transform 0.25s ease-out;
+}
+
+.card.shifted {
+	/*transform: translate(0px,100%);*/
+}
+
+.card.shifted-backward {
+	/*transform: translate(0px,-100%);*/
 }
 
 @media (min-width: 2501px) {
