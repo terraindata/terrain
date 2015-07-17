@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en" ng-app="terrainApp">
+<!--<![endif]-->
+<head>
+	<meta charset="utf-8" />
+	<title>Terrain Admin | Dashboard</title>
+	<link rel="icon" type="image/png" href="assets/img/Terrain_Icon.jpeg">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+	<meta content="" name="description" />
+	<meta content="" name="author" />
+	
+	<!-- ================== BEGIN BASE CSS STYLE ================== -->
+	<!-- <link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" /> -->
+	<link href="assets/color-admin/plugins/jquery-ui/themes/base/minified/jquery-ui.min.css" rel="stylesheet" />
+	<link href="assets/color-admin/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="assets/color-admin/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+	<link href="assets/color-admin/css/animate.min.css" rel="stylesheet" />
+	<link href="assets/color-admin/css/style.css" rel="stylesheet" />
+	<link href="assets/color-admin/css/style-responsive.css" rel="stylesheet" />
+	<link href="assets/color-admin/css/theme/default.css" rel="stylesheet" id="theme" />
+	<!-- ================== END BASE CSS STYLE ================== -->
+	
+	<!-- ================== BEGIN PAGE LEVEL STYLE ================== -->
+	<link href="assets/color-admin/plugins/jquery-jvectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" />
+	<link href="assets/color-admin/plugins/bootstrap-datepicker/css/datepicker.css" rel="stylesheet" />
+	<link href="assets/color-admin/plugins/bootstrap-datepicker/css/datepicker3.css" rel="stylesheet" />
+    <link href="assets/color-admin/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+	<!-- ================== END PAGE LEVEL STYLE ================== -->
+	
+	<!-- ================== BEGIN BASE JS ================== -->
+	<script src="assets/color-admin/plugins/pace/pace.min.js"></script>
+	<!-- ================== END BASE JS ================== -->
+
+	<!-- ================== BEGIN TERRAIN CUSTOM ================== -->
+	<link rel="stylesheet/less" type="text/css" href="assets/terrain.less" />
+	<link rel="stylesheet" href="barline.css">
+	<link rel="stylesheet" href="slicer.css">
+	<link rel="stylesheet" href="assets/css/terrain-autocomplete.css">
+	<link rel="stylesheet" href="assets/css/open-sans.css">
+
+	<script src="jquery.js"></script>
+	<script src="assets/js/terrain-config.js"></script>
+	<script src="barline.js"></script>
+	<script src="slicer.js"></script>
+	<script src="assets/js/angular.min.js"></script>
+	<script src="assets/js/d3.angular.js"></script>
+	<script src="assets/js/node_modules/angular-route/angular-route.min.js"></script>
+	<script src="assets/js/ngDraggable.js"></script>
+	<script src="assets/js/angular-touch.min.js"></script>
+	<script src="assets/js/ngTouchmove.js"></script>
+	<script src="assets/js/ng-slide-down.js"></script>
+	<script src="assets/js/terrain.js"></script>
+	<script src="assets/js/terrain-app.js"></script>
+	<script src="assets/js/terrain-autocomplete.angular.js"></script>
+	<script src="assets/js/terrain-barline.angular.js"></script>
+	<script src="assets/js/terrain-slicer.angular.js"></script>
+	<script src="assets/js/terrain-controllers.js"></script>
+	<script src="assets/js/terrain-directives.js"></script>
+	<script src="assets/js/terrain-connectors.js"></script>
+
+	<!-- set options before less.js script -->
+	<script>
+	  less = {
+	    env: "development",
+	    async: false,
+	    fileAsync: false,
+	    poll: 1000,
+	    functions: {},
+	    dumpLineNumbers: "comments",
+	    relativeUrls: false,
+	    rootpath: ""
+	  };
+	</script>
+	<script src="assets/js/less.min.js"></script>
+
+	<!-- ================== END TERRAIN CUSTOM ================== -->
+</head>
+<body>
+	<!-- begin #page-loader -->
+	<div id="page-loader" class="fade in"><span class="spinner"></span></div>
+	<!-- end #page-loader -->
+	
+	<!-- begin #page-container -->
+	<div id="page-container" class="fade page-sidebar-fixed in page-header-fixed">
+
+		<button onclick="testGetTQL()">Hello</button>
+
+	</div>
+	<!-- end page container -->
+	
+	<!-- ================== BEGIN BASE JS ================== -->
+	<script src="assets/color-admin/plugins/jquery/jquery-1.9.1.min.js"></script>
+	<script src="assets/color-admin/plugins/jquery/jquery-migrate-1.1.0.min.js"></script>
+	<script src="assets/color-admin/plugins/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+	<script src="assets/color-admin/plugins/bootstrap/js/bootstrap.min.js"></script>
+	<!--[if lt IE 9]>
+		<script src="assets/color-admin/crossbrowserjs/html5shiv.js"></script>
+		<script src="assets/color-admin/crossbrowserjs/respond.min.js"></script>
+		<script src="assets/color-admin/crossbrowserjs/excanvas.min.js"></script>
+	<![endif]-->
+	<script src="assets/color-admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+	<script src="assets/color-admin/plugins/jquery-cookie/jquery.cookie.js"></script>
+	<!-- ================== END BASE JS ================== -->
+	
+	<!-- ================== BEGIN PAGE LEVEL JS ================== -->
+	<script src="assets/color-admin/plugins/gritter/js/jquery.gritter.js"></script>
+	<script src="assets/color-admin/plugins/flot/jquery.flot.min.js"></script>
+	<script src="assets/color-admin/plugins/flot/jquery.flot.time.min.js"></script>
+	<script src="assets/color-admin/plugins/flot/jquery.flot.resize.min.js"></script>
+	<script src="assets/color-admin/plugins/flot/jquery.flot.pie.min.js"></script>
+	<script src="assets/color-admin/plugins/sparkline/jquery.sparkline.js"></script>
+	<script src="assets/color-admin/plugins/jquery-jvectormap/jquery-jvectormap-1.2.2.min.js"></script>
+	<script src="assets/color-admin/plugins/jquery-jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+	<script src="assets/color-admin/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+	<script src="assets/color-admin/js/dashboard.js"></script>
+	<script src="assets/color-admin/js/apps.min.js"></script>
+	<!-- ================== END PAGE LEVEL JS ================== -->
+	
+	<script>
+		$(document).ready(function() {
+			App.init();
+			Dashboard.init();
+			if($(window).width() > 767)
+				$('.sidebar-minify-btn').click();
+		});
+	</script>
+</body>
+</html>
