@@ -52,6 +52,9 @@ function getTQL(dataArray) {
 			case 'from':
 				strTQL = doFrom(strTQL, dataArray[i].table);
 				break;
+			case 'filter':
+				strTQL = doFilter(strTQL, dataArray[i].filters);
+				break;
 		}
 	}
 	alert(strTQL);
@@ -68,15 +71,22 @@ function testGetTQL() {
 			type: 'filter',
 			filters : [
 				{
+					combinator : 'none',
 					first : 'rating',
 					comparator : '>=',
 					last : 'input.rating'
 				},
 				{
-					combine : 'and',
+					combinator : 'and',
 					first : 'price',
 					comparator : '<',
 					last : '400'
+				},
+				{
+					combinator : 'or',
+					first : 'city',
+					comparator : '==',
+					last : '\'San Francisco\''
 				}
 			]
 		}
@@ -88,6 +98,36 @@ function testGetTQL() {
 
 function doFrom(strTQL, strTable) {
 	//db.from('product')
-	strTQL = strTQL + ".from('" + encodeURI(strTable) + "')";
+	strTQL += ".from('" + encodeURI(strTable) + "')";
+	return strTQL;
+}
+
+function doFilter(strTQL, arrFilters) {
+	//db.filter(<> table == 'product' && rating > 3)
+	strTQL += ".filter(<>";
+	for (var i = 0; i < arrFilters.length; i++){
+		
+		//First handle the combinator if it exists
+		switch(arrFilters[i].combinator) {
+			case 'and':
+				strTQL += " && ";
+				break;
+			case 'or' :
+				strTQL += " || ";
+				break;
+		}		
+		//TBD: Will strings be passed from the interface with quotes or should that be handled here?
+		//Next write out first
+		strTQL += " " + arrFilters[i].first;
+		
+		//Next the comparator
+		strTQL += " " + arrFilters[i].comparator;
+		
+		//TBD: Will strings be passed from the interface with quotes or should that be handled here?		
+		//Finally the second term
+		strTQL += " " + arrFilters[i].last;
+				
+	}
+	strTQL += ")";
 	return strTQL;
 }
