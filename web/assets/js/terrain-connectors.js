@@ -53,7 +53,10 @@ function getTQL(dataArray) {
 				strTQL = doFrom(strTQL, dataArray[i].table);
 				break;
 			case 'filter':
-				strTQL = doFilter(strTQL, dataArray[i].filters);
+				strTQL = doFilter(strTQL, dataArray[i].args);
+				break;
+			case 'sort' :
+				strTQL = doSort(strTQL, dataArray[i].args);
 				break;
 		}
 	}
@@ -69,26 +72,35 @@ function testGetTQL() {
 		},
 		{
 			type: 'filter',
-			filters : [
+			args : [
 				{
 					combinator : 'none',
-					first : 'rating',
-					comparator : '>=',
-					last : 'input.rating'
+					term : '\'rating\' >= \'input.rating\''
 				},
 				{
 					combinator : 'and',
-					first : 'price',
-					comparator : '<',
-					last : '400'
+					term : '\'price\' < 400'
 				},
 				{
 					combinator : 'or',
-					first : 'city',
-					comparator : '==',
-					last : '\'San Francisco\''
+					term : '\'city\' == \'San Francisco\''
 				}
 			]
+		},
+		{
+			type: 'sort',
+			args: [
+				{
+					//true is ascending, false is descending
+					direction: 'true',
+					term: '\'rating\''		
+				},
+				{
+					direction: 'false',
+					term: 'year + day / 365'
+				}
+			]
+
 		}
 	]
 	getTQL(objCards);
@@ -104,7 +116,7 @@ function doFrom(strTQL, strTable) {
 
 function doFilter(strTQL, arrFilters) {
 	//db.filter(<> table == 'product' && rating > 3)
-	strTQL += ".filter(<>";
+	strTQL += ".filter(";
 	for (var i = 0; i < arrFilters.length; i++){
 		
 		//First handle the combinator if it exists
@@ -116,16 +128,22 @@ function doFilter(strTQL, arrFilters) {
 				strTQL += " || ";
 				break;
 		}		
-		//TBD: Will strings be passed from the interface with quotes or should that be handled here?
-		//Next write out first
-		strTQL += " " + arrFilters[i].first;
+
+		strTQL += arrFilters[i].term;			
+	}
+	strTQL += ")";
+	return strTQL;
+}
+
+function doSort(strTQL, arrSorts) {
+	//db.sort('price',true,'date',false)
+	strTQL += ".sort(";
+	// For each sort, write out the argument and the sort direction
+	for (var i = 0; i < arrSorts.length; i++){
 		
-		//Next the comparator
-		strTQL += " " + arrFilters[i].comparator;
+		if (i > 0) strTQL += ",";
+		strTQL += arrSorts[i].term + "," + arrSorts[i].direction;
 		
-		//TBD: Will strings be passed from the interface with quotes or should that be handled here?		
-		//Finally the second term
-		strTQL += " " + arrFilters[i].last;
 				
 	}
 	strTQL += ")";
