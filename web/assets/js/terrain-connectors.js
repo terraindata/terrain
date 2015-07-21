@@ -58,6 +58,9 @@ function getTQL(dataArray) {
 			case 'sort' :
 				strTQL = doSort(strTQL, dataArray[i].args);
 				break;
+			case 'slice' :
+				strTQL = doSlice(strTQL, dataArray[i].low, dataArray[i].high);
+				break;
 		}
 	}
 	alert(strTQL);
@@ -100,7 +103,11 @@ function testGetTQL() {
 					term: 'year + day / 365'
 				}
 			]
-
+		},
+		{
+			type: 'slice',
+			low: 5,
+			high: 25
 		}
 	]
 	getTQL(objCards);
@@ -140,12 +147,15 @@ function doSort(strTQL, arrSorts) {
 	strTQL += ".sort(";
 	// For each sort, write out the argument and the sort direction
 	for (var i = 0; i < arrSorts.length; i++){
-		
 		if (i > 0) strTQL += ",";
 		strTQL += arrSorts[i].term + "," + arrSorts[i].direction;
-		
-				
 	}
 	strTQL += ")";
 	return strTQL;
+}
+
+function doSlice(strTQL, low, high) {
+	strTQL += ".slice(" + low + "," + high + ")";
+	
+	return strTQL;	
 }
