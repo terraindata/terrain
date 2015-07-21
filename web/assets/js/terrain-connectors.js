@@ -44,26 +44,29 @@ THE SOFTWARE.
 
 function getTQL(dataArray) {
 	
-	var strTQL = new String("db");
+	var strQuery = new String("db");
 	
 	var arrayLength = dataArray.length;
 	for (var i = 0; i < arrayLength; i++){
 		switch(dataArray[i].type) {
 			case 'from':
-				strTQL = doFrom(strTQL, dataArray[i].table);
+				strQuery += doFrom(dataArray[i].table);
 				break;
 			case 'filter':
-				strTQL = doFilter(strTQL, dataArray[i].args);
+				strQuery += doFilter(dataArray[i].args);
 				break;
 			case 'sort' :
-				strTQL = doSort(strTQL, dataArray[i].args);
+				strQuery += doSort(dataArray[i].args);
 				break;
 			case 'slice' :
-				strTQL = doSlice(strTQL, dataArray[i].low, dataArray[i].high);
+				strQuery += doSlice(dataArray[i].low, dataArray[i].high);
+				break;
+			case 'select' :
+				strQuery += doSelect(dataArray[i].args);
 				break;
 		}
 	}
-	alert(strTQL);
+	alert(strQuery);
 }
 
 function testGetTQL() {
@@ -71,7 +74,19 @@ function testGetTQL() {
 	var objCards = [
 		{
 			type: 'from',
-			table: 'products'
+			table: '\'products\''
+		},
+		{
+			type: 'select',
+			args : [
+				{
+					term : '\'rating\''
+				},{
+					term : '\'price\''
+				},{
+					term : '\'city\''
+				}	
+			]
 		},
 		{
 			type: 'filter',
@@ -115,14 +130,15 @@ function testGetTQL() {
 	
 }
 
-function doFrom(strTQL, strTable) {
-	//db.from('product')
-	strTQL += ".from('" + encodeURI(strTable) + "')";
+function doFrom(strTable) {
+	
+	var strTQL = new String("");
+	strTQL += ".from(" + strTable + ")";
 	return strTQL;
 }
 
-function doFilter(strTQL, arrFilters) {
-	//db.filter(<> table == 'product' && rating > 3)
+function doFilter(arrFilters) {
+	var strTQL = new String("");
 	strTQL += ".filter(";
 	for (var i = 0; i < arrFilters.length; i++){
 		
@@ -142,8 +158,8 @@ function doFilter(strTQL, arrFilters) {
 	return strTQL;
 }
 
-function doSort(strTQL, arrSorts) {
-	//db.sort('price',true,'date',false)
+function doSort(arrSorts) {
+	var strTQL = new String("");
 	strTQL += ".sort(";
 	// For each sort, write out the argument and the sort direction
 	for (var i = 0; i < arrSorts.length; i++){
@@ -154,8 +170,21 @@ function doSort(strTQL, arrSorts) {
 	return strTQL;
 }
 
-function doSlice(strTQL, low, high) {
+function doSlice(low, high) {
+	var strTQL = new String("");
 	strTQL += ".slice(" + low + "," + high + ")";
 	
 	return strTQL;	
+}
+
+function doSelect(arrSelect) {
+	var strTQL = new String("");
+	strTQL += ".select(";
+	
+	for (var i = 0; i < arrSelect.length; i++){
+		if (i > 0) strTQL += ",";
+		strTQL += arrSelect[i].term;
+	}
+	strTQL += ")";
+	return strTQL;
 }
