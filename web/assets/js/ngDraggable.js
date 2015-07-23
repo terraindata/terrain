@@ -89,6 +89,8 @@ angular.module("ngDraggable", [])
 
                     var getDragData = $parse(attrs.ngDragData);
 
+                    var dragElement = $parse(attrs.ngDragElement);
+
                     // deregistration function for mouse move events in $rootScope triggered by jqLite trigger handler
                     var _deregisterRootMoveListener = angular.noop;
 
@@ -166,11 +168,7 @@ angular.module("ngDraggable", [])
                                 onlongpress(evt);
                             },100);
                             $document.on(_moveEvents, cancelPress);
-                            $document.on(_releaseEvents, function(event) {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                cancelPress();
-                            });
+                            $document.on(_releaseEvents, cancelPress);
                         }else{
                             onlongpress(evt);
                         }

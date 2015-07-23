@@ -72,7 +72,7 @@ THE SOFTWARE.
           overflow: 'hidden',
           transitionProperty: 'height',
           transitionDuration: '' + duration + 's',
-          transitionTimingFunction: 'ease-in-out'
+          transitionTimingFunction: 'ease-out'
         });
         getHeight = function (passedScope) {
           var c, children, height, _i, _len;

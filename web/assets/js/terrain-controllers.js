@@ -153,7 +153,6 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		});
 
 		$scope.orderableFields = $scope.selectableFields.concat([{id: -1, name: '*TerrainScore'}]);
-
     });
 
 	
@@ -220,6 +219,10 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 
 	$scope.cardFor = function(type) {
 		return $scope.cards.reduce(function(prev,cur) { if(cur[type]) return cur; return prev; }, null);
+	}
+
+	$scope.resultsShouldShowScore = function() {
+		return $scope.cardFor('order');
 	}
 
 	$scope.apply = function() {
@@ -322,13 +325,15 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			value: 'Listings'
 		},
 		name: 'From',
-		useTitle: true
+		useTitle: true,
+		suggested: true
 	}, {
 		id: 17,
 		select: {
 			fields: ['name', 'price', 'rating', 'stays', 'description']
 		},
-		name: 'Select'
+		name: 'Select',
+		suggested: true
 	}, {
 		id: 237,
 		filters: [{
@@ -337,7 +342,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			value: 'MaxPrice',
 			operator: 'le'
 		}],
-		name: 'Filter'
+		name: 'Filter',
+		suggested: true
 	}, { 
 		id: 0,
 		order: {
@@ -350,7 +356,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}, {
 		id: 1,
 		transform: true,
-		name: 'Price',
+		name: '[Transform] Price',
 		key: 'price',
 		inDataResponse: true,
 		color: $scope.getColor(),
@@ -371,10 +377,11 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		weight: 50,
 		newCardIsShowing: false,
 		showing: true,
+		suggested: true
 	}, {
 		id: 23,
 		transform: true,
-		name: 'Location',
+		name: '[Transform] Location',
 		key: 'location',
 		color: $scope.getColor(),
 		data: {
@@ -393,7 +400,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		},
 		weight: 50,
 		newCardIsShowing: false,
-		showing: true
+		showing: true,
+		suggested: true
 	}];
 
 	$scope.newCards = [
@@ -570,9 +578,13 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	$.each($scope.cards, function(i,c) { c.card = true; });
 	$.each($scope.newCards, function(i,c) { c.card = true; });
 
-	if($scope.ab('empty')) {
+	if(!$scope.ab('start')) {
 		$scope.newCards = $scope.cards.concat($scope.newCards);
 		$scope.cards = [];
+	} else {
+		$.each($scope.cards, function(i,c) {
+			c.allShowing = true;
+		});
 	}
 
 	$scope.collapseAllCards = function(state) {
@@ -655,14 +667,17 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		// 			cardToAdd[key] = $.extend({}, obj);
 		// 	});
 		// }
-		cardToAdd.allHidden = true;
 		$scope.cards.splice(addAtEnd ? $scope.cards.length : $scope.cards.indexOf(cardToAddInFrontOf), 0, cardToAdd);
+		if(cardToAddInFrontOf) 
 			cardToAddInFrontOf.newCardIsShowing = false;
 		if($scope.newCards.indexOf(cardToAdd) != -1 && !cardToAdd.repeated)
 			$scope.newCards.splice($scope.newCards.indexOf(cardToAdd), 1);
 		$timeout(function() {
+			// cardToAdd.allShowing = true;
 			$(".card-container-" + cardToAdd.id).hide();
 			$(".card-container-" + cardToAdd.id).slideDown(250);
+			// $timeout(function() {
+			// }, 500);
 		}, 25);
 	}
 
@@ -725,6 +740,9 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		if(score > 1) {
 			return score;
 		}
+		if(score == 0) {
+			return "0";
+		}
 		if(score == 1) return "1.00";
 		score = ("" + score).substr(1);
 		while(score.length < 4) score = score + "0";
@@ -780,7 +798,6 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		$(".card").css('transform', '');
 		$scope.dragIndices['card'] = -1;
 
-		console.log('lock');
 		$timeout(function() { $scope.cardDragLock = false; }, 250);
 	}
 
@@ -790,6 +807,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		if($(".dragging").length > 0) {
 			$scope.cardDragLock = true;
 			$scope.dragIndices[type] = index;
+			$(".card.dragging").css('transition', 'transform 0s ease-out');
 		} else {
 			$scope.dragIndices[type] = -1;
 		}
@@ -858,13 +876,13 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		}
 	}
 
-	$scope.inputs = [{
+	$scope.inputs = $scope.ab('start') ? [{
 		name: 'MaxPrice',
 		value: '200',
 		showing: true
-	}];
+	}] : [];
 	$scope.newInput = function(index) {
-		var newInput = { name: '', value: '' };
+		var newInput = { name: '', value: '', showing: false };
 		if(index == -1)
 			index = $scope.inputs.length;
 		$scope.inputs.splice(index, 0, newInput);

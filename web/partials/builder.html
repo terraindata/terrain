@@ -7,7 +7,7 @@
 			</div>
 		</h1>
 		<div class="fixed-area inputs-area" ng-show="showing('inputs')">
-			<div ng-repeat="input in inputs" ng-slide-down="input.showing" duration="0.25">
+			<div ng-repeat="input in inputs" ng-slide-down="input.showing" duration="0.5" class="input-container">
 				<div class="pre-input">
 					<a class="new-card-plus-area" ng-click="newInput($index)">
 						<div class="new-card-plus">
@@ -41,6 +41,10 @@
 			<div class="input">
 				<input type="text" placeholder="Add an input" ng-focus="newInput(-1)">
 			</div>
+			<div class="empty-algorithm" ng-show="inputs.length == 0">
+				Inputs are empty
+				<small>Add a new one above</small>
+			</div>
 		</div>
 	</div>
 	<div class="col-sm-6 col-xs-12 main-column builder-column">
@@ -51,18 +55,36 @@
 			</div>
 		</h1>
 		<div class="fixed-area builder-area {{dragIndices['card'] != -1 ? 'card-is-being-dragged' : ''}}" ng-show="showing('builder')">
+			<div class="algorithm-name-area">
+				<div class="row">
+					<div class="col-xs-9">
+						<input type="text" class="algorithm-name-input" placeholder="Name your algorithm" />
+					</div>
+					<div class="col-xs-3">
+						<a class="algorithm-save-btn button">Create Algorithm</a>
+					</div>
+				</div>
+			</div>
 			<div class="all-weights" ng-show="ab('weights')">
 				<div class="weight" d3-slicer data="cards" on-change="handleChange(cardId)" card-id="-1"></div>
 			</div>
 			<div ng-repeat="card in cards track by card.id" class="card-container-{{card.id}}"  ng-drop="true" ng-drop-success="onCardDropComplete($index,$data,$event)" rel="{{$index}}" ng-mousemove="resultMove($index, 'card')" ng-touchmove="resultMove({{$index}}, 'card')">
 				<div class="pre-card">
-					<div ng-slide-down="card.newCardIsShowing" duration="0.25">
+					<div ng-slide-down="card.newCardIsShowing" duration="0.25" class="new-card-wrapper">
 						<div class="new-card card">
-							<div class="card-title">
-								New Card
-								<a ng-click="card.newCardIsShowing = false" class="pull-right small"> Hide </a>
+							<div class="row new-card-text-area">
+								<div class="col-xs-1 new-card-icon-cell">
+									<div class="new-card-icon">
+										<div class="new-card-icon-inner">+</div>
+									</div>
+								</div>
+								<div class="col-xs-10">
+									<div tdb-autocomplete data="newCards" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names"></div>
+								</div>
+								<div class="col-xs-1">
+									<a ng-click="card.newCardIsShowing = false" class="pull-right small"> Hide </a>
+								</div>
 							</div>
-							<div tdb-autocomplete data="newCards" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names"></div>
 							<div class="new-card-suggestions-area">
 								<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion button" ng-click="addCard(suggestion, card)">
 									{{suggestion.name}}
@@ -70,7 +92,7 @@
 							</div>
 						</div>
 					</div>
-					<div ng-slide-down="!card.newCardIsShowing" duration="0.25">
+					<div ng-slide-down="!card.newCardIsShowing" duration="0.25" class="new-card-plus-wrapper">
 						<a class="new-card-plus-area" ng-click="card.newCardIsShowing = true">
 							<div class="new-card-plus">
 								+
@@ -79,27 +101,8 @@
 					</div>
 				</div>
 				<div class="card card-{{card.id}} has-more-button {{shiftedClass($index, 'card')}}" ng-right-click-menu ng-drag="true" ng-drag-data="card"  rel="{{$index}}">
-					<div class="card-title{{ card.useTitle ? '-no-border' : ''}} row" ng-click="cardToggle(card)">
-						<div class="col-xs-11 {{ card.useTitle ? 'card-title-no-border-text  col-sm-3 col-md-2' : ''}}">{{card.key || ""}} {{titleForCard(card)}}</div>
-						<div class="col-xs-11 col-sm-8 col-md-9">
-							<div class="card-from-area" ng-show="card.from">
-								<div tdb-autocomplete data="fromOptions" model="card.from.value" placeholder="Table Name" auto-placeholder="Start typing to see matching table names"></div>
-							</div>
-							<div class="card-transform-title-area" ng-show="card.transform">
-								
-							</div>
-							<div class="card-sort-title-area row" ng-show="card.order">
-								<div class="col-xs-12 col-sm-6">
-									<div tdb-autocomplete data="orderableFields" model="card.order.field" placeholder="Field Name" auto-placeholder="Start typing to see matching field names" on-select="handleChange()"></div>
-								</div>
-								<div class="col-xs-12 col-sm-6">
-									<select ng-model="card.order.direction" ng-change="resort()" class="card-order-select">
-										<option value="descending">Descending</option>
-										<option value="ascending">Ascending</option>
-									</select>
-								</div>
-							</div>
-						</div>
+					<div class="card-title row" ng-click="cardToggle(card)">
+						<div ng-drag-handle class="col-xs-11">{{card.key || ""}} {{titleForCard(card)}}</div>
 					</div>
 					<div class="more-button more-4-items more-right more-button-large" ng-click="console.log(event)">
 						<i class="fa fa-ellipsis-h more-icon"></i>
@@ -112,6 +115,20 @@
 						</div>
 					</div>
 					<div class="card-body" ng-slide-down="!card.hidden" duration="0.25">
+						<div class="card-from-area" ng-show="card.from">
+							<div tdb-autocomplete data="fromOptions" model="card.from.value" placeholder="Table Name" auto-placeholder="Start typing to see matching table names"></div>
+						</div>
+						<div class="card-sort-title-area row" ng-show="card.order">
+							<div class="col-xs-12 col-sm-6">
+								<div tdb-autocomplete data="orderableFields" model="card.order.field" placeholder="Field Name" auto-placeholder="Start typing to see matching field names" on-select="handleChange()"></div>
+							</div>
+							<div class="col-xs-12 col-sm-6">
+								<select ng-model="card.order.direction" ng-change="resort()" class="card-order-select">
+									<option value="descending">Descending</option>
+									<option value="ascending">Ascending</option>
+								</select>
+							</div>
+						</div>
 						<div class="card-select-area" ng-show="card.select">
 							<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields">
 								<div class="col-xs-11 card-select-col">
@@ -152,7 +169,7 @@
 									<input ng-model="f.value" ng-blur="checkForNewInput(card)" ng-keydown="blurOnEnter($event)" placeholder="Value" />
 								</div>
 							</div>
-							<a class="new-filter-btn" ng-click="addFilter(card)">Add a filter</a>
+							<a class="new-filter-btn button" ng-click="addFilter(card)">Add a filter</a>
 						</div>
 						<div class="card-transform-area" ng-show="card.transform">
 							<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
@@ -162,11 +179,17 @@
 				</div>
 			</div>
 			<!-- TODO put this into a component so that copy/paste isn't needed -->
-			<div class="new-card card">
-				<div class="card-title">
-					New Card
-				</div>
-				<div  tdb-autocomplete data="newCards" on-select="addCardAndApply(obj, null)" input-classes="bordered-input" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
+			<div class="new-card card bottom-new-card">
+				<div class="row new-card-text-area">
+					<div class="col-xs-1 new-card-icon-cell">
+						<div class="new-card-icon">
+							<div class="new-card-icon-inner">+</div>
+						</div>
+					</div>
+					<div class="col-xs-11">
+						<div  tdb-autocomplete data="newCards" on-select="addCardAndApply(obj, null)" input-classes="bordered-input" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
+						</div>
+					</div>
 				</div>
 				<div class="new-card-suggestions-area">
 					<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion button" ng-click="addCard(suggestion, null)">
@@ -192,7 +215,7 @@
 			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort | filter: filterResult" ng-drop="true" ng-drop-success="onDropComplete($index,$data,$event)" ng-mousemove="resultMove(result.index, 'result')" ng-touchmove="resultMove({{result.index}}, 'result')" rel="{{result.index}}">
 				<div class="result-inner {{locked ? 'result-inner-locked' : ''}} {{shiftedClass(result.index, 'result')}}" rel="{{result.index}}" ng-drag="true" ng-drag-data="result">
 					<div class="result-main has-more-button" ng-show="!result.flipped">
-						<div class="result-score" ng-click="result.flipped = !result.flipped" style="{{result.spotlight ? 'background-color:' + result.spotlightColor : ''}}">
+						<div class="result-score" ng-show="resultsShouldShowScore()" ng-click="result.flipped = !result.flipped" style="{{result.spotlight ? 'background-color:' + result.spotlightColor : ''}}">
 							<img src="assets/img/Terrain_Icon_White.png" class="result-score-img" />
 							{{scoreForResultDisplay(result)}}
 						</div>
@@ -202,13 +225,13 @@
 							<div class="result-info row">
 								<div class="result-rating col-xs-6" ng-show="selectedField('rating')">
 									<div class="result-stars">
-										<div ng-class="result.rating >= 1 ? 'result-star-shown' : 'result-star-hidden'"></div>
-										<div ng-class="result.rating >= 2 ? 'result-star-shown' : 'result-star-hidden'"></div>
-										<div ng-class="result.rating >= 3 ? 'result-star-shown' : 'result-star-hidden'"></div>
-										<div ng-class="result.rating >= 4 ? 'result-star-shown' : 'result-star-hidden'"></div>
-										<div ng-class="result.rating >= 5 ? 'result-star-shown' : 'result-star-hidden'"></div>
+										<div ng-class="result.rating >= 1 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
+										<div ng-class="result.rating >= 2 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
+										<div ng-class="result.rating >= 3 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
+										<div ng-class="result.rating >= 4 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
+										<div ng-class="result.rating >= 5 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
 									</div>
-									<div class="result-rating-value">({{result.rating}})</div>
+									<!-- <div class="result-rating-value">({{result.rating}})</div> -->
 								</div>
 								<div class="result-stays col-xs-4" ng-show="selectedField('stays')">{{result.stays}} Stays</div>
 								<div class="result-price col-xs-2" ng-show="selectedField('price')">${{result.price}}</div>

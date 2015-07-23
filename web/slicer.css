@@ -44,6 +44,7 @@
 	font-weight: 200;
 	outline: none;
 	height: 100%;
+	padding: 0px;
   	padding-top: 3px;
   	transition: all 0.25s;
   	-webkit-transition: all 0.25s;

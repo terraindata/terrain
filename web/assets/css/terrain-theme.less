@@ -1,0 +1,213 @@
+/* Colors */
+@sidebar-bg: #7a8074;
+@sidebar-active-bg: #ccda61;
+@sidebar-hover-bg: #60665a;
+@sidebar-icon-color: #fff;
+
+@page-header-text-color: rgba(255,255,255,0.5);
+@builder-page-bg: #babfab;
+@section-bg: #fff;
+@card-bg: #dbe0cb;
+@card-title-bg: #bbc1a9;
+@card-title-color: #fff;
+@transform-card-bg: rgba(255,255,255,0.1);
+@algorithm-background: #797f73;	
+
+/* Sidebar */
+
+.sidebar {
+	background: @sidebar-bg;
+}
+
+.sidebar li a {
+	color: @sidebar-icon-color !important;
+}
+
+.sidebar li:hover a {
+	background: @sidebar-hover-bg !important;
+}
+
+.sidebar li.active a {
+	background: @sidebar-active-bg !important;
+}
+
+/* Header bars */
+
+.page-header {
+	background: @sidebar-bg;
+	color: @page-header-text-color;
+	border-color: rgba(0,0,0,0.15);
+}
+
+/* Builder */
+
+.content {
+	background: @builder-page-bg;
+}
+
+.inputs-area {
+	border-color: rgba(0,0,0,0.15);
+}
+
+.builder-area, .inputs-area {
+	margin: 5px;
+	padding: 5px;
+	background: @section-bg;
+	border-radius: 5px 5px 0px 0px;
+	box-shadow: -1px 1px 2px 0px rgba(0,0,0,0.15);
+}
+
+.algorithm-name-area {
+	background: @algorithm-background;
+}
+
+
+.button {
+	background: #51594a;
+	border-width: 0px;
+	color: #fff;
+	-webkit-transition: all 0.25s;
+	transition: all 0.25s;
+	
+	&:hover {
+		color: #fff;
+		background: darken(#51594a, 10%);
+	}
+}
+
+.more-button {
+	background: rgba(0,0,0,0.25);
+	color: #fff;
+	border-color: #fff;
+	border-width: 2px;
+	font-size: 14px;
+}
+
+.card .more-button {
+	top: 6px;
+	right: 6px;
+}
+
+.more-button:hover, .more-button-showing {
+	border-color: #fff;
+	border-width: 0px;
+	background: rgba(122,128,116,0.9);
+	box-shadow: 0px 0px 2px rgba(0,0,0,0.2);
+}
+
+.more-menu-item {
+	color: #fff;
+}
+
+.more-menu-item:hover {
+	background: rgba(0,0,0,0.25);
+}
+
+/* Inputs */
+
+input {
+	color: #58645c;
+	padding: 5px;
+	padding-left: 10px;
+}
+
+.input {
+	padding: 8px;
+}
+
+.input input {
+	border-radius: 4px !important;
+	border-width: 0px !important;
+}
+
+.input-name-area {
+	margin-bottom: 8px;
+	input {
+		width: 100% !important;
+	}
+}
+
+.input:hover {
+	.input-name-area input {
+		width: calc(100% - 17px) !important;		
+	}
+}
+
+/* Cards */
+
+.card, .input {
+	background: @card-bg;
+	border-radius: 5px;
+	/*overflow: hidden;*/
+}
+
+.card-title {
+	background: @card-title-bg;
+	color: @card-title-color;
+	margin-top: -5px;
+	padding: 7px;
+	text-shadow: 0px 0px 3px rgba(0,0,0,0.25);
+	-webkit-transition: all 0.25s;
+	transition: all 0.25s;
+	font-size: 16px;
+	font-weight: 700;
+	text-transform: none;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	margin-left: -5px;
+  	margin-right: -5px;
+
+	&:hover {
+		background: darken(@card-title-bg, 15%);
+		color: @card-title-color;
+	}
+}
+
+.card-transform-area {
+	background: @transform-card-bg;
+}
+
+.card-select-field {
+	border-color: #b3b7a8;
+
+	.card-select-delete {
+		opacity: 0;
+		-webkit-transition: all 0.25s;
+		-o-transition: all 0.25s;
+		transition: all 0.25s;
+	}
+
+	&:hover {
+		.card-select-delete {
+			opacity: 1;
+		}
+	}
+}
+
+/* New Cards Area */
+
+.new-card-text-area {
+	padding: 10px;
+}
+
+.new-card-suggestions-area {
+	margin: -5px;
+	margin-top: 5px;
+	padding: 15px;
+	background: #7d7d7b;
+	overflow-x: scroll;
+	height: 75px;
+	white-space: nowrap;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+
+.new-card-suggestion {
+	padding: 10px 15px;
+	background: #bcc1aa;
+	border-width: 0px;
+	color: #fff;
+	text-shadow: 0px 0px 4px rgba(0,0,0,0.35);
+	box-shadow: 0px 0px 3px rgba(0,0,0,0.25);
+	margin-right: 10px;
+}

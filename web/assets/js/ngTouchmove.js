@@ -50,7 +50,7 @@ angular.module("ngTouchmove", []).directive("ngTouchmove", function () {
       $element.bind('touchstart', onTouchStart);
       
       function onTouchStart(event) {
-        event.preventDefault();
+        // event.preventDefault();
         $element.bind('touchmove', onTouchMove);
         $element.bind('touchend', onTouchEnd);
       };
@@ -63,7 +63,7 @@ angular.module("ngTouchmove", []).directive("ngTouchmove", function () {
       };
       
       function onTouchEnd(event) {
-        event.preventDefault();
+        // event.preventDefault();
         $element.unbind('touchmove', onTouchMove);
         $element.unbind('touchend', onTouchEnd);
       };

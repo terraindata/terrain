@@ -110,6 +110,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 	.attr("width", opts.width)
 	.attr("height", opts.height);
 
+	var bgArea = svg.append("g");
 	var scaleArea = svg.append("g");
 	var barArea = svg.append("g");
 
@@ -138,6 +139,15 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		svg.attr('width', opts.width);
 		$(barArea).find('.bar').remove();
 
+		bgArea.selectAll('*').remove();
+		bgArea.append('rect')
+			.attr('class', 'bg')
+			.attr('x', 0)
+			.attr('y', 0)
+			.attr('width', opts.width)
+			.attr('height', opts.height)
+			.attr('fill', '#fff');
+			
 		data.bars = [];
 		for(var i = 0; i < data.numberOfBars; i++) data.bars.push(0);
 		var bucketExtremes = data.domain.length > 2 && data.domain[2]; 
