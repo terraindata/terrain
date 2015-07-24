@@ -212,8 +212,13 @@
 			</div>
 		</h1>
 		<div class="results-area fixed-area" ng-show="showing('results')">
-			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }}" ng-repeat="result in results | orderBy: scoreForResultSort | filter: filterResult" ng-drop="true" ng-drop-success="onDropComplete($index,$data,$event)" ng-mousemove="resultMove(result.index, 'result')" ng-touchmove="resultMove({{result.index}}, 'result')" rel="{{result.index}}">
-				<div class="result-inner {{locked ? 'result-inner-locked' : ''}} {{shiftedClass(result.index, 'result')}}" rel="{{result.index}}" ng-drag="true" ng-drag-data="result">
+			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }} {{result.$isMoving && !result.$isMovingTransitioningOff ? 'result-moving' : ''}}" ng-repeat="result in results | orderBy: scoreForResultSort | filter: filterResult" 
+			ng-down="touchDown('result', result, $event)"
+			ng-move="touchMove('result', result, $event)"
+			ng-up="touchUp('result', result, $event)"
+			ng-style="resultStyle(result)"
+			 rel="{{result.index}}">
+				<div class="result-inner {{locked ? 'result-inner-locked' : ''}} {{shiftedClass(result.index, 'result')}}" rel="{{result.index}}">
 					<div class="result-main has-more-button" ng-show="!result.flipped">
 						<div class="result-score" ng-show="resultsShouldShowScore()" ng-click="result.flipped = !result.flipped" style="{{result.spotlight ? 'background-color:' + result.spotlightColor : ''}}">
 							<img src="assets/img/Terrain_Icon_White.png" class="result-score-img" />

@@ -97,6 +97,24 @@ terrainApp.directive('ngRightClick', function($parse) {
     };
 });
 
+var touchMethod = function(events, directive) {
+	return function($parse) {
+	    return function(scope, element, attrs) {
+	        var fn = $parse(attrs[directive]);
+	        element.bind(events, function(event) {
+	            scope.$apply(function() {
+	                event.preventDefault();
+	                fn(scope, {$event:event});
+	            });
+	        });
+	    };
+	}
+}
+
+terrainApp.directive('ngDown', touchMethod('touchstart mousedown', 'ngDown'));
+terrainApp.directive('ngMove', touchMethod('touchmove mousemove', 'ngMove'));
+terrainApp.directive('ngUp', touchMethod('touchend touchcancel mouseup', 'ngUp'));
+
 terrainApp.directive('ngRightClickMenu', function($parse) {
     return function(scope, element, attrs) {
         var fn = $parse(attrs.ngRightClick);

@@ -933,6 +933,129 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 
 		return 'SELECT ' + selectFields + ' FROM ' + fromTable + filtersText + orderText;
 	}
+
+	$scope.touchDown = function(type, obj, evt) {
+		console.log('down', arguments);
+
+		obj.$isMoving = true;
+		obj.$sx = parseInt($("." + type + "[rel=" + obj.index + "]").css('left'));
+		obj.$sy = parseInt($("." + type + "[rel=" + obj.index + "]").css('top'));
+		obj.$x = obj.$sx;
+		obj.$y = obj.$sy;
+		console.log(obj.$x, obj.$y, "." + type + "[rel=" + obj.index + "]", $("." + type + "[rel=" + obj.index + "]"), $("." + type + "[rel=" + obj.index + "]").css('top'));
+
+		if(evt.pageX && evt.pageY) {
+			obj.$smx = evt.pageX;
+			obj.$smy = evt.pageY;
+		}
+
+		obj.$smy += $(".results-area").scrollTop();
+		obj.$smx += $(".results-area").scrollLeft();
+
+		obj.$isMovingTransitioningOff = false;
+	}
+
+	$scope.reindex = function(result, index) {
+		$.each($scope.results, function(i,r) {
+			if(r.$originalOverrideIndex !== undefined)
+				r.overrideIndex = r.$originalOverrideIndex;
+			r.$originalOverrideIndex = undefined;
+		});
+
+		var indexToMove = index, resultToMove = $scope.results.reduce(function(ans,cur) { if(cur.overrideIndex === indexToMove) return cur; return ans; }, null);
+		console.log("indexToMove", indexToMove);
+		while(resultToMove !== null && resultToMove !== result) {
+			indexToMove ++;
+			var nextResultToMove = $scope.results.reduce(function(ans,cur) { if(cur.overrideIndex === indexToMove) return cur; return ans; }, null);
+			console.log("moving", resultToMove.overrideIndex, indexToMove);
+			resultToMove.$originalOverrideIndex = resultToMove.overrideIndex;
+			resultToMove.overrideIndex = indexToMove;
+			resultToMove = nextResultToMove;
+		}
+		console.log("moving original", result.overrideIndex, index);
+		result.overrideIndex = index;
+		$scope.resort();
+	}
+
+	$scope.touchMove = function(type, obj, evt) {
+		if(!obj.$isMoving) return;
+
+		var ele = function(res) {
+			return $(".result[rel=" + res.index + "]");
+		}
+
+		var mx, my;
+		if(evt.pageX && evt.pageY) {
+			mx = evt.pageX;
+			my = evt.pageY;
+		}
+
+		my += $(".results-area").scrollTop();
+		mx += $(".results-area").scrollLeft();
+
+		console.log(evt);
+
+		var dx = mx - obj.$smx;
+		var dy = my - obj.$smy;
+
+		// console.log(dx, dy);
+
+		obj.$x = obj.$sx + dx;
+		obj.$y = obj.$sy + dy;
+
+		var columns = Math.round(ele(obj).parent().width() / ele(obj).width());
+
+		var px = mx - ele(obj).parent().offset().left;
+		if(px < 0) px = 0;
+		if(px > ele(obj).parent().offset().left + ele(obj).parent().width()) px = ele(obj).parent().offset().left + ele(obj).parent().width();
+		var py = my - ele(obj).parent().offset().top;
+		if(py < 0) py = 0;
+		console.log($(".result").length, columns, ele(obj).height());
+		var height = Math.ceil($(".result").length / columns) * ele(obj).height();
+		console.log(py, ele(obj).parent().offset().top);
+		if(py > ele(obj).parent().offset().top + height) py = ele(obj).parent().offset().top + height;
+		console.log(py);
+
+		var index = index = Math.floor(px / ele(obj).width());
+		index += columns * Math.floor(py / ele(obj).height());
+
+		console.log(px, py, columns, Math.floor(px / ele(obj).width()), columns * Math.floor(py / ele(obj).height()));
+
+		if(index !== obj.overrideIndex)
+			$scope.reindex(obj, index);
+		console.log(index);
+	}
+
+	$scope.touchUp = function(type, obj, evt) {
+		console.log('up', arguments);
+		obj.$isMovingTransitioningOff = true;
+		$timeout(function() { obj.$isMoving = false; }, 30);
+	}
+
+	$scope.resultStyle = function(result) {
+		var x, y;
+
+		if(result.$isMoving) {
+			x = result.$x;
+			y = result.$y;
+		} else {
+			var ele = function(res) {
+				return $(".result[rel=" + res.index + "]");
+			}
+
+			var columns = Math.round(ele(result).parent().width() / ele(result).width());
+
+			y = $scope.results.reduce(function(total, current) {
+				if(current.index < result.index && (current.index - 1) % columns == 0)
+					total += ele(current).height();
+				return total;
+			}, 0);
+
+			x = result.index % columns * ele(result).width();
+		}
+
+		return { top: y + "px", left: x + "px" };
+	}
 }]);
 
 terrainControllers.controller('PlaceholderCtrl', ['$scope', '$routeParams', function($scope, $routeParams) {

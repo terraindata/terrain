@@ -28,6 +28,12 @@ a:hover {
     user-select: none;
 }
 
+.no-transition {
+	-webkit-transition: 0s all !important;
+	-o-transition: 0s all !important;
+	transition: 0s all !important;
+}
+
 .button {
 	display: inline-block;
 	background: #fff;
@@ -584,6 +590,7 @@ input:focus {
 	/*overflow-x: hidden;*/
 	overflow-x: visible;
 	padding-bottom: 10px;
+	position: relative;
 }
 
 .weight, .graph {
@@ -612,6 +619,18 @@ input:focus {
 	/*border: 1px solid #ddd;*/
 	/*overflow: hidden;*/
 	border-radius: 5px;
+
+	@result-duration: 0.5s;
+	-webkit-transition: all @result-duration ease-out;
+	-o-transition: all @result-duration ease-out;
+	transition: all @result-duration ease-out;
+
+	position: absolute;
+}
+
+.result-moving {
+	.no-transition;
+	z-index: 99999;
 }
 
 @result-height: 216px;
