@@ -115,6 +115,7 @@
 						</div>
 					</div>
 					<div class="card-body" ng-slide-down="!card.hidden" duration="0.25">
+						<div class="card-body-spacing"></div>
 						<div class="card-from-area" ng-show="card.from">
 							<div tdb-autocomplete data="fromOptions" model="card.from.value" placeholder="Table Name" auto-placeholder="Start typing to see matching table names"></div>
 						</div>
@@ -175,6 +176,7 @@
 							<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
 							<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
 						</div>
+						<div class="card-body-spacing"></div>
 					</div>
 				</div>
 			</div>
@@ -223,6 +225,10 @@
 						<div class="result-score" ng-show="resultsShouldShowScore()" ng-click="result.flipped = !result.flipped" style="{{result.spotlight ? 'background-color:' + result.spotlightColor : ''}}">
 							<img src="assets/img/Terrain_Icon_White.png" class="result-score-img" />
 							{{scoreForResultDisplay(result)}}
+						</div>
+						<div class="result-pin" ng-click="unpin(result)" ng-show="result.overrideIndex !== false">
+							<i class="fa fa-thumb-tack result-pin-icon"></i>
+							<i class="fa fa-remove result-unpin-icon"></i>
 						</div>
 						<div class="result-img" style="background-image:url('assets/img/data/{{result.id}}.jpg');"></div>
 						<div class="result-text">

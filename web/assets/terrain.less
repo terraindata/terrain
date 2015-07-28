@@ -366,7 +366,15 @@ input:focus {
 
 /* CARDS */
 
+.card, .input {
+	background: #fff;
+	padding: 5px;
+	border-radius: 4px;
+	border: 1px solid #ddd;
+}
+
 .card {
+	padding-bottom: 0px;
 	position: relative;
 	.noselect;
 
@@ -376,13 +384,12 @@ input:focus {
 			background: rgba(255,255,255,255);
 		}
 	}
+
+	overflow: hidden;;
 }
 
-.card, .input {
-	background: #fff;
-	padding: 5px;
-	border-radius: 4px;
-	border: 1px solid #ddd;
+.card-body-spacing {
+	height: 5px;
 }
 
 .card-title, .card-title-no-border {
@@ -396,7 +403,7 @@ input:focus {
 }
 
 .card-title {
-	margin-bottom: 5px;
+	margin-bottom: 0px;
 	padding-bottom: 2px;
 	cursor: pointer;
 	/*width: calc(100% - 40px);*/
@@ -620,10 +627,10 @@ input:focus {
 	/*overflow: hidden;*/
 	border-radius: 5px;
 
-	@result-duration: 0.5s;
-	-webkit-transition: all @result-duration ease-out;
-	-o-transition: all @result-duration ease-out;
-	transition: all @result-duration ease-out;
+	@result-duration: 1s;
+	-webkit-transition: all @result-duration ease-in-out;
+	-o-transition: all @result-duration ease-in-out;
+	transition: all @result-duration ease-in-out;
 
 	position: absolute;
 }
@@ -850,6 +857,10 @@ input:focus {
 	height: 4.1em; /* clip after four lines */
 }
 
+@result-score-width: 80px;
+@result-score-height: 36px;
+@result-score-radius: 5px;
+
 .result-score {
 	position: absolute;
 	background: rgba(0,0,0,0.6);
@@ -858,13 +869,18 @@ input:focus {
 	font-size: 18px;
 	padding: 5px;
 	color: #fff;
-	border-bottom-right-radius: 5px;
-	width: 80px;
+	border-bottom-right-radius: @result-score-radius;
+	width: @result-score-width;
+	height: @result-score-height;
 	text-align: right;
 	font-weight: 100;
 	letter-spacing: 1px;
 	white-space: nowrap;
 	cursor: pointer;
+}
+
+.result-pinned .result-score {
+	border-bottom-right-radius: 0px;
 }
 
 .result-spotlight:hover, .result-score:hover {
@@ -884,7 +900,7 @@ input:focus {
 	/*right: 5px;*/
 	/*top: 5px;*/
 	font-size: 14px;
-	padding: 5px 9px;
+	padding: 7px 9px;
 	color: #fff;
 	font-weight: 100;
 }
@@ -898,6 +914,13 @@ input:focus {
 	padding: 8px 12px;
 	border-right: 1px solid rgba(0,0,0,0.5);
 	/*border-bottom-right-radius: 4px;*/
+}
+
+.result-pin {
+	position: absolute;
+	left: @result-score-width;
+	top: 0px;
+	border-bottom-right-radius: @result-score-radius;
 }
 
 .result-pin .result-unpin-icon {
@@ -914,9 +937,9 @@ input:focus {
 }
 
 .result-pin {
-	border-top: 1px solid rgba(0,0,0,0.5);
-	height: 30px;
+	height: @result-score-height;
 	width: 30px;
+	border-left: 1px solid rgba(0,0,0,0.5); 
 }
 
 .result-controls-right {
@@ -946,12 +969,6 @@ input:focus {
 
 	-webkit-box-shadow: 0px 0px 0px 0 rgba(0,0,0,0);
 	box-shadow: 0px 0px 0px 0 rgba(0,0,0,0);
-
-	/*-moz-transition: all 0.25s ease-out;
-	-ms-transition: all 0.25s ease-out;
-	-o-transition: all 0.25s ease-out;
-    -webkit-transition: all 0.25s ease-out;
-    transition: all 0.25s ease-out;*/
 }
 
 
@@ -959,67 +976,10 @@ input:focus {
 	border-color: #ffa747;
 }
 
-.result-inner.drag-over {
-    background: #fff;
-}
-
 .result-inner {
     -webkit-box-shadow: 0px 0px 0px 0px rgba(20,20,20,0.25);
 	box-shadow: 0px 0px 0px 0px rgba(20,20,20,0.25);
 }
-
-.result-inner.dragging {
-    opacity: 1;
-    z-index: 999999 !important;
-   
-    -webkit-transition: -webkit-transform 0s, -webkit-box-transform 1s;
-    transition: transform 0s, box-shadow 1s;
-
-    -webkit-box-shadow: 1px 1px 10px 3px rgba(20,20,20,0.25);
-	box-shadow: 1px 1px 10px 3px rgba(20,20,20,0.25);
-}
-
-
-.result-inner-locked {
-	-moz-transition: all 0s ease-out;
-	-ms-transition: all 0s ease-out;
-	-o-transition: all 0s ease-out;
-    -webkit-transition: all 0s ease-out;
-    transition: all 0s ease-out;	
-}
-
-
-.result.drag-enter {
-    /*background: #47ffa7;*/
-    /*border-top-width: 3px;*/
-    cursor: pointer;
-    /*width: 600px;*/
-    /*border-radius: 3px;*/
-
-    .result-inner {
-    	/*@drag-offset-top: 10px;
-    	-moz-transform: translateX(0px) translateY(10px);
-		-webkit-transform: translateX(0px) translateY(10px);
-		-o-transform: translateX(0px) translateY(10px);
-		-ms-transform: translateX(0px) translateY(10px);
-		transform: translateX(10px) translateY(0px);*/
-    	/*margin-top: @drag-offset-top;*/
-	    /*height: calc(@result-height - @drag-offset-top);*/
-	}
-
-    .dragging {
-    	/*margin-top: 0px;
-    	height: @result-height;*/
-    }
-}
-
-/*.result.drag-enter::before {
-	content: "";
-	display: inline-block;
-	width: 20px;
-	height: 20px;
-	background: #000;
-}*/
 
 .result-scores-area {
 	height: 160px;
