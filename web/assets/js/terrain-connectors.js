@@ -64,6 +64,9 @@ function getTQL(dataArray) {
 			case 'select' :
 				strQuery += doSelect(dataArray[i].args);
 				break;
+			case 'equijoin' :
+				strQuery += doEquijoin(dataArray[i].colname, dataArray[i].jointable, dataArray[i].joincolname);
+				break;
 		}
 	}
 	alert(strQuery);
@@ -75,6 +78,12 @@ function testGetTQL() {
 		{
 			type: 'from',
 			table: '\'products\''
+		},
+		{
+			type: 'equijoin',
+			colname: '\'OwnerID\'',
+			jointable: '\'owners\'',
+			joincolname: '\'ID\''
 		},
 		{
 			type: 'select',
@@ -186,5 +195,12 @@ function doSelect(arrSelect) {
 		strTQL += arrSelect[i].term;
 	}
 	strTQL += ")";
+	return strTQL;
+}
+
+function doEquijoin(colname, jointable, joincolname)
+{
+	var strTQL = new String("");
+	strTQL += ".equijoin(" + colname + "," + jointable + "," + joincolname + ")";
 	return strTQL;
 }
