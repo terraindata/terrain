@@ -48,28 +48,36 @@ function getTQL(dataArray) {
 	
 	var arrayLength = dataArray.length;
 	for (var i = 0; i < arrayLength; i++){
-		switch(dataArray[i].type) {
-			case 'from':
-				strQuery += doFrom(dataArray[i].table);
-				break;
-			case 'filter':
-				strQuery += doFilter(dataArray[i].args);
-				break;
-			case 'sort' :
-				strQuery += doSort(dataArray[i].args);
-				break;
-			case 'slice' :
-				strQuery += doSlice(dataArray[i].low, dataArray[i].high);
-				break;
-			case 'select' :
-				strQuery += doSelect(dataArray[i].args);
-				break;
-			case 'equijoin' :
-				strQuery += doEquijoin(dataArray[i].colname, dataArray[i].jointable, dataArray[i].joincolname);
-				break;
-		}
+		strQuery += getTQLSnippet(dataArray[i]);
 	}
 	alert(strQuery);
+}
+
+function getTQLSnippet(card) {
+	
+		strSnippet = new String("");
+	
+		switch(card.type) {
+			case 'from':
+				strSnippet += doFrom(card.table);
+				break;
+			case 'filter':
+				strSnippet += doFilter(card.args);
+				break;
+			case 'sort' :
+				strSnippet += doSort(card.args);
+				break;
+			case 'slice' :
+				strSnippet += doSlice(card.low, card.high);
+				break;
+			case 'select' :
+				strSnippet += doSelect(card.args);
+				break;
+			case 'equijoin' :
+				strSnippet += doEquijoin(card.colname, card.jointable, card.joincolname);
+				break;	
+				
+			return strSnippet;
 }
 
 function testGetTQL() {
