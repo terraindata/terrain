@@ -54,46 +54,49 @@
 				{{showing('builder') ? '-' : '+'}}
 			</div>
 		</h1>
-		<div class="fixed-area builder-area {{dragIndices['card'] != -1 ? 'card-is-being-dragged' : ''}}" ng-show="showing('builder')">
-			<div class="algorithm-name-area">
-				<div class="row">
-					<div class="col-xs-9">
-						<input type="text" class="algorithm-name-input" placeholder="Name your algorithm" />
-					</div>
-					<div class="col-xs-3">
-						<a class="algorithm-save-btn button">Create Algorithm</a>
-					</div>
+		<div class="algorithm-name-area">
+			<div class="row">
+				<div class="col-xs-9">
+					<input type="text" class="algorithm-name-input" placeholder="Name your algorithm" />
+				</div>
+				<div class="col-xs-3">
+					<a class="algorithm-save-btn button">Create Algorithm</a>
 				</div>
 			</div>
+		</div>
+		<div class="fixed-area builder-area {{dragIndices['card'] != -1 ? 'card-is-being-dragged' : ''}}" ng-show="showing('builder')">
 			<div class="all-weights" ng-show="ab('weights')">
 				<div class="weight" d3-slicer data="cards" on-change="handleChange(cardId)" card-id="-1"></div>
 			</div>
 			<div ng-repeat="card in cards track by card.id" class="card-container-{{card.id}}"  ng-drop="true" ng-drop-success="onCardDropComplete($index,$data,$event)" rel="{{$index}}" ng-mousemove="resultMove($index, 'card')" ng-touchmove="resultMove({{$index}}, 'card')">
 				<div class="pre-card">
-					<div ng-slide-down="card.newCardIsShowing" duration="0.25" class="new-card-wrapper">
-						<div class="new-card card">
-							<div class="row new-card-text-area">
-								<div class="col-xs-1 new-card-icon-cell">
-									<div class="new-card-icon">
-										<div class="new-card-icon-inner">+</div>
+					<div ng-slide-down="card.newCardIsShowing" duration="0.25">
+						<div class="new-card-wrapper">
+							<div class="new-card card">
+								<div class="row new-card-text-area">
+									<div class="col-xs-1 new-card-icon-cell">
+										<div class="new-card-icon">
+											<div class="new-card-icon-inner">+</div>
+										</div>
+									</div>
+									<div class="col-xs-10">
+										<div tdb-autocomplete data="newCards" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names"></div>
+									</div>
+									<div class="col-xs-1">
+										<a ng-click="card.newCardIsShowing = false" class="new-card-hide-btn pull-right small"> Hide </a>
 									</div>
 								</div>
-								<div class="col-xs-10">
-									<div tdb-autocomplete data="newCards" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names"></div>
+								<div class="new-card-suggestions-area">
+									<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion button" ng-click="addCard(suggestion, card)">
+										{{suggestion.name}}
+									</a>
 								</div>
-								<div class="col-xs-1">
-									<a ng-click="card.newCardIsShowing = false" class="pull-right small"> Hide </a>
-								</div>
-							</div>
-							<div class="new-card-suggestions-area">
-								<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion button" ng-click="addCard(suggestion, card)">
-									{{suggestion.name}}
-								</a>
 							</div>
 						</div>
 					</div>
-					<div ng-slide-down="!card.newCardIsShowing" duration="0.25" class="new-card-plus-wrapper">
+					<div class="new-card-plus-wrapper" ng-slide-down="!card.newCardIsShowing" duration="0.25">
 						<a class="new-card-plus-area" ng-click="card.newCardIsShowing = true">
+							<div class="new-card-plus-line"></div>
 							<div class="new-card-plus">
 								+
 							</div>

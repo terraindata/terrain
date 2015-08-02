@@ -42,45 +42,73 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-function getTQL(dataArray) {
+/* 
+ dataArray: array of cards of format:
+ 	type: 'from', 'select', 'filter', 'sort', 'slice'
+ 	[meta]
+ meta: 
+ 	from: 
+ 		table: 'table name'
+ 	select:
+ 		args: array of objects
+ 			term: 'field name'
+	filter:
+		args: array of objects
+			combinator: 'none', 'and', 'or'
+			term: 'string expression' e.g. '\'rating\' >= \'input.rating\'' or "'city' == 'San Francisco'" or "'price' < 400"
+	sort:
+		args: array of objects
+			direction: 'true' for asc, 'false' for desc
+			term: e.g. 'rating'
+	slice:
+		low: integer
+		high: integer
+ */
+
+var terrainConnector = function() {}; //angular.module('terrainConnector', []);
+
+terrainConnector.getTQL = function(dataArray) {
 	
 	var strQuery = new String("db");
 	
 	var arrayLength = dataArray.length;
 	for (var i = 0; i < arrayLength; i++){
-		strQuery += getTQLSnippet(dataArray[i]);
+		strQuery += terrainConnector.getTQLSnippet(dataArray[i]);
 	}
-	alert(strQuery);
+
+	return strQuery;
 }
 
-function getTQLSnippet(card) {
+terrainConnector.getTQLSnippet = function(card) {
 	
 		strSnippet = new String("");
 	
 		switch(card.type) {
 			case 'from':
-				strSnippet += doFrom(card.table);
+				strSnippet += terrainConnector.doFrom(card.table);
 				break;
 			case 'filter':
-				strSnippet += doFilter(card.args);
+				strSnippet += terrainConnector.doFilter(card.args);
 				break;
 			case 'sort' :
-				strSnippet += doSort(card.args);
+				strSnippet += terrainConnector.doSort(card.args);
 				break;
 			case 'slice' :
-				strSnippet += doSlice(card.low, card.high);
+				strSnippet += terrainConnector.doSlice(card.low, card.high);
 				break;
 			case 'select' :
-				strSnippet += doSelect(card.args);
+				strSnippet += terrainConnector.doSelect(card.args);
 				break;
 			case 'equijoin' :
-				strSnippet += doEquijoin(card.colname, card.jointable, card.joincolname);
+				strSnippet += terrainConnector.doEquijoin(card.colname, card.jointable, card.joincolname);
 				break;	
 				
-			return strSnippet;
+		}
+		
+		return strSnippet;
 }
 
-function testGetTQL() {
+terrainConnector.testGetTQL = function() {
 	
 	var objCards = [
 		{
@@ -142,19 +170,18 @@ function testGetTQL() {
 			high: 25
 		}
 	]
-	getTQL(objCards);
-	
-	
+
+	return terrainConnector.getTQL(objCards);
 }
 
-function doFrom(strTable) {
+terrainConnector.doFrom = function(strTable) {
 	
 	var strTQL = new String("");
 	strTQL += ".from(" + strTable + ")";
 	return strTQL;
 }
 
-function doFilter(arrFilters) {
+terrainConnector.doFilter = function(arrFilters) {
 	var strTQL = new String("");
 	strTQL += ".filter(";
 	for (var i = 0; i < arrFilters.length; i++){
@@ -175,7 +202,7 @@ function doFilter(arrFilters) {
 	return strTQL;
 }
 
-function doSort(arrSorts) {
+terrainConnector.doSort = function(arrSorts) {
 	var strTQL = new String("");
 	strTQL += ".sort(";
 	// For each sort, write out the argument and the sort direction
@@ -187,14 +214,14 @@ function doSort(arrSorts) {
 	return strTQL;
 }
 
-function doSlice(low, high) {
+terrainConnector.doSlice = function(low, high) {
 	var strTQL = new String("");
 	strTQL += ".slice(" + low + "," + high + ")";
 	
 	return strTQL;	
 }
 
-function doSelect(arrSelect) {
+terrainConnector.doSelect = function(arrSelect) {
 	var strTQL = new String("");
 	strTQL += ".select(";
 	
@@ -206,8 +233,7 @@ function doSelect(arrSelect) {
 	return strTQL;
 }
 
-function doEquijoin(colname, jointable, joincolname)
-{
+terrainConnector.doEquijoin = function(colname, jointable, joincolname) {
 	var strTQL = new String("");
 	strTQL += ".equijoin(" + colname + "," + jointable + "," + joincolname + ")";
 	return strTQL;

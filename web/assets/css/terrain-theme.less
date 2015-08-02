@@ -1,17 +1,28 @@
 /* Colors */
+@green: #37df97;
+
 @sidebar-bg: #7a8074;
 @sidebar-active-bg: #ccda61;
 @sidebar-hover-bg: #60665a;
 @sidebar-icon-color: #fff;
 
-@page-header-text-color: rgba(255,255,255,0.5);
-@builder-page-bg: #babfab;
+@page-header-text-color: rgba(0,0,0,1);
+@builder-page-bg: #e8ebdd;
 @section-bg: #fff;
 @card-bg: #dbe0cb;
 @card-title-bg: #bbc1a9;
 @card-title-color: #fff;
 @transform-card-bg: rgba(255,255,255,0.1);
 @algorithm-background: #797f73;	
+
+@results-stroke-color: #bcbfb3;
+
+@scrollbar-bg: #e8ebdd;
+@scrollbar-rail: #dde0d3;
+@scrollbar-handle: #bcbfb8;
+
+@link-color: darken(#bbc1a9, 15%);
+@link-color-hover: @green;
 
 /* Sidebar */
 
@@ -34,12 +45,21 @@
 /* Header bars */
 
 .page-header {
-	background: @sidebar-bg;
+	background: @builder-page-bg;
 	color: @page-header-text-color;
-	border-color: rgba(0,0,0,0.15);
+	border-width: 0px;
+	/*font-size: 20px;*/
+	/*text-transform: none;*/
+	padding-left: 20px;
+	/*font-weight: normal;*/
+
 }
 
 /* Builder */
+
+.main-column {
+  padding: 5px !important;
+}
 
 .content {
 	background: @builder-page-bg;
@@ -52,6 +72,7 @@
 .builder-area, .inputs-area {
 	margin: 5px;
 	padding: 5px;
+	padding-top: 0px;
 	background: @section-bg;
 	border-radius: 5px 5px 0px 0px;
 	box-shadow: -1px 1px 2px 0px rgba(0,0,0,0.15);
@@ -200,6 +221,7 @@ input {
 	padding: 15px;
 	background: #7d7d7b;
 	overflow-x: scroll;
+	overflow-y: hidden;
 	height: 75px;
 	white-space: nowrap;
 	border-bottom-right-radius: 5px;
@@ -214,4 +236,13 @@ input {
 	text-shadow: 0px 0px 4px rgba(0,0,0,0.35);
 	box-shadow: 0px 0px 3px rgba(0,0,0,0.25);
 	margin-right: 10px;
+}
+
+.new-card-hide-btn {
+	font-size: 14px;
+	color: @link-color;
+}
+
+.new-card-hide-btn:hover {
+	color: @link-color-hover;
 }

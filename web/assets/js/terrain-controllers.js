@@ -52,7 +52,8 @@ function selectPage(page) {
 	if(page == '#/builder') $(".navbar-tql").show();
 }
 
-terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http', '$timeout', function($scope, $routeParams, $http, $timeout) {
+terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http', '$timeout', 
+									function($scope, $routeParams, $http, $timeout) {
 	selectPage('#/builder');
 
 	var isShowing = ['builder', 'inputs', 'results'];
@@ -575,6 +576,82 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		}
 	];
 
+	$scope.currentCardsToConnectorFormat = function() {
+		return $scope.cards.map(function(card) {
+			if(card.from) {
+				// from card
+				return {
+					type: 'from',
+					table: card.from.value
+				}
+			}
+			if(card.select) {
+				return {
+					type: 'select', 
+					args: card.select.fields.map(function(field) {
+						return {
+							term: "'" + field + "'"
+						}
+					})
+				}
+			}
+			if(card.filters) {
+				/*
+				from:
+					filters: [{
+						field: 'price',
+						valueType: 'input',
+						value: 'MaxPrice',
+						operator: 'le'
+					}]
+				to:
+					args: array of objects
+						combinator: 'none', 'and', 'or'
+						term: 'string expression' e.g. '\'rating\' >= \'input.rating\'' or "'city' == 'San Francisco'" or "'price' < 400"
+				*/
+				return {
+					type: 'filter',
+					args: card.filters.map(function(filter, index) {
+						var operatorMapping = {
+							'le': '<=',
+							'lt': '<',
+							'eq': '==',
+							'gt': '>',
+							'ge': '>='
+						}
+						return {
+							combinator: index == 0 ? 'none' : 'and',
+							term: "'" + filter.field + "' " + operatorMapping[filter.operator] + " " +
+									(filter.valueType == 'input' ? 'input.' : '') + filter.value
+						};
+					})
+				}
+			}
+			if(card.order) {
+				/*
+					args: [{
+						//true is ascending, false is descending
+						direction: 'true',
+						term: '\'rating\''		
+					}]
+				*/
+				return {
+					type: 'order',
+					args: [{
+						direction: card.order.direction == 'ascending' ? 'true' : 'false',
+						term: "'" + card.field + "'"
+					}]
+				}
+			}
+			console.log('null card', card);
+			return null;
+		}).reduce(function(result, element) {
+			if(element !== null)
+				return result.concat([element]);
+			return result;
+		}, []);
+	}
+
 	$.each($scope.cards, function(i,c) { c.card = true; });
 	$.each($scope.newCards, function(i,c) { c.card = true; });
 
@@ -902,6 +979,10 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	});
 
 	$scope.builderToTql = function() {
+		console.log('c');
+		console.log($scope.currentCardsToConnectorFormat());
+		return terrainConnector.getTQL($scope.currentCardsToConnectorFormat());
+
 		var errors = [];
 
 		// SELECT
