@@ -293,17 +293,22 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			fieldValue = parseFloat(fieldValue);
 			switch(this.operator) {
 				case 'le':
-					passing = passing && fieldValue <= filterValue;
+					passing = passing && (fieldValue <= filterValue);
 					break;
 				case 'lt':
-					passing = passing && fieldValue < filterValue;
+					passing = passing && (fieldValue < filterValue);
+					break;
 				case 'ge':
-					passing = passing && fieldValue >= filterValue;
+					passing = passing && (fieldValue >= filterValue);
 					break;
 				case 'gt':
-					passing = passing && fieldValue > filterValue;
+					passing = passing && (fieldValue > filterValue);
+					break;
 				case 'eq':
-					passing = passing && fieldValue == filterValue;
+					passing = passing && (fieldValue === filterValue);
+					break;
+				case 'ne':
+					passing = passing && (fieldValue !== filterValue);
 					break;
 			}
 		});
@@ -643,7 +648,6 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 					}]
 				}
 			}
-			console.log('null card', card);
 			return null;
 		}).reduce(function(result, element) {
 			if(element !== null)
@@ -979,8 +983,6 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	});
 
 	$scope.builderToTql = function() {
-		console.log('c');
-		console.log($scope.currentCardsToConnectorFormat());
 		return terrainConnector.getTQL($scope.currentCardsToConnectorFormat());
 
 		var errors = [];
@@ -1016,14 +1018,12 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 
 	$scope.touchDown = function(type, obj, evt) {
-		console.log('down', arguments);
 
 		obj.$isMoving = true;
 		obj.$sx = parseInt($("." + type + "[rel=" + obj.index + "]").css('left'));
 		obj.$sy = parseInt($("." + type + "[rel=" + obj.index + "]").css('top'));
 		obj.$x = obj.$sx;
 		obj.$y = obj.$sy;
-		console.log(obj.$x, obj.$y, "." + type + "[rel=" + obj.index + "]", $("." + type + "[rel=" + obj.index + "]"), $("." + type + "[rel=" + obj.index + "]").css('top'));
 
 		if(evt.pageX && evt.pageY) {
 			obj.$smx = evt.pageX;
@@ -1044,16 +1044,13 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		});
 
 		var indexToMove = index, resultToMove = $scope.results.reduce(function(ans,cur) { if(cur.overrideIndex === indexToMove) return cur; return ans; }, null);
-		console.log("indexToMove", indexToMove);
 		while(resultToMove !== null && resultToMove !== result) {
 			indexToMove ++;
 			var nextResultToMove = $scope.results.reduce(function(ans,cur) { if(cur.overrideIndex === indexToMove) return cur; return ans; }, null);
-			console.log("moving", resultToMove.overrideIndex, indexToMove);
 			resultToMove.$originalOverrideIndex = resultToMove.overrideIndex;
 			resultToMove.overrideIndex = indexToMove;
 			resultToMove = nextResultToMove;
 		}
-		console.log("moving original", result.overrideIndex, index);
 		result.overrideIndex = index;
 		$scope.resort();
 	}
@@ -1074,12 +1071,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		my += $(".results-area").scrollTop();
 		mx += $(".results-area").scrollLeft();
 
-		console.log(evt);
-
 		var dx = mx - obj.$smx;
 		var dy = my - obj.$smy;
-
-		// console.log(dx, dy);
 
 		obj.$x = obj.$sx + dx;
 		obj.$y = obj.$sy + dy;
@@ -1091,24 +1084,17 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		if(px > ele(obj).parent().offset().left + ele(obj).parent().width()) px = ele(obj).parent().offset().left + ele(obj).parent().width();
 		var py = my - ele(obj).parent().offset().top;
 		if(py < 0) py = 0;
-		console.log($(".result").length, columns, ele(obj).height());
 		var height = Math.ceil($(".result").length / columns) * ele(obj).height();
-		console.log(py, ele(obj).parent().offset().top);
 		if(py > ele(obj).parent().offset().top + height) py = ele(obj).parent().offset().top + height;
-		console.log(py);
 
 		var index = index = Math.floor(px / ele(obj).width());
 		index += columns * Math.floor(py / ele(obj).height());
 
-		console.log(px, py, columns, Math.floor(px / ele(obj).width()), columns * Math.floor(py / ele(obj).height()));
-
 		if(index !== obj.overrideIndex)
 			$scope.reindex(obj, index);
-		console.log(index);
 	}
 
 	$scope.touchUp = function(type, obj, evt) {
-		console.log('up', arguments);
 		obj.$isMovingTransitioningOff = true;
 		$timeout(function() { obj.$isMoving = false; }, 30);
 	}
