@@ -119,7 +119,7 @@
 							<div class="more-menu-item" ng-click="removeCard(card)">Delete</div>
 						</div>
 					</div>
-					<div class="card-body" ng-slide-down="!card.hidden" duration="0.25">
+					<div class="card-body" rel="{{card.id}}" ng-slide-down="!card.hidden" duration="0.25" ng-mousemove="showBody(card.id)">
 						<div class="card-body-spacing"></div>
 						<div class="card-from-area" ng-show="card.from">
 							<div tdb-autocomplete data="fromOptions" model="card.from.value" placeholder="Table Name" auto-placeholder="Start typing to see matching table names"></div>
@@ -153,14 +153,24 @@
 								</div>
 								<div class="col-xs-2">
 									<div class="sign-selector">
-										<select class="sign-select" ng-model="f.operator">
-											<option value="le">&le;</option>
-											<option value="lt">&lt;</option>
-											<option value="ge">&ge;</option>
-											<option value="gt">&gt;</option>
-											<option value="eq">=</option>
-											<option value="ne">&ne;</option>
-										</select>
+										<div class="terrain-dropdown terrain-dropdown-6-items">
+											<div class="terrain-dropdown-value-area">
+												<div class="terrain-dropdown-cell" ng-show="f.operator == 'le'">&le;</div>
+												<div class="terrain-dropdown-cell" ng-show="f.operator == 'lt'">&lt;</div>
+												<div class="terrain-dropdown-cell" ng-show="f.operator == 'ge'">&ge;</div>
+												<div class="terrain-dropdown-cell" ng-show="f.operator == 'gt'">&gt;</div>
+												<div class="terrain-dropdown-cell" ng-show="f.operator == 'eq'">=</div>
+												<div class="terrain-dropdown-cell" ng-show="f.operator == 'ne'">&ne;</div>
+											</div>
+											<div class="terrain-dropdown-cell-area">
+												<div class="terrain-dropdown-cell" ng-step-change="f.operator = 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&le;</div>
+												<div class="terrain-dropdown-cell" ng-step-change="f.operator = 'lt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&lt;</div>
+												<div class="terrain-dropdown-cell" ng-step-change="f.operator = 'ge'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ge;</div>
+												<div class="terrain-dropdown-cell" ng-step-change="f.operator = 'gt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&gt;</div>
+												<div class="terrain-dropdown-cell" ng-step-change="f.operator = 'eq'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">=</div>
+												<div class="terrain-dropdown-cell" ng-step-change="f.operator = 'ne'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ne;</div>
+											</div>
+										</div>
 									</div>
 								</div>
 								<div class="col-xs-2">

@@ -83,6 +83,15 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		$(".navbar-logo").addClass("navbar-logo-green");
 	}
 
+	if($scope.ab('rounded')) {
+		$("body").addClass("rounded");
+	}
+
+	if($scope.ab('slightly-rounded')) {
+		$("body").removeClass("rounded");
+		$("body").addClass("slightly-rounded");
+	}
+
 	$scope.colorIndex = 0;
 	$scope.getColor = function() {
 		return CARD_COLORS[$scope.colorIndex ++];
@@ -268,6 +277,10 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			value: '',
 			operator: 'le'
 		});
+	}
+
+	$scope.operatorToHtml = function(operator) {
+		return "&"+operator+";";
 	}
 
 	$scope.inputFor = function(inputName) {
@@ -1122,6 +1135,10 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		}
 
 		return { top: y + "px", left: x + "px" };
+	}
+
+	$scope.showBody = function(cardId) {
+		$(".card-body[rel="+cardId+"]").css("overflow", "visible");
 	}
 }]);
 

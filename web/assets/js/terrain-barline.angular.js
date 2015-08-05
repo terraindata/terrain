@@ -200,6 +200,9 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			.attr("fill", function(d, i) {
 				return barColor;
 			})
+			.attr("stroke", function(d, i) {
+				return d3.rgb(barColor).darker(1.0);
+			})
 			.attr("class", function(d, i) {
 				return "bar bar_" + i;
 			})

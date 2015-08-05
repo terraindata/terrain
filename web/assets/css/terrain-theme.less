@@ -24,6 +24,54 @@
 @link-color: darken(#bbc1a9, 15%);
 @link-color-hover: @green;
 
+@dropdown-bg: #7a8074;
+@dropdown-color: #fff;
+@dropdown-stroke: lighten(@dropdown-bg, 15%);
+@dropdown-bg-hover: darken(@dropdown-bg, 25%);
+@dropdown-value-bg: #fff;
+@dropdown-value-color: @dropdown-bg;
+
+
+.scrollbars(@size, @foreground-color, @background-color: mix(@foreground-color, white,  50%)) {
+  // For Google Chrome
+  ::-webkit-scrollbar {
+      width:  @size;
+      height: @size;
+  }
+
+  ::-webkit-scrollbar-thumb {
+      background: @foreground-color;
+  }
+
+  ::-webkit-scrollbar-track {
+      background: @background-color;
+  }
+
+  // For Internet Explorer
+  body {
+    scrollbar-face-color: @foreground-color;
+    scrollbar-track-color: @background-color;
+  }
+}
+
+body {
+	.scrollbars(10px, @scrollbar-handle, @scrollbar-bg);
+}
+
+body.slightly-rounded {
+  ::-webkit-scrollbar-thumb {
+  	  -webkit-border-radius: 3px;
+      border-radius: 3px;
+  }
+}
+
+body.rounded {
+  ::-webkit-scrollbar-thumb {
+  	  -webkit-border-radius: 5px;
+      border-radius: 5px;
+  }
+}
+
 /* Sidebar */
 
 .sidebar {
@@ -76,6 +124,10 @@
 	background: @section-bg;
 	border-radius: 5px 5px 0px 0px;
 	box-shadow: -1px 1px 2px 0px rgba(0,0,0,0.15);
+}
+
+.inputs-area {
+	margin-top: 3px;
 }
 
 .algorithm-name-area {
@@ -202,6 +254,21 @@ input {
 		.card-select-delete {
 			opacity: 1;
 		}
+	}
+}
+
+.terrain-dropdown-value-area {
+	background: @dropdown-value-bg;
+	color: @dropdown-value-color;
+}
+
+.terrain-dropdown-cell-area .terrain-dropdown-cell {
+	border-color: @dropdown-stroke;
+	background: @dropdown-bg;
+	color: @dropdown-color;
+
+	&:hover {
+		background: @dropdown-bg-hover;
 	}
 }
 

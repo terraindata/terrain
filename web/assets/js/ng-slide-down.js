@@ -94,6 +94,9 @@ THE SOFTWARE.
           return element.css('height', getHeight());
         };
         hide = function () {
+          element.css({
+            overflow: 'hidden'
+          });
           element.css('height', '0px');
           if (emitOnClose || onClose || lazyRender) {
             return closePromise = $timeout(function () {

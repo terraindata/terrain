@@ -142,7 +142,7 @@ $.fn.barline = function(data, options, selectFn) {
 			return barColor;
 		})
 		.attr("class", function(d, i) {
-			return "bar_" + i;
+			return "bar bar_" + i;
 		});
 
 	// MARK: Axes

@@ -26,6 +26,10 @@ svg {
 .bar {
     -webkit-transition: height 0.25s, y 0.25s;
     transition: height 0.25s, y 0.25s;
+
+    border: 1px solid #ddd;
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
 }
 
 

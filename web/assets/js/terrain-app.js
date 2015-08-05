@@ -140,3 +140,49 @@ terrainApp.directive('ngRightClickMenu', function($parse) {
         });
     };
 });
+
+terrainApp.directive('ngStepChange', function($parse) {
+	return function(scope, element, attrs) {
+        var fn = $parse(attrs.ngStepChange);
+        var changeElement = $(element);
+        if(attrs.ngStepChangeParentClass) {
+        	var parentElement = changeElement;
+        	while(parentElement.length !== 0) {
+        		if(parentElement.hasClass(attrs.ngStepChangeParentClass)) {
+        			changeElement = parentElement;
+        			break;
+        		}
+        		parentElement = parentElement.parent();
+        	}
+        }
+
+        if(attrs.ngStepChangeChildClass) {
+        	var childElements = changeElement.find('.' + attrs.ngStepChangeChildClass);
+        	if(childElements.length > 0)
+        		changeElement = $(childElements[0]);
+        }
+        console.log(changeElement);
+
+        element.bind('mousedown touchstart', function(event) {
+        	event.preventDefault();
+        	var firstDuration = attrs.ngStepChangeFirstDuration || 150;
+        	var secondDuration = attrs.ngStepChangeSecondDuration || 150;
+			var applyFn = function() {
+				scope.$apply(function() {
+                	fn(scope, {$event:event});
+            	});
+			};
+
+			changeElement.addClass('step-changing');
+			setTimeout(function() {
+				applyFn();
+				changeElement.removeClass('step-changing');
+				changeElement.addClass('step-changed');
+
+				setTimeout(function() {
+					changeElement.removeClass('step-changed');
+				}, secondDuration);
+			}, firstDuration);
+        });
+    };
+});
