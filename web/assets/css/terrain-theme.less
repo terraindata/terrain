@@ -42,10 +42,17 @@
 
   ::-webkit-scrollbar-thumb {
       background: @foreground-color;
+      border-top: 1px solid #fff;
+      border-bottom: 1px solid #fff;
+   	  -webkit-border-radius: @size;
+   	  border-radius: @size;
   }
 
   ::-webkit-scrollbar-track {
       background: @background-color;
+      -webkit-border-radius: @size;
+   	  border-radius: @size;
+   	  margin: 2px 0px;
   }
 
   // For Internet Explorer
@@ -56,7 +63,10 @@
 }
 
 body {
-	.scrollbars(10px, @scrollbar-handle, @scrollbar-bg);
+	.scrollbars(6px, @scrollbar-handle, @scrollbar-rail);
+	::-webkit-scrollbar-thumb {
+		
+  	}
 }
 
 body.slightly-rounded {
