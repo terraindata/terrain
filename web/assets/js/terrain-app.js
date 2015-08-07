@@ -161,7 +161,6 @@ terrainApp.directive('ngStepChange', function($parse) {
         	if(childElements.length > 0)
         		changeElement = $(childElements[0]);
         }
-        console.log(changeElement);
 
         element.bind('mousedown touchstart', function(event) {
         	event.preventDefault();

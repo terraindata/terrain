@@ -28,6 +28,7 @@
 @dropdown-color: #fff;
 @dropdown-stroke: lighten(@dropdown-bg, 15%);
 @dropdown-bg-hover: darken(@dropdown-bg, 25%);
+@dropdown-bg-selected: darken(@dropdown-bg-hover, 10%);
 @dropdown-value-bg: #fff;
 @dropdown-value-color: @dropdown-bg;
 
@@ -269,6 +270,14 @@ input {
 
 	&:hover {
 		background: @dropdown-bg-hover;
+	}
+
+
+	&.selected {
+		background: @dropdown-bg-selected;
+		&:hover {
+			background: @dropdown-bg-selected;
+		}
 	}
 }
 

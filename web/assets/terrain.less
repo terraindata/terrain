@@ -1,6 +1,9 @@
 @green: #37df97;
 @light-green: #57ffa7;
 
+@ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+@ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+
 html, body, div {
 	font-family: 'Open Sans';
 }
@@ -182,37 +185,60 @@ body {
 	-webkit-border-radius: 50%;
 	border-radius: 50%;
 
-	-webkit-transition: all 0.15s ease-out;
-	-o-transition: all 0.15s ease-out;
-	transition: all 0.15s ease-out;
+	-webkit-transition: all 0.15s ease-out, padding-top 0.5s linear;
+	-o-transition: all 0.15s ease-out, padding-top 0.5s linear;
+	transition: all 0.15s ease-out, padding-top 0.5s linear;
+
+	.terrain-dropdown-cell {
+		-webkit-transition: all 0.15s ease-out, font-size 0.5s linear;
+		-o-transition: all 0.15s ease-out, font-size 0.5s linear;
+		transition: all 0.15s ease-out, font-size 0.5s linear;
+	}
 }
 
 .terrain-dropdown-value-area.step-changing {
-	font-size: 25px;
 	width: 50px;
 	height: 50px;
 	-webkit-border-radius: 25px;
 	border-radius: 25px;
 	color: rgba(255,255,255,0);
 	margin: -5px;
+
+	.terrain-dropdown-cell {
+		/*font-size: 25px;*/
+		width: 50px;
+		height: 50px;
+		padding-top: 10px;
+	}
 }
 
 .terrain-dropdown-value-area.step-changed {
-	font-size: 15px;
 	width: 30px;
 	height: 30px;
 	-webkit-border-radius: 15px;
 	border-radius: 15px;
 	color: rgba(255,255,255,0);
 	margin: 5px;
+	padding-top: 10px;
+
+	-webkit-transition: all 0.15s ease-out, padding-top 0.15s linear;
+	-o-transition: all 0.15s ease-out, padding-top 0.15s linear;
+	transition: all 0.15s ease-out, padding-top 0.15s linear;
+
+	.terrain-dropdown-cell {
+		font-size: 1px;
+		width: 30px;
+		height: 30px;
+		padding-top: 0px;
+	}
 }
 
 .terrain-dropdown .terrain-dropdown-cell-area {
 	height: 0px;
 	overflow: hidden;
-	-webkit-transition: height 0.25s ease-out;
-	-o-transition: height 0.25s ease-out;
-	transition: height 0.25s ease-out;
+	-webkit-transition: height 0.25s @ease-in-cubic;
+	-o-transition: height 0.25s @ease-in-cubic;
+	transition: height 0.25s @ease-in-cubic;
 
 	z-index: 9999;
   	position: relative;
@@ -222,9 +248,10 @@ body {
   	width: 40px;
 }
 
-.terrain-dropdown:hover {
-	/*-webkit-border-radius: 5px;*/
-	/*border-radius: 5px;*/
+.terrain-dropdown:hover .terrain-dropdown-cell-area {
+	-webkit-transition: height 0.25s @ease-out-cubic;
+	-o-transition: height 0.25s @ease-out-cubic;
+	transition: height 0.25s @ease-out-cubic;
 }
 
 .terrain-dropdown-1-item.terrain-dropdown:hover .terrain-dropdown-cell-area {
@@ -273,6 +300,13 @@ body {
 
 	&:first-child {
 		border-top-width: 0px;
+	}
+
+	&.selected {
+		background: #aaa;
+		&:hover {
+			background: #aaa;
+		}
 	}
 }
 
