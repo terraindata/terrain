@@ -108,7 +108,7 @@ body.rounded {
 	color: @page-header-text-color;
 	border-width: 0px;
 	/*font-size: 20px;*/
-	/*text-transform: none;*/
+	text-transform: none;
 	padding-left: 20px;
 	/*font-weight: normal;*/
 
@@ -117,7 +117,7 @@ body.rounded {
 /* Builder */
 
 .main-column {
-  padding: 5px !important;
+  padding: 0px !important;
 }
 
 .content {
@@ -143,6 +143,15 @@ body.rounded {
 
 .algorithm-name-area {
 	background: @algorithm-background;
+	padding: 8px;
+
+	.algorithm-left {
+		padding-right: 4px;
+	}
+
+	.algorithm-right {
+		padding-left: 4px;
+	}
 }
 
 
@@ -289,6 +298,10 @@ input {
 			background: @dropdown-bg-selected;
 		}
 	}
+}
+
+.new-field-input {
+	width: calc(100% + 20px);
 }
 
 /* New Cards Area */

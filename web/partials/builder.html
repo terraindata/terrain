@@ -28,7 +28,7 @@
 						</div>
 					</div>
 					<div class="input-value-area">
-						<input ng-model="input.value" type="text" class="input-value-input" placeholder="Value">
+						<input ng-model="input.value" ng-change="resort()" type="text" class="input-value-input" placeholder="Value">
 					</div>
 				</div>
 			</div>
@@ -58,10 +58,10 @@
 		</h1>
 		<div class="algorithm-name-area">
 			<div class="row">
-				<div class="col-xs-9">
+				<div class="col-xs-9 algorithm-left">
 					<input type="text" class="algorithm-name-input" placeholder="Name your algorithm" />
 				</div>
-				<div class="col-xs-3">
+				<div class="col-xs-3 algorithm-right">
 					<a class="algorithm-save-btn button">Create Algorithm</a>
 				</div>
 			</div>

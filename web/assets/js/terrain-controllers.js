@@ -257,7 +257,9 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			$.each(card.filters, function(index,filter) {
 				if(filter.value && filter.value.length > 0 && filter.valueType == 'input') {
 					if(! $scope.inputs.reduce(function(value,cur) { if(cur.name == filter.value) return true; return value; }, false)) {
-						$scope.inputs.push({ name: filter.value, value: '' });
+						$scope.newInput(-1, filter.value);
+						// console.log('check5');
+						// $scope.inputs.push({ name: filter.value, value: '', showing: false });
 					}
 				}
 			});
@@ -291,7 +293,6 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		// return true if result should be displayed
 		var filtersCard = $scope.cardFor('filters'), passing = true;;
 		if(!filtersCard) return true;
-		console.log(filtersCard.filters);
 		$.each(filtersCard.filters, function() {
 			if(!this.field || this.field.length == 0 || this.value.length == 0)
 				return;
@@ -325,7 +326,6 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 					passing = passing && (fieldValue !== filterValue);
 					break;
 			}
-			console.log(filterValue, fieldValue, this.operator, passing);
 		});
 		return passing;
 	}
@@ -757,7 +757,6 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		// 	var first = cardToAdd;
 		// 	cardToAdd = $.extend({}, cardToAdd); // clone
 		// 	first.name = 'first';
-		// 	console.log(first, cardToAdd);
 		// 	$.each(cardToAdd, function(key,obj) { // attempt to deep clone, please upgrade
 		// 		if(typeof obj == 'object')
 		// 			cardToAdd[key] = $.extend({}, obj);
@@ -875,7 +874,6 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		$scope.locked = true;
 		// $(".result-inner").addClass("result-inner-locked");
 		$timeout(function() {
-			// console.log($(".result-inner-locked").length);
 			// $(".result-inner").removeClass("result-inner-locked")
 			$scope.locked = false;
 		}, 250);
@@ -977,15 +975,20 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		value: '200',
 		showing: true
 	}] : [];
-	$scope.newInput = function(index) {
-		var newInput = { name: '', value: '', showing: false };
+	$scope.newInput = function(index, inputName) {
+		var focusValue = inputName ? true : false;
+		inputName = inputName || '';
+		var newInput = { name: inputName, value: '', showing: false };
 		if(index == -1)
 			index = $scope.inputs.length;
 		$scope.inputs.splice(index, 0, newInput);
 		$timeout(function() {
 			newInput.showing = true;
 			$timeout(function() {
-				$(".input-"+index+" .input-name-input").focus();
+				if(focusValue)
+					$(".input-"+index+" .input-value-input").focus();
+				else
+					$(".input-"+index+" .input-name-input").focus();
 			}, 100)
 		}, 25);
 	}
@@ -1128,7 +1131,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			var columns = Math.round(ele(result).parent().width() / ele(result).width());
 
 			y = $scope.results.reduce(function(total, current) {
-				if(current.index < result.index && (current.index - 1) % columns == 0)
+				if(current.index < result.index && (current.index - 1) % columns == 0 && $scope.filterResult(current))
 					total += ele(current).height();
 				return total;
 			}, 0);
