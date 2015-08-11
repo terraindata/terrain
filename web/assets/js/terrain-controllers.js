@@ -279,6 +279,9 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			value: '',
 			operator: 'le'
 		});
+		setTimeout(function() {
+			$(".card-"+card.id).find(".filter-field-input-wrapper:last-child input").focus();
+		}, 250);
 	}
 
 	$scope.operatorToHtml = function(operator) {
@@ -293,6 +296,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		// return true if result should be displayed
 		var filtersCard = $scope.cardFor('filters'), passing = true;;
 		if(!filtersCard) return true;
+		console.log(filtersCard.filters);
 		$.each(filtersCard.filters, function() {
 			if(!this.field || this.field.length == 0 || this.value.length == 0)
 				return;

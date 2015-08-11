@@ -202,6 +202,15 @@ input {
 	color: #58645c;
 	padding: 5px;
 	padding-left: 10px;
+	/*font-weight: 100;*/
+	/*letter-spacing: 0.5px;*/
+}
+
+.card input[type="text"] {
+	background: #fff;
+	&:hover {
+		background: rgba(255,255,255,255);
+	}
 }
 
 .input {
@@ -256,12 +265,20 @@ input {
 	}
 }
 
+.card-body {
+	padding: 0px 0px;
+}
+
+.card-body-spacing {
+	height: 15px;
+}
+
 .card-transform-area {
 	background: @transform-card-bg;
 }
 
 .card-select-field {
-	border-color: #b3b7a8;
+	border-width: 0px;
 
 	.card-select-delete {
 		opacity: 0;
@@ -275,6 +292,10 @@ input {
 			opacity: 1;
 		}
 	}
+}
+
+.card-select-area {
+	padding: 0px;
 }
 
 .terrain-dropdown-value-area {
@@ -301,7 +322,7 @@ input {
 }
 
 .new-field-input {
-	width: calc(100% + 20px);
+	/*width: 100%;*/
 }
 
 /* New Cards Area */

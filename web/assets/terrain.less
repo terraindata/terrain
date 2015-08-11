@@ -22,6 +22,10 @@ a:hover {
 	text-decoration: none;
 }
 
+.center-align {
+	text-align: center;
+}
+
 .noselect {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -627,16 +631,41 @@ input:focus {
 	opacity: 0;
 }
 
+.card-body .row {
+	margin: 0px;
+	margin-top: 10px;
+	&:first-child {
+		margin-top: 0px;
+	}
+
+	.col-xs-1 {
+		text-align: center;
+	}
+}
+
 .card-select-area {
 	padding: 0px 10px;
 }
 
 .card-select-field {
 	border-bottom: 1px solid #eee;
+	position: relative;
 }
 
-.card-select-col {
-	padding: 0px !important;
+.card-select-col-small {
+	width: 35px;
+	position: absolute;
+	right: -35px;
+	top: 0px;
+}
+
+.card-select-sign {
+	left: -45px;
+	top: 1px;
+}
+
+.card-select-col-wide {
+	/*width: 100%;*/
 }
 
 .card-select-delete {
@@ -655,13 +684,15 @@ input:focus {
 }
 
 .new-field-input {
-	margin: 5px -10px 0px -10px;
-	border: 0px;
+	/*border: 0px;*/
 }
 
 .sign-selector {
 	text-align: center;
-	padding-top: 8px;
+	position: relative;
+	top: -2px;
+	left: 50%;
+	margin-left: -20px;
 }
 
 .new-filter-btn {
@@ -730,6 +761,9 @@ input:focus {
 	left: 1px;
 	top: 2px;
 	text-align: left;
+	-webkit-transition: all 0.25s;
+	-o-transition: all 0.25s;
+	transition: all 0.25s;
 }
 
 .new-card-icon-inner {
@@ -739,6 +773,18 @@ input:focus {
 	position: relative;
 	  left: 5px;
 	  top: -5px;
+	  -webkit-transition: all 0.25s;
+	-o-transition: all 0.25s;
+	transition: all 0.25s;
+}
+
+.new-card-icon:hover {
+	cursor: pointer;
+	border-color: @green;
+	
+	.new-card-icon-inner {
+		color: @green;
+	}
 }
 
 .new-card-plus-area:hover .new-card-plus-line {
