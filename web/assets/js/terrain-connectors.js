@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 /* 
  dataArray: array of cards of format:
- 	type: 'from', 'select', 'filter', 'sort', 'slice'
+ 	type: 'from', 'select', 'filter', 'sort', 'slice', 'top', 'skip', 'max', 'as', selectFrom
  	[meta]
  meta: 
  	from: 
@@ -63,6 +63,16 @@ THE SOFTWARE.
 	slice:
 		low: integer
 		high: integer
+    top:
+        low: integer
+    skip:
+        high: integer
+    max:
+        max: integer
+    as:
+        as: 'string'
+    selectFrom:
+        as: 
  */
 
 var terrainConnector = function() {}; //angular.module('terrainConnector', []);
@@ -101,8 +111,22 @@ terrainConnector.getTQLSnippet = function(card) {
 				break;
 			case 'equijoin' :
 				strSnippet += terrainConnector.doEquijoin(card.colname, card.jointable, card.joincolname);
-				break;	
-				
+				break;
+            case 'top' :
+                strSnippet += terrainConnector.doTop(card.low);
+                break;
+            case 'skip' :
+                strSnippet += terrainConnector.doSkip(card.high);
+                break;
+            case 'max' :
+                strSnippet += terrainConnector.doMax(card.args, card.max);
+                break;
+            case 'as':
+                strSnipped += terrainConnector.doAs(card.as);
+                break;
+            case 'selectfrom' :
+                strSnippet += terrainConnector.doselectFrom(card.args);
+                break;
 		}
 		
 		return strSnippet;
@@ -121,7 +145,7 @@ terrainConnector.testGetTQL = function() {
 			jointable: '\'owners\'',
 			joincolname: '\'ID\''
 		},
-		{
+        {
 			type: 'select',
 			args : [
 				{
@@ -164,11 +188,59 @@ terrainConnector.testGetTQL = function() {
 				}
 			]
 		},
-		{
+		
+        {
 			type: 'slice',
 			low: 5,
 			high: 25
-		}
+		},
+        
+        {
+            type: 'top',
+            low: 5
+        },
+        
+        {
+            type: 'skip',
+            high: 25
+        },
+        
+        {
+            type: 'max',
+            args: [
+                {
+                   term : '\'max\''
+                }
+        },
+        
+        {
+            type: 'as',
+            args : [
+                {
+                    term : '\'rating\''
+                },{
+                    term : '\'price\''
+                },{
+                    term : '\'city\''
+                }
+            ]
+        },
+        
+        {
+            type: 'selectFrom',
+            args : [
+                {
+                    term : '\'rating\''
+                },{
+                    term : '\'price\''
+                },{
+                    term : '\'city\''
+                }
+            ]
+        },
+        
+        
+
 	]
 
 	return terrainConnector.getTQL(objCards);
@@ -238,3 +310,51 @@ terrainConnector.doEquijoin = function(colname, jointable, joincolname) {
 	strTQL += ".equijoin(" + colname + "," + jointable + "," + joincolname + ")";
 	return strTQL;
 }
+
+terrainConnector.doTop = function(low) {
+    var strTQL = new String("");
+    strTQL += ".top(" + low + ")";
+    
+    return strTQL;
+}
+
+terrainConnector.doSkip = function(high) {
+    var strTQL = new String("");
+    strTQL += ".skip(" + high + ")";
+    
+    return strTQL;
+}
+
+terrainConnector.doMax = function(max) {
+    var strTQL = new String("");
+    strTQL += ".max(" + max + ")";
+    
+    return strTQL;
+}
+                    
+                    
+terrainConnector.doSelect = function(arrAs) {
+    var strTQL = new String("");
+    trTQL += ".as(";
+                    
+    for (var i = 0; i < arrAs.length; i++){
+            if (i > 0) strTQL += ",";
+            strTQL += arrAs[i].term;
+        }
+        strTQL += ")";
+        return strTQL;
+}
+
+terrainConnector.doSelect = function(arrselectFrom) {
+    var strTQL = new String("");
+    strTQL += ".selectFrom(";
+    
+    for (var i = 0; i < arrselectFrom.length; i++){
+        if (i > 0) strTQL += ",";
+        strTQL += arrselectFrom[i].term;
+    }
+    strTQL += ")";
+    return strTQL;
+}
+
+
