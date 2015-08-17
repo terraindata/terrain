@@ -64,9 +64,9 @@ THE SOFTWARE.
 		low: integer
 		high: integer
     top:
-        numelements: integer
+        numElements: integer
     skip:
-        high: integer
+        numToSkip: integer
     max:
         max: integer
     as:
@@ -113,16 +113,16 @@ terrainConnector.getTQLSnippet = function(card) {
 				strSnippet += terrainConnector.doEquijoin(card.colname, card.jointable, card.joincolname);
 				break;
             case 'top' :
-                strSnippet += terrainConnector.doTop(card.numelements);
+                strSnippet += terrainConnector.doTop(card.numElements);
                 break;
             case 'skip' :
-                strSnippet += terrainConnector.doSkip(card.high);
+                strSnippet += terrainConnector.doSkip(card.numToSkip);
                 break;
             case 'max' :
-                strSnippet += terrainConnector.doMax(card.args, card.max);
+                strSnippet += terrainConnector.doMax(card.max, card.args);
                 break;
-            case 'as':
-                strSnipped += terrainConnector.doAs(card.as);
+            case 'let':
+                strSnipped += terrainConnector.doAs(card.let);
                 break;
             case 'selectfrom' :
                 strSnippet += terrainConnector.doselectFrom(card.args);
@@ -197,24 +197,26 @@ terrainConnector.testGetTQL = function() {
         
         {
             type: 'top',
-            numelements: 5
+            numElements: 5
         },
         
         {
             type: 'skip',
-            high: 25
+            numToSkip: 25
         },
         
         {
             type: 'max',
-            args: [
+            args :[
                 {
-                   term : '\'max\''
+                    term:"a,b,c,d,e,f"
                 }
+                    
+            ]
         },
         
         {
-            type: 'as',
+            type: 'let',
             args : [
                 {
                     term : '\'rating\''
@@ -311,47 +313,56 @@ terrainConnector.doEquijoin = function(colname, jointable, joincolname) {
 	return strTQL;
 }
 
-terrainConnector.doTop = function(numelements) {
+terrainConnector.doTop = function(numElements) {
     var strTQL = new String("");
-    strTQL += ".top(" + numelements + ")";
+    strTQL += ".top(" + numElements + ")";
     
     return strTQL;
 }
 
-terrainConnector.doSkip = function(high) {
+terrainConnector.doSkip = function(numToSkip) {
     var strTQL = new String("");
-    strTQL += ".skip(" + high + ")";
+    strTQL += ".skip(" + numToSkip + ")";
     
     return strTQL;
 }
 
-terrainConnector.doMax = function(max) {
+terrainConnector.doMax = function(arrMax) {
     var strTQL = new String("");
-    strTQL += ".max(" + max + ")";
-    
+    strTQL += ".max(";
+    for (var i = 0; i < arrMax.length; i++){
+        if (i > 0) strTQL += ",";
+        strTQL += arrMax[i].term;
+      
+        }		
+        
+        strTQL += arrMax[i].term;
+    }
+    strTQL += ")";
     return strTQL;
 }
+
                     
                     
-terrainConnector.doSelect = function(arrAs) {
+terrainConnector.doLet = function(arrLet) {
     var strTQL = new String("");
-    trTQL += ".as(";
+    trTQL += ".let(";
                     
-    for (var i = 0; i < arrAs.length; i++){
+    for (var i = 0; i < arrLet.length; i++){
             if (i > 0) strTQL += ",";
-            strTQL += arrAs[i].term;
+            strTQL += arrLet[i].term;
         }
         strTQL += ")";
         return strTQL;
 }
 
-terrainConnector.doSelect = function(arrselectFrom) {
+terrainConnector.doselectFrom = function(arrSelectFrom) {
     var strTQL = new String("");
     strTQL += ".selectFrom(";
     
-    for (var i = 0; i < arrselectFrom.length; i++){
+    for (var i = 0; i < arrSelectFrom.length; i++){
         if (i > 0) strTQL += ",";
-        strTQL += arrselectFrom[i].term;
+        strTQL += arrSelectFrom[i].term;
     }
     strTQL += ")";
     return strTQL;
