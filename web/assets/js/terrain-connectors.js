@@ -64,7 +64,7 @@ THE SOFTWARE.
 		low: integer
 		high: integer
     top:
-        low: integer
+        numelements: integer
     skip:
         high: integer
     max:
@@ -113,7 +113,7 @@ terrainConnector.getTQLSnippet = function(card) {
 				strSnippet += terrainConnector.doEquijoin(card.colname, card.jointable, card.joincolname);
 				break;
             case 'top' :
-                strSnippet += terrainConnector.doTop(card.low);
+                strSnippet += terrainConnector.doTop(card.numelements);
                 break;
             case 'skip' :
                 strSnippet += terrainConnector.doSkip(card.high);
@@ -197,7 +197,7 @@ terrainConnector.testGetTQL = function() {
         
         {
             type: 'top',
-            low: 5
+            numelements: 5
         },
         
         {
@@ -311,9 +311,9 @@ terrainConnector.doEquijoin = function(colname, jointable, joincolname) {
 	return strTQL;
 }
 
-terrainConnector.doTop = function(low) {
+terrainConnector.doTop = function(numelements) {
     var strTQL = new String("");
-    strTQL += ".top(" + low + ")";
+    strTQL += ".top(" + numelements + ")";
     
     return strTQL;
 }
