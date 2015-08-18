@@ -77,13 +77,13 @@ THE SOFTWARE.
 
 var terrainConnector = function() {}; //angular.module('terrainConnector', []);
 
-terrainConnector.getTQL = function(dataArray) {
+terrainConnector.getTQL = function(cardArray) {
 	
 	var strQuery = new String("db");
 	
-	var arrayLength = dataArray.length;
+	var arrayLength = cardArray.length;
 	for (var i = 0; i < arrayLength; i++){
-		strQuery += terrainConnector.getTQLSnippet(dataArray[i]);
+		strQuery += terrainConnector.getTQLSnippet(cardArray[i]);
 	}
 
 	return strQuery;
@@ -122,7 +122,7 @@ terrainConnector.getTQLSnippet = function(card) {
                 strSnippet += terrainConnector.doMax(card.max, card.args);
                 break;
             case 'let':
-                strSnipped += terrainConnector.doAs(card.let);
+                strSnippet += terrainConnector.doLet(card.let);
                 break;
             case 'selectfrom' :
                 strSnippet += terrainConnector.doselectFrom(card.args);
@@ -205,28 +205,18 @@ terrainConnector.testGetTQL = function() {
             numToSkip: 25
         },
         
-        {
-            type: 'max',
-            args :[
-                {
-                    term:"a,b,c,d,e,f"
-                }
-                    
-            ]
-        },
-        
-        {
-            type: 'let',
-            args : [
-                {
-                    term : '\'rating\''
-                },{
-                    term : '\'price\''
-                },{
-                    term : '\'city\''
-                }
-            ]
-        },
+ //       {
+ //           type: 'let',
+ //           args : [
+ //               {
+ //                   term : '\'rating\''
+ //               },{
+ //                   term : '\'price\''
+ //               },{
+ //                   term : '\'city\''
+ //               }
+ //           ]
+ //       },
         
         {
             type: 'selectFrom',
@@ -338,12 +328,10 @@ terrainConnector.doMax = function(arrMax) {
     strTQL += ")";
     return strTQL;
 }
-
-                    
-                    
+        
 terrainConnector.doLet = function(arrLet) {
     var strTQL = new String("");
-    trTQL += ".let(";
+    strTQL += ".let(";
                     
     for (var i = 0; i < arrLet.length; i++){
             if (i > 0) strTQL += ",";
