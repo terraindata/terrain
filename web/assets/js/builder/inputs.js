@@ -42,70 +42,78 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var terrainControllers = angular.module('terrainControllers', []);
+var _terrainBuilderExtension = _terrainBuilderExtension || function() {};
 
-function selectPage(page) {
-	$(".nav li").removeClass('active');
-	page = page || location.hash;
-	$(".nav li a[href='"+page+"']").parent().addClass('active');
-	$(".navbar-tql").hide();
-	if(page == '#/builder') $(".navbar-tql").show();
-}
+_terrainBuilderExtension.inputs = function(_deps) {
+	$scope = _deps.$scope;
+	$http = _deps.$http;
+	$timeout = _deps.$timeout;
 
-terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http', '$timeout', 
-									function($scope, $routeParams, $http, $timeout) {
-	selectPage('#/builder');
 
-	var _deps = {
-		$scope: $scope,
-		$timeout: $timeout,
-		$http: $http,
-	};
+	/* ----------------------------
+	 * Section: Input Initialization
+	 * ---------------------------- */
 
-	var isShowing = ['builder', 'inputs', 'results'];
-	$scope.showing = function(page, value) {
-		if($(window).width() > 767)
-			return true;
-		if(value === undefined)
-			return isShowing.indexOf(page) !== -1;
-		if(value && isShowing.indexOf(page) === -1)
-			isShowing.push(page);
-		if(!value && isShowing.indexOf(page) !== -1)
-			isShowing.splice(isShowing.indexOf(page), 1);
+	$scope.inputs = $scope.ab('start') ? [{
+		name: 'MaxPrice',
+		value: '200',
+		showing: true
+	}] : [];
+
+
+	/* ----------------------------
+	 * Section: Input Helpers
+	 * ---------------------------- */
+	
+	$scope.inputFor = function(inputName) {
+		return $scope.inputs.reduce(function(prev,cur) { return cur.name == inputName ? cur : prev; }, null);
 	}
 
-	$(window).resize(function() {
-		$scope.$apply();
-	})
-
-	$scope.abConfig = $routeParams.abConfig;
-	$scope.ab = function(exp) {
-		if($scope.abConfig && $scope.abConfig.indexOf(exp) != -1)
-			return true;
-		return false;
+	$scope.newInput = function(index, inputName) {
+		var focusValue = inputName ? true : false;
+		inputName = inputName || '';
+		var newInput = { name: inputName, value: '', showing: false };
+		if(index == -1)
+			index = $scope.inputs.length;
+		$scope.inputs.splice(index, 0, newInput);
+		$timeout(function() {
+			newInput.showing = true;
+			$timeout(function() {
+				if(focusValue)
+					$(".input-"+index+" .input-value-input").focus();
+				else
+					$(".input-"+index+" .input-name-input").focus();
+			}, 100)
+		}, 25);
 	}
 	
-	$scope.blurOnEnter = function(evt) {
-		if(evt.keyCode == 13) {
-			$(evt.currentTarget).blur();
+	$scope.removeInputAtIndex = function(index) {
+		$scope.inputs.splice(index, 1);
+	}
+
+	
+
+	/* ----------------------------
+	 * Section: Input View Functions
+	 * ---------------------------- */
+
+
+	$scope.checkForNewInput = function(card) {
+		if(card.filters) {
+			$.each(card.filters, function(index,filter) {
+				if(filter.value && filter.value.length > 0 && filter.valueType == 'input') {
+					if(! $scope.inputs.reduce(function(value,cur) { if(cur.name == filter.value) return true; return value; }, false)) {
+						$scope.newInput(-1, filter.value);
+					}
+				}
+			});
 		}
 	}
 
-	$scope.handleChange = function(cardId) {
-		$scope.resort();
-		$scope.$apply();
-	}
 
 
-	// Note: Order may matter. Be careful.
-	_terrainBuilderExtension.cards(_deps);
-	_terrainBuilderExtension.inputs(_deps);
-	_terrainBuilderExtension.results(_deps);
-	_terrainBuilderExtension.transform(_deps);
 
-}]);
 
-terrainControllers.controller('PlaceholderCtrl', ['$scope', '$routeParams', function($scope, $routeParams) {
-	$scope.page = window.location.hash.substr(2);
-	selectPage();
-}]);
+
+
+}

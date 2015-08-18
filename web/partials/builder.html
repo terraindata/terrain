@@ -181,29 +181,7 @@
 						<div class="card-filter-area" ng-show="card.filters">
 							<div class="row" ng-repeat="f in card.filters">
 								<div class="col-xs-1">
-									<div class="sign-selector">
-										<div class="terrain-dropdown terrain-dropdown-6-items">
-											<div class="terrain-dropdown-value-area">
-												<div class="terrain-dropdown-cell" ng-show="f.combinator == '&'">&amp;</div>
-												<div class="terrain-dropdown-cell" ng-show="f.operator == '||'">||</div>
-											</div>
-											<div class="terrain-dropdown-cell-area">
-												<div class="terrain-dropdown-cell {{f.operator == 'le' ? 'selected' : ''}}" ng-step-change="f.operator = 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&le;</div>
-												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'le'">&le;</div>
-												<div class="terrain-dropdown-cell {{f.operator == 'lt' ? 'selected' : ''}}" ng-step-change="f.operator = 'lt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'lt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&lt;</div>
-												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'lt'">&lt;</div>
-												<div class="terrain-dropdown-cell {{f.operator == 'ge' ? 'selected' : ''}}" ng-step-change="f.operator = 'ge'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'ge'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ge;</div>
-												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'ge'">&ge;</div>
-												<div class="terrain-dropdown-cell {{f.operator == 'gt' ? 'selected' : ''}}" ng-step-change="f.operator = 'gt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'gt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&gt;</div>
-												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'gt'">&gt;</div>
-												<div class="terrain-dropdown-cell {{f.operator == 'eq' ? 'selected' : ''}}" ng-step-change="f.operator = 'eq'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'eq'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">=</div>
-												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'eq'">=</div>
-												<div class="terrain-dropdown-cell {{f.operator == 'ne' ? 'selected' : ''}}" ng-step-change="f.operator = 'ne'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'ne'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ne;</div>
-												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'ne'">&ne;</div>
-											</div>
-										</div>
-									</div>
-								</div>
+									
 								</div>
 								<div class="col-xs-4">
 									<div tdb-autocomplete data="selectableFields" model="f.field" placeholder="Field" auto-placeholder="Start typing to see matching field names" on-select="apply()" class="filter-field-input-wrapper"></div>
@@ -343,7 +321,7 @@
 						<div class="more-button more-4-items more-right more-button-large">
 							<i class="fa fa-ellipsis-h more-icon"></i>
 							<div class="more-hidden-area">
-								<div class="more-menu-item" ng-click="onDropComplete($index,result)" ng-show="result.overrideIndex === false">Pin</div>
+								<div class="more-menu-item" ng-click="result.overrideIndex = $index" ng-show="result.overrideIndex === false">Pin</div>
 								<div class="more-menu-item" ng-click="unpin(result)" ng-show="result.overrideIndex !== false">Unpin</div>
 								<div class="more-menu-item" ng-click="spotlightToggle(result)">
 									Spotlight

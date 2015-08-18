@@ -42,70 +42,86 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var terrainControllers = angular.module('terrainControllers', []);
+var _terrainBuilderExtension = _terrainBuilderExtension || function() {};
 
-function selectPage(page) {
-	$(".nav li").removeClass('active');
-	page = page || location.hash;
-	$(".nav li a[href='"+page+"']").parent().addClass('active');
-	$(".navbar-tql").hide();
-	if(page == '#/builder') $(".navbar-tql").show();
-}
+// A module just for the transform cards
+_terrainBuilderExtension.transform = function(_deps) {
+	$scope = _deps.$scope;
+	$http = _deps.$http;
+	$timeout = _deps.$timeout;
 
-terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http', '$timeout', 
-									function($scope, $routeParams, $http, $timeout) {
-	selectPage('#/builder');
 
-	var _deps = {
-		$scope: $scope,
-		$timeout: $timeout,
-		$http: $http,
-	};
 
-	var isShowing = ['builder', 'inputs', 'results'];
-	$scope.showing = function(page, value) {
-		if($(window).width() > 767)
-			return true;
-		if(value === undefined)
-			return isShowing.indexOf(page) !== -1;
-		if(value && isShowing.indexOf(page) === -1)
-			isShowing.push(page);
-		if(!value && isShowing.indexOf(page) !== -1)
-			isShowing.splice(isShowing.indexOf(page), 1);
+	/* ----------------------------
+	 * Section: Transform Card Initialization
+	 * ---------------------------- */
+
+
+
+	/* ----------------------------
+	 * Section: Transform Card Helpers
+	 * ---------------------------- */
+
+	$scope.cardForKey = function(key) {
+		return $scope.getAllCards().reduce(function(card, candidate) {
+			if(candidate.key === key)
+				return candidate;
+			return card;
+		}, null);
 	}
 
-	$(window).resize(function() {
-		$scope.$apply();
-	})
-
-	$scope.abConfig = $routeParams.abConfig;
-	$scope.ab = function(exp) {
-		if($scope.abConfig && $scope.abConfig.indexOf(exp) != -1)
-			return true;
-		return false;
+	$scope.addRawScoreToCardWithKey = function(key, score) {
+		// there must be a better way to do this
+		var card = $scope.cardForKey(key);
+		card.data.raw = card.data.raw || [];
+      	card.data.raw.push(score);
 	}
-	
-	$scope.blurOnEnter = function(evt) {
-		if(evt.keyCode == 13) {
-			$(evt.currentTarget).blur();
+
+
+	$scope.hasTransformCards = function() {
+		return $scope.cards.reduce(function(val, cur) { return val || cur.transform; }, false);
+	}
+
+
+
+	/* ----------------------------
+	 * Section: Transform Card View Functions
+	 * ---------------------------- */
+
+
+	// Spotlights
+
+	$scope.spotlightColors = ['#67b7ff', '#67ffb7', '#ffb767', '#ff67b7', '#b7ff67', '#b767ff'];
+	$scope.spotlightLabels = ["1","2","3","4","5","6"];
+	$scope.spotlightToggle = function(result) {
+		if(result.spotlight) {
+			result.spotlight = false;
+			$scope.spotlightColors.push(result.spotlightColor);
+			$scope.spotlightLabels.splice(0,0,result.spotlightLabel);
+		} else {
+			if($scope.spotlightColors.length > 0) {
+				result.spotlight = true;
+				result.spotlightColor = $scope.spotlightColors.splice(0,1)[0];
+				result.spotlightLabel = $scope.spotlightLabels.splice(0,1)[0];
+			} else {
+				alert('Maximum number of spotlights added.')
+			}
 		}
+
+		$.each($scope.cards, function(cardIndex, card) {
+			if(!card.data) return;
+			card.data.spotlights = [];
+			$.each($scope.results, function(resultIndex, result) {
+				if(result.spotlight) {
+					card.data.spotlights.push({
+						rawValue: result[card.key],
+						label: result.spotlightLabel,
+						color: result.spotlightColor
+					});
+				}
+			});
+		});
 	}
 
-	$scope.handleChange = function(cardId) {
-		$scope.resort();
-		$scope.$apply();
-	}
 
-
-	// Note: Order may matter. Be careful.
-	_terrainBuilderExtension.cards(_deps);
-	_terrainBuilderExtension.inputs(_deps);
-	_terrainBuilderExtension.results(_deps);
-	_terrainBuilderExtension.transform(_deps);
-
-}]);
-
-terrainControllers.controller('PlaceholderCtrl', ['$scope', '$routeParams', function($scope, $routeParams) {
-	$scope.page = window.location.hash.substr(2);
-	selectPage();
-}]);
+}
