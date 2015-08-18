@@ -335,9 +335,6 @@ terrainConnector.doMax = function(arrMax) {
         strTQL += arrMax[i].term;
       
         }		
-        
-        strTQL += arrMax[i].term;
-    }
     strTQL += ")";
     return strTQL;
 }
