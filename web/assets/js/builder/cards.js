@@ -91,6 +91,14 @@ _terrainBuilderExtension.cards = function(_deps) {
 		}],
 		name: 'Filter',
 		suggested: true
+	}, {
+		id: 982,
+		name: "Score",
+		suggested: true,
+		scores: {
+			inputField: "Score",
+			outputField: "WeightedScore"
+		}		
 	}, { 
 		id: 0,
 		order: {
@@ -486,6 +494,26 @@ _terrainBuilderExtension.cards = function(_deps) {
 		return arguments[0].newCardIsShowing;
 	}
 
+	$scope.cards_score_updateWeight = function(card, weight) {
+		if(weight > 100)
+			weight = 100;
+
+		var diff = card.weight - weight;
+		card.weight = perc;
+
+		$.each($scope.cards, function(i,c) {
+			if(c.weight !== undefined) {
+				c.weight += diff;
+				if(c.weight < 0) {
+					diff = -1 * c.weight;
+					c.weight = 0;
+				} else {
+					diff = 0;
+				}
+			}
+		});
+	}
+
 
 
 	/* ----------------------------
@@ -512,6 +540,8 @@ _terrainBuilderExtension.cards = function(_deps) {
 		if(card.filters) return 'Filter';
 		if(card.transform) return 'Transform';
 		if(card.order) return 'Order';
+		if(card.scores) return 'Score';
+		return card.name;
 	}
 
 

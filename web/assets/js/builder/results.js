@@ -207,7 +207,7 @@ _terrainBuilderExtension.results = function(_deps) {
 		return total; 
 	}
 
-	
+
 	$scope.resort = function() {
 		// since we want to allow manual overrides, we have to make our own sorting function. Fun, I know.
 		// assumes: overrideIndexes are unique
@@ -233,7 +233,7 @@ _terrainBuilderExtension.results = function(_deps) {
 			return normals;
 		}, {});
 
-		scores.sort(function(a,b) { return a > b; });
+		scores.sort(function(a,b) { return a - b; });
 
 		var orderCard = $scope.cardFor('order');
 		if(!orderCard || orderCard.order.direction == 'descending')
@@ -350,8 +350,7 @@ _terrainBuilderExtension.results = function(_deps) {
 			if(!field && selectCard.select.fields.length == 0) return true;
 			return selectCard.select.fields.indexOf(field) != -1;
 		}
-		if(!field) return true;
-		return false;
+		return field;
 	}
 
 

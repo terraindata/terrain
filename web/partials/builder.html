@@ -244,6 +244,36 @@
 							<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
 							<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
 						</div>
+						<div class="card-score-area" ng-show="card.scores">
+							<div class="row">
+								<div class="col-xs-1"></div>
+								<div class="col-xs-4">
+									<input type="text" ng-model="card.scores.inputField" placeholder="Input Field" />
+								</div>
+								<div class="col-xs-1 score-arrow-wrapper">
+									<div class="vertically-middle">
+										<img src="assets/img/arrow.png" />
+									</div>
+								</div>
+								<div class="col-xs-5">
+									<input type="text" ng-model="card.scores.outputField" placeholder="Output Field" />
+								</div>
+								<div class="col-xs-1"></div>
+							</div>
+							<div class="row" ng-repeat="transformCard in cards | filter: { transform: true }">
+								<div class="col-xs-1"></div>
+								<div class="col-xs-5">
+									<input type="text" ng-value="transformCard.key + '.Score'" disabled />
+								</div>
+								<div class="col-xs-4">
+									<div class="weight" rel="{{transformCard.id}}" d3-slicer data="cards" card-id="{{transformCard.id}}" on-change="handleChange(cardId)"></div>
+								</div>
+								<div class="col-xs-1 score-card-weight-wrapper">
+									<input type="tel" class="score-card-weight" ng-model="transformCard.weight" />
+								</div>
+								<div class="col-xs-1"></div>
+							</div>
+						</div>
 						<div class="card-body-spacing"></div>
 					</div>
 				</div>
