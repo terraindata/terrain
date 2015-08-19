@@ -86,6 +86,8 @@ terrainConnector.getTQL = function(cardArray) {
 		strQuery += terrainConnector.getTQLSnippet(cardArray[i]);
 	}
 
+	alert(strQuery);
+
 	return strQuery;
 }
 
