@@ -55,7 +55,7 @@ terrainApp.directive('d3Slicer', ['$window', '$timeout', 'd3Service', function($
 
 		    	var opts = $.extend( {
 		    		width: $(ele[0]).width(),
-		    		height: 40,
+		    		height: 34,
 		    		minimumWeight: 5,
 		    		selectFn: function() { /* no select fn specified */ }
 		    	}, attrs);
