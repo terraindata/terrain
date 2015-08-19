@@ -329,6 +329,9 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 				case 'ne':
 					passing = passing && (fieldValue !== filterValue);
 					break;
+				case 'in':
+					passing = passing && true; //Note: if we want to take the backend functionality of lists, we will need to implement. Currently always passes.
+					break;
 			}
 		});
 		return passing;
