@@ -494,15 +494,20 @@ _terrainBuilderExtension.cards = function(_deps) {
 		return arguments[0].newCardIsShowing;
 	}
 
-	$scope.cards_score_updateWeight = function(card, weight) {
-		if(weight > 100)
-			weight = 100;
+	$scope.cards_score_updateWeight = function(card) {
+		if(card.weight > 100)
+			card.weight = 100;
 
-		var diff = card.weight - weight;
-		card.weight = perc;
+		var sumWeight = $scope.cards.reduce(function(sum,cur) {
+			if(cur.weight !== undefined)
+				sum += parseInt(cur.weight);
+			return sum;
+		}, 0);
+
+		var diff = 100 - sumWeight;
 
 		$.each($scope.cards, function(i,c) {
-			if(c.weight !== undefined) {
+			if(c.weight !== undefined && c.id !== card.id) {
 				c.weight += diff;
 				if(c.weight < 0) {
 					diff = -1 * c.weight;
@@ -513,7 +518,6 @@ _terrainBuilderExtension.cards = function(_deps) {
 			}
 		});
 	}
-
 
 
 	/* ----------------------------

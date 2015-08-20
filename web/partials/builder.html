@@ -269,7 +269,7 @@
 									<div class="weight" rel="{{transformCard.id}}" d3-slicer data="cards" card-id="{{transformCard.id}}" on-change="handleChange(cardId)"></div>
 								</div>
 								<div class="col-xs-1 score-card-weight-wrapper">
-									<input type="tel" class="score-card-weight" ng-model="transformCard.weight" />
+									<input type="tel" class="score-card-weight" ng-model="transformCard.weight" ng-change="cards_score_updateWeight(transformCard)" />
 								</div>
 								<div class="col-xs-1"></div>
 							</div>
