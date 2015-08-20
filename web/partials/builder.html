@@ -188,7 +188,7 @@
 								</div>
 								<div class="col-xs-2 center-align">
 									<div class="sign-selector">
-										<div class="terrain-dropdown terrain-dropdown-6-items">
+										<div class="terrain-dropdown terrain-dropdown-7-items">
 											<div class="terrain-dropdown-value-area">
 												<div class="terrain-dropdown-cell" ng-show="f.operator == 'le'">&le;</div>
 												<div class="terrain-dropdown-cell" ng-show="f.operator == 'lt'">&lt;</div>
@@ -196,6 +196,7 @@
 												<div class="terrain-dropdown-cell" ng-show="f.operator == 'gt'">&gt;</div>
 												<div class="terrain-dropdown-cell" ng-show="f.operator == 'eq'">=</div>
 												<div class="terrain-dropdown-cell" ng-show="f.operator == 'ne'">&ne;</div>
+												<div class="terrain-dropdown-cell" bg-show="f.operator == 'in'">in</div>
 											</div>
 											<div class="terrain-dropdown-cell-area">
 												<div class="terrain-dropdown-cell {{f.operator == 'le' ? 'selected' : ''}}" ng-step-change="f.operator = 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&le;</div>
@@ -210,6 +211,8 @@
 												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'eq'">=</div>
 												<div class="terrain-dropdown-cell {{f.operator == 'ne' ? 'selected' : ''}}" ng-step-change="f.operator = 'ne'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'ne'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ne;</div>
 												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'ne'">&ne;</div>
+												<div class="terrain-dropdown-cell {{f.operator == 'in' ? 'selected' : ''}}" ng-step-change="f.operator = 'in'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'in'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">in</div>
+												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'in'">&ne;</div>
 											</div>
 										</div>
 									</div>
