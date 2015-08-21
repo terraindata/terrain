@@ -31,6 +31,26 @@
 						<input ng-model="input.value" ng-change="resort()" type="text" class="input-value-input" placeholder="Value">
 					</div>
 				</div>
+				<div class="input batch-input-area input-{{$index}} has-more-button">
+					<div class="input-name-area">
+						<input ng-model="input.name" type="text" class="input-name-input first-input" placeholder="Name">
+						<div class="pull-right more-button more-2-items">
+							<i class="fa fa-ellipsis-h more-icon"></i>
+							<div class="more-hidden-area">
+								<a class="more-menu-item">Join</a>
+								<a class="more-menu-item" ng-click="removeInputAtIndex($index)">Remove</a>
+							</div>
+						</div>
+					</div>
+					<div class="input-calendar-area">
+						
+						Selected Date: {{ data.date | date:'yyyy-MM-dd a' }}
+						 
+						<datetimepicker data-ng-model="data.embeddedDate"
+						    data-datetimepicker-config="{ startView:'day', minView:'hour' }" />											
+						
+					</div>	
+				</div>
 			</div>
 			<div class="pre-input">
 				<a class="new-card-plus-area" ng-click="newInput(-1)">
@@ -188,7 +208,7 @@
 								</div>
 								<div class="col-xs-2 center-align">
 									<div class="sign-selector">
-										<div class="terrain-dropdown terrain-dropdown-6-items">
+										<div class="terrain-dropdown terrain-dropdown-7-items">
 											<div class="terrain-dropdown-value-area">
 												<div class="terrain-dropdown-cell" ng-show="f.operator == 'le'">&le;</div>
 												<div class="terrain-dropdown-cell" ng-show="f.operator == 'lt'">&lt;</div>
@@ -196,6 +216,7 @@
 												<div class="terrain-dropdown-cell" ng-show="f.operator == 'gt'">&gt;</div>
 												<div class="terrain-dropdown-cell" ng-show="f.operator == 'eq'">=</div>
 												<div class="terrain-dropdown-cell" ng-show="f.operator == 'ne'">&ne;</div>
+												<div class="terrain-dropdown-cell" bg-show="f.operator == 'in'">in</div>
 											</div>
 											<div class="terrain-dropdown-cell-area">
 												<div class="terrain-dropdown-cell {{f.operator == 'le' ? 'selected' : ''}}" ng-step-change="f.operator = 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&le;</div>
@@ -210,6 +231,8 @@
 												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'eq'">=</div>
 												<div class="terrain-dropdown-cell {{f.operator == 'ne' ? 'selected' : ''}}" ng-step-change="f.operator = 'ne'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'ne'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ne;</div>
 												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'ne'">&ne;</div>
+												<div class="terrain-dropdown-cell {{f.operator == 'in' ? 'selected' : ''}}" ng-step-change="f.operator = 'in'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'in'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">in</div>
+												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'in'">in</div>
 											</div>
 										</div>
 									</div>

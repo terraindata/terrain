@@ -159,6 +159,9 @@ _terrainBuilderExtension.results = function(_deps) {
 				case 'ne':
 					passing = passing && (fieldValue !== filterValue);
 					break;
+				case 'in':
+					passing = passing && true; //we need to decide if we want to hack this functionality for the demo or just wait for the backend to do it
+					break;
 			}
 		});
 		return passing;

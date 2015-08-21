@@ -164,15 +164,19 @@ terrainConnector.testGetTQL = function() {
 			args : [
 				{
 					combinator : 'none',
-					term : '\'rating\' >= \'input.rating\''
+					term : '\'sitter.rating\' >= \'input.rating\''
 				},
 				{
 					combinator : 'and',
-					term : '\'price\' < 400'
+					term : '\'sitter.price\' < 400'
 				},
 				{
 					combinator : 'or',
-					term : '\'city\' == \'San Francisco\''
+					term : '\'sitter.city\' == \'San Francisco\''
+				},
+				{
+					combinator : 'in',
+					term : '\'input.attributes\' in \'sitter.attributes\''
 				}
 			]
 		},
