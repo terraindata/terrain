@@ -31,6 +31,26 @@
 						<input ng-model="input.value" ng-change="resort()" type="text" class="input-value-input" placeholder="Value">
 					</div>
 				</div>
+				<div class="input batch-input-area input-{{$index}} has-more-button">
+					<div class="input-name-area">
+						<input ng-model="input.name" type="text" class="input-name-input first-input" placeholder="Name">
+						<div class="pull-right more-button more-2-items">
+							<i class="fa fa-ellipsis-h more-icon"></i>
+							<div class="more-hidden-area">
+								<a class="more-menu-item">Join</a>
+								<a class="more-menu-item" ng-click="removeInputAtIndex($index)">Remove</a>
+							</div>
+						</div>
+					</div>
+					<div class="input-calendar-area">
+						
+						Selected Date: {{ data.date | date:'yyyy-MM-dd a' }}
+						 
+						<datetimepicker data-ng-model="data.embeddedDate"
+						    data-datetimepicker-config="{ startView:'day', minView:'hour' }" />											
+						
+					</div>	
+				</div>
 			</div>
 			<div class="pre-input">
 				<a class="new-card-plus-area" ng-click="newInput(-1)">
