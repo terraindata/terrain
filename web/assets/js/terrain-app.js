@@ -49,7 +49,8 @@ var terrainApp = angular.module('terrainApp', [
 	'ngDraggable',
 	'ng-slide-down',
 	'ngTouch',
-	'ngTouchmove'
+	'ngTouchmove',
+	'ui.bootstrap.datetimepicker'
 	]);
 
 terrainApp.config(['$routeProvider',
