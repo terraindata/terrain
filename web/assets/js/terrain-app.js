@@ -77,8 +77,8 @@ terrainApp.config(['$routeProvider',
 			controller: 'PlaceholderCtrl'
 		}).
 		when('/dashboard', {
-			templateUrl: 'assets/plugins/angular-bootstrap-datetimepicker-master/demo/index.html',
-			controller: 'demo.democontroller'
+			templateUrl: 'partials/placeholder.html',
+			controller: 'PlaceholderCtrl'
 		}).
 		otherwise({
 			redirectTo: '/builder'
