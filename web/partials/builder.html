@@ -44,14 +44,13 @@
 					</div>
 					<div class="input-calendar-area">
 						<div class="input-value-area">
-							<input data-ng-model="input.embeddedDate" type="text" class="input-name-input" placeholder="">
+							<input ng-model="input.date" type="date" class="input-name-input" placeholder="yyyy-MM-dd">
+							<input ng-model="input.date" type="time" class="input-name-input" step="60">
 						</div>
-						<div class="input-calendar-value-area">
-							<!--Selected Date: {{ input.embeddedDate | date:'short' }}-->
-							 
+	<!--					<div class="input-calendar-value-area">							 
 							<datetimepicker data-ng-model="input.embeddedDate"
-							    data-datetimepicker-config="{ startView:'day', minView:'minute' , minuteStep:15 }" />											
-						</div>
+							    data-datetimepicker-config="{ startView:'day', minView:'minute' , minuteStep:15 }" />	
+						</div> -->
 					</div>	
 				</div>
 			</div>
