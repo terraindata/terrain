@@ -96,6 +96,10 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		$scope.$apply();
 	}
 
+	$scope.apply = function() {
+		$scope.$apply();
+	}
+
 
 	// Note: Order may matter. Be careful.
 	_terrainBuilderExtension.cards(_deps);
