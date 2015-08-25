@@ -44,8 +44,8 @@
 					</div>
 					<div class="input-calendar-area">
 						<div class="input-value-area">
-							<input ng-model="input.date" type="date" class="input-name-input" placeholder="yyyy-MM-dd">
-							<input ng-model="input.date" type="time" class="input-name-input" step="60">
+							<!-- <input ng-model="input.date" type="date" class="input-name-input" placeholder="yyyy-MM-dd"> -->
+							<!-- <input ng-model="input.date" type="time" class="input-name-input" step="60"> -->
 						</div>
 				<!--	<div class="input-calendar-value-area">							 
 							<datetimepicker data-ng-model="input.embeddedDate"
@@ -250,7 +250,9 @@
 								<div class="col-xs-4">
 									<input ng-model="f.value" ng-blur="checkForNewInput(card)" ng-keydown="blurOnEnter($event)" placeholder="Value" />
 								</div>
-								<div class="col-xs-1"></div>
+								<div class="col-xs-1">
+									<div class="card-select-delete clickable" ng-click="card_filter_removeField(card, $index)"><i class="fa fa-remove"></i></div>
+								</div>
 							</div>
 							<div class="row">
 								<div class="col-xs-1">
@@ -265,9 +267,31 @@
 							</div>
 							<!-- <a class="new-filter-btn button" ng-click="addFilter(card)">Add a filter</a> -->
 						</div>
-						<div class="card-transform-area" ng-show="card.transform">
-							<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
-							<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
+						<div class="card-transform-area" ng-show="card.transform || card.preTransform">
+							<div class="row">
+								<div class="col-xs-1"></div>
+								<div class="col-xs-4">
+									<div tdb-autocomplete data="transformableFields" model="card.key" placeholder="Field Name" auto-placeholder="Start typing to see matching field names" on-select="transform_newKey(card, obj)"></div>
+								</div>
+								<div class="col-xs-1 arrow-wrapper">
+									<div class="vertically-middle">
+										<img src="assets/img/arrow.png" />
+									</div>
+								</div>
+								<div class="col-xs-5">
+									<div ng-show="card.preTransform">
+										Select a field.
+									</div>
+									<div ng-show="card.transform">
+										<input type="text" ng-model="card.var" />
+									</div>
+								</div>
+								<div class="col-xs-1"></div>
+							</div>
+							<div ng-repeat="t in card.transformArr">
+								<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
+								<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
+							</div>
 						</div>
 						<div class="card-score-area" ng-show="card.scores">
 							<div class="row">
@@ -275,7 +299,7 @@
 								<div class="col-xs-4">
 									<input type="text" ng-model="card.scores.inputField" placeholder="Input Field" />
 								</div>
-								<div class="col-xs-1 score-arrow-wrapper">
+								<div class="col-xs-1 arrow-wrapper">
 									<div class="vertically-middle">
 										<img src="assets/img/arrow.png" />
 									</div>

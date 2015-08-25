@@ -71,21 +71,16 @@ _terrainBuilderExtension.results = function(_deps) {
       		/* Locations */
       		var locScore = latLongToDistance(result.lat, result.long, $scope.search.lat, $scope.search.long); //Math.pow(this.lat - $scope.search.lat, 2) + Math.pow(this.long - $scope.search.long, 2);
       		// TODO make sense of the ridiculous number of different location types
-      		var locationKeys = ['location', 'location_map', 'location_radius', 'location_mapradius', 'location_latlong'];
+      		var locationKeys = ['location']; //, 'location_map', 'location_radius', 'location_mapradius', 'location_latlong'];
       		$.each(locationKeys, function(i,key) {
       			result[key] = locScore;
-      			$scope.addRawScoreToCardWithKey(key, locScore);
       		});
 
       		/* add any more calculated result values here, as they come up, if they are not pre-calculated in the response */
       		result.overrideIndex = false;
 
-      		// sooo inefficient omg omg
-      		$.each($scope.getAllCards(), function() {
-      			var card = this;
-      			if(card.inDataResponse) {
-      				$scope.addRawScoreToCardWithKey(card.key, result[card.key]);
-      			}
+      		$.each(result, function(key, val) {
+      			$scope.addRawScoreToCardWithKey(key, val);
       		});
       	});
 		$scope.resort();
@@ -212,6 +207,8 @@ _terrainBuilderExtension.results = function(_deps) {
 
 
 	$scope.resort = function() {
+		if(!$scope.results) return;
+		
 		// since we want to allow manual overrides, we have to make our own sorting function. Fun, I know.
 		// assumes: overrideIndexes are unique
 		var showingResults = 0;

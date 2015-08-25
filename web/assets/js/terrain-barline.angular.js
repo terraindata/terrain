@@ -142,11 +142,11 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		bgArea.selectAll('*').remove();
 		bgArea.append('rect')
 			.attr('class', 'bg')
-			.attr('x', 0)
-			.attr('y', 0)
-			.attr('width', opts.width)
-			.attr('height', opts.height)
-			.attr('fill', '#fff');
+			.attr('x', minX)
+			.attr('y', minY)
+			.attr('width', workingWidth)
+			.attr('height', workingHeight)
+			.attr('fill', '#f0f1e9');
 			
 		data.bars = [];
 		for(var i = 0; i < data.numberOfBars; i++) data.bars.push(0);
@@ -158,7 +158,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			return Math.floor((val - data.domain[0]) / (data.domain[1] - data.domain[0]) * numBuckets);
 		}
 		
-		if(!data.raw) return;
+		if(!data.raw) { return; }
 		$.each(data.raw, function(i, val) {
 			// TODO use d3 domain functions
 			var bucket = bucketForVal(val);
@@ -176,6 +176,9 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		var maxValue = d3.max(data.bars, function(d) {
 			return d;
 		});
+
+		// we want MaxValue to be divisible by 5.
+		maxValue = maxValue - (maxValue % 5) + 5;
 
 		for(var i = 0; i < data.bars.length; i ++)
 			data.bars[i] /= maxValue;
@@ -237,6 +240,8 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 						.scale(barXScale) 
 						.orient("bottom")
 						.ticks(data.numberOfBars)
+						.tickSize(-1 * workingHeight, 0, 0)
+						.tickPadding(7)
 						.tickFormat(function(d,i) {
 							return data.xLabelFormat(i, (i == data.numberOfBars && data.domain[2] ? i - 1 : i) * (data.domain[1] - data.domain[0]) / numBuckets + data.domain[0], i == data.numberOfBars && data.domain[2]);
 						});
@@ -252,7 +257,8 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		var yBarAxis = d3.svg.axis()
 							.scale(yBarScale)
 							.orient("left")
-							.ticks(5);
+							.ticks(10)
+							.tickSize(0,0,0);
 		scaleArea.append("g")
 			.attr("class", "axis y-axis y-bar-axis")
 			.attr("transform", "translate("+leftMargin+","+topMargin+")")
@@ -262,10 +268,12 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		var yPointAxis = d3.svg.axis()
 						.scale(yPointScale)
 						.orient("right")
-						.ticks(5)
+						.ticks(10)
+						.tickSize(-1 * workingWidth, 0, 0)
 						.tickFormat(opts.pointLabelFormat);
 		scaleArea.append("g")
 			.attr("class", "axis y-axis y-point-axis")
+			.attr('color', '#6b705a')
 			.attr("transform", "translate("+(workingWidth + leftMargin)+","+topMargin+")")
 			.call(yPointAxis);
 

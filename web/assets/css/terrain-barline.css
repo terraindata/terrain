@@ -19,7 +19,11 @@ svg {
 .axis text {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 11px;
-    fill: #777;
+    fill: #6b805a;
+}
+
+.grid path {
+      stroke-width: 0;
 }
 
 
