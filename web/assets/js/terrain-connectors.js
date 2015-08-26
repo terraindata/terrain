@@ -302,7 +302,7 @@ terrainConnector.testGetTQL = function() {
                     
         {
             type: 'as',
-            asValue: "Product"
+            asValue: "Product",
             args : [
                 {
                     term : '\'rating\''
