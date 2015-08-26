@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 /* 
  dataArray: array of cards of format:
- 	type: 'from', 'select', 'filter', 'sort', 'slice', 'top', 'skip', 'max', 'as', selectFrom
+ 	type: 'from', 'select', 'filter', 'sort', 'slice', 'top', 'skip', 'max', 'let', 'selectFrom', 'insert', 'min', 'sum', 'average', 'count', 'append'
  	[meta]
  meta: 
  	from: 
@@ -68,11 +68,25 @@ THE SOFTWARE.
     skip:
         numToSkip: integer
     max:
-        max: integer
-    as:
-        as: 'string'
+        maxValue: return integer
+    let:
+        nameChange: "string" to swap with column name
     selectFrom:
-        as: 
+        args: array of objects
+        term: 'field name'
+        table: 'table name'
+    insert:
+        insertValue: string, integer, array
+    min:
+        minValue: returns minimum integer
+    sum:
+        sumValue: returns sum of integers
+    average:
+        averageValue: returns integer average
+    count:
+        countValue: returns integer
+    append:
+        appendValue: appends string "Appended"
  */
 
 var terrainConnector = function() {}; //angular.module('terrainConnector', []);
@@ -121,14 +135,38 @@ terrainConnector.getTQLSnippet = function(card) {
                 strSnippet += terrainConnector.doSkip(card.numToSkip);
                 break;
             case 'max' :
-                strSnippet += terrainConnector.doMax(card.max, card.args);
+                strSnippet += terrainConnector.doMax(card.maximumValue);
                 break;
             case 'let':
-                strSnippet += terrainConnector.doLet(card.let);
+                strSnippet += terrainConnector.doLet(card.nameChange);
                 break;
-            case 'selectfrom' :
-                strSnippet += terrainConnector.doselectFrom(card.args);
+            case 'selectFrom' :
+                strSnippet += terrainConnector.doSelectFrom(card.args);
                 break;
+            case 'insert' :
+                strSnippet += terrainConnector.doInsert(card.insertValue);
+                break;
+            case 'min' :
+                strSnippet += terrainConnector.doMin(card.minimumValue);
+                break;
+            case 'sum' :
+                strSnippet += terrainConnector.doSum(card.sumValue);
+                break;
+            case 'avg' :
+                strSnippet += terrainConnector.doAvg(card.averageValue);
+                break;
+            case 'count' :
+                strSnippet += terrainConnector.doCount(card.countValue);
+                break;
+            case 'append' :
+                strSnippet += terrainConnector.doAppend(card.appendValue);
+                break;
+            case 'as' :
+                strSnippet += terrainConnector.doAs(card.asValue, card.args);
+                break;
+                
+                
+                
 		}
 		
 		return strSnippet;
@@ -210,19 +248,15 @@ terrainConnector.testGetTQL = function() {
             type: 'skip',
             numToSkip: 25
         },
+        {
+            type: 'max',
+            maximumValue: 5
+        },
         
- //       {
- //           type: 'let',
- //           args : [
- //               {
- //                   term : '\'rating\''
- //               },{
- //                   term : '\'price\''
- //               },{
- //                   term : '\'city\''
- //               }
- //           ]
- //       },
+        {
+            type: 'let',
+            nameChange: "New Column Name"
+        },
         
         {
             type: 'selectFrom',
@@ -237,7 +271,49 @@ terrainConnector.testGetTQL = function() {
             ]
         },
         
+        {
+            type: 'insert',
+            insertValue: 5
+        },
+                    
+       {
+           type: 'min',
+            minimumValue: 5
+       },
+                    
+        {
+            type: 'sum',
+            sumValue: 5
+        },
+                    
+        {
+            type: 'avg',
+            averageValue: 5
+        },
         
+        {
+            type: 'count',
+            countValue: 5
+        },
+        {
+            type: 'append',
+            appendValue: "Appended"
+        },
+                    
+        {
+            type: 'as',
+            asValue: "Product"
+            args : [
+                {
+                    term : '\'rating\''
+                },{
+                    term : '\'price\''
+                },{
+                    term : '\'city\''
+                }
+            ]
+
+        },
 
 	]
 
@@ -323,31 +399,22 @@ terrainConnector.doSkip = function(numToSkip) {
     return strTQL;
 }
 
-terrainConnector.doMax = function(arrMax) {
+terrainConnector.doMax = function(maximumValue) {
     var strTQL = new String("");
-    strTQL += ".max(";
-    for (var i = 0; i < arrMax.length; i++){
-        if (i > 0) strTQL += ",";
-        strTQL += arrMax[i].term;
-      
-        }		
-    strTQL += ")";
+    strTQL += ".max(" + maximumValue + ")";
+    
     return strTQL;
+
 }
         
-terrainConnector.doLet = function(arrLet) {
+terrainConnector.doLet = function(nameChange) {
     var strTQL = new String("");
-    strTQL += ".let(";
-                    
-    for (var i = 0; i < arrLet.length; i++){
-            if (i > 0) strTQL += ",";
-            strTQL += arrLet[i].term;
-        }
-        strTQL += ")";
-        return strTQL;
+    strTQL += ".let(" + nameChange + ")";
+    
+    return strTQL;
 }
 
-terrainConnector.doselectFrom = function(arrSelectFrom) {
+terrainConnector.doSelectFrom = function(arrSelectFrom) {
     var strTQL = new String("");
     strTQL += ".selectFrom(";
     
@@ -357,6 +424,61 @@ terrainConnector.doselectFrom = function(arrSelectFrom) {
     }
     strTQL += ")";
     return strTQL;
+}
+
+terrainConnector.doInsert = function(insertValue){
+    var strTQL = new String("");
+    strTQL += ".insert(" + insertValue + ")";
+    
+    return strTQL;
+}
+
+terrainConnector.doMin = function(minimumValue){
+    var strTQL = new String("");
+    strTQL += ".min(" + minimumValue + ")";
+    
+    return strTQL;
+}
+
+terrainConnector.doSum = function(sumValue){
+    var strTQL = new String("");
+    strTQL += ".sum(" + sumValue + ")";
+    
+    return strTQL;
+}
+
+terrainConnector.doAvg = function(averageValue){
+    var strTQL = new String("");
+    strTQL += ".avg(" + averageValue + ")";
+    
+    return strTQL;
+}
+
+terrainConnector.doCount = function(countValue){
+    var strTQL = new String("");
+    strTQL += ".count(" + countValue + ")";
+    
+    return strTQL;
+}
+
+terrainConnector.doAppend = function(appendValue){
+    var strTQL = new String("");
+    strTQL += ".append(" + appendValue + ")";
+    
+    return strTQL;
+}
+
+terrainConnector.doAs = function(asValue, arrAsValue){
+    var strTQL = new String("");
+    strTQL += ".as("
+    for(var i = 0; i < arrAsValue.length; i++){
+        if(i > 0) strTQL += ",";
+        strTQL += arrAsValue[i].term;
+    }
+    
+    strTQL += ")";
+    return strTQL;
+    
 }
 
 
