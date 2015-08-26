@@ -58,7 +58,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 		name: 'MaxPrice',
 		value: '200',
 		showing: true,
-		date: ((new Date()).setMilliseconds(0))
+		type: 'namevalue'
 	}] : [];
 
 
@@ -70,13 +70,10 @@ _terrainBuilderExtension.inputs = function(_deps) {
 		return $scope.inputs.reduce(function(prev,cur) { return cur.name == inputName ? cur : prev; }, null);
 	}
 
-	$scope.newInput = function(index, inputName) {
-		var datenow = new Date();
-		datenow.setMilliseconds(0);
-		datenow.setSeconds(0);
+	$scope.newNameValueInput = function(index, inputName) {
 		var focusValue = inputName ? true : false;
 		inputName = inputName || '';
-		var newInput = { name: inputName, value: '', showing: false, date: datenow };
+		var newInput = { name: inputName, value: '', showing: false, type: 'namevalue' };
 		if(index == -1)
 			index = $scope.inputs.length;
 		$scope.inputs.splice(index, 0, newInput);
@@ -89,6 +86,27 @@ _terrainBuilderExtension.inputs = function(_deps) {
 					$(".input-"+index+" .input-name-input").focus();
 			}, 100)
 		}, 25);
+	}
+	
+	$scope.newDateTimeInput = function(index, inputName) {
+		var dateNow = new Date();
+		dateNow.setMilliseconds(0);
+		dateNow.setSeconds(0);
+		var focusValue = inputName ? true : false;
+		inputName = inputName || '';
+		var newInput = { name: inputName, value: dateNow, showing: false, type: 'datetime' };
+		if(index == -1)
+			index = $scope.inputs.length;
+		$scope.inputs.splice(index, 0, newInput);
+		$timeout(function() {
+			newInput.showing = true;
+			$timeout(function() {
+				if(focusValue)
+					$(".input-"+index+" .input-value-input").focus();
+				else
+					$(".input-"+index+" .input-name-input").focus();
+			}, 100)
+		}, 25);		
 	}
 	
 	$scope.removeInputAtIndex = function(index) {
@@ -107,7 +125,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 			$.each(card.filters, function(index,filter) {
 				if(filter.value && filter.value.length > 0 && filter.valueType == 'input') {
 					if(! $scope.inputs.reduce(function(value,cur) { if(cur.name == filter.value) return true; return value; }, false)) {
-						$scope.newInput(-1, filter.value);
+						$scope.newNameValueInput(-1, filter.value);
 					}
 				}
 			});

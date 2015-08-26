@@ -31,7 +31,7 @@
 						<input ng-model="input.value" ng-change="resort()" type="text" class="input-value-input" placeholder="Value">
 					</div>
 				</div>
-				<div class="input batch-input-area input-{{$index}} has-more-button">
+				<div class="input batch-input-area input-{{$index}} has-more-button" ng-show="input.type == 'datetime'">
 					<div class="input-name-area">
 						<input ng-model="input.name" type="text" class="input-name-input first-input" placeholder="Name">
 						<div class="pull-right more-button more-2-items">
@@ -44,13 +44,13 @@
 					</div>
 					<div class="input-calendar-area">
 						<div class="input-value-area">
-							<!-- <input ng-model="input.date" type="date" class="input-name-input" placeholder="yyyy-MM-dd"> -->
-							<!-- <input ng-model="input.date" type="time" class="input-name-input" step="60"> -->
+				<!--			<input ng-model="input.value" type="date" class="input-name-input" placeholder="yyyy-MM-dd"> -->
+				<!--			<input ng-model="input.value" type="time" class="input-name-input" step="60"> -->
 						</div>
-				<!--	<div class="input-calendar-value-area">							 
-							<datetimepicker data-ng-model="input.embeddedDate"
-							    data-datetimepicker-config="{ startView:'day', minView:'minute' , minuteStep:15 }" />	
-				</div> -->
+				<!--<div class="input-calendar-value-area">							 
+						<datetimepicker data-ng-model="input.embeddedDate"
+						data-datetimepicker-config="{ startView:'day', minView:'minute' , minuteStep:15 }" />	
+					</div> -->
 					</div>	
 				</div>
 			</div>
@@ -63,7 +63,7 @@
 				</a>
 			</div>
 			<div class="input">
-				<input type="text" placeholder="Add an input" ng-focus="newInput(-1)">
+				<input type="text" placeholder="Add an input" ng-focus="newNameValueInput(-1)">
 			</div>
 			<div class="empty-algorithm" ng-show="inputs.length == 0">
 				Inputs are empty
