@@ -42,56 +42,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+/* jshint node:true */
 
-// $(window).hashchange(function() {
-// 	switch(location.hash.substr(1)) {
-// 		case "home":
-// 		case "dashboard":
-// 		// case ""
-// 	}
-// });
+var bower = [
+  'bower_components/jquery/dist/jquery.js',
+  'bower_components/moment/moment.js',
+  'bower_components/moment/locale/*.js',
+  'bower_components/bootstrap/dist/js/bootstrap.js',
+  'bower_components/angular/angular.js',
+  'bower_components/angular-mocks/angular-mocks.js'
+];
+var bumpFiles = ['package.json', 'bower.json', 'README.md', 'src/js/*.js', 'src/css/*.css'];
+var miscFiles = ['GruntFile.js', 'gulpfile.js', 'karma.conf.js', 'paths.js'];
+var demoFiles = ['demo/**/*.js'];
+var sourceFiles = ['src/**/*.js'];
+var testFiles = ['test/**/*.spec.js'];
 
-// $(document).ready(function() {
-// 	var points = [];
-// 	for(var i = 0; i < 5; i ++) {
-// 		points.push(1 - Math.pow((i*2/10), 2));
-// 	}
-// 	$("#chart").barline({
-// 		// Data
-// 		labels: ["$0", "$100", "$200", "$300", "$400", "$500", "$600", "$700", "$800", "$900+"],
-// 		bars: [0.44,0.65,1.0,0.58,0.68,0.38,0.24,0.12,0.22],
-// 		barRange: [0,20],
-// 		points: points,
-// 		pointRange: [0,1],
-// 		barToPointRatio: 2
-// 	}, {
-// 		// Options
-// 		color: "#47ffa7",
-// 		width: 500,
-// 		height: 250
-// 	}, function() {
-// 		// Change Function
-// 		// console.log("Changed.");
-// 	});
-
-// 	$("#weight").slicer([
-// 		// data
-// 	{
-// 		value: 50,
-// 		color: "#ff47a7",
-// 		editable: true,
-// 		slider: true
-// 	}, {
-// 		value: 30,
-// 		color: "#47ffa7"
-// 	}, {
-// 		value: 20,
-// 		color: "#47a7ff"
-// 	}], {
-// 		// options
-// 		width: "500px",
-// 		height: "40px"
-// 	}, function() {
-// 		// select function
-// 	});
-// })
+module.exports = {
+  all: bower.concat(sourceFiles).concat(testFiles).concat(demoFiles),
+  app: sourceFiles,
+  bump: bumpFiles,
+  lint: miscFiles.concat(sourceFiles).concat(testFiles).concat(miscFiles),
+  src: sourceFiles,
+  test: testFiles
+};

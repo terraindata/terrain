@@ -108,55 +108,6 @@ _terrainBuilderExtension.cards = function(_deps) {
 		name: "Order",
 		useTitle: true,
 		suggested: true,
-	}, {
-		id: 1,
-		transform: true,
-		name: 'Price',
-		key: 'price',
-		inDataResponse: true,
-		color: $scope.getColor(),
-		data: {
-			// labels: ["$0", "$50", "$100", "$150", "$200", "$250", "$300", "$350", "$400", ">$400"],
-			// bars: [0.44,0.65,1.0,0.58,0.68,0.38,0.24,0.12,0.22],
-			xLabelFormat: function(i, value, isMaxpoint) {
-				return (isMaxpoint ? "> " : "") + "$" + (Math.floor(value));
-			},
-			domain: [0,400, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
-			numberOfBars: 9,
-			barRange: [0,20],
-			points: [0.64, 0.67, 0.90, 1, 0.3599999999999999].reverse(),
-			// points: 5,
-			pointRange: [0,1],
-			barToPointRatio: 2
-		},
-		weight: 50,
-		newCardIsShowing: false,
-		showing: true,
-		suggested: true
-	}, {
-		id: 23,
-		transform: true,
-		name: 'Location',
-		key: 'location',
-		color: $scope.getColor(),
-		data: {
-			// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
-			// bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
-			xLabelFormat: function(i, value, isMaxpoint) {
-				return (isMaxpoint ? "> " : "") + (Math.floor(value * 100) / 100) + " mi";
-			},
-			domain: [0,5, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
-			numberOfBars: 9,
-			barRange: [0,20],
-			points: [1, 0.96, 0.84, 0.64, 0.3599999999999999],
-			// points: 5,
-			pointRange: [0,1],
-			barToPointRatio: 2
-		},
-		weight: 50,
-		newCardIsShowing: false,
-		showing: true,
-		suggested: true
 	}];
 
 	$scope.newCards = [
@@ -164,180 +115,14 @@ _terrainBuilderExtension.cards = function(_deps) {
 			id: -1,
 			name: 'Transform',
 			suggested: true,
-			syntheticCard: 'transform'
+			syntheticCard: 'transform',
+			syntheticModel: {
+				preTransform: true,
+				name: 'Transform Card',
+				newCardIsShowing: false,
+				wasSynthetic: true
+			}
 		}];
-
-	$scope.syntheticCards = {
-		'transform': [
-		{
-			id: 2,
-			transform: true,
-			name: 'Average Rating',
-			key: 'rating',
-			inDataResponse: true,
-			data: {
-				// labels: ["0 Stars", "1 Star", "2 Stars", "3 Stars", "4 Stars", "5 Stars"],
-				// bars: [0.44,0.65,1.0,0.58,0.68],
-				xLabelFormat: function(i, value, isMaxpoint) {
-					return (isMaxpoint ? "> " : "") + (value) + " Stars";
-				},
-				domain: [0,5, false], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
-				numberOfBars: 5,
-				barRange: [0,40],
-				points: [1, 0.96, 0.84, 0.64, 0.3599999999999999].reverse(),
-				pointRange: [0,1],
-				barToPointRatio: 1
-			},
-			weight: 10,
-			newCardIsShowing: false,
-			suggested: true
-		},
-		{
-			transform: true,
-			name: 'Number of Bedrooms',
-			key: 'bedrooms',
-			inDataResponse: true,
-			id: 4,
-			data: {
-				// labels: ["0", "1", "2", "3", "4+"],
-				// bars: [0.27, 0.87, 1, 0.47, 0.17],
-				xLabelFormat: function(i, value, isMaxpoint) {
-					return (isMaxpoint ? "> " : "") + (Math.floor(value));
-				},
-				domain: [0,3, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
-				numberOfBars: 4,
-				barRange: [0,20],
-				points: [0.75, 0.75, 0.75, 0.75],
-				pointRange: [0,1],
-				barToPointRatio: 1
-			},
-			weight: 10,
-			newCardIsShowing: false,
-			suggested: true
-		}, {
-			transform: true,
-			name: 'Number of Stays',
-			key: 'stays',
-			inDataResponse: true,
-			id: 5,
-			data: {
-				// labels: ["0", "10", "25", "100", "250", "1000", "2500", ">2500"],
-				// bars: [0.37, 0.47, 1, 0.87, 0.47, 0.27, 0.17],
-				xLabelFormat: function(i, value, isMaxpoint) {
-					return (isMaxpoint ? "> " : "") + (Math.floor(value));
-				},
-				domain: [0,200, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
-				numberOfBars: 9,
-				points: [1, 0.96, 0.84, 0.64, 0.64].reverse(),
-				pointRange: [0,1],
-				barToPointRatio: 2
-			},
-			weight: 10,
-			newCardIsShowing: false,
-			suggested: true
-		}, {
-			transform: true,
-			name: 'Number of Reviews',
-			key: 'reviews',
-			inDataResponse: true,
-			id: 6,
-			data: {
-				// labels: ["0", "10", "25", "100", "250", "1000", "2500", ">2500"],
-				// bars: [0.47, 0.87, 1, 0.97, 0.39, 0.32, 0.12],
-				xLabelFormat: function(i, value, isMaxpoint) {
-					return (isMaxpoint ? "> " : "") + (Math.floor(value));
-				},
-				domain: [0,100, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
-				numberOfBars: 9,
-				points: [0.4, 0.4, 0.6, 0.8, 1],
-				pointRange: [0,1],
-				barToPointRatio: 2
-			},
-			weight: 10,
-			newCardIsShowing: false,
-			suggested: true
-		}, {
-			id: 7,
-			transform: true,
-			name: 'Location (Map)',
-			key: 'location_map',
-			data: {
-				// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
-				// bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
-				xLabelFormat: function(i, value, isMaxpoint) {
-					return (isMaxpoint ? "> " : "") + (Math.floor(value * 100) / 100) + " mi";
-				},
-				domain: [0,5, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
-				numberOfBars: 9,
-				points: [1, 0.96, 0.84, 0.64, 0.3599999999999999],
-				pointRange: [0,1],
-				barToPointRatio: 2
-			},
-			weight: 10,
-			newCardIsShowing: true,
-			suggested: false
-		}, {
-			id: 8,
-			transform: true,
-			name: 'Location (MapRadius)',
-			key: 'location_mapradius',
-			data: {
-				// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
-				// bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
-				xLabelFormat: function(i, value, isMaxpoint) {
-					return (isMaxpoint ? "> " : "") + (Math.floor(value * 100) / 100) + " mi";
-				},
-				domain: [0,5, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
-				numberOfBars: 9,
-				points: [1, 0.96, 0.84, 0.64, 0.3599999999999999],
-				pointRange: [0,1],
-				barToPointRatio: 2
-			},
-			weight: 10,
-			newCardIsShowing: true,
-			suggested: false
-		}, {
-			id: 9,
-			transform: true,
-			name: 'Location (Radius)',
-			key: 'location_radius',
-			data: {
-				// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
-				// bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
-				xLabelFormat: function(i, value, isMaxpoint) {
-					return (isMaxpoint ? "> " : "") + (Math.floor(value * 100) / 100) + " mi";
-				},
-				domain: [0,5, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
-				numberOfBars: 9,
-				points: [1, 0.96, 0.84, 0.64, 0.3599999999999999],
-				pointRange: [0,1],
-				barToPointRatio: 2
-			},
-			weight: 10,
-			newCardIsShowing: true,
-			suggested: false
-		}, {
-			id: 10,
-			transform: true,
-			name: 'Location (LatLong)',
-			key: 'location_latlong',
-			data: {
-				// labels: ["0 mi", "0.1 mi", "0.25 mi", "0.5 mi", "1 mi", "1.5 mi", "2 mi", "3 mi", "5 mi", ">5 mi"],
-				// bars: [0.07, 0.17, 0.24, 0.27, 0.47, 0.57, 0.63, 0.68, 1.0],
-				xLabelFormat: function(i, value, isMaxpoint) {
-					return (isMaxpoint ? "> " : "") + (Math.floor(value * 100) / 100) + " mi";
-				},
-				domain: [0,5, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
-				numberOfBars: 9,
-				points: [1, 0.96, 0.84, 0.64, 0.3599999999999999],
-				pointRange: [0,1],
-				barToPointRatio: 2
-			},
-			weight: 10,
-			newCardIsShowing: true,
-			suggested: false
-		}
-	]};
 
 	$.each($scope.cards, function(i,c) { c.card = true; });
 	$.each($scope.newCards, function(i,c) { c.card = true; });
@@ -376,7 +161,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 
 	$scope.getAllCards = function() {
 		// silly design decision. TODO make the cards as one variable and adjust accordingly
-		return $scope.cards.concat($scope.newCards).concat($scope.syntheticCards.transform);
+		return $scope.cards.concat($scope.newCards);
 	}
 
 
@@ -418,68 +203,40 @@ _terrainBuilderExtension.cards = function(_deps) {
 		$scope.newCards = $scope.newCards.concat([newCard]);
 	}
 
+	function deepClone(v) {
+		return JSON.parse(JSON.stringify(v)); // supposedly the fastest way to get a deep clone
+	}
 
-	// $scope.syntheticCardOverlay
-
-	$scope.addCard = function(cardToAdd, cardToAddInFrontOf, isSynthetic) {
-		if(cardToAdd.syntheticCard) {
-			alert("Transform cards are still in progress.");
-			return;
-			var cards = $scope.syntheticCards[cardToAdd.syntheticCard];
-			$scope.syntheticCardOverlay(cards, cardToAdd.name, cardToAddInFrontOf);
-		}
-
-		if($scope.cards.indexOf(cardToAdd) !== -1) return;
+	$scope.addCard = function(cardToAdd, cardToAddInFrontOf) {
 		var addAtEnd = false;
 		if(cardToAddInFrontOf == null) {
 			var addAtEnd = true;
 			cardToAddInFrontOf = $scope.cards[0];
 		}
 
-		if(cardToAdd.transform) {
-			if($scope.hasTransformCards()) {
-				cardToAdd.weight = 10;
-				var cardToSubtractWeightFrom = cardToAddInFrontOf;
-				while(cardToSubtractWeightFrom && (cardToSubtractWeightFrom.weight < 2 * cardToAdd.weight || !cardToSubtractWeightFrom.transform))
-					cardToSubtractWeightFrom = $scope.cards[$scope.cards.indexOf(cardToSubtractWeightFrom) + 1];
-				if(!cardToSubtractWeightFrom) {
-					cardToSubtractWeightFrom = cardToAddInFrontOf;
-					while(cardToSubtractWeightFrom && (cardToSubtractWeightFrom.weight < 2 * cardToAdd.weight || !cardToSubtractWeightFrom.transform))
-						cardToSubtractWeightFrom = $scope.cards[$scope.cards.indexOf(cardToSubtractWeightFrom) - 1];
-					if(!cardToSubtractWeightFrom) {
-						alert("There's no more space for a new card right now.");
-						return;
-					}
-				}
-
-				cardToSubtractWeightFrom.weight -= cardToAdd.weight;
-			} else {
-				cardToAdd.weight = 100;
-			}
-			cardToAdd.color = $scope.getColor();
+		if(cardToAdd.syntheticCard) {
+			cardToAdd = deepClone(cardToAdd.syntheticModel);
+			do {
+				cardToAdd.id = Math.floor(Math.random() * 40000);
+			} while($scope.cards.reduce(function(prev,cur) { return cur.id == cardToAdd.id || prev; }, false));
 		}
 
-		// if(cardToAdd.repeated) { // doesn't work (yet)
-		// 	var first = cardToAdd;
-		// 	cardToAdd = $.extend({}, cardToAdd); // clone
-		// 	first.name = 'first';
-		// 	$.each(cardToAdd, function(key,obj) { // attempt to deep clone, please upgrade
-		// 		if(typeof obj == 'object')
-		// 			cardToAdd[key] = $.extend({}, obj);
-		// 	});
-		// }
+		if($scope.cards.indexOf(cardToAdd) !== -1) return;
+
 		$scope.cards.splice(addAtEnd ? $scope.cards.length : $scope.cards.indexOf(cardToAddInFrontOf), 0, cardToAdd);
 		if(cardToAddInFrontOf) 
 			cardToAddInFrontOf.newCardIsShowing = false;
 		if($scope.newCards.indexOf(cardToAdd) != -1 && !cardToAdd.repeated)
 			$scope.newCards.splice($scope.newCards.indexOf(cardToAdd), 1);
 		$timeout(function() {
-			// cardToAdd.allShowing = true;
 			$(".card-container-" + cardToAdd.id).hide();
 			$(".card-container-" + cardToAdd.id).slideDown(250);
-			// $timeout(function() {
-			// }, 500);
 		}, 25);
+	}
+
+	if($scope.ab('start')) {
+		$scope.addCard($scope.newCards[0], $scope.cards[1]);
+		$scope.addCard($scope.newCards[0], $scope.cards[2]);
 	}
 
 	$scope.addCardAndApply = function(cardToAdd, cardToAddInFrontOf) {
@@ -494,15 +251,20 @@ _terrainBuilderExtension.cards = function(_deps) {
 		return arguments[0].newCardIsShowing;
 	}
 
-	$scope.cards_score_updateWeight = function(card, weight) {
-		if(weight > 100)
-			weight = 100;
+	$scope.cards_score_updateWeight = function(card) {
+		if(card.weight > 100)
+			card.weight = 100;
 
-		var diff = card.weight - weight;
-		card.weight = perc;
+		var sumWeight = $scope.cards.reduce(function(sum,cur) {
+			if(cur.weight !== undefined)
+				sum += parseInt(cur.weight);
+			return sum;
+		}, 0);
+
+		var diff = 100 - sumWeight;
 
 		$.each($scope.cards, function(i,c) {
-			if(c.weight !== undefined) {
+			if(c.weight !== undefined && c.id !== card.id) {
 				c.weight += diff;
 				if(c.weight < 0) {
 					diff = -1 * c.weight;
@@ -514,6 +276,11 @@ _terrainBuilderExtension.cards = function(_deps) {
 		});
 	}
 
+	$scope.card_filter_removeField = function(card, fieldIndex) {
+		if(card && card.filters && card.filters.length >= fieldIndex)
+			card.filters.splice(fieldIndex, 1);
+		$scope.resort();
+	}
 
 
 	/* ----------------------------

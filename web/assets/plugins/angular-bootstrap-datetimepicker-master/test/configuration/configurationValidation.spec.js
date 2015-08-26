@@ -42,47 +42,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-$(document).ready(function() {
-	var points = [];
-	for(var i = 0; i < 5; i ++) {
-		points.push(1 - Math.pow((i*2/10), 2));
-	}
-	$("#chart").barline({
-		// Data
-		labels: ["$0", "$100", "$200", "$300", "$400", "$500", "$600", "$700", "$800", "$900+"],
-		bars: [0.44,0.65,1.0,0.58,0.68,0.38,0.24,0.12,0.22],
-		barRange: [0,20],
-		points: points,
-		pointRange: [0,1],
-		barToPointRatio: 2
-	}, {
-		// Options
-		color: "#47ffa7",
-		width: 500,
-		height: 250
-	}, function() {
-		// Change Function
-		// console.log("Changed.");
-	});
+/*globals describe, beforeEach, it, expect, module, inject */
 
-	$("#weight").slicer([
-		// data
-	{
-		value: 50,
-		color: "#ff47a7",
-		editable: true,
-		slider: true
-	}, {
-		value: 30,
-		color: "#47ffa7"
-	}, {
-		value: 20,
-		color: "#47a7ff"
-	}], {
-		// options
-		width: "500px",
-		height: "40px"
-	}, function() {
-		// select function
-	});
-})
+/**
+ * @license angular-bootstrap-datetimepicker
+ * Copyright 2013 Knight Rider Consulting, Inc. http://www.knightrider.com
+ * License: MIT
+ */
+
+/**
+ *
+ *    @author        Dale "Ducky" Lotts
+ *    @since        8/4/13
+ */
+describe('configuration validation', function () {
+  'use strict';
+  var $rootScope;
+  var $compile;
+  beforeEach(module('ui.bootstrap.datetimepicker'));
+  beforeEach(inject(function (_$compile_, _$rootScope_) {
+    $compile = _$compile_;
+    $rootScope = _$rootScope_;
+    $rootScope.date = null;
+  }));
+
+  describe('does not throw exception', function () {
+    it('when no configuration is specified', function () {
+      $compile('<datetimepicker data-ng-model="date"></datetimepicker>')($rootScope);
+    });
+    it('when ng-model value is a valid date string (as if coming from json api)', function () {
+      $rootScope.date = '2013-08-04T23:00:00';
+      $compile('<datetimepicker data-ng-model="date"></datetimepicker>')($rootScope);
+      $rootScope.$digest();
+    });
+  });
+
+  describe('throws exception', function () {
+    it('if ng-model is not specified', function () {
+      function compile() {
+        $compile('<datetimepicker></datetimepicker>')($rootScope);
+      }
+
+      // Can't specify the error message here because it changed starting with 1.2.x
+      expect(compile).toThrow();
+    });
+    it('if invalid option name is specified', function () {
+      function compile() {
+        $compile('<datetimepicker data-ng-model="date" data-datetimepicker-config="{ minview: \'year\' }"></datetimepicker>')($rootScope);
+      }
+
+      expect(compile).toThrow('invalid option: minview');
+    });
+  });
+});
+

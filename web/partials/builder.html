@@ -31,6 +31,28 @@
 						<input ng-model="input.value" ng-change="resort()" type="text" class="input-value-input" placeholder="Value">
 					</div>
 				</div>
+				<div class="input batch-input-area input-{{$index}} has-more-button">
+					<div class="input-name-area">
+						<input ng-model="input.name" type="text" class="input-name-input first-input" placeholder="Name">
+						<div class="pull-right more-button more-2-items">
+							<i class="fa fa-ellipsis-h more-icon"></i>
+							<div class="more-hidden-area">
+								<a class="more-menu-item">Join</a>
+								<a class="more-menu-item" ng-click="removeInputAtIndex($index)">Remove</a>
+							</div>
+						</div>
+					</div>
+					<div class="input-calendar-area">
+						<div class="input-value-area">
+							<!-- <input ng-model="input.date" type="date" class="input-name-input" placeholder="yyyy-MM-dd"> -->
+							<!-- <input ng-model="input.date" type="time" class="input-name-input" step="60"> -->
+						</div>
+	<!--					<div class="input-calendar-value-area">							 
+							<datetimepicker data-ng-model="input.embeddedDate"
+							    data-datetimepicker-config="{ startView:'day', minView:'minute' , minuteStep:15 }" />	
+						</div> -->
+					</div>	
+				</div>
 			</div>
 			<div class="pre-input">
 				<a class="new-card-plus-area" ng-click="newInput(-1)">
@@ -228,7 +250,9 @@
 								<div class="col-xs-4">
 									<input ng-model="f.value" ng-blur="checkForNewInput(card)" ng-keydown="blurOnEnter($event)" placeholder="Value" />
 								</div>
-								<div class="col-xs-1"></div>
+								<div class="col-xs-1">
+									<div class="card-select-delete clickable" ng-click="card_filter_removeField(card, $index)"><i class="fa fa-remove"></i></div>
+								</div>
 							</div>
 							<div class="row">
 								<div class="col-xs-1">
@@ -243,9 +267,31 @@
 							</div>
 							<!-- <a class="new-filter-btn button" ng-click="addFilter(card)">Add a filter</a> -->
 						</div>
-						<div class="card-transform-area" ng-show="card.transform">
-							<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
-							<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
+						<div class="card-transform-area" ng-show="card.transform || card.preTransform">
+							<div class="row">
+								<div class="col-xs-1"></div>
+								<div class="col-xs-4">
+									<div tdb-autocomplete data="transformableFields" model="card.key" placeholder="Field Name" auto-placeholder="Start typing to see matching field names" on-select="transform_newKey(card, obj)"></div>
+								</div>
+								<div class="col-xs-1 arrow-wrapper">
+									<div class="vertically-middle">
+										<img src="assets/img/arrow.png" />
+									</div>
+								</div>
+								<div class="col-xs-5">
+									<div ng-show="card.preTransform">
+										Select a field.
+									</div>
+									<div ng-show="card.transform">
+										<input type="text" ng-model="card.var" />
+									</div>
+								</div>
+								<div class="col-xs-1"></div>
+							</div>
+							<div ng-repeat="t in card.transformArr">
+								<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
+								<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
+							</div>
 						</div>
 						<div class="card-score-area" ng-show="card.scores">
 							<div class="row">
@@ -253,7 +299,7 @@
 								<div class="col-xs-4">
 									<input type="text" ng-model="card.scores.inputField" placeholder="Input Field" />
 								</div>
-								<div class="col-xs-1 score-arrow-wrapper">
+								<div class="col-xs-1 arrow-wrapper">
 									<div class="vertically-middle">
 										<img src="assets/img/arrow.png" />
 									</div>
@@ -272,7 +318,7 @@
 									<div class="weight" rel="{{transformCard.id}}" d3-slicer data="cards" card-id="{{transformCard.id}}" on-change="handleChange(cardId)"></div>
 								</div>
 								<div class="col-xs-1 score-card-weight-wrapper">
-									<input type="tel" class="score-card-weight" ng-model="transformCard.weight" />
+									<input type="tel" class="score-card-weight" ng-model="transformCard.weight" ng-change="cards_score_updateWeight(transformCard)" />
 								</div>
 								<div class="col-xs-1"></div>
 							</div>

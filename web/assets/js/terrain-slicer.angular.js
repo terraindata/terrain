@@ -169,7 +169,8 @@ terrainApp.directive('d3Slicer', ['$window', '$timeout', 'd3Service', function($
 				}
 
 				scope.$watch('data', function(newData, oldData) {
-					if(newData.length != oldData.length)
+					var numSlices = newData.reduce(function(total, cur) { if(cur.transform) total ++; return total; }, 0);
+					if(numSlices != slices.length)
 						init();
 					else
 						updateSlicer();

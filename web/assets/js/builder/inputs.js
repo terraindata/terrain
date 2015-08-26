@@ -57,7 +57,8 @@ _terrainBuilderExtension.inputs = function(_deps) {
 	$scope.inputs = $scope.ab('start') ? [{
 		name: 'MaxPrice',
 		value: '200',
-		showing: true
+		showing: true,
+		date: ((new Date()).setMilliseconds(0))
 	}] : [];
 
 
@@ -70,9 +71,12 @@ _terrainBuilderExtension.inputs = function(_deps) {
 	}
 
 	$scope.newInput = function(index, inputName) {
+		var datenow = new Date();
+		datenow.setMilliseconds(0);
+		datenow.setSeconds(0);
 		var focusValue = inputName ? true : false;
 		inputName = inputName || '';
-		var newInput = { name: inputName, value: '', showing: false };
+		var newInput = { name: inputName, value: '', showing: false, date: datenow };
 		if(index == -1)
 			index = $scope.inputs.length;
 		$scope.inputs.splice(index, 0, newInput);
