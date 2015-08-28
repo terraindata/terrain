@@ -70,6 +70,34 @@ _terrainBuilderExtension.inputs = function(_deps) {
 		return $scope.inputs.reduce(function(prev,cur) { return cur.name == inputName ? cur : prev; }, null);
 	}
 
+	$scope.newInput = function(index, inputName, inputType) {	
+		switch(inputType){
+			case 'namevalue':
+				$scope.newNameValueInput(index, inputName);
+				break;
+			case 'datetime':
+				$scope.newDateTimeInput(index, inputName);
+				break;
+		}
+	}
+
+	$scope.switchInputAtIndex = function(index, newType) {
+		
+		switch(newType) {
+			case 'namevalue':
+				$scope.inputs[index].type = 'namevalue';
+				break;
+			case 'datetime':
+				$scope.inputs[index].type = 'datetime';
+				var dateNow = new Date();
+				dateNow.setMilliseconds(0);
+				dateNow.setSeconds(0);		
+				$scope.inputs[index].value = dateNow;		
+				break;
+		}
+		$scope.apply();
+	}
+
 	$scope.newNameValueInput = function(index, inputName) {
 		var focusValue = inputName ? true : false;
 		inputName = inputName || '';
@@ -102,7 +130,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 			newInput.showing = true;
 			$timeout(function() {
 				if(focusValue)
-					$(".input-"+index+" .input-value-input").focus();
+					$(".input-"+index+" .input-calendar-input").focus();
 				else
 					$(".input-"+index+" .input-name-input").focus();
 			}, 100)
