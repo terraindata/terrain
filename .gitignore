@@ -1,4 +1,6 @@
+.directory
 web/sftp-config.json
 *.DS_Store
 *~
 admin/
+__pycache__

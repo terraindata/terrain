@@ -1,0 +1,754 @@
+write to data segment 32
+newSegment 104 0 0x2873eb8 0x2873ee0
+TQLTextParser begin
+readExpression 3 new line
+readExpression 25 open curly brace, '{',
+readExpression::OpenBrace 1
+readExpression::OpenBrace enter statement code block
+setSegmentSize 0x2873ee0 0x2873ee0 0
+newSegment 104 0 0x2873f20 0x2873f48
+readExpression 3 new line
+readExpression 3 new line
+readExpression 6 letter
+write to data segment 1
+writeBytesToDataSegment 0x2873898 1 33
+120	
+write to code segment 0x2873f48 1
+write to code segment 0x2873f49 2
+write to code segment 0x2873f4b 1
+postExpression 1 space
+postExpression 11 equals sign, '=',
+postExpression: TT: special
+readOperator() '=' -> '='
+handleInfixOrPostfixOperator code: 22
+handleInfixOrPostfixOperator: 22 4 '=' | 251 '='
+readExpression 1 space
+readExpression 4 number
+write to code segment 0x2873f4c 1
+write to code segment 0x2873f4d 1
+postExpression 1 space
+postExpression 10 special symbol
+postExpression: TT: special
+readOperator() '+' -> '+'
+handleInfixOrPostfixOperator code: 4
+handleInfixOrPostfixOperator: 4 4 '+' | 233 '+'
+readExpression 1 space
+readExpression 4 number
+write to code segment 0x2873f4e 1
+write to code segment 0x2873f4f 1
+postExpression 22 semicolon, ';',
+write to code segment 0x2873f50 1
+write to code segment 0x2873f51 1
+handleTerminator 22 semicolon, ';', 44 code block
+write to code segment 0x2873f52 1
+readExpression 6 letter
+write to data segment 1
+writeBytesToDataSegment 0x28738a7 2 35
+102	48	
+write to code segment 0x2873f53 1
+write to code segment 0x2873f54 2
+write to code segment 0x2873f56 1
+postExpression 1 space
+postExpression 11 equals sign, '=',
+postExpression: TT: special
+readOperator() '=' -> '='
+handleInfixOrPostfixOperator code: 22
+handleInfixOrPostfixOperator: 22 4 '=' | 251 '='
+readExpression 1 space
+readExpression 20 open angle bracket, '<',
+setSegmentSize 0x2873f57 0x2873f48 15
+newSegment 104 0 0x2873f97 0x2873fbf
+write to data segment 1
+writeBytesToDataSegment 0x28738ad 7 38
+112	114	111	100	117	99	116	
+write to code segment 0x2873fbf 1
+write to code segment 0x2873fc0 2
+write to code segment 0x2873fc2 1
+readExpression 1 space
+readExpression 6 letter
+write to code segment 0x2873fc3 1
+write to code segment 0x2873fc4 2
+postExpression 17 decimal sign, '.', 
+write to data segment 1
+writeBytesToDataSegment 0x28738be 2 46
+105	100	
+write to code segment 0x2873fc6 1
+write to code segment 0x2873fc7 2
+handleExplicitAccessor : GetMember
+write to code segment 0x2873fc9 1
+postExpression 1 space
+postExpression 11 equals sign, '=',
+postExpression: TT: special
+readOperator() '==' -> '=='
+handleInfixOrPostfixOperator code: 16
+handleInfixOrPostfixOperator: 16 4 '==' | 245 '=='
+readExpression 1 space
+readExpression 4 number
+write to code segment 0x2873fca 1
+write to code segment 0x2873fcb 4
+postExpression 22 semicolon, ';',
+write to code segment 0x2873fcf 1
+handleTerminator 22 semicolon, ';', 46 function body
+write to code segment 0x2873fd0 1
+setSegmentSize 0x2873fd1 0x2873fbf 18
+newSegment 104 0 0x2873fd1 0x2873ff9
+exit group.... 0 
+exit group.... 1
+write to code segment 0x2873ff9 1
+handleTerminator 22 semicolon, ';', 44 code block
+write to code segment 0x2873ffa 1
+readExpression 6 letter
+write to data segment 1
+writeBytesToDataSegment 0x28738d0 2 49
+102	49	
+write to code segment 0x2873ffb 1
+write to code segment 0x2873ffc 2
+write to code segment 0x2873ffe 1
+postExpression 1 space
+postExpression 11 equals sign, '=',
+postExpression: TT: special
+readOperator() '=' -> '='
+handleInfixOrPostfixOperator code: 22
+handleInfixOrPostfixOperator: 22 4 '=' | 251 '='
+readExpression 1 space
+readExpression 20 open angle bracket, '<',
+setSegmentSize 0x2873fff 0x2873ff9 6
+newSegment 104 0 0x287403f 0x2874067
+write to code segment 0x2874067 1
+write to code segment 0x2874068 2
+write to code segment 0x287406a 1
+readExpression 1 space
+readExpression 25 open curly brace, '{',
+readExpression::OpenBrace 1
+readExpression::OpenBrace enter function body code block
+readExpression 6 letter
+write to code segment 0x287406b 1
+write to code segment 0x287406c 2
+postExpression 17 decimal sign, '.', 
+write to code segment 0x287406e 1
+write to code segment 0x287406f 2
+handleExplicitAccessor : GetMember
+write to code segment 0x2874071 1
+postExpression 1 space
+postExpression 11 equals sign, '=',
+postExpression: TT: special
+readOperator() '==' -> '=='
+handleInfixOrPostfixOperator code: 16
+handleInfixOrPostfixOperator: 16 4 '==' | 245 '=='
+readExpression 1 space
+readExpression 4 number
+write to code segment 0x2874072 1
+write to code segment 0x2874073 4
+postExpression 26 close curly brace, '}',
+write to code segment 0x2874077 1
+handleTerminator 26 close curly brace, '}', 44 code block
+exit group.... 0 
+exit group.... 1
+write to code segment 0x2874078 1
+setSegmentSize 0x2874079 0x2874067 18
+newSegment 104 0 0x2874079 0x28740a1
+exit group.... 0 
+exit group.... 1
+postExpression 22 semicolon, ';',
+write to code segment 0x28740a1 1
+handleTerminator 22 semicolon, ';', 44 code block
+write to code segment 0x28740a2 1
+readExpression 6 letter
+write to data segment 1
+writeBytesToDataSegment 0x28738fb 2 52
+102	50	
+write to code segment 0x28740a3 1
+write to code segment 0x28740a4 2
+write to code segment 0x28740a6 1
+postExpression 1 space
+postExpression 11 equals sign, '=',
+postExpression: TT: special
+readOperator() '=' -> '='
+handleInfixOrPostfixOperator code: 22
+handleInfixOrPostfixOperator: 22 4 '=' | 251 '='
+readExpression 1 space
+readExpression 20 open angle bracket, '<',
+setSegmentSize 0x28740a7 0x28740a1 6
+newSegment 104 0 0x28740e7 0x287410f
+write to code segment 0x287410f 1
+write to code segment 0x2874110 2
+write to code segment 0x2874112 1
+readExpression 1 space
+readExpression 6 letter
+readExpression 1 space
+readExpression 6 letter
+write to code segment 0x2874113 1
+write to code segment 0x2874114 2
+postExpression 17 decimal sign, '.', 
+write to code segment 0x2874116 1
+write to code segment 0x2874117 2
+handleExplicitAccessor : GetMember
+write to code segment 0x2874119 1
+postExpression 1 space
+postExpression 11 equals sign, '=',
+postExpression: TT: special
+readOperator() '==' -> '=='
+handleInfixOrPostfixOperator code: 16
+handleInfixOrPostfixOperator: 16 4 '==' | 245 '=='
+readExpression 1 space
+readExpression 4 number
+write to code segment 0x287411a 1
+write to code segment 0x287411b 4
+postExpression 22 semicolon, ';',
+write to code segment 0x287411f 1
+handleTerminator 22 semicolon, ';', 50 return value
+write to code segment 0x2874120 1
+exit group.... 0 
+exit group.... 1
+handleTerminator 22 semicolon, ';', 46 function body
+write to code segment 0x2874121 1
+setSegmentSize 0x2874122 0x287410f 19
+newSegment 104 0 0x2874122 0x287414a
+exit group.... 0 
+exit group.... 1
+write to code segment 0x287414a 1
+handleTerminator 22 semicolon, ';', 44 code block
+write to code segment 0x287414b 1
+readExpression 6 letter
+write to data segment 1
+writeBytesToDataSegment 0x287392b 2 55
+102	51	
+write to code segment 0x287414c 1
+write to code segment 0x287414d 2
+write to code segment 0x287414f 1
+postExpression 1 space
+postExpression 11 equals sign, '=',
+postExpression: TT: special
+readOperator() '=' -> '='
+handleInfixOrPostfixOperator code: 22
+handleInfixOrPostfixOperator: 22 4 '=' | 251 '='
+readExpression 1 space
+readExpression 20 open angle bracket, '<',
+setSegmentSize 0x2874150 0x287414a 6
+newSegment 104 0 0x2874190 0x28741b8
+write to code segment 0x28741b8 1
+write to code segment 0x28741b9 2
+write to code segment 0x28741bb 1
+readExpression 1 space
+readExpression 25 open curly brace, '{',
+readExpression::OpenBrace 1
+readExpression::OpenBrace enter function body code block
+readExpression 6 letter
+readExpression 1 space
+readExpression 6 letter
+write to code segment 0x28741bc 1
+write to code segment 0x28741bd 2
+postExpression 17 decimal sign, '.', 
+write to code segment 0x28741bf 1
+write to code segment 0x28741c0 2
+handleExplicitAccessor : GetMember
+write to code segment 0x28741c2 1
+postExpression 1 space
+postExpression 11 equals sign, '=',
+postExpression: TT: special
+readOperator() '==' -> '=='
+handleInfixOrPostfixOperator code: 16
+handleInfixOrPostfixOperator: 16 4 '==' | 245 '=='
+readExpression 1 space
+readExpression 4 number
+write to code segment 0x28741c3 1
+write to code segment 0x28741c4 4
+postExpression 26 close curly brace, '}',
+write to code segment 0x28741c8 1
+handleTerminator 26 close curly brace, '}', 50 return value
+write to code segment 0x28741c9 1
+exit group.... 0 
+exit group.... 1
+handleTerminator 26 close curly brace, '}', 44 code block
+exit group.... 0 
+exit group.... 1
+write to code segment 0x28741ca 1
+setSegmentSize 0x28741cb 0x28741b8 19
+newSegment 104 0 0x28741cb 0x28741f3
+exit group.... 0 
+exit group.... 1
+postExpression 22 semicolon, ';',
+write to code segment 0x28741f3 1
+handleTerminator 22 semicolon, ';', 44 code block
+write to code segment 0x28741f4 1
+readExpression 6 letter
+handleReferenceStatementOrUnaryPrefixOperator 'db' ref code 0
+visitCodedReference 0
+write to code segment 0x28741f5 1
+write to code segment 0x28741f6 1
+postExpression 17 decimal sign, '.', 
+handleReferenceStatementOrUnaryPrefixOperator ref code 29
+write to code segment 0x28741f7 1
+write to code segment 0x28741f8 1
+handleExplicitAccessor : GetMember
+write to code segment 0x28741f9 1
+postExpression 13 open parenthesis, '(',
+readExpression 6 letter
+write to data segment 1
+writeBytesToDataSegment 0x2873963 1 58
+102	
+write to code segment 0x28741fa 1
+write to code segment 0x28741fb 2
+postExpression 14 close parenthesis, ')', 
+handleTerminator 14 close parenthesis, ')',  43 function argument
+write to code segment 0x28741fd 1
+exit group.... 0 
+exit group.... 1
+postExpression 17 decimal sign, '.', 
+handleReferenceStatementOrUnaryPrefixOperator ref code 29
+write to code segment 0x28741fe 1
+write to code segment 0x28741ff 1
+handleExplicitAccessor : GetMember
+write to code segment 0x2874200 1
+postExpression 13 open parenthesis, '(',
+readExpression 11 equals sign, '=',
+setSegmentSize 0x2874201 0x28741f3 14
+newSegment 104 0 0x2874241 0x2874269
+write to code segment 0x2874269 1
+readExpression 1 space
+readExpression 6 letter
+write to data segment 1
+writeBytesToDataSegment 0x287396f 4 60
+100	97	116	101	
+write to code segment 0x287426a 1
+write to code segment 0x287426b 2
+postExpression 1 space
+postExpression 10 special symbol
+postExpression: TT: special
+readOperator() '>=' -> '>='
+handleInfixOrPostfixOperator code: 20
+handleInfixOrPostfixOperator: 20 4 '>=' | 249 '>='
+readExpression 1 space
+readExpression 4 number
+write to code segment 0x287426d 1
+write to code segment 0x287426e 4
+postExpression 14 close parenthesis, ')', 
+write to code segment 0x2874272 1
+handleTerminator 14 close parenthesis, ')',  46 function body
+write to code segment 0x2874273 1
+setSegmentSize 0x2874274 0x2874269 11
+newSegment 104 0 0x2874274 0x287429c
+exit group.... 0 
+exit group.... 1
+handleTerminator 14 close parenthesis, ')',  43 function argument
+write to code segment 0x287429c 1
+exit group.... 0 
+exit group.... 1
+postExpression 17 decimal sign, '.', 
+handleReferenceStatementOrUnaryPrefixOperator ref code 62
+write to code segment 0x287429d 1
+write to code segment 0x287429e 1
+handleExplicitAccessor : GetMember
+write to code segment 0x287429f 1
+postExpression 13 open parenthesis, '(',
+readExpression 3 new line
+readExpression 5 quote
+write to data segment 1
+writeBytesToDataSegment 0x287398d 1 65
+113	
+write to code segment 0x28742a0 1
+write to code segment 0x28742a1 2
+postExpression 15 comma
+handleTerminator 15 comma 43 function argument
+readExpression 1 space
+readExpression 11 equals sign, '=',
+setSegmentSize 0x28742a3 0x287429c 7
+newSegment 104 0 0x28742e3 0x287430b
+write to code segment 0x287430b 1
+readExpression 1 space
+readExpression 13 open parenthesis, '(',
+readExpression 6 letter
+write to data segment 1
+writeBytesToDataSegment 0x2873994 2 67
+114	116	
+write to code segment 0x287430c 1
+write to code segment 0x287430d 2
+postExpression 1 space
+postExpression 10 special symbol
+postExpression: TT: special
+readOperator() '+' -> '+'
+handleInfixOrPostfixOperator code: 4
+handleInfixOrPostfixOperator: 4 4 '+' | 233 '+'
+readExpression 1 space
+readExpression 6 letter
+write to data segment 1
+writeBytesToDataSegment 0x2873999 4 70
+109	105	110	115	
+write to code segment 0x287430f 1
+write to code segment 0x2874310 2
+postExpression 13 open parenthesis, '(',
+readExpression 4 number
+write to code segment 0x2874312 1
+write to code segment 0x2874313 1
+postExpression 14 close parenthesis, ')', 
+handleTerminator 14 close parenthesis, ')',  43 function argument
+write to code segment 0x2874314 1
+exit group.... 0 
+exit group.... 1
+postExpression 14 close parenthesis, ')', 
+write to code segment 0x2874315 1
+handleTerminator 14 close parenthesis, ')',  42 parenthetical group
+exit group.... 0 
+exit group.... 1
+postExpression 18 slash, '/',
+readOperator() '/' -> '/'
+handleInfixOrPostfixOperator code: 7
+handleInfixOrPostfixOperator: 7 4 '/' | 236 '/'
+readExpression 13 open parenthesis, '(',
+readExpression 6 letter
+write to data segment 1
+writeBytesToDataSegment 0x28739a4 2 75
+110	106	
+write to code segment 0x2874316 1
+write to code segment 0x2874317 2
+postExpression 1 space
+postExpression 10 special symbol
+postExpression: TT: special
+readOperator() '+' -> '+'
+handleInfixOrPostfixOperator code: 4
+handleInfixOrPostfixOperator: 4 4 '+' | 233 '+'
+readExpression 1 space
+readExpression 4 number
+write to code segment 0x2874319 1
+postExpression 14 close parenthesis, ')', 
+write to code segment 0x287431a 1
+handleTerminator 14 close parenthesis, ')',  42 parenthetical group
+exit group.... 0 
+exit group.... 1
+postExpression 14 close parenthesis, ')', 
+write to code segment 0x287431b 1
+handleTerminator 14 close parenthesis, ')',  46 function body
+write to code segment 0x287431c 1
+setSegmentSize 0x287431d 0x287430b 18
+newSegment 104 0 0x287431d 0x2874345
+exit group.... 0 
+exit group.... 1
+handleTerminator 14 close parenthesis, ')',  43 function argument
+write to code segment 0x2874345 1
+exit group.... 0 
+exit group.... 1
+postExpression 17 decimal sign, '.', 
+handleReferenceStatementOrUnaryPrefixOperator ref code 53
+write to code segment 0x2874346 1
+write to code segment 0x2874347 1
+handleExplicitAccessor : GetMember
+write to code segment 0x2874348 1
+postExpression 13 open parenthesis, '(',
+readExpression 14 close parenthesis, ')', 
+handleBareTerminator 14 close parenthesis, ')',  43 function argument
+write to code segment 0x2874349 1
+exit group.... 0 
+exit group.... 1
+postExpression 22 semicolon, ';',
+handleTerminator 22 semicolon, ';', 44 code block
+write to code segment 0x287434a 1
+readExpression 6 letter
+write to data segment 1
+writeBytesToDataSegment 0x28739bd 1 78
+121	
+write to code segment 0x287434b 1
+write to code segment 0x287434c 2
+write to code segment 0x287434e 1
+postExpression 1 space
+postExpression 11 equals sign, '=',
+postExpression: TT: special
+readOperator() '=' -> '='
+handleInfixOrPostfixOperator code: 22
+handleInfixOrPostfixOperator: 22 4 '=' | 251 '='
+readExpression 1 space
+readExpression 25 open curly brace, '{',
+readExpression::OpenBrace 1
+readExpression::OpenBrace: begin object initializer
+write to code segment 0x287434f 1
+readExpression 4 number
+write to code segment 0x2874350 1
+postExpression 15 comma
+handleTerminator 15 comma 48 object key
+write to code segment 0x2874351 1
+write to code segment 0x2874352 1
+readExpression 1 space
+readExpression 4 number
+write to code segment 0x2874353 1
+write to code segment 0x2874354 1
+postExpression 15 comma
+handleTerminator 15 comma 48 object key
+write to code segment 0x2874355 1
+write to code segment 0x2874356 1
+readExpression 1 space
+readExpression 5 quote
+write to data segment 1
+writeBytesToDataSegment 0x28739c9 4 80
+97	115	100	102	
+write to code segment 0x2874357 1
+write to code segment 0x2874358 2
+postExpression 21 colon, ':',
+handleTerminator 21 colon, ':', 48 object key
+readExpression 5 quote
+write to data segment 1
+writeBytesToDataSegment 0x28739d0 6 85
+113	119	101	114	116	121	
+write to code segment 0x287435a 1
+write to code segment 0x287435b 2
+postExpression 26 close curly brace, '}',
+handleTerminator 26 close curly brace, '}', 49 object value
+write to code segment 0x287435d 1
+exit group.... 0 
+exit group.... 1
+exit group.... 0 
+exit group.... 1
+postExpression 22 semicolon, ';',
+write to code segment 0x287435e 1
+handleTerminator 22 semicolon, ';', 44 code block
+write to code segment 0x287435f 1
+readExpression 6 letter
+write to code segment 0x2874360 1
+write to code segment 0x2874361 2
+postExpression 23 open bracket, '[',
+readExpression 4 number
+write to code segment 0x2874363 1
+postExpression 24 close bracket, ']',
+handleTerminator 24 close bracket, ']', 39 explicit accessor
+exit group.... 0 
+exit group.... 1
+handleExplicitAccessor : SetMember
+readExpression 1 space
+readExpression 5 quote
+write to code segment 0x2874364 1
+write to code segment 0x2874365 2
+postExpression 22 semicolon, ';',
+handleTerminator 22 semicolon, ';', 38 set member
+write to code segment 0x2874367 1
+exit group.... 0 
+exit group.... 1
+handleTerminator 22 semicolon, ';', 44 code block
+write to code segment 0x2874368 1
+readExpression 6 letter
+write to code segment 0x2874369 1
+write to code segment 0x287436a 2
+postExpression 17 decimal sign, '.', 
+write to code segment 0x287436c 1
+write to code segment 0x287436d 2
+handleExplicitAccessor : SetMember
+readExpression 1 space
+readExpression 4 number
+write to code segment 0x287436f 1
+write to code segment 0x2874370 2
+postExpression 22 semicolon, ';',
+handleTerminator 22 semicolon, ';', 38 set member
+write to code segment 0x2874372 1
+exit group.... 0 
+exit group.... 1
+handleTerminator 22 semicolon, ';', 44 code block
+write to code segment 0x2874373 1
+readExpression 6 letter
+write to code segment 0x2874374 1
+write to code segment 0x2874375 2
+postExpression 10 special symbol
+postExpression: TT: special
+readOperator() '++' -> '++'
+handleInfixOrPostfixOperator code: 23
+handleInfixOrPostfixOperator: 23 3 '++' | 252 '++'
+postExpression 22 semicolon, ';',
+write to code segment 0x2874377 1
+handleTerminator 22 semicolon, ';', 44 code block
+write to code segment 0x2874378 1
+readExpression 26 close curly brace, '}',
+handleBareTerminator 26 close curly brace, '}', 44 code block
+exit group.... 0 
+exit group.... 1
+write to code segment 0x2874379 1
+setSegmentSize 0x287437a 0x2874345 53
+newSegment 104 0 0x287437a 0x28743a2
+TQLTextParser end
+setSegmentSize 0x28743a2 0x28743a2 0
+layout code segment 0x28742e3 0x287430b 18 0
+writeBytesToDataSegment 0x287430b 18 91
+0	31	34	0	31	37	0	11	15	75	98	31	42	0	5	98	101	88	
+layout code segment 0x2874241 0x2874269 11 0
+writeBytesToDataSegment 0x2874269 11 109
+0	31	27	0	13	-37	94	1	-118	126	88	
+layout code segment 0x2874190 0x28741b8 19 0
+writeBytesToDataSegment 0x28741b8 19 120
+31	5	0	0	31	5	0	19	13	0	65	13	114	-29	1	0	122	88	88	
+layout code segment 0x28740e7 0x287410f 19 0
+writeBytesToDataSegment 0x287410f 19 139
+31	5	0	0	31	5	0	19	13	0	65	13	114	-29	1	0	122	88	88	
+layout code segment 0x287403f 0x2874067 18 0
+writeBytesToDataSegment 0x2874067 18 158
+31	5	0	0	31	5	0	19	13	0	65	13	114	-29	1	0	122	88	
+layout code segment 0x2873f97 0x2873fbf 18 0
+writeBytesToDataSegment 0x2873fbf 18 176
+31	5	0	0	31	5	0	19	13	0	65	13	114	-29	1	0	122	88	
+layout code segment 0x2873f20 0x2873f48 15 2
+writeBytesToDataSegment 0x2873f48 15 194
+31	0	0	63	11	3	11	7	98	60	58	31	2	0	63	
+write to data segment 1
+write to data segment 2
+layout code segment 0x2873fd1 0x2873ff9 6 2
+writeBytesToDataSegment 0x2873ff9 6 212
+60	58	31	16	0	63	
+write to data segment 1
+write to data segment 2
+layout code segment 0x2874079 0x28740a1 6 2
+writeBytesToDataSegment 0x28740a1 6 221
+60	58	31	19	0	63	
+write to data segment 1
+write to data segment 2
+layout code segment 0x2874122 0x287414a 6 2
+writeBytesToDataSegment 0x287414a 6 230
+60	58	31	22	0	63	
+write to data segment 1
+write to data segment 2
+layout code segment 0x28741cb 0x28741f3 14 2
+writeBytesToDataSegment 0x28741f3 14 239
+60	58	34	0	22	29	65	31	25	0	75	22	29	65	
+write to data segment 1
+write to data segment 2
+layout code segment 0x2874274 0x287429c 7 2
+writeBytesToDataSegment 0x287429c 7 256
+74	22	62	65	19	32	0	
+write to data segment 1
+write to data segment 2
+layout code segment 0x287431d 0x2874345 53 0
+writeBytesToDataSegment 0x2874345 53 266
+75	22	53	65	74	58	31	45	0	63	30	5	3	64	11	2	3	64	19	47	0	19	52	0	64	60	58	31	45	0	5	19	52	0	64	58	31	45	0	19	47	0	12	-46	4	64	58	31	0	0	-113	58	88	
+layout code segment 0x2873eb8 0x2873ee0 0 1
+writeBytesToDataSegment 0x2873ee0 0 319
+
+write to data segment 1
+write to data segment 2
+layout code segment 0x287437a 0x28743a2 0 0
+writeBytesToDataSegment 0x28743a2 0 322
+
+write to data segment 1
+Header Data:
+	 total size: 291
+	 data segment size: 59
+	 entry point: 287
+	 flags: 0
+Code Segment:
+59: PushConstantNull 
+60: PushReferenceShort 34 'rt'
+63: PushReferenceShort 37 'mins'
+66: PushConstantByte 15
+68: Call1 
+69: Add 
+70: PushReferenceShort 42 'nj'
+73: PushInteger1 
+74: Add 
+75: Divide 
+76: Return 
+77: PushConstantNull 
+78: PushReferenceShort 27 'date'
+81: PushConstantUInt 2315345627
+86: GreaterThanOrEqual 
+87: Return 
+88: PushReferenceShort 5 'product'
+91: PushConstantNull 
+92: PushReferenceShort 5 'product'
+95: PushConstantStringShortOffset 13 'id'
+98: GetMember 
+99: PushConstantUInt 123762
+104: Equals 
+105: Return 
+106: Return 
+107: PushReferenceShort 5 'product'
+110: PushConstantNull 
+111: PushReferenceShort 5 'product'
+114: PushConstantStringShortOffset 13 'id'
+117: GetMember 
+118: PushConstantUInt 123762
+123: Equals 
+124: Return 
+125: Return 
+126: PushReferenceShort 5 'product'
+129: PushConstantNull 
+130: PushReferenceShort 5 'product'
+133: PushConstantStringShortOffset 13 'id'
+136: GetMember 
+137: PushConstantUInt 123762
+142: Equals 
+143: Return 
+144: PushReferenceShort 5 'product'
+147: PushConstantNull 
+148: PushReferenceShort 5 'product'
+151: PushConstantStringShortOffset 13 'id'
+154: GetMember 
+155: PushConstantUInt 123762
+160: Equals 
+161: Return 
+162: PushReferenceShort 0 'x'
+165: Declare 
+166: PushConstantByte 3
+168: PushConstantByte 7
+170: Add 
+171: Assign 
+172: Pop 
+173: PushReferenceShort 2 'f0'
+176: Declare 
+177: PushFunctionShortOffset 144
+180: Assign 
+181: Pop 
+182: PushReferenceShort 16 'f1'
+185: Declare 
+186: PushFunctionShortOffset 126
+189: Assign 
+190: Pop 
+191: PushReferenceShort 19 'f2'
+194: Declare 
+195: PushFunctionShortOffset 107
+198: Assign 
+199: Pop 
+200: PushReferenceShort 22 'f3'
+203: Declare 
+204: PushFunctionShortOffset 88
+207: Assign 
+208: Pop 
+209: PushCodedReferenceByte 0 'db'
+211: PushCodedStringByte 29 'filter'
+213: GetMember 
+214: PushReferenceShort 25 'f'
+217: Call1 
+218: PushCodedStringByte 29 'filter'
+220: GetMember 
+221: PushFunctionShortOffset 77
+224: Call0 
+225: PushCodedStringByte 62 'let'
+227: GetMember 
+228: PushConstantStringShortOffset 32 'q'
+231: PushFunctionShortOffset 59
+234: Call1 
+235: PushCodedStringByte 53 'flatten'
+237: GetMember 
+238: Call0 
+239: Pop 
+240: PushReferenceShort 45 'y'
+243: Declare 
+244: PushEmptyObject 
+245: PushInteger1 
+246: PushConstantTrue 
+247: SetMember 
+248: PushConstantByte 2
+250: PushConstantTrue 
+251: SetMember 
+252: PushConstantStringShortOffset 47 'asdf'
+255: PushConstantStringShortOffset 52 'qwerty'
+258: SetMember 
+259: Assign 
+260: Pop 
+261: PushReferenceShort 45 'y'
+264: PushInteger1 
+265: PushConstantStringShortOffset 52 'qwerty'
+268: SetMember 
+269: Pop 
+270: PushReferenceShort 45 'y'
+273: PushConstantStringShortOffset 47 'asdf'
+276: PushConstantUShort 1234
+279: SetMember 
+280: Pop 
+281: PushReferenceShort 0 'x'
+284: PostIncrement 
+285: Pop 
+286: Return 
+287: JumpShort 162
+290: Return 
