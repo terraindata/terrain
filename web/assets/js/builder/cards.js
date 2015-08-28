@@ -60,10 +60,6 @@ _terrainBuilderExtension.cards = function(_deps) {
 		{ id: 3, name: 'Renters' },
 		{ id: 4, name: 'Leasers' }
 		];
-		
-	$scope.userDefinedVariables = [
-		{ name: one, value: 1}
-	]
 
 	$scope.colorIndex = 0;
 	$scope.getColor = function() {
