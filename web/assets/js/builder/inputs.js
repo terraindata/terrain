@@ -66,6 +66,17 @@ _terrainBuilderExtension.inputs = function(_deps) {
 	 * Section: Input Helpers
 	 * ---------------------------- */
 	
+	$scope.safeApply = function(fn) {
+		var phase = this.$root.$$phase;
+		if(phase == '$apply' || phase == '$digest') {
+			if(fn && (typeof(fn) === 'function')) {
+	    		fn();
+	  		}
+	  	} else {
+	    	this.$apply(fn);
+	  	}
+	};	
+	
 	$scope.inputFor = function(inputName) {
 		return $scope.inputs.reduce(function(prev,cur) { return cur.name == inputName ? cur : prev; }, null);
 	}
@@ -95,7 +106,9 @@ _terrainBuilderExtension.inputs = function(_deps) {
 				$scope.inputs[index].value = dateNow;		
 				break;
 		}
-		$scope.apply();
+		$timeout(function() {
+			$scope.apply();
+		})
 	}
 
 	$scope.newNameValueInput = function(index, inputName) {
