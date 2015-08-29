@@ -380,23 +380,30 @@
 						</div>
 						<div class="result-img" style="background-image:url('assets/img/data/{{result.id}}.jpg');"></div>
 						<div class="result-text">
-							<div class="result-name" ng-show="selectedField('name')">{{result.name}}</div>
-							<div class="result-info row">
-								<div class="result-rating col-xs-6" ng-show="selectedField('rating')">
-									<div class="result-stars">
-										<div ng-class="result.rating >= 1 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
-										<div ng-class="result.rating >= 2 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
-										<div ng-class="result.rating >= 3 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
-										<div ng-class="result.rating >= 4 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
-										<div ng-class="result.rating >= 5 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
-									</div>
-									<!-- <div class="result-rating-value">({{result.rating}})</div> -->
+							<div ng-repeat="field in selectableFields" ng-show="selectedField(field.name)">
+								<div class="row result-field-row">
+									<div class="col-xs-4 result-field-row-field">{{field.name}}</div>
+									<div class="col-xs-8 result-field-row-value">{{result[field.name]}} &nbsp;</div>
 								</div>
-								<div class="result-stays col-xs-4" ng-show="selectedField('stays')">{{result.stays}} Stays</div>
-								<div class="result-price col-xs-2" ng-show="selectedField('price')">${{result.price}}</div>
 							</div>
-							<div class="result-description" ng-show="selectedField('description')">{{result.description}}</div>
-							<div class="result-nothing-selected" ng-show="selectedField(false)"s>Add fields to a <b>Select</b> card to preview result data here.</div>
+							<div style="display:none;"> <!-- saving in case we figure out better formatting -->
+								<div class="result-name" ng-show="selectedField('name')">{{result.name}}</div>
+								<div class="result-info row">
+									<div class="result-rating col-xs-6" ng-show="selectedField('rating')">
+										<div class="result-stars">
+											<div ng-class="result.rating >= 1 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
+											<div ng-class="result.rating >= 2 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
+											<div ng-class="result.rating >= 3 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
+											<div ng-class="result.rating >= 4 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
+											<div ng-class="result.rating >= 5 ? 'result-star-shown' : 'result-star-hidden'"><i class="fa fa-star"></i></div>
+										</div>
+									</div>
+									<div class="result-stays col-xs-4" ng-show="selectedField('stays')">{{result.stays}} Stays</div>
+									<div class="result-price col-xs-2" ng-show="selectedField('price')">${{result.price}}</div>
+								</div>
+								<div class="result-description" ng-show="selectedField('description')">{{result.description}}</div>
+								<div class="result-nothing-selected" ng-show="selectedField(false)"s>Add fields to a <b>Select</b> card to preview result data here.</div>
+							</div>
 						</div>
 						<div class="more-button more-4-items more-right more-button-large">
 							<i class="fa fa-ellipsis-h more-icon"></i>

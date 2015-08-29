@@ -1070,8 +1070,23 @@ input:focus {
 	background-position-y: center;
 }
 
+@result-padding: 6px;
+
 .result-text {
-	padding: 10px;
+	padding-left: @result-padding;
+	overflow-y: scroll;
+	height: 120px;
+}
+
+
+.result-field-row-field, .result-field-row-value {
+	padding-top: calc(@result-padding / 2);
+	padding-bottom: calc(@result-padding / 2);
+}
+
+.result-field-row-field {
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .result-name {
