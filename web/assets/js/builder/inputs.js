@@ -54,26 +54,58 @@ _terrainBuilderExtension.inputs = function(_deps) {
 	 * Section: Input Initialization
 	 * ---------------------------- */
 
-	$scope.inputs = $scope.ab('start') ? [ /*{
-		name: 'MaxPrice',
-		value: '200',
-		showing: true,
-		date: ((new Date()).setMilliseconds(0))
-	} */] : [];
-
+	$scope.inputs = [];
 
 	/* ----------------------------
 	 * Section: Input Helpers
 	 * ---------------------------- */
 	
+	$scope.safeApply = function(fn) {
+		var phase = this.$root.$$phase;
+		if(phase == '$apply' || phase == '$digest') {
+			if(fn && (typeof(fn) === 'function')) {
+	    		fn();
+	  		}
+	  	} else {
+	    	this.$apply(fn);
+	  	}
+	};	
+	
 	$scope.inputFor = function(inputName) {
 		return $scope.inputs.reduce(function(prev,cur) { return cur.name == inputName ? cur : prev; }, null);
 	}
 
-	$scope.newInput = function(index, inputName, inputValue) {
-		var datenow = new Date();
-		datenow.setMilliseconds(0);
-		datenow.setSeconds(0);
+	$scope.newInput = function(index, inputName, inputType) {	
+		switch(inputType){
+			case 'namevalue':
+				$scope.newNameValueInput(index, inputName);
+				break;
+			case 'datetime':
+				$scope.newDateTimeInput(index, inputName);
+				break;
+		}
+	}
+
+	$scope.switchInputAtIndex = function(index, newType) {
+		
+		switch(newType) {
+			case 'namevalue':
+				$scope.inputs[index].type = 'namevalue';
+				break;
+			case 'datetime':
+				$scope.inputs[index].type = 'datetime';
+				var dateNow = new Date();
+				dateNow.setMilliseconds(0);
+				dateNow.setSeconds(0);		
+				$scope.inputs[index].value = dateNow;		
+				break;
+		}
+		$timeout(function() {
+			$scope.apply();
+		})
+	}
+
+	$scope.newNameValueInput = function(index, inputName, inputValue) {
 		var focusAnything = !inputName && !inputValue;
 		var focusValue = inputName ? true : false;
 		inputName = inputName || '';
@@ -99,7 +131,28 @@ _terrainBuilderExtension.inputs = function(_deps) {
 	}
 
 	if($scope.ab('start'))
-		$scope.newInput(-1, 'MaxPrice', '200');
+		$scope.newNameValueInput(-1, 'MaxPrice', '200');
+	
+	$scope.newDateTimeInput = function(index, inputName) {
+		var dateNow = new Date();
+		dateNow.setMilliseconds(0);
+		dateNow.setSeconds(0);
+		var focusValue = inputName ? true : false;
+		inputName = inputName || '';
+		var newInput = { name: inputName, value: dateNow, showing: false, type: 'datetime' };
+		if(index == -1)
+			index = $scope.inputs.length;
+		$scope.inputs.splice(index, 0, newInput);
+		$timeout(function() {
+			newInput.showing = true;
+			$timeout(function() {
+				if(focusValue)
+					$(".input-"+index+" .input-calendar-input").focus();
+				else
+					$(".input-"+index+" .input-name-input").focus();
+			}, 100)
+		}, 25);		
+	}
 	
 	$scope.removeInputAtIndex = function(index) {
 		$scope.inputs.splice(index, 1);
@@ -145,7 +198,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 			$.each(card.filters, function(index,filter) {
 				if(filter.value && filter.value.length > 0 && filter.valueType == 'input') {
 					if(! $scope.inputs.reduce(function(value,cur) { if(cur.name == filter.value) return true; return value; }, false)) {
-						$scope.newInput(-1, filter.value);
+						$scope.newNameValueInput(-1, filter.value);
 					}
 				}
 			});
