@@ -42,6 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+MAP = 'map';
+INPUT = 'input';
+
 var _terrainBuilderExtension = _terrainBuilderExtension || function() {};
 
 _terrainBuilderExtension.results = function(_deps) {
@@ -80,7 +83,9 @@ _terrainBuilderExtension.results = function(_deps) {
       		result.overrideIndex = false;
 
       		$.each(result, function(key, val) {
-      			$scope.addRawScoreToCardWithKey(key, val);
+      			$scope._v_add('listing.' + key, function(r) {
+      				return r[key];
+      			});
       		});
       	});
 		$scope.resort();
@@ -94,6 +99,11 @@ _terrainBuilderExtension.results = function(_deps) {
 		});
 
 		$scope.orderableFields = $scope.selectableFields.concat([{id: -1, name: '*TerrainScore'}]);
+
+		if($scope.ab('start')) {
+			$scope.transform_newKey($scope.cards[1], {name: 'listing.price'}, true);
+			$scope.transform_newKey($scope.cards[2], {name: 'listing.location'}, true);
+		}
     });
 
 	$scope.selectableFields = [];
@@ -123,36 +133,31 @@ _terrainBuilderExtension.results = function(_deps) {
 		var filtersCard = $scope.cardFor('filters'), passing = true;;
 		if(!filtersCard) return true;
 		$.each(filtersCard.filters, function() {
-			if(!this.field || this.field.length == 0 || this.value.length == 0)
+			if(!passing) return;
+
+			firstValue = $scope._v_result(this.first, result);
+			secondValue = $scope._v_result(this.second, result);
+			if(firstValue === undefined || secondValue === undefined)
 				return;
-			var fieldValue = result[this.field], filterValue;
-			if(this.valueType == 'input') {
-				var input = $scope.inputFor(this.value);
-				if(!input || input.value.length == 0) return;
-				filterValue = input && input.value;
-			} else {
-				filterValue = this.value;
-			}
-			filterValue = parseFloat(filterValue);
-			fieldValue = parseFloat(fieldValue);
+
 			switch(this.operator) {
 				case 'le':
-					passing = passing && (fieldValue <= filterValue);
+					passing = passing && (secondValue <= firstValue);
 					break;
 				case 'lt':
-					passing = passing && (fieldValue < filterValue);
+					passing = passing && (secondValue < firstValue);
 					break;
 				case 'ge':
-					passing = passing && (fieldValue >= filterValue);
+					passing = passing && (secondValue >= firstValue);
 					break;
 				case 'gt':
-					passing = passing && (fieldValue > filterValue);
+					passing = passing && (secondValue > firstValue);
 					break;
 				case 'eq':
-					passing = passing && (fieldValue === filterValue);
+					passing = passing && (secondValue === firstValue);
 					break;
 				case 'ne':
-					passing = passing && (fieldValue !== filterValue);
+					passing = passing && (secondValue !== firstValue);
 					break;
 				case 'in':
 					passing = passing && true; //we need to decide if we want to hack this functionality for the demo or just wait for the backend to do it
@@ -166,7 +171,7 @@ _terrainBuilderExtension.results = function(_deps) {
 	$scope.cardValueForResult = function(card, result) {
 		if(!card.transform)
 			return false;
-		return result[card.key];
+		return $scope._v_result(card.key, result);
 	}
 
 	$scope.cardScoreForResult = function(card, result) {

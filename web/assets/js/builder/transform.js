@@ -57,9 +57,8 @@ _terrainBuilderExtension.transform = function(_deps) {
 	 * ---------------------------- */
 
 	 $scope.transformSettings = {
-		'price': {
+		'listing.price': {
 			name: 'Price',
-			key: 'price',
 			inDataResponse: true,
 			data: {
 				xLabelFormat: function(i, value, isMaxpoint) {
@@ -73,9 +72,8 @@ _terrainBuilderExtension.transform = function(_deps) {
 				barToPointRatio: 2
 			},
 		}, 
-		'location': {
+		'listing.location': {
 			name: 'Location',
-			key: 'location',
 			data: {
 				xLabelFormat: function(i, value, isMaxpoint) {
 					return (isMaxpoint ? "> " : "") + (Math.floor(value * 100) / 100) + " mi";
@@ -88,9 +86,8 @@ _terrainBuilderExtension.transform = function(_deps) {
 				barToPointRatio: 2
 			},
 		},
-		'rating': {
+		'listing.rating': {
 			name: 'Average Rating',
-			key: 'rating',
 			inDataResponse: true,
 			data: {
 				xLabelFormat: function(i, value, isMaxpoint) {
@@ -104,7 +101,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 				barToPointRatio: 1
 			},
 		},
-		'bedrooms': {
+		'listing.bedrooms': {
 			name: 'Number of Bedrooms',
 			inDataResponse: true,
 			data: {
@@ -123,7 +120,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 			newCardIsShowing: false,
 			suggested: true
 		},
-		'stays': {
+		'listing.stays': {
 			name: 'Number of Stays',
 			inDataResponse: true,
 			data: {
@@ -137,7 +134,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 				barToPointRatio: 2
 			},
 		},
-		'reviews': {
+		'listing.reviews': {
 			name: 'Number of Reviews',
 			inDataResponse: true,
 			data: {
@@ -152,7 +149,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 			},
 		},
 		/*
-		'location_map': {
+		'listing.location_map': {
 			name: 'Location (Map)',
 			data: {
 				xLabelFormat: function(i, value, isMaxpoint) {
@@ -165,7 +162,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 				barToPointRatio: 2
 			},
 		},
-		'location_mapradius': {
+		'listing.location_mapradius': {
 			name: 'Location (MapRadius)',
 			data: {
 				xLabelFormat: function(i, value, isMaxpoint) {
@@ -178,7 +175,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 				barToPointRatio: 2
 			},
 		},
-		'location_radius': {
+		'listing.location_radius': {
 			name: 'Location (Radius)',
 			data: {
 				xLabelFormat: function(i, value, isMaxpoint) {
@@ -191,7 +188,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 				barToPointRatio: 2
 			},
 		},
-		'location_latlong': {
+		'listing.location_latlong': {
 			name: 'Location (LatLong)',
 			data: {
 				xLabelFormat: function(i, value, isMaxpoint) {
@@ -229,15 +226,6 @@ _terrainBuilderExtension.transform = function(_deps) {
 		}, null);
 	}
 
-	$scope.addRawScoreToCardWithKey = function(key, score) {
-		// there must be a better way to do this
-		var card = $scope.transformSettings[key];
-		if(!card) return;
-		card.data.raw = card.data.raw || [];
-      	card.data.raw.push(score);
-	}
-
-
 	$scope.hasTransformCards = function() {
 		return $scope.cards.reduce(function(val, cur) { return val || cur.transform; }, false);
 	}
@@ -247,6 +235,12 @@ _terrainBuilderExtension.transform = function(_deps) {
 	}
 
 	$scope.transform_newKey = function(card, obj, skipApply) {
+		card.key = obj.name;
+		if(!$scope._v_val(card.key)) {
+			alert("No value for that transform card.");
+			return;
+		}
+
 		// weight handling
 		if(card.preTransform) {
 			if($scope.hasTransformCards()) {
@@ -267,8 +261,13 @@ _terrainBuilderExtension.transform = function(_deps) {
 			card.color = $scope.getColor();
 		}
 
-		card.key = obj.name;
 		$.extend(card, $scope.transformSettings[card.key]);
+
+		card.data.raw = [];
+		$.each($scope.results, function() {
+			// TODO make sure you update the raw values if you're transforming a Let variable, and it changes
+			card.data.raw.push($scope._v_result(card.key, this));
+		});
 		
 		card.preTransform = undefined;
 		card.transform = true;
@@ -278,11 +277,6 @@ _terrainBuilderExtension.transform = function(_deps) {
 
 		if(!skipApply)
 			$scope.$apply();
-	}
-
-	if($scope.ab('start')) {
-		$scope.transform_newKey($scope.cards[1], {name: 'price'}, true);
-		$scope.transform_newKey($scope.cards[2], {name: 'location'}, true);
 	}
 
 

@@ -7,9 +7,9 @@
 			</div>
 		</h1>
 		<div class="fixed-area inputs-area" ng-show="showing('inputs')">
-			<div ng-repeat="input in inputs" ng-slide-down="input.showing" duration="0.5" class="input-container">
+			<div ng-repeat="input in inputs" ng-show="input.showing" ng-slide-down="input.showing" duration="0.5" class="input-container">
 				<div class="pre-input">
-					<a class="new-card-plus-area" ng-click="newInput($index)">
+					<a class="new-card-plus-area" ng-click="newInput($index)" clicked="300">
 						<div class="new-card-plus-line"></div>
 						<div class="new-card-plus">
 							+
@@ -18,7 +18,7 @@
 				</div>
 				<div class="input batch-input-area input-{{$index}} has-more-button">
 					<div class="input-name-area">
-						<input ng-model="input.name" type="text" class="input-name-input first-input" placeholder="Name">
+						<input ng-model="input.name" ng-change="input_name_changed(input)" type="text" class="input-name-input first-input" placeholder="Name">
 						<div class="pull-right more-button more-2-items">
 							<i class="fa fa-ellipsis-h more-icon"></i>
 							<div class="more-hidden-area">
@@ -205,8 +205,9 @@
 								<div class="col-xs-1">
 									
 								</div>
-								<div class="col-xs-4">
-									<div tdb-autocomplete data="selectableFields" model="f.field" placeholder="Field" auto-placeholder="Start typing to see matching field names" on-select="apply()" class="filter-field-input-wrapper"></div>
+								<div class="col-xs-4 filter-field-input-wrapper">
+									<!-- <div tdb-autocomplete data="selectableFields" model="f.field" placeholder="Field" auto-placeholder="Start typing to see matching field names" on-select="apply()" class=""></div> -->
+									<input ng-model="f.first" ng-blur="input_checkForNewInput(f.first)" ng-keydown="blurOnEnter($event)" placeholder="Value" />
 								</div>
 								<div class="col-xs-2 center-align">
 									<div class="sign-selector">
@@ -248,7 +249,7 @@
 									</div>
 								</div> -->
 								<div class="col-xs-4">
-									<input ng-model="f.value" ng-blur="checkForNewInput(card)" ng-keydown="blurOnEnter($event)" placeholder="Value" />
+									<input ng-model="f.second" ng-blur="input_checkForNewInput(f.second)" ng-keydown="blurOnEnter($event)" placeholder="Value" />
 								</div>
 								<div class="col-xs-1">
 									<div class="card-select-delete clickable" ng-click="card_filter_removeField(card, $index)"><i class="fa fa-remove"></i></div>

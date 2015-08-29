@@ -213,3 +213,25 @@ terrainApp.directive('ngStepChange', function($parse) {
         });
     };
 });
+
+terrainApp.directive('clicked', ['$timeout', function($timeout) {
+    return function(scope, element, attr) {
+
+        element.on('touchend mouseup', function(event) {
+        // element.on('touchend', function(event) {
+            element.addClass("ng-clicked");
+            $timeout(function() {
+                element.removeClass('ng-clicked');
+                if(attr.clickedSecond) {
+                    element.addClass("ng-clicked-second");
+                    $timeout(function() {
+                        element.removeClass('ng-clicked-second');
+                    }, parseInt(attr.clickedSecond) || 250);
+                }
+            }, parseInt(attr.clicked) || 250);
+            // scope.$apply(function() { 
+                // scope.$eval(attr.touchend); 
+            // });
+        });
+    };
+}]);

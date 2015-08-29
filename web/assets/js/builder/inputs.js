@@ -54,12 +54,12 @@ _terrainBuilderExtension.inputs = function(_deps) {
 	 * Section: Input Initialization
 	 * ---------------------------- */
 
-	$scope.inputs = $scope.ab('start') ? [{
+	$scope.inputs = $scope.ab('start') ? [ /*{
 		name: 'MaxPrice',
 		value: '200',
 		showing: true,
 		date: ((new Date()).setMilliseconds(0))
-	}] : [];
+	} */] : [];
 
 
 	/* ----------------------------
@@ -70,29 +70,62 @@ _terrainBuilderExtension.inputs = function(_deps) {
 		return $scope.inputs.reduce(function(prev,cur) { return cur.name == inputName ? cur : prev; }, null);
 	}
 
-	$scope.newInput = function(index, inputName) {
+	$scope.newInput = function(index, inputName, inputValue) {
 		var datenow = new Date();
 		datenow.setMilliseconds(0);
 		datenow.setSeconds(0);
+		var focusAnything = !inputName && !inputValue;
 		var focusValue = inputName ? true : false;
 		inputName = inputName || '';
-		var newInput = { name: inputName, value: '', showing: false, date: datenow };
+		inputValue = inputValue || '';
+		var newInput = { name: inputName, value: inputValue, showing: false, date: datenow };
 		if(index == -1)
 			index = $scope.inputs.length;
 		$scope.inputs.splice(index, 0, newInput);
 		$timeout(function() {
 			newInput.showing = true;
-			$timeout(function() {
-				if(focusValue)
-					$(".input-"+index+" .input-value-input").focus();
-				else
-					$(".input-"+index+" .input-name-input").focus();
-			}, 100)
-		}, 25);
+			if(focusAnything) {
+				$timeout(function() {
+					if(focusValue)
+						$(".input-"+index+" .input-value-input").focus();
+					else
+						$(".input-"+index+" .input-name-input").focus();
+				}, 100);
+			}
+		}, 250);
+
+		if(inputName.length > 0)
+			input_addToV(newInput);
 	}
+
+	if($scope.ab('start'))
+		$scope.newInput(-1, 'MaxPrice', '200');
 	
 	$scope.removeInputAtIndex = function(index) {
 		$scope.inputs.splice(index, 1);
+	}
+
+	function input_addToV(input) {
+		var key = "input." + input.name;
+		$scope._v_move_or_add(input.prevKey, key, function() { return input.value; });
+		input.prevKey = key;
+
+		$scope.resort();
+
+		/*
+		// TODO mabye need to consider atomicity and race conditions, here's a basic start
+		var fn = function() {
+			// ...
+		};
+
+		input.fns = input.fns || [];
+		input.fns.push(fn);
+		(input.fns.pop())();
+		*/
+	}
+
+	$scope.input_name_changed = function(input) {
+		input_addToV(input);
 	}
 
 	
@@ -102,7 +135,12 @@ _terrainBuilderExtension.inputs = function(_deps) {
 	 * ---------------------------- */
 
 
-	$scope.checkForNewInput = function(card) {
+	$scope.input_checkForNewInput = function(inputName) {
+		if(inputName && inputName.indexOf("input.") === 0)
+			if(! $scope.inputs.reduce(function(value,cur) { if(cur.name === inputName) return true; return value; }, false)) {
+				$scope.newInput(-1, inputName.substr("input.".length));
+			}
+		/*
 		if(card.filters) {
 			$.each(card.filters, function(index,filter) {
 				if(filter.value && filter.value.length > 0 && filter.valueType == 'input') {
@@ -112,6 +150,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 				}
 			});
 		}
+		*/
 	}
 
 

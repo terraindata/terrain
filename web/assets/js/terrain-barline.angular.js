@@ -356,6 +356,22 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			.selectAll("circle")
 			.data(data.points)
 			.enter()
+			/* .append("g") // for this I was thinking about a guideline that appears when you hover over the point
+			.attr("class", "circle-g")
+			.append("rect")
+			.attr("x", function(d, i) {
+				return 0;
+			})
+			.attr("width", function(d, i) {
+				return 200;
+			})
+			.attr("height", function(d, i) {
+				return 1;
+			})
+			.attr("y", function(d, i) {
+				return pointY(d);
+			})
+			.attr("fill", "#f00") */
 			.append("circle")
 			.attr("cx", function(d, i) {
 				return pointX(i);

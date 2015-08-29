@@ -84,9 +84,8 @@ _terrainBuilderExtension.cards = function(_deps) {
 	}, {
 		id: 237,
 		filters: [{
-			field: 'price',
-			valueType: 'input',
-			value: 'MaxPrice',
+			first: 'input.MaxPrice',
+			second: 'listing.price',
 			operator: 'le'
 		}],
 		name: 'Filter',
@@ -190,10 +189,9 @@ _terrainBuilderExtension.cards = function(_deps) {
 			operator: 'le'
 		});
 		setTimeout(function() {
-			$(".card-"+card.id).find(".filter-field-input-wrapper:last-child input").focus();
+			$(".card-"+card.id).find(".filter-field-input-wrapper:last input").focus();
 		}, 250);
 	}
-
 
 	$scope.removeCard = function(card) {
 		$scope.cards.splice($scope.cards.indexOf(card), 1);

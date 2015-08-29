@@ -100,13 +100,59 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		$scope.$apply();
 	}
 
+	// avoid touching this; use helper functions.
+	var _v = {};
+
+	// Use this function to get the value for 'result' for any string 'key'
+	$scope._v_result = function(key, result) {
+		if(!_v[key]) {
+			return false;
+		}
+		return _v[key](result);
+	}
+
+	$scope._v_val = function(key) {
+		return _v[key];
+	}
+
+	// val can be a single value or a function that takes a 'result' argument
+	// returns false and does nothing if key is already set, or for invalid key
+	$scope._v_add = function(key, val) {
+		if(!key || key.length === 0 || _v[key])
+			return false;
+
+		if(typeof val !== 'function') {
+			var v = val;
+			val = function(result) {
+				return v;
+			}
+		}
+
+		_v[key] = val;
+		return true;
+	}
+
+	// returns false and does nothing if originalKey is not already set
+	$scope._v_move = function(originalKey, newKey) {
+		if(originalKey && _v[originalKey]) {
+			_v[newKey] = _v[originalKey];
+			delete _v[originalKey];
+			return true;
+		} 
+		return false;
+	}
+
+	// val can be a single value or a function that takes a 'result' argument
+	$scope._v_move_or_add = function(originalKey, newKey, val) {
+		if(!$scope._v_move(originalKey, newKey))
+			return $scope._v_add(newKey, val);
+	}
 
 	// Note: Order may matter. Be careful.
 	_terrainBuilderExtension.cards(_deps);
-	_terrainBuilderExtension.inputs(_deps);
 	_terrainBuilderExtension.results(_deps);
+	_terrainBuilderExtension.inputs(_deps);
 	_terrainBuilderExtension.transform(_deps);
-
 }]);
 
 terrainControllers.controller('PlaceholderCtrl', ['$scope', '$routeParams', function($scope, $routeParams) {
