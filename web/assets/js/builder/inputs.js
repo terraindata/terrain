@@ -110,7 +110,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 		var focusValue = inputName ? true : false;
 		inputName = inputName || '';
 		inputValue = inputValue || '';
-		var newInput = { name: inputName, value: inputValue, showing: false, date: datenow };
+		var newInput = { name: inputName, value: inputValue, showing: false, type: 'namevalue'};
 		if(index == -1)
 			index = $scope.inputs.length;
 		$scope.inputs.splice(index, 0, newInput);
