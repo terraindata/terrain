@@ -28,7 +28,7 @@
 						</div>
 					</div>
 					<div class="input-value-area">
-						<input ng-model="input.value" ng-change="resort()" type="text" class="input-value-input" placeholder="Value">
+						<input ng-model="input.stringValue" ng-change="resort()" type="text" class="input-value-input" placeholder="Value">
 					</div>
 				</div>
 				<div class="input batch-input-area input-{{$index}} has-more-button" ng-show="input.type == 'datetime'">
@@ -43,8 +43,8 @@
 						</div>
 					</div>
 					<div class="input-calendar-area">
-						<input ng-model="input.value" type="date" class="input-calendar-input-top" placeholder="yyyy-MM-dd">
-						<input ng-model="input.value" type="time" class="input-calendar-input-bottom" step="60">
+						<input ng-model="input.dateValue" type="date" class="input-calendar-input-top" placeholder="yyyy-MM-dd">
+						<input ng-model="input.dateValue" type="time" class="input-calendar-input-bottom" step="60">
 				<!--<div class="input-calendar-value-area">							 
 						<datetimepicker data-ng-model="input.embeddedDate"
 						data-datetimepicker-config="{ startView:'day', minView:'minute' , minuteStep:15 }" />	

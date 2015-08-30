@@ -97,7 +97,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 				var dateNow = new Date();
 				dateNow.setMilliseconds(0);
 				dateNow.setSeconds(0);		
-				$scope.inputs[index].value = dateNow;		
+				$scope.inputs[index].dateValue = dateNow;		
 				break;
 		}
 		$timeout(function() {
@@ -110,7 +110,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 		var focusValue = inputName ? true : false;
 		inputName = inputName || '';
 		inputValue = inputValue || '';
-		var newInput = { name: inputName, value: inputValue, showing: false, type: 'namevalue'};
+		var newInput = { name: inputName, stringValue: inputValue, showing: false, type: 'namevalue'};
 		if(index == -1)
 			index = $scope.inputs.length;
 		$scope.inputs.splice(index, 0, newInput);
@@ -139,7 +139,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 		dateNow.setSeconds(0);
 		var focusValue = inputName ? true : false;
 		inputName = inputName || '';
-		var newInput = { name: inputName, value: dateNow, showing: false, type: 'datetime' };
+		var newInput = { name: inputName, dateValue: dateNow, showing: false, type: 'datetime' };
 		if(index == -1)
 			index = $scope.inputs.length;
 		$scope.inputs.splice(index, 0, newInput);
