@@ -322,6 +322,23 @@
 								<div class="col-xs-1"></div>
 							</div>
 						</div>
+						<div class="card-let-area" ng-show="card.let">
+							<div class="row">
+								<div class="col-xs-1"></div>
+								<div class="col-xs-4">
+									<input type="text" ng-model="card.let.key" ng-change="card_let_keyUpdate(card)" placeholder="Key" />
+								</div>
+								<div class="col-xs-1 arrow-wrapper">
+									<div class="vertically-middle">
+										<img src="assets/img/arrow.png" />
+									</div>
+								</div>
+								<div class="col-xs-5">
+									<input type="text" ng-change="card_let_expressionUpdate(card)" ng-model="card.let.expression" placeholder="Expression" />
+								</div>
+								<div class="col-xs-1"></div>
+							</div>
+						</div>
 						<div class="card-body-spacing"></div>
 					</div>
 				</div>

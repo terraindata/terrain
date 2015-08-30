@@ -117,8 +117,11 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 
 	// val can be a single value or a function that takes a 'result' argument
 	// returns false and does nothing if key is already set, or for invalid key
-	$scope._v_add = function(key, val) {
-		if(!key || key.length === 0 || _v[key])
+	$scope._v_add = function(key, val, overwrite) {
+		if(!key || key.length === 0)
+			return false;
+
+		if(_v[key] && !overwrite)
 			return false;
 
 		if(typeof val !== 'function') {
