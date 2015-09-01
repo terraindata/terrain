@@ -101,8 +101,8 @@ _terrainBuilderExtension.results = function(_deps) {
 		$scope.orderableFields = $scope.selectableFields.concat([{id: -1, name: '*TerrainScore'}]);
 
 		if($scope.ab('start')) {
-			$scope.transform_newKey($scope.cards[1], {name: 'listing.price'}, true);
-			$scope.transform_newKey($scope.cards[2], {name: 'listing.location'}, true);
+			$scope.transform_newKey($scope.cards[1], 'listing.price');
+			$scope.transform_newKey($scope.cards[2], 'listing.location');
 		}
     });
 
@@ -135,29 +135,29 @@ _terrainBuilderExtension.results = function(_deps) {
 		$.each(filtersCard.filters, function() {
 			if(!passing) return;
 
-			firstValue = $scope._v_result(this.first, result);
-			secondValue = $scope._v_result(this.second, result);
+			firstValue = parseFloat($scope._v_result(this.first, result));
+			secondValue = parseFloat($scope._v_result(this.second, result));
 			if(firstValue === undefined || secondValue === undefined)
 				return;
 
 			switch(this.operator) {
 				case 'le':
-					passing = passing && (secondValue <= firstValue);
+					passing = passing && (firstValue <= secondValue);
 					break;
 				case 'lt':
-					passing = passing && (secondValue < firstValue);
+					passing = passing && (firstValue < secondValue);
 					break;
 				case 'ge':
-					passing = passing && (secondValue >= firstValue);
+					passing = passing && (firstValue >= secondValue);
 					break;
 				case 'gt':
-					passing = passing && (secondValue > firstValue);
+					passing = passing && (firstValue > secondValue);
 					break;
 				case 'eq':
-					passing = passing && (secondValue === firstValue);
+					passing = passing && (firstValue === secondValue);
 					break;
 				case 'ne':
-					passing = passing && (secondValue !== firstValue);
+					passing = passing && (firstValue !== secondValue);
 					break;
 				case 'in':
 					passing = passing && true; //we need to decide if we want to hack this functionality for the demo or just wait for the backend to do it
@@ -195,7 +195,7 @@ _terrainBuilderExtension.results = function(_deps) {
 	$scope.scoreForResult = function(result) {
 		var orderCard = $scope.cardFor('order');
 		if(orderCard && orderCard.order.field != '*TerrainScore') {
-			return result[orderCard.order.field];
+			return $scope._v_result(orderCard.order.field, result);
 		}
 
 		// TerrainScore
@@ -213,12 +213,16 @@ _terrainBuilderExtension.results = function(_deps) {
 
 	$scope.resort = function() {
 		if(!$scope.results) return;
+
+		$.each($scope.results, function() {
+			this.showing = $scope.filterResult(this);
+		})
 		
 		// since we want to allow manual overrides, we have to make our own sorting function. Fun, I know.
 		// assumes: overrideIndexes are unique
 		var showingResults = 0;
 		var overrides = $scope.results.reduce(function(overrides, result) {
-			if(result.overrideIndex !== false && $scope.filterResult(result)) {
+			if(result.overrideIndex !== false && result.showing) {
 				overrides[result.overrideIndex] = result;
 				result.index = result.overrideIndex;
 				showingResults ++;
@@ -227,7 +231,7 @@ _terrainBuilderExtension.results = function(_deps) {
 		}, {});
 		var scores = [];
 		var normals = $scope.results.reduce(function(normals, result) {
-			if(result.overrideIndex === false && $scope.filterResult(result)) {
+			if(result.overrideIndex === false && result.showing) {
 				var score = $scope.scoreForResult(result);
 				if(!normals[score])
 					normals[score] = [];
@@ -349,13 +353,18 @@ _terrainBuilderExtension.results = function(_deps) {
 	}
 
 	
-	$scope.selectedField = function(field) {
+	$scope.selectedKey = function(field) {
 		var selectCard =  $scope.cardFor('select');
 		if(selectCard) {
 			if(!field && selectCard.select.fields.length == 0) return true;
 			return selectCard.select.fields.indexOf(field) != -1;
 		}
 		return field;
+	}
+
+	$scope.logSelectCard = function() {
+		var selectCard =  $scope.cardFor('select');
+		console.log(selectCard);
 	}
 
 
@@ -406,7 +415,7 @@ _terrainBuilderExtension.results = function(_deps) {
 			var columns = Math.round(ele(result).parent().width() / ele(result).width());
 
 			y = $scope.results.reduce(function(total, current) {
-				if(current.index < result.index && (current.index - 1) % columns == 0 && $scope.filterResult(current))
+				if(current.index < result.index && (current.index - 1) % columns == 0 && current.showing)
 					total += ele(current).height();
 				return total;
 			}, 0);

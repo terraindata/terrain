@@ -77,7 +77,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 	}, {
 		id: 17,
 		select: {
-			fields: ['name', 'price', 'rating', 'stays', 'description']
+			fields: ['listing.name', 'listing.price', 'listing.rating', 'listing.stays', 'listing.description']
 		},
 		name: 'Select',
 		suggested: true
@@ -95,8 +95,8 @@ _terrainBuilderExtension.cards = function(_deps) {
 		name: "Score",
 		suggested: true,
 		scores: {
-			inputField: "Score",
-			outputField: "WeightedScore"
+			inputField: "Weighted",
+			outputField: "FinalScore"
 		}		
 	}, { 
 		id: 0,
@@ -314,6 +314,12 @@ _terrainBuilderExtension.cards = function(_deps) {
 	$scope.card_filter_removeField = function(card, fieldIndex) {
 		if(card && card.filters && card.filters.length >= fieldIndex)
 			card.filters.splice(fieldIndex, 1);
+		$scope.resort();
+	}
+
+	$scope.card_filter_setOperator = function(card, fieldIndex, operator) {
+		console.log(arguments);
+		card.filters[fieldIndex].operator = operator;
 		$scope.resort();
 	}
 

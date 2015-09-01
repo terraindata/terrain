@@ -234,10 +234,11 @@ _terrainBuilderExtension.transform = function(_deps) {
 		return $scope.cards.reduce(function(builder, cur) { if(cur.transform) builder.push(cur); return builder; }, []);
 	}
 
-	$scope.transform_newKey = function(card, obj, skipApply) {
-		card.key = obj.name;
+	$scope.transform_newKey = function(card, obj, doApply) {
+		console.log(arguments);
+		if(obj) card.key = obj;
 		if(!$scope._v_val(card.key)) {
-			alert("No value for that transform card.");
+			console.log("No value for that transform card.");
 			return;
 		}
 
@@ -275,8 +276,10 @@ _terrainBuilderExtension.transform = function(_deps) {
 
 		$scope.resort();
 
-		if(!skipApply)
+		if(doApply) {
+			console.log('a')
 			$scope.$apply();
+		}
 	}
 
 
