@@ -4491,7 +4491,7 @@ ul.tagit.inverse li.tagit-choice .tagit-close:focus .ui-icon-close:before {
 .datetimepicker table tr td.active,
 .datetimepicker table tr span.active {
     background-image: none !important;
-    background: #348fe2!important;
+    background: #bdc2ad!important;
     color: #fff !important;
 }
 .datetimepicker table {
