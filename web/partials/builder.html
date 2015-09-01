@@ -151,14 +151,54 @@
 								</div>
 								<div class="col-xs-1"></div>
 							</div>
+							<div ng-repeat="join in card.from.joins" ng-slide-down="join.showing" duration="0.5" class="input-container" class="row">
+								<div class="row card-join-area">
+									<div class="col-xs-1"></div>
+									<div class="col-xs-4">
+										<input type="text" class="input-join-input" ng-focus="" placeholder="does this grow correctly?" />
+									</div>
+									<div class="col-xs-2">
+										<input type="text" class="input-join-input" ng-focus="" placeholder="does this grow correctly?" />
+									</div>
+									<div class="col-xs-2 center-align">
+										<div class="sign-selector">
+											<div class="terrain-dropdown terrain-dropdown-5-items">
+												<div class="terrain-dropdown-value-area">
+													<div class="terrain-dropdown-cell" ng-show="join.operator == 'le'">&le;</div>
+													<div class="terrain-dropdown-cell" ng-show="join.operator == 'lt'">&lt;</div>
+													<div class="terrain-dropdown-cell" ng-show="join.operator == 'ge'">&ge;</div>
+													<div class="terrain-dropdown-cell" ng-show="join.operator == 'gt'">&gt;</div>
+													<div class="terrain-dropdown-cell" ng-show="join.operator == 'eq'">=</div>
+												</div>
+												<div class="terrain-dropdown-cell-area">
+													<div class="terrain-dropdown-cell {{join.operator == 'le' ? 'selected' : ''}}" ng-step-change="join.operator = 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&le;</div>
+													<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'le'">&le;</div>
+													<div class="terrain-dropdown-cell {{join.operator == 'lt' ? 'selected' : ''}}" ng-step-change="join.operator = 'lt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'lt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&lt;</div>
+													<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'lt'">&lt;</div>
+													<div class="terrain-dropdown-cell {{join.operator == 'ge' ? 'selected' : ''}}" ng-step-change="join.operator = 'ge'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'ge'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ge;</div>
+													<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'ge'">&ge;</div>
+													<div class="terrain-dropdown-cell {{join.operator == 'gt' ? 'selected' : ''}}" ng-step-change="join.operator = 'gt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'gt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&gt;</div>
+													<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'gt'">&gt;</div>
+													<div class="terrain-dropdown-cell {{join.operator == 'eq' ? 'selected' : ''}}" ng-step-change="join.operator = 'eq'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'eq'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">=</div>
+													<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'eq'">=</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-2">
+										<input type="text" class="input-join-input" ng-focus="" placeholder="does this grow correctly?" />
+									</div>
+									<div class="col-xs-1"></div>
+								</div>
+							</div>
 							<div class="row">
 								<div class="col-xs-1">
-									<div class="new-card-icon" ng-click="">
+									<div class="new-card-icon" ng-click="addBlankJoin()">
 										<div class="new-card-icon-inner">+</div>
 									</div>
 								</div>
 								<div class="col-xs-10">
-									<input class="new-field-input" ng-focus="" placeholder="Add Another Field" />
+									<input class="new-field-input" ng-focus="" placeholder="Add a Join" />
 								</div>
 								<div class="col-xs-1"></div>
 							</div>
