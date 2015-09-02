@@ -151,18 +151,18 @@
 								</div>
 								<div class="col-xs-1"></div>
 							</div>
-							<div ng-repeat="join in card.from.joins" ng-slide-down="join.showing" duration="0.5" class="input-container" class="row">
+							<div ng-repeat="join in card.from.joins" duration="0.5" class="input-container" class="row">
 								<div class="row card-join-area">
 									<div class="col-xs-1"></div>
-									<div class="col-xs-4">
-										<input type="text" class="input-join-input" ng-focus="" placeholder="does this grow correctly?" />
+									<div class="col-xs-5">
+										<input type="text" class="card-join-input" ng-focus="" placeholder="does this grow correctly?" />
 									</div>
 									<div class="col-xs-2">
-										<input type="text" class="input-join-input" ng-focus="" placeholder="does this grow correctly?" />
+										<input type="text" class="card-join-input" ng-focus="" placeholder="does this grow correctly?" />
 									</div>
-									<div class="col-xs-2 center-align">
+									<div class="col-xs-1 center-align input-join-dropdown">
 										<div class="sign-selector">
-											<div class="terrain-dropdown terrain-dropdown-5-items">
+											<div class="terrain-dropdown terrain-dropdown-5-items card-join-dropdown-area">
 												<div class="terrain-dropdown-value-area">
 													<div class="terrain-dropdown-cell" ng-show="join.operator == 'le'">&le;</div>
 													<div class="terrain-dropdown-cell" ng-show="join.operator == 'lt'">&lt;</div>
@@ -186,7 +186,7 @@
 										</div>
 									</div>
 									<div class="col-xs-2">
-										<input type="text" class="input-join-input" ng-focus="" placeholder="does this grow correctly?" />
+										<input type="text" class="card-join-input" ng-focus="" placeholder="does this grow correctly?" />
 									</div>
 									<div class="col-xs-1"></div>
 								</div>
