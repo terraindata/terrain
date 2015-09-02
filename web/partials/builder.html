@@ -50,7 +50,7 @@
 					</div>
 					<div class="input-calendar-value-area">							 
 						<datetimepicker data-ng-model="input.dateValue"
-						data-datetimepicker-config="{ startView:'day', minView:'minute' , minuteStep:15 }" />	
+						data-datetimepicker-config="{ startView:'day', minView:'minute' , minuteStep:30 }" />	
 					</div>
 				</div>
 			</div>
@@ -155,10 +155,10 @@
 								<div class="row card-join-area">
 									<div class="col-xs-1"></div>
 									<div class="col-xs-5">
-										<input type="text" class="card-join-input" ng-focus="" placeholder="does this grow correctly?" />
+										<input type="text" class="card-join-input" ng-model="join.table" placeholder="enter table to join" />
 									</div>
 									<div class="col-xs-2">
-										<input type="text" class="card-join-input" ng-focus="" placeholder="does this grow correctly?" />
+										<input type="text" class="card-join-input" ng-model="join.first" placeholder="" />
 									</div>
 									<div class="col-xs-1 center-align input-join-dropdown">
 										<div class="sign-selector">
@@ -186,19 +186,19 @@
 										</div>
 									</div>
 									<div class="col-xs-2">
-										<input type="text" class="card-join-input" ng-focus="" placeholder="does this grow correctly?" />
+										<input type="text" class="card-join-input" ng-model="join.second" placeholder="" />
 									</div>
 									<div class="col-xs-1"></div>
 								</div>
 							</div>
 							<div class="row">
 								<div class="col-xs-1">
-									<div class="new-card-icon" ng-click="addBlankJoin()">
+									<div class="new-card-icon" ng-click="addBlankJoin(card, -1)">
 										<div class="new-card-icon-inner">+</div>
 									</div>
 								</div>
 								<div class="col-xs-10">
-									<input class="new-field-input" ng-focus="" placeholder="Add a Join" />
+									<div class="card-addjoin-text">Add a Join</div>
 								</div>
 								<div class="col-xs-1"></div>
 							</div>
