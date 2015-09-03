@@ -110,7 +110,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 		name: "Score",
 		suggested: true,
 		scores: {
-			inputField: "Weighted",
+			method: "weighted",
 			outputField: "FinalScore"
 		}		
 	}, { 

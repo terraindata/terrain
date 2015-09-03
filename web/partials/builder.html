@@ -347,7 +347,7 @@
 							<div class="row">
 								<div class="col-xs-1"></div>
 								<div class="col-xs-4">
-									<input type="text" ng-model="card.scores.inputField" placeholder="Input Field" />
+									<input type="text" ng-model="card.scores.method" placeholder="Scoring Method" editable="false" />
 								</div>
 								<div class="col-xs-1 arrow-wrapper">
 									<div class="vertically-middle">
@@ -355,11 +355,11 @@
 									</div>
 								</div>
 								<div class="col-xs-5">
-									<input type="text" ng-model="card.scores.outputField" placeholder="Output Field" />
+									<input type="text" ng-model="card.scores.outputField" editable="false" placeholder="Output Field" />
 								</div>
 								<div class="col-xs-1"></div>
 							</div>
-							<div class="row" ng-repeat="transformCard in cards | filter: { transform: true }">
+							<div class="row" ng-repeat="transformCard in cards | filter: { type: 'transform' }">
 								<div class="col-xs-1"></div>
 								<div class="col-xs-5">
 									<input type="text" ng-value="transformCard.key + '.Score'" disabled />
