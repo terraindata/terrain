@@ -69,7 +69,22 @@ _terrainBuilderExtension.cards = function(_deps) {
 	$scope.cards = [{
 		id:24,
 		from: {
-			value: 'Listings'
+			value: 'Listings',
+			joins: [
+				{
+					table: 'availability',
+					first: 'sitter.id',
+					second: 'availability.sitterID',
+					operator: 'eq',
+					showing: 'true'
+				},
+				{
+					table: 'job',
+					first: 'sitter.id',
+					second: 'job.sitterID',
+					operator: 'eq',
+					showing: 'true'
+				}]
 		},
 		name: 'From',
 		useTitle: true,
@@ -84,8 +99,8 @@ _terrainBuilderExtension.cards = function(_deps) {
 	}, {
 		id: 237,
 		filters: [{
-			first: 'input.MaxPrice',
-			second: 'listing.price',
+			first: 'listing.price',
+			second: 'input.MaxPrice',
 			operator: 'le'
 		}],
 		name: 'Filter',
@@ -175,29 +190,6 @@ _terrainBuilderExtension.cards = function(_deps) {
 		// silly design decision. TODO make the cards as one variable and adjust accordingly
 		return $scope.cards.concat($scope.newCards);
 	}
-/*  TODO Commented out pending Luke's variable definition work
-	//finds the array element by the supplied name and returns the value. Returns null if not found
-	$scope.getUserDefinedAttributeValueByName = function(name) {
-		for (int i=0; i < $scope.userDefineVariables.length; i++) {
-			if ($scope.userDefinedVariables[i].name == name) {
-				return $scope.userDefinedVariables[i].value;
-			}
-		}
-		return null;
-	}
-	
-	//Attempts to remove an element by name and returns the resultant array. If the element is not found, it returns the full array
-	$scope.removeUserDefinedAttributeByName = function(name) {
-		for (int i=0; i < $scope.userDefineVariables.length; i++) {
-			if ($scope.userDefinedVariables[i].name == name) {
-				return $scope.userDefinedVariables.splice(i,1);
-			}
-		}
-		return $scope.userDefinedVariables;		
-	}
-	
-	
-*/
 
 	$scope.cardFor = function(type) {
 		return $scope.cards.reduce(function(prev,cur) { if(cur[type]) return cur; return prev; }, null);
@@ -226,6 +218,10 @@ _terrainBuilderExtension.cards = function(_deps) {
 		setTimeout(function() {
 			$(".card-"+card.id).find(".filter-field-input-wrapper:last input").focus();
 		}, 250);
+	}
+	
+	$scope.addBlankJoin = function() {
+		
 	}
 
 	$scope.removeCard = function(card) {

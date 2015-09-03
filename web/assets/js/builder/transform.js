@@ -235,10 +235,8 @@ _terrainBuilderExtension.transform = function(_deps) {
 	}
 
 	$scope.transform_newKey = function(card, obj, doApply) {
-		console.log(arguments);
 		if(obj) card.key = obj;
 		if(!$scope._v_val(card.key)) {
-			console.log("No value for that transform card.");
 			return;
 		}
 
@@ -277,7 +275,6 @@ _terrainBuilderExtension.transform = function(_deps) {
 		$scope.resort();
 
 		if(doApply) {
-			console.log('a')
 			$scope.$apply();
 		}
 	}
