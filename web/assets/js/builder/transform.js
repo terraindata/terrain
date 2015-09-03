@@ -279,8 +279,27 @@ _terrainBuilderExtension.transform = function(_deps) {
 	$scope.transform_newKey = function(card, obj, doApply) {
 		if(obj) card.key = obj;
 		if(!$scope._v_val(card.key)) {
+			if(card.data) card.data.invalid = true;
+
+			if(doApply) {
+				$scope.$apply();
+			}
 			return;
 		}
+
+		var existingKey = false;
+		$.each($scope.cards, function(i,c) { if(c.transform && c.key == card.key && c.id !== card.id) existingKey = true; });
+		if(existingKey) {
+			card.invalid = true;
+			if(card.data) card.data.invalid = true;
+			
+			if(doApply) {
+				$scope.$apply();
+			}
+			return;
+		}
+		card.invalid = false;
+		if(card.data) card.data.invalid = false;
 
 		// weight handling
 		if(card.preTransform) {
@@ -292,6 +311,10 @@ _terrainBuilderExtension.transform = function(_deps) {
 				
 				if(i >= $scope.cards.length) {
 					alert("There's no more space for a new card right now.");
+
+					if(doApply) {
+						$scope.$apply();
+					}
 					return;
 				}
 

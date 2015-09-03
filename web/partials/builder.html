@@ -313,6 +313,9 @@
 							<!-- <a class="new-filter-btn button" ng-click="addFilter(card)">Add a filter</a> -->
 						</div>
 						<div class="card-transform-area" ng-show="card.transform || card.preTransform">
+							<div class="invalid" ng-show="card.invalid">
+								You can't have two Transform cards for the same property.
+							</div>
 							<div class="row">
 								<div class="col-xs-1"></div>
 								<div class="col-xs-4">
@@ -326,8 +329,8 @@
 									</div>
 								</div>
 								<div class="col-xs-5">
-									<div ng-show="card.preTransform">
-										Select a field.
+									<div ng-show="card.preTransform" class="pre-transform">
+										Select a field to create a Transform card.
 									</div>
 									<div ng-show="card.transform">
 										<input type="text" ng-model="card.transform.outputKey" editable="false" />

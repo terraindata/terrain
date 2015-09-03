@@ -137,9 +137,15 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		data = newData;
 		calcVars();
 		svg.attr('width', opts.width);
-		$(barArea).find('.bar').remove();
 
+		$(barArea).find('.bar').remove();
 		bgArea.selectAll('*').remove();
+		if(!sameData) barArea.selectAll('*').remove(); /* deals with data not being dirty on window resize */
+		scaleArea.selectAll("*").remove();
+		spotlightsArea.selectAll('*').remove();
+		if(!sameData) linesArea.selectAll('*').remove();
+		if(!sameData) svg.selectAll('circle').remove(); /* deals with data not being dirty on window resize */
+
 		bgArea.append('rect')
 			.attr('class', 'bg')
 			.attr('x', minX)
@@ -182,51 +188,9 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 
 		for(var i = 0; i < data.bars.length; i ++)
 			data.bars[i] /= maxValue;
-		
-		if(!sameData) barArea.selectAll('*').remove(); /* deals with data not being dirty on window resize */
-	    barArea.selectAll("rect")
-			.data(data.bars)
-			.enter()
-			.append("rect")
-			.attr("x", function(d, i) {
-				return barStartingX(i);
-			})
-			.attr("y", function(d, i) {
-				return topMargin + workingHeight;
-			})
-			.attr("width", function(d, i) {
-				return barWidth;
-			})
-			.attr("height", function(d, i) {
-				return 0;
-			})
-			.attr("fill", function(d, i) {
-				return barColor;
-			})
-			.attr("stroke", function(d, i) {
-				return d3.rgb(barColor).darker(1.0);
-			})
-			.attr("class", function(d, i) {
-				return "bar bar_" + i;
-			})
-			.transition()
-				.duration(1000)
-				.ease("cubic-out")
-				.attr("height", function(d, i) {
-					if(d)
-						return workingHeight * d;
-					return 0;
-				})
-				.attr("y", function(d, i) {
-					if(d)
-						return barStartingY(d);
-					return 0;
-				})
-			;
 
 		// MARK: Axes
 
-		scaleArea.selectAll("*").remove();
 
 		var barXScale = d3.scale.linear()
 			.domain([0, data.numberOfBars])
@@ -276,10 +240,53 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			.attr('color', '#6b705a')
 			.attr("transform", "translate("+(workingWidth + leftMargin)+","+topMargin+")")
 			.call(yPointAxis);
+		
+		
+		if(data.invalid)
+			return;
+
+	    barArea.selectAll("rect")
+			.data(data.bars)
+			.enter()
+			.append("rect")
+			.attr("x", function(d, i) {
+				return barStartingX(i);
+			})
+			.attr("y", function(d, i) {
+				return topMargin + workingHeight;
+			})
+			.attr("width", function(d, i) {
+				return barWidth;
+			})
+			.attr("height", function(d, i) {
+				return 0;
+			})
+			.attr("fill", function(d, i) {
+				return barColor;
+			})
+			.attr("stroke", function(d, i) {
+				return d3.rgb(barColor).darker(1.0);
+			})
+			.attr("class", function(d, i) {
+				return "bar bar_" + i;
+			})
+			.transition()
+				.duration(1000)
+				.ease("cubic-out")
+				.attr("height", function(d, i) {
+					if(d)
+						return workingHeight * d;
+					return 0;
+				})
+				.attr("y", function(d, i) {
+					if(d)
+						return barStartingY(d);
+					return 0;
+				})
+			;
 
 		// MARK: spotlights
 
-		spotlightsArea.selectAll('*').remove();
 		if(data.spotlights) {
 			$.each(data.spotlights, function() {
 				var spotlightWidth = 4;
@@ -324,7 +331,6 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			lineFunction = lineFunction.interpolate("cardinal");
 		}
 
-		if(!sameData) linesArea.selectAll('*').remove();
 		var lineGroup = linesArea.append('g');
 
 
@@ -345,7 +351,6 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 
 		// MARK: Points
 		// var pointGroup = svg.append('g')
-		if(!sameData) svg.selectAll('circle').remove(); /* deals with data not being dirty on window resize */
 		var touchDown = function(d, i) {
 			$(ele[0]).find(".point_" + i).attr("rel", "active");
 			$(ele[0]).find("[rel=active]").css("stroke", opts.activeColor);
