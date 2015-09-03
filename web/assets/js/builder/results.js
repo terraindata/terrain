@@ -167,47 +167,12 @@ _terrainBuilderExtension.results = function(_deps) {
 		return passing;
 	}
 
-
-	$scope.cardValueForResult = function(card, result) {
-		if(!card.transform)
-			return false;
-		return $scope._v_result(card.key, result);
-	}
-
-	$scope.cardScoreForResult = function(card, result) {
-		var data = card.data;
-		if(!data || !card.transform)
-			return 0;
-		if($scope.cardValueForResult(card, result) === undefined)
-			return 0;
-
-		// TODO replace by a better bucket getter if you redo buckets
-		var bucketStart = data.domain[0];
-		var bucketEnd = data.domain[1];
-		var bucketSize = (bucketEnd - bucketStart) / data.numberOfBars;
-		var bucket = 0;
-		while($scope.cardValueForResult(card, result) > bucketStart + bucketSize * bucket && bucket < data.numberOfBars) bucket ++;
-		bucket --; // we always overshoot it
-
-		return (data.points[Math.floor(bucket / data.barToPointRatio)] + data.points[Math.ceil(bucket / data.barToPointRatio)]) / 2;
-	}
-
 	$scope.scoreForResult = function(result) {
 		var orderCard = $scope.cardFor('order');
-		if(orderCard && orderCard.order.field != '*TerrainScore') {
+		if(orderCard) {
 			return $scope._v_result(orderCard.order.field, result);
 		}
-
-		// TerrainScore
-		var total = 0;
-		$.each($scope.cards, function(index, card) {
-			if(card.transform) {
-				var score = $scope.cardScoreForResult(card,result);
-				if(!isNaN(score))
-					total += score * card.weight / 100;
-			}
-		});
-		return total; 
+		return 0;
 	}
 
 
@@ -385,15 +350,6 @@ _terrainBuilderExtension.results = function(_deps) {
 	$scope.scoreForResultDisplay = function(result) {
 		return $scope.numberToDisplay($scope.scoreForResult(result));
 	}
-
-	$scope.cardValueForResultDisplay = function(card, result) {
-		return $scope.numberToDisplay($scope.cardValueForResult(card, result));
-	}
-
-	$scope.cardScoreForResultDisplay = function(card, result) {
-		return $scope.numberToDisplay($scope.cardScoreForResult(card, result));
-	}
-
 
 	$scope.scoreForResultSort = function(result) {
 		// sorts low to hi and doesn't seem like you can control it from the template

@@ -467,6 +467,23 @@ _terrainBuilderExtension.cards = function(_deps) {
 	}
 
 
+	// Section: score card
+
+	function score_scoreForResult(result) {
+		// TerrainScore
+		var total = 0;
+		$.each($scope.cards, function(index, card) {
+			if(card.transform) {
+				var score = $scope._v_result(card.transform.outputKey,result);
+				if(!isNaN(score))
+					total += score * card.weight / 100;
+			}
+		});
+		return total; 
+	}
+
+	$scope._v_add('*TerrainScore', score_scoreForResult);
+
 	/* ---------------------
 	 * Section: Connector
 	 * --------------------- */
