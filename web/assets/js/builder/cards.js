@@ -220,9 +220,17 @@ _terrainBuilderExtension.cards = function(_deps) {
 		}, 250);
 	}
 	
-	$scope.addBlankJoin = function() {
-		
-	}
+	$scope.addBlankJoin = function(card, joinIndex) {
+		var joinTable = '';
+		var firstValue = '';
+		var secondValue = '';
+		var newOperator = 'eq';
+		var cardIndex = $scope.cards.indexOf(card);
+		var newJoin = { table: joinTable, first: firstValue, second: secondValue, showing: true, operator: newOperator};
+		if(joinIndex == -1)
+			joinIndex = $scope.cards[cardIndex].from.joins.length;
+		$scope.cards[cardIndex].from.joins.splice(joinIndex, 0, newJoin);
+	}	
 
 	$scope.removeCard = function(card) {
 		$scope.cards.splice($scope.cards.indexOf(card), 1);

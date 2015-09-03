@@ -50,7 +50,7 @@
 					</div>
 					<div class="input-calendar-value-area">							 
 						<datetimepicker data-ng-model="input.dateValue"
-						data-datetimepicker-config="{ startView:'day', minView:'minute' , minuteStep:15 }" />	
+						data-datetimepicker-config="{ startView:'day', minView:'minute' , minuteStep:30 }" />	
 					</div>
 				</div>
 			</div>
@@ -151,18 +151,18 @@
 								</div>
 								<div class="col-xs-1"></div>
 							</div>
-							<div ng-repeat="join in card.from.joins" class="input-container" class="row">
+							<div ng-repeat="join in card.from.joins" duration="0.5" class="input-container" class="row">
 								<div class="row card-join-area">
 									<div class="col-xs-1"></div>
-									<div class="col-xs-4">
-										<input type="text" class="input-join-input" ng-focus="" placeholder="does this grow correctly?" />
+									<div class="col-xs-5">
+										<input type="text" class="card-join-input" ng-model="join.table" placeholder="enter table to join" />
 									</div>
 									<div class="col-xs-2">
-										<input type="text" class="input-join-input" ng-focus="" placeholder="does this grow correctly?" />
+										<input type="text" class="card-join-input" ng-model="join.first" placeholder="" />
 									</div>
-									<div class="col-xs-2 center-align">
+									<div class="col-xs-1 center-align input-join-dropdown">
 										<div class="sign-selector">
-											<div class="terrain-dropdown terrain-dropdown-5-items">
+											<div class="terrain-dropdown terrain-dropdown-5-items card-join-dropdown-area">
 												<div class="terrain-dropdown-value-area">
 													<div class="terrain-dropdown-cell" ng-show="join.operator == 'le'">&le;</div>
 													<div class="terrain-dropdown-cell" ng-show="join.operator == 'lt'">&lt;</div>
@@ -186,19 +186,19 @@
 										</div>
 									</div>
 									<div class="col-xs-2">
-										<input type="text" class="input-join-input" ng-focus="" placeholder="does this grow correctly?" />
+										<input type="text" class="card-join-input" ng-model="join.second" placeholder="" />
 									</div>
 									<div class="col-xs-1"></div>
 								</div>
 							</div>
 							<div class="row">
 								<div class="col-xs-1">
-									<div class="new-card-icon" ng-click="addBlankJoin()">
+									<div class="new-card-icon" ng-click="addBlankJoin(card, -1)">
 										<div class="new-card-icon-inner">+</div>
 									</div>
 								</div>
 								<div class="col-xs-10">
-									<input class="new-field-input" ng-focus="" placeholder="Add a Join" />
+									<div class="card-addjoin-text">Add a Join</div>
 								</div>
 								<div class="col-xs-1"></div>
 							</div>
