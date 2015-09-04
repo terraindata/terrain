@@ -481,7 +481,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 				// }
 	}, true);
 	$(window).resize(function() {
-		doChart(data, true);
+		doChart(data);
 	});
 
 

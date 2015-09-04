@@ -81,7 +81,7 @@ terrainApp.directive('d3Slicer', ['$window', '$timeout', 'd3Service', function($
 			    	$(ele[0]).html("");
 				   	slicer = $(ele[0]).append("<div>").find("div")
 				    	.addClass("slicer")
-				    	.css("width", opts.width)
+				    	.css("width", '100%') //opts.width)
 				    	.css("height", opts.height);
 			    	slice_area = slicer.append("<div class='slice-area'>").find('.slice-area');
 			    	handle_area = slicer.append("<div class='handle-area'>").find('.handle-area');
