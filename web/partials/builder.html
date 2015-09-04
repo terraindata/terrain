@@ -104,7 +104,9 @@
 										</div>
 									</div>
 									<div class="col-xs-10">
-										<div tdb-autocomplete data="newCards" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names"></div>
+										<div tdb-autocomplete data="newCards" key-to-display="name" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
+											<input type="text" placeholder="Card Name" />
+										</div>
 									</div>
 									<div class="col-xs-1">
 										<a ng-click="card.newCardIsShowing = false" class="new-card-hide-btn pull-right small"> Hide </a>
@@ -147,7 +149,9 @@
 							<div class="row">
 								<div class="col-xs-1"></div>
 								<div class="col-xs-10">
-									<div tdb-autocomplete data="fromOptions" model="card.from.value" placeholder="Table Name" auto-placeholder="Start typing to see matching table names"></div>
+									<div tdb-autocomplete data="fromOptions" model="card.from.value" placeholder="Table Name" auto-placeholder="Start typing to see matching table names">
+										<input type="text" ng-model="card.from.value" placeholder="Table Name" />
+									</div>
 								</div>
 								<div class="col-xs-1"></div>
 							</div>
@@ -250,8 +254,9 @@
 									
 								</div>
 								<div class="col-xs-4 filter-field-input-wrapper">
-									<!-- <div tdb-autocomplete data="selectableFields" model="f.field" placeholder="Field" auto-placeholder="Start typing to see matching field names" on-select="apply()" class=""></div> -->
-									<input ng-model="f.first" ng-blur="input_checkForNewInput(f.first)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
+									<div tdb-autocomplete data="_v_keys" model="f.first" on-select="resort()" auto-placeholder="Start typing to see matching field names">
+										<input ng-model="f.first" ng-blur="input_checkForNewInput(f.first)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
+									</div>
 								</div>
 								<div class="col-xs-2 center-align">
 									<div class="sign-selector">
@@ -284,16 +289,10 @@
 										</div>
 									</div>
 								</div>
-								<!-- <div class="col-xs-2">
-									<div class="sign-selector">
-										<select class="from-value-select" ng-model="f.valueType">
-											<option value="input">Input</option>
-											<option value="raw">Raw</option>
-										</select>
-									</div>
-								</div> -->
 								<div class="col-xs-4">
-									<input ng-model="f.second" ng-blur="input_checkForNewInput(f.second)" ng-keydown="blurOnEnter($event)" placeholder="Value"  ng-change="resort()" />
+									<div tdb-autocomplete data="_v_keys" model="f.second" on-select="resort()" auto-placeholder="Start typing to see matching field names">
+										<input ng-model="f.second" ng-blur="input_checkForNewInput(f.first)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
+									</div>
 								</div>
 								<div class="col-xs-1">
 									<div class="card-select-delete clickable" ng-click="card_filter_removeField(card, $index)"><i class="fa fa-remove"></i></div>
@@ -403,7 +402,8 @@
 						</div>
 					</div>
 					<div class="col-xs-11">
-						<div  tdb-autocomplete data="newCards" on-select="addCardAndApply(obj, null)" input-classes="bordered-input" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
+						<div tdb-autocomplete data="newCards" key-to-display="name" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
+							<input type="text" placeholder="Card Name" />
 						</div>
 					</div>
 				</div>

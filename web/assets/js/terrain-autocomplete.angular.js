@@ -52,6 +52,7 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 		    },
 		    link: function(scope, ele, attrs) {
 		    	ele.addClass('autocomplete');
+		    	var keyToDisplay = attrs.keyToDisplay;
 		    	var placeholderStr = '<div class="autocomplete-placeholder">'+attrs.autoPlaceholder+'</div>';
 		    	ele.append('<div class="autocomplete-results"> ' +
 							placeholderStr +
@@ -67,11 +68,14 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 	    				scope.onSelect({ obj: result });
 	    			input.blur();
 		    	}
+		    	
 		    	var doResults = function(data) {
 		    		results.find(".autocomplete-result").remove();
 		    		resultsObjs = [];
 			    	$.each(data, function(index) {
-			    		results.append('<div class="autocomplete-result" rel="'+index+'">'+this+'</div>');
+			    		var str = keyToDisplay ? this[keyToDisplay] : this;
+			    		str = str + "";
+			    		results.append('<div class="autocomplete-result" rel="'+index+'">'+str+'</div>');
 			    		var obj = { result: this, elem: results.find('[rel='+index+']')};
 			    		resultsObjs.push(obj);
 
@@ -130,7 +134,8 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 			    			allResultsElems.show();
 			    			showingResults = [];
 			    			$.each(resultsObjs, function(index) {
-			    				if(this.result.toLowerCase().indexOf(val) == -1)
+			    				var str = keyToDisplay ? "" + this.result[keyToDisplay] : "" + this.result;
+			    				if(str.toLowerCase().indexOf(val) == -1)
 			    					this.elem.hide();
 			    				else
 			    					showingResults.push(this);

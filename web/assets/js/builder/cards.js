@@ -116,7 +116,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 	}, { 
 		id: 0,
 		order: {
-			field: "*TerrainScore",
+			field: "FinalScore",
 			direction: "descending"
 		},
 		name: "Order",
@@ -180,6 +180,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 	});
 
 
+	$scope.fromOptions = ['listings'];
 
 
 	/* ----------------------------
@@ -490,7 +491,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 		return total; 
 	}
 
-	$scope._v_add('*TerrainScore', score_scoreForResult);
+	$scope._v_add('FinalScore', score_scoreForResult);
 
 	/* ---------------------
 	 * Section: Connector
