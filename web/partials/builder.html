@@ -210,10 +210,7 @@
 									<div tdb-autocomplete data="orderableFields" model="card.order.field" placeholder="Field Name" auto-placeholder="Start typing to see matching field names" on-select="handleChange()"></div>
 								</div>
 								<div class="col-xs-12 col-sm-5">
-									<select ng-model="card.order.direction" ng-change="resort()" class="card-order-select">
-										<option value="descending">Descending</option>
-										<option value="ascending">Ascending</option>
-									</select>
+									<div tdb-autocomplete data="orderableFields" mg-change="resort()" model="card.order.direction" placeholder="Descending" on-select="handleChange()"></div>
 								</div>
 								<div class="col-xs-1"></div>
 							</div>
