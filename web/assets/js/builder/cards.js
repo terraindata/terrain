@@ -92,15 +92,15 @@ _terrainBuilderExtension.cards = function(_deps) {
 	}, {
 		id: 17,
 		select: {
-			fields: ['name', 'price', 'rating', 'stays', 'description']
+			fields: ['listing.name', 'listing.price', 'listing.rating', 'listing.stays', 'listing.description']
 		},
 		name: 'Select',
 		suggested: true
 	}, {
 		id: 237,
 		filters: [{
-			first: 'input.MaxPrice',
-			second: 'listing.price',
+			first: 'listing.price',
+			second: 'input.MaxPrice',
 			operator: 'le'
 		}],
 		name: 'Filter',
@@ -110,8 +110,8 @@ _terrainBuilderExtension.cards = function(_deps) {
 		name: "Score",
 		suggested: true,
 		scores: {
-			inputField: "Score",
-			outputField: "WeightedScore"
+			method: "weighted",
+			outputField: "FinalScore"
 		}		
 	}, { 
 		id: 0,
@@ -134,7 +134,20 @@ _terrainBuilderExtension.cards = function(_deps) {
 				preTransform: true,
 				name: 'Transform Card',
 				newCardIsShowing: false,
-				wasSynthetic: true
+			}
+		},
+		{
+			id: -2,
+			name: 'Let',
+			suggested: true,
+			syntheticCard: 'let',
+			syntheticModel: {
+				let: {
+					expression: '',
+					key: ''
+				},
+				newCardIsShowing: false,
+				name: 'Let'
 			}
 		}];
 
@@ -240,10 +253,12 @@ _terrainBuilderExtension.cards = function(_deps) {
 
 		if(cardToAdd.syntheticCard) {
 			cardToAdd = deepClone(cardToAdd.syntheticModel);
+			cardToAdd.wasSynthetic = true;
 			do {
 				cardToAdd.id = Math.floor(Math.random() * 40000);
 			} while($scope.cards.reduce(function(prev,cur) { return cur.id == cardToAdd.id || prev; }, false));
 		}
+		cardToAdd.newCardIsShowing = false;
 
 		if($scope.cards.indexOf(cardToAdd) !== -1) return;
 
@@ -303,6 +318,12 @@ _terrainBuilderExtension.cards = function(_deps) {
 	$scope.card_filter_removeField = function(card, fieldIndex) {
 		if(card && card.filters && card.filters.length >= fieldIndex)
 			card.filters.splice(fieldIndex, 1);
+		$scope.resort();
+	}
+
+	$scope.card_filter_setOperator = function(card, fieldIndex, operator) {
+		console.log(arguments);
+		card.filters[fieldIndex].operator = operator;
 		$scope.resort();
 	}
 
@@ -390,6 +411,86 @@ _terrainBuilderExtension.cards = function(_deps) {
 		$(".card-body[rel="+cardId+"]").css("overflow", "visible");
 	}
 
+
+	$scope.card_let_keyUpdate = function(card) {
+		// TODO consider a better approach, and also race conditions?
+		$scope._v_move(card.let.formerKey, card.let.key);
+		card.let.formerKey = card.let.key;
+	}
+
+	var let_ignoreChars = " ";
+	var let_operatorChars = "/*+-";
+	var let_operatorMap = {
+		'/': function(a,b) { return a / b; },
+		'*': function(a,b) { return a * b; },
+		'+': function(a,b) { return a + b; },
+		'-': function(a,b) { return a - b; }
+	}
+	$scope.card_let_expressionUpdate = function(card) {
+		var tokens = [""], ex = card.let.expression;
+		for(var i = 0; i < ex.length; i ++) {
+			var c = ex.charAt(i);
+			// ignore certain characters
+			if(let_ignoreChars.indexOf(c) !== -1)
+				continue;
+			// operator character ends previous bucket, starts new bucket
+			if(let_operatorChars.indexOf(c) !== -1) {
+				tokens.push(c);
+				tokens.push("");
+				continue;
+			}
+			// assumed: c is part of a variable's name
+			tokens[tokens.length - 1] += c;
+		}
+		console.log('tokens', tokens);
+		
+		// tokenized!
+
+		// make faster by pre-populating a result to value map.
+		var resultToValueMap = {};
+
+		// add to the _v for the let's key
+		$scope._v_add(card.let.key, function(result) {
+			if(resultToValueMap[result.id] !== undefined) return resultToValueMap[result.id];
+			console.log('eval', card.let.key, result);
+
+			// lazily evaluate the tokens
+			// ASSUMED: expression is of the form [var] [operator] [var] [operator] etc., e.g. listing.price / listing.bedrooms + listing.rating
+			// TODO: Add special functions, like SUM and COUNT
+			var val = $scope._v_result(tokens[0], result);
+			if(val === false) val = 0;
+			for(var i = 1; i < tokens.length - 1; i += 2) {
+				// ASSUMED: tokens[i] is an operator; tokens[i + 1] is a variable
+				var op = tokens[i], val2 = $scope._v_result(tokens[i+1], result);
+				console.log('step', tokens[i], op, tokens[i+1], val2);
+				if(let_operatorMap[op] === undefined || val2 === false) { continue; }
+				val = let_operatorMap[op](val, val2);
+				console.log('yields', val);
+			}
+
+			resultToValueMap[result.id] = val;
+			console.log('final', val);
+			return val;
+		}, true);
+	}
+
+
+	// Section: score card
+
+	function score_scoreForResult(result) {
+		// TerrainScore
+		var total = 0;
+		$.each($scope.cards, function(index, card) {
+			if(card.transform) {
+				var score = $scope._v_result(card.transform.outputKey,result);
+				if(!isNaN(score))
+					total += score * card.weight / 100;
+			}
+		});
+		return total; 
+	}
+
+	$scope._v_add('*TerrainScore', score_scoreForResult);
 
 	/* ---------------------
 	 * Section: Connector

@@ -117,8 +117,11 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 
 	// val can be a single value or a function that takes a 'result' argument
 	// returns false and does nothing if key is already set, or for invalid key
-	$scope._v_add = function(key, val) {
-		if(!key || key.length === 0 || _v[key])
+	$scope._v_add = function(key, val, overwrite) {
+		if(!key || key.length === 0)
+			return false;
+
+		if(_v[key] && !overwrite)
 			return false;
 
 		if(typeof val !== 'function') {
@@ -129,6 +132,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		}
 
 		_v[key] = val;
+		_v_change();
 		return true;
 	}
 
@@ -137,6 +141,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		if(originalKey && _v[originalKey]) {
 			_v[newKey] = _v[originalKey];
 			delete _v[originalKey];
+			_v_change();
 			return true;
 		} 
 		return false;
@@ -146,6 +151,12 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	$scope._v_move_or_add = function(originalKey, newKey, val) {
 		if(!$scope._v_move(originalKey, newKey))
 			return $scope._v_add(newKey, val);
+	}
+
+	$scope._v_keys = [];
+	// to be called whenever _v changes; recompute anything necessary
+	function _v_change() {
+		$scope._v_keys = $.map(_v, function(val,key) { return key; });
 	}
 
 	// Note: Order may matter. Be careful.

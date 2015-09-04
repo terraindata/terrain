@@ -53,8 +53,7 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 		    link: function(scope, ele, attrs) {
 		    	ele.addClass('autocomplete');
 		    	var placeholderStr = '<div class="autocomplete-placeholder">'+attrs.autoPlaceholder+'</div>';
-		    	ele.html('<input type="text" class="new-card-input '+attrs.inputClasses+'" placeholder="'+attrs.placeholder+'" value="'+scope.model+'" /> \
-						<div class="autocomplete-results"> ' +
+		    	ele.append('<div class="autocomplete-results"> ' +
 							placeholderStr +
 						'</div>');
 		    	var input = ele.find('input');
@@ -63,10 +62,7 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 		    	var placeholder = ele.find('.autocomplete-placeholder');
 		    	var allResultsElems, resultsObjs;
 		    	function select(result) {
-		    		// if(scope.model) {
-	    				scope.model = result.name;
-		    		// }
-	    			input.val(result.name);
+		    		scope.model = result + "";
 	    			if(scope.onSelect)
 	    				scope.onSelect({ obj: result });
 	    			input.blur();
@@ -75,7 +71,7 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 		    		results.find(".autocomplete-result").remove();
 		    		resultsObjs = [];
 			    	$.each(data, function(index) {
-			    		results.append('<div class="autocomplete-result" rel="'+index+'">'+this.name+'</div>');
+			    		results.append('<div class="autocomplete-result" rel="'+index+'">'+this+'</div>');
 			    		var obj = { result: this, elem: results.find('[rel='+index+']')};
 			    		resultsObjs.push(obj);
 
@@ -134,7 +130,7 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 			    			allResultsElems.show();
 			    			showingResults = [];
 			    			$.each(resultsObjs, function(index) {
-			    				if(this.result.name.toLowerCase().indexOf(val) == -1)
+			    				if(this.result.toLowerCase().indexOf(val) == -1)
 			    					this.elem.hide();
 			    				else
 			    					showingResults.push(this);
@@ -154,11 +150,17 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 			    }
 			    doResults(scope.data);
 
-		    	scope.$watch('model', function(newModel, oldModel) {
-					input.val(newModel);
-				}, true);
-
 				scope.$watch('data', function(newData, oldData) {
+					if(newData.length === oldData.length) {
+						var match = true;
+						for(var i = 0; i < newData.length; i ++)
+							if(newData[i] !== oldData[i]) {
+								match = false;
+								break;
+							}
+						if(match)
+							return;
+					}
 					doResults(newData);
 				});
 		    }

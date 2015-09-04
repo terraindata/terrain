@@ -234,12 +234,72 @@ _terrainBuilderExtension.transform = function(_deps) {
 		return $scope.cards.reduce(function(builder, cur) { if(cur.transform) builder.push(cur); return builder; }, []);
 	}
 
-	$scope.transform_newKey = function(card, obj, skipApply) {
-		card.key = obj.name;
+
+	// Section: finding transform scores
+
+
+	$scope.cardValueForResultDisplay = function(card, result) {
+		return $scope.numberToDisplay(cardValueForResult(card, result));
+	}
+
+	$scope.cardScoreForResultDisplay = function(card, result) {
+		return $scope.numberToDisplay(cardScoreForResult(card, result));
+	}
+
+	var cardValueForResult = function(card, result) {
+		if(!card.transform)
+			return false;
+		return $scope._v_result(card.key, result);
+	}
+
+	var cardScoreForResultFn = function(_card) {
+		var card = _card;
+		return function(result) {
+			var data = card.data;
+			if(!data || !card.transform)
+				return 0;
+			if(cardValueForResult(card, result) === undefined)
+				return 0;
+
+			// TODO replace by a better bucket getter if you redo buckets
+			var bucketStart = data.domain[0];
+			var bucketEnd = data.domain[1];
+			var bucketSize = (bucketEnd - bucketStart) / data.numberOfBars;
+			var bucket = 0;
+			while(cardValueForResult(card, result) > bucketStart + bucketSize * bucket && bucket < data.numberOfBars) bucket ++;
+			bucket --; // we always overshoot it
+
+			var score = (data.points[Math.floor(bucket / data.barToPointRatio)] + data.points[Math.ceil(bucket / data.barToPointRatio)]) / 2;
+			return score * card.weight / 100;
+		}
+	}
+
+
+
+	$scope.transform_newKey = function(card, obj, doApply) {
+		if(obj) card.key = obj;
 		if(!$scope._v_val(card.key)) {
-			alert("No value for that transform card.");
+			if(card.data) card.data.invalid = true;
+
+			if(doApply) {
+				$scope.$apply();
+			}
 			return;
 		}
+
+		var existingKey = false;
+		$.each($scope.cards, function(i,c) { if(c.transform && c.key == card.key && c.id !== card.id) existingKey = true; });
+		if(existingKey) {
+			card.invalid = true;
+			if(card.data) card.data.invalid = true;
+			
+			if(doApply) {
+				$scope.$apply();
+			}
+			return;
+		}
+		card.invalid = false;
+		if(card.data) card.data.invalid = false;
 
 		// weight handling
 		if(card.preTransform) {
@@ -251,6 +311,10 @@ _terrainBuilderExtension.transform = function(_deps) {
 				
 				if(i >= $scope.cards.length) {
 					alert("There's no more space for a new card right now.");
+
+					if(doApply) {
+						$scope.$apply();
+					}
 					return;
 				}
 
@@ -270,13 +334,20 @@ _terrainBuilderExtension.transform = function(_deps) {
 		});
 		
 		card.preTransform = undefined;
-		card.transform = true;
+		card.transform = {};
 		card.transformArr = [1];
+		card.type = 'transform';
+
+		var newOutputKey = card.key + ".score";
+		$scope._v_move_or_add(card.transform.outputKey, newOutputKey, cardScoreForResultFn(card));
+		card.transform.outputKey = newOutputKey;
+		console.log(newOutputKey, cardScoreForResultFn(card));
 
 		$scope.resort();
 
-		if(!skipApply)
+		if(doApply) {
 			$scope.$apply();
+		}
 	}
 
 

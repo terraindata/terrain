@@ -160,7 +160,17 @@ _terrainBuilderExtension.inputs = function(_deps) {
 
 	function input_addToV(input) {
 		var key = "input." + input.name;
-		$scope._v_move_or_add(input.prevKey, key, function() { return input.value; });
+		console.log(key);
+		$scope._v_move_or_add(input.prevKey, key, function() { 
+			switch(input.type) {
+				case 'namevalue':
+					return input.stringValue;
+				case 'datetime':
+					return input.dateValue;		
+			}
+			console.log('input with no type');
+			return false;
+		});
 		input.prevKey = key;
 
 		$scope.resort();
