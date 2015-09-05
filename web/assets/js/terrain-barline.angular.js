@@ -471,14 +471,8 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		var spotlightsArea = svg.append('g');
 		var linesArea = svg.append('g');
 	scope.$watch('data', function(newData, oldData) { 
-		// for(var i in newData)
-			// if(newData.hasOwnProperty(i))
-				// if(newData[i] !== oldData[i]){
-					// console.log(i, newData[i], oldData[i]);
-					if(!$(ele[0]).find("[rel=active]").length)
-						doChart(newData);
-					// break;
-				// }
+		if(!$(ele[0]).find("[rel=active]").length)
+			doChart(newData);
 	}, true);
 	$(window).resize(function() {
 		doChart(data);
@@ -507,7 +501,6 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		});
 
 		scope.$watch('data', function(newData) {
-			console.log($(ele[0]).find("[rel=active]"));
 			if(!$(ele[0]).find("[rel=active]").length) {
 				scope.render(newData);
 			}

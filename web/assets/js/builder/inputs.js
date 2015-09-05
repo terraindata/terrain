@@ -105,12 +105,17 @@ _terrainBuilderExtension.inputs = function(_deps) {
 		})
 	}
 
+	var random = function(max) {
+		max = max || 999999;
+		return Math.floor(Math.random() * max);
+	}
+
 	$scope.newNameValueInput = function(index, inputName, inputValue) {
 		var focusAnything = !inputName && !inputValue;
 		var focusValue = inputName ? true : false;
 		inputName = inputName || '';
 		inputValue = inputValue || '';
-		var newInput = { name: inputName, stringValue: inputValue, showing: false, type: 'namevalue'};
+		var newInput = { name: inputName, stringValue: inputValue, showing: false, type: 'namevalue', id: random() };
 		if(index == -1)
 			index = $scope.inputs.length;
 		$scope.inputs.splice(index, 0, newInput);
@@ -139,7 +144,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 		dateNow.setSeconds(0);
 		var focusValue = inputName ? true : false;
 		inputName = inputName || '';
-		var newInput = { name: inputName, dateValue: dateNow, showing: false, type: 'datetime' };
+		var newInput = { name: inputName, dateValue: dateNow, showing: false, type: 'datetime', id: random() };
 		if(index == -1)
 			index = $scope.inputs.length;
 		$scope.inputs.splice(index, 0, newInput);
@@ -160,7 +165,6 @@ _terrainBuilderExtension.inputs = function(_deps) {
 
 	function input_addToV(input) {
 		var key = "input." + input.name;
-		console.log(key);
 		$scope._v_move_or_add(input.prevKey, key, function() { 
 			switch(input.type) {
 				case 'namevalue':
@@ -168,7 +172,6 @@ _terrainBuilderExtension.inputs = function(_deps) {
 				case 'datetime':
 					return input.dateValue;		
 			}
-			console.log('input with no type');
 			return false;
 		});
 		input.prevKey = key;

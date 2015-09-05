@@ -7,7 +7,7 @@
 			</div>
 		</h1>
 		<div class="fixed-area inputs-area" ng-show="showing('inputs')">
-			<div ng-repeat="input in inputs" ng-show="input.showing" ng-slide-down="input.showing" duration="0.5" class="input-container">
+			<div ng-repeat="input in inputs track by input.id" ng-show="input.showing" ng-slide-down="input.showing" duration="0.5" class="input-container">
 				<div class="pre-input">
 					<a class="new-card-plus-area" ng-click="newInput($index,'','namevalue')" clicked="300">
 						<div class="new-card-plus-line"></div>
@@ -18,7 +18,7 @@
 				</div>
 				<div class="input batch-input-area input-{{$index}} has-more-button" ng-show="input.type == 'namevalue'">
 					<div class="input-name-area">
-						<input ng-model="input.name" ng-change="input_name_changed(input)" type="text" class="input-name-input first-input" placeholder="Name">
+						<input ng-model="input.name" ng-blur="input_name_changed(input)" type="text" class="input-name-input first-input" placeholder="Name">
 						<div class="pull-right more-button more-2-items">
 							<i class="fa fa-ellipsis-h more-icon"></i>
 							<div class="more-hidden-area">
@@ -133,7 +133,7 @@
 					<div class="card-title row" ng-click="cardToggle(card)">
 						<div ng-drag-handle class="col-xs-11">{{card.key || ""}} {{titleForCard(card)}}</div>
 					</div>
-					<div class="more-button more-4-items more-right more-button-large" ng-click="console.log(event)">
+					<div class="more-button more-4-items more-right more-button-large">
 						<i class="fa fa-ellipsis-h more-icon"></i>
 						<div class="more-hidden-area">
 							<div class="more-menu-item" ng-click="cardToggle(card)" ng-hide="card.hidden">Collapse</div>
@@ -434,7 +434,7 @@
 			ng-down="touchDown('result', result, $event)"
 			ng-move="touchMove('result', result, $event)"
 			ng-up="touchUp('result', result, $event)"
-			ng-style="resultStyle(result)"
+			ng-style="{ top: result.top, left: result.left }"
 			 rel="{{result.index}}">
 				<div class="result-inner {{locked ? 'result-inner-locked' : ''}} {{shiftedClass(result.index, 'result')}}" rel="{{result.index}}">
 					<div class="result-main has-more-button" ng-show="!result.flipped">

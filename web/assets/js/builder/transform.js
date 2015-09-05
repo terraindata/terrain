@@ -341,7 +341,6 @@ _terrainBuilderExtension.transform = function(_deps) {
 		var newOutputKey = card.key + ".score";
 		$scope._v_move_or_add(card.transform.outputKey, newOutputKey, cardScoreForResultFn(card));
 		card.transform.outputKey = newOutputKey;
-		console.log(newOutputKey, cardScoreForResultFn(card));
 
 		$scope.resort();
 

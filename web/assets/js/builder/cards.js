@@ -323,7 +323,6 @@ _terrainBuilderExtension.cards = function(_deps) {
 	}
 
 	$scope.card_filter_setOperator = function(card, fieldIndex, operator) {
-		console.log(arguments);
 		card.filters[fieldIndex].operator = operator;
 		$scope.resort();
 	}
@@ -443,7 +442,6 @@ _terrainBuilderExtension.cards = function(_deps) {
 			// assumed: c is part of a variable's name
 			tokens[tokens.length - 1] += c;
 		}
-		console.log('tokens', tokens);
 		
 		// tokenized!
 
@@ -453,7 +451,6 @@ _terrainBuilderExtension.cards = function(_deps) {
 		// add to the _v for the let's key
 		$scope._v_add(card.let.key, function(result) {
 			if(resultToValueMap[result.id] !== undefined) return resultToValueMap[result.id];
-			console.log('eval', card.let.key, result);
 
 			// lazily evaluate the tokens
 			// ASSUMED: expression is of the form [var] [operator] [var] [operator] etc., e.g. listing.price / listing.bedrooms + listing.rating
@@ -463,14 +460,11 @@ _terrainBuilderExtension.cards = function(_deps) {
 			for(var i = 1; i < tokens.length - 1; i += 2) {
 				// ASSUMED: tokens[i] is an operator; tokens[i + 1] is a variable
 				var op = tokens[i], val2 = $scope._v_result(tokens[i+1], result);
-				console.log('step', tokens[i], op, tokens[i+1], val2);
 				if(let_operatorMap[op] === undefined || val2 === false) { continue; }
 				val = let_operatorMap[op](val, val2);
-				console.log('yields', val);
 			}
 
 			resultToValueMap[result.id] = val;
-			console.log('final', val);
 			return val;
 		}, true);
 	}

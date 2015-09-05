@@ -106,6 +106,10 @@ _terrainBuilderExtension.results = function(_deps) {
 		}
     });
 
+	$(window).resize(function() {
+		$scope.resort();
+	});
+
 	$scope.selectableFields = [];
 	$scope.orderableFields = [];
 
@@ -186,6 +190,7 @@ _terrainBuilderExtension.results = function(_deps) {
 		// since we want to allow manual overrides, we have to make our own sorting function. Fun, I know.
 		// assumes: overrideIndexes are unique
 		var showingResults = 0;
+		var resultsInOrder = [];
 		var overrides = $scope.results.reduce(function(overrides, result) {
 			if(result.overrideIndex !== false && result.showing) {
 				overrides[result.overrideIndex] = result;
@@ -216,11 +221,37 @@ _terrainBuilderExtension.results = function(_deps) {
 		var index = 0;
 		while(index < showingResults) {
 			if(!overrides[index]) {
-				normals[scores.shift()].shift().index = index;
+				var r = normals[scores.shift()].shift();
+				r.index = index;
+				resultsInOrder.push(r);
+			} else {
+				resultsInOrder.push(overrides[index]);
 			}
 			index ++;
 		}
 
+		var top = 0, left = 0, resultHeight = 220, columns, w = $(window).width();
+		if(w > 2501) {
+			columns = 4;
+		} else if(w > 2001) {
+			columns = 3;
+		} else if(w > 1081) {
+			columns = 2;
+		} else if(w > 768) {
+			columns = 1;
+		} else if(w > 401) {
+			columns = 2;
+		} else {
+			columns = 1;
+		}
+
+		for(var i = 0; i < resultsInOrder.length; i ++) {
+			var r = resultsInOrder[i];
+			r.top = (Math.floor(i / columns) * resultHeight) + "px";
+			r.left = (i % columns) * Math.floor(100 / columns) + "%";
+			r.endTop = r.top;
+			r.endLeft = r.left;
+		}
 	}
 
 	
@@ -299,11 +330,25 @@ _terrainBuilderExtension.results = function(_deps) {
 
 		if(index !== obj.overrideIndex)
 			$scope.reindex(obj, index);
+
+		obj.left = obj.$x + "px";
+		obj.top = obj.$y + "px";
 	}
 
 	$scope.touchUp = function(type, obj, evt) {
+		// trying to get it to animate on touch up
+		// var ele = function(res) {
+			// return $(".result[rel=" + res.index + "]");
+		// }
+		// ele(obj).css('transition', 'all 0.25s linear');
 		obj.$isMovingTransitioningOff = true;
-		$timeout(function() { obj.$isMoving = false; }, 30);
+		$timeout(function() { 
+			obj.$isMoving = false;
+			$timeout(function() {
+				obj.top = obj.endTop;
+				obj.left = obj.endLeft;
+			}, 60);
+		}, 30);
 	}
 
 
@@ -329,7 +374,6 @@ _terrainBuilderExtension.results = function(_deps) {
 
 	$scope.logSelectCard = function() {
 		var selectCard =  $scope.cardFor('select');
-		console.log(selectCard);
 	}
 
 
@@ -356,6 +400,7 @@ _terrainBuilderExtension.results = function(_deps) {
 		return result.index;
 	}
 
+	var resultHeight = 220;
 
 	$scope.resultStyle = function(result) {
 		var x, y;
@@ -367,16 +412,17 @@ _terrainBuilderExtension.results = function(_deps) {
 			var ele = function(res) {
 				return $(".result[rel=" + res.index + "]");
 			}
+			var parentWidth = ele(result).parent().width();
 
-			var columns = Math.round(ele(result).parent().width() / ele(result).width());
+			// var columns = parentWidth / 
 
 			y = $scope.results.reduce(function(total, current) {
 				if(current.index < result.index && (current.index - 1) % columns == 0 && current.showing)
-					total += ele(current).height();
+					total += resultHeight;
 				return total;
 			}, 0);
 
-			x = result.index % columns * ele(result).width();
+			x = (result.index % columns) * ele(result).width();
 		}
 
 		return { top: y + "px", left: x + "px" };
