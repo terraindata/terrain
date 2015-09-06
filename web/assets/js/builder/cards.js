@@ -228,8 +228,12 @@ _terrainBuilderExtension.cards = function(_deps) {
 		var newOperator = 'eq';
 		var cardIndex = $scope.cards.indexOf(card);
 		var newJoin = { table: joinTable, first: firstValue, second: secondValue, showing: true, operator: newOperator};
-		if(joinIndex == -1)
+		if(joinIndex == -1) {
 			joinIndex = $scope.cards[cardIndex].from.joins.length;
+			$timeout(function() {
+				$(".card[rel=" + cardIndex +"] .card-join-area:last input:first").focus();
+			}, 100);
+		}
 		$scope.cards[cardIndex].from.joins.splice(joinIndex, 0, newJoin);
 	}	
 

@@ -202,7 +202,8 @@
 									</div>
 								</div>
 								<div class="col-xs-10">
-									<div class="card-addjoin-text">Add a Join</div>
+									<input type="text" ng-focus="addBlankJoin(card, -1)" placeholder="Add a Join" />
+									<!-- <div class="card-addjoin-text">Add a Join</div> -->
 								</div>
 								<div class="col-xs-1"></div>
 							</div>
@@ -228,8 +229,8 @@
 							<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields track by $index">
 								<div class="col-xs-1"></div>
 								<div class="col-xs-10">
-									<div tdb-autocomplete data="_v_keys" model="card.select.fields[$index]" on-select="apply()" auto-placeholder="Start typing to see matching field names">
-										<input type="text" ng-model="card.select.fields[$index]" placeholder="Field Name" ng-change="logSelectCard()" />
+									<div tdb-autocomplete data="_v_keys" model="card.select.fields[$index]" on-select="_v_change()" auto-placeholder="Start typing to see matching field names">
+										<input type="text" ng-model="card.select.fields[$index]" placeholder="Field Name" ng-blur="_v_change()" />
 									</div>
 								</div>
 								<div class="col-xs-1">
@@ -429,7 +430,7 @@
 		</h1>
 		<div class="results-area fixed-area" ng-show="showing('results')">
 			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }} {{result.$isMoving && !result.$isMovingTransitioningOff ? 'result-moving' : ''}}" 
-			ng-repeat="result in results | orderBy: scoreForResultSort" 
+			ng-repeat="result in results" 
 			ng-show="result.showing"
 			ng-down="touchDown('result', result, $event)"
 			ng-move="touchMove('result', result, $event)"
@@ -438,7 +439,7 @@
 			 rel="{{result.index}}">
 				<div class="result-inner {{locked ? 'result-inner-locked' : ''}} {{shiftedClass(result.index, 'result')}}" rel="{{result.index}}">
 					<div class="result-main has-more-button" ng-show="!result.flipped">
-						<div class="result-score" ng-show="resultsShouldShowScore()" ng-click="result.flipped = !result.flipped" style="{{result.spotlight ? 'background-color:' + result.spotlightColor : ''}}">
+						<!-- <div class="result-score" ng-show="resultsShouldShowScore()" ng-click="result.flipped = !result.flipped" style="{{result.spotlight ? 'background-color:' + result.spotlightColor : ''}}">
 							<img src="assets/img/Terrain_Icon_White.png" class="result-score-img" />
 							{{scoreForResultDisplay(result)}}
 						</div>
@@ -446,13 +447,28 @@
 							<i class="fa fa-thumb-tack result-pin-icon"></i>
 							<i class="fa fa-remove result-unpin-icon"></i>
 						</div>
-						<div class="result-img" style="background-image:url('assets/img/data/{{result.id}}.jpg');"></div>
+						<div class="result-img" style="background-image:url('assets/img/data/{{result.id}}.jpg');"></div> -->
+						<div class="result-flipped-name">
+							{{result.name}}
+						</div>
+						<div class="result-flipped-final-score">
+							<img src="assets/img/Terrain_Icon_White.png" class="result-flipped-score-img" />
+							Final Score
+							<div class="pull-right">{{scoreForResultDisplay(result)}}</div>
+						</div>
 						<div class="result-text">
-							<div ng-repeat="key in _v_keys" ng-show="selectedKey(key)">
+							<div ng-repeat="v_key in _v_keys | orderBy: _v_key_order" ng-show="selectedKey(v_key.key)">
 								<div class="row result-field-row">
-									<div class="col-xs-5 result-field-row-field">{{key}}</div>
-									<div class="col-xs-7 result-field-row-value">{{_v_result(key, result)}} &nbsp;</div>
+									<div class="col-xs-6 result-field-row-field">{{result_keyToDisplay(v_key.key)}}</div>
+									<div class="result-field-row-value {{result_valueClass(_v_result(v_key.key, result))}}">{{_v_result(v_key.key, result)}} &nbsp;</div>
+									<div class="col-xs-6 result-weight-row">
+										Weight: <span class="result-value-green">{{result_weightForKey(key)}}</span>
+									</div>
+									<div class="col-xs-6 result-weight-row">
+										Score: <span class="result-value-green">{{numberToDisplay(_v_result(v_key.key + '.score', result))}}</span>
+									</div>
 								</div>
+
 							</div>
 							<div style="display:none;"> <!-- saving in case we figure out better formatting -->
 								<div class="result-name" ng-show="selectedField('name')">{{result.name}}</div>
@@ -473,7 +489,7 @@
 								<div class="result-nothing-selected" ng-show="selectedField(false)"s>Add fields to a <b>Select</b> card to preview result data here.</div>
 							</div>
 						</div>
-						<div class="more-button more-4-items more-right more-button-large">
+						<div class="more-button more-2-items more-right more-button-large results-more-button">
 							<i class="fa fa-ellipsis-h more-icon"></i>
 							<div class="more-hidden-area">
 								<div class="more-menu-item" ng-click="result.overrideIndex = $index" ng-show="result.overrideIndex === false">Pin</div>
@@ -481,9 +497,9 @@
 								<div class="more-menu-item" ng-click="spotlightToggle(result)">
 									Spotlight
 								</div>
-								<div class="more-menu-item" ng-click="result.flipped = !result.flipped" ng-show="!result.flipped">Score View</div>
+								<!-- <div class="more-menu-item" ng-click="result.flipped = !result.flipped" ng-show="!result.flipped">Score View</div>
 								<div class="more-menu-item" ng-click="result.flipped = !result.flipped" ng-show="result.flipped">Product View</div>
-								<div class="more-menu-item" ng-click="">Multi Scroll</div>
+								<div class="more-menu-item" ng-click="">Multi Scroll</div> -->
 							</div>
 						</div>
 					</div>

@@ -190,6 +190,9 @@ body.rounded {
 
 .more-menu-item {
 	color: #fff;
+	-webkit-transition: background 0.25s;
+	-o-transition: background 0.25s;
+	transition: background 0.25s;
 }
 
 .more-menu-item:hover {
@@ -421,13 +424,28 @@ input {
 }
 
 .result-text {
-	background: @card-title-bg;
+	background: #fff;
+	overflow-x: hidden;
 }
 
 .result-field-row {
-	border-bottom: 1px solid darken(@results-stroke-color, 15%);
+	border-bottom: 1px solid #ddd;
+	padding: 5px 10px;
+}
+
+.result-field-row-field {
+	font-weight: bold;
 }
 
 .result-field-row-value {
-	background: @card-bg;
+	font-weight: bold;
+}
+
+.result-field-row-value, .result-value-green {
+	color: #8ba63f;
+}
+
+.results-more-button {
+	top: 2px;
+	right: 2px;
 }

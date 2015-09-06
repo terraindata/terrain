@@ -357,6 +357,17 @@ _terrainBuilderExtension.results = function(_deps) {
 	 * Section: Result View Functions
 	 * ---------------------------- */
 
+	 $scope.result_valueClass = function(value) {
+	 	if(value && value.length > 15)
+	 		return 'col-xs-12';
+	 	return 'col-xs-6';
+	 }
+
+	 $scope.result_keyToDisplay = function(key) {
+	 	if(key.indexOf(".") > 0)
+	 		return key.substr(key.indexOf("."));
+	 	return key;
+	 }
 
 	$scope.resultsShouldShowScore = function() {
 		return $scope.cardFor('order');
@@ -374,6 +385,19 @@ _terrainBuilderExtension.results = function(_deps) {
 
 	$scope.logSelectCard = function() {
 		var selectCard =  $scope.cardFor('select');
+	}
+
+	$scope.result_weightForKey = function(key) {
+		var weight = 0;
+		$.each($scope.cards, function() {
+			if(this.transform && this.key == key) {
+				console.log(this);
+				weight = this.weight;
+			}
+		});
+		if(weight === undefined)
+			return 'N/A';
+		return weight + '%';
 	}
 
 

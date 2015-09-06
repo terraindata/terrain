@@ -132,7 +132,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		}
 
 		_v[key] = val;
-		_v_change();
+		$scope._v_change();
 		return true;
 	}
 
@@ -141,7 +141,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 		if(originalKey && _v[originalKey]) {
 			_v[newKey] = _v[originalKey];
 			delete _v[originalKey];
-			_v_change();
+			$scope._v_change();
 			return true;
 		} 
 		return false;
@@ -155,8 +155,24 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 
 	$scope._v_keys = [];
 	// to be called whenever _v changes; recompute anything necessary
-	function _v_change() {
-		$scope._v_keys = $.map(_v, function(val,key) { return key; });
+	$scope._v_change = function() {
+		var selectCard = $scope.cardFor('select');
+		// TODO remove this v_key and order stuff, because it's  not used
+		$scope._v_keys = $.map(_v, function(val,key) { 
+			var i = selectCard ? selectCard.select.fields.indexOf(key) : -1;
+			return { 
+				key: key,
+				order: i === -1 ? 9999 : i
+			};
+		});
+	}
+
+	$scope._v_key_order = function(v_key) {
+		var selectCard = $scope.cardFor('select');
+		if(selectCard) {
+			return selectCard.select.fields.indexOf(v_key.key);
+		}
+		return 0;
 	}
 
 	// Note: Order may matter. Be careful.
