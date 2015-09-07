@@ -391,7 +391,6 @@ _terrainBuilderExtension.results = function(_deps) {
 		var weight = 0;
 		$.each($scope.cards, function() {
 			if(this.transform && this.key == key) {
-				console.log(this);
 				weight = this.weight;
 			}
 		});

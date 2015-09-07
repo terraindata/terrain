@@ -462,7 +462,7 @@
 									<div class="col-xs-6 result-field-row-field">{{result_keyToDisplay(v_key.key)}}</div>
 									<div class="result-field-row-value {{result_valueClass(_v_result(v_key.key, result))}}">{{_v_result(v_key.key, result)}} &nbsp;</div>
 									<div class="col-xs-6 result-weight-row">
-										Weight: <span class="result-value-green">{{result_weightForKey(key)}}</span>
+										Weight: <span class="result-value-green">{{result_weightForKey(v_key.key)}}</span>
 									</div>
 									<div class="col-xs-6 result-weight-row">
 										Score: <span class="result-value-green">{{numberToDisplay(_v_result(v_key.key + '.score', result))}}</span>
