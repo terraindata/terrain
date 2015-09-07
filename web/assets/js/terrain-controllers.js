@@ -154,6 +154,7 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 
 	$scope._v_keys = [];
+	$scope._v_keys_plain = [];
 	// to be called whenever _v changes; recompute anything necessary
 	$scope._v_change = function() {
 		var selectCard = $scope.cardFor('select');
@@ -164,6 +165,9 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 				key: key,
 				order: i === -1 ? 9999 : i
 			};
+		});
+		$scope._v_keys_plain = $.map(_v, function(val,key) { 
+			return key;
 		});
 	}
 

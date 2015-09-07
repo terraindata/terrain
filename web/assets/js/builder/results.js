@@ -61,7 +61,7 @@ _terrainBuilderExtension.results = function(_deps) {
 		lat: 37.77816542086827, long: -122.48045251661345
 	}
 
-	$http.get('assets/ajax/airbnb.json').success(function(response) {
+	$http.get('assets/ajax/urbansitter.json').success(function(response) {
       	$scope.results = response.data;
       	var fields = {};
       	$.each($scope.results, function(index) {
@@ -71,19 +71,18 @@ _terrainBuilderExtension.results = function(_deps) {
       			fields[key] = 1;
       		});
 
-      		/* Locations */
-      		var locScore = latLongToDistance(result.lat, result.long, $scope.search.lat, $scope.search.long); //Math.pow(this.lat - $scope.search.lat, 2) + Math.pow(this.long - $scope.search.long, 2);
-      		// TODO make sense of the ridiculous number of different location types
-      		var locationKeys = ['location']; //, 'location_map', 'location_radius', 'location_mapradius', 'location_latlong'];
-      		$.each(locationKeys, function(i,key) {
-      			result[key] = locScore;
-      		});
+      		// var locScore = latLongToDistance(result.lat, result.long, $scope.search.lat, $scope.search.long); //Math.pow(this.lat - $scope.search.lat, 2) + Math.pow(this.long - $scope.search.long, 2);
+      		// // TODO make sense of the ridiculous number of different location types
+      		// var locationKeys = ['location']; //, 'location_map', 'location_radius', 'location_mapradius', 'location_latlong'];
+      		// $.each(locationKeys, function(i,key) {
+      		// 	result[key] = locScore;
+      		// });
 
       		/* add any more calculated result values here, as they come up, if they are not pre-calculated in the response */
       		result.overrideIndex = false;
 
       		$.each(result, function(key, val) {
-      			$scope._v_add('listing.' + key, function(r) {
+      			$scope._v_add('sitter.' + key, function(r) {
       				return r[key];
       			});
       		});
@@ -137,7 +136,7 @@ _terrainBuilderExtension.results = function(_deps) {
 		var filtersCard = $scope.cardFor('filters'), passing = true;;
 		if(!filtersCard) return true;
 		$.each(filtersCard.filters, function() {
-			if(!passing) return;
+			if(!passing || !this.first || !this.second || this.first.length === 0 || this.second.length === 0) return;
 
 			firstValue = parseFloat($scope._v_result(this.first, result));
 			secondValue = parseFloat($scope._v_result(this.second, result));

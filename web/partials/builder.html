@@ -212,7 +212,7 @@
 							<div class="row">
 								<div class="col-xs-1"></div>
 								<div class="col-xs-12 col-sm-5">
-									<div tdb-autocomplete data="_v_keys" model="card.order.field" on-select="handleChange()" auto-placeholder="Start typing to see matching field names">
+									<div tdb-autocomplete data="_v_keys_plain" model="card.order.field" on-select="handleChange()" auto-placeholder="Start typing to see matching field names">
 										<input type="text" ng-model="card.order.field" placeholder="Field Name" ng-change="resort()" />
 									</div>
 								</div>
@@ -226,7 +226,7 @@
 							<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields track by $index">
 								<div class="col-xs-1"></div>
 								<div class="col-xs-10">
-									<div tdb-autocomplete data="_v_keys" model="card.select.fields[$index]" on-select="_v_change()" auto-placeholder="Start typing to see matching field names">
+									<div tdb-autocomplete data="_v_keys_plain" model="card.select.fields[$index]" on-select="_v_change()" auto-placeholder="Start typing to see matching field names">
 										<input type="text" ng-model="card.select.fields[$index]" placeholder="Field Name" ng-blur="_v_change()" />
 									</div>
 								</div>
@@ -252,7 +252,7 @@
 									
 								</div>
 								<div class="col-xs-4 filter-field-input-wrapper">
-									<div tdb-autocomplete data="_v_keys" model="f.first" on-select="resort()" auto-placeholder="Start typing to see matching field names">
+									<div tdb-autocomplete data="_v_keys_plain" model="f.first" on-select="resort()" auto-placeholder="Start typing to see matching field names">
 										<input ng-model="f.first" ng-blur="input_checkForNewInput(f.first)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
 									</div>
 								</div>
@@ -288,7 +288,7 @@
 									</div>
 								</div>
 								<div class="col-xs-4">
-									<div tdb-autocomplete data="_v_keys" model="f.second" on-select="resort()" auto-placeholder="Start typing to see matching field names">
+									<div tdb-autocomplete data="_v_keys_plain" model="f.second" on-select="resort()" auto-placeholder="Start typing to see matching field names">
 										<input ng-model="f.second" ng-blur="input_checkForNewInput(f.first)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
 									</div>
 								</div>

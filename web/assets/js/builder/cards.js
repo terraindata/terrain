@@ -69,22 +69,23 @@ _terrainBuilderExtension.cards = function(_deps) {
 	$scope.cards = [{
 		id:24,
 		from: {
-			value: 'Listings',
+			value: '',
 			joins: [
-				{
-					table: 'availability',
-					first: 'sitter.id',
-					second: 'availability.sitterID',
-					operator: 'eq',
-					showing: 'true'
-				},
-				{
-					table: 'job',
-					first: 'sitter.id',
-					second: 'job.sitterID',
-					operator: 'eq',
-					showing: 'true'
-				}]
+				// {
+				// 	table: 'availability',
+				// 	first: 'sitter.id',
+				// 	second: 'availability.sitterID',
+				// 	operator: 'eq',
+				// 	showing: 'true'
+				// },
+				// {
+				// 	table: 'job',
+				// 	first: 'sitter.id',
+				// 	second: 'job.sitterID',
+				// 	operator: 'eq',
+				// 	showing: 'true'
+				// }
+				]
 		},
 		name: 'From',
 		useTitle: true,
@@ -92,17 +93,21 @@ _terrainBuilderExtension.cards = function(_deps) {
 	}, {
 		id: 17,
 		select: {
-			fields: ['listing.name', 'listing.price', 'listing.rating', 'listing.stays', 'listing.description']
+			fields: [
+				// 'listing.name', 'listing.price', 'listing.rating', 'listing.stays', 'listing.description'
+				]
 		},
 		name: 'Select',
 		suggested: true
 	}, {
 		id: 237,
-		filters: [{
-			first: 'listing.price',
-			second: 'input.MaxPrice',
-			operator: 'le'
-		}],
+		filters: [
+		// {
+		// 	first: 'listing.price',
+		// 	second: 'input.MaxPrice',
+		// 	operator: 'le'
+		// }
+		],
 		name: 'Filter',
 		suggested: true
 	}, {
@@ -180,7 +185,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 	});
 
 
-	$scope.fromOptions = ['listings'];
+	$scope.fromOptions = ['sitters', 'jobs', 'availability'];
 
 
 	/* ----------------------------
