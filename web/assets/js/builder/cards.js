@@ -281,6 +281,8 @@ _terrainBuilderExtension.cards = function(_deps) {
 			$(".card-container-" + cardToAdd.id).hide();
 			$(".card-container-" + cardToAdd.id).slideDown(250);
 		}, 25);
+
+		$scope.resort();
 	}
 
 	if($scope.ab('start')) {

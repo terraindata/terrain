@@ -82,7 +82,14 @@ _terrainBuilderExtension.results = function(_deps) {
       		result.overrideIndex = false;
 
       		$.each(result, function(key, val) {
-      			$scope._v_add('sitter.' + key, function(r) {
+      			var k = 'sitter.' + key;
+      			if(key === 'imgUrl')
+      				k = 'sitter.profile';
+      			if(key.indexOf('.') !== -1)
+      				k = key;
+      			if(key.toLowerCase() === 'avgrating')
+      				k = 'avgRating';
+      			$scope._v_add(k, function(r) {
       				return r[key];
       			});
       		});
@@ -177,7 +184,7 @@ _terrainBuilderExtension.results = function(_deps) {
 		if(orderCard) {
 			return $scope._v_result(orderCard.order.field, result);
 		}
-		return 0;
+		return "N/A";
 	}
 
 
@@ -415,13 +422,35 @@ _terrainBuilderExtension.results = function(_deps) {
 		return score;
 	}
 
+	$scope.numberOrTextToDisplay = function(val) {
+		var v = +val;
+		if(isNaN(v)) return val;
+		return $scope.numberToDisplay(v);
+	}
+
 	$scope.scoreForResultDisplay = function(result) {
-		return $scope.numberToDisplay($scope.scoreForResult(result));
+		return $scope.numberOrTextToDisplay($scope.scoreForResult(result));
 	}
 
 	$scope.scoreForResultSort = function(result) {
 		// sorts low to hi and doesn't seem like you can control it from the template
 		return result.index;
+	}
+
+	$scope.result_shouldShowWeightAndScoreForKey = function(key) {
+		if(key && key.indexOf("imgUrl") === -1 && key !== "sitter.profile")
+			return true;
+		return false;
+	}
+
+	$scope.result_shouldShowImage = function(key) {
+		if(key && (key.indexOf("imgUrl") !== -1 || key === "sitter.profile"))
+			return true;
+		return false;	
+	}
+
+	$scope.result_imgUrlForKey = function(key, result) {
+		return "assets/img/data/urbansitter/" + $scope._v_result(key, result);
 	}
 
 	var resultHeight = 220;

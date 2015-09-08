@@ -205,8 +205,9 @@ _terrainBuilderExtension.inputs = function(_deps) {
 
 	$scope.input_checkForNewInput = function(inputName) {
 		if(inputName && inputName.indexOf("input.") === 0)
-			if(! $scope.inputs.reduce(function(value,cur) { if(cur.name === inputName) return true; return value; }, false)) {
-				$scope.newInput(-1, inputName.substr("input.".length));
+			var n = inputName.substr(6);
+			if(! $scope.inputs.reduce(function(value,cur) { if(cur.name === n) return true; return value; }, false)) {
+				$scope.newInput(-1, inputName.substr("input.".length), 'namevalue');
 			}
 		/*
 		if(card.filters) {
