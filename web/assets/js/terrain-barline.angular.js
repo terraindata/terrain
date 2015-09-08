@@ -153,15 +153,17 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			.attr('width', workingWidth)
 			.attr('height', workingHeight)
 			.attr('fill', '#f0f1e9');
-			
+		
+		var domain = data.domain;
+
 		data.bars = [];
 		for(var i = 0; i < data.numberOfBars; i++) data.bars.push(0);
-		var bucketExtremes = data.domain.length > 2 && data.domain[2]; 
+		var bucketExtremes = domain.length > 2 && domain[2]; 
 		// if the third element in domain is 'true', leave the last bar as a 'catch-all-greater'
 		var numBuckets = bucketExtremes ? data.numberOfBars - 1 : data.numberOfBars;
 
 		function bucketForVal(val) {
-			return Math.floor((val - data.domain[0]) / (data.domain[1] - data.domain[0]) * numBuckets);
+			return Math.floor((val - domain[0]) / (domain[1] - domain[0]) * numBuckets);
 		}
 		
 		if(!data.raw) { return; }
@@ -194,7 +196,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 
 		var barXScale = d3.scale.linear()
 			.domain([0, data.numberOfBars])
-			// .domain([data.domain[0], data.domain[1]])
+			// .domain([domain[0], domain[1]])
 			// so there's a problem where d3's axis will override the ticks argument and force a "nice" number of buckets
 			// so we can't give it the real domain but have to give it a dummy domain to force a certain number of ticks
 			// please someone figure out how to fix this please oh please
@@ -207,7 +209,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 						.tickSize(-1 * workingHeight, 0, 0)
 						.tickPadding(7)
 						.tickFormat(function(d,i) {
-							return data.xLabelFormat(i, (i == data.numberOfBars && data.domain[2] ? i - 1 : i) * (data.domain[1] - data.domain[0]) / numBuckets + data.domain[0], i == data.numberOfBars && data.domain[2]);
+							return data.xLabelFormat(i, (i == data.numberOfBars && domain[2] ? i - 1 : i) * (domain[1] - domain[0]) / numBuckets + domain[0], i == data.numberOfBars && domain[2]);
 						});
 		scaleArea.append("g")
 			.attr("class", "axis xAxis")

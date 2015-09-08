@@ -57,6 +57,36 @@ _terrainBuilderExtension.transform = function(_deps) {
 	 * ---------------------------- */
 
 	 $scope.transformSettings = {
+	 	'sitter.minPrice': {
+			name: 'Response Time',
+			inDataResponse: true,
+			data: {
+				xLabelFormat: function(i, value, isMaxpoint) {
+					return (isMaxpoint ? "> " : "") + "$" + (Math.floor(value));
+				},
+				// domain: [0,400, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
+				numberOfBars: 9,
+				barRange: [0,20],
+				points: [0.5, 0.5, 0.5, 0.5, 0.5].reverse(),
+				pointRange: [0,1],
+				barToPointRatio: 2
+			},
+		}, 
+	 	'sitter.responseTime': {
+			name: 'Response Time',
+			inDataResponse: true,
+			data: {
+				xLabelFormat: function(i, value, isMaxpoint) {
+					return (isMaxpoint ? "> " : "") + (Math.floor(value / 60)) + " min";
+				},
+				// domain: [0,400, true], // applies to both bars and points, third argument 'true' indicates to include a bucket for greater extremes
+				numberOfBars: 9,
+				barRange: [0,20],
+				points: [0.5, 0.5, 0.5, 0.5, 0.5].reverse(),
+				pointRange: [0,1],
+				barToPointRatio: 2
+			},
+		}, 
 		'listing.price': {
 			name: 'Price',
 			inDataResponse: true,
@@ -332,6 +362,19 @@ _terrainBuilderExtension.transform = function(_deps) {
 			// TODO make sure you update the raw values if you're transforming a Let variable, and it changes
 			card.data.raw.push($scope._v_result(card.key, this));
 		});
+
+		if(!card.data.domain) {
+			// need to make a domain
+			var max = card.data.raw.reduce(function(m, c) {
+				if(m === false || c > m) return c;
+				return m;
+			}, false);
+			var min = card.data.raw.reduce(function(m, c) {
+				if(m === false || c < m) return c;
+				return m;
+			}, false);
+			card.data.domain = [min - 1, max + 1, false];
+		}
 		
 		card.preTransform = undefined;
 		card.transform = {};
