@@ -185,7 +185,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 	});
 
 
-	$scope.fromOptions = ['sitters', 'jobs', 'availability'];
+	$scope.fromOptions = ['sitter', 'job', 'availability'];
 
 
 	/* ----------------------------
