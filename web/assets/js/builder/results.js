@@ -386,6 +386,14 @@ _terrainBuilderExtension.results = function(_deps) {
 			if(!field && selectCard.select.fields.length == 0) return true;
 			return selectCard.select.fields.indexOf(field) != -1;
 		}
+		if(field.indexOf("availability.") === 0) {
+			var f = $scope.cardFor('from');
+			return f && f.from.joins.reduce(function(ans, cur) {
+				return ans || cur.table == 'availability';
+			}, false);
+		}
+		if(field === 'FinalScore')
+			return false;
 		return field;
 	}
 

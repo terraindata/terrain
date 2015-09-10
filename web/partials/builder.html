@@ -149,8 +149,8 @@
 							<div class="row">
 								<div class="col-xs-1"></div>
 								<div class="col-xs-10">
-									<div tdb-autocomplete data="fromOptions" model="card.from.value" placeholder="Table Name" auto-placeholder="Start typing to see matching table names">
-										<input type="text" ng-model="card.from.value" placeholder="Table Name" />
+									<div tdb-autocomplete data="fromOptions" model="card.from.value" placeholder="Table Name" auto-placeholder="Start typing to see matching table names" on-select="card_fromChanged(card)">
+										<input type="text" ng-model="card.from.value" placeholder="Table Name" ng-keyup="card_fromChanged(card)" />
 									</div>
 								</div>
 								<div class="col-xs-1"></div>
@@ -159,7 +159,10 @@
 								<div class="row card-join-area">
 									<div class="col-xs-1"></div>
 									<div class="col-xs-5">
-										<input type="text" class="card-join-input" ng-model="join.table" placeholder="enter table to join" />
+										<div tdb-autocomplete data="fromOptions" model="join.table" placeholder="Table Name" auto-placeholder="Start typing to see matching table names" on-select="card_joinChanged(card, $index)">
+											<input type="text" class="card-join-input" ng-model="join.table" placeholder="Table Name" ng-change="card_joinChanged(card, $index)" />
+										</div>
+										<!-- <input type="text"  placeholder="enter table to join" /> -->
 									</div>
 									<div class="col-xs-2">
 										<input type="text" class="card-join-input" ng-model="join.first" placeholder="" />
@@ -289,7 +292,7 @@
 								</div>
 								<div class="col-xs-4">
 									<div tdb-autocomplete data="_v_keys_plain" model="f.second" on-select="resort()" auto-placeholder="Start typing to see matching field names">
-										<input ng-model="f.second" ng-blur="input_checkForNewInput(f.first)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
+										<input ng-model="f.second" ng-blur="input_checkForNewInput(f.second)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
 									</div>
 								</div>
 								<div class="col-xs-1">
@@ -414,7 +417,7 @@
 			<div class="empty-algorithm" ng-show="cards.length == 0">
 				The algorithm is currently empty.
 				<small>To get started, just add an expression above.</small>
-				<div class="button">Guide Me</div>
+				<!-- <div class="button">Guide Me</div> -->
 			</div>
 		</div>
 	</div>
@@ -425,7 +428,7 @@
 				{{showing('results') ? '-' : '+'}}
 			</div>
 		</h1>
-		<div class="results-area fixed-area" ng-show="showing('results')">
+		<div class="results-area fixed-area" ng-show="HAS_SITTERS">
 			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }} {{result.$isMoving && !result.$isMovingTransitioningOff ? 'result-moving' : ''}}" 
 			ng-repeat="result in results" 
 			ng-show="result.showing"

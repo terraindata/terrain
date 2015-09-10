@@ -481,6 +481,26 @@ _terrainBuilderExtension.cards = function(_deps) {
 	}
 
 
+	$scope.HAS_SITTERS = false;
+	$scope.card_fromChanged = function(card, fromIndex) {
+		// timeout because autocomplete has delay in updating model value
+		// TODO find a way around the timeout
+		$timeout(function() { 
+			if(card.from.value === 'sitters')
+				$scope.HAS_SITTERS = true;
+		}, 150);
+	}
+
+	$scope.card_joinChanged = function(card, joinIndex) {
+		// timeout because autocomplete has delay in updating model value
+		// TODO find a way around the timeout
+		$timeout(function() { 
+			var j = card.from.joins[joinIndex];
+			j.first = j.table + '.sitterid';
+			j.second = 'sitter.id';
+		}, 150);
+	}
+
 	// Section: score card
 
 	function score_scoreForResult(result) {
