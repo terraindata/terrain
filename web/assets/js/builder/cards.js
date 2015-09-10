@@ -486,7 +486,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 		// timeout because autocomplete has delay in updating model value
 		// TODO find a way around the timeout
 		$timeout(function() { 
-			if(card.from.value === 'sitters')
+			if(card.from.value === 'sitter')
 				$scope.HAS_SITTERS = true;
 		}, 150);
 	}

@@ -100,6 +100,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 				$scope.inputs[index].dateValue = dateNow;		
 				break;
 		}
+		$scope.resort();
 		$timeout(function() {
 			$scope.apply();
 		})
@@ -170,8 +171,8 @@ _terrainBuilderExtension.inputs = function(_deps) {
 				case 'namevalue':
 					return input.stringValue;
 				case 'datetime':
-					if (input.name == "input.startDateTime") return 10000; //Hack for pre-DB version of demo
-					if (input.name == "input.endDateTime") return 11000 //Hack for pre-DB version of demo
+					if (key == "input.startDateTime") return 10000; //Hack for pre-DB version of demo
+					if (key == "input.endDateTime") return 11000 //Hack for pre-DB version of demo
 					return input.dateValue;		
 			}
 			return false;
