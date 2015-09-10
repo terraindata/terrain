@@ -44,8 +44,8 @@
 							</div>
 						</div>
 						<div class="input-datetime-area">
-							<input ng-model="input.dateValue" type="date" class="input-calendar-input-left" placeholder="yyyy-MM-dd">
-							<input ng-model="input.dateValue" type="time" class="input-calendar-input-right" step="60">
+							<input ng-model="input.dateValue" type="date" ng-change="resort()" class="input-calendar-input-left" placeholder="yyyy-MM-dd">
+							<input ng-model="input.dateValue" type="time" ng-change="resort()" class="input-calendar-input-right" step="60">
 						</div>
 					</div>
 					<div class="input-calendar-value-area">							 
