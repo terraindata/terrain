@@ -172,7 +172,7 @@ _terrainBuilderExtension.results = function(_deps) {
 				case 'in':
 					firstValue = $scope._v_result(this.first, result);
 					secondValue = $scope._v_result(this.second, result);
-					passing = passing && (secondValue.indexOf(firstValue)); //we need to decide if we want to hack this functionality for the demo or just wait for the backend to do it
+					passing = passing && ((secondValue.indexOf(firstValue) > -1) ? true : false); //we need to decide if we want to hack this functionality for the demo or just wait for the backend to do it
 					break;
 			}
 		});

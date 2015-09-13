@@ -564,7 +564,8 @@ _terrainBuilderExtension.cards = function(_deps) {
 							'lt': '<',
 							'eq': '==',
 							'gt': '>',
-							'ge': '>='
+							'ge': '>=',
+							'in': 'in'
 						}
 						return {
 							combinator: index == 0 ? 'none' : 'and',
