@@ -164,7 +164,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 		$scope.cards = [];
 		if($scope.ab('from')) {
 			var c = $scope.newCards.shift();
-			c.from.value = 'sitters';
+			c.from.value = 'sitter';
 			c.allShowing = true;
 			$scope.cards = [c];
 			$timeout(function() {
