@@ -269,7 +269,7 @@
 												<div class="terrain-dropdown-cell" ng-show="f.operator == 'gt'">&gt;</div>
 												<div class="terrain-dropdown-cell" ng-show="f.operator == 'eq'">=</div>
 												<div class="terrain-dropdown-cell" ng-show="f.operator == 'ne'">&ne;</div>
-												<div class="terrain-dropdown-cell" bg-show="f.operator == 'in'">in</div>
+												<div class="terrain-dropdown-cell" ng-show="f.operator == 'in'">in</div>
 											</div>
 											<div class="terrain-dropdown-cell-area">
 												<div class="terrain-dropdown-cell {{f.operator == 'le' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'le')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&le;</div>
