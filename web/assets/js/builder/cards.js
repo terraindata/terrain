@@ -162,6 +162,18 @@ _terrainBuilderExtension.cards = function(_deps) {
 	if(!$scope.ab('start')) {
 		$scope.newCards = $scope.cards.concat($scope.newCards);
 		$scope.cards = [];
+		if($scope.ab('from')) {
+			var c = $scope.newCards.shift();
+			c.from.value = 'sitters';
+			c.allShowing = true;
+			$scope.cards = [c];
+			$timeout(function() {
+				$scope.HAS_SITTERS = true;
+			}, 250);
+			// delete $scope.newCards[0];
+			// $scope.cards[0].allShowing = true;
+			// $scope.cards[0].from.value = 'sitters';
+		}
 	} else {
 		$.each($scope.cards, function(i,c) {
 			c.allShowing = true;

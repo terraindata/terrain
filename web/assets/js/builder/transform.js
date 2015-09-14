@@ -355,12 +355,45 @@ _terrainBuilderExtension.transform = function(_deps) {
 			card.color = $scope.getColor();
 		}
 
-		$.extend(card, $scope.transformSettings[card.key]);
+		if($scope.transformSettings[card.key]) {
+			// we have preset transform data
+			$.extend(card, $scope.transformSettings[card.key]);
+		} else {
+			// programmatically generate the data
+			var settings = {
+				name: card.key.split("").map(function(c,i) {
+					// splitting every character into an array, mapping to individual characters
+					if(i === 0)
+						return c.toUpperCase();
+					if(c.toUpperCase() === c && i != 0)
+						// assume camel case key, separate by word
+						return " " + c;
+					return c;
+				}),
+				inDataResponse: true, // duh
+				data: {
+					xLabelFormat: function(i, value, isMaxpoint) {
+						if(value < 2)
+							return (Math.round(value * 1000) / 1000); // cap at three decimal places
+						if(value < 10)
+							return (Math.round(value * 10) / 10); // cap at one decimal place
+						return Math.round(value);
+					},
+					numberOfBars: 9, // TODO allow the user to change this.
+					barRange: [0,20], // TODO programmatic
+					points: [0.5, 0.5, 0.5, 0.5, 0.5], // TODO programmatic size of array
+					pointRange: [0,1], // don't change this
+					barToPointRatio: 2 // TODO tied to size of array above
+				}
+			}
+
+			$.extend(card, settings);
+		}
 
 		card.data.raw = [];
 		$.each($scope.results, function() {
 			// TODO make sure you update the raw values if you're transforming a Let variable, and it changes
-			card.data.raw.push($scope._v_result(card.key, this));
+			card.data.raw.push(+$scope._v_result(card.key, this));
 		});
 
 		if(!card.data.domain) {
