@@ -255,7 +255,7 @@
 									
 								</div>
 								<div class="col-xs-4 filter-field-input-wrapper">
-									<div tdb-autocomplete data="_v_keys_plain" model="f.first" on-select="resort()" auto-placeholder="Start typing to see matching field names">
+									<div tdb-autocomplete data="_v_keys_plain" model="f.first" on-select="card_valAndResort(obj, $index, false)" auto-placeholder="Start typing to see matching field names">
 										<input ng-model="f.first" ng-blur="input_checkForNewInput(f.first)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
 									</div>
 								</div>
@@ -291,7 +291,7 @@
 									</div>
 								</div>
 								<div class="col-xs-4">
-									<div tdb-autocomplete data="_v_keys_plain" model="f.second" on-select="resort()" auto-placeholder="Start typing to see matching field names">
+									<div tdb-autocomplete data="_v_keys_plain" model="f.second" on-select="card_valAndResort(obj, $index, true)" auto-placeholder="Start typing to see matching field names">
 										<input ng-model="f.second" ng-blur="input_checkForNewInput(f.second)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
 									</div>
 								</div>

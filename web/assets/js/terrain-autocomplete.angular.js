@@ -62,11 +62,20 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 		    	results.css('top', (input.height() + parseInt(input.css('padding-top')) * 2 + 1) + 'px');
 		    	var placeholder = ele.find('.autocomplete-placeholder');
 		    	var allResultsElems, resultsObjs;
-		    	function select(result) {
-		    		scope.model = result + "";
+		    	function select(result, fromClick) {
+		    		result = result + "";
+		    		scope.model = result;
 	    			if(scope.onSelect)
 	    				scope.onSelect({ obj: result });
+
 	    			input.blur();
+
+	    			if(fromClick) {
+	    				input.focus();
+	    				$timeout(function() {
+	    					input.blur();
+	    				}, 250);
+	    			}
 		    	}
 		    	
 		    	var doResults = function(data) {
@@ -80,7 +89,7 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 			    		resultsObjs.push(obj);
 
 			    		obj.elem.click(function() {
-			    			select(obj.result);
+			    			select(obj.result, true);
 			    		});
 			    	});
 			    	allResultsElems = ele.find('.autocomplete-result');

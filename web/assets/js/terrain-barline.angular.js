@@ -152,7 +152,6 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 					var bucket = bucketForVal(this.rawValue);
 					var point1 = data.points[Math.floor(bucket / data.barToPointRatio)];
 					var point2 = data.points[Math.ceil(bucket / data.barToPointRatio)];
-					console.log(bucket, data.barToPointRatio, pointX(Math.floor(bucket / data.barToPointRatio)));
 					var cx = pointX(Math.floor(bucket / data.barToPointRatio)) / 2 + pointX(Math.ceil(bucket / data.barToPointRatio)) / 2;
 					var cy = pointY(point1) / 2 + pointY(point2) / 2;
 					if(!bucketCounts[cx])

@@ -530,6 +530,18 @@ _terrainBuilderExtension.cards = function(_deps) {
 
 	$scope._v_add('FinalScore', score_scoreForResult);
 
+
+	$scope.card_valAndResort = function(obj, filterIndex, isSecond) {
+		// Because clicking on the select autocomplete option doesn't work correctly
+		//  so we have this function to do the dirty work for us.
+		var f = $scope.cardFor('filters').filters[filterIndex];
+		if(isSecond)
+			f.second = obj;
+		else
+			f.first = obj;
+		$scope.resort();
+	}
+
 	/* ---------------------
 	 * Section: Connector
 	 * --------------------- */

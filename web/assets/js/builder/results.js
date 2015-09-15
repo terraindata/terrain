@@ -230,14 +230,11 @@ _terrainBuilderExtension.results = function(_deps) {
 		while(index < showingResults) {
 			if(!overrides[index]) {
 				if(scores === undefined) {
-					console.log('scores undefined');
 					break;
 				}
 				var s = scores.shift();
-				console.log('score', s, index);
 				var n = normals[s];
 				if(n === undefined) {
-					console.log('n undefined', normals)
 					break;
 				}
 				var r = n.shift();
