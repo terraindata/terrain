@@ -452,7 +452,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 
 	// Spotlights
 
-	$scope.spotlightColors = ['#b7ff67','#ff67b7', '#b767ff','#67b7ff', '#67ffb7', '#ffb767'];
+	$scope.spotlightColors = ['#09739c','#de5135', '#b767ff','#67b7ff', '#67ffb7', '#ffb767'];
 	$scope.spotlightLabels = ["1","2","3","4","5","6"];
 	$scope.spotlightToggle = function(result) {
 		if(result.spotlight) {
