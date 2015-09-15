@@ -142,6 +142,8 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 
 
 		function doSpotlights() {
+			spotlightsArea.selectAll('*').remove();
+			var bucketCounts = {};
 			if(data.spotlights) {
 				$.each(data.spotlights, function() {
 					var spotlightWidth = 4;
@@ -153,16 +155,23 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 					console.log(bucket, data.barToPointRatio, pointX(Math.floor(bucket / data.barToPointRatio)));
 					var cx = pointX(Math.floor(bucket / data.barToPointRatio)) / 2 + pointX(Math.ceil(bucket / data.barToPointRatio)) / 2;
 					var cy = pointY(point1) / 2 + pointY(point2) / 2;
-					if(opts.spotlightAbove == 'true') {
-						cy += (cy > 2 * radius + 5 ? -1.5 : 1.5) * (radius + 3);
-					}
-					spotlightsArea.selectAll('*').remove();
+					if(!bucketCounts[cx])
+						bucketCounts[cx] = 1;
+					else
+						bucketCounts[cx] ++;
+					radius = radius + 4 * (bucketCounts[cx] - 1);
+					var fill = '#fff';
+					if(bucketCounts[cx] !== 1)
+						fill = 'rgba(0,0,0,0)';
+					// if(opts.spotlightAbove == 'true') {
+					// 	cy += (cy > 2 * radius + 5 ? -1.5 : 1.5) * (radius + 3);
+					// }
 
 					spotlightsArea.append('circle')
 								.attr('cx', cx)
 								.attr('cy', cy)
 								.attr('r', radius)
-								.attr('fill', '#fff')
+								.attr('fill', fill)
 								.attr('stroke', this.color)
 								.attr('stroke-width', spotlightWidth);
 					
