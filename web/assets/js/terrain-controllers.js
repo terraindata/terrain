@@ -172,11 +172,15 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 
 	$scope._v_key_order = function(v_key) {
-		var selectCard = $scope.cardFor('select');
-		if(selectCard) {
-			return selectCard.select.fields.indexOf(v_key.key);
-		}
-		return 0;
+		if(v_key.key === 'sitter.profile')
+			return 0;
+		if(v_key.key === 'sitter.numJobs')
+			return 1;
+		if(v_key.key === 'sitter.responseTime')
+			return 2;
+		if(v_key.key === 'sitter.minPrice')
+			return 3;
+		return 4;
 	}
 
 	// Note: Order may matter. Be careful.

@@ -205,10 +205,8 @@ _terrainBuilderExtension.inputs = function(_deps) {
 
 
 	$scope.input_checkForNewInput = function(inputName) {
-		console.log(inputName);
 		if(inputName && inputName.indexOf("input.") === 0) {
 			var n = inputName.substr(6);
-			console.log('n ' + n);
 			if(! $scope.inputs.reduce(function(value,cur) { if(cur.name === n) return true; return value; }, false)) {
 				$scope.newInput(-1, n, 'namevalue');
 			}

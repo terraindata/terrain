@@ -191,19 +191,20 @@ _terrainBuilderExtension.results = function(_deps) {
 	$scope.resort = function() {
 		if(!$scope.results) return;
 
+		var showingResults = 0;
 		$.each($scope.results, function() {
 			this.showing = $scope.filterResult(this);
+			if(this.showing)
+				showingResults ++;
 		})
 		
 		// since we want to allow manual overrides, we have to make our own sorting function. Fun, I know.
 		// assumes: overrideIndexes are unique
-		var showingResults = 0;
 		var resultsInOrder = [];
 		var overrides = $scope.results.reduce(function(overrides, result) {
 			if(result.overrideIndex !== false && result.showing) {
 				overrides[result.overrideIndex] = result;
 				result.index = result.overrideIndex;
-				showingResults ++;
 			}
 			return overrides;
 		}, {});
@@ -215,7 +216,6 @@ _terrainBuilderExtension.results = function(_deps) {
 					normals[score] = [];
 				normals[score].push(result);
 				scores.push(score);
-				showingResults ++;
 			}
 			return normals;
 		}, {});
@@ -229,7 +229,18 @@ _terrainBuilderExtension.results = function(_deps) {
 		var index = 0;
 		while(index < showingResults) {
 			if(!overrides[index]) {
-				var r = normals[scores.shift()].shift();
+				if(scores === undefined) {
+					console.log('scores undefined');
+					break;
+				}
+				var s = scores.shift();
+				console.log('score', s, index);
+				var n = normals[s];
+				if(n === undefined) {
+					console.log('n undefined', normals)
+					break;
+				}
+				var r = n.shift();
 				r.index = index;
 				resultsInOrder.push(r);
 			} else {
