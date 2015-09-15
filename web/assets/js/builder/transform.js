@@ -434,7 +434,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 
 	// Spotlights
 
-	$scope.spotlightColors = ['#67b7ff', '#67ffb7', '#ffb767', '#ff67b7', '#b7ff67', '#b767ff'];
+	$scope.spotlightColors = ['#b7ff67','#ff67b7', '#b767ff','#67b7ff', '#67ffb7', '#ffb767'];
 	$scope.spotlightLabels = ["1","2","3","4","5","6"];
 	$scope.spotlightToggle = function(result) {
 		if(result.spotlight) {
@@ -457,7 +457,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 			$.each($scope.results, function(resultIndex, result) {
 				if(result.spotlight) {
 					card.data.spotlights.push({
-						rawValue: result[card.key],
+						rawValue: $scope._v_result(card.key, result),
 						label: result.spotlightLabel,
 						color: result.spotlightColor
 					});

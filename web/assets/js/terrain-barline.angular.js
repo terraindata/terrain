@@ -113,6 +113,8 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 	var bgArea = svg.append("g");
 	var scaleArea = svg.append("g");
 	var barArea = svg.append("g");
+	var spotlightsArea = svg.append('g');
+
 
 	function barStartingX(i) {
 		return i / numPoints * workingWidth + (workingWidth / numPoints - barWidth) / 2 + leftMargin;
@@ -133,6 +135,50 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		return barStartingY(d) - pointRadius / 2;
 	}
 
+
+	var bucketForVal = function(val) {
+			return Math.floor((val - domain[0]) / (domain[1] - domain[0]) * numBuckets);
+		}
+
+
+		function doSpotlights() {
+			if(data.spotlights) {
+				$.each(data.spotlights, function() {
+					var spotlightWidth = 4;
+					var spotlightSpacing = 3;
+					var radius = pointRadius + spotlightWidth + spotlightSpacing;
+					var bucket = bucketForVal(this.rawValue);
+					var point1 = data.points[Math.floor(bucket / data.barToPointRatio)];
+					var point2 = data.points[Math.ceil(bucket / data.barToPointRatio)];
+					console.log(bucket, data.barToPointRatio, pointX(Math.floor(bucket / data.barToPointRatio)));
+					var cx = pointX(Math.floor(bucket / data.barToPointRatio)) / 2 + pointX(Math.ceil(bucket / data.barToPointRatio)) / 2;
+					var cy = pointY(point1) / 2 + pointY(point2) / 2;
+					if(opts.spotlightAbove == 'true') {
+						cy += (cy > 2 * radius + 5 ? -1.5 : 1.5) * (radius + 3);
+					}
+					spotlightsArea.selectAll('*').remove();
+
+					spotlightsArea.append('circle')
+								.attr('cx', cx)
+								.attr('cy', cy)
+								.attr('r', radius)
+								.attr('fill', '#fff')
+								.attr('stroke', this.color)
+								.attr('stroke-width', spotlightWidth);
+					
+					// var textSize = 16;
+					// spotlightsArea.append('text')
+					// 			.attr('x', cx)
+					// 			.attr('y', cy + ((radius * 2 - textSize) / 2))
+					// 			.text(this.label)
+					// 			.attr('text-anchor', 'middle')
+					// 			.attr('font-family', '"Open Sans", OpenSans')
+					// 			.attr('fill', '#fff')
+					// 			.attr('font-size', textSize * 1.15 + 'px');
+				});
+			}
+		}
+
 	function doChart(newData, sameData) {
 		data = newData;
 		calcVars();
@@ -142,7 +188,6 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		bgArea.selectAll('*').remove();
 		if(!sameData) barArea.selectAll('*').remove(); /* deals with data not being dirty on window resize */
 		scaleArea.selectAll("*").remove();
-		spotlightsArea.selectAll('*').remove();
 		if(!sameData) linesArea.selectAll('*').remove();
 		if(!sameData) svg.selectAll('circle').remove(); /* deals with data not being dirty on window resize */
 
@@ -162,7 +207,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		// if the third element in domain is 'true', leave the last bar as a 'catch-all-greater'
 		var numBuckets = bucketExtremes ? data.numberOfBars - 1 : data.numberOfBars;
 
-		function bucketForVal(val) {
+		bucketForVal = function(val) {
 			return Math.floor((val - domain[0]) / (domain[1] - domain[0]) * numBuckets);
 		}
 		
@@ -289,39 +334,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 
 		// MARK: spotlights
 
-		if(data.spotlights) {
-			$.each(data.spotlights, function() {
-				var spotlightWidth = 4;
-				var spotlightSpacing = 3;
-				var radius = pointRadius + spotlightWidth + spotlightSpacing;
-				var bucket = bucketForVal(this.rawValue);
-				var point1 = data.points[Math.floor(bucket / data.barToPointRatio)];
-				var point2 = data.points[Math.ceil(bucket / data.barToPointRatio)];
-				var cx = pointX(Math.floor(bucket / data.barToPointRatio)) / 2 + pointX(Math.ceil(bucket / data.barToPointRatio)) / 2;
-				var cy = pointY(point1) / 2 + pointY(point2) / 2;
-				if(opts.spotlightAbove == 'true') {
-					cy += (cy > 2 * radius + 5 ? -1.5 : 1.5) * (radius + 3);
-				}
-
-				spotlightsArea.append('circle')
-							.attr('cx', cx)
-							.attr('cy', cy)
-							.attr('r', radius)
-							.attr('fill', 'rgba(0,0,0,0)')
-							.attr('stroke', this.color)
-							.attr('stroke-width', spotlightWidth);
-				
-				// var textSize = 16;
-				// spotlightsArea.append('text')
-				// 			.attr('x', cx)
-				// 			.attr('y', cy + ((radius * 2 - textSize) / 2))
-				// 			.text(this.label)
-				// 			.attr('text-anchor', 'middle')
-				// 			.attr('font-family', '"Open Sans", OpenSans')
-				// 			.attr('fill', '#fff')
-				// 			.attr('font-size', textSize * 1.15 + 'px');
-			});
-		}
+		doSpotlights();
 
 		// MARK: Lines
 
@@ -360,7 +373,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		}
 		svg //.append('g')
 			//.attr('class', 'point-group')
-			.selectAll("circle")
+			.selectAll("circlepoints")
 			.data(data.points)
 			.enter()
 			/* .append("g") // for this I was thinking about a guideline that appears when you hover over the point
@@ -432,7 +445,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 
 					$(ele[0]).find(".path").remove();
 					var index = $(ele[0]).find("[rel=active]").attr('index');
-					data.points[index] = (workingHeight + topMargin - pos) / workingHeight; // yScale.invert(pos) / (data.barRange[1] - data.barRange[0]);
+					data.points[index] = (workingHeight + topMargin - pos - 4) / workingHeight; // yScale.invert(pos) / (data.barRange[1] - data.barRange[0]);
 					lineGroup.append("path")
 								.attr("d", lineFunction(data.points))
 								.attr("stroke", strokeColor)
@@ -470,11 +483,13 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			});
 		}
 
-		var spotlightsArea = svg.append('g');
 		var linesArea = svg.append('g');
 	scope.$watch('data', function(newData, oldData) { 
-		if(!$(ele[0]).find("[rel=active]").length)
+		var spotlightsChanged = newData.spotlights && (!oldData.spotlights || newData.spotlights.length != oldData.spotlights.length);
+		if(!$(ele[0]).find("[rel=active]").length && !spotlightsChanged)
 			doChart(newData);
+		else
+			doSpotlights(newData);
 	}, true);
 	$(window).resize(function() {
 		doChart(data);
