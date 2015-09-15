@@ -408,6 +408,8 @@ _terrainBuilderExtension.transform = function(_deps) {
 			}, false);
 			card.data.domain = [min - 1, max + 1, false];
 		}
+
+		$scope.result_doTheSpotlights();
 		
 		card.preTransform = undefined;
 		card.transform = {};
@@ -432,6 +434,22 @@ _terrainBuilderExtension.transform = function(_deps) {
 	 * ---------------------------- */
 
 
+	 $scope.result_doTheSpotlights = function() {
+	 	$.each($scope.cards, function(cardIndex, card) {
+			if(!card.data) return;
+			card.data.spotlights = [];
+			$.each($scope.results, function(resultIndex, result) {
+				if(result.spotlight) {
+					card.data.spotlights.push({
+						rawValue: $scope._v_result(card.key, result),
+						label: result.spotlightLabel,
+						color: result.spotlightColor
+					});
+				}
+			});
+		});
+	 }
+
 	// Spotlights
 
 	$scope.spotlightColors = ['#09739c','#de5135', '#b767ff','#67b7ff', '#67ffb7', '#ffb767'];
@@ -451,19 +469,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 			}
 		}
 
-		$.each($scope.cards, function(cardIndex, card) {
-			if(!card.data) return;
-			card.data.spotlights = [];
-			$.each($scope.results, function(resultIndex, result) {
-				if(result.spotlight) {
-					card.data.spotlights.push({
-						rawValue: $scope._v_result(card.key, result),
-						label: result.spotlightLabel,
-						color: result.spotlightColor
-					});
-				}
-			});
-		});
+		$scope.result_doTheSpotlights();
 	}
 
 
