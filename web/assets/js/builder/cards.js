@@ -266,6 +266,33 @@ _terrainBuilderExtension.cards = function(_deps) {
 		return JSON.parse(JSON.stringify(v)); // supposedly the fastest way to get a deep clone
 	}
 
+	// returns the initial starting height for each card
+	// TODO: *Finally* figure out how to do an adequate sliding animation with angular
+	function getDefaultHeightForCard(card) {
+		if(card.preTransform)
+			return '153px';
+		if(card.transform)
+			return '476px';
+		if(card.from)
+			return '172px';
+		if(card.select)
+			return '128px';
+		if(card.filter)
+			return '128px';
+		if(card.score)
+			return (128 + 44 * $scope.cards.reduce(function(sum,c) { 
+				if(c.transform) return sum + 1; 
+				return sum 
+			}, 0)) + 'px';
+		if(card.order)
+			return '128px';
+		if(card.let)
+			return '128px';
+
+		console.log('*** WARNING! DANGER! PANIC! No height in cards.js > getDefaultHeightForCard() for card: ', card);
+		return '128px';
+	}
+
 	$scope.addCard = function(cardToAdd, cardToAddInFrontOf) {
 		var addAtEnd = false;
 		if(cardToAddInFrontOf == null) {
@@ -284,14 +311,20 @@ _terrainBuilderExtension.cards = function(_deps) {
 
 		if($scope.cards.indexOf(cardToAdd) !== -1) return;
 
-		$scope.cards.splice(addAtEnd ? $scope.cards.length : $scope.cards.indexOf(cardToAddInFrontOf), 0, cardToAdd);
+		// for animated slide-down
+		cardToAdd.height = '0px';
+
+		var addIndex = addAtEnd ? $scope.cards.length : $scope.cards.indexOf(cardToAddInFrontOf);
+		$scope.cards.splice(addIndex, 0, cardToAdd);
 		if(cardToAddInFrontOf) 
 			cardToAddInFrontOf.newCardIsShowing = false;
 		if($scope.newCards.indexOf(cardToAdd) != -1 && !cardToAdd.repeated)
 			$scope.newCards.splice($scope.newCards.indexOf(cardToAdd), 1);
 		$timeout(function() {
-			$(".card-container-" + cardToAdd.id).hide();
-			$(".card-container-" + cardToAdd.id).slideDown(250);
+			cardToAdd.height = getDefaultHeightForCard(cardToAdd);
+			$timeout(function() {
+				cardToAdd.height = 'auto';
+			}, 750)
 		}, 25);
 
 		$scope.resort();
