@@ -125,8 +125,13 @@ _terrainBuilderExtension.results = function(_deps) {
 	 * ---------------------------- */
 
 
-	$scope.unpin = function(result) {
+	$scope.result_unpin = function(result) {
 		result.overrideIndex = false;
+		$scope.resort();
+	}
+
+	$scope.result_pin = function(result) {
+		result.overrideIndex = result.index;
 		$scope.resort();
 	}
 
