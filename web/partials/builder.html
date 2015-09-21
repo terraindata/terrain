@@ -430,6 +430,10 @@
 				{{showing('results') ? '-' : '+'}}
 			</div>
 		</h1>
+		<div class="empty-algorithm empty-results" ng-hide="HAS_SITTERS">
+			Your algorithm doesn't specify a table.
+			<small>Add a From card in the Builder column to see results here.</small>
+		</div>
 		<div class="results-area fixed-area" ng-show="HAS_SITTERS">
 			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }} {{result.$isMoving && !result.$isMovingTransitioningOff ? 'result-moving' : ''}}" 
 			ng-repeat="result in results" 
