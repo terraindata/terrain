@@ -313,6 +313,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 
 		// for animated slide-down
 		cardToAdd.height = '0px';
+		cardToAdd.allShowing = false;
 
 		var addIndex = addAtEnd ? $scope.cards.length : $scope.cards.indexOf(cardToAddInFrontOf);
 		$scope.cards.splice(addIndex, 0, cardToAdd);
@@ -320,8 +321,22 @@ _terrainBuilderExtension.cards = function(_deps) {
 			cardToAddInFrontOf.newCardIsShowing = false;
 		if($scope.newCards.indexOf(cardToAdd) != -1 && !cardToAdd.repeated)
 			$scope.newCards.splice($scope.newCards.indexOf(cardToAdd), 1);
+
+		// Here's how I have the slide-down animation working for cards now:
+		//  0. builder.html has an ng-show="card.allShowing" and ng-style="{height: card.height}"
+		//  1. When we add a new card, set allShowing = false (so that angular doesn't briefly flash the card)
+		//  2. After a frame, set height = '0px' and allShowing = true. This will show the div but keep its height at 0.
+		//      (again, we need allShowing to stop Angular from flashing the card at full height)
+		//  3. After another frame, set height = getDefaultHeightForCard(card)
+		//      that function returns the standard pre-calculated height for each card type (which isn't great...)
+		//  4. After the animation is done, set height = 'auto' so that the height can change
+		// If you find a better way that doesn't flash and doesn't break the builder, please implement it!
 		$timeout(function() {
-			cardToAdd.height = getDefaultHeightForCard(cardToAdd);
+			cardToAdd.allShowing = true;
+			cardToAdd.height = '0px';
+			$timeout(function() {
+				cardToAdd.height = getDefaultHeightForCard(cardToAdd);
+			}, 50);
 			$timeout(function() {
 				cardToAdd.height = 'auto';
 			}, 750)

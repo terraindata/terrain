@@ -92,7 +92,8 @@
 			<div class="all-weights" ng-show="ab('weights')">
 				<div class="weight" d3-slicer data="cards" on-change="handleChange(cardId)" card-id="-1"></div>
 			</div>
-			<div ng-repeat="card in cards track by card.id" class="card-container card-container-{{card.id}}"  ng-drop="true" ng-drop-success="onCardDropComplete($index,$data,$event)" rel="{{$index}}" ng-mousemove="resultMove($index, 'card')" ng-touchmove="resultMove({{$index}}, 'card')" 
+			<div ng-repeat="card in cards track by card.id" class="card-container card-container-{{card.id}}"  ng-drop="true" ng-drop-success="onCardDropComplete($index,$data,$event)" rel="{{$index}}" ng-mousemove="resultMove($index, 'card')" ng-touchmove="resultMove({{$index}}, 'card')"
+			ng-show="card.allShowing" 
 			ng-style="{height: card.height}">
 				<div class="pre-card">
 					<div ng-slide-down="card.newCardIsShowing" duration="0.25">
