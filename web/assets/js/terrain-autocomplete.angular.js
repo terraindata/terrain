@@ -59,7 +59,7 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 						'</div>');
 		    	var input = ele.find('input');
 		    	var results = ele.find('.autocomplete-results');
-		    	results.css('top', (input.height() + parseInt(input.css('padding-top')) * 2 + 1) + 'px');
+		    	results.css('top', (input.height() + parseInt(input.css('padding-top')) * 2 + parseInt(input.css('margin-top')) + 1) + 'px');
 		    	var placeholder = ele.find('.autocomplete-placeholder');
 		    	var allResultsElems, resultsObjs;
 		    	function select(result, fromClick) {
