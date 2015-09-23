@@ -1,4 +1,4 @@
-<div class="row builder-row">
+<div class="row builder-row" ng-up="touchUp('result', result, $event)" ng-move="touchMove('result', result, $event)">
 	<div class="col-sm-2 col-xs-12 main-column">
 		<h1 class="page-header" ng-click="showing('inputs', !showing('inputs'))">
 			Inputs
@@ -439,8 +439,6 @@
 			ng-repeat="result in results" 
 			ng-show="result.showing"
 			ng-down="touchDown('result', result, $event)"
-			ng-move="touchMove('result', result, $event)"
-			ng-up="touchUp('result', result, $event)"
 			ng-style="{ top: result.top, left: result.left }"
 			 rel="{{result.index}}">
 				<div class="result-inner {{locked ? 'result-inner-locked' : ''}} {{shiftedClass(result.index, 'result')}}" rel="{{result.index}}">

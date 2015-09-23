@@ -112,7 +112,16 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 			    		if(val.length == 0) {
 			    			placeholder.show();
 			    			allResultsElems.hide();
-			    		} else if(evt.keyCode <= 40 && evt.keyCode >= 37) {
+			    			var RESULTS_TO_SHOW_WHEN_BLANK = 5;
+			    			for(var i = 0; i < RESULTS_TO_SHOW_WHEN_BLANK && i < allResultsElems.length; i ++)
+			    				$(allResultsElems[i]).show();
+			    			showingResults = [];
+			    			$.each(resultsObjs, function(index) {
+			    				if(index < RESULTS_TO_SHOW_WHEN_BLANK)
+			    					showingResults.push(this);
+			    			});
+			    		} 
+			    		if(evt.keyCode <= 40 && evt.keyCode >= 37) {
 			    			// arrow keys
 			    			if(evt.type != 'keydown') {
 			    				// we only want to do this on one keyboard event; I chose keyup
@@ -120,6 +129,7 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 			    			}
 			    			if(evt.keyCode == 40) {
 			    				// down
+			    				console.log(selectedResultIndex);
 			    				showingResults[selectedResultIndex].elem.removeClass(selectedClass);
 			    				if(selectedResultIndex < showingResults.length - 1)
 			    					selectedResultIndex ++;
@@ -138,7 +148,7 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 			    			// enter key
 			    			if(showingResults[selectedResultIndex])
 			    				select(showingResults[selectedResultIndex].result);
-			    		} else {
+			    		} else if(val.length != 0) {
 			    			placeholder.hide();
 			    			allResultsElems.show();
 			    			showingResults = [];

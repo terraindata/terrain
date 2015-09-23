@@ -132,6 +132,7 @@ _terrainBuilderExtension.results = function(_deps) {
 
 	$scope.result_pin = function(result) {
 		result.overrideIndex = result.index;
+		result.$pinning = true;
 		$scope.resort();
 	}
 
@@ -275,24 +276,27 @@ _terrainBuilderExtension.results = function(_deps) {
 		}
 	}
 
-	
+	var movingResultObj;
 	$scope.touchDown = function(type, obj, evt) {
-
-		obj.$isMoving = true;
-		obj.$sx = parseInt($("." + type + "[rel=" + obj.index + "]").css('left'));
-		obj.$sy = parseInt($("." + type + "[rel=" + obj.index + "]").css('top'));
-		obj.$x = obj.$sx;
-		obj.$y = obj.$sy;
+		movingResultObj = obj;
+		// keep track of the origianl index so that dropping a card into its existing place does
+		//  not cause it to be pinned; unless it was already pinned there.
+		movingResultObj.$originalIndex = movingResultObj.overrideIndex ? -1 : movingResultObj.index;
+		movingResultObj.$isMoving = true;
+		movingResultObj.$sx = parseInt($("." + type + "[rel=" + movingResultObj.index + "]").css('left'));
+		movingResultObj.$sy = parseInt($("." + type + "[rel=" + movingResultObj.index + "]").css('top'));
+		movingResultObj.$x = movingResultObj.$sx;
+		movingResultObj.$y = movingResultObj.$sy;
 
 		if(evt.pageX && evt.pageY) {
-			obj.$smx = evt.pageX;
-			obj.$smy = evt.pageY;
+			movingResultObj.$smx = evt.pageX;
+			movingResultObj.$smy = evt.pageY;
 		}
 
-		obj.$smy += $(".results-area").scrollTop();
-		obj.$smx += $(".results-area").scrollLeft();
+		movingResultObj.$smy += $(".results-area").scrollTop();
+		movingResultObj.$smx += $(".results-area").scrollLeft();
 
-		obj.$isMovingTransitioningOff = false;
+		movingResultObj.$isMovingTransitioningOff = false;
 	}
 
 	$scope.reindex = function(result, index) {
@@ -315,7 +319,7 @@ _terrainBuilderExtension.results = function(_deps) {
 	}
 
 	$scope.touchMove = function(type, obj, evt) {
-		if(!obj.$isMoving) return;
+		if(!movingResultObj || !movingResultObj.$isMoving) return;
 
 		var ele = function(res) {
 			return $(".result[rel=" + res.index + "]");
@@ -330,44 +334,47 @@ _terrainBuilderExtension.results = function(_deps) {
 		my += $(".results-area").scrollTop();
 		mx += $(".results-area").scrollLeft();
 
-		var dx = mx - obj.$smx;
-		var dy = my - obj.$smy;
+		var dx = mx - movingResultObj.$smx;
+		var dy = my - movingResultObj.$smy;
 
-		obj.$x = obj.$sx + dx;
-		obj.$y = obj.$sy + dy;
+		movingResultObj.$x = movingResultObj.$sx + dx;
+		movingResultObj.$y = movingResultObj.$sy + dy;
 
-		var columns = Math.round(ele(obj).parent().width() / ele(obj).width());
+		var columns = Math.round(ele(movingResultObj).parent().width() / ele(movingResultObj).width());
 
-		var px = mx - ele(obj).parent().offset().left;
+		var px = mx - ele(movingResultObj).parent().offset().left;
 		if(px < 0) px = 0;
-		if(px > ele(obj).parent().offset().left + ele(obj).parent().width()) px = ele(obj).parent().offset().left + ele(obj).parent().width();
-		var py = my - ele(obj).parent().offset().top;
+		if(px > ele(movingResultObj).parent().offset().left + ele(movingResultObj).parent().width()) px = ele(movingResultObj).parent().offset().left + ele(movingResultObj).parent().width();
+		var py = my - ele(movingResultObj).parent().offset().top;
 		if(py < 0) py = 0;
-		var height = Math.ceil($(".result").length / columns) * ele(obj).height();
-		if(py > ele(obj).parent().offset().top + height) py = ele(obj).parent().offset().top + height;
+		var height = Math.ceil($(".result").length / columns) * ele(movingResultObj).height();
+		if(py > ele(movingResultObj).parent().offset().top + height) py = ele(movingResultObj).parent().offset().top + height;
 
-		var index = index = Math.floor(px / ele(obj).width());
-		index += columns * Math.floor(py / ele(obj).height());
+		var index = index = Math.floor(px / ele(movingResultObj).width());
+		index += columns * Math.floor(py / ele(movingResultObj).height());
 
-		if(index !== obj.overrideIndex)
-			$scope.reindex(obj, index);
+		if(index !== movingResultObj.overrideIndex)
+			$scope.reindex(movingResultObj, index);
 
-		obj.left = obj.$x + "px";
-		obj.top = obj.$y + "px";
+		movingResultObj.left = movingResultObj.$x + "px";
+		movingResultObj.top = movingResultObj.$y + "px";
 	}
 
 	$scope.touchUp = function(type, obj, evt) {
-		// trying to get it to animate on touch up
-		// var ele = function(res) {
-			// return $(".result[rel=" + res.index + "]");
-		// }
-		// ele(obj).css('transition', 'all 0.25s linear');
-		obj.$isMovingTransitioningOff = true;
+		if(!movingResultObj || !movingResultObj.$isMoving)
+			return;
+		var movedObj = movingResultObj;
+		movedObj.$isMovingTransitioningOff = true;
 		$timeout(function() { 
-			obj.$isMoving = false;
+			movedObj.$isMoving = false;
+			movingResultObj = null;
+			if(movedObj.$originalIndex == movedObj.overrideIndex && !movedObj.$pinning)
+				movedObj.overrideIndex = false;
+			// we need to know if we were pinning, because that click to pin will trigger this function too
+			movedObj.$pinning = false;
 			$timeout(function() {
-				obj.top = obj.endTop;
-				obj.left = obj.endLeft;
+				movedObj.top = movedObj.endTop;
+				movedObj.left = movedObj.endLeft;
 			}, 60);
 		}, 30);
 	}
