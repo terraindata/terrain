@@ -241,6 +241,9 @@ _terrainBuilderExtension.results = function(_deps) {
 				var s = scores.shift();
 				var n = normals[s];
 				if(n === undefined) {
+					console.log("asdf");
+					console.log(s);
+					console.log(normals);
 					break;
 				}
 				var r = n.shift();

@@ -62,20 +62,22 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 		    	results.css('top', (input.height() + parseInt(input.css('padding-top')) * 2 + parseInt(input.css('margin-top')) + 1) + 'px');
 		    	var placeholder = ele.find('.autocomplete-placeholder');
 		    	var allResultsElems, resultsObjs;
-		    	function select(result, fromClick) {
+		    	function select(result, fromClick, skipBlur) {
 		    		result = result + "";
 		    		scope.model = result;
 	    			if(scope.onSelect)
 	    				scope.onSelect({ obj: result });
 
-	    			input.blur();
+	    			if(!skipBlur) {
+		    			input.blur();
 
-	    			if(fromClick) {
-	    				input.focus();
-	    				$timeout(function() {
-	    					input.blur();
-	    				}, 250);
-	    			}
+		    			if(fromClick) {
+		    				input.focus();
+		    				$timeout(function() {
+		    					input.blur();
+		    				}, 250);
+		    			}
+		    		}
 		    	}
 		    	
 		    	var doResults = function(data) {
@@ -144,10 +146,10 @@ terrainApp.directive('tdbAutocomplete', ['$window', '$timeout', function($window
 			    				showingResults[selectedResultIndex].elem.addClass(selectedClass);
 			    				evt.preventDefault();
 			    			}
-			    		} else if(evt.keyCode == 13) {
-			    			// enter key
+			    		} else if(evt.keyCode == 13 || evt.keyCode == 9) {
+			    			// enter key or tab key
 			    			if(showingResults[selectedResultIndex])
-			    				select(showingResults[selectedResultIndex].result);
+			    				select(showingResults[selectedResultIndex].result, false, evt.keyCode === 9);
 			    		} else if(val.length != 0) {
 			    			placeholder.hide();
 			    			allResultsElems.show();
