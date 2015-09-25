@@ -202,13 +202,18 @@ _terrainBuilderExtension.results = function(_deps) {
 			this.showing = $scope.filterResult(this);
 			if(this.showing)
 				showingResults ++;
-		})
+		});
 		
 		// since we want to allow manual overrides, we have to make our own sorting function. Fun, I know.
 		// assumes: overrideIndexes are unique
 		var resultsInOrder = [];
 		var overrides = $scope.results.reduce(function(overrides, result) {
 			if(result.overrideIndex !== false && result.showing) {
+				if(overrides && overrides[result.overrideIndex]) {
+					console.log("ERROR! DUPLICATE OVERRIDES!", result.overrideIndex, overrides[result.overrideIndex], result);
+					result.overrideIndex = false;
+					return overrides;
+				}
 				overrides[result.overrideIndex] = result;
 				result.index = result.overrideIndex;
 			}
@@ -233,7 +238,9 @@ _terrainBuilderExtension.results = function(_deps) {
 			scores.reverse();
 
 		var index = 0;
+		// console.log(scores);
 		while(index < showingResults) {
+			// console.log(index, showingResults);
 			if(!overrides[index]) {
 				if(scores === undefined) {
 					break;
@@ -241,9 +248,9 @@ _terrainBuilderExtension.results = function(_deps) {
 				var s = scores.shift();
 				var n = normals[s];
 				if(n === undefined) {
-					console.log("asdf");
-					console.log(s);
-					console.log(normals);
+					// console.log("asdf");
+					// console.log(s);
+					// console.log(normals);
 					break;
 				}
 				var r = n.shift();
@@ -303,21 +310,57 @@ _terrainBuilderExtension.results = function(_deps) {
 	}
 
 	$scope.reindex = function(result, index) {
+		// reset all results to their original override indices, 
+		//  so that if we are moving the result all over the place,
+		//  we keep track of where things are / should be / started
 		$.each($scope.results, function(i,r) {
 			if(r.$originalOverrideIndex !== undefined)
 				r.overrideIndex = r.$originalOverrideIndex;
 			r.$originalOverrideIndex = undefined;
 		});
 
-		var indexToMove = index, resultToMove = $scope.results.reduce(function(ans,cur) { if(cur.overrideIndex === indexToMove) return cur; return ans; }, null);
+		result.overrideIndex = index;
+		result.$resultReindexMoving = true;
+
+		// if all results below this one are pinned, we will need to shift things backward
+		var direction = 1;
+		var allResultsAfterArePinned = $scope.results.reduce(function(ans,cur) {
+			if(cur.index >= index) {
+				return ans && cur.overrideIndex !== false;
+			}
+			return ans;
+			// if(!(cur.overrideIndex === false || (cur.overrideIndex !== false && cur.overrideIndex >= index) || cur.$resultReindexMoving))
+				// console.log('falsey', cur.overrideIndex, cur);
+			// return ans && (cur.overrideIndex === false || (cur.overrideIndex !== false && cur.overrideIndex >= index) || cur.$resultReindexMoving);
+		}, true);
+		if(allResultsAfterArePinned)
+			direction = -1;
+
+		// ASSUMES: result.id is unique
+		var indexToMove = index, resultToMove = $scope.results.reduce(function(ans,cur) { 
+			if(cur.overrideIndex === indexToMove && !cur.$resultReindexMoving) 
+				return cur; 
+			return ans; 
+		}, null);
+
+		console.log(indexToMove, allResultsAfterArePinned, direction, resultToMove);
+
 		while(resultToMove !== null && resultToMove !== result) {
-			indexToMove ++;
-			var nextResultToMove = $scope.results.reduce(function(ans,cur) { if(cur.overrideIndex === indexToMove) return cur; return ans; }, null);
+			indexToMove += direction;
+
+			var nextResultToMove = $scope.results.reduce(function(ans,cur) { 
+				if(cur.overrideIndex === indexToMove && !cur.$resultReindexMoving) 
+					return cur; 
+				return ans; 
+			}, null);
 			resultToMove.$originalOverrideIndex = resultToMove.overrideIndex;
 			resultToMove.overrideIndex = indexToMove;
+			console.log(resultToMove.name, resultToMove.overrideIndex, resultToMove.$originalOverrideIndex);
 			resultToMove = nextResultToMove;
 		}
-		result.overrideIndex = index;
+
+		result.$resultReindexMoving = false;
+		
 		$scope.resort();
 	}
 
@@ -368,6 +411,12 @@ _terrainBuilderExtension.results = function(_deps) {
 			return;
 		var movedObj = movingResultObj;
 		movedObj.$isMovingTransitioningOff = true;
+
+		// reset original override indices
+		$.each($scope.results, function() {
+			this.$originalOverrideIndex = this.overrideIndex;
+		});
+
 		$timeout(function() { 
 			movedObj.$isMoving = false;
 			movingResultObj = null;
