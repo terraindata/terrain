@@ -202,6 +202,8 @@ _terrainBuilderExtension.results = function(_deps) {
 			this.showing = $scope.filterResult(this);
 			if(this.showing)
 				showingResults ++;
+			else
+				this.index = -1;
 		});
 		
 		// since we want to allow manual overrides, we have to make our own sorting function. Fun, I know.
@@ -238,9 +240,7 @@ _terrainBuilderExtension.results = function(_deps) {
 			scores.reverse();
 
 		var index = 0;
-		// console.log(scores);
 		while(index < showingResults) {
-			// console.log(index, showingResults);
 			if(!overrides[index]) {
 				if(scores === undefined) {
 					break;
@@ -248,9 +248,6 @@ _terrainBuilderExtension.results = function(_deps) {
 				var s = scores.shift();
 				var n = normals[s];
 				if(n === undefined) {
-					// console.log("asdf");
-					// console.log(s);
-					// console.log(normals);
 					break;
 				}
 				var r = n.shift();
@@ -329,21 +326,15 @@ _terrainBuilderExtension.results = function(_deps) {
 				return ans && cur.overrideIndex !== false;
 			}
 			return ans;
-			// if(!(cur.overrideIndex === false || (cur.overrideIndex !== false && cur.overrideIndex >= index) || cur.$resultReindexMoving))
-				// console.log('falsey', cur.overrideIndex, cur);
-			// return ans && (cur.overrideIndex === false || (cur.overrideIndex !== false && cur.overrideIndex >= index) || cur.$resultReindexMoving);
 		}, true);
 		if(allResultsAfterArePinned)
 			direction = -1;
 
-		// ASSUMES: result.id is unique
 		var indexToMove = index, resultToMove = $scope.results.reduce(function(ans,cur) { 
 			if(cur.overrideIndex === indexToMove && !cur.$resultReindexMoving) 
 				return cur; 
 			return ans; 
 		}, null);
-
-		console.log(indexToMove, allResultsAfterArePinned, direction, resultToMove);
 
 		while(resultToMove !== null && resultToMove !== result) {
 			indexToMove += direction;
@@ -355,7 +346,6 @@ _terrainBuilderExtension.results = function(_deps) {
 			}, null);
 			resultToMove.$originalOverrideIndex = resultToMove.overrideIndex;
 			resultToMove.overrideIndex = indexToMove;
-			console.log(resultToMove.name, resultToMove.overrideIndex, resultToMove.$originalOverrideIndex);
 			resultToMove = nextResultToMove;
 		}
 

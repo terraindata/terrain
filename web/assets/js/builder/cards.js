@@ -279,7 +279,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 			return '128px';
 		if(card.filters)
 			return '128px';
-		if(card.score)
+		if(card.scores)
 			return (128 + 44 * $scope.cards.reduce(function(sum,c) { 
 				if(c.transform) return sum + 1; 
 				return sum 
