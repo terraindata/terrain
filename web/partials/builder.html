@@ -78,20 +78,17 @@
 				{{showing('builder') ? '-' : '+'}}
 			</div>
 		</h1>
-		<div class="algorithm-name-area">
-			<div class="row">
-				<div class="col-xs-9 algorithm-left">
-					<input type="text" class="algorithm-name-input" placeholder="Name your algorithm" />
-				</div>
-				<div class="col-xs-3 algorithm-right">
-					<a class="algorithm-save-btn button">Create Algorithm</a>
-				</div>
-			</div>
-		</div>
 		<div class="fixed-area builder-area {{dragIndices['card'] != -1 ? 'card-is-being-dragged' : ''}}" ng-show="showing('builder')">
-			<div class="all-weights" ng-show="ab('weights')">
-				<div class="weight" d3-slicer data="cards" on-change="handleChange(cardId)" card-id="-1"></div>
-			</div>
+			<!-- <div class="algorithm-name-area">
+				<div class="row">
+					<div class="col-xs-9 algorithm-left">
+						<input type="text" class="algorithm-name-input" placeholder="Name your algorithm" />
+					</div>
+					<div class="col-xs-3 algorithm-right">
+						<a class="algorithm-save-btn button">Create Algorithm</a>
+					</div>
+				</div>
+			</div> -->
 			<div ng-repeat="card in cards track by card.id" class="card-container card-container-{{card.id}}"  ng-drop="true" ng-drop-success="onCardDropComplete($index,$data,$event)" rel="{{$index}}" ng-mousemove="resultMove($index, 'card')" ng-touchmove="resultMove({{$index}}, 'card')"
 			ng-show="card.allShowing" 
 			ng-style="{height: card.height}">
@@ -555,8 +552,10 @@
 
 <script>
 var resize = function() {
-	if($(window).width() > 767)
+	if($(window).width() > 767) {
 		$('.fixed-area').css('height', ($(window).height() - $('.fixed-area').offset().top) + 'px');
+		$('.main-column').css('height', ($(window).height() - $('.main-column').offset().top) + 'px');
+	}
 	else
 		$('.fixed-area').css('height', 'auto');
 }

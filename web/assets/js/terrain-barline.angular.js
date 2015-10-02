@@ -187,7 +187,14 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			}
 		}
 
-	function doChart(newData, sameData) {
+	function doChart(newData, noAnimate) {
+		var sameData = false;
+		var initialDelay = 500;
+		var barAnimationDuration = 1000;
+		var pointAnimationDuration = 1000;
+		if(noAnimate)
+			initialDelay = barAnimationDuration = pointAnimationDuration = 0;
+
 		data = newData;
 		calcVars();
 		svg.attr('width', opts.width);
@@ -300,7 +307,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		if(data.invalid)
 			return;
 
-	    barArea.selectAll("rect")
+	    var b = barArea.selectAll("rect")
 			.data(data.bars)
 			.enter()
 			.append("rect")
@@ -308,12 +315,19 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 				return barStartingX(i);
 			})
 			.attr("y", function(d, i) {
+				if(noAnimate) {
+					if(d)
+						return barStartingY(d);
+					return 0;
+				}
 				return topMargin + workingHeight;
 			})
 			.attr("width", function(d, i) {
 				return barWidth;
 			})
 			.attr("height", function(d, i) {
+				if(d && noAnimate)
+					return workingHeight * d;
 				return 0;
 			})
 			.attr("fill", function(d, i) {
@@ -324,9 +338,9 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			})
 			.attr("class", function(d, i) {
 				return "bar bar_" + i;
-			})
-			.transition()
-				.duration(1000)
+			}).transition()
+				.delay(initialDelay)
+				.duration(barAnimationDuration)
 				.ease("cubic-out")
 				.attr("height", function(d, i) {
 					if(d)
@@ -363,10 +377,10 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 		.attr("stroke-width", opts.strokeWidth)
 		.attr("class", "path")
 		.attr("fill", "none")
-		.attr("opacity", 0)
+		.attr("opacity", noAnimate ? 1 : 0)
 		.transition()
-			.delay(1000)
-			.duration(500)
+			.delay(initialDelay + barAnimationDuration)
+			.duration(pointAnimationDuration)
 			.attr("opacity", 1)
 		;
 	        // .css('z-index', 1);
@@ -434,10 +448,10 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			.on("touchstart", function(d, i) {
 				touchDown(d,i);
 			})
-			.attr("opacity", 0)
+			.attr("opacity", noAnimate ? 1 : 0)
 			.transition()
-				.delay(1000)
-				.duration(500)
+				.delay(initialDelay + barAnimationDuration)
+				.duration(pointAnimationDuration)
 				.attr("opacity", 1)
 			;
 
@@ -500,7 +514,7 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 			doSpotlights(newData);
 	}, true);
 	$(window).resize(function() {
-		doChart(data);
+		doChart(data, true);
 	});
 
 
@@ -569,7 +583,11 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 					return scope.onClick({item: d});
 				})
 				.attr('height', barHeight)
-				.attr('width', 140)
+				.attr('width', function(d) {
+					if(noAnimate)
+						return xScale(d.score);
+					return 140;
+				})
 				.attr('x', Math.round(margin/2))
 				.attr('y', function(d,i) {
 					return i * (barHeight + barPadding);
@@ -578,7 +596,8 @@ terrainApp.directive('d3Bars', ['$window', '$timeout', 'd3Service', function($wi
 					return color(d.score);
 				})
 				.transition()
-				.duration(1000)
+				.delay(initialDelay)
+				.duration(barAnimationDuration)
 				.attr('width', function(d) {
 					return xScale(d.score);
 				});

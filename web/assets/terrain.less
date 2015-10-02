@@ -557,9 +557,7 @@ input:focus {
 }
 
 .fixed-area.builder-area {
-  margin-top: 0px;
-  border-radius: 0px;
-  padding-bottom: 70px;
+  padding-bottom: 10px;
 }
 
 
@@ -1462,4 +1460,23 @@ input:focus {
 	.more-button {
 		opacity: 1;
 	}
+}
+
+.page-header {
+	z-index: 999;
+    position: absolute;
+    width: 100%;
+    left: 10px;
+}
+
+.fixed-area {
+	margin-top: 20px;
+}
+
+@builder-total-padding: 20px;
+.fixed-area-pinned-at-bottom {
+    height: auto !important;
+    position: absolute;
+    width: calc(~"100% - 10px");
+    bottom: 0px;
 }

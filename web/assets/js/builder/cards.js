@@ -48,6 +48,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 	$scope = _deps.$scope;
 	$http = _deps.$http;
 	$timeout = _deps.$timeout;
+	$interval = _deps.$interval;
 
 
 	/* ----------------------------
@@ -259,7 +260,8 @@ _terrainBuilderExtension.cards = function(_deps) {
 		var newCard = $.extend({}, card);
 		newCard.suggested = true;
 		delete newCard['$$hashKey'];
-		$scope.newCards = $scope.newCards.concat([newCard]);
+		if(!newCard.wasSynthetic)
+			$scope.newCards = $scope.newCards.concat([newCard]);
 	}
 
 	function deepClone(v) {
@@ -311,6 +313,11 @@ _terrainBuilderExtension.cards = function(_deps) {
 
 		if($scope.cards.indexOf(cardToAdd) !== -1) return;
 
+		// // for pinning scroll at the bottom
+		// var builderElem = $(".builder-area");
+		// var isScrolledToBottom = builderElem[0].scrollHeight - builderElem[0].clientHeight <= builderElem[0].scrollTop + 1;
+		// console.log(isScrolledToBottom ? "bottom" : "not bottom");
+
 		// for animated slide-down
 		cardToAdd.height = '0px';
 		cardToAdd.allShowing = false;
@@ -343,6 +350,17 @@ _terrainBuilderExtension.cards = function(_deps) {
 		}, 25);
 
 		$scope.resort();
+
+		// // for pinning scroll at the bottom
+		// var builderElem = $(".builder-area");
+		// var isScrolledToBottom = builderElem[0].scrollHeight - builderElem[0].clientHeight <= builderElem[0].scrollTop + 1;
+		// console.log(isScrolledToBottom ? "bottom" : "not bottom");
+		// if(isScrolledToBottom) {
+		// 	$interval(function() {
+		// 		console.log('pin!');
+		// 		builderElem[0].scrollTop = builderElem[0].scrollHeight - builderElem[0].clientHeight;
+		// 	}, 25, (750 + 25) / 25);
+		// }
 	}
 
 	if($scope.ab('start')) {
@@ -589,6 +607,75 @@ _terrainBuilderExtension.cards = function(_deps) {
 			f.first = obj;
 		$scope.resort();
 	}
+
+
+	// Section: pinning builder to bottom
+	var builderElem = null;
+	var builderPinCount = 0;
+	$scope.$watch(function(scope) { return scope.cards; }, function(newValue, oldValue) {
+		if($scope.cards_dontPinBuilder) return;
+
+		// for pinning scroll at the bottom
+		if(!builderElem &&$ (".builder-area").length > 0)
+			builderElem = $(".builder-area");
+		if(builderElem) {
+			var isScrolledToBottom = builderElem[0].scrollHeight - builderElem[0].clientHeight <= builderElem[0].scrollTop + 1;
+			
+			var heightIsFilled = function() {
+				var sumHeight = 0;
+				$.each(builderElem.children(), function() {
+					sumHeight += $(this).height();
+				});
+				return sumHeight >= builderElem.height() - 2;
+			};
+
+			var pin = function(duration) {
+				if(duration === undefined) duration = 1000;
+				builderElem.addClass('fixed-area-pinned-at-bottom');
+				builderPinCount ++;
+				$timeout(function() {
+					builderPinCount --;
+					if(builderPinCount === 0) {
+						// ^ we need a counter in case the user changes cards again before timer is done
+						builderElem.removeClass('fixed-area-pinned-at-bottom');
+						builderElem[0].scrollTop = builderElem[0].scrollHeight - builderElem[0].clientHeight;
+					}
+				}, duration);
+			}
+
+			if(isScrolledToBottom) {
+				if(heightIsFilled()) {
+					pin();
+				} else {
+					var gotScrolledToBottom = false;
+					var intCount = 0;
+					$interval(function() {
+						intCount ++;
+						if(gotScrolledToBottom) return;
+						if(heightIsFilled()) {
+							pin(1000 - intCount * 50);
+							gotScrolledToBottom = true;
+						}
+					}, 50, 1000 / 50);	
+				}
+			}
+		}
+
+		// // Old approach, caused glitchiness
+		// if(!builderElem &&$ (".builder-area").length > 0)
+		// 	builderElem = $(".builder-area");
+		// if(builderElem) {
+		// 	var isScrolledToBottom = builderElem[0].scrollHeight - builderElem[0].clientHeight <= builderElem[0].scrollTop + 1;
+		// 	if(isScrolledToBottom) {
+		// 		// builderElem.animate({
+		// 		//     scrollTop: builderElem[0].scrollHeight - builderElem[0].clientHeight
+		// 		//  }, 750);
+		// 		$interval(function() {
+		// 			builderElem[0].scrollTop = builderElem[0].scrollHeight - builderElem[0].clientHeight;
+		// 		}, 25, (750 + 25) / 	25);
+		// 	}
+		// }
+	}, true);
 
 	/* ---------------------
 	 * Section: Connector

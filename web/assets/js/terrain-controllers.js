@@ -52,14 +52,15 @@ function selectPage(page) {
 	if(page == '#/builder') $(".navbar-tql").show();
 }
 
-terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http', '$timeout', 
-									function($scope, $routeParams, $http, $timeout) {
+terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http', '$timeout', '$interval',
+									function($scope, $routeParams, $http, $timeout, $interval) {
 	selectPage('#/builder');
 
 	var _deps = {
 		$scope: $scope,
 		$timeout: $timeout,
 		$http: $http,
+		$interval: $interval
 	};
 
 	var isShowing = ['builder', 'inputs', 'results'];
