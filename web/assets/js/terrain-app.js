@@ -344,6 +344,8 @@ terrainApp.directive('verticallyDraggable', ['$timeout', function($timeout) {
                     parent.children().css('-webkit-transition', 'top 0s');
                     parent.children().css('transition', 'top 0s');
                     parent.children().css('top', '0px');
+                    parent.children().css('z-index', 0);
+                    parent.children().css('position', 'inherit');
                     parent.find('.dragging-vertically-shifted-up').removeClass('dragging-vertically-shifted-up');
                     parent.find('.dragging-vertically-shifted-down').removeClass('dragging-vertically-shifted-down');
                     parent.find('.dragging-vertically').removeClass('dragging-vertically');

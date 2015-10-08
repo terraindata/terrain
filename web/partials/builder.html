@@ -226,7 +226,7 @@
 						</div>
 						<div class="card-select-area" ng-show="card.select">
 							<div>
-								<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields track by $index " vertically-draggable array="card.select.fields" index="$index" duration="0.25s"> <!-- removed:  -->
+								<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields track by $index" vertically-draggable array="card.select.fields" index="$index" duration="0.25s"> <!-- removed:  -->
 									<div class="col-xs-1"></div>
 									<div class="col-xs-10">
 										<div tdb-autocomplete data="_v_keys_plain" model="card.select.fields[$index]" on-select="_v_change()" auto-placeholder="Start typing to see matching field names">
@@ -251,53 +251,55 @@
 							</div>
 						</div>
 						<div class="card-filter-area" ng-show="card.filters">
-							<div class="row" ng-repeat="f in card.filters">
-								<div class="col-xs-1">
-									
-								</div>
-								<div class="col-xs-4 filter-field-input-wrapper">
-									<div tdb-autocomplete data="_v_keys_plain" model="f.first" on-select="card_valAndResort(obj, $index, false)" auto-placeholder="Start typing to see matching field names">
-										<input ng-model="f.first" ng-blur="input_checkForNewInput(f.first)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
+							<div>
+								<div class="row" ng-repeat="f in card.filters" vertically-draggable array="card.filters" index="$index" duration="0.25s">
+									<div class="col-xs-1">
+										
 									</div>
-								</div>
-								<div class="col-xs-2 center-align">
-									<div class="sign-selector">
-										<div class="terrain-dropdown terrain-dropdown-7-items">
-											<div class="terrain-dropdown-value-area">
-												<div class="terrain-dropdown-cell" ng-show="f.operator == 'le'">&le;</div>
-												<div class="terrain-dropdown-cell" ng-show="f.operator == 'lt'">&lt;</div>
-												<div class="terrain-dropdown-cell" ng-show="f.operator == 'ge'">&ge;</div>
-												<div class="terrain-dropdown-cell" ng-show="f.operator == 'gt'">&gt;</div>
-												<div class="terrain-dropdown-cell" ng-show="f.operator == 'eq'">=</div>
-												<div class="terrain-dropdown-cell" ng-show="f.operator == 'ne'">&ne;</div>
-												<div class="terrain-dropdown-cell" ng-show="f.operator == 'in'">in</div>
-											</div>
-											<div class="terrain-dropdown-cell-area">
-												<div class="terrain-dropdown-cell {{f.operator == 'le' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'le')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&le;</div>
-												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'le'">&le;</div>
-												<div class="terrain-dropdown-cell {{f.operator == 'lt' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'lt')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'lt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&lt;</div>
-												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'lt'">&lt;</div>
-												<div class="terrain-dropdown-cell {{f.operator == 'ge' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'ge')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'ge'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ge;</div>
-												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'ge'">&ge;</div>
-												<div class="terrain-dropdown-cell {{f.operator == 'gt' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'gt')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'gt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&gt;</div>
-												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'gt'">&gt;</div>
-												<div class="terrain-dropdown-cell {{f.operator == 'eq' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'eq')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'eq'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">=</div>
-												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'eq'">=</div>
-												<div class="terrain-dropdown-cell {{f.operator == 'ne' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'ne')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'ne'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ne;</div>
-												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'ne'">&ne;</div>
-												<div class="terrain-dropdown-cell {{f.operator == 'in' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'in')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'in'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">in</div>
-												<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'in'">in</div>
+									<div class="col-xs-4 filter-field-input-wrapper">
+										<div tdb-autocomplete data="_v_keys_plain" model="f.first" on-select="card_valAndResort(obj, $index, false)" auto-placeholder="Start typing to see matching field names">
+											<input ng-model="f.first" ng-blur="input_checkForNewInput(f.first)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
+										</div>
+									</div>
+									<div class="col-xs-2 center-align">
+										<div class="sign-selector">
+											<div class="terrain-dropdown terrain-dropdown-7-items">
+												<div class="terrain-dropdown-value-area">
+													<div class="terrain-dropdown-cell" ng-show="f.operator == 'le'">&le;</div>
+													<div class="terrain-dropdown-cell" ng-show="f.operator == 'lt'">&lt;</div>
+													<div class="terrain-dropdown-cell" ng-show="f.operator == 'ge'">&ge;</div>
+													<div class="terrain-dropdown-cell" ng-show="f.operator == 'gt'">&gt;</div>
+													<div class="terrain-dropdown-cell" ng-show="f.operator == 'eq'">=</div>
+													<div class="terrain-dropdown-cell" ng-show="f.operator == 'ne'">&ne;</div>
+													<div class="terrain-dropdown-cell" ng-show="f.operator == 'in'">in</div>
+												</div>
+												<div class="terrain-dropdown-cell-area">
+													<div class="terrain-dropdown-cell {{f.operator == 'le' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'le')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&le;</div>
+													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'le'">&le;</div>
+													<div class="terrain-dropdown-cell {{f.operator == 'lt' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'lt')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'lt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&lt;</div>
+													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'lt'">&lt;</div>
+													<div class="terrain-dropdown-cell {{f.operator == 'ge' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'ge')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'ge'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ge;</div>
+													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'ge'">&ge;</div>
+													<div class="terrain-dropdown-cell {{f.operator == 'gt' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'gt')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'gt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&gt;</div>
+													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'gt'">&gt;</div>
+													<div class="terrain-dropdown-cell {{f.operator == 'eq' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'eq')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'eq'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">=</div>
+													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'eq'">=</div>
+													<div class="terrain-dropdown-cell {{f.operator == 'ne' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'ne')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'ne'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ne;</div>
+													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'ne'">&ne;</div>
+													<div class="terrain-dropdown-cell {{f.operator == 'in' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'in')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'in'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">in</div>
+													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'in'">in</div>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-								<div class="col-xs-4">
-									<div tdb-autocomplete data="_v_keys_plain" model="f.second" on-select="card_valAndResort(obj, $index, true)" auto-placeholder="Start typing to see matching field names">
-										<input ng-model="f.second" ng-blur="input_checkForNewInput(f.second)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
+									<div class="col-xs-4">
+										<div tdb-autocomplete data="_v_keys_plain" model="f.second" on-select="card_valAndResort(obj, $index, true)" auto-placeholder="Start typing to see matching field names">
+											<input ng-model="f.second" ng-blur="input_checkForNewInput(f.second)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
+										</div>
 									</div>
-								</div>
-								<div class="col-xs-1">
-									<div class="card-select-delete clickable" ng-click="card_filter_removeField(card, $index)"><i class="fa fa-remove"></i></div>
+									<div class="col-xs-1">
+										<div class="card-select-delete clickable" ng-click="card_filter_removeField(card, $index)"><i class="fa fa-remove"></i></div>
+									</div>
 								</div>
 							</div>
 							<div class="row">
