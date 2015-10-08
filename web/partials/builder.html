@@ -225,15 +225,17 @@
 							</div>
 						</div>
 						<div class="card-select-area" ng-show="card.select">
-							<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields track by $index">
-								<div class="col-xs-1"></div>
-								<div class="col-xs-10">
-									<div tdb-autocomplete data="_v_keys_plain" model="card.select.fields[$index]" on-select="_v_change()" auto-placeholder="Start typing to see matching field names">
-										<input type="text" ng-model="card.select.fields[$index]" placeholder="Field Name" ng-blur="_v_change()" />
+							<div>
+								<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields track by $index " vertically-draggable array="card.select.fields" index="$index" duration="0.25s"> <!-- removed:  -->
+									<div class="col-xs-1"></div>
+									<div class="col-xs-10">
+										<div tdb-autocomplete data="_v_keys_plain" model="card.select.fields[$index]" on-select="_v_change()" auto-placeholder="Start typing to see matching field names">
+											<input type="text" ng-model="card.select.fields[$index]" placeholder="Field Name" ng-blur="_v_change()" />
+										</div>
 									</div>
-								</div>
-								<div class="col-xs-1">
-									<div class="card-select-delete clickable" ng-click="removeSelectFieldFromCard(card, $index)"><i class="fa fa-remove"></i></div>
+									<div class="col-xs-1">
+										<div class="card-select-delete clickable" ng-click="removeSelectFieldFromCard(card, $index)"><i class="fa fa-remove"></i></div>
+									</div>
 								</div>
 							</div>
 							<div class="row card-select-field card-new-select-field">

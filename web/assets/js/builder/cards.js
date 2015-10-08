@@ -175,6 +175,16 @@ _terrainBuilderExtension.cards = function(_deps) {
 			// $scope.cards[0].allShowing = true;
 			// $scope.cards[0].from.value = 'sitters';
 		}
+		if($scope.ab('select')) {
+			setTimeout(function() {
+				$scope.addCard($scope.newCards[0], null);
+				$scope.cards[1].select.fields = ['sitter.name', 'sitter.minPrice', 'sitter.responseTime', 'sitter.attributes'];
+			}, 2000);
+			// var c = $scope.newCards.shift();
+			// c.select.fields = ['sitter.name', 'sitter.minPrice', 'sitter.responseTime', 'sitter.attributes'];
+			// c.allShowing = true;
+			// $scope.cards = $scope.cards.concat($scope.cards, [c]);
+		}
 	} else {
 		$.each($scope.cards, function(i,c) {
 			c.allShowing = true;

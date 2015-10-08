@@ -46,6 +46,7 @@
 	<script src="jquery.js"></script>
 	<script src="assets/js/terrain-config.js"></script>
 	<script src="assets/js/angular.min.js"></script>
+	<script src="assets/js/d3.min.js"></script>
 	<script src="assets/js/d3.angular.js"></script>
 	<script src="assets/js/node_modules/angular-route/angular-route.min.js"></script>
 	<script src="assets/js/ngDraggable.js"></script>
@@ -62,10 +63,13 @@
 	<script src="assets/js/builder/results.js"></script>
 	<script src="assets/js/builder/transform.js"></script>
 	<script src="assets/js/terrain-controllers.js"></script>
+	<script src="assets/js/hex-controller.js"></script>
+	<script src="assets/js/terrain-hex.angular.js"></script>
 	<script src="assets/js/terrain-directives.js"></script>
 	<script src="assets/plugins/fancybox/jquery.fancybox.js"></script>
 	<script type="text/javascript" src="assets/color-admin/plugins/moment/moment.min.js"></script>
 	<script src="assets/plugins/angular-bootstrap-datetimepicker-master/src/js/datetimepicker.js"></script>
+
 
 	<!-- set options before less.js script -->
 	<script>
@@ -85,6 +89,9 @@
 	<!-- ================== END TERRAIN CUSTOM ================== -->
 </head>
 <body>
+	<div class="loading-screen"></div>
+	<script src="assets/js/hex-intro.js"></script>
+
 	<!-- begin #page-loader -->
 	<div id="page-loader" class="fade in"><span class="spinner"></span></div>
 	<!-- end #page-loader -->
@@ -249,5 +256,6 @@
 				$('.sidebar-minify-btn').click();
 		});
 	</script>
+
 </body>
 </html>

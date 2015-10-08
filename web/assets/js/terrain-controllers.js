@@ -173,6 +173,12 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 
 	$scope._v_key_order = function(v_key) {
+		var c = $scope.cardFor('select');
+		if(c) {
+			return c.select.fields.indexOf(v_key.key);
+		}
+		return 0;
+
 		if(v_key.key === 'sitter.profile')
 			return 0;
 		if(v_key.key === 'sitter.numJobs')
@@ -185,8 +191,8 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 	}
 
 	// Note: Order may matter. Be careful.
-	_terrainBuilderExtension.cards(_deps);
 	_terrainBuilderExtension.results(_deps);
+	_terrainBuilderExtension.cards(_deps);
 	_terrainBuilderExtension.inputs(_deps);
 	_terrainBuilderExtension.transform(_deps);
 }]);

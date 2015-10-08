@@ -235,3 +235,123 @@ terrainApp.directive('clicked', ['$timeout', function($timeout) {
         });
     };
 }]);
+
+terrainApp.directive('verticallyDraggable', ['$timeout', function($timeout) {
+    return {
+        restrict: 'EA', // (E)lement or (A)trribute
+        scope: {
+            array: '=', // bi-directional data-binding
+            index: '=' 
+        },
+        link: function(scope, element, attr) {
+
+            element.on('touchstart mousedown', function(event) {
+                event.preventDefault();
+                var target = event.originalEvent.target;
+                element.css('z-index', '999999');
+                element.css('position', 'relative');
+                element.css('cursor', 'pointer');
+                var startY = event.pageY;
+                var minY = element.parent().offset().top,
+                    maxY = element.parent().offset().top + element.parent().height() - element.height();
+                minY -= element.offset().top;
+                maxY -= element.offset().top;
+
+                var origY = element.offset().top;
+                var parent = element.parent();
+
+                var duration = attr.duration || '0.25s';
+                element.css('-webkit-transition', 'top 0s');
+                element.css('transition', 'top 0s');
+                element.addClass('dragging-vertically');
+
+                var children = [];
+                $.each(parent.children(), function() {
+                    if($(this).hasClass('dragging-vertically')) return;
+                    children.push({ top: $(this).offset().top, obj: $(this) });
+                    $(this).css('-webkit-transition', 'top ' + duration);
+                    $(this).css('transition', 'top ' + duration);
+                    $(this).css('position', 'relative');
+                    $(this).css('top', '0px');
+                });
+
+                var move = function(event) {
+                    var dy = event.pageY - startY;
+                    if(dy > maxY) dy = maxY;
+                    if(dy < minY) dy = minY;
+
+                    element.css('top', dy + 'px');
+                    var  curY = element.offset().top;
+                    
+                    $.each(children, function() {
+                        if(this.top < origY) {
+                            // current is on top of element
+                            if(curY < this.top + this.obj.height() / 2) {
+                                // should shift
+                                if(!this.obj.hasClass('dragging-vertically-shifted-down')) {
+                                    this.obj.css('top', (element.height() + parseInt(element.css('margin-top')) 
+                                        + parseInt(element.css('margin-bottom'))) + 'px'); 
+                                    this.obj.addClass('dragging-vertically-shifted-down');
+                                }
+                            } else {
+                                if(this.obj.hasClass('dragging-vertically-shifted-down')) {
+                                    this.obj.removeClass('dragging-vertically-shifted-down');
+                                    this.obj.css('top', '0px');
+                                }
+                            }
+                        } else {
+                            // current is below element
+                            if(curY + element.height() > this.top + 2) {
+                                // should shift
+                                if(!this.obj.hasClass('dragging-vertically-shifted-up')) {
+                                    this.obj.css('top', -1 * (element.height() /* + parseInt(element.css('margin-top')) */
+                                        + parseInt(element.css('margin-bottom')) + parseInt(this.obj.css('margin-top'))) + 'px'); 
+                                    this.obj.addClass('dragging-vertically-shifted-up');
+                                }
+                            } else {
+                                if(this.obj.hasClass('dragging-vertically-shifted-up')) {
+                                    this.obj.removeClass('dragging-vertically-shifted-up')
+                                    this.obj.css('top', '0px');
+                                }
+                            }
+                        }
+                    })
+                }
+                $(document).on('touchmove mousemove', move);
+
+                var endListeners = function(event) {
+                    var dy = event.pageY - startY;
+                    if(Math.abs(dy) < 2)
+                        $(target).focus();
+                    var newIndex = -1;
+                    if(parent.find('.dragging-vertically-shifted-down').length) {
+                        for(newIndex = 0; newIndex < parent.children().length; newIndex ++) {
+                            if($(parent.children()[newIndex]).hasClass('dragging-vertically-shifted-down'))
+                                break;
+                        }
+                    } else if(parent.find('.dragging-vertically-shifted-up').length) {
+                        for(newIndex = parent.children().length - 1; newIndex >= 0; newIndex --) {
+                            if($(parent.children()[newIndex]).hasClass('dragging-vertically-shifted-up'))
+                                break;
+                        }
+                    }
+                    if(newIndex != -1) {
+                        var a = scope.array.splice(scope.index, 1);
+                        scope.array.splice(newIndex, 0, a[0]); // TODO potential bug here when shifting backward?
+                        scope.$apply();
+                    }
+
+                    parent.children().css('-webkit-transition', 'top 0s');
+                    parent.children().css('transition', 'top 0s');
+                    parent.children().css('top', '0px');
+                    parent.find('.dragging-vertically-shifted-up').removeClass('dragging-vertically-shifted-up');
+                    parent.find('.dragging-vertically-shifted-down').removeClass('dragging-vertically-shifted-down');
+                    parent.find('.dragging-vertically').removeClass('dragging-vertically');
+                    $(document).off('touchmove mousemove', move);
+                    $(document).off('touchend mouseup', endListeners);
+                }
+                $(document).on('touchend mouseup', endListeners);
+            });
+        }
+    };
+}]);
