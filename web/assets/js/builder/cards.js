@@ -439,6 +439,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 	}
 
 	$scope.cardToggle = function(card) {
+		console.log('ct', card);
 		if($scope.cardDragLock)
 			return;
 		card.hidden = !card.hidden;

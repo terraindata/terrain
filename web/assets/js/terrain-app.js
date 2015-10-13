@@ -236,16 +236,17 @@ terrainApp.directive('clicked', ['$timeout', function($timeout) {
     };
 }]);
 
-terrainApp.directive('verticallyDraggable', ['$timeout', function($timeout) {
+terrainApp.directive('verticallyDraggable', ['$timeout', '$parse', function($timeout, $parse) {
     return {
         restrict: 'EA', // (E)lement or (A)trribute
         scope: {
             array: '=', // bi-directional data-binding
-            index: '=' 
+            index: '=',
+            vdClick: '&'  // parent execution binding
         },
         link: function(scope, element, attr) {
-
-            element.on('touchstart mousedown', function(event) {
+            var downElement = attr.handleClass ? element.find('.' + attr.handleClass) : element;
+            downElement.on('touchstart mousedown', function(event) {
                 event.preventDefault();
                 var target = event.originalEvent.target;
                 element.css('z-index', '999999');
@@ -286,7 +287,7 @@ terrainApp.directive('verticallyDraggable', ['$timeout', function($timeout) {
                     $.each(children, function() {
                         if(this.top < origY) {
                             // current is on top of element
-                            if(curY < this.top + this.obj.height() / 2) {
+                            if(curY < this.top + this.obj.height() - 5) {
                                 // should shift
                                 if(!this.obj.hasClass('dragging-vertically-shifted-down')) {
                                     this.obj.css('top', (element.height() + parseInt(element.css('margin-top')) 
@@ -301,7 +302,7 @@ terrainApp.directive('verticallyDraggable', ['$timeout', function($timeout) {
                             }
                         } else {
                             // current is below element
-                            if(curY + element.height() > this.top + 2) {
+                            if(curY + element.height() > this.top + 5) {
                                 // should shift
                                 if(!this.obj.hasClass('dragging-vertically-shifted-up')) {
                                     this.obj.css('top', -1 * (element.height() /* + parseInt(element.css('margin-top')) */
@@ -321,8 +322,18 @@ terrainApp.directive('verticallyDraggable', ['$timeout', function($timeout) {
 
                 var endListeners = function(event) {
                     var dy = event.pageY - startY;
-                    if(Math.abs(dy) < 2)
+                    if(Math.abs(dy) < 2) {
+                        console.log('ab');
                         $(target).focus();
+                        if(scope.vdClick && typeof scope.vdClick == 'function') {
+                            console.log('bc');
+                            scope.vdClick();
+                        }
+                    }
+                    else {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
                     var newIndex = -1;
                     if(parent.find('.dragging-vertically-shifted-down').length) {
                         for(newIndex = 0; newIndex < parent.children().length; newIndex ++) {
@@ -344,15 +355,17 @@ terrainApp.directive('verticallyDraggable', ['$timeout', function($timeout) {
                     parent.children().css('-webkit-transition', 'top 0s');
                     parent.children().css('transition', 'top 0s');
                     parent.children().css('top', '0px');
-                    parent.children().css('z-index', 0);
+                    parent.children().css('z-index', '');
                     parent.children().css('position', 'inherit');
                     parent.find('.dragging-vertically-shifted-up').removeClass('dragging-vertically-shifted-up');
                     parent.find('.dragging-vertically-shifted-down').removeClass('dragging-vertically-shifted-down');
                     parent.find('.dragging-vertically').removeClass('dragging-vertically');
                     $(document).off('touchmove mousemove', move);
                     $(document).off('touchend mouseup', endListeners);
+                    element.off('touchend mouseup', endListeners);
                 }
                 $(document).on('touchend mouseup', endListeners);
+                element.on('touchend mouseup', endListeners);
             });
         }
     };

@@ -89,311 +89,315 @@
 					</div>
 				</div>
 			</div> -->
-			<div ng-repeat="card in cards track by card.id" class="card-container card-container-{{card.id}}"  ng-drop="true" ng-drop-success="onCardDropComplete($index,$data,$event)" rel="{{$index}}" ng-mousemove="resultMove($index, 'card')" ng-touchmove="resultMove({{$index}}, 'card')"
-			ng-show="card.allShowing" 
-			ng-style="{height: card.height}">
-				<div class="pre-card">
-					<div ng-slide-down="card.newCardIsShowing" duration="0.25">
-						<div class="new-card-wrapper">
-							<div class="new-card card">
-								<div class="row new-card-text-area">
-									<div class="col-xs-1 new-card-icon-cell">
-										<div class="new-card-icon">
+			<div>
+				<div ng-repeat="card in cards track by card.id" class="card-container card-container-{{card.id}}"  ng-drop="true" ng-drop-success="onCardDropComplete($index,$data,$event)" rel="{{$index}}" ng-mousemove="resultMove($index, 'card')" ng-touchmove="resultMove({{$index}}, 'card')"
+				ng-show="card.allShowing" 
+				ng-style="{height: card.height}"
+				vertically-draggable array="cards" index="$index" duration="0.25s" handle-class="card-title" vd-click="cardToggle(card)"
+				>
+					<div class="pre-card">
+						<div ng-slide-down="card.newCardIsShowing" duration="0.25">
+							<div class="new-card-wrapper">
+								<div class="new-card card">
+									<div class="row new-card-text-area">
+										<div class="col-xs-1 new-card-icon-cell">
+											<div class="new-card-icon">
+												<div class="new-card-icon-inner">+</div>
+											</div>
+										</div>
+										<div class="col-xs-10">
+											<div tdb-autocomplete data="newCards" key-to-display="name" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
+												<input type="text" placeholder="Card Name" />
+											</div>
+										</div>
+										<div class="col-xs-1">
+											<a ng-click="card.newCardIsShowing = false" class="new-card-hide-btn pull-right small"> Hide </a>
+										</div>
+									</div>
+									<div class="new-card-suggestions-area">
+										<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion button" ng-click="addCard(suggestion, card)">
+											{{suggestion.name}}
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="new-card-plus-wrapper" ng-slide-down="!card.newCardIsShowing" duration="0.25">
+							<a class="new-card-plus-area" ng-click="card.newCardIsShowing = true">
+								<div class="new-card-plus-line"></div>
+								<div class="new-card-plus">
+									+
+								</div>
+							</a>
+						</div>
+					</div>
+					<div class="card card-{{card.id}} has-more-button {{shiftedClass($index, 'card')}}" ng-right-click-menu rel="{{$index}}">
+						<div class="card-title row">
+							<div class="col-xs-11">{{card.key || ""}} {{titleForCard(card)}}</div>
+						</div>
+						<div class="more-button more-4-items more-right more-button-large">
+							<i class="fa fa-ellipsis-h more-icon"></i>
+							<div class="more-hidden-area">
+								<div class="more-menu-item" ng-click="cardToggle(card)" ng-hide="card.hidden">Collapse</div>
+								<div class="more-menu-item" ng-click="cardToggle(card)" ng-show="card.hidden">Reveal</div>
+								<div class="more-menu-item" ng-click="collapseAllCards(true)">Collapse All</div>
+								<div class="more-menu-item" ng-click="collapseAllCards(false)">Reveal All</div>
+								<div class="more-menu-item" ng-click="removeCard(card)">Delete</div>
+							</div>
+						</div>
+						<div class="card-body" rel="{{card.id}}" ng-slide-down="!card.hidden" duration="0.25" ng-mousemove="showBody(card.id)">
+							<div class="card-body-spacing"></div>
+							<div class="card-from-area" ng-show="card.from">
+								<div class="row">
+									<div class="col-xs-1"></div>
+									<div class="col-xs-10">
+										<div tdb-autocomplete data="fromOptions" model="card.from.value" placeholder="Table Name" auto-placeholder="Start typing to see matching table names" on-select="card_fromChanged(card)">
+											<input type="text" ng-model="card.from.value" placeholder="Table Name" ng-keyup="card_fromChanged(card)" />
+										</div>
+									</div>
+									<div class="col-xs-1"></div>
+								</div>
+								<div ng-repeat="join in card.from.joins" duration="0.5" class="input-container" class="row">
+									<div class="row card-join-area">
+										<div class="col-xs-1"></div>
+										<div class="col-xs-5">
+											<div tdb-autocomplete data="fromOptions" model="join.table" placeholder="Table Name" auto-placeholder="Start typing to see matching table names" on-select="card_joinChanged(card, $index)">
+												<input type="text" class="card-join-input" ng-model="join.table" placeholder="Table Name" ng-change="card_joinChanged(card, $index)" />
+											</div>
+											<!-- <input type="text"  placeholder="enter table to join" /> -->
+										</div>
+										<div class="col-xs-2">
+											<input type="text" class="card-join-input" ng-model="join.first" placeholder="" />
+										</div>
+										<div class="col-xs-1 center-align input-join-dropdown">
+											<div class="sign-selector">
+												<div class="terrain-dropdown terrain-dropdown-5-items card-join-dropdown-area">
+													<div class="terrain-dropdown-value-area">
+														<div class="terrain-dropdown-cell" ng-show="join.operator == 'le'">&le;</div>
+														<div class="terrain-dropdown-cell" ng-show="join.operator == 'lt'">&lt;</div>
+														<div class="terrain-dropdown-cell" ng-show="join.operator == 'ge'">&ge;</div>
+														<div class="terrain-dropdown-cell" ng-show="join.operator == 'gt'">&gt;</div>
+														<div class="terrain-dropdown-cell" ng-show="join.operator == 'eq'">=</div>
+													</div>
+													<div class="terrain-dropdown-cell-area">
+														<div class="terrain-dropdown-cell {{join.operator == 'le' ? 'selected' : ''}}" ng-step-change="join.operator = 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&le;</div>
+														<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'le'">&le;</div>
+														<div class="terrain-dropdown-cell {{join.operator == 'lt' ? 'selected' : ''}}" ng-step-change="join.operator = 'lt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'lt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&lt;</div>
+														<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'lt'">&lt;</div>
+														<div class="terrain-dropdown-cell {{join.operator == 'ge' ? 'selected' : ''}}" ng-step-change="join.operator = 'ge'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'ge'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ge;</div>
+														<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'ge'">&ge;</div>
+														<div class="terrain-dropdown-cell {{join.operator == 'gt' ? 'selected' : ''}}" ng-step-change="join.operator = 'gt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'gt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&gt;</div>
+														<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'gt'">&gt;</div>
+														<div class="terrain-dropdown-cell {{join.operator == 'eq' ? 'selected' : ''}}" ng-step-change="join.operator = 'eq'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'eq'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">=</div>
+														<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'eq'">=</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-xs-2">
+											<input type="text" class="card-join-input" ng-model="join.second" placeholder="" />
+										</div>
+										<div class="col-xs-1"></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-1">
+										<div class="new-card-icon" ng-click="addBlankJoin(card, -1)">
 											<div class="new-card-icon-inner">+</div>
 										</div>
 									</div>
 									<div class="col-xs-10">
-										<div tdb-autocomplete data="newCards" key-to-display="name" input-classes="bordered-input" on-select="addCardAndApply(obj, card)" placeholder="Type card name here, or select from the suggetions below" auto-placeholder="Start typing to see matching card names">
-											<input type="text" placeholder="Card Name" />
+										<input type="text" ng-focus="addBlankJoin(card, -1)" placeholder="Add a Join" />
+										<!-- <div class="card-addjoin-text">Add a Join</div> -->
+									</div>
+									<div class="col-xs-1"></div>
+								</div>
+							</div>
+							<div class="card-sort-title-area" ng-show="card.order">
+								<div class="row">
+									<div class="col-xs-1"></div>
+									<div class="col-xs-12 col-sm-5">
+										<div tdb-autocomplete data="_v_keys_plain" model="card.order.field" on-select="handleChange()" auto-placeholder="Start typing to see matching field names">
+											<input type="text" ng-model="card.order.field" placeholder="Field Name" ng-change="resort()" />
 										</div>
 									</div>
+									<div class="col-xs-12 col-sm-5">
+										<input ng-blur="resort()" ng-model="card.order.direction" placeholder="Descending" />
+									</div>
+									<div class="col-xs-1"></div>
+								</div>
+							</div>
+							<div class="card-select-area" ng-show="card.select">
+								<div>
+									<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields track by $index" vertically-draggable array="card.select.fields" index="$index" duration="0.25s"> <!-- removed:  -->
+										<div class="col-xs-1"></div>
+										<div class="col-xs-10">
+											<div tdb-autocomplete data="_v_keys_plain" model="card.select.fields[$index]" on-select="_v_change()" auto-placeholder="Start typing to see matching field names">
+												<input type="text" ng-model="card.select.fields[$index]" placeholder="Field Name" ng-blur="_v_change()" />
+											</div>
+										</div>
+										<div class="col-xs-1">
+											<div class="card-select-delete clickable" ng-click="removeSelectFieldFromCard(card, $index)"><i class="fa fa-remove"></i></div>
+										</div>
+									</div>
+								</div>
+								<div class="row card-select-field card-new-select-field">
 									<div class="col-xs-1">
-										<a ng-click="card.newCardIsShowing = false" class="new-card-hide-btn pull-right small"> Hide </a>
+										<div class="new-card-icon" ng-click="newSelectFieldForCard(card)">
+											<div class="new-card-icon-inner">+</div>
+										</div>
+									</div>
+									<div class="col-xs-10">
+										<input class="new-field-input" ng-focus="newSelectFieldForCard(card)" placeholder="Add a new field" />
+									</div>
+									<div class="col-xs-1"></div>
+								</div>
+							</div>
+							<div class="card-filter-area" ng-show="card.filters">
+								<div>
+									<div class="row" ng-repeat="f in card.filters" vertically-draggable array="card.filters" index="$index" duration="0.25s">
+										<div class="col-xs-1">
+											
+										</div>
+										<div class="col-xs-4 filter-field-input-wrapper">
+											<div tdb-autocomplete data="_v_keys_plain" model="f.first" on-select="card_valAndResort(obj, $index, false)" auto-placeholder="Start typing to see matching field names">
+												<input ng-model="f.first" ng-blur="input_checkForNewInput(f.first)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
+											</div>
+										</div>
+										<div class="col-xs-2 center-align">
+											<div class="sign-selector">
+												<div class="terrain-dropdown terrain-dropdown-7-items">
+													<div class="terrain-dropdown-value-area">
+														<div class="terrain-dropdown-cell" ng-show="f.operator == 'le'">&le;</div>
+														<div class="terrain-dropdown-cell" ng-show="f.operator == 'lt'">&lt;</div>
+														<div class="terrain-dropdown-cell" ng-show="f.operator == 'ge'">&ge;</div>
+														<div class="terrain-dropdown-cell" ng-show="f.operator == 'gt'">&gt;</div>
+														<div class="terrain-dropdown-cell" ng-show="f.operator == 'eq'">=</div>
+														<div class="terrain-dropdown-cell" ng-show="f.operator == 'ne'">&ne;</div>
+														<div class="terrain-dropdown-cell" ng-show="f.operator == 'in'">in</div>
+													</div>
+													<div class="terrain-dropdown-cell-area">
+														<div class="terrain-dropdown-cell {{f.operator == 'le' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'le')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&le;</div>
+														<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'le'">&le;</div>
+														<div class="terrain-dropdown-cell {{f.operator == 'lt' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'lt')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'lt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&lt;</div>
+														<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'lt'">&lt;</div>
+														<div class="terrain-dropdown-cell {{f.operator == 'ge' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'ge')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'ge'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ge;</div>
+														<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'ge'">&ge;</div>
+														<div class="terrain-dropdown-cell {{f.operator == 'gt' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'gt')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'gt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&gt;</div>
+														<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'gt'">&gt;</div>
+														<div class="terrain-dropdown-cell {{f.operator == 'eq' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'eq')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'eq'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">=</div>
+														<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'eq'">=</div>
+														<div class="terrain-dropdown-cell {{f.operator == 'ne' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'ne')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'ne'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ne;</div>
+														<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'ne'">&ne;</div>
+														<div class="terrain-dropdown-cell {{f.operator == 'in' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'in')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'in'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">in</div>
+														<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'in'">in</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-xs-4">
+											<div tdb-autocomplete data="_v_keys_plain" model="f.second" on-select="card_valAndResort(obj, $index, true)" auto-placeholder="Start typing to see matching field names">
+												<input ng-model="f.second" ng-blur="input_checkForNewInput(f.second)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
+											</div>
+										</div>
+										<div class="col-xs-1">
+											<div class="card-select-delete clickable" ng-click="card_filter_removeField(card, $index)"><i class="fa fa-remove"></i></div>
+										</div>
 									</div>
 								</div>
-								<div class="new-card-suggestions-area">
-									<a ng-repeat="suggestion in newCards | filter:{ suggested: true }" class="new-card-suggestion button" ng-click="addCard(suggestion, card)">
-										{{suggestion.name}}
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="new-card-plus-wrapper" ng-slide-down="!card.newCardIsShowing" duration="0.25">
-						<a class="new-card-plus-area" ng-click="card.newCardIsShowing = true">
-							<div class="new-card-plus-line"></div>
-							<div class="new-card-plus">
-								+
-							</div>
-						</a>
-					</div>
-				</div>
-				<div class="card card-{{card.id}} has-more-button {{shiftedClass($index, 'card')}}" ng-right-click-menu ng-drag="true" ng-drag-data="card"  rel="{{$index}}">
-					<div class="card-title row" ng-click="cardToggle(card)">
-						<div ng-drag-handle class="col-xs-11">{{card.key || ""}} {{titleForCard(card)}}</div>
-					</div>
-					<div class="more-button more-4-items more-right more-button-large">
-						<i class="fa fa-ellipsis-h more-icon"></i>
-						<div class="more-hidden-area">
-							<div class="more-menu-item" ng-click="cardToggle(card)" ng-hide="card.hidden">Collapse</div>
-							<div class="more-menu-item" ng-click="cardToggle(card)" ng-show="card.hidden">Reveal</div>
-							<div class="more-menu-item" ng-click="collapseAllCards(true)">Collapse All</div>
-							<div class="more-menu-item" ng-click="collapseAllCards(false)">Reveal All</div>
-							<div class="more-menu-item" ng-click="removeCard(card)">Delete</div>
-						</div>
-					</div>
-					<div class="card-body" rel="{{card.id}}" ng-slide-down="!card.hidden" duration="0.25" ng-mousemove="showBody(card.id)">
-						<div class="card-body-spacing"></div>
-						<div class="card-from-area" ng-show="card.from">
-							<div class="row">
-								<div class="col-xs-1"></div>
-								<div class="col-xs-10">
-									<div tdb-autocomplete data="fromOptions" model="card.from.value" placeholder="Table Name" auto-placeholder="Start typing to see matching table names" on-select="card_fromChanged(card)">
-										<input type="text" ng-model="card.from.value" placeholder="Table Name" ng-keyup="card_fromChanged(card)" />
+								<div class="row">
+									<div class="col-xs-1">
+										<div class="new-card-icon" ng-click="addFilter(card)">
+											<div class="new-card-icon-inner">+</div>
+										</div>
 									</div>
+									<div class="col-xs-10">
+										<input class="new-field-input" ng-focus="addFilter(card)" placeholder="Add Another Filter" />
+									</div>
+									<div class="col-xs-1"></div>
 								</div>
-								<div class="col-xs-1"></div>
+								<!-- <a class="new-filter-btn button" ng-click="addFilter(card)">Add a filter</a> -->
 							</div>
-							<div ng-repeat="join in card.from.joins" duration="0.5" class="input-container" class="row">
-								<div class="row card-join-area">
+							<div class="card-transform-area" ng-show="card.transform || card.preTransform">
+								<div class="invalid" ng-show="card.invalid">
+									You can't have two Transform cards for the same property.
+								</div>
+								<div class="row">
+									<div class="col-xs-1"></div>
+									<div class="col-xs-4">
+										<div tdb-autocomplete data="_v_keys_plain" model="card.key" on-select="transform_newKey(card, obj, true)" auto-placeholder="Start typing to see matching field names">
+											<input type="text" ng-model="card.key" placeholder="Field Name" ng-change="transform_newKey(card)" />
+										</div>
+									</div>
+									<div class="col-xs-1 arrow-wrapper">
+										<div class="vertically-middle">
+											<img src="assets/img/arrow.png" />
+										</div>
+									</div>
+									<div class="col-xs-5">
+										<div ng-show="card.preTransform" class="pre-transform">
+											Select a field to create a Transform card.
+										</div>
+										<div ng-show="card.transform">
+											<input type="text" ng-model="card.transform.outputKey" editable="false" />
+										</div>
+									</div>
+									<div class="col-xs-1"></div>
+								</div>
+								<div ng-repeat="t in card.transformArr">
+									<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
+									<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
+								</div>
+							</div>
+							<div class="card-score-area" ng-show="card.scores">
+								<div class="row">
+									<div class="col-xs-1"></div>
+									<div class="col-xs-4">
+										<input type="text" ng-model="card.scores.method" placeholder="Scoring Method" editable="false" />
+									</div>
+									<div class="col-xs-1 arrow-wrapper">
+										<div class="vertically-middle">
+											<img src="assets/img/arrow.png" />
+										</div>
+									</div>
+									<div class="col-xs-5">
+										<input type="text" ng-model="card.scores.outputField" editable="false" placeholder="Output Field" />
+									</div>
+									<div class="col-xs-1"></div>
+								</div>
+								<div class="row" ng-repeat="transformCard in cards | filter: { type: 'transform' }">
 									<div class="col-xs-1"></div>
 									<div class="col-xs-5">
-										<div tdb-autocomplete data="fromOptions" model="join.table" placeholder="Table Name" auto-placeholder="Start typing to see matching table names" on-select="card_joinChanged(card, $index)">
-											<input type="text" class="card-join-input" ng-model="join.table" placeholder="Table Name" ng-change="card_joinChanged(card, $index)" />
-										</div>
-										<!-- <input type="text"  placeholder="enter table to join" /> -->
-									</div>
-									<div class="col-xs-2">
-										<input type="text" class="card-join-input" ng-model="join.first" placeholder="" />
-									</div>
-									<div class="col-xs-1 center-align input-join-dropdown">
-										<div class="sign-selector">
-											<div class="terrain-dropdown terrain-dropdown-5-items card-join-dropdown-area">
-												<div class="terrain-dropdown-value-area">
-													<div class="terrain-dropdown-cell" ng-show="join.operator == 'le'">&le;</div>
-													<div class="terrain-dropdown-cell" ng-show="join.operator == 'lt'">&lt;</div>
-													<div class="terrain-dropdown-cell" ng-show="join.operator == 'ge'">&ge;</div>
-													<div class="terrain-dropdown-cell" ng-show="join.operator == 'gt'">&gt;</div>
-													<div class="terrain-dropdown-cell" ng-show="join.operator == 'eq'">=</div>
-												</div>
-												<div class="terrain-dropdown-cell-area">
-													<div class="terrain-dropdown-cell {{join.operator == 'le' ? 'selected' : ''}}" ng-step-change="join.operator = 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&le;</div>
-													<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'le'">&le;</div>
-													<div class="terrain-dropdown-cell {{join.operator == 'lt' ? 'selected' : ''}}" ng-step-change="join.operator = 'lt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'lt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&lt;</div>
-													<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'lt'">&lt;</div>
-													<div class="terrain-dropdown-cell {{join.operator == 'ge' ? 'selected' : ''}}" ng-step-change="join.operator = 'ge'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'ge'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ge;</div>
-													<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'ge'">&ge;</div>
-													<div class="terrain-dropdown-cell {{join.operator == 'gt' ? 'selected' : ''}}" ng-step-change="join.operator = 'gt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'gt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&gt;</div>
-													<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'gt'">&gt;</div>
-													<div class="terrain-dropdown-cell {{join.operator == 'eq' ? 'selected' : ''}}" ng-step-change="join.operator = 'eq'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="join.operator == 'eq'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">=</div>
-													<div class="terrain-dropdown-cell selected" ng-show="join.operator == 'eq'">=</div>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-xs-2">
-										<input type="text" class="card-join-input" ng-model="join.second" placeholder="" />
-									</div>
-									<div class="col-xs-1"></div>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-xs-1">
-									<div class="new-card-icon" ng-click="addBlankJoin(card, -1)">
-										<div class="new-card-icon-inner">+</div>
-									</div>
-								</div>
-								<div class="col-xs-10">
-									<input type="text" ng-focus="addBlankJoin(card, -1)" placeholder="Add a Join" />
-									<!-- <div class="card-addjoin-text">Add a Join</div> -->
-								</div>
-								<div class="col-xs-1"></div>
-							</div>
-						</div>
-						<div class="card-sort-title-area" ng-show="card.order">
-							<div class="row">
-								<div class="col-xs-1"></div>
-								<div class="col-xs-12 col-sm-5">
-									<div tdb-autocomplete data="_v_keys_plain" model="card.order.field" on-select="handleChange()" auto-placeholder="Start typing to see matching field names">
-										<input type="text" ng-model="card.order.field" placeholder="Field Name" ng-change="resort()" />
-									</div>
-								</div>
-								<div class="col-xs-12 col-sm-5">
-									<input ng-blur="resort()" ng-model="card.order.direction" placeholder="Descending" />
-								</div>
-								<div class="col-xs-1"></div>
-							</div>
-						</div>
-						<div class="card-select-area" ng-show="card.select">
-							<div>
-								<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields track by $index" vertically-draggable array="card.select.fields" index="$index" duration="0.25s"> <!-- removed:  -->
-									<div class="col-xs-1"></div>
-									<div class="col-xs-10">
-										<div tdb-autocomplete data="_v_keys_plain" model="card.select.fields[$index]" on-select="_v_change()" auto-placeholder="Start typing to see matching field names">
-											<input type="text" ng-model="card.select.fields[$index]" placeholder="Field Name" ng-blur="_v_change()" />
-										</div>
-									</div>
-									<div class="col-xs-1">
-										<div class="card-select-delete clickable" ng-click="removeSelectFieldFromCard(card, $index)"><i class="fa fa-remove"></i></div>
-									</div>
-								</div>
-							</div>
-							<div class="row card-select-field card-new-select-field">
-								<div class="col-xs-1">
-									<div class="new-card-icon" ng-click="newSelectFieldForCard(card)">
-										<div class="new-card-icon-inner">+</div>
-									</div>
-								</div>
-								<div class="col-xs-10">
-									<input class="new-field-input" ng-focus="newSelectFieldForCard(card)" placeholder="Add a new field" />
-								</div>
-								<div class="col-xs-1"></div>
-							</div>
-						</div>
-						<div class="card-filter-area" ng-show="card.filters">
-							<div>
-								<div class="row" ng-repeat="f in card.filters" vertically-draggable array="card.filters" index="$index" duration="0.25s">
-									<div class="col-xs-1">
-										
-									</div>
-									<div class="col-xs-4 filter-field-input-wrapper">
-										<div tdb-autocomplete data="_v_keys_plain" model="f.first" on-select="card_valAndResort(obj, $index, false)" auto-placeholder="Start typing to see matching field names">
-											<input ng-model="f.first" ng-blur="input_checkForNewInput(f.first)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
-										</div>
-									</div>
-									<div class="col-xs-2 center-align">
-										<div class="sign-selector">
-											<div class="terrain-dropdown terrain-dropdown-7-items">
-												<div class="terrain-dropdown-value-area">
-													<div class="terrain-dropdown-cell" ng-show="f.operator == 'le'">&le;</div>
-													<div class="terrain-dropdown-cell" ng-show="f.operator == 'lt'">&lt;</div>
-													<div class="terrain-dropdown-cell" ng-show="f.operator == 'ge'">&ge;</div>
-													<div class="terrain-dropdown-cell" ng-show="f.operator == 'gt'">&gt;</div>
-													<div class="terrain-dropdown-cell" ng-show="f.operator == 'eq'">=</div>
-													<div class="terrain-dropdown-cell" ng-show="f.operator == 'ne'">&ne;</div>
-													<div class="terrain-dropdown-cell" ng-show="f.operator == 'in'">in</div>
-												</div>
-												<div class="terrain-dropdown-cell-area">
-													<div class="terrain-dropdown-cell {{f.operator == 'le' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'le')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'le'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&le;</div>
-													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'le'">&le;</div>
-													<div class="terrain-dropdown-cell {{f.operator == 'lt' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'lt')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'lt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&lt;</div>
-													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'lt'">&lt;</div>
-													<div class="terrain-dropdown-cell {{f.operator == 'ge' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'ge')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'ge'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ge;</div>
-													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'ge'">&ge;</div>
-													<div class="terrain-dropdown-cell {{f.operator == 'gt' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'gt')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'gt'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&gt;</div>
-													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'gt'">&gt;</div>
-													<div class="terrain-dropdown-cell {{f.operator == 'eq' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'eq')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'eq'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">=</div>
-													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'eq'">=</div>
-													<div class="terrain-dropdown-cell {{f.operator == 'ne' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'ne')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'ne'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">&ne;</div>
-													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'ne'">&ne;</div>
-													<div class="terrain-dropdown-cell {{f.operator == 'in' ? 'selected' : ''}}" ng-step-change="card_filter_setOperator(card, $index, 'in')" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area" ng-hide="f.operator == 'in'" ng-step-change-parent-class="terrain-dropdown" ng-step-change-child-class="terrain-dropdown-value-area">in</div>
-													<div class="terrain-dropdown-cell selected" ng-show="f.operator == 'in'">in</div>
-												</div>
-											</div>
-										</div>
+										<input type="text" ng-value="transformCard.key + '.Score'" disabled />
 									</div>
 									<div class="col-xs-4">
-										<div tdb-autocomplete data="_v_keys_plain" model="f.second" on-select="card_valAndResort(obj, $index, true)" auto-placeholder="Start typing to see matching field names">
-											<input ng-model="f.second" ng-blur="input_checkForNewInput(f.second)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
+										<div class="weight" rel="{{transformCard.id}}" d3-slicer data="cards" card-id="{{transformCard.id}}" on-change="handleChange(cardId)"></div>
+									</div>
+									<div class="col-xs-1 score-card-weight-wrapper">
+										<input type="tel" class="score-card-weight" ng-model="transformCard.weight" ng-change="cards_score_updateWeight(transformCard)" />
+									</div>
+									<div class="col-xs-1"></div>
+								</div>
+							</div>
+							<div class="card-let-area" ng-show="card.let">
+								<div class="row">
+									<div class="col-xs-1"></div>
+									<div class="col-xs-4">
+										<input type="text" ng-model="card.let.key" ng-change="card_let_keyUpdate(card)" placeholder="Key" />
+									</div>
+									<div class="col-xs-1 arrow-wrapper">
+										<div class="vertically-middle">
+											<img src="assets/img/arrow.png" />
 										</div>
 									</div>
-									<div class="col-xs-1">
-										<div class="card-select-delete clickable" ng-click="card_filter_removeField(card, $index)"><i class="fa fa-remove"></i></div>
+									<div class="col-xs-5">
+										<input type="text" ng-change="card_let_expressionUpdate(card)" ng-model="card.let.expression" placeholder="Expression" />
 									</div>
+									<div class="col-xs-1"></div>
 								</div>
 							</div>
-							<div class="row">
-								<div class="col-xs-1">
-									<div class="new-card-icon" ng-click="addFilter(card)">
-										<div class="new-card-icon-inner">+</div>
-									</div>
-								</div>
-								<div class="col-xs-10">
-									<input class="new-field-input" ng-focus="addFilter(card)" placeholder="Add Another Filter" />
-								</div>
-								<div class="col-xs-1"></div>
-							</div>
-							<!-- <a class="new-filter-btn button" ng-click="addFilter(card)">Add a filter</a> -->
+							<div class="card-body-spacing"></div>
 						</div>
-						<div class="card-transform-area" ng-show="card.transform || card.preTransform">
-							<div class="invalid" ng-show="card.invalid">
-								You can't have two Transform cards for the same property.
-							</div>
-							<div class="row">
-								<div class="col-xs-1"></div>
-								<div class="col-xs-4">
-									<div tdb-autocomplete data="_v_keys_plain" model="card.key" on-select="transform_newKey(card, obj, true)" auto-placeholder="Start typing to see matching field names">
-										<input type="text" ng-model="card.key" placeholder="Field Name" ng-change="transform_newKey(card)" />
-									</div>
-								</div>
-								<div class="col-xs-1 arrow-wrapper">
-									<div class="vertically-middle">
-										<img src="assets/img/arrow.png" />
-									</div>
-								</div>
-								<div class="col-xs-5">
-									<div ng-show="card.preTransform" class="pre-transform">
-										Select a field to create a Transform card.
-									</div>
-									<div ng-show="card.transform">
-										<input type="text" ng-model="card.transform.outputKey" editable="false" />
-									</div>
-								</div>
-								<div class="col-xs-1"></div>
-							</div>
-							<div ng-repeat="t in card.transformArr">
-								<div class="graph" rel="{{card.id}}" d3-bars data="card.data" on-change="handleChange(cardId)" color="{{card.color}}" bar-height="20" bar-padding="5" smooth-line="{{ab('smooth')}}" spotlight-above="{{ab('spotlight')}}"></div>
-								<div class="weight" rel="{{card.id}}" d3-slicer data="cards" card-id="{{card.id}}" on-change="handleChange(cardId)"></div>
-							</div>
-						</div>
-						<div class="card-score-area" ng-show="card.scores">
-							<div class="row">
-								<div class="col-xs-1"></div>
-								<div class="col-xs-4">
-									<input type="text" ng-model="card.scores.method" placeholder="Scoring Method" editable="false" />
-								</div>
-								<div class="col-xs-1 arrow-wrapper">
-									<div class="vertically-middle">
-										<img src="assets/img/arrow.png" />
-									</div>
-								</div>
-								<div class="col-xs-5">
-									<input type="text" ng-model="card.scores.outputField" editable="false" placeholder="Output Field" />
-								</div>
-								<div class="col-xs-1"></div>
-							</div>
-							<div class="row" ng-repeat="transformCard in cards | filter: { type: 'transform' }">
-								<div class="col-xs-1"></div>
-								<div class="col-xs-5">
-									<input type="text" ng-value="transformCard.key + '.Score'" disabled />
-								</div>
-								<div class="col-xs-4">
-									<div class="weight" rel="{{transformCard.id}}" d3-slicer data="cards" card-id="{{transformCard.id}}" on-change="handleChange(cardId)"></div>
-								</div>
-								<div class="col-xs-1 score-card-weight-wrapper">
-									<input type="tel" class="score-card-weight" ng-model="transformCard.weight" ng-change="cards_score_updateWeight(transformCard)" />
-								</div>
-								<div class="col-xs-1"></div>
-							</div>
-						</div>
-						<div class="card-let-area" ng-show="card.let">
-							<div class="row">
-								<div class="col-xs-1"></div>
-								<div class="col-xs-4">
-									<input type="text" ng-model="card.let.key" ng-change="card_let_keyUpdate(card)" placeholder="Key" />
-								</div>
-								<div class="col-xs-1 arrow-wrapper">
-									<div class="vertically-middle">
-										<img src="assets/img/arrow.png" />
-									</div>
-								</div>
-								<div class="col-xs-5">
-									<input type="text" ng-change="card_let_expressionUpdate(card)" ng-model="card.let.expression" placeholder="Expression" />
-								</div>
-								<div class="col-xs-1"></div>
-							</div>
-						</div>
-						<div class="card-body-spacing"></div>
 					</div>
 				</div>
 			</div>
