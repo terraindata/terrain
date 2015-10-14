@@ -50,166 +50,27 @@ _terrainBuilderExtension.cards = function(_deps) {
 	$timeout = _deps.$timeout;
 	$interval = _deps.$interval;
 
+	var data = $scope.data;
 
 	/* ----------------------------
 	 * Section: Card Initialization
 	 * ---------------------------- */
-
-	$scope.fromOptions = [
-		{ id: 1, name: 'Listings' },
-		{ id: 2, name: 'Reviews' },
-		{ id: 3, name: 'Renters' },
-		{ id: 4, name: 'Leasers' }
-		];
 
 	$scope.colorIndex = 0;
 	$scope.getColor = function() {
 		return CARD_COLORS[$scope.colorIndex ++];
 	}
 
-	$scope.cards = [{
-		id:24,
-		from: {
-			value: '',
-			joins: [
-				// {
-				// 	table: 'availability',
-				// 	first: 'sitter.id',
-				// 	second: 'availability.sitterID',
-				// 	operator: 'eq',
-				// 	showing: 'true'
-				// },
-				// {
-				// 	table: 'job',
-				// 	first: 'sitter.id',
-				// 	second: 'job.sitterID',
-				// 	operator: 'eq',
-				// 	showing: 'true'
-				// }
-				]
-		},
-		name: 'From',
-		useTitle: true,
-		suggested: true
-	}, {
-		id: 17,
-		select: {
-			fields: [
-				// 'listing.name', 'listing.price', 'listing.rating', 'listing.stays', 'listing.description'
-				]
-		},
-		name: 'Select',
-		suggested: true
-	}, {
-		id: 237,
-		filters: [
-		// {
-		// 	first: 'listing.price',
-		// 	second: 'input.MaxPrice',
-		// 	operator: 'le'
-		// }
-		],
-		name: 'Filter',
-		suggested: true
-	}, {
-		id: 982,
-		name: "Score",
-		suggested: true,
-		scores: {
-			method: "weighted",
-			outputField: "FinalScore"
-		}		
-	}, { 
-		id: 0,
-		order: {
-			field: "FinalScore",
-			direction: "descending"
-		},
-		name: "Order",
-		useTitle: true,
-		suggested: true,
-	}];
-
-	$scope.newCards = [
-		{
-			id: -1,
-			name: 'Transform',
-			suggested: true,
-			syntheticCard: 'transform',
-			syntheticModel: {
-				preTransform: true,
-				name: 'Transform Card',
-				newCardIsShowing: false,
-			}
-		},
-		{
-			id: -2,
-			name: 'Let',
-			suggested: true,
-			syntheticCard: 'let',
-			syntheticModel: {
-				let: {
-					expression: '',
-					key: ''
-				},
-				newCardIsShowing: false,
-				name: 'Let'
-			}
-		}];
-
-	$.each($scope.cards, function(i,c) { c.card = true; });
-	$.each($scope.newCards, function(i,c) { c.card = true; });
-
-	if(!$scope.ab('start')) {
-		$scope.newCards = $scope.cards.concat($scope.newCards);
-		$scope.cards = [];
-		if($scope.ab('from')) {
-			var c = $scope.newCards.shift();
-			c.from.value = 'sitter';
-			c.allShowing = true;
-			$scope.cards = [c];
-			$timeout(function() {
-				$scope.HAS_SITTERS = true;
-			}, 250);
-			// delete $scope.newCards[0];
-			// $scope.cards[0].allShowing = true;
-			// $scope.cards[0].from.value = 'sitters';
-		}
-		if($scope.ab('select')) {
-			setTimeout(function() {
-				$scope.addCard($scope.newCards[0], null);
-				$scope.cards[1].select.fields = ['sitter.name', 'sitter.minPrice', 'sitter.responseTime', 'sitter.attributes'];
-			}, 2000);
-			// var c = $scope.newCards.shift();
-			// c.select.fields = ['sitter.name', 'sitter.minPrice', 'sitter.responseTime', 'sitter.attributes'];
-			// c.allShowing = true;
-			// $scope.cards = $scope.cards.concat($scope.cards, [c]);
-		}
-	} else {
-		$.each($scope.cards, function(i,c) {
-			c.allShowing = true;
-		});
-	}
-
-
-
-	var ORIGINAL_CARDS = JSON.parse(JSON.stringify($scope.cards)); // supposedly the fastest way to get a deep clone
-	var ORIGINAL_NEW_CARDS = JSON.parse(JSON.stringify($scope.newCards)); 
-
 	$scope.hardReset = function() {
 		ORIGINAL_CARDS = ORIGINAL_CARDS.map(function(card) { card.id += 875; return card; }); // because track by card.id
 		ORIGINAL_NEW_CARDS = ORIGINAL_NEW_CARDS.map(function(card) { card.id += 875; return card; }); // because track by card.id
-		$scope.cards = JSON.parse(JSON.stringify(ORIGINAL_CARDS));
-		$scope.newCards = JSON.parse(JSON.stringify(ORIGINAL_NEW_CARDS));
+		data.cards = JSON.parse(JSON.stringify(ORIGINAL_CARDS));
+		data.newCards = JSON.parse(JSON.stringify(ORIGINAL_NEW_CARDS));
 	}
 
 	$(".hard-reset").click(function() {
 		$scope.hardReset();
 	});
-
-
-	$scope.fromOptions = ['sitter', 'job', 'availability'];
-
 
 	/* ----------------------------
 	 * Section: Card Helpers
@@ -217,11 +78,11 @@ _terrainBuilderExtension.cards = function(_deps) {
 
 	$scope.getAllCards = function() {
 		// silly design decision. TODO make the cards as one variable and adjust accordingly
-		return $scope.cards.concat($scope.newCards);
+		return data.cards.concat(data.newCards);
 	}
 
 	$scope.cardFor = function(type) {
-		return $scope.cards.reduce(function(prev,cur) { if(cur[type]) return cur; return prev; }, null);
+		return data.cards.reduce(function(prev,cur) { if(cur[type]) return cur; return prev; }, null);
 	}
 
 
@@ -254,24 +115,24 @@ _terrainBuilderExtension.cards = function(_deps) {
 		var firstValue = '';
 		var secondValue = '';
 		var newOperator = 'eq';
-		var cardIndex = $scope.cards.indexOf(card);
+		var cardIndex = data.cards.indexOf(card);
 		var newJoin = { table: joinTable, first: firstValue, second: secondValue, showing: true, operator: newOperator};
 		if(joinIndex == -1) {
-			joinIndex = $scope.cards[cardIndex].from.joins.length;
+			joinIndex = data.cards[cardIndex].from.joins.length;
 			$timeout(function() {
 				$(".card[rel=" + cardIndex +"] .card-join-area:last input:first").focus();
 			}, 100);
 		}
-		$scope.cards[cardIndex].from.joins.splice(joinIndex, 0, newJoin);
+		data.cards[cardIndex].from.joins.splice(joinIndex, 0, newJoin);
 	}	
 
 	$scope.removeCard = function(card) {
-		$scope.cards.splice($scope.cards.indexOf(card), 1);
+		data.cards.splice(data.cards.indexOf(card), 1);
 		var newCard = $.extend({}, card);
 		newCard.suggested = true;
 		delete newCard['$$hashKey'];
 		if(!newCard.wasSynthetic)
-			$scope.newCards = $scope.newCards.concat([newCard]);
+			data.newCards = data.newCards.concat([newCard]);
 	}
 
 	function deepClone(v) {
@@ -292,7 +153,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 		if(card.filters)
 			return '128px';
 		if(card.scores)
-			return (128 + 44 * $scope.cards.reduce(function(sum,c) { 
+			return (128 + 44 * data.cards.reduce(function(sum,c) { 
 				if(c.transform) return sum + 1; 
 				return sum 
 			}, 0)) + 'px';
@@ -309,7 +170,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 		var addAtEnd = false;
 		if(cardToAddInFrontOf == null) {
 			var addAtEnd = true;
-			cardToAddInFrontOf = $scope.cards[0];
+			cardToAddInFrontOf = data.cards[0];
 		}
 
 		if(cardToAdd.syntheticCard) {
@@ -317,11 +178,11 @@ _terrainBuilderExtension.cards = function(_deps) {
 			cardToAdd.wasSynthetic = true;
 			do {
 				cardToAdd.id = Math.floor(Math.random() * 40000);
-			} while($scope.cards.reduce(function(prev,cur) { return cur.id == cardToAdd.id || prev; }, false));
+			} while(data.cards.reduce(function(prev,cur) { return cur.id == cardToAdd.id || prev; }, false));
 		}
 		cardToAdd.newCardIsShowing = false;
 
-		if($scope.cards.indexOf(cardToAdd) !== -1) return;
+		if(data.cards.indexOf(cardToAdd) !== -1) return;
 
 		// // for pinning scroll at the bottom
 		// var builderElem = $(".builder-area");
@@ -332,12 +193,12 @@ _terrainBuilderExtension.cards = function(_deps) {
 		cardToAdd.height = '0px';
 		cardToAdd.allShowing = false;
 
-		var addIndex = addAtEnd ? $scope.cards.length : $scope.cards.indexOf(cardToAddInFrontOf);
-		$scope.cards.splice(addIndex, 0, cardToAdd);
+		var addIndex = addAtEnd ? data.cards.length : data.cards.indexOf(cardToAddInFrontOf);
+		data.cards.splice(addIndex, 0, cardToAdd);
 		if(cardToAddInFrontOf) 
 			cardToAddInFrontOf.newCardIsShowing = false;
-		if($scope.newCards.indexOf(cardToAdd) != -1 && !cardToAdd.repeated)
-			$scope.newCards.splice($scope.newCards.indexOf(cardToAdd), 1);
+		if(data.newCards.indexOf(cardToAdd) != -1 && !cardToAdd.repeated)
+			data.newCards.splice(data.newCards.indexOf(cardToAdd), 1);
 
 		// Here's how I have the slide-down animation working for cards now:
 		//  0. builder.html has an ng-show="card.allShowing" and ng-style="{height: card.height}"
@@ -374,8 +235,8 @@ _terrainBuilderExtension.cards = function(_deps) {
 	}
 
 	if($scope.ab('start')) {
-		$scope.addCard($scope.newCards[0], $scope.cards[1]);
-		$scope.addCard($scope.newCards[0], $scope.cards[2]);
+		$scope.addCard(data.newCards[0], data.cards[1]);
+		$scope.addCard(data.newCards[0], data.cards[2]);
 	}
 
 	$scope.addCardAndApply = function(cardToAdd, cardToAddInFrontOf) {
@@ -390,11 +251,11 @@ _terrainBuilderExtension.cards = function(_deps) {
 		return arguments[0].newCardIsShowing;
 	}
 
-	$scope.cards_score_updateWeight = function(card) {
+	data.cards_score_updateWeight = function(card) {
 		if(card.weight > 100)
 			card.weight = 100;
 
-		var sumWeight = $scope.cards.reduce(function(sum,cur) {
+		var sumWeight = data.cards.reduce(function(sum,cur) {
 			if(cur.weight !== undefined)
 				sum += parseInt(cur.weight);
 			return sum;
@@ -402,7 +263,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 
 		var diff = 100 - sumWeight;
 
-		$.each($scope.cards, function(i,c) {
+		$.each(data.cards, function(i,c) {
 			if(c.weight !== undefined && c.id !== card.id) {
 				c.weight += diff;
 				if(c.weight < 0) {
@@ -433,7 +294,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 
 
 	$scope.collapseAllCards = function(state) {
-		$.each($scope.cards, function(index, card) {
+		$.each(data.cards, function(index, card) {
 			card.hidden = state;
 		});
 	}
@@ -462,8 +323,8 @@ _terrainBuilderExtension.cards = function(_deps) {
 	$scope.onCardDropComplete = function(index,card,event) {
 		if(!card.card) return; // not a card
 		// $(".card-container-"+card.id).css('opacity', '0');
-		$scope.cards.splice($scope.cards.indexOf(card), 1);
-		$scope.cards.splice(index, 0, card);
+		data.cards.splice(data.cards.indexOf(card), 1);
+		data.cards.splice(index, 0, card);
 		$(".card").css('transition', 'transform 0s ease-out');
 		$timeout(function() {
 			$(".card").css('transition', '');
@@ -595,7 +456,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 	function score_scoreForResult(result) {
 		// TerrainScore
 		var total = 0;
-		$.each($scope.cards, function(index, card) {
+		$.each(data.cards, function(index, card) {
 			if(card.transform) {
 				var score = $scope._v_result(card.transform.outputKey,result);
 				if(!isNaN(score))
@@ -624,7 +485,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 	var builderElem = null;
 	var builderPinCount = 0;
 	$scope.$watch(function(scope) { return scope.cards; }, function(newValue, oldValue) {
-		if($scope.cards_dontPinBuilder) return;
+		if(data.cards_dontPinBuilder) return;
 
 		// for pinning scroll at the bottom
 		if(!builderElem &&$ (".builder-area").length > 0)
@@ -694,7 +555,7 @@ _terrainBuilderExtension.cards = function(_deps) {
 
 
 	$scope.currentCardsToConnectorFormat = function() {
-		return $scope.cards.map(function(card) {
+		return data.cards.map(function(card) {
 			if(card.from) {
 				// from card
 				return {

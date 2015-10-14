@@ -178,19 +178,10 @@ terrainControllers.controller('BuilderCtrl', ['$scope', '$routeParams', '$http',
 			return c.select.fields.indexOf(v_key.key);
 		}
 		return 0;
-
-		if(v_key.key === 'sitter.profile')
-			return 0;
-		if(v_key.key === 'sitter.numJobs')
-			return 1;
-		if(v_key.key === 'sitter.responseTime')
-			return 2;
-		if(v_key.key === 'sitter.minPrice')
-			return 3;
-		return 4;
 	}
 
 	// Note: Order may matter. Be careful.
+	_terrainBuilderExtension.data(_deps);
 	_terrainBuilderExtension.results(_deps);
 	_terrainBuilderExtension.cards(_deps);
 	_terrainBuilderExtension.inputs(_deps);

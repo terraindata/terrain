@@ -257,11 +257,11 @@ _terrainBuilderExtension.transform = function(_deps) {
 	}
 
 	$scope.hasTransformCards = function() {
-		return $scope.cards.reduce(function(val, cur) { return val || cur.transform; }, false);
+		return $scope.data.cards.reduce(function(val, cur) { return val || cur.transform; }, false);
 	}
 
 	$scope.transformCards = function() {
-		return $scope.cards.reduce(function(builder, cur) { if(cur.transform) builder.push(cur); return builder; }, []);
+		return $scope.data.cards.reduce(function(builder, cur) { if(cur.transform) builder.push(cur); return builder; }, []);
 	}
 
 
@@ -318,7 +318,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 		}
 
 		var existingKey = false;
-		$.each($scope.cards, function(i,c) { if(c.transform && c.key == card.key && c.id !== card.id) existingKey = true; });
+		$.each($scope.data.cards, function(i,c) { if(c.transform && c.key == card.key && c.id !== card.id) existingKey = true; });
 		if(existingKey) {
 			card.invalid = true;
 			if(card.data) card.data.invalid = true;
@@ -336,10 +336,10 @@ _terrainBuilderExtension.transform = function(_deps) {
 			if($scope.hasTransformCards()) {
 				card.weight = 10;
 				var i = 0;
-				while(i < $scope.cards.length && ($scope.cards[i].weight < 2 * card.weight || !$scope.cards[i].transform))
+				while(i < $scope.data.cards.length && ($scope.data.cards[i].weight < 2 * card.weight || !$scope.data.cards[i].transform))
 					i ++;
 				
-				if(i >= $scope.cards.length) {
+				if(i >= $scope.data.cards.length) {
 					alert("There's no more space for a new card right now.");
 
 					if(doApply) {
@@ -348,7 +348,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 					return;
 				}
 
-				$scope.cards[i].weight -= card.weight;
+				$scope.data.cards[i].weight -= card.weight;
 			} else {
 				card.weight = 100;
 			}
@@ -435,7 +435,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 
 
 	 $scope.result_doTheSpotlights = function() {
-	 	$.each($scope.cards, function(cardIndex, card) {
+	 	$.each($scope.data.cards, function(cardIndex, card) {
 			if(!card.data) return;
 			card.data.spotlights = [];
 			$.each($scope.results, function(resultIndex, result) {

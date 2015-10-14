@@ -107,8 +107,8 @@ _terrainBuilderExtension.results = function(_deps) {
 		$scope.orderableFields = $scope.selectableFields.concat([{id: -1, name: '*TerrainScore'}]);
 
 		if($scope.ab('start')) {
-			$scope.transform_newKey($scope.cards[1], 'listing.price');
-			$scope.transform_newKey($scope.cards[2], 'listing.location');
+			$scope.transform_newKey($scope.data.cards[1], 'listing.price');
+			$scope.transform_newKey($scope.data.cards[2], 'listing.location');
 		}
     });
 
@@ -467,7 +467,7 @@ _terrainBuilderExtension.results = function(_deps) {
 
 	$scope.result_weightForKey = function(key) {
 		var weight = 0;
-		$.each($scope.cards, function() {
+		$.each($scope.data.cards, function() {
 			if(this.transform && this.key == key) {
 				weight = this.weight;
 			}
