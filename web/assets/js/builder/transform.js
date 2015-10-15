@@ -267,7 +267,6 @@ _terrainBuilderExtension.transform = function(_deps) {
 
 	// Section: finding transform scores
 
-
 	$scope.cardValueForResultDisplay = function(card, result) {
 		return $scope.numberToDisplay(cardValueForResult(card, result));
 	}
@@ -391,7 +390,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 		}
 
 		card.data.raw = [];
-		$.each($scope.results, function() {
+		$.each($scope.data.results, function() {
 			// TODO make sure you update the raw values if you're transforming a Let variable, and it changes
 			card.data.raw.push(+$scope._v_result(card.key, this));
 		});
@@ -438,7 +437,7 @@ _terrainBuilderExtension.transform = function(_deps) {
 	 	$.each($scope.data.cards, function(cardIndex, card) {
 			if(!card.data) return;
 			card.data.spotlights = [];
-			$.each($scope.results, function(resultIndex, result) {
+			$.each($scope.data.results, function(resultIndex, result) {
 				if(result.spotlight) {
 					card.data.spotlights.push({
 						rawValue: $scope._v_result(card.key, result),

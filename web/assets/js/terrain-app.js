@@ -323,10 +323,8 @@ terrainApp.directive('verticallyDraggable', ['$timeout', '$parse', function($tim
                 var endListeners = function(event) {
                     var dy = event.pageY - startY;
                     if(Math.abs(dy) < 2) {
-                        console.log('ab');
                         $(target).focus();
                         if(scope.vdClick && typeof scope.vdClick == 'function') {
-                            console.log('bc');
                             scope.vdClick();
                         }
                     }

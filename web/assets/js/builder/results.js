@@ -57,67 +57,10 @@ _terrainBuilderExtension.results = function(_deps) {
 	 * Section: Result Initialization
 	 * ---------------------------- */
 
-	$scope.search = {
-		lat: 37.77816542086827, long: -122.48045251661345
-	}
-
-	$http.get('assets/ajax/urbansitter.json').success(function(response) {
-      	$scope.results = response.data;
-      	var fields = {};
-      	$.each($scope.results, function(index) {
-      		var result = this;
-
-      		$.each(result, function(key,val) {
-      			fields[key] = 1;
-      		});
-
-      		// var locScore = latLongToDistance(result.lat, result.long, $scope.search.lat, $scope.search.long); //Math.pow(this.lat - $scope.search.lat, 2) + Math.pow(this.long - $scope.search.long, 2);
-      		// // TODO make sense of the ridiculous number of different location types
-      		// var locationKeys = ['location']; //, 'location_map', 'location_radius', 'location_mapradius', 'location_latlong'];
-      		// $.each(locationKeys, function(i,key) {
-      		// 	result[key] = locScore;
-      		// });
-
-      		/* add any more calculated result values here, as they come up, if they are not pre-calculated in the response */
-      		result.overrideIndex = false;
-
-      		$.each(result, function(key, val) {
-      			var k = 'sitter.' + key;
-      			if(key === 'imgUrl')
-      				k = 'sitter.profile';
-      			if(key.indexOf('.') !== -1)
-      				k = key;
-      			if(key.toLowerCase() === 'avgrating')
-      				k = 'avgRating';
-      			$scope._v_add(k, function(r) {
-      				return r[key];
-      			});
-      		});
-      	});
-		$scope.resort();
-
-		var i = 0;
-		$scope.selectableFields = $.map(fields, function(val, key) {
-			return {
-				id: i++,
-				name: key
-			}
-		});
-
-		$scope.orderableFields = $scope.selectableFields.concat([{id: -1, name: '*TerrainScore'}]);
-
-		if($scope.ab('start')) {
-			$scope.transform_newKey($scope.data.cards[1], 'listing.price');
-			$scope.transform_newKey($scope.data.cards[2], 'listing.location');
-		}
-    });
 
 	$(window).resize(function() {
 		$scope.resort();
 	});
-
-	$scope.selectableFields = [];
-	$scope.orderableFields = [];
 
 
 	/* ----------------------------
@@ -195,10 +138,10 @@ _terrainBuilderExtension.results = function(_deps) {
 
 
 	$scope.resort = function() {
-		if(!$scope.results) return;
+		if(!$scope.data.results) return;
 
 		var showingResults = 0;
-		$.each($scope.results, function() {
+		$.each($scope.data.results, function() {
 			this.showing = $scope.filterResult(this);
 			if(this.showing)
 				showingResults ++;
@@ -209,7 +152,7 @@ _terrainBuilderExtension.results = function(_deps) {
 		// since we want to allow manual overrides, we have to make our own sorting function. Fun, I know.
 		// assumes: overrideIndexes are unique
 		var resultsInOrder = [];
-		var overrides = $scope.results.reduce(function(overrides, result) {
+		var overrides = $scope.data.results.reduce(function(overrides, result) {
 			if(result.overrideIndex !== false && result.showing) {
 				if(overrides && overrides[result.overrideIndex]) {
 					console.log("ERROR! DUPLICATE OVERRIDES!", result.overrideIndex, overrides[result.overrideIndex], result);
@@ -222,7 +165,7 @@ _terrainBuilderExtension.results = function(_deps) {
 			return overrides;
 		}, {});
 		var scores = [];
-		var normals = $scope.results.reduce(function(normals, result) {
+		var normals = $scope.data.results.reduce(function(normals, result) {
 			if(result.overrideIndex === false && result.showing) {
 				var score = $scope.scoreForResult(result);
 				if(!normals[score])
@@ -310,7 +253,7 @@ _terrainBuilderExtension.results = function(_deps) {
 		// reset all results to their original override indices, 
 		//  so that if we are moving the result all over the place,
 		//  we keep track of where things are / should be / started
-		$.each($scope.results, function(i,r) {
+		$.each($scope.data.results, function(i,r) {
 			if(r.$originalOverrideIndex !== undefined)
 				r.overrideIndex = r.$originalOverrideIndex;
 			r.$originalOverrideIndex = undefined;
@@ -321,7 +264,7 @@ _terrainBuilderExtension.results = function(_deps) {
 
 		// if all results below this one are pinned, we will need to shift things backward
 		var direction = 1;
-		var allResultsAfterArePinned = $scope.results.reduce(function(ans,cur) {
+		var allResultsAfterArePinned = $scope.data.results.reduce(function(ans,cur) {
 			if(cur.index >= index) {
 				return ans && cur.overrideIndex !== false;
 			}
@@ -330,7 +273,7 @@ _terrainBuilderExtension.results = function(_deps) {
 		if(allResultsAfterArePinned)
 			direction = -1;
 
-		var indexToMove = index, resultToMove = $scope.results.reduce(function(ans,cur) { 
+		var indexToMove = index, resultToMove = $scope.data.results.reduce(function(ans,cur) { 
 			if(cur.overrideIndex === indexToMove && !cur.$resultReindexMoving) 
 				return cur; 
 			return ans; 
@@ -339,7 +282,7 @@ _terrainBuilderExtension.results = function(_deps) {
 		while(resultToMove !== null && resultToMove !== result) {
 			indexToMove += direction;
 
-			var nextResultToMove = $scope.results.reduce(function(ans,cur) { 
+			var nextResultToMove = $scope.data.results.reduce(function(ans,cur) { 
 				if(cur.overrideIndex === indexToMove && !cur.$resultReindexMoving) 
 					return cur; 
 				return ans; 
@@ -403,7 +346,7 @@ _terrainBuilderExtension.results = function(_deps) {
 		movedObj.$isMovingTransitioningOff = true;
 
 		// reset original override indices
-		$.each($scope.results, function() {
+		$.each($scope.data.results, function() {
 			this.$originalOverrideIndex = this.overrideIndex;
 		});
 
@@ -539,7 +482,7 @@ _terrainBuilderExtension.results = function(_deps) {
 
 			// var columns = parentWidth / 
 
-			y = $scope.results.reduce(function(total, current) {
+			y = $scope.data.results.reduce(function(total, current) {
 				if(current.index < result.index && (current.index - 1) % columns == 0 && current.showing)
 					total += resultHeight;
 				return total;

@@ -52,11 +52,13 @@ var _terrainBuilderExtension = _terrainBuilderExtension || function() {};
 _terrainBuilderExtension.data = function(_deps) {
 	$scope = _deps.$scope;
 	$timeout = _deps.$timeout;
+	$http = _deps.$http;
+	$interval = _deps.$interval;
 
 	var data = {};
 
 	/* ----------------------------
-	 * Section: Data Initialization
+	 * Section: Cards Initialization
 	 * ---------------------------- */
 
 	data.tables = ['sitter', 'job', 'availability'];
@@ -188,6 +190,45 @@ _terrainBuilderExtension.data = function(_deps) {
 	var ORIGINAL_CARDS = JSON.parse(JSON.stringify(data.cards)); // supposedly the fastest way to get a deep clone
 	var ORIGINAL_NEW_CARDS = JSON.parse(JSON.stringify(data.newCards)); 
 
+
+	/* ----------------------------
+	 * Section: Results Initialization
+	 * ---------------------------- */
+
+	$http.get('assets/ajax/urbansitter.json').success(function(response) {
+      	data.results = response.data;
+      	var fields = {};
+      	$.each(data.results, function(index) {
+      		var result = this;
+
+      		$.each(result, function(key,val) {
+      			fields[key] = 1;
+      		});
+
+      		/* add any more calculated result values here, as they come up, if they are not pre-calculated in the response */
+      		result.overrideIndex = false;
+
+      		$.each(result, function(key, val) {
+      			var k = 'sitter.' + key;
+      			if(key === 'imgUrl')
+      				k = 'sitter.profile';
+      			if(key.indexOf('.') !== -1)
+      				k = key;
+      			if(key.toLowerCase() === 'avgrating')
+      				k = 'avgRating';
+      			$scope._v_add(k, function(r) {
+      				return r[key];
+      			});
+      		});
+      	});
+      	if($scope.resort)
+			$scope.resort();
+
+		if($scope.ab('start')) {
+			$scope.transform_newKey($scope.data.cards[1], 'listing.price');
+			$scope.transform_newKey($scope.data.cards[2], 'listing.location');
+		}
+    });
 
 	$scope.data = data;
 }

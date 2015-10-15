@@ -441,7 +441,7 @@
 		</div>
 		<div class="results-area fixed-area" ng-show="HAS_SITTERS">
 			<div class="result {{result.overrideIndex !== false ? 'result-pinned' : '' }} {{result.$isMoving && !result.$isMovingTransitioningOff ? 'result-moving' : ''}}" 
-			ng-repeat="result in results" 
+			ng-repeat="result in data.results" 
 			ng-show="result.showing"
 			ng-down="touchDown('result', result, $event)"
 			ng-style="{ top: result.top, left: result.left }"
