@@ -230,5 +230,15 @@ _terrainBuilderExtension.data = function(_deps) {
 		}
     });
 
+
+
+	/* ----------------------------
+	 * Section: Input Initialization
+	 * ---------------------------- */
+
+	data.inputs = [];
+
+
+
 	$scope.data = data;
 }

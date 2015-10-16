@@ -49,12 +49,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 	$http = _deps.$http;
 	$timeout = _deps.$timeout;
 
-
-	/* ----------------------------
-	 * Section: Input Initialization
-	 * ---------------------------- */
-
-	$scope.inputs = [];
+	var data = $scope.data;
 
 	/* ----------------------------
 	 * Section: Input Helpers
@@ -72,7 +67,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 	};	
 	
 	$scope.inputFor = function(inputName) {
-		return $scope.inputs.reduce(function(prev,cur) { return cur.name == inputName ? cur : prev; }, null);
+		return data.inputs.reduce(function(prev,cur) { return cur.name == inputName ? cur : prev; }, null);
 	}
 
 	$scope.newInput = function(index, inputName, inputType) {	
@@ -90,14 +85,14 @@ _terrainBuilderExtension.inputs = function(_deps) {
 		
 		switch(newType) {
 			case 'namevalue':
-				$scope.inputs[index].type = 'namevalue';
+				data.inputs[index].type = 'namevalue';
 				break;
 			case 'datetime':
-				$scope.inputs[index].type = 'datetime';
+				data.inputs[index].type = 'datetime';
 				var dateNow = new Date();
 				dateNow.setMilliseconds(0);
 				dateNow.setSeconds(0);		
-				$scope.inputs[index].dateValue = dateNow;		
+				data.inputs[index].dateValue = dateNow;		
 				break;
 		}
 		$scope.resort();
@@ -118,8 +113,8 @@ _terrainBuilderExtension.inputs = function(_deps) {
 		inputValue = inputValue || '';
 		var newInput = { name: inputName, stringValue: inputValue, showing: false, type: 'namevalue', id: random() };
 		if(index == -1)
-			index = $scope.inputs.length;
-		$scope.inputs.splice(index, 0, newInput);
+			index = data.inputs.length;
+		data.inputs.splice(index, 0, newInput);
 		$timeout(function() {
 			newInput.showing = true;
 			if(focusAnything) {
@@ -147,8 +142,8 @@ _terrainBuilderExtension.inputs = function(_deps) {
 		inputName = inputName || '';
 		var newInput = { name: inputName, dateValue: dateNow, showing: false, type: 'datetime', id: random() };
 		if(index == -1)
-			index = $scope.inputs.length;
-		$scope.inputs.splice(index, 0, newInput);
+			index = data.inputs.length;
+		data.inputs.splice(index, 0, newInput);
 		$timeout(function() {
 			newInput.showing = true;
 			$timeout(function() {
@@ -161,7 +156,7 @@ _terrainBuilderExtension.inputs = function(_deps) {
 	}
 	
 	$scope.removeInputAtIndex = function(index) {
-		$scope.inputs.splice(index, 1);
+		data.inputs.splice(index, 1);
 	}
 
 	function input_addToV(input) {
@@ -207,27 +202,9 @@ _terrainBuilderExtension.inputs = function(_deps) {
 	$scope.input_checkForNewInput = function(inputName) {
 		if(inputName && inputName.indexOf("input.") === 0) {
 			var n = inputName.substr(6);
-			if(! $scope.inputs.reduce(function(value,cur) { if(cur.name === n) return true; return value; }, false)) {
+			if ( ! $scope._v_val(inputName)) {
 				$scope.newInput(-1, n, 'namevalue');
 			}
 		}
-		/*
-		if(card.filters) {
-			$.each(card.filters, function(index,filter) {
-				if(filter.value && filter.value.length > 0 && filter.valueType == 'input') {
-					if(! $scope.inputs.reduce(function(value,cur) { if(cur.name == filter.value) return true; return value; }, false)) {
-						$scope.newNameValueInput(-1, filter.value);
-					}
-				}
-			});
-		}
-		*/
 	}
-
-
-
-
-
-
-
 }

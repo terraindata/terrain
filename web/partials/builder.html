@@ -7,7 +7,7 @@
 			</div>
 		</h1>
 		<div class="fixed-area inputs-area" ng-show="showing('inputs')">
-			<div ng-repeat="input in inputs track by input.id" ng-show="input.showing" ng-slide-down="input.showing" duration="0.5" class="input-container">
+			<div ng-repeat="input in data.inputs track by input.id" ng-show="input.showing" ng-slide-down="input.showing" duration="0.5" class="input-container">
 				<div class="pre-input">
 					<a class="new-card-plus-area" ng-click="newInput($index,'','namevalue')" clicked="300">
 						<div class="new-card-plus-line"></div>
@@ -65,7 +65,7 @@
 			<div class="input">
 				<input type="text" placeholder="Add an input" ng-focus="newInput(-1,'','namevalue')"> 	
 			</div>
-			<div class="empty-algorithm" ng-show="inputs.length == 0">
+			<div class="empty-algorithm" ng-show="data.inputs.length == 0">
 				Inputs are empty
 				<small>Add a new one above</small>
 			</div>
@@ -93,7 +93,7 @@
 				<div ng-repeat="card in data.cards track by card.id" class="card-container card-container-{{card.id}}"  ng-drop="true" ng-drop-success="onCardDropComplete($index,$data,$event)" rel="{{$index}}" ng-mousemove="resultMove($index, 'card')" ng-touchmove="resultMove({{$index}}, 'card')"
 				ng-show="card.allShowing" 
 				ng-style="{height: card.height}"
-				vertically-draggable array="data.cards" index="$index" duration="0.25s" handle-class="card-title" vd-click="cardToggle(card)"
+				vertically-draggable vd-array="data.cards" vd-index="$index" vd-duration="0.25s" vd-handle-class="card-title" vd-click="cardToggle(card)"
 				>
 					<div class="pre-card">
 						<div ng-slide-down="card.newCardIsShowing" duration="0.25">
@@ -164,7 +164,6 @@
 											<div tdb-autocomplete data="data.tables" model="join.table" placeholder="Table Name" auto-placeholder="Start typing to see matching table names" on-select="card_joinChanged(card, $index)">
 												<input type="text" class="card-join-input" ng-model="join.table" placeholder="Table Name" ng-change="card_joinChanged(card, $index)" />
 											</div>
-											<!-- <input type="text"  placeholder="enter table to join" /> -->
 										</div>
 										<div class="col-xs-2">
 											<input type="text" class="card-join-input" ng-model="join.first" placeholder="" />
@@ -229,7 +228,7 @@
 							</div>
 							<div class="card-select-area" ng-show="card.select">
 								<div>
-									<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields track by $index" vertically-draggable array="card.select.fields" index="$index" duration="0.25s"> <!-- removed:  -->
+									<div class="row card-select-field card-select-field-{{$index}}" ng-repeat="field in card.select.fields track by $index" vertically-draggable vd-array="card.select.fields" vd-index="$index" vd-duration="0.25s">
 										<div class="col-xs-1"></div>
 										<div class="col-xs-10">
 											<div tdb-autocomplete data="_v_keys_plain" model="card.select.fields[$index]" on-select="_v_change()" auto-placeholder="Start typing to see matching field names">
@@ -255,13 +254,13 @@
 							</div>
 							<div class="card-filter-area" ng-show="card.filters">
 								<div>
-									<div class="row" ng-repeat="f in card.filters" vertically-draggable array="card.filters" index="$index" duration="0.25s">
+									<div class="row" ng-repeat="f in card.filters" vertically-draggable vd-array="card.filters" vd-index="$index" vd-duration="0.25s">
 										<div class="col-xs-1">
 											
 										</div>
 										<div class="col-xs-4 filter-field-input-wrapper">
 											<div tdb-autocomplete data="_v_keys_plain" model="f.first" on-select="card_valAndResort(obj, $index, false)" auto-placeholder="Start typing to see matching field names">
-												<input ng-model="f.first" ng-blur="input_checkForNewInput(f.first)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
+												<input ng-model="f.first" ng-blur="input_checkForNewInput(f.first)" placeholder="Value" ng-change="resort()" />
 											</div>
 										</div>
 										<div class="col-xs-2 center-align">
@@ -297,7 +296,7 @@
 										</div>
 										<div class="col-xs-4">
 											<div tdb-autocomplete data="_v_keys_plain" model="f.second" on-select="card_valAndResort(obj, $index, true)" auto-placeholder="Start typing to see matching field names">
-												<input ng-model="f.second" ng-blur="input_checkForNewInput(f.second)" ng-keydown="blurOnEnter($event)" placeholder="Value" ng-change="resort()" />
+												<input ng-model="f.second" ng-blur="input_checkForNewInput(f.second)" placeholder="Value" ng-change="resort()" />
 											</div>
 										</div>
 										<div class="col-xs-1">

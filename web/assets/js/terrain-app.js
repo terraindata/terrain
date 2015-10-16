@@ -218,7 +218,6 @@ terrainApp.directive('clicked', ['$timeout', function($timeout) {
     return function(scope, element, attr) {
 
         element.on('touchend mouseup', function(event) {
-        // element.on('touchend', function(event) {
             element.addClass("ng-clicked");
             $timeout(function() {
                 element.removeClass('ng-clicked');
@@ -229,9 +228,6 @@ terrainApp.directive('clicked', ['$timeout', function($timeout) {
                     }, parseInt(attr.clickedSecond) || 250);
                 }
             }, parseInt(attr.clicked) || 250);
-            // scope.$apply(function() { 
-                // scope.$eval(attr.touchend); 
-            // });
         });
     };
 }]);
@@ -240,12 +236,12 @@ terrainApp.directive('verticallyDraggable', ['$timeout', '$parse', function($tim
     return {
         restrict: 'EA', // (E)lement or (A)trribute
         scope: {
-            array: '=', // bi-directional data-binding
-            index: '=',
+            vdArray: '=', // bi-directional data-binding
+            vdIndex: '=',
             vdClick: '&'  // parent execution binding
         },
         link: function(scope, element, attr) {
-            var downElement = attr.handleClass ? element.find('.' + attr.handleClass) : element;
+            var downElement = attr.vdHandleClass ? element.find('.' + attr.vdHandleClass) : element;
             downElement.on('touchstart mousedown', function(event) {
                 event.preventDefault();
                 var target = event.originalEvent.target;
@@ -261,7 +257,7 @@ terrainApp.directive('verticallyDraggable', ['$timeout', '$parse', function($tim
                 var origY = element.offset().top;
                 var parent = element.parent();
 
-                var duration = attr.duration || '0.25s';
+                var duration = attr.vdDuration || '0.25s';
                 element.css('-webkit-transition', 'top 0s');
                 element.css('transition', 'top 0s');
                 element.addClass('dragging-vertically');
@@ -345,8 +341,8 @@ terrainApp.directive('verticallyDraggable', ['$timeout', '$parse', function($tim
                         }
                     }
                     if(newIndex != -1) {
-                        var a = scope.array.splice(scope.index, 1);
-                        scope.array.splice(newIndex, 0, a[0]); // TODO potential bug here when shifting backward?
+                        var a = scope.vdArray.splice(scope.vdIndex, 1);
+                        scope.vdArray.splice(newIndex, 0, a[0]); // TODO potential bug here when shifting backward?
                         scope.$apply();
                     }
 
