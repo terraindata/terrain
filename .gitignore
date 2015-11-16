@@ -4,3 +4,5 @@ web/sftp-config.json
 *~
 admin/
 __pycache__
+node_modules
+*.psd
