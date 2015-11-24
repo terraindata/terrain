@@ -42,26 +42,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-module.exports = {
-    entry: "./src/app/App.js",
-    devtool: 'eval',
-    output: {
-        path: __dirname,
-        filename: "bundle.js"
-    },
-    resolve: {
-        extensions: [ '', '.js', '.css', '.less' ]
-    },
-    module: {
-        loaders: [
-            { test: /\.css$/, loader: "style!css" },
-            { test: /\.less$/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
-            { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
-            { test: /\.woff(2)?$/,   loader: "url?limit=10000&mimetype=application/font-woff" },
-            { test: /\.ttf$/, loader: "file" },
-            { test: /\.eot$/, loader: "file" },
-            { test: /\.svg$/, loader: "file" },
-            { test: require.resolve('jquery'), loader: "expose?jQuery" }
-        ]
-    }
+var _ = require('underscore');
+var ActionTypes = require('./ActionTypes.js');
+var Store = require('./Store.js');
+
+// object of action creators
+var create = 
+{
+	moveCard: (curIndex, newIndex) =>
+	{
+		return {
+			type: ActionTypes.cards.move,
+			curIndex: curIndex,
+			newIndex: newIndex,
+		};
+	},
 };
+
+// object of action dispatchers
+// use: Actions.dispatch.moveCard(4, 8)
+var dispatch = _.mapObject(create, (actionCreator) =>
+{
+	return function() {
+		return Store.dispatch(actionCreator.apply(this, arguments));
+	}
+});
+
+var Actions =
+{
+	types: ActionTypes,
+	create: create,
+	dispatch: dispatch,
+};
+
+module.exports = Actions;

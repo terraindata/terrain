@@ -45,7 +45,8 @@ THE SOFTWARE.
 var Util = {
 	// Return a random integer [min, max)
 	// assumes min of 0 if not passed.
-	randInt() {
+	randInt() 
+	{
 		var min = arguments[0], max = arguments[1];
 		if(arguments.length === 1) {
 			min = 0;
@@ -53,7 +54,12 @@ var Util = {
 		}
 
 		return Math.floor(Math.random() * max - min) + min;
-	}
+	},
+
+	isInt(num)
+	{
+		return num === parseInt(num, 10);
+	},
 };
 
 module.exports = Util;

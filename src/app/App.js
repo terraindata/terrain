@@ -42,52 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require("./style.css");
+require("./GeneralStyle.less");
 var React = require("react");
-var LayoutManager = require("./components/layout/layout_manager.js");
+var ReactDOM = require("react-dom");
+var LayoutManager = require("./components/layout/LayoutManager.js");
 var PanelPlaceholder = require("./components/layout/PanelPlaceholder.js");
 var Card = require("./components/cards/Card.js");
+var Store = require("./data/Store.js");
 
 var App = React.createClass({
 
+  getInitialState () {
+    Store.subscribe(() => {
+      this.setState(Store.getState());
+    });
+
+    return Store.getState();
+  },
+
   render () {
+    var cards = this.state.cards;
+    var inputs = this.state.inputs;
+    var results = this.state.results;
+
   	var layout = {
   		stackAt: 650,
   		columns: [
   			{
-  				rows: [
-  					{
-  						content: <PanelPlaceholder drag_y={true} />
-  					},
-  					{
-  						content: <PanelPlaceholder drag_y={true} />
-  					},
-  					{
-  						content: <PanelPlaceholder drag_y={true} />
-  					},
-  					{
-  						content: <PanelPlaceholder drag_y={true} />
-  					},
-  					{
-  						content: <PanelPlaceholder drag_y={true} />
-  					}
-  				]
+  				reorderable: true,
+  				rows: inputs.map((input) => 
+            ({
+              content: <PanelPlaceholder drag_y={true} text={input.text} />
+            }))
   			},
   			{
   				colSpan: 2,
-  				rows: [
-  					{
-  						content: <Card />
-  					},
-  					{
-  						content: <Card />
-  					},
-  					{
-  						content: <Card />
-  					},
-  				],
+  				reorderable: true,
+  				rows: cards.map((card) =>
+            ({
+              content: <Card name={card.name} />
+            }))
   			},
   			{
+  				reorderable: true,
   				cellHeight: 150,
   				cellWidth: {
   					0: '100%',
@@ -125,7 +122,7 @@ var App = React.createClass({
 
 });
 
-React.render(<App />, document.getElementById('app'), function () {
+ReactDOM.render(<App />, document.getElementById('app'), function () {
   // require('./tests').run(this);
   // TODO: tests here.
 });

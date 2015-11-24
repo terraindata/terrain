@@ -44,22 +44,29 @@ THE SOFTWARE.
 
 require('./panel.less');
 var React = require('react');
-var Util = require('../../util/util.js');
+var Util = require('../../util/Util.js');
 var $ = require('jquery');
 
 var Panel = {
-	propTypes: {
+	propTypes: 
+	{
 		drag_x: React.PropTypes.bool,
 		drag_y: React.PropTypes.bool,
 		drag_xy: React.PropTypes.bool,
 		onDrop: React.PropTypes.func,
 		fill: React.PropTypes.bool,
+		reorderOnDrag: React.PropTypes.bool,
+		neighborDragging: React.PropTypes.bool,
 	},
 
 	getInitialState() {
 		return {
-			dragging: false
+			dragging: false,
 		}
+	},
+
+	isPanel() {
+		return true;
 	},
 
 	// Returns true if this is draggable in the 'x', 'y', or (default) either directions
@@ -73,32 +80,63 @@ var Panel = {
 		return this.props.drag_x || this.props.drag_y || this.props.drag_xy;
 	},
 
-	startDrag(x, y) {
-		if(this.canDrag())
-			this.setState({dragging: true, ox: x, oy: y, dx: 0, dy: 0});
+	startDrag(x, y) 
+	{
+		if(this.canDrag()) 
+		{
+			this.setState({ 
+				dragging: true, 
+				ox: x, 
+				oy: y, 
+				dx: 0, 
+				dy: 0,
+			});
+		}
 	},
 
-	dragTo(x, y) {
-		if(this.canDrag('x')) {
+	dragTo(x, y) 
+	{
+		var draggedTo = { x: 0, y: 0 };
+
+		if(this.canDrag('x')) 
+		{
 			this.setState({
 				dx: x - this.state.ox
 			});
+			draggedTo.dx = dx;
 		}
-		if(this.canDrag('y')) {
+
+		if(this.canDrag('y')) 
+		{
 			this.setState({
 				dy: y - this.state.oy
 			});
+			draggedTo.dy = this.state.dy;
+		}
+
+		if(this.props.onDrag) 
+		{
+			this.props.onDrag(draggedTo);
 		}
 	},
 
 	stopDrag(x, y) {
-		this.setState({dragging: false});
+		this.setState({ dragging: false });
+
+		if(this.props.onDrop)
+		{
+			this.props.onDrop({
+				dx: x - this.state.ox,
+				dy: y - this.state.oy,
+			});
+		}
 	},
 
 
 	// Section: Mouse Events
 
-	down(event) {
+	down(event) 
+	{
 		this.startDrag(event.pageX, event.pageY);
 		$(document).on('mousemove', this.move);
 		$(document).on('touchmove', this.move);
@@ -106,7 +144,8 @@ var Panel = {
 		$(document).on('touchend', this.up);
 	},
 
-	move(event) {
+	move(event) 
+	{
 		this.dragTo(event.pageX, event.pageY);
 	},
 
@@ -126,14 +165,31 @@ var Panel = {
 
 		var style = {};
 
-		if(this.state.dragging) {
+		if(this.props.dx) 
+		{
+			style.left = this.props.dx + 'px';
+		}
+
+		if(this.props.dy) 
+		{
+			style.top = this.props.dy + 'px';
+		}
+
+		if(this.state.dragging) 
+		{
 			style.left = this.state.dx + 'px';
 			style.top = this.state.dy + 'px';
 			style.zIndex = 99999999;
 			panelClass += ' panel-dragging';
 		}
 
-		if(this.props.fill) {
+		if(this.props.neighborDragging)
+		{
+			panelClass += ' neighbor-dragging';
+		}
+
+		if(this.props.fill) 
+		{
 			style.width = '100%';
 			style.height = '100%';
 		}

@@ -44,24 +44,29 @@ THE SOFTWARE.
 
 require('./panel.less');
 var React = require('react');
-var Util = require('../../util/util.js');
+var Util = require('../../util/Util.js');
 var PanelMixin = require('./PanelMixin.js');
 var $ = require('jquery');
 
 var PanelPlaceholder = React.createClass({
 	mixins: [PanelMixin],
-	getDefaultProps() {
+
+	getDefaultProps() 
+	{
 		return {
-			height: '50px'
+			height: '50px',
+			text: '',
 		}
 	},
-	render() {
+
+	render() 
+	{
 		var style = {
 			height: this.props.height,
 			background: '#ccc',
 			border: '1px solid #aaa',
 		};
-		return this.renderPanel(<div style={style}></div>);
+		return this.renderPanel(<div style={style}> { this.props.text } </div>);
 	},
 });
 

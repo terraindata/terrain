@@ -42,26 +42,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-module.exports = {
-    entry: "./src/app/App.js",
-    devtool: 'eval',
-    output: {
-        path: __dirname,
-        filename: "bundle.js"
-    },
-    resolve: {
-        extensions: [ '', '.js', '.css', '.less' ]
-    },
-    module: {
-        loaders: [
-            { test: /\.css$/, loader: "style!css" },
-            { test: /\.less$/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
-            { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
-            { test: /\.woff(2)?$/,   loader: "url?limit=10000&mimetype=application/font-woff" },
-            { test: /\.ttf$/, loader: "file" },
-            { test: /\.eot$/, loader: "file" },
-            { test: /\.svg$/, loader: "file" },
-            { test: require.resolve('jquery'), loader: "expose?jQuery" }
-        ]
-    }
+var _ = require('underscore');
+
+// prepend str to every item in the array
+var prependArray = (str, arr) => 
+{
+	return arr.map((elem) => str + "." + elem);
 };
+
+// convert an array into an object where the keys === values
+var makeObject = (str, arr) =>
+{
+	return _.object(arr, prependArray(str, arr));
+};
+
+var ActionTypes = 
+{
+	cards: makeObject('cards',
+	[
+		'move',
+		'create',
+	]),
+
+	inputs: makeObject('inputs',
+	[
+		'move',
+		'create',
+	]),
+
+	results:
+	{
+		'nothing': 'results.nothing',
+	}
+};
+
+console.log(ActionTypes);
+
+module.exports = ActionTypes;

@@ -42,9 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./layout_manager.less');
+require('./LayoutManager.less');
 var React = require('react');
 var $ = require('jquery');
+
+var Actions = require('../../data/Actions.js');
 
 // Coordinate these classNames with layout_manager.css/less
 var lmClass = 'layout-manager';
@@ -53,21 +55,36 @@ var rowClass = 'layout-manager-row';
 var cellClass = 'layout-manager-cell';
 
 var LayoutManager = React.createClass({
-	propTypes: {
+	propTypes: 
+	{
 		layout: React.PropTypes.object.isRequired
 	},
 
-	updateDimensions() {
-		this.setState({rand: Math.random()});
+	getInitialState() {
+		return {
+			shiftedIndices: [],
+			shiftedHeight: 0,
+			shiftedWidth: 0,
+		};
 	},
-	componentDidMount() {
+
+	updateDimensions()
+	{
+		this.setState({ rand: Math.random() });
+	},
+
+	componentDidMount()
+	{
         window.addEventListener("resize", this.updateDimensions);
   },
-  componentWillUnmount() {
+
+  componentWillUnmount()
+  {
       window.removeEventListener("resize", this.updateDimensions);
   },
 
-	getSumThroughIndex(index) {
+	getSumThroughIndex(index)
+	{
 		var sum = 0;
 		if(this.props.layout.rows) {
 			sum = this.props.layout.rows.reduce((sum, row, i) => (((i < index || index === -1) && (row.rowSpan || 1)) + sum), 0);
@@ -77,19 +94,165 @@ var LayoutManager = React.createClass({
 		return sum;
 	},
 
-	renderObj(obj, className, index, style) {
-		var content = obj.content; 
+	computeShiftedIndices(index, coords)
+	{
+		var clientRect = this.refs[index].getBoundingClientRect();
+		var indicesToShift = [];
+
+		var curY = 0; // current Y position to compare, either the top edge (if dragged up) or bottom (if dragged down)
+		var compareIndices = (refIndex) => false; // is the given neighbor index applicable?
+		var getRefMidpoint = (refClientRect) => 0; // midpoint of the neighbor to compare
+		var compareRefMidpoint = (refMidpoint) => false; // given an applicable neighbor's midpoint, should we shift?
+		var heightAmplifier = 0; // shift our neighbor by heightAmplifier * our height
+		var widthAmplifier = 0; // ditto, for width
+
+		// dragged up
+		if(coords.dy < 0) 
+		{
+			var curY = clientRect.top + coords.dy;
+			var compareIndices = (refIndex) => refIndex < index;
+			var getRefMidpoint = (refClientRect) => refClientRect.bottom - refClientRect.height / 2;
+			var compareRefMidpoint = (refMidpoint) => curY < refMidpoint;
+			var heightAmplifier = 1;
+			var widthAmplifier = 0;
+		}
+
+		// dragged down
+		if(coords.dy > 0) 
+		{
+			var curY = clientRect.bottom + coords.dy;
+			var compareIndices = (refIndex) => refIndex > index;
+			var getRefMidpoint = (refClientRect) => refClientRect.top + refClientRect.height / 2;
+			var compareRefMidpoint = (refMidpoint) => curY > refMidpoint;
+			var heightAmplifier = -1;
+			var widthAmplifier = 0;
+		}	
+
+		$.each(this.refs, (refIndex, refObj) => 
+		{
+			if(compareIndices(refIndex))
+			{
+				var refClientRect = refObj.getBoundingClientRect();
+				var refMidpoint = getRefMidpoint(refClientRect);
+				if(compareRefMidpoint(refMidpoint))
+				{
+ 					indicesToShift.push(+refIndex);
+				}
+			}
+		});
+
+		return indicesToShift;
+	},
+
+	onDragFactory(index)
+	{
+		return (coords) => 
+		{
+			var clientRect = this.refs[index].getBoundingClientRect();
+			var indicesToShift = this.computeShiftedIndices(index, coords);
+
+			// dragged up
+			if(coords.dy < 0) 
+			{
+				var heightAmplifier = 1;
+				var widthAmplifier = 0;
+			}
+
+			// dragged down
+			if(coords.dy > 0) 
+			{
+				var heightAmplifier = -1;
+				var widthAmplifier = 0;
+			}				
+
+			this.setState({
+				shiftedIndices: indicesToShift,
+				shiftedHeight: clientRect.height * heightAmplifier,
+				shiftedWidth: clientRect.width * widthAmplifier,
+			});
+		}
+	},
+
+	onDropFactory(index)
+	{
+		return (coords) => 
+		{
+			var shiftedIndices = this.computeShiftedIndices(index, coords);
+			
+			if(shiftedIndices.length === 0)
+				return;
+
+			var fn = () => null;
+			
+			// dragged up
+			if(coords.dy < 0)
+			{
+				fn = Math.min;
+			}
+
+			// dragged down
+			if(coords.dy > 0)
+			{
+				fn = Math.max;
+			}
+
+			var indexToMoveTo = fn.apply(null, shiftedIndices);
+			console.log('move', index, 'to', indexToMoveTo);
+
+			Actions.dispatch.moveCard(index, indexToMoveTo);
+
+			if(indexToMoveTo !== null && this.props.moveTo)
+			{
+				// TODO probably need redux / flux here
+				this.props.moveTo(index, indexToMoveTo);
+			}
+
+			this.setState({
+				shiftedIndices: [],
+				shiftedHeight: 0,
+				shiftedWidth: 0,
+			});
+		}
+	},
+
+	renderObj(obj, className, index, style) 
+	{
+		if(obj.content)
+		{
+			// if obj.content is null or undef, then React.cloneElement will error and cause the whole app to break
+
+			var props = { 
+				onDrag: this.onDragFactory(index),
+				onDrop: this.onDropFactory(index),
+			};
+
+			if(this.state.shiftedIndices.indexOf(index) !== -1)
+			{
+				props.dy = this.state.shiftedHeight;
+				props.dx = this.state.shiftedWidth;
+				props.neighborDragging = true;
+			}
+
+			var content = React.cloneElement(obj.content, props);
+		}
 
 		// check for a nested layout
 		if(obj.columns || obj.rows || obj.cells)
-			content = <LayoutManager layout={obj} />
+		{
+			content = <LayoutManager layout={obj} ref={index} />
+		}
 		
-		return (<div className={className} style={style} key={index}>{content}</div>);
+		return (
+			<div className={className} style={style} key={index} ref={index}>
+				{content}
+			</div>);
 	},
 
-	renderRow(row, index) {
+	renderRow(row, index) 
+	{
 		var style = {};
-		if(this.props.layout.rowHeight === 'fill') {
+		if(this.props.layout.rowHeight === 'fill') 
+		{
 			// TODO clean this up
 			var total = this.getSumThroughIndex(-1), sum = this.getSumThroughIndex(index);
 			style = {
@@ -98,10 +261,12 @@ var LayoutManager = React.createClass({
 				position: 'absolute'
 			};
 		}
+
 		return this.renderObj(row, rowClass, index, style);
 	},
 
-	renderColumn(column, index) {
+	renderColumn(column, index) 
+	{
 		// TODO clean this up
 		var total = this.getSumThroughIndex(-1), sum = this.getSumThroughIndex(index);
 		var classToPass = colClass;
@@ -116,7 +281,8 @@ var LayoutManager = React.createClass({
 		return this.renderObj(column, classToPass, index, style);
 	},
 
-	renderCell(cell, index) {
+	renderCell(cell, index) 
+	{
 		// todo consider moving this to somehwere not in a loop
 		var height = this.props.layout.cellHeight;
 		if(typeof height !== 'string')
@@ -145,7 +311,8 @@ var LayoutManager = React.createClass({
 		return this.renderObj(cell, cellClass, index, style);
 	},
 
-	render() {
+	render() 
+	{
 		var layoutSum = (this.props.layout.rows ? 1 : 0) + (this.props.layout.columns ? 1 : 0) + (this.props.layout.cells ? 1 : 0);
 		if(layoutSum !== 1) {
 			// TODO write test for this

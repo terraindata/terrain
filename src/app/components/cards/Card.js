@@ -44,12 +44,17 @@ THE SOFTWARE.
 
 require('./card.less');
 var React = require('react');
-var Util = require('../../util/util.js');
+var Util = require('../../util/Util.js');
 var PanelMixin = require('../layout/PanelMixin.js');
 var $ = require('jquery');
 
 var Card = React.createClass({
 	mixins: [PanelMixin],
+
+	propTypes:
+	{
+		name: React.PropTypes.string.isRequired,
+	},
 
 	getDefaultProps() 
 	{
@@ -57,6 +62,7 @@ var Card = React.createClass({
 			drag_x: false,
 			drag_y: true,
 			onDrop: this.onDrop,
+			reorderOnDrag: true,
 		};
 	},
 
@@ -68,7 +74,7 @@ var Card = React.createClass({
 		return this.renderPanel((
 			<div className='card'>
 				<div className='card-inner'>
-					I am a card.
+					{this.props.name}
 				</div>
 			</div>
 			));

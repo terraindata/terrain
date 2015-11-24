@@ -42,26 +42,86 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-module.exports = {
-    entry: "./src/app/App.js",
-    devtool: 'eval',
-    output: {
-        path: __dirname,
-        filename: "bundle.js"
-    },
-    resolve: {
-        extensions: [ '', '.js', '.css', '.less' ]
-    },
-    module: {
-        loaders: [
-            { test: /\.css$/, loader: "style!css" },
-            { test: /\.less$/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
-            { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
-            { test: /\.woff(2)?$/,   loader: "url?limit=10000&mimetype=application/font-woff" },
-            { test: /\.ttf$/, loader: "file" },
-            { test: /\.eot$/, loader: "file" },
-            { test: /\.svg$/, loader: "file" },
-            { test: require.resolve('jquery'), loader: "expose?jQuery" }
-        ]
-    }
+var _ = require('underscore');
+
+var Redux = require('redux');
+var ActionTypes = require('./ActionTypes.js');
+var Util = require('../util/Util.js');
+
+var cardsCalculator = (cards = [], action) =>
+{
+	var newCards = _.assign([], cards);
+	console.log(action.type);
+	switch(action.type) {
+		case ActionTypes.cards.move:
+			console.log('move card');
+			if(! Util.isInt(action.curIndex) || ! Util.isInt(action.newIndex))
+			{
+				console.log('Error: must pass integer indices in action when moving a card', action);
+				return cards;
+			}
+
+			var card = newCards.splice(action.curIndex, 1)[0];
+			console.log(card);
+			var newIndexAdjustment = action.curIndex < action.newIndex ? 0 : 0;
+			newCards.splice(action.newIndex + newIndexAdjustment, 0, card);
+			console.log(action.newIndex + newIndexAdjustment);
+
+			return newCards;
+	}
+
+	return cards;
+}
+
+var inputsCalculator = (inputs = [], action) =>
+{
+	return inputs;
+}
+
+var resultsCalculator = (results = {}, action) =>
+{
+	return results;
+}
+
+var defaultState =
+{
+	cards:  [
+						{
+							name: 'card 1',
+						},
+						{
+							name: 'card 2',
+						},
+						{
+							name: 'card 3',
+						},
+						{
+							name: 'card 4',
+						},
+					],
+	inputs: [
+  					{
+  						text: 'input 1',
+  					},
+  					{
+  						text: 'input 2',
+  					},
+  					{
+  						text: 'input 3',
+  					},
+  				],
+	results: {},
 };
+
+var stateCalculator = (state = defaultState, action) =>
+{
+	return {
+		cards: cardsCalculator(state.cards, action),
+		inputs: inputsCalculator(state.inputs, action),
+		results: resultsCalculator(state.results, action),
+	}
+}
+
+let Store = Redux.createStore(stateCalculator);
+
+module.exports = Store;
