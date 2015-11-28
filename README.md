@@ -3,6 +3,7 @@
 ## Standards / Conventions
 
 1. Capitalize all React component names and filenames (applies to style files as well)
+	Most `.js` and `.less` files should be capitalized.
 2. `{` and `}` are both on their own lines, for legibility.
 	Same applies to `[` and `]` when appropriate.
 3. Camel case function names. 
@@ -35,6 +36,11 @@
 	Rebase and squash on your feature branch before merging if you have too many commits, or unhelpful commit messages.
 	`git log` in master should always look beautiful and be a helpful history of what has happened.
 	Commit to good commits.
+17. Code should read like English. Comment when necessary, but try your best to write code that doesn't need comments.
+18. Be keen on adding to this README, and keen on trimming it down.
+19. None of these standards are set in stone; if you have an idea for a way to improve these, make it known. Coding practices evolve.
+20. No code is set in stone, either. Refactor when you find something that you know you could do better.
+	Refactor responsibly: test your changes, and apply appropriate cost-benefit-analysis before starting to be certain that your time is well-used.
 11. No not believing in yourself.
 24. Linear ordering in ordered lists is overrated.
 
