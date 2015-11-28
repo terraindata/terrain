@@ -49,7 +49,7 @@ var Util = require('../../util/Util.js');
 var PanelPlaceholder = require('../layout/PanelPlaceholder.js');
 var PanelMixin = require('../layout/PanelMixin.js');
 var LayoutManager = require('../layout/LayoutManager.js');
-var CardInput = require('./CardInput.js');
+var CardInput = require('./CardField.js');
 var $ = require('jquery');
 
 var Card = React.createClass({
@@ -72,14 +72,19 @@ var Card = React.createClass({
 	render() {
 		var fields = [];
 		var moveFn = () => console.log('move!');
+		var changeFnFactory = (index) => () => console.log('change!');
 
 		if(this.props.data.select)
 		{
 			fields = this.props.data.select.fields;
 			moveFn = (curIndex, newIndex) =>
       {
-      	console.log(Actions.dispatch.cards.select.moveField);
         Actions.dispatch.cards.select.moveField(this.props.data, curIndex, newIndex);
+      }
+      changeFnFactory = (index) => (value) =>
+      {
+      	// console.log(index, value);
+      	Actions.dispatch.cards.select.changeField(this.props.data, index, value);
       }
 		}
 
@@ -98,10 +103,9 @@ var Card = React.createClass({
 
 		var layout = {
   				reorderable: true,
-  				rows: fields.map((field) => {
-  					var onFieldChange = (event) => console.log('change');
+  				rows: fields.map((field, index) => {
             return {
-              content: <CardInput value={field} onChange={onFieldChange} />
+              content: <CardInput value={field} onChange={changeFnFactory(index)} />
             }
           }),
   			};

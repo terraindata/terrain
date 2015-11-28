@@ -42,18 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./CardInput.less');
+require('./CardField.less');
 var React = require('react');
 var Util = require('../../util/Util.js');
 var PanelMixin = require('../layout/PanelMixin.js');
 var $ = require('jquery');
 
-var Card = React.createClass({
+var CardField = React.createClass({
 	mixins: [PanelMixin],
 
 	propTypes:
 	{
-		value: React.PropTypes.string.isRequired,
+		value: React.PropTypes.string,
 		onChange: React.PropTypes.func.isRequired,
 	},
 
@@ -63,18 +63,42 @@ var Card = React.createClass({
 			drag_x: false,
 			drag_y: true,
 			reorderOnDrag: true,
+			value: '',
 		};
+	},
+
+	willReceiveNewProps(newProps)
+	{
+		this.setState({
+			value: newProps.value,
+		});
+	},
+
+	getInitialState()
+	{
+		return {
+			value: this.props.value,
+		};
+	},
+
+	handleChange(event)
+	{
+		this.setState({
+			value: event.target.value,
+		});
+
+		this.props.onChange(event.target.value);
 	},
 
 	render() {
 		return this.renderPanel((
 			<div className='card-input'>
 				<div className='card-input-inner'>
-					<input type="text" value={this.props.value} onChange={this.props.onChange} />
+					<input type="text" value={this.props.value} onChange={this.handleChange} />
 				</div>
 			</div>
 			));
 	},
 });
 
-module.exports = Card;
+module.exports = CardField;

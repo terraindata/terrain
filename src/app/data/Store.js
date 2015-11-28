@@ -74,18 +74,19 @@ var move = (arr, curIndex, newIndex) =>
 var selectCardReducer = (cards = [], action) =>
 {
 	var cardIndex = cards.indexOf(action.card);
-	console.log(cardIndex);
 	if(cardIndex === -1)
 		return cards;
 	// assumed: cardIndex points to a real card from now on
 
-	console.log(action.type, ActionTypes.cards.select.moveField);
 	switch(action.type)
 	{
 		case ActionTypes.cards.select.moveField:
 			cards = cloneArray(cards);
 			cards[cardIndex].select.fields = move(cards[cardIndex].select.fields, action.curIndex, action.newIndex);
-			console.log('moved');
+			return cards;
+		case ActionTypes.cards.select.changeField:
+			cards = cloneArray(cards);
+			cards[cardIndex].select.fields[action.index] = action.value;
 			return cards;
 	}
 

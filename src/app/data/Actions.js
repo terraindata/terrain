@@ -70,7 +70,16 @@ var create =
 					curIndex: curIndex,
 					newIndex: newIndex,
 				}
-			}
+			},
+			changeField: (card, index, value) =>
+			{
+				return {
+					type: ActionTypes.cards.select.changeField,
+					card: card,
+					index: index,
+					value: value,
+				}
+			},
 		}
 	},
 
