@@ -25,6 +25,9 @@
 	Nearly every bug-solving merge should have a test covering the buggy case. 
 	TDD FTW!
 14. Comma after the last line in an object.`,`
+	Note: You can't do this in JSON.`,`
+15. Every file ends with `module.exports = YourClassyClassName;`. In other words, name your exports.
+	Don't do `module.exports = { ... }` because then the Webpack/React/browser won't work together so well and you will see components in the React Chrome plugin that are called `module.exports` and that's not helping anybody.
 11. No not believing in yourself.
 24. Linear ordering in ordered lists is overrated.
 

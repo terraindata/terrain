@@ -45,5 +45,8 @@
     "url-loader": "^0.5.6",
     "webpack": "^1.7.3",
     "webpack-dev-server": "^1.8.0"
+  },
+  "scripts": {
+    "deploy": "webpack && scp bundle.js u51505641@lukeknepper.com:alfaromeo/bundle.js"
   }
 }
