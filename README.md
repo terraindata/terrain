@@ -5,29 +5,36 @@
 1. Capitalize all React component names and filenames (applies to style files as well)
 2. `{` and `}` are both on their own lines, for legibility.
 	Same applies to `[` and `]` when appropriate.
-3. Camel case function names. e.g. `doABarrelRoll()`
+3. Camel case function names. 
+	e.g. `doABarrelRoll()`
 4. Use JSX optimizations whenever possible, but not at the expense of legibility.
 	e.g. `() => { ... }` instead of `function() { }`, `useTheForce(): { ... }` instead of `useTheForce: function() { ... }`
 5. Selectors in stylesheets should each go on their own line.
 	e.g. Don't do `.first, .second, .third .thirds-kid, .fourth[type=text]`, but rather put a newline after every comma.
-6. CSS classes are named with `-` dashes.
+6. CSS classes are named with `-`.
 	e.g. `blue-and-black` or `white-and-gold`
-7. `TODO` should be treated like poison. Why write `TODO` when you can do it correctly right now? Tech debt is evil. The Death Star was built upon tech debt, and look what happened to it. `Tech Debt == Death Star` is truthy.
-8. Directories and namespaces are your friends. Optimal directory size is two to five files. 
+7. `TODO` should be treated like poison. 
+	Why write `TODO` when you can do it correctly right now? Tech debt is evil. The Death Star was built upon tech debt, and look what happened to it. `Tech Debt == Death Star` is truthy.
+8. Optimal directory size is two to five files.
 	No directories in `src` with over ten files.
 	No objects / namespaces with over ten keys.
 9. Say "yes" to whitespace for legibility.
 10. Use whatever quotes make you happy but keep it consistent within the same file / piece of code.
-11. Say "no" to single line scope and the bugs that it makes possible. `{}` should follow every `if`, `for`, `while`, etc.
-12. Don't mix `||` and `&&` without `()`. Who knows boolean order of operations anyways?
-13. Tests are the best! 
-	Every feature-adding merge should have appropriate test coverage to be accepted.
-	Nearly every bug-solving merge should have a test covering the buggy case. 
+11. `{}` should follow every `if`, `for`, `while`, etc.
+12. Don't mix `||` and `&&` without `()`.
+	Who knows boolean order of operations anyways?
+13. Every feature-adding merge should have appropriate test coverage to be accepted.
+	Nearly every bug-solving merge should have a test covering the buggy case.
 	TDD FTW!
 14. Comma after the last line in an object.`,`
+	This makes adding new lines to objects easier and allows for a cleaner merge.`,`
 	Note: You can't do this in JSON.`,`
 15. Every file ends with `module.exports = YourClassyClassName;`. In other words, name your exports.
 	Don't do `module.exports = { ... }` because then the Webpack/React/browser won't work together so well and you will see components in the React Chrome plugin that are called `module.exports` and that's not helping anybody.
+16. Commits should be solidly incremental and should have a helpful one-line explanation.
+	Rebase and squash on your feature branch before merging if you have too many commits, or unhelpful commit messages.
+	`git log` in master should always look beautiful and be a helpful history of what has happened.
+	Commit to good commits.
 11. No not believing in yourself.
 24. Linear ordering in ordered lists is overrated.
 
