@@ -49,24 +49,100 @@ var Store = require('./Store.js');
 // object of action creators
 var create = 
 {
-	moveCard: (curIndex, newIndex) =>
+	cards:
+	{
+		move: (curIndex, newIndex) =>
+		{
+			return {
+				type: ActionTypes.cards.move,
+				curIndex: curIndex,
+				newIndex: newIndex,
+			};
+		},
+
+		select:
+		{
+			moveField: (card, curIndex, newIndex) =>
+			{
+				return {
+					type: ActionTypes.cards.select.moveField,
+					card: card,
+					curIndex: curIndex,
+					newIndex: newIndex,
+				}
+			}
+		}
+	},
+
+	moveInput: (curIndex, newIndex) =>
 	{
 		return {
-			type: ActionTypes.cards.move,
+			type: ActionTypes.inputs.move,
 			curIndex: curIndex,
 			newIndex: newIndex,
 		};
 	},
+	moveResult: (curIndex, newIndex) =>
+	{
+		return {
+			type: ActionTypes.results.move,
+			curIndex: curIndex,
+			newIndex: newIndex,
+		};
+	},
+
+	selectCard:
+	{
+		moveField: (curIndex, newIndex) =>
+		{
+			return {
+				type: AcitonTypes.cards.select.moveField,
+				curIndex: curIndex,
+				newIndex: newIndex,
+			}
+		},
+		newField: (index = -1, field = '') =>
+		{
+			return {
+				type: AcitonTypes.cards.select.newField,
+				index: index,
+				field: field,
+			}
+		},
+		deleteField: (index) =>
+		{
+			return {
+				type: AcitonTypes.cards.select.deleteField,
+				index: index,
+			}
+		},
+	}
+};
+
+var actionCreatorsToDispatchers = (actionCreators) => 
+{
+	return _.mapObject(actionCreators, (actionCreator) =>
+	{
+		if(typeof actionCreator === 'function') 
+		{
+			return function() {
+				return Store.dispatch(actionCreator.apply(this, arguments));
+			}
+		}
+
+		if(typeof actionCreator === 'object')
+		{
+			return actionCreatorsToDispatchers(actionCreator);
+		}
+
+		console.log('Unrecognized actionCreator', actionCreator);
+		return null;
+	});
 };
 
 // object of action dispatchers
 // use: Actions.dispatch.moveCard(4, 8)
-var dispatch = _.mapObject(create, (actionCreator) =>
-{
-	return function() {
-		return Store.dispatch(actionCreator.apply(this, arguments));
-	}
-});
+var dispatch = actionCreatorsToDispatchers(create); 
 
 var Actions =
 {

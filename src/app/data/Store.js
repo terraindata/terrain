@@ -48,38 +48,81 @@ var Redux = require('redux');
 var ActionTypes = require('./ActionTypes.js');
 var Util = require('../util/Util.js');
 
-var cardsCalculator = (cards = [], action) =>
+// Important: all reducers must return either
+//  - a clone, if any changes were made to the object (do not modify the object passed)
+//  - the exact same object, if no changes were made
+
+var cloneArray = (arr) => _.assign([], arr);
+
+// common function, pure function, no side effects, always return a new copy
+var move = (arr, curIndex, newIndex) =>
 {
-	var newCards = _.assign([], cards);
-	console.log(action.type);
-	switch(action.type) {
+	if(! Util.isInt(curIndex) || ! Util.isInt(newIndex))
+	{
+		console.log('Error: must pass integer indices in action when moving', arr, curIndex, newIndex);
+		return arr;
+	}
+
+	arr = cloneArray(arr);
+	var obj = arr.splice(curIndex, 1)[0];
+	arr.splice(newIndex, 0, obj);
+
+	return arr;
+}
+
+
+var selectCardReducer = (cards = [], action) =>
+{
+	var cardIndex = cards.indexOf(action.card);
+	console.log(cardIndex);
+	if(cardIndex === -1)
+		return cards;
+	// assumed: cardIndex points to a real card from now on
+
+	console.log(action.type, ActionTypes.cards.select.moveField);
+	switch(action.type)
+	{
+		case ActionTypes.cards.select.moveField:
+			cards = cloneArray(cards);
+			cards[cardIndex].select.fields = move(cards[cardIndex].select.fields, action.curIndex, action.newIndex);
+			console.log('moved');
+			return cards;
+	}
+
+	return cards;
+};
+
+var cardsReducer = (cards = [], action) =>
+{
+	console.log(action);
+	cards = selectCardReducer(cards, action);
+
+	switch(action.type)
+	{
 		case ActionTypes.cards.move:
-			console.log('move card');
-			if(! Util.isInt(action.curIndex) || ! Util.isInt(action.newIndex))
-			{
-				console.log('Error: must pass integer indices in action when moving a card', action);
-				return cards;
-			}
-
-			var card = newCards.splice(action.curIndex, 1)[0];
-			console.log(card);
-			var newIndexAdjustment = action.curIndex < action.newIndex ? 0 : 0;
-			newCards.splice(action.newIndex + newIndexAdjustment, 0, card);
-			console.log(action.newIndex + newIndexAdjustment);
-
-			return newCards;
+			return move(cards, action.curIndex, action.newIndex);
 	}
 
 	return cards;
 }
 
-var inputsCalculator = (inputs = [], action) =>
+var inputsReducer = (inputs = [], action) =>
 {
+	switch(action.type) {
+		case ActionTypes.inputs.move:
+			return move(inputs, action.curIndex, action.newIndex);
+	}
+
 	return inputs;
 }
 
-var resultsCalculator = (results = {}, action) =>
+var resultsReducer = (results = {}, action) =>
 {
+	switch(action.type) {
+		case ActionTypes.results.move:
+			return move(results, action.curIndex, action.newIndex);
+	}
+
 	return results;
 }
 
@@ -87,41 +130,92 @@ var defaultState =
 {
 	cards:  [
 						{
-							name: 'card 1',
+							type: 'from',
+							from:
+							{
+								table: 'heroes',
+							},
 						},
 						{
-							name: 'card 2',
+							type: 'select',
+							select:
+							{
+								fields: [
+									'name',
+									'picture',
+									'description',
+									'minPrice',
+									'numJobs',
+								],
+							},
 						},
 						{
-							name: 'card 3',
+							type: 'order',
+							order:
+							{
+								field: 'urbanSitterRating',
+							}
 						},
 						{
-							name: 'card 4',
+							type: 'score',
+							score:
+							{
+								fields:
+								[
+									'urbanSitterRating',
+									'numJobs',
+								]
+							}
 						},
 					],
 	inputs: [
   					{
-  						text: 'input 1',
+  						key: 'search',
+  						value: 'the republic',
   					},
   					{
-  						text: 'input 2',
+  						key: 'minAge',
+  						value: '24',
   					},
   					{
-  						text: 'input 3',
+  						key: 'role',
+  						value: 'leader',
   					},
   				],
-	results: {},
+	results: [
+						{
+							name: 'Leia Skywalker',
+						},
+						{
+							name: 'Lando Calrissian',
+						},
+						{
+							name: 'Obi Wan Kenobi',
+						},
+						{
+							name: 'C-3P0',
+						},
+						{
+							name: 'Luke Skywalker',
+						},
+						{
+							name: 'R2-D2',
+						},
+						{
+							name: 'Han Solo',
+						},
+					],
 };
 
-var stateCalculator = (state = defaultState, action) =>
+var stateReducer = (state = defaultState, action) =>
 {
 	return {
-		cards: cardsCalculator(state.cards, action),
-		inputs: inputsCalculator(state.inputs, action),
-		results: resultsCalculator(state.results, action),
+		cards: cardsReducer(state.cards, action),
+		inputs: inputsReducer(state.inputs, action),
+		results: resultsReducer(state.results, action),
 	}
 }
 
-let Store = Redux.createStore(stateCalculator);
+let Store = Redux.createStore(stateReducer);
 
 module.exports = Store;

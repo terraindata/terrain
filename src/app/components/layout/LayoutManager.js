@@ -45,6 +45,7 @@ THE SOFTWARE.
 require('./LayoutManager.less');
 var React = require('react');
 var $ = require('jquery');
+var _ = require('underscore');
 
 var Actions = require('../../data/Actions.js');
 
@@ -94,47 +95,78 @@ var LayoutManager = React.createClass({
 		return sum;
 	},
 
-	computeShiftedIndices(index, coords)
+	computeShiftedIndicesSingleAxis(index, coords)
 	{
 		var clientRect = this.refs[index].getBoundingClientRect();
 		var indicesToShift = [];
 
 		var curY = 0; // current Y position to compare, either the top edge (if dragged up) or bottom (if dragged down)
+		var curX = 0; // current X position to compare, either the left edge (if dragged left) or the right (if dragged right)
 		var compareIndices = (refIndex) => false; // is the given neighbor index applicable?
-		var getRefMidpoint = (refClientRect) => 0; // midpoint of the neighbor to compare
-		var compareRefMidpoint = (refMidpoint) => false; // given an applicable neighbor's midpoint, should we shift?
+		var getRefMidpointY = (refClientRect) => 0; // MidpointY of the neighbor to compare
+		var getRefMidpointX = (refClientRect) => 0; // MidpointX of the neighbor to compare
+		var compareRefMidpointY = (refMidpointY) => false; // given an applicable neighbor's MidpointY, should we shift?
+		var compareRefMidpointX = (refMidpointX) => false; // given an applicable neighbor's MidpointX, should we shift?
 		var heightAmplifier = 0; // shift our neighbor by heightAmplifier * our height
 		var widthAmplifier = 0; // ditto, for width
 
-		// dragged up
-		if(coords.dy < 0) 
+		if(this.props.layout.rows)
 		{
-			var curY = clientRect.top + coords.dy;
-			var compareIndices = (refIndex) => refIndex < index;
-			var getRefMidpoint = (refClientRect) => refClientRect.bottom - refClientRect.height / 2;
-			var compareRefMidpoint = (refMidpoint) => curY < refMidpoint;
-			var heightAmplifier = 1;
-			var widthAmplifier = 0;
-		}
+			// dragged up
+			if(coords.dy < 0) 
+			{
+				var curY = clientRect.top + coords.dy;
+				var compareIndices = (refIndex) => refIndex < index;
+				var getRefMidpointY = (refClientRect) => refClientRect.bottom - refClientRect.height / 2;
+				var compareRefMidpointY = (refMidpointY) => curY < refMidpointY;
+				var heightAmplifier = 1;
+				var widthAmplifier = 0;
+			}
 
-		// dragged down
-		if(coords.dy > 0) 
-		{
-			var curY = clientRect.bottom + coords.dy;
-			var compareIndices = (refIndex) => refIndex > index;
-			var getRefMidpoint = (refClientRect) => refClientRect.top + refClientRect.height / 2;
-			var compareRefMidpoint = (refMidpoint) => curY > refMidpoint;
-			var heightAmplifier = -1;
-			var widthAmplifier = 0;
+			// dragged down
+			if(coords.dy > 0) 
+			{
+				var curY = clientRect.bottom + coords.dy;
+				var compareIndices = (refIndex) => refIndex > index;
+				var getRefMidpointY = (refClientRect) => refClientRect.top + refClientRect.height / 2;
+				var compareRefMidpointY = (refMidpointY) => curY > refMidpointY;
+				var heightAmplifier = -1;
+				var widthAmplifier = 0;
+			}
 		}	
+
+		if(this.props.layout.columns)
+		{
+			// dragged left
+			if(coords.dx < 0) 
+			{
+				var curX = clientRect.left + coords.dx;
+				var compareIndices = (refIndex) => refIndex < index;
+				var getRefMidpointX = (refClientRect) => refClientRect.right - refClientRect.width / 2;
+				var compareRefMidpointX = (refMidpointX) => curX < refMidpointX;
+				var heightAmplifier = 0;
+				var widthAmplifier = 1;
+			}
+			// dragged down
+			if(coords.dx > 0) 
+			{
+				var curX = clientRect.right + coords.dx;
+				var compareIndices = (refIndex) => refIndex > index;
+				var getRefMidpointX = (refClientRect) => refClientRect.left + refClientRect.width / 2;
+				var compareRefMidpointX = (refMidpointX) => curX > refMidpointX;
+				var heightAmplifier = 0;
+				var widthAmplifier = -1;
+			}	
+		}
 
 		$.each(this.refs, (refIndex, refObj) => 
 		{
 			if(compareIndices(refIndex))
 			{
 				var refClientRect = refObj.getBoundingClientRect();
-				var refMidpoint = getRefMidpoint(refClientRect);
-				if(compareRefMidpoint(refMidpoint))
+				var refMidpointY = getRefMidpointY(refClientRect);
+				var refMidpointX = getRefMidpointX(refClientRect);
+				if(compareRefMidpointY(refMidpointY) || compareRefMidpointX(refMidpointX))
 				{
  					indicesToShift.push(+refIndex);
 				}
@@ -144,26 +176,83 @@ var LayoutManager = React.createClass({
 		return indicesToShift;
 	},
 
+	computeShiftedIndicesCells(index, coords, originalCoords)
+	{
+		// Find which index the mouse is in
+		var mx = originalCoords.x + coords.dx;
+		var my = originalCoords.y + coords.dy;
+		var destinationIndex = -1;
+
+		$.each(this.refs, (refIndex, refObj) =>
+		{
+			var cr = refObj.getBoundingClientRect();
+			if(mx >= cr.left && mx <= cr.right && my >= cr.top && my <= cr.bottom)
+			{
+				destinationIndex = parseInt(refIndex, 10);
+			}
+		})
+
+		if(destinationIndex !== -1)
+		{
+			if(index < destinationIndex)
+			{
+				return _.range(index + 1, destinationIndex + 1); // _.range's domain is [first, second)
+			}
+			return _.range(destinationIndex, index);
+		}
+
+		return [];
+	},
+
+	computeShiftedIndices(index, coords, originalCoords)
+	{
+		if(this.props.layout.rows || this.props.layout.columns)
+		{
+			return this.computeShiftedIndicesSingleAxis(index, coords);
+		}
+		
+		if(this.props.layout.cells)
+		{
+			return this.computeShiftedIndicesCells(index, coords, originalCoords);
+		}
+
+		return [];
+	},
+
 	onDragFactory(index)
 	{
-		return (coords) => 
+		return (coords, originalCoords) => 
 		{
-			var clientRect = this.refs[index].getBoundingClientRect();
-			var indicesToShift = this.computeShiftedIndices(index, coords);
+			this.setState({dragging: true, draggingIndex: index});
 
-			// dragged up
-			if(coords.dy < 0) 
+			var clientRect = this.refs[index].getBoundingClientRect();
+			var indicesToShift = this.computeShiftedIndices(index, coords, originalCoords);
+
+			var heightAmplifier = 0;
+			var widthAmplifier = 0;
+
+			// dragged up/down
+			if(this.props.layout.rows)
 			{
-				var heightAmplifier = 1;
-				var widthAmplifier = 0;
+				heightAmplifier = 1;
+				if(coords.dy > 0)
+					heightAmplifier = -1;
 			}
 
-			// dragged down
-			if(coords.dy > 0) 
+			// dragged left/right
+			if(this.props.layout.columns)
 			{
-				var heightAmplifier = -1;
-				var widthAmplifier = 0;
-			}				
+				widthAmplifier = 1;
+				if(coords.dx > 0)
+					widthAmplifier = -1;
+			}
+
+			if(this.props.layout.cells)
+			{
+				// handled in this.renderObj
+				widthAmplifier = 1;
+				heightAmplifier = 1;
+			}
 
 			this.setState({
 				shiftedIndices: indicesToShift,
@@ -175,35 +264,29 @@ var LayoutManager = React.createClass({
 
 	onDropFactory(index)
 	{
-		return (coords) => 
+		return (coords, originalCoords) => 
 		{
-			var shiftedIndices = this.computeShiftedIndices(index, coords);
+			this.setState({draggingIndex: -1, dragging: false});
+
+			var shiftedIndices = this.computeShiftedIndices(index, coords, originalCoords);
 			
 			if(shiftedIndices.length === 0)
 				return;
 
-			var fn = () => null;
-			
-			// dragged up
-			if(coords.dy < 0)
+			var fn = Math.max;
+				
+			if(shiftedIndices.length && shiftedIndices[0] < index)
 			{
 				fn = Math.min;
 			}
 
-			// dragged down
-			if(coords.dy > 0)
-			{
-				fn = Math.max;
-			}
-
 			var indexToMoveTo = fn.apply(null, shiftedIndices);
-			console.log('move', index, 'to', indexToMoveTo);
 
-			Actions.dispatch.moveCard(index, indexToMoveTo);
+			console.log(indexToMoveTo);
 
 			if(indexToMoveTo !== null && this.props.moveTo)
 			{
-				// TODO probably need redux / flux here
+				console.log('moving');
 				this.props.moveTo(index, indexToMoveTo);
 			}
 
@@ -226,11 +309,42 @@ var LayoutManager = React.createClass({
 				onDrop: this.onDropFactory(index),
 			};
 
+			if(this.state.dragging && this.state.draggingIndex !== index)
+			{
+				props.neighborDragging = true;
+			}
+
 			if(this.state.shiftedIndices.indexOf(index) !== -1)
 			{
 				props.dy = this.state.shiftedHeight;
 				props.dx = this.state.shiftedWidth;
-				props.neighborDragging = true;
+
+				if(this.props.layout.cells)
+				{
+					if(index < this.state.draggingIndex)
+					{
+						// should shift forward and down
+						props.dx = this.state.shiftedWidth;
+						props.dy = 0;
+						if((index + 1) % this.getNumCellsInRow() === 0)
+						{
+							props.dx = -1 * this.state.shiftedWidth * (this.getNumCellsInRow() - 1);
+							props.dy = this.state.shiftedHeight;
+						}
+					}
+
+					if(index > this.state.draggingIndex)
+					{
+						// should shift backward and up
+						props.dx = -1 * this.state.shiftedWidth;
+						props.dy = 0;
+						if(index % this.getNumCellsInRow() === 0)
+						{
+							props.dx = this.state.shiftedWidth * (this.getNumCellsInRow() - 1);
+							props.dy = -1 * this.state.shiftedHeight;
+						}
+					}
+				}
 			}
 
 			var content = React.cloneElement(obj.content, props);
@@ -239,7 +353,7 @@ var LayoutManager = React.createClass({
 		// check for a nested layout
 		if(obj.columns || obj.rows || obj.cells)
 		{
-			content = <LayoutManager layout={obj} ref={index} />
+			content = <LayoutManager layout={obj} ref={index} moveTo={obj.moveTo} />
 		}
 		
 		return (
@@ -281,27 +395,47 @@ var LayoutManager = React.createClass({
 		return this.renderObj(column, classToPass, index, style);
 	},
 
+	getNumCellsInRow()
+	{
+		var widthObj = this.props.layout.cellWidth;
+		if(typeof widthObj !== 'object')
+			return 1;
+
+		// parse the object
+		var docWidth = $(window).width(), curMax = -1;
+		$.each(widthObj, function(key, val) {
+			var curWidth = parseInt(key, 10);
+			// find the largest key smaller than docWidth
+			if(docWidth > curWidth && curWidth > curMax)
+				curMax = key;
+		});
+		return widthObj[curMax];
+	},
+
+	getCellWidth()
+	{
+		var width = this.props.layout.cellWidth;
+		
+		if(typeof width === 'object') {
+			width = (100 / this.getNumCellsInRow()) + '%';
+		}
+
+		return width;
+	},
+
+	getCellHeight()
+	{
+		return this.props.layout.cellHeight;
+	},
+
 	renderCell(cell, index) 
 	{
 		// todo consider moving this to somehwere not in a loop
-		var height = this.props.layout.cellHeight;
+		var height = this.getCellHeight();
 		if(typeof height !== 'string')
 			height += 'px'; // necessary?
 
-		var width = this.props.layout.cellWidth;
-		if(typeof width === 'object') {
-			// parse the object
-			var docWidth = $(window).width(), curMax = -1;
-			$.each(width, function(key, val) {
-				// find the largest key smaller than docWidth
-				if(docWidth > key && key > curMax)
-					curMax = key;
-			});
-			width = width[curMax];
-		}
-		// todo parse if not string
-
-		// var x = 
+		var width = this.getCellWidth();
 
 		var style = {
 			height: height,

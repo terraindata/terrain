@@ -42,96 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Style
-require("./GeneralStyle.less");
+require('./Input.less');
+var React = require('react');
+var Util = require('../../util/Util.js');
+var PanelMixin = require('../layout/PanelMixin.js');
+var $ = require('jquery');
 
-// Libraries
-var React = require("react");
-var ReactDOM = require("react-dom");
+var Input = React.createClass({
+	mixins: [PanelMixin],
 
-// Data
-var Store = require("./data/Store.js");
-var Actions = require("./data/Actions.js");
+	propTypes:
+	{
+		data: React.PropTypes.object.isRequired,
+	},
 
-// Components
-var LayoutManager = require("./components/layout/LayoutManager.js");
-var PanelPlaceholder = require("./components/layout/PanelPlaceholder.js");
-var Card = require("./components/cards/Card.js");
-var Input = require("./components/inputs/Input.js");
-var Result = require("./components/results/Result.js");
+	getDefaultProps() 
+	{
+		return {
+			drag_x: false,
+			drag_y: true,
+			reorderOnDrag: true,
+		};
+	},
 
+	changeKey(event)
+	{
+		
+	},
 
-var App = React.createClass({
+	changeValue(event)
+	{
+		
+	},
 
-  getInitialState () {
-    Store.subscribe(() => {
-      this.setState(Store.getState());
-    });
-
-    return Store.getState();
-  },
-
-  render () {
-    var cards = this.state.cards;
-    var inputs = this.state.inputs;
-    var results = this.state.results;
-
-  	var layout = {
-  		stackAt: 650,
-  		columns: [
-  			{
-  				reorderable: true,
-  				rows: inputs.map((input) => 
-            ({
-              content: <Input data={input} />
-            })),
-          moveTo: (curIndex, newIndex) =>
-          {
-            Actions.dispatch.moveInput(curIndex, newIndex);
-          }
-  			},
-  			{
-  				colSpan: 2,
-  				reorderable: true,
-  				rows: cards.map((card) =>
-            ({
-              content: <Card name={card.name} data={card} />
-            })),
-          moveTo: (curIndex, newIndex) =>
-          {
-            Actions.dispatch.cards.move(curIndex, newIndex);
-          }
-  			},
-  			{
-  				reorderable: true,
-  				cellHeight: 150,
-  				cellWidth: {
-  					0: 1,
-  					300: 2,
-  					650: 1,
-  					1200: 2,
-  					1850: 3,
-  					2400: 4,
-  				},
-  				cells: results.map((result) => ({
-              content: <Result data={result} />
-            })),
-          moveTo: (curIndex, newIndex) =>
-          {
-            Actions.dispatch.moveResult(curIndex, newIndex);
-          }
-  			},
-  		]
-  	};
-
-    return (
-      <LayoutManager layout={layout} />
-    );
-  }
-
+	render() {
+		return this.renderPanel((
+			<div className='input'>
+				<div className='input-inner'>
+					<input type="text" value={this.props.data.key} onChange={this.changeKey} className="input-text input-text-first" />
+					<input type="text" value={this.props.data.value} onChange={this.changeValue} className="input-text input-text-second" />
+				</div>
+			</div>
+			));
+	},
 });
 
-ReactDOM.render(<App />, document.getElementById('app'), function () {
-  // require('./tests').run(this);
-  // TODO: tests here.
-});
+module.exports = Input;

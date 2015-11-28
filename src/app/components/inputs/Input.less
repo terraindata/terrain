@@ -1,0 +1,34 @@
+@import "../../util/Common.less";
+
+.input {
+	padding: 2px;
+
+	.input-inner {
+		padding: 12px;
+		background: @light-green;
+		border: 1px solid @medium-dark-green;
+		border-radius: 5px;
+
+		.input-text {
+			display: block;
+			-webkit-appearance: none;
+			outline: none;
+			background: #fff;
+			border: 0px solid #ddd;
+			padding: 7px;
+			color: @gray;
+			border-radius: 3px;
+			width: 100%;
+			font-size: @medium-font-size;
+		}
+
+		.input-text-first {
+			margin-bottom: 12px;
+		}
+	}
+}
+
+.panel-dragging .input-inner {
+	transition: box-shadow 0.25s ease-out;
+	box-shadow: 0px 0px 25px rgba(0,0,0,0.25);
+}

@@ -43,9 +43,13 @@ THE SOFTWARE.
 */
 
 require('./card.less');
+var Actions = require('../../data/Actions.js');
 var React = require('react');
 var Util = require('../../util/Util.js');
+var PanelPlaceholder = require('../layout/PanelPlaceholder.js');
 var PanelMixin = require('../layout/PanelMixin.js');
+var LayoutManager = require('../layout/LayoutManager.js');
+var CardInput = require('./CardInput.js');
 var $ = require('jquery');
 
 var Card = React.createClass({
@@ -53,7 +57,7 @@ var Card = React.createClass({
 
 	propTypes:
 	{
-		name: React.PropTypes.string.isRequired,
+		data: React.PropTypes.object.isRequired,
 	},
 
 	getDefaultProps() 
@@ -61,20 +65,51 @@ var Card = React.createClass({
 		return {
 			drag_x: false,
 			drag_y: true,
-			onDrop: this.onDrop,
 			reorderOnDrag: true,
 		};
 	},
 
-	onDrop() {
-		console.log('drop!');
-	},
-
 	render() {
+		var fields = [];
+		var moveFn = () => console.log('move!');
+
+		if(this.props.data.select)
+		{
+			fields = this.props.data.select.fields;
+			moveFn = (curIndex, newIndex) =>
+      {
+      	console.log(Actions.dispatch.cards.select.moveField);
+        Actions.dispatch.cards.select.moveField(this.props.data, curIndex, newIndex);
+      }
+		}
+
+		if(this.props.data.from)
+			fields = [this.props.data.from.table];
+
+		if(this.props.data.order)
+			fields = [this.props.data.order.field];
+
+		if(this.props.data.score)
+			fields = this.props.data.score.fields;
+
+		var dragY = false;
+		if(fields.length > 1)
+			dragY = true;
+
+		var layout = {
+  				reorderable: true,
+  				rows: fields.map((field) => {
+  					var onFieldChange = (event) => console.log('change');
+            return {
+              content: <CardInput value={field} onChange={onFieldChange} />
+            }
+          }),
+  			};
+
 		return this.renderPanel((
 			<div className='card'>
 				<div className='card-inner'>
-					{this.props.name}
+					<LayoutManager layout={layout} moveTo={moveFn} />
 				</div>
 			</div>
 			));

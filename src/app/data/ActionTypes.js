@@ -68,14 +68,20 @@ var ActionTypes =
 	[
 		'move',
 		'create',
+		'changeKey',
+		'changeValue',
 	]),
 
-	results:
-	{
-		'nothing': 'results.nothing',
-	}
+	results: makeObject('results', 
+	[
+		'move',
+	])
 };
 
-console.log(ActionTypes);
+ActionTypes.cards.select = makeObject('cards.select', [
+	'moveField',
+	'newField',
+	'deleteField',
+]);
 
 module.exports = ActionTypes;

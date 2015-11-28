@@ -91,7 +91,9 @@ var Panel = {
 				dx: 0, 
 				dy: 0,
 			});
+			return true;
 		}
+		return false;
 	},
 
 	dragTo(x, y) 
@@ -103,7 +105,7 @@ var Panel = {
 			this.setState({
 				dx: x - this.state.ox
 			});
-			draggedTo.dx = dx;
+			draggedTo.dx = this.state.dx;
 		}
 
 		if(this.canDrag('y')) 
@@ -116,7 +118,10 @@ var Panel = {
 
 		if(this.props.onDrag) 
 		{
-			this.props.onDrag(draggedTo);
+			this.props.onDrag(draggedTo, { 
+				x: this.state.ox,
+				y: this.state.oy,
+			});
 		}
 	},
 
@@ -128,6 +133,9 @@ var Panel = {
 			this.props.onDrop({
 				dx: x - this.state.ox,
 				dy: y - this.state.oy,
+			}, { 
+				x: this.state.ox,
+				y: this.state.oy,
 			});
 		}
 	},
@@ -137,11 +145,13 @@ var Panel = {
 
 	down(event) 
 	{
-		this.startDrag(event.pageX, event.pageY);
-		$(document).on('mousemove', this.move);
-		$(document).on('touchmove', this.move);
-		$(document).on('mouseup', this.up);
-		$(document).on('touchend', this.up);
+		if(this.startDrag(event.pageX, event.pageY)) {
+			event.stopPropagation();
+			$(document).on('mousemove', this.move);
+			$(document).on('touchmove', this.move);
+			$(document).on('mouseup', this.up);
+			$(document).on('touchend', this.up);
+		}
 	},
 
 	move(event) 

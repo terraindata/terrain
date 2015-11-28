@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./panel.less');
+var _ = require('underscore');
 var React = require('react');
 var Util = require('../../util/Util.js');
 var PanelMixin = require('./PanelMixin.js');
@@ -61,11 +62,12 @@ var PanelPlaceholder = React.createClass({
 
 	render() 
 	{
-		var style = {
+		var style = _.extend({}, {
 			height: this.props.height,
 			background: '#ccc',
 			border: '1px solid #aaa',
-		};
+		}, this.props.style);
+
 		return this.renderPanel(<div style={style}> { this.props.text } </div>);
 	},
 });
