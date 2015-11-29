@@ -65,6 +65,7 @@ var CardField = React.createClass({
 			drag_y: true,
 			reorderOnDrag: true,
 			value: '',
+			handleRef: 'handle',
 		};
 	},
 
@@ -104,7 +105,7 @@ var CardField = React.createClass({
 		return this.renderPanel((
 			<div className='card-field'>
 				<div className='card-field-inner'>
-					<div className='card-field-handle'>⋮⋮</div>
+					<div className='card-field-handle' ref='handle'>⋮⋮</div>
 					<input type="text" value={this.props.value} onChange={this.handleChange} />
 					<div className='card-field-delete' onClick={this.deleteField}>&times;</div>
 				</div>

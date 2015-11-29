@@ -14,8 +14,9 @@
 	e.g. Don't do `.first, .second, .third .thirds-kid, .fourth[type=text]`, but rather put a newline after every comma.
 6. CSS classes are named with `-`.
 	e.g. `blue-and-black` or `white-and-gold`
-7. `TODO` should be treated like poison. 
+7. `// TODO` should be treated like poison. 
 	Why write `TODO` when you can do it correctly right now? Tech debt is evil. The Death Star was built upon tech debt, and look what happened to it. `Tech Debt == Death Star` is truthy.
+	But if you absolutely have to leave something for later or make a reminder note, write `// TODO [something I can't do right now]` so that we can keep track.
 8. Optimal directory size is two to five files.
 	No directories in `src` with over ten files.
 	No objects / namespaces with over ten keys.
@@ -41,6 +42,8 @@
 19. None of these standards are set in stone; if you have an idea for a way to improve these, make it known. Coding practices evolve.
 20. No code is set in stone, either. Refactor when you find something that you know you could do better.
 	Refactor responsibly: test your changes, and apply appropriate cost-benefit-analysis before starting to be certain that your time is well-used.
+21. We only deploy from `master`.
+22. Use effective markdown syntax in this file.
 11. No not believing in yourself.
 24. Linear ordering in ordered lists is overrated.
 
@@ -76,6 +79,11 @@ Utility functions or styles that are used across multiple files.
 
 Whenever new packages are installed from branches merged to master, run `npm install` locally.
 
+## Deploying
+
+From `master` branch:
+	npm run deploy
+
 ## Code Overview
 
 ### Layout
@@ -86,11 +94,12 @@ The `src/app/components/layout` directory contains all files pertinent to layout
 
 ### Data / Actions / Redux
 
-Our data layer is powered by Redux. In brief, Redux provides:
+Our front-end data layer is powered by Redux. In brief, Redux provides:
 1. A "store" which contains the application's data/state, and allows for subscribers to listen to changes in state.
 2. "Actions" which are dispatched by the view (anywhere within the React code) and may cause the application to enter a new state.
 
 #### The Store and Reducers
+
 The store is created by a set of "reducers," which are pure functions (no side effects) that accept a state and an action and return either
 - a new state object, if the action caused a change in state (do not mutate the state object that is passed)
 - the same state object that was passed, if the action did not affect the state

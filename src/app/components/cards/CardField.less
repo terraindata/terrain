@@ -16,10 +16,17 @@
 	.card-field-handle,
 	.card-field-delete {
 		position: relative;
-		top: 5px;
+		top: 2px;
 		width: 20px;
 		opacity: 0;
-		.transition(opacity 0.25s);
+		font-weight: 200;
+		font-size: calc(@medium-font-size * 1.25);
+		color: @light-gray;
+		.transition(all 0.25s);
+
+		&:hover {
+			color: @black;
+		}
 	}
 
 	.card-field-handle {

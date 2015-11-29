@@ -57,6 +57,7 @@ var Panel = {
 		fill: React.PropTypes.bool,
 		reorderOnDrag: React.PropTypes.bool,
 		neighborDragging: React.PropTypes.bool,
+		handleRef: React.PropTypes.string,
 	},
 
 	getInitialState() {
@@ -145,6 +146,16 @@ var Panel = {
 
 	down(event) 
 	{
+		console.log(event);
+		if(this.props.handleRef)
+		{
+			if(event.target != this.refs[this.props.handleRef])
+			{
+				// a handleRef is set, so only respond to mouse events on our handle
+				return;
+			}
+		}
+
 		if(this.startDrag(event.pageX, event.pageY)) {
 			event.stopPropagation();
 			$(document).on('mousemove', this.move);
