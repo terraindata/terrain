@@ -1,15 +1,41 @@
 @import "../../util/Common.less";
 
-.card-input {
+.card-field {
 	padding: 5px;
 
-	.card-input-inner input {
+	.card-field-inner input {
 		font-size: @medium-font-size;
-		width: 100%;
+		width: calc(~"100% - 40px");
 		-webkit-appearance: none;
 		border-width: 0px;
 		background: #fff;
 		border-radius: 5px;
 		padding: 5px;
+	}
+
+	.card-field-handle,
+	.card-field-delete {
+		position: relative;
+		top: 5px;
+		width: 20px;
+		opacity: 0;
+		.transition(opacity 0.25s);
+	}
+
+	.card-field-handle {
+		float: left;
+		text-align: left;
+	}
+
+	.card-field-delete {
+		float: right;
+		text-align: right;
+	}
+
+	&:hover {
+		.card-field-handle,
+		.card-field-delete {
+			opacity: 1;
+		}
 	}
 }

@@ -4,7 +4,8 @@
   "description": "The one search front-end to rule them all.",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --inline --content-base src/app"
+    "start": "webpack-dev-server --inline --content-base src/app",
+    "deploy": "webpack && scp bundle.js u51505641@lukeknepper.com:alfaromeo/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -45,8 +46,5 @@
     "url-loader": "^0.5.6",
     "webpack": "^1.7.3",
     "webpack-dev-server": "^1.8.0"
-  },
-  "scripts": {
-    "deploy": "webpack && scp bundle.js u51505641@lukeknepper.com:alfaromeo/bundle.js"
   }
 }

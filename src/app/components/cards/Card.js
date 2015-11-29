@@ -73,18 +73,26 @@ var Card = React.createClass({
 		var fields = [];
 		var moveFn = () => console.log('move!');
 		var changeFnFactory = (index) => () => console.log('change!');
+		var deleteFnFactory = (index) => () => console.log('remove!');
 
 		if(this.props.data.select)
 		{
 			fields = this.props.data.select.fields;
+			
 			moveFn = (curIndex, newIndex) =>
       {
         Actions.dispatch.cards.select.moveField(this.props.data, curIndex, newIndex);
       }
+
       changeFnFactory = (index) => (value) =>
       {
-      	// console.log(index, value);
       	Actions.dispatch.cards.select.changeField(this.props.data, index, value);
+      }
+
+      deleteFnFactory = (index) => () =>
+      {
+      	console.log('delete');
+      	Actions.dispatch.cards.select.deleteField(this.props.data, index);
       }
 		}
 
@@ -105,7 +113,7 @@ var Card = React.createClass({
   				reorderable: true,
   				rows: fields.map((field, index) => {
             return {
-              content: <CardInput value={field} onChange={changeFnFactory(index)} />
+              content: <CardInput value={field} onChange={changeFnFactory(index)} onDelete={deleteFnFactory(index)} />
             }
           }),
   			};

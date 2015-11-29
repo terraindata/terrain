@@ -76,21 +76,28 @@ var selectCardReducer = (cards = [], action) =>
 	var cardIndex = cards.indexOf(action.card);
 	if(cardIndex === -1)
 		return cards;
-	// assumed: cardIndex points to a real card from now on
+	// cardIndex points to a real card from now on
+
+	var newCards = cards = cloneArray(cards);
+	var select = newCards[cardIndex].select
 
 	switch(action.type)
 	{
 		case ActionTypes.cards.select.moveField:
-			cards = cloneArray(cards);
-			cards[cardIndex].select.fields = move(cards[cardIndex].select.fields, action.curIndex, action.newIndex);
-			return cards;
+			select.fields = move(select.fields, action.curIndex, action.newIndex);
+			break;
 		case ActionTypes.cards.select.changeField:
-			cards = cloneArray(cards);
-			cards[cardIndex].select.fields[action.index] = action.value;
+			select.fields[action.index] = action.value;
+			break;
+		case ActionTypes.cards.select.deleteField:
+			select.fields.splice(action.index, 1);
+			break;
+		default:
+			// ActionType not applicable, return normal cards
 			return cards;
 	}
 
-	return cards;
+	return newCards;
 };
 
 var cardsReducer = (cards = [], action) =>

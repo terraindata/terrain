@@ -55,6 +55,7 @@ var CardField = React.createClass({
 	{
 		value: React.PropTypes.string,
 		onChange: React.PropTypes.func.isRequired,
+		onDelete: React.PropTypes.func,
 	},
 
 	getDefaultProps() 
@@ -69,6 +70,7 @@ var CardField = React.createClass({
 
 	willReceiveNewProps(newProps)
 	{
+		console.log(newProps);
 		this.setState({
 			value: newProps.value,
 		});
@@ -90,11 +92,21 @@ var CardField = React.createClass({
 		this.props.onChange(event.target.value);
 	},
 
+	deleteField(event)
+	{
+		if(typeof this.props.onDelete === 'function')
+		{
+			this.props.onDelete();
+		}
+	},
+
 	render() {
 		return this.renderPanel((
-			<div className='card-input'>
-				<div className='card-input-inner'>
+			<div className='card-field'>
+				<div className='card-field-inner'>
+					<div className='card-field-handle'>⋮⋮</div>
 					<input type="text" value={this.props.value} onChange={this.handleChange} />
+					<div className='card-field-delete' onClick={this.deleteField}>&times;</div>
 				</div>
 			</div>
 			));

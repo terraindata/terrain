@@ -76,7 +76,47 @@ Utility functions or styles that are used across multiple files.
 
 Whenever new packages are installed from branches merged to master, run `npm install` locally.
 
+## Code Overview
+
+### Layout
+
+The `src/app/components/layout` directory contains all files pertinent to layout (i.e. positioning) of HTML components on the page.
+* `PanelMixin`: A mixin to include in components that should be treated as drag-and-droppable "panels." Panels accept a variety of props that dictate how they can be dragged, what happens when they're dragged, and what happens when they're dropped.
+* `LayoutManager`: Contains a set of panels, passed in as an object through the `layout` prop. The panels are treated either as rows, columns, or cells. The `layout` object can contain nested row/column/cell objects, which will be resolved into LayoutManagers; this allows for short-hand when writing LayoutManager layouts.
+
+### Data / Actions / Redux
+
+Our data layer is powered by Redux. In brief, Redux provides:
+1. A "store" which contains the application's data/state, and allows for subscribers to listen to changes in state.
+2. "Actions" which are dispatched by the view (anywhere within the React code) and may cause the application to enter a new state.
+
+#### The Store and Reducers
+The store is created by a set of "reducers," which are pure functions (no side effects) that accept a state and an action and return either
+- a new state object, if the action caused a change in state (do not mutate the state object that is passed)
+- the same state object that was passed, if the action did not affect the state
+
+Our set of reducers are contained in `src/app/data/Store.js`, but as the app grows, they should be broken out into separate files and sub-directories. `Store.js` returns our store object, so any JS file can receive the store by including it.
+
+In the future, we may want to have multiple stores, to power different types of data (e.g. builder data versus team/administrative data).
+
+The connection to the back-end will probably listen for changes to the store, send changes via AJAX to the back-end endpoint, and receive the new state of the application (e.g. results and ordering, for the builder).
+
+#### Actions
+
+An action object contains:
+1. A string `type` which is unique that type of action
+2. Any metadata applicable to that action
+
+The types of actions that we can dispatch are located in `src/app/data/ActionTypes.js`. These are nested / namespaced / categorized (e.g. `ActionTypes.cards.select.moveField => "cards.select.moveField"` or `ActionTypes.inputs.changeKey => "inputs.changeKey"`). More details and helper functions are located in that file.
+
+Redux works well with "action creators" and "action dispatchers". Both are defined in `src/app/data/Actions.js` (though we may need to break them out into separate files later). Action creators are functions that accept structured arguments and return an action with the appropriate type and metadata (e.g. `Actions.create.cards.select.moveField(card, fieldIndex, newIndex)` will return an action with `{type: ActionTypes.cards.select.moveField, card: card, curIndex: fieldIndex, newIndex: newIndex }`). Action dispatchers are functions with the same parameters as the creators that both create the action and dispatch it to the store. For every action creator that we have, a dispatcher is automatically made. In practice, you will probably only need to use the dispatchers, and not the creators, but it may be helpful to have both.
+
+To add a new action:
+1. Add the action type to `ActionTypes.js`
+2. Add the action creator to `Actions.js`
+3. Digest that action in the appropriate reducer in `Store.js`
+
 ## Troubleshooting
 
 1. Node or npm errors: `npm install` - you may be missing packages.
-2. Assume it's an early sign of the apocalypse. Panic, scream, and run.
+2. Assume it's an early sign of the apocalypse. Hide your kids. Run.

@@ -71,6 +71,7 @@ var create =
 					newIndex: newIndex,
 				}
 			},
+			
 			changeField: (card, index, value) =>
 			{
 				return {
@@ -78,6 +79,15 @@ var create =
 					card: card,
 					index: index,
 					value: value,
+				}
+			},
+
+			deleteField: (card, index) =>
+			{
+				return {
+					type: ActionTypes.cards.select.deleteField,
+					card: card,
+					index: index,
 				}
 			},
 		}
