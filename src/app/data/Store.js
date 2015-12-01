@@ -70,6 +70,27 @@ var move = (arr, curIndex, newIndex) =>
 	return arr;
 }
 
+// accepts a flexible amount of arguments
+// first arg is an array
+// second arg is the value to change to
+// the next args are the key(s) to key in to the array / objects
+// returns a copy of arr with the keyed value set
+var change = function(arr, value) // needs to be a function to make use of `arguments`
+{
+	console.log(arguments);
+	var newArr = cloneArray(arr);
+	var pointer = newArr;
+	var i;
+	for(i = 2; i < arguments.length - 1; i ++)
+	{
+		pointer = pointer[arguments[i]];
+	}
+
+	pointer[arguments[i]] = value;
+
+	return newArr;
+}
+
 
 var selectCardReducer = (cards = [], action) =>
 {
@@ -78,7 +99,7 @@ var selectCardReducer = (cards = [], action) =>
 		return cards;
 	// cardIndex points to a real card from now on
 
-	var newCards = cards = cloneArray(cards);
+	var newCards = cloneArray(cards);
 	var select = newCards[cardIndex].select
 
 	switch(action.type)
@@ -102,7 +123,6 @@ var selectCardReducer = (cards = [], action) =>
 
 var cardsReducer = (cards = [], action) =>
 {
-	console.log(action);
 	cards = selectCardReducer(cards, action);
 
 	switch(action.type)
@@ -116,9 +136,15 @@ var cardsReducer = (cards = [], action) =>
 
 var inputsReducer = (inputs = [], action) =>
 {
+	var inputIndex = inputs.indexOf(action.input);
+
 	switch(action.type) {
 		case ActionTypes.inputs.move:
 			return move(inputs, action.curIndex, action.newIndex);
+		case ActionTypes.inputs.changeKey:
+			return change(inputs, action.text, inputIndex, 'key');
+		case ActionTypes.inputs.changeValue:
+			return change(inputs, action.text, inputIndex, 'value');
 	}
 
 	return inputs;

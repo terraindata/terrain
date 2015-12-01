@@ -282,11 +282,8 @@ var LayoutManager = React.createClass({
 
 			var indexToMoveTo = fn.apply(null, shiftedIndices);
 
-			console.log(indexToMoveTo);
-
 			if(indexToMoveTo !== null && this.props.moveTo)
 			{
-				console.log('moving');
 				this.props.moveTo(index, indexToMoveTo);
 			}
 

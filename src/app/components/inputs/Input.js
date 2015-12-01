@@ -46,6 +46,7 @@ require('./Input.less');
 var React = require('react');
 var Util = require('../../util/Util.js');
 var PanelMixin = require('../layout/PanelMixin.js');
+var Actions = require('../../data/Actions.js');
 var $ = require('jquery');
 
 var Input = React.createClass({
@@ -67,12 +68,12 @@ var Input = React.createClass({
 
 	changeKey(event)
 	{
-		
+		Actions.dispatch.inputs.changeKey(this.props.data, event.target.value);
 	},
 
 	changeValue(event)
 	{
-		
+		Actions.dispatch.inputs.changeValue(this.props.data, event.target.value);
 	},
 
 	render() {

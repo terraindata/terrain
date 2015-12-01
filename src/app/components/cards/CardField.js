@@ -71,7 +71,6 @@ var CardField = React.createClass({
 
 	willReceiveNewProps(newProps)
 	{
-		console.log(newProps);
 		this.setState({
 			value: newProps.value,
 		});

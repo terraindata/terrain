@@ -101,6 +101,8 @@ var Panel = {
 	{
 		var draggedTo = { x: 0, y: 0 };
 
+		$('input').blur();
+
 		if(this.canDrag('x')) 
 		{
 			this.setState({
@@ -146,7 +148,6 @@ var Panel = {
 
 	down(event) 
 	{
-		console.log(event);
 		if(this.props.handleRef)
 		{
 			if(event.target != this.refs[this.props.handleRef])
@@ -168,6 +169,7 @@ var Panel = {
 	move(event) 
 	{
 		this.dragTo(event.pageX, event.pageY);
+		event.preventDefault();
 	},
 
 	up(event) 

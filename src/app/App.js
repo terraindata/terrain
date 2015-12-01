@@ -87,7 +87,7 @@ var App = React.createClass({
             })),
           moveTo: (curIndex, newIndex) =>
           {
-            Actions.dispatch.moveInput(curIndex, newIndex);
+            Actions.dispatch.inputs.move(curIndex, newIndex);
           }
   			},
   			{

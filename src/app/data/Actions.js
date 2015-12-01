@@ -90,17 +90,39 @@ var create =
 					index: index,
 				}
 			},
-		}
-	},
+		},
+	}, // /cards
 
-	moveInput: (curIndex, newIndex) =>
+	inputs:
 	{
-		return {
-			type: ActionTypes.inputs.move,
-			curIndex: curIndex,
-			newIndex: newIndex,
-		};
-	},
+		move: (curIndex, newIndex) =>
+		{
+			return {
+				type: ActionTypes.inputs.move,
+				curIndex: curIndex,
+				newIndex: newIndex,
+			};
+		},
+
+		changeKey: (input, text) =>
+		{
+			return {
+				type: ActionTypes.inputs.changeKey,
+				input: input,
+				text: text,
+			}
+		},
+
+		changeValue: (input, text) =>
+		{
+			return {
+				type: ActionTypes.inputs.changeValue,
+				input: input,
+				text: text,
+			}
+		},		
+	}, // /inputs
+
 	moveResult: (curIndex, newIndex) =>
 	{
 		return {
