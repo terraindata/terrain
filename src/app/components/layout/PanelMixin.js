@@ -44,8 +44,13 @@ THE SOFTWARE.
 
 require('./panel.less');
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Util = require('../../util/Util.js');
 var $ = require('jquery');
+
+var SCROLL_ACCELERATION = 20;
+var MAX_SCROLL_VELOCITY = 20;
+var SCROLL_INTERVAL = 25;
 
 var Panel = {
 	propTypes: 
@@ -63,6 +68,9 @@ var Panel = {
 	getInitialState() {
 		return {
 			dragging: false,
+			scrollingParentUp: false,
+			scrollInterval: null,
+			scrollVelocity: 0,
 		}
 	},
 
@@ -81,6 +89,99 @@ var Panel = {
 		return this.props.drag_x || this.props.drag_y || this.props.drag_xy;
 	},
 
+	componentWillMount()
+	{
+		setInterval(this.scrollParentUp, SCROLL_INTERVAL);
+	},
+
+	scrollParentUp()
+	{
+		if(!this.state.scrollingParentUp && !this.state.scrollingParentDown && !this.state.scrollVelocity)
+		{
+			// fast break
+			return;
+		}
+
+		if(this.state.scrollingParentUp)
+		{
+			this.setState({
+				scrollVelocity: -1 * MAX_SCROLL_VELOCITY, // Math.max(this.state.scrollVelocity - SCROLL_ACCELERATION, -1 * MAX_SCROLL_VELOCITY),
+			});
+		}
+		else if(this.state.scrollingParentDown)
+		{
+			this.setState({
+				scrollVelocity: MAX_SCROLL_VELOCITY, // Math.min(this.state.scrollVelocity + SCROLL_ACCELERATION, MAX_SCROLL_VELOCITY),
+			});
+		}
+		// else
+		// {
+		// 	// slow down
+		// 	if(Math.abs(this.state.scrollVelocity) <= 2 * SCROLL_ACCELERATION)
+		// 	{
+		// 		console.log('zero');
+		// 		this.setState({
+		// 			scrollVelocity: 0,
+		// 		})
+		// 	}
+
+		// 	else if(this.state.scrollVelocity < 0)
+		// 	{
+		// 		this.setState({
+		// 			scrollVelocity: this.state.scrollVelocity + 2 * SCROLL_ACCELERATION,
+		// 		});
+		// 	}
+
+		// 	else if(this.state.scrollVelocity > 0)
+		// 	{
+		// 		this.setState({
+		// 			scrollVelocity: this.state.scrollVelocity - 2 * SCROLL_ACCELERATION,
+		// 		});
+		// 	}
+		// }
+
+		// TODO update this when we add scrolling containers
+		// TOOD make this max actually work
+		var maxScrollPosition = Util.parentNode(Util.parentNode(this)).getBoundingClientRect().height;
+		var scrollPosition = this.parentNode().scrollTop + this.state.scrollVelocity;
+		scrollPosition = Util.valueMinMax(scrollPosition, 0, maxScrollPosition);
+
+		this.parentNode().scrollTop = scrollPosition;
+
+		if(this.state.draggedTo && this.state.scrollVelocity !== 0 && scrollPosition > 0 && scrollPosition < maxScrollPosition)
+		{
+			var newY = this.state.draggedTo.y + this.state.scrollVelocity;
+			// var maxY = maxScrollPosition - ReactDOM.findDOMNode(this).getBoundingClientRect().height;
+
+			this.dragTo(this.state.draggedTo.x, newY);
+		}
+	},
+
+	startScrollingParentUp()
+	{
+		this.setState({
+			scrollingParentUp: true,
+			scrollingParentDown: false,
+		});
+	},
+
+	startScrollingParentDown()
+	{
+		this.setState({
+			scrollingParentUp: false,
+			scrollingParentDown: true,
+		});
+	},
+
+	stopScrollingParent()
+	{
+		this.setState({
+			scrollingParentUp: false,
+			scrollingParentDown: false,
+			scrollVelocity: 0,
+		});
+	},
+
 	startDrag(x, y) 
 	{
 		if(this.canDrag()) 
@@ -92,9 +193,16 @@ var Panel = {
 				dx: 0, 
 				dy: 0,
 			});
+			
 			return true;
 		}
 		return false;
+	},
+
+	parentNode()
+	{
+		// TODO use Util.parentNode(this).scrollTop when the parent element scrolls
+		return $('body')[0];
 	},
 
 	dragTo(x, y) 
@@ -108,6 +216,7 @@ var Panel = {
 			this.setState({
 				dx: x - this.state.ox
 			});
+			draggedTo.x = x;
 			draggedTo.dx = this.state.dx;
 		}
 
@@ -116,8 +225,13 @@ var Panel = {
 			this.setState({
 				dy: y - this.state.oy
 			});
+			draggedTo.y = y;
 			draggedTo.dy = this.state.dy;
 		}
+
+		this.setState({
+			draggedTo: draggedTo,
+		})
 
 		if(this.props.onDrag) 
 		{
@@ -126,10 +240,25 @@ var Panel = {
 				y: this.state.oy,
 			});
 		}
+
+		if(y - this.parentNode().scrollTop < 50)
+		{
+			this.startScrollingParentUp();
+		}
+		else if(y - this.parentNode().scrollTop > $(window).height() - 50 && y - this.parentNode().scrollTop < $(window).height()) // TODO change away from window
+		{
+			this.startScrollingParentDown();
+		}
+		else
+		{
+			this.stopScrollingParent();
+		}
 	},
 
 	stopDrag(x, y) {
+		console.log('stop');
 		this.setState({ dragging: false });
+		this.stopScrollingParent();
 
 		if(this.props.onDrop)
 		{
@@ -174,6 +303,7 @@ var Panel = {
 
 	up(event) 
 	{
+		console.log(event.pageX, event.pageY);
 		this.stopDrag(event.pageX, event.pageY);
 		$(document).off('mousemove', this.move);
 		$(document).off('touchmove', this.move);

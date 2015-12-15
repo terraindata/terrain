@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+var ReactDOM = require('react-dom');
+
 var Util = {
 	// Return a random integer [min, max)
 	// assumes min of 0 if not passed.
@@ -59,6 +61,16 @@ var Util = {
 	isInt(num)
 	{
 		return num === parseInt(num, 10);
+	},
+
+	parentNode(reactNode)
+	{
+		return ReactDOM.findDOMNode(reactNode).parentNode;
+	},
+
+	valueMinMax(value, min, max)
+	{
+		return Math.min(Math.max(value, min), max);
 	},
 };
 

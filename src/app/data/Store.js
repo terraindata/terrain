@@ -238,6 +238,48 @@ var defaultState =
 						{
 							name: 'Han Solo',
 						},
+						{
+							name: 'Leia Skywalker',
+						},
+						{
+							name: 'Lando Calrissian',
+						},
+						{
+							name: 'Obi Wan Kenobi',
+						},
+						{
+							name: 'C-3P0',
+						},
+						{
+							name: 'Luke Skywalker',
+						},
+						{
+							name: 'R2-D2',
+						},
+						{
+							name: 'Han Solo',
+						},
+						{
+							name: 'Leia Skywalker',
+						},
+						{
+							name: 'Lando Calrissian',
+						},
+						{
+							name: 'Obi Wan Kenobi',
+						},
+						{
+							name: 'C-3P0',
+						},
+						{
+							name: 'Luke Skywalker',
+						},
+						{
+							name: 'R2-D2',
+						},
+						{
+							name: 'Han Solo',
+						},
 					],
 };
 

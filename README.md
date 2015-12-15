@@ -44,6 +44,9 @@
 	Refactor responsibly: test your changes, and apply appropriate cost-benefit-analysis before starting to be certain that your time is well-used.
 21. We only deploy from `master`.
 22. Use effective markdown syntax in this file.
+23. Constants are named with all caps and underscores
+	e.g. `var ANSWER_TO_THE_ULTIMATE_QUESTION = 42;`
+24. No global variables; every variable must be preceded by 'var'.
 11. No not believing in yourself.
 24. Linear ordering in ordered lists is overrated.
 
