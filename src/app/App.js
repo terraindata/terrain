@@ -78,9 +78,11 @@ var App = React.createClass({
 
   	var layout = {
   		stackAt: 650,
+      fullHeight: true,
   		columns: [
   			{
   				reorderable: true,
+          fullHeight: true,
   				rows: inputs.map((input) => 
             ({
               content: <Input data={input} />
@@ -93,6 +95,7 @@ var App = React.createClass({
   			{
   				colSpan: 2,
   				reorderable: true,
+          fullHeight: true,
   				rows: cards.map((card) =>
             ({
               content: <Card name={card.name} data={card} />
@@ -104,6 +107,7 @@ var App = React.createClass({
   			},
   			{
   				reorderable: true,
+          fullHeight: true,
   				cellHeight: 150,
   				cellWidth: {
   					0: 1,

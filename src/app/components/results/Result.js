@@ -54,6 +54,7 @@ var Result = React.createClass({
 	propTypes:
 	{
 		data: React.PropTypes.object.isRequired,
+		parentNode: React.PropTypes.object,
 	},
 
 	getDefaultProps() 

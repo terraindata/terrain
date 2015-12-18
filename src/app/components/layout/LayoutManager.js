@@ -54,6 +54,7 @@ var lmClass = 'layout-manager';
 var colClass = 'layout-manager-column';
 var rowClass = 'layout-manager-row';
 var cellClass = 'layout-manager-cell';
+var fullHeightClass = 'layout-manager-full-height';
 
 var LayoutManager = React.createClass({
 	propTypes: 
@@ -76,12 +77,12 @@ var LayoutManager = React.createClass({
 
 	componentDidMount()
 	{
-        window.addEventListener("resize", this.updateDimensions);
+    window.addEventListener("resize", this.updateDimensions);
   },
 
   componentWillUnmount()
   {
-      window.removeEventListener("resize", this.updateDimensions);
+    window.removeEventListener("resize", this.updateDimensions);
   },
 
 	getSumThroughIndex(index)
@@ -185,14 +186,20 @@ var LayoutManager = React.createClass({
 
 		$.each(this.refs, (refIndex, refObj) =>
 		{
+			if(refIndex === 'layoutManagerDiv')
+			{
+				return;
+			}
+
 			var cr = refObj.getBoundingClientRect();
-			var refTop = refObj.offsetTop, refBottom = refObj.offsetTop + cr.height;
+			var refTop = refObj.offsetTop - this.refs.layoutManagerDiv.scrollTop;
+			var refBottom = refObj.offsetTop + cr.height - this.refs.layoutManagerDiv.scrollTop;
 			// TODO If we have horizontally scrolling cell parent divs, we will need to adapt this.
 			if(mx >= cr.left && mx <= cr.right && my >= refTop && my <= refBottom)
 			{
 				destinationIndex = parseInt(refIndex, 10);
 			}
-		})
+		});
 
 		if(destinationIndex !== -1)
 		{
@@ -306,6 +313,7 @@ var LayoutManager = React.createClass({
 			var props = { 
 				onDrag: this.onDragFactory(index),
 				onDrop: this.onDropFactory(index),
+				parentNode: this.refs.layoutManagerDiv,
 			};
 
 			if(this.state.dragging && this.state.draggingIndex !== index)
@@ -457,8 +465,15 @@ var LayoutManager = React.createClass({
 				);
 		}
 
+		var lmClasses = [lmClass];
+		if(this.props.layout.fullHeight)
+		{
+			lmClasses.unshift(fullHeightClass);
+		}
+		var lmClassString = lmClasses.join(" ");
+
 		return (
-			<div className={lmClass}>
+			<div className={lmClassString} ref='layoutManagerDiv'>
 				{ this.props.layout.columns && this.props.layout.columns.map(this.renderColumn) }
 				{ this.props.layout.rows && this.props.layout.rows.map(this.renderRow) }
 				{ this.props.layout.cells && this.props.layout.cells.map(this.renderCell) }

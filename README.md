@@ -46,7 +46,9 @@
 22. Use effective markdown syntax in this file.
 23. Constants are named with all caps and underscores
 	e.g. `var ANSWER_TO_THE_ULTIMATE_QUESTION = 42;`
-24. No global variables; every variable must be preceded by 'var'.
+24. No global variables; every variable must be preceded by `var`.
+25. Only one variable per `var`, for legibility. Don't separate variables by commas.
+	e.g. Don't do `var first = 4, second = 8, third = 15;` etc. Instead, put each variable on its on line.
 11. No not believing in yourself.
 24. Linear ordering in ordered lists is overrated.
 
