@@ -49,6 +49,7 @@ var ReactDOM = require('react-dom');
 var Util = require('../../util/Util.js');
 var $ = require('jquery');
 
+// TODO clean up the scroll acceleration code
 var SCROLL_ACCELERATION = 20;
 var MAX_SCROLL_VELOCITY = 20;
 var SCROLL_INTERVAL = 25;
@@ -100,10 +101,10 @@ var Panel = {
 		if(!this.state.scrollingParentUp && !this.state.scrollingParentDown && !this.state.scrollVelocity)
 		{
 			// fast break
-			this.setState({
-				scrollVelocity: 0,
-				draggedTo: null,
-			});
+			// this.setState({
+			// 	scrollVelocity: 0,
+			// 	draggedTo: null,
+			// });
 			return;
 		}
 
@@ -120,20 +121,14 @@ var Panel = {
 			});
 		}
 
-		// TODO update this when we add scrolling containers
-		// TOOD make this max actually work
-		var maxScrollPosition = this.state.oParentHeight; //2500;// Util.parentNode(Util.parentNode(this)).getBoundingClientRect().height;
+		var maxScrollPosition = this.state.oParentHeight;
 		var scrollPosition = this.parentNode().scrollTop + this.state.scrollVelocity;
 		scrollPosition = Util.valueMinMax(scrollPosition, 0, maxScrollPosition);
-		// scrollPosition = Math.max(scrollPosition, 0);
 
 		this.parentNode().scrollTop = scrollPosition;
 
 		if(this.state.draggedTo && this.state.scrollVelocity !== 0 && scrollPosition > 0 && scrollPosition < maxScrollPosition)
 		{
-			var newY = this.state.draggedTo.y + this.state.scrollVelocity;
-			// var maxY = maxScrollPosition - ReactDOM.findDOMNode(this).getBoundingClientRect().height;
-
 			this.dragTo(this.state.draggedTo.x, this.state.draggedTo.y);
 		}
 	},
@@ -177,11 +172,9 @@ var Panel = {
 
 			if(this.parentNode())
 			{
-				console.log('set scroll top');
-				console.log(_.map(this.parentNode().childNodes).map);
 				var maxYPosition = _.max(_.map(this.parentNode().childNodes).map((node) => node.getBoundingClientRect().bottom));
 				maxYPosition += this.parentNode().scrollTop;
-				console.log(maxYPosition);
+				maxYPosition -= this.parentNode().getBoundingClientRect().height;
 				this.setState({
 					oScrollTop: this.parentNode().scrollTop,
 					oParentHeight: maxYPosition,
@@ -195,9 +188,7 @@ var Panel = {
 
 	parentNode()
 	{
-		// TODO use Util.parentNode(this).scrollTop when the parent element scrolls
-		// return $('body')[0];
-		return this.props.parentNode; //Util.parentNode(Util.parentNode(this));
+		return this.props.parentNode;
 	},
 
 	dragTo(x, y) 
