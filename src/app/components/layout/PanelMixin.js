@@ -60,7 +60,10 @@ var Panel = {
 		drag_x: React.PropTypes.bool,
 		drag_y: React.PropTypes.bool,
 		drag_xy: React.PropTypes.bool,
+		dragInsideOnly: React.PropTypes.bool,
+
 		onDrop: React.PropTypes.func,
+
 		fill: React.PropTypes.bool,
 		reorderOnDrag: React.PropTypes.bool,
 		neighborDragging: React.PropTypes.bool,
@@ -168,6 +171,7 @@ var Panel = {
 				oy: y, 
 				dx: 0, 
 				dy: 0,
+				ocr: ReactDOM.findDOMNode(this).getBoundingClientRect(),
 			});
 
 			if(this.parentNode())
@@ -196,6 +200,16 @@ var Panel = {
 		var draggedTo = { x: 0, y: 0 };
 
 		$('input').blur();
+
+		if(this.props.dragInsideOnly)
+		{
+			y = Util.valueMinMax(y,
+					this.parentNode().getBoundingClientRect().top + this.state.oy - this.state.ocr.top,
+					this.parentNode().getBoundingClientRect().bottom + this.state.oy - this.state.ocr.bottom);
+			x = Util.valueMinMax(x,
+					this.parentNode().getBoundingClientRect().left + this.state.ox - this.state.ocr.left,
+					this.parentNode().getBoundingClientRect().right + this.state.ox - this.state.ocr.right);
+		}
 
 		if(this.canDrag('x')) 
 		{

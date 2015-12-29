@@ -113,7 +113,11 @@ var Card = React.createClass({
   				reorderable: true,
   				rows: fields.map((field, index) => {
             return {
-              content: <CardInput value={field} onChange={changeFnFactory(index)} onDelete={deleteFnFactory(index)} />
+              content: <CardInput 
+              					value={field}
+              					onChange={changeFnFactory(index)}
+              					onDelete={deleteFnFactory(index)}
+              					dragInsideOnly={true} />
             }
           }),
   			};
