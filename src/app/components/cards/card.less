@@ -4,10 +4,23 @@
 	padding: 2px;
 
 	.card-inner {
-		padding: 15px;
 		background: @light-green;
 		border: 1px solid @medium-dark-green;
 		border-radius: 5px;
+	}
+
+	@card-padding-horizontal: 15px;
+	@card-padding-vertical: 7px;
+	.card-title {
+		background: @dark-green;
+		padding: @card-padding-vertical @card-padding-horizontal;
+		color: #fff;
+		// font-size: @large-font-size;
+		font-weight: @bold-font-weight;
+	}
+
+	.card-content{
+		padding: @card-padding-vertical @card-padding-horizontal;
 	}
 }
 

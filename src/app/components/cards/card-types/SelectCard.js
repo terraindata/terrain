@@ -52,25 +52,25 @@ var $ = require('jquery');
 var SelectCard = React.createClass({
 	propTypes:
 	{
-		select: React.PropTypes.object.isRequired,
+		data: React.PropTypes.object.isRequired,
 	},
 
 	render() {
-		var fields = this.props.select.fields;
+		var fields = this.props.data.select.fields;
 
 		var moveFn = (curIndex, newIndex) =>
     {
-      Actions.dispatch.cards.select.moveField(this.props.select, curIndex, newIndex);
+      Actions.dispatch.cards.select.moveField(this.props.data, curIndex, newIndex);
     }
 
     var changeFnFactory = (index) => (value) =>
     {
-    	Actions.dispatch.cards.select.changeField(this.props.select, index, value);
+    	Actions.dispatch.cards.select.changeField(this.props.data, index, value);
     }
 
     var deleteFnFactory = (index) => () =>
     {
-    	Actions.dispatch.cards.select.deleteField(this.props.select, index);
+    	Actions.dispatch.cards.select.deleteField(this.props.data, index);
     }
 
 		var layout = {

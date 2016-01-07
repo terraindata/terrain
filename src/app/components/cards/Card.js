@@ -67,7 +67,26 @@ var Card = React.createClass({
 			drag_x: false,
 			drag_y: true,
 			reorderOnDrag: true,
+			handleRef: 'handle',
 		};
+	},
+
+	getInitialState()
+	{
+		return {
+			open: true,
+		}
+	},
+
+	handleTitleClick()
+	{
+		if(!this.state.moved)
+		{
+			// this.state.moved is updated in panelMixin
+			this.setState({
+				open: !this.state.open,
+			});
+		}
 	},
 
 	render() {
@@ -76,16 +95,27 @@ var Card = React.createClass({
 		switch(this.props.data.type)
 		{
 			case 'select':
-				content = <SelectCard select={this.props.data.select} />
+				content = <SelectCard {...this.props} />
 				break;
 			default:
 				content = <div>This card has not been implemented yet.</div>
 		}
 
+		var title = this.props.data.type.charAt(0).toUpperCase() + this.props.data.type.substr(1);
+
 		return this.renderPanel((
 			<div className='card'>
 				<div className='card-inner'>
-					{content}
+					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>
+						{title}
+					</div>
+					{
+						this.state.open ? 
+							(<div className='card-content'>
+								{content}
+							</div>)
+						: null
+					}
 				</div>
 			</div>
 			));

@@ -76,6 +76,7 @@ var Panel = {
 			scrollingParentUp: false,
 			scrollInterval: null,
 			scrollVelocity: 0,
+			moved: false,
 		}
 	},
 
@@ -293,12 +294,24 @@ var Panel = {
 			$(document).on('mouseup', this.up);
 			$(document).on('touchend', this.up);
 		}
+
+		// we reset the moved state here, and not on the 'up' event,
+		//  because the 'up' event handler gets called before any click event listeners
+		//  the parent may have set
+		//  I think reseting the state here should be equivalent, but if you find a bug or
+		//  know a better way, implement it
+		this.setState({
+			moved: false,
+		});
 	},
 
 	move(event) 
 	{
 		this.dragTo(event.pageX, event.pageY);
 		event.preventDefault();
+		this.setState({
+			moved: true,
+		});
 	},
 
 	up(event) 

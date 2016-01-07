@@ -77,13 +77,11 @@ var move = (arr, curIndex, newIndex) =>
 var findAndMove = (arr, obj, newIndex) =>
 {
 	var curIndex = arr.findIndex((candidate) => candidate.id === obj.id );
-	console.log('found index', curIndex);
 	if(curIndex === -1)
 	{
 		// not present in this array
 		return arr;
 	}
-		console.log('do it');
 	return move(arr, curIndex, newIndex);
 }
 
@@ -120,6 +118,7 @@ var change = function(arr, value) // needs to be a function to make use of `argu
 var selectCardReducer = (cards = [], action) =>
 {
 	var cardIndex = cards.indexOf(action.card);
+	console.log(action.type, cardIndex);
 	if(cardIndex === -1)
 		return cards;
 	// cardIndex points to a real card from now on
@@ -130,6 +129,7 @@ var selectCardReducer = (cards = [], action) =>
 	switch(action.type)
 	{
 		case ActionTypes.cards.select.moveField:
+			console.log('move');
 			select.fields = move(select.fields, action.curIndex, action.newIndex);
 			break;
 		case ActionTypes.cards.select.changeField:
@@ -150,7 +150,6 @@ var cardsReducer = (cards = [], action) =>
 {
 	cards = selectCardReducer(cards, action);
 
-	console.log(action.type);
 	switch(action.type)
 	{
 		case ActionTypes.cards.move:
