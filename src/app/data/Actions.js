@@ -51,11 +51,11 @@ var create =
 {
 	cards:
 	{
-		move: (curIndex, newIndex) =>
+		move: (card, newIndex) =>
 		{
 			return {
 				type: ActionTypes.cards.move,
-				curIndex: curIndex,
+				card: card,
 				newIndex: newIndex,
 			};
 		},
@@ -123,11 +123,11 @@ var create =
 		},		
 	}, // /inputs
 
-	moveResult: (curIndex, newIndex) =>
+	moveResult: (result, newIndex) =>
 	{
 		return {
 			type: ActionTypes.results.move,
-			curIndex: curIndex,
+			result: result,
 			newIndex: newIndex,
 		};
 	},

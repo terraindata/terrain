@@ -42,50 +42,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Input.less');
 var React = require('react');
 var Util = require('../../util/Util.js');
 var PanelMixin = require('../layout/PanelMixin.js');
 var Actions = require('../../data/Actions.js');
 var $ = require('jquery');
+var Card = require("../cards/Card.js");
+var LayoutManager = require("../layout/LayoutManager.js");
 
-var Input = React.createClass({
-	mixins: [PanelMixin],
-
+var CardsArea = React.createClass({
 	propTypes:
 	{
-		input: React.PropTypes.object.isRequired,
-	},
-
-	getDefaultProps() 
-	{
-		return {
-			drag_x: false,
-			drag_y: true,
-			reorderOnDrag: true,
-		};
-	},
-
-	changeKey(event)
-	{
-		Actions.dispatch.inputs.changeKey(this.props.input, event.target.value);
-	},
-
-	changeValue(event)
-	{
-		Actions.dispatch.inputs.changeValue(this.props.input, event.target.value);
+		cards: React.PropTypes.array.isRequired,
 	},
 
 	render() {
-		return this.renderPanel((
-			<div className='input'>
-				<div className='input-inner'>
-					<input type="text" value={this.props.input.key} onChange={this.changeKey} className="input-text input-text-first" />
-					<input type="text" value={this.props.input.value} onChange={this.changeValue} className="input-text input-text-second" />
-				</div>
-			</div>
-			));
+		var layout = {
+			rows: this.props.cards.map((card) => {
+				return {
+					content: <Card name={card.name} data={card} />,
+				};
+			}),
+			fullHeight: true,
+		};
+
+		var moveTo = (curIndex, newIndex) =>
+    {
+      Actions.dispatch.cards.move(this.props.cards[curIndex], newIndex);
+    };
+
+		return <LayoutManager layout={layout} moveTo={moveTo} />;
 	},
 });
 
-module.exports = Input;
+module.exports = CardsArea;

@@ -1,0 +1,32 @@
+@import "../../util/Common.less";
+
+.tabs-container {
+	height: 100%;
+	position: relative;
+
+	@tabs-row-height: 35px;
+
+	.tabs-row {
+		height: @tabs-row-height;
+	}
+
+	.tabs-content {
+		height: calc(100% - @tabs-row-height);
+	}
+
+	.tabs-tab {
+		display: inline-block;
+		font-size: @large-font-size;
+		background: @dark-green;
+		height: 35px;
+		padding: 8px 15px;
+		box-sizing: border-box;
+		cursor: pointer;
+		color: @dark-gray;
+		border: 1px solid @medium-dark-green;
+	}
+
+	.tabs-tab-selected {
+		background: @light-green;
+	}
+}

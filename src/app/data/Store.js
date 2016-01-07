@@ -53,7 +53,9 @@ var Util = require('../util/Util.js');
 //  - the exact same object, if no changes were made
 
 var cloneArray = (arr) => _.assign([], arr);
+var cloneObj = (obj) => _.assign({}, obj);
 
+// move element from arr from one index to another
 // common function, pure function, no side effects, always return a new copy
 var move = (arr, curIndex, newIndex) =>
 {
@@ -70,6 +72,21 @@ var move = (arr, curIndex, newIndex) =>
 	return arr;
 }
 
+// find the given element and move it in the arr to a new index
+// common function, pure function, no side effects, always return a new copy
+var findAndMove = (arr, obj, newIndex) =>
+{
+	var curIndex = arr.findIndex((candidate) => candidate.id === obj.id );
+	console.log('found index', curIndex);
+	if(curIndex === -1)
+	{
+		// not present in this array
+		return arr;
+	}
+		console.log('do it');
+	return move(arr, curIndex, newIndex);
+}
+
 // accepts a flexible amount of arguments
 // first arg is an array
 // second arg is the value to change to
@@ -77,8 +94,16 @@ var move = (arr, curIndex, newIndex) =>
 // returns a copy of arr with the keyed value set
 var change = function(arr, value) // needs to be a function to make use of `arguments`
 {
-	console.log(arguments);
-	var newArr = cloneArray(arr);
+	var newArr;
+	if(typeof arr === 'array')
+	{
+		newArr = cloneArray(arr);
+	}
+	if(typeof arr === 'object')
+	{
+		newArr = cloneObj(arr);
+	}
+
 	var pointer = newArr;
 	var i;
 	for(i = 2; i < arguments.length - 1; i ++)
@@ -125,10 +150,11 @@ var cardsReducer = (cards = [], action) =>
 {
 	cards = selectCardReducer(cards, action);
 
+	console.log(action.type);
 	switch(action.type)
 	{
 		case ActionTypes.cards.move:
-			return move(cards, action.curIndex, action.newIndex);
+			return findAndMove(cards, action.card, action.newIndex);
 	}
 
 	return cards;
@@ -154,141 +180,295 @@ var resultsReducer = (results = {}, action) =>
 {
 	switch(action.type) {
 		case ActionTypes.results.move:
-			return move(results, action.curIndex, action.newIndex);
+			var curIndex = results.findIndex((result) => result.id === action.result.id);
+			return move(results, curIndex, action.newIndex);
 	}
 
 	return results;
 }
 
+var groupsReducer = (groups = {}, action, groupKey, reducer) =>
+{
+	var changed = false;
+	var newGroups = _.reduce(groups, (newGroups, group, key) => 
+	{
+		var newValue = reducer(group[groupKey], action);
+		if(newValue !== group[groupKey])
+		{
+			changed = true;
+			newGroups[key] = change(group, newValue, groupKey);
+		}
+		else
+		{
+			newGroups[key] = group;
+		}
+		return newGroups;
+	}, {});
+
+	if(changed)
+	{
+		return newGroups;
+	}
+	// no change, return original object
+	//  note: keeping track of whether the object changed is important for redux --
+	//        which requires us to return the orginal object if no change occured
+	//        if you know a simpler way to achieve this, implement it
+	return groups;
+}
+
+var resultGroupsReducer = (resultGroups = {}, action) =>
+{
+	return groupsReducer(resultGroups, action, 'results', resultsReducer);
+}
+
+var cardGroupsReducer = (cardGroups = {}, action) =>
+{
+	return groupsReducer(cardGroups, action, 'cards', cardsReducer);
+}
+
 var defaultState =
 {
-	cards:  [
-						{
-							type: 'from',
-							from:
-							{
-								table: 'heroes',
-							},
-						},
-						{
-							type: 'select',
-							select:
-							{
-								fields: [
-									'name',
-									'picture',
-									'description',
-									'minPrice',
-									'numJobs',
-								],
-							},
-						},
-						{
-							type: 'order',
-							order:
-							{
-								field: 'urbanSitterRating',
-							}
-						},
-						{
-							type: 'score',
-							score:
-							{
-								fields:
-								[
-									'urbanSitterRating',
-									'numJobs',
-								]
-							}
-						},
-					],
+	cardGroups: {
+		100: {
+			id: 100,
+			cards: [
+				{
+					type: 'from',
+					id: 1,
+					from:
+					{
+						table: 'heroes',
+					},
+				},
+				{
+					type: 'select',
+					id: 2,
+					select:
+					{
+						fields: [
+							'name',
+							'picture',
+							'description',
+							'minPrice',
+							'numJobs',
+						],
+					},
+				},
+				{
+					type: 'order',
+					id: 3,
+					order:
+					{
+						field: 'urbanSitterRating',
+					}
+				},
+				{
+					type: 'score',
+					id: 4,
+					score:
+					{
+						fields:
+						[
+							'urbanSitterRating',
+							'numJobs',
+						]
+					}
+				},
+			],
+		},
+		101: {
+			id: 101,
+			cards: [
+				{
+					type: 'from',
+					id: 101,
+					from:
+					{
+						table: 'heroes',
+					},
+				},
+				{
+					type: 'select',
+					id: 201,
+					select:
+					{
+						fields: [
+							'name',
+							'picture',
+							'description',
+						],
+					},
+				},
+			],
+		}
+	},
 	inputs: [
-  					{
-  						key: 'search',
-  						value: 'the republic',
-  					},
-  					{
-  						key: 'minAge',
-  						value: '24',
-  					},
-  					{
-  						key: 'role',
-  						value: 'leader',
-  					},
-  				],
-	results: [
-						{
-							name: 'Leia Skywalker',
-						},
-						{
-							name: 'Lando Calrissian',
-						},
-						{
-							name: 'Obi Wan Kenobi',
-						},
-						{
-							name: 'C-3P0',
-						},
-						{
-							name: 'Luke Skywalker',
-						},
-						{
-							name: 'R2-D2',
-						},
-						{
-							name: 'Han Solo',
-						},
-						{
-							name: 'Leia Skywalker',
-						},
-						{
-							name: 'Lando Calrissian',
-						},
-						{
-							name: 'Obi Wan Kenobi',
-						},
-						{
-							name: 'C-3P0',
-						},
-						{
-							name: 'Luke Skywalker',
-						},
-						{
-							name: 'R2-D2',
-						},
-						{
-							name: 'Han Solo',
-						},
-						{
-							name: 'Leia Skywalker',
-						},
-						{
-							name: 'Lando Calrissian',
-						},
-						{
-							name: 'Obi Wan Kenobi',
-						},
-						{
-							name: 'C-3P0',
-						},
-						{
-							name: 'Luke Skywalker',
-						},
-						{
-							name: 'R2-D2',
-						},
-						{
-							name: 'Han Solo',
-						},
-					],
+		{
+			key: 'search',
+			value: 'responsible babysitter',
+			id: 5,
+		},
+		{
+			key: 'minAge',
+			value: '24',
+			id: 6,
+		},
+		{
+			key: 'attributes',
+			value: 'calm, cool, collected',
+			id: 7,
+		},
+	],
+	resultGroups: {
+		100: {
+			id: 100,
+			results: 
+			[
+				{
+					name: 'Sitter 1',
+					id: 8,
+				},
+				{
+					name: 'Sitter 2',
+					id: 9,
+				},
+				{
+					name: 'Sitter 3',
+					id: 10,
+				},
+				{
+					name: 'Sitter 4',
+					id: 11,
+				},
+				{
+					name: 'Sitter 5',
+					id: 12,
+				},
+				{
+					name: 'Sitter 6',
+					id: 13,
+				},
+				{
+					name: 'Sitter 7',
+					id: 14,
+				},
+				{
+					name: 'Sitter 8',
+					id: 15,
+				},
+				{
+					name: 'Sitter 9',
+					id: 16,
+				},
+				{
+					name: 'Sitter 10',
+					id: 17,
+				},
+				{
+					name: 'Sitter 11',
+					id: 18,
+				},
+				{
+					name: 'Sitter 12',
+					id: 19,
+				},
+				{
+					name: 'Sitter 13',
+					id: 20,
+				},
+				{
+					name: 'Sitter 14',
+					id: 21,
+				},
+				{
+					name: 'Sitter 15',
+					id: 24,
+				},
+				{
+					name: 'Sitter 16',
+					id: 25,
+				},
+			],
+		},
+		101: {
+			id: 100,
+			results: 
+			[
+				{
+					name: 'Sitter 6',
+					id: 13,
+				},
+				{
+					name: 'Sitter 2',
+					id: 9,
+				},
+				{
+					name: 'Sitter 1',
+					id: 8,
+				},
+				{
+					name: 'Sitter 4',
+					id: 11,
+				},
+				{
+					name: 'Sitter 3',
+					id: 10,
+				},
+				{
+					name: 'Sitter 5',
+					id: 12,
+				},
+				{
+					name: 'Sitter 7',
+					id: 14,
+				},
+				{
+					name: 'Sitter 10',
+					id: 17,
+				},
+				{
+					name: 'Sitter 8',
+					id: 15,
+				},
+				{
+					name: 'Sitter 9',
+					id: 16,
+				},
+				{
+					name: 'Sitter 11',
+					id: 18,
+				},
+				{
+					name: 'Sitter 12',
+					id: 19,
+				},
+				{
+					name: 'Sitter 13',
+					id: 20,
+				},
+				{
+					name: 'Sitter 14',
+					id: 21,
+				},
+				{
+					name: 'Sitter 15',
+					id: 24,
+				},
+				{
+					name: 'Sitter 16',
+					id: 25,
+				},
+			],
+		}
+	}
 };
 
 var stateReducer = (state = defaultState, action) =>
 {
 	return {
-		cards: cardsReducer(state.cards, action),
+		cardGroups: cardGroupsReducer(state.cardGroups, action),
 		inputs: inputsReducer(state.inputs, action),
-		results: resultsReducer(state.results, action),
+		resultGroups: resultGroupsReducer(state.resultGroups, action),
 	}
 }
 

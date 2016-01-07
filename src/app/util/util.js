@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 var ReactDOM = require('react-dom');
+var _ = require('underscore');
 
 var Util = {
 	// Return a random integer [min, max)
@@ -71,6 +72,18 @@ var Util = {
 	valueMinMax(value, min, max)
 	{
 		return Math.min(Math.max(value, min), max);
+	},
+
+	// accepts object of key/vals like this: { 'className': include? }
+	objToClassname(obj)
+	{
+		return _.reduce(obj, (classNameArray, include, className) => {
+				if(include)
+				{
+					classNameArray.unshift(className);
+				}
+				return classNameArray;
+			}, []).join(" ");
 	},
 };
 

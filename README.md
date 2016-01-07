@@ -52,6 +52,15 @@
 11. No not believing in yourself.
 24. Linear ordering in ordered lists is overrated.
 
+## Major Dependencies
+
+The Terrain search front-end is built upon these technologies:
+
+- React (tutorial: link forthcoming)
+- JSX / ES6 (tutorial: link forthcoming)
+- Redux (tutorial: link forthcoming)
+- Webpack (tutorial: link forthcoming)
+
 ## Directory Overview
 
 ### src

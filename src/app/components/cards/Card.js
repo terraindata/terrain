@@ -50,6 +50,7 @@ var PanelPlaceholder = require('../layout/PanelPlaceholder.js');
 var PanelMixin = require('../layout/PanelMixin.js');
 var LayoutManager = require('../layout/LayoutManager.js');
 var CardInput = require('./CardField.js');
+var SelectCard = require('./card-types/SelectCard.js');
 var $ = require('jquery');
 
 var Card = React.createClass({
@@ -70,62 +71,21 @@ var Card = React.createClass({
 	},
 
 	render() {
-		var fields = [];
-		var moveFn = () => console.log('move!');
-		var changeFnFactory = (index) => () => console.log('change!');
-		var deleteFnFactory = (index) => () => console.log('remove!');
 
-		if(this.props.data.select)
+		var content;
+		switch(this.props.data.type)
 		{
-			fields = this.props.data.select.fields;
-			
-			moveFn = (curIndex, newIndex) =>
-      {
-        Actions.dispatch.cards.select.moveField(this.props.data, curIndex, newIndex);
-      }
-
-      changeFnFactory = (index) => (value) =>
-      {
-      	Actions.dispatch.cards.select.changeField(this.props.data, index, value);
-      }
-
-      deleteFnFactory = (index) => () =>
-      {
-      	console.log('delete');
-      	Actions.dispatch.cards.select.deleteField(this.props.data, index);
-      }
+			case 'select':
+				content = <SelectCard select={this.props.data.select} />
+				break;
+			default:
+				content = <div>This card has not been implemented yet.</div>
 		}
-
-		if(this.props.data.from)
-			fields = [this.props.data.from.table];
-
-		if(this.props.data.order)
-			fields = [this.props.data.order.field];
-
-		if(this.props.data.score)
-			fields = this.props.data.score.fields;
-
-		var dragY = false;
-		if(fields.length > 1)
-			dragY = true;
-
-		var layout = {
-  				reorderable: true,
-  				rows: fields.map((field, index) => {
-            return {
-              content: <CardInput 
-              					value={field}
-              					onChange={changeFnFactory(index)}
-              					onDelete={deleteFnFactory(index)}
-              					dragInsideOnly={true} />
-            }
-          }),
-  			};
 
 		return this.renderPanel((
 			<div className='card'>
 				<div className='card-inner'>
-					<LayoutManager layout={layout} moveTo={moveFn} />
+					{content}
 				</div>
 			</div>
 			));

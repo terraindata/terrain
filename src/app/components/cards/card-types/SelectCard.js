@@ -42,50 +42,54 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Input.less');
+var Actions = require('../../../data/Actions.js');
 var React = require('react');
-var Util = require('../../util/Util.js');
-var PanelMixin = require('../layout/PanelMixin.js');
-var Actions = require('../../data/Actions.js');
+var Util = require('../../../util/Util.js');
+var LayoutManager = require('../../layout/LayoutManager.js');
+var CardInput = require('./../CardField.js');
 var $ = require('jquery');
 
-var Input = React.createClass({
-	mixins: [PanelMixin],
-
+var SelectCard = React.createClass({
 	propTypes:
 	{
-		input: React.PropTypes.object.isRequired,
-	},
-
-	getDefaultProps() 
-	{
-		return {
-			drag_x: false,
-			drag_y: true,
-			reorderOnDrag: true,
-		};
-	},
-
-	changeKey(event)
-	{
-		Actions.dispatch.inputs.changeKey(this.props.input, event.target.value);
-	},
-
-	changeValue(event)
-	{
-		Actions.dispatch.inputs.changeValue(this.props.input, event.target.value);
+		select: React.PropTypes.object.isRequired,
 	},
 
 	render() {
-		return this.renderPanel((
-			<div className='input'>
-				<div className='input-inner'>
-					<input type="text" value={this.props.input.key} onChange={this.changeKey} className="input-text input-text-first" />
-					<input type="text" value={this.props.input.value} onChange={this.changeValue} className="input-text input-text-second" />
-				</div>
-			</div>
-			));
+		var fields = this.props.select.fields;
+
+		var moveFn = (curIndex, newIndex) =>
+    {
+      Actions.dispatch.cards.select.moveField(this.props.select, curIndex, newIndex);
+    }
+
+    var changeFnFactory = (index) => (value) =>
+    {
+    	Actions.dispatch.cards.select.changeField(this.props.select, index, value);
+    }
+
+    var deleteFnFactory = (index) => () =>
+    {
+    	Actions.dispatch.cards.select.deleteField(this.props.select, index);
+    }
+
+		var layout = {
+  				reorderable: true,
+  				rows: fields.map((field, index) => {
+            return {
+              content: <CardInput 
+              					value={field}
+              					onChange={changeFnFactory(index)}
+              					onDelete={deleteFnFactory(index)}
+              					dragInsideOnly={true} />
+            }
+          }),
+  			};
+
+		return (
+					<LayoutManager layout={layout} moveTo={moveFn} />
+				);
 	},
 });
 
-module.exports = Input;
+module.exports = SelectCard;

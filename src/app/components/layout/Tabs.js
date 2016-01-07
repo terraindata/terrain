@@ -42,50 +42,58 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Input.less');
+require('./Tabs.less');
 var React = require('react');
 var Util = require('../../util/Util.js');
-var PanelMixin = require('../layout/PanelMixin.js');
-var Actions = require('../../data/Actions.js');
 var $ = require('jquery');
+var LayoutManager = require("../layout/LayoutManager.js");
 
-var Input = React.createClass({
-	mixins: [PanelMixin],
-
+var Tabs = React.createClass({
 	propTypes:
 	{
-		input: React.PropTypes.object.isRequired,
+		tabs: React.PropTypes.array.isRequired,
+		// selectedIndex: React.PropTypes.n
 	},
 
-	getDefaultProps() 
+	getInitialState()
 	{
 		return {
-			drag_x: false,
-			drag_y: true,
-			reorderOnDrag: true,
+			selectedIndex: this.props.selectedIndex || 0,
 		};
 	},
 
-	changeKey(event)
+	handleTabSelectFactory(index)
 	{
-		Actions.dispatch.inputs.changeKey(this.props.input, event.target.value);
-	},
-
-	changeValue(event)
-	{
-		Actions.dispatch.inputs.changeValue(this.props.input, event.target.value);
+		return () => {
+			this.setState({
+				selectedIndex: index,
+			});
+		};
 	},
 
 	render() {
-		return this.renderPanel((
-			<div className='input'>
-				<div className='input-inner'>
-					<input type="text" value={this.props.input.key} onChange={this.changeKey} className="input-text input-text-first" />
-					<input type="text" value={this.props.input.value} onChange={this.changeValue} className="input-text input-text-second" />
-				</div>
+		var content = this.props.tabs[this.state.selectedIndex].content;
+
+		return (<div className='tabs-container'>
+			<div className='tabs-row'>
+				{
+					this.props.tabs.map((tab, index) => 
+						<div 
+							className={Util.objToClassname({
+								'tabs-tab': true,
+								'tabs-tab-selected': index === this.state.selectedIndex,
+								})}
+							key={index}
+							onClick={this.handleTabSelectFactory(index)}>
+								{tab.tabName}
+						</div>)
+				}
 			</div>
-			));
+			<div className='tabs-content'>
+				{content}
+			</div>
+		 </div>);
 	},
 });
 
-module.exports = Input;
+module.exports = Tabs;

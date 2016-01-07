@@ -54,11 +54,14 @@ var Store = require("./data/Store.js");
 var Actions = require("./data/Actions.js");
 
 // Components
+var Tabs = require("./components/layout/Tabs.js")
 var LayoutManager = require("./components/layout/LayoutManager.js");
 var PanelPlaceholder = require("./components/layout/PanelPlaceholder.js");
 var Card = require("./components/cards/Card.js");
-var Input = require("./components/inputs/Input.js");
 var Result = require("./components/results/Result.js");
+var InputsArea = require("./components/inputs/InputsArea.js");
+var CardsArea = require("./components/cards/CardsArea.js");
+var ResultsArea = require("./components/results/ResultsArea.js");
 
 
 var App = React.createClass({
@@ -72,58 +75,44 @@ var App = React.createClass({
   },
 
   render () {
-    var cards = this.state.cards;
+    console.log(this.state);
+    var cards1 = this.state.cardGroups[100].cards;
+    var cards2 = this.state.cardGroups[101].cards;
     var inputs = this.state.inputs;
-    var results = this.state.results;
+    var results1 = this.state.resultGroups[100].results;
+    var results2 = this.state.resultGroups[101].results;
 
   	var layout = {
   		stackAt: 650,
       fullHeight: true,
   		columns: [
   			{
-  				reorderable: true,
-          fullHeight: true,
-  				rows: inputs.map((input) => 
-            ({
-              content: <Input data={input} />
-            })),
-          moveTo: (curIndex, newIndex) =>
-          {
-            Actions.dispatch.inputs.move(curIndex, newIndex);
-          }
+  				content: <InputsArea inputs={inputs} />,
   			},
   			{
   				colSpan: 2,
-  				reorderable: true,
-          fullHeight: true,
-  				rows: cards.map((card) =>
-            ({
-              content: <Card name={card.name} data={card} />
-            })),
-          moveTo: (curIndex, newIndex) =>
-          {
-            Actions.dispatch.cards.move(curIndex, newIndex);
-          }
+  				content: <Tabs tabs={[
+            {
+              content: <CardsArea cards={cards1} />,
+              tabName: 'Algorithm 1',
+            },
+            {
+              content: <CardsArea cards={cards2} />,
+              tabName: 'Algorithm 1',
+            },
+          ]} />
   			},
   			{
-  				reorderable: true,
-          fullHeight: true,
-  				cellHeight: 150,
-  				cellWidth: {
-  					0: 1,
-  					300: 2,
-  					650: 1,
-  					1200: 2,
-  					1850: 3,
-  					2400: 4,
-  				},
-  				cells: results.map((result) => ({
-              content: <Result data={result} />
-            })),
-          moveTo: (curIndex, newIndex) =>
-          {
-            Actions.dispatch.moveResult(curIndex, newIndex);
-          }
+          content: <Tabs tabs={[
+            {
+              content: <ResultsArea results={results1} />,
+              tabName: 'Alg. 1 Results',
+            },
+            {
+              content: <ResultsArea results={results2} />,
+              tabName: 'Alg. 2 Results',
+            },
+          ]} />
   			},
   		]
   	};
