@@ -118,7 +118,6 @@ var change = function(arr, value) // needs to be a function to make use of `argu
 var selectCardReducer = (cards = [], action) =>
 {
 	var cardIndex = cards.indexOf(action.card);
-	console.log(action.type, cardIndex);
 	if(cardIndex === -1)
 		return cards;
 	// cardIndex points to a real card from now on
@@ -129,7 +128,6 @@ var selectCardReducer = (cards = [], action) =>
 	switch(action.type)
 	{
 		case ActionTypes.cards.select.moveField:
-			console.log('move');
 			select.fields = move(select.fields, action.curIndex, action.newIndex);
 			break;
 		case ActionTypes.cards.select.changeField:
@@ -186,7 +184,7 @@ var resultsReducer = (results = {}, action) =>
 	return results;
 }
 
-var groupsReducer = (groups = {}, action, groupKey, reducer) =>
+var groupsReducer = (groups = {}, action, groupKey, reducer, newValModel) =>
 {
 	var changed = false;
 	var newGroups = _.reduce(groups, (newGroups, group, key) => 
@@ -204,6 +202,17 @@ var groupsReducer = (groups = {}, action, groupKey, reducer) =>
 		return newGroups;
 	}, {});
 
+	if(action.type === ActionTypes.newAlgorithm)
+	{
+		console.log('h');
+		var newGroup = {
+			id: currentGroupId,
+		};
+		newGroup[groupKey] = cloneArray(newValModel);
+		newGroups[currentGroupId] = newGroup;
+		changed = true;
+	}
+
 	if(changed)
 	{
 		return newGroups;
@@ -217,13 +226,125 @@ var groupsReducer = (groups = {}, action, groupKey, reducer) =>
 
 var resultGroupsReducer = (resultGroups = {}, action) =>
 {
-	return groupsReducer(resultGroups, action, 'results', resultsReducer);
+	return groupsReducer(resultGroups, action, 'results', resultsReducer, newResults);
 }
 
 var cardGroupsReducer = (cardGroups = {}, action) =>
 {
-	return groupsReducer(cardGroups, action, 'cards', cardsReducer);
+	return groupsReducer(cardGroups, action, 'cards', cardsReducer, newCards);
 }
+
+var currentGroupId = 101;
+var newCards = [
+	{
+		type: 'from',
+		id: 1,
+		from:
+		{
+			table: 'heroes',
+		},
+	},
+	{
+		type: 'select',
+		id: 2,
+		select:
+		{
+			fields: [
+				'name',
+				'picture',
+				'description',
+				'minPrice',
+				'numJobs',
+			],
+		},
+	},
+	{
+		type: 'order',
+		id: 3,
+		order:
+		{
+			field: 'urbanSitterRating',
+		}
+	},
+	{
+		type: 'score',
+		id: 4,
+		score:
+		{
+			fields:
+			[
+				'urbanSitterRating',
+				'numJobs',
+			]
+		}
+	},
+];
+var newResults = [
+	{
+		name: 'Sitter 1',
+		id: 8,
+	},
+	{
+		name: 'Sitter 2',
+		id: 9,
+	},
+	{
+		name: 'Sitter 3',
+		id: 10,
+	},
+	{
+		name: 'Sitter 4',
+		id: 11,
+	},
+	{
+		name: 'Sitter 5',
+		id: 12,
+	},
+	{
+		name: 'Sitter 6',
+		id: 13,
+	},
+	{
+		name: 'Sitter 7',
+		id: 14,
+	},
+	{
+		name: 'Sitter 8',
+		id: 15,
+	},
+	{
+		name: 'Sitter 9',
+		id: 16,
+	},
+	{
+		name: 'Sitter 10',
+		id: 17,
+	},
+	{
+		name: 'Sitter 11',
+		id: 18,
+	},
+	{
+		name: 'Sitter 12',
+		id: 19,
+	},
+	{
+		name: 'Sitter 13',
+		id: 20,
+	},
+	{
+		name: 'Sitter 14',
+		id: 21,
+	},
+	{
+		name: 'Sitter 15',
+		id: 24,
+	},
+	{
+		name: 'Sitter 16',
+		id: 25,
+	},
+];
 
 var defaultState =
 {
@@ -390,7 +511,7 @@ var defaultState =
 			],
 		},
 		101: {
-			id: 100,
+			id: 101,
 			results: 
 			[
 				{
@@ -464,6 +585,11 @@ var defaultState =
 
 var stateReducer = (state = defaultState, action) =>
 {
+	if(action.type === ActionTypes.newAlgorithm)
+	{
+		currentGroupId ++;
+	}
+
 	return {
 		cardGroups: cardGroupsReducer(state.cardGroups, action),
 		inputs: inputsReducer(state.inputs, action),

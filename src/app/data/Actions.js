@@ -137,7 +137,7 @@ var create =
 		moveField: (curIndex, newIndex) =>
 		{
 			return {
-				type: AcitonTypes.cards.select.moveField,
+				type: ActionTypes.cards.select.moveField,
 				curIndex: curIndex,
 				newIndex: newIndex,
 			}
@@ -145,7 +145,7 @@ var create =
 		newField: (index = -1, field = '') =>
 		{
 			return {
-				type: AcitonTypes.cards.select.newField,
+				type: ActionTypes.cards.select.newField,
 				index: index,
 				field: field,
 			}
@@ -153,10 +153,17 @@ var create =
 		deleteField: (index) =>
 		{
 			return {
-				type: AcitonTypes.cards.select.deleteField,
+				type: ActionTypes.cards.select.deleteField,
 				index: index,
 			}
 		},
+	},
+
+	newAlgorithm: () =>
+	{
+		return {
+			type: ActionTypes.newAlgorithm,
+		};
 	}
 };
 

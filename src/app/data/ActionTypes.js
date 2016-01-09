@@ -75,7 +75,9 @@ var ActionTypes =
 	results: makeObject('results', 
 	[
 		'move',
-	])
+	]),
+
+	newAlgorithm: 'newAlgorithm',
 };
 
 ActionTypes.cards.select = makeObject('cards.select', [

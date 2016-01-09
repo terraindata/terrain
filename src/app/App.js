@@ -48,6 +48,7 @@ require("./GeneralStyle.less");
 // Libraries
 var React = require("react");
 var ReactDOM = require("react-dom");
+var _ = require("underscore");
 
 // Data
 var Store = require("./data/Store.js");
@@ -74,13 +75,31 @@ var App = React.createClass({
     return Store.getState();
   },
 
+  handleNewAlgorithmTab () {
+    Actions.dispatch.newAlgorithm();
+  },
+
   render () {
-    console.log(this.state);
-    var cards1 = this.state.cardGroups[100].cards;
-    var cards2 = this.state.cardGroups[101].cards;
+    var cardTabs = _.map(this.state.cardGroups, (cardGroup) => {
+      return {
+        content: <CardsArea cards={cardGroup.cards} />,
+        tabName: 'Algorithm ' + cardGroup.id,
+      };
+    });
+    cardTabs.push({
+      content: null,
+      tabName: '+',
+      onClick: this.handleNewAlgorithmTab,
+    });
+
+    var resultTabs = _.map(this.state.resultGroups, (resultGroup) => {
+      return {
+        content: <ResultsArea results={resultGroup.results} />,
+        tabName: 'Alg. ' + resultGroup.id + ' Results',
+      };
+    });
+
     var inputs = this.state.inputs;
-    var results1 = this.state.resultGroups[100].results;
-    var results2 = this.state.resultGroups[101].results;
 
   	var layout = {
   		stackAt: 650,
@@ -91,28 +110,10 @@ var App = React.createClass({
   			},
   			{
   				colSpan: 2,
-  				content: <Tabs tabs={[
-            {
-              content: <CardsArea cards={cards1} />,
-              tabName: 'Algorithm 1',
-            },
-            {
-              content: <CardsArea cards={cards2} />,
-              tabName: 'Algorithm 1',
-            },
-          ]} />
+  				content: <Tabs tabs={cardTabs} />
   			},
   			{
-          content: <Tabs tabs={[
-            {
-              content: <ResultsArea results={results1} />,
-              tabName: 'Alg. 1 Results',
-            },
-            {
-              content: <ResultsArea results={results2} />,
-              tabName: 'Alg. 2 Results',
-            },
-          ]} />
+          content: <Tabs tabs={resultTabs} />
   			},
   		]
   	};

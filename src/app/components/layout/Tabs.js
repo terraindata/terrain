@@ -65,6 +65,11 @@ var Tabs = React.createClass({
 	handleTabSelectFactory(index)
 	{
 		return () => {
+			if(typeof this.props.tabs[index].onClick === 'function')
+			{
+				this.props.tabs[index].onClick();	
+			}
+
 			this.setState({
 				selectedIndex: index,
 			});
