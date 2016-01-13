@@ -2,55 +2,54 @@
 
 ## Standards / Conventions
 
-1. Capitalize all React component names and filenames (applies to style files as well)
+- Capitalize all React component names and filenames (applies to style files as well)
 	Most `.js` and `.less` files should be capitalized.
-2. `{` and `}` are both on their own lines, for legibility.
+- `{` and `}` are both on their own lines, for legibility.
 	Same applies to `[` and `]` when appropriate.
-3. Camel case function names. 
+- Camel case function names. 
 	e.g. `doABarrelRoll()`
-4. Use JSX optimizations whenever possible, but not at the expense of legibility.
+- Use JSX optimizations whenever possible, but not at the expense of legibility.
 	e.g. `() => { ... }` instead of `function() { }`, `useTheForce(): { ... }` instead of `useTheForce: function() { ... }`
-5. Selectors in stylesheets should each go on their own line.
+- Selectors in stylesheets should each go on their own line.
 	e.g. Don't do `.first, .second, .third .thirds-kid, .fourth[type=text]`, but rather put a newline after every comma.
-6. CSS classes are named with `-`.
+- CSS classes are named with `-`.
 	e.g. `blue-and-black` or `white-and-gold`
-7. `// TODO` should be treated like poison. 
+- `// TODO` should be treated like poison. 
 	Why write `TODO` when you can do it correctly right now? Tech debt is evil. The Death Star was built upon tech debt, and look what happened to it. `Tech Debt == Death Star` is truthy.
 	But if you absolutely have to leave something for later or make a reminder note, write `// TODO [something I can't do right now]` so that we can keep track.
-8. Optimal directory size is two to five files.
+- Optimal directory size is two to five files.
 	No directories in `src` with over ten files.
 	No objects / namespaces with over ten keys.
-9. Say "yes" to whitespace for legibility.
-10. Use whatever quotes make you happy but keep it consistent within the same file / piece of code.
-11. `{}` should follow every `if`, `for`, `while`, etc.
-12. Don't mix `||` and `&&` without `()`.
+- Say "yes" to whitespace for legibility.
+- Use whatever quotes make you happy but keep it consistent within the same file / piece of code.
+- `{}` should follow every `if`, `for`, `while`, etc.
+- Don't mix `||` and `&&` without `()`.
 	Who knows boolean order of operations anyways?
-13. Every feature-adding merge should have appropriate test coverage to be accepted.
+- Every feature-adding merge should have appropriate test coverage to be accepted.
 	Nearly every bug-solving merge should have a test covering the buggy case.
 	TDD FTW!
-14. Comma after the last line in an object.`,`
+- Comma after the last line in an object.`,`
 	This makes adding new lines to objects easier and allows for a cleaner merge.`,`
 	Note: You can't do this in JSON.`,`
-15. Every file ends with `module.exports = YourClassyClassName;`. In other words, name your exports.
+- Every file ends with `module.exports = YourClassyClassName;`. In other words, name your exports.
 	Don't do `module.exports = { ... }` because then the Webpack/React/browser won't work together so well and you will see components in the React Chrome plugin that are called `module.exports` and that's not helping anybody.
-16. Commits should be solidly incremental and should have a helpful one-line explanation.
+- Commits should be solidly incremental and should have a helpful one-line explanation.
 	Rebase and squash on your feature branch before merging if you have too many commits, or unhelpful commit messages.
 	`git log` in master should always look beautiful and be a helpful history of what has happened.
 	Commit to good commits.
-17. Code should read like English. Comment when necessary, but try your best to write code that doesn't need comments.
-18. Be keen on adding to this README, and keen on trimming it down.
-19. None of these standards are set in stone; if you have an idea for a way to improve these, make it known. Coding practices evolve.
-20. No code is set in stone, either. Refactor when you find something that you know you could do better.
+- Code should read like English. Comment when necessary, but try your best to write code that doesn't need comments.
+- Be keen on adding to this README, and keen on trimming it down.
+- None of these standards are set in stone; if you have an idea for a way to improve these, make it known. Coding practices evolve.
+- No code is set in stone, either. Refactor when you find something that you know you could do better.
 	Refactor responsibly: test your changes, and apply appropriate cost-benefit-analysis before starting to be certain that your time is well-used.
-21. We only deploy from `master`.
-22. Use effective markdown syntax in this file.
-23. Constants are named with all caps and underscores
+- We only deploy from `master`.
+- Use effective markdown syntax in this file.
+- Constants are named with all caps and underscores
 	e.g. `var ANSWER_TO_THE_ULTIMATE_QUESTION = 42;`
-24. No global variables; every variable must be preceded by `var`.
-25. Only one variable per `var`, for legibility. Don't separate variables by commas.
+- No global variables; every variable must be preceded by `var`.
+- Only one variable per `var`, for legibility. Don't separate variables by commas.
 	e.g. Don't do `var first = 4, second = 8, third = 15;` etc. Instead, put each variable on its on line.
-11. No not believing in yourself.
-24. Linear ordering in ordered lists is overrated.
+- No not believing in yourself.
 
 ## Major Dependencies
 
@@ -85,9 +84,12 @@ Utility functions or styles that are used across multiple files.
 
 ## Setup
 
-1. Install **Homebrew**
-2. Install **Node**
-3. Install **npm**
+1. Install Homebrew
+	`ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
+2. Install Node
+	`brew install node`
+3. Install npm
+	`brew install npm`
 4. `npm install`
 5. `npm start` - dev server now running at [localhost:8080]
 
@@ -96,7 +98,9 @@ Whenever new packages are installed from branches merged to master, run `npm ins
 ## Deploying
 
 From `master` branch:
-	npm run deploy
+```
+npm run deploy
+```
 
 ## Code Overview
 
