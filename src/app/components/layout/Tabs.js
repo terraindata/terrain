@@ -52,7 +52,8 @@ var Tabs = React.createClass({
 	propTypes:
 	{
 		tabs: React.PropTypes.array.isRequired,
-		// selectedIndex: React.PropTypes.n
+		selectedIndex: React.PropTypes.number,
+		title: React.PropTypes.string,
 	},
 
 	getInitialState()
@@ -79,19 +80,34 @@ var Tabs = React.createClass({
 	render() {
 		var content = this.props.tabs[this.state.selectedIndex].content;
 
+		var showTabs = this.props.tabs && this.props.tabs.length >= 2;
+
 		return (<div className='tabs-container'>
-			<div className='tabs-row'>
+			<div className='tabs-row-wrapper'>
+				{ 
+					this.props.title ? (
+						<div className={'tabs-title' + (!showTabs ? ' tabs-title-no-tabs' : '')}>
+							{this.props.title}
+						</div>
+					) : null
+				}
 				{
-					this.props.tabs.map((tab, index) => 
-						<div 
-							className={Util.objToClassname({
-								'tabs-tab': true,
-								'tabs-tab-selected': index === this.state.selectedIndex,
-								})}
-							key={index}
-							onClick={this.handleTabSelectFactory(index)}>
-								{tab.tabName}
-						</div>)
+					showTabs ? (
+						<div className='tabs-row'>
+							{
+								this.props.tabs.map((tab, index) => 
+									<div 
+										className={Util.objToClassname({
+											'tabs-tab': true,
+											'tabs-tab-selected': index === this.state.selectedIndex,
+											})}
+										key={index}
+										onClick={this.handleTabSelectFactory(index)}>
+											{tab.tabName}
+									</div>)
+							}
+						</div>
+					) : null
 				}
 			</div>
 			<div className='tabs-content'>

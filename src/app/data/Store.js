@@ -204,7 +204,6 @@ var groupsReducer = (groups = {}, action, groupKey, reducer, newValModel) =>
 
 	if(action.type === ActionTypes.newAlgorithm)
 	{
-		console.log('h');
 		var newGroup = {
 			id: currentGroupId,
 		};

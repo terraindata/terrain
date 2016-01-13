@@ -6,10 +6,33 @@
 
 	@tabs-row-height: 35px;
 
-	.tabs-row {
+	.tabs-row-wrapper {
+		background: @dark-green;	
+		position: relative;
+		border-bottom: 1px solid @dark-green-border;
 		height: @tabs-row-height;
-		overflow-x: auto;
-    white-space: nowrap;
+		width: 100%;
+
+		.tabs-row {
+			height: @tabs-row-height;
+			overflow-x: auto;
+	    white-space: nowrap;
+		}
+
+		.tabs-title {
+			float: left;
+			padding: 7px 15px;
+			box-sizing: border-box;
+			height: @tabs-row-height;
+			font-size: @large-font-size;
+			font-weight: @bold-font-weight;
+			color: @white;
+			border-left: 1px solid @dark-green-border;
+
+			&.tabs-title-no-tabs {
+				width: 100%;
+			}
+		}		
 	}
 
 	.tabs-content {

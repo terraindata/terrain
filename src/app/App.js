@@ -100,20 +100,24 @@ var App = React.createClass({
     });
 
     var inputs = this.state.inputs;
+    var inputTabs = [{
+      content: <InputsArea inputs={inputs} />,
+      tabName: 'Inputs',
+    }]
 
   	var layout = {
   		stackAt: 650,
       fullHeight: true,
   		columns: [
   			{
-  				content: <InputsArea inputs={inputs} />,
+  				content: <Tabs tabs={inputTabs} title="Inputs" />,
   			},
   			{
   				colSpan: 2,
-  				content: <Tabs tabs={cardTabs} />
+  				content: <Tabs tabs={cardTabs} title="Builder" />
   			},
   			{
-          content: <Tabs tabs={resultTabs} />
+          content: <Tabs tabs={resultTabs} title="Results" />
   			},
   		]
   	};
