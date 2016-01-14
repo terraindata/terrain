@@ -47,7 +47,7 @@ var React = require('react');
 var $ = require('jquery');
 var _ = require('underscore');
 
-var Actions = require('../../data/Actions.js');
+var Actions = require('../../data/Actions.tsx');
 
 // Coordinate these classNames with layout_manager.css/less
 var lmClass = 'layout-manager';

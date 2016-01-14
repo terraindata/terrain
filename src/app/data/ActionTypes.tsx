@@ -87,4 +87,4 @@ ActionTypes.cards.select = makeObject('cards.select', [
 	'changeField',
 ]);
 
-module.exports = ActionTypes;
+export = ActionTypes;

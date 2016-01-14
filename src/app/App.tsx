@@ -55,7 +55,7 @@ var _ = require("underscore");
 
 // Data
 var Store = require("./data/Store.tsx");
-var Actions = require("./data/Actions.js");
+var Actions = require("./data/Actions.tsx");
 
 // Components
 var Tabs = require("./components/layout/Tabs.js")

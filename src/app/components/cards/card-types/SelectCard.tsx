@@ -45,7 +45,7 @@ THE SOFTWARE.
 /// <reference path="../../../../typings/tsd.d.ts" />
 
 import * as React from 'react';
-var Actions = require('../../../data/Actions.js');
+var Actions = require('../../../data/Actions.tsx');
 var Util = require('../../../util/Util.tsx');
 var LayoutManager = require('../../layout/LayoutManager.js');
 var CardInput = require('./../CardField.js');

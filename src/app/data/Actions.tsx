@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 var _ = require('underscore');
-var ActionTypes = require('./ActionTypes.js');
+var ActionTypes = require('./ActionTypes.tsx');
 var Store = require('./Store.tsx');
 
 // object of action creators
@@ -199,4 +199,4 @@ var Actions =
 	dispatch: dispatch,
 };
 
-module.exports = Actions;
+export = Actions;

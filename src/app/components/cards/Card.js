@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 require('./card.less');
-var Actions = require('../../data/Actions.js');
+var Actions = require('../../data/Actions.tsx');
 var React = require('react');
 var Util = require('../../util/Util.tsx');
 var PanelPlaceholder = require('../layout/PanelPlaceholder.js');
