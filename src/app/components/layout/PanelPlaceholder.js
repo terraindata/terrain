@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./panel.less');
 var _ = require('underscore');
 var React = require('react');
-var Util = require('../../util/Util.js');
+var Util = require('../../util/Util.tsx');
 var PanelMixin = require('./PanelMixin.js');
 var $ = require('jquery');
 

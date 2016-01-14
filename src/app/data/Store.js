@@ -46,7 +46,7 @@ var _ = require('underscore');
 
 var Redux = require('redux');
 var ActionTypes = require('./ActionTypes.js');
-var Util = require('../util/Util.js');
+var Util = require('../util/Util.tsx');
 
 // Important: all reducers must return either
 //  - a clone, if any changes were made to the object (do not modify the object passed)

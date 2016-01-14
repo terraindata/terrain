@@ -48,9 +48,9 @@ var _ = require('underscore');
 var Util = {
 	// Return a random integer [min, max)
 	// assumes min of 0 if not passed.
-	randInt() 
+	randInt(...args: number[]): number 
 	{
-		var min = arguments[0], max = arguments[1];
+		var min:number = arguments[0], max:number = arguments[1];
 		if(arguments.length === 1) {
 			min = 0;
 			max = arguments[0];
@@ -59,25 +59,25 @@ var Util = {
 		return Math.floor(Math.random() * max - min) + min;
 	},
 
-	isInt(num)
+	isInt(num): boolean
 	{
 		return num === parseInt(num, 10);
 	},
 
-	parentNode(reactNode)
+	parentNode(reactNode): Node
 	{
 		return ReactDOM.findDOMNode(reactNode).parentNode;
 	},
 
-	valueMinMax(value, min, max)
+	valueMinMax(value: number, min: number, max: number)
 	{
 		return Math.min(Math.max(value, min), max);
 	},
 
 	// accepts object of key/vals like this: { 'className': include? }
-	objToClassname(obj)
+	objToClassname(obj: { [className: string]: boolean }): string
 	{
-		return _.reduce(obj, (classNameArray, include, className) => {
+		return _.reduce(obj, (classNameArray: string[], include: boolean, className: string) => {
 				if(include)
 				{
 					classNameArray.unshift(className);
@@ -87,4 +87,4 @@ var Util = {
 	},
 };
 
-module.exports = Util;
+export = Util;

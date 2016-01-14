@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 var React = require('react');
-var Util = require('../../util/Util.js');
+var Util = require('../../util/Util.tsx');
 var PanelMixin = require('../layout/PanelMixin.js');
 var Actions = require('../../data/Actions.js');
 var $ = require('jquery');

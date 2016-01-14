@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 require('./Tabs.less');
 var React = require('react');
-var Util = require('../../util/Util.js');
+var Util = require('../../util/Util.tsx');
 var $ = require('jquery');
 var LayoutManager = require("../layout/LayoutManager.js");
 

@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./card.less');
 var Actions = require('../../data/Actions.js');
 var React = require('react');
-var Util = require('../../util/Util.js');
+var Util = require('../../util/Util.tsx');
 var PanelPlaceholder = require('../layout/PanelPlaceholder.js');
 var PanelMixin = require('../layout/PanelMixin.js');
 var LayoutManager = require('../layout/LayoutManager.js');
