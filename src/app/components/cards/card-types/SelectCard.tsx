@@ -42,18 +42,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Actions = require('../../../data/Actions.js');
-var React = require('react');
-var Util = require('../../../util/Util.js');
-var LayoutManager = require('../../layout/LayoutManager.js');
-var CardInput = require('./../CardField.js');
-var $ = require('jquery');
+/// <reference path="../../../../typings/tsd.d.ts" />
 
-var SelectCard = React.createClass({
-	propTypes:
-	{
-		data: React.PropTypes.object.isRequired,
-	},
+import * as React from 'react';
+var Actions:any = require('../../../data/Actions.js');
+var Util:any = require('../../../util/Util.js');
+var LayoutManager:any = require('../../layout/LayoutManager.js');
+var CardInput:any = require('./../CardField.js');
+var $:any = require('jquery');
+
+interface Props {
+  data:any;
+}
+
+class SelectCard extends React.Component<Props, any>
+{
+  constructor(props:Props)
+  {
+    super(props);
+  }
 
 	render() {
 		var fields = this.props.data.select.fields;
@@ -74,22 +81,24 @@ var SelectCard = React.createClass({
     }
 
 		var layout = {
-  				reorderable: true,
-  				rows: fields.map((field, index) => {
-            return {
-              content: <CardInput 
-              					value={field}
-              					onChange={changeFnFactory(index)}
-              					onDelete={deleteFnFactory(index)}
-              					dragInsideOnly={true} />
-            }
-          }),
-  			};
+			reorderable: true,
+			rows: fields.map((field, index) => {
+        return {
+          content: (
+            <CardInput 
+    					value={field}
+    					onChange={changeFnFactory(index)}
+    					onDelete={deleteFnFactory(index)}
+    					dragInsideOnly={true} />
+          ),
+        };
+      }),
+		};
 
 		return (
-					<LayoutManager layout={layout} moveTo={moveFn} />
-				);
-	},
-});
+			<LayoutManager layout={layout} moveTo={moveFn} />
+		);
+	}
+};
 
-module.exports = SelectCard;
+export = SelectCard;

@@ -113,12 +113,12 @@ var App = React.createClass({
   				content: <Tabs tabs={inputTabs} title="Inputs" />,
   			},
   			{
-  				colSpan: 2,
-  				content: <Tabs tabs={cardTabs} title="Builder" />
-  			},
-  			{
+          colSpan: 2,
+          content: <Tabs tabs={cardTabs} title="Builder" />
+        },
+        {
           content: <Tabs tabs={resultTabs} title="Results" />
-  			},
+        },
   		]
   	};
 

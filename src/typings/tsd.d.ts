@@ -42,27 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-module.exports = {
-    entry: "./src/app/App.js",
-    devtool: 'eval',
-    output: {
-        path: __dirname,
-        filename: "bundle.js"
-    },
-    resolve: {
-        extensions: [ '', '.js', '.css', '.less', '.tsx' ]
-    },
-    module: {
-        loaders: [
-            { test: /\.css$/, loader: "style!css" },
-            { test: /\.less$/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
-            { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
-            { test: /\.woff(2)?$/,   loader: "url?limit=10000&mimetype=application/font-woff" },
-            { test: /\.ttf$/, loader: "file" },
-            { test: /\.eot$/, loader: "file" },
-            { test: /\.svg$/, loader: "file" },
-            { test: require.resolve('jquery'), loader: "expose?jQuery" },
-            { test: /\.tsx$/, loader: 'babel!ts-loader' }
-        ]
-    }
-};
+
+/// <reference path="react/react.d.ts" />
+
+declare var require: any;

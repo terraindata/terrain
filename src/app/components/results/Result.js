@@ -63,6 +63,7 @@ var Result = React.createClass({
 			drag_x: true,
 			drag_y: true,
 			reorderOnDrag: true,
+			dragInsideOnly: true,
 		};
 	},
 
