@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 var _ = require('underscore');
+var Immutable = require('immutable');
 
 var Redux = require('redux');
 var ActionTypes = require('./ActionTypes.js');
@@ -90,9 +91,11 @@ var findAndMove = (arr, obj, newIndex) =>
 // second arg is the value to change to
 // the next args are the key(s) to key in to the array / objects
 // returns a copy of arr with the keyed value set
-var change = function(arr, value) // needs to be a function to make use of `arguments`
+var change = function<T>(...args: any[]): T // needs to be `function` to make use of `arguments`
 {
-	var newArr;
+	var arr = args[0];
+	var value = args[1];
+	var newArr: T;
 	if(typeof arr === 'array')
 	{
 		newArr = cloneArray(arr);
@@ -103,7 +106,7 @@ var change = function(arr, value) // needs to be a function to make use of `argu
 	}
 
 	var pointer = newArr;
-	var i;
+	var i: number;
 	for(i = 2; i < arguments.length - 1; i ++)
 	{
 		pointer = pointer[arguments[i]];
@@ -157,23 +160,24 @@ var cardsReducer = (cards = [], action) =>
 	return cards;
 }
 
-var inputsReducer = (inputs = [], action) =>
+// TODO consider an input type class
+var inputsReducer = (inputs = [], action: {input: any, type: string, text: string, newIndex: number}) =>
 {
-	var inputIndex = inputs.indexOf(action.input);
+	var inputIndex: number = inputs.indexOf(action.input);
 
 	switch(action.type) {
 		case ActionTypes.inputs.move:
-			return move(inputs, action.curIndex, action.newIndex);
+			return move(inputs, inputIndex, action.newIndex);
 		case ActionTypes.inputs.changeKey:
-			return change(inputs, action.text, inputIndex, 'key');
+			return change<Array<any>>(inputs, action.text, inputIndex, 'key');
 		case ActionTypes.inputs.changeValue:
-			return change(inputs, action.text, inputIndex, 'value');
+			return change<Array<any>>(inputs, action.text, inputIndex, 'value');
 	}
 
 	return inputs;
 }
 
-var resultsReducer = (results = {}, action) =>
+var resultsReducer = (results:Array<any> = [], action) =>
 {
 	switch(action.type) {
 		case ActionTypes.results.move:
@@ -234,353 +238,9 @@ var cardGroupsReducer = (cardGroups = {}, action) =>
 }
 
 var currentGroupId = 101;
-var newCards = [
-	{
-		type: 'from',
-		id: 1,
-		from:
-		{
-			table: 'heroes',
-		},
-	},
-	{
-		type: 'select',
-		id: 2,
-		select:
-		{
-			fields: [
-				'name',
-				'picture',
-				'description',
-				'minPrice',
-				'numJobs',
-			],
-		},
-	},
-	{
-		type: 'order',
-		id: 3,
-		order:
-		{
-			field: 'urbanSitterRating',
-		}
-	},
-	{
-		type: 'score',
-		id: 4,
-		score:
-		{
-			fields:
-			[
-				'urbanSitterRating',
-				'numJobs',
-			]
-		}
-	},
-];
-var newResults = [
-	{
-		name: 'Sitter 1',
-		id: 8,
-	},
-	{
-		name: 'Sitter 2',
-		id: 9,
-	},
-	{
-		name: 'Sitter 3',
-		id: 10,
-	},
-	{
-		name: 'Sitter 4',
-		id: 11,
-	},
-	{
-		name: 'Sitter 5',
-		id: 12,
-	},
-	{
-		name: 'Sitter 6',
-		id: 13,
-	},
-	{
-		name: 'Sitter 7',
-		id: 14,
-	},
-	{
-		name: 'Sitter 8',
-		id: 15,
-	},
-	{
-		name: 'Sitter 9',
-		id: 16,
-	},
-	{
-		name: 'Sitter 10',
-		id: 17,
-	},
-	{
-		name: 'Sitter 11',
-		id: 18,
-	},
-	{
-		name: 'Sitter 12',
-		id: 19,
-	},
-	{
-		name: 'Sitter 13',
-		id: 20,
-	},
-	{
-		name: 'Sitter 14',
-		id: 21,
-	},
-	{
-		name: 'Sitter 15',
-		id: 24,
-	},
-	{
-		name: 'Sitter 16',
-		id: 25,
-	},
-];
-
-var defaultState =
-{
-	cardGroups: {
-		100: {
-			id: 100,
-			cards: [
-				{
-					type: 'from',
-					id: 1,
-					from:
-					{
-						table: 'heroes',
-					},
-				},
-				{
-					type: 'select',
-					id: 2,
-					select:
-					{
-						fields: [
-							'name',
-							'picture',
-							'description',
-							'minPrice',
-							'numJobs',
-						],
-					},
-				},
-				{
-					type: 'order',
-					id: 3,
-					order:
-					{
-						field: 'urbanSitterRating',
-					}
-				},
-				{
-					type: 'score',
-					id: 4,
-					score:
-					{
-						fields:
-						[
-							'urbanSitterRating',
-							'numJobs',
-						]
-					}
-				},
-			],
-		},
-		101: {
-			id: 101,
-			cards: [
-				{
-					type: 'from',
-					id: 101,
-					from:
-					{
-						table: 'heroes',
-					},
-				},
-				{
-					type: 'select',
-					id: 201,
-					select:
-					{
-						fields: [
-							'name',
-							'picture',
-							'description',
-						],
-					},
-				},
-			],
-		}
-	},
-	inputs: [
-		{
-			key: 'search',
-			value: 'responsible babysitter',
-			id: 5,
-		},
-		{
-			key: 'minAge',
-			value: '24',
-			id: 6,
-		},
-		{
-			key: 'attributes',
-			value: 'calm, cool, collected',
-			id: 7,
-		},
-	],
-	resultGroups: {
-		100: {
-			id: 100,
-			results: 
-			[
-				{
-					name: 'Sitter 1',
-					id: 8,
-				},
-				{
-					name: 'Sitter 2',
-					id: 9,
-				},
-				{
-					name: 'Sitter 3',
-					id: 10,
-				},
-				{
-					name: 'Sitter 4',
-					id: 11,
-				},
-				{
-					name: 'Sitter 5',
-					id: 12,
-				},
-				{
-					name: 'Sitter 6',
-					id: 13,
-				},
-				{
-					name: 'Sitter 7',
-					id: 14,
-				},
-				{
-					name: 'Sitter 8',
-					id: 15,
-				},
-				{
-					name: 'Sitter 9',
-					id: 16,
-				},
-				{
-					name: 'Sitter 10',
-					id: 17,
-				},
-				{
-					name: 'Sitter 11',
-					id: 18,
-				},
-				{
-					name: 'Sitter 12',
-					id: 19,
-				},
-				{
-					name: 'Sitter 13',
-					id: 20,
-				},
-				{
-					name: 'Sitter 14',
-					id: 21,
-				},
-				{
-					name: 'Sitter 15',
-					id: 24,
-				},
-				{
-					name: 'Sitter 16',
-					id: 25,
-				},
-			],
-		},
-		101: {
-			id: 101,
-			results: 
-			[
-				{
-					name: 'Sitter 6',
-					id: 13,
-				},
-				{
-					name: 'Sitter 2',
-					id: 9,
-				},
-				{
-					name: 'Sitter 1',
-					id: 8,
-				},
-				{
-					name: 'Sitter 4',
-					id: 11,
-				},
-				{
-					name: 'Sitter 3',
-					id: 10,
-				},
-				{
-					name: 'Sitter 5',
-					id: 12,
-				},
-				{
-					name: 'Sitter 7',
-					id: 14,
-				},
-				{
-					name: 'Sitter 10',
-					id: 17,
-				},
-				{
-					name: 'Sitter 8',
-					id: 15,
-				},
-				{
-					name: 'Sitter 9',
-					id: 16,
-				},
-				{
-					name: 'Sitter 11',
-					id: 18,
-				},
-				{
-					name: 'Sitter 12',
-					id: 19,
-				},
-				{
-					name: 'Sitter 13',
-					id: 20,
-				},
-				{
-					name: 'Sitter 14',
-					id: 21,
-				},
-				{
-					name: 'Sitter 15',
-					id: 24,
-				},
-				{
-					name: 'Sitter 16',
-					id: 25,
-				},
-			],
-		}
-	}
-};
+var newCards = require('./json/_cards.json');
+var newResults = require('./json/_results.json');
+var defaultState =require('./json/_state.js');
 
 var stateReducer = (state = defaultState, action) =>
 {
@@ -598,4 +258,4 @@ var stateReducer = (state = defaultState, action) =>
 
 let Store = Redux.createStore(stateReducer);
 
-module.exports = Store;
+export = Store;

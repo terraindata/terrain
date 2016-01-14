@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 var _ = require('underscore');
 var ActionTypes = require('./ActionTypes.js');
-var Store = require('./Store.js');
+var Store = require('./Store.tsx');
 
 // object of action creators
 var create = 

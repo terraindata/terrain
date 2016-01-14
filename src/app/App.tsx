@@ -54,7 +54,7 @@ var ReactDOM = require("react-dom");
 var _ = require("underscore");
 
 // Data
-var Store = require("./data/Store.js");
+var Store = require("./data/Store.tsx");
 var Actions = require("./data/Actions.js");
 
 // Components

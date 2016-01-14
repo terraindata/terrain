@@ -1,0 +1,44 @@
+[
+  {
+    "type": "from",
+    "id": 1,
+    "from":
+    {
+      "table": "heroes",
+    },
+  },
+  {
+    "type": "select",
+    "id": 2,
+    "select":
+    {
+      "fields": [
+        "name",
+        "picture",
+        "description",
+        "minPrice",
+        "numJobs",
+      ],
+    },
+  },
+  {
+    "type": "order",
+    "id": 3,
+    "order":
+    {
+      "field": "urbanSitterRating",
+    }
+  },
+  {
+    "type": "score",
+    "id": 4,
+    "score":
+    {
+      "fields":
+      [
+        "urbanSitterRating",
+        "numJobs",
+      ]
+    }
+  },
+]
