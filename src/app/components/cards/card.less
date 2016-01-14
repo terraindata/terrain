@@ -7,6 +7,7 @@
 		background: @light-green;
 		border: 1px solid @medium-dark-green;
 		border-radius: 5px;
+		overflow: hidden;
 	}
 
 	@card-padding-horizontal: 15px;
@@ -21,6 +22,21 @@
 
 	.card-content{
 		padding: @card-padding-vertical @card-padding-horizontal;
+	}
+
+	.card-sub-bar {
+		background: @medium-green;
+		color: #fff;
+		padding: 5px;
+		text-align: center;
+
+		.card-sub-bar-inner {
+			display: inline-block;
+			font-size: @large-font-size;
+			background: @dark-green;
+			padding: 0px 13px 3px 13px;
+			border-radius: 7px;
+		}
 	}
 }
 

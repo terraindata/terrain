@@ -45,14 +45,18 @@ THE SOFTWARE.
 /// <reference path="../../../../typings/tsd.d.ts" />
 
 import * as React from 'react';
-var Actions:any = require('../../../data/Actions.js');
-var Util:any = require('../../../util/Util.js');
-var LayoutManager:any = require('../../layout/LayoutManager.js');
-var CardInput:any = require('./../CardField.js');
-var $:any = require('jquery');
+var Actions = require('../../../data/Actions.js');
+var Util = require('../../../util/Util.js');
+var LayoutManager = require('../../layout/LayoutManager.js');
+var CardInput = require('./../CardField.js');
+var $ = require('jquery');
 
 interface Props {
-  data:any;
+  data: {
+    select: {
+      fields: string[],
+    },
+  };
 }
 
 class SelectCard extends React.Component<Props, any>

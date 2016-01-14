@@ -42,10 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+/// <reference path="../typings/tsd.d.ts" />
+
 // Style
 require("./GeneralStyle.less");
 
 // Libraries
+// import * as React from 'react';
 var React = require("react");
 var ReactDOM = require("react-dom");
 var _ = require("underscore");

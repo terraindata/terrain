@@ -92,13 +92,46 @@ var Card = React.createClass({
 	render() {
 
 		var content;
+		var subBar;
+
 		switch(this.props.data.type)
 		{
 			case 'select':
-				content = <SelectCard {...this.props} />
+				content = <SelectCard />;
+				subBar = 
+				{
+					content: '+',
+					onClick: () => {
+						console.log('add click');
+					},
+				};
+
 				break;
 			default:
 				content = <div>This card has not been implemented yet.</div>
+		}
+		content = React.cloneElement(content, this.props);
+
+		var contentToDisplay;
+		var subBarToDisplay;
+		if(this.state.open)
+		{
+			contentToDisplay = (
+				<div className='card-content'>
+					{content}
+				</div>
+			);
+
+			if(subBar)
+			{
+				subBarToDisplay = (
+					<div className='card-sub-bar' onCick={subBar.onClick}>
+						<div className='card-sub-bar-inner'>
+							{subBar.content}
+						</div>
+					</div>
+				);
+			}
 		}
 
 		var title = this.props.data.type.charAt(0).toUpperCase() + this.props.data.type.substr(1);
@@ -109,13 +142,8 @@ var Card = React.createClass({
 					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>
 						{title}
 					</div>
-					{
-						this.state.open ? 
-							(<div className='card-content'>
-								{content}
-							</div>)
-						: null
-					}
+					{ contentToDisplay }
+					{ subBarToDisplay }
 				</div>
 			</div>
 			));

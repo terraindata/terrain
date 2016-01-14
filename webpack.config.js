@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 module.exports = {
-    entry: "./src/app/App.js",
+    entry: "./src/app/App.tsx",
     devtool: 'eval',
     output: {
         path: __dirname,
