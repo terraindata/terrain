@@ -96,11 +96,11 @@ var change = function<T>(...args: any[]): T // needs to be `function` to make us
 	var arr = args[0];
 	var value = args[1];
 	var newArr: T;
-	if(typeof arr === 'array')
+	if(Util.isArray(arr))
 	{
 		newArr = cloneArray(arr);
 	}
-	if(typeof arr === 'object')
+	else
 	{
 		newArr = cloneObj(arr);
 	}
@@ -120,9 +120,15 @@ var change = function<T>(...args: any[]): T // needs to be `function` to make us
 
 var selectCardReducer = (cards = [], action) =>
 {
-	var cardIndex = cards.indexOf(action.card);
-	if(cardIndex === -1)
+	if(!action.payload)
+	{
 		return cards;
+	}
+	var cardIndex = cards.indexOf(action.payload.card);
+	if(cardIndex === -1)
+	{
+		return cards;
+	}
 	// cardIndex points to a real card from now on
 
 	var newCards = cloneArray(cards);
@@ -131,13 +137,13 @@ var selectCardReducer = (cards = [], action) =>
 	switch(action.type)
 	{
 		case ActionTypes.cards.select.moveField:
-			select.fields = move(select.fields, action.curIndex, action.newIndex);
+			select.fields = move(select.fields, action.payload.fieldIndex, action.payload.index);
 			break;
 		case ActionTypes.cards.select.changeField:
-			select.fields[action.index] = action.value;
+			select.fields[action.payload.fieldIndex] = action.payload.value;
 			break;
 		case ActionTypes.cards.select.deleteField:
-			select.fields.splice(action.index, 1);
+			select.fields.splice(action.payload.fieldIndex, 1);
 			break;
 		default:
 			// ActionType not applicable, return normal cards
@@ -154,24 +160,32 @@ var cardsReducer = (cards = [], action) =>
 	switch(action.type)
 	{
 		case ActionTypes.cards.move:
-			return findAndMove(cards, action.card, action.newIndex);
+			return findAndMove(cards, action.payload.card, action.payload.index);
 	}
 
 	return cards;
 }
 
 // TODO consider an input type class
-var inputsReducer = (inputs = [], action: {input: any, type: string, text: string, newIndex: number}) =>
+var inputsReducer = (inputs = [], action: Action) =>
 {
-	var inputIndex: number = inputs.indexOf(action.input);
+	if(!action.payload)
+	{
+		return inputs;
+	}
+	var inputIndex: number = inputs.indexOf(action.payload.input);
+	if(inputIndex === -1)
+	{
+		return inputs;
+	}
 
 	switch(action.type) {
 		case ActionTypes.inputs.move:
-			return move(inputs, inputIndex, action.newIndex);
+			return move(inputs, inputIndex, action.payload.index);
 		case ActionTypes.inputs.changeKey:
-			return change<Array<any>>(inputs, action.text, inputIndex, 'key');
+			return change<Array<any>>(inputs, action.payload.value, inputIndex, 'key');
 		case ActionTypes.inputs.changeValue:
-			return change<Array<any>>(inputs, action.text, inputIndex, 'value');
+			return change<Array<any>>(inputs, action.payload.value, inputIndex, 'value');
 	}
 
 	return inputs;
@@ -179,10 +193,15 @@ var inputsReducer = (inputs = [], action: {input: any, type: string, text: strin
 
 var resultsReducer = (results:Array<any> = [], action) =>
 {
+	if(!action.payload)
+	{
+		return results;
+	}
+
 	switch(action.type) {
 		case ActionTypes.results.move:
-			var curIndex = results.findIndex((result) => result.id === action.result.id);
-			return move(results, curIndex, action.newIndex);
+			var curIndex = results.findIndex((result) => result.id === action.payload.result.id);
+			return move(results, curIndex, action.payload.index);
 	}
 
 	return results;
@@ -240,7 +259,7 @@ var cardGroupsReducer = (cardGroups = {}, action) =>
 var currentGroupId = 101;
 var newCards = require('./json/_cards.json');
 var newResults = require('./json/_results.json');
-var defaultState =require('./json/_state.js');
+var defaultState = require('./json/_state.json');
 
 var stateReducer = (state = defaultState, action) =>
 {

@@ -102,6 +102,10 @@ From `master` branch:
 npm run deploy
 ```
 
+## Useful Tutorials
+
+- [http://jaysoo.ca/2015/09/26/typed-react-and-redux/]
+
 ## Code Overview
 
 ### Layout

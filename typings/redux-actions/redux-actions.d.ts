@@ -42,37 +42,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var React = require('react');
-var Util = require('../../util/Util.tsx');
-var PanelMixin = require('../layout/PanelMixin.js');
-var Actions = require('../../data/Actions.tsx');
-var $ = require('jquery');
-var Input = require("../inputs/Input.js");
-var LayoutManager = require("../layout/LayoutManager.js");
-
-var InputsArea = React.createClass({
-	propTypes:
-	{
-		inputs: React.PropTypes.array.isRequired,
-	},
-
-	render() {
-		var layout = {
-			rows: this.props.inputs.map((input) => {
-				return {
-					content: <Input input={input} />,
-				};
-			}),
-			fullHeight: true,
-		};
-
-		var moveTo = (curIndex, newIndex) =>
-    {
-      Actions.dispatch.inputs.move(this.props.inputs[curIndex], newIndex);
+// Type definitions for redux-actions v0.8.0
+// Project: https://github.com/acdlite/redux-actions
+// Definitions by: Jack Hsu <https://github.com/jaysoo>
+// Definitions: https://github.com/borisyankov/DefinitelyTyped
+declare module ReduxActions {
+    // FSA-compliant action.
+    // See: https://github.com/acdlite/flux-standard-action
+    type Action = {
+        type: string
+        payload?: any
+        error?: boolean
+        meta?: any
     };
 
-		return <LayoutManager layout={layout} moveTo={moveTo} />;
-	},
-});
+    type PayloadCreator<T> = (...args: any[]) => T;
+    type MetaCreator = (...args: any[]) => any;
 
-module.exports = InputsArea;
+    type Reducer<T> = (state: T, action: Action) => T;
+
+    type ReducerMap<T> = {
+        [actionType: string]: Reducer<T>
+    };
+
+    export function createAction<T>(actionType: string, payloadCreator?: PayloadCreator<T>, metaCreator?: MetaCreator): (...args: any[]) => Action;
+
+    export function handleAction<T>(actionType: string, reducer: Reducer<T> | ReducerMap<T>): Reducer<T>;
+
+    export function handleActions<T>(reducerMap: ReducerMap<T>, initialState?: T): Reducer<T>;
+}
+
+declare module 'redux-actions' {
+    export = ReduxActions;
+}
+

@@ -42,37 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var React = require('react');
-var Util = require('../../util/Util.tsx');
-var PanelMixin = require('../layout/PanelMixin.js');
-var Actions = require('../../data/Actions.tsx');
-var $ = require('jquery');
-var Input = require("../inputs/Input.js");
-var LayoutManager = require("../layout/LayoutManager.js");
-
-var InputsArea = React.createClass({
-	propTypes:
-	{
-		inputs: React.PropTypes.array.isRequired,
-	},
-
-	render() {
-		var layout = {
-			rows: this.props.inputs.map((input) => {
-				return {
-					content: <Input input={input} />,
-				};
-			}),
-			fullHeight: true,
-		};
-
-		var moveTo = (curIndex, newIndex) =>
-    {
-      Actions.dispatch.inputs.move(this.props.inputs[curIndex], newIndex);
-    };
-
-		return <LayoutManager layout={layout} moveTo={moveTo} />;
-	},
-});
-
-module.exports = InputsArea;
+export namespace Models
+{
+  export interface Action
+  {
+    type: string;
+    payload: any;
+  }
+}

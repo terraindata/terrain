@@ -1,235 +1,235 @@
 {
-  cardGroups: {
-    100: {
-      id: 100,
-      cards: [
+  "cardGroups": {
+    "100": {
+      "id": 100,
+      "cards": [
         {
-          type: "from",
-          id: 1,
-          from:
+          "type": "from",
+          "id": 1,
+          "from":
           {
-            table: "heroes",
-          },
+            "table": "heroes"
+          }
         },
         {
-          type: "select",
-          id: 2,
-          select:
+          "type": "select",
+          "id": 2,
+          "select":
           {
-            fields: [
+            "fields": [
               "name",
               "picture",
               "description",
               "minPrice",
-              "numJobs",
-            ],
-          },
-        },
-        {
-          type: "order",
-          id: 3,
-          order:
-          {
-            field: "urbanSitterRating",
-          }
-        },
-        {
-          type: "score",
-          id: 4,
-          score:
-          {
-            fields:
-            [
-              "urbanSitterRating",
-              "numJobs",
+              "numJobs"
             ]
           }
         },
-      ],
-    },
-    101: {
-      id: 101,
-      cards: [
         {
-          type: "from",
-          id: 101,
-          from:
+          "type": "order",
+          "id": 3,
+          "order":
           {
-            table: "heroes",
-          },
+            "field": "urbanSitterRating"
+          }
         },
         {
-          type: "select",
-          id: 201,
-          select:
+          "type": "score",
+          "id": 4,
+          "score":
           {
-            fields: [
+            "fields":
+            [
+              "urbanSitterRating",
+              "numJobs"
+            ]
+          }
+        }
+      ]
+    },
+    "101": {
+      "id": 101,
+      "cards": [
+        {
+          "type": "from",
+          "id": 101,
+          "from":
+          {
+            "table": "heroes"
+          }
+        },
+        {
+          "type": "select",
+          "id": 201,
+          "select":
+          {
+            "fields": [
               "name",
               "picture",
-              "description",
-            ],
-          },
-        },
-      ],
+              "description"
+            ]
+          }
+        }
+      ]
     }
   },
-  inputs: [
+  "inputs": [
     {
-      key: "search",
-      value: "responsible babysitter",
-      id: 5,
+      "key": "search",
+      "value": "responsible babysitter",
+      "id": 5
     },
     {
-      key: "minAge",
-      value: "24",
-      id: 6,
+      "key": "minAge",
+      "value": "24",
+      "id": 6
     },
     {
-      key: "attributes",
-      value: "calm, cool, collected",
-      id: 7,
-    },
+      "key": "attributes",
+      "value": "calm, cool, collected",
+      "id": 7
+    }
   ],
-  resultGroups: {
-    100: {
-      id: 100,
-      results: 
+  "resultGroups": {
+    "100": {
+      "id": 100,
+      "results": 
       [
         {
-          name: "Sitter 1",
-          id: 8,
+          "name": "Sitter 1",
+          "id": 8
         },
         {
-          name: "Sitter 2",
-          id: 9,
+          "name": "Sitter 2",
+          "id": 9
         },
         {
-          name: "Sitter 3",
-          id: 10,
+          "name": "Sitter 3",
+          "id": 10
         },
         {
-          name: "Sitter 4",
-          id: 11,
+          "name": "Sitter 4",
+          "id": 11
         },
         {
-          name: "Sitter 5",
-          id: 12,
+          "name": "Sitter 5",
+          "id": 12
         },
         {
-          name: "Sitter 6",
-          id: 13,
+          "name": "Sitter 6",
+          "id": 13
         },
         {
-          name: "Sitter 7",
-          id: 14,
+          "name": "Sitter 7",
+          "id": 14
         },
         {
-          name: "Sitter 8",
-          id: 15,
+          "name": "Sitter 8",
+          "id": 15
         },
         {
-          name: "Sitter 9",
-          id: 16,
+          "name": "Sitter 9",
+          "id": 16
         },
         {
-          name: "Sitter 10",
-          id: 17,
+          "name": "Sitter 10",
+          "id": 17
         },
         {
-          name: "Sitter 11",
-          id: 18,
+          "name": "Sitter 11",
+          "id": 18
         },
         {
-          name: "Sitter 12",
-          id: 19,
+          "name": "Sitter 12",
+          "id": 19
         },
         {
-          name: "Sitter 13",
-          id: 20,
+          "name": "Sitter 13",
+          "id": 20
         },
         {
-          name: "Sitter 14",
-          id: 21,
+          "name": "Sitter 14",
+          "id": 21
         },
         {
-          name: "Sitter 15",
-          id: 24,
+          "name": "Sitter 15",
+          "id": 24
         },
         {
-          name: "Sitter 16",
-          id: 25,
-        },
-      ],
+          "name": "Sitter 16",
+          "id": 25
+        }
+      ]
     },
-    101: {
-      id: 101,
-      results: 
+    "101": {
+      "id": 101,
+      "results": 
       [
         {
-          name: "Sitter 6",
-          id: 13,
+          "name": "Sitter 6",
+          "id": 13
         },
         {
-          name: "Sitter 2",
-          id: 9,
+          "name": "Sitter 2",
+          "id": 9
         },
         {
-          name: "Sitter 1",
-          id: 8,
+          "name": "Sitter 1",
+          "id": 8
         },
         {
-          name: "Sitter 4",
-          id: 11,
+          "name": "Sitter 4",
+          "id": 11
         },
         {
-          name: "Sitter 3",
-          id: 10,
+          "name": "Sitter 3",
+          "id": 10
         },
         {
-          name: "Sitter 5",
-          id: 12,
+          "name": "Sitter 5",
+          "id": 12
         },
         {
-          name: "Sitter 7",
-          id: 14,
+          "name": "Sitter 7",
+          "id": 14
         },
         {
-          name: "Sitter 10",
-          id: 17,
+          "name": "Sitter 10",
+          "id": 17
         },
         {
-          name: "Sitter 8",
-          id: 15,
+          "name": "Sitter 8",
+          "id": 15
         },
         {
-          name: "Sitter 9",
-          id: 16,
+          "name": "Sitter 9",
+          "id": 16
         },
         {
-          name: "Sitter 11",
-          id: 18,
+          "name": "Sitter 11",
+          "id": 18
         },
         {
-          name: "Sitter 12",
-          id: 19,
+          "name": "Sitter 12",
+          "id": 19
         },
         {
-          name: "Sitter 13",
-          id: 20,
+          "name": "Sitter 13",
+          "id": 20
         },
         {
-          name: "Sitter 14",
-          id: 21,
+          "name": "Sitter 14",
+          "id": 21
         },
         {
-          name: "Sitter 15",
-          id: 24,
+          "name": "Sitter 15",
+          "id": 24
         },
         {
-          name: "Sitter 16",
-          id: 25,
-        },
-      ],
+          "name": "Sitter 16",
+          "id": 25
+        }
+      ]
     }
   }
 }

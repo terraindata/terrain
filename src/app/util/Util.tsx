@@ -64,6 +64,11 @@ var Util = {
 		return num === parseInt(num, 10);
 	},
 
+	isArray(arr: any): boolean
+	{
+		return arr.length !== undefined;
+	},
+
 	parentNode(reactNode): Node
 	{
 		return ReactDOM.findDOMNode(reactNode).parentNode;

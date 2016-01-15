@@ -46,125 +46,146 @@ var _ = require('underscore');
 var ActionTypes = require('./ActionTypes.tsx');
 var Store = require('./Store.tsx');
 
+import ReduxActions = require('redux-actions');
+var createAction = ReduxActions.createAction;
+
+interface NewAlgorithmPayload {}
+
+// Generic Payload Types
+
+interface MovePayload
+{
+	index: number;
+}
+
+interface CreatePayload
+{
+	index: number;
+}
+
+interface ChangePayload<T>
+{
+	value: T;
+}
+
+interface DeletePayload
+{
+	index: number;
+}
+
+
+// Section: Card Actions
+
+interface CardPayload
+{
+	card: any; // TODO make a Card class
+}
+
+interface CreateCardPayload extends CardPayload, CreatePayload {}
+interface MoveCardPayload extends CardPayload, MovePayload {}
+
+
+// Sub-section: Select Card
+
+interface SelectCardPayload extends CardPayload
+{
+	fieldIndex: number;
+}
+
+interface MoveSelectCardFieldPayload extends SelectCardPayload, MovePayload {}
+interface ChangeSelectCardFieldPayload extends SelectCardPayload, ChangePayload<string> {}
+interface DeleteSelectCardFieldPayload extends SelectCardPayload {}
+
+
+// Inputs
+
+interface InputPayload
+{
+	input: any; // TODO input class
+}
+
+interface CreateInputPayload extends InputPayload, CreatePayload {}
+interface MoveInputPayload extends InputPayload, MovePayload {}
+interface ChangeInputValuePayload extends InputPayload, ChangePayload<string> {}
+interface ChangeInputKeyPayload extends InputPayload, ChangePayload<string> {}
+interface DeleteInputPayload extends InputPayload, DeletePayload {}
+
+
+// Results
+
+interface ResultPayload
+{
+	result: any; // TODO result class
+}
+
+interface MoveResultPayload extends ResultPayload, MovePayload {}
+
 // object of action creators
-var create = 
+const create = 
 {
 	cards:
 	{
-		move: (card, newIndex) =>
-		{
-			return {
-				type: ActionTypes.cards.move,
-				card: card,
-				newIndex: newIndex,
-			};
-		},
+		create: createAction<CreateCardPayload>(
+			ActionTypes.cards.create,
+			(card: any, index: number) => ({card, index})
+		),
+
+		move: createAction<MoveCardPayload>(
+			ActionTypes.cards.move,
+			(card: any, index: number) => ({card, index})
+		),
 
 		select:
 		{
-			moveField: (card, curIndex, newIndex) =>
-			{
-				return {
-					type: ActionTypes.cards.select.moveField,
-					card: card,
-					curIndex: curIndex,
-					newIndex: newIndex,
-				}
-			},
-			
-			changeField: (card, index, value) =>
-			{
-				return {
-					type: ActionTypes.cards.select.changeField,
-					card: card,
-					index: index,
-					value: value,
-				}
-			},
+			moveField: createAction<MoveSelectCardFieldPayload>(
+				ActionTypes.cards.select.moveField,
+				(card: any, fieldIndex: number, index: number) => ({card, fieldIndex, index})
+			),
 
-			deleteField: (card, index) =>
-			{
-				return {
-					type: ActionTypes.cards.select.deleteField,
-					card: card,
-					index: index,
-				}
-			},
+			changeField: createAction<ChangeSelectCardFieldPayload>(
+				ActionTypes.cards.select.changeField,
+				(card: any, fieldIndex: number, value: string) => ({card, fieldIndex, value})
+			),
+
+			deleteField: createAction<DeleteSelectCardFieldPayload>(
+   	   	ActionTypes.cards.select.deleteField,
+      	(card: any, fieldIndex: number) => ({card, fieldIndex})
+			),
 		},
 	}, // /cards
 
 	inputs:
 	{
-		move: (curIndex, newIndex) =>
-		{
-			return {
-				type: ActionTypes.inputs.move,
-				curIndex: curIndex,
-				newIndex: newIndex,
-			};
-		},
+		create: createAction<CreateInputPayload>(
+			ActionTypes.inputs.create,
+			(input: any, index: number) => ({input, index})
+		),
 
-		changeKey: (input, text) =>
-		{
-			return {
-				type: ActionTypes.inputs.changeKey,
-				input: input,
-				text: text,
-			}
-		},
+		move: createAction<MoveInputPayload>(
+      ActionTypes.inputs.move,
+      (input: any, index: number) => ({input, index})
+		),
 
-		changeValue: (input, text) =>
-		{
-			return {
-				type: ActionTypes.inputs.changeValue,
-				input: input,
-				text: text,
-			}
-		},		
+		changeKey: createAction<ChangeInputKeyPayload>(
+      ActionTypes.inputs.changeKey,
+      (input: any, value: string) => ({input, value})
+		),
+
+		changeValue: createAction<ChangeInputValuePayload>(
+      ActionTypes.inputs.changeValue,
+      (input: any, value: string) => ({input, value})
+		),
 	}, // /inputs
 
-	moveResult: (result, newIndex) =>
-	{
-		return {
-			type: ActionTypes.results.move,
-			result: result,
-			newIndex: newIndex,
-		};
-	},
+	moveResult: createAction<MoveResultPayload>(
+    ActionTypes.results.move,
+    (result: any, index: number) => ({result, index})
+	),
 
-	selectCard:
-	{
-		moveField: (curIndex, newIndex) =>
-		{
-			return {
-				type: ActionTypes.cards.select.moveField,
-				curIndex: curIndex,
-				newIndex: newIndex,
-			}
-		},
-		newField: (index = -1, field = '') =>
-		{
-			return {
-				type: ActionTypes.cards.select.newField,
-				index: index,
-				field: field,
-			}
-		},
-		deleteField: (index) =>
-		{
-			return {
-				type: ActionTypes.cards.select.deleteField,
-				index: index,
-			}
-		},
-	},
-
-	newAlgorithm: () =>
-	{
-		return {
-			type: ActionTypes.newAlgorithm,
-		};
-	}
+	newAlgorithm: createAction<NewAlgorithmPayload>(
+    ActionTypes.newAlgorithm,
+    () => ({})
+	),
 };
 
 var actionCreatorsToDispatchers = (actionCreators) => 
@@ -188,6 +209,8 @@ var actionCreatorsToDispatchers = (actionCreators) =>
 	});
 };
 
+
+
 // object of action dispatchers
 // use: Actions.dispatch.moveCard(4, 8)
 var dispatch = actionCreatorsToDispatchers(create); 
@@ -197,6 +220,7 @@ var Actions =
 	types: ActionTypes,
 	create: create,
 	dispatch: dispatch,
+	newDispatch: Store.dispatch,
 };
 
 export = Actions;

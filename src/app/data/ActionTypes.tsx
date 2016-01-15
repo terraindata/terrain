@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 var _ = require('underscore');
+var Immutable = require('immutable');
 
 // prepend str to every item in the array
 var prependArray = (str, arr) => 
@@ -56,8 +57,12 @@ var makeObject = (str, arr) =>
 	return _.object(arr, prependArray(str, arr));
 };
 
+
 var ActionTypes = 
 {
+	// moveCard: moveCard,
+	// Action: Action,
+
 	cards: makeObject('cards',
 	[
 		'move',
@@ -86,5 +91,6 @@ ActionTypes.cards.select = makeObject('cards.select', [
 	'deleteField',
 	'changeField',
 ]);
+
 
 export = ActionTypes;

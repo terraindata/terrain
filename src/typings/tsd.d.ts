@@ -44,10 +44,18 @@ THE SOFTWARE.
 
 
 /// <reference path="react/react.d.ts" />
+/// <reference path='./../../node_modules/immutable/dist/Immutable.d.ts'/>
 
 declare var require: any;
 
 interface Array<T> {
-    find(predicate: (search: T) => boolean) : T;
-    findIndex(predicate: (search: T) => boolean) : number;
+  find(predicate: (search: T) => boolean) : T;
+  findIndex(predicate: (search: T) => boolean) : number;
 }
+
+interface Action
+{
+  type: string;
+  payload: any;
+}
+  

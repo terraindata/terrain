@@ -4,8 +4,8 @@
     "id": 1,
     "from":
     {
-      "table": "heroes",
-    },
+      "table": "heroes"
+    }
   },
   {
     "type": "select",
@@ -17,16 +17,16 @@
         "picture",
         "description",
         "minPrice",
-        "numJobs",
-      ],
-    },
+        "numJobs"
+      ]
+    }
   },
   {
     "type": "order",
     "id": 3,
     "order":
     {
-      "field": "urbanSitterRating",
+      "field": "urbanSitterRating"
     }
   },
   {
@@ -37,8 +37,8 @@
       "fields":
       [
         "urbanSitterRating",
-        "numJobs",
+        "numJobs"
       ]
     }
-  },
+  }
 ]
