@@ -42,16 +42,79 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-
-/// <reference path="react/react.d.ts" />
-/// <reference path='./../../node_modules/immutable/dist/Immutable.d.ts'/>
-
-/// <reference path="models/ActionModels.d.ts" />
-/// <reference path="models/CardModels.d.ts" />
-
-declare var require: any;
-
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
+interface Action
+{
+  type: string;
+  payload: any;
 }
+
+interface NewAlgorithmPayload {}
+
+// Generic Payload Types
+
+interface MovePayload
+{
+  index: number;
+}
+
+interface CreatePayload
+{
+  index: number;
+}
+
+interface ChangePayload<T>
+{
+  value: T;
+}
+
+interface DeletePayload
+{
+  index: number;
+}
+
+
+// Section: Card Actions
+
+interface CardPayload
+{
+  card: any; // TODO make a Card class
+}
+
+interface CreateCardPayload extends CardPayload, CreatePayload {}
+interface MoveCardPayload extends CardPayload, MovePayload {}
+
+
+// Sub-section: Select Card
+
+interface SelectCardPayload extends CardPayload
+{
+  fieldIndex: number;
+}
+
+interface MoveSelectCardFieldPayload extends SelectCardPayload, MovePayload {}
+interface ChangeSelectCardFieldPayload extends SelectCardPayload, ChangePayload<string> {}
+interface DeleteSelectCardFieldPayload extends SelectCardPayload {}
+
+
+// Inputs
+
+interface InputPayload
+{
+  input: any; // TODO input class
+}
+
+interface CreateInputPayload extends InputPayload, CreatePayload {}
+interface MoveInputPayload extends InputPayload, MovePayload {}
+interface ChangeInputValuePayload extends InputPayload, ChangePayload<string> {}
+interface ChangeInputKeyPayload extends InputPayload, ChangePayload<string> {}
+interface DeleteInputPayload extends InputPayload, DeletePayload {}
+
+
+// Results
+
+interface ResultPayload
+{
+  result: any; // TODO result class
+}
+
+interface MoveResultPayload extends ResultPayload, MovePayload {}

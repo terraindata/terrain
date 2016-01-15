@@ -42,11 +42,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-export namespace Models
+interface Card
 {
-  export interface Action
-  {
-    type: string;
-    payload: any;
-  }
+  id: number;
+  type: string;
 }
+
+// TODO in progress
+
+// declare class SelectCard implements Card
+// {
+//   id: number;
+//   type: string;
+//   fields: string[];
+
+//   constructor(id: number, fields: string[])
+//   {
+//     this.type = 'select';
+//     this.id = id;
+//     this.fields = fields;
+//   }
+// }
+
+// declare class FromCard implements Card
+// {
+//   id: number;
+//   type: string;
+//   from: {
+//     field: string; 
+//   }
+// }
