@@ -42,33 +42,100 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-interface Card
+declare type ID = number;
+declare type Group = string;
+declare type Key = string;
+declare type Value = string;
+
+declare enum Operator
 {
-  id: number;
-  type: string;
+  EQ,
+  NE,
+  GT,
+  GE,
+  LT,
+  LE
 }
 
-// TODO in progress
+declare enum Direction
+{
+  ASC,
+  DESC
+}
 
-// declare class SelectCard implements Card
-// {
-//   id: number;
-//   type: string;
-//   fields: string[];
+declare enum Combinator
+{
+  AND,
+  OR
+}
 
-//   constructor(id: number, fields: string[])
-//   {
-//     this.type = 'select';
-//     this.id = id;
-//     this.fields = fields;
-//   }
-// }
 
-// declare class FromCard implements Card
-// {
-//   id: number;
-//   type: string;
-//   from: {
-//     field: string; 
-//   }
-// }
+interface Property
+{
+  group: Group;
+  key: Key;
+  value: Value;
+
+  // TODO may need to consider static values (e.g. "17"), or compiled values (e.g. from a Let card)
+}
+
+interface Comparison
+{
+  first: Property;
+  second: Property;
+  operator: Operator;
+}
+
+
+
+interface CardModel
+{
+  id: ID;
+  type: string; // Note: type may not be necessary, thanks to typescript
+}
+
+interface FromCardModel extends CardModel
+{
+  from:
+  {
+    group: Group;
+    joins: [
+      {
+        group: Group;
+        comparison: Comparison;
+      }
+    ]
+  }  
+}
+
+interface SelectCardModel extends CardModel
+{
+  select: 
+  {
+    properties: Property[];
+  }
+}
+
+interface OrderCardModel extends CardModel
+{
+  order:
+  {
+    property: Property;
+    direction: Direction;
+  }
+}
+
+interface FilterCardModel extends CardModel
+{
+  filter:
+  {
+    // TODO adapt this model to support order of operations appropriately
+    filters: [
+      {
+         comparison: Comparison;
+         combinator: Combinator;   
+      }
+    ]
+  }
+}
+
