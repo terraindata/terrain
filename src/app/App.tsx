@@ -49,7 +49,7 @@ require("./GeneralStyle.less");
 
 // Libraries
 import * as React from 'react';
-var ReactDOM = require("react-dom");
+import * as ReactDOM from "react-dom";
 var _ = require("underscore");
 
 // Data

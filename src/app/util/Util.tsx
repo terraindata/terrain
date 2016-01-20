@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var ReactDOM = require('react-dom');
+import * as ReactDOM from "react-dom";
 var _ = require('underscore');
 
 var Util = {

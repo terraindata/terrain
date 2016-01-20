@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./panel.less');
 import * as React from 'react';
 var _ = require('underscore');
-var ReactDOM = require('react-dom');
+import * as ReactDOM from "react-dom";
 import Util from '../../util/Util.tsx';
 var $ = require('jquery');
 
