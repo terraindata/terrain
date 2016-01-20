@@ -42,15 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var React = require('react');
-var Util = require('../../util/Util.tsx');
+import * as React from 'react';
+import * as Util from '../../util/Util.tsx';
 var PanelMixin = require('../layout/PanelMixin.js');
 var Actions = require('../../data/Actions.tsx');
-var $ = require('jquery');
 var Input = require("../inputs/Input.tsx").default;
 var LayoutManager = require("../layout/LayoutManager.js");
 
-var InputsArea = React.createClass({
+var InputsArea = React.createClass<any, any>({
 	propTypes:
 	{
 		inputs: React.PropTypes.array.isRequired,
@@ -75,4 +74,4 @@ var InputsArea = React.createClass({
 	},
 });
 
-module.exports = InputsArea;
+export default InputsArea;

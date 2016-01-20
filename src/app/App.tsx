@@ -63,7 +63,7 @@ var LayoutManager = require("./components/layout/LayoutManager.js");
 var PanelPlaceholder = require("./components/layout/PanelPlaceholder.js");
 import Card from "./components/cards/Card.tsx";
 var Result = require("./components/results/Result.js");
-var InputsArea = require("./components/inputs/InputsArea.js");
+import InputsArea from "./components/inputs/InputsArea.tsx";
 import CardsArea from "./components/cards/CardsArea.tsx";
 var ResultsArea = require("./components/results/ResultsArea.js");
 
