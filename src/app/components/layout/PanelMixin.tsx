@@ -46,7 +46,7 @@ require('./panel.less');
 import * as React from 'react';
 var _ = require('underscore');
 var ReactDOM = require('react-dom');
-var Util = require('../../util/Util.tsx');
+import Util from '../../util/Util.tsx';
 var $ = require('jquery');
 
 // TODO clean up the scroll acceleration code

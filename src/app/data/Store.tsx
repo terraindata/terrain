@@ -47,7 +47,7 @@ var Immutable = require('immutable');
 
 var Redux = require('redux');
 var ActionTypes = require('./ActionTypes.tsx');
-var Util = require('../util/Util.tsx');
+import Util from '../util/Util.tsx';
 
 // Important: all reducers must return either
 //  - a clone, if any changes were made to the object (do not modify the object passed)

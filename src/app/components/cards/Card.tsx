@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./card.less');
 import Actions from "../../data/Actions.tsx";
 import * as React from 'react';
-import * as Util from '../../util/Util.tsx';
+import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CardInput from './CardField.tsx';

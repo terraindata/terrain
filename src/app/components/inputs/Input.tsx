@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 require('./Input.less');
 import * as React from 'react';
-import * as Util from '../../util/Util.tsx';
+import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/Actions.tsx";
 

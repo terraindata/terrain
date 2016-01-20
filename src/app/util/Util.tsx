@@ -92,4 +92,4 @@ var Util = {
 	},
 };
 
-export = Util;
+export default Util;
