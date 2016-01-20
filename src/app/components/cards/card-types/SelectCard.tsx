@@ -48,7 +48,7 @@ import * as React from 'react';
 var Actions = require('../../../data/Actions.tsx');
 var Util = require('../../../util/Util.tsx');
 var LayoutManager = require('../../layout/LayoutManager.js');
-var CardInput = require('./../CardField.js');
+import CardInput from './../CardField.tsx';
 var $ = require('jquery');
 
 interface Props {

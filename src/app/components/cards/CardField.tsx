@@ -43,10 +43,9 @@ THE SOFTWARE.
 */
 
 require('./CardField.less');
-var React = require('react');
+import * as React from 'react';
 var Util = require('../../util/Util.tsx');
 var PanelMixin = require('../layout/PanelMixin.js');
-var $ = require('jquery');
 
 var CardField = React.createClass({
 	mixins: [PanelMixin],
@@ -58,7 +57,7 @@ var CardField = React.createClass({
 		onDelete: React.PropTypes.func,
 	},
 
-	getDefaultProps() 
+	getDefaultProps():any 
 	{
 		return {
 			drag_x: false,
@@ -113,4 +112,4 @@ var CardField = React.createClass({
 	},
 });
 
-module.exports = CardField;
+export default CardField;

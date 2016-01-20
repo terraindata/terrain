@@ -49,7 +49,7 @@ import * as Util from '../../util/Util.tsx';
 var PanelPlaceholder = require('../layout/PanelPlaceholder.js');
 var PanelMixin = require('../layout/PanelMixin.js');
 var LayoutManager = require('../layout/LayoutManager.js');
-var CardInput = require('./CardField.js');
+import CardInput from './CardField.tsx';
 var SelectCard = require('./card-types/SelectCard.tsx');
 
 var Card = React.createClass({
