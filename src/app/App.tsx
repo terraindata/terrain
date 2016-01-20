@@ -59,7 +59,7 @@ var Actions = require("./data/Actions.tsx");
 
 // Components
 import Tabs from "./components/layout/Tabs.tsx";
-var LayoutManager = require("./components/layout/LayoutManager.js");
+import LayoutManager from "./components/layout/LayoutManager.tsx";
 import Card from "./components/cards/Card.tsx";
 import Result from "./components/results/Result.tsx";
 import InputsArea from "./components/inputs/InputsArea.tsx";

@@ -47,7 +47,7 @@ var Actions = require('../../data/Actions.tsx');
 import * as React from 'react';
 import * as Util from '../../util/Util.tsx';
 var PanelMixin = require('../layout/PanelMixin.js');
-var LayoutManager = require('../layout/LayoutManager.js');
+import LayoutManager from "../layout/LayoutManager.tsx";
 import CardInput from './CardField.tsx';
 var SelectCard = require('./card-types/SelectCard.tsx');
 

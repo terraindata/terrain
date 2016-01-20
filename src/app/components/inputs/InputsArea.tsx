@@ -47,7 +47,7 @@ import * as Util from '../../util/Util.tsx';
 var PanelMixin = require('../layout/PanelMixin.js');
 var Actions = require('../../data/Actions.tsx');
 var Input = require("../inputs/Input.tsx").default;
-var LayoutManager = require("../layout/LayoutManager.js");
+import LayoutManager from "../layout/LayoutManager.tsx";
 
 var InputsArea = React.createClass<any, any>({
 	propTypes:

@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./Tabs.less');
 import * as React from 'react';
 import * as Util from '../../util/Util.tsx';
-var LayoutManager = require("../layout/LayoutManager.js");
+import LayoutManager from "../layout/LayoutManager.tsx";
 
 var Tabs = React.createClass<any, any>({
 	propTypes:

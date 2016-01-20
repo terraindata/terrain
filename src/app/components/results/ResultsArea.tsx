@@ -47,7 +47,7 @@ import * as Util from '../../util/Util.tsx';
 var PanelMixin = require('../layout/PanelMixin.js');
 var Actions = require('../../data/Actions.tsx');
 import Result from "../results/Result.tsx";
-var LayoutManager = require("../layout/LayoutManager.js");
+import LayoutManager from "../layout/LayoutManager.tsx";
 
 var ResultsArea = React.createClass<any, any>({
 	propTypes:

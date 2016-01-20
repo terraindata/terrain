@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 require('./LayoutManager.less');
-var React = require('react');
+import * as React from 'react';
 var $ = require('jquery');
 var _ = require('underscore');
 
@@ -56,7 +56,7 @@ var rowClass = 'layout-manager-row';
 var cellClass = 'layout-manager-cell';
 var fullHeightClass = 'layout-manager-full-height';
 
-var LayoutManager = React.createClass({
+var LayoutManager = React.createClass<any, any>({
 	propTypes: 
 	{
 		layout: React.PropTypes.object.isRequired
@@ -101,11 +101,11 @@ var LayoutManager = React.createClass({
 		var clientRect = this.refs[index].getBoundingClientRect();
 		var indicesToShift = [];
 
-		var curY = 0; // current Y position to compare, either the top edge (if dragged up) or bottom (if dragged down)
-		var curX = 0; // current X position to compare, either the left edge (if dragged left) or the right (if dragged right)
+		var curY:any = 0; // current Y position to compare, either the top edge (if dragged up) or bottom (if dragged down)
+		var curX:any = 0; // current X position to compare, either the left edge (if dragged left) or the right (if dragged right)
 		var compareIndices = (refIndex) => false; // is the given neighbor index applicable?
-		var getRefMidpointY = (refClientRect) => 0; // MidpointY of the neighbor to compare
-		var getRefMidpointX = (refClientRect) => 0; // MidpointX of the neighbor to compare
+		var getRefMidpointY:any = (refClientRect) => 0; // MidpointY of the neighbor to compare
+		var getRefMidpointX:any = (refClientRect) => 0; // MidpointX of the neighbor to compare
 		var compareRefMidpointY = (refMidpointY) => false; // given an applicable neighbor's MidpointY, should we shift?
 		var compareRefMidpointX = (refMidpointX) => false; // given an applicable neighbor's MidpointX, should we shift?
 		var heightAmplifier = 0; // shift our neighbor by heightAmplifier * our height
@@ -118,7 +118,7 @@ var LayoutManager = React.createClass({
 			{
 				var curY = clientRect.top + coords.dy;
 				var compareIndices = (refIndex) => refIndex < index;
-				var getRefMidpointY = (refClientRect) => refClientRect.bottom - refClientRect.height / 2;
+				var getRefMidpointY:any = (refClientRect) => refClientRect.bottom - refClientRect.height / 2;
 				var compareRefMidpointY = (refMidpointY) => curY < refMidpointY;
 				var heightAmplifier = 1;
 				var widthAmplifier = 0;
@@ -129,7 +129,7 @@ var LayoutManager = React.createClass({
 			{
 				var curY = clientRect.bottom + coords.dy;
 				var compareIndices = (refIndex) => refIndex > index;
-				var getRefMidpointY = (refClientRect) => refClientRect.top + refClientRect.height / 2;
+				var getRefMidpointY:any = (refClientRect) => refClientRect.top + refClientRect.height / 2;
 				var compareRefMidpointY = (refMidpointY) => curY > refMidpointY;
 				var heightAmplifier = -1;
 				var widthAmplifier = 0;
@@ -143,7 +143,7 @@ var LayoutManager = React.createClass({
 			{
 				var curX = clientRect.left + coords.dx;
 				var compareIndices = (refIndex) => refIndex < index;
-				var getRefMidpointX = (refClientRect) => refClientRect.right - refClientRect.width / 2;
+				var getRefMidpointX:any = (refClientRect) => refClientRect.right - refClientRect.width / 2;
 				var compareRefMidpointX = (refMidpointX) => curX < refMidpointX;
 				var heightAmplifier = 0;
 				var widthAmplifier = 1;
@@ -153,7 +153,7 @@ var LayoutManager = React.createClass({
 			{
 				var curX = clientRect.right + coords.dx;
 				var compareIndices = (refIndex) => refIndex > index;
-				var getRefMidpointX = (refClientRect) => refClientRect.left + refClientRect.width / 2;
+				var getRefMidpointX:any = (refClientRect) => refClientRect.left + refClientRect.width / 2;
 				var compareRefMidpointX = (refMidpointX) => curX > refMidpointX;
 				var heightAmplifier = 0;
 				var widthAmplifier = -1;
@@ -310,7 +310,7 @@ var LayoutManager = React.createClass({
 		{
 			// if obj.content is null or undef, then React.cloneElement will error and cause the whole app to break
 
-			var props = { 
+			var props:any = { 
 				onDrag: this.onDragFactory(index),
 				onDrop: this.onDropFactory(index),
 				parentNode: this.refs.layoutManagerDiv,
@@ -354,7 +354,7 @@ var LayoutManager = React.createClass({
 				}
 			}
 
-			var content = React.cloneElement(obj.content, props);
+			var content:any = React.cloneElement(obj.content, props);
 		}
 
 		// check for a nested layout
@@ -391,7 +391,7 @@ var LayoutManager = React.createClass({
 		// TODO clean this up
 		var total = this.getSumThroughIndex(-1), sum = this.getSumThroughIndex(index);
 		var classToPass = colClass;
-		var style = {
+		var style:any = {
 			left: (sum / total) * 100 + '%',
 			width: ((column.colSpan || 1) / total) * 100 + '%'
 		};
@@ -482,4 +482,4 @@ var LayoutManager = React.createClass({
 	},
 });
 
-module.exports = LayoutManager;
+export default LayoutManager;

@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as React from 'react';
 var Actions = require('../../../data/Actions.tsx');
 var Util = require('../../../util/Util.tsx');
-var LayoutManager = require('../../layout/LayoutManager.js');
+import LayoutManager from "../../layout/LayoutManager.tsx";
 import CardInput from './../CardField.tsx';
 var $ = require('jquery');
 
