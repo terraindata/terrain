@@ -60,7 +60,7 @@ var Card = React.createClass({
 		data: React.PropTypes.object.isRequired,
 	},
 
-	getDefaultProps() 
+	getDefaultProps():any
 	{
 		return {
 			drag_x: false,
