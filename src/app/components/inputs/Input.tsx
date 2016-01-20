@@ -43,11 +43,10 @@ THE SOFTWARE.
 */
 
 require('./Input.less');
-var React = require('react');
-var Util = require('../../util/Util.tsx');
+import * as React from 'react';
+import * as Util from '../../util/Util.tsx';
 var PanelMixin = require('../layout/PanelMixin.js');
 var Actions = require('../../data/Actions.tsx');
-var $ = require('jquery');
 
 var Input = React.createClass({
 	mixins: [PanelMixin],
@@ -88,4 +87,4 @@ var Input = React.createClass({
 	},
 });
 
-module.exports = Input;
+export default Input;

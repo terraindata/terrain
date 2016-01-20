@@ -47,7 +47,7 @@ var Util = require('../../util/Util.tsx');
 var PanelMixin = require('../layout/PanelMixin.js');
 var Actions = require('../../data/Actions.tsx');
 var $ = require('jquery');
-var Input = require("../inputs/Input.js");
+var Input = require("../inputs/Input.tsx").default;
 var LayoutManager = require("../layout/LayoutManager.js");
 
 var InputsArea = React.createClass({
