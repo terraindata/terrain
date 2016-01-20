@@ -58,7 +58,7 @@ var Store = require("./data/Store.tsx");
 var Actions = require("./data/Actions.tsx");
 
 // Components
-var Tabs = require("./components/layout/Tabs.js")
+import Tabs from "./components/layout/Tabs.tsx";
 var LayoutManager = require("./components/layout/LayoutManager.js");
 var PanelPlaceholder = require("./components/layout/PanelPlaceholder.js");
 import Card from "./components/cards/Card.tsx";

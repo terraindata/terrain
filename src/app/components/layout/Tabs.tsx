@@ -43,12 +43,11 @@ THE SOFTWARE.
 */
 
 require('./Tabs.less');
-var React = require('react');
-var Util = require('../../util/Util.tsx');
-var $ = require('jquery');
+import * as React from 'react';
+import * as Util from '../../util/Util.tsx';
 var LayoutManager = require("../layout/LayoutManager.js");
 
-var Tabs = React.createClass({
+var Tabs = React.createClass<any, any>({
 	propTypes:
 	{
 		tabs: React.PropTypes.array.isRequired,
@@ -117,4 +116,4 @@ var Tabs = React.createClass({
 	},
 });
 
-module.exports = Tabs;
+export default Tabs;
