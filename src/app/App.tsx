@@ -54,7 +54,7 @@ var ReactDOM = require("react-dom");
 var _ = require("underscore");
 
 // Data
-var Store = require("./data/Store.tsx");
+import Store from "./data/Store.tsx";
 import Actions from "./data/Actions.tsx";
 
 // Components

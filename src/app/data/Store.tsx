@@ -287,4 +287,4 @@ var stateReducer = (state = defaultState, action) =>
 
 let Store = Redux.createStore(stateReducer);
 
-export = Store;
+export default Store;
