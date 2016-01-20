@@ -45,6 +45,16 @@ THE SOFTWARE.
 var _ = require('underscore');
 var Immutable = require('immutable');
 
+/*
+
+Terminology:
+- create
+- change
+- move
+- delete
+
+*/
+
 // prepend str to every item in the array
 var prependArray = (str, arr) => 
 {
@@ -85,11 +95,35 @@ var ActionTypes =
 	newAlgorithm: 'newAlgorithm',
 };
 
+ActionTypes.cards.from = makeObject('cards.from', [
+	'changeGroup',
+]);
+ActionTypes.cards.from.join = makeObject('cards.from.join', [
+	'create',
+	'changeGroup',
+	'changeFirstProperty',
+	'changeSecondProperty',
+	'changeOperator'
+]);
+
 ActionTypes.cards.select = makeObject('cards.select', [
 	'moveField',
-	'newField',
+	'createField',
 	'deleteField',
 	'changeField',
+]);
+
+ActionTypes.cards.order = makeObject('cards.order', [
+	'changeProperty',
+	'changeDirection',
+]);
+
+ActionTypes.cards.filter = makeObject('cards.filter', [
+	'createFilter',
+	'changeFirstProperty',
+	'changeSecondProperty',
+	'changeOperator',
+	'changeCombinator'
 ]);
 
 

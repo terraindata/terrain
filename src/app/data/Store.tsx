@@ -145,6 +145,16 @@ var selectCardReducer = (cards = [], action) =>
 		case ActionTypes.cards.select.deleteField:
 			select.fields.splice(action.payload.fieldIndex, 1);
 			break;
+		case ActionTypes.cards.select.createField:
+			if(action.payload.fieldIndex === -1 || action.payload.fieldIndex === undefined || action.payload.fieldIndex === null)
+			{
+				select.fields.push(""); // TODO update with field type
+			}
+			else
+			{
+				select.fields.splice(action.payload.fieldIndex, 0, "");  // TODO update with field type
+			}
+			break;
 		default:
 			// ActionType not applicable, return normal cards
 			return cards;

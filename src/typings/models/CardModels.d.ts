@@ -77,6 +77,7 @@ interface Property
   value: Value;
 
   // TODO may need to consider static values (e.g. "17"), or compiled values (e.g. from a Let card)
+  //  or freeform TQL, or functions
 }
 
 interface Comparison
@@ -94,19 +95,22 @@ interface CardModel
   type: string; // Note: type may not be necessary, thanks to typescript
 }
 
+
+interface Join
+{
+  group: Group;
+  comparison: Comparison;
+}
+
 interface FromCardModel extends CardModel
 {
   from:
   {
     group: Group;
-    joins: [
-      {
-        group: Group;
-        comparison: Comparison;
-      }
-    ]
+    joins: Join[];
   }  
 }
+
 
 interface SelectCardModel extends CardModel
 {
@@ -116,13 +120,23 @@ interface SelectCardModel extends CardModel
   }
 }
 
+
+interface Order
+{
+  property: Property;
+  direction: Direction;
+}
+
 interface OrderCardModel extends CardModel
 {
-  order:
-  {
-    property: Property;
-    direction: Direction;
-  }
+  order: Order;
+}
+
+
+interface Filter
+{  
+ comparison: Comparison;
+ combinator: Combinator;   
 }
 
 interface FilterCardModel extends CardModel
@@ -130,12 +144,7 @@ interface FilterCardModel extends CardModel
   filter:
   {
     // TODO adapt this model to support order of operations appropriately
-    filters: [
-      {
-         comparison: Comparison;
-         combinator: Combinator;   
-      }
-    ]
+    filters: Filter[];
   }
 }
 

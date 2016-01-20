@@ -80,6 +80,11 @@ const create =
    	   	ActionTypes.cards.select.deleteField,
       	(card: any, fieldIndex: number) => ({card, fieldIndex})
 			),
+
+			createField: createAction<CreateSelectCardFieldPayload>(
+				ActionTypes.cards.select.createField,
+				(card: any, fieldIndex: number) => ({card, fieldIndex})
+			),
 		},
 	}, // /cards
 

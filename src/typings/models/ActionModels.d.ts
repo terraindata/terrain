@@ -42,6 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+/*
+
+Terminology and general payloads:
+- create
+    may contain an index at which to create
+    otherwise it is assumed to create at the end position
+- change
+    contains identifying info (index, card, etc.) and the value to change to
+- move
+    contains identifying info (index, card, etc.) and the index to move to
+- delete
+    contains identifying info
+
+*/
+
 interface Action
 {
   type: string;
@@ -52,51 +67,63 @@ interface NewAlgorithmPayload {}
 
 // Generic Payload Types
 
-interface MovePayload
+interface IndexedPayload
 {
   index: number;
 }
 
-interface CreatePayload
-{
-  index: number;
-}
+interface MovePayload extends IndexedPayload {}
+interface CreatePayload extends IndexedPayload {}
+interface DeletePayload extends IndexedPayload {}
 
 interface ChangePayload<T>
 {
   value: T;
 }
 
-interface DeletePayload
-{
-  index: number;
-}
-
-
-// Section: Card Actions
 
 interface CardPayload
 {
-  card: any; // TODO make a Card class
+  card: CardModel;
 }
 
 interface CreateCardPayload extends CardPayload, CreatePayload {}
 interface MoveCardPayload extends CardPayload, MovePayload {}
 
 
-// Sub-section: Select Card
+interface FromCardPayload extends CardPayload {
+  card: FromCardModel;
+}
+interface ChangeFromCardGroupPayload extends FromCardPayload, ChangePayload<Group> {}
+interface CreateJoinPayload extends FromCardPayload, CreatePayload {}
+interface DeleteJoinPayload extends FromCardPayload, DeletePayload {}
+interface ChangeJoinPayload extends FromCardPayload, IndexedPayload, ChangePayload<Join> {}
+
 
 interface SelectCardPayload extends CardPayload
 {
-  fieldIndex: number;
+  card: SelectCardModel;
+  fieldIndex: number; // TODO change this
 }
 
 interface MoveSelectCardFieldPayload extends SelectCardPayload, MovePayload {}
 interface ChangeSelectCardFieldPayload extends SelectCardPayload, ChangePayload<string> {}
 interface DeleteSelectCardFieldPayload extends SelectCardPayload {}
+interface CreateSelectCardFieldPayload extends SelectCardPayload {}
 
 
-// Inputs
+interface OrderCardPayload extends CardPayload {
+  card: OrderCardModel;
+}
+interface ChangeOrderCardPayload extends OrderCardPayload, ChangePayload<Order> {}
+
+
+interface FilterCardPayload extends CardPayload {
+  card: FilterCardModel;
+}
+interface CreateFilterPayload extends FilterCardPayload, CreatePayload {}
+interface ChangeFilterPayload extends FilterCardPayload, IndexedPayload, ChangePayload<Filter> {}
+
 
 interface InputPayload
 {
@@ -109,8 +136,6 @@ interface ChangeInputValuePayload extends InputPayload, ChangePayload<string> {}
 interface ChangeInputKeyPayload extends InputPayload, ChangePayload<string> {}
 interface DeleteInputPayload extends InputPayload, DeletePayload {}
 
-
-// Results
 
 interface ResultPayload
 {
