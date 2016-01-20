@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./Result.less');
 import * as React from 'react';
 import * as Util from '../../util/Util.tsx';
-var PanelMixin = require('../layout/PanelMixin.js');
+import PanelMixin from '../layout/PanelMixin.tsx';
 var $ = require('jquery');
 
 var Result = React.createClass<any, any>({

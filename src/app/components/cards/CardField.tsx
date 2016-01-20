@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./CardField.less');
 import * as React from 'react';
 var Util = require('../../util/Util.tsx');
-var PanelMixin = require('../layout/PanelMixin.js');
+import PanelMixin from '../layout/PanelMixin.tsx';
 
 var CardField = React.createClass({
 	mixins: [PanelMixin],

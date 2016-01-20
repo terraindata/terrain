@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 require('./panel.less');
-var React = require('react');
+import * as React from 'react';
 var _ = require('underscore');
 var ReactDOM = require('react-dom');
 var Util = require('../../util/Util.tsx');
@@ -198,7 +198,7 @@ var Panel = {
 
 	dragTo(x, y) 
 	{
-		var draggedTo = { x: 0, y: 0 };
+		var draggedTo:any = { x: 0, y: 0 };
 
 		$('input').blur();
 
@@ -328,7 +328,7 @@ var Panel = {
 		// Coordinate these classNames with panel.css/less
 		var panelClass = 'panel';
 
-		var style = {};
+		var style:React.CSSProperties = {};
 
 		if(this.props.dx) 
 		{
@@ -371,4 +371,4 @@ var Panel = {
 	},
 };
 
-module.exports = Panel;
+export default Panel;
