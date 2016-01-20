@@ -157,4 +157,4 @@ var Actions =
 	newDispatch: Store.dispatch,
 };
 
-export = Actions;
+export default Actions;

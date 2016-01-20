@@ -46,7 +46,7 @@ require('./Input.less');
 import * as React from 'react';
 import * as Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
-var Actions = require('../../data/Actions.tsx');
+import Actions from "../../data/Actions.tsx";
 
 var Input = React.createClass({
 	mixins: [PanelMixin],

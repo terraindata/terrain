@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 require('./card.less');
-var Actions = require('../../data/Actions.tsx');
+import Actions from "../../data/Actions.tsx";
 import * as React from 'react';
 import * as Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
