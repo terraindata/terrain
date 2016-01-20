@@ -49,7 +49,7 @@ import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CardInput from './CardField.tsx';
-var SelectCard = require('./card-types/SelectCard.tsx');
+import SelectCard from './card-types/SelectCard.tsx';
 
 var Card = React.createClass({
 	mixins: [PanelMixin],
@@ -95,7 +95,7 @@ var Card = React.createClass({
 		switch(this.props.data.type)
 		{
 			case 'select':
-				content = <SelectCard />;
+				content = <SelectCard {...this.props} />;
 				subBar = 
 				{
 					content: '+',
