@@ -105,10 +105,6 @@ var Panel = {
 		if(!this.state.scrollingParentUp && !this.state.scrollingParentDown && !this.state.scrollVelocity)
 		{
 			// fast break
-			// this.setState({
-			// 	scrollVelocity: 0,
-			// 	draggedTo: null,
-			// });
 			return;
 		}
 
@@ -202,14 +198,30 @@ var Panel = {
 
 		$('input').blur();
 
-		if(this.props.dragInsideOnly)
+		if(this.props.dragInsideOnly && this.parentNode())
 		{
-			y = Util.valueMinMax(y,
-					this.parentNode().getBoundingClientRect().top + this.state.oy - this.state.ocr.top,
-					this.parentNode().getBoundingClientRect().bottom + this.state.oy - this.state.ocr.bottom);
-			x = Util.valueMinMax(x,
-					this.parentNode().getBoundingClientRect().left + this.state.ox - this.state.ocr.left,
-					this.parentNode().getBoundingClientRect().right + this.state.ox - this.state.ocr.right);
+			// must have parentNode() passed in correctly for this to work
+			var minY = this.parentNode().getBoundingClientRect().top + this.state.oy - this.state.ocr.top;
+			var maxY = this.parentNode().getBoundingClientRect().bottom + this.state.oy - this.state.ocr.bottom;
+			y = Util.valueMinMax(y, minY, maxY);
+
+			var minX = this.parentNode().getBoundingClientRect().left + this.state.ox - this.state.ocr.left;
+			var maxX = this.parentNode().getBoundingClientRect().right + this.state.ox - this.state.ocr.right;
+			x = Util.valueMinMax(x,minX, maxX);
+
+			// automatically scroll if at boundaries
+			if(y === minY)
+			{
+				this.startScrollingParentUp();
+			}
+			else if(y === maxY)
+			{
+				this.startScrollingParentDown();
+			}
+			else
+			{
+				this.stopScrollingParent();
+			}
 		}
 
 		if(this.canDrag('x')) 
@@ -223,7 +235,21 @@ var Panel = {
 
 		if(this.canDrag('y')) 
 		{
-			var scrollOffset = this.parentNode() ? (this.state.oScrollTop - this.parentNode().scrollTop) : 0;
+			var scrollOffset = 0;
+			if(this.parentNode())
+			{
+				if(isNaN(this.state.oScrollTop))
+				{
+					// need to correct for the oScrollTop which wasn't set on startDrag,
+					//  since we didn't yet have parentNode()
+					this.setState({
+						oScrollTop: this.parentNode().scrollTop,
+					});
+				}
+				scrollOffset = this.state.oScrollTop - this.parentNode().scrollTop;
+			}
+
+			
 			this.setState({
 				dy: y - this.state.oy - scrollOffset,
 			});
@@ -241,19 +267,6 @@ var Panel = {
 				x: this.state.ox,
 				y: this.state.oy,
 			});
-		}
-
-		if(y < 30)
-		{
-			this.startScrollingParentUp();
-		}
-		else if(y > this.parentNode().getBoundingClientRect().height - 30)
-		{
-			this.startScrollingParentDown();
-		}
-		else
-		{
-			this.stopScrollingParent();
 		}
 	},
 
