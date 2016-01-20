@@ -42,18 +42,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Type definitions for redux-actions v0.8.0
+// Project: https://github.com/acdlite/redux-actions
+// Definitions by: Jack Hsu <https://github.com/jaysoo>
+// Definitions: https://github.com/borisyankov/DefinitelyTyped
+declare module ReduxActions {
+    // FSA-compliant action.
+    // See: https://github.com/acdlite/flux-standard-action
+    type Action = {
+        type: string
+        payload?: any
+        error?: boolean
+        meta?: any
+    };
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
+    type PayloadCreator<T> = (...args: any[]) => T;
+    type MetaCreator = (...args: any[]) => any;
 
-/// <reference path="models/ActionModels.d.ts" />
-/// <reference path="models/CardModels.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
-/// <reference path="redux-actions/redux-actions.d.ts" />
+    type Reducer<T> = (state: T, action: Action) => T;
 
-declare var require: any;
+    type ReducerMap<T> = {
+        [actionType: string]: Reducer<T>
+    };
 
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
+    export function createAction<T>(actionType: string, payloadCreator?: PayloadCreator<T>, metaCreator?: MetaCreator): (...args: any[]) => Action;
+
+    export function handleAction<T>(actionType: string, reducer: Reducer<T> | ReducerMap<T>): Reducer<T>;
+
+    export function handleActions<T>(reducerMap: ReducerMap<T>, initialState?: T): Reducer<T>;
 }
+
+declare module 'redux-actions' {
+    export = ReduxActions;
+}
+

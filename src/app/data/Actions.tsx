@@ -46,7 +46,7 @@ var _ = require('underscore');
 import ActionTypes from './ActionTypes.tsx';
 import Store from './Store.tsx';
 
-import ReduxActions = require('redux-actions');
+import * as ReduxActions from 'redux-actions';
 var createAction = ReduxActions.createAction;
 
 // object of action creators
