@@ -47,7 +47,7 @@ var Util = require('../../util/Util.tsx');
 var PanelMixin = require('../layout/PanelMixin.js');
 var Actions = require('../../data/Actions.tsx');
 var $ = require('jquery');
-var Card = require("../cards/Card.js");
+var Card = require("../cards/Card.tsx").default;
 var LayoutManager = require("../layout/LayoutManager.js");
 
 var CardsArea = React.createClass({

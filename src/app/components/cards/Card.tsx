@@ -44,14 +44,13 @@ THE SOFTWARE.
 
 require('./card.less');
 var Actions = require('../../data/Actions.tsx');
-var React = require('react');
-var Util = require('../../util/Util.tsx');
+import * as React from 'react';
+import * as Util from '../../util/Util.tsx';
 var PanelPlaceholder = require('../layout/PanelPlaceholder.js');
 var PanelMixin = require('../layout/PanelMixin.js');
 var LayoutManager = require('../layout/LayoutManager.js');
 var CardInput = require('./CardField.js');
 var SelectCard = require('./card-types/SelectCard.tsx');
-var $ = require('jquery');
 
 var Card = React.createClass({
 	mixins: [PanelMixin],
@@ -125,7 +124,7 @@ var Card = React.createClass({
 			if(subBar)
 			{
 				subBarToDisplay = (
-					<div className='card-sub-bar' onCick={subBar.onClick}>
+					<div className='card-sub-bar' onClick={subBar.onClick}>
 						<div className='card-sub-bar-inner'>
 							{subBar.content}
 						</div>
@@ -150,4 +149,4 @@ var Card = React.createClass({
 	},
 });
 
-module.exports = Card;
+export default Card;
