@@ -46,7 +46,6 @@ require('./card.less');
 var Actions = require('../../data/Actions.tsx');
 import * as React from 'react';
 import * as Util from '../../util/Util.tsx';
-var PanelPlaceholder = require('../layout/PanelPlaceholder.js');
 var PanelMixin = require('../layout/PanelMixin.js');
 var LayoutManager = require('../layout/LayoutManager.js');
 import CardInput from './CardField.tsx';

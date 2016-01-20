@@ -60,7 +60,6 @@ var Actions = require("./data/Actions.tsx");
 // Components
 import Tabs from "./components/layout/Tabs.tsx";
 var LayoutManager = require("./components/layout/LayoutManager.js");
-var PanelPlaceholder = require("./components/layout/PanelPlaceholder.js");
 import Card from "./components/cards/Card.tsx";
 import Result from "./components/results/Result.tsx";
 import InputsArea from "./components/inputs/InputsArea.tsx";
