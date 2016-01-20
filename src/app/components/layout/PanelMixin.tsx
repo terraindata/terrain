@@ -202,7 +202,12 @@ var Panel = {
 
 		$('input').blur();
 
-		if(this.props.dragInsideOnly)
+		// TODO remove the this.parentNode() check, figure out how to get
+		//  parentNode to come in correctly on the first time
+		// currently there is a bug where the first drag won't work completely
+		// (it doesn't get parentNode correctly, so it won't scroll the container and
+		// it won't be bound by the parent)
+		if(this.props.dragInsideOnly && this.parentNode())
 		{
 			y = Util.valueMinMax(y,
 					this.parentNode().getBoundingClientRect().top + this.state.oy - this.state.ocr.top,
@@ -223,7 +228,21 @@ var Panel = {
 
 		if(this.canDrag('y')) 
 		{
-			var scrollOffset = this.parentNode() ? (this.state.oScrollTop - this.parentNode().scrollTop) : 0;
+			var scrollOffset = 0;
+			if(this.parentNode())
+			{
+				if(isNaN(this.state.oScrollTop))
+				{
+					// need to correct for the oScrollTop which wasn't set on startDrag,
+					//  since we didn't yet have parentNode()
+					this.setState({
+						oScrollTop: this.parentNode().scrollTop,
+					});
+				}
+				scrollOffset = this.state.oScrollTop - this.parentNode().scrollTop;
+			}
+
+			
 			this.setState({
 				dy: y - this.state.oy - scrollOffset,
 			});
