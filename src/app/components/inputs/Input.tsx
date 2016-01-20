@@ -48,7 +48,7 @@ import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/Actions.tsx";
 
-var Input = React.createClass({
+var Input = React.createClass<any, any>({
 	mixins: [PanelMixin],
 
 	propTypes:
