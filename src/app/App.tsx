@@ -65,7 +65,7 @@ import Card from "./components/cards/Card.tsx";
 import Result from "./components/results/Result.tsx";
 import InputsArea from "./components/inputs/InputsArea.tsx";
 import CardsArea from "./components/cards/CardsArea.tsx";
-var ResultsArea = require("./components/results/ResultsArea.js");
+import ResultsArea from "./components/results/ResultsArea.tsx";
 
 
 var App = React.createClass({
