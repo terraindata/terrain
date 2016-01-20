@@ -42,46 +42,74 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var React = require('react');
-var Util = require('../../util/Util.js');
-var PanelMixin = require('../layout/PanelMixin.js');
-var Actions = require('../../data/Actions.js');
-var $ = require('jquery');
-var Result = require("../results/Result.js");
-var LayoutManager = require("../layout/LayoutManager.js");
+require('./CardField.less');
+import * as React from 'react';
+import Util from '../../util/Util.tsx';
+import PanelMixin from '../layout/PanelMixin.tsx';
 
-var ResultsArea = React.createClass({
+var CardField = React.createClass({
+	mixins: [PanelMixin],
+
 	propTypes:
 	{
-		results: React.PropTypes.array.isRequired,
+		value: React.PropTypes.string,
+		onChange: React.PropTypes.func.isRequired,
+		onDelete: React.PropTypes.func,
+	},
+
+	getDefaultProps():any 
+	{
+		return {
+			drag_x: false,
+			drag_y: true,
+			reorderOnDrag: true,
+			value: '',
+			handleRef: 'handle',
+		};
+	},
+
+	willReceiveNewProps(newProps)
+	{
+		this.setState({
+			value: newProps.value,
+		});
+	},
+
+	getInitialState()
+	{
+		return {
+			value: this.props.value,
+		};
+	},
+
+	handleChange(event)
+	{
+		this.setState({
+			value: event.target.value,
+		});
+
+		this.props.onChange(event.target.value);
+	},
+
+	deleteField(event)
+	{
+		if(typeof this.props.onDelete === 'function')
+		{
+			this.props.onDelete();
+		}
 	},
 
 	render() {
-		var layout = {
-			cells: this.props.results.map((result) => {
-				return {
-					content: <Result data={result} />,
-				};
-			}),
-			cellHeight: 150,
-			cellWidth: {
-				0: 1,
-				300: 2,
-				650: 1,
-				1200: 2,
-				1850: 3,
-				2400: 4,
-			},
-			fullHeight: true,
-		};
-
-		var moveTo = (curIndex, newIndex) =>
-    {
-      Actions.dispatch.moveResult(this.props.results[curIndex], newIndex);
-    };
-
-		return <LayoutManager layout={layout} moveTo={moveTo} />;
+		return this.renderPanel((
+			<div className='card-field'>
+				<div className='card-field-inner'>
+					<div className='card-field-handle' ref='handle'>⋮⋮</div>
+					<input type="text" value={this.props.value} onChange={this.handleChange} />
+					<div className='card-field-delete' onClick={this.deleteField}>&times;</div>
+				</div>
+			</div>
+			));
 	},
 });
 
-module.exports = ResultsArea;
+export default CardField;

@@ -42,75 +42,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./CardField.less');
-var React = require('react');
-var Util = require('../../util/Util.js');
-var PanelMixin = require('../layout/PanelMixin.js');
-var $ = require('jquery');
+import * as React from 'react';
+import Util from '../../util/Util.tsx';
+import PanelMixin from '../layout/PanelMixin.tsx';
+import Actions from "../../data/Actions.tsx";
+import Card from "../cards/Card.tsx";
+import LayoutManager from "../layout/LayoutManager.tsx";
 
-var CardField = React.createClass({
-	mixins: [PanelMixin],
-
+var CardsArea = React.createClass<any, any>({
 	propTypes:
 	{
-		value: React.PropTypes.string,
-		onChange: React.PropTypes.func.isRequired,
-		onDelete: React.PropTypes.func,
-	},
-
-	getDefaultProps() 
-	{
-		return {
-			drag_x: false,
-			drag_y: true,
-			reorderOnDrag: true,
-			value: '',
-			handleRef: 'handle',
-		};
-	},
-
-	willReceiveNewProps(newProps)
-	{
-		this.setState({
-			value: newProps.value,
-		});
-	},
-
-	getInitialState()
-	{
-		return {
-			value: this.props.value,
-		};
-	},
-
-	handleChange(event)
-	{
-		this.setState({
-			value: event.target.value,
-		});
-
-		this.props.onChange(event.target.value);
-	},
-
-	deleteField(event)
-	{
-		if(typeof this.props.onDelete === 'function')
-		{
-			this.props.onDelete();
-		}
+		cards: React.PropTypes.array.isRequired,
 	},
 
 	render() {
-		return this.renderPanel((
-			<div className='card-field'>
-				<div className='card-field-inner'>
-					<div className='card-field-handle' ref='handle'>⋮⋮</div>
-					<input type="text" value={this.props.value} onChange={this.handleChange} />
-					<div className='card-field-delete' onClick={this.deleteField}>&times;</div>
-				</div>
-			</div>
-			));
+		var layout = {
+			rows: this.props.cards.map((card) => {
+				return {
+					content: <Card name={card.name} data={card} />,
+				};
+			}),
+			fullHeight: true,
+		};
+
+		var moveTo = (curIndex, newIndex) =>
+    {
+      Actions.dispatch.cards.move(this.props.cards[curIndex], newIndex);
+    };
+
+		return <LayoutManager layout={layout} moveTo={moveTo} />;
 	},
 });
 
-module.exports = CardField;
+export default CardsArea;

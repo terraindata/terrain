@@ -42,49 +42,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var ReactDOM = require('react-dom');
-var _ = require('underscore');
+import * as React from 'react';
+import Util from '../../util/Util.tsx';
+import PanelMixin from '../layout/PanelMixin.tsx';
+import Actions from "../../data/Actions.tsx";
+import Result from "../results/Result.tsx";
+import LayoutManager from "../layout/LayoutManager.tsx";
 
-var Util = {
-	// Return a random integer [min, max)
-	// assumes min of 0 if not passed.
-	randInt() 
+var ResultsArea = React.createClass<any, any>({
+	propTypes:
 	{
-		var min = arguments[0], max = arguments[1];
-		if(arguments.length === 1) {
-			min = 0;
-			max = arguments[0];
-		}
-
-		return Math.floor(Math.random() * max - min) + min;
+		results: React.PropTypes.array.isRequired,
 	},
 
-	isInt(num)
-	{
-		return num === parseInt(num, 10);
-	},
+	render() {
+		var layout = {
+			cells: this.props.results.map((result) => {
+				return {
+					content: <Result data={result} />,
+				};
+			}),
+			cellHeight: 150,
+			cellWidth: {
+				0: 1,
+				300: 2,
+				650: 1,
+				1200: 2,
+				1850: 3,
+				2400: 4,
+			},
+			fullHeight: true,
+		};
 
-	parentNode(reactNode)
-	{
-		return ReactDOM.findDOMNode(reactNode).parentNode;
-	},
+		var moveTo = (curIndex, newIndex) =>
+    {
+      Actions.dispatch.moveResult(this.props.results[curIndex], newIndex);
+    };
 
-	valueMinMax(value, min, max)
-	{
-		return Math.min(Math.max(value, min), max);
+		return <LayoutManager layout={layout} moveTo={moveTo} />;
 	},
+});
 
-	// accepts object of key/vals like this: { 'className': include? }
-	objToClassname(obj)
-	{
-		return _.reduce(obj, (classNameArray, include, className) => {
-				if(include)
-				{
-					classNameArray.unshift(className);
-				}
-				return classNameArray;
-			}, []).join(" ");
-	},
-};
-
-module.exports = Util;
+export default ResultsArea;

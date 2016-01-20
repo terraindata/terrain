@@ -42,14 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-/// <reference path="../../../../typings/tsd.d.ts" />
-
 import * as React from 'react';
-var Actions = require('../../../data/Actions.js');
-var Util = require('../../../util/Util.js');
-var LayoutManager = require('../../layout/LayoutManager.js');
-var CardInput = require('./../CardField.js');
-var $ = require('jquery');
+import Actions from "../../../data/Actions.tsx";
+import Util from '../../../util/Util.tsx';
+import LayoutManager from "../../layout/LayoutManager.tsx";
+import CardInput from './../CardField.tsx';
 
 interface Props {
   data: {
@@ -105,4 +102,4 @@ class SelectCard extends React.Component<Props, any>
 	}
 };
 
-export = SelectCard;
+export default SelectCard;

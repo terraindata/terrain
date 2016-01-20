@@ -50,7 +50,7 @@ module.exports = {
         filename: "bundle.js"
     },
     resolve: {
-        extensions: [ '', '.js', '.css', '.less', '.tsx' ]
+        extensions: [ '', '.js', '.css', '.less', '.tsx', '.json' ]
     },
     module: {
         loaders: [
@@ -62,7 +62,8 @@ module.exports = {
             { test: /\.eot$/, loader: "file" },
             { test: /\.svg$/, loader: "file" },
             { test: require.resolve('jquery'), loader: "expose?jQuery" },
-            { test: /\.tsx$/, loader: 'babel!ts-loader' }
+            { test: /\.tsx$/, loader: 'babel!ts-loader' },
+            { test: /\.json$/, loader: 'json' }
         ]
     }
 };

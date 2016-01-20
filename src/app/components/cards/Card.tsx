@@ -42,95 +42,110 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-/// <reference path="../typings/tsd.d.ts" />
-
-// Style
-require("./GeneralStyle.less");
-
-// Libraries
+require('./card.less');
+import Actions from "../../data/Actions.tsx";
 import * as React from 'react';
-import * as ReactDOM from "react-dom";
-var _ = require("underscore");
+import Util from '../../util/Util.tsx';
+import PanelMixin from '../layout/PanelMixin.tsx';
+import LayoutManager from "../layout/LayoutManager.tsx";
+import CardInput from './CardField.tsx';
+import SelectCard from './card-types/SelectCard.tsx';
 
-// Data
-import Store from "./data/Store.tsx";
-import Actions from "./data/Actions.tsx";
+var Card = React.createClass({
+	mixins: [PanelMixin],
 
-// Components
-import Tabs from "./components/layout/Tabs.tsx";
-import LayoutManager from "./components/layout/LayoutManager.tsx";
-import Card from "./components/cards/Card.tsx";
-import Result from "./components/results/Result.tsx";
-import InputsArea from "./components/inputs/InputsArea.tsx";
-import CardsArea from "./components/cards/CardsArea.tsx";
-import ResultsArea from "./components/results/ResultsArea.tsx";
+	propTypes:
+	{
+		data: React.PropTypes.object.isRequired,
+	},
 
+	getDefaultProps():any
+	{
+		return {
+			drag_x: false,
+			drag_y: true,
+			reorderOnDrag: true,
+			handleRef: 'handle',
+		};
+	},
 
-var App = React.createClass({
+	getInitialState()
+	{
+		return {
+			open: true,
+		}
+	},
 
-  getInitialState () {
-    Store.subscribe(() => {
-      this.setState(Store.getState());
-    });
+	handleTitleClick()
+	{
+		if(!this.state.moved)
+		{
+			// this.state.moved is updated in panelMixin
+			this.setState({
+				open: !this.state.open,
+			});
+		}
+	},
 
-    return Store.getState();
-  },
+	render() {
 
-  handleNewAlgorithmTab () {
-    Actions.dispatch.newAlgorithm();
-  },
+		var content;
+		var subBar;
 
-  render () {
-    var cardTabs = _.map(this.state.cardGroups, (cardGroup) => {
-      return {
-        content: <CardsArea cards={cardGroup.cards} />,
-        tabName: 'Algorithm ' + cardGroup.id,
-      };
-    });
-    cardTabs.push({
-      content: null,
-      tabName: '+',
-      onClick: this.handleNewAlgorithmTab,
-    });
+		switch(this.props.data.type)
+		{
+			case 'select':
+				content = <SelectCard {...this.props} />;
+				subBar = 
+				{
+					content: '+',
+					onClick: () => {
+						console.log('add click');
+					},
+				};
 
-    var resultTabs = _.map(this.state.resultGroups, (resultGroup) => {
-      return {
-        content: <ResultsArea results={resultGroup.results} />,
-        tabName: 'Alg. ' + resultGroup.id + ' Results',
-      };
-    });
+				break;
+			default:
+				content = <div>This card has not been implemented yet.</div>
+		}
+		content = React.cloneElement(content, this.props);
 
-    var inputs = this.state.inputs;
-    var inputTabs = [{
-      content: <InputsArea inputs={inputs} />,
-      tabName: 'Inputs',
-    }]
+		var contentToDisplay;
+		var subBarToDisplay;
+		if(this.state.open)
+		{
+			contentToDisplay = (
+				<div className='card-content'>
+					{content}
+				</div>
+			);
 
-  	var layout = {
-  		stackAt: 650,
-      fullHeight: true,
-  		columns: [
-  			{
-  				content: <Tabs tabs={inputTabs} title="Inputs" />,
-  			},
-  			{
-          colSpan: 2,
-          content: <Tabs tabs={cardTabs} title="Builder" />
-        },
-        {
-          content: <Tabs tabs={resultTabs} title="Results" />
-        },
-  		]
-  	};
+			if(subBar)
+			{
+				subBarToDisplay = (
+					<div className='card-sub-bar' onClick={subBar.onClick}>
+						<div className='card-sub-bar-inner'>
+							{subBar.content}
+						</div>
+					</div>
+				);
+			}
+		}
 
-    return (
-      <LayoutManager layout={layout} />
-    );
-  }
+		var title = this.props.data.type.charAt(0).toUpperCase() + this.props.data.type.substr(1);
 
+		return this.renderPanel((
+			<div className='card'>
+				<div className='card-inner'>
+					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>
+						{title}
+					</div>
+					{ contentToDisplay }
+					{ subBarToDisplay }
+				</div>
+			</div>
+			));
+	},
 });
 
-ReactDOM.render(<App />, document.getElementById('app'), function () {
-  // require('./tests').run(this);
-  // TODO: tests here.
-});
+export default Card;

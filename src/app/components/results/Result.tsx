@@ -42,50 +42,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Input.less');
-var React = require('react');
-var Util = require('../../util/Util.js');
-var PanelMixin = require('../layout/PanelMixin.js');
-var Actions = require('../../data/Actions.js');
-var $ = require('jquery');
+require('./Result.less');
+import * as React from 'react';
+import Util from '../../util/Util.tsx';
+import PanelMixin from '../layout/PanelMixin.tsx';
 
-var Input = React.createClass({
+var Result = React.createClass<any, any>({
 	mixins: [PanelMixin],
 
 	propTypes:
 	{
-		input: React.PropTypes.object.isRequired,
+		data: React.PropTypes.object.isRequired,
+		parentNode: React.PropTypes.object,
 	},
 
 	getDefaultProps() 
 	{
 		return {
-			drag_x: false,
+			drag_x: true,
 			drag_y: true,
 			reorderOnDrag: true,
+			dragInsideOnly: true,
 		};
-	},
-
-	changeKey(event)
-	{
-		Actions.dispatch.inputs.changeKey(this.props.input, event.target.value);
-	},
-
-	changeValue(event)
-	{
-		Actions.dispatch.inputs.changeValue(this.props.input, event.target.value);
 	},
 
 	render() {
 		return this.renderPanel((
-			<div className='input'>
-				<div className='input-inner'>
-					<input type="text" value={this.props.input.key} onChange={this.changeKey} className="input-text input-text-first" />
-					<input type="text" value={this.props.input.value} onChange={this.changeValue} className="input-text input-text-second" />
+			<div className='result'>
+				<div className='result-inner'>
+					<div className='result-name'>
+						{this.props.data.name}
+					</div>
+					<div className='result-score'>
+					</div>
 				</div>
 			</div>
 			));
 	},
 });
 
-module.exports = Input;
+export default Result;

@@ -42,37 +42,109 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var React = require('react');
-var Util = require('../../util/Util.js');
-var PanelMixin = require('../layout/PanelMixin.js');
-var Actions = require('../../data/Actions.js');
-var $ = require('jquery');
-var Input = require("../inputs/Input.js");
-var LayoutManager = require("../layout/LayoutManager.js");
+declare type ID = number;
+declare type Group = string;
+declare type Key = string;
+declare type Value = string;
 
-var InputsArea = React.createClass({
-	propTypes:
-	{
-		inputs: React.PropTypes.array.isRequired,
-	},
+declare enum Operator
+{
+  EQ,
+  NE,
+  GT,
+  GE,
+  LT,
+  LE
+}
 
-	render() {
-		var layout = {
-			rows: this.props.inputs.map((input) => {
-				return {
-					content: <Input input={input} />,
-				};
-			}),
-			fullHeight: true,
-		};
+declare enum Direction
+{
+  ASC,
+  DESC
+}
 
-		var moveTo = (curIndex, newIndex) =>
-    {
-      Actions.dispatch.inputs.move(curIndex, newIndex);
-    };
+declare enum Combinator
+{
+  AND,
+  OR
+}
 
-		return <LayoutManager layout={layout} moveTo={moveTo} />;
-	},
-});
 
-module.exports = InputsArea;
+interface Property
+{
+  group: Group;
+  key: Key;
+  value: Value;
+
+  // TODO may need to consider static values (e.g. "17"), or compiled values (e.g. from a Let card)
+  //  or freeform TQL, or functions
+}
+
+interface Comparison
+{
+  first: Property;
+  second: Property;
+  operator: Operator;
+}
+
+
+
+interface CardModel
+{
+  id: ID;
+  type: string; // Note: type may not be necessary, thanks to typescript
+}
+
+
+interface Join
+{
+  group: Group;
+  comparison: Comparison;
+}
+
+interface FromCardModel extends CardModel
+{
+  from:
+  {
+    group: Group;
+    joins: Join[];
+  }  
+}
+
+
+interface SelectCardModel extends CardModel
+{
+  select: 
+  {
+    properties: Property[];
+  }
+}
+
+
+interface Order
+{
+  property: Property;
+  direction: Direction;
+}
+
+interface OrderCardModel extends CardModel
+{
+  order: Order;
+}
+
+
+interface Filter
+{  
+ comparison: Comparison;
+ combinator: Combinator;   
+}
+
+interface FilterCardModel extends CardModel
+{
+  filter:
+  {
+    // TODO adapt this model to support order of operations appropriately
+    filters: Filter[];
+  }
+}
+

@@ -102,6 +102,10 @@ From `master` branch:
 npm run deploy
 ```
 
+## Useful Tutorials
+
+- [http://jaysoo.ca/2015/09/26/typed-react-and-redux/]
+
 ## Code Overview
 
 ### Layout
@@ -134,13 +138,13 @@ An action object contains:
 1. A string `type` which is unique that type of action
 2. Any metadata applicable to that action
 
-The types of actions that we can dispatch are located in `src/app/data/ActionTypes.js`. These are nested / namespaced / categorized (e.g. `ActionTypes.cards.select.moveField => "cards.select.moveField"` or `ActionTypes.inputs.changeKey => "inputs.changeKey"`). More details and helper functions are located in that file.
+The types of actions that we can dispatch are located in `src/app/data/ActionTypes.tsx`. These are nested / namespaced / categorized (e.g. `ActionTypes.cards.select.moveField => "cards.select.moveField"` or `ActionTypes.inputs.changeKey => "inputs.changeKey"`). More details and helper functions are located in that file.
 
-Redux works well with "action creators" and "action dispatchers". Both are defined in `src/app/data/Actions.js` (though we may need to break them out into separate files later). Action creators are functions that accept structured arguments and return an action with the appropriate type and metadata (e.g. `Actions.create.cards.select.moveField(card, fieldIndex, newIndex)` will return an action with `{type: ActionTypes.cards.select.moveField, card: card, curIndex: fieldIndex, newIndex: newIndex }`). Action dispatchers are functions with the same parameters as the creators that both create the action and dispatch it to the store. For every action creator that we have, a dispatcher is automatically made. In practice, you will probably only need to use the dispatchers, and not the creators, but it may be helpful to have both.
+Redux works well with "action creators" and "action dispatchers". Both are defined in `src/app/data/Actions.tsx` (though we may need to break them out into separate files later). Action creators are functions that accept structured arguments and return an action with the appropriate type and metadata (e.g. `Actions.create.cards.select.moveField(card, fieldIndex, newIndex)` will return an action with `{type: ActionTypes.cards.select.moveField, card: card, curIndex: fieldIndex, newIndex: newIndex }`). Action dispatchers are functions with the same parameters as the creators that both create the action and dispatch it to the store. For every action creator that we have, a dispatcher is automatically made. In practice, you will probably only need to use the dispatchers, and not the creators, but it may be helpful to have both.
 
 To add a new action:
-1. Add the action type to `ActionTypes.js`
-2. Add the action creator to `Actions.js`
+1. Add the action type to `ActionTypes.tsx`
+2. Add the action creator to `Actions.tsx`
 3. Digest that action in the appropriate reducer in `Store.js`
 
 ## Troubleshooting

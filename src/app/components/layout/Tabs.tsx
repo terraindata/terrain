@@ -42,49 +42,78 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
+require('./Tabs.less');
+import * as React from 'react';
+import Util from '../../util/Util.tsx';
+import LayoutManager from "../layout/LayoutManager.tsx";
 
-// prepend str to every item in the array
-var prependArray = (str, arr) => 
-{
-	return arr.map((elem) => str + "." + elem);
-};
+var Tabs = React.createClass<any, any>({
+	propTypes:
+	{
+		tabs: React.PropTypes.array.isRequired,
+		selectedIndex: React.PropTypes.number,
+		title: React.PropTypes.string,
+	},
 
-// convert an array into an object where the keys === values
-var makeObject = (str, arr) =>
-{
-	return _.object(arr, prependArray(str, arr));
-};
+	getInitialState()
+	{
+		return {
+			selectedIndex: this.props.selectedIndex || 0,
+		};
+	},
 
-var ActionTypes = 
-{
-	cards: makeObject('cards',
-	[
-		'move',
-		'create',
-	]),
+	handleTabSelectFactory(index)
+	{
+		return () => {
+			if(typeof this.props.tabs[index].onClick === 'function')
+			{
+				this.props.tabs[index].onClick();	
+			}
 
-	inputs: makeObject('inputs',
-	[
-		'move',
-		'create',
-		'changeKey',
-		'changeValue',
-	]),
+			this.setState({
+				selectedIndex: index,
+			});
+		};
+	},
 
-	results: makeObject('results', 
-	[
-		'move',
-	]),
+	render() {
+		var content = this.props.tabs[this.state.selectedIndex].content;
 
-	newAlgorithm: 'newAlgorithm',
-};
+		var showTabs = this.props.tabs && this.props.tabs.length >= 2;
 
-ActionTypes.cards.select = makeObject('cards.select', [
-	'moveField',
-	'newField',
-	'deleteField',
-	'changeField',
-]);
+		return (<div className='tabs-container'>
+			<div className='tabs-row-wrapper'>
+				{ 
+					this.props.title ? (
+						<div className={'tabs-title' + (!showTabs ? ' tabs-title-no-tabs' : '')}>
+							{this.props.title}
+						</div>
+					) : null
+				}
+				{
+					showTabs ? (
+						<div className='tabs-row'>
+							{
+								this.props.tabs.map((tab, index) => 
+									<div 
+										className={Util.objToClassname({
+											'tabs-tab': true,
+											'tabs-tab-selected': index === this.state.selectedIndex,
+											})}
+										key={index}
+										onClick={this.handleTabSelectFactory(index)}>
+											{tab.tabName}
+									</div>)
+							}
+						</div>
+					) : null
+				}
+			</div>
+			<div className='tabs-content'>
+				{content}
+			</div>
+		 </div>);
+	},
+});
 
-module.exports = ActionTypes;
+export default Tabs;

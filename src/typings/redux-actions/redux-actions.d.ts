@@ -42,44 +42,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Result.less');
-var React = require('react');
-var Util = require('../../util/Util.js');
-var PanelMixin = require('../layout/PanelMixin.js');
-var $ = require('jquery');
+// Type definitions for redux-actions v0.8.0
+// Project: https://github.com/acdlite/redux-actions
+// Definitions by: Jack Hsu <https://github.com/jaysoo>
+// Definitions: https://github.com/borisyankov/DefinitelyTyped
+declare module ReduxActions {
+    // FSA-compliant action.
+    // See: https://github.com/acdlite/flux-standard-action
+    type Action = {
+        type: string
+        payload?: any
+        error?: boolean
+        meta?: any
+    };
 
-var Result = React.createClass({
-	mixins: [PanelMixin],
+    type PayloadCreator<T> = (...args: any[]) => T;
+    type MetaCreator = (...args: any[]) => any;
 
-	propTypes:
-	{
-		data: React.PropTypes.object.isRequired,
-		parentNode: React.PropTypes.object,
-	},
+    type Reducer<T> = (state: T, action: Action) => T;
 
-	getDefaultProps() 
-	{
-		return {
-			drag_x: true,
-			drag_y: true,
-			reorderOnDrag: true,
-			dragInsideOnly: true,
-		};
-	},
+    type ReducerMap<T> = {
+        [actionType: string]: Reducer<T>
+    };
 
-	render() {
-		return this.renderPanel((
-			<div className='result'>
-				<div className='result-inner'>
-					<div className='result-name'>
-						{this.props.data.name}
-					</div>
-					<div className='result-score'>
-					</div>
-				</div>
-			</div>
-			));
-	},
-});
+    export function createAction<T>(actionType: string, payloadCreator?: PayloadCreator<T>, metaCreator?: MetaCreator): (...args: any[]) => Action;
 
-module.exports = Result;
+    export function handleAction<T>(actionType: string, reducer: Reducer<T> | ReducerMap<T>): Reducer<T>;
+
+    export function handleActions<T>(reducerMap: ReducerMap<T>, initialState?: T): Reducer<T>;
+}
+
+declare module 'redux-actions' {
+    export = ReduxActions;
+}
+

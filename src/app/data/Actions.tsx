@@ -43,128 +43,83 @@ THE SOFTWARE.
 */
 
 var _ = require('underscore');
-var ActionTypes = require('./ActionTypes.js');
-var Store = require('./Store.js');
+import ActionTypes from './ActionTypes.tsx';
+import Store from './Store.tsx';
+
+import * as ReduxActions from 'redux-actions';
+var createAction = ReduxActions.createAction;
 
 // object of action creators
-var create = 
+const create = 
 {
 	cards:
 	{
-		move: (card, newIndex) =>
-		{
-			return {
-				type: ActionTypes.cards.move,
-				card: card,
-				newIndex: newIndex,
-			};
-		},
+		create: createAction<CreateCardPayload>(
+			ActionTypes.cards.create,
+			(card: any, index: number) => ({card, index})
+		),
+
+		move: createAction<MoveCardPayload>(
+			ActionTypes.cards.move,
+			(card: any, index: number) => ({card, index})
+		),
 
 		select:
 		{
-			moveField: (card, curIndex, newIndex) =>
-			{
-				return {
-					type: ActionTypes.cards.select.moveField,
-					card: card,
-					curIndex: curIndex,
-					newIndex: newIndex,
-				}
-			},
-			
-			changeField: (card, index, value) =>
-			{
-				return {
-					type: ActionTypes.cards.select.changeField,
-					card: card,
-					index: index,
-					value: value,
-				}
-			},
+			moveField: createAction<MoveSelectCardFieldPayload>(
+				ActionTypes.cards.select.moveField,
+				(card: any, fieldIndex: number, index: number) => ({card, fieldIndex, index})
+			),
 
-			deleteField: (card, index) =>
-			{
-				return {
-					type: ActionTypes.cards.select.deleteField,
-					card: card,
-					index: index,
-				}
-			},
+			changeField: createAction<ChangeSelectCardFieldPayload>(
+				ActionTypes.cards.select.changeField,
+				(card: any, fieldIndex: number, value: string) => ({card, fieldIndex, value})
+			),
+
+			deleteField: createAction<DeleteSelectCardFieldPayload>(
+   	   	ActionTypes.cards.select.deleteField,
+      	(card: any, fieldIndex: number) => ({card, fieldIndex})
+			),
+
+			createField: createAction<CreateSelectCardFieldPayload>(
+				ActionTypes.cards.select.createField,
+				(card: any, fieldIndex: number) => ({card, fieldIndex})
+			),
 		},
 	}, // /cards
 
 	inputs:
 	{
-		move: (curIndex, newIndex) =>
-		{
-			return {
-				type: ActionTypes.inputs.move,
-				curIndex: curIndex,
-				newIndex: newIndex,
-			};
-		},
+		create: createAction<CreateInputPayload>(
+			ActionTypes.inputs.create,
+			(input: any, index: number) => ({input, index})
+		),
 
-		changeKey: (input, text) =>
-		{
-			return {
-				type: ActionTypes.inputs.changeKey,
-				input: input,
-				text: text,
-			}
-		},
+		move: createAction<MoveInputPayload>(
+      ActionTypes.inputs.move,
+      (input: any, index: number) => ({input, index})
+		),
 
-		changeValue: (input, text) =>
-		{
-			return {
-				type: ActionTypes.inputs.changeValue,
-				input: input,
-				text: text,
-			}
-		},		
+		changeKey: createAction<ChangeInputKeyPayload>(
+      ActionTypes.inputs.changeKey,
+      (input: any, value: string) => ({input, value})
+		),
+
+		changeValue: createAction<ChangeInputValuePayload>(
+      ActionTypes.inputs.changeValue,
+      (input: any, value: string) => ({input, value})
+		),
 	}, // /inputs
 
-	moveResult: (result, newIndex) =>
-	{
-		return {
-			type: ActionTypes.results.move,
-			result: result,
-			newIndex: newIndex,
-		};
-	},
+	moveResult: createAction<MoveResultPayload>(
+    ActionTypes.results.move,
+    (result: any, index: number) => ({result, index})
+	),
 
-	selectCard:
-	{
-		moveField: (curIndex, newIndex) =>
-		{
-			return {
-				type: ActionTypes.cards.select.moveField,
-				curIndex: curIndex,
-				newIndex: newIndex,
-			}
-		},
-		newField: (index = -1, field = '') =>
-		{
-			return {
-				type: ActionTypes.cards.select.newField,
-				index: index,
-				field: field,
-			}
-		},
-		deleteField: (index) =>
-		{
-			return {
-				type: ActionTypes.cards.select.deleteField,
-				index: index,
-			}
-		},
-	},
-
-	newAlgorithm: () =>
-	{
-		return {
-			type: ActionTypes.newAlgorithm,
-		};
-	}
+	newAlgorithm: createAction<NewAlgorithmPayload>(
+    ActionTypes.newAlgorithm,
+    () => ({})
+	),
 };
 
 var actionCreatorsToDispatchers = (actionCreators) => 
@@ -188,6 +143,8 @@ var actionCreatorsToDispatchers = (actionCreators) =>
 	});
 };
 
+
+
 // object of action dispatchers
 // use: Actions.dispatch.moveCard(4, 8)
 var dispatch = actionCreatorsToDispatchers(create); 
@@ -197,6 +154,7 @@ var Actions =
 	types: ActionTypes,
 	create: create,
 	dispatch: dispatch,
+	newDispatch: Store.dispatch,
 };
 
-module.exports = Actions;
+export default Actions;

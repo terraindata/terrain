@@ -42,34 +42,54 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./panel.less');
+import * as ReactDOM from "react-dom";
 var _ = require('underscore');
-var React = require('react');
-var Util = require('../../util/Util.js');
-var PanelMixin = require('./PanelMixin.js');
-var $ = require('jquery');
 
-var PanelPlaceholder = React.createClass({
-	mixins: [PanelMixin],
-
-	getDefaultProps() 
+var Util = {
+	// Return a random integer [min, max)
+	// assumes min of 0 if not passed.
+	randInt(...args: number[]): number 
 	{
-		return {
-			height: '50px',
-			text: '',
+		var min:number = arguments[0], max:number = arguments[1];
+		if(arguments.length === 1) {
+			min = 0;
+			max = arguments[0];
 		}
+
+		return Math.floor(Math.random() * max - min) + min;
 	},
 
-	render() 
+	isInt(num): boolean
 	{
-		var style = _.extend({}, {
-			height: this.props.height,
-			background: '#ccc',
-			border: '1px solid #aaa',
-		}, this.props.style);
-
-		return this.renderPanel(<div style={style}> { this.props.text } </div>);
+		return num === parseInt(num, 10);
 	},
-});
 
-module.exports = PanelPlaceholder;
+	isArray(arr: any): boolean
+	{
+		return arr.length !== undefined;
+	},
+
+	parentNode(reactNode): Node
+	{
+		return ReactDOM.findDOMNode(reactNode).parentNode;
+	},
+
+	valueMinMax(value: number, min: number, max: number)
+	{
+		return Math.min(Math.max(value, min), max);
+	},
+
+	// accepts object of key/vals like this: { 'className': include? }
+	objToClassname(obj: { [className: string]: boolean }): string
+	{
+		return _.reduce(obj, (classNameArray: string[], include: boolean, className: string) => {
+				if(include)
+				{
+					classNameArray.unshift(className);
+				}
+				return classNameArray;
+			}, []).join(" ");
+	},
+};
+
+export default Util;

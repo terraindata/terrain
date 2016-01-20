@@ -42,112 +42,89 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./card.less');
-var Actions = require('../../data/Actions.js');
-var React = require('react');
-var Util = require('../../util/Util.js');
-var PanelPlaceholder = require('../layout/PanelPlaceholder.js');
-var PanelMixin = require('../layout/PanelMixin.js');
-var LayoutManager = require('../layout/LayoutManager.js');
-var CardInput = require('./CardField.js');
-var SelectCard = require('./card-types/SelectCard.tsx');
-var $ = require('jquery');
+var _ = require('underscore');
+var Immutable = require('immutable');
 
-var Card = React.createClass({
-	mixins: [PanelMixin],
+/*
 
-	propTypes:
-	{
-		data: React.PropTypes.object.isRequired,
-	},
+Terminology:
+- create
+- change
+- move
+- delete
 
-	getDefaultProps() 
-	{
-		return {
-			drag_x: false,
-			drag_y: true,
-			reorderOnDrag: true,
-			handleRef: 'handle',
-		};
-	},
+*/
 
-	getInitialState()
-	{
-		return {
-			open: true,
-		}
-	},
+// prepend str to every item in the array
+var prependArray = (str, arr) => 
+{
+	return arr.map((elem) => str + "." + elem);
+};
 
-	handleTitleClick()
-	{
-		if(!this.state.moved)
-		{
-			// this.state.moved is updated in panelMixin
-			this.setState({
-				open: !this.state.open,
-			});
-		}
-	},
+// convert an array into an object where the keys === values
+var makeObject = (str, arr) =>
+{
+	return _.object(arr, prependArray(str, arr));
+};
 
-	render() {
 
-		var content;
-		var subBar;
+var ActionTypes = 
+{
+	// moveCard: moveCard,
+	// Action: Action,
 
-		switch(this.props.data.type)
-		{
-			case 'select':
-				content = <SelectCard />;
-				subBar = 
-				{
-					content: '+',
-					onClick: () => {
-						console.log('add click');
-					},
-				};
+	cards: makeObject('cards',
+	[
+		'move',
+		'create',
+	]),
 
-				break;
-			default:
-				content = <div>This card has not been implemented yet.</div>
-		}
-		content = React.cloneElement(content, this.props);
+	inputs: makeObject('inputs',
+	[
+		'move',
+		'create',
+		'changeKey',
+		'changeValue',
+	]),
 
-		var contentToDisplay;
-		var subBarToDisplay;
-		if(this.state.open)
-		{
-			contentToDisplay = (
-				<div className='card-content'>
-					{content}
-				</div>
-			);
+	results: makeObject('results', 
+	[
+		'move',
+	]),
 
-			if(subBar)
-			{
-				subBarToDisplay = (
-					<div className='card-sub-bar' onCick={subBar.onClick}>
-						<div className='card-sub-bar-inner'>
-							{subBar.content}
-						</div>
-					</div>
-				);
-			}
-		}
+	newAlgorithm: 'newAlgorithm',
+};
 
-		var title = this.props.data.type.charAt(0).toUpperCase() + this.props.data.type.substr(1);
+ActionTypes.cards.from = makeObject('cards.from', [
+	'changeGroup',
+]);
+ActionTypes.cards.from.join = makeObject('cards.from.join', [
+	'create',
+	'changeGroup',
+	'changeFirstProperty',
+	'changeSecondProperty',
+	'changeOperator'
+]);
 
-		return this.renderPanel((
-			<div className='card'>
-				<div className='card-inner'>
-					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>
-						{title}
-					</div>
-					{ contentToDisplay }
-					{ subBarToDisplay }
-				</div>
-			</div>
-			));
-	},
-});
+ActionTypes.cards.select = makeObject('cards.select', [
+	'moveField',
+	'createField',
+	'deleteField',
+	'changeField',
+]);
 
-module.exports = Card;
+ActionTypes.cards.order = makeObject('cards.order', [
+	'changeProperty',
+	'changeDirection',
+]);
+
+ActionTypes.cards.filter = makeObject('cards.filter', [
+	'createFilter',
+	'changeFirstProperty',
+	'changeSecondProperty',
+	'changeOperator',
+	'changeCombinator'
+]);
+
+
+export default ActionTypes;

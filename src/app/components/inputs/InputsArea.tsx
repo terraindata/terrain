@@ -42,79 +42,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Tabs.less');
-var React = require('react');
-var Util = require('../../util/Util.js');
-var $ = require('jquery');
-var LayoutManager = require("../layout/LayoutManager.js");
+import * as React from 'react';
+import Util from '../../util/Util.tsx';
+import PanelMixin from '../layout/PanelMixin.tsx';
+import Actions from "../../data/Actions.tsx";
+import Input from "../inputs/Input.tsx";
+import LayoutManager from "../layout/LayoutManager.tsx";
 
-var Tabs = React.createClass({
+var InputsArea = React.createClass<any, any>({
 	propTypes:
 	{
-		tabs: React.PropTypes.array.isRequired,
-		selectedIndex: React.PropTypes.number,
-		title: React.PropTypes.string,
-	},
-
-	getInitialState()
-	{
-		return {
-			selectedIndex: this.props.selectedIndex || 0,
-		};
-	},
-
-	handleTabSelectFactory(index)
-	{
-		return () => {
-			if(typeof this.props.tabs[index].onClick === 'function')
-			{
-				this.props.tabs[index].onClick();	
-			}
-
-			this.setState({
-				selectedIndex: index,
-			});
-		};
+		inputs: React.PropTypes.array.isRequired,
 	},
 
 	render() {
-		var content = this.props.tabs[this.state.selectedIndex].content;
+		var layout = {
+			rows: this.props.inputs.map((input) => {
+				return {
+					content: <Input input={input} />,
+				};
+			}),
+			fullHeight: true,
+		};
 
-		var showTabs = this.props.tabs && this.props.tabs.length >= 2;
+		var moveTo = (curIndex, newIndex) =>
+    {
+      Actions.dispatch.inputs.move(this.props.inputs[curIndex], newIndex);
+    };
 
-		return (<div className='tabs-container'>
-			<div className='tabs-row-wrapper'>
-				{ 
-					this.props.title ? (
-						<div className={'tabs-title' + (!showTabs ? ' tabs-title-no-tabs' : '')}>
-							{this.props.title}
-						</div>
-					) : null
-				}
-				{
-					showTabs ? (
-						<div className='tabs-row'>
-							{
-								this.props.tabs.map((tab, index) => 
-									<div 
-										className={Util.objToClassname({
-											'tabs-tab': true,
-											'tabs-tab-selected': index === this.state.selectedIndex,
-											})}
-										key={index}
-										onClick={this.handleTabSelectFactory(index)}>
-											{tab.tabName}
-									</div>)
-							}
-						</div>
-					) : null
-				}
-			</div>
-			<div className='tabs-content'>
-				{content}
-			</div>
-		 </div>);
+		return <LayoutManager layout={layout} moveTo={moveTo} />;
 	},
 });
 
-module.exports = Tabs;
+export default InputsArea;
