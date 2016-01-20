@@ -47,7 +47,7 @@ var Util = require('../../util/Util.tsx');
 var PanelMixin = require('../layout/PanelMixin.js');
 var Actions = require('../../data/Actions.tsx');
 var $ = require('jquery');
-var Result = require("../results/Result.js");
+var Result = require("../results/Result.tsx").default;
 var LayoutManager = require("../layout/LayoutManager.js");
 
 var ResultsArea = React.createClass({

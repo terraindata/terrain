@@ -43,8 +43,8 @@ THE SOFTWARE.
 */
 
 require('./Result.less');
-var React = require('react');
-var Util = require('../../util/Util.tsx');
+import * as React from 'react';
+import * as Util from '../../util/Util.tsx';
 var PanelMixin = require('../layout/PanelMixin.js');
 var $ = require('jquery');
 
@@ -82,4 +82,4 @@ var Result = React.createClass({
 	},
 });
 
-module.exports = Result;
+export default Result;
