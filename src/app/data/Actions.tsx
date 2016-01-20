@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 var _ = require('underscore');
-var ActionTypes = require('./ActionTypes.tsx');
+import ActionTypes from './ActionTypes.tsx';
 import Store from './Store.tsx';
 
 import ReduxActions = require('redux-actions');

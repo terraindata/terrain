@@ -127,4 +127,4 @@ ActionTypes.cards.filter = makeObject('cards.filter', [
 ]);
 
 
-export = ActionTypes;
+export default ActionTypes;

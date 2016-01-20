@@ -46,7 +46,7 @@ var _ = require('underscore');
 var Immutable = require('immutable');
 
 var Redux = require('redux');
-var ActionTypes = require('./ActionTypes.tsx');
+import ActionTypes from './ActionTypes.tsx';
 import Util from '../util/Util.tsx';
 
 // Important: all reducers must return either
