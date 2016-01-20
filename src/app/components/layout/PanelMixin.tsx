@@ -105,10 +105,6 @@ var Panel = {
 		if(!this.state.scrollingParentUp && !this.state.scrollingParentDown && !this.state.scrollVelocity)
 		{
 			// fast break
-			// this.setState({
-			// 	scrollVelocity: 0,
-			// 	draggedTo: null,
-			// });
 			return;
 		}
 
@@ -202,19 +198,30 @@ var Panel = {
 
 		$('input').blur();
 
-		// TODO remove the this.parentNode() check, figure out how to get
-		//  parentNode to come in correctly on the first time
-		// currently there is a bug where the first drag won't work completely
-		// (it doesn't get parentNode correctly, so it won't scroll the container and
-		// it won't be bound by the parent)
 		if(this.props.dragInsideOnly && this.parentNode())
 		{
-			y = Util.valueMinMax(y,
-					this.parentNode().getBoundingClientRect().top + this.state.oy - this.state.ocr.top,
-					this.parentNode().getBoundingClientRect().bottom + this.state.oy - this.state.ocr.bottom);
-			x = Util.valueMinMax(x,
-					this.parentNode().getBoundingClientRect().left + this.state.ox - this.state.ocr.left,
-					this.parentNode().getBoundingClientRect().right + this.state.ox - this.state.ocr.right);
+			// must have parentNode() passed in correctly for this to work
+			var minY = this.parentNode().getBoundingClientRect().top + this.state.oy - this.state.ocr.top;
+			var maxY = this.parentNode().getBoundingClientRect().bottom + this.state.oy - this.state.ocr.bottom;
+			y = Util.valueMinMax(y, minY, maxY);
+
+			var minX = this.parentNode().getBoundingClientRect().left + this.state.ox - this.state.ocr.left;
+			var maxX = this.parentNode().getBoundingClientRect().right + this.state.ox - this.state.ocr.right;
+			x = Util.valueMinMax(x,minX, maxX);
+
+			// automatically scroll if at boundaries
+			if(y === minY)
+			{
+				this.startScrollingParentUp();
+			}
+			else if(y === maxY)
+			{
+				this.startScrollingParentDown();
+			}
+			else
+			{
+				this.stopScrollingParent();
+			}
 		}
 
 		if(this.canDrag('x')) 
@@ -260,19 +267,6 @@ var Panel = {
 				x: this.state.ox,
 				y: this.state.oy,
 			});
-		}
-
-		if(y < 30)
-		{
-			this.startScrollingParentUp();
-		}
-		else if(y > this.parentNode().getBoundingClientRect().height - 30)
-		{
-			this.startScrollingParentDown();
-		}
-		else
-		{
-			this.stopScrollingParent();
 		}
 	},
 
