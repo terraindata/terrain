@@ -84,7 +84,7 @@ const create =
 				),
 
 				delete: createAction<DeleteJoinPayload>(
-					ActionTypes.cards.from.delete,
+					ActionTypes.cards.from.join.delete,
 					(card: any, index: number) => ({card, index})
 				),
 			},

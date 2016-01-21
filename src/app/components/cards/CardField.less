@@ -4,34 +4,39 @@
 	padding: 5px;
 	position: relative;
 	text-align: center;
+	height: 30px;
 
-	.card-field-inner input {
+	.card-field-inner {
 		display: inline-block;
 		width: calc(~"100% - 40px");
 	}
 
-	.card-field-handle,
-	.card-field-delete {
+	.card-field-tools-left,
+	.card-field-tools-right {
 		position: relative;
 		top: 2px;
 		width: 20px;
+	}
+
+	.card-field-handle,
+	.card-field-delete {
 		opacity: 0;
 		font-weight: 200;
 		font-size: calc(@medium-font-size * 1.25);
 		color: @light-gray;
-		.transition(all 0.25s);
-
+		.transition(all 0.25s);		
+		cursor: pointer;
 		&:hover {
 			color: @black;
 		}
 	}
 
-	.card-field-handle {
+	.card-field-tools-left {
 		float: left;
 		text-align: left;
 	}
 
-	.card-field-delete {
+	.card-field-tools-right {
 		float: right;
 		text-align: right;
 	}

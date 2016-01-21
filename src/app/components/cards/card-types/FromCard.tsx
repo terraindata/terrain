@@ -46,17 +46,91 @@ import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
-import CardInput from './../CardField.tsx';
+import CardField from './../CardField.tsx';
 
 interface Props {
   card: FromCardModel;
 }
+
+var OPERATOR_WIDTH: number = 20;
+var CARD_PADDING: number = 12;
 
 class FromCard extends React.Component<Props, any>
 {
   constructor(props:Props)
   {
     super(props);
+    this.renderJoin = this.renderJoin.bind(this);
+  }
+
+  renderJoin(join: Join, index: number)
+  {
+    var refBase = 'join-ref-' + index + '-' + this.props.card.id + '-';
+    var groupRef = refBase + 'group';
+    var firstRef = refBase + 'first';
+    var secondRef = refBase + 'second';
+
+    var changeJoin = () =>
+    {
+        var group = this.refs[groupRef]['value'];
+        var first = this.refs[firstRef]['value'];
+        var second = this.refs[secondRef]['value'];
+        var operator = join.comparison.operator;
+        
+        Actions.dispatch.cards.from.join.change(this.props.card, index, {
+          group: group,
+          comparison:
+          {
+            first: first,
+            second: second,
+            operator: operator,
+          }
+        });
+    }
+
+    var joinLayout =
+    {
+      columns: [
+        {
+          content: (
+            <input type='text' value={join.group} onChange={changeJoin} ref={groupRef} />
+          ),
+          colSpan: 2,
+        },
+        {
+          content: (
+            <input type='text' value={join.comparison.first} onChange={changeJoin} ref={firstRef} />
+          ),
+        },
+        {
+          content: (
+            <div>=</div>
+          ),
+          width: OPERATOR_WIDTH,
+        },
+        {
+          content: (
+            <input type='text' value={join.comparison.second} onChange={changeJoin} ref={secondRef} />
+          ),
+        }
+      ],
+      colPadding: CARD_PADDING,
+    };
+
+    var deleteFn = () =>
+    {
+        Actions.dispatch.cards.from.join.delete(this.props.card, index);
+    }
+
+    return (
+      <CardField
+        key={index}
+        draggable={false}
+        removable={true}
+        onDelete={deleteFn} >
+        <LayoutManager layout={joinLayout} />
+      </CardField>
+    );
   }
 
 	render() {
@@ -65,37 +139,19 @@ class FromCard extends React.Component<Props, any>
       Actions.dispatch.cards.from.changeGroup(this.props.card, value);
     }
 
-    var joinLayout: any =
-    {
-      rows: this.props.card.from.joins.map((join) =>
-        ({
-          columns: [
-            {
-              content: <input type='text' />,
-            },
-            {
-              content: <div>=</div>,
-            },
-            {
-              content: <input type='text' />
-            }
-          ]
-        })
-      ),
-    }
-
-    console.log(joinLayout);
+    var joinContent = this.props.card.from.joins.map(this.renderJoin);
 
 		return (
       <div>
-        <CardInput 
-          value={this.props.card.from.group}
-          onChange={handleChange}
-          onDelete={null}
+        <CardField
           draggable={false}
           removable={false}
-          drag_y={true} />
-        <LayoutManager layout={joinLayout} />
+          drag_y={true}>
+          <input type="text" 
+            value={this.props.card.from.group}
+            onChange={handleChange} />
+        </CardField>
+        { joinContent }
       </div>
 		);
 	}

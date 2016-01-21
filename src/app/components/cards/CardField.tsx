@@ -53,7 +53,6 @@ var CardField = React.createClass({
 	propTypes:
 	{
 		value: React.PropTypes.string,
-		onChange: React.PropTypes.func.isRequired,
 		onDelete: React.PropTypes.func,
 	},
 
@@ -101,24 +100,28 @@ var CardField = React.createClass({
 	},
 
 	render() {
-		var handleContent = null;
-		var removeContent = null;
+		var handleContent = <div>&nbsp;</div>;
+		var removeContent = <div>&nbsp;</div>;
 		if(this.props.draggable)
 		{
-			handleContent = <div className='card-field-handle' ref='handle'>⋮⋮</div>;
+			handleContent = (
+				<div className='card-field-handle' ref='handle'>⋮⋮</div>
+			);
 		}
 		if(this.props.removable)
 		{
-			removeContent = <div className='card-field-delete' onClick={this.deleteField}>&times;</div>;
+			removeContent = (
+				<div className='card-field-delete' onClick={this.deleteField}>&times;</div>
+			);
 		}
 
 		return this.renderPanel((
 			<div className='card-field'>
+				<div className='card-field-tools-left'>{ handleContent }</div>
 				<div className='card-field-inner'>
-					{ handleContent }
-					<input type="text" value={this.props.value} onChange={this.handleChange} />
-					{ removeContent }
+					{ this.props.children }
 				</div>
+				<div className='card-field-tools-right'>{ removeContent }</div>
 			</div>
 			));
 	},

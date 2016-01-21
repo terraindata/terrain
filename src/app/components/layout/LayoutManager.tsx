@@ -56,6 +56,13 @@ var rowClass = 'layout-manager-row';
 var cellClass = 'layout-manager-cell';
 var fullHeightClass = 'layout-manager-full-height';
 
+interface Style {
+	left?: number,
+	top?: number,
+	width?: number,
+	height?: number,
+}
+
 var LayoutManager = React.createClass<any, any>({
 	propTypes: 
 	{
@@ -85,13 +92,17 @@ var LayoutManager = React.createClass<any, any>({
     window.removeEventListener("resize", this.updateDimensions);
   },
 
-	getSumThroughIndex(index)
+	sumColsThroughIndex(index)
 	{
 		var sum = 0;
 		if(this.props.layout.rows) {
-			sum = this.props.layout.rows.reduce((sum, row, i) => (((i < index || index === -1) && (row.rowSpan || 1)) + sum), 0);
+			sum = this.props.layout.rows.reduce((sum, row, i) => (
+				((i < index || index === -1) && (row.rowSpan || 1)) + sum
+			), 0);
 		} else if(this.props.layout.columns) {
-			sum = this.props.layout.columns.reduce((sum, col, i) => (((i < index || index === -1) && (col.colSpan || 1)) + sum), 0);
+			sum = this.props.layout.columns.reduce((sum, col, i) => (
+				col.width !== undefined ? sum : ((i < index || index === -1) && (col.colSpan || 1)) + sum
+			), 0);
 		}
 		return sum;
 	},
@@ -375,7 +386,7 @@ var LayoutManager = React.createClass<any, any>({
 		if(this.props.layout.rowHeight === 'fill') 
 		{
 			// TODO clean this up
-			var total = this.getSumThroughIndex(-1), sum = this.getSumThroughIndex(index);
+			var total = this.sumColsThroughIndex(-1), sum = this.sumColsThroughIndex(index);
 			style = {
 				top: (sum / total) * 100 + '%',
 				height: ((row.rowSpan || 1) / total) * 100 + '%',
@@ -386,19 +397,88 @@ var LayoutManager = React.createClass<any, any>({
 		return this.renderObj(row, rowClass, index, style);
 	},
 
+	calcColumnLeft(column, index)
+	{
+		var left = this.props.layout.columns.reduce((sum, col, i) => {
+			if(i >= index)
+			{
+				return sum;
+			}
+
+			var widthValues = this.calcColumnWidthValues(col, i);
+			return {
+				percentage: sum.percentage + widthValues.percentage,
+				offset: sum.offset + widthValues.offset + this.paddingForColAtIndex(index),
+			};
+		}, {
+			percentage: 0,
+			offset: 0,
+		});
+		
+		return 'calc(' + left.percentage + '% + ' + left.offset + 'px)';
+	},
+
+	sumColumnWidthsThroughIndex(index)
+	{
+		return this.props.layout.columns.reduce((sum, column, i) => (sum + 
+			(index === -1 || i <= index ? (column.width || 0) : 0) +
+			(this.props.layout.colPadding && i !== 0 ? this.props.layout.colPadding : 0)
+		), 0);
+	},
+
+	paddingForColAtIndex(index: number): number
+	{
+		return this.props.layout.colPadding && index !== 0 ? this.props.layout.colPadding : 0;
+	},
+
+	calcColumnWidthValues(column, index): {percentage: number, offset: number}
+	{
+		var colPadding = this.paddingForColAtIndex(index);
+
+		if(column.width !== undefined)
+		{
+			return {
+				percentage: 0,
+				offset: column.width, // + colPadding,
+			};
+		}
+
+		var setWidth = this.sumColumnWidthsThroughIndex(-1);
+		var totalCols = this.sumColsThroughIndex(-1);
+		var sumCols = this.sumColsThroughIndex(index);
+		var percentWidth = (column.colSpan || 1) / totalCols;
+		var portionOfSetWidth = percentWidth * setWidth; // - colPadding;
+		// console.log(portionOfSetWidth, colPadding);
+		// portionOfSetWidth -= colPadding;
+
+		return {
+			percentage: percentWidth * 100,
+			offset: portionOfSetWidth * -1,
+		};
+	},
+
+	calcColumnWidth(column, index)
+	{
+		var widthValues = this.calcColumnWidthValues(column, index);
+		var finalWidth = 'calc(' + widthValues.percentage + '% + ' + widthValues.offset + 'px)';
+
+		return finalWidth;
+	},
+
 	renderColumn(column, index) 
 	{
-		// TODO clean this up
-		var total = this.getSumThroughIndex(-1), sum = this.getSumThroughIndex(index);
 		var classToPass = colClass;
-		var style:any = {
-			left: (sum / total) * 100 + '%',
-			width: ((column.colSpan || 1) / total) * 100 + '%'
+		var style: Style =
+		{
+			left: this.calcColumnLeft(column, index),
+			width: this.calcColumnWidth(column, index),
 		};
+
 		if(this.props.layout.stackAt && this.props.layout.stackAt > $(window).width()) {
 			classToPass = "";
 			style = {};
 		}
+
 		return this.renderObj(column, classToPass, index, style);
 	},
 

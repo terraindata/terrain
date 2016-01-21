@@ -100,9 +100,8 @@ ActionTypes.cards.from = makeObject('cards.from', [
 ]);
 ActionTypes.cards.from.join = makeObject('cards.from.join', [
 	'create',
-	'changeFirstProperty',
-	'changeSecondProperty',
-	'changeOperator'
+	'change',
+	'delete',
 ]);
 
 ActionTypes.cards.select = makeObject('cards.select', [

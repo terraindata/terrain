@@ -179,8 +179,10 @@ var fromCardReducer = (cards = [], action) =>
 			from.joins.push(Defaults.JOIN_DEFAULT);
 			break;
 		case ActionTypes.cards.from.join.change:
+			from.joins[action.payload.index] = action.payload.value;
 			break;
 		case ActionTypes.cards.from.join.delete:
+   from.joins.splice(action.payload.index, 1);
 			break;
 		default:
 			// ActionType not applicable, return normal cards

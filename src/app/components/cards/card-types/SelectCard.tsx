@@ -46,7 +46,7 @@ import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
-import CardInput from './../CardField.tsx';
+import CardField from './../CardField.tsx';
 
 interface Props {
   data: {
@@ -71,9 +71,9 @@ class SelectCard extends React.Component<Props, any>
       Actions.dispatch.cards.select.moveField(this.props.data, curIndex, newIndex);
     }
 
-    var changeFnFactory = (index) => (value) =>
+    var changeFnFactory = (index) => (event) =>
     {
-    	Actions.dispatch.cards.select.changeField(this.props.data, index, value);
+    	Actions.dispatch.cards.select.changeField(this.props.data, index, event.target.value);
     }
 
     var deleteFnFactory = (index) => () =>
@@ -86,14 +86,16 @@ class SelectCard extends React.Component<Props, any>
 			rows: fields.map((field, index) => {
         return {
           content: (
-            <CardInput 
-    					value={field}
-    					onChange={changeFnFactory(index)}
+            <CardField
     					onDelete={deleteFnFactory(index)}
               draggable={true}
               removable={true}
               drag_y={true}
-    					dragInsideOnly={true} />
+    					dragInsideOnly={true}>
+              <input type="text" 
+                value={field}
+                onChange={changeFnFactory(index)} />
+            </CardField>
           ),
         };
       }),
