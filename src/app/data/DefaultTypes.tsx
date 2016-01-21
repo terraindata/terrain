@@ -42,88 +42,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-var Immutable = require('immutable');
+/// <reference path="../../typings/tsd.d.ts" />
 
-/*
+var GROUP_DEFAULT = "";
+var PROPERTY_DEFAULT = "";
+var OPERATOR_DEFAULT: Operator = 0;
 
-Terminology:
-- create
-- change
-- move
-- delete
-
-*/
-
-// prepend str to every item in the array
-var prependArray = (str, arr) => 
+var COMPARISON_DEFAULT =
 {
-	return arr.map((elem) => str + "." + elem);
-};
+  first: PROPERTY_DEFAULT,
+  second: PROPERTY_DEFAULT,
+  operator: OPERATOR_DEFAULT,
+}
 
-// convert an array into an object where the keys === values
-var makeObject = (str, arr) =>
+export default
 {
-	return _.object(arr, prependArray(str, arr));
+  JOIN_DEFAULT:
+  {
+    group: GROUP_DEFAULT,
+    comparison: COMPARISON_DEFAULT,
+  }
 };
-
-
-var ActionTypes = 
-{
-	// moveCard: moveCard,
-	// Action: Action,
-
-	cards: makeObject('cards',
-	[
-		'move',
-		'create',
-	]),
-
-	inputs: makeObject('inputs',
-	[
-		'move',
-		'create',
-		'changeKey',
-		'changeValue',
-	]),
-
-	results: makeObject('results', 
-	[
-		'move',
-	]),
-
-	newAlgorithm: 'newAlgorithm',
-};
-
-ActionTypes.cards.from = makeObject('cards.from', [
-	'changeGroup',
-]);
-ActionTypes.cards.from.join = makeObject('cards.from.join', [
-	'create',
-	'changeFirstProperty',
-	'changeSecondProperty',
-	'changeOperator'
-]);
-
-ActionTypes.cards.select = makeObject('cards.select', [
-	'moveField',
-	'createField',
-	'deleteField',
-	'changeField',
-]);
-
-ActionTypes.cards.order = makeObject('cards.order', [
-	'changeProperty',
-	'changeDirection',
-]);
-
-ActionTypes.cards.filter = makeObject('cards.filter', [
-	'createFilter',
-	'changeFirstProperty',
-	'changeSecondProperty',
-	'changeOperator',
-	'changeCombinator'
-]);
-
-
-export default ActionTypes;

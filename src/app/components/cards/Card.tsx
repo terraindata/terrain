@@ -50,6 +50,7 @@ import PanelMixin from '../layout/PanelMixin.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CardInput from './CardField.tsx';
 import SelectCard from './card-types/SelectCard.tsx';
+import FromCard from './card-types/FromCard.tsx';
 
 var Card = React.createClass({
 	mixins: [PanelMixin],
@@ -99,8 +100,21 @@ var Card = React.createClass({
 				subBar = 
 				{
 					content: '+',
-					onClick: () => {
-						console.log('add click');
+					onClick: () => 
+					{
+						Actions.dispatch.cards.select.createField(this.props.data);
+					},
+				};
+
+				break;
+			case 'from':
+				content = <FromCard card={this.props.data} />;
+				subBar =
+				{
+					content: '+',
+					onClick: () => 
+					{
+						Actions.dispatch.cards.from.join.create(this.props.data);
 					},
 				};
 

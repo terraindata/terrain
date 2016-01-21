@@ -49,6 +49,8 @@ var Redux = require('redux');
 import ActionTypes from './ActionTypes.tsx';
 import Util from '../util/Util.tsx';
 
+import Defaults from './DefaultTypes.tsx';
+
 // Important: all reducers must return either
 //  - a clone, if any changes were made to the object (do not modify the object passed)
 //  - the exact same object, if no changes were made
@@ -120,19 +122,13 @@ var change = function<T>(...args: any[]): T // needs to be `function` to make us
 
 var selectCardReducer = (cards = [], action) =>
 {
-	if(!action.payload)
-	{
-		return cards;
-	}
 	var cardIndex = cards.indexOf(action.payload.card);
-	if(cardIndex === -1)
+	var newCards = cloneArray(cards);
+	var select = newCards[cardIndex].select;
+	if(!select)
 	{
 		return cards;
 	}
-	// cardIndex points to a real card from now on
-
-	var newCards = cloneArray(cards);
-	var select = newCards[cardIndex].select
 
 	switch(action.type)
 	{
@@ -163,9 +159,51 @@ var selectCardReducer = (cards = [], action) =>
 	return newCards;
 };
 
+
+var fromCardReducer = (cards = [], action) =>
+{
+	var cardIndex = cards.indexOf(action.payload.card);
+	var newCards = cloneArray(cards);
+	var from = newCards[cardIndex].from;
+	if(!from)
+	{
+		return cards;
+	}
+
+	switch(action.type)
+	{
+		case ActionTypes.cards.from.changeGroup:
+			from.group = action.payload.value;
+			break;
+		case ActionTypes.cards.from.join.create:
+			from.joins.push(Defaults.JOIN_DEFAULT);
+			break;
+		case ActionTypes.cards.from.join.change:
+			break;
+		case ActionTypes.cards.from.join.delete:
+			break;
+		default:
+			// ActionType not applicable, return normal cards
+			return cards;
+	}
+
+	return newCards;
+};
+
 var cardsReducer = (cards = [], action) =>
 {
+	if(!action.payload)
+	{
+		return cards;
+	}
+	var cardIndex = cards.indexOf(action.payload.card);
+	if(cardIndex === -1)
+	{
+		return cards;
+	}
+
 	cards = selectCardReducer(cards, action);
+	cards = fromCardReducer(cards, action);
 
 	switch(action.type)
 	{

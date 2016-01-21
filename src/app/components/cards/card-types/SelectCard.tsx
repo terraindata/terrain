@@ -90,6 +90,9 @@ class SelectCard extends React.Component<Props, any>
     					value={field}
     					onChange={changeFnFactory(index)}
     					onDelete={deleteFnFactory(index)}
+              draggable={true}
+              removable={true}
+              drag_y={true}
     					dragInsideOnly={true} />
           ),
         };

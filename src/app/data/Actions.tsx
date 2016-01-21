@@ -64,6 +64,32 @@ const create =
 			(card: any, index: number) => ({card, index})
 		),
 
+		from:
+		{
+			changeGroup: createAction<ChangeFromCardGroupPayload>(
+				ActionTypes.cards.from.changeGroup,
+				(card: any, value: Group) => ({card, value})
+			),
+
+			join:
+			{
+				create: createAction<CreateJoinPayload>(
+					ActionTypes.cards.from.join.create,
+					(card: any, index: number, value: Group) => ({card, index, value})
+				),
+
+				change: createAction<ChangeJoinPayload>(
+					ActionTypes.cards.from.join.change,
+					(card: FromCardModel, index: number, value: Join) => ({card, index, value})
+				),
+
+				delete: createAction<DeleteJoinPayload>(
+					ActionTypes.cards.from.delete,
+					(card: any, index: number) => ({card, index})
+				),
+			},
+		},
+
 		select:
 		{
 			moveField: createAction<MoveSelectCardFieldPayload>(

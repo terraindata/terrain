@@ -42,88 +42,63 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-var Immutable = require('immutable');
+import * as React from 'react';
+import Actions from "../../../data/Actions.tsx";
+import Util from '../../../util/Util.tsx';
+import LayoutManager from "../../layout/LayoutManager.tsx";
+import CardInput from './../CardField.tsx';
 
-/*
+interface Props {
+  card: FromCardModel;
+}
 
-Terminology:
-- create
-- change
-- move
-- delete
-
-*/
-
-// prepend str to every item in the array
-var prependArray = (str, arr) => 
+class FromCard extends React.Component<Props, any>
 {
-	return arr.map((elem) => str + "." + elem);
+  constructor(props:Props)
+  {
+    super(props);
+  }
+
+	render() {
+    var handleChange = (value) => 
+    {
+      Actions.dispatch.cards.from.changeGroup(this.props.card, value);
+    }
+
+    var joinLayout: any =
+    {
+      rows: this.props.card.from.joins.map((join) =>
+        ({
+          columns: [
+            {
+              content: <input type='text' />,
+            },
+            {
+              content: <div>=</div>,
+            },
+            {
+              content: <input type='text' />
+            }
+          ]
+        })
+      ),
+    }
+
+    console.log(joinLayout);
+
+		return (
+      <div>
+        <CardInput 
+          value={this.props.card.from.group}
+          onChange={handleChange}
+          onDelete={null}
+          draggable={false}
+          removable={false}
+          drag_y={true} />
+        <LayoutManager layout={joinLayout} />
+      </div>
+		);
+	}
 };
 
-// convert an array into an object where the keys === values
-var makeObject = (str, arr) =>
-{
-	return _.object(arr, prependArray(str, arr));
-};
-
-
-var ActionTypes = 
-{
-	// moveCard: moveCard,
-	// Action: Action,
-
-	cards: makeObject('cards',
-	[
-		'move',
-		'create',
-	]),
-
-	inputs: makeObject('inputs',
-	[
-		'move',
-		'create',
-		'changeKey',
-		'changeValue',
-	]),
-
-	results: makeObject('results', 
-	[
-		'move',
-	]),
-
-	newAlgorithm: 'newAlgorithm',
-};
-
-ActionTypes.cards.from = makeObject('cards.from', [
-	'changeGroup',
-]);
-ActionTypes.cards.from.join = makeObject('cards.from.join', [
-	'create',
-	'changeFirstProperty',
-	'changeSecondProperty',
-	'changeOperator'
-]);
-
-ActionTypes.cards.select = makeObject('cards.select', [
-	'moveField',
-	'createField',
-	'deleteField',
-	'changeField',
-]);
-
-ActionTypes.cards.order = makeObject('cards.order', [
-	'changeProperty',
-	'changeDirection',
-]);
-
-ActionTypes.cards.filter = makeObject('cards.filter', [
-	'createFilter',
-	'changeFirstProperty',
-	'changeSecondProperty',
-	'changeOperator',
-	'changeCombinator'
-]);
-
-
-export default ActionTypes;
+export default FromCard;

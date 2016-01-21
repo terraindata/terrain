@@ -46,6 +46,7 @@ declare type ID = number;
 declare type Group = string;
 declare type Key = string;
 declare type Value = string;
+declare type Property = string;
 
 declare enum Operator
 {
@@ -70,23 +71,12 @@ declare enum Combinator
 }
 
 
-interface Property
-{
-  group: Group;
-  key: Key;
-  value: Value;
-
-  // TODO may need to consider static values (e.g. "17"), or compiled values (e.g. from a Let card)
-  //  or freeform TQL, or functions
-}
-
 interface Comparison
 {
   first: Property;
   second: Property;
   operator: Operator;
 }
-
 
 
 interface CardModel

@@ -61,7 +61,8 @@ var CardField = React.createClass({
 	{
 		return {
 			drag_x: false,
-			drag_y: true,
+			drag_y: false,
+			dragInsideOnly: true,
 			reorderOnDrag: true,
 			value: '',
 			handleRef: 'handle',
@@ -100,12 +101,23 @@ var CardField = React.createClass({
 	},
 
 	render() {
+		var handleContent = null;
+		var removeContent = null;
+		if(this.props.draggable)
+		{
+			handleContent = <div className='card-field-handle' ref='handle'>⋮⋮</div>;
+		}
+		if(this.props.removable)
+		{
+			removeContent = <div className='card-field-delete' onClick={this.deleteField}>&times;</div>;
+		}
+
 		return this.renderPanel((
 			<div className='card-field'>
 				<div className='card-field-inner'>
-					<div className='card-field-handle' ref='handle'>⋮⋮</div>
+					{ handleContent }
 					<input type="text" value={this.props.value} onChange={this.handleChange} />
-					<div className='card-field-delete' onClick={this.deleteField}>&times;</div>
+					{ removeContent }
 				</div>
 			</div>
 			));

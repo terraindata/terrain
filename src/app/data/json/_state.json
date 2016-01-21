@@ -8,7 +8,19 @@
           "id": 1,
           "from":
           {
-            "table": "heroes"
+            "group": "sitters",
+            "joins": 
+            [
+              {
+                "group": "availability",
+                "comparison":
+                {
+                  "first": "sitter.id",
+                  "second": "availability.sitterId",
+                  "operator": "eq"
+                }
+              }
+            ]
           }
         },
         {
