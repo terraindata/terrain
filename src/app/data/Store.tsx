@@ -217,6 +217,26 @@ var filterCardReducer = (cards = [], action) => {
  return newCards;
 };
 
+var sortCardReducer = (cards = [], action) => {
+ var cardIndex = cards.indexOf(action.payload.card);
+ var newCards = cloneArray(cards);
+ if (!newCards[cardIndex].sort) {
+  return cards;
+ }
+
+ switch (action.type) {
+  case ActionTypes.cards.sort.change:
+   newCards[cardIndex].sort = action.payload.value;
+   break;
+  default:
+   // ActionType not applicable, return normal cards
+   return cards;
+ }
+
+ return newCards;
+};
+
+
 var cardsReducer = (cards = [], action) =>
 {
 	if(!action.payload)
@@ -231,7 +251,8 @@ var cardsReducer = (cards = [], action) =>
 
 	cards = selectCardReducer(cards, action);
 	cards = fromCardReducer(cards, action);
- cards = filterCardReducer(cards, action);
+  cards = filterCardReducer(cards, action);
+  cards = sortCardReducer(cards, action);
 
 	switch(action.type)
 	{

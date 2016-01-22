@@ -48,7 +48,7 @@ import Util from '../../util/Util.tsx';
 
 interface Props
 {
-  onSelect: (index: number) => void;
+  onChange: (index: number) => void;
   selectedIndex: number;
   ref?: string;
   options: string[];
@@ -65,40 +65,35 @@ class Dropdown extends React.Component<Props, any>
     this.value = this.props.selectedIndex;
   }
   
-  // get value() {
-    // console.log('val');
-    // return 10;
-  // }
-
   renderOption(option, index)
   {
     var handleClick = () => {
       this.value = index;
-      this.props.onSelect(index);
+      this.props.onChange(index);
     }
     return (
-    <div className="dropdown-option" key={index} onClick={handleClick}>
-    <div className="dropdown-option-inner">
-    { option }
-    </div>
-    </div>
+      <div className="dropdown-option" key={index} onClick={handleClick}>
+        <div className="dropdown-option-inner">
+          { option }
+        </div>
+      </div>
     );
   }
 
   render() {
     return (
-    <div className={"dropdown-wrapper" + (this.props.circle ? " dropdown-wrapper-circle" : "")}>
-    <div className="dropdown-value">
-    <div className="dropdown-option-inner">
-    { this.props.options[this.props.selectedIndex] }
-    </div>
-    </div>
-    <div className="dropdown-options-wrapper">
-    {
-      this.props.options.map(this.renderOption)
-    }
-    </div>
-    </div>
+      <div className={"dropdown-wrapper" + (this.props.circle ? " dropdown-wrapper-circle" : "")}>
+        <div className="dropdown-value">
+          <div className="dropdown-option-inner">
+            { this.props.options[this.props.selectedIndex] }
+          </div>
+        </div>
+        <div className="dropdown-options-wrapper">
+          {
+            this.props.options.map(this.renderOption)
+          }
+        </div>
+      </div>
     );
   }
 };

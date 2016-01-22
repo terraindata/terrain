@@ -1,4 +1,3 @@
-export var Operators: string[] = ['=', '≥', '>', '≤', '<', 'in', '≠'];
 /*
 University of Illinois/NCSA Open Source License 
 
@@ -43,3 +42,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+export var Operators: string[] = ['=', '≥', '>', '≤', '<', 'in', '≠'];
+export var Directions: string[] = ['ascending', 'descending'];

@@ -71,9 +71,22 @@ declare type Property = string;
 //   OR
 // }
 
-declare module A
+declare module CommonVars
 {
- export enum E {x, y, z}
+ export enum Operator {
+   EQ,
+   GE,
+   GT,
+   LE,
+   LT,
+   IN,
+   NE
+ }
+ 
+ export enum Direction {
+   ASC,
+   DESC
+ }
 }
 
 
@@ -81,7 +94,7 @@ interface Comparison
 {
   first: Property;
   second: Property;
-  operator: A.E;
+  operator: CommonVars.Operator;
 }
 
 
@@ -120,7 +133,7 @@ interface SelectCardModel extends CardModel
 interface Sort
 {
   property: Property;
-  direction: string;
+  direction: CommonVars.Direction;
 }
 
 interface SortCardModel extends CardModel

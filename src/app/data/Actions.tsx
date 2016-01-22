@@ -89,6 +89,13 @@ const create =
 				),
 			},
 		},
+    
+    sort: {
+      change: createAction<ChangeSortCardPayload>(
+        ActionTypes.cards.sort.change,
+        (card: any, value: Sort) => ({card, value})
+      ),
+    },
 
 		select:
 		{

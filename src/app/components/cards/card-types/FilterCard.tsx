@@ -99,7 +99,7 @@ class FilterCard extends React.Component<Props, any>
         {
           content: (
             <div>
-              <Dropdown ref={operatorRef} circle={true} options={Operators} selectedIndex={filter.comparison.operator} onSelect={changeFilter} />
+              <Dropdown ref={operatorRef} circle={true} options={Operators} selectedIndex={filter.comparison.operator} onChange={changeFilter} />
             </div>
           ),
           width: OPERATOR_WIDTH,

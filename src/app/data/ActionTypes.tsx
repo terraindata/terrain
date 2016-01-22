@@ -111,9 +111,8 @@ ActionTypes.cards.select = makeObject('cards.select', [
 	'changeField',
 ]);
 
-ActionTypes.cards.order = makeObject('cards.order', [
-	'changeProperty',
-	'changeDirection',
+ActionTypes.cards.sort = makeObject('cards.sort', [
+	'change',
 ]);
 
 ActionTypes.cards.filter = makeObject('cards.filter', [

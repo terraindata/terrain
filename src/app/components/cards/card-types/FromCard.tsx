@@ -108,7 +108,7 @@ class FromCard extends React.Component<Props, any>
         {
           content: (
             <div>
-             <Dropdown ref={operatorRef} circle={true} options={Operators} selectedIndex={join.comparison.operator} onSelect={changeJoin} />
+             <Dropdown ref={operatorRef} circle={true} options={Operators} selectedIndex={join.comparison.operator} onChange={changeJoin} />
             </div>
           ),
           width: OPERATOR_WIDTH,

@@ -43,7 +43,7 @@
           "sort":
           {
             "property": "urbanSitterRating",
-            "direction": "asc"
+            "direction": 0
           }
         },
         {

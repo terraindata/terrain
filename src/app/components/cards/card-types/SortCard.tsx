@@ -46,7 +46,9 @@ import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
+import Dropdown from './../../common/Dropdown.tsx';
 import CardField from './../CardField.tsx';
+import { Directions } from './../../../CommonVars.tsx';
 
 interface Props {
   card: SortCardModel;
@@ -54,41 +56,47 @@ interface Props {
 
 class SortCard extends React.Component<Props, any>
 {
- constructor(props:Props)
- {
-   super(props);
- }
+  constructor(props:Props)
+  {
+    super(props);
+  }
 
- handleChange()
- {
-
- }
-
-	render() {
-		var sort = this.props.card.sort;
-
-		var layout = {
-			colPadding: 12,
-   columns: [
+  render() {
+    var sort = this.props.card.sort;
+    
+    var dropdownRef = 'dropdown';
+    var propertyRef = 'property';
+    
+    var handleChange = () =>
     {
-     content: (
-      <input type='text' value={sort.property} onChange={this.handleChange} />
-     ),
-    },
-    {
-     content: (
-      <input type='text' value={sort.direction} onChange={this.handleChange} />
-     ),
+      Actions.dispatch.cards.sort.change(this.props.card, {
+        property: this.refs[propertyRef]['value'],
+        direction: this.refs[dropdownRef]['value']
+      });
     }
-   ],
-		};
 
-		return (
-			<CardField>
-    <LayoutManager layout={layout} />
-   </CardField>
-		);
-	}
+    var layout = {
+      colPadding: 12,
+      columns: [
+      {
+        content: (
+          <input type='text' value={sort.property} onChange={handleChange} ref={propertyRef} />
+        ),
+      },
+      {
+        content: (
+          <Dropdown options={Directions} selectedIndex={sort.direction} onChange={handleChange} ref={dropdownRef} />
+        ),
+      }
+      ],
+    };
+
+    return (
+      <CardField>
+        <LayoutManager layout={layout} />
+      </CardField>
+    );
+  }
 };
 
 export default SortCard;
