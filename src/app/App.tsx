@@ -81,50 +81,38 @@ var App = React.createClass({
   },
 
   render () {
-    var cardTabs = _.map(this.state.cardGroups, (cardGroup) => {
-      return {
-        content: <CardsArea cards={cardGroup.cards} />,
-        tabName: 'Algorithm ' + cardGroup.id,
-      };
+    var tabs = _.map(this.state.cardGroups, (cardGroup) => {
+     var layout = {
+      stackAt: 650,
+      fullHeight: true,
+      columns: [
+       {
+        content: <InputsArea inputs={this.state.inputs} />,
+       },
+       {
+        colSpan: 2,
+        content: <CardsArea cards={cardGroup.cards} />
+       },
+       {
+        content: <ResultsArea results={this.state.resultGroups[cardGroup.id].results} />
+       },
+      ]
+     };
+
+     return {
+      content: <LayoutManager layout={layout} />,
+      tabName: 'Algorithm ' + cardGroup.id,
+     };
     });
-    cardTabs.push({
+    
+    tabs.push({
       content: null,
       tabName: '+',
       onClick: this.handleNewAlgorithmTab,
     });
 
-    var resultTabs = _.map(this.state.resultGroups, (resultGroup) => {
-      return {
-        content: <ResultsArea results={resultGroup.results} />,
-        tabName: 'Alg. ' + resultGroup.id + ' Results',
-      };
-    });
-
-    var inputs = this.state.inputs;
-    var inputTabs = [{
-      content: <InputsArea inputs={inputs} />,
-      tabName: 'Inputs',
-    }]
-
-  	var layout = {
-  		stackAt: 650,
-      fullHeight: true,
-  		columns: [
-  			{
-  				content: <Tabs tabs={inputTabs} title="Inputs" />,
-  			},
-  			{
-          colSpan: 2,
-          content: <Tabs tabs={cardTabs} title="Builder" />
-        },
-        {
-          content: <Tabs tabs={resultTabs} title="Results" />
-        },
-  		]
-  	};
-
     return (
-      <LayoutManager layout={layout} />
+     <Tabs tabs={tabs} title="Builder" />
     );
   }
 

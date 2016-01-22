@@ -167,6 +167,10 @@ var fromCardReducer = (cards = [], action) => {
  if (!from) {
   return cards;
  }
+ 
+ if(!from.joins) {
+  from.joins = [];
+ }
 
  switch (action.type) {
   case ActionTypes.cards.from.changeGroup:

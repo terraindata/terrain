@@ -139,12 +139,16 @@ class FromCard extends React.Component<Props, any>
   }
 
 	render() {
-    var handleChange = (value) => 
+    var handleChange = (event) => 
     {
-      Actions.dispatch.cards.from.changeGroup(this.props.card, value);
+      Actions.dispatch.cards.from.changeGroup(this.props.card, event.target.value);
     }
 
-    var joinContent = this.props.card.from.joins.map(this.renderJoin);
+    var joinContent = null;
+    if (this.props.card.from.joins) 
+    {
+        joinContent = this.props.card.from.joins.map(this.renderJoin);
+    }
 
 		return (
       <div>
