@@ -47,6 +47,8 @@ import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import CardField from './../CardField.tsx';
+import Dropdown from './../../common/Dropdown.tsx';
+import { Operators } from './../../../CommonVars.tsx';
 
 interface Props {
   card: FilterCardModel;
@@ -74,8 +76,7 @@ class FilterCard extends React.Component<Props, any>
     {
         var first = this.refs[firstRef]['value'];
         var second = this.refs[secondRef]['value'];
-        var operator = filter.comparison.operator;
-        // TODO: var operator = this.refs[operatorRef]['value'];
+        var operator = this.refs[operatorRef]['value'];
         
         Actions.dispatch.cards.filter.change(this.props.card, index, {
           comparison:
@@ -97,7 +98,9 @@ class FilterCard extends React.Component<Props, any>
         },
         {
           content: (
-            <div>{Util.operatorToString(filter.comparison.operator)}</div>
+            <div>
+              <Dropdown ref={operatorRef} circle={true} options={Operators} selectedIndex={filter.comparison.operator} onSelect={changeFilter} />
+            </div>
           ),
           width: OPERATOR_WIDTH,
         },

@@ -2,13 +2,23 @@
 
 .card {
 	padding: 2px;
+ 
+ @card-border-radius: 5px;
 
 	.card-inner {
 		background: @light-green;
 		border: 1px solid @medium-dark-green;
-		border-radius: 5px;
-		overflow: hidden;
+		border-radius: @card-border-radius;
 	}
+ 
+ .card-title {
+  border-top-left-radius: calc(@card-border-radius - 1px);
+  border-top-right-radius: calc(@card-border-radius - 1px);
+ }
+ .card-sub-bar {
+  border-bottom-left-radius: calc(@card-border-radius - 1px);
+  border-bottom-right-radius: calc(@card-border-radius - 1px);
+ }
 
 	@card-padding-horizontal: 15px;
 	@card-padding-vertical: 7px;

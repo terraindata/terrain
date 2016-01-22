@@ -42,105 +42,65 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-declare type ID = number;
-declare type Group = string;
-declare type Key = string;
-declare type Value = string;
-declare type Property = string;
+require('./Dropdown.less');
+import * as React from 'react';
+import Util from '../../util/Util.tsx';
 
-// Not used, need to figure out the right way to use these.
-// declare enum Operator
-// {
-//   EQ,
-//   NE,
-//   GT,
-//   GE,
-//   LT,
-//   LE
-// }
-
-// declare enum Direction
-// {
-//   ASC,
-//   DESC
-// }
-
-// declare enum Combinator
-// {
-//   AND,
-//   OR
-// }
-
-declare module A
+interface Props
 {
- export enum E {x, y, z}
+  onSelect: (index: number) => void;
+  selectedIndex: number;
+  ref?: string;
+  options: string[];
+  circle?: boolean;
 }
 
-
-interface Comparison
+class Dropdown extends React.Component<Props, any>
 {
-  first: Property;
-  second: Property;
-  operator: A.E;
-}
-
-
-interface CardModel
-{
-  id: ID;
-  type: string; // Note: type may not be necessary, thanks to typescript
-}
-
-
-interface Join
-{
-  group: Group;
-  comparison: Comparison;
-}
-
-interface FromCardModel extends CardModel
-{
-  from:
-  {
-    group: Group;
-    joins: Join[];
-  }  
-}
-
-
-interface SelectCardModel extends CardModel
-{
-  select: 
-  {
-    properties: Property[];
+  value: number;
+  
+  constructor(props: Props) {
+    super(props);
+    this.renderOption = this.renderOption.bind(this);
+    this.value = this.props.selectedIndex;
   }
-}
+  
+  // get value() {
+    // console.log('val');
+    // return 10;
+  // }
 
-
-interface Sort
-{
-  property: Property;
-  direction: string;
-}
-
-interface SortCardModel extends CardModel
-{
-  sort: Sort;
-}
-
-
-interface Filter
-{  
- comparison: Comparison;
- combinator: string;   
-}
-
-interface FilterCardModel extends CardModel
-{
-  filter:
+  renderOption(option, index)
   {
-    // TODO adapt this model to support sort of operations appropriately
-    filters: Filter[];
+    var handleClick = () => {
+      this.value = index;
+      this.props.onSelect(index);
+    }
+    return (
+    <div className="dropdown-option" key={index} onClick={handleClick}>
+    <div className="dropdown-option-inner">
+    { option }
+    </div>
+    </div>
+    );
   }
-}
 
+  render() {
+    return (
+    <div className={"dropdown-wrapper" + (this.props.circle ? " dropdown-wrapper-circle" : "")}>
+    <div className="dropdown-value">
+    <div className="dropdown-option-inner">
+    { this.props.options[this.props.selectedIndex] }
+    </div>
+    </div>
+    <div className="dropdown-options-wrapper">
+    {
+      this.props.options.map(this.renderOption)
+    }
+    </div>
+    </div>
+    );
+  }
+};
+
+export default Dropdown;

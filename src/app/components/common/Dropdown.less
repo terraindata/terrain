@@ -1,0 +1,62 @@
+@import "../../util/Common.less";
+
+@option-height: 27px;
+
+.dropdown-wrapper {
+ background: @white;
+ height: @option-height;
+ overflow: hidden;
+ border-radius: calc(@option-height / 2);
+ box-sizing: border-box;
+ 
+ transition: height 0.15s;
+ .dropdown-value {
+  // transition: all 0.15s;
+ }
+ 
+ &.dropdown-wrapper-circle {
+  width: @option-height;
+ }
+ 
+ &:hover {
+  position: relative;
+  z-index: 999;
+  height: auto;
+  border: 1px solid @dark-green-border;
+  margin-top: -1px;
+  
+  .dropdown-value {
+   // background: @dark-green-border;
+   // color: @white;
+  }
+ }
+ 
+ .dropdown-value,
+ .dropdown-option {
+  height: @option-height;
+  padding: 0px 5px;
+  position: relative;
+ }
+ 
+ .dropdown-option {
+  transition: all 0.05s;
+  border-top: 1px solid @dark-green-border;
+  background: @white;
+  color: @bright-green;
+  
+  &:hover {
+   background: @bright-green;
+   color: @white;
+  }
+  
+  &:active {
+   background: @medium-green;
+   // font-size: 1.1em;
+  }
+ }
+ 
+ .dropdown-option-inner {
+   .vertically-middle;
+   margin-top: -1px;
+ }
+}

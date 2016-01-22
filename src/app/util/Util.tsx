@@ -79,6 +79,8 @@ var Util = {
 		return Math.min(Math.max(value, min), max);
 	},
 
+
+ // TODO remove
 	operatorToString(operator: string): string
 	{
 		switch(operator) {

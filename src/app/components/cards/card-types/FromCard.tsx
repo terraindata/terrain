@@ -47,12 +47,14 @@ import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import CardField from './../CardField.tsx';
+import Dropdown from './../../common/Dropdown.tsx';
+import { Operators } from './../../../CommonVars.tsx';
 
 interface Props {
   card: FromCardModel;
 }
 
-var OPERATOR_WIDTH: number = 20;
+var OPERATOR_WIDTH: number = 30;
 var CARD_PADDING: number = 12;
 
 class FromCard extends React.Component<Props, any>
@@ -69,13 +71,14 @@ class FromCard extends React.Component<Props, any>
     var groupRef = refBase + 'group';
     var firstRef = refBase + 'first';
     var secondRef = refBase + 'second';
+    var operatorRef = refBase + 'operator';
 
     var changeJoin = () =>
     {
         var group = this.refs[groupRef]['value'];
         var first = this.refs[firstRef]['value'];
         var second = this.refs[secondRef]['value'];
-        var operator = join.comparison.operator;
+        var operator = this.refs[operatorRef]['value'];
         
         Actions.dispatch.cards.from.join.change(this.props.card, index, {
           group: group,
@@ -104,7 +107,9 @@ class FromCard extends React.Component<Props, any>
         },
         {
           content: (
-            <div>{Util.operatorToString(join.comparison.operator)}</div>
+            <div>
+             <Dropdown ref={operatorRef} circle={true} options={Operators} selectedIndex={join.comparison.operator} onSelect={changeJoin} />
+            </div>
           ),
           width: OPERATOR_WIDTH,
         },

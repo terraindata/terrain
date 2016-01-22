@@ -17,7 +17,7 @@
                 {
                   "first": "sitter.id",
                   "second": "availability.sitterId",
-                  "operator": "ge"
+                  "operator": 0
                 }
               }
             ]
@@ -58,23 +58,23 @@
             {
              "first": "input.maxPrice",
              "second": "sitter.minPrice",
-             "operator": "ge"
+             "operator": 1
             }
            },
            {
             "comparison":
             {
              "first": "input.startDateTime",
-             "second": "availability.endDateTime",
-             "operator": "ge"
+             "second": "availability.startDateTime",
+             "operator": 1
             }
            },
            {
             "comparison":
             {
              "first": "input.endDateTime",
-             "second": "availability.startDateTime",
-             "operator": "le"
+             "second": "availability.endDateTime",
+             "operator": 3
             }
            },
            {
@@ -82,7 +82,7 @@
             {
              "first": "input.city",
              "second": "sitter.attributes",
-             "operator": "in"
+             "operator": 5
             }
            }
           ]
