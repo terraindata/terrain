@@ -51,6 +51,8 @@ import LayoutManager from "../layout/LayoutManager.tsx";
 import CardInput from './CardField.tsx';
 import SelectCard from './card-types/SelectCard.tsx';
 import FromCard from './card-types/FromCard.tsx';
+import SortCard from './card-types/SortCard.tsx';
+import FilterCard from './card-types/FilterCard.tsx';
 
 var Card = React.createClass({
 	mixins: [PanelMixin],
@@ -119,6 +121,13 @@ var Card = React.createClass({
 				};
 
 				break;
+   case 'sort':
+     content = <SortCard card={this.props.data} />
+     break;
+   case 'filter':
+    content = <FilterCard card={this.props.data} />
+    // TODO sub bar
+    break;
 			default:
 				content = <div>This card has not been implemented yet.</div>
 		}

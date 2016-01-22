@@ -46,7 +46,8 @@ THE SOFTWARE.
 
 var GROUP_DEFAULT = "";
 var PROPERTY_DEFAULT = "";
-var OPERATOR_DEFAULT: Operator = 0;
+var OPERATOR_DEFAULT = 'eq';
+var COMBINATOR_DEFAULT = '&';
 
 var COMPARISON_DEFAULT =
 {
@@ -61,5 +62,11 @@ export default
   {
     group: GROUP_DEFAULT,
     comparison: COMPARISON_DEFAULT,
+  },
+
+  FILTER_DEFAULT:
+  {
+   comparison: COMPARISON_DEFAULT,
+   combinator: COMBINATOR_DEFAULT,
   }
 };

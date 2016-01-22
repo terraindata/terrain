@@ -112,6 +112,24 @@ const create =
 				(card: any, fieldIndex: number) => ({card, fieldIndex})
 			),
 		},
+
+  filter:
+  {
+   create: createAction<CreateFilterPayload>(
+    ActionTypes.cards.filter.create,
+    (card: any, index: number) => ({ card, index })
+   ),
+
+   change: createAction<ChangeFilterPayload>(
+    ActionTypes.cards.filter.change,
+    (card: any, index: number, value: Filter) => ({ card, index, value })
+   ),
+
+   delete: createAction<DeleteFilterPayload>(
+    ActionTypes.cards.filter.delete,
+    (card: any, index: number) => ({ card, index })
+   ),
+  },
 	}, // /cards
 
 	inputs:

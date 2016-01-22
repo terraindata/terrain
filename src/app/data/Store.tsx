@@ -160,36 +160,61 @@ var selectCardReducer = (cards = [], action) =>
 };
 
 
-var fromCardReducer = (cards = [], action) =>
-{
-	var cardIndex = cards.indexOf(action.payload.card);
-	var newCards = cloneArray(cards);
-	var from = newCards[cardIndex].from;
-	if(!from)
-	{
-		return cards;
-	}
+var fromCardReducer = (cards = [], action) => {
+ var cardIndex = cards.indexOf(action.payload.card);
+ var newCards = cloneArray(cards);
+ var from = newCards[cardIndex].from;
+ if (!from) {
+  return cards;
+ }
 
-	switch(action.type)
-	{
-		case ActionTypes.cards.from.changeGroup:
-			from.group = action.payload.value;
-			break;
-		case ActionTypes.cards.from.join.create:
-			from.joins.push(Defaults.JOIN_DEFAULT);
-			break;
-		case ActionTypes.cards.from.join.change:
-			from.joins[action.payload.index] = action.payload.value;
-			break;
-		case ActionTypes.cards.from.join.delete:
+ switch (action.type) {
+  case ActionTypes.cards.from.changeGroup:
+   from.group = action.payload.value;
+   break;
+  case ActionTypes.cards.from.join.create:
+   from.joins.push(Defaults.JOIN_DEFAULT);
+   break;
+  case ActionTypes.cards.from.join.change:
+   from.joins[action.payload.index] = action.payload.value;
+   break;
+  case ActionTypes.cards.from.join.delete:
    from.joins.splice(action.payload.index, 1);
-			break;
-		default:
-			// ActionType not applicable, return normal cards
-			return cards;
-	}
+   break;
+  default:
+   // ActionType not applicable, return normal cards
+   return cards;
+ }
 
-	return newCards;
+ return newCards;
+};
+
+
+var filterCardReducer = (cards = [], action) => {
+ var cardIndex = cards.indexOf(action.payload.card);
+ var newCards = cloneArray(cards);
+ var filter = newCards[cardIndex].filter;
+ if (!filter) {
+  return cards;
+ }
+ var filters = filter.filters;
+
+ switch (action.type) {
+  case ActionTypes.cards.filter.create:
+   filters.push(Defaults.FILTER_DEFAULT);
+   break;
+  case ActionTypes.cards.filter.change:
+   filters[action.payload.index] = action.payload.value;
+   break;
+  case ActionTypes.cards.filter.delete:
+   filters.splice(action.payload.index, 1);
+   break;
+  default:
+   // ActionType not applicable, return normal cards
+   return cards;
+ }
+
+ return newCards;
 };
 
 var cardsReducer = (cards = [], action) =>
@@ -206,6 +231,7 @@ var cardsReducer = (cards = [], action) =>
 
 	cards = selectCardReducer(cards, action);
 	cards = fromCardReducer(cards, action);
+ cards = filterCardReducer(cards, action);
 
 	switch(action.type)
 	{

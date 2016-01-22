@@ -17,7 +17,7 @@
                 {
                   "first": "sitter.id",
                   "second": "availability.sitterId",
-                  "operator": "eq"
+                  "operator": "ge"
                 }
               }
             ]
@@ -38,24 +38,55 @@
           }
         },
         {
-          "type": "order",
+          "type": "sort",
           "id": 3,
-          "order":
+          "sort":
           {
-            "field": "urbanSitterRating"
+            "property": "urbanSitterRating",
+            "direction": "asc"
           }
         },
         {
-          "type": "score",
-          "id": 4,
-          "score":
-          {
-            "fields":
-            [
-              "urbanSitterRating",
-              "numJobs"
-            ]
-          }
+         "type": "filter",
+         "id": 41,
+         "filter":
+         {
+          "filters":
+          [
+           {
+            "comparison":
+            {
+             "first": "input.maxPrice",
+             "second": "sitter.minPrice",
+             "operator": "ge"
+            }
+           },
+           {
+            "comparison":
+            {
+             "first": "input.startDateTime",
+             "second": "availability.endDateTime",
+             "operator": "ge"
+            }
+           },
+           {
+            "comparison":
+            {
+             "first": "input.endDateTime",
+             "second": "availability.startDateTime",
+             "operator": "le"
+            }
+           },
+           {
+            "comparison":
+            {
+             "first": "input.city",
+             "second": "sitter.attributes",
+             "operator": "in"
+            }
+           }
+          ]
+         }
         }
       ]
     },

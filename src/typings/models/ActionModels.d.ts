@@ -112,10 +112,10 @@ interface DeleteSelectCardFieldPayload extends SelectCardPayload {}
 interface CreateSelectCardFieldPayload extends SelectCardPayload {}
 
 
-interface OrderCardPayload extends CardPayload {
-  card: OrderCardModel;
+interface SortCardPayload extends CardPayload {
+  card: SortCardModel;
 }
-interface ChangeOrderCardPayload extends OrderCardPayload, ChangePayload<Order> {}
+interface ChangeSortCardPayload extends SortCardPayload, ChangePayload<Sort> {}
 
 
 interface FilterCardPayload extends CardPayload {
@@ -123,6 +123,7 @@ interface FilterCardPayload extends CardPayload {
 }
 interface CreateFilterPayload extends FilterCardPayload, CreatePayload {}
 interface ChangeFilterPayload extends FilterCardPayload, IndexedPayload, ChangePayload<Filter> {}
+interface DeleteFilterPayload extends FilterCardPayload, DeletePayload {}
 
 
 interface InputPayload

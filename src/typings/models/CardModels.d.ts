@@ -48,34 +48,35 @@ declare type Key = string;
 declare type Value = string;
 declare type Property = string;
 
-declare enum Operator
-{
-  EQ,
-  NE,
-  GT,
-  GE,
-  LT,
-  LE
-}
+// Not used, need to figure out the right way to use these.
+// declare enum Operator
+// {
+//   EQ,
+//   NE,
+//   GT,
+//   GE,
+//   LT,
+//   LE
+// }
 
-declare enum Direction
-{
-  ASC,
-  DESC
-}
+// declare enum Direction
+// {
+//   ASC,
+//   DESC
+// }
 
-declare enum Combinator
-{
-  AND,
-  OR
-}
+// declare enum Combinator
+// {
+//   AND,
+//   OR
+// }
 
 
 interface Comparison
 {
   first: Property;
   second: Property;
-  operator: Operator;
+  operator: string;
 }
 
 
@@ -111,29 +112,29 @@ interface SelectCardModel extends CardModel
 }
 
 
-interface Order
+interface Sort
 {
   property: Property;
-  direction: Direction;
+  direction: string;
 }
 
-interface OrderCardModel extends CardModel
+interface SortCardModel extends CardModel
 {
-  order: Order;
+  sort: Sort;
 }
 
 
 interface Filter
 {  
  comparison: Comparison;
- combinator: Combinator;   
+ combinator: string;   
 }
 
 interface FilterCardModel extends CardModel
 {
   filter:
   {
-    // TODO adapt this model to support order of operations appropriately
+    // TODO adapt this model to support sort of operations appropriately
     filters: Filter[];
   }
 }

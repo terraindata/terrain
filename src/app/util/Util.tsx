@@ -79,6 +79,30 @@ var Util = {
 		return Math.min(Math.max(value, min), max);
 	},
 
+	operatorToString(operator: string): string
+	{
+		switch(operator) {
+			case 'eq':
+				return '=';
+			case 'ge':
+				return '≥';
+			case 'gt':
+				return '>';
+			case 'le':
+				return '≤';
+			case 'lt':
+				return '<';
+   case 'in':
+    return 'in';
+			case 'ne':
+				return '≠';
+		}
+
+		console.log('Not a valid operator: ' + operator);
+
+		return "";
+	},
+
 	// accepts object of key/vals like this: { 'className': include? }
 	objToClassname(obj: { [className: string]: boolean }): string
 	{

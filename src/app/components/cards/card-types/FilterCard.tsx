@@ -49,68 +49,61 @@ import LayoutManager from "../../layout/LayoutManager.tsx";
 import CardField from './../CardField.tsx';
 
 interface Props {
-  card: FromCardModel;
+  card: FilterCardModel;
 }
 
 var OPERATOR_WIDTH: number = 20;
 var CARD_PADDING: number = 12;
 
-class FromCard extends React.Component<Props, any>
+class FilterCard extends React.Component<Props, any>
 {
   constructor(props:Props)
   {
     super(props);
-    this.renderJoin = this.renderJoin.bind(this);
+    this.renderFilter = this.renderFilter.bind(this);
   }
 
-  renderJoin(join: Join, index: number)
+  renderFilter(filter: Filter, index: number)
   {
-    var refBase = 'join-ref-' + index + '-' + this.props.card.id + '-';
-    var groupRef = refBase + 'group';
+    var refBase = 'filter-ref-' + index + '-' + this.props.card.id + '-';
+    var operatorRef = refBase + 'operator';
     var firstRef = refBase + 'first';
     var secondRef = refBase + 'second';
 
-    var changeJoin = () =>
+    var changeFilter = () =>
     {
-        var group = this.refs[groupRef]['value'];
         var first = this.refs[firstRef]['value'];
         var second = this.refs[secondRef]['value'];
-        var operator = join.comparison.operator;
+        var operator = filter.comparison.operator;
+        // TODO: var operator = this.refs[operatorRef]['value'];
         
-        Actions.dispatch.cards.from.join.change(this.props.card, index, {
-          group: group,
+        Actions.dispatch.cards.filter.change(this.props.card, index, {
           comparison:
           {
-            first: first,
-            second: second,
-            operator: operator,
-          }
+              operator: operator,
+              first: first,
+              second: second,
+          },
         });
     }
 
-    var joinLayout =
+    var filterLayout =
     {
       columns: [
         {
           content: (
-            <input type='text' value={join.group} onChange={changeJoin} ref={groupRef} />
-          ),
-          colSpan: 2,
-        },
-        {
-          content: (
-            <input type='text' value={join.comparison.first} onChange={changeJoin} ref={firstRef} />
+            <input type='text' value={filter.comparison.first} onChange={changeFilter} ref={firstRef} />
           ),
         },
         {
           content: (
-            <div>{Util.operatorToString(join.comparison.operator)}</div>
+            <div>{Util.operatorToString(filter.comparison.operator)}</div>
           ),
           width: OPERATOR_WIDTH,
         },
         {
           content: (
-            <input type='text' value={join.comparison.second} onChange={changeJoin} ref={secondRef} />
+            <input type='text' value={filter.comparison.second} onChange={changeFilter} ref={secondRef} />
           ),
         }
       ],
@@ -119,7 +112,7 @@ class FromCard extends React.Component<Props, any>
 
     var deleteFn = () =>
     {
-        Actions.dispatch.cards.from.join.delete(this.props.card, index);
+        Actions.dispatch.cards.filter.delete(this.props.card, index);
     }
 
     return (
@@ -128,33 +121,18 @@ class FromCard extends React.Component<Props, any>
         draggable={false}
         removable={true}
         onDelete={deleteFn} >
-        <LayoutManager layout={joinLayout} />
+        <LayoutManager layout={filterLayout} />
       </CardField>
     );
   }
 
 	render() {
-    var handleChange = (value) => 
-    {
-      Actions.dispatch.cards.from.changeGroup(this.props.card, value);
-    }
-
-    var joinContent = this.props.card.from.joins.map(this.renderJoin);
-
-		return (
+    return (
       <div>
-        <CardField
-          draggable={false}
-          removable={false}
-          drag_y={true}>
-          <input type="text" 
-            value={this.props.card.from.group}
-            onChange={handleChange} />
-        </CardField>
-        { joinContent }
+        { this.props.card.filter.filters.map(this.renderFilter) }
       </div>
 		);
 	}
 };
 
-export default FromCard;
+export default FilterCard;

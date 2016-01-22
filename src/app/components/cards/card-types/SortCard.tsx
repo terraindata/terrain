@@ -42,85 +42,53 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-var Immutable = require('immutable');
+import * as React from 'react';
+import Actions from "../../../data/Actions.tsx";
+import Util from '../../../util/Util.tsx';
+import LayoutManager from "../../layout/LayoutManager.tsx";
+import CardField from './../CardField.tsx';
 
-/*
+interface Props {
+  card: SortCardModel;
+}
 
-Terminology:
-- create
-- change
-- move
-- delete
-
-*/
-
-// prepend str to every item in the array
-var prependArray = (str, arr) => 
+class SortCard extends React.Component<Props, any>
 {
-	return arr.map((elem) => str + "." + elem);
+ constructor(props:Props)
+ {
+   super(props);
+ }
+
+ handleChange()
+ {
+
+ }
+
+	render() {
+		var sort = this.props.card.sort;
+
+		var layout = {
+			colPadding: 12,
+   columns: [
+    {
+     content: (
+      <input type='text' value={sort.property} onChange={this.handleChange} />
+     ),
+    },
+    {
+     content: (
+      <input type='text' value={sort.direction} onChange={this.handleChange} />
+     ),
+    }
+   ],
+		};
+
+		return (
+			<CardField>
+    <LayoutManager layout={layout} />
+   </CardField>
+		);
+	}
 };
 
-// convert an array into an object where the keys === values
-var makeObject = (str, arr) =>
-{
-	return _.object(arr, prependArray(str, arr));
-};
-
-
-var ActionTypes = 
-{
-	// moveCard: moveCard,
-	// Action: Action,
-
-	cards: makeObject('cards',
-	[
-		'move',
-		'create',
-	]),
-
-	inputs: makeObject('inputs',
-	[
-		'move',
-		'create',
-		'changeKey',
-		'changeValue',
-	]),
-
-	results: makeObject('results', 
-	[
-		'move',
-	]),
-
-	newAlgorithm: 'newAlgorithm',
-};
-
-ActionTypes.cards.from = makeObject('cards.from', [
-	'changeGroup',
-]);
-ActionTypes.cards.from.join = makeObject('cards.from.join', [
-	'create',
-	'change',
-	'delete',
-]);
-
-ActionTypes.cards.select = makeObject('cards.select', [
-	'moveField',
-	'createField',
-	'deleteField',
-	'changeField',
-]);
-
-ActionTypes.cards.order = makeObject('cards.order', [
-	'changeProperty',
-	'changeDirection',
-]);
-
-ActionTypes.cards.filter = makeObject('cards.filter', [
-	'create',
- 'change',
- 'delete',
-]);
-
-
-export default ActionTypes;
+export default SortCard;
