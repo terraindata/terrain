@@ -42,26 +42,76 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-/// <reference path="../typings/tsd.d.ts" />
-
-// Style
-require("./GeneralStyle.less");
-
 // Libraries
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
+var _ = require("underscore");
+
+// Data
+import Store from "./../../data/Store.tsx";
+import Actions from "./../../data/Actions.tsx";
 
 // Components
-import Builder from "./components/builder/Builder.tsx";
+import Tabs from "./../../components/layout/Tabs.tsx";
+import LayoutManager from "./../../components/layout/LayoutManager.tsx";
+import Card from "./../../components/cards/Card.tsx";
+import Result from "./../../components/results/Result.tsx";
+import InputsArea from "./../../components/inputs/InputsArea.tsx";
+import CardsArea from "./../../components/cards/CardsArea.tsx";
+import ResultsArea from "./../../components/results/ResultsArea.tsx";
 
-var App = React.createClass({
-  render () {
-   return <Builder />;
+class Builder extends React.Component<any, any>
+{
+  constructor()
+  {
+    super();
+    
+    Store.subscribe(() => {
+      this.setState(Store.getState());
+    });
+    
+    this.state = Store.getState();
+  }
+  
+  handleNewAlgorithmTab() {
+    Actions.dispatch.newAlgorithm();
   }
 
-});
+	render() {
+    var tabs = _.map(this.state.cardGroups, (cardGroup) => {
+      var layout = {
+        stackAt: 650,
+        fullHeight: true,
+        columns: [
+          {
+            content: <InputsArea inputs={this.state.inputs} />,
+          },
+          {
+            colSpan: 2,
+            content: <CardsArea cards={cardGroup.cards} />
+          },
+          {
+            content: <ResultsArea results={this.state.resultGroups[cardGroup.id].results} />
+          },
+        ]
+      };
 
-ReactDOM.render(<App />, document.getElementById('app'), function () {
-  // require('./tests').run(this);
-  // TODO: tests here.
-});
+      return {
+        content: <LayoutManager layout={layout} />,
+        tabName: 'Algorithm ' + cardGroup.id,
+      };
+    });
+
+    tabs.push({
+      content: null,
+      tabName: '+',
+      onClick: this.handleNewAlgorithmTab,
+    });
+
+    return (
+      <Tabs tabs={tabs} />
+    );
+	}
+};
+
+export default Builder;
