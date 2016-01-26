@@ -52,11 +52,97 @@ import * as React from 'react';
 import * as ReactDOM from "react-dom";
 
 // Components
+import LayoutManager from "./components/layout/LayoutManager.tsx";
 import Builder from "./components/builder/Builder.tsx";
+import Sidebar from "./components/layout/Sidebar.tsx";
+
+// Icons
+var HomeIcon = require("babel!svg-react!./../images/icon_home_17x14.svg?name=HomeIcon");
+var BrowserIcon = require("babel!svg-react!./../images/icon_browser_17x14.svg?name=BrowserIcon");
+var BuilderIcon = require("babel!svg-react!./../images/icon_builder_17x11.svg?name=BuilderIcon");
+var TQLIcon = require("babel!svg-react!./../images/icon_tql_17x14.svg?name=TQLIcon");
 
 var App = React.createClass({
+  getInitialState()
+  {
+    return {
+      selectedPage: 2,
+    };
+  },
+  
+  selectPage(index)
+  {
+    this.setState({
+      selectedPage: index,
+      sidebarExpanded: false,
+    });
+  },
+  
+  toggleSidebar()
+  {
+    console.log('toggle');
+    this.setState({
+      sidebarExpanded: !this.state.sidebarExpanded,
+    })
+  },
+  
   render () {
-   return <Builder />;
+    var links = 
+    [
+      {
+        icon: <HomeIcon />,
+        text: 'Home',
+      },
+      {
+        icon: <BrowserIcon />,
+        text: 'Browser',
+      },
+      {
+        icon: <BuilderIcon />,
+        text: 'Builder',
+      },
+      {
+        icon: <TQLIcon />,
+        text: 'TQL',
+      },
+    ];
+    
+    var content = (
+      <div className='page-placeholder'>
+        🚧 This page is still in progress. 🚧
+      </div> 
+    );
+    
+    switch(this.state.selectedPage) {
+      case 2:
+        content = <Builder />;
+      // New pages added here
+    }
+    
+    var sidebarWidth = this.state.sidebarExpanded ? 130 : 36;
+    
+    var layout =
+      {
+        fullHeight: true,
+        columns:
+        [
+          {
+            width: sidebarWidth,
+            content: <Sidebar 
+              links={links}
+              selectedIndex={this.state.selectedPage}
+              onChange={this.selectPage}
+              expandable={true}
+              expanded={this.state.sidebarExpanded}
+              onExpand={this.toggleSidebar} />
+          },
+          {
+            content: content
+          }
+        ],
+      };
+     
+    return <LayoutManager layout={layout} />;
   }
 
 });

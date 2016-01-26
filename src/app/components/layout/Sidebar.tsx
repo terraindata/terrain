@@ -42,29 +42,70 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-module.exports = {
-    entry: "./src/app/App.tsx",
-    devtool: 'eval',
-    output: {
-        path: __dirname,
-        filename: "bundle.js"
-    },
-    resolve: {
-        extensions: [ '', '.js', '.css', '.less', '.tsx', '.json', '.svg' ]
-    },
-    module: {
-        loaders: [
-            { test: /\.css$/, loader: "style!css" },
-            { test: /\.less$/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
-            { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
-            { test: /\.woff(2)?$/,   loader: "url?limit=10000&mimetype=application/font-woff" },
-            { test: /\.ttf$/, loader: "file" },
-            { test: /\.eot$/, loader: "file" },
-            { test: /\.svg$/, loader: "file" },
-            { test: require.resolve('jquery'), loader: "expose?jQuery" },
-            { test: /\.tsx$/, loader: 'babel!ts-loader' },
-            { test: /\.json$/, loader: 'json' },
-            { test: /\.svg$/, loader: 'babel!svg-react' }
-        ]
-    }
+require('./Sidebar.less');
+import * as React from 'react';
+import Util from '../../util/Util.tsx';
+
+var ExpandIcon = require("babel!svg-react!./../../../images/icon_expand_12x12.svg?name=ExpandIcon");
+
+interface Link {
+  icon: any;
+  text: string;
+}
+
+interface Props {
+  links: Link[];
+  selectedIndex: number;
+  onChange: (selectedIndex: number) => void;
+  expandable?: boolean;
+  expanded?: boolean;
+  onExpand?: () => void;
+}
+
+class Sidebar extends React.Component<Props, any>
+{
+	handleClickFactory(index)
+	{
+		return () => this.props.onChange(index);
+	}
+
+	render() {
+		return (
+      <div className={Util.objToClassname({
+        'sidebar-container': true,
+        'sidebar-container-expanded': this.props.expanded,
+      })}>
+				{
+					this.props.links.map((link, index) => 
+            (
+  						<div 
+  							className={Util.objToClassname({
+  								'sidebar-link': true,
+  								'sidebar-link-selected': index === this.props.selectedIndex,
+  								})}
+  							key={index}
+  							onClick={this.handleClickFactory(index)}>
+                  <div className="sidebar-link-inner">
+  								  { link.icon }
+                    <div className="sidebar-link-text">{link.text}</div>
+                    
+                  </div>
+  						</div>
+            )
+          )
+				}
+        {
+        this.props.expandable ?
+          (
+            <div className='sidebar-expand' onClick={this.props.onExpand}>
+              <ExpandIcon />
+            </div>
+          )
+          : null
+        }
+			</div>
+		);
+	}
 };
+
+export default Sidebar;
