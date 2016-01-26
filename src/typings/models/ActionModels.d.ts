@@ -87,7 +87,9 @@ interface CardPayload
   card: CardModel;
 }
 
-interface CreateCardPayload extends CardPayload, CreatePayload {}
+interface CreateCardPayload extends CreatePayload {
+  type: string;
+}
 interface MoveCardPayload extends CardPayload, MovePayload {}
 
 
@@ -103,13 +105,13 @@ interface ChangeJoinPayload extends FromCardPayload, IndexedPayload, ChangePaylo
 interface SelectCardPayload extends CardPayload
 {
   card: SelectCardModel;
-  fieldIndex: number; // TODO change this
+  propertyIndex: number; // TODO change this
 }
 
-interface MoveSelectCardFieldPayload extends SelectCardPayload, MovePayload {}
-interface ChangeSelectCardFieldPayload extends SelectCardPayload, ChangePayload<string> {}
-interface DeleteSelectCardFieldPayload extends SelectCardPayload {}
-interface CreateSelectCardFieldPayload extends SelectCardPayload {}
+interface MoveSelectCardPropertyPayload extends SelectCardPayload, MovePayload {}
+interface ChangeSelectCardPropertyPayload extends SelectCardPayload, ChangePayload<string> {}
+interface DeleteSelectCardPropertyPayload extends SelectCardPayload {}
+interface CreateSelectCardPropertyPayload extends SelectCardPayload {}
 
 
 interface SortCardPayload extends CardPayload {

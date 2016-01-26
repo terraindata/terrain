@@ -105,10 +105,10 @@ ActionTypes.cards.from.join = makeObject('cards.from.join', [
 ]);
 
 ActionTypes.cards.select = makeObject('cards.select', [
-	'moveField',
-	'createField',
-	'deleteField',
-	'changeField',
+	'moveProperty',
+	'createProperty',
+	'deleteProperty',
+	'changeProperty',
 ]);
 
 ActionTypes.cards.sort = makeObject('cards.sort', [

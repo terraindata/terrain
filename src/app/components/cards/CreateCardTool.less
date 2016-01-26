@@ -1,0 +1,89 @@
+@import "../../util/Common.less";
+
+.create-card-wrapper {
+  padding: 5px 0px;
+  
+  @create-card-border-radius: 5px;
+  @create-icon-height: 12px;
+  @create-icon-padding: 2px;
+  @create-card-row-height: calc(@create-icon-height + @create-icon-padding * 2);
+  .create-card-row {
+    position: relative;
+     
+    .create-card-plus {
+      background: @dark-green;
+      display: inline-block;
+      padding: @create-icon-padding;
+      border-radius: 10px;
+      position: relative;
+      left: 30px;
+      .transition;
+      
+      svg {
+        fill: #fff;
+        height: @create-icon-height;
+      }
+    }
+    
+    .create-card-line {
+      border-bottom: 1px solid @dark-green;
+      position: absolute;
+      width: 100%;
+      top: calc(@create-icon-height / 2 + @create-icon-padding);
+      .transition;
+    }
+    
+    &:hover {
+      .create-card-line {
+        border-color: darken(@dark-green, 5%);
+      }
+      .create-card-plus {
+        background: darken(@dark-green, 5%);
+      }
+    }
+  }
+  
+  .create-card-row,
+  .create-card-selector {
+    overflow: hidden;  
+    .transition;
+  }
+  
+  .create-card-selector {
+    // padding: 0px 10px;
+    background: @light-green;
+    border-radius: @create-card-border-radius;
+    overflow-x: scroll;
+    white-space: nowrap;
+    
+    .create-card-button {
+      cursor: pointer;
+      font-size: @large-font-size;
+      background: @dark-green;
+      color: #fff;
+      padding: 10px;
+      margin: 5px;
+      border-radius: @create-card-border-radius;
+      display: inline-block;
+      text-transform: capitalize;
+    }
+  }
+  
+  &.create-card-open {
+    .create-card-row {
+      height: 0px;
+    }
+    .create-card-selector {
+      height: 65px;
+    }
+  }
+  
+  &.create-card-closed {
+    .create-card-row {
+      height: @create-card-row-height;
+    }
+    .create-card-selector {
+      height: 0px;
+    }
+  }
+}

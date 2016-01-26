@@ -64,7 +64,7 @@ module.exports = {
             { test: require.resolve('jquery'), loader: "expose?jQuery" },
             { test: /\.tsx$/, loader: 'babel!ts-loader' },
             { test: /\.json$/, loader: 'json' },
-            { test: /\.svg$/, loader: 'babel!svg-react' }
+            { test: /\.svg\?name=[a-zA-Z]+$/, loader: 'babel!svg-react' }
         ]
     }
 };

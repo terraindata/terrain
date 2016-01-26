@@ -6,36 +6,30 @@
         {
           "type": "from",
           "id": 1,
-          "from":
-          {
-            "group": "sitters",
-            "joins": 
-            [
+          "group": "sitters",
+          "joins": 
+          [
+            {
+              "group": "availability",
+              "comparison":
               {
-                "group": "availability",
-                "comparison":
-                {
-                  "first": "sitter.id",
-                  "second": "availability.sitterId",
-                  "operator": 0
-                }
+                "first": "sitter.id",
+                "second": "availability.sitterId",
+                "operator": 0
               }
-            ]
-          }
+            }
+          ]
         },
         {
           "type": "select",
           "id": 2,
-          "select":
-          {
-            "fields": [
+            "properties": [
               "name",
               "picture",
               "description",
               "minPrice",
               "numJobs"
             ]
-          }
         },
         {
           "type": "sort",
@@ -49,8 +43,6 @@
         {
          "type": "filter",
          "id": 41,
-         "filter":
-         {
           "filters":
           [
            {
@@ -87,7 +79,6 @@
            }
           ]
          }
-        }
       ]
     },
     "101": {

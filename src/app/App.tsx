@@ -57,10 +57,10 @@ import Builder from "./components/builder/Builder.tsx";
 import Sidebar from "./components/layout/Sidebar.tsx";
 
 // Icons
-var HomeIcon = require("babel!svg-react!./../images/icon_home_17x14.svg?name=HomeIcon");
-var BrowserIcon = require("babel!svg-react!./../images/icon_browser_17x14.svg?name=BrowserIcon");
-var BuilderIcon = require("babel!svg-react!./../images/icon_builder_17x11.svg?name=BuilderIcon");
-var TQLIcon = require("babel!svg-react!./../images/icon_tql_17x14.svg?name=TQLIcon");
+var HomeIcon = require("./../images/icon_home_17x14.svg?name=HomeIcon");
+var BrowserIcon = require("./../images/icon_browser_17x14.svg?name=BrowserIcon");
+var BuilderIcon = require("./../images/icon_builder_17x11.svg?name=BuilderIcon");
+var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 
 var App = React.createClass({
   getInitialState()
@@ -80,7 +80,6 @@ var App = React.createClass({
   
   toggleSidebar()
   {
-    console.log('toggle');
     this.setState({
       sidebarExpanded: !this.state.sidebarExpanded,
     })

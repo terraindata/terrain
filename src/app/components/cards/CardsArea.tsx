@@ -48,6 +48,7 @@ import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/Actions.tsx";
 import Card from "../cards/Card.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
+import CreateCardTool from "./CreateCardTool.tsx";
 
 var CardsArea = React.createClass<any, any>({
 	propTypes:
@@ -57,13 +58,16 @@ var CardsArea = React.createClass<any, any>({
 
 	render() {
 		var layout = {
-			rows: this.props.cards.map((card) => {
+			rows: this.props.cards.map((card, index) => {
 				return {
-					content: <Card name={card.name} data={card} />,
+					content: <Card name={card.name} index={index} card={card} />,
 				};
 			}),
 			fullHeight: true,
 		};
+    layout.rows.push({
+      content: <CreateCardTool index={this.props.cards.length} alwaysOpen={true} />
+    });
 
 		var moveTo = (curIndex, newIndex) =>
     {

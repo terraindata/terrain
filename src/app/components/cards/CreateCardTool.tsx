@@ -42,117 +42,81 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-declare type ID = number;
-declare type Group = string;
-declare type Key = string;
-declare type Value = string;
-declare type Property = string;
+require('./CreateCardTool.less')
+import * as React from 'react';
+import Actions from "../../data/Actions.tsx";
+import Util from '../../util/Util.tsx';
+import { CardTypes } from './../../CommonVars.tsx';
 
-// Not used, need to figure out the right way to use these.
-// declare enum Operator
-// {
-//   EQ,
-//   NE,
-//   GT,
-//   GE,
-//   LT,
-//   LE
-// }
+var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
 
-// declare enum Direction
-// {
-//   ASC,
-//   DESC
-// }
-
-// declare enum Combinator
-// {
-//   AND,
-//   OR
-// }
-
-declare module CommonVars
-{
- export enum Operator {
-   EQ,
-   GE,
-   GT,
-   LE,
-   LT,
-   IN,
-   NE
- }
- 
- export enum Direction {
-   ASC,
-   DESC
- }
+interface Props {
+  index: number;
+  alwaysOpen?: boolean;
 }
 
-
-interface Comparison
+class CreateCardTool extends React.Component<Props, any>
 {
-  first: Property;
-  second: Property;
-  operator: CommonVars.Operator;
-}
-
-
-interface CardModel
-{
-  id: ID;
-  type: string; // Note: type may not be necessary, thanks to typescript
-}
-
-interface Join
-{
-  group: Group;
-  comparison: Comparison;
-}
-
-interface FromCardModel extends CardModel
-{
-  from:
+  constructor(props:Props)
   {
-    group: Group;
-    joins: Join[];
-  }  
-}
-
-
-interface SelectCardModel extends CardModel
-{
-  select: 
-  {
-    properties: Property[];
+    super(props);
+    this.state = {
+      open: false
+    };
+    this.toggleOpen = this.toggleOpen.bind(this);
   }
-}
-
-
-interface Sort
-{
-  property: Property;
-  direction: CommonVars.Direction;
-}
-
-interface SortCardModel extends CardModel
-{
-  sort: Sort;
-}
-
-
-interface Filter
-{  
- comparison: Comparison;
- combinator: string;   
-}
-
-interface FilterCardModel extends CardModel
-{
-  filter:
-  {
-    // TODO adapt this model to support sort of operations appropriately
-    filters: Filter[];
+  
+  createCardFactory(type: string): () => void {
+    return () => {
+      Actions.dispatch.cards.create(type, this.props.index);
+    }
   }
-}
+  
+  toggleOpen() {
+    this.setState({
+      open: !this.state.open,
+    });
+  }
+  
+  renderCardSelector() {
+    return (
+     <div className="create-card-selector" onClick={this.toggleOpen}>
+       {
+         CardTypes.map((type) => (
+           <div className="create-card-button" key={type} onClick={this.createCardFactory(type)}>
+             { type }
+           </div>
+         ))
+       }
+     </div>
+     );
+  }
+  
+  renderCreateCardRow() {
+    return (
+     <div className="create-card-row">
+       <div className="create-card-line"></div>
+       <div className="create-card-plus">
+         <AddIcon />
+       </div>
+     </div>
+     );
+  }
 
+  render() {
+    var classes = Util.objToClassname({
+      "create-card-wrapper": true,
+      "create-card-open": this.state.open || this.props.alwaysOpen,
+      "create-card-closed": !this.state.open && !this.props.alwaysOpen,
+    });
+    
+    return (
+      <div className={classes} onClick={this.toggleOpen}>
+        { this.renderCreateCardRow() }
+        { this.renderCardSelector() }
+     </div>
+   );
+  }
+};
+
+export default CreateCardTool;

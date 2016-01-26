@@ -52,6 +52,9 @@
     
     &.sidebar-link-selected {
       background: @sidebar-selected-bg;  
+      svg {
+        fill: @sidebar-bg;
+      }
     }
     
     .sidebar-link-inner {
@@ -85,6 +88,15 @@
     border-bottom-left-radius: @sidebar-link-height;
     border-top-left-radius: @sidebar-link-height;
     position: relative;
+    cursor: pointer;
+    .transition;
+    &:hover {
+      background: darken(@sidebar-expand-bg, 5%);
+      padding: 9px 9px;
+      svg {
+        width: 14px;
+      }
+    }
     
     svg {
       fill: #fff;

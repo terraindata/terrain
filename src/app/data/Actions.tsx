@@ -56,7 +56,7 @@ const create =
 	{
 		create: createAction<CreateCardPayload>(
 			ActionTypes.cards.create,
-			(card: any, index: number) => ({card, index})
+			(type: string, index: number) => ({type, index})
 		),
 
 		move: createAction<MoveCardPayload>(
@@ -99,24 +99,24 @@ const create =
 
 		select:
 		{
-			moveField: createAction<MoveSelectCardFieldPayload>(
-				ActionTypes.cards.select.moveField,
-				(card: any, fieldIndex: number, index: number) => ({card, fieldIndex, index})
+			moveProperty: createAction<MoveSelectCardPropertyPayload>(
+				ActionTypes.cards.select.moveProperty,
+				(card: any, propertyIndex: number, index: number) => ({card, propertyIndex, index})
 			),
 
-			changeField: createAction<ChangeSelectCardFieldPayload>(
-				ActionTypes.cards.select.changeField,
-				(card: any, fieldIndex: number, value: string) => ({card, fieldIndex, value})
+			changeProperty: createAction<ChangeSelectCardPropertyPayload>(
+				ActionTypes.cards.select.changeProperty,
+				(card: any, propertyIndex: number, value: string) => ({card, propertyIndex, value})
 			),
 
-			deleteField: createAction<DeleteSelectCardFieldPayload>(
-   	   	ActionTypes.cards.select.deleteField,
-      	(card: any, fieldIndex: number) => ({card, fieldIndex})
+			deleteProperty: createAction<DeleteSelectCardPropertyPayload>(
+   	   	ActionTypes.cards.select.deleteProperty,
+      	(card: any, propertyIndex: number) => ({card, propertyIndex})
 			),
 
-			createField: createAction<CreateSelectCardFieldPayload>(
-				ActionTypes.cards.select.createField,
-				(card: any, fieldIndex: number) => ({card, fieldIndex})
+			createProperty: createAction<CreateSelectCardPropertyPayload>(
+				ActionTypes.cards.select.createProperty,
+				(card: any, propertyIndex: number) => ({card, propertyIndex})
 			),
 		},
 

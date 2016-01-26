@@ -50,8 +50,10 @@ import CardField from './../CardField.tsx';
 import Dropdown from './../../common/Dropdown.tsx';
 import { Operators } from './../../../CommonVars.tsx';
 
+import { CardModels } from './../../../models/CardModels.tsx';
+
 interface Props {
-  card: FromCardModel;
+  card: CardModels.FromCard;
 }
 
 var OPERATOR_WIDTH: number = 30;
@@ -65,7 +67,7 @@ class FromCard extends React.Component<Props, any>
     this.renderJoin = this.renderJoin.bind(this);
   }
 
-  renderJoin(join: Join, index: number)
+  renderJoin(join: CardModels.Join, index: number)
   {
     var refBase = 'join-ref-' + index + '-' + this.props.card.id + '-';
     var groupRef = refBase + 'group';
@@ -145,9 +147,9 @@ class FromCard extends React.Component<Props, any>
     }
 
     var joinContent = null;
-    if (this.props.card.from.joins) 
+    if (this.props.card.joins) 
     {
-        joinContent = this.props.card.from.joins.map(this.renderJoin);
+        joinContent = this.props.card.joins.map(this.renderJoin);
     }
 
 		return (
@@ -157,7 +159,7 @@ class FromCard extends React.Component<Props, any>
           removable={false}
           drag_y={true}>
           <input type="text" 
-            value={this.props.card.from.group}
+            value={this.props.card.group}
             onChange={handleChange} />
         </CardField>
         { joinContent }

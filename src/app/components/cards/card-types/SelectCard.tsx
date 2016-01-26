@@ -48,12 +48,10 @@ import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import CardField from './../CardField.tsx';
 
+import { CardModels } from './../../../models/CardModels.tsx';
+
 interface Props {
-  data: {
-    select: {
-      fields: string[],
-    },
-  };
+  card: CardModels.SelectCard;
 }
 
 class SelectCard extends React.Component<Props, any>
@@ -64,26 +62,26 @@ class SelectCard extends React.Component<Props, any>
   }
 
 	render() {
-		var fields = this.props.data.select.fields;
+		var properties = this.props.card.properties;
 
 		var moveFn = (curIndex, newIndex) =>
     {
-      Actions.dispatch.cards.select.moveField(this.props.data, curIndex, newIndex);
+      Actions.dispatch.cards.select.moveProperty(this.props.card, curIndex, newIndex);
     }
 
     var changeFnFactory = (index) => (event) =>
     {
-    	Actions.dispatch.cards.select.changeField(this.props.data, index, event.target.value);
+    	Actions.dispatch.cards.select.changeProperty(this.props.card, index, event.target.value);
     }
 
     var deleteFnFactory = (index) => () =>
     {
-    	Actions.dispatch.cards.select.deleteField(this.props.data, index);
+    	Actions.dispatch.cards.select.deleteProperty(this.props.card, index);
     }
 
 		var layout = {
 			reorderable: true,
-			rows: fields.map((field, index) => {
+			rows: properties.map((property, index) => {
         return {
           content: (
             <CardField
@@ -93,7 +91,7 @@ class SelectCard extends React.Component<Props, any>
               drag_y={true}
     					dragInsideOnly={true}>
               <input type="text" 
-                value={field}
+                value={property}
                 onChange={changeFnFactory(index)} />
             </CardField>
           ),

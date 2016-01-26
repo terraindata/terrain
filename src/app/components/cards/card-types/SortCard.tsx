@@ -49,9 +49,10 @@ import LayoutManager from "../../layout/LayoutManager.tsx";
 import Dropdown from './../../common/Dropdown.tsx';
 import CardField from './../CardField.tsx';
 import { Directions } from './../../../CommonVars.tsx';
+import { CardModels } from './../../../models/CardModels.tsx';
 
 interface Props {
-  card: SortCardModel;
+  card: CardModels.SortCard;
 }
 
 class SortCard extends React.Component<Props, any>

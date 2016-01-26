@@ -49,9 +49,10 @@ import LayoutManager from "../../layout/LayoutManager.tsx";
 import CardField from './../CardField.tsx';
 import Dropdown from './../../common/Dropdown.tsx';
 import { Operators } from './../../../CommonVars.tsx';
+import { CardModels } from './../../../models/CardModels.tsx';
 
 interface Props {
-  card: FilterCardModel;
+  card: CardModels.FilterCard;
 }
 
 var OPERATOR_WIDTH: number = 20;
@@ -65,7 +66,7 @@ class FilterCard extends React.Component<Props, any>
     this.renderFilter = this.renderFilter.bind(this);
   }
 
-  renderFilter(filter: Filter, index: number)
+  renderFilter(filter: CardModels.Filter, index: number)
   {
     var refBase = 'filter-ref-' + index + '-' + this.props.card.id + '-';
     var operatorRef = refBase + 'operator';
@@ -132,7 +133,7 @@ class FilterCard extends React.Component<Props, any>
 	render() {
     return (
       <div>
-        { this.props.card.filter.filters.map(this.renderFilter) }
+        { this.props.card.filters.map(this.renderFilter) }
       </div>
 		);
 	}

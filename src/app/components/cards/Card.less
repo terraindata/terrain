@@ -1,7 +1,7 @@
 @import "../../util/Common.less";
 
 .card {
-	padding: 2px;
+	// padding: 2px;
  
  @card-border-radius: 5px;
 
@@ -14,6 +14,7 @@
  .card-title {
   border-top-left-radius: calc(@card-border-radius - 1px);
   border-top-right-radius: calc(@card-border-radius - 1px);
+  text-transform: capitalize;
  }
  .card-sub-bar {
   border-bottom-left-radius: calc(@card-border-radius - 1px);
@@ -48,6 +49,7 @@
 			border-radius: 7px;
 		}
 	}
+  
 }
 
 .panel-dragging .card-inner {

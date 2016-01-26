@@ -42,24 +42,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./card.less');
+require('./Card.less');
 import Actions from "../../data/Actions.tsx";
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
-import CardInput from './CardField.tsx';
 import SelectCard from './card-types/SelectCard.tsx';
 import FromCard from './card-types/FromCard.tsx';
 import SortCard from './card-types/SortCard.tsx';
 import FilterCard from './card-types/FilterCard.tsx';
+import CreateCardTool from './CreateCardTool.tsx';
+
 
 var Card = React.createClass({
 	mixins: [PanelMixin],
 
 	propTypes:
 	{
-		data: React.PropTypes.object.isRequired,
+		card: React.PropTypes.object.isRequired,
+    index: React.PropTypes.number.isRequired,
 	},
 
 	getDefaultProps():any
@@ -78,7 +80,7 @@ var Card = React.createClass({
 			open: true,
 		}
 	},
-
+  
 	handleTitleClick()
 	{
 		if(!this.state.moved)
@@ -92,46 +94,56 @@ var Card = React.createClass({
 
 	render() {
 
-		var content;
+		var CardComponent;
 		var subBar;
 
-		switch(this.props.data.type)
+		switch(this.props.card.type)
 		{
 			case 'select':
-				content = <SelectCard {...this.props} />;
+				CardComponent = SelectCard;
 				subBar = 
 				{
 					content: '+',
 					onClick: () => 
 					{
-						Actions.dispatch.cards.select.createField(this.props.data);
+						Actions.dispatch.cards.select.createProperty(this.props.card);
 					},
 				};
 
 				break;
 			case 'from':
-				content = <FromCard card={this.props.data} />;
+				CardComponent = FromCard;
 				subBar =
 				{
 					content: '+',
 					onClick: () => 
 					{
-						Actions.dispatch.cards.from.join.create(this.props.data);
+						Actions.dispatch.cards.from.join.create(this.props.card);
 					},
 				};
 
 				break;
    case 'sort':
-     content = <SortCard card={this.props.data} />
+     CardComponent = SortCard;
      break;
    case 'filter':
-    content = <FilterCard card={this.props.data} />
-    // TODO sub bar
+    CardComponent = FilterCard;
+    subBar = 
+        {
+          content: '+',
+          onClick: () => 
+          {
+            Actions.dispatch.cards.filter.create(this.props.card);
+          },
+        };
     break;
-			default:
-				content = <div>This card has not been implemented yet.</div>
 		}
-		content = React.cloneElement(content, this.props);
+    
+    var content = <div>This card has not been implemented yet.</div>;
+    if(CardComponent)
+    {
+      content = <CardComponent {...this.props} />
+    }
 
 		var contentToDisplay;
 		var subBarToDisplay;
@@ -155,10 +167,10 @@ var Card = React.createClass({
 			}
 		}
 
-		var title = this.props.data.type.charAt(0).toUpperCase() + this.props.data.type.substr(1);
-
+		var title = this.props.card.type.charAt(0).toUpperCase() + this.props.card.type.substr(1);
 		return this.renderPanel((
 			<div className='card'>
+        <CreateCardTool index={this.props.index} />
 				<div className='card-inner'>
 					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>
 						{title}

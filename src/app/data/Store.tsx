@@ -49,6 +49,8 @@ var Redux = require('redux');
 import ActionTypes from './ActionTypes.tsx';
 import Util from '../util/Util.tsx';
 
+import { CardModels } from './../models/CardModels.tsx';
+
 import Defaults from './DefaultTypes.tsx';
 
 // Important: all reducers must return either
@@ -124,31 +126,27 @@ var selectCardReducer = (cards = [], action) =>
 {
 	var cardIndex = cards.indexOf(action.payload.card);
 	var newCards = cloneArray(cards);
-	var select = newCards[cardIndex].select;
-	if(!select)
-	{
-		return cards;
-	}
+	var select = newCards[cardIndex];
 
 	switch(action.type)
 	{
-		case ActionTypes.cards.select.moveField:
-			select.fields = move(select.fields, action.payload.fieldIndex, action.payload.index);
+		case ActionTypes.cards.select.moveProperty:
+			select.properties = move(select.properties, action.payload.propertyIndex, action.payload.index);
 			break;
-		case ActionTypes.cards.select.changeField:
-			select.fields[action.payload.fieldIndex] = action.payload.value;
+		case ActionTypes.cards.select.changeProperty:
+			select.properties[action.payload.propertyIndex] = action.payload.value;
 			break;
-		case ActionTypes.cards.select.deleteField:
-			select.fields.splice(action.payload.fieldIndex, 1);
+		case ActionTypes.cards.select.deleteProperty:
+			select.properties.splice(action.payload.propertyIndex, 1);
 			break;
-		case ActionTypes.cards.select.createField:
-			if(action.payload.fieldIndex === -1 || action.payload.fieldIndex === undefined || action.payload.fieldIndex === null)
+		case ActionTypes.cards.select.createProperty:
+			if(action.payload.propertyIndex === -1 || action.payload.propertyIndex === undefined || action.payload.propertyIndex === null)
 			{
-				select.fields.push(""); // TODO update with field type
+				select.properties.push(""); // TODO update with property type
 			}
 			else
 			{
-				select.fields.splice(action.payload.fieldIndex, 0, "");  // TODO update with field type
+				select.properties.splice(action.payload.propertyIndex, 0, "");  // TODO update with property type
 			}
 			break;
 		default:
@@ -163,8 +161,8 @@ var selectCardReducer = (cards = [], action) =>
 var fromCardReducer = (cards = [], action) => {
  var cardIndex = cards.indexOf(action.payload.card);
  var newCards = cloneArray(cards);
- var from = newCards[cardIndex].from;
- if (!from) {
+ var from = newCards[cardIndex];
+ if (!from || from.type !== 'from') {
   return cards;
  }
  
@@ -197,11 +195,10 @@ var fromCardReducer = (cards = [], action) => {
 var filterCardReducer = (cards = [], action) => {
  var cardIndex = cards.indexOf(action.payload.card);
  var newCards = cloneArray(cards);
- var filter = newCards[cardIndex].filter;
- if (!filter) {
+ var filters = newCards[cardIndex].filters;
+ if (!filters) {
   return cards;
  }
- var filters = filter.filters;
 
  switch (action.type) {
   case ActionTypes.cards.filter.create:
@@ -247,6 +244,30 @@ var cardsReducer = (cards = [], action) =>
 	{
 		return cards;
 	}
+  
+  if(action.type === ActionTypes.cards.create)
+  {
+    var newCards = cloneArray(cards);
+    var newCard = new CardModels.Card(action.payload.type);
+    switch(action.payload.type)
+    {
+      case 'select':
+        newCard = new CardModels.SelectCard();
+        break;
+      case 'from':
+        newCard = new CardModels.FromCard();
+        break;
+      case 'sort':
+        newCard = new CardModels.SortCard();
+        break;
+      case 'filter':
+        newCard = new CardModels.FilterCard();
+        break;
+    }
+    newCards.splice(action.payload.index, 0, newCard);
+    return newCards;
+  }
+  
 	var cardIndex = cards.indexOf(action.payload.card);
 	if(cardIndex === -1)
 	{

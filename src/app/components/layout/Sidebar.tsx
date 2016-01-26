@@ -46,7 +46,7 @@ require('./Sidebar.less');
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 
-var ExpandIcon = require("babel!svg-react!./../../../images/icon_expand_12x12.svg?name=ExpandIcon");
+var ExpandIcon = require("./../../../images/icon_expand_12x12.svg?name=ExpandIcon");
 
 interface Link {
   icon: any;
