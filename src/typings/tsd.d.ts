@@ -56,3 +56,10 @@ interface Array<T> {
   find(predicate: (search: T) => boolean) : T;
   findIndex(predicate: (search: T) => boolean) : number;
 }
+
+declare type ID = number;
+declare type Group = string;
+declare type Key = string;
+declare type Value = string;
+declare type Property = string;
+

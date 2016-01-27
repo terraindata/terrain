@@ -44,12 +44,6 @@ THE SOFTWARE.
 
 import Util from '../util/Util.tsx';
 
-declare type ID = number;
-declare type Group = string;
-declare type Key = string;
-declare type Value = string;
-declare type Property = string;
-
 var assign = (instance: any, obj: any, properties: string[]) =>
 {
   // could have been passed a bogus object

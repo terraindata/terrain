@@ -49,6 +49,8 @@ import Store from './Store.tsx';
 import * as ReduxActions from 'redux-actions';
 var createAction = ReduxActions.createAction;
 
+import { CardModels } from './../models/CardModels.tsx';
+
 // object of action creators
 const create = 
 {
@@ -80,7 +82,7 @@ const create =
 
 				change: createAction<ChangeJoinPayload>(
 					ActionTypes.cards.from.join.change,
-					(card: FromCardModel, index: number, value: Join) => ({card, index, value})
+					(card: CardModels.FromCard, index: number, value: CardModels.Join) => ({card, index, value})
 				),
 
 				delete: createAction<DeleteJoinPayload>(
@@ -93,7 +95,7 @@ const create =
     sort: {
       change: createAction<ChangeSortCardPayload>(
         ActionTypes.cards.sort.change,
-        (card: any, value: Sort) => ({card, value})
+        (card: any, value: CardModels.Sort) => ({card, value})
       ),
     },
 
@@ -129,7 +131,7 @@ const create =
 
    change: createAction<ChangeFilterPayload>(
     ActionTypes.cards.filter.change,
-    (card: any, index: number, value: Filter) => ({ card, index, value })
+    (card: any, index: number, value: CardModels.Filter) => ({ card, index, value })
    ),
 
    delete: createAction<DeleteFilterPayload>(

@@ -81,7 +81,7 @@ var Tabs = React.createClass<any, any>({
   // Returns z-index so that tabs are layered in a nice fashion
   zIndexStyleForIndex(index: number): {zIndex?: number}
   {
-    if(index > this.state.selectedIndex)
+    if(index !== this.state.selectedIndex)
     {
       return {
         zIndex: this.props.tabs.length - index,

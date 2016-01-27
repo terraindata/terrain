@@ -84,7 +84,7 @@ interface ChangePayload<T>
 
 interface CardPayload
 {
-  card: CardModel;
+  card: any; //CardModel;
 }
 
 interface CreateCardPayload extends CreatePayload {
@@ -94,18 +94,18 @@ interface MoveCardPayload extends CardPayload, MovePayload {}
 
 
 interface FromCardPayload extends CardPayload {
-  card: FromCardModel;
+  card: any; //FromCardModel;
 }
 interface ChangeFromCardGroupPayload extends FromCardPayload, ChangePayload<Group> {}
 interface CreateJoinPayload extends FromCardPayload, CreatePayload {}
 interface DeleteJoinPayload extends FromCardPayload, DeletePayload {}
-interface ChangeJoinPayload extends FromCardPayload, IndexedPayload, ChangePayload<Join> {}
+interface ChangeJoinPayload extends FromCardPayload, IndexedPayload, ChangePayload<any> {} //Join> {}
 
 
 interface SelectCardPayload extends CardPayload
 {
-  card: SelectCardModel;
-  propertyIndex: number; // TODO change this
+  card: any; //SelectCardModel;
+  propertyIndex: number;
 }
 
 interface MoveSelectCardPropertyPayload extends SelectCardPayload, MovePayload {}
@@ -115,16 +115,16 @@ interface CreateSelectCardPropertyPayload extends SelectCardPayload {}
 
 
 interface SortCardPayload extends CardPayload {
-  card: SortCardModel;
+  card: any; //SortCardModel;
 }
-interface ChangeSortCardPayload extends SortCardPayload, ChangePayload<Sort> {}
+interface ChangeSortCardPayload extends SortCardPayload, ChangePayload<any> {} //Sort> {}
 
 
 interface FilterCardPayload extends CardPayload {
-  card: FilterCardModel;
+  card: any; //FilterCardModel;
 }
 interface CreateFilterPayload extends FilterCardPayload, CreatePayload {}
-interface ChangeFilterPayload extends FilterCardPayload, IndexedPayload, ChangePayload<Filter> {}
+interface ChangeFilterPayload extends FilterCardPayload, IndexedPayload, ChangePayload<any> {} //Filter> {}
 interface DeleteFilterPayload extends FilterCardPayload, DeletePayload {}
 
 
