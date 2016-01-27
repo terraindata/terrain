@@ -86,23 +86,31 @@
       "cards": [
         {
           "type": "from",
-          "id": 101,
-          "from":
-          {
-            "table": "heroes"
-          }
+          "id": 1,
+          "group": "sitters",
+          "joins": 
+          [
+            {
+              "group": "availability",
+              "comparison":
+              {
+                "first": "sitter.id",
+                "second": "availability.sitterId",
+                "operator": 0
+              }
+            }
+          ]
         },
         {
           "type": "select",
-          "id": 201,
-          "select":
-          {
-            "fields": [
+          "id": 2,
+            "properties": [
               "name",
               "picture",
-              "description"
+              "description",
+              "minPrice",
+              "numJobs"
             ]
-          }
         }
       ]
     }
