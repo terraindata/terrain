@@ -49,6 +49,7 @@ import Util from '../../util/Util.tsx';
 import { CardTypes } from './../../CommonVars.tsx';
 
 var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
+var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 
 interface Props {
   index: number;
@@ -97,7 +98,7 @@ class CreateCardTool extends React.Component<Props, any>
      <div className="create-card-row">
        <div className="create-card-line"></div>
        <div className="create-card-plus">
-         <AddIcon />
+         { this.state.open ? <CloseIcon /> : <AddIcon /> }
        </div>
      </div>
      );
