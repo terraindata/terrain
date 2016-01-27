@@ -98,7 +98,9 @@ class Sidebar extends React.Component<Props, any>
         this.props.expandable ?
           (
             <div className='sidebar-expand' onClick={this.props.onExpand}>
-              <ExpandIcon />
+              <div className="vertically-middle">
+                <ExpandIcon />
+              </div>
             </div>
           )
           : null
