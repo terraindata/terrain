@@ -47,6 +47,8 @@ import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
 
+var TabIcon = require("./../../../images/tab_corner_27x31.svg?name=TabIcon");
+
 var Tabs = React.createClass<any, any>({
 	propTypes:
 	{
@@ -75,6 +77,19 @@ var Tabs = React.createClass<any, any>({
 			});
 		};
 	},
+  
+  // Returns z-index so that tabs are layered in a nice fashion
+  zIndexStyleForIndex(index: number): {zIndex?: number}
+  {
+    if(index > this.state.selectedIndex)
+    {
+      return {
+        zIndex: this.props.tabs.length - index,
+      };
+    }
+    
+    return {};
+  },
 
 	render() {
 		var content = this.props.tabs[this.state.selectedIndex].content;
@@ -101,10 +116,14 @@ var Tabs = React.createClass<any, any>({
 											'tabs-tab-selected': index === this.state.selectedIndex,
 											})}
 										key={index}
+                    style={this.zIndexStyleForIndex(index)}
 										onClick={this.handleTabSelectFactory(index)}>
-											{tab.tabName}
+                      <TabIcon className='tab-icon tab-icon-left' />
+                      <div className='tab-inner'>{tab.tabName}</div>
+                      <TabIcon className='tab-icon tab-icon-right' />
 									</div>)
 							}
+              <div className='tabs-shadow'></div>
 						</div>
 					) : null
 				}
