@@ -59,6 +59,7 @@ The Terrain search front-end is built upon these technologies:
 - JSX / ES6 (tutorial: link forthcoming)
 - Redux (tutorial: link forthcoming)
 - Webpack (tutorial: link forthcoming)
+- Tape, for testing (https://github.com/substack/tape)
 
 ## Directory Overview
 
