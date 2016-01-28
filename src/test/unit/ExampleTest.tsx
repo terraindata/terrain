@@ -42,22 +42,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+/// <reference path="../../typings/tsd.d.ts" />
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
+import * as test from 'tape';
+import * as TestUtils from 'react-addons-test-utils';
+import * as ReactDom from 'react-dom';
+import * as React from 'react';
 
-/// <reference path="models/ActionModels.d.ts" />
-/// <reference path="redux-actions/redux-actions.d.ts" />
+var CardField = React.createClass({
+  render() {
+    return <div>test</div>;
+  },
+});
 
+test('Is a test', function (t) {
+  var AppElement = TestUtils.renderIntoDocument(<CardField/>);
+  var divs = TestUtils.scryRenderedDOMComponentsWithTag(AppElement, 'div');
+  t.equal(divs.length, 1, 'only has one');
+  console.log(divs[0]);
+  t.equal(divs[0].textContent, 'test', 'renders inner content');
+  t.end();
+});
 
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
-
-declare type ID = number;
-declare type Group = string;
-declare type Key = string;
-declare type Value = string;
-declare type Property = string;
-
+test('Uses types', function(t) {
+  var a: number = 1.0;
+  t.equal(a, 1.0);
+  t.end();
+});

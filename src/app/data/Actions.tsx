@@ -200,14 +200,13 @@ var actionCreatorsToDispatchers = (actionCreators) =>
 
 // object of action dispatchers
 // use: Actions.dispatch.moveCard(4, 8)
-var dispatch = actionCreatorsToDispatchers(create); 
+var dispatch = actionCreatorsToDispatchers(create);
 
 var Actions =
 {
 	types: ActionTypes,
 	create: create,
 	dispatch: dispatch,
-	newDispatch: Store.dispatch,
 };
 
 export default Actions;

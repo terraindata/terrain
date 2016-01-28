@@ -42,22 +42,76 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+var webpack = require('webpack');
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
+// with help from http://rmurphey.com/blog/2015/07/20/karma-webpack-tape-code-coverage
 
-/// <reference path="models/ActionModels.d.ts" />
-/// <reference path="redux-actions/redux-actions.d.ts" />
+module.exports = function(config) {
+  config.set({
+    plugins: [
+      require('karma-webpack'),
+      require('karma-tap'),
+      require('karma-chrome-launcher'),
+      require('karma-phantomjs-launcher'),
+      require('karma-coverage')
+    ],
 
+    basePath: '',
+    frameworks: [ 'tap' ],
+    files: [ 'src/test/**/*.tsx' ],
 
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
+    preprocessors: {
+      'src/test/**/*.tsx': [ 'webpack' ]
+    },
 
-declare type ID = number;
-declare type Group = string;
-declare type Key = string;
-declare type Value = string;
-declare type Property = string;
+    webpack: {
+      node : {
+        fs: 'empty'
+      },
+      
+      // Instrument code that isn't test or vendor code.
+      module: {
+        loaders: [
+            { test: /\.css$/, loader: "style!css" },
+            { test: /\.less$/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
+            { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
+            { test: /\.woff(2)?$/,   loader: "url?limit=10000&mimetype=application/font-woff" },
+            { test: /\.ttf$/, loader: "file" },
+            { test: /\.eot$/, loader: "file" },
+            { test: /\.svg$/, loader: "file" },
+            { test: require.resolve('jquery'), loader: "expose?jQuery" },
+            { test: /\.tsx$/, loader: 'babel!ts-loader' },
+            { test: /\.json$/, loader: 'json' },
+            { test: /\.svg\?name=[a-zA-Z]+$/, loader: 'babel!svg-react' }
+        ],
+        
+        postLoaders: [{
+          test: /\.tsx$/,
+          exclude: /(test|node_modules)\//,
+          loader: 'istanbul-instrumenter'
+        }],
+      },
+    },
 
+    webpackMiddleware: {
+      noInfo: true
+    },
+
+    reporters: [
+      'dots',
+      'coverage'
+    ],
+    
+    coverageReporter: {
+      type: 'text',
+      dir: 'coverage/'
+    },
+
+    port: 9876,
+    colors: true,
+    logLevel: config.LOG_INFO,
+    autoWatch: true,
+    browsers: ['Chrome'],
+    singleRun: false
+  })
+};

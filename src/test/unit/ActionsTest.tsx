@@ -42,22 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+/// <reference path="../../typings/tsd.d.ts" />
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
+import * as _ from 'underscore';
+import * as test from 'tape';
+import Actions from '../../app/data/Actions.tsx';
+import ActionTypes from '../../app/data/ActionTypes.tsx';
 
-/// <reference path="models/ActionModels.d.ts" />
-/// <reference path="redux-actions/redux-actions.d.ts" />
-
-
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
+var onlyContainsType = (obj, type: string) => {
+  return _.every(obj, (val) => {
+    return typeof val === type || (typeof val === 'object' && onlyContainsType(val, type));
+  });
 }
 
-declare type ID = number;
-declare type Group = string;
-declare type Key = string;
-declare type Value = string;
-declare type Property = string;
+test('ActionTypes', (t) => {  
+  t.ok(onlyContainsType(ActionTypes, 'string'), 'ActionTypes only contains strings');
+  t.end();
+});
 
+test('Actions exports correct features', (t) => {
+  t.ok(Actions.create, 'create');
+  t.ok(Actions.dispatch, 'dispatch');
+  t.ok(Actions.types, 'types');
+  t.deepEqual(Actions.types, ActionTypes, 'correct types');
+  t.end();
+});
+
+test('Actions.create', (t) => {
+  t.ok(onlyContainsType(Actions.create, 'function'), 'Actions.create only contains functions');
+  t.end();
+});
+
+test('Actions.dispatch', (t) => {
+  var containSameKeys = (first, second) => {
+    return _.every(first, (val, key) => {
+      if(typeof first[key] === 'object' && typeof second[key] === 'object')
+      {
+        return containSameKeys(first[key], second[key]);
+      }
+      
+      return typeof first[key] === typeof second[key];
+    });
+  }
+  
+  t.ok(containSameKeys(Actions.create, Actions.dispatch) && containSameKeys(Actions.dispatch, Actions.create),
+    'Actions.create and Actions.dispatch have identical key structures');
+});

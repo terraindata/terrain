@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+var webpack = require('webpack');
+
 module.exports = {
     entry: "./src/app/App.tsx",
     devtool: 'eval',
@@ -66,5 +68,5 @@ module.exports = {
             { test: /\.json$/, loader: 'json' },
             { test: /\.svg\?name=[a-zA-Z]+$/, loader: 'babel!svg-react' }
         ]
-    }
+    },
 };
