@@ -95,6 +95,7 @@ var Card = React.createClass({
   handleDelete()
   {
     console.log('delete');
+    Actions.dispatch.cards.remove(this.props.index);
   },
   
   handleCopy()

@@ -245,6 +245,7 @@ var cardsReducer = (cards = [], action) =>
 		return cards;
 	}
   
+  // TODO limit to correct algorithm
   if(action.type === ActionTypes.cards.create)
   {
     var newCards = cloneArray(cards);
@@ -265,6 +266,14 @@ var cardsReducer = (cards = [], action) =>
         break;
     }
     newCards.splice(action.payload.index, 0, newCard);
+    return newCards;
+  }
+  
+  // TODO limit to correct algorithm
+  if(action.type === ActionTypes.cards.remove)
+  {
+    var newCards = cloneArray(cards);
+    newCards.splice(action.payload.index, 1);
     return newCards;
   }
   

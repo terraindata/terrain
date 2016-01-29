@@ -51,7 +51,7 @@ Terminology:
 - create
 - change
 - move
-- delete
+- delete (transition to 'remove')
 
 */
 
@@ -77,6 +77,7 @@ var ActionTypes =
 	[
 		'move',
 		'create',
+    'remove',
 	]),
 
 	inputs: makeObject('inputs',

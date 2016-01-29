@@ -65,6 +65,11 @@ const create =
 			ActionTypes.cards.move,
 			(card: any, index: number) => ({card, index})
 		),
+    
+    remove: createAction<RemoveCardPayload>(
+      ActionTypes.cards.remove,
+      (index: number) => ({index})
+    ),
 
 		from:
 		{
