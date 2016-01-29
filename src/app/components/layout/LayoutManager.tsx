@@ -382,9 +382,9 @@ var LayoutManager = React.createClass<any, any>({
 	renderRow(row, index) 
 	{
 		var style = {};
-		if(this.props.layout.rowHeight === 'fill') 
-		{
-			// TODO clean this up
+		// TODO fix this, it's breaking
+    if(this.props.layout.rowHeight === 'fill') 
+    {
 			var total = this.sumColsThroughIndex(-1), sum = this.sumColsThroughIndex(index);
 			style = {
 				top: (sum / total) * 100 + '%',

@@ -75,35 +75,94 @@ test('LayoutManager renders columns', function (t) {
     columns: [
       {
         content: <div className='test-col' style={{height: '100%'}}>1</div>,
+        width: 20,
       },
       {
         content: <div className='test-col' style={{height: '100%'}}>2</div>,
-        colSpan: 2,
       },
       {
         content: <div className='test-col' style={{height: '100%'}}>3</div>,
+        colSpan: 2,
+      },
+      {
+        content: <div className='test-col' style={{height: '100%'}}>4</div>,
+      }
+    ]
+  }
+  
+  var width = 1000;
+  var height = 500;
+  var colOffset = 20;
+  var colLeftFactor = [-1, 0,1,3];
+  var colWidthFactor = [-1, 1,2,1];
+  var numColsFactor = 4;
+  var frame = createFrame(width, height);
+  ReactDOM.render(<LayoutManager layout={layout} />, frame);
+  
+  var divs = frame.querySelectorAll('.test-col');
+  t.equal(divs.length, 4, 'renders all columns');
+  
+  _.map(divs, (div, index) => {    
+    t.equal(div.textContent, (index + 1) + "", 'correct content');
+    t.equal(div.getBoundingClientRect().height, height, 'full height');
+    if(colLeftFactor[index] === -1)
+    {
+      // offset column
+      t.equal(div.getBoundingClientRect().left, 
+        0, 'correct left');
+      t.equal(div.getBoundingClientRect().width,
+        colOffset, 'correct width');
+    }
+    else
+    {
+      t.equal(div.getBoundingClientRect().left, 
+        colOffset + (width - colOffset) / numColsFactor * colLeftFactor[index], 'correct left');
+      t.equal(div.getBoundingClientRect().width,
+        (width - colOffset) / numColsFactor * colWidthFactor[index], 'correct width');
+    }
+  });
+  
+  cleanupFrame(frame);
+  
+  t.end();
+});
+
+test('LayoutManager renders rows', function (t) {
+  var layout = {
+    rows: [
+      {
+        content: <div className='test-row' style={{height: '20px'}}>1</div>,
+      },
+      {
+        content: <div className='test-row' style={{height: '40px'}}>2</div>,
+        rowSpan: 2,
+      },
+      {
+        content: <div className='test-row' style={{height: '20px'}}>3</div>,
       },
     ]
   }
   
   var width = 1000;
   var height = 500;
-  var colLeftFactor = [0,1,3];
-  var colWidthFactor = [1,2,1];
-  var numColsFactor = 4;
+  var rowHeight = 20;
+  var rowTopFactor = [0,1,3];
+  var rowHeightFactor = [1,2,1];
+  var numRowsFactor = 4;
   var frame = createFrame(width, height);
   ReactDOM.render(<LayoutManager layout={layout} />, frame);
   
-  var divs = frame.querySelectorAll('.test-col');
-  t.equal(divs.length, 3, 'renders all columns');
+  var divs = frame.querySelectorAll('.test-row');
+  t.equal(divs.length, 3, 'renders all rows');
   
   _.map(divs, (div, index) => {    
     t.equal(div.textContent, (index + 1) + "", 'correct content');
-    t.equal(div.getBoundingClientRect().left, 
-      width / numColsFactor * colLeftFactor[index], 'correct left');
-    t.equal(div.getBoundingClientRect().width,
-      width / numColsFactor * colWidthFactor[index], 'correct width');
-    t.equal(div.getBoundingClientRect().height, height, 'full height');
+    t.equal(div.getBoundingClientRect().left, 0, 'correct left');
+    t.equal(div.getBoundingClientRect().width, width, 'correct width');
+    t.equal(div.getBoundingClientRect().top, 
+      rowHeight * rowTopFactor[index], 'correct top');
+    t.equal(div.getBoundingClientRect().height,
+      rowHeight * rowHeightFactor[index], 'correct height');
   });
   
   cleanupFrame(frame);
