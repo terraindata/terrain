@@ -53,7 +53,7 @@ import FromCard from './card-types/FromCard.tsx';
 import SortCard from './card-types/SortCard.tsx';
 import FilterCard from './card-types/FilterCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
-
+import Menu from '../common/Menu.tsx';
 
 var Card = React.createClass({
 	mixins: [PanelMixin],
@@ -91,6 +91,18 @@ var Card = React.createClass({
 			});
 		}
 	},
+  
+  handleDelete()
+  {
+    console.log('delete');
+  },
+  
+  handleCopy()
+  {
+    console.log('do you copy');
+    console.log('nope');
+    console.log('roger that');
+  },
 
 	render() {
 
@@ -167,6 +179,22 @@ var Card = React.createClass({
 			}
 		}
 
+    var menuOptions = 
+    [
+      {
+        text: 'Copy',
+        onClick: this.handleCopy,
+      },
+      {
+        text: 'Hide',
+        onClick: this.handleTitleClick,
+      },
+      {
+        text: 'Delete',
+        onClick: this.handleDelete,
+      },
+    ];
+
 		var title = this.props.card.type.charAt(0).toUpperCase() + this.props.card.type.substr(1);
 		return this.renderPanel((
 			<div className='card'>
@@ -174,6 +202,7 @@ var Card = React.createClass({
 				<div className='card-inner'>
 					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>
 						{title}
+            <Menu options={menuOptions} />
 					</div>
 					{ contentToDisplay }
 					{ subBarToDisplay }

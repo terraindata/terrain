@@ -1,0 +1,70 @@
+@import "../../util/Common.less";
+
+@card-menu-bg: #828C76;
+
+@menu-color: #fff;
+@menu-collapsed-size: 24px;
+@menu-icon-width: 14px;
+@menu-icon-height: 14px;
+@option-height: 30px;
+
+.menu-wrapper {
+  float: right;
+  background: @card-menu-bg;
+  border-radius: @menu-collapsed-size;
+  position: absolute;
+  z-index: 9999;
+  top: 3px;
+  right: 4px;
+  cursor: pointer;
+  .transition;
+  overflow: hidden;
+  text-align: center;
+  
+  &:not(:hover) {
+    width: @menu-collapsed-size !important;
+    height: @menu-collapsed-size !important;
+  }
+  
+  .menu-icon {
+    fill: @menu-color;
+    width: @menu-icon-width;
+    height: @menu-icon-height;
+    position: absolute;
+    left: calc((@menu-collapsed-size - @menu-icon-width) / 2);
+    top: calc((@menu-collapsed-size - @menu-icon-height) / 2);
+    opacity: 1;
+    
+    .transition;
+  }
+  
+  .menu-option {
+    // display: none;
+    opacity: 0;
+    color: @menu-color;
+    position: relative;
+    
+    height: @option-height;
+    .transition;
+    
+    &:hover {
+      background: darken(@card-menu-bg, 5%);
+    }
+  }
+  
+  &:hover {
+    // width: inherit !important;
+    // height: inherit !important;
+    border-radius: 5px;
+    
+    .menu-icon {
+      display: none;
+      opacity: 0;
+    }
+    
+    .menu-option {
+      display: block;
+      opacity: 1;
+    }
+  }
+}

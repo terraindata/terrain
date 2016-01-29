@@ -42,58 +42,56 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Dropdown.less');
+require('./Menu.less');
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 
+var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
+
+var optionHeight = 30; // coordinate with Menu.less
+
 interface Props
 {
-  onChange: (index: number) => void;
-  selectedIndex: number;
-  ref?: string;
-  options: string[];
-  circle?: boolean;
+  options: {
+    text: string;
+    onClick: () => void;
+  }[];
 }
 
-class Dropdown extends React.Component<Props, any>
+class Menu extends React.Component<Props, any>
 {
-  value: number;
-  
   constructor(props: Props) {
     super(props);
     this.renderOption = this.renderOption.bind(this);
-    this.value = this.props.selectedIndex;
   }
   
   renderOption(option, index)
   {
-    if(index === this.props.selectedIndex)
-    {
-      return null;
-    }
+    var onClick = (event) => {
+      event.stopPropagation();
+      option.onClick();
+    };
     
-    var handleClick = () => {
-      this.value = index;
-      this.props.onChange(index);
-    }
     return (
-      <div className="dropdown-option" key={index} onClick={handleClick}>
-        <div className="dropdown-option-inner">
-          { option }
+      <div className="menu-option" key={index} onClick={onClick}>
+        <div className="vertically-middle">
+          { option.text }
         </div>
       </div>
     );
   }
 
   render() {
+    var style = {
+      width: 15 * this.props.options.reduce((max, option) => 
+        option.text.length > max ? option.text.length : max, 1),
+      height: this.props.options.length * optionHeight,
+    };
+    
     return (
-      <div className={"dropdown-wrapper" + (this.props.circle ? " dropdown-wrapper-circle" : "")}>
-        <div className="dropdown-value">
-          <div className="dropdown-option-inner">
-            { this.props.options[this.props.selectedIndex] }
-          </div>
-        </div>
-        <div className="dropdown-options-wrapper">
+      <div className="menu-wrapper" style={style}>
+        <MoreIcon className="menu-icon" />
+        <div className="menu-options-wrapper">
           {
             this.props.options.map(this.renderOption)
           }
@@ -103,4 +101,4 @@ class Dropdown extends React.Component<Props, any>
   }
 };
 
-export default Dropdown;
+export default Menu;
