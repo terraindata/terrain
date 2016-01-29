@@ -42,77 +42,72 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var webpack = require('webpack');
+/// <reference path="../../typings/tsd.d.ts" />
 
-// with help from http://rmurphey.com/blog/2015/07/20/karma-webpack-tape-code-coverage
+import * as _ from 'underscore';
+import * as test from 'tape';
+import * as TestUtils from 'react-addons-test-utils';
+import * as ReactDOM from 'react-dom';
+import * as React from 'react';
+import LayoutManager from '../../app/components/layout/LayoutManager.tsx';
 
-module.exports = function(config) {
-  config.set({
-    plugins: [
-      require('karma-webpack'),
-      require('karma-tap'),
-      require('karma-chrome-launcher'),
-      require('karma-phantomjs-launcher'),
-      require('karma-coverage')
-    ],
+// Because some of these tests will test size and positioning,
+//  we need to render them into a real document, because the
+//  React Test Utils does not render elements with size and position
+var createFrame = (width, height) => {
+  var frame = document.createElement('div');
+  frame.style.position = 'absolute';
+  frame.style.top = '0';
+  frame.style.left = '0';
+  frame.style.width = width + 'px';
+  frame.style.height = height + 'px';
+  document.body.appendChild(frame);
+  return frame;
+}
 
-    basePath: '',
-    frameworks: [ 'tap' ],
-    files: [ 'src/test/TestSuite.tsx' ],
-    autoWatch: true,
+var cleanupFrame = (frame) => {
+  document.body.removeChild(frame);
+}
 
-    preprocessors: {
-      'src/test/TestSuite.tsx': [ 'webpack' ]
-    },
-
-    webpack: {
-      node : {
-        fs: 'empty'
+test('LayoutManager renders columns', function (t) {
+  var layout = {
+    fullHeight: true,
+    columns: [
+      {
+        content: <div className='test-col' style={{height: '100%'}}>1</div>,
       },
-      
-      // Instrument code that isn't test or vendor code.
-      module: {
-        loaders: [
-            { test: /\.css$/, loader: "style!css" },
-            { test: /\.less$/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
-            { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
-            { test: /\.woff(2)?$/,   loader: "url?limit=10000&mimetype=application/font-woff" },
-            { test: /\.ttf$/, loader: "file" },
-            { test: /\.eot$/, loader: "file" },
-            { test: /\.svg$/, loader: "file" },
-            { test: require.resolve('jquery'), loader: "expose?jQuery" },
-            { test: /\.tsx$/, loader: 'babel!ts-loader' },
-            { test: /\.json$/, loader: 'json' },
-            { test: /\.svg\?name=[a-zA-Z]+$/, loader: 'babel!svg-react' }
-        ],
-        
-        postLoaders: [{
-          test: /\.tsx$/,
-          exclude: /(test|node_modules)\//,
-          loader: 'istanbul-instrumenter'
-        }],
+      {
+        content: <div className='test-col' style={{height: '100%'}}>2</div>,
+        colSpan: 2,
       },
-    },
+      {
+        content: <div className='test-col' style={{height: '100%'}}>3</div>,
+      },
+    ]
+  }
+  
+  var width = 1000;
+  var height = 500;
+  var colLeftFactor = [0,1,3];
+  var colWidthFactor = [1,2,1];
+  var numColsFactor = 4;
+  var frame = createFrame(width, height);
+  ReactDOM.render(<LayoutManager layout={layout} />, frame);
+  
+  var divs = frame.querySelectorAll('.test-col');
+  t.equal(divs.length, 3, 'renders all columns');
+  
+  _.map(divs, (div, index) => {    
+    t.equal(div.textContent, (index + 1) + "", 'correct content');
+    t.equal(div.getBoundingClientRect().left, 
+      width / numColsFactor * colLeftFactor[index], 'correct left');
+    t.equal(div.getBoundingClientRect().width,
+      width / numColsFactor * colWidthFactor[index], 'correct width');
+    t.equal(div.getBoundingClientRect().height, height, 'full height');
+  });
+  
+  cleanupFrame(frame);
+  
+  t.end();
+});
 
-    webpackMiddleware: {
-      noInfo: true
-    },
-
-    reporters: [
-      'dots',
-      'coverage'
-    ],
-    
-    coverageReporter: {
-      type: 'text',
-      dir: 'coverage/'
-    },
-
-    port: 9876,
-    colors: true,
-    logLevel: config.LOG_INFO,
-    autoWatch: true,
-    browsers: ['Chrome'],
-    singleRun: false
-  })
-};

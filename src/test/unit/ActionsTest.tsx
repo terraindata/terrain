@@ -87,4 +87,5 @@ test('Actions.dispatch', (t) => {
   
   t.ok(containSameKeys(Actions.create, Actions.dispatch) && containSameKeys(Actions.dispatch, Actions.create),
     'Actions.create and Actions.dispatch have identical key structures');
+  t.end();
 });

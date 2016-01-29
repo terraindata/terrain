@@ -47,8 +47,6 @@ import * as React from 'react';
 var $ = require('jquery');
 var _ = require('underscore');
 
-import Actions from "../../data/Actions.tsx";
-
 // Coordinate these classNames with layout_manager.css/less
 var lmClass = 'layout-manager';
 var colClass = 'layout-manager-column';
@@ -66,7 +64,8 @@ interface Style {
 var LayoutManager = React.createClass<any, any>({
 	propTypes: 
 	{
-		layout: React.PropTypes.object.isRequired
+		layout: React.PropTypes.object.isRequired, // TODO move to TS, describe different keys allowed
+    moveTo: React.PropTypes.func,
 	},
 
 	getInitialState() {

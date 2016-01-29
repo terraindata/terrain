@@ -103,6 +103,16 @@ From `master` branch:
 npm run deploy
 ```
 
+## Testing
+
+`npm run test` - runs tests continually in another copy of Chrome
+
+Sometimes your tests may trigger errors that cause your test browser to crash, and you will see karma report:
+`No captured browser.`
+When this happens, you need to quit Karma (Ctrl + C) and restart it.
+
+Note: when adding new tests, make sure to include `t.end()` at the end of every test (or `t.plan(x)` at the beginning), or else the test suite will hang.
+
 ## Useful Tutorials
 
 - [http://jaysoo.ca/2015/09/26/typed-react-and-redux/]
@@ -151,4 +161,5 @@ To add a new action:
 ## Troubleshooting
 
 1. Node or npm errors: `npm install` - you may be missing packages.
-2. Assume it's an early sign of the apocalypse. Hide your kids. Run.
+2. Test suite doesn't run all tests: make sure you have added correct `t.plan(x)` or `t.end()` statements to every test, otherwise the test suite will hang.
+3. Assume it's an early sign of the apocalypse. Hide your kids. Run.
