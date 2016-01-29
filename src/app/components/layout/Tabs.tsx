@@ -46,8 +46,60 @@ require('./Tabs.less');
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
+import PanelMixin from "../layout/PanelMixin.tsx";
 
 var TabIcon = require("./../../../images/tab_corner_27x31.svg?name=TabIcon");
+
+var Tab = React.createClass<any, any>({
+  mixins: [PanelMixin],
+  
+  propTypes: {
+    index: React.PropTypes.number,
+    selectedIndex: React.PropTypes.number,
+    tab: React.PropTypes.object,
+    tabs: React.PropTypes.array,
+    onSelect: React.PropTypes.func,
+  },
+  
+  getDefaultProps(): any
+  {
+    return {
+      drag_x: true,
+      reorderOnDrag: true,
+    }
+  },
+    
+  // Returns z-index so that tabs are layered in a nice fashion
+  zIndexStyleForIndex(index: number): {zIndex?: number}
+  {
+    if(index !== this.props.selectedIndex)
+    {
+      return {
+        zIndex: this.props.tabs.length - index,
+      };
+    }
+    
+    return {};
+  },
+
+  
+  render() {
+    return this.renderPanel(
+      <div 
+        className={Util.objToClassname({
+          'tabs-tab': true,
+          'tabs-tab-selected': this.props.index === this.props.selectedIndex,
+          })}
+        key={this.props.index}
+        style={this.zIndexStyleForIndex(this.props.index)}
+        onClick={this.props.onSelect}>
+          <TabIcon className='tab-icon tab-icon-left' />
+          <div className='tab-inner'>{this.props.tab.tabName}</div>
+          <TabIcon className='tab-icon tab-icon-right' />
+      </div>
+    );
+  },
+});
 
 var Tabs = React.createClass<any, any>({
 	propTypes:
@@ -66,35 +118,38 @@ var Tabs = React.createClass<any, any>({
 
 	handleTabSelectFactory(index)
 	{
-		return () => {
-			if(typeof this.props.tabs[index].onClick === 'function')
-			{
-				this.props.tabs[index].onClick();	
-			}
+	  var onClick = this.props.tabs[index].onClick;	
+    
+    return () => {
+      if(typeof onClick === 'function')
+      {
+        onClick();
+  		}
 
 			this.setState({
 				selectedIndex: index,
 			});
 		};
 	},
-  
-  // Returns z-index so that tabs are layered in a nice fashion
-  zIndexStyleForIndex(index: number): {zIndex?: number}
-  {
-    if(index !== this.state.selectedIndex)
-    {
-      return {
-        zIndex: this.props.tabs.length - index,
-      };
-    }
-    
-    return {};
-  },
 
 	render() {
 		var content = this.props.tabs[this.state.selectedIndex].content;
 
 		var showTabs = this.props.tabs && this.props.tabs.length >= 2;
+    
+    var tabsLayout = {
+      columns: this.props.tabs.map((tab, index) => ({
+      content:
+      (
+        <Tab 
+          index={index}
+          tab={tab}
+          tabs={this.props.tabs}
+          onSelect={this.handleTabSelectFactory(index)}
+          selectedIndex={this.state.selectedIndex} />
+      ),
+    }))
+    };
 
 		return (<div className='tabs-container'>
 			<div className='tabs-row-wrapper'>
@@ -108,21 +163,7 @@ var Tabs = React.createClass<any, any>({
 				{
 					showTabs ? (
 						<div className='tabs-row'>
-							{
-								this.props.tabs.map((tab, index) => 
-									<div 
-										className={Util.objToClassname({
-											'tabs-tab': true,
-											'tabs-tab-selected': index === this.state.selectedIndex,
-											})}
-										key={index}
-                    style={this.zIndexStyleForIndex(index)}
-										onClick={this.handleTabSelectFactory(index)}>
-                      <TabIcon className='tab-icon tab-icon-left' />
-                      <div className='tab-inner'>{tab.tabName}</div>
-                      <TabIcon className='tab-icon tab-icon-right' />
-									</div>)
-							}
+							<LayoutManager layout={tabsLayout} moveTo={this.props.moveTo} />
               <div className='tabs-shadow'></div>
 						</div>
 					) : null

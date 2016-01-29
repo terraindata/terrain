@@ -67,14 +67,26 @@ class Builder extends React.Component<any, any>
     super();
     
     Store.subscribe(() => {
-      this.setState(Store.getState());
+      var newState = Store.getState();
+      // updated cardGroup order
+      this.setState(newState);
     });
     
     this.state = Store.getState();
+    this.state.cardGroupOrder = [];
+    if(this.state.cardGroups)
+    {
+      this.state.cardGroupOrder = this.state.cardGroups.map((cardGroup, key) => key);
+    }
   }
   
   handleNewAlgorithmTab() {
     Actions.dispatch.newAlgorithm();
+  }
+  
+  moveTabs(index: number, destination: number)
+  {
+    
   }
 
 	render() {
@@ -109,7 +121,7 @@ class Builder extends React.Component<any, any>
     });
 
     return (
-      <Tabs tabs={tabs} />
+      <Tabs tabs={tabs} moveTo={this.moveTabs} />
     );
 	}
 };
