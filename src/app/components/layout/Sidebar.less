@@ -38,6 +38,17 @@
     }
   }
   
+  .sidebar-selected-square {
+    background: @sidebar-selected-bg;
+    height: @sidebar-link-height;
+    width: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    
+    transition: top 0.2s;
+  }
+  
   .sidebar-link {
     height: @sidebar-link-height;
     width: @sidebar-link-height;
@@ -47,11 +58,11 @@
     .transition;
     
     &:hover {
-      background: @sidebar-hover-bg;
+      background: rgba(255,255,255,0.1);
     }
     
     &.sidebar-link-selected {
-      background: @sidebar-selected-bg;  
+      // background: @sidebar-selected-bg;  
       svg {
         fill: @sidebar-bg;
       }
