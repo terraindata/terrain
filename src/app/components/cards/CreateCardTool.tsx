@@ -76,6 +76,7 @@ class CreateCardTool extends React.Component<Props, any>
     this.toggleOpen = this.toggleOpen.bind(this);
     this.toggleShowAll = this.toggleShowAll.bind(this);
     this.handleKeydown = this.handleKeydown.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     
     if(this.props.alwaysOpen)
     {
@@ -134,7 +135,9 @@ class CreateCardTool extends React.Component<Props, any>
         this.createCardFactory(type)();
       }
     }
-    
+  }
+  
+  handleChange(event) {
     this.setState({
       search: event.target.value,
     });
@@ -142,7 +145,8 @@ class CreateCardTool extends React.Component<Props, any>
   
   hideButton(type: string): boolean
   {
-    return type.indexOf(this.state.search) === -1;
+    return this.state.search !== "" &&
+      this.state.search !== type.substr(0, this.state.search.length);
   }
   
   renderCardSelector() {
@@ -178,7 +182,7 @@ class CreateCardTool extends React.Component<Props, any>
     return (
      <div className={classes} style={{height: overrideHeight}}>
        <div className="create-card-field-wrapper">
-         <input type="text" ref="field" className="create-card-field" placeholder="Type of card" onKeyDown={this.handleKeydown} />
+         <input type="text" ref="field" className="create-card-field" placeholder="Type of card" onKeyDown={this.handleKeydown} onChange={this.handleChange} />
        </div>
        {
          CardTypes.map((type, index) => this.hideButton(type) ? null : (
