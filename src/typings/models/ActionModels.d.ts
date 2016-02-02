@@ -88,10 +88,11 @@ interface CardPayload
 }
 
 interface CreateCardPayload extends CreatePayload {
+  algorithmId: string;
   type: string;
 }
 interface MoveCardPayload extends CardPayload, MovePayload {}
-interface RemoveCardPayload extends DeletePayload {}
+interface RemoveCardPayload extends CardPayload {}
 
 
 interface FromCardPayload extends CardPayload {

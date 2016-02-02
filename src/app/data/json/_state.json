@@ -86,7 +86,7 @@
       "cards": [
         {
           "type": "from",
-          "id": 1,
+          "id": 10101,
           "group": "sitters",
           "joins": 
           [
@@ -103,7 +103,7 @@
         },
         {
           "type": "select",
-          "id": 2,
+          "id": 10102,
             "properties": [
               "name",
               "picture",

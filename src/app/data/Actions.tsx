@@ -58,7 +58,7 @@ const create =
 	{
 		create: createAction<CreateCardPayload>(
 			ActionTypes.cards.create,
-			(type: string, index: number) => ({type, index})
+			(algorithmId: string, type: string, index: number) => ({algorithmId, type, index})
 		),
 
 		move: createAction<MoveCardPayload>(
@@ -68,7 +68,7 @@ const create =
     
     remove: createAction<RemoveCardPayload>(
       ActionTypes.cards.remove,
-      (index: number) => ({index})
+      (card: any) => ({card})
     ),
 
 		from:

@@ -78,20 +78,20 @@ class Builder extends React.Component<any, any>
   }
 
 	render() {
-    var tabs = _.map(this.state.cardGroups, (cardGroup) => {
+    var tabs = _.map(this.state.cardGroups, (cardGroup, algorithmId) => {
       var layout = {
         stackAt: 650,
         fullHeight: true,
         columns: [
           {
-            content: <InputsArea inputs={this.state.inputs} />,
+            content: <InputsArea inputs={this.state.inputs} algorithmId={algorithmId} />,
           },
           {
             colSpan: 2,
-            content: <CardsArea cards={cardGroup.cards} />
+            content: <CardsArea cards={cardGroup.cards} algorithmId={algorithmId} />
           },
           {
-            content: <ResultsArea results={this.state.resultGroups[cardGroup.id].results} />
+            content: <ResultsArea results={this.state.resultGroups[cardGroup.id].results} algorithmId={algorithmId} />
           },
         ]
       };
