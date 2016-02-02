@@ -1,0 +1,63 @@
+@import "../../util/Common.less";
+
+.account-dropdown-wrapper {
+  float: right;
+  padding-right: 10px;
+  padding-left: 10px;
+  height: 100%;
+  cursor: pointer;
+  .transition;
+  
+  &:hover {
+    background: rgba(255,255,255,0.1);
+  }
+  
+  .account-dropdown-top-bar {
+    .account-photo,
+    .account-name,
+    .account-arrow-icon {
+      display: inline-block;
+      .transition;
+    }
+    
+    .account-photo {
+      width: 25px;
+      height: 25px;
+      border: 1px solid @off-white ;
+      border-radius: 25px;
+      background: url("http://images.hngn.com/data/images/full/69536/han-solo.jpg");
+      background-size: cover;
+      background-position: center center;
+      
+      position: relative;
+      top: 4px;
+    }
+    
+    .account-name {
+      color: @off-white;
+      position: relative;
+      top: -3px;
+      padding-left: 10px;
+      padding-right: 15px;
+      
+      font-size: 17px;
+    }
+    
+    .account-arrow-icon {
+      fill: @off-white;
+      width: 8px;
+      
+      position: relative;
+      top: -5px;
+    }
+  }
+  
+  &.account-dropdown-open {
+    background: rgba(255,255,255,0.15);
+     
+    .account-arrow-icon {
+      .rotate180;
+      top: -3px;
+    } 
+  }
+}

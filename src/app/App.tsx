@@ -55,8 +55,10 @@ import * as ReactDOM from "react-dom";
 import LayoutManager from "./components/layout/LayoutManager.tsx";
 import Builder from "./components/builder/Builder.tsx";
 import Sidebar from "./components/layout/Sidebar.tsx";
+import AccountDropdown from "./components/common/AccountDropdown.tsx";
 
 // Icons
+var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
 var HomeIcon = require("./../images/icon_home_17x14.svg?name=HomeIcon");
 var BrowserIcon = require("./../images/icon_browser_17x14.svg?name=BrowserIcon");
 var BuilderIcon = require("./../images/icon_builder_17x11.svg?name=BuilderIcon");
@@ -141,7 +143,17 @@ var App = React.createClass({
         ],
       };
      
-    return <LayoutManager layout={layout} />;
+    return (
+      <div className='app'>
+        <div className='app-top-bar'>
+          <TerrainIcon className='app-top-bar-icon' />
+          <AccountDropdown />
+        </div>
+        <div className='app-wrapper'>
+          <LayoutManager layout={layout} />
+        </div>
+      </div>
+    );
   }
 
 });
