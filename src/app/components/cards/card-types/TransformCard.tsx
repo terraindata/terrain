@@ -74,19 +74,19 @@ class TransformCard extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
-    
+    console.log(props.card);
     this.state =
     {
       domain:
       {
-        x: 
-        [
-          10, 29.5
+        x: props.card.range,
+        // [
+          // 10, 29.5
           // props.card.scorePoints.reduce((min: any, scorePoint) => 
           //   (min === false || scorePoint.value < min ? scorePoint.value : min), false),
           // props.card.scorePoints.reduce((max: any, scorePoint) => 
           //   (max === false || scorePoint.value > max ? scorePoint.value : max), false),
-        ],
+        // ],
         y:
         [
           0,

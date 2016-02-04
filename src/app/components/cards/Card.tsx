@@ -153,6 +153,7 @@ var Card = React.createClass({
         };
     break;
     case 'transform':
+      console.log(this.props.card);
       CardComponent = TransformCard;
       break;
 		}

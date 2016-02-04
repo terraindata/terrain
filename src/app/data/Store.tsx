@@ -294,6 +294,9 @@ var cardsReducer = (cards = [], action, algorithmId) =>
       case 'filter':
         newCard = new CardModels.FilterCard();
         break;
+      case 'transform':
+        newCard = new CardModels.TransformCard();
+        break;
     }
     newCards.splice(action.payload.index, 0, newCard);
     return newCards;

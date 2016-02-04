@@ -374,7 +374,7 @@ var LayoutManager = React.createClass<any, any>({
 		}
 		
 		return (
-			<div className={className} style={style} key={index} ref={index}>
+			<div className={className} style={style} key={obj.key !== undefined ? obj.key : index} ref={index}>
 				{content}
 			</div>);
 	},

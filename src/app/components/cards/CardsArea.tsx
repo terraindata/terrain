@@ -62,12 +62,14 @@ var CardsArea = React.createClass<any, any>({
 			rows: this.props.cards.map((card, index) => {
 				return {
 					content: <Card name={card.name} index={index} card={card} algorithmId={this.props.algorithmId} />,
+          key: card.id,
 				};
 			}),
 			fullHeight: true,
 		};
     layout.rows.push({
-      content: <CreateCardTool index={this.props.cards.length} alwaysOpen={true} algorithmId={this.props.algorithmId} />
+      content: <CreateCardTool index={this.props.cards.length} alwaysOpen={true} algorithmId={this.props.algorithmId} />,
+      key: 'end-tool',
     });
 
 		var moveTo = (curIndex, newIndex) =>

@@ -148,7 +148,15 @@ var TransformChart = {
       .orient("bottom");
     d3.select(el).select('.bottomAxis')
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
-      .call(bottomAxis);
+      .call(bottomAxis)
+    .selectAll('text')
+      .style('text-anchor', (d) => {
+        if(d === scales.x.domain()[1])
+        {
+          return 'end';
+        }
+        return 'middle';
+      });
   },
   
   
@@ -161,6 +169,15 @@ var TransformChart = {
     
     var xPadding = 5;
     
+    var barWidth = (d) => {
+      var width = scales.realX(d['range']['max']) - scales.realX(d['range']['min']) - 2 * xPadding
+      if(width < 1)
+      {
+        width = 1
+      }
+      return width;
+    }
+    
     bar.enter()
       .append('rect')
       .attr('class', 'bar');
@@ -168,7 +185,7 @@ var TransformChart = {
     bar
       .attr('fill', color)
       .attr('x', (d) => scales.realX(d['range']['min']) + xPadding)
-      .attr('width', (d) => scales.realX(d['range']['max']) - scales.realX(d['range']['min']) - 2 * xPadding)
+      .attr('width', barWidth)
       .attr('y', (d) => scales.realBarY(d['percentage']))
       .attr('height', (d) => scaleMin(scales.realBarY) - scales.realBarY(d['percentage']));
     

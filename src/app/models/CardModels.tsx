@@ -193,6 +193,7 @@ export module CardModels
   {
     input: string = "";
     output: string = "";
+    range: number[] = [];
     bars: {
       count: number;
       percentage: number;
@@ -212,32 +213,38 @@ export module CardModels
     {
       super('transform', obj);
       
-      assign(this, obj, ['input', 'output', 'scorePoints', 'bars']);
+      assign(this, obj, ['input', 'output', 'scorePoints', 'bars', 'range']);
+      
+      if(this.range.length === 0)
+      {
+        switch(this.input) 
+        {
+          case 'sitter.minPrice':
+          console.log('sitter input');
+            this.range = [12, 26];
+            break;
+          // more defaults can go here
+          default:
+            this.range = [0,100];
+        }
+      }
       
       if(this.bars.length === 0)
       {
         // Create dummy data for now
-        var range = [0, 100];
-        switch(this.input) 
-        {
-          case 'sitter.minPrice':
-            range = [12, 30];
-            break;
-          // more defaults can go here
-        }
         
         var counts = [];
         var sum = 0;
-        for(var i = range[0]; i <= range[1]; i ++)
+        for(var i = this.range[0]; i <= this.range[1]; i ++)
         {
           var count: any = Util.randInt(3000);
           counts.push(count);
           sum += count;
         }
         
-        for(var i = range[0]; i <= range[1]; i ++)
+        for(var i = this.range[0]; i <= this.range[1]; i ++)
         {
-          var count: any = counts[i - range[0]];
+          var count: any = counts[i - this.range[0]];
           this.bars.push({
             count: count,
             percentage: count / sum,
@@ -249,7 +256,20 @@ export module CardModels
           });
         }
       }
-      console.log(this.bars);
+      
+      if(this.scorePoints.length === 0)
+      {
+        for(var i = 0; i < 5; i ++)
+        {
+          this.scorePoints.push(
+          {
+            value: this.range[0] + (this.range[1] - this.range[0]) / 4 * i,
+            score: 0.5,
+            id: "p" + i,
+          });
+        }
+        console.log(this.scorePoints);
+      }
     }
   }
 }
