@@ -148,3 +148,12 @@ interface ResultPayload
 }
 
 interface MoveResultPayload extends ResultPayload, MovePayload {}
+
+interface TransformCardChangePayload extends CardPayload {
+  input: string;
+  output: string;
+}
+interface TransformCardScorePointPayload extends CardPayload {
+  scorePointScore: number;
+  scorePointId: string;
+}

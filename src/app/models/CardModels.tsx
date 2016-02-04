@@ -188,4 +188,68 @@ export module CardModels
       super('filter', obj);
     }
   }
+  
+  export class TransformCard extends Card
+  {
+    input: string = "";
+    output: string = "";
+    bars: {
+      count: number;
+      percentage: number;
+      id: string;
+      range: {
+        min: number;
+        max: number;
+      }
+    }[] = [];
+    scorePoints: {
+      value: number;
+      score: number;
+      id: string;
+    }[] = [];
+    
+    constructor(obj?: any)
+    {
+      super('transform', obj);
+      
+      assign(this, obj, ['input', 'output', 'scorePoints', 'bars']);
+      
+      if(this.bars.length === 0)
+      {
+        // Create dummy data for now
+        var range = [0, 100];
+        switch(this.input) 
+        {
+          case 'sitter.minPrice':
+            range = [12, 30];
+            break;
+          // more defaults can go here
+        }
+        
+        var counts = [];
+        var sum = 0;
+        for(var i = range[0]; i <= range[1]; i ++)
+        {
+          var count: any = Util.randInt(3000);
+          counts.push(count);
+          sum += count;
+        }
+        
+        for(var i = range[0]; i <= range[1]; i ++)
+        {
+          var count: any = counts[i - range[0]];
+          this.bars.push({
+            count: count,
+            percentage: count / sum,
+            range: {
+              min: i,
+              max: i + 1,
+            },
+            id: "a4-" + i,
+          });
+        }
+      }
+      console.log(this.bars);
+    }
+  }
 }

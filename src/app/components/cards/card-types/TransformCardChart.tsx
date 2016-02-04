@@ -42,90 +42,80 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-var Immutable = require('immutable');
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import Actions from "../../../data/Actions.tsx";
+import Util from '../../../util/Util.tsx';
+import { CardModels } from './../../../models/CardModels.tsx';
 
-/*
+import TransformChart from '../../../charts/TransformChart.tsx';
 
-Terminology:
-- create
-- change
-- move
-- delete (transition to 'remove')
+interface Props {
+  card: CardModels.TransformCard;
+  pointsData: any;
+  barsData: any;
+  domain: any;
+  barColor: string;
+  lineColor: string;
+}
 
-*/
+// http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
 
-// prepend str to every item in the array
-var prependArray = (str, arr) => 
+class TransformCardChart extends React.Component<Props, any>
 {
-	return arr.map((elem) => str + "." + elem);
+  constructor(props:Props)
+  {
+    super(props);
+    this.onPointMove = this.onPointMove.bind(this);
+  }
+  
+  componentDidMount() {
+    var el = ReactDOM.findDOMNode(this);
+    TransformChart.create(el, {
+      width: '100%',
+      height: '300px',
+    }, this.getChartState());
+  }
+  
+  componentDidUpdate() {
+    var el = ReactDOM.findDOMNode(this);
+    TransformChart.update(el, this.getChartState());
+  }
+  
+  onPointMove(scorePointId, newScore) {
+    newScore = Util.valueMinMax(newScore, 0, 1);
+    Actions.dispatch.cards.transform.scorePoint(this.props.card, scorePointId, newScore);
+  }
+  
+  getChartState() {
+    var pointsData = this.props.pointsData.map((scorePoint) => ({
+      x: scorePoint.value,
+      y: scorePoint.score,
+      id: scorePoint.id,
+    }));
+    
+    return {
+      barsData: this.props.barsData,
+      pointsData: pointsData,
+      domain: this.props.domain,
+      onMove: this.onPointMove,
+      colors: {
+        bar: this.props.barColor,
+        line: this.props.lineColor,
+      },
+    };
+  }
+  
+  componentWillUnmount() {
+    var el = ReactDOM.findDOMNode(this);
+    TransformChart.destroy(el);
+  }
+
+	render() {
+    return (
+      <div></div>
+		);
+	}
 };
 
-// convert an array into an object where the keys === values
-var makeObject = (str, arr) =>
-{
-	return _.object(arr, prependArray(str, arr));
-};
-
-
-var ActionTypes = 
-{
-	// moveCard: moveCard,
-	// Action: Action,
-
-	cards: makeObject('cards',
-	[
-		'move',
-		'create',
-    'remove',
-	]),
-
-	inputs: makeObject('inputs',
-	[
-		'move',
-		'create',
-		'changeKey',
-		'changeValue',
-	]),
-
-	results: makeObject('results', 
-	[
-		'move',
-	]),
-
-	newAlgorithm: 'newAlgorithm',
-};
-
-ActionTypes.cards.from = makeObject('cards.from', [
-	'changeGroup',
-]);
-ActionTypes.cards.from.join = makeObject('cards.from.join', [
-	'create',
-	'change',
-	'delete',
-]);
-
-ActionTypes.cards.select = makeObject('cards.select', [
-	'moveProperty',
-	'createProperty',
-	'deleteProperty',
-	'changeProperty',
-]);
-
-ActionTypes.cards.sort = makeObject('cards.sort', [
-	'change',
-]);
-
-ActionTypes.cards.filter = makeObject('cards.filter', [
-	'create',
- 'change',
- 'delete',
-]);
-
-ActionTypes.cards.transform = makeObject('cards.transform', [
-  'change',
-  'scorePoint',
-]);
-
-
-export default ActionTypes;
+export default TransformCardChart;

@@ -122,6 +122,31 @@ var change = function<T>(...args: any[]): T // needs to be `function` to make us
 }
 
 
+var transformCardReducer = (cards = [], action) =>
+{
+  var cardIndex = cards.indexOf(action.payload.card);
+  var newCards = cloneArray(cards);
+  var card = newCards[cardIndex];
+  
+  switch(action.type)
+  {
+    case ActionTypes.cards.transform.change:
+      card.input = action.payload.input;
+      card.output = action.payload.output;
+      break;
+    case ActionTypes.cards.transform.scorePoint:
+      var scorePointIndex = card.scorePoints.findIndex((scorePoint) => scorePoint.id === action.payload.scorePointId);
+      card.scorePoints[scorePointIndex].score = action.payload.scorePointScore;
+      break;
+    default:
+      // not applicable
+      return cards;
+  }
+  
+  return newCards;
+}
+
+
 var selectCardReducer = (cards = [], action) =>
 {
 	var cardIndex = cards.indexOf(action.payload.card);
@@ -291,6 +316,7 @@ var cardsReducer = (cards = [], action, algorithmId) =>
 	cards = fromCardReducer(cards, action);
   cards = filterCardReducer(cards, action);
   cards = sortCardReducer(cards, action);
+  cards = transformCardReducer(cards, action);
 
 	switch(action.type)
 	{
@@ -392,9 +418,45 @@ var cardGroupsReducer = (cardGroups = {}, action) =>
 }
 
 var currentGroupId = 101;
-// var newCards = require('./json/_cards.json');
 var newResults = require('./json/_results.json');
-var defaultState = require('./json/_state.json');
+var defaultStateJson = require('./json/_state.json');
+
+var cardGroups = {};
+_.map(defaultStateJson.cardGroups, (cardGroup, key) => {
+  var cards = cardGroup.cards.map((card) => {
+    switch(card.type) {
+      case 'from':
+        return new CardModels.FromCard(card);
+        break;
+      case 'select':
+        return new CardModels.SelectCard(card);
+        break;
+      case 'sort':
+        return new CardModels.SortCard(card);
+        break;
+      case 'filter':
+        return new CardModels.FilterCard(card);
+        break;
+      case 'transform':
+        return new CardModels.TransformCard(card);
+        break;
+      default:
+        return new CardModels.Card(card.type, card);
+    }
+  });
+  
+  cardGroups[key] = {
+    id: cardGroup.id,
+    cards: cards,
+  }
+});
+
+var defaultState = 
+{
+  inputs: defaultStateJson.inputs,
+  resultGroups: defaultStateJson.resultGroups,
+  cardGroups: cardGroups,
+}
 
 var stateReducer = (state = defaultState, action) =>
 {

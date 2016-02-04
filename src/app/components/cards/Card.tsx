@@ -52,6 +52,7 @@ import SelectCard from './card-types/SelectCard.tsx';
 import FromCard from './card-types/FromCard.tsx';
 import SortCard from './card-types/SortCard.tsx';
 import FilterCard from './card-types/FilterCard.tsx';
+import TransformCard from './card-types/TransformCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
 import Menu from '../common/Menu.tsx';
 
@@ -151,6 +152,9 @@ var Card = React.createClass({
           },
         };
     break;
+    case 'transform':
+      CardComponent = TransformCard;
+      break;
 		}
     
     var content = <div>This card has not been implemented yet.</div>;

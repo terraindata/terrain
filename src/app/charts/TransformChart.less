@@ -1,0 +1,30 @@
+@import "../util/Common.less";
+
+.transform-chart {
+  
+  .tick text {
+    fill: @dark-green;
+  }
+  
+  .tick line {
+    stroke: @dark-green;
+    stroke-width: 1px;
+  }
+  
+  .domain {
+    fill: none;
+    stroke: @dark-green;
+    stroke-width: 1px;
+  }
+  
+  .point {
+    cursor: pointer;
+    transition: stroke-width 0.15s, stroke 0.15s;
+    
+    &:hover,
+    &.point-active {
+      stroke-width: 5px;
+      // stroke: #ce8311;
+    }
+  }
+}

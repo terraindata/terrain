@@ -4,6 +4,40 @@
       "id": 100,
       "cards": [
         {
+          "type": "transform",
+          "id": 74,
+          "input": "sitter.minPrice",
+          "output": "sitter.transformedMinPrice",
+          "scorePoints": 
+          [
+            {
+              "value": 10,
+              "score": 0.5,
+              "id": "0a0"
+            },
+            {
+              "value": 15,
+              "score": 0.7,
+              "id": "0a1"
+            },
+            {
+              "value": 20,
+              "score": 0.9,
+              "id": "0a2"
+            },
+            {
+              "value": 25,
+              "score": 0.7,
+              "id": "0a3"
+            },
+            {
+              "value": 30,
+              "score": 0.5,
+              "id": "0a4"
+            }
+          ]
+        },
+        {
           "type": "from",
           "id": 1,
           "group": "sitters",
@@ -139,67 +173,83 @@
       [
         {
           "name": "Sitter 1",
-          "id": 8
+          "id": 100,
+ 					"minPrice": 10
         },
         {
           "name": "Sitter 2",
-          "id": 9
+          "id": 9,
+ 					"minPrice": 9
         },
         {
           "name": "Sitter 3",
-          "id": 10
+          "id": 10,
+ 					"minPrice": 10
         },
         {
           "name": "Sitter 4",
-          "id": 11
+          "id": 11,
+ 					"minPrice": 11
         },
         {
           "name": "Sitter 5",
-          "id": 12
+          "id": 12,
+ 					"minPrice": 12
         },
         {
           "name": "Sitter 6",
-          "id": 13
+          "id": 13,
+ 					"minPrice": 13
         },
         {
           "name": "Sitter 7",
-          "id": 14
+          "id": 14,
+ 					"minPrice": 14
         },
         {
           "name": "Sitter 8",
-          "id": 15
+          "id": 15,
+ 					"minPrice": 15
         },
         {
           "name": "Sitter 9",
-          "id": 16
+          "id": 16,
+ 					"minPrice": 16
         },
         {
           "name": "Sitter 10",
-          "id": 17
+          "id": 17,
+ 					"minPrice": 17
         },
         {
           "name": "Sitter 11",
-          "id": 18
+          "id": 18,
+ 					"minPrice": 18
         },
         {
           "name": "Sitter 12",
-          "id": 19
+          "id": 19,
+ 					"minPrice": 19
         },
         {
           "name": "Sitter 13",
-          "id": 20
+          "id": 20,
+ 					"minPrice": 20
         },
         {
           "name": "Sitter 14",
-          "id": 21
+          "id": 21,
+ 					"minPrice": 21
         },
         {
           "name": "Sitter 15",
-          "id": 24
+          "id": 24,
+ 					"minPrice": 24
         },
         {
           "name": "Sitter 16",
-          "id": 25
+          "id": 25,
+ 					"minPrice": 25
         }
       ]
     },
@@ -209,67 +259,83 @@
       [
         {
           "name": "Sitter 6",
-          "id": 13
+          "id": 13,
+ 					"minPrice": 13
         },
         {
           "name": "Sitter 2",
-          "id": 9
+          "id": 9,
+ 					"minPrice": 9
         },
         {
           "name": "Sitter 1",
-          "id": 8
+          "id": 100,
+ 					"minPrice": 10
         },
         {
           "name": "Sitter 4",
-          "id": 11
+          "id": 11,
+ 					"minPrice": 11
         },
         {
           "name": "Sitter 3",
-          "id": 10
+          "id": 10,
+ 					"minPrice": 10
         },
         {
           "name": "Sitter 5",
-          "id": 12
+          "id": 12,
+ 					"minPrice": 12
         },
         {
           "name": "Sitter 7",
-          "id": 14
+          "id": 14,
+ 					"minPrice": 14
         },
         {
           "name": "Sitter 10",
-          "id": 17
+          "id": 17,
+ 					"minPrice": 17
         },
         {
           "name": "Sitter 8",
-          "id": 15
+          "id": 15,
+ 					"minPrice": 15
         },
         {
           "name": "Sitter 9",
-          "id": 16
+          "id": 16,
+ 					"minPrice": 16
         },
         {
           "name": "Sitter 11",
-          "id": 18
+          "id": 18,
+ 					"minPrice": 18
         },
         {
           "name": "Sitter 12",
-          "id": 19
+          "id": 19,
+ 					"minPrice": 19
         },
         {
           "name": "Sitter 13",
-          "id": 20
+          "id": 20,
+ 					"minPrice": 20
         },
         {
           "name": "Sitter 14",
-          "id": 21
+          "id": 21,
+ 					"minPrice": 21
         },
         {
           "name": "Sitter 15",
-          "id": 24
+          "id": 24,
+ 					"minPrice": 24
         },
         {
           "name": "Sitter 16",
-          "id": 25
+          "id": 25,
+ 					"minPrice": 25
         }
       ]
     }
