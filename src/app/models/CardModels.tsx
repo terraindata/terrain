@@ -220,10 +220,14 @@ export module CardModels
         switch(this.input) 
         {
           case 'sitter.minPrice':
-          console.log('sitter input');
             this.range = [12, 26];
             break;
           // more defaults can go here
+          case 'sitter.numJobs':
+            this.range = [0, 1000];
+            var rangeFn = Math.log;
+            var outliers = true;
+            break;
           default:
             this.range = [0,100];
         }
@@ -238,6 +242,11 @@ export module CardModels
         for(var i = this.range[0]; i <= this.range[1]; i ++)
         {
           var count: any = Util.randInt(3000);
+          // if(rangeFn)
+          // {
+          //   count = Math.floor(rangeFn((this.range[1] - i + 1)));
+          //   console.log(count);
+          // }
           counts.push(count);
           sum += count;
         }
@@ -268,7 +277,6 @@ export module CardModels
             id: "p" + i,
           });
         }
-        console.log(this.scorePoints);
       }
     }
   }

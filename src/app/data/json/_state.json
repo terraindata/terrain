@@ -5,6 +5,18 @@
       "cards": [
         {
           "type": "transform",
+          "id": 77,
+          "input": "sitter.score",
+          "output": "sitter.transformedScore"
+        },
+        {
+          "type": "transform",
+          "id": 76,
+          "input": "sitter.numJobs",
+          "output": "sitter.transformedNumJobs"
+        },
+        {
+          "type": "transform",
           "id": 74,
           "input": "sitter.minPrice",
           "output": "sitter.transformedMinPrice",

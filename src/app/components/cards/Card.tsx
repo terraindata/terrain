@@ -96,7 +96,6 @@ var Card = React.createClass({
   
   handleDelete()
   {
-    console.log('delete');
     Actions.dispatch.cards.remove(this.props.card);
   },
   
@@ -153,7 +152,6 @@ var Card = React.createClass({
         };
     break;
     case 'transform':
-      console.log(this.props.card);
       CardComponent = TransformCard;
       break;
 		}

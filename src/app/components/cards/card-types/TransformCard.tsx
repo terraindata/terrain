@@ -52,6 +52,7 @@ import { Directions } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 
 import TransformCardChart from './TransformCardChart.tsx';
+import TransformCardPeriscope from './TransformCardPeriscope.tsx';
 
 var Colors = [
 {
@@ -74,7 +75,9 @@ class TransformCard extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
-    console.log(props.card);
+    
+    this.handleDomainChange = this.handleDomainChange.bind(this);
+    
     this.state =
     {
       domain:
@@ -94,6 +97,16 @@ class TransformCard extends React.Component<Props, any>
         ]
       }
     };
+  }
+  
+  handleDomainChange(newDomain) {
+    this.setState({
+      domain:
+      {
+        x: newDomain,
+        y: this.state.domain.y,
+      },
+    });
   }
 
   render() {
@@ -133,6 +146,12 @@ class TransformCard extends React.Component<Props, any>
           barColor={Colors[0].bar}
           lineColor={Colors[0].line}
           pointsData={this.props.card.scorePoints}
+          barsData={this.props.card.bars}
+          domain={this.state.domain}
+          card={this.props.card} />
+        <TransformCardPeriscope
+          onDomainChange={this.handleDomainChange}
+          barColor={Colors[0].bar}
           barsData={this.props.card.bars}
           domain={this.state.domain}
           card={this.props.card} />
