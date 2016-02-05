@@ -66,6 +66,10 @@ class TransformCardPeriscope extends React.Component<Props, any>
   {
     super(props);
     this.handleDomainChange = this.handleDomainChange.bind(this);
+    this.state = {
+      chartState: false,
+      width: 0,
+    }
   }
   
   componentDidMount() {
@@ -76,9 +80,27 @@ class TransformCardPeriscope extends React.Component<Props, any>
     }, this.getChartState());
   }
   
+  componentWillReceiveProps(newProps)
+  {
+    if(newProps.domain !== this.props.domain
+      || newProps.barsData !== this.props.barsData)
+    {
+      this.setState({
+        chartState: false,
+      });
+    }
+  }
+  
   componentDidUpdate() {
     var el = ReactDOM.findDOMNode(this);
-    Periscope.update(el, this.getChartState());
+    if(!this.state.chartState || el.getBoundingClientRect().width !== this.state.width)
+    {
+      this.setState({
+        width: el.getBoundingClientRect().width,
+      });
+      
+      Periscope.update(el, this.getChartState());
+    }
   }
   
   handleDomainChange(handleIndex, value) {
@@ -89,7 +111,12 @@ class TransformCardPeriscope extends React.Component<Props, any>
   }
   
   getChartState() {
-    return {
+    if(this.state.chartState)
+    {
+      return this.state.chartState;
+    }
+    
+    var chartState = {
       barsData: this.props.barsData,
       maxRange: this.props.card.range,
       domain: this.props.domain,
@@ -98,6 +125,11 @@ class TransformCardPeriscope extends React.Component<Props, any>
         bar: this.props.barColor,
       },
     };
+    
+    this.setState({
+      chartState: chartState,
+    });
+    return chartState;
   }
   
   componentWillUnmount() {

@@ -94,6 +94,7 @@ var TransformChart = {
   
   update(el, state)
   {
+    console.log('update');
     if(!state._cache)
     {
       state._cache = {};

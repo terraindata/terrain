@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Actions from "../../../data/Actions.tsx";
@@ -84,9 +85,9 @@ class TransformCardChart extends React.Component<Props, any>
   
   componentWillReceiveProps(newProps)
   {
-    if(newProps.domain !== this.props.domain
-      || newProps.pointsData !== this.props.pointsData
-      || newProps.barsData !== this.props.barsData)
+    if(!_.isEqual(newProps.domain, this.props.domain)
+      || !_.isEqual(newProps.pointsData, this.props.pointsData)
+      || !_.isEqual(newProps.barsData, this.props.barsData))
     {
       this.setState({
         chartState: false,
@@ -107,6 +108,9 @@ class TransformCardChart extends React.Component<Props, any>
   }
   
   onPointMove(scorePointId, newScore) {
+    this.setState({
+      chartState: false,
+    });
     newScore = Util.valueMinMax(newScore, 0, 1);
     Actions.dispatch.cards.transform.scorePoint(this.props.card, scorePointId, newScore);
   }
