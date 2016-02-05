@@ -94,7 +94,22 @@ var TransformChart = {
   
   update(el, state)
   {
-    var barsData = this._precomputeBarsData(state.barsData, state.domain);
+    if(!state._cache)
+    {
+      state._cache = {};
+    }
+    
+    if(state._cache.domain !== state.domain
+      || state._cache.barsData !== state.barsData)
+    {
+      // compute barsData and cache
+      var computedBarsData = this._precomputeBarsData(state.barsData, state.domain);
+      state._cache.domain = state.domain;
+      state._cache.barsData = state.barsData;
+      state._cache.computedBarsData = computedBarsData;
+    }
+    
+    var barsData = state._cache.computedBarsData;
     var scales = this._scales(el, state.domain, barsData);
     this._draw(el, scales, barsData, state.pointsData, state.onMove, state.colors);
   },
@@ -109,6 +124,7 @@ var TransformChart = {
   
   _precomputeBarsData(oBarsData, domain)
   {
+    console.log('rp');
     var maxBars = 15;
     var minBars = 8;
     

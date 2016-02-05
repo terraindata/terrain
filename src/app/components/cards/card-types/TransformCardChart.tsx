@@ -67,9 +67,14 @@ class TransformCardChart extends React.Component<Props, any>
   {
     super(props);
     this.onPointMove = this.onPointMove.bind(this);
+    this.state = {
+      chartState: false,
+      width: 0,
+    }
   }
   
-  componentDidMount() {
+  componentDidMount() 
+  {
     var el = ReactDOM.findDOMNode(this);
     TransformChart.create(el, {
       width: '100%',
@@ -77,9 +82,28 @@ class TransformCardChart extends React.Component<Props, any>
     }, this.getChartState());
   }
   
+  componentWillReceiveProps(newProps)
+  {
+    if(newProps.domain !== this.props.domain
+      || newProps.pointsData !== this.props.pointsData
+      || newProps.barsData !== this.props.barsData)
+    {
+      this.setState({
+        chartState: false,
+      });
+    }
+  }
+  
   componentDidUpdate() {
     var el = ReactDOM.findDOMNode(this);
-    TransformChart.update(el, this.getChartState());
+    if(!this.state.chartState || el.getBoundingClientRect().width !== this.state.width)
+    {
+      this.setState({
+        width: el.getBoundingClientRect().width,
+      });
+      
+      TransformChart.update(el, this.getChartState());
+    }
   }
   
   onPointMove(scorePointId, newScore) {
@@ -88,13 +112,18 @@ class TransformCardChart extends React.Component<Props, any>
   }
   
   getChartState() {
+    if(this.state.chartState)
+    {
+      return this.state.chartState;
+    }
+    
     var pointsData = this.props.pointsData.map((scorePoint) => ({
       x: scorePoint.value,
       y: scorePoint.score,
       id: scorePoint.id,
     }));
     
-    return {
+    var chartState = {
       barsData: this.props.barsData,
       pointsData: pointsData,
       domain: this.props.domain,
@@ -104,6 +133,11 @@ class TransformCardChart extends React.Component<Props, any>
         line: this.props.lineColor,
       },
     };
+    
+    this.setState({
+      chartState: chartState,
+    });
+    return chartState;
   }
   
   componentWillUnmount() {

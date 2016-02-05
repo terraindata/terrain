@@ -274,7 +274,6 @@ var Periscope = {
     var barsMax = barsData.reduce((max, bar) =>
       (max === false || bar.percentage > max ? bar.percentage : max)
       , false);
-    barsMax = (Math.floor(barsMax * 100) + 1) / 100;
     
     var barY = d3.scale.linear()
       .range([height - yMargin, 0])
@@ -283,7 +282,7 @@ var Periscope = {
     var realBarY = d3.scale.linear()
       .range([height - yMargin, 0])
       .domain([0, barsMax]);
-    
+
     return {
       x,
       pointY,
