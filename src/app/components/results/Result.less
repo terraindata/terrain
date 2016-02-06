@@ -24,9 +24,42 @@
 			background: @light-green;
 			color: @dark-gray-green;
 			padding: 5px;
+      font-weight: 500;
+      font-size: 12px;
 
 			min-height: 12px; // todo remove
+      
+      .result-score-score {
+        float: right;
+      }
 		}
+    
+    .result-field {
+      border-bottom: 1px solid @off-white;
+      font-size: 12px;
+      margin: 4px;
+      
+      .result-field-name {
+        font-weight: bold;
+        display: inline-block;
+      }
+      
+      .result-field-value {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        
+        &.result-field-value-short {
+          float: right;
+          display: inline-block;
+        }
+        
+        &.result-field-value-open {
+          white-space: normal;
+          overflow: visible;
+        }
+      }
+    }
 	}
 }
 
