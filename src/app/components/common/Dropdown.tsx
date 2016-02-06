@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 require('./Dropdown.less');
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
 
 interface Props
@@ -62,7 +63,11 @@ class Dropdown extends React.Component<Props, any>
   constructor(props: Props) {
     super(props);
     this.renderOption = this.renderOption.bind(this);
+    this.computeDirection = this.computeDirection.bind(this);
     this.value = this.props.selectedIndex;
+    this.state = {
+      up: false,
+    };
   }
   
   renderOption(option, index)
@@ -84,20 +89,69 @@ class Dropdown extends React.Component<Props, any>
       </div>
     );
   }
+  
+  computeDirection() {
+    var cr = ReactDOM.findDOMNode(this).getBoundingClientRect();
+    if(this.state.up)
+    {
+      var componentTop = cr.bottom;
+    }
+    else
+    {
+      var componentTop = cr.top;
+    }
+    var windowMidpoint = window.innerHeight / 2;
+    
+    if(componentTop > windowMidpoint)
+    {
+      this.setState({
+        up: true,
+      });
+    }
+    else
+    {
+      this.setState({
+        up: false,
+      })
+    }
+  }
+  
+  componentDidMount() {
+    this.computeDirection();
+  }
+  
+  // componentDidUpdate() {
+  //   this.computeDirection();
+  // }
 
   render() {
+    var classes = Util.objToClassname({
+      "dropdown-wrapper": true,
+      "dropdown-wrapper-circle": this.props.circle,
+      "dropdown-up": this.state.up,
+    });
+    
     return (
-      <div className={"dropdown-wrapper" + (this.props.circle ? " dropdown-wrapper-circle" : "")}>
-        <div className="dropdown-value">
+      <div className={classes}>
+        { this.state.up ? (
+          <div className="dropdown-options-wrapper">
+            {
+              this.props.options.map(this.renderOption)
+            }
+          </div>
+        ) : null }
+        <div className="dropdown-value" onMouseEnter={this.computeDirection}>
           <div className="dropdown-option-inner">
             { this.props.options[this.props.selectedIndex] }
           </div>
         </div>
-        <div className="dropdown-options-wrapper">
-          {
-            this.props.options.map(this.renderOption)
-          }
-        </div>
+        { !this.state.up ? (
+          <div className="dropdown-options-wrapper">
+            {
+              this.props.options.map(this.renderOption)
+            }
+          </div>
+        ) : null }
       </div>
     );
   }

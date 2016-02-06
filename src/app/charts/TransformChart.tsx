@@ -94,7 +94,6 @@ var TransformChart = {
   
   update(el, state)
   {
-    console.log('update');
     if(!state._cache)
     {
       state._cache = {};
@@ -125,7 +124,6 @@ var TransformChart = {
   
   _precomputeBarsData(oBarsData, domain)
   {
-    console.log('rp');
     var maxBars = 15;
     var minBars = 8;
     
