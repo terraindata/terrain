@@ -166,8 +166,6 @@ var TransformChart = {
       return newBars;
     }, []);
     
-    console.log(newBars);
-    
     return newBars;
   },
   

@@ -94,15 +94,15 @@ class Dropdown extends React.Component<Props, any>
     var cr = ReactDOM.findDOMNode(this).getBoundingClientRect();
     if(this.state.up)
     {
-      var componentTop = cr.bottom;
+      var componentBottom = cr.bottom + cr.height;
     }
     else
     {
-      var componentTop = cr.top;
+      var componentBottom = cr.bottom;
     }
-    var windowMidpoint = window.innerHeight / 2;
+    var windowBottom = window.innerHeight;
     
-    if(componentTop > windowMidpoint)
+    if(componentBottom > windowBottom)
     {
       this.setState({
         up: true,
@@ -120,10 +120,6 @@ class Dropdown extends React.Component<Props, any>
     this.computeDirection();
   }
   
-  // componentDidUpdate() {
-  //   this.computeDirection();
-  // }
-
   render() {
     var classes = Util.objToClassname({
       "dropdown-wrapper": true,
