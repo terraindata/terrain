@@ -202,10 +202,7 @@ var LayoutManager = React.createClass<any, any>({
 			}
 
 			var cr = refObj.getBoundingClientRect();
-			var refTop = refObj.offsetTop - this.refs.layoutManagerDiv.scrollTop;
-			var refBottom = refObj.offsetTop + cr.height - this.refs.layoutManagerDiv.scrollTop;
-			// TODO If we have horizontally scrolling cell parent divs, we will need to adapt this.
-			if(mx >= cr.left && mx <= cr.right && my >= refTop && my <= refBottom)
+			if(mx >= cr.left && mx <= cr.right && my >= cr.top && my <= cr.bottom)
 			{
 				destinationIndex = parseInt(refIndex, 10);
 			}

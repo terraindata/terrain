@@ -224,8 +224,7 @@ export module CardModels
             break;
           // more defaults can go here
           case 'sitter.numJobs':
-            this.range = [0, 1000];
-            var rangeFn = Math.log;
+            this.range = [0,100];
             var outliers = true;
             break;
           default:
@@ -238,22 +237,38 @@ export module CardModels
         // Create dummy data for now
         
         var counts = [];
+        var count: any;
         var sum = 0;
         for(var i = this.range[0]; i <= this.range[1]; i ++)
         {
-          var count: any = Util.randInt(3000);
-          // if(rangeFn)
-          // {
-          //   count = Math.floor(rangeFn((this.range[1] - i + 1)));
-          //   console.log(count);
-          // }
+          count = Util.randInt(3000);
           counts.push(count);
           sum += count;
+        }
+        
+        if(outliers) {
+          for(var i = this.range[1] + 1; i < this.range[1] * 9; i ++)
+          {
+             count = 1; //Util.randInt(2);
+             counts.push(count);
+             sum += count;   
+          }
+          
+          for(var i = this.range[1] * 9; i < this.range[1] * 10; i ++)
+          {
+             count = Util.randInt(200);
+             counts.push(count);
+             sum += count;   
+          }
+          
+          this.range[1] *= 10;
         }
         
         for(var i = this.range[0]; i <= this.range[1]; i ++)
         {
           var count: any = counts[i - this.range[0]];
+          if(isNaN(count))
+            count = 0;
           this.bars.push({
             count: count,
             percentage: count / sum,

@@ -147,8 +147,8 @@ var TransformChart = {
       {
         newBars[newBars.length - 1] = 
         {
-          count: lastBar.count + bar.count,
-          percentage: lastBar.percentage + bar.percentage,
+          count: lastBar.count + (isNaN(bar.count) ? 0 : bar.count),
+          percentage: lastBar.percentage + (isNaN(bar.percentage) ? 0 : bar.percentage),
           id: lastBar.id + bar.id,
           range:
           {
@@ -165,6 +165,8 @@ var TransformChart = {
       
       return newBars;
     }, []);
+    
+    console.log(newBars);
     
     return newBars;
   },

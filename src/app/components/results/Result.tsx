@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./Result.less');
+import * as $ from 'jquery';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
@@ -84,33 +85,31 @@ var Result = React.createClass<any, any>({
 		};
 	},
   
+  toggleField(event) {
+    var field = $(event.target).attr('rel');
+    if(this.state.openFields.indexOf(field) === -1)
+    {
+      this.setState({
+        openFields: this.state.openFields.concat([field]),
+      });
+    }
+    else
+    {
+      this.state.openFields.splice(this.state.openFields.indexOf(field), 1);
+      this.setState({
+        openFields: this.state.openFields,
+      });
+    }
+  },
+  
   renderField(field)
   {
-    var toggleField = () => {
-      console.log('toggle');
-      if(this.state.openFields.indexOf(field) === -1)
-      {
-        console.log('add');
-        this.setState({
-          openFields: this.state.openFields.concat([field]),
-        });
-      }
-      else
-      {
-        console.log('remove');
-        this.state.openFields.splice(this.state.openFields.indexOf(field), 1);
-        this.setState({
-          openFields: this.state.openFields,
-        });
-      }
-    }
-    
     return (
       <div className="result-field" key={field}>
         <div className="result-field-name">
           { field }
         </div>
-        <div onClick={toggleField} className={Util.objToClassname(
+        <div onClick={this.toggleField} rel={field} className={Util.objToClassname(
             {
               "result-field-value": true,
               "result-field-value-open": this.state.openFields.indexOf(field) !== -1,
@@ -136,7 +135,9 @@ var Result = React.createClass<any, any>({
               { Math.floor(this.state.score * 100) / 100 }
             </div>
 					</div>
-          { fields.map(this.renderField) }
+          <div className='result-fields-wrapper'>
+            { fields.map(this.renderField) }
+          </div>
 				</div>
 			</div>
 			));

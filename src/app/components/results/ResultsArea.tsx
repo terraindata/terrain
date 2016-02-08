@@ -61,6 +61,7 @@ var ResultsArea = React.createClass<any, any>({
 			cells: this.props.results.map((result) => {
 				return {
 					content: <Result data={result} algorithmId={this.props.algorithmId} />,
+          key: result.id,
 				};
 			}),
 			cellHeight: 150,

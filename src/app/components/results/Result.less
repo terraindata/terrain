@@ -1,5 +1,10 @@
 @import "../../util/Common.less";
 
+@result-height: ~"100% - 6px"; // TODO figure out why this 6px is necessary
+@result-name-height: 25px;
+@result-score-height: 20px;
+@result-fields-wrapper-height: ~"100% - @{result-name-height} - @{result-score-height}";
+
 .result {
 	padding: 2px;
 	position: relative;
@@ -9,54 +14,68 @@
 		border: 1px solid @medium-dark-green;
 		border-radius: 2px;
 
-		height: calc(100% - 6px); // TODO figure out why this 6px is necessary
+		height: calc(@result-height);
+    position: relative;
 
-		overflow-y: auto;
+    .result-name {
+      height: @result-name-height;
+      
+      font-weight: 500;
+      padding: 5px;
+      box-sizing: border-box;
+      background: @dark-green;
+      color: @white-green;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-		.result-name {
-			font-weight: 500;
-			padding: 5px;
-			background: @dark-green;
-			color: @white-green;
-		}
-
-		.result-score {
-			background: @light-green;
-			color: @dark-gray-green;
-			padding: 5px;
+    .result-score {
+      height: @result-score-height;
+      
+      background: @light-green;
+      color: @dark-gray-green;
+      padding: 5px;
+      box-sizing: border-box;
       font-weight: 500;
       font-size: 12px;
 
-			min-height: 12px; // todo remove
+      min-height: 12px; // todo remove
       
       .result-score-score {
         float: right;
       }
-		}
+    }
     
-    .result-field {
-      border-bottom: 1px solid @off-white;
-      font-size: 12px;
-      margin: 4px;
+    .result-fields-wrapper {
+		  overflow-y: auto;
+      height: calc(@result-fields-wrapper-height);
       
-      .result-field-name {
-        font-weight: bold;
-        display: inline-block;
-      }
-      
-      .result-field-value {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+      .result-field {
+        border-bottom: 1px solid @off-white;
+        font-size: 12px;
+        // margin: 4px;
         
-        &.result-field-value-short {
-          float: right;
+        .result-field-name {
+          font-weight: bold;
           display: inline-block;
+          word-break: break-all;
         }
         
-        &.result-field-value-open {
-          white-space: normal;
-          overflow: visible;
+        .result-field-value {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          
+          &.result-field-value-short {
+            float: right;
+            display: inline-block;
+          }
+          
+          &.result-field-value-open {
+            white-space: normal;
+            overflow: visible;
+          }
         }
       }
     }
