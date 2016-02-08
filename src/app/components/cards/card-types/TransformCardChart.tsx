@@ -69,8 +69,10 @@ class TransformCardChart extends React.Component<Props, any>
     super(props);
     this.onPointMove = this.onPointMove.bind(this);
     this.state = {
-      chartState: false,
       width: 0,
+      domain: Util.deeperCloneObj(props.domain),
+      pointsData: Util.deeperCloneArr(props.pointsData),
+      barsData: Util.deeperCloneArr(props.barsData),
     }
   }
   
@@ -85,42 +87,57 @@ class TransformCardChart extends React.Component<Props, any>
   
   componentWillReceiveProps(newProps)
   {
-    if(!_.isEqual(newProps.domain, this.props.domain)
-      || !_.isEqual(newProps.pointsData, this.props.pointsData)
-      || !_.isEqual(newProps.barsData, this.props.barsData))
+    var changed = false;
+    var newDomain = this.state.domain;
+    var newPointsData = this.state.pointsData;
+    var newBarsData = this.state.barsData;
+    var newWidth = this.state.width;
+    
+    if(ReactDOM.findDOMNode(this).getBoundingClientRect().width !== this.state.width)
     {
-      this.setState({
-        chartState: false,
-      });
+      changed = true;
+      newWidth = ReactDOM.findDOMNode(this).getBoundingClientRect().width;
     }
-  }
-  
-  componentDidUpdate() {
-    var el = ReactDOM.findDOMNode(this);
-    if(!this.state.chartState || el.getBoundingClientRect().width !== this.state.width)
+    
+    if(!_.isEqual(newProps.domain, this.state.domain))
+    {
+      changed = true;
+      newDomain = Util.deeperCloneObj(newProps.domain);
+    }
+    
+    if(!_.isEqual(newProps.pointsData, this.state.pointsData))
+    {
+      changed = true;
+      newPointsData = Util.deeperCloneArr(newProps.pointsData);
+    }
+    
+    if(!_.isEqual(newProps.barsData, this.state.barsData))
+    {
+      changed = true;
+      newBarsData = Util.deeperCloneArr(newProps.barsData);
+    }
+    
+    if(changed)
     {
       this.setState({
-        width: el.getBoundingClientRect().width,
+        domain: newDomain,
+        pointsData: newPointsData,
+        barsData: newBarsData,
+        width: newWidth,
       });
       
+      var el = ReactDOM.findDOMNode(this);
       TransformChart.update(el, this.getChartState());
     }
+    
   }
   
   onPointMove(scorePointId, newScore) {
-    this.setState({
-      chartState: false,
-    });
     newScore = Util.valueMinMax(newScore, 0, 1);
     Actions.dispatch.cards.transform.scorePoint(this.props.card, scorePointId, newScore);
   }
   
   getChartState() {
-    if(this.state.chartState)
-    {
-      return this.state.chartState;
-    }
-    
     var pointsData = this.props.pointsData.map((scorePoint) => ({
       x: scorePoint.value,
       y: scorePoint.score,
@@ -138,9 +155,6 @@ class TransformCardChart extends React.Component<Props, any>
       },
     };
     
-    this.setState({
-      chartState: chartState,
-    });
     return chartState;
   }
   

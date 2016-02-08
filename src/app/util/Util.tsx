@@ -78,6 +78,18 @@ var Util = {
 	{
 		return Math.min(Math.max(value, min), max);
 	},
+  
+  deeperCloneArr(obj): any
+  {
+    return _.map(obj, _.clone);
+  },
+  
+  deeperCloneObj(obj): any
+  {
+    var ans = {}
+    _.map(obj, (val, key) => ans[key] = _.clone(val));
+    return ans;
+  },
 
 
  // TODO remove

@@ -287,7 +287,7 @@ var TransformChart = {
       
       // Note: in the future, for optimistic / faster rendering,
       //  you could use a line like this one:
-      //  point.attr('cy', startPointY + diffY);
+       point.attr('cy', newY);
       
       var newValue = scale.invert(newY);
       onMove(point.attr('_id'), newValue);
