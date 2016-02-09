@@ -42,90 +42,66 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-var Immutable = require('immutable');
+require('./AccountDropdown.less')
+import * as React from 'react';
+import Actions from "../../data/Actions.tsx";
+import Util from '../../util/Util.tsx';
 
-/*
+var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
-Terminology:
-- create
-- change
-- move
-- delete (transition to 'remove')
+interface Props {
+}
 
-*/
-
-// prepend str to every item in the array
-var prependArray = (str, arr) => 
+class AccountDropdown extends React.Component<Props, any>
 {
-	return arr.map((elem) => str + "." + elem);
+  constructor(props:Props)
+  {
+    super(props);
+    this.state = {
+      open: false,
+    };
+    this.toggleOpen = this.toggleOpen.bind(this);
+  }
+  
+  toggleOpen() {
+    this.setState({
+      open: !this.state.open,
+    });
+  }
+  
+  renderDropdown() {
+    if(!this.state.open)
+    {
+      return null;
+    }
+  
+    // TODO put dropdown content here.  
+    return null;
+  }
+  
+  renderTopBar() {
+    return (
+      <div className="account-dropdown-top-bar" onClick={this.toggleOpen}>
+        <div className="account-photo"></div>
+        <div className="account-name">Han Solo</div>
+        <ArrowIcon className="account-arrow-icon" />
+      </div>
+    );
+  }
+  
+  render() {
+    var classes = Util.objToClassname({
+      "account-dropdown-wrapper": true,
+      "account-dropdown-open": this.state.open,
+    });
+    
+    return (
+      <div className={classes}>
+        { this.renderTopBar() }
+        { this.renderDropdown() }
+      </div>
+   );
+  }
 };
 
-// convert an array into an object where the keys === values
-var makeObject = (str, arr) =>
-{
-	return _.object(arr, prependArray(str, arr));
-};
-
-
-var ActionTypes = 
-{
-	// moveCard: moveCard,
-	// Action: Action,
-
-	cards: makeObject('cards',
-	[
-		'move',
-		'create',
-    'remove',
-	]),
-
-	inputs: makeObject('inputs',
-	[
-		'move',
-		'create',
-		'changeKey',
-		'changeValue',
-	]),
-
-	results: makeObject('results', 
-	[
-		'move',
-	]),
-
-	newAlgorithm: 'newAlgorithm',
-};
-
-ActionTypes.cards.from = makeObject('cards.from', [
-	'changeGroup',
-]);
-ActionTypes.cards.from.join = makeObject('cards.from.join', [
-	'create',
-	'change',
-	'delete',
-]);
-
-ActionTypes.cards.select = makeObject('cards.select', [
-	'moveProperty',
-	'createProperty',
-	'deleteProperty',
-	'changeProperty',
-]);
-
-ActionTypes.cards.sort = makeObject('cards.sort', [
-	'change',
-]);
-
-ActionTypes.cards.filter = makeObject('cards.filter', [
-	'create',
- 'change',
- 'delete',
-]);
-
-ActionTypes.cards.transform = makeObject('cards.transform', [
-  'change',
-  'scorePoint',
-]);
-
-
-export default ActionTypes;
+export default AccountDropdown;

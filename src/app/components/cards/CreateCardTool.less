@@ -49,23 +49,96 @@
     .transition;
   }
   
+  @button-padding: 5px;
+  @button-height: 40px;
+  @button-width: 110px;
+  @field-height: 35px;
+  @selector-height: calc(@button-height + 3 * @button-padding + 2px + @field-height);
   .create-card-selector {
     // padding: 0px 10px;
     background: @light-green;
     border-radius: @create-card-border-radius;
-    overflow-x: scroll;
-    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    transition: height 0.15s;
+    
+    .create-card-field-wrapper {
+      margin: @button-padding;
+      margin-bottom: 0px;
+      
+      .create-card-field {
+        height: @field-height;
+        font-size: 17px;
+        outline: none;
+        -webkit-appearance: none;
+      }
+    }
     
     .create-card-button {
+      position: relative;
+      width: @button-width;
+      height: @button-height;
       cursor: pointer;
       font-size: @large-font-size;
-      background: @dark-green;
+      background: @medium-dark-green;
       color: #fff;
-      padding: 10px;
-      margin: 5px;
+      padding: 0px @button-padding;
+      box-sizing: border-box;
+      margin: @button-padding;
+      margin-right: 0px;
+      margin-bottom: 0px;
       border-radius: @create-card-border-radius;
       display: inline-block;
       text-transform: capitalize;
+      
+      .create-card-button-inner {
+        .vertically-middle;
+        max-width: calc(@button-width - 2 * @button-padding);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+    
+    .create-card-more-button {
+      cursor: pointer;
+      opacity: 1;
+      .transition;
+      
+      color: @dark-gray;
+      // font-weight: bold;
+      padding-left: 35px;
+      right: 0px;
+      height: @button-height + 2 * @button-padding;
+      position: absolute;
+      top: calc(@field-height + 2 * @button-padding);
+      right: @button-padding;
+      padding-top: 2px;
+      padding-left: 50px;
+      text-align: right;
+      
+      /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#d6f2c7+0,d6f2c7+100&0+0,1+100 */
+      background: -moz-linear-gradient(left,  rgba(214,242,199,0) 0%, rgba(214,242,199,1) 25%); /* FF3.6-15 */
+      background: -webkit-linear-gradient(left,  rgba(214,242,199,0) 0%,rgba(214,242,199,1) 25%); /* Chrome10-25,Safari5.1-6 */
+      background: linear-gradient(to right,  rgba(214,242,199,0) 0%,rgba(214,242,199,1) 25%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00d6f2c7', endColorstr='#d6f2c7',GradientType=1 ); /* IE6-9 */
+
+      .create-card-more-button-inner {
+        background: @dark-green;
+        padding: @button-padding * 2;
+        border-radius: @create-card-border-radius;
+        color: #fff;
+        display: inline-block;
+      }
+    }
+    
+    &.create-card-selector-show-all {
+      white-space: normal;
+      
+      .create-card-more-button {
+        opacity: 0;
+        pointer-events: none;
+      }
     }
   }
   
@@ -79,7 +152,10 @@
       }
     }
     .create-card-selector {
-      height: 65px;
+      height: @selector-height;
+      border: 1px solid @medium-dark-green;
+      box-sizing: border-box;
+      padding-bottom: @button-padding;
     }
   }
   
@@ -88,7 +164,7 @@
       height: @create-card-row-height;
     }
     .create-card-selector {
-      height: 0px;
+      height: 0px !important;
     }
   }
 }

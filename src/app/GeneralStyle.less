@@ -29,3 +29,29 @@ body {
   font-style: italic;
   color: #fff;
 }
+
+.app {
+  height: 100%;
+}
+
+@top-bar-height: 36px; // coordinate this with .app-wrapper below
+@icon-height: 17px;
+@icon-padding: calc((@top-bar-height - @icon-height) / 2);
+
+.app-top-bar {
+  height: @top-bar-height;
+  background: #3e3c3c;
+  
+  .app-top-bar-icon {
+    float: left;
+    height: @icon-height;
+    fill: @off-white;
+    padding-top: @icon-padding;
+    padding-left: @icon-padding; 
+  }
+}
+
+.app-wrapper {
+  height: calc(~"100% - 36px"); // put top bar height here
+}
+

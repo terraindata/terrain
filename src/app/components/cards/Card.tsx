@@ -52,6 +52,7 @@ import SelectCard from './card-types/SelectCard.tsx';
 import FromCard from './card-types/FromCard.tsx';
 import SortCard from './card-types/SortCard.tsx';
 import FilterCard from './card-types/FilterCard.tsx';
+import TransformCard from './card-types/TransformCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
 import Menu from '../common/Menu.tsx';
 
@@ -62,6 +63,7 @@ var Card = React.createClass({
 	{
 		card: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
+    algorithmId: React.PropTypes.string.isRequired,
 	},
 
 	getDefaultProps():any
@@ -94,8 +96,7 @@ var Card = React.createClass({
   
   handleDelete()
   {
-    console.log('delete');
-    Actions.dispatch.cards.remove(this.props.index);
+    Actions.dispatch.cards.remove(this.props.card);
   },
   
   handleCopy()
@@ -150,6 +151,9 @@ var Card = React.createClass({
           },
         };
     break;
+    case 'transform':
+      CardComponent = TransformCard;
+      break;
 		}
     
     var content = <div>This card has not been implemented yet.</div>;
@@ -199,7 +203,7 @@ var Card = React.createClass({
 		var title = this.props.card.type.charAt(0).toUpperCase() + this.props.card.type.substr(1);
 		return this.renderPanel((
 			<div className='card'>
-        <CreateCardTool index={this.props.index} />
+        <CreateCardTool index={this.props.index} algorithmId={this.props.algorithmId} />
 				<div className='card-inner'>
 					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>
 						{title}

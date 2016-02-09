@@ -18,6 +18,20 @@
   width: @option-height;
  }
  
+ .dropdown-options-wrapper {
+  display: none;
+ }
+ 
+ &.dropdown-up:hover {
+   -webkit-transform: translateY(calc(~"-100% + 29px")); // 2px greater than option-height
+   transform: translateY(calc(~"-100% + 29px")); // 2px greater than option-height
+   
+   .dropdown-option {
+     border-bottom: 1px solid @light-gray;
+     border-top: 0px;
+   }
+ }
+ 
  &:hover {
   position: relative;
   z-index: 999;
@@ -25,9 +39,8 @@
   border: 1px solid @light-gray;
   margin-top: -1px;
   
-  .dropdown-value {
-   // background: @dark-green-border;
-   // color: @white;
+  .dropdown-options-wrapper {
+    display: block;
   }
  }
  

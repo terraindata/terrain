@@ -122,6 +122,31 @@ var change = function<T>(...args: any[]): T // needs to be `function` to make us
 }
 
 
+var transformCardReducer = (cards = [], action) =>
+{
+  var cardIndex = cards.indexOf(action.payload.card);
+  var newCards = cloneArray(cards);
+  var card = newCards[cardIndex];
+  
+  switch(action.type)
+  {
+    case ActionTypes.cards.transform.change:
+      card.input = action.payload.input;
+      card.output = action.payload.output;
+      break;
+    case ActionTypes.cards.transform.scorePoint:
+      var scorePointIndex = card.scorePoints.findIndex((scorePoint) => scorePoint.id === action.payload.scorePointId);
+      card.scorePoints[scorePointIndex].score = action.payload.scorePointScore;
+      break;
+    default:
+      // not applicable
+      return cards;
+  }
+  
+  return newCards;
+}
+
+
 var selectCardReducer = (cards = [], action) =>
 {
 	var cardIndex = cards.indexOf(action.payload.card);
@@ -238,7 +263,7 @@ var sortCardReducer = (cards = [], action) => {
 };
 
 
-var cardsReducer = (cards = [], action) =>
+var cardsReducer = (cards = [], action, algorithmId) =>
 {
 	if(!action.payload)
 	{
@@ -248,6 +273,11 @@ var cardsReducer = (cards = [], action) =>
   // TODO limit to correct algorithm
   if(action.type === ActionTypes.cards.create)
   {
+    if(action.payload.algorithmId !== algorithmId)
+    {
+      return cards;
+    }
+    
     var newCards = cloneArray(cards);
     var newCard = new CardModels.Card(action.payload.type);
     switch(action.payload.type)
@@ -264,29 +294,32 @@ var cardsReducer = (cards = [], action) =>
       case 'filter':
         newCard = new CardModels.FilterCard();
         break;
+      case 'transform':
+        newCard = new CardModels.TransformCard();
+        break;
     }
     newCards.splice(action.payload.index, 0, newCard);
     return newCards;
   }
   
-  // TODO limit to correct algorithm
+  var cardIndex = cards.indexOf(action.payload.card);
+  if(cardIndex === -1)
+  {
+    return cards;
+  }
+  
   if(action.type === ActionTypes.cards.remove)
   {
     var newCards = cloneArray(cards);
-    newCards.splice(action.payload.index, 1);
+    newCards.splice(cardIndex, 1);
     return newCards;
   }
-  
-	var cardIndex = cards.indexOf(action.payload.card);
-	if(cardIndex === -1)
-	{
-		return cards;
-	}
 
 	cards = selectCardReducer(cards, action);
 	cards = fromCardReducer(cards, action);
   cards = filterCardReducer(cards, action);
   cards = sortCardReducer(cards, action);
+  cards = transformCardReducer(cards, action);
 
 	switch(action.type)
 	{
@@ -343,7 +376,7 @@ var groupsReducer = (groups = {}, action, groupKey, reducer, newValModel) =>
 	var changed = false;
 	var newGroups = _.reduce(groups, (newGroups, group, key) => 
 	{
-		var newValue = reducer(group[groupKey], action);
+		var newValue = reducer(group[groupKey], action, key);
 		if(newValue !== group[groupKey])
 		{
 			changed = true;
@@ -384,13 +417,49 @@ var resultGroupsReducer = (resultGroups = {}, action) =>
 
 var cardGroupsReducer = (cardGroups = {}, action) =>
 {
-	return groupsReducer(cardGroups, action, 'cards', cardsReducer, newCards);
+	return groupsReducer(cardGroups, action, 'cards', cardsReducer, []);
 }
 
 var currentGroupId = 101;
-var newCards = require('./json/_cards.json');
 var newResults = require('./json/_results.json');
-var defaultState = require('./json/_state.json');
+var defaultStateJson = require('./json/_state.json');
+
+var cardGroups = {};
+_.map(defaultStateJson.cardGroups, (cardGroup, key) => {
+  var cards = cardGroup.cards.map((card) => {
+    switch(card.type) {
+      case 'from':
+        return new CardModels.FromCard(card);
+        break;
+      case 'select':
+        return new CardModels.SelectCard(card);
+        break;
+      case 'sort':
+        return new CardModels.SortCard(card);
+        break;
+      case 'filter':
+        return new CardModels.FilterCard(card);
+        break;
+      case 'transform':
+        return new CardModels.TransformCard(card);
+        break;
+      default:
+        return new CardModels.Card(card.type, card);
+    }
+  });
+  
+  cardGroups[key] = {
+    id: cardGroup.id,
+    cards: cards,
+  }
+});
+
+var defaultState = 
+{
+  inputs: defaultStateJson.inputs,
+  resultGroups: defaultStateJson.resultGroups,
+  cardGroups: cardGroups,
+}
 
 var stateReducer = (state = defaultState, action) =>
 {

@@ -188,4 +188,111 @@ export module CardModels
       super('filter', obj);
     }
   }
+  
+  export class TransformCard extends Card
+  {
+    input: string = "";
+    output: string = "";
+    range: number[] = [];
+    bars: {
+      count: number;
+      percentage: number;
+      id: string;
+      range: {
+        min: number;
+        max: number;
+      }
+    }[] = [];
+    scorePoints: {
+      value: number;
+      score: number;
+      id: string;
+    }[] = [];
+    
+    constructor(obj?: any)
+    {
+      super('transform', obj);
+      
+      assign(this, obj, ['input', 'output', 'scorePoints', 'bars', 'range']);
+      
+      if(this.range.length === 0)
+      {
+        switch(this.input) 
+        {
+          case 'sitter.minPrice':
+            this.range = [12, 26];
+            break;
+          // more defaults can go here
+          case 'sitter.numJobs':
+            this.range = [0,100];
+            var outliers = true;
+            break;
+          default:
+            this.range = [0,100];
+        }
+      }
+      
+      if(this.bars.length === 0)
+      {
+        // Create dummy data for now
+        
+        var counts = [];
+        var count: any;
+        var sum = 0;
+        for(var i = this.range[0]; i <= this.range[1]; i ++)
+        {
+          count = Util.randInt(3000);
+          counts.push(count);
+          sum += count;
+        }
+        
+        if(outliers) {
+          for(var i = this.range[1] + 1; i < this.range[1] * 9; i ++)
+          {
+             count = 1; //Util.randInt(2);
+             counts.push(count);
+             sum += count;   
+          }
+          
+          for(var i = this.range[1] * 9; i < this.range[1] * 10; i ++)
+          {
+             count = Util.randInt(200);
+             counts.push(count);
+             sum += count;   
+          }
+          
+          this.range[1] *= 10;
+        }
+        
+        for(var i = this.range[0]; i <= this.range[1]; i ++)
+        {
+          var count: any = counts[i - this.range[0]];
+          if(isNaN(count))
+            count = 0;
+          this.bars.push({
+            count: count,
+            percentage: count / sum,
+            range: {
+              min: i,
+              max: i + 1,
+            },
+            id: "a4-" + i,
+          });
+        }
+      }
+      
+      if(this.scorePoints.length === 0)
+      {
+        for(var i = 0; i < 5; i ++)
+        {
+          this.scorePoints.push(
+          {
+            value: this.range[0] + (this.range[1] - this.range[0]) / 4 * i,
+            score: 0.5,
+            id: "p" + i,
+          });
+        }
+      }
+    }
+  }
 }

@@ -47,6 +47,7 @@ import * as React from 'react';
 import Util from '../../util/Util.tsx';
 
 var ExpandIcon = require("./../../../images/icon_expand_12x12.svg?name=ExpandIcon");
+var linkHeight = 36; // Coordinate with Sidebar.less
 
 interface Link {
   icon: any;
@@ -75,25 +76,28 @@ class Sidebar extends React.Component<Props, any>
         'sidebar-container': true,
         'sidebar-container-expanded': this.props.expanded,
       })}>
-				{
-					this.props.links.map((link, index) => 
+      <div className="sidebar-selected-square" style={{
+        top: (this.props.selectedIndex * linkHeight) + 'px',
+      }}></div>
+        {
+          this.props.links.map((link, index) => 
             (
-  						<div 
-  							className={Util.objToClassname({
-  								'sidebar-link': true,
-  								'sidebar-link-selected': index === this.props.selectedIndex,
-  								})}
-  							key={index}
-  							onClick={this.handleClickFactory(index)}>
+              <div 
+                className={Util.objToClassname({
+                  'sidebar-link': true,
+                  'sidebar-link-selected': index === this.props.selectedIndex,
+                  })}
+                key={index}
+                onClick={this.handleClickFactory(index)}>
                   <div className="sidebar-link-inner">
-  								  { link.icon }
+                    { link.icon }
                     <div className="sidebar-link-text">{link.text}</div>
                     
                   </div>
-  						</div>
+              </div>
             )
           )
-				}
+        }
         {
         this.props.expandable ?
           (

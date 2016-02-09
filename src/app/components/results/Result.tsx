@@ -43,12 +43,31 @@ THE SOFTWARE.
 */
 
 require('./Result.less');
+import * as $ from 'jquery';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 
+var fields = 
+[
+  'id',
+  'minPrice',
+  'numJobs',
+  'description',
+  'location',
+  'averageResponseTime',
+  'avgRating',
+];
+
 var Result = React.createClass<any, any>({
 	mixins: [PanelMixin],
+  
+  getInitialState() {
+    return {
+      score: Math.random(),
+      openFields: [],
+    }
+  },
 
 	propTypes:
 	{
@@ -65,6 +84,43 @@ var Result = React.createClass<any, any>({
 			dragInsideOnly: true,
 		};
 	},
+  
+  toggleField(event) {
+    var field = $(event.target).attr('rel');
+    if(this.state.openFields.indexOf(field) === -1)
+    {
+      this.setState({
+        openFields: this.state.openFields.concat([field]),
+      });
+    }
+    else
+    {
+      this.state.openFields.splice(this.state.openFields.indexOf(field), 1);
+      this.setState({
+        openFields: this.state.openFields,
+      });
+    }
+  },
+  
+  renderField(field)
+  {
+    return (
+      <div className="result-field" key={field}>
+        <div className="result-field-name">
+          { field }
+        </div>
+        <div onClick={this.toggleField} rel={field} className={Util.objToClassname(
+            {
+              "result-field-value": true,
+              "result-field-value-open": this.state.openFields.indexOf(field) !== -1,
+              "result-field-value-short": (field + this.props.data[field]).length < 15,
+            }
+          )}>
+          { this.props.data[field] }
+        </div>
+      </div>
+    );
+  },
 
 	render() {
 		return this.renderPanel((
@@ -74,7 +130,14 @@ var Result = React.createClass<any, any>({
 						{this.props.data.name}
 					</div>
 					<div className='result-score'>
+            Final Score
+            <div className='result-score-score'>
+              { Math.floor(this.state.score * 100) / 100 }
+            </div>
 					</div>
+          <div className='result-fields-wrapper'>
+            { fields.map(this.renderField) }
+          </div>
 				</div>
 			</div>
 			));

@@ -42,115 +42,106 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Dropdown.less');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import Util from '../../util/Util.tsx';
+import Actions from "../../../data/Actions.tsx";
+import Util from '../../../util/Util.tsx';
+import { CardModels } from './../../../models/CardModels.tsx';
 
-interface Props
-{
-  onChange: (index: number) => void;
-  selectedIndex: number;
-  ref?: string;
-  options: string[];
-  circle?: boolean;
+import Periscope from '../../../charts/Periscope.tsx';
+
+interface Props {
+  card: CardModels.TransformCard;
+  barsData: any;
+  domain: any;
+  barColor: string;
+  onDomainChange: (domain: number[]) => void;
 }
 
-class Dropdown extends React.Component<Props, any>
+// http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
+
+class TransformCardPeriscope extends React.Component<Props, any>
 {
-  value: number;
-  
-  constructor(props: Props) {
-    super(props);
-    this.renderOption = this.renderOption.bind(this);
-    this.computeDirection = this.computeDirection.bind(this);
-    this.value = this.props.selectedIndex;
-    this.state = {
-      up: false,
-    };
-  }
-  
-  renderOption(option, index)
+  constructor(props:Props)
   {
-    if(index === this.props.selectedIndex)
-    {
-      return null;
-    }
-    
-    var handleClick = () => {
-      this.value = index;
-      this.props.onChange(index);
-    }
-    return (
-      <div className="dropdown-option" key={index} onClick={handleClick}>
-        <div className="dropdown-option-inner">
-          { option }
-        </div>
-      </div>
-    );
-  }
-  
-  computeDirection() {
-    var cr = ReactDOM.findDOMNode(this).getBoundingClientRect();
-    if(this.state.up)
-    {
-      var componentBottom = cr.bottom + cr.height;
-    }
-    else
-    {
-      var componentBottom = cr.bottom;
-    }
-    var windowBottom = window.innerHeight;
-    
-    if(componentBottom > windowBottom)
-    {
-      this.setState({
-        up: true,
-      });
-    }
-    else
-    {
-      this.setState({
-        up: false,
-      })
+    super(props);
+    this.handleDomainChange = this.handleDomainChange.bind(this);
+    this.state = {
+      chartState: false,
+      width: 0,
     }
   }
   
   componentDidMount() {
-    this.computeDirection();
+    var el = ReactDOM.findDOMNode(this);
+    Periscope.create(el, {
+      width: '100%',
+      height: '60px',
+    }, this.getChartState());
   }
   
-  render() {
-    var classes = Util.objToClassname({
-      "dropdown-wrapper": true,
-      "dropdown-wrapper-circle": this.props.circle,
-      "dropdown-up": this.state.up,
-    });
-    
-    return (
-      <div className={classes}>
-        { this.state.up ? (
-          <div className="dropdown-options-wrapper">
-            {
-              this.props.options.map(this.renderOption)
-            }
-          </div>
-        ) : null }
-        <div className="dropdown-value" onMouseEnter={this.computeDirection}>
-          <div className="dropdown-option-inner">
-            { this.props.options[this.props.selectedIndex] }
-          </div>
-        </div>
-        { !this.state.up ? (
-          <div className="dropdown-options-wrapper">
-            {
-              this.props.options.map(this.renderOption)
-            }
-          </div>
-        ) : null }
-      </div>
-    );
+  componentWillReceiveProps(newProps)
+  {
+    if(newProps.domain !== this.props.domain
+      || newProps.barsData !== this.props.barsData)
+    {
+      this.setState({
+        chartState: false,
+      });
+    }
   }
+  
+  componentDidUpdate() {
+    var el = ReactDOM.findDOMNode(this);
+    if(!this.state.chartState || el.getBoundingClientRect().width !== this.state.width)
+    {
+      this.setState({
+        width: el.getBoundingClientRect().width,
+      });
+      
+      Periscope.update(el, this.getChartState());
+    }
+  }
+  
+  handleDomainChange(handleIndex, value) {
+    var newDomain = [this.props.domain.x[0], this.props.domain.x[1]];
+    newDomain[handleIndex] = value;
+    
+    this.props.onDomainChange(newDomain);
+  }
+  
+  getChartState() {
+    if(this.state.chartState)
+    {
+      return this.state.chartState;
+    }
+    
+    var chartState = {
+      barsData: this.props.barsData,
+      maxRange: this.props.card.range,
+      domain: this.props.domain,
+      onDomainChange: this.handleDomainChange,
+      colors: {
+        bar: this.props.barColor,
+      },
+    };
+    
+    this.setState({
+      chartState: chartState,
+    });
+    return chartState;
+  }
+  
+  componentWillUnmount() {
+    var el = ReactDOM.findDOMNode(this);
+    Periscope.destroy(el);
+  }
+
+	render() {
+    return (
+      <div></div>
+		);
+	}
 };
 
-export default Dropdown;
+export default TransformCardPeriscope;

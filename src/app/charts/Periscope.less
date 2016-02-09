@@ -1,0 +1,38 @@
+@import "../util/Common.less";
+
+.periscope {
+  
+  @active: #fc5218;
+    
+  .tick text {
+    fill: @dark-green;
+  }
+  
+  .tick line {
+    stroke: @dark-green;
+    stroke-width: 1px;
+  }
+  
+  .domain {
+    fill: none;
+    stroke: @dark-green;
+    stroke-width: 1px;
+  }
+  
+  .handle {
+    cursor: pointer;
+    transition: stroke-width 0.15s, stroke 0.15s;
+    stroke-width: 1px;
+    stroke: #aaa;
+    
+    &:hover,
+    &.handle-active {
+      // stroke-width: 3px;
+      stroke: @active;
+    }
+  }
+  
+  .line {
+    fill: @active;
+  }
+}

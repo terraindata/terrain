@@ -29,13 +29,20 @@
         
     .sidebar-expand {
       svg {
-        -moz-transform: rotate(180deg);
-        -webkit-transform: rotate(180deg);
-        -o-transform: rotate(180deg);
-        -ms-transform: rotate(180deg);
-        transform: rotate(180deg);
+        .rotate180;
       }
     }
+  }
+  
+  .sidebar-selected-square {
+    background: @sidebar-selected-bg;
+    height: @sidebar-link-height;
+    width: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    
+    transition: top 0.2s;
   }
   
   .sidebar-link {
@@ -47,11 +54,11 @@
     .transition;
     
     &:hover {
-      background: @sidebar-hover-bg;
+      background: rgba(255,255,255,0.1);
     }
     
     &.sidebar-link-selected {
-      background: @sidebar-selected-bg;  
+      // background: @sidebar-selected-bg;  
       svg {
         fill: @sidebar-bg;
       }
