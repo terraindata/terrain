@@ -398,6 +398,12 @@ var groupsReducer = (groups = {}, action, groupKey, reducer, newValModel) =>
 		newGroups[currentGroupId] = newGroup;
 		changed = true;
 	}
+  
+  if(action.type === ActionTypes.closeAlgorithm)
+  {
+    delete newGroups[action.payload.algorithmId];
+    changed = true;
+  }
 
 	if(changed)
 	{

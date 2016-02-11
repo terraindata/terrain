@@ -94,6 +94,7 @@ var ActionTypes =
 	]),
 
 	newAlgorithm: 'newAlgorithm',
+  closeAlgorithm: 'closeAlgorithm',
 };
 
 ActionTypes.cards.from = makeObject('cards.from', [

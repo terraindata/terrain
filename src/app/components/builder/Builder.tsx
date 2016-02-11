@@ -98,10 +98,17 @@ class Builder extends React.Component<any, any>
           },
         ]
       };
+      
+      var closeFn = () => 
+      {
+        Actions.dispatch.closeAlgorithm(algorithmId);
+      }
 
       tabs[algorithmId] = {
         content: <LayoutManager layout={layout} />,
         tabName: 'Algorithm ' + cardGroup.id,
+        closeable: true,
+        onClose: closeFn,
       };
     });
 
@@ -113,6 +120,8 @@ class Builder extends React.Component<any, any>
       selectNewTab: true,
       noDrag: true,
     };
+    
+    console.log(tabs);
 
     return (
       <Tabs tabs={tabs} />

@@ -112,6 +112,21 @@
       margin-right: -2px;
       
       border-top: 1px solid @tab-border-color;
+      
+      .tabs-close {
+        display: inline-block;
+        margin-left: 10px;
+        
+        svg {
+          fill: @gray;
+          width: 10px;
+          .transition;
+          
+          &:hover {
+            fill: darken(@gray, 15%);
+          }
+        }
+      }
     }
 	}
 

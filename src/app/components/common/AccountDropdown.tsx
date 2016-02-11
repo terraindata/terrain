@@ -83,7 +83,7 @@ class AccountDropdown extends React.Component<Props, any>
     return (
       <div className="account-dropdown-top-bar" onClick={this.toggleOpen}>
         <div className="account-photo"></div>
-        <div className="account-name">Han Solo</div>
+        <div className="account-name">Jack Shephard</div>
         <ArrowIcon className="account-arrow-icon" />
       </div>
     );

@@ -191,6 +191,11 @@ const create =
     ActionTypes.newAlgorithm,
     () => ({})
 	),
+  
+  closeAlgorithm: createAction<CloseAlgorithmPayload>(
+    ActionTypes.closeAlgorithm,
+    (algorithmId: string) => ({algorithmId})
+  ),
 };
 
 var actionCreatorsToDispatchers = (actionCreators) => 

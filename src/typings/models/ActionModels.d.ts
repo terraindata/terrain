@@ -63,8 +63,6 @@ interface Action
   payload: any;
 }
 
-interface NewAlgorithmPayload {}
-
 // Generic Payload Types
 
 interface IndexedPayload
@@ -79,6 +77,12 @@ interface DeletePayload extends IndexedPayload {}
 interface ChangePayload<T>
 {
   value: T;
+}
+
+
+interface NewAlgorithmPayload {}
+interface CloseAlgorithmPayload {
+  algorithmId: string;
 }
 
 

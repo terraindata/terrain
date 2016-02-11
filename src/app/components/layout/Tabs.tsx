@@ -50,11 +50,13 @@ import LayoutManager from "../layout/LayoutManager.tsx";
 import PanelMixin from "../layout/PanelMixin.tsx";
 
 var TabIcon = require("./../../../images/tab_corner_27x31.svg?name=TabIcon");
+var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 
 var Tab = React.createClass<any, any>({
   mixins: [PanelMixin],
   
-  propTypes: {
+  propTypes:
+  {
     index: React.PropTypes.number,
     selectedIndex: React.PropTypes.number,
     tab: React.PropTypes.object,
@@ -91,6 +93,24 @@ var Tab = React.createClass<any, any>({
     }
   },
   
+  close(event) {
+    event.stopPropagation();
+    this.props.tab.onClose();
+  },
+  
+  renderClose() {
+    if(!this.props.tab.closeable)
+    {
+      return null;
+    }
+    
+    return (
+      <div className='tabs-close' onClick={this.close}>
+        <CloseIcon />
+      </div>
+    );
+  },
+  
   render() {
     return this.renderPanel(
       <div 
@@ -102,7 +122,10 @@ var Tab = React.createClass<any, any>({
         style={this.zIndexStyleForIndex(this.props.index)}
         onClick={this.handleClick}>
           <TabIcon className='tab-icon tab-icon-left' />
-          <div className='tab-inner'>{this.props.tab.tabName}</div>
+          <div className='tab-inner'>
+            { this.props.tab.tabName }
+            { this.renderClose() }
+          </div>
           <TabIcon className='tab-icon tab-icon-right' />
       </div>
     );
@@ -113,7 +136,6 @@ var Tabs = React.createClass<any, any>({
 	propTypes:
 	{
 		tabs: React.PropTypes.object.isRequired,
-		selectedIndex: React.PropTypes.number,
 		title: React.PropTypes.string,
 	},
 
@@ -121,14 +143,8 @@ var Tabs = React.createClass<any, any>({
 	{
     var count = 0;
 		return {
-			selectedIndex: this.props.selectedIndex || 0,
-      tabOrder: _.map(this.props.tabs, (tab, key) => ({
-        content: tab['content'],
-        tabName: tab['tabName'],
-        pinnedAtEnd: tab['pinnedAtEnd'],
-        unselectable: tab['unselectable'],
-        selectNewTab: tab['selectNewTab'],
-        noDrag: tab['noDrag'],
+      tabOrder: _.map(this.props.tabs, (tab, key) => _.extend(tab, 
+      {
         selected: (count ++) === 0,
         key: key,
       })),
@@ -139,7 +155,7 @@ var Tabs = React.createClass<any, any>({
   {
     var tabOrder = this.state.tabOrder;
     var selectedTab = this.state.tabOrder.find((tab) => tab.selected);
-    if(selectedTab.selectNewTab)
+    if(selectedTab && selectedTab.selectNewTab)
     {
       selectedTab.selected = false;
       var selectNewTab = true;
@@ -150,12 +166,7 @@ var Tabs = React.createClass<any, any>({
       var index = tabOrder.findIndex((tab) => tab.key === key);
       if(index !== -1)
       {
-        tabOrder[index]['content'] = tab['content'];
-        tabOrder[index]['tabName'] = tab['tabName'];
-        tabOrder[index]['pinnedAtEnd'] = tab['pinnedAtEnd'];
-        tabOrder[index]['unselectable'] = tab['unselectable'];
-        tabOrder[index]['selectNewTab'] = tab['selectNewTab'];
-        tabOrder[index]['noDrag'] = tab['noDrag'];
+        tabOrder[index] = _.extend(tabOrder[index], tab);
       }
       else
       {
@@ -166,17 +177,11 @@ var Tabs = React.createClass<any, any>({
           index --;
         }
 
-        tabOrder.splice(index + 1, 0, 
+        tabOrder.splice(index + 1, 0, _.extend(tab,
         {
-          content: tab['content'],
-          tabName: tab['tabName'],
-          pinnedAtEnd: tab['pinnedAtEnd'],
-          unselectable: tab['unselectable'],
-          selectNewTab: tab['selectNewTab'],
-          noDrag: tab['noDrag'],
           selected: selectNewTab,
           key: key,
-        });
+        }));
       }
     });
     
@@ -204,7 +209,6 @@ var Tabs = React.createClass<any, any>({
       }
       
       this.setState({
-        // selectedIndex: index,
         tabOrder: this.state.tabOrder,
       });
       
@@ -229,9 +233,13 @@ var Tabs = React.createClass<any, any>({
       tabOrder: tabOrder,
     });
   },
-
+  
 	render() {
     var selectedIndex = this.state.tabOrder.findIndex((tab) => tab.selected);
+    if(selectedIndex === -1)
+    {
+      selectedIndex = 0;
+    }
 		var content = this.state.tabOrder[selectedIndex].content;
 
     var tabsLayout = 
@@ -239,7 +247,7 @@ var Tabs = React.createClass<any, any>({
       compact: true,
       columns: this.state.tabOrder.map((tab, index) => (
       {
-        noDrag: tab.noDrag || console.log(tab.noDrag),
+        noDrag: tab.noDrag,
         content:
         (
           <Tab 
