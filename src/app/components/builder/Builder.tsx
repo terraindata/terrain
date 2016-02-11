@@ -111,6 +111,7 @@ class Builder extends React.Component<any, any>
       pinnedAtEnd: true,
       onClick: this.handleNewAlgorithmTab,
       selectNewTab: true,
+      noDrag: true,
     };
 
     return (

@@ -343,12 +343,12 @@ var Panel = {
 
 		var style:React.CSSProperties = {};
 
-		if(this.props.dx) 
+		if(this.props.dx && this.canDrag())
 		{
 			style.left = this.props.dx + 'px';
 		}
 
-		if(this.props.dy) 
+		if(this.props.dy && this.canDrag()) 
 		{
 			style.top = this.props.dy + 'px';
 		}
@@ -357,7 +357,7 @@ var Panel = {
 		{
 			style.left = this.state.dx + 'px';
 			style.top = this.state.dy + 'px';
-			style.zIndex = 99999999;
+			style.zIndex = 999;
 			panelClass += ' panel-dragging';
 		}
 

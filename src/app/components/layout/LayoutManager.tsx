@@ -55,10 +55,12 @@ var cellClass = 'layout-manager-cell';
 var fullHeightClass = 'layout-manager-full-height';
 
 interface Style {
-	left?: number,
+	left?: number | string,
 	top?: number,
-	width?: number,
+	width?: number | string,
 	height?: number,
+  display?: string,
+  position?: string,
 }
 
 var LayoutManager = React.createClass<any, any>({
@@ -322,7 +324,7 @@ var LayoutManager = React.createClass<any, any>({
 				onDrop: this.onDropFactory(index),
 				parentNode: this.refs.layoutManagerDiv,
 			};
-
+      
 			if(this.state.dragging && this.state.draggingIndex !== index)
 			{
 				props.neighborDragging = true;
@@ -469,11 +471,22 @@ var LayoutManager = React.createClass<any, any>({
 			left: this.calcColumnLeft(column, index),
 			width: this.calcColumnWidth(column, index),
 		};
+    
+    if(this.props.layout.compact)
+    {
+       style =
+       {
+         display: 'inline-block',
+         position: 'relative',
+         left: '0px',
+         width: 'auto',
+       } ;
+    }
 
-		if(this.props.layout.stackAt && this.props.layout.stackAt > $(window).width()) {
-			classToPass = "";
-			style = {};
-		}
+    if(this.props.layout.stackAt && this.props.layout.stackAt > $(window).width()) {
+      classToPass = "";
+      style = {};
+    }
 
 		return this.renderObj(column, classToPass, index, style);
 	},

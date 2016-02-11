@@ -128,6 +128,7 @@ var Tabs = React.createClass<any, any>({
         pinnedAtEnd: tab['pinnedAtEnd'],
         unselectable: tab['unselectable'],
         selectNewTab: tab['selectNewTab'],
+        noDrag: tab['noDrag'],
         selected: (count ++) === 0,
         key: key,
       })),
@@ -154,6 +155,7 @@ var Tabs = React.createClass<any, any>({
         tabOrder[index]['pinnedAtEnd'] = tab['pinnedAtEnd'];
         tabOrder[index]['unselectable'] = tab['unselectable'];
         tabOrder[index]['selectNewTab'] = tab['selectNewTab'];
+        tabOrder[index]['noDrag'] = tab['noDrag'];
       }
       else
       {
@@ -171,6 +173,7 @@ var Tabs = React.createClass<any, any>({
           pinnedAtEnd: tab['pinnedAtEnd'],
           unselectable: tab['unselectable'],
           selectNewTab: tab['selectNewTab'],
+          noDrag: tab['noDrag'],
           selected: selectNewTab,
           key: key,
         });
@@ -215,6 +218,11 @@ var Tabs = React.createClass<any, any>({
   moveTabs(index: number, destination: number)
   {
     var tabOrder = this.state.tabOrder;
+    while(tabOrder[destination]['noDrag'])
+    {
+      destination --;
+    }
+    
     var id = tabOrder.splice(index, 1)[0];
     tabOrder.splice(destination, 0, id); 
     this.setState({
@@ -228,14 +236,17 @@ var Tabs = React.createClass<any, any>({
 
     var tabsLayout = 
     {
+      compact: true,
       columns: this.state.tabOrder.map((tab, index) => (
       {
+        noDrag: tab.noDrag || console.log(tab.noDrag),
         content:
         (
           <Tab 
             index={index}
             tab={tab}
             tabOrder={this.state.tabOrder}
+            drag_x={!tab.noDrag}
             onSelect={this.handleTabSelectFactory(index)}
             selectedIndex={selectedIndex} />
         ),
