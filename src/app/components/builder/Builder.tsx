@@ -121,8 +121,6 @@ class Builder extends React.Component<any, any>
       noDrag: true,
     };
     
-    console.log(tabs);
-
     return (
       <Tabs tabs={tabs} />
     );

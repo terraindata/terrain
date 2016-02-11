@@ -123,6 +123,10 @@ ActionTypes.cards.filter = makeObject('cards.filter', [
  'delete',
 ]);
 
+ActionTypes.cards.let = makeObject('cards.let', [
+  'change',
+]);
+
 ActionTypes.cards.transform = makeObject('cards.transform', [
   'change',
   'scorePoint',

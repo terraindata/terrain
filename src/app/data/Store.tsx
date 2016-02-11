@@ -262,6 +262,23 @@ var sortCardReducer = (cards = [], action) => {
  return newCards;
 };
 
+var letCardReducer = (cards = [], action) => {
+ var cardIndex = cards.indexOf(action.payload.card);
+ var newCards = cloneArray(cards);
+
+ switch (action.type) {
+  case ActionTypes.cards.let.change:
+   newCards[cardIndex].field = action.payload.field;
+   newCards[cardIndex].expression = action.payload.expression;
+   break;
+  default:
+   // ActionType not applicable, return normal cards
+   return cards;
+ }
+
+ return newCards;
+};
+
 
 var cardsReducer = (cards = [], action, algorithmId) =>
 {
@@ -320,6 +337,7 @@ var cardsReducer = (cards = [], action, algorithmId) =>
   cards = filterCardReducer(cards, action);
   cards = sortCardReducer(cards, action);
   cards = transformCardReducer(cards, action);
+  cards = letCardReducer(cards, action);
 
 	switch(action.type)
 	{

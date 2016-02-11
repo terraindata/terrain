@@ -189,6 +189,18 @@ export module CardModels
     }
   }
   
+  export class LetCard extends Card
+  {
+    field: string = "";
+    expression: string = "";
+    
+    constructor(obj?: any)
+    {
+      super('let', obj);
+      assign(this, obj, ['field', 'expression']);
+    }
+  }
+  
   export class TransformCard extends Card
   {
     input: string = "";

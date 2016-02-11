@@ -126,6 +126,12 @@ interface SortCardPayload extends CardPayload {
 interface ChangeSortCardPayload extends SortCardPayload, ChangePayload<any> {} //Sort> {}
 
 
+interface ChangeLetCardPayload extends CardPayload {
+  field: string;
+  expression: string;
+}
+
+
 interface FilterCardPayload extends CardPayload {
   card: any; //FilterCardModel;
 }

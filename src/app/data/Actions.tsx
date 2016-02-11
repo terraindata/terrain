@@ -127,6 +127,14 @@ const create =
 			),
 		},
     
+    let:
+    {
+      change: createAction<ChangeLetCardPayload>(
+        ActionTypes.cards.let.change,
+        (card: any, field: string, expression: string) => ({card, field, expression})
+      ),
+    },
+    
     transform:
     {
       change: createAction<TransformCardChangePayload>(
