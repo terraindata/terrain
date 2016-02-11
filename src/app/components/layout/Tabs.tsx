@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 require('./Tabs.less');
 import * as React from 'react';
+import * as _ from 'underscore';
 import Util from '../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
 import PanelMixin from "../layout/PanelMixin.tsx";
@@ -57,7 +58,7 @@ var Tab = React.createClass<any, any>({
     index: React.PropTypes.number,
     selectedIndex: React.PropTypes.number,
     tab: React.PropTypes.object,
-    tabs: React.PropTypes.array,
+    tabOrder: React.PropTypes.array,
     onSelect: React.PropTypes.func,
   },
   
@@ -75,13 +76,20 @@ var Tab = React.createClass<any, any>({
     if(index !== this.props.selectedIndex)
     {
       return {
-        zIndex: this.props.tabs.length - index,
+        zIndex: this.props.tabOrder.length - index,
       };
     }
     
     return {};
   },
 
+  handleClick()
+  {
+    if(!this.state.moved)
+    {
+      this.props.onSelect();
+    }
+  },
   
   render() {
     return this.renderPanel(
@@ -92,7 +100,7 @@ var Tab = React.createClass<any, any>({
           })}
         key={this.props.index}
         style={this.zIndexStyleForIndex(this.props.index)}
-        onClick={this.props.onSelect}>
+        onClick={this.handleClick}>
           <TabIcon className='tab-icon tab-icon-left' />
           <div className='tab-inner'>{this.props.tab.tabName}</div>
           <TabIcon className='tab-icon tab-icon-right' />
@@ -104,69 +112,150 @@ var Tab = React.createClass<any, any>({
 var Tabs = React.createClass<any, any>({
 	propTypes:
 	{
-		tabs: React.PropTypes.array.isRequired,
+		tabs: React.PropTypes.object.isRequired,
 		selectedIndex: React.PropTypes.number,
 		title: React.PropTypes.string,
 	},
 
 	getInitialState()
 	{
+    var count = 0;
 		return {
 			selectedIndex: this.props.selectedIndex || 0,
+      tabOrder: _.map(this.props.tabs, (tab, key) => ({
+        content: tab['content'],
+        tabName: tab['tabName'],
+        pinnedAtEnd: tab['pinnedAtEnd'],
+        unselectable: tab['unselectable'],
+        selectNewTab: tab['selectNewTab'],
+        selected: (count ++) === 0,
+        key: key,
+      })),
 		};
 	},
+  
+  componentWillReceiveProps(newProps)
+  {
+    var tabOrder = this.state.tabOrder;
+    var selectedTab = this.state.tabOrder.find((tab) => tab.selected);
+    if(selectedTab.selectNewTab)
+    {
+      selectedTab.selected = false;
+      var selectNewTab = true;
+    }
+    
+    _.map(newProps.tabs, (tab, key) => 
+    {
+      var index = tabOrder.findIndex((tab) => tab.key === key);
+      if(index !== -1)
+      {
+        tabOrder[index]['content'] = tab['content'];
+        tabOrder[index]['tabName'] = tab['tabName'];
+        tabOrder[index]['pinnedAtEnd'] = tab['pinnedAtEnd'];
+        tabOrder[index]['unselectable'] = tab['unselectable'];
+        tabOrder[index]['selectNewTab'] = tab['selectNewTab'];
+      }
+      else
+      {
+        index = tabOrder.length - 1;
+        
+        while(tabOrder[index] && tabOrder[index]['pinnedAtEnd'])
+        {
+          index --;
+        }
+
+        tabOrder.splice(index + 1, 0, 
+        {
+          content: tab['content'],
+          tabName: tab['tabName'],
+          pinnedAtEnd: tab['pinnedAtEnd'],
+          unselectable: tab['unselectable'],
+          selectNewTab: tab['selectNewTab'],
+          selected: selectNewTab,
+          key: key,
+        });
+      }
+    });
+    
+    tabOrder = tabOrder.reduce((newTabOrder, tab) => {
+      if(newProps.tabs[tab.key])
+        newTabOrder.push(tab);
+      return newTabOrder;
+    }, []);
+    
+    this.setState({
+      tabOrder: tabOrder,
+    })
+  },
 
 	handleTabSelectFactory(index)
 	{
-	  var onClick = this.props.tabs[index].onClick;	
+	  var key = this.state.tabOrder[index].key;	
+    var onClick = this.props.tabs[key].onClick;
     
     return () => {
+      if(!this.state.tabOrder[index].unselectable)
+      {
+        this.state.tabOrder.map((tab) => tab.selected = false);
+        this.state.tabOrder[index].selected = true;
+      }
+      
+      this.setState({
+        // selectedIndex: index,
+        tabOrder: this.state.tabOrder,
+      });
+      
       if(typeof onClick === 'function')
       {
         onClick();
   		}
-
-			this.setState({
-				selectedIndex: index,
-			});
 		};
 	},
+  
+  moveTabs(index: number, destination: number)
+  {
+    var tabOrder = this.state.tabOrder;
+    var id = tabOrder.splice(index, 1)[0];
+    tabOrder.splice(destination, 0, id); 
+    this.setState({
+      tabOrder: tabOrder,
+    });
+  },
 
 	render() {
-		var content = this.props.tabs[this.state.selectedIndex].content;
+    var selectedIndex = this.state.tabOrder.findIndex((tab) => tab.selected);
+		var content = this.state.tabOrder[selectedIndex].content;
 
-		var showTabs = this.props.tabs && this.props.tabs.length >= 2;
-    
-    var tabsLayout = {
-      columns: this.props.tabs.map((tab, index) => ({
-      content:
-      (
-        <Tab 
-          index={index}
-          tab={tab}
-          tabs={this.props.tabs}
-          onSelect={this.handleTabSelectFactory(index)}
-          selectedIndex={this.state.selectedIndex} />
-      ),
-    }))
+    var tabsLayout = 
+    {
+      columns: this.state.tabOrder.map((tab, index) => (
+      {
+        content:
+        (
+          <Tab 
+            index={index}
+            tab={tab}
+            tabOrder={this.state.tabOrder}
+            onSelect={this.handleTabSelectFactory(index)}
+            selectedIndex={selectedIndex} />
+        ),
+      }))
     };
 
 		return (<div className='tabs-container'>
 			<div className='tabs-row-wrapper'>
 				{ 
 					this.props.title ? (
-						<div className={'tabs-title' + (!showTabs ? ' tabs-title-no-tabs' : '')}>
+						<div className='tabs-title'>
 							{this.props.title}
 						</div>
 					) : null
 				}
 				{
-					showTabs ? (
-						<div className='tabs-row'>
-							<LayoutManager layout={tabsLayout} moveTo={this.props.moveTo} />
-              <div className='tabs-shadow'></div>
-						</div>
-					) : null
+					<div className='tabs-row'>
+						<LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />
+            <div className='tabs-shadow'></div>
+					</div>
 				}
 			</div>
 			<div className='tabs-content'>

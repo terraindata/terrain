@@ -67,30 +67,21 @@ class Builder extends React.Component<any, any>
     super();
     
     Store.subscribe(() => {
-      var newState = Store.getState();
-      // updated cardGroup order
-      this.setState(newState);
+      this.setState(Store.getState());
     });
     
     this.state = Store.getState();
-    this.state.cardGroupOrder = [];
-    if(this.state.cardGroups)
-    {
-      this.state.cardGroupOrder = this.state.cardGroups.map((cardGroup, key) => key);
-    }
   }
   
   handleNewAlgorithmTab() {
     Actions.dispatch.newAlgorithm();
   }
   
-  moveTabs(index: number, destination: number)
-  {
-    
-  }
-
 	render() {
-    var tabs = _.map(this.state.cardGroups, (cardGroup, algorithmId) => {
+    var tabs = {};
+    _.map(this.state.cardGroups, (cardGroup, algorithmId) => {//_.map(this.state.cardGroups, (cardGroup, algorithmId) => {
+      var cardGroup = this.state.cardGroups[algorithmId];
+      var resultGroup = this.state.resultGroups[algorithmId];
       var layout = {
         stackAt: 650,
         fullHeight: true,
@@ -103,25 +94,27 @@ class Builder extends React.Component<any, any>
             content: <CardsArea cards={cardGroup.cards} algorithmId={algorithmId} />
           },
           {
-            content: <ResultsArea results={this.state.resultGroups[cardGroup.id].results} algorithmId={algorithmId} />
+            content: <ResultsArea results={resultGroup.results} algorithmId={algorithmId} />
           },
         ]
       };
 
-      return {
+      tabs[algorithmId] = {
         content: <LayoutManager layout={layout} />,
         tabName: 'Algorithm ' + cardGroup.id,
       };
     });
 
-    tabs.push({
+    tabs[-1] = {
       content: null,
       tabName: '+',
+      pinnedAtEnd: true,
       onClick: this.handleNewAlgorithmTab,
-    });
+      selectNewTab: true,
+    };
 
     return (
-      <Tabs tabs={tabs} moveTo={this.moveTabs} />
+      <Tabs tabs={tabs} />
     );
 	}
 };

@@ -69,7 +69,7 @@ class TransformCardChart extends React.Component<Props, any>
     super(props);
     this.onPointMove = this.onPointMove.bind(this);
     this.state = {
-      width: 0,
+      width: -1,
       domain: Util.deeperCloneObj(props.domain),
       pointsData: Util.deeperCloneArr(props.pointsData),
       barsData: Util.deeperCloneArr(props.barsData),
