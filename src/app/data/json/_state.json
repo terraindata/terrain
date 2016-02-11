@@ -4,6 +4,12 @@
       "id": 100,
       "cards": [
         {
+          "type": "transform",
+          "id": 77,
+          "input": "sitter.score",
+          "output": "sitter.transformedScore"
+        },
+        {
           "type": "from",
           "id": 1,
           "group": "sitters",
@@ -17,12 +23,6 @@
               }
             }
           ]
-        },
-        {
-          "type": "transform",
-          "id": 77,
-          "input": "sitter.score",
-          "output": "sitter.transformedScore"
         },
         {
           "type": "transform",

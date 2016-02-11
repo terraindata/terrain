@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as React from 'react';
 import * as ReactDOM from "react-dom";
 var _ = require('underscore');
 
@@ -89,6 +90,12 @@ var Util = {
     var ans = {}
     _.map(obj, (val, key) => ans[key] = _.clone(val));
     return ans;
+  },
+  
+  
+  bind(component: React.Component<any, any>, fields: string[])
+  {
+    fields.map((field) => component[field] = component[field].bind(component));
   },
 
 

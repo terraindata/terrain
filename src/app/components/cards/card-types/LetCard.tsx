@@ -42,132 +42,79 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
+require('./LetCard.less');
+
 import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
-import Dropdown from './../../common/Dropdown.tsx';
 import CardField from './../CardField.tsx';
-import { Directions } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 
-import { Weight, Weighter } from '../../../charts/Weighter.tsx';
-import TransformCardChart from './TransformCardChart.tsx';
-import TransformCardPeriscope from './TransformCardPeriscope.tsx';
-
-var Colors = [
-{
-  bar: "#1590cb",
-  line: "#11709e",
-},
-{
-  bar: "#ff9c04",
-  line: "#ce8311",
-},
-];
+var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
 interface Props {
-  card: CardModels.TransformCard;
-  algorithmId: string;
+  card: CardModels.LetCard;
 }
 
-class TransformCard extends React.Component<Props, any>
+class LetCard extends React.Component<Props, any>
 {
   constructor(props:Props)
   {
     super(props);
-    
-    this.handleDomainChange = this.handleDomainChange.bind(this);
-    
-    this.state =
-    {
-      weights: [{weight: 0.3, key: 'a', color: '#a747ff'}, {weight: 0.2, key: 'b', color: '#47a7ff'}, {weight: 0.5, key: 'c', color: '#ff47a7'}],
-      domain:
-      {
-        x: props.card.range,
-        // [
-          // 10, 29.5
-          // props.card.scorePoints.reduce((min: any, scorePoint) => 
-          //   (min === false || scorePoint.value < min ? scorePoint.value : min), false),
-          // props.card.scorePoints.reduce((max: any, scorePoint) => 
-          //   (max === false || scorePoint.value > max ? scorePoint.value : max), false),
-        // ],
-        y:
-        [
-          0,
-          1
-        ]
-      }
-    };
-  }
-  
-  handleDomainChange(newDomain) {
-    this.setState({
-      domain:
-      {
-        x: newDomain,
-        y: this.state.domain.y,
-      },
-    });
   }
 
   render() {
-    var inputRef = 'input';
-    var outputRef = 'output';
+    var card = this.props.card;
+    
+    var fieldRef = 'field';
+    var expressionRef = 'expression';
     
     var handleChange = () =>
     {
-      Actions.dispatch.cards.transform.change(this.props.card, this.refs[inputRef]['value'], this.refs[outputRef]['value']);
+      Actions.dispatch.cards.let.change(this.props.card,
+        this.refs[fieldRef]['value'],
+        this.refs[expressionRef]['value']);
     }
 
     var layout = {
-      colPadding: 12,
       columns: [
       {
         content: (
-          <input type='text' value={this.props.card.input} onChange={handleChange} ref={inputRef} />
+          <input 
+            type='text' 
+            placeholder='Variable name'
+            value={this.props.card.field} 
+            onChange={handleChange} 
+            ref={fieldRef} />
         ),
       },
       {
         content: (
-          <input type='text' value={this.props.card.output} onChange={handleChange} ref={outputRef} />
+          <div className='let-card-arrow'>
+            <ArrowIcon />
+          </div>
+        ),
+      },
+      {
+        content: (
+          <input
+            type='text'
+            placeholder='Expression'
+            value={this.props.card.expression}
+            onChange={handleChange}
+            ref={expressionRef} />
         ),
       }
       ],
     };
-    
-    var onWeightChange = (weights: Weight[]) =>
-    {
-      this.setState({
-        weights: this.state.weights.map((weight, i) => _.extend(weight, weights[i])),
-      })
-    }
-    
+
     return (
-      <div>
-        <CardField>
-          <LayoutManager layout={layout} />
-        </CardField>
-        <TransformCardChart
-          barColor={Colors[0].bar}
-          lineColor={Colors[0].line}
-          pointsData={this.props.card.scorePoints}
-          barsData={this.props.card.bars}
-          domain={this.state.domain}
-          card={this.props.card} />
-        <TransformCardPeriscope
-          onDomainChange={this.handleDomainChange}
-          barColor={Colors[0].bar}
-          barsData={this.props.card.bars}
-          domain={this.state.domain}
-          card={this.props.card} />
-        <Weighter
-          weights={this.state.weights}
-          onChange={onWeightChange} />
-      </div>
+      <CardField>
+        <LayoutManager layout={layout} />
+      </CardField>
     );
   }
 };
 
-export default TransformCard;
+export default LetCard;

@@ -1,0 +1,54 @@
+@import "../util/Common.less";
+
+@handle-width: 10px;
+@border-radius: 5px;
+
+.weighter {
+  border-radius: 5px;
+  overflow: hidden;
+  color: #fff;
+  font-weight: 500;
+  font-size: 0px;
+  width: 100%;
+  position: relative;
+  height: 30px;
+  
+  .weight-wrapper {
+    display: inline-block;
+    font-size: 14px;
+    text-align: center;
+    position: relative;
+    height: 100%;
+    
+    &:first-child {
+      border-top-left-radius: @border-radius;
+      border-bottom-left-radius: @border-radius;
+    }
+    
+    &:last-child {
+      border-top-right-radius: @border-radius;
+      border-bottom-right-radius: @border-radius;
+    }
+    
+    .weight-weight {
+      .vertically-middle;
+      
+      max-width: 100%;
+      overflow: hidden;
+    }
+    
+    .weight-handle {
+      position: absolute;
+      left: calc(-1 * @handle-width / 2);
+      top: 0px;
+      width: @handle-width;
+      height: 100%;
+      box-sizing: border-box;
+      float: left;
+      background: #fff;
+      
+      border: 1px solid #eee;
+      border-radius: 3px;
+    }
+  }
+}

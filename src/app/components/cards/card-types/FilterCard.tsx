@@ -51,7 +51,8 @@ import Dropdown from './../../common/Dropdown.tsx';
 import { Operators } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 
-interface Props {
+interface Props
+{
   card: CardModels.FilterCard;
 }
 
