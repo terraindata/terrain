@@ -280,6 +280,27 @@ var letCardReducer = (cards = [], action) => {
 };
 
 
+var scoreCardReducer = (cards = [], action) => {
+ var cardIndex = cards.indexOf(action.payload.card);
+ var newCards = cloneArray(cards);
+
+ switch (action.type) {
+  case ActionTypes.cards.score.change:
+    newCards[cardIndex].method = action.payload.method;
+    newCards[cardIndex].output = action.payload.output;
+    break;
+  case ActionTypes.cards.score.changeWeights:
+   newCards[cardIndex].weights = action.payload.weights;
+   break;
+  default:
+   // ActionType not applicable, return normal cards
+   return cards;
+ }
+
+ return newCards;
+};
+
+
 var cardsReducer = (cards = [], action, algorithmId) =>
 {
 	if(!action.payload)
@@ -295,24 +316,32 @@ var cardsReducer = (cards = [], action, algorithmId) =>
       return cards;
     }
     
+    var obj = { algorithmId };
     var newCards = cloneArray(cards);
     var newCard = new CardModels.Card(action.payload.type);
     switch(action.payload.type)
     {
       case 'select':
-        newCard = new CardModels.SelectCard();
+        newCard = new CardModels.SelectCard(obj);
         break;
       case 'from':
-        newCard = new CardModels.FromCard();
+        newCard = new CardModels.FromCard(obj);
         break;
       case 'sort':
-        newCard = new CardModels.SortCard();
+        newCard = new CardModels.SortCard(obj);
         break;
       case 'filter':
-        newCard = new CardModels.FilterCard();
+        newCard = new CardModels.FilterCard(obj);
         break;
       case 'transform':
-        newCard = new CardModels.TransformCard();
+        newCard = new CardModels.TransformCard(obj);
+        break;
+      case 'let':
+        newCard = new CardModels.LetCard(obj);
+        break;
+      case 'score':
+        console.log(obj);
+        newCard = new CardModels.ScoreCard(obj);
         break;
     }
     newCards.splice(action.payload.index, 0, newCard);
@@ -338,6 +367,7 @@ var cardsReducer = (cards = [], action, algorithmId) =>
   cards = sortCardReducer(cards, action);
   cards = transformCardReducer(cards, action);
   cards = letCardReducer(cards, action);
+  cards = scoreCardReducer(cards, action);
 
 	switch(action.type)
 	{
@@ -451,6 +481,7 @@ var defaultStateJson = require('./json/_state.json');
 var cardGroups = {};
 _.map(defaultStateJson.cardGroups, (cardGroup, key) => {
   var cards = cardGroup.cards.map((card) => {
+    var card = _.extend(card, {algorithmId: key});
     switch(card.type) {
       case 'from':
         return new CardModels.FromCard(card);
@@ -466,6 +497,9 @@ _.map(defaultStateJson.cardGroups, (cardGroup, key) => {
         break;
       case 'transform':
         return new CardModels.TransformCard(card);
+        break;
+      case 'score':
+        return new CardModels.ScoreCard(card);
         break;
       default:
         return new CardModels.Card(card.type, card);

@@ -49,17 +49,18 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../util/Util.tsx';
 
+import ColorManager from '../util/ColorManager.tsx';
+
 export interface Weight
 {
   weight: number;
   key: string;
-  color?: string;
-  adjustable?: boolean;
 }
 
 interface Props
 {
   weights: Weight[];
+  weightIndex: number;
   onChange: (weights: Weight[]) => void;
 }
 
@@ -68,12 +69,20 @@ export class Weighter extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
+    
     Util.bind(this, ['renderHandle', 'renderWeight']);
   }
   
   renderHandle(index:number)
   {
     if(index === 0)
+    {
+      return null;
+    }
+    
+    if(this.props.weightIndex !== -1 && 
+      index !== this.props.weightIndex &&
+      index !== this.props.weightIndex + 1)
     {
       return null;
     }
@@ -137,17 +146,13 @@ export class Weighter extends React.Component<Props, any>
   
   renderWeight(weight:Weight, index:number)
   {
-    var color = weight.color || '#47a7ff';
+    var color = ColorManager.colorForKey(weight.key);
     
     var style =
     {
       background: color,
       width: (weight.weight * 100) + '%',
     }
-    
-    // var classes = Util.objToClassname({
-    //   'weight-weight': true,
-    // })
     
     return (
       <div className='weight-wrapper' style={style} key={weight.key}>

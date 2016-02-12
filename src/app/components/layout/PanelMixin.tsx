@@ -162,8 +162,7 @@ var Panel = {
 	{
 		if(this.canDrag()) 
 		{
-			this.setState({ 
-				dragging: true, 
+			this.setState({
 				ox: x, 
 				oy: y, 
 				dx: 0, 
@@ -259,6 +258,9 @@ var Panel = {
 
 		this.setState({
 			draggedTo: draggedTo,
+      dragging: true, 
+      // ^ this is here, and not in the startDrag method, so that we don't see
+      //    the dragging styles until we've actually moved the thing
 		})
 
 		if(this.props.onDrag) 

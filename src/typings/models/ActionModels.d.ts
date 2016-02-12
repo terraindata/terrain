@@ -131,6 +131,17 @@ interface ChangeLetCardPayload extends CardPayload {
   expression: string;
 }
 
+interface ChangeScoreCardPayload extends CardPayload {
+  method: string;
+  output: string;
+}
+
+interface ChangeScoreCardWeightsPayload extends CardPayload {
+  weights: {
+    weight: number;
+    key: string;
+  }[];
+}
 
 interface FilterCardPayload extends CardPayload {
   card: any; //FilterCardModel;

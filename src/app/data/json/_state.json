@@ -4,6 +4,27 @@
       "id": 100,
       "cards": [
         {
+          "type": "score",
+          "id": 177,
+          "method": "weightedSum",
+          "output": "finalScore",
+          "weights":
+          [
+            {
+              "key": "sitter.transformedScore",
+              "weight": 0.5
+            },
+            {
+              "key": "sitter.transformedNumJobs",
+              "weight": 0.3
+            },
+            {
+              "key": "sitter.transformedMinPrice",
+              "weight": 0.2
+            }
+          ]
+        },
+        {
           "type": "transform",
           "id": 77,
           "input": "sitter.score",

@@ -20,19 +20,20 @@
 - Optimal directory size is two to five files.
 	No directories in `src` with over ten files.
 	No objects / namespaces with over ten keys.
-- Say "yes" to whitespace for legibility.
-- Use whatever quotes make you happy but keep it consistent within the same file / piece of code.
+- Say yes to whitespace for legibility.
+- Break up template rendering when it makes sense. Name functions that return HTML `render[Description]`
+- Use 'single quotes' in Javascript, "double quotes" in HTML
 - `{}` should follow every `if`, `for`, `while`, etc.
 - Don't mix `||` and `&&` without `()`.
 	Who knows boolean order of operations anyways?
+- Name props that accept event handlers `on[EventName]`, and name the handler functions `handle[EventName]`
+  e.g. `onTransformToSuperSaiyan={this.handleTransformToSuperSaiyan}`
 - Every feature-adding merge should have appropriate test coverage to be accepted.
 	Nearly every bug-solving merge should have a test covering the buggy case.
 	TDD FTW!
 - Comma after the last line in an object.`,`
 	This makes adding new lines to objects easier and allows for a cleaner merge.`,`
 	Note: You can't do this in JSON.`,`
-- Every file ends with `module.exports = YourClassyClassName;`. In other words, name your exports.
-	Don't do `module.exports = { ... }` because then the Webpack/React/browser won't work together so well and you will see components in the React Chrome plugin that are called `module.exports` and that's not helping anybody.
 - Commits should be solidly incremental and should have a helpful one-line explanation.
 	Rebase and squash on your feature branch before merging if you have too many commits, or unhelpful commit messages.
 	`git log` in master should always look beautiful and be a helpful history of what has happened.
@@ -41,24 +42,26 @@
 - Be keen on adding to this README, and keen on trimming it down.
 - None of these standards are set in stone; if you have an idea for a way to improve these, make it known. Coding practices evolve.
 - No code is set in stone, either. Refactor when you find something that you know you could do better.
-	Refactor responsibly: test your changes, and apply appropriate cost-benefit-analysis before starting to be certain that your time is well-used.
+	Refactor responsibly: test your changes, and assess cost-benefit-analysis before starting to be certain that your time is well-used.
 - We only deploy from `master`.
 - Use effective markdown syntax in this file.
 - Constants are named with all caps and underscores
 	e.g. `var ANSWER_TO_THE_ULTIMATE_QUESTION = 42;`
 - No global variables; every variable must be preceded by `var`.
 - Only one variable per `var`, for legibility. Don't separate variables by commas.
-	e.g. Don't do `var first = 4, second = 8, third = 15;` etc. Instead, put each variable on its on line.
+	e.g. Don't do `var first = 'Luke', second = 'Leia', third = 'Han';` etc. Instead, put each variable on its on line.
 - No not believing in yourself.
 
 ## Major Dependencies
 
 The Terrain search front-end is built upon these technologies:
 
-- React (tutorial: link forthcoming)
-- JSX / ES6 (tutorial: link forthcoming)
-- Redux (tutorial: link forthcoming)
-- Webpack (tutorial: link forthcoming)
+- React
+- Typescript
+- JSX / ES6
+- Redux
+- Webpack
+- LESS
 - Tape, for testing (https://github.com/substack/tape)
 
 ## Directory Overview
@@ -73,15 +76,25 @@ Contains the React app.
 
 ### src/app/components
 
-Contains all React components and styles.
+Contains all React components and styles. Directories in here should be self-explanatory.
 
 ### src/app/data
 
-Contains Actions / Stores for Redux.
+Contains Actions and Stores for Redux.
 
 ### src/app/util
 
 Utility functions or styles that are used across multiple files.
+
+## src/test
+
+Contains test code.
+
+## src/typings
+
+Contains TypeScript typings.
+
+*Note*: When installing new types, make sure to `cd src` before you `tsd install`
 
 ## Setup
 

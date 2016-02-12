@@ -42,115 +42,114 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Dropdown.less');
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import Util from '../../util/Util.tsx';
+require('./ScoreCard.less');
 
-interface Props
-{
-  options: string[];
-  selectedIndex: number;
-  onChange: (index: number) => void;
-  ref?: string;
-  circle?: boolean;
+import * as _ from 'underscore';
+import * as React from 'react';
+import Actions from "../../../data/Actions.tsx";
+import Util from '../../../util/Util.tsx';
+import LayoutManager from "../../layout/LayoutManager.tsx";
+import Dropdown from "../../common/Dropdown.tsx";
+import CardField from './../CardField.tsx';
+import { CardModels } from './../../../models/CardModels.tsx';
+
+import { Weight, Weighter } from '../../../charts/Weighter.tsx';
+
+interface Props {
+  card: CardModels.ScoreCard;
+  algorithmId: string;
 }
 
-class Dropdown extends React.Component<Props, any>
+var methods = ['weightedSum'];
+
+class ScoreCard extends React.Component<Props, any>
 {
-  value: number;
-  
-  constructor(props: Props) {
+  constructor(props:Props)
+  {
     super(props);
-    this.renderOption = this.renderOption.bind(this);
-    this.computeDirection = this.computeDirection.bind(this);
-    this.value = this.props.selectedIndex;
-    this.state = {
-      up: false,
-    };
+    
+    Util.bind(this, ['handleWeightsChange', 'renderWeight', 'renderHeader', 'handleOutputChange', 'handleMethodChange']);
   }
   
-  renderOption(option, index)
+  handleWeightsChange(newWeights)
   {
-    if(index === this.props.selectedIndex)
+    Actions.dispatch.cards.score.changeWeights(this.props.card, newWeights);
+  }
+  
+  renderWeight(weight, index) 
+  {
+    var layout = 
     {
-      return null;
-    }
-    
-    var handleClick = () => {
-      this.value = index;
-      this.props.onChange(index);
+      colPadding: 12,
+      columns:
+      [
+        {
+          content: <div className='score-weight-key'>{ weight.key }</div>
+        },
+        {
+          content: <Weighter 
+            weights={this.props.card.weights} 
+            onChange={this.handleWeightsChange}
+            weightIndex={index} />  
+        }
+      ]
     }
     return (
-      <div className="dropdown-option" key={index} onClick={handleClick}>
-        <div className="dropdown-option-inner">
-          { option }
-        </div>
-      </div>
+      <CardField key={weight.key}>
+        <LayoutManager layout={layout} />
+      </CardField>
     );
   }
   
-  computeDirection() {
-    var cr = ReactDOM.findDOMNode(this).getBoundingClientRect();
-    if(this.state.up)
-    {
-      var componentBottom = cr.bottom + cr.height;
-    }
-    else
-    {
-      var componentBottom = cr.bottom;
-    }
-    var windowBottom = window.innerHeight;
-    
-    if(componentBottom > windowBottom)
-    {
-      this.setState({
-        up: true,
-      });
-    }
-    else
-    {
-      this.setState({
-        up: false,
-      })
-    }
+  handleOutputChange(event)
+  {
+    Actions.dispatch.cards.score.change(this.props.card, this.props.card.method, event.target.value);
   }
   
-  componentDidMount() {
-    this.computeDirection();
+  handleMethodChange(index: number)
+  {
+    Actions.dispatch.cards.score.change(this.props.card, methods[index], this.props.card.output); 
   }
   
-  render() {
-    var classes = Util.objToClassname({
-      "dropdown-wrapper": true,
-      "dropdown-wrapper-circle": this.props.circle,
-      "dropdown-up": this.state.up,
-    });
+  renderHeader()
+  {
+    var headerLayout = 
+    {
+      colPadding: 12,
+      columns: 
+      [
+        {
+          content: <Dropdown 
+            onChange={this.handleMethodChange}
+            options={methods}
+            selectedIndex={methods.indexOf(this.props.card.method)} />
+        },
+        {
+          content: <input type='text' value={this.props.card.output} onChange={this.handleOutputChange} />
+        }
+      ]
+    }
     
     return (
-      <div className={classes}>
-        { this.state.up ? (
-          <div className="dropdown-options-wrapper">
-            {
-              this.props.options.map(this.renderOption)
-            }
-          </div>
-        ) : null }
-        <div className="dropdown-value" onMouseEnter={this.computeDirection}>
-          <div className="dropdown-option-inner">
-            { this.props.options[this.props.selectedIndex] }
-          </div>
-        </div>
-        { !this.state.up ? (
-          <div className="dropdown-options-wrapper">
-            {
-              this.props.options.map(this.renderOption)
-            }
-          </div>
-        ) : null }
+      <CardField>
+        <LayoutManager layout={headerLayout} />
+      </CardField>
+    );
+  }
+
+  render()
+  {
+    return (
+      <div>
+        {
+          this.renderHeader()
+        }
+        {
+          this.props.card.weights.map(this.renderWeight)
+        }
       </div>
     );
   }
 };
 
-export default Dropdown;
+export default ScoreCard;

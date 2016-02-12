@@ -42,10 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./TransformCard.less');
+
 import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
+import ColorManager from '../../../util/ColorManager.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import Dropdown from './../../common/Dropdown.tsx';
 import CardField from './../CardField.tsx';
@@ -56,20 +59,10 @@ import { Weight, Weighter } from '../../../charts/Weighter.tsx';
 import TransformCardChart from './TransformCardChart.tsx';
 import TransformCardPeriscope from './TransformCardPeriscope.tsx';
 
-var Colors = [
-{
-  bar: "#1590cb",
-  line: "#11709e",
-},
-{
-  bar: "#ff9c04",
-  line: "#ce8311",
-},
-];
-
 interface Props {
   card: CardModels.TransformCard;
   algorithmId: string;
+  cards: CardModels.Card[];
 }
 
 class TransformCard extends React.Component<Props, any>
@@ -82,24 +75,14 @@ class TransformCard extends React.Component<Props, any>
     
     this.state =
     {
-      weights: [{weight: 0.3, key: 'a', color: '#a747ff'}, {weight: 0.2, key: 'b', color: '#47a7ff'}, {weight: 0.5, key: 'c', color: '#ff47a7'}],
       domain:
       {
         x: props.card.range,
-        // [
-          // 10, 29.5
-          // props.card.scorePoints.reduce((min: any, scorePoint) => 
-          //   (min === false || scorePoint.value < min ? scorePoint.value : min), false),
-          // props.card.scorePoints.reduce((max: any, scorePoint) => 
-          //   (max === false || scorePoint.value > max ? scorePoint.value : max), false),
-        // ],
-        y:
-        [
-          0,
-          1
-        ]
+        y: [0, 1],
       }
     };
+    
+    Util.bind(this, ['handleDomainChange', 'handleWeightChange'])
   }
   
   handleDomainChange(newDomain) {
@@ -110,6 +93,57 @@ class TransformCard extends React.Component<Props, any>
         y: this.state.domain.y,
       },
     });
+  }
+  
+  getScoreCard():CardModels.ScoreCard {
+    var scoreCard: CardModels.Card = this.props.cards.find((card) => 
+      card.type === 'score' && 
+      card['weights'].find((weight) => weight.key === this.props.card.output));
+    
+    if(scoreCard)
+    {
+      return scoreCard as CardModels.ScoreCard;
+    }
+    
+    return null;
+  }
+  
+  handleWeightChange(newWeights: Weight[])
+  {
+    Actions.dispatch.cards.score.changeWeights(this.getScoreCard(), newWeights);
+  }
+  
+  renderWeighter()
+  {
+    var scoreCard = this.getScoreCard();
+    if(!scoreCard)
+    {
+      return null;
+    }
+    
+    var weighterLayout = 
+    {
+      colPadding: 12,
+      columns:
+      [
+        {
+          colSpan: 2,
+          content: <Weighter
+            weights={scoreCard.weights}
+            weightIndex={1}
+            onChange={this.handleWeightChange} />
+        },
+        {
+          content: <div className='transform-card-weight-output'>{ scoreCard.output }</div>
+        }
+      ],
+    }
+    
+    return (
+      <CardField>
+        <LayoutManager layout={weighterLayout} />
+      </CardField>
+    );
   }
 
   render() {
@@ -136,35 +170,28 @@ class TransformCard extends React.Component<Props, any>
       }
       ],
     };
-    
-    var onWeightChange = (weights: Weight[]) =>
-    {
-      this.setState({
-        weights: this.state.weights.map((weight, i) => _.extend(weight, weights[i])),
-      })
-    }
-    
+
     return (
       <div>
         <CardField>
           <LayoutManager layout={layout} />
         </CardField>
         <TransformCardChart
-          barColor={Colors[0].bar}
-          lineColor={Colors[0].line}
+          barColor={ColorManager.colorForKey(this.props.card.output)}
+          lineColor={ColorManager.darkerColorForKey(this.props.card.output)}
           pointsData={this.props.card.scorePoints}
           barsData={this.props.card.bars}
           domain={this.state.domain}
           card={this.props.card} />
         <TransformCardPeriscope
           onDomainChange={this.handleDomainChange}
-          barColor={Colors[0].bar}
+          barColor={ColorManager.colorForKey(this.props.card.output)}
           barsData={this.props.card.bars}
           domain={this.state.domain}
           card={this.props.card} />
-        <Weighter
-          weights={this.state.weights}
-          onChange={onWeightChange} />
+        {
+          this.renderWeighter()
+        }
       </div>
     );
   }

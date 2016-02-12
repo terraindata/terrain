@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./Card.less');
+
 import Actions from "../../data/Actions.tsx";
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
@@ -53,6 +54,7 @@ import FromCard from './card-types/FromCard.tsx';
 import SortCard from './card-types/SortCard.tsx';
 import FilterCard from './card-types/FilterCard.tsx';
 import LetCard from './card-types/LetCard.tsx';
+import ScoreCard from './card-types/ScoreCard.tsx';
 import TransformCard from './card-types/TransformCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
 import Menu from '../common/Menu.tsx';
@@ -65,6 +67,7 @@ var Card = React.createClass({
 		card: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
     algorithmId: React.PropTypes.string.isRequired,
+    cards: React.PropTypes.array.isRequired,
 	},
 
 	getDefaultProps():any
@@ -157,6 +160,9 @@ var Card = React.createClass({
       break;
     case 'transform':
       CardComponent = TransformCard;
+      break;
+    case 'score':
+      CardComponent = ScoreCard;
       break;
 		}
     

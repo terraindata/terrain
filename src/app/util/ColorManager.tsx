@@ -42,48 +42,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as React from 'react';
-import Util from '../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
-import Actions from "../../data/Actions.tsx";
-import Card from "../cards/Card.tsx";
-import LayoutManager from "../layout/LayoutManager.tsx";
-import CreateCardTool from "./CreateCardTool.tsx";
-
-var CardsArea = React.createClass<any, any>({
-	propTypes:
-	{
-		cards: React.PropTypes.array.isRequired,
-    algorithmId: React.PropTypes.string.isRequired,
-	},
-
-	render() {
-		var layout = {
-			rows: this.props.cards.map((card, index) => {
-				return {
-					content: <Card 
-            name={card.name}
-            index={index}
-            card={card}
-            {...this.props} />,
-          key: card.id,
-				};
-			}),
-			fullHeight: true,
-		};
-    
-    layout.rows.push({
-      content: <CreateCardTool index={this.props.cards.length} alwaysOpen={true} algorithmId={this.props.algorithmId} />,
-      key: 'end-tool',
-    });
-
-		var moveTo = (curIndex, newIndex) =>
+class ColorManager
+{
+  static COLORS =
+  [
+    '#1590cb',
+    '#ff9c04',
+    '#ff47a7',
+    '#ffa747',
+    '#a7ff47',
+    '#a747ff',
+  ];
+  
+  static DARKER_COLORS =
+  [
+    '#11709e',
+    '#ce8311',
+    '#ef3797',
+    '#ef9737',
+    '#97ef37',
+    '#9737ef', 
+  ];
+  
+  static keyToIndex: { [s: string]: number; } = {};
+  
+  static currentIndex: number = 0;
+  
+  static indexForKey(key: string): number
+  {
+    if(this.keyToIndex[key] === undefined)
     {
-      Actions.dispatch.cards.move(this.props.cards[curIndex], newIndex);
-    };
+      this.keyToIndex[key] = this.currentIndex ++;
+    }
+    
+    return this.keyToIndex[key] % this.COLORS.length;
+  }
+  
+  static colorForKey(key: string): string
+  {
+    return this.COLORS[this.indexForKey(key)];
+  }
+  
+  static darkerColorForKey(key: string): string
+  {
+    return this.DARKER_COLORS[this.indexForKey(key)];
+  }
+}
 
-		return <LayoutManager layout={layout} moveTo={moveTo} />;
-	},
-});
-
-export default CardsArea;
+export default ColorManager;

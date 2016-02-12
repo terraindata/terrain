@@ -5,7 +5,6 @@
 
 .weighter {
   border-radius: 5px;
-  overflow: hidden;
   color: #fff;
   font-weight: 500;
   font-size: 0px;
@@ -39,6 +38,7 @@
     
     .weight-handle {
       position: absolute;
+      z-index: 99;
       left: calc(-1 * @handle-width / 2);
       top: 0px;
       width: @handle-width;

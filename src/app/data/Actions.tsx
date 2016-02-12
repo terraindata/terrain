@@ -147,24 +147,37 @@ const create =
         (card: any, scorePointId: string, scorePointScore: any) => ({card, scorePointId, scorePointScore})
       ),
     },
+    
+    score:
+    {
+      changeWeights: createAction<ChangeScoreCardWeightsPayload>(
+        ActionTypes.cards.score.changeWeights,
+        (card: any, weights: {weight:number, key:string}[]) => ({card, weights})
+      ),
+      
+      change: createAction<ChangeScoreCardPayload>(
+        ActionTypes.cards.score.change,
+        (card: any, method: string, output: string) => ({card, method, output})
+      ),
+    },
 
-  filter:
-  {
-   create: createAction<CreateFilterPayload>(
-    ActionTypes.cards.filter.create,
-    (card: any, index: number) => ({ card, index })
-   ),
+    filter:
+    {
+     create: createAction<CreateFilterPayload>(
+      ActionTypes.cards.filter.create,
+      (card: any, index: number) => ({ card, index })
+     ),
 
-   change: createAction<ChangeFilterPayload>(
-    ActionTypes.cards.filter.change,
-    (card: any, index: number, value: CardModels.Filter) => ({ card, index, value })
-   ),
+     change: createAction<ChangeFilterPayload>(
+      ActionTypes.cards.filter.change,
+      (card: any, index: number, value: CardModels.Filter) => ({ card, index, value })
+     ),
 
-   delete: createAction<DeleteFilterPayload>(
-    ActionTypes.cards.filter.delete,
-    (card: any, index: number) => ({ card, index })
-   ),
-  },
+     delete: createAction<DeleteFilterPayload>(
+      ActionTypes.cards.filter.delete,
+      (card: any, index: number) => ({ card, index })
+     ),
+    },
 	}, // /cards
 
 	inputs:

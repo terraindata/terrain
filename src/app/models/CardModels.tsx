@@ -121,6 +121,7 @@ export module CardModels
   {
     type: string = "";
     id: number;
+    algorithmId: string;
     
     constructor(type: string, obj?: any)
     {
@@ -134,6 +135,8 @@ export module CardModels
       {
         this.id = Util.randInt(0, 4815162342);
       }
+      
+      assign(this, obj, ['algorithmId']);
     }
   }
   
@@ -198,6 +201,25 @@ export module CardModels
     {
       super('let', obj);
       assign(this, obj, ['field', 'expression']);
+    }
+  }
+  
+  export class ScoreCard extends Card
+  {
+    weights: {
+      key: string;
+      weight: number;
+      color: string;
+    }[];
+    
+    method: string = "weightedSum";
+    output: string = "";
+    
+    constructor(obj?: any)
+    {
+      super('score', obj);
+      
+      assign(this, obj, ['weights', 'method', 'output']);
     }
   }
   

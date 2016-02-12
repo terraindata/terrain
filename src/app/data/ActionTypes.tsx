@@ -127,6 +127,11 @@ ActionTypes.cards.let = makeObject('cards.let', [
   'change',
 ]);
 
+ActionTypes.cards.score = makeObject('cards.score', [
+  'change',
+  'changeWeights',
+]);
+
 ActionTypes.cards.transform = makeObject('cards.transform', [
   'change',
   'scorePoint',
