@@ -50,7 +50,7 @@ class ColorManager
     '#ff9c04',
     '#ff47a7',
     '#ffa747',
-    '#a7ff47',
+    '#97ef37',
     '#a747ff',
   ];
   
@@ -60,7 +60,7 @@ class ColorManager
     '#ce8311',
     '#ef3797',
     '#ef9737',
-    '#97ef37',
+    '#87df27',
     '#9737ef', 
   ];
   

@@ -93,7 +93,6 @@ class CreateCardTool extends React.Component<Props, any>
         search: "",
       });
       
-      console.log(this.props.algorithmId);
       Actions.dispatch.cards.create(this.props.algorithmId, type, this.props.index);
     }
   }

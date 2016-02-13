@@ -285,16 +285,22 @@ var scoreCardReducer = (cards = [], action) => {
  var newCards = cloneArray(cards);
 
  switch (action.type) {
-  case ActionTypes.cards.score.change:
-    newCards[cardIndex].method = action.payload.method;
-    newCards[cardIndex].output = action.payload.output;
-    break;
-  case ActionTypes.cards.score.changeWeights:
-   newCards[cardIndex].weights = action.payload.weights;
-   break;
-  default:
-   // ActionType not applicable, return normal cards
-   return cards;
+   case ActionTypes.cards.score.create:
+     newCards[cardIndex].weights.push({
+       weight: 0,
+       key: '',
+     });
+     break;
+   case ActionTypes.cards.score.change:
+     newCards[cardIndex].method = action.payload.method;
+     newCards[cardIndex].output = action.payload.output;
+     break;
+   case ActionTypes.cards.score.changeWeights:
+     newCards[cardIndex].weights = action.payload.weights;
+     break;
+   default:
+     // ActionType not applicable, return normal cards
+     return cards;
  }
 
  return newCards;

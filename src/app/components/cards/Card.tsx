@@ -163,6 +163,11 @@ var Card = React.createClass({
       break;
     case 'score':
       CardComponent = ScoreCard;
+      subBar =
+      {
+        content: '+',
+        onClick: () => Actions.dispatch.cards.score.create(this.props.card),
+      }
       break;
 		}
     

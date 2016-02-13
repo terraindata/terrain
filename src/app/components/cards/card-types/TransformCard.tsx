@@ -118,7 +118,11 @@ class TransformCard extends React.Component<Props, any>
     var scoreCard = this.getScoreCard();
     if(!scoreCard)
     {
-      return null;
+      return (
+        <div className='transform-card-no-weighter'>
+          This card's output is not a part of any Score card.
+        </div>
+      );
     }
     
     var weighterLayout = 
@@ -130,7 +134,7 @@ class TransformCard extends React.Component<Props, any>
           colSpan: 2,
           content: <Weighter
             weights={scoreCard.weights}
-            weightIndex={1}
+            weightIndex={scoreCard.weights.findIndex((weight) => weight.key === this.props.card.output)}
             onChange={this.handleWeightChange} />
         },
         {
@@ -165,7 +169,7 @@ class TransformCard extends React.Component<Props, any>
       },
       {
         content: (
-          <input type='text' value={this.props.card.output} onChange={handleChange} ref={outputRef} />
+          <input type='text' defaultValue={this.props.card.output} onBlur={handleChange} ref={outputRef} />
         ),
       }
       ],

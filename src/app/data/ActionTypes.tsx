@@ -129,6 +129,7 @@ ActionTypes.cards.let = makeObject('cards.let', [
 
 ActionTypes.cards.score = makeObject('cards.score', [
   'change',
+  'create',
   'changeWeights',
 ]);
 

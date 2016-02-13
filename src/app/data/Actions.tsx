@@ -159,6 +159,11 @@ const create =
         ActionTypes.cards.score.change,
         (card: any, method: string, output: string) => ({card, method, output})
       ),
+      
+      create: createAction<CreateScoreCardWeightPayload>(
+        ActionTypes.cards.score.create,
+        (card: any) => ({card})
+      ),
     },
 
     filter:

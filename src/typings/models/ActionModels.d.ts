@@ -136,6 +136,8 @@ interface ChangeScoreCardPayload extends CardPayload {
   output: string;
 }
 
+interface CreateScoreCardWeightPayload extends CardPayload {}
+
 interface ChangeScoreCardWeightsPayload extends CardPayload {
   weights: {
     weight: number;

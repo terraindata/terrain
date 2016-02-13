@@ -46,6 +46,7 @@ require('./ScoreCard.less');
 
 import * as _ from 'underscore';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
@@ -64,15 +65,28 @@ var methods = ['weightedSum'];
 
 class ScoreCard extends React.Component<Props, any>
 {
+  test: string = "abc";
   constructor(props:Props)
   {
     super(props);
     
-    Util.bind(this, ['handleWeightsChange', 'renderWeight', 'renderHeader', 'handleOutputChange', 'handleMethodChange']);
+    Util.bind(this, ['handleWeightsChange', 'renderWeight', 'renderHeader',
+      'handleOutputChange', 'handleMethodChange', 'handleWeightKeyChange']);
   }
   
   handleWeightsChange(newWeights)
   {
+    Actions.dispatch.cards.score.changeWeights(this.props.card, newWeights);
+  }
+  
+  handleWeightKeyChange(event)
+  {
+    var key = event.target.value;
+    var index = ReactDOM.findDOMNode(event.target).getAttribute('rel');
+    
+    var newWeights = this.props.card.weights;
+    newWeights[index]['key'] = key;
+    
     Actions.dispatch.cards.score.changeWeights(this.props.card, newWeights);
   }
   
@@ -84,7 +98,11 @@ class ScoreCard extends React.Component<Props, any>
       columns:
       [
         {
-          content: <div className='score-weight-key'>{ weight.key }</div>
+          content: <input type='text' 
+            rel={index}
+            defaultValue={weight.key}
+            onBlur={this.handleWeightKeyChange}
+            placeholder='Variable or field name' />
         },
         {
           content: <Weighter 
@@ -95,7 +113,7 @@ class ScoreCard extends React.Component<Props, any>
       ]
     }
     return (
-      <CardField key={weight.key}>
+      <CardField key={index}>
         <LayoutManager layout={layout} />
       </CardField>
     );

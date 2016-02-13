@@ -73,6 +73,8 @@ class TransformCardChart extends React.Component<Props, any>
       domain: Util.deeperCloneObj(props.domain),
       pointsData: Util.deeperCloneArr(props.pointsData),
       barsData: Util.deeperCloneArr(props.barsData),
+      barColor: props.barColor,
+      lineColor: props.lineColor,
     }
   }
   
@@ -92,6 +94,8 @@ class TransformCardChart extends React.Component<Props, any>
     var newPointsData = this.state.pointsData;
     var newBarsData = this.state.barsData;
     var newWidth = this.state.width;
+    var newBarColor = this.state.barColor;
+    var newLineColor = this.state.lineColor;
     
     if(ReactDOM.findDOMNode(this).getBoundingClientRect().width !== this.state.width)
     {
@@ -117,6 +121,18 @@ class TransformCardChart extends React.Component<Props, any>
       newBarsData = Util.deeperCloneArr(newProps.barsData);
     }
     
+    if(this.state.barColor !== newProps.barColor)
+    {
+      changed = true;
+      newBarColor = newProps.barColor;
+    }
+    
+    if(this.state.lineColor !== newProps.lineColor)
+    {
+      changed = true;
+      newLineColor = newProps.lineColor;
+    }
+    
     if(changed)
     {
       this.setState({
@@ -124,10 +140,15 @@ class TransformCardChart extends React.Component<Props, any>
         pointsData: newPointsData,
         barsData: newBarsData,
         width: newWidth,
+        barColor: newBarColor,
+        lineColor: newLineColor,
       });
       
       var el = ReactDOM.findDOMNode(this);
-      TransformChart.update(el, this.getChartState());
+      TransformChart.update(el, this.getChartState({
+        barColor: newBarColor,
+        lineColor: newLineColor,
+      }));
     }
     
   }
@@ -137,7 +158,9 @@ class TransformCardChart extends React.Component<Props, any>
     Actions.dispatch.cards.transform.scorePoint(this.props.card, scorePointId, newScore);
   }
   
-  getChartState() {
+  getChartState(overrideState?: any) {
+    overrideState = overrideState || {};
+    
     var pointsData = this.props.pointsData.map((scorePoint) => ({
       x: scorePoint.value,
       y: scorePoint.score,
@@ -150,8 +173,8 @@ class TransformCardChart extends React.Component<Props, any>
       domain: this.props.domain,
       onMove: this.onPointMove,
       colors: {
-        bar: this.props.barColor,
-        line: this.props.lineColor,
+        bar: overrideState.barColor || this.props.barColor,
+        line: overrideState.lineColor || this.props.lineColor,
       },
     };
     

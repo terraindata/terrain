@@ -83,7 +83,8 @@ class TransformCardPeriscope extends React.Component<Props, any>
   componentWillReceiveProps(newProps)
   {
     if(newProps.domain !== this.props.domain
-      || newProps.barsData !== this.props.barsData)
+      || newProps.barsData !== this.props.barsData
+      || newProps.barColor !== this.props.barColor)
     {
       this.setState({
         chartState: false,

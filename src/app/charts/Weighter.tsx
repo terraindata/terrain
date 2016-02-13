@@ -155,7 +155,7 @@ export class Weighter extends React.Component<Props, any>
     }
     
     return (
-      <div className='weight-wrapper' style={style} key={weight.key}>
+      <div className='weight-wrapper' style={style} key={index}>
         { this.renderHandle(index) }
         <div className='weight-weight'>
           { Math.floor(weight.weight * 100) }%
