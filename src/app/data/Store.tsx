@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 var _ = require('underscore');
 var Immutable = require('immutable');
+import * as ReduxActions from 'redux-actions';
+
 
 var Redux = require('redux');
 import ActionTypes from './ActionTypes.tsx';
@@ -385,7 +387,7 @@ var cardsReducer = (cards = [], action, algorithmId) =>
 }
 
 // TODO consider an input type class
-var inputsReducer = (inputs = [], action: Action) =>
+var inputsReducer = (inputs = [], action) =>
 {
 	if(!action.payload)
 	{

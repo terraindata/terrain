@@ -112,7 +112,7 @@ export module CardModels
   
   export class Filter
   {
-    combinator: Combinator = Combinator.AND;
+    // combinator: Combinator = Combinator.AND;
     comparison: Comparison = new Comparison();
   }
   

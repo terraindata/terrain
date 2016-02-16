@@ -46,7 +46,6 @@ THE SOFTWARE.
 /// <reference path="react/react.d.ts" />
 /// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
 
-/// <reference path="models/ActionModels.d.ts" />
 /// <reference path="redux-actions/redux-actions.d.ts" />
 
 
