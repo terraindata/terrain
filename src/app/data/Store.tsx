@@ -161,7 +161,7 @@ var selectCardReducer = (cards = [], action) =>
 		case ActionTypes.cards.select.changeProperty:
 			select.properties[action.payload.propertyIndex] = action.payload.value;
 			break;
-		case ActionTypes.cards.select.deleteProperty:
+		case ActionTypes.cards.select.removeProperty:
 			select.properties.splice(action.payload.propertyIndex, 1);
 			break;
 		case ActionTypes.cards.select.createProperty:
@@ -205,7 +205,7 @@ var fromCardReducer = (cards = [], action) => {
   case ActionTypes.cards.from.join.change:
    from.joins[action.payload.index] = action.payload.value;
    break;
-  case ActionTypes.cards.from.join.delete:
+  case ActionTypes.cards.from.join.remove:
    from.joins.splice(action.payload.index, 1);
    break;
   default:
@@ -232,7 +232,7 @@ var filterCardReducer = (cards = [], action) => {
   case ActionTypes.cards.filter.change:
    filters[action.payload.index] = action.payload.value;
    break;
-  case ActionTypes.cards.filter.delete:
+  case ActionTypes.cards.filter.remove:
    filters.splice(action.payload.index, 1);
    break;
   default:

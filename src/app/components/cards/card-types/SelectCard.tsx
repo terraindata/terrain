@@ -76,7 +76,7 @@ class SelectCard extends React.Component<Props, any>
 
     var deleteFnFactory = (index) => () =>
     {
-    	Actions.dispatch.cards.select.deleteProperty(this.props.card, index);
+    	Actions.dispatch.cards.select.removeProperty(this.props.card, index);
     }
 
 		var layout = {

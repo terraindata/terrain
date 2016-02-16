@@ -117,7 +117,7 @@ class FilterCard extends React.Component<Props, any>
 
     var deleteFn = () =>
     {
-        Actions.dispatch.cards.filter.delete(this.props.card, index);
+        Actions.dispatch.cards.filter.remove(this.props.card, index);
     }
 
     return (

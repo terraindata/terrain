@@ -51,92 +51,127 @@ Terminology:
 - create
 - change
 - move
-- delete (transition to 'remove')
+- remove
 
 */
 
-// prepend str to every item in the array
-var prependArray = (str, arr) => 
-{
-	return arr.map((elem) => str + "." + elem);
-};
+// These are  commonly used type words. Defining them as variables here
+//  allows us to use ES6 short-hand in our ActionTypes object.
+var move = '';
+var create = '';
+var remove = '';
+var change = '';
 
-// convert an array into an object where the keys === values
-var makeObject = (str, arr) =>
-{
-	return _.object(arr, prependArray(str, arr));
-};
-
+// Defining our object like this gives us compile-time TypeScript support for ActionTypes
+//  and prevents us from defining duplicate action types.
+// The keys are the action types.
+// The values are initially the empty string (for coding expediency) but a function at the end
+//  of this file sets all of the values equal to the keys.
+// So you end up with ActionTypes.cards.move === 'cards.move'
 
 var ActionTypes = 
 {
-	// moveCard: moveCard,
-	// Action: Action,
+  cards:
+  {
+    move,
+    create,
+    remove,
+    
+    from:
+    {
+      changeGroup: '',
+      
+      join:
+      {
+        create,
+        change,
+        remove,
+      }
+    },
 
-	cards: makeObject('cards',
-	[
-		'move',
-		'create',
-    'remove',
-	]),
+    select: {
+    	createProperty: '',
+      changeProperty: '',
+      moveProperty: '',
+    	removeProperty: '',
+    },
 
-	inputs: makeObject('inputs',
-	[
-		'move',
-		'create',
-		'changeKey',
-		'changeValue',
-	]),
+    sort:
+    {
+    	change,
+    },
 
-	results: makeObject('results', 
-	[
-		'move',
-	]),
+    filter:
+    {
+      create,
+      change,
+      remove,
+    },
 
-	newAlgorithm: 'newAlgorithm',
-  closeAlgorithm: 'closeAlgorithm',
+    let:
+    {
+      change,
+    },
+
+    score:
+    {
+      change,
+      create,
+      changeWeights: '',
+    },
+
+    transform:
+    {
+      change,
+      scorePoint: '',
+    }
+    
+  },
+
+  inputs:
+  {
+    move,
+    create,
+    changeKey: '',
+    changeValue: '',
+  },
+
+  results:
+  {
+    move,
+  },
+
+  newAlgorithm: '',
+  closeAlgorithm: '',
 };
 
-ActionTypes.cards.from = makeObject('cards.from', [
-	'changeGroup',
-]);
-ActionTypes.cards.from.join = makeObject('cards.from.join', [
-	'create',
-	'change',
-	'delete',
-]);
+// I tried using this type to correclty classify this function,
+//  but because of how object literals work in TypeScript,
+//  it wasn't useful.
+// Reference: http://stackoverflow.com/questions/22077023/why-cant-i-indirectly-return-an-object-literal-to-satisfy-an-index-signature-re
+// type ObjectOfStrings = { [s: string]: ObjectOfStrings | string };
 
-ActionTypes.cards.select = makeObject('cards.select', [
-	'moveProperty',
-	'createProperty',
-	'deleteProperty',
-	'changeProperty',
-]);
+var setValuesToKeys = (obj: any, prefix: string) =>
+{
+  prefix = prefix + (prefix.length > 0 ? '.' : '');
+  for(var key in obj)
+  {
+    var value = prefix + key;
+    if(typeof obj[key] === 'string')
+    {
+      obj[key] = value;
+    }
+    else if(typeof obj[key] === 'object')
+    {
+      setValuesToKeys(obj[key], value);
+    }
+    else
+    {
+      throw "Value found in ActionTypes that is neither string or object of strings: key: " + key + ", value: " + obj[key];
+    }
+  }
+}
 
-ActionTypes.cards.sort = makeObject('cards.sort', [
-	'change',
-]);
-
-ActionTypes.cards.filter = makeObject('cards.filter', [
-	'create',
- 'change',
- 'delete',
-]);
-
-ActionTypes.cards.let = makeObject('cards.let', [
-  'change',
-]);
-
-ActionTypes.cards.score = makeObject('cards.score', [
-  'change',
-  'create',
-  'changeWeights',
-]);
-
-ActionTypes.cards.transform = makeObject('cards.transform', [
-  'change',
-  'scorePoint',
-]);
-
+setValuesToKeys(ActionTypes, '');
 
 export default ActionTypes;

@@ -90,8 +90,8 @@ const create =
 					(card: CardModels.FromCard, index: number, value: CardModels.Join) => ({card, index, value})
 				),
 
-				delete: createAction<DeleteJoinPayload>(
-					ActionTypes.cards.from.join.delete,
+				remove: createAction<DeleteJoinPayload>(
+					ActionTypes.cards.from.join.remove,
 					(card: any, index: number) => ({card, index})
 				),
 			},
@@ -116,8 +116,8 @@ const create =
 				(card: any, propertyIndex: number, value: string) => ({card, propertyIndex, value})
 			),
 
-			deleteProperty: createAction<DeleteSelectCardPropertyPayload>(
-   	   	ActionTypes.cards.select.deleteProperty,
+			removeProperty: createAction<DeleteSelectCardPropertyPayload>(
+   	   	ActionTypes.cards.select.removeProperty,
       	(card: any, propertyIndex: number) => ({card, propertyIndex})
 			),
 
@@ -178,8 +178,8 @@ const create =
       (card: any, index: number, value: CardModels.Filter) => ({ card, index, value })
      ),
 
-     delete: createAction<DeleteFilterPayload>(
-      ActionTypes.cards.filter.delete,
+     remove: createAction<DeleteFilterPayload>(
+      ActionTypes.cards.filter.remove,
       (card: any, index: number) => ({ card, index })
      ),
     },

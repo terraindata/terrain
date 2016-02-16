@@ -126,7 +126,7 @@ class FromCard extends React.Component<Props, any>
 
     var deleteFn = () =>
     {
-        Actions.dispatch.cards.from.join.delete(this.props.card, index);
+        Actions.dispatch.cards.from.join.remove(this.props.card, index);
     }
 
     return (
