@@ -53,10 +53,10 @@ var fields =
   'id',
   'minPrice',
   'numJobs',
-  'description',
-  'location',
-  'averageResponseTime',
   'avgRating',
+  'averageResponseTime',
+  'location',
+  'description',
 ];
 
 var Result = React.createClass<any, any>({
@@ -102,20 +102,21 @@ var Result = React.createClass<any, any>({
     }
   },
   
-  renderField(field)
+  renderField(field, index)
   {
+    if(index > 3)
+    {
+      return null;
+    }
+    
     return (
       <div className="result-field" key={field}>
         <div className="result-field-name">
           { field }
         </div>
-        <div onClick={this.toggleField} rel={field} className={Util.objToClassname(
-            {
-              "result-field-value": true,
-              "result-field-value-open": this.state.openFields.indexOf(field) !== -1,
-              "result-field-value-short": (field + this.props.data[field]).length < 15,
-            }
-          )}>
+        <div
+          className={'result-field-value ' + ((field + this.props.data[field]).length < 15 ? 'result-field-value-short' : '')}
+          >
           { this.props.data[field] }
         </div>
       </div>

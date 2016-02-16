@@ -35,7 +35,7 @@
       
       background: @light-green;
       color: @dark-gray-green;
-      padding: 5px;
+      padding: 3px;
       box-sizing: border-box;
       font-weight: 500;
       font-size: 12px;
@@ -48,11 +48,13 @@
     }
     
     .result-fields-wrapper {
-		  overflow-y: auto;
+		  overflow-y: hidden;
       height: calc(@result-fields-wrapper-height);
+      padding: 3px;
       
       .result-field {
         border-bottom: 1px solid @off-white;
+        padding: 1px;
         font-size: 12px;
         // margin: 4px;
         
