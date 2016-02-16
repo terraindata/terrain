@@ -110,7 +110,7 @@ class TransformCard extends React.Component<Props, any>
   
   handleWeightChange(newWeights: Weight[])
   {
-    Actions.dispatch.cards.score.changeWeights(this.getScoreCard(), newWeights);
+    Actions.cards.score.changeWeights(this.getScoreCard(), newWeights);
   }
   
   renderWeighter()
@@ -156,7 +156,7 @@ class TransformCard extends React.Component<Props, any>
     
     var handleChange = () =>
     {
-      Actions.dispatch.cards.transform.change(this.props.card, this.refs[inputRef]['value'], this.refs[outputRef]['value']);
+      Actions.cards.transform.change(this.props.card, this.refs[inputRef]['value'], this.refs[outputRef]['value']);
     }
 
     var layout = {

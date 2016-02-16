@@ -76,7 +76,7 @@ class ScoreCard extends React.Component<Props, any>
   
   handleWeightsChange(newWeights)
   {
-    Actions.dispatch.cards.score.changeWeights(this.props.card, newWeights);
+    Actions.cards.score.changeWeights(this.props.card, newWeights);
   }
   
   handleWeightKeyChange(event)
@@ -87,7 +87,7 @@ class ScoreCard extends React.Component<Props, any>
     var newWeights = this.props.card.weights;
     newWeights[index]['key'] = key;
     
-    Actions.dispatch.cards.score.changeWeights(this.props.card, newWeights);
+    Actions.cards.score.changeWeights(this.props.card, newWeights);
   }
   
   renderWeight(weight, index) 
@@ -121,12 +121,12 @@ class ScoreCard extends React.Component<Props, any>
   
   handleOutputChange(event)
   {
-    Actions.dispatch.cards.score.change(this.props.card, this.props.card.method, event.target.value);
+    Actions.cards.score.change(this.props.card, this.props.card.method, event.target.value);
   }
   
   handleMethodChange(index: number)
   {
-    Actions.dispatch.cards.score.change(this.props.card, methods[index], this.props.card.output); 
+    Actions.cards.score.change(this.props.card, methods[index], this.props.card.output); 
   }
   
   renderHeader()

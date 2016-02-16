@@ -62,7 +62,7 @@ test('ActionTypes', (t) => {
 
 test('Actions exports correct features', (t) => {
   // t.ok(Actions.create, 'create');
-  t.ok(Actions.dispatch, 'dispatch');
+  // t.ok(Actions, 'dispatch');
   // t.ok(Actions.types, 'types');
   // t.deepEqual(Actions.types, ActionTypes, 'correct types');
   t.end();
@@ -73,7 +73,7 @@ test('Actions.create', (t) => {
   t.end();
 });
 
-test('Actions.dispatch', (t) => {
+test('Actions', (t) => {
   var containSameKeys = (first, second) => {
     return _.every(first, (val, key) => {
       if(typeof first[key] === 'object' && typeof second[key] === 'object')
@@ -85,7 +85,7 @@ test('Actions.dispatch', (t) => {
     });
   }
   
-  // t.ok(containSameKeys(Actions.create, Actions.dispatch) && containSameKeys(Actions.dispatch, Actions.create),
-  //   'Actions.create and Actions.dispatch have identical key structures');
+  // t.ok(containSameKeys(Actions.create, Actions) && containSameKeys(Actions, Actions.create),
+  //   'Actions.create and Actions have identical key structures');
   t.end();
 });

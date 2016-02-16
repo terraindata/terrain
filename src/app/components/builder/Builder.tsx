@@ -74,7 +74,7 @@ class Builder extends React.Component<any, any>
   }
   
   handleNewAlgorithmTab() {
-    Actions.dispatch.newAlgorithm();
+    Actions.newAlgorithm();
   }
   
 	render() {
@@ -101,7 +101,7 @@ class Builder extends React.Component<any, any>
       
       var closeFn = () => 
       {
-        Actions.dispatch.closeAlgorithm(algorithmId);
+        Actions.closeAlgorithm(algorithmId);
       }
 
       tabs[algorithmId] = {

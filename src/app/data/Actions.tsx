@@ -52,148 +52,146 @@ var $ = (type: string, payload: any) => Store.dispatch({type, payload})
 
 var Actions =
 {
-	dispatch: {
-    cards:
-    {
-      create:
-        (algorithmId: string, type: string, index: number) => 
-          $(ActionTypes.cards.create, {algorithmId, type, index}),
+  cards:
+  {
+    create:
+      (algorithmId: string, type: string, index: number) => 
+        $(ActionTypes.cards.create, {algorithmId, type, index}),
 
-      move: 
-        (card: CardModels.Card, index: number) =>
-          $(ActionTypes.cards.move, {card, index}),
-      
-      remove: 
-        (card: CardModels.Card) =>
-          $(ActionTypes.cards.remove, {card}),
-
-      from:
-      {
-        changeGroup: 
-          (card: CardModels.FromCard, value: Group) =>
-            $(ActionTypes.cards.from.changeGroup, {card, value}),
-
-        join:
-        {
-          create: 
-            (card: CardModels.FromCard) =>
-              $(ActionTypes.cards.from.join.create, {card}),
-
-          change: 
-            (card: CardModels.FromCard, index: number, value: CardModels.Join) =>
-              $(ActionTypes.cards.from.join.change, {card, index, value}),
-
-          remove: 
-            (card: CardModels.FromCard, index: number) =>
-              $(ActionTypes.cards.from.join.remove, {card, index}),
-        },
-      },
-      
-      sort: {
-        change: 
-          (card: CardModels.SortCard, value: CardModels.Sort) =>
-            $(ActionTypes.cards.sort.change, {card, value}),
-      },
-
-      select:
-      {
-        moveProperty: 
-          (card: CardModels.SelectCard, propertyIndex: number, index: number) =>
-            $(ActionTypes.cards.select.moveProperty, {card, propertyIndex, index}),
-
-        changeProperty: 
-          (card: CardModels.SelectCard, propertyIndex: number, value: string) =>
-            $(ActionTypes.cards.select.changeProperty, {card, propertyIndex, value}),
-
-        removeProperty: 
-            (card: CardModels.SelectCard, propertyIndex: number) =>
-              $(ActionTypes.cards.select.removeProperty, {card, propertyIndex}),
-
-        createProperty: 
-          (card: CardModels.SelectCard, propertyIndex?: number) =>
-            $(ActionTypes.cards.select.createProperty, {card, propertyIndex}),
-      },
-      
-      let:
-      {
-        change: 
-          (card: CardModels.LetCard, field: string, expression: string) =>
-            $(ActionTypes.cards.let.change, {card, field, expression}),
-      },
-      
-      transform:
-      {
-        change: 
-          (card: CardModels.TransformCard, input: string, output: string) =>
-            $(ActionTypes.cards.transform.change, {card, input, output}),
-        
-        scorePoint: 
-          (card: CardModels.TransformCard, scorePointId: string, scorePointScore: any) =>
-            $(ActionTypes.cards.transform.scorePoint, {card, scorePointId, scorePointScore}),
-      },
-      
-      score:
-      {
-        changeWeights: 
-          (card: CardModels.ScoreCard, weights: {weight:number, key:string}[]) =>
-            $(ActionTypes.cards.score.changeWeights, {card, weights}),
-        
-        change: 
-          (card: CardModels.ScoreCard, method: string, output: string) =>
-            $(ActionTypes.cards.score.change, {card, method, output}),
-        
-        create: 
-          (card: CardModels.ScoreCard) =>
-            $(ActionTypes.cards.score.create, {card}),
-      },
-
-      filter:
-      {
-       create: 
-        (card: CardModels.FilterCard, index?: number) =>
-          $(ActionTypes.cards.filter.create, { card, index }),
-
-       change: 
-        (card: CardModels.FilterCard, index: number, value: CardModels.Filter) =>
-          $(ActionTypes.cards.filter.change, { card, index, value }),
-
-       remove: 
-        (card: CardModels.FilterCard, index: number) =>
-          $(ActionTypes.cards.filter.remove, { card, index }),
-      },
-    }, // /cards
-
-    inputs:
-    {
-      create: 
-        (input: any, index: number) =>
-          $(ActionTypes.inputs.create, {input, index}),
-
-      move: 
-        (input: any, index: number) =>
-          $(ActionTypes.inputs.move, {input, index}),
-
-      changeKey: 
-        (input: any, value: string) =>
-          $(ActionTypes.inputs.changeKey, {input, value}),
-
-      changeValue: 
-        (input: any, value: string) =>
-          $(ActionTypes.inputs.changeValue, {input, value}),
-    }, // /inputs
-
-    moveResult: 
-      (result: any, index: number) =>
-        $(ActionTypes.results.move, {result, index}),
-
-    newAlgorithm: 
-      () =>
-        $(ActionTypes.newAlgorithm, {}),
+    move: 
+      (card: CardModels.Card, index: number) =>
+        $(ActionTypes.cards.move, {card, index}),
     
-    closeAlgorithm: 
-      (algorithmId: string) =>
-        $(ActionTypes.closeAlgorithm, {algorithmId}),
-  }
+    remove: 
+      (card: CardModels.Card) =>
+        $(ActionTypes.cards.remove, {card}),
+
+    from:
+    {
+      changeGroup: 
+        (card: CardModels.FromCard, value: Group) =>
+          $(ActionTypes.cards.from.changeGroup, {card, value}),
+
+      join:
+      {
+        create: 
+          (card: CardModels.FromCard) =>
+            $(ActionTypes.cards.from.join.create, {card}),
+
+        change: 
+          (card: CardModels.FromCard, index: number, value: CardModels.Join) =>
+            $(ActionTypes.cards.from.join.change, {card, index, value}),
+
+        remove: 
+          (card: CardModels.FromCard, index: number) =>
+            $(ActionTypes.cards.from.join.remove, {card, index}),
+      },
+    },
+    
+    sort: {
+      change: 
+        (card: CardModels.SortCard, value: CardModels.Sort) =>
+          $(ActionTypes.cards.sort.change, {card, value}),
+    },
+
+    select:
+    {
+      moveProperty: 
+        (card: CardModels.SelectCard, propertyIndex: number, index: number) =>
+          $(ActionTypes.cards.select.moveProperty, {card, propertyIndex, index}),
+
+      changeProperty: 
+        (card: CardModels.SelectCard, propertyIndex: number, value: string) =>
+          $(ActionTypes.cards.select.changeProperty, {card, propertyIndex, value}),
+
+      removeProperty: 
+          (card: CardModels.SelectCard, propertyIndex: number) =>
+            $(ActionTypes.cards.select.removeProperty, {card, propertyIndex}),
+
+      createProperty: 
+        (card: CardModels.SelectCard, propertyIndex?: number) =>
+          $(ActionTypes.cards.select.createProperty, {card, propertyIndex}),
+    },
+    
+    let:
+    {
+      change: 
+        (card: CardModels.LetCard, field: string, expression: string) =>
+          $(ActionTypes.cards.let.change, {card, field, expression}),
+    },
+    
+    transform:
+    {
+      change: 
+        (card: CardModels.TransformCard, input: string, output: string) =>
+          $(ActionTypes.cards.transform.change, {card, input, output}),
+      
+      scorePoint: 
+        (card: CardModels.TransformCard, scorePointId: string, scorePointScore: any) =>
+          $(ActionTypes.cards.transform.scorePoint, {card, scorePointId, scorePointScore}),
+    },
+    
+    score:
+    {
+      changeWeights: 
+        (card: CardModels.ScoreCard, weights: {weight:number, key:string}[]) =>
+          $(ActionTypes.cards.score.changeWeights, {card, weights}),
+      
+      change: 
+        (card: CardModels.ScoreCard, method: string, output: string) =>
+          $(ActionTypes.cards.score.change, {card, method, output}),
+      
+      create: 
+        (card: CardModels.ScoreCard) =>
+          $(ActionTypes.cards.score.create, {card}),
+    },
+
+    filter:
+    {
+     create: 
+      (card: CardModels.FilterCard, index?: number) =>
+        $(ActionTypes.cards.filter.create, { card, index }),
+
+     change: 
+      (card: CardModels.FilterCard, index: number, value: CardModels.Filter) =>
+        $(ActionTypes.cards.filter.change, { card, index, value }),
+
+     remove: 
+      (card: CardModels.FilterCard, index: number) =>
+        $(ActionTypes.cards.filter.remove, { card, index }),
+    },
+  }, // /cards
+
+  inputs:
+  {
+    create: 
+      (input: any, index: number) =>
+        $(ActionTypes.inputs.create, {input, index}),
+
+    move: 
+      (input: any, index: number) =>
+        $(ActionTypes.inputs.move, {input, index}),
+
+    changeKey: 
+      (input: any, value: string) =>
+        $(ActionTypes.inputs.changeKey, {input, value}),
+
+    changeValue: 
+      (input: any, value: string) =>
+        $(ActionTypes.inputs.changeValue, {input, value}),
+  }, // /inputs
+
+  moveResult: 
+    (result: any, index: number) =>
+      $(ActionTypes.results.move, {result, index}),
+
+  newAlgorithm: 
+    () =>
+      $(ActionTypes.newAlgorithm, {}),
+  
+  closeAlgorithm: 
+    (algorithmId: string) =>
+      $(ActionTypes.closeAlgorithm, {algorithmId}),
 
 };
 

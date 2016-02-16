@@ -67,7 +67,7 @@ var InputsArea = React.createClass<any, any>({
 
 		var moveTo = (curIndex, newIndex) =>
     {
-      Actions.dispatch.inputs.move(this.props.inputs[curIndex], newIndex);
+      Actions.inputs.move(this.props.inputs[curIndex], newIndex);
     };
 
 		return <LayoutManager layout={layout} moveTo={moveTo} />;

@@ -66,17 +66,17 @@ class SelectCard extends React.Component<Props, any>
 
 		var moveFn = (curIndex, newIndex) =>
     {
-      Actions.dispatch.cards.select.moveProperty(this.props.card, curIndex, newIndex);
+      Actions.cards.select.moveProperty(this.props.card, curIndex, newIndex);
     }
 
     var changeFnFactory = (index) => (event) =>
     {
-    	Actions.dispatch.cards.select.changeProperty(this.props.card, index, event.target.value);
+    	Actions.cards.select.changeProperty(this.props.card, index, event.target.value);
     }
 
     var deleteFnFactory = (index) => () =>
     {
-    	Actions.dispatch.cards.select.removeProperty(this.props.card, index);
+    	Actions.cards.select.removeProperty(this.props.card, index);
     }
 
 		var layout = {

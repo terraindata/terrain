@@ -82,7 +82,7 @@ class FromCard extends React.Component<Props, any>
         var second = this.refs[secondRef]['value'];
         var operator = this.refs[operatorRef]['value'];
         
-        Actions.dispatch.cards.from.join.change(this.props.card, index, {
+        Actions.cards.from.join.change(this.props.card, index, {
           group: group,
           comparison:
           {
@@ -126,7 +126,7 @@ class FromCard extends React.Component<Props, any>
 
     var deleteFn = () =>
     {
-        Actions.dispatch.cards.from.join.remove(this.props.card, index);
+        Actions.cards.from.join.remove(this.props.card, index);
     }
 
     return (
@@ -143,7 +143,7 @@ class FromCard extends React.Component<Props, any>
 	render() {
     var handleChange = (event) => 
     {
-      Actions.dispatch.cards.from.changeGroup(this.props.card, event.target.value);
+      Actions.cards.from.changeGroup(this.props.card, event.target.value);
     }
 
     var joinContent = null;

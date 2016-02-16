@@ -72,7 +72,7 @@ class LetCard extends React.Component<Props, any>
     
     var handleChange = () =>
     {
-      Actions.dispatch.cards.let.change(this.props.card,
+      Actions.cards.let.change(this.props.card,
         this.refs[fieldRef]['value'],
         this.refs[expressionRef]['value']);
     }

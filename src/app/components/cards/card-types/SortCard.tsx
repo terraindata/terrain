@@ -70,7 +70,7 @@ class SortCard extends React.Component<Props, any>
     
     var handleChange = () =>
     {
-      Actions.dispatch.cards.sort.change(this.props.card, {
+      Actions.cards.sort.change(this.props.card, {
         property: this.refs[propertyRef]['value'],
         direction: this.refs[dropdownRef]['value']
       });

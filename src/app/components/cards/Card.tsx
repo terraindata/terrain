@@ -100,7 +100,7 @@ var Card = React.createClass({
   
   handleDelete()
   {
-    Actions.dispatch.cards.remove(this.props.card);
+    Actions.cards.remove(this.props.card);
   },
   
   handleCopy()
@@ -124,7 +124,7 @@ var Card = React.createClass({
 					content: '+',
 					onClick: () => 
 					{
-						Actions.dispatch.cards.select.createProperty(this.props.card);
+						Actions.cards.select.createProperty(this.props.card);
 					},
 				};
 
@@ -136,7 +136,7 @@ var Card = React.createClass({
 					content: '+',
 					onClick: () => 
 					{
-						Actions.dispatch.cards.from.join.create(this.props.card);
+						Actions.cards.from.join.create(this.props.card);
 					},
 				};
 
@@ -151,7 +151,7 @@ var Card = React.createClass({
           content: '+',
           onClick: () => 
           {
-            Actions.dispatch.cards.filter.create(this.props.card);
+            Actions.cards.filter.create(this.props.card);
           },
         };
       break;
@@ -166,7 +166,7 @@ var Card = React.createClass({
       subBar =
       {
         content: '+',
-        onClick: () => Actions.dispatch.cards.score.create(this.props.card),
+        onClick: () => Actions.cards.score.create(this.props.card),
       }
       break;
 		}

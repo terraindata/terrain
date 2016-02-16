@@ -80,7 +80,7 @@ class FilterCard extends React.Component<Props, any>
         var second = this.refs[secondRef]['value'];
         var operator = this.refs[operatorRef]['value'];
         
-        Actions.dispatch.cards.filter.change(this.props.card, index, {
+        Actions.cards.filter.change(this.props.card, index, {
           comparison:
           {
               operator: operator,
@@ -117,7 +117,7 @@ class FilterCard extends React.Component<Props, any>
 
     var deleteFn = () =>
     {
-        Actions.dispatch.cards.filter.remove(this.props.card, index);
+        Actions.cards.filter.remove(this.props.card, index);
     }
 
     return (

@@ -155,7 +155,7 @@ class TransformCardChart extends React.Component<Props, any>
   
   onPointMove(scorePointId, newScore) {
     newScore = Util.valueMinMax(newScore, 0, 1);
-    Actions.dispatch.cards.transform.scorePoint(this.props.card, scorePointId, newScore);
+    Actions.cards.transform.scorePoint(this.props.card, scorePointId, newScore);
   }
   
   getChartState(overrideState?: any) {

@@ -79,7 +79,7 @@ var CardsArea = React.createClass<any, any>({
 
 		var moveTo = (curIndex, newIndex) =>
     {
-      Actions.dispatch.cards.move(this.props.cards[curIndex], newIndex);
+      Actions.cards.move(this.props.cards[curIndex], newIndex);
     };
 
 		return <LayoutManager layout={layout} moveTo={moveTo} />;

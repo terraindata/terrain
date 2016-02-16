@@ -67,12 +67,12 @@ var Input = React.createClass<any, any>({
 
 	changeKey(event)
 	{
-		Actions.dispatch.inputs.changeKey(this.props.input, event.target.value);
+		Actions.inputs.changeKey(this.props.input, event.target.value);
 	},
 
 	changeValue(event)
 	{
-		Actions.dispatch.inputs.changeValue(this.props.input, event.target.value);
+		Actions.inputs.changeValue(this.props.input, event.target.value);
 	},
 
 	render() {
