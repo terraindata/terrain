@@ -181,9 +181,12 @@ var Actions =
         $(ActionTypes.inputs.changeValue, {input, value}),
   }, // /inputs
 
-  moveResult: 
-    (result: any, index: number) =>
-      $(ActionTypes.results.move, {result, index}),
+  results:
+  {
+    move:
+      (result: any, index: number) =>
+        $(ActionTypes.results.move, {result, index}),
+  },
 
   newAlgorithm: 
     () =>

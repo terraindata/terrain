@@ -60,19 +60,6 @@ test('ActionTypes', (t) => {
   t.end();
 });
 
-test('Actions exports correct features', (t) => {
-  // t.ok(Actions.create, 'create');
-  // t.ok(Actions, 'dispatch');
-  // t.ok(Actions.types, 'types');
-  // t.deepEqual(Actions.types, ActionTypes, 'correct types');
-  t.end();
-});
-
-test('Actions.create', (t) => {
-  // t.ok(onlyContainsType(Actions.create, 'function'), 'Actions.create only contains functions');
-  t.end();
-});
-
 test('Actions', (t) => {
   var containSameKeys = (first, second) => {
     return _.every(first, (val, key) => {
@@ -81,11 +68,11 @@ test('Actions', (t) => {
         return containSameKeys(first[key], second[key]);
       }
       
-      return typeof first[key] === typeof second[key];
+      return typeof second[key] === 'function';
     });
   }
   
-  // t.ok(containSameKeys(Actions.create, Actions) && containSameKeys(Actions, Actions.create),
-  //   'Actions.create and Actions have identical key structures');
+  t.ok(containSameKeys(ActionTypes, Actions),
+    'There is an action for every action type.');
   t.end();
 });
