@@ -42,58 +42,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
 var Immutable = require('immutable');
-import * as ReduxActions from 'redux-actions';
+import ActionTypes from './../../ActionTypes.tsx';
+import Util from './../../../util/Util.tsx';
+import { CardModels } from './../../../models/CardModels.tsx';
 
-var Redux = require('redux');
-import ActionTypes from './ActionTypes.tsx';
-import Util from '../util/Util.tsx';
+var TransformCardReducer = {};
 
-import { CardModels } from './../models/CardModels.tsx';
+TransformCardReducer[ActionTypes.cards.transform.scorePoint] =
+  Util.updateCardField('scorePoints', (scorePoints, action) => 
+    scorePoints.setIn(
+      [
+        scorePoints.findIndex((scorePoint) => scorePoint.get('id') === action.payload.scorePointId),
+        'score',
+      ],
+      action.payload.scorePointScore));
 
-var defaultStateJson = require('./json/_state.json');
+TransformCardReducer[ActionTypes.cards.transform.change] =
+  Util.setCardFields(['input', 'output']);
 
-_.map(defaultStateJson, (algorithm, algorithmId) => {
-  algorithm.cards = algorithm.cards.map((card) => {
-    var card = _.extend(card, {algorithmId: algorithmId});
-    if(card.type === 'transform')
-    {
-      Util.populateTransformDummyData(card);
-    }
-    return card;
-  });
-  
-  algorithm.inputs.map((input) => input.algorithmId = algorithmId);
-  algorithm.results.map((result) => result.algorithmId = algorithmId);
-});
-
-var DefaultState = Immutable.fromJS(defaultStateJson);
-
-import AlgorithmReducer from './reducers/builder/AlgorithmReducer.tsx';
-import InputsReducer from './reducers/builder/InputsReducer.tsx';
-import ResultsReducer from './reducers/builder/ResultsReducer.tsx';
-import CardsReducer from './reducers/builder/CardsReducer.tsx';
-import FromCardReducer from './reducers/builder/FromCardReducer.tsx';
-import ScoreCardReducer from './reducers/builder/ScoreCardReducer.tsx';
-import LetCardReducer from './reducers/builder/LetCardReducer.tsx';
-import SortCardReducer from './reducers/builder/SortCardReducer.tsx';
-import FilterCardReducer from './reducers/builder/FilterCardReducer.tsx';
-import SelectCardReducer from './reducers/builder/SelectCardReducer.tsx';
-import TransformCardReducer from './reducers/builder/TransformCardReducer.tsx';
-
-let Store = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  AlgorithmReducer,
-  ResultsReducer,
-  CardsReducer,
-  FromCardReducer,
-  InputsReducer,
-  ScoreCardReducer,
-  LetCardReducer,
-  SortCardReducer,
-  FilterCardReducer,
-  SelectCardReducer,
-  TransformCardReducer,
-{})), DefaultState);
-
-export default Store;
+export default TransformCardReducer;

@@ -62,7 +62,6 @@ var CardsArea = React.createClass<any, any>({
 			rows: this.props.cards.map((card, index) => {
 				return {
 					content: <Card 
-            name={card.name}
             index={index}
             card={card}
             {...this.props} />,

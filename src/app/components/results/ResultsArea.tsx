@@ -78,7 +78,7 @@ var ResultsArea = React.createClass<any, any>({
 
 		var moveTo = (curIndex, newIndex) =>
     {
-      Actions.moveResult(this.props.results[curIndex], newIndex);
+      Actions.results.move(this.props.results[curIndex], newIndex);
     };
 
 		return <LayoutManager layout={layout} moveTo={moveTo} />;

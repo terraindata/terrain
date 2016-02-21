@@ -52,7 +52,7 @@ import { Directions } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 
 interface Props {
-  card: CardModels.SortCard;
+  card: CardModels.ISortCard;
 }
 
 class SortCard extends React.Component<Props, any>

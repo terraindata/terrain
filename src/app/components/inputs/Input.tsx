@@ -45,8 +45,9 @@ THE SOFTWARE.
 require('./Input.less');
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/Actions.tsx";
+import PanelMixin from '../layout/PanelMixin.tsx';
+import ThrottledInput from "../common/ThrottledInput.tsx";
 
 var Input = React.createClass<any, any>({
 	mixins: [PanelMixin],
@@ -54,6 +55,7 @@ var Input = React.createClass<any, any>({
 	propTypes:
 	{
 		input: React.PropTypes.object.isRequired,
+    index: React.PropTypes.number.isRequired,
 	},
 
 	getDefaultProps() 
@@ -64,23 +66,23 @@ var Input = React.createClass<any, any>({
 			reorderOnDrag: true,
 		};
 	},
-
-	changeKey(event)
+  
+	changeKey(value: string)
 	{
-		Actions.inputs.changeKey(this.props.input, event.target.value);
+		Actions.inputs.changeKey(this.props.input, value, this.props.index);
 	},
 
-	changeValue(event)
+	changeValue(value: string)
 	{
-		Actions.inputs.changeValue(this.props.input, event.target.value);
+		Actions.inputs.changeValue(this.props.input, value, this.props.index);
 	},
 
 	render() {
 		return this.renderPanel((
 			<div className='input'>
 				<div className='input-inner'>
-					<input type="text" value={this.props.input.key} onChange={this.changeKey} className="input-text input-text-first" />
-					<input type="text" value={this.props.input.value} onChange={this.changeValue} className="input-text input-text-second" />
+					<ThrottledInput value={this.props.input.key} onChange={this.changeKey} className="input-text input-text-first" />
+					<ThrottledInput value={this.props.input.value} onChange={this.changeValue} className="input-text input-text-second" />
 				</div>
 			</div>
 			));

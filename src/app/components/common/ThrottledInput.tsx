@@ -43,57 +43,72 @@ THE SOFTWARE.
 */
 
 var _ = require('underscore');
-var Immutable = require('immutable');
-import * as ReduxActions from 'redux-actions';
 
-var Redux = require('redux');
-import ActionTypes from './ActionTypes.tsx';
-import Util from '../util/Util.tsx';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import Util from '../../util/Util.tsx';
 
-import { CardModels } from './../models/CardModels.tsx';
+interface Props
+{
+  value: string;
+  onChange: (value: string, event?: any) => void;
+  placeholder?: string;
+  ref?: string;
+  className?: string;
+  type?: string;
+  rel?: string;
+}
 
-var defaultStateJson = require('./json/_state.json');
-
-_.map(defaultStateJson, (algorithm, algorithmId) => {
-  algorithm.cards = algorithm.cards.map((card) => {
-    var card = _.extend(card, {algorithmId: algorithmId});
-    if(card.type === 'transform')
-    {
-      Util.populateTransformDummyData(card);
-    }
-    return card;
-  });
+class ThrottledInput extends React.Component<Props, any>
+{
+  value: string;
   
-  algorithm.inputs.map((input) => input.algorithmId = algorithmId);
-  algorithm.results.map((result) => result.algorithmId = algorithmId);
-});
+  constructor(props: Props) {
+    super(props);
+    
+    // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
+    this.executeChange = _.debounce(this.executeChange, 750);
+    Util.bind(this, ['executeChange', 'handleChange']);
+    
+    this.value = props.value;
+  }
+  
+  componentWillReceiveProps(newProps)
+  {
+    if(ReactDOM.findDOMNode(this) !== document.activeElement)
+    {
+      // if not focused, then update the value
+      ReactDOM.findDOMNode(this)['value'] = newProps.value;
+    }
+  }
+  
+  // throttled event handler
+  executeChange(event)
+  {
+    this.value = event.target.value;
+    this.props.onChange(event.target.value, event);
+  }
+  
+  // persists the event and calls the throttled handler
+  // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js/24679479#24679479
+  handleChange(event)
+  {
+    event.persist();
+    this.executeChange(event);
+  }
+  
+  render() {
+    return (
+      <input
+        type={ this.props.type || 'text' }
+        defaultValue={ this.props.value }
+        onChange={this.handleChange}
+        className={this.props.className}
+        placeholder={this.props.placeholder}
+        rel={this.props.rel}
+        />
+    );
+  }
+};
 
-var DefaultState = Immutable.fromJS(defaultStateJson);
-
-import AlgorithmReducer from './reducers/builder/AlgorithmReducer.tsx';
-import InputsReducer from './reducers/builder/InputsReducer.tsx';
-import ResultsReducer from './reducers/builder/ResultsReducer.tsx';
-import CardsReducer from './reducers/builder/CardsReducer.tsx';
-import FromCardReducer from './reducers/builder/FromCardReducer.tsx';
-import ScoreCardReducer from './reducers/builder/ScoreCardReducer.tsx';
-import LetCardReducer from './reducers/builder/LetCardReducer.tsx';
-import SortCardReducer from './reducers/builder/SortCardReducer.tsx';
-import FilterCardReducer from './reducers/builder/FilterCardReducer.tsx';
-import SelectCardReducer from './reducers/builder/SelectCardReducer.tsx';
-import TransformCardReducer from './reducers/builder/TransformCardReducer.tsx';
-
-let Store = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  AlgorithmReducer,
-  ResultsReducer,
-  CardsReducer,
-  FromCardReducer,
-  InputsReducer,
-  ScoreCardReducer,
-  LetCardReducer,
-  SortCardReducer,
-  FilterCardReducer,
-  SelectCardReducer,
-  TransformCardReducer,
-{})), DefaultState);
-
-export default Store;
+export default ThrottledInput;

@@ -51,8 +51,9 @@ interface Props
 {
   options: string[];
   selectedIndex: number;
-  onChange: (index: number) => void;
+  onChange: (index: number, event?: any) => void;
   ref?: string;
+  rel?: string;
   circle?: boolean;
 }
 
@@ -79,7 +80,9 @@ class Dropdown extends React.Component<Props, any>
     
     var handleClick = () => {
       this.value = index;
-      this.props.onChange(index);
+      this.props.onChange(index, {
+        target: ReactDOM.findDOMNode(this)
+      });
     }
     return (
       <div className="dropdown-option" key={index} onClick={handleClick}>
@@ -128,7 +131,7 @@ class Dropdown extends React.Component<Props, any>
     });
     
     return (
-      <div className={classes}>
+      <div className={classes} rel={this.props.rel}>
         { this.state.up ? (
           <div className="dropdown-options-wrapper">
             {

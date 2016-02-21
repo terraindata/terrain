@@ -53,7 +53,7 @@ import { CardModels } from './../../../models/CardModels.tsx';
 
 interface Props
 {
-  card: CardModels.FilterCard;
+  card: CardModels.IFilterCard;
 }
 
 var OPERATOR_WIDTH: number = 20;
@@ -67,7 +67,7 @@ class FilterCard extends React.Component<Props, any>
     this.renderFilter = this.renderFilter.bind(this);
   }
 
-  renderFilter(filter: CardModels.Filter, index: number)
+  renderFilter(filter: CardModels.IFilter, index: number)
   {
     var refBase = 'filter-ref-' + index + '-' + this.props.card.id + '-';
     var operatorRef = refBase + 'operator';
@@ -87,6 +87,7 @@ class FilterCard extends React.Component<Props, any>
               first: first,
               second: second,
           },
+          id: filter.id,
         });
     }
 
@@ -122,7 +123,7 @@ class FilterCard extends React.Component<Props, any>
 
     return (
       <CardField
-        key={index}
+        key={filter.id}
         draggable={false}
         removable={true}
         onDelete={deleteFn} >

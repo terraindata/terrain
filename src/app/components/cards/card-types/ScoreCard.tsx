@@ -57,7 +57,7 @@ import { CardModels } from './../../../models/CardModels.tsx';
 import { Weight, Weighter } from '../../../charts/Weighter.tsx';
 
 interface Props {
-  card: CardModels.ScoreCard;
+  card: CardModels.IScoreCard;
   algorithmId: string;
 }
 
@@ -82,7 +82,7 @@ class ScoreCard extends React.Component<Props, any>
   handleWeightKeyChange(event)
   {
     var key = event.target.value;
-    var index = ReactDOM.findDOMNode(event.target).getAttribute('rel');
+    var index = Util.rel(event.target);
     
     var newWeights = this.props.card.weights;
     newWeights[index]['key'] = key;

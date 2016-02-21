@@ -51,7 +51,7 @@ import { CardModels } from './../../../models/CardModels.tsx';
 import Periscope from '../../../charts/Periscope.tsx';
 
 interface Props {
-  card: CardModels.TransformCard;
+  card: CardModels.ITransformCard;
   barsData: any;
   domain: any;
   barColor: string;

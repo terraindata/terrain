@@ -51,7 +51,7 @@ import CardField from './../CardField.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 
 interface Props {
-  card: CardModels.SelectCard;
+  card: CardModels.ISelectCard;
 }
 
 class SelectCard extends React.Component<Props, any>
@@ -66,23 +66,28 @@ class SelectCard extends React.Component<Props, any>
 
 		var moveFn = (curIndex, newIndex) =>
     {
-      Actions.cards.select.moveProperty(this.props.card, curIndex, newIndex);
+      Actions.cards.select.move(this.props.card, this.props.card.properties[curIndex], newIndex);
     }
 
     var changeFnFactory = (index) => (event) =>
     {
-    	Actions.cards.select.changeProperty(this.props.card, index, event.target.value);
+    	Actions.cards.select.change(this.props.card, index, 
+        {
+          property: event.target.value,
+          id: this.props.card.properties[index].id,
+        });
     }
 
     var deleteFnFactory = (index) => () =>
     {
-    	Actions.cards.select.removeProperty(this.props.card, index);
+    	Actions.cards.select.remove(this.props.card, index);
     }
 
 		var layout = {
 			reorderable: true,
-			rows: properties.map((property, index) => {
+			rows: properties.map((property: CardModels.IProperty, index) => {
         return {
+          key: property.id,
           content: (
             <CardField
     					onDelete={deleteFnFactory(index)}
@@ -91,7 +96,7 @@ class SelectCard extends React.Component<Props, any>
               drag_y={true}
     					dragInsideOnly={true}>
               <input type="text" 
-                value={property}
+                value={property.property}
                 onChange={changeFnFactory(index)} />
             </CardField>
           ),

@@ -42,10 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
+import ThrottledInput from "../../common/ThrottledInput.tsx";
 import CardField from './../CardField.tsx';
 import Dropdown from './../../common/Dropdown.tsx';
 import { Operators } from './../../../CommonVars.tsx';
@@ -53,7 +55,8 @@ import { Operators } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 
 interface Props {
-  card: CardModels.FromCard;
+  card: CardModels.IFromCard;
+  index: number;
 }
 
 var OPERATOR_WIDTH: number = 30;
@@ -64,60 +67,66 @@ class FromCard extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
-    this.renderJoin = this.renderJoin.bind(this);
+    Util.bind(this, ['renderJoin', 'handleGroupChange', 'handleJoinChange']);
+  }
+  
+  handleJoinChange(joinValue, event)
+  {
+    var index = parseInt(Util.rel(event.target), 10);
+    var refBase = index + '-';
+    
+    var group = this.refs[refBase + 'group']['value'];
+    var first = this.refs[refBase + 'first']['value'];
+    var second = this.refs[refBase + 'second']['value'];
+    var operator = this.refs[refBase + 'operator']['value'];
+    
+    Actions.cards.from.join.change(this.props.card, index, {
+      group: group,
+      comparison:
+      {
+        first: first,
+        second: second,
+        operator: operator,
+      },
+      id: this.props.card.joins[index].id,
+    });
   }
 
-  renderJoin(join: CardModels.Join, index: number)
+  renderJoin(join: CardModels.IJoin, index: number)
   {
-    var refBase = 'join-ref-' + index + '-' + this.props.card.id + '-';
+    var refBase = index + '-';
     var groupRef = refBase + 'group';
     var firstRef = refBase + 'first';
     var secondRef = refBase + 'second';
     var operatorRef = refBase + 'operator';
 
-    var changeJoin = () =>
-    {
-        var group = this.refs[groupRef]['value'];
-        var first = this.refs[firstRef]['value'];
-        var second = this.refs[secondRef]['value'];
-        var operator = this.refs[operatorRef]['value'];
-        
-        Actions.cards.from.join.change(this.props.card, index, {
-          group: group,
-          comparison:
-          {
-            first: first,
-            second: second,
-            operator: operator,
-          }
-        });
-    }
+    var rel = index + "";
 
     var joinLayout =
     {
       columns: [
         {
           content: (
-            <input type='text' value={join.group} onChange={changeJoin} ref={groupRef} />
+            <ThrottledInput value={join.group} onChange={this.handleJoinChange} ref={groupRef} rel={rel} />
           ),
           colSpan: 2,
         },
         {
           content: (
-            <input type='text' value={join.comparison.first} onChange={changeJoin} ref={firstRef} />
+            <ThrottledInput value={join.comparison.first} onChange={this.handleJoinChange} ref={firstRef} rel={rel} />
           ),
         },
         {
           content: (
             <div>
-             <Dropdown ref={operatorRef} circle={true} options={Operators} selectedIndex={join.comparison.operator} onChange={changeJoin} />
+             <Dropdown ref={operatorRef} circle={true} options={Operators} selectedIndex={join.comparison.operator} onChange={this.handleJoinChange} rel={rel} />
             </div>
           ),
           width: OPERATOR_WIDTH,
         },
         {
           content: (
-            <input type='text' value={join.comparison.second} onChange={changeJoin} ref={secondRef} />
+            <ThrottledInput value={join.comparison.second} onChange={this.handleJoinChange} ref={secondRef} rel={rel} />
           ),
         }
       ],
@@ -131,7 +140,7 @@ class FromCard extends React.Component<Props, any>
 
     return (
       <CardField
-        key={index}
+        key={join.id}
         draggable={false}
         removable={true}
         onDelete={deleteFn} >
@@ -139,30 +148,25 @@ class FromCard extends React.Component<Props, any>
       </CardField>
     );
   }
+  
+  handleGroupChange(value)
+  {
+    Actions.cards.from.changeGroup(this.props.card, value, this.props.index);
+  }
 
 	render() {
-    var handleChange = (event) => 
-    {
-      Actions.cards.from.changeGroup(this.props.card, event.target.value);
-    }
-
-    var joinContent = null;
-    if (this.props.card.joins) 
-    {
-        joinContent = this.props.card.joins.map(this.renderJoin);
-    }
-
 		return (
       <div>
         <CardField
           draggable={false}
           removable={false}
           drag_y={true}>
-          <input type="text" 
+          <ThrottledInput
             value={this.props.card.group}
-            onChange={handleChange} />
+            onChange={this.handleGroupChange}
+            placeholder='Enter group name' />
         </CardField>
-        { joinContent }
+        { this.props.card.joins.map(this.renderJoin) }
       </div>
 		);
 	}

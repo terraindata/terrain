@@ -90,10 +90,10 @@ var ActionTypes =
     },
 
     select: {
-    	createProperty: '',
-      changeProperty: '',
-      moveProperty: '',
-    	removeProperty: '',
+    	create,
+      change,
+      move,
+      remove,
     },
 
     sort:
@@ -130,10 +130,11 @@ var ActionTypes =
 
   inputs:
   {
-    move,
     create,
     changeKey: '',
     changeValue: '',
+    move,
+    remove,
   },
 
   results:

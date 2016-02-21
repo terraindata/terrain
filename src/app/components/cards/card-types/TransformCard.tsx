@@ -60,9 +60,9 @@ import TransformCardChart from './TransformCardChart.tsx';
 import TransformCardPeriscope from './TransformCardPeriscope.tsx';
 
 interface Props {
-  card: CardModels.TransformCard;
+  card: CardModels.ITransformCard;
   algorithmId: string;
-  cards: CardModels.Card[];
+  cards: CardModels.ICard[];
 }
 
 class TransformCard extends React.Component<Props, any>
@@ -95,14 +95,14 @@ class TransformCard extends React.Component<Props, any>
     });
   }
   
-  getScoreCard():CardModels.ScoreCard {
-    var scoreCard: CardModels.Card = this.props.cards.find((card) => 
+  getScoreCard():CardModels.IScoreCard {
+    var scoreCard: CardModels.ICard = this.props.cards.find((card) => 
       card.type === 'score' && 
       card['weights'].find((weight) => weight.key === this.props.card.output));
     
     if(scoreCard)
     {
-      return scoreCard as CardModels.ScoreCard;
+      return scoreCard as CardModels.IScoreCard;
     }
     
     return null;

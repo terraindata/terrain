@@ -44,16 +44,6 @@ THE SOFTWARE.
 
 import Util from '../util/Util.tsx';
 
-var assign = (instance: any, obj: any, properties: string[]) =>
-{
-  // could have been passed a bogus object
-  obj = obj || {};
-  
-  properties.map((property) => {
-    instance[property] = obj[property] || instance[property];
-  });
-}
-
 export module CardModels
 {
   export enum Operator {
@@ -76,257 +66,112 @@ export module CardModels
     OR
   }
   
-  export class Comparison
+  export interface IComparison
   {
-    first: string = "";
-    second: string = "";
-    operator: Operator = Operator.EQ;
-    
-    constructor(obj?: any)
-    {
-      assign(this, obj, ['first', 'second', 'operator']);
-    }
+    first: string;
+    second: string;
+    operator: Operator;
   }
   
-  export class Join
+  export interface IJoin
   {
-    group: string = "";
-    comparison: Comparison = new Comparison();
-    
-    constructor(obj?: any)
-    {
-      assign(this, obj, ['group']);
-      
-      if(obj && obj.comparison)
-      {
-        this.comparison = new Comparison(obj.comparison);
-      }
-    }
+    group: string;
+    comparison: IComparison;
+    id: string;
   }
   
-  export class Sort
+  export interface ISort
   {
-    property: Property = "";
-    direction: Direction = Direction.ASC;
+    property: Property;
+    direction: Direction;
   }
   
-  export class Filter
+  export interface IFilter
   {
     // combinator: Combinator = Combinator.AND;
-    comparison: Comparison = new Comparison();
+    comparison: IComparison;
+    id: string;
   }
   
-  
-  export class Card
+  export interface ICard
   {
-    type: string = "";
+    type: string;
     id: number;
     algorithmId: string;
-    
-    constructor(type: string, obj?: any)
-    {
-      this.type = type;
-      
-      if(obj && obj['id'])
-      {
-        this.id = obj['id'];
-      }
-      else
-      {
-        this.id = Util.randInt(0, 4815162342);
-      }
-      
-      assign(this, obj, ['algorithmId']);
+  }
+  
+  export interface IFromCard extends ICard
+  {
+    group: string;
+    joins: IJoin[];
+  }
+  
+  export interface IProperty
+  {
+    property: string;
+    id: string;
+  }
+  
+  export interface ISelectCard extends ICard
+  {
+    properties: IProperty[];
+  }
+  
+  export interface ISortCard extends ICard
+  {
+    sort: ISort;
+  }
+  
+  export interface IFilterCard extends ICard
+  {
+    filters: IFilter[];
+  }
+  
+  export interface ILetCard extends ICard
+  {
+    field: string;
+    expression: string;
+  }
+  
+  export interface IWeight
+  {
+    key: string;
+    weight: number;
+    color: string;
+  }
+  
+  export interface IScoreCard extends ICard
+  {
+    weights: IWeight[];
+    method: string;
+    output: string;
+  }
+  
+  export interface IBar
+  {
+    count: number;
+    percentage: number;
+    id: string;
+    range: {
+      min: number;
+      max: number;
     }
   }
   
-  export class FromCard extends Card
+  export interface IScorePoint
   {
-    group: string = "";
-    joins: Join[] = [];
-    
-    constructor(obj?: any)
-    {
-      super('from', obj);
-      
-      assign(this, obj, ['group']);
-      
-      if(obj && obj.joins && obj.joins.length)
-      {
-        this.joins = obj.joins.map((join) => new Join(join));
-      }
-    }
+    value: number;
+    score: number;
+    id: string;
   }
   
-  export class SelectCard extends Card
+  export interface ITransformCard extends ICard
   {
-    properties: string[] = [""];
+    input: string;
+    output: string;
     
-    constructor(obj?: any)
-    {
-      super('select', obj);
-      
-      assign(this, obj, ['properties']);
-    }
-  }
-  
-  export class SortCard extends Card
-  {
-    sort: Sort = new Sort();
-    
-    constructor(obj?: any)
-    {
-      super('sort', obj);
-      
-      assign(this, obj, ['sort']);
-    }
-  }
-  
-  export class FilterCard extends Card
-  {
-    filters: Filter[] = [new Filter()];
-    
-    constructor(obj?: any)
-    {
-      super('filter', obj);
-    }
-  }
-  
-  export class LetCard extends Card
-  {
-    field: string = "";
-    expression: string = "";
-    
-    constructor(obj?: any)
-    {
-      super('let', obj);
-      assign(this, obj, ['field', 'expression']);
-    }
-  }
-  
-  export class ScoreCard extends Card
-  {
-    weights: {
-      key: string;
-      weight: number;
-      color: string;
-    }[];
-    
-    method: string = "weightedSum";
-    output: string = "";
-    
-    constructor(obj?: any)
-    {
-      super('score', obj);
-      
-      assign(this, obj, ['weights', 'method', 'output']);
-    }
-  }
-  
-  export class TransformCard extends Card
-  {
-    input: string = "";
-    output: string = "";
-    range: number[] = [];
-    bars: {
-      count: number;
-      percentage: number;
-      id: string;
-      range: {
-        min: number;
-        max: number;
-      }
-    }[] = [];
-    scorePoints: {
-      value: number;
-      score: number;
-      id: string;
-    }[] = [];
-    
-    constructor(obj?: any)
-    {
-      super('transform', obj);
-      
-      assign(this, obj, ['input', 'output', 'scorePoints', 'bars', 'range']);
-      
-      if(this.range.length === 0)
-      {
-        switch(this.input) 
-        {
-          case 'sitter.minPrice':
-            this.range = [12, 26];
-            break;
-          // more defaults can go here
-          case 'sitter.numJobs':
-            this.range = [0,100];
-            var outliers = true;
-            break;
-          default:
-            this.range = [0,100];
-        }
-      }
-      
-      if(this.bars.length === 0)
-      {
-        // Create dummy data for now
-        
-        var counts = [];
-        var count: any;
-        var sum = 0;
-        for(var i = this.range[0]; i <= this.range[1]; i ++)
-        {
-          count = Util.randInt(3000);
-          counts.push(count);
-          sum += count;
-        }
-        
-        if(outliers) {
-          for(var i = this.range[1] + 1; i < this.range[1] * 9; i ++)
-          {
-             count = 1; //Util.randInt(2);
-             counts.push(count);
-             sum += count;   
-          }
-          
-          for(var i = this.range[1] * 9; i < this.range[1] * 10; i ++)
-          {
-             count = Util.randInt(200);
-             counts.push(count);
-             sum += count;   
-          }
-          
-          this.range[1] *= 10;
-        }
-        
-        for(var i = this.range[0]; i <= this.range[1]; i ++)
-        {
-          var count: any = counts[i - this.range[0]];
-          if(isNaN(count))
-            count = 0;
-          this.bars.push({
-            count: count,
-            percentage: count / sum,
-            range: {
-              min: i,
-              max: i + 1,
-            },
-            id: "a4-" + i,
-          });
-        }
-      }
-      
-      if(this.scorePoints.length === 0)
-      {
-        for(var i = 0; i < 5; i ++)
-        {
-          this.scorePoints.push(
-          {
-            value: this.range[0] + (this.range[1] - this.range[0]) / 4 * i,
-            score: 0.5,
-            id: "p" + i,
-          });
-        }
-      }
-    }
+    range: number[];
+    bars: IBar[];
+    scorePoints: IScorePoint[];
   }
 }

@@ -59,105 +59,105 @@ var Actions =
         $(ActionTypes.cards.create, {algorithmId, type, index}),
 
     move: 
-      (card: CardModels.Card, index: number) =>
+      (card: CardModels.ICard, index: number) =>
         $(ActionTypes.cards.move, {card, index}),
     
     remove: 
-      (card: CardModels.Card) =>
+      (card: CardModels.ICard) =>
         $(ActionTypes.cards.remove, {card}),
 
     from:
     {
       changeGroup: 
-        (card: CardModels.FromCard, value: Group) =>
-          $(ActionTypes.cards.from.changeGroup, {card, value}),
+        (card: CardModels.IFromCard, value: Group, index: number) =>
+          $(ActionTypes.cards.from.changeGroup, {card, value, index}),
 
       join:
       {
         create: 
-          (card: CardModels.FromCard) =>
+          (card: CardModels.IFromCard) =>
             $(ActionTypes.cards.from.join.create, {card}),
 
         change: 
-          (card: CardModels.FromCard, index: number, value: CardModels.Join) =>
+          (card: CardModels.IFromCard, index: number, value: CardModels.IJoin) =>
             $(ActionTypes.cards.from.join.change, {card, index, value}),
 
         remove: 
-          (card: CardModels.FromCard, index: number) =>
+          (card: CardModels.IFromCard, index: number) =>
             $(ActionTypes.cards.from.join.remove, {card, index}),
       },
     },
     
     sort: {
       change: 
-        (card: CardModels.SortCard, value: CardModels.Sort) =>
+        (card: CardModels.ISortCard, value: CardModels.ISort) =>
           $(ActionTypes.cards.sort.change, {card, value}),
     },
 
     select:
     {
-      moveProperty: 
-        (card: CardModels.SelectCard, propertyIndex: number, index: number) =>
-          $(ActionTypes.cards.select.moveProperty, {card, propertyIndex, index}),
+      move: 
+        (card: CardModels.ISelectCard, property: CardModels.IProperty, index: number) =>
+          $(ActionTypes.cards.select.move, {card, property, index}),
 
-      changeProperty: 
-        (card: CardModels.SelectCard, propertyIndex: number, value: string) =>
-          $(ActionTypes.cards.select.changeProperty, {card, propertyIndex, value}),
+      change: 
+        (card: CardModels.ISelectCard, index: number, value: CardModels.IProperty) =>
+          $(ActionTypes.cards.select.change, {card, index, value}),
 
-      removeProperty: 
-          (card: CardModels.SelectCard, propertyIndex: number) =>
-            $(ActionTypes.cards.select.removeProperty, {card, propertyIndex}),
+      remove: 
+          (card: CardModels.ISelectCard, index: number) =>
+            $(ActionTypes.cards.select.remove, {card, index}),
 
-      createProperty: 
-        (card: CardModels.SelectCard, propertyIndex?: number) =>
-          $(ActionTypes.cards.select.createProperty, {card, propertyIndex}),
+      create: 
+        (card: CardModels.ISelectCard, index?: number) =>
+          $(ActionTypes.cards.select.create, {card, index}),
     },
     
     let:
     {
       change: 
-        (card: CardModels.LetCard, field: string, expression: string) =>
+        (card: CardModels.ILetCard, field: string, expression: string) =>
           $(ActionTypes.cards.let.change, {card, field, expression}),
     },
     
     transform:
     {
       change: 
-        (card: CardModels.TransformCard, input: string, output: string) =>
+        (card: CardModels.ITransformCard, input: string, output: string) =>
           $(ActionTypes.cards.transform.change, {card, input, output}),
       
       scorePoint: 
-        (card: CardModels.TransformCard, scorePointId: string, scorePointScore: any) =>
+        (card: CardModels.ITransformCard, scorePointId: string, scorePointScore: any) =>
           $(ActionTypes.cards.transform.scorePoint, {card, scorePointId, scorePointScore}),
     },
     
     score:
     {
       changeWeights: 
-        (card: CardModels.ScoreCard, weights: {weight:number, key:string}[]) =>
+        (card: CardModels.IScoreCard, weights: {weight:number, key:string}[]) =>
           $(ActionTypes.cards.score.changeWeights, {card, weights}),
       
       change: 
-        (card: CardModels.ScoreCard, method: string, output: string) =>
+        (card: CardModels.IScoreCard, method: string, output: string) =>
           $(ActionTypes.cards.score.change, {card, method, output}),
       
       create: 
-        (card: CardModels.ScoreCard) =>
+        (card: CardModels.IScoreCard) =>
           $(ActionTypes.cards.score.create, {card}),
     },
 
     filter:
     {
      create: 
-      (card: CardModels.FilterCard, index?: number) =>
+      (card: CardModels.IFilterCard, index?: number) =>
         $(ActionTypes.cards.filter.create, { card, index }),
 
      change: 
-      (card: CardModels.FilterCard, index: number, value: CardModels.Filter) =>
+      (card: CardModels.IFilterCard, index: number, value: CardModels.IFilter) =>
         $(ActionTypes.cards.filter.change, { card, index, value }),
 
      remove: 
-      (card: CardModels.FilterCard, index: number) =>
+      (card: CardModels.IFilterCard, index: number) =>
         $(ActionTypes.cards.filter.remove, { card, index }),
     },
   }, // /cards
@@ -165,20 +165,24 @@ var Actions =
   inputs:
   {
     create: 
-      (input: any, index: number) =>
-        $(ActionTypes.inputs.create, {input, index}),
+      (index: number) =>
+        $(ActionTypes.inputs.create, {index}),
 
     move: 
       (input: any, index: number) =>
         $(ActionTypes.inputs.move, {input, index}),
 
     changeKey: 
-      (input: any, value: string) =>
-        $(ActionTypes.inputs.changeKey, {input, value}),
+      (input: any, value: string, index: number) =>
+        $(ActionTypes.inputs.changeKey, {input, value, index}),
 
     changeValue: 
-      (input: any, value: string) =>
-        $(ActionTypes.inputs.changeValue, {input, value}),
+      (input: any, value: string, index: number) =>
+        $(ActionTypes.inputs.changeValue, {input, value, index}),
+    
+    remove:
+      (index: number) =>
+        $(ActionTypes.inputs.remove, {index}),
   }, // /inputs
 
   results:

@@ -57,9 +57,10 @@ var InputsArea = React.createClass<any, any>({
 
 	render() {
 		var layout = {
-			rows: this.props.inputs.map((input) => {
+			rows: this.props.inputs.map((input, index) => {
 				return {
-					content: <Input input={input} />,
+					content: <Input input={input} index={index} />,
+          key: input.id,
 				};
 			}),
 			fullHeight: true,

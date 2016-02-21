@@ -124,7 +124,7 @@ var Card = React.createClass({
 					content: '+',
 					onClick: () => 
 					{
-						Actions.cards.select.createProperty(this.props.card);
+						Actions.cards.select.create(this.props.card);
 					},
 				};
 

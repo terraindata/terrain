@@ -46,6 +46,8 @@ import * as React from 'react';
 import * as ReactDOM from "react-dom";
 var _ = require('underscore');
 
+import { CardModels } from './../models/CardModels.tsx';
+
 var Util = {
 	// Return a random integer [min, max)
 	// assumes min of 0 if not passed.
@@ -59,6 +61,20 @@ var Util = {
 
 		return Math.floor(Math.random() * max - min) + min;
 	},
+  
+  rel(target): string
+  {
+    return ReactDOM.findDOMNode(target).getAttribute('rel');
+  },
+  
+  immutableMove: (arr: any, id: any, index: number) => {
+    var curIndex = arr.findIndex((obj) => 
+      (typeof obj.get === 'function' && (obj.get('id') === id))
+      || (obj.id === id));
+    var obj = arr.get(curIndex);
+    arr = arr.delete(curIndex);
+    return arr.splice(index, 0, obj);
+  },
 
 	isInt(num): boolean
 	{
@@ -96,6 +112,24 @@ var Util = {
   bind(component: React.Component<any, any>, fields: string[])
   {
     fields.map((field) => component[field] = component[field].bind(component));
+  },
+  
+  throttle(component: React.Component<any, any>, fields: string[], rate)
+  {
+    // For throttling methods on a react component
+    // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
+    fields.map((field) => {
+      component['_throttled_' + field] = _.throttle(component[field], 1000);
+      component[field] = (event) => {
+        if(event && typeof event.persist === 'function')
+        {
+          // must call persist to keep the event around
+          // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js/24679479#24679479
+          event.persist();
+        }
+        component['_throttled_' + field](event);
+      }
+    });
   },
 
 
@@ -135,6 +169,138 @@ var Util = {
 				return classNameArray;
 			}, []).join(" ");
 	},
+  
+   
+  cardIndex: (cards, action) =>
+  {
+    return cards.findIndex(card => card.get('id') === action.payload.card.id);
+  },
+
+  // returns a reducing function that updates the given field with the fieldUpdater
+  //  fieldUpdater gets passed (fieldObject, action)
+  updateCardField: (field: string, fieldUpdater) =>
+    (state, action) =>
+      state.updateIn([action.payload.card.algorithmId, 'cards'], cards =>
+        cards.updateIn([cards.findIndex(card => card.get('id') === action.payload.card.id), field], 
+          (fieldObj) => fieldUpdater(fieldObj, action))),
+  
+  // Given a function that takes an action and generates a map
+  //  of field => value pairings,
+  //  returns a reducer that
+  //  finds the card specified in an action and sets
+  //  the values of the fields specified in the map
+  updateCardFields: (fieldMapFactory: (action: any) => {[field: string]: any}) =>
+    (state, action) =>
+      state.updateIn([action.payload.card.algorithmId, 'cards'], (cards) =>
+        cards.updateIn([cards.findIndex(card => card.get('id') === action.payload.card.id)], 
+          card => 
+            _.reduce(fieldMapFactory(action), (card, value, field) =>
+              card.set(field, value)
+            , card)
+          )
+        ),
+  
+  // Given an array of strings representing fields on a card, 
+  //  returns a reducer that
+  //  finds the card specified in an action and sets
+  //  the value of the fields specified to the values
+  //  of the matching fields in the action's payload.
+  setCardFields: (fields: string[]) =>
+    (state, action) =>
+      state.updateIn([action.payload.card.algorithmId, 'cards'], (cards) =>
+        cards.updateIn([cards.findIndex(card => card.get('id') === action.payload.card.id)], 
+          card => 
+            _.reduce(fields, (card, field) =>
+              card.set(field, action.payload[field])
+            , card)
+          )
+        ),
+  
+  populateTransformDummyData(transformCard)
+  {
+    transformCard.range = transformCard.range || [];
+    transformCard.bars = transformCard.bars || [];
+    transformCard.scorePoints = transformCard.scorePoints || [];
+    
+    if(transformCard.range.length === 0)
+    {
+      switch(transformCard.input) 
+      {
+        case 'sitter.minPrice':
+          transformCard.range = [12, 26];
+          break;
+        // more defaults can go here
+        case 'sitter.numJobs':
+          transformCard.range = [0,100];
+          var outliers = true;
+          break;
+        default:
+          transformCard.range = [0,100];
+      }
+    }
+    
+    if(transformCard.bars.length === 0)
+    {
+      // Create dummy data for now
+      
+      var counts = [];
+      var count: any;
+      var sum = 0;
+      for(var i = transformCard.range[0]; i <= transformCard.range[1]; i ++)
+      {
+        count = Util.randInt(3000);
+        counts.push(count);
+        sum += count;
+      }
+      
+      if(outliers) {
+        for(var i:any = transformCard.range[1] + 1; i < transformCard.range[1] * 9; i ++)
+        {
+           count = 1; //Util.randInt(2);
+           counts.push(count);
+           sum += count;   
+        }
+        
+        for(var i:any = transformCard.range[1] * 9; i < transformCard.range[1] * 10; i ++)
+        {
+           count = Util.randInt(200);
+           counts.push(count);
+           sum += count;   
+        }
+        
+        transformCard.range[1] *= 10;
+      }
+      
+      for(var i:any = transformCard.range[0]; i <= transformCard.range[1]; i ++)
+      {
+        var count: any = counts[i - transformCard.range[0]];
+        if(isNaN(count))
+          count = 0;
+        transformCard.bars.push({
+          count: count,
+          percentage: count / sum,
+          range: {
+            min: i,
+            max: i + 1,
+          },
+          id: "a4-" + i,
+        });
+      }
+    }
+    
+    if(transformCard.scorePoints.length === 0)
+    {
+      for(var i:any = 0; i < 5; i ++)
+      {
+        transformCard.scorePoints.push(
+        {
+          value: transformCard.range[0] + (transformCard.range[1] - transformCard.range[0]) / 4 * i,
+          score: 0.5,
+          id: "p" + i,
+        });
+      }
+    }
+  },
 };
 
 export default Util;

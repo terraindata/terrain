@@ -161,6 +161,7 @@ var Tabs = React.createClass<any, any>({
       var selectNewTab = true;
     }
     
+    
     _.map(newProps.tabs, (tab, key) => 
     {
       var index = tabOrder.findIndex((tab) => tab.key === key);

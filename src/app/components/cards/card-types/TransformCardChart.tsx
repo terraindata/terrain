@@ -52,7 +52,7 @@ import { CardModels } from './../../../models/CardModels.tsx';
 import TransformChart from '../../../charts/TransformChart.tsx';
 
 interface Props {
-  card: CardModels.TransformCard;
+  card: CardModels.ITransformCard;
   pointsData: any;
   barsData: any;
   domain: any;

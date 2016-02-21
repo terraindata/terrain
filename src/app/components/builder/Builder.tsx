@@ -62,15 +62,32 @@ import ResultsArea from "./../../components/results/ResultsArea.tsx";
 
 class Builder extends React.Component<any, any>
 {
+  // This variable is needed because React's state has not been working well with
+  //  Redux's state. For instance, if I just do:
+  //   this.setState(Store.getState().toJS())
+  //  then I can't close tabs. React doesn't seem to pick up
+  //  on keys being deleted from the state correctly.
+  reduxState: any;
+  
   constructor()
   {
     super();
     
     Store.subscribe(() => {
-      this.setState(Store.getState());
+      var newState = Store.getState().toJS();
+      this.reduxState = newState;
+      this.setState({
+        random: Math.random()
+      });
     });
-    
-    this.state = Store.getState();
+
+    // Some day in the distant future, you may consider
+    //  removing this 'toJS()' call and making
+    //  the whole Builder app built upon Immutable state.    
+    this.reduxState = Store.getState().toJS();
+    this.state = {
+      random: Math.random()
+    };
   }
   
   handleNewAlgorithmTab() {
@@ -79,22 +96,20 @@ class Builder extends React.Component<any, any>
   
 	render() {
     var tabs = {};
-    _.map(this.state.cardGroups, (cardGroup, algorithmId) => {//_.map(this.state.cardGroups, (cardGroup, algorithmId) => {
-      var cardGroup = this.state.cardGroups[algorithmId];
-      var resultGroup = this.state.resultGroups[algorithmId];
+    _.map(this.reduxState, (algorithm, algorithmId) => {
       var layout = {
         stackAt: 650,
         fullHeight: true,
         columns: [
           {
-            content: <InputsArea inputs={this.state.inputs} algorithmId={algorithmId} />,
+            content: <InputsArea inputs={algorithm.inputs} algorithmId={algorithmId} />,
           },
           {
             colSpan: 2,
-            content: <CardsArea cards={cardGroup.cards} algorithmId={algorithmId} />
+            content: <CardsArea cards={algorithm.cards} algorithmId={algorithmId} />
           },
           {
-            content: <ResultsArea results={resultGroup.results} algorithmId={algorithmId} />
+            content: <ResultsArea results={algorithm.results} algorithmId={algorithmId} />
           },
         ]
       };
@@ -106,7 +121,7 @@ class Builder extends React.Component<any, any>
 
       tabs[algorithmId] = {
         content: <LayoutManager layout={layout} />,
-        tabName: 'Algorithm ' + cardGroup.id,
+        tabName: 'Algorithm ' + algorithmId,
         closeable: true,
         onClose: closeFn,
       };

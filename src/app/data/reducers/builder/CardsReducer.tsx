@@ -42,79 +42,96 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./LetCard.less');
+var Immutable = require('immutable');
+import ActionTypes from './../../ActionTypes.tsx';
+import Util from './../../../util/Util.tsx';
 
-import * as React from 'react';
-import Actions from "../../../data/Actions.tsx";
-import Util from '../../../util/Util.tsx';
-import LayoutManager from "../../layout/LayoutManager.tsx";
-import CardField from './../CardField.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 
-var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
-interface Props {
-  card: CardModels.ILetCard;
-}
+var CardsReducer = {};
 
-class LetCard extends React.Component<Props, any>
-{
-  constructor(props:Props)
-  {
-    super(props);
-  }
-
-  render() {
-    var card = this.props.card;
-    
-    var fieldRef = 'field';
-    var expressionRef = 'expression';
-    
-    var handleChange = () =>
-    {
-      Actions.cards.let.change(this.props.card,
-        this.refs[fieldRef]['value'],
-        this.refs[expressionRef]['value']);
-    }
-
-    var layout = {
-      columns: [
+CardsReducer[ActionTypes.cards.create] =
+  (state, action) => {
+    return state.updateIn([action.payload.algorithmId, 'cards'], cards => {
+      var newCard: any = {};
+      
+      switch(action.payload.type)
       {
-        content: (
-          <input 
-            type='text' 
-            placeholder='Variable name'
-            value={this.props.card.field} 
-            onChange={handleChange} 
-            ref={fieldRef} />
-        ),
-      },
-      {
-        content: (
-          <div className='let-card-arrow'>
-            <ArrowIcon />
-          </div>
-        ),
-      },
-      {
-        content: (
-          <input
-            type='text'
-            placeholder='Expression'
-            value={this.props.card.expression}
-            onChange={handleChange}
-            ref={expressionRef} />
-        ),
+        case 'select':
+          newCard = 
+          {
+            properties: [],
+          };
+          break;
+        case 'from':
+          newCard = 
+          {
+            type: 'from',
+            group: '',
+            joins: [],
+          };
+          break;
+        case 'sort':
+          newCard =
+          {
+            sort:
+            {
+              property: '',
+              direction: CardModels.Direction.DESC,
+            }
+          };
+          break;
+        case 'filter':
+          newCard =
+          {
+            filters: [],
+          };
+          break;
+        case 'transform':
+          newCard =
+          {
+            input: '',
+            output: '',
+          };
+          Util.populateTransformDummyData(newCard);
+          break;
+        case 'let':
+          newCard =
+          {
+            field: '',
+            expression: '',
+          };
+          break;
+        case 'score':
+          newCard =
+          {
+            weights: [],
+            method: '',
+            output: '',
+          };
+          break;
       }
-      ],
-    };
+      
+      newCard['type'] = action.payload.type;
+      newCard['id'] = Util.randInt(4815162342);
+      newCard['algorithmId'] = action.payload.algorithmId;
+      
+      return cards.splice(action.payload.index, 0, Immutable.fromJS(newCard));
+    });
+  };
 
-    return (
-      <CardField>
-        <LayoutManager layout={layout} />
-      </CardField>
+CardsReducer[ActionTypes.cards.move] =
+  (state, action) =>
+    state.updateIn([action.payload.card.algorithmId, 'cards'], cards =>
+      Util.immutableMove(cards, action.payload.card.id, action.payload.index)
     );
-  }
-};
 
-export default LetCard;
+CardsReducer[ActionTypes.cards.remove] =
+  (state, action) =>
+    state.updateIn([action.payload.card.algorithmId, 'cards'], cards => {
+      var cardIndex = cards.findIndex((card) => card.id === action.payload.card.id);
+      return cards.remove(cardIndex);
+    });
+
+export default CardsReducer;
