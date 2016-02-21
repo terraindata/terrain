@@ -53,6 +53,7 @@ import LayoutManager from "../../layout/LayoutManager.tsx";
 import Dropdown from "../../common/Dropdown.tsx";
 import CardField from './../CardField.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
+import ThrottledInput from "../../common/ThrottledInput.tsx";
 
 import { Weight, Weighter } from '../../../charts/Weighter.tsx';
 
@@ -79,7 +80,7 @@ class ScoreCard extends React.Component<Props, any>
     Actions.cards.score.changeWeights(this.props.card, newWeights);
   }
   
-  handleWeightKeyChange(event)
+  handleWeightKeyChange(value, event)
   {
     var key = event.target.value;
     var index = Util.rel(event.target);
@@ -98,10 +99,10 @@ class ScoreCard extends React.Component<Props, any>
       columns:
       [
         {
-          content: <input type='text' 
+          content: <ThrottledInput
             rel={index}
-            defaultValue={weight.key}
-            onBlur={this.handleWeightKeyChange}
+            value={weight.key}
+            onChange={this.handleWeightKeyChange}
             placeholder='Variable or field name' />
         },
         {
@@ -119,9 +120,9 @@ class ScoreCard extends React.Component<Props, any>
     );
   }
   
-  handleOutputChange(event)
+  handleOutputChange(value)
   {
-    Actions.cards.score.change(this.props.card, this.props.card.method, event.target.value);
+    Actions.cards.score.change(this.props.card, this.props.card.method, value);
   }
   
   handleMethodChange(index: number)
@@ -143,7 +144,7 @@ class ScoreCard extends React.Component<Props, any>
             selectedIndex={methods.indexOf(this.props.card.method)} />
         },
         {
-          content: <input type='text' value={this.props.card.output} onChange={this.handleOutputChange} />
+          content: <ThrottledInput value={this.props.card.output} onChange={this.handleOutputChange} />
         }
       ]
     }

@@ -58,6 +58,7 @@ import { CardModels } from './../../../models/CardModels.tsx';
 import { Weight, Weighter } from '../../../charts/Weighter.tsx';
 import TransformCardChart from './TransformCardChart.tsx';
 import TransformCardPeriscope from './TransformCardPeriscope.tsx';
+import ThrottledInput from "../../common/ThrottledInput.tsx";
 
 interface Props {
   card: CardModels.ITransformCard;
@@ -164,12 +165,12 @@ class TransformCard extends React.Component<Props, any>
       columns: [
       {
         content: (
-          <input type='text' value={this.props.card.input} onChange={handleChange} ref={inputRef} />
+          <ThrottledInput value={this.props.card.input} onChange={handleChange} ref={inputRef} />
         ),
       },
       {
         content: (
-          <input type='text' defaultValue={this.props.card.output} onBlur={handleChange} ref={outputRef} />
+          <ThrottledInput value={this.props.card.output} onChange={handleChange} ref={outputRef} />
         ),
       }
       ],

@@ -50,6 +50,7 @@ import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import CardField from './../CardField.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
+import ThrottledInput from "../../common/ThrottledInput.tsx";
 
 var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
@@ -81,8 +82,7 @@ class LetCard extends React.Component<Props, any>
       columns: [
       {
         content: (
-          <input 
-            type='text' 
+          <ThrottledInput
             placeholder='Variable name'
             value={this.props.card.field} 
             onChange={handleChange} 
@@ -98,8 +98,7 @@ class LetCard extends React.Component<Props, any>
       },
       {
         content: (
-          <input
-            type='text'
+          <ThrottledInput
             placeholder='Expression'
             value={this.props.card.expression}
             onChange={handleChange}
@@ -107,6 +106,7 @@ class LetCard extends React.Component<Props, any>
         ),
       }
       ],
+      
     };
 
     return (

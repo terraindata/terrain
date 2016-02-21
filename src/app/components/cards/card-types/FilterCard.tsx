@@ -46,6 +46,7 @@ import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
+import ThrottledInput from "../../common/ThrottledInput.tsx";
 import CardField from './../CardField.tsx';
 import Dropdown from './../../common/Dropdown.tsx';
 import { Operators } from './../../../CommonVars.tsx';
@@ -96,7 +97,7 @@ class FilterCard extends React.Component<Props, any>
       columns: [
         {
           content: (
-            <input type='text' value={filter.comparison.first} onChange={changeFilter} ref={firstRef} />
+            <ThrottledInput value={filter.comparison.first} onChange={changeFilter} ref={firstRef} />
           ),
         },
         {
@@ -109,7 +110,7 @@ class FilterCard extends React.Component<Props, any>
         },
         {
           content: (
-            <input type='text' value={filter.comparison.second} onChange={changeFilter} ref={secondRef} />
+            <ThrottledInput value={filter.comparison.second} onChange={changeFilter} ref={secondRef} />
           ),
         }
       ],

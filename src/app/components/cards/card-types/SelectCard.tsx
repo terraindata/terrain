@@ -47,6 +47,7 @@ import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import CardField from './../CardField.tsx';
+import ThrottledInput from "../../common/ThrottledInput.tsx";
 
 import { CardModels } from './../../../models/CardModels.tsx';
 
@@ -69,11 +70,11 @@ class SelectCard extends React.Component<Props, any>
       Actions.cards.select.move(this.props.card, this.props.card.properties[curIndex], newIndex);
     }
 
-    var changeFnFactory = (index) => (event) =>
+    var changeFnFactory = (index) => (value) =>
     {
     	Actions.cards.select.change(this.props.card, index, 
         {
-          property: event.target.value,
+          property: value,
           id: this.props.card.properties[index].id,
         });
     }
@@ -95,7 +96,7 @@ class SelectCard extends React.Component<Props, any>
               removable={true}
               drag_y={true}
     					dragInsideOnly={true}>
-              <input type="text" 
+              <ThrottledInput
                 value={property.property}
                 onChange={changeFnFactory(index)} />
             </CardField>
