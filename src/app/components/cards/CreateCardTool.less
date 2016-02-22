@@ -7,43 +7,7 @@
   @create-icon-height: 12px;
   @create-icon-padding: 2px;
   @create-card-row-height: calc(@create-icon-height + @create-icon-padding * 2);
-  .create-card-row {
-    position: relative;
-     
-    .create-card-plus {
-      background: @dark-green;
-      display: inline-block;
-      padding: @create-icon-padding;
-      border-radius: 10px;
-      position: relative;
-      left: 30px;
-      .transition;
-      
-      svg {
-        fill: #fff;
-        height: @create-icon-height;
-      }
-    }
-    
-    .create-card-line {
-      border-bottom: 1px solid @dark-green;
-      position: absolute;
-      width: 100%;
-      top: calc(@create-icon-height / 2 + @create-icon-padding);
-      .transition;
-    }
-    
-    &:hover {
-      .create-card-line {
-        border-color: darken(@dark-green, 5%);
-      }
-      .create-card-plus {
-        background: darken(@dark-green, 5%);
-      }
-    }
-  }
   
-  .create-card-row,
   .create-card-selector {
     overflow: hidden;  
     .transition;
@@ -143,11 +107,11 @@
   }
   
   &.create-card-open {
-    .create-card-row {
+    .create-line-row {
       // height: 0px;
       margin-bottom: 5px;
       
-      .create-card-plus {
+      .create-line-plus {
         left: calc(~"100% - 45px");
       }
     }

@@ -67,6 +67,18 @@ var Util = {
     return ReactDOM.findDOMNode(target).getAttribute('rel');
   },
   
+  // corrects a given index so that it is appropriate
+  //  to pass into a `splice` call
+  spliceIndex(index: number, array: any[]): number
+  {
+    if(index === undefined || index === null || index === -1)
+    {
+      return array.length;
+    }
+    
+    return index;
+  },
+  
   immutableMove: (arr: any, id: any, index: number) => {
     var curIndex = arr.findIndex((obj) => 
       (typeof obj.get === 'function' && (obj.get('id') === id))

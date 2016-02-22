@@ -1,0 +1,43 @@
+@import "../../util/Common.less";
+
+@create-icon-height: 12px;
+@create-icon-padding: 2px;
+
+.create-line-row {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;  
+  .transition;
+   
+  .create-line-plus {
+    background: @dark-green;
+    display: inline-block;
+    padding: @create-icon-padding;
+    border-radius: 10px;
+    position: relative;
+    left: 30px;
+    .transition;
+    
+    svg {
+      fill: #fff;
+      height: @create-icon-height;
+    }
+  }
+  
+  .create-line-line {
+    border-bottom: 1px solid @dark-green;
+    position: absolute;
+    width: 100%;
+    top: calc(@create-icon-height / 2 + @create-icon-padding);
+    .transition;
+  }
+  
+  &:hover {
+    .create-line-line {
+      border-color: darken(@dark-green, 5%);
+    }
+    .create-line-plus {
+      background: darken(@dark-green, 5%);
+    }
+  }
+}

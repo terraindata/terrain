@@ -42,18 +42,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./InputsArea.less');
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/Actions.tsx";
 import Input from "../inputs/Input.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
+import CreateLine from '../common/CreateLine.tsx';
 
 var InputsArea = React.createClass<any, any>({
 	propTypes:
 	{
 		inputs: React.PropTypes.array.isRequired,
+    algorithmId: React.PropTypes.string.isRequired,
 	},
+  
+  createInput()
+  {
+    Actions.inputs.create(this.props.algorithmId, 0);
+  },
 
 	render() {
 		var layout = {
@@ -71,7 +79,12 @@ var InputsArea = React.createClass<any, any>({
       Actions.inputs.move(this.props.inputs[curIndex], newIndex);
     };
 
-		return <LayoutManager layout={layout} moveTo={moveTo} />;
+		return (
+      <div className='inputs-area'>
+        <CreateLine open={false} onClick={this.createInput} />
+        <LayoutManager layout={layout} moveTo={moveTo} />
+      </div>
+    );
 	},
 });
 

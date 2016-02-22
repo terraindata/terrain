@@ -165,8 +165,8 @@ var Actions =
   inputs:
   {
     create: 
-      (index: number) =>
-        $(ActionTypes.inputs.create, {index}),
+      (algorithmId: string, index: number) =>
+        $(ActionTypes.inputs.create, {algorithmId, index}),
 
     move: 
       (input: any, index: number) =>
@@ -181,8 +181,8 @@ var Actions =
         $(ActionTypes.inputs.changeValue, {input, value, index}),
     
     remove:
-      (index: number) =>
-        $(ActionTypes.inputs.remove, {index}),
+      (input: CardModels.IInput) =>
+        $(ActionTypes.inputs.remove, {input}),
   }, // /inputs
 
   results:

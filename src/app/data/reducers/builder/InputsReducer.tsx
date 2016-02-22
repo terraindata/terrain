@@ -50,12 +50,13 @@ var InputsReducer = {};
 
 InputsReducer[ActionTypes.inputs.create] =
   (state, action) =>
-    state.updateIn([action.payload.input.algorithmId, 'inputs'], inputs =>
-      inputs.splice(action.payload.index, 0, {
+    state.updateIn([action.payload.algorithmId, 'inputs'], inputs =>
+      inputs.splice(Util.spliceIndex(action.payload.index, inputs), 0, Immutable.fromJS({
         key: '',
         value: '',
         id: Util.randInt(123456789),
-      }));
+        algorithmId: action.payload.algorithmId,
+      })));
 
 InputsReducer[ActionTypes.inputs.move] =
   (state, action) => 
@@ -74,6 +75,7 @@ InputsReducer[ActionTypes.inputs.changeValue] =
 
 InputsReducer[ActionTypes.inputs.remove] =
   (state, action) =>
-    state.deleteIn([action.payload.input.algorithmId, 'inputs', action.payload.index]);
+    state.updateIn([action.payload.input.algorithmId, 'inputs'], inputs =>
+      inputs.delete(inputs.findIndex(input => input.get('id') === action.payload.input.id)));
 
 export default InputsReducer;

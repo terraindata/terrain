@@ -50,6 +50,7 @@ import Actions from "../../data/Actions.tsx";
 import PanelMixin from '../layout/PanelMixin.tsx';
 import ThrottledInput from "../common/ThrottledInput.tsx";
 import Menu from '../common/Menu.tsx';
+import CreateLine from '../common/CreateLine.tsx';
 import { CardModels } from './../../models/CardModels.tsx';
 
 var Input = React.createClass<any, any>({
@@ -92,7 +93,12 @@ var Input = React.createClass<any, any>({
   
   remove()
   {
-    Actions.inputs.remove(this.props.index);
+    Actions.inputs.remove(this.props.input);
+  },
+  
+  createInput()
+  {
+    Actions.inputs.create(this.props.input.algorithmId, this.props.index + 1);
   },
   
   getMenuOptions()
@@ -134,8 +140,9 @@ var Input = React.createClass<any, any>({
 					  <ThrottledInput value={this.props.input.value} onChange={this.changeValue} className="input-text input-text-second" />
           </div>
 				</div>
+        <CreateLine open={false} onClick={this.createInput} />
 			</div>
-			));
+		));
 	},
 });
 

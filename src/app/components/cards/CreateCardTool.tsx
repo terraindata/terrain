@@ -47,11 +47,12 @@ import * as React from 'react';
 import Actions from "../../data/Actions.tsx";
 import Util from '../../util/Util.tsx';
 import { CardTypes } from './../../CommonVars.tsx';
+import CreateLine from "../common/CreateLine.tsx";
 
 var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 
-// Coordinate tehse with .less
+// Coordinate these with .less
 var buttonPadding = 5;
 var buttonWidth = 110 + 2 * buttonPadding;
 var buttonHeight = 40 + buttonPadding;
@@ -209,14 +210,7 @@ class CreateCardTool extends React.Component<Props, any>
       return null;
     }
     
-    return (
-     <div className="create-card-row" onClick={this.toggleOpen}>
-       <div className="create-card-line"></div>
-       <div className="create-card-plus">
-         { this.state.open ? <CloseIcon /> : <AddIcon /> }
-       </div>
-     </div>
-     );
+    return <CreateLine open={this.state.open} onClick={this.toggleOpen} />;
   }
 
   render() {
