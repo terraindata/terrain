@@ -43,11 +43,14 @@ THE SOFTWARE.
 */
 
 require('./Input.less');
+var _ = require('underscore');
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import Actions from "../../data/Actions.tsx";
 import PanelMixin from '../layout/PanelMixin.tsx';
 import ThrottledInput from "../common/ThrottledInput.tsx";
+import Menu from '../common/Menu.tsx';
+import { CardModels } from './../../models/CardModels.tsx';
 
 var Input = React.createClass<any, any>({
 	mixins: [PanelMixin],
@@ -76,13 +79,60 @@ var Input = React.createClass<any, any>({
 	{
 		Actions.inputs.changeValue(this.props.input, value, this.props.index);
 	},
+  
+  convertToDate()
+  {
+    console.log('date');
+  },
+  
+  convertToText()
+  {
+    console.log('text');
+  },
+  
+  remove()
+  {
+    Actions.inputs.remove(this.props.index);
+  },
+  
+  getMenuOptions()
+  {
+    if(this.props.input.type === CardModels.InputType.TEXT)
+    {
+      var convertOption = 
+      {
+        text: 'Convert to Date',
+        onClick: this.convertToDate,
+      };
+    }
+    else
+    {
+      var convertOption = 
+      {
+        text: 'Convert to Text',
+        onClick: this.convertToText,
+      }
+    }
+    
+    return [convertOption].concat([
+      {
+        text: 'Remove',
+        onClick: this.remove,
+      }
+    ]);
+  },
 
 	render() {
 		return this.renderPanel((
 			<div className='input'>
 				<div className='input-inner'>
-					<ThrottledInput value={this.props.input.key} onChange={this.changeKey} className="input-text input-text-first" />
-					<ThrottledInput value={this.props.input.value} onChange={this.changeValue} className="input-text input-text-second" />
+          <div className='input-top-row'>
+					  <ThrottledInput value={this.props.input.key} onChange={this.changeKey} className="input-text input-text-first" />
+            <Menu options={this.getMenuOptions()} />
+          </div>
+          <div className='input-bottom-row'>
+					  <ThrottledInput value={this.props.input.value} onChange={this.changeValue} className="input-text input-text-second" />
+          </div>
 				</div>
 			</div>
 			));

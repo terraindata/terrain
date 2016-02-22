@@ -42,8 +42,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import Util from '../util/Util.tsx';
-
 export module CardModels
 {
   export enum Operator {
@@ -66,6 +64,11 @@ export module CardModels
     OR
   }
   
+  export interface IId
+  {
+    id: string;
+  }
+  
   export interface IComparison
   {
     first: string;
@@ -73,11 +76,10 @@ export module CardModels
     operator: Operator;
   }
   
-  export interface IJoin
+  export interface IJoin extends IId
   {
     group: string;
     comparison: IComparison;
-    id: string;
   }
   
   export interface ISort
@@ -86,17 +88,15 @@ export module CardModels
     direction: Direction;
   }
   
-  export interface IFilter
+  export interface IFilter extends IId
   {
     // combinator: Combinator = Combinator.AND;
     comparison: IComparison;
-    id: string;
   }
   
-  export interface ICard
+  export interface ICard extends IId
   {
     type: string;
-    id: number;
     algorithmId: string;
   }
   
@@ -106,10 +106,9 @@ export module CardModels
     joins: IJoin[];
   }
   
-  export interface IProperty
+  export interface IProperty extends IId
   {
     property: string;
-    id: string;
   }
   
   export interface ISelectCard extends ICard
@@ -147,22 +146,20 @@ export module CardModels
     output: string;
   }
   
-  export interface IBar
+  export interface IBar extends IId
   {
     count: number;
     percentage: number;
-    id: string;
     range: {
       min: number;
       max: number;
     }
   }
   
-  export interface IScorePoint
+  export interface IScorePoint extends IId
   {
     value: number;
     score: number;
-    id: string;
   }
   
   export interface ITransformCard extends ICard
@@ -173,5 +170,18 @@ export module CardModels
     range: number[];
     bars: IBar[];
     scorePoints: IScorePoint[];
+  }
+  
+  export enum InputType
+  {
+    TEXT,
+    DATE,
+  }
+  
+  export interface IInput extends IId
+  {
+    type: InputType;
+    key: string;
+    value: string;
   }
 }

@@ -20,12 +20,30 @@
 			border-radius: 3px;
 			width: 100%;
 			font-size: @medium-font-size;
+      height: 30px;
 		}
 
 		.input-text-first {
 			margin-bottom: 12px;
 		}
 	}
+  
+  .input-top-row {
+    position: relative;
+    margin-right: -5px;
+    
+    .input-text {
+      width: calc(~"100% - 35px");
+    }
+  }
+  
+  .menu-wrapper {
+    background: #b0be9f;
+    
+    &:hover {
+      background: #828C76;
+    }
+  }
 }
 
 .panel-dragging .input-inner {

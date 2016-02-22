@@ -775,16 +775,19 @@
       {
         "key": "search",
         "value": "responsible babysitter",
+        "type": 0,
         "id": 5
       },
       {
         "key": "minAge",
         "value": "24",
+        "type": 0,
         "id": 6
       },
       {
         "key": "attributes",
         "value": "calm, cool, collected",
+        "type": 0,
         "id": 7
       }
     ]
