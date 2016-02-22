@@ -42,8 +42,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./LetCard.less');
-
 import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
@@ -52,7 +50,7 @@ import CardField from './../CardField.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 import ThrottledInput from "../../common/ThrottledInput.tsx";
 
-var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
+var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIcon");
 
 interface Props {
   card: CardModels.ILetCard;
@@ -91,10 +89,11 @@ class LetCard extends React.Component<Props, any>
       },
       {
         content: (
-          <div className='let-card-arrow'>
+          <div className='card-arrow'>
             <ArrowIcon />
           </div>
         ),
+        width: 50,
       },
       {
         content: (

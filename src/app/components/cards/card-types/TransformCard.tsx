@@ -60,6 +60,8 @@ import TransformCardChart from './TransformCardChart.tsx';
 import TransformCardPeriscope from './TransformCardPeriscope.tsx';
 import ThrottledInput from "../../common/ThrottledInput.tsx";
 
+var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIcon");
+
 interface Props {
   card: CardModels.ITransformCard;
   algorithmId: string;
@@ -161,12 +163,19 @@ class TransformCard extends React.Component<Props, any>
     }
 
     var layout = {
-      colPadding: 12,
       columns: [
       {
         content: (
           <ThrottledInput value={this.props.card.input} onChange={handleChange} ref={inputRef} />
         ),
+      },
+      {
+        content: (
+          <div className='card-arrow'>
+            <ArrowIcon />
+          </div>
+        ),
+        width: 50,
       },
       {
         content: (
