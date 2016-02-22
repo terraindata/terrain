@@ -42,22 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Type definitions for Moment.js 2.8.0
+// Project: https://github.com/timrwood/moment
+// Definitions by: Michael Lakerveld <https://github.com/Lakerfield>, Aaron King <https://github.com/kingdango>, Hiroki Horiuchi <https://github.com/horiuchi>, Dick van den Brink <https://github.com/DickvdBrink>, Adi Dahiya <https://github.com/adidahiya>, Matt Brooks <https://github.com/EnableSoftware>
+// Definitions: https://github.com/borisyankov/DefinitelyTyped
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
+/// <reference path="moment-node.d.ts" />
 
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
-
-
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
-
-declare type ID = number;
-declare type Group = string;
-declare type Key = string;
-declare type Value = string;
-declare type Property = string;
-
+declare var moment: moment.MomentStatic;

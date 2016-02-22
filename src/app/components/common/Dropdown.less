@@ -31,6 +31,13 @@
      border-top: 0px;
    }
  }
+  
+  .dropdown-value {
+    position: absolute;
+    z-index: 9999;
+    top: 0;
+  }
+  
  
  &:hover {
   position: relative;
@@ -39,8 +46,21 @@
   border: 1px solid @light-gray;
   margin-top: -1px;
   
+  
   .dropdown-options-wrapper {
     display: block;
+    position: relative;
+    max-height: 250px;
+    overflow-y: scroll;
+  }
+  
+  &.dropdown-up {
+    padding-top: 0px;
+    
+    .dropdown-value {
+      bottom: 0;
+      top: auto;
+    }
   }
  }
  

@@ -73,6 +73,11 @@ InputsReducer[ActionTypes.inputs.changeValue] =
     state.setIn([action.payload.input.algorithmId, 'inputs', action.payload.index, 'value'],
       action.payload.value);
 
+InputsReducer[ActionTypes.inputs.changeType] =
+  (state, action) =>
+    state.setIn([action.payload.input.algorithmId, 'inputs', action.payload.index, 'type'],
+      action.payload.value);
+
 InputsReducer[ActionTypes.inputs.remove] =
   (state, action) =>
     state.updateIn([action.payload.input.algorithmId, 'inputs'], inputs =>

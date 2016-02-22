@@ -180,6 +180,10 @@ var Actions =
       (input: any, value: string, index: number) =>
         $(ActionTypes.inputs.changeValue, {input, value, index}),
     
+    changeType:
+      (input: CardModels.IInput, value: CardModels.InputType, index: number) =>
+        $(ActionTypes.inputs.changeType, {input, value, index}),
+    
     remove:
       (input: CardModels.IInput) =>
         $(ActionTypes.inputs.remove, {input}),

@@ -51,6 +51,7 @@ import PanelMixin from '../layout/PanelMixin.tsx';
 import ThrottledInput from "../common/ThrottledInput.tsx";
 import Menu from '../common/Menu.tsx';
 import CreateLine from '../common/CreateLine.tsx';
+import DatePicker from '../common/DatePicker.tsx';
 import { CardModels } from './../../models/CardModels.tsx';
 
 var Input = React.createClass<any, any>({
@@ -83,12 +84,12 @@ var Input = React.createClass<any, any>({
   
   convertToDate()
   {
-    console.log('date');
+    Actions.inputs.changeType(this.props.input, CardModels.InputType.DATE, this.props.index);
   },
   
   convertToText()
   {
-    console.log('text');
+    Actions.inputs.changeType(this.props.input, CardModels.InputType.TEXT, this.props.index);
   },
   
   remove()
@@ -127,6 +128,21 @@ var Input = React.createClass<any, any>({
       }
     ]);
   },
+  
+  renderInputValue()
+  {
+    if(this.props.input.type === CardModels.InputType.DATE)
+    {
+      return (<div>
+        <DatePicker date={this.props.input.value} onChange={this.changeValue} />
+      </div>);
+    }
+    
+    return <ThrottledInput
+      value={this.props.input.value}
+      onChange={this.changeValue}
+      className="input-text input-text-second" />;
+  },
 
 	render() {
 		return this.renderPanel((
@@ -137,7 +153,9 @@ var Input = React.createClass<any, any>({
             <Menu options={this.getMenuOptions()} />
           </div>
           <div className='input-bottom-row'>
-					  <ThrottledInput value={this.props.input.value} onChange={this.changeValue} className="input-text input-text-second" />
+					  {
+              this.renderInputValue()
+            }
           </div>
 				</div>
         <CreateLine open={false} onClick={this.createInput} />

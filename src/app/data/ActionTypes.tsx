@@ -133,6 +133,7 @@ var ActionTypes =
     create,
     changeKey: '',
     changeValue: '',
+    changeType: '',
     move,
     remove,
   },
