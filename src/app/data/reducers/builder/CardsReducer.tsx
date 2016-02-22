@@ -130,7 +130,7 @@ CardsReducer[ActionTypes.cards.move] =
 CardsReducer[ActionTypes.cards.remove] =
   (state, action) =>
     state.updateIn([action.payload.card.algorithmId, 'cards'], cards => {
-      var cardIndex = cards.findIndex((card) => card.id === action.payload.card.id);
+      var cardIndex = cards.findIndex((card) => card.get('id') === action.payload.card.id);
       return cards.remove(cardIndex);
     });
 
