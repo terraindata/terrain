@@ -58,6 +58,8 @@ interface Props {
   domain: any;
   barColor: string;
   lineColor: string;
+  spotlights: any[];
+  inputKey: string;
 }
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
@@ -75,6 +77,8 @@ class TransformCardChart extends React.Component<Props, any>
       barsData: Util.deeperCloneArr(props.barsData),
       barColor: props.barColor,
       lineColor: props.lineColor,
+      spotlights: props.spotlights,
+      inputKey: props.inputKey,
     }
   }
   
@@ -96,6 +100,8 @@ class TransformCardChart extends React.Component<Props, any>
     var newWidth = this.state.width;
     var newBarColor = this.state.barColor;
     var newLineColor = this.state.lineColor;
+    var newSpotlights = this.state.spotlights;
+    var newInputKey = this.state.inputKey;
     
     if(ReactDOM.findDOMNode(this).getBoundingClientRect().width !== this.state.width)
     {
@@ -121,6 +127,18 @@ class TransformCardChart extends React.Component<Props, any>
       newBarsData = Util.deeperCloneArr(newProps.barsData);
     }
     
+    if(!_.isEqual(newProps.spotlights, this.state.spotlights))
+    {
+      changed = true;
+      newSpotlights = Util.deeperCloneArr(newProps.spotlights);
+    }
+    
+    if(newProps.inputKey !== this.state.inputKey)
+    {
+      changed = true;
+      newInputKey = newProps.inputKey;
+    }
+    
     if(this.state.barColor !== newProps.barColor)
     {
       changed = true;
@@ -142,12 +160,17 @@ class TransformCardChart extends React.Component<Props, any>
         width: newWidth,
         barColor: newBarColor,
         lineColor: newLineColor,
+        spotlights: newSpotlights,
+        inputKey: newInputKey,
       });
       
       var el = ReactDOM.findDOMNode(this);
       TransformChart.update(el, this.getChartState({
         barColor: newBarColor,
         lineColor: newLineColor,
+        pointsData: newPointsData,
+        spotlights: newSpotlights,
+        inputKey: newInputKey,
       }));
     }
     
@@ -161,7 +184,7 @@ class TransformCardChart extends React.Component<Props, any>
   getChartState(overrideState?: any) {
     overrideState = overrideState || {};
     
-    var pointsData = this.props.pointsData.map((scorePoint) => ({
+    var pointsData = (this.props.pointsData || overrideState.pointsData).map((scorePoint) => ({
       x: scorePoint.value,
       y: scorePoint.score,
       id: scorePoint.id,
@@ -176,6 +199,8 @@ class TransformCardChart extends React.Component<Props, any>
         bar: overrideState.barColor || this.props.barColor,
         line: overrideState.lineColor || this.props.lineColor,
       },
+      spotlights: overrideState.spotlights || this.props.spotlights,
+      inputKey: overrideState.inputKey || this.props.inputKey,
     };
     
     return chartState;

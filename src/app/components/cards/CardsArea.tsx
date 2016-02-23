@@ -55,7 +55,8 @@ var CardsArea = React.createClass<any, any>({
 	{
 		cards: React.PropTypes.array.isRequired,
     algorithmId: React.PropTypes.string.isRequired,
-	},
+    spotlights: React.PropTypes.array.isRequired,
+  },
 
 	render() {
 		var layout = {

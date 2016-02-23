@@ -194,6 +194,10 @@ var Actions =
     move:
       (result: any, index: number) =>
         $(ActionTypes.results.move, {result, index}),
+    
+    spotlight:
+      (result: any, value: boolean | string) =>
+        $(ActionTypes.results.spotlight, {result, value}),
   },
 
   newAlgorithm: 

@@ -65,7 +65,11 @@ _.map(defaultStateJson, (algorithm, algorithmId) => {
   });
   
   algorithm.inputs.map((input) => input.algorithmId = algorithmId);
-  algorithm.results.map((result) => result.algorithmId = algorithmId);
+  algorithm.results.map((result, index) => 
+    {
+      result.algorithmId = algorithmId
+      result.score = 100 - index * 4;
+    });
 });
 
 var DefaultState = Immutable.fromJS(defaultStateJson);

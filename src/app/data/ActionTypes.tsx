@@ -141,6 +141,7 @@ var ActionTypes =
   results:
   {
     move,
+    spotlight: '',
   },
 
   newAlgorithm: '',

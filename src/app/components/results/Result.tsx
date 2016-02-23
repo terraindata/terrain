@@ -47,6 +47,9 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
+import Menu from '../common/Menu.tsx';
+import Actions from '../../data/Actions.tsx';
+import ColorManager from '../../util/ColorManager.tsx';
 
 var fields = 
 [
@@ -122,18 +125,57 @@ var Result = React.createClass<any, any>({
       </div>
     );
   },
+  
+  spotlight()
+  {
+    Actions.results.spotlight(this.props.data, ColorManager.colorForKey(this.props.data.id));
+  },
+  
+  unspotlight()
+  {
+    Actions.results.spotlight(this.props.data, false);
+  },
+  
+  renderSpotlight()
+  {
+    if(!this.props.data.spotlight)
+    {
+      return null;
+    }
+    
+    return <div className='result-spotlight' style={{background: this.props.data.spotlight}}></div>;
+  },
 
 	render() {
+    var menuOptions = [];
+    
+    if(this.props.data.spotlight)
+    {
+      menuOptions.push({
+        text: 'Un-Spotlight',
+        onClick: this.unspotlight,
+      });
+    }
+    else
+    {
+      menuOptions.push({
+        text: 'Spotlight',
+        onClick: this.spotlight,
+      });
+    }
+    
 		return this.renderPanel((
 			<div className='result'>
 				<div className='result-inner'>
 					<div className='result-name'>
-						{this.props.data.name}
+            {this.renderSpotlight()}
+            {this.props.data.name}
+            <Menu options={menuOptions} small={true} />
 					</div>
 					<div className='result-score'>
             Final Score
             <div className='result-score-score'>
-              { Math.floor(this.state.score * 100) / 100 }
+              { this.props.data.score }
             </div>
 					</div>
           <div className='result-fields-wrapper'>

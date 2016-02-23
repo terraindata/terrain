@@ -4,8 +4,11 @@
 
 @menu-color: #fff;
 @menu-collapsed-size: 24px;
+@menu-collapsed-small-size: 18px;
 @menu-icon-width: 14px;
 @menu-icon-height: 14px;
+@menu-icon-small-width: 10px;
+@menu-icon-small-height: 10px;
 @option-height: 30px;
 
 .menu-wrapper {
@@ -24,6 +27,11 @@
   &:not(:hover) {
     width: @menu-collapsed-size !important;
     height: @menu-collapsed-size !important;
+    
+    &.menu-wrapper-small {
+      width: @menu-collapsed-small-size !important;
+      height: @menu-collapsed-small-size !important;  
+    }
   }
   
   .menu-icon {
@@ -36,6 +44,15 @@
     opacity: 1;
     
     .transition;
+  }
+  
+  &.menu-wrapper-small {
+    .menu-icon {
+      width: @menu-icon-small-width;
+      height: @menu-icon-small-height;
+      left: calc((@menu-collapsed-small-size - @menu-icon-small-width) / 2);
+      top: calc((@menu-collapsed-small-size - @menu-icon-small-height) / 2);
+    }
   }
   
   .menu-option {

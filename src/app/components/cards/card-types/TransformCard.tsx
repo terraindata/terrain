@@ -66,6 +66,7 @@ interface Props {
   card: CardModels.ITransformCard;
   algorithmId: string;
   cards: CardModels.ICard[];
+  spotlights: any[];
 }
 
 class TransformCard extends React.Component<Props, any>
@@ -82,7 +83,7 @@ class TransformCard extends React.Component<Props, any>
       {
         x: props.card.range,
         y: [0, 1],
-      }
+      },
     };
     
     Util.bind(this, ['handleDomainChange', 'handleWeightChange'])
@@ -184,6 +185,13 @@ class TransformCard extends React.Component<Props, any>
       }
       ],
     };
+    
+    // TODO update this when we have middle tier
+    var inputKey = this.props.card.input;
+    if(inputKey.indexOf('.'))
+    {
+      inputKey = inputKey.substr(inputKey.indexOf('.') + 1);
+    }
 
     return (
       <div>
@@ -196,6 +204,8 @@ class TransformCard extends React.Component<Props, any>
           pointsData={this.props.card.scorePoints}
           barsData={this.props.card.bars}
           domain={this.state.domain}
+          spotlights={this.props.spotlights}
+          inputKey={inputKey}
           card={this.props.card} />
         <TransformCardPeriscope
           onDomainChange={this.handleDomainChange}

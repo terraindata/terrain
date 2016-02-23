@@ -54,4 +54,10 @@ ResultsReducer[ActionTypes.results.move] =
       Util.immutableMove(results, action.payload.result.id, action.payload.index)
     );
 
+ResultsReducer[ActionTypes.results.spotlight] =
+  (state, action) =>
+    state.updateIn([action.payload.result.algorithmId, 'results'], results =>
+      results.update(results.findIndex(result => result.get('id') === action.payload.result.id),
+        result => result.set('spotlight', action.payload.value)));
+
 export default ResultsReducer;

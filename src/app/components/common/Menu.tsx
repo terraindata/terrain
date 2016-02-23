@@ -56,6 +56,7 @@ interface Props
     text: string;
     onClick: () => void;
   }[];
+  small?: boolean;
 }
 
 class Menu extends React.Component<Props, any>
@@ -88,8 +89,10 @@ class Menu extends React.Component<Props, any>
       height: this.props.options.length * optionHeight,
     };
     
+    var classes = "menu-wrapper" + (this.props.small ? " menu-wrapper-small" : "");
+    
     return (
-      <div className="menu-wrapper" style={style}>
+      <div className={classes} style={style}>
         <MoreIcon className="menu-icon" />
         <div className="menu-options-wrapper">
           {

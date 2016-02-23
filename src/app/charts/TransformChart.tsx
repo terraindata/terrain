@@ -83,6 +83,9 @@ var TransformChart = {
       .attr('class', 'bars');
     
     innerSvg.append('g')
+      .attr('class', 'spotlights');
+    
+    innerSvg.append('g')
       .append('path')
       .attr('class', 'lines');
     
@@ -111,7 +114,8 @@ var TransformChart = {
     
     var barsData = state._cache.computedBarsData;
     var scales = this._scales(el, state.domain, barsData);
-    this._draw(el, scales, barsData, state.pointsData, state.onMove, state.colors);
+    this._draw(el, scales, barsData, state.pointsData, state.onMove, state.colors,
+      state.spotlights, state.inputKey);
   },
   
   destroy(el)
@@ -257,6 +261,46 @@ var TransformChart = {
     bar.exit().remove();
   },
   
+  
+  _drawSpotlights(el, scales, spotlights, inputKey, pointsData)
+  {
+    var g = d3.select(el).selectAll('.spotlights')
+    
+    var spotlight = g.selectAll('.spotlight')
+      .data(spotlights, (d) => d['id']);
+    
+    spotlight.enter()
+      .append('circle')
+      .attr('class', 'spotlight');
+    
+    spotlight
+      .attr('cx', (d) => scales.realX(d[inputKey] !== undefined ? d[inputKey] : 0))
+      .attr('cy', (d) => {
+        if(d[inputKey] === undefined)
+        {
+          return 0;
+        }
+        
+        // Consider using Binary Search to speed this up
+        var i = 1;
+        while(pointsData[i] && pointsData[i]['x'] < d[inputKey])
+        {
+          i ++;
+        }
+        
+        var first = pointsData[i - 1];
+        var second = pointsData[i];
+        var distanceRatio = (d[inputKey] - first['x']) / (second['x'] - first['x']);
+        var y = first['y'] * (1 - distanceRatio) + second['y'] * distanceRatio;
+        return scales.realPointY(y);
+      })
+      .attr('fill', (d) => d['spotlight'])
+      .attr('stroke', '#fff')
+      .attr('stroke-width', (d) => d[inputKey] !== undefined ? '2px' : '0px')
+      .attr('r',  (d) => d[inputKey] !== undefined ? 14 : 0);
+      
+  },
+  
   _drawLines(el, scales, pointsData, color)
   {
     var lineFunction = d3.svg.line()
@@ -334,7 +378,7 @@ var TransformChart = {
     point.exit().remove();
   },
   
-  _draw(el, scales, barsData, pointsData, onMove, colors)
+  _draw(el, scales, barsData, pointsData, onMove, colors, spotlights, inputKey)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -343,6 +387,7 @@ var TransformChart = {
     this._drawBg(el, scales);
     this._drawAxes(el, scales);
     this._drawBars(el, scales, barsData, colors.bar);
+    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData);
     this._drawLines(el, scales, pointsData, colors.line);
     this._drawPoints(el, scales, pointsData, onMove, colors.line);
   },

@@ -3,6 +3,12 @@
     "algorithmId": 100,
     "cards": [
       {
+        "type": "transform",
+        "id": 77,
+        "input": "sitter.score",
+        "output": "sitter.transformedScore"
+      },
+      {
         "type": "score",
         "id": 177,
         "method": "weightedSum",
@@ -22,12 +28,6 @@
             "weight": 0.2
           }
         ]
-      },
-      {
-        "type": "transform",
-        "id": 77,
-        "input": "sitter.score",
-        "output": "sitter.transformedScore"
       },
       {
         "type": "from",
@@ -182,7 +182,7 @@
       {
         "name": "Gob Bluth",
         "id": 2,
-        "minPrice": 34,
+        "minPrice": 14,
         "numJobs": 36,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Colma",
@@ -192,7 +192,7 @@
       {
         "name": "George Michael Bluth",
         "id": 3,
-        "minPrice": 28,
+        "minPrice": 18,
         "numJobs": 68,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Rohan",
@@ -222,7 +222,7 @@
       {
         "name": "Tobias Fünke",
         "id": 6,
-        "minPrice": 31,
+        "minPrice": 11,
         "numJobs": 74,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Gondor",
@@ -282,7 +282,7 @@
       {
         "name": "Barry Zuckerkorn",
         "id": 13,
-        "minPrice": 26,
+        "minPrice": 16,
         "numJobs": 2,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "San Francisco",
@@ -302,7 +302,7 @@
       {
         "name": "Lucille Austero",
         "id": 15,
-        "minPrice": 27,
+        "minPrice": 17,
         "numJobs": 43,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Gondor",
@@ -312,7 +312,7 @@
       {
         "name": "Lupe",
         "id": 16,
-        "minPrice": 34,
+        "minPrice": 14,
         "numJobs": 97,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Gondor",
@@ -332,7 +332,7 @@
       {
         "name": "Steve Holt",
         "id": 18,
-        "minPrice": 29,
+        "minPrice": 19,
         "numJobs": 22,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Atlantis",
@@ -372,7 +372,7 @@
       {
         "name": "Officers Taylor and Carter",
         "id": 24,
-        "minPrice": 30,
+        "minPrice": 10,
         "numJobs": 19,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Namek",
@@ -392,7 +392,7 @@
       {
         "name": "John Beard",
         "id": 26,
-        "minPrice": 26,
+        "minPrice": 16,
         "numJobs": 58,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "San Francisco",
@@ -422,7 +422,7 @@
       {
         "name": "Starla",
         "id": 29,
-        "minPrice": 26,
+        "minPrice": 16,
         "numJobs": 92,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Palo Alto",
@@ -442,7 +442,7 @@
       {
         "name": "Tom Saunders",
         "id": 31,
-        "minPrice": 29,
+        "minPrice": 19,
         "numJobs": 28,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Atlantis",
@@ -462,7 +462,7 @@
       {
         "name": "Trisha Thoon",
         "id": 33,
-        "minPrice": 30,
+        "minPrice": 20,
         "numJobs": 1,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Menlo Park",
@@ -472,7 +472,7 @@
       {
         "name": "Wayne Jarvis",
         "id": 34,
-        "minPrice": 33,
+        "minPrice": 23,
         "numJobs": 30,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "An island somewhere",
@@ -492,7 +492,7 @@
       {
         "name": "Sally Sitwell",
         "id": 36,
-        "minPrice": 25,
+        "minPrice": 15,
         "numJobs": 89,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Gotham",
@@ -502,7 +502,7 @@
       {
         "name": "Gene Parmesan",
         "id": 37,
-        "minPrice": 33,
+        "minPrice": 13,
         "numJobs": 84,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Gondor",
@@ -542,7 +542,7 @@
       {
         "name": "Maggie Lizer",
         "id": 42,
-        "minPrice": 28,
+        "minPrice": 18,
         "numJobs": 47,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Namek",
@@ -572,7 +572,7 @@
       {
         "name": "Uncle Trevor",
         "id": 45,
-        "minPrice": 30,
+        "minPrice": 10,
         "numJobs": 47,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Santa Cruz",
@@ -582,7 +582,7 @@
       {
         "name": "White Power Bill",
         "id": 46,
-        "minPrice": 24,
+        "minPrice": 14,
         "numJobs": 91,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Gondor",
@@ -612,7 +612,7 @@
       {
         "name": "DeBrie Bardeaux",
         "id": 49,
-        "minPrice": 27,
+        "minPrice": 17,
         "numJobs": 55,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Gotham",
@@ -632,7 +632,7 @@
       {
         "name": "Ron Howard",
         "id": 51,
-        "minPrice": 33,
+        "minPrice": 13,
         "numJobs": 30,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Menlo Park",
@@ -662,7 +662,7 @@
       {
         "name": "Mr. Bananagrabber",
         "id": 55,
-        "minPrice": 31,
+        "minPrice": 21,
         "numJobs": 65,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "San Francisco",
@@ -672,7 +672,7 @@
       {
         "name": "Mrs. Featherbottom",
         "id": 56,
-        "minPrice": 29,
+        "minPrice": 19,
         "numJobs": 33,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Gondor",
@@ -682,7 +682,7 @@
       {
         "name": "Surely Fünke/Woolfbeak",
         "id": 57,
-        "minPrice": 25,
+        "minPrice": 15,
         "numJobs": 39,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Santa Cruz",
@@ -722,7 +722,7 @@
       {
         "name": "James Buck",
         "id": 62,
-        "minPrice": 33,
+        "minPrice": 13,
         "numJobs": 78,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "An island somewhere",
@@ -742,7 +742,7 @@
       {
         "name": "Frank Wrench (Moses Taylor)",
         "id": 64,
-        "minPrice": 25,
+        "minPrice": 15,
         "numJobs": 21,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Gondor",
@@ -752,7 +752,7 @@
       {
         "name": "Tracey Bluth",
         "id": 65,
-        "minPrice": 27,
+        "minPrice": 17,
         "numJobs": 2,
         "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Rohan",
@@ -773,20 +773,20 @@
     "inputs":
     [
       {
-        "key": "startDateTime",
-        "value": "4/24/2016 8:15:00 PST",
-        "type": 1,
-        "id": 5
-      },
-      {
         "key": "city",
         "value": "Balboa Island",
         "type": 0,
         "id": 6
       },
       {
+        "key": "startDateTime",
+        "value": "4/24/2016 8:15:00 PST",
+        "type": 1,
+        "id": 5
+      },
+      {
         "key": "attributes",
-        "value": "calm, cool, collected",
+        "value": "asthma, toddlers",
         "type": 0,
         "id": 7
       }

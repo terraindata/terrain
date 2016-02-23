@@ -96,7 +96,19 @@ class Builder extends React.Component<any, any>
   
 	render() {
     var tabs = {};
+    
+    
     _.map(this.reduxState, (algorithm, algorithmId) => {
+      // this should be temporary; remove when middle tier arrives
+      var spotlights = algorithm.results.reduce((spotlights, result) =>
+      {
+        if(result.spotlight)
+        {
+          spotlights.push(result);
+        }
+        return spotlights;
+      }, []);
+      
       var layout = {
         stackAt: 650,
         fullHeight: true,
@@ -106,7 +118,7 @@ class Builder extends React.Component<any, any>
           },
           {
             colSpan: 2,
-            content: <CardsArea cards={algorithm.cards} algorithmId={algorithmId} />
+            content: <CardsArea cards={algorithm.cards} algorithmId={algorithmId} spotlights={spotlights} />
           },
           {
             content: <ResultsArea results={algorithm.results} algorithmId={algorithmId} />
