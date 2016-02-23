@@ -146,7 +146,7 @@ class DatePicker extends React.Component<Props, any>
         <ReactDayPicker
           modifiers={modifiers}
           onDayClick={this.handleDayClick}
-          initialMonth={date} />
+          />
         { this.renderTimePicker() }
       </div>
      );
