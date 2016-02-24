@@ -52,6 +52,8 @@ ResultsReducer[ActionTypes.results.move] =
   (state, action) =>
     state.updateIn([action.payload.result.algorithmId, 'results'], results =>
       Util.immutableMove(results, action.payload.result.id, action.payload.index)
+        .map(result => result.get('id') === action.payload.result.id ?
+          result.set('pinned', true).set('original_index', results.findIndex(result => result.get('id') === action.payload.result.id)) : result)
     );
 
 ResultsReducer[ActionTypes.results.spotlight] =
@@ -59,5 +61,23 @@ ResultsReducer[ActionTypes.results.spotlight] =
     state.updateIn([action.payload.result.algorithmId, 'results'], results =>
       results.update(results.findIndex(result => result.get('id') === action.payload.result.id),
         result => result.set('spotlight', action.payload.value)));
+
+
+ResultsReducer[ActionTypes.results.pin] =
+  (state, action) =>
+    state.updateIn([action.payload.result.algorithmId, 'results'], results =>
+      {
+        var resultIndex = results.findIndex(result => result.get('id') === action.payload.result.id);
+        var newResults: any = results.update(resultIndex,
+          result => result.set('pinned', action.payload.value));
+        var originalIndex = results.get(resultIndex).get('original_index');
+        if(originalIndex !== undefined)
+        {
+          // move back to original spot
+          newResults = Util.immutableMove(newResults, action.payload.result.id, originalIndex);
+        }
+        return newResults;
+      });
+        
 
 export default ResultsReducer;

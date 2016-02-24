@@ -51,6 +51,8 @@ import Util from '../util/Util.tsx';
 
 import ColorManager from '../util/ColorManager.tsx';
 
+var DEFAULT_COLOR = '#ddd';
+
 export interface Weight
 {
   weight: number;
@@ -146,7 +148,16 @@ export class Weighter extends React.Component<Props, any>
   
   renderWeight(weight:Weight, index:number)
   {
-    var color = ColorManager.colorForKey(weight.key);
+    var color = ColorManager.readColorForKey(weight.key)
+    if(!color)
+    {
+      color =  DEFAULT_COLOR;
+      if(!this.state || !this.state.refreshed)
+      {
+        // give it a second chance after init to see if anyone else registers with ColorManager
+        setTimeout((() => this.setState({refreshed: true})).bind(this), 1000);
+      }
+    }
     
     var style =
     {

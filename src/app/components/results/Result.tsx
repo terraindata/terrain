@@ -136,6 +136,16 @@ var Result = React.createClass<any, any>({
     Actions.results.spotlight(this.props.data, false);
   },
   
+  pin()
+  {
+    Actions.results.pin(this.props.data, true);
+  },
+  
+  unpin()
+  {
+    Actions.results.pin(this.props.data, false);
+  },
+  
   renderSpotlight()
   {
     if(!this.props.data.spotlight)
@@ -145,8 +155,9 @@ var Result = React.createClass<any, any>({
     
     return <div className='result-spotlight' style={{background: this.props.data.spotlight}}></div>;
   },
-
-	render() {
+  
+  getMenuOptions()
+  {
     var menuOptions = [];
     
     if(this.props.data.spotlight)
@@ -164,13 +175,34 @@ var Result = React.createClass<any, any>({
       });
     }
     
+    if(this.props.data.pinned)
+    {
+      menuOptions.push({
+        text: 'Un-Pin',
+        onClick: this.unpin,
+      });
+    }
+    else
+    {
+      menuOptions.push({
+        text: 'Pin',
+        onClick: this.pin,
+      })
+    }
+    
+    return menuOptions;
+  },
+
+	render() {
+    var classes = 'result' + (this.props.data.pinned ? ' result-pinned' : '');
+    
 		return this.renderPanel((
-			<div className='result'>
+			<div className={classes}>
 				<div className='result-inner'>
 					<div className='result-name'>
             {this.renderSpotlight()}
             {this.props.data.name}
-            <Menu options={menuOptions} small={true} />
+            <Menu options={this.getMenuOptions()} small={true} />
 					</div>
 					<div className='result-score'>
             Final Score

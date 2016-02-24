@@ -85,12 +85,18 @@
   
   .result-spotlight {
     display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 6px;
-    margin-right: 7px;
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    margin-right: 5px;
     
     border: 2px solid #fff;
+  }
+  
+  &.result-pinned {
+    .result-inner {
+      border-color: @bright-green;
+    }
   }
 }
 

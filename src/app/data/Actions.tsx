@@ -198,6 +198,10 @@ var Actions =
     spotlight:
       (result: any, value: boolean | string) =>
         $(ActionTypes.results.spotlight, {result, value}),
+    
+    pin:
+      (result: any, value: boolean) =>
+        $(ActionTypes.results.pin, {result, value}),
   },
 
   newAlgorithm: 

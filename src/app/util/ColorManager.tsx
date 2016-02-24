@@ -44,49 +44,127 @@ THE SOFTWARE.
 
 class ColorManager
 {
-  static COLORS =
+  private static COLORS =
   [
-    '#1590cb',
-    '#ff9c04',
-    '#ff47a7',
-    '#ffa747',
-    '#97ef37',
-    '#a747ff',
+    '#5F7D8C',
+    '#00A7F7',
+    '#00BCD6',
+    '#009788',
+    '#48B14B',
+    '#8AC541',
+    '#CCDD1F',
+    '#FFEC18',
+    '#FFC200',
+    '#FF9900',
   ];
   
-  static DARKER_COLORS =
+  private static DARKER_COLORS =
   [
-    '#11709e',
-    '#ce8311',
-    '#ef3797',
-    '#ef9737',
-    '#87df27',
-    '#9737ef', 
+    '#426057',
+    '#00809a',
+    '#009086',
+    '#007455',
+    '#32882f',
+    '#609728',
+    '#8eaa13',
+    '#b2b50f',
+    '#b29500',
+    '#b27500',
   ];
   
-  static keyToIndex: { [s: string]: number; } = {};
+  private static keyToIndex: { [s: string]: number; } = {};
   
-  static currentIndex: number = 0;
+  private static secondaryKeyToKey: { [s: string]: string; } = {};
   
-  static indexForKey(key: string): number
+  private static keyToSecondaryKey: { [s: string]: string; } = {};
+  
+  private static currentIndex: number = 0;
+  
+  private static readIndexForKey(key: string): number
   {
-    if(this.keyToIndex[key] === undefined)
+    if(this.keyToIndex[key] !== undefined)
     {
-      this.keyToIndex[key] = this.currentIndex ++;
+      return this.keyToIndex[key];
+    }
+    
+    if(this.secondaryKeyToKey[key])
+    {
+      return this.keyToIndex[this.secondaryKeyToKey[key]];
+    }
+    
+    return null;
+  }
+  
+  // Returns the color for the given key
+  //  if no color has been assigned to that key yet,
+  //  it will assign a color to that key, and also map
+  //  the secondaryKey passed to that key
+  // Limit of one secondaryKey per Key
+  private static indexForKey(key: string, secondaryKey?: string): number
+  {
+    if(this.keyToIndex[key] !== undefined)
+    {
+      if(secondaryKey && this.keyToSecondaryKey[key] !== secondaryKey)
+      {
+        if(this.keyToSecondaryKey[key])
+        {
+          // have to remove the old copy
+          delete this.secondaryKeyToKey[this.keyToSecondaryKey[key]];
+        }
+        
+        this.keyToSecondaryKey[key] = secondaryKey;
+        this.secondaryKeyToKey[secondaryKey] = key;
+      }
+      
+      return this.keyToIndex[key];
+    }
+    
+    // Insert
+    this.keyToIndex[key] = this.currentIndex ++;
+    if(secondaryKey)
+    {
+      this.keyToSecondaryKey[key] = secondaryKey;
+      this.secondaryKeyToKey[secondaryKey] = key;
     }
     
     return this.keyToIndex[key] % this.COLORS.length;
   }
   
-  static colorForKey(key: string): string
+  
+  // Public
+  
+  static colorForKey(key: string, secondaryKey?: string): string
   {
-    return this.COLORS[this.indexForKey(key)];
+    return this.COLORS[this.indexForKey(key, secondaryKey)];
   }
   
-  static darkerColorForKey(key: string): string
+  static darkerColorForKey(key: string, secondaryKey?: string): string
   {
     return this.DARKER_COLORS[this.indexForKey(key)];
   }
+  
+  static readColorForKey(key: string)
+  {
+    var index = this.readIndexForKey(key);
+    if(index === null)
+    {
+      return null;
+    }
+    
+    return this.COLORS[index];
+  }
+  
+  static readDarkerColorForKey(key: string)
+  {
+    var index = this.readIndexForKey(key);
+    if(index === null)
+    {
+      return null;
+    }
+    
+    return this.COLORS[index];
+  }
+  
 }
 
 export default ColorManager;

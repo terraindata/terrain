@@ -142,6 +142,7 @@ var ActionTypes =
   {
     move,
     spotlight: '',
+    pin: '',
   },
 
   newAlgorithm: '',

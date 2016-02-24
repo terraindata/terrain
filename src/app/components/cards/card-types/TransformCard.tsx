@@ -199,8 +199,8 @@ class TransformCard extends React.Component<Props, any>
           <LayoutManager layout={layout} />
         </CardField>
         <TransformCardChart
-          barColor={ColorManager.colorForKey(this.props.card.output)}
-          lineColor={ColorManager.darkerColorForKey(this.props.card.output)}
+          barColor={ColorManager.colorForKey(this.props.card.id, this.props.card.output)}
+          lineColor={ColorManager.darkerColorForKey(this.props.card.id, this.props.card.output)}
           pointsData={this.props.card.scorePoints}
           barsData={this.props.card.bars}
           domain={this.state.domain}
@@ -209,7 +209,7 @@ class TransformCard extends React.Component<Props, any>
           card={this.props.card} />
         <TransformCardPeriscope
           onDomainChange={this.handleDomainChange}
-          barColor={ColorManager.colorForKey(this.props.card.output)}
+          barColor={ColorManager.colorForKey(this.props.card.id, this.props.card.output)}
           barsData={this.props.card.bars}
           domain={this.state.domain}
           card={this.props.card} />
