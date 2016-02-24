@@ -70,6 +70,10 @@ class TransformCardChart extends React.Component<Props, any>
   {
     super(props);
     this.onPointMove = this.onPointMove.bind(this);
+    Util.bind(this, ['onPointMove', 'dispatchAction']);
+    // Util.throttle(this, ['dispatchAction'], 500);
+    this.dispatchAction = _.debounce(this.dispatchAction, 500);
+    
     this.state = {
       width: -1,
       domain: Util.deeperCloneObj(props.domain),
@@ -176,15 +180,31 @@ class TransformCardChart extends React.Component<Props, any>
     
   }
   
+  dispatchAction(arr)
+  {
+    var scorePointId = arr[0];
+    var newScore = arr[1];
+    Actions.cards.transform.scorePoint(this.props.card, scorePointId, newScore);
+  }
+  
   onPointMove(scorePointId, newScore) {
     newScore = Util.valueMinMax(newScore, 0, 1);
-    Actions.cards.transform.scorePoint(this.props.card, scorePointId, newScore);
+    var newPointsData = Util.deeperCloneArr(this.props.pointsData);
+    var pointIndex = newPointsData.findIndex(scorePoint => scorePoint.id === scorePointId);
+    newPointsData[pointIndex].score = newScore;
+    
+    var el = ReactDOM.findDOMNode(this);
+    TransformChart.update(el, this.getChartState({
+      pointsData: newPointsData,
+    }));
+    
+    this.dispatchAction([scorePointId, newScore]);
   }
   
   getChartState(overrideState?: any) {
     overrideState = overrideState || {};
     
-    var pointsData = (this.props.pointsData || overrideState.pointsData).map((scorePoint) => ({
+    var pointsData = (overrideState.pointsData || this.props.pointsData).map((scorePoint) => ({
       x: scorePoint.value,
       y: scorePoint.score,
       id: scorePoint.id,
