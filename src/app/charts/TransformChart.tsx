@@ -271,7 +271,8 @@ var TransformChart = {
     
     spotlight.enter()
       .append('circle')
-      .attr('class', 'spotlight');
+      .attr('class', 'spotlight')
+      .attr('_id', (d) => d['id']);
     
     spotlight
       .attr('cx', (d) => scales.realX(d[inputKey] !== undefined ? d[inputKey] : 0))
@@ -298,7 +299,8 @@ var TransformChart = {
       .attr('stroke', '#fff')
       .attr('stroke-width', (d) => d[inputKey] !== undefined ? '2px' : '0px')
       .attr('r',  (d) => d[inputKey] !== undefined ? 14 : 0);
-      
+    
+    spotlight.exit().remove();
   },
   
   _drawLines(el, scales, pointsData, color)
