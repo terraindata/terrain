@@ -51,6 +51,8 @@ import Menu from '../common/Menu.tsx';
 import Actions from '../../data/Actions.tsx';
 import ColorManager from '../../util/ColorManager.tsx';
 
+var PinIcon = require("./../../../images/icon_pin_21x21.svg?name=PinIcon&reactDom=react");
+
 var fields = 
 [
   'id',
@@ -201,6 +203,9 @@ var Result = React.createClass<any, any>({
 				<div className='result-inner'>
 					<div className='result-name'>
             {this.renderSpotlight()}
+            <div className='result-pin-icon'>
+              <PinIcon />
+            </div>
             {this.props.data.name}
             <Menu options={this.getMenuOptions()} small={true} />
 					</div>

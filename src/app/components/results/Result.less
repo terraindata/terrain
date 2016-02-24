@@ -1,9 +1,10 @@
 @import "../../util/Common.less";
 
 @result-height: ~"100% - 6px"; // TODO figure out why this 6px is necessary
-@result-name-height: 25px;
+@result-name-height: 26px;
 @result-score-height: 20px;
 @result-fields-wrapper-height: ~"100% - @{result-name-height} - @{result-score-height}";
+@result-icon-size: 17px;
 
 .result {
 	padding: 2px;
@@ -85,17 +86,32 @@
   
   .result-spotlight {
     display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 10px;
+    width: @result-icon-size;
+    height: @result-icon-size;
+    border-radius: @result-icon-size;
     margin-right: 5px;
+    box-sizing: border-box;
+    vertical-align: bottom;
     
     border: 2px solid #fff;
   }
   
+  .result-pin-icon {
+    display: none;
+  }
+  
   &.result-pinned {
-    .result-inner {
-      border-color: @bright-green;
+    .result-pin-icon {
+      display: inline-block;
+      vertical-align: bottom;
+      // margin-top: -2px;
+      margin-right: 5px;
+      
+      svg {
+        // margin-bottom: -3px;
+        width: @result-icon-size;
+        fill: #d52c28;
+      }
     }
   }
 }
