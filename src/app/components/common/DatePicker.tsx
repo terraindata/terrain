@@ -84,7 +84,6 @@ class DatePicker extends React.Component<Props, any>
     date.setDate(day.getDate());
     date.setMonth(day.getMonth());
     date.setFullYear(day.getFullYear());
-    console.log(date.toString());
     this.props.onChange(date.toString());
   }
   

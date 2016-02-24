@@ -84,7 +84,7 @@ class Menu extends React.Component<Props, any>
 
   render() {
     var style = {
-      width: 15 * this.props.options.reduce((max, option) => 
+      width: 14 * this.props.options.reduce((max, option) => 
         option.text.length > max ? option.text.length : max, 1),
       height: this.props.options.length * optionHeight,
     };

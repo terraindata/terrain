@@ -73,15 +73,19 @@ var InputsArea = React.createClass<any, any>({
 			}),
 			fullHeight: true,
 		};
+    
+    layout.rows.unshift({
+      content: <CreateLine open={false} onClick={this.createInput} />
+    });
 
 		var moveTo = (curIndex, newIndex) =>
     {
-      Actions.inputs.move(this.props.inputs[curIndex], newIndex);
+      // shift of -1 needed to offset the prepended CreateLine
+      Actions.inputs.move(this.props.inputs[curIndex - 1], newIndex - 1);
     };
 
 		return (
       <div className='inputs-area'>
-        <CreateLine open={false} onClick={this.createInput} />
         <LayoutManager layout={layout} moveTo={moveTo} />
       </div>
     );
