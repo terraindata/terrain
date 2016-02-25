@@ -71,6 +71,7 @@ var Result = React.createClass<any, any>({
     return {
       score: Math.random(),
       openFields: [],
+      expanded: false,
     }
   },
 
@@ -78,6 +79,7 @@ var Result = React.createClass<any, any>({
 	{
 		data: React.PropTypes.object.isRequired,
 		parentNode: React.PropTypes.object,
+    onExpand: React.PropTypes.func.isRequired,
 	},
 
 	getDefaultProps() 
@@ -87,6 +89,7 @@ var Result = React.createClass<any, any>({
 			drag_y: true,
 			reorderOnDrag: true,
 			dragInsideOnly: true,
+      data: {},
 		};
 	},
   
@@ -109,7 +112,12 @@ var Result = React.createClass<any, any>({
   
   renderField(field, index)
   {
-    if(index > 3)
+    if(index > 3 && !this.props.expanded)
+    {
+      return null;
+    }
+    
+    if(!this.props.data[field])
     {
       return null;
     }
@@ -194,13 +202,17 @@ var Result = React.createClass<any, any>({
     
     return menuOptions;
   },
-
+  
+  expand() {
+    this.props.onExpand(this.props.data);
+  },
+  
 	render() {
-    var classes = 'result' + (this.props.data.pinned ? ' result-pinned' : '');
+    var classes = 'result' + (this.props.data.pinned ? ' result-pinned' : '') + (this.state.expanded ? ' result-expanded' : '');
     
 		return this.renderPanel((
 			<div className={classes}>
-				<div className='result-inner'>
+				<div className='result-inner' onDoubleClick={this.expand}>
 					<div className='result-name'>
             {this.renderSpotlight()}
             <div className='result-pin-icon'>

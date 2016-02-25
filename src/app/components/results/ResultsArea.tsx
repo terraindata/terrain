@@ -55,12 +55,51 @@ var ResultsArea = React.createClass<any, any>({
 		results: React.PropTypes.array.isRequired,
     algorithmId: React.PropTypes.string.isRequired,
 	},
+  
+  getInitialState()
+  {
+    return {
+      expanded: false,
+      expandedResult: {},
+    };
+  },
+  
+  handleCollapse()
+  {
+    this.setState({
+      expanded: false,
+    });
+  },
+  
+  handleExpand(result)
+  {
+    this.setState({
+      expanded: true,
+      expandedResult: result,
+    });
+  },
+  
+  renderExpandedResult() {
+    return (
+      <div className={'result-expanded-wrapper' + (this.state.expanded ? '' : ' result-collapsed-wrapper')}>
+        <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
+        <Result 
+          data={this.state.expandedResult}
+          algorithmId={this.props.algorithmId}
+          onExpand={this.handleCollapse}
+          expanded={true}
+          drag_x={false}
+          drag_y={false}
+          />
+      </div>
+    );
+  },
 
 	render() {
 		var layout = {
 			cells: this.props.results.map((result) => {
 				return {
-					content: <Result data={result} algorithmId={this.props.algorithmId} />,
+					content: <Result data={result} algorithmId={this.props.algorithmId} onExpand={this.handleExpand} />,
           key: result.id,
 				};
 			}),
@@ -81,7 +120,12 @@ var ResultsArea = React.createClass<any, any>({
       Actions.results.move(this.props.results[curIndex], newIndex);
     };
 
-		return <LayoutManager layout={layout} moveTo={moveTo} />;
+		return (
+      <div>
+        <LayoutManager layout={layout} moveTo={moveTo} />
+        { this.renderExpandedResult() }
+      </div>
+    );
 	},
 });
 
