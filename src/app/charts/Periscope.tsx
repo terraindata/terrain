@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./Periscope.less');
 
 import * as d3 from 'd3';
-
+import Util from '../util/Util.tsx';
 
 var xMargin = 45;
 var yMargin = 15;
@@ -170,7 +170,7 @@ var Periscope = {
   },
   
   // needs to be "function" for d3.mouse(this)
-  _mousedownFactory: (el, onMove, scale) => function(event) {
+  _mousedownFactory: (el, onMove, scale, domain) => function(event) {
     var del = d3.select(el);
     var handle = d3.select(this);
     var startMouseX = d3.mouse(this)[0];
@@ -189,6 +189,16 @@ var Periscope = {
       
       var newValue = scale.clamp(true).invert(newX);
       var handleIndex = handle.attr('_id');
+      
+      if(handle.attr('_id') === '0' && newValue > domain.x[1] * 0.99)
+      {
+        newValue = domain.x[1] * 0.99;
+      }
+      
+      if(handle.attr('_id') === '1' && newValue < domain.x[0] * 1.01)
+      {
+        newValue = domain.x[0] * 1.01;
+      }
       
       onMove(handle.attr('_id'), newValue);
     }
@@ -227,8 +237,8 @@ var Periscope = {
     handle
       .attr('_id', (d, i) => i);
       
-    handle.on('mousedown', this._mousedownFactory(el, onDomainChange, scales.x));
-    handle.on('touchstart', this._mousedownFactory(el, onDomainChange, scales.x));
+    handle.on('mousedown', this._mousedownFactory(el, onDomainChange, scales.x, domain));
+    handle.on('touchstart', this._mousedownFactory(el, onDomainChange, scales.x, domain));
     
     handle.exit().remove();
   },
