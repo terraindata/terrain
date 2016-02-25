@@ -70,7 +70,7 @@ class TransformCardChart extends React.Component<Props, any>
   {
     super(props);
     this.onPointMove = this.onPointMove.bind(this);
-    Util.bind(this, ['onPointMove', 'dispatchAction']);
+    Util.bind(this, ['onPointMove', 'dispatchAction', 'onLineClick']);
     // Util.throttle(this, ['dispatchAction'], 500);
     this.dispatchAction = _.debounce(this.dispatchAction, 500);
     
@@ -184,10 +184,17 @@ class TransformCardChart extends React.Component<Props, any>
   {
     var scorePointId = arr[0];
     var newScore = arr[1];
-    Actions.cards.transform.scorePoint(this.props.card, scorePointId, newScore);
+    var value = this.props.card.scorePoints.find(scorePoint => scorePoint.id === scorePointId).value;
+    Actions.cards.transform.scorePoint(this.props.card, 
+    {
+      id: scorePointId,
+      score: newScore,
+      value,
+    });
   }
   
-  onPointMove(scorePointId, newScore) {
+  onPointMove(scorePointId, newScore)
+  {
     newScore = Util.valueMinMax(newScore, 0, 1);
     var newPointsData = Util.deeperCloneArr(this.props.pointsData);
     var pointIndex = newPointsData.findIndex(scorePoint => scorePoint.id === scorePointId);
@@ -199,6 +206,16 @@ class TransformCardChart extends React.Component<Props, any>
     }));
     
     this.dispatchAction([scorePointId, newScore]);
+  }
+  
+  onLineClick(x, y)
+  {
+    Actions.cards.transform.scorePoint(this.props.card,
+    {
+      id: null,
+      value: x,
+      score: y,
+    });
   }
   
   getChartState(overrideState?: any) {
@@ -215,6 +232,7 @@ class TransformCardChart extends React.Component<Props, any>
       pointsData: pointsData,
       domain: this.props.domain,
       onMove: this.onPointMove,
+      onLineClick: this.onLineClick,
       colors: {
         bar: overrideState.barColor || this.props.barColor,
         line: overrideState.lineColor || this.props.lineColor,

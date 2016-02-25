@@ -127,8 +127,8 @@ var Actions =
           $(ActionTypes.cards.transform.change, {card, input, output}),
       
       scorePoint: 
-        (card: CardModels.ITransformCard, scorePointId: string, scorePointScore: any) =>
-          $(ActionTypes.cards.transform.scorePoint, {card, scorePointId, scorePointScore}),
+        (card: CardModels.ITransformCard, scorePoint: CardModels.IScorePoint) =>
+          $(ActionTypes.cards.transform.scorePoint, {card, scorePoint}),
     },
     
     score:

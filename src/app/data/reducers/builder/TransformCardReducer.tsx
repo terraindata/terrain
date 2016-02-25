@@ -51,12 +51,24 @@ var TransformCardReducer = {};
 
 TransformCardReducer[ActionTypes.cards.transform.scorePoint] =
   Util.updateCardField('scorePoints', (scorePoints, action) => 
-    scorePoints.setIn(
-      [
-        scorePoints.findIndex((scorePoint) => scorePoint.get('id') === action.payload.scorePointId),
-        'score',
-      ],
-      action.payload.scorePointScore));
+    {
+      var scorePoint = action.payload.scorePoint;
+      var index = scorePoints.findIndex((sp) => sp.get('id') === scorePoint.id);
+      if(index !== -1)
+      {
+        return scorePoints.set(index, Immutable.fromJS(scorePoint));
+      }
+      
+      // new scorePoint
+      scorePoint.id = "sc" + Util.randInt(7035855195);
+      index = 0;
+      while(scorePoints.get(index) && scorePoints.get(index).get('value') < scorePoint.value)
+      {
+        index ++;
+      }
+      
+      return scorePoints.splice(index, 0, Immutable.fromJS(action.payload.scorePoint));
+    });
 
 TransformCardReducer[ActionTypes.cards.transform.change] =
   Util.setCardFields(['input', 'output']);

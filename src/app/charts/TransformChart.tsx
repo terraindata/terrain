@@ -115,7 +115,7 @@ var TransformChart = {
     var barsData = state._cache.computedBarsData;
     var scales = this._scales(el, state.domain, barsData);
     this._draw(el, scales, barsData, state.pointsData, state.onMove, state.colors,
-      state.spotlights, state.inputKey);
+      state.spotlights, state.inputKey, state.onLineClick);
   },
   
   destroy(el)
@@ -303,7 +303,15 @@ var TransformChart = {
     spotlight.exit().remove();
   },
   
-  _drawLines(el, scales, pointsData, color)
+  // needs to be "function" for d3.mouse(this)
+  _lineMousedownFactory: (el, onClick, scales) => function(event) {
+    var m = d3.mouse(this);
+    var x = scales.realX.invert(m[0]);
+    var y = scales.realPointY.invert(m[1]);
+    onClick(x,y);
+  },
+  
+  _drawLines(el, scales, pointsData, color, onClick)
   {
     var lineFunction = d3.svg.line()
       .x((d) => scales.realX(d['x']))
@@ -312,8 +320,9 @@ var TransformChart = {
     d3.select(el).select('.lines')
       .attr("d", lineFunction(pointsData))
       .attr("stroke", color)
-      .attr("stroke-width", "3px")
-      .attr("fill", "none");
+      .attr("stroke-width", "4px")
+      .attr("fill", "none")
+      .on("mousedown", this._lineMousedownFactory(el, onClick, scales));
   },
   
   // needs to be "function" for d3.mouse(this)
@@ -380,7 +389,7 @@ var TransformChart = {
     point.exit().remove();
   },
   
-  _draw(el, scales, barsData, pointsData, onMove, colors, spotlights, inputKey)
+  _draw(el, scales, barsData, pointsData, onMove, colors, spotlights, inputKey, onLineClick)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -390,7 +399,7 @@ var TransformChart = {
     this._drawAxes(el, scales);
     this._drawBars(el, scales, barsData, colors.bar);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData);
-    this._drawLines(el, scales, pointsData, colors.line);
+    this._drawLines(el, scales, pointsData, colors.line, onLineClick);
     this._drawPoints(el, scales, pointsData, onMove, colors.line);
   },
   
