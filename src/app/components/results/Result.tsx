@@ -117,7 +117,7 @@ var Result = React.createClass<any, any>({
       return null;
     }
     
-    if(!this.props.data[field])
+    if(this.props.data[field] === undefined)
     {
       return null;
     }

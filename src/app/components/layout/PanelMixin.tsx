@@ -359,7 +359,6 @@ var Panel = {
 		{
 			style.left = this.state.dx + 'px';
 			style.top = this.state.dy + 'px';
-			style.zIndex = 999;
 			panelClass += ' panel-dragging';
 		}
 
