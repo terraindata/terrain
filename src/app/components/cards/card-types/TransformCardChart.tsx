@@ -70,7 +70,7 @@ class TransformCardChart extends React.Component<Props, any>
   {
     super(props);
     this.onPointMove = this.onPointMove.bind(this);
-    Util.bind(this, ['onPointMove', 'dispatchAction', 'onLineClick']);
+    Util.bind(this, ['onPointMove', 'dispatchAction', 'onLineClick', 'onLineMove']);
     // Util.throttle(this, ['dispatchAction'], 500);
     this.dispatchAction = _.debounce(this.dispatchAction, 500);
     
@@ -218,6 +218,17 @@ class TransformCardChart extends React.Component<Props, any>
     });
   }
   
+  onLineMove(x, y)
+  {
+    // find point with given x, if it exists.
+    var scorePoint = this.props.card.scorePoints.find(scorePoint => scorePoint.value === x);
+    
+    if(scorePoint)
+    {
+      this.onPointMove(scorePoint.id, y);
+    }
+  }
+  
   getChartState(overrideState?: any) {
     overrideState = overrideState || {};
     
@@ -233,6 +244,7 @@ class TransformCardChart extends React.Component<Props, any>
       domain: this.props.domain,
       onMove: this.onPointMove,
       onLineClick: this.onLineClick,
+      onLineMove: this.onLineMove,
       colors: {
         bar: overrideState.barColor || this.props.barColor,
         line: overrideState.lineColor || this.props.lineColor,
