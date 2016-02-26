@@ -1,0 +1,29 @@
+@import "../../util/Common.less";
+
+@title-bar-height: 36px;
+@top-border-color: @light-green;
+
+.builder-column {
+  height: 100%;
+  overflow: hidden;
+  
+  .builder-title-bar {
+    background: @dark-moss;
+    padding:9px;
+    font-weight: bold;
+    color: #fff;
+    font-size: 14px;
+    height: @title-bar-height;
+    box-sizing: border-box;
+    box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.1);
+    border-left: 1px solid rgba(0,0,0,0.15);
+    
+    .builder-title-bar-title {
+      text-shadow: 0px 0px 3px rgba(0,0,0,0.15);
+    }
+  }
+  
+  .builder-column-content {
+    height: calc(~"100% - @{title-bar-height}");
+  }
+}

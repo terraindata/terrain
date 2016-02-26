@@ -48,6 +48,7 @@ import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/Actions.tsx";
 import Result from "../results/Result.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
+import BuilderColumn from '../builder/BuilderColumn.tsx';
 
 var ResultsArea = React.createClass<any, any>({
 	propTypes:
@@ -121,10 +122,10 @@ var ResultsArea = React.createClass<any, any>({
     };
 
 		return (
-      <div>
+      <BuilderColumn title='Results'>
         <LayoutManager layout={layout} moveTo={moveTo} />
         { this.renderExpandedResult() }
-      </div>
+      </BuilderColumn>
     );
 	},
 });

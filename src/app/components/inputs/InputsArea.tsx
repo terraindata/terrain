@@ -50,6 +50,7 @@ import Actions from "../../data/Actions.tsx";
 import Input from "../inputs/Input.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateLine from '../common/CreateLine.tsx';
+import BuilderColumn from '../builder/BuilderColumn.tsx';
 
 var InputsArea = React.createClass<any, any>({
 	propTypes:
@@ -85,9 +86,11 @@ var InputsArea = React.createClass<any, any>({
     };
 
 		return (
-      <div className='inputs-area'>
-        <LayoutManager layout={layout} moveTo={moveTo} />
-      </div>
+      <BuilderColumn title='Inputs'>
+        <div className='inputs-area'>
+          <LayoutManager layout={layout} moveTo={moveTo} />
+        </div>
+      </BuilderColumn>
     );
 	},
 });

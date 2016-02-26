@@ -2,8 +2,8 @@
 
 @tabs-bg: #666a60;
 @tab-border-color: @dark-gray;
-@tab-bg-color: @dark-green;
-@tab-selected-bg-color: @medium-green;
+@tab-bg-color: @dark-moss-faded;
+@tab-selected-bg-color: @dark-moss;
 @tab-selected-border-color: @light-green;
 
 .inner-shadow {
@@ -52,7 +52,6 @@
 
 	.tabs-content {
 		height: calc(~"100% - @{tabs-row-height} - 1px");
-    border-radius: 5px;
     overflow: hidden;
     background: @medium-green;
 	}
@@ -65,6 +64,8 @@
     z-index: 500;
     top: 0px;
     pointer-events: none;
+    border-bottom: 1px solid @tab-selected-border-color;
+    box-sizing: border-box;
   }
   
 	.tabs-tab {

@@ -42,53 +42,53 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./BuilderColumn.less');
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
-import Actions from "../../data/Actions.tsx";
-import Card from "../cards/Card.tsx";
-import LayoutManager from "../layout/LayoutManager.tsx";
-import CreateCardTool from "./CreateCardTool.tsx";
-import BuilderColumn from '../builder/BuilderColumn.tsx';
 
-var CardsArea = React.createClass<any, any>({
-	propTypes:
-	{
-		cards: React.PropTypes.array.isRequired,
-    algorithmId: React.PropTypes.string.isRequired,
-    spotlights: React.PropTypes.array.isRequired,
-  },
+interface Props
+{
+  title: string;
+  
+  // Options not yet supported
+  options?: {
+    text: string;
+    onClick: () => void;
+  }[];
+}
 
-	render() {
-		var layout = {
-			rows: this.props.cards.map((card, index) => {
-				return {
-					content: <Card 
-            index={index}
-            card={card}
-            {...this.props} />,
-          key: card.id,
-				};
-			}),
-			fullHeight: true,
-		};
-    
-    layout.rows.push({
-      content: <CreateCardTool index={this.props.cards.length} alwaysOpen={true} algorithmId={this.props.algorithmId} />,
-      key: 'end-tool',
-    });
-
-		var moveTo = (curIndex, newIndex) =>
-    {
-      Actions.cards.move(this.props.cards[curIndex], newIndex);
-    };
-
-		return (
-      <BuilderColumn title='Builder'>
-        <LayoutManager layout={layout} moveTo={moveTo} />
-      </BuilderColumn>
+class BuilderColumn extends React.Component<Props, any>
+{
+  constructor(props: Props) {
+    super(props);
+    this.renderOption = this.renderOption.bind(this);
+  }
+  
+  renderOption(option)
+  {
+    return null;
+  }
+  
+  render() {
+    return (
+      <div className='builder-column'>
+        <div className='builder-title-bar'>
+          <div className='builder-title-bar-title'>
+            { this.props.title }
+          </div>
+          <div className='builder-title-bar-options'>
+            {
+              this.props.options ? this.props.options.map(this.renderOption) : null
+            }
+          </div>
+        </div>
+        <div className='builder-column-content'>
+          { this.props.children }
+        </div>
+      </div>
     );
-	},
-});
+  }
+};
 
-export default CardsArea;
+export default BuilderColumn;
