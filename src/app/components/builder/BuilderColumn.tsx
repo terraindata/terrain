@@ -50,6 +50,7 @@ import Util from '../../util/Util.tsx';
 interface Props
 {
   title: string;
+  children?: any;
   
   // Options not yet supported
   options?: {
