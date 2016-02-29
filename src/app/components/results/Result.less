@@ -11,6 +11,11 @@
   margin-left: @standard-margin;
   margin-right: @standard-margin;
   
+  &:first-child,
+  &:nth-child(2) {
+    margin-top: 2 * @standard-margin;
+  }
+  
 	position: relative;
 
 	.result-inner {
@@ -178,8 +183,4 @@
     background: rgba(0,0,0,0);
     height: 0px;
   }
-}
-
-.results-area {
-  padding-top: @standard-margin;
 }

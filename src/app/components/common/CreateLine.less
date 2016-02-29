@@ -1,13 +1,14 @@
 @import "../../util/Common.less";
 
-@total-height: 2 * @standard-margin + 1px;
+@margin: 2 * @standard-margin;
+@total-height: 2 * @margin + 1px;
 @create-icon-height: 9px;
 @create-icon-padding: 1px;
-@create-line-padding: @standard-margin - (@create-icon-height - 1px) / 2;
+@create-line-padding: @margin - ((@create-icon-height - 1px) / 2);
 
 .create-line-row {
   height: @total-height;
-  margin-top: -1 * @standard-margin;
+  // margin-top: -1 * @margin;
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -21,7 +22,7 @@
     border-radius: 10px;
     position: relative;
     left: 15px;
-    top: @create-line-padding / 2;
+    top: (@total-height - @create-icon-height - 2 * @create-icon-padding) / 2;
     .transition;
     box-sizing: border-box;
     
@@ -35,7 +36,7 @@
     border-bottom: 1px solid @dark-green;
     position: absolute;
     width: 100%;
-    top: @standard-margin;
+    top: @margin;
     .transition;
   }
   

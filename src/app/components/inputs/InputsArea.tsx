@@ -42,7 +42,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./InputsArea.less');
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
