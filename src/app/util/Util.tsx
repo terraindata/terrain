@@ -244,12 +244,13 @@ var Util = {
         // more defaults can go here
         case 'sitter.numJobs':
           transformCard.range = [0,100];
-          var outliers = true;
           break;
         default:
           transformCard.range = [0,100];
       }
     }
+    
+    var outliers = transformCard.range[1] >= 1000;
     
     if(transformCard.bars.length === 0)
     {
@@ -258,7 +259,9 @@ var Util = {
       var counts = [];
       var count: any;
       var sum = 0;
-      for(var i = transformCard.range[0]; i <= transformCard.range[1]; i ++)
+      var upperEnd = transformCard.range[1];
+      if(outliers) upperEnd /= 10;
+      for(var i = transformCard.range[0]; i <= upperEnd; i ++)
       {
         count = Util.randInt(3000);
         counts.push(count);
@@ -266,21 +269,19 @@ var Util = {
       }
       
       if(outliers) {
-        for(var i:any = transformCard.range[1] + 1; i < transformCard.range[1] * 9; i ++)
+        for(var i:any = upperEnd + 1; i < transformCard.range[1]; i ++)
         {
            count = 1; //Util.randInt(2);
            counts.push(count);
            sum += count;   
         }
         
-        for(var i:any = transformCard.range[1] * 9; i < transformCard.range[1] * 10; i ++)
+        for(var i:any = upperEnd * 9; i < transformCard.range[1]; i ++)
         {
            count = Util.randInt(200);
            counts.push(count);
            sum += count;   
         }
-        
-        transformCard.range[1] *= 10;
       }
       
       for(var i:any = transformCard.range[0]; i <= transformCard.range[1]; i ++)

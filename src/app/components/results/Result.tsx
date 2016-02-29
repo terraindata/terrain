@@ -59,9 +59,11 @@ var fields =
   'minPrice',
   'numJobs',
   'avgRating',
-  'averageResponseTime',
+  'cities',
+  'attributes',
   'location',
   'description',
+  'avgResponseTime',
 ];
 
 var Result = React.createClass<any, any>({
