@@ -7,15 +7,19 @@
 @result-icon-size: 17px;
 
 .result {
-	padding: 2px;
+	.standard-margin;
+  margin-left: @standard-margin;
+  margin-right: @standard-margin;
+  
 	position: relative;
 
 	.result-inner {
 		background: @white;
 		border: 1px solid @medium-dark-green;
-		border-radius: 2px;
+		border-radius: 5px;
 
-		height: calc(@result-height);
+		height: calc(~"100% - 2 * @{standard-margin}");
+    box-sizing: border-box;
     position: relative;
 
     .result-name {
@@ -174,4 +178,8 @@
     background: rgba(0,0,0,0);
     height: 0px;
   }
+}
+
+.results-area {
+  padding-top: @standard-margin;
 }

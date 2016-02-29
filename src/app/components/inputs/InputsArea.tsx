@@ -75,8 +75,12 @@ var InputsArea = React.createClass<any, any>({
 			fullHeight: true,
 		};
     
-    layout.rows.unshift({
-      content: <CreateLine open={false} onClick={this.createInput} />
+    layout.rows.push({
+      content: (
+        <div className='standard-margin'>
+          <CreateLine open={false} onClick={this.createInput} />
+        </div>
+      ),
     });
 
 		var moveTo = (curIndex, newIndex) =>

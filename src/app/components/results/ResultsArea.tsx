@@ -104,14 +104,14 @@ var ResultsArea = React.createClass<any, any>({
           key: result.id,
 				};
 			}),
-			cellHeight: 150,
+			cellHeight: 200,
 			cellWidth: {
 				0: 1,
 				300: 2,
 				650: 1,
 				1200: 2,
-				1850: 3,
-				2400: 4,
+				1850: 2,
+				2400: 3,
 			},
 			fullHeight: true,
 		};
@@ -122,7 +122,7 @@ var ResultsArea = React.createClass<any, any>({
     };
 
 		return (
-      <BuilderColumn title='Results'>
+      <BuilderColumn title='Results' className='results-area'>
         <LayoutManager layout={layout} moveTo={moveTo} />
         { this.renderExpandedResult() }
       </BuilderColumn>

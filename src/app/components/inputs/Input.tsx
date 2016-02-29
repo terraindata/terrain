@@ -147,18 +147,18 @@ var Input = React.createClass<any, any>({
 	render() {
 		return this.renderPanel((
 			<div className='input'>
-				<div className='input-inner'>
+        <CreateLine open={false} onClick={this.createInput} />
+        <div className='input-inner'>
           <div className='input-top-row'>
-					  <ThrottledInput value={this.props.input.key} onChange={this.changeKey} className="input-text input-text-first" />
+            <ThrottledInput value={this.props.input.key} onChange={this.changeKey} className="input-text input-text-first" />
             <Menu options={this.getMenuOptions()} />
           </div>
           <div className='input-bottom-row'>
-					  {
+            {
               this.renderInputValue()
             }
           </div>
-				</div>
-        <CreateLine open={false} onClick={this.createInput} />
+        </div>
 			</div>
 		));
 	},

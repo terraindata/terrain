@@ -1,7 +1,6 @@
 @import "../../util/Common.less";
 
 .create-card-wrapper {
-  padding: 5px 0px;
   
   @create-card-border-radius: 5px;
   @create-icon-height: 12px;
@@ -109,7 +108,7 @@
   &.create-card-open {
     .create-line-row {
       // height: 0px;
-      margin-bottom: 5px;
+      padding-bottom: 4px;
       
       .create-line-plus {
         left: calc(~"100% - 45px");
@@ -125,7 +124,6 @@
   
   &.create-card-closed {
     .create-card-row {
-      height: @create-card-row-height;
     }
     .create-card-selector {
       height: 0px !important;

@@ -51,6 +51,7 @@ interface Props
 {
   title: string;
   children?: any;
+  className?: string;
   
   // Options not yet supported
   options?: {
@@ -84,7 +85,7 @@ class BuilderColumn extends React.Component<Props, any>
             }
           </div>
         </div>
-        <div className='builder-column-content'>
+        <div className={'builder-column-content ' + this.props.className}>
           { this.props.children }
         </div>
       </div>
