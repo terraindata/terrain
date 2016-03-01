@@ -1,10 +1,14 @@
 @import "../../util/Common.less";
 
-@tabs-bg: #666a60;
-@tab-bg-color: @dark-moss-faded;
-@tab-selected-bg-color: @dark-moss;
+@tabs-bg: @aged-moss;
+@tab-bg-color: #69735d;
+@tab-selected-bg-color: @fresh-moss;
 @tab-border-color: @tab-bg-color;
-@tab-selected-border-color: @tab-bg-color;
+@tab-selected-border-color: @tab-selected-bg-color;
+@tab-hover-color: lighten(@tab-bg-color, 5%);
+
+@font-color: @fresh-moss;
+@selected-font-color: #798072;
 
 .inner-shadow {
   -webkit-box-shadow:inset 0 -5px 5px 0 rgba(0,0,0,0.1);
@@ -39,7 +43,7 @@
 			padding: 7px 15px;
 			box-sizing: border-box;
 			height: @tabs-row-height;
-			font-size: @large-font-size;
+			font-size: @small-font-size;
 			font-weight: @bold-font-weight;
 			color: @white;
 			border-left: 1px solid @dark-green-border;
@@ -57,6 +61,8 @@
 	}
   
   .tabs-shadow {
+    display: none; // phased out for now
+    
     .inner-shadow;
     position: absolute;
     width: 100%;
@@ -71,12 +77,12 @@
 	.tabs-tab {
 		display: inline-block;
     position: relative;
-		// font-size: @large-font-size;
+		font-size: @small-font-size;
 		height: 35px;
 		padding: 8px 0px;
 		box-sizing: border-box;
 		cursor: pointer;
-		color: @gray;
+		color: @font-color;
     
     margin-right: -25px;
     position: relative;
@@ -88,7 +94,8 @@
       display: inline-block;
       stroke: @tab-border-color;
       position: relative;
-      z-index: 3;      
+      z-index: 3;  
+      .transition;    
     }
     
     .tab-icon-right {
@@ -104,10 +111,11 @@
       z-index: 17;
       display: inline-block;
       background: @tab-bg-color;
+      .transition;
       height: 31px;
       position: relative;
-      top: -12px;      
-      padding-top: 5px;
+      top: -13px;      
+      padding-top: 7px;
       padding-bottom: 5px;
       margin-left: -2px;
       margin-right: -2px;
@@ -129,14 +137,27 @@
         }
       }
     }
+    
+    &:hover:not(.tabs-tab-selected) {
+      .tab-icon {
+        fill: @tab-hover-color;
+      }
+      
+      .tab-inner {
+        background: @tab-hover-color;
+      }
+    }
 	}
 
 	.tabs-tab-selected {
     z-index: 9999;
+    color: @selected-font-color;
+    
     .tab-inner {
 		  background: @tab-selected-bg-color;
       border-color: @tab-selected-border-color;
     }
+    
     .tab-icon {
       fill: @tab-selected-bg-color;
       stroke: @tab-selected-border-color;

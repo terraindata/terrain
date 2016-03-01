@@ -1,5 +1,11 @@
 /* Colors */
 
+@light-foam: #dceec7;
+@fresh-moss: #a2af93;
+@aged-moss: #828c76;
+@cave-moss: #565d4e;
+@dark-grey: #3e3c3c;
+
 @dark-moss: #A2AF93;
 @dark-moss-faded: #a7ae9e;
 
@@ -29,6 +35,7 @@
 
 /* Fonts */
 
+@small-font-size: 11px;
 @medium-font-size: 14px;
 @large-font-size: 17px;
 @bold-font-weight: 500;
@@ -82,6 +89,14 @@ input {
   -o-transform: rotate(180deg);
   -ms-transform: rotate(180deg);
   transform: rotate(180deg);
+}
+
+.rotate (deg) {
+  -moz-transform: rotate(@deg);
+  -webkit-transform: rotate(@deg);
+  -o-transform: rotate(@deg);
+  -ms-transform: rotate(@deg);
+  transform: rotate(@deg);
 }
 
 

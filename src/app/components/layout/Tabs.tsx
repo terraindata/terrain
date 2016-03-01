@@ -249,6 +249,7 @@ var Tabs = React.createClass<any, any>({
       columns: this.state.tabOrder.map((tab, index) => (
       {
         noDrag: tab.noDrag,
+        key: tab.key,
         content:
         (
           <Tab 

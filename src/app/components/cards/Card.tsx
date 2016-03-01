@@ -59,6 +59,8 @@ import TransformCard from './card-types/TransformCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
 import Menu from '../common/Menu.tsx';
 
+var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
+
 var Card = React.createClass({
 	mixins: [PanelMixin],
 
@@ -217,11 +219,11 @@ var Card = React.createClass({
 
 		var title = this.props.card.type.charAt(0).toUpperCase() + this.props.card.type.substr(1);
 		return this.renderPanel((
-			<div className='card'>
+			<div className={'card ' + (!this.state.open ? 'card-closed' : '')}>
         <CreateCardTool index={this.props.index} algorithmId={this.props.algorithmId} />
 				<div className='card-inner'>
 					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>
-						{title}
+						<ArrowIcon className="card-arrow-icon" /> {title}
             <Menu options={menuOptions} />
 					</div>
 					{ contentToDisplay }

@@ -80,3 +80,17 @@ body {
 textarea, input {
   outline: none;
 }
+
+input[type=text], input[type=email], input[type=tel], input[type=num]
+{
+  .transition;
+  border: 1px solid rgba(0,0,0,0);
+  
+  &:hover {
+    border-color: @dark-green; //#ccc; //fade(#00bcd6, 50%);
+  }
+  
+  &:focus {
+   border-color: rgba(140,213,106,1); 
+  }
+}
