@@ -60,8 +60,8 @@ import AccountDropdown from "./components/common/AccountDropdown.tsx";
 // Icons
 var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
 var HomeIcon = require("./../images/icon_home_17x14.svg?name=HomeIcon");
-var BrowserIcon = require("./../images/icon_browser_17x14.svg?name=BrowserIcon");
-var BuilderIcon = require("./../images/icon_builder_17x11.svg?name=BuilderIcon");
+var BrowserIcon = require("./../images/icon_browser_20x16.svg?name=BrowserIcon");
+var BuilderIcon = require("./../images/icon_builder_18x18.svg?name=BuilderIcon");
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 
 var App = React.createClass({
