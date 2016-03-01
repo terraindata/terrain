@@ -121,8 +121,14 @@ var Util = {
   },
   
   
-  bind(component: React.Component<any, any>, fields: string[])
+  bind(component: React.Component<any, any>, ...args: any[])
   {
+    var fields: any[] = args;
+    if(typeof fields[0] === 'object')
+    {
+      fields = fields[0];
+    }
+    
     fields.map((field) => component[field] = component[field].bind(component));
   },
   

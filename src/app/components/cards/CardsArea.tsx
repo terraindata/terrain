@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
+import InfoArea from '../common/InfoArea.tsx';
 import Actions from "../../data/Actions.tsx";
 import Card from "../cards/Card.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
@@ -102,10 +102,28 @@ var CardsArea = React.createClass<any, any>({
     return <TQLView />
   },
   
+  createFromCard() {
+    Actions.cards.create(this.props.algorithmId, 'from', this.props.index);
+  },
+  
+  renderNoCards() {
+    return <InfoArea
+      large="No cards have been created, yet."
+      small="Most people start with the From card."
+      button="Create a From card"
+      onClick={this.createFromCard}
+      />;
+  },
+  
   renderCards() {
     if(this.state.showTQL)
     {
       return null;
+    }
+    
+    if(!this.props.cards.length)
+    {
+      return this.renderNoCards();
     }
     
     var layout = {
@@ -122,7 +140,11 @@ var CardsArea = React.createClass<any, any>({
     };
     
     layout.rows.push({
-      content: <CreateCardTool index={this.props.cards.length} alwaysOpen={true} algorithmId={this.props.algorithmId} />,
+      content: (
+        <div className='standard-margin standard-margin-top'>
+          <CreateCardTool index={this.props.cards.length} alwaysOpen={true} algorithmId={this.props.algorithmId} />
+        </div>
+      ),
       key: 'end-tool',
     });
 

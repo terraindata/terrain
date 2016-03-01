@@ -46,6 +46,7 @@ require('./TQLView.less');
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import Actions from "../../data/Actions.tsx";
+var tql = require('./dummyTql.json');
 
 interface Props
 {
@@ -59,7 +60,6 @@ class TQLView extends React.Component<Props, any>
   }
   
   render() {
-    var tql = "db\n  .from(sitter)\n  .select(\n    'FinalScore',\n    'sitter.name',\n    'sitter.location',\n    'sitter.minPrice',\n    'sitter.numJobs'\n  )\n  .filter(input.price >= sitter.minPrice && input.numJobs <= sitter.numJobs)";
     return (
       <div className='tql-view'>
         <textarea defaultValue={tql} />

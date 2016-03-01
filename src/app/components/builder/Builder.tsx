@@ -133,7 +133,7 @@ class Builder extends React.Component<any, any>
 
       tabs[algorithmId] = {
         content: <LayoutManager layout={layout} />,
-        tabName: 'Algorithm ' + algorithmId,
+        tabName: algorithm.algorithmName || 'New Algorithm',
         closeable: true,
         onClose: closeFn,
       };

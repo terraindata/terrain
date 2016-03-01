@@ -42,108 +42,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./InfoArea.less')
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
-import Actions from "../../data/Actions.tsx";
-import Input from "../inputs/Input.tsx";
-import LayoutManager from "../layout/LayoutManager.tsx";
-import CreateLine from '../common/CreateLine.tsx';
-import InfoArea from '../common/InfoArea.tsx';
-import BuilderColumn from '../builder/BuilderColumn.tsx';
 
-var InputsArea = React.createClass<any, any>({
-	propTypes:
-	{
-		inputs: React.PropTypes.array.isRequired,
-    algorithmId: React.PropTypes.string.isRequired,
-	},
-  
-  createInput()
+var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
+var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
+
+interface Props {
+  large?: string;
+  small?: string;
+  button?: string;
+  onClick?: () => void;
+}
+
+class InfoArea extends React.Component<Props, any>
+{
+  constructor(props)
   {
-    Actions.inputs.create(this.props.algorithmId, 0);
-  },
+    super(props);
+    Util.bind(this, 'renderThing');
+  }
   
-  copyAll()
-  {
-    console.log('copy');
-  },
-  
-  removeAll()
-  {
-    console.log('remove');
-  },
-  
-  getMenuOptions()
-  {
-    return [
-      {
-        text: 'Copy',
-        onClick: this.copyAll
-      },
-      {
-        text: 'Clear', 
-        onClick: this.removeAll
-      }
-    ];
-  },
-  
-  renderNoInputs()
-  {
-    var large = "No inputs have been added, yet."
-    var button = "Add One";
-    var onClick = this.createInput;
-    
-    return (
-      <InfoArea large={large} button={button} onClick={onClick} />
-    );
-  },
-  
-  renderContent()
-  {
-    if(this.props.inputs.length === 0)
+  renderThing(thing: string, onClick?: boolean) {
+    if(!this.props[thing])
     {
-      return this.renderNoInputs();
+      return null;
     }
     
-    var layout = {
-      rows: this.props.inputs.map((input, index) => {
-        return {
-          content: <Input input={input} index={index} />,
-          key: input.id,
-        };
-      }),
-      fullHeight: true,
-    };
-    
-    layout.rows.push({
-      content: (
-        <div className='standard-margin'>
-          <CreateLine open={false} onClick={this.createInput} />
-        </div>
-      ),
-    });
-
-    var moveTo = (curIndex, newIndex) =>
-    {
-      // shift of -1 needed to offset the prepended CreateLine
-      Actions.inputs.move(this.props.inputs[curIndex - 1], newIndex - 1);
-    };
-    
     return (
-      <div className='inputs-area'>
-        <LayoutManager layout={layout} moveTo={moveTo} />
+      <div className={"info-area-"+thing} onClick={onClick ? this.props.onClick : null}>
+        { this.props[thing] }
       </div>
     );
-  },
+  }
+  
+  render() {
+    return (
+     <div className="info-area">
+       { this.renderThing('large') }
+       { this.renderThing('small') }
+       { this.renderThing('button', true) }
+     </div>
+     );
+  }
+};
 
-	render() {
-		return (
-      <BuilderColumn title='Inputs' menuOptions={this.getMenuOptions()}>
-        { this.renderContent() }
-      </BuilderColumn>
-    );
-	},
-});
-
-export default InputsArea;
+export default InfoArea;

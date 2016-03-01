@@ -1,6 +1,7 @@
 {
   "100": {
     "algorithmId": 100,
+    "algorithmName": "sitter_ranking.tql",
     "cards": [
       {
         "type": "from",
