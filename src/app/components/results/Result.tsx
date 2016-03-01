@@ -84,6 +84,7 @@ import ColorManager from '../../util/ColorManager.tsx';
 // ];
 
 var PinIcon = require("./../../../images/icon_pin_21x21.svg?name=PinIcon&reactDom=react");
+var ScoreIcon = require("./../../../images/icon_terrain_27x16.svg?name=ScoreIcon");
 
 var fields = 
 [
@@ -268,9 +269,10 @@ var Result = React.createClass<any, any>({
               <PinIcon />
             </div>
             {this.props.data.name}
-            <Menu options={this.getMenuOptions()} small={true} />
+            <Menu options={this.getMenuOptions()} />
 					</div>
 					<div className='result-score'>
+            <ScoreIcon className='result-score-icon' />
             Final Score
             <div className='result-score-score'>
               { this.props.data.score }

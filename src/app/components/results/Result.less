@@ -1,8 +1,8 @@
 @import "../../util/Common.less";
 
 @result-height: ~"100% - 6px"; // TODO figure out why this 6px is necessary
-@result-name-height: 26px;
-@result-score-height: 20px;
+@result-name-height: 36px;
+@result-score-height: 24px;
 @result-fields-wrapper-height: ~"100% - @{result-name-height} - @{result-score-height}";
 @result-icon-size: 17px;
 
@@ -17,11 +17,17 @@
   }
   
 	position: relative;
+  
+  .menu-wrapper {
+    top: @standard-margin;
+    right: @standard-margin;
+  }
 
 	.result-inner {
 		background: @white;
 		border: 1px solid @medium-dark-green;
 		border-radius: 5px;
+    overflow: hidden;
 
 		height: calc(~"100% - 2 * @{standard-margin}");
     box-sizing: border-box;
@@ -31,29 +37,40 @@
       height: @result-name-height;
       
       font-weight: 500;
-      padding: 5px;
+      padding: 10px 13px;
       box-sizing: border-box;
-      background: @dark-green;
-      color: @white-green;
+      background: #b6bfae;
+      font-size: 14px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      
+      .trans-black;
     }
 
     .result-score {
       height: @result-score-height;
+      .trans-black;
       
-      background: @light-green;
-      color: @dark-gray-green;
+      background: #dfe6d8;
       padding: 3px;
       box-sizing: border-box;
       font-weight: 500;
-      font-size: 12px;
+      font-size: 14px;
 
       min-height: 12px; // todo remove
       
       .result-score-score {
         float: right;
+      }
+      
+      .result-score-icon {
+        fill : @trans-black;
+        mix-blend-mode: multiply;
+        width: 27px;
+        margin-top: -3px;
+        margin-bottom: -10px;
+        margin-right: 5px;
       }
     }
     
@@ -196,4 +213,8 @@
     background: rgba(0,0,0,0);
     height: 0px;
   }
+}
+
+.results-area {
+  background: #cfd7c8;
 }

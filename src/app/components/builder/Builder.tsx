@@ -117,10 +117,11 @@ class Builder extends React.Component<any, any>
             content: <InputsArea inputs={algorithm.inputs} algorithmId={algorithmId} />,
           },
           {
-            colSpan: 2,
+            colSpan: 3,
             content: <CardsArea cards={algorithm.cards} algorithmId={algorithmId} spotlights={spotlights} />
           },
           {
+            colSpan: 2,
             content: <ResultsArea results={algorithm.results} algorithmId={algorithmId} />
           },
         ]
