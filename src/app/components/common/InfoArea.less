@@ -27,30 +27,7 @@
     margin-bottom: 12px;
     
     color: @white;
-    position: relative;
-    z-index: 999;
-    cursor: pointer;
     
-    &:before {
-      border-radius: 5px;
-      content: "";
-      background: @dark-green;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      top: 0px;
-      left: 0px;
-      .transition;
-    }
-    
-    &:hover:before {
-      width: 105%;
-      height: 105%;
-      top: -2.5%;
-      left: -2.5%;
-      background: darken(@dark-green, 5%);
-    }
-    
+    .growing-button(@dark-green);    
   }
 }

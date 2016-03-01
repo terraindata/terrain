@@ -12,11 +12,16 @@
     .transition;
   }
   
-  @button-padding: 5px;
+  @button-padding: @standard-margin;
   @button-height: 40px;
   @button-width: 110px;
   @field-height: 35px;
-  @selector-height: calc(@button-height + 3 * @button-padding + 2px + @field-height);
+  @selector-height: calc(@button-height + 2 * 4 * @button-padding + 2px + @field-height);
+  
+  @buttons-bg: #7c7d7b;
+  @button-bg: #b6b7b4;
+  @button-color: #fff;
+  
   .create-card-selector {
     // padding: 0px 10px;
     background: @light-green;
@@ -24,17 +29,42 @@
     overflow: hidden;
     position: relative;
     transition: height 0.15s;
+    box-sizing: border-box;
     
     .create-card-field-wrapper {
-      margin: @button-padding;
-      margin-bottom: 0px;
+      margin: @button-padding * 2;
+      
+      @plus-size: 34px;
       
       .create-card-field {
         height: @field-height;
         font-size: 17px;
         outline: none;
         -webkit-appearance: none;
+        width: calc(~"100% - @{plus-size} - 2 * @{button-padding}")
       }
+      
+      .create-card-plus {
+        font-size: 26px;
+        color: #fff;
+        padding: 0px 9px;
+        background: #b4c1a4;
+        display: inline-block;
+        float: left;
+        height: @plus-size;
+        width: @plus-size;
+        box-sizing: border-box;
+        border-radius: 35px;
+        margin-right: 2 * @button-padding;
+      }
+    }
+    
+    .create-card-buttons-wrapper {
+      padding: @button-padding;
+      box-sizing: border-box;
+      background: @buttons-bg;
+      position: relative;
+      height: 100%;
     }
     
     .create-card-button {
@@ -43,16 +73,16 @@
       height: @button-height;
       cursor: pointer;
       font-size: @large-font-size;
-      background: @medium-dark-green;
-      color: #fff;
+      color: @button-color;
       padding: 0px @button-padding;
       box-sizing: border-box;
       margin: @button-padding;
-      margin-right: 0px;
-      margin-bottom: 0px;
       border-radius: @create-card-border-radius;
       display: inline-block;
       text-transform: capitalize;
+      .transition;
+      
+      .growing-button(@button-bg);
       
       .create-card-button-inner {
         .vertically-middle;
@@ -68,26 +98,24 @@
       opacity: 1;
       .transition;
       
-      color: @dark-gray;
-      // font-weight: bold;
       padding-left: 35px;
       right: 0px;
       height: @button-height + 2 * @button-padding;
       position: absolute;
-      top: calc(@field-height + 2 * @button-padding);
+      top: 2 * @button-padding;
       right: @button-padding;
       padding-top: 2px;
       padding-left: 50px;
       text-align: right;
       
       /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#d6f2c7+0,d6f2c7+100&0+0,1+100 */
-      background: -moz-linear-gradient(left,  rgba(214,242,199,0) 0%, rgba(214,242,199,1) 25%); /* FF3.6-15 */
-      background: -webkit-linear-gradient(left,  rgba(214,242,199,0) 0%,rgba(214,242,199,1) 25%); /* Chrome10-25,Safari5.1-6 */
-      background: linear-gradient(to right,  rgba(214,242,199,0) 0%,rgba(214,242,199,1) 25%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00d6f2c7', endColorstr='#d6f2c7',GradientType=1 ); /* IE6-9 */
+      background: -moz-linear-gradient(left,  fade(@buttons-bg, 00%) 0%, @buttons-bg 25%); /* FF3.6-15 */
+      background: -webkit-linear-gradient(left,  fade(@buttons-bg, 00%) 0%, @buttons-bg 25%); /* Chrome10-25,Safari5.1-6 */
+      background: linear-gradient(to right,  fade(@buttons-bg, 00%) 0%, @buttons-bg 25%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#003e3e3c', endColorstr='#3e3e3c',GradientType=1 ); /* IE6-9 */
 
       .create-card-more-button-inner {
-        background: @dark-green;
+        background: #909290;
         padding: @button-padding * 2;
         border-radius: @create-card-border-radius;
         color: #fff;

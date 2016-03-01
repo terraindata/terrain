@@ -53,8 +53,8 @@ var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 
 // Coordinate these with .less
-var buttonPadding = 5;
-var buttonWidth = 110 + 2 * buttonPadding;
+var buttonPadding = 12;
+var buttonWidth = 110 + buttonPadding;
 var buttonHeight = 40 + buttonPadding;
 var moreButtonWidth = 80;
 var fieldHeight = 35 + buttonPadding;
@@ -153,12 +153,17 @@ class CreateCardTool extends React.Component<Props, any>
   
   renderCardSelector() {
     var numToShow = 9999;
-    if(this.state.showAll)
+    if(this.state.showAll || this.props.alwaysOpen)
     {
       if(this.refs['ccWrapper'] && this.refs['ccWrapper']['offsetWidth'])
       {
-        var overrideHeight: any = buttonPadding + 2 + fieldHeight +
+        var overrideHeight: any = 2 * buttonPadding + 2 + fieldHeight +
           buttonHeight * Math.ceil(CardTypes.length * buttonWidth / this.refs['ccWrapper']['offsetWidth']);
+      }
+      else
+      {
+        overrideHeight = 'auto';
+        numToShow = 9999;
       }
     }
     else
@@ -170,11 +175,6 @@ class CreateCardTool extends React.Component<Props, any>
       }
     }
     
-    if(this.props.alwaysOpen)
-    {
-      overrideHeight = 'auto';
-      numToShow = 9999;
-    }
     
     var classes = Util.objToClassname({
       "create-card-selector": true,
@@ -184,20 +184,25 @@ class CreateCardTool extends React.Component<Props, any>
     return (
      <div className={classes} style={{height: overrideHeight}}>
        <div className="create-card-field-wrapper">
-         <input type="text" ref="field" className="create-card-field" placeholder="Type of card" onKeyDown={this.handleKeydown} onChange={this.handleChange} />
+         <div className="create-card-plus">
+           +
+         </div>
+         <input type="text" ref="field" className="create-card-field" placeholder="Type card name here, or select from the suggestions below" onKeyDown={this.handleKeydown} onChange={this.handleChange} />
        </div>
-       {
-         CardTypes.map((type, index) => this.hideButton(type) ? null : (
-           <div className="create-card-button" key={type} onClick={this.createCardFactory(type)}>
-             <div className="create-card-button-inner">
-               { type }
+       <div className="create-card-buttons-wrapper">
+         {
+           CardTypes.map((type, index) => this.hideButton(type) ? null : (
+             <div className="create-card-button" key={type} onClick={this.createCardFactory(type)}>
+               <div className="create-card-button-inner">
+                 { type }
+               </div>
              </div>
+           ))
+         }
+         <div className="create-card-more-button" onClick={this.toggleShowAll}>
+           <div className="create-card-more-button-inner">
+             Show All
            </div>
-         ))
-       }
-       <div className="create-card-more-button" onClick={this.toggleShowAll}>
-         <div className="create-card-more-button-inner">
-           Show All
          </div>
        </div>
      </div>
