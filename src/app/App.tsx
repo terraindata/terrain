@@ -56,12 +56,14 @@ import LayoutManager from "./components/layout/LayoutManager.tsx";
 import Builder from "./components/builder/Builder.tsx";
 import Sidebar from "./components/layout/Sidebar.tsx";
 import AccountDropdown from "./components/common/AccountDropdown.tsx";
+import InfoArea from "./components/common/InfoArea.tsx";
 
 // Icons
 var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
-var HomeIcon = require("./../images/icon_home_17x14.svg?name=HomeIcon");
+var HomeIcon = require("./../images/icon_profile_16x16.svg?name=HomeIcon");
 var BrowserIcon = require("./../images/icon_browser_20x16.svg?name=BrowserIcon");
-var BuilderIcon = require("./../images/icon_builder_18x18.svg?name=BuilderIcon");
+var BuilderIcon = require("./../images/icon_reporting_18x18.svg?name=BuilderIcon");
+var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIcon");
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 
 var App = React.createClass({
@@ -95,6 +97,10 @@ var App = React.createClass({
         text: 'Home',
       },
       {
+        icon: <ReportingIcon />,
+        text: 'Reporting',
+      },
+      {
         icon: <BrowserIcon />,
         text: 'Browser',
       },
@@ -109,9 +115,7 @@ var App = React.createClass({
     ];
     
     var content = (
-      <div className='page-placeholder'>
-        🚧 This page is still in progress. 🚧
-      </div> 
+      <InfoArea large="This page is still in progress." />
     );
     
     switch(this.state.selectedPage) {
