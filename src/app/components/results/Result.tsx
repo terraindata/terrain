@@ -51,11 +51,43 @@ import Menu from '../common/Menu.tsx';
 import Actions from '../../data/Actions.tsx';
 import ColorManager from '../../util/ColorManager.tsx';
 
+var images = 
+[
+  require('../../../images/sitters/sitters_0000_0.jpg'),
+  require('../../../images/sitters/sitters_0001_1.jpg'),
+  require('../../../images/sitters/sitters_0002_2.jpg'),
+  require('../../../images/sitters/sitters_0003_3.jpg'),
+  require('../../../images/sitters/sitters_0004_4.jpg'),
+  require('../../../images/sitters/sitters_0005_5.jpg'),
+  require('../../../images/sitters/sitters_0006_6.jpg'),
+  require('../../../images/sitters/sitters_0007_7.jpg'),
+  require('../../../images/sitters/sitters_0008_8.jpg'),
+  require('../../../images/sitters/sitters_0009_9.jpg'),
+  require('../../../images/sitters/sitters_0010_10.jpg'),
+  require('../../../images/sitters/sitters_0011_11.jpg'),
+  require('../../../images/sitters/sitters_0012_12.jpg'),
+  require('../../../images/sitters/sitters_0013_13.jpg'),
+  require('../../../images/sitters/sitters_0014_14.jpg'),
+  require('../../../images/sitters/sitters_0015_15.jpg'),
+  require('../../../images/sitters/sitters_0016_16.jpg'),
+  require('../../../images/sitters/sitters_0017_17.jpg'),
+  require('../../../images/sitters/sitters_0018_18.jpg'),
+  require('../../../images/sitters/sitters_0019_19.jpg'),
+  require('../../../images/sitters/sitters_0020_20.jpg'),
+  require('../../../images/sitters/sitters_0021_21.jpg'),
+  require('../../../images/sitters/sitters_0022_22.jpg'),
+  require('../../../images/sitters/sitters_0023_23.jpg'),
+  require('../../../images/sitters/sitters_0024_24.jpg'),
+  require('../../../images/sitters/sitters_0025_25.jpg'),
+  require('../../../images/sitters/sitters_0026_26.jpg'),
+  require('../../../images/sitters/sitters_0027_27.jpg'),
+];
+
 var PinIcon = require("./../../../images/icon_pin_21x21.svg?name=PinIcon&reactDom=react");
 
 var fields = 
 [
-  'id',
+  'image',
   'minPrice',
   'numJobs',
   'avgRating',
@@ -117,6 +149,20 @@ var Result = React.createClass<any, any>({
     if(index > 3 && !this.props.expanded)
     {
       return null;
+    }
+    
+    if(field === 'image')
+    {
+      return (
+        <div className="result-field result-field-image" key={field}>
+          <div className="result-field-name">
+            { field }
+          </div>
+          <div className='result-field-value result-field-value-image'>
+            <img src={images[this.props.data['id']]} />
+          </div>
+        </div>
+      );
     }
     
     if(this.props.data[field] === undefined)

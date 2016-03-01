@@ -67,6 +67,9 @@
         padding: 1px;
         font-size: 12px;
         // margin: 4px;
+        &.result-field-image {
+          height: 62px;
+        }
         
         .result-field-name {
           font-weight: bold;
@@ -87,6 +90,16 @@
           &.result-field-value-open {
             white-space: normal;
             overflow: visible;
+          }
+          
+          &.result-field-value-image {
+            float: right;
+            display: inline-block;
+            height: 60px;
+            
+            img {
+              width: 60px;
+            }
           }
         }
       }

@@ -229,7 +229,7 @@
     "results":
     [
       {
-        "name": "Michael Bluth",
+        "name": "Grace Miller",
         "id": 0,
         "minPrice": 17,
         "numJobs": 12,
@@ -239,7 +239,7 @@
         "avgRating": 3.09
       },
       {
-        "name": "Lindsay Bluth",
+        "name": "Monica Doan",
         "id": 1,
         "minPrice": 23,
         "numJobs": 44,
@@ -249,7 +249,7 @@
         "avgRating": 0.32
       },
       {
-        "name": "Gob Bluth",
+        "name": "Cheryl Burney",
         "id": 2,
         "minPrice": 14,
         "numJobs": 36,
@@ -259,7 +259,7 @@
         "avgRating": 2.022
       },
       {
-        "name": "George Michael Bluth",
+        "name": "Tina Sierra",
         "id": 3,
         "minPrice": 18,
         "numJobs": 68,
@@ -269,7 +269,7 @@
         "avgRating": 1.30
       },
       {
-        "name": "Maeby Fünke",
+        "name": "Lizzie Wescott",
         "id": 4,
         "minPrice": 22,
         "numJobs": 53,
@@ -279,7 +279,7 @@
         "avgRating": 4.26
       },
       {
-        "name": "Buster Bluth",
+        "name": "Bridget Cramer",
         "id": 5,
         "minPrice": 21,
         "numJobs": 61,
@@ -289,7 +289,7 @@
         "avgRating": 3.29
       },
       {
-        "name": "Tobias Fünke",
+        "name": "Faustina Green",
         "id": 6,
         "minPrice": 11,
         "numJobs": 74,
@@ -299,7 +299,7 @@
         "avgRating": 3.19
       },
       {
-        "name": "George Bluth, Sr.",
+        "name": "Mary Peek",
         "id": 7,
         "minPrice": 21,
         "numJobs": 44,
@@ -309,7 +309,7 @@
         "avgRating": 2.18
       },
       {
-        "name": "Lucille Bluth",
+        "name": "Lisa Walker",
         "id": 8,
         "minPrice": 22,
         "numJobs": 85,
@@ -319,7 +319,7 @@
         "avgRating": 1.72
       },
       {
-        "name": "Narrator",
+        "name": "Marietta Barker",
         "id": 9,
         "minPrice": 12,
         "numJobs": 31,
@@ -329,7 +329,7 @@
         "avgRating": 3.11
       },
       {
-        "name": "Ann Veal",
+        "name": "Bonnie Underhill",
         "id": 11,
         "minPrice": 14,
         "numJobs": 6,
@@ -339,7 +339,7 @@
         "avgRating": 3.73
       },
       {
-        "name": "Annyong Bluth",
+        "name": "Charlotte Wakeman",
         "id": 12,
         "minPrice": 14,
         "numJobs": 28,
@@ -349,7 +349,7 @@
         "avgRating": 1.95
       },
       {
-        "name": "Barry Zuckerkorn",
+        "name": "Betty Ruff",
         "id": 13,
         "minPrice": 16,
         "numJobs": 2,
@@ -359,7 +359,7 @@
         "avgRating": 4.65
       },
       {
-        "name": "Kitty Sanchez",
+        "name": "Danielle Morgan",
         "id": 14,
         "minPrice": 14,
         "numJobs": 55,

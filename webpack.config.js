@@ -63,6 +63,7 @@ module.exports = {
             { test: /\.ttf$/, loader: "file" },
             { test: /\.eot$/, loader: "file" },
             { test: /\.svg$/, loader: "file" },
+            { test: /\.jpg$/, loader: "file" },
             { test: require.resolve('jquery'), loader: "expose?jQuery" },
             { test: /\.tsx$/, loader: 'babel!ts-loader' },
             { test: /\.json$/, loader: 'json' },

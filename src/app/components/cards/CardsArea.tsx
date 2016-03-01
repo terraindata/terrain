@@ -62,7 +62,7 @@ var CardsArea = React.createClass<any, any>({
   
   getInitialState() {
     return {
-      showTQL: true,
+      showTQL: false,
     };
   },
   
