@@ -50,6 +50,7 @@ import Card from "../cards/Card.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateCardTool from "./CreateCardTool.tsx";
 import BuilderColumn from '../builder/BuilderColumn.tsx';
+import TQLView from '../tql/TQLView.tsx';
 
 var CardsArea = React.createClass<any, any>({
 	propTypes:
@@ -58,34 +59,86 @@ var CardsArea = React.createClass<any, any>({
     algorithmId: React.PropTypes.string.isRequired,
     spotlights: React.PropTypes.array.isRequired,
   },
-
-	render() {
-		var layout = {
-			rows: this.props.cards.map((card, index) => {
-				return {
-					content: <Card 
+  
+  getInitialState() {
+    return {
+      showTQL: true,
+    };
+  },
+  
+  copy() {},
+  
+  clear() {},
+  
+  switchView() {
+    this.setState({
+      showTQL: !this.state.showTQL,
+    });
+  },
+  
+  getMenuOptions() {
+    return [
+      {
+        text: this.state.showTQL ? 'Cards' : 'TQL',
+        onClick: this.switchView
+      },
+      {
+        text: 'Copy',
+        onClick: this.copy
+      },
+      {
+        text: 'Clear',
+        onClick: this.clear
+      }
+    ];
+  },
+  
+  renderTQL() {
+    if(!this.state.showTQL)
+    {
+      return null;
+    }
+    
+    return <TQLView />
+  },
+  
+  renderCards() {
+    if(this.state.showTQL)
+    {
+      return null;
+    }
+    
+    var layout = {
+      rows: this.props.cards.map((card, index) => {
+        return {
+          content: <Card 
             index={index}
             card={card}
             {...this.props} />,
           key: card.id,
-				};
-			}),
-			fullHeight: true,
-		};
+        };
+      }),
+      fullHeight: true,
+    };
     
     layout.rows.push({
       content: <CreateCardTool index={this.props.cards.length} alwaysOpen={true} algorithmId={this.props.algorithmId} />,
       key: 'end-tool',
     });
 
-		var moveTo = (curIndex, newIndex) =>
+    var moveTo = (curIndex, newIndex) =>
     {
       Actions.cards.move(this.props.cards[curIndex], newIndex);
     };
 
+    return <LayoutManager layout={layout} moveTo={moveTo} />;
+  },
+
+	render() {
 		return (
-      <BuilderColumn title='Builder'>
-        <LayoutManager layout={layout} moveTo={moveTo} />
+      <BuilderColumn title='Builder' menuOptions={this.getMenuOptions()}>
+        { this.renderTQL() }
+        { this.renderCards() }
       </BuilderColumn>
     );
 	},

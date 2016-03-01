@@ -62,6 +62,30 @@ var InputsArea = React.createClass<any, any>({
   {
     Actions.inputs.create(this.props.algorithmId, 0);
   },
+  
+  copyAll()
+  {
+    console.log('copy');
+  },
+  
+  removeAll()
+  {
+    console.log('remove');
+  },
+  
+  getMenuOptions()
+  {
+    return [
+      {
+        text: 'Copy',
+        onClick: this.copyAll
+      },
+      {
+        text: 'Clear', 
+        onClick: this.removeAll
+      }
+    ];
+  },
 
 	render() {
 		var layout = {
@@ -89,7 +113,7 @@ var InputsArea = React.createClass<any, any>({
     };
 
 		return (
-      <BuilderColumn title='Inputs'>
+      <BuilderColumn title='Inputs' menuOptions={this.getMenuOptions()}>
         <div className='inputs-area'>
           <LayoutManager layout={layout} moveTo={moveTo} />
         </div>

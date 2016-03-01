@@ -42,109 +42,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./TQLView.less');
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/Actions.tsx";
-import Result from "../results/Result.tsx";
-import LayoutManager from "../layout/LayoutManager.tsx";
-import BuilderColumn from '../builder/BuilderColumn.tsx';
 
-var ResultsArea = React.createClass<any, any>({
-	propTypes:
-	{
-		results: React.PropTypes.array.isRequired,
-    algorithmId: React.PropTypes.string.isRequired,
-	},
+interface Props
+{
   
-  getInitialState()
-  {
-    return {
-      expanded: false,
-      expandedResult: {},
-    };
-  },
-  
-  handleCollapse()
-  {
-    this.setState({
-      expanded: false,
-    });
-  },
-  
-  handleExpand(result)
-  {
-    this.setState({
-      expanded: true,
-      expandedResult: result,
-    });
-  },
+}
 
-  copy() {},
+class TQLView extends React.Component<Props, any>
+{
+  constructor(props: Props) {
+    super(props);
+  }
   
-  clear() {},
-  
-  getMenuOptions() {
-    return [
-      {
-        text: 'Copy',
-        onClick: this.copy
-      },
-      {
-        text: 'Clear',
-        onClick: this.clear
-      }
-    ];
-  },
-  
-  renderExpandedResult() {
+  render() {
+    var tql = "db\n  .from(sitter)\n  .select(\n    'FinalScore',\n    'sitter.name',\n    'sitter.location',\n    'sitter.minPrice',\n    'sitter.numJobs'\n  )\n  .filter(input.price >= sitter.minPrice && input.numJobs <= sitter.numJobs)";
     return (
-      <div className={'result-expanded-wrapper' + (this.state.expanded ? '' : ' result-collapsed-wrapper')}>
-        <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
-        <Result 
-          data={this.state.expandedResult}
-          algorithmId={this.props.algorithmId}
-          onExpand={this.handleCollapse}
-          expanded={true}
-          drag_x={false}
-          drag_y={false}
-          />
+      <div className='tql-view'>
+        <textarea defaultValue={tql} />
       </div>
     );
-  },
+  }
+};
 
-	render() {
-		var layout = {
-			cells: this.props.results.map((result) => {
-				return {
-					content: <Result data={result} algorithmId={this.props.algorithmId} onExpand={this.handleExpand} />,
-          key: result.id,
-				};
-			}),
-			cellHeight: 200,
-			cellWidth: {
-				0: 1,
-				300: 2,
-				650: 1,
-				1200: 2,
-				1850: 2,
-				2400: 3,
-			},
-			fullHeight: true,
-		};
-
-		var moveTo = (curIndex, newIndex) =>
-    {
-      Actions.results.move(this.props.results[curIndex], newIndex);
-    };
-
-		return (
-      <BuilderColumn title='Results' className='results-area' menuOptions={this.getMenuOptions()}>
-        <LayoutManager layout={layout} moveTo={moveTo} />
-        { this.renderExpandedResult() }
-      </BuilderColumn>
-    );
-	},
-});
-
-export default ResultsArea;
+export default TQLView;

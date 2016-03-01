@@ -46,6 +46,7 @@ require('./BuilderColumn.less');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
+import Menu from '../common/Menu.tsx';
 
 interface Props
 {
@@ -54,7 +55,7 @@ interface Props
   className?: string;
   
   // Options not yet supported
-  options?: {
+  menuOptions?: {
     text: string;
     onClick: () => void;
   }[];
@@ -64,12 +65,17 @@ class BuilderColumn extends React.Component<Props, any>
 {
   constructor(props: Props) {
     super(props);
-    this.renderOption = this.renderOption.bind(this);
+    Util.bind(this, ['renderMenu']);
   }
   
-  renderOption(option)
+  renderMenu()
   {
-    return null;
+    if(!this.props.menuOptions || !this.props.menuOptions.length)
+    {
+      return null;
+    }
+    
+    return <Menu options={this.props.menuOptions} />;
   }
   
   render() {
@@ -80,9 +86,7 @@ class BuilderColumn extends React.Component<Props, any>
             { this.props.title }
           </div>
           <div className='builder-title-bar-options'>
-            {
-              this.props.options ? this.props.options.map(this.renderOption) : null
-            }
+            { this.renderMenu() }
           </div>
         </div>
         <div className={'builder-column-content ' + this.props.className}>
