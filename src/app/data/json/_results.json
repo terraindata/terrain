@@ -1,82 +1,142 @@
 [
-{
-  "name": "Sitter 1",
-  "id": 100,
-  "minPrice": 10
-},
-{
-  "name": "Sitter 2",
-  "id": 9,
-  "minPrice": 9
-},
-{
-  "name": "Sitter 3",
-  "id": 10,
-  "minPrice": 10
-},
-{
-  "name": "Sitter 4",
-  "id": 11,
-  "minPrice": 11
-},
-{
-  "name": "Sitter 5",
-  "id": 12,
-  "minPrice": 12
-},
-{
-  "name": "Sitter 6",
-  "id": 13,
-  "minPrice": 13
-},
-{
-  "name": "Sitter 7",
-  "id": 14,
-  "minPrice": 14
-},
-{
-  "name": "Sitter 8",
-  "id": 15,
-  "minPrice": 15
-},
-{
-  "name": "Sitter 9",
-  "id": 16,
-  "minPrice": 16
-},
-{
-  "name": "Sitter 10",
-  "id": 17,
-  "minPrice": 17
-},
-{
-  "name": "Sitter 11",
-  "id": 18,
-  "minPrice": 18
-},
-{
-  "name": "Sitter 12",
-  "id": 19,
-  "minPrice": 19
-},
-{
-  "name": "Sitter 13",
-  "id": 20,
-  "minPrice": 20
-},
-{
-  "name": "Sitter 14",
-  "id": 21,
-  "minPrice": 21
-},
-{
-  "name": "Sitter 15",
-  "id": 24,
-  "minPrice": 24
-},
-{
-  "name": "Sitter 16",
-  "id": 25,
-  "minPrice": 25
-}
+  {
+    "name": "Grace Miller",
+    "id": 0,
+    "minPrice": 17,
+    "numJobs": 12,
+    "description": "I love kids! Kids are my favorite.",
+    "location": "San Francisco",
+    "averageResponseTime": 27,
+    "avgRating": 3.09
+  },
+  {
+    "name": "Monica Doan",
+    "id": 1,
+    "minPrice": 23,
+    "numJobs": 44,
+    "description": "Kids are the best. I love to babysit for kids.",
+    "location": "Palo Alto",
+    "averageResponseTime": 10,
+    "avgRating": 0.32
+  },
+  {
+    "name": "Cheryl Burney",
+    "id": 2,
+    "minPrice": 14,
+    "numJobs": 36,
+    "description": "My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+    "location": "Colma",
+    "averageResponseTime": 69,
+    "avgRating": 2.022
+  },
+  {
+    "name": "Tina Sierra",
+    "id": 3,
+    "minPrice": 18,
+    "numJobs": 68,
+    "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+    "location": "Rohan",
+    "averageResponseTime": 91,
+    "avgRating": 1.30
+  },
+  {
+    "name": "Lizzie Wescott",
+    "id": 4,
+    "minPrice": 22,
+    "numJobs": 53,
+    "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+    "location": "Atlantis",
+    "averageResponseTime": 13,
+    "avgRating": 4.26
+  },
+  {
+    "name": "Bridget Cramer",
+    "id": 5,
+    "minPrice": 21,
+    "numJobs": 61,
+    "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+    "location": "An island somewhere",
+    "averageResponseTime": 72,
+    "avgRating": 3.29
+  },
+  {
+    "name": "Faustina Green",
+    "id": 6,
+    "minPrice": 11,
+    "numJobs": 74,
+    "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+    "location": "Gondor",
+    "averageResponseTime": 111,
+    "avgRating": 3.19
+  },
+  {
+    "name": "Mary Peek",
+    "id": 7,
+    "minPrice": 21,
+    "numJobs": 44,
+    "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+    "location": "Santa Cruz",
+    "averageResponseTime": 55,
+    "avgRating": 2.18
+  },
+  {
+    "name": "Lisa Walker",
+    "id": 8,
+    "minPrice": 22,
+    "numJobs": 85,
+    "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+    "location": "Colma",
+    "averageResponseTime": 34,
+    "avgRating": 1.72
+  },
+  {
+    "name": "Marietta Barker",
+    "id": 9,
+    "minPrice": 12,
+    "numJobs": 31,
+    "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+    "location": "Palo Alto",
+    "averageResponseTime": 85,
+    "avgRating": 3.11
+  },
+  {
+    "name": "Bonnie Underhill",
+    "id": 11,
+    "minPrice": 14,
+    "numJobs": 6,
+    "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+    "location": "The North Pole",
+    "averageResponseTime": 65,
+    "avgRating": 3.73
+  },
+  {
+    "name": "Charlotte Wakeman",
+    "id": 12,
+    "minPrice": 14,
+    "numJobs": 28,
+    "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+    "location": "Namek",
+    "averageResponseTime": 29,
+    "avgRating": 1.95
+  },
+  {
+    "name": "Betty Ruff",
+    "id": 13,
+    "minPrice": 16,
+    "numJobs": 2,
+    "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+    "location": "San Francisco",
+    "averageResponseTime": 56,
+    "avgRating": 4.65
+  },
+  {
+    "name": "Danielle Morgan",
+    "id": 14,
+    "minPrice": 14,
+    "numJobs": 55,
+    "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+    "location": "Menlo Park",
+    "averageResponseTime": 69,
+    "avgRating": 4.22
+  }
 ]

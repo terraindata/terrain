@@ -233,7 +233,7 @@
         "id": 0,
         "minPrice": 17,
         "numJobs": 12,
-        "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+        "description": "I love kids! Kids are my favorite.",
         "location": "San Francisco",
         "averageResponseTime": 27,
         "avgRating": 3.09
@@ -243,7 +243,7 @@
         "id": 1,
         "minPrice": 23,
         "numJobs": 44,
-        "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+        "description": "Kids are the best. I love to babysit for kids.",
         "location": "Palo Alto",
         "averageResponseTime": 10,
         "avgRating": 0.32
@@ -253,7 +253,7 @@
         "id": 2,
         "minPrice": 14,
         "numJobs": 36,
-        "description": "I love kids! Kids are my favorite. Kids are the best. I love to babysit for kids. My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
+        "description": "My favorite thing to do with kids is to feed them bags of marshmallows and watch them go crazy around the house. I impose absolutely no rules and just want to let kids have fun. Let me babysit your kids!",
         "location": "Colma",
         "averageResponseTime": 69,
         "avgRating": 2.022
