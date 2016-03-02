@@ -263,14 +263,14 @@ var Result = React.createClass<any, any>({
 		return this.renderPanel((
 			<div className={classes}>
 				<div className='result-inner' onDoubleClick={this.expand}>
-					<div className='result-name'>
+          <div className='result-name'>
             {this.renderSpotlight()}
             <div className='result-pin-icon'>
               <PinIcon />
             </div>
             {this.props.data.name}
-            <Menu options={this.getMenuOptions()} />
-					</div>
+          </div>
+          <Menu options={this.getMenuOptions()} />
 					<div className='result-score'>
             <ScoreIcon className='result-score-icon' />
             Final Score

@@ -7,10 +7,6 @@
 @result-icon-size: 17px;
 
 .result {
-	.standard-margin;
-  margin-left: @standard-margin;
-  margin-right: @standard-margin;
-  
   &:first-child,
   &:nth-child(2) {
     margin-top: 2 * @standard-margin;
@@ -18,9 +14,20 @@
   
 	position: relative;
   
+  padding: 0px @standard-margin;
+  transition: padding 0.15s;
+  
+  &:hover {
+    // padding: 0px 2px; // if we want it to grow a little
+    .result-inner .result-name {
+      background: darken(#cfd7c8, 10%);
+    }
+  }
+  
   .menu-wrapper {
     top: @standard-margin;
     right: @standard-margin;
+    z-index: 10001;
   }
 
 	.result-inner {
@@ -38,15 +45,16 @@
       font-weight: 700;
       padding: 10px 13px;
       box-sizing: border-box;
-      background: #b6bfae;
+      background: #cfd7c8;
       font-size: 14px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       
       .trans-black;
+      .transition;
     }
-
+    
     .result-score {
       height: @result-score-height;
       .trans-black;
@@ -215,5 +223,5 @@
 }
 
 .results-area {
-  background: #cfd7c8;
+  background: #e9ece6;
 }

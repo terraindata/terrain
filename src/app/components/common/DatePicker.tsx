@@ -51,12 +51,18 @@ import Util from '../../util/Util.tsx';
 import Dropdown from './Dropdown.tsx';
 import LayoutManager from './../layout/LayoutManager.tsx';
 
-var HOUR_OPTIONS = [];
-for(var h = 0; h < 24; h ++) HOUR_OPTIONS.push("" + h);
+var MINUTE_INTERVAL = 30;
+var MINUTE_RATIO = (60 / MINUTE_INTERVAL);
 
-var MINUTE_INTERVAL = 15;
-var MINUTE_OPTIONS = [];
-for(var m = 0; m < 60; m += MINUTE_INTERVAL) MINUTE_OPTIONS.push((m < 10 ? "0" : "") + m);
+var HOUR_OPTIONS = [];
+for(var h = 0; h < 24; h ++)
+{
+  for(var m = 0; m < 60; m += MINUTE_INTERVAL) {
+    var hour = (h - 1) % 12 + 1;
+    if(h === 0) hour = 12;
+    HOUR_OPTIONS.push(hour + ":" + (m < 10 ? "0" : "") + m + (h < 12 ? 'am' : 'pm'));
+  }
+}
 
 interface Props {
   date: string;
@@ -70,7 +76,7 @@ class DatePicker extends React.Component<Props, any>
     super(props);
     
     Util.bind(this, ['handleDayClick', 'getDate', 'renderTimePicker',
-      'handleMinuteChange', 'handleHourChange']);
+      'handleHourChange']);
   }
   
   getDate(): Date
@@ -87,49 +93,30 @@ class DatePicker extends React.Component<Props, any>
     this.props.onChange(date.toString());
   }
   
-  handleHourChange(hour)
+  handleHourChange(hourIndex)
   {
     var date = this.getDate();
-    date.setHours(hour);
+    var minute
+    date.setHours(Math.floor(hourIndex / MINUTE_RATIO));
+    date.setMinutes((hourIndex % MINUTE_RATIO) * MINUTE_INTERVAL);
     this.props.onChange(date.toString()); 
   }
   
-  handleMinuteChange(minuteInterval)
+  dateToHourIndex(date)
   {
-    var date = this.getDate();
-    date.setMinutes(minuteInterval * MINUTE_INTERVAL);
-    this.props.onChange(date.toString());
+    return date.getHours() * (60 / MINUTE_INTERVAL) + (date.getMinutes() / MINUTE_INTERVAL);
   }
   
   renderTimePicker()
   {
     var date = this.getDate();
     
-    var layout =
-    {
-      columns: [
-        {
-          content: <Dropdown 
-            options={HOUR_OPTIONS}
-            selectedIndex={date.getHours()}
-            onChange={this.handleHourChange} />
-        },
-        {
-          content: <div className='date-time-colon'>:</div>,
-          width: 25,
-        },
-        {
-          content: <Dropdown 
-            options={MINUTE_OPTIONS}
-            selectedIndex={date.getMinutes() / MINUTE_INTERVAL}
-            onChange={this.handleMinuteChange} />
-        }
-      ],
-    }
-    
     return (
       <div className='date-time-time'>
-        <LayoutManager layout={layout} />
+        <Dropdown 
+            options={HOUR_OPTIONS}
+            selectedIndex={this.dateToHourIndex(this.getDate())}
+            onChange={this.handleHourChange} />
       </div>);
   }
   
