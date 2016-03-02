@@ -12,6 +12,7 @@
   height: 260px;
   
   color: @trans-black;
+  font-weight: 500;
   
   div {
     outline: none;
@@ -142,8 +143,9 @@
         text-align: center;
         cursor: pointer;
         vertical-align: middle;
+        background: #fff;
         
-        &:hover:not(.DayPicker-Day--selected) {
+        &:hover:not(.DayPicker-Day--selected):not(.DayPicker-Day--outside) {
           background: fade(@select-color, 10%);
         }
         
@@ -169,6 +171,7 @@
 .DayPicker-Day--outside {
   cursor: default;
   color: #dce0e0;
+  background: none;
 }
 
 /* Example modifiers */

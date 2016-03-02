@@ -114,6 +114,7 @@ class Builder extends React.Component<any, any>
         fullHeight: true,
         columns: [
           {
+            width: 316,
             content: <InputsArea inputs={algorithm.inputs} algorithmId={algorithmId} />,
           },
           {

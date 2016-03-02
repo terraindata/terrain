@@ -45,13 +45,12 @@ THE SOFTWARE.
 var Immutable = require('immutable');
 import ActionTypes from './../../ActionTypes.tsx';
 import Util from './../../../util/Util.tsx';
-var newResults = require('../../json/_results.json');
 
 var NEW_ALGORITHM = 
 {
   inputs: [],
   cards: [],
-  results: newResults,
+  results: [],
 };
 
 var currentAlgorithmId = 101;

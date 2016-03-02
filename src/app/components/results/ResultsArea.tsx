@@ -49,6 +49,7 @@ import Actions from "../../data/Actions.tsx";
 import Result from "../results/Result.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
 import BuilderColumn from '../builder/BuilderColumn.tsx';
+import InfoArea from '../common/InfoArea.tsx';
 
 var ResultsArea = React.createClass<any, any>({
 	propTypes:
@@ -84,7 +85,8 @@ var ResultsArea = React.createClass<any, any>({
   
   clear() {},
   
-  getMenuOptions() {
+  getMenuOptions()
+  {
     return [
       {
         text: 'Copy',
@@ -97,7 +99,8 @@ var ResultsArea = React.createClass<any, any>({
     ];
   },
   
-  renderExpandedResult() {
+  renderExpandedResult()
+  {
     return (
       <div className={'result-expanded-wrapper' + (this.state.expanded ? '' : ' result-collapsed-wrapper')}>
         <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
@@ -112,35 +115,48 @@ var ResultsArea = React.createClass<any, any>({
       </div>
     );
   },
-
-	render() {
-		var layout = {
-			cells: this.props.results.map((result) => {
-				return {
-					content: <Result data={result} algorithmId={this.props.algorithmId} onExpand={this.handleExpand} />,
+  
+  renderResults()
+  {
+    if(!this.props.results.length)
+    {
+      return <InfoArea
+        large="There are no results for your query."
+        />;
+    }
+    
+    var layout = {
+      cells: this.props.results.map((result) => {
+        return {
+          content: <Result data={result} algorithmId={this.props.algorithmId} onExpand={this.handleExpand} />,
           key: result.id,
-				};
-			}),
-			cellHeight: 200,
-			cellWidth: {
-				0: 1,
-				300: 2,
-				650: 1,
-				1200: 2,
-				1850: 2,
-				2400: 3,
-			},
-			fullHeight: true,
-		};
+        };
+      }),
+      cellHeight: 200,
+      cellWidth: {
+        0: 1,
+        300: 2,
+        650: 1,
+        1200: 2,
+        1850: 2,
+        2400: 3,
+      },
+      fullHeight: true,
+    };
 
-		var moveTo = (curIndex, newIndex) =>
+    var moveTo = (curIndex, newIndex) =>
     {
       Actions.results.move(this.props.results[curIndex], newIndex);
     };
 
+    return <LayoutManager layout={layout} moveTo={moveTo} />;
+  },
+
+	render()
+  {
 		return (
       <BuilderColumn title='Results' className='results-area' menuOptions={this.getMenuOptions()}>
-        <LayoutManager layout={layout} moveTo={moveTo} />
+        { this.renderResults() }
         { this.renderExpandedResult() }
       </BuilderColumn>
     );

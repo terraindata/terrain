@@ -46,12 +46,19 @@ var Immutable = require('immutable');
 import ActionTypes from './../../ActionTypes.tsx';
 import Util from './../../../util/Util.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
+var newResults = require('../../json/_results.json');
 
 var FromCardReducer = {};
 
 FromCardReducer[ActionTypes.cards.from.changeGroup] =
-  (state, action) =>
-    state.setIn([action.payload.card.algorithmId, 'cards', action.payload.index, 'group'], action.payload.value);
+  (state, action) => {
+    if(action.payload.value === 'sitters' && state.getIn([action.payload.card.algorithmId, 'results']).count() === 0)
+    {
+      state = state.setIn([action.payload.card.algorithmId, 'results'], Immutable.fromJS(newResults));
+    }
+    
+    return state.setIn([action.payload.card.algorithmId, 'cards', action.payload.index, 'group'], action.payload.value);
+  }
 
 FromCardReducer[ActionTypes.cards.from.join.create] =
   (state, action) =>
