@@ -173,7 +173,7 @@ var Periscope = {
   _mousedownFactory: (el, onMove, scale, domain) => function(event) {
     var del = d3.select(el);
     var handle = d3.select(this);
-    var startMouseX = d3.mouse(this)[0];
+    var startMouseX = d3.mouse(this)[0] + del[0][0]['getBoundingClientRect']()['left'];
     var startHandleX = parseInt(handle.attr('cx'), 10);
     
     var initialClasses = handle.attr('class');
@@ -203,17 +203,18 @@ var Periscope = {
       onMove(handle.attr('_id'), newValue);
     }
     
-    del.on('mousemove', move);
-    del.on('touchmove', move);
+    var bd = d3.select('body');
+    bd.on('mousemove', move);
+    bd.on('touchmove', move);
     
     var offFn = () => {
-      del.on('mousemove', null)
-      del.on('touchmove', null)
+      bd.on('mousemove', null)
+      bd.on('touchmove', null)
       handle.attr('class', initialClasses);
     };
-    del.on('mouseup', offFn);
-    del.on('touchend', offFn);
-    del.on('mouseleave', offFn);
+    bd.on('mouseup', offFn);
+    bd.on('touchend', offFn);
+    bd.on('mouseleave', offFn);
   },
   
   _drawHandles(el, scales, domain, onDomainChange)

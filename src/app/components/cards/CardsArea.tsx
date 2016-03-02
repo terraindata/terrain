@@ -158,7 +158,7 @@ var CardsArea = React.createClass<any, any>({
 
 	render() {
 		return (
-      <BuilderColumn title='Builder' menuOptions={this.getMenuOptions()}>
+      <BuilderColumn title={this.state.showTQL ? 'TQL' : 'Builder'} menuOptions={this.getMenuOptions()}>
         { this.renderTQL() }
         { this.renderCards() }
       </BuilderColumn>
