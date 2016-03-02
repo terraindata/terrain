@@ -127,12 +127,13 @@
         margin-left: 10px;
         
         svg {
-          fill: @gray;
+          fill: @font-color;
           width: 10px;
           .transition;
           
           &:hover {
-            fill: darken(@gray, 15%);
+            width: 14px;
+            margin: -2px;
           }
         }
       }
@@ -156,6 +157,10 @@
     .tab-inner {
 		  background: @tab-selected-bg-color;
       border-color: @tab-selected-border-color;
+      
+      .tabs-close svg {
+        fill: @selected-font-color;
+      }
     }
     
     .tab-icon {
