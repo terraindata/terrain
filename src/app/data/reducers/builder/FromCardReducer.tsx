@@ -54,6 +54,10 @@ FromCardReducer[ActionTypes.cards.from.changeGroup] =
   (state, action) => {
     if(action.payload.value === 'sitters' && state.getIn([action.payload.card.algorithmId, 'results']).count() === 0)
     {
+      newResults = newResults.map(result => {
+        result.algorithmId = action.payload.card.algorithmId;
+        return result;
+      })
       state = state.setIn([action.payload.card.algorithmId, 'results'], Immutable.fromJS(newResults));
     }
     

@@ -53,6 +53,7 @@ import Util from '../util/Util.tsx';
 import { CardModels } from './../models/CardModels.tsx';
 
 var defaultStateJson = require('./json/_state.json');
+var descriptions = require('./json/_descriptions.json');
 
 _.map(defaultStateJson, (algorithm, algorithmId) => {
   algorithm.cards = algorithm.cards.map((card) => {
@@ -69,6 +70,7 @@ _.map(defaultStateJson, (algorithm, algorithmId) => {
     {
       result.algorithmId = algorithmId
       result.score = 100 - index * 4;
+      result.description = descriptions[index];
     });
 });
 
