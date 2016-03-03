@@ -64,4 +64,22 @@ AlgorithmReducer[ActionTypes.closeAlgorithm] =
   (state, action) =>
     state.delete(action.payload.algorithmId);
 
+AlgorithmReducer[ActionTypes.duplicateAlgorithm] =
+  (state, action) => {
+    var algorithmId = "" + Math.random();
+    return state.set(algorithmId,
+      Immutable.fromJS(state.get("" + action.payload.algorithmId).toJS()))
+      .setIn([algorithmId, 'algorithmName'], 'Copy of ' + state.getIn(["" + action.payload.algorithmId, 'algorithmName']))
+      .updateIn([algorithmId, 'results'], results =>
+        results.map(result =>
+          result.set('algorithmId', algorithmId)))
+      .updateIn([algorithmId, 'cards'], cards =>
+        cards.map(card =>
+          card.set('algorithmId', algorithmId)))
+      .updateIn([algorithmId, 'inputs'], inputs =>
+        inputs.map(input =>
+          input.set('algorithmId', algorithmId)))
+      ;
+  }
+
 export default AlgorithmReducer;

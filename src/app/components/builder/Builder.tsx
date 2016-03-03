@@ -51,6 +51,8 @@ var _ = require("underscore");
 import Store from "./../../data/Store.tsx";
 import Actions from "./../../data/Actions.tsx";
 
+import Util from "./../../util/Util.tsx";
+
 // Components
 import Tabs from "./../../components/layout/Tabs.tsx";
 import LayoutManager from "./../../components/layout/LayoutManager.tsx";
@@ -59,6 +61,11 @@ import Result from "./../../components/results/Result.tsx";
 import InputsArea from "./../../components/inputs/InputsArea.tsx";
 import CardsArea from "./../../components/cards/CardsArea.tsx";
 import ResultsArea from "./../../components/results/ResultsArea.tsx";
+
+var NewIcon = require("./../../../images/icon_new_8x10.svg?name=NewIcon");
+var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
+var DuplicateIcon = require("./../../../images/icon_duplicate_11x12.svg?name=DuplicateIcon");
+var SaveIcon = require("./../../../images/icon_save_10x10.svg?name=SaveIcon");
 
 class Builder extends React.Component<any, any>
 {
@@ -86,12 +93,47 @@ class Builder extends React.Component<any, any>
     //  the whole Builder app built upon Immutable state.    
     this.reduxState = Store.getState().toJS();
     this.state = {
-      random: Math.random()
+      random: Math.random(),
+      selectedAlgorithmId: 100, // TODO change
     };
+    
+    Util.bind(this, 'duplicateAlgorithm', 'handleNewAlgorithmTab');
   }
   
-  handleNewAlgorithmTab() {
+  handleNewAlgorithmTab()
+  {
     Actions.newAlgorithm();
+  }
+  
+  duplicateAlgorithm()
+  {
+    Actions.duplicateAlgorithm(this.state.selectedAlgorithmId);
+  }
+  
+  getTabActions()
+  {
+    return [
+      {
+        text: 'new',
+        icon: <NewIcon />,
+        onClick: this.handleNewAlgorithmTab,
+      },
+      {
+        text: 'open',
+        icon: <OpenIcon />,
+        onClick: () => alert("Not yet implemented."),
+      },
+      {
+        text: 'duplicate',
+        icon: <DuplicateIcon />,
+        onClick: this.duplicateAlgorithm
+      },
+      {
+        text: 'save',
+        icon: <SaveIcon />,
+        onClick: () => alert("Not yet implemented."),
+      },
+    ];
   }
   
 	render() {
@@ -138,7 +180,17 @@ class Builder extends React.Component<any, any>
         tabName: algorithm.algorithmName || 'New Algorithm',
         closeable: true,
         onClose: closeFn,
+        onClick: () => {
+          this.setState({
+            selectedAlgorithmId: algorithmId,
+          });
+        }
       };
+      
+      if(!this.state.selectedAlgorithmId)
+      {
+        setTimeout(() => this.setState({ selectedAlgorithmId: algorithmId }));
+      }
     });
 
     tabs[-1] = {
@@ -151,7 +203,7 @@ class Builder extends React.Component<any, any>
     };
     
     return (
-      <Tabs tabs={tabs} />
+      <Tabs tabs={tabs} actions={this.getTabActions()} ref='tabs' />
     );
 	}
 };

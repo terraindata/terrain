@@ -168,4 +168,41 @@
       stroke: @tab-selected-border-color;
     }
 	}
+  
+  .tabs-actions {
+    position: absolute;
+    right: 9px;
+    top: 0px;
+    
+    // mix-blend-mode: multiply;
+    
+    color: rgba(255,255,255,0.8);
+    .tabs-action {
+      // height: 35px;
+      display: inline-block;
+      padding: 0px 5px;
+      margin-top: 9px;
+      cursor: pointer;
+      
+      border-left: 1px solid rgba(255,255,255,0.6);
+      &:first-child {
+        border-left: none;
+      }
+      
+      .transition;
+      
+      svg {
+        .transition;
+        fill: rgba(255,255,255,0.6);
+        width: 10px;
+      }
+     
+      &:hover {
+        color: #fff;
+        svg {
+          fill: #fff;
+        }
+      } 
+    }
+  }
 }

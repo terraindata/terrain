@@ -147,6 +147,7 @@ var ActionTypes =
 
   newAlgorithm: '',
   closeAlgorithm: '',
+  duplicateAlgorithm: '',
 };
 
 // I tried using this type to correclty classify this function,

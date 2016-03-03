@@ -126,8 +126,7 @@ var InputsArea = React.createClass<any, any>({
 
     var moveTo = (curIndex, newIndex) =>
     {
-      // shift of -1 needed to offset the prepended CreateLine
-      Actions.inputs.move(this.props.inputs[curIndex - 1], newIndex - 1);
+      Actions.inputs.move(this.props.inputs[curIndex], newIndex);
     };
     
     return (

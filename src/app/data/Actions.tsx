@@ -211,6 +211,10 @@ var Actions =
   closeAlgorithm: 
     (algorithmId: string) =>
       $(ActionTypes.closeAlgorithm, {algorithmId}),
+  
+  duplicateAlgorithm:
+    (algorithmId: string) =>
+      $(ActionTypes.duplicateAlgorithm, {algorithmId}),
 
 };
 

@@ -55,6 +55,8 @@ var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 var Tab = React.createClass<any, any>({
   mixins: [PanelMixin],
   
+  test: 'abc',
+  
   propTypes:
   {
     index: React.PropTypes.number,
@@ -62,6 +64,7 @@ var Tab = React.createClass<any, any>({
     tab: React.PropTypes.object,
     tabOrder: React.PropTypes.array,
     onSelect: React.PropTypes.func,
+    actions: React.PropTypes.array,
   },
   
   getDefaultProps(): any
@@ -235,7 +238,25 @@ var Tabs = React.createClass<any, any>({
     });
   },
   
-	render() {
+  renderActions()
+  {
+    if(!this.props.actions)
+    {
+      return null;
+    }
+    
+    return (
+      <div className='tabs-actions'>
+        {
+          this.props.actions.map((action, index) => 
+            <a className='tabs-action' key={index} onClick={action.onClick}>{action.icon} {action.text}</a>)
+        }
+      </div>
+    );
+  },
+  
+	render()
+  {
     var selectedIndex = this.state.tabOrder.findIndex((tab) => tab.selected);
     if(selectedIndex === -1)
     {
@@ -262,7 +283,7 @@ var Tabs = React.createClass<any, any>({
         ),
       }))
     };
-
+    
 		return (<div className='tabs-container'>
 			<div className='tabs-row-wrapper'>
 				{ 
@@ -275,6 +296,7 @@ var Tabs = React.createClass<any, any>({
 				{
 					<div className='tabs-row'>
 						<LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />
+            { this.renderActions() }
             <div className='tabs-shadow'></div>
 					</div>
 				}
