@@ -142,7 +142,7 @@ class TransformCard extends React.Component<Props, any>
             onChange={this.handleWeightChange} />
         },
         {
-          content: <div className='transform-card-weight-output'>{ scoreCard.output }</div>
+          content: <input type='text' defaultValue={ scoreCard.output } />
         }
       ],
     }
