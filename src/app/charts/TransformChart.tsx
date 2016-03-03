@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./TransformChart.less');
 
 import * as d3 from 'd3';
-
+import * as _ from 'underscore';
 
 var xMargin = 45;
 var yMargin = 10;
@@ -81,16 +81,18 @@ var TransformChart = {
         
     innerSvg.append('g')
       .attr('class', 'bars');
-    
-    innerSvg.append('g')
-      .attr('class', 'spotlights');
-    
     innerSvg.append('g')
       .append('path')
       .attr('class', 'lines');
     
     innerSvg.append('g')
       .attr('class', 'points');
+    
+    innerSvg.append('g')
+      .attr('class', 'spotlight-bgs');
+    
+    innerSvg.append('g')
+      .attr('class', 'spotlights');
     
     this.update(el, state);
   },
@@ -262,45 +264,186 @@ var TransformChart = {
   },
   
   
-  _drawSpotlights(el, scales, spotlights, inputKey, pointsData)
+  _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData)
   {
     var g = d3.select(el).selectAll('.spotlights')
     
     var spotlight = g.selectAll('.spotlight')
       .data(spotlights, (d) => d['id']);
     
-    spotlight.enter()
-      .append('circle')
+    var spotlightEnter = spotlight.enter()
+      .append('g')
       .attr('class', 'spotlight')
       .attr('_id', (d) => d['id']);
+    spotlightEnter.append('circle');
+    spotlightEnter.append('rect');
+    spotlightEnter.append('text');
     
-    spotlight
-      .attr('cx', (d) => scales.realX(d[inputKey] !== undefined ? d[inputKey] : 0))
-      .attr('cy', (d) => {
-        if(d[inputKey] === undefined)
-        {
-          return 0;
-        }
-        
+    var getBar = (d) => {
+      // find the bar that it fits in
+      var x = d[inputKey] !== undefined ? d[inputKey] : 0;
+      var i = 0;
+      // consider using binary search to speed this up
+      while(barsData[i] && !(barsData[i].range.max >= x && barsData[i].range.min <= x))
+      {
+        i++;
+      }
+      
+      return barsData[i];
+    }
+    
+    
+    var getBarX = (d) => {
+      var bar = getBar(d);
+      if(!bar)
+      {
+        return -12345;
+      }  
+      
+      return (bar.range.max + bar.range.min) / 2;
+    };
+    
+    var ys: _.Dictionary<{y: number, offset: number, x: number}> = {};
+    var idToY = {};
+    
+    var SPOTLIGHT_SIZE = 12;
+    var SPOTLIGHT_PADDING = 6;
+    var INITIAL_OFFSET = 27;
+    var OFFSET = SPOTLIGHT_SIZE + SPOTLIGHT_PADDING;
+    var TOOLTIP_BG_PADDING = 6;
+    
+    var getBarY = (d) => {
+      var bar = getBar(d);
+      if(!bar)
+      {
+        return -12345;
+      }
+      
+      if(ys[bar.range.min])
+      {
+        ys[bar.range.min].offset += OFFSET;
+      }
+      else
+      {
         // Consider using Binary Search to speed this up
         var i = 1;
-        while(pointsData[i] && pointsData[i]['x'] < d[inputKey])
+        var x = (bar.range.max + bar.range.min) / 2;
+        while(pointsData[i] && pointsData[i]['x'] < x)
         {
           i ++;
         }
         
         var first = pointsData[i - 1];
         var second = pointsData[i];
-        var distanceRatio = (d[inputKey] - first['x']) / (second['x'] - first['x']);
-        var y = first['y'] * (1 - distanceRatio) + second['y'] * distanceRatio;
-        return scales.realPointY(y);
+        var distanceRatio = (x - first['x']) / (second['x'] - first['x']);
+        var yVal = first['y'] * (1 - distanceRatio) + second['y'] * distanceRatio;
+        var y = scales.realPointY(yVal);
+        ys[bar.range.min] = 
+        {
+          y: y,
+          offset: INITIAL_OFFSET,
+          x: (bar.range.min + bar.range.max) / 2
+        }
+      }
+      
+      var finalY = ys[bar.range.min].y - ys[bar.range.min].offset;
+      idToY[d['id']] = finalY;
+      return finalY;
+    }
+    
+    var isvg = d3.select(el).select('.inner-svg');
+    
+    spotlight
+      .select('circle')
+      .attr('cx', (d) => {
+        return scales.realX(getBarX(d));
+      })
+      .attr('cy', (d) => {
+        if(d[inputKey] === undefined)
+        {
+          return 0;
+        }
+        
+        return getBarY(d);
       })
       .attr('fill', (d) => d['spotlight'])
-      .attr('stroke', '#fff')
-      .attr('stroke-width', (d) => d[inputKey] !== undefined ? '2px' : '0px')
-      .attr('r',  (d) => d[inputKey] !== undefined ? 14 : 0);
+      // .attr('stroke', '#fff')
+      // .attr('stroke-width', (d) => d[inputKey] !== undefined ? SPOTLIGHT_PADDING + 'px' : '0px')
+      .attr('r',  (d) => d[inputKey] !== undefined ? SPOTLIGHT_SIZE / 2 : 0)
+      ;
+    
+    spotlight
+      .select('text')
+      .text((d) => d['name'])
+      .attr('class', (d) => 'spotlight-tooltip spotlight-tooltip-' + d['id'])
+      .attr('y', (d) => idToY[d['id']] + 5)
+      .attr('x', (d) => scales.realX(getBarX(d)) + SPOTLIGHT_SIZE / 2 + SPOTLIGHT_PADDING + 3)
+      .attr('fill', (d) => d['spotlight'])
+      ;
+    
+    spotlight
+      .select('rect')
+      .attr('class', 'spotlight-tooltip-bg')
+      .attr('y', (d) => idToY[d['id']] + 5 - 11 - TOOLTIP_BG_PADDING)
+      .attr('height', TOOLTIP_BG_PADDING * 2 + 11)
+      .attr('x', (d) => scales.realX(getBarX(d)) + SPOTLIGHT_SIZE / 2 + SPOTLIGHT_PADDING - TOOLTIP_BG_PADDING + 3)
+      .attr('width', (d) => TOOLTIP_BG_PADDING * 2 + g.select('.spotlight-tooltip-' + d['id'])['node']()['getBBox']()['width'])
+      .attr('fill', 'rgba(255,255,255,0.95)')
+      .attr('rx', 6)
+      .attr('ry', 6)
+      ;
+    
+    
+    
+    var g2 = d3.select(el).selectAll('.spotlight-bgs');
+    
+    var bgData = _.map(ys, (y, k) => {
+      y['key'] = k;
+      return y;
+    });
+    
+    var spotlightBg = g2.selectAll('.spotlight-bg')
+      .data(bgData, (d) => { return d['key'] });
+    
+    spotlightBg.enter()
+      .append('path')
+      .attr('class', 'spotlight-bg');
+    
+    spotlightBg
+      .attr('d', (d) => 'M' + scales.realX(d['x']) + ' ' + d['y'])
+      .attr('fill', '#fff')
+      .attr('stroke', '#ccc')
+      .attr('stroke-width', '1px')
+      .attr('d', (d) => { 
+        var x = scales.realX(d['x']);
+        var y = d['y'];
+        var offset = d['offset'];
+        var radius = SPOTLIGHT_SIZE / 2 + SPOTLIGHT_PADDING;
+        var straightHeight = offset - radius * 2 - 2;
+        if(straightHeight < 0) straightHeight = 0;
+        var pinR = 5;
+        
+        var str = "Mx y l -p -15 " +
+        "a r r 0 0 1 -"+(radius - pinR)+" -r " + 
+        "l 0 -h " +
+        "a r r 0 0 1 r -r " +
+        "a r r 0 0 1 r r " +
+        "l 0 h " +
+        "a r r 0 0 1 -"+(radius - pinR)+" r " +
+        "l -p 15";
+        
+        str = str.replace(/x/g, x + "");
+        str = str.replace(/y/g, y + "");
+        str = str.replace(/h/g, straightHeight + "");
+        str = str.replace(/r/g, radius + "");
+        str = str.replace(/p/g, pinR + "");
+        
+        return str;
+      })
+      ;
     
     spotlight.exit().remove();
+    spotlightBg.exit().remove();
   },
   
   // needs to be "function" for d3.mouse(this)
@@ -421,7 +564,7 @@ var TransformChart = {
     this._drawBg(el, scales);
     this._drawAxes(el, scales);
     this._drawBars(el, scales, barsData, colors.bar);
-    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData);
+    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
     this._drawLines(el, scales, pointsData, colors.line, onLineClick, onLineMove);
     this._drawPoints(el, scales, pointsData, onMove, colors.line);
   },

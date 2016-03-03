@@ -106,14 +106,15 @@
         "id": 74,
         "input": "sitter.minPrice",
         "output": "sitter.transformedMinPrice",
+        "range": [10, 28],
         "scorePoints": [
           {
-            "value": 13,
+            "value": 11,
             "score": 0.5,
             "id": "0a0"
           },
           {
-            "value": 16,
+            "value": 15,
             "score": 0.7,
             "id": "0a1"
           },
@@ -123,12 +124,12 @@
             "id": "0a2"
           },
           {
-            "value": 22,
+            "value": 23,
             "score": 0.7,
             "id": "0a3"
           },
           {
-            "value": 25,
+            "value": 27,
             "score": 0.5,
             "id": "0a4"
           }

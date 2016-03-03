@@ -24,7 +24,10 @@
     &:hover,
     &.point-active {
       stroke-width: 5px;
-      // stroke: #ce8311;
+    }
+    
+    &.point-active {
+      stroke: #fc5218;
     }
   }
   
@@ -33,6 +36,35 @@
     
     &:hover {
       stroke: #fc5218;
+    }
+  }
+  
+  .spotlight,
+  .spotlight-bg {
+    position: relative;
+    z-index: 0;
+    .transition;
+  }
+  
+  .spotlight circle {
+    .transition;
+  }
+  
+  .spotlight-tooltip,
+  .spotlight-tooltip-bg {
+    opacity: 0;
+    pointer-events: none;
+    position: relative;
+    z-index: 999;
+    .transition;
+  }
+  
+  .spotlight:hover {
+    z-index: 999;
+    
+    .spotlight-tooltip,
+    .spotlight-tooltip-bg {
+      opacity: 1;
     }
   }
 }
