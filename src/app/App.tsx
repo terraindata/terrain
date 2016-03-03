@@ -70,7 +70,7 @@ var App = React.createClass({
   getInitialState()
   {
     return {
-      selectedPage: 2,
+      selectedPage: 3,
     };
   },
   
@@ -119,7 +119,7 @@ var App = React.createClass({
     );
     
     switch(this.state.selectedPage) {
-      case 2:
+      case 3:
         content = <Builder />;
       // New pages added here
     }
