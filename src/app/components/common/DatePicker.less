@@ -3,7 +3,8 @@
 /* for more info: http://www.gpbl.org/react-day-picker/docs/Styling.html */
 
 @import "../../util/Common.less";
-@select-color: @sea-green;
+@hover-color: #f7fcf1;
+@select-color: #b0be9f;
 
 .date-picker {
   background: #f0f8e8;
@@ -146,7 +147,7 @@
         background: #fff;
         
         &:hover:not(.DayPicker-Day--selected):not(.DayPicker-Day--outside) {
-          background: fade(@select-color, 10%);
+          background: @hover-color;
         }
         
       }
