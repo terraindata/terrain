@@ -72,7 +72,8 @@ class ScoreCard extends React.Component<Props, any>
     super(props);
     
     Util.bind(this, ['handleWeightsChange', 'renderWeight', 'renderHeader',
-      'handleOutputChange', 'handleMethodChange', 'handleWeightKeyChange']);
+      'handleOutputChange', 'handleMethodChange', 'handleWeightKeyChange',
+      'removeWeight']);
   }
   
   handleWeightsChange(newWeights)
@@ -89,6 +90,22 @@ class ScoreCard extends React.Component<Props, any>
     newWeights[index]['key'] = key;
     
     Actions.cards.score.changeWeights(this.props.card, newWeights);
+  }
+  
+  removeWeight(index)
+  {
+    var weights = Util.deeperCloneArr(this.props.card.weights);
+    var oldWeight = weights.splice(index, 1)[0];
+    if(weights[index])
+    {
+      weights[index].weight += oldWeight.weight;  
+    }
+    else if(weights[index - 1])
+    {
+      weights[index - 1].weight += oldWeight.weight;
+    }
+    
+    Actions.cards.score.changeWeights(this.props.card, weights);
   }
   
   renderWeight(weight, index) 
@@ -114,7 +131,7 @@ class ScoreCard extends React.Component<Props, any>
       ]
     }
     return (
-      <CardField key={index}>
+      <CardField key={index} index={index} removable={true} onDelete={this.removeWeight}>
         <LayoutManager layout={layout} />
       </CardField>
     );

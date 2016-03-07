@@ -54,7 +54,7 @@ ScoreCardReducer[ActionTypes.cards.score.create] =
     state.updateIn([action.payload.card.algorithmId, 'cards'], cards =>
       cards.updateIn([Util.cardIndex(cards, action), 'weights'], weights =>
         weights.push({
-          weight: 0,
+          weight: weights.count() ? 0 : 1,
           key: '',
         })
       ));

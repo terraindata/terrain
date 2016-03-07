@@ -54,6 +54,10 @@ var CardField = React.createClass({
 	{
 		value: React.PropTypes.string,
 		onDelete: React.PropTypes.func,
+    removable: React.PropTypes.bool,
+    draggable: React.PropTypes.bool,
+    onChange: React.PropTypes.func,
+    index: React.PropTypes.number,
 	},
 
 	getDefaultProps():any 
@@ -95,7 +99,7 @@ var CardField = React.createClass({
 	{
 		if(typeof this.props.onDelete === 'function')
 		{
-			this.props.onDelete();
+			this.props.onDelete(this.props.index);
 		}
 	},
 
