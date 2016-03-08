@@ -155,6 +155,12 @@ var Result = React.createClass<any, any>({
     if(field === 'image')
     {
       var id = this.props.data['id'];
+      
+      if(id === undefined)
+      {
+        return null;
+      }
+      
       return (
         <div className="result-field result-field-image" key={field}>
           <div className="result-field-name">
