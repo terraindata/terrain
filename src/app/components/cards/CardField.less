@@ -1,7 +1,7 @@
 @import "../../util/Common.less";
 
 .card-field {
-	padding: 5px;
+	padding: 5px 0px;
 	position: relative;
 	text-align: center;
 	height: 30px;
@@ -11,12 +11,21 @@
 		width: calc(~"100% - 40px");
 	}
 
-	.card-field-tools-left,
-	.card-field-tools-right {
-		position: relative;
-		top: 2px;
-		width: 20px;
-	}
+  .card-field-tools-left,
+  .card-field-tools-right {
+    position: relative;
+    top: 2px;
+    width: 20px;
+  }
+  
+  &.card-field-no-left {
+    .card-field-inner {
+      width: calc(~"100% - 20px");
+    }
+    .card-field-tools-left {
+      display: none;
+    }
+  }
 
 	.card-field-handle,
 	.card-field-delete {

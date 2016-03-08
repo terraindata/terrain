@@ -49,7 +49,7 @@ import LayoutManager from "../../layout/LayoutManager.tsx";
 import ThrottledInput from "../../common/ThrottledInput.tsx";
 import CardField from './../CardField.tsx';
 import Dropdown from './../../common/Dropdown.tsx';
-import { Operators } from './../../../CommonVars.tsx';
+import { Operators, Combinators } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 
 interface Props
@@ -57,7 +57,7 @@ interface Props
   card: CardModels.IFilterCard;
 }
 
-var OPERATOR_WIDTH: number = 20;
+var OPERATOR_WIDTH: number = 27;
 var CARD_PADDING: number = 12;
 
 class FilterCard extends React.Component<Props, any>
@@ -74,12 +74,14 @@ class FilterCard extends React.Component<Props, any>
     var operatorRef = refBase + 'operator';
     var firstRef = refBase + 'first';
     var secondRef = refBase + 'second';
+    var combinatorRef = refBase + 'combinator';
 
     var changeFilter = () =>
     {
         var first = this.refs[firstRef]['value'];
         var second = this.refs[secondRef]['value'];
         var operator = this.refs[operatorRef]['value'];
+        var combinator = this.refs[combinatorRef]['value'];
         
         Actions.cards.filter.change(this.props.card, index, {
           comparison:
@@ -88,6 +90,7 @@ class FilterCard extends React.Component<Props, any>
               first: first,
               second: second,
           },
+          combinator: combinator,
           id: filter.id,
         });
     }
@@ -95,6 +98,16 @@ class FilterCard extends React.Component<Props, any>
     var filterLayout =
     {
       columns: [
+        {
+          content: index === 0 ? null : <Dropdown
+            ref={combinatorRef}
+            circle={true}
+            options={Combinators}
+            selectedIndex={filter.combinator}
+            onChange={changeFilter}
+            />,
+          width: OPERATOR_WIDTH,
+        },
         {
           content: (
             <ThrottledInput value={filter.comparison.first} onChange={changeFilter} ref={firstRef} />
@@ -121,9 +134,10 @@ class FilterCard extends React.Component<Props, any>
     {
         Actions.cards.filter.remove(this.props.card, index);
     }
-
+    
     return (
       <CardField
+        noLeft={true}
         key={filter.id}
         draggable={false}
         removable={true}

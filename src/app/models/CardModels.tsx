@@ -95,7 +95,7 @@ export module CardModels
   
   export interface IFilter extends IId
   {
-    // combinator: Combinator = Combinator.AND;
+    combinator: Combinator;
     comparison: IComparison;
   }
   

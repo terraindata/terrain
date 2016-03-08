@@ -112,6 +112,11 @@ var CardField = React.createClass({
 				<div className='card-field-handle' ref='handle'>⋮⋮</div>
 			);
 		}
+    else if(this.props.leftContent)
+    {
+      handleContent = this.props.leftContent;
+    }
+    
 		if(this.props.removable)
 		{
 			removeContent = (
@@ -120,9 +125,12 @@ var CardField = React.createClass({
 		}
 
 		return this.renderPanel((
-			<div className='card-field'>
+			<div className={Util.objToClassname({
+          'card-field': true,
+          'card-field-no-left': this.props.noLeft,
+        })}>
 				<div className='card-field-tools-left'>{ handleContent }</div>
-				<div className='card-field-inner'>
+				<div className='card-field-inner' >
 					{ this.props.children }
 				</div>
 				<div className='card-field-tools-right'>{ removeContent }</div>

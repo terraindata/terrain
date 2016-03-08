@@ -65,6 +65,7 @@
               "second": "sitter.minPrice",
               "operator": 1
             },
+            "combinator": 0,
             "id": "asdf"
           },
           {
@@ -73,6 +74,7 @@
               "second": "availability.startDateTime",
               "operator": 1
             },
+            "combinator": 0,
             "id": "asdf1"
           },
           {
@@ -81,6 +83,7 @@
               "second": "availability.endDateTime",
               "operator": 3
             },
+            "combinator": 0,
             "id": "asdf2"
           },
           {
@@ -89,6 +92,7 @@
               "second": "sitter.cities",
               "operator": 5
             },
+            "combinator": 0,
             "id": "asdf3"
           },
           {
@@ -97,6 +101,7 @@
               "second": "sitter.attributes",
               "operator": 5
             },
+            "combinator": 0,
             "id": "asdf34"
           }
         ]
@@ -231,7 +236,7 @@
     "results":
     [
       {
-        "name": "Grace Miller",
+        "name": "Monica Doan",
         "id": 0,
         "minPrice": 17,
         "numJobs": 12,
@@ -241,7 +246,7 @@
         "avgRating": 3.09
       },
       {
-        "name": "Monica Doan",
+        "name": "Grace Miller",
         "id": 1,
         "minPrice": 23,
         "numJobs": 44,
