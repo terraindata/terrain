@@ -383,7 +383,7 @@ var TransformChart = {
     
     spotlight
       .select('rect')
-      .attr('class', 'spotlight-tooltip-bg')
+      .attr('class', (d) => 'spotlight-tooltip-bg spotlight-tooltip-bg-' + d['id'])
       .attr('y', (d) => idToY[d['id']] + 5 - 11 - TOOLTIP_BG_PADDING)
       .attr('height', TOOLTIP_BG_PADDING * 2 + 11)
       .attr('x', (d) => scales.realX(getBarX(d)) + SPOTLIGHT_SIZE / 2 + SPOTLIGHT_PADDING - TOOLTIP_BG_PADDING + 3)
@@ -440,14 +440,63 @@ var TransformChart = {
         
         return str;
       })
+      .attr('transform', (d) => {
+        var x = scales.realX(d['x']);
+        var y = d['y'];
+        var offset = d['offset'];
+        if(y - offset < 10) {
+          return 'rotate(180,' + x + ',' + y +')';
+        }
+        return '';
+      })
       ;
+    
+    spotlight //.select('circle')
+      .attr('transform', (d) => {
+        var bar = getBar(d);
+        var bg = ys[bar.range.min];
+        var x = scales.realX(bg['x']);
+        var y = bg['y'];
+        var offset = bg['offset'];
+        if(y - offset < 10) {
+          return 'rotate(180,' + x + ',' + y +')';
+        }
+        return '';
+      });
+    
+    spotlight.selectAll('text, rect')
+      .attr('transform', (d) => {
+        var rotate = '0';
+        var translateY = 0;
+        var translateX = 0;
+        
+        var bar = getBar(d);
+        var bg = ys[bar.range.min];
+        var x = scales.realX(bg['x']);
+        var y = bg['y'];
+        var offset = bg['offset'];
+        
+        if(y - offset < 10) {
+          translateY = 2 * (y - idToY[d['id']]);
+          rotate = '180,' + x + ',' + y;
+        }
+        
+        var width = g.select('.spotlight-tooltip-bg-' + d['id'])['node']()['getBBox']()['width'];
+        if(x + width > parseInt(isvg.attr('width'), 10))
+        {
+          translateX = -1 * width - SPOTLIGHT_SIZE - 2 * SPOTLIGHT_PADDING;
+        }
+        
+        return 'rotate(' + rotate + ')translate(' + translateX + ',' + translateY + ')';
+      });
     
     spotlight.exit().remove();
     spotlightBg.exit().remove();
   },
   
   // needs to be "function" for d3.mouse(this)
-  _lineMousedownFactory: (el, onClick, scales, onMove) => function(event) {
+  _lineMousedownFactory: (el, onClick, scales, onMove) => function(event)
+  {
     var m = d3.mouse(this);
     var x = scales.realX.invert(m[0]);
     var y = scales.realPointY.invert(m[1]);
