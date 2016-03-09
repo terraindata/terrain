@@ -48,11 +48,16 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
 
+var HOVER_TIMEOUT_TIME = 1000;
+
 interface Props
 {
   page: number;
   pages: number;
   onChange: (page: number) => void;
+  
+  onHover?: (page: number) => boolean;
+  onHoverEnd?: () => void;
 }
 
 class Paging extends React.Component<Props, any>
@@ -60,13 +65,25 @@ class Paging extends React.Component<Props, any>
   constructor(props: Props) {
     super(props);
     Util.bind(this, 'changePage', 'handlePageClick', 'handleAllPages',
-      'goFirst', 'goPrevious', 'goNext', 'goLast');
+      'goFirst', 'goPrevious', 'goNext', 'goLast',
+      'handlePageMouseOver', 'handleMouseOut',
+      'goHover', 'handleFirstHover', 'handlePreviousHover',
+      'handleNextHover', 'handleLastHover'); 
+      // 'handleHoverTimeout', 'clearHoverTimeout');
     this.state = {
       open: false,
+      
+      overPage: null,
+      // hoverTimeout: null,
     };
   }
   
-  changePage(page)
+  pageFromEvent(event): number
+  {
+    return parseInt(Util.rel(event.target), 10);
+  }
+  
+  changePage(page): void
   {
     this.setState({
       open: false,
@@ -78,38 +95,117 @@ class Paging extends React.Component<Props, any>
     }
   }
   
-  handlePageClick(event)
+  handlePageClick(event): void
   {
-    var page = parseInt(Util.rel(event.target), 10);
-    this.changePage(page);
+    this.changePage(this.pageFromEvent(event));
   }
   
-  handleAllPages()
+  handleAllPages(): void
   {
     this.setState({
       open: ! this.state.open,
     })
   }
   
-  goFirst()
+  goFirst(): void
   {
     this.changePage(1);
   }
   
-  goPrevious()
+  goPrevious(): void
   {
     this.changePage(this.props.page - 1);
   }
   
-  goNext()
+  goNext(): void
   {
     this.changePage(this.props.page + 1);
   }
   
-  goLast()
+  goLast(): void
   {
     this.changePage(this.props.pages);
   }
+  
+  // mouseovers
+  
+  goHover(page): void
+  {
+    if(this.props.onHover && this.props.onHover(page))
+    {
+      this.setState({
+        overPage: page,
+        // hoverTimeout: setTimeout(this.handleHoverTimeout, HOVER_TIMEOUT_TIME),
+      });
+    }
+  }
+  
+  handlePageMouseOver(event): void
+  {
+    this.goHover(this.pageFromEvent(event));
+  }
+  
+  handleFirstHover(): void
+  {
+    this.goHover(1);
+  }
+  
+  handlePreviousHover(): void
+  {
+    if(this.props.page !== 1)
+    {
+      this.goHover(this.props.page - 1);
+    }
+  }
+  
+  handleNextHover(): void
+  {
+    if(this.props.page !== this.props.pages)
+    {
+      this.goHover(this.props.page + 1);
+    }
+  }
+  
+  handleLastHover(): void
+  {
+    this.goHover(this.props.pages)
+  }
+  
+  handleMouseOut(event): void
+  {
+    // this.clearHoverTimeout();
+    
+    this.setState({
+      overPage: null,
+      // hoverTimeout: null,  
+    });
+    
+    if(this.props.onHoverEnd)
+    {
+      this.props.onHoverEnd();
+    }
+  }
+  
+  // In the future, if we want some kind of "long hover to go into"
+  //  when dragging, here's a start at the code for it
+  
+  // handleHoverTimeout()
+  // {
+  //   this.changePage(this.state.overPage);
+  // }
+  
+  // clearHoverTimeout()
+  // {
+  //   if(this.state.hoverTimeout)
+  //   {
+  //     clearTimeout(this.state.hoverTimeout);
+  //   }
+  // }
+  
+  // componentWillUnmount()
+  // {
+  //   this.clearHoverTimeout();
+  // }
   
   render() {
     return (
@@ -118,8 +214,22 @@ class Paging extends React.Component<Props, any>
           'paging': true,
           'paging-open': this.state.open,
         })}>
-        <div className='paging-first' onClick={this.goFirst}>&lt;&lt;</div>
-        <div className='paging-previous' onClick={this.goPrevious}>&lt;</div>
+        <div
+          className='paging-first'
+          onClick={this.goFirst}
+          onMouseOver={this.handleFirstHover}
+          onMouseOut={this.handleMouseOut}
+          >
+            &lt;&lt;
+        </div>
+        <div
+          className='paging-previous'
+          onClick={this.goPrevious}
+          onMouseOver={this.handlePreviousHover}
+          onMouseOut={this.handleMouseOut}
+          >
+            &lt;
+        </div>
         <div className='paging-pages'>
           {
             _.range(1, this.props.pages + 1).map((page) =>
@@ -130,8 +240,15 @@ class Paging extends React.Component<Props, any>
               
               return (
               <div 
-                className={'paging-page' + (page === this.props.page ? ' paging-page-selected' : '')}
+                className={Util.objToClassname(
+                {
+                  'paging-page': true,
+                  'paging-page-selected': page === this.props.page,
+                  'paging-page-hover': page === this.state.overPage,
+                })}
                 onClick={this.handlePageClick}
+                onMouseOver={this.handlePageMouseOver}
+                onMouseOut={this.handleMouseOut}
                 key={page}
                 rel={page + ''}
                 >
@@ -144,8 +261,22 @@ class Paging extends React.Component<Props, any>
         <div className='paging-all-pages' onClick={this.handleAllPages}>
           { this.state.open ? '-' : '...' }
         </div>
-        <div className='paging-next' onClick={this.goNext}>&gt;</div>
-        <div className='paging-last' onClick={this.goLast}>&gt;&gt;</div>
+        <div
+          className='paging-next'
+          onClick={this.goNext}
+          onMouseOver={this.handleNextHover}
+          onMouseOut={this.handleMouseOut}
+          >
+            &gt;
+        </div>
+        <div
+          className='paging-last'
+          onClick={this.goLast}
+          onMouseOver={this.handleLastHover}
+          onMouseOut={this.handleMouseOut}
+          >
+            &gt;&gt;
+        </div>
       </div>
     );
   }

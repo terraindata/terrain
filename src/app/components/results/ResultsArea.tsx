@@ -69,6 +69,7 @@ var ResultsArea = React.createClass<any, any>({
       pageChanging: false,
       nextPage: null,
       page: this.props.resultsPage,
+      hoveringPage: null,
     };
   },
   
@@ -142,11 +143,40 @@ var ResultsArea = React.createClass<any, any>({
     }
   },
   
+  handlePageHover(page)
+  {
+    this.setState({
+      hoverPage: page,
+    });
+    
+    return true;
+  },
+  
   renderPaging()
   {
     return (
-      <Paging page={this.props.resultsPage} pages={this.props.resultsPages} onChange={this.changePage} />
+      <Paging 
+        page={this.props.resultsPage}
+        pages={this.props.resultsPages}
+        onChange={this.changePage}
+        onHover={this.handlePageHover}
+        onHoverEnd={this.handlePageHover}
+        />
     );
+  },
+  
+  moveResult(curIndex, newIndex)
+  {
+    if(this.state.hoverPage)
+    {
+      alert('Moved to page ' + this.state.hoverPage);
+      this.setState({
+        hoverPage: null,
+      });
+      return;
+    }
+    
+    Actions.results.move(this.props.results[curIndex], newIndex);
   },
   
   renderResults()
@@ -184,12 +214,7 @@ var ResultsArea = React.createClass<any, any>({
       fullHeight: true,
     };
 
-    var moveTo = (curIndex, newIndex) =>
-    {
-      Actions.results.move(this.props.results[curIndex], newIndex);
-    };
-
-    return <LayoutManager layout={layout} moveTo={moveTo} />;
+    return <LayoutManager layout={layout} moveTo={this.moveResult} />;
   },
 
 	render()

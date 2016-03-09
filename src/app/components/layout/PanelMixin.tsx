@@ -296,6 +296,13 @@ var Panel = {
 				y: this.state.oy,
 			});
 		}
+    
+     if(this.props.dragHandleRef)
+    {
+      var dragHandle = this.refs[this.props.dragHandleRef];
+      dragHandle.style.left = '0px';
+      dragHandle.style.top = '0px';
+    }
 	},
 
 

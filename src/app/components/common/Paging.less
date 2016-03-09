@@ -3,14 +3,22 @@
 @w: 24px;
 @m: 6px;
 
+@bg: @aged-moss;
+@arrow-bg: @trans-black;
+@pg-bg: #48b14b;
+@selected-bg: @terrain-selected;
+
+
 .paging {
   display: block;
   position: absolute;
   bottom: 0px;
   left: 0px;
   width: 100%;
-  background: #444;
+  background: @bg;
   height: @w + 2 * @m;
+  
+  z-index: 9999;
   
   &.paging-open {
     height: auto;
@@ -30,7 +38,6 @@
     width: @w;
     
     text-align: center;
-    background: #000;
     border-radius: 3px;
     color: #fff;
     margin: 0px (@m / 2);
@@ -40,9 +47,32 @@
     cursor: pointer;
     .transition;
     
-    &:hover:not(.paging-page-selected) {
+    &:hover {
       background: #222;
     }
+    
+    &.paging-page-selected {
+      background: @terrain-selected;
+      color: #000;
+    }
+    
+    &.paging-page-hover {
+      background: @terrain-selected;
+      color: #000;
+      // .transition(~"background 1s, color 1s");
+    }
+  }
+  
+  .paging-page,
+  .paging-all-pages {
+    background: @pg-bg;
+  }
+  
+  .paging-first,
+  .paging-previous,
+  .paging-next,
+  .paging-last {
+    background: @arrow-bg;
   }
   
   .paging-first,
@@ -85,8 +115,4 @@
     right: @w * 2 + 3 * @m;
   }
   
-  .paging-page-selected {
-    background: @terrain-selected;
-    color: #000;
-  }
 }
