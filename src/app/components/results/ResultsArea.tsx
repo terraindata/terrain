@@ -50,11 +50,14 @@ import Result from "../results/Result.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
 import BuilderColumn from '../builder/BuilderColumn.tsx';
 import InfoArea from '../common/InfoArea.tsx';
+import Paging from '../common/Paging.tsx';
 
 var ResultsArea = React.createClass<any, any>({
 	propTypes:
 	{
 		results: React.PropTypes.array.isRequired,
+    resultsPage: React.PropTypes.number.isRequired,
+    resultsPages: React.PropTypes.number.isRequired,
     algorithmId: React.PropTypes.string.isRequired,
 	},
   
@@ -63,6 +66,9 @@ var ResultsArea = React.createClass<any, any>({
     return {
       expanded: false,
       expandedResult: {},
+      pageChanging: false,
+      nextPage: null,
+      page: this.props.resultsPage,
     };
   },
   
@@ -116,12 +122,46 @@ var ResultsArea = React.createClass<any, any>({
     );
   },
   
+  changePage(page)
+  {
+    this.setState({
+      pageChanging: true,
+      page: page,
+    });
+    
+    Actions.results.changePage(this.props.algorithmId, page);
+  },
+  
+  componentWillUpdate(newProps, newState)
+  {
+    if(newState.pageChanging && newProps.resultsPage === newState.page)
+    {
+      this.setState({
+        pageChanging: false,
+      });
+    }
+  },
+  
+  renderPaging()
+  {
+    return (
+      <Paging page={this.props.resultsPage} pages={this.props.resultsPages} onChange={this.changePage} />
+    );
+  },
+  
   renderResults()
   {
     if(!this.props.results.length)
     {
       return <InfoArea
         large="There are no results for your query."
+        />;
+    }
+    
+    if(this.state.pageChanging)
+    {
+      return <InfoArea
+        large='Loading...'
         />;
     }
     
@@ -157,6 +197,7 @@ var ResultsArea = React.createClass<any, any>({
 		return (
       <BuilderColumn title='Results' className='results-area' menuOptions={this.getMenuOptions()}>
         { this.renderResults() }
+        { this.renderPaging() }
         { this.renderExpandedResult() }
       </BuilderColumn>
     );

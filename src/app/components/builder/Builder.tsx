@@ -165,7 +165,7 @@ class Builder extends React.Component<any, any>
           },
           {
             colSpan: 2,
-            content: <ResultsArea results={algorithm.results} algorithmId={algorithmId} />
+            content: <ResultsArea results={algorithm.results} algorithmId={algorithmId} resultsPage={algorithm.resultsPage} resultsPages={algorithm.resultsPages} />
           },
         ]
       };

@@ -143,6 +143,7 @@ var ActionTypes =
     move,
     spotlight: '',
     pin: '',
+    changePage: '',
   },
 
   newAlgorithm: '',

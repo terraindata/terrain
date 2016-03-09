@@ -68,6 +68,7 @@ var Panel = {
 		reorderOnDrag: React.PropTypes.bool,
 		neighborDragging: React.PropTypes.bool,
 		handleRef: React.PropTypes.string,
+    dragHandleRef: React.PropTypes.string,
 	},
 
 	getInitialState() {
@@ -162,12 +163,14 @@ var Panel = {
 	{
 		if(this.canDrag()) 
 		{
+      var cr = ReactDOM.findDOMNode(this).getBoundingClientRect();
+      
 			this.setState({
 				ox: x, 
 				oy: y, 
 				dx: 0, 
 				dy: 0,
-				ocr: ReactDOM.findDOMNode(this).getBoundingClientRect(),
+				ocr: cr,
 			});
 
 			if(this.parentNode())
@@ -180,6 +183,13 @@ var Panel = {
 					oParentHeight: maxYPosition,
 				});
 			}
+      
+      if(this.props.dragHandleRef)
+      {
+        var dragHandle = this.refs[this.props.dragHandleRef];
+        dragHandle.style.left = (x - cr.left - dragHandle.getBoundingClientRect().width / 2) + 'px';
+        dragHandle.style.top = (y - cr.top - dragHandle.getBoundingClientRect().height / 2) + 'px';
+      }
 			
 			return true;
 		}

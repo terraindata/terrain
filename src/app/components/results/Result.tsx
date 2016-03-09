@@ -124,6 +124,7 @@ var Result = React.createClass<any, any>({
 			drag_y: true,
 			reorderOnDrag: true,
 			dragInsideOnly: true,
+      dragHandleRef: 'drag-handle',
       data: {},
 		};
 	},
@@ -288,6 +289,9 @@ var Result = React.createClass<any, any>({
             { fields.map(this.renderField) }
           </div>
 				</div>
+        <div className='result-dragging' ref='drag-handle'>
+          { this.props.data.name }
+        </div>
 			</div>
 			));
 	},

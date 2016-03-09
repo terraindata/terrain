@@ -51,6 +51,8 @@ var NEW_ALGORITHM =
   inputs: [],
   cards: [],
   results: [],
+  resultsPage: 1,
+  resultsPages: 30,
 };
 
 var currentAlgorithmId = 101;
@@ -81,5 +83,9 @@ AlgorithmReducer[ActionTypes.duplicateAlgorithm] =
           input.set('algorithmId', algorithmId)))
       ;
   }
+
+AlgorithmReducer[ActionTypes.results.changePage] =
+  (state, action) =>
+    state.setIn([action.payload.algorithmId, 'resultsPage'], action.payload.page);
 
 export default AlgorithmReducer;

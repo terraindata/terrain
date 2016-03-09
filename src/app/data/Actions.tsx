@@ -202,6 +202,10 @@ var Actions =
     pin:
       (result: any, value: boolean) =>
         $(ActionTypes.results.pin, {result, value}),
+    
+    changePage:
+      (algorithmId: string, page: number) =>
+        $(ActionTypes.results.changePage, {algorithmId, page}),
   },
 
   newAlgorithm: 
