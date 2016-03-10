@@ -69,7 +69,7 @@ The Terrain search front-end is built upon these technologies:
 
 ### src
 
-Source code for the front-end. There may not need to be any other directories in the `src` folder expect for `app`, so we may want to flatten this level.
+Source code for the front-end. There may not need to be any other directories in the `src` folder except for `app`, so we may want to flatten this level.
 
 ### src/app
 
