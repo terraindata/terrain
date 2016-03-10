@@ -56,6 +56,7 @@ import LayoutManager from "./components/layout/LayoutManager.tsx";
 import Builder from "./components/builder/Builder.tsx";
 import Sidebar from "./components/layout/Sidebar.tsx";
 import AccountDropdown from "./components/common/AccountDropdown.tsx";
+import Login from "./components/common/Login.tsx";
 import InfoArea from "./components/common/InfoArea.tsx";
 
 // Icons
@@ -71,6 +72,7 @@ var App = React.createClass({
   {
     return {
       selectedPage: 3,
+      loggedIn: true,
     };
   },
   
@@ -89,7 +91,27 @@ var App = React.createClass({
     })
   },
   
-  render () {
+  handleLogin()
+  {
+    this.setState({
+      loggedIn: true,
+    });
+  },
+  
+  handleLogout()
+  {
+    this.setState({
+      loggedIn: false,
+    });
+  },
+  
+  renderApp()
+  {
+    if(!this.state.loggedIn)
+    {
+      return <Login onLogin={this.handleLogin} />;
+    }
+    
     var links = 
     [
       {
@@ -147,14 +169,19 @@ var App = React.createClass({
         ],
       };
      
+    return <LayoutManager layout={layout} />;
+  },
+  
+  render ()
+  {
     return (
       <div className='app'>
         <div className='app-top-bar'>
           <TerrainIcon className='app-top-bar-icon' />
-          <AccountDropdown />
+          { this.state.loggedIn ? <AccountDropdown onLogout={this.handleLogout} /> : null }
         </div>
         <div className='app-wrapper'>
-          <LayoutManager layout={layout} />
+          { this.renderApp() }
         </div>
       </div>
     );

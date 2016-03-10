@@ -42,72 +42,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./AccountDropdown.less')
+require('./Login.less')
 import * as React from 'react';
-import Actions from "../../data/Actions.tsx";
 import Util from '../../util/Util.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
+var TerrainIcon = require("./../../../images/icon_terrain_108x17.svg?name=TerrainIcon");
 
 interface Props {
-  onLogout: () => void;
+  onLogin: () => void;
 }
 
-class AccountDropdown extends React.Component<Props, any>
+class Login extends React.Component<Props, any>
 {
   constructor(props:Props)
   {
     super(props);
-    this.state = {
-      open: false,
-    };
-    this.toggleOpen = this.toggleOpen.bind(this);
+    Util.bind(this, 'handleKeyDown');
   }
   
-  toggleOpen() {
-    this.setState({
-      open: !this.state.open,
-    });
-  }
-  
-  renderDropdown() {
-    if(!this.state.open)
+  handleKeyDown(event)
+  {
+    if(event.keyCode === 13)
     {
-      return null;
+      this.props.onLogin();
     }
-  
-    return (
-      <div className="account-dropdown-content">
-        <div className="account-dropdown-row" onClick={this.props.onLogout}>
-          Logout
-        </div>
-      </div>
-    );
-  }
-  
-  renderTopBar() {
-    return (
-      <div className="account-dropdown-top-bar" onClick={this.toggleOpen}>
-        <div className="account-photo"></div>
-        <div className="account-name">Jack Murphy</div>
-        <ArrowIcon className="account-arrow-icon" />
-      </div>
-    );
   }
   
   render() {
-    var classes = Util.objToClassname({
-      "account-dropdown-wrapper": true,
-      "account-dropdown-open": this.state.open,
-    });
-    
     return (
-      <div className={classes}>
-        { this.renderTopBar() }
-        { this.renderDropdown() }
+      <div className='login'>
+        <div className='login-wrapper'>
+          <div className='login-logo'>
+            <TerrainIcon />
+          </div>
+          <div className='login-info'>
+            <input type='text' id='login-username' placeholder='username' />
+            <input type='password' id='login-password' placeholder='password' onKeyDown={this.handleKeyDown} />
+          </div>
+          <a className='login-submit' onClick={this.props.onLogin}>
+            Login
+          </a>
+        </div>
       </div>
    );
   }
 };
 
-export default AccountDropdown;
+export default Login;

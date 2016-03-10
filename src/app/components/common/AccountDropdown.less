@@ -7,6 +7,7 @@
   height: 100%;
   cursor: pointer;
   .transition;
+  position: relative;
   
   &:hover {
     background: rgba(255,255,255,0.1);
@@ -58,6 +59,29 @@
     .account-arrow-icon {
       .rotate180;
       top: -3px;
-    } 
+    }
+  }
+  
+  .account-dropdown-content {
+    background: #fff;
+    position: absolute;
+    z-index: 99999999999;
+    top: 100%;
+    right: 0px;
+    min-width: 100%;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    
+    .account-dropdown-row {
+      padding: 12px 0px;
+      text-align: center;
+      font-size: @large-font-size;
+      .transition;
+      
+      &:hover {
+        background: #00a7f7;
+        color: #fff;
+      }
+    }
   }
 }
