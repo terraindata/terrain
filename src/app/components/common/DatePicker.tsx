@@ -81,7 +81,15 @@ class DatePicker extends React.Component<Props, any>
   
   getDate(): Date
   {
-    return new Date(this.props.date);
+    var date = new Date(this.props.date);
+    if(isNaN(date.getTime()))
+    {
+      // not a valid date
+      date = new Date();
+      date.setMinutes(0);
+    }
+    
+    return date;
   }
   
   handleDayClick(e, day: Date, modifiers)
@@ -96,7 +104,6 @@ class DatePicker extends React.Component<Props, any>
   handleHourChange(hourIndex)
   {
     var date = this.getDate();
-    var minute
     date.setHours(Math.floor(hourIndex / MINUTE_RATIO));
     date.setMinutes((hourIndex % MINUTE_RATIO) * MINUTE_INTERVAL);
     this.props.onChange(date.toString()); 
