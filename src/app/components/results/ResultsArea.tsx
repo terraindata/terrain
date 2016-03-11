@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
@@ -52,7 +53,7 @@ import BuilderColumn from '../builder/BuilderColumn.tsx';
 import InfoArea from '../common/InfoArea.tsx';
 import Paging from '../common/Paging.tsx';
 
-var ResultsArea = React.createClass<any, any>({
+var ResultsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
 	propTypes:
 	{
 		results: React.PropTypes.array.isRequired,
@@ -70,6 +71,18 @@ var ResultsArea = React.createClass<any, any>({
       nextPage: null,
       page: this.props.resultsPage,
       hoveringPage: null,
+      title: 'Results',
+      menuOptions: 
+      [
+        {
+          text: 'Copy',
+          onClick: this.copy
+        },
+        {
+          text: 'Clear',
+          onClick: this.clear
+        }
+      ]
     };
   },
   
@@ -91,20 +104,6 @@ var ResultsArea = React.createClass<any, any>({
   copy() {},
   
   clear() {},
-  
-  getMenuOptions()
-  {
-    return [
-      {
-        text: 'Copy',
-        onClick: this.copy
-      },
-      {
-        text: 'Clear',
-        onClick: this.clear
-      }
-    ];
-  },
   
   renderExpandedResult()
   {
@@ -217,16 +216,16 @@ var ResultsArea = React.createClass<any, any>({
     return <LayoutManager layout={layout} moveTo={this.moveResult} />;
   },
 
-	render()
+	renderContent()
   {
 		return (
-      <BuilderColumn title='Results' className='results-area' menuOptions={this.getMenuOptions()}>
+      <div className='results-area'>
         { this.renderResults() }
         { this.renderPaging() }
         { this.renderExpandedResult() }
-      </BuilderColumn>
+      </div>
     );
 	},
-});
+}));
 
 export default ResultsArea;

@@ -63,6 +63,9 @@ var Panel = {
 		dragInsideOnly: React.PropTypes.bool,
 
 		onDrop: React.PropTypes.func,
+    
+    onMouseDown: React.PropTypes.func,
+    mouseDownRef: React.PropTypes.string,
 
 		fill: React.PropTypes.bool,
 		reorderOnDrag: React.PropTypes.bool,
@@ -310,6 +313,14 @@ var Panel = {
 
 	down(event) 
 	{
+    if(this.props.onMouseDown)
+    {
+      if(!this.props.mouseDownRef || event.target == this.refs[this.props.mouseDownRef])
+      {
+        this.props.onMouseDown(event);
+      }
+    }
+    
 		if(this.props.handleRef)
 		{
 			if(event.target != this.refs[this.props.handleRef])

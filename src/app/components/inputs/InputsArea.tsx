@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
@@ -52,12 +53,29 @@ import CreateLine from '../common/CreateLine.tsx';
 import InfoArea from '../common/InfoArea.tsx';
 import BuilderColumn from '../builder/BuilderColumn.tsx';
 
-var InputsArea = React.createClass<any, any>({
+var InputsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
 	propTypes:
 	{
 		inputs: React.PropTypes.array.isRequired,
     algorithmId: React.PropTypes.string.isRequired,
 	},
+  
+  getInitialState()
+  {
+    return {
+      title: 'Inputs',
+      menuOptions: [
+        {
+          text: 'Copy',
+          onClick: this.copyAll
+        },
+        {
+          text: 'Clear', 
+          onClick: this.removeAll
+        }
+      ],
+    };
+  },
   
   createInput()
   {
@@ -72,20 +90,6 @@ var InputsArea = React.createClass<any, any>({
   removeAll()
   {
     console.log('remove');
-  },
-  
-  getMenuOptions()
-  {
-    return [
-      {
-        text: 'Copy',
-        onClick: this.copyAll
-      },
-      {
-        text: 'Clear', 
-        onClick: this.removeAll
-      }
-    ];
   },
   
   renderNoInputs()
@@ -135,14 +139,6 @@ var InputsArea = React.createClass<any, any>({
       </div>
     );
   },
-
-	render() {
-		return (
-      <BuilderColumn title='Inputs' menuOptions={this.getMenuOptions()}>
-        { this.renderContent() }
-      </BuilderColumn>
-    );
-	},
-});
+}));
 
 export default InputsArea;

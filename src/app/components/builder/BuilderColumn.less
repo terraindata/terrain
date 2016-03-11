@@ -2,6 +2,7 @@
 
 @title-bar-height: 36px;
 @top-border-color: @light-green;
+@handle-width: 10px;
 
 .builder-column {
   height: 100%;
@@ -9,7 +10,7 @@
   
   .builder-title-bar {
     background: @dark-moss;
-    padding:9px;
+    padding: 9px;
     font-weight: bold;
     color: #fff;
     font-size: 14px;
@@ -23,7 +24,46 @@
     .builder-title-bar-title {
       text-shadow: 0px 0px 3px rgba(0,0,0,0.15);
       display: inline-block;
+      position: relative;
+      left: @handle-width;
     }
+    
+    .builder-resize-handle {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: @handle-width;
+      height: 100%;
+      box-sizing: border-box;
+      cursor: col-resize;
+      .transition;
+      
+      .builder-resize-handle-line {
+        height: 100%;
+        width: 0px;
+        border-left: 1px solid rgba(0,0,0,0.08);
+        position: absolute;
+        top: 0px;
+        pointer-events: none;
+      }
+      
+      .builder-resize-handle-line:first-child {
+        left: calc(@handle-width / 2 - 1px);
+      }
+      
+      .builder-resize-handle-line:last-child {
+        left: calc(@handle-width - 1px);
+      }
+      
+      &:hover {
+        background: rgba(255,255,255,0.15);
+      }
+      
+      &.active {
+        background: rgba(255,255,255,0.5);
+      }
+    }
+    
   }
   
   .builder-title-bar-options {
