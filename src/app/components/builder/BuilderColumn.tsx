@@ -47,54 +47,71 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
 import Menu from '../common/Menu.tsx';
+import PanelMixin from '../layout/PanelMixin.tsx';
 
-interface Props
-{
-  title: string;
-  children?: any;
-  className?: string;
+// interface Props
+// {
+//   title: string;
+//   children?: any;
+//   className?: string;
   
-  // Options not yet supported
-  menuOptions?: {
-    text: string;
-    onClick: () => void;
-  }[];
-}
+//   // Options not yet supported
+//   menuOptions?: {
+//     text: string;
+//     onClick: () => void;
+//   }[];
+// }
 
-class BuilderColumn extends React.Component<Props, any>
+var BuilderColumn = //React.createClass<any, any>(
 {
-  constructor(props: Props) {
-    super(props);
-    Util.bind(this, ['renderMenu']);
-  }
+  mixins: [PanelMixin],
+  
+  propTypes:
+  {
+    className: React.PropTypes.string,
+  },
+  
+  getDefaultProps()
+  {
+    return {};
+  },
+  
+  renderContent()
+  {
+    return <div>No column content.</div>;
+  },
   
   renderMenu()
   {
-    if(!this.props.menuOptions || !this.props.menuOptions.length)
+    if(!this.state.menuOptions || !this.state.menuOptions.length)
     {
       return null;
     }
     
-    return <Menu options={this.props.menuOptions} />;
-  }
+    return <Menu options={this.state.menuOptions} />;
+  },
   
   render() {
-    return (
+    return this.renderPanel((
       <div className='builder-column'>
         <div className='builder-title-bar'>
+          <div className='builder-resize-handle' ref='resize-handle'>
+            <div className='builder-resize-handle-line'></div>
+            <div className='builder-resize-handle-line'></div>
+          </div>
           <div className='builder-title-bar-title'>
-            { this.props.title }
+            { this.state.title }
           </div>
           <div className='builder-title-bar-options'>
             { this.renderMenu() }
           </div>
         </div>
-        <div className={'builder-column-content ' + this.props.className}>
-          { this.props.children }
+        <div className='builder-column-content'>
+          { this.renderContent() }
         </div>
       </div>
-    );
+    ));
   }
-};
+} //);
 
 export default BuilderColumn;

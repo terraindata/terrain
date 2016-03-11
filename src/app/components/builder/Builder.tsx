@@ -157,14 +157,23 @@ class Builder extends React.Component<any, any>
         columns: [
           {
             width: 316,
+            minWidth: 316,
+            resizeable: true,
+            resizeHandleRef: 'resize-handle',
             content: <InputsArea inputs={algorithm.inputs} algorithmId={algorithmId} />,
           },
           {
             colSpan: 3,
+            minWidth: 350,
+            resizeable: true,
+            resizeHandleRef: 'resize-handle',
             content: <CardsArea cards={algorithm.cards} algorithmId={algorithmId} spotlights={spotlights} />
           },
           {
             colSpan: 2,
+            minWidth: 200,
+            resizeable: true,
+            resizeHandleRef: 'resize-handle',
             content: <ResultsArea results={algorithm.results} algorithmId={algorithmId} resultsPage={algorithm.resultsPage} resultsPages={algorithm.resultsPages} />
           },
         ]

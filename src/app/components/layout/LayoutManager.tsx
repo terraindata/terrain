@@ -54,13 +54,20 @@ var rowClass = 'layout-manager-row';
 var cellClass = 'layout-manager-cell';
 var fullHeightClass = 'layout-manager-full-height';
 
-interface Style {
+interface Style
+{
 	left?: number | string,
 	top?: number,
 	width?: number | string,
 	height?: number,
   display?: string,
   position?: string,
+}
+
+interface Adjustment
+{
+  x: number;
+  y: number;
 }
 
 var LayoutManager = React.createClass<any, any>({
@@ -75,6 +82,7 @@ var LayoutManager = React.createClass<any, any>({
 			shiftedIndices: [],
 			shiftedHeight: 0,
 			shiftedWidth: 0,
+      sizeAdjustments: {},
 		};
 	},
 
@@ -315,6 +323,11 @@ var LayoutManager = React.createClass<any, any>({
 
 	renderObj(obj, className, index, style) 
 	{
+    if(!this.state.sizeAdjustments[index])
+    {
+      this.state.sizeAdjustments[index] = {x: 0, y: 0};
+    }
+    
 		if(obj.content)
 		{
 			// if obj.content is null or undef, then React.cloneElement will error and cause the whole app to break
@@ -362,6 +375,63 @@ var LayoutManager = React.createClass<any, any>({
 					}
 				}
 			}
+      
+      if(obj.resizeable)
+      {
+        props.mouseDownRef = obj.resizeHandleRef;
+        props.onMouseDown = (event) =>
+        {
+          var startX = event.pageX;
+          var startSAX = this.state.sizeAdjustments[index].x;
+          this.setState({
+            resizingIndex: index,
+          });
+          
+          var arr = this.props.layout.rows || this.props.layout.columns || this.props.layout.cells;
+          var minWidth = arr[index].minWidth || 0;
+          var startWidth = this.refs[index].getBoundingClientRect().width;
+          
+          var minPrevWidth = arr[index - 1] ? arr[index - 1].minWidth || 0 : 0;
+          var startPrevWidth = arr[index - 1] ? this.refs[index - 1].getBoundingClientRect().width : null;
+          
+          var move = function(event)
+          {
+            var diffX = startX - event.pageX;
+            var newWidth = startWidth + diffX;
+            if(newWidth < minWidth)
+            {
+              diffX += minWidth - newWidth;
+            }
+            
+            var newPrevWidth = startPrevWidth - diffX;
+            if(minPrevWidth !== null && newPrevWidth < minPrevWidth)
+            {
+              diffX -= minPrevWidth - newPrevWidth;
+            }
+            
+            this.state.sizeAdjustments[index].x = startSAX + diffX;
+            this.setState({
+              sizeAdjustments: this.state.sizeAdjustments,
+            })
+          }.bind(this);
+          
+          var endMove = () => 
+          {
+            this.setState({
+              resizingIndex: null,
+            });
+            $(document).off('mousemove', move);
+            $(document).off('touchmove', move);
+            $(document).off('mouseup', endMove);
+            $(document).off('touchend', endMove);  
+          }
+          
+          $(document).on('mousemove', move);
+          $(document).on('touchmove', move);
+          $(document).on('mouseup', endMove);
+          $(document).on('touchend', endMove);
+        }
+      }
 
 			var content:any = React.cloneElement(obj.content, props);
 		}
@@ -371,7 +441,8 @@ var LayoutManager = React.createClass<any, any>({
 		{
 			content = <LayoutManager layout={obj} ref={index} moveTo={obj.moveTo} />
 		}
-		
+    
+    className += this.state.resizingIndex ? ' no-transition' : '';
 		return (
 			<div className={className} style={style} key={obj.key !== undefined ? obj.key : index} ref={index}>
 				{content}
@@ -432,27 +503,40 @@ var LayoutManager = React.createClass<any, any>({
 	calcColumnWidthValues(column, index): {percentage: number, offset: number}
 	{
 		var colPadding = this.paddingForColAtIndex(index);
+    var widthAdjustment = 0;
+    var values;
+    
+    if(this.state.sizeAdjustments[index])
+    {
+      widthAdjustment += this.state.sizeAdjustments[index].x;
+    }
+    if(this.state.sizeAdjustments[index + 1])
+    {
+      widthAdjustment -= this.state.sizeAdjustments[index + 1].x;
+    }
 
-		if(column.width !== undefined)
-		{
-			return {
-				percentage: 0,
-				offset: column.width, // + colPadding,
-			};
-		}
+    if(column.width !== undefined)
+    {
+      values = {
+        percentage: 0,
+        offset: column.width + widthAdjustment, // + colPadding,
+      };
+    }
+    else
+    {
+      var setWidth = this.sumColumnWidthsThroughIndex(-1);
+      var totalCols = this.sumColsThroughIndex(-1);
+      var sumCols = this.sumColsThroughIndex(index);
+      var percentWidth = (column.colSpan || 1) / totalCols;
+      var portionOfSetWidth = percentWidth * setWidth;
 
-		var setWidth = this.sumColumnWidthsThroughIndex(-1);
-		var totalCols = this.sumColsThroughIndex(-1);
-		var sumCols = this.sumColsThroughIndex(index);
-		var percentWidth = (column.colSpan || 1) / totalCols;
-		var portionOfSetWidth = percentWidth * setWidth; // - colPadding;
-		// console.log(portionOfSetWidth, colPadding);
-		// portionOfSetWidth -= colPadding;
-
-		return {
-			percentage: percentWidth * 100,
-			offset: portionOfSetWidth * -1,
-		};
+    	values = {
+    		percentage: percentWidth * 100,
+    		offset: portionOfSetWidth * -1 + widthAdjustment,
+    	};
+    }
+    
+    return values;
 	},
 
 	calcColumnWidth(column, index)
