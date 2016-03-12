@@ -143,10 +143,15 @@ var Input = React.createClass<any, any>({
       onChange={this.changeValue}
       className="input-text input-text-second" />;
   },
+  
+  componentDidMount()
+  {
+    Util.animateToAutoHeight(this.refs.input);
+  },
 
 	render() {
 		return this.renderPanel((
-			<div className='input'>
+			<div className='input' ref='input'>
         <CreateLine open={false} onClick={this.createInput} />
         <div className='input-inner'>
           <div className='input-top-row'>
