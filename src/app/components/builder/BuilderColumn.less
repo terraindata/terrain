@@ -39,20 +39,20 @@
       .transition;
       
       .builder-resize-handle-line {
-        height: 100%;
+        top: 33%;
+        height: 33%;
         width: 0px;
         border-left: 1px solid rgba(0,0,0,0.08);
         position: absolute;
-        top: 0px;
         pointer-events: none;
       }
       
       .builder-resize-handle-line:first-child {
-        left: calc(@handle-width / 2 - 1px);
+        left: calc(@handle-width / 3);
       }
       
       .builder-resize-handle-line:last-child {
-        left: calc(@handle-width - 1px);
+        left: calc(@handle-width * 2 / 3);
       }
       
       &:hover {

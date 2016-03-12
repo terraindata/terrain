@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 require('./Card.less');
 
+import * as $ from 'jquery';
 import Actions from "../../data/Actions.tsx";
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
@@ -94,11 +95,26 @@ var Card = React.createClass({
 		if(!this.state.moved)
 		{
 			// this.state.moved is updated in panelMixin
+      
+      if(this.state.open)
+      {
+        Util.animateToHeight(this.refs.cardBody, 0);
+      }
+      else
+      {
+        Util.animateToAutoHeight(this.refs.cardBody); 
+      }
+      
 			this.setState({
 				open: !this.state.open,
 			});
 		}
 	},
+  
+  componentDidMount()
+  {
+    Util.animateToAutoHeight(this.refs.cardBody); 
+  },
   
   handleDelete()
   {
@@ -179,26 +195,21 @@ var Card = React.createClass({
       content = <CardComponent {...this.props} />
     }
 
-		var contentToDisplay;
-		var subBarToDisplay;
-		if(this.state.open)
+		var contentToDisplay = (
+			<div className='card-content'>
+				{content}
+			</div>
+		);
+
+		if(subBar)
 		{
-			contentToDisplay = (
-				<div className='card-content'>
-					{content}
+			var subBarToDisplay = (
+				<div className='card-sub-bar' onClick={subBar.onClick}>
+					<div className='card-sub-bar-inner'>
+						{subBar.content}
+					</div>
 				</div>
 			);
-
-			if(subBar)
-			{
-				subBarToDisplay = (
-					<div className='card-sub-bar' onClick={subBar.onClick}>
-						<div className='card-sub-bar-inner'>
-							{subBar.content}
-						</div>
-					</div>
-				);
-			}
 		}
 
     var menuOptions = 
@@ -226,8 +237,10 @@ var Card = React.createClass({
 						<ArrowIcon className="card-arrow-icon" /> {title}
             <Menu options={menuOptions} />
 					</div>
-					{ contentToDisplay }
-					{ subBarToDisplay }
+          <div className='card-body' ref='cardBody'>
+  					{ contentToDisplay }
+  					{ subBarToDisplay }
+          </div>
 				</div>
 			</div>
 			));

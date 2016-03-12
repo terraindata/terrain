@@ -398,6 +398,9 @@ var LayoutManager = React.createClass<any, any>({
           
           var minPrevWidth = arr[index - 1] ? arr[index - 1].minWidth || 0 : 0;
           var startPrevWidth = arr[index - 1] ? this.refs[index - 1].getBoundingClientRect().width : null;
+          $('body').addClass('resizing');
+          var target = event.target;
+          $(target).addClass('active');
           
           var move = function(event)
           {
@@ -425,6 +428,8 @@ var LayoutManager = React.createClass<any, any>({
             this.setState({
               resizingIndex: null,
             });
+            $('body').removeClass('resizing');
+            $(target).removeClass('active');
             $(document).off('mousemove', move);
             $(document).off('touchmove', move);
             $(document).off('mouseup', endMove);

@@ -63,6 +63,11 @@ class SelectCard extends React.Component<Props, any>
   }
 
 	render() {
+    if(!this.props.card.properties.length)
+    {
+      return <div className='info-message'>No fields selected, add one below.</div>;
+    }
+      
 		var properties = this.props.card.properties;
 
 		var moveFn = (curIndex, newIndex) =>
@@ -98,6 +103,7 @@ class SelectCard extends React.Component<Props, any>
     					dragInsideOnly={true}>
               <ThrottledInput
                 value={property.property}
+                placeholder='Type field here'
                 onChange={changeFnFactory(index)} />
             </CardField>
           ),

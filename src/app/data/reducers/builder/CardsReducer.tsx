@@ -61,7 +61,10 @@ CardsReducer[ActionTypes.cards.create] =
         case 'select':
           newCard = 
           {
-            properties: [],
+            properties: [{
+              property: '',
+              id: '' + Math.random(),
+            }],
           };
           break;
         case 'from':

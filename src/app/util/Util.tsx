@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
 var _ = require('underscore');
@@ -118,6 +119,25 @@ var Util = {
     var ans = {}
     _.map(obj, (val, key) => ans[key] = _.clone(val));
     return ans;
+  },
+  
+  animateToHeight(node, height: number): void
+  {
+    var el = $(node);
+    var curHeight = el.height();
+
+    el.height(curHeight).animate({ height: height }, 250); 
+  },
+  
+  animateToAutoHeight(node): void
+  {
+    var el = $(node);
+    var curHeight = el.height();
+    var autoHeight = el.css('height', 'auto').height();
+
+    el.height(curHeight).animate({ height: autoHeight }, 250, function() {
+      el.css('height', 'auto'); 
+    });
   },
   
   
