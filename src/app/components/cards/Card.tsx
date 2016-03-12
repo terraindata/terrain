@@ -118,7 +118,10 @@ var Card = React.createClass({
   
   handleDelete()
   {
-    Actions.cards.remove(this.props.card);
+    Util.animateToHeight(this.refs.card, 0);
+    setTimeout(() => {
+      Actions.cards.remove(this.props.card);
+    }, 250);
   },
   
   handleCopy()
@@ -230,7 +233,7 @@ var Card = React.createClass({
 
 		var title = this.props.card.type.charAt(0).toUpperCase() + this.props.card.type.substr(1);
 		return this.renderPanel((
-			<div className={'card ' + (!this.state.open ? 'card-closed' : '')}>
+			<div className={'card ' + (!this.state.open ? 'card-closed' : '')} ref='card'>
         <CreateCardTool index={this.props.index} algorithmId={this.props.algorithmId} />
 				<div className='card-inner'>
 					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>

@@ -94,7 +94,10 @@ var Input = React.createClass<any, any>({
   
   remove()
   {
-    Actions.inputs.remove(this.props.input);
+    Util.animateToHeight(this.refs.input, 0);
+    setTimeout(() => {
+      Actions.inputs.remove(this.props.input)
+    }, 250);
   },
   
   createInput()
