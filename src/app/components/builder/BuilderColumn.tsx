@@ -62,7 +62,7 @@ import PanelMixin from '../layout/PanelMixin.tsx';
 //   }[];
 // }
 
-var BuilderColumn = //React.createClass<any, any>(
+var BuilderColumn =
 {
   mixins: [PanelMixin],
   
@@ -112,6 +112,6 @@ var BuilderColumn = //React.createClass<any, any>(
       </div>
     ));
   }
-} //);
+}
 
 export default BuilderColumn;

@@ -94,6 +94,11 @@ var LayoutManager = React.createClass<any, any>({
 	componentDidMount()
 	{
     window.addEventListener("resize", this.updateDimensions);
+    this.setState({
+      // triggers a re-render, this time with the window widths available,
+      // so that cells etc. can render with the correct width
+      mounted: true,
+    });
   },
 
   componentWillUnmount()
@@ -577,30 +582,17 @@ var LayoutManager = React.createClass<any, any>({
 
 	getNumCellsInRow()
 	{
-		var widthObj = this.props.layout.cellWidth;
-		if(typeof widthObj !== 'object')
-			return 1;
-
-		// parse the object
-		var docWidth = $(window).width(), curMax = -1;
-		$.each(widthObj, function(key, val) {
-			var curWidth = parseInt(key, 10);
-			// find the largest key smaller than docWidth
-			if(docWidth > curWidth && curWidth > curMax)
-				curMax = key;
-		});
-		return widthObj[curMax];
+    if(!this.refs.layoutManagerDiv)
+    {
+      return 1;
+    }
+    return Math.floor(this.refs.layoutManagerDiv.getBoundingClientRect().width /
+      this.props.layout.minCellWidth);
 	},
 
 	getCellWidth()
 	{
-		var width = this.props.layout.cellWidth;
-		
-		if(typeof width === 'object') {
-			width = (100 / this.getNumCellsInRow()) + '%';
-		}
-
-		return width;
+		return (100 / this.getNumCellsInRow()) + '%';
 	},
 
 	getCellHeight()
