@@ -126,6 +126,7 @@ var Util = {
     var el = $(node);
     var curHeight = el.height();
 
+    el.css('overflow', 'hidden');
     el.height(curHeight).animate({ height: height }, 250); 
   },
   
@@ -137,6 +138,7 @@ var Util = {
 
     el.height(curHeight).animate({ height: autoHeight }, 250, function() {
       el.css('height', 'auto'); 
+      el.css('overflow', 'visible');
     });
   },
   
