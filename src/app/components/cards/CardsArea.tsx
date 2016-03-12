@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import InfoArea from '../common/InfoArea.tsx';
@@ -52,7 +53,7 @@ import CreateCardTool from "./CreateCardTool.tsx";
 import BuilderColumn from '../builder/BuilderColumn.tsx';
 import TQLView from '../tql/TQLView.tsx';
 
-var CardsArea = React.createClass<any, any>({
+var CardsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
 	propTypes:
 	{
 		cards: React.PropTypes.array.isRequired,
@@ -60,9 +61,26 @@ var CardsArea = React.createClass<any, any>({
     spotlights: React.PropTypes.array.isRequired,
   },
   
-  getInitialState() {
+  getInitialState()
+  {
     return {
       showTQL: false,
+      title: 'Builder',
+      menuOptions:
+      [
+        {
+          text: 'TQL',
+          onClick: this.switchView
+        },
+        {
+          text: 'Copy',
+          onClick: this.copy
+        },
+        {
+          text: 'Clear',
+          onClick: this.clear
+        }
+      ],
     };
   },
   
@@ -156,14 +174,14 @@ var CardsArea = React.createClass<any, any>({
     return <LayoutManager layout={layout} moveTo={moveTo} />;
   },
 
-	render() {
+	renderContent() {
 		return (
-      <BuilderColumn title={this.state.showTQL ? 'TQL' : 'Builder'} menuOptions={this.getMenuOptions()}>
+      <div>
         { this.renderTQL() }
         { this.renderCards() }
-      </BuilderColumn>
+      </div>
     );
 	},
-});
+}));
 
 export default CardsArea;
