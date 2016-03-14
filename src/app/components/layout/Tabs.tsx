@@ -72,6 +72,7 @@ var Tab = React.createClass<any, any>({
     return {
       drag_x: true,
       reorderOnDrag: true,
+      dragInsideOnly: true,
     }
   },
     

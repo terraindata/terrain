@@ -202,7 +202,7 @@ var ResultsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
         };
       }),
       cellHeight: 200,
-      minCellWidth: 150,
+      minCellWidth: 175,
       fullHeight: true,
     };
 
