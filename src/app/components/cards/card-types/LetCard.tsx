@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./LetCard.less');
 import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
@@ -51,6 +52,7 @@ import { CardModels } from './../../../models/CardModels.tsx';
 import ThrottledInput from "../../common/ThrottledInput.tsx";
 
 var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIcon");
+var ExpandIcon = require("./../../../../images/icon_tql_17x14.svg?name=ExpandIcon");
 
 interface Props {
   card: CardModels.ILetCard;
@@ -61,6 +63,18 @@ class LetCard extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
+    this.state = 
+    {
+      expanded: false,
+    };
+    Util.bind(this, 'handleExpand');
+  }
+  
+  handleExpand()
+  {
+    this.setState({
+      expanded: !this.state.expanded,
+    });
   }
 
   render() {
@@ -75,42 +89,54 @@ class LetCard extends React.Component<Props, any>
         this.refs[fieldRef]['value'],
         this.refs[expressionRef]['value']);
     }
+    
+    var expressionInput = <ThrottledInput
+      placeholder='Expression'
+      value={this.props.card.expression}
+      className='let-card-code-input'
+      onChange={handleChange}
+      textarea={this.state.expanded}
+      ref={expressionRef} />;
 
     var layout = {
       columns: [
-      {
-        content: (
-          <ThrottledInput
-            placeholder='Variable name'
-            value={this.props.card.field} 
-            onChange={handleChange} 
-            ref={fieldRef} />
-        ),
-      },
-      {
-        content: (
-          <div className='card-arrow'>
-            <ArrowIcon />
-          </div>
-        ),
-        width: 50,
-      },
-      {
-        content: (
-          <ThrottledInput
-            placeholder='Expression'
-            value={this.props.card.expression}
-            onChange={handleChange}
-            ref={expressionRef} />
-        ),
-      }
+        {
+          content: (
+            <ThrottledInput
+              placeholder='Variable name'
+              value={this.props.card.field} 
+              onChange={handleChange} 
+              ref={fieldRef} />
+          ),
+        },
+        {
+          content: (
+            <div className='card-arrow'>
+              <ArrowIcon />
+            </div>
+          ),
+          width: 50,
+        },
       ],
-      
     };
+    
+    if(!this.state.expanded)
+    {
+      layout.columns.push({
+        content: expressionInput,
+      });
+    }
+    
+    var rightContent = (
+      <div onClick={this.handleExpand} className='let-card-expand'>
+        <ExpandIcon />
+      </div>
+    );
 
     return (
-      <CardField>
+      <CardField height={this.state.expanded ? 242 : 30} rightContent={rightContent}>
         <LayoutManager layout={layout} />
+        { this.state.expanded ? expressionInput : null }
       </CardField>
     );
   }

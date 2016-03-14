@@ -57,6 +57,7 @@ interface Props
   className?: string;
   type?: string;
   rel?: string;
+  textarea?: boolean;
 }
 
 class ThrottledInput extends React.Component<Props, any>
@@ -98,16 +99,29 @@ class ThrottledInput extends React.Component<Props, any>
   }
   
   render() {
-    return (
-      <input
-        type={ this.props.type || 'text' }
-        defaultValue={ this.props.value }
-        onChange={this.handleChange}
-        className={this.props.className}
-        placeholder={this.props.placeholder}
-        rel={this.props.rel}
-        />
-    );
+    var element = this.props.textarea ? <textarea /> : <input />;
+    
+    var props =
+    {
+      type: this.props.type || 'text',
+      defaultValue: this.props.value,
+      onChange: this.handleChange,
+      className: this.props.className,
+      placeholder: this.props.placeholder,
+      rel: this.props.rel,
+    };
+    
+    return React.cloneElement(element, props);
+    // return (
+    //   <input
+    //     type={ this.props.type || 'text' }
+    //     defaultValue={ this.props.value }
+    //     onChange={this.handleChange}
+    //     className={this.props.className}
+    //     placeholder={this.props.placeholder}
+    //     rel={this.props.rel}
+    //     />
+    // );
   }
 };
 

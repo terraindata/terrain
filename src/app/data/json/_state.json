@@ -4,6 +4,12 @@
     "algorithmName": "sitter_ranking.tql",
     "cards": [
       {
+        "type": "let",
+        "id": 10101,
+        "field": "sitter.avgRating",
+        "expression": "avg(from rating in 'ratings' select rating.value where rating.sitter == sitter.id)"
+      },
+      {
         "type": "from",
         "id": 1,
         "group": "sitters",
@@ -48,12 +54,6 @@
             "id": "p6"
           }
         ]
-      },
-      {
-        "type": "let",
-        "id": 10101,
-        "field": "sitter.avgRating",
-        "expression": "avg(from rating in 'ratings' select rating.value where rating.sitter == sitter.id)"
       },
       {
         "type": "filter",

@@ -1,0 +1,33 @@
+@import "../../../util/Common.less";
+
+.let-card-code-input {
+  .code-input;
+}
+
+textarea.let-card-code-input {
+  width: 100%;
+  margin-top: 42px;
+  height: 200px;
+  border-radius: 5px;
+  padding: 6px;
+  font-size: 16px;
+}
+
+.let-card-expand {
+  width: 17px;
+  fill: rgba(0,0,0,0.5);
+  opacity: 0;
+  .transition;
+  padding-left: 3px;
+  padding-top: 2px;
+  
+  &:hover {
+    fill: rgba(0,0,0,0.8);
+  }
+}
+
+.card:hover {
+  .let-card-expand {
+    opacity: 1;
+  }
+}
