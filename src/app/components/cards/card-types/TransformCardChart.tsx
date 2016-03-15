@@ -170,9 +170,12 @@ class TransformCardChart extends React.Component<Props, any>
       
       var el = ReactDOM.findDOMNode(this);
       TransformChart.update(el, this.getChartState({
+        domain: newDomain,
+        pointsData: newPointsData,
+        barsData: newBarsData,
+        width: newWidth,
         barColor: newBarColor,
         lineColor: newLineColor,
-        pointsData: newPointsData,
         spotlights: newSpotlights,
         inputKey: newInputKey,
       }));
@@ -239,9 +242,9 @@ class TransformCardChart extends React.Component<Props, any>
     }));
     
     var chartState = {
-      barsData: this.props.barsData,
+      barsData: overrideState.barsData || this.props.barsData,
       pointsData: pointsData,
-      domain: this.props.domain,
+      domain: overrideState.domain || this.props.domain,
       onMove: this.onPointMove,
       onLineClick: this.onLineClick,
       onLineMove: this.onLineMove,
