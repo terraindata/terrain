@@ -51,9 +51,8 @@ import Input from "../inputs/Input.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateLine from '../common/CreateLine.tsx';
 import InfoArea from '../common/InfoArea.tsx';
-import BuilderColumn from '../builder/BuilderColumn.tsx';
 
-var InputsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
+var InputsArea = React.createClass<any, any>({
 	propTypes:
 	{
 		inputs: React.PropTypes.array.isRequired,
@@ -64,16 +63,6 @@ var InputsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
   {
     return {
       title: 'Inputs',
-      menuOptions: [
-        {
-          text: 'Copy',
-          onClick: this.copyAll
-        },
-        {
-          text: 'Clear', 
-          onClick: this.removeAll
-        }
-      ],
     };
   },
   
@@ -103,7 +92,7 @@ var InputsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
     );
   },
   
-  renderContent()
+  render()
   {
     if(this.props.inputs.length === 0)
     {
@@ -139,6 +128,6 @@ var InputsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
       </div>
     );
   },
-}));
+});
 
 export default InputsArea;

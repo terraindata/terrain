@@ -352,7 +352,6 @@ var Panel = {
 
 	move(event) 
 	{
-    console.log('move');
 		this.dragTo(event.pageX, event.pageY);
 		event.preventDefault();
 		this.setState({

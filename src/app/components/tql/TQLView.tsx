@@ -50,7 +50,7 @@ var tql = require('./dummyTql.json');
 
 interface Props
 {
-  
+  algorithm: any;  
 }
 
 class TQLView extends React.Component<Props, any>

@@ -50,12 +50,15 @@ var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 
 var optionHeight = 30; // coordinate with Menu.less
 
+export interface MenuOption {
+  text: string;
+  onClick: () => void;
+  disabled?: boolean;
+};
+
 interface Props
 {
-  options: {
-    text: string;
-    onClick: () => void;
-  }[];
+  options: MenuOption[];
   small?: boolean;
 }
 
@@ -68,13 +71,16 @@ class Menu extends React.Component<Props, any>
   
   renderOption(option, index)
   {
-    var onClick = (event) => {
-      event.stopPropagation();
-      option.onClick();
-    };
+    if(!option.disabled)
+    {
+      var onClick = (event) => {
+        event.stopPropagation();
+        option.onClick(index);
+      };
+    }
     
     return (
-      <div className="menu-option" key={index} onClick={onClick}>
+      <div className={"menu-option" + (option.disabled ? " menu-option-disabled" : "")} key={index} onClick={onClick}>
         <div className="vertically-middle">
           { option.text }
         </div>

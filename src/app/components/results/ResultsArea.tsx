@@ -49,11 +49,10 @@ import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/Actions.tsx";
 import Result from "../results/Result.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
-import BuilderColumn from '../builder/BuilderColumn.tsx';
 import InfoArea from '../common/InfoArea.tsx';
 import Paging from '../common/Paging.tsx';
 
-var ResultsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
+var ResultsArea = React.createClass<any, any>({
 	propTypes:
 	{
 		results: React.PropTypes.array.isRequired,
@@ -72,17 +71,6 @@ var ResultsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
       page: this.props.resultsPage,
       hoveringPage: null,
       title: 'Results',
-      menuOptions: 
-      [
-        {
-          text: 'Copy',
-          onClick: this.copy
-        },
-        {
-          text: 'Clear',
-          onClick: this.clear
-        }
-      ]
     };
   },
   
@@ -210,7 +198,7 @@ var ResultsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
     return <LayoutManager layout={layout} moveTo={this.moveResult} />;
   },
 
-	renderContent()
+	render()
   {
 		return (
       <div className='results-area'>
@@ -220,6 +208,6 @@ var ResultsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
       </div>
     );
 	},
-}));
+});
 
 export default ResultsArea;

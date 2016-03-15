@@ -54,13 +54,11 @@ import Actions from "./../../data/Actions.tsx";
 import Util from "./../../util/Util.tsx";
 
 // Components
+import BuilderColumn from "./BuilderColumn.tsx";
 import Tabs from "./../../components/layout/Tabs.tsx";
 import LayoutManager from "./../../components/layout/LayoutManager.tsx";
 import Card from "./../../components/cards/Card.tsx";
 import Result from "./../../components/results/Result.tsx";
-import InputsArea from "./../../components/inputs/InputsArea.tsx";
-import CardsArea from "./../../components/cards/CardsArea.tsx";
-import ResultsArea from "./../../components/results/ResultsArea.tsx";
 
 var NewIcon = require("./../../../images/icon_new_8x10.svg?name=NewIcon");
 var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
@@ -188,16 +186,6 @@ class Builder extends React.Component<any, any>
     
     
     _.map(this.reduxState, (algorithm, algorithmId) => {
-      // this should be temporary; remove when middle tier arrives
-      var spotlights = algorithm.results.reduce((spotlights, result) =>
-      {
-        if(result.spotlight)
-        {
-          spotlights.push(result);
-        }
-        return spotlights;
-      }, []);
-      
       // TODO move type somewhere central
       var layout: {stackAt: number, fullHeight: boolean, columns: any[]} = {
         stackAt: 650,
@@ -208,7 +196,7 @@ class Builder extends React.Component<any, any>
             minWidth: 316,
             resizeable: true,
             resizeHandleRef: 'resize-handle',
-            content: <InputsArea inputs={algorithm.inputs} algorithmId={algorithmId} />,
+            content: <BuilderColumn algorithm={algorithm} />,
             hidden: this.state.numColumns < 2,
           },
           {
@@ -216,14 +204,14 @@ class Builder extends React.Component<any, any>
             minWidth: 350,
             resizeable: true,
             resizeHandleRef: 'resize-handle',
-            content: <CardsArea cards={algorithm.cards} algorithmId={algorithmId} spotlights={spotlights} />
+            content: <BuilderColumn algorithm={algorithm} />,
           },
           {
             colSpan: 2,
             minWidth: 200,
             resizeable: true,
             resizeHandleRef: 'resize-handle',
-            content: <ResultsArea results={algorithm.results} algorithmId={algorithmId} resultsPage={algorithm.resultsPage} resultsPages={algorithm.resultsPages} />,
+            content: <BuilderColumn algorithm={algorithm} />,
             hidden: this.state.numColumns < 3,
           },
         ]

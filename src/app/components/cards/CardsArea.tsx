@@ -50,10 +50,8 @@ import Actions from "../../data/Actions.tsx";
 import Card from "../cards/Card.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateCardTool from "./CreateCardTool.tsx";
-import BuilderColumn from '../builder/BuilderColumn.tsx';
-import TQLView from '../tql/TQLView.tsx';
 
-var CardsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
+var CardsArea = React.createClass<any, any>({
 	propTypes:
 	{
 		cards: React.PropTypes.array.isRequired,
@@ -66,21 +64,6 @@ var CardsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
     return {
       showTQL: false,
       title: 'Builder',
-      menuOptions:
-      [
-        {
-          text: 'TQL',
-          onClick: this.switchView
-        },
-        {
-          text: 'Copy',
-          onClick: this.copy
-        },
-        {
-          text: 'Clear',
-          onClick: this.clear
-        }
-      ],
     };
   },
   
@@ -95,38 +78,6 @@ var CardsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
   
   clear() {},
   
-  switchView() {
-    this.setState({
-      showTQL: !this.state.showTQL,
-    });
-  },
-  
-  getMenuOptions() {
-    return [
-      {
-        text: this.state.showTQL ? 'Cards' : 'TQL',
-        onClick: this.switchView
-      },
-      {
-        text: 'Copy',
-        onClick: this.copy
-      },
-      {
-        text: 'Clear',
-        onClick: this.clear
-      }
-    ];
-  },
-  
-  renderTQL() {
-    if(!this.state.showTQL)
-    {
-      return null;
-    }
-    
-    return <TQLView />
-  },
-  
   createFromCard() {
     Actions.cards.create(this.props.algorithmId, 'from', this.props.index);
   },
@@ -140,12 +91,7 @@ var CardsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
       />;
   },
   
-  renderCards() {
-    if(this.state.showTQL)
-    {
-      return null;
-    }
-    
+  render() {
     if(!this.props.cards.length)
     {
       return this.renderNoCards();
@@ -180,15 +126,6 @@ var CardsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
 
     return <LayoutManager layout={layout} moveTo={moveTo} />;
   },
-
-	renderContent() {
-		return (
-      <div>
-        { this.renderTQL() }
-        { this.renderCards() }
-      </div>
-    );
-	},
-}));
+});
 
 export default CardsArea;

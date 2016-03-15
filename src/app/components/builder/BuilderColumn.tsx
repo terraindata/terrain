@@ -47,7 +47,19 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
 import Menu from '../common/Menu.tsx';
+import { MenuOption } from '../common/Menu.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
+import InputsArea from "./../../components/inputs/InputsArea.tsx";
+import CardsArea from "./../../components/cards/CardsArea.tsx";
+import ResultsArea from "./../../components/results/ResultsArea.tsx";
+import TQLView from '../tql/TQLView.tsx';
+
+enum COLUMNS {
+  Inputs,
+  Builder,
+  Results,
+  TQL,
+};
 
 // interface Props
 // {
@@ -62,13 +74,21 @@ import PanelMixin from '../layout/PanelMixin.tsx';
 //   }[];
 // }
 
-var BuilderColumn =
+var BuilderColumn = React.createClass<any, any>(
 {
   mixins: [PanelMixin],
   
   propTypes:
   {
+    algorithm: React.PropTypes.object.isRequired,
     className: React.PropTypes.string,
+  },
+  
+  getInitialState()
+  {
+    return {
+      column: this.props.index,
+    }
   },
   
   getDefaultProps()
@@ -78,17 +98,69 @@ var BuilderColumn =
   
   renderContent()
   {
+    var algorithm = this.props.algorithm;
+    var algorithmId = algorithm.algorithmId;
+    
+    switch(this.state.column)
+    {
+      case COLUMNS.Builder:
+        // this should be temporary; remove when middle tier arrives
+        var spotlights = algorithm.results.reduce((spotlights, result) =>
+        {
+          if(result.spotlight)
+          {
+            spotlights.push(result);
+          }
+          return spotlights;
+        }, []);
+        
+        return <CardsArea cards={algorithm.cards} algorithmId={algorithmId} spotlights={spotlights} />;
+        
+      case COLUMNS.Inputs:
+        return <InputsArea inputs={algorithm.inputs} algorithmId={algorithmId} />;
+      
+      case COLUMNS.Results:
+        return <ResultsArea results={algorithm.results} algorithmId={algorithmId} resultsPage={algorithm.resultsPage} resultsPages={algorithm.resultsPages} />;
+      
+      case COLUMNS.TQL:
+        return <TQLView algorithm={algorithm} />;
+        
+    }
     return <div>No column content.</div>;
   },
   
-  renderMenu()
+  switchView(index)
   {
-    if(!this.state.menuOptions || !this.state.menuOptions.length)
-    {
-      return null;
-    }
+    this.setState({
+      column: index,
+    });
+  },
+  
+  getMenuOptions(): MenuOption[]
+  {
+    var options: MenuOption[] = 
+    [
+      {
+        text: 'Inputs',
+        onClick: this.switchView,
+      },
+      {
+        text: 'Builder',
+        onClick: this.switchView,
+      },
+      {
+        text: 'Results',
+        onClick: this.switchView,
+      },
+      {
+        text: 'TQL',
+        onClick: this.switchView,
+      },
+    ];
     
-    return <Menu options={this.state.menuOptions} />;
+    options[this.state.column].disabled = true;
+    
+    return options;
   },
   
   render() {
@@ -104,10 +176,10 @@ var BuilderColumn =
             )
           }
           <div className='builder-title-bar-title'>
-            { this.state.title }
+            { COLUMNS[this.state.column] }
           </div>
           <div className='builder-title-bar-options'>
-            { this.renderMenu() }
+            <Menu options={this.getMenuOptions()} />
           </div>
         </div>
         <div className='builder-column-content'>
@@ -116,6 +188,6 @@ var BuilderColumn =
       </div>
     ));
   }
-}
+});
 
 export default BuilderColumn;

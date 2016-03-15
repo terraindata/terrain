@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./AccountDropdown.less')
+import * as $ from 'jquery';
 import * as React from 'react';
 import Actions from "../../data/Actions.tsx";
 import Util from '../../util/Util.tsx';
@@ -61,16 +62,41 @@ class AccountDropdown extends React.Component<Props, any>
     this.state = {
       open: false,
     };
-    this.toggleOpen = this.toggleOpen.bind(this);
+    
+    Util.bind(this, 'toggleOpen', 'close');
   }
   
-  toggleOpen() {
+  close(event)
+  {
+    if(event.target !== this.refs['accountDropdownButton'])
+    {
+      this.setState({
+        open: false,
+      });
+    }
+    
+    $("body").unbind('click', this.close);
+  }
+  
+  componentWillUnmount()
+  {
+    $("body").unbind('click', this.close); 
+  }
+  
+  toggleOpen()
+  {
+    if(!this.state.open)
+    {
+      $("body").click(this.close);
+    }
+    
     this.setState({
       open: !this.state.open,
     });
   }
   
-  renderDropdown() {
+  renderDropdown()
+  {
     if(!this.state.open)
     {
       return null;
@@ -78,16 +104,17 @@ class AccountDropdown extends React.Component<Props, any>
   
     return (
       <div className="account-dropdown-content">
-        <div className="account-dropdown-row" onClick={this.props.onLogout}>
+        <div className="account-dropdown-row" onMouseDown={this.props.onLogout}>
           Logout
         </div>
       </div>
     );
   }
   
-  renderTopBar() {
+  renderTopBar()
+  {
     return (
-      <div className="account-dropdown-top-bar" onClick={this.toggleOpen}>
+      <div className="account-dropdown-top-bar" onClick={this.toggleOpen} ref='accountDropdownButton'>
         <div className="account-photo"></div>
         <div className="account-name">Jack Murphy</div>
         <ArrowIcon className="account-arrow-icon" />
@@ -95,7 +122,8 @@ class AccountDropdown extends React.Component<Props, any>
     );
   }
   
-  render() {
+  render()
+  {
     var classes = Util.objToClassname({
       "account-dropdown-wrapper": true,
       "account-dropdown-open": this.state.open,

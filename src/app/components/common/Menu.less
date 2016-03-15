@@ -56,7 +56,6 @@
   }
   
   .menu-option {
-    // display: none;
     opacity: 0;
     color: @menu-color;
     position: relative;
@@ -66,16 +65,19 @@
     
     white-space: nowrap;
     
-    &:hover {
+    &:hover:not(.menu-option-disabled) {
       background: darken(@card-menu-bg, 5%);
     }
     
     z-index: 1020;
+    
+    &.menu-option-disabled {
+      background: @dark-grey;
+      color: @grey;
+    }
   }
   
   &:hover {
-    // width: inherit !important;
-    // height: inherit !important;
     border-radius: 5px;
     z-index: 1020;
     
