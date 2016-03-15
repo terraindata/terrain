@@ -111,17 +111,37 @@ var LayoutManager = React.createClass<any, any>({
   {
     window.removeEventListener("resize", this.updateDimensions);
   },
+  
+  componentWillReceiveProps(newProps)
+  {
+    if(newProps.layout.columns && this.props.layout.columns)
+    {
+      var hfn = (sum, col) => sum + (col.hidden ? 1 : 0)
+      if(newProps.layout.columns.reduce(hfn, 0) !== this.props.layout.columns.reduce(hfn, 0))
+      {
+        // number of columns has changed, reset offsets
+        for(var index in this.state.sizeAdjustments)
+        {
+          this.state.sizeAdjustments[index] = {x: 0, y: 0};
+        }
+        
+        this.setState({
+          sizeAdjustments: this.state.sizeAdjustments,  
+        })
+      }
+    }
+  },
 
 	sumColsThroughIndex(index)
 	{
 		var sum = 0;
 		if(this.props.layout.rows) {
 			sum = this.props.layout.rows.reduce((sum, row, i) => (
-				((i < index || index === -1) && (row.rowSpan || 1)) + sum
+				((i < index || index === -1) && (row.rowSpan || 1) && (!row.hidden)) + sum
 			), 0);
 		} else if(this.props.layout.columns) {
 			sum = this.props.layout.columns.reduce((sum, col, i) => (
-				col.width !== undefined ? sum : ((i < index || index === -1) && (col.colSpan || 1)) + sum
+				col.width !== undefined || col.hidden ? sum : ((i < index || index === -1) && (col.colSpan || 1)) + sum
 			), 0);
 		}
 		return sum;
@@ -503,10 +523,18 @@ var LayoutManager = React.createClass<any, any>({
 
 	sumColumnWidthsThroughIndex(index)
 	{
-		return this.props.layout.columns.reduce((sum, column, i) => (sum + 
-			(index === -1 || i <= index ? (column.width || 0) : 0) +
-			(this.props.layout.colPadding && i !== 0 ? this.props.layout.colPadding : 0)
-		), 0);
+		return this.props.layout.columns.reduce((sum, column, i) =>
+    {
+      if(column.hidden)
+      {
+        return sum;
+      }
+      
+      sum += (index === -1 || i <= index ? (column.width || 0) : 0);
+  	  sum += (this.props.layout.colPadding && i !== 0 ? this.props.layout.colPadding : 0);
+		
+      return sum;
+    }, 0);
 	},
 
 	paddingForColAtIndex(index: number): number
@@ -516,6 +544,14 @@ var LayoutManager = React.createClass<any, any>({
 
 	calcColumnWidthValues(column, index): {percentage: number, offset: number}
 	{
+    if(this.props.layout.columns[index].hidden)
+    {
+      return {
+        percentage: 0,
+        offset: 0,
+      };
+    }
+    
 		var colPadding = this.paddingForColAtIndex(index);
     var widthAdjustment = 0;
     var values;

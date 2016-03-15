@@ -95,10 +95,14 @@ var BuilderColumn =
     return this.renderPanel((
       <div className='builder-column'>
         <div className='builder-title-bar'>
-          <div className='builder-resize-handle' ref='resize-handle'>
-            <div className='builder-resize-handle-line'></div>
-            <div className='builder-resize-handle-line'></div>
-          </div>
+          { 
+            this.props.index === 0 ? null : (
+              <div className='builder-resize-handle' ref='resize-handle'>
+                <div className='builder-resize-handle-line'></div>
+                <div className='builder-resize-handle-line'></div>
+              </div>
+            )
+          }
           <div className='builder-title-bar-title'>
             { this.state.title }
           </div>

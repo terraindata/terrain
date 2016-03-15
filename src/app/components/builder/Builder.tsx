@@ -94,10 +94,12 @@ class Builder extends React.Component<any, any>
     this.reduxState = Store.getState().toJS();
     this.state = {
       random: Math.random(),
-      selectedAlgorithmId: 100, // TODO change
+      selectedAlgorithmId: 100, // TODO change to not be hardcoded
+      numColumns: 3,
     };
     
-    Util.bind(this, 'duplicateAlgorithm', 'handleNewAlgorithmTab');
+    Util.bind(this, 'duplicateAlgorithm', 'handleNewAlgorithmTab',
+      'goOneColumn', 'goTwoColumns', 'goThreeColumns');
   }
   
   handleNewAlgorithmTab()
@@ -108,6 +110,27 @@ class Builder extends React.Component<any, any>
   duplicateAlgorithm()
   {
     Actions.duplicateAlgorithm(this.state.selectedAlgorithmId);
+  }
+  
+  goOneColumn()
+  {
+    this.setState({
+      numColumns: 1,
+    });
+  }
+  
+  goTwoColumns()
+  {
+    this.setState({
+      numColumns: 2,
+    }); 
+  }
+  
+  goThreeColumns()
+  {
+    this.setState({
+      numColumns: 3,
+    });
   }
   
   getTabActions()
@@ -133,6 +156,21 @@ class Builder extends React.Component<any, any>
         icon: <SaveIcon />,
         onClick: () => alert("Not yet implemented."),
       },
+      {
+        text: 'one',
+        icon: <SaveIcon />,
+        onClick: this.goOneColumn,
+      },
+      {
+        text: 'two',
+        icon: <SaveIcon />,
+        onClick: this.goTwoColumns,
+      },
+      {
+        text: 'three',
+        icon: <SaveIcon />,
+        onClick: this.goThreeColumns,
+      },
     ];
   }
   
@@ -151,7 +189,8 @@ class Builder extends React.Component<any, any>
         return spotlights;
       }, []);
       
-      var layout = {
+      // TODO move type somewhere central
+      var layout: {stackAt: number, fullHeight: boolean, columns: any[]} = {
         stackAt: 650,
         fullHeight: true,
         columns: [
@@ -161,6 +200,7 @@ class Builder extends React.Component<any, any>
             resizeable: true,
             resizeHandleRef: 'resize-handle',
             content: <InputsArea inputs={algorithm.inputs} algorithmId={algorithmId} />,
+            hidden: this.state.numColumns < 2,
           },
           {
             colSpan: 3,
@@ -174,7 +214,8 @@ class Builder extends React.Component<any, any>
             minWidth: 200,
             resizeable: true,
             resizeHandleRef: 'resize-handle',
-            content: <ResultsArea results={algorithm.results} algorithmId={algorithmId} resultsPage={algorithm.resultsPage} resultsPages={algorithm.resultsPages} />
+            content: <ResultsArea results={algorithm.results} algorithmId={algorithmId} resultsPage={algorithm.resultsPage} resultsPages={algorithm.resultsPages} />,
+            hidden: this.state.numColumns < 3,
           },
         ]
       };
