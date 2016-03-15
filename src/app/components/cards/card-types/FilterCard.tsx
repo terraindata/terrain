@@ -98,16 +98,16 @@ class FilterCard extends React.Component<Props, any>
     var filterLayout =
     {
       columns: [
-        {
-          content: index === 0 ? null : <Dropdown
-            ref={combinatorRef}
-            circle={true}
-            options={Combinators}
-            selectedIndex={filter.combinator}
-            onChange={changeFilter}
-            />,
-          width: OPERATOR_WIDTH,
-        },
+        // {
+        //   content: index === 0 ? null : <Dropdown
+        //     ref={combinatorRef}
+        //     circle={true}
+        //     options={Combinators}
+        //     selectedIndex={filter.combinator}
+        //     onChange={changeFilter}
+        //     />,
+        //   width: OPERATOR_WIDTH,
+        // },
         {
           content: (
             <ThrottledInput value={filter.comparison.first} onChange={changeFilter} ref={firstRef} />
@@ -135,9 +135,18 @@ class FilterCard extends React.Component<Props, any>
         Actions.cards.filter.remove(this.props.card, index);
     }
     
+        // noLeft={true}
     return (
       <CardField
-        noLeft={true}
+        leftContent={
+          index === 0 ? null : <Dropdown
+            ref={combinatorRef}
+            circle={true}
+            options={Combinators}
+            selectedIndex={filter.combinator}
+            onChange={changeFilter}
+            />
+        }
         key={filter.id}
         draggable={false}
         removable={true}

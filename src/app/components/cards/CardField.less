@@ -1,22 +1,54 @@
 @import "../../util/Common.less";
 
 .card-field {
-	padding: 5px 0px;
-	position: relative;
-	text-align: center;
-	height: 30px;
+  padding: @standard-margin;
+  margin: 0px -1 * @standard-margin;
+  position: relative;
+  text-align: center;
+  height: 30px;
   .transition;
   
-	.card-field-inner {
-		display: inline-block;
-		width: calc(~"100% - 40px");
-	}
+  .card-field-inner {
+    display: inline-block;
+    width: calc(~"100% - 80px");
+    position: relative;
+    z-index: 10;
+  }
 
   .card-field-tools-left,
   .card-field-tools-right {
-    position: relative;
-    top: 2px;
-    width: 20px;
+    border: 1px solid rgba(0,0,0,0);
+    position: absolute;
+    border-radius: 5px;
+    top: -1px;
+    left: 0px;
+    width: 100%; // 32px;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    
+    &:hover {
+      border-color: @medium-green;
+      background: rgba(255,255,255,0.1);
+    }
+  }
+  
+  .card-field-tools-left-inner,
+  .card-field-tools-right-inner {
+    pointer-events: all;
+    position: absolute;
+    top: 2px + @standard-margin;
+    width: 32px;
+    z-index: 9999;
+    text-align: center;
+  }
+  
+  .card-field-tools-left-inner {
+    left: 6px;
+  }
+  
+  .card-field-tools-right-inner {
+    right: 6px;
   }
   
   &.card-field-no-left {
@@ -28,33 +60,60 @@
     }
   }
 
-	.card-field-handle,
-	.card-field-delete {
-		opacity: 0;
-		font-weight: 200;
-		font-size: calc(@medium-font-size * 1.25);
-		color: @light-gray;
-		.transition(all 0.25s);		
-		cursor: pointer;
-		&:hover {
-			color: @black;
-		}
-	}
+  .card-field-handle,
+  .card-field-delete {
+    opacity: 0;
+    font-weight: 200;
+    font-size: calc(@medium-font-size * 1.25);
+    color: @light-gray;
+    .transition(all 0.25s);   
+    cursor: pointer;
+    // &:hover {
+    //   color: @black;
+    // }
+  }
 
-	.card-field-tools-left {
-		float: left;
-		text-align: left;
-	}
+  .card-field-tools-left {
+    float: left;
+    text-align: left;
+  }
 
-	.card-field-tools-right {
-		float: right;
-		text-align: right;
-	}
+  .card-field-tools-right {
+    float: right;
+    text-align: right;
+  }
 
-	&:hover {
-		.card-field-handle,
-		.card-field-delete {
-			opacity: 1;
-		}
-	}
+  &:hover {
+    .card-field-handle,
+    .card-field-delete {
+      opacity: 1;
+    }
+  }
+}
+
+.panel-dragging {
+  .card-field-tools-left {
+    background: lighten(@light-green, 5%) !important;
+    border-color: @medium-green;
+  }
+  
+  .card-field-handle,
+  .card-field-delete {
+    opacity: 1;
+  }
+}
+
+.panel-dragging .panel {
+  // if a parent panel is dragging, it's not the cardfield that's dragging,
+  //  and we shouldn't apply style
+  
+  .card-field-tools-left {
+    background: rgba(0,0,0,0) !important;
+    border-color: rgba(0,0,0,0);
+  }
+  
+  .card-field-handle,
+  .card-field-delete {
+    opacity: 0;
+  } 
 }

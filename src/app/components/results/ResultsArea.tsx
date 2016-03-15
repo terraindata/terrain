@@ -117,6 +117,7 @@ var ResultsArea = React.createClass<any, any>(_.extend({}, BuilderColumn, {
           expanded={true}
           drag_x={false}
           drag_y={false}
+          index={-1}
           />
       </div>
     );

@@ -77,7 +77,8 @@ var LayoutManager = React.createClass<any, any>({
     moveTo: React.PropTypes.func,
 	},
 
-	getInitialState() {
+	getInitialState()
+  {
 		return {
 			shiftedIndices: [],
 			shiftedHeight: 0,
@@ -85,6 +86,11 @@ var LayoutManager = React.createClass<any, any>({
       sizeAdjustments: {},
 		};
 	},
+  
+  componentWillMount()
+  {
+    // this.onDrag = _.throttle(this.onDrag, 500);
+  },
 
 	updateDimensions()
 	{
@@ -250,47 +256,44 @@ var LayoutManager = React.createClass<any, any>({
 		return [];
 	},
 
-	onDragFactory(index)
+	onDrag(index, coords, originalCoords)
 	{
-		return (coords, originalCoords) => 
+		this.setState({dragging: true, draggingIndex: index});
+
+		var clientRect = this.refs[index].getBoundingClientRect();
+		var indicesToShift = this.computeShiftedIndices(index, coords, originalCoords);
+
+		var heightAmplifier = 0;
+		var widthAmplifier = 0;
+
+		// dragged up/down
+		if(this.props.layout.rows)
 		{
-			this.setState({dragging: true, draggingIndex: index});
-
-			var clientRect = this.refs[index].getBoundingClientRect();
-			var indicesToShift = this.computeShiftedIndices(index, coords, originalCoords);
-
-			var heightAmplifier = 0;
-			var widthAmplifier = 0;
-
-			// dragged up/down
-			if(this.props.layout.rows)
-			{
-				heightAmplifier = 1;
-				if(coords.dy > 0)
-					heightAmplifier = -1;
-			}
-
-			// dragged left/right
-			if(this.props.layout.columns)
-			{
-				widthAmplifier = 1;
-				if(coords.dx > 0)
-					widthAmplifier = -1;
-			}
-
-			if(this.props.layout.cells)
-			{
-				// handled in this.renderObj
-				widthAmplifier = 1;
-				heightAmplifier = 1;
-			}
-
-			this.setState({
-				shiftedIndices: indicesToShift,
-				shiftedHeight: clientRect.height * heightAmplifier,
-				shiftedWidth: clientRect.width * widthAmplifier,
-			});
+			heightAmplifier = 1;
+			if(coords.dy > 0)
+				heightAmplifier = -1;
 		}
+
+		// dragged left/right
+		if(this.props.layout.columns)
+		{
+			widthAmplifier = 1;
+			if(coords.dx > 0)
+				widthAmplifier = -1;
+		}
+
+		if(this.props.layout.cells)
+		{
+			// handled in this.renderObj
+			widthAmplifier = 1;
+			heightAmplifier = 1;
+		}
+
+		this.setState({
+			shiftedIndices: indicesToShift,
+			shiftedHeight: clientRect.height * heightAmplifier,
+			shiftedWidth: clientRect.width * widthAmplifier,
+		});
 	},
 
 	onDropFactory(index)
@@ -338,7 +341,8 @@ var LayoutManager = React.createClass<any, any>({
 			// if obj.content is null or undef, then React.cloneElement will error and cause the whole app to break
 
 			var props:any = { 
-				onDrag: this.onDragFactory(index),
+        index: index,
+				onDrag: this.onDrag,
 				onDrop: this.onDropFactory(index),
 				parentNode: this.refs.layoutManagerDiv,
 			};

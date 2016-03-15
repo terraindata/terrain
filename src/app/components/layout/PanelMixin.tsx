@@ -57,6 +57,8 @@ var SCROLL_INTERVAL = 25;
 var Panel = {
 	propTypes: 
 	{
+    index: React.PropTypes.number,
+    
 		drag_x: React.PropTypes.bool,
 		drag_y: React.PropTypes.bool,
 		drag_xy: React.PropTypes.bool,
@@ -274,11 +276,11 @@ var Panel = {
       dragging: true, 
       // ^ this is here, and not in the startDrag method, so that we don't see
       //    the dragging styles until we've actually moved the thing
-		})
-
+		});
+    
 		if(this.props.onDrag) 
 		{
-			this.props.onDrag(draggedTo, { 
+			this.props.onDrag(this.props.index, draggedTo, { 
 				x: this.state.ox,
 				y: this.state.oy,
 			});
@@ -350,6 +352,7 @@ var Panel = {
 
 	move(event) 
 	{
+    console.log('move');
 		this.dragTo(event.pageX, event.pageY);
 		event.preventDefault();
 		this.setState({
@@ -406,6 +409,7 @@ var Panel = {
 				className={panelClass} 
 				style={style} 
 				onMouseDown={this.down} 
+        ref='panel'
 				onTouchStart={this.down}>
 				{content}
 			</div>

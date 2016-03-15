@@ -101,7 +101,8 @@ var CardField = React.createClass({
 	{
 		if(typeof this.props.onDelete === 'function')
 		{
-			this.props.onDelete(this.props.index);
+      Util.animateToHeight(this.refs.panel, 0, () =>
+			  this.props.onDelete(this.props.index));
 		}
 	},
 
@@ -135,12 +136,23 @@ var CardField = React.createClass({
 			<div className={Util.objToClassname({
           'card-field': true,
           'card-field-no-left': this.props.noLeft,
-        })} style={{ height: this.props.height }}>
-				<div className='card-field-tools-left'>{ handleContent }</div>
+        })}
+        style={{ height: this.props.height }}
+        ref='cardField'
+        >
+				<div className='card-field-tools-left'>
+          <div className='card-field-tools-left-inner'>
+            { handleContent }
+          </div>
+        </div>
 				<div className='card-field-inner' >
 					{ this.props.children }
 				</div>
-				<div className='card-field-tools-right'>{ rightContent }</div>
+				<div className='card-field-tools-right'>
+          <div className='card-field-tools-right-inner'>
+            { rightContent }
+          </div>
+        </div>
 			</div>
 			));
 	},
