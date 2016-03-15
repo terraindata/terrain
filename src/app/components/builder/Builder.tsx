@@ -112,25 +112,34 @@ class Builder extends React.Component<any, any>
     Actions.duplicateAlgorithm(this.state.selectedAlgorithmId);
   }
   
-  goOneColumn()
+  updateColumns(numColumns: number)
   {
     this.setState({
-      numColumns: 1,
+      numColumns: numColumns,
     });
+
+    // re-jigger after the resize has finished
+    // specifically for Transform cards    
+    setTimeout(() => {
+      this.setState({
+        random: Math.random(),
+      });
+    }, 150);
+  }
+  
+  goOneColumn()
+  {
+    this.updateColumns(1);
   }
   
   goTwoColumns()
   {
-    this.setState({
-      numColumns: 2,
-    }); 
+    this.updateColumns(2);
   }
   
   goThreeColumns()
   {
-    this.setState({
-      numColumns: 3,
-    });
+    this.updateColumns(3);
   }
   
   getTabActions()
