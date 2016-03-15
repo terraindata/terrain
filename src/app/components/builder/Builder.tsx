@@ -124,7 +124,7 @@ class Builder extends React.Component<any, any>
       this.setState({
         random: Math.random(),
       });
-    }, 150);
+    }, 250);
   }
   
   goOneColumn()
