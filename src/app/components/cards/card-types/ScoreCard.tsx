@@ -66,10 +66,14 @@ var methods = ['weightedSum'];
 
 class ScoreCard extends React.Component<Props, any>
 {
-  test: string = "abc";
   constructor(props:Props)
   {
     super(props);
+
+    this.state = 
+    {
+      seed: Math.random()
+    };    
     
     Util.bind(this, ['handleWeightsChange', 'renderWeight', 'renderHeader',
       'handleOutputChange', 'handleMethodChange', 'handleWeightKeyChange',
@@ -106,6 +110,9 @@ class ScoreCard extends React.Component<Props, any>
     }
     
     Actions.cards.score.changeWeights(this.props.card, weights);
+    this.setState({
+      seed: Math.random(),
+    })
   }
   
   renderWeight(weight, index) 
@@ -130,8 +137,15 @@ class ScoreCard extends React.Component<Props, any>
         }
       ]
     }
+    
+    // seed is needed to cause a fresh render after the closign animatino,
+    // otherwise React re-uses the collapsed div
+    // can't use 'weight.key' as the key for the div because that will cause 
+    //  multiple rows with the same/blank key to not render
+    // and using an 'id' is a pain
+    // if you can think of a better way, implement it
     return (
-      <CardField key={index} index={index} removable={true} onDelete={this.removeWeight}>
+      <CardField key={this.state.seed + index} index={index} removable={true} onDelete={this.removeWeight}>
         <LayoutManager layout={layout} />
       </CardField>
     );

@@ -107,17 +107,17 @@ var CardField = React.createClass({
 	},
 
 	render() {
-		var handleContent = <div>&nbsp;</div>;
-		var rightContent = <div>&nbsp;</div>;
+		var leftContent;
+		var rightContent;
 		if(this.props.draggable)
 		{
-			handleContent = (
+			leftContent = (
 				<div className='card-field-handle' ref='handle'>⋮⋮</div>
 			);
 		}
     else if(this.props.leftContent)
     {
-      handleContent = this.props.leftContent;
+      leftContent = this.props.leftContent;
     }
     
 		if(this.props.removable)
@@ -140,19 +140,23 @@ var CardField = React.createClass({
         style={{ height: this.props.height }}
         ref='cardField'
         >
-				<div className='card-field-tools-left'>
-          <div className='card-field-tools-left-inner'>
-            { handleContent }
+        { leftContent ? (
+  				<div className='card-field-tools-left'>
+            <div className='card-field-tools-left-inner'>
+              { leftContent }
+            </div>
           </div>
-        </div>
+        ) : null }
 				<div className='card-field-inner' >
 					{ this.props.children }
 				</div>
+        { rightContent ? (
 				<div className='card-field-tools-right'>
           <div className='card-field-tools-right-inner'>
             { rightContent }
           </div>
         </div>
+        ) : null }
 			</div>
 			));
 	},

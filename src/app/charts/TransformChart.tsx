@@ -532,7 +532,7 @@ var TransformChart = {
     d3.select(el).select('.lines')
       .attr("d", lineFunction(pointsData))
       .attr("stroke", color)
-      .attr("stroke-width", "4px")
+      .attr("stroke-width", "5px")
       .attr("fill", "none")
       .on("mousedown", this._lineMousedownFactory(el, onClick, scales, onMove));
   },
