@@ -71,7 +71,6 @@ var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIc
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 
 import Actions from "./data/Actions.tsx";
-import Store from "./data/Store.tsx";
 
 var App = React.createClass({
   componentDidMount() {
