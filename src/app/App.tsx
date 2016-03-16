@@ -70,7 +70,14 @@ var BuilderIcon = require("./../images/icon_reporting_18x18.svg?name=BuilderIcon
 var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIcon");
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 
+import Actions from "./data/Actions.tsx";
+import Store from "./data/Store.tsx";
+
 var App = React.createClass({
+  componentDidMount() {
+    
+  },
+  
   getInitialState()
   {
     return {
@@ -94,8 +101,9 @@ var App = React.createClass({
     })
   },
   
-  handleLogin()
+  handleLogin(token: string)
   {
+    Actions.authentication.login(token);
     this.setState({
       loggedIn: true,
     });
@@ -103,6 +111,7 @@ var App = React.createClass({
   
   handleLogout()
   {
+    Actions.authentication.logout();
     this.setState({
       loggedIn: false,
     });

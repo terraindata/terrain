@@ -42,28 +42,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Production build configuration for webpack.
+import ActionTypes from './../ActionTypes.tsx';
 
-var webpack = require('webpack');
-var conf = require('./webpack.config');
+let AuthenticationReducer = {};
 
+AuthenticationReducer[ActionTypes.authentication.login] =
+  (state, action) =>
+    state.set("authenticationToken", action.payload.token);
 
-// Disable source map.
-delete conf.devtool;
+AuthenticationReducer[ActionTypes.authentication.logout] =
+  (state, action) =>
+    state.set("authenticationToken", null);
 
-conf.plugins = [
-  new webpack.DefinePlugin({
-    // Signal to React not to include detailed checks.
-    'process.env': {
-      'NODE_ENV': "'production'"
-    },
-    
-    // The server simultaneously serves the client and the client's requests.
-    'SERVER_URL': "''"
-  }),
-
-  // Minify code.
-  new webpack.optimize.UglifyJsPlugin()
-];
-
-module.exports = conf;
+export default AuthenticationReducer;

@@ -257,6 +257,16 @@ var Actions =
       (state: any) =>
         $(ActionTypes.algorithm.load, {state}),
   },
+  
+  authentication:
+  {
+    login:
+      (token: string) =>
+        $(ActionTypes.authentication.login, { token }),
+    logout:
+      () =>
+        $(ActionTypes.authentication.logout, null),
+  },
 };
 
 export default Actions;

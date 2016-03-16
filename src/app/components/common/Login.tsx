@@ -50,7 +50,7 @@ var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 var TerrainIcon = require("./../../../images/icon_terrain_108x17.svg?name=TerrainIcon");
 
 interface Props {
-  onLogin: () => void;
+  onLogin: (token: string) => void;
 }
 
 class Login extends React.Component<Props, any>
@@ -59,14 +59,51 @@ class Login extends React.Component<Props, any>
   {
     super(props);
     Util.bind(this, 'handleKeyDown');
+    this.state = {
+      username: '',
+      password: '',
+    }
   }
   
-  handleKeyDown(event)
+  handleKeyDown = (event) =>
   {
     if(event.keyCode === 13)
     {
-      this.props.onLogin();
+      this.handleLogin();
     }
+  }
+  
+  handleUsernameChange = (ev:any) =>
+  {
+    this.setState({ username: ev.target.value });
+  }
+  
+  handlePasswordChange = (ev:any) =>
+  {
+    this.setState({ password: ev.target.value });
+  }
+  
+  handleLogin = () =>
+  {
+    let xhr = new XMLHttpRequest();
+    xhr.onerror = (ev:Event) => {
+      alert("Uh oh: " + ev);
+    }
+    xhr.onload = (ev:Event) => {
+      if (xhr.status != 200) {
+        alert(xhr.responseText);
+        return;
+      } 
+      
+      let token = xhr.responseText;
+      this.props.onLogin(token);
+    }
+    // NOTE: $SERVER_URL will be replaced by the build process.
+    xhr.open("POST", SERVER_URL + "/auth", true);
+    xhr.send(JSON.stringify({
+      username: this.state.username,
+      password: this.state.password,
+    }));
   }
   
   render() {
@@ -77,10 +114,10 @@ class Login extends React.Component<Props, any>
             <TerrainIcon />
           </div>
           <div className='login-info'>
-            <input type='text' id='login-username' placeholder='username' />
-            <input type='password' id='login-password' placeholder='password' onKeyDown={this.handleKeyDown} />
+            <input type='text' id='login-username' placeholder='username' onChange={this.handleUsernameChange} />
+            <input type='password' id='login-password' placeholder='password' onKeyDown={this.handleKeyDown} onChange={this.handlePasswordChange} />
           </div>
-          <a className='login-submit' onClick={this.props.onLogin}>
+          <a className='login-submit' onClick={this.handleLogin}>
             Login
           </a>
         </div>

@@ -71,4 +71,9 @@ module.exports = {
             { test: /\.svg\?name=[a-zA-Z]+&reactDom=react$/, loader: 'babel!svg-react' }
         ]
     },
+    plugins: [
+      new webpack.DefinePlugin({
+        'SERVER_URL': "'//localhost:40080'"
+      })
+    ]
 };
