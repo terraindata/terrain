@@ -71,10 +71,16 @@ var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIc
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 
 import Actions from "./data/Actions.tsx";
+import Store from "./data/Store.tsx";
 
 var App = React.createClass({
   componentDidMount() {
-    
+    Store.subscribe(() => {
+      let token = Store.getState().get('authenticationToken');
+      this.setState({
+        loggedIn: token !== null
+      });
+    });
   },
   
   getInitialState()
@@ -100,27 +106,16 @@ var App = React.createClass({
     })
   },
   
-  handleLogin(token: string)
-  {
-    Actions.authentication.login(token);
-    this.setState({
-      loggedIn: true,
-    });
-  },
-  
   handleLogout()
   {
     Actions.authentication.logout();
-    this.setState({
-      loggedIn: false,
-    });
   },
   
   renderApp()
   {
     if(!this.state.loggedIn)
     {
-      return <Login onLogin={this.handleLogin} />;
+      return <Login />;
     }
     
     var links = 

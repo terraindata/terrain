@@ -45,12 +45,12 @@ THE SOFTWARE.
 require('./Login.less')
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
+import Actions from "../../data/Actions.tsx";
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 var TerrainIcon = require("./../../../images/icon_terrain_108x17.svg?name=TerrainIcon");
 
 interface Props {
-  onLogin: (token: string) => void;
 }
 
 class Login extends React.Component<Props, any>
@@ -87,16 +87,16 @@ class Login extends React.Component<Props, any>
   {
     let xhr = new XMLHttpRequest();
     xhr.onerror = (ev:Event) => {
-      alert("Uh oh: " + ev);
+      alert("Error logging in: " + ev);
     }
     xhr.onload = (ev:Event) => {
       if (xhr.status != 200) {
-        alert(xhr.responseText);
+        alert("Failed to log in: " + xhr.responseText);
         return;
       } 
       
       let token = xhr.responseText;
-      this.props.onLogin(token);
+      Actions.authentication.login(token);
     }
     // NOTE: $SERVER_URL will be replaced by the build process.
     xhr.open("POST", SERVER_URL + "/auth", true);
