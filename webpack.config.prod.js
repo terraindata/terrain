@@ -55,7 +55,7 @@ conf.plugins = [
   // Signal to React not to include detailed checks.
   new webpack.DefinePlugin({
     'process.env': {
-      'NODE_ENV': 'production'
+      'NODE_ENV': "'production'"
     }
   }),
 
