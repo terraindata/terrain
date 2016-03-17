@@ -75,19 +75,26 @@ import Store from "./data/Store.tsx";
 
 var App = React.createClass({
   componentDidMount() {
+    // Respond to authentication state changes.
     Store.subscribe(() => {
       let token = Store.getState().get('authenticationToken');
       this.setState({
         loggedIn: token !== null
       });
     });
+    
+    // Retrieve logged-in state from persistent storage.
+    let token = localStorage['authenticationToken'];
+    if (token !== undefined && token !== null) {
+      Actions.authentication.login(token);
+    }
   },
   
   getInitialState()
   {
     return {
       selectedPage: 3,
-      loggedIn: true,
+      loggedIn: false,
     };
   },
   

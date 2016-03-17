@@ -47,11 +47,16 @@ import ActionTypes from './../ActionTypes.tsx';
 let AuthenticationReducer = {};
 
 AuthenticationReducer[ActionTypes.authentication.login] =
-  (state, action) =>
-    state.set("authenticationToken", action.payload.token);
+  (state, action) => {
+    let t:string = action.payload.token;
+    localStorage['authenticationToken'] = t; 
+    return state.set("authenticationToken", t);
+  }
 
 AuthenticationReducer[ActionTypes.authentication.logout] =
-  (state, action) =>
-    state.set("authenticationToken", null);
+  (state, action) => {
+    delete localStorage['authenticationToken'];
+    return state.set("authenticationToken", null);
+  }
 
 export default AuthenticationReducer;
