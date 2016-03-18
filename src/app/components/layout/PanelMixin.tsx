@@ -369,9 +369,9 @@ var Panel = {
 	},
 
 
-	renderPanel(content) {
+	renderPanel(content, className) {
 		// Coordinate these classNames with panel.css/less
-		var panelClass = 'panel';
+		var panelClass = 'panel ' + (className || '');
 
 		var style:React.CSSProperties = {};
 

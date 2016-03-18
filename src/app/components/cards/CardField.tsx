@@ -47,6 +47,9 @@ import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 
+var FIELD_HEIGHT = 32;
+var STANDARD_MARGIN = 6;
+
 var CardField = React.createClass({
 	mixins: [PanelMixin],
 
@@ -73,6 +76,12 @@ var CardField = React.createClass({
 			handleRef: 'handle',
 		};
 	},
+  
+  componentDidMount()
+  {
+    // $(this.refs.panel).height(0);
+    Util.animateToAutoHeight(this.refs.panel);
+  },
 
 	willReceiveNewProps(newProps)
 	{
@@ -158,7 +167,7 @@ var CardField = React.createClass({
         </div>
         ) : null }
 			</div>
-			));
+			), 'card-field-panel-wrapper');
 	},
 });
 
