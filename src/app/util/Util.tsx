@@ -49,6 +49,33 @@ var _ = require('underscore');
 
 import { CardModels } from './../models/CardModels.tsx';
 
+var immutableCardsUpdateHelper = (node: any, keyToUpdate: string, id: string, updater: (node: any, key: string) => any) =>
+{
+  if(node.get('id') === id)
+  {
+    return node.update(keyToUpdate, (node: any) => updater(node, keyToUpdate));
+  }
+  
+  if(node.get('cards'))
+  {
+    return node.update('cards', cards => cards.map(card => immutableCardsUpdateHelper(card, keyToUpdate, id, updater)));
+  }
+  
+  return node;
+}
+
+var immutableCardsUpdate = 
+  (state: any, keysToUpdate: string | string[], id: string, updater: (node: any, key: string) => any) => {
+    if(typeof keysToUpdate === "string")
+    {
+      keysToUpdate = [keysToUpdate as string];
+    }
+    return state.map((algorithm) => 
+      (keysToUpdate as string[]).reduce(
+        (algorithm, keyToUpdate) => immutableCardsUpdateHelper(algorithm, keyToUpdate, id, updater)
+      , algorithm));
+  }
+
 var Util = {
 	// Return a random integer [min, max)
 	// assumes min of 0 if not passed.
@@ -88,6 +115,8 @@ var Util = {
     arr = arr.delete(curIndex);
     return arr.splice(index, 0, obj);
   },
+  
+  immutableCardsUpdate: immutableCardsUpdate,
 
 	isInt(num): boolean
 	{
@@ -223,25 +252,25 @@ var Util = {
   //  fieldUpdater gets passed (fieldObject, action)
   updateCardField: (field: string, fieldUpdater) =>
     (state, action) =>
-      state.updateIn([action.payload.card.algorithmId, 'cards'], cards =>
-        cards.updateIn([cards.findIndex(card => card.get('id') === action.payload.card.id), field], 
-          (fieldObj) => fieldUpdater(fieldObj, action))),
+      Util.immutableCardsUpdate(state, field, action.payload.card.id,
+        (fieldObj) => fieldUpdater(fieldObj, action)),
   
   // Given a function that takes an action and generates a map
   //  of field => value pairings,
   //  returns a reducer that
   //  finds the card specified in an action and sets
   //  the values of the fields specified in the map
-  updateCardFields: (fieldMapFactory: (action: any) => {[field: string]: any}) =>
-    (state, action) =>
-      state.updateIn([action.payload.card.algorithmId, 'cards'], (cards) =>
-        cards.updateIn([cards.findIndex(card => card.get('id') === action.payload.card.id)], 
-          card => 
-            _.reduce(fieldMapFactory(action), (card, value, field) =>
-              card.set(field, value)
-            , card)
-          )
-        ),
+  // note: outdated and unused
+  // updateCardFields: (fieldMapFactory: (action: any) => {[field: string]: any}) =>
+  //   (state, action) =>
+  //     state.updateIn([action.payload.card.parentId, 'cards'], (cards) =>
+  //       cards.updateIn([cards.findIndex(card => card.get('id') === action.payload.card.id)], 
+  //         card => 
+  //           _.reduce(fieldMapFactory(action), (card, value, field) =>
+  //             card.set(field, value)
+  //           , card)
+  //         )
+  //       ),
   
   // Given an array of strings representing fields on a card, 
   //  returns a reducer that
@@ -250,14 +279,8 @@ var Util = {
   //  of the matching fields in the action's payload.
   setCardFields: (fields: string[]) =>
     (state, action) =>
-      state.updateIn([action.payload.card.algorithmId, 'cards'], (cards) =>
-        cards.updateIn([cards.findIndex(card => card.get('id') === action.payload.card.id)], 
-          card => 
-            _.reduce(fields, (card, field) =>
-              card.set(field, action.payload[field])
-            , card)
-          )
-        ),
+      Util.immutableCardsUpdate(state, fields, action.payload.card.id, 
+        (fieldVal, field) => action.payload[field]),
   
   populateTransformDummyData(transformCard)
   {

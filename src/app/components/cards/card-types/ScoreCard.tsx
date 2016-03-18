@@ -59,7 +59,7 @@ import { Weight, Weighter } from '../../../charts/Weighter.tsx';
 
 interface Props {
   card: CardModels.IScoreCard;
-  algorithmId: string;
+  parentId: string;
 }
 
 var methods = ['weightedSum'];

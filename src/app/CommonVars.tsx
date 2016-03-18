@@ -45,5 +45,25 @@ THE SOFTWARE.
 export var Operators: string[] = ['=', '≥', '>', '≤', '<', 'in', '≠'];
 export var Combinators: string[] = ['&', '||'];
 export var Directions: string[] = ['ascending', 'descending'];
-export var CardTypes: string[]  = ['from', 'select', 'sort', 'filter', 'let', 'score', 'transform', 
-  'slice', 'text match', 'exceptions', 'flatten', 'insert', 'update', 'replace', 'max', 'min', 'sum', 'average', 'count'];
+export var CardTypes: string[]  = 
+[
+ 'from',
+ 'select',
+ 'sort',
+ 'filter',
+ 'let',
+ 'score',
+ 'transform',
+ 'max',
+ 'min',
+ 'sum',
+ 'avg',
+ 'count'
+ // 'slice',
+ // 'text match',
+ // 'exceptions',
+ // 'flatten',
+ // 'insert',
+ // 'update',
+ // 'replace',
+];

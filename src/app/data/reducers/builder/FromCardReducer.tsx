@@ -51,23 +51,23 @@ var newResults = require('../../json/_results.json');
 var FromCardReducer = {};
 
 FromCardReducer[ActionTypes.cards.from.changeGroup] =
-  (state, action) => {
-    if(action.payload.value === 'sitters' && state.getIn([action.payload.card.algorithmId, 'results']).count() === 0)
-    {
-      newResults = newResults.map(result => {
-        result.algorithmId = action.payload.card.algorithmId;
-        return result;
-      })
-      state = state.setIn([action.payload.card.algorithmId, 'results'], Immutable.fromJS(newResults));
-    }
+  Util.updateCardField('group', (group, action) => action.payload.value);
+  // {
+    // if(action.payload.value === 'sitters' && state.getIn([action.payload.card.parentId, 'results']).count() === 0)
+    // {
+    //   newResults = newResults.map(result => {
+    //     result.parentId = action.payload.card.parentId;
+    //     return result;
+    //   })
+    //   state = state.setIn([action.payload.card.parentId, 'results'], Immutable.fromJS(newResults));
+    // }
     
-    return state.setIn([action.payload.card.algorithmId, 'cards', action.payload.index, 'group'], action.payload.value);
-  }
+    // return state.setIn([action.payload.card.parentId, 'cards', action.payload.index, 'group'], action.payload.value);
+    
+  // });
 
 FromCardReducer[ActionTypes.cards.from.join.create] =
-  (state, action) =>
-    state.updateIn([action.payload.card.algorithmId, 'cards'], cards =>
-      cards.updateIn([Util.cardIndex(cards, action), 'joins'], joins =>
+  Util.updateCardField('joins', (joins, action) =>
         joins.push({
           group: '',
           comparison:
@@ -76,8 +76,8 @@ FromCardReducer[ActionTypes.cards.from.join.create] =
             second: '',
             operator: CardModels.Operator.EQ,
           },
-          id: Util.randInt(2307961512),
-        })));
+          id: "j-"+Util.randInt(2307961512),
+        }));
     
 FromCardReducer[ActionTypes.cards.from.join.change] =
   Util.updateCardField('joins', (joins, action) => 

@@ -55,37 +55,37 @@ var NEW_ALGORITHM =
   resultsPages: 30,
 };
 
-var currentAlgorithmId = 101;
+var currentparentId = 101;
 var AlgorithmReducer = {};
 
 AlgorithmReducer[ActionTypes.newAlgorithm] =
   (state, action) => 
-    state.set("" + (currentAlgorithmId ++), Immutable.fromJS(NEW_ALGORITHM));
+    state.set("" + (currentparentId ++), Immutable.fromJS(NEW_ALGORITHM));
 
 AlgorithmReducer[ActionTypes.closeAlgorithm] =
   (state, action) =>
-    state.delete(action.payload.algorithmId);
+    state.delete(action.payload.parentId);
 
 AlgorithmReducer[ActionTypes.duplicateAlgorithm] =
   (state, action) => {
-    var algorithmId = "" + Math.random();
-    return state.set(algorithmId,
-      Immutable.fromJS(state.get("" + action.payload.algorithmId).toJS()))
-      .setIn([algorithmId, 'algorithmName'], 'Copy of ' + state.getIn(["" + action.payload.algorithmId, 'algorithmName']))
-      .updateIn([algorithmId, 'results'], results =>
+    var parentId = "" + Math.random();
+    return state.set(parentId,
+      Immutable.fromJS(state.get("" + action.payload.parentId).toJS()))
+      .setIn([parentId, 'algorithmName'], 'Copy of ' + state.getIn(["" + action.payload.parentId, 'algorithmName']))
+      .updateIn([parentId, 'results'], results =>
         results.map(result =>
-          result.set('algorithmId', algorithmId)))
-      .updateIn([algorithmId, 'cards'], cards =>
+          result.set('parentId', parentId)))
+      .updateIn([parentId, 'cards'], cards =>
         cards.map(card =>
-          card.set('algorithmId', algorithmId)))
-      .updateIn([algorithmId, 'inputs'], inputs =>
+          card.set('parentId', parentId)))
+      .updateIn([parentId, 'inputs'], inputs =>
         inputs.map(input =>
-          input.set('algorithmId', algorithmId)))
+          input.set('parentId', parentId)))
       ;
   }
 
 AlgorithmReducer[ActionTypes.results.changePage] =
   (state, action) =>
-    state.setIn([action.payload.algorithmId, 'resultsPage'], action.payload.page);
+    state.setIn([action.payload.parentId, 'resultsPage'], action.payload.page);
 
 export default AlgorithmReducer;

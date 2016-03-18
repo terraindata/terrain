@@ -55,8 +55,9 @@ var CardsArea = React.createClass<any, any>({
 	propTypes:
 	{
 		cards: React.PropTypes.array.isRequired,
-    algorithmId: React.PropTypes.string.isRequired,
+    parentId: React.PropTypes.string.isRequired,
     spotlights: React.PropTypes.array.isRequired,
+    topLevel: React.PropTypes.bool,
   },
   
   getInitialState()
@@ -67,34 +68,23 @@ var CardsArea = React.createClass<any, any>({
     };
   },
   
-  getDefaultProps()
-  {
-    return {
-      
-    }  
-  },
-  
   copy() {},
   
   clear() {},
   
   createFromCard() {
-    Actions.cards.create(this.props.algorithmId, 'from', this.props.index);
-  },
-  
-  renderNoCards() {
-    return <InfoArea
-      large="No cards have been created, yet."
-      small="Most people start with the From card."
-      button="Create a From card"
-      onClick={this.createFromCard}
-      />;
+    Actions.cards.create(this.props.parentId, 'from', this.props.index);
   },
   
   render() {
-    if(!this.props.cards.length)
+    if(!this.props.cards.length && this.props.topLevel)
     {
-      return this.renderNoCards();
+      return <InfoArea
+        large="No cards have been created, yet."
+        small="Most people start with the From card."
+        button="Create a From card"
+        onClick={this.createFromCard}
+        />;
     }
     
     var layout = {
@@ -107,13 +97,12 @@ var CardsArea = React.createClass<any, any>({
           key: card.id,
         };
       }),
-      fullHeight: true,
     };
     
     layout.rows.push({
       content: (
-        <div className='standard-margin standard-margin-top'>
-          <CreateCardTool index={this.props.cards.length} alwaysOpen={true} algorithmId={this.props.algorithmId} />
+        <div className={this.props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}>
+          <CreateCardTool index={this.props.cards.length} alwaysOpen={this.props.topLevel} parentId={this.props.parentId} />
         </div>
       ),
       key: 'end-tool',
@@ -121,10 +110,14 @@ var CardsArea = React.createClass<any, any>({
 
     var moveTo = (curIndex, newIndex) =>
     {
-      Actions.cards.move(this.props.cards[curIndex], newIndex);
+      Actions.cards.move(this.props.cards[curIndex], newIndex, this.props.parentId);
     };
 
-    return <LayoutManager layout={layout} moveTo={moveTo} />;
+    return (
+      <div className='cards-area'>
+        <LayoutManager layout={layout} moveTo={moveTo} />
+      </div>
+    );
   },
 });
 

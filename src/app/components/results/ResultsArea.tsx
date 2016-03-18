@@ -58,7 +58,7 @@ var ResultsArea = React.createClass<any, any>({
 		results: React.PropTypes.array.isRequired,
     resultsPage: React.PropTypes.number.isRequired,
     resultsPages: React.PropTypes.number.isRequired,
-    algorithmId: React.PropTypes.string.isRequired,
+    parentId: React.PropTypes.string.isRequired,
 	},
   
   getInitialState()
@@ -100,7 +100,7 @@ var ResultsArea = React.createClass<any, any>({
         <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
         <Result 
           data={this.state.expandedResult}
-          algorithmId={this.props.algorithmId}
+          parentId={this.props.parentId}
           onExpand={this.handleCollapse}
           expanded={true}
           drag_x={false}
@@ -118,7 +118,7 @@ var ResultsArea = React.createClass<any, any>({
       page: page,
     });
     
-    Actions.results.changePage(this.props.algorithmId, page);
+    Actions.results.changePage(this.props.parentId, page);
   },
   
   componentWillUpdate(newProps, newState)
@@ -186,7 +186,7 @@ var ResultsArea = React.createClass<any, any>({
     var layout = {
       cells: this.props.results.map((result) => {
         return {
-          content: <Result data={result} algorithmId={this.props.algorithmId} onExpand={this.handleExpand} />,
+          content: <Result data={result} parentId={this.props.parentId} onExpand={this.handleExpand} />,
           key: result.id,
         };
       }),

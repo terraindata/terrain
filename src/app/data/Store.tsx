@@ -55,20 +55,27 @@ import { CardModels } from './../models/CardModels.tsx';
 var defaultStateJson = require('./json/_state.json');
 var descriptions = require('./json/_descriptions.json');
 
-_.map(defaultStateJson, (algorithm, algorithmId) => {
-  algorithm.cards = algorithm.cards.map((card) => {
-    var card = _.extend(card, {algorithmId: algorithmId});
+_.map(defaultStateJson, (algorithm, parentId) => {
+
+  var initCard = (card) => {
+    var card = _.extend(card, {parentId: parentId});
     if(card.type === 'transform')
     {
       Util.populateTransformDummyData(card);
     }
+    if(card.cards)
+    {
+      card.cards = card.cards.map(initCard);
+    }
     return card;
-  });
+  }
+
+  algorithm.cards = algorithm.cards.map(initCard);
   
-  algorithm.inputs.map((input) => input.algorithmId = algorithmId);
+  algorithm.inputs.map((input) => input.parentId = parentId);
   algorithm.results.map((result, index) => 
     {
-      result.algorithmId = algorithmId
+      result.parentId = parentId
       result.score = 100 - index * 4;
       result.description = descriptions[index];
     });

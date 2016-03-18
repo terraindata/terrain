@@ -55,15 +55,15 @@ var Actions =
   cards:
   {
     create:
-      (algorithmId: string, type: string, index: number) => 
-        $(ActionTypes.cards.create, {algorithmId, type, index}),
+      (parentId: string, type: string, index: number) => 
+        $(ActionTypes.cards.create, {parentId, type, index}),
 
     move: 
-      (card: CardModels.ICard, index: number) =>
-        $(ActionTypes.cards.move, {card, index}),
+      (card: CardModels.ICard, index: number, parentId: string) =>
+        $(ActionTypes.cards.move, {card, index, parentId}),
     
     remove: 
-      (card: CardModels.ICard) =>
+      (card: CardModels.ICard, parentId: string) =>
         $(ActionTypes.cards.remove, {card}),
 
     from:
@@ -165,8 +165,8 @@ var Actions =
   inputs:
   {
     create: 
-      (algorithmId: string, index: number) =>
-        $(ActionTypes.inputs.create, {algorithmId, index}),
+      (parentId: string, index: number) =>
+        $(ActionTypes.inputs.create, {parentId, index}),
 
     move: 
       (input: any, index: number) =>
@@ -204,8 +204,8 @@ var Actions =
         $(ActionTypes.results.pin, {result, value}),
     
     changePage:
-      (algorithmId: string, page: number) =>
-        $(ActionTypes.results.changePage, {algorithmId, page}),
+      (parentId: string, page: number) =>
+        $(ActionTypes.results.changePage, {parentId, page}),
   },
 
   newAlgorithm: 
@@ -213,12 +213,12 @@ var Actions =
       $(ActionTypes.newAlgorithm, {}),
   
   closeAlgorithm: 
-    (algorithmId: string) =>
-      $(ActionTypes.closeAlgorithm, {algorithmId}),
+    (parentId: string) =>
+      $(ActionTypes.closeAlgorithm, {parentId}),
   
   duplicateAlgorithm:
-    (algorithmId: string) =>
-      $(ActionTypes.duplicateAlgorithm, {algorithmId}),
+    (parentId: string) =>
+      $(ActionTypes.duplicateAlgorithm, {parentId}),
 
 };
 

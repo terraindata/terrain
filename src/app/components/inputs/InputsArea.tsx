@@ -56,7 +56,7 @@ var InputsArea = React.createClass<any, any>({
 	propTypes:
 	{
 		inputs: React.PropTypes.array.isRequired,
-    algorithmId: React.PropTypes.string.isRequired,
+    parentId: React.PropTypes.string.isRequired,
 	},
   
   getInitialState()
@@ -68,7 +68,7 @@ var InputsArea = React.createClass<any, any>({
   
   createInput()
   {
-    Actions.inputs.create(this.props.algorithmId, 0);
+    Actions.inputs.create(this.props.parentId, 0);
   },
   
   copyAll()

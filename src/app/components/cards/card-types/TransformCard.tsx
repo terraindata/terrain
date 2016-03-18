@@ -64,7 +64,7 @@ var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIco
 
 interface Props {
   card: CardModels.ITransformCard;
-  algorithmId: string;
+  parentId: string;
   cards: CardModels.ICard[];
   spotlights: any[];
 }

@@ -92,6 +92,13 @@
     position: relative;
     height: calc(~"100% - @{title-bar-height}");
     border-left: 1px solid rgba(0,0,0,0.15);
+    
+    &.builder-column-content-scroll {
+      overflow-y: auto;
+      overflow-x: auto;
+      margin-right: @standard-margin;
+      padding-right: 0px;
+    }
   
     .standard-margin-container;
   }

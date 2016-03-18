@@ -69,9 +69,9 @@ export module CardModels
     id: string;
   }
   
-  export interface IAlgorithmId
+  export interface IParentId
   {
-    algorithmId: string;
+    parentId: string;
   }
   
   export interface IComparison
@@ -99,15 +99,27 @@ export module CardModels
     comparison: IComparison;
   }
   
-  export interface ICard extends IId, IAlgorithmId
+  export interface ICard extends IId, IParentId
   {
     type: string;
   }
   
-  export interface IFromCard extends ICard
+  export interface ICardsContainer
+  {
+    cards: ICard[];
+  }
+  
+  export interface IFromCard extends ICard, ICardsContainer
   {
     group: string;
+    variable: string;
     joins: IJoin[];
+  }
+  
+  export interface IJoinCard extends ICard
+  {
+    group: string;
+    comparison: IComparison;
   }
   
   export interface IProperty extends IId
@@ -130,11 +142,17 @@ export module CardModels
     filters: IFilter[];
   }
   
-  export interface ILetCard extends ICard
+  export interface ILetCard extends ICard, ICardsContainer
   {
     field: string;
     expression: string;
   }
+  
+  export interface ICountCard extends ICard, ICardsContainer {}
+  export interface IAvgCard extends ICard, ICardsContainer {}
+  export interface ISumCard extends ICard, ICardsContainer {}
+  export interface IMinCard extends ICard, ICardsContainer {}
+  export interface IMaxCard extends ICard, ICardsContainer {}
   
   export interface IWeight
   {
@@ -182,7 +200,7 @@ export module CardModels
     DATE,
   }
   
-  export interface IInput extends IId, IAlgorithmId
+  export interface IInput extends IId, IParentId
   {
     type: InputType;
     key: string;

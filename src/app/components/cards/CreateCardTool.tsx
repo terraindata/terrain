@@ -62,7 +62,7 @@ var fieldHeight = 35 + buttonPadding;
 interface Props {
   index: number;
   alwaysOpen?: boolean;
-  algorithmId: string;
+  parentId: string;
 }
 
 class CreateCardTool extends React.Component<Props, any>
@@ -94,7 +94,7 @@ class CreateCardTool extends React.Component<Props, any>
         search: "",
       });
       
-      Actions.cards.create(this.props.algorithmId, type, this.props.index);
+      Actions.cards.create(this.props.parentId, type, this.props.index);
     }
   }
   

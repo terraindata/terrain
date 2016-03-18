@@ -92,7 +92,7 @@ class Builder extends React.Component<any, any>
     this.reduxState = Store.getState().toJS();
     this.state = {
       random: Math.random(),
-      selectedAlgorithmId: 100, // TODO change to not be hardcoded
+      selectedparentId: 100, // TODO change to not be hardcoded
       numColumns: 3,
     };
     
@@ -107,7 +107,7 @@ class Builder extends React.Component<any, any>
   
   duplicateAlgorithm()
   {
-    Actions.duplicateAlgorithm(this.state.selectedAlgorithmId);
+    Actions.duplicateAlgorithm(this.state.selectedparentId);
   }
   
   updateColumns(numColumns: number)
@@ -185,7 +185,7 @@ class Builder extends React.Component<any, any>
     var tabs = {};
     
     
-    _.map(this.reduxState, (algorithm, algorithmId) => {
+    _.map(this.reduxState, (algorithm, parentId) => {
       // TODO move type somewhere central
       var layout: {stackAt: number, fullHeight: boolean, columns: any[]} = {
         stackAt: 650,
@@ -201,14 +201,14 @@ class Builder extends React.Component<any, any>
           },
           {
             colSpan: 3,
-            minWidth: 350,
+            minWidth: 316,
             resizeable: true,
             resizeHandleRef: 'resize-handle',
             content: <BuilderColumn algorithm={algorithm} />,
           },
           {
             colSpan: 2,
-            minWidth: 200,
+            minWidth: 316,
             resizeable: true,
             resizeHandleRef: 'resize-handle',
             content: <BuilderColumn algorithm={algorithm} />,
@@ -219,24 +219,24 @@ class Builder extends React.Component<any, any>
       
       var closeFn = () => 
       {
-        Actions.closeAlgorithm(algorithmId);
+        Actions.closeAlgorithm(parentId);
       }
 
-      tabs[algorithmId] = {
+      tabs[parentId] = {
         content: <LayoutManager layout={layout} />,
         tabName: algorithm.algorithmName || 'New Algorithm',
         closeable: true,
         onClose: closeFn,
         onClick: () => {
           this.setState({
-            selectedAlgorithmId: algorithmId,
+            selectedparentId: parentId,
           });
         }
       };
       
-      if(!this.state.selectedAlgorithmId)
+      if(!this.state.selectedparentId)
       {
-        setTimeout(() => this.setState({ selectedAlgorithmId: algorithmId }));
+        setTimeout(() => this.setState({ selectedparentId: parentId }));
       }
     });
 

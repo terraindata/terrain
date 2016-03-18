@@ -53,7 +53,7 @@ var CardsReducer = {};
 
 CardsReducer[ActionTypes.cards.create] =
   (state, action) => {
-    return state.updateIn([action.payload.algorithmId, 'cards'], cards => {
+    return Util.immutableCardsUpdate(state, 'cards', action.payload.parentId, cards => {
       var newCard: any = {};
       
       switch(action.payload.type)
@@ -73,6 +73,7 @@ CardsReducer[ActionTypes.cards.create] =
             type: 'from',
             group: '',
             joins: [],
+            cards: [],
           };
           break;
         case 'sort':
@@ -104,6 +105,7 @@ CardsReducer[ActionTypes.cards.create] =
           {
             field: '',
             expression: '',
+            cards: [],
           };
           break;
         case 'score':
@@ -114,11 +116,21 @@ CardsReducer[ActionTypes.cards.create] =
             output: '',
           };
           break;
+        case 'sum':
+        case 'avg':
+        case 'min':
+        case 'max':
+        case 'count':
+          newCard =
+          {
+            cards: [],
+          };
+          break;
       }
       
       newCard['type'] = action.payload.type;
-      newCard['id'] = Util.randInt(4815162342);
-      newCard['algorithmId'] = action.payload.algorithmId;
+      newCard['id'] = "c-"+Util.randInt(4815162342);
+      newCard['parentId'] = action.payload.parentId;
       
       return cards.splice(action.payload.index, 0, Immutable.fromJS(newCard));
     });
@@ -126,15 +138,14 @@ CardsReducer[ActionTypes.cards.create] =
 
 CardsReducer[ActionTypes.cards.move] =
   (state, action) =>
-    state.updateIn([action.payload.card.algorithmId, 'cards'], cards =>
+    Util.immutableCardsUpdate(state, 'cards', action.payload.parentId, cards =>
       Util.immutableMove(cards, action.payload.card.id, action.payload.index)
     );
 
 CardsReducer[ActionTypes.cards.remove] =
   (state, action) =>
-    state.updateIn([action.payload.card.algorithmId, 'cards'], cards => {
-      var cardIndex = cards.findIndex((card) => card.get('id') === action.payload.card.id);
-      return cards.remove(cardIndex);
-    });
+    Util.immutableCardsUpdate(state, 'cards', action.payload.parentId, cards =>
+      cards.remove(cards.findIndex((card) => card.get('id') === action.payload.card.id))
+    );
 
 export default CardsReducer;

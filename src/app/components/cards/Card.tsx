@@ -69,7 +69,7 @@ var Card = React.createClass({
 	{
 		card: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
-    algorithmId: React.PropTypes.string.isRequired,
+    parentId: React.PropTypes.string.isRequired,
     cards: React.PropTypes.array.isRequired,
 	},
 
@@ -113,28 +113,26 @@ var Card = React.createClass({
   
   componentDidMount()
   {
-    Util.animateToAutoHeight(this.refs.cardBody); 
+    Util.animateToAutoHeight(this.refs.card);
   },
   
   handleDelete()
   {
     Util.animateToHeight(this.refs.card, 0);
     setTimeout(() => {
-      Actions.cards.remove(this.props.card);
+      Actions.cards.remove(this.props.card, this.props.parentId);
     }, 250);
   },
   
   handleCopy()
   {
-    console.log('do you copy');
-    console.log('nope');
-    console.log('roger that');
   },
 
 	render() {
 
 		var CardComponent;
 		var subBar;
+    var isFlat = false;
 
 		switch(this.props.card.type)
 		{
@@ -190,6 +188,12 @@ var Card = React.createClass({
         onClick: () => Actions.cards.score.create(this.props.card),
       }
       break;
+    case 'count':
+    case 'sum':
+    case 'min':
+    case 'max':
+    case 'avg':
+      isFlat = true;
 		}
     
     var content = <div>This card has not been implemented yet.</div>;
@@ -234,16 +238,19 @@ var Card = React.createClass({
 		var title = this.props.card.type.charAt(0).toUpperCase() + this.props.card.type.substr(1);
 		return this.renderPanel((
 			<div className={'card ' + (!this.state.open ? 'card-closed' : '')} ref='card'>
-        <CreateCardTool index={this.props.index} algorithmId={this.props.algorithmId} />
+        <CreateCardTool index={this.props.index} parentId={this.props.parentId} />
 				<div className='card-inner'>
 					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>
-						<ArrowIcon className="card-arrow-icon" /> {title}
+            { isFlat ? null : <ArrowIcon className="card-arrow-icon" /> }
+            { title }
             <Menu options={menuOptions} />
 					</div>
-          <div className='card-body' ref='cardBody'>
-  					{ contentToDisplay }
-  					{ subBarToDisplay }
-          </div>
+          { isFlat ? null : 
+            <div className='card-body' ref='cardBody'>
+    					{ contentToDisplay }
+    					{ subBarToDisplay }
+            </div>
+          }
 				</div>
 			</div>
 			));

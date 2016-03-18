@@ -42,26 +42,89 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Immutable = require('immutable');
-import ActionTypes from './../../ActionTypes.tsx';
-import Util from './../../../util/Util.tsx';
+import * as React from 'react';
+import Actions from "../../../data/Actions.tsx";
+import Util from '../../../util/Util.tsx';
+import LayoutManager from "../../layout/LayoutManager.tsx";
+import Dropdown from './../../common/Dropdown.tsx';
+import CardField from './../CardField.tsx';
+import { Directions } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
+import ThrottledInput from "../../common/ThrottledInput.tsx";
+import { Operators } from './../../../CommonVars.tsx';
 
-var ScoreCardReducer = {};
+interface Props {
+  card: CardModels.IJoinCard;
+}
 
-ScoreCardReducer[ActionTypes.cards.score.create] =
-  Util.updateCardField('weights', (weights, action) => 
-    weights.push({
-      weight: weights.count() ? 0 : 1,
-      key: '',
-    }));
-              
-ScoreCardReducer[ActionTypes.cards.score.change] =
-  Util.setCardFields(['method', 'output']);
+var OPERATOR_WIDTH: number = 30;
+var CARD_PADDING: number = 12;
 
-ScoreCardReducer[ActionTypes.cards.score.changeWeights] =
-  Util.updateCardField('weights', (weights, action) =>
-    Immutable.fromJS(action.payload.weights)
-  );
+class JoinCard extends React.Component<Props, any>
+{
+  constructor(props:Props)
+  {
+    super(props);
+  }
+  
+  
+  handleJoinChange(joinValue, event)
+  {
+    var group = this.refs['group']['value'];
+    var first = this.refs['first']['value'];
+    var second = this.refs['second']['value'];
+    var operator = this.refs['operator']['value'];
     
-export default ScoreCardReducer;
+    // Actions.cards.join.change(this.props.card, {
+    //   group: group,
+    //   comparison:
+    //   {
+    //     first: first,
+    //     second: second,
+    //     operator: operator,
+    //   },
+    // });
+  }
+
+  render()
+  {
+    var joinLayout =
+    {
+      columns: [
+        {
+          content: (
+            <ThrottledInput value={this.props.card.group} onChange={this.handleJoinChange} ref={'group'} />
+          ),
+          colSpan: 2,
+        },
+        {
+          content: (
+            <ThrottledInput value={this.props.card.comparison.first} onChange={this.handleJoinChange} ref={'first'} />
+          ),
+        },
+        {
+          content: (
+            <div>
+             <Dropdown ref={'operator'} circle={true} options={Operators} selectedIndex={this.props.card.comparison.operator} onChange={this.handleJoinChange} />
+            </div>
+          ),
+          width: OPERATOR_WIDTH,
+        },
+        {
+          content: (
+            <ThrottledInput value={this.props.card.comparison.second} onChange={this.handleJoinChange} ref={'second'} />
+          ),
+        }
+      ],
+      colPadding: CARD_PADDING,
+    };
+
+    return (
+      <CardField>
+        <LayoutManager layout={joinLayout} />
+      </CardField>
+    );
+  }
+};
+
+export default JoinCard;

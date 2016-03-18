@@ -50,19 +50,17 @@ import { CardModels } from './../../../models/CardModels.tsx';
 var FilterCardReducer = {};
 
 FilterCardReducer[ActionTypes.cards.filter.create] =
-  (state, action) =>
-    state.updateIn([action.payload.card.algorithmId, 'cards'], cards =>
-      cards.updateIn([Util.cardIndex(cards, action), 'filters'], filters =>
-        filters.push({
-          comparison: 
-          {
-            first: '',
-            second: '',
-            operator: CardModels.Operator.EQ,
-          },
-          combinator: CardModels.Combinator.AND,
-          id: Util.randInt(2307961512),
-        })));
+  Util.updateCardField('filters', (filters, action) => 
+    filters.push({
+      comparison: 
+      {
+        first: '',
+        second: '',
+        operator: CardModels.Operator.EQ,
+      },
+      combinator: CardModels.Combinator.AND,
+      id: Util.randInt(2307961512),
+    }));
     
 FilterCardReducer[ActionTypes.cards.filter.change] =
   Util.updateCardField('filters', (filters, action) => 

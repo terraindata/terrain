@@ -50,17 +50,15 @@ import { CardModels } from './../../../models/CardModels.tsx';
 var SelectCardReducer = {};
 
 SelectCardReducer[ActionTypes.cards.select.create] =
-  (state, action) =>
-    state.updateIn([action.payload.card.algorithmId, 'cards'], cards =>
-      cards.updateIn([Util.cardIndex(cards, action), 'properties'], properties =>
-        properties.splice(
-          action.payload.index !== undefined && action.payload.index !== -1
-            ? action.payload.index : properties.size,
-          0,
-          {
-            property: "",
-            id: "p" + Util.randInt(23496243),
-          })));
+  Util.updateCardField('properties', (properties, action) => 
+    properties.splice(
+      action.payload.index !== undefined && action.payload.index !== -1
+        ? action.payload.index : properties.size,
+      0,
+      {
+        property: "",
+        id: "p" + Util.randInt(23496243),
+      }));
     
 SelectCardReducer[ActionTypes.cards.select.change] =
   Util.updateCardField('properties', (properties, action) => 

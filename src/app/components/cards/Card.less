@@ -4,14 +4,15 @@
 
 .card {
  .standard-margin;
+  height: 0px;
  
  @card-border-radius: 5px;
 
-	.card-inner {
-		background: @light-green;
-		border: 1px solid @medium-dark-green;
-		border-radius: @card-border-radius;
-	}
+  .card-inner {
+    background: @light-green;
+    border: 1px solid @medium-dark-green;
+    border-radius: @card-border-radius;
+  }
  
  .card-title {
   border-top-left-radius: calc(@card-border-radius - 1px);
@@ -24,13 +25,13 @@
   border-bottom-right-radius: calc(@card-border-radius - 1px);
  }
 
-	@card-padding-horizontal: 15px;
-	@card-padding-vertical: 7px;
-	.card-title {
-		background: @dark-green;
-		padding: @card-padding-vertical @card-padding-horizontal;
-		color: @card-title-color;
-		font-weight: @bold-font-weight;
+  @card-padding-horizontal: 15px;
+  @card-padding-vertical: 7px;
+  .card-title {
+    background: @dark-green;
+    padding: @card-padding-vertical @card-padding-horizontal;
+    color: @card-title-color;
+    font-weight: @bold-font-weight;
     .transition;
     
     &:hover {
@@ -46,7 +47,7 @@
       left: -7px;
       .transition;
     }
-	}
+  }
   
   &.card-closed {
     .card-title {
@@ -56,14 +57,10 @@
     }
   }
 
-	.card-content{
-		padding: @card-padding-vertical @card-padding-horizontal;
+  .card-content{
+    padding: @card-padding-vertical @card-padding-horizontal;
   }
   
-  .card-body {
-    height: 0px;
-  }
-
 	.card-sub-bar {
 		background: @medium-green;
 		color: #fff;
@@ -117,4 +114,28 @@
   .create-card-wrapper {
     opacity: 0;
   }
+}
+
+.cards-area {
+  background: #bcd4ae;
+ 
+  .cards-area {
+    // for nested cards
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin-right: -2.5 * @standard-margin - 1px;
+    margin-left: -1 * @standard-margin;
+    padding-left: 2px;
+    // padding-bottom: @standard-margin;
+    border: 1px solid @fresh-moss;
+    border-right: 0px;
+    
+    .card {
+      margin-right: 0px;
+    }
+    
+    .nested-create-card-tool-wrapper {
+      padding-left: @standard-margin + 1px;
+    }
+  } 
 }

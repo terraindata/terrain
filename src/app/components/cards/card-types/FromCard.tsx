@@ -50,6 +50,7 @@ import LayoutManager from "../../layout/LayoutManager.tsx";
 import ThrottledInput from "../../common/ThrottledInput.tsx";
 import CardField from './../CardField.tsx';
 import Dropdown from './../../common/Dropdown.tsx';
+import CardsArea from './../CardsArea.tsx';
 import { Operators } from './../../../CommonVars.tsx';
 
 import { CardModels } from './../../../models/CardModels.tsx';
@@ -67,7 +68,7 @@ class FromCard extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
-    Util.bind(this, ['renderJoin', 'handleGroupChange', 'handleJoinChange']);
+    Util.bind(this, ['renderJoin', 'handleGroupChange', 'handleJoinChange', 'renderCards']);
   }
   
   handleJoinChange(joinValue, event)
@@ -153,6 +154,11 @@ class FromCard extends React.Component<Props, any>
   {
     Actions.cards.from.changeGroup(this.props.card, value, this.props.index);
   }
+  
+  renderCards()
+  {
+    return <CardsArea cards={this.props.card.cards} parentId={this.props.card.id} spotlights={[]} />;
+  }
 
 	render() {
 		return (
@@ -167,6 +173,7 @@ class FromCard extends React.Component<Props, any>
             placeholder='Enter group name' />
         </CardField>
         { this.props.card.joins.map(this.renderJoin) }
+        { this.renderCards() }
       </div>
 		);
 	}

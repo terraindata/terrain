@@ -99,7 +99,7 @@ var BuilderColumn = React.createClass<any, any>(
   renderContent()
   {
     var algorithm = this.props.algorithm;
-    var algorithmId = algorithm.algorithmId;
+    var parentId = algorithm.id;
     
     switch(this.state.column)
     {
@@ -114,13 +114,13 @@ var BuilderColumn = React.createClass<any, any>(
           return spotlights;
         }, []);
         
-        return <CardsArea cards={algorithm.cards} algorithmId={algorithmId} spotlights={spotlights} />;
+        return <CardsArea cards={algorithm.cards} parentId={parentId} spotlights={spotlights} topLevel={true} />;
         
       case COLUMNS.Inputs:
-        return <InputsArea inputs={algorithm.inputs} algorithmId={algorithmId} />;
+        return <InputsArea inputs={algorithm.inputs} parentId={parentId} />;
       
       case COLUMNS.Results:
-        return <ResultsArea results={algorithm.results} algorithmId={algorithmId} resultsPage={algorithm.resultsPage} resultsPages={algorithm.resultsPages} />;
+        return <ResultsArea results={algorithm.results} parentId={parentId} resultsPage={algorithm.resultsPage} resultsPages={algorithm.resultsPages} />;
       
       case COLUMNS.TQL:
         return <TQLView algorithm={algorithm} />;
@@ -182,7 +182,10 @@ var BuilderColumn = React.createClass<any, any>(
             <Menu options={this.getMenuOptions()} />
           </div>
         </div>
-        <div className='builder-column-content'>
+        <div className={
+            'builder-column-content' + 
+            (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '')
+          }>
           { this.renderContent() }
         </div>
       </div>

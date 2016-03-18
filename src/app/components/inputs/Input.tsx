@@ -102,7 +102,7 @@ var Input = React.createClass<any, any>({
   
   createInput()
   {
-    Actions.inputs.create(this.props.input.algorithmId, this.props.index);
+    Actions.inputs.create(this.props.input.parentId, this.props.index);
   },
   
   getMenuOptions()

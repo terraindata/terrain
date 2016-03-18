@@ -81,7 +81,7 @@ class FilterCard extends React.Component<Props, any>
         var first = this.refs[firstRef]['value'];
         var second = this.refs[secondRef]['value'];
         var operator = this.refs[operatorRef]['value'];
-        var combinator = this.refs[combinatorRef]['value'];
+        var combinator = this.refs[combinatorRef] ? this.refs[combinatorRef]['value'] : CardModels.Combinator.AND;
         
         Actions.cards.filter.change(this.props.card, index, {
           comparison:
@@ -98,16 +98,6 @@ class FilterCard extends React.Component<Props, any>
     var filterLayout =
     {
       columns: [
-        // {
-        //   content: index === 0 ? null : <Dropdown
-        //     ref={combinatorRef}
-        //     circle={true}
-        //     options={Combinators}
-        //     selectedIndex={filter.combinator}
-        //     onChange={changeFilter}
-        //     />,
-        //   width: OPERATOR_WIDTH,
-        // },
         {
           content: (
             <ThrottledInput value={filter.comparison.first} onChange={changeFilter} ref={firstRef} />
