@@ -50,8 +50,8 @@ var newResults = require('../../json/_results.json');
 
 var FromCardReducer = {};
 
-FromCardReducer[ActionTypes.cards.from.changeGroup] =
-  Util.updateCardField('group', (group, action) => action.payload.value);
+FromCardReducer[ActionTypes.cards.from.change] =
+  Util.setCardFields(['group', 'iterator']);
   // {
     // if(action.payload.value === 'sitters' && state.getIn([action.payload.card.parentId, 'results']).count() === 0)
     // {

@@ -79,7 +79,7 @@ var ActionTypes =
     
     from:
     {
-      changeGroup: '',
+      change,
       
       join:
       {

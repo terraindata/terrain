@@ -112,7 +112,7 @@ export module CardModels
   export interface IFromCard extends ICard, ICardsContainer
   {
     group: string;
-    variable: string;
+    iterator: string;
     joins: IJoin[];
   }
   

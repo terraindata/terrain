@@ -52,8 +52,9 @@ import CardField from './../CardField.tsx';
 import Dropdown from './../../common/Dropdown.tsx';
 import CardsArea from './../CardsArea.tsx';
 import { Operators } from './../../../CommonVars.tsx';
-
 import { CardModels } from './../../../models/CardModels.tsx';
+
+var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIcon");
 
 interface Props {
   card: CardModels.IFromCard;
@@ -68,7 +69,7 @@ class FromCard extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
-    Util.bind(this, ['renderJoin', 'handleGroupChange', 'handleJoinChange', 'renderCards']);
+    Util.bind(this, ['renderJoin', 'handleChange', 'handleJoinChange', 'renderCards']);
   }
   
   handleJoinChange(joinValue, event)
@@ -150,9 +151,10 @@ class FromCard extends React.Component<Props, any>
     );
   }
   
-  handleGroupChange(value)
+  handleChange(value)
   {
-    Actions.cards.from.changeGroup(this.props.card, value, this.props.index);
+    Actions.cards.from.change(this.props.card,
+      this.refs['group']['value'], this.refs['iterator']['value']);
   }
   
   renderCards()
@@ -161,16 +163,42 @@ class FromCard extends React.Component<Props, any>
   }
 
 	render() {
+    var layout = 
+    {
+      columns:
+      [
+        {
+          content: <ThrottledInput
+            value={this.props.card.group}
+            ref='group'
+            onChange={this.handleChange}
+            placeholder='Enter group name' />,
+        },
+        {
+          content: (
+            <div className='card-arrow'>
+              <ArrowIcon />
+            </div>
+          ),
+          width: 50,
+        },
+        {
+          content: <ThrottledInput
+            value={this.props.card.iterator}
+            ref='iterator'
+            onChange={this.handleChange}
+            placeholder='Iterator name' />,
+        }
+      ]
+    }
+    
 		return (
       <div>
         <CardField
           draggable={false}
           removable={false}
           drag_y={true}>
-          <ThrottledInput
-            value={this.props.card.group}
-            onChange={this.handleGroupChange}
-            placeholder='Enter group name' />
+          <LayoutManager layout={layout} />
         </CardField>
         { this.props.card.joins.map(this.renderJoin) }
         { this.renderCards() }

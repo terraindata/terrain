@@ -68,9 +68,9 @@ var Actions =
 
     from:
     {
-      changeGroup: 
-        (card: CardModels.IFromCard, value: Group, index: number) =>
-          $(ActionTypes.cards.from.changeGroup, {card, value, index}),
+      change: 
+        (card: CardModels.IFromCard, group: string, iterator: string) =>
+          $(ActionTypes.cards.from.change, {card, group, iterator}),
 
       join:
       {
