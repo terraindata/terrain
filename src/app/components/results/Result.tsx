@@ -268,8 +268,8 @@ var Result = React.createClass<any, any>({
     var classes = 'result' + (this.props.data.pinned ? ' result-pinned' : '') + (this.state.expanded ? ' result-expanded' : '');
     
 		return this.renderPanel((
-			<div className={classes}>
-				<div className='result-inner' onDoubleClick={this.expand}>
+			<div className={classes} onDoubleClick={this.expand}>
+				<div className='result-inner'>
           <div className='result-name'>
             {this.renderSpotlight()}
             <div className='result-pin-icon'>
