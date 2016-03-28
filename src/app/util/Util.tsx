@@ -87,7 +87,7 @@ var Util = {
 			max = arguments[0];
 		}
 
-		return Math.floor(Math.random() * max - min) + min;
+		return Math.floor(Math.random() * (max - min)) + min;
 	},
   
   rel(target): string
