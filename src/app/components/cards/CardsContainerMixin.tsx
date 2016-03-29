@@ -73,13 +73,18 @@ var CardsContainerMixin =
   {
     if(this.hasCardsArea())
     {
-      DropZoneManager.register(this.state.id,
+      var zoneId = 'z' + Util.randInt(123456789);
+      DropZoneManager.register(zoneId,
       {
-        id: this.state.id,
+        id: zoneId,
         element: this.refs[this.props.dropZoneRef],
         onDragOver: this.onDragOver,
         onDragOut: this.onDragOut,
         onDrop: this.onDrop,
+      });
+      
+      this.setState({
+        zoneId
       });
     }
   },
@@ -88,7 +93,7 @@ var CardsContainerMixin =
   {
     if(this.hasCardsArea())
     {
-      DropZoneManager.deregister(this.state.ref);
+      DropZoneManager.deregister(this.state.zoneId);
     }
   },
   
