@@ -45,6 +45,7 @@ THE SOFTWARE.
 var Immutable = require('immutable');
 import ActionTypes from './../../ActionTypes.tsx';
 import Util from './../../../util/Util.tsx';
+import * as _ from 'underscore';
 
 var NEW_ALGORITHM = 
 {
@@ -60,7 +61,7 @@ var AlgorithmReducer = {};
 
 AlgorithmReducer[ActionTypes.newAlgorithm] =
   (state, action) => 
-    state.set("" + (currentparentId ++), Immutable.fromJS(NEW_ALGORITHM));
+    state.set("" + (currentparentId ++), Immutable.fromJS(_.extend({}, NEW_ALGORITHM, {id: "alg-" + Util.randInt(1234567)})));
 
 AlgorithmReducer[ActionTypes.closeAlgorithm] =
   (state, action) =>

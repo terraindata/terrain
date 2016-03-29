@@ -107,14 +107,15 @@ var Panel = {
 
 	componentWillMount()
 	{
-    this.setState({
-		  scrollIntervalID: setInterval(this.scrollParentUp, SCROLL_INTERVAL),
-    })
+    // TODO re-enable when fixed
+    // this.setState({
+		  // scrollIntervalID: setInterval(this.scrollParentUp, SCROLL_INTERVAL),
+    // })
 	},
   
   componentWillUnmount()
   {
-    clearInterval(this.state.scrollIntervalID);
+    // clearInterval(this.state.scrollIntervalID);
   },
 
 	scrollParentUp()
@@ -361,7 +362,7 @@ var Panel = {
 		});
 	},
 
-  handleDropZoneManager(event, dropped, overrideCR)
+  handleDropZoneManager(event, dropped, overrideCR): boolean
   {
     if(this.props.useDropZoneManager)
     {
@@ -378,7 +379,7 @@ var Panel = {
       //   y = cr.top;
       // }
       
-      DropZoneManager[dropped ? 'drop' : 'drag'](
+      return DropZoneManager[dropped ? 'drop' : 'drag'](
         x,
         y,
         this.props[this.props.dropDataPropKey],
@@ -399,9 +400,10 @@ var Panel = {
 
 	up(event) 
 	{
-    this.handleDropZoneManager(event, true); //, cr);
-    // var cr = this.refs.panel.getBoundingClientRect();
-    this.stopDrag(event.pageX, event.pageY);
+    if(!this.handleDropZoneManager(event, true))
+    {
+      this.stopDrag(event.pageX, event.pageY);
+    }
     $(document).off('mousemove', this.move);
     $(document).off('touchmove', this.move);
     $(document).off('mouseup', this.up);
@@ -467,11 +469,6 @@ var Panel = {
 			style.height = '100%';
 		}
     
-    // var wrapperStyle: React.CSSProperties = {};
-    // if( 
-      // <div style={wrapperStyle}>
-      // </div>
-
     return (
         <div 
           className={panelClass} 

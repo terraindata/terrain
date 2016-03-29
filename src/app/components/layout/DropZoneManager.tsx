@@ -51,7 +51,7 @@ export interface DropZone
   element: Element;
   onDragOver: (dragData: any, x: number, y: number, draggingElement?: Element) => void;
   onDragOut: () => void;
-  onDrop: (dragData: any, x: number, y: number, draggingElement?: Element) => void;
+  onDrop: (dragData: any, x: number, y: number, draggingElement?: Element) => boolean;
   clientRect?: ClientRect;
 }
 
@@ -106,13 +106,14 @@ export class DropZoneManager
         $(targetZone.element).addClass('drag-over');
       }
       
-      targetZone[drop ? 'onDrop' : 'onDragOver'](dragData, x, y, draggingElement);
+      var result = targetZone[drop ? 'onDrop' : 'onDragOver'](dragData, x, y, draggingElement);
     } 
     
     if(!targetZone || drop)
     {
       this.lastZoneID = null;
     }
+    return result;
   }
   
   // Public
@@ -154,10 +155,10 @@ export class DropZoneManager
     this.dragDrop(x, y, dragData, false, draggingElement);
   }
   
-  static drop(x: number, y: number, dragData: any, draggingElement: Element)
+  static drop(x: number, y: number, dragData: any, draggingElement: Element): boolean
   {
     this.isDragging = false;
-    this.dragDrop(x, y, dragData, true, draggingElement);
+    return this.dragDrop(x, y, dragData, true, draggingElement);
   }
   
 }

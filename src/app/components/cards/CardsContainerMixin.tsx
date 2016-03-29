@@ -113,7 +113,7 @@ var CardsContainerMixin =
     })
   },
   
-  onDrop(data: any, x: number, y: number)
+  onDrop(data: any, x: number, y: number): boolean
   {
     var index = 0;
     var node = $(ReactDOM.findDOMNode(this));
@@ -133,6 +133,9 @@ var CardsContainerMixin =
     Actions.cards.move(data, index, this.getParentId());
     
     this.onDragOut();
+    
+    // used by PanelMixin to determine if panel was dropped outside and thus unmounted
+    return cardIndex === -1;
   },
 };
 

@@ -92,7 +92,7 @@ class Builder extends React.Component<any, any>
     this.reduxState = Store.getState().toJS();
     this.state = {
       random: Math.random(),
-      selectedparentId: 100, // TODO change to not be hardcoded
+      selectedAlgorithmId: 100, // TODO change to not be hardcoded
       numColumns: 3,
     };
     
@@ -107,7 +107,7 @@ class Builder extends React.Component<any, any>
   
   duplicateAlgorithm()
   {
-    Actions.duplicateAlgorithm(this.state.selectedparentId);
+    Actions.duplicateAlgorithm(this.state.selectedAlgorithmId);
   }
   
   updateColumns(numColumns: number)
@@ -185,7 +185,7 @@ class Builder extends React.Component<any, any>
     var tabs = {};
     
     
-    _.map(this.reduxState, (algorithm, parentId) => {
+    _.map(this.reduxState, (algorithm, algorithmId) => {
       // TODO move type somewhere central
       var layout: {stackAt: number, fullHeight: boolean, columns: any[]} = {
         stackAt: 650,
@@ -219,24 +219,24 @@ class Builder extends React.Component<any, any>
       
       var closeFn = () => 
       {
-        Actions.closeAlgorithm(parentId);
+        Actions.closeAlgorithm(algorithmId);
       }
 
-      tabs[parentId] = {
+      tabs[algorithmId] = {
         content: <LayoutManager layout={layout} />,
         tabName: algorithm.algorithmName || 'New Algorithm',
         closeable: true,
         onClose: closeFn,
         onClick: () => {
           this.setState({
-            selectedparentId: parentId,
+            selectedAlgorithmId: algorithmId,
           });
         }
       };
       
-      if(!this.state.selectedparentId)
+      if(!this.state.selectedAlgorithmId)
       {
-        setTimeout(() => this.setState({ selectedparentId: parentId }));
+        setTimeout(() => this.setState({ selectedAlgorithmId: algorithmId }));
       }
     });
 
