@@ -55,6 +55,7 @@ import FilterCard from './card-types/FilterCard.tsx';
 import LetCard from './card-types/LetCard.tsx';
 import ScoreCard from './card-types/ScoreCard.tsx';
 import TransformCard from './card-types/TransformCard.tsx';
+import WrapperCard from './card-types/WrapperCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
 import Menu from '../common/Menu.tsx';
 import Actions from "../../data/Actions.tsx";
@@ -62,7 +63,7 @@ import CardsContainerMixin from "./CardsContainerMixin.tsx";
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
-var CARD_TYPES_WITH_CARDS = ['from']; // 'let', 'count'
+var CARD_TYPES_WITH_CARDS = ['from', 'let', 'count', 'min', 'max', 'avg']; // 'let', 'count'
 
 var Card = React.createClass({
 	mixins: [PanelMixin, CardsContainerMixin],
@@ -202,7 +203,7 @@ var Card = React.createClass({
     case 'min':
     case 'max':
     case 'avg':
-      isFlat = true;
+      CardComponent = WrapperCard;
 		}
     
     var content = <div>This card has not been implemented yet.</div>;
