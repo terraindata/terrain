@@ -80,7 +80,7 @@ var CardField = React.createClass({
   componentDidMount()
   {
     // $(this.refs.panel).height(0);
-    Util.animateToAutoHeight(this.refs.panel);
+    // Util.animateToAutoHeight(this.refs.panel);
   },
 
 	willReceiveNewProps(newProps)

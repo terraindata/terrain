@@ -75,6 +75,7 @@ var LayoutManager = React.createClass<any, any>({
 	{
 		layout: React.PropTypes.object.isRequired, // TODO move to TS, describe different keys allowed
     moveTo: React.PropTypes.func,
+    placeholder: React.PropTypes.object,
 	},
 
 	getInitialState()
@@ -278,49 +279,83 @@ var LayoutManager = React.createClass<any, any>({
 
 	onDrag(index, coords, originalCoords)
 	{
-		this.setState({dragging: true, draggingIndex: index});
+    this.setState({dragging: true, draggingIndex: index});
 
-		var clientRect = this.refs[index].getBoundingClientRect();
-		var indicesToShift = this.computeShiftedIndices(index, coords, originalCoords);
+    var clientRect = this.refs[index].getBoundingClientRect();
+    var indicesToShift = this.computeShiftedIndices(index, coords, originalCoords);
 
-		var heightAmplifier = 0;
-		var widthAmplifier = 0;
+    var heightAmplifier = 0;
+    var widthAmplifier = 0;
 
-		// dragged up/down
-		if(this.props.layout.rows)
-		{
-			heightAmplifier = 1;
-			if(coords.dy > 0)
-				heightAmplifier = -1;
-		}
+    // dragged up/down
+    if(this.props.layout.rows)
+    {
+      heightAmplifier = 1;
+      if(coords.dy > 0)
+        heightAmplifier = -1;
+    }
 
-		// dragged left/right
-		if(this.props.layout.columns)
-		{
-			widthAmplifier = 1;
-			if(coords.dx > 0)
-				widthAmplifier = -1;
-		}
+    // dragged left/right
+    if(this.props.layout.columns)
+    {
+      widthAmplifier = 1;
+      if(coords.dx > 0)
+        widthAmplifier = -1;
+    }
 
-		if(this.props.layout.cells)
-		{
-			// handled in this.renderObj
-			widthAmplifier = 1;
-			heightAmplifier = 1;
-		}
+    if(this.props.layout.cells)
+    {
+      // handled in this.renderObj
+      widthAmplifier = 1;
+      heightAmplifier = 1;
+    }
+    
+    var lcr = this.refs.layoutManagerDiv.getBoundingClientRect();
+    var y = coords.y;
+    if(coords.y >= lcr.top && coords.y <= lcr.bottom)
+    {
+      var draggingInside = true;
+    }
 
 		this.setState({
 			shiftedIndices: indicesToShift,
 			shiftedHeight: clientRect.height * heightAmplifier,
 			shiftedWidth: clientRect.width * widthAmplifier,
+      draggingInside: !! draggingInside,
+      draggingOutside: ! draggingInside,
 		});
 	},
+  
+  panelIsOutside(coords, originalCoords)
+  {
+    var cr = this.refs.layoutManagerDiv.getBoundingClientRect();
+    var y = coords.dy + originalCoords.y;
+    var x = coords.dx + originalCoords.x;
+    if(y < cr.top || y > cr.bottom || x < cr.left || x > cr.right)
+    {
+      // TOOD may want to adapt boundaries above
+      return true;
+    }
+    
+    return false;
+  },
+  
+  getKeyForIndex(index)
+  {
+    var arr = this.props.layout.rows || this.props.layout.columns || this.props.layout.cells;
+    return arr[index].key;
+  },
 
-	onDropFactory(index)
-	{
-		return (coords, originalCoords) => 
-		{
-			this.setState({draggingIndex: -1, dragging: false});
+  onDropFactory(index)
+  {
+    return (coords, originalCoords) => 
+    {
+      this.setState({draggingIndex: -1, dragging: false});
+      
+      if(this.panelIsOutside(coords,originalCoords) && this.props.onDropOutside)
+      {
+        this.props.onDropOutside(coords, originalCoords, this.getKeyForIndex(index));
+      }
 
 			var shiftedIndices = this.computeShiftedIndices(index, coords, originalCoords);
 			
@@ -345,6 +380,8 @@ var LayoutManager = React.createClass<any, any>({
 				shiftedIndices: [],
 				shiftedHeight: 0,
 				shiftedWidth: 0,
+        draggingInside: 0,
+        draggingOutside: 0,
 			});
 		}
 	},
@@ -365,6 +402,8 @@ var LayoutManager = React.createClass<any, any>({
 				onDrag: this.onDrag,
 				onDrop: this.onDropFactory(index),
 				parentNode: this.refs.layoutManagerDiv,
+        dy: 0,
+        dx: 0,
 			};
       
 			if(this.state.dragging && this.state.draggingIndex !== index)
@@ -372,7 +411,7 @@ var LayoutManager = React.createClass<any, any>({
 				props.neighborDragging = true;
 			}
 
-			if(this.state.shiftedIndices.indexOf(index) !== -1)
+			if(this.state.shiftedIndices.indexOf(index) !== -1 && !this.props.layout.useDropZones)
 			{
 				props.dy = this.state.shiftedHeight;
 				props.dx = this.state.shiftedWidth;
@@ -404,6 +443,15 @@ var LayoutManager = React.createClass<any, any>({
 					}
 				}
 			}
+      
+      if(this.props.placeholder && this.refs[index] && this.props.layout.useDropZones)
+      {
+        // note: only works for Y axis for now
+        if(this.refs[index].getBoundingClientRect().top >= this.props.placeholder.y)
+        {
+          props.dy += this.props.placeholder.element.getBoundingClientRect().height;
+        }
+      }
       
       if(obj.resizeable)
       {
@@ -485,7 +533,7 @@ var LayoutManager = React.createClass<any, any>({
 
 	renderRow(row, index) 
 	{
-		var style = {};
+		var style: React.CSSProperties = {};
 		// TODO fix this, it's breaking
     if(this.props.layout.rowHeight === 'fill') 
     {
@@ -496,6 +544,11 @@ var LayoutManager = React.createClass<any, any>({
 				position: 'absolute'
 			};
 		}
+    
+    if(this.state.draggingOutside && index === this.state.draggingIndex)
+    {
+      style.height = '0px';
+    }
 
 		return this.renderObj(row, rowClass, index, style);
 	},
@@ -682,11 +735,12 @@ var LayoutManager = React.createClass<any, any>({
 		}
 		var lmClassString = lmClasses.join(" ");
 
-		return (
-			<div className={lmClassString} ref='layoutManagerDiv'>
-				{ this.props.layout.columns && this.props.layout.columns.map(this.renderColumn) }
-				{ this.props.layout.rows && this.props.layout.rows.map(this.renderRow) }
-				{ this.props.layout.cells && this.props.layout.cells.map(this.renderCell) }
+    return (
+      <div className={lmClassString} ref='layoutManagerDiv'>
+        { this.props.layout.columns && this.props.layout.columns.map(this.renderColumn) }
+        { this.props.layout.rows && this.props.layout.rows.map(this.renderRow) }
+        { this.props.layout.cells && this.props.layout.cells.map(this.renderCell) }
+        { this.props.placeholder && <div style={{height: this.props.placeholder.element.getBoundingClientRect().height }} /> }
 			</div>
 			);
 	},

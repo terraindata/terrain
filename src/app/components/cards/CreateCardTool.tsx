@@ -63,6 +63,8 @@ interface Props {
   index: number;
   alwaysOpen?: boolean;
   parentId: string;
+  dy?: number;
+  className?: string;
 }
 
 class CreateCardTool extends React.Component<Props, any>
@@ -224,9 +226,19 @@ class CreateCardTool extends React.Component<Props, any>
       "create-card-open": this.state.open || this.props.alwaysOpen,
       "create-card-closed": !this.state.open && !this.props.alwaysOpen,
     });
+    classes += ' ' + this.props.className;
+    
+    if(this.props.dy)
+    {
+      var style = 
+      {
+        position: 'relative',
+        top: this.props.dy + 'px',
+      }
+    }
     
     return (
-      <div className={classes} ref="ccWrapper">
+      <div className={classes} ref="ccWrapper" style={style}>
         { this.renderCreateCardRow() }
         { this.renderCardSelector() }
      </div>

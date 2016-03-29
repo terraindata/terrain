@@ -4,7 +4,7 @@
 
 .card {
  .standard-margin;
-  height: 0px;
+  // height: 0px;
  
  @card-border-radius: 5px;
 
@@ -118,6 +118,7 @@
 
 .cards-area {
   background: #bcd4ae;
+  .transition;
  
   .cards-area {
     // for nested cards
@@ -138,4 +139,18 @@
       padding-left: @standard-margin + 1px;
     }
   } 
+  
+  &.drag-over {
+    background: lighten(#bcd4ae, 5%);
+  }
+}
+
+.drag-over:not(.cards-area) {
+  .cards-area {
+    background: lighten(#bcd4ae, 5%);
+    
+    .cards-area {
+      background: #bcd4ae;
+    }
+  }
 }

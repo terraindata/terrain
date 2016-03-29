@@ -72,6 +72,7 @@ CardsReducer[ActionTypes.cards.create] =
           {
             type: 'from',
             group: '',
+            iterator: '',
             joins: [],
             cards: [],
           };
@@ -137,10 +138,43 @@ CardsReducer[ActionTypes.cards.create] =
   };
 
 CardsReducer[ActionTypes.cards.move] =
-  (state, action) =>
-    Util.immutableCardsUpdate(state, 'cards', action.payload.parentId, cards =>
-      Util.immutableMove(cards, action.payload.card.id, action.payload.index)
-    );
+  (state, action) => {
+    var betweenAreas = false;
+    state = Util.immutableCardsUpdate(state, 'cards', action.payload.parentId, cards => {
+      if(cards.find((card => card.get('id') === action.payload.card.id)))
+      {
+        return Util.immutableMove(cards, action.payload.card.id, action.payload.index)
+      }
+      
+      // need to move the card between cards areas
+      betweenAreas = true;
+      return cards.splice(action.payload.index, 0, Immutable.fromJS(action.payload.card));
+    });
+    
+    if(betweenAreas)
+    {
+      // remove from old area
+      var removeFn = (cardsContainer) =>
+      {
+        if(cardsContainer.get('cards'))
+        {
+          return cardsContainer.update('cards', cards => cards.reduce((newContainer, card) => {
+            if(card.get('id') !== action.payload.card.id || cardsContainer.get('id') === action.payload.parentId)
+            {
+              return newContainer.push(removeFn(card));
+            }
+            return newContainer;
+          }, Immutable.fromJS([])));
+        }
+        
+        return cardsContainer;
+      }
+      
+      state = state.map(removeFn);
+    }
+    
+    return state;
+  }
 
 CardsReducer[ActionTypes.cards.remove] =
   (state, action) =>

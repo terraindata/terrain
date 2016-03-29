@@ -48,6 +48,7 @@ var _ = require('underscore');
 import * as ReactDOM from "react-dom";
 import Util from '../../util/Util.tsx';
 var $ = require('jquery');
+import { DropZone, DropZoneManager } from './DropZoneManager';
 
 // TODO clean up the scroll acceleration code
 var SCROLL_ACCELERATION = 20;
@@ -74,6 +75,9 @@ var Panel = {
 		neighborDragging: React.PropTypes.bool,
 		handleRef: React.PropTypes.string,
     dragHandleRef: React.PropTypes.string,
+    
+    useDropZoneManager: React.PropTypes.bool,
+    dropDataPropKey: React.PropTypes.string, // key of value in props to pass to DropZoneManager
 	},
 
 	getInitialState() {
@@ -103,8 +107,15 @@ var Panel = {
 
 	componentWillMount()
 	{
-		setInterval(this.scrollParentUp, SCROLL_INTERVAL);
+    this.setState({
+		  scrollIntervalID: setInterval(this.scrollParentUp, SCROLL_INTERVAL),
+    })
 	},
+  
+  componentWillUnmount()
+  {
+    clearInterval(this.state.scrollIntervalID);
+  },
 
 	scrollParentUp()
 	{
@@ -288,9 +299,9 @@ var Panel = {
 	},
 
 	stopDrag(x, y) {
-		this.setState({ dragging: false });
-		this.stopScrollingParent();
-
+    this.setState({ dragging: false });
+    this.stopScrollingParent();
+    
 		if(this.props.onDrop)
 		{
 			this.props.onDrop({
@@ -350,6 +361,32 @@ var Panel = {
 		});
 	},
 
+  handleDropZoneManager(event, dropped, overrideCR)
+  {
+    if(this.props.useDropZoneManager)
+    {
+      var x = event.pageX;
+      var cr = overrideCR || this.refs.panel.getBoundingClientRect();
+      var y = cr.top; // event.pageY;
+      // if(y > this.state.oy)
+      // {
+      //   // dragged down, use bottom edge
+      //   y = cr.bottom; // this.state.oy - event.pageY;
+      // }
+      // else
+      // {
+      //   y = cr.top;
+      // }
+      
+      DropZoneManager[dropped ? 'drop' : 'drag'](
+        x,
+        y,
+        this.props[this.props.dropDataPropKey],
+        this.refs.panel
+      );
+    }
+  },
+
 	move(event) 
 	{
 		this.dragTo(event.pageX, event.pageY);
@@ -357,15 +394,19 @@ var Panel = {
 		this.setState({
 			moved: true,
 		});
+    this.handleDropZoneManager(event, false);
 	},
 
 	up(event) 
 	{
-		this.stopDrag(event.pageX, event.pageY);
-		$(document).off('mousemove', this.move);
-		$(document).off('touchmove', this.move);
-		$(document).off('mouseup', this.up);
-		$(document).off('touchend', this.up);
+    this.handleDropZoneManager(event, true); //, cr);
+    // var cr = this.refs.panel.getBoundingClientRect();
+    this.stopDrag(event.pageX, event.pageY);
+    $(document).off('mousemove', this.move);
+    $(document).off('touchmove', this.move);
+    $(document).off('mouseup', this.up);
+    $(document).off('touchend', this.up);
+    
 	},
 
 
@@ -387,12 +428,35 @@ var Panel = {
 
 		if(this.state.dragging) 
 		{
-			style.left = this.state.dx + 'px';
-			style.top = this.state.dy + 'px';
-			panelClass += ' panel-dragging';
-		}
+  	  panelClass += ' panel-dragging';
+      
+      if(!this.props.useDropZoneManager)
+      {
+        style.left = this.state.dx + 'px';
+        style.top = this.state.dy + 'px';
+  		}
+      else
+      {
+        style.left = (this.state.draggedTo.x + this.state.ocr.left - this.state.ox) + 'px';
+        style.top = (this.state.draggedTo.y + this.state.ocr.top - this.state.oy) + 'px';
+        
+        if(!this.props.drag_x)
+        {
+          style.left = this.state.ocr.left;
+          style.width = this.state.ocr.width;  
+        }
+        
+        if(!this.props.drag_y)
+        {
+          style.top = this.state.ocr.top;
+          style.height = this.state.ocr.height;
+        }
+        
+        style.position = 'fixed';
+      }
+    }
 
-		if(this.props.neighborDragging)
+		if(this.props.neighborDragging || DropZoneManager.isDragging)
 		{
 			panelClass += ' neighbor-dragging';
 		}
@@ -402,16 +466,21 @@ var Panel = {
 			style.width = '100%';
 			style.height = '100%';
 		}
+    
+    // var wrapperStyle: React.CSSProperties = {};
+    // if( 
+      // <div style={wrapperStyle}>
+      // </div>
 
-		return (
-			<div 
-				className={panelClass} 
-				style={style} 
-				onMouseDown={this.down} 
-        ref='panel'
-				onTouchStart={this.down}>
-				{content}
-			</div>
+    return (
+        <div 
+          className={panelClass} 
+          style={style} 
+          onMouseDown={this.down} 
+          ref='panel'
+          onTouchStart={this.down}>
+          {content}
+        </div>
 			);
 	},
 };

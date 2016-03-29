@@ -43,21 +43,43 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
+import * as $ from 'jquery';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
 import InfoArea from '../common/InfoArea.tsx';
 import Actions from "../../data/Actions.tsx";
 import Card from "../cards/Card.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
+import { DropZone, DropZoneManager } from "../layout/DropZoneManager.tsx";
 import CreateCardTool from "./CreateCardTool.tsx";
+import CardsContainerMixin from "./CardsContainerMixin.tsx";
 
 var CardsArea = React.createClass<any, any>({
+  mixins: [CardsContainerMixin],
+  
 	propTypes:
 	{
 		cards: React.PropTypes.array.isRequired,
     parentId: React.PropTypes.string.isRequired,
     spotlights: React.PropTypes.array.isRequired,
     topLevel: React.PropTypes.bool,
+    draggingOver: React.PropTypes.bool,
+    draggingPlaceholder: React.PropTypes.object,
+  },
+  
+  getDefaultProps()
+  {
+    return {
+      cardsPropKeyPath: ['cards'],
+      parentIdPropKeyPath: ['parentId'],
+      dropZoneRef: 'cardsArea',
+    };
+  },
+  
+  hasCardsArea()
+  {
+    return this.props.topLevel;
   },
   
   getInitialState()
@@ -65,6 +87,7 @@ var CardsArea = React.createClass<any, any>({
     return {
       showTQL: false,
       title: 'Builder',
+      id: Util.randInt(123456789),
     };
   },
   
@@ -74,6 +97,12 @@ var CardsArea = React.createClass<any, any>({
   
   createFromCard() {
     Actions.cards.create(this.props.parentId, 'from', this.props.index);
+  },
+  
+  // when a child card is dropped outside of its CardsArea
+  onDropOutside(coords, originalCoords, key)
+  {
+    
   },
   
   render() {
@@ -93,29 +122,43 @@ var CardsArea = React.createClass<any, any>({
           content: <Card 
             index={index}
             card={card}
-            {...this.props} />,
+            onDropOutside={this.onDropOutside}
+            parentId={this.props.parentId}
+            cards={this.props.cards}
+            spotlights={this.props.spotlights}
+            />,
           key: card.id,
         };
       }),
+      useDropZones: true,
     };
     
     layout.rows.push({
       content: (
-        <div className={this.props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}>
-          <CreateCardTool index={this.props.cards.length} alwaysOpen={this.props.topLevel} parentId={this.props.parentId} />
-        </div>
+        <CreateCardTool
+          index={this.props.cards.length}
+          alwaysOpen={this.props.topLevel}
+          parentId={this.props.parentId}
+          className={this.props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
+          />
       ),
       key: 'end-tool',
     });
 
     var moveTo = (curIndex, newIndex) =>
     {
-      Actions.cards.move(this.props.cards[curIndex], newIndex, this.props.parentId);
+      // Actions.cards.move(this.props.cards[curIndex], newIndex, this.props.parentId);
     };
 
     return (
-      <div className='cards-area'>
-        <LayoutManager layout={layout} moveTo={moveTo} />
+      <div
+        className='cards-area'
+        ref='cardsArea'>
+        <LayoutManager
+          layout={layout}
+          moveTo={moveTo}
+          placeholder={this.state.draggingPlaceholder || this.props.draggingPlaceholder}
+          />
       </div>
     );
   },

@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 require('./Card.less');
 
-import * as $ from 'jquery';
-import Actions from "../../data/Actions.tsx";
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
@@ -59,11 +57,15 @@ import ScoreCard from './card-types/ScoreCard.tsx';
 import TransformCard from './card-types/TransformCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
 import Menu from '../common/Menu.tsx';
+import Actions from "../../data/Actions.tsx";
+import CardsContainerMixin from "./CardsContainerMixin.tsx";
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
+var CARD_TYPES_WITH_CARDS = ['from']; // 'let', 'count'
+
 var Card = React.createClass({
-	mixins: [PanelMixin],
+	mixins: [PanelMixin, CardsContainerMixin],
 
 	propTypes:
 	{
@@ -80,6 +82,11 @@ var Card = React.createClass({
 			drag_y: true,
 			reorderOnDrag: true,
 			handleRef: 'handle',
+      useDropZoneManager: true,
+      dropDataPropKey: 'card',
+      cardsPropKeyPath: ['card', 'cards'],
+      parentIdPropKeyPath: ['card', 'id'],
+      dropZoneRef: 'cardBody',
 		};
 	},
 
@@ -87,6 +94,8 @@ var Card = React.createClass({
 	{
 		return {
 			open: true,
+      ref: 'card-' + this.props.card.id,
+      id: this.props.card.id,
 		}
 	},
   
@@ -111,14 +120,14 @@ var Card = React.createClass({
 		}
 	},
   
-  componentDidMount()
+  hasCardsArea(): boolean
   {
-    Util.animateToAutoHeight(this.refs.card);
+    return !! CARD_TYPES_WITH_CARDS.find(type => type === this.props.card.type);
   },
   
   handleDelete()
   {
-    Util.animateToHeight(this.refs.card, 0);
+    Util.animateToHeight(this.refs[this.state.ref], 0);
     setTimeout(() => {
       Actions.cards.remove(this.props.card, this.props.parentId);
     }, 250);
@@ -199,7 +208,7 @@ var Card = React.createClass({
     var content = <div>This card has not been implemented yet.</div>;
     if(CardComponent)
     {
-      content = <CardComponent {...this.props} />
+      content = <CardComponent {...this.props} draggingOver={this.state.draggingOver} draggingPlaceholder={this.state.draggingPlaceholder} />
     }
 
 		var contentToDisplay = (
@@ -237,7 +246,7 @@ var Card = React.createClass({
 
 		var title = this.props.card.type.charAt(0).toUpperCase() + this.props.card.type.substr(1);
 		return this.renderPanel((
-			<div className={'card ' + (!this.state.open ? 'card-closed' : '')} ref='card'>
+			<div className={'card ' + (!this.state.open ? 'card-closed' : '')} ref={this.state.ref} rel={'card-' + this.props.card.id}>
         <CreateCardTool index={this.props.index} parentId={this.props.parentId} />
 				<div className='card-inner'>
 					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>
