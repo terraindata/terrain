@@ -334,7 +334,7 @@ var Panel = {
     {
       this.refs.panel.parentNode.style.width = null;
       this.refs.panel.parentNode.style.height = null;
-      $(".builder-column-content-scroll").children().css('padding-bottom', '200px');
+      $(".builder-column-content-scroll").children().css('padding-bottom', '');
     }
 	},
 
