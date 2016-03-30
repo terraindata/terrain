@@ -50,6 +50,8 @@ import * as ReactDOM from 'react-dom';
 import * as $ from 'jquery';
 import Actions from "../../data/Actions.tsx";
 
+var CARD_TOP_THRESHOLD = 15;
+
 var CardsContainerMixin = 
 {
   propTypes:
@@ -119,7 +121,7 @@ var CardsContainerMixin =
     var node = $(ReactDOM.findDOMNode(this));
     var cards = this.getCards();
     while(index < cards.length &&
-      node.find('[rel="card-' + cards[index].id+'"]')[0].getBoundingClientRect().top <= y)
+      node.find('[rel="card-' + cards[index].id+'"]')[0].getBoundingClientRect().top <= y + CARD_TOP_THRESHOLD)
     {
       index ++;
     }

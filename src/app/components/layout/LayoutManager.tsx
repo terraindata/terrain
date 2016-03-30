@@ -53,6 +53,7 @@ var colClass = 'layout-manager-column';
 var rowClass = 'layout-manager-row';
 var cellClass = 'layout-manager-cell';
 var fullHeightClass = 'layout-manager-full-height';
+var CARD_TOP_THRESHOLD = 15;
 
 interface Style
 {
@@ -279,7 +280,10 @@ var LayoutManager = React.createClass<any, any>({
 
 	onDrag(index, coords, originalCoords)
 	{
-    this.setState({dragging: true, draggingIndex: index});
+    this.setState({
+      dragging: true,
+      draggingIndex: index
+    });
 
     var clientRect = this.refs[index].getBoundingClientRect();
     var indicesToShift = this.computeShiftedIndices(index, coords, originalCoords);
@@ -323,6 +327,7 @@ var LayoutManager = React.createClass<any, any>({
 			shiftedWidth: clientRect.width * widthAmplifier,
       draggingInside: !! draggingInside,
       draggingOutside: ! draggingInside,
+      draggingPlaceholder: clientRect,
 		});
 	},
   
@@ -350,7 +355,7 @@ var LayoutManager = React.createClass<any, any>({
   {
     return (coords, originalCoords) => 
     {
-      this.setState({draggingIndex: -1, dragging: false});
+      this.setState({draggingIndex: -1, dragging: false, draggingPlaceholder: null});
       
       if(this.panelIsOutside(coords,originalCoords) && this.props.onDropOutside)
       {
@@ -444,12 +449,19 @@ var LayoutManager = React.createClass<any, any>({
 				}
 			}
       
-      if(this.props.placeholder && this.refs[index] && this.props.layout.useDropZones)
+      if(this.refs[index] && this.props.layout.useDropZones)
       {
-        // note: only works for Y axis for now
-        if(this.refs[index].getBoundingClientRect().top >= this.props.placeholder.y)
+        if(this.props.placeholder && index !== this.state.draggingIndex)
         {
-          props.dy += this.props.placeholder.element.getBoundingClientRect().height;
+          // note: only works for Y axis for now
+          if(this.refs[index].getBoundingClientRect().top + CARD_TOP_THRESHOLD >= this.props.placeholder.y)
+          {
+            style.position = 'relative';
+            style.top = this.props.placeholder.element.getBoundingClientRect().height + 'px';
+          }
+          
+          // since we have a placeholder now we don't need the fixed size no more
+          $('[fixed-size=1]').css('width', '').css('height', '').attr('fixed-size', '');
         }
       }
       
@@ -545,10 +557,10 @@ var LayoutManager = React.createClass<any, any>({
 			};
 		}
     
-    if(this.state.draggingOutside && index === this.state.draggingIndex)
-    {
-      style.height = '0px';
-    }
+    // if(this.state.draggingOutside && index === this.state.draggingIndex)
+    // {
+    //   style.height = '0px';
+    // }
 
 		return this.renderObj(row, rowClass, index, style);
 	},
@@ -735,12 +747,16 @@ var LayoutManager = React.createClass<any, any>({
 		}
 		var lmClassString = lmClasses.join(" ");
 
+    if(this.props.placeholder)
+    {
+      var style = {paddingBottom: this.props.placeholder.element.getBoundingClientRect().height }
+    }
+        // { this.props.placeholder && <div style={{height: this.props.placeholder.element.getBoundingClientRect().height }} /> }
     return (
-      <div className={lmClassString} ref='layoutManagerDiv'>
+      <div className={lmClassString} ref='layoutManagerDiv' style={style}>
         { this.props.layout.columns && this.props.layout.columns.map(this.renderColumn) }
         { this.props.layout.rows && this.props.layout.rows.map(this.renderRow) }
         { this.props.layout.cells && this.props.layout.cells.map(this.renderCell) }
-        { this.props.placeholder && <div style={{height: this.props.placeholder.element.getBoundingClientRect().height }} /> }
 			</div>
 			);
 	},

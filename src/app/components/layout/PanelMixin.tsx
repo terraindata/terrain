@@ -189,7 +189,16 @@ var Panel = {
 				dy: 0,
 				ocr: cr,
 			});
-
+      
+      if(this.props.useDropZoneManager)
+      {
+        // this may be buggy if the parentnode already had a style or has multiple panels
+        this.refs.panel.parentNode.style.width = cr.width;
+        this.refs.panel.parentNode.style.height = cr.height;
+        this.refs.panel.parentNode.setAttribute('fixed-size', '1');
+        $(".builder-column-content-scroll").children().css('padding-bottom', '400px');
+      }
+      
 			if(this.parentNode())
 			{
 				var maxYPosition = _.max(_.map(this.parentNode().childNodes).map((node) => node.getBoundingClientRect().bottom));
@@ -283,13 +292,6 @@ var Panel = {
 			draggedTo.dy = this.state.dy + scrollOffset;
 		}
 
-		this.setState({
-			draggedTo: draggedTo,
-      dragging: true, 
-      // ^ this is here, and not in the startDrag method, so that we don't see
-      //    the dragging styles until we've actually moved the thing
-		});
-    
 		if(this.props.onDrag) 
 		{
 			this.props.onDrag(this.props.index, draggedTo, { 
@@ -297,6 +299,13 @@ var Panel = {
 				y: this.state.oy,
 			});
 		}
+    
+    this.setState({
+      draggedTo: draggedTo,
+      dragging: true, 
+      // ^ this is here, and not in the startDrag method, so that we don't see
+      //    the dragging styles until we've actually moved the thing
+    });
 	},
 
 	stopDrag(x, y) {
@@ -319,6 +328,13 @@ var Panel = {
       var dragHandle = this.refs[this.props.dragHandleRef];
       dragHandle.style.left = '0px';
       dragHandle.style.top = '0px';
+    }
+    
+    if(this.props.useDropZoneManager)
+    {
+      this.refs.panel.parentNode.style.width = null;
+      this.refs.panel.parentNode.style.height = null;
+      $(".builder-column-content-scroll").children().css('padding-bottom', '200px');
     }
 	},
 
@@ -457,6 +473,12 @@ var Panel = {
         style.position = 'fixed';
       }
     }
+    
+    // if((!this.state.dragging || this.props.useDropZoneManager) && this.refs.panel)
+    // {
+    //   this.refs.panel.parentNode.style.width = null;
+    //   this.refs.panel.parentNode.style.height = null;
+    // }
 
 		if(this.props.neighborDragging || DropZoneManager.isDragging)
 		{
