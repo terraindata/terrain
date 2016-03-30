@@ -122,6 +122,8 @@ CardsReducer[ActionTypes.cards.create] =
         case 'min':
         case 'max':
         case 'count':
+        case 'exists':
+        case 'parentheses':
           newCard =
           {
             cards: [],

@@ -63,7 +63,7 @@ import CardsContainerMixin from "./CardsContainerMixin.tsx";
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
-var CARD_TYPES_WITH_CARDS = ['from', 'let', 'count', 'min', 'max', 'avg']; // 'let', 'count'
+var CARD_TYPES_WITH_CARDS = ['from', 'let', 'count', 'min', 'max', 'avg', 'exists', 'parentheses']; // 'let'
 
 var Card = React.createClass({
 	mixins: [PanelMixin, CardsContainerMixin],
@@ -203,6 +203,8 @@ var Card = React.createClass({
     case 'min':
     case 'max':
     case 'avg':
+    case 'exists':
+    case 'parentheses':
       CardComponent = WrapperCard;
 		}
     
@@ -246,6 +248,11 @@ var Card = React.createClass({
     ];
 
 		var title = this.props.card.type.charAt(0).toUpperCase() + this.props.card.type.substr(1);
+    if(this.props.card.type === 'parentheses')
+    {
+      title = '( )';
+    }
+    
 		return this.renderPanel((
 			<div className={'card ' + (!this.state.open ? 'card-closed' : '')} ref={this.state.ref} rel={'card-' + this.props.card.id}>
         <CreateCardTool index={this.props.index} parentId={this.props.parentId} />

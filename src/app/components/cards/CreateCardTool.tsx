@@ -196,7 +196,7 @@ class CreateCardTool extends React.Component<Props, any>
            CardTypes.map((type, index) => this.hideButton(type) ? null : (
              <div className="create-card-button" key={type} onClick={this.createCardFactory(type)}>
                <div className="create-card-button-inner">
-                 { type }
+                 { type === 'parentheses' ? '( )' : type }
                </div>
              </div>
            ))

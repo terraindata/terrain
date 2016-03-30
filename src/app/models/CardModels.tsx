@@ -153,6 +153,8 @@ export module CardModels
   export interface ISumCard extends ICard, ICardsContainer {}
   export interface IMinCard extends ICard, ICardsContainer {}
   export interface IMaxCard extends ICard, ICardsContainer {}
+  export interface IExistsCard extends ICard, ICardsContainer {}
+  export interface IParenthesesCard extends ICard, ICardsContainer {}
   
   export interface IWeight
   {

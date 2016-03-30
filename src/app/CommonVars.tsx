@@ -58,7 +58,9 @@ export var CardTypes: string[]  =
  'min',
  'sum',
  'avg',
- 'count'
+ 'count',
+ 'exists',
+ 'parentheses',
  // 'slice',
  // 'text match',
  // 'exceptions',
