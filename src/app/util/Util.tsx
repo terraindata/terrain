@@ -45,6 +45,7 @@ THE SOFTWARE.
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
+import * as Immutable from "immutable";
 var _ = require('underscore');
 
 import { CardModels } from './../models/CardModels.tsx';
@@ -60,6 +61,10 @@ var immutableCardsUpdateHelper = (node: any, keyToUpdate: string, id: string, up
   {
     return node.update('cards', cards => cards.map(card => immutableCardsUpdateHelper(card, keyToUpdate, id, updater)));
   }
+  
+  node = node.map((value, key) => !Immutable.Iterable.isIterable(value) ? value :
+    immutableCardsUpdateHelper(value, keyToUpdate, id, updater)
+  );
   
   return node;
 }
@@ -280,7 +285,7 @@ var Util = {
   setCardFields: (fields: string[]) =>
     (state, action) =>
       Util.immutableCardsUpdate(state, fields, action.payload.card.id, 
-        (fieldVal, field) => action.payload[field]),
+        (fieldVal, field) => Immutable.fromJS(action.payload[field])),
   
   populateTransformDummyData(transformCard)
   {

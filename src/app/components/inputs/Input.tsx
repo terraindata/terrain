@@ -48,7 +48,7 @@ import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import Actions from "../../data/Actions.tsx";
 import PanelMixin from '../layout/PanelMixin.tsx';
-import ThrottledInput from "../common/ThrottledInput.tsx";
+import BuilderTextbox from "../common/BuilderTextbox.tsx";
 import Menu from '../common/Menu.tsx';
 import CreateLine from '../common/CreateLine.tsx';
 import DatePicker from '../common/DatePicker.tsx';
@@ -141,7 +141,7 @@ var Input = React.createClass<any, any>({
       </div>);
     }
     
-    return <ThrottledInput
+    return <BuilderTextbox
       value={this.props.input.value}
       onChange={this.changeValue}
       className="input-text input-text-second" />;
@@ -158,7 +158,7 @@ var Input = React.createClass<any, any>({
         <CreateLine open={false} onClick={this.createInput} />
         <div className='input-inner'>
           <div className='input-top-row'>
-            <ThrottledInput value={this.props.input.key} onChange={this.changeKey} className="input-text input-text-first" />
+            <BuilderTextbox value={this.props.input.key} onChange={this.changeKey} className="input-text input-text-first" />
             <Menu options={this.getMenuOptions()} />
           </div>
           <div className='input-bottom-row'>

@@ -49,13 +49,15 @@ import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import CardField from './../CardField.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
-import ThrottledInput from "../../common/ThrottledInput.tsx";
+import BuilderTextbox from "../../common/BuilderTextbox.tsx";
+import BuilderTextboxCards from "../../common/BuilderTextboxCards.tsx";
 
 var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIcon");
 var ExpandIcon = require("./../../../../images/icon_tql_17x14.svg?name=ExpandIcon");
 
 interface Props {
   card: CardModels.ILetCard;
+  spotlights: any[];
 }
 
 class LetCard extends React.Component<Props, any>
@@ -90,29 +92,32 @@ class LetCard extends React.Component<Props, any>
         this.refs[expressionRef]['value']);
     }
     
-    var expressionInput = <ThrottledInput
+    var expressionInput = <BuilderTextbox
       placeholder='Expression'
       value={this.props.card.expression}
       className='let-card-code-input'
       onChange={handleChange}
       textarea={this.state.expanded}
-      ref={expressionRef} />;
+      ref={expressionRef}
+      acceptsCards={true}
+      />;
 
     var layout = {
       columns: [
         {
           content: (
-            <ThrottledInput
+            <BuilderTextbox
               placeholder='Variable name'
               value={this.props.card.field} 
               onChange={handleChange} 
+              parentId={this.props.card.id}
               ref={fieldRef} />
           ),
         },
         {
           content: (
-            <div className='card-arrow'>
-              <ArrowIcon />
+            <div className='card-assignment'>
+              =
             </div>
           ),
           width: 50,
@@ -127,17 +132,24 @@ class LetCard extends React.Component<Props, any>
       });
     }
     
-    var rightContent = (
+    var rightContent = typeof this.props.card.expression === 'string' && (
       <div onClick={this.handleExpand} className='let-card-expand'>
         <ExpandIcon />
       </div>
     );
 
     return (
-      <CardField height={this.state.expanded ? 242 : 30} rightContent={rightContent}>
-        <LayoutManager layout={layout} />
-        { this.state.expanded ? expressionInput : null }
-      </CardField>
+      <div ref='let'>
+        <CardField height={this.state.expanded ? 242 : 30} rightContent={rightContent}>
+          <LayoutManager layout={layout} />
+          { this.state.expanded ? expressionInput : null }
+        </CardField>
+        <BuilderTextboxCards
+          value={this.props.card.expression}
+          spotlights={this.props.spotlights}
+          parentId={this.props.card.id}
+          />
+      </div>
     );
   }
 };

@@ -42,34 +42,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
+require('./BuilderTextbox.less');
 
+import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
+import { CardModels } from '../../models/CardModels.tsx';
+// import CardsArea from '../cards/CardsArea.tsx';
+import Card from '../cards/Card.tsx';
 
 interface Props
 {
-  value: string;
+  value: CardModels.CardString;
   onChange: (value: string, event?: any) => void;
+  
   placeholder?: string;
   ref?: string;
   className?: string;
   type?: string;
   rel?: string;
   textarea?: boolean;
+
+  acceptsCards?: boolean;
+  top?: boolean;
+  parentId?: string;
 }
 
-class ThrottledInput extends React.Component<Props, any>
+class BuilderTextbox extends React.Component<Props, any>
 {
-  value: string;
+  value: CardModels.CardString;
   
   constructor(props: Props) {
     super(props);
     
     // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
     this.executeChange = _.debounce(this.executeChange, 750);
-    Util.bind(this, ['executeChange', 'handleChange']);
+    Util.bind(this, ['executeChange', 'handleChange', 'renderSwitch', 'handleSwitch']);
     
     this.value = props.value;
   }
@@ -81,6 +90,7 @@ class ThrottledInput extends React.Component<Props, any>
       // if not focused, then update the value
       ReactDOM.findDOMNode(this)['value'] = newProps.value;
     }
+    this.value = newProps.value;
   }
   
   // throttled event handler
@@ -98,31 +108,87 @@ class ThrottledInput extends React.Component<Props, any>
     this.executeChange(event);
   }
   
-  render() {
-    var element = this.props.textarea ? <textarea /> : <input />;
-    
-    var props =
+  isText()
+  {
+    return typeof this.props.value === 'string';
+  }
+  
+  handleSwitch()
+  {
+    if(!this.isText())
     {
-      type: this.props.type || 'text',
-      defaultValue: this.props.value,
-      onChange: this.handleChange,
-      className: this.props.className,
-      placeholder: this.props.placeholder,
-      rel: this.props.rel,
-    };
+      this.value = '';
+      this.executeChange({
+        target: {
+          value: '',
+        },
+        switched: true,
+      })  
+    }
+    else
+    {
+      var newCard:CardModels.IParenthesesCard =
+      {
+        id: 'c-' + Math.random(),
+        parentId: this.props.parentId,
+        type: 'parentheses',
+        cards: [],
+      };
+      
+      this.value = newCard;
+      this.executeChange({
+        target: {
+          value: newCard,
+        },
+        switched: true,
+      });
+    }
+  }
+  
+  renderSwitch()
+  {
+    return (
+      <div className='builder-tb-switch' onClick={this.handleSwitch}>
+        [ ]
+      </div>
+    );
+  }
+  
+  render() {
+    if(this.isText())
+    {
+      var element = this.props.textarea ? <textarea /> : <input />;
+      
+      var props =
+      {
+        type: this.props.type || 'text',
+        defaultValue: this.props.value,
+        onChange: this.handleChange,
+        className: this.props.className,
+        placeholder: this.props.placeholder,
+        rel: this.props.rel,
+      };
+      
+      return (
+        <div className={'builder-tb ' + (this.props.acceptsCards ? 'builder-tb-accepts-cards' : '')}>
+          { React.cloneElement(element, props) }
+          { this.props.acceptsCards && this.renderSwitch() }
+        </div>
+      );
+    }
     
-    return React.cloneElement(element, props);
-    // return (
-    //   <input
-    //     type={ this.props.type || 'text' }
-    //     defaultValue={ this.props.value }
-    //     onChange={this.handleChange}
-    //     className={this.props.className}
-    //     placeholder={this.props.placeholder}
-    //     rel={this.props.rel}
-    //     />
-    // );
+    // We're in card mode
+    return (
+      <div className='builder-tb builder-tb-cards'>
+        <div className='builder-tb-cards-input'>
+          { this.renderSwitch() }
+          <div className='builder-tb-cards-input-value'>
+            Cards
+          </div>
+        </div>
+      </div>
+    );
   }
 };
 
-export default ThrottledInput;
+export default BuilderTextbox;

@@ -19,6 +19,7 @@
   border-top-right-radius: calc(@card-border-radius - 1px);
   text-transform: capitalize;
   position: relative; // for menu component
+  text-align: left;
  }
  .card-sub-bar {
   border-bottom-left-radius: calc(@card-border-radius - 1px);
@@ -80,7 +81,6 @@
       .card-sub-bar-inner {
         padding-left: 20px;
         padding-right: 20px;
-        // margin: -1px;
         background: darken(@dark-green, 5%);
       }
     }
@@ -91,6 +91,10 @@
     .transition;
   }
   
+  .card-assignment {
+    text-align: center;
+    padding-top: 3px;
+  }
   
   .card-arrow {
     height: 27px;
@@ -139,6 +143,10 @@
       padding-left: @standard-margin + 1px;
     }
   } 
+  
+  .card .card {
+    margin-right: 0px;
+  }
   
   &.drag-over {
     background: lighten(#bcd4ae, 5%);

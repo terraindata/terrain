@@ -22,6 +22,27 @@
         "cards": 
         [
           {
+            "type": "let",
+            "id": "10101",
+            "field": "sitter.avgRating",
+            "expression": 
+            {
+              "type": "parentheses",
+              "id": "pa729",
+              "cards":
+              [
+                {
+                  "id": "123let",
+                  "type": "from",
+                  "group": "ratings",
+                  "iterator": "rating",
+                  "joins": [],
+                  "cards": []
+                }
+              ]
+            }
+          },
+          {
             "type": "select",
             "id": "2",
             "properties": [
@@ -101,12 +122,6 @@
                 "id": "asdf34"
               }
             ]
-          },
-          {
-            "type": "let",
-            "id": "10101",
-            "field": "sitter.avgRating",
-            "expression": "avg(from rating in 'ratings' select rating.value where rating.sitter == sitter.id)"
           },
           {
             "type": "transform",
@@ -235,6 +250,12 @@
             }
           }
         ]
+      },
+      {
+        "type": "let",
+        "id": "101012",
+        "field": "sitter.avgRating",
+        "expression": ""
       }
     ],
     "resultsPage": 1,

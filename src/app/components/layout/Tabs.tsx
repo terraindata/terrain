@@ -250,7 +250,12 @@ var Tabs = React.createClass<any, any>({
       <div className='tabs-actions'>
         {
           this.props.actions.map((action, index) => 
-            <a className='tabs-action' key={index} onClick={action.onClick}>{action.icon} {action.text}</a>)
+            <a
+              className={'tabs-action' + (action.noDivider ? ' tabs-action-no-divider' : '')}
+              key={index}
+              onClick={action.onClick}>
+              {action.icon} {action.text}
+            </a>)
         }
       </div>
     );

@@ -64,6 +64,7 @@ export module CardModels
     OR
   }
   
+  
   export interface IId
   {
     id: string;
@@ -103,6 +104,8 @@ export module CardModels
   {
     type: string;
   }
+  
+  export type CardString = string | ICard;
   
   export interface ICardsContainer
   {
@@ -145,7 +148,7 @@ export module CardModels
   export interface ILetCard extends ICard, ICardsContainer
   {
     field: string;
-    expression: string;
+    expression: CardString;
   }
   
   export interface ICountCard extends ICard, ICardsContainer {}

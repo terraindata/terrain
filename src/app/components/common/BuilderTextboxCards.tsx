@@ -42,89 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import * as React from 'react';
-import Actions from "../../../data/Actions.tsx";
-import Util from '../../../util/Util.tsx';
-import LayoutManager from "../../layout/LayoutManager.tsx";
-import Dropdown from './../../common/Dropdown.tsx';
-import CardField from './../CardField.tsx';
-import { Directions } from './../../../CommonVars.tsx';
-import { CardModels } from './../../../models/CardModels.tsx';
-import BuilderTextbox from "../../common/BuilderTextbox.tsx";
-import { Operators } from './../../../CommonVars.tsx';
+import * as ReactDOM from 'react-dom';
+import Util from '../../util/Util.tsx';
+import { CardModels } from '../../models/CardModels.tsx';
+import Card from '../cards/Card.tsx';
 
-interface Props {
-  card: CardModels.IJoinCard;
+interface Props
+{
+  value: CardModels.CardString;
+  spotlights?: any[];
+  parentId?: string;
 }
 
-var OPERATOR_WIDTH: number = 30;
-var CARD_PADDING: number = 12;
-
-class JoinCard extends React.Component<Props, any>
+class BuilderTextboxCards extends React.Component<Props, any>
 {
-  constructor(props:Props)
-  {
+  constructor(props: Props) {
     super(props);
   }
   
-  
-  handleJoinChange(joinValue, event)
+  isText()
   {
-    var group = this.refs['group']['value'];
-    var first = this.refs['first']['value'];
-    var second = this.refs['second']['value'];
-    var operator = this.refs['operator']['value'];
-    
-    // Actions.cards.join.change(this.props.card, {
-    //   group: group,
-    //   comparison:
-    //   {
-    //     first: first,
-    //     second: second,
-    //     operator: operator,
-    //   },
-    // });
+    return typeof this.props.value === 'string';
   }
-
-  render()
-  {
-    var joinLayout =
+  
+  render() {
+    if(this.isText())
     {
-      columns: [
-        {
-          content: (
-            <BuilderTextbox value={this.props.card.group} onChange={this.handleJoinChange} ref={'group'} />
-          ),
-          colSpan: 2,
-        },
-        {
-          content: (
-            <BuilderTextbox value={this.props.card.comparison.first} onChange={this.handleJoinChange} ref={'first'} />
-          ),
-        },
-        {
-          content: (
-            <div>
-             <Dropdown ref={'operator'} circle={true} options={Operators} selectedIndex={this.props.card.comparison.operator} onChange={this.handleJoinChange} />
-            </div>
-          ),
-          width: OPERATOR_WIDTH,
-        },
-        {
-          content: (
-            <BuilderTextbox value={this.props.card.comparison.second} onChange={this.handleJoinChange} ref={'second'} />
-          ),
-        }
-      ],
-      colPadding: CARD_PADDING,
-    };
-
+      return null;
+    }
+    
+    // We're in card mode
     return (
-      <CardField>
-        <LayoutManager layout={joinLayout} />
-      </CardField>
+      <div className='builder-tb-cards-area' ref='tb'>
+        <Card
+          singleCard={true}
+          card={this.props.value}
+          spotlights={this.props.spotlights}
+          index={0}
+          />
+      </div>
     );
   }
 };
 
-export default JoinCard;
+export default BuilderTextboxCards;

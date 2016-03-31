@@ -1,0 +1,54 @@
+@import "../../util/Common.less";
+
+@input-height: 29px;
+@switch-width: 20px;
+
+.builder-tb {
+  position: relative;
+  min-height: @input-height;
+  
+  &.builder-tb-accepts-cards {
+    input, textarea {
+      padding-left: @switch-width + 6px;
+    }
+  }
+  
+  .builder-tb-switch {
+    position: absolute;
+    text-align: center;
+    top: 0px;
+    left: 0px;
+    height: @input-height;
+    width: @switch-width;
+    padding-top: 5px;
+    background: rgba(142,149,255,1);
+    color: rgba(0,0,0,1);
+    box-sizing: border-box;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    opacity: 0.25;
+    .transition;
+    
+    &:hover {
+      opacity: 1.0;
+    }
+  }
+  
+  .builder-tb-card-wrapper {
+    position: relative;
+  }
+  
+  .builder-tb-cards-input {
+    height: @input-height;
+    border-radius: 5px;
+    padding-top: 6px;
+    box-sizing: border-box;
+    background: #fff;
+    margin-bottom: @standard-margin;
+  }
+}
+
+.builder-tb-cards-area {
+  margin-right: -16px;
+  margin-left: -12px;
+}

@@ -146,7 +146,7 @@ var CardField = React.createClass({
           'card-field': true,
           'card-field-no-left': this.props.noLeft,
         })}
-        style={{ height: this.props.height }}
+        style={{ minHeight: this.props.height }}
         ref='cardField'
         >
         { leftContent ? (

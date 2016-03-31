@@ -58,14 +58,13 @@ import { CardModels } from './../../../models/CardModels.tsx';
 import { Weight, Weighter } from '../../../charts/Weighter.tsx';
 import TransformCardChart from './TransformCardChart.tsx';
 import TransformCardPeriscope from './TransformCardPeriscope.tsx';
-import ThrottledInput from "../../common/ThrottledInput.tsx";
+import BuilderTextbox from "../../common/BuilderTextbox.tsx";
 
 var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIcon");
 
 interface Props {
   card: CardModels.ITransformCard;
   parentId: string;
-  cards: CardModels.ICard[];
   spotlights: any[];
 }
 
@@ -86,7 +85,7 @@ class TransformCard extends React.Component<Props, any>
       },
     };
     
-    Util.bind(this, ['handleDomainChange', 'handleWeightChange'])
+    Util.bind(this, ['handleDomainChange'])
   }
   
   handleDomainChange(newDomain) {
@@ -99,61 +98,6 @@ class TransformCard extends React.Component<Props, any>
     });
   }
   
-  getScoreCard():CardModels.IScoreCard {
-    var scoreCard: CardModels.ICard = this.props.cards.find((card) => 
-      card.type === 'score' && 
-      card['weights'].find((weight) => weight.key === this.props.card.output));
-    
-    if(scoreCard)
-    {
-      return scoreCard as CardModels.IScoreCard;
-    }
-    
-    return null;
-  }
-  
-  handleWeightChange(newWeights: Weight[])
-  {
-    Actions.cards.score.changeWeights(this.getScoreCard(), newWeights);
-  }
-  
-  renderWeighter()
-  {
-    var scoreCard = this.getScoreCard();
-    if(!scoreCard)
-    {
-      return (
-        <div className='transform-card-no-weighter'>
-          This card's output is not a part of any Score card.
-        </div>
-      );
-    }
-    
-    var weighterLayout = 
-    {
-      colPadding: 12,
-      columns:
-      [
-        {
-          colSpan: 2,
-          content: <Weighter
-            weights={scoreCard.weights}
-            weightIndex={scoreCard.weights.findIndex((weight) => weight.key === this.props.card.output)}
-            onChange={this.handleWeightChange} />
-        },
-        {
-          content: <input type='text' defaultValue={ scoreCard.output } />
-        }
-      ],
-    }
-    
-    return (
-      <CardField>
-        <LayoutManager layout={weighterLayout} />
-      </CardField>
-    );
-  }
-
   render() {
     var inputRef = 'input';
     var outputRef = 'output';
@@ -167,7 +111,7 @@ class TransformCard extends React.Component<Props, any>
       columns: [
       {
         content: (
-          <ThrottledInput value={this.props.card.input} onChange={handleChange} ref={inputRef} />
+          <BuilderTextbox value={this.props.card.input} onChange={handleChange} ref={inputRef} />
         ),
       },
       {
@@ -180,7 +124,7 @@ class TransformCard extends React.Component<Props, any>
       },
       {
         content: (
-          <ThrottledInput value={this.props.card.output} onChange={handleChange} ref={outputRef} />
+          <BuilderTextbox value={this.props.card.output} onChange={handleChange} ref={outputRef} />
         ),
       }
       ],
@@ -213,9 +157,6 @@ class TransformCard extends React.Component<Props, any>
           barsData={this.props.card.bars}
           domain={this.state.domain}
           card={this.props.card} />
-        {
-          this.renderWeighter()
-        }
       </div>
     );
   }

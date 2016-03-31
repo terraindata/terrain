@@ -46,7 +46,8 @@ import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
-import ThrottledInput from "../../common/ThrottledInput.tsx";
+import BuilderTextbox from "../../common/BuilderTextbox.tsx";
+import BuilderTextboxCards from "../../common/BuilderTextboxCards.tsx";
 import CardField from './../CardField.tsx';
 import Dropdown from './../../common/Dropdown.tsx';
 import { Operators, Combinators } from './../../../CommonVars.tsx';
@@ -55,6 +56,7 @@ import { CardModels } from './../../../models/CardModels.tsx';
 interface Props
 {
   card: CardModels.IFilterCard;
+  spotlights: any[];
 }
 
 var OPERATOR_WIDTH: number = 27;
@@ -100,7 +102,14 @@ class FilterCard extends React.Component<Props, any>
       columns: [
         {
           content: (
-            <ThrottledInput value={filter.comparison.first} onChange={changeFilter} ref={firstRef} />
+            <BuilderTextbox
+              value={filter.comparison.first}
+              onChange={changeFilter}
+              ref={firstRef}
+              acceptsCards={true}
+              parentId={this.props.card.id}
+              top={true}
+              />
           ),
         },
         {
@@ -113,7 +122,13 @@ class FilterCard extends React.Component<Props, any>
         },
         {
           content: (
-            <ThrottledInput value={filter.comparison.second} onChange={changeFilter} ref={secondRef} />
+            <BuilderTextbox
+              value={filter.comparison.second}
+              onChange={changeFilter}
+              ref={secondRef}
+              acceptsCards={true}
+              parentId={this.props.card.id}
+              />
           ),
         }
       ],
@@ -125,30 +140,40 @@ class FilterCard extends React.Component<Props, any>
         Actions.cards.filter.remove(this.props.card, index);
     }
     
-        // noLeft={true}
     return (
-      <CardField
-        leftContent={
-          index === 0 ? null : <Dropdown
-            ref={combinatorRef}
-            circle={true}
-            options={Combinators}
-            selectedIndex={filter.combinator}
-            onChange={changeFilter}
-            />
-        }
-        key={filter.id}
-        draggable={false}
-        removable={true}
-        onDelete={deleteFn} >
-        <LayoutManager layout={filterLayout} />
-      </CardField>
+      <div key={filter.id}>
+        <BuilderTextboxCards
+          value={filter.comparison.first}
+          spotlights={this.props.spotlights}
+          parentId={this.props.card.id}
+          />
+        <CardField
+          leftContent={
+            index === 0 ? null : <Dropdown
+              ref={combinatorRef}
+              circle={true}
+              options={Combinators}
+              selectedIndex={filter.combinator}
+              onChange={changeFilter}
+              />
+          }
+          draggable={false}
+          removable={true}
+          onDelete={deleteFn} >
+          <LayoutManager layout={filterLayout} />
+        </CardField>
+        <BuilderTextboxCards
+          value={filter.comparison.second}
+          spotlights={this.props.spotlights}
+          parentId={this.props.card.id}
+          />
+      </div>
     );
   }
 
 	render() {
     return (
-      <div>
+      <div ref='card'>
         { this.props.card.filters.map(this.renderFilter) }
       </div>
 		);

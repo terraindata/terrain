@@ -55,16 +55,6 @@ var cellClass = 'layout-manager-cell';
 var fullHeightClass = 'layout-manager-full-height';
 var CARD_TOP_THRESHOLD = 15;
 
-interface Style
-{
-	left?: number | string,
-	top?: number,
-	width?: number | string,
-	height?: number,
-  display?: string,
-  position?: string,
-}
-
 interface Adjustment
 {
   x: number;
@@ -665,7 +655,7 @@ var LayoutManager = React.createClass<any, any>({
 	renderColumn(column, index) 
 	{
 		var classToPass = colClass;
-		var style: Style =
+		var style: React.CSSProperties =
 		{
 			left: this.calcColumnLeft(column, index),
 			width: this.calcColumnWidth(column, index),
@@ -680,6 +670,18 @@ var LayoutManager = React.createClass<any, any>({
          left: '0px',
          width: 'auto',
        } ;
+    }
+    
+    if(this.props.layout.useRelative)
+    {
+      style =
+      {
+        display: 'inline-block',
+        width: style.width,
+        position: 'relative',
+        height: 'auto',
+        verticalAlign: 'top',
+      }
     }
 
     if(this.props.layout.stackAt && this.props.layout.stackAt > $(window).width()) {

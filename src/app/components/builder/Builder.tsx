@@ -64,6 +64,9 @@ var NewIcon = require("./../../../images/icon_new_8x10.svg?name=NewIcon");
 var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
 var DuplicateIcon = require("./../../../images/icon_duplicate_11x12.svg?name=DuplicateIcon");
 var SaveIcon = require("./../../../images/icon_save_10x10.svg?name=SaveIcon");
+var OneColumnIcon = require("./../../../images/icon_1Column_10x10.svg?name=OneColumnIcon");
+var TwoColumnsIcon = require("./../../../images/icon_2Columns_10x10.svg?name=TwoColumnsIcon");
+var ThreeColumnsIcon = require("./../../../images/icon_3Columns_10x10.svg?name=ThreeColumnsIcon");
 
 class Builder extends React.Component<any, any>
 {
@@ -164,19 +167,21 @@ class Builder extends React.Component<any, any>
         onClick: () => alert("Not yet implemented."),
       },
       {
-        text: 'one',
-        icon: <SaveIcon />,
+        text: '',
+        icon: <OneColumnIcon />,
         onClick: this.goOneColumn,
       },
       {
-        text: 'two',
-        icon: <SaveIcon />,
+        text: '',
+        icon: <TwoColumnsIcon />,
         onClick: this.goTwoColumns,
+        noDivider: true,
       },
       {
-        text: 'three',
-        icon: <SaveIcon />,
+        text: '',
+        icon: <ThreeColumnsIcon />,
         onClick: this.goThreeColumns,
+        noDivider: true,
       },
     ];
   }

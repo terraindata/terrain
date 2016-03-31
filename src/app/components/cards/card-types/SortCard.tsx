@@ -50,7 +50,7 @@ import Dropdown from './../../common/Dropdown.tsx';
 import CardField from './../CardField.tsx';
 import { Directions } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
-import ThrottledInput from "../../common/ThrottledInput.tsx";
+import BuilderTextbox from "../../common/BuilderTextbox.tsx";
 
 interface Props {
   card: CardModels.ISortCard;
@@ -82,7 +82,7 @@ class SortCard extends React.Component<Props, any>
       columns: [
       {
         content: (
-          <ThrottledInput value={sort.property} onChange={handleChange} ref={propertyRef} />
+          <BuilderTextbox value={sort.property} onChange={handleChange} ref={propertyRef} />
         ),
       },
       {

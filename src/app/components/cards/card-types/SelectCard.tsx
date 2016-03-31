@@ -47,7 +47,7 @@ import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import CardField from './../CardField.tsx';
-import ThrottledInput from "../../common/ThrottledInput.tsx";
+import BuilderTextbox from "../../common/BuilderTextbox.tsx";
 
 import { CardModels } from './../../../models/CardModels.tsx';
 
@@ -101,7 +101,7 @@ class SelectCard extends React.Component<Props, any>
               removable={true}
               drag_y={true}
     					dragInsideOnly={true}>
-              <ThrottledInput
+              <BuilderTextbox
                 value={property.property}
                 placeholder='Type field here'
                 onChange={changeFnFactory(index)} />

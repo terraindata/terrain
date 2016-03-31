@@ -5,7 +5,7 @@
   margin: 0px -1 * @standard-margin;
   position: relative;
   text-align: center;
-  height: 30px;
+  min-height: 30px;
   .transition;
   
   .card-field-inner {
@@ -68,9 +68,6 @@
     color: @light-gray;
     .transition(all 0.25s);   
     cursor: pointer;
-    // &:hover {
-    //   color: @black;
-    // }
   }
 
   .card-field-tools-left {
@@ -84,6 +81,20 @@
   }
 
   &:hover {
+    .card {
+      .card-field-handle,
+      .card-field-delete {
+        opacity: 0;
+      }
+      
+      .card-field:hover {
+        .card-field-handle,
+        .card-field-delete {
+          opacity: 1;
+        }
+      }
+    }
+    
     .card-field-handle,
     .card-field-delete {
       opacity: 1;

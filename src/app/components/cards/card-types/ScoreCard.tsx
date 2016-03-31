@@ -53,7 +53,7 @@ import LayoutManager from "../../layout/LayoutManager.tsx";
 import Dropdown from "../../common/Dropdown.tsx";
 import CardField from './../CardField.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
-import ThrottledInput from "../../common/ThrottledInput.tsx";
+import BuilderTextbox from "../../common/BuilderTextbox.tsx";
 
 import { Weight, Weighter } from '../../../charts/Weighter.tsx';
 
@@ -123,7 +123,7 @@ class ScoreCard extends React.Component<Props, any>
       columns:
       [
         {
-          content: <ThrottledInput
+          content: <BuilderTextbox
             rel={index}
             value={weight.key}
             onChange={this.handleWeightKeyChange}
@@ -175,7 +175,7 @@ class ScoreCard extends React.Component<Props, any>
             selectedIndex={methods.indexOf(this.props.card.method)} />
         },
         {
-          content: <ThrottledInput value={this.props.card.output} onChange={this.handleOutputChange} />
+          content: <BuilderTextbox value={this.props.card.output} onChange={this.handleOutputChange} />
         }
       ]
     }

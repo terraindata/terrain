@@ -47,7 +47,7 @@ import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
-import ThrottledInput from "../../common/ThrottledInput.tsx";
+import BuilderTextbox from "../../common/BuilderTextbox.tsx";
 import CardField from './../CardField.tsx';
 import Dropdown from './../../common/Dropdown.tsx';
 import CardsArea from './../CardsArea.tsx';
@@ -112,13 +112,13 @@ class FromCard extends React.Component<Props, any>
       columns: [
         {
           content: (
-            <ThrottledInput value={join.group} onChange={this.handleJoinChange} ref={groupRef} rel={rel} />
+            <BuilderTextbox value={join.group} onChange={this.handleJoinChange} ref={groupRef} rel={rel} />
           ),
           colSpan: 2,
         },
         {
           content: (
-            <ThrottledInput value={join.comparison.first} onChange={this.handleJoinChange} ref={firstRef} rel={rel} />
+            <BuilderTextbox value={join.comparison.first} onChange={this.handleJoinChange} ref={firstRef} rel={rel} />
           ),
         },
         {
@@ -131,7 +131,7 @@ class FromCard extends React.Component<Props, any>
         },
         {
           content: (
-            <ThrottledInput value={join.comparison.second} onChange={this.handleJoinChange} ref={secondRef} rel={rel} />
+            <BuilderTextbox value={join.comparison.second} onChange={this.handleJoinChange} ref={secondRef} rel={rel} />
           ),
         }
       ],
@@ -172,7 +172,7 @@ class FromCard extends React.Component<Props, any>
       columns:
       [
         {
-          content: <ThrottledInput
+          content: <BuilderTextbox
             value={this.props.card.group}
             ref='group'
             onChange={this.handleChange}
@@ -187,7 +187,7 @@ class FromCard extends React.Component<Props, any>
           width: 50,
         },
         {
-          content: <ThrottledInput
+          content: <BuilderTextbox
             value={this.props.card.iterator}
             ref='iterator'
             onChange={this.handleChange}

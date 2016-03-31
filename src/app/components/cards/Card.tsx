@@ -72,8 +72,8 @@ var Card = React.createClass({
 	{
 		card: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
-    parentId: React.PropTypes.string.isRequired,
-    cards: React.PropTypes.array.isRequired,
+    parentId: React.PropTypes.string,
+    singleCard: React.PropTypes.bool, // indicates it's not in a list, it's just a single card
 	},
 
 	getDefaultProps():any
@@ -255,13 +255,17 @@ var Card = React.createClass({
     
 		return this.renderPanel((
 			<div className={'card ' + (!this.state.open ? 'card-closed' : '')} ref={this.state.ref} rel={'card-' + this.props.card.id}>
-        <CreateCardTool index={this.props.index} parentId={this.props.parentId} />
+        { !this.props.singleCard &&
+          <CreateCardTool index={this.props.index} parentId={this.props.parentId} />
+        }
 				<div className='card-inner'>
-					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>
-            { isFlat ? null : <ArrowIcon className="card-arrow-icon" /> }
-            { title }
-            <Menu options={menuOptions} />
-					</div>
+          { !this.props.singleCard &&
+  					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>
+              { isFlat ? null : <ArrowIcon className="card-arrow-icon" /> }
+              { title }
+              <Menu options={menuOptions} />
+  					</div>
+          }
           { isFlat ? null : 
             <div className='card-body' ref='cardBody'>
     					{ contentToDisplay }
