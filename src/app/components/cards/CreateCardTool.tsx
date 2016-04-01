@@ -54,7 +54,7 @@ var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 
 // Coordinate these with .less
 var buttonPadding = 12;
-var buttonWidth = 110 + buttonPadding;
+var buttonWidth = 110 + 2 * buttonPadding;
 var buttonHeight = 40 + buttonPadding;
 var moreButtonWidth = 80;
 var fieldHeight = 35 + buttonPadding;
@@ -62,6 +62,7 @@ var fieldHeight = 35 + buttonPadding;
 interface Props {
   index: number;
   alwaysOpen?: boolean;
+  alwaysShowAll?: boolean;
   parentId: string;
   dy?: number;
   className?: string;
@@ -82,7 +83,7 @@ class CreateCardTool extends React.Component<Props, any>
     this.handleKeydown = this.handleKeydown.bind(this);
     this.handleChange = this.handleChange.bind(this);
     
-    if(this.props.alwaysOpen)
+    if(this.props.alwaysShowAll)
     {
       this.state.showAll = true;
     }
@@ -155,12 +156,13 @@ class CreateCardTool extends React.Component<Props, any>
   
   renderCardSelector() {
     var numToShow = 9999;
-    if(this.state.showAll || this.props.alwaysOpen)
+    if(this.state.showAll || this.props.alwaysShowAll)
     {
       if(this.refs['ccWrapper'] && this.refs['ccWrapper']['offsetWidth'])
       {
         var overrideHeight: any = 2 * buttonPadding + 2 + fieldHeight +
-          buttonHeight * Math.ceil(CardTypes.length * buttonWidth / this.refs['ccWrapper']['offsetWidth']);
+          buttonHeight * Math.ceil(CardTypes.length * buttonWidth /
+           (this.refs['ccWrapper']['offsetWidth'] - 2 * buttonPadding));
       }
       else
       {
@@ -221,7 +223,6 @@ class CreateCardTool extends React.Component<Props, any>
   }
 
   render() {
-    return null; // for now
     var classes = Util.objToClassname({
       "create-card-wrapper": true,
       "create-card-open": this.state.open || this.props.alwaysOpen,
@@ -238,9 +239,9 @@ class CreateCardTool extends React.Component<Props, any>
       }
     }
     
+        // { this.renderCreateCardRow() }
     return (
       <div className={classes} ref="ccWrapper" style={style}>
-        { this.renderCreateCardRow() }
         { this.renderCardSelector() }
      </div>
    );

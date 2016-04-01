@@ -168,6 +168,13 @@ CardsReducer[ActionTypes.cards.move] =
             return newContainer;
           }, Immutable.fromJS([])));
         }
+        else
+        {
+          cardsContainer = cardsContainer.map((value, key) => 
+            !Immutable.Iterable.isIterable(value) ? value :
+              removeFn(value)
+          );
+        }
         
         return cardsContainer;
       }

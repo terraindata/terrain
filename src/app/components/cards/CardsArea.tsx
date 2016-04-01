@@ -137,7 +137,8 @@ var CardsArea = React.createClass<any, any>({
       content: (
         <CreateCardTool
           index={this.props.cards.length}
-          alwaysOpen={this.props.topLevel}
+          alwaysOpen={this.props.topLevel || this.props.cards.length === 0}
+          alwaysShowAll={this.props.topLevel}
           parentId={this.props.parentId}
           className={this.props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
           />
