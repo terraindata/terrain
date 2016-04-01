@@ -100,35 +100,11 @@ class TransformCard extends React.Component<Props, any>
   
   render() {
     var inputRef = 'input';
-    var outputRef = 'output';
     
     var handleChange = () =>
     {
-      Actions.cards.transform.change(this.props.card, this.refs[inputRef]['value'], this.refs[outputRef]['value']);
+      Actions.cards.transform.change(this.props.card, this.refs[inputRef]['value']);
     }
-
-    var layout = {
-      columns: [
-      {
-        content: (
-          <BuilderTextbox value={this.props.card.input} onChange={handleChange} ref={inputRef} />
-        ),
-      },
-      {
-        content: (
-          <div className='card-arrow'>
-            <ArrowIcon />
-          </div>
-        ),
-        width: 50,
-      },
-      {
-        content: (
-          <BuilderTextbox value={this.props.card.output} onChange={handleChange} ref={outputRef} />
-        ),
-      }
-      ],
-    };
     
     // TODO update this when we have middle tier
     var inputKey = this.props.card.input;
@@ -140,11 +116,11 @@ class TransformCard extends React.Component<Props, any>
     return (
       <div>
         <CardField>
-          <LayoutManager layout={layout} />
+          <BuilderTextbox value={this.props.card.input} onChange={handleChange} ref={inputRef} />
         </CardField>
         <TransformCardChart
-          barColor={ColorManager.colorForKey(this.props.card.id, this.props.card.output)}
-          lineColor={ColorManager.darkerColorForKey(this.props.card.id, this.props.card.output)}
+          barColor={ColorManager.colorForKey(this.props.card.id, this.props.card.input)}
+          lineColor={ColorManager.darkerColorForKey(this.props.card.id, this.props.card.input)}
           pointsData={this.props.card.scorePoints}
           barsData={this.props.card.bars}
           domain={this.state.domain}
@@ -153,7 +129,7 @@ class TransformCard extends React.Component<Props, any>
           card={this.props.card} />
         <TransformCardPeriscope
           onDomainChange={this.handleDomainChange}
-          barColor={ColorManager.colorForKey(this.props.card.id, this.props.card.output)}
+          barColor={ColorManager.colorForKey(this.props.card.id, this.props.card.input)}
           barsData={this.props.card.bars}
           domain={this.state.domain}
           card={this.props.card} />

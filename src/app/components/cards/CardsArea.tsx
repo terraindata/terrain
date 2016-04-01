@@ -152,7 +152,7 @@ var CardsArea = React.createClass<any, any>({
 
     return (
       <div
-        className='cards-area'
+        className={'cards-area' + (this.props.topLevel ? ' cards-area-top-level' : '')}
         ref='cardsArea'>
         <LayoutManager
           layout={layout}

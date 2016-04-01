@@ -192,7 +192,6 @@ export module CardModels
   export interface ITransformCard extends ICard
   {
     input: string;
-    output: string;
     
     range: number[];
     bars: IBar[];

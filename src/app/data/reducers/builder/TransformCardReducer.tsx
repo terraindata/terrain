@@ -71,6 +71,6 @@ TransformCardReducer[ActionTypes.cards.transform.scorePoint] =
     });
 
 TransformCardReducer[ActionTypes.cards.transform.change] =
-  Util.setCardFields(['input', 'output']);
+  Util.setCardFields(['input']);
 
 export default TransformCardReducer;

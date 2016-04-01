@@ -8,17 +8,6 @@
         "id": "1",
         "group": "sitters",
         "iterator": "sitter",
-        "joins": [
-          {
-            "group": "availability",
-            "comparison": {
-              "first": "sitter.id",
-              "second": "availability.sitterId",
-              "operator": 0
-            },
-            "id": "23094"
-          }
-        ],
         "cards": 
         [
           {

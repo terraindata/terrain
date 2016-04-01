@@ -221,6 +221,7 @@ class CreateCardTool extends React.Component<Props, any>
   }
 
   render() {
+    return null; // for now
     var classes = Util.objToClassname({
       "create-card-wrapper": true,
       "create-card-open": this.state.open || this.props.alwaysOpen,

@@ -3,15 +3,18 @@
 @card-title-color: @white;
 
 .card {
- .standard-margin;
+ // .standard-margin;
   // height: 0px;
  
  @card-border-radius: 5px;
 
   .card-inner {
-    background: @light-green;
     border: 1px solid @medium-dark-green;
     border-radius: @card-border-radius;
+    
+    &.card-single {
+      border: 0px;
+    }
   }
  
  .card-title {
@@ -29,15 +32,14 @@
   @card-padding-horizontal: 15px;
   @card-padding-vertical: 7px;
   .card-title {
-    background: @dark-green;
     padding: @card-padding-vertical @card-padding-horizontal;
     color: @card-title-color;
     font-weight: @bold-font-weight;
     .transition;
     
-    &:hover {
-      background: darken(@dark-green, 5%);
-    }
+    // &:hover {
+    //   background: darken(@dark-green, 5%);
+    // }
     
     .card-arrow-icon {
       display: inline-block;
@@ -60,6 +62,10 @@
 
   .card-content{
     padding: @card-padding-vertical @card-padding-horizontal;
+  }
+  
+  .card-content-single {
+    padding: 0px;
   }
   
 	.card-sub-bar {
@@ -121,27 +127,33 @@
 }
 
 .cards-area {
-  background: #bcd4ae;
+  // background: #bcd4ae;
   .transition;
+  
+  &.cards-area-top-level {
+    padding-top: 2 * @standard-margin;
+    padding-bottom: 2 * @standard-margin;
+    padding-right: @standard-margin;
+  }
  
   .cards-area {
     // for nested cards
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
     margin-right: -2.5 * @standard-margin - 1px;
-    margin-left: -1 * @standard-margin;
-    padding-left: 2px;
+    // margin-left: -1 * @standard-margin;
+    // padding-left: 2px;
     // padding-bottom: @standard-margin;
-    border: 1px solid @fresh-moss;
+    // border: 1px solid @fresh-moss;
     border-right: 0px;
     
     .card {
       margin-right: 0px;
     }
     
-    .nested-create-card-tool-wrapper {
-      padding-left: @standard-margin + 1px;
-    }
+    // .nested-create-card-tool-wrapper {
+    //   padding-left: @standard-margin + 1px;
+    // }
   } 
   
   .card .card {

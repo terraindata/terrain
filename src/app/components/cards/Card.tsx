@@ -65,6 +65,22 @@ var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
 var CARD_TYPES_WITH_CARDS = ['from', 'let', 'count', 'min', 'max', 'avg', 'exists', 'parentheses']; // 'let'
 
+// title is first, body is second
+var BGS: {[key: string]: string[]} = 
+{
+  none: ["#B45759", "#EA7E81"],
+  from: ["#89B4A7", "#C1EADE"],
+  filter: ["#7EAAB3", "#B9E1E9"],
+  count: ["#70B1AC", "#D2F3F0"],
+  select: ["#8AC888", "#B7E9B5"],
+  let: ["#C0C0BE", "#E2E2E0"],
+  transform: ["#E7BE70", "#EDD8B1"],
+  score: ["#9DC3B8", "#D1EFE7"],
+  sort: ["#C5AFD5", "#EAD9F7"],
+  skip: ["#CDCF85", "#F5F6B3"],
+  parentheses: ["#9eb292", "#d6f2c7"],
+};
+
 var Card = React.createClass({
 	mixins: [PanelMixin, CardsContainerMixin],
 
@@ -148,26 +164,26 @@ var Card = React.createClass({
 		{
 			case 'select':
 				CardComponent = SelectCard;
-				subBar = 
-				{
-					content: '+',
-					onClick: () => 
-					{
-						Actions.cards.select.create(this.props.card);
-					},
-				};
+				// subBar = 
+				// {
+				// 	content: '+',
+				// 	onClick: () => 
+				// 	{
+				// 		Actions.cards.select.create(this.props.card);
+				// 	},
+				// };
 
 				break;
 			case 'from':
 				CardComponent = FromCard;
-				subBar =
-				{
-					content: '+',
-					onClick: () => 
-					{
-						Actions.cards.from.join.create(this.props.card);
-					},
-				};
+				// subBar =
+				// {
+				// 	content: '+',
+				// 	onClick: () => 
+				// 	{
+				// 		Actions.cards.from.join.create(this.props.card);
+				// 	},
+				// };
 
 				break;
    case 'sort':
@@ -175,14 +191,14 @@ var Card = React.createClass({
      break;
    case 'filter':
     CardComponent = FilterCard;
-    subBar = 
-        {
-          content: '+',
-          onClick: () => 
-          {
-            Actions.cards.filter.create(this.props.card);
-          },
-        };
+    // subBar = 
+    //     {
+    //       content: '+',
+    //       onClick: () => 
+    //       {
+    //         Actions.cards.filter.create(this.props.card);
+    //       },
+    //     };
       break;
     case 'let':
       CardComponent = LetCard;
@@ -192,11 +208,11 @@ var Card = React.createClass({
       break;
     case 'score':
       CardComponent = ScoreCard;
-      subBar =
-      {
-        content: '+',
-        onClick: () => Actions.cards.score.create(this.props.card),
-      }
+      // subBar =
+      // {
+      //   content: '+',
+      //   onClick: () => Actions.cards.score.create(this.props.card),
+      // }
       break;
     case 'count':
     case 'sum':
@@ -215,7 +231,7 @@ var Card = React.createClass({
     }
 
 		var contentToDisplay = (
-			<div className='card-content'>
+			<div className={'card-content' + (this.props.singleCard ? ' card-content-single' : '')}>
 				{content}
 			</div>
 		);
@@ -253,14 +269,47 @@ var Card = React.createClass({
       title = '( )';
     }
     
+    if(BGS[this.props.card.type])
+    {
+      var titleStyle = {
+        background: BGS[this.props.card.type][0],
+      };
+      var bodyStyle = {
+        background: BGS[this.props.card.type][1],
+        borderColor: BGS[this.props.card.type][0],
+      };
+    }
+    else
+    {
+      var titleStyle = {
+        background: BGS['none'][0],
+      };
+      var bodyStyle = {
+        background: BGS['none'][1],
+        borderColor: BGS['none'][0],
+      }; 
+    }
+    
 		return this.renderPanel((
-			<div className={'card ' + (!this.state.open ? 'card-closed' : '')} ref={this.state.ref} rel={'card-' + this.props.card.id}>
+			<div
+        className={'card card-' + this.props.card.type + (!this.state.open ? ' card-closed' : '')}
+        ref={this.state.ref}
+        rel={'card-' + this.props.card.id}
+        >
         { !this.props.singleCard &&
           <CreateCardTool index={this.props.index} parentId={this.props.parentId} />
         }
-				<div className='card-inner'>
+				<div
+          className={'card-inner ' + (this.props.singleCard ? 'card-single' : '')}
+          style={bodyStyle}
+        >
           { !this.props.singleCard &&
-  					<div className='card-title' ref='handle' onClick={this.handleTitleClick}>
+  					<div
+              className='card-title'
+              ref='handle'
+              onClick={this.handleTitleClick}
+              style={titleStyle}
+              >
               { isFlat ? null : <ArrowIcon className="card-arrow-icon" /> }
               { title }
               <Menu options={menuOptions} />

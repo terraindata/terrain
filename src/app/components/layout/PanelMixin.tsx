@@ -312,16 +312,16 @@ var Panel = {
     this.setState({ dragging: false });
     this.stopScrollingParent();
     
-		if(this.props.onDrop)
-		{
-			this.props.onDrop({
-				dx: x - this.state.ox,
-				dy: y - this.state.oy,
-			}, { 
-				x: this.state.ox,
-				y: this.state.oy,
-			});
-		}
+    if(this.props.onDrop)
+    {
+      this.props.onDrop({
+        dx: x - this.state.ox,
+        dy: y - this.state.oy,
+      }, { 
+        x: this.state.ox,
+        y: this.state.oy,
+      });
+    }
     
      if(this.props.dragHandleRef)
     {
@@ -330,12 +330,6 @@ var Panel = {
       dragHandle.style.top = '0px';
     }
     
-    if(this.props.useDropZoneManager)
-    {
-      this.refs.panel.parentNode.style.width = null;
-      this.refs.panel.parentNode.style.height = null;
-      $(".builder-column-content-scroll").children().css('padding-bottom', '');
-    }
 	},
 
 
@@ -416,6 +410,13 @@ var Panel = {
 
 	up(event) 
 	{
+    if(this.props.useDropZoneManager)
+    {
+      this.refs.panel.parentNode.style.width = null;
+      this.refs.panel.parentNode.style.height = null;
+      $(".builder-column-content-scroll").children().css('padding-bottom', '');
+    }
+    
     if(!this.handleDropZoneManager(event, true))
     {
       this.stopDrag(event.pageX, event.pageY);

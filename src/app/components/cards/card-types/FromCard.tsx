@@ -180,8 +180,8 @@ class FromCard extends React.Component<Props, any>
         },
         {
           content: (
-            <div className='card-arrow'>
-              <ArrowIcon />
+            <div className='card-assignment'>
+              as
             </div>
           ),
           width: 50,
@@ -204,7 +204,7 @@ class FromCard extends React.Component<Props, any>
           drag_y={true}>
           <LayoutManager layout={layout} />
         </CardField>
-        { this.props.card.joins.map(this.renderJoin) }
+        { this.props.card.joins && this.props.card.joins.map(this.renderJoin) }
         { this.renderCards() }
       </div>
 		);
