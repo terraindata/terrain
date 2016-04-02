@@ -5,6 +5,7 @@
 .card {
  // .standard-margin;
   // height: 0px;
+  position: relative;
  
  @card-border-radius: 5px;
 
@@ -111,6 +112,49 @@
       margin-top: 5px;
       width: 42px;
       fill: #fff;
+    }
+  }
+  
+  .card-add-card-btn {
+    z-index: 999;
+    
+    @w: 20px;
+    width: @w;
+    height: @w;
+    border-radius: @w;
+    text-align: center;
+    background: #fff;
+    position: absolute;
+    left: calc(~"50% - @{w} / 2");
+    padding-top: 1px;
+    box-sizing: border-box;
+    color: @bright-green;
+    opacity: 0;
+    .transition;
+    
+    &:not(.card-add-card-btn-bottom) {
+      top: calc(@w * -0.5);
+    }
+    &.card-add-card-btn-bottom {
+      bottom: calc(@w * -0.5);
+    }
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+  
+  &.card-hovering {
+    .card {
+      .card-add-card-btn {
+        opacity: 0;
+      }
+    }
+    .card-add-card-btn {
+      opacity: 0.9;
+      &:hover {
+        opacity: 1;
+      }
     }
   }
 }

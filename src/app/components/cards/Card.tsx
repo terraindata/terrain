@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 require('./Card.less');
 
+import * as $ from 'jquery';
+import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
@@ -60,26 +62,22 @@ import CreateCardTool from './CreateCardTool.tsx';
 import Menu from '../common/Menu.tsx';
 import Actions from "../../data/Actions.tsx";
 import CardsContainerMixin from "./CardsContainerMixin.tsx";
+import { CardColors } from './../../CommonVars.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
 var CARD_TYPES_WITH_CARDS = ['from', 'let', 'count', 'min', 'max', 'avg', 'exists', 'parentheses']; // 'let'
 
-// title is first, body is second
-var BGS: {[key: string]: string[]} = 
-{
-  none: ["#B45759", "#EA7E81"],
-  from: ["#89B4A7", "#C1EADE"],
-  filter: ["#7EAAB3", "#B9E1E9"],
-  count: ["#70B1AC", "#D2F3F0"],
-  select: ["#8AC888", "#B7E9B5"],
-  let: ["#C0C0BE", "#E2E2E0"],
-  transform: ["#E7BE70", "#EDD8B1"],
-  score: ["#9DC3B8", "#D1EFE7"],
-  sort: ["#C5AFD5", "#EAD9F7"],
-  skip: ["#CDCF85", "#F5F6B3"],
-  parentheses: ["#9eb292", "#d6f2c7"],
+var hoverCard = (event) => {
+  $('.card-hovering').removeClass('card-hovering');
+  var f = (n) => n && !n.is('body') && (n.hasClass('card') ? n : f(n.parent()));
+  var c = f($(event.target));
+  if(c)
+  {
+    c.addClass('card-hovering');
+  }
 };
+$('body').mousemove(_.throttle(hoverCard, 100));
 
 var Card = React.createClass({
 	mixins: [PanelMixin, CardsContainerMixin],
@@ -152,6 +150,42 @@ var Card = React.createClass({
   
   handleCopy()
   {
+  },
+  
+  addCardBelow()
+  {
+    this.setState({
+      addingCardBelow: !this.state.addingCardBelow,
+    });
+  },
+  
+  addCardAbove()
+  {
+    this.setState({
+      addingCardAbove: !this.state.addingCardAbove,
+    });
+  },
+  
+  minimizeCreateCard()
+  {
+    this.setState({
+      addingCardAbove: false,
+      addingCardBelow: false,
+    });
+  },
+  
+  renderAddCard(isBottom?: boolean)
+  {
+    return (
+      <div
+        className={'card-add-card-btn' + (isBottom ? ' card-add-card-btn-bottom' : '')}
+        onClick={isBottom ? this.addCardBelow : this.addCardAbove}
+      >
+        {
+          (isBottom ? this.state.addingCardBelow : this.state.addingCardAbove) ? '-' : '+'
+        }
+      </div>
+    );
   },
 
 	render() {
@@ -269,37 +303,43 @@ var Card = React.createClass({
       title = '( )';
     }
     
-    if(BGS[this.props.card.type])
+    if(CardColors[this.props.card.type])
     {
-      var titleStyle = {
-        background: BGS[this.props.card.type][0],
+      var titleStyle: React.CSSProperties = {
+        background: CardColors[this.props.card.type][0],
       };
-      var bodyStyle = {
-        background: BGS[this.props.card.type][1],
-        borderColor: BGS[this.props.card.type][0],
+      var bodyStyle: React.CSSProperties = {
+        background: CardColors[this.props.card.type][1],
+        borderColor: CardColors[this.props.card.type][0],
       };
     }
     else
     {
-      var titleStyle = {
-        background: BGS['none'][0],
+      var titleStyle: React.CSSProperties = {
+        background: CardColors['none'][0],
       };
-      var bodyStyle = {
-        background: BGS['none'][1],
-        borderColor: BGS['none'][0],
+      var bodyStyle: React.CSSProperties = {
+        background: CardColors['none'][1],
+        borderColor: CardColors['none'][0],
       }; 
     }
     
 		return this.renderPanel((
 			<div
-        className={'card card-' + this.props.card.type + (!this.state.open ? ' card-closed' : '')}
+        className={'card' + (!this.state.open ? ' card-closed' : '')}
         ref={this.state.ref}
         rel={'card-' + this.props.card.id}
         >
         { !this.props.singleCard &&
-          <CreateCardTool index={this.props.index} parentId={this.props.parentId} />
+          <CreateCardTool
+            index={this.props.index}
+            parentId={this.props.parentId}
+            open={this.state.addingCardAbove}
+            onMinimize={this.minimizeCreateCard}
+          />
         }
-				<div
+				{ this.renderAddCard() }
+        <div
           className={'card-inner ' + (this.props.singleCard ? 'card-single' : '')}
           style={bodyStyle}
         >
@@ -322,6 +362,15 @@ var Card = React.createClass({
             </div>
           }
 				</div>
+        { this.renderAddCard(true) }
+        { !this.props.singleCard &&
+          <CreateCardTool
+            index={this.props.index + 1}
+            parentId={this.props.parentId}
+            open={this.state.addingCardBelow}
+            onMinimize={this.minimizeCreateCard}
+          />
+        }
 			</div>
 			));
 	},

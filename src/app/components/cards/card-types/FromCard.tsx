@@ -163,7 +163,8 @@ class FromCard extends React.Component<Props, any>
   renderCards()
   {
     return <CardsArea cards={this.props.card.cards} parentId={this.props.card.id} spotlights={this.props.spotlights} 
-      draggingOver={this.props.draggingOver} draggingPlaceholder={this.props.draggingPlaceholder} />;
+      draggingOver={this.props.draggingOver} draggingPlaceholder={this.props.draggingPlaceholder}
+      />;
   }
 
 	render() {

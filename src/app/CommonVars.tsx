@@ -69,3 +69,25 @@ export var CardTypes: string[]  =
  // 'update',
  // 'replace',
 ];
+
+export var CardColors = 
+// title is first, body is second
+{
+  none: ["#B45759", "#EA7E81"],
+  from: ["#89B4A7", "#C1EADE"],
+  filter: ["#7EAAB3", "#B9E1E9"],
+  count: ["#70B1AC", "#D2F3F0"],
+  select: ["#8AC888", "#B7E9B5"],
+  let: ["#C0C0BE", "#E2E2E0"],
+  transform: ["#E7BE70", "#EDD8B1"],
+  score: ["#9DC3B8", "#D1EFE7"],
+  sort: ["#C5AFD5", "#EAD9F7"],
+  skip: ["#CDCF85", "#F5F6B3"],
+  parentheses: ["#b37e7e", "#daa3a3"],
+  max: ["#8299b8", "#acc6ea"],
+  min: ["#cc9898", "#ecbcbc"],
+  sum: ["#8dc4c1", "#bae8e5"],
+  avg: ["#a2b37e", "#c9daa6"],
+  exists: ["#a98abf", "#cfb3e3"],
+  if: ["#7eb397", "#a9dec2"],
+};

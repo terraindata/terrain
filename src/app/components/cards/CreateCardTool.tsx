@@ -46,7 +46,7 @@ require('./CreateCardTool.less')
 import * as React from 'react';
 import Actions from "../../data/Actions.tsx";
 import Util from '../../util/Util.tsx';
-import { CardTypes } from './../../CommonVars.tsx';
+import { CardTypes, CardColors } from './../../CommonVars.tsx';
 import CreateLine from "../common/CreateLine.tsx";
 
 var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
@@ -54,18 +54,15 @@ var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 
 // Coordinate these with .less
 var buttonPadding = 12;
-var buttonWidth = 110 + 2 * buttonPadding;
-var buttonHeight = 40 + buttonPadding;
-var moreButtonWidth = 80;
-var fieldHeight = 35 + buttonPadding;
+var minButtonWidth = 120;
 
 interface Props {
   index: number;
-  alwaysOpen?: boolean;
-  alwaysShowAll?: boolean;
+  open?: boolean;
   parentId: string;
   dy?: number;
   className?: string;
+  onMinimize?: () => void;
 }
 
 class CreateCardTool extends React.Component<Props, any>
@@ -75,45 +72,22 @@ class CreateCardTool extends React.Component<Props, any>
     super(props);
     this.state = {
       open: false,
-      showAll: false,
-      search: "",
     };
-    this.toggleOpen = this.toggleOpen.bind(this);
-    this.toggleShowAll = this.toggleShowAll.bind(this);
-    this.handleKeydown = this.handleKeydown.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    
-    if(this.props.alwaysShowAll)
-    {
-      this.state.showAll = true;
-    }
   }
   
   createCardFactory(type): () => void {
     return () => {
-      this.refs['field']['value'] = '';
       this.setState({
         open: false,
-        search: "",
       });
+      
+      if(this.props.open && this.props.onMinimize)
+      {
+        this.props.onMinimize();
+      }
       
       Actions.cards.create(this.props.parentId, type, this.props.index);
     }
-  }
-  
-  toggleOpen() {
-    this.setState({
-      open: !this.state.open,
-      showAll: false,
-    });
-    
-    this.refs['field']['focus']();
-  }
-  
-  toggleShowAll() {
-    this.setState({
-      showAll: !this.state.showAll,
-    });
   }
   
   componentWillMount() {
@@ -123,110 +97,47 @@ class CreateCardTool extends React.Component<Props, any>
     }, 150);
   }
   
-  handleKeydown(event) {
-    if(event.keyCode === 13)
-    {
-      // enter
-      var type = CardTypes.reduce((answer, type): any => {
-        if(!answer && !this.hideButton(type))
-        {
-          return type;
-        }
-        return answer;
-      }, false);
-      
-      if(type && typeof type === 'string')
-      {
-        this.createCardFactory(type)();
-      }
-    }
-  }
-  
-  handleChange(event) {
-    this.setState({
-      search: event.target.value,
-    });
-  }
-  
-  hideButton(type: string): boolean
-  {
-    return this.state.search !== "" &&
-      this.state.search !== type.substr(0, this.state.search.length);
-  }
-  
   renderCardSelector() {
-    var numToShow = 9999;
-    if(this.state.showAll || this.props.alwaysShowAll)
+    var buttonWidth = minButtonWidth;
+    if(this.refs['ccWrapper'])
     {
-      if(this.refs['ccWrapper'] && this.refs['ccWrapper']['offsetWidth'])
-      {
-        var overrideHeight: any = 2 * buttonPadding + 2 + fieldHeight +
-          buttonHeight * Math.ceil(CardTypes.length * buttonWidth /
-           (this.refs['ccWrapper']['offsetWidth'] - 2 * buttonPadding));
-      }
-      else
-      {
-        overrideHeight = 'auto';
-        numToShow = 9999;
-      }
+      var totalWidth = this.refs['ccWrapper']['getBoundingClientRect']().width - buttonPadding;
+      var numButtons = Math.floor(totalWidth / minButtonWidth);
+      var remainder = totalWidth % minButtonWidth;
+      buttonWidth = minButtonWidth + remainder / numButtons - buttonPadding;
     }
-    else
-    {
-      if(this.refs['ccWrapper'] && this.refs['ccWrapper']['offsetWidth'])
-      {
-        var totalWidth = this.refs['ccWrapper']['offsetWidth'] - moreButtonWidth;
-        numToShow = Math.floor(totalWidth / buttonWidth);
-      }
-    }
-    
-    
-    var classes = Util.objToClassname({
-      "create-card-selector": true,
-      "create-card-selector-show-all": this.state.showAll,
-    });
     
     return (
-     <div className={classes} style={{height: overrideHeight}}>
-       <div className="create-card-field-wrapper">
-         <div className="create-card-plus">
-           +
-         </div>
-         <input type="text" ref="field" className="create-card-field" placeholder="Type card name here, or select from the suggestions below" onKeyDown={this.handleKeydown} onChange={this.handleChange} />
-       </div>
-       <div className="create-card-buttons-wrapper">
+     <div className='create-card-selector'>
+       <div className='create-card-selector-inner'>
          {
-           CardTypes.map((type, index) => this.hideButton(type) ? null : (
-             <div className="create-card-button" key={type} onClick={this.createCardFactory(type)}>
+           CardTypes.map((type, index) => (
+             <a
+               className="create-card-button"
+               key={type}
+               onClick={this.createCardFactory(type)}
+               style={{
+                 background: CardColors[type][0],
+                 borderColor: CardColors[type][1],
+                 width: buttonWidth,
+               }}
+             >
                <div className="create-card-button-inner">
                  { type === 'parentheses' ? '( )' : type }
                </div>
-             </div>
+             </a>
            ))
          }
-         <div className="create-card-more-button" onClick={this.toggleShowAll}>
-           <div className="create-card-more-button-inner">
-             Show All
-           </div>
-         </div>
        </div>
      </div>
      );
   }
   
-  renderCreateCardRow() {
-    if(this.props.alwaysOpen)
-    {
-      return null;
-    }
-    
-    return <CreateLine open={this.state.open} onClick={this.toggleOpen} />;
-  }
-
   render() {
     var classes = Util.objToClassname({
       "create-card-wrapper": true,
-      "create-card-open": this.state.open || this.props.alwaysOpen,
-      "create-card-closed": !this.state.open && !this.props.alwaysOpen,
+      "create-card-open": this.state.open || this.props.open,
+      "create-card-closed": !this.state.open && !this.props.open,
     });
     classes += ' ' + this.props.className;
     
@@ -239,7 +150,6 @@ class CreateCardTool extends React.Component<Props, any>
       }
     }
     
-        // { this.renderCreateCardRow() }
     return (
       <div className={classes} ref="ccWrapper" style={style}>
         { this.renderCardSelector() }

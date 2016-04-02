@@ -46,6 +46,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
 var _ = require("underscore");
+import * as $ from 'jquery';
 
 // Data
 import Store from "./../../data/Store.tsx";
