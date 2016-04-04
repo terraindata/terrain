@@ -135,6 +135,13 @@ var TransformChart = {
       }
       d3.select(el).select('.right-menu').remove();
     });
+    
+    var drawMenu = this._drawMenu;
+    d3.select(el).select('.inner-svg').on('contextmenu', function() {
+      d3.event['preventDefault']();
+      drawMenu(el, d3.mouse(this), '+ Point', state.onCreate, scales);
+      return false;
+    });
   },
   
   destroy(el)
@@ -623,7 +630,7 @@ var TransformChart = {
     del.on('mouseleave', offFn);
   },
   
-  _drawMenu(el, mouse, text, fn)
+  _drawMenu(el, mouse, text, fn, scales)
   {
     d3.select(el).select('.right-menu').remove();
     
@@ -655,13 +662,18 @@ var TransformChart = {
       .duration(50)
       .attr('opacity', 1);
     
-    menu.on('mousedown', fn);
+    var isvg = d3.select(el).select('.inner-svg');
+    menu.on('mousedown', () => fn(
+      scales.x.invert(mouse[0] + parseInt(isvg.attr('x'), 10)),
+      scales.realPointY.invert(mouse[1] + parseInt(isvg.attr('y'), 10))
+    ));
   },
   
   _rightClickFactory: (el, onDelete, scales, drawMenu) => function(point)
   {
     d3.event['preventDefault']();
-    drawMenu(el, d3.mouse(this), 'Delete', () => onDelete(point.id));
+    d3.event['stopPropagation']();
+    drawMenu(el, d3.mouse(this), 'Delete', () => onDelete(point.id), scales);
     return false;
   },
   

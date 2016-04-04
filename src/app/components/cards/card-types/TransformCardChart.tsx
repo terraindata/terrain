@@ -221,10 +221,17 @@ class TransformCardChart extends React.Component<Props, any>
     } 
     else
     {
-      console.log('do scorepoints');
       Actions.cards.transform.scorePoints(this.props.card, arr);
-      console.log('end scorepoints');
     }
+  }
+  
+  updatePointsData(newPointsData)
+  {
+    TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState({
+      pointsData: newPointsData,
+    }));
+    
+    this.dispatchAction(newPointsData);
   }
   
   onPointMove(scorePointId, newScore)
@@ -241,12 +248,7 @@ class TransformCardChart extends React.Component<Props, any>
       return scorePoint;
     });
     
-    var el = ReactDOM.findDOMNode(this);
-    TransformChart.update(el, this.getChartState({
-      pointsData: newPointsData,
-    }));
-    
-    this.dispatchAction(newPointsData);
+    this.updatePointsData(newPointsData);
   }
   
   onLineClick(x, y)
@@ -264,17 +266,12 @@ class TransformCardChart extends React.Component<Props, any>
       point.score = Util.valueMinMax(point.score + scoreDiff, 0, 1);
       return point;
     });
-    this.dispatchAction(newPointsData);
-
-    var el = ReactDOM.findDOMNode(this);
-    TransformChart.update(el, this.getChartState({
-      pointsData: newPointsData,
-    }));
+    
+    this.updatePointsData(newPointsData);
   }
   
   onDelete(pointId)
   {
-    console.log('delete start');
     var newPointsData = this.props.pointsData.reduce((pointsData, point) => {
       if(point.id !== pointId && ! this.state.selectedPointIds.find(id => id === point.id))
       {
@@ -283,17 +280,24 @@ class TransformCardChart extends React.Component<Props, any>
       return pointsData;
     }, []);
     
-    TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState({
-      pointsData: newPointsData,
-    }));
-    
-    this.dispatchAction(newPointsData);
-    console.log('delete end');
+    this.updatePointsData(newPointsData);
   }
   
-  onCreate(x, y)
+  onCreate(value, score)
   {
-    console.log(x,y);
+    var index = 0;
+    while(this.props.card.scorePoints[index] && this.props.card.scorePoints[index].value < value)
+    {
+      index ++;
+    }
+    var newPoints = Util.deeperCloneArr(this.props.pointsData);
+    newPoints.splice(index, 0, {
+      value: value,
+      score: score,
+      id: 'sp-' + Util.randInt(123456789),
+    });
+    
+    this.updatePointsData(newPoints);
   }
   
   getChartState(overrideState?: any) {

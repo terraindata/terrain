@@ -70,14 +70,12 @@ var CARD_TYPES_WITH_CARDS = ['from', 'let', 'count', 'min', 'max', 'avg', 'exist
 
 var hoverCard = (event) => {
   $('.card-hovering').removeClass('card-hovering');
-  console.log('h');
   var f = (n, count) => count > 100 ? null : (n && !n.is('body') && (n.hasClass('card') ? n : f(n.parent(), count + 1)));
   var c = f($(event.target), 0);
   if(c)
   {
     c.addClass('card-hovering');
   }
-  console.log('ho');
 };
 $('body').mousemove(_.throttle(hoverCard, 100));
 
