@@ -125,7 +125,14 @@ var TransformChart = {
     var barsData = state._cache.computedBarsData;
     var scales = this._scales(el, state.domain, barsData);
     this._draw(el, scales, barsData, state.pointsData, state.onMove, state.colors,
-      state.spotlights, state.inputKey, state.onLineClick, state.onLineMove);
+      state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect);
+    
+    d3.select(el).on('mousedown', () => {
+      if(!d3.event['shiftKey'])
+      {
+        state.onSelect(null);
+      }
+    });
   },
   
   destroy(el)
@@ -510,6 +517,10 @@ var TransformChart = {
     var y = scales.realPointY.invert(m[1]);
     onClick(x,y);
     
+    var line = d3.select(this);
+    var initialClasses = line.attr('class');
+    line.attr('class', initialClasses + ' line-active');
+    
     var del = d3.select(el).select('.inner-svg');
     var move = function(event) {
       onMove(x, scales.realPointY.invert(d3.mouse(this)[1]));
@@ -524,6 +535,7 @@ var TransformChart = {
       del.on('mouseup', null);
       del.on('touchend', null);
       del.on('mouseleave', null);
+      line.attr('class', initialClasses);
     };
     
     del.on('mouseup', offFn);
@@ -546,7 +558,16 @@ var TransformChart = {
   },
   
   // needs to be "function" for d3.mouse(this)
-  _mousedownFactory: (el, onMove, scale) => function(event) {
+  _mousedownFactory: (el, onMove, scale, onSelect) => function(d) {
+    if(d3.event['shiftKey'])
+    {
+      onSelect(d.id);
+    }
+    else
+    {
+      onSelect(null);
+    }
+    
     var del = d3.select(el);
     var point = d3.select(this);
     var startMouseY = d3.mouse(this)[1] 
@@ -555,6 +576,7 @@ var TransformChart = {
     
     var initialClasses = point.attr('class');
     point.attr('class', initialClasses + ' point-active');
+    
     
     var move = function(event) {
       var diffY = d3.mouse(this)[1] - startMouseY;
@@ -584,16 +606,15 @@ var TransformChart = {
     del.on('mouseleave', offFn);
   },
   
-  _drawPoints(el, scales, pointsData, onMove, color)
+  _drawPoints(el, scales, pointsData, onMove, color, onSelect)
   {
     var g = d3.select(el).selectAll('.points');
     
-    var point = g.selectAll('.point')
+    var point = g.selectAll('circle')
       .data(pointsData, (d) => d['id']);
     
     point.enter()
-      .append('circle')
-      .attr('class', 'point');
+      .append('circle');
     
     point
       .attr('cx', (d) => scales.realX(d['x']))
@@ -601,18 +622,20 @@ var TransformChart = {
       .attr('fill', '#fff')
       .attr('stroke', color)
       .attr('stroke-width', '3px')
+      .attr('class', (d) => 'point' + (d['selected'] ? ' point-selected' : ''))
+      // .attr('class', (d) => d['selected'] ? 'point-select' : '')
       .attr('r',  10);
     
     point
       .attr('_id', (d) => d['id']);
       
-    point.on('mousedown', this._mousedownFactory(el, onMove, scales.realPointY));
-    point.on('touchstart', this._mousedownFactory(el, onMove, scales.realPointY));
+    point.on('mousedown', this._mousedownFactory(el, onMove, scales.realPointY, onSelect));
+    point.on('touchstart', this._mousedownFactory(el, onMove, scales.realPointY, onSelect));
     
     point.exit().remove();
   },
   
-  _draw(el, scales, barsData, pointsData, onMove, colors, spotlights, inputKey, onLineClick, onLineMove)
+  _draw(el, scales, barsData, pointsData, onMove, colors, spotlights, inputKey, onLineClick, onLineMove, onSelect)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -623,7 +646,7 @@ var TransformChart = {
     this._drawBars(el, scales, barsData, colors.bar);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
     this._drawLines(el, scales, pointsData, colors.line, onLineClick, onLineMove);
-    this._drawPoints(el, scales, pointsData, onMove, colors.line);
+    this._drawPoints(el, scales, pointsData, onMove, colors.line, onSelect);
   },
   
   _scales(el, domain, barsData)

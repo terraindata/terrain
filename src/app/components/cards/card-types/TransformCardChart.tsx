@@ -70,7 +70,7 @@ class TransformCardChart extends React.Component<Props, any>
   {
     super(props);
     this.onPointMove = this.onPointMove.bind(this);
-    Util.bind(this, ['onPointMove', 'dispatchAction', 'onLineClick', 'onLineMove']);
+    Util.bind(this, ['onPointMove', 'dispatchAction', 'onLineClick', 'onLineMove', 'onSelect']);
     // Util.throttle(this, ['dispatchAction'], 500);
     this.dispatchAction = _.debounce(this.dispatchAction, 500);
     
@@ -83,6 +83,7 @@ class TransformCardChart extends React.Component<Props, any>
       lineColor: props.lineColor,
       spotlights: props.spotlights,
       inputKey: props.inputKey,
+      selectedPointIds: [],
     }
   }
   
@@ -183,6 +184,25 @@ class TransformCardChart extends React.Component<Props, any>
     
   }
   
+  onSelect(pointId)
+  {
+    if(!pointId)
+    {
+      // things got unselected
+      this.setState({
+        selectedPointIds: [],
+      });
+    }
+    else
+    {
+      this.setState({
+        selectedPointIds: this.state.selectedPointIds.concat([pointId])
+      })
+    }
+    
+    TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState());
+  }
+  
   dispatchAction(arr)
   {
     if(arr[0] === true)
@@ -200,7 +220,6 @@ class TransformCardChart extends React.Component<Props, any>
     } 
     else
     {
-      console.log(arr);
       Actions.cards.transform.scorePoints(this.props.card, arr);
     }
   }
@@ -208,16 +227,23 @@ class TransformCardChart extends React.Component<Props, any>
   onPointMove(scorePointId, newScore)
   {
     newScore = Util.valueMinMax(newScore, 0, 1);
-    var newPointsData = Util.deeperCloneArr(this.props.pointsData);
-    var pointIndex = newPointsData.findIndex(scorePoint => scorePoint.id === scorePointId);
-    newPointsData[pointIndex].score = newScore;
+    var pointIndex = this.props.pointsData.findIndex(scorePoint => scorePoint.id === scorePointId);
+    var scoreDiff = newScore - this.props.pointsData[pointIndex].score;
+    
+    var newPointsData = Util.deeperCloneArr(this.props.pointsData).map(scorePoint => {
+      if(scorePoint.id === scorePointId || this.state.selectedPointIds.find(id => id === scorePoint.id))
+      {
+        scorePoint.score = Util.valueMinMax(scorePoint.score + scoreDiff, 0, 1);
+      }
+      return scorePoint;
+    });
     
     var el = ReactDOM.findDOMNode(this);
     TransformChart.update(el, this.getChartState({
       pointsData: newPointsData,
     }));
     
-    this.dispatchAction([true, scorePointId, newScore]);
+    this.dispatchAction(newPointsData);
   }
   
   onLineClick(x, y)
@@ -226,13 +252,6 @@ class TransformCardChart extends React.Component<Props, any>
       lineMoving: true,
       initialLineY: y,
     })
-    // nada señor
-    // Actions.cards.transform.scorePoint(this.props.card,
-    // {
-    //   id: null,
-    //   value: x,
-    //   score: y,
-    // });
   }
   
   onLineMove(x, y)
@@ -257,6 +276,7 @@ class TransformCardChart extends React.Component<Props, any>
       x: scorePoint.value,
       y: scorePoint.score,
       id: scorePoint.id,
+      selected: !! this.state.selectedPointIds.find(id => id === scorePoint.id),
     }));
     
     var chartState = {
@@ -272,6 +292,7 @@ class TransformCardChart extends React.Component<Props, any>
       },
       spotlights: overrideState.spotlights || this.props.spotlights,
       inputKey: overrideState.inputKey || this.props.inputKey,
+      onSelect: this.onSelect,
     };
     
     return chartState;
