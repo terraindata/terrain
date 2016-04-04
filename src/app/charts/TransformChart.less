@@ -22,15 +22,12 @@
     transition: stroke-width 0.15s, stroke 0.15s;
     
     &:hover,
-    &.point-active {
+    &[active="1"] {
       stroke-width: 5px;
     }
     
-    &.point-selected {
-      stroke: #fc5218;
-    }
-    
-    &.point-active {
+    &.point-selected,
+    &[active="1"] {
       stroke: #fc5218;
     }
   }
@@ -68,6 +65,27 @@
     .spotlight-tooltip,
     .spotlight-tooltip-bg {
       opacity: 1;
+    }
+  }
+  
+  .right-menu {
+    rect {
+      fill: rgba(0,0,0,0.75);
+      .transition;
+    }
+    
+    &:hover {
+      rect {
+        fill: rgba(0,0,0,0.95);
+      }
+    }
+    
+    text {
+      fill: #fff;
+      font-size: 16px;
+      // opacity: 0.95;
+      font-weight: 200;
+      letter-spacing: 0.5px;
     }
   }
 }

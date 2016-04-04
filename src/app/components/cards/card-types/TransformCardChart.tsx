@@ -269,6 +269,16 @@ class TransformCardChart extends React.Component<Props, any>
     }));
   }
   
+  onDelete(pointId)
+  {
+    console.log(pointId);
+  }
+  
+  onCreate(x, y)
+  {
+    console.log(x,y);
+  }
+  
   getChartState(overrideState?: any) {
     overrideState = overrideState || {};
     
@@ -293,6 +303,8 @@ class TransformCardChart extends React.Component<Props, any>
       spotlights: overrideState.spotlights || this.props.spotlights,
       inputKey: overrideState.inputKey || this.props.inputKey,
       onSelect: this.onSelect,
+      onDelete: this.onDelete,
+      onCreate: this.onCreate,
     };
     
     return chartState;
