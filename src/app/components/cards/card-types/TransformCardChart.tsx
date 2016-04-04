@@ -70,7 +70,8 @@ class TransformCardChart extends React.Component<Props, any>
   {
     super(props);
     this.onPointMove = this.onPointMove.bind(this);
-    Util.bind(this, ['onPointMove', 'dispatchAction', 'onLineClick', 'onLineMove', 'onSelect']);
+    Util.bind(this, ['onPointMove', 'dispatchAction', 'onLineClick', 'onLineMove', 'onSelect',
+      'onDelete', 'onCreate']);
     // Util.throttle(this, ['dispatchAction'], 500);
     this.dispatchAction = _.debounce(this.dispatchAction, 500);
     
@@ -271,7 +272,19 @@ class TransformCardChart extends React.Component<Props, any>
   
   onDelete(pointId)
   {
-    console.log(pointId);
+    var newPointsData = this.props.pointsData.reduce((pointsData, point) => {
+      if(point.id !== pointId && ! this.state.selectedPointIds.find(id => id === point.id))
+      {
+        pointsData.push(point);
+      }
+      return pointsData;
+    }, []);
+    
+    TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState({
+      pointsData: newPointsData,
+    }));
+    
+    this.dispatchAction(newPointsData);
   }
   
   onCreate(x, y)
