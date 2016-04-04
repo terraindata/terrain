@@ -221,7 +221,9 @@ class TransformCardChart extends React.Component<Props, any>
     } 
     else
     {
+      console.log('do scorepoints');
       Actions.cards.transform.scorePoints(this.props.card, arr);
+      console.log('end scorepoints');
     }
   }
   
@@ -272,6 +274,7 @@ class TransformCardChart extends React.Component<Props, any>
   
   onDelete(pointId)
   {
+    console.log('delete start');
     var newPointsData = this.props.pointsData.reduce((pointsData, point) => {
       if(point.id !== pointId && ! this.state.selectedPointIds.find(id => id === point.id))
       {
@@ -285,6 +288,7 @@ class TransformCardChart extends React.Component<Props, any>
     }));
     
     this.dispatchAction(newPointsData);
+    console.log('delete end');
   }
   
   onCreate(x, y)

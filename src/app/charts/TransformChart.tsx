@@ -551,8 +551,24 @@ var TransformChart = {
       .x((d) => scales.realX(d['x']))
       .y((d) => scales.realPointY(d['y']));
     
+    var linesPointsData = _.clone(pointsData);
+    if(linesPointsData.length)
+    {
+      var range = (scaleMax(scales.x) - scaleMin(scales.x));
+      linesPointsData.unshift({
+        x: scaleMin(scales.x) - range,
+        y: linesPointsData[0].y,
+        id: '*%*-first',
+      });
+      linesPointsData.push({
+        x: scaleMax(scales.x) + range,
+        y: linesPointsData[linesPointsData.length - 1].y,
+        id: '*%*-last',
+      });
+    }
+    
     d3.select(el).select('.lines')
-      .attr("d", lineFunction(pointsData))
+      .attr("d", lineFunction(linesPointsData))
       .attr("stroke", color)
       .attr("stroke-width", "5px")
       .attr("fill", "none")
@@ -609,9 +625,11 @@ var TransformChart = {
   
   _drawMenu(el, mouse, text, fn)
   {
+    d3.select(el).select('.right-menu').remove();
+    
     var menu = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'right-menu');
-      
+    
     var w = 100;
     var h = 30;
     menu.append('rect')
@@ -633,7 +651,7 @@ var TransformChart = {
       .text(text)
       .attr('opacity', 0)
       .transition()
-      .delay(50)
+      .delay(100)
       .duration(50)
       .attr('opacity', 1);
     
