@@ -90,7 +90,21 @@ class CreateCardTool extends React.Component<Props, any>
     }
   }
   
-  componentWillMount() {
+  // componentWillReceiveProps(newProps)
+  // {
+  //   if(newProps.open)
+  //   {
+  //     Util.animateToAutoHeight(this.refs['ccWrapper']);
+  //   }
+  //   else
+  //   {
+  //     Util.animateToHeight(this.refs['ccWrapper'], 0);
+  //     this.refs['ccWrapper']['style']['overflow'] = 'hidden';
+  //   }
+  // }
+  
+  componentWillMount()
+  {
     // On initial render we don't get the dimensions, need to trigger a redo
     setTimeout(() => {
       this.setState(this.state);

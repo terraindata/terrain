@@ -185,15 +185,24 @@ class TransformCardChart extends React.Component<Props, any>
   
   dispatchAction(arr)
   {
-    var scorePointId = arr[0];
-    var newScore = arr[1];
-    var value = this.props.card.scorePoints.find(scorePoint => scorePoint.id === scorePointId).value;
-    Actions.cards.transform.scorePoint(this.props.card, 
+    if(arr[0] === true)
     {
-      id: scorePointId,
-      score: newScore,
-      value,
-    });
+      // only changing one score point
+      var scorePointId = arr[1];
+      var newScore = arr[2];
+      var value = this.props.card.scorePoints.find(scorePoint => scorePoint.id === scorePointId).value;
+      Actions.cards.transform.scorePoint(this.props.card, 
+      {
+        id: scorePointId,
+        score: newScore,
+        value,
+      });
+    } 
+    else
+    {
+      console.log(arr);
+      Actions.cards.transform.scorePoints(this.props.card, arr);
+    }
   }
   
   onPointMove(scorePointId, newScore)
@@ -208,28 +217,37 @@ class TransformCardChart extends React.Component<Props, any>
       pointsData: newPointsData,
     }));
     
-    this.dispatchAction([scorePointId, newScore]);
+    this.dispatchAction([true, scorePointId, newScore]);
   }
   
   onLineClick(x, y)
   {
-    Actions.cards.transform.scorePoint(this.props.card,
-    {
-      id: null,
-      value: x,
-      score: y,
-    });
+    this.setState({
+      lineMoving: true,
+      initialLineY: y,
+    })
+    // nada señor
+    // Actions.cards.transform.scorePoint(this.props.card,
+    // {
+    //   id: null,
+    //   value: x,
+    //   score: y,
+    // });
   }
   
   onLineMove(x, y)
   {
-    // find point with given x, if it exists.
-    var scorePoint = this.props.card.scorePoints.find(scorePoint => scorePoint.value === x);
-    
-    if(scorePoint)
-    {
-      this.onPointMove(scorePoint.id, y);
-    }
+    var scoreDiff = y - this.state.initialLineY;
+    var newPointsData = Util.deeperCloneArr(this.props.pointsData).map(point => {
+      point.score = Util.valueMinMax(point.score + scoreDiff, 0, 1);
+      return point;
+    });
+    this.dispatchAction(newPointsData);
+
+    var el = ReactDOM.findDOMNode(this);
+    TransformChart.update(el, this.getChartState({
+      pointsData: newPointsData,
+    }));
   }
   
   getChartState(overrideState?: any) {

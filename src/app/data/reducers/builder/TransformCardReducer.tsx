@@ -49,6 +49,9 @@ import { CardModels } from './../../../models/CardModels.tsx';
 
 var TransformCardReducer = {};
 
+TransformCardReducer[ActionTypes.cards.transform.scorePoints] = 
+  Util.setCardFields(['scorePoints']);
+
 TransformCardReducer[ActionTypes.cards.transform.scorePoint] =
   Util.updateCardField('scorePoints', (scorePoints, action) => 
     {

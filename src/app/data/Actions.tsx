@@ -129,6 +129,10 @@ var Actions =
       scorePoint: 
         (card: CardModels.ITransformCard, scorePoint: CardModels.IScorePoint) =>
           $(ActionTypes.cards.transform.scorePoint, {card, scorePoint}),
+      
+      scorePoints: 
+        (card: CardModels.ITransformCard, scorePoints: CardModels.IScorePoint[]) =>
+          $(ActionTypes.cards.transform.scorePoints, {card, scorePoints}),
     },
     
     score:

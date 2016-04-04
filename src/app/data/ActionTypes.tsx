@@ -124,6 +124,7 @@ var ActionTypes =
     {
       change,
       scorePoint: '',
+      scorePoints: '',
     }
     
   },

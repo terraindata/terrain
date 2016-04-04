@@ -78,6 +78,14 @@ var TransformChart = {
       .attr('class', 'inner-svg')
       .attr('x', xMargin)
       .attr('y', yMargin);
+      
+    // need a transparent filling background so that the touchmove events on inner-svg register as expected
+    innerSvg.append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', '100%')
+        .attr('height', '100%')
+        .attr('opacity', 0);
         
     innerSvg.append('g')
       .attr('class', 'bars');
