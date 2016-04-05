@@ -57,6 +57,13 @@ import BuilderTextbox from "../../common/BuilderTextbox.tsx";
 
 import { Weight, Weighter } from '../../../charts/Weighter.tsx';
 
+var BORDER_RADIUS = '5px';
+var SCORE_COLORS = 
+{
+  POSITIVE: ["#DFDE52", "#AFD364", "#9DCF66", "#88C33E"],
+  NEGATIVE: ["#F8B14A", "#FF735B", "#DD333C", "#A50808"],
+};
+
 interface Props {
   card: CardModels.IScoreCard;
   parentId: string;
@@ -76,24 +83,17 @@ class ScoreCard extends React.Component<Props, any>
     };    
     
     Util.bind(this, ['handleWeightsChange', 'renderWeight', 'renderHeader',
-      'handleOutputChange', 'handleMethodChange', 'handleWeightKeyChange',
-      'removeWeight']);
+      'handleMethodChange', 'removeWeight', 'renderWeightGraph']);
   }
   
-  handleWeightsChange(newWeights)
+  handleWeightsChange(value, event)
   {
-    Actions.cards.score.changeWeights(this.props.card, newWeights);
-  }
-  
-  handleWeightKeyChange(value, event)
-  {
-    var key = event.target.value;
-    var index = Util.rel(event.target);
-    
-    var newWeights = this.props.card.weights;
-    newWeights[index]['key'] = key;
-    
-    Actions.cards.score.changeWeights(this.props.card, newWeights);
+    Actions.cards.score.changeWeights(this.props.card, _.range(0, this.props.card.weights.length).map(
+      index => ({
+        key: this.refs[index]['value'],
+        weight: parseFloat(this.refs[index + '-weight']['value']),
+      })
+    ));
   }
   
   removeWeight(index)
@@ -123,17 +123,25 @@ class ScoreCard extends React.Component<Props, any>
       columns:
       [
         {
+          colSpan: 3,
           content: <BuilderTextbox
-            rel={index}
+            ref={index}
             value={weight.key}
-            onChange={this.handleWeightKeyChange}
+            onChange={this.handleWeightsChange}
             placeholder='Variable or field name' />
         },
         {
-          content: <Weighter 
-            weights={this.props.card.weights} 
+          colSpan: 1,
+          content: <BuilderTextbox
+            ref={index + '-weight'}
+            value={weight.weight + ""}
             onChange={this.handleWeightsChange}
-            weightIndex={index} />  
+            placeholder='0'
+            />
+        },
+        {
+          colSpan: 4,
+          content: this.renderWeightGraph(weight)
         }
       ]
     }
@@ -151,38 +159,52 @@ class ScoreCard extends React.Component<Props, any>
     );
   }
   
-  handleOutputChange(value)
+  renderWeightGraph(weight)
   {
-    Actions.cards.score.change(this.props.card, this.props.card.method, value);
+    var max = _.max(this.props.card.weights.map(weight => Math.abs(weight.weight)));
+    var perc = Math.abs(weight.weight) / max * 100;
+    var style:React.CSSProperties = {
+      width: perc / 2 + '%',
+    };
+    
+    if(weight.weight > 0)
+    {
+      style.left = '50%';
+      style['background'] = SCORE_COLORS.POSITIVE[Math.floor((perc - 1) / 25)];
+      style.borderTopRightRadius = BORDER_RADIUS;
+      style.borderBottomRightRadius = BORDER_RADIUS;
+    }
+    else if(weight.weight < 0)
+    {
+      style.right = '50%';
+      style['background'] = SCORE_COLORS.NEGATIVE[Math.floor((perc - 1) / 25)];
+      style.borderTopLeftRadius = BORDER_RADIUS;
+      style.borderBottomLeftRadius = BORDER_RADIUS;
+    }
+    
+    return (
+      <div className='weight-graph'>
+        <div className='weight-graph-inner'>
+          <div className='weight-graph-bar' style={style} />
+        </div>
+        <div className='weight-graph-line' />
+      </div>
+    );
   }
   
   handleMethodChange(index: number)
   {
-    Actions.cards.score.change(this.props.card, methods[index], this.props.card.output); 
+    Actions.cards.score.change(this.props.card, methods[index]);
   }
   
   renderHeader()
   {
-    var headerLayout = 
-    {
-      colPadding: 12,
-      columns: 
-      [
-        {
-          content: <Dropdown 
-            onChange={this.handleMethodChange}
-            options={methods}
-            selectedIndex={methods.indexOf(this.props.card.method)} />
-        },
-        {
-          content: <BuilderTextbox value={this.props.card.output} onChange={this.handleOutputChange} />
-        }
-      ]
-    }
-    
     return (
       <CardField>
-        <LayoutManager layout={headerLayout} />
+        <Dropdown 
+          onChange={this.handleMethodChange}
+          options={methods}
+          selectedIndex={methods.indexOf(this.props.card.method)} />
       </CardField>
     );
   }

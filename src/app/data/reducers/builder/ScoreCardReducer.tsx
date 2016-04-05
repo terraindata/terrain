@@ -57,7 +57,7 @@ ScoreCardReducer[ActionTypes.cards.score.create] =
     }));
               
 ScoreCardReducer[ActionTypes.cards.score.change] =
-  Util.setCardFields(['method', 'output']);
+  Util.setCardFields(['method']);
 
 ScoreCardReducer[ActionTypes.cards.score.changeWeights] =
   Util.updateCardField('weights', (weights, action) =>

@@ -163,14 +163,12 @@ export module CardModels
   {
     key: string;
     weight: number;
-    color: string;
   }
   
   export interface IScoreCard extends ICard
   {
     weights: IWeight[];
     method: string;
-    output: string;
   }
   
   export interface IBar extends IId

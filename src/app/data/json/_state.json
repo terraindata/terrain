@@ -32,6 +32,46 @@
             }
           },
           {
+            "type": "score",
+            "id": "177",
+            "method": "weightedSum",
+            "weights":
+            [
+              {
+                "key": "sitter.transformedMinPrice",
+                "weight": 20
+              },
+              {
+                "key": "sitter.transformedNumJobs",
+                "weight": 45
+              },
+              {
+                "key": "sitter.transformedRating",
+                "weight": 80
+              },
+              {
+                "key": "sitter.badReviewCount",
+                "weight": -25
+              },
+              {
+                "key": "sitter.awfulReviewCount",
+                "weight": -50
+              },
+              {
+                "key": "sitter.absolutelyTerribleReviewCount",
+                "weight": -100
+              }
+            ]
+          },
+          {
+            "type": "sort",
+            "id": "3",
+            "sort": {
+              "property": "sitter.finalScore",
+              "direction": 1
+            }
+          },
+          {
             "type": "select",
             "id": "2",
             "properties": [
@@ -208,35 +248,6 @@
                 "id": "3a4"
               }
             ]
-          },
-          {
-            "type": "score",
-            "id": "177",
-            "method": "weightedSum",
-            "output": "finalScore",
-            "weights":
-            [
-              {
-                "key": "sitter.transformedMinPrice",
-                "weight": 0.2
-              },
-              {
-                "key": "sitter.transformedNumJobs",
-                "weight": 0.3
-              },
-              {
-                "key": "sitter.transformedRating",
-                "weight": 0.5
-              }
-            ]
-          },
-          {
-            "type": "sort",
-            "id": "3",
-            "sort": {
-              "property": "sitter.finalScore",
-              "direction": 1
-            }
           }
         ]
       },

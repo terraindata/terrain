@@ -85,11 +85,15 @@ class BuilderTextbox extends React.Component<Props, any>
   
   componentWillReceiveProps(newProps)
   {
-    if(ReactDOM.findDOMNode(this) !== document.activeElement)
+    if(this.refs['input'])
     {
-      // if not focused, then update the value
-      ReactDOM.findDOMNode(this)['value'] = newProps.value;
+      if(this.refs['input'] !== document.activeElement)
+      {
+        // if not focused, then update the value
+        this.refs['input']['value'] = newProps.value;
+      }
     }
+    
     this.value = newProps.value;
   }
   
@@ -157,7 +161,7 @@ class BuilderTextbox extends React.Component<Props, any>
   render() {
     if(this.isText())
     {
-      var element = this.props.textarea ? <textarea /> : <input />;
+      var element = this.props.textarea ? <textarea ref='input' /> : <input ref='input' />;
       
       var props =
       {

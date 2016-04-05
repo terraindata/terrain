@@ -142,8 +142,8 @@ var Actions =
           $(ActionTypes.cards.score.changeWeights, {card, weights}),
       
       change: 
-        (card: CardModels.IScoreCard, method: string, output: string) =>
-          $(ActionTypes.cards.score.change, {card, method, output}),
+        (card: CardModels.IScoreCard, method: string) =>
+          $(ActionTypes.cards.score.change, {card, method}),
       
       create: 
         (card: CardModels.IScoreCard) =>
