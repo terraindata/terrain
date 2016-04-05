@@ -85,7 +85,6 @@ class CreateCardTool extends React.Component<Props, any>
       {
         this.props.onMinimize();
       }
-      
       Actions.cards.create(this.props.parentId, type, this.props.index);
     }
   }
