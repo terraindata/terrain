@@ -99,15 +99,7 @@ class ScoreCard extends React.Component<Props, any>
   removeWeight(index)
   {
     var weights = Util.deeperCloneArr(this.props.card.weights);
-    var oldWeight = weights.splice(index, 1)[0];
-    if(weights[index])
-    {
-      weights[index].weight += oldWeight.weight;  
-    }
-    else if(weights[index - 1])
-    {
-      weights[index - 1].weight += oldWeight.weight;
-    }
+    weights.splice(index, 1)[0];
     
     Actions.cards.score.changeWeights(this.props.card, weights);
     this.setState({
