@@ -11,25 +11,140 @@
         "cards": 
         [
           {
-            "type": "let",
-            "id": "10101",
-            "field": "sitter.avgRating",
-            "expression": 
-            {
-              "type": "parentheses",
-              "id": "pa729",
-              "cards":
-              [
-                {
-                  "id": "123let",
-                  "type": "from",
-                  "group": "ratings",
-                  "iterator": "rating",
-                  "joins": [],
-                  "cards": []
-                }
-              ]
-            }
+            "type": "filter",
+            "id": "41",
+            "filters": [
+              {
+                "comparison": {
+                  "first": "input.price",
+                  "second": "sitter.minPrice",
+                  "operator": 1
+                },
+                "combinator": 0,
+                "id": "asdf"
+              },
+              {
+                "comparison": {
+                  "first":
+                  {
+                      "type": "parentheses",
+                      "id": "pa729",
+                      "cards":
+                      [
+                        {
+                          "id": "count1",
+                          "type": "min",
+                          "cards":
+                          [
+                            {
+                              "id": "123let",
+                              "type": "from",
+                              "group": "ratings",
+                              "iterator": "rating",
+                              "joins": [],
+                              "cards": [
+                                {
+                                  "type": "filter",
+                                  "id": "filtercard1",
+                                  "filters":
+                                  [
+                                    {
+                                      "comparison":
+                                      {
+                                        "first": "rating.sitter_id",
+                                        "second": "sitter.id",
+                                        "operator": 0
+                                      },
+                                      "combinator": 0,
+                                      "id": "big combo"
+                                    }  
+                                  ]
+                                },
+                                {
+                                  "id": "someselect",
+                                  "type": "select",
+                                  "properties":
+                                  [
+                                    {
+                                      "id": "sp123",
+                                      "property": "value"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                  },
+                  "second":
+                  {
+                      "type": "parentheses",
+                      "id": "pa7292",
+                      "cards":
+                      [
+                        {
+                          "id": "count12",
+                          "type": "avg",
+                          "cards":
+                          [
+                            {
+                              "id": "123let2",
+                              "type": "from",
+                              "group": "ratings",
+                              "iterator": "rating",
+                              "joins": [],
+                              "cards": [
+                                {
+                                  "id": "someselect2",
+                                  "type": "select",
+                                  "properties":
+                                  [
+                                    {
+                                      "id": "sp1232",
+                                      "property": "value"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                  },
+                  "operator": 1
+                },
+                "combinator": 0,
+                "id": "asdf1"
+              },
+              {
+                "comparison": {
+                  "first": "input.endDateTime",
+                  "second": "availability.endDateTime",
+                  "operator": 3
+                },
+                "combinator": 0,
+                "id": "asdf2"
+              },
+              {
+                "comparison": {
+                  "first": "input.city",
+                  "second": "sitter.cities",
+                  "operator": 5
+                },
+                "combinator": 0,
+                "id": "asdf3"
+              },
+              {
+                "comparison": {
+                  "first": "input.attributes",
+                  "second": "sitter.attributes",
+                  "operator": 5
+                },
+                "combinator": 0,
+                "id": "asdf34"
+              }
+            ]
           },
           {
             "type": "score",
@@ -98,57 +213,6 @@
               {
                 "property": "sitter.attributes",
                 "id": "p6"
-              }
-            ]
-          },
-          {
-            "type": "filter",
-            "id": "41",
-            "filters": [
-              {
-                "comparison": {
-                  "first": "input.price",
-                  "second": "sitter.minPrice",
-                  "operator": 1
-                },
-                "combinator": 0,
-                "id": "asdf"
-              },
-              {
-                "comparison": {
-                  "first": "input.startDateTime",
-                  "second": "availability.startDateTime",
-                  "operator": 1
-                },
-                "combinator": 0,
-                "id": "asdf1"
-              },
-              {
-                "comparison": {
-                  "first": "input.endDateTime",
-                  "second": "availability.endDateTime",
-                  "operator": 3
-                },
-                "combinator": 0,
-                "id": "asdf2"
-              },
-              {
-                "comparison": {
-                  "first": "input.city",
-                  "second": "sitter.cities",
-                  "operator": 5
-                },
-                "combinator": 0,
-                "id": "asdf3"
-              },
-              {
-                "comparison": {
-                  "first": "input.attributes",
-                  "second": "sitter.attributes",
-                  "operator": 5
-                },
-                "combinator": 0,
-                "id": "asdf34"
               }
             ]
           },

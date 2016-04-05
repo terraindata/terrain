@@ -46,6 +46,60 @@
     background: #fff;
     margin-bottom: @standard-margin;
   }
+  
+  &.builder-tb-cards {
+  }
+  
+  @card-chip-offset: 35px;
+  @t: 6px; // triangle half-height
+  .builder-tb-cards-input-value {
+    display: inline-block;
+    background: #47a7ff;
+    padding: 3px 0px;
+    text-align: center;
+    border-radius: 5px;
+    color: #fff;
+    width: calc(~"100% - 2 * @{card-chip-offset}");
+    .vertically-middle;
+  }
+  
+  .builder-tb-cards-arrow {
+    border-top: 1px solid #47a7ff;
+    border-right: 1px solid #47a7ff;
+    position: absolute;
+    left: calc(~"100% - @{card-chip-offset}");
+    width: @card-chip-offset - 6px;
+    height: @input-height / 2 + @standard-margin;
+    top: 50%;
+    .transition;
+    
+    .builder-tb-cards-arrow-inner {
+      .transition;
+      position: absolute;
+      left: (@card-chip-offset - 10px) / 2;
+      top: -1 * @t;
+      width: 0px;
+      height: 0px;
+      // http://html-tuts.com/css-arrows-up-down-left-right-triangle/
+      border-top: @t solid transparent;
+      border-bottom: @t solid transparent;
+      border-right: @t solid transparent;
+      border-left: @t solid #47a7ff;
+    }
+  }
+  
+  &.builder-tb-cards-top {
+    .builder-tb-cards-arrow {
+      top: -1 * @standard-margin;
+      border-bottom: 1px solid #fff;
+      border-top-width: 0px;
+      
+      .builder-tb-cards-arrow-inner {
+        bottom: -1 * @t;
+        top: auto;
+      }
+    }
+  }
 }
 
 .builder-tb-cards-area {

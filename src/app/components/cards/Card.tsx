@@ -297,11 +297,7 @@ var Card = React.createClass({
       },
     ];
 
-		var title = this.props.card.type.charAt(0).toUpperCase() + this.props.card.type.substr(1);
-    if(this.props.card.type === 'parentheses')
-    {
-      title = '( )';
-    }
+		var title = Util.titleForCard(this.props.card);
     
     if(CardColors[this.props.card.type])
     {

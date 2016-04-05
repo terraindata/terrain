@@ -100,6 +100,17 @@ var Util = {
     return ReactDOM.findDOMNode(target).getAttribute('rel');
   },
   
+  titleForCard(card: CardModels.ICard): string
+  {
+    var title = card.type.charAt(0).toUpperCase() + card.type.substr(1);
+    if(card.type === 'parentheses')
+    {
+      title = '( )';
+    }
+    
+    return title;
+  },
+  
   // corrects a given index so that it is appropriate
   //  to pass into a `splice` call
   spliceIndex(index: number, array: any[]): number

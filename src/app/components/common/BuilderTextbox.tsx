@@ -51,6 +51,7 @@ import Util from '../../util/Util.tsx';
 import { CardModels } from '../../models/CardModels.tsx';
 // import CardsArea from '../cards/CardsArea.tsx';
 import Card from '../cards/Card.tsx';
+import { CardColors } from './../../CommonVars.tsx';
 
 interface Props
 {
@@ -181,13 +182,42 @@ class BuilderTextbox extends React.Component<Props, any>
       );
     }
     
+    var cards = this.props.value['cards'];
+    if(cards.length)
+    {
+      var card = cards[0];
+      var color = CardColors[card.type][0] as string;
+      var title = Util.titleForCard(card);
+    }
+    else
+    {
+      var color = "#aaa";
+      var title = "Add a Card";
+    }
+    
+    var chipStyle = 
+    {
+      background: color,
+    };
+    var arrowLineStyle =
+    {
+      borderColor: color,
+    };
+    var arrowHeadStyle = 
+    {
+      borderLeftColor: color,
+    }
+    
     // We're in card mode
     return (
-      <div className='builder-tb builder-tb-cards'>
+      <div className={'builder-tb builder-tb-cards' + (this.props.top ? ' builder-tb-cards-top' : '')} ref='cards'>
         <div className='builder-tb-cards-input'>
           { this.renderSwitch() }
-          <div className='builder-tb-cards-input-value'>
-            Cards
+          <div className='builder-tb-cards-input-value' style={chipStyle}>
+            { title }
+          </div>
+          <div className='builder-tb-cards-arrow' style={arrowLineStyle}>
+            <div className='builder-tb-cards-arrow-inner' style={arrowHeadStyle} />
           </div>
         </div>
       </div>

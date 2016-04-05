@@ -64,7 +64,7 @@ var Actions =
     
     remove: 
       (card: CardModels.ICard, parentId: string) =>
-        $(ActionTypes.cards.remove, {card}),
+        $(ActionTypes.cards.remove, {card, parentId}),
 
     from:
     {
