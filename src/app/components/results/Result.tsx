@@ -155,20 +155,13 @@ var Result = React.createClass<any, any>({
     
     if(field === 'image')
     {
-      var id = this.props.data['id'];
-      
-      if(id === undefined)
-      {
-        return null;
-      }
-      
       return (
         <div className="result-field result-field-image" key={field}>
           <div className="result-field-name">
             { field }
           </div>
           <div className='result-field-value result-field-value-image'>
-            <img src={'http://lukeknepper.com/alfaromeo/sitters/sitters_00' + (id < 10 ? '0' : '') + id + '_' + id + '.jpg'} />
+            <img src={this.props.data[field]} />
           </div>
         </div>
       );

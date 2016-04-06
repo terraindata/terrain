@@ -58,6 +58,7 @@ IfCardReducer[ActionTypes.cards.if.else] =
      ? elses.delete(action.payload.indexToRemove)
      : elses.push(Immutable.fromJS(
        {
+         type: "if",
          id: "e" + Math.random(),
          cards: [],
          elses: [], 

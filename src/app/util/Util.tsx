@@ -57,11 +57,6 @@ var immutableCardsUpdateHelper = (node: any, keyToUpdate: string, id: string, up
     return node.update(keyToUpdate, (node: any) => updater(node, keyToUpdate));
   }
   
-  // if(node.get('cards'))
-  // {
-  //   return node.update('cards', cards => cards.map(card => immutableCardsUpdateHelper(card, keyToUpdate, id, updater)));
-  // }
-  
   node = node.map((value, key) => !Immutable.Iterable.isIterable(value) ? value :
     immutableCardsUpdateHelper(value, keyToUpdate, id, updater)
   );

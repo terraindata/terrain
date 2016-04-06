@@ -192,7 +192,7 @@ CardsReducer[ActionTypes.cards.move] =
       {
         if(cardsContainer.get('cards'))
         {
-          return cardsContainer.update('cards', cards => cards.reduce((newContainer, card) => {
+          cardsContainer = cardsContainer.update('cards', cards => cards.reduce((newContainer, card) => {
             if(card.get('id') !== action.payload.card.id || cardsContainer.get('id') === action.payload.parentId)
             {
               return newContainer.push(removeFn(card));
@@ -200,15 +200,11 @@ CardsReducer[ActionTypes.cards.move] =
             return newContainer;
           }, Immutable.fromJS([])));
         }
-        else
-        {
-          cardsContainer = cardsContainer.map((value, key) => 
-            !Immutable.Iterable.isIterable(value) ? value :
+        
+        return cardsContainer.map((value, key) => 
+            !Immutable.Iterable.isIterable(value) || key === 'cards' ? value :
               removeFn(value)
           );
-        }
-        
-        return cardsContainer;
       }
       
       state = state.map(removeFn);

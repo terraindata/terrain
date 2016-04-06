@@ -49,6 +49,7 @@ import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
+import Card from './../Card.tsx';
 import CardsArea from './../CardsArea.tsx';
 import FilterArea from './FilterArea.tsx';
 
@@ -59,7 +60,7 @@ interface Props {
   draggingPlaceholder: any;
 }
 
-class WrapperCard extends React.Component<Props, any>
+class IfCard extends React.Component<Props, any>
 {
   constructor(props:Props)
   {
@@ -98,16 +99,20 @@ class WrapperCard extends React.Component<Props, any>
               </div>
               {
                 els.filters.length
-                  ? <FilterArea card={els} spotlights={this.props.spotlights} />
+                  ? null 
                   : <div className='button' onClick={this.addElseIf} rel={""+index}>+ If</div>
               }
-              <CardsArea cards={els.cards} parentId={els.id} spotlights={this.props.spotlights} 
-              />
+              <Card
+                singleCard={true}
+                card={els}
+                spotlights={this.props.spotlights}
+                index={0}
+                />
             </div>
           ))
         }
         { 
-          elses.length && !_.last(elses).filters.length ? null :
+          elses.length || !this.props.card.filters.length ? null :
             <div className='button' onClick={this.addElse}>+ Else</div>
         }
       </div>
@@ -115,4 +120,4 @@ class WrapperCard extends React.Component<Props, any>
   }
 };
 
-export default WrapperCard;
+export default IfCard;

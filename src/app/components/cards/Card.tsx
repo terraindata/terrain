@@ -71,7 +71,7 @@ var CARD_TYPES_WITH_CARDS = ['from', 'let', 'count', 'min', 'max', 'avg', 'exist
 
 var hoverCard = (event) => {
   $('.card-hovering').removeClass('card-hovering');
-  var f = (n, count) => count > 100 ? null : (n && !n.is('body') && (n.hasClass('card') ? n : f(n.parent(), count + 1)));
+  var f = (n, count) => count > 100 ? null : (n && !n.is('body') && (n.hasClass('card') && !n.hasClass('single-card') ? n : f(n.parent(), count + 1)));
   var c = f($(event.target), 0);
   if(c)
   {
@@ -177,6 +177,11 @@ var Card = React.createClass({
   
   renderAddCard(isBottom?: boolean)
   {
+    if(this.props.singleCard)
+    {
+      return null;
+    }
+    
     return (
       <div
         className={'card-add-card-btn' + (isBottom ? ' card-add-card-btn-bottom' : '')}
@@ -326,7 +331,7 @@ var Card = React.createClass({
     
 		return this.renderPanel((
 			<div
-        className={'card' + (!this.state.open ? ' card-closed' : '')}
+        className={'card' + (!this.state.open ? ' card-closed' : '') + (this.props.singleCard ? ' single-card' : '')}
         ref={this.state.ref}
         rel={'card-' + this.props.card.id}
         >
