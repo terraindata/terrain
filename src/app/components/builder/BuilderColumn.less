@@ -1,8 +1,8 @@
 @import "../../util/Common.less";
 
 @title-bar-height: 36px;
-@top-border-color: @light-green;
 @handle-width: 10px;
+@side-border-color: #d3d6d0;
 
 .builder-column {
   height: 100%;
@@ -88,10 +88,11 @@
   }
   
   .builder-column-content {
+    background: @builder-bg;
     z-index: 0;
     position: relative;
     height: calc(~"100% - @{title-bar-height}");
-    border-left: 1px solid rgba(0,0,0,0.15);
+    border-left: 1px solid @side-border-color;
     
     &.builder-column-content-scroll {
       overflow-y: auto;
