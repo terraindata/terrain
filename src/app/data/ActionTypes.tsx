@@ -125,7 +125,13 @@ var ActionTypes =
       change,
       scorePoint: '',
       scorePoints: '',
-    }
+    },
+    
+    if:
+    {
+      change,
+      else: '',
+    },
     
   },
 

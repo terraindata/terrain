@@ -90,7 +90,19 @@ CardsReducer[ActionTypes.cards.create] =
         case 'filter':
           newCard =
           {
-            filters: [],
+            filters:
+            [
+              {
+                condition:
+                {
+                  first: '',
+                  second: '',
+                  operator: 0,
+                },
+                combinator: 0,
+                id: 'co' + Math.random(),
+              }
+            ],
           };
           break;
         case 'transform':
@@ -115,6 +127,26 @@ CardsReducer[ActionTypes.cards.create] =
             weights: [],
             method: '',
             output: '',
+          };
+          break;
+        case 'if':
+          newCard =
+          {
+            filters:
+            [
+              {
+                condition:
+                {
+                  first: '',
+                  second: '',
+                  operator: 0,
+                },
+                combinator: 0,
+                id: 'co' + Math.random(),
+              }
+            ],
+            cards: [],
+            elses: [],
           };
           break;
         case 'sum':

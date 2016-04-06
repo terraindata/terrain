@@ -42,34 +42,77 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Generic class for cards that only wrap / eat other cards
+
+import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
-import LayoutManager from "../../layout/LayoutManager.tsx";
-import BuilderTextbox from "../../common/BuilderTextbox.tsx";
-import BuilderTextboxCards from "../../common/BuilderTextboxCards.tsx";
-import CardField from './../CardField.tsx';
-import Dropdown from './../../common/Dropdown.tsx';
-import { Operators, Combinators } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
-import FilterArea from './FilterArea';
+import CardsArea from './../CardsArea.tsx';
+import FilterArea from './FilterArea.tsx';
 
-interface Props
-{
-  card: CardModels.IFilterCard;
-  spotlights: any[];
+interface Props {
+  card: CardModels.IIfCard;
+  spotlights: any;
+  draggingOver: boolean;
+  draggingPlaceholder: any;
 }
 
-class FilterCard extends React.Component<Props, any>
+class WrapperCard extends React.Component<Props, any>
 {
-  // so simple, but may become more complex in the future, which is why I'm keeping it
-	render() {
+  constructor(props:Props)
+  {
+    super(props);
+    Util.bind(this, 'addElse', 'addElseIf');
+  }
+  
+  addElse()
+  {
+    Actions.cards.if.else(this.props.card);
+  }
+  
+  addElseIf(event)
+  {
+    var index = parseInt(Util.rel(event.target), 10);
+    Actions.cards.filter.create(this.props.card.elses[index]);
+  }
+
+      //Note: the draggingover in the CardsArea may cause problems
+  render()
+  {
+    var card = this.props.card;
+    var elses = card.elses;
     return (
       <div ref='card'>
         <FilterArea {...this.props} />
+        <CardsArea cards={this.props.card.cards} parentId={this.props.card.id} spotlights={this.props.spotlights} 
+          draggingOver={this.props.draggingOver} draggingPlaceholder={this.props.draggingPlaceholder}
+        />
+        {
+          elses.map((els, index) =>
+          (
+            <div key={els.id}>
+              <div className='if-card-else'>
+                Else { els.filters.length !== 0 && 'If' }
+              </div>
+              {
+                els.filters.length
+                  ? <FilterArea card={els} spotlights={this.props.spotlights} />
+                  : <div className='button' onClick={this.addElseIf} rel={""+index}>+ If</div>
+              }
+              <CardsArea cards={els.cards} parentId={els.id} spotlights={this.props.spotlights} 
+              />
+            </div>
+          ))
+        }
+        { 
+          elses.length && !_.last(elses).filters.length ? null :
+            <div className='button' onClick={this.addElse}>+ Else</div>
+        }
       </div>
-		);
-	}
+    );
+  }
 };
 
-export default FilterCard;
+export default WrapperCard;

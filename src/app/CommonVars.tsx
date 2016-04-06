@@ -54,6 +54,7 @@ export var CardTypes: string[]  =
  'let',
  'score',
  'transform',
+ 'if',
  'max',
  'min',
  'sum',

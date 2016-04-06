@@ -62,12 +62,12 @@ export default
   JOIN_DEFAULT:
   {
     group: GROUP_DEFAULT,
-    comparison: COMPARISON_DEFAULT,
+    condition: COMPARISON_DEFAULT,
   },
 
   FILTER_DEFAULT:
   {
-   comparison: COMPARISON_DEFAULT,
+   condition: COMPARISON_DEFAULT,
    combinator: COMBINATOR_DEFAULT,
   }
 };

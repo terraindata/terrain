@@ -52,7 +52,7 @@ var FilterCardReducer = {};
 FilterCardReducer[ActionTypes.cards.filter.create] =
   Util.updateCardField('filters', (filters, action) => 
     filters.push({
-      comparison: 
+      condition: 
       {
         first: '',
         second: '',

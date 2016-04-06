@@ -75,7 +75,7 @@ export module CardModels
     parentId: string;
   }
   
-  export interface IComparison
+  export interface ICondition
   {
     first: string;
     second: string;
@@ -85,7 +85,7 @@ export module CardModels
   export interface IJoin extends IId
   {
     group: string;
-    comparison: IComparison;
+    condition: ICondition;
   }
   
   export interface ISort
@@ -97,7 +97,7 @@ export module CardModels
   export interface IFilter extends IId
   {
     combinator: Combinator;
-    comparison: IComparison;
+    condition: ICondition;
   }
   
   export interface ICard extends IId, IParentId
@@ -122,7 +122,7 @@ export module CardModels
   export interface IJoinCard extends ICard
   {
     group: string;
-    comparison: IComparison;
+    condition: ICondition;
   }
   
   export interface IProperty extends IId
@@ -195,6 +195,19 @@ export module CardModels
     bars: IBar[];
     scorePoints: IScorePoint[];
   }
+  
+  // export interface IElse extends IId, ICardsContainer
+  // {
+  //   condition?: ICondition; // no condition means it's an unconditional else
+  // }
+  
+  export interface IIfCard extends ICard, ICardsContainer
+  {
+    filters: IFilter[]; // no filters means it's an unconditional else
+    elses: IIfCard[];
+  }
+  
+  
   
   export enum InputType
   {

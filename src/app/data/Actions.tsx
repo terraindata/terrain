@@ -164,6 +164,17 @@ var Actions =
       (card: CardModels.IFilterCard, index: number) =>
         $(ActionTypes.cards.filter.remove, { card, index }),
     },
+    
+    if:
+    {
+      change:
+        (card: CardModels.IIfCard, filters: CardModels.IFilter[]) => //, elses: CardModels.IElse[]) =>
+          $(ActionTypes.cards.if.change, { card, filters }), //, elses }),
+      
+      else:
+        (card: CardModels.IIfCard, indexToRemove?: number) =>
+          $(ActionTypes.cards.if.else, { card, indexToRemove }),
+    },
   }, // /cards
 
   inputs:

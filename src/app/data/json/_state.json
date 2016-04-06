@@ -11,11 +11,29 @@
         "cards": 
         [
           {
+            "id": "if123",
+            "type": "if",
+            "filters":
+            [
+              {
+                "condition": {
+                  "first": "input.price",
+                  "second": "sitter.minPrice",
+                  "operator": 1
+                },
+                "combinator": 0,
+                "id": "asdfff"
+              }
+            ],
+            "cards": [],
+            "elses": []
+          },
+          {
             "type": "filter",
             "id": "41",
             "filters": [
               {
-                "comparison": {
+                "condition": {
                   "first": "input.price",
                   "second": "sitter.minPrice",
                   "operator": 1
@@ -24,7 +42,7 @@
                 "id": "asdf"
               },
               {
-                "comparison": {
+                "condition": {
                   "first":
                   {
                       "type": "parentheses",
@@ -49,7 +67,7 @@
                                   "filters":
                                   [
                                     {
-                                      "comparison":
+                                      "condition":
                                       {
                                         "first": "rating.sitter_id",
                                         "second": "sitter.id",
@@ -118,7 +136,7 @@
                 "id": "asdf1"
               },
               {
-                "comparison": {
+                "condition": {
                   "first": "input.endDateTime",
                   "second": "availability.endDateTime",
                   "operator": 3
@@ -127,7 +145,7 @@
                 "id": "asdf2"
               },
               {
-                "comparison": {
+                "condition": {
                   "first": "input.city",
                   "second": "sitter.cities",
                   "operator": 5
@@ -136,7 +154,7 @@
                 "id": "asdf3"
               },
               {
-                "comparison": {
+                "condition": {
                   "first": "input.attributes",
                   "second": "sitter.attributes",
                   "operator": 5

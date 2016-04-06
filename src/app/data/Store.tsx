@@ -94,6 +94,7 @@ import SortCardReducer from './reducers/builder/SortCardReducer.tsx';
 import FilterCardReducer from './reducers/builder/FilterCardReducer.tsx';
 import SelectCardReducer from './reducers/builder/SelectCardReducer.tsx';
 import TransformCardReducer from './reducers/builder/TransformCardReducer.tsx';
+import IfCardReducer from './reducers/builder/IfCardReducer.tsx';
 
 let Store = Redux.createStore(ReduxActions.handleActions(_.extend({},
   AlgorithmReducer,
@@ -107,6 +108,7 @@ let Store = Redux.createStore(ReduxActions.handleActions(_.extend({},
   FilterCardReducer,
   SelectCardReducer,
   TransformCardReducer,
+  IfCardReducer,
 {})), DefaultState);
 
 export default Store;

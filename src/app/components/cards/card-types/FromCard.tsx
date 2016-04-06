@@ -87,7 +87,7 @@ class FromCard extends React.Component<Props, any>
     
     Actions.cards.from.join.change(this.props.card, index, {
       group: group,
-      comparison:
+      condition:
       {
         first: first,
         second: second,
@@ -118,20 +118,20 @@ class FromCard extends React.Component<Props, any>
         },
         {
           content: (
-            <BuilderTextbox value={join.comparison.first} onChange={this.handleJoinChange} ref={firstRef} rel={rel} />
+            <BuilderTextbox value={join.condition.first} onChange={this.handleJoinChange} ref={firstRef} rel={rel} />
           ),
         },
         {
           content: (
             <div>
-             <Dropdown ref={operatorRef} circle={true} options={Operators} selectedIndex={join.comparison.operator} onChange={this.handleJoinChange} rel={rel} />
+             <Dropdown ref={operatorRef} circle={true} options={Operators} selectedIndex={join.condition.operator} onChange={this.handleJoinChange} rel={rel} />
             </div>
           ),
           width: OPERATOR_WIDTH,
         },
         {
           content: (
-            <BuilderTextbox value={join.comparison.second} onChange={this.handleJoinChange} ref={secondRef} rel={rel} />
+            <BuilderTextbox value={join.condition.second} onChange={this.handleJoinChange} ref={secondRef} rel={rel} />
           ),
         }
       ],

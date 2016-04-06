@@ -70,7 +70,7 @@ FromCardReducer[ActionTypes.cards.from.join.create] =
   Util.updateCardField('joins', (joins, action) =>
         joins.push({
           group: '',
-          comparison:
+          condition:
           {
             first: '',
             second: '',

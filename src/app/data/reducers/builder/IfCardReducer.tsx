@@ -42,34 +42,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as React from 'react';
-import Actions from "../../../data/Actions.tsx";
-import Util from '../../../util/Util.tsx';
-import LayoutManager from "../../layout/LayoutManager.tsx";
-import BuilderTextbox from "../../common/BuilderTextbox.tsx";
-import BuilderTextboxCards from "../../common/BuilderTextboxCards.tsx";
-import CardField from './../CardField.tsx';
-import Dropdown from './../../common/Dropdown.tsx';
-import { Operators, Combinators } from './../../../CommonVars.tsx';
+var Immutable = require('immutable');
+import ActionTypes from './../../ActionTypes.tsx';
+import Util from './../../../util/Util.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
-import FilterArea from './FilterArea';
 
-interface Props
-{
-  card: CardModels.IFilterCard;
-  spotlights: any[];
-}
+var IfCardReducer = {};
 
-class FilterCard extends React.Component<Props, any>
-{
-  // so simple, but may become more complex in the future, which is why I'm keeping it
-	render() {
-    return (
-      <div ref='card'>
-        <FilterArea {...this.props} />
-      </div>
-		);
-	}
-};
+IfCardReducer[ActionTypes.cards.if.change] =
+  Util.setCardFields(['condition', 'elses']);
 
-export default FilterCard;
+IfCardReducer[ActionTypes.cards.if.else] =
+  Util.updateCardField('elses', (elses, action) =>
+    action.payload.indexToRemove !== undefined
+     ? elses.delete(action.payload.indexToRemove)
+     : elses.push(Immutable.fromJS(
+       {
+         id: "e" + Math.random(),
+         cards: [],
+         elses: [], 
+         filters: [],
+         // no filters for starters
+         // filters: [
+         //  {
+         //    id: "f"+Math.random(),
+         //    combinator: 0,
+         //    condition:
+         //    {
+         //      first: '',
+         //      second: '',
+         //      operator: 0,
+         //    }
+         //  }
+         // ]
+       }
+     ))
+  )
+
+export default IfCardReducer;

@@ -58,6 +58,7 @@ import LetCard from './card-types/LetCard.tsx';
 import ScoreCard from './card-types/ScoreCard.tsx';
 import TransformCard from './card-types/TransformCard.tsx';
 import WrapperCard from './card-types/WrapperCard.tsx';
+import IfCard from './card-types/IfCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
 import Menu from '../common/Menu.tsx';
 import Actions from "../../data/Actions.tsx";
@@ -66,7 +67,7 @@ import { CardColors } from './../../CommonVars.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
-var CARD_TYPES_WITH_CARDS = ['from', 'let', 'count', 'min', 'max', 'avg', 'exists', 'parentheses']; // 'let'
+var CARD_TYPES_WITH_CARDS = ['from', 'let', 'count', 'min', 'max', 'avg', 'exists', 'parentheses', 'if'];
 
 var hoverCard = (event) => {
   $('.card-hovering').removeClass('card-hovering');
@@ -247,6 +248,9 @@ var Card = React.createClass({
       //   content: '+',
       //   onClick: () => Actions.cards.score.create(this.props.card),
       // }
+      break;
+    case 'if':
+      CardComponent = IfCard;
       break;
     case 'count':
     case 'sum':

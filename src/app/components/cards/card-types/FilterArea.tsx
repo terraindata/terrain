@@ -46,85 +46,132 @@ import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
-import Dropdown from './../../common/Dropdown.tsx';
-import CardField from './../CardField.tsx';
-import { Directions } from './../../../CommonVars.tsx';
-import { CardModels } from './../../../models/CardModels.tsx';
 import BuilderTextbox from "../../common/BuilderTextbox.tsx";
-import { Operators } from './../../../CommonVars.tsx';
+import BuilderTextboxCards from "../../common/BuilderTextboxCards.tsx";
+import CardField from './../CardField.tsx';
+import Dropdown from './../../common/Dropdown.tsx';
+import { Operators, Combinators } from './../../../CommonVars.tsx';
+import { CardModels } from './../../../models/CardModels.tsx';
 
-interface Props {
-  card: CardModels.IJoinCard;
+interface Props
+{
+  card: CardModels.IFilterCard | CardModels.IIfCard;
+  spotlights: any[];
 }
 
-var OPERATOR_WIDTH: number = 30;
+var OPERATOR_WIDTH: number = 27;
 var CARD_PADDING: number = 12;
 
-class JoinCard extends React.Component<Props, any>
+class FilterArea extends React.Component<Props, any>
 {
   constructor(props:Props)
   {
     super(props);
-  }
-  
-  
-  handleJoinChange(joinValue, event)
-  {
-    var group = this.refs['group']['value'];
-    var first = this.refs['first']['value'];
-    var second = this.refs['second']['value'];
-    var operator = this.refs['operator']['value'];
-    
-    // Actions.cards.join.change(this.props.card, {
-    //   group: group,
-    //   comparison:
-    //   {
-    //     first: first,
-    //     second: second,
-    //     operator: operator,
-    //   },
-    // });
+    Util.bind(this, 'renderFilter');
   }
 
-  render()
+  renderFilter(filter: CardModels.IFilter, index: number)
   {
-    var joinLayout =
+    var changeFilter = () =>
+    {
+        var first = this.refs['first']['value'];
+        var second = this.refs['second']['value'];
+        var operator = this.refs['operator']['value'];
+        var combinator = this.refs['combinator'] ? this.refs['combinator']['value'] : CardModels.Combinator.AND;
+        
+        Actions.cards.filter.change(this.props.card, index, {
+          condition:
+          {
+              operator: operator,
+              first: first,
+              second: second,
+          },
+          combinator: combinator,
+          id: filter.id,
+        });
+    }
+
+    var filterLayout =
     {
       columns: [
         {
           content: (
-            <BuilderTextbox value={this.props.card.group} onChange={this.handleJoinChange} ref={'group'} />
-          ),
-          colSpan: 2,
-        },
-        {
-          content: (
-            <BuilderTextbox value={this.props.card.comparison.first} onChange={this.handleJoinChange} ref={'first'} />
+            <BuilderTextbox
+              value={filter.condition.first}
+              onChange={changeFilter}
+              ref='first'
+              acceptsCards={true}
+              parentId={this.props.card.id}
+              top={true}
+              />
           ),
         },
         {
           content: (
             <div>
-             <Dropdown ref={'operator'} circle={true} options={Operators} selectedIndex={this.props.card.comparison.operator} onChange={this.handleJoinChange} />
+              <Dropdown ref='operator' circle={true} options={Operators} selectedIndex={filter.condition.operator} onChange={changeFilter} />
             </div>
           ),
           width: OPERATOR_WIDTH,
         },
         {
           content: (
-            <BuilderTextbox value={this.props.card.comparison.second} onChange={this.handleJoinChange} ref={'second'} />
+            <BuilderTextbox
+              value={filter.condition.second}
+              onChange={changeFilter}
+              ref='second'
+              acceptsCards={true}
+              parentId={this.props.card.id}
+              />
           ),
         }
       ],
       colPadding: CARD_PADDING,
     };
 
+    var deleteFn = () =>
+    {
+        Actions.cards.filter.remove(this.props.card, index);
+    }
+    
     return (
-      <CardField>
-        <LayoutManager layout={joinLayout} />
-      </CardField>
+      <div key={filter.id}>
+        <BuilderTextboxCards
+          value={filter.condition.first}
+          spotlights={this.props.spotlights}
+          parentId={this.props.card.id}
+          />
+        <CardField
+          leftContent={
+            index === 0 ? null : <Dropdown
+              ref='combinator'
+              circle={true}
+              options={Combinators}
+              selectedIndex={filter.combinator}
+              onChange={changeFilter}
+              />
+          }
+          draggable={false}
+          removable={true}
+          onDelete={deleteFn} >
+          <LayoutManager layout={filterLayout} />
+        </CardField>
+        <BuilderTextboxCards
+          value={filter.condition.second}
+          spotlights={this.props.spotlights}
+          parentId={this.props.card.id}
+          />
+      </div>
     );
   }
+
+	render() {
+    return (
+      <div>
+        { this.props.card.filters.map(this.renderFilter) }
+      </div>
+		);
+	}
 };
 
-export default JoinCard;
+export default FilterArea;

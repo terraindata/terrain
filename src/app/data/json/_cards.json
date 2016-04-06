@@ -7,7 +7,7 @@
     [
       {
         "group": "availability",
-        "comparison":
+        "condition":
         {
           "first": "sitter.id",
           "second": "availability.sitterId",

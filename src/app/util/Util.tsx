@@ -266,7 +266,7 @@ var Util = {
 
   // returns a reducing function that updates the given field with the fieldUpdater
   //  fieldUpdater gets passed (fieldObject, action)
-  updateCardField: (field: string, fieldUpdater) =>
+  updateCardField: (field: string, fieldUpdater: (node: any, action: any) => any) =>
     (state, action) =>
       Util.immutableCardsUpdate(state, field, action.payload.card.id,
         (fieldObj) => fieldUpdater(fieldObj, action)),
