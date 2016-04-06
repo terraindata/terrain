@@ -151,6 +151,12 @@ export module CardModels
     expression: CardString;
   }
   
+  export interface IVarCard extends ICard, ICardsContainer
+  {
+    field: string;
+    expression: CardString;
+  }
+  
   export interface ICountCard extends ICard, ICardsContainer {}
   export interface IAvgCard extends ICard, ICardsContainer {}
   export interface ISumCard extends ICard, ICardsContainer {}

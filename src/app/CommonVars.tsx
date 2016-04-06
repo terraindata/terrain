@@ -62,6 +62,7 @@ export var CardTypes: string[]  =
  'count',
  'exists',
  'parentheses',
+ 'var',
  // 'slice',
  // 'text match',
  // 'exceptions',
@@ -91,4 +92,5 @@ export var CardColors =
   avg: ["#a2b37e", "#c9daa6"],
   exists: ["#a98abf", "#cfb3e3"],
   if: ["#7eb397", "#a9dec2"],
+  var: ["#b3a37e", "#d7c7a2"],
 };

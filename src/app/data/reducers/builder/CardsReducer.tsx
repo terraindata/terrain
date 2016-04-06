@@ -114,6 +114,7 @@ CardsReducer[ActionTypes.cards.create] =
           Util.populateTransformDummyData(newCard);
           break;
         case 'let':
+        case 'var':
           newCard =
           {
             field: '',

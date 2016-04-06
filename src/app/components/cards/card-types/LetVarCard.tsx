@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./LetCard.less');
+require('./LetVarCard.less');
 import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
@@ -56,11 +56,11 @@ var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIco
 var ExpandIcon = require("./../../../../images/icon_tql_17x14.svg?name=ExpandIcon");
 
 interface Props {
-  card: CardModels.ILetCard;
+  card: CardModels.ILetCard | CardModels.IVarCard;
   spotlights: any[];
 }
 
-class LetCard extends React.Component<Props, any>
+class LetVarCard extends React.Component<Props, any>
 {
   constructor(props:Props)
   {
@@ -154,4 +154,4 @@ class LetCard extends React.Component<Props, any>
   }
 };
 
-export default LetCard;
+export default LetVarCard;

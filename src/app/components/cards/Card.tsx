@@ -54,7 +54,7 @@ import SelectCard from './card-types/SelectCard.tsx';
 import FromCard from './card-types/FromCard.tsx';
 import SortCard from './card-types/SortCard.tsx';
 import FilterCard from './card-types/FilterCard.tsx';
-import LetCard from './card-types/LetCard.tsx';
+import LetVarCard from './card-types/LetVarCard.tsx';
 import ScoreCard from './card-types/ScoreCard.tsx';
 import TransformCard from './card-types/TransformCard.tsx';
 import WrapperCard from './card-types/WrapperCard.tsx';
@@ -67,7 +67,7 @@ import { CardColors } from './../../CommonVars.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
-var CARD_TYPES_WITH_CARDS = ['from', 'let', 'count', 'min', 'max', 'avg', 'exists', 'parentheses', 'if'];
+var CARD_TYPES_WITH_CARDS = ['from', 'let', 'count', 'min', 'max', 'avg', 'exists', 'parentheses', 'if', 'var'];
 
 var hoverCard = (event) => {
   $('.card-hovering').removeClass('card-hovering');
@@ -241,7 +241,8 @@ var Card = React.createClass({
     //     };
       break;
     case 'let':
-      CardComponent = LetCard;
+    case 'var':
+      CardComponent = LetVarCard;
       break;
     case 'transform':
       CardComponent = TransformCard;
