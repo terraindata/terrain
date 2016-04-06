@@ -60,33 +60,39 @@ class SelectCard extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
+    Util.bind(this, 'addField', 'removeField', 'move');
+  }
+  
+  addField(index)
+  {
+    Actions.cards.select.create(this.props.card, index + 1);
+  }
+  
+  removeField(index)
+  {
+   	Actions.cards.select.remove(this.props.card, index);
+  }
+  
+  move(curIndex, newIndex)
+  {
+    Actions.cards.select.move(this.props.card, this.props.card.properties[curIndex], newIndex);
   }
 
-	render() {
+  render() {
     if(!this.props.card.properties.length)
     {
-      return <div className='info-message'>No fields selected, add one below.</div>;
+      return <div className='info-message info-message-clickable' onClick={this.addField}>No fields selected, click to add one.</div>;
     }
       
-		var properties = this.props.card.properties;
-
-		var moveFn = (curIndex, newIndex) =>
-    {
-      Actions.cards.select.move(this.props.card, this.props.card.properties[curIndex], newIndex);
-    }
+    var properties = this.props.card.properties;
 
     var changeFnFactory = (index) => (value) =>
     {
-    	Actions.cards.select.change(this.props.card, index, 
+      Actions.cards.select.change(this.props.card, index, 
         {
           property: value,
           id: this.props.card.properties[index].id,
         });
-    }
-
-    var deleteFnFactory = (index) => () =>
-    {
-    	Actions.cards.select.remove(this.props.card, index);
     }
 
 		var layout = {
@@ -96,11 +102,14 @@ class SelectCard extends React.Component<Props, any>
           key: property.id,
           content: (
             <CardField
-    					onDelete={deleteFnFactory(index)}
+    					onDelete={this.removeField}
               draggable={true}
               removable={true}
               drag_y={true}
-    					dragInsideOnly={true}>
+    					dragInsideOnly={true}
+              addable={true}
+              onAdd={this.addField}
+              >
               <BuilderTextbox
                 value={property.property}
                 placeholder='Type field here'
@@ -112,7 +121,7 @@ class SelectCard extends React.Component<Props, any>
 		};
 
 		return (
-			<LayoutManager layout={layout} moveTo={moveFn} />
+			<LayoutManager layout={layout} moveTo={this.move} />
 		);
 	}
 };

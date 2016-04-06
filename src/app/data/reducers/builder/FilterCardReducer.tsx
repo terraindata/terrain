@@ -51,7 +51,7 @@ var FilterCardReducer = {};
 
 FilterCardReducer[ActionTypes.cards.filter.create] =
   Util.updateCardField('filters', (filters, action) => 
-    filters.push({
+    filters.splice(Util.spliceIndex(action.payload.index, filters), 0, {
       condition: 
       {
         first: '',
@@ -69,5 +69,9 @@ FilterCardReducer[ActionTypes.cards.filter.change] =
 FilterCardReducer[ActionTypes.cards.filter.remove] =
     Util.updateCardField('filters', (filters, action) =>
       filters.remove(action.payload.index));
+
+FilterCardReducer[ActionTypes.cards.filter.move] =
+  Util.updateCardField('filters', (filters, action) =>
+    Util.immutableMove(filters, action.payload.filter.id, action.payload.index));
 
 export default FilterCardReducer;

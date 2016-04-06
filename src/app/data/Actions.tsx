@@ -89,9 +89,21 @@ var Actions =
     },
     
     sort: {
+      create: 
+        (card: CardModels.ISortCard, index?: number) =>
+          $(ActionTypes.cards.sort.create, {card, index}),
+          
       change: 
-        (card: CardModels.ISortCard, value: CardModels.ISort) =>
-          $(ActionTypes.cards.sort.change, {card, value}),
+        (card: CardModels.ISortCard, index: number, value: CardModels.ISort) =>
+          $(ActionTypes.cards.sort.change, {card, index, value}),
+          
+      move: 
+        (card: CardModels.ISortCard, sort: CardModels.ISort, index: number) =>
+          $(ActionTypes.cards.sort.move, {card, sort, index}),
+
+      remove: 
+          (card: CardModels.ISortCard, index: number) =>
+            $(ActionTypes.cards.sort.remove, {card, index}),
     },
 
     select:
@@ -146,8 +158,8 @@ var Actions =
           $(ActionTypes.cards.score.change, {card, method}),
       
       create: 
-        (card: CardModels.IScoreCard) =>
-          $(ActionTypes.cards.score.create, {card}),
+        (card: CardModels.IScoreCard, index?: number) =>
+          $(ActionTypes.cards.score.create, {card, index}),
     },
 
     filter:
@@ -159,7 +171,11 @@ var Actions =
      change: 
       (card: CardModels.IFilterCard, index: number, value: CardModels.IFilter) =>
         $(ActionTypes.cards.filter.change, { card, index, value }),
-
+     
+     move:
+       (card: CardModels.IFilterCard, filter: CardModels.IFilter, index: number) =>
+         $(ActionTypes.cards.filter.move, { card, filter, index }),
+     
      remove: 
       (card: CardModels.IFilterCard, index: number) =>
         $(ActionTypes.cards.filter.remove, { card, index }),

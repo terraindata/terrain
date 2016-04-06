@@ -58,6 +58,7 @@ interface Props {
   spotlights: any;
   draggingOver: boolean;
   draggingPlaceholder: any;
+  singleCard?: boolean;
 }
 
 class IfCard extends React.Component<Props, any>
@@ -86,7 +87,7 @@ class IfCard extends React.Component<Props, any>
     var elses = card.elses;
     return (
       <div ref='card'>
-        <FilterArea {...this.props} />
+        <FilterArea {...this.props} hideNoFilterMessage={this.props.singleCard} />
         <CardsArea cards={this.props.card.cards} parentId={this.props.card.id} spotlights={this.props.spotlights} 
           draggingOver={this.props.draggingOver} draggingPlaceholder={this.props.draggingPlaceholder}
         />

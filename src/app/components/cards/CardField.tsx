@@ -47,6 +47,9 @@ import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 
+var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
+var RemoveIcon = require("./../../../images/icon_close_8x8.svg?name=RemoveIcon");
+
 var FIELD_HEIGHT = 32;
 var STANDARD_MARGIN = 6;
 
@@ -56,13 +59,17 @@ var CardField = React.createClass({
 	propTypes:
 	{
 		value: React.PropTypes.string,
-		onDelete: React.PropTypes.func,
+    addable: React.PropTypes.bool,
+    onAdd: React.PropTypes.func,
     removable: React.PropTypes.bool,
+		onDelete: React.PropTypes.func,
     draggable: React.PropTypes.bool,
     onChange: React.PropTypes.func,
     index: React.PropTypes.number,
     height: React.PropTypes.number,
     rightContent: React.PropTypes.node,
+    aboveContent: React.PropTypes.node,
+    belowContent: React.PropTypes.node,
 	},
 
 	getDefaultProps():any 
@@ -114,6 +121,14 @@ var CardField = React.createClass({
 			  this.props.onDelete(this.props.index));
 		}
 	},
+  
+  addField(event)
+  {
+    if(this.props.addable)
+    {
+      this.props.onAdd(this.props.index);
+    }
+  },
 
 	render() {
 		var leftContent;
@@ -129,12 +144,12 @@ var CardField = React.createClass({
       leftContent = this.props.leftContent;
     }
     
-		if(this.props.removable)
-		{
-			rightContent = (
-				<div className='card-field-delete' onClick={this.deleteField}>&times;</div>
-			);
-		}
+		rightContent = (
+      <div>
+        { this.props.addable && <div className='card-field-add' onClick={this.addField}><AddIcon /></div> }
+			  { this.props.removable && <div className='card-field-remove' onClick={this.deleteField}><RemoveIcon /></div> }
+      </div>
+		);
     
     if(this.props.rightContent)
     {
@@ -142,31 +157,35 @@ var CardField = React.createClass({
     }
 
 		return this.renderPanel((
-			<div className={Util.objToClassname({
-          'card-field': true,
-          'card-field-no-left': this.props.noLeft,
-        })}
-        style={{ minHeight: this.props.height }}
-        ref='cardField'
-        >
-        { leftContent ? (
-  				<div className='card-field-tools-left'>
-            <div className='card-field-tools-left-inner'>
-              { leftContent }
+      <div>
+        { this.props.aboveContent }
+			  <div className={Util.objToClassname({
+            'card-field': true,
+            'card-field-no-left': this.props.noLeft,
+          })}
+          style={{ minHeight: this.props.height }}
+          ref='cardField'
+          >
+          { leftContent ? (
+    				<div className='card-field-tools-left'>
+              <div className='card-field-tools-left-inner'>
+                { leftContent }
+              </div>
+            </div>
+          ) : null }
+  				<div className='card-field-inner' >
+  					{ this.props.children }
+  				</div>
+          { rightContent ? (
+  				<div className='card-field-tools-right'>
+            <div className='card-field-tools-right-inner'>
+              { rightContent }
             </div>
           </div>
-        ) : null }
-				<div className='card-field-inner' >
-					{ this.props.children }
-				</div>
-        { rightContent ? (
-				<div className='card-field-tools-right'>
-          <div className='card-field-tools-right-inner'>
-            { rightContent }
-          </div>
-        </div>
-        ) : null }
-			</div>
+          ) : null }
+  			</div>
+        { this.props.belowContent }
+      </div>
 			), 'card-field-panel-wrapper');
 	},
 });

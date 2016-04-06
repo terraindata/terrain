@@ -61,19 +61,36 @@ class SortCard extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
+    Util.bind(this, 'renderSort', 'moveSort', 'removeSort', 'addSort');
+  }
+  
+  addSort(index)
+  {
+    Actions.cards.sort.create(this.props.card, index + 1);
+  }
+  
+  moveSort(curIndex, newIndex)
+  {
+    console.log(curIndex, this.props.card.sorts[curIndex]);
+    Actions.cards.sort.move(this.props.card, this.props.card.sorts[curIndex], newIndex);
+  }
+  
+  removeSort(index)
+  {
+    Actions.cards.sort.remove(this.props.card, index);
   }
 
-  render() {
-    var sort = this.props.card.sort;
-    
-    var dropdownRef = 'dropdown';
-    var propertyRef = 'property';
+  renderSort(sort, index)
+  {
+    var dropdownRef = 'dropdown' + index;
+    var propertyRef = 'property' + index;
     
     var handleChange = () =>
     {
-      Actions.cards.sort.change(this.props.card, {
+      Actions.cards.sort.change(this.props.card, index, {
         property: this.refs[propertyRef]['value'],
-        direction: this.refs[dropdownRef]['value']
+        direction: this.refs[dropdownRef]['value'],
+        id: sort.id,
       });
     }
 
@@ -94,10 +111,37 @@ class SortCard extends React.Component<Props, any>
     };
 
     return (
-      <CardField>
+      <CardField
+        draggable={true}
+        addable={true}
+        onAdd={this.addSort}
+        removable={true}
+        onDelete={this.removeSort}
+        drag_y={true}
+      >
         <LayoutManager layout={layout} />
       </CardField>
     );
+  }
+  
+  render()
+  {
+    if(this.props.card.sorts.length === 0)
+    {
+      return <div className='info-message info-message-clickable' onClick={this.addSort}>Click to add a sort</div>;
+    }
+    
+    return (
+    <LayoutManager
+      layout={{
+        reorderable: true,
+        rows: this.props.card.sorts.map((sort, index) => ({
+          key: sort.id,
+          content: this.renderSort(sort, index)
+        }))
+      }}
+      moveTo={this.moveSort}
+    />);
   }
 };
 

@@ -197,14 +197,6 @@
             ]
           },
           {
-            "type": "sort",
-            "id": "3",
-            "sort": {
-              "property": "sitter.finalScore",
-              "direction": 1
-            }
-          },
-          {
             "type": "select",
             "id": "2",
             "properties": [

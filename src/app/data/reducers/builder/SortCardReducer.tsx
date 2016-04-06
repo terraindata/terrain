@@ -49,8 +49,28 @@ import { CardModels } from './../../../models/CardModels.tsx';
 
 var SortCardReducer = {};
 
+SortCardReducer[ActionTypes.cards.sort.create] =
+  Util.updateCardField('sorts', (sorts, action) => 
+    sorts.splice(
+      Util.spliceIndex(action.payload.index, sorts),
+      0,
+      Immutable.fromJS({
+        property: "",
+        direction: 0,
+        id: "s" + Util.randInt(23496243),
+      })));
+    
 SortCardReducer[ActionTypes.cards.sort.change] =
-  Util.updateCardField('sort', (sort, action) => 
-    Immutable.fromJS(action.payload.value));
+  Util.updateCardField('sorts', (sorts, action) => 
+    sorts.set(action.payload.index, Immutable.fromJS(action.payload.value)));
+
+SortCardReducer[ActionTypes.cards.sort.move] =
+  Util.updateCardField('sorts', (sorts, action) =>
+    Util.immutableMove(sorts, action.payload.sort.id, action.payload.index));
+    
+SortCardReducer[ActionTypes.cards.sort.remove] =
+    Util.updateCardField('sorts', (sorts, action) =>
+      sorts.remove(action.payload.index));
+
 
 export default SortCardReducer;

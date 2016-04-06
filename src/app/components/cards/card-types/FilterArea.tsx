@@ -57,6 +57,7 @@ interface Props
 {
   card: CardModels.IFilterCard | CardModels.IIfCard;
   spotlights: any[];
+  hideNoFilterMessage?: boolean;
 }
 
 var OPERATOR_WIDTH: number = 27;
@@ -67,28 +68,50 @@ class FilterArea extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
-    Util.bind(this, 'renderFilter');
+    Util.bind(this, 'renderFilter', 'addFilter', 'moveFilter');
+  }
+  
+  addFilter(index)
+  {
+    Actions.cards.filter.create(this.props.card, index + 1);
   }
 
   renderFilter(filter: CardModels.IFilter, index: number)
   {
     var changeFilter = () =>
     {
-        var first = this.refs['first']['value'];
-        var second = this.refs['second']['value'];
-        var operator = this.refs['operator']['value'];
-        var combinator = this.refs['combinator'] ? this.refs['combinator']['value'] : CardModels.Combinator.AND;
-        
-        Actions.cards.filter.change(this.props.card, index, {
-          condition:
-          {
-              operator: operator,
-              first: first,
-              second: second,
-          },
-          combinator: combinator,
-          id: filter.id,
-        });
+      if(typeof filter.condition.first === 'string')
+      {
+        var first: any = this.refs['first' + index]['value'];
+      }
+      else
+      {
+        var first: any = filter.condition.first;
+      }
+      
+      if(typeof filter.condition.second === 'string')
+      {
+        var second: any = this.refs['second' + index]['value'];
+      }
+      else
+      {
+        var second: any = filter.condition.second;
+      }
+      
+      var operator = this.refs['operator' + index]['value'];
+      console.log(operator);
+      var combinator = this.refs['combinator' + index] ? this.refs['combinator' + index]['value'] : CardModels.Combinator.AND;
+      
+      Actions.cards.filter.change(this.props.card, index, {
+        condition:
+        {
+            operator: operator,
+            first: first,
+            second: second,
+        },
+        combinator: combinator,
+        id: filter.id,
+      });
     }
 
     var filterLayout =
@@ -99,7 +122,7 @@ class FilterArea extends React.Component<Props, any>
             <BuilderTextbox
               value={filter.condition.first}
               onChange={changeFilter}
-              ref='first'
+              ref={'first' + index}
               acceptsCards={true}
               parentId={this.props.card.id}
               top={true}
@@ -109,7 +132,7 @@ class FilterArea extends React.Component<Props, any>
         {
           content: (
             <div>
-              <Dropdown ref='operator' circle={true} options={Operators} selectedIndex={filter.condition.operator} onChange={changeFilter} />
+              <Dropdown ref={'operator' + index} circle={true} options={Operators} selectedIndex={filter.condition.operator} onChange={changeFilter} />
             </div>
           ),
           width: OPERATOR_WIDTH,
@@ -119,11 +142,23 @@ class FilterArea extends React.Component<Props, any>
             <BuilderTextbox
               value={filter.condition.second}
               onChange={changeFilter}
-              ref='second'
+              ref={'second' + index}
               acceptsCards={true}
               parentId={this.props.card.id}
               />
           ),
+        },
+        {
+          width: OPERATOR_WIDTH,
+          content: index === this.props.card.filters.length - 1 ? null : (
+            <Dropdown
+              ref={'combinator' + index}
+              circle={true}
+              options={Combinators}
+              selectedIndex={filter.combinator}
+              onChange={changeFilter}
+              />
+          )
         }
       ],
       colPadding: CARD_PADDING,
@@ -135,32 +170,44 @@ class FilterArea extends React.Component<Props, any>
     }
     
     return (
-      <div key={filter.id}>
-        <BuilderTextboxCards
+      <CardField
+        draggable={true}
+        drag_y={true}
+        removable={true}
+        addable={true}
+        onAdd={this.addFilter}
+        onDelete={deleteFn}
+        aboveContent={<BuilderTextboxCards
           value={filter.condition.first}
           spotlights={this.props.spotlights}
           parentId={this.props.card.id}
-          />
-        <CardField
-          leftContent={
-            index === 0 ? null : <Dropdown
-              ref='combinator'
-              circle={true}
-              options={Combinators}
-              selectedIndex={filter.combinator}
-              onChange={changeFilter}
-              />
-          }
-          draggable={false}
-          removable={true}
-          onDelete={deleteFn} >
-          <LayoutManager layout={filterLayout} />
-        </CardField>
-        <BuilderTextboxCards
+          />}
+        belowContent={<BuilderTextboxCards
           value={filter.condition.second}
           spotlights={this.props.spotlights}
           parentId={this.props.card.id}
-          />
+          />}
+      >
+        <LayoutManager layout={filterLayout} />
+      </CardField>
+    );
+  }
+  
+  moveFilter(curIndex, newIndex)
+  {
+    Actions.cards.filter.move(this.props.card, this.props.card.filters[curIndex], newIndex);
+  }
+  
+  renderNoFilters()
+  {
+    if(this.props.hideNoFilterMessage)
+    {
+      return null;
+    }
+    
+    return (
+      <div className='info-message info-message-clickable' onClick={this.addFilter}>
+        Click to add a filter
       </div>
     );
   }
@@ -168,7 +215,19 @@ class FilterArea extends React.Component<Props, any>
 	render() {
     return (
       <div>
-        { this.props.card.filters.map(this.renderFilter) }
+        { this.props.card.filters.length === 0 && this.renderNoFilters() }
+        <LayoutManager
+          layout={{
+            reorderable: true,
+            rows: this.props.card.filters.map((filter, index) => (
+              {
+                key: filter.id,
+                content: this.renderFilter(filter, index)
+              })
+            )
+          }}
+          moveTo={this.moveFilter}
+          />
       </div>
 		);
 	}

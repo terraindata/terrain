@@ -101,7 +101,7 @@ class Builder extends React.Component<any, any>
     };
     
     Util.bind(this, 'duplicateAlgorithm', 'handleNewAlgorithmTab',
-      'goOneColumn', 'goTwoColumns', 'goThreeColumns');
+      'goOneColumn', 'goTwoColumns', 'goThreeColumns', 'save');
   }
   
   handleNewAlgorithmTab()
@@ -165,7 +165,7 @@ class Builder extends React.Component<any, any>
       {
         text: 'save',
         icon: <SaveIcon />,
-        onClick: () => alert("Not yet implemented."),
+        onClick: this.save,
       },
       {
         text: '',
@@ -185,6 +185,11 @@ class Builder extends React.Component<any, any>
         noDivider: true,
       },
     ];
+  }
+  
+  save()
+  {
+    console.log(JSON.stringify(this.reduxState));
   }
   
 	render() {

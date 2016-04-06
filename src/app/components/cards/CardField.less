@@ -28,18 +28,19 @@
     pointer-events: none;
     
     &:hover {
-      border-color: @medium-green;
+      border-color: rgba(255,255,255,0.5);
       background: rgba(255,255,255,0.1);
     }
   }
   
   .card-field-tools-left-inner,
   .card-field-tools-right-inner {
+    opacity: 0;
     pointer-events: all;
     position: absolute;
     top: 2px + @standard-margin;
-    width: 32px;
-    // z-index: 9999;
+    // width: 32px;
+    .transition;
     text-align: center;
   }
   
@@ -59,10 +60,9 @@
       display: none;
     }
   }
-
+  
   .card-field-handle,
-  .card-field-delete {
-    opacity: 0;
+  .card-field-remove {
     font-weight: 200;
     font-size: calc(@medium-font-size * 1.25);
     color: @light-gray;
@@ -79,24 +79,84 @@
     float: right;
     text-align: right;
   }
+  
+  .card-field-remove {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    .transition;
+    width: 12px;
+    height: 12px;
+    border-radius: 12px;
+    // background: #fff;
+    margin-top: 5px;
+    
+    svg {
+      width: 8px;
+      fill: #777; // #FF6259;
+      .vertically-middle;
+    }
+    
+    &:hover {
+      background: #FF6259;
+      
+      svg {
+        fill: #fff;
+      }
+    }
+    
+    &:active {
+      background: #d43a33;
+    }
+  }
+  
+  .card-field-add {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    .transition;
+    margin-right: 6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 18px;
+    background: #fff;
+    margin-top: 3px;
+    
+    svg {
+      width: 12px;
+      fill: #8ac541;
+      .vertically-middle;
+    }
+    
+    &:hover {
+      background: #8ac541;
+      svg {
+        fill: #fff;
+      }
+    }
+    
+    &:active {
+      background: #7ab536;
+    }
+  }
 
   &:hover {
     .card {
-      .card-field-handle,
-      .card-field-delete {
+      .card-field-tools-left-inner,
+      .card-field-tools-right-inner {
         opacity: 0;
       }
       
       .card-field:hover {
-        .card-field-handle,
-        .card-field-delete {
+        .card-field-tools-left-inner,
+        .card-field-tools-right-inner {
           opacity: 1;
         }
       }
     }
     
-    .card-field-handle,
-    .card-field-delete {
+    .card-field-tools-left-inner,
+    .card-field-tools-right-inner {
       opacity: 1;
     }
   }
@@ -104,12 +164,13 @@
 
 .panel-dragging {
   .card-field-tools-left {
-    background: lighten(@light-green, 5%) !important;
-    border-color: @medium-green;
+    background: rgba(255,255,255,0.25) !important;
+    background-blend-mode: multiply;
+    border-color: rgba(255,255,255,1);
   }
   
-  .card-field-handle,
-  .card-field-delete {
+  .card-field-tools-left-inner,
+  .card-field-tools-right-inner {
     opacity: 1;
   }
 }
@@ -123,8 +184,8 @@
     border-color: rgba(0,0,0,0);
   }
   
-  .card-field-handle,
-  .card-field-delete {
+  .card-field-tools-left-inner,
+  .card-field-tools-right-inner {
     opacity: 0;
   } 
 }

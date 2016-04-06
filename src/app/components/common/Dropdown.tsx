@@ -49,7 +49,7 @@ import Util from '../../util/Util.tsx';
 
 interface Props
 {
-  options: string[];
+  options: (string | JSX.Element)[];
   selectedIndex: number;
   onChange: (index: number, event?: any) => void;
   ref?: string;
@@ -79,6 +79,7 @@ class Dropdown extends React.Component<Props, any>
     }
     
     var handleClick = () => {
+      console.log(index);
       this.value = index;
       this.props.onChange(index, {
         target: ReactDOM.findDOMNode(this)

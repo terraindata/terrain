@@ -98,13 +98,17 @@ var ActionTypes =
 
     sort:
     {
+      create,
     	change,
+      move,
+      remove,
     },
 
     filter:
     {
       create,
       change,
+      move,
       remove,
     },
 

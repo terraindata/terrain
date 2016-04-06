@@ -80,11 +80,14 @@ CardsReducer[ActionTypes.cards.create] =
         case 'sort':
           newCard =
           {
-            sort:
-            {
-              property: '',
-              direction: CardModels.Direction.DESC,
-            }
+            sorts:
+            [
+              {
+                id: 's' + Math.random(),
+                property: '',
+                direction: CardModels.Direction.DESC,
+              }
+            ]
           };
           break;
         case 'filter':

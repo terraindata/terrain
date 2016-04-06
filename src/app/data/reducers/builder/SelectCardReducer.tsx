@@ -52,8 +52,7 @@ var SelectCardReducer = {};
 SelectCardReducer[ActionTypes.cards.select.create] =
   Util.updateCardField('properties', (properties, action) => 
     properties.splice(
-      action.payload.index !== undefined && action.payload.index !== -1
-        ? action.payload.index : properties.size,
+      Util.spliceIndex(action.payload.index, properties),
       0,
       {
         property: "",

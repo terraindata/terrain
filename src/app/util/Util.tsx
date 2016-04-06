@@ -112,6 +112,10 @@ var Util = {
   {
     if(index === undefined || index === null || index === -1)
     {
+      if(Immutable.Iterable.isIterable(array))
+      {
+        return array['size'];
+      }
       return array.length;
     }
     

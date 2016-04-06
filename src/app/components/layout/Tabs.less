@@ -128,6 +128,8 @@
       .tabs-close {
         display: inline-block;
         margin-left: 10px;
+        opacity: 0;
+        .transition;
         
         svg {
           fill: @font-color;
@@ -139,6 +141,12 @@
             margin: -2px;
           }
         }
+      }
+    }
+    
+    &:hover {
+      .tabs-close {
+        opacity: 1;
       }
     }
     

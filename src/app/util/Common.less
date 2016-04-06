@@ -104,6 +104,11 @@ input {
 .info-message {
   text-align: center;
   color: rgba(0,0,0,0.5);
+  .transition;
+  
+  &.info-message-clickable:hover {
+    color: #000;
+  }
 }
 
 
@@ -299,4 +304,9 @@ input {
 	-moz-transform-origin:    @x @y;
 	-ms-transform-origin:     @x @y;
 	-o-transform-origin:      @x @y;
+}
+
+
+.strike {
+  text-decoration: line-through;
 }

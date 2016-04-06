@@ -46,12 +46,13 @@ export module CardModels
 {
   export enum Operator {
     EQ,
+    NE,
     GE,
     GT,
     LE,
     LT,
     IN,
-    NE
+    NIN,
   }
   
   export enum Direction {
@@ -88,7 +89,7 @@ export module CardModels
     condition: ICondition;
   }
   
-  export interface ISort
+  export interface ISort extends IId
   {
     property: Property;
     direction: Direction;
@@ -137,7 +138,7 @@ export module CardModels
   
   export interface ISortCard extends ICard
   {
-    sort: ISort;
+    sorts: ISort[];
   }
   
   export interface IFilterCard extends ICard

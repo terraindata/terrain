@@ -83,7 +83,8 @@ class ScoreCard extends React.Component<Props, any>
     };    
     
     Util.bind(this, ['handleWeightsChange', 'renderWeight', 'renderHeader',
-      'handleMethodChange', 'removeWeight', 'renderWeightGraph']);
+      'handleMethodChange', 'removeWeight', 'renderWeightGraph',
+      'addWeight']);
   }
   
   handleWeightsChange(value, event)
@@ -105,6 +106,11 @@ class ScoreCard extends React.Component<Props, any>
     this.setState({
       seed: Math.random(),
     })
+  }
+  
+  addWeight(index)
+  {
+    Actions.cards.score.create(this.props.card, index);
   }
   
   renderWeight(weight, index) 
@@ -145,7 +151,14 @@ class ScoreCard extends React.Component<Props, any>
     // and using an 'id' is a pain
     // if you can think of a better way, implement it
     return (
-      <CardField key={this.state.seed + index} index={index} removable={true} onDelete={this.removeWeight}>
+      <CardField
+        key={this.state.seed + index}
+        index={index}
+        removable={true}
+        onDelete={this.removeWeight}
+        addable={true}
+        onAdd={this.addWeight}
+      >
         <LayoutManager layout={layout} />
       </CardField>
     );
@@ -191,14 +204,16 @@ class ScoreCard extends React.Component<Props, any>
   
   renderHeader()
   {
-    return (
-      <CardField>
-        <Dropdown 
-          onChange={this.handleMethodChange}
-          options={methods}
-          selectedIndex={methods.indexOf(this.props.card.method)} />
-      </CardField>
-    );
+    // we only have one option for now, so we won't show the header
+    return null;
+    // return (
+    //   <CardField>
+    //     <Dropdown 
+    //       onChange={this.handleMethodChange}
+    //       options={methods}
+    //       selectedIndex={methods.indexOf(this.props.card.method)} />
+    //   </CardField>
+    // );
   }
 
   render()

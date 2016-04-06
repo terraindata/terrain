@@ -42,8 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-export var Operators: string[] = ['=', '≥', '>', '≤', '<', 'in', '≠'];
-export var Combinators: string[] = ['&', '||'];
+import * as React from 'react';
+
+export var Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
+export var Combinators: string[] = ['&', 'or'];
 export var Directions: string[] = ['ascending', 'descending'];
 export var CardTypes: string[]  = 
 [
