@@ -59,16 +59,20 @@ var NEW_ALGORITHM =
 var currentparentId = 101;
 var AlgorithmReducer = {};
 
-AlgorithmReducer[ActionTypes.newAlgorithm] =
+AlgorithmReducer[ActionTypes.algorithm.create] =
   (state, action) => 
     state.set("" + (currentparentId ++), Immutable.fromJS(_.extend({}, NEW_ALGORITHM, {id: "alg-" + Util.randInt(1234567)})));
 
-AlgorithmReducer[ActionTypes.closeAlgorithm] =
+AlgorithmReducer[ActionTypes.algorithm.remove] =
   (state, action) =>
     state.delete(action.payload.parentId);
 
-AlgorithmReducer[ActionTypes.duplicateAlgorithm] =
+AlgorithmReducer[ActionTypes.algorithm.duplicate] =
   (state, action) => {
+    var changeId = (node) => node.map((value, key) => 
+      key === 'id' ? "i" + Math.random() : 
+        (Immutable.Iterable.isIterable(value) ? changeId(value) : value));
+    
     var parentId = "" + Math.random();
     return state.set(parentId,
       Immutable.fromJS(state.get("" + action.payload.parentId).toJS()))
@@ -82,11 +86,16 @@ AlgorithmReducer[ActionTypes.duplicateAlgorithm] =
       .updateIn([parentId, 'inputs'], inputs =>
         inputs.map(input =>
           input.set('parentId', parentId)))
+      .map(changeId)
       ;
   }
 
 AlgorithmReducer[ActionTypes.results.changePage] =
   (state, action) =>
     state.setIn([action.payload.parentId, 'resultsPage'], action.payload.page);
+
+AlgorithmReducer[ActionTypes.algorithm.load] =
+  (state, action) =>
+    Immutable.fromJS(action.payload.state);
 
 export default AlgorithmReducer;

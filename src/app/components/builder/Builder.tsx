@@ -100,18 +100,23 @@ class Builder extends React.Component<any, any>
       numColumns: 3,
     };
     
-    Util.bind(this, 'duplicateAlgorithm', 'handleNewAlgorithmTab',
+    Util.bind(this, 'duplicateAlgorithm', 'createAlgorithm',
       'goOneColumn', 'goTwoColumns', 'goThreeColumns', 'save');
   }
   
-  handleNewAlgorithmTab()
+  createAlgorithm()
   {
-    Actions.newAlgorithm();
+    Actions.algorithm.create();
   }
   
   duplicateAlgorithm()
   {
-    Actions.duplicateAlgorithm(this.state.selectedAlgorithmId);
+    Actions.algorithm.duplicate(this.state.selectedAlgorithmId);
+  }
+  
+  loadAlgorithm()
+  {
+    Actions.algorithm.load(JSON.parse(prompt("Paste Algorithm state here")));
   }
   
   updateColumns(numColumns: number)
@@ -150,17 +155,17 @@ class Builder extends React.Component<any, any>
       {
         text: 'new',
         icon: <NewIcon />,
-        onClick: this.handleNewAlgorithmTab,
+        onClick: this.createAlgorithm,
       },
       {
         text: 'open',
         icon: <OpenIcon />,
-        onClick: () => alert("Not yet implemented."),
+        onClick: this.loadAlgorithm,
       },
       {
         text: 'duplicate',
         icon: <DuplicateIcon />,
-        onClick: this.duplicateAlgorithm
+        onClick: this.duplicateAlgorithm,
       },
       {
         text: 'save',
@@ -230,7 +235,7 @@ class Builder extends React.Component<any, any>
       
       var closeFn = () => 
       {
-        Actions.closeAlgorithm(algorithmId);
+        Actions.algorithm.remove(algorithmId);
       }
 
       tabs[algorithmId] = {
@@ -255,7 +260,7 @@ class Builder extends React.Component<any, any>
       content: null,
       tabName: '+',
       pinnedAtEnd: true,
-      onClick: this.handleNewAlgorithmTab,
+      onClick: this.createAlgorithm,
       selectNewTab: true,
       noDrag: true,
     };

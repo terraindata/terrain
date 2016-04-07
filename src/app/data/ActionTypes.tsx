@@ -157,9 +157,13 @@ var ActionTypes =
     changePage: '',
   },
 
-  newAlgorithm: '',
-  closeAlgorithm: '',
-  duplicateAlgorithm: '',
+  algorithm:
+  {
+    create,
+    remove,
+    duplicate: '',
+    load: '',
+  },
 };
 
 // I tried using this type to correclty classify this function,

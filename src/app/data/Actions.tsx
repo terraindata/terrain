@@ -239,18 +239,24 @@ var Actions =
         $(ActionTypes.results.changePage, {parentId, page}),
   },
 
-  newAlgorithm: 
-    () =>
-      $(ActionTypes.newAlgorithm, {}),
-  
-  closeAlgorithm: 
-    (parentId: string) =>
-      $(ActionTypes.closeAlgorithm, {parentId}),
-  
-  duplicateAlgorithm:
-    (parentId: string) =>
-      $(ActionTypes.duplicateAlgorithm, {parentId}),
-
+  algorithm:
+  {
+    create: 
+      () =>
+        $(ActionTypes.algorithm.create, {}),
+    
+    remove: 
+      (parentId: string) =>
+        $(ActionTypes.algorithm.remove, {parentId}),
+    
+    duplicate:
+      (parentId: string) =>
+        $(ActionTypes.algorithm.duplicate, {parentId}),
+    
+    load:
+      (state: any) =>
+        $(ActionTypes.algorithm.load, {state}),
+  },
 };
 
 export default Actions;
