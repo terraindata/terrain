@@ -224,6 +224,11 @@ class ScoreCard extends React.Component<Props, any>
           this.renderHeader()
         }
         {
+          this.props.card.weights.length === 0 && 
+            <div className='info-message info-message-clickable'
+              onClick={this.addWeight}>Add a weight</div>
+        }
+        {
           this.props.card.weights.map(this.renderWeight)
         }
       </div>
