@@ -110,7 +110,7 @@ class ScoreCard extends React.Component<Props, any>
   
   addWeight(index)
   {
-    Actions.cards.score.create(this.props.card, index);
+    Actions.cards.score.create(this.props.card, index + 1);
   }
   
   renderWeight(weight, index) 
