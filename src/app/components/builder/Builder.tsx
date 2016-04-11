@@ -97,7 +97,7 @@ class Builder extends React.Component<any, any>
     this.state = {
       random: Math.random(),
       selectedAlgorithmId: 100, // TODO change to not be hardcoded
-      numColumns: 1,
+      numColumns: 3,
     };
     
     Util.bind(this, 'duplicateAlgorithm', 'createAlgorithm',

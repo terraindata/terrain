@@ -56,9 +56,9 @@ import TQLView from '../tql/TQLView.tsx';
 
 enum COLUMNS {
   Inputs,
-  TQL,
   Builder,
   Results,
+  TQL,
 };
 
 // interface Props
