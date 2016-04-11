@@ -122,7 +122,6 @@ CardsReducer[ActionTypes.cards.create] =
           {
             field: '',
             expression: '',
-            cards: [],
           };
           break;
         case 'score':

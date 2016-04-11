@@ -67,7 +67,7 @@ import { CardColors } from './../../CommonVars.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
-var CARD_TYPES_WITH_CARDS = ['from', 'let', 'count', 'min', 'max', 'avg', 'exists', 'parentheses', 'if', 'var'];
+var CARD_TYPES_WITH_CARDS = ['from', 'count', 'min', 'max', 'avg', 'exists', 'parentheses', 'if']; // 'let', 'var' removed
 
 var hoverCard = (event) => {
   $('.card-hovering').removeClass('card-hovering');

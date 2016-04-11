@@ -68,52 +68,53 @@ class FilterArea extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
-    Util.bind(this, 'renderFilter', 'addFilter', 'moveFilter');
+    Util.bind(this, 'renderFilter', 'addFilter', 'moveFilter', 'changeFilter');
   }
   
   addFilter(index)
   {
     Actions.cards.filter.create(this.props.card, index + 1);
   }
-
+  
+  changeFilter(v, event)
+  {
+    var index = +Util.rel(event.target);
+    var filter = this.props.card.filters[index];
+    if(typeof filter.condition.first === 'string')
+    {
+      var first: any = this.refs['first' + index]['value'];
+    }
+    else
+    {
+      var first: any = filter.condition.first;
+    }
+    
+    if(typeof filter.condition.second === 'string')
+    {
+      var second: any = this.refs['second' + index]['value'];
+    }
+    else
+    {
+      var second: any = filter.condition.second;
+    }
+    
+    var operator = this.refs['operator' + index]['value'];
+    var combinator = this.refs['combinator' + index] ? this.refs['combinator' + index]['value'] : CardModels.Combinator.AND;
+    
+    Actions.cards.filter.change(this.props.card, index, {
+      condition:
+      {
+          operator: operator,
+          first: first,
+          second: second,
+      },
+      combinator: combinator,
+      id: filter.id,
+    });
+  }
+  
   renderFilter(filter: CardModels.IFilter, index: number)
   {
-    var changeFilter = () =>
-    {
-      if(typeof filter.condition.first === 'string')
-      {
-        var first: any = this.refs['first' + index]['value'];
-      }
-      else
-      {
-        var first: any = filter.condition.first;
-      }
-      
-      if(typeof filter.condition.second === 'string')
-      {
-        var second: any = this.refs['second' + index]['value'];
-      }
-      else
-      {
-        var second: any = filter.condition.second;
-      }
-      
-      var operator = this.refs['operator' + index]['value'];
-      console.log(operator);
-      var combinator = this.refs['combinator' + index] ? this.refs['combinator' + index]['value'] : CardModels.Combinator.AND;
-      
-      Actions.cards.filter.change(this.props.card, index, {
-        condition:
-        {
-            operator: operator,
-            first: first,
-            second: second,
-        },
-        combinator: combinator,
-        id: filter.id,
-      });
-    }
-
     var filterLayout =
     {
       columns: [
@@ -121,18 +122,26 @@ class FilterArea extends React.Component<Props, any>
           content: (
             <BuilderTextbox
               value={filter.condition.first}
-              onChange={changeFilter}
+              onChange={this.changeFilter}
+              rel={""+index}
               ref={'first' + index}
               acceptsCards={true}
               parentId={this.props.card.id}
               top={true}
-              />
+            />
           ),
         },
         {
           content: (
             <div>
-              <Dropdown ref={'operator' + index} circle={true} options={Operators} selectedIndex={filter.condition.operator} onChange={changeFilter} />
+              <Dropdown
+                ref={'operator' + index}
+                rel={""+index}
+                circle={true}
+                options={Operators}
+                selectedIndex={filter.condition.operator}
+                onChange={this.changeFilter}
+              />
             </div>
           ),
           width: OPERATOR_WIDTH,
@@ -141,7 +150,8 @@ class FilterArea extends React.Component<Props, any>
           content: (
             <BuilderTextbox
               value={filter.condition.second}
-              onChange={changeFilter}
+              onChange={this.changeFilter}
+              rel={""+index}
               ref={'second' + index}
               acceptsCards={true}
               parentId={this.props.card.id}
@@ -156,7 +166,7 @@ class FilterArea extends React.Component<Props, any>
               circle={true}
               options={Combinators}
               selectedIndex={filter.combinator}
-              onChange={changeFilter}
+              onChange={this.changeFilter}
               />
           )
         }

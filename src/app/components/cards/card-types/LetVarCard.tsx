@@ -69,7 +69,7 @@ class LetVarCard extends React.Component<Props, any>
     {
       expanded: false,
     };
-    Util.bind(this, 'handleExpand');
+    Util.bind(this, 'handleExpand', 'handleChange');
   }
   
   handleExpand()
@@ -78,27 +78,24 @@ class LetVarCard extends React.Component<Props, any>
       expanded: !this.state.expanded,
     });
   }
+    
+  handleChange()
+  {
+    Actions.cards.let.change(this.props.card,
+      this.refs['field']['value'],
+      this.refs['expression']['value']);
+  }
 
   render() {
     var card = this.props.card;
-    
-    var fieldRef = 'field';
-    var expressionRef = 'expression';
-    
-    var handleChange = () =>
-    {
-      Actions.cards.let.change(this.props.card,
-        this.refs[fieldRef]['value'],
-        this.refs[expressionRef]['value']);
-    }
     
     var expressionInput = <BuilderTextbox
       placeholder='Expression'
       value={this.props.card.expression}
       className='let-card-code-input'
-      onChange={handleChange}
+      onChange={this.handleChange}
       textarea={this.state.expanded}
-      ref={expressionRef}
+      ref={'expression'}
       acceptsCards={true}
       />;
 
@@ -109,9 +106,9 @@ class LetVarCard extends React.Component<Props, any>
             <BuilderTextbox
               placeholder='Variable name'
               value={this.props.card.field} 
-              onChange={handleChange} 
+              onChange={this.handleChange} 
               parentId={this.props.card.id}
-              ref={fieldRef} />
+              ref={'field'} />
           ),
         },
         {

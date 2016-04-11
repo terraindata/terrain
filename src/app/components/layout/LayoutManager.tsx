@@ -754,13 +754,14 @@ var LayoutManager = React.createClass<any, any>({
       var style = {paddingBottom: this.props.placeholder.element.getBoundingClientRect().height }
     }
         // { this.props.placeholder && <div style={{height: this.props.placeholder.element.getBoundingClientRect().height }} /> }
-    return (
+    var z = (
       <div className={lmClassString} ref='layoutManagerDiv' style={style}>
         { this.props.layout.columns && this.props.layout.columns.map(this.renderColumn) }
         { this.props.layout.rows && this.props.layout.rows.map(this.renderRow) }
         { this.props.layout.cells && this.props.layout.cells.map(this.renderCell) }
 			</div>
 			);
+    return z;
 	},
 });
 

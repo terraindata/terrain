@@ -46,7 +46,8 @@ require('./TQLView.less');
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import Actions from "../../data/Actions.tsx";
-var tql = require('./dummyTql.json');
+import TQLConverter from "../../tql/TQLConverter.tsx";
+// var tql = require('./dummyTql.json');
 
 interface Props
 {
@@ -59,10 +60,18 @@ class TQLView extends React.Component<Props, any>
     super(props);
   }
   
+  handleChange()
+  {
+    alert("don't change that");
+  }
+  
   render() {
     return (
       <div className='tql-view'>
-        <textarea defaultValue={tql} />
+        <textarea
+          value={TQLConverter.toTQL(this.props.algorithm.cards)}
+          onChange={this.handleChange}
+        />
       </div>
     );
   }

@@ -79,7 +79,6 @@ class Dropdown extends React.Component<Props, any>
     }
     
     var handleClick = () => {
-      console.log(index);
       this.value = index;
       this.props.onChange(index, {
         target: ReactDOM.findDOMNode(this)
