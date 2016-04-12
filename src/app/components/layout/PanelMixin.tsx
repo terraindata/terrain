@@ -314,7 +314,7 @@ var Panel = {
     
     if(this.props.onDrop)
     {
-      this.props.onDrop({
+      this.props.onDrop(this.props.index, {
         dx: x - this.state.ox,
         dy: y - this.state.oy,
       }, { 
@@ -341,7 +341,7 @@ var Panel = {
     {
       if(!this.props.mouseDownRef || event.target == this.refs[this.props.mouseDownRef])
       {
-        this.props.onMouseDown(event);
+        this.props.onMouseDown(this.props.index, event);
       }
     }
     

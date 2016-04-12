@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./CreateCardTool.less')
+var shallowCompare = require('react-addons-shallow-compare');
 import * as React from 'react';
 import Actions from "../../data/Actions.tsx";
 import Util from '../../util/Util.tsx';
@@ -51,10 +52,6 @@ import CreateLine from "../common/CreateLine.tsx";
 
 var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
-
-// Coordinate these with .less
-var buttonPadding = 12;
-var minButtonWidth = 120;
 
 interface Props {
   index: number;
@@ -73,20 +70,25 @@ class CreateCardTool extends React.Component<Props, any>
     this.state = {
       open: false,
     };
+    Util.bind(this, 'createCard');
   }
   
-  createCardFactory(type): () => void {
-    return () => {
-      this.setState({
-        open: false,
-      });
-      
-      if(this.props.open && this.props.onMinimize)
-      {
-        this.props.onMinimize();
-      }
-      Actions.cards.create(this.props.parentId, type, this.props.index);
+  shouldComponentUpdate(nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState);
+  }
+  
+  createCard(event) {
+    this.setState({
+      open: false,
+    });
+    
+    if(this.props.open && this.props.onMinimize)
+    {
+      this.props.onMinimize();
     }
+    
+    var type = Util.rel(event.target);
+    Actions.cards.create(this.props.parentId, type, this.props.index);
   }
   
   // componentWillReceiveProps(newProps)
@@ -102,24 +104,7 @@ class CreateCardTool extends React.Component<Props, any>
   //   }
   // }
   
-  componentWillMount()
-  {
-    // On initial render we don't get the dimensions, need to trigger a redo
-    setTimeout(() => {
-      this.setState(this.state);
-    }, 150);
-  }
-  
   renderCardSelector() {
-    var buttonWidth = minButtonWidth;
-    if(this.refs['ccWrapper'])
-    {
-      var totalWidth = this.refs['ccWrapper']['getBoundingClientRect']().width - buttonPadding;
-      var numButtons = Math.floor(totalWidth / minButtonWidth);
-      var remainder = totalWidth % minButtonWidth;
-      buttonWidth = minButtonWidth + remainder / numButtons - buttonPadding;
-    }
-    
     return (
      <div className='create-card-selector'>
        <div className='create-card-selector-inner'>
@@ -128,14 +113,14 @@ class CreateCardTool extends React.Component<Props, any>
              <a
                className="create-card-button"
                key={type}
-               onClick={this.createCardFactory(type)}
+               rel={type}
+               onClick={this.createCard}
                style={{
                  background: CardColors[type][0],
                  borderColor: CardColors[type][1],
-                 width: buttonWidth,
                }}
              >
-               <div className="create-card-button-inner">
+               <div className="create-card-button-inner" rel={type}>
                  { type === 'parentheses' ? '( )' : type }
                </div>
              </a>

@@ -120,7 +120,7 @@ class Dropdown extends React.Component<Props, any>
   }
   
   componentDidMount() {
-    this.computeDirection();
+    // this.computeDirection();
   }
   
   render() {

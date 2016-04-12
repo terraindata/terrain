@@ -68,6 +68,11 @@ var LayoutManager = React.createClass<any, any>({
     moveTo: React.PropTypes.func,
     placeholder: React.PropTypes.object,
 	},
+  
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return true;
+  },
 
 	getInitialState()
   {
@@ -341,45 +346,100 @@ var LayoutManager = React.createClass<any, any>({
     return arr[index].key;
   },
 
-  onDropFactory(index)
+  onDrop(index, coords, originalCoords)
   {
-    return (coords, originalCoords) => 
+    this.setState({draggingIndex: -1, dragging: false, draggingPlaceholder: null});
+    
+    if(this.panelIsOutside(coords,originalCoords) && this.props.onDropOutside)
     {
-      this.setState({draggingIndex: -1, dragging: false, draggingPlaceholder: null});
-      
-      if(this.panelIsOutside(coords,originalCoords) && this.props.onDropOutside)
-      {
-        this.props.onDropOutside(coords, originalCoords, this.getKeyForIndex(index));
-      }
+      this.props.onDropOutside(coords, originalCoords, this.getKeyForIndex(index));
+    }
 
-			var shiftedIndices = this.computeShiftedIndices(index, coords, originalCoords);
+		var shiftedIndices = this.computeShiftedIndices(index, coords, originalCoords);
+		
+		if(shiftedIndices.length === 0)
+			return;
+
+		var fn = Math.max;
 			
-			if(shiftedIndices.length === 0)
-				return;
-
-			var fn = Math.max;
-				
-			if(shiftedIndices.length && shiftedIndices[0] < index)
-			{
-				fn = Math.min;
-			}
-
-			var indexToMoveTo = fn.apply(null, shiftedIndices);
-
-			if(indexToMoveTo !== null && this.props.moveTo)
-			{
-				this.props.moveTo(index, indexToMoveTo);
-			}
-
-			this.setState({
-				shiftedIndices: [],
-				shiftedHeight: 0,
-				shiftedWidth: 0,
-        draggingInside: 0,
-        draggingOutside: 0,
-			});
+		if(shiftedIndices.length && shiftedIndices[0] < index)
+		{
+			fn = Math.min;
 		}
+
+		var indexToMoveTo = fn.apply(null, shiftedIndices);
+
+		if(indexToMoveTo !== null && this.props.moveTo)
+		{
+			this.props.moveTo(index, indexToMoveTo);
+		}
+
+		this.setState({
+			shiftedIndices: [],
+			shiftedHeight: 0,
+			shiftedWidth: 0,
+      draggingInside: 0,
+      draggingOutside: 0,
+		});
 	},
+  
+  onResize(index, event)
+  {
+    var startX = event.pageX;
+    var startSAX = this.state.sizeAdjustments[index].x;
+    this.setState({
+      resizingIndex: index,
+    });
+    
+    var arr = this.props.layout.rows || this.props.layout.columns || this.props.layout.cells;
+    var minWidth = arr[index].minWidth || 0;
+    var startWidth = this.refs[index].getBoundingClientRect().width;
+    
+    var minPrevWidth = arr[index - 1] ? arr[index - 1].minWidth || 0 : 0;
+    var startPrevWidth = arr[index - 1] ? this.refs[index - 1].getBoundingClientRect().width : null;
+    $('body').addClass('resizing');
+    var target = event.target;
+    $(target).addClass('active');
+    
+    var move = function(event)
+    {
+      var diffX = startX - event.pageX;
+      var newWidth = startWidth + diffX;
+      if(newWidth < minWidth)
+      {
+        diffX += minWidth - newWidth;
+      }
+      
+      var newPrevWidth = startPrevWidth - diffX;
+      if(minPrevWidth !== null && newPrevWidth < minPrevWidth)
+      {
+        diffX -= minPrevWidth - newPrevWidth;
+      }
+      
+      this.state.sizeAdjustments[index].x = startSAX + diffX;
+      this.setState({
+        sizeAdjustments: this.state.sizeAdjustments,
+      })
+    }.bind(this);
+    
+    var endMove = () => 
+    {
+      this.setState({
+        resizingIndex: null,
+      });
+      $('body').removeClass('resizing');
+      $(target).removeClass('active');
+      $(document).off('mousemove', move);
+      $(document).off('touchmove', move);
+      $(document).off('mouseup', endMove);
+      $(document).off('touchend', endMove);  
+    }
+    
+    $(document).on('mousemove', move);
+    $(document).on('touchmove', move);
+    $(document).on('mouseup', endMove);
+    $(document).on('touchend', endMove);
+  },
 
 	renderObj(obj, className, index, style) 
 	{
@@ -395,7 +455,7 @@ var LayoutManager = React.createClass<any, any>({
 			var props:any = { 
         index: index,
 				onDrag: this.onDrag,
-				onDrop: this.onDropFactory(index),
+				onDrop: this.onDrop,
 				parentNode: this.refs.layoutManagerDiv,
         dy: 0,
         dx: 0,
@@ -458,63 +518,7 @@ var LayoutManager = React.createClass<any, any>({
       if(obj.resizeable)
       {
         props.mouseDownRef = obj.resizeHandleRef;
-        props.onMouseDown = (event) =>
-        {
-          var startX = event.pageX;
-          var startSAX = this.state.sizeAdjustments[index].x;
-          this.setState({
-            resizingIndex: index,
-          });
-          
-          var arr = this.props.layout.rows || this.props.layout.columns || this.props.layout.cells;
-          var minWidth = arr[index].minWidth || 0;
-          var startWidth = this.refs[index].getBoundingClientRect().width;
-          
-          var minPrevWidth = arr[index - 1] ? arr[index - 1].minWidth || 0 : 0;
-          var startPrevWidth = arr[index - 1] ? this.refs[index - 1].getBoundingClientRect().width : null;
-          $('body').addClass('resizing');
-          var target = event.target;
-          $(target).addClass('active');
-          
-          var move = function(event)
-          {
-            var diffX = startX - event.pageX;
-            var newWidth = startWidth + diffX;
-            if(newWidth < minWidth)
-            {
-              diffX += minWidth - newWidth;
-            }
-            
-            var newPrevWidth = startPrevWidth - diffX;
-            if(minPrevWidth !== null && newPrevWidth < minPrevWidth)
-            {
-              diffX -= minPrevWidth - newPrevWidth;
-            }
-            
-            this.state.sizeAdjustments[index].x = startSAX + diffX;
-            this.setState({
-              sizeAdjustments: this.state.sizeAdjustments,
-            })
-          }.bind(this);
-          
-          var endMove = () => 
-          {
-            this.setState({
-              resizingIndex: null,
-            });
-            $('body').removeClass('resizing');
-            $(target).removeClass('active');
-            $(document).off('mousemove', move);
-            $(document).off('touchmove', move);
-            $(document).off('mouseup', endMove);
-            $(document).off('touchend', endMove);  
-          }
-          
-          $(document).on('mousemove', move);
-          $(document).on('touchmove', move);
-          $(document).on('mouseup', endMove);
-          $(document).on('touchend', endMove);
-        }
+        props.onMouseDown = this.onResize;
       }
 
 			var content:any = React.cloneElement(obj.content, props);
@@ -684,10 +688,10 @@ var LayoutManager = React.createClass<any, any>({
       }
     }
 
-    if(this.props.layout.stackAt && this.props.layout.stackAt > $(window).width()) {
-      classToPass = "";
-      style = {};
-    }
+    // if(this.props.layout.stackAt && this.props.layout.stackAt > $(window).width()) {
+    //   classToPass = "";
+    //   style = {};
+    // }
 
 		return this.renderObj(column, classToPass, index, style);
 	},
@@ -754,14 +758,13 @@ var LayoutManager = React.createClass<any, any>({
       var style = {paddingBottom: this.props.placeholder.element.getBoundingClientRect().height }
     }
         // { this.props.placeholder && <div style={{height: this.props.placeholder.element.getBoundingClientRect().height }} /> }
-    var z = (
+    return (
       <div className={lmClassString} ref='layoutManagerDiv' style={style}>
         { this.props.layout.columns && this.props.layout.columns.map(this.renderColumn) }
         { this.props.layout.rows && this.props.layout.rows.map(this.renderRow) }
         { this.props.layout.cells && this.props.layout.cells.map(this.renderCell) }
 			</div>
 			);
-    return z;
 	},
 });
 

@@ -50,6 +50,9 @@ require("./GeneralStyle.less");
 // Libraries
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
+import * as Perf from 'react-addons-perf';
+window['PerfStart'] = Perf.start;
+window['PerfEnd'] = () => { Perf.stop(); Perf.printWasted(Perf.getLastMeasurements()); }
 
 // Components
 import LayoutManager from "./components/layout/LayoutManager.tsx";

@@ -84,6 +84,11 @@ var CardField = React.createClass({
 		};
 	},
   
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return nextProps.children !== this.props.children || nextProps.value !== this.state.value || nextState.value !== this.state.value;
+  },
+  
   componentDidMount()
   {
     // $(this.refs.panel).height(0);
