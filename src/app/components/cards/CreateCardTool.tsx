@@ -73,9 +73,9 @@ class CreateCardTool extends React.Component<Props, any>
     Util.bind(this, 'createCard');
   }
   
-  shouldComponentUpdate(nextProps, nextState) {
-    return shallowCompare(this, nextProps, nextState);
-  }
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   return shallowCompare(this, nextProps, nextState);
+  // }
   
   createCard(event) {
     this.setState({

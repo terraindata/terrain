@@ -145,18 +145,12 @@ var CardsArea = React.createClass<any, any>({
       key: 'end-tool',
     });
 
-    var moveTo = (curIndex, newIndex) =>
-    {
-      // Actions.cards.move(this.props.cards[curIndex], newIndex, this.props.parentId);
-    };
-
     return (
       <div
         className={'cards-area' + (this.props.topLevel ? ' cards-area-top-level' : '')}
         ref='cardsArea'>
         <LayoutManager
           layout={layout}
-          moveTo={moveTo}
           placeholder={this.state.draggingPlaceholder || this.props.draggingPlaceholder}
           />
       </div>

@@ -45,6 +45,7 @@ THE SOFTWARE.
 require('./panel.less');
 import * as React from 'react';
 var _ = require('underscore');
+var shallowCompare = require('react-addons-shallow-compare');
 import * as ReactDOM from "react-dom";
 import Util from '../../util/Util.tsx';
 var $ = require('jquery');
@@ -56,6 +57,10 @@ var MAX_SCROLL_VELOCITY = 20;
 var SCROLL_INTERVAL = 25;
 
 var Panel = {
+  shouldComponentUpdate(nextProps, nextState) {
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  },
+  
 	propTypes: 
 	{
     index: React.PropTypes.number,

@@ -71,7 +71,9 @@ var LayoutManager = React.createClass<any, any>({
   
   shouldComponentUpdate(nextProps, nextState)
   {
-    return true;
+    return !_.isEqual(this.props.layout, nextProps.layout)
+      || !_.isEqual(this.state, nextState)
+      || !_.isEqual(this.props.placeholder, nextProps.placeholder);
   },
 
 	getInitialState()
