@@ -71,6 +71,7 @@ var LayoutManager = React.createClass<any, any>({
   
   shouldComponentUpdate(nextProps, nextState)
   {
+    // return true;
     return !_.isEqual(this.props.layout, nextProps.layout)
       || !_.isEqual(this.state, nextState)
       || !_.isEqual(this.props.placeholder, nextProps.placeholder);
@@ -475,14 +476,15 @@ var LayoutManager = React.createClass<any, any>({
 
 				if(this.props.layout.cells)
 				{
+          var numCells = this.getNumCellsInRow();
 					if(index < this.state.draggingIndex)
 					{
 						// should shift forward and down
 						props.dx = this.state.shiftedWidth;
 						props.dy = 0;
-						if((index + 1) % this.getNumCellsInRow() === 0)
+						if((index + 1) % numCells === 0)
 						{
-							props.dx = -1 * this.state.shiftedWidth * (this.getNumCellsInRow() - 1);
+							props.dx = -1 * this.state.shiftedWidth * (numCells - 1);
 							props.dy = this.state.shiftedHeight;
 						}
 					}
@@ -492,9 +494,9 @@ var LayoutManager = React.createClass<any, any>({
 						// should shift backward and up
 						props.dx = -1 * this.state.shiftedWidth;
 						props.dy = 0;
-						if(index % this.getNumCellsInRow() === 0)
+						if(index % numCells === 0)
 						{
-							props.dx = this.state.shiftedWidth * (this.getNumCellsInRow() - 1);
+							props.dx = this.state.shiftedWidth * (numCells - 1);
 							props.dy = -1 * this.state.shiftedHeight;
 						}
 					}
@@ -690,50 +692,50 @@ var LayoutManager = React.createClass<any, any>({
       }
     }
 
-    // if(this.props.layout.stackAt && this.props.layout.stackAt > $(window).width()) {
-    //   classToPass = "";
-    //   style = {};
-    // }
-
 		return this.renderObj(column, classToPass, index, style);
-	},
-
-	getNumCellsInRow()
-	{
-    if(!this.refs.layoutManagerDiv)
-    {
-      return 1;
-    }
-    return Math.floor(this.refs.layoutManagerDiv.getBoundingClientRect().width /
-      this.props.layout.minCellWidth);
-	},
-
-	getCellWidth()
-	{
-		return (100 / this.getNumCellsInRow()) + '%';
-	},
-
-	getCellHeight()
-	{
-		return this.props.layout.cellHeight;
 	},
 
 	renderCell(cell, index) 
 	{
 		// todo consider moving this to somehwere not in a loop
-		var height = this.getCellHeight();
+		var height = this.props.layout.cellHeight;
 		if(typeof height !== 'string')
 			height += 'px'; // necessary?
 
-		var width = this.getCellWidth();
-
 		var style = {
 			height: height,
-			width: width
+			minWidth: this.props.layout.minCellWidth,
 		}
 
 		return this.renderObj(cell, cellClass, index, style);
 	},
+  
+  renderBlankCell(cell, index)
+  {
+    return <div
+      style={{minWidth: this.props.layout.minCellWidth}}
+      key={'blank-' + index}
+      className={cellClass}
+    />;
+  },
+  
+  getNumCellsInRow()
+  {
+    // TODO change how cell drag and drop works, and remove this crap
+    var count = 1;
+    var children = this.refs['layoutManagerDiv'].children;
+    if(children[0])
+    {
+      var y = children[0].getBoundingClientRect().top;
+      while(children[count] && children[count].getBoundingClientRect().top === y)
+      {
+        count ++;
+      }
+      return count;
+    }
+    
+    return 1;
+  },
 
 	render() 
 	{
@@ -765,6 +767,7 @@ var LayoutManager = React.createClass<any, any>({
         { this.props.layout.columns && this.props.layout.columns.map(this.renderColumn) }
         { this.props.layout.rows && this.props.layout.rows.map(this.renderRow) }
         { this.props.layout.cells && this.props.layout.cells.map(this.renderCell) }
+        { this.props.layout.cells && this.props.layout.cells.map(this.renderBlankCell) }
 			</div>
 			);
 	},

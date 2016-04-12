@@ -3,7 +3,8 @@
 
 .layout-manager {
 	position: relative;
-	/*height: 100%;*/
+  display: flex;
+  flex-wrap: wrap;
 	width: 100%;
 	font-size: 0px;
 }
@@ -15,6 +16,7 @@
 .layout-manager-cell {
 	position: relative;
 	display: inline-block;
+  flex-grow: 1;
 }
 
 .layout-manager-column {

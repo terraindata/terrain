@@ -82,13 +82,62 @@ var CardsArea = React.createClass<any, any>({
     return this.props.topLevel;
   },
   
+  componentWillReceiveProps(nextProps)
+  {
+    if(!_.isEqual(nextProps, this.props))
+    {
+      this.setState({
+        layout:
+        {
+          rows: this.getRows(nextProps),
+          useDropZones: true,
+        }
+      });
+    }
+  },
+  
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  },
+  
   getInitialState()
   {
     return {
-      showTQL: false,
-      title: 'Builder',
       id: Util.randInt(123456789),
+      layout:
+      {
+        rows: this.getRows(this.props),
+        useDropZones: true,
+      }
     };
+  },
+  
+  getRows(props)
+  {
+    return props.cards.map((card, index) => (
+      {
+        content: <Card 
+          index={index}
+          card={card}
+          onDropOutside={this.onDropOutside}
+          parentId={this.props.parentId}
+          cards={this.props.cards}
+          spotlights={this.props.spotlights}
+          />,
+        key: card.id,
+      }
+    )).concat({
+      content: (
+        <CreateCardTool
+          index={this.props.cards.length}
+          open={this.props.topLevel || this.props.cards.length === 0}
+          parentId={this.props.parentId}
+          className={this.props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
+          />
+      ),
+      key: 'end-tool',
+    })
   },
   
   copy() {},
@@ -115,42 +164,13 @@ var CardsArea = React.createClass<any, any>({
         onClick={this.createFromCard}
         />;
     }
-    
-    var layout = {
-      rows: this.props.cards.map((card, index) => {
-        return {
-          content: <Card 
-            index={index}
-            card={card}
-            onDropOutside={this.onDropOutside}
-            parentId={this.props.parentId}
-            cards={this.props.cards}
-            spotlights={this.props.spotlights}
-            />,
-          key: card.id,
-        };
-      }),
-      useDropZones: true,
-    };
-    
-    layout.rows.push({
-      content: (
-        <CreateCardTool
-          index={this.props.cards.length}
-          open={this.props.topLevel || this.props.cards.length === 0}
-          parentId={this.props.parentId}
-          className={this.props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
-          />
-      ),
-      key: 'end-tool',
-    });
 
     return (
       <div
         className={'cards-area' + (this.props.topLevel ? ' cards-area-top-level' : '')}
         ref='cardsArea'>
         <LayoutManager
-          layout={layout}
+          layout={this.state.layout}
           placeholder={this.state.draggingPlaceholder || this.props.draggingPlaceholder}
           />
       </div>
