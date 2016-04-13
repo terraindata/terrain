@@ -61,11 +61,11 @@ var AlgorithmReducer = {};
 
 AlgorithmReducer[ActionTypes.algorithm.create] =
   (state, action) => 
-    state.set("" + (currentparentId ++), Immutable.fromJS(_.extend({}, NEW_ALGORITHM, {id: "alg-" + Util.randInt(1234567)})));
+    state.setIn(["algorithms", "" + (currentparentId ++)], Immutable.fromJS(_.extend({}, NEW_ALGORITHM, {id: "alg-" + Util.randInt(1234567)})));
 
 AlgorithmReducer[ActionTypes.algorithm.remove] =
   (state, action) =>
-    state.delete(action.payload.parentId);
+    state.deleteIn(["algorithms", action.payload.parentId]);
 
 AlgorithmReducer[ActionTypes.algorithm.duplicate] =
   (state, action) => {
@@ -74,7 +74,7 @@ AlgorithmReducer[ActionTypes.algorithm.duplicate] =
         (Immutable.Iterable.isIterable(value) ? changeId(value) : value));
     
     var parentId = "" + Math.random();
-    return state.set(parentId,
+    return state.setIn(["algorithms", parentId],
       Immutable.fromJS(state.get("" + action.payload.parentId).toJS()))
       .setIn([parentId, 'algorithmName'], 'Copy of ' + state.getIn(["" + action.payload.parentId, 'algorithmName']))
       .updateIn([parentId, 'results'], results =>
@@ -92,10 +92,10 @@ AlgorithmReducer[ActionTypes.algorithm.duplicate] =
 
 AlgorithmReducer[ActionTypes.results.changePage] =
   (state, action) =>
-    state.setIn([action.payload.parentId, 'resultsPage'], action.payload.page);
+    state.setIn(["algorithms", action.payload.parentId, 'resultsPage'], action.payload.page);
 
 AlgorithmReducer[ActionTypes.algorithm.load] =
   (state, action) =>
-    Immutable.fromJS(action.payload.state);
+    state.set("algorithms", Immutable.fromJS(action.payload.state));
 
 export default AlgorithmReducer;

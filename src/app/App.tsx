@@ -70,12 +70,31 @@ var BuilderIcon = require("./../images/icon_reporting_18x18.svg?name=BuilderIcon
 var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIcon");
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 
+import Actions from "./data/Actions.tsx";
+import Store from "./data/Store.tsx";
+
 var App = React.createClass({
+  componentDidMount() {
+    // Respond to authentication state changes.
+    Store.subscribe(() => {
+      let token = Store.getState().get('authenticationToken');
+      this.setState({
+        loggedIn: token !== null
+      });
+    });
+    
+    // Retrieve logged-in state from persistent storage.
+    let token = localStorage['authenticationToken'];
+    if (token !== undefined && token !== null) {
+      Actions.authentication.login(token);
+    }
+  },
+  
   getInitialState()
   {
     return {
       selectedPage: 3,
-      loggedIn: true,
+      loggedIn: false,
     };
   },
   
@@ -94,25 +113,16 @@ var App = React.createClass({
     })
   },
   
-  handleLogin()
-  {
-    this.setState({
-      loggedIn: true,
-    });
-  },
-  
   handleLogout()
   {
-    this.setState({
-      loggedIn: false,
-    });
+    Actions.authentication.logout();
   },
   
   renderApp()
   {
     if(!this.state.loggedIn)
     {
-      return <Login onLogin={this.handleLogin} />;
+      return <Login />;
     }
     
     var links = 

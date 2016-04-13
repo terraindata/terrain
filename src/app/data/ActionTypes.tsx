@@ -164,6 +164,12 @@ var ActionTypes =
     duplicate: '',
     load: '',
   },
+
+  authentication:
+  {
+    login: '',
+    logout: '',
+  },
 };
 
 // I tried using this type to correclty classify this function,

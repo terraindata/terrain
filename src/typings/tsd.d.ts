@@ -61,3 +61,8 @@ declare type Key = string;
 declare type Value = string;
 declare type Property = string;
 
+// SERVER_URL is a "compile time" substition done by Webpack.
+declare var SERVER_URL: string;
+
+// DEV is a "compile time" substition done by Webpack.
+declare var DEV: boolean;
