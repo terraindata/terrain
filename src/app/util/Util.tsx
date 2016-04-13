@@ -70,10 +70,10 @@ var immutableCardsUpdate =
     {
       keysToUpdate = [keysToUpdate as string];
     }
-    return state.get('algorithms').map((algorithm) => 
+    return state.update('algorithms', algorithms => algorithms.map((algorithm) => 
       (keysToUpdate as string[]).reduce(
         (algorithm, keyToUpdate) => immutableCardsUpdateHelper(algorithm, keyToUpdate, id, updater)
-      , algorithm));
+      , algorithm)));
   }
 
 var Util = {
