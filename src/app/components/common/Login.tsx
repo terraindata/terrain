@@ -85,6 +85,15 @@ class Login extends React.Component<Props, any>
   
   handleLogin = () =>
   {
+    let login = (token: string) => {
+      Actions.authentication.login(token);
+    };
+    
+    if (DEV === true) {
+      login("DEV mode free pass.");
+      return
+    }
+    
     let xhr = new XMLHttpRequest();
     xhr.onerror = (ev:Event) => {
       alert("Error logging in: " + ev);
@@ -93,10 +102,8 @@ class Login extends React.Component<Props, any>
       if (xhr.status != 200) {
         alert("Failed to log in: " + xhr.responseText);
         return;
-      } 
-      
-      let token = xhr.responseText;
-      Actions.authentication.login(token);
+      }
+      login(xhr.responseText);
     }
     // NOTE: $SERVER_URL will be replaced by the build process.
     xhr.open("POST", SERVER_URL + "/auth", true);

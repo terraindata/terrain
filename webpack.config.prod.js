@@ -58,6 +58,8 @@ conf.plugins = [
       'NODE_ENV': "'production'"
     },
     
+    'DEV': "false",
+    
     // The server simultaneously serves the client and the client's requests.
     'SERVER_URL': "''"
   }),

@@ -73,7 +73,8 @@ module.exports = {
     },
     plugins: [
       new webpack.DefinePlugin({
-        'SERVER_URL': "'//localhost:40080'"
+        'SERVER_URL': "'//localhost:40080'",
+        'DEV': "true"
       })
     ]
 };
