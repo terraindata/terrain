@@ -55,6 +55,10 @@ var cellClass = 'layout-manager-cell';
 var fullHeightClass = 'layout-manager-full-height';
 var CARD_TOP_THRESHOLD = 15;
 
+// var LT = 0;
+// var WT = 0;
+// var ST = 0;
+
 interface Adjustment
 {
   x: number;
@@ -71,10 +75,13 @@ var LayoutManager = React.createClass<any, any>({
   
   shouldComponentUpdate(nextProps, nextState)
   {
-    // return true;
-    return !_.isEqual(this.props.layout, nextProps.layout)
+    var b = !_.isEqual(this.props.layout, nextProps.layout)
       || !_.isEqual(this.state, nextState)
       || !_.isEqual(this.props.placeholder, nextProps.placeholder);
+    return b;
+    // return !_.isEqual(this.props.layout, nextProps.layout)
+    //   || !_.isEqual(this.state, nextState)
+    //   || !_.isEqual(this.props.placeholder, nextProps.placeholder);
   },
 
 	getInitialState()
@@ -544,27 +551,12 @@ var LayoutManager = React.createClass<any, any>({
 	renderRow(row, index) 
 	{
 		var style: React.CSSProperties = {};
-		// TODO fix this, it's breaking
-    if(this.props.layout.rowHeight === 'fill') 
-    {
-			var total = this.sumColsThroughIndex(-1), sum = this.sumColsThroughIndex(index);
-			style = {
-				top: (sum / total) * 100 + '%',
-				height: ((row.rowSpan || 1) / total) * 100 + '%',
-				position: 'absolute'
-			};
-		}
-    
-    // if(this.state.draggingOutside && index === this.state.draggingIndex)
-    // {
-    //   style.height = '0px';
-    // }
-
 		return this.renderObj(row, rowClass, index, style);
 	},
 
 	calcColumnLeft(column, index)
 	{
+    // var t = (new Date()).getTime();
 		var left = this.props.layout.columns.reduce((sum, col, i) => {
 			if(i >= index)
 			{
@@ -580,7 +572,8 @@ var LayoutManager = React.createClass<any, any>({
 			percentage: 0,
 			offset: 0,
 		});
-		
+		// LT += (new Date()).getTime() - t;
+  //   console.log('L', LT);
 		return 'calc(' + left.percentage + '% + ' + left.offset + 'px)';
 	},
 
@@ -654,24 +647,21 @@ var LayoutManager = React.createClass<any, any>({
 
 	calcColumnWidth(column, index)
 	{
+    // var t = (new Date()).getTime();
 		var widthValues = this.calcColumnWidthValues(column, index);
 		var finalWidth = 'calc(' + widthValues.percentage + '% + ' + widthValues.offset + 'px)';
-
+    // WT += (new Date()).getTime() - t;
+    // console.log('w', WT);
 		return finalWidth;
 	},
 
 	renderColumn(column, index) 
 	{
 		var classToPass = colClass;
-		var style: React.CSSProperties =
-		{
-			left: this.calcColumnLeft(column, index),
-			width: this.calcColumnWidth(column, index),
-		};
     
     if(this.props.layout.compact)
     {
-       style =
+       var style: React.CSSProperties =
        {
          display: 'inline-block',
          position: 'relative',
@@ -679,19 +669,15 @@ var LayoutManager = React.createClass<any, any>({
          width: 'auto',
        } ;
     }
-    
-    if(this.props.layout.useRelative)
+    else
     {
-      style =
+      var style: React.CSSProperties =
       {
-        display: 'inline-block',
-        width: style.width,
-        position: 'relative',
-        height: 'auto',
-        verticalAlign: 'top',
-      }
+        left: this.calcColumnLeft(column, index),
+        width: this.calcColumnWidth(column, index),
+      };
     }
-
+    
 		return this.renderObj(column, classToPass, index, style);
 	},
 

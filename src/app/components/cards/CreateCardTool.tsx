@@ -73,9 +73,9 @@ class CreateCardTool extends React.Component<Props, any>
     Util.bind(this, 'createCard');
   }
   
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   return shallowCompare(this, nextProps, nextState);
-  // }
+  shouldComponentUpdate(nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState);
+  }
   
   createCard(event) {
     this.setState({
@@ -132,6 +132,11 @@ class CreateCardTool extends React.Component<Props, any>
   }
   
   render() {
+    if(!this.props.open && !this.state.open)
+    {
+      return null;
+    }
+    
     var classes = Util.objToClassname({
       "create-card-wrapper": true,
       "create-card-open": this.state.open || this.props.open,
