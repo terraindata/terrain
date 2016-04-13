@@ -6,7 +6,7 @@
   "scripts": {
     "start": "webpack-dev-server --inline --content-base src/app",
     "test": "karma start karma.conf.js",
-    "deploy": "webpack && scp bundle.js u51505641@lukeknepper.com:alfaromeo/bundle.js",
+    "deploy": "webpack --config webpack.config.prod.js --output-filename bundle.prod.js && scp bundle.prod.js u51505641@lukeknepper.com:alfaromeo/bundle.js",
     "build-prod": "webpack --config webpack.config.prod.js --output-filename bundle.prod.js"
   },
   "repository": {

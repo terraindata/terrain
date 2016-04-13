@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 require('./BuilderColumn.less');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -55,11 +56,12 @@ import ResultsArea from "./../../components/results/ResultsArea.tsx";
 import TQLView from '../tql/TQLView.tsx';
 
 enum COLUMNS {
-  Inputs,
   Builder,
-  Results,
   TQL,
+  Inputs,
+  Results,
 };
+var NUM_COLUMNS = 4;
 
 // interface Props
 // {
@@ -143,25 +145,10 @@ var BuilderColumn = React.createClass<any, any>(
   
   getMenuOptions(): MenuOption[]
   {
-    var options: MenuOption[] = 
-    [
-      {
-        text: 'Inputs',
-        onClick: this.switchView,
-      },
-      {
-        text: 'Builder',
-        onClick: this.switchView,
-      },
-      {
-        text: 'Results',
-        onClick: this.switchView,
-      },
-      {
-        text: 'TQL',
-        onClick: this.switchView,
-      },
-    ];
+    var options: MenuOption[] = _.range(0, NUM_COLUMNS).map(index => ({
+      text: COLUMNS[index],
+      onClick: this.switchView,
+    }));
     
     options[this.state.column].disabled = true;
     

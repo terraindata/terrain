@@ -124,9 +124,7 @@ class BuilderTextbox extends React.Component<Props, any>
     {
       this.value = '';
       this.executeChange({
-        target: {
-          value: '',
-        },
+        target: this,
         switched: true,
       })  
     }
@@ -142,9 +140,7 @@ class BuilderTextbox extends React.Component<Props, any>
       
       this.value = newCard;
       this.executeChange({
-        target: {
-          value: newCard,
-        },
+        target: this,
         switched: true,
       });
     }

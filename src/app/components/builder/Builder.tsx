@@ -97,7 +97,7 @@ class Builder extends React.Component<any, any>
     this.state = {
       random: Math.random(),
       selectedAlgorithmId: 100, // TODO change to not be hardcoded
-      numColumns: 3,
+      numColumns: 2,
     };
     
     Util.bind(this, 'duplicateAlgorithm', 'createAlgorithm',
@@ -208,7 +208,7 @@ class Builder extends React.Component<any, any>
         fullHeight: true,
         columns: [
           {
-            width: 316,
+            // width: 316,
             minWidth: 316,
             resizeable: true,
             resizeHandleRef: 'resize-handle',
@@ -216,14 +216,14 @@ class Builder extends React.Component<any, any>
             hidden: this.state.numColumns < 2,
           },
           {
-            colSpan: 3,
+            // colSpan: 3,
             minWidth: 316,
             resizeable: true,
             resizeHandleRef: 'resize-handle',
             content: <BuilderColumn algorithm={algorithm} />,
           },
           {
-            colSpan: 2,
+            // colSpan: 2,
             minWidth: 316,
             resizeable: true,
             resizeHandleRef: 'resize-handle',

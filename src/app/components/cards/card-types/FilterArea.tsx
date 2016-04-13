@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
@@ -60,15 +61,12 @@ interface Props
   hideNoFilterMessage?: boolean;
 }
 
-var OPERATOR_WIDTH: number = 27;
-var CARD_PADDING: number = 12;
-
 class FilterArea extends React.Component<Props, any>
 {
   constructor(props:Props)
   {
     super(props);
-    Util.bind(this, 'renderFilter', 'addFilter', 'moveFilter', 'changeFilter');
+    Util.bind(this, 'renderFilter', 'addFilter', 'moveFilter', 'changeFilter', 'deleteFilter');
   }
   
   addFilter(index)
@@ -76,28 +74,18 @@ class FilterArea extends React.Component<Props, any>
     Actions.cards.filter.create(this.props.card, index + 1);
   }
   
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(nextProps.card.filters, this.props.card.filters)
+      || !_.isEqual(nextProps.spotlights, this.props.spotlights);
+  }
+  
   changeFilter(v, event)
   {
     var index = +Util.rel(event.target);
     var filter = this.props.card.filters[index];
-    if(typeof filter.condition.first === 'string')
-    {
-      var first: any = this.refs['first' + index]['value'];
-    }
-    else
-    {
-      var first: any = filter.condition.first;
-    }
-    
-    if(typeof filter.condition.second === 'string')
-    {
-      var second: any = this.refs['second' + index]['value'];
-    }
-    else
-    {
-      var second: any = filter.condition.second;
-    }
-    
+    var first: any = this.refs['first' + index]['value'];
+    var second: any = this.refs['second' + index]['value'];
     var operator = this.refs['operator' + index]['value'];
     var combinator = this.refs['combinator' + index] ? this.refs['combinator' + index]['value'] : CardModels.Combinator.AND;
     
@@ -113,72 +101,13 @@ class FilterArea extends React.Component<Props, any>
     });
   }
   
+  deleteFilter(index)
+  {
+    Actions.cards.filter.remove(this.props.card, index);
+  }
+  
   renderFilter(filter: CardModels.IFilter, index: number)
   {
-    var filterLayout =
-    {
-      columns: [
-        {
-          content: (
-            <BuilderTextbox
-              value={filter.condition.first}
-              onChange={this.changeFilter}
-              rel={""+index}
-              ref={'first' + index}
-              acceptsCards={true}
-              parentId={this.props.card.id}
-              top={true}
-            />
-          ),
-        },
-        {
-          content: (
-            <div>
-              <Dropdown
-                ref={'operator' + index}
-                rel={""+index}
-                circle={true}
-                options={Operators}
-                selectedIndex={filter.condition.operator}
-                onChange={this.changeFilter}
-              />
-            </div>
-          ),
-          width: OPERATOR_WIDTH,
-        },
-        {
-          content: (
-            <BuilderTextbox
-              value={filter.condition.second}
-              onChange={this.changeFilter}
-              rel={""+index}
-              ref={'second' + index}
-              acceptsCards={true}
-              parentId={this.props.card.id}
-              />
-          ),
-        },
-        {
-          width: OPERATOR_WIDTH,
-          content: index === this.props.card.filters.length - 1 ? null : (
-            <Dropdown
-              ref={'combinator' + index}
-              circle={true}
-              options={Combinators}
-              selectedIndex={filter.combinator}
-              onChange={this.changeFilter}
-              />
-          )
-        }
-      ],
-      colPadding: CARD_PADDING,
-    };
-
-    var deleteFn = () =>
-    {
-        Actions.cards.filter.remove(this.props.card, index);
-    }
-    
     return (
       <CardField
         draggable={true}
@@ -186,7 +115,7 @@ class FilterArea extends React.Component<Props, any>
         removable={true}
         addable={true}
         onAdd={this.addFilter}
-        onDelete={deleteFn}
+        onDelete={this.deleteFilter}
         aboveContent={<BuilderTextboxCards
           value={filter.condition.first}
           spotlights={this.props.spotlights}
@@ -198,7 +127,50 @@ class FilterArea extends React.Component<Props, any>
           parentId={this.props.card.id}
           />}
       >
-        <LayoutManager layout={filterLayout} />
+        <div className='flex-container'>
+          <div className='flex-grow card-padding'>
+            <BuilderTextbox
+              value={filter.condition.first}
+              onChange={this.changeFilter}
+              rel={""+index}
+              ref={'first' + index}
+              acceptsCards={true}
+              parentId={this.props.card.id}
+              top={true}
+            />
+          </div>
+          <div className='builder-operator'>
+            <Dropdown
+              ref={'operator' + index}
+              rel={""+index}
+              circle={true}
+              options={Operators}
+              selectedIndex={filter.condition.operator}
+              onChange={this.changeFilter}
+            />
+          </div>
+          <div className='flex-grow card-padding'>
+            <BuilderTextbox
+              value={filter.condition.second}
+              onChange={this.changeFilter}
+              rel={""+index}
+              ref={'second' + index}
+              acceptsCards={true}
+              parentId={this.props.card.id}
+            />
+          </div>
+          <div className='builder-operator'>
+            { index === 0 ? null :
+              <Dropdown
+                ref={'combinator' + index}
+                circle={true}
+                options={Combinators}
+                selectedIndex={filter.combinator}
+                onChange={this.changeFilter}
+              />
+            }
+          </div>
+        </div>
       </CardField>
     );
   }

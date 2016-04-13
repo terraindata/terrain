@@ -105,14 +105,36 @@ var Card = React.createClass({
       dropZoneRef: 'cardBody',
 		};
 	},
-
+  
 	getInitialState()
 	{
 		return {
 			open: true,
       ref: 'card-' + this.props.card.id,
       id: this.props.card.id,
-		}
+      menuOptions:
+      [
+        {
+          text: 'Copy',
+          onClick: this.handleCopy,
+        },
+        {
+          text: 'Hide',
+          onClick: this.handleTitleClick,
+        },
+        {
+          text: 'Delete',
+          onClick: this.handleDelete,
+        },
+      ],
+      titleStyle: {
+        background: CardColors[this.props.card.type] ? CardColors[this.props.card.type][0] : CardColors['none'][0],
+      },
+      bodyStyle: {
+        background: CardColors[this.props.card.type] ? CardColors[this.props.card.type][1] : CardColors['none'][1],
+        borderColor: CardColors[this.props.card.type] ? CardColors[this.props.card.type][0] : CardColors['none'][0],
+      },
+    }
 	},
   
 	handleTitleClick()
@@ -197,48 +219,20 @@ var Card = React.createClass({
 	render() {
 
 		var CardComponent;
-		var subBar;
-    var isFlat = false;
 
 		switch(this.props.card.type)
 		{
 			case 'select':
 				CardComponent = SelectCard;
-				// subBar = 
-				// {
-				// 	content: '+',
-				// 	onClick: () => 
-				// 	{
-				// 		Actions.cards.select.create(this.props.card);
-				// 	},
-				// };
-
 				break;
 			case 'from':
 				CardComponent = FromCard;
-				// subBar =
-				// {
-				// 	content: '+',
-				// 	onClick: () => 
-				// 	{
-				// 		Actions.cards.from.join.create(this.props.card);
-				// 	},
-				// };
-
 				break;
    case 'sort':
      CardComponent = SortCard;
      break;
    case 'filter':
     CardComponent = FilterCard;
-    // subBar = 
-    //     {
-    //       content: '+',
-    //       onClick: () => 
-    //       {
-    //         Actions.cards.filter.create(this.props.card);
-    //       },
-    //     };
       break;
     case 'let':
     case 'var':
@@ -249,11 +243,6 @@ var Card = React.createClass({
       break;
     case 'score':
       CardComponent = ScoreCard;
-      // subBar =
-      // {
-      //   content: '+',
-      //   onClick: () => Actions.cards.score.create(this.props.card),
-      // }
       break;
     case 'if':
       CardComponent = IfCard;
@@ -280,55 +269,7 @@ var Card = React.createClass({
 			</div>
 		);
 
-		if(subBar)
-		{
-			var subBarToDisplay = (
-				<div className='card-sub-bar' onClick={subBar.onClick}>
-					<div className='card-sub-bar-inner'>
-						{subBar.content}
-					</div>
-				</div>
-			);
-		}
-
-    var menuOptions = 
-    [
-      {
-        text: 'Copy',
-        onClick: this.handleCopy,
-      },
-      {
-        text: 'Hide',
-        onClick: this.handleTitleClick,
-      },
-      {
-        text: 'Delete',
-        onClick: this.handleDelete,
-      },
-    ];
-
 		var title = Util.titleForCard(this.props.card);
-    
-    if(CardColors[this.props.card.type])
-    {
-      var titleStyle: React.CSSProperties = {
-        background: CardColors[this.props.card.type][0],
-      };
-      var bodyStyle: React.CSSProperties = {
-        background: CardColors[this.props.card.type][1],
-        borderColor: CardColors[this.props.card.type][0],
-      };
-    }
-    else
-    {
-      var titleStyle: React.CSSProperties = {
-        background: CardColors['none'][0],
-      };
-      var bodyStyle: React.CSSProperties = {
-        background: CardColors['none'][1],
-        borderColor: CardColors['none'][0],
-      }; 
-    }
     
 		return this.renderPanel((
 			<div
@@ -347,26 +288,23 @@ var Card = React.createClass({
 				{ this.renderAddCard() }
         <div
           className={'card-inner ' + (this.props.singleCard ? 'card-single' : '')}
-          style={bodyStyle}
+          style={this.state.bodyStyle}
         >
           { !this.props.singleCard &&
   					<div
               className='card-title'
               ref='handle'
               onClick={this.handleTitleClick}
-              style={titleStyle}
+              style={this.state.titleStyle}
               >
-              { isFlat ? null : <ArrowIcon className="card-arrow-icon" /> }
+              <ArrowIcon className="card-arrow-icon" />
               { title }
-              <Menu options={menuOptions} />
+              <Menu options={this.state.menuOptions} />
   					</div>
           }
-          { isFlat ? null : 
-            <div className='card-body' ref='cardBody'>
-    					{ contentToDisplay }
-    					{ subBarToDisplay }
-            </div>
-          }
+          <div className='card-body' ref='cardBody'>
+  					{ contentToDisplay }
+          </div>
 				</div>
         { this.renderAddCard(true) }
         { !this.props.singleCard &&

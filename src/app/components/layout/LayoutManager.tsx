@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 require('./LayoutManager.less');
 import * as React from 'react';
+var shallowCompare = require('react-addons-shallow-compare');
 var $ = require('jquery');
 var _ = require('underscore');
 
@@ -75,10 +76,7 @@ var LayoutManager = React.createClass<any, any>({
   
   shouldComponentUpdate(nextProps, nextState)
   {
-    var b = !_.isEqual(this.props.layout, nextProps.layout)
-      || !_.isEqual(this.state, nextState)
-      || !_.isEqual(this.props.placeholder, nextProps.placeholder);
-    return b;
+    return shallowCompare(this, nextProps, nextState);
     // return !_.isEqual(this.props.layout, nextProps.layout)
     //   || !_.isEqual(this.state, nextState)
     //   || !_.isEqual(this.props.placeholder, nextProps.placeholder);
@@ -426,9 +424,10 @@ var LayoutManager = React.createClass<any, any>({
         diffX -= minPrevWidth - newPrevWidth;
       }
       
-      this.state.sizeAdjustments[index].x = startSAX + diffX;
+      var sa = _.clone(this.state.sizeAdjustments);
+      sa[index].x = startSAX + diffX;
       this.setState({
-        sizeAdjustments: this.state.sizeAdjustments,
+        sizeAdjustments: sa,
       })
     }.bind(this);
     
