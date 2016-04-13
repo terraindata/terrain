@@ -55,7 +55,7 @@ import { CardModels } from './../models/CardModels.tsx';
 var defaultStateJson = require('./json/_state.json');
 var descriptions = require('./json/_descriptions.json');
 
-_.map(defaultStateJson, (algorithm, parentId) => {
+_.map(defaultStateJson.algorithms, (algorithm, parentId) => {
 
   var initCard = (card) => {
     var card = _.extend(card, {parentId: parentId});

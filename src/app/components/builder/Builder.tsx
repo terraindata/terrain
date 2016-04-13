@@ -84,7 +84,7 @@ class Builder extends React.Component<any, any>
     
     Store.subscribe(() => {
       var newState = Store.getState().toJS();
-      this.reduxState = newState;
+      this.reduxState = newState.algorithms;
       this.setState({
         random: Math.random()
       });
@@ -93,7 +93,7 @@ class Builder extends React.Component<any, any>
     // Some day in the distant future, you may consider
     //  removing this 'toJS()' call and making
     //  the whole Builder app built upon Immutable state.    
-    this.reduxState = Store.getState().toJS();
+    this.reduxState = Store.getState().toJS().algorithms;
     this.state = {
       random: Math.random(),
       selectedAlgorithmId: 100, // TODO change to not be hardcoded
