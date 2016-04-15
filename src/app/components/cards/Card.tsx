@@ -158,7 +158,7 @@ var Card = React.createClass({
     //   // when it already knows it's being dragged so we can hide it with CSS.
     //   captureDraggingState: true
     // });
-    this.dragPreview = createDragPreview(this.props.card.type, {
+    this.dragPreview = createDragPreview(Util.titleForCard(this.props.card), {
       backgroundColor: this.getColor(0),
       borderColor: this.getColor(1),
       color: '#fff',
