@@ -42,78 +42,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Menu.less');
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../util/Util.tsx';
+// Type definitions for classnames
+// Project: https://github.com/JedWatson/classnames
+// Definitions by: Dave Keen <http://www.keendevelopment.ch>, Adi Dahiya <https://github.com/adidahiya>, Jason Killian <https://github.com/JKillian>
+// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
+declare type ClassValue = string | number | ClassDictionary | ClassArray;
 
-var optionHeight = 30; // coordinate with Menu.less
-
-export interface MenuOption {
-  text: string;
-  onClick: () => void;
-  disabled?: boolean;
-};
-
-interface Props
-{
-  options: MenuOption[];
-  small?: boolean;
+interface ClassDictionary {
+	[id: string]: boolean;
 }
 
-class Menu extends React.Component<Props, any>
-{
-  constructor(props: Props) {
-    super(props);
-    this.renderOption = this.renderOption.bind(this);
-  }
-  
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  }
-  
-  renderOption(option, index)
-  {
-    if(!option.disabled)
-    {
-      var onClick = (event) => {
-        event.stopPropagation();
-        option.onClick(index);
-      };
-    }
-    
-    return (
-      <div className={"menu-option" + (option.disabled ? " menu-option-disabled" : "")} key={index} onClick={onClick}>
-        <div className="vertically-middle">
-          { option.text }
-        </div>
-      </div>
-    );
-  }
+interface ClassArray extends Array<ClassValue> { }
 
-  render() {
-    var style = {
-      width: 14 * this.props.options.reduce((max, option) => 
-        option.text.length > max ? option.text.length : max, 1),
-      height: this.props.options.length * optionHeight,
-    };
-    
-    var classes = "menu-wrapper" + (this.props.small ? " menu-wrapper-small" : "");
-    
-    return (
-      <div className={classes} style={style}>
-        <MoreIcon className="menu-icon" />
-        <div className="menu-options-wrapper">
-          {
-            this.props.options.map(this.renderOption)
-          }
-        </div>
-      </div>
-    );
-  }
-};
+interface ClassNamesFn {
+	(...classes: ClassValue[]): string;
+}
 
-export default Menu;
+declare var classNames: ClassNamesFn;
+
+declare module "classnames" {
+	export = classNames
+}

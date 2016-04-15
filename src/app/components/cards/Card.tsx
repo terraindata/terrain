@@ -47,6 +47,10 @@ require('./Card.less');
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
+import * as classNames from 'classnames';
+import { DragSource, DropTarget } from 'react-dnd';
+var { createDragPreview } = require('react-dnd-text-dragpreview');
+var { getEmptyImage } = require('react-dnd-html5-backend');
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
@@ -81,7 +85,7 @@ var hoverCard = (event) => {
 $('body').mousemove(_.throttle(hoverCard, 100));
 
 var Card = React.createClass({
-	mixins: [PanelMixin, CardsContainerMixin],
+	mixins: [CardsContainerMixin],
 
 	propTypes:
 	{
@@ -90,6 +94,11 @@ var Card = React.createClass({
     parentId: React.PropTypes.string,
     singleCard: React.PropTypes.bool, // indicates it's not in a list, it's just a single card
 	},
+  
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  },
 
 	getDefaultProps():any
 	{
@@ -110,7 +119,6 @@ var Card = React.createClass({
 	{
 		return {
 			open: true,
-      ref: 'card-' + this.props.card.id,
       id: this.props.card.id,
       menuOptions:
       [
@@ -120,7 +128,7 @@ var Card = React.createClass({
         },
         {
           text: 'Hide',
-          onClick: this.handleTitleClick,
+          onClick: this.toggleClose,
         },
         {
           text: 'Delete',
@@ -137,25 +145,48 @@ var Card = React.createClass({
     }
 	},
   
-	handleTitleClick()
+  getColor(index:number): string
+  {
+    return CardColors[this.props.card.type] ? CardColors[this.props.card.type][index] : CardColors['none'][index];
+  },
+  
+  componentDidMount() {
+    // Use empty image as a drag preview so browsers don't draw it
+    // and we can draw whatever we want on the custom drag layer instead.
+    // this.props.connectDragPreview(getEmptyImage(), {
+    //   // IE fallback: specify that we'd rather screenshot the node
+    //   // when it already knows it's being dragged so we can hide it with CSS.
+    //   captureDraggingState: true
+    // });
+    this.dragPreview = createDragPreview(this.props.card.type, {
+      backgroundColor: this.getColor(0),
+      borderColor: this.getColor(1),
+      color: '#fff',
+      fontSize: 15,
+      fontWeight: 'bold',
+      paddingTop: 7,
+      paddingRight: 12,
+      paddingBottom: 9,
+      paddingLeft: 12,
+      borderRadius: 10
+    });
+    this.props.connectDragPreview(this.dragPreview);
+  },
+  
+	toggleClose()
 	{
-		if(!this.state.moved)
-		{
-			// this.state.moved is updated in panelMixin
-      
-      if(this.state.open)
-      {
-        Util.animateToHeight(this.refs.cardBody, 0);
-      }
-      else
-      {
-        Util.animateToAutoHeight(this.refs.cardBody); 
-      }
-      
-			this.setState({
-				open: !this.state.open,
-			});
-		}
+    if(this.state.open)
+    {
+      Util.animateToHeight(this.refs.cardBody, 0);
+    }
+    else
+    {
+      Util.animateToAutoHeight(this.refs.cardBody); 
+    }
+    
+		this.setState({
+			open: !this.state.open,
+		});
 	},
   
   hasCardsArea(): boolean
@@ -165,7 +196,7 @@ var Card = React.createClass({
   
   handleDelete()
   {
-    Util.animateToHeight(this.refs[this.state.ref], 0);
+    Util.animateToHeight(this.refs.cardBody, 0);
     setTimeout(() => {
       Actions.cards.remove(this.props.card, this.props.parentId);
     }, 250);
@@ -271,12 +302,18 @@ var Card = React.createClass({
 
 		var title = Util.titleForCard(this.props.card);
     
-		return this.renderPanel((
+    const { isDragging, connectDragSource, isOverCurrent, connectDropTarget } = this.props;
+		return connectDropTarget(
 			<div
-        className={'card' + (!this.state.open ? ' card-closed' : '') + (this.props.singleCard ? ' single-card' : '')}
-        ref={this.state.ref}
+        className={classNames({
+          'card': true,
+          'card-dragging': isDragging,
+          'card-drag-over': isOverCurrent,
+          'card-closed' : !this.state.open,
+          'single-card': this.props.singleCard
+        })}
         rel={'card-' + this.props.card.id}
-        >
+      >
         { !this.props.singleCard &&
           <CreateCardTool
             index={this.props.index}
@@ -286,26 +323,28 @@ var Card = React.createClass({
           />
         }
 				{ this.renderAddCard() }
+        <div className='card-stroke card-stroke-above' />
         <div
           className={'card-inner ' + (this.props.singleCard ? 'card-single' : '')}
           style={this.state.bodyStyle}
         >
           { !this.props.singleCard &&
-  					<div
-              className='card-title'
-              ref='handle'
-              onClick={this.handleTitleClick}
-              style={this.state.titleStyle}
-              >
-              <ArrowIcon className="card-arrow-icon" />
-              { title }
-              <Menu options={this.state.menuOptions} />
-  					</div>
+  					connectDragSource(
+              <div
+                className='card-title'
+                style={this.state.titleStyle}
+                >
+                <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
+                { title }
+                <Menu options={this.state.menuOptions} />
+    					</div>
+            )
           }
           <div className='card-body' ref='cardBody'>
   					{ contentToDisplay }
           </div>
 				</div>
+        <div className='card-stroke card-stroke-below' />
         { this.renderAddCard(true) }
         { !this.props.singleCard &&
           <CreateCardTool
@@ -316,8 +355,71 @@ var Card = React.createClass({
           />
         }
 			</div>
-			));
+		);
 	},
 });
 
-export default Card;
+
+// DnD stuff
+
+// Defines a draggable result functionality
+const cardSource = 
+{
+  beginDrag(props)
+  {
+    const item = props.card;
+    return item;
+  },
+  
+  endDrag(props, monitor, component)
+  {
+    if(!monitor.didDrop())
+    {
+      return;
+    }
+    
+    const item = monitor.getItem();
+    const dropResult = monitor.getDropResult();
+  }
+}
+
+// Defines props to inject into the component
+const dragCollect = (connect, monitor) =>
+({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging(),
+  connectDragPreview: connect.dragPreview()
+});
+
+const cardTarget = 
+{
+  canDrop(props, monitor)
+  {
+    return true;
+  },
+  
+  hover(props, monitor, component)
+  {
+    const canDrop = monitor.canDrop();
+  },
+  
+  drop(props, monitor, component)
+  {
+    const item = monitor.getItem();
+    if(monitor.isOver({ shallow: true}))
+    {
+      Actions.cards.move(item, props.index, props.parentId);
+    }
+  }
+}
+
+const dropCollect = (connect, monitor) =>
+({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver(),
+  isOverCurrent: monitor.isOver({ shallow: true }),
+  canDrop: monitor.canDrop(),
+  itemType: monitor.getItemType()
+});
+
+export default DropTarget('CARD', cardTarget, dropCollect)(DragSource('CARD', cardSource, dragCollect)(Card));

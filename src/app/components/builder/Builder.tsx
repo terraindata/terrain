@@ -45,8 +45,11 @@ THE SOFTWARE.
 // Libraries
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
-var _ = require("underscore");
+import * as _ from "underscore";
 import * as $ from 'jquery';
+import { DragDropContext } from 'react-dnd';
+var HTML5Backend = require('react-dnd-html5-backend');
+import BuilderDragLayer from './BuilderDragLayer.tsx';
 
 // Data
 import Store from "./../../data/Store.tsx";
@@ -197,9 +200,20 @@ class Builder extends React.Component<any, any>
     console.log(JSON.stringify(this.reduxState));
   }
   
+  tabClose(algorithmId)
+  {
+    Actions.algorithm.remove(algorithmId);
+  }
+  
+  tabClick(algorithmId)
+  {
+    this.setState({
+      selectedAlgorithmId: algorithmId,
+    });
+  }
+  
 	render() {
     var tabs = {};
-    
     
     _.map(this.reduxState, (algorithm, algorithmId) => {
       // TODO move type somewhere central
@@ -233,21 +247,12 @@ class Builder extends React.Component<any, any>
         ]
       };
       
-      var closeFn = () => 
-      {
-        Actions.algorithm.remove(algorithmId);
-      }
-
       tabs[algorithmId] = {
         content: <LayoutManager layout={layout} />,
-        tabName: algorithm.algorithmName || 'New Algorithm',
+        tabName: algorithm['algorithmName'] || 'New Algorithm',
         closeable: true,
-        onClose: closeFn,
-        onClick: () => {
-          this.setState({
-            selectedAlgorithmId: algorithmId,
-          });
-        }
+        onClose: this.tabClose,
+        onClick: this.tabClick,
       };
       
       if(!this.state.selectedAlgorithmId)
@@ -265,10 +270,13 @@ class Builder extends React.Component<any, any>
       noDrag: true,
     };
     
+        // <BuilderDragLayer />
     return (
-      <Tabs tabs={tabs} actions={this.getTabActions()} ref='tabs' />
+      <div className='builder'>
+        <Tabs tabs={tabs} actions={this.getTabActions()} ref='tabs' />
+      </div>
     );
 	}
 };
 
-export default Builder;
+export default DragDropContext(HTML5Backend)(Builder);

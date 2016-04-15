@@ -133,7 +133,7 @@ var CardsContainerMixin =
     }
     
     Actions.cards.move(data, index, this.getParentId());
-    
+    console.log('ab');
     this.onDragOut();
     
     // used by PanelMixin to determine if panel was dropped outside and thus unmounted

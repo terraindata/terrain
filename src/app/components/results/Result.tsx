@@ -45,43 +45,13 @@ THE SOFTWARE.
 require('./Result.less');
 import * as $ from 'jquery';
 import * as React from 'react';
+import * as classNames from 'classnames';
+import { DragSource, DropTarget } from 'react-dnd';
+var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
 import Menu from '../common/Menu.tsx';
 import Actions from '../../data/Actions.tsx';
 import ColorManager from '../../util/ColorManager.tsx';
-
-// var images = 
-// [
-//   require('../../../images/sitters/sitters_0000_0.jpg'),
-//   require('../../../images/sitters/sitters_0001_1.jpg'),
-//   require('../../../images/sitters/sitters_0002_2.jpg'),
-//   require('../../../images/sitters/sitters_0003_3.jpg'),
-//   require('../../../images/sitters/sitters_0004_4.jpg'),
-//   require('../../../images/sitters/sitters_0005_5.jpg'),
-//   require('../../../images/sitters/sitters_0006_6.jpg'),
-//   require('../../../images/sitters/sitters_0007_7.jpg'),
-//   require('../../../images/sitters/sitters_0008_8.jpg'),
-//   require('../../../images/sitters/sitters_0009_9.jpg'),
-//   require('../../../images/sitters/sitters_0010_10.jpg'),
-//   require('../../../images/sitters/sitters_0011_11.jpg'),
-//   require('../../../images/sitters/sitters_0012_12.jpg'),
-//   require('../../../images/sitters/sitters_0013_13.jpg'),
-//   require('../../../images/sitters/sitters_0014_14.jpg'),
-//   require('../../../images/sitters/sitters_0015_15.jpg'),
-//   require('../../../images/sitters/sitters_0016_16.jpg'),
-//   require('../../../images/sitters/sitters_0017_17.jpg'),
-//   require('../../../images/sitters/sitters_0018_18.jpg'),
-//   require('../../../images/sitters/sitters_0019_19.jpg'),
-//   require('../../../images/sitters/sitters_0020_20.jpg'),
-//   require('../../../images/sitters/sitters_0021_21.jpg'),
-//   require('../../../images/sitters/sitters_0022_22.jpg'),
-//   require('../../../images/sitters/sitters_0023_23.jpg'),
-//   require('../../../images/sitters/sitters_0024_24.jpg'),
-//   require('../../../images/sitters/sitters_0025_25.jpg'),
-//   require('../../../images/sitters/sitters_0026_26.jpg'),
-//   require('../../../images/sitters/sitters_0027_27.jpg'),
-// ];
 
 var PinIcon = require("./../../../images/icon_pin_21x21.svg?name=PinIcon&reactDom=react");
 var ScoreIcon = require("./../../../images/icon_terrain_27x16.svg?name=ScoreIcon");
@@ -99,8 +69,20 @@ var fields =
   'avgResponseTime',
 ];
 
+var dragPreviewStyle = {
+  backgroundColor: '#cfd7c8',
+  borderColor: '#cfd7c8',
+  color: '#44484d',
+  fontSize: 15,
+  fontWeight: 'bold',
+  paddingTop: 7,
+  paddingRight: 12,
+  paddingBottom: 9,
+  paddingLeft: 12,
+  borderRadius: 10
+}
+
 var Result = React.createClass<any, any>({
-	mixins: [PanelMixin],
   
   getInitialState() {
     return {
@@ -115,7 +97,13 @@ var Result = React.createClass<any, any>({
 		data: React.PropTypes.object.isRequired,
 		parentNode: React.PropTypes.object,
     onExpand: React.PropTypes.func.isRequired,
+    index: React.PropTypes.number.isRequired,
 	},
+  
+  componentDidMount() {
+    this.dragPreview = createDragPreview(this.props.data.name, dragPreviewStyle);
+    this.props.connectDragPreview(this.dragPreview);
+  },
 
 	getDefaultProps() 
 	{
@@ -258,17 +246,27 @@ var Result = React.createClass<any, any>({
   },
   
 	render() {
-    var classes = 'result' + (this.props.data.pinned ? ' result-pinned' : '') + (this.state.expanded ? ' result-expanded' : '');
+    const { isDragging, connectDragSource, isOver, connectDropTarget } = this.props;
     
-		return this.renderPanel((
+    var classes = classNames({
+      'result': true,
+      'result-pinned': this.props.data.pinned,
+      'result-expanded': this.state.expanded,
+      'result-dragging': isDragging,
+      'result-drag-over': isOver,
+    });
+    
+		return connectDropTarget(connectDragSource(
 			<div className={classes} onDoubleClick={this.expand}>
 				<div className='result-inner'>
           <div className='result-name'>
-            {this.renderSpotlight()}
-            <div className='result-pin-icon'>
-              <PinIcon />
+            <div className='result-name-inner'>
+              {this.renderSpotlight()}
+              <div className='result-pin-icon'>
+                <PinIcon />
+              </div>
+              {this.props.data.name}
             </div>
-            {this.props.data.name}
           </div>
           <Menu options={this.getMenuOptions()} />
 					<div className='result-score'>
@@ -286,8 +284,68 @@ var Result = React.createClass<any, any>({
           { this.props.data.name }
         </div>
 			</div>
-			));
+		));
 	},
 });
 
-export default Result;
+
+// DnD stuff
+
+// Defines a draggable result functionality
+const resultSource = 
+{
+  beginDrag(props)
+  {
+    const item = props.data;
+    return item;
+  },
+  
+  endDrag(props, monitor, component)
+  {
+    if(!monitor.didDrop())
+    {
+      return;
+    }
+    
+    const item = monitor.getItem();
+    const dropResult = monitor.getDropResult();
+  }
+}
+
+// Defines props to inject into the component
+const dragCollect = (connect, monitor) =>
+({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging(),
+  connectDragPreview: connect.dragPreview()
+});
+
+const resultTarget = 
+{
+  canDrop(props, monitor)
+  {
+    return true;
+  },
+  
+  hover(props, monitor, component)
+  {
+    const canDrop = monitor.canDrop();
+  },
+  
+  drop(props, monitor, component)
+  {
+    const item = monitor.getItem();
+    Actions.results.move(item, props.index);
+  }
+}
+
+const dropCollect = (connect, monitor) =>
+({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver(),
+  isOverCurrent: monitor.isOver({ shallow: true }),
+  canDrop: monitor.canDrop(),
+  itemType: monitor.getItemType()
+});
+
+export default DropTarget('RESULT', resultTarget, dropCollect)(DragSource('RESULT', resultSource, dragCollect)(Result));

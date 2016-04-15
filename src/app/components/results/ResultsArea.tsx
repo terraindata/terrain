@@ -184,9 +184,9 @@ var ResultsArea = React.createClass<any, any>({
     }
     
     var layout = {
-      cells: this.props.results.map((result) => {
+      cells: this.props.results.map((result, index) => {
         return {
-          content: <Result data={result} parentId={this.props.parentId} onExpand={this.handleExpand} />,
+          content: <Result data={result} parentId={this.props.parentId} onExpand={this.handleExpand} index={index} />,
           key: result.id,
         };
       }),
@@ -200,10 +200,10 @@ var ResultsArea = React.createClass<any, any>({
 
 	render()
   {
-		return (
+        // { this.renderPaging() }
+    return (
       <div className='results-area'>
         { this.renderResults() }
-        { this.renderPaging() }
         { this.renderExpandedResult() }
       </div>
     );

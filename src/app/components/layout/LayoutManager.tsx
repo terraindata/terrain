@@ -76,10 +76,10 @@ var LayoutManager = React.createClass<any, any>({
   
   shouldComponentUpdate(nextProps, nextState)
   {
-    return shallowCompare(this, nextProps, nextState);
-    // return !_.isEqual(this.props.layout, nextProps.layout)
-    //   || !_.isEqual(this.state, nextState)
-    //   || !_.isEqual(this.props.placeholder, nextProps.placeholder);
+    // return shallowCompare(this, nextProps, nextState);
+    return !_.isEqual(this.props.layout, nextProps.layout)
+      || !_.isEqual(this.state, nextState)
+      || !_.isEqual(this.props.placeholder, nextProps.placeholder);
   },
 
 	getInitialState()
@@ -99,17 +99,17 @@ var LayoutManager = React.createClass<any, any>({
 
 	updateDimensions()
 	{
-		this.setState({ rand: Math.random() });
+		// this.setState({ rand: Math.random() });
 	},
 
 	componentDidMount()
 	{
     window.addEventListener("resize", this.updateDimensions);
-    this.setState({
-      // triggers a re-render, this time with the window widths available,
-      // so that cells etc. can render with the correct width
-      mounted: true,
-    });
+    // this.setState({
+    //   // triggers a re-render, this time with the window widths available,
+    //   // so that cells etc. can render with the correct width
+    //   mounted: true,
+    // });
   },
 
   componentWillUnmount()

@@ -43,90 +43,98 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import Actions from "../../../data/Actions.tsx";
-import Util from '../../../util/Util.tsx';
-import LayoutManager from "../../layout/LayoutManager.tsx";
-import CardField from './../CardField.tsx';
-import BuilderTextbox from "../../common/BuilderTextbox.tsx";
+var { PropTypes } = React;
+import { DragLayer } from 'react-dnd';
 
-import { CardModels } from './../../../models/CardModels.tsx';
+const layerStyles = {
+  position: 'fixed',
+  pointerEvents: 'none',
+  zIndex: 999999,
+  left: 0,
+  top: 0,
+  width: '100%',
+  height: '100%'
+};
 
-interface Props {
-  card: CardModels.ISelectCard;
+function getItemStyles(props): React.CSSProperties {
+  const { currentOffset } = props;
+  if (!currentOffset) {
+    return {
+      display: 'none'
+    };
+  }
+
+  const { x, y } = currentOffset;
+  const transform = `translate(${x}px, ${y}px)`;
+  return {
+    transform: transform,
+    WebkitTransform: transform
+  };
 }
 
-class SelectCard extends React.Component<Props, any>
+
+type Props =
 {
-  constructor(props:Props)
-  {
-    super(props);
-    Util.bind(this, 'addField', 'removeField', 'move', 'handleChange');
-  }
-  
-  addField(index)
-  {
-    Actions.cards.select.create(this.props.card, index + 1);
-  }
-  
-  removeField(index)
-  {
-   	Actions.cards.select.remove(this.props.card, index);
-  }
-  
-  move(curIndex, newIndex)
-  {
-    Actions.cards.select.move(this.props.card, this.props.card.properties[curIndex], newIndex);
-  }
-  
-  handleChange(value, event)
-  {
-    var index = +Util.rel(event.target);
-    Actions.cards.select.change(this.props.card, index, 
-      {
-        property: value,
-        id: this.props.card.properties[index].id,
-      });
+  item: any,
+  itemType: string,
+  currentOffset: {
+    x: number,
+    y: number
+  },
+  isDragging: boolean
+};
+
+class BuilderDragLayer extends React.Component<Props, any> {
+  renderItem(type, item) {
+    var text = 'unknown type';
+    switch (type) {
+      case 'CARD':
+        text = item.type;
+        break;
+      case 'RESULT':
+        text = item.name;
+    }
+    return (
+      <div className='drag-preview'>
+        drag a { text }
+      </div>
+    );
   }
 
   render() {
-    if(!this.props.card.properties.length)
-    {
-      return <div className='info-message info-message-clickable' onClick={this.addField}>No fields selected, click to add one.</div>;
+    const { item, itemType, isDragging } = this.props;
+    if (!isDragging) {
+      return null;
     }
-      
-    var properties = this.props.card.properties;
 
-		var layout = {
-			reorderable: true,
-			rows: properties.map((property: CardModels.IProperty, index) => {
-        return {
-          key: property.id,
-          content: (
-            <CardField
-    					onDelete={this.removeField}
-              draggable={true}
-              removable={true}
-              drag_y={true}
-    					dragInsideOnly={true}
-              addable={true}
-              onAdd={this.addField}
-              >
-              <BuilderTextbox
-                value={property.property}
-                placeholder='Type field here'
-                rel={'' + index}
-                onChange={this.handleChange}
-              />
-            </CardField>
-          ),
-        };
-      }),
-		};
+    return (
+      <div style={layerStyles}>
+        <div style={getItemStyles(this.props)}>
+          {this.renderItem(itemType, item)}
+        </div>
+      </div>
+    );
+  }
+}
 
-		return (
-			<LayoutManager layout={layout} moveTo={this.move} />
-		);
-	}
-};
+function collect(monitor) {
+  return {
+    item: monitor.getItem(),
+    itemType: monitor.getItemType(),
+    currentOffset: monitor.getSourceClientOffset(),
+    isDragging: monitor.isDragging()
+  };
+}
 
-export default SelectCard;
+var options =
+{
+  arePropsEqual(props, otherProps)
+  {
+    return (props.data && !otherProps.data)
+      || (!props.data && otherProps.data)
+      || (props.data && otherProps.data && props.data.name !== otherProps.data.name)
+      || (props.card && otherProps.card && props.card.type !== otherProps.card.type);
+  }
+}
+
+export default DragLayer(collect, options)(BuilderDragLayer);

@@ -69,6 +69,11 @@ class IfCard extends React.Component<Props, any>
     Util.bind(this, 'addElse', 'addElseIf');
   }
   
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  }
+  
   addElse()
   {
     Actions.cards.if.else(this.props.card);

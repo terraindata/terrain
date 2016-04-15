@@ -93,13 +93,13 @@ var Tab = React.createClass<any, any>({
   {
     if(!this.state.moved)
     {
-      this.props.onSelect();
+      this.props.onSelect(this.props.tab.key);
     }
   },
   
   close(event) {
     event.stopPropagation();
-    this.props.tab.onClose();
+    this.props.tab.onClose(this.props.tab.key);
   },
   
   renderClose() {
@@ -142,6 +142,11 @@ var Tabs = React.createClass<any, any>({
 		tabs: React.PropTypes.object.isRequired,
 		title: React.PropTypes.string,
 	},
+  
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  },
 
 	getInitialState()
 	{

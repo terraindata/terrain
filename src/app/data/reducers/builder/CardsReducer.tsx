@@ -210,7 +210,7 @@ CardsReducer[ActionTypes.cards.move] =
           );
       }
       
-      state = state.map(removeFn);
+      state = state.update('algorithms', algorithms => algorithms.map(removeFn));
     }
     
     return state;

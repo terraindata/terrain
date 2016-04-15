@@ -17,6 +17,35 @@
       border: 0px;
     }
   }
+  
+  &.card-dragging {
+    .card-inner {
+      // opacity: 0.5;
+      border-color: @drag-color !important;
+    }
+  }
+  
+  .card-stroke {
+    position: absolute;
+    height: 3px;
+    z-index: 999;
+    width: 100%;
+    left: 0px;
+    background: @drag-color;
+    opacity: 0;
+    .transition;
+  }
+  .card-stroke-above {
+    top: 0px;
+  }
+  .card-stroke-below {
+    top: 0px;
+  }
+  &.card-drag-over {
+    .card-stroke-above {
+      opacity: 1;
+    }
+  }
  
  .card-title {
   border-top-left-radius: calc(@card-border-radius - 1px);
