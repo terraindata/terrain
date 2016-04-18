@@ -96,10 +96,10 @@ var CardsArea = React.createClass<any, any>({
     }
   },
   
-  // shouldComponentUpdate(nextProps, nextState)
-  // {
-  //   return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  // },
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  },
   
   getInitialState()
   {
