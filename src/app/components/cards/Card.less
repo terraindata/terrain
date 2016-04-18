@@ -79,12 +79,16 @@
     
     .card-arrow-icon {
       display: inline-block;
-      fill: @card-title-color;
+      fill: rgba(255,255,255,0.75); // @card-title-color;
       width: 10px;
       position: relative;
       top: -1px;
       left: -7px;
       .transition;
+      
+      &:hover {
+        fill: #fff;
+      }
     }
   }
   
