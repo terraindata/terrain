@@ -95,10 +95,10 @@ var Card = React.createClass({
     singleCard: React.PropTypes.bool, // indicates it's not in a list, it's just a single card
 	},
   
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  },
+  // shouldComponentUpdate(nextProps, nextState)
+  // {
+  //   return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  // },
 
 	getDefaultProps():any
 	{

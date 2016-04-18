@@ -96,10 +96,10 @@ var CardsArea = React.createClass<any, any>({
     }
   },
   
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  },
+  // shouldComponentUpdate(nextProps, nextState)
+  // {
+  //   return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  // },
   
   getInitialState()
   {
@@ -121,19 +121,19 @@ var CardsArea = React.createClass<any, any>({
           index={index}
           card={card}
           onDropOutside={this.onDropOutside}
-          parentId={this.props.parentId}
-          cards={this.props.cards}
-          spotlights={this.props.spotlights}
+          parentId={props.parentId}
+          cards={props.cards}
+          spotlights={props.spotlights}
           />,
         key: card.id,
       }
     )).concat({
       content: (
         <CreateCardTool
-          index={this.props.cards.length}
-          open={this.props.topLevel || this.props.cards.length === 0}
-          parentId={this.props.parentId}
-          className={this.props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
+          index={props.cards.length}
+          open={props.topLevel || props.cards.length === 0}
+          parentId={props.parentId}
+          className={props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
           />
       ),
       key: 'end-tool',

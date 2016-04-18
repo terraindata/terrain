@@ -67,9 +67,6 @@ class CreateCardTool extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
-    this.state = {
-      open: false,
-    };
     Util.bind(this, 'createCard');
   }
   
@@ -78,10 +75,6 @@ class CreateCardTool extends React.Component<Props, any>
   }
   
   createCard(event) {
-    this.setState({
-      open: false,
-    });
-    
     if(this.props.open && this.props.onMinimize)
     {
       this.props.onMinimize();
@@ -132,15 +125,15 @@ class CreateCardTool extends React.Component<Props, any>
   }
   
   render() {
-    if(!this.props.open && !this.state.open)
+    if(!this.props.open)
     {
       return null;
     }
     
     var classes = Util.objToClassname({
       "create-card-wrapper": true,
-      "create-card-open": this.state.open || this.props.open,
-      "create-card-closed": !this.state.open && !this.props.open,
+      "create-card-open": this.props.open,
+      "create-card-closed": !this.props.open,
     });
     classes += ' ' + this.props.className;
     
