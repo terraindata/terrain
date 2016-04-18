@@ -178,9 +178,16 @@ CardsReducer[ActionTypes.cards.move] =
   (state, action) => {
     var betweenAreas = false;
     state = Util.immutableCardsUpdate(state, 'cards', action.payload.parentId, cards => {
-      if(cards.find((card => card.get('id') === action.payload.card.id)))
+      var cardIndex = cards.findIndex((card => card.get('id') === action.payload.card.id));
+      if(cardIndex !== -1)
       {
-        return Util.immutableMove(cards, action.payload.card.id, action.payload.index)
+        var { index } = action.payload;
+        if(cardIndex < index)
+        {
+          // offset for itself
+          index -= 1;
+        }
+        return Util.immutableMove(cards, action.payload.card.id, index)
       }
       
       // need to move the card between cards areas

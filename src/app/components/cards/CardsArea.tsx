@@ -124,6 +124,7 @@ var CardsArea = React.createClass<any, any>({
           parentId={props.parentId}
           cards={props.cards}
           spotlights={props.spotlights}
+          onHover={$({})}
           />,
         key: card.id,
       }
