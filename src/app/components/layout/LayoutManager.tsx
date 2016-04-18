@@ -76,7 +76,6 @@ var LayoutManager = React.createClass<any, any>({
   
   shouldComponentUpdate(nextProps, nextState)
   {
-    // return shallowCompare(this, nextProps, nextState);
     return !_.isEqual(this.props.layout, nextProps.layout)
       || !_.isEqual(this.state, nextState)
       || !_.isEqual(this.props.placeholder, nextProps.placeholder);
@@ -424,7 +423,7 @@ var LayoutManager = React.createClass<any, any>({
         diffX -= minPrevWidth - newPrevWidth;
       }
       
-      var sa = _.clone(this.state.sizeAdjustments);
+      var sa = JSON.parse(JSON.stringify(this.state.sizeAdjustments));
       sa[index].x = startSAX + diffX;
       this.setState({
         sizeAdjustments: sa,
