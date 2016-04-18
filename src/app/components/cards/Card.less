@@ -26,23 +26,25 @@
     }
   }
   
+  @stroke-height: 5px;
   .card-stroke {
     position: absolute;
-    height: 3px;
+    height: 5px;
     z-index: 999;
     width: 100%;
     left: 0px;
     background: @drag-color;
     opacity: 0;
     border: 1px solid rgba(255,255,255,0.5);
+    box-sizing: border-box;
     border-radius: 3px;
     .transition;
   }
   .card-stroke-above {
-    top: 0px;
+    top: @stroke-height / -2;
   }
   .card-stroke-below {
-    bottom: 0px;
+    bottom: @stroke-height / -2;
   }
   &.card-drag-over {
     &:not(.card-drag-over-lower) {
