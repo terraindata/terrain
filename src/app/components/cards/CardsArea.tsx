@@ -135,7 +135,7 @@ var CardsArea = React.createClass<any, any>({
           open={props.topLevel || props.cards.length === 0}
           parentId={props.parentId}
           className={props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
-          />
+        />
       ),
       key: 'end-tool',
     })
@@ -178,5 +178,6 @@ var CardsArea = React.createClass<any, any>({
     );
   },
 });
+
 
 export default CardsArea;

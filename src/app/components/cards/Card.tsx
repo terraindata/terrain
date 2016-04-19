@@ -229,7 +229,7 @@ var Card = React.createClass({
   
   handleDelete()
   {
-    Util.animateToHeight(this.refs.cardBody, 0);
+    Util.animateToHeight(this.refs.cardInner, 0);
     setTimeout(() => {
       Actions.cards.remove(this.props.card, this.props.parentId);
     }, 250);
@@ -361,6 +361,7 @@ var Card = React.createClass({
         <div
           className={'card-inner ' + (this.props.singleCard ? 'card-single' : '')}
           style={this.state.bodyStyle}
+          ref='cardInner'
         >
           { !this.props.singleCard &&
   					connectDragSource(

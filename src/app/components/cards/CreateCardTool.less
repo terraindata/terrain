@@ -1,13 +1,18 @@
 @import "../../util/Common.less";
 
 .create-card-wrapper {
-  // height: 0px;  
-  // overflow: hidden;
   @create-card-border-radius: 5px;
+  border-radius: @create-card-border-radius;
   
   .create-card-selector {
     overflow: hidden;  
     .transition;
+  }
+  
+  &.create-card-wrapper-drag-over {
+    .create-card-selector {
+      border: 2px solid @drag-color;
+    }
   }
   
   @button-padding: @standard-margin;

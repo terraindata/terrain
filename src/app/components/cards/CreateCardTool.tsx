@@ -49,6 +49,7 @@ import Actions from "../../data/Actions.tsx";
 import Util from '../../util/Util.tsx';
 import { CardTypes, CardColors } from './../../CommonVars.tsx';
 import CreateLine from "../common/CreateLine.tsx";
+import { DragSource, DropTarget } from 'react-dnd';
 
 var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -60,6 +61,8 @@ interface Props {
   dy?: number;
   className?: string;
   onMinimize?: () => void;
+  isOverCurrent?: boolean;
+  connectDropTarget?: (Element) => void;
 }
 
 class CreateCardTool extends React.Component<Props, any>
@@ -130,10 +133,12 @@ class CreateCardTool extends React.Component<Props, any>
       return null;
     }
     
+    const { isOverCurrent, connectDropTarget } = this.props;
     var classes = Util.objToClassname({
       "create-card-wrapper": true,
       "create-card-open": this.props.open,
       "create-card-closed": !this.props.open,
+      "create-card-wrapper-drag-over": isOverCurrent,
     });
     classes += ' ' + this.props.className;
     
@@ -146,12 +151,38 @@ class CreateCardTool extends React.Component<Props, any>
       }
     }
     
-    return (
-      <div className={classes} ref="ccWrapper" style={style}>
+    return connectDropTarget(
+      <div className={classes} style={style}>
         { this.renderCardSelector() }
      </div>
    );
   }
 };
 
-export default CreateCardTool;
+
+const cardTarget = 
+{
+  canDrop(props, monitor)
+  {
+    return true;
+  },
+  
+  drop(props, monitor, component)
+  {
+    const item = monitor.getItem();
+    if(monitor.isOver({ shallow: true}))
+    {
+      Actions.cards.move(item, props.index || 0, props.parentId);
+    }
+  }
+}
+
+const dropCollect = (connect, monitor) =>
+({
+  connectDropTarget: connect.dropTarget(),
+  isOverCurrent: monitor.isOver({ shallow: true }),
+  canDrop: monitor.canDrop(),
+  itemType: monitor.getItemType()
+});
+
+export default DropTarget('CARD', cardTarget, dropCollect)(CreateCardTool);
