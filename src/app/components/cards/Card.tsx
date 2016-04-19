@@ -171,7 +171,9 @@ var Card = React.createClass({
     //   // when it already knows it's being dragged so we can hide it with CSS.
     //   captureDraggingState: true
     // });
-    this.dragPreview = createDragPreview(Util.titleForCard(this.props.card), {
+    this.dragPreview = createDragPreview(
+      Util.titleForCard(this.props.card) + ': ' + Util.previewForCard(this.props.card),
+    {
       backgroundColor: this.getColor(0),
       borderColor: this.getColor(1),
       color: '#fff',
@@ -380,6 +382,9 @@ var Card = React.createClass({
                 >
                 <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
                 { title }
+                <span className='card-title-preview'>
+                  { Util.previewForCard(this.props.card) }
+                </span>
                 <Menu options={this.state.menuOptions} />
     					</div>
             )

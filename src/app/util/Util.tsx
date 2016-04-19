@@ -124,6 +124,31 @@ var Util = {
     return title;
   },
   
+  previewForCard(card: CardModels.ICard): string
+  {
+    switch(card.type)
+    {
+      case 'from':
+        return card['group'] + ' as ' + card['iterator'];
+      case 'select':
+        return card['properties'].length + ' propert' + (card['properties'].length !== 1 ? 'ies' : 'y');
+      case 'sort':
+        return card['sorts'].length ? card['sorts'][0]['property'] : '';
+      case 'filter':
+        return card['filters'].length + ' condition' + (card['filters'].length === 1 ? '' : 's');
+      case 'let':
+      case 'var':
+        return card['field'];
+      case 'score':
+        return card['weights'].length + ' factor' + (card['weights'].length === 1 ? '' : 's');
+      case 'transform':
+        return card['input'];
+      case 'if':
+        return card['filters'].length + ' condition' + (card['filters'].length === 1 ? '' : 's');
+    }
+    return '';
+  },
+  
   // corrects a given index so that it is appropriate
   //  to pass into a `splice` call
   spliceIndex(index: number, array: any[]): number

@@ -251,9 +251,7 @@ const btbTarget =
 const dropCollect = (connect, monitor) =>
 ({
   connectDropTarget: connect.dropTarget(),
-  isOverCurrent: monitor.isOver({ shallow: true }),
-  canDrop: monitor.canDrop(),
-  itemType: monitor.getItemType()
+  isOverCurrent: monitor.isOver({ shallow: true }) && monitor.canDrop(),
 });
 
 export default DropTarget<Props>('CARD', btbTarget, dropCollect)(BuilderTextbox);
