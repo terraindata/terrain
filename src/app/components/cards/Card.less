@@ -30,12 +30,13 @@
   .card-stroke {
     position: absolute;
     height: 5px;
+    border: 1px solid rgba(255,255,255,0.5);
+    // height: 0px;
     z-index: 999;
     width: 100%;
     left: 0px;
     background: @drag-color;
     opacity: 0;
-    border: 1px solid rgba(255,255,255,0.5);
     box-sizing: border-box;
     border-radius: 3px;
     .transition;
@@ -50,18 +51,22 @@
     &:not(.card-drag-over-lower) {
       .card-stroke-above {
         opacity: 1;
+        // height: 25px;
       }
       .card .card-stroke-above {
         opacity: 0;
+        // height: 0px;
       }
     }
     
     &.card-drag-over-lower {
       .card-stroke-below {
         opacity: 1;
+        // height: 25px;
       }
       .card .card-stroke-below {
         opacity: 0;
+        // height: 0px;
       }
     }
   }
@@ -311,4 +316,9 @@
 
 .card-padding {
   padding: 0px 12px;
+}
+
+.flex-card-field {
+  .flex-grow;
+  .card-padding;
 }

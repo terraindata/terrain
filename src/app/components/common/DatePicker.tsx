@@ -121,9 +121,10 @@ class DatePicker extends React.Component<Props, any>
     return (
       <div className='date-time-time'>
         <Dropdown 
-            options={HOUR_OPTIONS}
-            selectedIndex={this.dateToHourIndex(this.getDate())}
-            onChange={this.handleHourChange} />
+          options={HOUR_OPTIONS}
+          selectedIndex={this.dateToHourIndex(this.getDate())}
+          onChange={this.handleHourChange}
+        />
       </div>);
   }
   
@@ -139,7 +140,7 @@ class DatePicker extends React.Component<Props, any>
         <ReactDayPicker
           modifiers={modifiers}
           onDayClick={this.handleDayClick}
-          />
+        />
         { this.renderTimePicker() }
       </div>
      );

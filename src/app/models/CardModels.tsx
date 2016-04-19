@@ -106,7 +106,7 @@ export module CardModels
     type: string;
   }
   
-  export type CardString = string | ICard;
+  export type CardString = string | IParenthesesCard;
   
   export interface ICardsContainer
   {
@@ -146,13 +146,13 @@ export module CardModels
     filters: IFilter[];
   }
   
-  export interface ILetCard extends ICard, ICardsContainer
+  export interface ILetCard extends ICard
   {
     field: string;
     expression: CardString;
   }
   
-  export interface IVarCard extends ICard, ICardsContainer
+  export interface IVarCard extends ICard
   {
     field: string;
     expression: CardString;

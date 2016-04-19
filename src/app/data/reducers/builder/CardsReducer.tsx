@@ -229,4 +229,8 @@ CardsReducer[ActionTypes.cards.remove] =
       cards.remove(cards.findIndex((card) => card.get('id') === action.payload.card.id))
     );
 
+CardsReducer[ActionTypes.cards.change] =
+  (state, action) =>
+    Util.immutableCardsSetIn(state, action.payload.cardId, action.payload.keyPath, action.payload.value);
+
 export default CardsReducer;

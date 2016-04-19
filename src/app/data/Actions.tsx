@@ -62,6 +62,10 @@ var Actions =
       (card: CardModels.ICard, index: number, parentId: string) =>
         $(ActionTypes.cards.move, {card, index, parentId}),
     
+    change:
+      (cardId: string, keyPath: (string | number)[], value: any) =>
+        $(ActionTypes.cards.change, {cardId, keyPath, value}),
+    
     remove: 
       (card: CardModels.ICard, parentId: string) =>
         $(ActionTypes.cards.remove, {card, parentId}),

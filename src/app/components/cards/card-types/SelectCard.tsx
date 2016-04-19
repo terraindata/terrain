@@ -48,14 +48,14 @@ import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import CardField from './../CardField.tsx';
 import BuilderTextbox from "../../common/BuilderTextbox.tsx";
-
+import BuilderClass from './../../builder/BuilderClass.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 
 interface Props {
   card: CardModels.ISelectCard;
 }
 
-class SelectCard extends React.Component<Props, any>
+class SelectCard extends BuilderClass<Props>
 {
   constructor(props:Props)
   {
@@ -115,7 +115,8 @@ class SelectCard extends React.Component<Props, any>
                 value={property.property}
                 placeholder='Type field here'
                 rel={'' + index}
-                onChange={this.handleChange}
+                id={this.props.card.id}
+                keyPath={this._keyPath('properties', index, 'property')}
               />
             </CardField>
           ),

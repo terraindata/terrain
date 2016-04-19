@@ -46,12 +46,17 @@ require('./Dropdown.less');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
+import Actions from "../../data/Actions.tsx";
 
 interface Props
 {
   options: (string | JSX.Element)[];
   selectedIndex: number;
-  onChange: (index: number, event?: any) => void;
+  onChange?: (index: number, event?: any) => void;
+  id?: string;
+  keyPath?: (string | number)[];
+  values?: any[]; // maps indices to values, otherwise index will be used as the value
+
   ref?: string;
   rel?: string;
   circle?: boolean;
@@ -59,16 +64,38 @@ interface Props
 
 class Dropdown extends React.Component<Props, any>
 {
-  value: number;
-  
   constructor(props: Props) {
     super(props);
-    this.renderOption = this.renderOption.bind(this);
-    this.computeDirection = this.computeDirection.bind(this);
-    this.value = this.props.selectedIndex;
-    this.state = {
+    Util.bind(this, 'renderOption', 'computeDirection', 'clickHandler');
+    
+    this.state =
+    {
       up: false,
     };
+  }
+  
+  _clickHandlers: {[index: number]: () => void} = {};
+  clickHandler(index)
+  {
+    if(!this._clickHandlers[index])
+    {
+      this._clickHandlers[index] = () =>
+      {
+        var pr = this.props;
+        if(pr.id && pr.keyPath)
+        {
+          Actions.cards.change(pr.id, pr.keyPath, this.props.values ? pr.values[index] : index);
+        }
+        if(pr.onChange)
+        {
+          this.props.onChange(index, {
+            target: ReactDOM.findDOMNode(this)
+          });
+        }
+      }
+    }
+    
+    return this._clickHandlers[index];
   }
   
   renderOption(option, index)
@@ -78,14 +105,12 @@ class Dropdown extends React.Component<Props, any>
       return null;
     }
     
-    var handleClick = () => {
-      this.value = index;
-      this.props.onChange(index, {
-        target: ReactDOM.findDOMNode(this)
-      });
-    }
     return (
-      <div className="dropdown-option" key={index} onClick={handleClick}>
+      <div
+        className="dropdown-option"
+        key={index} 
+        onClick={this.clickHandler(index)}
+      >
         <div className="dropdown-option-inner">
           { option }
         </div>
@@ -93,7 +118,8 @@ class Dropdown extends React.Component<Props, any>
     );
   }
   
-  computeDirection() {
+  computeDirection()
+  {
     var cr = ReactDOM.findDOMNode(this).getBoundingClientRect();
     if(this.state.up)
     {
@@ -105,22 +131,9 @@ class Dropdown extends React.Component<Props, any>
     }
     var windowBottom = window.innerHeight;
     
-    if(componentBottom > windowBottom)
-    {
-      this.setState({
-        up: true,
-      });
-    }
-    else
-    {
-      this.setState({
-        up: false,
-      })
-    }
-  }
-  
-  componentDidMount() {
-    // this.computeDirection();
+    this.setState({
+      up: componentBottom > windowBottom,
+    });
   }
   
   render() {

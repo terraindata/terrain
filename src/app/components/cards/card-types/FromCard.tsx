@@ -53,6 +53,7 @@ import Dropdown from './../../common/Dropdown.tsx';
 import CardsArea from './../CardsArea.tsx';
 import { Operators } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
+import BuilderClass from './../../builder/BuilderClass.tsx';
 
 var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIcon");
 
@@ -67,146 +68,49 @@ interface Props {
 var OPERATOR_WIDTH: number = 30;
 var CARD_PADDING: number = 12;
 
-class FromCard extends React.Component<Props, any>
+class FromCard extends BuilderClass<Props>
 {
-  constructor(props:Props)
-  {
-    super(props);
-    Util.bind(this, ['renderJoin', 'handleChange', 'handleJoinChange', 'renderCards']);
-  }
-  
-  handleJoinChange(joinValue, event)
-  {
-    var index = parseInt(Util.rel(event.target), 10);
-    var refBase = index + '-';
-    
-    var group = this.refs[refBase + 'group']['value'];
-    var first = this.refs[refBase + 'first']['value'];
-    var second = this.refs[refBase + 'second']['value'];
-    var operator = this.refs[refBase + 'operator']['value'];
-    
-    Actions.cards.from.join.change(this.props.card, index, {
-      group: group,
-      condition:
-      {
-        first: first,
-        second: second,
-        operator: operator,
-      },
-      id: this.props.card.joins[index].id,
-    });
-  }
-
-  renderJoin(join: CardModels.IJoin, index: number)
-  {
-    var refBase = index + '-';
-    var groupRef = refBase + 'group';
-    var firstRef = refBase + 'first';
-    var secondRef = refBase + 'second';
-    var operatorRef = refBase + 'operator';
-
-    var rel = index + "";
-
-    var joinLayout =
-    {
-      columns: [
-        {
-          content: (
-            <BuilderTextbox value={join.group} onChange={this.handleJoinChange} ref={groupRef} rel={rel} />
-          ),
-          colSpan: 2,
-        },
-        {
-          content: (
-            <BuilderTextbox value={join.condition.first} onChange={this.handleJoinChange} ref={firstRef} rel={rel} />
-          ),
-        },
-        {
-          content: (
-            <div>
-             <Dropdown ref={operatorRef} circle={true} options={Operators} selectedIndex={join.condition.operator} onChange={this.handleJoinChange} rel={rel} />
-            </div>
-          ),
-          width: OPERATOR_WIDTH,
-        },
-        {
-          content: (
-            <BuilderTextbox value={join.condition.second} onChange={this.handleJoinChange} ref={secondRef} rel={rel} />
-          ),
-        }
-      ],
-      colPadding: CARD_PADDING,
-    };
-
-    var deleteFn = () =>
-    {
-        Actions.cards.from.join.remove(this.props.card, index);
-    }
-
-    return (
-      <CardField
-        key={join.id}
-        draggable={false}
-        removable={true}
-        onDelete={deleteFn} >
-        <LayoutManager layout={joinLayout} />
-      </CardField>
-    );
-  }
-  
-  handleChange(value)
-  {
-    Actions.cards.from.change(this.props.card,
-      this.refs['group']['value'], this.refs['iterator']['value']);
-  }
-  
-  renderCards()
-  {
-    return <CardsArea cards={this.props.card.cards} parentId={this.props.card.id} spotlights={this.props.spotlights} 
-      draggingOver={this.props.draggingOver} draggingPlaceholder={this.props.draggingPlaceholder}
-      />;
-  }
-
 	render() {
-    var layout = 
-    {
-      columns:
-      [
-        {
-          content: <BuilderTextbox
-            value={this.props.card.group}
-            ref='group'
-            onChange={this.handleChange}
-            placeholder='Enter group name' />,
-        },
-        {
-          content: (
-            <div className='card-assignment'>
-              as
-            </div>
-          ),
-          width: 50,
-        },
-        {
-          content: <BuilderTextbox
-            value={this.props.card.iterator}
-            ref='iterator'
-            onChange={this.handleChange}
-            placeholder='Iterator name' />,
-        }
-      ]
-    }
-    
 		return (
       <div>
         <CardField
           draggable={false}
           removable={false}
-          drag_y={true}>
-          <LayoutManager layout={layout} />
+          drag_y={true}
+        >
+          <div className='flex-container'>
+            <div className='flex-card-field'>
+              <BuilderTextbox
+                value={this.props.card.group}
+                ref='group'
+                placeholder='Enter group name'
+                id={this.props.card.id}
+                keyPath={this._keyPath('group')}
+              />
+            </div>
+            <div className='builder-operator'>
+              <div className='card-assignment'>
+                as
+              </div>
+            </div>
+            <div className='flex-card-field'>
+              <BuilderTextbox
+                value={this.props.card.iterator}
+                ref='iterator'
+                placeholder='Iterator name'
+                id={this.props.card.id}
+                keyPath={this._keyPath('iterator')}
+              />
+            </div>
+          </div>  
         </CardField>
-        { this.props.card.joins && this.props.card.joins.map(this.renderJoin) }
-        { this.renderCards() }
+        <CardsArea 
+          cards={this.props.card.cards}
+          parentId={this.props.card.id}
+          spotlights={this.props.spotlights} 
+          draggingOver={this.props.draggingOver}
+          draggingPlaceholder={this.props.draggingPlaceholder}
+        />
       </div>
 		);
 	}

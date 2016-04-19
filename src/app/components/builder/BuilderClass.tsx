@@ -42,45 +42,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Immutable = require('immutable');
-import ActionTypes from './../../ActionTypes.tsx';
-import Util from './../../../util/Util.tsx';
+import * as React from 'react';
 
-var InputsReducer = {};
+class BuilderClass<T> extends React.Component<T, any>
+{
+  constructor(props: T)
+  {
+    super(props);
+    
+    for(var m in this)
+    {
+      // auto-bind child methods to this
+      if(!BuilderClass.prototype[m] && typeof this[m] === 'function')
+      {
+        this[m] = this[m].bind(this);
+      }
+    }
+    
+    this._keyPath = this._keyPath.bind(this);
+  }
+  
+  // for the construction of keyPaths for Redux actions,
+  //  this function accepts arguments from which to 
+  //  construct an array keyPath, and memoizes that array
+  //  so as to allow for pure rendering
+  _keyPaths: {[key: string]: (string | number)[]} = {};
+  _keyPath(...keys: (string | number)[])
+  {
+    var key = keys.join(".");
+    if(this._keyPaths[key] === undefined)
+    {
+      this._keyPaths[key] = keys;
+    }
+    return this._keyPaths[key];
+  }
+}
 
-InputsReducer[ActionTypes.inputs.create] =
-  (state, action) =>
-    state.updateIn(['algorithms', action.payload.parentId, 'inputs'], inputs =>
-      inputs.splice(Util.spliceIndex(action.payload.index, inputs), 0, Immutable.fromJS({
-        key: '',
-        value: '',
-        id: Util.randInt(123456789),
-        parentId: action.payload.parentId,
-      })));
-
-InputsReducer[ActionTypes.inputs.move] =
-  (state, action) => 
-    state.updateIn(['algorithms', action.payload.input.parentId, 'inputs'], inputs =>
-      Util.immutableMove(inputs, action.payload.input.id, action.payload.index));
-
-InputsReducer[ActionTypes.inputs.changeKey] =
-  (state, action) =>
-    state.setIn(['algorithms', action.payload.input.parentId, 'inputs', action.payload.index, 'key'],
-      action.payload.value);
-
-InputsReducer[ActionTypes.inputs.changeValue] =
-  (state, action) =>
-    state.setIn(['algorithms', action.payload.input.parentId, 'inputs', action.payload.index, 'value'],
-      action.payload.value);
-
-InputsReducer[ActionTypes.inputs.changeType] =
-  (state, action) =>
-    state.setIn(['algorithms', action.payload.input.parentId, 'inputs', action.payload.index, 'type'],
-      action.payload.value);
-
-InputsReducer[ActionTypes.inputs.remove] =
-  (state, action) =>
-    state.updateIn(['algorithms', action.payload.input.parentId, 'inputs'], inputs =>
-      inputs.delete(inputs.findIndex(input => input.get('id') === action.payload.input.id)));
-
-export default InputsReducer;
+export default BuilderClass;

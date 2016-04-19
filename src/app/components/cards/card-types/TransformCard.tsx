@@ -54,8 +54,7 @@ import Dropdown from './../../common/Dropdown.tsx';
 import CardField from './../CardField.tsx';
 import { Directions } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
-
-import { Weight, Weighter } from '../../../charts/Weighter.tsx';
+import BuilderClass from './../../builder/BuilderClass.tsx';
 import TransformCardChart from './TransformCardChart.tsx';
 import TransformCardPeriscope from './TransformCardPeriscope.tsx';
 import BuilderTextbox from "../../common/BuilderTextbox.tsx";
@@ -68,7 +67,7 @@ interface Props {
   spotlights: any[];
 }
 
-class TransformCard extends React.Component<Props, any>
+class TransformCard extends BuilderClass<Props>
 {
   constructor(props:Props)
   {
@@ -101,11 +100,6 @@ class TransformCard extends React.Component<Props, any>
   render() {
     var inputRef = 'input';
     
-    var handleChange = () =>
-    {
-      Actions.cards.transform.change(this.props.card, this.refs[inputRef]['value']);
-    }
-    
     // TODO update this when we have middle tier
     var inputKey = this.props.card.input;
     if(inputKey.indexOf('.'))
@@ -116,7 +110,12 @@ class TransformCard extends React.Component<Props, any>
     return (
       <div>
         <CardField>
-          <BuilderTextbox value={this.props.card.input} onChange={handleChange} ref={inputRef} />
+          <BuilderTextbox
+            value={this.props.card.input}
+            ref={inputRef}
+            id={this.props.card.id}
+            keyPath={this._keyPath('input')}
+          />
         </CardField>
         <TransformCardChart
           barColor={ColorManager.colorForKey(this.props.card.id, this.props.card.input)}

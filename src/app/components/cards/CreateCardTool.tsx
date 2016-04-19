@@ -62,7 +62,7 @@ interface Props {
   className?: string;
   onMinimize?: () => void;
   isOverCurrent?: boolean;
-  connectDropTarget?: (Element) => void;
+  connectDropTarget?: (Element) => JSX.Element;
 }
 
 class CreateCardTool extends React.Component<Props, any>

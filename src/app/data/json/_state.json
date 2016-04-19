@@ -20,7 +20,6 @@
             {
               "field": "qualityThreshold",
               "expression": "200",
-              "cards": [],
               "type": "var",
               "id": "c-390165501",
               "parentId": "100"
@@ -28,7 +27,6 @@
             {
               "field": "responsivenessThreshold",
               "expression": "0",
-              "cards": [],
               "type": "var",
               "id": "c-2785901662",
               "parentId": "100"
@@ -36,272 +34,6 @@
             {
               "field": "lastMinuteThreshold",
               "expression": "0",
-              "cards": [
-                {
-                  "type": "from",
-                  "group": "sitters",
-                  "iterator": "s",
-                  "joins": [],
-                  "cards": [
-                    {
-                      "filters": [
-                        {
-                          "condition": {
-                            "operator": 0,
-                            "first": {
-                              "id": "c-0.5924580801755908",
-                              "parentId": "c-2622631634",
-                              "type": "parentheses",
-                              "cards": [
-                                {
-                                  "cards": [
-                                    {
-                                      "type": "from",
-                                      "group": "sitter_locations",
-                                      "iterator": "sl",
-                                      "joins": [],
-                                      "cards": [
-                                        {
-                                          "filters": [
-                                            {
-                                              "condition": {
-                                                "operator": 0,
-                                                "first": "sl.sitter_id",
-                                                "second": "s.id"
-                                              },
-                                              "combinator": 0,
-                                              "id": "co0.09564233661929711"
-                                            },
-                                            {
-                                              "condition": {
-                                                "operator": 0,
-                                                "first": "sl.name",
-                                                "second": "City"
-                                              },
-                                              "combinator": 0,
-                                              "id": 1638424015
-                                            },
-                                            {
-                                              "condition": {
-                                                "operator": 0,
-                                                "first": "sl.state",
-                                                "second": "StateCode"
-                                              },
-                                              "combinator": 0,
-                                              "id": 1684698907
-                                            }
-                                          ],
-                                          "type": "filter",
-                                          "id": "c-4371453989",
-                                          "parentId": "c-4562940125"
-                                        }
-                                      ],
-                                      "id": "c-4562940125",
-                                      "parentId": "c-2162540330"
-                                    }
-                                  ],
-                                  "type": "exists",
-                                  "id": "c-2162540330",
-                                  "parentId": "c-0.5924580801755908"
-                                }
-                              ]
-                            },
-                            "second": "true"
-                          },
-                          "combinator": 0,
-                          "id": "co0.1563294333820613"
-                        }
-                      ],
-                      "type": "filter",
-                      "id": "c-2622631634",
-                      "parentId": "100"
-                    },
-                    {
-                      "filters": [
-                        {
-                          "condition": {
-                            "operator": 0,
-                            "first": "s.is_disabled",
-                            "second": "false"
-                          },
-                          "combinator": 0,
-                          "id": "co0.6678176769990432"
-                        },
-                        {
-                          "condition": {
-                            "operator": 0,
-                            "first": "s.is_hidden",
-                            "second": "false"
-                          },
-                          "combinator": 0,
-                          "id": 367241441
-                        }
-                      ],
-                      "type": "filter",
-                      "id": "c-3775241516",
-                      "parentId": "100"
-                    },
-                    {
-                      "filters": [
-                        {
-                          "condition": {
-                            "operator": 0,
-                            "first": "hasTimeRange",
-                            "second": "true"
-                          },
-                          "combinator": 0,
-                          "id": "co0.3614192015559379"
-                        }
-                      ],
-                      "cards": [
-                        {
-                          "filters": [
-                            {
-                              "condition": {
-                                "operator": 0,
-                                "first": {
-                                  "id": "c-0.6270764325873994",
-                                  "parentId": "c-2935491840",
-                                  "type": "parentheses",
-                                  "cards": [
-                                    {
-                                      "cards": [
-                                        {
-                                          "type": "from",
-                                          "group": "booking_availability",
-                                          "iterator": "ba",
-                                          "joins": [],
-                                          "cards": [
-                                            {
-                                              "filters": [
-                                                {
-                                                  "condition": {
-                                                    "operator": 0,
-                                                    "first": "ba.sitter_id",
-                                                    "second": "s.id"
-                                                  },
-                                                  "combinator": 0,
-                                                  "id": "co0.5209971224939236"
-                                                },
-                                                {
-                                                  "condition": {
-                                                    "operator": 4,
-                                                    "first": "ba.begin",
-                                                    "second": "Begin"
-                                                  },
-                                                  "combinator": 0,
-                                                  "id": 1712766900
-                                                },
-                                                {
-                                                  "condition": {
-                                                    "operator": 2,
-                                                    "first": "ba.end",
-                                                    "second": "End"
-                                                  },
-                                                  "combinator": 0,
-                                                  "id": 1158075961
-                                                }
-                                              ],
-                                              "type": "filter",
-                                              "id": "c-2355852363",
-                                              "parentId": "c-1506367275"
-                                            }
-                                          ],
-                                          "id": "c-1506367275",
-                                          "parentId": "c-2834803967"
-                                        }
-                                      ],
-                                      "type": "exists",
-                                      "id": "c-2834803967",
-                                      "parentId": "c-0.6270764325873994"
-                                    }
-                                  ]
-                                },
-                                "second": "true"
-                              },
-                              "combinator": 0,
-                              "id": "co0.8412812276246"
-                            }
-                          ],
-                          "type": "filter",
-                          "id": "c-2935491840",
-                          "parentId": "100"
-                        },
-                        {
-                          "filters": [
-                            {
-                              "condition": {
-                                "operator": 4,
-                                "first": {
-                                  "id": "c-0.945656871712814",
-                                  "parentId": "c-1325251573",
-                                  "type": "parentheses",
-                                  "cards": [
-                                    {
-                                      "cards": [
-                                        {
-                                          "type": "from",
-                                          "group": "bookings",
-                                          "iterator": "b",
-                                          "joins": [],
-                                          "cards": [
-                                            {
-                                              "filters": [
-                                                {
-                                                  "condition": {
-                                                    "operator": 0,
-                                                    "first": "b.sitter_id",
-                                                    "second": "s.id"
-                                                  },
-                                                  "combinator": 0,
-                                                  "id": "co0.47424809894675546"
-                                                },
-                                                {
-                                                  "condition": {
-                                                    "operator": 0,
-                                                    "first": "b.begin",
-                                                    "second": ""
-                                                  },
-                                                  "combinator": 0,
-                                                  "id": 235771347
-                                                }
-                                              ],
-                                              "type": "filter",
-                                              "id": "c-3826564322",
-                                              "parentId": "c-731495250"
-                                            }
-                                          ],
-                                          "id": "c-731495250",
-                                          "parentId": "c-3600688848"
-                                        }
-                                      ],
-                                      "type": "exists",
-                                      "id": "c-3600688848",
-                                      "parentId": "c-0.945656871712814"
-                                    }
-                                  ]
-                                },
-                                "second": ""
-                              },
-                              "combinator": 0,
-                              "id": "co0.30778150958198247"
-                            }
-                          ],
-                          "type": "filter",
-                          "id": "c-1325251573",
-                          "parentId": "100"
-                        }
-                      ],
-                      "elses": [],
-                      "type": "if",
-                      "id": "c-2525915369",
-                      "parentId": "100"
-                    }
-                  ],
-                  "id": "c-4372845968",
-                  "parentId": "100"
-                }
-              ],
               "type": "var",
               "id": "c-855651324",
               "parentId": "100"
@@ -335,7 +67,6 @@
                 {
                   "field": "responsivenessThreshold",
                   "expression": "0",
-                  "cards": [],
                   "type": "var",
                   "id": "c-3548814921",
                   "parentId": "e0.9306559582068967"
@@ -343,7 +74,6 @@
                 {
                   "field": "lastMinuteThreshold",
                   "expression": "0",
-                  "cards": [],
                   "type": "var",
                   "id": "c-757425329",
                   "parentId": "e0.9306559582068967"
@@ -357,7 +87,6 @@
                     {
                       "field": "qualityThreshold",
                       "expression": "200",
-                      "cards": [],
                       "type": "var",
                       "id": "c-2439972416",
                       "parentId": "e0.5460149214334937"
@@ -365,7 +94,6 @@
                     {
                       "field": "responsivenessThreshold",
                       "expression": "20",
-                      "cards": [],
                       "type": "var",
                       "id": "c-3353528132",
                       "parentId": "e0.5460149214334937"
@@ -373,7 +101,6 @@
                     {
                       "field": "lastMinuteThreshold",
                       "expression": "40",
-                      "cards": [],
                       "type": "var",
                       "id": "c-326668961",
                       "parentId": "e0.5460149214334937"
@@ -387,7 +114,6 @@
                         {
                           "field": "qualityThreshold",
                           "expression": "200",
-                          "cards": [],
                           "type": "var",
                           "id": "c-1069548621",
                           "parentId": "e0.9645169669427978"
@@ -395,7 +121,6 @@
                         {
                           "field": "responsivenessThreshold",
                           "expression": "0",
-                          "cards": [],
                           "type": "var",
                           "id": "c-4445006451",
                           "parentId": "e0.9645169669427978"
@@ -403,7 +128,6 @@
                         {
                           "field": "lastMinuteThreshold",
                           "expression": "40",
-                          "cards": [],
                           "type": "var",
                           "id": "c-2829004495",
                           "parentId": "e0.9645169669427978"
@@ -498,7 +222,6 @@
               }
             ]
           },
-          "cards": [],
           "type": "var",
           "id": "c-4377078246",
           "parentId": "100"
@@ -557,7 +280,6 @@
               }
             ]
           },
-          "cards": [],
           "type": "var",
           "id": "c-2072691443",
           "parentId": "100"
@@ -607,7 +329,6 @@
               }
             ]
           },
-          "cards": [],
           "type": "var",
           "id": "c-3886300512",
           "parentId": "100"
@@ -666,7 +387,6 @@
               }
             ]
           },
-          "cards": [],
           "type": "var",
           "id": "c-3547421366",
           "parentId": "100"
@@ -734,7 +454,6 @@
               }
             ]
           },
-          "cards": [],
           "type": "var",
           "id": "c-1980821222",
           "parentId": "100"
@@ -784,7 +503,6 @@
               }
             ]
           },
-          "cards": [],
           "type": "var",
           "id": "c-1294664316",
           "parentId": "100"
@@ -843,7 +561,6 @@
               }
             ]
           },
-          "cards": [],
           "type": "var",
           "id": "c-4231809856",
           "parentId": "100"
@@ -893,7 +610,6 @@
               }
             ]
           },
-          "cards": [],
           "type": "var",
           "id": "c-1369611972",
           "parentId": "100"
@@ -1458,7 +1174,6 @@
                   }
                 ]
               },
-              "cards": [],
               "type": "let",
               "id": "c-60721396",
               "parentId": "100"
@@ -1500,7 +1215,6 @@
                   }
                 ]
               },
-              "cards": [],
               "type": "let",
               "id": "c-3276799597",
               "parentId": "100"
@@ -1530,7 +1244,6 @@
                   }
                 ]
               },
-              "cards": [],
               "type": "let",
               "id": "c-65666618",
               "parentId": "100"
@@ -1568,7 +1281,6 @@
                   }
                 ]
               },
-              "cards": [],
               "type": "let",
               "id": "c-4157076070",
               "parentId": "100"
@@ -1606,7 +1318,6 @@
                   }
                 ]
               },
-              "cards": [],
               "type": "let",
               "id": "c-4753580723",
               "parentId": "100"
@@ -1645,7 +1356,6 @@
                 {
                   "field": "s.tier",
                   "expression": "1",
-                  "cards": [],
                   "type": "let",
                   "id": "c-2637137387",
                   "parentId": "100"
@@ -1659,7 +1369,6 @@
                     {
                       "field": "s.tier",
                       "expression": "0",
-                      "cards": [],
                       "type": "let",
                       "id": "c-2671809305",
                       "parentId": "e0.11198705846368129"
@@ -1689,7 +1398,6 @@
                 {
                   "field": "s.rank",
                   "expression": "1",
-                  "cards": [],
                   "type": "let",
                   "id": "c-915146942",
                   "parentId": "100"
@@ -1703,7 +1411,6 @@
                     {
                       "field": "s.rank",
                       "expression": "2",
-                      "cards": [],
                       "type": "let",
                       "id": "c-3545978525",
                       "parentId": "e0.25864265318462154"
@@ -1717,7 +1424,6 @@
                         {
                           "field": "s.rank",
                           "expression": "3",
-                          "cards": [],
                           "type": "let",
                           "id": "c-1687852224",
                           "parentId": "e0.20080441255236403"
@@ -1731,7 +1437,6 @@
                             {
                               "field": "s.rank",
                               "expression": "4",
-                              "cards": [],
                               "type": "let",
                               "id": "c-3502054433",
                               "parentId": "e0.017144870539927304"
@@ -1745,7 +1450,6 @@
                                 {
                                   "field": "s.rank",
                                   "expression": "5",
-                                  "cards": [],
                                   "type": "let",
                                   "id": "c-2236765086",
                                   "parentId": "e0.8031880246021963"
@@ -1759,7 +1463,6 @@
                                     {
                                       "field": "s.rank",
                                       "expression": "6",
-                                      "cards": [],
                                       "type": "let",
                                       "id": "c-4051477128",
                                       "parentId": "e0.4947156455061896"

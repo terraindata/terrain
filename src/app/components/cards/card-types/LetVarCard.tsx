@@ -51,6 +51,7 @@ import CardField from './../CardField.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 import BuilderTextbox from "../../common/BuilderTextbox.tsx";
 import BuilderTextboxCards from "../../common/BuilderTextboxCards.tsx";
+import BuilderClass from './../../builder/BuilderClass.tsx';
 
 var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIcon");
 var ExpandIcon = require("./../../../../images/icon_tql_17x14.svg?name=ExpandIcon");
@@ -60,7 +61,7 @@ interface Props {
   spotlights: any[];
 }
 
-class LetVarCard extends React.Component<Props, any>
+class LetVarCard extends BuilderClass<Props>
 {
   constructor(props:Props)
   {
@@ -69,7 +70,6 @@ class LetVarCard extends React.Component<Props, any>
     {
       expanded: false,
     };
-    Util.bind(this, 'handleExpand', 'handleChange');
   }
   
   handleExpand()
@@ -78,69 +78,65 @@ class LetVarCard extends React.Component<Props, any>
       expanded: !this.state.expanded,
     });
   }
-    
-  handleChange()
-  {
-    Actions.cards.let.change(this.props.card,
-      this.refs['field']['value'],
-      this.refs['expression']['value']);
-  }
 
   render() {
     var card = this.props.card;
-    
-    var expressionInput = <BuilderTextbox
-      placeholder='Expression'
-      value={this.props.card.expression}
-      className='let-card-code-input'
-      onChange={this.handleChange}
-      textarea={this.state.expanded}
-      ref={'expression'}
-      acceptsCards={true}
-      />;
-
-    var layout = {
-      columns: [
-        {
-          content: (
-            <BuilderTextbox
-              placeholder='Variable name'
-              value={this.props.card.field} 
-              onChange={this.handleChange} 
-              parentId={this.props.card.id}
-              ref={'field'} />
-          ),
-        },
-        {
-          content: (
-            <div className='card-assignment'>
-              =
-            </div>
-          ),
-          width: 50,
-        },
-      ],
-    };
-    
-    if(!this.state.expanded)
-    {
-      layout.columns.push({
-        content: expressionInput,
-      });
-    }
     
     var rightContent = typeof this.props.card.expression === 'string' && (
       <div onClick={this.handleExpand} className='let-card-expand'>
         <ExpandIcon />
       </div>
     );
+    
+    var expanded = this.state.expanded && typeof this.props.card.expression === 'string';
 
     return (
       <div ref='let'>
-        <CardField height={this.state.expanded ? 242 : 30} rightContent={rightContent}>
-          <LayoutManager layout={layout} />
-          { this.state.expanded ? expressionInput : null }
+        <CardField rightContent={rightContent}>
+          <div className='flex-container'>
+            <div className='flex-card-field'>
+              <BuilderTextbox
+                placeholder='Variable name'
+                value={this.props.card.field} 
+                parentId={this.props.card.id}
+                ref={'field'}
+                id={this.props.card.id}
+                keyPath={this._keyPath('field')}
+              />
+            </div>
+            <div className='builder-operator'>
+              <div className='card-assignment'>
+                =
+              </div>
+            </div>
+            { expanded ? null : 
+              <div className='flex-card-field'>
+                <BuilderTextbox
+                  placeholder='Expression'
+                  value={this.props.card.expression}
+                  className='let-card-code-input'
+                  textarea={this.state.expanded}
+                  ref={'expression'}
+                  acceptsCards={true}
+                  id={this.props.card.id}
+                  keyPath={this._keyPath('expression')}
+                />
+              </div>
+            }
+          </div>
         </CardField>
+        { !expanded ? null : 
+          <BuilderTextbox
+            placeholder='Expression'
+            value={this.props.card.expression}
+            className='let-card-code-input'
+            textarea={this.state.expanded}
+            ref={'expression'}
+            acceptsCards={true}
+            id={this.props.card.id}
+            keyPath={this._keyPath('expression')}
+          />
+        }
         <BuilderTextboxCards
           value={this.props.card.expression}
           spotlights={this.props.spotlights}

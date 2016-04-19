@@ -47,16 +47,19 @@ require('./BuilderTextbox.less');
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import Actions from "../../data/Actions.tsx";
 import Util from '../../util/Util.tsx';
 import { CardModels } from '../../models/CardModels.tsx';
-// import CardsArea from '../cards/CardsArea.tsx';
 import Card from '../cards/Card.tsx';
 import { CardColors } from './../../CommonVars.tsx';
+import { DragSource, DropTarget } from 'react-dnd';
+import * as classNames from 'classnames';
 
 interface Props
 {
   value: CardModels.CardString;
-  onChange: (value: string, event?: any) => void;
+  id: string;
+  keyPath: (string | number)[];
   
   placeholder?: string;
   ref?: string;
@@ -68,11 +71,14 @@ interface Props
   acceptsCards?: boolean;
   top?: boolean;
   parentId?: string;
+  
+  isOverCurrent?: boolean;
+  connectDropTarget?: (Element) => JSX.Element;
 }
 
 class BuilderTextbox extends React.Component<Props, any>
 {
-  value: CardModels.CardString;
+  backupValue: CardModels.CardString;
   
   constructor(props: Props) {
     super(props);
@@ -80,8 +86,6 @@ class BuilderTextbox extends React.Component<Props, any>
     // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
     this.executeChange = _.debounce(this.executeChange, 750);
     Util.bind(this, ['executeChange', 'handleChange', 'renderSwitch', 'handleSwitch']);
-    
-    this.value = props.value;
   }
   
   componentWillReceiveProps(newProps)
@@ -94,23 +98,17 @@ class BuilderTextbox extends React.Component<Props, any>
         this.refs['input']['value'] = newProps.value;
       }
     }
-    
-    this.value = newProps.value;
   }
   
   // throttled event handler
-  executeChange(event)
+  executeChange(value)
   {
-    this.value = event.target.value;
-    this.props.onChange(event.target.value, event);
+    Actions.cards.change(this.props.id, this.props.keyPath, value)
   }
   
-  // persists the event and calls the throttled handler
-  // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js/24679479#24679479
   handleChange(event)
   {
-    event.persist();
-    this.executeChange(event);
+    this.executeChange(event.target.value);
   }
   
   isText()
@@ -120,30 +118,24 @@ class BuilderTextbox extends React.Component<Props, any>
   
   handleSwitch()
   {
-    if(!this.isText())
+    var value: CardModels.CardString = '';
+    if(this.backupValue)
     {
-      this.value = '';
-      this.executeChange({
-        target: this,
-        switched: true,
-      })  
+      value = this.backupValue;
     }
-    else
+    else if(this.isText())
     {
-      var newCard:CardModels.IParenthesesCard =
+      value =
       {
         id: 'c-' + Math.random(),
         parentId: this.props.parentId,
         type: 'parentheses',
         cards: [],
       };
-      
-      this.value = newCard;
-      this.executeChange({
-        target: this,
-        switched: true,
-      });
     }
+    
+    this.backupValue = this.props.value;
+    this.executeChange(value);
   }
   
   renderSwitch()
@@ -159,6 +151,7 @@ class BuilderTextbox extends React.Component<Props, any>
     if(this.isText())
     {
       var element = this.props.textarea ? <textarea ref='input' /> : <input ref='input' />;
+      const { isOverCurrent, connectDropTarget } = this.props;
       
       var props =
       {
@@ -170,8 +163,12 @@ class BuilderTextbox extends React.Component<Props, any>
         rel: this.props.rel,
       };
       
-      return (
-        <div className={'builder-tb ' + (this.props.acceptsCards ? 'builder-tb-accepts-cards' : '')}>
+      return connectDropTarget(
+        <div className={classNames({
+          'builder-tb': true,
+          'builder-tb-drag-over': isOverCurrent,
+          'builder-tb-accepts-cards': this.props.acceptsCards
+        })}>
           { React.cloneElement(element, props) }
           { this.props.acceptsCards && this.renderSwitch() }
         </div>
@@ -206,7 +203,11 @@ class BuilderTextbox extends React.Component<Props, any>
     
     // We're in card mode
     return (
-      <div className={'builder-tb builder-tb-cards' + (this.props.top ? ' builder-tb-cards-top' : '')} ref='cards'>
+      <div className={classNames({
+        'builder-tb': true,
+        'builder-tb-cards': true,
+        'builder-tb-cards-top': this.props.top
+      })} ref='cards'>
         <div className='builder-tb-cards-input'>
           { this.renderSwitch() }
           <div className='builder-tb-cards-input-value' style={chipStyle}>
@@ -221,4 +222,38 @@ class BuilderTextbox extends React.Component<Props, any>
   }
 };
 
-export default BuilderTextbox;
+const btbTarget = 
+{
+  canDrop(props, monitor)
+  {
+    return props.acceptsCards;
+  },
+  
+  drop(props, monitor, component)
+  {
+    const item = monitor.getItem();
+    if(monitor.isOver({ shallow: true}))
+    {
+      var newId = 'c-' + Math.random();
+      var newCard:CardModels.IParenthesesCard =
+      {
+        id: newId,
+        parentId: props.parentId,
+        type: 'parentheses',
+        cards: [],
+      };
+      Actions.cards.change(props.id, props.keyPath, newCard)
+      Actions.cards.move(item, 0, newId);
+    }
+  }
+}
+
+const dropCollect = (connect, monitor) =>
+({
+  connectDropTarget: connect.dropTarget(),
+  isOverCurrent: monitor.isOver({ shallow: true }),
+  canDrop: monitor.canDrop(),
+  itemType: monitor.getItemType()
+});
+
+export default DropTarget<Props>('CARD', btbTarget, dropCollect)(BuilderTextbox);

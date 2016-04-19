@@ -43,14 +43,6 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import Actions from "../../../data/Actions.tsx";
-import Util from '../../../util/Util.tsx';
-import LayoutManager from "../../layout/LayoutManager.tsx";
-import BuilderTextbox from "../../common/BuilderTextbox.tsx";
-import BuilderTextboxCards from "../../common/BuilderTextboxCards.tsx";
-import CardField from './../CardField.tsx';
-import Dropdown from './../../common/Dropdown.tsx';
-import { Operators, Combinators } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 import FilterArea from './FilterArea';
 

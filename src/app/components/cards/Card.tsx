@@ -69,6 +69,7 @@ import Menu from '../common/Menu.tsx';
 import Actions from "../../data/Actions.tsx";
 import CardsContainerMixin from "./CardsContainerMixin.tsx";
 import { CardColors } from './../../CommonVars.tsx';
+import { CardModels } from './../../models/CardModels.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
@@ -84,6 +85,14 @@ var hoverCard = (event) => {
   }
 };
 $('body').mousemove(_.throttle(hoverCard, 100));
+
+interface Props
+{
+  card: CardModels.ICard;
+  index: number;
+  parentId: string;
+  singleCard?: boolean;
+}
 
 var Card = React.createClass({
 	mixins: [CardsContainerMixin],

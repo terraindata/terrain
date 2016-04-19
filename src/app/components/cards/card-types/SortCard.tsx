@@ -51,19 +51,14 @@ import CardField from './../CardField.tsx';
 import { Directions } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 import BuilderTextbox from "../../common/BuilderTextbox.tsx";
+import BuilderClass from './../../builder/BuilderClass.tsx';
 
 interface Props {
   card: CardModels.ISortCard;
 }
 
-class SortCard extends React.Component<Props, any>
+class SortCard extends BuilderClass<Props>
 {
-  constructor(props:Props)
-  {
-    super(props);
-    Util.bind(this, 'renderSort', 'moveSort', 'removeSort', 'addSort');
-  }
-  
   addSort(index)
   {
     Actions.cards.sort.create(this.props.card, index + 1);
@@ -71,7 +66,6 @@ class SortCard extends React.Component<Props, any>
   
   moveSort(curIndex, newIndex)
   {
-    console.log(curIndex, this.props.card.sorts[curIndex]);
     Actions.cards.sort.move(this.props.card, this.props.card.sorts[curIndex], newIndex);
   }
   
@@ -82,34 +76,6 @@ class SortCard extends React.Component<Props, any>
 
   renderSort(sort, index)
   {
-    var dropdownRef = 'dropdown' + index;
-    var propertyRef = 'property' + index;
-    
-    var handleChange = () =>
-    {
-      Actions.cards.sort.change(this.props.card, index, {
-        property: this.refs[propertyRef]['value'],
-        direction: this.refs[dropdownRef]['value'],
-        id: sort.id,
-      });
-    }
-
-    var layout = {
-      colPadding: 12,
-      columns: [
-      {
-        content: (
-          <BuilderTextbox value={sort.property} onChange={handleChange} ref={propertyRef} />
-        ),
-      },
-      {
-        content: (
-          <Dropdown options={Directions} selectedIndex={sort.direction} onChange={handleChange} ref={dropdownRef} />
-        ),
-      }
-      ],
-    };
-
     return (
       <CardField
         draggable={true}
@@ -119,7 +85,23 @@ class SortCard extends React.Component<Props, any>
         onDelete={this.removeSort}
         drag_y={true}
       >
-        <LayoutManager layout={layout} />
+        <div className='flex-container'>
+          <div className='flex-card-field'>
+            <BuilderTextbox
+              value={sort.property}
+              id={this.props.card.id}
+              keyPath={this._keyPath('sorts', index, 'property')}
+            />
+          </div>
+          <div className='flex-card-field'>
+            <Dropdown
+              options={Directions}
+              selectedIndex={sort.direction}
+              id={this.props.card.id}
+              keyPath={this._keyPath('sorts', index, 'direction')}
+            />
+          </div>
+        </div>
       </CardField>
     );
   }

@@ -136,15 +136,21 @@ var Input = React.createClass<any, any>({
   {
     if(this.props.input.type === CardModels.InputType.DATE)
     {
-      return (<div>
-        <DatePicker date={this.props.input.value} onChange={this.changeValue} />
-      </div>);
+      return (
+        <div>
+          <DatePicker date={this.props.input.value} onChange={this.changeValue} />
+        </div>
+      );
     }
     
-    return <BuilderTextbox
-      value={this.props.input.value}
-      onChange={this.changeValue}
-      className="input-text input-text-second" />;
+    return (
+      <BuilderTextbox
+        value={this.props.input.value}
+        className="input-text input-text-second"
+        id={this.props.input.id}
+        keyPath={['value']}
+      />
+    );
   },
   
   componentDidMount()
@@ -158,7 +164,12 @@ var Input = React.createClass<any, any>({
         <CreateLine open={false} onClick={this.createInput} />
         <div className='input-inner'>
           <div className='input-top-row'>
-            <BuilderTextbox value={this.props.input.key} onChange={this.changeKey} className="input-text input-text-first" />
+            <BuilderTextbox
+              value={this.props.input.key}
+              className="input-text input-text-first"
+              id={this.props.input.id}
+              keyPath={['key']}
+            />
             <Menu options={this.getMenuOptions()} />
           </div>
           <div className='input-bottom-row'>

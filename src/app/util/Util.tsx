@@ -50,11 +50,22 @@ var _ = require('underscore');
 
 import { CardModels } from './../models/CardModels.tsx';
 
-var immutableCardsUpdateHelper = (node: any, keyToUpdate: string, id: string, updater: (node: any, key: string) => any) =>
+var immutableCardsUpdateHelper = (node: any, keyToUpdate: string | string[], id: string, updater: (node: any, key: string | string[]) => any) =>
 {
   if(node.get('id') === id)
   {
-    return node.update(keyToUpdate, (node: any) => updater(node, keyToUpdate));
+    if(typeof keyToUpdate === 'string')
+    {
+      return node.update(keyToUpdate, (node: any) => updater(node, keyToUpdate));
+    }
+    else
+    {
+      if(node.getIn(keyToUpdate) === undefined)
+      {
+        console.log('Potential warning: you are setting a value at a keyPath that had an undefined value.', keyToUpdate, node.toJS());
+      }
+      return node.updateIn(keyToUpdate, (node: any) => updater(node, keyToUpdate));
+    }
   }
   
   node = node.map((value, key) => !Immutable.Iterable.isIterable(value) ? value :
@@ -74,7 +85,14 @@ var immutableCardsUpdate =
       (keysToUpdate as string[]).reduce(
         (algorithm, keyToUpdate) => immutableCardsUpdateHelper(algorithm, keyToUpdate, id, updater)
       , algorithm)));
-  }
+  };
+
+var immutableCardsSetIn = 
+  (state: any, id: string, keyPath: string[], value) => {
+    return state.update('algorithms', algorithms => 
+      immutableCardsUpdateHelper(algorithms, keyPath, id,
+        (n) => Immutable.fromJS(value))
+  )};
 
 var Util = {
 	// Return a random integer [min, max)
@@ -132,6 +150,7 @@ var Util = {
   },
   
   immutableCardsUpdate: immutableCardsUpdate,
+  immutableCardsSetIn: immutableCardsSetIn,
 
 	isInt(num): boolean
 	{

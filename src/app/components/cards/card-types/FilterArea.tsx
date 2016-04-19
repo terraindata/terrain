@@ -53,6 +53,7 @@ import CardField from './../CardField.tsx';
 import Dropdown from './../../common/Dropdown.tsx';
 import { Operators, Combinators } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
+import BuilderClass from './../../builder/BuilderClass.tsx';
 
 interface Props
 {
@@ -61,14 +62,8 @@ interface Props
   hideNoFilterMessage?: boolean;
 }
 
-class FilterArea extends React.Component<Props, any>
+class FilterArea extends BuilderClass<Props>
 {
-  constructor(props:Props)
-  {
-    super(props);
-    Util.bind(this, 'renderFilter', 'addFilter', 'moveFilter', 'changeFilter', 'deleteFilter');
-  }
-  
   addFilter(index)
   {
     Actions.cards.filter.create(this.props.card, index + 1);
@@ -78,27 +73,6 @@ class FilterArea extends React.Component<Props, any>
   {
     return !_.isEqual(nextProps.card.filters, this.props.card.filters)
       || !_.isEqual(nextProps.spotlights, this.props.spotlights);
-  }
-  
-  changeFilter(v, event)
-  {
-    var index = +Util.rel(event.target);
-    var filter = this.props.card.filters[index];
-    var first: any = this.refs['first' + index]['value'];
-    var second: any = this.refs['second' + index]['value'];
-    var operator = this.refs['operator' + index]['value'];
-    var combinator = this.refs['combinator' + index] ? this.refs['combinator' + index]['value'] : CardModels.Combinator.AND;
-    
-    Actions.cards.filter.change(this.props.card, index, {
-      condition:
-      {
-          operator: operator,
-          first: first,
-          second: second,
-      },
-      combinator: combinator,
-      id: filter.id,
-    });
   }
   
   deleteFilter(index)
@@ -131,9 +105,8 @@ class FilterArea extends React.Component<Props, any>
           <div className='flex-grow card-padding'>
             <BuilderTextbox
               value={filter.condition.first}
-              onChange={this.changeFilter}
-              rel={""+index}
-              ref={'first' + index}
+              id={this.props.card.id}
+              keyPath={this._keyPath('filters', index, 'condition', 'first')}
               acceptsCards={true}
               parentId={this.props.card.id}
               top={true}
@@ -141,20 +114,18 @@ class FilterArea extends React.Component<Props, any>
           </div>
           <div className='builder-operator'>
             <Dropdown
-              ref={'operator' + index}
-              rel={""+index}
               circle={true}
               options={Operators}
               selectedIndex={filter.condition.operator}
-              onChange={this.changeFilter}
+              id={this.props.card.id}
+              keyPath={this._keyPath('filters', index, 'condition', 'operator')}
             />
           </div>
           <div className='flex-grow card-padding'>
             <BuilderTextbox
               value={filter.condition.second}
-              onChange={this.changeFilter}
-              rel={""+index}
-              ref={'second' + index}
+              id={this.props.card.id}
+              keyPath={this._keyPath('filters', index, 'condition', 'second')}
               acceptsCards={true}
               parentId={this.props.card.id}
             />
@@ -162,11 +133,11 @@ class FilterArea extends React.Component<Props, any>
           <div className='builder-operator'>
             { index === 0 ? null :
               <Dropdown
-                ref={'combinator' + index}
                 circle={true}
                 options={Combinators}
                 selectedIndex={filter.combinator}
-                onChange={this.changeFilter}
+                id={this.props.card.id}
+                keyPath={this._keyPath('filters', index, 'condition', 'combinator')}
               />
             }
           </div>

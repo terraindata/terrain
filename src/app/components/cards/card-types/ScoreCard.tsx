@@ -54,6 +54,7 @@ import Dropdown from "../../common/Dropdown.tsx";
 import CardField from './../CardField.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 import BuilderTextbox from "../../common/BuilderTextbox.tsx";
+import BuilderClass from './../../builder/BuilderClass.tsx';
 
 import { Weight, Weighter } from '../../../charts/Weighter.tsx';
 
@@ -71,7 +72,7 @@ interface Props {
 
 var methods = ['weightedSum'];
 
-class ScoreCard extends React.Component<Props, any>
+class ScoreCard extends BuilderClass<Props>
 {
   constructor(props:Props)
   {
@@ -81,10 +82,6 @@ class ScoreCard extends React.Component<Props, any>
     {
       seed: Math.random()
     };    
-    
-    Util.bind(this, ['handleWeightsChange', 'renderWeight', 'renderHeader',
-      'handleMethodChange', 'removeWeight', 'renderWeightGraph',
-      'addWeight']);
   }
   
   handleWeightsChange(value, event)
@@ -122,19 +119,24 @@ class ScoreCard extends React.Component<Props, any>
       [
         {
           colSpan: 3,
-          content: <BuilderTextbox
-            ref={index}
-            value={weight.key}
-            onChange={this.handleWeightsChange}
-            placeholder='Variable or field name' />
+          content:
+            <BuilderTextbox
+              ref={index}
+              value={weight.key}
+              placeholder='Variable or field name'
+              id={this.props.card.id}
+              keyPath={this._keyPath('weights', index, 'key')}
+            />
         },
         {
           colSpan: 1,
-          content: <BuilderTextbox
-            ref={index + '-weight'}
-            value={weight.weight + ""}
-            onChange={this.handleWeightsChange}
-            placeholder='0'
+          content:
+            <BuilderTextbox
+              ref={index + '-weight'}
+              value={weight.weight + ""}
+              id={this.props.card.id}
+              keyPath={this._keyPath('weights', index, 'weight')}
+              placeholder='0'
             />
         },
         {
