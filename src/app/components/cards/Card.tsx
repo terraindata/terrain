@@ -247,7 +247,16 @@ var Card = React.createClass({
     {
       // TODO apply to children
     }
+    
+    event.preventDefault();
+    event.stopPropagation();
 	},
+  
+  handleTitleClick(event)
+  {
+    console.log('a');
+    Actions.cards.selectCard(this.props.card.id, event.altKey, event.shiftKey);
+  },
   
   hasCardsArea(): boolean
   {
@@ -395,6 +404,7 @@ var Card = React.createClass({
               <div
                 className='card-title'
                 style={this.state.titleStyle}
+                onClick={this.handleTitleClick}
                 >
                 <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
                 { title }

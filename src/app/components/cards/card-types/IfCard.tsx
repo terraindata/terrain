@@ -42,8 +42,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Generic class for cards that only wrap / eat other cards
-
 import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
@@ -93,6 +91,11 @@ class IfCard extends React.Component<Props, any>
     return (
       <div ref='card'>
         <FilterArea {...this.props} hideNoFilterMessage={this.props.singleCard} />
+        { this.props.card.filters.length ?
+          <div className='if-card-else'>
+            Then
+          </div>
+        : null }
         <CardsArea cards={this.props.card.cards} parentId={this.props.card.id} spotlights={this.props.spotlights} 
           draggingOver={this.props.draggingOver} draggingPlaceholder={this.props.draggingPlaceholder}
         />
@@ -119,7 +122,7 @@ class IfCard extends React.Component<Props, any>
         }
         { 
           elses.length || !this.props.card.filters.length ? null :
-            <div className='button' onClick={this.addElse}>+ Else</div>
+            <div className='button if-card-button' onClick={this.addElse}>+ Else</div>
         }
       </div>
     );
