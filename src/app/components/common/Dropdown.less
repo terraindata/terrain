@@ -23,7 +23,7 @@
   display: none;
  }
  
- &.dropdown-up:hover {
+ &.dropdown-up.dropdown-open {
    -webkit-transform: translateY(calc(~"-100% + 29px")); // 2px greater than option-height
    transform: translateY(calc(~"-100% + 29px")); // 2px greater than option-height
    
@@ -40,12 +40,16 @@
   }
   
  
- &:hover {
+ &:hover,
+ &.dropdown-open {
+  border: 1px solid @light-gray;
+  margin-top: -1px;
+ }
+ 
+ &.dropdown-open {
   position: relative;
   z-index: 1000;
   height: auto;
-  border: 1px solid @light-gray;
-  margin-top: -1px;
   
   
   .dropdown-options-wrapper {

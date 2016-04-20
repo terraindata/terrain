@@ -43,10 +43,13 @@ THE SOFTWARE.
 */
 
 require('./Dropdown.less');
+import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as classNames from 'classnames';
 import Util from '../../util/Util.tsx';
 import Actions from "../../data/Actions.tsx";
+import BuilderClass from './../builder/BuilderClass.tsx';
 
 interface Props
 {
@@ -62,15 +65,15 @@ interface Props
   circle?: boolean;
 }
 
-class Dropdown extends React.Component<Props, any>
+class Dropdown extends BuilderClass<Props>
 {
   constructor(props: Props) {
     super(props);
-    Util.bind(this, 'renderOption', 'computeDirection', 'clickHandler');
     
     this.state =
     {
       up: false,
+      open: false,
     };
   }
   
@@ -118,46 +121,57 @@ class Dropdown extends React.Component<Props, any>
     );
   }
   
-  computeDirection()
+  close()
   {
-    var cr = ReactDOM.findDOMNode(this).getBoundingClientRect();
-    if(this.state.up)
+    this.setState({
+      open: false,
+    })
+    $(document).off('click', this.close);
+  }
+  
+  toggleOpen()
+  {
+    if(!this.state.open)
     {
-      var componentBottom = cr.bottom + cr.height;
+      $(document).on('click', this.close);
     }
-    else
-    {
-      var componentBottom = cr.bottom;
-    }
+    
+    var cr = this.refs['value']['getBoundingClientRect']();
     var windowBottom = window.innerHeight;
     
     this.setState({
-      up: componentBottom > windowBottom,
+      open: !this.state.open,
+      up: cr.bottom > windowBottom / 2,
     });
   }
   
   render() {
-    var classes = Util.objToClassname({
+    var classes = classNames({
       "dropdown-wrapper": true,
       "dropdown-wrapper-circle": this.props.circle,
       "dropdown-up": this.state.up,
+      "dropdown-open": this.state.open,
     });
     
     return (
       <div className={classes} rel={this.props.rel}>
-        { this.state.up ? (
+        { this.state.up && this.state.open ? (
           <div className="dropdown-options-wrapper">
             {
               this.props.options.map(this.renderOption)
             }
           </div>
         ) : null }
-        <div className="dropdown-value" onMouseEnter={this.computeDirection}>
+        <div
+          className="dropdown-value"
+          ref="value"
+          onClick={this.toggleOpen}
+        >
           <div className="dropdown-option-inner">
             { this.props.options[this.props.selectedIndex] }
           </div>
         </div>
-        { !this.state.up ? (
+        { !this.state.up && this.state.open ? (
           <div className="dropdown-options-wrapper">
             {
               this.props.options.map(this.renderOption)
