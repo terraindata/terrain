@@ -285,13 +285,14 @@ class TransformCardChart extends React.Component<Props, any>
     this.setState({
       lineMoving: true,
       initialLineY: y,
+      initialLinePoints: Util.deeperCloneArr(this.props.pointsData),
     })
   }
   
   onLineMove(x, y)
   {
     var scoreDiff = y - this.state.initialLineY;
-    var newPointsData = Util.deeperCloneArr(this.props.pointsData).map(point => {
+    var newPointsData = Util.deeperCloneArr(this.state.initialLinePoints).map(point => {
       point.score = Util.valueMinMax(point.score + scoreDiff, 0, 1);
       return point;
     });
