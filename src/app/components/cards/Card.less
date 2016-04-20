@@ -261,6 +261,34 @@
       }
     }
   }
+  
+  &.card-hovering-lower {
+    .card {
+      .card-add-card-btn-lower {
+        opacity: 0;
+      }
+    }
+    .card-add-card-btn-lower {
+      opacity: 0.9;
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+  
+  &.card-hovering-upper {
+    .card {
+      .card-add-card-btn:not(.card-add-card-btn-lower) {
+        opacity: 0;
+      }
+    }
+    .card-add-card-btn:not(.card-add-card-btn-lower) {
+      opacity: 0.9;
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
 }
 
 .panel-dragging {

@@ -76,12 +76,22 @@ var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 var CARD_TYPES_WITH_CARDS = ['from', 'count', 'min', 'max', 'avg', 'exists', 'parentheses', 'if']; // 'let', 'var' removed
 
 var hoverCard = (event) => {
-  $('.card-hovering').removeClass('card-hovering');
+  // $('.card-hovering').removeClass('card-hovering');
+  $('.card-hovering-lower').removeClass('card-hovering-lower');
+  $('.card-hovering-upper').removeClass('card-hovering-upper');
   var f = (n, count) => count > 100 ? null : (n && !n.is('body') && (n.hasClass('card') && !n.hasClass('single-card') ? n : f(n.parent(), count + 1)));
   var c = f($(event.target), 0);
   if(c)
   {
-    c.addClass('card-hovering');
+    // c.addClass('card-hovering');
+    if(event.pageY > c.offset().top + c.height() / 2)
+    {
+      c.addClass('card-hovering-lower');
+    }
+    else
+    {
+      c.addClass('card-hovering-upper');
+    }
   }
 };
 $('body').mousemove(_.throttle(hoverCard, 100));
