@@ -372,8 +372,8 @@ var Card = React.createClass({
 		var title = Util.titleForCard(this.props.card);
     const { isDragging, connectDragSource, isOverCurrent, connectDropTarget, dragCoordinates } = this.props;
     
-    return connectDropTarget(
-			<div
+    const rendering = 
+      <div
         className={classNames({
           'card': true,
           'card-dragging': isDragging,
@@ -392,7 +392,7 @@ var Card = React.createClass({
             onMinimize={this.minimizeCreateCard}
           />
         }
-				{ this.renderAddCard() }
+        { this.renderAddCard() }
         <div className='card-stroke card-stroke-above' />
         <div
           className={'card-inner ' + (this.props.singleCard ? 'card-single' : '')}
@@ -400,7 +400,7 @@ var Card = React.createClass({
           ref='cardInner'
         >
           { !this.props.singleCard &&
-  					connectDragSource(
+            connectDragSource(
               <div
                 className='card-title'
                 style={this.state.titleStyle}
@@ -415,13 +415,13 @@ var Card = React.createClass({
                   { Util.previewForCard(this.props.card) }
                 </span>
                 <Menu options={this.state.menuOptions} />
-    					</div>
+              </div>
             )
           }
           <div className='card-body' ref='cardBody'>
-  					{ contentToDisplay }
+            { contentToDisplay }
           </div>
-				</div>
+        </div>
         <div className='card-stroke card-stroke-below' />
         { this.renderAddCard(true) }
         { !this.props.singleCard &&
@@ -432,8 +432,13 @@ var Card = React.createClass({
             onMinimize={this.minimizeCreateCard}
           />
         }
-			</div>
-		);
+      </div>;
+      
+    if(!this.props.singleCard)
+    {
+      return connectDropTarget(rendering);
+    }
+    return rendering;			
 	},
 });
 
