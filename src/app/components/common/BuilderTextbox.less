@@ -79,10 +79,8 @@
     color: #fff;
     width: calc(~"100% - 2 * @{card-chip-offset}");
     position: absolute;
-    top: 50%;
-    left: 50%;
-    -webkit-transform: translateX(calc(-50% - 10px)) translateY(-50%);
-    transform: translateX(calc(-50% - 10px)) translateY(-50%);
+    top: 2px;
+    left: 6px;
     text-overflow: ellipsis;
     overflow: hidden;
     display: flex;
@@ -94,6 +92,9 @@
     vertical-align: middle;
     margin-left: 10px;
     padding-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .builder-tb-cards-arrow {
