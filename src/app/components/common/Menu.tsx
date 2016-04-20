@@ -43,10 +43,12 @@ THE SOFTWARE.
 */
 
 require('./Menu.less');
+import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
-
+import * as classNames from 'classnames';
+import BuilderClass from './../builder/BuilderClass.tsx';
 var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 
 var optionHeight = 30; // coordinate with Menu.less
@@ -63,11 +65,14 @@ interface Props
   small?: boolean;
 }
 
-class Menu extends React.Component<Props, any>
+class Menu extends BuilderClass<Props>
 {
   constructor(props: Props) {
     super(props);
-    this.renderOption = this.renderOption.bind(this);
+    this.state =
+    {
+      open: false,
+    }
   }
   
   shouldComponentUpdate(nextProps, nextState)
@@ -93,6 +98,26 @@ class Menu extends React.Component<Props, any>
       </div>
     );
   }
+  
+  close()
+  {
+    this.setState({
+      open: false,
+    })
+    $(document).off('click', this.close);
+  }
+  
+  toggleOpen()
+  {
+    if(!this.state.open)
+    {
+      $(document).on('click', this.close);
+    }
+    
+    this.setState({
+      open: !this.state.open,
+    })
+  }
 
   render() {
     var style = {
@@ -101,16 +126,24 @@ class Menu extends React.Component<Props, any>
       height: this.props.options.length * optionHeight,
     };
     
-    var classes = "menu-wrapper" + (this.props.small ? " menu-wrapper-small" : "");
-    
     return (
-      <div className={classes} style={style}>
+      <div
+        className={classNames({
+          "menu-wrapper": true,
+          "menu-wrapper-small": this.props.small,
+          "menu-open": this.state.open,        
+        })}
+        style={style}
+        onClick={this.toggleOpen}
+      >
         <MoreIcon className="menu-icon" />
-        <div className="menu-options-wrapper">
-          {
-            this.props.options.map(this.renderOption)
-          }
-        </div>
+        { !this.state.open ? null :
+          <div className="menu-options-wrapper">
+            {
+              this.props.options.map(this.renderOption)
+            }
+          </div>
+        }
       </div>
     );
   }
