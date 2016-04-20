@@ -84,11 +84,11 @@ var hoverCard = (event) => {
   if(c)
   {
     // c.addClass('card-hovering');
-    if(event.pageY > c.offset().top + c.height() / 2)
+    if(event.pageY > c.offset().top + c.height() - 30)
     {
       c.addClass('card-hovering-lower');
     }
-    else
+    if(event.pageY < c.offset().top + 30)
     {
       c.addClass('card-hovering-upper');
     }
