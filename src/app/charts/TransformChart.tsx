@@ -129,7 +129,7 @@ var TransformChart = {
       state.onCreate, state.onDelete);
     
     d3.select(el).on('mousedown', () => {
-      if(!d3.event['shiftKey'])
+      if(!d3.event['shiftKey'] && !d3.event['altKey'])
       {
         state.onSelect(null);
       }
@@ -584,13 +584,14 @@ var TransformChart = {
   
   // needs to be "function" for d3.mouse(this)
   _mousedownFactory: (el, onMove, scale, onSelect) => function(d) {
-    if(d3.event['shiftKey'])
+    if(d3.event['shiftKey'] || d3.event['altKey'])
     {
-      onSelect(d.id);
+      onSelect(d.id, d3.event['shiftKey']);
     }
     else if(!d.selected)
     {
       onSelect(null);
+      onSelect(d.id);
     }
     d3.event['stopPropagation']();
     

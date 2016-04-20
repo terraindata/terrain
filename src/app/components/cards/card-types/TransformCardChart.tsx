@@ -185,20 +185,49 @@ class TransformCardChart extends React.Component<Props, any>
     
   }
   
-  onSelect(pointId)
+  onSelect(pointId, selectRange)
   {
-    if(!pointId)
+    if(pointId)
     {
-      // things got unselected
+      var pointMap: {[id: string]: boolean} = this.state.selectedPointIds.reduce((map, point) => {
+        map[point] = true;
+        return map;
+      }, {});
+      
+      if(selectRange && this.state.lastSelectedPointId)
+      {
+        var find = (id, points) => points.findIndex(point => point.id === id);
+        var firstIndex = find(pointId, this.state.pointsData);
+        var secondIndex = find(this.state.lastSelectedPointId, this.state.pointsData);
+        if(secondIndex !== -1)
+        {
+          var range = _.range(Math.min(firstIndex, secondIndex), Math.max(firstIndex, secondIndex) + 1);
+          range.map(index => pointMap[this.state.pointsData[index].id] = true);
+        }
+        else
+        {
+          pointMap[pointId] = true;
+        }
+      }
+      else
+      {
+        pointMap[pointId] = ! pointMap[pointId];
+      }
+      
       this.setState({
-        selectedPointIds: [],
+        selectedPointIds: _.reduce(pointMap, (ids, val, pointId) => {
+          if(val) ids.push(pointId);
+          return ids;
+        }, []),
+        lastSelectedPointId: pointId,
       });
     }
     else
     {
+      // a click to unselect things
       this.setState({
-        selectedPointIds: this.state.selectedPointIds.concat([pointId])
-      })
+        selectedPointIds: [],
+      }); 
     }
     
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState());

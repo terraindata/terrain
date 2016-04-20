@@ -217,7 +217,7 @@ var Card = React.createClass({
     });
   },
   
-	toggleClose()
+	toggleClose(event)
 	{
     if(this.state.open)
     {
@@ -227,10 +227,16 @@ var Card = React.createClass({
     {
       Util.animateToAutoHeight(this.refs.cardBody); 
     }
-    
+   
+    var open = !this.state.open;
 		this.setState({
-			open: !this.state.open,
+			open: open,
 		});
+    
+    if(event.shiftKey)
+    {
+      // TODO apply to children
+    }
 	},
   
   hasCardsArea(): boolean
