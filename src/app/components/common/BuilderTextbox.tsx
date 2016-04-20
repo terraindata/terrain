@@ -250,6 +250,27 @@ const btbTarget =
     const item = monitor.getItem();
     if(monitor.isOver({ shallow: true}))
     {
+      const card = monitor.getItem();
+      const id = props.id;
+      const findId = (c) =>
+      {
+        for(var i in c)
+        {
+          if(c.hasOwnProperty(i) && typeof c[i] === 'object')
+          {
+            if(c[i].id === id || findId(card[i]))
+            {
+              return true;  
+            }
+          }
+        }
+      }
+      
+      if(findId(card))
+      {
+        return;  
+      }
+      
       var newId = 'c-' + Math.random();
       var newCard:CardModels.IParenthesesCard =
       {

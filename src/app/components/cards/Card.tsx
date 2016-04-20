@@ -504,9 +504,29 @@ const cardTarget =
   
   drop(props, monitor, component)
   {
-    const item = monitor.getItem();
     if(monitor.isOver({ shallow: true}))
     {
+      const card = monitor.getItem();
+      const id = props.card.id;
+      const findId = (c) =>
+      {
+        for(var i in c)
+        {
+          if(c.hasOwnProperty(i) && typeof c[i] === 'object')
+          {
+            if(c[i].id === id || findId(card[i]))
+            {
+              return true;  
+            }
+          }
+        }
+      }
+      
+      if(findId(card))
+      {
+        return;  
+      }
+      
       var cr = ReactDOM.findDOMNode(component).getBoundingClientRect();
       var m = monitor.getClientOffset();
       if(m.y > (cr.top + cr.bottom) / 2)
@@ -517,7 +537,7 @@ const cardTarget =
       {
         var index = props.index;
       }
-      Actions.cards.move(item, index, props.parentId);
+      Actions.cards.move(card, index, props.parentId);
     }
   }
 }
