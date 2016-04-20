@@ -50,7 +50,8 @@
     border-radius: 5px;
     padding-top: 6px;
     box-sizing: border-box;
-    background: #fff;
+    border: 1px solid #fff;
+    background: rgba(255,255,255,0.5);
     margin-bottom: @standard-margin;
   }
   
@@ -68,6 +69,17 @@
     color: #fff;
     width: calc(~"100% - 2 * @{card-chip-offset}");
     .vertically-middle;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .builder-tb-cards-input-value-text {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+    padding-top: 1px;
   }
   
   .builder-tb-cards-arrow {

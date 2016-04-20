@@ -181,6 +181,7 @@ class BuilderTextbox extends React.Component<Props, any>
       var card = cards[0];
       var color = CardColors[card.type][0] as string;
       var title = Util.titleForCard(card);
+      var preview = Util.previewForCard(card);
     }
     else
     {
@@ -211,7 +212,14 @@ class BuilderTextbox extends React.Component<Props, any>
         <div className='builder-tb-cards-input'>
           { this.renderSwitch() }
           <div className='builder-tb-cards-input-value' style={chipStyle}>
-            { title }
+            <div className='builder-tb-cards-input-value-text'>
+              { title }
+            </div>
+            { !preview ? null :
+              <div className='card-preview'>
+                { preview }
+              </div>
+            }
           </div>
           <div className='builder-tb-cards-arrow' style={arrowLineStyle}>
             <div className='builder-tb-cards-arrow-inner' style={arrowHeadStyle} />

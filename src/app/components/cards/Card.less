@@ -89,13 +89,30 @@
   position: relative; // for menu component
   text-align: left;
  }
- .card-title-preview {
-  opacity: 0.75;
-  font-weight: 200;
-  margin-left: 10px;
+ .card-preview {
+  opacity: 1;
+  font-weight: normal;
+  margin: 0px 10px;
   letter-spacing: 0.5;
   text-transform: none;
+  font-size: 12px;
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.5);
+  color: @trans-black;
+  background-blend-mode: multiply;
+  .transition;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
+  
+  &.card-preview-hidden {
+    opacity: 0;
+  }
  }
+ 
  .card-sub-bar {
   border-bottom-left-radius: calc(@card-border-radius - 1px);
   border-bottom-right-radius: calc(@card-border-radius - 1px);
