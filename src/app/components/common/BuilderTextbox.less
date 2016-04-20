@@ -9,7 +9,7 @@
   
   &.builder-tb-accepts-cards {
     input, textarea {
-      padding-left: @switch-width + 6px;
+      padding-right: @switch-width + 6px;
     }
   }
   
@@ -23,21 +23,31 @@
   .builder-tb-switch {
     position: absolute;
     text-align: center;
+    display: block;
     top: 0px;
-    left: 0px;
+    right: 0px;
     height: @input-height;
     width: @switch-width;
     padding-top: 5px;
-    background: rgba(142,149,255,1);
+    background: #D0D1CF;
+    border-left: 1px solid #a3a8a6;
     color: rgba(0,0,0,1);
     box-sizing: border-box;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-    opacity: 0.25;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    opacity: 0.75;
+    width: 30px;
     .transition;
     
     &:hover {
       opacity: 1.0;
+    }
+    
+    svg {
+      position: relative;
+      top: 1px;
+      height: 17px;
+      vertical-align: middle;
     }
   }
   
@@ -68,7 +78,11 @@
     border-radius: 5px;
     color: #fff;
     width: calc(~"100% - 2 * @{card-chip-offset}");
-    .vertically-middle;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translateX(calc(-50% - 10px)) translateY(-50%);
+    transform: translateX(calc(-50% - 10px)) translateY(-50%);
     text-overflow: ellipsis;
     overflow: hidden;
     display: flex;
@@ -86,7 +100,7 @@
     border-top: 1px solid #47a7ff;
     border-right: 1px solid #47a7ff;
     position: absolute;
-    left: calc(~"100% - @{card-chip-offset}");
+    left: calc(~"100% - @{card-chip-offset} - 30px");
     width: @card-chip-offset - 6px;
     height: @input-height / 2 + @standard-margin;
     top: 50%;

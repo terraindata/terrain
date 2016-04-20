@@ -255,7 +255,7 @@ var Card = React.createClass({
   handleTitleClick(event)
   {
     console.log('a');
-    Actions.cards.selectCard(this.props.card.id, event.altKey, event.shiftKey);
+    // Actions.cards.selectCard(this.props.card.id, event.altKey, event.shiftKey);
   },
   
   hasCardsArea(): boolean

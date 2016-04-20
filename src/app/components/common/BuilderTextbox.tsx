@@ -54,6 +54,8 @@ import Card from '../cards/Card.tsx';
 import { CardColors } from './../../CommonVars.tsx';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as classNames from 'classnames';
+var AddCardIcon = require("./../../../images/icon_addCard_22x17.svg?name=AddCardIcon");
+var TextIcon = require("./../../../images/icon_text_12x18.svg?name=TextIcon");
 
 interface Props
 {
@@ -141,9 +143,15 @@ class BuilderTextbox extends React.Component<Props, any>
   renderSwitch()
   {
     return (
-      <div className='builder-tb-switch' onClick={this.handleSwitch}>
-        [ ]
-      </div>
+      <a
+        className='builder-tb-switch'
+        onClick={this.handleSwitch}
+        title={this.isText() ? 'Convert to cards' : 'Convert to text'}
+      >
+        {
+          this.isText() ? <AddCardIcon /> : <TextIcon />
+        }
+      </a>
     );
   }
   
