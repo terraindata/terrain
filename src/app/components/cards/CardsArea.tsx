@@ -51,13 +51,9 @@ import InfoArea from '../common/InfoArea.tsx';
 import Actions from "../../data/Actions.tsx";
 import Card from "../cards/Card.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
-import { DropZone, DropZoneManager } from "../layout/DropZoneManager.tsx";
 import CreateCardTool from "./CreateCardTool.tsx";
-import CardsContainerMixin from "./CardsContainerMixin.tsx";
 
 var CardsArea = React.createClass<any, any>({
-  mixins: [CardsContainerMixin],
-  
 	propTypes:
 	{
 		cards: React.PropTypes.array.isRequired,
@@ -66,6 +62,7 @@ var CardsArea = React.createClass<any, any>({
     topLevel: React.PropTypes.bool,
     draggingOver: React.PropTypes.bool,
     draggingPlaceholder: React.PropTypes.object,
+    selectedCardIds: React.PropTypes.object.isRequired,
   },
   
   getDefaultProps()
@@ -118,14 +115,14 @@ var CardsArea = React.createClass<any, any>({
     return props.cards.map((card, index) => (
       {
         content: <Card 
+          {...props}
+          singleCard={false}
+          topLevel={false}
           index={index}
           card={card}
           onDropOutside={this.onDropOutside}
-          parentId={props.parentId}
-          cards={props.cards}
-          spotlights={props.spotlights}
           onHover={$({})}
-          />,
+        />,
         key: card.id,
       }
     )).concat({

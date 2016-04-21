@@ -225,12 +225,80 @@ CardsReducer[ActionTypes.cards.move] =
 
 CardsReducer[ActionTypes.cards.remove] =
   (state, action) =>
-    Util.immutableCardsUpdate(state, 'cards', action.payload.parentId, cards =>
-      cards.remove(cards.findIndex((card) => card.get('id') === action.payload.card.id))
-    );
+  {
+    var id = action.payload.card.id;
+    var algorithmId = Util.keyPathForId(state, id)[1];
+    
+    var removeFn = (state, cardId) =>
+    {
+      var kp = Util.keyPathForId(state, cardId);
+      if(!kp)
+      {
+        // card may have already been removed, e.g. if its parent was removed
+        return state;
+      }
+      console.log(cardId, kp);
+      var index = kp.splice(-1, 1)[0];
+      return state.updateIn(kp, cards => cards.remove(index))
+        // .deleteIn(['algorithms', algorithmId, 'selectedCardIds', cardId]);
+      // return Util.immutableCardsUpdate(state, 'cards', action.payload.parentId, cards =>
+      //   cards.remove(cards.findIndex((card) => card.get('id') === action.payload.card.id))
+      // );
+    }
+    
+    if(state.getIn(['algorithms', algorithmId, 'selectedCardIds', id]))
+    {
+      console.log(state.getIn(['algorithms', algorithmId, 'selectedCardIds']));
+      // apply to selection
+      return state.getIn(['algorithms', algorithmId, 'selectedCardIds'])
+        .reduce((state, v, cid) => removeFn(state, cid), state);
+    }
+    
+    return removeFn(state, action.payload.card.id);
+  }
 
 CardsReducer[ActionTypes.cards.change] =
   (state, action) =>
     Util.immutableCardsSetIn(state, action.payload.cardId, action.payload.keyPath, action.payload.value);
 
+CardsReducer[ActionTypes.cards.selectCard] =
+  (state, action) =>
+    {
+      var id = action.payload.cardId;
+      if(id === null)
+      {
+        // unselect
+        if(!action.payload.altKey && !action.payload.shiftKey)
+        {
+          return state.update('algorithms', algorithms => algorithms.map(algorithm => algorithm.set('selectedCardIds', Immutable.fromJS({}))));
+        }
+        return state;
+      }
+      
+      var algorithmId = Util.keyPathForId(state, id)[1];
+      var keyPath = ['algorithms', algorithmId, 'selectedCardIds'];
+      var alreadySelected = state.getIn(keyPath.concat([id]));
+      if(action.payload.altKey || action.payload.shiftKey)
+      {
+        if(alreadySelected)
+        {
+          return state.deleteIn(keyPath.concat([id]));
+        }
+        return state.setIn(keyPath.concat([id]), true);
+      }
+      
+      if(alreadySelected)
+      {
+        // clicking a selected card does nothing
+        return state;
+      }
+      
+      var value = {};
+      value[id] = true;
+      return state.setIn(keyPath, Immutable.fromJS(value));
+    }
+
 export default CardsReducer;
+
+
+

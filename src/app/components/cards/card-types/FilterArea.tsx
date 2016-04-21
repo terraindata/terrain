@@ -90,16 +90,20 @@ class FilterArea extends BuilderClass<Props>
         addable={true}
         onAdd={this.addFilter}
         onDelete={this.deleteFilter}
-        aboveContent={<BuilderTextboxCards
-          value={filter.condition.first}
-          spotlights={this.props.spotlights}
-          parentId={this.props.card.id}
-          />}
-        belowContent={<BuilderTextboxCards
-          value={filter.condition.second}
-          spotlights={this.props.spotlights}
-          parentId={this.props.card.id}
-          />}
+        aboveContent={
+          <BuilderTextboxCards
+            {...this.props}
+            value={filter.condition.first}
+            parentId={this.props.card.id}
+          />
+        }
+        belowContent={
+          <BuilderTextboxCards
+            {...this.props}
+            value={filter.condition.second}
+            parentId={this.props.card.id}
+          />
+        }
       >
         <div className='flex-container'>
           <div className='flex-grow card-padding'>

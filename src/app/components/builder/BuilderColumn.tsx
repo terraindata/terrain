@@ -115,12 +115,13 @@ var BuilderColumn = React.createClass<any, any>(
           }
           return spotlights;
         }, []);
-        
+        console.log(algorithm.selectedCardIds);
         return <CardsArea 
           cards={algorithm.cards} 
           parentId={parentId} 
           spotlights={spotlights} 
           topLevel={true}
+          selectedCardIds={algorithm.selectedCardIds}
           />;
         
       case COLUMNS.Inputs:

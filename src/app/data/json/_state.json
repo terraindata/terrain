@@ -3,6 +3,7 @@
     "100": {
       "id": "100",
       "algorithmName": "sitter_ranking.tql",
+      "selectedCardIds": {},
       "cards": [
         {
           "input": "intoSuperSaiyan",

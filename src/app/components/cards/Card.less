@@ -8,6 +8,7 @@
   position: relative;
  
  @card-border-radius: 5px;
+ border-radius: @card-border-radius;
 
   .card-inner {
     border: 1px solid @medium-dark-green;
@@ -34,12 +35,15 @@
     }
   }
   
+  &.card-selected {
+    box-shadow: 0px 0px 0px 3px @drag-color;
+    z-index: 9001;
+  }
+  
   &.card-dragging {
     background: #000;
     border-radius: 5px;
     .card-inner {
-      // border-color: @drag-color !important;
-      // box-shadow: 0px 0px 0px 2px @drag-color;
       opacity: 0.75;
       background-blend-mode: multiply;
     }

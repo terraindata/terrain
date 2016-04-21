@@ -49,7 +49,6 @@ var shallowCompare = require('react-addons-shallow-compare');
 import * as ReactDOM from "react-dom";
 import Util from '../../util/Util.tsx';
 var $ = require('jquery');
-import { DropZone, DropZoneManager } from './DropZoneManager';
 
 // TODO clean up the scroll acceleration code
 var SCROLL_ACCELERATION = 20;
@@ -80,9 +79,6 @@ var Panel = {
 		neighborDragging: React.PropTypes.bool,
 		handleRef: React.PropTypes.string,
     dragHandleRef: React.PropTypes.string,
-    
-    useDropZoneManager: React.PropTypes.bool,
-    dropDataPropKey: React.PropTypes.string, // key of value in props to pass to DropZoneManager
 	},
 
 	getInitialState() {
@@ -194,15 +190,6 @@ var Panel = {
 				dy: 0,
 				ocr: cr,
 			});
-      
-      if(this.props.useDropZoneManager)
-      {
-        // this may be buggy if the parentnode already had a style or has multiple panels
-        this.refs.panel.parentNode.style.width = cr.width;
-        this.refs.panel.parentNode.style.height = cr.height;
-        this.refs.panel.parentNode.setAttribute('fixed-size', '1');
-        $(".builder-column-content-scroll").children().css('padding-bottom', '400px');
-      }
       
 			if(this.parentNode())
 			{
@@ -377,32 +364,6 @@ var Panel = {
 		});
 	},
 
-  handleDropZoneManager(event, dropped, overrideCR): boolean
-  {
-    if(this.props.useDropZoneManager)
-    {
-      var x = event.pageX;
-      var cr = overrideCR || this.refs.panel.getBoundingClientRect();
-      var y = cr.top; // event.pageY;
-      // if(y > this.state.oy)
-      // {
-      //   // dragged down, use bottom edge
-      //   y = cr.bottom; // this.state.oy - event.pageY;
-      // }
-      // else
-      // {
-      //   y = cr.top;
-      // }
-      
-      return DropZoneManager[dropped ? 'drop' : 'drag'](
-        x,
-        y,
-        this.props[this.props.dropDataPropKey],
-        this.refs.panel
-      );
-    }
-  },
-
 	move(event) 
 	{
 		this.dragTo(event.pageX, event.pageY);
@@ -410,22 +371,10 @@ var Panel = {
 		this.setState({
 			moved: true,
 		});
-    this.handleDropZoneManager(event, false);
 	},
 
 	up(event) 
 	{
-    if(this.props.useDropZoneManager)
-    {
-      this.refs.panel.parentNode.style.width = null;
-      this.refs.panel.parentNode.style.height = null;
-      $(".builder-column-content-scroll").children().css('padding-bottom', '');
-    }
-    
-    if(!this.handleDropZoneManager(event, true))
-    {
-      this.stopDrag(event.pageX, event.pageY);
-    }
     $(document).off('mousemove', this.move);
     $(document).off('touchmove', this.move);
     $(document).off('mouseup', this.up);
@@ -454,39 +403,11 @@ var Panel = {
 		{
   	  panelClass += ' panel-dragging';
       
-      if(!this.props.useDropZoneManager)
-      {
-        style.left = this.state.dx + 'px';
-        style.top = this.state.dy + 'px';
-  		}
-      else
-      {
-        style.left = (this.state.draggedTo.x + this.state.ocr.left - this.state.ox) + 'px';
-        style.top = (this.state.draggedTo.y + this.state.ocr.top - this.state.oy) + 'px';
-        
-        if(!this.props.drag_x)
-        {
-          style.left = this.state.ocr.left;
-          style.width = this.state.ocr.width;  
-        }
-        
-        if(!this.props.drag_y)
-        {
-          style.top = this.state.ocr.top;
-          style.height = this.state.ocr.height;
-        }
-        
-        style.position = 'fixed';
-      }
+      style.left = this.state.dx + 'px';
+      style.top = this.state.dy + 'px';
     }
     
-    // if((!this.state.dragging || this.props.useDropZoneManager) && this.refs.panel)
-    // {
-    //   this.refs.panel.parentNode.style.width = null;
-    //   this.refs.panel.parentNode.style.height = null;
-    // }
-
-		if(this.props.neighborDragging || DropZoneManager.isDragging)
+		if(this.props.neighborDragging)
 		{
 			panelClass += ' neighbor-dragging';
 		}

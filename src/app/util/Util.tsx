@@ -94,6 +94,31 @@ var immutableCardsSetIn =
         (n) => Immutable.fromJS(value))
   )};
 
+var keyPathForId = (node: any, id: string) =>
+  {
+    if(node.get('id') === id)
+    {
+      return true;
+    }
+    
+    return node.reduce((keyPath, value, key) =>
+    {
+      if(keyPath)
+      {
+        return keyPath;
+      }
+      
+      if(Immutable.Iterable.isIterable(value))
+      {
+        var kp = keyPathForId(value, id);
+        if(kp)
+        {
+          return ([key]).concat(kp === true ? [] : kp);
+        }
+      }
+    }, false);
+  }
+
 var Util = {
 	// Return a random integer [min, max)
 	// assumes min of 0 if not passed.
@@ -176,6 +201,7 @@ var Util = {
   
   immutableCardsUpdate: immutableCardsUpdate,
   immutableCardsSetIn: immutableCardsSetIn,
+  keyPathForId: keyPathForId,
 
 	isInt(num): boolean
 	{

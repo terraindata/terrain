@@ -96,8 +96,10 @@ class IfCard extends React.Component<Props, any>
             Then
           </div>
         : null }
-        <CardsArea cards={this.props.card.cards} parentId={this.props.card.id} spotlights={this.props.spotlights} 
-          draggingOver={this.props.draggingOver} draggingPlaceholder={this.props.draggingPlaceholder}
+        <CardsArea
+          {...this.props}
+          cards={this.props.card.cards}
+          parentId={this.props.card.id}
         />
         {
           elses.map((els, index) =>
@@ -112,9 +114,9 @@ class IfCard extends React.Component<Props, any>
                   : <div className='button' onClick={this.addElseIf} rel={""+index}>+ If</div>
               }
               <Card
+                {...this.props}
                 singleCard={true}
                 card={els}
-                spotlights={this.props.spotlights}
                 index={0}
                 />
             </div>

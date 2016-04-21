@@ -77,6 +77,7 @@ var ActionTypes =
     create,
     change, // generic change to card, requires key path
     remove,
+    selectCard: '',
     
     from:
     {

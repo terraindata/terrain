@@ -67,9 +67,13 @@ class WrapperCard extends React.Component<Props, any>
 
   render()
   {
-    return <CardsArea cards={this.props.card.cards} parentId={this.props.card.id} spotlights={this.props.spotlights} 
-      draggingOver={this.props.draggingOver} draggingPlaceholder={this.props.draggingPlaceholder}
-      />;
+    return (
+      <CardsArea 
+        {...this.props}
+        cards={this.props.card.cards}
+        parentId={this.props.card.id}
+      />
+    );
   }
 };
 

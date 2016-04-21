@@ -138,8 +138,8 @@ class LetVarCard extends BuilderClass<Props>
           />
         }
         <BuilderTextboxCards
+          {...this.props}
           value={this.props.card.expression}
-          spotlights={this.props.spotlights}
           parentId={this.props.card.id}
           />
       </div>

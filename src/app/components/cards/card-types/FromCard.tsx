@@ -105,11 +105,9 @@ class FromCard extends BuilderClass<Props>
           </div>  
         </CardField>
         <CardsArea 
+          {...this.props}
           cards={this.props.card.cards}
           parentId={this.props.card.id}
-          spotlights={this.props.spotlights} 
-          draggingOver={this.props.draggingOver}
-          draggingPlaceholder={this.props.draggingPlaceholder}
         />
       </div>
 		);

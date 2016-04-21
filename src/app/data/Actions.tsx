@@ -69,6 +69,10 @@ var Actions =
     remove: 
       (card: CardModels.ICard, parentId: string) =>
         $(ActionTypes.cards.remove, {card, parentId}),
+    
+    selectCard:
+      (cardId: string, altKey: boolean, shiftKey: boolean) =>
+        $(ActionTypes.cards.selectCard, {cardId, altKey, shiftKey}),
 
     from:
     {

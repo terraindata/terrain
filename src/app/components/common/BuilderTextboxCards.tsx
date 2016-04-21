@@ -77,9 +77,9 @@ class BuilderTextboxCards extends React.Component<Props, any>
     return (
       <div className='builder-tb-cards-area' ref='tb'>
         <Card
+          {...this.props}
           singleCard={true}
           card={this.props.value}
-          spotlights={this.props.spotlights}
           index={0}
           />
       </div>

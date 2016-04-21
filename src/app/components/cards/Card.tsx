@@ -67,7 +67,6 @@ import IfCard from './card-types/IfCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
 import Menu from '../common/Menu.tsx';
 import Actions from "../../data/Actions.tsx";
-import CardsContainerMixin from "./CardsContainerMixin.tsx";
 import { CardColors } from './../../CommonVars.tsx';
 import { CardModels } from './../../models/CardModels.tsx';
 
@@ -75,12 +74,15 @@ var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
 var CARD_TYPES_WITH_CARDS = ['from', 'count', 'min', 'max', 'avg', 'exists', 'parentheses', 'if']; // 'let', 'var' removed
 
+var findParentWithClass = 
+  (n, className, count) => 
+    count > 100 ? null : (n && !n.is('body') && (n.hasClass(className) && !n.hasClass('single-card') ? n :
+      findParentWithClass(n.parent(), className, count + 1)));
 var hoverCard = (event) => {
   $('.card-hovering').removeClass('card-hovering');
   $('.card-hovering-lower').removeClass('card-hovering-lower');
   $('.card-hovering-upper').removeClass('card-hovering-upper');
-  var f = (n, count) => count > 100 ? null : (n && !n.is('body') && (n.hasClass('card') && !n.hasClass('single-card') ? n : f(n.parent(), count + 1)));
-  var c = f($(event.target), 0);
+  var c = findParentWithClass($(event.target), 'card', 0);
   if(c)
   {
     c.addClass('card-hovering');
@@ -96,23 +98,32 @@ var hoverCard = (event) => {
 };
 $('body').mousemove(_.throttle(hoverCard, 100));
 
+$('body').on('click', (event) =>
+{
+  // surely there is a better way to do this?
+  if(!$(event.target).hasClass('card-title') && !findParentWithClass($(event.target), 'card-title', 0))
+  {
+    Actions.cards.selectCard(null, event.altKey, event.shiftKey);
+  }
+});
+
 interface Props
 {
   card: CardModels.ICard;
   index: number;
   parentId: string;
   singleCard?: boolean;
+  selectedCardIds: any;
 }
 
 var Card = React.createClass({
-	mixins: [CardsContainerMixin],
-
 	propTypes:
 	{
 		card: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
     parentId: React.PropTypes.string,
     singleCard: React.PropTypes.bool, // indicates it's not in a list, it's just a single card
+    selectedCardIds: React.PropTypes.object.isRequired,
 	},
   
   shouldComponentUpdate(nextProps, nextState)
@@ -254,8 +265,10 @@ var Card = React.createClass({
   
   handleTitleClick(event)
   {
-    console.log('a');
-    // Actions.cards.selectCard(this.props.card.id, event.altKey, event.shiftKey);
+    event.stopPropagation();
+    event.preventDefault();
+    console.log(event.altKey, event.shiftKey);
+    Actions.cards.selectCard(this.props.card.id, event.altKey, event.shiftKey);
   },
   
   hasCardsArea(): boolean
@@ -371,7 +384,7 @@ var Card = React.createClass({
 
 		var title = Util.titleForCard(this.props.card);
     const { isDragging, connectDragSource, isOverCurrent, connectDropTarget, dragCoordinates } = this.props;
-    
+    if(!this.props.selectedCardIds) console.log(this.props);
     const rendering = 
       <div
         className={classNames({
@@ -380,7 +393,8 @@ var Card = React.createClass({
           'card-drag-over': isOverCurrent,
           'card-drag-over-lower': this.state.lowerHover,
           'card-closed' : !this.state.open,
-          'single-card': this.props.singleCard
+          'single-card': this.props.singleCard,
+          'card-selected': this.props.selectedCardIds && this.props.selectedCardIds[this.props.card.id],
         })}
         rel={'card-' + this.props.card.id}
       >
