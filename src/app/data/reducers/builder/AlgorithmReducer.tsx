@@ -54,6 +54,7 @@ var NEW_ALGORITHM =
   results: [],
   resultsPage: 1,
   resultsPages: 30,
+  algorithmName: 'New Algorithm',
 };
 
 var currentparentId = 101;
@@ -69,24 +70,27 @@ AlgorithmReducer[ActionTypes.algorithm.remove] =
 
 AlgorithmReducer[ActionTypes.algorithm.duplicate] =
   (state, action) => {
-    var changeId = (node) => node.map((value, key) => 
+    var changeId = (node) => !node.map ? console.log(node) : node.map((value, key) => 
       key === 'id' ? "i" + Math.random() : 
         (Immutable.Iterable.isIterable(value) ? changeId(value) : value));
     
-    var parentId = "" + Math.random();
+    var parentId = "alg-" + Math.random();
     return state.setIn(["algorithms", parentId],
-      Immutable.fromJS(state.get("" + action.payload.parentId).toJS()))
-      .setIn([parentId, 'algorithmName'], 'Copy of ' + state.getIn(["" + action.payload.parentId, 'algorithmName']))
-      .updateIn([parentId, 'results'], results =>
+      Immutable.fromJS(state.getIn(["algorithms", "" + action.payload.parentId]).toJS()))
+      .setIn(["algorithms", parentId, 'algorithmName'], 'Copy of ' + state.getIn(["algorithms", "" + action.payload.parentId, 'algorithmName']))
+      .updateIn(["algorithms", parentId, 'results'], results =>
         results.map(result =>
-          result.set('parentId', parentId)))
-      .updateIn([parentId, 'cards'], cards =>
+          result.set('parentId', parentId))
+        .map(changeId))
+      .updateIn(["algorithms", parentId, 'cards'], cards =>
         cards.map(card =>
-          card.set('parentId', parentId)))
-      .updateIn([parentId, 'inputs'], inputs =>
+          card.set('parentId', parentId))
+        .map(changeId))
+      .updateIn(["algorithms", parentId, 'inputs'], inputs =>
         inputs.map(input =>
-          input.set('parentId', parentId)))
-      .map(changeId)
+          input.set('parentId', parentId))
+        .map(changeId))
+      // .updateIn(["algorithms", parentId], algorithm => algorithm.map(changeId))
       ;
   }
 

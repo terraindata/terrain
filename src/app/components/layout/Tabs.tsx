@@ -150,26 +150,18 @@ var Tabs = React.createClass<any, any>({
 
 	getInitialState()
 	{
-    var count = 0;
 		return {
       tabOrder: _.map(this.props.tabs, (tab, key) => _.extend(tab, 
       {
-        selected: (count ++) === 0,
         key: key,
       })),
+      selectedIndex: 0,
 		};
 	},
   
   componentWillReceiveProps(newProps)
   {
     var tabOrder = this.state.tabOrder;
-    var selectedTab = this.state.tabOrder.find((tab) => tab.selected);
-    if(selectedTab && selectedTab.selectNewTab)
-    {
-      selectedTab.selected = false;
-      var selectNewTab = true;
-    }
-    
     
     _.map(newProps.tabs, (tab, key) => 
     {
@@ -187,9 +179,13 @@ var Tabs = React.createClass<any, any>({
           index --;
         }
 
+        if(index === this.state.selectedIndex)
+        {
+          tab['onClick'](this.state.selectedIndex);
+        }
+        
         tabOrder.splice(index + 1, 0, _.extend(tab,
         {
-          selected: selectNewTab,
           key: key,
         }));
       }
@@ -201,46 +197,54 @@ var Tabs = React.createClass<any, any>({
       return newTabOrder;
     }, []);
     
-    this.setState({
+    var state:any = {
       tabOrder: tabOrder,
-    })
+    }
+    
+    this.setState(state);
   },
 
+  _onTabSelect: {},
 	handleTabSelectFactory(index)
 	{
-	  var key = this.state.tabOrder[index].key;	
-    var onClick = this.props.tabs[key].onClick;
+    if(!this._onTabSelect[index])
+    {
+      this._onTabSelect[index] = () => {
+        if(!this.state.tabOrder[index].unselectable)
+        {
+          this.setState({
+            selectedIndex: index
+          });
+        }
+        
+        var key = this.state.tabOrder[index].key;  
+        var onClick = this.props.tabs[key].onClick;
+        
+        if(typeof onClick === 'function')
+        {
+          onClick(key);
+        }
+      };
+    }
     
-    return () => {
-      if(!this.state.tabOrder[index].unselectable)
-      {
-        this.state.tabOrder.map((tab) => tab.selected = false);
-        this.state.tabOrder[index].selected = true;
-      }
-      
-      this.setState({
-        tabOrder: this.state.tabOrder,
-      });
-      
-      if(typeof onClick === 'function')
-      {
-        onClick();
-  		}
-		};
+    return this._onTabSelect[index];
 	},
   
   moveTabs(index: number, destination: number)
   {
-    var tabOrder = this.state.tabOrder;
+    var tabOrder = Util.deeperCloneArr(this.state.tabOrder);
     while(tabOrder[destination]['noDrag'])
     {
       destination --;
     }
     
-    var id = tabOrder.splice(index, 1)[0];
-    tabOrder.splice(destination, 0, id); 
+    var selectedKey = tabOrder[this.state.selectedIndex].key;
+    var tab = tabOrder.splice(index, 1)[0];
+    tabOrder.splice(destination, 0, tab);
+    
     this.setState({
       tabOrder: tabOrder,
+      selectedIndex: tabOrder.findIndex(tab => tab.key === selectedKey),
     });
   },
   
@@ -268,11 +272,7 @@ var Tabs = React.createClass<any, any>({
   
 	render()
   {
-    var selectedIndex = this.state.tabOrder.findIndex((tab) => tab.selected);
-    if(selectedIndex === -1)
-    {
-      selectedIndex = 0;
-    }
+    var selectedIndex = this.state.selectedIndex;
 		var content = this.state.tabOrder[selectedIndex].content;
 
     var tabsLayout = 

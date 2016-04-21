@@ -99,11 +99,12 @@ class Builder extends React.Component<any, any>
     this.reduxState = Store.getState().toJS().algorithms;
     this.state = {
       random: Math.random(),
-      selectedAlgorithmId: 100, // TODO change to not be hardcoded
+      selectedAlgorithmId: _.first(_.keys(this.reduxState)),
       numColumns: 2,
     };
     
     Util.bind(this, 'duplicateAlgorithm', 'createAlgorithm',
+      'tabClick',
       'goOneColumn', 'goTwoColumns', 'goThreeColumns', 'save');
   }
   
