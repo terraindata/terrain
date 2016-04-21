@@ -19,6 +19,18 @@
   box-shadow:none;
 }
 
+.tabs-loading,
+.tabs-loading-hidden {
+  pointer-events: none;
+  .transition;
+  opacity: 1;
+  background: @builder-bg;
+}
+
+.tabs-loading-hidden {
+  opacity: 0;
+}
+
 .tabs-container {
 	height: 100%;
 	position: relative;

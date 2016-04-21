@@ -38,6 +38,16 @@
     }
   }
   
+  .menu-wrapper:not(.menu-open) {
+    opacity: 0;
+    .transition;
+  }
+  &:hover {
+    .menu-wrapper {
+      opacity: 1;
+    }
+  }
+  
   .result-name {
     height: @result-name-height;
     border-top-right-radius: 5px;

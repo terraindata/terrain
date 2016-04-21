@@ -48,6 +48,7 @@ import * as _ from 'underscore';
 import Util from '../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
 import PanelMixin from "../layout/PanelMixin.tsx";
+import InfoArea from "./../common/InfoArea.tsx";
 
 var TabIcon = require("./../../../images/tab_corner_27x31.svg?name=TabIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -156,6 +157,7 @@ var Tabs = React.createClass<any, any>({
         key: key,
       })),
       selectedIndex: 0,
+      selectingIndex: null,
 		};
 	},
   
@@ -213,8 +215,14 @@ var Tabs = React.createClass<any, any>({
         if(!this.state.tabOrder[index].unselectable)
         {
           this.setState({
-            selectedIndex: index
+            selectedIndex: index,
+            selectingIndex: index
           });
+          setTimeout(() => {
+            this.setState({
+              selectingIndex: null
+            });
+          }, 250);
         }
         
         var key = this.state.tabOrder[index].key;  
@@ -274,6 +282,10 @@ var Tabs = React.createClass<any, any>({
   {
     var selectedIndex = this.state.selectedIndex;
 		var content = this.state.tabOrder[selectedIndex].content;
+    if(this.state.selectingIndex !== null)
+    {
+      content = null;
+    }
 
     var tabsLayout = 
     {
@@ -315,6 +327,9 @@ var Tabs = React.createClass<any, any>({
 			<div className='tabs-content'>
 				{content}
 			</div>
+      <div className={this.state.selectingIndex !== null ? 'tabs-loading' : 'tabs-loading-hidden'}>
+        <InfoArea large='Loading...' />
+      </div>
 		 </div>);
 	},
 });
