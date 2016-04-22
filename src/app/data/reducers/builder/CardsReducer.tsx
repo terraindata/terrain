@@ -45,6 +45,7 @@ THE SOFTWARE.
 var Immutable = require('immutable');
 import ActionTypes from './../../ActionTypes.tsx';
 import Util from './../../../util/Util.tsx';
+import * as _ from 'underscore';
 
 import { CardModels } from './../../../models/CardModels.tsx';
 
@@ -176,51 +177,48 @@ CardsReducer[ActionTypes.cards.create] =
 
 CardsReducer[ActionTypes.cards.move] =
   (state, action) => {
-    var betweenAreas = false;
-    state = Util.immutableCardsUpdate(state, 'cards', action.payload.parentId, cards => {
-      var cardIndex = cards.findIndex((card => card.get('id') === action.payload.card.id));
-      if(cardIndex !== -1)
-      {
-        var { index } = action.payload;
-        if(cardIndex < index)
-        {
-          // offset for itself
-          index -= 1;
-        }
-        return Util.immutableMove(cards, action.payload.card.id, index)
-      }
-      
-      // need to move the card between cards areas
-      betweenAreas = true;
-      return cards.splice(action.payload.index, 0, Immutable.fromJS(action.payload.card));
-    });
-    
-    if(betweenAreas)
+    var moveFn = (state, cardId) => 
     {
-      // remove from old area
-      var removeFn = (cardsContainer) =>
+      var keyPath = Util.keyPathForId(state, cardId);
+      var card = state.getIn(keyPath);
+      state = state.removeIn(keyPath);
+      var parentKeyPath = Util.keyPathForId(state, action.payload.parentId);
+      if(parentKeyPath)
       {
-        if(cardsContainer.get('cards'))
+        var shift = 0;
+        keyPath.splice(keyPath.length - 2, 2);
+        if(_.isEqual(keyPath, parentKeyPath))
         {
-          cardsContainer = cardsContainer.update('cards', cards => cards.reduce((newContainer, card) => {
-            if(card.get('id') !== action.payload.card.id || cardsContainer.get('id') === action.payload.parentId)
-            {
-              return newContainer.push(removeFn(card));
-            }
-            return newContainer;
-          }, Immutable.fromJS([])));
+          // same area
+          if(keyPath[keyPath.length - 1] < action.payload.index)
+          {
+            shift = -1;
+          }
         }
-        
-        return cardsContainer.map((value, key) => 
-            !Immutable.Iterable.isIterable(value) || key === 'cards' ? value :
-              removeFn(value)
-          );
+        return state.updateIn(parentKeyPath.concat(['cards']), cards =>
+          cards.splice(action.payload.index + shift, 0, card));
       }
-      
-      state = state.update('algorithms', algorithms => algorithms.map(removeFn));
+      else
+      {
+        // we must have removed ourself, just re-insert the card where it was
+        var index = keyPath.splice(-1, 1)[0];
+        return state.updateIn(keyPath, cards => cards.splice(index, 0, card));
+      }
     }
     
-    return state;
+    var id = action.payload.card.id;
+    var algorithmId = Util.keyPathForId(state, id)[1];
+    
+    if(state.getIn(['algorithms', algorithmId, 'selectedCardIds', id]))
+    {
+      // apply to selection
+      return state.getIn(['algorithms', algorithmId, 'selectedCardIds'])
+        .reduce((state, v, cid) => moveFn(state, cid), state);
+    }
+    
+    return moveFn(state, action.payload.card.id)
+      .setIn(['algorithms', algorithmId, 'selectedCardIds'],
+        Immutable.fromJS({}));
   }
 
 CardsReducer[ActionTypes.cards.remove] =
@@ -237,18 +235,12 @@ CardsReducer[ActionTypes.cards.remove] =
         // card may have already been removed, e.g. if its parent was removed
         return state;
       }
-      console.log(cardId, kp);
       var index = kp.splice(-1, 1)[0];
       return state.updateIn(kp, cards => cards.remove(index))
-        // .deleteIn(['algorithms', algorithmId, 'selectedCardIds', cardId]);
-      // return Util.immutableCardsUpdate(state, 'cards', action.payload.parentId, cards =>
-      //   cards.remove(cards.findIndex((card) => card.get('id') === action.payload.card.id))
-      // );
     }
     
     if(state.getIn(['algorithms', algorithmId, 'selectedCardIds', id]))
     {
-      console.log(state.getIn(['algorithms', algorithmId, 'selectedCardIds']));
       // apply to selection
       return state.getIn(['algorithms', algorithmId, 'selectedCardIds'])
         .reduce((state, v, cid) => removeFn(state, cid), state);

@@ -267,7 +267,6 @@ var Card = React.createClass({
   {
     event.stopPropagation();
     event.preventDefault();
-    console.log(event.altKey, event.shiftKey);
     Actions.cards.selectCard(this.props.card.id, event.altKey, event.shiftKey);
   },
   
@@ -465,11 +464,17 @@ const cardSource =
   beginDrag(props)
   {
     const item = props.card;
+    // TODO do something better than this
+    $('body').addClass('card-is-dragging');
+    Actions.cards.selectCard(item.id, false, false);
     return item;
   },
   
   endDrag(props, monitor, component)
   {
+    // TODO do something better than this
+    $('body').removeClass('card-is-dragging');
+    
     if(!monitor.didDrop())
     {
       return;

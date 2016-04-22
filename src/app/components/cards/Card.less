@@ -230,7 +230,7 @@
   }
   
   .card-add-card-btn {
-    z-index: 999;
+    z-index: 9999;
     
     @w: 20px;
     width: @w;
@@ -400,4 +400,15 @@
 .if-card-button {
   margin-left: -6px;
   margin-bottom: -5px;
+}
+
+.card-is-dragging {
+  .card-selected {
+    background: #000;
+    border-radius: 5px;
+    .card-inner {
+      opacity: 0.75;
+      background-blend-mode: multiply;
+    }
+  }
 }
