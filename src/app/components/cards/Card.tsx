@@ -132,7 +132,6 @@ var Card = React.createClass({
       // console.log(this.props, nextProps);
     }
     return b; //!_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-      // || !_.isEqual(this.props.dragCoordinates, nextProps.dragCoordinates);
   },
 
   getInitialState()
@@ -172,6 +171,27 @@ var Card = React.createClass({
     return CardColors[this.props.card.type] ? CardColors[this.props.card.type][index] : CardColors['none'][index];
   },
   
+  componentWillMount()
+  {
+    this.setState({
+      unsubscribe: Store.subscribe(() =>
+      {
+        let selected = Store.getState().getIn(['selectedCardIds', this.props.card.id]);
+        if((selected && !this.state.selected) || (!selected && this.state.selected))
+        {
+          this.setState({
+            selected
+          });
+        }
+      }),
+    });
+  },
+  
+  componentWillUnmount()
+  {
+    this.state.unsubscribe();
+  },
+  
   componentDidMount()
   {
     // Use empty image as a drag preview so browsers don't draw it
@@ -204,15 +224,6 @@ var Card = React.createClass({
     }
     
      // Util.animateToAutoHeight(this.refs.cardInner);
-    Store.subscribe(() => {
-      let selected = Store.getState().getIn(['selectedCardIds', this.props.card.id]);
-      if((selected && !this.state.selected) || (!selected && this.state.selected))
-      {
-        this.setState({
-          selected
-        });
-      }
-    });
   },
   
   componentDidUpdate()
@@ -382,7 +393,7 @@ var Card = React.createClass({
 		);
 
 		var title = Util.titleForCard(this.props.card);
-    const { isDragging, connectDragSource, isOverCurrent, connectDropTarget, dragCoordinates } = this.props;
+    const { isDragging, connectDragSource, isOverCurrent, connectDropTarget } = this.props;
     const rendering = 
       <div
         className={classNames({
@@ -568,11 +579,7 @@ const cardTarget =
 const dropCollect = (connect, monitor) =>
 ({
   connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
   isOverCurrent: monitor.isOver({ shallow: true }),
-  dragCoordinates: monitor.getClientOffset(),
-  canDrop: monitor.canDrop(),
-  itemType: monitor.getItemType()
 });
 
 export default DropTarget('CARD', cardTarget, dropCollect)(DragSource('CARD', cardSource, dragCollect)(Card));

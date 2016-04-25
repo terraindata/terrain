@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./CardField.less');
+import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
@@ -84,10 +85,10 @@ var CardField = React.createClass({
 		};
 	},
   
-  // shouldComponentUpdate(nextProps, nextState)
-  // {
-  //   return nextProps.children !== this.props.children || nextProps.value !== this.state.value || nextState.value !== this.state.value;
-  // },
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  },
   
   componentDidMount()
   {

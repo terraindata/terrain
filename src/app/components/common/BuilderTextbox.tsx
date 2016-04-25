@@ -102,6 +102,11 @@ class BuilderTextbox extends React.Component<Props, any>
     }
   }
   
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  }
+  
   // throttled event handler
   executeChange(value)
   {

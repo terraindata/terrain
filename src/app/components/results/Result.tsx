@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 require('./Result.less');
-import * as $ from 'jquery';
+import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
@@ -99,6 +99,11 @@ var Result = React.createClass<any, any>({
     index: React.PropTypes.number.isRequired,
 	},
   
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  },
+  
   componentDidMount() {
     this.dragPreview = createDragPreview(this.props.data.name, dragPreviewStyle);
     this.props.connectDragPreview(this.dragPreview);
@@ -115,23 +120,6 @@ var Result = React.createClass<any, any>({
       data: {},
 		};
 	},
-  
-  toggleField(event) {
-    var field = $(event.target).attr('rel');
-    if(this.state.openFields.indexOf(field) === -1)
-    {
-      this.setState({
-        openFields: this.state.openFields.concat([field]),
-      });
-    }
-    else
-    {
-      this.state.openFields.splice(this.state.openFields.indexOf(field), 1);
-      this.setState({
-        openFields: this.state.openFields,
-      });
-    }
-  },
   
   renderField(field, index)
   {

@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 require('./CreateCardTool.less')
 var shallowCompare = require('react-addons-shallow-compare');
+import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../data/Actions.tsx";
 import Util from '../../util/Util.tsx';
@@ -74,7 +75,7 @@ class CreateCardTool extends React.Component<Props, any>
   }
   
   shouldComponentUpdate(nextProps, nextState) {
-    return shallowCompare(this, nextProps, nextState);
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
   
   createCard(event) {
@@ -181,8 +182,6 @@ const dropCollect = (connect, monitor) =>
 ({
   connectDropTarget: connect.dropTarget(),
   isOverCurrent: monitor.isOver({ shallow: true }),
-  canDrop: monitor.canDrop(),
-  itemType: monitor.getItemType()
 });
 
 export default DropTarget('CARD', cardTarget, dropCollect)(CreateCardTool);

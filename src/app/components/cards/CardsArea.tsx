@@ -62,15 +62,6 @@ var CardsArea = React.createClass<any, any>({
     topLevel: React.PropTypes.bool,
   },
   
-  getDefaultProps()
-  {
-    return {
-      cardsPropKeyPath: ['cards'],
-      parentIdPropKeyPath: ['parentId'],
-      dropZoneRef: 'cardsArea',
-    };
-  },
-  
   hasCardsArea()
   {
     return this.props.topLevel;

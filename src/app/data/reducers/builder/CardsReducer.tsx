@@ -186,11 +186,11 @@ CardsReducer[ActionTypes.cards.move] =
       if(parentKeyPath)
       {
         var shift = 0;
-        keyPath.splice(keyPath.length - 2, 2);
+        var oldIndex = keyPath.splice(keyPath.length - 2, 2)[1];
         if(_.isEqual(keyPath, parentKeyPath))
         {
           // same area
-          if(keyPath[keyPath.length - 1] < action.payload.index)
+          if(oldIndex < action.payload.index)
           {
             shift = -1;
           }
