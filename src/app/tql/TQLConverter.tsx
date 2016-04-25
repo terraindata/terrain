@@ -159,6 +159,6 @@ class TQLConverter
   
 }
 
-TQLConverter.toTQL = _.throttle(TQLConverter.toTQL, 1000);
+// TQLConverter.toTQL = _.debounce(TQLConverter.toTQL, 1000);
 
 export default TQLConverter;

@@ -212,6 +212,11 @@ var Tabs = React.createClass<any, any>({
     if(!this._onTabSelect[index])
     {
       this._onTabSelect[index] = () => {
+        if(index === this.state.selectedIndex)
+        {
+          return;
+        }
+        
         if(!this.state.tabOrder[index].unselectable)
         {
           this.setState({

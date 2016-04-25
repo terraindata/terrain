@@ -120,7 +120,6 @@ var BuilderColumn = React.createClass<any, any>(
           parentId={parentId} 
           spotlights={spotlights} 
           topLevel={true}
-          selectedCardIds={algorithm.selectedCardIds}
           />;
         
       case COLUMNS.Inputs:

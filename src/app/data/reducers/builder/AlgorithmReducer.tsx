@@ -51,7 +51,6 @@ var NEW_ALGORITHM =
 {
   inputs: [],
   cards: [],
-  selectedCardIds: {},
   results: [],
   resultsPage: 1,
   resultsPages: 30,
@@ -91,7 +90,6 @@ AlgorithmReducer[ActionTypes.algorithm.duplicate] =
         inputs.map(input =>
           input.set('parentId', parentId))
         .map(changeId))
-      .setIn(['algorithms', parentId, 'selectedCardIds'], Immutable.fromJS({}))
       // .updateIn(["algorithms", parentId], algorithm => algorithm.map(changeId))
       ;
   }

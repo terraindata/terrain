@@ -54,8 +54,6 @@ import FilterArea from './FilterArea.tsx';
 interface Props {
   card: CardModels.IIfCard;
   spotlights: any;
-  draggingOver: boolean;
-  draggingPlaceholder: any;
   singleCard?: boolean;
 }
 

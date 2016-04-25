@@ -60,8 +60,6 @@ var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIco
 interface Props {
   card: CardModels.IFromCard;
   index: number;
-  draggingOver: boolean;
-  draggingPlaceholder: any;
   spotlights: any;
 }
 

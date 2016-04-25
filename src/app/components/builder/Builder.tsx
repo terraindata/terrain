@@ -88,6 +88,7 @@ class Builder extends React.Component<any, any>
     Store.subscribe(() => {
       var newState = Store.getState().toJS();
       this.reduxState = newState.algorithms;
+      console.log('builder', (new Date()).getTime());
       this.setState({
         random: Math.random()
       });

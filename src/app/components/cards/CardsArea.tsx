@@ -60,9 +60,6 @@ var CardsArea = React.createClass<any, any>({
     parentId: React.PropTypes.string.isRequired,
     spotlights: React.PropTypes.array.isRequired,
     topLevel: React.PropTypes.bool,
-    draggingOver: React.PropTypes.bool,
-    draggingPlaceholder: React.PropTypes.object,
-    selectedCardIds: React.PropTypes.object.isRequired,
   },
   
   getDefaultProps()
@@ -116,11 +113,11 @@ var CardsArea = React.createClass<any, any>({
       {
         content: <Card 
           {...props}
+          cards={null}
           singleCard={false}
           topLevel={false}
           index={index}
           card={card}
-          onDropOutside={this.onDropOutside}
           onHover={$({})}
         />,
         key: card.id,
@@ -146,12 +143,6 @@ var CardsArea = React.createClass<any, any>({
     Actions.cards.create(this.props.parentId, 'from', this.props.index);
   },
   
-  // when a child card is dropped outside of its CardsArea
-  onDropOutside(coords, originalCoords, key)
-  {
-    
-  },
-  
   render() {
     if(!this.props.cards.length && this.props.topLevel)
     {
@@ -169,7 +160,6 @@ var CardsArea = React.createClass<any, any>({
         ref='cardsArea'>
         <LayoutManager
           layout={this.state.layout}
-          placeholder={this.state.draggingPlaceholder || this.props.draggingPlaceholder}
           />
       </div>
     );

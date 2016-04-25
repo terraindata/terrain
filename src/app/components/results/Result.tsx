@@ -95,7 +95,6 @@ var Result = React.createClass<any, any>({
 	propTypes:
 	{
 		data: React.PropTypes.object.isRequired,
-		parentNode: React.PropTypes.object,
     onExpand: React.PropTypes.func.isRequired,
     index: React.PropTypes.number.isRequired,
 	},

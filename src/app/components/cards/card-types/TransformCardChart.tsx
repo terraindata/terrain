@@ -99,6 +99,7 @@ class TransformCardChart extends React.Component<Props, any>
   
   componentWillReceiveProps(newProps)
   {
+    console.log('a');
     var changed = false;
     var newDomain = this.state.domain;
     var newPointsData = this.state.pointsData;

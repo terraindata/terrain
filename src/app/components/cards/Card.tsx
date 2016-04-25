@@ -53,7 +53,6 @@ import { DragSource, DropTarget } from 'react-dnd';
 var { createDragPreview } = require('react-dnd-text-dragpreview');
 var { getEmptyImage } = require('react-dnd-html5-backend');
 import Util from '../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
 import SelectCard from './card-types/SelectCard.tsx';
 import FromCard from './card-types/FromCard.tsx';
@@ -69,6 +68,7 @@ import Menu from '../common/Menu.tsx';
 import Actions from "../../data/Actions.tsx";
 import { CardColors } from './../../CommonVars.tsx';
 import { CardModels } from './../../models/CardModels.tsx';
+import Store from "./../../data/Store.tsx";
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
@@ -113,46 +113,35 @@ interface Props
   index: number;
   parentId: string;
   singleCard?: boolean;
-  selectedCardIds: any;
 }
 
 var Card = React.createClass({
-	propTypes:
-	{
-		card: React.PropTypes.object.isRequired,
+  propTypes:
+  {
+    card: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
     parentId: React.PropTypes.string,
     singleCard: React.PropTypes.bool, // indicates it's not in a list, it's just a single card
-    selectedCardIds: React.PropTypes.object.isRequired,
-	},
+  },
   
   shouldComponentUpdate(nextProps, nextState)
   {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState)
-      || !_.isEqual(this.props.dragCoordinates, nextProps.dragCoordinates);
+    var b = !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+    if(b)
+    {
+      // console.log(this.props, nextProps);
+    }
+    return b; //!_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+      // || !_.isEqual(this.props.dragCoordinates, nextProps.dragCoordinates);
   },
 
-	getDefaultProps():any
-	{
-		return {
-			drag_x: false,
-			drag_y: true,
-			reorderOnDrag: true,
-			handleRef: 'handle',
-      useDropZoneManager: true,
-      dropDataPropKey: 'card',
-      cardsPropKeyPath: ['card', 'cards'],
-      parentIdPropKeyPath: ['card', 'id'],
-      dropZoneRef: 'cardBody',
-		};
-	},
-  
-	getInitialState()
-	{
-		return {
-			open: true,
+  getInitialState()
+  {
+    return {
+      open: true,
       id: this.props.card.id,
       hoverOverLowerHalf: false,
+      selected: false,
       menuOptions:
       [
         {
@@ -176,7 +165,7 @@ var Card = React.createClass({
         borderColor: CardColors[this.props.card.type] ? CardColors[this.props.card.type][0] : CardColors['none'][0],
       },
     }
-	},
+  },
   
   getColor(index:number): string
   {
@@ -213,6 +202,17 @@ var Card = React.createClass({
       this.props.onHover.bind('lowerHover', this.lowerHover);
       this.props.onHover.bind('upperHover', this.upperHover);
     }
+    
+     // Util.animateToAutoHeight(this.refs.cardInner);
+    Store.subscribe(() => {
+      let selected = Store.getState().getIn(['selectedCardIds', this.props.card.id]);
+      if((selected && !this.state.selected) || (!selected && this.state.selected))
+      {
+        this.setState({
+          selected
+        });
+      }
+    });
   },
   
   componentDidUpdate()
@@ -372,7 +372,7 @@ var Card = React.createClass({
     var content = <div>This card has not been implemented yet.</div>;
     if(CardComponent)
     {
-      content = <CardComponent {...this.props} draggingOver={this.state.draggingOver} draggingPlaceholder={this.state.draggingPlaceholder} />
+      content = <CardComponent {...this.props} />
     }
 
 		var contentToDisplay = (
@@ -383,7 +383,6 @@ var Card = React.createClass({
 
 		var title = Util.titleForCard(this.props.card);
     const { isDragging, connectDragSource, isOverCurrent, connectDropTarget, dragCoordinates } = this.props;
-    if(!this.props.selectedCardIds) console.log(this.props);
     const rendering = 
       <div
         className={classNames({
@@ -393,7 +392,7 @@ var Card = React.createClass({
           'card-drag-over-lower': this.state.lowerHover,
           'card-closed' : !this.state.open,
           'single-card': this.props.singleCard,
-          'card-selected': this.props.selectedCardIds && this.props.selectedCardIds[this.props.card.id],
+          'card-selected': this.state.selected,
         })}
         rel={'card-' + this.props.card.id}
       >

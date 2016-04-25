@@ -51,7 +51,7 @@ var FilterCardReducer = {};
 
 FilterCardReducer[ActionTypes.cards.filter.create] =
   Util.updateCardField('filters', (filters, action) => 
-    filters.splice(Util.spliceIndex(action.payload.index, filters), 0, {
+    filters.splice(Util.spliceIndex(action.payload.index, filters), 0, Immutable.fromJS({
       condition: 
       {
         first: '',
@@ -60,7 +60,7 @@ FilterCardReducer[ActionTypes.cards.filter.create] =
       },
       combinator: CardModels.Combinator.AND,
       id: Util.randInt(2307961512),
-    }));
+    })));
     
 FilterCardReducer[ActionTypes.cards.filter.change] =
   Util.updateCardField('filters', (filters, action) => 

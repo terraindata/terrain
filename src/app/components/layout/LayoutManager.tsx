@@ -329,7 +329,6 @@ var LayoutManager = React.createClass<any, any>({
 			shiftedWidth: clientRect.width * widthAmplifier,
       draggingInside: !! draggingInside,
       draggingOutside: ! draggingInside,
-      draggingPlaceholder: clientRect,
 		});
 	},
   
@@ -355,13 +354,11 @@ var LayoutManager = React.createClass<any, any>({
 
   onDrop(index, coords, originalCoords)
   {
-    this.setState({draggingIndex: -1, dragging: false, draggingPlaceholder: null});
+    this.setState({
+      draggingIndex: -1,
+      dragging: false
+    });
     
-    if(this.panelIsOutside(coords,originalCoords) && this.props.onDropOutside)
-    {
-      this.props.onDropOutside(coords, originalCoords, this.getKeyForIndex(index));
-    }
-
 		var shiftedIndices = this.computeShiftedIndices(index, coords, originalCoords);
 		
 		if(shiftedIndices.length === 0)
@@ -464,7 +461,6 @@ var LayoutManager = React.createClass<any, any>({
         index: index,
 				onDrag: this.onDrag,
 				onDrop: this.onDrop,
-				parentNode: this.refs.layoutManagerDiv,
         dy: 0,
         dx: 0,
 			};

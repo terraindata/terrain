@@ -98,13 +98,14 @@ class BuilderTextbox extends React.Component<Props, any>
       {
         // if not focused, then update the value
         this.refs['input']['value'] = newProps.value;
-      }
+      } else console.log('tb', (new Date()).getTime());
     }
   }
   
   // throttled event handler
   executeChange(value)
   {
+    console.log('execute', (new Date()).getTime());
     Actions.cards.change(this.props.id, this.props.keyPath, value)
   }
   

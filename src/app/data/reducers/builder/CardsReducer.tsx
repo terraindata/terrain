@@ -207,17 +207,16 @@ CardsReducer[ActionTypes.cards.move] =
     }
     
     var id = action.payload.card.id;
-    var algorithmId = Util.keyPathForId(state, id)[1];
     
-    if(state.getIn(['algorithms', algorithmId, 'selectedCardIds', id]))
+    if(state.getIn(['selectedCardIds', id]))
     {
       // apply to selection
-      return state.getIn(['algorithms', algorithmId, 'selectedCardIds'])
+      return state.get('selectedCardIds')
         .reduce((state, v, cid) => moveFn(state, cid), state);
     }
     
     return moveFn(state, action.payload.card.id)
-      .setIn(['algorithms', algorithmId, 'selectedCardIds'],
+      .set('selectedCardIds',
         Immutable.fromJS({}));
   }
 
@@ -225,7 +224,6 @@ CardsReducer[ActionTypes.cards.remove] =
   (state, action) =>
   {
     var id = action.payload.card.id;
-    var algorithmId = Util.keyPathForId(state, id)[1];
     
     var removeFn = (state, cardId) =>
     {
@@ -239,10 +237,10 @@ CardsReducer[ActionTypes.cards.remove] =
       return state.updateIn(kp, cards => cards.remove(index))
     }
     
-    if(state.getIn(['algorithms', algorithmId, 'selectedCardIds', id]))
+    if(state.getIn(['selectedCardIds', id]))
     {
       // apply to selection
-      return state.getIn(['algorithms', algorithmId, 'selectedCardIds'])
+      return state.get('selectedCardIds')
         .reduce((state, v, cid) => removeFn(state, cid), state);
     }
     
@@ -262,13 +260,13 @@ CardsReducer[ActionTypes.cards.selectCard] =
         // unselect
         if(!action.payload.altKey && !action.payload.shiftKey)
         {
-          return state.update('algorithms', algorithms => algorithms.map(algorithm => algorithm.set('selectedCardIds', Immutable.fromJS({}))));
+          return state.set('selectedCardIds', Immutable.fromJS({}));
         }
         return state;
       }
       
       var algorithmId = Util.keyPathForId(state, id)[1];
-      var keyPath = ['algorithms', algorithmId, 'selectedCardIds'];
+      var keyPath = ['selectedCardIds'];
       var alreadySelected = state.getIn(keyPath.concat([id]));
       if(action.payload.altKey || action.payload.shiftKey)
       {

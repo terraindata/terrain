@@ -53,8 +53,6 @@ import CardsArea from './../CardsArea.tsx';
 interface Props {
   card: CardModels.ICountCard | CardModels.IAvgCard | CardModels.ISumCard | CardModels.IMinCard | CardModels.IMaxCard
     | CardModels.IExistsCard | CardModels.IParenthesesCard;
-  draggingOver: boolean;
-  draggingPlaceholder: any;
   spotlights: any;
 }
 
