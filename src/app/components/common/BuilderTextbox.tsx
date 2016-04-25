@@ -110,7 +110,6 @@ class BuilderTextbox extends React.Component<Props, any>
   // throttled event handler
   executeChange(value)
   {
-    console.log('execute', (new Date()).getTime());
     Actions.cards.change(this.props.id, this.props.keyPath, value)
   }
   
@@ -143,7 +142,8 @@ class BuilderTextbox extends React.Component<Props, any>
     }
     
     this.backupValue = this.props.value;
-    this.executeChange(value);
+    // not using executeChange because it is debounced and causes a false delay
+    Actions.cards.change(this.props.id, this.props.keyPath, value)
   }
   
   renderSwitch()
