@@ -13,8 +13,10 @@
     }
   }
   
-  &.builder-tb-drag-over {
+  &.card-drag-over-upper,
+  &.card-drag-over-lower {
     input, textarea {
+      .transition(~"none");
       border-color: @drag-color;
       box-shadow: 0px 0px 0px 1px @drag-color;
     }

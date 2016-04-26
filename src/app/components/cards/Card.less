@@ -57,10 +57,6 @@
     .card-stroke-below {
       opacity: 0 !important;
     }
-    // .builder-textbox {
-    //   border-color: #fff !important;
-    //   box-shadow: none !important;
-    // }
   }
   
   @stroke-height: 5px;
@@ -76,32 +72,13 @@
     opacity: 0;
     box-sizing: border-box;
     border-radius: 3px;
-    .transition;
+    // .transition;
   }
   .card-stroke-above {
     top: @stroke-height / -2;
   }
   .card-stroke-below {
     bottom: @stroke-height / -2;
-  }
-  &.card-drag-over {
-    &:not(.card-drag-over-lower) {
-      .card-stroke-above {
-        opacity: 1;
-      }
-      .card .card-stroke-above {
-        opacity: 0;
-      }
-    }
-    
-    &.card-drag-over-lower {
-      .card-stroke-below {
-        opacity: 1;
-      }
-      .card .card-stroke-below {
-        opacity: 0;
-      }
-    }
   }
   
  .card-title {
@@ -409,6 +386,26 @@
     .card-inner {
       opacity: 0.75;
       background-blend-mode: multiply;
+    }
+  }
+  
+  .card {
+    &.card-drag-over-upper {
+      .card-stroke-above {
+        opacity: 1;
+      }
+      .card .card-stroke-above {
+        opacity: 0;
+      }
+    }
+    
+    &.card-drag-over-lower {
+      .card-stroke-below {
+        opacity: 1;
+      }
+      .card .card-stroke-below {
+        opacity: 0;
+      }
     }
   }
 }

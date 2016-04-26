@@ -9,7 +9,9 @@
     .transition;
   }
   
-  &.create-card-wrapper-drag-over {
+  &.card-drag-over-upper,
+  &.card-drag-over-lower {
+    .transition(~"none");
     .create-card-selector {
       border: 2px solid @drag-color;
     }

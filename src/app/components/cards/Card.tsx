@@ -107,6 +107,35 @@ $('body').on('click', (event) =>
   }
 });
 
+var _lastDragOverEl;
+var _lastDragOverClassName;
+const handleCardDragover = (event) => 
+{
+  var el = findParentWithClass($(event.target), 'card-drop-target', 0);
+  if(el)
+  {
+    var lower = event.pageY > el.offset().top + el.height() / 2;
+    var className = lower ? 'card-drag-over-lower' : 'card-drag-over-upper';
+    if(!_lastDragOverEl || el !== _lastDragOverEl || _lastDragOverClassName !== className)
+    {
+      _lastDragOverEl && _lastDragOverEl.removeClass(_lastDragOverClassName);
+      el.addClass(className);
+      _lastDragOverEl = el;
+      _lastDragOverClassName = className;
+    }
+  }
+};
+$(document).on('dragover', _.throttle(handleCardDragover, 100));
+// $(document).on('dragend', () => 
+// {
+//   _lastDragOverEl.removeClass(_lastDragOverClassName);
+//   setTimeout(() => {
+//     // hack because the drag handler is throttled so could fire after 'dragend'
+//     _lastDragOverEl.removeClass(_lastDragOverClassName);
+//     _lastDragOverEl = null;
+//   }, 200);
+// });
+
 interface Props
 {
   card: CardModels.ICard;
@@ -404,6 +433,7 @@ var Card = React.createClass({
           'card-closed' : !this.state.open,
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
+          'card-drop-target': true,
         })}
         rel={'card-' + this.props.card.id}
       >
@@ -514,26 +544,26 @@ const cardTarget =
   
   hover(props, monitor, component)
   {
-    const canDrop = monitor.canDrop();
-    if(monitor.isOver({ shallow: true }))
-    {
-      var cr = ReactDOM.findDOMNode(component).getBoundingClientRect();
-      var m = monitor.getClientOffset();
-      if(m.y > (cr.top + cr.bottom) / 2)
-      {
-        if(props.onHover)
-        {
-          props.onHover.trigger('lowerHover');
-        }
-      }
-      else
-      {
-        if(props.onHover)
-        {
-          props.onHover.trigger('upperHover');
-        }
-      }
-    }
+    // const canDrop = monitor.canDrop();
+    // if(monitor.isOver({ shallow: true }))
+    // {
+    //   var cr = ReactDOM.findDOMNode(component).getBoundingClientRect();
+    //   var m = monitor.getClientOffset();
+    //   if(m.y > (cr.top + cr.bottom) / 2)
+    //   {
+    //     if(props.onHover)
+    //     {
+    //       props.onHover.trigger('lowerHover');
+    //     }
+    //   }
+    //   else
+    //   {
+    //     if(props.onHover)
+    //     {
+    //       props.onHover.trigger('upperHover');
+    //     }
+    //   }
+    // }
   },
   
   drop(props, monitor, component)
@@ -579,7 +609,7 @@ const cardTarget =
 const dropCollect = (connect, monitor) =>
 ({
   connectDropTarget: connect.dropTarget(),
-  isOverCurrent: monitor.isOver({ shallow: true }),
+  // isOverCurrent: monitor.isOver({ shallow: true }),
 });
 
 export default DropTarget('CARD', cardTarget, dropCollect)(DragSource('CARD', cardSource, dragCollect)(Card));

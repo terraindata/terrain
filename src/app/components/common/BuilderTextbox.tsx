@@ -181,7 +181,8 @@ class BuilderTextbox extends React.Component<Props, any>
         <div className={classNames({
           'builder-tb': true,
           'builder-tb-drag-over': isOverCurrent,
-          'builder-tb-accepts-cards': this.props.acceptsCards
+          'builder-tb-accepts-cards': this.props.acceptsCards,
+          'card-drop-target': this.props.acceptsCards
         })}>
           { React.cloneElement(element, props) }
           { this.props.acceptsCards && this.renderSwitch() }
@@ -294,7 +295,7 @@ const btbTarget =
 const dropCollect = (connect, monitor) =>
 ({
   connectDropTarget: connect.dropTarget(),
-  isOverCurrent: monitor.isOver({ shallow: true }) && monitor.canDrop(),
+  // isOverCurrent: monitor.isOver({ shallow: true }) && monitor.canDrop(),
 });
 
 export default DropTarget<Props>('CARD', btbTarget, dropCollect)(BuilderTextbox);

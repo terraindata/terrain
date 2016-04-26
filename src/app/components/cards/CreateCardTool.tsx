@@ -140,6 +140,7 @@ class CreateCardTool extends React.Component<Props, any>
       "create-card-open": this.props.open,
       "create-card-closed": !this.props.open,
       "create-card-wrapper-drag-over": isOverCurrent,
+      "card-drop-target": true
     });
     classes += ' ' + this.props.className;
     
@@ -181,7 +182,7 @@ const cardTarget =
 const dropCollect = (connect, monitor) =>
 ({
   connectDropTarget: connect.dropTarget(),
-  isOverCurrent: monitor.isOver({ shallow: true }),
+  // isOverCurrent: monitor.isOver({ shallow: true }),
 });
 
 export default DropTarget('CARD', cardTarget, dropCollect)(CreateCardTool);
