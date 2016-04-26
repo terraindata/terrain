@@ -53,7 +53,7 @@ import Menu from '../common/Menu.tsx';
 import Actions from '../../data/Actions.tsx';
 import ColorManager from '../../util/ColorManager.tsx';
 
-var PinIcon = require("./../../../images/icon_pin_21x21.svg?name=PinIcon&reactDom=react");
+var PinIcon = require("./../../../images/icon_pin_21x21.svg?name=PinIcon");
 var ScoreIcon = require("./../../../images/icon_terrain_27x16.svg?name=ScoreIcon");
 
 var fields = 

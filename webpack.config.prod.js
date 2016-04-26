@@ -68,4 +68,13 @@ conf.plugins = [
   new webpack.optimize.UglifyJsPlugin()
 ];
 
+// enable babel plugins on tsx loader
+if(conf.module.loaders[0].loader !== 'babel?presets[]=react!ts-loader')
+{
+  throw new Error('Expected first loader to be "babel?presets[]=react!ts-loader" but found '
+    + conf.module.loaders[0].loader);
+}
+conf.module.loaders[0].loader =
+  'babel?presets[]=react&plugins[]=transform-react-inline-elements&plugins[]=transform-react-constant-elements!ts-loader';
+
 module.exports = conf;
