@@ -135,7 +135,7 @@ class FilterArea extends BuilderClass<Props>
             />
           </div>
           <div className='builder-operator'>
-            { index === 0 ? null :
+            { index === this.props.card.filters.length - 1 ? null :
               <Dropdown
                 circle={true}
                 options={Combinators}
