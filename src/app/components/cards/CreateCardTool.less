@@ -4,11 +4,6 @@
   @create-card-border-radius: 5px;
   border-radius: @create-card-border-radius;
   
-  .create-card-selector {
-    overflow: hidden;  
-    .transition;
-  }
-  
   &.card-drag-over-upper,
   &.card-drag-over-lower {
     .transition(~"none");
@@ -60,18 +55,6 @@
       &:active {
         border-bottom-width: 2px;
       }
-    }
-  }
-  
-  &.create-card-open {
-    .create-card-selector {
-      // height: auto;
-    }
-  }
-  
-  &.create-card-closed {
-    .create-card-selector {
-      // height: 0px !important;
     }
   }
 }

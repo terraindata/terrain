@@ -92,11 +92,15 @@ class CreateCardTool extends React.Component<Props, any>
   {
     if(newProps.open)
     {
-      Util.animateToAutoHeight(this.refs['ccWrapper']);
+      setTimeout(() =>
+        Util.animateToAutoHeight(this.refs['ccWrapper']),
+      150);
     }
     else
     {
-      Util.animateToHeight(this.refs['ccWrapper'], 0);
+      setTimeout(() =>
+        Util.animateToHeight(this.refs['ccWrapper'], 0),
+      150);
     }
   }
   
@@ -136,6 +140,11 @@ class CreateCardTool extends React.Component<Props, any>
   }
   
   render() {
+    // if(!this.props.open)
+    // {
+    //   return null;
+    // }
+    
     const { isOverCurrent, connectDropTarget } = this.props;
     var classes = Util.objToClassname({
       "create-card-wrapper": true,

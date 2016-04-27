@@ -216,6 +216,7 @@ var Card = React.createClass({
     if(this.props.dndListener)
     {
       this.props.dndListener.unbind('draggedAway', this.handleDraggedAway);
+      this.props.dndListener.unbind('dropped', this.handleDropped);
       this.props.dndListener.unbind('droppedBelow', this.handleDroppedBelow);
       this.props.dndListener.unbind('droppedAbove', this.handleDroppedAbove);
     }
@@ -223,13 +224,6 @@ var Card = React.createClass({
   
   componentDidMount()
   {
-    // Use empty image as a drag preview so browsers don't draw it
-    // and we can draw whatever we want on the custom drag layer instead.
-    // this.props.connectDragPreview(getEmptyImage(), {
-    //   // IE fallback: specify that we'd rather screenshot the node
-    //   // when it already knows it's being dragged so we can hide it with CSS.
-    //   captureDraggingState: true
-    // });
     this.dragPreview = createDragPreview(
       Util.titleForCard(this.props.card) + ' (' + Util.previewForCard(this.props.card) + ')',
     {
@@ -249,6 +243,7 @@ var Card = React.createClass({
     if(this.props.dndListener)
     {
       this.props.dndListener.bind('draggedAway', this.handleDraggedAway);
+      this.props.dndListener.bind('dropped', this.handleDropped);
       this.props.dndListener.bind('droppedBelow', this.handleDroppedBelow);
       this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
     }
@@ -271,6 +266,7 @@ var Card = React.createClass({
     if(this.props.dndListener)
     {
       this.props.dndListener.bind('draggedAway', this.handleDraggedAway);
+      this.props.dndListener.bind('dropped', this.handleDropped);
       this.props.dndListener.bind('droppedBelow', this.handleDroppedBelow);
       this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
     }
@@ -279,6 +275,11 @@ var Card = React.createClass({
   handleDraggedAway()
   {
     Util.animateToHeight(this.refs['cardContainer'], 0);
+  },
+  
+  handleDropped()
+  {
+    Util.animateToAutoHeight(this.refs['cardContainer']);
   },
   
   handleDroppedBelow(item)
@@ -297,25 +298,20 @@ var Card = React.createClass({
   
 	toggleClose(event)
 	{
+    this.setState({
+      open: ! this.state.open,
+    })
     if(this.state.open)
     {
-      Util.animateToHeight(this.refs.cardBody, 0);
+      setTimeout(() => 
+      Util.animateToHeight(this.refs.cardBody, 0), 300);
     }
     else
     {
-      Util.animateToAutoHeight(this.refs.cardBody); 
+      setTimeout(() => 
+      Util.animateToAutoHeight(this.refs.cardBody), 300);
     }
-   
-    var open = !this.state.open;
-		this.setState({
-			open: open,
-		});
-    
-    if(event.shiftKey)
-    {
-      // TODO apply to children
-    }
-    
+       
     event.preventDefault();
     event.stopPropagation();
 	},
@@ -523,7 +519,11 @@ const cardSource =
     const item = props.card;
     // TODO do something better than this
     $('body').addClass('card-is-dragging');
-    Actions.cards.selectCard(item.id, false, false);
+    if(props.dndListener)
+    {
+       props.dndListener.trigger('draggedAway')
+    }
+    // Actions.cards.selectCard(item.id, false, false);
     return item;
   },
   
@@ -531,6 +531,11 @@ const cardSource =
   {
     // TODO do something better than this
     $('body').removeClass('card-is-dragging');
+    
+    if(props.dndListener)
+    {
+       props.dndListener.trigger('dropped')
+    }
     
     if(!monitor.didDrop())
     {
@@ -541,10 +546,6 @@ const cardSource =
     const dropResult = monitor.getDropResult();
     
     var m = monitor.getClientOffset();
-    if(props.dndListener)
-    {
-      props.dndListener.trigger('draggedAway');
-    }
   }
 }
 
@@ -563,30 +564,6 @@ const cardTarget =
   canDrop(props, monitor)
   {
     return true;
-  },
-  
-  hover(props, monitor, component)
-  {
-    // const canDrop = monitor.canDrop();
-    // if(monitor.isOver({ shallow: true }))
-    // {
-    //   var cr = ReactDOM.findDOMNode(component).getBoundingClientRect();
-    //   var m = monitor.getClientOffset();
-    //   if(m.y > (cr.top + cr.bottom) / 2)
-    //   {
-    //     if(props.onHover)
-    //     {
-    //       props.onHover.trigger('lowerHover');
-    //     }
-    //   }
-    //   else
-    //   {
-    //     if(props.onHover)
-    //     {
-    //       props.onHover.trigger('upperHover');
-    //     }
-    //   }
-    // }
   },
   
   drop(props, monitor, component)
@@ -625,9 +602,7 @@ const cardTarget =
           monitor.getItem()
         );
       
-      setTimeout(() =>
-        Actions.cards.move(card, props.index + (below ? 1 : 0), props.parentId)
-      , 250);
+      Actions.cards.move(card, props.index + (below ? 1 : 0), props.parentId)
     }
   }
 }
