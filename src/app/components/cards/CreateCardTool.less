@@ -20,6 +20,8 @@
   @button-padding: @standard-margin;
   
   .create-card-selector {
+    height: 0px;
+    overflow: hidden;
     background: #747771;
     border-radius: @create-card-border-radius;
     box-sizing: border-box;
@@ -63,13 +65,13 @@
   
   &.create-card-open {
     .create-card-selector {
-      height: auto;
+      // height: auto;
     }
   }
   
   &.create-card-closed {
     .create-card-selector {
-      height: 0px !important;
+      // height: 0px !important;
     }
   }
 }

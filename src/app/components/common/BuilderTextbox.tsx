@@ -286,8 +286,14 @@ const btbTarget =
         type: 'parentheses',
         cards: [],
       };
-      Actions.cards.change(props.id, props.keyPath, newCard)
-      Actions.cards.move(item, 0, newId);
+      
+      props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
+      
+      setTimeout(() =>
+      {
+        Actions.cards.change(props.id, props.keyPath, newCard)
+        Actions.cards.move(item, 0, newId);
+      }, 250);
     }
   }
 }
@@ -295,7 +301,6 @@ const btbTarget =
 const dropCollect = (connect, monitor) =>
 ({
   connectDropTarget: connect.dropTarget(),
-  // isOverCurrent: monitor.isOver({ shallow: true }) && monitor.canDrop(),
 });
 
 export default DropTarget<Props>('CARD', btbTarget, dropCollect)(BuilderTextbox);

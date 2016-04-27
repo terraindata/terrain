@@ -88,22 +88,29 @@ class CreateCardTool extends React.Component<Props, any>
     Actions.cards.create(this.props.parentId, type, this.props.index);
   }
   
-  // componentWillReceiveProps(newProps)
-  // {
-  //   if(newProps.open)
-  //   {
-  //     Util.animateToAutoHeight(this.refs['ccWrapper']);
-  //   }
-  //   else
-  //   {
-  //     Util.animateToHeight(this.refs['ccWrapper'], 0);
-  //     this.refs['ccWrapper']['style']['overflow'] = 'hidden';
-  //   }
-  // }
+  componentWillReceiveProps(newProps)
+  {
+    if(newProps.open)
+    {
+      Util.animateToAutoHeight(this.refs['ccWrapper']);
+    }
+    else
+    {
+      Util.animateToHeight(this.refs['ccWrapper'], 0);
+    }
+  }
+  
+  componentDidMount()
+  {
+    if(this.props.open)
+    {
+      Util.animateToAutoHeight(this.refs['ccWrapper']);
+    }
+  }
   
   renderCardSelector() {
     return (
-     <div className='create-card-selector'>
+     <div className='create-card-selector' ref='ccWrapper'>
        <div className='create-card-selector-inner'>
          {
            CardTypes.map((type, index) => (
@@ -129,11 +136,6 @@ class CreateCardTool extends React.Component<Props, any>
   }
   
   render() {
-    if(!this.props.open)
-    {
-      return null;
-    }
-    
     const { isOverCurrent, connectDropTarget } = this.props;
     var classes = Util.objToClassname({
       "create-card-wrapper": true,
@@ -174,7 +176,12 @@ const cardTarget =
     const item = monitor.getItem();
     if(monitor.isOver({ shallow: true}))
     {
-      Actions.cards.move(item, props.index || 0, props.parentId);
+      props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
+      
+      setTimeout(() =>
+      {
+        Actions.cards.move(item, props.index || 0, props.parentId);
+      }, 250);
     }
   }
 }
@@ -182,7 +189,6 @@ const cardTarget =
 const dropCollect = (connect, monitor) =>
 ({
   connectDropTarget: connect.dropTarget(),
-  // isOverCurrent: monitor.isOver({ shallow: true }),
 });
 
 export default DropTarget('CARD', cardTarget, dropCollect)(CreateCardTool);

@@ -155,12 +155,7 @@ var Card = React.createClass({
   
   shouldComponentUpdate(nextProps, nextState)
   {
-    var b = !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-    if(b)
-    {
-      // console.log(this.props, nextProps);
-    }
-    return b; //!_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   },
 
   getInitialState()
@@ -168,7 +163,6 @@ var Card = React.createClass({
     return {
       open: true,
       id: this.props.card.id,
-      hoverOverLowerHalf: false,
       selected: false,
       menuOptions:
       [
@@ -219,6 +213,12 @@ var Card = React.createClass({
   componentWillUnmount()
   {
     this.state.unsubscribe();
+    if(this.props.dndListener)
+    {
+      this.props.dndListener.unbind('draggedAway', this.handleDraggedAway);
+      this.props.dndListener.unbind('droppedBelow', this.handleDroppedBelow);
+      this.props.dndListener.unbind('droppedAbove', this.handleDroppedAbove);
+    }
   },
   
   componentDidMount()
@@ -246,35 +246,52 @@ var Card = React.createClass({
     });
     this.props.connectDragPreview(this.dragPreview);
     
-    if(this.props.onHover)
+    if(this.props.dndListener)
     {
-      this.props.onHover.bind('lowerHover', this.lowerHover);
-      this.props.onHover.bind('upperHover', this.upperHover);
+      this.props.dndListener.bind('draggedAway', this.handleDraggedAway);
+      this.props.dndListener.bind('droppedBelow', this.handleDroppedBelow);
+      this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
     }
     
-     // Util.animateToAutoHeight(this.refs.cardInner);
+    setTimeout(() =>
+      Util.animateToAutoHeight(this.refs.cardContainer),
+    50);
+  },
+  
+  componentWillReceiveProps(nextProps)
+  {
+    if(nextProps['index'] !== this.props.index)
+    {
+      Util.animateToAutoHeight(this.refs.cardContainer);
+    }
   },
   
   componentDidUpdate()
   {
-    if(this.props.onHover)
+    if(this.props.dndListener)
     {
-      this.props.onHover.bind('lowerHover', this.lowerHover);
-      this.props.onHover.bind('upperHover', this.upperHover);
+      this.props.dndListener.bind('draggedAway', this.handleDraggedAway);
+      this.props.dndListener.bind('droppedBelow', this.handleDroppedBelow);
+      this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
     }
   },
   
-  lowerHover()
+  handleDraggedAway()
+  {
+    Util.animateToHeight(this.refs['cardContainer'], 0);
+  },
+  
+  handleDroppedBelow(item)
   {
     this.setState({
-      lowerHover: true,
+      droppedBelow: true,
     });
   },
   
-  upperHover()
+  handleDroppedAbove(item)
   {
     this.setState({
-      lowerHover: false,
+      droppedAbove: true,
     });
   },
   
@@ -422,14 +439,12 @@ var Card = React.createClass({
 		);
 
 		var title = Util.titleForCard(this.props.card);
-    const { isDragging, connectDragSource, isOverCurrent, connectDropTarget } = this.props;
+    const { isDragging, connectDragSource, connectDropTarget } = this.props;
     const rendering = 
       <div
         className={classNames({
           'card': true,
           'card-dragging': isDragging,
-          'card-drag-over': isOverCurrent,
-          'card-drag-over-lower': this.state.lowerHover,
           'card-closed' : !this.state.open,
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
@@ -437,54 +452,56 @@ var Card = React.createClass({
         })}
         rel={'card-' + this.props.card.id}
       >
-        { !this.props.singleCard &&
-          <CreateCardTool
-            index={this.props.index}
-            parentId={this.props.parentId}
-            open={this.state.addingCardAbove}
-            onMinimize={this.minimizeCreateCard}
-          />
-        }
-        { this.renderAddCard() }
-        <div className='card-stroke card-stroke-above' />
-        <div
-          className={'card-inner ' + (this.props.singleCard ? 'card-single' : '')}
-          style={this.state.bodyStyle}
-          ref='cardInner'
-        >
+        <div ref='cardContainer' className='card-container'>
           { !this.props.singleCard &&
-            connectDragSource(
-              <div
-                className='card-title'
-                style={this.state.titleStyle}
-                onClick={this.handleTitleClick}
-                >
-                <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
-                { title }
-                <span className={classNames({
-                  'card-preview': true,
-                  'card-preview-hidden': this.state.open
-                })}>
-                  { Util.previewForCard(this.props.card) }
-                </span>
-                <Menu options={this.state.menuOptions} />
-              </div>
-            )
+            <CreateCardTool
+              index={this.props.index}
+              parentId={this.props.parentId}
+              open={this.state.addingCardAbove}
+              onMinimize={this.minimizeCreateCard}
+            />
           }
-          <div className='card-body' ref='cardBody'>
-            { contentToDisplay }
+          { this.renderAddCard() }
+          <div className='card-stroke card-stroke-above' />
+          <div
+            className={'card-inner ' + (this.props.singleCard ? 'card-single' : '')}
+            style={this.state.bodyStyle}
+            ref='cardInner'
+          >
+            { !this.props.singleCard &&
+              connectDragSource(
+                <div
+                  className='card-title'
+                  style={this.state.titleStyle}
+                  onClick={this.handleTitleClick}
+                  >
+                  <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
+                  { title }
+                  <span className={classNames({
+                    'card-preview': true,
+                    'card-preview-hidden': this.state.open
+                  })}>
+                    { Util.previewForCard(this.props.card) }
+                  </span>
+                  <Menu options={this.state.menuOptions} />
+                </div>
+              )
+            }
+            <div className='card-body' ref='cardBody'>
+              { contentToDisplay }
+            </div>
           </div>
+          <div className='card-stroke card-stroke-below' />
+          { this.renderAddCard(true) }
+          { !this.props.singleCard &&
+            <CreateCardTool
+              index={this.props.index + 1}
+              parentId={this.props.parentId}
+              open={this.state.addingCardBelow}
+              onMinimize={this.minimizeCreateCard}
+            />
+          }
         </div>
-        <div className='card-stroke card-stroke-below' />
-        { this.renderAddCard(true) }
-        { !this.props.singleCard &&
-          <CreateCardTool
-            index={this.props.index + 1}
-            parentId={this.props.parentId}
-            open={this.state.addingCardBelow}
-            onMinimize={this.minimizeCreateCard}
-          />
-        }
       </div>;
       
     if(!this.props.singleCard)
@@ -522,6 +539,12 @@ const cardSource =
     
     const item = monitor.getItem();
     const dropResult = monitor.getDropResult();
+    
+    var m = monitor.getClientOffset();
+    if(props.dndListener)
+    {
+      props.dndListener.trigger('draggedAway');
+    }
   }
 }
 
@@ -595,13 +618,16 @@ const cardTarget =
       var m = monitor.getClientOffset();
       if(m.y > (cr.top + cr.bottom) / 2)
       {
-        var index = props.index + 1;
+        var below = true;
       }
-      else
-      {
-        var index = props.index;
-      }
-      Actions.cards.move(card, index, props.parentId);
+      
+      props.dndListener && props.dndListener.trigger(below ? 'droppedBelow' : 'droppedAbove',
+          monitor.getItem()
+        );
+      
+      setTimeout(() =>
+        Actions.cards.move(card, props.index + (below ? 1 : 0), props.parentId)
+      , 250);
     }
   }
 }
@@ -609,7 +635,6 @@ const cardTarget =
 const dropCollect = (connect, monitor) =>
 ({
   connectDropTarget: connect.dropTarget(),
-  // isOverCurrent: monitor.isOver({ shallow: true }),
 });
 
 export default DropTarget('CARD', cardTarget, dropCollect)(DragSource('CARD', cardSource, dragCollect)(Card));

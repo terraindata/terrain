@@ -109,7 +109,7 @@ var CardsArea = React.createClass<any, any>({
           topLevel={false}
           index={index}
           card={card}
-          onHover={$({})}
+          dndListener={$({})}
         />,
         key: card.id,
       }
