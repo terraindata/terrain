@@ -1,0 +1,1783 @@
+{
+  "selectedCardIds": {},
+  "algorithms":{
+    "100": {
+      "id": "100",
+      "algorithmName": "sitter_ranking.tql",
+      "cards": [
+        {
+          "filters": [
+            {
+              "condition": {
+                "operator": 0,
+                "first": "searchContext",
+                "second": "\"NewParentNoDateTime\""
+              },
+              "combinator": 0,
+              "id": "co0.2958904276435348"
+            }
+          ],
+          "cards": [
+            {
+              "field": "qualityThreshold",
+              "expression": "200",
+              "type": "var",
+              "id": "c-390165501",
+              "parentId": "100"
+            },
+            {
+              "field": "responsivenessThreshold",
+              "expression": "0",
+              "type": "var",
+              "id": "c-2785901662",
+              "parentId": "100"
+            },
+            {
+              "field": "lastMinuteThreshold",
+              "expression": "0",
+              "type": "var",
+              "id": "c-855651324",
+              "parentId": "100"
+            }
+          ],
+          "elses": [
+            {
+              "type": "if",
+              "id": "e0.9306559582068967",
+              "cards": [
+                {
+                  "field": "qualityThreshold",
+                  "expression": "200",
+                  "cards": [
+                    {
+                      "properties": [
+                        {
+                          "property": "",
+                          "id": "0.3890866880470252"
+                        }
+                      ],
+                      "type": "select",
+                      "id": "c-1822025775",
+                      "parentId": "100"
+                    }
+                  ],
+                  "type": "var",
+                  "id": "c-2675153650",
+                  "parentId": "e0.9306559582068967"
+                },
+                {
+                  "field": "responsivenessThreshold",
+                  "expression": "0",
+                  "type": "var",
+                  "id": "c-3548814921",
+                  "parentId": "e0.9306559582068967"
+                },
+                {
+                  "field": "lastMinuteThreshold",
+                  "expression": "0",
+                  "type": "var",
+                  "id": "c-757425329",
+                  "parentId": "e0.9306559582068967"
+                }
+              ],
+              "elses": [
+                {
+                  "type": "if",
+                  "id": "e0.5460149214334937",
+                  "cards": [
+                    {
+                      "field": "qualityThreshold",
+                      "expression": "200",
+                      "type": "var",
+                      "id": "c-2439972416",
+                      "parentId": "e0.5460149214334937"
+                    },
+                    {
+                      "field": "responsivenessThreshold",
+                      "expression": "20",
+                      "type": "var",
+                      "id": "c-3353528132",
+                      "parentId": "e0.5460149214334937"
+                    },
+                    {
+                      "field": "lastMinuteThreshold",
+                      "expression": "40",
+                      "type": "var",
+                      "id": "c-326668961",
+                      "parentId": "e0.5460149214334937"
+                    }
+                  ],
+                  "elses": [
+                    {
+                      "type": "if",
+                      "id": "e0.9645169669427978",
+                      "cards": [
+                        {
+                          "field": "qualityThreshold",
+                          "expression": "200",
+                          "type": "var",
+                          "id": "c-1069548621",
+                          "parentId": "e0.9645169669427978"
+                        },
+                        {
+                          "field": "responsivenessThreshold",
+                          "expression": "0",
+                          "type": "var",
+                          "id": "c-4445006451",
+                          "parentId": "e0.9645169669427978"
+                        },
+                        {
+                          "field": "lastMinuteThreshold",
+                          "expression": "40",
+                          "type": "var",
+                          "id": "c-2829004495",
+                          "parentId": "e0.9645169669427978"
+                        }
+                      ],
+                      "elses": [],
+                      "filters": [
+                        {
+                          "condition": {
+                            "operator": 0,
+                            "first": "searchContext ",
+                            "second": "\"RepeatParentLastMinuteDateTime\""
+                          },
+                          "combinator": 0,
+                          "id": 1460592966
+                        }
+                      ]
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "condition": {
+                        "operator": 0,
+                        "first": "searchContext ",
+                        "second": "\"NewParentLastMinuteDateTime\""
+                      },
+                      "combinator": 0,
+                      "id": 276965268
+                    }
+                  ]
+                }
+              ],
+              "filters": [
+                {
+                  "condition": {
+                    "operator": 0,
+                    "first": "searchContext",
+                    "second": "\"NewParentStandardDateTime\""
+                  },
+                  "combinator": 0,
+                  "id": 1728577758
+                }
+              ]
+            }
+          ],
+          "type": "if",
+          "id": "c-3078406199",
+          "parentId": "100"
+        },
+        {
+          "field": "selfConnectedSitters",
+          "expression": {
+            "id": "c-0.8409910260779163",
+            "type": "parentheses",
+            "cards": [
+              {
+                "type": "from",
+                "group": "sit_log",
+                "iterator": "sl",
+                "joins": [],
+                "cards": [
+                  {
+                    "filters": [
+                      {
+                        "condition": {
+                          "operator": 0,
+                          "first": "sl.parent",
+                          "second": "parentID"
+                        },
+                        "combinator": 1,
+                        "id": "co0.3617570130323151"
+                      }
+                    ],
+                    "type": "filter",
+                    "id": "c-2911828091",
+                    "parentId": "c-1792684379"
+                  },
+                  {
+                    "properties": [
+                      {
+                        "property": "sl.sitter_id",
+                        "id": "0.04261859244991961"
+                      }
+                    ],
+                    "type": "select",
+                    "id": "c-4162897215",
+                    "parentId": "100"
+                  }
+                ],
+                "id": "c-1792684379",
+                "parentId": "c-0.8409910260779163"
+              }
+            ]
+          },
+          "type": "var",
+          "id": "c-4377078246",
+          "parentId": "100"
+        },
+        {
+          "field": "friends",
+          "expression": {
+            "id": "c-0.4093261728797011",
+            "type": "parentheses",
+            "cards": [
+              {
+                "type": "from",
+                "group": "friends",
+                "iterator": "friend",
+                "joins": [],
+                "cards": [
+                  {
+                    "filters": [
+                      {
+                        "condition": {
+                          "operator": 0,
+                          "first": "friend.parent_id",
+                          "second": "parentID"
+                        },
+                        "combinator": 0,
+                        "id": "co0.759553524242315"
+                      },
+                      {
+                        "condition": {
+                          "operator": 1,
+                          "first": "second.friend_id",
+                          "second": "parentID"
+                        },
+                        "combinator": 0,
+                        "id": 712071226
+                      }
+                    ],
+                    "type": "filter",
+                    "id": "c-4199446844",
+                    "parentId": "c-4060169248"
+                  },
+                  {
+                    "properties": [
+                      {
+                        "property": "friend.friend_id",
+                        "id": "0.9421936743896355"
+                      }
+                    ],
+                    "type": "select",
+                    "id": "c-4242052213",
+                    "parentId": "c-4060169248"
+                  }
+                ],
+                "id": "c-4060169248",
+                "parentId": "c-0.4093261728797011"
+              }
+            ]
+          },
+          "type": "var",
+          "id": "c-2072691443",
+          "parentId": "100"
+        },
+        {
+          "field": "directConnectedSitters",
+          "expression": {
+            "id": "c-0.7671855901302389",
+            "type": "parentheses",
+            "cards": [
+              {
+                "type": "from",
+                "group": "sit_log",
+                "iterator": "sl",
+                "joins": [],
+                "cards": [
+                  {
+                    "filters": [
+                      {
+                        "condition": {
+                          "operator": 6,
+                          "first": "sl.parent_id",
+                          "second": "friends"
+                        },
+                        "combinator": 0,
+                        "id": "co0.6638692467082172"
+                      }
+                    ],
+                    "type": "filter",
+                    "id": "c-83374920",
+                    "parentId": "c-4164422344"
+                  },
+                  {
+                    "properties": [
+                      {
+                        "property": "sl.sitter_id",
+                        "id": "0.899324671239532"
+                      }
+                    ],
+                    "type": "select",
+                    "id": "c-2631045963",
+                    "parentId": "c-4164422344"
+                  }
+                ],
+                "id": "c-4164422344",
+                "parentId": "c-0.7671855901302389"
+              }
+            ]
+          },
+          "type": "var",
+          "id": "c-3886300512",
+          "parentId": "100"
+        },
+        {
+          "field": "excludedSitters",
+          "expression": {
+            "id": "c-0.5680003391923247",
+            "type": "parentheses",
+            "cards": [
+              {
+                "type": "from",
+                "group": "reviews",
+                "iterator": "r",
+                "joins": [],
+                "cards": [
+                  {
+                    "filters": [
+                      {
+                        "condition": {
+                          "operator": 0,
+                          "first": "r.parent_id",
+                          "second": "ParentID"
+                        },
+                        "combinator": 0,
+                        "id": "co0.9466566157774277"
+                      },
+                      {
+                        "condition": {
+                          "operator": 5,
+                          "first": "r.vote",
+                          "second": "ReviewVoteThreshold"
+                        },
+                        "combinator": 0,
+                        "id": 176914811
+                      }
+                    ],
+                    "type": "filter",
+                    "id": "c-1648781806",
+                    "parentId": "c-557700008"
+                  },
+                  {
+                    "properties": [
+                      {
+                        "property": "r.sitter_id",
+                        "id": "0.6091735012992194"
+                      }
+                    ],
+                    "type": "select",
+                    "id": "c-702529483",
+                    "parentId": "c-557700008"
+                  }
+                ],
+                "id": "c-557700008",
+                "parentId": "c-0.5680003391923247"
+              }
+            ]
+          },
+          "type": "var",
+          "id": "c-3547421366",
+          "parentId": "100"
+        },
+        {
+          "field": "friendsOfFriends",
+          "expression": {
+            "id": "c-0.6650110438771992",
+            "type": "parentheses",
+            "cards": [
+              {
+                "type": "from",
+                "group": "friends",
+                "iterator": "second",
+                "joins": [],
+                "cards": [
+                  {
+                    "filters": [
+                      {
+                        "condition": {
+                          "operator": 6,
+                          "first": "second.parent_id",
+                          "second": "friends"
+                        },
+                        "combinator": 0,
+                        "id": "co0.7847453177251669"
+                      },
+                      {
+                        "condition": {
+                          "operator": 7,
+                          "first": "second.friend_id",
+                          "second": "friends"
+                        },
+                        "combinator": 0,
+                        "id": 875913267
+                      },
+                      {
+                        "condition": {
+                          "operator": 1,
+                          "first": "second.friend_id",
+                          "second": "parentID"
+                        },
+                        "combinator": 0,
+                        "id": 20801337
+                      }
+                    ],
+                    "type": "filter",
+                    "id": "c-477345069",
+                    "parentId": "c-4690772261"
+                  },
+                  {
+                    "properties": [
+                      {
+                        "property": "second.id",
+                        "id": "0.359866891593964"
+                      }
+                    ],
+                    "type": "select",
+                    "id": "c-1619551464",
+                    "parentId": "c-4690772261"
+                  }
+                ],
+                "id": "c-4690772261",
+                "parentId": "c-0.6650110438771992"
+              }
+            ]
+          },
+          "type": "var",
+          "id": "c-1980821222",
+          "parentId": "100"
+        },
+        {
+          "field": "indirectConnectedSitters",
+          "expression": {
+            "id": "c-0.480957506157075",
+            "type": "parentheses",
+            "cards": [
+              {
+                "type": "from",
+                "group": "sit_log",
+                "iterator": "sl",
+                "joins": [],
+                "cards": [
+                  {
+                    "filters": [
+                      {
+                        "condition": {
+                          "operator": 6,
+                          "first": "sl.parent_id",
+                          "second": "friendsOfFriends"
+                        },
+                        "combinator": 0,
+                        "id": "co0.9300197407329089"
+                      }
+                    ],
+                    "type": "filter",
+                    "id": "c-3884897884",
+                    "parentId": "c-2909244758"
+                  },
+                  {
+                    "properties": [
+                      {
+                        "property": "sl.sitter_id",
+                        "id": "0.4159598338172612"
+                      }
+                    ],
+                    "type": "select",
+                    "id": "c-1962203415",
+                    "parentId": "c-2909244758"
+                  }
+                ],
+                "id": "c-2909244758",
+                "parentId": "c-0.480957506157075"
+              }
+            ]
+          },
+          "type": "var",
+          "id": "c-1294664316",
+          "parentId": "100"
+        },
+        {
+          "field": "schoolParents",
+          "expression": {
+            "id": "c-0.7522847871039253",
+            "type": "parentheses",
+            "cards": [
+              {
+                "type": "from",
+                "group": "parent_schools",
+                "iterator": "ps",
+                "joins": [],
+                "cards": [
+                  {
+                    "filters": [
+                      {
+                        "condition": {
+                          "operator": 6,
+                          "first": "ps.school_id",
+                          "second": "parentSchools"
+                        },
+                        "combinator": 0,
+                        "id": "co0.1623370339476362"
+                      },
+                      {
+                        "condition": {
+                          "operator": 1,
+                          "first": "ps.parent_id",
+                          "second": "parentID"
+                        },
+                        "combinator": 0,
+                        "id": 308277863
+                      }
+                    ],
+                    "type": "filter",
+                    "id": "c-2748506710",
+                    "parentId": "c-3499928254"
+                  },
+                  {
+                    "properties": [
+                      {
+                        "property": "ps.parent_id",
+                        "id": "0.277761834481534"
+                      }
+                    ],
+                    "type": "select",
+                    "id": "c-3604144739",
+                    "parentId": "c-3499928254"
+                  }
+                ],
+                "id": "c-3499928254",
+                "parentId": "c-0.7522847871039253"
+              }
+            ]
+          },
+          "type": "var",
+          "id": "c-4231809856",
+          "parentId": "100"
+        },
+        {
+          "field": "schoolConnectedSitters",
+          "expression": {
+            "id": "c-0.7832746611476122",
+            "type": "parentheses",
+            "cards": [
+              {
+                "type": "from",
+                "group": "sit_log",
+                "iterator": "sl",
+                "joins": [],
+                "cards": [
+                  {
+                    "filters": [
+                      {
+                        "condition": {
+                          "operator": 6,
+                          "first": "sl.parent_id",
+                          "second": "schoolParents"
+                        },
+                        "combinator": 0,
+                        "id": "co0.33016158859331"
+                      }
+                    ],
+                    "type": "filter",
+                    "id": "c-2880599813",
+                    "parentId": "c-544116987"
+                  },
+                  {
+                    "properties": [
+                      {
+                        "property": "sl.sitter_id",
+                        "id": "0.14058833037704122"
+                      }
+                    ],
+                    "type": "select",
+                    "id": "c-4194380024",
+                    "parentId": "c-544116987"
+                  }
+                ],
+                "id": "c-544116987",
+                "parentId": "c-0.7832746611476122"
+              }
+            ]
+          },
+          "type": "var",
+          "id": "c-1369611972",
+          "parentId": "100"
+        },
+        {
+          "type": "from",
+          "group": "sitters",
+          "iterator": "s",
+          "joins": [],
+          "cards": [
+            {
+              "filters": [
+                {
+                  "condition": {
+                    "operator": 0,
+                    "first": {
+                      "id": "c-0.6155030329296964",
+                      "parentId": "c-830491112",
+                      "type": "parentheses",
+                      "cards": [
+                        {
+                          "cards": [
+                            {
+                              "type": "from",
+                              "group": "sitter_locations",
+                              "iterator": "sl",
+                              "joins": [],
+                              "cards": [
+                                {
+                                  "filters": [
+                                    {
+                                      "condition": {
+                                        "operator": 0,
+                                        "first": "si.sitter_id",
+                                        "second": "s.id"
+                                      },
+                                      "combinator": 0,
+                                      "id": "co0.39797760559636175"
+                                    },
+                                    {
+                                      "condition": {
+                                        "operator": 0,
+                                        "first": "sl.name",
+                                        "second": "City"
+                                      },
+                                      "combinator": 0,
+                                      "id": 2070718185
+                                    },
+                                    {
+                                      "condition": {
+                                        "operator": 0,
+                                        "first": "sl.state",
+                                        "second": "StateCode"
+                                      },
+                                      "combinator": 0,
+                                      "id": 900443525
+                                    }
+                                  ],
+                                  "type": "filter",
+                                  "id": "c-3705461339",
+                                  "parentId": "c-2032129247"
+                                }
+                              ],
+                              "id": "c-2032129247",
+                              "parentId": "c-4549328329"
+                            }
+                          ],
+                          "type": "exists",
+                          "id": "c-4549328329",
+                          "parentId": "c-0.6155030329296964"
+                        }
+                      ]
+                    },
+                    "second": "true"
+                  },
+                  "combinator": 0,
+                  "id": "co0.98180935007367"
+                }
+              ],
+              "type": "filter",
+              "id": "c-830491112",
+              "parentId": "100"
+            },
+            {
+              "filters": [
+                {
+                  "condition": {
+                    "operator": 0,
+                    "first": "s.is_disabled",
+                    "second": "false"
+                  },
+                  "combinator": 0,
+                  "id": "co0.7412054606029903"
+                },
+                {
+                  "condition": {
+                    "operator": 0,
+                    "first": "s.is_hidden",
+                    "second": "false"
+                  },
+                  "combinator": 0,
+                  "id": 1000164546
+                }
+              ],
+              "type": "filter",
+              "id": "c-3605309732",
+              "parentId": "100"
+            },
+            {
+              "filters": [
+                {
+                  "condition": {
+                    "operator": 0,
+                    "first": "hasTimeRange",
+                    "second": "true"
+                  },
+                  "combinator": 0,
+                  "id": "co0.08620411925492877"
+                }
+              ],
+              "cards": [
+                {
+                  "filters": [
+                    {
+                      "condition": {
+                        "operator": 0,
+                        "first": {
+                          "id": "c-0.5961136327924617",
+                          "parentId": "c-4794304985",
+                          "type": "parentheses",
+                          "cards": [
+                            {
+                              "cards": [
+                                {
+                                  "type": "from",
+                                  "group": "booking_availability",
+                                  "iterator": "ba",
+                                  "joins": [],
+                                  "cards": [
+                                    {
+                                      "filters": [
+                                        {
+                                          "condition": {
+                                            "operator": 0,
+                                            "first": "ba.sitter_id",
+                                            "second": "s.id"
+                                          },
+                                          "combinator": 0,
+                                          "id": "co0.4310760738511217"
+                                        },
+                                        {
+                                          "condition": {
+                                            "operator": 4,
+                                            "first": "ba.begin",
+                                            "second": "Begin"
+                                          },
+                                          "combinator": 0,
+                                          "id": 613852984
+                                        },
+                                        {
+                                          "condition": {
+                                            "operator": 2,
+                                            "first": "b.end",
+                                            "second": "End"
+                                          },
+                                          "combinator": 0,
+                                          "id": 4575892
+                                        }
+                                      ],
+                                      "type": "filter",
+                                      "id": "c-1661792184",
+                                      "parentId": "c-1419876877"
+                                    }
+                                  ],
+                                  "id": "c-1419876877",
+                                  "parentId": "c-2479076687"
+                                }
+                              ],
+                              "type": "exists",
+                              "id": "c-2479076687",
+                              "parentId": "c-0.5961136327924617"
+                            }
+                          ]
+                        },
+                        "second": "true"
+                      },
+                      "combinator": 0,
+                      "id": "co0.8222397220903845"
+                    }
+                  ],
+                  "type": "filter",
+                  "id": "c-4794304985",
+                  "parentId": "100"
+                },
+                {
+                  "filters": [
+                    {
+                      "condition": {
+                        "operator": 0,
+                        "first": {
+                          "id": "c-0.46232161729643373",
+                          "parentId": "c-2832341674",
+                          "type": "parentheses",
+                          "cards": [
+                            {
+                              "cards": [
+                                {
+                                  "type": "from",
+                                  "group": "bookings",
+                                  "iterator": "b",
+                                  "joins": [],
+                                  "cards": [
+                                    {
+                                      "filters": [
+                                        {
+                                          "condition": {
+                                            "operator": 0,
+                                            "first": "b.sitter_id",
+                                            "second": "s.id"
+                                          },
+                                          "combinator": 0,
+                                          "id": "co0.782533802553121"
+                                        },
+                                        {
+                                          "condition": {
+                                            "operator": 4,
+                                            "first": "b.begin",
+                                            "second": "End"
+                                          },
+                                          "combinator": 0,
+                                          "id": 2046190887
+                                        },
+                                        {
+                                          "condition": {
+                                            "operator": 2,
+                                            "first": "b.end",
+                                            "second": "Begin"
+                                          },
+                                          "combinator": 0,
+                                          "id": 925746602
+                                        }
+                                      ],
+                                      "type": "filter",
+                                      "id": "c-2164321055",
+                                      "parentId": "c-4317127725"
+                                    }
+                                  ],
+                                  "id": "c-4317127725",
+                                  "parentId": "c-77018652"
+                                }
+                              ],
+                              "type": "exists",
+                              "id": "c-77018652",
+                              "parentId": "c-0.46232161729643373"
+                            }
+                          ]
+                        },
+                        "second": "false"
+                      },
+                      "combinator": 0,
+                      "id": "co0.3900302154006492"
+                    }
+                  ],
+                  "type": "filter",
+                  "id": "c-2832341674",
+                  "parentId": "100"
+                }
+              ],
+              "elses": [],
+              "type": "if",
+              "id": "c-2714737697",
+              "parentId": "100"
+            },
+            {
+              "filters": [
+                {
+                  "condition": {
+                    "operator": 0,
+                    "first": "usingBookmarks",
+                    "second": "false"
+                  },
+                  "combinator": 1,
+                  "id": "co0.032574564103394765"
+                },
+                {
+                  "condition": {
+                    "operator": 0,
+                    "first": {
+                      "id": "c-0.48574275869067285",
+                      "parentId": "c-1337594361",
+                      "type": "parentheses",
+                      "cards": [
+                        {
+                          "cards": [
+                            {
+                              "type": "from",
+                              "group": "bookmarks",
+                              "iterator": "b",
+                              "joins": [],
+                              "cards": [
+                                {
+                                  "filters": [
+                                    {
+                                      "condition": {
+                                        "operator": 0,
+                                        "first": "b.parent_id",
+                                        "second": "ParentID"
+                                      },
+                                      "combinator": 0,
+                                      "id": "co0.5751323644171495"
+                                    },
+                                    {
+                                      "condition": {
+                                        "operator": 0,
+                                        "first": "b.type",
+                                        "second": "BookmarkType"
+                                      },
+                                      "combinator": 0,
+                                      "id": 283246026
+                                    }
+                                  ],
+                                  "type": "filter",
+                                  "id": "c-4650419067",
+                                  "parentId": "c-1506142102"
+                                }
+                              ],
+                              "id": "c-1506142102",
+                              "parentId": "c-419877891"
+                            }
+                          ],
+                          "type": "exists",
+                          "id": "c-419877891",
+                          "parentId": "c-0.48574275869067285"
+                        }
+                      ]
+                    },
+                    "second": "true"
+                  },
+                  "combinator": 0,
+                  "id": 794172069
+                }
+              ],
+              "type": "filter",
+              "id": "c-1337594361",
+              "parentId": "100"
+            },
+            {
+              "filters": [
+                {
+                  "condition": {
+                    "operator": 0,
+                    "first": "s.accepts_existing_parents_only",
+                    "second": "false"
+                  },
+                  "combinator": 1,
+                  "id": "co0.8614799016301395"
+                },
+                {
+                  "condition": {
+                    "operator": 0,
+                    "first": {
+                      "id": "c-0.32126031557788526",
+                      "parentId": "c-2118464533",
+                      "type": "parentheses",
+                      "cards": [
+                        {
+                          "cards": [
+                            {
+                              "type": "from",
+                              "group": "sit_log",
+                              "iterator": "sl",
+                              "joins": [],
+                              "cards": [
+                                {
+                                  "filters": [
+                                    {
+                                      "condition": {
+                                        "operator": 0,
+                                        "first": "sl.sitter_id",
+                                        "second": "s.id"
+                                      },
+                                      "combinator": 0,
+                                      "id": "co0.02750087442834892"
+                                    },
+                                    {
+                                      "condition": {
+                                        "operator": 0,
+                                        "first": "sl.parent_id",
+                                        "second": "ParentID"
+                                      },
+                                      "combinator": 0,
+                                      "id": 237843754
+                                    }
+                                  ],
+                                  "type": "filter",
+                                  "id": "c-1551712544",
+                                  "parentId": "c-777398195"
+                                }
+                              ],
+                              "id": "c-777398195",
+                              "parentId": "c-3807789090"
+                            }
+                          ],
+                          "type": "exists",
+                          "id": "c-3807789090",
+                          "parentId": "c-0.32126031557788526"
+                        }
+                      ]
+                    },
+                    "second": "true"
+                  },
+                  "combinator": 0,
+                  "id": 1546198426
+                }
+              ],
+              "type": "filter",
+              "id": "c-2118464533",
+              "parentId": "100"
+            },
+            {
+              "filters": [
+                {
+                  "condition": {
+                    "operator": 7,
+                    "first": "r.sitter_id",
+                    "second": "excludedSitters"
+                  },
+                  "combinator": 0,
+                  "id": "co0.3275180255781702"
+                }
+              ],
+              "type": "filter",
+              "id": "c-751453580",
+              "parentId": "100"
+            },
+            {
+              "field": "s.quality_points_total",
+              "expression": {
+                "id": "c-0.5140504150444072",
+                "type": "parentheses",
+                "cards": [
+                  {
+                    "weights": [
+                      {
+                        "key": "s.AcceptsCreditCards",
+                        "weight": 50
+                      },
+                      {
+                        "key": "s.BackgroundCheck",
+                        "weight": 50
+                      },
+                      {
+                        "key": "s.AcceptsCodeOfConduct",
+                        "weight": 10
+                      },
+                      {
+                        "key": "s.Promising",
+                        "weight": 25
+                      },
+                      {
+                        "key": "s.OneSitterFriendWithTenmoreCompletedSitterBookings",
+                        "weight": 10
+                      },
+                      {
+                        "key": "s.MoreThanFiveSitterFriends",
+                        "weight": 10
+                      },
+                      {
+                        "key": "s.RespondedToARequest",
+                        "weight": 20
+                      },
+                      {
+                        "key": "s.FirstReviewOfFourOrFiveStars",
+                        "weight": 10
+                      },
+                      {
+                        "key": "s.SecondReviewOfFourOrFiveStars",
+                        "weight": 15
+                      },
+                      {
+                        "key": "s.ThirdReviewOfFourOrFiveStars",
+                        "weight": 25
+                      },
+                      {
+                        "key": "s.FirstSitterEndorsement",
+                        "weight": 10
+                      },
+                      {
+                        "key": "s.SecondSitterEndorsement",
+                        "weight": 15
+                      },
+                      {
+                        "key": "s.ThirdSitterEndorsement",
+                        "weight": 25
+                      },
+                      {
+                        "key": "s.OneRepeatFamily",
+                        "weight": 10
+                      },
+                      {
+                        "key": "s.SecondRepeatFamily",
+                        "weight": 15
+                      },
+                      {
+                        "key": "s.ThirdRepeatFamily",
+                        "weight": 25
+                      },
+                      {
+                        "key": "s.ResponsePenaltyLevel1",
+                        "weight": -50
+                      },
+                      {
+                        "key": "s.ResponsePenaltyLevel2",
+                        "weight": -100
+                      },
+                      {
+                        "key": "s.NegativeReviewPenalty1",
+                        "weight": -25
+                      },
+                      {
+                        "key": "s.NegativeReviewPenalty2",
+                        "weight": -50
+                      },
+                      {
+                        "key": "s.NegativeReviewPenalty3",
+                        "weight": -75
+                      },
+                      {
+                        "key": "s.CalendarUpdate1",
+                        "weight": 100
+                      },
+                      {
+                        "key": "s.CalendarUpdate2",
+                        "weight": 50
+                      },
+                      {
+                        "key": "s.CalendarUpdate3",
+                        "weight": -50
+                      },
+                      {
+                        "key": "s.CalendarUpdate4",
+                        "weight": -100
+                      },
+                      {
+                        "key": "s.ProfileVideo",
+                        "weight": 50
+                      },
+                      {
+                        "key": "s.Package",
+                        "weight": 50
+                      },
+                      {
+                        "key": "s.ExtraPackage",
+                        "weight": 100
+                      }
+                    ],
+                    "method": "",
+                    "output": "",
+                    "type": "score",
+                    "id": "c-2226273979",
+                    "parentId": "c-0.5140504150444072"
+                  }
+                ]
+              },
+              "type": "let",
+              "id": "c-60721396",
+              "parentId": "100"
+            },
+            {
+              "field": "s.responsiveness_points_total",
+              "expression": {
+                "id": "c-0.9253735258860496",
+                "type": "parentheses",
+                "cards": [
+                  {
+                    "weights": [
+                      {
+                        "key": "s.RecentCompletedSitterBookings",
+                        "weight": 5
+                      },
+                      {
+                        "key": "s.RecentDeclinedJobSitterBookings",
+                        "weight": 0
+                      },
+                      {
+                        "key": "s.RecentDeclinedJobSitterBookingsWhenAvailable",
+                        "weight": -10
+                      },
+                      {
+                        "key": "s.RecentCanceledJobSitterBookings",
+                        "weight": 0
+                      },
+                      {
+                        "key": "s.RecentExpiredSitterBookings",
+                        "weight": -20
+                      }
+                    ],
+                    "method": "",
+                    "output": "",
+                    "type": "score",
+                    "id": "c-3118821087",
+                    "parentId": "c-0.9253735258860496"
+                  }
+                ]
+              },
+              "type": "let",
+              "id": "c-3276799597",
+              "parentId": "100"
+            },
+            {
+              "field": "s.new_parent_points_total",
+              "expression": {
+                "id": "c-0.8043655310904296",
+                "type": "parentheses",
+                "cards": [
+                  {
+                    "weights": [
+                      {
+                        "key": "s.CompletedFirstRequest",
+                        "weight": 25
+                      },
+                      {
+                        "key": "s.InterestedInJobs",
+                        "weight": 10
+                      }
+                    ],
+                    "method": "",
+                    "output": "",
+                    "type": "score",
+                    "id": "c-592100260",
+                    "parentId": "c-0.8043655310904296"
+                  }
+                ]
+              },
+              "type": "let",
+              "id": "c-65666618",
+              "parentId": "100"
+            },
+            {
+              "field": "s.last_minute_points_total",
+              "expression": {
+                "id": "c-0.6980437431316597",
+                "type": "parentheses",
+                "cards": [
+                  {
+                    "weights": [
+                      {
+                        "key": "s.RespondsInOneHourBadge",
+                        "weight": 80
+                      },
+                      {
+                        "key": "s.RespondsInFourHoursBadge",
+                        "weight": 60
+                      },
+                      {
+                        "key": "s.RespondsInEightHoursBadge",
+                        "weight": 40
+                      },
+                      {
+                        "key": "s.RespondsInTwentyfourHoursBadge",
+                        "weight": 20
+                      }
+                    ],
+                    "method": "",
+                    "output": "",
+                    "type": "score",
+                    "id": "c-3793899926",
+                    "parentId": "c-0.6980437431316597"
+                  }
+                ]
+              },
+              "type": "let",
+              "id": "c-4157076070",
+              "parentId": "100"
+            },
+            {
+              "field": "s.points",
+              "expression": {
+                "id": "c-0.7084397464158942",
+                "type": "parentheses",
+                "cards": [
+                  {
+                    "weights": [
+                      {
+                        "key": "s.quality_points_total",
+                        "weight": 100
+                      },
+                      {
+                        "key": "s.responsiveness_points_total",
+                        "weight": 100
+                      },
+                      {
+                        "key": "s.new_parent_points_total",
+                        "weight": 100
+                      },
+                      {
+                        "key": "s.last_minute_points_total",
+                        "weight": 100
+                      }
+                    ],
+                    "method": "",
+                    "output": "",
+                    "type": "score",
+                    "id": "c-2370471770",
+                    "parentId": "c-0.7084397464158942"
+                  }
+                ]
+              },
+              "type": "let",
+              "id": "c-4753580723",
+              "parentId": "100"
+            },
+            {
+              "filters": [
+                {
+                  "condition": {
+                    "operator": 3,
+                    "first": "s.quality_points_total",
+                    "second": "qualityThreshold"
+                  },
+                  "combinator": 0,
+                  "id": "co0.87030407091205"
+                },
+                {
+                  "condition": {
+                    "operator": 3,
+                    "first": "s.responsiveness_points_total",
+                    "second": "responsivenessThreshold"
+                  },
+                  "combinator": 0,
+                  "id": 1012747356
+                },
+                {
+                  "condition": {
+                    "operator": 3,
+                    "first": "s.last_minute_points_total",
+                    "second": "lastMinuteThreshold"
+                  },
+                  "combinator": 0,
+                  "id": 1543903912
+                }
+              ],
+              "cards": [
+                {
+                  "field": "s.tier",
+                  "expression": "1",
+                  "type": "let",
+                  "id": "c-2637137387",
+                  "parentId": "100"
+                }
+              ],
+              "elses": [
+                {
+                  "type": "if",
+                  "id": "e0.11198705846368129",
+                  "cards": [
+                    {
+                      "field": "s.tier",
+                      "expression": "0",
+                      "type": "let",
+                      "id": "c-2671809305",
+                      "parentId": "e0.11198705846368129"
+                    }
+                  ],
+                  "elses": [],
+                  "filters": []
+                }
+              ],
+              "type": "if",
+              "id": "c-2413478665",
+              "parentId": "100"
+            },
+            {
+              "filters": [
+                {
+                  "condition": {
+                    "operator": 6,
+                    "first": "s.id",
+                    "second": "self_connected_sitters"
+                  },
+                  "combinator": 0,
+                  "id": "co0.8168452888027522"
+                }
+              ],
+              "cards": [
+                {
+                  "field": "s.rank",
+                  "expression": "1",
+                  "type": "let",
+                  "id": "c-915146942",
+                  "parentId": "100"
+                }
+              ],
+              "elses": [
+                {
+                  "type": "if",
+                  "id": "e0.25864265318462154",
+                  "cards": [
+                    {
+                      "field": "s.rank",
+                      "expression": "2",
+                      "type": "let",
+                      "id": "c-3545978525",
+                      "parentId": "e0.25864265318462154"
+                    }
+                  ],
+                  "elses": [
+                    {
+                      "type": "if",
+                      "id": "e0.20080441255236403",
+                      "cards": [
+                        {
+                          "field": "s.rank",
+                          "expression": "3",
+                          "type": "let",
+                          "id": "c-1687852224",
+                          "parentId": "e0.20080441255236403"
+                        }
+                      ],
+                      "elses": [
+                        {
+                          "type": "if",
+                          "id": "e0.017144870539927304",
+                          "cards": [
+                            {
+                              "field": "s.rank",
+                              "expression": "4",
+                              "type": "let",
+                              "id": "c-3502054433",
+                              "parentId": "e0.017144870539927304"
+                            }
+                          ],
+                          "elses": [
+                            {
+                              "type": "if",
+                              "id": "e0.8031880246021963",
+                              "cards": [
+                                {
+                                  "field": "s.rank",
+                                  "expression": "5",
+                                  "type": "let",
+                                  "id": "c-2236765086",
+                                  "parentId": "e0.8031880246021963"
+                                }
+                              ],
+                              "elses": [
+                                {
+                                  "type": "if",
+                                  "id": "e0.4947156455061896",
+                                  "cards": [
+                                    {
+                                      "field": "s.rank",
+                                      "expression": "6",
+                                      "type": "let",
+                                      "id": "c-4051477128",
+                                      "parentId": "e0.4947156455061896"
+                                    }
+                                  ],
+                                  "elses": [],
+                                  "filters": []
+                                }
+                              ],
+                              "filters": [
+                                {
+                                  "condition": {
+                                    "operator": 6,
+                                    "first": "s.id",
+                                    "second": "affiliate_connected_sitters"
+                                  },
+                                  "combinator": 0,
+                                  "id": 310195793
+                                }
+                              ]
+                            }
+                          ],
+                          "filters": [
+                            {
+                              "condition": {
+                                "operator": 6,
+                                "first": "s.id",
+                                "second": "school_connected_sitters"
+                              },
+                              "combinator": 0,
+                              "id": 1463160863
+                            }
+                          ]
+                        }
+                      ],
+                      "filters": [
+                        {
+                          "condition": {
+                            "operator": 6,
+                            "first": "s.id",
+                            "second": "indirect_connected_sitters"
+                          },
+                          "combinator": 0,
+                          "id": 1867222570
+                        }
+                      ]
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "condition": {
+                        "operator": 6,
+                        "first": "s.id",
+                        "second": "direct_connected_sitters"
+                      },
+                      "combinator": 0,
+                      "id": 434038411
+                    }
+                  ]
+                }
+              ],
+              "type": "if",
+              "id": "c-4281938411",
+              "parentId": "100"
+            },
+            {
+              "sorts": [
+                {
+                  "property": "s.tier",
+                  "direction": 1,
+                  "id": "s0.34693348211637165"
+                },
+                {
+                  "property": "s.rank",
+                  "direction": 0,
+                  "id": "s2156469"
+                },
+                {
+                  "property": "s.points_total",
+                  "direction": 1,
+                  "id": "s10521912"
+                }
+              ],
+              "type": "sort",
+              "id": "c-3673413724",
+              "parentId": "100"
+            }
+          ],
+          "id": "c-4679654815",
+          "parentId": "100"
+        }
+      ],
+      "resultsPage": 1,
+      "resultsPages": 180,
+      "results": [
+        {
+          "parentId": "100",
+          "averageResponseTime": 27,
+          "name": "Monica Doan",
+          "avgRating": 3.09,
+          "score": 100,
+          "location": "San Francisco",
+          "minPrice": 17,
+          "id": "rrr0",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0000_0.jpg",
+          "numJobs": 12,
+          "description": "I graduated from Sonoma State in Spring 2013 with a degree in English Literature and I am currently attending Notre Dame de Nemur in Belmont pursuing my Multiple Subject Teaching Credential. This year I am student teaching during the week during school hours in addition to taking classes at NDNU at night. \nI’m planning on teaching elementary school in the 3rd to 5th grade range but I love working with kids of all ages. I spent the [removed] school year as a 5th grade aid at Baywood Elementary in San Mateo. In summer 2013 and 2015 I was the 3rd-5th grade Lead Art Instructor at the Camp Galileo in San Carlos and spent the two summers prior working for the camp as a Team Leader. In addition to babysitting, I am a Brand Ambassador for UrbanSitter as a member of the Peninsula community management team. \nI have been babysitting since I was 13 and I have babysat children as young as 6 weeks old and as old as middle school age. I also have 28 first cousins ranging from 35 to 14... So I am no stranger to babies! \nI grew up in Foster City and love spending my free time exploring the Bay Area and getting up to Tahoe as much as possible with family and friends. I’m passionate about working with kids and furthering their daily experiences and creativity discovery. I love to play hands on games with kids; puzzles, arts and crafts, going to the park, reading their favorite books, and I’m a master at hide and seek! \n\n"
+        },
+        {
+          "parentId": "100",
+          "averageResponseTime": 10,
+          "name": "Grace Miller",
+          "avgRating": 0.32,
+          "score": 96,
+          "location": "Palo Alto",
+          "minPrice": 23,
+          "id": "rrr1",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0001_1.jpg",
+          "numJobs": 44,
+          "description": "I am a senior at Menlo College where I am majoring in Marketing. I have been babysitting for family friends for many years and I absolutely love working with children and families. I am originally from Southern California, and have been a competitive dancer for most of my life. In high school I was on a dance team for four years, and was team captain for three years. I went to Panama to teach dance at an all girl orphanage and participated in putting on a showcase at the National Theater of Panama. I also taught dance to high school students & went through a background check through Pomona Unified School District. \n** I am CPR & First Aid Certified - Infant, Child & Adult through the American RedCross.\n*** I am also completely up to date on all of my vaccinations!!!\nMy Schedule seems to change every week, so if any families have questions on availability please just ask. \n**** I am extremely Pet Friendly!! \nI am excited to have the opportunity to work with children and their families. Thank you for your consideration :)\nNOTE: FOR FRIDAY & SATURDAY EVENING JOBS, I DO HAVE A FOUR (4) HOUR MINIMUM & FOR ALL OTHER DAYS/TIMES A THREE (3) HOUR MINIMUM. THANK YOU FOR YOUR UNDERSTANDING :)\nALSO: 1/2 MAX. PHONE INTERVIEWS ARE AT NO CHARGE. \nIN-PERSON INTERVIEWS ARE $25 FOR ONE HOUR OR FEEL FREE TO BOOK ME FOR MY MINIMUM 3-4 HOUR JOB AT APPROPRIATE RATES. \n\n"
+        },
+        {
+          "parentId": "100",
+          "averageResponseTime": 69,
+          "name": "Cheryl Burney",
+          "avgRating": 2.022,
+          "score": 92,
+          "location": "Colma",
+          "minPrice": 14,
+          "id": "rrr2",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0002_2.jpg",
+          "numJobs": 36,
+          "description": "Hi! I am a mother of five and have been working with children for 28 years. In addition to working in varius childcare situations over the years, I have succesfully raised my children to be upstanding citizens and contributers to society. Three of my children are adults and have grown into responsible, hard working human beings. As well as being high acheiving, scholar athletes they also believe in volunteerism and are pursuing a higher education. I am now looking to help you with yours!\nI am trustworthy, patient, kind, energetic, enthusiastic, motivated, reliable, fun and friendly. I feel that I have a great understanding of children, thier mental, as well as physical growth. I know that children also love and need very much, safety boundaries. I feel I am in touch with what a childs needs are at any given moment.\nI am very flexible! Nights, weekends, days I have no problem. I have an extreme amount of patience but yet a firm handle. I am tons of fun however believe in boudaries, and setting limits. I believe hands on approach to learning. I believe in a well balanced, healthy diet. In your home or mine! I am even willing to be on call and last minute to meet every need!!\nI also have a educational backround in early childcare and nutrition. I am First Aid/CPR Certified. \nI currently work for Events, Visiting Families, Weddings and have individual clients! I am also an infant specialist. I am currently working with a set of triplets, twins. I have alot of Multiples experience!\n"
+        },
+        {
+          "parentId": "100",
+          "averageResponseTime": 91,
+          "name": "Tina Sierra",
+          "avgRating": 1.3,
+          "score": 88,
+          "location": "Rohan",
+          "minPrice": 18,
+          "id": "rrr3",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0003_3.jpg",
+          "numJobs": 68,
+          "description": "Hi Everyone! :)\n\nI am a senior at Notre Dame de Namur University with a major in Kinesiology and minor in Psychology, and will be graduating in the spiring of 2016. As you already know, I am a part-time/occasional babysitter, as well as I am a birth Doula (DONA), and I volunteer with multiple organizations including the RedCross. I am also a Brand Ambassador for the UrbanSitter and I work closely with plenty other sitters and parents, too. \n\nI have been in childcare for about 7 years. I started off doing occasional date nights, at the age of 13, for family members and family friends. At 15, I worked as a volunteer teacher's assistant at a summer camp for children with learning disabilities. Once I began my college career in 2011, I became a teacher's assistant at a Montessori Pre-School and I was working as a Student Event Coordinator, as well. I later joined UrbanSitter in order to find part-time work.\n\nI believe that children are amazing little beings with the best personalities. They are all so different, which makes my job even better. There is never a dull moment at work because of all the different families I am able to work with. I enjoy what I do and I do my best to give families the help they really need. I always look forward to meeting new families, and hope to hear from you. Please feel free to book me if you feel I am the sitter for your child.\n"
+        },
+        {
+          "parentId": "100",
+          "averageResponseTime": 13,
+          "name": "Lizzie Wescott",
+          "avgRating": 4.26,
+          "score": 84,
+          "location": "Atlantis",
+          "minPrice": 22,
+          "id": "rrr4",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0004_4.jpg",
+          "numJobs": 53,
+          "description": "Hello there! I am a Junior in college majoring in Accounting. I am originally from Southern California and attend Menlo College in the Bay Area. I have 8 years experience taking care of children and babysit from infancy to age 15. I love to engage in children's interest and play what they want to play, especially dancing. I am on the Dance Team at Menlo and have been a dancer since I was five. If you are looking for any date night or weekend night positions, please feel free to contact me. Thanks for viewing at my profile! \n"
+        },
+        {
+          "parentId": "100",
+          "averageResponseTime": 72,
+          "name": "Bridget Cramer",
+          "avgRating": 3.29,
+          "score": 80,
+          "location": "An island somewhere",
+          "minPrice": 21,
+          "id": "rrr5",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0005_5.jpg",
+          "numJobs": 61,
+          "description": "Hi, I recently graduated from LSU with a major in History and a minor in Sociology. I have two younger sisters (currently aged 18 and 19) and have been babysitting them since I was 12 years old. I was always a helpful hand while my sisters were younger so I learned a lot about child care from my parents and my own nannies while I was growing up. I began as a mother's helper when I was about 10 with a family in my neighborhood with a boy and a girl between ages 2-4. I progressed with that family to full time babysitting and learned a lot through my experiences babysitting with them. Because I had two younger sisters, I spent a lot of time babysitting them when my parents went out and gained a lot of experience babysitting for their friends' families as well. \n\nThrough middle school and high school I babysat on the weekends and mainly looked after toddlers to school aged children. After I graduated High School, I was a nanny for a 3 year old and a 15 month old for part of the summer. After that, I was a nanny for 3 years for two pre-teen/teenagers while I attended Foothill Community College; I was also a nanny for a 1st grader for a year and half and occasionally watched after his little 3 year old sister when she was not in daycare. \n\nI love kids and am interested in teaching Kindergarten or First grade before I attend Law School or find my dream job. When babysitting or nannying, I usually bring the kids to the park and play with them there, take them on trips to museums or other fun outings, and do things at home like reading, arts and crafts, playing with toys and dolls, and building things like forts. For older children I have no problem driving them around to activities and picking them up from school and helping with homework.\n"
+        },
+        {
+          "parentId": "100",
+          "averageResponseTime": 111,
+          "name": "Faustina Green",
+          "avgRating": 3.19,
+          "score": 76,
+          "location": "Gondor",
+          "minPrice": 11,
+          "id": "rrr6",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0006_6.jpg",
+          "numJobs": 74,
+          "description": "I am 25 years old and a full time student at Foothill College, studying Communications. Couple more quarters left and I'll be ready to transfer to a local four year. \n\nI became a nanny because I love kids and it worked around my school schedule, school is definitely a priority. Currently I am working for a regular family. In the afternoons, I work with two sweet girls, ages 6 and 10. On a weekly basis, we usually go to the library, go to the park, we bake, go swimming, do art and other fun activities. I ,myself, love to travel, I am very outdoorsy so I love taking the girls out instead of being home all day.\n\nI am looking for more hours doing some occasional sitting. My calendar is usually up to date, but feel free to message me regarding the hours. Also if I'm not available, my mom (Ermelinda F https://[removed][removed]/profile/ermelinda-flores ) is on the site too, she raised me so obviously she's good :)\n\nI look forward to hearing from you.\n"
+        },
+        {
+          "parentId": "100",
+          "averageResponseTime": 55,
+          "name": "Mary Peek",
+          "avgRating": 2.18,
+          "score": 72,
+          "location": "Santa Cruz",
+          "minPrice": 21,
+          "id": "rrr7",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0007_7.jpg",
+          "numJobs": 44,
+          "description": "Hi,\n\nI have been a professional Nanny for the last 22 years. I have worked with all ages and have enjoyed every minute of it. I am married and have 2 children of my own age 9 and 13 both girls. \nI have worked as a one-on-one coach at an elementary school for 2 years helping children stay engaged and working with their peers.\nI currently work full time with a toddler. This is a new job for me and I look forward to working with this family for many years to come as I was with my last family for 10 years.I love being outside and in my spare time I do photography.\n\nI am looking forward to meeting you and Please do not hesitate to contact me with any questions you have.\n"
+        },
+        {
+          "parentId": "100",
+          "averageResponseTime": 34,
+          "name": "Lisa Walker",
+          "avgRating": 1.72,
+          "score": 68,
+          "location": "Colma",
+          "minPrice": 22,
+          "id": "rrr8",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0008_8.jpg",
+          "numJobs": 85,
+          "description": "Hello Moms, and Dads\nI am Dilek from Turkey and 26 years old.I am a dedicated, fun and flexible Peninsula and Bay Area based caregiver with great references from local parents! I am available (day and time). I enjoy caring for others and find this type of work rewarding and fun. I am also a very quick learner and currently available 24 hours a day. I have over 3 years experience working with infants, children, adolescents, adults and seniors. I hold a BA in (degree) , speak fluent Turkish. I have a cleared background check and a clean driving record. I am CPR/AED certified for infants, children and adults, TB negative, and immunized! I am very outgoing in my personal life; I enjoy jogging, biking, and hiking. I like to keep the children busy with arts and crafts, play time, walks, healthy snacking, and much more. \nCare-giving Skills:\n*Dressing and bathing\n*Preparing meals, bottle prep\n*Driving children\n*Laundry, including folding\n*Play time: Outdoor and indoor\n*Story time: Reading interactively\n*Tutoring and teaching\n*Pet care: Walking, feeding, appointments \n*Event planning: Play-dates and more\n*Grocery shopping and errands\n*Housekeeping: All around cleaning and tidying up\n*Administering medication/sick care\n*Mentoring and emotional support\n*Consult and advise family and household matters\nAnd much more!\n"
+        },
+        {
+          "parentId": "100",
+          "averageResponseTime": 85,
+          "name": "Marietta Barker",
+          "avgRating": 3.11,
+          "score": 64,
+          "location": "Palo Alto",
+          "minPrice": 12,
+          "id": "rrr9",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0009_9.jpg",
+          "numJobs": 31,
+          "description": "Hello! I'm currently a full time student at Menlo College and graduating in May, but look forward to staying in the area. I'm also on the cheer team and dance team at Menlo College. I have 3 years of paid experience watching children of all ages. I enjoy working with kids and keeping them entertained. I also enjoy playing board games. I'm very outgoing, responsible and communicate throughly. I look forward to being help to your family.\n"
+        },
+        {
+          "parentId": "100",
+          "averageResponseTime": 65,
+          "name": "Bonnie Underhill",
+          "avgRating": 3.73,
+          "score": 60,
+          "location": "The North Pole",
+          "minPrice": 14,
+          "id": "rrr11",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0011_11.jpg",
+          "numJobs": 6,
+          "description": "Hello, I'm a science student at the University of British Columbia on academic leave for the semester. I graduated from Los Altos High School. My experience with children is in babysitting for neighbors and family friends outside of the home and nannying two boys for the past year, I learned a great deal from caring for my sister growing up. I am an academic at heart, so I love to help with homework. My high school had an excellent culinary program and I had the opportunity to be trained in an industrial kitchen, so I'm happy to help with meal prep. I am a very cautious driver and a rather cautious person in general. I am a fan of both creativity and structure. I enjoy crafting, photography, cooking and baking. I am a fluent, native Spanish speaker. I'm also a huge fan of dogs.\n"
+        },
+        {
+          "parentId": "100",
+          "averageResponseTime": 29,
+          "name": "Charlotte Wakeman",
+          "avgRating": 1.95,
+          "score": 56,
+          "location": "Namek",
+          "minPrice": 14,
+          "id": "rrr12",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0012_12.jpg",
+          "numJobs": 28,
+          "description": "My speciality is in working with children ages 5 and up. I am currently working full-time and in school part-time, so I am only available for the occasional date night. I am not only a sitter - I also work at UrbanSitter HQ on the Support team.\n\nMy experience with children comes from the world of teaching and tutoring for children 5 years old and up. I spent one year as teacher helper for a room of approximately thirty dynamic 5th graders in a small public school, and was an assistant teacher in two separate 8th grade classrooms at a charter school in Oakland. I have experience working with youth with special needs including ADD/ADHD, mild/moderate autism, PTSD, separation anxiety and other behavioral disorders. \n\nActivities with your child could include taking them to the park or other places of interest; board games or watching movies; arts and crafts; and anything fun! I also have a background in tutoring English, reading, writing, and web development, and can offer lessons in any of those. I love working with kids to keep learning and watching them get inspired by what they work on.\n\nPlease reach out if you think we might be a good match!\n\n"
+        },
+        {
+          "parentId": "100",
+          "averageResponseTime": 56,
+          "name": "Betty Ruff",
+          "avgRating": 4.65,
+          "score": 52,
+          "location": "San Francisco",
+          "minPrice": 16,
+          "id": "rrr13",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0013_13.jpg",
+          "numJobs": 2,
+          "description": "I really like working with children; their attitude and energy make them a joy to be around. I'm responsible, compassionate and dependable. I’m 33 years old and originally from Brazil. \n\nI was an au pair in US for two years: one year in Chicago, where I took care of two girls (10 and 15 years old), and one year in San Francisco, where I took care of a 5 year old boy and a 3 year old girl. The au pair experience was wonderful for me because was an opportunity to work with kids and learn more about the american culture.\n\nI have 6 years of experience, babysitting in Brazil and in US. I have experience with babies to young teens. With me, your children will have fun; I like to take them for outdoor activities and play games, rather than just sitting in front of a tv.\n\nMy hobbies include yoga, reading and traveling. \n"
+        },
+        {
+          "parentId": "100",
+          "averageResponseTime": 69,
+          "name": "Danielle Morgan",
+          "avgRating": 4.22,
+          "score": 48,
+          "location": "Menlo Park",
+          "minPrice": 14,
+          "id": "rrr14",
+          "image": "http://lukeknepper.com/alfaromeo/sitters/sitters_0014_14.jpg",
+          "numJobs": 55
+        }
+      ],
+      "inputs": [
+        {
+          "key": "city",
+          "value": "Palo Alto",
+          "type": 0,
+          "id": "601",
+          "parentId": "100"
+        },
+        {
+          "key": "price",
+          "value": "22",
+          "type": 0,
+          "id": "610",
+          "parentId": "100"
+        },
+        {
+          "key": "attributes",
+          "value": "asthma, toddlers",
+          "type": 0,
+          "id": "701",
+          "parentId": "100"
+        },
+        {
+          "key": "startDateTime",
+          "value": "3/3/2016 18:00:00 PST",
+          "type": 1,
+          "id": "501",
+          "parentId": "100"
+        },
+        {
+          "key": "endDateTime",
+          "value": "3/3/2016 21:00:00 PST",
+          "type": 1,
+          "id": "502",
+          "parentId": "100"
+        }
+      ]
+    }
+  }
+}

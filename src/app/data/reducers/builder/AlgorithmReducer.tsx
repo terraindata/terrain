@@ -76,7 +76,9 @@ AlgorithmReducer[ActionTypes.algorithm.duplicate] =
     
     var parentId = "alg-" + Math.random();
     return state.setIn(["algorithms", parentId],
-      Immutable.fromJS(state.getIn(["algorithms", "" + action.payload.parentId]).toJS()))
+        Immutable.fromJS(state.getIn(["algorithms", "" + action.payload.parentId]).toJS())
+          .set('id', parentId)
+      )
       .setIn(["algorithms", parentId, 'algorithmName'], 'Copy of ' + state.getIn(["algorithms", "" + action.payload.parentId, 'algorithmName']))
       .updateIn(["algorithms", parentId, 'results'], results =>
         results.map(result =>

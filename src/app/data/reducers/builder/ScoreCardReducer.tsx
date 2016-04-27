@@ -51,10 +51,10 @@ var ScoreCardReducer = {};
 
 ScoreCardReducer[ActionTypes.cards.score.create] =
   Util.updateCardField('weights', (weights, action) => 
-    weights.splice(Util.spliceIndex(action.payload.index, weights), 0, {
+    weights.splice(Util.spliceIndex(action.payload.index, weights), 0, Immutable.fromJS({
       weight: 0,
       key: '',
-    }));
+    })));
               
 ScoreCardReducer[ActionTypes.cards.score.change] =
   Util.setCardFields(['method']);
