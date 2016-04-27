@@ -89,7 +89,7 @@ class Login extends React.Component<Props, any>
       Actions.authentication.login(token);
     };
     
-    if (DEV === true || true) {
+    if (DEV === true) {
       login("DEV mode free pass.");
       return
     }
