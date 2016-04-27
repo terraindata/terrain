@@ -54,7 +54,6 @@ interface Props {
   card: CardModels.ITransformCard;
   barsData: any;
   domain: any;
-  barColor: string;
   onDomainChange: (domain: number[]) => void;
 }
 
@@ -72,7 +71,8 @@ class TransformCardPeriscope extends React.Component<Props, any>
     }
   }
   
-  componentDidMount() {
+  componentDidMount()
+  {
     var el = ReactDOM.findDOMNode(this);
     Periscope.create(el, {
       width: '100%',
@@ -83,8 +83,7 @@ class TransformCardPeriscope extends React.Component<Props, any>
   componentWillReceiveProps(newProps)
   {
     if(newProps.domain !== this.props.domain
-      || newProps.barsData !== this.props.barsData
-      || newProps.barColor !== this.props.barColor)
+      || newProps.barsData !== this.props.barsData)
     {
       this.setState({
         chartState: false,
@@ -92,7 +91,8 @@ class TransformCardPeriscope extends React.Component<Props, any>
     }
   }
   
-  componentDidUpdate() {
+  componentDidUpdate()
+  {
     var el = ReactDOM.findDOMNode(this);
     if(!this.state.chartState || el.getBoundingClientRect().width !== this.state.width)
     {
@@ -104,14 +104,16 @@ class TransformCardPeriscope extends React.Component<Props, any>
     }
   }
   
-  handleDomainChange(handleIndex, value) {
+  handleDomainChange(handleIndex, value)
+  {
     var newDomain = [this.props.domain.x[0], this.props.domain.x[1]];
     newDomain[handleIndex] = value;
     
     this.props.onDomainChange(newDomain);
   }
   
-  getChartState() {
+  getChartState()
+  {
     if(this.state.chartState)
     {
       return this.state.chartState;
@@ -122,9 +124,6 @@ class TransformCardPeriscope extends React.Component<Props, any>
       maxRange: this.props.card.range,
       domain: this.props.domain,
       onDomainChange: this.handleDomainChange,
-      colors: {
-        bar: this.props.barColor,
-      },
     };
     
     this.setState({
@@ -133,12 +132,14 @@ class TransformCardPeriscope extends React.Component<Props, any>
     return chartState;
   }
   
-  componentWillUnmount() {
+  componentWillUnmount()
+  {
     var el = ReactDOM.findDOMNode(this);
     Periscope.destroy(el);
   }
 
-	render() {
+	render()
+  {
     return (
       <div></div>
 		);

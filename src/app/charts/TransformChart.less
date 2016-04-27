@@ -1,25 +1,39 @@
 @import "../util/Common.less";
 
+@line: #005d69;
+@bar: #0acee9;
+@lineFill: #01a8bf;
+@axis: #b1e0e6;
+@bg: #dbf7fb;
+@text: fade(@trans-black, 50%);
+
 .transform-chart {
   
+  .bg {
+    fill: @bg;
+  }
+  
   .tick text {
-    fill: @dark-green;
+    fill: @text;
   }
   
   .tick line {
-    stroke: @dark-green;
+    stroke: @axis;
     stroke-width: 1px;
   }
   
   .domain {
     fill: none;
-    stroke: @dark-green;
+    stroke: @text;
     stroke-width: 0px;
   }
   
   .point {
     cursor: pointer;
     transition: stroke-width 0.15s, stroke 0.15s;
+    fill: #fff;
+    stroke: @line;
+    stroke-width: 3px;
     
     &:hover,
     &[active="1"] {
@@ -32,7 +46,16 @@
     }
   }
   
+  .lines-bg {
+    fill: fade(@lineFill, 80%);
+    mix-blend-mode: multiply;
+  }
+  
   .lines {
+    stroke: @line;
+    stroke-width: 5px;
+    fill: none;
+    
     .transition(~"stroke 0.15s");
     
     &:hover {
@@ -42,6 +65,10 @@
     &.line-active {
       stroke: #fc5218;
     }
+  }
+  
+  .bar {
+    fill: @bar;
   }
   
   .spotlight,

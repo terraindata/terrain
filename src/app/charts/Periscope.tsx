@@ -89,7 +89,7 @@ var Periscope = {
   {
     state.numBars = 10;
     var scales = this._scales(el, state.maxRange, state.domain, state.barsData);
-    this._draw(el, scales, state.domain, state.barsData, state.onDomainChange, state.colors);
+    this._draw(el, scales, state.domain, state.barsData, state.onDomainChange);
   },
   
   destroy(el)
@@ -123,7 +123,7 @@ var Periscope = {
   },
   
   
-  _drawBars(el, scales, barsData, color)
+  _drawBars(el, scales, barsData)
   {
     var g = d3.select(el).selectAll('.bars');
     
@@ -146,7 +146,6 @@ var Periscope = {
       .attr('class', 'bar');
     
     bar
-      .attr('fill', color)
       .attr('x', (d) => scales.realX(d['range']['min']) + xPadding)
       .attr('width', barWidth)
       .attr('y', (d) => scales.realBarY(d['percentage']))
@@ -244,7 +243,7 @@ var Periscope = {
     handle.exit().remove();
   },
   
-  _draw(el, scales, domain, barsData, onDomainChange, colors)
+  _draw(el, scales, domain, barsData, onDomainChange)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -252,7 +251,7 @@ var Periscope = {
       
     this._drawBg(el, scales);
     this._drawAxes(el, scales);
-    this._drawBars(el, scales, barsData, colors.bar);
+    this._drawBars(el, scales, barsData);
     this._drawLine(el, scales, domain);
     this._drawHandles(el, scales, domain, onDomainChange);
   },

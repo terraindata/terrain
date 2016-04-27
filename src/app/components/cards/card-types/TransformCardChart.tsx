@@ -56,8 +56,6 @@ interface Props {
   pointsData: any;
   barsData: any;
   domain: any;
-  barColor: string;
-  lineColor: string;
   spotlights: any[];
   inputKey: string;
 }
@@ -80,8 +78,6 @@ class TransformCardChart extends React.Component<Props, any>
       domain: Util.deeperCloneObj(props.domain),
       pointsData: Util.deeperCloneArr(props.pointsData),
       barsData: Util.deeperCloneArr(props.barsData),
-      barColor: props.barColor,
-      lineColor: props.lineColor,
       spotlights: props.spotlights,
       inputKey: props.inputKey,
       selectedPointIds: [],
@@ -99,14 +95,11 @@ class TransformCardChart extends React.Component<Props, any>
   
   componentWillReceiveProps(newProps)
   {
-    console.log('a');
     var changed = false;
     var newDomain = this.state.domain;
     var newPointsData = this.state.pointsData;
     var newBarsData = this.state.barsData;
     var newWidth = this.state.width;
-    var newBarColor = this.state.barColor;
-    var newLineColor = this.state.lineColor;
     var newSpotlights = this.state.spotlights;
     var newInputKey = this.state.inputKey;
     
@@ -146,18 +139,6 @@ class TransformCardChart extends React.Component<Props, any>
       newInputKey = newProps.inputKey;
     }
     
-    if(this.state.barColor !== newProps.barColor)
-    {
-      changed = true;
-      newBarColor = newProps.barColor;
-    }
-    
-    if(this.state.lineColor !== newProps.lineColor)
-    {
-      changed = true;
-      newLineColor = newProps.lineColor;
-    }
-    
     if(changed)
     {
       this.setState({
@@ -165,8 +146,6 @@ class TransformCardChart extends React.Component<Props, any>
         pointsData: newPointsData,
         barsData: newBarsData,
         width: newWidth,
-        barColor: newBarColor,
-        lineColor: newLineColor,
         spotlights: newSpotlights,
         inputKey: newInputKey,
       });
@@ -177,8 +156,6 @@ class TransformCardChart extends React.Component<Props, any>
         pointsData: newPointsData,
         barsData: newBarsData,
         width: newWidth,
-        barColor: newBarColor,
-        lineColor: newLineColor,
         spotlights: newSpotlights,
         inputKey: newInputKey,
       }));
@@ -348,10 +325,6 @@ class TransformCardChart extends React.Component<Props, any>
       onMove: this.onPointMove,
       onLineClick: this.onLineClick,
       onLineMove: this.onLineMove,
-      colors: {
-        bar: overrideState.barColor || this.props.barColor,
-        line: overrideState.lineColor || this.props.lineColor,
-      },
       spotlights: overrideState.spotlights || this.props.spotlights,
       inputKey: overrideState.inputKey || this.props.inputKey,
       onSelect: this.onSelect,

@@ -1,21 +1,36 @@
 @import "../util/Common.less";
 
+@line: #005d69;
+@bar: #0acee9;
+@lineFill: #01a8bf;
+@axis: #b1e0e6;
+@bg: #dbf7fb;
+@text: fade(@trans-black, 50%);
+
 .periscope {
   
   @active: #fc5218;
+  
+  .bg {
+    fill: @bg;
+  }
     
   .tick text {
-    fill: @dark-green;
+    fill: @text;
   }
   
   .tick line {
-    stroke: @dark-green;
+    stroke: @text;
     stroke-width: 1px;
+  }
+  
+  .bar {
+    fill: @bar;
   }
   
   .domain {
     fill: none;
-    stroke: @dark-green;
+    stroke: @trans-black;
     stroke-width: 1px;
   }
   

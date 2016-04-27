@@ -48,7 +48,6 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
-import ColorManager from '../../../util/ColorManager.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import Dropdown from './../../common/Dropdown.tsx';
 import CardField from './../CardField.tsx';
@@ -118,8 +117,6 @@ class TransformCard extends BuilderClass<Props>
           />
         </CardField>
         <TransformCardChart
-          barColor={ColorManager.colorForKey(this.props.card.id, this.props.card.input)}
-          lineColor={ColorManager.darkerColorForKey(this.props.card.id, this.props.card.input)}
           pointsData={this.props.card.scorePoints}
           barsData={this.props.card.bars}
           domain={this.state.domain}
@@ -128,7 +125,6 @@ class TransformCard extends BuilderClass<Props>
           card={this.props.card} />
         <TransformCardPeriscope
           onDomainChange={this.handleDomainChange}
-          barColor={ColorManager.colorForKey(this.props.card.id, this.props.card.input)}
           barsData={this.props.card.bars}
           domain={this.state.domain}
           card={this.props.card} />

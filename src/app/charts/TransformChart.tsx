@@ -91,6 +91,9 @@ var TransformChart = {
       .attr('class', 'bars');
     innerSvg.append('g')
       .append('path')
+      .attr('class', 'lines-bg');
+    innerSvg.append('g')
+      .append('path')
       .attr('class', 'lines');
     
     innerSvg.append('g')
@@ -124,7 +127,7 @@ var TransformChart = {
     
     var barsData = state._cache.computedBarsData;
     var scales = this._scales(el, state.domain, barsData);
-    this._draw(el, scales, barsData, state.pointsData, state.onMove, state.colors,
+    this._draw(el, scales, barsData, state.pointsData, state.onMove,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
       state.onCreate, state.onDelete);
     
@@ -205,8 +208,7 @@ var TransformChart = {
       .attr('x', scaleMin(scales.x))
       .attr('width', scaleMax(scales.x) - scaleMin(scales.x))
       .attr('y', scaleMax(scales.pointY))
-      .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY))
-      .attr('fill', '#f0f8e8');
+      .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY));
   },
   
   _drawAxes(el, scales)
@@ -255,7 +257,7 @@ var TransformChart = {
   },
   
   
-  _drawBars(el, scales, barsData, color)
+  _drawBars(el, scales, barsData)
   {
     var g = d3.select(el).selectAll('.bars');
     
@@ -278,7 +280,6 @@ var TransformChart = {
       .attr('class', 'bar');
     
     bar
-      .attr('fill', color)
       .attr('x', (d) => scales.realX(d['range']['min']) + xPadding)
       .attr('width', barWidth)
       .attr('y', (d) => scales.realBarY(d['percentage']))
@@ -391,8 +392,6 @@ var TransformChart = {
         return getBarY(d);
       })
       .attr('fill', (d) => d['spotlight'])
-      // .attr('stroke', '#fff')
-      // .attr('stroke-width', (d) => d[inputKey] !== undefined ? SPOTLIGHT_PADDING + 'px' : '0px')
       .attr('r',  (d) => d[inputKey] !== undefined ? SPOTLIGHT_SIZE / 2 : 0)
       ;
     
@@ -552,12 +551,8 @@ var TransformChart = {
     del.on('mouseleave', offFn);
   },
   
-  _drawLines(el, scales, pointsData, color, onClick, onMove)
+  _getLinesData(pointsData, scales, isFill)
   {
-    var lineFunction = d3.svg.line()
-      .x((d) => scales.realX(d['x']))
-      .y((d) => scales.realPointY(d['y']));
-    
     var linesPointsData = _.clone(pointsData);
     if(linesPointsData.length)
     {
@@ -567,19 +562,44 @@ var TransformChart = {
         y: linesPointsData[0].y,
         id: '*%*-first',
       });
+      if(isFill)
+      {
+        linesPointsData.unshift({
+          x: scaleMin(scales.x) - range,
+          y: -1,
+          id: '*%*-first-anchor',
+        });
+      }
+      
       linesPointsData.push({
         x: scaleMax(scales.x) + range,
         y: linesPointsData[linesPointsData.length - 1].y,
         id: '*%*-last',
       });
+      if(isFill)
+      {
+        linesPointsData.push({
+          x: scaleMax(scales.x) + range,
+          y: -1,
+          id: '*%*-last-anchor',
+        });
+      }
     }
+    return linesPointsData;
+  },
+  
+  _drawLines(el, scales, pointsData, onClick, onMove)
+  {
+    var lineFunction = d3.svg.line()
+      .x((d) => scales.realX(d['x']))
+      .y((d) => scales.realPointY(d['y']));
     
     d3.select(el).select('.lines')
-      .attr("d", lineFunction(linesPointsData))
-      .attr("stroke", color)
-      .attr("stroke-width", "5px")
-      .attr("fill", "none")
+      .attr("d", lineFunction(this._getLinesData(pointsData, scales)))
       .on("mousedown", this._lineMousedownFactory(el, onClick, scales, onMove));
+    
+    d3.select(el).select('.lines-bg')
+      .attr("d", lineFunction(this._getLinesData(pointsData, scales, true)));
   },
   
   // needs to be "function" for d3.mouse(this)
@@ -678,7 +698,7 @@ var TransformChart = {
     return false;
   },
   
-  _drawPoints(el, scales, pointsData, onMove, color, onSelect, onDelete)
+  _drawPoints(el, scales, pointsData, onMove, onSelect, onDelete)
   {
     var g = d3.select(el).selectAll('.points');
     
@@ -691,11 +711,7 @@ var TransformChart = {
     point
       .attr('cx', (d) => scales.realX(d['x']))
       .attr('cy', (d) => scales.realPointY(d['y']))
-      .attr('fill', '#fff')
-      .attr('stroke', color)
-      .attr('stroke-width', '3px')
       .attr('class', (d) => 'point' + (d['selected'] ? ' point-selected' : ''))
-      // .attr('class', (d) => d['selected'] ? 'point-select' : '')
       .attr('r',  10);
     
     point
@@ -708,7 +724,7 @@ var TransformChart = {
     point.exit().remove();
   },
   
-  _draw(el, scales, barsData, pointsData, onMove, colors, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete)
+  _draw(el, scales, barsData, pointsData, onMove, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -716,10 +732,10 @@ var TransformChart = {
       
     this._drawBg(el, scales);
     this._drawAxes(el, scales);
-    this._drawBars(el, scales, barsData, colors.bar);
+    this._drawBars(el, scales, barsData);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
-    this._drawLines(el, scales, pointsData, colors.line, onLineClick, onLineMove);
-    this._drawPoints(el, scales, pointsData, onMove, colors.line, onSelect, onDelete);
+    this._drawLines(el, scales, pointsData, onLineClick, onLineMove);
+    this._drawPoints(el, scales, pointsData, onMove, onSelect, onDelete);
   },
   
   _scales(el, domain, barsData)
