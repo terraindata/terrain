@@ -1,6 +1,13 @@
 {
   "selectedCardIds": {},
   "algorithms": {
+    "1": {
+      "id": "1",
+      "algorithmName": "New Algorithm",
+      "cards": [],
+      "results": [],
+      "inputs": []  
+    },
     "10": {
       "id": "10",
       "algorithmName": "US Sitter Algorithm",

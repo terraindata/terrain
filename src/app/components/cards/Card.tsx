@@ -534,7 +534,9 @@ const cardSource =
     
     if(props.dndListener)
     {
+      setTimeout(() =>
        props.dndListener.trigger('dropped')
+      , 250);
     }
     
     if(!monitor.didDrop())

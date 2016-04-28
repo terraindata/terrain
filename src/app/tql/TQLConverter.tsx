@@ -63,25 +63,25 @@ class TQLConverter
   //  or functions that are passed in a reference to the card/obj and then return a parse string
   private static TQLF =
   {
-    from: "from '$group' as $iterator $cards  ",
-    select: "select $properties;",
+    from: "from '$group' as $iterator $cards",
+    select: "select $properties",
       properties: (p, index) => join(", ", index) + "$property",
-    sort: "sort $sorts;",
+    sort: "sort $sorts",
       sorts: (sort, index) => join(", ", index) + "$property " + (sort.direction ? 'desc' : 'asc'),
-    filter: "filter $filters;",
+    filter: "filter $filters",
       filters: (filter, index, isLast) =>
         TQLConverter._parse("$first ", filter.condition)
         + OperatorsTQL[filter.condition.operator] + " "
         + TQLConverter._parse("$second", filter.condition)
         + (isLast ? "" : " " + CombinatorsTQL[filter.combinator] + " "),
     
-    let: "let $field = $expression;",
-    var: "var $field = $expression;",
+    let: "let $field = $expression",
+    var: "var $field = $expression",
     score: (score) => "linearScore([$weights])",
-      weights: (weight, index) => join(", ", index) + "[$weight, $key]",
+      weights: (weight, index) => join(", ", index) + "\n[$weight, $key]",
     
     transform: "piecewiseLinearTransform([$scorePoints], $input)",
-      scorePoints: (sp, index) => join(", ", index) + "[$value, $score]",
+      scorePoints: (sp, index) => join(", ", index) + "\n[$value, $score]",
     
     if: (card) => "if $filters {$cards}"
       + (card.elses.length ? " else " + (

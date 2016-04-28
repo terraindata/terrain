@@ -113,11 +113,12 @@ var CardsArea = React.createClass<any, any>({
         />,
         key: card.id,
       }
-    )).concat({
+    ))
+    .concat({
       content: (
         <CreateCardTool
           index={props.cards.length}
-          open={props.topLevel || props.cards.length === 0}
+          open={props.cards.length === 0}
           parentId={props.parentId}
           className={props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
         />

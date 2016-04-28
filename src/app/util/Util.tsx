@@ -151,6 +151,11 @@ var Util = {
   
   previewForCard(card: CardModels.ICard): string
   {
+    if(!card)
+    {
+      return 'No cards';
+    }
+    
     switch(card.type)
     {
       case 'from':
@@ -170,6 +175,14 @@ var Util = {
         return card['input'];
       case 'if':
         return card['filters'].length + ' condition' + (card['filters'].length === 1 ? '' : 's');
+      case 'parentheses':
+      case 'min':
+      case 'max':
+      case 'avg':
+      case 'count':
+      case 'exists':
+      case 'sum':
+        return Util.previewForCard(card['cards'][0]);
     }
     return '';
   },

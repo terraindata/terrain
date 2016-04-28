@@ -88,29 +88,29 @@ class CreateCardTool extends React.Component<Props, any>
     Actions.cards.create(this.props.parentId, type, this.props.index);
   }
   
-  componentWillReceiveProps(newProps)
-  {
-    if(newProps.open)
-    {
-      setTimeout(() =>
-        Util.animateToAutoHeight(this.refs['ccWrapper']),
-      150);
-    }
-    else
-    {
-      setTimeout(() =>
-        Util.animateToHeight(this.refs['ccWrapper'], 0),
-      150);
-    }
-  }
+  // componentWillReceiveProps(newProps)
+  // {
+  //   if(newProps.open)
+  //   {
+  //     setTimeout(() =>
+  //       Util.animateToAutoHeight(this.refs['ccWrapper']),
+  //     150);
+  //   }
+  //   else
+  //   {
+  //     setTimeout(() =>
+  //       Util.animateToHeight(this.refs['ccWrapper'], 0),
+  //     150);
+  //   }
+  // }
   
-  componentDidMount()
-  {
-    if(this.props.open)
-    {
-      Util.animateToAutoHeight(this.refs['ccWrapper']);
-    }
-  }
+  // componentDidMount()
+  // {
+  //   if(this.props.open)
+  //   {
+  //     Util.animateToAutoHeight(this.refs['ccWrapper']);
+  //   }
+  // }
   
   renderCardSelector() {
     return (
@@ -140,10 +140,10 @@ class CreateCardTool extends React.Component<Props, any>
   }
   
   render() {
-    // if(!this.props.open)
-    // {
-    //   return null;
-    // }
+    if(!this.props.open)
+    {
+      return null;
+    }
     
     const { isOverCurrent, connectDropTarget } = this.props;
     var classes = Util.objToClassname({

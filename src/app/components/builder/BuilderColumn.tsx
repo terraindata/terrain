@@ -57,8 +57,8 @@ import TQLView from '../tql/TQLView.tsx';
 
 enum COLUMNS {
   Builder,
-  Results,
   TQL,
+  Results,
   Inputs,
 };
 var NUM_COLUMNS = 4;
