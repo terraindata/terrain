@@ -8,6 +8,7 @@
     "start-docker": "webpack-dev-server --config webpack.config.docker.js --inline --content-base src/app",
     "test": "karma start karma.conf.js",
     "deploy": "webpack && scp bundle.js u51505641@lukeknepper.com:alfaromeo/bundle.js",
+    "deploy-prod": "npm run build-prod && scp bundle.prod.js u51505641@lukeknepper.com:alfaromeo/bundle.js",
     "build-prod": "webpack --config webpack.config.prod.js --output-filename bundle.prod.js"
   },
   "repository": {

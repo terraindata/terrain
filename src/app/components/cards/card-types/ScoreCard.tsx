@@ -56,8 +56,6 @@ import { CardModels } from './../../../models/CardModels.tsx';
 import BuilderTextbox from "../../common/BuilderTextbox.tsx";
 import BuilderClass from './../../builder/BuilderClass.tsx';
 
-import { Weight, Weighter } from '../../../charts/Weighter.tsx';
-
 var BORDER_RADIUS = '5px';
 var SCORE_COLORS = 
 {

@@ -241,7 +241,7 @@ var Util = {
     var curHeight = el.height();
 
     el.css('overflow', 'hidden');
-    el.height(curHeight).animate({ height: height }, 150, () => {
+    el.height(curHeight).animate({ height: height }, 250, () => {
       onComplete && onComplete(); 
     }); 
   },
@@ -252,7 +252,7 @@ var Util = {
     var curHeight = el.height();
     var autoHeight = el.css('height', 'auto').height();
 
-    el.height(curHeight).animate({ height: autoHeight }, 150, function() {
+    el.height(curHeight).animate({ height: autoHeight }, 250, function() {
       el.css('height', 'auto'); 
       el.css('overflow', 'visible');
       onComplete && onComplete();
