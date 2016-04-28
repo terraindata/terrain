@@ -467,7 +467,10 @@ var Card = React.createClass({
             { !this.props.singleCard &&
               connectDragSource(
                 <div
-                  className='card-title'
+                  className={classNames({
+                    'card-title': true,
+                    'card-title-closed': !this.state.open,
+                  })}
                   style={this.state.titleStyle}
                   onClick={this.handleTitleClick}
                   >
