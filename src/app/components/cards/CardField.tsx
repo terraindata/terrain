@@ -152,8 +152,26 @@ var CardField = React.createClass({
     
 		rightContent = (
       <div>
-        { this.props.addable && <div className='card-field-add' onClick={this.addField}><AddIcon /></div> }
-			  { this.props.removable && <div className='card-field-remove' onClick={this.deleteField}><RemoveIcon /></div> }
+        { 
+          this.props.addable &&
+          <div
+            className='card-field-add'
+            onClick={this.addField}
+            data-tip='Add another'
+          >
+            <AddIcon />
+          </div> 
+        }
+			  { 
+          this.props.removable && 
+          <div
+            className='card-field-remove'
+            onClick={this.deleteField}
+            data-tip='Remove'
+          >
+            <RemoveIcon />
+          </div>
+        }
       </div>
 		);
     

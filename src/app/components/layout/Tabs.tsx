@@ -49,14 +49,14 @@ import Util from '../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
 import PanelMixin from "../layout/PanelMixin.tsx";
 import InfoArea from "./../common/InfoArea.tsx";
+// import * as classNames from 'classnames';
+var ReactTooltip = require("react-tooltip");
 
 var TabIcon = require("./../../../images/tab_corner_27x31.svg?name=TabIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 
 var Tab = React.createClass<any, any>({
   mixins: [PanelMixin],
-  
-  test: 'abc',
   
   propTypes:
   {
@@ -110,7 +110,11 @@ var Tab = React.createClass<any, any>({
     }
     
     return (
-      <div className='tabs-close' onClick={this.close}>
+      <div
+        className='tabs-close'
+        onClick={this.close}
+        data-tip='Close'
+      >
         <CloseIcon />
       </div>
     );
@@ -122,16 +126,21 @@ var Tab = React.createClass<any, any>({
         className={Util.objToClassname({
           'tabs-tab': true,
           'tabs-tab-selected': this.props.index === this.props.selectedIndex,
+          'tabs-tab-no-bg': this.props.tab.noBackground,
           })}
         key={this.props.index}
         style={this.zIndexStyleForIndex(this.props.index)}
         onClick={this.handleClick}>
-          <TabIcon className='tab-icon tab-icon-left' />
+          { this.props.tab.noBackground ? null :
+            <TabIcon className='tab-icon tab-icon-left' />
+          }
           <div className='tab-inner'>
             { this.props.tab.tabName }
             { this.renderClose() }
           </div>
-          <TabIcon className='tab-icon tab-icon-right' />
+          { this.props.tab.noBackground ? null :
+            <TabIcon className='tab-icon tab-icon-right' />
+          }
       </div>
     );
   },
@@ -275,8 +284,10 @@ var Tabs = React.createClass<any, any>({
             <a
               className={'tabs-action' + (action.noDivider ? ' tabs-action-no-divider' : '')}
               key={index}
-              onClick={action.onClick}>
-              {action.icon} {action.text}
+              onClick={action.onClick}
+              data-tip={action.text}
+            >
+              {action.icon}
             </a>)
         }
       </div>
@@ -286,10 +297,13 @@ var Tabs = React.createClass<any, any>({
 	render()
   {
     var selectedIndex = this.state.selectedIndex;
-		var content = this.state.tabOrder[selectedIndex].content;
-    if(this.state.selectingIndex !== null)
+    if(this.state.selectingIndex !== null || !this.state.tabOrder[selectedIndex])
     {
-      content = null;
+      var content = null;
+    }
+    else
+    {
+		  var content = this.state.tabOrder[selectedIndex].content;
     }
 
     var tabsLayout = 

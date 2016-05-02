@@ -62,7 +62,7 @@ class TQLView extends React.Component<Props, any>
   
   handleChange()
   {
-    alert("don't change that");
+    // alert("don't change that");
   }
   
   render() {

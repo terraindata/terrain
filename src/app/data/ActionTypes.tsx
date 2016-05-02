@@ -157,6 +157,8 @@ var ActionTypes =
     spotlight: '',
     pin: '',
     changePage: '',
+    query: '',
+    set: '',
   },
 
   algorithm:

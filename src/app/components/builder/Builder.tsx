@@ -64,7 +64,7 @@ import LayoutManager from "./../../components/layout/LayoutManager.tsx";
 import Card from "./../../components/cards/Card.tsx";
 import Result from "./../../components/results/Result.tsx";
 
-var NewIcon = require("./../../../images/icon_new_8x10.svg?name=NewIcon");
+var NewIcon = require("./../../../images/icon_new_21x17.svg?name=NewIcon");
 var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
 var DuplicateIcon = require("./../../../images/icon_duplicate_11x12.svg?name=DuplicateIcon");
 var SaveIcon = require("./../../../images/icon_save_10x10.svg?name=SaveIcon");
@@ -157,22 +157,17 @@ class Builder extends React.Component<any, any>
   {
     return [
       {
-        text: 'new',
-        icon: <NewIcon />,
-        onClick: this.createAlgorithm,
-      },
-      {
-        text: 'open',
-        icon: <OpenIcon />,
-        onClick: this.loadAlgorithm,
-      },
-      {
-        text: 'duplicate',
+        text: 'Duplicate',
         icon: <DuplicateIcon />,
         onClick: this.duplicateAlgorithm,
       },
       {
-        text: 'save',
+        text: 'Open',
+        icon: <OpenIcon />,
+        onClick: this.loadAlgorithm,
+      },
+      {
+        text: 'Save',
         icon: <SaveIcon />,
         onClick: this.save,
       },
@@ -264,7 +259,8 @@ class Builder extends React.Component<any, any>
 
     tabs[-1] = {
       content: null,
-      tabName: '+',
+      tabName: <NewIcon data-tip="New" />,
+      noBackground: true,
       pinnedAtEnd: true,
       onClick: this.createAlgorithm,
       selectNewTab: true,

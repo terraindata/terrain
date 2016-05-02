@@ -45,33 +45,59 @@ THE SOFTWARE.
 import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
+import Ajax from '../../util/Ajax.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/Actions.tsx";
 import Result from "../results/Result.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
 import InfoArea from '../common/InfoArea.tsx';
-import Paging from '../common/Paging.tsx';
+// import Paging from '../common/Paging.tsx';
+import TQLConverter from "../../tql/TQLConverter.tsx";
 
 var ResultsArea = React.createClass<any, any>({
 	propTypes:
 	{
-		results: React.PropTypes.array.isRequired,
-    resultsPage: React.PropTypes.number.isRequired,
-    resultsPages: React.PropTypes.number.isRequired,
-    parentId: React.PropTypes.string.isRequired,
+    algorithm: React.PropTypes.object.isRequired,
+    onLoadStart: React.PropTypes.func,
+    onLoadEnd: React.PropTypes.func,
 	},
   
   getInitialState()
   {
     return {
+      results: null,
+      resultText: null,
       expanded: false,
       expandedResult: {},
-      pageChanging: false,
-      nextPage: null,
-      page: this.props.resultsPage,
-      hoveringPage: null,
-      title: 'Results',
+      tql: "",
+      
+      // pageChanging: false,
+      // nextPage: null,
+      // page: this.props.resultsPage,
+      // hoveringPage: null,
+      
     };
+  },
+  
+  componentDidMount()
+  {
+    this.queryResults(this.props.algorithm);
+  },
+  
+  componentWillUnmount()
+  {
+    if(this.state.xhr)
+    {
+      this.state.xhr.abort();
+    }
+  },
+  
+  componentWillReceiveProps(nextProps)
+  {
+    if(!_.isEqual(nextProps.algorithm, this.props.algorithm))
+    {
+      this.queryResults(nextProps.algorithm);
+    }
   },
   
   handleCollapse()
@@ -111,80 +137,96 @@ var ResultsArea = React.createClass<any, any>({
     );
   },
   
-  changePage(page)
-  {
-    this.setState({
-      pageChanging: true,
-      page: page,
-    });
+  // changePage(page)
+  // {
+  //   this.setState({
+  //     pageChanging: true,
+  //     page: page,
+  //   });
     
-    Actions.results.changePage(this.props.parentId, page);
-  },
+  //   Actions.results.changePage(this.props.parentId, page);
+  // },
   
-  componentWillUpdate(newProps, newState)
-  {
-    if(newState.pageChanging && newProps.resultsPage === newState.page)
-    {
-      this.setState({
-        pageChanging: false,
-      });
-    }
-  },
+  // componentWillUpdate(newProps, newState)
+  // {
+  //   if(newState.pageChanging && newProps.resultsPage === newState.page)
+  //   {
+  //     this.setState({
+  //       pageChanging: false,
+  //     });
+  //   }
+  // },
   
-  handlePageHover(page)
-  {
-    this.setState({
-      hoverPage: page,
-    });
+  // handlePageHover(page)
+  // {
+  //   this.setState({
+  //     hoverPage: page,
+  //   });
     
-    return true;
-  },
+  //   return true;
+  // },
   
-  renderPaging()
-  {
-    return (
-      <Paging 
-        page={this.props.resultsPage}
-        pages={this.props.resultsPages}
-        onChange={this.changePage}
-        onHover={this.handlePageHover}
-        onHoverEnd={this.handlePageHover}
-        />
-    );
-  },
+  // renderPaging()
+  // {
+  //   return (
+  //     <Paging 
+  //       page={this.props.resultsPage}
+  //       pages={this.props.resultsPages}
+  //       onChange={this.changePage}
+  //       onHover={this.handlePageHover}
+  //       onHoverEnd={this.handlePageHover}
+  //       />
+  //   );
+  // },
   
-  moveResult(curIndex, newIndex)
-  {
-    if(this.state.hoverPage)
-    {
-      alert('Moved to page ' + this.state.hoverPage);
-      this.setState({
-        hoverPage: null,
-      });
-      return;
-    }
+  // moveResult(curIndex, newIndex)
+  // {
+  //   if(this.state.hoverPage)
+  //   {
+  //     alert('Moved to page ' + this.state.hoverPage);
+  //     this.setState({
+  //       hoverPage: null,
+  //     });
+  //     return;
+  //   }
     
-    Actions.results.move(this.props.results[curIndex], newIndex);
-  },
+  //   Actions.results.move(this.props.results[curIndex], newIndex);
+  // },
   
   renderResults()
   {
-    if(!this.props.results.length)
+    if(this.state.error)
+    {
+      return <InfoArea
+        large="There was an error with your query."
+      />
+    }
+    
+    if(!this.state.results)
+    {
+      return <InfoArea
+        large="No results queried yet."
+      />;
+    }
+    
+    if(this.state.resultType !== 'rel')
+    {
+      return (
+        <div className='result-text'>
+          {this.state.results}
+        </div>
+      );
+    }
+    
+    if(!this.state.results.length)
     {
       return <InfoArea
         large="There are no results for your query."
-        />;
-    }
-    
-    if(this.state.pageChanging)
-    {
-      return <InfoArea
-        large='Loading...'
-        />;
+      />;
     }
     
     var layout = {
-      cells: this.props.results.map((result, index) => {
+      cells: this.state.results.map((result, index) => {
         return {
           content: <Result data={result} parentId={this.props.parentId} onExpand={this.handleExpand} index={index} />,
           key: result.id,
@@ -195,7 +237,63 @@ var ResultsArea = React.createClass<any, any>({
       fullHeight: true,
     };
 
-    return <LayoutManager layout={layout} moveTo={this.moveResult} />;
+    return <LayoutManager layout={layout} />; //moveTo={this.moveResult}
+  },
+  
+  handleResultsChange(response)
+  {
+    var result;
+    try {
+      var result = JSON.parse(response).result;
+    } catch(e) {
+      this.setState({
+        error: true,
+        xhr: null,
+        // TODO add error
+      });
+      return; 
+    }
+    
+    this.props.onLoadEnd && this.props.onLoadEnd();
+    if(result)
+    {
+      this.setState({
+        results: result.value,
+        resultType: result.type,
+        querying: false,
+        error: false,
+        xhr: null,
+      });
+    }
+    else
+    {
+      this.setState({
+        error: true,
+        xhr: null,
+        // TODO add error
+      });
+    }
+  },
+  
+  handleError(ev)
+  {
+    this.setState({
+      error: true,
+    })
+  },
+  
+  queryResults(algorithm)
+  {
+    var tql = TQLConverter.toTQL(algorithm.cards);
+    if(tql !== this.state.tql)
+    {
+      this.setState({
+        querying: true,
+        xhr: Ajax.query(tql, this.handleResultsChange, this.handleError),
+        tql
+      });
+      this.props.onLoadStart && this.props.onLoadStart();
+    }
   },
 
 	render()

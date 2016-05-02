@@ -183,6 +183,9 @@ var Util = {
       case 'exists':
       case 'sum':
         return Util.previewForCard(card['cards'][0]);
+      case 'skip':
+      case 'take':
+        return card['value'];
     }
     return '';
   },

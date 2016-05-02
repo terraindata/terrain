@@ -126,9 +126,7 @@
         }
         
         .result-field-value {
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          
           
           &.result-field-value-short {
             float: right;
@@ -153,6 +151,15 @@
       }
     }
 	}
+  
+  &:not(.result-expanded) {
+    .result-field-value {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+  }
   
   .result-spotlight {
     display: inline-block;

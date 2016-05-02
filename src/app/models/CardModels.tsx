@@ -214,7 +214,13 @@ export module CardModels
     elses: IIfCard[];
   }
   
+  export interface IValueCard extends ICard
+  {
+    value: string;  
+  }
   
+  export interface ITakeCard extends IValueCard {}
+  export interface ISkipCard extends IValueCard {}
   
   export enum InputType
   {

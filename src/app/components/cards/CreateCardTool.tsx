@@ -66,6 +66,16 @@ interface Props {
   connectDropTarget?: (Element) => JSX.Element;
 }
 
+var styles: any = {};
+CardTypes.map(type => 
+  styles[type] =
+  {
+    background: CardColors[type] ? CardColors[type][0] : CardColors['none'][0],
+    borderColor: CardColors[type] ? CardColors[type][1] : CardColors['none'][1],
+  }
+);
+console.log(styles);
+
 class CreateCardTool extends React.Component<Props, any>
 {
   constructor(props:Props)
@@ -123,10 +133,7 @@ class CreateCardTool extends React.Component<Props, any>
                key={type}
                rel={type}
                onClick={this.createCard}
-               style={{
-                 background: CardColors[type][0],
-                 borderColor: CardColors[type][1],
-               }}
+               style={styles[type]}
              >
                <div className="create-card-button-inner" rel={type}>
                  { type === 'parentheses' ? '( )' : type }

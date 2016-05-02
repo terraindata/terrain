@@ -62,6 +62,7 @@ import LetVarCard from './card-types/LetVarCard.tsx';
 import ScoreCard from './card-types/ScoreCard.tsx';
 import TransformCard from './card-types/TransformCard.tsx';
 import WrapperCard from './card-types/WrapperCard.tsx';
+import ValueCard from './card-types/ValueCard.tsx';
 import IfCard from './card-types/IfCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
 import Menu from '../common/Menu.tsx';
@@ -420,6 +421,12 @@ var Card = React.createClass({
     case 'exists':
     case 'parentheses':
       CardComponent = WrapperCard;
+      var isWrapperCard = true;
+      break;
+    case 'take':
+    case 'skip':
+      CardComponent = ValueCard;
+      break;
 		}
     
     var content = <div>This card has not been implemented yet.</div>;
@@ -445,6 +452,7 @@ var Card = React.createClass({
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
           'card-drop-target': true,
+          'wrapper-card': isWrapperCard,
         })}
         rel={'card-' + this.props.card.id}
       >

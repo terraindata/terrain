@@ -4,7 +4,7 @@
     "1": {
       "id": "1",
       "algorithmName": "New Algorithm",
-      "cards": [],
+      "cards": [{"type":"from","group":"usprofile_babysitter","iterator":"b","joins":[],"cards":[{"filters":[{"condition":{"first":"b.current_school","second":"null","operator":1},"combinator":0,"id":95748954},{"condition":{"first":"b.promising","second":"true","operator":0},"combinator":0,"id":1484980504}],"type":"filter","id":"c-4306580683","parentId":"c-4026940950"},{"value":"17","type":"take","id":"c-2451816596","parentId":"c-4026940950"},{"properties":[{"property":"b._rid","id":"0.7104692216488695"},{"property":"b.current_school","id":"p19774651"},{"property":"b.xp_infants","id":"p16728995"},{"property":"b.xp_toddlers","id":"p19878117"}],"type":"select","id":"c-1476898853","parentId":"c-4026940950"}],"id":"c-4026940950","parentId":"1"}],
       "results": [],
       "inputs": []  
     },

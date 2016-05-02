@@ -48,6 +48,7 @@ THE SOFTWARE.
 require("./GeneralStyle.less");
 
 // Libraries
+import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
 import * as Perf from 'react-addons-perf';
@@ -61,6 +62,7 @@ import Sidebar from "./components/layout/Sidebar.tsx";
 import AccountDropdown from "./components/common/AccountDropdown.tsx";
 import Login from "./components/common/Login.tsx";
 import InfoArea from "./components/common/InfoArea.tsx";
+var ReactTooltip = require("./components/common/tooltip/react-tooltip.js");
 
 // Icons
 var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
@@ -196,6 +198,13 @@ var App = React.createClass({
         <div className='app-wrapper'>
           { this.renderApp() }
         </div>
+        
+        <ReactTooltip
+          place="bottom"
+          effect="solid"
+          class="tooltip"
+          hideOnClick={true}
+        />
       </div>
     );
   }

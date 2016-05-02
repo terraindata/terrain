@@ -165,6 +165,13 @@ CardsReducer[ActionTypes.cards.create] =
             cards: [],
           };
           break;
+       case 'take':
+       case 'skip':
+         newCard =
+         {
+           value: "",
+         }
+         break;
       }
       
       newCard['type'] = action.payload.type;

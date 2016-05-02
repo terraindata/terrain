@@ -42,35 +42,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Immutable = require('immutable');
-import ActionTypes from './../../ActionTypes.tsx';
-import Util from './../../../util/Util.tsx';
+import * as React from 'react';
+import Actions from "../../../data/Actions.tsx";
+import Util from '../../../util/Util.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
+import BuilderTextbox from "../../common/BuilderTextbox.tsx";
+import BuilderClass from './../../builder/BuilderClass.tsx';
 
-var SelectCardReducer = {};
+interface Props {
+  card: CardModels.IValueCard;
+}
 
-SelectCardReducer[ActionTypes.cards.select.create] =
-  Util.updateCardField('properties', (properties, action) => 
-    properties.splice(
-      Util.spliceIndex(action.payload.index, properties),
-      0,
-      
-      Immutable.fromJS({
-        property: "",
-        id: "p" + Util.randInt(23496243),
-      })));
-    
-SelectCardReducer[ActionTypes.cards.select.change] =
-  Util.updateCardField('properties', (properties, action) => 
-    properties.set(action.payload.index, Immutable.fromJS(action.payload.value)));
+var placeholders =
+{
+  take: 'Number of results to take',
+  skip: 'Number of results to skip',
+}
 
-SelectCardReducer[ActionTypes.cards.select.move] =
-  Util.updateCardField('properties', (properties, action) =>
-    Util.immutableMove(properties, action.payload.property.id, action.payload.index));
-    
-SelectCardReducer[ActionTypes.cards.select.remove] =
-    Util.updateCardField('properties', (properties, action) =>
-      properties.remove(action.payload.index));
+class ValueCard extends BuilderClass<Props>
+{
+  render()
+  {
+    return <BuilderTextbox
+      id={this.props.card.id}
+      value={this.props.card.value}
+      keyPath={this._keyPath('value')}
+      placeholder={placeholders[this.props.card.type]}
+    />
+  }
+};
 
-
-export default SelectCardReducer;
+export default ValueCard;

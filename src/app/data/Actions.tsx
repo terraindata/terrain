@@ -245,6 +245,14 @@ var Actions =
     changePage:
       (parentId: string, page: number) =>
         $(ActionTypes.results.changePage, {parentId, page}),
+    
+    query:
+      (algorithmId: string) =>
+        $(ActionTypes.results.query, {algorithmId}),
+    
+    set:
+      (algorithmId: string, results: any) =>
+        $(ActionTypes.results.query, {algorithmId, results}),
   },
 
   algorithm:

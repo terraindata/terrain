@@ -63,7 +63,7 @@ class TQLConverter
   //  or functions that are passed in a reference to the card/obj and then return a parse string
   private static TQLF =
   {
-    from: "from '$group' as $iterator $cards",
+    from: "from '$group' as $iterator $cards;",
     select: "select $properties",
       properties: (p, index) => join(", ", index) + "$property",
     sort: "sort $sorts",
@@ -97,6 +97,8 @@ class TQLConverter
     count: "count ($cards)",
     sum: "sum ($cards)",
     exists: "exists ($cards)",
+    take: "take $value",
+    skip: "skip $value",
   }
   
   private static _cards(cards: CardModels.ICard[]): string

@@ -42,35 +42,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Immutable = require('immutable');
-import ActionTypes from './../../ActionTypes.tsx';
-import Util from './../../../util/Util.tsx';
-import { CardModels } from './../../../models/CardModels.tsx';
+import * as $ from 'jquery';
+var _ = require('underscore');
 
-var SelectCardReducer = {};
+import Store from './../data/Store.tsx';
 
-SelectCardReducer[ActionTypes.cards.select.create] =
-  Util.updateCardField('properties', (properties, action) => 
-    properties.splice(
-      Util.spliceIndex(action.payload.index, properties),
-      0,
-      
-      Immutable.fromJS({
-        property: "",
-        id: "p" + Util.randInt(23496243),
-      })));
+var Ajax = {
+	query(tql: string, onLoad: (response: any) => void, onError?: (ev:Event) => void)
+  {
+    let xhr = new XMLHttpRequest();
+    xhr.onerror = onError;
+    xhr.onload = (ev:Event) => {
+      if (xhr.status != 200) {
+        alert("Query failed: " + JSON.stringify(xhr.responseText));
+        return;
+      }
+      onLoad(xhr.responseText);
+    }
     
-SelectCardReducer[ActionTypes.cards.select.change] =
-  Util.updateCardField('properties', (properties, action) => 
-    properties.set(action.payload.index, Immutable.fromJS(action.payload.value)));
+    // NOTE: $SERVER_URL will be replaced by the build process.
+    xhr.open("POST", SERVER_URL + "/query", true);
+    xhr.setRequestHeader('token', Store.getState().get('authenticationToken'));
+    xhr.send(tql);
+    return xhr;
+  }
+};
 
-SelectCardReducer[ActionTypes.cards.select.move] =
-  Util.updateCardField('properties', (properties, action) =>
-    Util.immutableMove(properties, action.payload.property.id, action.payload.index));
-    
-SelectCardReducer[ActionTypes.cards.select.remove] =
-    Util.updateCardField('properties', (properties, action) =>
-      properties.remove(action.payload.index));
-
-
-export default SelectCardReducer;
+export default Ajax;

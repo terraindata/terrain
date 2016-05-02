@@ -152,7 +152,7 @@ class BuilderTextbox extends React.Component<Props, any>
       <a
         className='builder-tb-switch'
         onClick={this.handleSwitch}
-        title={this.isText() ? 'Convert to cards' : 'Convert to text'}
+        data-tip={this.isText() ? 'Convert to cards' : 'Convert to text'}
       >
         {
           this.isText() ? <AddCardIcon /> : <TextIcon />

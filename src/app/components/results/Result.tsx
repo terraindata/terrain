@@ -56,18 +56,12 @@ import ColorManager from '../../util/ColorManager.tsx';
 var PinIcon = require("./../../../images/icon_pin_21x21.svg?name=PinIcon");
 var ScoreIcon = require("./../../../images/icon_terrain_27x16.svg?name=ScoreIcon");
 
-var fields = 
-[
-  'image',
-  'minPrice',
-  'numJobs',
-  'avgRating',
-  'cities',
-  'attributes',
-  'location',
-  'description',
-  'avgResponseTime',
-];
+// var fields = 
+// [
+//   'current_school',
+//   'cats_ok',
+//   'xp_toddlers',
+// ];
 
 var dragPreviewStyle = {
   backgroundColor: '#cfd7c8',
@@ -121,13 +115,13 @@ var Result = React.createClass<any, any>({
 		};
 	},
   
-  renderField(field, index)
+  renderExpandedField(value, field)
   {
-    if(index > 3 && !this.props.expanded)
-    {
-      return null;
-    }
-    
+    return this.renderField(field);
+  },
+  
+  renderField(field)
+  {
     if(field === 'image')
     {
       return (
@@ -147,6 +141,16 @@ var Result = React.createClass<any, any>({
       return null;
     }
     
+    var value = this.props.data[field];
+    if(typeof value === 'boolean')
+    {
+      value = value ? 'true' : 'false';
+    }
+    // if(typeof value === 'string')
+    // {
+    //   value = value.replace(/\\n/g, '<br />');
+    // }
+    
     return (
       <div className="result-field" key={field}>
         <div className="result-field-name">
@@ -154,8 +158,8 @@ var Result = React.createClass<any, any>({
         </div>
         <div
           className={'result-field-value ' + ((field + this.props.data[field]).length < 15 ? 'result-field-value-short' : '')}
-          >
-          { this.props.data[field] }
+        >
+          {value}
         </div>
       </div>
     );
@@ -242,36 +246,40 @@ var Result = React.createClass<any, any>({
       'result-dragging': isDragging,
       'result-drag-over': isOver,
     });
-    
-		return connectDropTarget(connectDragSource(
-			<div className={classes} onDoubleClick={this.expand}>
-				<div className='result-inner'>
+					// <div className='result-score'>
+     //        <ScoreIcon className='result-score-icon' />
+     //        Final Score
+     //        <div className='result-score-score'>
+     //          { this.props.data.score }
+     //        </div>
+					// </div>
+    return connectDropTarget(connectDragSource(
+      <div className={classes} onDoubleClick={this.expand}>
+        <div className='result-inner'>
           <div className='result-name'>
             <div className='result-name-inner'>
               {this.renderSpotlight()}
               <div className='result-pin-icon'>
                 <PinIcon />
               </div>
-              {this.props.data.name}
+              { this.props.data[_.first(_.keys(this.props.data))] }
             </div>
           </div>
           <Menu options={this.getMenuOptions()} />
-					<div className='result-score'>
-            <ScoreIcon className='result-score-icon' />
-            Final Score
-            <div className='result-score-score'>
-              { this.props.data.score }
-            </div>
-					</div>
           <div className='result-fields-wrapper'>
-            { fields.map(this.renderField) }
+            {
+              _.map(this.props.data, this.renderExpandedField)
+            }
           </div>
-				</div>
+        </div>
         <div className='result-dragging' ref='drag-handle'>
           { this.props.data.name }
         </div>
-			</div>
-		));
+      </div>
+    ));
+              // this.props.expanded
+              //   ? _.map(this.props.result, this.renderField)
+              //   : fields.map(this.renderField)
 	},
 });
 

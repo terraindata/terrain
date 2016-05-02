@@ -57,8 +57,8 @@ import TQLView from '../tql/TQLView.tsx';
 
 enum COLUMNS {
   Builder,
-  TQL,
   Results,
+  TQL,
   Inputs,
 };
 var NUM_COLUMNS = 4;
@@ -90,12 +90,27 @@ var BuilderColumn = React.createClass<any, any>(
   {
     return {
       column: this.props.index,
+      loading: false,
     }
   },
   
   getDefaultProps()
   {
     return {};
+  },
+  
+  handleLoadStart()
+  {
+    this.setState({
+      loading: true,
+    })
+  },
+  
+  handleLoadEnd()
+  {
+    this.setState({
+      loading: false,
+    });
   },
   
   renderContent()
@@ -120,16 +135,24 @@ var BuilderColumn = React.createClass<any, any>(
           parentId={parentId} 
           spotlights={spotlights} 
           topLevel={true}
-          />;
+        />;
         
       case COLUMNS.Inputs:
-        return <InputsArea inputs={algorithm.inputs} parentId={parentId} />;
+        return <InputsArea
+          inputs={algorithm.inputs}
+          parentId={parentId}
+        />;
       
       case COLUMNS.Results:
-        return <ResultsArea results={algorithm.results} parentId={parentId} resultsPage={algorithm.resultsPage} resultsPages={algorithm.resultsPages} />;
+        return <ResultsArea 
+          algorithm={algorithm}
+          onLoadstart={this.handleLoadStart}
+        />;
       
       case COLUMNS.TQL:
-        return <TQLView algorithm={algorithm} />;
+        return <TQLView
+          algorithm={algorithm}
+        />;
         
     }
     return <div>No column content.</div>;
@@ -168,6 +191,7 @@ var BuilderColumn = React.createClass<any, any>(
           }
           <div className='builder-title-bar-title'>
             { COLUMNS[this.state.column] }
+            { this.state.loading ? 'Loading...' : '' }
           </div>
           <div className='builder-title-bar-options'>
             <Menu options={this.getMenuOptions()} />
