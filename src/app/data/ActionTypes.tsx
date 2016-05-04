@@ -55,7 +55,7 @@ Terminology:
 
 */
 
-// These are  commonly used type words. Defining them as variables here
+// These are  commonly used type words. Defining them as keys here
 //  allows us to use ES6 short-hand in our ActionTypes object.
 var move = '';
 var create = '';

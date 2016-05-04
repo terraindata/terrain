@@ -1,0 +1,50 @@
+@import "../../util/Common.less";
+
+@padding: 6px;
+
+.autocomplete {
+  position: relative;
+  
+  .ac-options {
+    text-align: left;
+    position: absolute;
+    z-index: 99999999;
+    top: 100%;
+    min-width: 100%;
+    background: #fff;
+    border-radius: 5px;
+    
+    .ac-option {
+      padding: @padding;
+      border-top: 1px solid #eee;
+      max-height: 300px;
+      overflow-y: auto;
+      &:first-child {
+        border-top: 0px;
+      }
+      
+      &.ac-option-selected {
+        background: #e8ebff;
+      }
+      
+      &:hover {
+        background: #f5f7ff;
+      }
+      
+      &:first-child {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+      }
+      
+      &:last-child {
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+      }
+    }
+    
+    .ac-no-options {
+      padding: @padding;
+      
+    }
+  }
+}

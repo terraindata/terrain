@@ -63,6 +63,7 @@ import Tabs from "./../../components/layout/Tabs.tsx";
 import LayoutManager from "./../../components/layout/LayoutManager.tsx";
 import Card from "./../../components/cards/Card.tsx";
 import Result from "./../../components/results/Result.tsx";
+import Ajax from "./../../util/Ajax.tsx";
 
 var NewIcon = require("./../../../images/icon_new_21x17.svg?name=NewIcon");
 var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");

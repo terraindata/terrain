@@ -54,6 +54,7 @@ import CardsArea from './../CardsArea.tsx';
 import { Operators } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 import BuilderClass from './../../builder/BuilderClass.tsx';
+import Ajax from './../../../util/Ajax.tsx';
 
 var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIcon");
 
@@ -61,6 +62,7 @@ interface Props {
   card: CardModels.IFromCard;
   index: number;
   spotlights: any;
+  keys: string[];
 }
 
 var OPERATOR_WIDTH: number = 30;
@@ -68,7 +70,48 @@ var CARD_PADDING: number = 12;
 
 class FromCard extends BuilderClass<Props>
 {
-	render() {
+  constructor(props:Props)
+  {
+    super(props);
+    this.state =
+    {
+      tables: null,
+      tableNames: null,
+      tableKeys: [],
+    }
+  }
+  
+  componentDidMount()
+  {
+    Ajax.schema((tablesData: {name: string, columns: any[]}[], error) =>
+    {
+      if(tablesData)
+      {
+        var tables = tablesData['reduce'](
+          (memo, table) => 
+          {
+            memo[table.name] = table.columns.map(column => column.name);
+            return memo;
+          },
+          {});
+        var tableKeys = tables[this.props.card.group] ?
+          tables[this.props.card.group].map(column => this.props.card.iterator + '.' + column)
+          : [];
+        this.setState({
+          tables,
+          tableKeys,
+          tableNames: _.keys(tables),
+        })
+      }
+      else
+      {
+        alert(error);
+      }
+    });
+  }
+  
+	render()
+  {
 		return (
       <div>
         <CardField
@@ -80,6 +123,7 @@ class FromCard extends BuilderClass<Props>
             <div className='flex-card-field'>
               <BuilderTextbox
                 value={this.props.card.group}
+                options={this.state.tableNames}
                 ref='group'
                 placeholder='Enter group name'
                 id={this.props.card.id}
@@ -106,6 +150,9 @@ class FromCard extends BuilderClass<Props>
           {...this.props}
           cards={this.props.card.cards}
           parentId={this.props.card.id}
+          keys={
+            this.props.keys.concat(this.state.tableKeys)
+          }
         />
       </div>
 		);

@@ -50,6 +50,7 @@ interface Props
 {
   card: CardModels.IFilterCard;
   spotlights: any[];
+  keys: string[];
 }
 
 class FilterCard extends React.Component<Props, any>

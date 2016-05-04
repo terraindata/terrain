@@ -54,6 +54,7 @@ import Card from '../cards/Card.tsx';
 import { CardColors } from './../../CommonVars.tsx';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as classNames from 'classnames';
+import Autocomplete from './Autocomplete.tsx';
 var AddCardIcon = require("./../../../images/icon_addCard_22x17.svg?name=AddCardIcon");
 var TextIcon = require("./../../../images/icon_text_12x18.svg?name=TextIcon");
 
@@ -62,7 +63,8 @@ interface Props
   value: CardModels.CardString;
   id: string;
   keyPath: (string | number)[];
-  
+
+  options?: string[];  
   placeholder?: string;
   ref?: string;
   className?: string;
@@ -87,7 +89,7 @@ class BuilderTextbox extends React.Component<Props, any>
     
     // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
     this.executeChange = _.debounce(this.executeChange, 750);
-    Util.bind(this, ['executeChange', 'handleChange', 'renderSwitch', 'handleSwitch']);
+    Util.bind(this, ['executeChange', 'handleTextareaChange', 'renderSwitch', 'handleSwitch', 'handleAutocompleteChange']);
   }
   
   componentWillReceiveProps(newProps)
@@ -113,9 +115,14 @@ class BuilderTextbox extends React.Component<Props, any>
     Actions.cards.change(this.props.id, this.props.keyPath, value)
   }
   
-  handleChange(event)
+  handleTextareaChange(event)
   {
     this.executeChange(event.target.value);
+  }
+  
+  handleAutocompleteChange(value)
+  {
+    this.executeChange(value);
   }
   
   isText()
@@ -164,19 +171,7 @@ class BuilderTextbox extends React.Component<Props, any>
   render() {
     if(this.isText())
     {
-      var element = this.props.textarea ? <textarea ref='input' /> : <input ref='input' />;
       const { isOverCurrent, connectDropTarget } = this.props;
-      
-      var props =
-      {
-        type: this.props.type || 'text',
-        defaultValue: this.props.value,
-        onChange: this.handleChange,
-        className: this.props.className,
-        placeholder: this.props.placeholder,
-        rel: this.props.rel,
-      };
-      
       return connectDropTarget(
         <div className={classNames({
           'builder-tb': true,
@@ -184,7 +179,25 @@ class BuilderTextbox extends React.Component<Props, any>
           'builder-tb-accepts-cards': this.props.acceptsCards,
           'card-drop-target': this.props.acceptsCards
         })}>
-          { React.cloneElement(element, props) }
+          {
+            this.props.textarea ?
+              <textarea
+                ref='input'
+                defaultValue={this.props.value as string}
+                onChange={this.handleTextareaChange}
+                className={this.props.className}
+                placeholder={this.props.placeholder}
+                rel={this.props.rel}
+              />
+            :
+              <Autocomplete
+                ref='input'
+                value={this.props.value as string}
+                options={this.props.options}
+                onChange={this.handleAutocompleteChange}
+                placeholder={this.props.placeholder}
+              />
+          }
           { this.props.acceptsCards && this.renderSwitch() }
         </div>
       );

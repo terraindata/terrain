@@ -74,7 +74,6 @@ CardTypes.map(type =>
     borderColor: CardColors[type] ? CardColors[type][1] : CardColors['none'][1],
   }
 );
-console.log(styles);
 
 class CreateCardTool extends React.Component<Props, any>
 {

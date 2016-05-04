@@ -143,6 +143,7 @@ interface Props
   index: number;
   parentId: string;
   singleCard?: boolean;
+  keys: string[];
 }
 
 var Card = React.createClass({
@@ -152,6 +153,7 @@ var Card = React.createClass({
     index: React.PropTypes.number.isRequired,
     parentId: React.PropTypes.string,
     singleCard: React.PropTypes.bool, // indicates it's not in a list, it's just a single card
+    keys: React.PropTypes.array.isRequired,
   },
   
   shouldComponentUpdate(nextProps, nextState)

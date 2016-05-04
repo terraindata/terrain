@@ -60,6 +60,7 @@ var CardsArea = React.createClass<any, any>({
     parentId: React.PropTypes.string.isRequired,
     spotlights: React.PropTypes.array.isRequired,
     topLevel: React.PropTypes.bool,
+    keys: React.PropTypes.array.isRequired,
   },
   
   hasCardsArea()
@@ -98,6 +99,21 @@ var CardsArea = React.createClass<any, any>({
     };
   },
   
+  getKeys(props)
+  {
+    return props.keys.concat(
+      props.cards.reduce(
+        (memo, card) => {
+          if(card.type === 'var' || card.type === 'let')
+          {
+            memo.push(card.field);
+          }
+          return memo;
+        }
+      , [])
+    );
+  },
+  
   getRows(props)
   {
     return props.cards.map((card, index) => (
@@ -110,6 +126,7 @@ var CardsArea = React.createClass<any, any>({
           index={index}
           card={card}
           dndListener={$({})}
+          keys={this.getKeys(props)}
         />,
         key: card.id,
       }

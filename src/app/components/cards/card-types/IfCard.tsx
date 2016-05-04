@@ -55,6 +55,7 @@ interface Props {
   card: CardModels.IIfCard;
   spotlights: any;
   singleCard?: boolean;
+  keys: string[];
 }
 
 class IfCard extends React.Component<Props, any>

@@ -91,6 +91,22 @@ var BuilderColumn = React.createClass<any, any>(
     return {
       column: this.props.index,
       loading: false,
+      inputKeys: this.calcinputKeys(this.props)
+    }
+  },
+  
+  calcinputKeys(props)
+  {
+    return props.algorithm.inputs.map(input => input.key);
+  },
+  
+  willReceiveProps(nextProps)
+  {
+    if(!_.isEqual(nextProps.algorithm.inputs, this.props.algorithm.inputs))
+    {
+      this.setState({
+        inputKeys: this.calcinputKeys(nextProps.state),
+      });
     }
   },
   
@@ -135,6 +151,7 @@ var BuilderColumn = React.createClass<any, any>(
           parentId={parentId} 
           spotlights={spotlights} 
           topLevel={true}
+          keys={this.state.inputKeys}
         />;
         
       case COLUMNS.Inputs:

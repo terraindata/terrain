@@ -48,23 +48,43 @@ var _ = require('underscore');
 import Store from './../data/Store.tsx';
 
 var Ajax = {
-	query(tql: string, onLoad: (response: any) => void, onError?: (ev:Event) => void)
+  _post(url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void) 
   {
     let xhr = new XMLHttpRequest();
     xhr.onerror = onError;
     xhr.onload = (ev:Event) => {
       if (xhr.status != 200) {
-        alert("Query failed: " + JSON.stringify(xhr.responseText));
+        onLoad({
+          error: xhr.responseText
+        });
         return;
       }
       onLoad(xhr.responseText);
     }
     
     // NOTE: $SERVER_URL will be replaced by the build process.
-    xhr.open("POST", SERVER_URL + "/query", true);
+    xhr.open("POST", SERVER_URL + url, true);
     xhr.setRequestHeader('token', Store.getState().get('authenticationToken'));
-    xhr.send(tql);
-    return xhr;
+    xhr.send(data);
+    return xhr;  
+  },
+  
+	query(tql: string, onLoad: (response: any) => void, onError?: (ev:Event) => void)
+  {
+    return Ajax._post("/query", tql, onLoad, onError);
+  },
+  
+  schema(onLoad: (tables: {name: string, columns: any[]}[], error?: any) => void, onError?: (ev:Event) => void)
+  {
+    return Ajax._post("/schema/" , null, (response) => {
+      try {
+        var tables = JSON.parse(response)['tables'];
+      } catch(e) {
+        onLoad(null, e);
+        return;
+      }
+      onLoad(tables);
+    }, onError);
   }
 };
 

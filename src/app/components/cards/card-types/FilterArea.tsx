@@ -60,6 +60,7 @@ interface Props
   card: CardModels.IFilterCard | CardModels.IIfCard;
   spotlights: any[];
   hideNoFilterMessage?: boolean;
+  keys: string[];
 }
 
 class FilterArea extends BuilderClass<Props>
@@ -72,7 +73,8 @@ class FilterArea extends BuilderClass<Props>
   shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(nextProps.card.filters, this.props.card.filters)
-      || !_.isEqual(nextProps.spotlights, this.props.spotlights);
+      || !_.isEqual(nextProps.spotlights, this.props.spotlights)
+      || !_.isEqual(nextProps.keys, this.props.keys);
   }
   
   deleteFilter(index)
@@ -114,6 +116,7 @@ class FilterArea extends BuilderClass<Props>
               acceptsCards={true}
               parentId={this.props.card.id}
               top={true}
+              options={this.props.keys}
             />
           </div>
           <div className='builder-operator'>
@@ -132,6 +135,7 @@ class FilterArea extends BuilderClass<Props>
               keyPath={this._keyPath('filters', index, 'condition', 'second')}
               acceptsCards={true}
               parentId={this.props.card.id}
+              options={this.props.keys}
             />
           </div>
           <div className='builder-operator'>
