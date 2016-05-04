@@ -163,7 +163,8 @@ var BuilderColumn = React.createClass<any, any>(
       case COLUMNS.Results:
         return <ResultsArea 
           algorithm={algorithm}
-          onLoadstart={this.handleLoadStart}
+          onLoadStart={this.handleLoadStart}
+          onLoadEnd={this.handleLoadEnd}
         />;
       
       case COLUMNS.TQL:
@@ -208,7 +209,7 @@ var BuilderColumn = React.createClass<any, any>(
           }
           <div className='builder-title-bar-title'>
             { COLUMNS[this.state.column] }
-            { this.state.loading ? 'Loading...' : '' }
+            { this.state.loading ? <div className='builder-column-loading'>Loading...</div> : '' }
           </div>
           <div className='builder-title-bar-options'>
             <Menu options={this.getMenuOptions()} />

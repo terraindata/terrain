@@ -116,7 +116,6 @@ class Autocomplete extends BuilderClass<Props>
   
   handleSelect(event)
   {
-    console.log('ab');
     this.handleChange(event);
     this.setState({
       open: false,

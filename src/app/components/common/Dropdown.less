@@ -1,12 +1,13 @@
 @import "../../util/Common.less";
 
 @option-height: 27px;
+@border-radius: calc(@option-height / 2);
 
 .dropdown-wrapper {
  background: @white;
  height: @option-height;
  overflow: hidden;
- border-radius: calc(@option-height / 2);
+ border-radius: @border-radius;
  box-sizing: border-box;
  z-index: 0;
  
@@ -30,6 +31,11 @@
    .dropdown-option {
      border-bottom: 1px solid @light-gray;
      border-top: 0px;
+     
+     &:first-child {
+      border-top-left-radius: @border-radius;
+      border-top-right-radius: @border-radius;
+     }
    }
  }
   

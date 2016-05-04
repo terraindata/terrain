@@ -205,7 +205,7 @@ var ResultsArea = React.createClass<any, any>({
     if(!this.state.results)
     {
       return <InfoArea
-        large="No results queried yet."
+        large="Querying results..."
       />;
     }
     

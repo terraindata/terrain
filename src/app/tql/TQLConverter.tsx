@@ -65,7 +65,7 @@ class TQLConverter
   {
     from: "from '$group' as $iterator $cards;",
     select: "select $properties",
-      properties: (p, index) => join(", ", index) + "$property",
+      properties: (p, index) => p.property.length ? join(", ", index) + "$property" : "",
     sort: "sort $sorts",
       sorts: (sort, index) => join(", ", index) + "$property " + (sort.direction ? 'desc' : 'asc'),
     filter: "filter $filters",
