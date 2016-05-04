@@ -199,6 +199,7 @@ var ResultsArea = React.createClass<any, any>({
     {
       return <InfoArea
         large="There was an error with your query."
+        small={this.state.error}
       />
     }
     
@@ -222,6 +223,7 @@ var ResultsArea = React.createClass<any, any>({
     {
       return <InfoArea
         large="There are no results for your query."
+        small="The query was successful, but there were no matches in the database."
       />;
     }
     
@@ -247,7 +249,7 @@ var ResultsArea = React.createClass<any, any>({
       var result = JSON.parse(response).result;
     } catch(e) {
       this.setState({
-        error: true,
+        error: "No response was returned from the server.",
         xhr: null,
         // TODO add error
       });
@@ -257,18 +259,41 @@ var ResultsArea = React.createClass<any, any>({
     this.props.onLoadEnd && this.props.onLoadEnd();
     if(result)
     {
-      this.setState({
-        results: result.value,
-        resultType: result.type,
-        querying: false,
-        error: false,
-        xhr: null,
-      });
+      if(result.error)
+      {
+        this.setState({
+          error: "Error on line " + result.line+": " + result.error,
+          xhr: null,
+          querying: false,
+          results: null,
+          resultType: null,
+        });
+      }
+      else if(result.raw_result)
+      {
+        this.setState({
+          error: "Error with query: " + result.raw_result,
+          xhr: null,
+          querying: false,
+          results: null,
+          resultType: null,
+        }); 
+      }
+      else
+      {
+        this.setState({
+          results: result.value,
+          resultType: result.type,
+          querying: false,
+          error: false,
+          xhr: null,
+        });
+      }
     }
     else
     {
       this.setState({
-        error: true,
+        error: "No response was returned from the server.",
         xhr: null,
         // TODO add error
       });

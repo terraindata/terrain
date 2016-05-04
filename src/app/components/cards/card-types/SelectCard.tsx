@@ -53,6 +53,7 @@ import { CardModels } from './../../../models/CardModels.tsx';
 
 interface Props {
   card: CardModels.ISelectCard;
+  keys: string[];
 }
 
 class SelectCard extends BuilderClass<Props>
@@ -117,6 +118,7 @@ class SelectCard extends BuilderClass<Props>
                 rel={'' + index}
                 id={this.props.card.id}
                 keyPath={this._keyPath('properties', index, 'property')}
+                options={this.props.keys}
               />
             </CardField>
           ),
