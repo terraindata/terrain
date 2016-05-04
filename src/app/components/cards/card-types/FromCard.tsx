@@ -81,6 +81,13 @@ class FromCard extends BuilderClass<Props>
     }
   }
   
+  computeTableKeys(tables, props)
+  {
+    return tables[props.card.group] ?
+          tables[props.card.group].map(column => props.card.iterator + '.' + column)
+          : [];
+  }
+  
   componentDidMount()
   {
     Ajax.schema((tablesData: {name: string, columns: any[]}[], error) =>
@@ -94,12 +101,10 @@ class FromCard extends BuilderClass<Props>
             return memo;
           },
           {});
-        var tableKeys = tables[this.props.card.group] ?
-          tables[this.props.card.group].map(column => this.props.card.iterator + '.' + column)
-          : [];
+
         this.setState({
           tables,
-          tableKeys,
+          tableKeys: this.computeTableKeys(tables, this.props),
           tableNames: _.keys(tables),
         })
       }
@@ -108,6 +113,16 @@ class FromCard extends BuilderClass<Props>
         alert(error);
       }
     });
+  }
+  
+  componentWillReceiveProps(nextProps)
+  {
+    if(!_.isEqual(nextProps, this.props) && this.state.tables)
+    {
+      this.setState({
+        tableKeys: this.computeTableKeys(this.state.tables, nextProps),
+      })
+    }
   }
   
 	render()
