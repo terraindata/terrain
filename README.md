@@ -134,7 +134,7 @@ Note: when adding new tests, make sure to include `t.end()` at the end of every 
 1. In Midway's directory, run `make docker`.
 1. Clone [Tiny](http://git.terrain.int/rbeerman/tiny).
 1. In Tiny's directory, run `docker build --tag=tiny .`.
-1. In this directory, run `docker-compose up`.
+1. In this directory, run `docker-compose up`. (NOTE: This launches a long-running process that takes over your terminal, so subsequent commands must be run in new terminals.)
 1. Also in this directory, run `MIDWAY_HOST=$(docker-machine ip default) npm run start-docker` if on OS X. If on Linux, `MIDWAY_HOST=localhost npm run start-docker` may work instead, but I have not tested that.
 
 ## Useful Tutorials
