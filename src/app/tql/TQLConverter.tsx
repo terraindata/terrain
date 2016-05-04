@@ -56,14 +56,14 @@ class TQLConverter
 {
   static toTQL(cards: CardModels.ICard[]): string
   {
-    return removeBlanks(this._cards(cards));
+    return removeBlanks(this._cards(cards, ";"));
   }
 
   // parse strings where "$key" indicates to replace "$key" with the value of card[key]
   //  or functions that are passed in a reference to the card/obj and then return a parse string
   private static TQLF =
   {
-    from: "from '$group' as $iterator $cards;",
+    from: "from '$group' as $iterator $cards",
     select: "select $properties",
       properties: (p, index) => p.property.length ? join(", ", index) + "$property" : "",
     sort: "sort $sorts",
@@ -101,9 +101,10 @@ class TQLConverter
     skip: "skip $value",
   }
   
-  private static _cards(cards: CardModels.ICard[]): string
+  private static _cards(cards: CardModels.ICard[], append?: string): string
   {
-    return addTabs("\n" + cards.map(this._card, this).join("\n")) + "\n";
+    var glue = "\n" + (append || "");
+    return addTabs("\n" + cards.map(this._card, this).join(glue)) + glue;
   }
   
   private static _card(card: CardModels.ICard): string
