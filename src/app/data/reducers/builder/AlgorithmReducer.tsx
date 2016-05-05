@@ -62,7 +62,7 @@ var AlgorithmReducer = {};
 
 AlgorithmReducer[ActionTypes.algorithm.create] =
   (state, action) => 
-    state.setIn(["algorithms", "" + (currentparentId ++)], Immutable.fromJS(_.extend({}, NEW_ALGORITHM, {id: "alg-" + Util.randInt(1234567)})));
+    state.setIn(["algorithms", "" + (Math.random())], Immutable.fromJS(_.extend({}, NEW_ALGORITHM, {id: "alg-" + Util.randInt(1234567)})));
 
 AlgorithmReducer[ActionTypes.algorithm.remove] =
   (state, action) =>

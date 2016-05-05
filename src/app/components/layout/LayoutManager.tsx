@@ -71,14 +71,12 @@ var LayoutManager = React.createClass<any, any>({
 	{
 		layout: React.PropTypes.object.isRequired, // TODO move to TS, describe different keys allowed
     moveTo: React.PropTypes.func,
-    placeholder: React.PropTypes.object,
 	},
   
   shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(this.props.layout, nextProps.layout)
-      || !_.isEqual(this.state, nextState)
-      || !_.isEqual(this.props.placeholder, nextProps.placeholder);
+      || !_.isEqual(this.state, nextState);
   },
 
 	getInitialState()
@@ -504,22 +502,6 @@ var LayoutManager = React.createClass<any, any>({
 				}
 			}
       
-      if(this.refs[index] && this.props.layout.useDropZones)
-      {
-        if(this.props.placeholder && index !== this.state.draggingIndex)
-        {
-          // note: only works for Y axis for now
-          if(this.refs[index].getBoundingClientRect().top + CARD_TOP_THRESHOLD >= this.props.placeholder.y)
-          {
-            style.position = 'relative';
-            style.top = this.props.placeholder.element.getBoundingClientRect().height + 'px';
-          }
-          
-          // since we have a placeholder now we don't need the fixed size no more
-          $('[fixed-size=1]').css('width', '').css('height', '').attr('fixed-size', '');
-        }
-      }
-      
       if(obj.resizeable)
       {
         props.mouseDownRef = obj.resizeHandleRef;
@@ -566,8 +548,6 @@ var LayoutManager = React.createClass<any, any>({
 			percentage: 0,
 			offset: 0,
 		});
-		// LT += (new Date()).getTime() - t;
-  //   console.log('L', LT);
 		return 'calc(' + left.percentage + '% + ' + left.offset + 'px)';
 	},
 
@@ -641,11 +621,8 @@ var LayoutManager = React.createClass<any, any>({
 
 	calcColumnWidth(column, index)
 	{
-    // var t = (new Date()).getTime();
 		var widthValues = this.calcColumnWidthValues(column, index);
 		var finalWidth = 'calc(' + widthValues.percentage + '% + ' + widthValues.offset + 'px)';
-    // WT += (new Date()).getTime() - t;
-    // console.log('w', WT);
 		return finalWidth;
 	},
 
@@ -737,13 +714,8 @@ var LayoutManager = React.createClass<any, any>({
 		}
 		var lmClassString = lmClasses.join(" ");
 
-    if(this.props.placeholder)
-    {
-      var style = {paddingBottom: this.props.placeholder.element.getBoundingClientRect().height }
-    }
-        // { this.props.placeholder && <div style={{height: this.props.placeholder.element.getBoundingClientRect().height }} /> }
     return (
-      <div className={lmClassString} ref='layoutManagerDiv' style={style}>
+      <div className={lmClassString} ref='layoutManagerDiv'>
         { this.props.layout.columns && this.props.layout.columns.map(this.renderColumn) }
         { this.props.layout.rows && this.props.layout.rows.map(this.renderRow) }
         { this.props.layout.cells && this.props.layout.cells.map(this.renderCell) }

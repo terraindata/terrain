@@ -55,6 +55,9 @@ import CardsArea from "./../../components/cards/CardsArea.tsx";
 import ResultsArea from "./../../components/results/ResultsArea.tsx";
 import TQLView from '../tql/TQLView.tsx';
 
+var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
+var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
+
 enum COLUMNS {
   Builder,
   Results,
@@ -84,6 +87,11 @@ var BuilderColumn = React.createClass<any, any>(
   {
     algorithm: React.PropTypes.object.isRequired,
     className: React.PropTypes.string,
+    index: React.PropTypes.number,
+    canAddColumn: React.PropTypes.bool,
+    canCloseColumn: React.PropTypes.bool,
+    onAddColumn: React.PropTypes.func.isRequired,
+    onCloseColumn: React.PropTypes.func.isRequired,
   },
   
   getInitialState()
@@ -112,7 +120,12 @@ var BuilderColumn = React.createClass<any, any>(
   
   getDefaultProps()
   {
-    return {};
+    return {
+      drag_x: true,
+      dragInsideOnly: true,
+      reorderOnDrag: true,
+      handleRef: 'handle',
+    };
   },
   
   handleLoadStart()
@@ -195,6 +208,16 @@ var BuilderColumn = React.createClass<any, any>(
     return options;
   },
   
+  handleAddColumn()
+  {
+    this.props.onAddColumn(this.props.index);
+  },
+  
+  handleCloseColumn()
+  {
+    this.props.onCloseColumn(this.props.index);
+  },
+  
   render() {
     return this.renderPanel((
       <div className='builder-column'>
@@ -208,11 +231,29 @@ var BuilderColumn = React.createClass<any, any>(
             )
           }
           <div className='builder-title-bar-title'>
-            { COLUMNS[this.state.column] }
+            <span ref='handle'>
+              { COLUMNS[this.state.column] }
+            </span>
             { this.state.loading ? <div className='builder-column-loading'>Loading...</div> : '' }
           </div>
           <div className='builder-title-bar-options'>
             <Menu options={this.getMenuOptions()} />
+            {
+              this.props.canAddColumn && 
+                <SplitScreenIcon
+                  onClick={this.handleAddColumn}
+                  className='bc-options-svg'
+                  data-tip="Add Column"
+                />
+            }
+            {
+              this.props.canCloseColumn && 
+                <CloseIcon
+                  onClick={this.handleCloseColumn}
+                  className='bc-options-svg'
+                  data-tip="Close Column"
+                />
+             }
           </div>
         </div>
         <div className={

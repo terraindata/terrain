@@ -47,6 +47,7 @@ import * as React from 'react';
 import * as ReactDOM from "react-dom";
 import * as _ from "underscore";
 import * as $ from 'jquery';
+import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
 var HTML5Backend = require('react-dnd-html5-backend');
 import BuilderDragLayer from './BuilderDragLayer.tsx';
@@ -69,9 +70,6 @@ var NewIcon = require("./../../../images/icon_new_21x17.svg?name=NewIcon");
 var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
 var DuplicateIcon = require("./../../../images/icon_duplicate_11x12.svg?name=DuplicateIcon");
 var SaveIcon = require("./../../../images/icon_save_10x10.svg?name=SaveIcon");
-var OneColumnIcon = require("./../../../images/icon_1Column_10x10.svg?name=OneColumnIcon");
-var TwoColumnsIcon = require("./../../../images/icon_2Columns_10x10.svg?name=TwoColumnsIcon");
-var ThreeColumnsIcon = require("./../../../images/icon_3Columns_10x10.svg?name=ThreeColumnsIcon");
 
 class Builder extends React.Component<any, any>
 {
@@ -89,6 +87,7 @@ class Builder extends React.Component<any, any>
     Store.subscribe(() => {
       var newState = Store.getState().toJS();
       this.reduxState = newState.algorithms;
+      console.log(newState.algorithms);
       this.setState({
         random: Math.random()
       });
@@ -98,15 +97,20 @@ class Builder extends React.Component<any, any>
     //  removing this 'toJS()' call and making
     //  the whole Builder app built upon Immutable state.    
     this.reduxState = Store.getState().toJS().algorithms;
-    this.state = {
+    const algorithmId = _.first(_.keys(this.reduxState));
+    
+    var colKeys = [Math.random(), Math.random()];
+    this.state =
+    {
       random: Math.random(),
-      selectedAlgorithmId: _.first(_.keys(this.reduxState)),
-      numColumns: 2,
+      algorithmId: algorithmId,
+      colKeys,
+      noColumnAnimation: false,
     };
     
     Util.bind(this, 'duplicateAlgorithm', 'createAlgorithm',
       'tabClick',
-      'goOneColumn', 'goTwoColumns', 'goThreeColumns', 'save');
+      'save');
   }
   
   createAlgorithm()
@@ -116,42 +120,12 @@ class Builder extends React.Component<any, any>
   
   duplicateAlgorithm()
   {
-    Actions.algorithm.duplicate(this.state.selectedAlgorithmId);
+    Actions.algorithm.duplicate(this.state.algorithmId);
   }
   
   loadAlgorithm()
   {
     Actions.algorithm.load(JSON.parse(prompt("Paste Algorithm state here")));
-  }
-  
-  updateColumns(numColumns: number)
-  {
-    this.setState({
-      numColumns: numColumns,
-    });
-
-    // re-jigger after the resize has finished
-    // specifically for Transform cards    
-    setTimeout(() => {
-      this.setState({
-        random: Math.random(),
-      });
-    }, 250);
-  }
-  
-  goOneColumn()
-  {
-    this.updateColumns(1);
-  }
-  
-  goTwoColumns()
-  {
-    this.updateColumns(2);
-  }
-  
-  goThreeColumns()
-  {
-    this.updateColumns(3);
   }
   
   getTabActions()
@@ -172,23 +146,6 @@ class Builder extends React.Component<any, any>
         icon: <SaveIcon />,
         onClick: this.save,
       },
-      {
-        text: '',
-        icon: <OneColumnIcon />,
-        onClick: this.goOneColumn,
-      },
-      {
-        text: '',
-        icon: <TwoColumnsIcon />,
-        onClick: this.goTwoColumns,
-        noDivider: true,
-      },
-      {
-        text: '',
-        icon: <ThreeColumnsIcon />,
-        onClick: this.goThreeColumns,
-        noDivider: true,
-      },
     ];
   }
   
@@ -197,81 +154,131 @@ class Builder extends React.Component<any, any>
     console.log(JSON.stringify(this.reduxState));
   }
   
-  tabClose(algorithmId)
+  tabClose = (algorithmId) =>
   {
+    if(this.state.algorithmId === algorithmId)
+    {
+      this.setState({
+        algorithmId: _.keys(this.reduxState).reduce(
+            (memo, id) =>
+              memo || (id !== algorithmId && id)
+          , null),
+      })
+    }
     Actions.algorithm.remove(algorithmId);
   }
   
   tabClick(algorithmId)
   {
     this.setState({
-      selectedAlgorithmId: algorithmId,
+      algorithmId,
     });
   }
+  
+  getLayout = () =>
+  (
+    {
+      stackAt: 650,
+      fullHeight: true,
+      columns:
+        _.range(0, this.state.colKeys.length).map(index => 
+          this.getColumn(this.reduxState[this.state.algorithmId], index, this.state.colKeys)
+        )
+    }
+  )
+  
+  getColumn = (algorithm, index, colKeys: number[]) =>
+  (
+    {
+      minWidth: 316,
+      resizeable: true,
+      resizeHandleRef: 'resize-handle',
+      content: algorithm && <BuilderColumn
+        algorithm={algorithm} 
+        index={index}
+        onAddColumn={this.handleAddColumn}
+        onCloseColumn={this.handleCloseColumn}
+        canAddColumn={colKeys.length < 3}
+        canCloseColumn={colKeys.length > 1}
+      />,
+      hidden: this.state && this.state.closingIndex === index,
+      key: colKeys[index],
+    }
+  )
+  
+  handleAddColumn = (index) =>
+  {
+    index = index + 1;
+    var colKeys = _.clone(this.state.colKeys);
+    colKeys.splice(index, 0, Math.random());
+    this.setState({
+      colKeys,
+    }); 
+  }
+  
+  handleCloseColumn = (index) =>
+  {
+    var colKeys = _.clone(this.state.colKeys);
+    colKeys.splice(index, 1);
+    this.setState({
+      colKeys,
+    }); 
+  }
+  
+  moveColumn= (curIndex, newIndex) =>
+  {
+    var colKeys = _.clone(this.state.colKeys);
+    var tmp = colKeys.splice(curIndex, 1)[0];
+    colKeys.splice(newIndex, 0, tmp);
+    this.setState({
+      colKeys,
+      noColumnAnimation: true,
+    })
+    setTimeout(() => this.setState({
+      noColumnAnimation: false,
+    }), 250);
+  }
+  
   
 	render() {
     var tabs = {};
     
     _.map(this.reduxState, (algorithm, algorithmId) => {
-      // TODO move type somewhere central
-      var layout: {stackAt: number, fullHeight: boolean, columns: any[]} = {
-        stackAt: 650,
-        fullHeight: true,
-        columns: [
-          {
-            // width: 316,
-            minWidth: 316,
-            resizeable: true,
-            resizeHandleRef: 'resize-handle',
-            content: <BuilderColumn algorithm={algorithm} />,
-            hidden: this.state.numColumns < 2,
-          },
-          {
-            // colSpan: 3,
-            minWidth: 316,
-            resizeable: true,
-            resizeHandleRef: 'resize-handle',
-            content: <BuilderColumn algorithm={algorithm} />,
-          },
-          {
-            // colSpan: 2,
-            minWidth: 316,
-            resizeable: true,
-            resizeHandleRef: 'resize-handle',
-            content: <BuilderColumn algorithm={algorithm} />,
-            hidden: this.state.numColumns < 3,
-          },
-        ]
-      };
-      
       tabs[algorithmId] = {
-        content: <LayoutManager layout={layout} />,
         tabName: algorithm['algorithmName'] || 'New Algorithm',
         closeable: true,
         onClose: this.tabClose,
         onClick: this.tabClick,
       };
       
-      if(!this.state.selectedAlgorithmId)
+      if(!this.state.algorithmId)
       {
-        setTimeout(() => this.setState({ selectedAlgorithmId: algorithmId }));
+        setTimeout(() => this.setState({ algorithmId }));
       }
     });
 
     tabs[-1] = {
-      content: null,
       tabName: <NewIcon data-tip="New" />,
       noBackground: true,
       pinnedAtEnd: true,
       onClick: this.createAlgorithm,
       selectNewTab: true,
       noDrag: true,
+      unselectable: true,
     };
     
-        // <BuilderDragLayer />
     return (
-      <div className='builder'>
+      <div className={classNames({
+        'builder': true,
+        'builder-no-column-animation': this.state.noColumnAnimation,
+      })}>
         <Tabs tabs={tabs} actions={this.getTabActions()} ref='tabs' />
+        {
+          !_.keys(this.reduxState).length ? null :
+            <div className='tabs-content'>
+              <LayoutManager layout={this.getLayout()} moveTo={this.moveColumn} />
+            </div>
+        }
       </div>
     );
 	}

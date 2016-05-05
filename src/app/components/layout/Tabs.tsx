@@ -166,7 +166,6 @@ var Tabs = React.createClass<any, any>({
         key: key,
       })),
       selectedIndex: 0,
-      selectingIndex: null,
 		};
 	},
   
@@ -190,10 +189,10 @@ var Tabs = React.createClass<any, any>({
           index --;
         }
 
-        if(index === this.state.selectedIndex)
-        {
-          tab['onClick'](this.state.selectedIndex);
-        }
+        // if(index === this.state.selectedIndex)
+        // {
+          tab['onClick'](key);
+        // }
         
         tabOrder.splice(index + 1, 0, _.extend(tab,
         {
@@ -221,26 +220,16 @@ var Tabs = React.createClass<any, any>({
     if(!this._onTabSelect[index])
     {
       this._onTabSelect[index] = () => {
-        if(index === this.state.selectedIndex)
+        if(index === this.state.selectedIndex && !this.state.tabOrder[index].unselectable)
         {
           return;
         }
         
-        if(!this.state.tabOrder[index].unselectable)
-        {
-          this.setState({
-            selectedIndex: index,
-            selectingIndex: index
-          });
-          setTimeout(() => {
-            this.setState({
-              selectingIndex: null
-            });
-          }, 250);
-        }
+        var { key, onClick } = this.state.tabOrder[index];  
         
-        var key = this.state.tabOrder[index].key;  
-        var onClick = this.props.tabs[key].onClick;
+        this.setState({
+          selectedIndex: index,
+        });
         
         if(typeof onClick === 'function')
         {
@@ -297,14 +286,6 @@ var Tabs = React.createClass<any, any>({
 	render()
   {
     var selectedIndex = this.state.selectedIndex;
-    if(this.state.selectingIndex !== null || !this.state.tabOrder[selectedIndex])
-    {
-      var content = null;
-    }
-    else
-    {
-		  var content = this.state.tabOrder[selectedIndex].content;
-    }
 
     var tabsLayout = 
     {
@@ -326,30 +307,29 @@ var Tabs = React.createClass<any, any>({
       }))
     };
     
-		return (<div className='tabs-container'>
-			<div className='tabs-row-wrapper'>
-				{ 
-					this.props.title ? (
-						<div className='tabs-title'>
-							{this.props.title}
-						</div>
-					) : null
-				}
-				{
-					<div className='tabs-row'>
-						<LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />
+      // <div className={this.state.selectingIndex !== null ? 'tabs-loading' : 'tabs-loading-hidden'}>
+      //   <InfoArea large='Loading...' />
+      // </div>
+    return (
+    <div className='tabs-container'>
+      <div className='tabs-row-wrapper'>
+        { 
+          this.props.title ? (
+            <div className='tabs-title'>
+              {this.props.title}
+            </div>
+          ) : null
+        }
+        {
+          <div className='tabs-row'>
+            <LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />
             { this.renderActions() }
             <div className='tabs-shadow'></div>
-					</div>
-				}
-			</div>
-			<div className='tabs-content'>
-				{content}
-			</div>
-      <div className={this.state.selectingIndex !== null ? 'tabs-loading' : 'tabs-loading-hidden'}>
-        <InfoArea large='Loading...' />
+          </div>
+        }
       </div>
-		 </div>);
+		 </div>
+     );
 	},
 });
 
