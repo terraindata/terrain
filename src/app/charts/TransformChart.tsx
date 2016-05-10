@@ -55,14 +55,16 @@ var scaleMax = (scale) => scale.range()[scale.range().length - 1];
 
 var TransformChart = {
   
-  create(el, props, state)
+  create(el, state)
   {
     var svg = d3
       .select(el)
       .append('svg')
       .attr('class', 'transform-chart')
-      .attr('width', props.width)
-      .attr('height', props.height);
+      .attr('width', state.width)
+      .attr('height', state.height)
+      .attr('viewBox', '0 0 ' + state.width + ' ' + state.height)
+      ;
     
     svg.append('rect')
       .attr('class', 'bg');
@@ -126,10 +128,10 @@ var TransformChart = {
     }
     
     var barsData = state._cache.computedBarsData;
-    var scales = this._scales(el, state.domain, barsData);
+    var scales = this._scales(el, state.domain, barsData, state.width, state.height);
     this._draw(el, scales, barsData, state.pointsData, state.onMove,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
-      state.onCreate, state.onDelete);
+      state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height);
     
     d3.select(el).on('mousedown', () => {
       if(!d3.event['shiftKey'] && !d3.event['altKey'])
@@ -211,11 +213,11 @@ var TransformChart = {
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY));
   },
   
-  _drawAxes(el, scales)
+  _drawAxes(el, scales, width, height)
   {
     var yLeftAxis = d3.svg.axis()
       .scale(scales.pointY)
-      .ticks(10)
+      .ticks(height > 200 ? 10 : 5)
       .tickSize(scaleMin(scales.x) - scaleMax(scales.x), scaleMin(scales.x) - scaleMax(scales.x))
       .orient("left");
     d3.select(el).select('.yLeftAxis')
@@ -224,7 +226,7 @@ var TransformChart = {
     
     var yRightAxis = d3.svg.axis()
       .scale(scales.barY)
-      .ticks(10)
+      .ticks(height > 200 ? 10 : 5)
       .tickSize(0, 0)
       .tickFormat(d3.format(" <-.2p")) // try '%' if more precision is needed
       .orient("right");
@@ -235,7 +237,7 @@ var TransformChart = {
     // var bottomAxisTickFn: any = (tick, index: number): string => index == 0 || index == 10 ? "" : tick;
     var bottomAxis = d3.svg.axis()
       .scale(scales.x)
-      .ticks(10)
+      .ticks(width > 500 ? 10 : 5)
       .tickSize(-1 * scaleMin(scales.pointY) + scaleMax(scales.pointY), -1 * scaleMin(scales.pointY) + scaleMax(scales.pointY))
       .tickFormat(d3.format(".3g"))
       .orient("bottom");
@@ -603,7 +605,7 @@ var TransformChart = {
   },
   
   // needs to be "function" for d3.mouse(this)
-  _mousedownFactory: (el, onMove, scale, onSelect) => function(d) {
+  _mousedownFactory: (el, onMove, scales, onSelect, onPointMoveStart) => function(d) {
     if(d3.event['shiftKey'] || d3.event['altKey'])
     {
       onSelect(d.id, d3.event['shiftKey']);
@@ -617,22 +619,15 @@ var TransformChart = {
     
     var del = d3.select(el);
     var point = d3.select(this);
-    var startMouseY = d3.mouse(this)[1] 
-      + parseInt(del.select('.inner-svg').attr('y'), 10);
-    var startPointY = parseInt(point.attr('cy'), 10);
+    var startY = scales.realPointY.invert(d3.mouse(this)[1]);
+    onPointMoveStart(startY);
+    var t = this;
     
     point.attr('active', '1');
     
     var move = function(event) {
-      var diffY = d3.mouse(this)[1] - startMouseY;
-      var newY = startPointY + diffY;
-      
-      // Note: in the future, for optimistic / faster rendering,
-      //  you could use a line like this one:
-       point.attr('cy', newY);
-      
-      var newValue = scale.invert(newY);
-      onMove(point.attr('_id'), newValue);
+      var newY = scales.realPointY.invert(d3.mouse(t)[1]);
+      onMove(point.attr('_id'), newY);
     }
     
     del.on('mousemove', move);
@@ -698,7 +693,7 @@ var TransformChart = {
     return false;
   },
   
-  _drawPoints(el, scales, pointsData, onMove, onSelect, onDelete)
+  _drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart)
   {
     var g = d3.select(el).selectAll('.points');
     
@@ -717,35 +712,35 @@ var TransformChart = {
     point
       .attr('_id', (d) => d['id']);
       
-    point.on('mousedown', this._mousedownFactory(el, onMove, scales.realPointY, onSelect));
-    point.on('touchstart', this._mousedownFactory(el, onMove, scales.realPointY, onSelect));
+    point.on('mousedown', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
+    point.on('touchstart', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
     point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu))
     
     point.exit().remove();
   },
   
-  _draw(el, scales, barsData, pointsData, onMove, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete)
+  _draw(el, scales, barsData, pointsData, onMove, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
       .attr('height', scaleMin(scales.realBarY));
       
     this._drawBg(el, scales);
-    this._drawAxes(el, scales);
+    this._drawAxes(el, scales, width, height);
     this._drawBars(el, scales, barsData);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
     this._drawLines(el, scales, pointsData, onLineClick, onLineMove);
-    this._drawPoints(el, scales, pointsData, onMove, onSelect, onDelete);
+    this._drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart);
   },
   
-  _scales(el, domain, barsData)
+  _scales(el, domain, barsData, stateWidth, stateHeight)
   {
     if(!domain)
     {
       return null;
     }
-    var width = el.offsetWidth - xMargin;
-    var height = el.offsetHeight - 2 * yMargin;
+    var width = stateWidth - xMargin;
+    var height = stateHeight - 2 * yMargin;
     
     var x = d3.scale.linear()
       .range([xMargin, width])
@@ -760,7 +755,7 @@ var TransformChart = {
       .domain(domain.y);
     
     var realPointY = d3.scale.linear()
-      .range([height, 0])
+      .range([height - yMargin, 0])
       .domain(domain.y);
     
     var barsMax = barsData.reduce((max, bar) =>

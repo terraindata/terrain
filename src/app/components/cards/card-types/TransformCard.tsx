@@ -107,7 +107,7 @@ class TransformCard extends BuilderClass<Props>
     }
 
     return (
-      <div>
+      <div className='transform-card'>
         <CardField>
           <BuilderTextbox
             value={this.props.card.input}
@@ -122,12 +122,14 @@ class TransformCard extends BuilderClass<Props>
           domain={this.state.domain}
           spotlights={this.props.spotlights}
           inputKey={inputKey}
-          card={this.props.card} />
+          card={this.props.card}
+        />
         <TransformCardPeriscope
           onDomainChange={this.handleDomainChange}
           barsData={this.props.card.bars}
           domain={this.state.domain}
-          card={this.props.card} />
+          card={this.props.card}
+        />
       </div>
     );
   }

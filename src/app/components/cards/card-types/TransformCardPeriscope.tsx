@@ -64,20 +64,28 @@ class TransformCardPeriscope extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
-    this.handleDomainChange = this.handleDomainChange.bind(this);
+    Util.bind(this, 'handleDomainChange', 'update');
     this.state = {
       chartState: false,
-      width: 0,
     }
   }
   
   componentDidMount()
   {
     var el = ReactDOM.findDOMNode(this);
-    Periscope.create(el, {
-      width: '100%',
-      height: '60px',
-    }, this.getChartState());
+    var width = el.getBoundingClientRect().width;
+    this.setState({
+      width,
+    });
+    Periscope.create(el, this.getChartState({
+      width,
+    })); 
+  }
+  
+  update(overrideState?)
+  {
+    var el = ReactDOM.findDOMNode(this);
+    Periscope.update(el, this.getChartState(overrideState)); 
   }
   
   componentWillReceiveProps(newProps)
@@ -85,50 +93,45 @@ class TransformCardPeriscope extends React.Component<Props, any>
     if(newProps.domain !== this.props.domain
       || newProps.barsData !== this.props.barsData)
     {
-      this.setState({
-        chartState: false,
-      });
+      this.update({
+        domain: newProps.domain
+      })
     }
   }
   
-  componentDidUpdate()
+  handleDomainChangeStart = (initialVal) =>
   {
-    var el = ReactDOM.findDOMNode(this);
-    if(!this.state.chartState || el.getBoundingClientRect().width !== this.state.width)
-    {
-      this.setState({
-        width: el.getBoundingClientRect().width,
-      });
-      
-      Periscope.update(el, this.getChartState());
-    }
+    this.setState({
+      initialDomain: JSON.parse(JSON.stringify(this.props.domain)),
+      initialVal,
+    })
   }
   
-  handleDomainChange(handleIndex, value)
+  handleDomainChange(handleIndex, newVal)
   {
-    var newDomain = [this.props.domain.x[0], this.props.domain.x[1]];
-    newDomain[handleIndex] = value;
+    var newDomain = JSON.parse(JSON.stringify(this.state.initialDomain));
+    newDomain.x[handleIndex] += newVal - this.state.initialVal;
+    var buffer = (this.props.card.range[1] - this.props.card.range[0]) * 0.01;
+    newDomain.x[0] = Util.valueMinMax(newDomain.x[0], this.props.card.range[0], this.state.initialDomain.x[1] - buffer);
+    newDomain.x[1] = Util.valueMinMax(newDomain.x[1], this.state.initialDomain.x[0] + buffer, this.props.card.range[1]);
     
-    this.props.onDomainChange(newDomain);
+    this.props.onDomainChange(newDomain.x);
+    this.update({
+      domain: newDomain,
+    })
   }
   
-  getChartState()
+  getChartState(overrideState?)
   {
-    if(this.state.chartState)
-    {
-      return this.state.chartState;
-    }
-    
     var chartState = {
       barsData: this.props.barsData,
       maxRange: this.props.card.range,
-      domain: this.props.domain,
+      domain: (overrideState && overrideState.domain) || this.props.domain,
       onDomainChange: this.handleDomainChange,
+      onDomainChangeStart: this.handleDomainChangeStart,
+      width: overrideState.width || this.state.width,
+      height: 60,
     };
-    
-    this.setState({
-      chartState: chartState,
-    });
     return chartState;
   }
   

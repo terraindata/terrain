@@ -67,14 +67,13 @@ class TransformCardChart extends React.Component<Props, any>
   constructor(props:Props)
   {
     super(props);
-    this.onPointMove = this.onPointMove.bind(this);
     Util.bind(this, ['onPointMove', 'dispatchAction', 'onLineClick', 'onLineMove', 'onSelect',
-      'onDelete', 'onCreate']);
+      'onDelete', 'onCreate', 'onPointMoveStart']);
     // Util.throttle(this, ['dispatchAction'], 500);
     this.dispatchAction = _.debounce(this.dispatchAction, 500);
     
     this.state = {
-      width: -1,
+      // width: -1,
       domain: Util.deeperCloneObj(props.domain),
       pointsData: Util.deeperCloneArr(props.pointsData),
       barsData: Util.deeperCloneArr(props.barsData),
@@ -86,11 +85,15 @@ class TransformCardChart extends React.Component<Props, any>
   
   componentDidMount() 
   {
+    // TODO initial width guess
     var el = ReactDOM.findDOMNode(this);
-    TransformChart.create(el, {
-      width: '100%',
-      height: '300px',
-    }, this.getChartState());
+    var { width } = el.getBoundingClientRect();
+    var height = width / 2;
+    TransformChart.create(el, this.getChartState({
+      width,
+      height
+    }));
+    this.setState({ width, height });
   }
   
   componentWillReceiveProps(newProps)
@@ -99,15 +102,15 @@ class TransformCardChart extends React.Component<Props, any>
     var newDomain = this.state.domain;
     var newPointsData = this.state.pointsData;
     var newBarsData = this.state.barsData;
-    var newWidth = this.state.width;
+    // var newWidth = this.state.width;
     var newSpotlights = this.state.spotlights;
     var newInputKey = this.state.inputKey;
     
-    if(ReactDOM.findDOMNode(this).getBoundingClientRect().width !== this.state.width)
-    {
-      changed = true;
-      newWidth = ReactDOM.findDOMNode(this).getBoundingClientRect().width;
-    }
+    // if(ReactDOM.findDOMNode(this).getBoundingClientRect().width !== this.state.width)
+    // {
+    //   changed = true;
+    //   newWidth = ReactDOM.findDOMNode(this).getBoundingClientRect().width;
+    // }
     
     if(!_.isEqual(newProps.domain, this.state.domain))
     {
@@ -145,7 +148,7 @@ class TransformCardChart extends React.Component<Props, any>
         domain: newDomain,
         pointsData: newPointsData,
         barsData: newBarsData,
-        width: newWidth,
+        // width: newWidth,
         spotlights: newSpotlights,
         inputKey: newInputKey,
       });
@@ -155,7 +158,7 @@ class TransformCardChart extends React.Component<Props, any>
         domain: newDomain,
         pointsData: newPointsData,
         barsData: newBarsData,
-        width: newWidth,
+        // width: newWidth,
         spotlights: newSpotlights,
         inputKey: newInputKey,
       }));
@@ -241,16 +244,22 @@ class TransformCardChart extends React.Component<Props, any>
     this.dispatchAction(newPointsData);
   }
   
+  onPointMoveStart(initialScore)
+  {
+    this.setState({
+      initialScore,
+      initialPoints: Util.deeperCloneArr(this.props.pointsData),
+    })
+  }
+  
   onPointMove(scorePointId, newScore)
   {
-    newScore = Util.valueMinMax(newScore, 0, 1);
+    var scoreDiff = this.state.initialScore - newScore;
     var pointIndex = this.props.pointsData.findIndex(scorePoint => scorePoint.id === scorePointId);
-    var scoreDiff = newScore - this.props.pointsData[pointIndex].score;
-    
-    var newPointsData = Util.deeperCloneArr(this.props.pointsData).map(scorePoint => {
+    var newPointsData = Util.deeperCloneArr(this.state.initialPoints).map(scorePoint => {
       if(scorePoint.id === scorePointId || this.state.selectedPointIds.find(id => id === scorePoint.id))
       {
-        scorePoint.score = Util.valueMinMax(scorePoint.score + scoreDiff, 0, 1);
+        scorePoint.score = Util.valueMinMax(scorePoint.score - scoreDiff, 0, 1);
       }
       return scorePoint;
     });
@@ -330,6 +339,9 @@ class TransformCardChart extends React.Component<Props, any>
       onSelect: this.onSelect,
       onDelete: this.onDelete,
       onCreate: this.onCreate,
+      onPointMoveStart: this.onPointMoveStart,
+      width: overrideState.width || this.state.width,
+      height: overrideState.height || this.state.height,
     };
     
     return chartState;

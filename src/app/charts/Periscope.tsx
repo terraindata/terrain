@@ -55,14 +55,16 @@ var scaleMax = (scale) => scale.range()[scale.range().length - 1];
 
 var Periscope = {
   
-  create(el, props, state)
+  create(el, state)
   {
     var svg = d3
       .select(el)
       .append('svg')
       .attr('class', 'periscope')
-      .attr('width', props.width)
-      .attr('height', props.height);
+      .attr('width', state.width)
+      .attr('height', state.height)
+      .attr('viewBox', '0 0 ' + state.width + ' ' + state.height)
+      ;
     
     svg.append('rect')
       .attr('class', 'bg');
@@ -88,8 +90,8 @@ var Periscope = {
   update(el, state)
   {
     state.numBars = 10;
-    var scales = this._scales(el, state.maxRange, state.domain, state.barsData);
-    this._draw(el, scales, state.domain, state.barsData, state.onDomainChange);
+    var scales = this._scales(el, state.maxRange, state.domain, state.barsData, state.width, state.height);
+    this._draw(el, scales, state.domain, state.barsData, state.onDomainChange, state.onDomainChangeStart);
   },
   
   destroy(el)
@@ -169,37 +171,18 @@ var Periscope = {
   },
   
   // needs to be "function" for d3.mouse(this)
-  _mousedownFactory: (el, onMove, scale, domain) => function(event) {
+  _mousedownFactory: (el, onMove, scale, domain, onMoveStart) => function(event) {
     var del = d3.select(el);
     var handle = d3.select(this);
-    var startMouseX = d3.mouse(this)[0] + del[0][0]['getBoundingClientRect']()['left'];
-    var startHandleX = parseInt(handle.attr('cx'), 10);
+    var startX = scale.invert(d3.mouse(this)[0]);
+    onMoveStart(startX);
+    var t = this;
     
     var initialClasses = handle.attr('class');
     handle.attr('class', initialClasses + ' handle-active');
     
     var move = function(event) {
-      var diffX = d3.mouse(this)[0] - startMouseX;
-      var newX = startHandleX + diffX;
-      
-      // Note: in the future, for optimistic / faster rendering,
-      //  you could use a line like this one:
-      //  point.attr('cy', startPointY + diffY);
-      
-      var newValue = scale.clamp(true).invert(newX);
-      var handleIndex = handle.attr('_id');
-      
-      if(handle.attr('_id') === '0' && newValue > domain.x[1] * 0.99)
-      {
-        newValue = domain.x[1] * 0.99;
-      }
-      
-      if(handle.attr('_id') === '1' && newValue < domain.x[0] * 1.01)
-      {
-        newValue = domain.x[0] * 1.01;
-      }
-      
-      onMove(handle.attr('_id'), newValue);
+      onMove(handle.attr('_id'), scale.invert(d3.mouse(t)[0]));
     }
     
     var bd = d3.select('body');
@@ -216,7 +199,7 @@ var Periscope = {
     bd.on('mouseleave', offFn);
   },
   
-  _drawHandles(el, scales, domain, onDomainChange)
+  _drawHandles(el, scales, domain, onDomainChange, onMoveStart)
   {
     var g = d3.select(el).selectAll('.handles');
     var handle = g.selectAll('.handle')
@@ -237,13 +220,13 @@ var Periscope = {
     handle
       .attr('_id', (d, i) => i);
       
-    handle.on('mousedown', this._mousedownFactory(el, onDomainChange, scales.x, domain));
-    handle.on('touchstart', this._mousedownFactory(el, onDomainChange, scales.x, domain));
+    handle.on('mousedown', this._mousedownFactory(el, onDomainChange, scales.x, domain, onMoveStart));
+    handle.on('touchstart', this._mousedownFactory(el, onDomainChange, scales.x, domain, onMoveStart));
     
     handle.exit().remove();
   },
   
-  _draw(el, scales, domain, barsData, onDomainChange)
+  _draw(el, scales, domain, barsData, onDomainChange, onDomainChangeStart)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -253,17 +236,17 @@ var Periscope = {
     this._drawAxes(el, scales);
     this._drawBars(el, scales, barsData);
     this._drawLine(el, scales, domain);
-    this._drawHandles(el, scales, domain, onDomainChange);
+    this._drawHandles(el, scales, domain, onDomainChange, onDomainChangeStart);
   },
   
-  _scales(el, range, domain, barsData)
+  _scales(el, range, domain, barsData, stateWidth, stateHeight)
   {
     if(!domain)
     {
       return null;
     }
-    var width = el.offsetWidth - xMargin;
-    var height = el.offsetHeight - yMargin;
+    var width = stateWidth - xMargin;
+    var height = stateHeight - yMargin;
     
     var x = d3.scale.linear()
       .range([xMargin, width])
