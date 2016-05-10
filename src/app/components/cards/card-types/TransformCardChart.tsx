@@ -69,11 +69,9 @@ class TransformCardChart extends React.Component<Props, any>
     super(props);
     Util.bind(this, ['onPointMove', 'dispatchAction', 'onLineClick', 'onLineMove', 'onSelect',
       'onDelete', 'onCreate', 'onPointMoveStart']);
-    // Util.throttle(this, ['dispatchAction'], 500);
     this.dispatchAction = _.debounce(this.dispatchAction, 500);
     
     this.state = {
-      // width: -1,
       domain: Util.deeperCloneObj(props.domain),
       pointsData: Util.deeperCloneArr(props.pointsData),
       barsData: Util.deeperCloneArr(props.barsData),
@@ -85,9 +83,8 @@ class TransformCardChart extends React.Component<Props, any>
   
   componentDidMount() 
   {
-    // TODO initial width guess
     var el = ReactDOM.findDOMNode(this);
-    var { width } = el.getBoundingClientRect();
+    var width = 600;
     var height = width / 2;
     TransformChart.create(el, this.getChartState({
       width,
@@ -102,15 +99,8 @@ class TransformCardChart extends React.Component<Props, any>
     var newDomain = this.state.domain;
     var newPointsData = this.state.pointsData;
     var newBarsData = this.state.barsData;
-    // var newWidth = this.state.width;
     var newSpotlights = this.state.spotlights;
     var newInputKey = this.state.inputKey;
-    
-    // if(ReactDOM.findDOMNode(this).getBoundingClientRect().width !== this.state.width)
-    // {
-    //   changed = true;
-    //   newWidth = ReactDOM.findDOMNode(this).getBoundingClientRect().width;
-    // }
     
     if(!_.isEqual(newProps.domain, this.state.domain))
     {
@@ -148,7 +138,6 @@ class TransformCardChart extends React.Component<Props, any>
         domain: newDomain,
         pointsData: newPointsData,
         barsData: newBarsData,
-        // width: newWidth,
         spotlights: newSpotlights,
         inputKey: newInputKey,
       });
@@ -158,7 +147,6 @@ class TransformCardChart extends React.Component<Props, any>
         domain: newDomain,
         pointsData: newPointsData,
         barsData: newBarsData,
-        // width: newWidth,
         spotlights: newSpotlights,
         inputKey: newInputKey,
       }));
