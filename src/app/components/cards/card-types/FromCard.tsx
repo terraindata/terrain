@@ -53,7 +53,7 @@ import Dropdown from './../../common/Dropdown.tsx';
 import CardsArea from './../CardsArea.tsx';
 import { Operators } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
-import BuilderClass from './../../builder/BuilderClass.tsx';
+import Classs from './../../common/Classs.tsx';
 import Ajax from './../../../util/Ajax.tsx';
 
 var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIcon");
@@ -68,7 +68,7 @@ interface Props {
 var OPERATOR_WIDTH: number = 30;
 var CARD_PADDING: number = 12;
 
-class FromCard extends BuilderClass<Props>
+class FromCard extends Classs<Props>
 {
   constructor(props:Props)
   {

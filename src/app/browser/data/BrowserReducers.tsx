@@ -42,36 +42,61 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
+import ActionTypes from './BrowserActionTypes.tsx';
+import Util from './../../util/Util.tsx';
+import BrowserTypes from './../BrowserTypes.tsx';
+var Immutable = require('immutable');
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
+var BrowserReducers = {};
 
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
+BrowserReducers[ActionTypes.groups.create] =
+  (state, action) =>
+    {
+      var newGroup = BrowserTypes.newGroup();
+      const id = newGroup.get('id');
+      return state
+        .setIn(['groups', id], newGroup)
+        .update('groupsOrdering', ordering => ordering.push(id));
+    }
 
+BrowserReducers[ActionTypes.groups.change] =
+  (state, action) =>
+    state.setIn(['groups', action.payload.group.id], action.payload.group);
 
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
+BrowserReducers[ActionTypes.algorithms.create] =
+  (state, action) =>
+    {
+      const { groupId } = action.payload;
+      var newAlg = BrowserTypes.newAlgorithm(groupId);
+      const id = newAlg.id;
+      return state
+        .setIn(['groups', groupId, 'algorithms', id], newAlg)
+        .updateIn(['groups', groupId, 'algorithmsOrdering'],
+          ordering => ordering.push(id));
+    }
 
-declare type ID = string;
-declare interface IId
-{
-  id: ID;
-}
-declare interface IName
-{
-  name: string;
-}
-declare interface ILastEdited
-{
-  lastUserId: ID;
-  lastEdited: string;
-}
+BrowserReducers[ActionTypes.algorithms.change] =
+  (state, action) =>
+    state.setIn(['groups', action.payload.algorithm.groupId, 'algorithms', action.payload.algorithm.id],
+      action.payload.algorithm);
 
-// SERVER_URL is a "compile time" substition done by Webpack.
-declare var SERVER_URL: string;
+BrowserReducers[ActionTypes.variants.create] =
+  (state, action) =>
+    {
+      const { groupId, algorithmId } = action.payload;
+      const v = BrowserTypes.newVariant(algorithmId, groupId);
+      const id = v.id;
+      return state
+        .setIn(['groups', groupId, 'algorithms', algorithmId, 'variants', id], v)
+        .updateIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrdering'],
+          ordering => ordering.push(id));
+    }
 
-// DEV is a "compile time" substition done by Webpack.
-declare var DEV: boolean;
+BrowserReducers[ActionTypes.variants.change] =
+  (state, action) =>
+    state.setIn(['groups', action.payload.variant.groupId, 'algorithms',
+        action.payload.variant.algorithmId, 'variants', action.payload.variant.id],
+      action.payload.variant);
+
+export default BrowserReducers;

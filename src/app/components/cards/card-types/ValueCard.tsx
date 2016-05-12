@@ -47,7 +47,7 @@ import Actions from "../../../data/Actions.tsx";
 import Util from '../../../util/Util.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 import BuilderTextbox from "../../common/BuilderTextbox.tsx";
-import BuilderClass from './../../builder/BuilderClass.tsx';
+import Classs from './../../common/Classs.tsx';
 
 interface Props {
   card: CardModels.IValueCard;
@@ -59,7 +59,7 @@ var placeholders =
   skip: 'Number of results to skip',
 }
 
-class ValueCard extends BuilderClass<Props>
+class ValueCard extends Classs<Props>
 {
   render()
   {

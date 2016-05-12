@@ -42,36 +42,77 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./Browser.less');
+import * as React from 'react';
+import Classs from './../../components/common/Classs.tsx';
+import Store from './../data/BrowserStore.tsx';
+import BrowserTypes from './../BrowserTypes.tsx';
+import GroupsColumn from './GroupsColumn.tsx';
+import AlgorithmsColumn from './AlgorithmsColumn.tsx';
+import VariantsColumn from './VariantsColumn.tsx';
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
-
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
-
-
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
-
-declare type ID = string;
-declare interface IId
+interface Props
 {
-  id: ID;
-}
-declare interface IName
-{
-  name: string;
-}
-declare interface ILastEdited
-{
-  lastUserId: ID;
-  lastEdited: string;
+  params?: any;
 }
 
-// SERVER_URL is a "compile time" substition done by Webpack.
-declare var SERVER_URL: string;
+class Browser extends Classs<Props>
+{
+  constructor(props)
+  {
+    super(props);
+    
+    this.state = {
+      istate: Store.getState()
+    };
+    Store.subscribe(() => this.setState({
+      istate: Store.getState()
+    }))
+  }
+  
+  render()
+  {
+    const state = this.state.istate;
+    
+    var groupId = this.props.params.groupId;
+    var algorithmId = this.props.params.algorithmId;
+    if(groupId)
+    {
+      var algorithms = state.getIn(['groups', groupId, 'algorithms']);
+      var algorithmsOrdering = state.getIn(['groups', groupId, 'algorithmsOrdering']);
+      
+      if(algorithmId)
+      {
+        // Sublime gets messed up with the 'var' in 'variant', hence this pseudonym
+        var vriants = state.getIn(['groups', groupId, 'algorithms', algorithmId, 'variants']);
+        var vriantsOrdering = state.getIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrdering']);
+      }
+    }
+    
+    return (
+      <div className='browser'>
+        <GroupsColumn
+          groups={state.get('groups')}
+          groupsOrdering={state.get('groupsOrdering')}
+        />
+        <AlgorithmsColumn
+          {...{
+            algorithms,
+            algorithmsOrdering,
+            groupId
+          }}
+        />
+        <VariantsColumn
+          variants={vriants}
+          variantsOrdering={vriantsOrdering}
+          {...{
+            groupId,
+            algorithmId,
+          }}
+        />
+      </div>
+    );
+  }
+}
 
-// DEV is a "compile time" substition done by Webpack.
-declare var DEV: boolean;
+export default Browser;

@@ -42,36 +42,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./BrowserColumn.less');
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
+import * as React from 'react';
+import Classs from './../../components/common/Classs.tsx';
 
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
-
-
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
-
-declare type ID = string;
-declare interface IId
+interface Props
 {
-  id: ID;
-}
-declare interface IName
-{
-  name: string;
-}
-declare interface ILastEdited
-{
-  lastUserId: ID;
-  lastEdited: string;
+  index: number;
+  title: string;
 }
 
-// SERVER_URL is a "compile time" substition done by Webpack.
-declare var SERVER_URL: string;
+class BrowserColumn extends Classs<Props>
+{
+  render()
+  {
+    return (
+      <div className={'browser-column browser-column-' + this.props.index}>
+        <div className='browser-column-title'>
+          { this.props.title }
+        </div>
+        <div className='browser-column-content'>
+          <div className='browser-column-content-inner'>
+            { this.props['children'] }
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
 
-// DEV is a "compile time" substition done by Webpack.
-declare var DEV: boolean;
+export default BrowserColumn;

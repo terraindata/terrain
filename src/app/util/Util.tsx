@@ -49,7 +49,7 @@ import * as Immutable from "immutable";
 var _ = require('underscore');
 
 import { CardModels } from './../models/CardModels.tsx';
-
+const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 var immutableCardsUpdateHelper = (node: any, keyToUpdate: string | string[], id: string, updater: (node: any, key: string | string[]) => any) =>
 {
   if(node.get('id') === id)
@@ -132,6 +132,39 @@ var Util = {
 
 		return Math.floor(Math.random() * (max - min)) + min;
 	},
+  
+  getId(): ID
+  {
+    // TODO have this fetch a list of IDs from server,
+    // give IDs from that list
+    return _.range(0, 10).map(i => chars[Util.randInt(chars.length)]).join("");
+  },
+  
+  extendId(obj: Object): Object
+  {
+    return _.extend({}, { id: Util.getId() }, _.omit(obj, value => value === undefined));
+  },
+  
+  setValuesToKeys(obj: any, prefix: string)
+  {
+    prefix = prefix + (prefix.length > 0 ? '.' : '');
+    for(var key in obj)
+    {
+      var value = prefix + key;
+      if(typeof obj[key] === 'string')
+      {
+        obj[key] = value;
+      }
+      else if(typeof obj[key] === 'object')
+      {
+        Util.setValuesToKeys(obj[key], value);
+      }
+      else
+      {
+        throw "Value found in ActionTypes that is neither string or object of strings: key: " + key + ", value: " + obj[key];
+      }
+    }
+  },
   
   rel(target): string
   {

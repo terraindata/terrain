@@ -53,7 +53,7 @@ import CardField from './../CardField.tsx';
 import Dropdown from './../../common/Dropdown.tsx';
 import { Operators, Combinators } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
-import BuilderClass from './../../builder/BuilderClass.tsx';
+import Classs from './../../common/Classs.tsx';
 
 interface Props
 {
@@ -63,7 +63,7 @@ interface Props
   keys: string[];
 }
 
-class FilterArea extends BuilderClass<Props>
+class FilterArea extends Classs<Props>
 {
   addFilter(index)
   {

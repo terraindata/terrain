@@ -53,7 +53,7 @@ import Dropdown from './../../common/Dropdown.tsx';
 import CardField from './../CardField.tsx';
 import { Directions } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
-import BuilderClass from './../../builder/BuilderClass.tsx';
+import Classs from './../../common/Classs.tsx';
 import TransformCardChart from './TransformCardChart.tsx';
 import TransformCardPeriscope from './TransformCardPeriscope.tsx';
 import BuilderTextbox from "../../common/BuilderTextbox.tsx";
@@ -66,7 +66,7 @@ interface Props {
   spotlights: any[];
 }
 
-class TransformCard extends BuilderClass<Props>
+class TransformCard extends Classs<Props>
 {
   constructor(props:Props)
   {

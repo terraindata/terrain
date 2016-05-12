@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// TODO update naming
+
 export module CardModels
 {
   export enum Operator {
@@ -91,7 +93,7 @@ export module CardModels
   
   export interface ISort extends IId
   {
-    property: Property;
+    property: string;
     direction: Direction;
   }
   

@@ -21,6 +21,10 @@
 	No directories in `src` with over ten files.
 	No objects / namespaces with over ten keys.
 - Say yes to whitespace for legibility.
+- Interfaces are named with the letter 'I'
+  e.g. `IRobot`, `IAyeAye`
+- Enums are named with the letter 'E' and are singular
+  e.g. `enum ECharacter { EllenParsons, PattyHewes, ArthurFrobisher }; // ECharacter.EllenParsons`
 - Break up template rendering when it makes sense. Name functions that return HTML `render[Description]`
 - Use 'single quotes' in Javascript, "double quotes" in HTML
 - `{}` should follow every `if`, `for`, `while`, etc.

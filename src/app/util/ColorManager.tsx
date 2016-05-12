@@ -120,14 +120,14 @@ class ColorManager
     }
     
     // Insert
-    this.keyToIndex[key] = this.currentIndex ++;
+    this.keyToIndex[key] = (this.currentIndex ++) % this.COLORS.length;
     if(secondaryKey)
     {
       this.keyToSecondaryKey[key] = secondaryKey;
       this.secondaryKeyToKey[secondaryKey] = key;
     }
     
-    return this.keyToIndex[key] % this.COLORS.length;
+    return this.keyToIndex[key];
   }
   
   

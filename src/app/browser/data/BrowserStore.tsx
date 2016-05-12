@@ -42,36 +42,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
+import * as Immutable from 'immutable';
+import * as ReduxActions from 'redux-actions';
+var Redux = require('redux');
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
+import BrowserTypes from './../BrowserTypes.tsx';
+import Util from './../../util/Util.tsx';
+import { g0, g1, g2, g3, g4 } from './BrowserFixtures.tsx';
 
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
+var DefaultState = Immutable.fromJS({
+  groups: {
+    g0,
+    g1,
+    g2,
+    g3,
+    g4,
+  },
+  groupsOrdering: ['g0', 'g1', 'g2', 'g3', 'g4'],
+});
 
+import BrowserReducers from './BrowserReducers.tsx';
 
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
+let BrowserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
+  BrowserReducers,
+{})), DefaultState);
 
-declare type ID = string;
-declare interface IId
-{
-  id: ID;
-}
-declare interface IName
-{
-  name: string;
-}
-declare interface ILastEdited
-{
-  lastUserId: ID;
-  lastEdited: string;
-}
-
-// SERVER_URL is a "compile time" substition done by Webpack.
-declare var SERVER_URL: string;
-
-// DEV is a "compile time" substition done by Webpack.
-declare var DEV: boolean;
+export default BrowserStore;

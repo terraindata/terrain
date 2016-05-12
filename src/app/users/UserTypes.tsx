@@ -42,36 +42,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import RoleTypes from './../roles/RoleTypes.tsx';
+import * as Immutable from 'immutable';
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
-
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
-
-
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
-
-declare type ID = string;
-declare interface IId
+export module UserTypes
 {
-  id: ID;
-}
-declare interface IName
-{
-  name: string;
-}
-declare interface ILastEdited
-{
-  lastUserId: ID;
-  lastEdited: string;
+  let _User = Immutable.Record({
+    id: "",
+    name: "",
+    groupRoles: Immutable.Map({}),
+    picData: "",
+  });
+  export class User extends _User implements IId, IName
+  {
+    id: string;
+    name: string;
+    groupRoles: {[groupId: string]: RoleTypes.GroupUserRole;}
+    picData: string; // or url?
+  }
 }
 
-// SERVER_URL is a "compile time" substition done by Webpack.
-declare var SERVER_URL: string;
-
-// DEV is a "compile time" substition done by Webpack.
-declare var DEV: boolean;
+export default UserTypes;

@@ -42,36 +42,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// import Util from './../util/Util.tsx';
+import * as Immutable from 'immutable';
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
-
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
-
-
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
-
-declare type ID = string;
-declare interface IId
+export module RoleTypes
 {
-  id: ID;
-}
-declare interface IName
-{
-  name: string;
-}
-declare interface ILastEdited
-{
-  lastUserId: ID;
-  lastEdited: string;
+  export enum EGroupRole
+  {
+    Viewer,
+    Builder,
+    Admin,
+  }
+  
+  // https://coderwall.com/p/vxk_tg/using-immutable-js-in-typescript
+  
+  let _GroupUserRole = Immutable.Record(
+  {
+    id: "",
+    groupId: "",
+    userId: "",
+    role: 0,
+  });
+  export class GroupUserRole extends _GroupUserRole implements IId
+  {
+    id: string;
+    groupId: ID;
+    userId: ID;
+    role: EGroupRole;
+  }
+  
+  // export function newRole(userId: ID, groupId: ID, role?: EGroupRole): GroupUserRole
+  // {
+  //   return new GroupUserRole({
+  //     id: Util.getId(),
+  //     userId,
+  //     groupId,
+  //     role: role || EGroupRole.Viewer,
+  //   });
+  // }
 }
 
-// SERVER_URL is a "compile time" substition done by Webpack.
-declare var SERVER_URL: string;
-
-// DEV is a "compile time" substition done by Webpack.
-declare var DEV: boolean;
+export default RoleTypes;

@@ -49,7 +49,7 @@ import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import Util from '../../util/Util.tsx';
 import Actions from "../../data/Actions.tsx";
-import BuilderClass from './../builder/BuilderClass.tsx';
+import Classs from './../common/Classs.tsx';
 
 interface Props
 {
@@ -65,7 +65,7 @@ interface Props
   circle?: boolean;
 }
 
-class Dropdown extends BuilderClass<Props>
+class Dropdown extends Classs<Props>
 {
   constructor(props: Props) {
     super(props);

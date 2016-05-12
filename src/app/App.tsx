@@ -58,11 +58,16 @@ window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.
 // Components
 import LayoutManager from "./components/layout/LayoutManager.tsx";
 import Builder from "./components/builder/Builder.tsx";
+import Browser from './browser/components/Browser.tsx';
 import Sidebar from "./components/layout/Sidebar.tsx";
 import AccountDropdown from "./components/common/AccountDropdown.tsx";
 import Login from "./components/common/Login.tsx";
 import InfoArea from "./components/common/InfoArea.tsx";
+import Placeholder from "./components/common/Placeholder.tsx";
 var ReactTooltip = require("./components/common/tooltip/react-tooltip.js");
+import { Router, Route, IndexRoute } from 'react-router';
+import { createHistory } from 'history'; // you need to install this package
+let history = createHistory();
 
 // Icons
 var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
@@ -74,6 +79,35 @@ var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 
 import Actions from "./data/Actions.tsx";
 import Store from "./data/Store.tsx";
+
+var links = 
+[
+  {
+    icon: <HomeIcon />,
+    text: 'Home',
+    route: '/home',
+  },
+  {
+    icon: <ReportingIcon />,
+    text: 'Reporting',
+    route: '/reporting',
+  },
+  {
+    icon: <BrowserIcon />,
+    text: 'Browser',
+    route: '/browser',
+  },
+  {
+    icon: <BuilderIcon />,
+    text: 'Builder',
+    route: '/builder',
+  },
+  {
+    icon: <TQLIcon />,
+    text: 'TQL',
+    route: '/tql',
+  },
+];
 
 var App = React.createClass({
   componentDidMount() {
@@ -102,10 +136,6 @@ var App = React.createClass({
   
   selectPage(index)
   {
-    this.setState({
-      selectedPage: index,
-      sidebarExpanded: false,
-    });
   },
   
   toggleSidebar()
@@ -127,41 +157,12 @@ var App = React.createClass({
       return <Login />;
     }
     
-    var links = 
-    [
-      {
-        icon: <HomeIcon />,
-        text: 'Home',
-      },
-      {
-        icon: <ReportingIcon />,
-        text: 'Reporting',
-      },
-      {
-        icon: <BrowserIcon />,
-        text: 'Browser',
-      },
-      {
-        icon: <BuilderIcon />,
-        text: 'Builder',
-      },
-      {
-        icon: <TQLIcon />,
-        text: 'TQL',
-      },
-    ];
-    
-    var content = (
-      <InfoArea large="This page is still in progress." />
-    );
-    
-    switch(this.state.selectedPage) {
-      case 3:
-        content = <Builder />;
-      // New pages added here
-    }
-    
     var sidebarWidth = this.state.sidebarExpanded ? 130 : 36;
+    var selectedIndex = links.findIndex(link => this.props.location.pathname.indexOf(link.route) === 0 );
+    if(selectedIndex === -1)
+    {
+      selectedIndex = 3;
+    }
     
     var layout =
       {
@@ -172,14 +173,15 @@ var App = React.createClass({
             width: sidebarWidth,
             content: <Sidebar 
               links={links}
-              selectedIndex={this.state.selectedPage}
+              selectedIndex={selectedIndex}
               onChange={this.selectPage}
               expandable={true}
               expanded={this.state.sidebarExpanded}
-              onExpand={this.toggleSidebar} />
+              onExpand={this.toggleSidebar}
+            />
           },
           {
-            content: content
+            content: this.props.children,
           }
         ],
       };
@@ -208,10 +210,27 @@ var App = React.createClass({
       </div>
     );
   }
-
 });
 
-ReactDOM.render(<App />, document.getElementById('app'), function () {
-  // require('./tests').run(this);
-  // TODO: tests here.
+var router = (
+  <Router history={history}>
+    <Route path="/" component={App}>
+      <IndexRoute component={Builder} />
+      <Route path="/builder" component={Builder} />
+      <Route path="/builder/:config" component={Builder} />
+      
+      <Route path="/browser" component={Browser} />
+      <Route path="/browser/:groupId" component={Browser} />
+      <Route path="/browser/:groupId/:algorithmId" component={Browser} />
+      <Route path="/browser/:groupId/:algorithmId/:variantId" component={Browser} />
+      
+      <Route path="/home" component={Placeholder} />
+      <Route path="/reporting" component={Placeholder} />
+      <Route path="/tql" component={Placeholder} />
+    </Route>
+  </Router>
+);
+
+ReactDOM.render(router, document.getElementById('app'), function () {
+  // tests can go here
 });

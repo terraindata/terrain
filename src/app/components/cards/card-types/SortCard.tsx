@@ -51,13 +51,13 @@ import CardField from './../CardField.tsx';
 import { Directions } from './../../../CommonVars.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 import BuilderTextbox from "../../common/BuilderTextbox.tsx";
-import BuilderClass from './../../builder/BuilderClass.tsx';
+import Classs from './../../common/Classs.tsx';
 
 interface Props {
   card: CardModels.ISortCard;
 }
 
-class SortCard extends BuilderClass<Props>
+class SortCard extends Classs<Props>
 {
   addSort(index)
   {

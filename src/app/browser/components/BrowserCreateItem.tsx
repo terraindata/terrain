@@ -42,36 +42,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./BrowserCreateItem.less');
+import * as React from 'react';
+import Classs from './../../components/common/Classs.tsx';
+import Menu from './../../components/common/Menu.tsx';
+var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
-
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
-
-
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
-
-declare type ID = string;
-declare interface IId
-{
-  id: ID;
-}
-declare interface IName
+interface Props
 {
   name: string;
+  onCreate: () => void;
 }
-declare interface ILastEdited
+
+class BrowserCreateItem extends Classs<Props>
 {
-  lastUserId: ID;
-  lastEdited: string;
+  render()
+  {
+    return (
+      <div className='browser-create-item' onClick={this.props.onCreate} data-tip={'Create ' + this.props.name}>
+        <AddIcon />        
+      </div>
+    );
+  }
 }
 
-// SERVER_URL is a "compile time" substition done by Webpack.
-declare var SERVER_URL: string;
-
-// DEV is a "compile time" substition done by Webpack.
-declare var DEV: boolean;
+export default BrowserCreateItem;

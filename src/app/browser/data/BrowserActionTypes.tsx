@@ -42,36 +42,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+var _ = require('underscore');
+var Immutable = require('immutable');
+import Util from './../../util/Util.tsx';
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
+var create = '';
+var change = '';
+var move = '';
+var remove = '';
+var duplicate = '';
 
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
-
-
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
-
-declare type ID = string;
-declare interface IId
+var BrowserActionTypes = 
 {
-  id: ID;
-}
-declare interface IName
-{
-  name: string;
-}
-declare interface ILastEdited
-{
-  lastUserId: ID;
-  lastEdited: string;
-}
+  groups: { create, change, move, remove, duplicate },
+  algorithms: { create, change, move, remove, duplicate },
+  variants: { create, change, move, remove, duplicate },
+};
 
-// SERVER_URL is a "compile time" substition done by Webpack.
-declare var SERVER_URL: string;
+Util.setValuesToKeys(BrowserActionTypes, '');
 
-// DEV is a "compile time" substition done by Webpack.
-declare var DEV: boolean;
+export default BrowserActionTypes;

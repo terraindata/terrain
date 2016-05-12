@@ -42,36 +42,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as React from 'react';
+import InfoArea from './InfoArea.tsx';
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
-
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
-
-
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
-
-declare type ID = string;
-declare interface IId
+class Placeholder extends React.Component<any, any>
 {
-  id: ID;
-}
-declare interface IName
-{
-  name: string;
-}
-declare interface ILastEdited
-{
-  lastUserId: ID;
-  lastEdited: string;
-}
+  render() {
+    return (
+       <InfoArea large="In progress." />
+     );
+  }
+};
 
-// SERVER_URL is a "compile time" substition done by Webpack.
-declare var SERVER_URL: string;
-
-// DEV is a "compile time" substition done by Webpack.
-declare var DEV: boolean;
+export default Placeholder;

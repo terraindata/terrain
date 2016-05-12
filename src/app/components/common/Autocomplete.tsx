@@ -49,7 +49,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
-import BuilderClass from './../builder/BuilderClass.tsx';
+import Classs from './../common/Classs.tsx';
 
 interface Props
 {
@@ -61,7 +61,7 @@ interface Props
   className?: string;
 }
 
-class Autocomplete extends BuilderClass<Props>
+class Autocomplete extends Classs<Props>
 {
   value: string;
   

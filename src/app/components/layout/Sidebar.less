@@ -42,7 +42,7 @@
     left: 0px;
     top: 0px;
     
-    transition: top 0.2s;
+    .transition(~"all 600ms cubic-bezier(0.23, 1, 0.32, 1)");
   }
   
   .sidebar-link {
@@ -51,7 +51,7 @@
     color: @sidebar-text-color;
     position: relative;
     cursor: pointer;
-    .transition;
+    .transition(~"all 600ms cubic-bezier(0.23, 1, 0.32, 1)");
     
     &:hover {
       background: rgba(255,255,255,0.1);
@@ -75,6 +75,7 @@
     svg {
       width: 17px;
       fill: #fff;
+      .transition(~"all 600ms cubic-bezier(0.23, 1, 0.32, 1)");
     }
     
     .sidebar-link-text {
@@ -98,7 +99,7 @@
     border-top-left-radius: @sidebar-link-height;
     position: relative;
     cursor: pointer;
-    .transition;
+    .transition(~"all 600ms cubic-bezier(0.23, 1, 0.32, 1)");
     &:hover {
       background: darken(@sidebar-expand-bg, 5%);
       // padding: 9px 9px;
@@ -111,7 +112,7 @@
       fill: #fff;
       width: 9px;
       // .vertically-middle;
-      .transition;
+      .transition(~"all 600ms cubic-bezier(0.23, 1, 0.32, 1)");
     }
   }
 }

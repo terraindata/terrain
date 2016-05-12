@@ -42,36 +42,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+var _ = require('underscore');
+import ActionTypes from './BrowserActionTypes.tsx';
+import Store from './BrowserStore.tsx';
+import BrowserTypes from './../BrowserTypes.tsx';
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
+var $ = (type: string, payload: any) => Store.dispatch({type, payload})
 
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
-
-
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
-
-declare type ID = string;
-declare interface IId
+const Actions =
 {
-  id: ID;
-}
-declare interface IName
-{
-  name: string;
-}
-declare interface ILastEdited
-{
-  lastUserId: ID;
-  lastEdited: string;
+  groups:
+  {
+    create:
+      () =>
+        $(ActionTypes.groups.create, {}),
+    
+    change:
+      (group: BrowserTypes.Group) =>
+        $(ActionTypes.groups.change, { group }),
+  },
+  
+  algorithms:
+  {
+    create:
+      (groupId: ID) =>
+        $(ActionTypes.algorithms.create, { groupId }),
+    
+    change:
+      (algorithm: BrowserTypes.Algorithm) =>
+        $(ActionTypes.algorithms.change, { algorithm }),
+  },
+  
+  variants:
+  {
+    create:
+      (groupId: ID, algorithmId: ID) =>
+        $(ActionTypes.variants.create, { groupId, algorithmId }),
+    
+    change:
+      (variant: BrowserTypes.Variant) =>
+        $(ActionTypes.variants.change, { variant }),
+  },
 }
 
-// SERVER_URL is a "compile time" substition done by Webpack.
-declare var SERVER_URL: string;
-
-// DEV is a "compile time" substition done by Webpack.
-declare var DEV: boolean;
+export default Actions;

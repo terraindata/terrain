@@ -51,7 +51,7 @@ import CardField from './../CardField.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 import BuilderTextbox from "../../common/BuilderTextbox.tsx";
 import BuilderTextboxCards from "../../common/BuilderTextboxCards.tsx";
-import BuilderClass from './../../builder/BuilderClass.tsx';
+import Classs from './../../common/Classs.tsx';
 
 var ArrowIcon = require("./../../../../images/icon_arrow_42x16.svg?name=ArrowIcon");
 var ExpandIcon = require("./../../../../images/icon_tql_17x14.svg?name=ExpandIcon");
@@ -61,7 +61,7 @@ interface Props {
   spotlights: any[];
 }
 
-class LetVarCard extends BuilderClass<Props>
+class LetVarCard extends Classs<Props>
 {
   constructor(props:Props)
   {

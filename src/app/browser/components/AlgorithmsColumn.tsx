@@ -42,111 +42,104 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Menu.less');
-import * as $ from 'jquery';
-import * as _ from 'underscore';
 import * as React from 'react';
-import Util from '../../util/Util.tsx';
-import * as classNames from 'classnames';
-import Classs from './../common/Classs.tsx';
-var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
-
-var optionHeight = 30; // coordinate with Menu.less
-
-export interface MenuOption {
-  text: string;
-  onClick: () => void;
-  disabled?: boolean;
-};
+import Classs from './../../components/common/Classs.tsx';
+import BrowserColumn from './BrowserColumn.tsx';
+import BrowserItem from './BrowserItem.tsx';
+import BrowserCreateItem from './BrowserCreateItem.tsx';
+import BrowserTypes from './../BrowserTypes.tsx';
+import ColorManager from './../../util/ColorManager.tsx';
+import InfoArea from './../../components/common/InfoArea.tsx';
+import Actions from './../data/BrowserActions.tsx';
+type Algorithm = BrowserTypes.Algorithm;
 
 interface Props
 {
-  options: MenuOption[];
-  small?: boolean;
+  algorithms: Immutable.Map<ID, Algorithm>;
+  algorithmsOrdering: Immutable.List<ID>;
+  groupId: ID;
 }
 
-class Menu extends Classs<Props>
+class AlgorithmsColumn extends Classs<Props>
 {
-  constructor(props: Props) {
+  constructor(props)
+  {
     super(props);
-    this.state =
-    {
-      open: false,
-    }
   }
   
-  shouldComponentUpdate(nextProps, nextState)
+  handleDuplicate(index: number)
   {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+    console.log(index);
   }
   
-  renderOption(option, index)
+  handleCreate()
   {
-    if(!option.disabled)
-    {
-      var onClick = (event) => {
-        event.stopPropagation();
-        option.onClick(index);
-      };
-    }
-    
-    return (
-      <div className={"menu-option" + (option.disabled ? " menu-option-disabled" : "")} key={index} onClick={onClick}>
-        <div className="vertically-middle">
-          { option.text }
-        </div>
-      </div>
+    Actions.algorithms.create(this.props.groupId);
+  }
+  
+  handleNameChange(id: ID, name: string)
+  {
+    Actions.algorithms.change(
+      this.props.algorithms.get(id)
+        .set('name', name) as Algorithm
     );
   }
   
-  close()
+  renderAlgorithm(id: ID, index: number)
   {
-    this.setState({
-      open: false,
-    })
-    $(document).off('click', this.close);
-  }
-  
-  toggleOpen()
-  {
-    if(!this.state.open)
-    {
-      $(document).on('click', this.close);
-    }
-    
-    this.setState({
-      open: !this.state.open,
-    })
-  }
-
-  render() {
-    var style = {
-      width: 14 * this.props.options.reduce((max, option) => 
-        option.text.length > max ? option.text.length : max, 1),
-      height: this.props.options.length * optionHeight,
-    };
-    
+    const algorithm = this.props.algorithms.get(id);
     return (
-      <div
-        className={classNames({
-          "menu-wrapper": true,
-          "menu-wrapper-small": this.props.small,
-          "menu-open": this.state.open,        
-        })}
-        style={style}
-        onClick={this.toggleOpen}
+      <BrowserItem
+        index={index}
+        name={algorithm.name}
+        icon={null}
+        onDuplicate={this.handleDuplicate}
+        color={ColorManager.colorForKey(this.props.groupId)}
+        key={algorithm.id}
+        to={`/browser/${this.props.groupId}/${algorithm.id}`}
+        className='browser-item-lighter'
+        id={id}
+        onNameChange={this.handleNameChange}
+        type='algorithm'
       >
-        <MoreIcon className="menu-icon" />
-        { !this.state.open ? null :
-          <div className="menu-options-wrapper">
-            {
-              this.props.options.map(this.renderOption)
-            }
-          </div>
-        }
-      </div>
+      </BrowserItem>
     );
   }
-};
+  
+  render()
+  {
+    return (
+      <BrowserColumn
+        index={2}
+        title='Algorithms'
+      >
+        { 
+          this.props.algorithms ?
+            (
+              this.props.algorithms.size ?
+              (
+                <div>
+                  {
+                    this.props.algorithmsOrdering.map(this.renderAlgorithm)
+                  }
+                  <BrowserCreateItem
+                    name='algorithm'
+                    onCreate={this.handleCreate}
+                  />
+                </div>
+              )
+              :
+              <InfoArea
+                large='No algorithms created, yet.'
+                button='Create a algorithm'
+                onClick={this.handleCreate}
+              />
+            )
+          : null
+        }
+      </BrowserColumn>
+    );
+  }
+}
 
-export default Menu;
+export default AlgorithmsColumn;

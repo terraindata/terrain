@@ -48,7 +48,7 @@ import Util from '../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import CardField from './../CardField.tsx';
 import BuilderTextbox from "../../common/BuilderTextbox.tsx";
-import BuilderClass from './../../builder/BuilderClass.tsx';
+import Classs from './../../common/Classs.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 
 interface Props {
@@ -56,7 +56,7 @@ interface Props {
   keys: string[];
 }
 
-class SelectCard extends BuilderClass<Props>
+class SelectCard extends Classs<Props>
 {
   constructor(props:Props)
   {

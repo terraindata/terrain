@@ -1,0 +1,54 @@
+@import "../../util/Common.less";
+
+.browser-column {
+  width: 33.33%;
+  position: absolute;
+  top: 0px;
+  height: 100%;
+  
+  &.browser-column-1 {
+    left: 0px;
+  }
+  &.browser-column-2 {
+    left: 33.33%;
+  }
+  &.browser-column-3 {
+    left: 66.67%;
+  }
+  
+  @title-height: 35px;
+  .browser-column-title {
+    background: #a2af93;
+    padding-left: 15px;
+    padding-top: 7px;
+    box-sizing: border-box;
+    color: #fff;
+    font-weight: 500;
+    font-size: 16px;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: @title-height;
+    border-right: 1px solid rgba(0,0,0,0.15);
+  }
+  
+  .browser-column-content {
+    @col-top-margin: 6px;
+    position: absolute;
+    width: 100%;
+    box-sizing: border-box;
+    height: calc(~"100% - @{title-height} - 2 * @{col-top-margin}");
+    top: @title-height + @col-top-margin;
+    text-align: center;
+    border-right: 1px solid #ddd;
+    padding: 0px 6px;
+    
+    .browser-column-content-inner {
+      height: calc(~"100% + @{col-top-margin}");
+      position: relative;
+      overflow-y: auto;
+    }
+  }
+}

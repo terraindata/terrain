@@ -54,7 +54,7 @@ import Dropdown from "../../common/Dropdown.tsx";
 import CardField from './../CardField.tsx';
 import { CardModels } from './../../../models/CardModels.tsx';
 import BuilderTextbox from "../../common/BuilderTextbox.tsx";
-import BuilderClass from './../../builder/BuilderClass.tsx';
+import Classs from './../../common/Classs.tsx';
 
 var BORDER_RADIUS = '5px';
 var SCORE_COLORS = 
@@ -70,7 +70,7 @@ interface Props {
 
 var methods = ['weightedSum'];
 
-class ScoreCard extends BuilderClass<Props>
+class ScoreCard extends Classs<Props>
 {
   constructor(props:Props)
   {

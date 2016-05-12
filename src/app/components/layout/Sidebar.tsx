@@ -45,6 +45,7 @@ THE SOFTWARE.
 require('./Sidebar.less');
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
+import { Link } from 'react-router';
 
 var ExpandIcon = require("./../../../images/icon_expand_12x12.svg?name=ExpandIcon");
 var linkHeight = 36; // Coordinate with Sidebar.less
@@ -52,6 +53,7 @@ var linkHeight = 36; // Coordinate with Sidebar.less
 interface Link {
   icon: any;
   text: string;
+  route: string;
 }
 
 interface Props {
@@ -82,19 +84,22 @@ class Sidebar extends React.Component<Props, any>
         {
           this.props.links.map((link, index) => 
             (
-              <div 
-                className={Util.objToClassname({
-                  'sidebar-link': true,
-                  'sidebar-link-selected': index === this.props.selectedIndex,
-                  })}
+              <Link
+                to={link.route}
                 key={index}
-                onClick={this.handleClickFactory(index)}>
-                  <div className="sidebar-link-inner">
-                    { link.icon }
-                    <div className="sidebar-link-text">{link.text}</div>
-                    
-                  </div>
-              </div>
+              >
+                <div 
+                  className={Util.objToClassname({
+                    'sidebar-link': true,
+                    'sidebar-link-selected': index === this.props.selectedIndex,
+                    })}
+                  onClick={this.handleClickFactory(index)}>
+                    <div className="sidebar-link-inner">
+                      { link.icon }
+                      <div className="sidebar-link-text">{link.text}</div>
+                    </div>
+                </div>
+              </Link>
             )
           )
         }

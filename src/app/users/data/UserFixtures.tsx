@@ -42,36 +42,53 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import RoleTypes from './../../roles/RoleTypes.tsx';
+import UserTypes from './../UserTypes.tsx';
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
+export const U0 = new UserTypes.User({
+  id: "u0",
+  name: "Patty Hewes",
+  // groupRoles: [],
+})
 
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
+export const U1 = new UserTypes.User({
+  id: "u1",
+  name: "Ellen Parsons",
+  // groupRoles: [],
+})
 
+export const U2 = new UserTypes.User({
+  id: "U2",
+  name: "Paul Hewson",
+  // groupRoles: [],
+})
 
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
+export const U3 = new UserTypes.User({
+  id: "u3",
+  name: "Wes Krulik",
+  // groupRoles: [],
+})
 
-declare type ID = string;
-declare interface IId
-{
-  id: ID;
-}
-declare interface IName
-{
-  name: string;
-}
-declare interface ILastEdited
-{
-  lastUserId: ID;
-  lastEdited: string;
-}
+export const U4 = new UserTypes.User({
+  id: "u4",
+  name: "Tom Shayes",
+  // groupRoles: [],
+})
 
-// SERVER_URL is a "compile time" substition done by Webpack.
-declare var SERVER_URL: string;
+export const U5 = new UserTypes.User({
+  id: "u5",
+  name: "Arthur Frobisher",
+  // groupRoles: [],
+})
 
-// DEV is a "compile time" substition done by Webpack.
-declare var DEV: boolean;
+export const U6 = new UserTypes.User({
+  id: "u6",
+  name: "Ray Fiske",
+  // groupRoles: [],
+})
+
+export const U7 = new UserTypes.User({
+  id: "u7",
+  name: "David Connor",
+  // groupRoles: [],
+})

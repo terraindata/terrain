@@ -1,0 +1,32 @@
+@import "../../util/Common.less";
+
+.browser-create-item {
+  @size: 24px;
+  @margin-top: 15px;
+  width: @size;
+  height: @size;
+  border-radius: @size;
+  border: 1px solid #a2af93;
+  background: #fff;
+  position: relative;
+  margin: @margin-top 0px;
+  display: inline-block;
+  cursor: pointer;
+  .transition;
+  
+  svg {
+    width: 10px;
+    fill: #5f7d8c;
+    .vertically-middle;
+  }
+  
+  &:hover {
+    @amp: 4px;
+    width: @size + @amp;
+    height: @size + @amp;
+    border-radius: @size + @amp;    
+    margin-left: -0.5 * @amp;
+    margin-bottom: @margin-top - 0.5 * @amp;
+    margin-top: @margin-top - 0.5 * @amp;
+  }
+}

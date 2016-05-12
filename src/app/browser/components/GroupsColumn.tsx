@@ -42,36 +42,98 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as React from 'react';
+import Classs from './../../components/common/Classs.tsx';
+import BrowserColumn from './BrowserColumn.tsx';
+import BrowserItem from './BrowserItem.tsx';
+import BrowserCreateItem from './BrowserCreateItem.tsx';
+import BrowserTypes from './../BrowserTypes.tsx';
+import ColorManager from './../../util/ColorManager.tsx';
+import InfoArea from './../../components/common/InfoArea.tsx';
+import Actions from './../data/BrowserActions.tsx';
+type Group = BrowserTypes.Group;
 
-/// <reference path="react/react.d.ts" />
-/// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
-
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
-
-
-interface Array<T> {
-  find(predicate: (search: T) => boolean) : T;
-  findIndex(predicate: (search: T) => boolean) : number;
-}
-
-declare type ID = string;
-declare interface IId
+interface Props
 {
-  id: ID;
-}
-declare interface IName
-{
-  name: string;
-}
-declare interface ILastEdited
-{
-  lastUserId: ID;
-  lastEdited: string;
+  groups: Immutable.Map<ID, Group>;
+  groupsOrdering: Immutable.List<ID>;
 }
 
-// SERVER_URL is a "compile time" substition done by Webpack.
-declare var SERVER_URL: string;
+class GroupsColumn extends Classs<Props>
+{
+  constructor(props)
+  {
+    super(props);
+  }
+  
+  handleDuplicate(index: number)
+  {
+    console.log(index);
+  }
+  
+  handleNameChange(id: ID, name: string)
+  {
+    Actions.groups.change(
+      this.props.groups.get(id)
+        .set('name', name) as Group
+    );
+  }
+  
+  handleCreate()
+  {
+    Actions.groups.create();
+  }
+  
+  renderGroup(id: ID, index: number)
+  {
+    const group = this.props.groups.get(id);
+    return (
+      <BrowserItem
+        index={index}
+        name={group.name}
+        id={id}
+        icon={null}
+        onDuplicate={this.handleDuplicate}
+        color={ColorManager.colorForKey(group.id)}
+        key={group.id}
+        to={'/browser/' + group.id}
+        onNameChange={this.handleNameChange}
+        type='group'
+      >
+      </BrowserItem>
+    );
+  }
+  
+  render()
+  {
+    return (
+      <BrowserColumn
+        index={1}
+        title='Groups'
+      >
+        {
+          this.props.groups.size ?
+            (
+              <div>
+                {
+                  this.props.groupsOrdering.map(this.renderGroup)
+                }
+                <BrowserCreateItem
+                  name='group'
+                  onCreate={this.handleCreate}
+                />
+              </div>
+            )
+            :
+            <InfoArea
+              large='No groups created, yet.'
+              button='Create a group'
+              onClick={this.handleCreate}
+            />
+        }
+      </BrowserColumn>
+    );
+  }
+}
 
-// DEV is a "compile time" substition done by Webpack.
-declare var DEV: boolean;
+export default GroupsColumn;
