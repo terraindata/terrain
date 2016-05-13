@@ -57,12 +57,50 @@ BrowserReducers[ActionTypes.groups.create] =
       const id = newGroup.get('id');
       return state
         .setIn(['groups', id], newGroup)
-        .update('groupsOrdering', ordering => ordering.push(id));
+        .update('groupsOrder', order => order.push(id));
     }
 
 BrowserReducers[ActionTypes.groups.change] =
   (state, action) =>
     state.setIn(['groups', action.payload.group.id], action.payload.group);
+
+BrowserReducers[ActionTypes.groups.move] =
+  (state, action) =>
+  {
+    let id = state.getIn(['groupsOrder', action.payload.index]);
+    return state
+      .updateIn(['groupsOrder'], order => 
+        order.splice(action.payload.index, 1)
+          .splice(action.payload.newIndex + Util.moveIndexOffset(action.payload.index, action.payload.newIndex), 0, id)
+        )
+  }
+
+BrowserReducers[ActionTypes.groups.duplicate] =
+  (state, action) =>
+  {
+    var id = Util.getId();
+    var idMap = {};
+    var { group } = action.payload;
+    return state
+      .setIn(['groups', id], group
+        .set('id', id)
+        .set('name', 'Copy of ' + group.name)
+        .update('algorithms', algorithms =>
+          algorithms.reduce((memo, algorithm, key) =>
+          {
+            let aid = Util.getId();
+            idMap[key] = aid;
+            return memo.set(aid, duplicateAlgorithm(algorithm, aid, id));
+          }, Immutable.Map({}))
+        )
+        .update('algorithmsOrder', order => 
+          order.map(oldId => idMap[oldId]))
+      )
+      .updateIn(['groupsOrder'],
+        order => order.splice(action.payload.index, 0, id))
+  }
+
+
 
 BrowserReducers[ActionTypes.algorithms.create] =
   (state, action) =>
@@ -72,14 +110,59 @@ BrowserReducers[ActionTypes.algorithms.create] =
       const id = newAlg.id;
       return state
         .setIn(['groups', groupId, 'algorithms', id], newAlg)
-        .updateIn(['groups', groupId, 'algorithmsOrdering'],
-          ordering => ordering.push(id));
+        .updateIn(['groups', groupId, 'algorithmsOrder'],
+          order => order.push(id));
     }
 
 BrowserReducers[ActionTypes.algorithms.change] =
   (state, action) =>
     state.setIn(['groups', action.payload.algorithm.groupId, 'algorithms', action.payload.algorithm.id],
       action.payload.algorithm);
+
+BrowserReducers[ActionTypes.algorithms.move] =
+  (state, action) =>
+  {
+    let id = state.getIn(['groups', action.payload.groupId, 'algorithmsOrder', action.payload.index]);
+    return state
+      .updateIn(['groups', action.payload.groupId, 'algorithmsOrder'], order => 
+        order.splice(action.payload.index, 1)
+          .splice(action.payload.newIndex + Util.moveIndexOffset(action.payload.index, action.payload.newIndex), 0, id)
+        )
+  }
+
+let duplicateAlgorithm = (algorithm, id, groupId) =>
+{
+  var idMap = {};
+  return algorithm.set('id', id)
+    .set('name', 'Copy of ' + algorithm.name)
+    .set('groupId', groupId)
+    .update('variants', variants => variants.reduce(
+      (memo, value, key) =>
+      {
+        var vid = Util.getId();
+        idMap[key] = vid;
+        return memo.set(vid, value.set('id', vid)
+          .set('groupId', groupId)
+          .set('name', 'Copy of ' + value.name)
+          .set('algorithmId', id));
+      },
+      Immutable.Map({})))
+    .update('variantsOrder', order => 
+      order.map(oldId => idMap[oldId]))
+}
+
+BrowserReducers[ActionTypes.algorithms.duplicate] =
+  (state, action) =>
+  {
+    var id = Util.getId();
+    let { algorithm } = action.payload;
+    return state
+      .setIn(['groups', algorithm.groupId, 'algorithms', id], 
+        duplicateAlgorithm(algorithm, id, algorithm.groupId))
+      .updateIn(['groups', action.payload.algorithm.groupId, 'algorithmsOrder'],
+        order => order.splice(action.payload.index, 0, id))
+  }
+
 
 BrowserReducers[ActionTypes.variants.create] =
   (state, action) =>
@@ -89,8 +172,8 @@ BrowserReducers[ActionTypes.variants.create] =
       const id = v.id;
       return state
         .setIn(['groups', groupId, 'algorithms', algorithmId, 'variants', id], v)
-        .updateIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrdering'],
-          ordering => ordering.push(id));
+        .updateIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrder'],
+          order => order.push(id));
     }
 
 BrowserReducers[ActionTypes.variants.change] =
@@ -99,4 +182,28 @@ BrowserReducers[ActionTypes.variants.change] =
         action.payload.variant.algorithmId, 'variants', action.payload.variant.id],
       action.payload.variant);
 
+BrowserReducers[ActionTypes.variants.move] =
+  (state, action) =>
+  {
+    let id = state.getIn(['variantsOrder', action.payload.index]);
+    return state
+      .updateIn(['groups', action.payload.groupId, 'algorithms', action.payload.algorithmId, 'variantsOrder'], order => 
+        order.splice(action.payload.index, 1)
+          .splice(action.payload.newIndex + Util.moveIndexOffset(action.payload.index, action.payload.newIndex), 0, id)
+        )
+  }
+
+BrowserReducers[ActionTypes.variants.duplicate] =
+  (state, action) =>
+  {
+    var id = Util.getId();
+    return state
+      .setIn(['groups', action.payload.variant.groupId, 'algorithms', action.payload.variant.algorithmId, 'variants', id],
+        action.payload.variant.set('id', id)
+          .set('name', 'Copy of ' + action.payload.variant.name))
+      .updateIn(['groups', action.payload.variant.groupId, 'algorithms', action.payload.variant.algorithmId, 'variantsOrder'],
+        order => order.splice(action.payload.index, 0, id))
+  }
+  
+  
 export default BrowserReducers;

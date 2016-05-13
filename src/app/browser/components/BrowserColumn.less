@@ -35,20 +35,21 @@
   }
   
   .browser-column-content {
-    @col-top-margin: 6px;
     position: absolute;
-    width: 100%;
+    width: calc(~"100% - 6px");
     box-sizing: border-box;
+    height: calc(~"100% - @{title-height}");
+    top: @title-height;
+    text-align: center;
+    overflow-y: auto;
+  }
+  
+  .browser-column-border {
+    position: absolute;
+    border-right: 1px solid #ddd;
+    @col-top-margin: 6px;
     height: calc(~"100% - @{title-height} - 2 * @{col-top-margin}");
     top: @title-height + @col-top-margin;
-    text-align: center;
-    border-right: 1px solid #ddd;
-    padding: 0px 6px;
-    
-    .browser-column-content-inner {
-      height: calc(~"100% + @{col-top-margin}");
-      position: relative;
-      overflow-y: auto;
-    }
+    right: 0;
   }
 }

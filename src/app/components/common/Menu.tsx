@@ -85,6 +85,7 @@ class Menu extends Classs<Props>
     if(!option.disabled)
     {
       var onClick = (event) => {
+        event.preventDefault();
         event.stopPropagation();
         option.onClick(index);
       };

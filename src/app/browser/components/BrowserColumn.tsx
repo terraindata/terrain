@@ -63,10 +63,9 @@ class BrowserColumn extends Classs<Props>
           { this.props.title }
         </div>
         <div className='browser-column-content'>
-          <div className='browser-column-content-inner'>
-            { this.props['children'] }
-          </div>
+          { this.props['children'] }
         </div>
+        <div className='browser-column-border' />
       </div>
     );
   }

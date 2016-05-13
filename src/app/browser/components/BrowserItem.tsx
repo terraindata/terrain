@@ -60,6 +60,7 @@ interface Props
   type: string;
   onNameChange: (id: ID, name: string) => void;
   id: ID;
+  rendered: boolean; // has the parent been mounted?
   className?: string;
 }
 
@@ -68,6 +69,8 @@ class BrowserItem extends Classs<Props>
   state = {
     nameEditing: false,
     focusField: false,
+    mounted: false,
+    timeout: null,
   }
   
   menuOptions = [
@@ -80,9 +83,27 @@ class BrowserItem extends Classs<Props>
   
   componentDidMount()
   {
+    this.setState({
+      timeout: 
+        setTimeout(() =>
+        {
+          this.setState({
+            mounted: true,
+          })
+        }, this.props.rendered ? 0 : Math.min(this.props.index * 100, 1000)),
+    })
+    
     if(!this.props.name.length)
     {
       this.showTextfield();
+    }
+  }
+  
+  componentWillUnmount()
+  {
+    if(this.state.timeout)
+    {
+      clearTimeout(this.state.timeout);
     }
   }
   
@@ -136,7 +157,13 @@ class BrowserItem extends Classs<Props>
   {
     return (
       <Link to={this.props.to} className='browser-item-link' activeClassName='browser-item-active'>
-        <div className='browser-item-wrapper' style={{borderColor:this.props.color}}>
+        <div
+          className={classNames({
+            'browser-item-wrapper': true,
+            'browser-item-wrapper-mounted': this.state.mounted,
+          })}
+          style={{borderColor:this.props.color}}
+        >
           <div className={'browser-item ' + this.props.className} style={{background:this.props.color}}>
             <div
               className={classNames({

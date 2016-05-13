@@ -56,11 +56,22 @@ type Group = BrowserTypes.Group;
 interface Props
 {
   groups: Immutable.Map<ID, Group>;
-  groupsOrdering: Immutable.List<ID>;
+  groupsOrder: Immutable.List<ID>;
 }
 
 class GroupsColumn extends Classs<Props>
 {
+  state = {
+    rendered: false,
+  }
+  
+  componentDidMount()
+  {
+    this.setState({
+      rendered: true,
+    });
+  }
+  
   constructor(props)
   {
     super(props);
@@ -68,7 +79,7 @@ class GroupsColumn extends Classs<Props>
   
   handleDuplicate(index: number)
   {
-    console.log(index);
+    Actions.groups.duplicate(this.props.groups.get(this.props.groupsOrder.get(index)), index);
   }
   
   handleNameChange(id: ID, name: string)
@@ -99,6 +110,7 @@ class GroupsColumn extends Classs<Props>
         to={'/browser/' + group.id}
         onNameChange={this.handleNameChange}
         type='group'
+        rendered={this.state.rendered}
       >
       </BrowserItem>
     );
@@ -116,7 +128,7 @@ class GroupsColumn extends Classs<Props>
             (
               <div>
                 {
-                  this.props.groupsOrdering.map(this.renderGroup)
+                  this.props.groupsOrder.map(this.renderGroup)
                 }
                 <BrowserCreateItem
                   name='group'

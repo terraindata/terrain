@@ -60,6 +60,14 @@ const Actions =
     change:
       (group: BrowserTypes.Group) =>
         $(ActionTypes.groups.change, { group }),
+    
+    move:
+      (index: number, newIndex: number) =>
+        $(ActionTypes.groups.move, { index, newIndex }),
+        
+    duplicate:
+      (group: BrowserTypes.Group, index: number) =>
+        $(ActionTypes.groups.duplicate, { group, index }),
   },
   
   algorithms:
@@ -71,6 +79,14 @@ const Actions =
     change:
       (algorithm: BrowserTypes.Algorithm) =>
         $(ActionTypes.algorithms.change, { algorithm }),
+    
+    move:
+      (index: number, newIndex: number) =>
+        $(ActionTypes.algorithms.move, { index, newIndex }),
+        
+    duplicate:
+      (algorithm: BrowserTypes.Algorithm, index: number) =>
+        $(ActionTypes.algorithms.duplicate, { algorithm, index }),
   },
   
   variants:
@@ -82,6 +98,14 @@ const Actions =
     change:
       (variant: BrowserTypes.Variant) =>
         $(ActionTypes.variants.change, { variant }),
+    
+    move:
+      (index: number, newIndex: number) =>
+        $(ActionTypes.variants.move, { index, newIndex }),
+        
+    duplicate:
+      (variant: BrowserTypes.Variant, index: number) =>
+        $(ActionTypes.variants.duplicate, { variant, index }),
   },
 }
 

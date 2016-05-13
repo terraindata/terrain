@@ -89,7 +89,7 @@ export module BrowserTypes
     lastEdited: "",
     groupId: "",
     variants: Immutable.Map({}),
-    variantsOrdering: Immutable.List([]),
+    variantsOrder: Immutable.List([]),
   });
   export class Algorithm extends _Algorithm implements IId, IName, ILastEdited
   {
@@ -99,12 +99,12 @@ export module BrowserTypes
     lastUserId: string;
     groupId: ID;
     variants: {[variantId: string]: Variant};
-    variantsOrdering: ID[];
+    variantsOrder: ID[];
   }
   export function newAlgorithm(groupId: string, id?: ID, name?: string, lastEdited?: string, lastUserId?: string,
-    variants?: Immutable.Map<ID, Variant>, variantsOrdering?: Immutable.List<ID>):Algorithm
+    variants?: Immutable.Map<ID, Variant>, variantsOrder?: Immutable.List<ID>):Algorithm
   {
-    return new Algorithm(Util.extendId({ groupId, id, name, lastEdited, lastUserId, variants, variantsOrdering }));
+    return new Algorithm(Util.extendId({ groupId, id, name, lastEdited, lastUserId, variants, variantsOrder }));
   }
 
   let _Group = Immutable.Record(
@@ -114,7 +114,7 @@ export module BrowserTypes
     lastEdited: "",
     users: Immutable.List([]),
     algorithms: Immutable.Map({}),
-    algorithmsOrdering: Immutable.List([]),
+    algorithmsOrder: Immutable.List([]),
   });
   export class Group extends _Group implements IId, IName
   {
@@ -124,12 +124,12 @@ export module BrowserTypes
     lastUserId: string;
     users: UserTypes.User[]; // central store for users and roles
     algorithms: {[algorithmId: string]: Algorithm}
-    algorithmsOrdering: ID[];
+    algorithmsOrder: ID[];
   }
   export function newGroup(id?: ID, name?: string, lastEdited?: string, lastUserId?: string, users?: Immutable.List<UserTypes.User>,
-    algorithms?: Immutable.Map<ID, Algorithm>, algorithmsOrdering?: Immutable.List<ID>):Group
+    algorithms?: Immutable.Map<ID, Algorithm>, algorithmsOrder?: Immutable.List<ID>):Group
   {
-    return new Group(Util.extendId({ id, name, lastEdited, lastUserId, users, algorithms, algorithmsOrdering }));
+    return new Group(Util.extendId({ id, name, lastEdited, lastUserId, users, algorithms, algorithmsOrder }));
   }
 }
 

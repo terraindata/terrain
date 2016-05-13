@@ -59,7 +59,7 @@ var DefaultState = Immutable.fromJS({
     g3,
     g4,
   },
-  groupsOrdering: ['g0', 'g1', 'g2', 'g3', 'g4'],
+  groupsOrder: ['g0', 'g1', 'g2', 'g3', 'g4'],
 });
 
 import BrowserReducers from './BrowserReducers.tsx';

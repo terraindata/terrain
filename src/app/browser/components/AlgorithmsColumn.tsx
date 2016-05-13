@@ -56,20 +56,39 @@ type Algorithm = BrowserTypes.Algorithm;
 interface Props
 {
   algorithms: Immutable.Map<ID, Algorithm>;
-  algorithmsOrdering: Immutable.List<ID>;
+  algorithmsOrder: Immutable.List<ID>;
   groupId: ID;
 }
 
 class AlgorithmsColumn extends Classs<Props>
 {
-  constructor(props)
+  state = {
+    rendered: false,
+  }
+  
+  componentDidUpdate()
   {
-    super(props);
+    if(!this.state.rendered)
+    {
+      this.setState({
+        rendered: true,
+      });
+    }
+  }
+  
+  componentWillReceiveProps(nextProps)
+  {
+    if(nextProps.groupId !== this.props.groupId)
+    {
+      this.setState({
+        rendered: false,
+      });
+    }
   }
   
   handleDuplicate(index: number)
   {
-    console.log(index);
+    Actions.algorithms.duplicate(this.props.algorithms.get(this.props.algorithmsOrder.get(index)), index);
   }
   
   handleCreate()
@@ -79,6 +98,7 @@ class AlgorithmsColumn extends Classs<Props>
   
   handleNameChange(id: ID, name: string)
   {
+    console.log(id, name,this.props.algorithms.get(id).get('groupId'));
     Actions.algorithms.change(
       this.props.algorithms.get(id)
         .set('name', name) as Algorithm
@@ -101,6 +121,7 @@ class AlgorithmsColumn extends Classs<Props>
         id={id}
         onNameChange={this.handleNameChange}
         type='algorithm'
+        rendered={this.state.rendered}
       >
       </BrowserItem>
     );
@@ -120,7 +141,7 @@ class AlgorithmsColumn extends Classs<Props>
               (
                 <div>
                   {
-                    this.props.algorithmsOrdering.map(this.renderAlgorithm)
+                    this.props.algorithmsOrder.map(this.renderAlgorithm)
                   }
                   <BrowserCreateItem
                     name='algorithm'

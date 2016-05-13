@@ -145,6 +145,11 @@ var Util = {
     return _.extend({}, { id: Util.getId() }, _.omit(obj, value => value === undefined));
   },
   
+  moveIndexOffset(index: number, newIndex: number): number
+  {
+    return index < newIndex ? -1 : 0;
+  },
+  
   setValuesToKeys(obj: any, prefix: string)
   {
     prefix = prefix + (prefix.length > 0 ? '.' : '');

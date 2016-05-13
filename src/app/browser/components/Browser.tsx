@@ -79,13 +79,13 @@ class Browser extends Classs<Props>
     if(groupId)
     {
       var algorithms = state.getIn(['groups', groupId, 'algorithms']);
-      var algorithmsOrdering = state.getIn(['groups', groupId, 'algorithmsOrdering']);
+      var algorithmsOrder = state.getIn(['groups', groupId, 'algorithmsOrder']);
       
       if(algorithmId)
       {
         // Sublime gets messed up with the 'var' in 'variant', hence this pseudonym
         var vriants = state.getIn(['groups', groupId, 'algorithms', algorithmId, 'variants']);
-        var vriantsOrdering = state.getIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrdering']);
+        var vriantsOrder = state.getIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrder']);
       }
     }
     
@@ -93,18 +93,18 @@ class Browser extends Classs<Props>
       <div className='browser'>
         <GroupsColumn
           groups={state.get('groups')}
-          groupsOrdering={state.get('groupsOrdering')}
+          groupsOrder={state.get('groupsOrder')}
         />
         <AlgorithmsColumn
           {...{
             algorithms,
-            algorithmsOrdering,
+            algorithmsOrder,
             groupId
           }}
         />
         <VariantsColumn
           variants={vriants}
-          variantsOrdering={vriantsOrdering}
+          variantsOrder={vriantsOrder}
           {...{
             groupId,
             algorithmId,

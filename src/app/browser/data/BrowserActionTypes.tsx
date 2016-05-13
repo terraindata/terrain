@@ -49,14 +49,13 @@ import Util from './../../util/Util.tsx';
 var create = '';
 var change = '';
 var move = '';
-var remove = '';
 var duplicate = '';
 
 var BrowserActionTypes = 
 {
-  groups: { create, change, move, remove, duplicate },
-  algorithms: { create, change, move, remove, duplicate },
-  variants: { create, change, move, remove, duplicate },
+  groups: { create, change, move, duplicate },
+  algorithms: { create, change, move, duplicate },
+  variants: { create, change, move, duplicate },
 };
 
 Util.setValuesToKeys(BrowserActionTypes, '');

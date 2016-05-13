@@ -56,21 +56,40 @@ type Variant = BrowserTypes.Variant;
 interface Props
 {
   variants: Immutable.Map<ID, Variant>;
-  variantsOrdering: Immutable.List<ID>;
+  variantsOrder: Immutable.List<ID>;
   groupId: ID;
   algorithmId: ID;
 }
 
 class VariantsColumn extends Classs<Props>
 {
-  constructor(props)
+  state = {
+    rendered: false,
+  }
+  
+  componentDidUpdate()
   {
-    super(props);
+    if(!this.state.rendered)
+    {
+      this.setState({
+        rendered: true,
+      });
+    }
+  }
+  
+  componentWillReceiveProps(nextProps)
+  {
+    if(nextProps.algorithmId !== this.props.algorithmId)
+    {
+      this.setState({
+        rendered: false,
+      });
+    }
   }
   
   handleDuplicate(index: number)
   {
-    console.log(index);
+    Actions.variants.duplicate(this.props.variants.get(this.props.variantsOrder.get(index)), index);
   }
   
   handleCreate()
@@ -103,6 +122,7 @@ class VariantsColumn extends Classs<Props>
         id={id}
         type='Variant'
         onNameChange={this.handleNameChange}
+        rendered={this.state.rendered}
       >
       </BrowserItem>
     );
@@ -122,7 +142,7 @@ class VariantsColumn extends Classs<Props>
               (
                 <div>
                   {
-                    this.props.variantsOrdering.map(this.renderVariant)
+                    this.props.variantsOrder.map(this.renderVariant)
                   }
                   <BrowserCreateItem
                     name='variant'
