@@ -81,8 +81,8 @@ const Actions =
         $(ActionTypes.algorithms.change, { algorithm }),
     
     move:
-      (index: number, newIndex: number) =>
-        $(ActionTypes.algorithms.move, { index, newIndex }),
+      (index: number, newIndex: number, groupId: ID) =>
+        $(ActionTypes.algorithms.move, { groupId, index, newIndex }),
         
     duplicate:
       (algorithm: BrowserTypes.Algorithm, index: number) =>
@@ -100,8 +100,8 @@ const Actions =
         $(ActionTypes.variants.change, { variant }),
     
     move:
-      (index: number, newIndex: number) =>
-        $(ActionTypes.variants.move, { index, newIndex }),
+      (index: number, newIndex: number, groupId: ID, algorithmId: ID) =>
+        $(ActionTypes.variants.move, { index, newIndex, groupId, algorithmId }),
         
     duplicate:
       (variant: BrowserTypes.Variant, index: number) =>

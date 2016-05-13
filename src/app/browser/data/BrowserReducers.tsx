@@ -185,11 +185,12 @@ BrowserReducers[ActionTypes.variants.change] =
 BrowserReducers[ActionTypes.variants.move] =
   (state, action) =>
   {
-    let id = state.getIn(['variantsOrder', action.payload.index]);
+    let { groupId, algorithmId, index, newIndex } = action.payload;
+    let id = state.getIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrder', index]);
     return state
-      .updateIn(['groups', action.payload.groupId, 'algorithms', action.payload.algorithmId, 'variantsOrder'], order => 
-        order.splice(action.payload.index, 1)
-          .splice(action.payload.newIndex + Util.moveIndexOffset(action.payload.index, action.payload.newIndex), 0, id)
+      .updateIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrder'], order => 
+        order.splice(index, 1)
+          .splice(newIndex + Util.moveIndexOffset(index, newIndex), 0, id)
         )
   }
 

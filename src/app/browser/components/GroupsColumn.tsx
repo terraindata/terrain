@@ -63,6 +63,7 @@ class GroupsColumn extends Classs<Props>
 {
   state = {
     rendered: false,
+    lastMoved: null,
   }
   
   componentDidMount()
@@ -95,6 +96,26 @@ class GroupsColumn extends Classs<Props>
     Actions.groups.create();
   }
   
+  handleHover(index: number, type: string, id: ID)
+  {
+    var itemIndex = this.props.groupsOrder.findIndex(v => v === id);
+    if(type === 'group' && itemIndex !== index 
+      && this.state.lastMoved !== index + ' ' + itemIndex)
+    {
+      this.setState({
+        lastMoved: index + ' ' + itemIndex,
+      });
+      Actions.groups.move(itemIndex, index + (itemIndex < index ? 1 : 0));
+    }
+  }
+
+  handleDrop()
+  {
+    this.setState({
+      lastMove: null,
+    })
+  }  
+  
   renderGroup(id: ID, index: number)
   {
     const group = this.props.groups.get(id);
@@ -111,6 +132,7 @@ class GroupsColumn extends Classs<Props>
         onNameChange={this.handleNameChange}
         type='group'
         rendered={this.state.rendered}
+        onHover={this.handleHover}
       >
       </BrowserItem>
     );

@@ -51,7 +51,6 @@ import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 var { createDragPreview } = require('react-dnd-text-dragpreview');
-var { getEmptyImage } = require('react-dnd-html5-backend');
 import Util from '../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
 import SelectCard from './card-types/SelectCard.tsx';

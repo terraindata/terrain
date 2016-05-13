@@ -64,6 +64,7 @@ class AlgorithmsColumn extends Classs<Props>
 {
   state = {
     rendered: false,
+    lastMoved: null,
   }
   
   componentDidUpdate()
@@ -104,7 +105,20 @@ class AlgorithmsColumn extends Classs<Props>
         .set('name', name) as Algorithm
     );
   }
-  
+    
+  handleHover(index: number, type: string, id: ID)
+  {
+    var itemIndex = this.props.algorithmsOrder.findIndex(v => v === id);
+    if(type === 'algorithm' && itemIndex !== index 
+      && this.state.lastMoved !== index + ' ' + itemIndex)
+    {
+      this.setState({
+        lastMoved: index + ' ' + itemIndex,
+      });
+      Actions.algorithms.move(itemIndex, index + (itemIndex < index ? 1 : 0), this.props.groupId);
+    }
+  }
+
   renderAlgorithm(id: ID, index: number)
   {
     const algorithm = this.props.algorithms.get(id);
@@ -122,6 +136,7 @@ class AlgorithmsColumn extends Classs<Props>
         onNameChange={this.handleNameChange}
         type='algorithm'
         rendered={this.state.rendered}
+        onHover={this.handleHover}
       >
       </BrowserItem>
     );

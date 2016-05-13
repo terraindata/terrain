@@ -48,6 +48,7 @@ import Classs from './../../components/common/Classs.tsx';
 import Menu from './../../components/common/Menu.tsx';
 import { Link } from 'react-router';
 import * as classNames from 'classnames';
+import { DragSource, DropTarget } from 'react-dnd';
 
 interface Props
 {
@@ -61,7 +62,11 @@ interface Props
   onNameChange: (id: ID, name: string) => void;
   id: ID;
   rendered: boolean; // has the parent been mounted?
+  onHover: (index: number, type: string, id: ID) => void;
   className?: string;
+  connectDropTarget?: (html: any) => JSX.Element;
+  connectDragSource?: (html: any) => JSX.Element;
+  isDragging?: boolean;
 }
 
 class BrowserItem extends Classs<Props>
@@ -155,50 +160,131 @@ class BrowserItem extends Classs<Props>
   
   render()
   {
-    return (
-      <Link to={this.props.to} className='browser-item-link' activeClassName='browser-item-active'>
-        <div
-          className={classNames({
-            'browser-item-wrapper': true,
-            'browser-item-wrapper-mounted': this.state.mounted,
-          })}
-          style={{borderColor:this.props.color}}
-        >
-          <div className={'browser-item ' + this.props.className} style={{background:this.props.color}}>
-            <div
-              className={classNames({
-                'browser-item-title-bar': true,
-                'browser-item-title-bar-editing': this.state.nameEditing,
-              })}
-            >
-              { this.props.icon }
-              <div
-                className='browser-item-name'
-                onDoubleClick={this.showTextfield}
-              >
-                { this.props.name.length ? this.props.name : <em>Untitled</em> }
+    let { connectDropTarget, connectDragSource, isDragging } = this.props;
+    return connectDropTarget((
+      <div>
+        <Link to={this.props.to} className='browser-item-link' activeClassName='browser-item-active'>
+          <div
+            className={classNames({
+              'browser-item-wrapper': true,
+              'browser-item-wrapper-mounted': this.state.mounted,
+              'browser-item-wrapper-dragging': isDragging,
+            })}
+            style={{borderColor:this.props.color}}
+          >
+            { connectDragSource(
+              <div className={'browser-item ' + this.props.className} style={{background:this.props.color}}>
+                <div
+                  className={classNames({
+                    'browser-item-title-bar': true,
+                    'browser-item-title-bar-editing': this.state.nameEditing,
+                  })}
+                >
+                  { this.props.icon }
+                  <div
+                    className='browser-item-name'
+                    onDoubleClick={this.showTextfield}
+                  >
+                    { this.props.name.length ? this.props.name : <em>Untitled</em> }
+                  </div>
+                  <input
+                    className='browser-item-name-input'
+                    value={ this.props.name }
+                    placeholder={this.props.type.substr(0, 1).toUpperCase() + this.props.type.substr(1) + ' name'}
+                    onChange={ this.handleChange }
+                    onBlur={ this.hideTextfield }
+                    onKeyDown={ this.handleKeyDown }
+                    ref='input'
+                  />
+                  <Menu
+                    options={this.menuOptions}
+                  />
+                </div>
+                <div className='browser-item-content'>
+                  { this.props['children'] }
+                </div>
               </div>
-              <input
-                className='browser-item-name-input'
-                value={ this.props.name }
-                placeholder={this.props.type + ' name'}
-                onChange={ this.handleChange }
-                onBlur={ this.hideTextfield }
-                onKeyDown={ this.handleKeyDown }
-                ref='input'
-              />
-              <Menu
-                options={this.menuOptions}
-              />
-            </div>
-            <div className='browser-item-content'>
-              { this.props['children'] }
-            </div>
+            )}
           </div>
-        </div>
-      </Link>
-    );
+        </Link>
+      </div>
+    ));
   }
 }
 
-export default BrowserItem;
+
+// DnD stuff
+
+const source = 
+{
+  beginDrag(props)
+  {
+    const item = {
+      id: props.id,
+      type: props.type,
+      index: props.index,
+    };
+    return item;
+  },
+  
+  endDrag(props, monitor, component)
+  {
+    if(!monitor.didDrop())
+    {
+      return;
+    }
+    const item = monitor.getItem();
+    const dropResult = monitor.getDropResult();
+  }
+}
+
+const dragCollect = (connect, monitor) =>
+({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging(),
+});
+
+
+let canDrop = (props, monitor) =>
+{
+  let itemType = monitor.getItem().type;
+  let targetType = props.type;
+  switch(itemType)
+  {
+    case 'variant':
+      return targetType === 'variant' || targetType === 'algorithm';
+    case 'algorithm':
+      return targetType === 'algorithm' || targetType === 'group';
+    case 'group':
+      return targetType === 'group';
+  }
+  return false;
+};
+const target = 
+{
+  canDrop,
+  
+  hover(props, monitor, component)
+  {
+    if(canDrop(props, monitor))
+    {
+      let item = monitor.getItem();
+      props.onHover(props.index, item.type, item.id);
+    }
+  },
+  
+  drop(props, monitor, component)
+  {
+    if(monitor.isOver({ shallow: true}))
+    {
+      let item = monitor.getItem();
+    }
+  }
+}
+
+const dropCollect = (connect, monitor) =>
+({
+  connectDropTarget: connect.dropTarget(),
+});
+
+export default DropTarget('BROWSER', target, dropCollect)(DragSource('BROWSER', source, dragCollect)(BrowserItem));

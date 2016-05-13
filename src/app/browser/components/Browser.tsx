@@ -50,6 +50,8 @@ import BrowserTypes from './../BrowserTypes.tsx';
 import GroupsColumn from './GroupsColumn.tsx';
 import AlgorithmsColumn from './AlgorithmsColumn.tsx';
 import VariantsColumn from './VariantsColumn.tsx';
+import { DragDropContext } from 'react-dnd';
+var HTML5Backend = require('react-dnd-html5-backend');
 
 interface Props
 {
@@ -115,4 +117,4 @@ class Browser extends Classs<Props>
   }
 }
 
-export default Browser;
+export default DragDropContext(HTML5Backend)(Browser);

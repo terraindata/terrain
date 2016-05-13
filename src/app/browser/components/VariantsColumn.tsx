@@ -65,6 +65,7 @@ class VariantsColumn extends Classs<Props>
 {
   state = {
     rendered: false,
+    lastMoved: null,
   }
   
   componentDidUpdate()
@@ -104,6 +105,20 @@ class VariantsColumn extends Classs<Props>
         .set('name', name) as Variant
     );
   }
+    
+  handleHover(index: number, type: string, id: ID)
+  {
+    var itemIndex = this.props.variantsOrder.findIndex(v => v === id);
+    if(type === 'variant' && itemIndex !== index 
+      && this.state.lastMoved !== index + ' ' + itemIndex)
+    {
+      this.setState({
+        lastMoved: index + ' ' + itemIndex,
+      });
+      Actions.variants.move(itemIndex, index + (itemIndex < index ? 1 : 0), this.props.groupId, this.props.algorithmId);
+    }
+  }
+
   
   renderVariant(id: ID, index: number)
   {
@@ -120,9 +135,10 @@ class VariantsColumn extends Classs<Props>
         to={`/browser/${this.props.groupId}/${this.props.algorithmId}/${id}`}
         className='browser-item-lightest'
         id={id}
-        type='Variant'
+        type='variant'
         onNameChange={this.handleNameChange}
         rendered={this.state.rendered}
+        onHover={this.handleHover}
       >
       </BrowserItem>
     );
