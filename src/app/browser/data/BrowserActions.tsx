@@ -62,8 +62,8 @@ const Actions =
         $(ActionTypes.groups.change, { group }),
     
     move:
-      (index: number, newIndex: number) =>
-        $(ActionTypes.groups.move, { index, newIndex }),
+      (group, index: number) =>
+        $(ActionTypes.groups.move, { group, index }),
         
     duplicate:
       (group: BrowserTypes.Group, index: number) =>
@@ -81,12 +81,16 @@ const Actions =
         $(ActionTypes.algorithms.change, { algorithm }),
     
     move:
-      (index: number, newIndex: number, groupId: ID) =>
-        $(ActionTypes.algorithms.move, { groupId, index, newIndex }),
+      (algorithm: BrowserTypes.Algorithm, index: number, groupId: ID) =>
+        $(ActionTypes.algorithms.move, { groupId, index, algorithm }),
         
     duplicate:
       (algorithm: BrowserTypes.Algorithm, index: number) =>
         $(ActionTypes.algorithms.duplicate, { algorithm, index }),
+    
+    switch:
+      (algorithm: BrowserTypes.Algorithm, groupId: ID, copy?: boolean) =>
+        $(ActionTypes.algorithms.switchGroup, { algorithm, groupId, copy }),
   },
   
   variants:
@@ -100,12 +104,13 @@ const Actions =
         $(ActionTypes.variants.change, { variant }),
     
     move:
-      (index: number, newIndex: number, groupId: ID, algorithmId: ID) =>
-        $(ActionTypes.variants.move, { index, newIndex, groupId, algorithmId }),
+      (variant: BrowserTypes.Variant, index: number, groupId: ID, algorithmId: ID) =>
+        $(ActionTypes.variants.move, { variant, index, groupId, algorithmId }),
         
     duplicate:
       (variant: BrowserTypes.Variant, index: number) =>
         $(ActionTypes.variants.duplicate, { variant, index }),
+    
   },
 }
 

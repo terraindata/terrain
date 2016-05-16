@@ -105,15 +105,23 @@ class GroupsColumn extends Classs<Props>
       this.setState({
         lastMoved: index + ' ' + itemIndex,
       });
-      Actions.groups.move(itemIndex, index + (itemIndex < index ? 1 : 0));
+      Actions.groups.move(this.props.groups.get(id), index);
     }
   }
 
-  handleDrop()
+  handleDropped(id: ID, targetType: string, groupId: ID, algorithmId: ID)
   {
-    this.setState({
-      lastMove: null,
-    })
+    
+    // switch (targetType) {
+    //   case "group":
+    //     break;
+    //   case "algorithm":
+    //     Actions.algorithms.move(this.props.)
+      
+    //   default:
+    //     // code...
+    //     break;
+    // }
   }  
   
   renderGroup(id: ID, index: number)
@@ -133,6 +141,8 @@ class GroupsColumn extends Classs<Props>
         type='group'
         rendered={this.state.rendered}
         onHover={this.handleHover}
+        onDropped={this.handleDropped}
+        item={group}
       >
       </BrowserItem>
     );

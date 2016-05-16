@@ -93,7 +93,7 @@
   padding: 3px;
   border-radius: 8px;
   border: 3px solid rgba(0,0,0,0);
-  .transition(~"border-color 0.25s, opacity 0.25s");
+  .transition(~"border-color 0.25s, opacity 0.25s, background 0.15s");
   
   opacity: 0;
   
@@ -103,6 +103,13 @@
   
   &.browser-item-wrapper-dragging {
     opacity: 0;
+  }
+  
+  &.browser-item-wrapper-drag-over {
+    background: rgba(255, 200, 0, 0.35) !important;
+    // margin-left: 25px;
+    // padding: 0px;
+    // margin-bottom: 6px;
   }
 }
 

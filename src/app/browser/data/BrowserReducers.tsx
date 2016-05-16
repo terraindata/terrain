@@ -50,15 +50,37 @@ var Immutable = require('immutable');
 
 var BrowserReducers = {};
 
+let removeItem = (state, id: ID, parentKeyPath: (string | ID)[], type: string) =>
+  state.removeIn(parentKeyPath.concat([type + 's', id]))
+    .updateIn(parentKeyPath.concat([type + 'sOrder']), order =>
+      order.filter(value => value !== id)
+    );
+
+let removeVariant = (state, variant) =>
+  removeItem(state, variant.id, ['groups', variant.groupId, 'algorithms', variant.algorithmId], 'variant');
+let removeAlgorithm = (state, algorithm) =>
+  removeItem(state, algorithm.id, ['groups', algorithm.groupId], 'algorithm');
+let removeGroup = (state, group) =>
+  removeItem(state, group.id, [], 'group');
+
+let addItem = (state, item, parentKeyPath: (string | ID)[], type: string, index?: number) => {
+  state = state.setIn(parentKeyPath.concat([type + 's', item.id]), item)
+    .updateIn(parentKeyPath.concat([type + 'sOrder']),
+      order => order.splice(index === undefined ? order.size : index, 0, item.id));
+  return state;
+}
+
+// assumes the objec'ts `groupId` and `algorithmId` keys are set
+let addVariant = (state, variant, index?: number) =>
+  addItem(state, variant, ['groups', variant.groupId, 'algorithms', variant.algorithmId], 'variant', index);
+let addAlgorithm = (state, algorithm, index?: number) =>
+  addItem(state, algorithm, ['groups', algorithm.groupId], 'algorithm', index);
+let addGroup = (state, group, index?: number) =>
+  addItem(state, group, [], 'group', index);
+
 BrowserReducers[ActionTypes.groups.create] =
   (state, action) =>
-    {
-      var newGroup = BrowserTypes.newGroup();
-      const id = newGroup.get('id');
-      return state
-        .setIn(['groups', id], newGroup)
-        .update('groupsOrder', order => order.push(id));
-    }
+    addGroup(state, BrowserTypes.newGroup().set('id', Util.getId()));
 
 BrowserReducers[ActionTypes.groups.change] =
   (state, action) =>
@@ -66,14 +88,7 @@ BrowserReducers[ActionTypes.groups.change] =
 
 BrowserReducers[ActionTypes.groups.move] =
   (state, action) =>
-  {
-    let id = state.getIn(['groupsOrder', action.payload.index]);
-    return state
-      .updateIn(['groupsOrder'], order => 
-        order.splice(action.payload.index, 1)
-          .splice(action.payload.newIndex + Util.moveIndexOffset(action.payload.index, action.payload.newIndex), 0, id)
-        )
-  }
+    addGroup(removeGroup(state, action.payload.group), action.payload.group, action.payload.index);
 
 BrowserReducers[ActionTypes.groups.duplicate] =
   (state, action) =>
@@ -104,15 +119,7 @@ BrowserReducers[ActionTypes.groups.duplicate] =
 
 BrowserReducers[ActionTypes.algorithms.create] =
   (state, action) =>
-    {
-      const { groupId } = action.payload;
-      var newAlg = BrowserTypes.newAlgorithm(groupId);
-      const id = newAlg.id;
-      return state
-        .setIn(['groups', groupId, 'algorithms', id], newAlg)
-        .updateIn(['groups', groupId, 'algorithmsOrder'],
-          order => order.push(id));
-    }
+    addAlgorithm(state, BrowserTypes.newAlgorithm(action.payload.groupId, Util.getId()));
 
 BrowserReducers[ActionTypes.algorithms.change] =
   (state, action) =>
@@ -121,14 +128,9 @@ BrowserReducers[ActionTypes.algorithms.change] =
 
 BrowserReducers[ActionTypes.algorithms.move] =
   (state, action) =>
-  {
-    let id = state.getIn(['groups', action.payload.groupId, 'algorithmsOrder', action.payload.index]);
-    return state
-      .updateIn(['groups', action.payload.groupId, 'algorithmsOrder'], order => 
-        order.splice(action.payload.index, 1)
-          .splice(action.payload.newIndex + Util.moveIndexOffset(action.payload.index, action.payload.newIndex), 0, id)
-        )
-  }
+    addAlgorithm(removeAlgorithm(state, action.payload.algorithm),
+      action.payload.algorithm.set('groupId', action.payload.groupId),
+      action.payload.index);
 
 let duplicateAlgorithm = (algorithm, id, groupId) =>
 {
@@ -166,15 +168,7 @@ BrowserReducers[ActionTypes.algorithms.duplicate] =
 
 BrowserReducers[ActionTypes.variants.create] =
   (state, action) =>
-    {
-      const { groupId, algorithmId } = action.payload;
-      const v = BrowserTypes.newVariant(algorithmId, groupId);
-      const id = v.id;
-      return state
-        .setIn(['groups', groupId, 'algorithms', algorithmId, 'variants', id], v)
-        .updateIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrder'],
-          order => order.push(id));
-    }
+    addVariant(state, BrowserTypes.newVariant(action.payload.algorithmId, action.payload.groupId, Util.getId()));
 
 BrowserReducers[ActionTypes.variants.change] =
   (state, action) =>
@@ -184,27 +178,62 @@ BrowserReducers[ActionTypes.variants.change] =
 
 BrowserReducers[ActionTypes.variants.move] =
   (state, action) =>
-  {
-    let { groupId, algorithmId, index, newIndex } = action.payload;
-    let id = state.getIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrder', index]);
-    return state
-      .updateIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrder'], order => 
-        order.splice(index, 1)
-          .splice(newIndex + Util.moveIndexOffset(index, newIndex), 0, id)
-        )
-  }
+    addVariant(removeVariant(state, action.payload.variant),
+      action.payload.variant
+        .set('groupId', action.payload.groupId)
+        .set('algorithmId', action.payload.algorithmId),
+      action.payload.index);
+  // {
+  //   let { groupId, algorithmId, index, newIndex } = action.payload;
+  //   let id = state.getIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrder', index]);
+  //   return state
+  //     .updateIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrder'], order => 
+  //       order.splice(index, 1)
+  //         .splice(newIndex + Util.moveIndexOffset(index, newIndex), 0, id)
+  //       )
+  // }
+
+let duplicateVariant = (variant, id, groupId?, algorithmId?) =>
+{
+  return variant.set('id', id)
+    .set('name', 'Copy of ' + variant.name)
+    .set('groupId', groupId || variant.groupId)
+    .set('algorithmId', algorithmId || variant.algorithmId);
+}
 
 BrowserReducers[ActionTypes.variants.duplicate] =
   (state, action) =>
   {
-    var id = Util.getId();
+    let id = Util.getId();
+    let v = action.payload.variant;
     return state
-      .setIn(['groups', action.payload.variant.groupId, 'algorithms', action.payload.variant.algorithmId, 'variants', id],
-        action.payload.variant.set('id', id)
-          .set('name', 'Copy of ' + action.payload.variant.name))
-      .updateIn(['groups', action.payload.variant.groupId, 'algorithms', action.payload.variant.algorithmId, 'variantsOrder'],
+      .setIn(['groups', v.groupId, 'algorithms', v.algorithmId, 'variants', id],
+        duplicateVariant(v, id))
+      .updateIn(['groups', v.groupId, 'algorithms', v.algorithmId, 'variantsOrder'],
         order => order.splice(action.payload.index, 0, id))
   }
-  
+
+BrowserReducers[ActionTypes.variants.switchAlgorithm] =
+  (state, action) =>
+  {
+    let { copy, algorithm } = action.payload;
+    var v = action.payload.variant;
+    let id = copy ? Util.getId() : v.id;
+    
+    if(copy)
+    {
+      v = duplicateVariant(v, id, algorithm.groupId, algorithm.id);
+    }
+    else
+    {
+      state = removeVariant(state, v);
+      v = v.set('groupId', algorithm.groupId)
+        .set('algorithmId', algorithm.id);
+    }
+    
+    return addVariant(state, v);
+  }
   
 export default BrowserReducers;
+
+

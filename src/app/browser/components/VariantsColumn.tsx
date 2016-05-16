@@ -115,11 +115,27 @@ class VariantsColumn extends Classs<Props>
       this.setState({
         lastMoved: index + ' ' + itemIndex,
       });
-      Actions.variants.move(itemIndex, index + (itemIndex < index ? 1 : 0), this.props.groupId, this.props.algorithmId);
+      Actions.variants.move(this.props.variants.get(id), index, this.props.groupId, this.props.algorithmId);
     }
   }
 
-  
+  handleDropped(id: ID, targetType: string, targetItem: any)
+  {
+    switch (targetType) {
+      case "group":
+        // move this one to the new group
+        // and create a new group
+        // Actions.algorithms.move(this.props.algorithms.get(id), undefined, targetItem.id);
+        break;
+      case "algorithm":
+        Actions.variants.move(this.props.variants.get(id), undefined, targetItem.groupId, targetItem.id);
+        break;
+      case "variant":
+        // maybe the code for moving one variant to a specific spot in another alg goes here?
+        break;
+    }
+  }
+
   renderVariant(id: ID, index: number)
   {
     // Sublime gets messed up with the 'var' in 'variant', hence this pseudonym
@@ -139,6 +155,8 @@ class VariantsColumn extends Classs<Props>
         onNameChange={this.handleNameChange}
         rendered={this.state.rendered}
         onHover={this.handleHover}
+        onDropped={this.handleDropped}
+        item={vriant}
       >
       </BrowserItem>
     );

@@ -99,7 +99,6 @@ class AlgorithmsColumn extends Classs<Props>
   
   handleNameChange(id: ID, name: string)
   {
-    console.log(id, name,this.props.algorithms.get(id).get('groupId'));
     Actions.algorithms.change(
       this.props.algorithms.get(id)
         .set('name', name) as Algorithm
@@ -115,7 +114,23 @@ class AlgorithmsColumn extends Classs<Props>
       this.setState({
         lastMoved: index + ' ' + itemIndex,
       });
-      Actions.algorithms.move(itemIndex, index + (itemIndex < index ? 1 : 0), this.props.groupId);
+      Actions.algorithms.move(this.props.algorithms.get(id), index, this.props.groupId);
+    }
+  }
+  
+  handleDropped(id: ID, targetType: string, targetItem: any)
+  {
+    switch (targetType) {
+      case "group":
+        // move this one to the new group
+        Actions.algorithms.move(this.props.algorithms.get(id), undefined, targetItem.id);
+        break;
+      case "algorithm":
+        // maybe the code for moving one algorithm to a specific spot in another group goes here?
+        break;
+      case "variant":
+        // no good
+        break;
     }
   }
 
@@ -137,6 +152,8 @@ class AlgorithmsColumn extends Classs<Props>
         type='algorithm'
         rendered={this.state.rendered}
         onHover={this.handleHover}
+        onDropped={this.handleDropped}
+        item={algorithm}
       >
       </BrowserItem>
     );

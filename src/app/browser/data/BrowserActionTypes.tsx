@@ -53,9 +53,23 @@ var duplicate = '';
 
 var BrowserActionTypes = 
 {
-  groups: { create, change, move, duplicate },
-  algorithms: { create, change, move, duplicate },
-  variants: { create, change, move, duplicate },
+  groups: 
+  { 
+    create, change, move, duplicate,
+  },
+  
+  algorithms: 
+  {
+    create, change, move, duplicate,
+    switchGroup: '',
+  },
+  
+  variants:
+  {
+    create, change, move, duplicate,
+    switchAlgorithm: '',
+    switchGroup: '', // move by itself onto a group, which should also create a new algorithm
+  },
 };
 
 Util.setValuesToKeys(BrowserActionTypes, '');

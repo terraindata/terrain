@@ -61,12 +61,26 @@ interface Props
   type: string;
   onNameChange: (id: ID, name: string) => void;
   id: ID;
-  rendered: boolean; // has the parent been mounted?
+  rendered: boolean;
   onHover: (index: number, type: string, id: ID) => void;
+  // ^ called on target
+  onDropped: (id: ID, targetType: string, targetItem: any) => void;
+  // ^ called on dragged element
+  
+  // partially-optional. need to be provided if available.
+  groupId?: ID;
+  algorithmId?: ID;
+  variantId?: ID;
+  
+  // optional
   className?: string;
+  
+  // populated by DnD code
   connectDropTarget?: (html: any) => JSX.Element;
   connectDragSource?: (html: any) => JSX.Element;
   isDragging?: boolean;
+  isOver?: boolean;
+  dragItemType? : string;
 }
 
 class BrowserItem extends Classs<Props>
@@ -160,7 +174,7 @@ class BrowserItem extends Classs<Props>
   
   render()
   {
-    let { connectDropTarget, connectDragSource, isDragging } = this.props;
+    let { connectDropTarget, connectDragSource, isDragging, isOver, dragItemType } = this.props;
     return connectDropTarget((
       <div>
         <Link to={this.props.to} className='browser-item-link' activeClassName='browser-item-active'>
@@ -169,6 +183,7 @@ class BrowserItem extends Classs<Props>
               'browser-item-wrapper': true,
               'browser-item-wrapper-mounted': this.state.mounted,
               'browser-item-wrapper-dragging': isDragging,
+              'browser-item-wrapper-drag-over': isOver && dragItemType !== this.props.type,
             })}
             style={{borderColor:this.props.color}}
           >
@@ -234,7 +249,8 @@ const source =
       return;
     }
     const item = monitor.getItem();
-    const dropResult = monitor.getDropResult();
+    const { type, targetItem } = monitor.getDropResult();
+    props.onDropped(item.id, type, targetItem);
   }
 }
 
@@ -252,7 +268,7 @@ let canDrop = (props, monitor) =>
   switch(itemType)
   {
     case 'variant':
-      return targetType === 'variant' || targetType === 'algorithm';
+      return targetType === 'variant' || targetType === 'algorithm' || targetType === 'group';
     case 'algorithm':
       return targetType === 'algorithm' || targetType === 'group';
     case 'group':
@@ -277,7 +293,10 @@ const target =
   {
     if(monitor.isOver({ shallow: true}))
     {
-      let item = monitor.getItem();
+      return {
+        targetItem: props.item,
+        type: props.type,
+      };
     }
   }
 }
@@ -285,6 +304,8 @@ const target =
 const dropCollect = (connect, monitor) =>
 ({
   connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver() && monitor.canDrop(),
+  dragItemType: monitor.getItem() && monitor.getItem().type,
 });
 
 export default DropTarget('BROWSER', target, dropCollect)(DragSource('BROWSER', source, dragCollect)(BrowserItem));
