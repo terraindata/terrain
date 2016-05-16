@@ -118,12 +118,19 @@ class AlgorithmsColumn extends Classs<Props>
     }
   }
   
-  handleDropped(id: ID, targetType: string, targetItem: any)
+  handleDropped(id: ID, targetType: string, targetItem: any, shiftKey: boolean)
   {
     switch (targetType) {
       case "group":
         // move this one to the new group
-        Actions.algorithms.move(this.props.algorithms.get(id), undefined, targetItem.id);
+        if(shiftKey)
+        {
+          Actions.algorithms.duplicate(this.props.algorithms.get(id), 0, targetItem.id);
+        }
+        else
+        {
+          Actions.algorithms.move(this.props.algorithms.get(id), 0, targetItem.id);
+        }
         break;
       case "algorithm":
         // maybe the code for moving one algorithm to a specific spot in another group goes here?

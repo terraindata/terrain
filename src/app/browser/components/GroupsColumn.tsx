@@ -109,7 +109,7 @@ class GroupsColumn extends Classs<Props>
     }
   }
 
-  handleDropped(id: ID, targetType: string, groupId: ID, algorithmId: ID)
+  handleDropped(id: ID, targetType: string, targetItem: any, shifted: boolean)
   {
     
     // switch (targetType) {

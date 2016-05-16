@@ -119,7 +119,7 @@ class VariantsColumn extends Classs<Props>
     }
   }
 
-  handleDropped(id: ID, targetType: string, targetItem: any)
+  handleDropped(id: ID, targetType: string, targetItem: any, shiftKey: boolean)
   {
     switch (targetType) {
       case "group":
@@ -128,7 +128,14 @@ class VariantsColumn extends Classs<Props>
         // Actions.algorithms.move(this.props.algorithms.get(id), undefined, targetItem.id);
         break;
       case "algorithm":
-        Actions.variants.move(this.props.variants.get(id), undefined, targetItem.groupId, targetItem.id);
+        if(shiftKey)
+        {
+          Actions.variants.duplicate(this.props.variants.get(id), 0, targetItem.groupId, targetItem.id);
+        }
+        else
+        {
+          Actions.variants.move(this.props.variants.get(id), 0, targetItem.groupId, targetItem.id);
+        }
         break;
       case "variant":
         // maybe the code for moving one variant to a specific spot in another alg goes here?

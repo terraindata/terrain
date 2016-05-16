@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 require('./BrowserItem.less');
 import * as React from 'react';
+import * as $ from 'jquery';
 import Classs from './../../components/common/Classs.tsx';
 import Menu from './../../components/common/Menu.tsx';
 import { Link } from 'react-router';
@@ -64,7 +65,7 @@ interface Props
   rendered: boolean;
   onHover: (index: number, type: string, id: ID) => void;
   // ^ called on target
-  onDropped: (id: ID, targetType: string, targetItem: any) => void;
+  onDropped: (id: ID, targetType: string, targetItem: any, shiftKey: boolean) => void;
   // ^ called on dragged element
   
   // partially-optional. need to be provided if available.
@@ -175,6 +176,7 @@ class BrowserItem extends Classs<Props>
   render()
   {
     let { connectDropTarget, connectDragSource, isDragging, isOver, dragItemType } = this.props;
+    let draggingOver = isOver && dragItemType !== this.props.type;
     return connectDropTarget((
       <div>
         <Link to={this.props.to} className='browser-item-link' activeClassName='browser-item-active'>
@@ -183,7 +185,8 @@ class BrowserItem extends Classs<Props>
               'browser-item-wrapper': true,
               'browser-item-wrapper-mounted': this.state.mounted,
               'browser-item-wrapper-dragging': isDragging,
-              'browser-item-wrapper-drag-over': isOver && dragItemType !== this.props.type,
+              'browser-item-wrapper-drag-over': draggingOver,
+              'browser-item-wrapper-drag-over-shift': draggingOver && shifted,
             })}
             style={{borderColor:this.props.color}}
           >
@@ -230,6 +233,10 @@ class BrowserItem extends Classs<Props>
 
 // DnD stuff
 
+var shifted = false;
+$(document).on('dragover dragend', function(e){shifted = e.shiftKey; return true;} );
+// http://stackoverflow.com/questions/3781142/jquery-or-javascript-how-determine-if-shift-key-being-pressed-while-clicking-an
+
 const source = 
 {
   beginDrag(props)
@@ -250,7 +257,7 @@ const source =
     }
     const item = monitor.getItem();
     const { type, targetItem } = monitor.getDropResult();
-    props.onDropped(item.id, type, targetItem);
+    props.onDropped(item.id, type, targetItem, shifted);
   }
 }
 
@@ -268,7 +275,7 @@ let canDrop = (props, monitor) =>
   switch(itemType)
   {
     case 'variant':
-      return targetType === 'variant' || targetType === 'algorithm' || targetType === 'group';
+      return targetType === 'variant' || targetType === 'algorithm';
     case 'algorithm':
       return targetType === 'algorithm' || targetType === 'group';
     case 'group':
