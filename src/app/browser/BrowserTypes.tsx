@@ -82,6 +82,12 @@ export module BrowserTypes
     return new Variant(Util.extendId({ algorithmId, groupId, id, name, lastEdited, lastUserId, status }));
   }
   
+  
+  export enum EAlgorithmStatus
+  {
+    Live,
+    Archive,  
+  }
   let _Algorithm = Immutable.Record(
   {
     id: "",
@@ -90,6 +96,7 @@ export module BrowserTypes
     groupId: "",
     variants: Immutable.Map({}),
     variantsOrder: Immutable.List([]),
+    status: EAlgorithmStatus.Live,
   });
   export class Algorithm extends _Algorithm implements IId, IName, ILastEdited
   {
@@ -100,13 +107,20 @@ export module BrowserTypes
     groupId: ID;
     variants: {[variantId: string]: Variant};
     variantsOrder: ID[];
+    status: EAlgorithmStatus;
   }
   export function newAlgorithm(groupId: string, id?: ID, name?: string, lastEdited?: string, lastUserId?: string,
-    variants?: Immutable.Map<ID, Variant>, variantsOrder?: Immutable.List<ID>):Algorithm
+    variants?: Immutable.Map<ID, Variant>, variantsOrder?: Immutable.List<ID>, status?: EAlgorithmStatus):Algorithm
   {
-    return new Algorithm(Util.extendId({ groupId, id, name, lastEdited, lastUserId, variants, variantsOrder }));
+    return new Algorithm(Util.extendId({ groupId, id, name, lastEdited, lastUserId, variants, variantsOrder, status }));
   }
 
+
+  export enum EGroupStatus
+  {
+    Live,
+    Archive,  
+  }
   let _Group = Immutable.Record(
   {
     id: "",
@@ -115,6 +129,7 @@ export module BrowserTypes
     users: Immutable.List([]),
     algorithms: Immutable.Map({}),
     algorithmsOrder: Immutable.List([]),
+    status: EGroupStatus.Live,
   });
   export class Group extends _Group implements IId, IName
   {
@@ -125,11 +140,12 @@ export module BrowserTypes
     users: UserTypes.User[]; // central store for users and roles
     algorithms: {[algorithmId: string]: Algorithm}
     algorithmsOrder: ID[];
+    status: EGroupStatus;
   }
   export function newGroup(id?: ID, name?: string, lastEdited?: string, lastUserId?: string, users?: Immutable.List<UserTypes.User>,
-    algorithms?: Immutable.Map<ID, Algorithm>, algorithmsOrder?: Immutable.List<ID>):Group
+    algorithms?: Immutable.Map<ID, Algorithm>, algorithmsOrder?: Immutable.List<ID>, status?: EGroupStatus):Group
   {
-    return new Group(Util.extendId({ id, name, lastEdited, lastUserId, users, algorithms, algorithmsOrder }));
+    return new Group(Util.extendId({ id, name, lastEdited, lastUserId, users, algorithms, algorithmsOrder, status }));
   }
 }
 

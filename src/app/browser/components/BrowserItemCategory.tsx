@@ -54,12 +54,19 @@ interface Props
   type: string;
   onHover: (status: string, id: ID) => void;
   connectDropTarget?: (c: any) => any;
+  titleHidden?: boolean;
 }
 
 class BrowserItemCategory extends Classs<Props>
 {
   state = {
     open: true,
+  }
+  
+  constructor(props:Props)
+  {
+    super(props);
+    this.state.open = this.props.status !== 'Archive';
   }
   
   toggleOpen()
@@ -73,10 +80,12 @@ class BrowserItemCategory extends Classs<Props>
   {
     return this.props.connectDropTarget(
       <div className={`browser-category browser-category-${this.props.status} browser-category-${this.state.open ? 'open' : 'closed'}`}>
-        <div className='browser-category-title' onClick={this.toggleOpen}>
-          <div className='browser-category-title-symbol' />
-          { this.props.status }
-        </div>
+        { ! this.props.titleHidden &&
+          <div className='browser-category-title' onClick={this.toggleOpen}>
+            <div className='browser-category-title-symbol' />
+            { this.props.status }
+          </div>
+        }
         <div className='browser-category-content'>
           { this.props['children'] }
         </div>

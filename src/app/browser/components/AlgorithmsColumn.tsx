@@ -46,6 +46,7 @@ import * as React from 'react';
 import Classs from './../../components/common/Classs.tsx';
 import BrowserColumn from './BrowserColumn.tsx';
 import BrowserItem from './BrowserItem.tsx';
+import BrowserItemCategory from './BrowserItemCategory.tsx';
 import BrowserCreateItem from './BrowserCreateItem.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
@@ -114,7 +115,8 @@ class AlgorithmsColumn extends Classs<Props>
       this.setState({
         lastMoved: index + ' ' + itemIndex,
       });
-      Actions.algorithms.move(this.props.algorithms.get(id), index, this.props.groupId);
+      var target = this.props.algorithms.get(this.props.algorithmsOrder.get(index));
+      Actions.algorithms.move(this.props.algorithms.get(id).set('status', target.status) as Algorithm, index, this.props.groupId);
     }
   }
   
@@ -166,6 +168,44 @@ class AlgorithmsColumn extends Classs<Props>
     );
   }
   
+  handleCategoryHover(statusString: string, id: ID)
+  {
+    let a = this.props.algorithms.get(id);
+    let status = BrowserTypes.EAlgorithmStatus[statusString];
+    if(a.status !== status)
+    {
+      Actions.algorithms.change(a.set('status', status) as Algorithm);  
+    }
+  }
+  
+  renderCategory(status: BrowserTypes.EAlgorithmStatus)
+  {
+    var ids = this.props.algorithmsOrder.filter(id => this.props.algorithms.get(id).status === status);
+    return (
+      <BrowserItemCategory
+        status={BrowserTypes.EAlgorithmStatus[status]}
+        key={status}
+        onHover={this.handleCategoryHover}
+        type='algorithm'
+        titleHidden={status === BrowserTypes.EAlgorithmStatus.Live}
+      >
+        {
+          ids.map(this.renderAlgorithm)
+        }
+        {
+          ids.size === 0 && <div className='browser-category-none'>None</div>
+        }
+        {
+          status === BrowserTypes.EAlgorithmStatus.Live && 
+            <BrowserCreateItem
+              name='algorithm'
+              onCreate={this.handleCreate}
+            />
+        }
+      </BrowserItemCategory>
+    );
+  }
+  
   render()
   {
     return (
@@ -179,13 +219,8 @@ class AlgorithmsColumn extends Classs<Props>
               this.props.algorithms.size ?
               (
                 <div>
-                  {
-                    this.props.algorithmsOrder.map(this.renderAlgorithm)
-                  }
-                  <BrowserCreateItem
-                    name='algorithm'
-                    onCreate={this.handleCreate}
-                  />
+                  { this.renderCategory(BrowserTypes.EAlgorithmStatus.Live) }
+                  { this.renderCategory(BrowserTypes.EAlgorithmStatus.Archive) }
                 </div>
               )
               :

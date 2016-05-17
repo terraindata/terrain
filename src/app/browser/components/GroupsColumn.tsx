@@ -46,6 +46,7 @@ import * as React from 'react';
 import Classs from './../../components/common/Classs.tsx';
 import BrowserColumn from './BrowserColumn.tsx';
 import BrowserItem from './BrowserItem.tsx';
+import BrowserItemCategory from './BrowserItemCategory.tsx';
 import BrowserCreateItem from './BrowserCreateItem.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
@@ -105,23 +106,14 @@ class GroupsColumn extends Classs<Props>
       this.setState({
         lastMoved: index + ' ' + itemIndex,
       });
-      Actions.groups.move(this.props.groups.get(id), index);
+      var target = this.props.groups.get(this.props.groupsOrder.get(index));
+      Actions.groups.move(this.props.groups.get(id).set('status', target.status) as Group, index);
     }
   }
 
   handleDropped(id: ID, targetType: string, targetItem: any, shifted: boolean)
   {
     
-    // switch (targetType) {
-    //   case "group":
-    //     break;
-    //   case "algorithm":
-    //     Actions.algorithms.move(this.props.)
-      
-    //   default:
-    //     // code...
-    //     break;
-    // }
   }  
   
   renderGroup(id: ID, index: number)
@@ -148,6 +140,44 @@ class GroupsColumn extends Classs<Props>
     );
   }
   
+  handleCategoryHover(statusString: string, id: ID)
+  {
+    let g = this.props.groups.get(id);
+    let status = BrowserTypes.EGroupStatus[statusString];
+    if(g.status !== status)
+    {
+      Actions.groups.change(g.set('status', status) as Group);  
+    }
+  }
+  
+  renderCategory(status: BrowserTypes.EGroupStatus)
+  {
+    var ids = this.props.groupsOrder.filter(id => this.props.groups.get(id).status === status);
+    return (
+      <BrowserItemCategory
+        status={BrowserTypes.EGroupStatus[status]}
+        key={status}
+        onHover={this.handleCategoryHover}
+        type='group'
+        titleHidden={status === BrowserTypes.EGroupStatus.Live}
+      >
+        {
+          ids.map(this.renderGroup)
+        }
+        {
+          ids.size === 0 && <div className='browser-category-none'>None</div>
+        }
+        {
+          status === BrowserTypes.EGroupStatus.Live && 
+            <BrowserCreateItem
+              name='group'
+              onCreate={this.handleCreate}
+            />
+        }
+      </BrowserItemCategory>
+    );
+  }
+  
   render()
   {
     return (
@@ -159,13 +189,8 @@ class GroupsColumn extends Classs<Props>
           this.props.groups.size ?
             (
               <div>
-                {
-                  this.props.groupsOrder.map(this.renderGroup)
-                }
-                <BrowserCreateItem
-                  name='group'
-                  onCreate={this.handleCreate}
-                />
+                { this.renderCategory(BrowserTypes.EGroupStatus.Live) }
+                { this.renderCategory(BrowserTypes.EGroupStatus.Archive) }
               </div>
             )
             :
