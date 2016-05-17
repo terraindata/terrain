@@ -178,10 +178,8 @@ class VariantsColumn extends Classs<Props>
   {
     let v = this.props.variants.get(id);
     let status = BrowserTypes.EVariantStatus[statusString];
-    console.log('a');
     if(v.status !== status)
     {
-      console.log(v.set('status', status).toJS());
       Actions.variants.change(v.set('status', status) as Variant);  
     }
   }
@@ -217,6 +215,14 @@ class VariantsColumn extends Classs<Props>
           ? null
           : <div className='browser-category-none'>None</div>
         }
+        {
+          status === BrowserTypes.EVariantStatus.Design
+          ? <BrowserCreateItem
+              name='variant'
+              onCreate={this.handleCreate}
+            />
+          : null
+        }
       </BrowserItemCategory>
     );
   }
@@ -237,10 +243,6 @@ class VariantsColumn extends Classs<Props>
                   {
                     _.map(BrowserTypes.EVariantStatus, this.renderVariantStatus)
                   }
-                  <BrowserCreateItem
-                    name='variant'
-                    onCreate={this.handleCreate}
-                  />
                 </div>
               )
               :

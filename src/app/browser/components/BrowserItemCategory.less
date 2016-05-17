@@ -16,6 +16,7 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     text-align: left;
+    cursor: pointer;
     
     .browser-category-title-symbol {
       display: inline-block;
@@ -25,6 +26,24 @@
       border-radius: @r;
       background: #ddd;
       margin: 0px 6px;
+      position: relative;
+      top: -2px;
+    }
+    
+    &:before {
+      display: inline-block;
+      content: '';
+      .arrow-down;
+      position: relative;
+      top: -2px;
+      opacity: 0.5;
+      .transition;
+    }
+    
+    &:hover {
+      &:before {
+        opacity: 1;
+      }
     }
   }
   
@@ -40,6 +59,9 @@
     .browser-category-title {
       color: @live;
       border-color: @live;
+      &:before {
+        border-top-color: @live;
+      }
       svg {
         fill: @live;
       }
@@ -53,6 +75,9 @@
     .browser-category-title {
       color: @approve;
       border-color: @approve;
+      &:before {
+        border-top-color: @approve;
+      }
       svg {
         fill: @approve;
       }
@@ -66,6 +91,9 @@
     .browser-category-title {
       color: @design;
       border-color: @design;
+      &:before {
+        border-top-color: @design;
+      }
       svg {
         fill: @design;
       }
@@ -79,6 +107,9 @@
     .browser-category-title {
       color: @archive;
       border-color: @archive;
+      &:before {
+        border-top-color: @archive;
+      }
       svg {
         fill: @archive;
       }
@@ -88,5 +119,15 @@
     }
   }
   
-  // &.browser-category-approve
+  &.browser-category-closed {
+    .browser-category-content {
+      display: none;
+    }
+    
+    .browser-category-title {
+      &:before {
+        .rotate90;
+      }
+    }
+  }
 }

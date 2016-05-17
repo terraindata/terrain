@@ -72,7 +72,7 @@ class BrowserItemCategory extends Classs<Props>
   render()
   {
     return this.props.connectDropTarget(
-      <div className={`browser-category browser-category-${this.props.status}`}>
+      <div className={`browser-category browser-category-${this.props.status} browser-category-${this.state.open ? 'open' : 'closed'}`}>
         <div className='browser-category-title' onClick={this.toggleOpen}>
           <div className='browser-category-title-symbol' />
           { this.props.status }
@@ -96,10 +96,8 @@ const target =
   
   hover(props, monitor, component)
   {
-    console.log('hov', props.status);
     if(canDrop(props, monitor))
     {
-      console.log('c');
       let item = monitor.getItem();
       props.onHover(props.status, item.id);
     }
