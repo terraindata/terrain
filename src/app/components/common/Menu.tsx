@@ -108,16 +108,21 @@ class Menu extends Classs<Props>
     $(document).off('click', this.close);
   }
   
+  componentWillUnmount()
+  {
+    $(document).off('click', this.close);
+  }
+  
   toggleOpen()
   {
+    this.setState({
+      open: !this.state.open,
+    });
+    
     if(!this.state.open)
     {
       $(document).on('click', this.close);
     }
-    
-    this.setState({
-      open: !this.state.open,
-    })
   }
 
   render() {

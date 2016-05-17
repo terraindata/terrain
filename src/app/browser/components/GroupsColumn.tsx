@@ -84,6 +84,12 @@ class GroupsColumn extends Classs<Props>
     Actions.groups.duplicate(this.props.groups.get(this.props.groupsOrder.get(index)), index);
   }
   
+  handleArchive(index: number)
+  {
+    Actions.groups.change(this.props.groups.get(this.props.groupsOrder.get(index))
+      .set('status', BrowserTypes.EGroupStatus.Archive) as Group);
+  }
+  
   handleNameChange(id: ID, name: string)
   {
     Actions.groups.change(
@@ -126,6 +132,7 @@ class GroupsColumn extends Classs<Props>
         id={id}
         icon={null}
         onDuplicate={this.handleDuplicate}
+        onArchive={this.handleArchive}
         color={ColorManager.colorForKey(group.id)}
         key={group.id}
         to={'/browser/' + group.id}

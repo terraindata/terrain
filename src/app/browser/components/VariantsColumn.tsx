@@ -95,6 +95,12 @@ class VariantsColumn extends Classs<Props>
     Actions.variants.duplicate(this.props.variants.get(this.props.variantsOrder.get(index)), index);
   }
   
+  handleArchive(index: number)
+  {
+    Actions.variants.change(this.props.variants.get(this.props.variantsOrder.get(index))
+      .set('status', BrowserTypes.EVariantStatus.Archive) as Variant);
+  }
+  
   handleCreate()
   {
     Actions.variants.create(this.props.groupId, this.props.algorithmId);
@@ -158,6 +164,7 @@ class VariantsColumn extends Classs<Props>
         name={vriant.name}
         icon={null}
         onDuplicate={this.handleDuplicate}
+        onArchive={this.handleArchive}
         color={ColorManager.colorForKey(this.props.groupId)}
         key={vriant.id}
         to={`/browser/${this.props.groupId}/${this.props.algorithmId}/${id}`}

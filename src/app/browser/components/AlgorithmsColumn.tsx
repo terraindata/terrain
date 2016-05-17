@@ -93,6 +93,12 @@ class AlgorithmsColumn extends Classs<Props>
     Actions.algorithms.duplicate(this.props.algorithms.get(this.props.algorithmsOrder.get(index)), index);
   }
   
+  handleArchive(index: number)
+  {
+    Actions.algorithms.change(this.props.algorithms.get(this.props.algorithmsOrder.get(index))
+      .set('status', BrowserTypes.EAlgorithmStatus.Archive) as Algorithm);
+  }
+  
   handleCreate()
   {
     Actions.algorithms.create(this.props.groupId);
@@ -152,6 +158,7 @@ class AlgorithmsColumn extends Classs<Props>
         name={algorithm.name}
         icon={null}
         onDuplicate={this.handleDuplicate}
+        onArchive={this.handleArchive}
         color={ColorManager.colorForKey(this.props.groupId)}
         key={algorithm.id}
         to={`/browser/${this.props.groupId}/${algorithm.id}`}

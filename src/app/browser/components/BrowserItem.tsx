@@ -56,6 +56,7 @@ interface Props
   index: number;
   name: string;
   onDuplicate: (index: number) => void;
+  onArchive: (index: number) => void;
   icon: Element;
   color: string;
   to: string;
@@ -99,6 +100,10 @@ class BrowserItem extends Classs<Props>
       // icon: '',
       onClick: this.handleDuplicate,   
     },
+    {
+      text: 'Archive',
+      onClick: this.handleArchive,
+    }
   ];
   
   componentDidMount()
@@ -130,6 +135,11 @@ class BrowserItem extends Classs<Props>
   handleDuplicate()
   {
     this.props.onDuplicate(this.props.index);
+  }
+  
+  handleArchive()
+  {
+    this.props.onArchive(this.props.index);
   }
   
   handleChange(event)
