@@ -42,117 +42,59 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Menu.less');
-import * as $ from 'jquery';
-import * as _ from 'underscore';
+require('./Scoreline.less');
 import * as React from 'react';
-import Util from '../../util/Util.tsx';
-import * as classNames from 'classnames';
-import Classs from './../common/Classs.tsx';
-var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
-
-var optionHeight = 30; // coordinate with Menu.less
-
-export interface MenuOption {
-  text: string;
-  onClick: () => void;
-  disabled?: boolean;
-};
+import Classs from './../../components/common/Classs.tsx';
 
 interface Props
 {
-  options: MenuOption[];
-  small?: boolean;
+  scores: {
+    color: string,
+    score: number,
+  }[];
+  
+  hideZeroes: boolean;
 }
 
-class Menu extends Classs<Props>
+class Scoreline extends Classs<Props>
 {
-  constructor(props: Props) {
-    super(props);
-    this.state =
-    {
-      open: false,
-    }
-  }
-  
-  shouldComponentUpdate(nextProps, nextState)
+  renderScore(score: { color: string, score: number}, index: number)
   {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  }
-  
-  renderOption(option, index)
-  {
-    if(!option.disabled)
+    if(score.score === 0 && this.props.hideZeroes)
     {
-      var onClick = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        option.onClick(index);
-      };
-    }
+      return null;
+    }  
     
     return (
-      <div className={"menu-option" + (option.disabled ? " menu-option-disabled" : "")} key={index} onClick={onClick}>
-        <div className="dead-center">
-          { option.text }
+      <div className='scoreline-score' key={index}>
+        <div
+          className='scoreline-score-icon'
+          style={{ backgroundColor: score.color, }}
+        />
+        <div
+          className='scoreline-score-score'
+          style={{ color: score.color, }}
+        >
+          { score.score }
         </div>
       </div>
     );
   }
   
-  close()
+  render()
   {
-    this.setState({
-      open: false,
-    })
-    $(document).off('click', this.close);
-  }
-  
-  componentWillUnmount()
-  {
-    $(document).off('click', this.close);
-  }
-  
-  toggleOpen()
-  {
-    this.setState({
-      open: !this.state.open,
-    });
-    
-    if(!this.state.open)
+    if(this.props.hideZeroes && this.props.scores.every(score => score.score === 0))
     {
-      $(document).on('click', this.close);
+      var none = <div className='scoreline-none'>None</div>
     }
-  }
-
-  render() {
-    var style = {
-      width: 14 * this.props.options.reduce((max, option) => 
-        option.text.length > max ? option.text.length : max, 1),
-      height: this.props.options.length * optionHeight,
-    };
     
     return (
-      <div
-        className={classNames({
-          "menu-wrapper": true,
-          "menu-wrapper-small": this.props.small,
-          "menu-open": this.state.open,        
-        })}
-        style={style}
-        onClick={this.toggleOpen}
-      >
-        <MoreIcon className="menu-icon" />
-        { !this.state.open ? null :
-          <div className="menu-options-wrapper">
-            {
-              this.props.options.map(this.renderOption)
-            }
-          </div>
-        }
+      <div className='scoreline'>
+        { this.props.scores.map(this.renderScore) }
+        { none }
       </div>
     );
   }
-};
+}
 
-export default Menu;
+export default Scoreline;

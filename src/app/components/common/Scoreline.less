@@ -1,0 +1,40 @@
+@import "../../util/Common.less";
+
+.scoreline {
+  background: #fff;
+  border-radius: 5px;
+  display: inline-block;
+  font-size: 0px;
+  
+  @m: 3px;
+  padding: (@m - 2px) @m;
+  
+  .scoreline-score {
+    display: inline-block;
+    padding: @m;
+    
+    .scoreline-score-icon {
+      @r: 6px;
+      width: @r;
+      height: @r;
+      border-radius: @r;
+      display: inline-block;
+      margin-right: @m;
+      position: relative;
+      top: -1px;
+    }
+    
+    .scoreline-score-score {
+      margin-left: @m;
+      display: inline-block;  
+      font-size: 11px;
+      margin-right: @m / 2;
+    }
+  }
+  
+  .scoreline-none {
+    padding: @m;
+    color: #aaa;
+    font-size: 11px;
+  }
+}

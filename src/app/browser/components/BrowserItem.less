@@ -24,7 +24,7 @@
     
     svg {
       display: inline-block;
-      .vertically-middle;
+      .dead-center;
       position: absolute;
       left: 18px;
       width: 16px;
@@ -64,8 +64,12 @@
     height: @h - @th;
     background: rgba(255,255,255,0.15);
     background-blend-mode: multiply;
-    padding: @standard-margin;
+    padding: @standard-margin + 1px;
     box-sizing: border-box;
+    
+    .browser-item-line {
+      padding: 3px;
+    }
   }
   
   .menu-wrapper {

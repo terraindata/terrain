@@ -53,6 +53,12 @@ import ColorManager from './../../util/ColorManager.tsx';
 import InfoArea from './../../components/common/InfoArea.tsx';
 import Actions from './../data/BrowserActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
+import Scoreline from './../../components/common/Scoreline.tsx';
+
+let live = '#48b14b';
+let approve = '#bf5bff';
+let design = '#00a7f7';
+let archive = '#ff735b';
 
 var AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
@@ -156,6 +162,26 @@ class AlgorithmsColumn extends Classs<Props>
   renderAlgorithm(id: ID, index: number)
   {
     const algorithm = this.props.algorithms.get(id);
+    var scores = [
+      {
+        score: 0,
+        color: live, 
+      },
+      {
+        score: 0,
+        color: approve,
+      },
+      {
+        score: 0,
+        color: design,
+      },
+      {
+        score: 0,
+        color: archive,
+      }
+    ];
+    algorithm.variants.map(v => scores[v.status].score ++);
+    
     return (
       <BrowserItem
         index={index}
@@ -175,7 +201,21 @@ class AlgorithmsColumn extends Classs<Props>
         onDropped={this.handleDropped}
         item={algorithm}
       >
-        <UserThumbnail userId={algorithm.lastUserId} />
+        <div className='flex-container'>
+          <UserThumbnail userId={algorithm.lastUserId} />
+          
+          <div className='flex-grow'>
+            <div className='browser-item-line'>
+              <Scoreline 
+                scores={scores}
+                hideZeroes={true}
+              />
+            </div>
+            <div className='browser-item-line'>
+              Last Edited: { algorithm.lastEdited }
+            </div>
+          </div>
+        </div>
       </BrowserItem>
     );
   }

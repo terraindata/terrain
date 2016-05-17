@@ -182,7 +182,15 @@ class VariantsColumn extends Classs<Props>
         onDropped={this.handleDropped}
         item={vriant}
       >
-        <UserThumbnail userId={vriant.lastUserId} />
+        <div className='flex-container'>
+          <UserThumbnail userId={vriant.lastUserId} />
+          
+          <div className='flex-grow'>
+            <div className='browser-item-line'>
+              Last Edited: { vriant.lastEdited }
+            </div>
+          </div>
+        </div>
       </BrowserItem>
     );
   }

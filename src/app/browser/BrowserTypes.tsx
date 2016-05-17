@@ -107,8 +107,8 @@ export module BrowserTypes
     lastEdited: string;
     lastUserId: ID;
     groupId: ID;
-    variants: {[variantId: string]: Variant};
-    variantsOrder: ID[];
+    variants: Immutable.Map<ID, Variant>;
+    variantsOrder: Immutable.List<ID>;
     status: EAlgorithmStatus;
   }
   export function newAlgorithm(groupId: string, id?: ID, name?: string, lastEdited?: string, lastUserId?: string,
@@ -141,8 +141,8 @@ export module BrowserTypes
     lastEdited: string;
     lastUserId: ID;
     userIds: ID[];
-    algorithms: {[algorithmId: string]: Algorithm}
-    algorithmsOrder: ID[];
+    algorithms: Immutable.Map<ID, Algorithm>;
+    algorithmsOrder: Immutable.List<ID>;
     status: EGroupStatus;
   }
   export function newGroup(id?: ID, name?: string, lastEdited?: string, lastUserId?: string, userIds?: Immutable.List<ID>,
