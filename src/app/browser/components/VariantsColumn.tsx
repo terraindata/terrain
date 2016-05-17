@@ -43,9 +43,11 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
+import * as _ from 'underscore';
 import Classs from './../../components/common/Classs.tsx';
 import BrowserColumn from './BrowserColumn.tsx';
 import BrowserItem from './BrowserItem.tsx';
+import BrowserItemCategory from './BrowserItemCategory.tsx';
 import BrowserCreateItem from './BrowserCreateItem.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
@@ -115,7 +117,10 @@ class VariantsColumn extends Classs<Props>
       this.setState({
         lastMoved: index + ' ' + itemIndex,
       });
-      Actions.variants.move(this.props.variants.get(id), index, this.props.groupId, this.props.algorithmId);
+      
+      var target = this.props.variants.get(this.props.variantsOrder.get(index));
+      Actions.variants.move(this.props.variants.get(id).set('status', target.status) as Variant,
+        index, this.props.groupId, this.props.algorithmId);
     }
   }
 
@@ -169,6 +174,53 @@ class VariantsColumn extends Classs<Props>
     );
   }
   
+  handleVariantStatusHover(statusString: string, id: ID)
+  {
+    let v = this.props.variants.get(id);
+    let status = BrowserTypes.EVariantStatus[statusString];
+    console.log('a');
+    if(v.status !== status)
+    {
+      console.log(v.set('status', status).toJS());
+      Actions.variants.change(v.set('status', status) as Variant);  
+    }
+  }
+  
+  hasStatus(id: ID, status: BrowserTypes.EVariantStatus)
+  {
+    return this.props.variants.getIn([id, 'status']) === status;
+  }
+  
+  renderVariantStatus(status)
+  {
+    if(!/^\d+$/.test(status))
+    {
+      // filter out string keys
+      return null;  
+    }
+    
+    return (
+      <BrowserItemCategory
+        status={BrowserTypes.EVariantStatus[status]}
+        key={status}
+        type='variant'
+        onHover={this.handleVariantStatusHover}
+      >
+        {
+          this.props.variantsOrder.map((id, index) =>
+            this.hasStatus(id, status) &&
+              this.renderVariant(id, index)
+          )
+        }
+        {
+          this.props.variantsOrder.some(id => this.hasStatus(id, status))
+          ? null
+          : <div className='browser-category-none'>None</div>
+        }
+      </BrowserItemCategory>
+    );
+  }
+  
   render()
   {
     return (
@@ -183,7 +235,7 @@ class VariantsColumn extends Classs<Props>
               (
                 <div>
                   {
-                    this.props.variantsOrder.map(this.renderVariant)
+                    _.map(BrowserTypes.EVariantStatus, this.renderVariantStatus)
                   }
                   <BrowserCreateItem
                     name='variant'

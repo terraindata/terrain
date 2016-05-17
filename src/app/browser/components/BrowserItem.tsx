@@ -79,7 +79,7 @@ interface Props
   // populated by DnD code
   connectDropTarget?: (html: any) => JSX.Element;
   connectDragSource?: (html: any) => JSX.Element;
-  isDragging?: boolean;
+  draggingItemId?: ID;
   isOver?: boolean;
   dragItemType? : string;
 }
@@ -175,7 +175,7 @@ class BrowserItem extends Classs<Props>
   
   render()
   {
-    let { connectDropTarget, connectDragSource, isDragging, isOver, dragItemType } = this.props;
+    let { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId } = this.props;
     let draggingOver = isOver && dragItemType !== this.props.type;
     return connectDropTarget((
       <div>
@@ -184,7 +184,7 @@ class BrowserItem extends Classs<Props>
             className={classNames({
               'browser-item-wrapper': true,
               'browser-item-wrapper-mounted': this.state.mounted,
-              'browser-item-wrapper-dragging': isDragging,
+              'browser-item-wrapper-dragging': draggingItemId === this.props.id,
               'browser-item-wrapper-drag-over': draggingOver,
               'browser-item-wrapper-drag-over-shift': draggingOver && shifted,
             })}
@@ -264,7 +264,8 @@ const source =
 const dragCollect = (connect, monitor) =>
 ({
   connectDragSource: connect.dragSource(),
-  isDragging: monitor.isDragging(),
+  draggingItemId: monitor.getItem() && monitor.getItem().id,
+  // built-in `isDragging` unreliable if the component is being inserted into other parts of the app during drag
 });
 
 

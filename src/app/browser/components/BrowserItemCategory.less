@@ -1,0 +1,92 @@
+@import "../../util/Common.less";
+
+@live: #48b14b;
+@approve: #bf5bff;
+@design: #00a7f7;
+@archive: #ff735b;
+
+.browser-category {
+  padding: 10px 0px;
+  
+  .browser-category-title {
+    margin: 1px 10px;
+    margin-bottom: 5px;
+    padding: 4px;
+    border-bottom: 1px solid #ddd;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: left;
+    
+    .browser-category-title-symbol {
+      display: inline-block;
+      @r: 8px;
+      width: @r;
+      height: @r;
+      border-radius: @r;
+      background: #ddd;
+      margin: 0px 6px;
+    }
+  }
+  
+  .browser-category-none {
+    text-align: center;
+    padding: 25px;
+    color: #828c76;
+    font-style: italic;
+    opacity: 0.5;
+  }
+  
+  &.browser-category-live {
+    .browser-category-title {
+      color: @live;
+      border-color: @live;
+      svg {
+        fill: @live;
+      }
+      .browser-category-title-symbol {
+        background: @live;
+      }
+    }
+  }
+  
+  &.browser-category-approve {
+    .browser-category-title {
+      color: @approve;
+      border-color: @approve;
+      svg {
+        fill: @approve;
+      }
+      .browser-category-title-symbol {
+        background: @approve;
+      }
+    }
+  }
+  
+  &.browser-category-design {
+    .browser-category-title {
+      color: @design;
+      border-color: @design;
+      svg {
+        fill: @design;
+      }
+      .browser-category-title-symbol {
+        background: @design;
+      }
+    }
+  }
+  
+  &.browser-category-archive {
+    .browser-category-title {
+      color: @archive;
+      border-color: @archive;
+      svg {
+        fill: @archive;
+      }
+      .browser-category-title-symbol {
+        background: @archive;
+      }
+    }
+  }
+  
+  // &.browser-category-approve
+}
