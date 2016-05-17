@@ -104,6 +104,14 @@
   }
   
   &.browser-category-archive {
+    &.browser-category-closed {
+      opacity: 0.38;
+      .transition;
+      &:hover {
+        opacity: 1;
+      }
+    }
+    
     .browser-category-title {
       color: @archive;
       border-color: @archive;

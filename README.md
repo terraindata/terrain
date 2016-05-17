@@ -38,6 +38,8 @@
 - Comma after the last line in an object.`,`
 	This makes adding new lines to objects easier and allows for a cleaner merge.`,`
 	Note: You can't do this in JSON.`,`
+- Name variables clearly.
+  E.g. `user` or `users` for user objects, `userId` or `userIds` for ids
 - Commits should be solidly incremental and should have a helpful one-line explanation.
 	Rebase and squash on your feature branch before merging if you have too many commits, or unhelpful commit messages.
 	`git log` in master should always look beautiful and be a helpful history of what has happened.

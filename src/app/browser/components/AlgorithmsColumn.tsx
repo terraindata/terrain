@@ -52,6 +52,10 @@ import BrowserTypes from './../BrowserTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
 import InfoArea from './../../components/common/InfoArea.tsx';
 import Actions from './../data/BrowserActions.tsx';
+import UserThumbnail from './../../users/components/UserThumbnail.tsx';
+
+var AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
+
 type Algorithm = BrowserTypes.Algorithm;
 
 interface Props
@@ -156,7 +160,7 @@ class AlgorithmsColumn extends Classs<Props>
       <BrowserItem
         index={index}
         name={algorithm.name}
-        icon={null}
+        icon={<AlgorithmIcon />}
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
         color={ColorManager.colorForKey(this.props.groupId)}
@@ -171,6 +175,7 @@ class AlgorithmsColumn extends Classs<Props>
         onDropped={this.handleDropped}
         item={algorithm}
       >
+        <UserThumbnail userId={algorithm.lastUserId} />
       </BrowserItem>
     );
   }

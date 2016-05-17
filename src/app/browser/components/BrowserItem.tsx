@@ -57,7 +57,7 @@ interface Props
   name: string;
   onDuplicate: (index: number) => void;
   onArchive: (index: number) => void;
-  icon: Element;
+  icon: any;
   color: string;
   to: string;
   type: string;
@@ -187,6 +187,7 @@ class BrowserItem extends Classs<Props>
   {
     let { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId } = this.props;
     let draggingOver = isOver && dragItemType !== this.props.type;
+    console.log(this.props.icon);
     return connectDropTarget((
       <div>
         <Link to={this.props.to} className='browser-item-link' activeClassName='browser-item-active'>

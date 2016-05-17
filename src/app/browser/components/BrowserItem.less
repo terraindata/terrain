@@ -4,15 +4,16 @@
   position: relative;
   
   
-  @h: 80px;
+  @h: 96px;
   height: @h;
   text-align: left;
   border-radius: 4px;
   overflow: hidden;
   color: #fff;
   
-  @th: 34px;
+  @th: 36px;
   .browser-item-title-bar {
+    position: relative;
     height: @th;
     font-size: 16px;
     padding: 8px;
@@ -21,9 +22,21 @@
     letter-spacing: 0.5;
     background-blend-mode: multiply;
     
+    svg {
+      display: inline-block;
+      .vertically-middle;
+      position: absolute;
+      left: 18px;
+      width: 16px;
+    }
+    svg, .cls-1 {
+      fill: #fff;
+    }
+    
     .browser-item-name,
     .browser-item-name-input {
       padding-left: 6px;
+      margin-left: 20px;
     }
     
     .browser-item-name-input {
@@ -51,10 +64,17 @@
     height: @h - @th;
     background: rgba(255,255,255,0.15);
     background-blend-mode: multiply;
+    padding: @standard-margin;
+    box-sizing: border-box;
   }
   
   .menu-wrapper {
+    top: @standard-margin;
+    right: @standard-margin;
     opacity: 0;
+    svg {
+      margin-left: -1 * @standard-margin;
+    }
   }
   
   &:hover {
@@ -75,6 +95,9 @@
   &.browser-item-lightest {
     .browser-item-title-bar {
       background: rgba(255,255,255,0.5);
+      svg, .cls-1 {
+        fill: @trans-black;
+      }
     }
     .browser-item-content {
       background: rgba(255,255,255,0.65);

@@ -62,16 +62,17 @@ export module BrowserTypes
     id: "",
     name: "",
     lastEdited: "",
+    lastUserId: "",
     algorithmId: "",
     groupId: "",
     status: EVariantStatus.Design,
   });
   export class Variant extends _Variant implements IId, IName, ILastEdited
   {
-    id: string;
+    id: ID;
     name: string;
     lastEdited: string;
-    lastUserId: string;
+    lastUserId: ID;
     status: EVariantStatus;
     algorithmId: ID;
     groupId: Group;
@@ -93,6 +94,7 @@ export module BrowserTypes
     id: "",
     name: "",
     lastEdited: "",
+    lastUserId: "",
     groupId: "",
     variants: Immutable.Map({}),
     variantsOrder: Immutable.List([]),
@@ -100,10 +102,10 @@ export module BrowserTypes
   });
   export class Algorithm extends _Algorithm implements IId, IName, ILastEdited
   {
-    id: string;
+    id: ID;
     name: string;
     lastEdited: string;
-    lastUserId: string;
+    lastUserId: ID;
     groupId: ID;
     variants: {[variantId: string]: Variant};
     variantsOrder: ID[];
@@ -126,26 +128,27 @@ export module BrowserTypes
     id: "",
     name: "",
     lastEdited: "",
-    users: Immutable.List([]),
+    lastUserId: "",
+    userIds: Immutable.List([]),
     algorithms: Immutable.Map({}),
     algorithmsOrder: Immutable.List([]),
     status: EGroupStatus.Live,
   });
   export class Group extends _Group implements IId, IName
   {
-    id: string;
+    id: ID;
     name: string;
     lastEdited: string;
-    lastUserId: string;
-    users: UserTypes.User[]; // central store for users and roles
+    lastUserId: ID;
+    userIds: ID[];
     algorithms: {[algorithmId: string]: Algorithm}
     algorithmsOrder: ID[];
     status: EGroupStatus;
   }
-  export function newGroup(id?: ID, name?: string, lastEdited?: string, lastUserId?: string, users?: Immutable.List<UserTypes.User>,
+  export function newGroup(id?: ID, name?: string, lastEdited?: string, lastUserId?: string, userIds?: Immutable.List<ID>,
     algorithms?: Immutable.Map<ID, Algorithm>, algorithmsOrder?: Immutable.List<ID>, status?: EGroupStatus):Group
   {
-    return new Group(Util.extendId({ id, name, lastEdited, lastUserId, users, algorithms, algorithmsOrder, status }));
+    return new Group(Util.extendId({ id, name, lastEdited, lastUserId, userIds, algorithms, algorithmsOrder, status }));
   }
 }
 

@@ -1,0 +1,21 @@
+@import "../../util/Common.less";
+
+.user-thumbnail {
+  display: inline-block;
+  margin: @standard-margin;
+  
+  @r: 36px;
+  width: @r;
+  height: @r;
+  border-radius: @r;
+  box-sizing: border-box;
+  overflow: hidden;
+  
+  background-size: 100% 100%;
+  background-size: cover;
+  background-position: center center;
+ 
+  &.user-thumbnail-admin {
+    border: 3px solid #CCDD1f;
+  } 
+}

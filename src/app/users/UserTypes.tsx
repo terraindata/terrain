@@ -51,15 +51,18 @@ export module UserTypes
     id: "",
     name: "",
     groupRoles: Immutable.Map({}),
-    picData: "",
+    imgUrl: "",
   });
   export class User extends _User implements IId, IName
   {
     id: string;
     name: string;
     groupRoles: {[groupId: string]: RoleTypes.GroupUserRole;}
-    picData: string; // or url?
+    imgUrl: string;
   }
+  
+  export type UserMap = { [id: string]: User }
+  // using `ID` instead of `string` causes a compile-time warning
 }
 
 export default UserTypes;

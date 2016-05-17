@@ -52,6 +52,10 @@ import BrowserTypes from './../BrowserTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
 import InfoArea from './../../components/common/InfoArea.tsx';
 import Actions from './../data/BrowserActions.tsx';
+import UserThumbnail from './../../users/components/UserThumbnail.tsx';
+
+var GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
+
 type Group = BrowserTypes.Group;
 
 interface Props
@@ -130,7 +134,7 @@ class GroupsColumn extends Classs<Props>
         index={index}
         name={group.name}
         id={id}
-        icon={null}
+        icon={<GroupIcon />}
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
         color={ColorManager.colorForKey(group.id)}
@@ -143,6 +147,9 @@ class GroupsColumn extends Classs<Props>
         onDropped={this.handleDropped}
         item={group}
       >
+        {
+          group.userIds.map(userId => <UserThumbnail userId={userId} key={userId} />)
+        }
       </BrowserItem>
     );
   }

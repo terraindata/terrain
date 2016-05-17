@@ -53,6 +53,10 @@ import BrowserTypes from './../BrowserTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
 import InfoArea from './../../components/common/InfoArea.tsx';
 import Actions from './../data/BrowserActions.tsx';
+import UserThumbnail from './../../users/components/UserThumbnail.tsx';
+
+var VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
+
 type Variant = BrowserTypes.Variant;
 
 interface Props
@@ -158,11 +162,12 @@ class VariantsColumn extends Classs<Props>
   {
     // Sublime gets messed up with the 'var' in 'variant', hence this pseudonym
     const vriant = this.props.variants.get(id);
+    
     return (
       <BrowserItem
         index={index}
         name={vriant.name}
-        icon={null}
+        icon={<VariantIcon />}
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
         color={ColorManager.colorForKey(this.props.groupId)}
@@ -177,6 +182,7 @@ class VariantsColumn extends Classs<Props>
         onDropped={this.handleDropped}
         item={vriant}
       >
+        <UserThumbnail userId={vriant.lastUserId} />
       </BrowserItem>
     );
   }

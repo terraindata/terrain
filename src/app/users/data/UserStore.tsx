@@ -42,61 +42,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import RoleTypes from './../../roles/RoleTypes.tsx';
+import * as _ from 'underscore';
+import * as Immutable from 'immutable';
+import * as ReduxActions from 'redux-actions';
+var Redux = require('redux');
+
 import UserTypes from './../UserTypes.tsx';
+import Util from './../../util/Util.tsx';
+import { u0, u1, U2, u3, u4, u5, u6, u7 } from './UserFixtures.tsx';
 
-export const u0 = new UserTypes.User({
-  id: "u0",
-  name: "Patty Hewes",
-  imgUrl: "http://lukeknepper.com/uploads/u0.jpg",
-  // groupRoles: [],
-})
+var DefaultState = Immutable.fromJS({
+  users: { u0, u1, U2, u3, u4, u5, u6, u7 },
+});
 
-export const u1 = new UserTypes.User({
-  id: "u1",
-  name: "Ellen Parsons",
-  imgUrl: "http://lukeknepper.com/uploads/u1.jpg",
-  // groupRoles: [],
-})
+// import UserReducers from './UserReducers.tsx';
 
-export const U2 = new UserTypes.User({
-  id: "U2",
-  name: "Paul Hewson",
-  imgUrl: "http://lukeknepper.com/uploads/U2.jpg",
-  // groupRoles: [],
-})
+let UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
+  // UserReducers,
+{})), DefaultState);
 
-export const u3 = new UserTypes.User({
-  id: "u3",
-  name: "Wes Krulik",
-  imgUrl: "http://lukeknepper.com/uploads/u3.jpg",
-  // groupRoles: [],
-})
-
-export const u4 = new UserTypes.User({
-  id: "u4",
-  name: "Tom Shayes",
-  imgUrl: "http://lukeknepper.com/uploads/u4.jpg",
-  // groupRoles: [],
-})
-
-export const u5 = new UserTypes.User({
-  id: "u5",
-  name: "Arthur Frobisher",
-  imgUrl: "http://lukeknepper.com/uploads/u5.jpg",
-  // groupRoles: [],
-})
-
-export const u6 = new UserTypes.User({
-  id: "u6",
-  name: "Ray Fiske",
-  imgUrl: "http://lukeknepper.com/uploads/u6.jpg",
-  // groupRoles: [],
-})
-
-export const u7 = new UserTypes.User({
-  id: "u7",
-  name: "David Connor",
-  imgUrl: "http://lukeknepper.com/uploads/u7.jpg",
-  // groupRoles: [],
-})
+export default UserStore;

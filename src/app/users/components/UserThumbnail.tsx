@@ -42,61 +42,81 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import RoleTypes from './../../roles/RoleTypes.tsx';
+require('./UserThumbnail.less');
+import * as React from 'react';
+import Classs from './../../components/common/Classs.tsx';
+import { Link } from 'react-router';
+import * as classNames from 'classnames';
 import UserTypes from './../UserTypes.tsx';
+import UserStore from './../data/UserStore.tsx';
+import ColorManager from './../../util/ColorManager.tsx';
 
-export const u0 = new UserTypes.User({
-  id: "u0",
-  name: "Patty Hewes",
-  imgUrl: "http://lukeknepper.com/uploads/u0.jpg",
-  // groupRoles: [],
-})
+type User = UserTypes.User;
 
-export const u1 = new UserTypes.User({
-  id: "u1",
-  name: "Ellen Parsons",
-  imgUrl: "http://lukeknepper.com/uploads/u1.jpg",
-  // groupRoles: [],
-})
+interface Props
+{
+  userId: ID;
+}
 
-export const U2 = new UserTypes.User({
-  id: "U2",
-  name: "Paul Hewson",
-  imgUrl: "http://lukeknepper.com/uploads/U2.jpg",
-  // groupRoles: [],
-})
+class UserThumbnail extends Classs<Props>
+{
+  state: { user: User } = {
+    user: null,
+  }
+  
+  constructor(props:Props)
+  {
+    super(props);
+    
+    UserStore.subscribe(this.fetchUser);
+  }
+  
+  componentDidMount()
+  {
+    this.fetchUser();
+  }
+  
+  componentWillReceiveProps(nextProps)
+  {
+    if(nextProps.userId !== this.props.userId)
+    {
+      this.fetchUser();
+    }  
+  }
+  
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return nextState.user !== this.state.user;
+  }
+  
+  fetchUser()
+  {
+    let user: User = UserStore.getState().getIn(['users', this.props.userId]) as User;
+    
+    this.setState({
+      user,  
+    });
+  }
+  
+  render()
+  {
+    let name: string = this.state.user ? this.state.user.name : 'Loading...';
+    let url: string = this.state.user ? this.state.user.imgUrl : 'http://lukeknepper.com/terrain/assets/img/Terrain_Icon_White.png';
+    let style = 
+    {
+      backgroundImage: `url(${url})`,
+      backgroundColor: ColorManager.colorForKey(this.props.userId),
+    };
+    
+    return (
+      <div
+        className='user-thumbnail'
+        data-tip={name}
+        style={style}
+      >
+      </div>
+    );
+  }
+}
 
-export const u3 = new UserTypes.User({
-  id: "u3",
-  name: "Wes Krulik",
-  imgUrl: "http://lukeknepper.com/uploads/u3.jpg",
-  // groupRoles: [],
-})
-
-export const u4 = new UserTypes.User({
-  id: "u4",
-  name: "Tom Shayes",
-  imgUrl: "http://lukeknepper.com/uploads/u4.jpg",
-  // groupRoles: [],
-})
-
-export const u5 = new UserTypes.User({
-  id: "u5",
-  name: "Arthur Frobisher",
-  imgUrl: "http://lukeknepper.com/uploads/u5.jpg",
-  // groupRoles: [],
-})
-
-export const u6 = new UserTypes.User({
-  id: "u6",
-  name: "Ray Fiske",
-  imgUrl: "http://lukeknepper.com/uploads/u6.jpg",
-  // groupRoles: [],
-})
-
-export const u7 = new UserTypes.User({
-  id: "u7",
-  name: "David Connor",
-  imgUrl: "http://lukeknepper.com/uploads/u7.jpg",
-  // groupRoles: [],
-})
+export default UserThumbnail;
