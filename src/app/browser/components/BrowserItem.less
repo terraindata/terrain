@@ -130,12 +130,15 @@
   
   &.browser-item-wrapper-dragging {
     opacity: 0;
+    &.browser-item-wrapper-shifted {
+      opacity: 1;
+    }
   }
   
   &.browser-item-wrapper-drag-over {
     background: rgba(255, 200, 0, 0.35) !important;
     
-    &.browser-item-wrapper-drag-over-shift {
+    &.browser-item-wrapper-shifted {
       background: rgba(50, 136, 47, 0.35) !important;
     }
   }

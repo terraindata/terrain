@@ -194,10 +194,10 @@ class BrowserItem extends Classs<Props>
           <div
             className={classNames({
               'browser-item-wrapper': true,
+              'browser-item-wrapper-shifted': shifted,
               'browser-item-wrapper-mounted': this.state.mounted,
               'browser-item-wrapper-dragging': draggingItemId === this.props.id,
               'browser-item-wrapper-drag-over': draggingOver,
-              'browser-item-wrapper-drag-over-shift': draggingOver && shifted,
             })}
             style={{borderColor:this.props.color}}
           >
