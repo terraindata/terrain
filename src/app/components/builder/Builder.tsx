@@ -50,7 +50,6 @@ import * as $ from 'jquery';
 import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
 var HTML5Backend = require('react-dnd-html5-backend');
-import BuilderDragLayer from './BuilderDragLayer.tsx';
 
 // Data
 import Store from "./../../data/Store.tsx";
