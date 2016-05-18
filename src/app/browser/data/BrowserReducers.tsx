@@ -192,7 +192,9 @@ let duplicateVariant = (variant, id, groupId?, algorithmId?) =>
   return variant.set('id', id)
     .set('name', 'Copy of ' + variant.name)
     .set('groupId', groupId || variant.groupId)
-    .set('algorithmId', algorithmId || variant.algorithmId);
+    .set('algorithmId', algorithmId || variant.algorithmId)
+    .set('status', BrowserTypes.EVariantStatus.Design)
+    ;
 }
 
 BrowserReducers[ActionTypes.variants.duplicate] =
