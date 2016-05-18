@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 require('./Browser.less');
 import * as React from 'react';
-import Classs from './../../components/common/Classs.tsx';
+import Classs from './../../common/components/Classs.tsx';
 import Store from './../data/BrowserStore.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
 import GroupsColumn from './GroupsColumn.tsx';

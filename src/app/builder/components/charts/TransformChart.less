@@ -1,0 +1,121 @@
+@import "../../../common/Common.less";
+
+@line: #005d69;
+@bar: #0acee9;
+@lineFill: #01a8bf;
+@axis: #b1e0e6;
+@bg: #dbf7fb;
+@text: fade(@trans-black, 50%);
+
+.transform-chart {
+  width: 100%;
+  height: auto;
+  max-width: 700px;
+  
+  .bg {
+    fill: @bg;
+  }
+  
+  .tick text {
+    fill: @text;
+  }
+  
+  .tick line {
+    stroke: @axis;
+    stroke-width: 1px;
+  }
+  
+  .domain {
+    fill: none;
+    stroke: @text;
+    stroke-width: 0px;
+  }
+  
+  .point {
+    cursor: pointer;
+    transition: stroke-width 0.15s, stroke 0.15s;
+    fill: #fff;
+    stroke: @line;
+    stroke-width: 3px;
+    
+    &:hover,
+    &[active="1"] {
+      stroke-width: 5px;
+    }
+    
+    &.point-selected,
+    &[active="1"] {
+      stroke: #fc5218;
+    }
+  }
+  
+  .lines-bg {
+    fill: fade(@lineFill, 80%);
+    mix-blend-mode: multiply;
+  }
+  
+  .lines {
+    stroke: @line;
+    stroke-width: 5px;
+    fill: none;
+    
+    .transition(~"stroke 0.15s");
+    
+    &:hover {
+      stroke: #fc5218;
+    }
+    
+    &.line-active {
+      stroke: #fc5218;
+    }
+  }
+  
+  .bar {
+    fill: @bar;
+  }
+  
+  .spotlight,
+  .spotlight-bg {
+    position: relative;
+    z-index: 0;
+  }
+  
+  .spotlight-tooltip,
+  .spotlight-tooltip-bg {
+    opacity: 0;
+    pointer-events: none;
+    position: relative;
+    z-index: 999;
+    .transition;
+  }
+  
+  .spotlight:hover {
+    z-index: 999;
+    
+    .spotlight-tooltip,
+    .spotlight-tooltip-bg {
+      opacity: 1;
+    }
+  }
+  
+  .right-menu {
+    rect {
+      fill: rgba(0,0,0,0.75);
+      .transition;
+    }
+    
+    &:hover {
+      rect {
+        fill: rgba(0,0,0,0.95);
+      }
+    }
+    
+    text {
+      fill: #fff;
+      font-size: 16px;
+      // opacity: 0.95;
+      font-weight: 200;
+      letter-spacing: 0.5px;
+    }
+  }
+}

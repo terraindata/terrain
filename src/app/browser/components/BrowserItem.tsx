@@ -45,8 +45,8 @@ THE SOFTWARE.
 require('./BrowserItem.less');
 import * as React from 'react';
 import * as $ from 'jquery';
-import Classs from './../../components/common/Classs.tsx';
-import Menu from './../../components/common/Menu.tsx';
+import Classs from './../../common/components/Classs.tsx';
+import Menu from './../../common/components/Menu.tsx';
 import { Link } from 'react-router';
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';

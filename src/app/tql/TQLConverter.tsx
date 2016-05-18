@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
-import { CardModels } from "../models/CardModels";
+import { BuilderTypes } from "../builder/BuilderTypes.tsx";
 
 var OperatorsTQL = ['==', '!=', '>=', '>', '<=', '<', 'in', 'notIn'];
 var CombinatorsTQL = ['&&', '||'];
@@ -54,7 +54,7 @@ type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
 
 class TQLConverter
 {
-  static toTQL(cards: CardModels.ICard[]): string
+  static toTQL(cards: BuilderTypes.ICard[]): string
   {
     return removeBlanks(this._cards(cards, ";"));
   }
@@ -101,13 +101,13 @@ class TQLConverter
     skip: "skip $value",
   }
   
-  private static _cards(cards: CardModels.ICard[], append?: string): string
+  private static _cards(cards: BuilderTypes.ICard[], append?: string): string
   {
     var glue = "\n" + (append || "");
     return addTabs("\n" + cards.map(this._card, this).join(glue)) + glue;
   }
   
-  private static _card(card: CardModels.ICard): string
+  private static _card(card: BuilderTypes.ICard): string
   {
     if(this.TQLF[card.type])
     {
@@ -119,7 +119,7 @@ class TQLConverter
   }
   
   private static _parse(pattern: string | PatternFn, 
-    card: CardModels.ICard, index?: number, isLast?: boolean): string
+    card: BuilderTypes.ICard, index?: number, isLast?: boolean): string
   {
     if(typeof pattern === 'function')
     {
@@ -140,7 +140,7 @@ class TQLConverter
     return str;
   }
   
-  private static _value(field: string, card: CardModels.ICard)
+  private static _value(field: string, card: BuilderTypes.ICard)
   {
     if(field === 'cards')
     {

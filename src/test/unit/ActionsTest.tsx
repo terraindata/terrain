@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as test from 'tape';
-import Actions from '../../app/data/Actions.tsx';
-import ActionTypes from '../../app/data/ActionTypes.tsx';
+import Actions from '../../app/builder/data/BuilderActions.tsx';
+import ActionTypes from '../../app/builder/data/BuilderActionTypes.tsx';
 
 var onlyContainsType = (obj, type: string) => {
   return _.every(obj, (val) => {

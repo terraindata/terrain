@@ -1,0 +1,51 @@
+@import "../../common/Common.less";
+
+@margin: 2 * @standard-margin;
+@total-height: 2 * @margin + 1px;
+@create-icon-height: 9px;
+@create-icon-padding: 1px;
+@create-line-padding: @margin - ((@create-icon-height - 1px) / 2);
+
+.create-line-row {
+  height: @total-height;
+  // margin-top: -1 * @margin;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  
+  .transition;
+   
+  .create-line-plus {
+    background: #a2af93;
+    display: inline-block;
+    padding: @create-icon-padding;
+    border-radius: 10px;
+    position: relative;
+    left: 15px;
+    top: (@total-height - @create-icon-height - 2 * @create-icon-padding) / 2;
+    .transition;
+    box-sizing: border-box;
+    
+    svg {
+      fill: #fff;
+      height: @create-icon-height;
+    }
+  }
+  
+  .create-line-line {
+    border-bottom: 1px solid #dde0d9;
+    position: absolute;
+    width: 100%;
+    top: @margin;
+    .transition;
+  }
+  
+  &:hover {
+    .create-line-line {
+      border-color: darken(@dark-green, 5%);
+    }
+    .create-line-plus {
+      background: darken(@dark-green, 5%);
+    }
+  }
+}

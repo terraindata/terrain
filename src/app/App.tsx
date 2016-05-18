@@ -45,7 +45,7 @@ THE SOFTWARE.
 /// <reference path="../typings/tsd.d.ts" />
 
 // Style
-require("./GeneralStyle.less");
+require("./App.less");
 
 // Libraries
 import * as $ from 'jquery';
@@ -56,15 +56,15 @@ window['PerfStart'] = Perf.start;
 window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); }
 
 // Components
-import LayoutManager from "./components/layout/LayoutManager.tsx";
-import Builder from "./components/builder/Builder.tsx";
+import LayoutManager from "./builder/components/layout/LayoutManager.tsx";
+import Builder from "./builder/components/Builder.tsx";
 import Browser from './browser/components/Browser.tsx';
-import Sidebar from "./components/layout/Sidebar.tsx";
-import AccountDropdown from "./components/common/AccountDropdown.tsx";
-import Login from "./components/common/Login.tsx";
-import InfoArea from "./components/common/InfoArea.tsx";
-import Placeholder from "./components/common/Placeholder.tsx";
-var ReactTooltip = require("./components/common/tooltip/react-tooltip.js");
+import Sidebar from "./common/components/Sidebar.tsx";
+import AccountDropdown from "./common/components/AccountDropdown.tsx";
+import Login from "./common/components/Login.tsx";
+import InfoArea from "./common/components/InfoArea.tsx";
+import Placeholder from "./common/components/Placeholder.tsx";
+var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
 import { Router, Route, IndexRoute } from 'react-router';
 import { createHistory } from 'history'; // you need to install this package
 let history = createHistory();
@@ -77,8 +77,8 @@ var BuilderIcon = require("./../images/icon_reporting_18x18.svg?name=BuilderIcon
 var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIcon");
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 
-import Actions from "./data/Actions.tsx";
-import Store from "./data/Store.tsx";
+import Actions from "./builder/data/BuilderActions.tsx";
+import Store from "./builder/data/BuilderStore.tsx";
 
 var links = 
 [

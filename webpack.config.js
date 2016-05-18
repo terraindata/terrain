@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 var webpack = require('webpack');
+var path = require('path');
 
 module.exports = {
     entry: "./src/app/App.tsx",
@@ -52,7 +53,7 @@ module.exports = {
         filename: "bundle.js"
     },
     resolve: {
-        extensions: [ '', '.js', '.css', '.less', '.tsx', '.json', '.svg' ]
+        extensions: [ '', '.js', '.css', '.less', '.tsx', '.json', '.svg' ],
     },
     module: {
         loaders: [

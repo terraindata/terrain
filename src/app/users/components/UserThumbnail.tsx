@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 require('./UserThumbnail.less');
 import * as React from 'react';
-import Classs from './../../components/common/Classs.tsx';
+import Classs from './../../common/components/Classs.tsx';
 import { Link } from 'react-router';
 import * as classNames from 'classnames';
 import UserTypes from './../UserTypes.tsx';

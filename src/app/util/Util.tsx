@@ -48,7 +48,7 @@ import * as ReactDOM from "react-dom";
 import * as Immutable from "immutable";
 var _ = require('underscore');
 
-import { CardModels } from './../models/CardModels.tsx';
+import { BuilderTypes } from './../builder/BuilderTypes.tsx';
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 var immutableCardsUpdateHelper = (node: any, keyToUpdate: string | string[], id: string, updater: (node: any, key: string | string[]) => any) =>
 {
@@ -176,7 +176,7 @@ var Util = {
     return ReactDOM.findDOMNode(target).getAttribute('rel');
   },
   
-  titleForCard(card: CardModels.ICard): string
+  titleForCard(card: BuilderTypes.ICard): string
   {
     var title = card.type.charAt(0).toUpperCase() + card.type.substr(1);
     if(card.type === 'parentheses')
@@ -187,7 +187,7 @@ var Util = {
     return title;
   },
   
-  previewForCard(card: CardModels.ICard): string
+  previewForCard(card: BuilderTypes.ICard): string
   {
     if(!card)
     {

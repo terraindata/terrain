@@ -1,0 +1,118 @@
+@import "../../common/Common.less";
+
+@w: 24px;
+@m: 6px;
+
+@bg: @aged-moss;
+@arrow-bg: @trans-black;
+@pg-bg: #48b14b;
+@selected-bg: @terrain-selected;
+
+
+.paging {
+  display: block;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  background: @bg;
+  height: @w + 2 * @m;
+  
+  z-index: 9999;
+  
+  &.paging-open {
+    height: auto;
+    
+    .paging-pages {
+      overflow-y: auto;
+    }
+  }
+  
+  .paging-first,
+  .paging-previous,
+  .paging-page,
+  .paging-all-pages,
+  .paging-next,
+  .paging-last {
+    display: inline-block;
+    width: @w;
+    
+    text-align: center;
+    border-radius: 3px;
+    color: #fff;
+    margin: 0px (@m / 2);
+    margin-bottom: @m;
+    padding: 4px 0px;
+    
+    cursor: pointer;
+    .transition;
+    
+    &:hover {
+      background: #222;
+    }
+    
+    &.paging-page-selected {
+      background: @terrain-selected;
+      color: #000;
+    }
+    
+    &.paging-page-hover {
+      background: @terrain-selected;
+      color: #000;
+      // .transition(~"background 1s, color 1s");
+    }
+  }
+  
+  .paging-page,
+  .paging-all-pages {
+    background: @pg-bg;
+  }
+  
+  .paging-first,
+  .paging-previous,
+  .paging-next,
+  .paging-last {
+    background: @arrow-bg;
+  }
+  
+  .paging-first,
+  .paging-previous,
+  .paging-next,
+  .paging-last,
+  .paging-all-pages {
+    position: absolute;
+    top: @m;
+  }
+  .paging-first {
+    left: @m;
+  }
+  
+  .paging-previous {
+    left: @w + 2 * @m;
+  }
+  
+  .paging-last {
+    right: @m;
+  }
+  
+  .paging-next {
+    right: @w + 2 * @m;
+  }
+  
+  .paging-pages {
+    left: 2 * @w + 3 * @m;
+    width: calc(~"100% - 5 * @{w} - 7 * @{m}");
+    overflow: hidden;
+    position: relative;
+    top: @m;
+    left: @w * 2 + 3 * @m;
+    padding-bottom: @m;
+    
+    max-height: 250px;
+  }
+  
+  .paging-all-pages {
+    right: @w * 2 + 3 * @m;
+  }
+  
+}

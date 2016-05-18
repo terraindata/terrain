@@ -45,7 +45,7 @@ THE SOFTWARE.
 import * as $ from 'jquery';
 var _ = require('underscore');
 
-import Store from './../data/Store.tsx';
+import Store from './../builder/data/BuilderStore.tsx';
 
 var Ajax = {
   _post(url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void) 

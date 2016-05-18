@@ -43,14 +43,14 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import Classs from './../../components/common/Classs.tsx';
+import Classs from './../../common/components/Classs.tsx';
 import BrowserColumn from './BrowserColumn.tsx';
 import BrowserItem from './BrowserItem.tsx';
 import BrowserItemCategory from './BrowserItemCategory.tsx';
 import BrowserCreateItem from './BrowserCreateItem.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
-import InfoArea from './../../components/common/InfoArea.tsx';
+import InfoArea from './../../common/components/InfoArea.tsx';
 import Actions from './../data/BrowserActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 

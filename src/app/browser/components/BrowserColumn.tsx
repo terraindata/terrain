@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./BrowserColumn.less');
 
 import * as React from 'react';
-import Classs from './../../components/common/Classs.tsx';
+import Classs from './../../common/components/Classs.tsx';
 
 interface Props
 {

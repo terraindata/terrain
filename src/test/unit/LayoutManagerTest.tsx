@@ -49,7 +49,7 @@ import * as test from 'tape';
 import * as TestUtils from 'react-addons-test-utils';
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
-import LayoutManager from '../../app/components/layout/LayoutManager.tsx';
+import LayoutManager from '../../app/builder/components/layout/LayoutManager.tsx';
 
 // Because some of these tests will test size and positioning,
 //  we need to render them into a real document, because the

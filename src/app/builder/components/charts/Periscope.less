@@ -1,0 +1,60 @@
+@import "../../../common/Common.less";
+
+@line: #005d69;
+@bar: #0acee9;
+@lineFill: #01a8bf;
+@axis: #b1e0e6;
+@bg: #dbf7fb;
+@text: fade(@trans-black, 50%);
+
+.periscope {
+  width: 100%;
+  height: auto;
+  max-width: 700px;
+  
+  @active: #fc5218;
+  
+  .bg {
+    fill: @bg;
+  }
+    
+  .tick text {
+    fill: @text;
+  }
+  
+  .tick line {
+    stroke: @text;
+    stroke-width: 1px;
+  }
+  
+  .bar {
+    fill: @bar;
+  }
+  
+  .domain {
+    fill: none;
+    stroke: @trans-black;
+    stroke-width: 1px;
+  }
+  
+  .handle {
+    cursor: pointer;
+    transition: stroke-width 0.15s, stroke 0.15s;
+    stroke-width: 1px;
+    stroke: #aaa;
+    
+    &:hover,
+    &.handle-active {
+      // stroke-width: 3px;
+      stroke-width: 3px;
+    }
+    
+    &.handle-active {
+      stroke: @active;
+    }
+  }
+  
+  .line {
+    fill: @active;
+  }
+}
