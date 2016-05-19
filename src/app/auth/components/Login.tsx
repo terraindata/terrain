@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./Login.less')
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
-import Actions from "../../builder/data/BuilderActions.tsx";
+import Actions from "../data/AuthActions.tsx";
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 var TerrainIcon = require("./../../../images/icon_terrain_108x17.svg?name=TerrainIcon");
@@ -86,7 +86,7 @@ class Login extends React.Component<Props, any>
   handleLogin = () =>
   {
     let login = (token: string) => {
-      Actions.authentication.login(token);
+      Actions.login(token);
     };
     
     if (DEV === true) {

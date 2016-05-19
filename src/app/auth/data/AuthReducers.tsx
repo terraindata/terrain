@@ -42,21 +42,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import ActionTypes from './../BuilderActionTypes.tsx';
+import * as _ from 'underscore';
+import ActionTypes from './AuthActionTypes.tsx';
+var Immutable = require('immutable');
 
-let AuthenticationReducer = {};
+let AuthReducer = {};
 
-AuthenticationReducer[ActionTypes.authentication.login] =
+AuthReducer[ActionTypes.login] =
   (state, action) => {
     let t:string = action.payload.token;
     localStorage['authenticationToken'] = t; 
     return state.set("authenticationToken", t);
   }
 
-AuthenticationReducer[ActionTypes.authentication.logout] =
+AuthReducer[ActionTypes.logout] =
   (state, action) => {
     delete localStorage['authenticationToken'];
     return state.set("authenticationToken", null);
   }
 
-export default AuthenticationReducer;
+export default AuthReducer;

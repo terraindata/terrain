@@ -47,19 +47,20 @@ import * as Immutable from 'immutable';
 import * as ReduxActions from 'redux-actions';
 var Redux = require('redux');
 
+import AuthStore from './../../auth/data/AuthStore.tsx';
+import Actions from "./BrowserActions.tsx";
 import BrowserTypes from './../BrowserTypes.tsx';
 import Util from './../../util/Util.tsx';
 import { g0, g1, g2, g3, g4 } from './BrowserFixtures.tsx';
+import { a00, a01, a02, a03 } from './BrowserFixtures.tsx';
+import { v000, v001, v002, v003, v004, v005, v006, v007, v008, v009 } from './BrowserFixtures.tsx';
+
+import Ajax from './../../util/Ajax.tsx';
 
 var DefaultState = Immutable.fromJS({
-  groups: {
-    g0,
-    g1,
-    g2,
-    g3,
-    g4,
-  },
-  groupsOrder: ['g0', 'g1', 'g2', 'g3', 'g4'],
+  loading: true,
+  // groups: {},
+  // groupsOrder: [],
 });
 
 import BrowserReducers from './BrowserReducers.tsx';
@@ -67,5 +68,83 @@ import BrowserReducers from './BrowserReducers.tsx';
 let BrowserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   BrowserReducers,
 {})), DefaultState);
+
+
+// AuthStore.subscribe(() =>
+// {
+  // Ajax.saveItem(g0, (e) => {
+  //   console.log(e);
+  //   Ajax.getItems((items:any) =>
+  //   {
+  //     console.log(items);
+  //   }, (ev:Event) =>
+  //   {
+  //     console.log('error');
+  //   }); 
+  // }, (e) => console.log('error', e));
+  // Ajax.saveItem(g1);
+  // Ajax.saveItem(g2);
+  // Ajax.saveItem(g3);
+  // Ajax.saveItem(g4);
+  
+  // Ajax.saveItem(a00);
+  // Ajax.saveItem(a01);
+  // Ajax.saveItem(a02);
+  // Ajax.saveItem(a03);
+  
+  // Ajax.saveItem(v000);
+  // Ajax.saveItem(v001);
+  // Ajax.saveItem(v002);
+  // Ajax.saveItem(v003);
+  // Ajax.saveItem(v004);
+  // Ajax.saveItem(v005);
+  // Ajax.saveItem(v006);
+  // Ajax.saveItem(v007);
+  // Ajax.saveItem(v008);
+  // Ajax.saveItem(v009);
+  
+//   Ajax.saveItem(Immutable.Map({
+//     id: 'groupsOrder',
+//     type: 'groupsOrder',
+//     groupsOrder: ["g0", "g1", "g2", "g3", "g4"],
+//   }));
+// });
+
+// AuthStore.subscribe(() =>
+// {
+//   if(AuthStore.getState().get('authenticationToken'))
+//   {
+//     Actions.fetch();
+//   }
+// });
+
+BrowserStore.subscribe(() =>
+{
+  let state = BrowserStore.getState();
+  if(!state.get('loading'))
+  {
+    // TODO in the future, consider a more effecient approach
+    state.get('groups').map(
+      group =>
+      {
+        Ajax.saveItem(group);
+        group.get('algorithms').map(
+          algorithm =>
+          {
+            Ajax.saveItem(algorithm);
+            algorithm.get('variants').map(
+              variant => Ajax.saveItem(variant)
+            );
+          }
+        );
+      }
+    );
+    Ajax.saveItem(Immutable.Map({
+      id: 'groupsOrder',
+      type: 'groupsOrder',
+      groupsOrder: state.get('groupsOrder'),
+    }));
+  }
+});
 
 export default BrowserStore;

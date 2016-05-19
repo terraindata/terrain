@@ -95,7 +95,6 @@ import FilterCardReducer from './reducers/builder/FilterCardReducer.tsx';
 import SelectCardReducer from './reducers/builder/SelectCardReducer.tsx';
 import TransformCardReducer from './reducers/builder/TransformCardReducer.tsx';
 import IfCardReducer from './reducers/builder/IfCardReducer.tsx';
-import AuthenticationReducer from './reducers/AuthenticationReducer.tsx';
 
 let BuilderStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   AlgorithmReducer,
@@ -110,7 +109,6 @@ let BuilderStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   SelectCardReducer,
   TransformCardReducer,
   IfCardReducer,
-  AuthenticationReducer,
 {})), DefaultState);
 
 export default BuilderStore;

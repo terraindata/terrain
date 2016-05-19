@@ -158,16 +158,6 @@ BrowserReducers[ActionTypes.algorithms.duplicate] =
     addAlgorithm(state,
       duplicateAlgorithm(action.payload.algorithm, Util.getId(), action.payload.groupId),
       action.payload.index);
-  // {
-  //   var id = Util.getId();
-  //   let { algorithm } = action.payload;
-  //   return state
-  //     .setIn(['groups', algorithm.groupId, 'algorithms', id], 
-  //       duplicateAlgorithm(algorithm, id, algorithm.groupId))
-  //     .updateIn(['groups', action.payload.algorithm.groupId, 'algorithmsOrder'],
-  //       order => order.splice(action.payload.index, 0, id))
-  // }
-
 
 BrowserReducers[ActionTypes.variants.create] =
   (state, action) =>
@@ -202,6 +192,11 @@ BrowserReducers[ActionTypes.variants.duplicate] =
     addVariant(state, 
       duplicateVariant(action.payload.variant, Util.getId(), action.payload.groupId, action.payload.algorithmId),
       action.payload.index);
+
+
+
+BrowserReducers[ActionTypes.loadState] =
+  (state, action) => action.payload.state;
 
 export default BrowserReducers;
 

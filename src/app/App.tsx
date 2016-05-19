@@ -61,7 +61,7 @@ import Builder from "./builder/components/Builder.tsx";
 import Browser from './browser/components/Browser.tsx';
 import Sidebar from "./common/components/Sidebar.tsx";
 import AccountDropdown from "./common/components/AccountDropdown.tsx";
-import Login from "./common/components/Login.tsx";
+import Login from "./auth/components/Login.tsx";
 import InfoArea from "./common/components/InfoArea.tsx";
 import Placeholder from "./common/components/Placeholder.tsx";
 var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
@@ -77,8 +77,8 @@ var BuilderIcon = require("./../images/icon_reporting_18x18.svg?name=BuilderIcon
 var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIcon");
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 
-import Actions from "./builder/data/BuilderActions.tsx";
-import Store from "./builder/data/BuilderStore.tsx";
+import AuthActions from "./auth/data/AuthActions.tsx";
+import AuthStore from "./auth/data/AuthStore.tsx";
 
 var links = 
 [
@@ -112,8 +112,8 @@ var links =
 var App = React.createClass({
   componentDidMount() {
     // Respond to authentication state changes.
-    Store.subscribe(() => {
-      let token = Store.getState().get('authenticationToken');
+    AuthStore.subscribe(() => {
+      let token = AuthStore.getState().get('authenticationToken');
       this.setState({
         loggedIn: token !== null
       });
@@ -122,7 +122,7 @@ var App = React.createClass({
     // Retrieve logged-in state from persistent storage.
     let token = localStorage['authenticationToken'];
     if (token !== undefined && token !== null) {
-      Actions.authentication.login(token);
+      AuthActions.login(token);
     }
   },
   
@@ -147,7 +147,7 @@ var App = React.createClass({
   
   handleLogout()
   {
-    Actions.authentication.logout();
+    AuthActions.logout();
   },
   
   renderApp()

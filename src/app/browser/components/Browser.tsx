@@ -46,11 +46,13 @@ require('./Browser.less');
 import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
 import Store from './../data/BrowserStore.tsx';
+import Actions from './../data/BrowserActions.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
 import GroupsColumn from './GroupsColumn.tsx';
 import AlgorithmsColumn from './AlgorithmsColumn.tsx';
 import VariantsColumn from './VariantsColumn.tsx';
 import { DragDropContext } from 'react-dnd';
+import InfoArea from './../../common/components/InfoArea.tsx';
 var HTML5Backend = require('react-dnd-html5-backend');
 
 interface Props
@@ -72,9 +74,21 @@ class Browser extends Classs<Props>
     }))
   }
   
+  componentWillMount()
+  {
+    Actions.fetch();
+  }
+  
   render()
   {
     const state = this.state.istate;
+
+    if(state.get('loading'))
+    {
+      return (
+          <InfoArea large='Loading...' />
+      );
+    }
     
     var groupId = this.props.params.groupId;
     var algorithmId = this.props.params.algorithmId;

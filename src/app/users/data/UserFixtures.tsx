@@ -89,14 +89,28 @@ export const u5 = new UserTypes.User({
 
 export const u6 = new UserTypes.User({
   id: "u6",
-  name: "Ray Fiske",
+  name: "ASDFKLJ WEIOXOQ",
   imgUrl: "http://lukeknepper.com/uploads/u6.jpg",
   // groupRoles: [],
 })
 
 export const u7 = new UserTypes.User({
   id: "u7",
-  name: "David Connor",
+  name: "PPRO ,TRKGP",
   imgUrl: "http://lukeknepper.com/uploads/u7.jpg",
+  // groupRoles: [],
+})
+
+export const u8 = new UserTypes.User({
+  id: "u8",
+  name: "Ray Fiske",
+  imgUrl: "http://lukeknepper.com/uploads/u8.jpg",
+  // groupRoles: [],
+})
+
+export const u9 = new UserTypes.User({
+  id: "u9",
+  name: "David Connor",
+  imgUrl: "http://lukeknepper.com/uploads/u9.jpg",
   // groupRoles: [],
 })

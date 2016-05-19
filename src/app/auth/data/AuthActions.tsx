@@ -42,100 +42,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./AccountDropdown.less')
-import * as $ from 'jquery';
-import * as React from 'react';
-import Actions from "../../builder/data/BuilderActions.tsx";
-import Util from '../../util/Util.tsx';
+var _ = require('underscore');
+import ActionTypes from './AuthActionTypes.tsx';
+import Store from './AuthStore.tsx';
 
-var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
+var $ = (type: string, payload: any) => Store.dispatch({type, payload})
 
-interface Props {
-  onLogout: () => void;
-}
-
-class AccountDropdown extends React.Component<Props, any>
+var AuthActions =
 {
-  constructor(props:Props)
-  {
-    super(props);
-    this.state = {
-      open: false,
-    };
-    
-    Util.bind(this, 'toggleOpen', 'close');
-  }
-  
-  close(event)
-  {
-    if(event.target !== this.refs['accountDropdownButton'])
-    {
-      this.setState({
-        open: false,
-      });
-    }
-    
-    $("body").unbind('click', this.close);
-  }
-  
-  componentWillUnmount()
-  {
-    $("body").unbind('click', this.close); 
-  }
-  
-  toggleOpen()
-  {
-    if(!this.state.open)
-    {
-      $("body").click(this.close);
-    }
-    
-    this.setState({
-      open: !this.state.open,
-    });
-  }
-  
-  renderDropdown()
-  {
-    if(!this.state.open)
-    {
-      return null;
-    }
-  
-    return (
-      <div className="account-dropdown-content">
-        <div className="account-dropdown-row" onMouseDown={this.props.onLogout}>
-          Logout
-        </div>
-      </div>
-    );
-  }
-  
-  renderTopBar()
-  {
-    return (
-      <div className="account-dropdown-top-bar" onClick={this.toggleOpen} ref='accountDropdownButton'>
-        <div className="account-photo"></div>
-        <div className="account-name">Paul Hewson</div>
-        <ArrowIcon className="account-arrow-icon" />
-      </div>
-    );
-  }
-  
-  render()
-  {
-    var classes = Util.objToClassname({
-      "account-dropdown-wrapper": true,
-      "account-dropdown-open": this.state.open,
-    });
-    
-    return (
-      <div className={classes}>
-        { this.renderTopBar() }
-        { this.renderDropdown() }
-      </div>
-   );
-  }
+  login:
+    (token: string) =>
+      $(ActionTypes.login, { token }),
+  logout:
+    () =>
+      $(ActionTypes.logout, null),
 };
 
-export default AccountDropdown;
+export default AuthActions;

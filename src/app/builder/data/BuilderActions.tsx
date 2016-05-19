@@ -273,16 +273,6 @@ var BuilderActions =
       (state: any) =>
         $(ActionTypes.algorithm.load, {state}),
   },
-  
-  authentication:
-  {
-    login:
-      (token: string) =>
-        $(ActionTypes.authentication.login, { token }),
-    logout:
-      () =>
-        $(ActionTypes.authentication.logout, null),
-  },
 };
 
 export default BuilderActions;

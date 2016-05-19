@@ -137,7 +137,7 @@ var Util = {
   {
     // TODO have this fetch a list of IDs from server,
     // give IDs from that list
-    return _.range(0, 10).map(i => chars[Util.randInt(chars.length)]).join("");
+    return _.range(0, 5).map(i => chars[Util.randInt(chars.length)]).join("");
   },
   
   extendId(obj: Object): Object

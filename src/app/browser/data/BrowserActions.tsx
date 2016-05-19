@@ -46,6 +46,9 @@ var _ = require('underscore');
 import ActionTypes from './BrowserActionTypes.tsx';
 import Store from './BrowserStore.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
+import * as Immutable from 'immutable';
+
+import Ajax from './../../util/Ajax.tsx';
 
 var $ = (type: string, payload: any) => Store.dispatch({type, payload})
 
@@ -108,6 +111,51 @@ const Actions =
         $(ActionTypes.variants.duplicate, { variant, index, groupId, algorithmId }),
     
   },
+  
+  loadState:
+    (state) =>
+      $(ActionTypes.loadState, { state }),
+  
+  
+  // overwrites current state with state from server
+  fetch:
+    () =>
+    {
+      Ajax.getItems((groups, algorithms, variants, groupsOrder) =>
+      {
+        var groupMap = {};
+        _.map(groups, group =>
+        {
+          group.algorithms = Immutable.Map(
+            group.algorithms.reduce(
+              (algorithmMap, algorithmId) =>
+              {
+                var algorithm = algorithms[algorithmId];
+                algorithm.variants = Immutable.Map(
+                  algorithm.variants.reduce(
+                    (variantMap, variantId) =>
+                    {
+                      variantMap[variantId] = new BrowserTypes.Variant(variants[variantId]);
+                      return variantMap;
+                    }, {}
+                  )
+                );
+                algorithm.variantsOrder = Immutable.List(algorithm.variantsOrder);
+                algorithmMap[algorithm.id] = new BrowserTypes.Algorithm(algorithm);
+                return algorithmMap;
+              }, {})
+            );
+          group.algorithmsOrder = Immutable.List(group.algorithmsOrder);
+          groupMap[group.id] = new BrowserTypes.Group(group);
+        });
+        
+        Actions.loadState(Immutable.fromJS({
+          groups: groupMap,
+          groupsOrder: Immutable.List(groupsOrder),
+        }));
+      })
+    },
 }
+
 
 export default Actions;

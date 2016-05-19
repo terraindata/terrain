@@ -66,6 +66,10 @@ export module BrowserTypes
     algorithmId: "",
     groupId: "",
     status: EVariantStatus.Design,
+    
+    // for DB storage
+    type: "variant",
+    associations: null,
   });
   export class Variant extends _Variant implements IId, IName, ILastEdited
   {
@@ -99,6 +103,10 @@ export module BrowserTypes
     variants: Immutable.Map({}),
     variantsOrder: Immutable.List([]),
     status: EAlgorithmStatus.Live,
+    
+    // for DB storage
+    type: "algorithm",
+    associations: "variants",
   });
   export class Algorithm extends _Algorithm implements IId, IName, ILastEdited
   {
@@ -133,6 +141,10 @@ export module BrowserTypes
     algorithms: Immutable.Map({}),
     algorithmsOrder: Immutable.List([]),
     status: EGroupStatus.Live,
+    
+    // for DB storage
+    type: "group",
+    associations: "algorithms",
   });
   export class Group extends _Group implements IId, IName
   {

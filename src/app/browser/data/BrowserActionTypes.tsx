@@ -70,6 +70,8 @@ var BrowserActionTypes =
     switchAlgorithm: '',
     switchGroup: '', // move by itself onto a group, which should also create a new algorithm
   },
+  
+  loadState: '',
 };
 
 Util.setValuesToKeys(BrowserActionTypes, '');

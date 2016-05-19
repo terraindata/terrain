@@ -46,23 +46,23 @@ import * as Immutable from 'immutable';
 import BrowserTypes from './../BrowserTypes.tsx';
 import { u0, u1, U2, u3, u4, u5, u6, u7 } from './../../users/data/UserFixtures.tsx';
 
-const v000 = BrowserTypes.newVariant("a00", "g0", "v000", "Desktop, V 3.0", "4/02/2016 4:44:44pm", "u1", BrowserTypes.EVariantStatus.Live);
-const v001 = BrowserTypes.newVariant("a00", "g0", "v001", "Desktop, V 3.1", "4/12/2016 4:44:44pm", "u0", BrowserTypes.EVariantStatus.Live);
-const v002 = BrowserTypes.newVariant("a00", "g0", "v002", "Desktop, V 3.2", "4/22/2016 4:44:44pm", "u1", BrowserTypes.EVariantStatus.Approve);
-const v003 = BrowserTypes.newVariant("a00", "g0", "v003", "Desktop, V 3.3", "4/24/2016 5:25:00pm", "u0", BrowserTypes.EVariantStatus.Design);
-const v004 = BrowserTypes.newVariant("a00", "g0", "v004", "Desktop, Experimental", "4/02/2016 4:44:44pm", "u0", BrowserTypes.EVariantStatus.Design);
-const v005 = BrowserTypes.newVariant("a00", "g0", "v005", "Desktop, V 1.0", "1/02/2016 4:44:44pm", "u1", BrowserTypes.EVariantStatus.Archive);
-const v006 = BrowserTypes.newVariant("a00", "g0", "v006", "Desktop, V 2.0", "2/02/2016 4:44:44pm", "u0", BrowserTypes.EVariantStatus.Archive);
-const v007 = BrowserTypes.newVariant("a00", "g0", "v007", "Desktop, V 2.1", "3/02/2016 4:44:44pm", "U2", BrowserTypes.EVariantStatus.Archive);
-const v008 = BrowserTypes.newVariant("a00", "g0", "v008", "Desktop, V 2.2", "3/10/2016 4:44:44pm", "u1", BrowserTypes.EVariantStatus.Archive);
-const v009 = BrowserTypes.newVariant("a00", "g0", "v009", "Desktop, V 2.3", "3/16/2016 4:44:44pm", "U2", BrowserTypes.EVariantStatus.Archive);
+export const v000 = BrowserTypes.newVariant("a00", "g0", "v000", "Desktop, V 3.0", "4/02/2016 4:44:44pm", "u1", BrowserTypes.EVariantStatus.Live);
+export const v001 = BrowserTypes.newVariant("a00", "g0", "v001", "Desktop, V 3.1", "4/12/2016 4:44:44pm", "u0", BrowserTypes.EVariantStatus.Live);
+export const v002 = BrowserTypes.newVariant("a00", "g0", "v002", "Desktop, V 3.2", "4/22/2016 4:44:44pm", "u1", BrowserTypes.EVariantStatus.Approve);
+export const v003 = BrowserTypes.newVariant("a00", "g0", "v003", "Desktop, V 3.3", "4/24/2016 5:25:00pm", "u0", BrowserTypes.EVariantStatus.Design);
+export const v004 = BrowserTypes.newVariant("a00", "g0", "v004", "Desktop, Experimental", "4/02/2016 4:44:44pm", "u0", BrowserTypes.EVariantStatus.Design);
+export const v005 = BrowserTypes.newVariant("a00", "g0", "v005", "Desktop, V 1.0", "1/02/2016 4:44:44pm", "u1", BrowserTypes.EVariantStatus.Archive);
+export const v006 = BrowserTypes.newVariant("a00", "g0", "v006", "Desktop, V 2.0", "2/02/2016 4:44:44pm", "u0", BrowserTypes.EVariantStatus.Archive);
+export const v007 = BrowserTypes.newVariant("a00", "g0", "v007", "Desktop, V 2.1", "3/02/2016 4:44:44pm", "U2", BrowserTypes.EVariantStatus.Archive);
+export const v008 = BrowserTypes.newVariant("a00", "g0", "v008", "Desktop, V 2.2", "3/10/2016 4:44:44pm", "u1", BrowserTypes.EVariantStatus.Archive);
+export const v009 = BrowserTypes.newVariant("a00", "g0", "v009", "Desktop, V 2.3", "3/16/2016 4:44:44pm", "U2", BrowserTypes.EVariantStatus.Archive);
 
-const a00 = BrowserTypes.newAlgorithm("g0", "a00", "Desktop", "4/24/2016 5:25:00pm", "u0",
+export const a00 = BrowserTypes.newAlgorithm("g0", "a00", "Desktop", "4/24/2016 5:25:00pm", "u0",
   Immutable.Map({v000, v001, v002, v003, v004, v005, v006, v007, v008, v009}),
   Immutable.List(["v000", "v001", "v002", "v003", "v004", "v005", "v006", "v007", "v008", "v009"]));
-const a01 = BrowserTypes.newAlgorithm("g0", "a01", "Desktop, New User", "4/23/2016 1:22:00pm", "U2");
-const a02 = BrowserTypes.newAlgorithm("g0", "a02", "Mobile", "4/22/2016 3:25:00pm", "u1");
-const a03 = BrowserTypes.newAlgorithm("g0", "a03", "Mobile, New User", "3/24/2016 5:25:00pm", "u0");
+export const a01 = BrowserTypes.newAlgorithm("g0", "a01", "Desktop, New User", "4/23/2016 1:22:00pm", "U2");
+export const a02 = BrowserTypes.newAlgorithm("g0", "a02", "Mobile", "4/22/2016 3:25:00pm", "u1");
+export const a03 = BrowserTypes.newAlgorithm("g0", "a03", "Mobile, New User", "3/24/2016 5:25:00pm", "u0");
 
 export const g0 = BrowserTypes.newGroup("g0", "Product Search", "4/24/2016 5:25:00pm", "u0", 
   Immutable.List(["u0", "u1", "U2"]),
@@ -74,6 +74,6 @@ export const g2 = BrowserTypes.newGroup("g2", "Marketing", null, null,
   Immutable.List(["u0", "u1", "U2", "u3", "u4", "u5", "u6", "u7"]))
 export const g3 = BrowserTypes.newGroup("g3", "Interns", null, null, 
   Immutable.List(["u0", "u1", "U2", "u3"]))
-export const g4 = BrowserTypes.newGroup("g4", "Wild Baboons", null, null, 
+export const g4 = BrowserTypes.newGroup("g4", "Huh?", null, null, 
   Immutable.List(["u6", "u7"]))
 
