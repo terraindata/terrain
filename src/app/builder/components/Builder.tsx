@@ -272,6 +272,17 @@ class Builder extends Classs<Props>
         console.log('def', newConfig);
       }
       
+    }
+    else if(!this.props.params.config || !this.props.params.config.length)
+    {
+      if(config)
+      {
+        newConfig = config;
+      }
+    }
+    
+    if(newConfig)
+    {
       this.props.history.replaceState({}, `/builder/${newConfig}`);
     }
   }

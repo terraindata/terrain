@@ -68,6 +68,7 @@ var CARD_PADDING: number = 12;
 
 class FromCard extends Classs<Props>
 {
+  xhr = null;
   constructor(props:Props)
   {
     super(props);
@@ -86,10 +87,12 @@ class FromCard extends Classs<Props>
           : [];
   }
   
-  componentDidMount()
+  componentWillMount()
   {
-    Ajax.schema((tablesData: {name: string, columns: any[]}[], error) =>
+    this.xhr = Ajax.schema((tablesData: {name: string, columns: any[]}[], error) =>
     {
+      if(!this.xhr) return;
+      
       if(tablesData)
       {
         var tables = tablesData['reduce'](
@@ -111,6 +114,12 @@ class FromCard extends Classs<Props>
         alert(error);
       }
     });
+  }
+  
+  componentWillUnmount()
+  {
+    this.xhr && this.xhr.abort();
+    this.xhr = false;
   }
   
   componentWillReceiveProps(nextProps)
