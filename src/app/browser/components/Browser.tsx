@@ -58,10 +58,13 @@ var HTML5Backend = require('react-dnd-html5-backend');
 interface Props
 {
   params?: any;
+  history?: any;
 }
 
 class Browser extends Classs<Props>
 {
+  cancelSubscription = null;
+  
   constructor(props)
   {
     super(props);
@@ -69,14 +72,21 @@ class Browser extends Classs<Props>
     this.state = {
       istate: Store.getState()
     };
-    Store.subscribe(() => this.setState({
-      istate: Store.getState()
-    }))
+    
+    this.cancelSubscription = 
+      Store.subscribe(() => this.setState({
+        istate: Store.getState()
+      }))
   }
   
   componentWillMount()
   {
     Actions.fetch();
+  }
+  
+  componentWillUnmount()
+  {
+    this.cancelSubscription && this.cancelSubscription();
   }
   
   render()
@@ -121,6 +131,7 @@ class Browser extends Classs<Props>
         <VariantsColumn
           variants={vriants}
           variantsOrder={vriantsOrder}
+          history={this.props.history}
           {...{
             groupId,
             algorithmId,

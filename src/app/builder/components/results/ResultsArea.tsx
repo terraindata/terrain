@@ -53,44 +53,44 @@ import LayoutManager from "../layout/LayoutManager.tsx";
 import InfoArea from '../../../common/components/InfoArea.tsx';
 // import Paging from '../common/Paging.tsx';
 import TQLConverter from "../../../tql/TQLConverter.tsx";
+import Classs from './../../../common/components/Classs.tsx';
 
-var ResultsArea = React.createClass<any, any>({
-	propTypes:
-	{
-    algorithm: React.PropTypes.object.isRequired,
-    onLoadStart: React.PropTypes.func,
-    onLoadEnd: React.PropTypes.func,
-	},
+interface Props
+{
+  algorithm: any;
+  onLoadStart: () => void;
+  onLoadEnd: () => void;
+}
+
+class ResultsArea extends Classs<Props>
+{
+  xhr = null;
   
-  getInitialState()
-  {
-    return {
+  state = {
       results: null,
       resultText: null,
       expanded: false,
       expandedResult: {},
       tql: "",
+      error: null,
+      resultType: null,
       
       // pageChanging: false,
       // nextPage: null,
       // page: this.props.resultsPage,
       // hoveringPage: null,
-      
-    };
-  },
+  }
   
   componentDidMount()
   {
     this.queryResults(this.props.algorithm);
-  },
+  }
   
   componentWillUnmount()
   {
-    if(this.state.xhr)
-    {
-      this.state.xhr.abort();
-    }
-  },
+    this.xhr && this.xhr.abort();
+    this.xhr = false;
+  }
   
   componentWillReceiveProps(nextProps)
   {
@@ -98,14 +98,14 @@ var ResultsArea = React.createClass<any, any>({
     {
       this.queryResults(nextProps.algorithm);
     }
-  },
+  }
   
   handleCollapse()
   {
     this.setState({
       expanded: false,
     });
-  },
+  }
   
   handleExpand(result)
   {
@@ -113,11 +113,11 @@ var ResultsArea = React.createClass<any, any>({
       expanded: true,
       expandedResult: result,
     });
-  },
+  }
 
-  copy() {},
+  copy() {}
   
-  clear() {},
+  clear() {}
   
   renderExpandedResult()
   {
@@ -126,7 +126,6 @@ var ResultsArea = React.createClass<any, any>({
         <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
         <Result 
           data={this.state.expandedResult}
-          parentId={this.props.parentId}
           onExpand={this.handleCollapse}
           expanded={true}
           drag_x={false}
@@ -135,7 +134,7 @@ var ResultsArea = React.createClass<any, any>({
           />
       </div>
     );
-  },
+  }
   
   // changePage(page)
   // {
@@ -230,7 +229,7 @@ var ResultsArea = React.createClass<any, any>({
     var layout = {
       cells: this.state.results.map((result, index) => {
         return {
-          content: <Result data={result} parentId={this.props.parentId} onExpand={this.handleExpand} index={index} />,
+          content: <Result data={result} onExpand={this.handleExpand} index={index} />,
           key: result.id,
         };
       }),
@@ -240,10 +239,12 @@ var ResultsArea = React.createClass<any, any>({
     };
 
     return <LayoutManager layout={layout} />; //moveTo={this.moveResult}
-  },
+  }
   
   handleResultsChange(response)
   {
+    if(!this.xhr) return;
+    
     var result;
     try {
       var result = JSON.parse(response).result;
@@ -298,14 +299,14 @@ var ResultsArea = React.createClass<any, any>({
         // TODO add error
       });
     }
-  },
+  }
   
   handleError(ev)
   {
     this.setState({
       error: true,
     })
-  },
+  }
   
   queryResults(algorithm)
   {
@@ -314,12 +315,12 @@ var ResultsArea = React.createClass<any, any>({
     {
       this.setState({
         querying: true,
-        xhr: Ajax.query(tql, this.handleResultsChange, this.handleError),
         tql
       });
       this.props.onLoadStart && this.props.onLoadStart();
+      this.xhr = Ajax.query(tql, this.handleResultsChange, this.handleError);
     }
-  },
+  }
 
 	render()
   {
@@ -330,7 +331,7 @@ var ResultsArea = React.createClass<any, any>({
         { this.renderExpandedResult() }
       </div>
     );
-	},
-});
+	}
+}
 
 export default ResultsArea;

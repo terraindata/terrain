@@ -76,6 +76,7 @@ interface Props
   
   // optional
   className?: string;
+  onDoubleClick?: (id:ID) => void;
   
   // populated by DnD code
   connectDropTarget?: (html: any) => JSX.Element;
@@ -183,6 +184,13 @@ class BrowserItem extends Classs<Props>
     })
   }
   
+  handleDoubleClick(event)
+  {
+    event.preventDefault();
+    event.stopPropagation();
+    this.props.onDoubleClick && this.props.onDoubleClick(this.props.id);
+  }
+  
   render()
   {
     let { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId } = this.props;
@@ -190,7 +198,7 @@ class BrowserItem extends Classs<Props>
     
     return connectDropTarget((
       <div>
-        <Link to={this.props.to} className='browser-item-link' activeClassName='browser-item-active'>
+        <Link to={this.props.to} className='browser-item-link' activeClassName='browser-item-active' onDoubleClick={this.handleDoubleClick}>
           <div
             className={classNames({
               'browser-item-wrapper': true,

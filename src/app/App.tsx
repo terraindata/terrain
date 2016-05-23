@@ -66,7 +66,7 @@ import InfoArea from "./common/components/InfoArea.tsx";
 import Placeholder from "./common/components/Placeholder.tsx";
 var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
 import { Router, Route, IndexRoute } from 'react-router';
-import { createHistory } from 'history'; // you need to install this package
+import { createHistory } from 'history';
 let history = createHistory();
 
 // Icons
@@ -215,9 +215,11 @@ var App = React.createClass({
 var router = (
   <Router history={history}>
     <Route path="/" component={App}>
+    
       <IndexRoute component={Builder} />
       <Route path="/builder" component={Builder} />
       <Route path="/builder/:config" component={Builder} />
+      <Route path="/builder/:config/:splitConfig" component={Builder} />
       
       <Route path="/browser" component={Browser} />
       <Route path="/browser/:groupId" component={Browser} />

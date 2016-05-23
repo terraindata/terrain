@@ -65,6 +65,7 @@ interface Props
   variantsOrder: Immutable.List<ID>;
   groupId: ID;
   algorithmId: ID;
+  history: any;
 }
 
 class VariantsColumn extends Classs<Props>
@@ -157,6 +158,12 @@ class VariantsColumn extends Classs<Props>
         break;
     }
   }
+  
+  handleDoubleClick(id:ID)
+  {
+    console.log(`/builder/?o=${id}`);
+    this.props.history.pushState({}, `/builder/?o=${id}`);
+  }
 
   renderVariant(id: ID, index: number)
   {
@@ -181,6 +188,7 @@ class VariantsColumn extends Classs<Props>
         onHover={this.handleHover}
         onDropped={this.handleDropped}
         item={vriant}
+        onDoubleClick={this.handleDoubleClick}
       >
         <div className='flex-container'>
           <UserThumbnail userId={vriant.lastUserId} />

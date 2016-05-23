@@ -81,12 +81,12 @@ var Ajax = {
   
   _post(url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void)
   {
-    Ajax._req("POST", url, data, onLoad, onError);
+    return Ajax._req("POST", url, data, onLoad, onError);
   },
   
   _get(url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void)
   {
-    Ajax._req("GET", url, data, onLoad, onError);
+    return Ajax._req("GET", url, data, onLoad, onError);
   },
   
   getItems( 
@@ -115,7 +115,6 @@ var Ajax = {
         }
         if(spec.type === 'groupsOrder')
         {
-          console.log(spec);
           mapping.groupsOrder = spec.groupsOrder;
         }
       })

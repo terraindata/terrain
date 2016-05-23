@@ -63,17 +63,23 @@ class UserThumbnail extends Classs<Props>
   state: { user: User } = {
     user: null,
   }
+  unsubscribe = null;
   
   constructor(props:Props)
   {
     super(props);
     
-    UserStore.subscribe(this.fetchUser);
+    this.unsubscribe = UserStore.subscribe(this.fetchUser);
   }
   
-  componentDidMount()
+  componentWillMount()
   {
     this.fetchUser();
+  }
+  
+  componentWillUnmount()
+  {
+    this.unsubscribe && this.unsubscribe();
   }
   
   componentWillReceiveProps(nextProps)

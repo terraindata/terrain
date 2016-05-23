@@ -49,15 +49,16 @@ import * as _ from "underscore";
 import * as $ from 'jquery';
 import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
+import * as Immutable from 'immutable';
 var HTML5Backend = require('react-dnd-html5-backend');
 
 // Data
 import Store from "./../data/BuilderStore.tsx";
 import Actions from "./../data/BuilderActions.tsx";
-
 import Util from "./../../util/Util.tsx";
 
 // Components
+import Classs from './../../common/components/Classs.tsx';
 import BuilderColumn from "./BuilderColumn.tsx";
 import Tabs from "./layout/Tabs.tsx";
 import LayoutManager from "./layout/LayoutManager.tsx";
@@ -70,7 +71,14 @@ var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
 var DuplicateIcon = require("./../../../images/icon_duplicate_11x12.svg?name=DuplicateIcon");
 var SaveIcon = require("./../../../images/icon_save_10x10.svg?name=SaveIcon");
 
-class Builder extends React.Component<any, any>
+interface Props
+{
+  params?: any;
+  history?: any;
+  location?: any;
+}
+
+class Builder extends Classs<Props>
 {
   // This variable is needed because React's state has not been working well with
   //  Redux's state. For instance, if I just do:
@@ -78,18 +86,20 @@ class Builder extends React.Component<any, any>
   //  then I can't close tabs. React doesn't seem to pick up
   //  on keys being deleted from the state correctly.
   reduxState: any;
+  cancelSubscription = null;
   
-  constructor()
+  constructor(props:Props)
   {
-    super();
+    super(props);
     
-    Store.subscribe(() => {
-      var newState = Store.getState().toJS();
-      this.reduxState = newState.algorithms;
-      this.setState({
-        random: Math.random()
+    this.cancelSubscription =
+      Store.subscribe(() => {
+        var newState = Store.getState().toJS();
+        this.reduxState = newState.algorithms;
+        this.setState({
+          random: Math.random()
+        });
       });
-    });
 
     // Some day in the distant future, you may consider
     //  removing this 'toJS()' call and making
@@ -105,10 +115,11 @@ class Builder extends React.Component<any, any>
       colKeys,
       noColumnAnimation: false,
     };
-    
-    Util.bind(this, 'duplicateAlgorithm', 'createAlgorithm',
-      'tabClick',
-      'save');
+  }
+  
+  componentWillUnmount()
+  {
+    this.cancelSubscription();
   }
   
   createAlgorithm()
@@ -126,33 +137,30 @@ class Builder extends React.Component<any, any>
     Actions.algorithm.load(JSON.parse(prompt("Paste Algorithm state here")));
   }
   
-  getTabActions()
-  {
-    return [
-      {
-        text: 'Duplicate',
-        icon: <DuplicateIcon />,
-        onClick: this.duplicateAlgorithm,
-      },
-      {
-        text: 'Open',
-        icon: <OpenIcon />,
-        onClick: this.loadAlgorithm,
-      },
-      {
-        text: 'Save',
-        icon: <SaveIcon />,
-        onClick: this.save,
-      },
-    ];
-  }
+  tabActions = Immutable.List([
+    {
+      text: 'Duplicate',
+      icon: <DuplicateIcon />,
+      onClick: this.duplicateAlgorithm,
+    },
+    {
+      text: 'Open',
+      icon: <OpenIcon />,
+      onClick: this.loadAlgorithm,
+    },
+    {
+      text: 'Save',
+      icon: <SaveIcon />,
+      onClick: this.save,
+    },
+  ]);
   
   save()
   {
     console.log(JSON.stringify(this.reduxState));
   }
   
-  tabClose = (algorithmId) =>
+  tabClose(algorithmId)
   {
     if(this.state.algorithmId === algorithmId)
     {
@@ -173,21 +181,21 @@ class Builder extends React.Component<any, any>
     });
   }
   
-  getLayout = () =>
-  (
-    {
+  getLayout()
+  {
+    return {
       stackAt: 650,
       fullHeight: true,
       columns:
         _.range(0, this.state.colKeys.length).map(index => 
           this.getColumn(this.reduxState[this.state.algorithmId], index, this.state.colKeys)
         )
-    }
-  )
+    };
+  }
   
-  getColumn = (algorithm, index, colKeys: number[]) =>
-  (
-    {
+  getColumn(algorithm, index, colKeys: number[])
+  {
+    return {
       minWidth: 316,
       resizeable: true,
       resizeHandleRef: 'resize-handle',
@@ -202,9 +210,9 @@ class Builder extends React.Component<any, any>
       hidden: this.state && this.state.closingIndex === index,
       key: colKeys[index],
     }
-  )
+  }
   
-  handleAddColumn = (index) =>
+  handleAddColumn(index)
   {
     index = index + 1;
     var colKeys = _.clone(this.state.colKeys);
@@ -214,7 +222,7 @@ class Builder extends React.Component<any, any>
     }); 
   }
   
-  handleCloseColumn = (index) =>
+  handleCloseColumn(index)
   {
     var colKeys = _.clone(this.state.colKeys);
     colKeys.splice(index, 1);
@@ -223,7 +231,7 @@ class Builder extends React.Component<any, any>
     }); 
   }
   
-  moveColumn= (curIndex, newIndex) =>
+  moveColumn(curIndex, newIndex)
   {
     var colKeys = _.clone(this.state.colKeys);
     var tmp = colKeys.splice(curIndex, 1)[0];
@@ -237,40 +245,48 @@ class Builder extends React.Component<any, any>
     }), 250);
   }
   
-  
-	render() {
-    var tabs = {};
+  componentWillMount()
+  {
+    let config = localStorage.getItem('config') || '';
+    let open = this.props.location.query.o;
+    var newConfig;
     
-    _.map(this.reduxState, (algorithm, algorithmId) => {
-      tabs[algorithmId] = {
-        tabName: algorithm['algorithmName'] || 'New Algorithm',
-        closeable: true,
-        onClose: this.tabClose,
-        onClick: this.tabClick,
-      };
-      
-      if(!this.state.algorithmId)
+    if(open)
+    {
+      if(config === 'undefined' || config === '')
       {
-        setTimeout(() => this.setState({ algorithmId }));
+        newConfig = '!' + open;
+        console.log('undef', newConfig);
       }
-    });
-
-    tabs[-1] = {
-      tabName: <NewIcon data-tip="New" />,
-      noBackground: true,
-      pinnedAtEnd: true,
-      onClick: this.createAlgorithm,
-      selectNewTab: true,
-      noDrag: true,
-      unselectable: true,
-    };
+      else
+      {
+        var configArr = config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id);
+        var i = configArr.indexOf(open);
+        if(i === -1)
+        {
+          i = configArr.length;
+        }
+        configArr[i] = '!' + open;
+        
+        newConfig = configArr.join(',');
+        console.log('def', newConfig);
+      }
+      
+      this.props.history.replaceState({}, `/builder/${newConfig}`);
+    }
+  }
+  
+	render()
+  {
+    let config = this.props.params.config;
+    localStorage.setItem('config', config || '');
     
     return (
       <div className={classNames({
         'builder': true,
         'builder-no-column-animation': this.state.noColumnAnimation,
       })}>
-        <Tabs tabs={tabs} actions={this.getTabActions()} ref='tabs' />
+        <Tabs actions={this.tabActions} config={config} ref='tabs' history={this.props.history} />
         {
           !_.keys(this.reduxState).length ? null :
             <div className='tabs-content'>

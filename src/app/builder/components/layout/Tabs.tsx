@@ -43,13 +43,18 @@ THE SOFTWARE.
 */
 
 require('./Tabs.less');
+import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
 import PanelMixin from "../layout/PanelMixin.tsx";
 import InfoArea from "./../../../common/components/InfoArea.tsx";
-// import * as classNames from 'classnames';
+import Classs from './../../../common/components/Classs.tsx';
+import BrowserStore from './../../../browser/data/BrowserStore.tsx';
+import BrowserActions from './../../../browser/data/BrowserActions.tsx';
+import BrowserTypes from './../../../browser/BrowserTypes.tsx';
+import * as classNames from 'classnames';
 var ReactTooltip = require("react-tooltip");
 
 var TabIcon = require("./../../../../images/tab_corner_27x31.svg?name=TabIcon");
@@ -60,12 +65,12 @@ var Tab = React.createClass<any, any>({
   
   propTypes:
   {
-    index: React.PropTypes.number,
-    selectedIndex: React.PropTypes.number,
-    tab: React.PropTypes.object,
-    tabOrder: React.PropTypes.array,
-    onSelect: React.PropTypes.func,
-    actions: React.PropTypes.array,
+    id: React.PropTypes.string.isRequired,
+    name: React.PropTypes.string.isRequired,
+    selected: React.PropTypes.bool.isRequired,
+    index: React.PropTypes.number.isRequired,
+    onClick: React.PropTypes.func.isRequired,
+    onClose: React.PropTypes.func.isRequired,
   },
   
   getDefaultProps(): any
@@ -78,12 +83,12 @@ var Tab = React.createClass<any, any>({
   },
     
   // Returns z-index so that tabs are layered in a nice fashion
-  zIndexStyleForIndex(index: number): {zIndex?: number}
+  zIndexStyle(): {zIndex?: number}
   {
-    if(index !== this.props.selectedIndex)
+    if(!this.props.selected)
     {
       return {
-        zIndex: this.props.tabOrder.length - index,
+        zIndex: this.props.index,
       };
     }
     
@@ -94,17 +99,17 @@ var Tab = React.createClass<any, any>({
   {
     if(!this.state.moved)
     {
-      this.props.onSelect(this.props.tab.key);
+      this.props.onClick(this.props.id);
     }
   },
   
   close(event) {
     event.stopPropagation();
-    this.props.tab.onClose(this.props.tab.key);
+    this.props.onClose(this.props.id);
   },
   
   renderClose() {
-    if(!this.props.tab.closeable)
+    if(this.props.fixed)
     {
       return null;
     }
@@ -125,20 +130,20 @@ var Tab = React.createClass<any, any>({
       <div 
         className={Util.objToClassname({
           'tabs-tab': true,
-          'tabs-tab-selected': this.props.index === this.props.selectedIndex,
-          'tabs-tab-no-bg': this.props.tab.noBackground,
+          'tabs-tab-selected': this.props.selected,
+          'tabs-tab-no-bg': this.props.fixed,
           })}
-        key={this.props.index}
-        style={this.zIndexStyleForIndex(this.props.index)}
+        key={this.props.id}
+        style={this.zIndexStyle()}
         onClick={this.handleClick}>
-          { this.props.tab.noBackground ? null :
+          { this.props.fixed ? null :
             <TabIcon className='tab-icon tab-icon-left' />
           }
           <div className='tab-inner'>
-            { this.props.tab.tabName }
+            { this.props.name }
             { this.renderClose() }
           </div>
-          { this.props.tab.noBackground ? null :
+          { this.props.fixed ? null :
             <TabIcon className='tab-icon tab-icon-right' />
           }
       </div>
@@ -146,132 +151,106 @@ var Tab = React.createClass<any, any>({
   },
 });
 
-var Tabs = React.createClass<any, any>({
-	propTypes:
-	{
-		tabs: React.PropTypes.object.isRequired,
-		title: React.PropTypes.string,
-	},
+interface TabsProps
+{
+  config: string;
+  actions: Immutable.List<{
+    text: string;
+    icon: any;
+    onClick: () => void;
+  }>;
+  history: any;
+}
+
+class Tabs extends Classs<TabsProps> {
+  state = {
+    variants: null,
+    tabs: null,
+  }
+  cancel = null;
+  
+  componentDidMount()
+  {
+    BrowserActions.fetch();
+    
+    let a = () => 
+    {
+      let groups = BrowserStore.getState().get('groups');
+      if(groups)
+      {
+        var variants: {[id: string]: BrowserTypes.Variant} = {};
+
+        // todo consider a different approach
+        groups.map(group =>
+          group.algorithms.map(algorithm =>
+            algorithm.variants.map(variant =>
+              variants[variant.id] = variant)
+            )
+        );
+        
+        this.computeTabs(this.props.config, variants);
+      }
+    }
+    
+    this.cancel = BrowserStore.subscribe(a);
+    a();
+  }
+  
+  componentWillUnmount()
+  {
+    this.cancel && this.cancel();
+  }
+  
+  componentWillReceiveProps(nextProps)
+  {
+    if(nextProps.config !== this.props.config)
+    {
+      this.computeTabs(nextProps.config);
+    }
+  }
+  
+  computeTabs(config, variants?)
+  {
+    variants = variants || this.state.variants;
+    
+    let tabs = config && variants && config.split(',').map(vId =>
+    ({
+      id: this.getId(vId),
+      name: variants[this.getId(vId)] ? variants[this.getId(vId)].name : null,
+      selected: this.isSelected(vId),
+    }));
+    
+    this.setState({
+      tabs,
+      variants,
+    });
+  }
   
   shouldComponentUpdate(nextProps, nextState)
   {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  },
-
-	getInitialState()
-	{
-		return {
-      tabOrder: _.map(this.props.tabs, (tab, key) => _.extend(tab, 
-      {
-        key: key,
-      })),
-      selectedIndex: 0,
-		};
-	},
-  
-  componentWillReceiveProps(newProps)
-  {
-    var tabOrder = this.state.tabOrder;
-    
-    _.map(newProps.tabs, (tab, key) => 
-    {
-      var index = tabOrder.findIndex((tab) => tab.key === key);
-      if(index !== -1)
-      {
-        tabOrder[index] = _.extend(tabOrder[index], tab);
-      }
-      else
-      {
-        index = tabOrder.length - 1;
-        
-        while(tabOrder[index] && tabOrder[index]['pinnedAtEnd'])
-        {
-          index --;
-        }
-
-        // if(index === this.state.selectedIndex)
-        // {
-          tab['onClick'](key);
-        // }
-        
-        tabOrder.splice(index + 1, 0, _.extend(tab,
-        {
-          key: key,
-        }));
-      }
-    });
-    
-    tabOrder = tabOrder.reduce((newTabOrder, tab) => {
-      if(newProps.tabs[tab.key])
-        newTabOrder.push(tab);
-      return newTabOrder;
-    }, []);
-    
-    var state:any = {
-      tabOrder: tabOrder,
-    }
-    
-    this.setState(state);
-  },
-
-  _onTabSelect: {},
-	handleTabSelectFactory(index)
-	{
-    if(!this._onTabSelect[index])
-    {
-      this._onTabSelect[index] = () => {
-        if(index === this.state.selectedIndex && !this.state.tabOrder[index].unselectable)
-        {
-          return;
-        }
-        
-        var { key, onClick } = this.state.tabOrder[index];  
-        
-        this.setState({
-          selectedIndex: index,
-        });
-        
-        if(typeof onClick === 'function')
-        {
-          onClick(key);
-        }
-      };
-    }
-    
-    return this._onTabSelect[index];
-	},
+    return !_.isEqual(nextState.tabs, this.state.tabs);
+  }
   
   moveTabs(index: number, destination: number)
   {
-    var tabOrder = Util.deeperCloneArr(this.state.tabOrder);
-    while(tabOrder[destination]['noDrag'])
-    {
-      destination --;
-    }
-    
-    var selectedKey = tabOrder[this.state.selectedIndex].key;
-    var tab = tabOrder.splice(index, 1)[0];
-    tabOrder.splice(destination, 0, tab);
-    
-    this.setState({
-      tabOrder: tabOrder,
-      selectedIndex: tabOrder.findIndex(tab => tab.key === selectedKey),
-    });
-  },
+    var newTabs = JSON.parse(JSON.stringify(this.state.tabs));
+    var tab = newTabs.splice(index, 1)[0];
+    newTabs.splice(destination, 0, tab);
+    this.props.history.pushState({}, '/builder/' + 
+      newTabs.map(
+        tab => (tab.selected ? '!' : '') + tab.id
+      ).join(',')
+    );
+  }
   
   renderActions()
   {
-    if(!this.props.actions)
-    {
-      return null;
-    }
-    
     return (
       <div className='tabs-actions'>
         {
           this.props.actions.map((action, index) => 
             <a
-              className={'tabs-action' + (action.noDivider ? ' tabs-action-no-divider' : '')}
+              className='tabs-action'
               key={index}
               onClick={action.onClick}
               data-tip={action.text}
@@ -281,56 +260,86 @@ var Tabs = React.createClass<any, any>({
         }
       </div>
     );
-  },
+  }
+  
+  getId(idStr:string):string
+  {
+    if(idStr.substr(0, 1) === '!')
+    {
+      return idStr.substr(1);
+    }
+    return idStr;
+  }
+  
+  isSelected(idStr:string):boolean
+  {
+    return idStr.substr(0, 1) === '!';
+  }
+  
+  handleClick(id:ID)
+  {
+    this.props.history.pushState({ state: { config: this.props.config }}, this.getTo(id));
+  }
+  
+  handleClose(id:ID)
+  {
+    this.props.history.pushState({}, this.getCloseTo(id));
+  }
+  
+  getTo(id)
+  {
+    return '/builder/' + this.state.tabs.map(
+      tab => (tab.id === id ? "!" : "") + tab.id
+    ).join(",");
+  }
+  
+  getCloseTo(id)
+  {
+    let tab = this.state.tabs.find(tab => tab.id === id);
+    return '/builder/' + (tab.selected && this.state.tabs.length > 1 ? '!' : '')
+      + this.state.tabs.map(tab => 
+        tab.id === id ? null : 
+          (tab.selected ? "!" : "") + tab.id
+    ).filter(s => s)
+     .join(",");
+  }
   
 	render()
   {
-    var selectedIndex = this.state.selectedIndex;
-
-    var tabsLayout = 
+    let { tabs } = this.state;
+    
+    var tabsLayout =
     {
       compact: true,
-      columns: this.state.tabOrder.map((tab, index) => (
+      columns: tabs ? tabs.map((tab, index) => (
       {
-        noDrag: tab.noDrag,
-        key: tab.key,
+        key: tab.id,
         content:
-        (
           <Tab 
+            name={tab.name}
+            selected={tab.selected}
+            id={tab.id}
             index={index}
-            tab={tab}
-            tabOrder={this.state.tabOrder}
-            drag_x={!tab.noDrag}
-            onSelect={this.handleTabSelectFactory(index)}
-            selectedIndex={selectedIndex} />
-        ),
+            onClick={this.handleClick}
+            onClose={this.handleClose}
+          />
+        ,
       }))
+      : []
     };
     
-      // <div className={this.state.selectingIndex !== null ? 'tabs-loading' : 'tabs-loading-hidden'}>
-      //   <InfoArea large='Loading...' />
-      // </div>
     return (
-    <div className='tabs-container'>
-      <div className='tabs-row-wrapper'>
-        { 
-          this.props.title ? (
-            <div className='tabs-title'>
-              {this.props.title}
-            </div>
-          ) : null
-        }
-        {
+      <div className='tabs-container'>
+        <div className='tabs-row-wrapper'>
           <div className='tabs-row'>
             <LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />
             { this.renderActions() }
             <div className='tabs-shadow'></div>
           </div>
-        }
+        </div>
       </div>
-		 </div>
      );
-	},
-});
+	}
+};
 
 export default Tabs;
