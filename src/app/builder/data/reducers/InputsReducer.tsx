@@ -43,35 +43,44 @@ THE SOFTWARE.
 */
 
 var Immutable = require('immutable');
-import ActionTypes from './../../BuilderActionTypes.tsx';
-import Util from './../../../../util/Util.tsx';
-import { BuilderTypes } from './../../../BuilderTypes.tsx';
+import ActionTypes from './../BuilderActionTypes.tsx';
+import Util from './../../../util/Util.tsx';
 
-var FilterCardReducer = {};
+var InputsReducer = {};
 
-FilterCardReducer[ActionTypes.cards.filter.create] =
-  Util.updateCardField('filters', (filters, action) => 
-    filters.splice(Util.spliceIndex(action.payload.index, filters), 0, Immutable.fromJS({
-      condition: 
-      {
-        first: '',
-        second: '',
-        operator: BuilderTypes.Operator.EQ,
-      },
-      combinator: BuilderTypes.Combinator.AND,
-      id: Util.randInt(2307961512),
-    })));
-    
-FilterCardReducer[ActionTypes.cards.filter.change] =
-  Util.updateCardField('filters', (filters, action) => 
-    filters.set(action.payload.index, Immutable.fromJS(action.payload.value)));
-    
-FilterCardReducer[ActionTypes.cards.filter.remove] =
-    Util.updateCardField('filters', (filters, action) =>
-      filters.remove(action.payload.index));
+InputsReducer[ActionTypes.inputs.create] =
+  (state, action) =>
+    state.updateIn(['algorithms', action.payload.parentId, 'inputs'], inputs =>
+      inputs.splice(Util.spliceIndex(action.payload.index, inputs), 0, Immutable.fromJS({
+        key: '',
+        value: '',
+        id: Util.randInt(123456789),
+        parentId: action.payload.parentId,
+      })));
 
-FilterCardReducer[ActionTypes.cards.filter.move] =
-  Util.updateCardField('filters', (filters, action) =>
-    Util.immutableMove(filters, action.payload.filter.id, action.payload.index));
+InputsReducer[ActionTypes.inputs.move] =
+  (state, action) => 
+    state.updateIn(['algorithms', action.payload.input.parentId, 'inputs'], inputs =>
+      Util.immutableMove(inputs, action.payload.input.id, action.payload.index));
 
-export default FilterCardReducer;
+InputsReducer[ActionTypes.inputs.changeKey] =
+  (state, action) =>
+    state.setIn(['algorithms', action.payload.input.parentId, 'inputs', action.payload.index, 'key'],
+      action.payload.value);
+
+InputsReducer[ActionTypes.inputs.changeValue] =
+  (state, action) =>
+    state.setIn(['algorithms', action.payload.input.parentId, 'inputs', action.payload.index, 'value'],
+      action.payload.value);
+
+InputsReducer[ActionTypes.inputs.changeType] =
+  (state, action) =>
+    state.setIn(['algorithms', action.payload.input.parentId, 'inputs', action.payload.index, 'type'],
+      action.payload.value);
+
+InputsReducer[ActionTypes.inputs.remove] =
+  (state, action) =>
+    state.updateIn(['algorithms', action.payload.input.parentId, 'inputs'], inputs =>
+      inputs.delete(inputs.findIndex(input => input.get('id') === action.payload.input.id)));
+
+export default InputsReducer;

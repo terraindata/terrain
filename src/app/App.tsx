@@ -215,8 +215,8 @@ var App = React.createClass({
 var router = (
   <Router history={history}>
     <Route path="/" component={App}>
+      <IndexRoute component={Placeholder} />
     
-      <IndexRoute component={Builder} />
       <Route path="/builder" component={Builder} />
       <Route path="/builder/:config" component={Builder} />
       <Route path="/builder/:config/:splitConfig" component={Builder} />

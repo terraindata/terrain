@@ -151,14 +151,14 @@ var BuilderColumn = React.createClass<any, any>(
     {
       case COLUMNS.Builder:
         // this should be temporary; remove when middle tier arrives
-        var spotlights = algorithm.results.reduce((spotlights, result) =>
+        var spotlights = algorithm.results ? algorithm.results.reduce((spotlights, result) =>
         {
           if(result.spotlight)
           {
             spotlights.push(result);
           }
           return spotlights;
-        }, []);
+        }, []) : [];
         return <CardsArea 
           cards={algorithm.cards} 
           parentId={parentId} 

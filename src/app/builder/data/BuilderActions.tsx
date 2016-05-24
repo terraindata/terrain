@@ -47,6 +47,9 @@ import ActionTypes from './BuilderActionTypes.tsx';
 import Store from './BuilderStore.tsx';
 
 import { BuilderTypes } from './../BuilderTypes.tsx';
+import * as Immutable from 'immutable';
+import List = Immutable.List;
+import Map = Immutable.Map;
 
 var $ = (type: string, payload: any) => Store.dispatch({type, payload})
 
@@ -255,24 +258,32 @@ var BuilderActions =
         $(ActionTypes.results.query, {algorithmId, results}),
   },
 
-  algorithm:
-  {
-    create: 
-      () =>
-        $(ActionTypes.algorithm.create, {}),
+  // algorithm:
+  // {
+  //   create: 
+  //     () =>
+  //       $(ActionTypes.algorithm.create, {}),
     
-    remove: 
-      (parentId: string) =>
-        $(ActionTypes.algorithm.remove, {parentId}),
+  //   remove: 
+  //     (parentId: string) =>
+  //       $(ActionTypes.algorithm.remove, {parentId}),
     
-    duplicate:
-      (parentId: string) =>
-        $(ActionTypes.algorithm.duplicate, {parentId}),
+  //   duplicate:
+  //     (parentId: string) =>
+  //       $(ActionTypes.algorithm.duplicate, {parentId}),
     
-    load:
-      (state: any) =>
-        $(ActionTypes.algorithm.load, {state}),
-  },
+  //   load:
+  //     (state: any) =>
+  //       $(ActionTypes.algorithm.load, {state}),
+  // },
+  
+  fetch:
+    (variantIds: List<ID>) =>
+      $(ActionTypes.fetch, { variantIds }),
+  
+  setVariant:
+    (variantId: ID, variant) =>
+      $(ActionTypes.setVariant, { variantId, variant }),
 };
 
 export default BuilderActions;

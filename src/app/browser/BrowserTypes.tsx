@@ -66,6 +66,9 @@ export module BrowserTypes
     algorithmId: "",
     groupId: "",
     status: EVariantStatus.Design,
+
+    cards: Immutable.List([]),
+    inputs: Immutable.List([]),
     
     // for DB storage
     type: "variant",
@@ -80,6 +83,9 @@ export module BrowserTypes
     status: EVariantStatus;
     algorithmId: ID;
     groupId: Group;
+
+    cards: any;
+    inputs: any;
   }
   export function newVariant(algorithmId: string, groupId: string, id?: ID, name?: string, lastEdited?: string,
     lastUserId?: string, status?: EVariantStatus):Variant

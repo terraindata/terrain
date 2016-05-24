@@ -43,34 +43,34 @@ THE SOFTWARE.
 */
 
 var Immutable = require('immutable');
-import ActionTypes from './../../BuilderActionTypes.tsx';
-import Util from './../../../../util/Util.tsx';
-import { BuilderTypes } from './../../../BuilderTypes.tsx';
+import ActionTypes from './../BuilderActionTypes.tsx';
+import Util from './../../../util/Util.tsx';
+import { BuilderTypes } from './../../BuilderTypes.tsx';
 
-var SelectCardReducer = {};
+var FromCardReducer = {};
 
-SelectCardReducer[ActionTypes.cards.select.create] =
-  Util.updateCardField('properties', (properties, action) => 
-    properties.splice(
-      Util.spliceIndex(action.payload.index, properties),
-      0,
-      
-      Immutable.fromJS({
-        property: "",
-        id: "p" + Util.randInt(23496243),
-      })));
+FromCardReducer[ActionTypes.cards.from.change] =
+  Util.setCardFields(['group', 'iterator']);
+
+FromCardReducer[ActionTypes.cards.from.join.create] =
+  Util.updateCardField('joins', (joins, action) =>
+        joins.push({
+          group: '',
+          condition:
+          {
+            first: '',
+            second: '',
+            operator: BuilderTypes.Operator.EQ,
+          },
+          id: "j-"+Util.randInt(2307961512),
+        }));
     
-SelectCardReducer[ActionTypes.cards.select.change] =
-  Util.updateCardField('properties', (properties, action) => 
-    properties.set(action.payload.index, Immutable.fromJS(action.payload.value)));
-
-SelectCardReducer[ActionTypes.cards.select.move] =
-  Util.updateCardField('properties', (properties, action) =>
-    Util.immutableMove(properties, action.payload.property.id, action.payload.index));
+FromCardReducer[ActionTypes.cards.from.join.change] =
+  Util.updateCardField('joins', (joins, action) => 
+    joins.set(action.payload.index, Immutable.fromJS(action.payload.value)));
     
-SelectCardReducer[ActionTypes.cards.select.remove] =
-    Util.updateCardField('properties', (properties, action) =>
-      properties.remove(action.payload.index));
+FromCardReducer[ActionTypes.cards.from.join.remove] =
+    Util.updateCardField('joins', (joins, action) =>
+      joins.remove(action.payload.index));
 
-
-export default SelectCardReducer;
+export default FromCardReducer;

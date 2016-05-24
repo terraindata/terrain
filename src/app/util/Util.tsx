@@ -67,10 +67,18 @@ var immutableCardsUpdateHelper = (node: any, keyToUpdate: string | string[], id:
       return node.updateIn(keyToUpdate, (node: any) => updater(node, keyToUpdate));
     }
   }
-  
-  node = node.map((value, key) => !Immutable.Iterable.isIterable(value) ? value :
-    immutableCardsUpdateHelper(value, keyToUpdate, id, updater)
-  );
+  let keys = node.keys();
+  var iterator = keys.next();
+  while(!iterator.done) //node.each((value, key) => // used `map` this way because `map` returns `undefined` for Immutable records
+  {
+    let key = iterator.value;
+    let value = node.get(key);
+    if(Immutable.Iterable.isIterable(value))
+    {
+      node = node.set(key, immutableCardsUpdateHelper(value, keyToUpdate, id, updater));
+    }
+    iterator = keys.next();
+  };
   
   return node;
 }
@@ -81,10 +89,12 @@ var immutableCardsUpdate =
     {
       keysToUpdate = [keysToUpdate as string];
     }
-    return state.update('algorithms', algorithms => algorithms.map((algorithm) => 
-      (keysToUpdate as string[]).reduce(
+    return state.update('algorithms', algorithms => algorithms.map((algorithm) => {
+      var a = (keysToUpdate as string[]).reduce(
         (algorithm, keyToUpdate) => immutableCardsUpdateHelper(algorithm, keyToUpdate, id, updater)
-      , algorithm)));
+      , algorithm);
+      return a;
+    }));
   };
 
 var immutableCardsSetIn = 
@@ -423,76 +433,9 @@ var Util = {
   
   populateTransformDummyData(transformCard)
   {
-    transformCard.range = transformCard.range || [];
+    transformCard.range = transformCard.range || [0,100];
     transformCard.bars = transformCard.bars || [];
     transformCard.scorePoints = transformCard.scorePoints || [];
-    
-    if(transformCard.range.length === 0)
-    {
-      switch(transformCard.input) 
-      {
-        case 'sitter.minPrice':
-          transformCard.range = [12, 26];
-          break;
-        // more defaults can go here
-        case 'sitter.numJobs':
-          transformCard.range = [0,100];
-          break;
-        default:
-          transformCard.range = [0,100];
-      }
-    }
-    
-    var outliers = transformCard.range[1] >= 1000;
-    
-    if(transformCard.bars.length === 0)
-    {
-      // Create dummy data for now
-      
-      var counts = [];
-      var count: any;
-      var sum = 0;
-      var upperEnd = transformCard.range[1];
-      if(outliers) upperEnd /= 10;
-      for(var i = transformCard.range[0]; i <= upperEnd; i ++)
-      {
-        count = Util.randInt(3000);
-        counts.push(count);
-        sum += count;
-      }
-      
-      if(outliers) {
-        for(var i:any = upperEnd + 1; i < transformCard.range[1]; i ++)
-        {
-           count = 1; //Util.randInt(2);
-           counts.push(count);
-           sum += count;   
-        }
-        
-        for(var i:any = upperEnd * 9; i < transformCard.range[1]; i ++)
-        {
-           count = Util.randInt(200);
-           counts.push(count);
-           sum += count;   
-        }
-      }
-      
-      for(var i:any = transformCard.range[0]; i <= transformCard.range[1]; i ++)
-      {
-        var count: any = counts[i - transformCard.range[0]];
-        if(isNaN(count))
-          count = 0;
-        transformCard.bars.push({
-          count: count,
-          percentage: count / sum,
-          range: {
-            min: i,
-            max: i + 1,
-          },
-          id: "a4-" + i,
-        });
-      }
-    }
     
     if(transformCard.scorePoints.length === 0)
     {
