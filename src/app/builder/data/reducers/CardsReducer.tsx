@@ -43,11 +43,11 @@ THE SOFTWARE.
 */
 
 var Immutable = require('immutable');
-import ActionTypes from './../../BuilderActionTypes.tsx';
-import Util from './../../../../util/Util.tsx';
+import ActionTypes from './../BuilderActionTypes.tsx';
+import Util from './../../../util/Util.tsx';
 import * as _ from 'underscore';
 
-import { BuilderTypes } from './../../../BuilderTypes.tsx';
+import { BuilderTypes } from './../../BuilderTypes.tsx';
 
 
 var CardsReducer = {};
@@ -177,7 +177,6 @@ CardsReducer[ActionTypes.cards.create] =
       newCard['type'] = action.payload.type;
       newCard['id'] = "c-"+Util.randInt(4815162342);
       newCard['parentId'] = action.payload.parentId;
-      
       return cards.splice(action.payload.index, 0, Immutable.fromJS(newCard));
     });
   };

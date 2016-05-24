@@ -43,9 +43,9 @@ THE SOFTWARE.
 */
 
 var Immutable = require('immutable');
-import ActionTypes from './../../BuilderActionTypes.tsx';
-import Util from './../../../../util/Util.tsx';
-import { BuilderTypes } from './../../../BuilderTypes.tsx';
+import ActionTypes from './../BuilderActionTypes.tsx';
+import Util from './../../../util/Util.tsx';
+import { BuilderTypes } from './../../BuilderTypes.tsx';
 
 var TransformCardReducer = {};
 

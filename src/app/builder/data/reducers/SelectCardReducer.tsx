@@ -43,41 +43,34 @@ THE SOFTWARE.
 */
 
 var Immutable = require('immutable');
-import ActionTypes from './../../BuilderActionTypes.tsx';
-import Util from './../../../../util/Util.tsx';
+import ActionTypes from './../BuilderActionTypes.tsx';
+import Util from './../../../util/Util.tsx';
+import { BuilderTypes } from './../../BuilderTypes.tsx';
 
-var ResultsReducer = {};
+var SelectCardReducer = {};
 
-ResultsReducer[ActionTypes.results.move] =
-  (state, action) =>
-    state.updateIn(['algorithms', action.payload.result.parentId, 'results'], results =>
-      Util.immutableMove(results, action.payload.result.id, action.payload.index)
-        .map(result => result.get('id') === action.payload.result.id ?
-          result.set('pinned', true).set('original_index', results.findIndex(result => result.get('id') === action.payload.result.id)) : result)
-    );
+SelectCardReducer[ActionTypes.cards.select.create] =
+  Util.updateCardField('properties', (properties, action) => 
+    properties.splice(
+      Util.spliceIndex(action.payload.index, properties),
+      0,
+      
+      Immutable.fromJS({
+        property: "",
+        id: "p" + Util.randInt(23496243),
+      })));
+    
+SelectCardReducer[ActionTypes.cards.select.change] =
+  Util.updateCardField('properties', (properties, action) => 
+    properties.set(action.payload.index, Immutable.fromJS(action.payload.value)));
 
-ResultsReducer[ActionTypes.results.spotlight] =
-  (state, action) =>
-    state.updateIn(['algorithms', action.payload.result.parentId, 'results'], results =>
-      results.update(results.findIndex(result => result.get('id') === action.payload.result.id),
-        result => result.set('spotlight', action.payload.value)));
+SelectCardReducer[ActionTypes.cards.select.move] =
+  Util.updateCardField('properties', (properties, action) =>
+    Util.immutableMove(properties, action.payload.property.id, action.payload.index));
+    
+SelectCardReducer[ActionTypes.cards.select.remove] =
+    Util.updateCardField('properties', (properties, action) =>
+      properties.remove(action.payload.index));
 
 
-ResultsReducer[ActionTypes.results.pin] =
-  (state, action) =>
-    state.updateIn(['algorithms', action.payload.result.parentId, 'results'], results =>
-      {
-        var resultIndex = results.findIndex(result => result.get('id') === action.payload.result.id);
-        var newResults: any = results.update(resultIndex,
-          result => result.set('pinned', action.payload.value));
-        var originalIndex = results.get(resultIndex).get('original_index');
-        if(originalIndex !== undefined)
-        {
-          // move back to original spot
-          newResults = Util.immutableMove(newResults, action.payload.result.id, originalIndex);
-        }
-        return newResults;
-      });
-        
-
-export default ResultsReducer;
+export default SelectCardReducer;

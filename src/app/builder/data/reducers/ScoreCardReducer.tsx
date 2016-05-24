@@ -43,48 +43,25 @@ THE SOFTWARE.
 */
 
 var Immutable = require('immutable');
-import ActionTypes from './../../BuilderActionTypes.tsx';
-import Util from './../../../../util/Util.tsx';
-import { BuilderTypes } from './../../../BuilderTypes.tsx';
-var newResults = require('../../json/_results.json');
+import ActionTypes from './../BuilderActionTypes.tsx';
+import Util from './../../../util/Util.tsx';
+import { BuilderTypes } from './../../BuilderTypes.tsx';
 
-var FromCardReducer = {};
+var ScoreCardReducer = {};
 
-FromCardReducer[ActionTypes.cards.from.change] =
-  Util.setCardFields(['group', 'iterator']);
-  // {
-    // if(action.payload.value === 'sitters' && state.getIn([action.payload.card.parentId, 'results']).count() === 0)
-    // {
-    //   newResults = newResults.map(result => {
-    //     result.parentId = action.payload.card.parentId;
-    //     return result;
-    //   })
-    //   state = state.setIn([action.payload.card.parentId, 'results'], Immutable.fromJS(newResults));
-    // }
-    
-    // return state.setIn([action.payload.card.parentId, 'cards', action.payload.index, 'group'], action.payload.value);
-    
-  // });
+ScoreCardReducer[ActionTypes.cards.score.create] =
+  Util.updateCardField('weights', (weights, action) => 
+    weights.splice(Util.spliceIndex(action.payload.index, weights), 0, Immutable.fromJS({
+      weight: 0,
+      key: '',
+    })));
+              
+ScoreCardReducer[ActionTypes.cards.score.change] =
+  Util.setCardFields(['method']);
 
-FromCardReducer[ActionTypes.cards.from.join.create] =
-  Util.updateCardField('joins', (joins, action) =>
-        joins.push({
-          group: '',
-          condition:
-          {
-            first: '',
-            second: '',
-            operator: BuilderTypes.Operator.EQ,
-          },
-          id: "j-"+Util.randInt(2307961512),
-        }));
+ScoreCardReducer[ActionTypes.cards.score.changeWeights] =
+  Util.updateCardField('weights', (weights, action) =>
+    Immutable.fromJS(action.payload.weights)
+  );
     
-FromCardReducer[ActionTypes.cards.from.join.change] =
-  Util.updateCardField('joins', (joins, action) => 
-    joins.set(action.payload.index, Immutable.fromJS(action.payload.value)));
-    
-FromCardReducer[ActionTypes.cards.from.join.remove] =
-    Util.updateCardField('joins', (joins, action) =>
-      joins.remove(action.payload.index));
-
-export default FromCardReducer;
+export default ScoreCardReducer;

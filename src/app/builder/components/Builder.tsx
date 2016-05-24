@@ -115,6 +115,75 @@ class Builder extends Classs<Props>
       colKeys,
       noColumnAnimation: false,
     };
+    
+  }
+  
+  componentWillMount()
+  {
+    this.checkConfig(this.props);
+  }
+  
+  componentWillReceiveProps(nextProps)
+  {
+    this.checkConfig(nextProps);
+  }
+  
+  checkConfig(props:Props)
+  {
+    let config = localStorage.getItem('config') || '';
+    let open = props.location.query.o;
+    var newConfig;
+    
+    if(open)
+    {
+      if(config === 'undefined' || config === '')
+      {
+        newConfig = '!' + open;
+      }
+      else
+      {
+        var configArr = config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id);
+        var i = configArr.indexOf(open);
+        if(i === -1)
+        {
+          i = configArr.length;
+        }
+        configArr[i] = '!' + open;
+        
+        newConfig = configArr.join(',');
+      }
+      
+    }
+    else if(!props.params.config || !props.params.config.length)
+    {
+      if(config)
+      {
+        newConfig = config;
+      }
+    }
+    
+    if(newConfig)
+    {
+      props.history.replaceState({}, `/builder/${newConfig}`);
+      this.fetch(newConfig);
+    }
+    else
+    {
+      this.fetch(props.params.config);
+    }
+  }
+  
+  fetch(config:string)
+  {
+    Actions.fetch(Immutable.List(
+      config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id)
+    ));
+  }
+  
+  getSelectedId()
+  {
+    var selected = this.props.params.config && this.props.params.config.split(',').find(id => id.indexOf('!') === 0);
+    return selected && selected.substr(1);
   }
   
   componentWillUnmount()
@@ -124,30 +193,30 @@ class Builder extends Classs<Props>
   
   createAlgorithm()
   {
-    Actions.algorithm.create();
+    // Actions.algorithm.create();
   }
   
   duplicateAlgorithm()
   {
-    Actions.algorithm.duplicate(this.state.algorithmId);
+    // Actions.algorithm.duplicate(this.state.algorithmId);
   }
   
   loadAlgorithm()
   {
-    Actions.algorithm.load(JSON.parse(prompt("Paste Algorithm state here")));
+    // Actions.algorithm.load(JSON.parse(prompt("Paste Algorithm state here")));
   }
   
   tabActions = Immutable.List([
-    {
-      text: 'Duplicate',
-      icon: <DuplicateIcon />,
-      onClick: this.duplicateAlgorithm,
-    },
-    {
-      text: 'Open',
-      icon: <OpenIcon />,
-      onClick: this.loadAlgorithm,
-    },
+  //   {
+  //     text: 'Duplicate',
+  //     icon: <DuplicateIcon />,
+  //     onClick: this.duplicateAlgorithm,
+  //   },
+  //   {
+  //     text: 'Open',
+  //     icon: <OpenIcon />,
+  //     onClick: this.loadAlgorithm,
+  //   },
     {
       text: 'Save',
       icon: <SaveIcon />,
@@ -157,28 +226,7 @@ class Builder extends Classs<Props>
   
   save()
   {
-    console.log(JSON.stringify(this.reduxState));
-  }
-  
-  tabClose(algorithmId)
-  {
-    if(this.state.algorithmId === algorithmId)
-    {
-      this.setState({
-        algorithmId: _.keys(this.reduxState).reduce(
-            (memo, id) =>
-              memo || (id !== algorithmId && id)
-          , null),
-      })
-    }
-    Actions.algorithm.remove(algorithmId);
-  }
-  
-  tabClick(algorithmId)
-  {
-    this.setState({
-      algorithmId,
-    });
+    Ajax.saveItem(Immutable.fromJS(this.reduxState[this.getSelectedId()]));
   }
   
   getLayout()
@@ -188,7 +236,7 @@ class Builder extends Classs<Props>
       fullHeight: true,
       columns:
         _.range(0, this.state.colKeys.length).map(index => 
-          this.getColumn(this.reduxState[this.state.algorithmId], index, this.state.colKeys)
+          this.getColumn(this.reduxState[this.getSelectedId()], index, this.state.colKeys)
         )
     };
   }
@@ -244,53 +292,11 @@ class Builder extends Classs<Props>
       noColumnAnimation: false,
     }), 250);
   }
-  
-  componentWillMount()
-  {
-    let config = localStorage.getItem('config') || '';
-    let open = this.props.location.query.o;
-    var newConfig;
-    
-    if(open)
-    {
-      if(config === 'undefined' || config === '')
-      {
-        newConfig = '!' + open;
-        console.log('undef', newConfig);
-      }
-      else
-      {
-        var configArr = config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id);
-        var i = configArr.indexOf(open);
-        if(i === -1)
-        {
-          i = configArr.length;
-        }
-        configArr[i] = '!' + open;
-        
-        newConfig = configArr.join(',');
-        console.log('def', newConfig);
-      }
-      
-    }
-    else if(!this.props.params.config || !this.props.params.config.length)
-    {
-      if(config)
-      {
-        newConfig = config;
-      }
-    }
-    
-    if(newConfig)
-    {
-      this.props.history.replaceState({}, `/builder/${newConfig}`);
-    }
-  }
-  
 	render()
   {
     let config = this.props.params.config;
     localStorage.setItem('config', config || '');
+    
     
     return (
       <div className={classNames({

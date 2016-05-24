@@ -43,65 +43,41 @@ THE SOFTWARE.
 */
 
 var Immutable = require('immutable');
-import ActionTypes from './../../BuilderActionTypes.tsx';
-import Util from './../../../../util/Util.tsx';
-import * as _ from 'underscore';
+import ActionTypes from './../BuilderActionTypes.tsx';
+import Util from './../../../util/Util.tsx';
 
-var NEW_ALGORITHM = 
-{
-  inputs: [],
-  cards: [],
-  results: [],
-  resultsPage: 1,
-  resultsPages: 30,
-  algorithmName: 'New Algorithm',
-};
+var ResultsReducer = {};
 
-var currentparentId = 101;
-var AlgorithmReducer = {};
-
-AlgorithmReducer[ActionTypes.algorithm.create] =
-  (state, action) => 
-    state.setIn(["algorithms", "" + (Math.random())], Immutable.fromJS(_.extend({}, NEW_ALGORITHM, {id: "alg-" + Util.randInt(1234567)})));
-
-AlgorithmReducer[ActionTypes.algorithm.remove] =
+ResultsReducer[ActionTypes.results.move] =
   (state, action) =>
-    state.deleteIn(["algorithms", action.payload.parentId]);
+    state.updateIn(['algorithms', action.payload.result.parentId, 'results'], results =>
+      Util.immutableMove(results, action.payload.result.id, action.payload.index)
+        .map(result => result.get('id') === action.payload.result.id ?
+          result.set('pinned', true).set('original_index', results.findIndex(result => result.get('id') === action.payload.result.id)) : result)
+    );
 
-AlgorithmReducer[ActionTypes.algorithm.duplicate] =
-  (state, action) => {
-    var changeId = (node) => !node.map ? console.log(node) : node.map((value, key) => 
-      key === 'id' ? "i" + Math.random() : 
-        (Immutable.Iterable.isIterable(value) ? changeId(value) : value));
-    
-    var parentId = "alg-" + Math.random();
-    return state.setIn(["algorithms", parentId],
-        Immutable.fromJS(state.getIn(["algorithms", "" + action.payload.parentId]).toJS())
-          .set('id', parentId)
-      )
-      .setIn(["algorithms", parentId, 'algorithmName'], 'Copy of ' + state.getIn(["algorithms", "" + action.payload.parentId, 'algorithmName']))
-      .updateIn(["algorithms", parentId, 'results'], results =>
-        results.map(result =>
-          result.set('parentId', parentId))
-        .map(changeId))
-      .updateIn(["algorithms", parentId, 'cards'], cards =>
-        cards.map(card =>
-          card.set('parentId', parentId))
-        .map(changeId))
-      .updateIn(["algorithms", parentId, 'inputs'], inputs =>
-        inputs.map(input =>
-          input.set('parentId', parentId))
-        .map(changeId))
-      // .updateIn(["algorithms", parentId], algorithm => algorithm.map(changeId))
-      ;
-  }
-
-AlgorithmReducer[ActionTypes.results.changePage] =
+ResultsReducer[ActionTypes.results.spotlight] =
   (state, action) =>
-    state.setIn(["algorithms", action.payload.parentId, 'resultsPage'], action.payload.page);
+    state.updateIn(['algorithms', action.payload.result.parentId, 'results'], results =>
+      results.update(results.findIndex(result => result.get('id') === action.payload.result.id),
+        result => result.set('spotlight', action.payload.value)));
 
-AlgorithmReducer[ActionTypes.algorithm.load] =
+
+ResultsReducer[ActionTypes.results.pin] =
   (state, action) =>
-    state.set("algorithms", Immutable.fromJS(action.payload.state));
+    state.updateIn(['algorithms', action.payload.result.parentId, 'results'], results =>
+      {
+        var resultIndex = results.findIndex(result => result.get('id') === action.payload.result.id);
+        var newResults: any = results.update(resultIndex,
+          result => result.set('pinned', action.payload.value));
+        var originalIndex = results.get(resultIndex).get('original_index');
+        if(originalIndex !== undefined)
+        {
+          // move back to original spot
+          newResults = Util.immutableMove(newResults, action.payload.result.id, originalIndex);
+        }
+        return newResults;
+      });
+        
 
-export default AlgorithmReducer;
+export default ResultsReducer;

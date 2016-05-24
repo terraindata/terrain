@@ -43,25 +43,13 @@ THE SOFTWARE.
 */
 
 var Immutable = require('immutable');
-import ActionTypes from './../../BuilderActionTypes.tsx';
-import Util from './../../../../util/Util.tsx';
-import { BuilderTypes } from './../../../BuilderTypes.tsx';
+import ActionTypes from './../BuilderActionTypes.tsx';
+import Util from './../../../util/Util.tsx';
+import { BuilderTypes } from './../../BuilderTypes.tsx';
 
-var ScoreCardReducer = {};
-
-ScoreCardReducer[ActionTypes.cards.score.create] =
-  Util.updateCardField('weights', (weights, action) => 
-    weights.splice(Util.spliceIndex(action.payload.index, weights), 0, Immutable.fromJS({
-      weight: 0,
-      key: '',
-    })));
+var LetCardReducer = {};
               
-ScoreCardReducer[ActionTypes.cards.score.change] =
-  Util.setCardFields(['method']);
-
-ScoreCardReducer[ActionTypes.cards.score.changeWeights] =
-  Util.updateCardField('weights', (weights, action) =>
-    Immutable.fromJS(action.payload.weights)
-  );
+LetCardReducer[ActionTypes.cards.let.change] =
+  Util.setCardFields(['field', 'expression']);
     
-export default ScoreCardReducer;
+export default LetCardReducer;

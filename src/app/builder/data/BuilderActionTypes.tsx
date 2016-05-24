@@ -161,13 +161,16 @@ var BuilderActionTypes =
     set: '',
   },
 
-  algorithm:
-  {
-    create,
-    remove,
-    duplicate: '',
-    load: '',
-  },
+  // algorithm:
+  // {
+  //   create,
+  //   remove,
+  //   duplicate: '',
+  //   load: '',
+  // },
+  
+  fetch: '',
+  setVariant: '',
 };
 
 // I tried using this type to correclty classify this function,
