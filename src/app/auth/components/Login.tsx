@@ -85,8 +85,9 @@ class Login extends React.Component<Props, any>
   
   handleLogin = () =>
   {
+    let { username } = this.state;
     let login = (token: string) => {
-      Actions.login(token);
+      Actions.login(token, username);
     };
     
     if (DEV === true) {
@@ -108,7 +109,7 @@ class Login extends React.Component<Props, any>
     // NOTE: $SERVER_URL will be replaced by the build process.
     xhr.open("POST", SERVER_URL + "/auth", true);
     xhr.send(JSON.stringify({
-      username: this.state.username,
+      username,
       password: this.state.password,
     }));
   }

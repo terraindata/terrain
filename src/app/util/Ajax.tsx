@@ -43,10 +43,11 @@ THE SOFTWARE.
 */
 
 import * as $ from 'jquery';
-var _ = require('underscore');
+import * as _ from 'underscore';
 
 import Store from './../auth/data/AuthStore.tsx';
 import Actions from './../auth/data/AuthActions.tsx';
+import UserTypes from './../users/UserTypes.tsx';
 
 var Ajax = {
   _req(method: string, url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void) 
@@ -87,6 +88,26 @@ var Ajax = {
   _get(url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void)
   {
     return Ajax._req("GET", url, data, onLoad, onError);
+  },
+  
+  getUsers(onLoad: (users: {[id: string]: any}) => void)
+  {
+    return Ajax._get("/user/", "", (response: any) =>
+      {
+        let usersArr = JSON.parse(response);
+        var usersObj = {};
+        usersArr.map(user => usersObj[user.username] = user);
+        onLoad(usersObj);
+      });
+  },
+  
+  saveUser(user: UserTypes.User)
+  {
+    var data = user.toJS();
+    user.excludeFields.map(field => delete data[field]);
+    return Ajax._post(`/user/${user.username}`, JSON.stringify({
+      data: JSON.stringify(data),
+    }), () => {});
   },
   
   getItems( 

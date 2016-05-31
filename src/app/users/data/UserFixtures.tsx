@@ -45,17 +45,22 @@ THE SOFTWARE.
 import RoleTypes from './../../roles/RoleTypes.tsx';
 import UserTypes from './../UserTypes.tsx';
 
-export const u0 = new UserTypes.User({
-  id: "u0",
+export const patty = new UserTypes.User({
+  id: "patty",
   name: "Patty Hewes",
   imgUrl: "http://lukeknepper.com/uploads/u0.jpg",
   // groupRoles: [],
 })
 
-export const u1 = new UserTypes.User({
-  id: "u1",
+export const ellen = new UserTypes.User({
+  id: "ellen",
   name: "Ellen Parsons",
   imgUrl: "http://lukeknepper.com/uploads/u1.jpg",
+  username: "ellen",
+  timezone: "Eastern / New York",
+  email: "ellen@hewes.com",
+  skype: "ellenparsons",
+  phone: "(555) 867-5309",
   // groupRoles: [],
 })
 

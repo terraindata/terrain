@@ -46,19 +46,13 @@ import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 import * as ReduxActions from 'redux-actions';
 var Redux = require('redux');
+import Util from './../../util/Util.tsx';
 
 import UserTypes from './../UserTypes.tsx';
-import Util from './../../util/Util.tsx';
-import { u0, u1, U2, u3, u4, u5, u6, u7 } from './UserFixtures.tsx';
-
-var DefaultState = Immutable.fromJS({
-  users: { u0, u1, U2, u3, u4, u5, u6, u7 },
-});
-
-// import UserReducers from './UserReducers.tsx';
+import UserReducers from './UserReducers.tsx';
 
 let UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  // UserReducers,
-{})), DefaultState);
+  UserReducers,
+{})), new UserTypes.UserState({}));
 
 export default UserStore;

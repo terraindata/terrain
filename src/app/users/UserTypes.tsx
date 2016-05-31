@@ -48,21 +48,49 @@ import * as Immutable from 'immutable';
 export module UserTypes
 {
   let _User = Immutable.Record({
-    id: "",
     name: "",
-    groupRoles: Immutable.Map({}),
+    username: "",
+    email: "",
+    skype: "",
+    timezone: "",
+    phone: "",
     imgUrl: "",
+    
+    isAdmin: false,
+    isBuilder: false,
+    
+    excludeFields: ["isAdmin", "isBuilder", "username"],
+    
+    // groupRoles: Immutable.Map({}),
   });
-  export class User extends _User implements IId, IName
+  export class User extends _User
   {
-    id: string;
     name: string;
-    groupRoles: {[groupId: string]: RoleTypes.GroupUserRole;}
+    username: string;
+    email: string;
+    skype: string;
+    timezone: string;
+    phone: string;
     imgUrl: string;
+    
+    isAdmin: boolean;
+    isBuilder: boolean;
+    
+    excludeFields: string[];
+    
+    // groupRoles: {[groupId: string]: RoleTypes.GroupUserRole;}
   }
   
-  export type UserMap = { [id: string]: User }
-  // using `ID` instead of `string` causes a compile-time warning
+  export type UserMap = Immutable.Map<ID, UserTypes.User>;
+  
+  let _UserState = Immutable.Record({
+    loading: true,
+    users: Immutable.Map<ID, User>({}),
+  })
+  export class UserState extends _UserState {
+    loading: boolean;
+    users: UserMap;
+  }
 }
 
 export default UserTypes;

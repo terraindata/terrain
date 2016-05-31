@@ -40,11 +40,10 @@
 	Note: You can't do this in JSON.`,`
 - Name variables clearly.
   E.g. `user` or `users` for user objects, `userId` or `userIds` for ids
-- Commits should be solidly incremental and should have a helpful one-line explanation.
-	Rebase and squash on your feature branch before merging if you have too many commits, or unhelpful commit messages.
-	`git log` in master should always look beautiful and be a helpful history of what has happened.
-	Commit to good commits.
+- Commit to good commits. Commits should be solidly incremental and should have a helpful one-line explanation.
+	Feel free to squash commits on your feature branch before merging if you have too many commits, or unhelpful commit messages.
 - Code should read like English. Comment when necessary, but try your best to write code that doesn't need comments.
+- Booleans should be named clearly with `is` or `can`, e.g. `isWizard` or `canDoTheCanCan`
 - Be keen on adding to this README, and keen on trimming it down.
 - None of these standards are set in stone; if you have an idea for a way to improve these, make it known. Coding practices evolve.
 - No code is set in stone, either. Refactor when you find something that you know you could do better.
@@ -53,8 +52,7 @@
 - Use effective markdown syntax in this file.
 - Constants are named with all caps and underscores
 	e.g. `var ANSWER_TO_THE_ULTIMATE_QUESTION = 42;`
-- No global variables; every variable must be preceded by `var`.
-- Only one variable per `var`, for legibility. Don't separate variables by commas.
+- Only one variable per `var` / `let`, for legibility. Don't separate variables by commas.
 	e.g. Don't do `var first = 'Luke', second = 'Leia', third = 'Han';` etc. Instead, put each variable on its on line.
 - No not believing in yourself.
 
@@ -179,6 +177,8 @@ An action object contains:
 1. A string `type` which is unique that type of action
 2. Any metadata applicable to that action
 
+SOME OF THIS IS OUTDATED
+
 The types of actions that we can dispatch are located in `src/app/data/ActionTypes.tsx`. These are nested / namespaced / categorized (e.g. `ActionTypes.cards.select.moveField => "cards.select.moveField"` or `ActionTypes.inputs.changeKey => "inputs.changeKey"`). More details and helper functions are located in that file.
 
 Redux works well with "action creators" and "action dispatchers". Both are defined in `src/app/data/Actions.tsx` (though we may need to break them out into separate files later). Action creators are functions that accept structured arguments and return an action with the appropriate type and metadata (e.g. `Actions.create.cards.select.moveField(card, fieldIndex, newIndex)` will return an action with `{type: ActionTypes.cards.select.moveField, card: card, curIndex: fieldIndex, newIndex: newIndex }`). Action dispatchers are functions with the same parameters as the creators that both create the action and dispatch it to the store. For every action creator that we have, a dispatcher is automatically made. In practice, you will probably only need to use the dispatchers, and not the creators, but it may be helpful to have both.
@@ -187,6 +187,24 @@ To add a new action:
 1. Add the action type to `ActionTypes.tsx`
 2. Add the action creator to `Actions.tsx`
 3. Digest that action in the appropriate reducer in `Store.js`
+
+## Gotchas
+
+A list of common programming gotchas in this codebase
+- `let` scope is different than `var` and can cause unexpected errors
+  ```
+  if(false)
+  {
+    var theCowboysAreGood = true;
+  }
+  console.log(theCowboysAreGood); // "undefined"
+  
+  if(false)
+  {
+    let theEaglesAreGood = true;
+  }
+  console.log(theEaglesAreGood); // ERROR: cannot find name theEaglesAreGood
+  ```
 
 ## Troubleshooting
 

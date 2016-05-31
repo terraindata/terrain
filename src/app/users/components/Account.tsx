@@ -42,20 +42,71 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-import ActionTypes from './AuthActionTypes.tsx';
-import Store from './AuthStore.tsx';
+require('./Account.less');
+import * as React from 'react';
+import Classs from './../../common/components/Classs.tsx';
+import Store from './../data/UserStore.tsx';
+import Actions from './../data/UserActions.tsx';
+import BrowserTypes from './../UserTypes.tsx';
+import InfoArea from './../../common/components/InfoArea.tsx';
+import { Link } from 'react-router';
+var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
 
-var $ = (type: string, payload: any) => Store.dispatch({type, payload})
-
-var AuthActions =
+interface Props
 {
-  login:
-    (token: string, username: string) =>
-      $(ActionTypes.login, { token, username }),
-  logout:
-    () =>
-      $(ActionTypes.logout, null),
-};
+  location?: any;
+  children?: any;
+}
 
-export default AuthActions;
+class Account extends Classs<Props>
+{
+  render()
+  {
+    var title = "Account";
+    switch(this.props.location.pathname)
+    {
+      case "/account/profile":
+        title = "Profile";
+        break;
+      case "/account/notifications":
+        title = "Notifications";
+        break;
+      case "/account/team":
+        title = "Team";
+        break;
+      case "/account/settings":
+        title = "Settings";
+        break;      
+    }
+    
+    return (
+      <div className='account'>
+        <div className='account-wrapper'>
+          <div className='account-title'>
+            <HomeIcon />
+            { title }
+          </div>
+          <div className='account-links'>
+            <Link to={'/account/settings'} className='account-link'>
+              Settings
+            </Link>
+            <Link to={'/account/notifications'} className='account-link'>
+              Notifications
+            </Link>
+            <Link to={'/account/profile'} className='account-link'>
+              Profile
+            </Link>
+            <Link to={'/account/team'} className='account-link'>
+              Team
+            </Link>
+          </div>
+          <div className='account-inner'>
+            { this.props.children }
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default Account;

@@ -42,20 +42,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-import ActionTypes from './AuthActionTypes.tsx';
-import Store from './AuthStore.tsx';
+import * as _ from 'underscore';
+import ActionTypes from './UserActionTypes.tsx';
+import Actions from './UserActions.tsx';
+import Util from './../../util/Util.tsx';
+import Ajax from './../../util/Ajax.tsx';
+import UserTypes from './../UserTypes.tsx';
 
-var $ = (type: string, payload: any) => Store.dispatch({type, payload})
+var Immutable = require('immutable');
 
-var AuthActions =
-{
-  login:
-    (token: string, username: string) =>
-      $(ActionTypes.login, { token, username }),
-  logout:
-    () =>
-      $(ActionTypes.logout, null),
-};
+var UserReducers = {};
 
-export default AuthActions;
+UserReducers[ActionTypes.change] =
+  (state, action) => 
+    state.setIn(['users', action.payload.user.username], action.payload.user);
+
+UserReducers[ActionTypes.fetch] =
+  (state, action) =>
+  {
+    Ajax.getUsers((usersObj) =>
+    {
+      var users:UserTypes.UserMap = Immutable.Map({});
+      _.map(usersObj, (userObj, username) =>
+      {
+        let data = userObj.data && userObj.data.length ? JSON.parse(userObj.data) : {};
+        let isAdmin = userObj.admin === 1;
+        let isBuilder = userObj.builder === 1;
+        users = users.set(username, new UserTypes.User(
+          _.extend(data, {
+            username,
+            isAdmin,
+            isBuilder,
+          })
+        ));
+      })
+      Actions.setUsers(users);
+    })
+    return state.set('loading', true);
+  }
+
+UserReducers[ActionTypes.setUsers] =
+  (state, action) =>
+  {
+    return state.set('users', action.payload.users)
+      .set('loading', false);
+  }
+
+export default UserReducers;

@@ -42,20 +42,65 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-import ActionTypes from './AuthActionTypes.tsx';
-import Store from './AuthStore.tsx';
+require('./Account.less');
+import * as React from 'react';
+import Classs from './../../common/components/Classs.tsx';
+import Store from './../data/UserStore.tsx';
+import Actions from './../data/UserActions.tsx';
+import BrowserTypes from './../UserTypes.tsx';
+import InfoArea from './../../common/components/InfoArea.tsx';
+import { Link } from 'react-router';
+var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
 
-var $ = (type: string, payload: any) => Store.dispatch({type, payload})
-
-var AuthActions =
+interface Props
 {
-  login:
-    (token: string, username: string) =>
-      $(ActionTypes.login, { token, username }),
-  logout:
-    () =>
-      $(ActionTypes.logout, null),
-};
+  params?: any;
+  history?: any;
+}
 
-export default AuthActions;
+class User extends Classs<Props>
+{
+  cancelSubscription = null;
+  
+  constructor(props)
+  {
+    super(props);
+    
+    this.state = {
+      istate: Store.getState()
+    };
+    
+    this.cancelSubscription = 
+      Store.subscribe(() => this.setState({
+        istate: Store.getState()
+      }))
+  }
+  
+  componentWillMount()
+  {
+    // Actions.fetch();
+  }
+  
+  componentWillUnmount()
+  {
+    this.cancelSubscription && this.cancelSubscription();
+  }
+  
+  render()
+  {
+    const state = this.state.istate;
+
+    return (
+      <div className='account'>
+        <div className='account-wrapper'>
+          <div className='account-title'>
+            <HomeIcon />
+            User!
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default User;

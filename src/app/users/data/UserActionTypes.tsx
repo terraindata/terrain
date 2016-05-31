@@ -43,19 +43,21 @@ THE SOFTWARE.
 */
 
 var _ = require('underscore');
-import ActionTypes from './AuthActionTypes.tsx';
-import Store from './AuthStore.tsx';
+var Immutable = require('immutable');
+import Util from './../../util/Util.tsx';
 
-var $ = (type: string, payload: any) => Store.dispatch({type, payload})
+var create = '';
+var change = '';
 
-var AuthActions =
+var UserActionTypes = 
 {
-  login:
-    (token: string, username: string) =>
-      $(ActionTypes.login, { token, username }),
-  logout:
-    () =>
-      $(ActionTypes.logout, null),
+  create,
+  change, 
+  
+  fetch: '',
+  setUsers: '',
 };
 
-export default AuthActions;
+Util.setValuesToKeys(UserActionTypes, '');
+
+export default UserActionTypes;

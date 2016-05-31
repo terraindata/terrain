@@ -49,16 +49,20 @@ var Immutable = require('immutable');
 let AuthReducer = {};
 
 AuthReducer[ActionTypes.login] =
-  (state, action) => {
-    let t:string = action.payload.token;
-    localStorage['authenticationToken'] = t; 
-    return state.set("authenticationToken", t);
+  (state, action) =>
+  {
+    let { token, username } = action.payload;
+    localStorage['authenticationToken'] = token;
+    localStorage['username'] = username;
+    return state.set("authenticationToken", token).set('username', username);
   }
 
 AuthReducer[ActionTypes.logout] =
-  (state, action) => {
+  (state, action) =>
+  {
     delete localStorage['authenticationToken'];
-    return state.set("authenticationToken", null);
+    delete localStorage['username'];
+    return state.set("authenticationToken", null).set('username', null);
   }
 
 export default AuthReducer;

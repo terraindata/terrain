@@ -59,6 +59,11 @@ window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.
 import LayoutManager from "./builder/components/layout/LayoutManager.tsx";
 import Builder from "./builder/components/Builder.tsx";
 import Browser from './browser/components/Browser.tsx';
+import Account from './users/components/Account.tsx';
+import Settings from './users/components/Settings.tsx';
+import Notifications from './users/components/Notifications.tsx';
+import Profile from './users/components/Profile.tsx';
+import Team from './users/components/Team.tsx';
 import Sidebar from "./common/components/Sidebar.tsx";
 import AccountDropdown from "./common/components/AccountDropdown.tsx";
 import Login from "./auth/components/Login.tsx";
@@ -84,8 +89,8 @@ var links =
 [
   {
     icon: <HomeIcon />,
-    text: 'Home',
-    route: '/home',
+    text: 'Account',
+    route: '/account',
   },
   {
     icon: <ReportingIcon />,
@@ -121,8 +126,9 @@ var App = React.createClass({
     
     // Retrieve logged-in state from persistent storage.
     let token = localStorage['authenticationToken'];
+    let username = localStorage['username'];
     if (token !== undefined && token !== null) {
-      AuthActions.login(token);
+      AuthActions.login(token, username);
     }
   },
   
@@ -226,7 +232,14 @@ var router = (
       <Route path="/browser/:groupId/:algorithmId" component={Browser} />
       <Route path="/browser/:groupId/:algorithmId/:variantId" component={Browser} />
       
-      <Route path="/home" component={Placeholder} />
+      <Route path="/account" component={Account}>
+        <IndexRoute component={Profile} />
+        <Route path="/account/profile" component={Profile} />
+        <Route path="/account/settings" component={Settings} />
+        <Route path="/account/notifications" component={Notifications} />
+        <Route path="/account/team" component={Team} />
+      </Route>
+      
       <Route path="/reporting" component={Placeholder} />
       <Route path="/tql" component={Placeholder} />
     </Route>
