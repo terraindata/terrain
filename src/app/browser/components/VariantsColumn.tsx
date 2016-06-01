@@ -48,7 +48,7 @@ import Classs from './../../common/components/Classs.tsx';
 import BrowserColumn from './BrowserColumn.tsx';
 import BrowserItem from './BrowserItem.tsx';
 import BrowserItemCategory from './BrowserItemCategory.tsx';
-import BrowserCreateItem from './BrowserCreateItem.tsx';
+import CreateItem from '../../common/components/CreateItem.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
@@ -246,7 +246,7 @@ class VariantsColumn extends Classs<Props>
         }
         {
           status === BrowserTypes.EVariantStatus.Design
-          ? <BrowserCreateItem
+          ? <CreateItem
               name='variant'
               onCreate={this.handleCreate}
             />

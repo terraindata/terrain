@@ -168,7 +168,7 @@ var App = React.createClass({
     var selectedIndex = links.findIndex(link => this.props.location.pathname.indexOf(link.route) === 0 );
     if(selectedIndex === -1)
     {
-      selectedIndex = 3;
+      selectedIndex = 0;
     }
     
     var layout =
@@ -242,7 +242,7 @@ var router = (
         <Route path="/account/team" component={Team} />
       </Route>
       
-      <Route path="/user/:username" component={Profile} />
+      <Route path="/users/:username" component={Profile} />
       
       <Route path="/reporting" component={Placeholder} />
       <Route path="/tql" component={Placeholder} />

@@ -61,6 +61,8 @@ interface Props
   large?: boolean;
   small?: boolean;
   smallest?: boolean;
+  square?: boolean;
+  hideAdmin?: boolean;
 }
 
 class UserThumbnail extends Classs<Props>
@@ -125,6 +127,8 @@ class UserThumbnail extends Classs<Props>
           'user-thumbnail-large': this.props.large,
           'user-thumbnail-small': this.props.small,
           'user-thumbnail-smallest': this.props.smallest,
+          'user-thumbnail-square': this.props.square,
+          'user-thumbnail-admin': user && user.isAdmin && !this.props.hideAdmin,
         })}
         data-tip={tip}
       >

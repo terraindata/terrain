@@ -52,6 +52,7 @@ import InfoArea from './../../common/components/InfoArea.tsx';
 import UserTypes from './../UserTypes.tsx';
 import AuthStore from './../../auth/data/AuthStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
+import * as classNames from 'classnames';
 
 interface Props
 {
@@ -68,9 +69,13 @@ class Profile extends Classs<Props>
   state: {
     user: UserTypes.User,
     loading: boolean,
+    isLoggedInUser: boolean,
+    routeIsDirect: boolean,
   } = {
     user: null,
     loading: false,
+    isLoggedInUser: false,
+    routeIsDirect: false,
   };
   
   infoKeys = [
@@ -96,9 +101,23 @@ class Profile extends Classs<Props>
   {
     let userState:UserTypes.UserState = UserStore.getState();
     let authState = AuthStore.getState();
+    var username = authState.get('username');
+    let routeUsername = this.props.params.username;
+    var isLoggedInUser = true;
+    var routeIsDirect = false;
+    
+    if(routeUsername && routeUsername.length)
+    {
+      isLoggedInUser = routeUsername === username;
+      username = routeUsername;
+      routeIsDirect = true;
+    }
+    
     this.setState({
-      user: userState.getIn(['users', authState.get('username')]),
+      user: userState.getIn(['users', username]),
       loading: userState.get('loading'),
+      isLoggedInUser,
+      routeIsDirect,
     })
   }
   
@@ -141,7 +160,10 @@ class Profile extends Classs<Props>
     }
     
     return (
-      <div className='profile'>
+      <div className={classNames({
+        'profile': true,
+        'profile-wrapper': this.state.routeIsDirect,
+      })}>
         <div
           className='profile-pic'
         >
@@ -154,16 +176,23 @@ class Profile extends Classs<Props>
         <div className='profile-name'>
           { this.state.user.name() }
         </div>
-        <div className='profile-edit-row'>
-          <Link to='/account/profile/edit' className='button'>
-            Edit
-          </Link>
-        </div>
+        {
+          this.state.isLoggedInUser ? 
+            <div className='profile-edit-row'>
+              <Link to='/account/profile/edit' className='button'>
+                Edit
+              </Link>
+            </div>
+          : null
+        }
         <div className='profile-info'>
           { 
             this.infoKeys.map(this.renderInfoItem)
           }
         </div>
+        <Link to='/account/team' className='profile-team-button'>
+          Team Directory
+        </Link>
       </div>
     );
   }

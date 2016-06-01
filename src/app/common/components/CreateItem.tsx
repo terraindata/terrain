@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./BrowserCreateItem.less');
+require('./CreateItem.less');
 import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
 import Menu from './../../common/components/Menu.tsx';
@@ -54,16 +54,16 @@ interface Props
   onCreate: () => void;
 }
 
-class BrowserCreateItem extends Classs<Props>
+class CreateItem extends Classs<Props>
 {
   render()
   {
     return (
-      <div className='browser-create-item' onClick={this.props.onCreate} data-tip={'Create ' + this.props.name}>
+      <div className='create-item' onClick={this.props.onCreate} data-tip={'Create ' + this.props.name}>
         <AddIcon />        
       </div>
     );
   }
 }
 
-export default BrowserCreateItem;
+export default CreateItem;

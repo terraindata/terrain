@@ -110,6 +110,13 @@ var Ajax = {
     }), onSave, onError);
   },
   
+  createUser(username: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
+  {
+    return Ajax._post(`/user/${username}`, JSON.stringify({
+      password,
+    }), onSave, onError);
+  },
+  
   getItems( 
     onLoad: (groups: {[id: string]: any}, algorithms: {[id: string]: any}, variants: {[id: string]: any}, groupsOrder: ID[]) => void, 
     onError?: (ev:Event) => void

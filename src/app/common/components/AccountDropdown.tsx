@@ -146,6 +146,7 @@ class AccountDropdown extends Classs<Props>
         <UserThumbnail
           showName={true}
           username={this.state.username}
+          hideAdmin={true}
         />
         <ArrowIcon className="account-arrow-icon" />
       </div>
