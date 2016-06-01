@@ -43,12 +43,12 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import { Link } from 'react-router';
 import Classs from './../../common/components/Classs.tsx';
 import UserStore from './../data/UserStore.tsx';
 import Actions from './../data/UserActions.tsx';
 import BrowserTypes from './../UserTypes.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
+import { Link } from 'react-router';
 import UserTypes from './../UserTypes.tsx';
 import AuthStore from './../../auth/data/AuthStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
@@ -68,23 +68,57 @@ class Profile extends Classs<Props>
   state: {
     user: UserTypes.User,
     loading: boolean,
+    saving: boolean,
+    savingReq: any,
   } = {
     user: null,
     loading: false,
+    saving: false,
+    savingReq: null,
   };
   
   infoKeys = [
-    'username',
-    'whatIDo',
-    'timezone',
-    'phone',
-    'email',
-    'skype',
+    {
+      key: 'firstName',
+      label: 'First Name',
+      subText: '',
+    },
+    {
+      key: 'lastName',
+      label: 'Last Name',
+      subText: '',
+    },
+    {
+      key: 'whatIDo',
+      label: 'What I Do',
+      subText: '',
+    },
+    {
+      key: 'timezone',
+      label: 'Timezone',
+      subText: 'Let people know your role',
+    },
+    {
+      key: 'phone',
+      label: 'Phone',
+      subText: 'This will be displayed on your internal profile',
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      subText: 'This will be displayed on your internal profile',
+    },
+    {
+      key: 'skype',
+      label: 'Skype',
+      subText: 'This will be displayed on your internal profile',
+    },
   ];
   
   constructor(props:Props)
   {
     super(props);
+    
     
     this.userUnsubscribe = 
       UserStore.subscribe(() => this.updateUser(this.props));
@@ -112,20 +146,90 @@ class Profile extends Classs<Props>
   {
     this.userUnsubscribe && this.userUnsubscribe();
     this.authUnsubscribe && this.authUnsubscribe();
+    this.state.savingReq && this.state.savingReq.abort();
   }
   
-  renderInfoItem(key:string)
+  handleSave()
+  {
+    var newUser = this.state.user
+      .set('imgSrc', this.refs['profilePicImg']['src']);
+    this.infoKeys.map(infoKey =>
+    {
+      newUser = newUser.set(infoKey.key, this.refs[infoKey.key]['value']);
+    });
+    
+    Actions.change(newUser as UserTypes.User);
+    
+    this.setState({
+      saving: true,
+      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
+    });
+      
+  }
+  
+  onSave()
+  {
+    this.setState({
+      saving: false,
+      savingReq: null,
+    });
+    this.props.history.pushState({}, '/account/profile');
+  }
+  
+  onSaveError(response)
+  {
+    alert("Error saving: " + JSON.stringify(response));
+    this.setState({
+      saving: false,
+      savingReq: null,
+    });
+  }
+  
+  renderInfoItem(infoKey:{key: string, label: string, subText: string})
   {
     return (
-      <div className='profile-info-item' key={key}>
+      <div className='profile-info-item-edit' key={infoKey.key}>
         <div className='profile-info-item-name'>
-          { key.replace(/([A-Z])/g, (v) => " " + v) }
+          { infoKey.label }
         </div>
         <div className='profile-info-item-value'>
-          { this.state.user[key] }
+          <input
+            type='text'
+            defaultValue={this.state.user[infoKey.key]}
+            ref={infoKey.key}
+          />
+        </div>
+        <div className='profile-info-item-subtext'>
+          { infoKey.subText }
         </div>
       </div>
     );
+  }
+  
+  handleProfilePicClick(event)
+  {
+    this.refs['imageInput']['click']();
+  }
+  
+  handleProfilePicChange(event)
+  {
+    var reader  = new FileReader();
+
+    reader.addEventListener("load", () => {
+      this.refs['profilePicImg']['src'] = reader.result;
+    }, false);
+    
+    let file = event.target.files[0];
+    
+    if(file) {
+      if(file.size > 3000000)
+      {
+        alert('Maximum allowed file size is 3MB');
+        return;
+      }
+      
+      reader.readAsDataURL(file);
+    }
   }
   
   render()
@@ -141,28 +245,40 @@ class Profile extends Classs<Props>
     }
     
     return (
-      <div className='profile'>
-        <div
-          className='profile-pic'
-        >
-          <img
-            className='profile-pic-image'
-            src={this.state.user.imgSrc}
-            ref='profilePicImg'
-          />
-        </div>
-        <div className='profile-name'>
-          { this.state.user.name() }
-        </div>
-        <div className='profile-edit-row'>
-          <Link to='/account/profile/edit' className='button'>
-            Edit
-          </Link>
-        </div>
-        <div className='profile-info'>
-          { 
-            this.infoKeys.map(this.renderInfoItem)
+      <div className='profile profile-edit'>
+        <div className='profile-save-row'>
+          {
+            this.state.saving ?
+              <div className='profile-saving'>Saving...</div>
+            :
+              <div className='button' onClick={this.handleSave}>
+                Save
+              </div>
           }
+        </div>
+        <div className='profile-edit-container'>
+          <div className='profile-info'>
+            { 
+              this.infoKeys.map(this.renderInfoItem)
+            }
+          </div>
+          <div
+            className='profile-pic'
+            onClick={this.handleProfilePicClick}
+          >
+            <img
+              className='profile-pic-image'
+              src={this.state.user.imgSrc}
+              ref='profilePicImg'
+            />
+            <input
+              ref='imageInput'
+              type='file'
+              className='profile-pic-upload'
+              onChange={this.handleProfilePicChange}
+              id='profile-image-input'
+            />
+          </div>
         </div>
       </div>
     );

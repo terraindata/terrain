@@ -75,8 +75,16 @@
     height: 350px;
     display: inline-block;
     border-radius: 6px;
-    background-size: cover;
-    background-position: center center;
+    overflow: hidden;
+    
+    .profile-pic-image {
+      display: block;
+      width: 100%;
+    }
+  }
+  
+  .profile-pic-upload {
+    display: none;
   }
   
   .profile-name {
@@ -124,9 +132,49 @@
         width: 50%;
       }
       
+    }
+    
+    .profile-info-item-edit {
+      .profile-info-item-name {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      
       input {
         border: 1px solid #ccc;
       }
+      
+      .profile-info-item-subtext {
+        height: 15px;
+        margin-top: 3px;
+        margin-bottom: 10px;
+        font-size: 12px;
+      }
     }
+  }
+}
+
+.profile-edit {
+  max-width: 850px;  
+  
+  .profile-save-row {
+    position: relative;
+    top: -12px;
+    
+    .button {
+      font-size: 18px;
+      background: @sea-green;
+      width: 120px;
+      height: 24px;
+    }
+  }
+}
+
+.profile-edit-container {
+  display: flex;
+  
+  .profile-info {
+    border-top: 0px solid;
+    flex-grow: 1;
   }
 }

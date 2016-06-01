@@ -63,6 +63,7 @@ import Account from './users/components/Account.tsx';
 import Settings from './users/components/Settings.tsx';
 import Notifications from './users/components/Notifications.tsx';
 import Profile from './users/components/Profile.tsx';
+import EditProfile from './users/components/EditProfile.tsx';
 import Team from './users/components/Team.tsx';
 import Sidebar from "./common/components/Sidebar.tsx";
 import AccountDropdown from "./common/components/AccountDropdown.tsx";
@@ -235,10 +236,13 @@ var router = (
       <Route path="/account" component={Account}>
         <IndexRoute component={Profile} />
         <Route path="/account/profile" component={Profile} />
+        <Route path="/account/profile/edit" component={EditProfile} />
         <Route path="/account/settings" component={Settings} />
         <Route path="/account/notifications" component={Notifications} />
         <Route path="/account/team" component={Team} />
       </Route>
+      
+      <Route path="/user/:username" component={Profile} />
       
       <Route path="/reporting" component={Placeholder} />
       <Route path="/tql" component={Placeholder} />

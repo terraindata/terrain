@@ -101,13 +101,13 @@ var Ajax = {
       });
   },
   
-  saveUser(user: UserTypes.User)
+  saveUser(user: UserTypes.User, onSave: (response: any) => void, onError: (response: any) => void)
   {
     var data = user.toJS();
     user.excludeFields.map(field => delete data[field]);
     return Ajax._post(`/user/${user.username}`, JSON.stringify({
       data: JSON.stringify(data),
-    }), () => {});
+    }), onSave, onError);
   },
   
   getItems( 

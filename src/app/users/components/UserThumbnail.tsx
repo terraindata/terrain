@@ -106,8 +106,8 @@ class UserThumbnail extends Classs<Props>
   
   render()
   {
-    let name: string = this.state.user ? this.state.user.name : 'Loading...';
-    let url: string = this.state.user ? this.state.user.imgUrl : 'http://lukeknepper.com/terrain/assets/img/Terrain_Icon_White.png';
+    let name: string = this.state.user ? this.state.user.name() : 'Loading...';
+    let url: string = this.state.user ? this.state.user.imgSrc : 'http://lukeknepper.com/terrain/assets/img/Terrain_Icon_White.png';
     let style = 
     {
       backgroundImage: `url(${url})`,

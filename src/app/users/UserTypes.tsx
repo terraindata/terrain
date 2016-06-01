@@ -48,35 +48,49 @@ import * as Immutable from 'immutable';
 export module UserTypes
 {
   let _User = Immutable.Record({
-    name: "",
+    // db-level fields
     username: "",
+    isAdmin: false,
+    isBuilder: false,
+    
+    // metadata fields
+    firstName: "",
+    lastName: "",
+    whatIDo: "",
     email: "",
     skype: "",
     timezone: "",
     phone: "",
-    imgUrl: "",
+    imgSrc: "",
     
-    isAdmin: false,
-    isBuilder: false,
-    
+    // exlcude the db-level fields from the meta-data save
     excludeFields: ["isAdmin", "isBuilder", "username"],
     
     // groupRoles: Immutable.Map({}),
   });
   export class User extends _User
   {
-    name: string;
     username: string;
+    
+    // data fields
+    firstName: string;
+    lastName: string;
+    whatIDo: string;
     email: string;
     skype: string;
     timezone: string;
     phone: string;
-    imgUrl: string;
+    imgSrc: string;
     
     isAdmin: boolean;
     isBuilder: boolean;
     
     excludeFields: string[];
+    
+    name(): string
+    {
+      return `${this.firstName} ${this.lastName}`;
+    }
     
     // groupRoles: {[groupId: string]: RoleTypes.GroupUserRole;}
   }
