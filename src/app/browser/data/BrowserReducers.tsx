@@ -119,7 +119,13 @@ BrowserReducers[ActionTypes.groups.duplicate] =
 
 BrowserReducers[ActionTypes.algorithms.create] =
   (state, action) =>
-    addAlgorithm(state, BrowserTypes.newAlgorithm(action.payload.groupId, Util.getId()));
+  {
+    let algId = Util.getId();
+    return addVariant(
+      addAlgorithm(state, BrowserTypes.newAlgorithm(action.payload.groupId, algId)),
+      BrowserTypes.newVariant(algId, action.payload.groupId)
+    );
+  }
 
 BrowserReducers[ActionTypes.algorithms.change] =
   (state, action) =>
