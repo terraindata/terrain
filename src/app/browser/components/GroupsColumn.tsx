@@ -148,7 +148,7 @@ class GroupsColumn extends Classs<Props>
         item={group}
       >
         {
-          group.userIds.map(userId => <UserThumbnail userId={userId} key={userId} />)
+          group.usernames.map(username => <UserThumbnail username={username} key={username} />)
         }
       </BrowserItem>
     );

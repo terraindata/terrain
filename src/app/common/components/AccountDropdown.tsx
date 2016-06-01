@@ -47,6 +47,10 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import Actions from "../../builder/data/BuilderActions.tsx";
 import Util from '../../util/Util.tsx';
+import Classs from '../../common/components/Classs.tsx';
+import UserThumbnail from '../../users/components/UserThumbnail.tsx';
+import AuthStore from '../../auth/data/AuthStore.tsx';
+import UserTypes from '../../users/UserTypes.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
@@ -54,16 +58,44 @@ interface Props {
   onLogout: () => void;
 }
 
-class AccountDropdown extends React.Component<Props, any>
+class AccountDropdown extends Classs<Props>
 {
+  state: {
+    open: boolean,
+    username: string,
+  } = {
+    open: false,
+    username: null,
+  };
+  
+  unsubscribe = null;
+  
   constructor(props:Props)
   {
     super(props);
-    this.state = {
-      open: false,
-    };
-    
-    Util.bind(this, 'toggleOpen', 'close');
+  }
+  
+  componentWillMount()
+  {
+    this.unsubscribe = AuthStore.subscribe(this.updateUser)
+    this.updateUser();
+  }
+  
+  componentWillUnmount()
+  {
+    $("body").unbind('click', this.close); 
+    this.unsubscribe && this.unsubscribe();
+  }
+  
+  updateUser()
+  {
+    let state = AuthStore.getState();
+    if(state)
+    {
+      this.setState({
+        username: state.get('username'),
+      })
+    }
   }
   
   close(event)
@@ -74,25 +106,21 @@ class AccountDropdown extends React.Component<Props, any>
         open: false,
       });
     }
+    event.stopPropagation();
     
     $("body").unbind('click', this.close);
   }
   
-  componentWillUnmount()
+  toggleOpen(event)
   {
-    $("body").unbind('click', this.close); 
-  }
-  
-  toggleOpen()
-  {
+    this.setState({
+      open: !this.state.open,
+    });
+    
     if(!this.state.open)
     {
       $("body").click(this.close);
     }
-    
-    this.setState({
-      open: !this.state.open,
-    });
   }
   
   renderDropdown()
@@ -115,8 +143,10 @@ class AccountDropdown extends React.Component<Props, any>
   {
     return (
       <div className="account-dropdown-top-bar" onClick={this.toggleOpen} ref='accountDropdownButton'>
-        <div className="account-photo"></div>
-        <div className="account-name">Paul Hewson</div>
+        <UserThumbnail
+          showName={true}
+          username={this.state.username}
+        />
         <ArrowIcon className="account-arrow-icon" />
       </div>
     );

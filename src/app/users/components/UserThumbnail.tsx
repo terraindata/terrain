@@ -55,7 +55,12 @@ type User = UserTypes.User;
 
 interface Props
 {
-  userId: ID;
+  username: string;
+  showName?: boolean;
+  largest?: boolean;
+  large?: boolean;
+  small?: boolean;
+  smallest?: boolean;
 }
 
 class UserThumbnail extends Classs<Props>
@@ -84,7 +89,7 @@ class UserThumbnail extends Classs<Props>
   
   componentWillReceiveProps(nextProps)
   {
-    if(nextProps.userId !== this.props.userId)
+    if(nextProps.username !== this.props.username)
     {
       this.fetchUser();
     }  
@@ -97,7 +102,7 @@ class UserThumbnail extends Classs<Props>
   
   fetchUser()
   {
-    let user: User = UserStore.getState().getIn(['users', this.props.userId]) as User;
+    let user: User = UserStore.getState().getIn(['users', this.props.username]) as User;
     
     this.setState({
       user,  
@@ -106,20 +111,27 @@ class UserThumbnail extends Classs<Props>
   
   render()
   {
-    let name: string = this.state.user ? this.state.user.name() : 'Loading...';
-    let url: string = this.state.user ? this.state.user.imgSrc : 'http://lukeknepper.com/terrain/assets/img/Terrain_Icon_White.png';
-    let style = 
-    {
-      backgroundImage: `url(${url})`,
-      backgroundColor: ColorManager.colorForKey(this.props.userId),
-    };
+    let { user } = this.state;
+    let name: string = user ? user.name() : 'Loading...';
+    let src: string = user ? user.imgSrc : 'http://lukeknepper.com/terrain/assets/img/Terrain_Icon_White.png';
+    let tip: string = this.props.showName ? null : name;
+    let text: string = this.props.showName ? name : null;
     
     return (
       <div
-        className='user-thumbnail'
-        data-tip={name}
-        style={style}
+        className={classNames({
+          'user-thumbnail': true,
+          'user-thumbnail-largest': this.props.largest,
+          'user-thumbnail-large': this.props.large,
+          'user-thumbnail-small': this.props.small,
+          'user-thumbnail-smallest': this.props.smallest,
+        })}
+        data-tip={tip}
       >
+        <div className='user-thumbnail-image-wrapper'>
+          <img src={src} className='user-thumbnail-image' />
+        </div>
+        { text ? <div className='user-thumbnail-text'>{text}</div> : null }
       </div>
     );
   }

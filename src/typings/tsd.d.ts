@@ -64,11 +64,6 @@ declare interface IName
 {
   name: string;
 }
-declare interface ILastEdited
-{
-  lastUserId: ID;
-  lastEdited: string;
-}
 
 // SERVER_URL is a "compile time" substition done by Webpack.
 declare var SERVER_URL: string;

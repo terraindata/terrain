@@ -202,7 +202,7 @@ class AlgorithmsColumn extends Classs<Props>
         item={algorithm}
       >
         <div className='flex-container'>
-          <UserThumbnail userId={algorithm.lastUserId} />
+          <UserThumbnail username={algorithm.lastUsername} />
           
           <div className='flex-grow'>
             <div className='browser-item-line'>

@@ -191,7 +191,7 @@ class VariantsColumn extends Classs<Props>
         onDoubleClick={this.handleDoubleClick}
       >
         <div className='flex-container'>
-          <UserThumbnail userId={vriant.lastUserId} />
+          <UserThumbnail username={vriant.lastUsername} />
           
           <div className='flex-grow'>
             <div className='browser-item-line'>

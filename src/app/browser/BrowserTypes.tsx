@@ -62,7 +62,7 @@ export module BrowserTypes
     id: "",
     name: "",
     lastEdited: "",
-    lastUserId: "",
+    lastUsername: "",
     algorithmId: "",
     groupId: "",
     status: EVariantStatus.Design,
@@ -74,12 +74,12 @@ export module BrowserTypes
     type: "variant",
     associations: null,
   });
-  export class Variant extends _Variant implements IId, IName, ILastEdited
+  export class Variant extends _Variant
   {
     id: ID;
     name: string;
     lastEdited: string;
-    lastUserId: ID;
+    lastUsername: string;
     status: EVariantStatus;
     algorithmId: ID;
     groupId: Group;
@@ -88,9 +88,9 @@ export module BrowserTypes
     inputs: any;
   }
   export function newVariant(algorithmId: string, groupId: string, id?: ID, name?: string, lastEdited?: string,
-    lastUserId?: string, status?: EVariantStatus):Variant
+    lastUsername?: string, status?: EVariantStatus):Variant
   {
-    return new Variant(Util.extendId({ algorithmId, groupId, id, name, lastEdited, lastUserId, status }));
+    return new Variant(Util.extendId({ algorithmId, groupId, id, name, lastEdited, lastUsername, status }));
   }
   
   
@@ -104,7 +104,7 @@ export module BrowserTypes
     id: "",
     name: "",
     lastEdited: "",
-    lastUserId: "",
+    lastUsername: "",
     groupId: "",
     variants: Immutable.Map({}),
     variantsOrder: Immutable.List([]),
@@ -114,21 +114,21 @@ export module BrowserTypes
     type: "algorithm",
     associations: "variants",
   });
-  export class Algorithm extends _Algorithm implements IId, IName, ILastEdited
+  export class Algorithm extends _Algorithm
   {
     id: ID;
     name: string;
     lastEdited: string;
-    lastUserId: ID;
+    lastUsername: string;
     groupId: ID;
     variants: Immutable.Map<ID, Variant>;
     variantsOrder: Immutable.List<ID>;
     status: EAlgorithmStatus;
   }
-  export function newAlgorithm(groupId: string, id?: ID, name?: string, lastEdited?: string, lastUserId?: string,
+  export function newAlgorithm(groupId: string, id?: ID, name?: string, lastEdited?: string, lastUsername?: string,
     variants?: Immutable.Map<ID, Variant>, variantsOrder?: Immutable.List<ID>, status?: EAlgorithmStatus):Algorithm
   {
-    return new Algorithm(Util.extendId({ groupId, id, name, lastEdited, lastUserId, variants, variantsOrder, status }));
+    return new Algorithm(Util.extendId({ groupId, id, name, lastEdited, lastUsername, variants, variantsOrder, status }));
   }
 
 
@@ -142,8 +142,8 @@ export module BrowserTypes
     id: "",
     name: "",
     lastEdited: "",
-    lastUserId: "",
-    userIds: Immutable.List([]),
+    lastUsername: "",
+    usernames: Immutable.List([]),
     algorithms: Immutable.Map({}),
     algorithmsOrder: Immutable.List([]),
     status: EGroupStatus.Live,
@@ -152,21 +152,21 @@ export module BrowserTypes
     type: "group",
     associations: "algorithms",
   });
-  export class Group extends _Group implements IId, IName
+  export class Group extends _Group
   {
     id: ID;
     name: string;
     lastEdited: string;
-    lastUserId: ID;
-    userIds: ID[];
+    lastUsername: string;
+    usernames: string[];
     algorithms: Immutable.Map<ID, Algorithm>;
     algorithmsOrder: Immutable.List<ID>;
     status: EGroupStatus;
   }
-  export function newGroup(id?: ID, name?: string, lastEdited?: string, lastUserId?: string, userIds?: Immutable.List<ID>,
+  export function newGroup(id?: ID, name?: string, lastEdited?: string, lastUsername?: string, usernames?: Immutable.List<ID>,
     algorithms?: Immutable.Map<ID, Algorithm>, algorithmsOrder?: Immutable.List<ID>, status?: EGroupStatus):Group
   {
-    return new Group(Util.extendId({ id, name, lastEdited, lastUserId, userIds, algorithms, algorithmsOrder, status }));
+    return new Group(Util.extendId({ id, name, lastEdited, lastUsername, usernames, algorithms, algorithmsOrder, status }));
   }
 }
 
