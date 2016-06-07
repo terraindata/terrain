@@ -151,6 +151,7 @@ class BrowserInfoColumn extends Classs<Props>
       groupRoles={this.state.groupRoles}
       me={this.state.me}
       groupId={this.props.group.id}
+      key={user.username}
     />;
   }
   
@@ -206,13 +207,9 @@ class BrowserInfoColumn extends Classs<Props>
     
     return (
       <div className='browser-info-users'>
-        {
-          [
-            this.renderUser(this.state.me),
-            this.renderGroupRoles(),
-            this.renderRemainingUsers(),
-          ]
-        }
+        { this.renderUser(this.state.me) }
+        { this.renderGroupRoles() }
+        { this.renderRemainingUsers() }
       </div>
     );
   }
@@ -222,7 +219,7 @@ class BrowserInfoColumn extends Classs<Props>
     let item: BrowserTypes.Variant | BrowserTypes.Algorithm | BrowserTypes.Group = 
       this.props.variant || this.props.algorithm || this.props.group;
     
-    switch(item.type)
+    switch(item && item.type)
     {
       case 'group':
         var groupId: any = item.id;
@@ -262,13 +259,9 @@ class BrowserInfoColumn extends Classs<Props>
               <div className='browser-info-name'>
                 { item.name }
               </div>
-              {
-                [
-                  this.renderVariant(),
-                  this.renderAlgorithm(),
-                  this.renderGroup(),
-                ]
-              }
+              { this.renderVariant() }
+              { this.renderAlgorithm() }
+              { this.renderGroup() }
             </div>
           :
             <InfoArea

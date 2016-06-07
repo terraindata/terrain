@@ -269,9 +269,10 @@ class VariantsColumn extends Classs<Props>
               this.props.variants.size ?
               (
                 <div>
-                  {
-                    _.map(BrowserTypes.EVariantStatus, this.renderVariantStatus)
-                  }
+                  { this.renderVariantStatus(BrowserTypes.EVariantStatus.Live) }
+                  { this.renderVariantStatus(BrowserTypes.EVariantStatus.Approve) }
+                  { this.renderVariantStatus(BrowserTypes.EVariantStatus.Build) }
+                  { this.renderVariantStatus(BrowserTypes.EVariantStatus.Archive) }
                 </div>
               )
               :

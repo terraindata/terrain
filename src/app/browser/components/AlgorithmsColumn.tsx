@@ -57,7 +57,7 @@ import Scoreline from './../../common/components/Scoreline.tsx';
 
 let live = '#48b14b';
 let approve = '#bf5bff';
-let design = '#00a7f7';
+let build = '#00a7f7';
 let archive = '#ff735b';
 
 var AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
@@ -165,7 +165,11 @@ class AlgorithmsColumn extends Classs<Props>
     var scores = [
       {
         score: 0,
-        color: live, 
+        color: archive,
+      },
+      {
+        score: 0,
+        color: build,
       },
       {
         score: 0,
@@ -173,12 +177,8 @@ class AlgorithmsColumn extends Classs<Props>
       },
       {
         score: 0,
-        color: design,
+        color: live, 
       },
-      {
-        score: 0,
-        color: archive,
-      }
     ];
     algorithm.variants.map(v => scores[v.status].score ++);
     
