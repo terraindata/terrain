@@ -66,7 +66,7 @@ let removeGroup = (state, group) =>
 let addItem = (state, item, parentKeyPath: (string | ID)[], type: string, index?: number) => {
   state = state.setIn(parentKeyPath.concat([type + 's', item.id]), item)
     .updateIn(parentKeyPath.concat([type + 'sOrder']),
-      order => order.splice(index === undefined ? order.size : index, 0, item.id));
+      order => {console.log(order, index, item.id, order.splice(index === undefined ? order.size : index, 0, item.id)); return order.splice(index === undefined ? order.size : index, 0, item.id)});
   return state;
 }
 
@@ -135,7 +135,12 @@ BrowserReducers[ActionTypes.algorithms.change] =
 BrowserReducers[ActionTypes.algorithms.move] =
   (state, action) =>
     addAlgorithm(removeAlgorithm(state, action.payload.algorithm),
-      action.payload.algorithm.set('groupId', action.payload.groupId),
+      action.payload.algorithm
+        .set('groupId', action.payload.groupId)
+        .update('variants', variants => variants.map(
+          v => v.set('groupId', action.payload.groupId)
+        ))
+      ,
       action.payload.index);
 
 let duplicateAlgorithm = (algorithm, id, groupId) =>

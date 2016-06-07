@@ -143,6 +143,15 @@ var Util = {
 		return Math.floor(Math.random() * (max - min)) + min;
 	},
   
+  asJS(obj:any)
+  {
+    if(obj && typeof obj.toJS === 'function')
+    {
+      return obj.toJS();
+    }
+    return obj;
+  },
+  
   getId(): ID
   {
     // TODO have this fetch a list of IDs from server,

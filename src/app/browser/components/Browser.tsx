@@ -105,17 +105,36 @@ class Browser extends Classs<Props>
     if(groupId)
     {
       var group = state.getIn(['groups', groupId]) as BrowserTypes.Group;
-      var { algorithms, algorithmsOrder } = group;
       
-      if(algorithmId)
+      if(group)
       {
-        var algorithm = algorithms.get(algorithmId);
-        var { variants, variantsOrder } = algorithm;
+        var { algorithms, algorithmsOrder } = group;
         
-        if(variantId)
+        if(algorithmId)
         {
-          var variant = variants.get(variantId);
+          var algorithm = algorithms.get(algorithmId);
+          
+          if(algorithm)
+          {
+            var { variants, variantsOrder } = algorithm;
+            
+            if(variantId)
+            {
+              var variant = variants.get(variantId);
+              
+              if(!variant)
+              {
+                this.props.history.replaceState({}, `/browser/${groupId}/${algorithmId}`);    
+              }
+            }
+          } else {
+            // !algorithm
+            this.props.history.replaceState({}, `/browser/${groupId}`);
+          }
         }
+      } else {
+        // !group
+        this.props.history.replaceState({}, '/browser');
       }
     }
     

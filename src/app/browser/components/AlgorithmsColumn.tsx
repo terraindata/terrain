@@ -140,7 +140,7 @@ class AlgorithmsColumn extends Classs<Props>
   {
     switch (targetType) {
       case "group":
-        // move this one to the new group
+        // duplicate this one to the new group
         if(shiftKey)
         {
           Actions.algorithms.duplicate(this.props.algorithms.get(id), 0, targetItem.id);
@@ -151,7 +151,6 @@ class AlgorithmsColumn extends Classs<Props>
         }
         break;
       case "algorithm":
-        // maybe the code for moving one algorithm to a specific spot in another group goes here?
         break;
       case "variant":
         // no good
@@ -260,6 +259,7 @@ class AlgorithmsColumn extends Classs<Props>
   
   render()
   {
+    console.log(this.props.algorithms);
     return (
       <BrowserColumn
         index={2}

@@ -49,6 +49,7 @@ import Store from './../auth/data/AuthStore.tsx';
 import Actions from './../auth/data/AuthActions.tsx';
 import UserTypes from './../users/UserTypes.tsx';
 import RoleTypes from './../roles/RoleTypes.tsx';
+import Util from './../util/Util.tsx';
 
 var Ajax = {
   _req(method: string, url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void) 
@@ -180,8 +181,12 @@ var Ajax = {
     var obj = {
       data: {},
     };
-    item.get('dbFields').map(field => obj[field] = item.get(field));
-    item.get('dataFields').map(field => obj.data[field] = item.get(field));
+    item.get('dbFields').map(field => 
+      obj[field] = Util.asJS(item.get(field))
+    );
+    item.get('dataFields').map(field => 
+        obj.data[field] = Util.asJS(item.get(field))
+    );
     obj.data = JSON.stringify(obj.data);
     onLoad = onLoad || _.noop;
     return Ajax._req("POST", `/${type}s/${id}`, JSON.stringify(obj), onLoad, onError);

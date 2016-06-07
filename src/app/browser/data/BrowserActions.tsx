@@ -133,9 +133,9 @@ const Actions =
         });
         
         _.map(algorithms, algorithm => {
-          if(!algorithm.variants)
+          if(algorithm.variantsOrder)
           {
-            algorithm.variants = Immutable.Map({});
+            algorithm.variantsOrder = Immutable.List(algorithm.variantsOrder);
           }
           let g = groups[algorithm.groupId];
           if(!g.algorithms)
@@ -147,14 +147,12 @@ const Actions =
         
         var groupMap = {};
         _.map(groups, group => {
-          if(!group.algorithms)
+          if(group.algorithmsOrder)
           {
-            group.algorithms = Immutable.Map({});
+            group.algorithmsOrder = Immutable.List(group.algorithmsOrder);
           }
           groupMap[group.id] = new BrowserTypes.Group(group);
-          console.log(new BrowserTypes.Group(group));
         });
-        console.log(groupMap);
         
         Actions.loadState(Immutable.fromJS({
           groups: Immutable.Map(groupMap),
