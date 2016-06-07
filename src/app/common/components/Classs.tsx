@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
+import Util from '../../util/Util.tsx';
 
 class Classs<T> extends React.Component<T, any>
 {
@@ -59,8 +60,36 @@ class Classs<T> extends React.Component<T, any>
       }
     }
     
-    this._keyPath = this._keyPath.bind(this);
+    let unmountFn = this['componentWillUnmount'];
+    this['componentWillUnmount'] = () =>
+    {
+      this.subscriptions.map(cancelSubscription => cancelSubscription());
+      unmountFn && unmountFn();
+    }
+    
+    Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
   }
+  
+  
+  // subscribes to a Redux store
+  _subscribe(
+    store: {subscribe: (any) => () => void, getState: () => any},
+    updater: (storeState:any) => void
+  )
+  {
+    let update = () => updater(store.getState());
+    this.subscriptions.push(
+      store.subscribe(update)
+    );
+    let mountFn = this['componentWillMount'];
+    this['componentWillMount'] = () =>
+    {
+      update();
+      mountFn && mountFn();
+    }
+  }
+  subscriptions: (() => void)[] = [];
+
   
   // for the construction of keyPaths for Redux actions,
   //  this function accepts arguments from which to 

@@ -85,6 +85,7 @@ var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 
 import AuthActions from "./auth/data/AuthActions.tsx";
 import AuthStore from "./auth/data/AuthStore.tsx";
+import UserActions from "./users/data/UserActions.tsx";
 
 var links = 
 [
@@ -123,7 +124,12 @@ var App = React.createClass({
       this.setState({
         loggedIn: token !== null
       });
+      if(token !== null)
+      {
+        UserActions.fetch();
+      }
     });
+    
     
     // Retrieve logged-in state from persistent storage.
     let token = localStorage['authenticationToken'];

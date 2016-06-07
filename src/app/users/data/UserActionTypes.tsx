@@ -56,6 +56,7 @@ var UserActionTypes =
   
   fetch: '',
   setUsers: '',
+  updateCurrentUser: '',
 };
 
 Util.setValuesToKeys(UserActionTypes, '');

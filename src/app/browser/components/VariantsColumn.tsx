@@ -245,7 +245,7 @@ class VariantsColumn extends Classs<Props>
           : <div className='browser-category-none'>None</div>
         }
         {
-          status === BrowserTypes.EVariantStatus.Design
+          status === BrowserTypes.EVariantStatus.Build
           ? <CreateItem
               name='variant'
               onCreate={this.handleCreate}

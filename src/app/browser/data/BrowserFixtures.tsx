@@ -49,8 +49,8 @@ import { patty, ellen, U2, u3, u4, u5, u6, u7 } from './../../users/data/UserFix
 export const v000 = BrowserTypes.newVariant("a00", "g0", "v000", "Desktop, V 3.0", "4/02/2016 4:44:44pm", "ellen", BrowserTypes.EVariantStatus.Live);
 export const v001 = BrowserTypes.newVariant("a00", "g0", "v001", "Desktop, V 3.1", "4/12/2016 4:44:44pm", "patty", BrowserTypes.EVariantStatus.Live);
 export const v002 = BrowserTypes.newVariant("a00", "g0", "v002", "Desktop, V 3.2", "4/22/2016 4:44:44pm", "ellen", BrowserTypes.EVariantStatus.Approve);
-export const v003 = BrowserTypes.newVariant("a00", "g0", "v003", "Desktop, V 3.3", "4/24/2016 5:25:00pm", "patty", BrowserTypes.EVariantStatus.Design);
-export const v004 = BrowserTypes.newVariant("a00", "g0", "v004", "Desktop, Experimental", "4/02/2016 4:44:44pm", "patty", BrowserTypes.EVariantStatus.Design);
+export const v003 = BrowserTypes.newVariant("a00", "g0", "v003", "Desktop, V 3.3", "4/24/2016 5:25:00pm", "patty", BrowserTypes.EVariantStatus.Build);
+export const v004 = BrowserTypes.newVariant("a00", "g0", "v004", "Desktop, Experimental", "4/02/2016 4:44:44pm", "patty", BrowserTypes.EVariantStatus.Build);
 export const v005 = BrowserTypes.newVariant("a00", "g0", "v005", "Desktop, V 1.0", "1/02/2016 4:44:44pm", "ellen", BrowserTypes.EVariantStatus.Archive);
 export const v006 = BrowserTypes.newVariant("a00", "g0", "v006", "Desktop, V 2.0", "2/02/2016 4:44:44pm", "patty", BrowserTypes.EVariantStatus.Archive);
 export const v007 = BrowserTypes.newVariant("a00", "g0", "v007", "Desktop, V 2.1", "3/02/2016 4:44:44pm", "U2", BrowserTypes.EVariantStatus.Archive);

@@ -51,10 +51,11 @@ export module BrowserTypes
 {
   export enum EVariantStatus
   {
-    Live,
-    Approve,
-    Design,
+    // This order must be consistent with Midway
     Archive,
+    Build,
+    Approve,
+    Live,
   }
 
   let _Variant = Immutable.Record(
@@ -65,14 +66,16 @@ export module BrowserTypes
     lastUsername: "",
     algorithmId: "",
     groupId: "",
-    status: EVariantStatus.Design,
+    status: EVariantStatus.Build,
 
     cards: Immutable.List([]),
     inputs: Immutable.List([]),
     
     // for DB storage
     type: "variant",
-    associations: null,
+    dbFields: ['groupId', 'algorithmId', 'status'],
+    dataFields: ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs'],    
+    statusMap: (s:EVariantStatus) => EVariantStatus[s],
   });
   export class Variant extends _Variant
   {
@@ -86,6 +89,10 @@ export module BrowserTypes
 
     cards: any;
     inputs: any;
+    
+    type: string;
+    dbFields: string[]; // fields saved directly to DB
+    dataFields: string[]; // fields saved in metadata
   }
   export function newVariant(algorithmId: string, groupId: string, id?: ID, name?: string, lastEdited?: string,
     lastUsername?: string, status?: EVariantStatus):Variant
@@ -96,8 +103,9 @@ export module BrowserTypes
   
   export enum EAlgorithmStatus
   {
-    Live,
+    // This order must be consistent with Midway
     Archive,  
+    Live,
   }
   let _Algorithm = Immutable.Record(
   {
@@ -112,7 +120,9 @@ export module BrowserTypes
     
     // for DB storage
     type: "algorithm",
-    associations: "variants",
+    dbFields: ['groupId', 'status'],
+    dataFields: ['name', 'lastEdited', 'lastUsername', 'variantsOrder'],
+    statusMap: (s:EAlgorithmStatus) => EAlgorithmStatus[s],
   });
   export class Algorithm extends _Algorithm
   {
@@ -124,6 +134,10 @@ export module BrowserTypes
     variants: Immutable.Map<ID, Variant>;
     variantsOrder: Immutable.List<ID>;
     status: EAlgorithmStatus;
+    
+    type: string;
+    dbFields: string[]; // fields saved directly to DB
+    dataFields: string[]; // fields saved in metadata
   }
   export function newAlgorithm(groupId: string, id?: ID, name?: string, lastEdited?: string, lastUsername?: string,
     variants?: Immutable.Map<ID, Variant>, variantsOrder?: Immutable.List<ID>, status?: EAlgorithmStatus):Algorithm
@@ -134,8 +148,9 @@ export module BrowserTypes
 
   export enum EGroupStatus
   {
+    // This order must be consistent with Midway
+    Archive,
     Live,
-    Archive,  
   }
   let _Group = Immutable.Record(
   {
@@ -150,7 +165,9 @@ export module BrowserTypes
     
     // for DB storage
     type: "group",
-    associations: "algorithms",
+    dbFields: ['status'],
+    dataFields: ['name', 'lastEdited', 'lastUsername', 'algorithmsOrder'],
+    statusMap: (s:EGroupStatus) => EGroupStatus[s],
   });
   export class Group extends _Group
   {
@@ -162,6 +179,10 @@ export module BrowserTypes
     algorithms: Immutable.Map<ID, Algorithm>;
     algorithmsOrder: Immutable.List<ID>;
     status: EGroupStatus;
+    
+    type: string;
+    dbFields: string[]; // fields saved directly to DB
+    dataFields: string[]; // fields saved in metadata
   }
   export function newGroup(id?: ID, name?: string, lastEdited?: string, lastUsername?: string, usernames?: Immutable.List<ID>,
     algorithms?: Immutable.Map<ID, Algorithm>, algorithmsOrder?: Immutable.List<ID>, status?: EGroupStatus):Group

@@ -65,6 +65,10 @@ const Actions =
   setUsers:
     (users: UserTypes.UserMap) =>
       $(ActionTypes.setUsers, { users }),
+  
+  updateCurrentUser:
+    () =>
+      $(ActionTypes.updateCurrentUser, {}),
 }
 
 export default Actions;

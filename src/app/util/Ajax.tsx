@@ -48,6 +48,7 @@ import * as _ from 'underscore';
 import Store from './../auth/data/AuthStore.tsx';
 import Actions from './../auth/data/AuthActions.tsx';
 import UserTypes from './../users/UserTypes.tsx';
+import RoleTypes from './../roles/RoleTypes.tsx';
 
 var Ajax = {
   _req(method: string, url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void) 
@@ -90,9 +91,21 @@ var Ajax = {
     return Ajax._req("GET", url, data, onLoad, onError);
   },
   
+  saveRole: (role:RoleTypes.Role) =>
+    Ajax._post(
+      `/roles/${role.groupId}/${role.username}/${role.admin ? '1' : '0'}/${role.builder ? '1' : '0'}`,
+      "",
+      _.noop),
+  
+  getRoles: (onLoad: (roles: any[]) => void) =>
+    Ajax._get("/roles/", "", (response: any) => {
+      onLoad(JSON.parse(response));
+    })
+  ,
+  
   getUsers(onLoad: (users: {[id: string]: any}) => void)
   {
-    return Ajax._get("/user/", "", (response: any) =>
+    return Ajax._get("/users/", "", (response: any) =>
       {
         let usersArr = JSON.parse(response);
         var usersObj = {};
@@ -105,14 +118,14 @@ var Ajax = {
   {
     var data = user.toJS();
     user.excludeFields.map(field => delete data[field]);
-    return Ajax._post(`/user/${user.username}`, JSON.stringify({
+    return Ajax._post(`/users/${user.username}`, JSON.stringify({
       data: JSON.stringify(data),
     }), onSave, onError);
   },
   
   createUser(username: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
   {
-    return Ajax._post(`/user/${username}`, JSON.stringify({
+    return Ajax._post(`/users/${username}`, JSON.stringify({
       password,
     }), onSave, onError);
   },
@@ -122,7 +135,7 @@ var Ajax = {
     onError?: (ev:Event) => void
   )
   {
-    return Ajax._get("/algo/", "", (response: any) =>
+    return Ajax._get("/items/", "", (response: any) =>
     {
       let items = JSON.parse(response);
       
@@ -131,21 +144,22 @@ var Ajax = {
         variants: {},
         algorithms: {},
         groups: {},
-        groupsOrder: null,
+        groupsOrder: [],
       };
-      
-      items.map(item =>
-      {
-        let spec = JSON.parse(item.specification);
-        if(mapping[spec.type + 's'])
+      let keys = ['groups', 'algorithms', 'variants'];
+      keys.map(key =>
+        items[key].map(item =>
         {
-          mapping[spec.type + 's'][spec.id] = spec;
-        }
-        if(spec.type === 'groupsOrder')
-        {
-          mapping.groupsOrder = spec.groupsOrder;
-        }
-      })
+          let data = item.data && item.data.length ? item.data : "{}";
+          item = _.extend({}, JSON.parse(item.data), item);
+          delete item.data;
+          mapping[key][item.id] = item;
+          if(key === 'groups')
+          {
+            mapping.groupsOrder.push(item.id);
+          }
+        })
+      )
       
       onLoad(mapping.groups, mapping.algorithms, mapping.variants, mapping.groupsOrder);
     }, onError);
@@ -162,18 +176,15 @@ var Ajax = {
   saveItem(item: Immutable.Map<string, any>, onLoad?: (resp: any) => void, onError?: (ev:Event) => void)
   {
     let id = item.get('id');
-    if(item.get('associations'))
-    {
-      item = item
-        .update
-        (
-          item.get('associations'),
-          assocs => assocs.keySeq()
-        );
-    }
-    let data = JSON.stringify(item.toJS());
+    let type = item.get('type');
+    var obj = {
+      data: {},
+    };
+    item.get('dbFields').map(field => obj[field] = item.get(field));
+    item.get('dataFields').map(field => obj.data[field] = item.get(field));
+    obj.data = JSON.stringify(obj.data);
     onLoad = onLoad || _.noop;
-    return Ajax._req("POST", `/algo/${id}`, data, onLoad, onError);
+    return Ajax._req("POST", `/${type}s/${id}`, JSON.stringify(obj), onLoad, onError);
   },
   
 	query(tql: string, onLoad: (response: any) => void, onError?: (ev:Event) => void)

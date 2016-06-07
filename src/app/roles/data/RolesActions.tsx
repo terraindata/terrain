@@ -42,71 +42,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import RoleTypes from './../roles/RoleTypes.tsx';
 import * as Immutable from 'immutable';
+import ActionTypes from './RolesActionTypes.tsx';
+import Store from './RolesStore.tsx';
+import RoleTypes from './../RoleTypes.tsx';
 
-export module UserTypes
+var $ = (type: string, payload: any) => Store.dispatch({type, payload})
+
+var RolesActions =
 {
-  let _User = Immutable.Record({
-    // db-level fields
-    username: "",
-    isAdmin: false,
-    isBuilder: false,
-    
-    // metadata fields
-    firstName: "",
-    lastName: "",
-    whatIDo: "",
-    email: "",
-    skype: "",
-    timezone: "",
-    phone: "",
-    imgSrc: "",
-    
-    // exlcude the db-level fields from the meta-data save
-    excludeFields: ["isAdmin", "isBuilder", "username"],
-    
-    // groupRoles: Immutable.Map({}),
-  });
-  export class User extends _User
-  {
-    username: string;
-    
-    // data fields
-    firstName: string;
-    lastName: string;
-    whatIDo: string;
-    email: string;
-    skype: string;
-    timezone: string;
-    phone: string;
-    imgSrc: string;
-    
-    isAdmin: boolean;
-    isBuilder: boolean;
-    
-    excludeFields: string[];
-    
-    name(): string
-    {
-      return `${this.firstName} ${this.lastName}`;
-    }
-    
-    // groupRoles: {[groupId: string]: RoleTypes.GroupUserRole;}
-  }
+  fetch:
+    () =>
+      $(ActionTypes.fetch, { }),
   
-  export type UserMap = Immutable.Map<ID, UserTypes.User>;
+  setRoles:
+    (roles:RoleTypes.RoleMap) =>
+      $(ActionTypes.setRoles, { roles }),
   
-  let _UserState = Immutable.Record({
-    loading: true,
-    users: Immutable.Map<ID, User>({}),
-    currentUser: null,
-  })
-  export class UserState extends _UserState {
-    loading: boolean;
-    users: UserMap;
-    currentUser: User;
-  }
-}
+  change:
+    (role:RoleTypes.Role) =>
+      $(ActionTypes.change, { role }),
+};
 
-export default UserTypes;
+export default RolesActions;

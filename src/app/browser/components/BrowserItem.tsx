@@ -143,10 +143,10 @@ class BrowserItem extends Classs<Props>
     this.props.onArchive(this.props.index);
   }
   
-  handleChange(event)
-  {
-    this.props.onNameChange(this.props.id, event.target.value);
-  }
+  // handleChange(event)
+  // {
+  //   this.props.onNameChange(this.props.id, event.target.value);
+  // }
   
   handleKeyDown(event)
   {
@@ -179,6 +179,7 @@ class BrowserItem extends Classs<Props>
   
   hideTextfield(event)
   {
+    this.props.onNameChange(this.props.id, event.target.value);
     this.setState({
       nameEditing: false,
     })
@@ -226,9 +227,8 @@ class BrowserItem extends Classs<Props>
                   </div>
                   <input
                     className='browser-item-name-input'
-                    value={ this.props.name }
+                    defaultValue={ this.props.name }
                     placeholder={this.props.type.substr(0, 1).toUpperCase() + this.props.type.substr(1) + ' name'}
-                    onChange={ this.handleChange }
                     onBlur={ this.hideTextfield }
                     onKeyDown={ this.handleKeyDown }
                     ref='input'

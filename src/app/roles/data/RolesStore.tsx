@@ -42,71 +42,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import RoleTypes from './../roles/RoleTypes.tsx';
-import * as Immutable from 'immutable';
+var _ = require('underscore');
+var Immutable = require('immutable');
+var Redux = require('redux');
+import * as ReduxActions from 'redux-actions';
+import ActionTypes from './RolesActionTypes.tsx';
 
-export module UserTypes
-{
-  let _User = Immutable.Record({
-    // db-level fields
-    username: "",
-    isAdmin: false,
-    isBuilder: false,
-    
-    // metadata fields
-    firstName: "",
-    lastName: "",
-    whatIDo: "",
-    email: "",
-    skype: "",
-    timezone: "",
-    phone: "",
-    imgSrc: "",
-    
-    // exlcude the db-level fields from the meta-data save
-    excludeFields: ["isAdmin", "isBuilder", "username"],
-    
-    // groupRoles: Immutable.Map({}),
-  });
-  export class User extends _User
-  {
-    username: string;
-    
-    // data fields
-    firstName: string;
-    lastName: string;
-    whatIDo: string;
-    email: string;
-    skype: string;
-    timezone: string;
-    phone: string;
-    imgSrc: string;
-    
-    isAdmin: boolean;
-    isBuilder: boolean;
-    
-    excludeFields: string[];
-    
-    name(): string
-    {
-      return `${this.firstName} ${this.lastName}`;
-    }
-    
-    // groupRoles: {[groupId: string]: RoleTypes.GroupUserRole;}
-  }
-  
-  export type UserMap = Immutable.Map<ID, UserTypes.User>;
-  
-  let _UserState = Immutable.Record({
-    loading: true,
-    users: Immutable.Map<ID, User>({}),
-    currentUser: null,
-  })
-  export class UserState extends _UserState {
-    loading: boolean;
-    users: UserMap;
-    currentUser: User;
-  }
-}
+import RolesReducers from './RolesReducers.tsx';
 
-export default UserTypes;
+let RolesStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
+  RolesReducers,
+{})), Immutable.Map({}));
+
+export default RolesStore;

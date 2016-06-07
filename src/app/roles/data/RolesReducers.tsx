@@ -42,71 +42,54 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import RoleTypes from './../roles/RoleTypes.tsx';
-import * as Immutable from 'immutable';
+import * as _ from 'underscore';
+import Ajax from './../../util/Ajax.tsx';
+import ActionTypes from './RolesActionTypes.tsx';
+import Actions from './RolesActions.tsx';
+import RoleTypes from './../RoleTypes.tsx';
+var Immutable = require('immutable');
 
-export module UserTypes
-{
-  let _User = Immutable.Record({
-    // db-level fields
-    username: "",
-    isAdmin: false,
-    isBuilder: false,
-    
-    // metadata fields
-    firstName: "",
-    lastName: "",
-    whatIDo: "",
-    email: "",
-    skype: "",
-    timezone: "",
-    phone: "",
-    imgSrc: "",
-    
-    // exlcude the db-level fields from the meta-data save
-    excludeFields: ["isAdmin", "isBuilder", "username"],
-    
-    // groupRoles: Immutable.Map({}),
-  });
-  export class User extends _User
+let RolesReducer = {};
+
+RolesReducer[ActionTypes.fetch] =
+  (state, action) =>
   {
-    username: string;
-    
-    // data fields
-    firstName: string;
-    lastName: string;
-    whatIDo: string;
-    email: string;
-    skype: string;
-    timezone: string;
-    phone: string;
-    imgSrc: string;
-    
-    isAdmin: boolean;
-    isBuilder: boolean;
-    
-    excludeFields: string[];
-    
-    name(): string
+    Ajax.getRoles((rolesData: any[]) =>
     {
-      return `${this.firstName} ${this.lastName}`;
-    }
-    
-    // groupRoles: {[groupId: string]: RoleTypes.GroupUserRole;}
+      var roles = Immutable.Map({});
+      rolesData.map(role =>
+      {
+        let { groupId, username } = role;
+        if(!roles.get(groupId))
+        {
+          roles = roles.set(groupId, Immutable.Map({}));
+        }
+        role.admin = !! role.admin;
+        role.builder = !! role.builder;
+        roles = roles.setIn([groupId, username], new RoleTypes.Role(role));
+      });
+      
+      Actions.setRoles(roles);
+    });
+    return state;
   }
-  
-  export type UserMap = Immutable.Map<ID, UserTypes.User>;
-  
-  let _UserState = Immutable.Record({
-    loading: true,
-    users: Immutable.Map<ID, User>({}),
-    currentUser: null,
-  })
-  export class UserState extends _UserState {
-    loading: boolean;
-    users: UserMap;
-    currentUser: User;
-  }
-}
 
-export default UserTypes;
+RolesReducer[ActionTypes.setRoles] =
+  (state, action) =>
+    action.payload.roles;
+
+RolesReducer[ActionTypes.change] =
+  (state, action) =>
+  {
+    let role:RoleTypes.Role = action.payload.role;
+    
+    Ajax.saveRole(role);
+    if(!state.get(role.groupId))
+    {
+      state = state.set(role.groupId, Immutable.Map({}));
+    }
+    console.log('here we go', state.setIn([role.groupId, role.username], role));
+    return state.setIn([role.groupId, role.username], role);
+  }
+
+export default RolesReducer;

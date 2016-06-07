@@ -123,34 +123,41 @@ const Actions =
     {
       Ajax.getItems((groups, algorithms, variants, groupsOrder) =>
       {
-        var groupMap = {};
-        _.map(groups, group =>
-        {
-          group.algorithms = Immutable.Map(
-            group.algorithms.reduce(
-              (algorithmMap, algorithmId) =>
-              {
-                var algorithm = algorithms[algorithmId];
-                algorithm.variants = Immutable.Map(
-                  algorithm.variants.reduce(
-                    (variantMap, variantId) =>
-                    {
-                      variantMap[variantId] = new BrowserTypes.Variant(variants[variantId]);
-                      return variantMap;
-                    }, {}
-                  )
-                );
-                algorithm.variantsOrder = Immutable.List(algorithm.variantsOrder);
-                algorithmMap[algorithm.id] = new BrowserTypes.Algorithm(algorithm);
-                return algorithmMap;
-              }, {})
-            );
-          group.algorithmsOrder = Immutable.List(group.algorithmsOrder);
-          groupMap[group.id] = new BrowserTypes.Group(group);
+        _.map(variants, variant => {
+          let alg = algorithms[variant.algorithmId];
+          if(!alg.variants)
+          {
+            alg.variants = Immutable.Map({});
+          }
+          alg.variants = alg.variants.set(variant.id, new BrowserTypes.Variant(variant));
         });
         
+        _.map(algorithms, algorithm => {
+          if(!algorithm.variants)
+          {
+            algorithm.variants = Immutable.Map({});
+          }
+          let g = groups[algorithm.groupId];
+          if(!g.algorithms)
+          {
+            g.algorithms = Immutable.Map({});
+          }
+          g.algorithms = g.algorithms.set(algorithm.id, new BrowserTypes.Algorithm(algorithm));
+        });
+        
+        var groupMap = {};
+        _.map(groups, group => {
+          if(!group.algorithms)
+          {
+            group.algorithms = Immutable.Map({});
+          }
+          groupMap[group.id] = new BrowserTypes.Group(group);
+          console.log(new BrowserTypes.Group(group));
+        });
+        console.log(groupMap);
+        
         Actions.loadState(Immutable.fromJS({
-          groups: groupMap,
+          groups: Immutable.Map(groupMap),
           groupsOrder: Immutable.List(groupsOrder),
         }));
       })

@@ -139,11 +139,11 @@ BrowserStore.subscribe(() =>
         );
       }
     );
-    Ajax.saveItem(Immutable.Map({
-      id: 'groupsOrder',
-      type: 'groupsOrder',
-      groupsOrder: state.get('groupsOrder'),
-    }));
+    // Ajax.saveItem(Immutable.Map({
+    //   id: 'groupsOrder',
+    //   type: 'groupsOrder',
+    //   groupsOrder: state.get('groupsOrder'),
+    // }));
   }
 });
 

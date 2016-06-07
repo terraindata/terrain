@@ -189,7 +189,7 @@ let duplicateVariant = (variant, id, groupId?, algorithmId?) =>
     .set('name', 'Copy of ' + variant.name)
     .set('groupId', groupId || variant.groupId)
     .set('algorithmId', algorithmId || variant.algorithmId)
-    .set('status', BrowserTypes.EVariantStatus.Design)
+    .set('status', BrowserTypes.EVariantStatus.Build)
     ;
 }
 

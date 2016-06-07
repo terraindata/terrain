@@ -51,6 +51,7 @@ import BrowserTypes from './../BrowserTypes.tsx';
 import GroupsColumn from './GroupsColumn.tsx';
 import AlgorithmsColumn from './AlgorithmsColumn.tsx';
 import VariantsColumn from './VariantsColumn.tsx';
+import BrowserInfoColumn from './BrowserInfoColumn.tsx';
 import { DragDropContext } from 'react-dnd';
 import InfoArea from './../../common/components/InfoArea.tsx';
 var HTML5Backend = require('react-dnd-html5-backend');
@@ -100,18 +101,21 @@ class Browser extends Classs<Props>
       );
     }
     
-    var groupId = this.props.params.groupId;
-    var algorithmId = this.props.params.algorithmId;
+    var { groupId, algorithmId, variantId } = this.props.params;
     if(groupId)
     {
-      var algorithms = state.getIn(['groups', groupId, 'algorithms']);
-      var algorithmsOrder = state.getIn(['groups', groupId, 'algorithmsOrder']);
+      var group = state.getIn(['groups', groupId]) as BrowserTypes.Group;
+      var { algorithms, algorithmsOrder } = group;
       
       if(algorithmId)
       {
-        // Sublime gets messed up with the 'var' in 'variant', hence this pseudonym
-        var vriants = state.getIn(['groups', groupId, 'algorithms', algorithmId, 'variants']);
-        var vriantsOrder = state.getIn(['groups', groupId, 'algorithms', algorithmId, 'variantsOrder']);
+        var algorithm = algorithms.get(algorithmId);
+        var { variants, variantsOrder } = algorithm;
+        
+        if(variantId)
+        {
+          var variant = variants.get(variantId);
+        }
       }
     }
     
@@ -129,12 +133,19 @@ class Browser extends Classs<Props>
           }}
         />
         <VariantsColumn
-          variants={vriants}
-          variantsOrder={vriantsOrder}
           history={this.props.history}
           {...{
+            variants,
+            variantsOrder,
             groupId,
             algorithmId,
+          }}
+        />
+        <BrowserInfoColumn
+          {...{
+            group,
+            algorithm,
+            variant,
           }}
         />
       </div>

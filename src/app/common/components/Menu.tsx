@@ -55,7 +55,7 @@ var optionHeight = 30; // coordinate with Menu.less
 
 export interface MenuOption {
   text: string;
-  onClick: () => void;
+  onClick: (index:number) => void;
   disabled?: boolean;
 };
 

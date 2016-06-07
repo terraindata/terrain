@@ -42,44 +42,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// import Util from './../../util/Util.tsx';
 import * as Immutable from 'immutable';
 
 export module RoleTypes
 {
-  export enum EGroupRole
+  let _Role = Immutable.Record(
   {
-    Viewer,
-    Builder,
-    Admin,
-  }
-  
-  // https://coderwall.com/p/vxk_tg/using-immutable-js-in-typescript
-  
-  let _GroupUserRole = Immutable.Record(
-  {
-    id: "",
     groupId: "",
-    userId: "",
-    role: 0,
+    username: "",
+    admin: false,
+    builder: false,
   });
-  export class GroupUserRole extends _GroupUserRole implements IId
+  export class Role extends _Role
   {
-    id: string;
     groupId: ID;
-    userId: ID;
-    role: EGroupRole;
+    username: string;
+    admin: boolean;
+    builder: boolean;
   }
   
-  // export function newRole(userId: ID, groupId: ID, role?: EGroupRole): GroupUserRole
-  // {
-  //   return new GroupUserRole({
-  //     id: Util.getId(),
-  //     userId,
-  //     groupId,
-  //     role: role || EGroupRole.Viewer,
-  //   });
-  // }
+  // { groupId: { username: Role }}
+  export type GroupRoleMap = Immutable.Map<ID, Role>
+  // { { username: Role }
+  export type RoleMap = Immutable.Map<ID, GroupRoleMap>
 }
 
 export default RoleTypes;

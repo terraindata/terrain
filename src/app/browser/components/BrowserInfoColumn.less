@@ -1,0 +1,64 @@
+@import "../../common/Common.less";
+
+.browser-info {
+  background: rgba(255,255,255,0.5);
+  min-height: 100%;
+  
+  .browser-info-image {
+    margin: 30px 0px;
+    display: inline-block;
+    @r: 125px;
+    width: @r;
+    height: @r;
+    border-radius: @r;
+    background: @dark-grey;
+    position: relative;
+    
+    svg {
+      width: @r / 2;
+      fill: #fff;
+      .dead-center;
+      .cls-1 {
+        fill: #fff;
+      }
+    }
+  }
+  
+  .browser-info-name {
+    font-size: 24px;
+    color: @dark-grey;
+    margin-bottom: 15px;
+  }
+  
+  .browser-info-users {
+    text-align: left;
+    
+    .browser-info-user {
+      border-bottom: 1px solid #eee;
+      position: relative;
+      height: 45px;
+      
+      .user-thumbnail {
+        position: absolute;
+        left: 0px;
+        width: 60%;
+        margin: 0px;
+        padding: 6px;
+        box-sizing: border-box;
+      }
+      
+      .browser-info-user-roles {
+        position: absolute;
+        left: 60%;
+        width: 40%;
+        color: #aaa;
+        padding: 15px 3px;
+        box-sizing: border-box;
+      }
+      
+      .menu-wrapper {
+        top: 14px;
+      }
+    }
+  }
+}

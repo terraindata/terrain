@@ -49,6 +49,9 @@ import Util from './../../util/Util.tsx';
 import Ajax from './../../util/Ajax.tsx';
 import UserTypes from './../UserTypes.tsx';
 
+import AuthStore from './../../auth/data/AuthStore.tsx';
+AuthStore.subscribe(Actions.updateCurrentUser);
+
 var Immutable = require('immutable');
 
 var UserReducers = {};
@@ -83,9 +86,13 @@ UserReducers[ActionTypes.fetch] =
 
 UserReducers[ActionTypes.setUsers] =
   (state, action) =>
-  {
-    return state.set('users', action.payload.users)
+    state.set('users', action.payload.users)
+      .set('currentUser', action.payload.users.get(AuthStore.getState().get('username')))
       .set('loading', false);
-  }
+
+UserReducers[ActionTypes.updateCurrentUser] =
+  (state, action) =>
+    state.set('currentUser', 
+      state.getIn(['users', AuthStore.getState().get('username')]));
 
 export default UserReducers;
