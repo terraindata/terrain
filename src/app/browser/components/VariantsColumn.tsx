@@ -54,6 +54,10 @@ import ColorManager from './../../util/ColorManager.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
 import Actions from './../data/BrowserActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
+import UserTypes from '../../users/UserTypes.tsx';
+import UserStore from '../../users/data/UserStore.tsx';
+import RoleTypes from '../../roles/RoleTypes.tsx';
+import RolesStore from '../../roles/data/RolesStore.tsx';
 
 var VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
 
@@ -70,9 +74,36 @@ interface Props
 
 class VariantsColumn extends Classs<Props>
 {
-  state = {
+  state: {
+    rendered: boolean,
+    lastMoved: any,
+    me: UserTypes.User,
+    roles: RoleTypes.RoleMap,
+  } = {
     rendered: false,
     lastMoved: null,
+    me: null,
+    roles: null,
+  }
+  
+  componentWillMount()
+  {
+    this._subscribe(UserStore, {
+      stateKey: 'me',
+      storeKeyPath: ['currentUser'],
+      isMounted: true,
+    });
+    this._subscribe(RolesStore, {
+      stateKey: 'roles', 
+      isMounted: true
+    });
+  }
+  
+  componetDidMount()
+  {
+    this.setState({
+      rendered: true,
+    })
   }
   
   componentDidUpdate()
@@ -169,6 +200,8 @@ class VariantsColumn extends Classs<Props>
   {
     // Sublime gets messed up with the 'var' in 'variant', hence this pseudonym
     const vriant = this.props.variants.get(id);
+    let {me, roles} = this.state;
+    let canEdit = me && roles && roles.getIn([this.props.groupId, me.username, 'builder']);
     
     return (
       <BrowserItem
@@ -189,6 +222,8 @@ class VariantsColumn extends Classs<Props>
         onDropped={this.handleDropped}
         item={vriant}
         onDoubleClick={this.handleDoubleClick}
+        canEdit={canEdit}
+        canDrag={canEdit}
       >
         <div className='flex-container'>
           <UserThumbnail username={vriant.lastUsername} />
@@ -226,6 +261,9 @@ class VariantsColumn extends Classs<Props>
       return null;  
     }
     
+    let {me, roles} = this.state;
+    let canCreate = me && roles && roles.getIn([this.props.groupId, me.username, 'builder']);
+    
     return (
       <BrowserItemCategory
         status={BrowserTypes.EVariantStatus[status]}
@@ -245,7 +283,7 @@ class VariantsColumn extends Classs<Props>
           : <div className='browser-category-none'>None</div>
         }
         {
-          status === BrowserTypes.EVariantStatus.Build
+          status === BrowserTypes.EVariantStatus.Build && canCreate
           ? <CreateItem
               name='variant'
               onCreate={this.handleCreate}

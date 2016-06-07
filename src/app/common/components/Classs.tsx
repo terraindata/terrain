@@ -74,18 +74,45 @@ class Classs<T> extends React.Component<T, any>
   // subscribes to a Redux store
   _subscribe(
     store: {subscribe: (any) => () => void, getState: () => any},
-    updater: (storeState:any) => void
+    config: {
+      stateKey?: string,
+      storeKeyPath?: string[],
+      isMounted?: boolean,
+      updater?: (storeState:any) => void
+    }
   )
   {
-    let update = () => updater(store.getState());
+    let update = () => 
+    {
+      config.updater && config.updater(store.getState());
+      
+      if(config.stateKey)
+      {
+        if(config.storeKeyPath)
+        {
+          var value = store.getState().getIn(config.storeKeyPath);
+        } else {
+          var value = store.getState();
+        }
+        var state = {};
+        state[config.stateKey] = value;
+        this.setState(state);
+      }
+    }
     this.subscriptions.push(
       store.subscribe(update)
     );
-    let mountFn = this['componentWillMount'];
-    this['componentWillMount'] = () =>
+    
+    if(config.isMounted)
     {
       update();
-      mountFn && mountFn();
+    } else {
+      let mountFn = this['componentWillMount'];
+      this['componentWillMount'] = () =>
+      {
+        update();
+        mountFn && mountFn();
+      }
     }
   }
   subscriptions: (() => void)[] = [];

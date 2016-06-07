@@ -54,6 +54,10 @@ import InfoArea from './../../common/components/InfoArea.tsx';
 import Actions from './../data/BrowserActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import Scoreline from './../../common/components/Scoreline.tsx';
+import UserTypes from '../../users/UserTypes.tsx';
+import UserStore from '../../users/data/UserStore.tsx';
+import RoleTypes from '../../roles/RoleTypes.tsx';
+import RolesStore from '../../roles/data/RolesStore.tsx';
 
 let live = '#48b14b';
 let approve = '#bf5bff';
@@ -73,9 +77,36 @@ interface Props
 
 class AlgorithmsColumn extends Classs<Props>
 {
-  state = {
+  state: {
+    rendered: boolean,
+    lastMoved: any,
+    me: UserTypes.User,
+    roles: RoleTypes.RoleMap,
+  } = {
     rendered: false,
     lastMoved: null,
+    me: null,
+    roles: null,
+  }
+  
+  componentWillMount()
+  {
+    this._subscribe(UserStore, {
+      stateKey: 'me',
+      storeKeyPath: ['currentUser'],
+      isMounted: true,
+    });
+    this._subscribe(RolesStore, {
+      stateKey: 'roles', 
+      isMounted: true
+    });
+  }
+  
+  componetDidMount()
+  {
+    this.setState({
+      rendered: true,
+    })
   }
   
   componentDidUpdate()
@@ -181,6 +212,10 @@ class AlgorithmsColumn extends Classs<Props>
     ];
     algorithm.variants.map(v => scores[v.status].score ++);
     
+    let {me, roles} = this.state;
+    let canEdit = me && roles && roles.getIn([algorithm.groupId, me.username, 'builder']);
+    let canDrag = me && roles && roles.getIn([algorithm.groupId, me.username, 'admin']);
+    
     return (
       <BrowserItem
         index={index}
@@ -199,6 +234,8 @@ class AlgorithmsColumn extends Classs<Props>
         onHover={this.handleHover}
         onDropped={this.handleDropped}
         item={algorithm}
+        canEdit={canEdit}
+        canDrag={canDrag}
       >
         <div className='flex-container'>
           <UserThumbnail username={algorithm.lastUsername} />
@@ -232,6 +269,9 @@ class AlgorithmsColumn extends Classs<Props>
   renderCategory(status: BrowserTypes.EAlgorithmStatus)
   {
     var ids = this.props.algorithmsOrder.filter(id => this.props.algorithms.get(id).status === status);
+    let {me, roles} = this.state;
+    let canCreate = me && roles && roles.getIn([this.props.groupId, me.username, 'admin']);
+    
     return (
       <BrowserItemCategory
         status={BrowserTypes.EAlgorithmStatus[status]}
@@ -247,7 +287,7 @@ class AlgorithmsColumn extends Classs<Props>
           ids.size === 0 && <div className='browser-category-none'>None</div>
         }
         {
-          status === BrowserTypes.EAlgorithmStatus.Live && 
+          status === BrowserTypes.EAlgorithmStatus.Live && canCreate &&
             <CreateItem
               name='algorithm'
               onCreate={this.handleCreate}
@@ -259,7 +299,6 @@ class AlgorithmsColumn extends Classs<Props>
   
   render()
   {
-    console.log(this.props.algorithms);
     return (
       <BrowserColumn
         index={2}

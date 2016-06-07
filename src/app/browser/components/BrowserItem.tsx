@@ -64,6 +64,9 @@ interface Props
   onNameChange: (id: ID, name: string) => void;
   id: ID;
   rendered: boolean;
+  canEdit: boolean;
+  canDrag: boolean;
+  
   onHover: (index: number, type: string, id: ID) => void;
   // ^ called on target
   onDropped: (id: ID, targetType: string, targetItem: any, shiftKey: boolean) => void;
@@ -143,11 +146,6 @@ class BrowserItem extends Classs<Props>
     this.props.onArchive(this.props.index);
   }
   
-  // handleChange(event)
-  // {
-  //   this.props.onNameChange(this.props.id, event.target.value);
-  // }
-  
   handleKeyDown(event)
   {
     if(event.keyCode === 13)
@@ -158,6 +156,11 @@ class BrowserItem extends Classs<Props>
   
   showTextfield(event?)
   {
+    if(!this.props.canEdit)
+    {
+      return;
+    }
+    
     this.setState({
       nameEditing: true,
       focusField: true,
@@ -258,6 +261,11 @@ $(document).on('dragover dragend', function(e){shifted = e.shiftKey; return true
 
 const source = 
 {
+  canDrag(props, monitor)
+  {
+    return props.canDrag;  
+  },
+  
   beginDrag(props)
   {
     const item = {
@@ -290,6 +298,11 @@ const dragCollect = (connect, monitor) =>
 
 let canDrop = (props, monitor) =>
 {
+  if(!props.canEdit)
+  {
+    return false;
+  }
+  
   let itemType = monitor.getItem().type;
   let targetType = props.type;
   switch(itemType)

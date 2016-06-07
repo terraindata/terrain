@@ -53,6 +53,10 @@ import ColorManager from './../../util/ColorManager.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
 import Actions from './../data/BrowserActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
+import UserTypes from '../../users/UserTypes.tsx';
+import UserStore from '../../users/data/UserStore.tsx';
+import RoleTypes from '../../roles/RoleTypes.tsx';
+import RolesStore from '../../roles/data/RolesStore.tsx';
 
 var GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
 
@@ -66,9 +70,16 @@ interface Props
 
 class GroupsColumn extends Classs<Props>
 {
-  state = {
+  state: {
+    rendered: boolean,
+    lastMoved: any,
+    me: UserTypes.User,
+    roles: RoleTypes.RoleMap,
+  } = {
     rendered: false,
     lastMoved: null,
+    me: null,
+    roles: null,
   }
   
   componentDidMount()
@@ -76,11 +87,15 @@ class GroupsColumn extends Classs<Props>
     this.setState({
       rendered: true,
     });
-  }
-  
-  constructor(props)
-  {
-    super(props);
+    this._subscribe(UserStore, {
+      stateKey: 'me',
+      storeKeyPath: ['currentUser'],
+      isMounted: true,
+    });
+    this._subscribe(RolesStore, {
+      stateKey: 'roles', 
+      isMounted: true
+    });
   }
   
   handleDuplicate(index: number)
@@ -129,6 +144,10 @@ class GroupsColumn extends Classs<Props>
   renderGroup(id: ID, index: number)
   {
     const group = this.props.groups.get(id);
+    let {me, roles} = this.state;
+    let canEdit = me && roles && roles.getIn([id, me.username, 'admin']);
+    let canDrag = me && me.isAdmin;
+      
     return (
       <BrowserItem
         index={index}
@@ -146,6 +165,8 @@ class GroupsColumn extends Classs<Props>
         onHover={this.handleHover}
         onDropped={this.handleDropped}
         item={group}
+        canEdit={canEdit}
+        canDrag={canDrag}
       >
         {
           group.usernames.map(username => <UserThumbnail username={username} key={username} />)
@@ -167,6 +188,8 @@ class GroupsColumn extends Classs<Props>
   renderCategory(status: BrowserTypes.EGroupStatus)
   {
     var ids = this.props.groupsOrder.filter(id => this.props.groups.get(id).status === status);
+    let canCreate = this.state.me && this.state.me.isAdmin;
+    
     return (
       <BrowserItemCategory
         status={BrowserTypes.EGroupStatus[status]}
@@ -182,7 +205,7 @@ class GroupsColumn extends Classs<Props>
           ids.size === 0 && <div className='browser-category-none'>None</div>
         }
         {
-          status === BrowserTypes.EGroupStatus.Live && 
+          status === BrowserTypes.EGroupStatus.Live && canCreate &&
             <CreateItem
               name='group'
               onCreate={this.handleCreate}

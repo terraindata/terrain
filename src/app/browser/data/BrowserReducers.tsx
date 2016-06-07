@@ -66,7 +66,7 @@ let removeGroup = (state, group) =>
 let addItem = (state, item, parentKeyPath: (string | ID)[], type: string, index?: number) => {
   state = state.setIn(parentKeyPath.concat([type + 's', item.id]), item)
     .updateIn(parentKeyPath.concat([type + 'sOrder']),
-      order => {console.log(order, index, item.id, order.splice(index === undefined ? order.size : index, 0, item.id)); return order.splice(index === undefined ? order.size : index, 0, item.id)});
+      order => order.splice(index === undefined ? order.size : index, 0, item.id));
   return state;
 }
 

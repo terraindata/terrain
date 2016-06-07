@@ -99,16 +99,17 @@ class BrowserInfoColumn extends Classs<Props>
     super(props);
     UserActions.fetch();
     RolesActions.fetch();
-    this._subscribe(UserStore, this.updateUsers);
-    this._subscribe(RolesStore, this.updateRoles);
-  }
-  
-  updateUsers(userStoreState)
-  {
-    this.setState({
-      users: userStoreState.get('users'),
-      me: userStoreState.get('currentUser'),
-    })
+    this._subscribe(UserStore, {
+      stateKey: 'users', 
+      storeKeyPath: ['users'],
+    });
+    this._subscribe(UserStore, {
+      stateKey: 'me', 
+      storeKeyPath: ['currentUser'],
+    });
+    this._subscribe(RolesStore, {
+      updater: this.updateRoles,
+    });
   }
   
   updateRoles(rolesStoreState)
@@ -242,7 +243,7 @@ class BrowserInfoColumn extends Classs<Props>
     return (
       <BrowserColumn
         index={4}
-        title='Details'
+        title={null}
       >
         {
           item ?

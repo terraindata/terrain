@@ -46,6 +46,7 @@ require('./BrowserColumn.less');
 
 import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
+import * as classNames from 'classnames';
 
 interface Props
 {
@@ -59,10 +60,17 @@ class BrowserColumn extends Classs<Props>
   {
     return (
       <div className={'browser-column browser-column-' + this.props.index}>
-        <div className='browser-column-title'>
-          { this.props.title }
-        </div>
-        <div className='browser-column-content'>
+        { 
+          this.props.title ? 
+            <div className='browser-column-title'>
+              { this.props.title }
+            </div>
+          : null
+        }
+        <div className={classNames({
+          'browser-column-content': true,
+          'browser-column-content-no-title': !this.props.title,
+        })}>
           { this.props['children'] }
         </div>
         <div className='browser-column-border' />
