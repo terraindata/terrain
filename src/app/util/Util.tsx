@@ -46,7 +46,9 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
 import * as Immutable from "immutable";
-var _ = require('underscore');
+import * as _ from 'underscore';
+
+import BrowserTypes from './../browser/BrowserTypes.tsx';
 
 import { BuilderTypes } from './../builder/BuilderTypes.tsx';
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -150,6 +152,23 @@ var Util = {
       return obj.toJS();
     }
     return obj;
+  },
+  
+  canEdit(item: BrowserTypes.Variant | BrowserTypes.Algorithm | BrowserTypes.Group, UserStore, RolesStore)
+  {
+    let me = UserStore.getState().get('currentUser');
+    if(!me)
+    {
+      return false;
+    }
+    if(item.type === 'group' && me.isAdmin)
+    {
+      return true;
+    }
+    
+    let groupId = item.type === 'group' ? item.id : item['groupId'];
+    let role = item.type === 'group' ? 'admin' : 'builder';
+    return !! RolesStore.getState().getIn([groupId, me.username, role]);
   },
   
   getId(): ID

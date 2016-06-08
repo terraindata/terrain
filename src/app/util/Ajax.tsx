@@ -174,12 +174,25 @@ var Ajax = {
     }, onError);
   },
   
-  getItem(id: ID, onLoad: (item: any) => void, onError?: (ev:Event) => void)
+  getItem(type: string, id: ID, onLoad: (item: any) => void, onError?: (ev:Event) => void)
   {
-    return Ajax._get(`/algo/${id}`, "", (response: any) =>
+    return Ajax._get(`/items/${id}`, "", (response: any) =>
     {
-      onLoad(JSON.parse(response));
+      let r = JSON.parse(response);
+      let all = r && r[type + 's'];
+      var item = all && all.find(i => i.id === id);
+      if(item)
+      {
+        _.extend(item, JSON.parse(item.data));
+        delete item.data;
+      }
+      onLoad(item);
     }, onError);
+  },
+  
+  getVariant(id: ID, onLoad: (variant: any) => void)
+  {
+    return Ajax.getItem('variant', id, onLoad);
   },
   
   saveItem(item: Immutable.Map<string, any>, onLoad?: (resp: any) => void, onError?: (ev:Event) => void)

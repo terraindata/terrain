@@ -165,7 +165,7 @@ class GroupsColumn extends Classs<Props>
         onHover={this.handleHover}
         onDropped={this.handleDropped}
         item={group}
-        canEdit={canEdit}
+        canEdit={canEdit || canDrag}
         canDrag={canDrag}
       >
         {

@@ -142,7 +142,7 @@ class BrowserInfoColumn extends Classs<Props>
   renderUser(user: User)
   {
     let { groupRoles } = this.state;
-    if(!user)
+    if(!user || user.isDisabled)
     {
       return null;
     }

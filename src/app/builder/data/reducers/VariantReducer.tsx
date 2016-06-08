@@ -52,71 +52,19 @@ import * as _ from 'underscore';
 
 var VariantReducer = {};
 
-// var NEW_ALGORITHM = 
-// {
-//   inputs: [],
-//   cards: [],
-//   results: [],
-//   resultsPage: 1,
-//   resultsPages: 30,
-//   algorithmName: 'New Algorithm',
-// };
-// var currentparentId = 101;
-
-
-// VariantReducer[ActionTypes.algorithm.create] =
-//   (state, action) => 
-//     state.setIn(["algorithms", "" + (Math.random())], Immutable.fromJS(_.extend({}, NEW_ALGORITHM, {id: "alg-" + Util.randInt(1234567)})));
-
-// VariantReducer[ActionTypes.algorithm.remove] =
-//   (state, action) =>
-//     state.deleteIn(["algorithms", action.payload.parentId]);
-
-// VariantReducer[ActionTypes.algorithm.duplicate] =
-//   (state, action) => {
-//     var changeId = (node) => !node.map ? console.log(node) : node.map((value, key) => 
-//       key === 'id' ? "i" + Math.random() : 
-//         (Immutable.Iterable.isIterable(value) ? changeId(value) : value));
-    
-//     var parentId = "alg-" + Math.random();
-//     return state.setIn(["algorithms", parentId],
-//         Immutable.fromJS(state.getIn(["algorithms", "" + action.payload.parentId]).toJS())
-//           .set('id', parentId)
-//       )
-//       .setIn(["algorithms", parentId, 'algorithmName'], 'Copy of ' + state.getIn(["algorithms", "" + action.payload.parentId, 'algorithmName']))
-//       .updateIn(["algorithms", parentId, 'results'], results =>
-//         results.map(result =>
-//           result.set('parentId', parentId))
-//         .map(changeId))
-//       .updateIn(["algorithms", parentId, 'cards'], cards =>
-//         cards.map(card =>
-//           card.set('parentId', parentId))
-//         .map(changeId))
-//       .updateIn(["algorithms", parentId, 'inputs'], inputs =>
-//         inputs.map(input =>
-//           input.set('parentId', parentId))
-//         .map(changeId))
-//       // .updateIn(["algorithms", parentId], algorithm => algorithm.map(changeId))
-//       ;
-//   }
-
-// VariantReducer[ActionTypes.results.changePage] =
-//   (state, action) =>
-//     state.setIn(["algorithms", action.payload.parentId, 'resultsPage'], action.payload.page);
-
-// VariantReducer[ActionTypes.algorithm.load] =
-//   (state, action) =>
-//     state.set("algorithms", Immutable.fromJS(action.payload.state));
-
 VariantReducer[ActionTypes.fetch] =
   (state, action) =>
   {
     action.payload.variantIds.map(
       variantId =>
-        Ajax.getItem(variantId, (item) =>
+        Ajax.getVariant(variantId, (item) =>
         {
-          item.cards = Immutable.fromJS(item.cards);
-          item.inputs = Immutable.fromJS(item.inputs);
+          if(!item)
+          {
+            return;
+          }
+          item.cards = Immutable.fromJS(item.cards || []);
+          item.inputs = Immutable.fromJS(item.inputs || []);
           Actions.setVariant(variantId, item);
         }
       )

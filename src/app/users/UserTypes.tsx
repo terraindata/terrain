@@ -89,6 +89,11 @@ export module UserTypes
     
     name(): string
     {
+      if(!this.firstName.length && !this.lastName.length)
+      {
+        return this.username;
+      }
+      
       return `${this.firstName} ${this.lastName}`;
     }
     

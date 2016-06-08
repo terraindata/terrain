@@ -207,7 +207,8 @@ BrowserReducers[ActionTypes.variants.duplicate] =
 
 
 BrowserReducers[ActionTypes.loadState] =
-  (state, action) => action.payload.state;
+  (state, action) => 
+    action.payload.state.set('prevGroups', action.payload.state.get('groups'));
 
 export default BrowserReducers;
 

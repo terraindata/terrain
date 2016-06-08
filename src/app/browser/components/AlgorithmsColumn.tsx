@@ -268,7 +268,8 @@ class AlgorithmsColumn extends Classs<Props>
   
   renderCategory(status: BrowserTypes.EAlgorithmStatus)
   {
-    var ids = this.props.algorithmsOrder.filter(id => this.props.algorithms.get(id).status === status);
+    let {algorithms} = this.props;
+    var ids = this.props.algorithmsOrder.filter(id => algorithms.get(id) && algorithms.get(id).status === status);
     let {me, roles} = this.state;
     let canCreate = me && roles && roles.getIn([this.props.groupId, me.username, 'admin']);
     

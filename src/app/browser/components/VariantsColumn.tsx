@@ -273,8 +273,9 @@ class VariantsColumn extends Classs<Props>
       >
         {
           this.props.variantsOrder.map((id, index) =>
-            this.hasStatus(id, status) &&
-              this.renderVariant(id, index)
+            this.props.variants.get(id) &&
+              this.hasStatus(id, status) &&
+                this.renderVariant(id, index)
           )
         }
         {
