@@ -54,9 +54,13 @@ import InputsArea from "./inputs/InputsArea.tsx";
 import CardsArea from "./cards/CardsArea.tsx";
 import ResultsArea from "./results/ResultsArea.tsx";
 import TQLView from '../../tql/components/TQLView.tsx';
+import UserStore from '../../users/data/UserStore.tsx';
+import RolesStore from '../../roles/data/RolesStore.tsx';
+import BrowserTypes from '../../browser/BrowserTypes.tsx';
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
+var LockedIcon = require("./../../../images/icon_pin_18x18.svg?name=LockedIcon");
 
 enum COLUMNS {
   Builder,
@@ -99,8 +103,16 @@ var BuilderColumn = React.createClass<any, any>(
     return {
       column: this.props.index,
       loading: false,
-      inputKeys: this.calcinputKeys(this.props)
+      inputKeys: this.calcinputKeys(this.props),
+      rand: 1,
     }
+  },
+  
+  componentWillMount()
+  {
+    let rejigger = () => this.setState({ rand: Math.random() });
+    UserStore.subscribe(rejigger);
+    RolesStore.subscribe(rejigger);
   },
   
   calcinputKeys(props)
@@ -142,7 +154,7 @@ var BuilderColumn = React.createClass<any, any>(
     });
   },
   
-  renderContent()
+  renderContent(canEdit:boolean)
   {
     var algorithm = this.props.algorithm;
     var parentId = algorithm.id;
@@ -165,6 +177,7 @@ var BuilderColumn = React.createClass<any, any>(
           spotlights={spotlights} 
           topLevel={true}
           keys={this.state.inputKeys}
+          canEdit={canEdit}
         />;
         
       case COLUMNS.Inputs:
@@ -178,6 +191,7 @@ var BuilderColumn = React.createClass<any, any>(
           algorithm={algorithm}
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
+          canEdit={canEdit}
         />;
       
       case COLUMNS.TQL:
@@ -219,6 +233,13 @@ var BuilderColumn = React.createClass<any, any>(
   },
   
   render() {
+    let {algorithm} = this.props;
+    let canEdit = algorithm.status === BrowserTypes.EVariantStatus.Build
+      && Util.canEdit(algorithm, UserStore, RolesStore)
+      || this.state.column === COLUMNS.Inputs;
+    let cantEditReason = algorithm.status === BrowserTypes.EVariantStatus.Build ?
+      'This Variant is not in Build status' : 'You are not authorized to edit this Variant';
+    
     return this.renderPanel((
       <div className='builder-column'>
         <div className='builder-title-bar'>
@@ -233,6 +254,11 @@ var BuilderColumn = React.createClass<any, any>(
           <div className='builder-title-bar-title'>
             <span ref='handle'>
               { COLUMNS[this.state.column] }
+              {
+                !canEdit ? 
+                  <LockedIcon data-tip={cantEditReason} />
+                : null
+              }
             </span>
             { this.state.loading ? <div className='builder-column-loading'>Loading...</div> : '' }
           </div>
@@ -260,7 +286,7 @@ var BuilderColumn = React.createClass<any, any>(
             'builder-column-content' + 
             (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '')
           }>
-          { this.renderContent() }
+          { this.renderContent(canEdit) }
         </div>
       </div>
     ));

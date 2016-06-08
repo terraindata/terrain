@@ -47,6 +47,8 @@ import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
 import Store from './../data/BrowserStore.tsx';
 import Actions from './../data/BrowserActions.tsx';
+import RolesActions from './../../roles/data/RolesActions.tsx';
+import UserActions from './../../users/data/UserActions.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
 import GroupsColumn from './GroupsColumn.tsx';
 import AlgorithmsColumn from './AlgorithmsColumn.tsx';
@@ -83,6 +85,8 @@ class Browser extends Classs<Props>
   componentWillMount()
   {
     Actions.fetch();
+    RolesActions.fetch();
+    UserActions.fetch();
   }
   
   componentWillUnmount()

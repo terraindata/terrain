@@ -71,6 +71,7 @@ type Algorithm = BrowserTypes.Algorithm;
 type Variant = BrowserTypes.Variant;
 
 type Role = RoleTypes.Role;
+type RoleMap = RoleTypes.RoleMap;
 type GroupRoleMap = RoleTypes.GroupRoleMap;
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
@@ -86,11 +87,11 @@ class BrowserInfoColumn extends Classs<Props>
 {
   state: {
     users: UserMap,
-    groupRoles: GroupRoleMap,
+    roles: RoleMap,
     me: User,
   } = {
     users: null,
-    groupRoles: null,
+    roles: null,
     me: null,
   }
   
@@ -108,15 +109,8 @@ class BrowserInfoColumn extends Classs<Props>
       storeKeyPath: ['currentUser'],
     });
     this._subscribe(RolesStore, {
-      updater: this.updateRoles,
+      stateKey: 'roles', 
     });
-  }
-  
-  updateRoles(rolesStoreState)
-  {
-    this.setState({
-      groupRoles: this.props.group && rolesStoreState.getIn([this.props.group.id]),
-    })
   }
   
   renderVariant()
@@ -141,7 +135,7 @@ class BrowserInfoColumn extends Classs<Props>
   
   renderUser(user: User)
   {
-    let { groupRoles } = this.state;
+    let groupRoles = this.state.roles.get(this.props.group.id);
     if(!user || user.isDisabled)
     {
       return null;
@@ -149,7 +143,7 @@ class BrowserInfoColumn extends Classs<Props>
     
     return <BrowserInfoUser 
       user={user}
-      groupRoles={this.state.groupRoles}
+      groupRoles={groupRoles}
       me={this.state.me}
       groupId={this.props.group.id}
       key={user.username}
@@ -158,7 +152,8 @@ class BrowserInfoColumn extends Classs<Props>
   
   renderGroupRoles()
   {
-    let { me, groupRoles, users } = this.state;
+    let { me, users } = this.state;
+    let groupRoles = this.state.roles.get(this.props.group.id);
     if(!me || !groupRoles || !users)
     {
       return null;
@@ -176,7 +171,8 @@ class BrowserInfoColumn extends Classs<Props>
   
   renderRemainingUsers()
   {
-    let { me, groupRoles, users } = this.state;
+    let { me,   users } = this.state;
+    let groupRoles = this.state.roles.get(this.props.group.id);
     if(!me || !users)
     {
       return null;

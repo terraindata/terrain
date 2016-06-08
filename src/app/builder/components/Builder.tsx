@@ -56,6 +56,8 @@ var HTML5Backend = require('react-dnd-html5-backend');
 import Store from "./../data/BuilderStore.tsx";
 import Actions from "./../data/BuilderActions.tsx";
 import Util from "./../../util/Util.tsx";
+import UserActions from '../../users/data/UserActions.tsx';
+import RolesActions from '../../roles/data/RolesActions.tsx';
 
 // Components
 import Classs from './../../common/components/Classs.tsx';
@@ -121,6 +123,7 @@ class Builder extends Classs<Props>
   componentWillMount()
   {
     this.checkConfig(this.props);
+    RolesActions.fetch();
   }
   
   componentWillReceiveProps(nextProps)
