@@ -51,7 +51,7 @@ export module UserTypes
     // db-level fields
     username: "",
     isAdmin: false,
-    isBuilder: false,
+    isDisabled: false,
     
     // metadata fields
     firstName: "",
@@ -64,7 +64,7 @@ export module UserTypes
     imgSrc: "",
     
     // exlcude the db-level fields from the meta-data save
-    excludeFields: ["isAdmin", "isBuilder", "username"],
+    excludeFields: ["isAdmin", "username", "disabled"],
     
     // groupRoles: Immutable.Map({}),
   });
@@ -83,7 +83,7 @@ export module UserTypes
     imgSrc: string;
     
     isAdmin: boolean;
-    isBuilder: boolean;
+    isDisabled: boolean;
     
     excludeFields: string[];
     

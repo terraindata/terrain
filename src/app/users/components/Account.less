@@ -202,3 +202,29 @@
     flex-grow: 1;
   }
 }
+
+.profile-admin-tools {
+  .profile-admin-button {
+    margin-bottom: 10px;
+    cursor: pointer;
+    display: block;
+    color: @light-blue;
+    padding: 4px;
+    .transition;
+    
+    &:hover {
+      background: @light-blue;
+      border-radius: 5px;
+      color: #fff;
+    }
+    
+    &.profile-admin-button-red {
+      color: #ff3456;
+      &:hover {
+        background: #ff3456;
+        border-radius: 5px;
+        color: #fff;
+      }
+    }
+  }
+}

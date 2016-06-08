@@ -124,6 +124,14 @@ var Ajax = {
     }), onSave, onError);
   },
   
+  adminSaveUser(user: UserTypes.User)
+  {
+    return Ajax._post(`/users/${user.username}`, JSON.stringify({
+      admin: user.isAdmin ? 1 : 0,
+      disabled: user.isDisabled ? 1 : 0,
+    }), _.noop);
+  },
+  
   createUser(username: string, password: string, onSave: (response: any) => void, onError: (response: any) => void)
   {
     return Ajax._post(`/users/${username}`, JSON.stringify({

@@ -68,11 +68,13 @@ class Profile extends Classs<Props>
   
   state: {
     user: UserTypes.User,
+    me: UserTypes.User,
     loading: boolean,
     isLoggedInUser: boolean,
     routeIsDirect: boolean,
   } = {
     user: null,
+    me: null,
     loading: false,
     isLoggedInUser: false,
     routeIsDirect: false,
@@ -95,6 +97,10 @@ class Profile extends Classs<Props>
       UserStore.subscribe(() => this.updateUser(this.props));
     this.authUnsubscribe = 
       AuthStore.subscribe(() => this.updateUser(this.props));
+    this._subscribe(UserStore, {
+      stateKey: 'me',
+      storeKeyPath: ['currentUser'],
+    });
   }
   
   updateUser(props:Props)
@@ -147,6 +153,74 @@ class Profile extends Classs<Props>
     );
   }
   
+  toggleAdmin()
+  {
+    if(window.confirm(
+      this.state.user.isAdmin ?
+        'Are you sure you want to revoke this user\'s administrative privileges?'
+      :
+      'Are you sure you want to make this user a system-level administrator? \
+The user will be able to create new user accounts, create new groups, \
+disable existing users, add new system administrators, and revoke \
+any existing system administrator privileges, including your own. \
+(You can revoke their administator privileges later, as long as you \
+are still a system administrator yourself.)'))
+    {
+      let user = this.state.user.set('isAdmin', !this.state.user.isAdmin) as UserTypes.User;
+      Actions.change(user);
+      Ajax.adminSaveUser(user);
+    } 
+  }
+  
+  toggleDisabled()
+  {
+    if(window.confirm(this.state.user.isDisabled ?
+      'Are you sure you want to re-enable this user? They will be able to log in to Terraformer again.'
+      :
+      'Are you sure you want to disable this user? \
+The user will not be able to log in to Terraformer, nor will they \
+be able to view any information or make any changes. They will \
+immediately be logged out of any existing sessions. \
+(You can re-enable this user later, if needed.)'))
+    {
+      let user = this.state.user.set('isDisabled', !this.state.user.isDisabled) as UserTypes.User;
+      Actions.change(user);
+      Ajax.adminSaveUser(user);
+    }
+  }
+  
+  renderAdminTools()
+  {
+    let {me, user} = this.state;
+    if(!me || !me.isAdmin || me.username === user.username)
+    {
+      return null;
+    }
+    
+    return (
+      <div className='profile-admin-tools'>
+        <div
+          className={classNames({
+            'profile-admin-button': true,
+            'profile-admin-button-red': user.isAdmin,
+          })}
+          onClick={this.toggleAdmin}
+        >
+          { user.isAdmin ? 'Revoke System Administratorship' : 'Make System Administrator' }
+        </div>
+        <div
+          className={classNames({
+            'profile-admin-button': true,
+            'profile-admin-button-red': !user.isDisabled,
+          })}
+          onClick={this.toggleDisabled}
+        >
+          { user.isDisabled ? 'Re-Enable User' : 'Disable User' }
+        </div>
+      </div>
+    );
+  }
+  
   render()
   {
     if(this.state.loading)
@@ -175,6 +249,7 @@ class Profile extends Classs<Props>
         </div>
         <div className='profile-name'>
           { this.state.user.name() }
+          { this.state.user.isDisabled ? <b><br />Disabled</b> : null }
         </div>
         {
           this.state.isLoggedInUser ? 
@@ -190,6 +265,7 @@ class Profile extends Classs<Props>
             this.infoKeys.map(this.renderInfoItem)
           }
         </div>
+        { this.renderAdminTools() }
         <Link to='/account/team' className='profile-team-button'>
           Team Directory
         </Link>

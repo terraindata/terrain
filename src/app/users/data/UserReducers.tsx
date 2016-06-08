@@ -71,11 +71,13 @@ UserReducers[ActionTypes.fetch] =
         let data = userObj.data && userObj.data.length ? JSON.parse(userObj.data) : {};
         let isAdmin = userObj.admin === 1;
         let isBuilder = userObj.builder === 1;
+        let isDisabled = userObj.disabled === 1;
         users = users.set(username, new UserTypes.User(
           _.extend(data, {
             username,
             isAdmin,
             isBuilder,
+            isDisabled,
           })
         ));
       })

@@ -73,10 +73,12 @@ class Team extends Classs<Props>
     loading: boolean,
     users: UserMap,
     addingUser: boolean,
+    showDisabledUsers: boolean,
   } = {
     users: null,
     loading: true,
     addingUser: false,
+    showDisabledUsers: false,
   };
   
   constructor(props)
@@ -107,6 +109,11 @@ class Team extends Classs<Props>
   
   renderUser(user:User)
   {
+    if(user.isDisabled && !this.state.showDisabledUsers)
+    {
+      return null;
+    }
+    
     return (
       <Link to={`/users/${user.username}`} className='team-link' key={user.username}>
         <div className='team-row'>
@@ -122,7 +129,7 @@ class Team extends Classs<Props>
               { user.name() }
             </div>
             <div className='team-role'>
-              { user.whatIDo }
+              { user.isDisabled ? <b>Disabled</b> : user.whatIDo }
             </div>
             <div className='team-username'>
               @{ user.username }
@@ -164,6 +171,28 @@ class Team extends Classs<Props>
     this.setState({
       addingUser: !this.state.addingUser,
     })
+  }
+  
+  toggleShowDisabledUsers()
+  {
+    this.setState({
+      showDisabledUsers: !this.state.showDisabledUsers,
+    })
+  }
+  
+  renderShowDisabledUsers()
+  {
+    if(!this.state.users.some(user => user.isDisabled))
+    {
+      // no disabled users
+      return null;
+    }
+    
+    return (
+      <div className='team-show-disabled' onClick={this.toggleShowDisabledUsers}>
+        { this.state.showDisabledUsers ? 'Hide Disabled Users' : 'Show Disabled Users' }
+      </div>
+    );
   }
   
   createNewUser()
@@ -278,6 +307,7 @@ class Team extends Classs<Props>
             users.toArray().map(this.renderUser)
         }
         { this.renderAddUser() }
+        { this.renderShowDisabledUsers() }
       </div>
     );
   }
