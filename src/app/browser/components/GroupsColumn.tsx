@@ -168,10 +168,18 @@ class GroupsColumn extends Classs<Props>
         item={group}
         canEdit={canEdit || canDrag}
         canDrag={canDrag}
+        canArchive={canEdit || canDrag}
+        canDuplicate={canDrag}
       >
         {
           groupRoles && groupRoles.toArray().map(
-            role => <UserThumbnail username={role.username} key={role.username} />
+            (role, index) => 
+              index > 3 ? null : 
+                <UserThumbnail
+                  username={role.username}
+                  key={role.username}
+                  medium={true}
+                />
           )
         }
       </BrowserItem>

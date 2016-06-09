@@ -57,6 +57,8 @@ interface Props
   name: string;
   onDuplicate: (index: number) => void;
   onArchive: (index: number) => void;
+  canArchive: boolean;
+  canDuplicate: boolean;
   icon: any;
   color: string;
   to: string;
@@ -98,17 +100,37 @@ class BrowserItem extends Classs<Props>
     timeout: null,
   }
   
-  menuOptions = [
-    {
-      text: 'Duplicate',
-      // icon: '',
-      onClick: this.handleDuplicate,   
-    },
-    {
-      text: 'Archive',
-      onClick: this.handleArchive,
-    }
-  ];
+  menuOptions =
+  {
+    none: [],
+    duplicate: 
+    [
+      {
+        text: 'Duplicate',
+        // icon: '',
+        onClick: this.handleDuplicate,
+      },
+    ],
+    archive:
+    [
+      {
+        text: 'Archive',
+        onClick: this.handleArchive,
+      },
+    ],
+    duplicateArchive:
+    [
+      {
+        text: 'Duplicate',
+        // icon: '',
+        onClick: this.handleDuplicate,
+      },
+      {
+        text: 'Archive',
+        onClick: this.handleArchive,
+      },
+    ],
+  }
   
   componentDidMount()
   {
@@ -200,6 +222,16 @@ class BrowserItem extends Classs<Props>
     let { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId } = this.props;
     let draggingOver = isOver && dragItemType !== this.props.type;
     
+    let {canArchive, canDuplicate} = this.props;
+    let menuOptions =
+      (canArchive && canDuplicate) ? this.menuOptions.duplicateArchive :
+      (
+        canArchive ? this.menuOptions.archive :
+        (
+          canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
+        )
+      );
+    
     return connectDropTarget((
       <div>
         <Link to={this.props.to} className='browser-item-link' activeClassName='browser-item-active' onDoubleClick={this.handleDoubleClick}>
@@ -237,7 +269,7 @@ class BrowserItem extends Classs<Props>
                     ref='input'
                   />
                   <Menu
-                    options={this.menuOptions}
+                    options={menuOptions}
                   />
                 </div>
                 <div className='browser-item-content'>

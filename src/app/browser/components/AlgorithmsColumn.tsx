@@ -237,6 +237,8 @@ class AlgorithmsColumn extends Classs<Props>
         item={algorithm}
         canEdit={canEdit}
         canDrag={canDrag}
+        canArchive={canDrag}
+        canDuplicate={canDrag}
       >
         <div className='flex-container'>
           <UserThumbnail username={algorithm.lastUsername} />

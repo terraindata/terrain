@@ -202,7 +202,13 @@ class VariantsColumn extends Classs<Props>
     // Sublime gets messed up with the 'var' in 'variant', hence this pseudonym
     const vriant = this.props.variants.get(id);
     let {me, roles} = this.state;
-    let canEdit = me && roles && roles.getIn([this.props.groupId, me.username, 'builder']);
+    if(me && roles)
+    {
+      var canEdit = roles.getIn([this.props.groupId, me.username, 'builder']);
+      var canDrag = canEdit && 
+        (vriant.status !== BrowserTypes.EVariantStatus.Live || 
+          roles.getIn([this.props.groupId, me.username, 'admin']));
+    }
     
     return (
       <BrowserItem
@@ -211,6 +217,8 @@ class VariantsColumn extends Classs<Props>
         icon={<VariantIcon />}
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
+        canArchive={canDrag}
+        canDuplicate={canEdit}
         color={ColorManager.colorForKey(this.props.groupId)}
         key={vriant.id}
         to={`/browser/${this.props.groupId}/${this.props.algorithmId}/${id}`}
@@ -223,8 +231,8 @@ class VariantsColumn extends Classs<Props>
         onDropped={this.handleDropped}
         item={vriant}
         onDoubleClick={this.handleDoubleClick}
-        canEdit={canEdit}
-        canDrag={canEdit}
+        canEdit={canDrag}
+        canDrag={canDrag}
       >
         <div className='flex-container'>
           <UserThumbnail username={vriant.lastUsername} />

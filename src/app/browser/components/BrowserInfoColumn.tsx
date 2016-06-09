@@ -345,6 +345,7 @@ class BrowserInfoUser extends Classs<BrowserInfoUserProps>
         <UserThumbnail
           username={user.username}
           showName={true}
+          link={true}
         />
         <div className='browser-info-user-roles'>
           {

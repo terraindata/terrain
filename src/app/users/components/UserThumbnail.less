@@ -4,7 +4,7 @@
   display: inline-block;
   margin: 0px @standard-margin;
 
-  .user-thumbnail-image-wrapper {
+  .user-thumbnail-image {
     display: inline-block;
     @r: 32px;
     width: @r;
@@ -13,11 +13,13 @@
     box-sizing: border-box;
     overflow: hidden;
     vertical-align: middle;
+    background-size: cover;
+    background-position: center center;
     
-    .user-thumbnail-image {
-      width: 100%;
-      vertical-align: middle;
-    }
+    // .user-thumbnail-image {
+    //   width: 100%;
+    //   vertical-align: middle;
+    // }
   }
   
   .user-thumbnail-text {
@@ -27,14 +29,14 @@
   }
   
   &.user-thumbnail-admin {
-    .user-thumbnail-image-wrapper {
+    .user-thumbnail-image {
       border: 2px solid #CCDD1f;
     }
   } 
   
   
   &.user-thumbnail-largest {
-    .user-thumbnail-image-wrapper {
+    .user-thumbnail-image {
       @r: 150px;
       width: @r;
       height: @r;
@@ -43,7 +45,7 @@
   }
   
   &.user-thumbnail-large {
-    .user-thumbnail-image-wrapper {
+    .user-thumbnail-image {
       @r: 72px;
       width: @r;
       height: @r;
@@ -51,8 +53,17 @@
     }
   }
   
+  &.user-thumbnail-medium {
+    .user-thumbnail-image {
+      @r: 46px;
+      width: @r;
+      height: @r;
+      border-radius: @r;
+    }
+  }
+  
   &.user-thumbnail-small {
-    .user-thumbnail-image-wrapper {
+    .user-thumbnail-image {
       @r: 25px;
       width: @r;
       height: @r;
@@ -61,7 +72,7 @@
   }
   
   &.user-thumbnail-smallest {
-    .user-thumbnail-image-wrapper {
+    .user-thumbnail-image {
       @r: 16px;
       width: @r;
       height: @r;
@@ -70,8 +81,12 @@
   }
   
   &.user-thumbnail-square {
-    .user-thumbnail-image-wrapper {
+    .user-thumbnail-image {
       border-radius: 5px;
     }
   }
+}
+
+a .user-thumbnail {
+  color: @sea-green;
 }

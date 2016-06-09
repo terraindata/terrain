@@ -59,10 +59,12 @@ interface Props
   showName?: boolean;
   largest?: boolean;
   large?: boolean;
+  medium?: boolean;
   small?: boolean;
   smallest?: boolean;
   square?: boolean;
   hideAdmin?: boolean;
+  link?: boolean;
 }
 
 class UserThumbnail extends Classs<Props>
@@ -118,13 +120,13 @@ class UserThumbnail extends Classs<Props>
     let src: string = user ? user.imgSrc : 'http://lukeknepper.com/terrain/assets/img/Terrain_Icon_White.png';
     let tip: string = this.props.showName ? null : name;
     let text: string = this.props.showName ? name : null;
-    
-    return (
+    let thumbnail = (
       <div
         className={classNames({
           'user-thumbnail': true,
           'user-thumbnail-largest': this.props.largest,
           'user-thumbnail-large': this.props.large,
+          'user-thumbnail-medium': this.props.medium,
           'user-thumbnail-small': this.props.small,
           'user-thumbnail-smallest': this.props.smallest,
           'user-thumbnail-square': this.props.square,
@@ -132,12 +134,26 @@ class UserThumbnail extends Classs<Props>
         })}
         data-tip={tip}
       >
-        <div className='user-thumbnail-image-wrapper'>
-          <img src={src} className='user-thumbnail-image' />
-        </div>
+        <div
+          className='user-thumbnail-image'
+          style={{
+            backgroundImage: `url(${src})`,
+          }}
+        />
         { text ? <div className='user-thumbnail-text'>{text}</div> : null }
       </div>
     );
+    
+    if(this.props.link)
+    {
+      return (
+        <Link to={`/users/${user.username}`}>
+          { thumbnail }
+        </Link>
+      );
+    }
+    
+    return thumbnail;
   }
 }
 

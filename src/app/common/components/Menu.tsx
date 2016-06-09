@@ -126,10 +126,16 @@ class Menu extends Classs<Props>
   }
 
   render() {
+    let {options} = this.props;
+    if(!options || !options.length)
+    {
+      return null;
+    }
+    
     var style = {
-      width: 14 * this.props.options.reduce((max, option) => 
+      width: 14 * options.reduce((max, option) => 
         option.text.length > max ? option.text.length : max, 1),
-      height: this.props.options.length * optionHeight,
+      height: options.length * optionHeight,
     };
     
     return (
@@ -146,7 +152,7 @@ class Menu extends Classs<Props>
         { !this.state.open ? null :
           <div className="menu-options-wrapper">
             {
-              this.props.options.map(this.renderOption)
+              options.map(this.renderOption)
             }
           </div>
         }
