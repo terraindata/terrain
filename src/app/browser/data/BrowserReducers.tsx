@@ -201,7 +201,9 @@ let duplicateVariant = (variant, id, groupId?, algorithmId?) =>
 BrowserReducers[ActionTypes.variants.duplicate] =
   (state, action) =>
     addVariant(state, 
-      duplicateVariant(action.payload.variant, Util.getId(), action.payload.groupId, action.payload.algorithmId),
+      duplicateVariant(
+        BrowserTypes.touchVariant(action.payload.variant), 
+        Util.getId(), action.payload.groupId, action.payload.algorithmId),
       action.payload.index);
 
 

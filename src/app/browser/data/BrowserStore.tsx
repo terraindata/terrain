@@ -53,9 +53,6 @@ import RoleStore from './../../roles/data/RolesStore.tsx';
 import Actions from "./BrowserActions.tsx";
 import BrowserTypes from './../BrowserTypes.tsx';
 import Util from './../../util/Util.tsx';
-import { g0, g1, g2, g3, g4 } from './BrowserFixtures.tsx';
-import { a00, a01, a02, a03 } from './BrowserFixtures.tsx';
-import { v000, v001, v002, v003, v004, v005, v006, v007, v008, v009 } from './BrowserFixtures.tsx';
 
 import Ajax from './../../util/Ajax.tsx';
 

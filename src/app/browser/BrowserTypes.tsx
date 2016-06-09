@@ -94,10 +94,15 @@ export module BrowserTypes
     dbFields: string[]; // fields saved directly to DB
     dataFields: string[]; // fields saved in metadata
   }
-  export function newVariant(algorithmId: string, groupId: string, id?: ID, name?: string, lastEdited?: string,
-    lastUsername?: string, status?: EVariantStatus):Variant
+  export function newVariant(algorithmId: string, groupId: string, id?: ID, name?: string, status?: EVariantStatus):Variant
   {
-    return new Variant(Util.extendId({ algorithmId, groupId, id, name, lastEdited, lastUsername, status }));
+    return touchVariant(new Variant(Util.extendId({ algorithmId, groupId, id, name, status})));
+  }
+  
+  export function touchVariant(v: Variant): Variant
+  {
+    return v.set('lastEdited', new Date())
+      .set('lastUsername', localStorage['username']) as Variant;
   }
   
   

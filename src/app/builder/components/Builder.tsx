@@ -58,6 +58,7 @@ import Actions from "./../data/BuilderActions.tsx";
 import Util from "./../../util/Util.tsx";
 import UserActions from '../../users/data/UserActions.tsx';
 import RolesActions from '../../roles/data/RolesActions.tsx';
+import BrowserTypes from '../../browser/BrowserTypes.tsx';
 
 // Components
 import Classs from './../../common/components/Classs.tsx';
@@ -229,7 +230,7 @@ class Builder extends Classs<Props>
   
   save()
   {
-    Ajax.saveItem(Immutable.fromJS(this.reduxState[this.getSelectedId()]));
+    Ajax.saveItem(BrowserTypes.touchVariant(Immutable.fromJS(this.reduxState[this.getSelectedId()])));
   }
   
   getLayout()

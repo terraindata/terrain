@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
+import * as moment from 'moment';
 import Classs from './../../common/components/Classs.tsx';
 import BrowserColumn from './BrowserColumn.tsx';
 import BrowserItem from './BrowserItem.tsx';
@@ -217,6 +218,20 @@ class AlgorithmsColumn extends Classs<Props>
     let canEdit = me && roles && roles.getIn([algorithm.groupId, me.username, 'builder']);
     let canDrag = me && roles && roles.getIn([algorithm.groupId, me.username, 'admin']);
     
+    let lastTouched = algorithm.variants.reduce((lastTouched, v) =>
+    {
+      let date = new Date(v.lastEdited);
+      if(!lastTouched || (lastTouched.date < date || isNaN(lastTouched.date.getTime())))
+      {
+        return ({
+          date,
+          username: v.lastUsername,
+        });
+      }
+      return lastTouched;
+    }, null);
+    let {date, username} = lastTouched;
+    
     return (
       <BrowserItem
         index={index}
@@ -241,7 +256,7 @@ class AlgorithmsColumn extends Classs<Props>
         canDuplicate={canDrag}
       >
         <div className='flex-container'>
-          <UserThumbnail username={algorithm.lastUsername} />
+          <UserThumbnail username={username} medium={true} />
           
           <div className='flex-grow'>
             <div className='browser-item-line'>
@@ -251,7 +266,7 @@ class AlgorithmsColumn extends Classs<Props>
               />
             </div>
             <div className='browser-item-line'>
-              Last Edited: { algorithm.lastEdited }
+              { moment(date).fromNow() }
             </div>
           </div>
         </div>

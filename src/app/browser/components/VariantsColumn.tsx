@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import * as _ from 'underscore';
+import * as moment from 'moment';
 import Classs from './../../common/components/Classs.tsx';
 import BrowserColumn from './BrowserColumn.tsx';
 import BrowserItem from './BrowserItem.tsx';
@@ -235,11 +236,11 @@ class VariantsColumn extends Classs<Props>
         canDrag={canDrag}
       >
         <div className='flex-container'>
-          <UserThumbnail username={vriant.lastUsername} />
+          <UserThumbnail username={vriant.lastUsername} medium={true} />
           
           <div className='flex-grow'>
             <div className='browser-item-line'>
-              Last Edited: { vriant.lastEdited }
+              { moment(vriant.lastEdited).fromNow() }
             </div>
           </div>
         </div>
