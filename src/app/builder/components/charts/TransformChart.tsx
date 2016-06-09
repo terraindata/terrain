@@ -131,7 +131,8 @@ var TransformChart = {
     var scales = this._scales(el, state.domain, barsData, state.width, state.height);
     this._draw(el, scales, barsData, state.pointsData, state.onMove,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
-      state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height);
+      state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height,
+      state.canEdit);
     
     d3.select(el).on('mousedown', () => {
       if(!d3.event['shiftKey'] && !d3.event['altKey'])
@@ -142,11 +143,14 @@ var TransformChart = {
     });
     
     var drawMenu = this._drawMenu;
-    d3.select(el).select('.inner-svg').on('contextmenu', function() {
-      d3.event['preventDefault']();
-      drawMenu(el, d3.mouse(this), '+ Point', state.onCreate, scales);
-      return false;
-    });
+    if(state.canEdit)
+    {
+      d3.select(el).select('.inner-svg').on('contextmenu', function() {
+        d3.event['preventDefault']();
+        drawMenu(el, d3.mouse(this), '+ Point', state.onCreate, scales);
+        return false;
+      });
+    }
   },
   
   destroy(el)
@@ -590,15 +594,20 @@ var TransformChart = {
     return linesPointsData;
   },
   
-  _drawLines(el, scales, pointsData, onClick, onMove)
+  _drawLines(el, scales, pointsData, onClick, onMove, canEdit)
   {
     var lineFunction = d3.svg.line()
       .x((d) => scales.realX(d['x']))
       .y((d) => scales.realPointY(d['y']));
     
-    d3.select(el).select('.lines')
+    var lines = d3.select(el).select('.lines')
       .attr("d", lineFunction(this._getLinesData(pointsData, scales)))
-      .on("mousedown", this._lineMousedownFactory(el, onClick, scales, onMove));
+      .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
+    
+    if(canEdit)
+    {
+      lines.on("mousedown", this._lineMousedownFactory(el, onClick, scales, onMove));
+    }
     
     d3.select(el).select('.lines-bg')
       .attr("d", lineFunction(this._getLinesData(pointsData, scales, true)));
@@ -693,7 +702,7 @@ var TransformChart = {
     return false;
   },
   
-  _drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart)
+  _drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart, canEdit)
   {
     var g = d3.select(el).selectAll('.points');
     
@@ -706,20 +715,25 @@ var TransformChart = {
     point
       .attr('cx', (d) => scales.realX(d['x']))
       .attr('cy', (d) => scales.realPointY(d['y']))
-      .attr('class', (d) => 'point' + (d['selected'] ? ' point-selected' : ''))
+      .attr('class', (d) => 
+        'point' + (d['selected'] ? ' point-selected' : '')
+          + (canEdit ? '' : ' point-disabled'))
       .attr('r',  10);
     
     point
       .attr('_id', (d) => d['id']);
       
-    point.on('mousedown', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
-    point.on('touchstart', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
-    point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu))
+    if(canEdit)
+    {
+      point.on('mousedown', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
+      point.on('touchstart', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
+      point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu))
+    }
     
     point.exit().remove();
   },
   
-  _draw(el, scales, barsData, pointsData, onMove, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height)
+  _draw(el, scales, barsData, pointsData, onMove, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -729,8 +743,8 @@ var TransformChart = {
     this._drawAxes(el, scales, width, height);
     this._drawBars(el, scales, barsData);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
-    this._drawLines(el, scales, pointsData, onLineClick, onLineMove);
-    this._drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart);
+    this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+    this._drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart, canEdit);
   },
   
   _scales(el, domain, barsData, stateWidth, stateHeight)

@@ -171,6 +171,7 @@ var ReactTooltip = function (_Component) {
     key: 'componentDidMount',
     value: function componentDidMount() {
       this.bindListener();
+      setTimeout(this.bindListener.bind(this), 1000);
       this.setStyleHeader();
       /* Add window event listener for hide and rebuild */
       window.removeEventListener('__react_tooltip_hide_event', this.globalHide);

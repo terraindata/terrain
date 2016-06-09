@@ -145,6 +145,7 @@ var Input = React.createClass<any, any>({
     
     return (
       <BuilderTextbox
+        {...this.props}
         value={this.props.input.value}
         className="input-text input-text-second"
         id={this.props.input.id}
@@ -165,6 +166,7 @@ var Input = React.createClass<any, any>({
         <div className='input-inner'>
           <div className='input-top-row'>
             <BuilderTextbox
+              {...this.props}
               value={this.props.input.key}
               className="input-text input-text-first"
               id={this.props.input.id}

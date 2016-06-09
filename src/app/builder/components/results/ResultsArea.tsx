@@ -60,6 +60,7 @@ interface Props
   algorithm: any;
   onLoadStart: () => void;
   onLoadEnd: () => void;
+  canEdit: boolean;
 }
 
 class ResultsArea extends Classs<Props>
@@ -229,7 +230,12 @@ class ResultsArea extends Classs<Props>
     var layout = {
       cells: this.state.results.map((result, index) => {
         return {
-          content: <Result data={result} onExpand={this.handleExpand} index={index} />,
+          content: <Result
+            data={result}
+            onExpand={this.handleExpand}
+            index={index}
+            canDrag={this.props.canEdit}
+          />,
           key: result.id,
         };
       }),

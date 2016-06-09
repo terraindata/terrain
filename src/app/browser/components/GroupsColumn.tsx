@@ -145,7 +145,8 @@ class GroupsColumn extends Classs<Props>
   {
     const group = this.props.groups.get(id);
     let {me, roles} = this.state;
-    let canEdit = me && roles && roles.getIn([id, me.username, 'admin']);
+    let groupRoles = roles && roles.get(id);
+    let canEdit = me && groupRoles && groupRoles.getIn([me.username, 'admin']);
     let canDrag = me && me.isAdmin;
       
     return (
@@ -169,7 +170,9 @@ class GroupsColumn extends Classs<Props>
         canDrag={canDrag}
       >
         {
-          group.usernames.map(username => <UserThumbnail username={username} key={username} />)
+          groupRoles && groupRoles.toArray().map(
+            role => <UserThumbnail username={role.username} key={role.username} />
+          )
         }
       </BrowserItem>
     );

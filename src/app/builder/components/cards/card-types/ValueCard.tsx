@@ -64,6 +64,7 @@ class ValueCard extends Classs<Props>
   render()
   {
     return <BuilderTextbox
+      {...this.props}
       id={this.props.card.id}
       value={this.props.card.value}
       keyPath={this._keyPath('value')}

@@ -144,6 +144,7 @@ class FromCard extends Classs<Props>
           <div className='flex-container'>
             <div className='flex-card-field'>
               <BuilderTextbox
+                {...this.props}
                 value={this.props.card.group}
                 options={this.state.tableNames}
                 ref='group'
@@ -159,6 +160,7 @@ class FromCard extends Classs<Props>
             </div>
             <div className='flex-card-field'>
               <BuilderTextbox
+                {...this.props}
                 value={this.props.card.iterator}
                 ref='iterator'
                 placeholder='Iterator name'

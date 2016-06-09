@@ -58,6 +58,7 @@ interface Props {
   domain: any;
   spotlights: any[];
   inputKey: string;
+  canEdit?: boolean;
 }
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
@@ -330,6 +331,7 @@ class TransformCardChart extends React.Component<Props, any>
       onPointMoveStart: this.onPointMoveStart,
       width: overrideState.width || this.state.width,
       height: overrideState.height || this.state.height,
+      canEdit: this.props.canEdit,
     };
     
     return chartState;

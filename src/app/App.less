@@ -103,7 +103,7 @@ input[type=text], input[type=email], input[type=tel], input[type=num]
   .transition;
   border: 1px solid rgba(0,0,0,0);
   
-  &:hover {
+  &:hover:not(:disabled) {
     border-color: @dark-green; //#ccc; //fade(#00bcd6, 50%);
   }
   

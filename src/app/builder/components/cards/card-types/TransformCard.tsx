@@ -108,6 +108,7 @@ class TransformCard extends Classs<Props>
       <div className='transform-card'>
         <CardField>
           <BuilderTextbox
+            {...this.props}
             value={this.props.card.input}
             ref={inputRef}
             id={this.props.card.id}
@@ -115,6 +116,7 @@ class TransformCard extends Classs<Props>
           />
         </CardField>
         <TransformCardChart
+          {...this.props}
           pointsData={this.props.card.scorePoints}
           barsData={this.props.card.bars}
           domain={this.state.domain}

@@ -96,6 +96,7 @@ class LetVarCard extends Classs<Props>
           <div className='flex-container'>
             <div className='flex-card-field'>
               <BuilderTextbox
+                {...this.props}
                 placeholder='Variable name'
                 value={this.props.card.field} 
                 parentId={this.props.card.id}
@@ -112,6 +113,7 @@ class LetVarCard extends Classs<Props>
             { expanded ? null : 
               <div className='flex-card-field'>
                 <BuilderTextbox
+                  {...this.props}
                   placeholder='Expression'
                   value={this.props.card.expression}
                   className='let-card-code-input'
@@ -127,6 +129,7 @@ class LetVarCard extends Classs<Props>
         </CardField>
         { !expanded ? null : 
           <BuilderTextbox
+            {...this.props}
             placeholder='Expression'
             value={this.props.card.expression}
             className='let-card-code-input'

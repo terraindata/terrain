@@ -289,6 +289,11 @@ var Result = React.createClass<any, any>({
 // Defines a draggable result functionality
 const resultSource = 
 {
+  canDrag(props)
+  {
+    return props.canDrag;
+  },
+  
   beginDrag(props)
   {
     const item = props.data;

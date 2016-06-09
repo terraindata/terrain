@@ -60,7 +60,7 @@ import BrowserTypes from '../../browser/BrowserTypes.tsx';
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
-var LockedIcon = require("./../../../images/icon_pin_18x18.svg?name=LockedIcon");
+var LockedIcon = require("./../../../images/icon_lock.svg?name=LockedIcon");
 
 enum COLUMNS {
   Builder,
@@ -237,7 +237,7 @@ var BuilderColumn = React.createClass<any, any>(
     let canEdit = algorithm.status === BrowserTypes.EVariantStatus.Build
       && Util.canEdit(algorithm, UserStore, RolesStore)
       || this.state.column === COLUMNS.Inputs;
-    let cantEditReason = algorithm.status === BrowserTypes.EVariantStatus.Build ?
+    let cantEditReason = algorithm.status !== BrowserTypes.EVariantStatus.Build ?
       'This Variant is not in Build status' : 'You are not authorized to edit this Variant';
     
     return this.renderPanel((

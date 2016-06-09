@@ -38,14 +38,16 @@
     stroke: @line;
     stroke-width: 3px;
     
-    &:hover,
-    &[active="1"] {
-      stroke-width: 5px;
-    }
-    
-    &.point-selected,
-    &[active="1"] {
-      stroke: #fc5218;
+    &:not(.point-disabled) {
+      &:hover,
+      &[active="1"] {
+        stroke-width: 5px;
+      }
+      
+      &.point-selected,
+      &[active="1"] {
+        stroke: #fc5218;
+      }
     }
   }
   
@@ -61,7 +63,7 @@
     
     .transition(~"stroke 0.15s");
     
-    &:hover {
+    &:hover:not(.lines-disabled) {
       stroke: #fc5218;
     }
     

@@ -54,6 +54,7 @@ import InfoArea from './../../common/components/InfoArea.tsx';
 import Actions from './../data/BrowserActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import Scoreline from './../../common/components/Scoreline.tsx';
+import Util from '../../util/Util.tsx';
 import UserTypes from '../../users/UserTypes.tsx';
 import UserStore from '../../users/data/UserStore.tsx';
 import RoleTypes from '../../roles/RoleTypes.tsx';
@@ -318,7 +319,10 @@ class AlgorithmsColumn extends Classs<Props>
               :
               <InfoArea
                 large='No algorithms created, yet.'
-                button='Create a algorithm'
+                button={
+                  Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
+                    ? 'Create a algorithm' : null
+                  }
                 onClick={this.handleCreate}
               />
             )

@@ -110,6 +110,7 @@ class FilterArea extends Classs<Props>
         <div className='flex-container'>
           <div className='flex-grow card-padding'>
             <BuilderTextbox
+              {...this.props}
               value={filter.condition.first}
               id={this.props.card.id}
               keyPath={this._keyPath('filters', index, 'condition', 'first')}
@@ -130,6 +131,7 @@ class FilterArea extends Classs<Props>
           </div>
           <div className='flex-grow card-padding'>
             <BuilderTextbox
+              {...this.props}
               value={filter.condition.second}
               id={this.props.card.id}
               keyPath={this._keyPath('filters', index, 'condition', 'second')}

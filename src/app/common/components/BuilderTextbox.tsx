@@ -64,6 +64,7 @@ interface Props
   id: string;
   keyPath: (string | number)[];
 
+  canEdit?: boolean;
   options?: string[];  
   placeholder?: string;
   ref?: string;
@@ -84,7 +85,8 @@ class BuilderTextbox extends React.Component<Props, any>
 {
   backupValue: BuilderTypes.CardString;
   
-  constructor(props: Props) {
+  constructor(props: Props)
+  {
     super(props);
     
     // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
@@ -155,6 +157,11 @@ class BuilderTextbox extends React.Component<Props, any>
   
   renderSwitch()
   {
+    if(!this.props.canEdit)
+    {
+      return null;
+    }
+    
     return (
       <a
         className='builder-tb-switch'
@@ -183,6 +190,7 @@ class BuilderTextbox extends React.Component<Props, any>
             this.props.textarea ?
               <textarea
                 ref='input'
+                disabled={!this.props.canEdit}
                 defaultValue={this.props.value as string}
                 onChange={this.handleTextareaChange}
                 className={this.props.className}
@@ -192,6 +200,7 @@ class BuilderTextbox extends React.Component<Props, any>
             :
               <Autocomplete
                 ref='input'
+                disabled={!this.props.canEdit}
                 value={this.props.value as string}
                 options={this.props.options}
                 onChange={this.handleAutocompleteChange}

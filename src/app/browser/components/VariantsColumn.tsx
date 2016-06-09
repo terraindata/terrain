@@ -52,6 +52,7 @@ import CreateItem from '../../common/components/CreateItem.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
+import Util from '../../util/Util.tsx';
 import Actions from './../data/BrowserActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import UserTypes from '../../users/UserTypes.tsx';
@@ -317,7 +318,10 @@ class VariantsColumn extends Classs<Props>
               :
               <InfoArea
                 large='No variants created, yet.'
-                button='Create a variant'
+                button={
+                  Util.haveRole(this.props.groupId, 'builder', UserStore, RolesStore)
+                    ? 'Create a variant' : null
+                }
                 onClick={this.handleCreate}
               />
             )

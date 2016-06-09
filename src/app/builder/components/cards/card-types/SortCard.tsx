@@ -88,6 +88,7 @@ class SortCard extends Classs<Props>
         <div className='flex-container'>
           <div className='flex-card-field'>
             <BuilderTextbox
+              {...this.props}
               value={sort.property}
               id={this.props.card.id}
               keyPath={this._keyPath('sorts', index, 'property')}

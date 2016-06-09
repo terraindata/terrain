@@ -460,6 +460,7 @@ var Card = React.createClass({
         <div ref='cardContainer' className='card-container'>
           { !this.props.singleCard &&
             <CreateCardTool
+              {...this.props}
               index={this.props.index}
               parentId={this.props.parentId}
               open={this.state.addingCardAbove}
@@ -503,6 +504,7 @@ var Card = React.createClass({
           { this.renderAddCard(true) }
           { !this.props.singleCard &&
             <CreateCardTool
+              {...this.props}
               index={this.props.index + 1}
               parentId={this.props.parentId}
               open={this.state.addingCardBelow}
@@ -526,6 +528,11 @@ var Card = React.createClass({
 // Defines a draggable result functionality
 const cardSource = 
 {
+  canDrag(props)
+  {
+    return props.canEdit;
+  },
+  
   beginDrag(props)
   {
     const item = props.card;

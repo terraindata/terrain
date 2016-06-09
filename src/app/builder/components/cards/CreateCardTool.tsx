@@ -59,6 +59,7 @@ interface Props {
   index: number;
   open?: boolean;
   parentId: string;
+  canEdit: boolean;
   dy?: number;
   className?: string;
   onMinimize?: () => void;
@@ -146,7 +147,7 @@ class CreateCardTool extends React.Component<Props, any>
   }
   
   render() {
-    if(!this.props.open)
+    if(!this.props.open || !this.props.canEdit)
     {
       return null;
     }

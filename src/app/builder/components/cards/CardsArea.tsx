@@ -61,6 +61,7 @@ var CardsArea = React.createClass<any, any>({
     spotlights: React.PropTypes.array.isRequired,
     topLevel: React.PropTypes.bool,
     keys: React.PropTypes.array.isRequired,
+    canEdit: React.PropTypes.bool.isRequired,
   },
   
   hasCardsArea()
@@ -134,6 +135,7 @@ var CardsArea = React.createClass<any, any>({
     .concat({
       content: (
         <CreateCardTool
+          {...this.props}
           index={props.cards.length}
           open={props.cards.length === 0}
           parentId={props.parentId}

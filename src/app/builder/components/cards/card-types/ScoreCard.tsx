@@ -119,6 +119,7 @@ class ScoreCard extends Classs<Props>
           colSpan: 3,
           content:
             <BuilderTextbox
+              {...this.props}
               ref={index}
               value={weight.key}
               placeholder='Variable or field name'
@@ -130,6 +131,7 @@ class ScoreCard extends Classs<Props>
           colSpan: 1,
           content:
             <BuilderTextbox
+              {...this.props}
               ref={index + '-weight'}
               value={weight.weight + ""}
               id={this.props.card.id}

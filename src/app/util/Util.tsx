@@ -154,6 +154,17 @@ var Util = {
     return obj;
   },
   
+  haveRole(groupId: ID, role: string, UserStore, RolesStore)
+  {
+    let me = UserStore.getState().get('currentUser');
+    if(!me)
+    {
+      return false;
+    }
+    
+    return !! RolesStore.getState().getIn([groupId, me.username, role]);
+  },
+  
   canEdit(item: BrowserTypes.Variant | BrowserTypes.Algorithm | BrowserTypes.Group, UserStore, RolesStore)
   {
     let me = UserStore.getState().get('currentUser');
@@ -168,7 +179,7 @@ var Util = {
     
     let groupId = item.type === 'group' ? item.id : item['groupId'];
     let role = item.type === 'group' ? 'admin' : 'builder';
-    return !! RolesStore.getState().getIn([groupId, me.username, role]);
+    return !! Util.haveRole(groupId, role, UserStore, RolesStore);
   },
   
   getId(): ID

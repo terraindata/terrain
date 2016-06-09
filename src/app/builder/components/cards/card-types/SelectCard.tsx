@@ -113,6 +113,7 @@ class SelectCard extends Classs<Props>
               onAdd={this.addField}
               >
               <BuilderTextbox
+                {...this.props}
                 value={property.property}
                 placeholder='Type field here'
                 rel={'' + index}

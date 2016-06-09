@@ -59,6 +59,7 @@ interface Props
   placeholder?: string;
   ref?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 class Autocomplete extends Classs<Props>
@@ -210,6 +211,7 @@ class Autocomplete extends Classs<Props>
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
           onKeyDown={this.handleKeydown}
+          disabled={this.props.disabled}
         />
         { !options || !this.state.open ? null :
           <div
