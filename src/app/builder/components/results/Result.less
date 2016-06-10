@@ -109,46 +109,77 @@
 		  overflow-y: hidden;
       height: calc(@result-fields-wrapper-height);
       padding: 3px;
+    }
       
-      .result-field {
-        border-bottom: 1px solid @off-white;
-        padding: 1px;
-        font-size: 12px;
-        // margin: 4px;
-        &.result-field-image {
-          height: 62px;
+    .result-field {
+      border-bottom: 1px solid @off-white;
+      padding: 1px;
+      font-size: 12px;
+      // margin: 4px;
+      &.result-field-image {
+        height: 62px;
+      }
+      
+      .result-field-name {
+        font-weight: bold;
+        display: inline-block;
+        word-break: break-all;
+      }
+      
+      .result-field-value {
+        &.result-field-value-number {
+          font-weight: 400;
         }
         
-        .result-field-name {
-          font-weight: bold;
+        &.result-field-value-italics {
+          font-style: italic;
+        }
+        
+        &.result-field-value-short {
+          float: right;
           display: inline-block;
-          word-break: break-all;
         }
         
-        .result-field-value {
+        &.result-field-value-open {
+          white-space: normal;
+          overflow: visible;
+        }
+        
+        &.result-field-value-image {
+          float: right;
+          display: inline-block;
+          height: 60px;
           
-          
-          &.result-field-value-short {
-            float: right;
-            display: inline-block;
-          }
-          
-          &.result-field-value-open {
-            white-space: normal;
-            overflow: visible;
-          }
-          
-          &.result-field-value-image {
-            float: right;
-            display: inline-block;
-            height: 60px;
-            
-            img {
-              width: 60px;
-            }
+          img {
+            width: 60px;
           }
         }
       }
+    }
+    
+    .result-expanded-fields {
+      margin-top: 10px;
+      padding-top: 10px;
+      
+      .result-expanded-fields-title {
+        text-align: center;
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+    }
+    
+    .result-bottom {
+      position: absolute;
+      bottom: 0px;
+      width: 100%;
+      text-align: center;
+      padding: 3px;
+      font-size: 12px;
+      color: #aaa;
+      background: #fff;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+      box-sizing: border-box;
     }
 	}
   
@@ -224,6 +255,7 @@
     
     .result-inner {
       height: auto;
+      overflow: hidden;
       
       .result-field-value {
         white-space: normal !important;

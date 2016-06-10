@@ -56,13 +56,6 @@ import ColorManager from '../../../util/ColorManager.tsx';
 var PinIcon = require("./../../../../images/icon_pin_21x21.svg?name=PinIcon");
 var ScoreIcon = require("./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon");
 
-// var fields = 
-// [
-//   'current_school',
-//   'cats_ok',
-//   'xp_toddlers',
-// ];
-
 var dragPreviewStyle = {
   backgroundColor: '#cfd7c8',
   borderColor: '#cfd7c8',
@@ -117,10 +110,10 @@ var Result = React.createClass<any, any>({
   
   renderExpandedField(value, field)
   {
-    return this.renderField(field);
+    return this.renderField(value, field);
   },
   
-  renderField(field)
+  renderField(value, field)
   {
     if(field === 'image')
     {
@@ -130,21 +123,30 @@ var Result = React.createClass<any, any>({
             { field }
           </div>
           <div className='result-field-value result-field-value-image'>
-            <img src={this.props.data[field]} />
+            <img src={value} />
           </div>
         </div>
       );
     }
     
-    if(this.props.data[field] === undefined)
+    if(value === undefined)
     {
-      return null;
+      value = 'undefined';
     }
     
-    var value = this.props.data[field];
     if(typeof value === 'boolean')
     {
       value = value ? 'true' : 'false';
+    }
+    if(typeof value === "string" && !value.length)
+    {
+      value = 'blank';
+      var italics = true;
+    }
+    if(value === null)
+    {
+      value = 'null';
+      var italics = true;
     }
     // if(typeof value === 'string')
     // {
@@ -157,7 +159,12 @@ var Result = React.createClass<any, any>({
           { field }
         </div>
         <div
-          className={'result-field-value ' + ((field + this.props.data[field]).length < 15 ? 'result-field-value-short' : '')}
+          className={classNames({
+            'result-field-value': true,
+            'result-field-value-short': (field + value).length < 0,
+            'result-field-value-number': typeof value === 'number',
+            'result-field-value-italics': italics,
+          })}
         >
           {value}
         </div>
@@ -233,11 +240,11 @@ var Result = React.createClass<any, any>({
   },
   
   expand() {
-    this.props.onExpand(this.props.data);
+    this.props.onExpand(this.props.index);
   },
   
 	render() {
-    const { isDragging, connectDragSource, isOver, connectDropTarget } = this.props;
+    const { isDragging, connectDragSource, isOver, connectDropTarget, data } = this.props;
     
     var classes = classNames({
       'result': true,
@@ -253,6 +260,32 @@ var Result = React.createClass<any, any>({
      //          { this.props.data.score }
      //        </div>
 					// </div>
+    
+    let dataArr = _.keys(data);
+    if(dataArr.length > 4 && !this.props.expanded)
+    {
+      var bottom = (
+        <div className='result-bottom'>
+          { dataArr.length - 4 } more fields
+        </div>
+      );
+    }
+    
+    if(this.props.expanded)
+    {
+      var {allFieldsData} = this.props;
+      var expanded = (
+        <div className='result-expanded-fields'>
+          <div className='result-expanded-fields-title'>
+            All Fields
+          </div>
+          {
+            allFieldsData ? _.map(allFieldsData, this.renderExpandedField) : 'Loading...'
+          }
+        </div>
+      );
+    }
+    
     return connectDropTarget(connectDragSource(
       <div className={classes} onDoubleClick={this.expand}>
         <div className='result-inner'>
@@ -268,9 +301,11 @@ var Result = React.createClass<any, any>({
           <Menu options={this.getMenuOptions()} />
           <div className='result-fields-wrapper'>
             {
-              _.map(this.props.data, this.renderExpandedField)
+                _.map(data, this.renderField)
             }
+            { expanded }
           </div>
+          { bottom }
         </div>
         <div className='result-dragging' ref='drag-handle'>
           { this.props.data.name }

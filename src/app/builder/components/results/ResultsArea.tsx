@@ -66,20 +66,17 @@ interface Props
 class ResultsArea extends Classs<Props>
 {
   xhr = null;
+  allXhr = null;
   
   state = {
       results: null,
+      resultsWithAllFields: null,
       resultText: null,
       expanded: false,
-      expandedResult: {},
+      expandedResultIndex: null,
       tql: "",
       error: null,
       resultType: null,
-      
-      // pageChanging: false,
-      // nextPage: null,
-      // page: this.props.resultsPage,
-      // hoveringPage: null,
   }
   
   componentDidMount()
@@ -90,7 +87,9 @@ class ResultsArea extends Classs<Props>
   componentWillUnmount()
   {
     this.xhr && this.xhr.abort();
+    this.allXhr && this.allXhr.abort();
     this.xhr = false;
+    this.allXhr = false;
   }
   
   componentWillReceiveProps(nextProps)
@@ -108,11 +107,11 @@ class ResultsArea extends Classs<Props>
     });
   }
   
-  handleExpand(result)
+  handleExpand(resultIndex)
   {
     this.setState({
       expanded: true,
-      expandedResult: result,
+      expandedResultIndex: resultIndex,
     });
   }
 
@@ -122,11 +121,22 @@ class ResultsArea extends Classs<Props>
   
   renderExpandedResult()
   {
+    let {results, resultsWithAllFields, expandedResultIndex} = this.state;
+    if(results)
+    {
+      var result = results[expandedResultIndex];
+    }
+    if(resultsWithAllFields)
+    {
+      var resultAllFields = resultsWithAllFields[expandedResultIndex];
+    }
+    
     return (
       <div className={'result-expanded-wrapper' + (this.state.expanded ? '' : ' result-collapsed-wrapper')}>
         <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
         <Result 
-          data={this.state.expandedResult}
+          data={result}
+          allFieldsData={resultAllFields}
           onExpand={this.handleCollapse}
           expanded={true}
           drag_x={false}
@@ -136,62 +146,6 @@ class ResultsArea extends Classs<Props>
       </div>
     );
   }
-  
-  // changePage(page)
-  // {
-  //   this.setState({
-  //     pageChanging: true,
-  //     page: page,
-  //   });
-    
-  //   Actions.results.changePage(this.props.parentId, page);
-  // },
-  
-  // componentWillUpdate(newProps, newState)
-  // {
-  //   if(newState.pageChanging && newProps.resultsPage === newState.page)
-  //   {
-  //     this.setState({
-  //       pageChanging: false,
-  //     });
-  //   }
-  // },
-  
-  // handlePageHover(page)
-  // {
-  //   this.setState({
-  //     hoverPage: page,
-  //   });
-    
-  //   return true;
-  // },
-  
-  // renderPaging()
-  // {
-  //   return (
-  //     <Paging 
-  //       page={this.props.resultsPage}
-  //       pages={this.props.resultsPages}
-  //       onChange={this.changePage}
-  //       onHover={this.handlePageHover}
-  //       onHoverEnd={this.handlePageHover}
-  //       />
-  //   );
-  // },
-  
-  // moveResult(curIndex, newIndex)
-  // {
-  //   if(this.state.hoverPage)
-  //   {
-  //     alert('Moved to page ' + this.state.hoverPage);
-  //     this.setState({
-  //       hoverPage: null,
-  //     });
-  //     return;
-  //   }
-    
-  //   Actions.results.move(this.props.results[curIndex], newIndex);
-  // },
   
   renderResults()
   {
@@ -247,9 +201,16 @@ class ResultsArea extends Classs<Props>
     return <LayoutManager layout={layout} />; //moveTo={this.moveResult}
   }
   
-  handleResultsChange(response)
+  handleAllFieldsResponse(response)
   {
-    if(!this.xhr) return;
+    this.handleResultsChange(response, true);
+  }
+  
+  handleResultsChange(response, isAllFields?: boolean)
+  {
+    let xhrKey = isAllFields ? 'allXhr' : 'xhr';
+    if(!this[xhrKey]) return;
+    this[xhrKey] = null;
     
     var result;
     try {
@@ -257,7 +218,6 @@ class ResultsArea extends Classs<Props>
     } catch(e) {
       this.setState({
         error: "No response was returned from the server.",
-        xhr: null,
         // TODO add error
       });
       return; 
@@ -270,7 +230,6 @@ class ResultsArea extends Classs<Props>
       {
         this.setState({
           error: "Error on line " + result.line+": " + result.error,
-          xhr: null,
           querying: false,
           results: null,
           resultType: null,
@@ -280,7 +239,6 @@ class ResultsArea extends Classs<Props>
       {
         this.setState({
           error: "Error with query: " + result.raw_result,
-          xhr: null,
           querying: false,
           results: null,
           resultType: null,
@@ -288,13 +246,19 @@ class ResultsArea extends Classs<Props>
       }
       else
       {
-        this.setState({
-          results: result.value,
-          resultType: result.type,
-          querying: false,
-          error: false,
-          xhr: null,
-        });
+        if(isAllFields)
+        {
+          this.setState({
+            resultsWithAllFields: result.value,
+          });
+        } else {
+          this.setState({
+            results: result.value,
+            resultType: result.type,
+            querying: false,
+            error: false,
+          });
+        }
       }
     }
     else
@@ -325,6 +289,10 @@ class ResultsArea extends Classs<Props>
       });
       this.props.onLoadStart && this.props.onLoadStart();
       this.xhr = Ajax.query(tql, this.handleResultsChange, this.handleError);
+      this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm.cards, { allFields: true }), 
+        this.handleAllFieldsResponse,
+        this.handleError
+      );
     }
   }
 

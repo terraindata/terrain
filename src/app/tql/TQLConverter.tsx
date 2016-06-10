@@ -52,11 +52,41 @@ var addTabs = (str) => str.replace(/\n/g, "\n ");
 var removeBlanks = (str) => str.replace(/\n[ \t]*\n/g, "\n");
 type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
 
+export interface Options {
+  allFields?: boolean; // amend the final Select card to include all possible fields.
+}
+
 class TQLConverter
 {
-  static toTQL(cards: BuilderTypes.ICard[]): string
+  static toTQL(cards: BuilderTypes.ICard[], options: Options = {}): string
   {
-    return removeBlanks(this._cards(cards, ";"));
+    cards = JSON.parse(JSON.stringify(cards)) as BuilderTypes.ICard[];
+    if(options.allFields)
+    {
+      // find top-level 'from' cards
+      cards.map(topCard =>
+      {
+        if(topCard.type === 'from')
+        {
+          var fromCard = topCard as BuilderTypes.IFromCard;
+          fromCard.cards = fromCard.cards.map(card =>
+          {
+            if(card.type === 'select')
+            {
+              card['properties'] = [
+                {
+                  property: '*',
+                  id: 1,
+                }
+              ];
+            }
+            return card;
+          })
+        }
+      });
+    }
+    
+    return removeBlanks(this._cards(cards, ";", options));
   }
 
   // parse strings where "$key" indicates to replace "$key" with the value of card[key]
@@ -101,7 +131,7 @@ class TQLConverter
     skip: "skip $value",
   }
   
-  private static _cards(cards: BuilderTypes.ICard[], append?: string): string
+  private static _cards(cards: BuilderTypes.ICard[], append?: string, options?: Options): string
   {
     var glue = "\n" + (append || "");
     return addTabs("\n" + cards.map(this._card, this).join(glue)) + glue;
@@ -109,6 +139,8 @@ class TQLConverter
   
   private static _card(card: BuilderTypes.ICard): string
   {
+    // var {TQLF, _parse} = TQLConverter;
+    // var options = this;
     if(this.TQLF[card.type])
     {
       return this._parse(this.TQLF[card.type], card);
