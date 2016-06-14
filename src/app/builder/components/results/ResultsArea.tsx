@@ -44,12 +44,13 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as React from 'react';
+import * as classNames from 'classnames';
 import Util from '../../../util/Util.tsx';
 import Ajax from '../../../util/Ajax.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import Result from "../results/Result.tsx";
-import LayoutManager from "../layout/LayoutManager.tsx";
+import {Config, ResultsConfig} from "../results/ResultsConfig.tsx";
 import InfoArea from '../../../common/components/InfoArea.tsx';
 // import Paging from '../common/Paging.tsx';
 import TQLConverter from "../../../tql/TQLConverter.tsx";
@@ -69,14 +70,23 @@ class ResultsArea extends Classs<Props>
   allXhr = null;
   
   state = {
-      results: null,
-      resultsWithAllFields: null,
-      resultText: null,
-      expanded: false,
-      expandedResultIndex: null,
-      tql: "",
-      error: null,
-      resultType: null,
+    results: null,
+    resultsWithAllFields: null,
+    resultsConfig: null,
+    resultText: null,
+    expanded: false,
+    expandedResultIndex: null,
+    tql: "",
+    error: null,
+    resultType: null,
+    showingConfig: false,
+  }
+  
+  constructor(props:Props)
+  {
+    super(props);
+    
+    this.state.resultsConfig = this.getResultsConfig()[this.props.algorithm.id];
   }
   
   componentDidMount()
@@ -97,6 +107,10 @@ class ResultsArea extends Classs<Props>
     if(!_.isEqual(nextProps.algorithm, this.props.algorithm))
     {
       this.queryResults(nextProps.algorithm);
+      console.log(this.getResultsConfig()[nextProps.algorithm.id]);
+      this.setState({
+        resultsConfig: this.getResultsConfig()[nextProps.algorithm.id],
+      });
     }
   }
   
@@ -107,7 +121,7 @@ class ResultsArea extends Classs<Props>
     });
   }
   
-  handleExpand(resultIndex)
+  handleExpand(resultIndex: number)
   {
     this.setState({
       expanded: true,
@@ -130,13 +144,17 @@ class ResultsArea extends Classs<Props>
     {
       var resultAllFields = resultsWithAllFields[expandedResultIndex];
     }
-    
+    if(!result)
+    {
+      return null;
+    }
     return (
       <div className={'result-expanded-wrapper' + (this.state.expanded ? '' : ' result-collapsed-wrapper')}>
         <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
         <Result 
           data={result}
           allFieldsData={resultAllFields}
+          config={this.state.resultsConfig}
           onExpand={this.handleCollapse}
           expanded={true}
           drag_x={false}
@@ -181,24 +199,24 @@ class ResultsArea extends Classs<Props>
       />;
     }
     
-    var layout = {
-      cells: this.state.results.map((result, index) => {
-        return {
-          content: <Result
-            data={result}
-            onExpand={this.handleExpand}
-            index={index}
-            canDrag={this.props.canEdit}
-          />,
-          key: result.id,
-        };
-      }),
-      cellHeight: 200,
-      minCellWidth: 175,
-      fullHeight: true,
-    };
-
-    return <LayoutManager layout={layout} />; //moveTo={this.moveResult}
+    return (
+      <div className='results-area-results'>
+        {
+          this.state.results.map((result, index) => 
+            <Result
+              data={result}
+              allFieldsData={this.state.resultsWithAllFields && this.state.resultsWithAllFields[index]}
+              config={this.state.resultsConfig}
+              onExpand={this.handleExpand}
+              index={index}
+              canDrag={this.props.canEdit}
+              key={index}
+            />
+          )
+        }
+        <div className='results-area-fodder' />
+      </div>
+    );
   }
   
   handleAllFieldsResponse(response)
@@ -295,14 +313,87 @@ class ResultsArea extends Classs<Props>
       );
     }
   }
+  
+  renderTopbar()
+  {
+    return (
+      <div className='results-top'>
+        <div className='results-top-summary'>
+          {
+            this.state.error ? 'Error with query' : 
+            (this.state.results ? `${this.state.results.length} results` : 'Text result')
+          }
+        </div>
+        <div className='results-top-config' onClick={this.showConfig}>
+          Customize view
+        </div>
+      </div>
+    );
+  }
+  
+  showConfig()
+  {
+    this.setState({
+      showingConfig: true,
+    });
+  }
+  
+  hideConfig()
+  {
+    this.setState({
+      showingConfig: false,
+    });
+  }
+  
+  getResultsConfig()
+  {
+    var config;
+    try {
+      config = JSON.parse(localStorage['resultsConfig'])
+    } catch(e) {
+      config = {};
+    }
+    if(typeof config !== 'object')
+    {
+      config = {};
+    }
+    return config;
+  }
+  
+  renderConfig()
+  {
+    if(this.state.showingConfig)
+    {
+      return <ResultsConfig
+        config={this.getResultsConfig()[this.props.algorithm.id]}
+        onClose={this.hideConfig}
+        onConfigChange={this.handleConfigChange}
+        resultsWithAllFields={this.state.resultsWithAllFields}
+      />;
+    }
+  }
+  
+  handleConfigChange(config:Config)
+  {
+    var resultsConfig = this.getResultsConfig();
+    resultsConfig[this.props.algorithm.id] = config;
+    localStorage['resultsConfig'] = JSON.stringify(resultsConfig);
+    this.setState({
+      resultsConfig: config,
+    });
+  }
 
 	render()
   {
-        // { this.renderPaging() }
     return (
-      <div className='results-area'>
+      <div className={classNames({
+        'results-area': true,
+        'results-area-config-open': this.state.showingConfig,
+      })}>
+        { this.renderTopbar() }
         { this.renderResults() }
         { this.renderExpandedResult() }
+        { this.renderConfig() }
       </div>
     );
 	}

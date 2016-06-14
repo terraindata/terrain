@@ -1,0 +1,164 @@
+@import "../../../common/Common.less";
+
+@result-name-bg: #cfd7c8;
+@result-score-bg: #dfe6d8;
+
+.results-config-wrapper {
+  *, *:before, *:after {
+    box-sizing: border-box;
+  }
+  
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  
+  @br: 5px;
+  
+  .results-config {
+    position: absolute;
+    left: 5%;
+    top: 5%;
+    width: 90%;
+    height: 90%;
+    overflow: hidden;
+    
+    background: #fff;
+    border-radius: @br;
+    
+    @bar-h: 30px;
+    .results-config-bar {
+      height: @bar-h;
+      position: relative;
+      // border-bottom: 1px solid #ddd;
+      background: darken(@dark-grey, 10%);
+      
+      .results-config-title {
+        // text-align: center;
+        font-size: 16px;
+        padding: 6px 12px;
+        color: @off-white;
+        // margin-bottom: 6px;
+      }
+      
+      
+      .results-config-button {
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        height: 100%;
+        font-size: 16px;
+        padding: 0px 20px;
+        background: @sea-green;
+        cursor: pointer;
+        color: #fff;
+        padding-top: 5px;
+        
+        &:hover {
+          background: darken(@sea-green, 5%);
+        }
+      }
+      
+      // .results-config-instructions {
+      //   text-align: left;
+      //   font-size: 13px;
+      //   margin-bottom: 12px;
+      // }
+      
+    }
+    
+    .results-config-config-wrapper,
+    .results-config-available-fields {
+      position: absolute;
+      overflow: auto;
+      top: @bar-h;
+      width: 50%;
+      height: calc(~"100% - @{bar-h}");
+      background: @dark-grey;
+    }
+    
+    .results-config-config-wrapper {
+      left: 50%;
+      // background: #eee;
+      // border-top-left-radius: @br;
+      // border-bottom-left-radius: @br;
+      padding: 12px;
+      .results-config-config {
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: -1px 1px 2px rgba(0,0,0,0.75);
+        
+        .results-config-name,
+        .results-config-score,
+        .results-config-fields {
+          padding: 3px;
+          
+          em {
+            padding: 8px;
+            display: inline-block;
+          }
+        }
+        
+        .results-config-name {
+          background: @result-name-bg;
+          border-top-left-radius: 5px;
+          border-top-right-radius: 5px;
+          &.results-config-over {
+            border: 3px solid @bright-green;
+            padding: 0px;
+            // background: darken(@result-name-bg, 4%);
+          }
+          .results-config-field {
+            background: @result-name-bg;
+          }
+        }
+        
+        .results-config-score {
+          background: @result-score-bg;
+          &.results-config-over {
+            border: 3px solid @bright-green;
+            padding: 0px;
+            // background: darken(@result-score-bg, 4%);
+          }
+          .results-config-field {
+            background: @result-score-bg;
+          }
+        }
+        
+        .results-config-fields {
+          background: #fff;
+          min-height: 100px;
+          &.results-config-over {
+            border: 3px solid @bright-green;
+            padding: 0px;
+            // background: #f7fffa;
+          }
+        }
+      }
+    }
+    
+    .results-config-available-fields {
+      left: 0%;
+      background: #eee;
+      // padding: 6px;
+      
+      &.results-config-over {
+        // background: #f7fffa;
+        border: 3px solid @bright-green;
+        padding: 3px;
+      }
+    }
+    
+    .results-config-field {
+      padding: 8px;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      
+      &.results-config-field-dragging {
+        opacity: 0;
+      }
+    }
+  }
+}

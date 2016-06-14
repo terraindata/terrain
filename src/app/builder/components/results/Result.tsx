@@ -52,6 +52,8 @@ import Util from '../../../util/Util.tsx';
 import Menu from '../../../common/components/Menu.tsx';
 import Actions from '../../data/BuilderActions.tsx';
 import ColorManager from '../../../util/ColorManager.tsx';
+import Classs from './../../../common/components/Classs.tsx';
+import {Config} from './ResultsConfig.tsx';
 
 var PinIcon = require("./../../../../images/icon_pin_21x21.svg?name=PinIcon");
 var ScoreIcon = require("./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon");
@@ -69,52 +71,53 @@ var dragPreviewStyle = {
   borderRadius: 10
 }
 
-var Result = React.createClass<any, any>({
-  
-  getInitialState() {
-    return {
-      score: Math.random(),
-      openFields: [],
-      expanded: false,
-    }
-  },
+interface Props
+{
+  data: {
+    id: string;
+    name: string;
+    spotlight: any;
+    pinned: boolean;
+  };
+  allFieldsData: any;
+  connectDragPreview?: (a:any) => void;
+  config: Config;
+  index: number;
+  onExpand: (index:number) => void;
+  expanded?: boolean;
+  isDragging: boolean;
+  connectDragSource: (a:any) => any;
+  isOver: boolean;
+  connectDropTarget: (a:any) => any;
+}
 
-	propTypes:
-	{
-		data: React.PropTypes.object.isRequired,
-    onExpand: React.PropTypes.func.isRequired,
-    index: React.PropTypes.number.isRequired,
-	},
-  
+class Result extends Classs<Props> {
   shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  },
+  }
   
-  componentDidMount() {
-    this.dragPreview = createDragPreview(this.props.data.name, dragPreviewStyle);
-    this.props.connectDragPreview(this.dragPreview);
-  },
+  // dragPreview: any;
+  // componentDidMount() {
+  //   this.dragPreview = createDragPreview(this.props.data.name, dragPreviewStyle);
+  //   this.props.connectDragPreview(this.dragPreview);
+  // }
 
-	getDefaultProps() 
-	{
-		return {
-			drag_x: true,
-			drag_y: true,
-			reorderOnDrag: true,
-			dragInsideOnly: true,
-      dragHandleRef: 'drag-handle',
-      data: {},
-		};
-	},
-  
+  getValue(field)
+  {
+    var {data, allFieldsData} = this.props;
+    return allFieldsData ? allFieldsData[field] : (data && data[field]);
+  }
+
   renderExpandedField(value, field)
   {
-    return this.renderField(value, field);
-  },
+    return this.renderField(field);
+  }
   
-  renderField(value, field)
+  renderField(field)
   {
+    var value = this.getValue(field);
+    
     if(field === 'image')
     {
       return (
@@ -170,27 +173,27 @@ var Result = React.createClass<any, any>({
         </div>
       </div>
     );
-  },
+  }
   
   spotlight()
   {
     Actions.results.spotlight(this.props.data, ColorManager.colorForKey(this.props.data.id));
-  },
+  }
   
   unspotlight()
   {
     Actions.results.spotlight(this.props.data, false);
-  },
+  }
   
   pin()
   {
     Actions.results.pin(this.props.data, true);
-  },
+  }
   
   unpin()
   {
     Actions.results.pin(this.props.data, false);
-  },
+  }
   
   renderSpotlight()
   {
@@ -200,7 +203,7 @@ var Result = React.createClass<any, any>({
     }
     
     return <div className='result-spotlight' style={{background: this.props.data.spotlight}}></div>;
-  },
+  }
   
   getMenuOptions()
   {
@@ -221,7 +224,7 @@ var Result = React.createClass<any, any>({
       });
     }
     
-    if(this.props.data.pinned)
+    if(this.props.data && this.props.data.pinned)
     {
       menuOptions.push({
         text: 'Un-Pin',
@@ -237,36 +240,72 @@ var Result = React.createClass<any, any>({
     }
     
     return menuOptions;
-  },
+  }
   
-  expand() {
+  expand()
+  {
     this.props.onExpand(this.props.index);
-  },
+  }
   
-	render() {
-    const { isDragging, connectDragSource, isOver, connectDropTarget, data } = this.props;
+  getFields(): string[]
+  {
+    let {config, data} = this.props;
+    if(config && config.fields && config.fields.length)
+    {
+      return config.fields;
+    }
+    else
+    {
+      return _.keys(data);
+    }
+  }
+  
+  getName()
+  {
+    let {config, data} = this.props;
+    if(config && config.name)
+    {
+      var nameField = config.name;
+    }
+    else
+    {
+      var nameField = _.first(this.getFields());
+    }
+    
+    return this.getValue(nameField);
+  }
+  
+	render()
+  {
+    const { isDragging, connectDragSource, isOver, connectDropTarget, data, config } = this.props;
     
     var classes = classNames({
       'result': true,
-      'result-pinned': this.props.data.pinned,
-      'result-expanded': this.state.expanded,
+      'result-pinned': this.props.data && this.props.data.pinned,
+      'result-expanded': this.props.expanded,
       'result-dragging': isDragging,
       'result-drag-over': isOver,
     });
-					// <div className='result-score'>
-     //        <ScoreIcon className='result-score-icon' />
-     //        Final Score
-     //        <div className='result-score-score'>
-     //          { this.props.data.score }
-     //        </div>
-					// </div>
     
-    let dataArr = _.keys(data);
-    if(dataArr.length > 4 && !this.props.expanded)
+    if(config && config.score)
+    {
+      var scoreArea = (
+    		<div className='result-score'>
+          <ScoreIcon className='result-score-icon' />
+          <div className='result-score-score'>
+            { this.getValue(config.score) }
+          </div>
+    		</div>
+      );
+    }
+    
+    let fields = this.getFields();
+    
+    if(fields.length > 4 && !this.props.expanded)
     {
       var bottom = (
         <div className='result-bottom'>
-          { dataArr.length - 4 } more fields
+          { fields.length - 4 } more fields
         </div>
       );
     }
@@ -295,13 +334,14 @@ var Result = React.createClass<any, any>({
               <div className='result-pin-icon'>
                 <PinIcon />
               </div>
-              { this.props.data[_.first(_.keys(this.props.data))] }
+              { this.getName() }
             </div>
           </div>
           <Menu options={this.getMenuOptions()} />
+          { scoreArea }
           <div className='result-fields-wrapper'>
             {
-                _.map(data, this.renderField)
+                _.map(fields, this.renderField)
             }
             { expanded }
           </div>
@@ -315,8 +355,8 @@ var Result = React.createClass<any, any>({
               // this.props.expanded
               //   ? _.map(this.props.result, this.renderField)
               //   : fields.map(this.renderField)
-	},
-});
+	}
+};
 
 
 // DnD stuff
