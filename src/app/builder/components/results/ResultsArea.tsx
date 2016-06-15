@@ -79,7 +79,7 @@ class ResultsArea extends Classs<Props>
     tql: "",
     error: null,
     resultType: null,
-    showingConfig: false,
+    showingConfig: true,
   }
   
   constructor(props:Props)

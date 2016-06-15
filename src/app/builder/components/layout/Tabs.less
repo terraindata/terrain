@@ -135,20 +135,16 @@
       border-top: 1px solid @tab-border-color;
       
       .tabs-close {
-        display: inline-block;
         margin-left: 10px;
         opacity: 0;
+        display: inline-block;
+        position: relative;
+        width: 10px;
+        height: 10px;
         .transition;
         
         svg {
-          fill: @font-color;
-          width: 10px;
-          .transition;
-          
-          &:hover {
-            width: 14px;
-            margin: -2px;
-          }
+          position: absolute;
         }
       }
     }
@@ -203,6 +199,12 @@
     .tab-icon {
       fill: @tab-selected-bg-color;
       stroke: @tab-selected-border-color;
+    }
+  }
+  
+  :not(.tabs-tab-selected) {
+    .tabs-close:not(:hover) svg {
+      fill: @font-color;
     }
   }
   

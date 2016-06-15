@@ -120,7 +120,7 @@ var Tab = React.createClass<any, any>({
         onClick={this.close}
         data-tip='Close'
       >
-        <CloseIcon />
+        <CloseIcon className='close' />
       </div>
     );
   },

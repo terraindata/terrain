@@ -205,6 +205,21 @@ input {
     user-select: text;
 }
 
+.close {
+  display: inline-block;
+  fill: @grey;
+  width: 12px;
+  height: 12px;
+  border-radius: 12px;
+  .transition;
+  background: rgba(255,0,0,0);
+
+  &:hover {
+    fill: #fff;
+    background: rgba(255,60,70,1);
+  }           
+}
+
 
 /* Mixins */
 

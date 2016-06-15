@@ -112,6 +112,7 @@
           }
           .results-config-field {
             background: @result-name-bg;
+            border-bottom: 0px;
           }
         }
         
@@ -124,6 +125,7 @@
           }
           .results-config-field {
             background: @result-score-bg;
+            border-bottom: 0px;
           }
         }
         
@@ -142,19 +144,41 @@
     .results-config-available-fields {
       left: 0%;
       background: #eee;
-      // padding: 6px;
+      padding: 3px;
       
       &.results-config-over {
         // background: #f7fffa;
         border: 3px solid @bright-green;
-        padding: 3px;
+        padding: 0px;
       }
     }
     
     .results-config-field {
       padding: 8px;
+      padding-bottom: 6px;
       background: #fff;
       border-bottom: 1px solid #eee;
+      
+      .results-config-handle {
+        margin-right: 8px;
+        opacity: 0.5;
+        .transition;
+      }
+      
+      .close {
+        float: right;
+        margin-top: 2px;
+        opacity: 0.5;
+        &:hover {
+          opacity: 1;
+        }
+      }
+      
+      &:hover {
+        .results-config-handle {
+          opacity: 1;
+        }
+      }
       
       &.results-config-field-dragging {
         opacity: 0;

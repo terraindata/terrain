@@ -97,11 +97,19 @@ class Result extends Classs<Props> {
     return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
   
-  // dragPreview: any;
-  // componentDidMount() {
-  //   this.dragPreview = createDragPreview(this.props.data.name, dragPreviewStyle);
-  //   this.props.connectDragPreview(this.dragPreview);
-  // }
+  dragPreview: any;
+  componentDidMount() {
+    this.generateDragPreview(this.props); 
+  }
+  componentWillReceiveProps(nextProps)
+  {
+    this.generateDragPreview(nextProps);
+  }
+  generateDragPreview(props:Props)
+  {
+    this.dragPreview = createDragPreview(this.getName(props), dragPreviewStyle);
+    props.connectDragPreview(this.dragPreview);
+  }
 
   getValue(field)
   {
@@ -114,8 +122,13 @@ class Result extends Classs<Props> {
     return this.renderField(field);
   }
   
-  renderField(field)
+  renderField(field, index?)
   {
+    if(index >= 4)
+    {
+      return null;
+    }
+    
     var value = this.getValue(field);
     
     if(field === 'image')
@@ -252,17 +265,19 @@ class Result extends Classs<Props> {
     let {config, data} = this.props;
     if(config && config.fields && config.fields.length)
     {
-      return config.fields;
+      var fields = config.fields;
     }
     else
     {
-      return _.keys(data);
+      var fields = _.keys(data);
     }
+    
+    return fields;
   }
   
-  getName()
+  getName(props?:Props)
   {
-    let {config, data} = this.props;
+    let {config, data} = props || this.props;
     if(config && config.name)
     {
       var nameField = config.name;
@@ -343,9 +358,9 @@ class Result extends Classs<Props> {
             {
                 _.map(fields, this.renderField)
             }
+            { bottom }
             { expanded }
           </div>
-          { bottom }
         </div>
         <div className='result-dragging' ref='drag-handle'>
           { this.props.data.name }

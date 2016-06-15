@@ -54,6 +54,8 @@ import InfoArea from '../../../common/components/InfoArea.tsx';
 import Classs from './../../../common/components/Classs.tsx';
 import { DragSource, DropTarget } from 'react-dnd';
 
+var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
+
 export interface Config {
   name: string;
   score: string;
@@ -173,10 +175,28 @@ export class ResultsConfig extends Classs<Props>
     }
   }
   
-  fieldIsAvailable(field)
+  fieldIsSelected(field)
   {
     let {config} = this.props;
-    return config.name !== field && config.score !== field && config.fields.indexOf(field) === -1;
+    return config.name === field || config.score === field || config.fields.indexOf(field) !== -1;
+  }
+  
+  fieldType(field)
+  {
+    let {config} = this.props;
+    if(config.name === field)
+    {
+      return 'name';
+    }
+    if(config.score === field)
+    {
+      return 'score';
+    }
+    if(config.fields.indexOf(field) !== -1)
+    {
+      return 'field';
+    }
+    return null;
   }
   
   handleFieldHover(index:number, field:string)
@@ -188,6 +208,11 @@ export class ResultsConfig extends Classs<Props>
       });
       this.handleDrop('field', field, index);
     }
+  }
+  
+  handleRemove(field:string)
+  {
+    this.handleDrop(null, field);
   }
   
 	render()
@@ -219,6 +244,7 @@ export class ResultsConfig extends Classs<Props>
                   <ConfigResult
                     field={config.name}
                     is='score'
+                    onRemove={this.handleRemove}
                   />
                 : <em>Not set</em> }
               </CRTarget>
@@ -231,6 +257,7 @@ export class ResultsConfig extends Classs<Props>
                   <ConfigResult
                     field={config.score}
                     is='score'
+                    onRemove={this.handleRemove}
                   />
                 : <em>Not set</em> }
               </CRTarget>
@@ -247,6 +274,7 @@ export class ResultsConfig extends Classs<Props>
                       index={index}
                       onHover={this.handleFieldHover}
                       draggingField={this.state.lastHover.field}
+                      onRemove={this.handleRemove}
                     />
                 ) : null }
                 { !config || !config.fields.length ? <em>None</em> : null }
@@ -258,10 +286,13 @@ export class ResultsConfig extends Classs<Props>
             type={null}
             onDrop={this.handleDrop}
           >
-            { this.state.fields.filter(this.fieldIsAvailable).map(field =>
+            { this.state.fields.map(field =>
                 <ConfigResult
                   key={field}
                   field={field}
+                  is={this.fieldType(field)}
+                  isAvailableField={true}
+                  onRemove={this.handleRemove}
                 />
             ) }
           </CRTarget>
@@ -281,9 +312,16 @@ interface ConfigResultProps
   connectDropTarget?: (a:any) => any; 
   isDragging?: boolean;
   draggingField?: string;
+  isAvailableField?: boolean;
+  onRemove: (field: any) => void;
 }
 class ConfigResultC extends Classs<ConfigResultProps>
 {
+  handleRemove()
+  {
+    this.props.onRemove(this.props.field);
+  }
+  
   render()
   {
     return this.props.connectDropTarget(this.props.connectDragSource(
@@ -291,8 +329,22 @@ class ConfigResultC extends Classs<ConfigResultProps>
         'results-config-field': true,
         'results-config-field-dragging': this.props.isDragging ||
           (this.props.draggingField && this.props.draggingField === this.props.field),
+        'results-config-field-name': this.props.is === 'name',
+        'results-config-field-score': this.props.is === 'score',
+        'results-config-field-field': this.props.is === 'field',
       })}>
-        {this.props.field}
+        <span className='results-config-handle'>⋮⋮</span>
+        {
+          this.props.field
+        }
+        {
+          this.props.is !== null ? 
+            <CloseIcon
+              className='close'
+              onClick={this.handleRemove}
+            />
+          : null
+        }
       </div>
     ));
   }
@@ -334,8 +386,10 @@ const resultTarget =
   
   hover(props, monitor, component)
   {
-    const canDrop = monitor.canDrop();
-    props.onHover && props.onHover(props.index, monitor.getItem().field);
+    if(!props.isAvailableField && props.onHover)
+    {
+      props.onHover(props.index, monitor.getItem().field);
+    }
   },
   
   drop(props, monitor, component)
