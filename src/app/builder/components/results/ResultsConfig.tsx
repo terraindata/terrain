@@ -220,7 +220,10 @@ export class ResultsConfig extends Classs<Props>
     let {config} = this.props;
     return (
       <div className='results-config-wrapper'>
-        <div className='results-config'>
+        <div className={classNames({
+            'results-config': true,
+            'results-config-disabled': !this.props.configEnabled,
+          })}>
           <div className='results-config-bar'>
             <div className='results-config-title'>
               Customize Results View
@@ -313,6 +316,12 @@ export class ResultsConfig extends Classs<Props>
                 />
             ) }
           </CRTarget>
+          <div className='results-config-disabled-veil'>
+            <div className='results-config-disabled-veil-inner'>
+              <b>Custom results view is off.</b>
+              Results will display the information returned from the query.
+            </div>
+          </div>
         </div>
       </div>
     );
