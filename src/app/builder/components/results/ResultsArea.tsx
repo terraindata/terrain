@@ -164,7 +164,7 @@ class ResultsArea extends Classs<Props>
         <Result 
           data={result}
           allFieldsData={resultAllFields}
-          config={this.state.resultsConfig}
+          config={this.state.configEnabled ? this.state.resultsConfig : null}
           onExpand={this.handleCollapse}
           expanded={true}
           drag_x={false}
@@ -216,7 +216,7 @@ class ResultsArea extends Classs<Props>
             <Result
               data={result}
               allFieldsData={this.state.resultsWithAllFields && this.state.resultsWithAllFields[index]}
-              config={this.state.resultsConfig}
+              config={this.state.configEnabled ? this.state.resultsConfig : null}
               onExpand={this.handleExpand}
               index={index}
               canDrag={this.props.canEdit}
