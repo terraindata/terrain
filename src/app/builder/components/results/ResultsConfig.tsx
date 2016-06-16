@@ -52,6 +52,7 @@ import Ajax from '../../../util/Ajax.tsx';
 import Result from "../results/Result.tsx";
 import InfoArea from '../../../common/components/InfoArea.tsx';
 import Classs from './../../../common/components/Classs.tsx';
+import Switch from './../../../common/components/Switch.tsx';
 import { DragSource, DropTarget } from 'react-dnd';
 
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -68,6 +69,8 @@ interface Props
   config: Config;
   onConfigChange: (config:Config) => void;
   onClose: () => void;
+  configEnabled: boolean;
+  onConfigEnableToggle: () => void;
 }
 
 export class ResultsConfig extends Classs<Props>
@@ -83,11 +86,6 @@ export class ResultsConfig extends Classs<Props>
   componentWillMount()
   {
     this.calcFields(this.props);
-  }
-  
-  componentWillUnmount()
-  {
-    
   }
   
   componentWillReceiveProps(nextProps)
@@ -215,57 +213,76 @@ export class ResultsConfig extends Classs<Props>
     this.handleDrop(null, field);
   }
   
+  none = <div className='results-config-none'>None</div>;
+  
 	render()
   {
-            // <div className='results-config-instructions'>
-            //   Drag fields to/from the sample result below to configure
-            //   how results will display in the Builder.
-            // </div>
     let {config} = this.props;
     return (
       <div className='results-config-wrapper'>
         <div className='results-config'>
           <div className='results-config-bar'>
             <div className='results-config-title'>
-              Configure Results View
+              Customize Results View
+            </div>
+            <div className='results-config-switch'>
+              <Switch
+                first='Enabled'
+                second='Disabled'
+                onChange={this.props.onConfigEnableToggle}
+                selected={this.props.configEnabled ? 1 : 2}
+              />
             </div>
             <div className='results-config-button' onClick={this.props.onClose}>
               Done
             </div>
           </div>
           <div className='results-config-config-wrapper'>
+            <div className='results-config-instructions'>
+              Drag fields to/from the sample result below to customize
+              how this algorithm's results look in the Builder.
+            </div>
             <div className='results-config-config'>
               <CRTarget
                 className='results-config-name'
                 type='name'
                 onDrop={this.handleDrop}
               >
+                <div className='results-config-area-title'>
+                  Name
+                </div>
                 { config && config.name ? 
                   <ConfigResult
                     field={config.name}
                     is='score'
                     onRemove={this.handleRemove}
                   />
-                : <em>Not set</em> }
+                : this.none }
               </CRTarget>
               <CRTarget
                 className='results-config-score'
                 type='score'
                 onDrop={this.handleDrop}
               >
+                <div className='results-config-area-title'>
+                  Score
+                </div>
                 { config && config.score ?
                   <ConfigResult
                     field={config.score}
                     is='score'
                     onRemove={this.handleRemove}
                   />
-                : <em>Not set</em> }
+                : this.none }
               </CRTarget>
               <CRTarget
                 className='results-config-fields'
                 type='field'
                 onDrop={this.handleDrop}
               >
+                <div className='results-config-area-title'>
+                  Fields
+                </div>
                 { config ? config.fields.map((field, index) =>
                     <ConfigResult
                       field={field}
@@ -277,7 +294,7 @@ export class ResultsConfig extends Classs<Props>
                       onRemove={this.handleRemove}
                     />
                 ) : null }
-                { !config || !config.fields.length ? <em>None</em> : null }
+                { !config || !config.fields.length ? this.none : null }
               </CRTarget>
             </div>
           </div>
@@ -332,6 +349,7 @@ class ConfigResultC extends Classs<ConfigResultProps>
         'results-config-field-name': this.props.is === 'name',
         'results-config-field-score': this.props.is === 'score',
         'results-config-field-field': this.props.is === 'field',
+        'results-config-field-used': this.props.is !== null && this.props.isAvailableField,
       })}>
         <span className='results-config-handle'>⋮⋮</span>
         {

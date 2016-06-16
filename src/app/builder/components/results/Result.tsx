@@ -304,12 +304,10 @@ class Result extends Classs<Props> {
     
     if(config && config.score)
     {
+          // <ScoreIcon className='result-score-icon' />
       var scoreArea = (
-    		<div className='result-score'>
-          <ScoreIcon className='result-score-icon' />
-          <div className='result-score-score'>
-            { this.getValue(config.score) }
-          </div>
+        <div className='result-score'>
+          { this.renderField(config.score) }
     		</div>
       );
     }
@@ -319,7 +317,7 @@ class Result extends Classs<Props> {
     if(fields.length > 4 && !this.props.expanded)
     {
       var bottom = (
-        <div className='result-bottom'>
+        <div className='result-bottom' onClick={this.expand}>
           { fields.length - 4 } more fields
         </div>
       );

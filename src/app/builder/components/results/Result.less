@@ -84,29 +84,27 @@
     // box-sizing: border-box;
     position: relative;
     .result-score {
-      height: @result-score-height;
+      // height: @result-score-height;
       .trans-black;
       
       background: @result-score-bg;
       padding: 3px;
       box-sizing: border-box;
-      font-weight: 700;
-      font-size: 14px;
-
-      min-height: 12px; // todo remove
+      // font-weight: 700;
+      // font-size: 14px;
       
-      .result-score-score {
-        float: right;
-      }
+      // .result-score-score {
+      //   float: right;
+      // }
       
-      .result-score-icon {
-        fill : @trans-black;
-        mix-blend-mode: multiply;
-        width: 27px;
-        margin-top: -3px;
-        margin-bottom: -10px;
-        margin-right: 5px;
-      }
+      // .result-score-icon {
+      //   fill : @trans-black;
+      //   mix-blend-mode: multiply;
+      //   width: 27px;
+      //   margin-top: -3px;
+      //   margin-bottom: -10px;
+      //   margin-right: 5px;
+      // }
     }
     
     .result-fields-wrapper {
@@ -181,6 +179,10 @@
       font-size: 12px;
       color: #aaa;
       background: #fff;
+      .transition;
+      &:hover {
+        color: #777;
+      }
       // border-bottom-left-radius: 10px;
       // border-bottom-right-radius: 10px;
       // box-sizing: border-box;
@@ -301,6 +303,7 @@
   margin-right: -1 * @standard-margin;
   padding-right: @standard-margin;
   padding-left: @standard-margin;
+  overflow: hidden;
   
   .results-area-results {
     height: calc(~"100% - @{top-height}");

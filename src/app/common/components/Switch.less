@@ -1,0 +1,82 @@
+@import "../../common/Common.less";
+
+@on: rgb(138, 200, 136); //@terrain-selected; //@light-blue;
+@on-color: #fff; // @grey; //@trans-black;
+@off: @grey;
+@off-color: rgba(255,255,255,0.65); // @dark-grey;
+@br: 4px;
+
+.switch {
+  display: inline-block;
+  cursor: pointer;
+  background: @off;
+  border-radius: @br;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.1);
+  
+  @w: 170px;
+  @h: 26px;
+  width: @w;
+  height: @h;
+  .switch-first,
+  .switch-second {
+    font-size: @h * 0.5;
+    padding-top: @h * 0.215;
+  }
+  
+  .switch-first,
+  .switch-second,
+  .switch-on {
+    position: absolute;
+    top: 0px;
+    width: 50%;
+    text-align: center;
+    padding-left: 6px;
+    padding-right: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: @off-color;
+    height: 100%;
+    .transition(~"all 0.35s");
+  }
+  
+  .switch-first {
+    left: 0px;
+  }
+  .switch-second {
+    left: 50%;
+  }
+  
+  .switch-on {
+    background: @on;
+    .transition(~"all 0.35s");
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  
+  &.switch-on-first {
+    .switch-first {
+      // background: @on;
+      color: @on-color;
+    }
+    .switch-on {
+      left: 0px;
+      border-top-left-radius: @br;
+      border-bottom-left-radius: @br;
+      border-right: 0px;
+    }
+  }
+  
+  &.switch-on-second {
+    .switch-second {
+      // background: @on;
+      color: @on-color;
+    }
+    .switch-on {
+      left: 50%;
+      border-top-right-radius: @br;
+      border-bottom-right-radius: @br;
+      border-left: 0px;
+    }
+  }
+}

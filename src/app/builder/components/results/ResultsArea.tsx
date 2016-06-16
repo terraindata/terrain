@@ -80,6 +80,7 @@ class ResultsArea extends Classs<Props>
     error: null,
     resultType: null,
     showingConfig: true,
+    configEnabled: false,
   }
   
   constructor(props:Props)
@@ -87,6 +88,7 @@ class ResultsArea extends Classs<Props>
     super(props);
     
     this.state.resultsConfig = this.getResultsConfig()[this.props.algorithm.id];
+    this.state.configEnabled = !! this.state.resultsConfig;
   }
   
   componentDidMount()
@@ -107,9 +109,10 @@ class ResultsArea extends Classs<Props>
     if(!_.isEqual(nextProps.algorithm, this.props.algorithm))
     {
       this.queryResults(nextProps.algorithm);
-      console.log(this.getResultsConfig()[nextProps.algorithm.id]);
+      let resultsConfig = this.getResultsConfig()[nextProps.algorithm.id];
       this.setState({
-        resultsConfig: this.getResultsConfig()[nextProps.algorithm.id],
+        resultsConfig,
+        configEnabled: !! resultsConfig,
       });
     }
   }
@@ -120,12 +123,19 @@ class ResultsArea extends Classs<Props>
       expanded: false,
     });
   }
-  
+
   handleExpand(resultIndex: number)
   {
     this.setState({
       expanded: true,
       expandedResultIndex: resultIndex,
+    });
+  }
+  
+  handleConfigEnabledToggle()
+  {
+    this.setState({
+      configEnabled: !this.state.configEnabled,
     });
   }
 
@@ -369,6 +379,8 @@ class ResultsArea extends Classs<Props>
         onClose={this.hideConfig}
         onConfigChange={this.handleConfigChange}
         resultsWithAllFields={this.state.resultsWithAllFields}
+        configEnabled={this.state.configEnabled}
+        onConfigEnableToggle={this.handleConfigEnabledToggle}
       />;
     }
   }

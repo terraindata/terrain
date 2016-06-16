@@ -2,6 +2,7 @@
 
 @result-name-bg: #cfd7c8;
 @result-score-bg: #dfe6d8;
+@bg: #eef1f4;
 
 .results-config-wrapper {
   *, *:before, *:after {
@@ -25,22 +26,18 @@
     height: 90%;
     overflow: hidden;
     
-    background: #fff;
+    background: @bg;
     border-radius: @br;
     
     @bar-h: 30px;
     .results-config-bar {
       height: @bar-h;
       position: relative;
-      // border-bottom: 1px solid #ddd;
-      background: darken(@dark-grey, 10%);
       
       .results-config-title {
-        // text-align: center;
-        font-size: 16px;
-        padding: 6px 12px;
-        color: @off-white;
-        // margin-bottom: 6px;
+        font-size: 14px;
+        padding: 9px 12px;
+        color: rgba(0,0,0,0.5);
       }
       
       
@@ -49,24 +46,32 @@
         right: 0px;
         top: 0px;
         height: 100%;
-        font-size: 16px;
+        // font-size: 16px;
         padding: 0px 20px;
-        background: @sea-green;
+        background: rgb(138, 200, 136);
         cursor: pointer;
         color: #fff;
-        padding-top: 5px;
+        padding-top: 6px;
+        border-top-right-radius: @br;
+        border-bottom-left-radius: @br;
+        .transition;
         
         &:hover {
-          background: darken(@sea-green, 5%);
+          background: darken(rgb(138, 200, 136), 5%);
         }
       }
       
-      // .results-config-instructions {
-      //   text-align: left;
-      //   font-size: 13px;
-      //   margin-bottom: 12px;
-      // }
-      
+      .results-config-switch {
+        position: absolute;
+        top: 3px;
+        right: 90px;
+      }
+    }
+    
+    .results-config-instructions {
+      text-align: left;
+      font-size: 13px;
+      margin-bottom: 12px;
     }
     
     .results-config-config-wrapper,
@@ -76,29 +81,35 @@
       top: @bar-h;
       width: 50%;
       height: calc(~"100% - @{bar-h}");
-      background: @dark-grey;
     }
     
     .results-config-config-wrapper {
       left: 50%;
-      // background: #eee;
-      // border-top-left-radius: @br;
-      // border-bottom-left-radius: @br;
       padding: 12px;
+      padding-top: 6px;
       .results-config-config {
         border-radius: 5px;
         overflow: hidden;
-        box-shadow: -1px 1px 2px rgba(0,0,0,0.75);
+        box-shadow: -2px 2px 17px rgba(0, 0, 0, 0.05);
         
         .results-config-name,
         .results-config-score,
         .results-config-fields {
           padding: 3px;
           
-          em {
+          .results-config-none {
             padding: 8px;
-            display: inline-block;
+            color: rgba(0,0,0,0.35);
           }
+        }
+        
+        .results-config-area-title {
+          font-size: 12px;
+          color: rgba(0, 0, 0, 0.5);
+          font-weight: 500;
+          margin-left: 6px;
+          margin-top: 2px;
+          margin-bottom: 6px;
         }
         
         .results-config-name {
@@ -108,10 +119,11 @@
           &.results-config-over {
             border: 3px solid @bright-green;
             padding: 0px;
-            // background: darken(@result-name-bg, 4%);
           }
           .results-config-field {
-            background: @result-name-bg;
+            // background: @result-name-bg;
+            background: rgba(255,255,255,0.5);
+            blend-mode: multiply;
             border-bottom: 0px;
           }
         }
@@ -121,10 +133,11 @@
           &.results-config-over {
             border: 3px solid @bright-green;
             padding: 0px;
-            // background: darken(@result-score-bg, 4%);
           }
           .results-config-field {
-            background: @result-score-bg;
+            // background: @result-score-bg;
+            background: rgba(255,255,255,0.5);
+            blend-mode: multiply;
             border-bottom: 0px;
           }
         }
@@ -132,10 +145,10 @@
         .results-config-fields {
           background: #fff;
           min-height: 100px;
+          padding-bottom: 30px;
           &.results-config-over {
             border: 3px solid @bright-green;
             padding: 0px;
-            // background: #f7fffa;
           }
         }
       }
@@ -143,11 +156,9 @@
     
     .results-config-available-fields {
       left: 0%;
-      background: #eee;
       padding: 3px;
       
       &.results-config-over {
-        // background: #f7fffa;
         border: 3px solid @bright-green;
         padding: 0px;
       }
@@ -158,6 +169,11 @@
       padding-bottom: 6px;
       background: #fff;
       border-bottom: 1px solid #eee;
+      border-radius: 3px;
+      
+      &.results-config-field-used {
+        background: #fafafa;
+      }
       
       .results-config-handle {
         margin-right: 8px;
