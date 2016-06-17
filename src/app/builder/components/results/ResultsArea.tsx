@@ -79,7 +79,7 @@ class ResultsArea extends Classs<Props>
     tql: "",
     error: null,
     resultType: null,
-    showingConfig: true,
+    showingConfig: false,
     configEnabled: false,
   }
   
@@ -175,6 +175,8 @@ class ResultsArea extends Classs<Props>
     );
   }
   
+  resultsFodderRange = _.range(0, 25);
+  
   renderResults()
   {
     if(this.state.error)
@@ -224,7 +226,9 @@ class ResultsArea extends Classs<Props>
             />
           )
         }
-        <div className='results-area-fodder' />
+        {
+          this.resultsFodderRange.map(i => <div className='results-area-fodder' key={i} />)
+        }
       </div>
     );
   }

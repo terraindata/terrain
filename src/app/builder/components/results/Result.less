@@ -9,18 +9,20 @@
 @result-name-bg: #cfd7c8;
 @result-score-bg: #dfe6d8;
 
-.result {
-  margin-top: @standard-margin;
-  
-	position: relative;
-  padding: 0px (@standard-margin / 2);
+.result,
+.results-area-fodder {
   min-width: 125px;
   flex-grow: 1;
   flex-basis: 125px;
-  // display: inline-block;
+  padding: 0px (@standard-margin / 2);
+}
+
+.result {
+  margin-top: @standard-margin;
+  
+  position: relative;
   
   &:hover {
-    // padding: 0px 2px; // if we want it to grow a little
     .result-inner .result-name {
       background: darken(@result-name-bg, 10%);
     }
@@ -311,11 +313,6 @@
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
-    
-    .results-area-fodder {
-      flex-grow: 1000;
-      // flex-basis: 100%;
-    }
   }
   
   .results-top,
