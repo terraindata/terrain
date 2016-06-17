@@ -1,135 +1,43 @@
-# Terrain Search Front-end
+# Terraformer: Terrain Search Front-end
 
-## Standards / Conventions
+## Overview
 
-- Capitalize all React component names and filenames (applies to style files as well)
-	Most `.js` and `.less` files should be capitalized.
-- `{` and `}` are both on their own lines, for legibility.
-	Same applies to `[` and `]` when appropriate.
-- Camel case function names. 
-	e.g. `doABarrelRoll()`
-- Use JSX optimizations whenever possible, but not at the expense of legibility.
-	e.g. `() => { ... }` instead of `function() { }`, `useTheForce(): { ... }` instead of `useTheForce: function() { ... }`
-- Selectors in stylesheets should each go on their own line.
-	e.g. Don't do `.first, .second, .third .thirds-kid, .fourth[type=text]`, but rather put a newline after every comma.
-- CSS classes are named with `-`.
-	e.g. `blue-and-black` or `white-and-gold`
-- `// TODO` should be treated like poison. 
-	Why write `TODO` when you can do it correctly right now? Tech debt is evil. The Death Star was built upon tech debt, and look what happened to it. `Tech Debt == Death Star` is truthy.
-	But if you absolutely have to leave something for later or make a reminder note, write `// TODO [something I can't do right now]` so that we can keep track.
-- Optimal directory size is two to five files.
-	No directories in `src` with over ten files.
-	No objects / namespaces with over ten keys.
-- Say yes to whitespace for legibility.
-- Interfaces are named with the letter 'I'
-  e.g. `IRobot`, `IAyeAye`
-- Enums are named with the letter 'E' and are singular
-  e.g. `enum ECharacter { EllenParsons, PattyHewes, ArthurFrobisher }; // ECharacter.EllenParsons`
-- Break up template rendering when it makes sense. Name functions that return HTML `render[Description]`
-- Use 'single quotes' in Javascript, "double quotes" in HTML
-- `{}` should follow every `if`, `for`, `while`, etc.
-- Don't mix `||` and `&&` without `()`.
-	Who knows boolean order of operations anyways?
-- Name props that accept event handlers `on[EventName]`, and name the handler functions `handle[EventName]`
-  e.g. `onTransformToSuperSaiyan={this.handleTransformToSuperSaiyan}`
-- Every feature-adding merge should have appropriate test coverage to be accepted.
-	Nearly every bug-solving merge should have a test covering the buggy case.
-	TDD FTW!
-- Comma after the last line in an object.`,`
-	This makes adding new lines to objects easier and allows for a cleaner merge.`,`
-	Note: You can't do this in JSON.`,`
-- Name variables clearly.
-  E.g. `user` or `users` for user objects, `userId` or `userIds` for ids
-- Commit to good commits. Commits should be solidly incremental and should have a helpful one-line explanation.
-	Feel free to squash commits on your feature branch before merging if you have too many commits, or unhelpful commit messages.
-- Code should read like English. Comment when necessary, but try your best to write code that doesn't need comments.
-- Booleans should be named clearly with `is` or `can`, e.g. `isWizard` or `canDoTheCanCan`
-- Be keen on adding to this README, and keen on trimming it down.
-- None of these standards are set in stone; if you have an idea for a way to improve these, make it known. Coding practices evolve.
-- No code is set in stone, either. Refactor when you find something that you know you could do better.
-	Refactor responsibly: test your changes, and assess cost-benefit-analysis before starting to be certain that your time is well-used.
-- We only deploy from `master`.
-- Use effective markdown syntax in this file.
-- Constants are named with all caps and underscores
-	e.g. `var ANSWER_TO_THE_ULTIMATE_QUESTION = 42;`
-- Only one variable per `var` / `let`, for legibility. Don't separate variables by commas.
-	e.g. Don't do `var first = 'Luke', second = 'Leia', third = 'Han';` etc. Instead, put each variable on its on line.
-- No not believing in yourself.
+### What Terraformer Does
 
-## Major Dependencies
+Terraformer is the front-end web app that configures search in TerrainDB. Each customer (aka "team") will have Terraformer running on their stack alongside TerrainDB. The team's employees (aka "users") who work with TerrainDB will have individual user accounts within Terraformer. Users can have different privileges within Terraformer.
 
-The Terrain search front-end is built upon these technologies:
+In Terraformer, a team can have multiple "groups." A group contains two things: a set of "algorithms" and a set of "members" (more on those later). An algorithm is a process for taking a set of "inputs" (e.g. from a customer's search) into TerrainDB and returning a set of "results" (e.g. items stored in TerrainDB). For example, an algorithm for Airbnb's apartment search might take inputs like "location," "number of guests," and "max price," search through Airbnb's apartment listings table for any matching listings, and then sort them in some order. Each algorithm has one or more "variants." A variant specifies the exact process in TQL ("TerrainDB Query Language") that an algorithm should take to go from inputs to results. Variants are configured in the "Builder" (more on that later). Variants can have one of four statuses: "Build" (the variant is being worked on), "Approve" (the variant is ready for an admin to review and promote to Live), "Live" (the variant is being used in production), and "Archive" (the variant is no longer pertinent and is stashed away). Only variants in Build status can be changed in Terraformer. There can be multiple variants in each status, or none.
 
-- React
-- Typescript
-- JSX / ES6
-- Redux
-- Immutable
-- Webpack
-- LESS
-- Tape, for testing (https://github.com/substack/tape)
+The group's members are users who have certain privileges within that group. Each group member has one of three "roles" in that group: "admin," "builder," or "viewer" (multiple members can have the same role). Viewers can see everything within a group, but can't make any changes. Builders can create new Variants within Algorithms and change any Variants that aren't in Live status (nor can they promote a Variant to Live). Group admins can do all that Builders can do, and can move variants to/from the Live status, create new Algorithms, and edit the roles for all users within a group.
 
-## Directory Overview
+The heart of Terraformer is the "Builder," where users can compose Variants and preview their results. The Builder works by creating, editing, nesting, and re-arranging "Cards" -- objects which represent certain TQL statements. The list of Cards in the builder compiles to the Variant's TQL. You can set up sample inputs into the Variant and also view sample results that are actually returned by TerrainDB.
 
-### src
+In the future, we will expand Terraformer by adding new apps for analytics, server performance, TQL editing, and more.
 
-Source code for the front-end. There may not need to be any other directories in the `src` folder except for `app`, so we may want to flatten this level.
+One last note: a team has one or more "System Admins" (aka sysadmins) who can create new users, create new groups, disable existing users, and promote other users to be sysadmins. Sysadmins can also give themselves any role within any group.
 
-### src/app
+### How Terraformer Is Built
 
-Contains the React app. 
+Terraformer is built in Javascript. It runs on the user's browser. The user's browser downloads all of the code for Terraformer when they first navigate to Terraformer's URL. Though the URL in the browser will change as they use the app, they are not actually navigating to a different webpage; Terraformer is modifying the URL via Javascript to reflect where the user is in the app.
 
-### src/app/components
+The back-end for Terraformer is called "midway." Midway stores and serves all of Terraformer's data (user accounts, groups, algorithms, variants, etc.), authenticates users when they log in, and passes queries from Terraformer to TerrainDB and returns the results. Midway is built in Go and has a CRUD-esque API.
 
-Contains all React components and styles. Directories in here should be self-explanatory.
-
-### src/app/data
-
-Contains Actions and Stores for Redux.
-
-### src/app/util
-
-Utility functions or styles that are used across multiple files.
-
-## src/test
-
-Contains test code.
-
-## src/typings
-
-Contains TypeScript typings.
-
-*Note*: When installing new types, make sure to `cd src` before you `tsd install`
+As TerrainDB is not yet ready to be used end-to-end with Terraformer, we currently use a mock DB called "tiny." Tiny is written in erlang and accepts TQL. Tiny does not have the performance that TerrainDB will, but it offers a great stand-in for the time being.
 
 ## Setup
 
+1. Install `midway` and `tiny` and get them up and running with Docker.
 1. Install Homebrew
-	`ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
-2. Install Node
-	`brew install node`
-3. Install npm
-	`brew install npm`
-4. `npm install`
-5. `npm start` - dev server now running at [localhost:8080]
+  `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
+1. Install Node
+  `brew install node`
+1. Install npm
+  `brew install npm`
+1. `npm install`
+1. `npm run start-docker` - dev server now running at [localhost:8080](localhost:8080).
+1. Default user login: `luser` / `secret`
 
 Whenever new packages are installed from branches merged to master, run `npm install` locally.
-
-## Deploying
-
-From `master` branch:
-```
-npm run deploy
-```
-
-## Testing
-
-`npm run test` - runs tests continually in another copy of Chrome
-
-Sometimes your tests may trigger errors that cause your test browser to crash, and you will see karma report:
-`No captured browser.`
-When this happens, you need to quit Karma (Ctrl + C) and restart it.
-
-Note: when adding new tests, make sure to include `t.end()` at the end of every test (or `t.plan(x)` at the beginning), or else the test suite will hang.
 
 ## Running with Midway (via Docker)
 
@@ -141,52 +49,118 @@ Note: when adding new tests, make sure to include `t.end()` at the end of every 
 1. In this directory, run `docker-compose up`. (NOTE: This launches a long-running process that takes over your terminal, so subsequent commands must be run in new terminals.)
 1. Also in this directory, run `MIDWAY_HOST=$(docker-machine ip default) npm run start-docker` if on OS X. If on Linux, `MIDWAY_HOST=localhost npm run start-docker` may work instead, but I have not tested that.
 
+## Major Dependencies
+
+The Terrain search front-end uses these technologies:
+
+- React
+- Typescript
+- JSX / ES6
+- Redux
+- Immutable
+- LESS
+- ReactRouter
+- Webpack
+- npm
+- Tape, for testing (https://github.com/substack/tape)
+
+## Standards / Conventions
+
+- Capitalize all class names, React component names, and filenames
+  e.g. `class MillenniumFalcon {..}`, `MillenniumFalcon.tsx` and `MillenniumFalcon.less`
+- Camel case function names. 
+  e.g. `doABarrelRoll()`
+- `{` and `}` are both on their own lines, for legibility.
+  Same applies to `[` and `]` when appropriate.
+  e.g.
+  ```
+  let castSpell = (spell: Spell) =>
+  {
+    ...
+  }
+  ```
+- Use JSX optimizations whenever possible
+  e.g. `() => { ... }` instead of `function() { }`, `useTheForce() { ... }` instead of `useTheForce: function() { ... }`
+- Selectors in stylesheets should each go on their own line.
+  e.g. instead of `.first, .second, .third .thirds-kid, .fourth[type=text]`, put a newline after every comma.
+- CSS classes are named with `-`.
+  e.g. `blue-and-black` or `white-and-gold`
+- Avoid `// TODO` at all costs
+- Avoid commenting; aim to write code that doesn't need comments
+- Interfaces are named with the letter 'I'
+  e.g. `IRobot`, `IAyeAye`
+- Enums are named with the letter 'E' and are singular
+  e.g. `enum ECharacter { MichaelScott, JimHalpert, PamBeesley }; // let myFavoriteCharacter = ECharacter.JimHalpert`
+- Name functions that return HTML like: `render[Description]`
+  e.g. `renderLizLemon()`, `renderJackDonaghy()`
+- Use 'single quotes' in Javascript, "double quotes" in HTML
+- `{ ... }` should follow every `if`, `for`, `while`, etc.
+- Don't mix `||` and `&&` without `()`.
+  Who knows boolean order of operations anyways?
+- Comma after the last line in an object.`,`
+  This makes adding new lines to objects easier and allows for a cleaner merge.`,`
+  Note: You can't do this in JSON.`,`
+- Name variables clearly.
+  E.g. `user` or `users` for user objects, `userId` or `userIds` for ids
+- Booleans should be named clearly with `is` or `can`, e.g. `isWizard` or `canDoTheCanCan`
+- Constants are named with all caps and underscores
+  e.g. `const ANSWER_TO_THE_ULTIMATE_QUESTION = 42;`
+- Only one variable per `var` / `let`, for legibility. Don't separate variables by commas.
+  e.g. Don't do `var first = 'Regina George', second = 'Gretchen Wieners', third = 'Glenn Cocoo';` etc. Instead, put each variable on its on line.
+- In React, name props that accept event handlers `on[EventName]`, and name the handler functions `handle[EventName]`
+  e.g. `onTransformToSuperSaiyan={this.handleTransformToSuperSaiyan}`
+- Follow React's paradigm of building smaller apps within apps (decomposition). Try to keep your files under 200 lines of code.
+- Be keen on adding to this README, and keen on trimming it down.
+- None of these standards are set in stone; if you have an idea for a way to improve these, make it known.
+- No code is set in stone, either. Refactor when you find something that you know you could do better.
+  Refactor responsibly: test your changes, and before you start be certain that your time will be well-used.
+- We only deploy from `master`.
+- Believe in yourself.
+
+## Directory Overview
+
+### src
+
+Source code for the front-end. Has directories for `app`, `images`, `test`, `typings`
+
+### src/app
+
+Contains the React app. The `app` directory splits many smaller apps by function, e.g. `builder`, `browser`, `auth` (for login / authorization), `common` (shared components), `util` (utility functions), etc.
+
+### src/app/[smaller_app]/components
+
+Contains one or more of:
+- `[SmallerApp]Types.tsx`: defines any interfaces, classes, enums, etc. relevant to that app
+- `components/`: contains React components and styles
+- `data/`: contains Redux data files
+
+### src/app/[smaller_app]/data
+
+Contains Actions and Stores for Redux.
+- `[SmallerApp]ActionTypes.tsx`: a static object of strings. Add new action types here.
+- `[SmallerApp]Actions.tsx`: an object of functions that dispatch Actions to that app's Store.
+- `[SmallerApp]Store.tsx`: the Store that defines that app's default state and its reducers
+- `[CommonFunction]Reducers.tsx`: defines reducers relating to a common function in that smaller app. If the smaller app doesn't have many different actions, there may be just one reducers file.
+
+## src/typings
+
+Contains TypeScript typings.
+
+*Note*: When installing new types, make sure to `cd src` before you `tsd install`
+
+## Testing
+
+`npm run test` - runs tests continually in another copy of Chrome
+
+Sometimes your tests may trigger errors that cause your test browser to crash, and you will see karma report:
+`No captured browser.`
+When this happens, you need to quit Karma (Ctrl + C) and restart it.
+
+Note: when adding new tests, make sure to include `t.end()` at the end of every test (or `t.plan(x)` at the beginning), or else the test suite will hang.
+
 ## Useful Tutorials
 
 - [http://jaysoo.ca/2015/09/26/typed-react-and-redux/]
-
-## Code Overview
-
-### Layout
-
-The `src/app/components/layout` directory contains all files pertinent to layout (i.e. positioning) of HTML components on the page.
-* `PanelMixin`: A mixin to include in components that should be treated as drag-and-droppable "panels." Panels accept a variety of props that dictate how they can be dragged, what happens when they're dragged, and what happens when they're dropped.
-* `LayoutManager`: Contains a set of panels, passed in as an object through the `layout` prop. The panels are treated either as rows, columns, or cells. The `layout` object can contain nested row/column/cell objects, which will be resolved into LayoutManagers; this allows for short-hand when writing LayoutManager layouts.
-
-### Data / Actions / Redux
-
-Our front-end data layer is powered by Redux. In brief, Redux provides:
-1. A "store" which contains the application's data/state, and allows for subscribers to listen to changes in state.
-2. "Actions" which are dispatched by the view (anywhere within the React code) and may cause the application to enter a new state.
-
-#### The Store and Reducers
-
-The store is created by a set of "reducers," which are pure functions (no side effects) that accept a state and an action and return either
-- a new state object, if the action caused a change in state (do not mutate the state object that is passed)
-- the same state object that was passed, if the action did not affect the state
-
-Our set of reducers are contained in `src/app/data/Store.js`, but as the app grows, they should be broken out into separate files and sub-directories. `Store.js` returns our store object, so any JS file can receive the store by including it.
-
-In the future, we may want to have multiple stores, to power different types of data (e.g. builder data versus team/administrative data).
-
-The connection to the back-end will probably listen for changes to the store, send changes via AJAX to the back-end endpoint, and receive the new state of the application (e.g. results and ordering, for the builder).
-
-#### Actions
-
-An action object contains:
-1. A string `type` which is unique that type of action
-2. Any metadata applicable to that action
-
-SOME OF THIS IS OUTDATED
-
-The types of actions that we can dispatch are located in `src/app/data/ActionTypes.tsx`. These are nested / namespaced / categorized (e.g. `ActionTypes.cards.select.moveField => "cards.select.moveField"` or `ActionTypes.inputs.changeKey => "inputs.changeKey"`). More details and helper functions are located in that file.
-
-Redux works well with "action creators" and "action dispatchers". Both are defined in `src/app/data/Actions.tsx` (though we may need to break them out into separate files later). Action creators are functions that accept structured arguments and return an action with the appropriate type and metadata (e.g. `Actions.create.cards.select.moveField(card, fieldIndex, newIndex)` will return an action with `{type: ActionTypes.cards.select.moveField, card: card, curIndex: fieldIndex, newIndex: newIndex }`). Action dispatchers are functions with the same parameters as the creators that both create the action and dispatch it to the store. For every action creator that we have, a dispatcher is automatically made. In practice, you will probably only need to use the dispatchers, and not the creators, but it may be helpful to have both.
-
-To add a new action:
-1. Add the action type to `ActionTypes.tsx`
-2. Add the action creator to `Actions.tsx`
-3. Digest that action in the appropriate reducer in `Store.js`
 
 ## Gotchas
 
