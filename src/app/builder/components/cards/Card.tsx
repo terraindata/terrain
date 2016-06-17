@@ -250,17 +250,17 @@ var Card = React.createClass({
       this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
     }
     
-    setTimeout(() =>
-      Util.animateToAutoHeight(this.refs.cardContainer),
-    50);
+    // setTimeout(() =>
+    //   Util.animateToAutoHeight(this.refs.cardContainer),
+    // 50);
   },
   
   componentWillReceiveProps(nextProps)
   {
-    if(nextProps['index'] !== this.props.index)
-    {
-      Util.animateToAutoHeight(this.refs.cardContainer);
-    }
+    // if(nextProps['index'] !== this.props.index)
+    // {
+    //   Util.animateToAutoHeight(this.refs.cardContainer);
+    // }
   },
   
   componentDidUpdate()
