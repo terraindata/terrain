@@ -4,7 +4,9 @@
 
 ### What Terraformer Does
 
-Terraformer is the front-end web app that configures search in TerrainDB. Each customer (aka "team") will have Terraformer running on their stack alongside TerrainDB. The team's employees (aka "users") who work with TerrainDB will have individual user accounts within Terraformer. Users can have different privileges within Terraformer.
+Terraformer is the front-end web app that configures search in TerrainDB. Using Terraformer, customers can interact with their TerrainDB stack via a friendly web interface. Users use Terraformer to create and manage their TerrainDB search algorithms, run ad-hoc queries, see basic analytics and server performance data, set up error alerting and reporting, and implement A/B tests.
+
+Each customer (aka "team") will have Terraformer running on their stack alongside TerrainDB. The team's employees (aka "users") who work with TerrainDB will have individual user accounts within Terraformer. Users can have different privileges within Terraformer.
 
 In Terraformer, a team can have multiple "groups." A group contains two things: a set of "algorithms" and a set of "members" (more on those later). An algorithm is a process for taking a set of "inputs" (e.g. from a customer's search) into TerrainDB and returning a set of "results" (e.g. items stored in TerrainDB). For example, an algorithm for Airbnb's apartment search might take inputs like "location," "number of guests," and "max price," search through Airbnb's apartment listings table for any matching listings, and then sort them in some order. Each algorithm has one or more "variants." A variant specifies the exact process in TQL ("TerrainDB Query Language") that an algorithm should take to go from inputs to results. Variants are configured in the "Builder" (more on that later). Variants can have one of four statuses: "Build" (the variant is being worked on), "Approve" (the variant is ready for an admin to review and promote to Live), "Live" (the variant is being used in production), and "Archive" (the variant is no longer pertinent and is stashed away). Only variants in Build status can be changed in Terraformer. There can be multiple variants in each status, or none.
 
@@ -12,7 +14,7 @@ The group's members are users who have certain privileges within that group. Eac
 
 The heart of Terraformer is the "Builder," where users can compose Variants and preview their results. The Builder works by creating, editing, nesting, and re-arranging "Cards" -- objects which represent certain TQL statements. The list of Cards in the builder compiles to the Variant's TQL. You can set up sample inputs into the Variant and also view sample results that are actually returned by TerrainDB.
 
-In the future, we will expand Terraformer by adding new apps for analytics, server performance, TQL editing, and more.
+In the future, we will expand Terraformer by adding new apps for analytics, server performance, TQL editing, error monitoring and reporting, set up A/B tests, and more.
 
 One last note: a team has one or more "System Admins" (aka sysadmins) who can create new users, create new groups, disable existing users, and promote other users to be sysadmins. Sysadmins can also give themselves any role within any group.
 
@@ -20,7 +22,7 @@ One last note: a team has one or more "System Admins" (aka sysadmins) who can cr
 
 Terraformer is built in Javascript. It runs on the user's browser. The user's browser downloads all of the code for Terraformer when they first navigate to Terraformer's URL. Though the URL in the browser will change as they use the app, they are not actually navigating to a different webpage; Terraformer is modifying the URL via Javascript to reflect where the user is in the app.
 
-The back-end for Terraformer is called "midway." Midway stores and serves all of Terraformer's data (user accounts, groups, algorithms, variants, etc.), authenticates users when they log in, and passes queries from Terraformer to TerrainDB and returns the results. Midway is built in Go and has a CRUD-esque API.
+The back-end for Terraformer is called "midway." Midway stores and serves all of Terraformer's data (user accounts, groups, algorithms, variants, etc.), authenticates users when they log in, and passes queries from Terraformer to TerrainDB and returns the results. Midway is built in Go and has a CRUD-like API.
 
 As TerrainDB is not yet ready to be used end-to-end with Terraformer, we currently use a mock DB called "tiny." Tiny is written in erlang and accepts TQL. Tiny does not have the performance that TerrainDB will, but it offers a great stand-in for the time being.
 

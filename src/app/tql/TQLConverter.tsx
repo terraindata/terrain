@@ -44,6 +44,9 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import { BuilderTypes } from "../builder/BuilderTypes.tsx";
+type ICard = BuilderTypes.ICard;
+type IFromCard = BuilderTypes.IFromCard;
+
 
 var OperatorsTQL = ['==', '!=', '>=', '>', '<=', '<', 'in', 'notIn'];
 var CombinatorsTQL = ['&&', '||'];
@@ -54,39 +57,71 @@ type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
 
 export interface Options {
   allFields?: boolean; // amend the final Select card to include all possible fields.
+  limit?: number;
 }
 
 class TQLConverter
 {
-  static toTQL(cards: BuilderTypes.ICard[], options: Options = {}): string
+  static toTQL(cards: ICard[], options: Options = {}): string
   {
-    cards = JSON.parse(JSON.stringify(cards)) as BuilderTypes.ICard[];
+    cards = JSON.parse(JSON.stringify(cards)) as ICard[];
+    
+    cards = this.applyOptions(cards, options);
+    
+    return removeBlanks(this._cards(cards, ";", options));
+  }
+  
+  private static _topFromCard(cards: ICard[], fn: (fromCard: IFromCard) => IFromCard)
+  {
+    // find top-level 'from' cards
+    return cards.map(topCard =>
+    {
+      if(topCard.type === 'from')
+      {
+        return fn(topCard as IFromCard);
+      }
+      return topCard;
+    });
+  }
+  
+  private static applyOptions(cards, options): ICard[]
+  {
     if(options.allFields)
     {
-      // find top-level 'from' cards
-      cards.map(topCard =>
+      cards = this._topFromCard(cards, (fromCard: IFromCard) =>
       {
-        if(topCard.type === 'from')
+        fromCard.cards = fromCard.cards.map(card =>
         {
-          var fromCard = topCard as BuilderTypes.IFromCard;
-          fromCard.cards = fromCard.cards.map(card =>
+          if(card.type === 'select')
           {
-            if(card.type === 'select')
-            {
-              card['properties'] = [
-                {
-                  property: '*',
-                  id: 1,
-                }
-              ];
-            }
-            return card;
-          })
-        }
+            card['properties'] = [
+              {
+                property: '*',
+                id: 1,
+              }
+            ];
+          }
+          return card;
+        });
+        
+        return fromCard;
       });
     }
     
-    return removeBlanks(this._cards(cards, ";", options));
+    if(options.limit)
+    {
+      cards = this._topFromCard(cards, (fromCard: IFromCard) =>
+      {
+        fromCard.cards.push({
+          type: 'take',
+          value: options.limit,
+        } as BuilderTypes.ITakeCard);
+        
+        return fromCard;
+      });
+    }
+    
+    return cards;
   }
 
   // parse strings where "$key" indicates to replace "$key" with the value of card[key]

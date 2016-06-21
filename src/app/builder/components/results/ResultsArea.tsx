@@ -55,6 +55,9 @@ import InfoArea from '../../../common/components/InfoArea.tsx';
 // import Paging from '../common/Paging.tsx';
 import TQLConverter from "../../../tql/TQLConverter.tsx";
 import Classs from './../../../common/components/Classs.tsx';
+import InfiniteScroll from './../../../common/components/InfiniteScroll.tsx';
+
+const RESULTS_PAGE_SIZE = 25;
 
 interface Props
 {
@@ -81,6 +84,9 @@ class ResultsArea extends Classs<Props>
     resultType: null,
     showingConfig: false,
     configEnabled: false,
+    resultsPages: 1,
+    loadedResultsPages: 1,
+    onResultsLoaded: null,
   }
   
   constructor(props:Props)
@@ -114,6 +120,11 @@ class ResultsArea extends Classs<Props>
         resultsConfig,
         configEnabled: !! resultsConfig,
       });
+      
+      if(this.state.onResultsLoaded)
+      {
+        this.state.onResultsLoaded(false);
+      }
     }
   }
   
@@ -175,6 +186,23 @@ class ResultsArea extends Classs<Props>
     );
   }
   
+  
+  handleRequestMoreResults(onResultsLoaded: (unchanged?: boolean) => void)
+  {
+    if(this.state.loadedResultsPages !== this.state.resultsPages)
+    {
+      // still loading a previous request
+      return;
+    }
+    
+    let pages = this.state.resultsPages + 1;
+    this.setState({
+      resultsPages: pages,
+      onResultsLoaded,
+    });
+    this.queryResults(this.props.algorithm, pages);
+  }
+  
   resultsFodderRange = _.range(0, 25);
   
   renderResults()
@@ -212,7 +240,10 @@ class ResultsArea extends Classs<Props>
     }
     
     return (
-      <div className='results-area-results'>
+      <InfiniteScroll
+        className='results-area-results'
+        onRequestMoreItems={this.handleRequestMoreResults}
+      >
         {
           this.state.results.map((result, index) => 
             <Result
@@ -229,7 +260,7 @@ class ResultsArea extends Classs<Props>
         {
           this.resultsFodderRange.map(i => <div className='results-area-fodder' key={i} />)
         }
-      </div>
+      </InfiniteScroll>
     );
   }
   
@@ -284,6 +315,15 @@ class ResultsArea extends Classs<Props>
             resultsWithAllFields: result.value,
           });
         } else {
+          if(this.state.onResultsLoaded && this.state.resultsPages !== this.state.loadedResultsPages)
+          {
+            this.setState({
+              loadedResultsPages: this.state.resultsPages,
+            });
+            console.log(result.value.length, this.state.results.length);
+            this.state.onResultsLoaded(result.value.length === this.state.results.length);
+          }
+          
           this.setState({
             results: result.value,
             resultType: result.type,
@@ -301,6 +341,7 @@ class ResultsArea extends Classs<Props>
         // TODO add error
       });
     }
+    
   }
   
   handleError(ev)
@@ -310,9 +351,16 @@ class ResultsArea extends Classs<Props>
     })
   }
   
-  queryResults(algorithm)
+  queryResults(algorithm, pages?: number)
   {
-    var tql = TQLConverter.toTQL(algorithm.cards);
+    if(!pages)
+    {
+      pages = this.state.resultsPages;
+    }
+    
+    var tql = TQLConverter.toTQL(algorithm.cards, {
+      limit: pages * RESULTS_PAGE_SIZE,
+    });
     if(tql !== this.state.tql)
     {
       this.setState({
@@ -321,7 +369,11 @@ class ResultsArea extends Classs<Props>
       });
       this.props.onLoadStart && this.props.onLoadStart();
       this.xhr = Ajax.query(tql, this.handleResultsChange, this.handleError);
-      this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm.cards, { allFields: true }), 
+      this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm.cards, {
+        allFields: true,
+        // limit: pages * RESULTS_PAGE_SIZE,
+        // don't limit the all fields request
+      }), 
         this.handleAllFieldsResponse,
         this.handleError
       );
@@ -335,7 +387,11 @@ class ResultsArea extends Classs<Props>
         <div className='results-top-summary'>
           {
             this.state.error ? 'Error with query' : 
-            (this.state.results ? `${this.state.results.length} results` : 'Text result')
+            (
+              this.state.resultsWithAllFields ? 
+                `${this.state.resultsWithAllFields.length} results` 
+              : 'Text result'
+            )
           }
         </div>
         <div className='results-top-config' onClick={this.showConfig}>
