@@ -331,11 +331,11 @@ class BrowserInfoUser extends Classs<BrowserInfoUserProps>
     let menuOptions = 
     [
       {
-        text: isAdmin ? 'Revoke Admin' : 'Make Admin',
+        text: isAdmin ? 'Demote to Builder' : 'Make Admin',
         onClick: this.toggleAdmin,
       },
       {
-        text: isBuilder || isAdmin ? 'Revoke Builder' : 'Make Builder',
+        text: isBuilder || isAdmin ? 'Demote to Viewer' : 'Make Builder',
         onClick: this.toggleBuilder,
       }
     ];
