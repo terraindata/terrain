@@ -12,7 +12,8 @@
   background: @off;
   border-radius: @br;
   overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.1);
+  // border: 1px solid rgba(0,0,0,0.1);
+  position: relative;
   
   @w: 170px;
   @h: 26px;
@@ -22,6 +23,18 @@
   .switch-second {
     font-size: @h * 0.5;
     padding-top: @h * 0.215;
+  }
+  
+  &.switch-small {
+    @w: 80px;
+    @h: 18px;
+    width: @w;
+    height: @h;
+    .switch-first,
+    .switch-second {
+      font-size: @h * 0.62;
+      padding-top: @h * 0.115;
+    }  
   }
   
   .switch-first,
@@ -39,6 +52,7 @@
     color: @off-color;
     height: 100%;
     .transition(~"all 0.35s");
+    box-sizing: border-box;
   }
   
   .switch-first {
@@ -51,7 +65,13 @@
   .switch-on {
     background: @on;
     .transition(~"all 0.35s");
-    border: 1px solid rgba(0,0,0,0.1);
+    // border: 1px solid rgba(0,0,0,0.1);
+  }
+  
+  &:hover{
+    .switch-on {
+      background: lighten((@on), 4%)
+    }
   }
   
   &.switch-on-first {

@@ -50,12 +50,13 @@ import Ajax from '../../../util/Ajax.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import Result from "../results/Result.tsx";
+import ResultsTable from "../results/ResultsTable.tsx";
 import {Config, ResultsConfig} from "../results/ResultsConfig.tsx";
 import InfoArea from '../../../common/components/InfoArea.tsx';
-// import Paging from '../common/Paging.tsx';
 import TQLConverter from "../../../tql/TQLConverter.tsx";
 import Classs from './../../../common/components/Classs.tsx';
 import InfiniteScroll from './../../../common/components/InfiniteScroll.tsx';
+import Switch from './../../../common/components/Switch.tsx';
 
 const RESULTS_PAGE_SIZE = 25;
 
@@ -72,7 +73,27 @@ class ResultsArea extends Classs<Props>
   xhr = null;
   allXhr = null;
   
-  state = {
+  state: {
+    results: any[];
+    resultsWithAllFields: any[];
+    resultText: string;
+    resultType: string;
+    
+    tql: string;
+    error: any;
+    
+    resultFormat: string;
+    resultsConfig: Config;
+    showingConfig: boolean;
+    configEnabled: boolean;
+    
+    expanded: boolean;
+    expandedResultIndex: number;
+    
+    resultsPages: number;
+    loadedResultsPages: number;
+    onResultsLoaded: (unchanged?: boolean) => void;
+  } = {
     results: null,
     resultsWithAllFields: null,
     resultsConfig: null,
@@ -87,7 +108,8 @@ class ResultsArea extends Classs<Props>
     resultsPages: 1,
     loadedResultsPages: 1,
     onResultsLoaded: null,
-  }
+    resultFormat: 'table',
+  };
   
   constructor(props:Props)
   {
@@ -124,6 +146,15 @@ class ResultsArea extends Classs<Props>
       if(this.state.onResultsLoaded)
       {
         this.state.onResultsLoaded(false);
+      }
+      
+      if(nextProps.algorithm.id !== this.props.algorithm.id)
+      {
+        this.setState({
+          results: null,
+          resultsWithAllFields: null,
+          resultText: 'Loading',
+        })
       }
     }
   }
@@ -239,6 +270,15 @@ class ResultsArea extends Classs<Props>
       />;
     }
     
+    if(this.state.resultFormat === 'table')
+    {
+      return <ResultsTable
+        results={this.state.results}
+        resultsWithAllFields={this.state.resultsWithAllFields}
+        resultsConfig={this.state.configEnabled && this.state.resultsConfig}
+      />;
+    }
+    
     return (
       <InfiniteScroll
         className='results-area-results'
@@ -254,6 +294,7 @@ class ResultsArea extends Classs<Props>
               index={index}
               canDrag={this.props.canEdit}
               key={index}
+              format={this.state.resultFormat}
             />
           )
         }
@@ -341,7 +382,6 @@ class ResultsArea extends Classs<Props>
         // TODO add error
       });
     }
-    
   }
   
   handleError(ev)
@@ -380,6 +420,13 @@ class ResultsArea extends Classs<Props>
     }
   }
   
+  toggleView()
+  {
+    this.setState({
+      resultFormat: this.state.resultFormat === 'icon' ? 'table' : 'icon',
+    })
+  }
+  
   renderTopbar()
   {
     return (
@@ -394,6 +441,15 @@ class ResultsArea extends Classs<Props>
             )
           }
         </div>
+        
+        <Switch
+          first='Icons'
+          second='Table'
+          onChange={this.toggleView}
+          selected={this.state.resultFormat === 'icon' ? 1 : 2}
+          small={true}
+        />
+        
         <div className='results-top-config' onClick={this.showConfig}>
           Customize view
         </div>
@@ -461,6 +517,7 @@ class ResultsArea extends Classs<Props>
       <div className={classNames({
         'results-area': true,
         'results-area-config-open': this.state.showingConfig,
+        'results-area-table': this.state.resultFormat === 'table',
       })}>
         { this.renderTopbar() }
         { this.renderResults() }

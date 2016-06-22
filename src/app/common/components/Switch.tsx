@@ -53,6 +53,7 @@ interface Props
   second: string;
   selected: number;
   onChange: (selected:number) => void;
+  small?: boolean;
 }
 
 class Switch extends Classs<Props>
@@ -67,6 +68,7 @@ class Switch extends Classs<Props>
       "switch": true,
       "switch-on-first": this.props.selected === 1,
       "switch-on-second": this.props.selected !== 1,
+      'switch-small': this.props.small,
     });
     
     return (
