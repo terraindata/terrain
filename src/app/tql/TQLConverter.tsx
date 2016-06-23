@@ -108,18 +108,16 @@ class TQLConverter
       });
     }
     
-    if(options.limit)
+    let limit = options.limit || 5000; // queries without a limit will crash Tiny
+    cards = this._topFromCard(cards, (fromCard: IFromCard) =>
     {
-      cards = this._topFromCard(cards, (fromCard: IFromCard) =>
-      {
-        fromCard.cards.push({
-          type: 'take',
-          value: options.limit,
-        } as BuilderTypes.ITakeCard);
-        
-        return fromCard;
-      });
-    }
+      fromCard.cards.push({
+        type: 'take',
+        value: limit,
+      } as BuilderTypes.ITakeCard);
+      
+      return fromCard;
+    });
     
     return cards;
   }

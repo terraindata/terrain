@@ -108,7 +108,7 @@ class ResultsArea extends Classs<Props>
     resultsPages: 1,
     loadedResultsPages: 1,
     onResultsLoaded: null,
-    resultFormat: 'table',
+    resultFormat: 'icon',
   };
   
   constructor(props:Props)
@@ -272,11 +272,15 @@ class ResultsArea extends Classs<Props>
     
     if(this.state.resultFormat === 'table')
     {
-      return <ResultsTable
-        results={this.state.results}
-        resultsWithAllFields={this.state.resultsWithAllFields}
-        resultsConfig={this.state.configEnabled && this.state.resultsConfig}
-      />;
+      return (
+        <div className='results-table-wrapper'>
+          <ResultsTable
+            results={this.state.results}
+            resultsWithAllFields={this.state.resultsWithAllFields}
+            resultsConfig={this.state.configEnabled && this.state.resultsConfig}
+          />
+        </div>
+      );
     }
     
     return (

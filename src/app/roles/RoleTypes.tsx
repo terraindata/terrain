@@ -61,10 +61,13 @@ export module RoleTypes
     builder: boolean;
   }
   
-  // { groupId: { username: Role }}
-  export type GroupRoleMap = Immutable.Map<ID, Role>
   // { { username: Role }
+  export type GroupRoleMap = Immutable.Map<ID, Role>
+  // { groupId: { username: Role }}
   export type RoleMap = Immutable.Map<ID, GroupRoleMap>
+  
+  // if
+  // roles.getIn([groupId, username])
 }
 
 export default RoleTypes;

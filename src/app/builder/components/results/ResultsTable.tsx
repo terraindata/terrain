@@ -68,9 +68,35 @@ class ResultsTable extends Classs<Props>
 {
   state: {
     widths: {[field: string]: number};
+    // fixed: {[field: string]: boolean};
   } = {
     widths: {},
+    // fixed: {},
   }
+  
+  // constructor(props:Props)
+  // {
+  //   super(props);
+    
+  //   let {resultsConfig} = this.props;
+  //   if(resultsConfig && resultsConfig.name)
+  //   {
+  //     this.state.fixed[resultsConfig.name] = true;
+  //   }
+  // }
+  
+  // componentWillReceiveProps(nextProps)
+  // {
+  //   let {resultsConfig} = this.props;
+  //   if(resultsConfig && resultsConfig.name && this.state.fixed[resultsConfig.name] === undefined)
+  //   {
+  //     this.setState({
+  //       resultsConfig: _.extend({}, resultsConfig, {
+  //         [resultsConfig.name]: true,
+  //       })
+  //     });
+  //   }
+  // }
   
   handleColumnResize(width: number, field: string)
   {
@@ -105,6 +131,7 @@ class ResultsTable extends Classs<Props>
         key={index}
         isResizable={true}
         columnKey={field}
+        fixed={field === this.props.resultsConfig.name || field === this.props.resultsConfig.score}
       />
     );
   }
@@ -122,29 +149,27 @@ class ResultsTable extends Classs<Props>
             resultsWithAllFields && resultsWithAllFields.length ? _.keys(resultsWithAllFields[0]) : []
           ),
       };
-    
+    console.log(this.props.containerHeight);
     return (
-      <div className='results-table-wrapper'>
-        <Table
-          rowsCount={resultsWithAllFields ? resultsWithAllFields.length : 0}
-          rowHeight={35}
-          headerHeight={35}
-          width={this.props.containerWidth}
-          height={this.props.containerHeight}
-          onColumnResizeEndCallback={this.handleColumnResize}
-          isColumnResizing={false}
-        >
-          {
-            this.renderCol(config.name)
-          }
-          {
-            this.renderCol(config.score)
-          }
-          {
-            config.fields.map(this.renderCol)
-          }
-        </Table>
-      </div>
+      <Table
+        rowsCount={resultsWithAllFields ? resultsWithAllFields.length : 0}
+        rowHeight={35}
+        headerHeight={35}
+        width={this.props.containerWidth}
+        height={this.props.containerHeight}
+        onColumnResizeEndCallback={this.handleColumnResize}
+        isColumnResizing={false}
+      >
+        {
+          this.renderCol(config.name)
+        }
+        {
+          this.renderCol(config.score)
+        }
+        {
+          config.fields.map(this.renderCol)
+        }
+      </Table>
     );
 	}
 }
