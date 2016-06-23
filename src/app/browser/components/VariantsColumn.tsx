@@ -211,6 +211,18 @@ class VariantsColumn extends Classs<Props>
           roles.getIn([this.props.groupId, me.username, 'admin']));
     }
     
+    let role = "Viewer"
+    if (this.state.roles.getIn([this.props.groupId, me.username])) 
+    {
+      if (this.state.roles.getIn([this.props.groupId, me.username]).admin) 
+      {
+        role = "Admin"
+      }
+      else if (this.state.roles.getIn([this.props.groupId, me.username]).builder) 
+      {
+        role = "Builder"
+      }
+    }
     return (
       <BrowserItem
         index={index}
@@ -236,7 +248,7 @@ class VariantsColumn extends Classs<Props>
         canDrag={canDrag}
       >
         <div className='flex-container'>
-          <UserThumbnail username={vriant.lastUsername} medium={true} />
+          <UserThumbnail username={vriant.lastUsername} medium={true} extra = {role}/>
           
           <div className='flex-grow'>
             <div 

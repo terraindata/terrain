@@ -65,6 +65,7 @@ interface Props
   square?: boolean;
   hideAdmin?: boolean;
   link?: boolean;
+  extra?: string;
 }
 
 class UserThumbnail extends Classs<Props>
@@ -118,7 +119,8 @@ class UserThumbnail extends Classs<Props>
     let { user } = this.state;
     let name: string = user ? user.name() : 'Loading...';
     let src: string = user ? user.imgSrc : 'http://lukeknepper.com/terrain/assets/img/Terrain_Icon_White.png';
-    let tip: string = this.props.showName ? null : name;
+    console.log(name, this.props.extra);
+    let tip = this.props.showName ? null : '<div class="center">' + name + '<br />' + this.props.extra + '</div>';
     let text: string = this.props.showName ? name : null;
     let thumbnail = (
       <div
@@ -132,7 +134,8 @@ class UserThumbnail extends Classs<Props>
           'user-thumbnail-square': this.props.square,
           'user-thumbnail-admin': user && user.isAdmin && !this.props.hideAdmin,
         })}
-        data-tip={tip}
+        data-tip={tip} 
+        data-html={true}
       >
         <div
           className='user-thumbnail-image'
