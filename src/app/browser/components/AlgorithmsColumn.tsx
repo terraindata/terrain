@@ -212,13 +212,15 @@ class AlgorithmsColumn extends Classs<Props>
         color: live, 
       },
     ];
+   
     algorithm.variants.map(v => scores[v.status].score ++);
     
     let {me, roles} = this.state;
     let canEdit = me && roles && roles.getIn([algorithm.groupId, me.username, 'builder']);
     let canDrag = me && roles && roles.getIn([algorithm.groupId, me.username, 'admin']);
     
-    let lastTouched = algorithm.variants.reduce((lastTouched, v) =>
+    let lastTouched: {date: string, username: string} = 
+      algorithm.variants.reduce((lastTouched, v) =>
     {
       let date = new Date(v.lastEdited);
       if(!lastTouched || (lastTouched.date < date || isNaN(lastTouched.date.getTime())))
@@ -230,8 +232,13 @@ class AlgorithmsColumn extends Classs<Props>
       }
       return lastTouched;
     }, null);
-    let {date, username} = lastTouched;
-    
+    if (lastTouched) {
+      var {date, username} = lastTouched;
+    }
+    else {
+      var date= "There are no variants";
+      var username = "There are no variants";
+    }
     return (
       <BrowserItem
         index={index}
@@ -265,8 +272,12 @@ class AlgorithmsColumn extends Classs<Props>
                 hideZeroes={true}
               />
             </div>
-            <div className='browser-item-line'>
+            <div 
+              className='browser-item-line'
+              data-tip={moment(date).format('MMMM Do YYYY, h:mm:ss a') }
+            >
               { moment(date).fromNow() }
+
             </div>
           </div>
         </div>

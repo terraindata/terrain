@@ -239,7 +239,10 @@ class VariantsColumn extends Classs<Props>
           <UserThumbnail username={vriant.lastUsername} medium={true} />
           
           <div className='flex-grow'>
-            <div className='browser-item-line'>
+            <div 
+              className='browser-item-line'
+              data-tip={moment(vriant.lastEdited).format('MMMM Do YYYY, h:mm:ss a') }
+            >
               { moment(vriant.lastEdited).fromNow() }
             </div>
           </div>
