@@ -150,16 +150,16 @@ class GroupsColumn extends Classs<Props>
     let canDrag = me && me.isAdmin;
       
 
-    let extra = "Viewer"
+    var extra = "Viewer";
     if (groupRoles) 
     {
       if (groupRoles.getIn([me.username, 'admin'])) 
       {
-         extra = "Admin"
+        extra = "Admin";
       }
       else if (groupRoles.getIn([me.username, 'builder'])) 
       {
-        extra = "Builder"
+        extra = "Builder";
       }
     }
     return (

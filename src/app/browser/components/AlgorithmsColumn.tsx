@@ -240,16 +240,16 @@ class AlgorithmsColumn extends Classs<Props>
       var username = "There are no variants";
     }
 
-    let role = "Viewer"
+    var role = "Viewer";
     if (this.state.roles.getIn([this.props.groupId, username])) 
     {
       if (this.state.roles.getIn([this.props.groupId, username]).admin) 
       {
-        role = "Admin"
+        role = "Admin";
       }
       else if (this.state.roles.getIn([this.props.groupId, username]).builder) 
       {
-        role = "Builder"
+        role = "Builder";
       }
     }
     return (
@@ -276,8 +276,7 @@ class AlgorithmsColumn extends Classs<Props>
         canDuplicate={canDrag}
       >
         <div className='flex-container'>
-        <UserThumbnail username={username} medium={true} extra = {role}/>
-          
+          <UserThumbnail username={username} medium={true} extra={role}/>
           <div className='flex-grow'>
             <div className='browser-item-line'>
               <Scoreline 

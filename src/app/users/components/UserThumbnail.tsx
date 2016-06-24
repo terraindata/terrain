@@ -119,7 +119,6 @@ class UserThumbnail extends Classs<Props>
     let { user } = this.state;
     let name: string = user ? user.name() : 'Loading...';
     let src: string = user ? user.imgSrc : 'http://lukeknepper.com/terrain/assets/img/Terrain_Icon_White.png';
-    console.log(name, this.props.extra);
     let tip = this.props.showName ? null : '<div class="center">' + name + '<br />' + this.props.extra + '</div>';
     let text: string = this.props.showName ? name : null;
     let thumbnail = (
