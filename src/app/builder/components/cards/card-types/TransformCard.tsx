@@ -113,6 +113,8 @@ class TransformCard extends Classs<Props>
             ref={inputRef}
             id={this.props.card.id}
             keyPath={this._keyPath('input')}
+            placeholder='Field or variable name'
+            help='This is the input<br />into the Transform card.'
           />
         </CardField>
         <TransformCardChart

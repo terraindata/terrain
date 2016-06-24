@@ -57,6 +57,7 @@ interface Props
   options: string[];
   onChange: (value: string) => void;
   placeholder?: string;
+  help?: string;
   ref?: string;
   className?: string;
   disabled?: boolean;
@@ -212,6 +213,9 @@ class Autocomplete extends Classs<Props>
           onBlur={this.handleBlur}
           onKeyDown={this.handleKeydown}
           disabled={this.props.disabled}
+          placeholder={this.props.placeholder}
+          data-tip={this.props.help}
+          data-html={true}
         />
         { !options || !this.state.open ? null :
           <div

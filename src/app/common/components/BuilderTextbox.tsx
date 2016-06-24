@@ -67,6 +67,7 @@ interface Props
   canEdit?: boolean;
   options?: string[];  
   placeholder?: string;
+  help?: string;
   ref?: string;
   className?: string;
   type?: string;
@@ -205,6 +206,7 @@ class BuilderTextbox extends React.Component<Props, any>
                 options={this.props.options}
                 onChange={this.handleAutocompleteChange}
                 placeholder={this.props.placeholder}
+                help={this.props.help}
               />
           }
           { this.props.acceptsCards && this.renderSwitch() }

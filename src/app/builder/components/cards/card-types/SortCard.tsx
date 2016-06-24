@@ -92,6 +92,8 @@ class SortCard extends Classs<Props>
               value={sort.property}
               id={this.props.card.id}
               keyPath={this._keyPath('sorts', index, 'property')}
+              placeholder='Field name'
+              help='Field by which to sort.<br />For multiple sort fields,<br />priority goes top to bottom.'
             />
           </div>
           <div className='flex-card-field'>

@@ -118,6 +118,7 @@ class FilterArea extends Classs<Props>
               parentId={this.props.card.id}
               top={true}
               options={this.props.keys}
+              placeholder='Field or variable'
             />
           </div>
           <div className='builder-operator'>
@@ -138,6 +139,7 @@ class FilterArea extends Classs<Props>
               acceptsCards={true}
               parentId={this.props.card.id}
               options={this.props.keys}
+              placeholder='Field or variable'
             />
           </div>
           <div className='builder-operator'>
