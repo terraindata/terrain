@@ -49,8 +49,11 @@ import * as $ from 'jquery';
 import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
 import * as Immutable from 'immutable';
+import ResultsView from './ResultsView.tsx';
+//React
 var HTML5Backend = require('react-dnd-html5-backend');
 var ReactGridLayout = require('react-grid-layout');
+var Button = require('react-button');
 //Components
 import Classs from './../../common/components/Classs.tsx';
 import LayoutManager from "./layout/LayoutManager.tsx";
@@ -63,26 +66,44 @@ interface Props
   history?: any;
 }
 
-
-
 class TQL extends Classs<Props>
 {
-  render()
-  { 
-    var layout = [];
- 	 return (
-    	<ReactGridLayout className="tql-view" isDraggable={false} layout={layout} cols={2} rowHeight={1000}>
-      		<div key={1} className="column-1">
-      			<textarea className="code-input"/>
-      		</div>
-      		<div key={2} className="column-2">
-      			<textarea disabled={true}>
-      			Results
-      			</textarea>
-      		</div>
-    	</ReactGridLayout>
+  state: {
+   tql: string,
+  } = {
+   tql: null
+  };
+
+	executeCode()
+	{
+		console.log("Execute code");
+		this.setState( { tql: "from 'usprofile_babysitter' as bb\n take 10\n select bb.dogs_ok;"});
+	}
+  	render()
+  	{ 
+ 		return (
+ 			<div>
+ 				<Button onClick={this.executeCode}>
+  					Execute code
+      		</Button>
+  				<ReactGridLayout 
+    				className="tql-view" 
+    				isDraggable={false} 
+    				isResiable={false}
+    				layout={[]} 
+    				cols={2} 
+    				rowHeight={window.innerHeight}
+    			>
+      			<div key={1} className="column-1">
+      				<textarea className="code-input"/>
+      			</div>
+      			<div key={2} className="column-2" id='results'>
+      				<ResultsView tql={this.state.tql}/>
+      			</div>
+    		</ReactGridLayout>
+    	</div>
     );
-  }
+  	}
 }
 
 export default DragDropContext(HTML5Backend)(TQL);
