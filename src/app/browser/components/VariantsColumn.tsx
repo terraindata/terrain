@@ -212,13 +212,13 @@ class VariantsColumn extends Classs<Props>
     }
     
     var role = "Viewer";
-    if (this.state.roles.getIn([this.props.groupId, me.username])) 
+    if (this.state.roles.getIn([this.props.groupId, vriant.lastUsername])) 
     {
-      if (this.state.roles.getIn([this.props.groupId, me.username]).admin) 
+      if (this.state.roles.getIn([this.props.groupId, vriant.lastUsername]).admin) 
       {
         role = "Admin";
       }
-      else if (this.state.roles.getIn([this.props.groupId, me.username]).builder) 
+      else if (this.state.roles.getIn([this.props.groupId, vriant.lastUsername]).builder)
       {
         role = "Builder";
       }
