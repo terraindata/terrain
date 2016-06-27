@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+
 require('./Dropdown.less');
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -59,6 +60,7 @@ interface Props
   id?: string;
   keyPath?: (string | number)[];
   values?: any[]; // maps indices to values, otherwise index will be used as the value
+  canEdit?: boolean;
 
   ref?: string;
   rel?: string;
@@ -131,6 +133,11 @@ class Dropdown extends Classs<Props>
   
   toggleOpen()
   {
+    if(!this.props.canEdit)
+    {
+      return;
+    }
+    
     if(!this.state.open)
     {
       $(document).on('click', this.close);
@@ -151,6 +158,7 @@ class Dropdown extends Classs<Props>
       "dropdown-wrapper-circle": this.props.circle,
       "dropdown-up": this.state.up,
       "dropdown-open": this.state.open,
+      "dropdown-disabled": !this.props.canEdit,
     });
     
     return (

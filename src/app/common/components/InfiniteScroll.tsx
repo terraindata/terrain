@@ -94,7 +94,6 @@ class Browser extends Classs<Props>
   
   onItemsLoaded(unchanged?: boolean)
   {
-    console.log('parent says', unchanged ? 'unchanged' : 'changed');
     this.setState({
       unchanged,
     });
@@ -110,18 +109,21 @@ class Browser extends Classs<Props>
     
     if(unchanged)
     {
-      console.log('unchanged');
       // no change in item state, don't fire a request to parent
       return;
     }
     
     let el: any = this.refs['is'];
+    if(!el)
+    {
+      return;
+    }
+    
     let {height} = el.getBoundingClientRect();
     let {scrollHeight, scrollTop} = el;
     
     if(height + scrollTop + SCROLL_SENSITIVITY > scrollHeight)
     {
-      console.log('s');
       this.props.onRequestMoreItems(this.onItemsLoaded);
     }
   }

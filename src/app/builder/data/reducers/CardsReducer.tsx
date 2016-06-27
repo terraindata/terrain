@@ -242,7 +242,6 @@ CardsReducer[ActionTypes.cards.remove] =
       var index = kp.splice(-1, 1)[0];
       return state.updateIn(kp, cards => cards.remove(index))
     }
-    
     if(state.getIn(['selectedCardIds', id]))
     {
       // apply to selection

@@ -365,8 +365,14 @@ class ResultsArea extends Classs<Props>
             this.setState({
               loadedResultsPages: this.state.resultsPages,
             });
-            console.log(result.value.length, this.state.results.length);
-            this.state.onResultsLoaded(result.value.length === this.state.results.length);
+            
+            // set a timeout to prevent an infinite loop with InfiniteScroll
+            // could move this somewhere that executes after the results have rendered
+            setTimeout(() =>
+              this.state.onResultsLoaded && this.state.onResultsLoaded(
+                this.state.results &&
+                result.value.length === this.state.results.length
+              ), 1000);
           }
           
           this.setState({
@@ -411,7 +417,11 @@ class ResultsArea extends Classs<Props>
         querying: true,
         tql
       });
+      
       this.props.onLoadStart && this.props.onLoadStart();
+      this.xhr && this.xhr.abort();
+      this.allXhr && this.allXhr.abort();
+      
       this.xhr = Ajax.query(tql, this.handleResultsChange, this.handleError);
       this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm.cards, {
         allFields: true,

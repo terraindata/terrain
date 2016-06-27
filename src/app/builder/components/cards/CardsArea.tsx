@@ -132,7 +132,8 @@ var CardsArea = React.createClass<any, any>({
         key: card.id,
       }
     ))
-    .concat({
+    .concat(!this.props.canEdit ? [] :
+    [{
       content: (
         <CreateCardTool
           {...this.props}
@@ -143,7 +144,7 @@ var CardsArea = React.createClass<any, any>({
         />
       ),
       key: 'end-tool',
-    })
+    }]);
   },
   
   copy() {},

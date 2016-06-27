@@ -95,6 +95,10 @@ class Builder extends Classs<Props>
   {
     super(props);
     
+  }
+  
+  componentWillMount()
+  {
     this.cancelSubscription =
       Store.subscribe(() => {
         var newState = Store.getState().toJS();
@@ -111,18 +115,14 @@ class Builder extends Classs<Props>
     const algorithmId = _.first(_.keys(this.reduxState));
     
     var colKeys = [Math.random(), Math.random()];
-    this.state =
+    this.setState(
     {
       random: Math.random(),
-      algorithmId: algorithmId,
+      algorithmId,
       colKeys,
       noColumnAnimation: false,
-    };
+    });
     
-  }
-  
-  componentWillMount()
-  {
     this.checkConfig(this.props);
     RolesActions.fetch();
   }

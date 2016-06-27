@@ -55,6 +55,7 @@ import Classs from './../../../../common/components/Classs.tsx';
 
 interface Props {
   card: BuilderTypes.ISortCard;
+  canEdit?: boolean;
 }
 
 class SortCard extends Classs<Props>
@@ -78,10 +79,10 @@ class SortCard extends Classs<Props>
   {
     return (
       <CardField
-        draggable={true}
-        addable={true}
+        draggable={this.props.canEdit}
+        addable={this.props.canEdit}
         onAdd={this.addSort}
-        removable={true}
+        removable={this.props.canEdit}
         onDelete={this.removeSort}
         drag_y={true}
       >
@@ -102,6 +103,7 @@ class SortCard extends Classs<Props>
               selectedIndex={sort.direction}
               id={this.props.card.id}
               keyPath={this._keyPath('sorts', index, 'direction')}
+              canEdit={this.props.canEdit}
             />
           </div>
         </div>
