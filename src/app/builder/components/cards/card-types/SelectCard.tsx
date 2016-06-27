@@ -115,7 +115,8 @@ class SelectCard extends Classs<Props>
               <BuilderTextbox
                 {...this.props}
                 value={property.property}
-                placeholder='Type field here'
+                placeholder='Field name'
+                help='The name of the field in the database.'
                 rel={'' + index}
                 id={this.props.card.id}
                 keyPath={this._keyPath('properties', index, 'property')}

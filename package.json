@@ -4,7 +4,7 @@
   "description": "The one search front-end to rule them all.",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --inline --content-base src/app --history-api-fallback",
+    "start": "MIDWAY_HOST=$(docker-machine ip default) webpack-dev-server --config webpack.config.docker.js --inline --content-base src/app --history-api-fallback",
     "start-docker": "MIDWAY_HOST=$(docker-machine ip default) webpack-dev-server --config webpack.config.docker.js --inline --content-base src/app --history-api-fallback",
     "test": "karma start karma.conf.js",
     "deploy": "webpack && scp bundle.js u51505641@lukeknepper.com:alfaromeo/bundle.js",

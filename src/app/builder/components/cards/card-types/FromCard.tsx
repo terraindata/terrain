@@ -148,7 +148,8 @@ class FromCard extends Classs<Props>
                 value={this.props.card.group}
                 options={this.state.tableNames}
                 ref='group'
-                placeholder='Enter group name'
+                placeholder='Table'
+                help='The name of the table in the database.'
                 id={this.props.card.id}
                 keyPath={this._keyPath('group')}
               />
@@ -163,7 +164,11 @@ class FromCard extends Classs<Props>
                 {...this.props}
                 value={this.props.card.iterator}
                 ref='iterator'
-                placeholder='Iterator name'
+                placeholder='Variable name'
+                help='Refer to elements in the table by this. \
+                  <br/>Example: From a "users" table, you \
+                  <br />could name this variable "user" and then \
+                  <br />refer to "user.id", "user.name", etc.'
                 id={this.props.card.id}
                 keyPath={this._keyPath('iterator')}
               />

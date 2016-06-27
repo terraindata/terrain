@@ -137,6 +137,7 @@ class ScoreCard extends Classs<Props>
               id={this.props.card.id}
               keyPath={this._keyPath('weights', index, 'weight')}
               placeholder='0'
+              help='Weight for this field or variable'
             />
         },
         {

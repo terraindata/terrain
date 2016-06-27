@@ -98,6 +98,7 @@ class LetVarCard extends Classs<Props>
               <BuilderTextbox
                 {...this.props}
                 placeholder='Variable name'
+                help='Name by which you<br />refer to this variable.'
                 value={this.props.card.field} 
                 parentId={this.props.card.id}
                 ref={'field'}
@@ -115,6 +116,7 @@ class LetVarCard extends Classs<Props>
                 <BuilderTextbox
                   {...this.props}
                   placeholder='Expression'
+                  help='The value to which this<br />variable will be set.'
                   value={this.props.card.expression}
                   className='let-card-code-input'
                   textarea={this.state.expanded}

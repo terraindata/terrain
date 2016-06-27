@@ -91,7 +91,7 @@ class IfCard extends React.Component<Props, any>
       <div ref='card'>
         <FilterArea {...this.props} hideNoFilterMessage={this.props.singleCard} />
         { this.props.card.filters.length ?
-          <div className='if-card-else'>
+          <div className='if-card-else' data-tip='Action to take if<br />previous condition is true.'>
             Then
           </div>
         : null }
@@ -104,13 +104,20 @@ class IfCard extends React.Component<Props, any>
           elses.map((els, index) =>
           (
             <div key={els.id}>
-              <div className='if-card-else'>
+              <div className='if-card-else' data-tip='Action to take if<br />condition is true.'>
                 Else { els.filters.length !== 0 && 'If' }
               </div>
               {
                 els.filters.length
                   ? null 
-                  : <div className='button' onClick={this.addElseIf} rel={""+index}>+ If</div>
+                  : <div
+                      className='button'
+                      onClick={this.addElseIf}
+                      rel={""+index}
+                      data-tip='Add If condition'
+                    >
+                      + If
+                    </div>
               }
               <Card
                 {...this.props}
@@ -123,7 +130,13 @@ class IfCard extends React.Component<Props, any>
         }
         { 
           elses.length || !this.props.card.filters.length ? null :
-            <div className='button if-card-button' onClick={this.addElse}>+ Else</div>
+            <div
+              className='button if-card-button'
+              onClick={this.addElse}
+              data-tip='Add an Else condition'
+            >
+              + Else
+            </div>
         }
       </div>
     );
