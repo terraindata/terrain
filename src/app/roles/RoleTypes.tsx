@@ -60,7 +60,6 @@ export module RoleTypes
     admin: boolean;
     builder: boolean;
   }
-  
   // { { username: Role }
   export type GroupRoleMap = Immutable.Map<ID, Role>
   // { groupId: { username: Role }}

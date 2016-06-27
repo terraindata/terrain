@@ -239,6 +239,19 @@ class AlgorithmsColumn extends Classs<Props>
       var date= "There are no variants";
       var username = "There are no variants";
     }
+
+    var role = "Viewer";
+    if (this.state.roles.getIn([this.props.groupId, username])) 
+    {
+      if (this.state.roles.getIn([this.props.groupId, username]).admin) 
+      {
+        role = "Admin";
+      }
+      else if (this.state.roles.getIn([this.props.groupId, username]).builder) 
+      {
+        role = "Builder";
+      }
+    }
     return (
       <BrowserItem
         index={index}
@@ -263,8 +276,7 @@ class AlgorithmsColumn extends Classs<Props>
         canDuplicate={canDrag}
       >
         <div className='flex-container'>
-          <UserThumbnail username={username} medium={true} />
-          
+          <UserThumbnail username={username} medium={true} extra={role}/>
           <div className='flex-grow'>
             <div className='browser-item-line'>
               <Scoreline 
