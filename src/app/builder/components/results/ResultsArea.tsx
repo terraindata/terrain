@@ -127,6 +127,7 @@ class ResultsArea extends Classs<Props>
     this.allXhr && this.allXhr.abort();
     this.xhr = false;
     this.allXhr = false;
+    this.timeout && clearTimeout(this.timeout);
   }
   
   componentWillReceiveProps(nextProps)
@@ -301,6 +302,8 @@ class ResultsArea extends Classs<Props>
     this.handleResultsChange(response, true);
   }
   
+  timeout = null;
+  
   handleResultsChange(response, isAllFields?: boolean)
   {
     let xhrKey = isAllFields ? 'allXhr' : 'xhr';
@@ -355,7 +358,7 @@ class ResultsArea extends Classs<Props>
             
             // set a timeout to prevent an infinite loop with InfiniteScroll
             // could move this somewhere that executes after the results have rendered
-            setTimeout(() =>
+            this.timeout = setTimeout(() =>
               this.state.onResultsLoaded && this.state.onResultsLoaded(
                 this.state.results &&
                 result.value.length === this.state.results.length

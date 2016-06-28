@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
 
@@ -76,28 +77,28 @@ class Browser extends Classs<Props>
     this.check();
   }
   
+  unmounted = false;
+  componentWillUnmount()
+  {
+    // I know this is an anti-pattern, but I can't figure out a way around it
+    //  ResultsArea sometimes calls onItemsLoaded after this component has been unmounted
+    this.unmounted = true;
+  }
+  
   handleScroll()
   {
     this.check();
   }
   
-  // componentWillReceiveProps(nextProps:Props)
-  // {
-  //   if(this.props.children !== nextProps.children)
-  //   {
-  //     console.log('diff childs');
-  //     this.setState({
-  //       unchanged: false,
-  //     });
-  //   }
-  // }
-  
   onItemsLoaded(unchanged?: boolean)
   {
-    this.setState({
-      unchanged,
-    });
-    this.check(unchanged);
+    if(!this.unmounted)
+    {
+      this.setState({
+        unchanged,
+      });
+      this.check(unchanged);
+    }
   }
   
   check(unchanged?: boolean)
