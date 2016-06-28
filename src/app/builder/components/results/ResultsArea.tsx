@@ -85,7 +85,6 @@ class ResultsArea extends Classs<Props>
     resultFormat: string;
     resultsConfig: Config;
     showingConfig: boolean;
-    configEnabled: boolean;
     
     expanded: boolean;
     expandedResultIndex: number;
@@ -104,7 +103,6 @@ class ResultsArea extends Classs<Props>
     error: null,
     resultType: null,
     showingConfig: false,
-    configEnabled: false,
     resultsPages: 1,
     loadedResultsPages: 1,
     onResultsLoaded: null,
@@ -116,7 +114,6 @@ class ResultsArea extends Classs<Props>
     super(props);
     
     this.state.resultsConfig = this.getResultsConfig()[this.props.algorithm.id];
-    this.state.configEnabled = !! this.state.resultsConfig;
   }
   
   componentDidMount()
@@ -140,7 +137,6 @@ class ResultsArea extends Classs<Props>
       let resultsConfig = this.getResultsConfig()[nextProps.algorithm.id];
       this.setState({
         resultsConfig,
-        configEnabled: !! resultsConfig,
       });
       
       if(this.state.onResultsLoaded)
@@ -174,13 +170,6 @@ class ResultsArea extends Classs<Props>
     });
   }
   
-  handleConfigEnabledToggle()
-  {
-    this.setState({
-      configEnabled: !this.state.configEnabled,
-    });
-  }
-
   copy() {}
   
   clear() {}
@@ -206,7 +195,7 @@ class ResultsArea extends Classs<Props>
         <Result 
           data={result}
           allFieldsData={resultAllFields}
-          config={this.state.configEnabled ? this.state.resultsConfig : null}
+          config={this.state.resultsConfig}
           onExpand={this.handleCollapse}
           expanded={true}
           drag_x={false}
@@ -275,9 +264,7 @@ class ResultsArea extends Classs<Props>
       return (
         <div className='results-table-wrapper'>
           <ResultsTable
-            results={this.state.results}
-            resultsWithAllFields={this.state.resultsWithAllFields}
-            resultsConfig={this.state.configEnabled && this.state.resultsConfig}
+            {...this.state}
           />
         </div>
       );
@@ -293,7 +280,7 @@ class ResultsArea extends Classs<Props>
             <Result
               data={result}
               allFieldsData={this.state.resultsWithAllFields && this.state.resultsWithAllFields[index]}
-              config={this.state.configEnabled ? this.state.resultsConfig : null}
+              config={this.state.resultsConfig}
               onExpand={this.handleExpand}
               index={index}
               canDrag={this.props.canEdit}
@@ -508,9 +495,8 @@ class ResultsArea extends Classs<Props>
         config={this.getResultsConfig()[this.props.algorithm.id]}
         onClose={this.hideConfig}
         onConfigChange={this.handleConfigChange}
+        results={this.state.results}
         resultsWithAllFields={this.state.resultsWithAllFields}
-        configEnabled={this.state.configEnabled}
-        onConfigEnableToggle={this.handleConfigEnabledToggle}
       />;
     }
   }
