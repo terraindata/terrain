@@ -147,8 +147,8 @@ class TQLConverter
     score: (score) => "linearScore([$weights])",
       weights: (weight, index) => join(", ", index) + "\n[$weight, $key]",
     
-    transform: "piecewiseLinearTransform([$scorePoints], $input)",
-      scorePoints: (sp, index) => join(", ", index) + "\n[$value, $score]",
+    transform: "linearTransform([$scorePoints], $input)",
+      scorePoints: (sp, index) => join(", ", index) + "\n[$score, $value]",
     
     if: (card) => "if $filters {$cards}"
       + (card.elses.length ? " else " + (

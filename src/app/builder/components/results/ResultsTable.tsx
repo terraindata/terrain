@@ -109,7 +109,7 @@ class ResultsTable extends Classs<Props>
     });
   }
   
-  renderCol(field:string, index?: number)
+  renderCol(field:string, index?: number, arr?: string[], config?: Config)
   {
     if(!field || !field.length)
     {
@@ -131,25 +131,27 @@ class ResultsTable extends Classs<Props>
         key={index}
         isResizable={true}
         columnKey={field}
-        fixed={field === this.props.resultsConfig.name || field === this.props.resultsConfig.score}
+        fixed={config && (field === config.name || field === config.score)}
+        allowCellsRecycling={true}
       />
     );
   }
 
 	render()
   {
-    let {results, resultsWithAllFields} = this.props;
-    let config = this.props.resultsConfig.fields && this.props.resultsConfig.fields.length ?
-      this.props.resultsConfig : 
+    let {results, resultsWithAllFields, resultsConfig} = this.props;
+    let config: Config = resultsConfig && resultsConfig.enabled ?
+      resultsConfig : 
       {
         name: null,
         score: null,
         fields: !this.props.results.length ? null :
           _.keys(this.props.results[0]).concat(
-            resultsWithAllFields && resultsWithAllFields.length ? _.keys(resultsWithAllFields[0]) : []
+            results && results.length ? _.keys(results[0]) : []
           ),
+        enabled: true,
       };
-    console.log(this.props.containerHeight);
+    
     return (
       <Table
         rowsCount={resultsWithAllFields ? resultsWithAllFields.length : 0}
@@ -161,10 +163,10 @@ class ResultsTable extends Classs<Props>
         isColumnResizing={false}
       >
         {
-          this.renderCol(config.name)
+          this.renderCol(config.name, null, null, config)
         }
         {
-          this.renderCol(config.score)
+          this.renderCol(config.score, null, null, config)
         }
         {
           config.fields.map(this.renderCol)
