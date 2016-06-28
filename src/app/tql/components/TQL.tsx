@@ -68,17 +68,25 @@ interface Props
 
 class TQL extends Classs<Props>
 {
-  state: {
-   tql: string,
+ state: {
+    tql: string;
+    value: string;
   } = {
-   tql: null
+    tql: null,
+    value: null
   };
+
 
 	executeCode()
 	{
 		console.log("Execute code");
-		this.setState( { tql: "from 'usprofile_babysitter' as bb\n take 10\n select bb.dogs_ok;"});
+    	this.setState({ tql: this.state.value});//"from 'usprofile_babysitter' as bb\n take 10\n select\n bb.dogs_ok;"});
 	}
+
+	getTql(event) {
+    this.setState({ value: event.target.value})
+   }
+
   	render()
   	{ 
  		return (
@@ -95,7 +103,12 @@ class TQL extends Classs<Props>
     				rowHeight={window.innerHeight}
     			>
       			<div key={1} className="column-1">
-      				<textarea className="code-input"/>
+      				<textarea 
+      					className="code-input" 
+                		type="text"
+               		value={this.state.value}
+              	 		onChange = {this.getTql}
+              		/>
       			</div>
       			<div key={2} className="column-2" id='results'>
       				<ResultsView tql={this.state.tql}/>

@@ -64,29 +64,21 @@ class ResultsView extends Classs<Props>
   state: {
     results: any[];
     resultsWithAllFields: any[];
-    resultText: string;
     resultType: string;
     error: any;
-    
-    resultFormat: string;
-    expanded: boolean;
-    expandedResultIndex: number;
-    
     resultsPages: number;
     loadedResultsPages: number;
     onResultsLoaded: (unchanged?: boolean) => void;
+    querying: boolean;
   } = {
     results: null,
     resultsWithAllFields: null,
-    resultText: null,
-    expanded: false,
-    expandedResultIndex: null,
     error: null,
     resultType: null,
     resultsPages: 1,
     loadedResultsPages: 1,
     onResultsLoaded: null,
-    resultFormat: 'icon',
+    querying: false,
   };
 
   //If the component updates and the tql command has been changed, then query results
@@ -109,22 +101,29 @@ class ResultsView extends Classs<Props>
   
   renderResults()
   {
-      console.log("Rendering results");
+    console.log("Rendering results");
     if(this.state.error)
     {
-      return <div>ERROR</div>
+      return <div>{this.state.error}</div>
     }
     
-    if(!this.state.results)
+    if(this.state.querying)
     {
-      return <div>Querying Results</div>
+      return <div>Querying results...</div>
+    } 
+    if(!this.state.results) 
+    {
+      return <div>Enter a TQL query on the left.</div>
     }
-    
     if(this.state.resultType !== 'rel')
     {
       return(
         <div>
-          {this.state.results.toString()}
+        <ul>
+          {this.state.results.map(function(result) {
+            return <li>{JSON.stringify(result)}</li>;
+          })}
+        </ul>
         </div>
       );
     }
@@ -135,7 +134,11 @@ class ResultsView extends Classs<Props>
     }
      return(
         <div>
-          {this.state.results.toString()}
+          <ul>
+          {this.state.results.map(function(result) {
+            return <li>{JSON.stringify(result)}</li>;
+          })}
+        </ul>
         </div>
       );
   }
@@ -227,6 +230,7 @@ class ResultsView extends Classs<Props>
   
   queryResults(pages?: number)
   {
+    console.log("Querying results");
     if(!pages)
     {
       pages = this.state.resultsPages;
