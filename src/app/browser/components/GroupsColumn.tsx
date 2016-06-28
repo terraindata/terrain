@@ -149,19 +149,6 @@ class GroupsColumn extends Classs<Props>
     let canEdit = me && groupRoles && groupRoles.getIn([me.username, 'admin']);
     let canDrag = me && me.isAdmin;
       
-
-    var extra = "Viewer";
-    if (groupRoles) 
-    {
-      if (groupRoles.getIn([me.username, 'admin'])) 
-      {
-        extra = "Admin";
-      }
-      else if (groupRoles.getIn([me.username, 'builder'])) 
-      {
-        extra = "Builder";
-      }
-    }
     return (
       <BrowserItem
         index={index}
@@ -192,7 +179,10 @@ class GroupsColumn extends Classs<Props>
                   username={role.username}
                   key={role.username}
                   medium={true}
-                  extra={extra}
+                  extra={
+                    groupRoles.getIn([role.username, 'admin']) ? 'Admin' : 
+                      (groupRoles.getIn([role.username, 'builder']) ? 'Builder' : 'Viewer')
+                  }
                 />
           )
         }
