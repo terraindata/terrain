@@ -93,10 +93,6 @@ class Profile extends Classs<Props>
   {
     super(props);
     
-    this.userUnsubscribe = 
-      UserStore.subscribe(() => this.updateUser(this.props));
-    this.authUnsubscribe = 
-      AuthStore.subscribe(() => this.updateUser(this.props));
     this._subscribe(UserStore, {
       stateKey: 'me',
       storeKeyPath: ['currentUser'],
@@ -127,10 +123,15 @@ class Profile extends Classs<Props>
     })
   }
   
-  componentWillMount()
+  componentDidMount()
   {
     Actions.fetch();
     this.updateUser(this.props);
+    
+    this.userUnsubscribe = 
+      UserStore.subscribe(() => this.updateUser(this.props));
+    this.authUnsubscribe = 
+      AuthStore.subscribe(() => this.updateUser(this.props));
   }
   
   componentWillUnmount()

@@ -45,6 +45,21 @@ THE SOFTWARE.
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 
+// type StoreKeyPath = string[] | (() => string[]);
+interface Config
+{
+  stateKey?: string;
+  storeKeyPath?: string[] | (() => string[]);
+  isMounted?: boolean;
+  updater?: (storeState:any) => void;
+}
+
+interface Store
+{
+  subscribe: (any) => () => void;
+  getState: () => any;
+}
+
 class Classs<T> extends React.Component<T, any>
 {
   constructor(props: T)
@@ -73,43 +88,29 @@ class Classs<T> extends React.Component<T, any>
   
   // subscribes to a Redux store
   _subscribe(
-    store: {subscribe: (any) => () => void, getState: () => any},
-    config: {
-      stateKey?: string,
-      storeKeyPath?: string[],
-      isMounted?: boolean,
-      updater?: (storeState:any) => void
-    }
+    store: Store,
+    config: Config
   )
   {
     let update = () => 
     {
-      config.updater && config.updater(store.getState());
-      
-      if(config.stateKey)
-      {
-        if(config.storeKeyPath)
-        {
-          var value = store.getState().getIn(config.storeKeyPath);
-        } else {
-          var value = store.getState();
-        }
-        var state = {};
-        state[config.stateKey] = value;
-        this.setState(state);
-      }
+      this._update(store, config);  
     }
-    this.subscriptions.push(
-      store.subscribe(update)
-    );
+    
+    let subscribe = () => 
+      this.subscriptions.push(
+        store.subscribe(update)
+      );
     
     if(config.isMounted)
     {
+      subscribe();
       update();
     } else {
-      let mountFn = this['componentWillMount'];
-      this['componentWillMount'] = () =>
+      let mountFn = this['componentDidMount'];
+      this['componentDidMount'] = () =>
       {
+        subscribe();
         update();
         mountFn && mountFn();
       }
@@ -117,6 +118,24 @@ class Classs<T> extends React.Component<T, any>
   }
   subscriptions: (() => void)[] = [];
 
+  _update(store: Store, config: Config)
+  {
+    config.updater && config.updater(store.getState());
+      
+    if(config.stateKey)
+    {
+      if(config.storeKeyPath)
+      {
+        let keyPath = typeof config.storeKeyPath === 'function' ? (config.storeKeyPath as (() => string[]))() : config.storeKeyPath;
+        var value = store.getState().getIn(keyPath);
+      } else {
+        var value = store.getState();
+      }
+      var state = {};
+      state[config.stateKey] = value;
+      this.setState(state);
+    }
+  }
   
   // for the construction of keyPaths for Redux actions,
   //  this function accepts arguments from which to 

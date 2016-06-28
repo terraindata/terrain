@@ -98,8 +98,7 @@ class BrowserInfoColumn extends Classs<Props>
   constructor(props:Props)
   {
     super(props);
-    UserActions.fetch();
-    RolesActions.fetch();
+    
     this._subscribe(UserStore, {
       stateKey: 'users', 
       storeKeyPath: ['users'],
@@ -133,14 +132,14 @@ class BrowserInfoColumn extends Classs<Props>
     return 'Algorithm';
   }
   
-  renderUser(user: User)
+  renderUser(user: User): JSX.Element
   {
-    let groupRoles = this.state.roles.get(this.props.group.id);
+    let {roles} = this.state;
+    let groupRoles = roles && roles.get(this.props.group.id);
     if(!user || user.isDisabled)
     {
       return null;
     }
-    
     return <BrowserInfoUser 
       user={user}
       groupRoles={groupRoles}
@@ -150,13 +149,13 @@ class BrowserInfoColumn extends Classs<Props>
     />;
   }
   
-  renderGroupRoles()
+  renderGroupRoles(): JSX.Element | JSX.Element[]
   {
-    let { me, users } = this.state;
-    let groupRoles = this.state.roles.get(this.props.group.id);
+    let { me, users, roles } = this.state;
+    let groupRoles = roles && roles.get(this.props.group.id);
     if(!me || !groupRoles || !users)
     {
-      return null;
+      return <div>Loading...</div>;
     }
     
     return groupRoles.toArray().map((role: Role) =>
@@ -171,8 +170,8 @@ class BrowserInfoColumn extends Classs<Props>
   
   renderRemainingUsers()
   {
-    let { me,   users } = this.state;
-    let groupRoles = this.state.roles.get(this.props.group.id);
+    let { me, roles, users } = this.state;
+    let groupRoles = roles && roles.get(this.props.group.id);
     if(!me || !users)
     {
       return null;
