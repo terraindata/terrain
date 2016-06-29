@@ -68,6 +68,7 @@ import LayoutManager from "./layout/LayoutManager.tsx";
 import Card from "./cards/Card.tsx";
 import Result from "./results/Result.tsx";
 import Ajax from "./../../util/Ajax.tsx";
+import InfoArea from '../../common/components/InfoArea.tsx';
 
 var NewIcon = require("./../../../images/icon_new_21x17.svg?name=NewIcon");
 var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
@@ -91,16 +92,30 @@ class Builder extends Classs<Props>
   reduxState: any;
   cancelSubscription = null;
   
+  state: {
+    loading: boolean;
+    colKeys: number[];
+    noColumnAnimation: boolean;
+  } = {
+    loading: true,
+    colKeys: null,
+    noColumnAnimation: false,
+  };
+  
   constructor(props:Props)
   {
     super(props);
-    
+  }
+  
+  componentWillMount()
+  {
     this.cancelSubscription =
       Store.subscribe(() => {
         var newState = Store.getState().toJS();
         this.reduxState = newState.algorithms;
         this.setState({
-          random: Math.random()
+          random: Math.random(),
+          loading: false,
         });
       });
 
@@ -111,18 +126,14 @@ class Builder extends Classs<Props>
     const algorithmId = _.first(_.keys(this.reduxState));
     
     var colKeys = [Math.random(), Math.random()];
-    this.state =
+    this.setState(
     {
       random: Math.random(),
-      algorithmId: algorithmId,
+      algorithmId,
       colKeys,
       noColumnAnimation: false,
-    };
+    });
     
-  }
-  
-  componentWillMount()
-  {
     this.checkConfig(this.props);
     RolesActions.fetch();
   }
@@ -134,19 +145,21 @@ class Builder extends Classs<Props>
   
   checkConfig(props:Props)
   {
-    let config = localStorage.getItem('config') || '';
+    let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query.o;
     var newConfig;
     
     if(open)
     {
-      if(config === 'undefined' || config === '')
+      if(!storedConfig || storedConfig === 'undefined' || storedConfig === '')
       {
+        // no stored config, just load the open tab.
         newConfig = '!' + open;
       }
       else
       {
-        var configArr = config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id);
+        // append or update the open id to the stored config list
+        var configArr = storedConfig.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id);
         var i = configArr.indexOf(open);
         if(i === -1)
         {
@@ -156,29 +169,33 @@ class Builder extends Classs<Props>
         
         newConfig = configArr.join(',');
       }
-      
     }
     else if(!props.params.config || !props.params.config.length)
     {
-      if(config)
-      {
-        newConfig = config;
-      }
+      // no 'open' passed in and no config in the url params
+      newConfig = storedConfig;
     }
     
     if(newConfig)
     {
       props.history.replaceState({}, `/builder/${newConfig}`);
-      this.fetch(newConfig);
     }
     else
     {
-      this.fetch(props.params.config);
+      newConfig = props.params.config;
     }
+    
+    localStorage.setItem('config', newConfig || '');
+    this.fetch(newConfig);
   }
   
   fetch(config:string)
   {
+    if(!config)
+    {
+      return;
+    }
+    
     Actions.fetch(Immutable.List(
       config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id)
     ));
@@ -259,7 +276,7 @@ class Builder extends Classs<Props>
         canAddColumn={colKeys.length < 3}
         canCloseColumn={colKeys.length > 1}
       />,
-      hidden: this.state && this.state.closingIndex === index,
+      // hidden: this.state && this.state.closingIndex === index,
       key: colKeys[index],
     }
   }
@@ -283,6 +300,37 @@ class Builder extends Classs<Props>
     }); 
   }
   
+  handleEmptyTabs(tabIds: ID[])
+  {
+    if(!this.props.params.config)
+    {
+      return;
+    }
+    
+    let newConfigArr = this.props.params.config.split(',').filter(tabId =>
+    {
+      if(tabId.indexOf('!') === 0)
+      {
+        tabId = tabId.substr(1);
+      }
+      
+      return tabIds.indexOf(tabId) === -1;
+    });
+    
+    if(newConfigArr.length && !newConfigArr.some(tabId => tabId.indexOf('!') === 0))
+    {
+      var prependSelect = true;
+    }
+    
+    let newConfig = (prependSelect ? '!' : '') + newConfigArr.join(',');
+    
+    this.props.history.replaceState({}, `/builder/${newConfig}`);
+    localStorage.setItem('config', newConfig || '');
+    this.setState({
+      random: Math.random(),
+    });
+  }
+  
   moveColumn(curIndex, newIndex)
   {
     var colKeys = _.clone(this.state.colKeys);
@@ -296,20 +344,37 @@ class Builder extends Classs<Props>
       noColumnAnimation: false,
     }), 250);
   }
+  
+  goToBrowser()
+  {
+    this.props.history.pushState({}, '/browser');
+  }
+  
 	render()
   {
     let config = this.props.params.config;
-    localStorage.setItem('config', config || '');
-    
     
     return (
       <div className={classNames({
         'builder': true,
         'builder-no-column-animation': this.state.noColumnAnimation,
       })}>
-        <Tabs actions={this.tabActions} config={config} ref='tabs' history={this.props.history} />
+        <Tabs
+          actions={this.tabActions}
+          config={config}
+          ref='tabs'
+          history={this.props.history}
+          reportEmptyTabs={this.handleEmptyTabs}
+        />
         {
-          !_.keys(this.reduxState).length ? null :
+          !_.keys(this.reduxState).length ? 
+            <InfoArea
+              large='No variants open'
+              small='You can open one in the Browser'
+              button='Go to the Browser'
+              onClick={this.goToBrowser}
+            />
+          :
             <div className='tabs-content'>
               <LayoutManager layout={this.getLayout()} moveTo={this.moveColumn} />
             </div>

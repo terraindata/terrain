@@ -144,11 +144,48 @@ Contains Actions and Stores for Redux.
 - `[SmallerApp]Store.tsx`: the Store that defines that app's default state and its reducers
 - `[CommonFunction]Reducers.tsx`: defines reducers relating to a common function in that smaller app. If the smaller app doesn't have many different actions, there may be just one reducers file.
 
-## src/typings
+### src/typings
 
 Contains TypeScript typings.
 
 *Note*: When installing new types, make sure to `cd src` before you `tsd install`
+
+## Packages and Imports
+
+### To install a package from npm
+
+`npm install [package-name] --save`
+
+This will install the package and also add a reference to it in your `package.json` file. You should commit the change to the `package.json` file and advise other developers to run `npm install` once they pull in your commit.
+
+If you forget to add `--save`, no line will be added to `package.json`
+
+You will then need to `cd` into `src` and run `tsd install [package_name]` to install any associated typing files. This will add a new directory to `src/typings`, which you should include in your commit.
+
+If there are no public typings available for this package, then `tsd` will tell you that it has written 0 files. In that case, you cannot use the `import` syntax to include the package, but must use the `require` syntax.
+
+For example, to add `truffle-oil` to my app, I would:
+1. `cd ~/git/Search`
+1. `npm install truffle-oil --save`
+1. `git add package.json`
+1. `cd src`
+1. `tsd install truffle-oil`
+1. `cd ..`
+1. `git add typings`
+
+### Importing / requiring files
+
+To include another `.tsx` file from within the Terraformer codebase (`/src`), use `import [ClassName] from '[relative path]'`, e.g.
+`import DotComponent from './DotComponent.tsx';`
+`import NapoleonDynamite from '../../movies/NapoleonDynamite.tsx';`
+
+To include any file that's not a `.tsx` from within the Terraformer codebase, use `let [ClassName] = require('[relative path]')` e.g.
+`require('./Pay.less');`
+`let EssVeeGee = require('../../images/svg.svg');`
+
+To include a package install from `npm`, use `import * as [ClassName] from '[package_name]';` if there are typings available, and `let [ClassName] = require('[package_name]');` if not. e.g.
+`import * as TheForce from 'the-force';`
+`let UnpopularLibrary = require('unpopular-library');`
 
 ## Testing
 
@@ -167,6 +204,7 @@ Note: when adding new tests, make sure to include `t.end()` at the end of every 
 ## Gotchas
 
 A list of common programming gotchas in this codebase
+
 - `let` scope is different than `var` and can cause unexpected errors
   ```
   if(false)
@@ -181,6 +219,8 @@ A list of common programming gotchas in this codebase
   }
   console.log(theEaglesAreGood); // ERROR: cannot find name theEaglesAreGood
   ```
+- Subscribe to Redux stores within the `componentDidMount` method. Do not subscribe in the constructor, or else you will likely see many React `setState` warnings
+- Do not call `fetch` from within a constructor or you may see similar warnings (React thinks that state changes are happening from a higher component's `render` method)
 
 ## Troubleshooting
 

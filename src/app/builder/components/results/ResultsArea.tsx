@@ -85,7 +85,6 @@ class ResultsArea extends Classs<Props>
     resultFormat: string;
     resultsConfig: Config;
     showingConfig: boolean;
-    configEnabled: boolean;
     
     expanded: boolean;
     expandedResultIndex: number;
@@ -104,7 +103,6 @@ class ResultsArea extends Classs<Props>
     error: null,
     resultType: null,
     showingConfig: false,
-    configEnabled: false,
     resultsPages: 1,
     loadedResultsPages: 1,
     onResultsLoaded: null,
@@ -116,7 +114,6 @@ class ResultsArea extends Classs<Props>
     super(props);
     
     this.state.resultsConfig = this.getResultsConfig()[this.props.algorithm.id];
-    this.state.configEnabled = !! this.state.resultsConfig;
   }
   
   componentDidMount()
@@ -130,6 +127,7 @@ class ResultsArea extends Classs<Props>
     this.allXhr && this.allXhr.abort();
     this.xhr = false;
     this.allXhr = false;
+    this.timeout && clearTimeout(this.timeout);
   }
   
   componentWillReceiveProps(nextProps)
@@ -140,7 +138,6 @@ class ResultsArea extends Classs<Props>
       let resultsConfig = this.getResultsConfig()[nextProps.algorithm.id];
       this.setState({
         resultsConfig,
-        configEnabled: !! resultsConfig,
       });
       
       if(this.state.onResultsLoaded)
@@ -174,13 +171,6 @@ class ResultsArea extends Classs<Props>
     });
   }
   
-  handleConfigEnabledToggle()
-  {
-    this.setState({
-      configEnabled: !this.state.configEnabled,
-    });
-  }
-
   copy() {}
   
   clear() {}
@@ -206,7 +196,7 @@ class ResultsArea extends Classs<Props>
         <Result 
           data={result}
           allFieldsData={resultAllFields}
-          config={this.state.configEnabled ? this.state.resultsConfig : null}
+          config={this.state.resultsConfig}
           onExpand={this.handleCollapse}
           expanded={true}
           drag_x={false}
@@ -275,9 +265,7 @@ class ResultsArea extends Classs<Props>
       return (
         <div className='results-table-wrapper'>
           <ResultsTable
-            results={this.state.results}
-            resultsWithAllFields={this.state.resultsWithAllFields}
-            resultsConfig={this.state.configEnabled && this.state.resultsConfig}
+            {...this.state}
           />
         </div>
       );
@@ -293,7 +281,7 @@ class ResultsArea extends Classs<Props>
             <Result
               data={result}
               allFieldsData={this.state.resultsWithAllFields && this.state.resultsWithAllFields[index]}
-              config={this.state.configEnabled ? this.state.resultsConfig : null}
+              config={this.state.resultsConfig}
               onExpand={this.handleExpand}
               index={index}
               canDrag={this.props.canEdit}
@@ -313,6 +301,8 @@ class ResultsArea extends Classs<Props>
   {
     this.handleResultsChange(response, true);
   }
+  
+  timeout = null;
   
   handleResultsChange(response, isAllFields?: boolean)
   {
@@ -365,8 +355,14 @@ class ResultsArea extends Classs<Props>
             this.setState({
               loadedResultsPages: this.state.resultsPages,
             });
-            console.log(result.value.length, this.state.results.length);
-            this.state.onResultsLoaded(result.value.length === this.state.results.length);
+            
+            // set a timeout to prevent an infinite loop with InfiniteScroll
+            // could move this somewhere that executes after the results have rendered
+            this.timeout = setTimeout(() =>
+              this.state.onResultsLoaded && this.state.onResultsLoaded(
+                this.state.results &&
+                result.value.length === this.state.results.length
+              ), 1000);
           }
           
           this.setState({
@@ -411,7 +407,11 @@ class ResultsArea extends Classs<Props>
         querying: true,
         tql
       });
+      
       this.props.onLoadStart && this.props.onLoadStart();
+      this.xhr && this.xhr.abort();
+      this.allXhr && this.allXhr.abort();
+      
       this.xhr = Ajax.query(tql, this.handleResultsChange, this.handleError);
       this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm.cards, {
         allFields: true,
@@ -498,9 +498,8 @@ class ResultsArea extends Classs<Props>
         config={this.getResultsConfig()[this.props.algorithm.id]}
         onClose={this.hideConfig}
         onConfigChange={this.handleConfigChange}
+        results={this.state.results}
         resultsWithAllFields={this.state.resultsWithAllFields}
-        configEnabled={this.state.configEnabled}
-        onConfigEnableToggle={this.handleConfigEnabledToggle}
       />;
     }
   }

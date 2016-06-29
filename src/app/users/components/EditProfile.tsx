@@ -119,7 +119,6 @@ class Profile extends Classs<Props>
   {
     super(props);
     
-    
     this.userUnsubscribe = 
       UserStore.subscribe(() => this.updateUser(this.props));
     this.authUnsubscribe = 

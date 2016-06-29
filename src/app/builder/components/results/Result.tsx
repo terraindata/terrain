@@ -114,7 +114,9 @@ class Result extends Classs<Props> {
   getValue(field)
   {
     var {data, allFieldsData} = this.props;
-    return allFieldsData ? allFieldsData[field] : (data && data[field]);
+    var dataField = data && data[field];
+    var allDataField = allFieldsData && allFieldsData[field];
+    return allDataField || dataField;
   }
 
   renderExpandedField(value, field)
@@ -263,7 +265,7 @@ class Result extends Classs<Props> {
   getFields(): string[]
   {
     let {config, data} = this.props;
-    if(config && config.fields && config.fields.length)
+    if(config && config.enabled && config.fields && config.fields.length)
     {
       var fields = config.fields;
     }
@@ -278,7 +280,7 @@ class Result extends Classs<Props> {
   getName(props?:Props)
   {
     let {config, data} = props || this.props;
-    if(config && config.name)
+    if(config && config.name && config.enabled)
     {
       var nameField = config.name;
     }
@@ -302,7 +304,7 @@ class Result extends Classs<Props> {
       'result-drag-over': isOver,
     });
     
-    if(config && config.score)
+    if(config && config.score && config.enabled)
     {
           // <ScoreIcon className='result-score-icon' />
       var scoreArea = (

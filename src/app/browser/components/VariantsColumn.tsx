@@ -99,10 +99,6 @@ class VariantsColumn extends Classs<Props>
       stateKey: 'roles', 
       isMounted: true
     });
-  }
-  
-  componetDidMount()
-  {
     this.setState({
       rendered: true,
     })
@@ -194,7 +190,6 @@ class VariantsColumn extends Classs<Props>
   
   handleDoubleClick(id:ID)
   {
-    console.log(`/builder/?o=${id}`);
     this.props.history.pushState({}, `/builder/?o=${id}`);
   }
 
@@ -212,13 +207,13 @@ class VariantsColumn extends Classs<Props>
     }
     
     var role = "Viewer";
-    if (this.state.roles.getIn([this.props.groupId, me.username])) 
+    if (roles && roles.getIn([this.props.groupId, vriant.lastUsername])) 
     {
-      if (this.state.roles.getIn([this.props.groupId, me.username]).admin) 
+      if (roles && roles.getIn([this.props.groupId, vriant.lastUsername]).admin) 
       {
         role = "Admin";
       }
-      else if (this.state.roles.getIn([this.props.groupId, me.username]).builder) 
+      else if (roles && roles.getIn([this.props.groupId, vriant.lastUsername]).builder)
       {
         role = "Builder";
       }

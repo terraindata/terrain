@@ -54,6 +54,7 @@ import { BuilderTypes } from './../../../BuilderTypes.tsx';
 interface Props {
   card: BuilderTypes.ISelectCard;
   keys: string[];
+  canEdit?: boolean;
 }
 
 class SelectCard extends Classs<Props>
@@ -105,11 +106,11 @@ class SelectCard extends Classs<Props>
           content: (
             <CardField
     					onDelete={this.removeField}
-              draggable={true}
-              removable={true}
+              draggable={this.props.canEdit}
+              removable={this.props.canEdit}
               drag_y={true}
     					dragInsideOnly={true}
-              addable={true}
+              addable={this.props.canEdit}
               onAdd={this.addField}
               >
               <BuilderTextbox

@@ -78,40 +78,36 @@ class UserThumbnail extends Classs<Props>
   constructor(props:Props)
   {
     super(props);
-    
-    this.unsubscribe = UserStore.subscribe(this.fetchUser);
   }
   
-  componentWillMount()
+  componentDidMount()
   {
-    this.fetchUser();
+    this._subscribe(UserStore, {
+      stateKey: 'user',
+      storeKeyPath: this.getStoreKeyPath(),
+      isMounted: true,
+    });
   }
   
-  componentWillUnmount()
+  getStoreKeyPath()
   {
-    this.unsubscribe && this.unsubscribe();
+    return ['users', this.props.username];
   }
   
   componentWillReceiveProps(nextProps)
   {
     if(nextProps.username !== this.props.username)
     {
-      this.fetchUser();
+      this._update(UserStore, {
+        stateKey: 'user',
+        storeKeyPath: this.getStoreKeyPath(),
+      });
     }  
   }
   
   shouldComponentUpdate(nextProps, nextState)
   {
     return nextState.user !== this.state.user;
-  }
-  
-  fetchUser()
-  {
-    let user: User = UserStore.getState().getIn(['users', this.props.username]) as User;
-    
-    this.setState({
-      user,  
-    });
   }
   
   render()
@@ -146,7 +142,7 @@ class UserThumbnail extends Classs<Props>
       </div>
     );
     
-    if(this.props.link)
+    if(this.props.link && user)
     {
       return (
         <Link to={`/users/${user.username}`}>

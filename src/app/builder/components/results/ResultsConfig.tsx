@@ -61,16 +61,16 @@ export interface Config {
   name: string;
   score: string;
   fields: string[];
+  enabled: boolean;
 }
 
 interface Props
 {
+  results: any[];
   resultsWithAllFields: any[];
   config: Config;
   onConfigChange: (config:Config) => void;
   onClose: () => void;
-  configEnabled: boolean;
-  onConfigEnableToggle: () => void;
 }
 
 export class ResultsConfig extends Classs<Props>
@@ -95,7 +95,7 @@ export class ResultsConfig extends Classs<Props>
   
   calcFields(props:Props)
   {
-    if(!props.resultsWithAllFields)
+    if(!props.resultsWithAllFields && !props.results)
     {
       this.setState({
         fields: [],
@@ -104,14 +104,20 @@ export class ResultsConfig extends Classs<Props>
       return;
     }
     
+    let fieldReducer = (fields, result) =>
+    {
+      _.map(result, (v, field) => fields[field] = 1);
+      return fields;
+    };
+    let resultsFieldsReduced = props.results ? props.results.reduce(fieldReducer, {}) : {};
+    let allResultsFieldsReduced = props.resultsWithAllFields ? props.resultsWithAllFields.reduce(fieldReducer, {}) : {};
+    
+    let fields = _.keys(_.extend(resultsFieldsReduced, allResultsFieldsReduced));
+    
     this.setState({
       loading: false,
-      fields: _.keys(props.resultsWithAllFields.reduce((fields, result) =>
-      {
-        _.map(result, (v, field) => fields[field] = 1);
-        return fields;
-      }, {}))
-    })
+      fields,
+    });
   }
   
   handleDrop(type: string, field: string, index?: number)
@@ -130,6 +136,7 @@ export class ResultsConfig extends Classs<Props>
       name: config && config.name,
       score: config && config.score,
       fields: (config && config.fields) || [],
+      enabled: true,
     }
     
     // remove if already set
@@ -173,6 +180,14 @@ export class ResultsConfig extends Classs<Props>
     }
   }
   
+  handleEnabledToggle()
+  {
+    this.props.onConfigChange(_.extend({}, this.props.config,
+    {
+      enabled: !this.props.config.enabled,
+    }));
+  }
+  
   fieldIsSelected(field)
   {
     let {config} = this.props;
@@ -182,6 +197,7 @@ export class ResultsConfig extends Classs<Props>
   fieldType(field)
   {
     let {config} = this.props;
+    if(!config) return null;
     if(config.name === field)
     {
       return 'name';
@@ -218,11 +234,12 @@ export class ResultsConfig extends Classs<Props>
 	render()
   {
     let {config} = this.props;
+    let enabled = config && !config.enabled;
     return (
       <div className='results-config-wrapper'>
         <div className={classNames({
             'results-config': true,
-            'results-config-disabled': !this.props.configEnabled,
+            'results-config-disabled': enabled,
           })}>
           <div className='results-config-bar'>
             <div className='results-config-title'>
@@ -232,8 +249,8 @@ export class ResultsConfig extends Classs<Props>
               <Switch
                 first='Enabled'
                 second='Disabled'
-                onChange={this.props.onConfigEnableToggle}
-                selected={this.props.configEnabled ? 1 : 2}
+                onChange={this.handleEnabledToggle}
+                selected={enabled ? 1 : 2}
               />
             </div>
             <div className='results-config-button' onClick={this.props.onClose}>

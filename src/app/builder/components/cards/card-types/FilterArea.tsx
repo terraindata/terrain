@@ -61,6 +61,7 @@ interface Props
   spotlights: any[];
   hideNoFilterMessage?: boolean;
   keys: string[];
+  canEdit?: boolean;
 }
 
 class FilterArea extends Classs<Props>
@@ -74,7 +75,8 @@ class FilterArea extends Classs<Props>
   {
     return !_.isEqual(nextProps.card.filters, this.props.card.filters)
       || !_.isEqual(nextProps.spotlights, this.props.spotlights)
-      || !_.isEqual(nextProps.keys, this.props.keys);
+      || !_.isEqual(nextProps.keys, this.props.keys)
+      || nextProps.canEdit !== this.props.canEdit;
   }
   
   deleteFilter(index)
@@ -86,10 +88,10 @@ class FilterArea extends Classs<Props>
   {
     return (
       <CardField
-        draggable={true}
+        draggable={this.props.canEdit}
         drag_y={true}
-        removable={true}
-        addable={true}
+        removable={this.props.canEdit}
+        addable={this.props.canEdit}
         onAdd={this.addFilter}
         onDelete={this.deleteFilter}
         aboveContent={
@@ -123,6 +125,7 @@ class FilterArea extends Classs<Props>
           </div>
           <div className='builder-operator'>
             <Dropdown
+              {...this.props}
               circle={true}
               options={Operators}
               selectedIndex={filter.condition.operator}

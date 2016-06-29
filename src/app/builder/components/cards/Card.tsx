@@ -198,23 +198,22 @@ var Card = React.createClass({
   
   componentWillMount()
   {
-    this.setState({
-      unsubscribe: Store.subscribe(() =>
+    this.unsubscribe = Store.subscribe(() =>
+    {
+      let selected = Store.getState().getIn(['selectedCardIds', this.props.card.id]);
+      if((selected && !this.state.selected) || (!selected && this.state.selected))
       {
-        let selected = Store.getState().getIn(['selectedCardIds', this.props.card.id]);
-        if((selected && !this.state.selected) || (!selected && this.state.selected))
-        {
-          this.setState({
-            selected
-          });
-        }
-      }),
+        this.setState({
+          selected
+        });
+      }
     });
   },
   
   componentWillUnmount()
   {
-    this.state.unsubscribe();
+    this.unsubscribe && this.unsubscribe();
+    this.unsubscribe = null;
     if(this.props.dndListener)
     {
       this.props.dndListener.unbind('draggedAway', this.handleDraggedAway);
@@ -249,18 +248,6 @@ var Card = React.createClass({
       this.props.dndListener.bind('droppedBelow', this.handleDroppedBelow);
       this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
     }
-    
-    // setTimeout(() =>
-    //   Util.animateToAutoHeight(this.refs.cardContainer),
-    // 50);
-  },
-  
-  componentWillReceiveProps(nextProps)
-  {
-    // if(nextProps['index'] !== this.props.index)
-    // {
-    //   Util.animateToAutoHeight(this.refs.cardContainer);
-    // }
   },
   
   componentDidUpdate()
@@ -276,12 +263,12 @@ var Card = React.createClass({
   
   handleDraggedAway()
   {
-    Util.animateToHeight(this.refs['cardContainer'], 0);
+    // Util.animateToHeight(this.refs['cardContainer'], 0);
   },
   
   handleDropped()
   {
-    Util.animateToAutoHeight(this.refs['cardContainer']);
+    // Util.animateToAutoHeight(this.refs['cardContainer']);
   },
   
   handleDroppedBelow(item)
@@ -320,6 +307,11 @@ var Card = React.createClass({
   
   handleTitleClick(event)
   {
+    if(!this.props.canEdit)
+    {
+      return;
+    }
+    
     event.stopPropagation();
     event.preventDefault();
     Actions.cards.selectCard(this.props.card.id, event.altKey, event.shiftKey);
@@ -366,7 +358,7 @@ var Card = React.createClass({
   
   renderAddCard(isLower?: boolean)
   {
-    if(this.props.singleCard)
+    if(this.props.singleCard || !this.props.canEdit)
     {
       return null;
     }
@@ -441,7 +433,7 @@ var Card = React.createClass({
 				{content}
 			</div>
 		);
-
+    
 		var title = Util.titleForCard(this.props.card);
     const { isDragging, connectDragSource, connectDropTarget } = this.props;
     const rendering = 
@@ -492,7 +484,9 @@ var Card = React.createClass({
                   })}>
                     { Util.previewForCard(this.props.card) }
                   </span>
-                  <Menu options={this.state.menuOptions} />
+                  {
+                    this.props.canEdit && <Menu options={this.state.menuOptions} />
+                  }
                 </div>
               )
             }

@@ -16,6 +16,10 @@
   // transition: all 0.15s;
  }
  
+ &.dropdown-disabled {
+  background: #eee;
+ }
+ 
  &.dropdown-wrapper-circle {
   width: @option-height;
  }
@@ -46,7 +50,7 @@
   }
   
  
- &:hover,
+ &:hover:not(.dropdown-disabled),
  &.dropdown-open {
   border: 1px solid @light-gray;
   margin-top: -1px;

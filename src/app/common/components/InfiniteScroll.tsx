@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
 
@@ -76,29 +77,28 @@ class Browser extends Classs<Props>
     this.check();
   }
   
+  unmounted = false;
+  componentWillUnmount()
+  {
+    // I know this is an anti-pattern, but I can't figure out a way around it
+    //  ResultsArea sometimes calls onItemsLoaded after this component has been unmounted
+    this.unmounted = true;
+  }
+  
   handleScroll()
   {
     this.check();
   }
   
-  // componentWillReceiveProps(nextProps:Props)
-  // {
-  //   if(this.props.children !== nextProps.children)
-  //   {
-  //     console.log('diff childs');
-  //     this.setState({
-  //       unchanged: false,
-  //     });
-  //   }
-  // }
-  
   onItemsLoaded(unchanged?: boolean)
   {
-    console.log('parent says', unchanged ? 'unchanged' : 'changed');
-    this.setState({
-      unchanged,
-    });
-    this.check(unchanged);
+    if(!this.unmounted)
+    {
+      this.setState({
+        unchanged,
+      });
+      this.check(unchanged);
+    }
   }
   
   check(unchanged?: boolean)
@@ -110,18 +110,21 @@ class Browser extends Classs<Props>
     
     if(unchanged)
     {
-      console.log('unchanged');
       // no change in item state, don't fire a request to parent
       return;
     }
     
     let el: any = this.refs['is'];
+    if(!el)
+    {
+      return;
+    }
+    
     let {height} = el.getBoundingClientRect();
     let {scrollHeight, scrollTop} = el;
     
     if(height + scrollTop + SCROLL_SENSITIVITY > scrollHeight)
     {
-      console.log('s');
       this.props.onRequestMoreItems(this.onItemsLoaded);
     }
   }

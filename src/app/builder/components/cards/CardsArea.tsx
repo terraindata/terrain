@@ -52,6 +52,7 @@ import Actions from "../../data/BuilderActions.tsx";
 import Card from "../cards/Card.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateCardTool from "./CreateCardTool.tsx";
+import { DropTarget } from 'react-dnd';
 
 var CardsArea = React.createClass<any, any>({
 	propTypes:
@@ -62,6 +63,7 @@ var CardsArea = React.createClass<any, any>({
     topLevel: React.PropTypes.bool,
     keys: React.PropTypes.array.isRequired,
     canEdit: React.PropTypes.bool.isRequired,
+    connectDropTarget: React.PropTypes.func,
   },
   
   hasCardsArea()
@@ -132,7 +134,8 @@ var CardsArea = React.createClass<any, any>({
         key: card.id,
       }
     ))
-    .concat({
+    .concat(!this.props.canEdit ? [] :
+    [{
       content: (
         <CreateCardTool
           {...this.props}
@@ -143,7 +146,7 @@ var CardsArea = React.createClass<any, any>({
         />
       ),
       key: 'end-tool',
-    })
+    }]);
   },
   
   copy() {},
@@ -165,17 +168,41 @@ var CardsArea = React.createClass<any, any>({
         />;
     }
 
-    return (
+    return this.props.connectDropTarget(
       <div
         className={'cards-area' + (this.props.topLevel ? ' cards-area-top-level' : '')}
-        ref='cardsArea'>
+      >
         <LayoutManager
           layout={this.state.layout}
-          />
+        />
       </div>
     );
   },
 });
 
 
-export default CardsArea;
+
+const cardTarget = 
+{
+  canDrop(props, monitor)
+  {
+    return true;
+  },
+  
+  drop(props, monitor, component)
+  {
+    if(monitor.isOver({ shallow: true}))
+    {
+      const card = monitor.getItem();
+      Actions.cards.move(card, props.cards.length, props.parentId);
+    }
+  }
+}
+
+const dropCollect = (connect, monitor) =>
+({
+  connectDropTarget: connect.dropTarget(),
+});
+
+
+export default DropTarget('CARD', cardTarget, dropCollect)(CardsArea);

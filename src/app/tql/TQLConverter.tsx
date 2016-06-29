@@ -108,13 +108,17 @@ class TQLConverter
       });
     }
     
-    let limit = options.limit || 5000; // queries without a limit will crash Tiny
     cards = this._topFromCard(cards, (fromCard: IFromCard) =>
     {
-      fromCard.cards.push({
-        type: 'take',
-        value: limit,
-      } as BuilderTypes.ITakeCard);
+      // add a take card if none are present
+      if(!fromCard.cards.some(card => card.type === 'take'))
+      {
+        let limit = options.limit || 5000; // queries without a limit will crash Tiny
+        fromCard.cards.push({
+          type: 'take',
+          value: limit,
+        } as BuilderTypes.ITakeCard);
+      }
       
       return fromCard;
     });
@@ -143,8 +147,8 @@ class TQLConverter
     score: (score) => "linearScore([$weights])",
       weights: (weight, index) => join(", ", index) + "\n[$weight, $key]",
     
-    transform: "piecewiseLinearTransform([$scorePoints], $input)",
-      scorePoints: (sp, index) => join(", ", index) + "\n[$value, $score]",
+    transform: "linearTransform([$scorePoints], $input)",
+      scorePoints: (sp, index) => join(", ", index) + "\n[$score, $value]",
     
     if: (card) => "if $filters {$cards}"
       + (card.elses.length ? " else " + (

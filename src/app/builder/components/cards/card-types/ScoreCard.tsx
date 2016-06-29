@@ -66,6 +66,8 @@ var SCORE_COLORS =
 interface Props {
   card: BuilderTypes.IScoreCard;
   parentId: string;
+  canEdit?: boolean;
+  keys: string[];
 }
 
 var methods = ['weightedSum'];
@@ -125,6 +127,7 @@ class ScoreCard extends Classs<Props>
               placeholder='Variable or field name'
               id={this.props.card.id}
               keyPath={this._keyPath('weights', index, 'key')}
+              options={this.props.keys}
             />
         },
         {
@@ -157,9 +160,9 @@ class ScoreCard extends Classs<Props>
       <CardField
         key={this.state.seed + index}
         index={index}
-        removable={true}
+        removable={this.props.canEdit}
         onDelete={this.removeWeight}
-        addable={true}
+        addable={this.props.canEdit}
         onAdd={this.addWeight}
       >
         <LayoutManager layout={layout} />

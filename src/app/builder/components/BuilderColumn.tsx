@@ -111,8 +111,14 @@ var BuilderColumn = React.createClass<any, any>(
   componentWillMount()
   {
     let rejigger = () => this.setState({ rand: Math.random() });
-    UserStore.subscribe(rejigger);
-    RolesStore.subscribe(rejigger);
+    this.unsubUser = UserStore.subscribe(rejigger);
+    this.unsubRoles = RolesStore.subscribe(rejigger);
+  },
+  
+  componentWillUnmount()
+  {
+    this.unsubUser && this.unsubUser();  
+    this.unsubRoles && this.unsubRoles();  
   },
   
   calcinputKeys(props)
@@ -158,7 +164,7 @@ var BuilderColumn = React.createClass<any, any>(
   {
     var algorithm = this.props.algorithm;
     var parentId = algorithm.id;
-    
+
     switch(this.state.column)
     {
       case COLUMNS.Builder:

@@ -96,11 +96,11 @@ class AlgorithmsColumn extends Classs<Props>
     this._subscribe(UserStore, {
       stateKey: 'me',
       storeKeyPath: ['currentUser'],
-      isMounted: true,
+      // isMounted: true,
     });
     this._subscribe(RolesStore, {
       stateKey: 'roles', 
-      isMounted: true
+      // isMounted: true
     });
   }
   
@@ -241,13 +241,13 @@ class AlgorithmsColumn extends Classs<Props>
     }
 
     var role = "Viewer";
-    if (this.state.roles.getIn([this.props.groupId, username])) 
+    if (roles && roles.getIn([this.props.groupId, username])) 
     {
-      if (this.state.roles.getIn([this.props.groupId, username]).admin) 
+      if (roles && roles.getIn([this.props.groupId, username]).admin) 
       {
         role = "Admin";
       }
-      else if (this.state.roles.getIn([this.props.groupId, username]).builder) 
+      else if (roles && roles.getIn([this.props.groupId, username]).builder) 
       {
         role = "Builder";
       }

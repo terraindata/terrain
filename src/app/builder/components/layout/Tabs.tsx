@@ -160,6 +160,7 @@ interface TabsProps
     onClick: () => void;
   }>;
   history: any;
+  reportEmptyTabs: (tabs: ID[]) => void;
 }
 
 class Tabs extends Classs<TabsProps> {
@@ -213,17 +214,41 @@ class Tabs extends Classs<TabsProps> {
   {
     variants = variants || this.state.variants;
     
+    var emptyTabs: ID[] = [];
     let tabs = config && variants && config.split(',').map(vId =>
-    ({
-      id: this.getId(vId),
-      name: variants[this.getId(vId)] ? variants[this.getId(vId)].name : null,
-      selected: this.isSelected(vId),
-    }));
-    
+    {
+      let id = this.getId(vId);
+      var name = variants[id] && variants[id].name;
+      if(name === '')
+      {
+        name = 'Untitled';
+      }
+      
+      return {
+        id,
+        name,
+        selected: this.isSelected(vId),
+      };
+    }).filter(tab => 
+    {
+      if(tab.name !== null)
+      {
+        return true;
+      }
+      emptyTabs.push(tab.id);
+      return false;
+    });
+
     this.setState({
       tabs,
       variants,
     });
+    
+    if(emptyTabs.length > 0)
+    {
+      this.props.reportEmptyTabs(emptyTabs);
+    }
+    
   }
   
   shouldComponentUpdate(nextProps, nextState)
@@ -295,9 +320,10 @@ class Tabs extends Classs<TabsProps> {
   
   getCloseTo(id)
   {
+    let {tabs} = this.state;
     let tab = this.state.tabs.find(tab => tab.id === id);
-    return '/builder/' + (tab.selected && this.state.tabs.length > 1 ? '!' : '')
-      + this.state.tabs.map(tab => 
+    return '/builder/' + (tab.selected && tabs.length > 1 ? '!' : '')
+      + tabs.map(tab => 
         tab.id === id ? null : 
           (tab.selected ? "!" : "") + tab.id
     ).filter(s => s)

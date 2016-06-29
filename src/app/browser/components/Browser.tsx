@@ -75,15 +75,15 @@ class Browser extends Classs<Props>
     this.state = {
       istate: Store.getState()
     };
-    
+  }
+  
+  componentDidMount()
+  {
     this.cancelSubscription = 
       Store.subscribe(() => this.setState({
         istate: Store.getState()
-      }))
-  }
-  
-  componentWillMount()
-  {
+      }));
+      
     Actions.fetch();
     RolesActions.fetch();
     UserActions.fetch();

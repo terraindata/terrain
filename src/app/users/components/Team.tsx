@@ -84,14 +84,13 @@ class Team extends Classs<Props>
   constructor(props)
   {
     super(props);
-    
-    this.unsub = Store.subscribe(this.updateState);
   }
   
   componentWillMount()
   {
     Actions.fetch();
     this.updateState();
+    this.unsub = Store.subscribe(this.updateState);
   }
   
   componentWillUnmount()
@@ -301,11 +300,10 @@ class Team extends Classs<Props>
     return (
       <div className='team'>
         {
-          loading ?
+          loading &&
             <InfoArea large='Loading...' />
-          :
-            users.toArray().map(this.renderUser)
         }
+        { users && users.toArray().map(this.renderUser) }
         { this.renderAddUser() }
         { this.renderShowDisabledUsers() }
       </div>
