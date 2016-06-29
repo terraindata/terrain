@@ -17,13 +17,46 @@
 }
 
 .column-1 {
-  width: 67%;
+  width: 60%;
   margin-left: 10px;
+  max-height: 100%
 }
 
 .column-2 {
-  width: 33%;
+  width: 40%;
   position: relative;
-  left: 67%;
+  left: 60%;
   margin-left: 10px;
+}
+
+.scrolling {
+  overflow-y: scroll;
+  max-height: 100%;
+  max-width: 100%;
+  word-wrap: break-word;
+  margin-right: 15px;
+}
+
+.results-list {
+  padding-left: 5;
+  list-style-type: none;
+}
+
+.error-message {
+  color: red;
+}
+
+ .theme-buttons {
+  div {
+    display: inline-block;
+    float: right;
+    padding: 10px;
+    background-color: gray;
+    color: white;
+    border-left: 1px solid black;
+  }
+ }
+
+.selected {
+  color: #CDDE20 !important;
 }

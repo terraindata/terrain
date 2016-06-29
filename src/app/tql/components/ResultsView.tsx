@@ -70,6 +70,7 @@ class ResultsView extends Classs<Props>
     loadedResultsPages: number;
     onResultsLoaded: (unchanged?: boolean) => void;
     querying: boolean;
+    showErrorMessage: boolean;
   } = {
     results: null,
     resultsWithAllFields: null,
@@ -79,6 +80,7 @@ class ResultsView extends Classs<Props>
     loadedResultsPages: 1,
     onResultsLoaded: null,
     querying: false,
+    showErrorMessage: false,
   };
 
   //If the component updates and the tql command has been changed, then query results
@@ -99,18 +101,40 @@ class ResultsView extends Classs<Props>
     
   resultsFodderRange = _.range(0, 25);
   
+  toggleError() 
+  {
+    this.setState({
+      showErrorMessage: !this.state.showErrorMessage,
+    });
+  }
+
   renderResults()
   {
     console.log("Rendering results");
-    if(this.state.error)
-    {
-      return <div>{this.state.error}</div>
-    }
-    
     if(this.state.querying)
     {
       return <div>Querying results...</div>
     } 
+
+    if(this.state.error)
+    {
+      var lineNum = (this.state.error).replace( /(^.+\D)(\d+)(\D.+$)/i,'$2');
+      var errorLineNumber = lineNum ? 'Error on line ' + lineNum : 'Error';
+      var matches = (this.state.error).match(/<<"([^>]+)">>/);
+      var errorMessage = (matches && matches[1]) || this.state.error;
+      return (
+        <div className="error-message">
+          <div onClick={this.toggleError}>
+          {this.state.showErrorMessage ? '^ ' : 'v '}
+          {errorLineNumber}          
+          </div>
+          <div >
+            {this.state.showErrorMessage ? errorMessage : null}
+          </div>
+        </div>
+      );
+    }
+
     if(!this.state.results) 
     {
       return <div>Enter a TQL query on the left.</div>
@@ -119,7 +143,7 @@ class ResultsView extends Classs<Props>
     {
       return(
         <div>
-        <ul>
+        <ul className="results-list"> 
           {this.state.results.map(function(result) {
             return <li>{JSON.stringify(result)}</li>;
           })}
@@ -134,7 +158,7 @@ class ResultsView extends Classs<Props>
     }
      return(
         <div>
-          <ul>
+          <ul className="results-list">
           {this.state.results.map(function(result) {
             return <li>{JSON.stringify(result)}</li>;
           })}
@@ -249,7 +273,7 @@ class ResultsView extends Classs<Props>
 	render()
   {
     return (
-      <div>
+      <div className="scrolling">
         { this.renderResults() }
       </div>
     );

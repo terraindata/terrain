@@ -50,15 +50,30 @@ import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
 import * as Immutable from 'immutable';
 import ResultsView from './ResultsView.tsx';
-//React
+//React Node Modules
 var HTML5Backend = require('react-dnd-html5-backend');
 var ReactGridLayout = require('react-grid-layout');
 var Button = require('react-button');
+
+//Code mirror
+var Codemirror = require('react-codemirror');
+//Style sheets for code-mirror
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/monokai.css';
+import 'codemirror/theme/cobalt.css';
+import 'codemirror/theme/neo.css';
+
+//Lint
+//import 'codemirror/addon/lint/lint.js'
+//import 'codemirror/addon/lint/javascript-lint.js'
+
+//Javascript mode
+import 'codemirror/mode/custom/custom';
+
 //Components
 import Classs from './../../common/components/Classs.tsx';
 import LayoutManager from "./layout/LayoutManager.tsx";
 import Ajax from "./../../util/Ajax.tsx";
-
 
 interface Props
 {
@@ -66,50 +81,86 @@ interface Props
   history?: any;
 }
 
+
 class TQL extends Classs<Props>
 {
- state: {
+
+ classNames = {
+   'default': 'selected', 
+   'monokai': 'unselected', 
+   'cobalt': 'unselected', 
+   'neo': 'unselected'
+ };
+
+ state: 
+ {
     tql: string;
-    value: string;
+    code: string;
+    theme: string;
   } = {
     tql: null,
-    value: null
+    code: "TQL GOES HERE",
+    theme: 'default',
   };
 
+  updateCode(newCode) 
+  {
+  		this.setState({
+  			code: newCode
+  		});  	
+  }
 
 	executeCode()
 	{
-		console.log("Execute code");
-    	this.setState({ tql: this.state.value});//"from 'usprofile_babysitter' as bb\n take 10\n select\n bb.dogs_ok;"});
+    	this.setState({ tql: this.state.code});//"from 'usprofile_babysitter' as bb\n take 10\n select\n bb.dogs_ok;"});
 	}
 
-	getTql(event) {
-    this.setState({ value: event.target.value})
+	getTql(event) 
+	{
+    this.setState({ code: event.target.value})
    }
 
+  changeTheme(newTheme: string)
+  {  
+    this.setState({
+      theme: newTheme
+    });
+    classNames['default'] = 'unselected';
+    classNames['monokai'] = 'unselected';
+    classNames['cobalt'] = 'unselected';
+    classNames['neo'] = 'unselected';
+    classNames[newTheme] = 'selected';
+  }
   	render()
   	{ 
+  		var options = {
+  			lineNumbers: true,
+  			mode: 'custom',
+        // gutters: ["CodeMirror-lint-markers"],
+        // lint: true,
+  		  theme: this.state.theme
+      }
  		return (
  			<div>
  				<Button onClick={this.executeCode}>
   					Execute code
       		</Button>
   				<ReactGridLayout 
-    				className="tql-view" 
     				isDraggable={false} 
     				isResiable={false}
     				layout={[]} 
     				cols={2} 
     				rowHeight={window.innerHeight}
     			>
-      			<div key={1} className="column-1">
-      				<textarea 
-      					className="code-input" 
-                		type="text"
-               		value={this.state.value}
-              	 		onChange = {this.getTql}
-              		/>
-      			</div>
+      			<div key={1} className="column-1 tql-view">
+						  <Codemirror value={this.state.code} onChange={this.updateCode} options={options} />      			
+      			  <div className="theme-buttons">
+                <div className={classNames['default']} onClick={()=>this.changeTheme('default')}>Default</div>
+                <div className={classNames['monokai']} onClick={()=>this.changeTheme('monokai')}>Monokai</div>
+                <div className={classNames['cobalt']} onClick={()=>this.changeTheme('cobalt')}>Cobalt</div>
+                <div className={classNames['neo']} onClick={()=>this.changeTheme('neo')}>Neo</div>
+              </div>
+            </div>
       			<div key={2} className="column-2" id='results'>
       				<ResultsView tql={this.state.tql}/>
       			</div>
