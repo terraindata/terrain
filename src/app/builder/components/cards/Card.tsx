@@ -263,12 +263,12 @@ var Card = React.createClass({
   
   handleDraggedAway()
   {
-    Util.animateToHeight(this.refs['cardContainer'], 0);
+    // Util.animateToHeight(this.refs['cardContainer'], 0);
   },
   
   handleDropped()
   {
-    Util.animateToAutoHeight(this.refs['cardContainer']);
+    // Util.animateToAutoHeight(this.refs['cardContainer']);
   },
   
   handleDroppedBelow(item)

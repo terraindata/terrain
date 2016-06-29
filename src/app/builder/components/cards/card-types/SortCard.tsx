@@ -56,6 +56,7 @@ import Classs from './../../../../common/components/Classs.tsx';
 interface Props {
   card: BuilderTypes.ISortCard;
   canEdit?: boolean;
+  keys: string[];
 }
 
 class SortCard extends Classs<Props>
@@ -95,6 +96,7 @@ class SortCard extends Classs<Props>
               keyPath={this._keyPath('sorts', index, 'property')}
               placeholder='Field name'
               help='Field by which to sort.<br />For multiple sort fields,<br />priority goes top to bottom.'
+              options={this.props.keys}
             />
           </div>
           <div className='flex-card-field'>

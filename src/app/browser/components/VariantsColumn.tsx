@@ -190,7 +190,6 @@ class VariantsColumn extends Classs<Props>
   
   handleDoubleClick(id:ID)
   {
-    console.log(`/builder/?o=${id}`);
     this.props.history.pushState({}, `/builder/?o=${id}`);
   }
 
