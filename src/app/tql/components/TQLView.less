@@ -46,7 +46,7 @@
   color: red;
 }
 
- .theme-buttons {
+.theme-buttons {
   div {
     display: inline-block;
     float: right;
@@ -54,9 +54,22 @@
     background-color: gray;
     color: white;
     border-left: 1px solid black;
+    cursor: hand;
   }
- }
+}
+
+.theme-buttons div:hover {
+  color: #eaf668
+}
+
+.no-border {
+  border: 0px !important;
+} 
 
 .selected {
   color: #CDDE20 !important;
+}
+
+.cm-line-error {
+  background-color: red;
 }

@@ -54,6 +54,7 @@ import Classs from './../../common/components/Classs.tsx';
 interface Props 
 {
   tql: string;
+  onError: (lineNumber: number) => void;
 }
 
 class ResultsView extends Classs<Props>
@@ -110,7 +111,7 @@ class ResultsView extends Classs<Props>
 
   renderResults()
   {
-    console.log("Rendering results");
+    console.log("ERGERGE");
     if(this.state.querying)
     {
       return <div>Querying results...</div>
@@ -122,6 +123,7 @@ class ResultsView extends Classs<Props>
       var errorLineNumber = lineNum ? 'Error on line ' + lineNum : 'Error';
       var matches = (this.state.error).match(/<<"([^>]+)">>/);
       var errorMessage = (matches && matches[1]) || this.state.error;
+      this.props.onError(lineNum);
       return (
         <div className="error-message">
           <div onClick={this.toggleError}>

@@ -56,24 +56,43 @@ var ReactGridLayout = require('react-grid-layout');
 var Button = require('react-button');
 
 //Code mirror
-var Codemirror = require('react-codemirror');
+var CodeMirror = require('react-codemirror');
 //Style sheets for code-mirror
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/monokai.css';
 import 'codemirror/theme/cobalt.css';
 import 'codemirror/theme/neo.css';
+import 'codemirror/addon/edit/matchbrackets.js';
+import 'codemirror/addon/edit/closebrackets.js';
 
 //Lint
 //import 'codemirror/addon/lint/lint.js'
 //import 'codemirror/addon/lint/javascript-lint.js'
 
-//Javascript mode
-import 'codemirror/mode/custom/custom';
+//mode
+import 'codemirror/mode/javascript/javascript';
+//require('./tql.js');
+
+//folding
+import 'codemirror/addon/fold/foldcode.js';
+import 'codemirror/addon/fold/foldgutter.js';
+import 'codemirror/addon/fold/brace-fold.js';
+import 'codemirror/addon/fold/comment-fold.js';
 
 //Components
 import Classs from './../../common/components/Classs.tsx';
 import LayoutManager from "./layout/LayoutManager.tsx";
 import Ajax from "./../../util/Ajax.tsx";
+
+// function highlightLine(lineNumber: number) {
+//   var cm = CodeMirror.getCodeMirrorInstance();
+//   var doc = cm.getDoc();
+//   doc.addLineClass(10, 'wrap', 'line-error');
+//   //var codeMirrorEditor = myEditor[0].Codemirror;     
+//   //Set line css class
+//   //codeMirrorEditor.setLineClass(actualLineNumber, 'background', 'line-error');
+// }
+
 
 interface Props
 {
@@ -85,34 +104,34 @@ interface Props
 class TQL extends Classs<Props>
 {
 
- classNames = {
-   'default': 'selected', 
-   'monokai': 'unselected', 
-   'cobalt': 'unselected', 
-   'neo': 'unselected'
- };
-
  state: 
  {
     tql: string;
     code: string;
     theme: string;
+    highlightedLine: number; //array? list? 
   } = {
     tql: null,
-    code: "TQL GOES HERE",
+    code: 'TQL GOES HERE',
     theme: 'default',
+    highlightedLine: null,
   };
 
   updateCode(newCode) 
   {
-  		this.setState({
-  			code: newCode
-  		});  	
+      //Shouldn't highlight the error line anymore
+    if(this.state.highlightedLine != null) {
+      this.refs['cm'].undoHighlight(this.state.highlightedLine);  
+    }
+    this.setState({
+      code: newCode,
+      highlightedLine: null
+    });
   }
 
 	executeCode()
 	{
-    	this.setState({ tql: this.state.code});//"from 'usprofile_babysitter' as bb\n take 10\n select\n bb.dogs_ok;"});
+    	this.setState({ tql: this.state.code});
 	}
 
 	getTql(event) 
@@ -125,20 +144,29 @@ class TQL extends Classs<Props>
     this.setState({
       theme: newTheme
     });
-    classNames['default'] = 'unselected';
-    classNames['monokai'] = 'unselected';
-    classNames['cobalt'] = 'unselected';
-    classNames['neo'] = 'unselected';
-    classNames[newTheme] = 'selected';
   }
-  	render()
+
+  highlightError(lineNumber: number) 
+  {
+    this.state.highlightedLine = lineNumber - 1; //-1 because they should be 0-indexed
+    console.log("Highlighting line " + this.state.highlightedLine);
+    if(this.refs['cm'])
+    {
+      this.refs['cm'].updateHighlightedLine(this.state.highlightedLine);
+    }
+  }
+  
+   render()
   	{ 
   		var options = {
   			lineNumbers: true,
-  			mode: 'custom',
+  			mode: 'javascript',
         // gutters: ["CodeMirror-lint-markers"],
         // lint: true,
-  		  theme: this.state.theme
+        lineWrapping: true,
+  		  theme: this.state.theme,
+        matchBrackets: true,
+        autoCloseBrackets: true,
       }
  		return (
  			<div>
@@ -153,16 +181,16 @@ class TQL extends Classs<Props>
     				rowHeight={window.innerHeight}
     			>
       			<div key={1} className="column-1 tql-view">
-						  <Codemirror value={this.state.code} onChange={this.updateCode} options={options} />      			
+						  <CodeMirror value={this.state.code} onChange={this.updateCode} ref="cm" options={options} />      			
       			  <div className="theme-buttons">
-                <div className={classNames['default']} onClick={()=>this.changeTheme('default')}>Default</div>
-                <div className={classNames['monokai']} onClick={()=>this.changeTheme('monokai')}>Monokai</div>
-                <div className={classNames['cobalt']} onClick={()=>this.changeTheme('cobalt')}>Cobalt</div>
-                <div className={classNames['neo']} onClick={()=>this.changeTheme('neo')}>Neo</div>
+                <div className={this.state.theme == 'default' ? 'selected' : ''} onClick={()=>this.changeTheme('default')}>Default</div>
+                <div className={this.state.theme == 'monokai' ? 'selected' : ''} onClick={()=>this.changeTheme('monokai')}>Monokai</div>
+                <div className={this.state.theme == 'cobalt' ? 'selected' : ''} onClick={()=>this.changeTheme('cobalt')}>Cobalt</div>
+                <div className={this.state.theme == 'neo' ? 'selected no-border' : 'no-border'} onClick={()=>this.changeTheme('neo')}>Neo</div>
               </div>
             </div>
-      			<div key={2} className="column-2" id='results'>
-      				<ResultsView tql={this.state.tql}/>
+      			<div key={2} className="column-2" id='results' >
+      				<ResultsView tql={this.state.tql} onError={this.highlightError}/>
       			</div>
     		</ReactGridLayout>
     	</div>
