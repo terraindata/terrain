@@ -79,7 +79,10 @@ CodeMirror.defineMode("tql", function(config, parserConfig) {
       "MAX": kw("MAX"), "MIN": kw("MIN"), "SUM": kw("SUM"), "AVG": kw("AVG"), 
       "COUNT": kw("COUNT"), "EXISTS": kw("EXISTS"), "TAKE": kw("TAKE"), 
       "SKIP": kw("SKIP"), "DESC": kw("DESC"), "ASC": kw("ASC"), "false": atom, 
-      "null": atom, "let": kw("var"), "var": kw("var"), "as": kw("var")
+      "null": atom, "let": kw("var"), "var": kw("var"), "as": kw("var"), "*": kw("operator"),
+      "+": kw("operator"), "-": kw("operator"), "=": kw("operator"),   
+      "<": kw("operator"), ">": kw("operator"), "?": kw("operator"), 
+      "and": kw("operator"), "or": kw("operator"), "&&": kw("&&"), "||": kw("||"), "function": kw("function")
     };
 
     if (isTS) {
@@ -97,7 +100,7 @@ CodeMirror.defineMode("tql", function(config, parserConfig) {
     return tqlKeywords;
   }();
 
-  var isOperatorChar = /[+\-*%=<>&!?|()^]/;
+  var isOperatorChar = /[+\-*%=<>!?()^]/;
 
   // Used as scratch variables to communicate multiple values without
   // consing up tons of objects.
@@ -117,8 +120,6 @@ CodeMirror.defineMode("tql", function(config, parserConfig) {
       return ret("spread", "meta");
     } else if (/[\[\]{}\(\),;\:\.]/.test(ch)) {
       return ret(ch);
-    } else if (ch == "=" && stream.eat(">")) {
-      return ret("=>", "operator");
     } else if (ch == "0" && stream.eat(/x/i)) {
       stream.eatWhile(/[\da-f]/i);
       return ret("number", "number");
@@ -142,18 +143,40 @@ CodeMirror.defineMode("tql", function(config, parserConfig) {
         stream.eatWhile(isOperatorChar);
         return ret("operator", "operator", stream.current());
       }
-    } else if (ch == "#") {
-      stream.skipToEnd();
-      return ret("error", "error");
-    } else if (isOperatorChar.test(ch)) {
-      stream.eatWhile(isOperatorChar);
-      return ret("operator", "operator", stream.current());
-    } else if (wordRE.test(ch)) {
-      stream.eatWhile(wordRE);
-      var word = stream.current(), known = keywords.propertyIsEnumerable(word) && keywords[word];
-      return (known && state.lastType != ".") ? ret(known.type, known.style, word) :
+      } 
+      else if (isOperatorChar.test(ch)) 
+      {
+        var word = stream.current(), known = keywords.propertyIsEnumerable(word) && keywords[word];
+        return (known && state.lastType != ".") ? ret(known.type, known.style, word) :
+                     ret("operator", "operator", word);
+      } 
+      else if (ch == "&")
+      {
+        if (stream.eat("&"))
+        {
+            console.log("Worked");
+            var word = stream.current(), known = keywords.propertyIsEnumerable(word) && keywords[word];
+            return (known && state.lastType != ".") ? ret(known.type, known.style, word) :
                      ret("variable", "variable", word);
-    }
+        }
+      }
+      else if (ch == "|")
+      {
+        if (stream.eat("|"))
+        {
+            console.log("Worked");
+            var word = stream.current(), known = keywords.propertyIsEnumerable(word) && keywords[word];
+            return (known && state.lastType != ".") ? ret(known.type, known.style, word) :
+                     ret("variable", "variable", word);
+        }
+      }
+      else if (wordRE.test(ch)) 
+      {
+        stream.eatWhile(wordRE);
+        var word = stream.current(), known = keywords.propertyIsEnumerable(word) && keywords[word];
+        return (known && state.lastType != ".") ? ret(known.type, known.style, word) :
+                     ret("variable", "variable", word);
+      }
   }
 
   function tokenString(quote) {
@@ -313,12 +336,11 @@ CodeMirror.defineMode("tql", function(config, parserConfig) {
   function maybeoperatorNoComma(type, value, noComma) {
     var me = noComma == false ? maybeoperatorComma : maybeoperatorNoComma;
     var expr = noComma == false ? expression : expressionNoComma;
-    if (type == "=>") return cont(pushcontext, noComma ? arrowBodyNoComma : arrowBody, popcontext);
     if (type == "operator") {
       if (/\+\+|--/.test(value)) return cont(me);
       if (value == "?") return cont(expression, expr);
       return cont(expr);
-    }
+    }   
     if (type == ";") return;
     if (type == "(") return contCommasep(expressionNoComma, ")", "call", me);
     if (type == ".") return cont(property, me);

@@ -401,6 +401,7 @@ class ResultsArea extends Classs<Props>
     var tql = TQLConverter.toTQL(algorithm.cards, {
       limit: pages * RESULTS_PAGE_SIZE,
     });
+    console.log(tql);
     if(tql !== this.state.tql)
     {
       this.setState({

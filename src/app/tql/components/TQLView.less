@@ -17,16 +17,17 @@
 }
 
 .column-1 {
-  width: 60%;
+  width: 60% !important;
   margin-left: 10px;
-  max-height: 100%
+  max-height: 100%;
 }
 
 .column-2 {
-  width: 40%;
+  transform: translate(10px, 10px) !important;
+  width: 40% !important;
   position: relative;
   left: 60%;
-  margin-left: 10px;
+  margin-left: 15px;
 }
 
 .scrolling {
@@ -42,34 +43,59 @@
   list-style-type: none;
 }
 
-.error-message {
+.error-title {
   color: red;
 }
 
 .theme-buttons {
   div {
     display: inline-block;
-    float: right;
-    padding: 10px;
-    background-color: gray;
+    float: left;
+    padding: 6px;
+    background-color: #646464;
     color: white;
     border-left: 1px solid black;
     cursor: hand;
+    font: 10px;
   }
 }
 
-.theme-buttons div:hover {
-  color: #eaf668
+.execute-button{
+    float: right;
+    background-color: #646464;
+    color: white !important;
+    border: none !important;
+    cursor: hand !important;
+    &:hover 
+    { 
+      background: none !important; 
+      background-color: #646464 !important; 
+      color: #eaf668 !important; 
+    }
 }
 
-.no-border {
-  border: 0px !important;
-} 
+.grid-layout {
+  padding-top:23px;
+}
+.theme-buttons div:hover {
+  color: #eaf668;
+}
 
 .selected {
   color: #CDDE20 !important;
 }
 
-.cm-line-error {
-  background-color: red;
+.error-detail {
+  color: gray;
+  font-size: 10;
 }
+
+.error-message {
+  color: gray;
+  font-size: 13;
+}
+
+//Placeholder styling for code-mirror, possibly move to differnt fiel
+.CodeMirror { border: 1px solid silver; }
+.CodeMirror-empty.CodeMirror-focused { outline: none; }
+.CodeMirror pre.CodeMirror-placeholder { color: #999; }

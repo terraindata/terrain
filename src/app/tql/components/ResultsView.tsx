@@ -55,6 +55,7 @@ interface Props
 {
   tql: string;
   onError: (lineNumber: number) => void;
+  noError: () => void;
 }
 
 class ResultsView extends Classs<Props>
@@ -109,28 +110,57 @@ class ResultsView extends Classs<Props>
     });
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if(_.isEqual(this.props, nextProps) && _.isEqual(this.state, nextState)) 
+    {
+      return false;
+    }
+    else 
+    {
+      return true;
+    }
+  }
+
   renderResults()
   {
-    console.log("ERGERGE");
     if(this.state.querying)
     {
+      if(this.state.error) 
+      {
+        this.props.noError();
+      }
       return <div>Querying results...</div>
     } 
 
     if(this.state.error)
     {
-      var lineNum = (this.state.error).replace( /(^.+\D)(\d+)(\D.+$)/i,'$2');
+      console.log(this.state.error);
+      if (this.state.error === "No response was returned from the server.")
+      {
+        return (
+          <div>
+            <span className = "error-title">
+            {this.state.error}
+            </span>
+          </div>
+        )
+      }
+      var lineNum = (this.state.error).replace(/^\D+|\D+$/g, "")
+      lineNum = parseInt(lineNum);
       var errorLineNumber = lineNum ? 'Error on line ' + lineNum : 'Error';
-      var matches = (this.state.error).match(/<<"([^>]+)">>/);
-      var errorMessage = (matches && matches[1]) || this.state.error;
+      var errorMessage = (this.state.error).replace(/Error on line/, '');
       this.props.onError(lineNum);
       return (
-        <div className="error-message">
+        <div>
           <div onClick={this.toggleError}>
-          {this.state.showErrorMessage ? '^ ' : 'v '}
-          {errorLineNumber}          
+          <span className="error-detail">
+          {this.state.showErrorMessage ? '\u25BC ' : '\u25B6 '}
+          </span>
+          <span className="error-title">
+            {errorLineNumber}          
+          </span>
           </div>
-          <div >
+          <div className="error-message">
             {this.state.showErrorMessage ? errorMessage : null}
           </div>
         </div>
@@ -186,7 +216,7 @@ class ResultsView extends Classs<Props>
     } catch(e) {
       this.setState({
         error: "No response was returned from the server.",
-        // TODO add error
+        querying: false,
       });
       return; 
     }
@@ -242,6 +272,7 @@ class ResultsView extends Classs<Props>
       this.setState({
         error: "No response was returned from the server.",
         xhr: null,
+        querying: false,
         // TODO add error
       });
     }
@@ -256,7 +287,6 @@ class ResultsView extends Classs<Props>
   
   queryResults(pages?: number)
   {
-    console.log("Querying results");
     if(!pages)
     {
       pages = this.state.resultsPages;
