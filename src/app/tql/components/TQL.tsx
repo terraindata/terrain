@@ -43,8 +43,8 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import * as ReactDOM from "react-dom";
-import * as _ from "underscore";
+import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
 import * as $ from 'jquery';
 import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
@@ -56,40 +56,41 @@ var ReactGridLayout = require('react-grid-layout');
 var Button = require('react-button');
 
 //Code mirror
-var CodeMirror = require('react-codemirror');
-//Style sheets for code-mirror
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/monokai.css';
-import 'codemirror/theme/cobalt.css';
-import 'codemirror/theme/neo.css';
+var CodeMirror = require('./Codemirror.js');
+//Style sheets and addons for code-mirror
+import './codemirror.css';
+import './monokai.css';
+import './cobalt.css';
+import './neo.css';
 import 'codemirror/addon/edit/matchbrackets.js';
 import 'codemirror/addon/edit/closebrackets.js';
-import "codemirror/addon/display/placeholder.js"
+import 'codemirror/addon/display/placeholder.js';
 
 //Searching
-import "codemirror/addon/dialog/dialog.js";
-import "codemirror/addon/search/searchcursor.js";
-import "codemirror/addon/search/search.js";
-import "codemirror/addon/scroll/annotatescrollbar.js";
-import "codemirror/addon/search/matchesonscrollbar.js";
-import "codemirror/addon/search/jump-to-line.js";
-import "codemirror/addon/dialog/dialog.css";
-import "codemirror/addon/search/matchesonscrollbar.css";
+import 'codemirror/addon/dialog/dialog.js';
+import './dialog.css';
+import 'codemirror/addon/search/searchcursor.js';
+import 'codemirror/addon/search/search.js';
+import 'codemirror/addon/scroll/annotatescrollbar.js';
+import 'codemirror/addon/search/matchesonscrollbar.js';
+import 'codemirror/addon/search/jump-to-line.js';
+//import "codemirror/addon/dialog/dialog.css";
+import 'codemirror/addon/search/matchesonscrollbar.css';
 
 //mode
 //import 'codemirror/mode/javascript/javascript';
 require('./tql.js');
 
 //folding doesn't work currently
-import 'codemirror/addon/fold/foldgutter.css';
-import 'codemirror/addon/fold/foldcode.js';
-import 'codemirror/addon/fold/foldgutter.js';
-import 'codemirror/addon/fold/brace-fold.js';
-import 'codemirror/addon/fold/comment-fold.js';
+// import 'codemirror/addon/fold/foldgutter.css';
+// import 'codemirror/addon/fold/foldcode.js';
+// import 'codemirror/addon/fold/foldgutter.js';
+// import 'codemirror/addon/fold/brace-fold.js';
+// import 'codemirror/addon/fold/comment-fold.js';
 
 //Components
 import Classs from './../../common/components/Classs.tsx';
-import LayoutManager from "./layout/LayoutManager.tsx";
+import LayoutManager from './layout/LayoutManager.tsx';
 import Ajax from "./../../util/Ajax.tsx";
 
 interface Props

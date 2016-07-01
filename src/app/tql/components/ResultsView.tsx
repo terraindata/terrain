@@ -86,7 +86,8 @@ class ResultsView extends Classs<Props>
   };
 
   //If the component updates and the tql command has been changed, then query results
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) 
+  {
     if(prevProps.tql != this.props.tql) 
     {
       this.queryResults();
@@ -135,17 +136,17 @@ class ResultsView extends Classs<Props>
     if(this.state.error)
     {
       console.log(this.state.error);
-      if (this.state.error === "No response was returned from the server.")
+      if (this.state.error === 'No response was returned from the server.')
       {
         return (
           <div>
-            <span className = "error-title">
+            <span className="error-title">
             {this.state.error}
             </span>
           </div>
         )
       }
-      var lineNum = (this.state.error).replace(/^\D+|\D+$/g, "")
+      var lineNum = (this.state.error).replace(/^\D+|\D+$/g, '');
       lineNum = parseInt(lineNum);
       var errorLineNumber = lineNum ? 'Error on line ' + lineNum : 'Error';
       var errorMessage = (this.state.error).replace(/Error on line/, '');
