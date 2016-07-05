@@ -239,20 +239,21 @@ class Result extends Classs<Props> {
       });
     }
     
-    if(this.props.data && this.props.data.pinned)
-    {
-      menuOptions.push({
-        text: 'Un-Pin',
-        onClick: this.unpin,
-      });
-    }
-    else
-    {
-      menuOptions.push({
-        text: 'Pin',
-        onClick: this.pin,
-      })
-    }
+    // TODO add back in once we have Result pinning
+    // if(this.props.data && this.props.data.pinned)
+    // {
+    //   menuOptions.push({
+    //     text: 'Un-Pin',
+    //     onClick: this.unpin,
+    //   });
+    // }
+    // else
+    // {
+    //   menuOptions.push({
+    //     text: 'Pin',
+    //     onClick: this.pin,
+    //   })
+    // }
     
     return menuOptions;
   }
@@ -381,7 +382,8 @@ const resultSource =
 {
   canDrag(props)
   {
-    return props.canDrag;
+    return false; // TODO remove once we get result dragging and pinning working
+    // return props.canDrag;
   },
   
   beginDrag(props)
