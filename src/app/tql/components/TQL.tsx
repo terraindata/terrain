@@ -154,6 +154,7 @@ class TQL extends Classs<Props>
 
   undoError() 
   {
+    console.log("Should unhighlight the error");
     if(this.state.highlightedLine != null) 
     {
       var x: any = this.refs['cm'];
