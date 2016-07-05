@@ -61,15 +61,19 @@ var CodeMirror = React.createClass({
 		codeMirrorInstance: React.PropTypes.object,
 		highlightedLine: React.PropTypes.number,
 	},
-	getCodeMirrorInstance: function getCodeMirrorInstance() {
+	getCodeMirrorInstance: function getCodeMirrorInstance() 
+	{
 		return this.props.codeMirrorInstance || require('codemirror');
 	},
-	getInitialState: function getInitialState() {
-		return {
+	getInitialState: function getInitialState() 
+	{
+		return 
+		{
 			isFocused: false
 		};
 	},
-	componentDidMount: function componentDidMount() {
+	componentDidMount: function componentDidMount() 
+	{
 		var textareaNode = this.refs.textarea;
 		var codeMirrorInstance = this.getCodeMirrorInstance();
 		this.codeMirror = codeMirrorInstance.fromTextArea(textareaNode, this.props.options);
@@ -80,54 +84,72 @@ var CodeMirror = React.createClass({
 		this.codeMirror.setSize("100%", "85%");
 		//this.codeMirror.markText(codeMirrorInstance.Pos(0,0), codeMirrorInstance.Pos(1,13), {collapsed: true});
 	},
-	componentWillUnmount: function componentWillUnmount() {
+	componentWillUnmount: function componentWillUnmount() 
+	{
 		// is there a lighter-weight way to remove the cm instance?
-		if (this.codeMirror) {
+		if (this.codeMirror) 
+		{
 			this.codeMirror.toTextArea();
 		}
 	},
-	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) {
-		if(lineToHighlight != null) {
+	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
+	{
+		if(lineToHighlight != null) 
+		{
 			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
 		}
 	},
-	undoHighlightedLine: function undoHighlightedLine(line) {
-		if(line != null) {
+	undoHighlightedLine: function undoHighlightedLine(line) 
+	{
+		if(line != null) 
+		{
 			this.codeMirror.removeLineClass(line, 'wrap', 'cm-error');
 		}
 	},
-	componentWillReceiveProps: debounce(function (nextProps) {
-		if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getValue() != nextProps.value) {
+	componentWillReceiveProps: debounce(function (nextProps) 
+	{
+		if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getValue() != nextProps.value) 
+		{
 			this.codeMirror.setValue(nextProps.value);
 		}
-		if (typeof nextProps.options === 'object') {
-			for (var optionName in nextProps.options) {
-				if (nextProps.options.hasOwnProperty(optionName)) {
+		if (typeof nextProps.options === 'object') 
+		{
+			for (var optionName in nextProps.options) 
+			{
+				if (nextProps.options.hasOwnProperty(optionName)) 
+				{
 					this.codeMirror.setOption(optionName, nextProps.options[optionName]);
 				}
 			}
 		}
 	}, 0),
-	getCodeMirror: function getCodeMirror() {
+	getCodeMirror: function getCodeMirror() 
+	{
 		return this.codeMirror;
 	},
-	focus: function focus() {
-		if (this.codeMirror) {
+	focus: function focus()
+	 {
+		if (this.codeMirror) 
+		{
 			this.codeMirror.focus();
 		}
 	},
-	focusChanged: function focusChanged(focused) {
+	focusChanged: function focusChanged(focused) 
+	{
 		this.setState({
 			isFocused: focused
 		});
 		this.props.onFocusChange && this.props.onFocusChange(focused);
 	},
-	codemirrorValueChanged: function codemirrorValueChanged(doc, change) {
-		if (this.props.onChange && change.origin != 'setValue') {
+	codemirrorValueChanged: function codemirrorValueChanged(doc, change) 
+	{
+		if (this.props.onChange && change.origin != 'setValue') 
+		{
 			this.props.onChange(doc.getValue());
 		}
 	},
-	render: function render() {
+	render: function render() 
+	{
 		var editorClassName = className('ReactCodeMirror', this.state.isFocused ? 'ReactCodeMirror--focused' : null, this.props.className);
 		return React.createElement(
 			'div',
