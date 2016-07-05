@@ -42,21 +42,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Adapted from javascript syntax codemirror file  
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
-(function(mod) {
+(function(mod) 
+{
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../../../node_modules/codemirror/lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
     define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
   else // Plain browser env
     mod(CodeMirror);
-})(function(CodeMirror) {
+})(function(CodeMirror) 
+{
 "use strict";
 
-
-CodeMirror.defineMode("tql", function(config, parserConfig) {
+CodeMirror.defineMode("tql", function(config, parserConfig) 
+{
   var jsonldMode = parserConfig.jsonld;
   var jsonMode = parserConfig.json || jsonldMode;
   var isTS = parserConfig.typescript;
@@ -64,11 +67,13 @@ CodeMirror.defineMode("tql", function(config, parserConfig) {
 
   // Tokenizer
 
-  var keywords = function(){
+  var keywords = function()
+  {
     function kw(type) {return {type: type, style: "keyword"};}
     var operator = kw("operator"), atom = {type: "atom", style: "atom"};
 
-    var tqlKeywords = {
+    var tqlKeywords = 
+    {
       "from": kw("from"), "select": kw("select"), "sort": kw("sort"), "filter": kw("filter"),
       "score": kw("score"), "linearTransform": kw("linearTransform"), "if": kw("if"), 
       "max": kw("max"), "min": kw("min"), "sum": kw("sum"), "avg": kw("avg"), 
@@ -85,18 +90,19 @@ CodeMirror.defineMode("tql", function(config, parserConfig) {
       "and": kw("operator"), "or": kw("operator"), "&&": kw("&&"), "||": kw("||"), "function": kw("function")
     };
 
-    if (isTS) {
+    if (isTS) 
+    {
       var type = {type: "variable", style: "variable-3"};
-      var tsKeywords = {
-        // types
+      var tsKeywords = 
+      {
         "string": type, "number": type, "boolean": type, "any": type
       };
 
-      for (var attr in tsKeywords) {
+      for (var attr in tsKeywords) 
+      {
         tqlKeywords[attr] = tsKeywords[attr];
       }
     }
-
     return tqlKeywords;
   }();
 
@@ -470,3 +476,5 @@ CodeMirror.defineMode("tql", function(config, parserConfig) {
 });
 
 });
+
+

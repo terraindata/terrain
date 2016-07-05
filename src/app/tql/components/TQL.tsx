@@ -154,7 +154,6 @@ class TQL extends Classs<Props>
 
   undoError() 
   {
-    console.log("Should unhighlight the error");
     if(this.state.highlightedLine != null) 
     {
       var x: any = this.refs['cm'];
@@ -179,28 +178,7 @@ class TQL extends Classs<Props>
     //if a line should be highlighted do it
  		return (
  			<div>
-          <div className="theme-buttons">
-            <div
-              className={this.state.theme == 'default' ? 'selected' : ''}
-              onClick={() => this.changeTheme('default') }>
-              Default
-            </div>
-            <div
-              className={this.state.theme == 'monokai' ? 'selected' : ''}
-              onClick={() => this.changeTheme('monokai') }>
-              Monokai
-            </div>
-            <div
-              className={this.state.theme == 'cobalt' ? 'selected' : ''}
-              onClick={() => this.changeTheme('cobalt') }>
-              Cobalt
-            </div>
-            <div
-              className={this.state.theme == 'neo' ? 'selected' : ''}
-              onClick={() => this.changeTheme('neo') }>
-              Neo
-            </div>
-          </div>
+
   				<ReactGridLayout 
     				isDraggable={false} 
     				isResiable={false}
@@ -211,6 +189,28 @@ class TQL extends Classs<Props>
             className='grid-layout'
     			>
       			<div key={1} className="column-1 tql-view">
+              <div className="theme-buttons">
+                <div
+                  className={this.state.theme == 'default' ? 'selected' : ''}
+                  onClick={() => this.changeTheme('default') }>
+                  Default
+                </div>
+                <div
+                  className={this.state.theme == 'monokai' ? 'selected' : ''}
+                  onClick={() => this.changeTheme('monokai') }>
+                  Monokai
+                </div>
+                <div
+                  className={this.state.theme == 'cobalt' ? 'selected' : ''}
+                  onClick={() => this.changeTheme('cobalt') }>
+                  Cobalt
+                </div>
+                <div
+                  className={this.state.theme == 'neo' ? 'selected' : ''}
+                  onClick={() => this.changeTheme('neo') }>
+                  Neo
+                </div>
+              </div>
 						  <CodeMirror 
                 highlightedLine={this.state.highlightedLine}  
                 value={this.state.code} 

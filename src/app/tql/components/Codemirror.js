@@ -67,8 +67,7 @@ var CodeMirror = React.createClass({
 	},
 	getInitialState: function getInitialState() 
 	{
-		return 
-		{
+		return {
 			isFocused: false
 		};
 	},
