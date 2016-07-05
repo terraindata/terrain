@@ -231,14 +231,14 @@ class Tabs extends Classs<TabsProps> {
       };
     }).filter(tab => 
     {
-      if(tab.name !== null)
+      if(tab.name)
       {
         return true;
       }
       emptyTabs.push(tab.id);
       return false;
     });
-
+    
     this.setState({
       tabs,
       variants,
