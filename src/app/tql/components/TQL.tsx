@@ -44,14 +44,10 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
-import * as $ from 'jquery';
 import * as classNames from 'classnames';
-import { DragDropContext } from 'react-dnd';
 import * as Immutable from 'immutable';
 import ResultsView from './ResultsView.tsx';
 //React Node Modules
-var HTML5Backend = require('react-dnd-html5-backend');
 var ReactGridLayout = require('react-grid-layout');
 var Button = require('react-button');
 
@@ -65,7 +61,7 @@ import './neo.css';
 import 'codemirror/addon/edit/matchbrackets.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/display/placeholder.js';
-
+import 'codemirror/addon/fold/foldgutter.css';
 //Searching
 import 'codemirror/addon/dialog/dialog.js';
 import './dialog.css';
@@ -74,23 +70,13 @@ import 'codemirror/addon/search/search.js';
 import 'codemirror/addon/scroll/annotatescrollbar.js';
 import 'codemirror/addon/search/matchesonscrollbar.js';
 import 'codemirror/addon/search/jump-to-line.js';
-//import "codemirror/addon/dialog/dialog.css";
 import 'codemirror/addon/search/matchesonscrollbar.css';
 
 //mode
-//import 'codemirror/mode/javascript/javascript';
 require('./tql.js');
-
-//folding doesn't work currently
-// import 'codemirror/addon/fold/foldgutter.css';
-// import 'codemirror/addon/fold/foldcode.js';
-// import 'codemirror/addon/fold/foldgutter.js';
-// import 'codemirror/addon/fold/brace-fold.js';
-// import 'codemirror/addon/fold/comment-fold.js';
 
 //Components
 import Classs from './../../common/components/Classs.tsx';
-import LayoutManager from './layout/LayoutManager.tsx';
 import Ajax from "./../../util/Ajax.tsx";
 
 interface Props
@@ -109,13 +95,19 @@ class TQL extends Classs<Props>
     code: string;
     theme: string;
     highlightedLine: number;
-
   } = {
     tql: null,
     code: '',
     theme: 'default',
     highlightedLine: null,
   };
+
+  changeTheme(newTheme) 
+  {
+    this.setState({
+      theme: newTheme,
+    });
+  }
 
   updateCode(newCode) 
   {
@@ -129,16 +121,31 @@ class TQL extends Classs<Props>
 	executeCode()
 	{
     this.setState({
-      //highlightedLine: null,
       tql: this.state.code
     });
 	}
 
-  changeTheme(newTheme: string)
+//Work on compressing this
+  changeThemeDefault()
   {  
     this.setState({
-     theme: newTheme
-   });
+      theme: 'default'
+    });
+  }
+  changeThemeMonokai() {
+    this.setState({
+      theme: 'monokai'
+    });
+  }
+  changeThemeNeo() {
+    this.setState({
+      theme: 'neo'
+    });
+  }
+  changeThemeCobalt() {
+    this.setState({
+      theme: 'cobalt'
+    });
   }
 
   highlightError(lineNumber: number) 
@@ -169,16 +176,16 @@ class TQL extends Classs<Props>
   		var options = {
   			lineNumbers: true,
   			mode: 'tql',
-        extraKeys: { "Ctrl-F": "findPersistent" },
+        extraKeys: { 'Ctrl-F': 'findPersistent'},
         lineWrapping: true,
   		  theme: this.state.theme,
         matchBrackets: true,
         autoCloseBrackets: true,
+        foldGutter: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
       }
-    //if a line should be highlighted do it
  		return (
  			<div>
-
   				<ReactGridLayout 
     				isDraggable={false} 
     				isResiable={false}
@@ -192,22 +199,22 @@ class TQL extends Classs<Props>
               <div className="theme-buttons">
                 <div
                   className={this.state.theme == 'default' ? 'selected' : ''}
-                  onClick={() => this.changeTheme('default') }>
+                  onClick={this.changeThemeDefault}>
                   Default
                 </div>
                 <div
                   className={this.state.theme == 'monokai' ? 'selected' : ''}
-                  onClick={() => this.changeTheme('monokai') }>
+                  onClick={this.changeThemeMonokai }>
                   Monokai
                 </div>
                 <div
                   className={this.state.theme == 'cobalt' ? 'selected' : ''}
-                  onClick={() => this.changeTheme('cobalt') }>
+                  onClick={this.changeThemeCobalt}>
                   Cobalt
                 </div>
                 <div
                   className={this.state.theme == 'neo' ? 'selected' : ''}
-                  onClick={() => this.changeTheme('neo') }>
+                  onClick={this.changeThemeNeo }>
                   Neo
                 </div>
               </div>
@@ -231,4 +238,4 @@ class TQL extends Classs<Props>
   	}
 }
 
-export default DragDropContext(HTML5Backend)(TQL);
+export default TQL;

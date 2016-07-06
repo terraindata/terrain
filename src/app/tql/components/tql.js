@@ -46,6 +46,8 @@ THE SOFTWARE.
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
+var TqlConfig = require('../TQLConfig.json');
+
 (function(mod) 
 {
   if (typeof exports == "object" && typeof module == "object") // CommonJS
@@ -72,23 +74,34 @@ CodeMirror.defineMode("tql", function(config, parserConfig)
     function kw(type) {return {type: type, style: "keyword"};}
     var operator = kw("operator"), atom = {type: "atom", style: "atom"};
 
-    var tqlKeywords = 
-    {
-      "from": kw("from"), "select": kw("select"), "sort": kw("sort"), "filter": kw("filter"),
-      "score": kw("score"), "linearTransform": kw("linearTransform"), "if": kw("if"), 
-      "max": kw("max"), "min": kw("min"), "sum": kw("sum"), "avg": kw("avg"), 
-      "count": kw("count"), "exisits": kw("exists"), "take": kw("take"), 
-      "skip": kw("skip"), "desc": kw("desc"), "asc": kw("asc"), "FROM": kw("FROM"), 
-      "SELECT": kw("SELECT"), "SORT": kw("SORT"), "FILTER": kw("FILTER"),
-      "SCORE": kw("SCORE"), "LINEARTRANSFORM": kw("LINEARTRANSFORM"), "IF": kw("IF"), 
-      "MAX": kw("MAX"), "MIN": kw("MIN"), "SUM": kw("SUM"), "AVG": kw("AVG"), 
-      "COUNT": kw("COUNT"), "EXISTS": kw("EXISTS"), "TAKE": kw("TAKE"), 
-      "SKIP": kw("SKIP"), "DESC": kw("DESC"), "ASC": kw("ASC"), "false": atom, 
-      "null": atom, "let": kw("var"), "var": kw("var"), "as": kw("var"), "*": kw("operator"),
-      "+": kw("operator"), "-": kw("operator"), "=": kw("operator"),   
-      "<": kw("operator"), ">": kw("operator"), "?": kw("operator"), 
-      "and": kw("operator"), "or": kw("operator"), "&&": kw("&&"), "||": kw("||"), "function": kw("function")
-    };
+    var tqlKeywords = {};
+    for (var index = 0; index < TqlConfig[0].keywords.length; index++)
+    { 
+      var key = TqlConfig[0].keywords[index];
+      var keyCap = key.toUpperCase();
+      tqlKeywords[key] = kw(key);
+      tqlKeywords[keyCap] = kw(keyCap);
+    }
+    for (var index = 0; index < TqlConfig[0].keywords2.length; index++)
+    { 
+      var key = TqlConfig[0].keywords2[index];
+      tqlKeywords[key] = kw(key);
+    }
+    for (var index = 0; index < TqlConfig[0].operators.length; index++)
+    { 
+      var key = TqlConfig[0].operators[index];
+      tqlKeywords[key] = kw("operator");
+    }
+    for (var index = 0; index < TqlConfig[0].atom.length; index++)
+    { 
+      var key = TqlConfig[0].atom[index];
+      tqlKeywords[key] = atom;
+    }
+    for (var index = 0; index < TqlConfig[0].var.length; index++)
+    { 
+      var key = TqlConfig[0].var[index];
+      tqlKeywords[key] = kw("var");
+    }
 
     if (isTS) 
     {
@@ -138,17 +151,23 @@ CodeMirror.defineMode("tql", function(config, parserConfig)
     } else if (/\d/.test(ch)) {
       stream.match(/^\d*(?:\.\d*)?(?:[eE][+\-]?\d+)?/);
       return ret("number", "number");
-    } else if (ch == "/") {
-      if (stream.eat("*")) {
-        state.tokenize = tokenComment;
-        return tokenComment(stream, state);
-      } else if (stream.eat("/")) {
-        stream.skipToEnd();
-        return ret("comment", "comment");
-      } else {
-        stream.eatWhile(isOperatorChar);
-        return ret("operator", "operator", stream.current());
-      }
+    } else if (ch == "/") 
+      {
+        if (stream.eat("*")) 
+        {
+          state.tokenize = tokenComment;
+          return tokenComment(stream, state);
+        } 
+        else if (stream.eat("/")) 
+        {
+          stream.skipToEnd();
+          return ret("comment", "comment");
+        } 
+        else 
+        {
+          stream.eatWhile(isOperatorChar);
+          return ret("operator", "operator", stream.current());
+        }
       } 
       else if (isOperatorChar.test(ch)) 
       {

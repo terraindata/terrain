@@ -42,11 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+//Adapted from https://github.com/JedWatson/react-codemirror
 'use strict';
 
 var React = require('react');
 var className = require('classnames');
-var debounce = require('lodash.debounce');
+//var debounce = require('lodash.debounce');
 
 var CodeMirror = React.createClass({
 	displayName: 'CodeMirror',
@@ -68,7 +69,9 @@ var CodeMirror = React.createClass({
 	getInitialState: function getInitialState() 
 	{
 		return {
-			isFocused: false
+			isFocused: false,
+			openingPos: null,
+			closingPos: null,
 		};
 	},
 	componentDidMount: function componentDidMount() 
@@ -81,7 +84,6 @@ var CodeMirror = React.createClass({
 		this.codeMirror.on('blur', this.focusChanged.bind(this, false));
 		this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
 		this.codeMirror.setSize("100%", "85%");
-		//this.codeMirror.markText(codeMirrorInstance.Pos(0,0), codeMirrorInstance.Pos(1,13), {collapsed: true});
 	},
 	componentWillUnmount: function componentWillUnmount() 
 	{
@@ -91,21 +93,7 @@ var CodeMirror = React.createClass({
 			this.codeMirror.toTextArea();
 		}
 	},
-	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
-	{
-		if(lineToHighlight != null) 
-		{
-			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
-		}
-	},
-	undoHighlightedLine: function undoHighlightedLine(line) 
-	{
-		if(line != null) 
-		{
-			this.codeMirror.removeLineClass(line, 'wrap', 'cm-error');
-		}
-	},
-	componentWillReceiveProps: debounce(function (nextProps) 
+	componentWillReceiveProps: function componentWillReceiveProps(nextProps)
 	{
 		if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getValue() != nextProps.value) 
 		{
@@ -121,7 +109,7 @@ var CodeMirror = React.createClass({
 				}
 			}
 		}
-	}, 0),
+	},
 	getCodeMirror: function getCodeMirror() 
 	{
 		return this.codeMirror;
