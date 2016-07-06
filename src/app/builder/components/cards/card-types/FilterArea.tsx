@@ -148,11 +148,12 @@ class FilterArea extends Classs<Props>
           <div className='builder-operator'>
             { index === this.props.card.filters.length - 1 ? null :
               <Dropdown
+                {...this.props}
                 circle={true}
                 options={Combinators}
                 selectedIndex={filter.combinator}
                 id={this.props.card.id}
-                keyPath={this._keyPath('filters', index, 'condition', 'combinator')}
+                keyPath={this._keyPath('filters', index, 'combinator')}
               />
             }
           </div>
