@@ -70,9 +70,21 @@ var CodeMirror = React.createClass({
 	{
 		return {
 			isFocused: false,
-			openingPos: null,
-			closingPos: null,
 		};
+	},
+	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
+	{
+		if(lineToHighlight != null) 
+		{
+			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
+		}
+	},
+	undoHighlightedLine: function undoHighlightedLine(line) 
+	{
+		if(line != null) 
+		{
+			this.codeMirror.removeLineClass(line, 'wrap', 'cm-error');
+		}
 	},
 	componentDidMount: function componentDidMount() 
 	{
