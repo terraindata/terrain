@@ -76,20 +76,6 @@ var CodeMirror = React.createClass({
 			isFocused: false,
 		};
 	},
-	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
-	{
-		if(lineToHighlight != null) 
-		{
-			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
-		}
-	},
-	undoHighlightedLine: function undoHighlightedLine(line) 
-	{
-		if(line != null) 
-		{
-			this.codeMirror.removeLineClass(line, 'wrap', 'cm-error');
-		}
-	},
 	componentDidMount: function componentDidMount() 
 	{
 		var textareaNode = this.refs.textarea;
@@ -109,7 +95,6 @@ var CodeMirror = React.createClass({
 			this.codeMirror.toTextArea();
 		}
 	},
-<<<<<<< HEAD
 	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
 	{
 		if(lineToHighlight != null) 
@@ -124,9 +109,43 @@ var CodeMirror = React.createClass({
 			this.codeMirror.removeLineClass(line, 'wrap', 'cm-error');
 		}
 	},
+	addOpenBrace: function addOpenBrace(i, ch, arr) 
+	{
+		for(var entry = 0; entry < arr.length; entry++) 
+			{
+			if(!arr[entry].closingPos)
+			{
+				arr[entry].counter += 1;
+			}
+		}
+		//Note: ch is + 1 because the opening ( should not be included in the collapsable range
+		var pos = {
+			openingPos: this.getCodeMirrorInstance().Pos(i, ch+1), 
+			closingPos: null,
+			counter: 1
+		};
+		arr.push(pos);
+		return arr;
+	},
+	addCloseBrace: function addCloseBrace(i, ch, arr) 
+	{
+		for(var entry = 0; entry < arr.length; entry++) 
+		{
+			if(!arr[entry].closingPos)
+			{
+				arr[entry].counter -= 1;
+				if(arr[entry].counter === 0) 
+				{
+					arr[entry].closingPos = this.getCodeMirrorInstance().Pos(i, ch);
+				}
+			}
+		}
+		return arr;
+	},
 	findCodeToFold: function findCodeToFold() 
 	{
-		var codeFoldingPositions = [];
+		var paranthesesPositions = [];
+		var bracketPositions 	 = [];
 		//Find positions of sets of ()
 		for(var i = 0; i < this.codeMirror.lineCount(); i++) 
 		{
@@ -135,42 +154,27 @@ var CodeMirror = React.createClass({
 			{
 				if(line[ch] === '(')
 				{
-					for(var entry = 0; entry < codeFoldingPositions.length; entry++) 
-					{
-						if(!codeFoldingPositions[entry].closingPos)
-						{
-							codeFoldingPositions[entry].counter += 1;
-						}
-					}
-					//Note: ch is + 1 because the opening ( should not be included in the collapsable range
-					var pos = {
-						openingPos: this.getCodeMirrorInstance().Pos(i, ch+1), 
-						closingPos: null,
-						counter: 1
-					};
-					codeFoldingPositions.push(pos);
+					paranthesesPositions = this.addOpenBrace(i, ch, paranthesesPositions);
 				} 
 				else if(line[ch] === ')')
 				{	
-					for(var entry = 0; entry < codeFoldingPositions.length; entry++) 
-					{
-						if(!codeFoldingPositions[entry].closingPos)
-						{
-							codeFoldingPositions[entry].counter -= 1;
-							if(codeFoldingPositions[entry].counter === 0) 
-							{
-								codeFoldingPositions[entry].closingPos = this.getCodeMirrorInstance().Pos(i, ch);
-							}
-						}
-					}
+					paranthesesPositions = this.addCloseBrace(i, ch, paranthesesPositions);
+				}
+				else if(line[ch] === '{')
+				{
+					bracketPositions = this.addOpenBrace(i, ch, bracketPositions);
+				}
+				else if(line[ch] === '}') 
+				{
+					bracketPositions = this.addCloseBrace(i, ch, bracketPositions);
 				}
 			}
 		}
+		var codeFoldingPositions = bracketPositions.concat(paranthesesPositions);
 		this.addGutterWidgets(codeFoldingPositions);
 	},
 	addGutterWidgets: function addGutterWidgets(codeFoldingPositions)
 	{
-		console.log("Add gutter widgets");
 		var self = this;
 		var codeMirrorInstance = this.getCodeMirrorInstance();
 		this.codeMirror.clearGutter('CodeMirror-foldgutter');
@@ -259,8 +263,6 @@ var CodeMirror = React.createClass({
   		return widget;
   	},
 	 
-=======
->>>>>>> 9c32b420d8d0365c8a679e83b8b03fcb04e6e257
 	componentWillReceiveProps: function componentWillReceiveProps(nextProps)
 	{
 		if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getValue() != nextProps.value) 

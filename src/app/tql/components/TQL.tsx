@@ -49,11 +49,15 @@ import * as Immutable from 'immutable';
 import ResultsView from './ResultsView.tsx';
 import Menu from './../../common/components/Menu.tsx';
 import { MenuOption } from '../../common/components/Menu.tsx';
+import Switch from './../../common/components/Switch.tsx';
+import TQLConverter from '../TQLConverter.tsx';
+import BuilderActions from './../../builder/data/BuilderActions.tsx';
+import * as _ from 'underscore';
+
 
 //React Node Modules
 var ReactGridLayout = require('react-grid-layout');
 var Button = require('react-button');
-var LocalStorageMixin = require('react-localstorage');
 
 //Code mirror
 var CodeMirror = require('./Codemirror.js');
@@ -67,10 +71,7 @@ import 'codemirror/addon/edit/matchbrackets.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/fold/foldgutter.css';
-<<<<<<< HEAD
 
-=======
->>>>>>> 9c32b420d8d0365c8a679e83b8b03fcb04e6e257
 //Searching
 import 'codemirror/addon/dialog/dialog.js';
 import './dialog.css';
@@ -97,30 +98,20 @@ interface Props
 
 class TQL extends Classs<Props>
 {
- state: 
- {
-    tql: string;
-    code: string;
-    theme: string;
-    highlightedLine: number;
-<<<<<<< HEAD
-    theme_index: number;
-=======
->>>>>>> 9c32b420d8d0365c8a679e83b8b03fcb04e6e257
-  } = {
-    tql: null,
-    code: '',
-    theme: 'default',
+   state:
+   {
+      tql: string;
+      code: string;
+      theme: string;
+      highlightedLine: number;
+      theme_index: number;
+   } = {
+      tql: null,
+      code: TQLConverter.toTQL(this.props.algorithm.cards),
+      theme: localStorage.getItem('theme') || 'default',
     highlightedLine: null,
     theme_index: 0,
   };
-
-  changeTheme(newTheme) 
-  {
-    this.setState({
-      theme: newTheme,
-    });
-  }
 
   updateCode(newCode) 
   {
@@ -146,9 +137,9 @@ class TQL extends Classs<Props>
     });
 	}
 
-<<<<<<< HEAD
   changeThemeDefault()
   {  
+    localStorage.setItem('theme', 'default');
     this.setState({
       theme: 'default',
       theme_index: 0
@@ -157,6 +148,7 @@ class TQL extends Classs<Props>
 
   changeThemeNeo() 
   {
+    localStorage.setItem('theme', 'neo');
     this.setState({
       theme: 'neo', 
       theme_index: 1
@@ -165,6 +157,7 @@ class TQL extends Classs<Props>
 
   changeThemeCobalt() 
   {
+    localStorage.setItem('theme', 'cobalt');
     this.setState({
       theme: 'cobalt',
       theme_index: 2
@@ -173,6 +166,7 @@ class TQL extends Classs<Props>
 
   changeThemeMonokai() 
   {
+    localStorage.setItem('theme', 'monokai');
     this.setState({
       theme: 'monokai',
       theme_index: 3
@@ -202,29 +196,6 @@ class TQL extends Classs<Props>
     ];
     options[this.state.theme_index].disabled = true;
     return options;
-=======
-//Work on compressing this
-  changeThemeDefault()
-  {  
-    this.setState({
-      theme: 'default'
-    });
-  }
-  changeThemeMonokai() {
-    this.setState({
-      theme: 'monokai'
-    });
-  }
-  changeThemeNeo() {
-    this.setState({
-      theme: 'neo'
-    });
-  }
-  changeThemeCobalt() {
-    this.setState({
-      theme: 'cobalt'
-    });
->>>>>>> 9c32b420d8d0365c8a679e83b8b03fcb04e6e257
   }
 
   highlightError(lineNumber: number) 
@@ -250,112 +221,83 @@ class TQL extends Classs<Props>
     }
   }
 
-  render()
-<<<<<<< HEAD
-  { 
-  	var options = {
-  		lineNumbers: true,
-  		mode: 'tql',
+  toggleMode()
+  {
+    BuilderActions.setVariant
+      (this.props.algorithm.id, _.extend
+        ( {}, this.props.algorithm, 
+          { 
+            mode: 
+              this.props.algorithm.mode === 'tql' ? 'cards' : 'tql',
+          } 
+        ) 
+      );
+      
+      //update when have tql to cards conversion capabilities 
+      this.setState({
+        code: TQLConverter.toTQL(this.props.algorithm.cards),
+      })
+  }
+  renderTopbar()
+  {
+       return (
+        <div className='results-top'>
+          <Button onClick={this.executeCode} className='execute-button'>
+            Execute code
+          </Button>
+          <Switch
+            first='Cards'
+            second='Tql'
+            onChange={this.toggleMode}
+            selected={this.props.algorithm.mode === 'tql' ? 2 : 1}
+            small={true}
+          />
+          <Menu options={this.getMenuOptions()} small={true}/>
+        </div>
+       );
+  }
+
+  renderTqlEditor()
+  {
+    var options = {
+      readOnly: !(this.props.algorithm.mode === 'tql'),
+      lineNumbers: true,
+      mode: 'tql',
       extraKeys: { 'Ctrl-F': 'findPersistent'},
       lineWrapping: true,
-  	  theme: this.state.theme,
+      theme: this.state.theme,
       matchBrackets: true,
       autoCloseBrackets: true,
       foldGutter: true,
       gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
     };
+    var value = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm.cards); 
+    return <CodeMirror 
+      highlightedLine={this.state.highlightedLine}  
+      onChange={this.updateCode} 
+      ref="cm" 
+      options={options} 
+      className='codemirror-text'
+      value={value}
+     /> 
+  }
+
+  renderResults()
+  {
+    return <ResultsView 
+              tql={this.state.tql} 
+              onError={this.highlightError} 
+              noError={this.undoError}
+           />
+  }
+
+  render()
+  { 
  		return (
  			<div>
-  			<ReactGridLayout 
-    			isDraggable={false} 
-    			isResiable={false}
-    			layout={[]} 
-          cols={2}
-    			rowHeight={window.innerHeight/2}
-          width={window.innerWidth}
-          className='grid-layout'
-    		>
-      		<div key={1} className="column-1 tql-view">
-             <CodeMirror 
-              highlightedLine={this.state.highlightedLine}  
-              value={this.state.code} 
-              onChange={this.updateCode} 
-              ref="cm" 
-              options={options} 
-              className='codemirror-text'
-            />
-            <Menu id='themes' options={this.getMenuOptions()} small={true}/>              
-            <Button onClick={this.executeCode} className='execute-button'>
-              Execute code
-            </Button>
-          </div>
-       		<div key={2} className="column-2" id='results' >
-      			<ResultsView tql={this.state.tql} onError={this.highlightError} noError={this.undoError}/>
-      		</div>
-    	  </ReactGridLayout>
-=======
-  	{ 
-  		var options = {
-  			lineNumbers: true,
-  			mode: 'tql',
-        extraKeys: { 'Ctrl-F': 'findPersistent'},
-        lineWrapping: true,
-  		  theme: this.state.theme,
-        matchBrackets: true,
-        autoCloseBrackets: true,
-        foldGutter: true,
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-      }
- 		return (
- 			<div>
-  				<ReactGridLayout 
-    				isDraggable={false} 
-    				isResiable={false}
-    				layout={[]} 
-    				cols={2} 
-    				rowHeight={window.innerHeight}
-            width={window.innerWidth}
-            className='grid-layout'
-    			>
-      			<div key={1} className="column-1 tql-view">
-              <div className="theme-buttons">
-                <div
-                  className={this.state.theme == 'default' ? 'selected' : ''}
-                  onClick={this.changeThemeDefault}>
-                  Default
-                </div>
-                <div
-                  className={this.state.theme == 'monokai' ? 'selected' : ''}
-                  onClick={this.changeThemeMonokai }>
-                  Monokai
-                </div>
-                <div
-                  className={this.state.theme == 'cobalt' ? 'selected' : ''}
-                  onClick={this.changeThemeCobalt}>
-                  Cobalt
-                </div>
-                <div
-                  className={this.state.theme == 'neo' ? 'selected' : ''}
-                  onClick={this.changeThemeNeo }>
-                  Neo
-                </div>
-              </div>
-						  <CodeMirror 
-                highlightedLine={this.state.highlightedLine}  
-                value={this.state.code} 
-                onChange={this.updateCode} 
-                ref="cm" 
-                options={options} 
-              />      			
-              <Button onClick={this.executeCode} className='execute-button'>
-                Execute code
-              </Button>
-            </div>
-      			<div key={2} className="column-2" id='results' >
-      				<ResultsView tql={this.state.tql} onError={this.highlightError} noError={this.undoError}/>
-      			</div>
-    		</ReactGridLayout>
->>>>>>> 9c32b420d8d0365c8a679e83b8b03fcb04e6e257
+        { this.renderTopbar() }
+        { this.renderTqlEditor() }
+        { this.renderResults() }
     	</div>
     );
   }

@@ -202,8 +202,9 @@ var BuilderColumn = React.createClass<any, any>(
         />;
       
       case COLUMNS.TQL:
-        return <TQLView
+        return <TQL
           algorithm={algorithm}
+          
         />;
         
     }
