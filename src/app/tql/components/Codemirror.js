@@ -76,6 +76,20 @@ var CodeMirror = React.createClass({
 			isFocused: false,
 		};
 	},
+	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
+	{
+		if(lineToHighlight != null) 
+		{
+			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
+		}
+	},
+	undoHighlightedLine: function undoHighlightedLine(line) 
+	{
+		if(line != null) 
+		{
+			this.codeMirror.removeLineClass(line, 'wrap', 'cm-error');
+		}
+	},
 	componentDidMount: function componentDidMount() 
 	{
 		var textareaNode = this.refs.textarea;
@@ -95,6 +109,7 @@ var CodeMirror = React.createClass({
 			this.codeMirror.toTextArea();
 		}
 	},
+<<<<<<< HEAD
 	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
 	{
 		if(lineToHighlight != null) 
@@ -244,6 +259,8 @@ var CodeMirror = React.createClass({
   		return widget;
   	},
 	 
+=======
+>>>>>>> 9c32b420d8d0365c8a679e83b8b03fcb04e6e257
 	componentWillReceiveProps: function componentWillReceiveProps(nextProps)
 	{
 		if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getValue() != nextProps.value) 

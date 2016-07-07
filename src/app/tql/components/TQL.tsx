@@ -67,7 +67,10 @@ import 'codemirror/addon/edit/matchbrackets.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/fold/foldgutter.css';
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9c32b420d8d0365c8a679e83b8b03fcb04e6e257
 //Searching
 import 'codemirror/addon/dialog/dialog.js';
 import './dialog.css';
@@ -100,7 +103,10 @@ class TQL extends Classs<Props>
     code: string;
     theme: string;
     highlightedLine: number;
+<<<<<<< HEAD
     theme_index: number;
+=======
+>>>>>>> 9c32b420d8d0365c8a679e83b8b03fcb04e6e257
   } = {
     tql: null,
     code: '',
@@ -108,6 +114,13 @@ class TQL extends Classs<Props>
     highlightedLine: null,
     theme_index: 0,
   };
+
+  changeTheme(newTheme) 
+  {
+    this.setState({
+      theme: newTheme,
+    });
+  }
 
   updateCode(newCode) 
   {
@@ -133,6 +146,7 @@ class TQL extends Classs<Props>
     });
 	}
 
+<<<<<<< HEAD
   changeThemeDefault()
   {  
     this.setState({
@@ -188,6 +202,29 @@ class TQL extends Classs<Props>
     ];
     options[this.state.theme_index].disabled = true;
     return options;
+=======
+//Work on compressing this
+  changeThemeDefault()
+  {  
+    this.setState({
+      theme: 'default'
+    });
+  }
+  changeThemeMonokai() {
+    this.setState({
+      theme: 'monokai'
+    });
+  }
+  changeThemeNeo() {
+    this.setState({
+      theme: 'neo'
+    });
+  }
+  changeThemeCobalt() {
+    this.setState({
+      theme: 'cobalt'
+    });
+>>>>>>> 9c32b420d8d0365c8a679e83b8b03fcb04e6e257
   }
 
   highlightError(lineNumber: number) 
@@ -214,6 +251,7 @@ class TQL extends Classs<Props>
   }
 
   render()
+<<<<<<< HEAD
   { 
   	var options = {
   		lineNumbers: true,
@@ -255,6 +293,69 @@ class TQL extends Classs<Props>
       			<ResultsView tql={this.state.tql} onError={this.highlightError} noError={this.undoError}/>
       		</div>
     	  </ReactGridLayout>
+=======
+  	{ 
+  		var options = {
+  			lineNumbers: true,
+  			mode: 'tql',
+        extraKeys: { 'Ctrl-F': 'findPersistent'},
+        lineWrapping: true,
+  		  theme: this.state.theme,
+        matchBrackets: true,
+        autoCloseBrackets: true,
+        foldGutter: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+      }
+ 		return (
+ 			<div>
+  				<ReactGridLayout 
+    				isDraggable={false} 
+    				isResiable={false}
+    				layout={[]} 
+    				cols={2} 
+    				rowHeight={window.innerHeight}
+            width={window.innerWidth}
+            className='grid-layout'
+    			>
+      			<div key={1} className="column-1 tql-view">
+              <div className="theme-buttons">
+                <div
+                  className={this.state.theme == 'default' ? 'selected' : ''}
+                  onClick={this.changeThemeDefault}>
+                  Default
+                </div>
+                <div
+                  className={this.state.theme == 'monokai' ? 'selected' : ''}
+                  onClick={this.changeThemeMonokai }>
+                  Monokai
+                </div>
+                <div
+                  className={this.state.theme == 'cobalt' ? 'selected' : ''}
+                  onClick={this.changeThemeCobalt}>
+                  Cobalt
+                </div>
+                <div
+                  className={this.state.theme == 'neo' ? 'selected' : ''}
+                  onClick={this.changeThemeNeo }>
+                  Neo
+                </div>
+              </div>
+						  <CodeMirror 
+                highlightedLine={this.state.highlightedLine}  
+                value={this.state.code} 
+                onChange={this.updateCode} 
+                ref="cm" 
+                options={options} 
+              />      			
+              <Button onClick={this.executeCode} className='execute-button'>
+                Execute code
+              </Button>
+            </div>
+      			<div key={2} className="column-2" id='results' >
+      				<ResultsView tql={this.state.tql} onError={this.highlightError} noError={this.undoError}/>
+      			</div>
+    		</ReactGridLayout>
+>>>>>>> 9c32b420d8d0365c8a679e83b8b03fcb04e6e257
     	</div>
     );
   }
