@@ -44,19 +44,20 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
-import * as $ from 'jquery';
 import * as classNames from 'classnames';
-import { DragDropContext } from 'react-dnd';
 import * as Immutable from 'immutable';
 import ResultsView from './ResultsView.tsx';
+import Menu from './../../common/components/Menu.tsx';
+import { MenuOption } from '../../common/components/Menu.tsx';
+
 //React Node Modules
-var HTML5Backend = require('react-dnd-html5-backend');
 var ReactGridLayout = require('react-grid-layout');
 var Button = require('react-button');
+var LocalStorageMixin = require('react-localstorage');
 
 //Code mirror
 var CodeMirror = require('./Codemirror.js');
+
 //Style sheets and addons for code-mirror
 import './codemirror.css';
 import './monokai.css';
@@ -65,6 +66,7 @@ import './neo.css';
 import 'codemirror/addon/edit/matchbrackets.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/display/placeholder.js';
+import 'codemirror/addon/fold/foldgutter.css';
 
 //Searching
 import 'codemirror/addon/dialog/dialog.js';
@@ -74,51 +76,42 @@ import 'codemirror/addon/search/search.js';
 import 'codemirror/addon/scroll/annotatescrollbar.js';
 import 'codemirror/addon/search/matchesonscrollbar.js';
 import 'codemirror/addon/search/jump-to-line.js';
-//import "codemirror/addon/dialog/dialog.css";
 import 'codemirror/addon/search/matchesonscrollbar.css';
 
 //mode
-//import 'codemirror/mode/javascript/javascript';
 require('./tql.js');
-
-//folding doesn't work currently
-// import 'codemirror/addon/fold/foldgutter.css';
-// import 'codemirror/addon/fold/foldcode.js';
-// import 'codemirror/addon/fold/foldgutter.js';
-// import 'codemirror/addon/fold/brace-fold.js';
-// import 'codemirror/addon/fold/comment-fold.js';
 
 //Components
 import Classs from './../../common/components/Classs.tsx';
-import LayoutManager from './layout/LayoutManager.tsx';
 import Ajax from "./../../util/Ajax.tsx";
 
 interface Props
 {
   params?: any;
   history?: any;
+  algorithm?: any;
 }
-
 
 class TQL extends Classs<Props>
 {
-
  state: 
  {
     tql: string;
     code: string;
     theme: string;
     highlightedLine: number;
-
+    theme_index: number;
   } = {
     tql: null,
     code: '',
     theme: 'default',
     highlightedLine: null,
+    theme_index: 0,
   };
 
   updateCode(newCode) 
   {
+    this.checkForFolding(newCode);
     this.undoError();
     this.setState({
       code: newCode,
@@ -126,19 +119,75 @@ class TQL extends Classs<Props>
     });
   }
 
+  checkForFolding(newCode) {
+    var x: any = this.refs['cm'];
+    if (x) {
+    x.findCodeToFold();
+    }
+  }
+
 	executeCode()
 	{
     this.setState({
-      //highlightedLine: null,
       tql: this.state.code
     });
 	}
 
-  changeTheme(newTheme: string)
+  changeThemeDefault()
   {  
     this.setState({
-     theme: newTheme
-   });
+      theme: 'default',
+      theme_index: 0
+    });
+  }
+
+  changeThemeNeo() 
+  {
+    this.setState({
+      theme: 'neo', 
+      theme_index: 1
+    });
+  }
+
+  changeThemeCobalt() 
+  {
+    this.setState({
+      theme: 'cobalt',
+      theme_index: 2
+    });
+  }
+
+  changeThemeMonokai() 
+  {
+    this.setState({
+      theme: 'monokai',
+      theme_index: 3
+    });
+  }
+
+  getMenuOptions(): MenuOption[]
+  {
+    var options: MenuOption[] =
+    [
+      {
+        text: 'Default',
+        onClick: this.changeThemeDefault,
+      },
+      {
+        text: 'Neo',
+        onClick: this.changeThemeNeo,
+      },
+      {
+        text: 'Cobalt',
+        onClick: this.changeThemeCobalt,
+      },
+      {
+        text: 'Monokai',
+        onClick: this.changeThemeMonokai,
+      },
+    ];
+    options[this.state.theme_index].disabled = true;
+    return options;
   }
 
   highlightError(lineNumber: number) 
@@ -165,70 +214,50 @@ class TQL extends Classs<Props>
   }
 
   render()
-  	{ 
-  		var options = {
-  			lineNumbers: true,
-  			mode: 'tql',
-        extraKeys: { "Ctrl-F": "findPersistent" },
-        lineWrapping: true,
-  		  theme: this.state.theme,
-        matchBrackets: true,
-        autoCloseBrackets: true,
-      }
-    //if a line should be highlighted do it
+  { 
+  	var options = {
+  		lineNumbers: true,
+  		mode: 'tql',
+      extraKeys: { 'Ctrl-F': 'findPersistent'},
+      lineWrapping: true,
+  	  theme: this.state.theme,
+      matchBrackets: true,
+      autoCloseBrackets: true,
+      foldGutter: true,
+      gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+    };
  		return (
  			<div>
-
-  				<ReactGridLayout 
-    				isDraggable={false} 
-    				isResiable={false}
-    				layout={[]} 
-    				cols={2} 
-    				rowHeight={window.innerHeight}
-            width={window.innerWidth}
-            className='grid-layout'
-    			>
-      			<div key={1} className="column-1 tql-view">
-              <div className="theme-buttons">
-                <div
-                  className={this.state.theme == 'default' ? 'selected' : ''}
-                  onClick={() => this.changeTheme('default') }>
-                  Default
-                </div>
-                <div
-                  className={this.state.theme == 'monokai' ? 'selected' : ''}
-                  onClick={() => this.changeTheme('monokai') }>
-                  Monokai
-                </div>
-                <div
-                  className={this.state.theme == 'cobalt' ? 'selected' : ''}
-                  onClick={() => this.changeTheme('cobalt') }>
-                  Cobalt
-                </div>
-                <div
-                  className={this.state.theme == 'neo' ? 'selected' : ''}
-                  onClick={() => this.changeTheme('neo') }>
-                  Neo
-                </div>
-              </div>
-						  <CodeMirror 
-                highlightedLine={this.state.highlightedLine}  
-                value={this.state.code} 
-                onChange={this.updateCode} 
-                ref="cm" 
-                options={options} 
-              />      			
-              <Button onClick={this.executeCode} className='execute-button'>
-                Execute code
-              </Button>
-            </div>
-      			<div key={2} className="column-2" id='results' >
-      				<ResultsView tql={this.state.tql} onError={this.highlightError} noError={this.undoError}/>
-      			</div>
-    		</ReactGridLayout>
+  			<ReactGridLayout 
+    			isDraggable={false} 
+    			isResiable={false}
+    			layout={[]} 
+          cols={2}
+    			rowHeight={window.innerHeight/2}
+          width={window.innerWidth}
+          className='grid-layout'
+    		>
+      		<div key={1} className="column-1 tql-view">
+             <CodeMirror 
+              highlightedLine={this.state.highlightedLine}  
+              value={this.state.code} 
+              onChange={this.updateCode} 
+              ref="cm" 
+              options={options} 
+              className='codemirror-text'
+            />
+            <Menu id='themes' options={this.getMenuOptions()} small={true}/>              
+            <Button onClick={this.executeCode} className='execute-button'>
+              Execute code
+            </Button>
+          </div>
+       		<div key={2} className="column-2" id='results' >
+      			<ResultsView tql={this.state.tql} onError={this.highlightError} noError={this.undoError}/>
+      		</div>
+    	  </ReactGridLayout>
     	</div>
     );
-  	}
+  }
 }
 
-export default DragDropContext(HTML5Backend)(TQL);
+export default TQL;

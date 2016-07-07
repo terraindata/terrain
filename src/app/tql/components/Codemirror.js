@@ -42,11 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+//Adapted from https://github.com/JedWatson/react-codemirror
 'use strict';
 
 var React = require('react');
 var className = require('classnames');
-var debounce = require('lodash.debounce');
+//var debounce = require('lodash.debounce');
 
 var CodeMirror = React.createClass({
 	displayName: 'CodeMirror',
@@ -61,6 +62,10 @@ var CodeMirror = React.createClass({
 		codeMirrorInstance: React.PropTypes.object,
 		highlightedLine: React.PropTypes.number,
 	},
+	foldClass: {
+		open: "CodeMirror-foldgutter-open",
+		folded: "CodeMirror-foldgutter-folded",
+	},
 	getCodeMirrorInstance: function getCodeMirrorInstance() 
 	{
 		return this.props.codeMirrorInstance || require('codemirror');
@@ -68,7 +73,7 @@ var CodeMirror = React.createClass({
 	getInitialState: function getInitialState() 
 	{
 		return {
-			isFocused: false
+			isFocused: false,
 		};
 	},
 	componentDidMount: function componentDidMount() 
@@ -81,7 +86,6 @@ var CodeMirror = React.createClass({
 		this.codeMirror.on('blur', this.focusChanged.bind(this, false));
 		this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
 		this.codeMirror.setSize("100%", "85%");
-		//this.codeMirror.markText(codeMirrorInstance.Pos(0,0), codeMirrorInstance.Pos(1,13), {collapsed: true});
 	},
 	componentWillUnmount: function componentWillUnmount() 
 	{
@@ -105,7 +109,142 @@ var CodeMirror = React.createClass({
 			this.codeMirror.removeLineClass(line, 'wrap', 'cm-error');
 		}
 	},
-	componentWillReceiveProps: debounce(function (nextProps) 
+	findCodeToFold: function findCodeToFold() 
+	{
+		var codeFoldingPositions = [];
+		//Find positions of sets of ()
+		for(var i = 0; i < this.codeMirror.lineCount(); i++) 
+		{
+			var line = this.codeMirror.getLine(i);
+			for(var ch = 0; ch < line.length; ch++) 
+			{
+				if(line[ch] === '(')
+				{
+					for(var entry = 0; entry < codeFoldingPositions.length; entry++) 
+					{
+						if(!codeFoldingPositions[entry].closingPos)
+						{
+							codeFoldingPositions[entry].counter += 1;
+						}
+					}
+					//Note: ch is + 1 because the opening ( should not be included in the collapsable range
+					var pos = {
+						openingPos: this.getCodeMirrorInstance().Pos(i, ch+1), 
+						closingPos: null,
+						counter: 1
+					};
+					codeFoldingPositions.push(pos);
+				} 
+				else if(line[ch] === ')')
+				{	
+					for(var entry = 0; entry < codeFoldingPositions.length; entry++) 
+					{
+						if(!codeFoldingPositions[entry].closingPos)
+						{
+							codeFoldingPositions[entry].counter -= 1;
+							if(codeFoldingPositions[entry].counter === 0) 
+							{
+								codeFoldingPositions[entry].closingPos = this.getCodeMirrorInstance().Pos(i, ch);
+							}
+						}
+					}
+				}
+			}
+		}
+		this.addGutterWidgets(codeFoldingPositions);
+	},
+	addGutterWidgets: function addGutterWidgets(codeFoldingPositions)
+	{
+		console.log("Add gutter widgets");
+		var self = this;
+		var codeMirrorInstance = this.getCodeMirrorInstance();
+		this.codeMirror.clearGutter('CodeMirror-foldgutter');
+		//Posible: mark all text with __isFold: false before this loop
+		//Also want to check if there are multiple foldable start points on the same line - which one should fold?
+
+		for(var i = 0; i < codeFoldingPositions.length; i++) 
+		{
+			let openingPos = codeFoldingPositions[i].openingPos;
+			let closingPos = codeFoldingPositions[i].closingPos;
+			if(openingPos && closingPos)
+			{
+				let range = this.codeMirror.markText(openingPos, closingPos, {
+      				__isFold: true
+    			});
+				let gutterWidget = this.makeGutterWidget(openingPos, closingPos);
+
+				codeMirrorInstance.on(gutterWidget, "mousedown", function(e) {
+					codeMirrorInstance.e_preventDefault(e);
+		      		if(gutterWidget.className === self.foldClass.folded)
+		      		{
+		      			var marks = self.codeMirror.findMarksAt(openingPos);
+		      			for(var i = 0; i < marks.length; i++) 
+		      			{
+		      				if(marks[i].__isFold) 
+		      				{
+		      					marks[i].clear();
+		      				}
+		      			}
+		      			gutterWidget.className = self.foldClass.open;
+		      		} else 
+		      		{
+		      			gutterWidget.className = self.foldClass.folded;
+		      			self.collapseCode(openingPos, closingPos, gutterWidget);
+		      		}
+		   		});
+
+		   		this.codeMirror.setGutterMarker(openingPos.line, "CodeMirror-foldgutter", gutterWidget);
+   			}
+   		}
+	},
+	collapseCode: function collapseCode(openingPos, closingPos, gutterWidget)
+	{					
+		var codeMirrorInstance = this.getCodeMirrorInstance();
+		var widget = this.makeWidget('...');
+		var self = this;
+		//Onclick functions to unfold the code
+		codeMirrorInstance.on(widget, "mousedown", function(e) {
+      		myRange.clear();
+      		gutterWidget.className = self.foldClass.open;
+     		codeMirrorInstance.e_preventDefault(e);
+   		});
+   		//Actually fold code
+    	var myRange = this.codeMirror.markText(openingPos, closingPos, {
+      		replacedWith: widget,
+      		__isFold: true
+    	});
+	},
+	makeWidget: function makeWidget(text) 
+	{
+		var widget = document.createElement("span");
+		var content = document.createTextNode(text);
+		widget.appendChild(content);
+		widget.className = "CodeMirror-foldmarker";
+		return widget;
+  	},
+  	//Create a gutter widget - check to see if the current section of code is already folded
+  	//to decide what class of widget to make
+  	makeGutterWidget: function makeGutterWidget(openingPos, closingPos)
+  	{
+  		var classname = this.foldClass.open;
+  		var marks = this.codeMirror.findMarks(openingPos, closingPos);
+  		if(marks) 
+  		{
+  			for (var i = 0; i < marks.length; i++)
+  			{
+  				if (marks[i].replacedWith)
+  				{
+  					classname = this.foldClass.folded;
+  				}
+  			}
+      		
+  		}
+  		var widget = document.createElement("span");
+  		widget.className = classname;
+  		return widget;
+  	},
+	 
+	componentWillReceiveProps: function componentWillReceiveProps(nextProps)
 	{
 		if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getValue() != nextProps.value) 
 		{
@@ -121,7 +260,7 @@ var CodeMirror = React.createClass({
 				}
 			}
 		}
-	}, 0),
+	},
 	getCodeMirror: function getCodeMirror() 
 	{
 		return this.codeMirror;
