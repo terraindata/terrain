@@ -2,9 +2,10 @@
 
 @result-name-bg: #cfd7c8;
 @result-score-bg: #dfe6d8;
-@bg: #eef1f4;
-@bar-h: 30px;
+@bg: @builder-bg;
+@bar-h: 34px;
 @br: 5px;
+@field-border-color: fade(#000, 20%);
 
 .results-config-wrapper {
   *, *:before, *:after {
@@ -33,45 +34,59 @@
     .results-config-bar {
       height: @bar-h;
       position: relative;
+      background: @fresh-moss;
       
       .results-config-title {
         font-size: 14px;
         padding: 9px 12px;
         color: rgba(0,0,0,0.5);
+        font-weight: 400;
+        letter-spacing: 0.5px;
+        color: #fff;
       }
       
       
       .results-config-button {
         position: absolute;
-        right: 0px;
-        top: 0px;
-        height: 100%;
+        right: 8px;
+        top: 4px;
+        // height: 100%;
         // font-size: 16px;
-        padding: 0px 20px;
-        background: rgb(138, 200, 136);
+        float: right;
+        padding: 4px 30px;
+        background: #eee; //@light-foam; //rgb(138, 200, 136);
+        color: @grey;
+        font-weight: 500;
+        
         cursor: pointer;
-        color: #fff;
-        padding-top: 6px;
-        border-top-right-radius: @br;
-        border-bottom-left-radius: @br;
+        // padding-top: 6px;
+        border-radius: @br;
         .transition;
         
         &:hover {
-          background: darken(rgb(138, 200, 136), 5%);
+          background: #fff;
         }
       }
       
       .results-config-switch {
         position: absolute;
-        top: 3px;
-        right: 90px;
+        top: 4px;
+        right: 110px;
+        
+        .switch {
+          border: 1px solid mix(@fresh-moss, @grey);
+        }
       }
     }
     
     .results-config-instructions {
       text-align: left;
-      font-size: 12px;
       margin-bottom: 12px;
+      color: @fresh-moss;
+      letter-spacing: 0.5px;
+      font-weight: 200;
+      line-height: 18px;
+      font-size: 12px;
     }
     
     .results-config-config-wrapper,
@@ -95,21 +110,15 @@
         .results-config-name,
         .results-config-score,
         .results-config-fields {
-          padding: 3px;
-          
-          .results-config-none {
-            padding: 8px;
-            color: rgba(0,0,0,0.35);
-          }
+          padding: 6px;
         }
         
         .results-config-area-title {
-          font-size: 12px;
-          color: rgba(0, 0, 0, 0.5);
-          font-weight: 500;
-          margin-left: 6px;
-          margin-top: 2px;
-          margin-bottom: 6px;
+          color: rgba(0, 0, 0, 0.65);
+          font-weight: bold;
+          margin: 6px;
+          margin-top: 0px;
+          letter-spacing: 0.5px;
         }
         
         .results-config-name {
@@ -117,28 +126,16 @@
           border-top-left-radius: 5px;
           border-top-right-radius: 5px;
           &.results-config-over {
-            border: 3px solid @bright-green;
-            padding: 0px;
-          }
-          .results-config-field {
-            // background: @result-name-bg;
-            background: rgba(255,255,255,0.5);
-            blend-mode: multiply;
-            border-bottom: 0px;
+            border: 3px solid fade(@bright-green, 50%);
+            padding: 3px;
           }
         }
         
         .results-config-score {
           background: @result-score-bg;
           &.results-config-over {
-            border: 3px solid @bright-green;
-            padding: 0px;
-          }
-          .results-config-field {
-            // background: @result-score-bg;
-            background: rgba(255,255,255,0.5);
-            blend-mode: multiply;
-            border-bottom: 0px;
+            border: 3px solid fade(@bright-green, 50%);
+            padding: 3px;
           }
         }
         
@@ -147,51 +144,109 @@
           min-height: 100px;
           padding-bottom: 30px;
           &.results-config-over {
-            border: 3px solid @bright-green;
-            padding: 0px;
+            border: 3px solid fade(@bright-green, 50%);
+            padding: 3px;
           }
+          
+          .results-config-field-wrapper {
+            padding-bottom: 6px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid @field-border-color;
+          }
+        }
+        
+        .results-config-field {
+          border-color: @field-border-color;
         }
       }
     }
     
     .results-config-available-fields {
       left: 0%;
-      padding: 3px;
+      padding: 6px;
       
-      &.results-config-over {
-        border: 3px solid @bright-green;
-        padding: 0px;
+      // &.results-config-over {
+      //   border: 3px solid @bright-green;
+      //   padding: 6px;
+      // }
+      
+      .results-config-field {
+        background: #fff;
       }
     }
     
+    .results-config-placeholder,
     .results-config-field {
-      padding: 8px;
-      padding-bottom: 6px;
-      background: #fff;
-      border-bottom: 1px solid #eee;
-      border-radius: 3px;
+      padding: 12px;
+      padding-bottom: 10px;
+      border-radius: 6px;
       font-size: 12px;
       
+      em {
+        font-style: normal;
+        opacity: 0.5;
+      }
+    }
+    
+    .results-config-placeholder {
+      background: fade(@aged-moss, 20%);
+      background-blend-mode: multiply;
+      border: 1px solid fade(@aged-moss, 20%);
+      color: @grey;
+    }
+    
+    .results-config-field {
+      background: rgba(255,255,255,0.25);
+      blend-mode: multiply;
+      border: 1px solid #fff;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      position: relative;
+      padding-left: 30px;
+      
       &.results-config-field-used {
-        background: #fafafa;
+        background: @light-green;
+        .results-config-handle {
+          opacity: 0;
+          &:hover {
+            opacity: 0;
+          }
+        }
       }
       
       .results-config-handle {
         margin-right: 8px;
         opacity: 0.5;
+        font-weight: bold;
         .transition;
+        font-size: 20px;
+        position: absolute;
+        left: 6px;
+        top: 6px;
+        letter-spacing: -2px;
       }
       
-      .close {
+      .close,
+      .results-config-field-gear {
         float: right;
         margin-top: 2px;
         opacity: 0.5;
+        .transition;
         &:hover {
           opacity: 1;
         }
       }
       
+      .results-config-field-gear {
+        width: 11px;
+        fill: @aged-moss;
+        margin-right: 6px;
+      }
+      
       &:hover {
+        border-color: @field-border-color;
+        
         .results-config-handle {
           opacity: 1;
         }
@@ -200,15 +255,86 @@
       &.results-config-field-dragging {
         opacity: 0;
       }
+      
+      .results-config-field-format {
+        display: none;
+        &.results-config-field-format-showing {
+          display: block;
+        }
+        
+        .results-config-format-btns {
+          background: @grey;
+          display: flex;
+          margin-top: 6px;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        
+        .results-config-text-btn,
+        .results-config-image-btn {
+          padding: 3px 0px;
+          flex-grow: 1;
+          text-align: center;
+          
+          color: #eee;
+          .transition;
+          
+          &:hover {
+            background: fade(@light-green, 25%);
+          }
+        }
+        
+        .rc-selected, .rc-selected:hover {
+          background: @light-green;
+          color: @grey;
+        }
+        
+        .results-config-image {
+          display: none;
+        }
+        
+        &.results-config-field-format-text {
+          .results-config-text-btn {
+            .rc-selected;
+          }
+        }
+        
+        &.results-config-field-format-image {
+          .results-config-image-btn {
+            .rc-selected;
+          }
+          
+          .results-config-image {
+            display: block;
+            margin-top: 6px;
+            
+            .results-config-field-value,
+            .results-config-raw-value {
+              margin-top: 6px;
+              font-weight: 200;
+            }
+          }
+        }
+        
+        input {
+          border: 1px solid @fresh-moss;
+          
+          &[type='checkbox'] {
+            width: auto;
+            display: inline-block;
+            -webkit-appearance: checkbox;
+          }
+        }
+      }
     }
   }
 }
 
 .results-config-disabled-veil {
   position: absolute;
-  top: @bar-h + 1px;
+  top: @bar-h;
   width: 100%;
-  height: calc(~"100% - @{bar-h} - 1px");
+  height: calc(~"100% - @{bar-h}");
   background: rgba(0,0,0,0);
   opacity: 0;
   pointer-events: none;

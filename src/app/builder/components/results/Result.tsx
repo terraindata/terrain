@@ -111,41 +111,59 @@ class Result extends Classs<Props> {
     props.connectDragPreview(this.dragPreview);
   }
 
-  getValue(field)
+  getValue(field, overrideFormat?)
   {
     var {data, allFieldsData} = this.props;
     var dataField = data && data[field];
     var allDataField = allFieldsData && allFieldsData[field];
-    return allDataField || dataField;
+    let value = allDataField || dataField;
+    
+    let format = this.props.config.formats && this.props.config.formats[field];
+    let {showRaw} = overrideFormat || format || { showRaw: false };
+    
+    if(format)
+    {
+      switch(format.type)
+      {
+        case 'image':
+        var url = format.template.replace(/\[value\]/g, value);
+        return (
+          <div>
+            <div className='result-field-value-image'>
+              <img src={url} />
+            </div>
+            <div className='result-field-value'>
+              {
+                showRaw ? value : null
+              }
+            </div>
+          </div>
+        );
+        case 'text':
+        // nothing special for now
+        break;
+      }
+    }
+    
+    return value;
   }
 
   renderExpandedField(value, field)
   {
-    return this.renderField(field);
+    return this.renderField(field, 0, null, {
+      showField: true,
+      showRaw: true,
+    });
   }
   
-  renderField(field, index?)
+  renderField(field, index?, fields?, overrideFormat?)
   {
     if(index >= 4)
     {
       return null;
     }
     
-    var value = this.getValue(field);
-    
-    if(field === 'image')
-    {
-      return (
-        <div className="result-field result-field-image" key={field}>
-          <div className="result-field-name">
-            { field }
-          </div>
-          <div className='result-field-value result-field-value-image'>
-            <img src={value} />
-          </div>
-        </div>
-      );
-    }
+    var value = this.getValue(field, overrideFormat);
     
     if(value === undefined)
     {
@@ -166,16 +184,17 @@ class Result extends Classs<Props> {
       value = 'null';
       var italics = true;
     }
-    // if(typeof value === 'string')
-    // {
-    //   value = value.replace(/\\n/g, '<br />');
-    // }
     
+    let format = this.props.config.formats && this.props.config.formats[field];
+    let showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
       <div className="result-field" key={field}>
-        <div className="result-field-name">
-          { field }
-        </div>
+        {
+          showField &&
+            <div className="result-field-name">
+              { field }
+            </div>
+        }
         <div
           className={classNames({
             'result-field-value': true,

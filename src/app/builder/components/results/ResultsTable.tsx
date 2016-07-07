@@ -150,6 +150,7 @@ class ResultsTable extends Classs<Props>
             results && results.length ? _.keys(results[0]) : []
           ),
         enabled: true,
+        formats: {},
       };
     
     return (
