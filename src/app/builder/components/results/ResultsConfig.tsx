@@ -57,6 +57,8 @@ import { DragSource, DropTarget } from 'react-dnd';
 
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
 var GearIcon = require("./../../../../images/icon_gear.svg?name=GearIcon");
+var TextIcon = require("./../../../../images/icon_text_12x18.svg?name=TextIcon");
+var ImageIcon = require("./../../../../images/icon_profile_16x16.svg?name=ImageIcon");
 
 export interface Format
 {
@@ -513,18 +515,21 @@ class ConfigResultC extends Classs<ConfigResultProps>
           'results-config-field-format-text': !image,
           'results-config-field-format-image': image,
         })}>
+          <div className='results-config-format-header'>
+            Display the value of { this.props.field } as:
+          </div>
           <div className='results-config-format-btns'>
             <div className='results-config-text-btn' onClick={this.changeToText}>
-              Text
+              <TextIcon /> Text
             </div>
             <div className='results-config-image-btn' onClick={this.changeToImage}>
-              Image
+              <ImageIcon /> Image
             </div>
           </div>
           
           <div className='results-config-image'>
             <div>
-              <b>URL Template</b>
+              <b>Image URL Template</b>
             </div>
             <div>
               <input
@@ -535,7 +540,7 @@ class ConfigResultC extends Classs<ConfigResultProps>
               />
             </div>
             <div>
-              <em>"[value]" inserts {this.props.field}</em>
+              <em>"[value]" inserts the value of {this.props.field}</em>
             </div>
             <div className='results-config-field-value'>
               <input
@@ -545,7 +550,7 @@ class ConfigResultC extends Classs<ConfigResultProps>
                 onChange={this.toggleField}
               />
               <label htmlFor={'check-f-' + this.props.field}>
-                Show field name
+                Show field name label
               </label>
             </div>
             <div className='results-config-raw-value'>
@@ -556,7 +561,7 @@ class ConfigResultC extends Classs<ConfigResultProps>
                 onChange={this.toggleRaw}
               />
               <label htmlFor={'check-' + this.props.field}>
-                Show raw value
+                Show raw value, as well
               </label>
             </div>
           </div>

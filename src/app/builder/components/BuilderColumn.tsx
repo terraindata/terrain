@@ -240,8 +240,8 @@ var BuilderColumn = React.createClass<any, any>(
   
   render() {
     let {algorithm} = this.props;
-    let canEdit = algorithm.status === BrowserTypes.EVariantStatus.Build
-      && Util.canEdit(algorithm, UserStore, RolesStore)
+    let canEdit = (algorithm.status === BrowserTypes.EVariantStatus.Build
+      && Util.canEdit(algorithm, UserStore, RolesStore))
       || this.state.column === COLUMNS.Inputs;
     let cantEditReason = algorithm.status !== BrowserTypes.EVariantStatus.Build ?
       'This Variant is not in Build status' : 'You are not authorized to edit this Variant';

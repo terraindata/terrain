@@ -90,11 +90,6 @@ class Login extends React.Component<Props, any>
       Actions.login(token, username);
     };
     
-    if (DEV === true) {
-      login("DEV mode free pass.");
-      return
-    }
-    
     let xhr = new XMLHttpRequest();
     xhr.onerror = (ev:Event) => {
       alert("Error logging in: " + ev);

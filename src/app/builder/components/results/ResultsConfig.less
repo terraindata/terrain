@@ -262,12 +262,17 @@
           display: block;
         }
         
+        .results-config-format-header {
+          margin-top: 10px;
+          font-weight: normal;
+        }
+        
         .results-config-format-btns {
-          background: @grey;
+          // background: @grey;
           display: flex;
           margin-top: 6px;
-          border-radius: 4px;
-          overflow: hidden;
+          // border-radius: 4px;
+          // overflow: hidden;
         }
         
         .results-config-text-btn,
@@ -276,8 +281,23 @@
           flex-grow: 1;
           text-align: center;
           
-          color: #eee;
+          color: @grey;
           .transition;
+          
+          border-radius: 6px;
+          padding: 6px 0px;
+          border: 1px solid #ddd;
+          margin-right: 6px;
+          
+          svg {
+            max-width: 12px;
+            max-height: 12px;
+            fill: @grey;
+            position: relative;
+            top: 2px;
+            float: left;
+            left: 6px;
+          }
           
           &:hover {
             background: fade(@light-green, 25%);
@@ -287,6 +307,7 @@
         .rc-selected, .rc-selected:hover {
           background: @light-green;
           color: @grey;
+          border-color: @light-green;
         }
         
         .results-config-image {

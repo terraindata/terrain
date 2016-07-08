@@ -9,7 +9,8 @@
     "test": "karma start karma.conf.js",
     "deploy": "webpack && scp bundle.js u51505641@lukeknepper.com:alfaromeo/bundle.js",
     "deploy-prod": "npm run build-prod && scp bundle.prod.js u51505641@lukeknepper.com:alfaromeo/bundle.js",
-    "build-prod": "webpack --config webpack.config.prod.js --output-filename bundle.prod.js"
+    "build-prod": "MIDWAY_HOST=http://pa-terraformer01.terrain.int:40080 webpack --config webpack.config.prod.js --output-filename bundle.prod.js",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -19,7 +20,9 @@
     "Luke Knepper",
     "Mason Simon",
     "Mike Agnich",
-    "Ben Smith"
+    "Ben Smith",
+    "Laura Brouckman",
+    "Leslie Kurt"
   ],
   "private": true,
   "dependencies": {
