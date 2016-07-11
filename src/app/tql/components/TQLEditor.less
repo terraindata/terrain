@@ -1,0 +1,85 @@
+@import "../../common/Common.less";
+@import "../../builder/components/results/Result.less";
+@import "./cobalt.less";
+@import "./monokai.less";
+@import "./neo.less";
+@import "./codemirror.less";
+
+.scrolling {
+  overflow-y: scroll;
+  max-height: 30%;
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
+.cobalt-topbar {
+  .results-top;
+  .cm-s-cobalt.CodeMirror;
+}
+
+.neo-topbar {
+  .results-top;
+  .cm-s-neo.CodeMirror;
+}
+
+.monokai-topbar {
+  .results-top;
+  .cm-s-monokai.CodeMirror;
+}
+
+.default-topbar {
+  .results-top;
+  color: black;
+  background-color: white;
+}
+
+.view-only {
+  font-size: 10;
+}
+
+.results-list {
+  padding-left: 5;
+  list-style-type: none;
+  margin-top: 0px;
+  background: #333;
+  color: #fff;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.codemirror-text{
+  max-height: 70%;
+}
+
+.error-title {
+  color: red;
+}
+
+.white-space {
+    flex-grow: 1;
+}
+
+.error-detail {
+  color: gray;
+  font-size: 10;
+  cursor: hand;
+}
+
+.error-message {
+  color: gray;
+  font-size: 13;
+}
+
+.tql-column {
+  cursor: default;
+  margin: 0px -6px;
+}
+
+.code-section {
+  position: relative;
+  height: calc(~"100% - 24px");
+}
+
+//Placeholder styling for code-mirror, possibly move to differnt fiel
+.CodeMirror-empty.CodeMirror-focused { outline: none; }
+.CodeMirror pre.CodeMirror-placeholder { color: #999; }

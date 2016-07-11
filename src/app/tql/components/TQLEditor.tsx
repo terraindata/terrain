@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./TQL.less');
+require('./TQLEditor.less');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
@@ -54,26 +54,26 @@ import Switch from './../../common/components/Switch.tsx';
 import TQLConverter from '../TQLConverter.tsx';
 import BuilderActions from './../../builder/data/BuilderActions.tsx';
 import * as _ from 'underscore';
+import Classs from './../../common/components/Classs.tsx';
+import Ajax from "./../../util/Ajax.tsx";
 
-//React Node Modules
-var Button = require('react-button');
-
-//Code mirror
+//Node Modules
 var CodeMirror = require('./Codemirror.js');
 
 //Style sheets and addons for code-mirror
-import './codemirror.css';
-import './monokai.css';
-import './cobalt.css';
-import './neo.css';
+require('./tql.js');
+import './codemirror.less';
+import './monokai.less';
+import './cobalt.less';
+import './neo.less';
 import 'codemirror/addon/edit/matchbrackets.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/fold/foldgutter.css';
 
-//Searching
+//Searching for code-mirror
 import 'codemirror/addon/dialog/dialog.js';
-import './dialog.css';
+import './dialog.less';
 import 'codemirror/addon/search/searchcursor.js';
 import 'codemirror/addon/search/search.js';
 import 'codemirror/addon/scroll/annotatescrollbar.js';
@@ -81,15 +81,7 @@ import 'codemirror/addon/search/matchesonscrollbar.js';
 import 'codemirror/addon/search/jump-to-line.js';
 import 'codemirror/addon/search/matchesonscrollbar.css';
 
-//mode
-require('./tql.js');
-
-//Components
-import Classs from './../../common/components/Classs.tsx';
-import Ajax from "./../../util/Ajax.tsx";
-
-interface Props
-{
+interface Props {
   params?: any;
   history?: any;
   algorithm?: any;
@@ -97,49 +89,54 @@ interface Props
 
 class TQL extends Classs<Props>
 {
-   state:
-   {
-      tql: string;
-      code: string;
-      theme: string;
-      highlightedLine: number;
-      theme_index: number;
-   } = {
-      tql: null,
-      code: TQLConverter.toTQL(this.props.algorithm.cards),
-      theme: localStorage.getItem('theme') || 'default',
+  state:
+  {
+    tql: string;
+    code: string;
+    theme: string;
+    highlightedLine: number;
+    theme_index: number;
+  } = {
+    tql: null,
+    code: TQLConverter.toTQL(this.props.algorithm.cards),
+    theme: localStorage.getItem('theme') || 'default',
     highlightedLine: null,
     theme_index: 0,
   };
 
-  updateCode(newCode) 
-  {
+  constructor(props: Props) {
+    super(props);
+    this.executeCode = _.debounce(this.executeCode, 1000);
+  }
+
+  updateCode(newCode) {
     this.checkForFolding(newCode);
     this.undoError();
     this.setState({
       code: newCode,
       highlightedLine: null
     });
+    this.executeCode();
   }
 
-  checkForFolding(newCode) 
-  {
+  checkForFolding(newCode) {
     var x: any = this.refs['cm'];
-    if (x) 
-    {
+    if (x) {
       x.findCodeToFold();
     }
   }
 
-	executeCode()
-	{
+  executeCode() {
+    var code = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm.cards)
     this.setState({
-      tql: this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm.cards)
+      tql: code
     });
-	}
+    this.updateVariant({ 
+      tql: code
+    })
+  }
 
-  changeThemeDefault()
-  {  
+  changeThemeDefault() {
     localStorage.setItem('theme', 'default');
     this.setState({
       theme: 'default',
@@ -147,17 +144,15 @@ class TQL extends Classs<Props>
     });
   }
 
-  changeThemeNeo() 
-  {
+  changeThemeNeo() {
     localStorage.setItem('theme', 'neo');
     this.setState({
-      theme: 'neo', 
+      theme: 'neo',
       theme_index: 1
     });
   }
 
-  changeThemeCobalt() 
-  {
+  changeThemeCobalt() {
     localStorage.setItem('theme', 'cobalt');
     this.setState({
       theme: 'cobalt',
@@ -165,8 +160,7 @@ class TQL extends Classs<Props>
     });
   }
 
-  changeThemeMonokai() 
-  {
+  changeThemeMonokai() {
     localStorage.setItem('theme', 'monokai');
     this.setState({
       theme: 'monokai',
@@ -174,134 +168,174 @@ class TQL extends Classs<Props>
     });
   }
 
-  getMenuOptions(): MenuOption[]
-  {
+  getThemeIndex() {
+    if (this.state.theme === 'default') {
+      return 0;
+    }
+    else if (this.state.theme === 'neo') {
+      return 1;
+    }
+    else if (this.state.theme === 'cobalt') {
+      return 2;
+    }
+    else {
+      return 3;
+    }
+  }
+
+  getMenuOptions(): MenuOption[] {
     var options: MenuOption[] =
-    [
-      {
-        text: 'Default',
-        onClick: this.changeThemeDefault,
-      },
-      {
-        text: 'Neo',
-        onClick: this.changeThemeNeo,
-      },
-      {
-        text: 'Cobalt',
-        onClick: this.changeThemeCobalt,
-      },
-      {
-        text: 'Monokai',
-        onClick: this.changeThemeMonokai,
-      },
-    ];
-    options[this.state.theme_index].disabled = true;
+      [
+        {
+          text: 'Default',
+          onClick: this.changeThemeDefault,
+        },
+        {
+          text: 'Neo',
+          onClick: this.changeThemeNeo,
+        },
+        {
+          text: 'Cobalt',
+          onClick: this.changeThemeCobalt,
+        },
+        {
+          text: 'Monokai',
+          onClick: this.changeThemeMonokai,
+        },
+      ];
+    options[this.getThemeIndex()].disabled = true;
     return options;
   }
 
-  highlightError(lineNumber: number) 
-  {
+  highlightError(lineNumber: number) {
     this.state.highlightedLine = lineNumber - 1; //-1 because they should be 0-indexed
     //This is a workaround for the missing property syntax error
     var x: any = this.refs['cm'];
-    if(x)
-    {
+    if (x) {
       x.updateHighlightedLine(this.state.highlightedLine);
     }
   }
 
-  undoError() 
-  {
-    if(this.state.highlightedLine != null) 
-    {
+  undoError() {
+    if (this.state.highlightedLine != null) {
       var x: any = this.refs['cm'];
-      if(x) 
-      {
+      if (x) {
         x.undoHighlightedLine(this.state.highlightedLine);
       }
     }
   }
 
-  toggleMode()
+  updateVariant(newProperties)
   {
     BuilderActions.setVariant
       (this.props.algorithm.id, _.extend
-        ( {}, this.props.algorithm, 
-          { 
-            mode: 
-              this.props.algorithm.mode === 'tql' ? 'cards' : 'tql',
-          } 
-        ) 
-      );
-      
-      //update when have tql to cards conversion capabilities 
-      this.setState({
-        code: TQLConverter.toTQL(this.props.algorithm.cards),
-      })
-  }
-  renderTopbar()
-  {
-       return (
-        <div className='results-top'>
-          <Button onClick={this.executeCode} className='execute-button'>
-            Execute code
-          </Button>
-          <div className='white-space' /> 
-          <Switch
-            first='Cards'
-            second='Tql'
-            onChange={this.toggleMode}
-            selected={this.props.algorithm.mode === 'tql' ? 2 : 1}
-            medium={true}
-          />
-          <Menu options={this.getMenuOptions()} small={true}/>
-        </div>
-       );
+        ({}, this.props.algorithm, newProperties));
   }
 
-  renderTqlEditor()
-  {
-    var options = 
+  componentDidUpdate(prevProps, prevState) 
+  {
+    //When they switch to tql mode, execute code
+    if(prevProps.algorithm.mode !== 'tql' && this.props.algorithm.mode === 'tql') 
+    {
+      this.executeCode();
+    }
+  }
+
+  toggleMode() {
+    if (this.state.code !== TQLConverter.toTQL(this.props.algorithm.cards) 
+        && !confirm("Warning: TQL added to the editor will be lost"))
     {
-      readOnly: (this.props.algorithm.mode === 'tql' ? false : "nocursor"),
-      lineNumbers: true,
-      mode: 'tql',
-      extraKeys: { 'Ctrl-F': 'findPersistent'},
-      lineWrapping: true,
-      theme: this.state.theme,
-      matchBrackets: true,
-      autoCloseBrackets: true,
-      foldGutter: true,
-      gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-    };
-    var value = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm.cards); 
-    return <CodeMirror 
-      highlightedLine={this.state.highlightedLine}  
-      onChange={this.updateCode} 
-      ref="cm" 
-      options={options} 
+      return;
+    }
+    this.updateVariant({
+      mode: this.props.algorithm.mode === 'tql' ? 'cards' : 'tql',
+    });
+
+    //update when have tql to cards conversion capabilities 
+    this.setState({
+      code: TQLConverter.toTQL(this.props.algorithm.cards),
+    });
+  }
+
+  getTopbarClass()
+  {
+    if (this.state.theme === 'default') {
+      return 'default-topbar';
+    }
+    else if (this.state.theme === 'neo') {
+      return 'neo-topbar';
+    }
+    else if (this.state.theme === 'cobalt') {
+      return 'cobalt-topbar';
+    }
+    else {
+      return 'monokai-topbar';
+    }
+  }
+
+  renderTopbar() {
+    var currTheme = this.getTopbarClass();
+    return (
+      <div className={currTheme}>
+        <Switch
+          first='Cards'
+          second='TQL'
+          onChange={this.toggleMode}
+          selected={this.props.algorithm.mode === 'tql' ? 2 : 1}
+          medium={true}
+          />
+        <div className = 'view-only'> 
+          {  
+            this.props.algorithm.mode === 'tql' ? null : "View-only"
+          }
+        </div> 
+        <div className='white-space' />
+        <Menu options={this.getMenuOptions() } small={true}/>
+      </div>
+    );
+  }
+
+  renderTqlEditor() {
+    var options =
+      {
+        readOnly: (this.props.algorithm.mode === 'tql' ? false : true),
+        lineNumbers: true,
+        mode: 'tql',
+        extraKeys: { 'Ctrl-F': 'findPersistent' },
+        lineWrapping: true,
+        theme: this.state.theme,
+        matchBrackets: true,
+        autoCloseBrackets: true,
+        foldGutter: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+      };
+    var value = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm.cards);
+    return <CodeMirror
+      highlightedLine={this.state.highlightedLine}
+      onChange={this.updateCode}
+      ref="cm"
+      options={options}
       className='codemirror-text'
       value={value}
-     /> 
+      />
   }
 
-  renderResults()
-  {
-    return <ResultsView 
-              tql={this.state.tql} 
-              onError={this.highlightError} 
-              noError={this.undoError}
-           />
+  renderResults() {
+    return <ResultsView
+      tql={this.state.tql}
+      onError={this.highlightError}
+      />
   }
 
-  render()
-  { 
- 		return (
- 			<div className='tql-column'>
+  render() {
+    return (
+      <div className='tql-column'>
         { this.renderTopbar() }
-        { this.renderTqlEditor() }
-        { this.renderResults() }
-    	</div>
+        <div className='code-section'> 
+          { this.renderTqlEditor() }
+          { this.renderResults() }
+        </div>
+      </div>
     );
   }
 }

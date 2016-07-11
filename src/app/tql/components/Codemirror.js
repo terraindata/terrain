@@ -84,7 +84,7 @@ var CodeMirror = React.createClass({
 		this.codeMirror.on('focus', this.focusChanged.bind(this, true));
 		this.codeMirror.on('blur', this.focusChanged.bind(this, false));
 		this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
-		this.codeMirror.setSize("100%", "85%");
+		this.codeMirror.setSize("100%", "70%");
 	},
 	componentWillUnmount: function componentWillUnmount() 
 	{

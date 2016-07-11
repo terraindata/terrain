@@ -55,51 +55,31 @@ interface Props
 {
   tql: string;
   onError: (lineNumber: number) => void;
-  noError: () => void;
 }
 
 class ResultsView extends Classs<Props>
 {
   xhr = null;
-  allXhr = null;
   
   state: {
     results: any[];
-    resultsWithAllFields: any[];
-    resultType: string;
     error: any;
-    resultsPages: number;
-    loadedResultsPages: number;
-    onResultsLoaded: (unchanged?: boolean) => void;
     querying: boolean;
     showErrorMessage: boolean;
   } = {
     results: null,
-    resultsWithAllFields: null,
     error: null,
-    resultType: null,
-    resultsPages: 1,
-    loadedResultsPages: 1,
-    onResultsLoaded: null,
     querying: false,
     showErrorMessage: false,
   };
 
   //If the component updates and the tql command has been changed, then query results
-  componentDidUpdate(prevProps, prevState) 
+  componentWillReceiveProps(nextProps) 
   {
-    if(prevProps.tql != this.props.tql) 
+    if(nextProps.tql !== this.props.tql) 
     {
-      this.queryResults();
+      this.queryResults(nextProps.tql);
     } 
-  }
-
-  componentWillUnmount()
-  {
-    this.xhr && this.xhr.abort();
-    this.allXhr && this.allXhr.abort();
-    this.xhr = false;
-    this.allXhr = false;
   }
     
   resultsFodderRange = _.range(0, 25);
@@ -112,24 +92,13 @@ class ResultsView extends Classs<Props>
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if(_.isEqual(this.props, nextProps) && _.isEqual(this.state, nextState)) 
-    {
-      return false;
-    }
-    else 
-    {
-      return true;
-    }
+    return !(_.isEqual(this.props, nextProps) && _.isEqual(this.state, nextState));
   }
 
   renderResults()
   {
     if(this.state.querying)
     {
-      if(this.state.error) 
-      {
-        this.props.noError();
-      }
       return <div>Querying results...</div>
     } 
 
@@ -171,20 +140,6 @@ class ResultsView extends Classs<Props>
     {
       return <div>Enter a TQL query above.</div>
     }
-    if(this.state.resultType !== 'rel')
-    {
-    var i = 0;
-      return(
-      <div>
-        <ul className="results-list">
-          {this.state.results.map(function(result, i) {
-            i++;
-            return <li key={i}>{JSON.stringify(result) }</li>;
-          }) }
-        </ul>
-      </div>
-      );
-    }
     
     if(!this.state.results.length)
     {
@@ -203,17 +158,8 @@ class ResultsView extends Classs<Props>
       );
   }
   
-  handleAllFieldsResponse(response)
-  {
-    this.handleResultsChange(response, true);
-  }
-  
   handleResultsChange(response, isAllFields?: boolean)
   {
-    let xhrKey = isAllFields ? 'allXhr' : 'xhr';
-    if(!this[xhrKey]) return;
-    this[xhrKey] = null;
-    
     var result;
     try {
       var result = JSON.parse(response).result;
@@ -233,7 +179,6 @@ class ResultsView extends Classs<Props>
           error: "Error on line " + result.line+ ": " + result.error,
           querying: false,
           results: null,
-          resultType: null,
         });
       }
       else if(result.raw_result)
@@ -242,34 +187,16 @@ class ResultsView extends Classs<Props>
           error: "Error with query: " + result.raw_result,
           querying: false,
           results: null,
-          resultType: null,
         }); 
       }
       else
-      {
-        if(isAllFields)
-        {
-          this.setState({
-            resultsWithAllFields: result.value,
-          });
-        } else {
-          if(this.state.onResultsLoaded && this.state.resultsPages !== this.state.loadedResultsPages)
-          {
-            this.setState({
-              loadedResultsPages: this.state.resultsPages,
-            });
-            console.log(result.value.length, this.state.results.length);
-            this.state.onResultsLoaded(result.value.length === this.state.results.length);
-          }
-          
+      { 
           this.setState({
             results: result.value,
-            resultType: result.type,
             querying: false,
             error: false,
           });
         }
-      }
     }
     else
     {
@@ -277,7 +204,6 @@ class ResultsView extends Classs<Props>
         error: "No response was returned from the server.",
         xhr: null,
         querying: false,
-        // TODO add error
       });
     }
   }
@@ -289,20 +215,14 @@ class ResultsView extends Classs<Props>
     })
   }
   
-  queryResults(pages?: number)
+  queryResults(tql)
   {
-    if(!pages)
-    {
-      pages = this.state.resultsPages;
-    }
-    var tql = this.props.tql;
     if(tql) 
     {
       this.setState({
         querying: true,
       });
       this.xhr = Ajax.query(tql, this.handleResultsChange, this.handleError);
-      this.allXhr = Ajax.query(tql, this.handleAllFieldsResponse, this.handleError);
     }
   }
   

@@ -70,7 +70,6 @@ import AccountDropdown from "./common/components/AccountDropdown.tsx";
 import Login from "./auth/components/Login.tsx";
 import InfoArea from "./common/components/InfoArea.tsx";
 import Placeholder from "./common/components/Placeholder.tsx";
-import TQL from "./tql/components/TQL.tsx";
 var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
 import { Router, Route, IndexRoute } from 'react-router';
 import { createHistory } from 'history';
@@ -110,11 +109,6 @@ var links =
     text: 'Builder',
     route: '/builder',
   },
-  // {
-  //   icon: <TQLIcon />,
-  //   text: 'TQL',
-  //   route: '/tql',
-  // },
 ];
 
 var App = React.createClass({
@@ -252,7 +246,6 @@ var router = (
       <Route path="/users/:username" component={Profile} />
       
       <Route path="/reporting" component={Placeholder} />
-      <Route path="/tql" component={TQL} />
     </Route>
   </Router>
 );
