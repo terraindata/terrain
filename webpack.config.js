@@ -75,7 +75,7 @@ module.exports = {
     },
     plugins: [
       new webpack.DefinePlugin({
-        'SERVER_URL': "'//localhost:40080'",
+        'SERVER_URL': "'//pa-terraformer01.terrain.int:40080'",
         'DEV': "true"
       })
     ]
