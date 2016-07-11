@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./TQL.less');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
@@ -54,9 +55,7 @@ import TQLConverter from '../TQLConverter.tsx';
 import BuilderActions from './../../builder/data/BuilderActions.tsx';
 import * as _ from 'underscore';
 
-
 //React Node Modules
-var ReactGridLayout = require('react-grid-layout');
 var Button = require('react-button');
 
 //Code mirror
@@ -123,17 +122,19 @@ class TQL extends Classs<Props>
     });
   }
 
-  checkForFolding(newCode) {
+  checkForFolding(newCode) 
+  {
     var x: any = this.refs['cm'];
-    if (x) {
-    x.findCodeToFold();
+    if (x) 
+    {
+      x.findCodeToFold();
     }
   }
 
 	executeCode()
 	{
     this.setState({
-      tql: this.state.code
+      tql: this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm.cards)
     });
 	}
 
@@ -245,12 +246,13 @@ class TQL extends Classs<Props>
           <Button onClick={this.executeCode} className='execute-button'>
             Execute code
           </Button>
+          <div className='white-space' /> 
           <Switch
             first='Cards'
             second='Tql'
             onChange={this.toggleMode}
             selected={this.props.algorithm.mode === 'tql' ? 2 : 1}
-            small={true}
+            medium={true}
           />
           <Menu options={this.getMenuOptions()} small={true}/>
         </div>
@@ -259,8 +261,9 @@ class TQL extends Classs<Props>
 
   renderTqlEditor()
   {
-    var options = {
-      readOnly: !(this.props.algorithm.mode === 'tql'),
+    var options = 
+    {
+      readOnly: (this.props.algorithm.mode === 'tql' ? false : "nocursor"),
       lineNumbers: true,
       mode: 'tql',
       extraKeys: { 'Ctrl-F': 'findPersistent'},
@@ -294,7 +297,7 @@ class TQL extends Classs<Props>
   render()
   { 
  		return (
- 			<div>
+ 			<div className='tql-column'>
         { this.renderTopbar() }
         { this.renderTqlEditor() }
         { this.renderResults() }

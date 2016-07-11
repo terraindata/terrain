@@ -135,7 +135,6 @@ class ResultsView extends Classs<Props>
 
     if(this.state.error)
     {
-      console.log(this.state.error);
       if (this.state.error === 'No response was returned from the server.')
       {
         return (
@@ -170,18 +169,20 @@ class ResultsView extends Classs<Props>
 
     if(!this.state.results) 
     {
-      return <div>Enter a TQL query on the left.</div>
+      return <div>Enter a TQL query above.</div>
     }
     if(this.state.resultType !== 'rel')
     {
+    var i = 0;
       return(
-        <div>
-        <ul className="results-list"> 
-          {this.state.results.map(function(result) {
-            return <li>{JSON.stringify(result)}</li>;
-          })}
+      <div>
+        <ul className="results-list">
+          {this.state.results.map(function(result, i) {
+            i++;
+            return <li key={i}>{JSON.stringify(result) }</li>;
+          }) }
         </ul>
-        </div>
+      </div>
       );
     }
     
@@ -189,11 +190,13 @@ class ResultsView extends Classs<Props>
     {
       return <div>"There are no results for your query."</div>;
     }
+    var i = 0;
      return(
         <div>
           <ul className="results-list">
-          {this.state.results.map(function(result) {
-            return <li>{JSON.stringify(result)}</li>;
+          {this.state.results.map(function(result, i) {
+           i++;
+           return <li key={i}>{JSON.stringify(result)}</li>;
           })}
         </ul>
         </div>

@@ -60,7 +60,6 @@ var CodeMirror = React.createClass({
 		value: React.PropTypes.string,
 		className: React.PropTypes.any,
 		codeMirrorInstance: React.PropTypes.object,
-		highlightedLine: React.PropTypes.number,
 	},
 	foldClass: {
 		open: "CodeMirror-foldgutter-open",
@@ -89,7 +88,6 @@ var CodeMirror = React.createClass({
 	},
 	componentWillUnmount: function componentWillUnmount() 
 	{
-		// is there a lighter-weight way to remove the cm instance?
 		if (this.codeMirror) 
 		{
 			this.codeMirror.toTextArea();
@@ -111,6 +109,7 @@ var CodeMirror = React.createClass({
 	},
 	addOpenBrace: function addOpenBrace(i, ch, arr) 
 	{
+		//Increment the counters for all unmatched braces
 		for(var entry = 0; entry < arr.length; entry++) 
 			{
 			if(!arr[entry].closingPos)
@@ -119,6 +118,7 @@ var CodeMirror = React.createClass({
 			}
 		}
 		//Note: ch is + 1 because the opening ( should not be included in the collapsable range
+		//Add a new entry for the open brace found at line i, position ch
 		var pos = {
 			openingPos: this.getCodeMirrorInstance().Pos(i, ch+1), 
 			closingPos: null,
@@ -129,6 +129,8 @@ var CodeMirror = React.createClass({
 	},
 	addCloseBrace: function addCloseBrace(i, ch, arr) 
 	{
+		//Decrement the counters for all unmatched braces 
+		//The counter at 0 is the one that the added closing brace belongs with
 		for(var entry = 0; entry < arr.length; entry++) 
 		{
 			if(!arr[entry].closingPos)
@@ -146,7 +148,7 @@ var CodeMirror = React.createClass({
 	{
 		var paranthesesPositions = [];
 		var bracketPositions 	 = [];
-		//Find positions of sets of ()
+		//Find positions of sets of () and {}
 		for(var i = 0; i < this.codeMirror.lineCount(); i++) 
 		{
 			var line = this.codeMirror.getLine(i);
@@ -178,9 +180,7 @@ var CodeMirror = React.createClass({
 		var self = this;
 		var codeMirrorInstance = this.getCodeMirrorInstance();
 		this.codeMirror.clearGutter('CodeMirror-foldgutter');
-		//Posible: mark all text with __isFold: false before this loop
-		//Also want to check if there are multiple foldable start points on the same line - which one should fold?
-
+		
 		for(var i = 0; i < codeFoldingPositions.length; i++) 
 		{
 			let openingPos = codeFoldingPositions[i].openingPos;
@@ -194,6 +194,7 @@ var CodeMirror = React.createClass({
 
 				codeMirrorInstance.on(gutterWidget, "mousedown", function(e) {
 					codeMirrorInstance.e_preventDefault(e);
+					//if it's folded, unfold (by removing the mark __isFold)
 		      		if(gutterWidget.className === self.foldClass.folded)
 		      		{
 		      			var marks = self.codeMirror.findMarksAt(openingPos);
@@ -205,7 +206,9 @@ var CodeMirror = React.createClass({
 		      				}
 		      			}
 		      			gutterWidget.className = self.foldClass.open;
-		      		} else 
+		      		} 
+		      		//if the section is open, collapse it
+		      		else 
 		      		{
 		      			gutterWidget.className = self.foldClass.folded;
 		      			self.collapseCode(openingPos, closingPos, gutterWidget);
@@ -216,6 +219,7 @@ var CodeMirror = React.createClass({
    			}
    		}
 	},
+	//Collapses code and replaces the code with a widget that can re-open the code segment
 	collapseCode: function collapseCode(openingPos, closingPos, gutterWidget)
 	{					
 		var codeMirrorInstance = this.getCodeMirrorInstance();
@@ -233,6 +237,7 @@ var CodeMirror = React.createClass({
       		__isFold: true
     	});
 	},
+	//Makes the codemirror widget 
 	makeWidget: function makeWidget(text) 
 	{
 		var widget = document.createElement("span");
@@ -241,8 +246,8 @@ var CodeMirror = React.createClass({
 		widget.className = "CodeMirror-foldmarker";
 		return widget;
   	},
-  	//Create a gutter widget - check to see if the current section of code is already folded
-  	//to decide what class of widget to make
+  	//Create a gutter widget
+  	//Check the current gutter widget to decide which widget to make
   	makeGutterWidget: function makeGutterWidget(openingPos, closingPos)
   	{
   		var classname = this.foldClass.open;
@@ -256,7 +261,6 @@ var CodeMirror = React.createClass({
   					classname = this.foldClass.folded;
   				}
   			}
-      		
   		}
   		var widget = document.createElement("span");
   		widget.className = classname;

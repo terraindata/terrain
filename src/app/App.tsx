@@ -110,11 +110,11 @@ var links =
     text: 'Builder',
     route: '/builder',
   },
-  {
-    icon: <TQLIcon />,
-    text: 'TQL',
-    route: '/tql',
-  },
+  // {
+  //   icon: <TQLIcon />,
+  //   text: 'TQL',
+  //   route: '/tql',
+  // },
 ];
 
 var App = React.createClass({

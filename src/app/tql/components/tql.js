@@ -179,7 +179,6 @@ CodeMirror.defineMode("tql", function(config, parserConfig)
       {
         if (stream.eat("&"))
         {
-            console.log("Worked");
             var word = stream.current(), known = keywords.propertyIsEnumerable(word) && keywords[word];
             return (known && state.lastType != ".") ? ret(known.type, known.style, word) :
                      ret("variable", "variable", word);
@@ -189,7 +188,6 @@ CodeMirror.defineMode("tql", function(config, parserConfig)
       {
         if (stream.eat("|"))
         {
-            console.log("Worked");
             var word = stream.current(), known = keywords.propertyIsEnumerable(word) && keywords[word];
             return (known && state.lastType != ".") ? ret(known.type, known.style, word) :
                      ret("variable", "variable", word);
