@@ -141,9 +141,11 @@ class TQL extends Classs<Props>
     this.setState({
       tql: code
     });
-    this.updateVariant({
-      tql: code
-    });
+    BuilderActions.setVariantField
+      (this.props.algorithm.id,
+      'tql',
+      code
+      );
   }
 
   changeThemeDefault() {
@@ -233,12 +235,6 @@ class TQL extends Classs<Props>
     }
   }
 
-  updateVariant(newProperties) {
-    BuilderActions.setVariant
-      (this.props.algorithm.id, _.extend
-        ({}, this.props.algorithm, newProperties));
-  }
-
   componentDidUpdate(prevProps, prevState)   {
         //When they switch to tql mode, execute code
         if (prevProps.algorithm.mode !== 'tql' && this.props.algorithm.mode === 'tql')     {
@@ -251,13 +247,17 @@ class TQL extends Classs<Props>
     }
 
   toggleMode() {
-    if (this.state.code !== TQLConverter.toTQL(this.props.algorithm.cards)
-      && !confirm("Warning: TQL added to the editor will be lost")) {
+    if (this.props.algorithm.mode === 'tql' 
+      && this.state.code !== TQLConverter.toTQL(this.props.algorithm.cards)
+      && !confirm("Warning: TQL added to the editor will be lost")) 
+    {
       return;
     }
-    this.updateVariant({
-      mode: this.props.algorithm.mode === 'tql' ? 'cards' : 'tql',
-    });
+    BuilderActions.setVariantField
+      (this.props.algorithm.id, 
+        'mode', 
+        this.props.algorithm.mode === 'tql' ? 'cards' : 'tql'
+      );
 
     //update when have tql to cards conversion capabilities 
     this.setState({
