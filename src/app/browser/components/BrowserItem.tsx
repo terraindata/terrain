@@ -214,6 +214,10 @@ class BrowserItem extends Classs<Props>
   {
     event.preventDefault();
     event.stopPropagation();
+    if(this.state.nameEditing)
+    {
+      this.props.onNameChange(this.props.id, this.refs['input']['value']);
+    }
     this.props.onDoubleClick && this.props.onDoubleClick(this.props.id);
   }
   
