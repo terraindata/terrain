@@ -85,5 +85,4 @@ VariantReducer[ActionTypes.setVariantField] =
       action.payload.value
     );
   
-
 export default VariantReducer;

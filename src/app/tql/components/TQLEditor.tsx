@@ -106,20 +106,24 @@ class TQL extends Classs<Props>
     theme_index: 0,
   };
 
-  constructor(props: Props) {
+  constructor(props: Props) 
+  {
     super(props);
     this.executeCode = _.debounce(this.executeCode, 1000);
   }
 
   //This function should be here, but whenever executeCode is called, the cards/tql
   //are not longer in sync
-  componentDidMount() {
-    if (this.props.algorithm.mode !== 'tql') {
+  componentDidMount() 
+  {
+    if (this.props.algorithm.mode !== 'tql') 
+    {
       this.executeCode();
     }
   }
 
-  updateCode(newCode) {
+  updateCode(newCode) 
+  {
     this.checkForFolding(newCode);
     this.undoError();
     this.setState({
@@ -129,14 +133,17 @@ class TQL extends Classs<Props>
     this.executeCode();
   }
 
-  checkForFolding(newCode) {
+  checkForFolding(newCode) 
+  {
     var x: any = this.refs['cm'];
-    if (x) {
+    if (x) 
+    {
       x.findCodeToFold();
     }
   }
 
-  executeCode() {
+  executeCode() 
+  {
     var code = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm.cards)
     this.setState({
       tql: code
@@ -148,7 +155,8 @@ class TQL extends Classs<Props>
       );
   }
 
-  changeThemeDefault() {
+  changeThemeDefault() 
+  {
     localStorage.setItem('theme', 'default');
     this.setState({
       theme: 'default',
@@ -156,7 +164,8 @@ class TQL extends Classs<Props>
     });
   }
 
-  changeThemeNeo() {
+  changeThemeNeo() 
+  {
     localStorage.setItem('theme', 'neo');
     this.setState({
       theme: 'neo',
@@ -164,7 +173,8 @@ class TQL extends Classs<Props>
     });
   }
 
-  changeThemeCobalt() {
+  changeThemeCobalt() 
+  {
     localStorage.setItem('theme', 'cobalt');
     this.setState({
       theme: 'cobalt',
@@ -172,7 +182,8 @@ class TQL extends Classs<Props>
     });
   }
 
-  changeThemeMonokai() {
+  changeThemeMonokai() 
+  {
     localStorage.setItem('theme', 'monokai');
     this.setState({
       theme: 'monokai',
@@ -180,8 +191,10 @@ class TQL extends Classs<Props>
     });
   }
 
-  getThemeIndex() {
-    switch (this.state.theme) {
+  getThemeIndex() 
+  {
+    switch (this.state.theme) 
+    {
       case 'monokai':
         return 3;
       case 'cobalt':
@@ -193,7 +206,8 @@ class TQL extends Classs<Props>
     }
   }
 
-  getMenuOptions(): MenuOption[] {
+  getMenuOptions(): MenuOption[] 
+  {
     var options: MenuOption[] =
       [
         {
@@ -217,17 +231,21 @@ class TQL extends Classs<Props>
     return options;
   }
 
-  highlightError(lineNumber: number) {
+  highlightError(lineNumber: number) 
+  {
     this.state.highlightedLine = lineNumber - 1; //-1 because they should be 0-indexed
     //This is a workaround for the missing property syntax error
     var x: any = this.refs['cm'];
-    if (x) {
+    if (x) 
+    {
       x.updateHighlightedLine(this.state.highlightedLine);
     }
   }
 
-  undoError() {
-    if (this.state.highlightedLine != null) {
+  undoError() 
+  {
+    if (this.state.highlightedLine != null) 
+    {
       var x: any = this.refs['cm'];
       if (x) {
         x.undoHighlightedLine(this.state.highlightedLine);
@@ -235,18 +253,22 @@ class TQL extends Classs<Props>
     }
   }
 
-  componentDidUpdate(prevProps, prevState)   {
+  componentDidUpdate(prevProps, prevState)   
+  {
         //When they switch to tql mode, execute code
-        if (prevProps.algorithm.mode !== 'tql' && this.props.algorithm.mode === 'tql')     {
+     if (prevProps.algorithm.mode !== 'tql' && this.props.algorithm.mode === 'tql')     
+     {
             this.executeCode();
-        }
-    else if (this.props.algorithm.mode !== 'tql' &&
-      !(_.isEqual(this.props.algorithm.cards, prevProps.algorithm.cards))) {
+     }
+     else if (this.props.algorithm.mode !== 'tql' &&
+      !(_.isEqual(this.props.algorithm.cards, prevProps.algorithm.cards))) 
+     {
       this.executeCode();
     }
-    }
+  }
 
-  toggleMode() {
+  toggleMode() 
+  {
     if (this.props.algorithm.mode === 'tql' 
       && this.state.code !== TQLConverter.toTQL(this.props.algorithm.cards)
       && !confirm("Warning: TQL added to the editor will be lost")) 
@@ -265,8 +287,10 @@ class TQL extends Classs<Props>
     });
   }
 
-  getTopbarClass() {
-    switch (this.state.theme) {
+  getTopbarClass() 
+  {
+    switch (this.state.theme) 
+    {
       case 'monokai':
         return 'monokai-topbar';
       case 'cobalt':
@@ -278,7 +302,8 @@ class TQL extends Classs<Props>
     }
   }
 
-  renderTopbar() {
+  renderTopbar() 
+  {
     var currTheme = this.getTopbarClass();
     return (
       <div className={currTheme}>
@@ -300,7 +325,8 @@ class TQL extends Classs<Props>
     );
   }
 
-  renderTqlEditor() {
+  renderTqlEditor() 
+  {
     var options =
       {
         readOnly: (this.props.algorithm.mode === 'tql' ? false : true),
@@ -325,7 +351,8 @@ class TQL extends Classs<Props>
       />
   }
 
-  renderResults() {
+  renderResults() 
+  {
     return <ResultsView
       tql={this.state.tql}
       onError={this.highlightError}
@@ -334,7 +361,8 @@ class TQL extends Classs<Props>
       />
   }
 
-  render() {
+  render() 
+  {
     return (
       <div className='tql-column'>
         { this.renderTopbar() }
