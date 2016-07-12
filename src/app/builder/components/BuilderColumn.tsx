@@ -211,7 +211,8 @@ var BuilderColumn = React.createClass<any, any>(
       case COLUMNS.TQL:
         return <TQLEditor
           algorithm={algorithm}
-          
+          onLoadStart={this.handleLoadStart}
+          onLoadEnd={this.handleLoadEnd}
         />;
         
     }

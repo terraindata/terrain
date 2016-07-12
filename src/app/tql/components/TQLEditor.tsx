@@ -85,6 +85,8 @@ interface Props {
   params?: any;
   history?: any;
   algorithm?: any;
+  onLoadStart: () => void;
+  onLoadEnd: () => void;
 }
 
 class TQL extends Classs<Props>
@@ -327,6 +329,8 @@ class TQL extends Classs<Props>
     return <ResultsView
       tql={this.state.tql}
       onError={this.highlightError}
+      onLoadStart={this.props.onLoadStart}
+      onLoadEnd={this.props.onLoadEnd}
       />
   }
 

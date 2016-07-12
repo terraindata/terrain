@@ -55,6 +55,8 @@ interface Props
 {
   tql: string;
   onError: (lineNumber: number) => void;
+  onLoadStart: () => void;
+  onLoadEnd: () => void;
 }
 
 class ResultsView extends Classs<Props>
@@ -170,7 +172,8 @@ class ResultsView extends Classs<Props>
       });
       return; 
     }
-    
+
+    this.props.onLoadEnd && this.props.onLoadEnd();
     if(result)
     {
       if(result.error)
@@ -219,6 +222,7 @@ class ResultsView extends Classs<Props>
   {
     if(tql) 
     {
+      this.props.onLoadStart && this.props.onLoadStart();
       this.setState({
         querying: true,
       });
