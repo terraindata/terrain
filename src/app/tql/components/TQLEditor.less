@@ -1,331 +1,85 @@
-require('./TQLEditor.less');
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import ResultsView from './ResultsView.tsx';
-import Menu from './../../common/components/Menu.tsx';
-import { MenuOption } from '../../common/components/Menu.tsx';
-import Switch from './../../common/components/Switch.tsx';
-import TQLConverter from '../TQLConverter.tsx';
-import BuilderActions from './../../builder/data/BuilderActions.tsx';
-import * as _ from 'underscore';
-import Classs from './../../common/components/Classs.tsx';
-import Ajax from "./../../util/Ajax.tsx";
+@import "../../common/Common.less";
+@import "../../builder/components/results/Result.less";
+@import "./cobalt.less";
+@import "./monokai.less";
+@import "./neo.less";
+@import "./codemirror.less";
 
-//Node Modules
-var CodeMirror = require('./Codemirror.js');
-
-//Style sheets and addons for code-mirror
-require('./tql.js');
-import './codemirror.less';
-import './monokai.less';
-import './cobalt.less';
-import './neo.less';
-import 'codemirror/addon/edit/matchbrackets.js';
-import 'codemirror/addon/edit/closebrackets.js';
-import 'codemirror/addon/display/placeholder.js';
-import 'codemirror/addon/fold/foldgutter.css';
-
-//Searching for code-mirror
-import 'codemirror/addon/dialog/dialog.js';
-import './dialog.less';
-import 'codemirror/addon/search/searchcursor.js';
-import 'codemirror/addon/search/search.js';
-import 'codemirror/addon/scroll/annotatescrollbar.js';
-import 'codemirror/addon/search/matchesonscrollbar.js';
-import 'codemirror/addon/search/jump-to-line.js';
-import 'codemirror/addon/search/matchesonscrollbar.css';
-
-interface Props 
-{
-  params?: any;
-  history?: any;
-  algorithm?: any;
+.scrolling {
+  overflow-y: scroll;
+  max-height: 30%;
+  max-width: 100%;
+  word-wrap: break-word;
 }
 
-class TQL extends Classs<Props>
-{
-  state:
-  {
-    tql: string;
-    code: string;
-    theme: string;
-    highlightedLine: number;
-    theme_index: number;
-  } = {
-    tql: null,
-    code: TQLConverter.toTQL(this.props.algorithm.cards),
-    theme: localStorage.getItem('theme') || 'default',
-    highlightedLine: null,
-    theme_index: 0,
-  };
-
-  constructor(props: Props) 
-  {
-    super(props);
-    this.executeCode = _.debounce(this.executeCode, 1000);
-  }
-
-//This function should be here, but whenever executeCode is called, the cards/tql
-//are not longer in sync
-  componentDidMount()
-  {
-    if (this.props.algorithm.mode !== 'tql')
-    {
-      this.executeCode();
-    }
-  }
-
-  updateCode(newCode) 
-  {
-    this.checkForFolding(newCode);
-    this.undoError();
-    this.setState({
-      code: newCode,
-      highlightedLine: null
-    });
-    this.executeCode();
-  }
-
-  checkForFolding(newCode) 
-  {
-    var x: any = this.refs['cm'];
-    if (x) 
-    {
-      x.findCodeToFold();
-    }
-  }
-
-  executeCode() 
-  {
-    var code = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm.cards)
-    this.setState({
-      tql: code
-    });
-    this.updateVariant({
-      tql: code
-    });
-  }
-
-  changeThemeDefault() 
-  {
-    localStorage.setItem('theme', 'default');
-    this.setState({
-      theme: 'default',
-      theme_index: 0
-    });
-  }
-
-  changeThemeNeo() 
-  {
-    localStorage.setItem('theme', 'neo');
-    this.setState({
-      theme: 'neo',
-      theme_index: 1
-    });
-  }
-
-  changeThemeCobalt() 
-  {
-    localStorage.setItem('theme', 'cobalt');
-    this.setState({
-      theme: 'cobalt',
-      theme_index: 2
-    });
-  }
-
-  changeThemeMonokai() 
-  {
-    localStorage.setItem('theme', 'monokai');
-    this.setState({
-      theme: 'monokai',
-      theme_index: 3
-    });
-  }
-
-getThemeIndex()
-{
-  switch (this.state.theme) {
-    case 'monokai':
-      return 3;
-    case 'cobalt':
-      return 2;
-    case 'neo':
-      return 1;
-    default:
-      return 0;
-  }
+.cobalt-topbar {
+  .results-top;
+  .cm-s-cobalt.CodeMirror;
 }
 
-  getMenuOptions(): MenuOption[] 
-  {
-    var options: MenuOption[] =
-      [
-        {
-          text: 'Default',
-          onClick: this.changeThemeDefault,
-        },
-        {
-          text: 'Neo',
-          onClick: this.changeThemeNeo,
-        },
-        {
-          text: 'Cobalt',
-          onClick: this.changeThemeCobalt,
-        },
-        {
-          text: 'Monokai',
-          onClick: this.changeThemeMonokai,
-        },
-      ];
-    options[this.getThemeIndex()].disabled = true;
-    return options;
-  }
-
-  highlightError(lineNumber: number) 
-  {
-    this.state.highlightedLine = lineNumber - 1; //-1 because they should be 0-indexed
-    //This is a workaround for the missing property syntax error
-    var x: any = this.refs['cm'];
-    if (x) 
-    {
-      x.updateHighlightedLine(this.state.highlightedLine);
-    }
-  }
-
-  undoError() 
-  {
-    if (this.state.highlightedLine != null) 
-    {
-      var x: any = this.refs['cm'];
-      if (x) 
-      {
-        x.undoHighlightedLine(this.state.highlightedLine);
-      }
-    }
-  }
-
-  updateVariant(newProperties)
-  {
-    BuilderActions.setVariant
-      (this.props.algorithm.id, _.extend
-        ({}, this.props.algorithm, newProperties));
-  }
-
-  componentDidUpdate(prevProps, prevState) 
-  {
-    //When they switch to tql mode, execute code
-    if(prevProps.algorithm.mode !== 'tql' && this.props.algorithm.mode === 'tql') 
-    {
-      this.executeCode();
-    }
-    else if(this.props.algorithm.mode !== 'tql' && 
-      !(_.isEqual(this.props.algorithm.cards, prevProps.algorithm.cards)))
-    {
-      this.executeCode();
-    }
-  }
-
-  toggleMode() 
-  {
-    if (this.state.code !== TQLConverter.toTQL(this.props.algorithm.cards) 
-        && !confirm("Warning: TQL added to the editor will be lost"))
-    {
-      return;
-    }
-    this.updateVariant({
-      mode: this.props.algorithm.mode === 'tql' ? 'cards' : 'tql',
-    });
-
-    //update when have tql to cards conversion capabilities 
-    this.setState({
-      code: TQLConverter.toTQL(this.props.algorithm.cards),
-    });
-  }
-
-  getTopbarClass()   {
-    switch (this.state.theme)     {
-      case 'monokai':
-        return 'monokai-topbar';
-      case 'cobalt':
-        return 'cobalt-topbar';
-      case 'neo':
-        return 'neo-topbar';
-      default:
-        return 'default-topbar';
-    }
-  }
-
-  renderTopbar() 
-  {
-    var currTheme = this.getTopbarClass();
-    return (
-      <div className={currTheme}>
-        <Switch
-          first='Cards'
-          second='TQL'
-          onChange={this.toggleMode}
-          selected={this.props.algorithm.mode === 'tql' ? 2 : 1}
-          medium={true}
-          />
-        <div className = 'view-only'> 
-          {  
-            this.props.algorithm.mode === 'tql' ? null : "View-only"
-          }
-        </div> 
-        <div className='white-space' />
-        <Menu options={this.getMenuOptions() } small={true}/>
-      </div>
-    );
-  }
-
-  renderTqlEditor() 
-  {
-    var options =
-      {
-        readOnly: (this.props.algorithm.mode === 'tql' ? false : true),
-        lineNumbers: true,
-        mode: 'tql',
-        extraKeys: { 'Ctrl-F': 'findPersistent' },
-        lineWrapping: true,
-        theme: this.state.theme,
-        matchBrackets: true,
-        autoCloseBrackets: true,
-        foldGutter: true,
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-      };
-    var value = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm.cards);
-    return <CodeMirror
-      highlightedLine={this.state.highlightedLine}
-      onChange={this.updateCode}
-      ref="cm"
-      options={options}
-      className='codemirror-text'
-      value={value}
-      />
-  }
-
-  renderResults() 
-  {
-    return <ResultsView
-      tql={this.state.tql}
-      onError={this.highlightError}
-      />
-  }
-
-  render() 
-  {
-    return (
-      <div className='tql-column'>
-        { this.renderTopbar() }
-        <div className='code-section'> 
-          { this.renderTqlEditor() }
-          { this.renderResults() }
-        </div>
-      </div>
-    );
-  }
+.neo-topbar {
+  .results-top;
+  .cm-s-neo.CodeMirror;
 }
 
-export default TQL;
+.monokai-topbar {
+  .results-top;
+  .cm-s-monokai.CodeMirror;
+}
+
+.default-topbar {
+  .results-top;
+  color: black;
+  background-color: white;
+}
+
+.view-only {
+  font-size: 10;
+}
+
+.results-list {
+  padding-left: 5;
+  list-style-type: none;
+  margin-top: 0px;
+  background: #333;
+  color: #fff;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.codemirror-text{
+  max-height: 70%;
+}
+
+.error-title {
+  color: red;
+}
+
+.white-space {
+    flex-grow: 1;
+}
+
+.error-detail {
+  color: gray;
+  font-size: 10;
+  cursor: hand;
+}
+
+.error-message {
+  color: gray;
+  font-size: 13;
+}
+
+.tql-column {
+  cursor: default;
+  margin: 0px -6px;
+}
+
+.code-section {
+  position: relative;
+  height: calc(~"100% - 24px");
+}
+
+//Placeholder styling for code-mirror, possibly move to differnt fiel
+.CodeMirror-empty.CodeMirror-focused { outline: none; }
+.CodeMirror pre.CodeMirror-placeholder { color: #999; }

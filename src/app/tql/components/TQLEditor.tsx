@@ -109,6 +109,14 @@ class TQL extends Classs<Props>
     this.executeCode = _.debounce(this.executeCode, 1000);
   }
 
+  //This function should be here, but whenever executeCode is called, the cards/tql
+  //are not longer in sync
+  componentDidMount() {
+    if (this.props.algorithm.mode !== 'tql') {
+      this.executeCode();
+    }
+  }
+
   updateCode(newCode) {
     this.checkForFolding(newCode);
     this.undoError();
@@ -131,9 +139,9 @@ class TQL extends Classs<Props>
     this.setState({
       tql: code
     });
-    this.updateVariant({ 
+    this.updateVariant({
       tql: code
-    })
+    });
   }
 
   changeThemeDefault() {
@@ -169,17 +177,15 @@ class TQL extends Classs<Props>
   }
 
   getThemeIndex() {
-    if (this.state.theme === 'default') {
-      return 0;
-    }
-    else if (this.state.theme === 'neo') {
-      return 1;
-    }
-    else if (this.state.theme === 'cobalt') {
-      return 2;
-    }
-    else {
-      return 3;
+    switch (this.state.theme) {
+      case 'monokai':
+        return 3;
+      case 'cobalt':
+        return 2;
+      case 'neo':
+        return 1;
+      default:
+        return 0;
     }
   }
 
@@ -225,26 +231,26 @@ class TQL extends Classs<Props>
     }
   }
 
-  updateVariant(newProperties)
-  {
+  updateVariant(newProperties) {
     BuilderActions.setVariant
       (this.props.algorithm.id, _.extend
         ({}, this.props.algorithm, newProperties));
   }
 
-  componentDidUpdate(prevProps, prevState) 
-  {
-    //When they switch to tql mode, execute code
-    if(prevProps.algorithm.mode !== 'tql' && this.props.algorithm.mode === 'tql') 
-    {
-      this.executeCode();
-    }
-  }
+  componentDidUpdate(prevProps, prevState)   {
+        //When they switch to tql mode, execute code
+        if (prevProps.algorithm.mode !== 'tql' && this.props.algorithm.mode === 'tql')     {
+            this.executeCode();
+        }
+    else if (this.props.algorithm.mode !== 'tql' &&
+      !(_.isEqual(this.props.algorithm.cards, prevProps.algorithm.cards))) {
+      this.executeCode();
+    }
+    }
 
   toggleMode() {
-    if (this.state.code !== TQLConverter.toTQL(this.props.algorithm.cards) 
-        && !confirm("Warning: TQL added to the editor will be lost"))
-    {
+    if (this.state.code !== TQLConverter.toTQL(this.props.algorithm.cards)
+      && !confirm("Warning: TQL added to the editor will be lost")) {
       return;
     }
     this.updateVariant({
@@ -257,19 +263,16 @@ class TQL extends Classs<Props>
     });
   }
 
-  getTopbarClass()
-  {
-    if (this.state.theme === 'default') {
-      return 'default-topbar';
-    }
-    else if (this.state.theme === 'neo') {
-      return 'neo-topbar';
-    }
-    else if (this.state.theme === 'cobalt') {
-      return 'cobalt-topbar';
-    }
-    else {
-      return 'monokai-topbar';
+  getTopbarClass() {
+    switch (this.state.theme) {
+      case 'monokai':
+        return 'monokai-topbar';
+      case 'cobalt':
+        return 'cobalt-topbar';
+      case 'neo':
+        return 'neo-topbar';
+      default:
+        return 'default-topbar';
     }
   }
 
@@ -284,11 +287,11 @@ class TQL extends Classs<Props>
           selected={this.props.algorithm.mode === 'tql' ? 2 : 1}
           medium={true}
           />
-        <div className = 'view-only'> 
-          {  
+        <div className = 'view-only'>
+          {
             this.props.algorithm.mode === 'tql' ? null : "View-only"
           }
-        </div> 
+        </div>
         <div className='white-space' />
         <Menu options={this.getMenuOptions() } small={true}/>
       </div>
@@ -331,7 +334,7 @@ class TQL extends Classs<Props>
     return (
       <div className='tql-column'>
         { this.renderTopbar() }
-        <div className='code-section'> 
+        <div className='code-section'>
           { this.renderTqlEditor() }
           { this.renderResults() }
         </div>
