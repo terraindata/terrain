@@ -118,34 +118,7 @@ class Result extends Classs<Props> {
     var allDataField = allFieldsData && allFieldsData[field];
     let value = allDataField || dataField;
     
-    let format = this.props.config.formats && this.props.config.formats[field];
-    let {showRaw} = overrideFormat || format || { showRaw: false };
-    
-    if(format)
-    {
-      switch(format.type)
-      {
-        case 'image':
-        var url = format.template.replace(/\[value\]/g, value);
-        return (
-          <div>
-            <div className='result-field-value-image'>
-              <img src={url} />
-            </div>
-            <div className='result-field-value'>
-              {
-                showRaw ? value : null
-              }
-            </div>
-          </div>
-        );
-        case 'text':
-        // nothing special for now
-        break;
-      }
-    }
-    
-    return value;
+    return ResultFormatValue(field, value, this.props.config, overrideFormat);
   }
 
   renderExpandedField(value, field)
@@ -165,27 +138,7 @@ class Result extends Classs<Props> {
     
     var value = this.getValue(field, overrideFormat);
     
-    if(value === undefined)
-    {
-      value = 'undefined';
-    }
-    
-    if(typeof value === 'boolean')
-    {
-      value = value ? 'true' : 'false';
-    }
-    if(typeof value === "string" && !value.length)
-    {
-      value = 'blank';
-      var italics = true;
-    }
-    if(value === null)
-    {
-      value = 'null';
-      var italics = true;
-    }
-    
-    let format = this.props.config.formats && this.props.config.formats[field];
+    let format = this.props.config && this.props.config.formats && this.props.config.formats[field];
     let showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
       <div className="result-field" key={field}>
@@ -200,7 +153,6 @@ class Result extends Classs<Props> {
             'result-field-value': true,
             'result-field-value-short': (field + value).length < 0,
             'result-field-value-number': typeof value === 'number',
-            'result-field-value-italics': italics,
           })}
         >
           {value}
@@ -392,6 +344,68 @@ class Result extends Classs<Props> {
               //   : fields.map(this.renderField)
 	}
 };
+
+
+
+export function ResultFormatValue(field: string, value: string | number, config: Config, overrideFormat?: any): any
+{
+  let format = config && config.formats && config.formats[field];
+  let {showRaw} = overrideFormat || format || { showRaw: false };
+  var italics = false;
+  
+  if(value === undefined)
+  {
+    value = 'undefined';
+    italics = true;
+  }
+  
+  if(typeof value === 'boolean')
+  {
+    value = value ? 'true' : 'false';
+    italics = true;
+  }
+  if(typeof value === "string" && !value.length)
+  {
+    value = '"" (blank)';
+    italics = true;
+  }
+  if(value === null)
+  {
+    value = 'null';
+    italics = true;
+  }
+  
+  if(format)
+  {
+    switch(format.type)
+    {
+      case 'image':
+      var url = format.template.replace(/\[value\]/g, value as string);
+      return (
+        <div>
+          <div className='result-field-value-image'>
+            <img src={url} />
+          </div>
+          <div className='result-field-value'>
+            {
+              showRaw ? value : null
+            }
+          </div>
+        </div>
+      );
+      case 'text':
+      // nothing special for now
+      break;
+    }
+  }
+  
+  if(italics)
+  {
+    return <em>{value}</em>;
+  }
+  
+  return value;
+}
 
 
 // DnD stuff
