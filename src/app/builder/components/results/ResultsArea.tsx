@@ -398,9 +398,16 @@ class ResultsArea extends Classs<Props>
       pages = this.state.resultsPages;
     }
     
-    var tql = TQLConverter.toTQL(algorithm.cards, {
-      limit: pages * RESULTS_PAGE_SIZE,
-    });
+    if (algorithm.mode === "tql")
+    {
+      var tql = algorithm.tql;
+    }
+    else 
+    {
+      tql = TQLConverter.toTQL(algorithm.cards, {
+        limit: pages * RESULTS_PAGE_SIZE,
+      });
+    }
     if(tql !== this.state.tql)
     {
       this.setState({
@@ -413,14 +420,25 @@ class ResultsArea extends Classs<Props>
       this.allXhr && this.allXhr.abort();
       
       this.xhr = Ajax.query(tql, this.handleResultsChange, this.handleError);
-      this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm.cards, {
-        allFields: true,
+      if (algorithm.mode === "tql")
+      {
+        this.allXhr = Ajax.query(tql, 
+          this.handleAllFieldsResponse,
+          this.handleError
+        );
+      }
+      else 
+      {
+        this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm.cards, {
+            allFields: true,
         // limit: pages * RESULTS_PAGE_SIZE,
         // don't limit the all fields request
-      }), 
-        this.handleAllFieldsResponse,
-        this.handleError
-      );
+          }), 
+          this.handleAllFieldsResponse,
+          this.handleError
+        );
+      }
+
     }
   }
   

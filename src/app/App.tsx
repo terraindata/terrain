@@ -110,11 +110,6 @@ var links =
     text: 'Builder',
     route: '/builder',
   },
-  {
-    icon: <TQLIcon />,
-    text: 'TQL',
-    route: '/tql',
-  },
 ];
 
 var App = React.createClass({
@@ -252,7 +247,6 @@ var router = (
       <Route path="/users/:username" component={Profile} />
       
       <Route path="/reporting" component={Placeholder} />
-      <Route path="/tql" component={Placeholder} />
     </Route>
   </Router>
 );

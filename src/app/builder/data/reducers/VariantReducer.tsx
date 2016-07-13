@@ -76,7 +76,13 @@ VariantReducer[ActionTypes.setVariant] =
   (state, action) =>
     state.setIn(['algorithms', action.payload.variantId],
       new BrowserTypes.Variant(action.payload.variant)
-    )
-  
+    );
 
+
+VariantReducer[ActionTypes.setVariantField] =
+  (state, action) =>
+    state.setIn(['algorithms', action.payload.variantId, action.payload.field],
+      action.payload.value
+    );
+  
 export default VariantReducer;

@@ -171,6 +171,7 @@ var BuilderActionTypes =
   
   fetch: '',
   setVariant: '',
+  setVariantField: '',
 };
 
 // I tried using this type to correclty classify this function,
