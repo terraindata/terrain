@@ -83,7 +83,6 @@ class Profile extends Classs<Props>
   infoKeys = [
     'username',
     'whatIDo',
-    'timezone',
     'phone',
     'email',
     'skype',

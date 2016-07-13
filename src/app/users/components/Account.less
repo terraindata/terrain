@@ -45,15 +45,16 @@
         background: fade(#00bcd6, 25%);  
       }
       
-      &.active {
-        background: #CDDE20;
-        color: @gray !important;
-      }
-      
       &:last-child {
         float: right;
       }
     }
+  }
+
+  .account-link-current {
+    .account-links.account-link;
+    background: #CDDE20;
+    color: @gray !important; 
   }
   
   .account-inner {
@@ -93,22 +94,119 @@
       font-size: 22px;
     }
   }
-  
+
   .profile-pic {
     width: 350px;
     height: 350px;
     display: inline-block;
     border-radius: 6px;
     overflow: hidden;
-    
     .profile-pic-image {
       display: block;
       width: 100%;
     }
   }
+
+  .edit-profile-pic {
+    .profile-pic;
+    cursor: pointer;
+    border: 8px solid white;
+    width: 200px;
+    height: 200px;
+    position: relative;
+    overflow: visible;
+    .profile-pic-image {
+      display: inline-block;
+      height: 100%;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+    }
+    &:hover {
+      border: 8px solid #00bcd6;
+      .overlay {
+        opacity: .75;
+      }
+    }
+  }
   
+  .overlay {
+    position: absolute;
+    height: 94%;
+    width: 94%;
+    left: 0px;
+    top: 0px;
+    text-align:center;
+    opacity:0;
+    background-color: #3e3c3c;
+    padding: 3%;
+  }
+
+  .overlay-message {
+    height: 100%;
+    width: 100%;
+    color: white;
+    font-size: 20px;
+  }
+
+  .camera-icon {
+    height: 100px;
+    width: 100px;
+    left: 25%;
+    top: 15px;
+    position: relative;
+  }
+
   .profile-pic-upload {
     display: none;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .dropdown {
+    z-index: 99999999;
+    color: #3e3c3c;
+    position: relative;
+    top: 200px;
+    left: 10%;
+    border: 1px solid @gray; //change this color
+    border-radius: 6px;
+    width: 80%;
+    background-color: white;
+    &:after, &:before {
+      bottom: 100%;
+      left: 50%;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+    &:after {
+      border: solid transparent;
+      border-bottom-color: #ffffff;
+      border-width: 7px;
+      margin-left: -7px;
+    }
+    &:before {
+      border: solid transparent;
+      border-bottom-color: @gray;
+      border-width: 8px;
+      margin-left: -8px;
+    }
+  }
+
+  .menu-item {
+    margin: 5px;
+    padding: 3px;
+    border-radius: 6px;
+    &:hover {
+      background-color: #cbece4;
+      color: #f48e7d;
+    }
   }
   
   .profile-name {
