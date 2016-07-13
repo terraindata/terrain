@@ -42,103 +42,83 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Settings.less');
+require('./AccountEntry.less');
+import * as $ from 'jquery';
+import * as _ from 'underscore';
 import * as React from 'react';
+import Util from '../../util/Util.tsx';
+import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
-import Store from './../data/UserStore.tsx';
-import Actions from './../data/UserActions.tsx';
-import BrowserTypes from './../UserTypes.tsx';
-import InfoArea from './../../common/components/InfoArea.tsx';
-import { Link } from 'react-router';
-
-import AccountEntry from './../../common/components/AccountEntry.tsx';
-
+var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 
 interface Props
 {
-  params?: any;
-  history?: any;
-  children?: any;
+  title: string;
+  description?: string;
+  onClick?: () => void;
 }
 
-class Settings extends Classs<Props>
+
+class AccountEntry extends Classs<Props>
 {
-  cancelSubscription = null;
-  
-  constructor(props)
+  constructor(props: Props) 
   {
     super(props);
-    
-    this.state = {
-      istate: Store.getState()
-    };
-    
-    this.cancelSubscription = 
-      Store.subscribe(() => this.setState({
-        istate: Store.getState()
-      }))
+    this.state =
+      {
+        expand: false,
+        expandedInfo: <div />,
+      }
   }
-  
-  componentWillMount()
+
+  expand()
   {
-    // Actions.fetch();
+    if (!this.state.expand) 
+    {
+      var code = this.props.onClick()
+      this.setState({
+        expandedInfo: code
+      });
+    }
+    else {
+      this.setState({
+        expandedInfo: <div/ >
+      });
+    }
+
+    this.setState({
+      expand: this.state.expand === false ? true : false
+    }); 
   }
-  
-  componentWillUnmount()
+
+  getDescription()
   {
-    this.cancelSubscription && this.cancelSubscription();
+    if (this.props.description)
+     {
+      return <div className='description'>{this.props.description}</div>;
+    }
   }
-  
-  expandUsername()
-  {
+
+  render() {
     return (
-      <div> test </div>
+        <div className='entry'> 
+          <div className='top-bar'> 
+            <div className='title'>
+              {this.props.title}   
+            </div> 
+            <div className='white-space' />
+            <div className='button' onClick={this.expand}>
+              {this.state.expand === false ? 'Expand' : 'Collapse'}
+            </div>
+          </div> 
+          {this.getDescription()}
+          <div className='expandedInfo'>
+            {this.state.expandedInfo}
+          </div>
+          <hr className ='line'/>
+        </div>
     );
   }
+};
 
-  expandPassword()
-  {
-    return <div> test </div>;
-  }
-
-  expandAuthentication()
-  {
-    return <div> test </div>;
-  }
-
-  expandEmail()
-  {
-    return <div> test </div>;
-  }
-
-  render()
-  {
-    const state = this.state.istate;
-
-    return (
-      <div>
-      <div className='settings-page-title'>Update your settings</div>
-      <AccountEntry 
-        title='Username'
-        onClick= {this.expandUsername}
-      /> 
-      <AccountEntry 
-        title='Password'
-        onClick={this.expandPassword}
-      /> 
-      <AccountEntry 
-        title='Two-Factor Authentication' 
-        description='Two-Factor authentication is inactive for your account.'
-        onClick={this.expandAuthentication}
-       /> 
-      <AccountEntry
-        title='Email'
-        description='Your email address is ben@terrainDB.com'
-        onClick={this.expandEmail}
-        /> 
-      </div >
-    );
-  }
-}
-
-export default Settings;
+export default AccountEntry;
