@@ -51,6 +51,8 @@ import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
 var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 
+
+
 interface Props
 {
   title: string;
@@ -73,22 +75,17 @@ class AccountEntry extends Classs<Props>
 
   expand()
   {
-    if (!this.state.expand) 
-    {
-      var code = this.props.onClick()
-      this.setState({
-        expandedInfo: code
-      });
-    }
-    else {
-      this.setState({
-        expandedInfo: <div/ >
-      });
-    }
-
     this.setState({
       expand: this.state.expand === false ? true : false
     }); 
+  }
+
+  expandCode()
+  {
+    if (this.state.expand) 
+    {
+      return this.props.onClick();
+    }
   }
 
   getDescription()
@@ -107,13 +104,13 @@ class AccountEntry extends Classs<Props>
               {this.props.title}   
             </div> 
             <div className='white-space' />
-            <div className='button' onClick={this.expand}>
+            <div className='expand-button button' onClick={this.expand}>
               {this.state.expand === false ? 'Expand' : 'Collapse'}
             </div>
           </div> 
           {this.getDescription()}
           <div className='expandedInfo'>
-            {this.state.expandedInfo}
+            {this.expandCode()}
           </div>
           <hr className ='line'/>
         </div>

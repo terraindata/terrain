@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./Notifications.less');
 import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
 import Store from './../data/UserStore.tsx';
@@ -49,6 +50,9 @@ import Actions from './../data/UserActions.tsx';
 import BrowserTypes from './../UserTypes.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
 import { Link } from 'react-router';
+import AccountEntry from './../../common/components/AccountEntry.tsx';
+import CheckBox from './../../common/components/CheckBox.tsx';
+import RadioButtons from './../../common/components/RadioButtons.tsx';
 
 interface Props
 {
@@ -61,12 +65,29 @@ class Notifications extends Classs<Props>
 {
   cancelSubscription = null;
   
+  emailNotificationOptions = [
+    {
+      value: 'Once every 15 minutes', 
+      handler: this.changeEmailNotifications_15Min
+    },
+    {
+      value: 'Once an hour at most',
+      handler: this.changeEmailNotifications_Hour
+    },
+    {
+      value: 'Never',
+      handler: this.changeEmailNotifications_Never
+    }
+  ]
+
   constructor(props)
   {
     super(props);
     
     this.state = {
-      istate: Store.getState()
+      istate: Store.getState(),
+      emailNotificationSetting: 'Never',
+      emailNewsOn: true,
     };
     
     this.cancelSubscription = 
@@ -77,7 +98,7 @@ class Notifications extends Classs<Props>
   
   componentWillMount()
   {
-    // Actions.fetch();
+    //Actions.fetch();
   }
   
   componentWillUnmount()
@@ -85,13 +106,125 @@ class Notifications extends Classs<Props>
     this.cancelSubscription && this.cancelSubscription();
   }
   
+  expandDesktopNotifications()
+  {
+   return (
+     <div>
+       <div>Send me desktop notifications for:</div>
+       <div>Desktop notifications use this sound:</div>
+     </div>
+   );
+  }
+  
+  changeEmailNotifications_15Min()
+  {
+    this.setState ({
+      emailNotificationSetting: this.emailNotificationOptions[0].value
+    })
+  }
+
+  changeEmailNotifications_Hour()
+  {
+    this.setState ({
+      emailNotificationSetting: this.emailNotificationOptions[1].value
+    })
+  }
+
+    changeEmailNotifications_Never()
+  {
+    this.setState ({
+      emailNotificationSetting: this.emailNotificationOptions[2].value
+    })
+  }
+
+  expandEmailNotifications() 
+  {
+    return (
+      <div className='notification-expansion'>
+        <div>Send me email notifications:</div>
+        <br/>
+        <div className='expanded-section-indent'>
+          <RadioButtons
+            selected={this.state.emailNotificationSetting}
+            options={this.emailNotificationOptions}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  toggleEmailNews() 
+  {
+    this.setState({
+      emailNewsOn: !this.state.emailNewsOn,
+    });
+  }
+
+  expandEmailNews() 
+  {
+    return (
+      <div className='notification-expansion'>
+        <div>You can choose which of these updates you'd like to receive:</div>
+        <br/>
+        <span className='expanded-section-indent'>
+          <CheckBox 
+            checked={this.state.emailNewsOn} 
+            onChange={this.toggleEmailNews}
+          />
+          Send me emails with Terrain news and tips <br/><br/>
+        </span>
+        <div>If you opt out of the above, note that we we'll still send you important
+        adminstrative emails, such as password resets. <br/>
+        </div>
+        {this.renderEmail()}
+      </div>
+      );
+  }
+
+  renderEmail() 
+  {
+    if(this.state.istate.currentUser && this.state.istate.currentUser.email) 
+    {
+      return(
+        <div>
+        Your email is currently set to
+        <span className='email-blue'>
+        {this.state.istate.currentUser.email}
+        </span>
+        .
+        </div>
+      );
+    } 
+    return <div>Your email adddress has not been set yet.</div>
+  }
+
   render()
   {
-    const state = this.state.istate;
-
     return (
       <div>
-      Notifications
+      <div className='notifications-page-title'>Update your notifications</div>
+      <AccountEntry
+        title='Desktop Notifications'
+        description='Terrain can send push notifications to your desktop \
+        when someone updates an algorithm. You are currently recieving updates \
+        for Activities of any kind.'
+         onClick={this.expandDesktopNotifications}
+      />
+      <AccountEntry
+        title='Email Notifications'
+        description="When you're busy or not online, Terrain can send you \
+          emails so you don't miss a beat.You are currently receiving emails \
+          NEVER"
+        onClick={this.expandEmailNotifications}
+      />
+      <AccountEntry
+        title='Email News & Updates'
+        description="From time to time we'd like to send you emails with \
+          interesting news from the Terrain team. You are set up to recieve \
+          emails with Terrain news and tips"
+        onClick={this.expandEmailNews}
+      />
+
       </div>
     );
   }

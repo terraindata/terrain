@@ -42,84 +42,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Account.less');
+require('./RadioButtons.less');
+import * as $ from 'jquery';
+import * as _ from 'underscore';
 import * as React from 'react';
+import Util from '../../util/Util.tsx';
+import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
-import Store from './../data/UserStore.tsx';
-import Actions from './../data/UserActions.tsx';
-import BrowserTypes from './../UserTypes.tsx';
-import InfoArea from './../../common/components/InfoArea.tsx';
-import { Link } from 'react-router';
-var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
 
-interface Props
-{
-  location?: any;
-  children?: any;
+interface Props {
+	selected?: string;
+	options: any;
 }
 
-class Account extends Classs<Props>
+class CheckBox extends Classs<Props>
 {
-  render()
-  {
-    var title = "Account";
-    var classNames = {
-      profile: "account-link",
-      notifications: "account-link",
-      team: "account-link",
-      settings: "account-link"
-    }
-    switch(this.props.location.pathname)
-    {
-      case "/account/profile":
-        title = "Profile";
-        classNames.profile = "account-link-current";
-        break;
-      case "/account/notifications":
-        title = "Notifications";
-        classNames.notifications = "account-link-current";
-        break;
-      case "/account/team":
-        title = "Team";
-        classNames.team = "account-link-current";
-        break;
-      case "/account/settings":
-        title = "Settings";
-        classNames.settings = "account-link-current";
-        break;
-      default:
-        classNames.profile = "account-link-current";
-        break;      
-    }
-    
-    return (
-      <div className='account'>
-        <div className='account-wrapper'>
-          <div className='account-title'>
-            <HomeIcon />
-            { title }
-          </div>
-          <div className='account-links'>
-            <Link to={'/account/settings'} className={classNames.settings}>
-              Settings
-            </Link>
-            <Link to={'/account/notifications'} className={classNames.notifications}>
-              Notifications
-            </Link>
-            <Link to={'/account/profile'} className={classNames.profile}>
-              Profile
-            </Link>
-            <Link to={'/account/team'} className={classNames.team}>
-              Team
-            </Link>
-          </div>
-          <div className='account-inner'>
-            { this.props.children }
-          </div>
-        </div>
-      </div>
-    );
-  }
+	render() 
+	{
+		var selected = this.props.selected;
+		return (
+			<div>
+				{this.props.options.map(function(option) {
+					return(
+						<div key={option.value} className='radio-button-option'>
+							<div 
+								onClick={option.handler}
+								className={option.value === selected ? 'selected-radio-button' : 'unselected-radio-button'}
+							>
+							O
+							</div>
+							{option.value}
+							<br/>
+						</div>
+						);
+				})}
+			</div>
+		);
+	};
 }
 
-export default Account;
+export default CheckBox;
