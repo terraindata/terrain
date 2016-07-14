@@ -155,7 +155,6 @@ class Profile extends Classs<Props>
       saving: true,
       savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
     });
-
   }
 
   onSave() {

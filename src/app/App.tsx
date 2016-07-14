@@ -130,7 +130,6 @@ var App = React.createClass({
       }
     });
     
-    
     // Retrieve logged-in state from persistent storage.
     let token = localStorage['authenticationToken'];
     let username = localStorage['username'];
