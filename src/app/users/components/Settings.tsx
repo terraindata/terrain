@@ -128,12 +128,12 @@ class Settings extends Classs<Props>
       /> 
       <AccountEntry 
         title='Two-Factor Authentication' 
-        description='Two-Factor authentication is inactive for your account.'
+        //description='Two-Factor authentication is inactive for your account.'
         onClick={this.expandAuthentication}
        /> 
       <AccountEntry
         title='Email'
-        description='Your email address is ben@terrainDB.com'
+      //  description='Your email address is ben@terrainDB.com'
         onClick={this.expandEmail}
         /> 
       </div >

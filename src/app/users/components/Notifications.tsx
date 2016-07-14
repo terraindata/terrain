@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./Notifications.less');
+require('./Select.less');
 import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
 import Store from './../data/UserStore.tsx';
@@ -53,6 +54,7 @@ import { Link } from 'react-router';
 import AccountEntry from './../../common/components/AccountEntry.tsx';
 import CheckBox from './../../common/components/CheckBox.tsx';
 import RadioButtons from './../../common/components/RadioButtons.tsx';
+var Select = require('react-select');
 
 interface Props
 {
@@ -80,6 +82,29 @@ class Notifications extends Classs<Props>
     }
   ]
 
+  notificationTypes = [
+    {
+      value: 'Activities of any kind',
+      label: 'Activities of any kind'
+    },
+    {
+      value: 'Certain activities',
+      label: 'Certain activities'
+    }
+  ]
+
+  desktopNotificationSounds = [
+    {
+      value: 'ding',
+      label: 'ding'
+    },
+    {
+      value: 'beep',
+      label: 'beep'
+    }
+  ]
+
+
   constructor(props)
   {
     super(props);
@@ -88,6 +113,9 @@ class Notifications extends Classs<Props>
       istate: Store.getState(),
       emailNotificationSetting: 'Never',
       emailNewsOn: true,
+      desktopNotificationType: 'Activities of any kind',
+      desktopNotificationSound: 'ding',
+      emailNotificationType: 'Activities of any kind',
     };
     
     this.cancelSubscription = 
@@ -105,13 +133,47 @@ class Notifications extends Classs<Props>
   {
     this.cancelSubscription && this.cancelSubscription();
   }
-  
+
+  onDesktopNotificationChange(val) 
+  {
+    this.setState ({
+      desktopNotificationType: val.value,
+    })
+  }
+
+  onDesktopNotificationsSoundChange(val) 
+  {
+    this.setState ({
+      desktopNotificationSound: val.value,
+    })
+  }
+
   expandDesktopNotifications()
   {
    return (
-     <div>
-       <div>Send me desktop notifications for:</div>
-       <div>Desktop notifications use this sound:</div>
+     <div className='notification-expansion'>
+       <div className='notification-subtitle'>
+         Send me desktop notifications for:
+       </div>
+       <Select
+         clearable={false}
+         name='desktop-notification'
+         value={this.state.desktopNotificationType}
+         options={this.notificationTypes}
+         onChange={this.onDesktopNotificationChange}
+         className='notifications-select'
+       />
+       <div className='notification-subtitle'>
+         Desktop notifications use this sound:
+       </div>
+        <Select
+          name='desktop-notification-sound'
+          value={this.state.desktopNotificationSound}
+          clearable={false}
+          options={this.desktopNotificationSounds}
+          onChange={this.onDesktopNotificationsSoundChange}
+          className='notifications-select'
+       />
      </div>
    );
   }
@@ -198,6 +260,41 @@ class Notifications extends Classs<Props>
     return <div>Your email adddress has not been set yet.</div>
   }
 
+  renderDesktopDescription() 
+  {
+    return(
+      <div>
+        Terrain can send push notifications to your desktop when someone 
+        updates an algorithm. You are currently recieving updates for 
+        <span><b>{' ' + this.state.desktopNotificationType}.</b></span>
+      </div>  
+    );
+
+  }
+
+  renderEmailDescription()
+  {
+    return(
+      <div>
+        When you're busy or not online, Terrain can send you 
+        emails so you don't miss a beat.You are currently receiving emails 
+        <span><b>{' ' + this.state.emailNotificationSetting}.</b></span>
+      </div>
+    );
+  }
+
+  renderEmailNewsDescription() 
+  {
+    return(
+      <div>
+        From time to time we'd like to send you emails with interesting 
+        news from the Terrain team. You are set up to 
+        <span><b>{this.state.emailNewsOn ? ' ' : ' not '}</b></span>
+        recieve emails with Terrain news and tips.
+      </div>
+    );
+  }
+
   render()
   {
     return (
@@ -205,23 +302,17 @@ class Notifications extends Classs<Props>
       <div className='notifications-page-title'>Update your notifications</div>
       <AccountEntry
         title='Desktop Notifications'
-        description='Terrain can send push notifications to your desktop \
-        when someone updates an algorithm. You are currently recieving updates \
-        for Activities of any kind.'
-         onClick={this.expandDesktopNotifications}
+        description={this.renderDesktopDescription}
+        onClick={this.expandDesktopNotifications}
       />
       <AccountEntry
         title='Email Notifications'
-        description="When you're busy or not online, Terrain can send you \
-          emails so you don't miss a beat.You are currently receiving emails \
-          NEVER"
+        description={this.renderEmailDescription}
         onClick={this.expandEmailNotifications}
       />
       <AccountEntry
         title='Email News & Updates'
-        description="From time to time we'd like to send you emails with \
-          interesting news from the Terrain team. You are set up to recieve \
-          emails with Terrain news and tips"
+        description={this.renderEmailNewsDescription}
         onClick={this.expandEmailNews}
       />
 

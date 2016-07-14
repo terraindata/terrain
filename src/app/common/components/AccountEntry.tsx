@@ -56,7 +56,7 @@ var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 interface Props
 {
   title: string;
-  description?: string;
+  description?: () => void;
   onClick?: () => void;
 }
 
@@ -92,7 +92,7 @@ class AccountEntry extends Classs<Props>
   {
     if (this.props.description)
      {
-      return <div className='description'>{this.props.description}</div>;
+      return <div className='description'>{this.props.description()}</div>;
     }
   }
 
@@ -108,7 +108,7 @@ class AccountEntry extends Classs<Props>
               {this.state.expand === false ? 'Expand' : 'Collapse'}
             </div>
           </div> 
-          {this.getDescription()}
+            {this.getDescription()}
           <div className='expandedInfo'>
             {this.expandCode()}
           </div>
