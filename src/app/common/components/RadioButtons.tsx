@@ -69,7 +69,6 @@ class CheckBox extends Classs<Props>
 								onClick={option.handler}
 								className={option.value === selected ? 'selected-radio-button' : 'unselected-radio-button'}
 							>
-							O
 							</div>
 							{option.value}
 							<br/>

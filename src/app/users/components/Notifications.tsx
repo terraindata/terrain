@@ -55,6 +55,7 @@ import AccountEntry from './../../common/components/AccountEntry.tsx';
 import CheckBox from './../../common/components/CheckBox.tsx';
 import RadioButtons from './../../common/components/RadioButtons.tsx';
 var Select = require('react-select');
+var SoundIcon = require("./../../../images/icon_camera.svg");
 
 interface Props
 {
@@ -99,8 +100,12 @@ class Notifications extends Classs<Props>
       label: 'ding'
     },
     {
-      value: 'beep',
-      label: 'beep'
+      value: 'ting',
+      label: 'ting'
+    },
+    {
+      value: 'pop',
+      label: 'pop'
     }
   ]
 
@@ -116,6 +121,7 @@ class Notifications extends Classs<Props>
       desktopNotificationType: 'Activities of any kind',
       desktopNotificationSound: 'ding',
       emailNotificationType: 'Activities of any kind',
+      playSound: false,
     };
     
     this.cancelSubscription = 
@@ -148,6 +154,13 @@ class Notifications extends Classs<Props>
     })
   }
 
+  playSound() 
+  {
+    var sound = new Audio();
+    sound.src = 'http://www.wav-sounds.com/mail/checked.wav';
+    sound.play();
+  }
+
   expandDesktopNotifications()
   {
    return (
@@ -166,14 +179,25 @@ class Notifications extends Classs<Props>
        <div className='notification-subtitle'>
          Desktop notifications use this sound:
        </div>
-        <Select
-          name='desktop-notification-sound'
-          value={this.state.desktopNotificationSound}
-          clearable={false}
-          options={this.desktopNotificationSounds}
-          onChange={this.onDesktopNotificationsSoundChange}
-          className='notifications-select'
-       />
+         <Select
+            name='desktop-notification-sound'
+            value={this.state.desktopNotificationSound}
+            clearable={false}
+            options={this.desktopNotificationSounds}
+            onChange={this.onDesktopNotificationsSoundChange}
+            className='notifications-select'
+         />
+         <div 
+           className='preview-button'
+           onClick={this.playSound}
+         >
+           <div className='sound-icon'>
+             <SoundIcon/>
+           </div>
+           <div className='preview-button-text'>
+           Preview
+           </div>
+         </div>
      </div>
    );
   }
@@ -199,6 +223,13 @@ class Notifications extends Classs<Props>
     })
   }
 
+  onEmailNotificationTypeChange(val)
+  {
+    this.setState({
+      emailNotificationType: val.value,
+    })
+  }
+
   expandEmailNotifications() 
   {
     return (
@@ -211,6 +242,17 @@ class Notifications extends Classs<Props>
             options={this.emailNotificationOptions}
           />
         </div>
+        <div className='notification-subtitle-small'>
+         Send me email notifications for:
+       </div>
+       <Select
+         clearable={false}
+         name='email-notification'
+         value={this.state.emailNotificationType}
+         options={this.notificationTypes}
+         onChange={this.onEmailNotificationTypeChange}
+         className='notifications-select'
+       />
       </div>
     );
   }

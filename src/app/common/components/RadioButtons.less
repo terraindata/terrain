@@ -9,16 +9,22 @@
 	width: 10px;
 	display: inline;
 	background: #b0b6b7;
-	color: #b0b6b7;
 	border-radius: 50%;
 	cursor: pointer;
 	margin-right: 10px;
 	font-size: 8px;
-	padding: 0px 2px;
+	padding: 0px 5px;
+	&:hover {
+		background: fade(#00bcd6, 25%);  
+	}
 }
 
 .selected-radio-button {
 	.unselected-radio-button;
 	background: #00bcd6;
-	color: #00bcd6;
+	font-size: 7px;
+	border: 1px solid #b0b6b7;
+	padding: 0px 4px;
+	z-index: 10;
+	box-shadow: inset 0 0 0 1px #fff;
 }
