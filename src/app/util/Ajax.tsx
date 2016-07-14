@@ -123,7 +123,7 @@ var Ajax = {
       data: JSON.stringify(data),
     }), onSave, onError);
   },
-  
+
   adminSaveUser(user: UserTypes.User)
   {
     return Ajax._post(`/users/${user.username}`, JSON.stringify({

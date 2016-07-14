@@ -42,80 +42,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./AccountEntry.less');
+require('./CheckBox.less');
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
-var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 
-
-
-interface Props
-{
-  title: string;
-  description?: () => void;
-  onClick?: () => void;
+interface Props {
+	checked: boolean;
+	onChange: () => void;
 }
 
-
-class AccountEntry extends Classs<Props>
+class CheckBox extends Classs<Props>
 {
-  constructor(props: Props) 
-  {
-    super(props);
-    this.state =
-      {
-        expand: false,
-        expandedInfo: <div />,
-      }
-  }
+	render() {
+		return (
+			<div 
+				className={this.props.checked ? 'checked' : 'checkbox'} 
+				onClick={this.props.onChange}
+			>
+				{this.props.checked ? '\u2713' : 'O'}
+			</div>
+		);
+	};
+}
 
-  expand()
-  {
-    this.setState({
-      expand: this.state.expand === false ? true : false
-    }); 
-  }
-
-  expandCode()
-  {
-    if (this.state.expand) 
-    {
-      return this.props.onClick();
-    }
-  }
-
-  getDescription()
-  {
-    if (this.props.description)
-     {
-      return <div className='description'>{this.props.description()}</div>;
-    }
-  }
-
-  render() {
-    return (
-        <div className='entry'> 
-          <div className='top-bar'> 
-            <div className='title'>
-              {this.props.title}   
-            </div> 
-            <div className='white-space' />
-            <div className='expand-button button' onClick={this.expand}>
-              {this.state.expand === false ? 'Expand' : 'Collapse'}
-            </div>
-          </div> 
-            {this.getDescription()}
-          <div className='expandedInfo'>
-            {this.expandCode()}
-          </div>
-          <hr className ='line'/>
-        </div>
-    );
-  }
-};
-
-export default AccountEntry;
+export default CheckBox;
