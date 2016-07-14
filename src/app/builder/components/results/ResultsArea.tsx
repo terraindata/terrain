@@ -106,7 +106,7 @@ class ResultsArea extends Classs<Props>
     resultsPages: 1,
     loadedResultsPages: 1,
     onResultsLoaded: null,
-    resultFormat: 'icon',
+    resultFormat: 'table', // 'icon',
   };
   
   constructor(props:Props)
@@ -266,6 +266,7 @@ class ResultsArea extends Classs<Props>
         <div className='results-table-wrapper'>
           <ResultsTable
             {...this.state}
+            onExpand={this.handleExpand}
           />
         </div>
       );
@@ -395,7 +396,7 @@ class ResultsArea extends Classs<Props>
   {
     if(!pages)
     {
-      pages = this.state.resultsPages;
+      pages = this.state.resultFormat === 'icon' ? this.state.resultsPages : 50;
     }
     
     if (algorithm.mode === "tql")

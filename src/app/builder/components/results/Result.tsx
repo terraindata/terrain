@@ -383,7 +383,14 @@ export function ResultFormatValue(field: string, value: string | number, config:
       var url = format.template.replace(/\[value\]/g, value as string);
       return (
         <div>
-          <div className='result-field-value-image'>
+          <div
+            className='result-field-value-image'
+            style={{
+              backgroundImage: `url(${url})`,
+              // give the div the background image, to make use of the "cover" CSS positioning,
+              // but also include the <img> tag below (with opacity 0) so that right-click options still work
+            }}
+          >
             <img src={url} />
           </div>
           <div className='result-field-value'>

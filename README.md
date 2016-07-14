@@ -68,6 +68,11 @@ The Terrain search front-end uses these technologies:
 
 ## Standards / Conventions
 
+- This README is the place where information about building and programming in Terraformer lives. 
+  Processes, standards, guides, hints, etc. should be added here and merged into the repo accordingly.
+  Do not add wiki pages for anything that is specific to Terraformer code.
+  Use proper Markdown syntax in this README.
+  Add additional sub-READMEs in sub-folders if necessary, and link to them from this README.
 - Capitalize all class names, React component names, and filenames
   e.g. `class MillenniumFalcon {..}`, `MillenniumFalcon.tsx` and `MillenniumFalcon.less`
 - Camel case function names. 
@@ -221,6 +226,8 @@ A list of common programming gotchas in this codebase
   ```
 - Subscribe to Redux stores within the `componentDidMount` method. Do not subscribe in the constructor, or else you will likely see many React `setState` warnings
 - Do not call `fetch` from within a constructor or you may see similar warnings (React thinks that state changes are happening from a higher component's `render` method)
+- ReactVirtualize: The library uses `shallowCompare` to detect prop changes, so you may need to pass additional props to indicate that data have changed.
+  More here: [https://github.com/bvaughn/react-virtualized#pure-components]
 
 ## Troubleshooting
 

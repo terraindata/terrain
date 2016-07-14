@@ -1,0 +1,89 @@
+@import "../../common/Common.less";
+
+.terra-GridRow {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+}
+
+.terra-GridColumn {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.terra-LeftSideGridContainer {
+  flex: 0 0 75px;
+  z-index: 10;
+}
+
+.terra-LeftSideGrid {
+  overflow: hidden !important;
+  padding-bottom: 7px;
+}
+.terra-HeaderGrid {
+  width: 100%;
+  overflow: hidden !important;
+}
+.terra-BodyGrid {
+  width: 100%;
+  outline: none;
+}
+
+.terra-evenRow {
+}
+.terra-oddRow {
+  background-color: rgba(0, 0, 0, .1);
+}
+
+
+@yp: 8px;
+@xp: 8px;
+
+.terra-cell,
+.terra-headerCell,
+.terra-leftCell {
+  width: 100%;
+  height: 100%;
+  // display: flex;
+  // flex-direction: column;
+  // justify-content: center;
+  // align-items: center;
+  text-align: left;
+  
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: @yp @xp;
+  
+  .result-field-value-image {
+    max-width: 32px !important;
+    max-height: 32px !important;
+    margin: -4px 0px;
+    height: calc(~"100% + 8px");
+    width: calc(~"100% + 4px");
+  }
+}
+
+.terra-cell-wrapper {
+  padding: 0px @xp; // for some reason it seems that y works fine by x padding is not accounted for.terra- not sure if this is accurate
+}
+
+.terra-headerCell,
+.terra-leftCell {
+  font-weight: bold;
+  border-left: 1px solid mix(#555, @aged-moss);
+}
+.terra-headerCell {
+}
+
+.terra-bodyCell {
+  background: #fff;
+  color: @grey;
+  border-left: 1px solid mix(@fresh-moss, #fff);
+  
+  &.terra-oddRow {
+    background: @builder-bg;
+  }
+}

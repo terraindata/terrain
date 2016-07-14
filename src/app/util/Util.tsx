@@ -222,7 +222,12 @@ var Util = {
   
   rel(target): string
   {
-    return ReactDOM.findDOMNode(target).getAttribute('rel');
+    return Util.attr(target, 'rel');
+  },
+  
+  attr(target, key: string): string
+  {
+    return ReactDOM.findDOMNode(target).getAttribute(key);
   },
   
   titleForCard(card: BuilderTypes.ICard): string

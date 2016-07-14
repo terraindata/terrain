@@ -93,9 +93,17 @@ export class ResultsConfig extends Classs<Props>
   state: {
     fields: string[];
     lastHover: {index: number, field: string},
+    config: Config;
   } = {
     fields: null,
     lastHover: {index: null, field: null},
+    config: null,
+  };
+  
+  constructor(props:Props)
+  {
+    super(props);
+    this.state.config = props.config;
   }
   
   componentWillMount()
@@ -106,6 +114,12 @@ export class ResultsConfig extends Classs<Props>
   componentWillReceiveProps(nextProps)
   {
     this.calcFields(nextProps);
+    if(!_.isEqual(nextProps.config, this.props.config))
+    {
+      this.setState({
+        config: nextProps.config,
+      });
+    }
   }
   
   calcFields(props:Props)
@@ -137,7 +151,7 @@ export class ResultsConfig extends Classs<Props>
   
   getConfig():Config
   {
-    let {config} = this.props;
+    let {config} = this.state;
     return {
       name: config && config.name,
       score: config && config.score,
@@ -190,7 +204,7 @@ export class ResultsConfig extends Classs<Props>
       newConfig[type] = field;
     }
     
-    this.props.onConfigChange(newConfig);
+    this.changeConfig(newConfig);
     
     if(index === undefined)
     {
@@ -200,10 +214,17 @@ export class ResultsConfig extends Classs<Props>
     }
   }
   
+  changeConfig(newConfig:Config)
+  {
+    this.setState({
+      config: newConfig,
+    });
+  }
+  
   handleEnabledToggle()
   {
     let config = this.getConfig();
-    this.props.onConfigChange(_.extend({}, config,
+    this.changeConfig(_.extend({}, config,
     {
       enabled: !config.enabled,
     }));
@@ -253,13 +274,19 @@ export class ResultsConfig extends Classs<Props>
   handleFormatChange(field:string, format:Format)
   {
     let config = this.getConfig();
-    this.props.onConfigChange(_.extend({}, config,
+    this.changeConfig(_.extend({}, config,
     {
       formats: _.extend({}, config.formats,
       {
         [field]: format,
       })
     }));
+  }
+  
+  handleClose()
+  {
+    this.props.onConfigChange(this.state.config);
+    this.props.onClose();
   }
   
 	render()
@@ -285,7 +312,7 @@ export class ResultsConfig extends Classs<Props>
                 selected={enabled ? 1 : 2}
               />
             </div>
-            <div className='results-config-button' onClick={this.props.onClose}>
+            <div className='results-config-button' onClick={this.handleClose}>
               Done
             </div>
           </div>
