@@ -102,11 +102,6 @@ class Profile extends Classs<Props>
       subText: 'This will be displayed on your internal profile',
     },
     {
-      key: 'email',
-      label: 'Email',
-      subText: 'This will be displayed on your internal profile',
-    },
-    {
       key: 'skype',
       label: 'Skype',
       subText: 'This will be displayed on your internal profile',

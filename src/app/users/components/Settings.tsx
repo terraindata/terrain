@@ -56,6 +56,7 @@ import AccountEntry from './../../common/components/AccountEntry.tsx';
 import CheckBox from './../../common/components/CheckBox.tsx';
 import UserTypes from '../UserTypes.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
+import Ajax from './../../util/Ajax.tsx';
 type User = UserTypes.User;
 
 interface Props
@@ -67,7 +68,16 @@ interface Props
 
 class Settings extends Classs<Props>
 {
+
   cancelSubscription = null;
+
+  infoKeys = [
+    {
+      key: 'email',
+      label: 'Email',
+      subText: 'This will be displayed on your internal profile',
+    }
+  ];
 
   constructor(props)
   {
@@ -82,6 +92,9 @@ class Settings extends Classs<Props>
       newPassword: '',
       confirmPassword: '',
       showPassword: false,
+      newEmail: '',
+      saving: false,
+      savingReq: null,
     };
     
     this.cancelSubscription = 
@@ -92,7 +105,7 @@ class Settings extends Classs<Props>
   
   componentWillMount()
   {
-    // Actions.fetch();
+    Actions.fetch();
   }
   
   componentWillUnmount()
@@ -282,20 +295,50 @@ class Settings extends Classs<Props>
 
   renderEmailDescription()
   {
-    let username = AuthStore.getState().get('username');
-    // let user = Store.getState().getIn(['users', username]) as User; 
-    // console.log(user.email);
-
-    let users: UserTypes.UserMap = UserStore.getState().get('users');
-    let user = UserStore.getState().get('currentUser')
-
-    return (
-      <div> 
-      Your email address is <b>test</b>
-      </div>
-    );
+    if(this.state.istate.currentUser && this.state.istate.currentUser.email) 
+    {
+      return(
+        <div>
+          Your email is <b>{this.state.istate.currentUser.email}</b>.
+        </div>
+      );
+    } 
+    return <div>Your email adddress has not been set yet.</div>
   }
   
+  changeEmail() 
+  {
+    var newUser = this.state.istate.currentUser;
+    this.infoKeys.map(infoKey => {
+      newUser = newUser.set(infoKey.key, this.state.newEmail);
+    });
+
+    Actions.change(newUser as UserTypes.User);
+
+    this.setState({
+      saving: true,
+      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
+    });
+  }
+
+  onSave() {
+    this.setState({
+      newEmail: '',
+    });
+    //somehow rerender the description so it shows the right description
+  }
+
+  onSaveError(response) {
+    alert("Error saving: " + JSON.stringify(response));
+  }
+
+  updateNewEmail(event)
+  {
+    this.setState({
+      newEmail: event.target.value,
+    });  
+  }
+
   expandEmail()
   {
     return (
@@ -306,13 +349,14 @@ class Settings extends Classs<Props>
         <div className='row'>
           <input
             type='text'
-            defaultValue=''
+            value={this.state.newEmail}
+            onChange={this.updateNewEmail}
             key='new-email'
             className='settings-input password-input'
             />
           <div className='white-space' />
         </div>
-        <div className='button save-button'>
+        <div className='button save-button' onClick={this.changeEmail}>
             Update Email
          </div>
       </div>
@@ -321,7 +365,7 @@ class Settings extends Classs<Props>
 
   render()
   {
-    const state = this.state.istate;
+    //const state = this.state.istate;
     return (
       <div>
       <div className='settings-page-title'>Update your settings</div>
