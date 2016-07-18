@@ -71,14 +71,6 @@ class Settings extends Classs<Props>
 
   cancelSubscription = null;
 
-  infoKeys = [
-    {
-      key: 'email',
-      label: 'Email',
-      subText: 'This will be displayed on your internal profile',
-    }
-  ];
-
   constructor(props)
   {
     super(props);
@@ -95,6 +87,7 @@ class Settings extends Classs<Props>
       newEmail: '',
       saving: false,
       savingReq: null,
+      user: null
     };
     
     this.cancelSubscription = 
@@ -297,9 +290,14 @@ class Settings extends Classs<Props>
   {
     if(this.state.istate.currentUser && this.state.istate.currentUser.email) 
     {
+      var email = this.state.istate.currentUser.email;
+      if(this.state.user) 
+      {
+        email = this.state.user.email;
+      }
       return(
         <div>
-          Your email is <b>{this.state.istate.currentUser.email}</b>.
+          Your email is <b>{email}</b>.
         </div>
       );
     } 
@@ -309,23 +307,22 @@ class Settings extends Classs<Props>
   changeEmail() 
   {
     var newUser = this.state.istate.currentUser;
-    this.infoKeys.map(infoKey => {
-      newUser = newUser.set(infoKey.key, this.state.newEmail);
-    });
+    newUser = newUser.set('email', this.state.newEmail);
 
     Actions.change(newUser as UserTypes.User);
 
     this.setState({
       saving: true,
       savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
+      user: newUser,
     });
   }
 
   onSave() {
     this.setState({
       newEmail: '',
+      istate: Store.getState(),
     });
-    //somehow rerender the description so it shows the right description
   }
 
   onSaveError(response) {
