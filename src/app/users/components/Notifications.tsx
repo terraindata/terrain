@@ -137,7 +137,7 @@ class Notifications extends Classs<Props>
   
   componentWillMount()
   {
-    //Actions.fetch();
+    Actions.fetch();
   }
   
   componentWillUnmount()

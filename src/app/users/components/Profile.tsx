@@ -86,7 +86,6 @@ class Profile extends Classs<Props>
     'username',
     'whatIDo',
     'phone',
-    'email',
     'skype',
   ];
   
