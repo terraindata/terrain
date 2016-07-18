@@ -203,6 +203,11 @@ class Settings extends Classs<Props>
     });
   }
 
+  resetPasswordByEmail()
+  {
+    alert('This button has not been implemented yet.'); 
+  }
+
   expandPassword()
   {
     return (
@@ -257,13 +262,18 @@ class Settings extends Classs<Props>
           <div className='field-info center'> 
             Can't remember your current password? 
           </div>
-          <div className='button password-button'>
+          <div className='button password-button' onClick={this.resetPasswordByEmail}>
             Reset your password by email
           </div>
           <div className='white-space' />
         </div>
       </div>
     );
+  }
+
+  setupAuthentication()
+  {
+    alert('This button has not been implemented yet');
   }
 
   renderAuthenticationDescription()
@@ -277,7 +287,21 @@ class Settings extends Classs<Props>
 
   expandAuthentication()
   {
-    return <div> None </div>;
+    return (
+      <div className='expand-field'> 
+       <div className='authentication-field'>
+       Protect your Terrain account with an extra layer of security by
+       requiring access to your phone. Once configured you'll be required
+       to enter <b>both your password and an authentication code from your
+       mobile phone</b> in order to sign into your Terrain account. 
+       </div>
+       <div className='row'>
+        <div className='button password-button' onClick={this.setupAuthentication}>
+          Setup Two-Factor Authentication
+        </div>
+       </div>
+      </div>
+    );
   }
 
   renderEmailDescription()
@@ -290,7 +314,7 @@ class Settings extends Classs<Props>
     let user = UserStore.getState().get('currentUser')
 
     return (
-      <div> 
+      <div > 
       Your email address is <b>test</b>
       </div>
     );
@@ -319,6 +343,22 @@ class Settings extends Classs<Props>
     );
   }
 
+  renderTimeZoneDescription()
+  {
+    return (
+      <div> 
+      Terrain uses your time zone to send summary and notification emails, for times
+      in your activity feeds, and for reminders. Your time zone is currently set to:
+      <b>current time zone </b>
+      </div>
+    );
+  }
+
+  expandTimeZone()
+  {
+    alert('This button has not been implemented yet');
+  }
+
   render()
   {
     const state = this.state.istate;
@@ -342,6 +382,11 @@ class Settings extends Classs<Props>
         title='Email'
         description={this.renderEmailDescription}
         onClick={this.expandEmail}
+        /> 
+      <AccountEntry
+        title='Time Zone'
+        description={this.renderTimeZoneDescription}
+        onClick={this.expandTimeZone}
         /> 
       </div >
     );

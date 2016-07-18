@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./AccountEntry.less');
+ require('./AccountEntry.less');
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';

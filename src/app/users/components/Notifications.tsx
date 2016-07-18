@@ -96,19 +96,24 @@ class Notifications extends Classs<Props>
 
   desktopNotificationSounds = [
     {
-      value: 'ding',
-      label: 'ding'
+      value: 'chime',
+      label: 'chime',
     },
     {
-      value: 'ting',
-      label: 'ting'
+      value: 'doorbell',
+      label: 'doorbell',
     },
     {
-      value: 'pop',
-      label: 'pop'
+      value: 'whistle',
+      label: 'whistle',  
     }
   ]
 
+  sounds = {
+    chime: 'http://www.wavsource.com/snds_2016-06-26_4317323406379653/sfx/chime.wav',
+    doorbell: 'http://www.wavsource.com/snds_2016-06-26_4317323406379653/sfx/doorbell_x.wav',
+    whistle: 'http://www.wavsource.com/snds_2016-06-26_4317323406379653/sfx/slide_whistle_up.wav'
+  };
 
   constructor(props)
   {
@@ -119,7 +124,7 @@ class Notifications extends Classs<Props>
       emailNotificationSetting: 'Never',
       emailNewsOn: true,
       desktopNotificationType: 'Activities of any kind',
-      desktopNotificationSound: 'ding',
+      desktopNotificationSound: 'chime',
       emailNotificationType: 'Activities of any kind',
       playSound: false,
     };
@@ -157,7 +162,7 @@ class Notifications extends Classs<Props>
   playSound() 
   {
     var sound = new Audio();
-    sound.src = 'http://www.wav-sounds.com/mail/checked.wav';
+    sound.src = this.sounds[this.state.desktopNotificationSound];
     sound.play();
   }
 
