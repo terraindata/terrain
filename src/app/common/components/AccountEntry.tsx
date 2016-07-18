@@ -58,6 +58,7 @@ interface Props
   title: string;
   description?: () => void;
   onClick?: () => void;
+  button?: () => void;
 }
 
 
@@ -96,6 +97,28 @@ class AccountEntry extends Classs<Props>
     }
   }
 
+  renderDefaultButton()
+  {
+    return (
+        <div className='expand-button button' onClick={this.expand}>
+            {this.state.expand === false ? 'Expand' : 'Collapse'}
+        </div>
+      );
+  }
+
+  renderButton()
+  {
+    if (this.props.button)
+    {
+      return (
+        <div> 
+          {this.props.button()} 
+        </div>
+      );
+    }
+    return this.renderDefaultButton();
+  }
+
   render() {
     return (
         <div className='entry'> 
@@ -104,9 +127,7 @@ class AccountEntry extends Classs<Props>
               {this.props.title}   
             </div> 
             <div className='white-space' />
-            <div className='expand-button button' onClick={this.expand}>
-              {this.state.expand === false ? 'Expand' : 'Collapse'}
-            </div>
+            {this.renderButton()}
           </div> 
             {this.getDescription()}
           <div className='expandedInfo'>

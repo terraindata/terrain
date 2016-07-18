@@ -58,6 +58,8 @@ import UserTypes from '../UserTypes.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
 type User = UserTypes.User;
+var Select = require('react-select');
+
 
 interface Props
 {
@@ -268,7 +270,7 @@ class Settings extends Classs<Props>
           <div className='field-info center'> 
             Can't remember your current password? 
           </div>
-          <div className='button password-button' onClick={this.resetPasswordByEmail}>
+          <div className='button gray-button' onClick={this.resetPasswordByEmail}>
             Reset your password by email
           </div>
           <div className='white-space' />
@@ -302,7 +304,7 @@ class Settings extends Classs<Props>
        mobile phone</b> in order to sign into your Terrain account. 
        </div>
        <div className='row'>
-        <div className='button password-button' onClick={this.setupAuthentication}>
+        <div className='button gray-button' onClick={this.setupAuthentication}>
           Setup Two-Factor Authentication
         </div>
        </div>
@@ -400,6 +402,45 @@ class Settings extends Classs<Props>
     alert('This button has not been implemented yet');
   }
 
+  renderSignOutDescription()
+  {
+    return (
+      <div> 
+        Lost your computer? Left yourself logged in on a public computer? Need a way to sign out 
+        everywhere except your current browser? This is for you.
+      </div>
+    );
+  }
+
+  renderSignOutButton()
+  {
+    return (
+        <div className='yellow-button button'> 
+          Sign out all other sessions
+        </div>
+    );
+  }
+
+  renderDeactivateDescription()
+  {
+    return (
+      <div>
+        If you no longer need your <b>Terrain</b> account you can deactivate it here. 
+        <br /> <b>Note:</b> Don't deactivate your account if you just want yo change your email 
+        address or username.
+      </div>
+    );
+  }
+
+  renderDeactivateButton()
+  {
+    return (
+      <div className='gray-button button'>
+        Deactivate your account
+      </div>
+    );
+  }
+
   render()
   {
     //const state = this.state.istate;
@@ -428,6 +469,16 @@ class Settings extends Classs<Props>
         title='Time Zone'
         description={this.renderTimeZoneDescription}
         onClick={this.expandTimeZone}
+        /> 
+      <AccountEntry
+        title='Sign out all other sessions'
+        description={this.renderSignOutDescription}
+        button={this.renderSignOutButton}
+        /> 
+      <AccountEntry
+        title='Deactivate your account'
+        description={this.renderDeactivateDescription}
+        button={this.renderDeactivateButton}
         /> 
       </div >
     );
