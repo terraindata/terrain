@@ -56,9 +56,9 @@ var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 interface Props
 {
   title: string;
-  description?: () => void;
-  onClick?: () => void;
-  button?: () => void;
+  getDescription?: () => JSX.Element;
+  getContent?: () => JSX.Element;
+  getButtonText?: () => JSX.Element;
 }
 
 
@@ -69,7 +69,7 @@ class AccountEntry extends Classs<Props>
     super(props);
     this.state =
       {
-        expand: false,
+        expanded: false,
         expandedInfo: <div />,
       }
   }
@@ -77,42 +77,42 @@ class AccountEntry extends Classs<Props>
   expand()
   {
     this.setState({
-      expand: this.state.expand === false ? true : false
+      expanded: !this.state.expanded
     }); 
   }
 
   expandCode()
   {
-    if (this.state.expand) 
+    if (this.state.expanded) 
     {
-      return this.props.onClick();
+      return this.props.getContent();
     }
   }
 
   getDescription()
   {
-    if (this.props.description)
+    if (this.props.getDescription)
      {
-      return <div className='description'>{this.props.description()}</div>;
+      return <div className='account-entry-description'>{this.props.getDescription()}</div>;
     }
   }
 
   renderDefaultButton()
   {
     return (
-        <div className='expand-button button' onClick={this.expand}>
-            {this.state.expand === false ? 'Expand' : 'Collapse'}
+        <div className='account-entry-expand-button button' onClick={this.expand}>
+            {this.state.expanded ? 'Collapse' : 'Expand'}
         </div>
       );
   }
 
   renderButton()
   {
-    if (this.props.button)
+    if (this.props.getButtonText)
     {
       return (
         <div> 
-          {this.props.button()} 
+          {this.props.getButtonText()} 
         </div>
       );
     }
@@ -121,19 +121,19 @@ class AccountEntry extends Classs<Props>
 
   render() {
     return (
-        <div className='entry'> 
-          <div className='top-bar'> 
-            <div className='title'>
+        <div className='account-entry'> 
+          <div className='account-entry-top-bar'> 
+            <div className='account-entry-title'>
               {this.props.title}   
             </div> 
-            <div className='white-space' />
+            <div className='account-entry-white-space' />
             {this.renderButton()}
           </div> 
             {this.getDescription()}
-          <div className='expandedInfo'>
+          <div className='account-entry-expanded-info'>
             {this.expandCode()}
           </div>
-          <hr className ='line'/>
+          <hr className ='account-entry-line'/>
         </div>
     );
   }

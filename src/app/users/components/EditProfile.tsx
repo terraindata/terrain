@@ -108,7 +108,8 @@ class Profile extends Classs<Props>
     },
   ];
 
-  constructor(props: Props) {
+  constructor(props: Props) 
+  {
     super(props);
 
     this.userUnsubscribe =
@@ -117,7 +118,8 @@ class Profile extends Classs<Props>
       AuthStore.subscribe(() => this.updateUser(this.props));
   }
 
-  updateUser(props: Props) {
+  updateUser(props: Props) 
+  {
     let userState: UserTypes.UserState = UserStore.getState();
     let authState = AuthStore.getState();
     this.setState({
@@ -126,18 +128,21 @@ class Profile extends Classs<Props>
     })
   }
 
-  componentWillMount() {
+  componentWillMount() 
+  {
     Actions.fetch();
     this.updateUser(this.props);
   }
 
-  componentWillUnmount() {
+  componentWillUnmount() 
+  {
     this.userUnsubscribe && this.userUnsubscribe();
     this.authUnsubscribe && this.authUnsubscribe();
     this.state.savingReq && this.state.savingReq.abort();
   }
 
-  handleSave() {
+  handleSave() 
+  {
     var newUser = this.state.user
       .set('imgSrc', this.refs['profilePicImg']['src']);
     this.infoKeys.map(infoKey => {
@@ -152,7 +157,8 @@ class Profile extends Classs<Props>
     });
   }
 
-  onSave() {
+  onSave() 
+  {
     this.setState({
       saving: false,
       savingReq: null,
@@ -160,7 +166,8 @@ class Profile extends Classs<Props>
     this.props.history.pushState({}, '/account/profile');
   }
 
-  onSaveError(response) {
+  onSaveError(response) 
+  {
     alert("Error saving: " + JSON.stringify(response));
     this.setState({
       saving: false,
@@ -168,7 +175,8 @@ class Profile extends Classs<Props>
     });
   }
 
-  renderInfoItem(infoKey: { key: string, label: string, subText: string }) {
+  renderInfoItem(infoKey: { key: string, label: string, subText: string }) 
+  {
     return (
       <div className='profile-info-item-edit' key={infoKey.key}>
         <div className='profile-info-item-name'>
@@ -188,14 +196,16 @@ class Profile extends Classs<Props>
     );
   }
 
-  handleProfilePicClick(event) {
+  handleProfilePicClick(event) 
+  {
     //maybe have a slight delay or animation here
     this.setState({
       showDropDown: !this.state.showDropDown,
     })
   }
 
-  handleUploadImage(event) {
+  handleUploadImage(event) 
+  {
     this.refs['imageInput']['click']();
   }
 
@@ -226,8 +236,10 @@ class Profile extends Classs<Props>
     }
   }
   
-  hidePictureMenu() {
-    if (this.state.showDropDown) {
+  hidePictureMenu() 
+  {
+    if (this.state.showDropDown) 
+    {
       this.setState({
         showDropDown: false,
       })

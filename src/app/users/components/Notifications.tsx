@@ -51,7 +51,7 @@ import Actions from './../data/UserActions.tsx';
 import BrowserTypes from './../UserTypes.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
 import { Link } from 'react-router';
-import AccountEntry from './../../common/components/AccountEntry.tsx';
+import AccountEntry from './AccountEntry.tsx';
 import CheckBox from './../../common/components/CheckBox.tsx';
 import RadioButton from './../../common/components/RadioButton.tsx';
 import Ajax from './../../util/Ajax.tsx';
@@ -250,10 +250,10 @@ class Notifications extends Classs<Props>
            className={sound === 'none' ? 'disabled' : 'preview-button'}
            onClick={sound === 'none' ? null : this.playSound}
          >
-          <div className='sound-icon'>
+          <div className='notification-sound-icon'>
             <SoundIcon/>
           </div>
-          <div className='preview-button-text'>
+          <div className='notification-preview-button-text'>
             Preview
           </div>
         </div>
@@ -385,7 +385,7 @@ class Notifications extends Classs<Props>
       return(
         <div>
         Your email is currently set to
-        <span className='email-blue'>
+        <span className='notification-email-blue'>
         {this.state.istate.currentUser.email}
         </span>
         .
@@ -456,18 +456,18 @@ class Notifications extends Classs<Props>
       <div className='notifications-page-title'>Update your notifications</div>
       <AccountEntry
         title='Desktop Notifications'
-        description={this.renderDesktopDescription}
-        onClick={this.expandDesktopNotifications}
+        getDescription={this.renderDesktopDescription}
+        getContent={this.expandDesktopNotifications}
       />
       <AccountEntry
         title='Email Notifications'
-        description={this.renderEmailDescription}
-        onClick={this.expandEmailNotifications}
+        getDescription={this.renderEmailDescription}
+        getContent={this.expandEmailNotifications}
       />
       <AccountEntry
         title='Email News & Updates'
-        description={this.renderEmailNewsDescription}
-        onClick={this.expandEmailNews}
+        getDescription={this.renderEmailNewsDescription}
+        getContent={this.expandEmailNews}
       />
 
       </div>

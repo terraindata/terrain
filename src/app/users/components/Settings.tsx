@@ -52,7 +52,7 @@ import InfoArea from './../../common/components/InfoArea.tsx';
 import { Link } from 'react-router';
 import AuthStore from './../../auth/data/AuthStore.tsx';
 import AuthActions from './../../auth/data/AuthActions.tsx';
-import AccountEntry from './../../common/components/AccountEntry.tsx';
+import AccountEntry from './AccountEntry.tsx';
 import CheckBox from './../../common/components/CheckBox.tsx';
 import UserTypes from '../UserTypes.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
@@ -545,36 +545,36 @@ class Settings extends Classs<Props>
       <div className='settings-page-title'>Update your settings</div>
       <AccountEntry 
         title='Username'
-        onClick= {this.expandUsername}
+        getContent= {this.expandUsername}
       /> 
       <AccountEntry 
         title='Password'
-        onClick={this.expandPassword}
+        getContent={this.expandPassword}
       /> 
       <AccountEntry 
         title='Two-Factor Authentication' 
-        description={this.renderAuthenticationDescription}
-        onClick={this.expandAuthentication}
+        getDescription={this.renderAuthenticationDescription}
+        getContent={this.expandAuthentication}
        /> 
       <AccountEntry
         title='Email'
-        description={this.renderEmailDescription}
-        onClick={this.expandEmail}
+        getDescription={this.renderEmailDescription}
+        getContent={this.expandEmail}
         /> 
       <AccountEntry
         title='Time Zone'
-        description={this.renderTimeZoneDescription}
-        onClick={this.expandTimeZone}
+        getDescription={this.renderTimeZoneDescription}
+        getContent={this.expandTimeZone}
         /> 
       <AccountEntry
         title='Sign out all other sessions'
-        description={this.renderSignOutDescription}
-        button={this.renderSignOutButton}
+        getDescription={this.renderSignOutDescription}
+        getButtonText={this.renderSignOutButton}
         /> 
       <AccountEntry
         title='Deactivate your account'
-        description={this.renderDeactivateDescription}
-        button={this.renderDeactivateButton}
+        getDescription={this.renderDeactivateDescription}
+        getButtonText={this.renderDeactivateButton}
         /> 
       </div >
     );
