@@ -61,6 +61,8 @@ type User = UserTypes.User;
 var Select = require('react-select');
 var TimeZones = require('./Timezones.json');
 var PasswordStrengthMeter = require('./password-strength.js');
+var LogoutIcon = require("./../../../images/icon_logout.svg");
+
 
 interface Props
 {
@@ -91,7 +93,7 @@ class Settings extends Classs<Props>
       saving: false,
       savingReq: null,
       user: null,
-      timeZone: 158,
+      timeZone: null,
     };
     
     this.cancelSubscription = 
@@ -143,21 +145,21 @@ class Settings extends Classs<Props>
     );
   }
 
-  handleCurrentPasswordChange = (ev:any) =>
+  handleCurrentPasswordChange(ev)
   {
     this.setState({ 
       currentPassword: ev.target.value 
     });
   }
 
-  handleNewPasswordChange = (ev:any) =>
+  handleNewPasswordChange(ev)
   {
     this.setState({ 
       newPassword: ev.target.value 
     });
   }
 
-  handleConfirmPasswordChange = (ev:any) =>
+  handleConfirmPasswordChange(ev)
   {
     this.setState({ 
       confirmPassword: ev.target.value 
@@ -403,14 +405,14 @@ class Settings extends Classs<Props>
   }
 
   renderTimeZoneDescription()
-  {
-    var timeZone;
-    if(this.state.istate.currentUser && this.state.istate.currentUser.timeZone) 
+  {  
+    if(this.state.istate.currentUser)
     {
-      timeZone = this.state.istate.currentUser.timeZone;
+      var timeZone = this.state.timeZone || this.state.istate.currentUser.timeZone || 158;
     }
-    else {
-      timeZone = 158;
+    else 
+    {
+      timeZone = this.state.timeZone || 158;
     }
     return (
       <div> 
@@ -458,11 +460,17 @@ class Settings extends Classs<Props>
   expandTimeZone()
   {
     var timeZonesList = this.renderTimeZonesList();
+    
+    if(this.state.istate.currentUser)
+    {
+      var timeZone = this.state.timeZone || this.state.istate.currentUser.timeZone || 158;
+    }
+
     return (
       <div className='row'>
         <Select
            clearable={false}
-           value={this.state.timeZone}
+           value={timeZone}
            options={timeZonesList}
            onChange={this.changeTimeZone}
            className='timezone-dropdown'
@@ -474,18 +482,28 @@ class Settings extends Classs<Props>
   renderSignOutDescription()
   {
     return (
-      <div> 
+      <div className='shifted-text'> 
         Lost your computer? Left yourself logged in on a public computer? Need a way to sign out 
         everywhere except your current browser? This is for you.
       </div>
     );
   }
 
+  signOut()
+  {
+    alert('This button has not been implemented.');
+  }
+
   renderSignOutButton()
   {
     return (
-        <div className='yellow-button button'> 
+        <div className='yellow-button button' onClick={this.signOut}> 
+          <div className='logout-button'>
+          <div className ='logout-icon'>
+            <LogoutIcon />
+          </div>
           Sign out all other sessions
+          </div>
         </div>
     );
   }
@@ -493,18 +511,26 @@ class Settings extends Classs<Props>
   renderDeactivateDescription()
   {
     return (
-      <div>
+      <div className='shifted-text'>
         If you no longer need your <b>Terrain</b> account you can deactivate it here. 
-        <br /> <b>Note:</b> Don't deactivate your account if you just want yo change your email 
-        address or username.
+        <br /> 
+        <span className='font-small'>
+          <b>Note:</b> Don't deactivate your account if you just want to change your <span className='blue-font'>email 
+          address </span> or <span className='blue-font'>username</span>.
+        </span>
       </div>
     );
+  }
+
+  deactivate()
+  {
+    alert('This button has not been implemented.');
   }
 
   renderDeactivateButton()
   {
     return (
-      <div className='gray-button button'>
+      <div className='gray-button button' onClick={this.deactivate}>
         Deactivate your account
       </div>
     );
@@ -512,7 +538,6 @@ class Settings extends Classs<Props>
 
   render()
   {
-    //const state = this.state.istate;
     return (
       <div>
       <div className='settings-page-title'>Update your settings</div>

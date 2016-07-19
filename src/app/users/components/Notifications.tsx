@@ -123,7 +123,7 @@ class Notifications extends Classs<Props>
   //These should be local files, only work if they are cached
   sounds = {
     chime: 'http://www.wavsource.com/snds_2016-06-26_4317323406379653/sfx/chime.wav',
-    doorbell: 'http://www.wavsource.com/snds_2016-06-26_4317323406379653/sfx/doorbell_x.wav',
+    doorbell: 'http://lukeknepper.com/upload/doorbell_x.wav',
     whistle: 'http://www.wavsource.com/snds_2016-06-26_4317323406379653/sfx/slide_whistle_up.wav'
   };
 
