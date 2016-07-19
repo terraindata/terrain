@@ -56,7 +56,7 @@ import CheckBox from './../../common/components/CheckBox.tsx';
 import RadioButtons from './../../common/components/RadioButtons.tsx';
 import Ajax from './../../util/Ajax.tsx';
 import UserTypes from '../UserTypes.tsx';
-var ReactPlayer = require('react-player');
+// var ReactPlayer = require('react-player');
 
 var Select = require('react-select');
 var SoundIcon = require("./../../../images/icon_camera.svg");
@@ -124,7 +124,7 @@ class Notifications extends Classs<Props>
   //These should be local files, only work if they are cached
   sounds = {
     chime: 'http://www.wavsource.com/snds_2016-06-26_4317323406379653/sfx/chime.wav',
-    doorbell: 'http://www.wavsource.com/snds_2016-06-26_4317323406379653/sfx/doorbell_x.wav',
+    doorbell: 'http://lukeknepper.com/upload/doorbell_x.wav',
     whistle: 'http://www.wavsource.com/snds_2016-06-26_4317323406379653/sfx/slide_whistle_up.wav'
   };
 
