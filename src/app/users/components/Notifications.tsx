@@ -56,7 +56,7 @@ import CheckBox from './../../common/components/CheckBox.tsx';
 import RadioButtons from './../../common/components/RadioButtons.tsx';
 import Ajax from './../../util/Ajax.tsx';
 import UserTypes from '../UserTypes.tsx';
-
+var ReactPlayer = require('react-player');
 
 var Select = require('react-select');
 var SoundIcon = require("./../../../images/icon_camera.svg");
@@ -140,7 +140,7 @@ class Notifications extends Classs<Props>
       desktopNotificationSound: '',
       emailNotificationType: '',
       saving: false,
-      savingReq: null,
+      savingReq: null
     };
     
     this.cancelSubscription = 
@@ -206,8 +206,10 @@ class Notifications extends Classs<Props>
       this.state.istate.currentUser.sound || '';
     if(soundName !== 'none') 
     {
+      //ISSUE: does not play unless sounds are cached
       var sound = new Audio();
       sound.src = this.sounds[soundName];
+      sound.load();
       sound.play();
     }
   }
@@ -256,7 +258,7 @@ class Notifications extends Classs<Props>
            <div className='preview-button-text'>
            Preview
            </div>
-         </div>
+          </div>
      </div>
    );
   }
