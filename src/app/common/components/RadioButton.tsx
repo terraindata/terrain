@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./CheckBox.less');
+require('./RadioButton.less');
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
@@ -51,25 +51,43 @@ import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
 
 interface Props {
-	checked: boolean;
-	onChange: () => void;
+	selected?: string;
+	options: {
+			value: string;
+			onClick: () => void
+		}[];
 }
 
-class CheckBox extends Classs<Props>
+class RadioButton extends Classs<Props>
 {
-	render() {
+
+	renderOption(option)
+	{
 		return (
-			<div 
-				className={classNames({
-					'checkbox': true,
-  				'checkbox-checked': this.props.checked,
-				})} 
-				onClick={this.props.onChange}
-			>
-				{this.props.checked ? '\u2713' : 'O'}
+			<div key={option.value} className='radio-button-option'>
+				<div 
+					onClick={option.onClick}
+					className={classNames({
+  					'radio-button': true,
+  					'radio-button-selected': option.value === this.props.selected,
+					})}							
+				>
+				</div>
+				{option.value}
+				<br/>
+			</div>
+		);
+
+	}
+
+	render() 
+	{
+		return (
+			<div>
+				{this.props.options.map(this.renderOption)}
 			</div>
 		);
 	};
 }
 
-export default CheckBox;
+export default RadioButton;

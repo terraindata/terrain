@@ -53,7 +53,7 @@ import InfoArea from './../../common/components/InfoArea.tsx';
 import { Link } from 'react-router';
 import AccountEntry from './../../common/components/AccountEntry.tsx';
 import CheckBox from './../../common/components/CheckBox.tsx';
-import RadioButtons from './../../common/components/RadioButtons.tsx';
+import RadioButton from './../../common/components/RadioButton.tsx';
 import Ajax from './../../util/Ajax.tsx';
 import UserTypes from '../UserTypes.tsx';
 
@@ -74,15 +74,15 @@ class Notifications extends Classs<Props>
   emailNotificationOptions = [
     {
       value: 'Once every 15 minutes', 
-      handler: this.changeEmailNotifications_15Min
+      onClick: this.changeEmailNotifications_15Min
     },
     {
       value: 'Once an hour at most',
-      handler: this.changeEmailNotifications_Hour
+      onClick: this.changeEmailNotifications_Hour
     },
     {
       value: 'Never',
-      handler: this.changeEmailNotifications_Never
+      onClick: this.changeEmailNotifications_Never
     }
   ];
 
@@ -317,7 +317,7 @@ class Notifications extends Classs<Props>
         <div>Send me email notifications:</div>
         <br/>
         <div className='expanded-section-indent'>
-          <RadioButtons
+          <RadioButton
             selected={emailTiming}
             options={this.emailNotificationOptions}
           />

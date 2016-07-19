@@ -130,16 +130,16 @@ class Settings extends Classs<Props>
             className='settings-input'
             disabled={true}
           />
-          <div className='button save-button' onClick={this.saveUsername}>
+          <div className='button settings-save-button' onClick={this.saveUsername}>
             Save
           </div>
         </div>
-        <div className='field-info'>
+        <div className='settings-field-info'>
           Usernames must be all lowercase.They cannot be longer than 21 characters and can only contain letters, periods, hyphens, and underscores.
           Most people choose to use their first name, last name, nickname, or some combination of those with initials.
           <br />
           <b>
-            Note that you can only change your user name twice per hour. 
+            Note that you can only change your username twice per hour. 
           </b> Choose wisely.
         </div>
       </div>
@@ -239,8 +239,8 @@ class Settings extends Classs<Props>
   expandPassword()
   {
     return (
-      <div className='expand-field'>
-        <div className='field-title'>
+      <div className='settings-expand-field'>
+        <div className='settings-field-title'>
           Current Password
         </div>
         <input
@@ -250,23 +250,23 @@ class Settings extends Classs<Props>
           className='settings-input password-input'
           value={this.state.currentPassword}
          />
-        <div className='field-title'>
+        <div className='settings-field-title'>
           New Password
         </div>
-        <div className='row'> 
-         <div className='password-container'>
+        <div className='settings-row'> 
+         <div className='settings-password-container'>
         <PasswordStrengthMeter
           onChange={this.handleNewPasswordChange}
           type={this.state.showPassword ? 'text' : 'password'}
           value={this.state.newPassword}
         />   
       </div>
-          <div className='white-space' />
+          <div className='settings-white-space' />
         </div>
-        <div className='field-title'>
+        <div className='settings-field-title'>
           Confirm Password
         </div>
-        <div className='row'>
+        <div className='settings-row'>
           <input
             type={this.state.showPassword ? 'text' : 'password'}
             value={this.state.confirmPassword}
@@ -274,26 +274,26 @@ class Settings extends Classs<Props>
             onChange={this.handleConfirmPasswordChange}
             className='settings-input password-input'
             />
-          <div className='white-space' />
+          <div className='settings-white-space' />
         </div>
-        <div className='row bottom-margin'> 
+        <div className='settings-row bottom-margin'> 
           <CheckBox checked={this.state.showPassword} onChange={this.toggleShowPassword}/>
-          <div className='field-info'>Show password</div>
+          <div className='settings-field-info'>Show password</div>
         </div>
-        <div className='row'>
-          <div className='button save-button' onClick={this.createNewPassword} >
+        <div className='settings-row'>
+          <div className='button settings-save-button' onClick={this.createNewPassword} >
             Save
           </div>
-          <div className='white-space' />
+          <div className='settings-white-space' />
         </div>
-        <div className='row'>
-          <div className='field-info center'> 
+        <div className='settings-row'>
+          <div className='settings-field-info settings-center'> 
             Can't remember your current password? 
           </div>
-          <div className='button gray-button' onClick={this.resetPasswordByEmail}>
+          <div className='button settings-gray-button' onClick={this.resetPasswordByEmail}>
             Reset your password by email
           </div>
-          <div className='white-space' />
+          <div className='settings-white-space' />
         </div>
       </div>
     );
@@ -316,15 +316,15 @@ class Settings extends Classs<Props>
   expandAuthentication()
   {
     return (
-      <div className='expand-field'> 
-       <div className='authentication-field'>
+      <div className='settings-expand-field'> 
+       <div className='settings-authentication-field'>
        Protect your Terrain account with an extra layer of security by
        requiring access to your phone. Once configured you'll be required
        to enter <b>both your password and an authentication code from your
        mobile phone</b> in order to sign into your Terrain account. 
        </div>
-       <div className='row'>
-        <div className='button gray-button' onClick={this.setupAuthentication}>
+       <div className='settings-row'>
+        <div className='button settings-gray-button' onClick={this.setupAuthentication}>
           Setup Two-Factor Authentication
         </div>
        </div>
@@ -385,11 +385,11 @@ class Settings extends Classs<Props>
   expandEmail()
   {
     return (
-      <div className='expand-field'> 
-        <div className='field-title'>
+      <div className='settings-expand-field'> 
+        <div className='settings-field-title'>
           New Email Address
         </div>
-        <div className='row'>
+        <div className='settings-row'>
           <input
             type='text'
             value={this.state.newEmail}
@@ -397,9 +397,9 @@ class Settings extends Classs<Props>
             key='new-email'
             className='settings-input password-input'
             />
-          <div className='white-space' />
+          <div className='settings-white-space' />
         </div>
-        <div className='button save-button' onClick={this.changeEmail}>
+        <div className='button settings-save-button' onClick={this.changeEmail}>
             Update Email
          </div>
       </div>
@@ -469,13 +469,13 @@ class Settings extends Classs<Props>
     }
 
     return (
-      <div className='row'>
+      <div className='settings-row'>
         <Select
            clearable={false}
            value={timeZone}
            options={timeZonesList}
            onChange={this.changeTimeZone}
-           className='timezone-dropdown'
+           className='settings-timezone-dropdown'
        />
        </div>
     );
@@ -484,7 +484,7 @@ class Settings extends Classs<Props>
   renderSignOutDescription()
   {
     return (
-      <div className='shifted-text'> 
+      <div className='settings-shifted-text'> 
         Lost your computer? Left yourself logged in on a public computer? Need a way to sign out 
         everywhere except your current browser? This is for you.
       </div>
@@ -499,9 +499,9 @@ class Settings extends Classs<Props>
   renderSignOutButton()
   {
     return (
-        <div className='yellow-button button' onClick={this.signOut}> 
-          <div className='logout-button'>
-          <div className ='logout-icon'>
+        <div className='settings-yellow-button button' onClick={this.signOut}> 
+          <div className='settings-logout-button'>
+          <div className ='settings-logout-icon'>
             <LogoutIcon />
           </div>
           Sign out all other sessions
@@ -513,12 +513,12 @@ class Settings extends Classs<Props>
   renderDeactivateDescription()
   {
     return (
-      <div className='shifted-text'>
+      <div className='settings-shifted-text'>
         If you no longer need your <b>Terrain</b> account you can deactivate it here. 
         <br /> 
-        <span className='font-small'>
-          <b>Note:</b> Don't deactivate your account if you just want to change your <span className='blue-font'>email 
-          address </span> or <span className='blue-font'>username</span>.
+        <span className='settings-font-small'>
+          <b>Note:</b> Don't deactivate your account if you just want to change your <span className='settings-blue-font'>email 
+          address </span> or <span className='settings-blue-font'>username</span>.
         </span>
       </div>
     );
@@ -532,7 +532,7 @@ class Settings extends Classs<Props>
   renderDeactivateButton()
   {
     return (
-      <div className='gray-button button' onClick={this.deactivate}>
+      <div className='settings-gray-button button' onClick={this.deactivate}>
         Deactivate your account
       </div>
     );
