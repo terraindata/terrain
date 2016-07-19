@@ -54,6 +54,10 @@ import { Link } from 'react-router';
 import AccountEntry from './../../common/components/AccountEntry.tsx';
 import CheckBox from './../../common/components/CheckBox.tsx';
 import RadioButtons from './../../common/components/RadioButtons.tsx';
+import Ajax from './../../util/Ajax.tsx';
+import UserTypes from '../UserTypes.tsx';
+var ReactPlayer = require('react-player');
+
 var Select = require('react-select');
 var SoundIcon = require("./../../../images/icon_camera.svg");
 
@@ -91,6 +95,10 @@ class Notifications extends Classs<Props>
     {
       value: 'Certain activities',
       label: 'Certain activities'
+    },
+    {
+      value: 'None',
+      label: 'None'
     }
   ]
 
@@ -106,9 +114,14 @@ class Notifications extends Classs<Props>
     {
       value: 'whistle',
       label: 'whistle',  
+    },
+    {
+      value: 'none',
+      label: 'none',
     }
   ]
 
+  //These should be local files, only work if they are cached
   sounds = {
     chime: 'http://www.wavsource.com/snds_2016-06-26_4317323406379653/sfx/chime.wav',
     doorbell: 'http://www.wavsource.com/snds_2016-06-26_4317323406379653/sfx/doorbell_x.wav',
@@ -121,12 +134,13 @@ class Notifications extends Classs<Props>
     
     this.state = {
       istate: Store.getState(),
-      emailNotificationSetting: 'Never',
-      emailNewsOn: true,
-      desktopNotificationType: 'Activities of any kind',
-      desktopNotificationSound: 'chime',
-      emailNotificationType: 'Activities of any kind',
-      playSound: false,
+      emailNotificationTiming: '',
+      emailNewsOn: '',
+      desktopNotificationType: '',
+      desktopNotificationSound: '',
+      emailNotificationType: '',
+      saving: false,
+      savingReq: null
     };
     
     this.cancelSubscription = 
@@ -147,27 +161,69 @@ class Notifications extends Classs<Props>
 
   onDesktopNotificationChange(val) 
   {
-    this.setState ({
+    var newUser = this.state.istate.currentUser;
+    newUser = newUser.set('desktopNotificationType', val.value);
+
+    Actions.change(newUser as UserTypes.User);
+
+    this.setState({
+      saving: true,
+      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
       desktopNotificationType: val.value,
-    })
+    });
+  }
+
+  onSave() 
+  {
+    this.setState({
+      saving: false,
+      savingReq: null,
+    });
+  }
+
+  onSaveError(response) 
+  {
+    alert("Error saving: " + JSON.stringify(response));
   }
 
   onDesktopNotificationsSoundChange(val) 
   {
-    this.setState ({
+    var newUser = this.state.istate.currentUser;
+    newUser = newUser.set('sound', val.value);
+
+    Actions.change(newUser as UserTypes.User);
+
+    this.setState({
+      saving: true,
+      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
       desktopNotificationSound: val.value,
-    })
+    });
   }
 
   playSound() 
   {
-    var sound = new Audio();
-    sound.src = this.sounds[this.state.desktopNotificationSound];
-    sound.play();
+    var soundName = this.state.desktopNotificationSound ||
+      this.state.istate.currentUser.sound || '';
+    if(soundName !== 'none') 
+    {
+      //ISSUE: does not play unless sounds are cached
+      var sound = new Audio();
+      sound.src = this.sounds[soundName];
+      sound.load();
+      sound.play();
+    }
   }
 
   expandDesktopNotifications()
   {
+   if(this.state.istate.currentUser)
+   {
+      var desktopNotification = 
+        this.state.desktopNotificationType ||
+        this.state.istate.currentUser.desktopNotificationType || '';
+      var sound = this.state.desktopNotificationSound ||
+                  this.state.istate.currentUser.sound || '';
+   }
    return (
      <div className='notification-expansion'>
        <div className='notification-subtitle'>
@@ -176,7 +232,7 @@ class Notifications extends Classs<Props>
        <Select
          clearable={false}
          name='desktop-notification'
-         value={this.state.desktopNotificationType}
+         value={desktopNotification}
          options={this.notificationTypes}
          onChange={this.onDesktopNotificationChange}
          className='notifications-select'
@@ -186,15 +242,15 @@ class Notifications extends Classs<Props>
        </div>
          <Select
             name='desktop-notification-sound'
-            value={this.state.desktopNotificationSound}
+            value={sound}
             clearable={false}
             options={this.desktopNotificationSounds}
             onChange={this.onDesktopNotificationsSoundChange}
             className='notifications-select'
          />
          <div 
-           className='preview-button'
-           onClick={this.playSound}
+           className={sound === 'none' ? 'disabled' : 'preview-button'}
+           onClick={sound === 'none' ? null : this.playSound}
          >
            <div className='sound-icon'>
              <SoundIcon/>
@@ -202,48 +258,68 @@ class Notifications extends Classs<Props>
            <div className='preview-button-text'>
            Preview
            </div>
-         </div>
+          </div>
      </div>
    );
   }
   
+  changeEmailTiming(newTimeSetting)
+  {
+    var newUser = this.state.istate.currentUser;
+    newUser = newUser.set('emailNotificationTiming', newTimeSetting);
+    Actions.change(newUser as UserTypes.User);
+    this.setState({
+      saving: true,
+      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
+      emailNotificationTiming: newTimeSetting,
+    });
+  }
+
   changeEmailNotifications_15Min()
   {
-    this.setState ({
-      emailNotificationSetting: this.emailNotificationOptions[0].value
-    })
+    this.changeEmailTiming(this.emailNotificationOptions[0].value);
   }
 
   changeEmailNotifications_Hour()
   {
-    this.setState ({
-      emailNotificationSetting: this.emailNotificationOptions[1].value
-    })
+    this.changeEmailTiming(this.emailNotificationOptions[1].value);
   }
-
-    changeEmailNotifications_Never()
+  
+  changeEmailNotifications_Never()
   {
-    this.setState ({
-      emailNotificationSetting: this.emailNotificationOptions[2].value
-    })
+    this.changeEmailTiming(this.emailNotificationOptions[2].value);
   }
 
   onEmailNotificationTypeChange(val)
   {
+    var newUser = this.state.istate.currentUser;
+    newUser = newUser.set('emailNotificationType', val.value);
+    Actions.change(newUser as UserTypes.User);
     this.setState({
+      saving: true,
+      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
       emailNotificationType: val.value,
-    })
+    });
   }
 
   expandEmailNotifications() 
   {
+   if(this.state.istate.currentUser)
+   {
+     var emailNotification = 
+      this.state.emailNotificationType ||
+      this.state.istate.currentUser.emailNotificationType || '';
+     var emailTiming = 
+       this.state.emailNotificationTiming ||
+       this.state.istate.currentUser.emailNotificationTiming || '';
+   }
     return (
       <div className='notification-expansion'>
         <div>Send me email notifications:</div>
         <br/>
         <div className='expanded-section-indent'>
           <RadioButtons
-            selected={this.state.emailNotificationSetting}
+            selected={emailTiming}
             options={this.emailNotificationOptions}
           />
         </div>
@@ -253,7 +329,7 @@ class Notifications extends Classs<Props>
        <Select
          clearable={false}
          name='email-notification'
-         value={this.state.emailNotificationType}
+         value={emailNotification}
          options={this.notificationTypes}
          onChange={this.onEmailNotificationTypeChange}
          className='notifications-select'
@@ -264,20 +340,33 @@ class Notifications extends Classs<Props>
 
   toggleEmailNews() 
   {
+    var emailNewsOn = (this.state.emailNewsOn || 
+        this.state.istate.currentUser.emailNews) === 'on';
+   var newEmailNewsSetting = emailNewsOn ? 'off' : 'on';
+   var newUser = this.state.istate.currentUser;
+    newUser = newUser.set('emailNews', newEmailNewsSetting);
+    Actions.change(newUser as UserTypes.User);
     this.setState({
-      emailNewsOn: !this.state.emailNewsOn,
+      saving: true,
+      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
+      emailNewsOn: newEmailNewsSetting,
     });
   }
 
   expandEmailNews() 
   {
+    if(this.state.istate.currentUser)
+    {
+      var emailNewsOn = (this.state.emailNewsOn || 
+        this.state.istate.currentUser.emailNews) === 'on';
+    }
     return (
       <div className='notification-expansion'>
         <div>You can choose which of these updates you'd like to receive:</div>
         <br/>
         <span className='expanded-section-indent'>
           <CheckBox 
-            checked={this.state.emailNewsOn} 
+            checked={emailNewsOn} 
             onChange={this.toggleEmailNews}
           />
           Send me emails with Terrain news and tips <br/><br/>
@@ -309,11 +398,19 @@ class Notifications extends Classs<Props>
 
   renderDesktopDescription() 
   {
+    //If they haven't changed the desktop notification type, use the one 
+    //stored in istate, otherwise, use the type stored in state
+   if(this.state.istate.currentUser)
+   {
+      var desktopNotification = 
+        this.state.desktopNotificationType ||
+        this.state.istate.currentUser.desktopNotificationType || '';    
+   }
     return(
       <div>
         Terrain can send push notifications to your desktop when someone 
         updates an algorithm. You are currently recieving updates for 
-        <span><b>{' ' + this.state.desktopNotificationType}.</b></span>
+        <span><b>{' ' + desktopNotification}.</b></span>
       </div>  
     );
 
@@ -321,22 +418,33 @@ class Notifications extends Classs<Props>
 
   renderEmailDescription()
   {
+    if(this.state.istate.currentUser) 
+    {
+      var emailTiming = 
+       this.state.emailNotificationTiming ||
+       this.state.istate.currentUser.emailNotificationTiming || '';
+    }
     return(
       <div>
         When you're busy or not online, Terrain can send you 
         emails so you don't miss a beat.You are currently receiving emails 
-        <span><b>{' ' + this.state.emailNotificationSetting}.</b></span>
+        <span><b>{' ' + emailTiming}.</b></span>
       </div>
     );
   }
 
   renderEmailNewsDescription() 
   {
+    if(this.state.istate.currentUser)
+    {
+      var emailNewsOn = (this.state.emailNewsOn || 
+        this.state.istate.currentUser.emailNews) === 'on';
+    }
     return(
       <div>
         From time to time we'd like to send you emails with interesting 
         news from the Terrain team. You are set up to 
-        <span><b>{this.state.emailNewsOn ? ' ' : ' not '}</b></span>
+        <span><b>{emailNewsOn ? ' ' : ' not '}</b></span>
         recieve emails with Terrain news and tips.
       </div>
     );

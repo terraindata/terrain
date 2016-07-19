@@ -62,6 +62,13 @@ export module UserTypes
     timeZone: 158,
     phone: "",
     imgSrc: "",
+
+    //notifications fields
+    sound: "chime",
+    emailNotificationType: "Activities of any kind",
+    emailNotificationTiming: "Once every 15 minutes",
+    desktopNotificationType: "Activities of any kind",
+    emailNews: 'on',
     
     // exlcude the db-level fields from the meta-data save
     excludeFields: ["isAdmin", "username", "disabled"],
@@ -82,6 +89,12 @@ export module UserTypes
     phone: string;
     imgSrc: string;
     
+    sound: string;
+    emailNotificationType: string;
+    emailNotificationTiming: string;
+    desktopNotificationType: string;
+    emailNews: string;
+
     isAdmin: boolean;
     isDisabled: boolean;
     

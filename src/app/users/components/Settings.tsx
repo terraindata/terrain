@@ -60,14 +60,15 @@ import Ajax from './../../util/Ajax.tsx';
 type User = UserTypes.User;
 var Select = require('react-select');
 var TimeZones = require('./Timezones.json');
+var PasswordStrengthMeter = require('./password-strength.js');
 
 interface Props
 {
   params?: any;
   history?: any;
   children?: any;
-}
 
+}
 class Settings extends Classs<Props>
 {
 
@@ -235,13 +236,12 @@ class Settings extends Classs<Props>
           New Password
         </div>
         <div className='row'> 
-          <input
-            type={this.state.showPassword ? 'text' : 'password'}
-            defaultValue=''
-            key='new-pasword'
-            onChange={this.handleNewPasswordChange}
-            className='settings-input password-input'
-            />
+         <div className='password-container'>
+        <PasswordStrengthMeter
+          onChange={this.handleNewPasswordChange}
+          type={this.state.showPassword ? 'text' : 'password'}
+        />   
+      </div>
           <div className='white-space' />
         </div>
         <div className='field-title'>
