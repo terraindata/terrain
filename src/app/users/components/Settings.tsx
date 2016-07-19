@@ -58,6 +58,7 @@ import UserTypes from '../UserTypes.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
 type User = UserTypes.User;
+
 var Select = require('react-select');
 var TimeZones = require('./Timezones.json');
 var PasswordStrengthMeter = require('./password-strength.js');
@@ -71,9 +72,9 @@ interface Props
   children?: any;
 
 }
+
 class Settings extends Classs<Props>
 {
-
   cancelSubscription = null;
 
   constructor(props)
@@ -182,7 +183,8 @@ class Settings extends Classs<Props>
       alert("Error logging in: " + ev)
     }
     xhr.onload = (ev:Event) => {
-      if (xhr.status != 200) {
+      if (xhr.status != 200) 
+      {
         alert("Failed to log in: " + xhr.responseText);
         return;
       }
