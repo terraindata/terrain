@@ -166,9 +166,11 @@ class Settings extends Classs<Props>
 
   createNewPassword()
   {
-    //check current password with actual current password
-    let username = localStorage['username'];
-    
+    let username:string = localStorage['username'];
+    let currentPassword:string = this.state.currentPassword;
+    let newPassword:string = this.state.newPassword;
+    let confirmPassword:string = this.state.confirmPassword;
+
     let login = (token: string) => {
       AuthActions.login(token, username);
     };
@@ -188,22 +190,34 @@ class Settings extends Classs<Props>
     xhr.open("POST", SERVER_URL + "/auth", true);
     xhr.send(JSON.stringify({
       username,
-      password: this.state.currentPassword,
+      password: currentPassword,
     }));
 
-    if(this.state.newPassword.length < 6)
+    if(newPassword.length < 6)
     {
       alert('Passwords should be at least six characters long');
       return;
     }
-
-    if(this.state.newPassword !== this.state.confirmPassword)
+    
+    if(newPassword !== confirmPassword)
     {
       alert('Passwords do not match');
       return;
     }
 
-    //update to be new password w/ Ajax call? 
+    this.setState({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+
+    Ajax.changePassword(username, currentPassword, newPassword, () => {
+      Actions.fetch();
+      alert('Your password has been changed.');
+    }, (error) => {
+      alert('Error creating user: ' + JSON.stringify(error))
+    });
+
   }
 
   toggleShowPassword()
@@ -227,10 +241,10 @@ class Settings extends Classs<Props>
         </div>
         <input
           type={this.state.showPassword ? 'text' : 'password'}
-          defaultValue=''
           onChange={this.handleCurrentPasswordChange}
           key='current-password'
           className='settings-input password-input'
+          value={this.state.currentPassword}
          />
         <div className='field-title'>
           New Password
@@ -240,6 +254,7 @@ class Settings extends Classs<Props>
         <PasswordStrengthMeter
           onChange={this.handleNewPasswordChange}
           type={this.state.showPassword ? 'text' : 'password'}
+          value={this.state.newPassword}
         />   
       </div>
           <div className='white-space' />
@@ -250,7 +265,7 @@ class Settings extends Classs<Props>
         <div className='row'>
           <input
             type={this.state.showPassword ? 'text' : 'password'}
-            defaultValue=''
+            value={this.state.confirmPassword}
             key='confirm-password'
             onChange={this.handleConfirmPasswordChange}
             className='settings-input password-input'

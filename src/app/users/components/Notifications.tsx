@@ -56,10 +56,9 @@ import CheckBox from './../../common/components/CheckBox.tsx';
 import RadioButtons from './../../common/components/RadioButtons.tsx';
 import Ajax from './../../util/Ajax.tsx';
 import UserTypes from '../UserTypes.tsx';
-var ReactPlayer = require('react-player');
 
 var Select = require('react-select');
-var SoundIcon = require("./../../../images/icon_camera.svg");
+var SoundIcon = require("./../../../images/icon_audio.svg");
 
 interface Props
 {
@@ -240,6 +239,7 @@ class Notifications extends Classs<Props>
        <div className='notification-subtitle'>
          Desktop notifications use this sound:
        </div>
+       <div className="notification-row">
          <Select
             name='desktop-notification-sound'
             value={sound}
@@ -255,10 +255,11 @@ class Notifications extends Classs<Props>
            <div className='sound-icon'>
              <SoundIcon/>
            </div>
-           <div className='preview-button-text'>
+          <div className='preview-button-text'>
            Preview
-           </div>
           </div>
+        </div>
+        </div>
      </div>
    );
   }
