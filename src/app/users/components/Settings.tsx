@@ -59,7 +59,7 @@ import UserStore from './../../users/data/UserStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
 type User = UserTypes.User;
 var Select = require('react-select');
-
+var TimeZones = require('./Timezones.json');
 
 interface Props
 {
@@ -78,7 +78,7 @@ class Settings extends Classs<Props>
     super(props);
     
     let authState = AuthStore.getState();
-    
+
     this.state = {
       istate: Store.getState(),
       username: authState.get('username'),
@@ -89,7 +89,8 @@ class Settings extends Classs<Props>
       newEmail: '',
       saving: false,
       savingReq: null,
-      user: null
+      user: null,
+      timeZone: 158,
     };
     
     this.cancelSubscription = 
@@ -388,18 +389,71 @@ class Settings extends Classs<Props>
 
   renderTimeZoneDescription()
   {
+    var timeZone;
+    if(this.state.istate.currentUser && this.state.istate.currentUser.timeZone) 
+    {
+      timeZone = this.state.istate.currentUser.timeZone;
+    }
+    else {
+      timeZone = 158;
+    }
     return (
       <div> 
-      Terrain uses your time zone to send summary and notification emails, for times
-      in your activity feeds, and for reminders. Your time zone is currently set to:
-      <b>current time zone </b>
+        Terrain uses your time zone to send summary and notification emails, for times in your activity feeds, and for reminders.
+        Your time zone is currently set to: <b>{TimeZones[timeZone].DisplayName}</b>.
       </div>
     );
   }
 
+  renderTimeZonesList()
+  {
+    var timeZonesList= [TimeZones.length];
+    for (var i = 0; i < TimeZones.length; i++){
+      timeZonesList[i] = {
+        value: i,
+        label: TimeZones[i].DisplayName,
+      }
+    }
+    return timeZonesList;
+  }
+
+  changeTimeZone(val)
+  { 
+    this.setState({
+      timeZone: val.value,
+    });
+    
+    var newUser = this.state.istate.currentUser;
+    newUser = newUser.set('timeZone', val.value);
+    Actions.change(newUser as UserTypes.User);
+
+    this.setState({
+      saving: true,
+      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSaveTimeZone, this.onSaveError),
+      user: newUser,
+    });
+  }
+
+  onSaveTimeZone() {
+    this.setState({
+      istate: Store.getState(),
+    });
+  }
+
   expandTimeZone()
   {
-    alert('This button has not been implemented yet');
+    var timeZonesList = this.renderTimeZonesList();
+    return (
+      <div className='row'>
+        <Select
+           clearable={false}
+           value={this.state.timeZone}
+           options={timeZonesList}
+           onChange={this.changeTimeZone}
+           className='timezone-dropdown'
+       />
+       </div>
+    );
   }
 
   renderSignOutDescription()

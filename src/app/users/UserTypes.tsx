@@ -59,7 +59,7 @@ export module UserTypes
     whatIDo: "",
     email: "",
     skype: "",
-    timezone: "",
+    timeZone: 158,
     phone: "",
     imgSrc: "",
     
@@ -78,7 +78,7 @@ export module UserTypes
     whatIDo: string;
     email: string;
     skype: string;
-    timezone: string;
+    timeZone: number;
     phone: string;
     imgSrc: string;
     
