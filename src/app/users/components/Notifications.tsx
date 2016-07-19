@@ -84,7 +84,7 @@ class Notifications extends Classs<Props>
       value: 'Never',
       handler: this.changeEmailNotifications_Never
     }
-  ]
+  ];
 
   notificationTypes = [
     {
@@ -99,7 +99,7 @@ class Notifications extends Classs<Props>
       value: 'None',
       label: 'None'
     }
-  ]
+  ];
 
   desktopNotificationSounds = [
     {
@@ -118,13 +118,12 @@ class Notifications extends Classs<Props>
       value: 'none',
       label: 'none',
     }
-  ]
+  ];
 
-  //These should be local files, only work if they are cached
   sounds = {
-    chime: 'http://www.wavsource.com/snds_2016-06-26_4317323406379653/sfx/chime.wav',
+    chime: 'http://lukeknepper.com/upload/chime.wav',
     doorbell: 'http://lukeknepper.com/upload/doorbell_x.wav',
-    whistle: 'http://www.wavsource.com/snds_2016-06-26_4317323406379653/sfx/slide_whistle_up.wav'
+    whistle: 'http://lukeknepper.com/upload/slide_whistle_up.wav'
   };
 
   constructor(props)
@@ -205,7 +204,6 @@ class Notifications extends Classs<Props>
       this.state.istate.currentUser.sound || '';
     if(soundName !== 'none') 
     {
-      //ISSUE: does not play unless sounds are cached
       var sound = new Audio();
       sound.src = this.sounds[soundName];
       sound.load();
@@ -252,14 +250,14 @@ class Notifications extends Classs<Props>
            className={sound === 'none' ? 'disabled' : 'preview-button'}
            onClick={sound === 'none' ? null : this.playSound}
          >
-           <div className='sound-icon'>
-             <SoundIcon/>
-           </div>
+          <div className='sound-icon'>
+            <SoundIcon/>
+          </div>
           <div className='preview-button-text'>
-           Preview
+            Preview
           </div>
         </div>
-        </div>
+      </div>
      </div>
    );
   }
@@ -343,8 +341,8 @@ class Notifications extends Classs<Props>
   {
     var emailNewsOn = (this.state.emailNewsOn || 
         this.state.istate.currentUser.emailNews) === 'on';
-   var newEmailNewsSetting = emailNewsOn ? 'off' : 'on';
-   var newUser = this.state.istate.currentUser;
+    var newEmailNewsSetting = emailNewsOn ? 'off' : 'on';
+    var newUser = this.state.istate.currentUser;
     newUser = newUser.set('emailNews', newEmailNewsSetting);
     Actions.change(newUser as UserTypes.User);
     this.setState({
