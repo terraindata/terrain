@@ -412,13 +412,12 @@ class Settings extends Classs<Props>
 
   getTimeZonesList()
   {
-    var timeZonesList= [TimeZones.length];
-    for (var i = 0; i < TimeZones.length; i++){
-      timeZonesList[i] = {
-        value: i,
-        label: TimeZones[i].DisplayName,
-      }
-    }
+    let timeZonesList = TimeZones.map( (tz, i) => { 
+      return {
+        value: i, 
+        label: tz.DisplayName, 
+      };
+    });
     return timeZonesList;
   }
 
