@@ -45,6 +45,7 @@ THE SOFTWARE.
 import * as _ from 'underscore';
 import { BuilderTypes } from "../builder/BuilderTypes.tsx";
 type ICard = BuilderTypes.ICard;
+type IInput = BuilderTypes.IInput;
 type IFromCard = BuilderTypes.IFromCard;
 
 
@@ -62,13 +63,31 @@ export interface Options {
 
 class TQLConverter
 {
-  static toTQL(cards: ICard[], options: Options = {}): string
+  static toTQL(exe: BuilderTypes.IExe, options: Options = {}): string
   {
+    var {cards, inputs} = exe;
+    
     cards = JSON.parse(JSON.stringify(cards)) as ICard[];
-    
     cards = this.applyOptions(cards, options);
+    let cardsTql = removeBlanks(this._cards(cards, ";", options));
     
-    return removeBlanks(this._cards(cards, ";", options));
+    let inputsTql = inputs.map((input: IInput) => 
+      {
+        var {value} = input;
+        if(input.type === BuilderTypes.InputType.TEXT)
+        {
+          value = `"${value}"`;
+        }
+        if(input.type == BuilderTypes.InputType.DATE)
+        {
+          value = `"${value}"`;
+        }
+        
+        return `var ${input.key} = ${value};`;
+      }
+    ).join("\n");
+    
+    return inputsTql + "\n\n" + cardsTql;
   }
   
   private static _topFromCard(cards: ICard[], fn: (fromCard: IFromCard) => IFromCard)

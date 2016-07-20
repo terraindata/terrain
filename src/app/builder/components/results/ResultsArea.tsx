@@ -106,7 +106,7 @@ class ResultsArea extends Classs<Props>
     resultsPages: 1,
     loadedResultsPages: 1,
     onResultsLoaded: null,
-    resultFormat: 'table', // 'icon',
+    resultFormat: 'icon',
   };
   
   constructor(props:Props)
@@ -405,7 +405,7 @@ class ResultsArea extends Classs<Props>
     }
     else 
     {
-      tql = TQLConverter.toTQL(algorithm.cards, {
+      tql = TQLConverter.toTQL(algorithm, {
         limit: pages * RESULTS_PAGE_SIZE,
       });
     }
@@ -430,7 +430,7 @@ class ResultsArea extends Classs<Props>
       }
       else 
       {
-        this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm.cards, {
+        this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm, {
             allFields: true,
         // limit: pages * RESULTS_PAGE_SIZE,
         // don't limit the all fields request
