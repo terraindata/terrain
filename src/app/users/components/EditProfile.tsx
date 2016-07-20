@@ -198,7 +198,6 @@ class Profile extends Classs<Props>
 
   handleProfilePicClick(event) 
   {
-    //maybe have a slight delay or animation here
     this.setState({
       showDropDown: !this.state.showDropDown,
     })

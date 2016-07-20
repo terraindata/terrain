@@ -214,7 +214,7 @@ class Notifications extends Classs<Props>
     }
   }
 
-  renderDesktopNotifications()
+  renderDesktopNotificationsContent()
   {
    if(this.state.istate.currentUser)
    {
@@ -297,7 +297,7 @@ class Notifications extends Classs<Props>
     });
   }
 
-  renderEmailNotifications() 
+  renderEmailNotificationsContent() 
   {
    if(this.state.istate.currentUser)
    {
@@ -345,7 +345,7 @@ class Notifications extends Classs<Props>
     });
   }
 
-  renderEmailNews() 
+  renderEmailNewsContent() 
   {
     if(this.state.istate.currentUser)
     {
@@ -449,18 +449,18 @@ class Notifications extends Classs<Props>
       <div className='notifications-page-title'>Update your notifications</div>
       <AccountEntry
         title='Desktop Notifications'
-        getDescription={this.renderDesktopDescription}
-        getContent={this.renderDesktopNotifications}
+        getDescription={this.renderDesktopDescription()}
+        getContent={this.renderDesktopNotificationsContent()}
       />
       <AccountEntry
         title='Email Notifications'
-        getDescription={this.renderEmailDescription}
-        getContent={this.renderEmailNotifications}
+        getDescription={this.renderEmailDescription()}
+        getContent={this.renderEmailNotificationsContent()}
       />
       <AccountEntry
         title='Email News & Updates'
-        getDescription={this.renderEmailNewsDescription}
-        getContent={this.renderEmailNews}
+        getDescription={this.renderEmailNewsDescription()}
+        getContent={this.renderEmailNewsContent()}
       />
 
       </div>
