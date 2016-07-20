@@ -329,6 +329,7 @@ class Notifications extends Classs<Props>
          onChange={this.onEmailNotificationTypeChange}
          className='notifications-select'
        />
+        {this.renderEmail()}
       </div>
     );
   }

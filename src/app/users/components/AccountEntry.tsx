@@ -129,7 +129,7 @@ class AccountEntry extends Classs<Props>
             <div className='account-entry-white-space' />
             {this.renderButton()}
           </div> 
-            {this.renderDescription}
+            {this.renderDescription()}
           <div className='account-entry-expanded-info'>
             {this.renderContent()}
           </div>

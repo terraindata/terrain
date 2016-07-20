@@ -63,33 +63,26 @@ class Account extends Classs<Props>
   render()
   {
     var title = "Account";
-    var classNames = {
-      profile: "account-link",
-      notifications: "account-link",
-      team: "account-link",
-      settings: "account-link"
-    }
+    // var classNames = {
+    //   profile: "account-link",
+    //   notifications: "account-link",
+    //   team: "account-link",
+    //   settings: "account-link"
+    // }
     switch(this.props.location.pathname)
     {
       case "/account/profile":
         title = "Profile";
-        classNames.profile = "account-link-current";
         break;
       case "/account/notifications":
         title = "Notifications";
-        classNames.notifications = "account-link-current";
         break;
       case "/account/team":
         title = "Team";
-        classNames.team = "account-link-current";
         break;
       case "/account/settings":
         title = "Settings";
-        classNames.settings = "account-link-current";
-        break;
-      default:
-        classNames.profile = "account-link-current";
-        break;      
+        break;     
     }
     
     return (
@@ -100,16 +93,16 @@ class Account extends Classs<Props>
             { title }
           </div>
           <div className='account-links'>
-            <Link to={'/account/settings'} className={classNames.settings}>
+            <Link to={'/account/settings'} className="account-link">
               Settings
             </Link>
-            <Link to={'/account/notifications'} className={classNames.notifications}>
+            <Link to={'/account/notifications'} className="account-link">
               Notifications
             </Link>
-            <Link to={'/account/profile'} className={classNames.profile}>
+            <Link to={'/account/profile'} className="account-link">
               Profile
             </Link>
-            <Link to={'/account/team'} className={classNames.team}>
+            <Link to={'/account/team'} className="account-link">
               Team
             </Link>
           </div>

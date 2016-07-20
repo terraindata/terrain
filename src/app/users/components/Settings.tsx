@@ -265,7 +265,7 @@ class Settings extends Classs<Props>
         </div>
         <div className='settings-row bottom-margin'> 
           <CheckBox checked={this.state.showPassword} onChange={this.toggleShowPassword}/>
-          <div className='settings-field-info'>Show password</div>
+          <div className='settings-field-info' onClick={this.toggleShowPassword}>Show password</div>
         </div>
         <div className='settings-row'>
           <div className='button settings-save-button' onClick={this.createNewPassword} >
@@ -366,6 +366,9 @@ class Settings extends Classs<Props>
       <div className='settings-expand-field'> 
         <div className='settings-field-title'>
           New Email Address
+        </div>
+        <div className="settings-email-label-small">
+          {this.renderEmailDescription()}
         </div>
         <div className='settings-row'>
           <input
