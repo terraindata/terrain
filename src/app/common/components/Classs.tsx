@@ -151,6 +151,25 @@ class Classs<T> extends React.Component<T, any>
     }
     return this._keyPaths[key];
   }
+  
+  _ikeyPaths: {
+    [key: string]: 
+    {
+      seed: Immutable.List<string | number>,
+      keyPath: Immutable.List<string | number>,
+    }
+  } = {};
+  _ikeyPath(seed: Immutable.List<string | number>, str: string)
+  {
+    if(!this._ikeyPaths[str] || this._ikeyPaths[str].seed !== seed)
+    {
+      this._ikeyPaths[str] = {
+        seed,
+        keyPath: seed.push(str),
+      }
+    }
+    return this._ikeyPaths[str].keyPath;
+  }
 }
 
 export default Classs;

@@ -106,7 +106,7 @@ class ResultsArea extends Classs<Props>
     resultsPages: 1,
     loadedResultsPages: 1,
     onResultsLoaded: null,
-    resultFormat: 'table', // 'icon',
+    resultFormat: 'icon',
   };
   
   constructor(props:Props)

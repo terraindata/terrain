@@ -1,0 +1,32 @@
+@import "../../common/Common.less";
+
+.x-area {
+  margin: 15px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  min-height: calc(~"100% - 30px");
+  box-sizing: border-box;
+  
+  .x-title {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  
+  .x-x {
+    margin: 10px;
+    padding: 10px 20px;
+    border: 1px solid @light-blue;
+    border-radius: 7px;
+    color: @light-blue;
+    font-size: 20px;
+    .transition;
+    
+    &:hover {
+      background: @light-blue;
+      color: #fff;
+    }
+  }
+}
