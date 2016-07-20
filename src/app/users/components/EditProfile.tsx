@@ -211,7 +211,6 @@ class Profile extends Classs<Props>
 
   removeProfilePicture()
   {
-    //TODO: check with Luke to make sure this is right
     this.refs['profilePicImg']['src'] = null; 
   }
 
@@ -280,7 +279,7 @@ class Profile extends Classs<Props>
             className='edit-profile-pic'
             onClick={this.handleProfilePicClick}
           >
-            <div className={this.state.showDropDown ? 'dropdown' : 'hidden'}>
+            <div className={this.state.showDropDown ? 'dropdown' : 'dropdown-hidden'}>
               <div
                 onClick={this.handleUploadImage}
                 className='menu-item'
@@ -299,8 +298,8 @@ class Profile extends Classs<Props>
               src={this.state.user.imgSrc}
               ref='profilePicImg'
             />
-            <div className='overlay'>
-              <div className='overlay-message'>
+            <div className='profile-pic-overlay'>
+              <div className='profile-pic-overlay-message'>
               <div className='camera-icon'>
                 <CameraIcon />
               </div>

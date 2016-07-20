@@ -53,7 +53,7 @@ import InfoArea from './../../common/components/InfoArea.tsx';
 import { Link } from 'react-router';
 import AccountEntry from './AccountEntry.tsx';
 import CheckBox from './../../common/components/CheckBox.tsx';
-import RadioButton from './../../common/components/RadioButton.tsx';
+import RadioButtons from './../../common/components/RadioButtons.tsx';
 import Ajax from './../../util/Ajax.tsx';
 import UserTypes from '../UserTypes.tsx';
 
@@ -157,17 +157,25 @@ class Notifications extends Classs<Props>
     this.cancelSubscription && this.cancelSubscription();
   }
 
+  changeUserField(field:string, value:string)
+  {
+     var newUser = this.state.istate.currentUser;
+     newUser = newUser.set(field, value);
+     Actions.change(newUser as UserTypes.User);
+
+     this.setState({
+       saving: true,
+       savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
+     });
+  }
+
+
   onDesktopNotificationChange(val) 
   {
-    var newUser = this.state.istate.currentUser;
-    newUser = newUser.set('desktopNotificationType', val.value);
-
-    Actions.change(newUser as UserTypes.User);
-
+    let {value} = val;
+    this.changeUserField('desktopNotificationType', value);
     this.setState({
-      saving: true,
-      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
-      desktopNotificationType: val.value,
+      desktopNotificationType: value,
     });
   }
 
@@ -186,22 +194,17 @@ class Notifications extends Classs<Props>
 
   onDesktopNotificationsSoundChange(val) 
   {
-    var newUser = this.state.istate.currentUser;
-    newUser = newUser.set('sound', val.value);
-
-    Actions.change(newUser as UserTypes.User);
-
+    let {value} = val;
+    this.changeUserField('sound', value);
     this.setState({
-      saving: true,
-      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
-      desktopNotificationSound: val.value,
+      desktopNotificationSound: value,
     });
   }
 
   playSound() 
   {
     var soundName = this.state.desktopNotificationSound ||
-      this.state.istate.currentUser.sound || '';
+      this.state.istate.currentUser.sound || 'none';
     if(soundName !== 'none') 
     {
       var sound = new Audio();
@@ -211,7 +214,7 @@ class Notifications extends Classs<Props>
     }
   }
 
-  expandDesktopNotifications()
+  renderDesktopNotifications()
   {
    if(this.state.istate.currentUser)
    {
@@ -264,12 +267,8 @@ class Notifications extends Classs<Props>
   
   changeEmailTiming(newTimeSetting)
   {
-    var newUser = this.state.istate.currentUser;
-    newUser = newUser.set('emailNotificationTiming', newTimeSetting);
-    Actions.change(newUser as UserTypes.User);
+    this.changeUserField('emailNotificationTiming', newTimeSetting);
     this.setState({
-      saving: true,
-      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
       emailNotificationTiming: newTimeSetting,
     });
   }
@@ -291,17 +290,14 @@ class Notifications extends Classs<Props>
 
   onEmailNotificationTypeChange(val)
   {
-    var newUser = this.state.istate.currentUser;
-    newUser = newUser.set('emailNotificationType', val.value);
-    Actions.change(newUser as UserTypes.User);
+    let {value} = val;
+    this.changeUserField('emailNotificationType', value);
     this.setState({
-      saving: true,
-      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
-      emailNotificationType: val.value,
+      emailNotificationType: value,
     });
   }
 
-  expandEmailNotifications() 
+  renderEmailNotifications() 
   {
    if(this.state.istate.currentUser)
    {
@@ -317,7 +313,7 @@ class Notifications extends Classs<Props>
         <div>Send me email notifications:</div>
         <br/>
         <div className='expanded-section-indent'>
-          <RadioButton
+          <RadioButtons
             selected={emailTiming}
             options={this.emailNotificationOptions}
           />
@@ -339,20 +335,17 @@ class Notifications extends Classs<Props>
 
   toggleEmailNews() 
   {
-    var emailNewsOn = (this.state.emailNewsOn || 
+    var emailNewsSetting = (this.state.emailNewsOn || 
         this.state.istate.currentUser.emailNews) === 'on';
-    var newEmailNewsSetting = emailNewsOn ? 'off' : 'on';
-    var newUser = this.state.istate.currentUser;
-    newUser = newUser.set('emailNews', newEmailNewsSetting);
-    Actions.change(newUser as UserTypes.User);
+    var newEmailNewsSetting = emailNewsSetting ? 'off' : 'on';
+
+    this.changeUserField('emailNews', newEmailNewsSetting);
     this.setState({
-      saving: true,
-      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
       emailNewsOn: newEmailNewsSetting,
     });
   }
 
-  expandEmailNews() 
+  renderEmailNews() 
   {
     if(this.state.istate.currentUser)
     {
@@ -457,17 +450,17 @@ class Notifications extends Classs<Props>
       <AccountEntry
         title='Desktop Notifications'
         getDescription={this.renderDesktopDescription}
-        getContent={this.expandDesktopNotifications}
+        getContent={this.renderDesktopNotifications}
       />
       <AccountEntry
         title='Email Notifications'
         getDescription={this.renderEmailDescription}
-        getContent={this.expandEmailNotifications}
+        getContent={this.renderEmailNotifications}
       />
       <AccountEntry
         title='Email News & Updates'
         getDescription={this.renderEmailNewsDescription}
-        getContent={this.expandEmailNews}
+        getContent={this.renderEmailNews}
       />
 
       </div>

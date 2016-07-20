@@ -81,7 +81,7 @@ class AccountEntry extends Classs<Props>
     }); 
   }
 
-  expandCode()
+  renderContent()
   {
     if (this.state.expanded) 
     {
@@ -89,7 +89,7 @@ class AccountEntry extends Classs<Props>
     }
   }
 
-  getDescription()
+  renderDescription()
   {
     if (this.props.getDescription)
      {
@@ -129,9 +129,9 @@ class AccountEntry extends Classs<Props>
             <div className='account-entry-white-space' />
             {this.renderButton()}
           </div> 
-            {this.getDescription()}
+            {this.renderDescription()}
           <div className='account-entry-expanded-info'>
-            {this.expandCode()}
+            {this.renderContent()}
           </div>
           <hr className ='account-entry-line'/>
         </div>

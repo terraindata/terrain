@@ -52,32 +52,41 @@ import Classs from './../../common/components/Classs.tsx';
 
 interface Props {
 	selected?: string;
-	options: any;
+	options: {
+			value: string;
+			onClick: () => void
+		}[];
 }
 
-class CheckBox extends Classs<Props>
+class RadioButton extends Classs<Props>
 {
+
+	renderOption(option)
+	{
+		return (
+			<div key={option.value} className='radio-button-option'>
+				<div 
+					onClick={option.onClick}
+					className={classNames({
+  					'radio-button': true,
+  					'radio-button-selected': option.value === this.props.selected,
+					})}							
+				>
+				</div>
+				{option.value}
+				<br/>
+			</div>
+		);
+	}
+
 	render() 
 	{
-		var selected = this.props.selected;
 		return (
 			<div>
-				{this.props.options.map(function(option) {
-					return(
-						<div key={option.value} className='radio-button-option'>
-							<div 
-								onClick={option.handler}
-								className={option.value === selected ? 'selected-radio-button' : 'unselected-radio-button'}
-							>
-							</div>
-							{option.value}
-							<br/>
-						</div>
-						);
-				})}
+				{this.props.options.map(this.renderOption)}
 			</div>
 		);
 	};
 }
 
-export default CheckBox;
+export default RadioButton;

@@ -112,6 +112,18 @@ class Settings extends Classs<Props>
   {
     this.cancelSubscription && this.cancelSubscription();
   }
+
+  changeUserField(field:string, value:string)
+  {
+     var newUser = this.state.istate.currentUser;
+     newUser = newUser.set(field, value);
+     Actions.change(newUser as UserTypes.User);
+
+     this.setState({
+       saving: true,
+       savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSaveTimeZone, this.onSaveError),
+     });
+  }
   
   saveUsername()
   {
@@ -126,7 +138,6 @@ class Settings extends Classs<Props>
           <input 
             type='text'
             defaultValue={'@' + this.state.username}
-            key='username' 
             className='settings-input'
             disabled={true}
           />
@@ -174,29 +185,6 @@ class Settings extends Classs<Props>
     let newPassword:string = this.state.newPassword;
     let confirmPassword:string = this.state.confirmPassword;
 
-    let login = (token: string) => {
-      AuthActions.login(token, username);
-    };
-
-    let xhr = new XMLHttpRequest();
-    xhr.onerror = (ev:Event) => {
-      alert("Error logging in: " + ev)
-    }
-    xhr.onload = (ev:Event) => {
-      if (xhr.status != 200) 
-      {
-        alert("Failed to log in: " + xhr.responseText);
-        return;
-      }
-      login(xhr.responseText);
-    }
-    // NOTE: $SERVER_URL will be replaced by the build process.
-    xhr.open("POST", SERVER_URL + "/auth", true);
-    xhr.send(JSON.stringify({
-      username,
-      password: currentPassword,
-    }));
-
     if(newPassword.length < 6)
     {
       alert('Passwords should be at least six characters long');
@@ -205,7 +193,8 @@ class Settings extends Classs<Props>
     
     if(newPassword !== confirmPassword)
     {
-      alert('Passwords do not match');
+      alert('You entered two different passwords for your new password. \
+       Change one so that they match');
       return;
     }
 
@@ -219,7 +208,7 @@ class Settings extends Classs<Props>
       Actions.fetch();
       alert('Your password has been changed.');
     }, (error) => {
-      alert('Error creating user: ' + JSON.stringify(error))
+      alert('Error changing your password: ' + JSON.stringify(error))
     });
 
   }
@@ -246,7 +235,6 @@ class Settings extends Classs<Props>
         <input
           type={this.state.showPassword ? 'text' : 'password'}
           onChange={this.handleCurrentPasswordChange}
-          key='current-password'
           className='settings-input password-input'
           value={this.state.currentPassword}
          />
@@ -270,7 +258,6 @@ class Settings extends Classs<Props>
           <input
             type={this.state.showPassword ? 'text' : 'password'}
             value={this.state.confirmPassword}
-            key='confirm-password'
             onChange={this.handleConfirmPasswordChange}
             className='settings-input password-input'
             />
@@ -394,7 +381,6 @@ class Settings extends Classs<Props>
             type='text'
             value={this.state.newEmail}
             onChange={this.updateNewEmail}
-            key='new-email'
             className='settings-input password-input'
             />
           <div className='settings-white-space' />
@@ -424,7 +410,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  renderTimeZonesList()
+  getTimeZonesList()
   {
     var timeZonesList= [TimeZones.length];
     for (var i = 0; i < TimeZones.length; i++){
@@ -438,30 +424,22 @@ class Settings extends Classs<Props>
 
   changeTimeZone(val)
   { 
+    this.changeUserField( 'timeZone', val.value);
     this.setState({
       timeZone: val.value,
-    });
-    
-    var newUser = this.state.istate.currentUser;
-    newUser = newUser.set('timeZone', val.value);
-    Actions.change(newUser as UserTypes.User);
-
-    this.setState({
-      saving: true,
-      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSaveTimeZone, this.onSaveError),
-      user: newUser,
     });
   }
 
   onSaveTimeZone() {
     this.setState({
-      istate: Store.getState(),
-    });
+      saving: false,
+      savingReq: null,
+    })
   }
 
   expandTimeZone()
   {
-    var timeZonesList = this.renderTimeZonesList();
+    var timeZonesList = this.getTimeZonesList();
     
     if(this.state.istate.currentUser)
     {
