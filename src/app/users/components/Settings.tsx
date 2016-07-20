@@ -118,7 +118,7 @@ class Settings extends Classs<Props>
     alert("Can not create a new username at this time");
   }
 
-  expandUsername()
+  renderUsernameContent()
   {
     return (
       <div>
@@ -236,7 +236,7 @@ class Settings extends Classs<Props>
     alert('This button has not been implemented yet.'); 
   }
 
-  expandPassword()
+  renderPasswordContent()
   {
     return (
       <div className='settings-expand-field'>
@@ -286,15 +286,6 @@ class Settings extends Classs<Props>
           </div>
           <div className='settings-white-space' />
         </div>
-        <div className='settings-row'>
-          <div className='settings-field-info settings-center'> 
-            Can't remember your current password? 
-          </div>
-          <div className='button settings-gray-button' onClick={this.resetPasswordByEmail}>
-            Reset your password by email
-          </div>
-          <div className='settings-white-space' />
-        </div>
       </div>
     );
   }
@@ -313,7 +304,7 @@ class Settings extends Classs<Props>
     );
   }
 
-  expandAuthentication()
+  renderAuthenticationContent()
   {
     return (
       <div className='settings-expand-field'> 
@@ -382,7 +373,7 @@ class Settings extends Classs<Props>
     });  
   }
 
-  expandEmail()
+  renderEmailContent()
   {
     return (
       <div className='settings-expand-field'> 
@@ -426,7 +417,7 @@ class Settings extends Classs<Props>
 
   renderTimeZonesList()
   {
-    var timeZonesList= [TimeZones.length];
+    var timeZonesList= [];
     for (var i = 0; i < TimeZones.length; i++){
       timeZonesList[i] = {
         value: i,
@@ -459,7 +450,7 @@ class Settings extends Classs<Props>
     });
   }
 
-  expandTimeZone()
+  renderTimeZoneContent()
   {
     var timeZonesList = this.renderTimeZonesList();
     
@@ -545,36 +536,36 @@ class Settings extends Classs<Props>
       <div className='settings-page-title'>Update your settings</div>
       <AccountEntry 
         title='Username'
-        getContent= {this.expandUsername}
+        getContent= {this.renderUsernameContent()}
       /> 
       <AccountEntry 
         title='Password'
-        getContent={this.expandPassword}
+        getContent={this.renderPasswordContent()}
       /> 
       <AccountEntry 
         title='Two-Factor Authentication' 
-        getDescription={this.renderAuthenticationDescription}
-        getContent={this.expandAuthentication}
+        getDescription={this.renderAuthenticationDescription()}
+        getContent={this.renderAuthenticationContent()}
        /> 
       <AccountEntry
         title='Email'
-        getDescription={this.renderEmailDescription}
-        getContent={this.expandEmail}
+        getDescription={this.renderEmailDescription()}
+        getContent={this.renderEmailContent()}
         /> 
       <AccountEntry
         title='Time Zone'
-        getDescription={this.renderTimeZoneDescription}
-        getContent={this.expandTimeZone}
+        getDescription={this.renderTimeZoneDescription()}
+        getContent={this.renderTimeZoneContent()}
         /> 
       <AccountEntry
         title='Sign out all other sessions'
-        getDescription={this.renderSignOutDescription}
-        getButtonText={this.renderSignOutButton}
+        getDescription={this.renderSignOutDescription()}
+        getButtonText={this.renderSignOutButton()}
         /> 
       <AccountEntry
         title='Deactivate your account'
-        getDescription={this.renderDeactivateDescription}
-        getButtonText={this.renderDeactivateButton}
+        getDescription={this.renderDeactivateDescription()}
+        getButtonText={this.renderDeactivateButton()}
         /> 
       </div >
     );

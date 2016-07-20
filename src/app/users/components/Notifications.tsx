@@ -201,7 +201,7 @@ class Notifications extends Classs<Props>
   playSound() 
   {
     var soundName = this.state.desktopNotificationSound ||
-      this.state.istate.currentUser.sound || '';
+      this.state.istate.currentUser.sound || 'none';
     if(soundName !== 'none') 
     {
       var sound = new Audio();
@@ -211,7 +211,7 @@ class Notifications extends Classs<Props>
     }
   }
 
-  expandDesktopNotifications()
+  renderDesktopNotificationsContent()
   {
    if(this.state.istate.currentUser)
    {
@@ -301,7 +301,7 @@ class Notifications extends Classs<Props>
     });
   }
 
-  expandEmailNotifications() 
+  renderEmailNotificationsContent() 
   {
    if(this.state.istate.currentUser)
    {
@@ -352,7 +352,7 @@ class Notifications extends Classs<Props>
     });
   }
 
-  expandEmailNews() 
+  renderEmailNewsContent() 
   {
     if(this.state.istate.currentUser)
     {
@@ -456,18 +456,18 @@ class Notifications extends Classs<Props>
       <div className='notifications-page-title'>Update your notifications</div>
       <AccountEntry
         title='Desktop Notifications'
-        getDescription={this.renderDesktopDescription}
-        getContent={this.expandDesktopNotifications}
+        getDescription={this.renderDesktopDescription()}
+        getContent={this.renderDesktopNotificationsContent()}
       />
       <AccountEntry
         title='Email Notifications'
-        getDescription={this.renderEmailDescription}
-        getContent={this.expandEmailNotifications}
+        getDescription={this.renderEmailDescription()}
+        getContent={this.renderEmailNotificationsContent()}
       />
       <AccountEntry
         title='Email News & Updates'
-        getDescription={this.renderEmailNewsDescription}
-        getContent={this.expandEmailNews}
+        getDescription={this.renderEmailNewsDescription()}
+        getContent={this.renderEmailNewsContent()}
       />
 
       </div>

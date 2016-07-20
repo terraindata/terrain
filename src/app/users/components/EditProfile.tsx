@@ -198,7 +198,6 @@ class Profile extends Classs<Props>
 
   handleProfilePicClick(event) 
   {
-    //maybe have a slight delay or animation here
     this.setState({
       showDropDown: !this.state.showDropDown,
     })
@@ -211,7 +210,6 @@ class Profile extends Classs<Props>
 
   removeProfilePicture()
   {
-    //TODO: check with Luke to make sure this is right
     this.refs['profilePicImg']['src'] = null; 
   }
 
