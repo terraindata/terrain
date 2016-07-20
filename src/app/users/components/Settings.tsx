@@ -90,11 +90,9 @@ class Settings extends Classs<Props>
       newPassword: '',
       confirmPassword: '',
       showPassword: false,
-      newEmail: '',
       saving: false,
       savingReq: null,
-      user: null,
-      timeZone: null,
+      newEmail: ''
     };
     
     this.cancelSubscription = 
@@ -121,7 +119,7 @@ class Settings extends Classs<Props>
 
      this.setState({
        saving: true,
-       savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSaveTimeZone, this.onSaveError),
+       savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
      });
   }
   
@@ -220,11 +218,6 @@ class Settings extends Classs<Props>
     });
   }
 
-  resetPasswordByEmail()
-  {
-    alert('This button has not been implemented yet.'); 
-  }
-
   renderPasswordContent()
   {
     return (
@@ -315,10 +308,6 @@ class Settings extends Classs<Props>
     if(this.state.istate.currentUser && this.state.istate.currentUser.email) 
     {
       var email = this.state.istate.currentUser.email;
-      if(this.state.user) 
-      {
-        email = this.state.user.email;
-      }
       return(
         <div>
           Your email is <b>{email}</b>.
@@ -330,22 +319,17 @@ class Settings extends Classs<Props>
   
   changeEmail() 
   {
-    var newUser = this.state.istate.currentUser;
-    newUser = newUser.set('email', this.state.newEmail);
-
-    Actions.change(newUser as UserTypes.User);
+    this.changeUserField('email', this.state.newEmail);
 
     this.setState({
-      saving: true,
-      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
-      user: newUser,
+      newEmail: ''
     });
   }
 
   onSave() {
     this.setState({
-      newEmail: '',
-      istate: Store.getState(),
+      saving: false,
+      savingReq: null,
     });
   }
 
@@ -390,12 +374,12 @@ class Settings extends Classs<Props>
   {  
     if(this.state.istate.currentUser)
     {
-      var timeZone = this.state.timeZone || this.state.istate.currentUser.timeZone || 158;
+      var timeZone = this.state.istate.currentUser.timeZone || 158;
+    } 
+    else {
+      timeZone = 158;
     }
-    else 
-    {
-      timeZone = this.state.timeZone || 158;
-    }
+
     return (
       <div> 
         Terrain uses your time zone to send summary and notification emails, for times in your activity feeds, and for reminders.
@@ -423,20 +407,17 @@ class Settings extends Classs<Props>
     });
   }
 
-  onSaveTimeZone() {
-    this.setState({
-      saving: false,
-      savingReq: null,
-    })
-  }
-
   renderTimeZoneContent()
   {
     var timeZonesList = this.getTimeZonesList();
     
     if(this.state.istate.currentUser)
     {
-      var timeZone = this.state.timeZone || this.state.istate.currentUser.timeZone || 158;
+      var timeZone = this.state.istate.currentUser.timeZone || 158;
+    } 
+    else 
+    {
+       timeZone = 158;
     }
 
     return (

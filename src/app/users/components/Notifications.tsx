@@ -132,11 +132,6 @@ class Notifications extends Classs<Props>
     
     this.state = {
       istate: Store.getState(),
-      emailNotificationTiming: '',
-      emailNewsOn: '',
-      desktopNotificationType: '',
-      desktopNotificationSound: '',
-      emailNotificationType: '',
       saving: false,
       savingReq: null
     };
@@ -174,9 +169,6 @@ class Notifications extends Classs<Props>
   {
     let {value} = val;
     this.changeUserField('desktopNotificationType', value);
-    this.setState({
-      desktopNotificationType: value,
-    });
   }
 
   onSave() 
@@ -196,21 +188,19 @@ class Notifications extends Classs<Props>
   {
     let {value} = val;
     this.changeUserField('sound', value);
-    this.setState({
-      desktopNotificationSound: value,
-    });
   }
 
   playSound() 
   {
-    var soundName = this.state.desktopNotificationSound ||
-      this.state.istate.currentUser.sound || 'none';
-    if(soundName !== 'none') 
-    {
-      var sound = new Audio();
-      sound.src = this.sounds[soundName];
-      sound.load();
-      sound.play();
+    if(this.state.istate.currentUser) {
+      var soundName = this.state.istate.currentUser.sound;
+      if(soundName !== 'none') 
+      {
+        var sound = new Audio();
+        sound.src = this.sounds[soundName];
+        sound.load();
+        sound.play();
+      }
     }
   }
 
@@ -218,12 +208,10 @@ class Notifications extends Classs<Props>
   {
    if(this.state.istate.currentUser)
    {
-      var desktopNotification = 
-        this.state.desktopNotificationType ||
-        this.state.istate.currentUser.desktopNotificationType || '';
-      var sound = this.state.desktopNotificationSound ||
-                  this.state.istate.currentUser.sound || '';
+      var desktopNotification = this.state.istate.currentUser.desktopNotificationType;
+      var sound = this.state.istate.currentUser.sound;
    }
+
    return (
      <div className='notification-expansion'>
        <div className='notification-subtitle'>
@@ -264,49 +252,34 @@ class Notifications extends Classs<Props>
      </div>
    );
   }
-  
-  changeEmailTiming(newTimeSetting)
-  {
-    this.changeUserField('emailNotificationTiming', newTimeSetting);
-    this.setState({
-      emailNotificationTiming: newTimeSetting,
-    });
-  }
 
   changeEmailNotifications_15Min()
   {
-    this.changeEmailTiming(this.emailNotificationOptions[0].value);
+    this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[0].value)
   }
 
   changeEmailNotifications_Hour()
   {
-    this.changeEmailTiming(this.emailNotificationOptions[1].value);
+    this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[1].value)
   }
   
   changeEmailNotifications_Never()
   {
-    this.changeEmailTiming(this.emailNotificationOptions[2].value);
+    this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[2].value)
   }
 
   onEmailNotificationTypeChange(val)
   {
     let {value} = val;
     this.changeUserField('emailNotificationType', value);
-    this.setState({
-      emailNotificationType: value,
-    });
   }
 
   renderEmailNotificationsContent() 
   {
    if(this.state.istate.currentUser)
    {
-     var emailNotification = 
-      this.state.emailNotificationType ||
-      this.state.istate.currentUser.emailNotificationType || '';
-     var emailTiming = 
-       this.state.emailNotificationTiming ||
-       this.state.istate.currentUser.emailNotificationTiming || '';
+     var emailNotification = this.state.istate.currentUser.emailNotificationType;
+     var emailTiming = this.state.istate.currentUser.emailNotificationTiming;
    }
     return (
       <div className='notification-expansion'>
@@ -336,22 +309,16 @@ class Notifications extends Classs<Props>
 
   toggleEmailNews() 
   {
-    var emailNewsSetting = (this.state.emailNewsOn || 
-        this.state.istate.currentUser.emailNews) === 'on';
+    var emailNewsSetting = (this.state.istate.currentUser.emailNews) === 'on';
     var newEmailNewsSetting = emailNewsSetting ? 'off' : 'on';
-
     this.changeUserField('emailNews', newEmailNewsSetting);
-    this.setState({
-      emailNewsOn: newEmailNewsSetting,
-    });
   }
 
   renderEmailNewsContent() 
   {
     if(this.state.istate.currentUser)
     {
-      var emailNewsOn = (this.state.emailNewsOn || 
-        this.state.istate.currentUser.emailNews) === 'on';
+      var emailNewsOn = this.state.istate.currentUser.emailNews === 'on';
     }
     return (
       <div className='notification-expansion'>
@@ -391,13 +358,9 @@ class Notifications extends Classs<Props>
 
   renderDesktopDescription() 
   {
-    //If they haven't changed the desktop notification type, use the one 
-    //stored in istate, otherwise, use the type stored in state
    if(this.state.istate.currentUser)
    {
-      var desktopNotification = 
-        this.state.desktopNotificationType ||
-        this.state.istate.currentUser.desktopNotificationType || '';    
+      var desktopNotification = this.state.istate.currentUser.desktopNotificationType;    
    }
     return(
       <div>
@@ -413,9 +376,7 @@ class Notifications extends Classs<Props>
   {
     if(this.state.istate.currentUser) 
     {
-      var emailTiming = 
-       this.state.emailNotificationTiming ||
-       this.state.istate.currentUser.emailNotificationTiming || '';
+      var emailTiming = this.state.istate.currentUser.emailNotificationTiming;
     }
     return(
       <div>
@@ -430,8 +391,7 @@ class Notifications extends Classs<Props>
   {
     if(this.state.istate.currentUser)
     {
-      var emailNewsOn = (this.state.emailNewsOn || 
-        this.state.istate.currentUser.emailNews) === 'on';
+      var emailNewsOn = (this.state.istate.currentUser.emailNews) === 'on';
     }
     return(
       <div>
