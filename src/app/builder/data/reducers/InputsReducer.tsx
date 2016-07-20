@@ -56,6 +56,7 @@ InputsReducer[ActionTypes.inputs.create] =
         value: '',
         id: Util.randInt(123456789),
         parentId: action.payload.parentId,
+        type: 0,
       })));
 
 InputsReducer[ActionTypes.inputs.move] =

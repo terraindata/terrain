@@ -138,7 +138,11 @@ var Input = React.createClass<any, any>({
     {
       return (
         <div>
-          <DatePicker date={this.props.input.value} onChange={this.changeValue} />
+          <DatePicker
+            date={this.props.input.value}
+            onChange={this.changeValue}
+            canEdit={true}
+          />
         </div>
       );
     }
@@ -146,6 +150,7 @@ var Input = React.createClass<any, any>({
     return (
       <BuilderTextbox
         {...this.props}
+        canEdit={true}
         value={this.props.input.value}
         className="input-text input-text-second"
         id={this.props.input.id}
@@ -167,6 +172,7 @@ var Input = React.createClass<any, any>({
           <div className='input-top-row'>
             <BuilderTextbox
               {...this.props}
+              canEdit={true}
               value={this.props.input.key}
               className="input-text input-text-first"
               id={this.props.input.id}
