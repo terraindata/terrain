@@ -119,9 +119,10 @@
       position: absolute;
       top: 0px;
       left: 0px;
+      border-radius: 6px;
     }
     &:hover {
-      border: 6px solid #00bcd6;
+       border: 6px solid #00bcd6;
       .profile-pic-overlay {
         opacity: .75;
       }
@@ -130,8 +131,8 @@
   
   .profile-pic-overlay {
     position: absolute;
-    height: 94%;
-    width: 94%;
+    height: 152px;
+    width: 153px;
     left: 0px;
     top: 0px;
     text-align:center;
@@ -142,19 +143,21 @@
 
   .profile-pic-overlay-message {
     height: 100%;
-    width: 100%;
+    width: 100px;
     color: #fff;
-    font-size: 15px;
-    letter-spacing: 0.4
+    font-size: 13px;
+    letter-spacing: 0.5;
+    position: absolute;
+    left: 31px;
   }
 
   .camera-icon {
     height: 60px;
     width: 78px;
-    left: 25%;
-    top: 20px;
+    left: 11px;
+    top: 22px;
     position: relative;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
   }
 
   .profile-pic-upload {
@@ -166,8 +169,8 @@
   }
 
   .dropdown {
-    z-index: 99999999;
-    color: #3e3c3c;
+    z-index: 9999999;
+    color: #0E0E0E;
     position: relative;
     top: 162px; 
     left: 10%;
@@ -203,12 +206,39 @@
     margin: 5px;
     padding: 3px;
     border-radius: 6px;
+    font-size: 12px;
+    line-height: 18px;
     &:hover {
-      background-color: #cbece4;
+      background-color: #d1efe7;
       color: #f48e7d;
     }
   }
+
+  .edit-profile-title {
+    font-size: 21px;
+    color: #020202;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    line-height: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    letter-spacing: 0.3;
+    margin-top: 12px;
+  }
+
+  .profile-pic-name {
+    font-size: 15px;
+    font-weight: bold;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    text-align: left;
+    padding-left: 6px;
+  }
+
+  .profile-pic-column {
+    margin-top: 20px;
+    margin-left: 5px;
+  } 
   
+
   .profile-name {
     margin-top: 25px;
     font-size: 18px;
@@ -225,7 +255,10 @@
   .profile-edit-row {
     padding: 10px 0px;
     .button {
-      .growing-button(@gray);
+      background-color: #636363;
+      &:hover {
+        background-color: fade(#636363, 75%);
+      }
     }
   }
   
@@ -282,13 +315,21 @@
   .profile-save-row {
     position: relative;
     top: -12px;
-    
+    display: inline-flex;
     .button {
       font-size: 18px;
       background: @sea-green;
       width: 120px;
       height: 24px;
     }
+  }
+  .edit-profile-close-icon {
+    height: 40px;
+    width: 40px;
+    position: relative;
+    left: 300px;
+    cursor: pointer;
+    fill: #636363;
   }
 }
 

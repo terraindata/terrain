@@ -52,7 +52,8 @@ import { Link } from 'react-router';
 import UserTypes from './../UserTypes.tsx';
 import AuthStore from './../../auth/data/AuthStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
-var CameraIcon = require("./../../../images/icon_camera.svg");
+var CameraIcon = require('./../../../images/icon_camera.svg');
+var CloseIcon = require('./../../../images/icon_close_8x8_gray.svg')
 
 interface Props
 {
@@ -244,6 +245,51 @@ class Profile extends Classs<Props>
     }
   }
 
+  renderProfilePicture()
+  {
+    return(
+      <div
+        className='edit-profile-pic'
+        onClick={this.handleProfilePicClick}
+      >
+        <div className={this.state.showDropDown ? 'dropdown' : 'dropdown-hidden'}>
+          <div
+            onClick={this.handleUploadImage}
+            className='menu-item'
+          >
+            Upload an image
+          </div>
+          <div
+            onClick={this.removeProfilePicture}
+            className='menu-item'
+          >
+            Remove photo
+          </div>
+        </div>
+        <img
+          className='profile-pic-image'
+          src={this.state.user.imgSrc}
+          ref='profilePicImg'
+        />
+        <div className='profile-pic-overlay'>
+          <div className='profile-pic-overlay-message'>
+            <div className='camera-icon'>
+              <CameraIcon />
+            </div>
+            Change your profile picture
+          </div>
+        </div>
+        <input
+          ref='imageInput'
+          type='file'
+          className='profile-pic-upload'
+          onChange={this.handleProfilePicChange}
+          id='profile-image-input'
+        />
+      </div>
+    );
+  }
+
   render()
   {
     if(this.state.loading)
@@ -259,14 +305,12 @@ class Profile extends Classs<Props>
     return (
       <div className='profile profile-edit' onClick={this.hidePictureMenu}>
         <div className='profile-save-row'>
-          {
-            this.state.saving ?
-              <div className='profile-saving'>Saving...</div>
-            :
-              <div className='button' onClick={this.handleSave}>
-                Save
-              </div>
-          }
+          <div className='edit-profile-title'>
+            Edit your profile
+          </div>
+          <div className='edit-profile-close-icon' onClick={this.handleSave}>
+            <CloseIcon />
+          </div>
         </div>
         <div className='profile-edit-container'>
           <div className='profile-info'>
@@ -274,48 +318,15 @@ class Profile extends Classs<Props>
               this.infoKeys.map(this.renderInfoItem)
             }
           </div>
-          <div
-            className='edit-profile-pic'
-            onClick={this.handleProfilePicClick}
-          >
-            <div className={this.state.showDropDown ? 'dropdown' : 'dropdown-hidden'}>
-              <div
-                onClick={this.handleUploadImage}
-                className='menu-item'
-                >
-                Upload an image
-              </div>
-              <div
-                onClick={this.removeProfilePicture}
-                className='menu-item'
-                >
-                Remove photo
-              </div>
-            </div>
-            <img
-              className='profile-pic-image'
-              src={this.state.user.imgSrc}
-              ref='profilePicImg'
-            />
-            <div className='profile-pic-overlay'>
-              <div className='profile-pic-overlay-message'>
-              <div className='camera-icon'>
-                <CameraIcon />
-              </div>
-              Change your profile picture
-              </div>
-            </div>
-            <input
-              ref='imageInput'
-              type='file'
-              className='profile-pic-upload'
-              onChange={this.handleProfilePicChange}
-              id='profile-image-input'
-            />
+          <div className='profile-pic-column'>
+            <div className='profile-pic-name'> Profile Picture </div>
+            {this.renderProfilePicture()}
           </div>
         </div>
       </div>
     );
+
+    
   }
 }
 

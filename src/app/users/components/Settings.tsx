@@ -527,6 +527,7 @@ class Settings extends Classs<Props>
         title='Deactivate your account'
         getDescription={this.renderDeactivateDescription()}
         getButtonText={this.renderDeactivateButton()}
+        lastEntry={true}
         /> 
       </div >
     );

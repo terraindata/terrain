@@ -59,6 +59,7 @@ interface Props
   getDescription?: JSX.Element;
   getContent?: JSX.Element;
   getButtonText?: JSX.Element;
+  lastEntry?: boolean;
 }
 
 
@@ -119,6 +120,15 @@ class AccountEntry extends Classs<Props>
     return this.renderDefaultButton();
   }
 
+  renderLine() 
+  {
+    if(!this.props.lastEntry)
+    {
+      return (<hr className ='account-entry-line'/>);
+    }
+    return <hr className ='account-entry-line settings-line-hidden'/>;
+  }
+
   render() {
     return (
         <div className='account-entry'> 
@@ -133,7 +143,7 @@ class AccountEntry extends Classs<Props>
           <div className='account-entry-expanded-info'>
             {this.renderContent()}
           </div>
-          <hr className ='account-entry-line'/>
+          {this.renderLine()}
         </div>
     );
   }

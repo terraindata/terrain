@@ -422,6 +422,7 @@ class Notifications extends Classs<Props>
         title='Email News & Updates'
         getDescription={this.renderEmailNewsDescription()}
         getContent={this.renderEmailNewsContent()}
+        lastEntry={true}
       />
 
       </div>

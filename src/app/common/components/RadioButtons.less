@@ -11,9 +11,6 @@
 	border-radius: 50%;
 	cursor: pointer;
 	margin-right: 10px;
-	&:hover {
-		background: fade(#00bcd6, 25%);  
-	}
 	&.radio-button-selected {
 		background: #00bcd6;
 		font-size: 7px;
@@ -21,11 +18,16 @@
 		padding: 0px 4px;
 		z-index: 10;
 		box-shadow: inset 0 0 0 1px #fff;
+		&:hover {
+			background: fade(#00bcd6, 25%);  
+		}
 	}
 	&:not(.radio-button-selected) {
 		background: #b0b6b7;
 		font-size: 8px;
 		padding: 0px 5px;
-
+		&:hover {
+			background: fade(#00bcd6, 25%);  
+		}
 	}
 }
