@@ -51,7 +51,7 @@ var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 
 interface Props {
   open: boolean;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 class CreateLine extends React.Component<Props, any>

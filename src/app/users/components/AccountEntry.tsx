@@ -119,6 +119,7 @@ class AccountEntry extends Classs<Props>
     return this.renderDefaultButton();
   }
 
+  //<hr className ='account-entry-line'/>
   render() {
     return (
         <div className='account-entry'> 
@@ -132,8 +133,8 @@ class AccountEntry extends Classs<Props>
             {this.renderDescription()}
           <div className='account-entry-expanded-info'>
             {this.renderContent()}
-          </div>
-          <hr className ='account-entry-line'/>
+          </div>  
+          <hr className ='account-entry-line'/>        
         </div>
     );
   }

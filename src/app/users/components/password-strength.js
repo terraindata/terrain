@@ -232,7 +232,7 @@ var PasswordStrengthMeter = (function (_Component) {
         'section',
         null,
         _react2['default'].createElement('input', { value: this.props.value, onInput: this.handleInput, type: inputType, name: 'password', id: 'password', ref: 'password' }),
-        _react2['default'].createElement('meter', { max: '4', id: 'password-strength-meter', ref: 'passwordStrengthMeter' })
+        _react2['default'].createElement('meter', { max: '4', id: 'password-strength-meter', ref: 'passwordStrengthMeter'})
       );
     }
   }]);

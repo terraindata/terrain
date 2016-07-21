@@ -231,7 +231,7 @@ class Settings extends Classs<Props>
           className='settings-input password-input'
           value={this.state.currentPassword}
          />
-        <div className='settings-field-title'>
+        <div className='settings-field-title settings-new-password-adjustment'>
           New Password
         </div>
         <div className='settings-row'> 
@@ -256,9 +256,9 @@ class Settings extends Classs<Props>
             />
           <div className='settings-white-space' />
         </div>
-        <div className='settings-row bottom-margin'> 
+        <div className='settings-row settings-bottom-margin'> 
           <CheckBox checked={this.state.showPassword} onChange={this.toggleShowPassword}/>
-          <div className='settings-field-info' onClick={this.toggleShowPassword}>Show password</div>
+          <div className='settings-field-info settings-left-shift' onClick={this.toggleShowPassword}>Show password</div>
         </div>
         <div className='settings-row'>
           <div className='button settings-save-button' onClick={this.createNewPassword} >
@@ -350,9 +350,6 @@ class Settings extends Classs<Props>
       <div className='settings-expand-field'> 
         <div className='settings-field-title'>
           New Email Address
-        </div>
-        <div className="settings-email-label-small">
-          {this.renderEmailDescription()}
         </div>
         <div className='settings-row'>
           <input
