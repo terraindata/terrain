@@ -144,6 +144,7 @@ class AccountEntry extends Classs<Props>
             {this.renderContent()}
           </div>
           {this.renderLine()}
+          </div>  
         </div>
     );
   }

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./Profile.less');
 import * as React from 'react';
 import { Link } from 'react-router';
 import Classs from './../../common/components/Classs.tsx';
@@ -255,7 +256,7 @@ immediately be logged out of any existing sessions. \
         {
           this.state.isLoggedInUser ? 
             <div className='profile-edit-row'>
-              <Link to='/account/profile/edit' className='button'>
+              <Link to='/account/profile/edit' className='profile-edit-button button'>
                 Edit
               </Link>
             </div>
