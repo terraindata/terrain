@@ -58,7 +58,7 @@ interface Props {
 		}[];
 }
 
-class RadioButton extends Classs<Props>
+class RadioButtons extends Classs<Props>
 {
 
 	renderOption(option)
@@ -89,4 +89,4 @@ class RadioButton extends Classs<Props>
 	};
 }
 
-export default RadioButton;
+export default RadioButtons;

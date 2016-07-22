@@ -57,16 +57,6 @@ interface Props {
 	onChange: () => void;
 }
 
-// <div 
-// 				className={classNames({
-// 					'checkbox': true,
-//   				
-// 				})} 
-// 				onClick={this.props.onChange}
-// 			>
-// 				{this.props.checked ? '\u2713' : 'O'}
-// 			</div>
-
 class CheckBox extends Classs<Props>
 {
 	render() {

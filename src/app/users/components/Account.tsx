@@ -65,27 +65,28 @@ class Account extends Classs<Props>
 {
   render()
   {
+
     var title = "Account";
-    var selected = 1;
+    var selected = '298px';
     var linkWidth = -144;
 
     switch(this.props.location.pathname)
     {
       case "/account/profile":
         title = "Profile";
-        selected = 1;
+        selected = '298px';
         break;
       case "/account/notifications":
         title = "Notifications";
-        selected = 2;
+        selected = '154px';
         break;
       case "/account/team":
         title = "Team";
-        selected = -(254/144);
+        selected = 'calc(100% - 10px - 144px)';
         break;
       case "/account/settings":
         title = "Settings";
-        selected = 3;
+        selected = '10px';
         break;    
     }
     
@@ -100,14 +101,14 @@ class Account extends Classs<Props>
             <div 
               className="selected-link-marker" 
               style={{
-                left: (selected * linkWidth) + 'px',
+                left: selected,
               }}
             />
             <Link 
               to={'/account/settings'} 
               className={classNames({
                 'account-link': true,
-                'active': selected === 3,
+                'active': selected === '10px',
               })}  
             >
               Settings
@@ -116,7 +117,7 @@ class Account extends Classs<Props>
               to={'/account/notifications'} 
               className={classNames({
                 'account-link': true,
-                'active': selected === 2,
+                'active': selected === '154px',
               })}  >
               Notifications
             </Link>
@@ -124,7 +125,7 @@ class Account extends Classs<Props>
               to={'/account/profile'} 
               className={classNames({
                 'account-link': true,
-                'active': selected === 1,
+                'active': selected === '298px',
               })}  >
               Profile
             </Link>
@@ -132,7 +133,7 @@ class Account extends Classs<Props>
               to={'/account/team'} 
               className={classNames({
                 'account-link': true,
-                'active': selected < 0,
+                'active': selected === 'calc(100% - 10px - 144px)',
               })}  >
               Team
             </Link>
