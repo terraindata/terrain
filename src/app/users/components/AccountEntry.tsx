@@ -128,24 +128,27 @@ class AccountEntry extends Classs<Props>
     }
     return <hr className ='account-entry-line settings-line-hidden'/>;
   }
+  //{this.renderLine()}
 
   render() {
     return (
-        <div className='account-entry'> 
-          <div className='account-entry-top-bar'> 
-            <div className='account-entry-title'>
-              {this.props.title}   
-            </div> 
-            <div className='account-entry-white-space' />
-            {this.renderButton()}
+      <div> 
+      <div className='account-entry'> 
+        <div className='account-entry-top-bar'> 
+          <div className='account-entry-title'>
+            {this.props.title}   
           </div> 
-            {this.renderDescription()}
-          <div className='account-entry-expanded-info'>
-            {this.renderContent()}
-          </div>
-          {this.renderLine()}
-          </div>  
+          <div className='account-entry-white-space' />
+          {this.renderButton()}
+        </div> 
+        {this.renderDescription()}
+        <div className='account-entry-expanded-info'>
+          {this.renderContent()}
         </div>
+        {this.renderLine()}
+      </div>
+
+      </div>
     );
   }
 };

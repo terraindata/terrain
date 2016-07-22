@@ -1,6 +1,10 @@
 @import "../../common/Common.less";
 
 .team {
+  margin-left: 84px;
+  margin-right: 84px;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+
   .team-row {
     color: @grey;
     text-align: left;
@@ -17,9 +21,11 @@
       padding-left: 10px;
       
       .team-name {
-        font-size: 22px;
+        font-size: 21px;
         font-weight: bold;
-        color: @dark-grey;
+        color: #020202;
+        letter-spacing: 0.3;
+
       }
       
       .team-role {
@@ -27,7 +33,7 @@
       }
       
       .team-username {
-        color: @dark-grey;
+        color: #7e7c7c;
       }
     }
     
@@ -91,3 +97,12 @@
     }
   }
 }
+
+.team-page-title {
+    font-size: 21px;
+    color: #020202;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    line-height: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }

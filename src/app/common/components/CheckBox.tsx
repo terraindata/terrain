@@ -49,11 +49,23 @@ import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
+var CheckMark = require("./../../../images/icon_checkMark.svg");
+
 
 interface Props {
 	checked: boolean;
 	onChange: () => void;
 }
+
+// <div 
+// 				className={classNames({
+// 					'checkbox': true,
+//   				
+// 				})} 
+// 				onClick={this.props.onChange}
+// 			>
+// 				{this.props.checked ? '\u2713' : 'O'}
+// 			</div>
 
 class CheckBox extends Classs<Props>
 {
@@ -62,11 +74,11 @@ class CheckBox extends Classs<Props>
 			<div 
 				className={classNames({
 					'checkbox': true,
-  				'checkbox-checked': this.props.checked,
+  					'checkbox-checked': this.props.checked,
 				})} 
 				onClick={this.props.onChange}
 			>
-				{this.props.checked ? '\u2713' : 'O'}
+			{this.props.checked ? <CheckMark className ='check-mark-icon'/> : 'O'}
 			</div>
 		);
 	};

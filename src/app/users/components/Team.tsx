@@ -289,7 +289,6 @@ class Team extends Classs<Props>
         />
       );
     }
-    
     return null;
   }
   
@@ -299,6 +298,9 @@ class Team extends Classs<Props>
 
     return (
       <div className='team'>
+        <div className='team-page-title'> 
+          Team Directory
+        </div>
         {
           loading &&
             <InfoArea large='Loading...' />

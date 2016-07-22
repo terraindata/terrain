@@ -256,7 +256,7 @@ immediately be logged out of any existing sessions. \
         {
           this.state.isLoggedInUser ? 
             <div className='profile-edit-row'>
-              <Link to='/account/profile/edit' className='profile-edit-button button'>
+              <Link to='/account/profile/edit' className='button'>
                 Edit
               </Link>
             </div>
