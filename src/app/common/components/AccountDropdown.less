@@ -78,7 +78,31 @@
     min-width: 100%;
     border-radius: 6px;
     box-shadow: 0px 0px 3px #888888;
-    margin-left: 6px;
+    margin-right: 6px;
+
+    &:after, &:before {
+      bottom: 100%;
+      left: 93%;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+    &:after {
+      border: solid transparent;
+      border-bottom-color: #ffffff;
+      border-width: 7px;
+      margin-left: -7px;
+    }
+    &:before {
+      border: solid transparent;
+      border-bottom-color: @gray;
+      border-width: 8px;
+      margin-left: -8px;
+    }
+
     .account-dropdown-row {
       padding: 12px 0px;
       font-size: 16px;
