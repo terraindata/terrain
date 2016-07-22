@@ -9,8 +9,8 @@
 6 silly lifecycle terrain-search@1.0.0~prestart: no script for prestart, continuing
 7 info lifecycle terrain-search@1.0.0~start: terrain-search@1.0.0
 8 verbose lifecycle terrain-search@1.0.0~start: unsafe-perm in lifecycle true
-9 verbose lifecycle terrain-search@1.0.0~start: PATH: /usr/local/lib/node_modules/npm/bin/node-gyp-bin:/Users/laura/git/Search/node_modules/.bin:/usr/local/Cellar/node/6.2.1/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin
-10 verbose lifecycle terrain-search@1.0.0~start: CWD: /Users/laura/git/Search
+9 verbose lifecycle terrain-search@1.0.0~start: PATH: /usr/local/lib/node_modules/npm/bin/node-gyp-bin:/Users/leslie/git/Search/node_modules/.bin:/usr/local/Cellar/node/6.2.1/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin
+10 verbose lifecycle terrain-search@1.0.0~start: CWD: /Users/leslie/git/Search
 11 silly lifecycle terrain-search@1.0.0~start: Args: [ '-c',
 11 silly lifecycle   'MIDWAY_HOST=$(docker-machine ip default) webpack-dev-server --config webpack.config.docker.js --inline --content-base src/app --history-api-fallback' ]
 12 silly lifecycle terrain-search@1.0.0~start: Returned: code: 1  signal: null
@@ -26,7 +26,7 @@
 14 verbose stack     at maybeClose (internal/child_process.js:852:16)
 14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:215:5)
 15 verbose pkgid terrain-search@1.0.0
-16 verbose cwd /Users/laura/git/Search
+16 verbose cwd /Users/leslie/git/Search
 17 error Darwin 15.3.0
 18 error argv "/usr/local/Cellar/node/6.2.1/bin/node" "/usr/local/bin/npm" "start"
 19 error node v6.2.1
