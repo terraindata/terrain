@@ -39,9 +39,9 @@
       border-radius: 6px;
       letter-spacing: 0.5;   
       float: left;   
-      // &:hover {
-      //   background: fade(#00bcd6, 25%);  
-      // }
+      &:hover {
+        text-decoration: underline !important;  
+      }
       .transition(~"all 600ms cubic-bezier(0.23, 1, 0.32, 1)");
       &:last-child {
         float: right;
@@ -74,5 +74,6 @@
     overflow-y: auto;
     height: calc(100% - 20px);
     border-right: 6px solid white;
+    width: (68vw - 100%);
   }
 }
