@@ -42,109 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
- require('./AccountEntry.less');
+require('./PasswordMeter.less');
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
-var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 
-interface Props
-{
-  title: string;
-  getDescription?: JSX.Element;
-  getContent?: JSX.Element;
-  getButtonText?: JSX.Element;
-  lastEntry?: boolean;
+const meterSectionValues = [0, 1, 2, 3, 4, 5]
+
+interface Props {
+	value: number,
 }
 
-
-class AccountEntry extends Classs<Props>
+class PasswordMeter extends Classs<Props>
 {
-  constructor(props: Props) 
-  {
-    super(props);
-    this.state =
-      {
-        expanded: false,
-        expandedInfo: <div />,
-      }
-  }
+	renderMeterSection(value) 
+	{
+		return (
+			<div 
+				className={classNames(
+					{
+					'meter-section': true,
+					'burgundy': 		this.props.value === 0,
+					'red': 					this.props.value === 1,
+					'orange': 			this.props.value === 2,
+					'yellow': 			this.props.value === 3,
+					'light-green': 	this.props.value === 4,
+					'green': 				this.props.value === 5,
+					'filled': 			this.props.value >= value
+				})}	
+				key={value}
+			></div>
+		);
+	}
 
-  expand()
-  {
-    this.setState({
-      expanded: !this.state.expanded
-    }); 
-  }
+	render() {
+		return (
+			<div className='password-meter'>
+				{meterSectionValues.map(this.renderMeterSection)}
+			</div>
+		);
+	};
+}
 
-  renderContent()
-  {
-    if (this.state.expanded) 
-    {
-      return this.props.getContent;
-    }
-  }
-
-  renderDescription()
-  {
-    if (this.props.getDescription)
-     {
-      return <div className='account-entry-description'>{this.props.getDescription}</div>;
-    }
-  }
-
-  renderDefaultButton()
-  {
-    return (
-        <div className='account-entry-expand-button button' onClick={this.expand}>
-            {this.state.expanded ? 'Collapse' : 'Expand'}
-        </div>
-      );
-  }
-
-  renderButton()
-  {
-    if (this.props.getButtonText)
-    {
-      return (
-        <div> 
-          {this.props.getButtonText} 
-        </div>
-      );
-    }
-    return this.renderDefaultButton();
-  }
-
-  renderLine() 
-  {
-    if(!this.props.lastEntry)
-    {
-      return (<hr className ='account-entry-line'/>);
-    }
-    return <hr className ='account-entry-line settings-line-hidden'/>;
-  }
-
-  render() {
-    return (
-      <div className='account-entry'> 
-      <div className='account-entry-top-bar'> 
-        <div className='account-entry-title'>
-          {this.props.title}   
-        </div> 
-        <div className='account-entry-white-space' />
-          {this.renderButton()}
-        </div> 
-        {this.renderDescription()}
-        <div className='account-entry-expanded-info'>
-          {this.renderContent()}
-        </div>
-        {this.renderLine()}
-      </div>  
-    );
-  }
-};
-
-export default AccountEntry;
+export default PasswordMeter;

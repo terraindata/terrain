@@ -42,109 +42,85 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
- require('./AccountEntry.less');
+require('./Settings.less')
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
-var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
+import PasswordMeter from './PasswordMeter.tsx';
+var zxcvbn = require('zxcvbn');
 
-interface Props
-{
-  title: string;
-  getDescription?: JSX.Element;
-  getContent?: JSX.Element;
-  getButtonText?: JSX.Element;
-  lastEntry?: boolean;
+interface Props {
+	onChange: (ev: any) => void,
+	value: string,
+	type: string,
 }
 
-
-class AccountEntry extends Classs<Props>
+class PasswordStrengthInput extends Classs<Props>
 {
-  constructor(props: Props) 
-  {
-    super(props);
-    this.state =
-      {
-        expanded: false,
-        expandedInfo: <div />,
-      }
-  }
+	constructor(Props) {
+		super(Props);
+		this.state = {
+			score: -1,
+		}
+	}
 
-  expand()
-  {
-    this.setState({
-      expanded: !this.state.expanded
-    }); 
-  }
+	handleInput(event) {
+		event.preventDefault();
+		var password = event.target.value;
+		if(password.length === 0)
+		{
+			this.setState({
+				score: -1,
+			});
+			return;
+		}
+		var result = zxcvbn(password);
+		var crack_time = result.crack_times_seconds.online_no_throttling_10_per_second;
+		var score;
+		if(crack_time <= Math.pow(10,2)) 
+		{
+			score = 0;
+		} 
+		else if(crack_time <= Math.pow(10,4)) {
+			score = 1;
+		}
+		else if(crack_time <= Math.pow(10,6)) {
+			score = 2;
+		}
+		else if(crack_time <= Math.pow(10,8)) {
+			score = 3;
+		}
+		else if(crack_time <= Math.pow(10,10)) {
+			score = 4;
+		}
+		else
+		{
+			score = 5;
+		}
 
-  renderContent()
-  {
-    if (this.state.expanded) 
-    {
-      return this.props.getContent;
-    }
-  }
+		this.setState({
+			score: score,
+		})
+	}
 
-  renderDescription()
-  {
-    if (this.props.getDescription)
-     {
-      return <div className='account-entry-description'>{this.props.getDescription}</div>;
-    }
-  }
+	render()
+	{
+		return(
+			<div>
+				<input 
+					type={this.props.type} 
+					value={this.props.value} 
+					onChange={this.props.onChange}
+					onInput={this.handleInput}
+					className='settings-input password-input'
+				/>
+				<PasswordMeter value={this.state.score}/>
+			</div>
+		);
+	}
+}
 
-  renderDefaultButton()
-  {
-    return (
-        <div className='account-entry-expand-button button' onClick={this.expand}>
-            {this.state.expanded ? 'Collapse' : 'Expand'}
-        </div>
-      );
-  }
-
-  renderButton()
-  {
-    if (this.props.getButtonText)
-    {
-      return (
-        <div> 
-          {this.props.getButtonText} 
-        </div>
-      );
-    }
-    return this.renderDefaultButton();
-  }
-
-  renderLine() 
-  {
-    if(!this.props.lastEntry)
-    {
-      return (<hr className ='account-entry-line'/>);
-    }
-    return <hr className ='account-entry-line settings-line-hidden'/>;
-  }
-
-  render() {
-    return (
-      <div className='account-entry'> 
-      <div className='account-entry-top-bar'> 
-        <div className='account-entry-title'>
-          {this.props.title}   
-        </div> 
-        <div className='account-entry-white-space' />
-          {this.renderButton()}
-        </div> 
-        {this.renderDescription()}
-        <div className='account-entry-expanded-info'>
-          {this.renderContent()}
-        </div>
-        {this.renderLine()}
-      </div>  
-    );
-  }
-};
-
-export default AccountEntry;
+export default PasswordStrengthInput;

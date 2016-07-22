@@ -58,10 +58,10 @@ import UserTypes from '../UserTypes.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
 type User = UserTypes.User;
+import PasswordStrengthInput from './PasswordStrengthInput.tsx';
 
 var Select = require('react-select');
 var TimeZones = require('./Timezones.json');
-var PasswordStrengthMeter = require('./password-strength.js');
 var LogoutIcon = require("./../../../images/icon_logout.svg");
 
 
@@ -231,16 +231,16 @@ class Settings extends Classs<Props>
           className='settings-input password-input'
           value={this.state.currentPassword}
          />
-        <div className='settings-field-title settings-new-password-adjustment'>
+        <div className='settings-field-title'>
           New Password
         </div>
         <div className='settings-row'> 
          <div className='settings-password-container'>
-        <PasswordStrengthMeter
-          onChange={this.handleNewPasswordChange}
-          type={this.state.showPassword ? 'text' : 'password'}
-          value={this.state.newPassword}
-        />   
+          <PasswordStrengthInput 
+            onChange={this.handleNewPasswordChange}
+            value={this.state.newPassword}
+            type={this.state.showPassword ? 'text' : 'password'}
+          />
       </div>
           <div className='settings-white-space' />
         </div>
