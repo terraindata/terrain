@@ -1,0 +1,50 @@
+@import "../../common/Common.less";
+
+.x-cards {
+  padding: 15px;
+  max-height: 100%;
+  overflow: auto;
+  width: 600px;
+  box-sizing: border-box;
+  
+  .x-card {
+    padding: 12px;
+    padding-top: 6px;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    position: relative;
+    box-sizing: border-box;
+    // .transition;
+    
+    &.x-card-dragging {
+      // opacity: 0;
+      // height: 0px;
+      // overflow: hidden;
+      // padding: 0px !important;
+      // .transition(~"all 0s");
+      display: none;
+    }
+    
+    .x-card-title {
+      margin-bottom: 6px;
+    }
+    
+    .x-card-cards {
+      margin-top: 6px;
+      // padding: 10px;
+      // background: #fff;
+    }
+    
+    .x-card-cards-empty {
+      background: rgba(255,255,255,0.5);
+      padding: 10px;
+      color: @grey;
+      border-radius: 6px;
+    }
+    
+    input {
+      margin-bottom: 6px;
+    }
+  }
+}
