@@ -63,6 +63,11 @@ var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 var LockedIcon = require("./../../../images/icon_lock.svg?name=LockedIcon");
 
+var BuilderIcon = require("./../../../images/icon_builder_18x18.svg");
+var ResultsIcon = require("./../../../images/icon_gear.svg");
+var TQLIcon = require("./../../../images/icon_tql_17x14.svg");
+var InputsIcon = require("./../../../images/icon_icon_17x12.svg");
+
 enum COLUMNS {
   Builder,
   Results,
@@ -70,6 +75,13 @@ enum COLUMNS {
   Inputs,
 };
 var NUM_COLUMNS = 4;
+
+var menuIcons = [
+    {icon: <BuilderIcon />, color: '#76a2c1'},
+    {icon: <ResultsIcon />, color: '#71bca2'},
+    {icon: <TQLIcon />, color: '#d47884'},
+    {icon: <InputsIcon />, color: '#c2b694'}
+];
 
 // interface Props
 // {
@@ -231,6 +243,8 @@ var BuilderColumn = React.createClass<any, any>(
     var options: MenuOption[] = _.range(0, NUM_COLUMNS).map(index => ({
       text: COLUMNS[index],
       onClick: this.switchView,
+      icon: menuIcons[index].icon,
+      iconColor: menuIcons[index].color
     }));
     
     options[this.state.column].disabled = true;

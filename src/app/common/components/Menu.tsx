@@ -57,6 +57,8 @@ export interface MenuOption {
   text: string;
   onClick: (index:number) => void;
   disabled?: boolean;
+  icon?: any; //What type should this be?
+  iconColor?: string,
 };
 
 interface Props
@@ -90,9 +92,15 @@ class Menu extends Classs<Props>
         option.onClick(index);
       };
     }
-    
     return (
       <div className={"menu-option" + (option.disabled ? " menu-option-disabled" : "")} key={index} onClick={onClick}>
+        <div 
+          className="menu-option-icon" 
+          style={{
+            fill: option.iconColor || 'black',
+          }}>
+          {option.icon}
+        </div>
         <div className="dead-center">
           { option.text }
         </div>
