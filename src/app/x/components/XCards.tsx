@@ -43,6 +43,8 @@ THE SOFTWARE.
 */
 
 require('./XCards.less');
+var Redux = require('redux');
+import * as ReduxActions from 'redux-actions';
 import * as classNames from 'classnames';
 import * as _ from 'underscore';
 import * as React from 'react';
@@ -58,6 +60,9 @@ var { createDragPreview } = require('react-dnd-text-dragpreview');
 
 type List<T> = Immutable.List<T>;
 let List = Immutable.List;
+type Map<T> = Immutable.Map<string, T>;
+let Map = Immutable.Map;
+
 
 const COLORS = 
 [
@@ -88,7 +93,7 @@ let _IXCard = Immutable.Record({
 });
 class IXCard extends _IXCard {
   id: string;
-  rows: string[];
+  rows: List<string>;
   cards: CardList;
   
   constructor(id: string, cards: CardList)
@@ -96,14 +101,10 @@ class IXCard extends _IXCard {
     super({
       id,
       cards,
-      rows:  _.range(0, Math.floor(Math.random() * 4)).map(i => ""),
+      rows:  List(_.range(0, Math.floor(Math.random() * 40)).map(i => "")),
     });
   }
 }
-
-// type IXCardMap = {
-//   [id: string]: IXCard;
-// }
 
 interface CardDragItem
 {
@@ -161,16 +162,6 @@ class _Card extends Classs<CardProps>
     return shallowCompare(this, nextProps, nextState);
   }
   
-  handleInputChange(event)
-  {
-    console.log(this.getKeyPath());
-  }
-  
-  getKeyPath()
-  {
-    return this._ikeyPath(this.props.keyPath, this.props.card.id);
-  }
-  
   // handleMouseDown(event)
   // {
   //   this.setState({
@@ -218,7 +209,11 @@ class _Card extends Classs<CardProps>
         <div className='x-card-fields'>
           {
             card.rows.map((row, index) =>
-              <input type='text' value={row} rel={index + ''} onChange={this.handleInputChange} key={index} />
+              <CardTextbox
+                keyPath={this._ikeyPath(this.props.keyPath, 'rows', index)}
+                value={row}
+                key={index}
+              />
             )
           }
         </div>
@@ -226,7 +221,7 @@ class _Card extends Classs<CardProps>
           !card.cards ? null : 
             <XCardsArea
               cards={card.cards}
-              keyPath={this.getKeyPath()}
+              keyPath={this._ikeyPath(this.props.keyPath, 'cards')}
               depth={this.props.depth}
               cardId={card.id}
             />
@@ -386,7 +381,24 @@ const dragCollect = (connect, monitor) =>
 let Card = DropTarget('CARD', cardTarget, dropCollect)(DragSource('CARD', cardSource, dragCollect)(_Card));
 
 
-
+interface CardTextboxProps
+{
+  value: string;
+  keyPath: KeyPath;
+}
+class CardTextbox extends Classs<CardTextboxProps>
+{
+  handleChange(event)
+  {
+    ActionSet(this.props.keyPath, event.target.value);
+  }
+  
+  render() {
+    return (
+      <input type='text' value={this.props.value} onChange={this.handleChange} />
+    );
+  }
+}
 
 
 
@@ -524,7 +536,7 @@ class _XCardsArea extends Classs<XCardsAreaProps>
           cards.map((card, index) => 
             <Card
               card={card}
-              keyPath={this._ikeyPath(this.props.keyPath, 'cards')}
+              keyPath={this._ikeyPath(this.props.keyPath, index)}
               key={card.id}
               depth={this.props.depth + 1}
               onHoverDrop={this.handleHoverDrop}
@@ -621,32 +633,18 @@ interface XCardsProps
 class XCards extends Classs<XCardsProps>
 {
   state: {
-    cards: CardList;
+    builder: BuilderState; 
   } = {
-    cards: List([
-      new IXCard('a', null),
-      new IXCard('b', null),
-      new IXCard('c', null),
-      new IXCard('d', null),
-      new IXCard('e', null),
-    ]),
-    // cards: List([
-    //   new IXCard('a', List([
-    //     new IXCard('ab', List([
-    //       new IXCard('ae', List([
-    //         new IXCard('ag', null),
-    //       ])),
-    //       new IXCard('af',  List([])),
-    //     ])),
-    //     new IXCard('ac', null),
-    //     new IXCard('ad',  List([])),
-    //   ])),
-    // ]),
+    builder: null
   };
-
+  
   constructor(props)
   {
     super(props);
+    
+    this._subscribe(Store, {
+      stateKey: 'builder',
+    });
   }
   
   _kp = Immutable.List([]);
@@ -655,16 +653,214 @@ class XCards extends Classs<XCardsProps>
   {
     return (
       <div className='x-cards'>
-        <XCardsArea
-          cards={this.state.cards}
-          keyPath={this._kp}
-          depth={0}
-          cardId={null}
-        />
+        {
+          this.state.builder ?
+            <XCardsArea
+              cards={this.state.builder.cards}
+              keyPath={this._ikeyPath(this._kp, 'cards')}
+              depth={0}
+              cardId={null}
+            />
+          :
+            <div>Loading...</div>
+        }
       </div>
     );
   }
 }
 
+
+let _BuilderState = Immutable.Record({
+  cards: List([]),
+});
+class BuilderState extends _BuilderState
+{
+  cards: List<IXCard>;
+}
+
+let defaultState = new BuilderState({ 
+  cards: 
+  List([
+      new IXCard('aa', List([
+        new IXCard('aab', List([
+          new IXCard('aae', List([
+            new IXCard('aag', null),
+          ])),
+          new IXCard('aaf',  List([])),
+        ])),
+        new IXCard('aac', List([new IXCard('aa1', List([
+        new IXCard('aab1', List([
+          new IXCard('aae1', List([
+            new IXCard('aag1', null),
+          ])),
+          new IXCard('aaf1',  List([])),
+        ])),
+        new IXCard('aac1', null),
+        new IXCard('aad1',  List([])),
+      ])),])),
+        new IXCard('aad',  List([])),
+      ])),
+      new IXCard('aasdf', List([
+          new IXCard('a1a', List([
+            new IXCard('a1ab', List([
+              new IXCard('a1ae', List([
+                new IXCard('a1ag', null),
+              ])),
+              new IXCard('a1af',  List([])),
+            ])),
+            new IXCard('a1ac', List([
+              new IXCard('a1a1', List([
+            new IXCard('a1ab1', List([
+              new IXCard('a1ae1', List([
+                new IXCard('a1ag1', null),
+              ])),
+              new IXCard('a1af1',  List([])),
+            ])),
+            new IXCard('a1ac1', null),
+            new IXCard('a1ad1',  List([])),
+          ])),])),
+            new IXCard('a1ad',  List([])),
+          ])),
+        ])),
+      new IXCard('aa10', List([
+          new IXCard('a21a', List([
+            new IXCard('a21ab', List([
+              new IXCard('a21ae', List([
+                new IXCard('a21ag', null),
+              ])),
+              new IXCard('a21af',  List([])),
+            ])),
+            new IXCard('a21ac', List([
+              new IXCard('a21a1', List([
+            new IXCard('a21ab1', List([
+              new IXCard('a21ae1', List([
+                new IXCard('a21ag1', null),
+              ])),
+              new IXCard('a21af1',  List([])),
+            ])),
+            new IXCard('a21ac1', null),
+            new IXCard('a21ad1',  List([])),
+          ])),])),
+            new IXCard('a21ad',  List([])),
+          ])),
+        ])),
+      new IXCard('a3a2', List([
+          new IXCard('a31a', List([
+            new IXCard('a31ab', List([
+              new IXCard('a31ae', List([
+                new IXCard('a31ag', null),
+              ])),
+              new IXCard('a31af',  List([])),
+            ])),
+            new IXCard('a31ac', List([
+              new IXCard('a31a1', List([
+            new IXCard('a31ab1', List([
+              new IXCard('a31ae1', List([
+                new IXCard('a31ag1', null),
+              ])),
+              new IXCard('a31af1',  List([])),
+            ])),
+            new IXCard('a31ac1', null),
+            new IXCard('a31ad1',  List([])),
+          ])),])),
+            new IXCard('a31ad',  List([])),
+          ])),
+        ])),
+      new IXCard('a4a3', List([
+          new IXCard('a41a', List([
+            new IXCard('a41ab', List([
+              new IXCard('a41ae', List([
+                new IXCard('a41ag', null),
+              ])),
+              new IXCard('a41af',  List([])),
+            ])),
+            new IXCard('a41ac', List([
+              new IXCard('a41a1', List([
+            new IXCard('a41ab1', List([
+              new IXCard('a41ae1', List([
+                new IXCard('a41ag1', null),
+              ])),
+              new IXCard('a41af1',  List([])),
+            ])),
+            new IXCard('a41ac1', null),
+            new IXCard('a41ad1',  List([])),
+          ])),])),
+            new IXCard('a41ad',  List([])),
+          ])),
+        ])),
+      new IXCard('aa4', List([
+          new IXCard('a51a', List([
+            new IXCard('a51ab', List([
+              new IXCard('a51ae', List([
+                new IXCard('a51ag', null),
+              ])),
+              new IXCard('a51af',  List([])),
+            ])),
+            new IXCard('a51ac', List([
+              new IXCard('a51a1', List([
+            new IXCard('a51ab1', List([
+              new IXCard('a51ae1', List([
+                new IXCard('a51ag1', null),
+              ])),
+              new IXCard('a51af1',  List([])),
+            ])),
+            new IXCard('a51ac1', null),
+            new IXCard('a51ad1',  List([])),
+          ])),])),
+            new IXCard('a51ad',  List([])),
+          ])),
+        ])),
+      new IXCard('a6a5', List([
+          new IXCard('a61a', List([
+            new IXCard('a61ab', List([
+              new IXCard('a61ae', List([
+                new IXCard('a61ag', null),
+              ])),
+              new IXCard('a61af',  List([])),
+            ])),
+            new IXCard('a61ac', List([
+              new IXCard('a61a1', List([
+            new IXCard('a61ab1', List([
+              new IXCard('a61ae1', List([
+                new IXCard('a61ag1', null),
+              ])),
+              new IXCard('a16af1',  List([])),
+            ])),
+            new IXCard('a61ac1', null),
+            new IXCard('a61ad1',  List([])),
+          ])),])),
+            new IXCard('a61ad',  List([])),
+          ])),
+        ])),
+    ]),
+  // List([
+  //     new IXCard('a', null),
+  //     new IXCard('b', null),
+  //     new IXCard('c', null),
+  //     new IXCard('d', null),
+  //     new IXCard('e', null),
+  //   ]),
+});
+
+interface BuilderAction
+{
+  type: string;
+  keyPath: KeyPath;
+  value: any;
+}
+var Reducers: {[type:string]: (state: BuilderState, action: BuilderAction) => BuilderState} = {};
+Reducers['set'] =
+  (state: BuilderState, action: BuilderAction) =>
+  {
+    return state.setIn(action.keyPath.toJS(), action.value) as BuilderState;
+  }
+
+let Store = Redux.createStore(ReduxActions.handleActions(Reducers), defaultState);
+
+let ActionSet = (keyPath: KeyPath, value: any) => Store.dispatch({
+  type: 'set',
+  keyPath,
+  value,
+});
 
 export default DragDropContext(HTML5Backend)(XCards);
