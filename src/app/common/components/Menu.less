@@ -14,7 +14,8 @@
 
 .menu-wrapper {
   // float: right;
-  background: @card-menu-bg;
+  //background: @card-menu-bg;
+
   border-radius: @menu-collapsed-size;
   position: absolute;
   // z-index: 999;
@@ -60,6 +61,7 @@
       height: @menu-icon-small-height;
       left: calc((@menu-collapsed-small-size - @menu-icon-small-width) / 2);
       top: calc((@menu-collapsed-small-size - @menu-icon-small-height) / 2);
+      fill: red !important;
     }
   }
   
@@ -101,8 +103,8 @@
     .menu-icon {
       //display: none;
       //opacity: 0;
-      top: -23px;
-      left: 36px;
+      //top: -23px;
+      //left: 36px;
       border: 2px solid white;
       border-radius: 50%;
       &:hover {

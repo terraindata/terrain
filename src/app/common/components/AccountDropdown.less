@@ -46,6 +46,29 @@
     }
   }
   
+  .account-dropdown-icon {
+    width: 25px;
+    float: left;
+    display: inline-block;
+    position: relative;
+    top: -3px;
+    padding-right: 10px;
+    padding-left: 6px;
+    &.account-dropdown-icon-red {
+      fill: #911352;
+    }
+
+    &.account-dropdown-icon-blue {
+      fill: #145257;
+    }
+  }
+
+
+  .account-dropdown-link {
+    color: #0e0e0e !important;
+    width: 130px;
+  }
+
   .account-dropdown-content {
     background: #fff;
     position: absolute;
@@ -53,18 +76,26 @@
     top: 100%;
     right: 0px;
     min-width: 100%;
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
-    
+    border-radius: 6px;
+    box-shadow: 0px 0px 3px #888888;
+    margin-left: 6px;
     .account-dropdown-row {
       padding: 12px 0px;
-      text-align: center;
-      font-size: @large-font-size;
+      font-size: 16px;
+      line-height: 18px;
+      border-radius: 6px;
+      color: #0e0e0e !important;
       .transition;
-      
+      margin-right: 10px;
+      margin-left: 10px;
+      margin-top: 10px; 
+
       &:hover {
-        background: #00a7f7;
-        color: #fff;
+        background: #d1efe7;
+      }
+      &:last-child {
+        margin-bottom: 10px;
+        margin-top: 0px;
       }
     }
   }
