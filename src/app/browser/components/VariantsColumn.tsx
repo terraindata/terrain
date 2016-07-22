@@ -190,7 +190,6 @@ class VariantsColumn extends Classs<Props>
   
   handleDoubleClick(id:ID)
   {
-    console.log(`/builder/?o=${id}`);
     this.props.history.pushState({}, `/builder/?o=${id}`);
   }
 
@@ -284,6 +283,7 @@ class VariantsColumn extends Classs<Props>
     
     let {me, roles} = this.state;
     let canCreate = me && roles && roles.getIn([this.props.groupId, me.username, 'builder']);
+    let canMakeLive = me && roles && roles.getIn([this.props.groupId, me.username, 'admin']);
     
     return (
       <BrowserItemCategory
@@ -291,6 +291,7 @@ class VariantsColumn extends Classs<Props>
         key={status}
         type='variant'
         onHover={this.handleVariantStatusHover}
+        dropDisabled={status === BrowserTypes.EVariantStatus.Live && !canMakeLive}
       >
         {
           this.props.variantsOrder.map((id, index) =>

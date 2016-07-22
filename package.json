@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "start": "MIDWAY_HOST=$(docker-machine ip default) webpack-dev-server --config webpack.config.docker.js --inline --content-base src/app --history-api-fallback",
-    "start-docker": "MIDWAY_HOST=$(docker-machine ip default) webpack-dev-server --config webpack.config.docker.js --inline --content-base src/app --history-api-fallback",
+    "start-prod": "MIDWAY_HOST=pa-terraformer01.terrain.int webpack-dev-server --config webpack.config.docker.js --inline --content-base src/app --history-api-fallback",
     "test": "karma start karma.conf.js",
-    "deploy": "webpack && scp bundle.js u51505641@lukeknepper.com:alfaromeo/bundle.js",
-    "deploy-prod": "npm run build-prod && scp bundle.prod.js u51505641@lukeknepper.com:alfaromeo/bundle.js",
-    "build-prod": "webpack --config webpack.config.prod.js --output-filename bundle.prod.js"
+    "deploy": "MIDWAY_HOST=pa-terraformer01.terrain.int webpack && scp bundle.js pa-terraformer01.terrain.int:/home/jkirk/midway/dist/bundle.js",
+    "build-prod": "MIDWAY_HOST=pa-terraformer01.terrain.int webpack --config webpack.config.prod.js --output-filename bundle.prod.js",
+    "build": "MIDWAY_HOST=pa-terraformer01.terrain.int webpack"
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,9 @@
     "Luke Knepper",
     "Mason Simon",
     "Mike Agnich",
-    "Ben Smith"
+    "Ben Smith",
+    "Laura Brouckman",
+    "Leslie Kurt"
   ],
   "private": true,
   "dependencies": {
@@ -36,8 +38,10 @@
     "bootstrap": "^3.3.4",
     "bootstrap-webpack": "0.0.3",
     "classnames": "^2.2.5",
+    "codemirror": "^5.16.0",
     "css-loader": "^0.10.1",
     "d3": "^3.5.14",
+    "dom-helpers": "^2.4.0",
     "events": "^1.0.2",
     "expose-loader": "^0.6.0",
     "file-loader": "^0.8.4",
@@ -69,6 +73,7 @@
     "react-testutils-additions": "^15.0.0",
     "react-tooltip": "^2.0.0",
     "react-tween-state": "0.0.5",
+    "react-virtualized": "^7.12.1",
     "redux": "^3.0.5",
     "redux-actions": "^0.9.0",
     "sort-by": "^1.1.0",

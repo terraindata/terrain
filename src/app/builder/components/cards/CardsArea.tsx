@@ -73,16 +73,13 @@ var CardsArea = React.createClass<any, any>({
   
   componentWillReceiveProps(nextProps)
   {
-    if(!_.isEqual(nextProps, this.props))
-    {
-      this.setState({
-        layout:
-        {
-          rows: this.getRows(nextProps),
-          useDropZones: true,
-        }
-      });
-    }
+    this.setState({
+      layout:
+      {
+        rows: this.getRows(nextProps),
+        useDropZones: true,
+      }
+    });
   },
   
   shouldComponentUpdate(nextProps, nextState)

@@ -284,6 +284,10 @@ var BuilderActions =
   setVariant:
     (variantId: ID, variant) =>
       $(ActionTypes.setVariant, { variantId, variant }),
+  
+  setVariantField:
+    (variantId: ID, field: string, value: any) =>
+      $(ActionTypes.setVariantField, { variantId, field, value }),
 };
 
 export default BuilderActions;

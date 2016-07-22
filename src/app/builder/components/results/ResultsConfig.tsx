@@ -56,12 +56,27 @@ import Switch from './../../../common/components/Switch.tsx';
 import { DragSource, DropTarget } from 'react-dnd';
 
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
+var GearIcon = require("./../../../../images/icon_gear.svg?name=GearIcon");
+var TextIcon = require("./../../../../images/icon_text_12x18.svg?name=TextIcon");
+var ImageIcon = require("./../../../../images/icon_profile_16x16.svg?name=ImageIcon");
 
-export interface Config {
+export interface Format
+{
+  type: string;
+  template: string;
+  showRaw: boolean;
+  showField: boolean;
+}
+
+export interface Config
+{
   name: string;
   score: string;
   fields: string[];
   enabled: boolean;
+  formats: {
+    [field: string]: Format
+  }
 }
 
 interface Props
@@ -78,9 +93,17 @@ export class ResultsConfig extends Classs<Props>
   state: {
     fields: string[];
     lastHover: {index: number, field: string},
+    config: Config;
   } = {
     fields: null,
     lastHover: {index: null, field: null},
+    config: null,
+  };
+  
+  constructor(props:Props)
+  {
+    super(props);
+    this.state.config = props.config;
   }
   
   componentWillMount()
@@ -91,6 +114,12 @@ export class ResultsConfig extends Classs<Props>
   componentWillReceiveProps(nextProps)
   {
     this.calcFields(nextProps);
+    if(!_.isEqual(nextProps.config, this.props.config))
+    {
+      this.setState({
+        config: nextProps.config,
+      });
+    }
   }
   
   calcFields(props:Props)
@@ -120,6 +149,18 @@ export class ResultsConfig extends Classs<Props>
     });
   }
   
+  getConfig():Config
+  {
+    let {config} = this.state;
+    return {
+      name: config && config.name,
+      score: config && config.score,
+      fields: (config && config.fields) || [],
+      enabled: config ? config.enabled : true,
+      formats: (config && config.formats) || {},
+    };
+  }
+  
   handleDrop(type: string, field: string, index?: number)
   {
     if(this.state.lastHover.field === field && index === undefined && type === 'field')
@@ -130,14 +171,7 @@ export class ResultsConfig extends Classs<Props>
       return;
     }
     
-    let {config} = this.props;
-    var newConfig:Config = 
-    {
-      name: config && config.name,
-      score: config && config.score,
-      fields: (config && config.fields) || [],
-      enabled: true,
-    }
+    var newConfig = this.getConfig();
     
     // remove if already set
     if(newConfig.name === field)
@@ -170,7 +204,7 @@ export class ResultsConfig extends Classs<Props>
       newConfig[type] = field;
     }
     
-    this.props.onConfigChange(newConfig);
+    this.changeConfig(newConfig);
     
     if(index === undefined)
     {
@@ -180,11 +214,19 @@ export class ResultsConfig extends Classs<Props>
     }
   }
   
+  changeConfig(newConfig:Config)
+  {
+    this.setState({
+      config: newConfig,
+    });
+  }
+  
   handleEnabledToggle()
   {
-    this.props.onConfigChange(_.extend({}, this.props.config,
+    let config = this.getConfig();
+    this.changeConfig(_.extend({}, config,
     {
-      enabled: !this.props.config.enabled,
+      enabled: !config.enabled,
     }));
   }
   
@@ -229,21 +271,38 @@ export class ResultsConfig extends Classs<Props>
     this.handleDrop(null, field);
   }
   
-  none = <div className='results-config-none'>None</div>;
+  handleFormatChange(field:string, format:Format)
+  {
+    let config = this.getConfig();
+    this.changeConfig(_.extend({}, config,
+    {
+      formats: _.extend({}, config.formats,
+      {
+        [field]: format,
+      })
+    }));
+  }
+  
+  handleClose()
+  {
+    this.props.onConfigChange(this.state.config);
+    this.props.onClose();
+  }
   
 	render()
   {
-    let {config} = this.props;
-    let enabled = config && !config.enabled;
+    let config = this.getConfig();
+    let enabled = config.enabled;
+    let formats = config.formats || {};
     return (
       <div className='results-config-wrapper'>
         <div className={classNames({
             'results-config': true,
-            'results-config-disabled': enabled,
+            'results-config-disabled': !enabled,
           })}>
           <div className='results-config-bar'>
             <div className='results-config-title'>
-              Customize Results View
+              Configure Results View
             </div>
             <div className='results-config-switch'>
               <Switch
@@ -253,7 +312,7 @@ export class ResultsConfig extends Classs<Props>
                 selected={enabled ? 1 : 2}
               />
             </div>
-            <div className='results-config-button' onClick={this.props.onClose}>
+            <div className='results-config-button' onClick={this.handleClose}>
               Done
             </div>
           </div>
@@ -271,13 +330,20 @@ export class ResultsConfig extends Classs<Props>
                 <div className='results-config-area-title'>
                   Name
                 </div>
-                { config && config.name ? 
-                  <ConfigResult
-                    field={config.name}
-                    is='score'
-                    onRemove={this.handleRemove}
-                  />
-                : this.none }
+                { 
+                  config && config.name ? 
+                    <ConfigResult
+                      field={config.name}
+                      is='score'
+                      onRemove={this.handleRemove}
+                      format={formats[config.name]}
+                      onFormatChange={this.handleFormatChange}
+                    />
+                  : 
+                    <div className='results-config-placeholder'>
+                      Drag name field <em>(optional)</em>
+                    </div>
+                }
               </CRTarget>
               <CRTarget
                 className='results-config-score'
@@ -287,13 +353,20 @@ export class ResultsConfig extends Classs<Props>
                 <div className='results-config-area-title'>
                   Score
                 </div>
-                { config && config.score ?
-                  <ConfigResult
-                    field={config.score}
-                    is='score'
-                    onRemove={this.handleRemove}
-                  />
-                : this.none }
+                {
+                  config && config.score ?
+                    <ConfigResult
+                      field={config.score}
+                      is='score'
+                      onRemove={this.handleRemove}
+                      format={formats[config.score]}
+                      onFormatChange={this.handleFormatChange}
+                    />
+                  : 
+                    <div className='results-config-placeholder'>
+                      Drag score field <em>(optional)</em>
+                    </div>
+                }
               </CRTarget>
               <CRTarget
                 className='results-config-fields'
@@ -303,18 +376,25 @@ export class ResultsConfig extends Classs<Props>
                 <div className='results-config-area-title'>
                   Fields
                 </div>
-                { config ? config.fields.map((field, index) =>
-                    <ConfigResult
-                      field={field}
-                      key={field}
-                      is='field'
-                      index={index}
-                      onHover={this.handleFieldHover}
-                      draggingField={this.state.lastHover.field}
-                      onRemove={this.handleRemove}
-                    />
-                ) : null }
-                { !config || !config.fields.length ? this.none : null }
+                {
+                  config && config.fields.map((field, index) =>
+                      <div className='results-config-field-wrapper' key={field}>
+                        <ConfigResult
+                          field={field}
+                          is='field'
+                          index={index}
+                          onHover={this.handleFieldHover}
+                          draggingField={this.state.lastHover.field}
+                          onRemove={this.handleRemove}
+                          format={formats[field]}
+                          onFormatChange={this.handleFormatChange}
+                        />
+                      </div>
+                    )
+                }
+                <div className='results-config-placeholder'>
+                  Drag more fields here
+                </div>
               </CRTarget>
             </div>
           </div>
@@ -330,6 +410,8 @@ export class ResultsConfig extends Classs<Props>
                   is={this.fieldType(field)}
                   isAvailableField={true}
                   onRemove={this.handleRemove}
+                  format={formats[field]}
+                  onFormatChange={this.handleFormatChange}
                 />
             ) }
           </CRTarget>
@@ -357,16 +439,74 @@ interface ConfigResultProps
   draggingField?: string;
   isAvailableField?: boolean;
   onRemove: (field: any) => void;
+  format: Format;
+  onFormatChange: (field: string, format:Format) => void;
 }
 class ConfigResultC extends Classs<ConfigResultProps>
 {
+  state: {
+    showFormat: boolean;
+  } = {
+    showFormat: false,
+  }
+  
   handleRemove()
   {
     this.props.onRemove(this.props.field);
   }
   
+  toggleShowFormat()
+  {
+    this.setState({
+      showFormat: !this.state.showFormat,
+    })
+  }
+  
+  changeToText()
+  {
+    this.changeFormat('type', 'text');
+  }
+  
+  changeToImage()
+  {
+    this.changeFormat('type', 'image');
+  }
+  
+  toggleRaw(event)
+  {
+    this.changeFormat('showRaw', event.target.checked);
+  }
+  
+  toggleField(event)
+  {
+    this.changeFormat('showField', event.target.checked);
+  }
+  
+  handleTemplateChange(event)
+  {
+    this.changeFormat('template', event.target.value);
+  }
+  
+  changeFormat(key:string, val:any)
+  {
+    let format: Format = this.props.format || {
+      type: 'text',
+      template: '',
+      showRaw: false,
+      showField: true,
+    };
+    
+    var newFormat = {
+      [key]: val,
+    };
+    
+    this.props.onFormatChange(this.props.field, _.extend({}, format, newFormat));
+  }
+  
   render()
   {
+    let {format} = this.props;
+    let image = format && format.type === 'image';
     return this.props.connectDropTarget(this.props.connectDragSource(
       <div className={classNames({
         'results-config-field': true,
@@ -377,18 +517,82 @@ class ConfigResultC extends Classs<ConfigResultProps>
         'results-config-field-field': this.props.is === 'field',
         'results-config-field-used': this.props.is !== null && this.props.isAvailableField,
       })}>
-        <span className='results-config-handle'>⋮⋮</span>
-        {
-          this.props.field
-        }
-        {
-          this.props.is !== null ? 
-            <CloseIcon
-              className='close'
-              onClick={this.handleRemove}
-            />
-          : null
-        }
+        <div className='results-config-field-body'>
+          <span className='results-config-handle'>⋮⋮</span>
+          {
+            this.props.field
+          }
+          {
+            this.props.is !== null ? 
+              <CloseIcon
+                className='close'
+                onClick={this.handleRemove}
+              />
+            : null
+          }
+          <GearIcon
+            className='results-config-field-gear'
+            onClick={this.toggleShowFormat}
+          />
+        </div>
+        
+        <div className={classNames({
+          'results-config-field-format': true,
+          'results-config-field-format-showing': this.state.showFormat,
+          'results-config-field-format-text': !image,
+          'results-config-field-format-image': image,
+        })}>
+          <div className='results-config-format-header'>
+            Display the value of { this.props.field } as:
+          </div>
+          <div className='results-config-format-btns'>
+            <div className='results-config-text-btn' onClick={this.changeToText}>
+              <TextIcon /> Text
+            </div>
+            <div className='results-config-image-btn' onClick={this.changeToImage}>
+              <ImageIcon /> Image
+            </div>
+          </div>
+          
+          <div className='results-config-image'>
+            <div>
+              <b>Image URL Template</b>
+            </div>
+            <div>
+              <input
+                type='text'
+                value={format ? format.template : ''}
+                onChange={this.handleTemplateChange}
+                placeholder={'http://web.com/img/[value].png'}
+              />
+            </div>
+            <div>
+              <em>"[value]" inserts the value of {this.props.field}</em>
+            </div>
+            <div className='results-config-field-value'>
+              <input
+                type='checkbox'
+                id={'check-f-' + this.props.field}
+                checked={format && format.showField}
+                onChange={this.toggleField}
+              />
+              <label htmlFor={'check-f-' + this.props.field}>
+                Show field name label
+              </label>
+            </div>
+            <div className='results-config-raw-value'>
+              <input
+                type='checkbox'
+                id={'check-' + this.props.field}
+                checked={format && format.showRaw}
+                onChange={this.toggleRaw}
+              />
+              <label htmlFor={'check-' + this.props.field}>
+                Show raw value, as well
+              </label>
+            </div>
+          </div>
+        </div>
       </div>
     ));
   }

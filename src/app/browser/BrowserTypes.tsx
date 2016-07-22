@@ -66,6 +66,8 @@ export module BrowserTypes
     lastUsername: "",
     algorithmId: "",
     groupId: "",
+    mode: "",
+    tql: "",
     status: EVariantStatus.Build,
 
     cards: Immutable.List([]),
@@ -89,6 +91,8 @@ export module BrowserTypes
 
     cards: any;
     inputs: any;
+    mode: string;
+    tql: string;
     
     type: string;
     dbFields: string[]; // fields saved directly to DB

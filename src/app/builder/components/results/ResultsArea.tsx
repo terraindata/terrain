@@ -266,6 +266,7 @@ class ResultsArea extends Classs<Props>
         <div className='results-table-wrapper'>
           <ResultsTable
             {...this.state}
+            onExpand={this.handleExpand}
           />
         </div>
       );
@@ -395,12 +396,19 @@ class ResultsArea extends Classs<Props>
   {
     if(!pages)
     {
-      pages = this.state.resultsPages;
+      pages = this.state.resultFormat === 'icon' ? this.state.resultsPages : 50;
     }
     
-    var tql = TQLConverter.toTQL(algorithm.cards, {
-      limit: pages * RESULTS_PAGE_SIZE,
-    });
+    if (algorithm.mode === "tql")
+    {
+      var tql = algorithm.tql;
+    }
+    else 
+    {
+      tql = TQLConverter.toTQL(algorithm, {
+        limit: pages * RESULTS_PAGE_SIZE,
+      });
+    }
     if(tql !== this.state.tql)
     {
       this.setState({
@@ -413,14 +421,25 @@ class ResultsArea extends Classs<Props>
       this.allXhr && this.allXhr.abort();
       
       this.xhr = Ajax.query(tql, this.handleResultsChange, this.handleError);
-      this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm.cards, {
-        allFields: true,
+      if (algorithm.mode === "tql")
+      {
+        this.allXhr = Ajax.query(tql, 
+          this.handleAllFieldsResponse,
+          this.handleError
+        );
+      }
+      else 
+      {
+        this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm, {
+            allFields: true,
         // limit: pages * RESULTS_PAGE_SIZE,
         // don't limit the all fields request
-      }), 
-        this.handleAllFieldsResponse,
-        this.handleError
-      );
+          }), 
+          this.handleAllFieldsResponse,
+          this.handleError
+        );
+      }
+
     }
   }
   

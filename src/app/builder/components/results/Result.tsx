@@ -111,77 +111,48 @@ class Result extends Classs<Props> {
     props.connectDragPreview(this.dragPreview);
   }
 
-  getValue(field)
+  getValue(field, overrideFormat?)
   {
     var {data, allFieldsData} = this.props;
     var dataField = data && data[field];
     var allDataField = allFieldsData && allFieldsData[field];
-    return allDataField || dataField;
+    let value = allDataField || dataField;
+    
+    return ResultFormatValue(field, value, this.props.config, overrideFormat);
   }
 
   renderExpandedField(value, field)
   {
-    return this.renderField(field);
+    return this.renderField(field, 0, null, {
+      showField: true,
+      showRaw: true,
+    });
   }
   
-  renderField(field, index?)
+  renderField(field, index?, fields?, overrideFormat?)
   {
     if(index >= 4)
     {
       return null;
     }
     
-    var value = this.getValue(field);
+    var value = this.getValue(field, overrideFormat);
     
-    if(field === 'image')
-    {
-      return (
-        <div className="result-field result-field-image" key={field}>
-          <div className="result-field-name">
-            { field }
-          </div>
-          <div className='result-field-value result-field-value-image'>
-            <img src={value} />
-          </div>
-        </div>
-      );
-    }
-    
-    if(value === undefined)
-    {
-      value = 'undefined';
-    }
-    
-    if(typeof value === 'boolean')
-    {
-      value = value ? 'true' : 'false';
-    }
-    if(typeof value === "string" && !value.length)
-    {
-      value = 'blank';
-      var italics = true;
-    }
-    if(value === null)
-    {
-      value = 'null';
-      var italics = true;
-    }
-    // if(typeof value === 'string')
-    // {
-    //   value = value.replace(/\\n/g, '<br />');
-    // }
-    
+    let format = this.props.config && this.props.config.formats && this.props.config.formats[field];
+    let showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
       <div className="result-field" key={field}>
-        <div className="result-field-name">
-          { field }
-        </div>
+        {
+          showField &&
+            <div className="result-field-name">
+              { field }
+            </div>
+        }
         <div
           className={classNames({
             'result-field-value': true,
             'result-field-value-short': (field + value).length < 0,
             'result-field-value-number': typeof value === 'number',
-            'result-field-value-italics': italics,
           })}
         >
           {value}
@@ -239,20 +210,21 @@ class Result extends Classs<Props> {
       });
     }
     
-    if(this.props.data && this.props.data.pinned)
-    {
-      menuOptions.push({
-        text: 'Un-Pin',
-        onClick: this.unpin,
-      });
-    }
-    else
-    {
-      menuOptions.push({
-        text: 'Pin',
-        onClick: this.pin,
-      })
-    }
+    // TODO add back in once we have Result pinning
+    // if(this.props.data && this.props.data.pinned)
+    // {
+    //   menuOptions.push({
+    //     text: 'Un-Pin',
+    //     onClick: this.unpin,
+    //   });
+    // }
+    // else
+    // {
+    //   menuOptions.push({
+    //     text: 'Pin',
+    //     onClick: this.pin,
+    //   })
+    // }
     
     return menuOptions;
   }
@@ -374,6 +346,75 @@ class Result extends Classs<Props> {
 };
 
 
+
+export function ResultFormatValue(field: string, value: string | number, config: Config, overrideFormat?: any): any
+{
+  let format = config && config.formats && config.formats[field];
+  let {showRaw} = overrideFormat || format || { showRaw: false };
+  var italics = false;
+  
+  if(value === undefined)
+  {
+    value = 'undefined';
+    italics = true;
+  }
+  
+  if(typeof value === 'boolean')
+  {
+    value = value ? 'true' : 'false';
+    italics = true;
+  }
+  if(typeof value === "string" && !value.length)
+  {
+    value = '"" (blank)';
+    italics = true;
+  }
+  if(value === null)
+  {
+    value = 'null';
+    italics = true;
+  }
+  
+  if(format)
+  {
+    switch(format.type)
+    {
+      case 'image':
+      var url = format.template.replace(/\[value\]/g, value as string);
+      return (
+        <div>
+          <div
+            className='result-field-value-image'
+            style={{
+              backgroundImage: `url(${url})`,
+              // give the div the background image, to make use of the "cover" CSS positioning,
+              // but also include the <img> tag below (with opacity 0) so that right-click options still work
+            }}
+          >
+            <img src={url} />
+          </div>
+          <div className='result-field-value'>
+            {
+              showRaw ? value : null
+            }
+          </div>
+        </div>
+      );
+      case 'text':
+      // nothing special for now
+      break;
+    }
+  }
+  
+  if(italics)
+  {
+    return <em>{value}</em>;
+  }
+  
+  return value;
+}
+
+
 // DnD stuff
 
 // Defines a draggable result functionality
@@ -381,7 +422,8 @@ const resultSource =
 {
   canDrag(props)
   {
-    return props.canDrag;
+    return false; // TODO remove once we get result dragging and pinning working
+    // return props.canDrag;
   },
   
   beginDrag(props)

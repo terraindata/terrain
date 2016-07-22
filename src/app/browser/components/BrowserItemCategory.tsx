@@ -55,6 +55,7 @@ interface Props
   onHover: (status: string, id: ID) => void;
   connectDropTarget?: (c: any) => any;
   titleHidden?: boolean;
+  dropDisabled?: boolean;
 }
 
 class BrowserItemCategory extends Classs<Props>
@@ -77,7 +78,7 @@ class BrowserItemCategory extends Classs<Props>
   }
   
   render()
-  {
+  { 
     return this.props.connectDropTarget(
       <div className={`browser-category browser-category-${this.props.status} browser-category-${this.state.open ? 'open' : 'closed'}`}>
         { ! this.props.titleHidden &&
@@ -97,7 +98,12 @@ class BrowserItemCategory extends Classs<Props>
 let canDrop = (props, monitor) =>
 {
   let itemType = monitor.getItem().type;
-  return itemType === props.type;
+  if(itemType !== props.type)
+  {
+    return false;
+  }
+  
+  return !props.dropDisabled;
 };
 const target = 
 {

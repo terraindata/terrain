@@ -228,6 +228,7 @@ export module BuilderTypes
   {
     TEXT,
     DATE,
+    NUMBER,
   }
   
   export interface IInput extends IId, IParentId
@@ -235,5 +236,11 @@ export module BuilderTypes
     type: InputType;
     key: string;
     value: string;
+  }
+  
+  export interface IExe
+  {
+    cards: ICard[];
+    inputs: IInput[];
   }
 }

@@ -155,7 +155,7 @@ class BrowserInfoColumn extends Classs<Props>
     let groupRoles = roles && roles.get(this.props.group.id);
     if(!me || !groupRoles || !users)
     {
-      return <div>Loading...</div>;
+      return null;
     }
     
     return groupRoles.toArray().map((role: Role) =>

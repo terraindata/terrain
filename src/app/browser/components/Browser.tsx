@@ -62,6 +62,9 @@ interface Props
 {
   params?: any;
   history?: any;
+  location?: {
+    pathname: string;
+  };
 }
 
 class Browser extends Classs<Props>
@@ -75,6 +78,19 @@ class Browser extends Classs<Props>
     this.state = {
       istate: Store.getState()
     };
+  }
+  
+  componentWillMount()
+  {
+    if(!this.props.params.groupId)
+    {
+      // no path given, redirect to last browser path
+      let path = localStorage.getItem('lastBrowserPath');
+      if(path)
+      {
+        this.props.history.replaceState({}, path);
+      }
+    }
   }
   
   componentDidMount()
@@ -141,6 +157,8 @@ class Browser extends Classs<Props>
         this.props.history.replaceState({}, '/browser');
       }
     }
+    
+    localStorage.setItem('lastBrowserPath', this.props.location.pathname);
     
     return (
       <div className='browser'>

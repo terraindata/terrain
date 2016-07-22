@@ -1,0 +1,61 @@
+[
+	{
+  		"keywords":
+    	[
+      		"from",
+      		"select",
+      		"sort", 
+      		"filter",
+      		"score",
+      		"linearTransform",
+      		"if",
+      		"max",
+      		"min",
+      		"sum",
+      		"avg",
+      		"count",
+      		"exists",
+      		"take",
+      		"skip",
+      		"desc",
+      		"asc",
+      		"from",
+      		"function"
+    	],
+		"keywords2":
+		[
+			"&&",
+			"||"
+		],
+		"operators":
+		[
+			"*",
+			"+",
+			"-",
+			"=",
+			"<",
+			">",
+			"?",
+			"and",
+			"or"
+		],
+		"atom":
+		[
+			"false",
+			"null",
+			"true"
+		],
+		"var":
+		[
+			"let",
+			"var",
+			"as"
+		]
+	}
+]
+
+
+
+
+
+   

@@ -54,6 +54,9 @@ import CreateLine from '../../../common/components/CreateLine.tsx';
 import DatePicker from '../../../common/components/DatePicker.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
 
+type IInput = BuilderTypes.IInput;
+let InputType = BuilderTypes.InputType;
+
 var Input = React.createClass<any, any>({
 	mixins: [PanelMixin],
 
@@ -92,6 +95,11 @@ var Input = React.createClass<any, any>({
     Actions.inputs.changeType(this.props.input, BuilderTypes.InputType.TEXT, this.props.index);
   },
   
+  convertToNumber()
+  {
+    Actions.inputs.changeType(this.props.input, BuilderTypes.InputType.NUMBER, this.props.index);
+  },
+  
   remove()
   {
     Util.animateToHeight(this.refs.input, 0);
@@ -107,29 +115,27 @@ var Input = React.createClass<any, any>({
   
   getMenuOptions()
   {
-    if(this.props.input.type === BuilderTypes.InputType.TEXT)
-    {
-      var convertOption = 
+    return [
       {
-        text: 'Convert to Date',
-        onClick: this.convertToDate,
-      };
-    }
-    else
-    {
-      var convertOption = 
+        text: 'Number',
+        onClick: this.convertToNumber,
+        disabled: this.props.input.type === InputType.NUMBER,
+      },
       {
-        text: 'Convert to Text',
+        text: 'Text',
         onClick: this.convertToText,
-      }
-    }
-    
-    return [convertOption].concat([
+        disabled: this.props.input.type === InputType.TEXT,
+      },
+      {
+        text: 'Date',
+        onClick: this.convertToDate,
+        disabled: this.props.input.type === InputType.DATE,
+      },
       {
         text: 'Remove',
         onClick: this.remove,
       }
-    ]);
+    ];
   },
   
   renderInputValue()
@@ -138,7 +144,11 @@ var Input = React.createClass<any, any>({
     {
       return (
         <div>
-          <DatePicker date={this.props.input.value} onChange={this.changeValue} />
+          <DatePicker
+            date={this.props.input.value}
+            onChange={this.changeValue}
+            canEdit={true}
+          />
         </div>
       );
     }
@@ -146,6 +156,7 @@ var Input = React.createClass<any, any>({
     return (
       <BuilderTextbox
         {...this.props}
+        canEdit={true}
         value={this.props.input.value}
         className="input-text input-text-second"
         id={this.props.input.id}
@@ -167,6 +178,7 @@ var Input = React.createClass<any, any>({
           <div className='input-top-row'>
             <BuilderTextbox
               {...this.props}
+              canEdit={true}
               value={this.props.input.key}
               className="input-text input-text-first"
               id={this.props.input.id}

@@ -42,39 +42,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./TQLView.less');
 import * as React from 'react';
-import Util from './../../util/Util.tsx';
-import Actions from "./../../builder/data/BuilderActions.tsx";
-import TQLConverter from "../../tql/TQLConverter.tsx";
-// var tql = require('./dummyTql.json');
+import InfoArea from './InfoArea.tsx';
 
 interface Props
 {
-  algorithm: any;  
+  history?: any;
 }
 
-class TQLView extends React.Component<Props, any>
+class Placeholder extends React.Component<Props, any>
 {
-  constructor(props: Props) {
-    super(props);
-  }
-  
-  handleChange()
+  componentWillMount()
   {
-    // alert("don't change that");
+    this.props.history.replaceState({}, '/browser');
   }
   
   render() {
     return (
-      <div className='tql-view'>
-        <textarea
-          value={TQLConverter.toTQL(this.props.algorithm.cards)}
-          onChange={this.handleChange}
-        />
-      </div>
-    );
+       <InfoArea large="Redirecting..." />
+     );
   }
 };
 
-export default TQLView;
+export default Placeholder;

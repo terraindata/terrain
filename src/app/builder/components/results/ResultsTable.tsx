@@ -44,185 +44,136 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as React from 'react';
-import * as classNames from 'classnames';
+import Classs from '../../../common/components/Classs.tsx';
+import Table from '../../../common/components/Table.tsx';
+import InfoArea from '../../../common/components/InfoArea.tsx';
 import {Config, ResultsConfig} from "../results/ResultsConfig.tsx";
-import Classs from './../../../common/components/Classs.tsx';
-// import * as FixedDataTable from 'fixed-data-table';
-let FixedDataTable = require('fixed-data-table');
-let {Table, Column, Cell} = FixedDataTable;
-require('../../../common/components/FixedDataTable.less');
-require('../../../common/components/FixedDataTableCustom.less');
-let Dimensions = require('react-dimensions');
+import {ResultFormatValue} from './Result.tsx';
 
 interface Props
 {
   results: any[];
   resultsWithAllFields: any[];
   resultsConfig: Config;
-  
-  containerWidth?: number;
-  containerHeight?: number;
+  onExpand: (index:number) => void;
 }
 
-class ResultsTable extends Classs<Props>
+export default class ResultsTable extends Classs<Props>
 {
   state: {
-    widths: {[field: string]: number};
-    // fixed: {[field: string]: boolean};
+    config: Config;
+    random: number;
   } = {
-    widths: {},
-    // fixed: {},
+    config: null,
+    random: 0,
+  };
+  
+  constructor(props:Props)
+  {
+    super(props);
+    this.state.config = this.getConfig(props.resultsConfig);
   }
   
-  // constructor(props:Props)
-  // {
-  //   super(props);
-    
-  //   let {resultsConfig} = this.props;
-  //   if(resultsConfig && resultsConfig.name)
-  //   {
-  //     this.state.fixed[resultsConfig.name] = true;
-  //   }
-  // }
-  
-  // componentWillReceiveProps(nextProps)
-  // {
-  //   let {resultsConfig} = this.props;
-  //   if(resultsConfig && resultsConfig.name && this.state.fixed[resultsConfig.name] === undefined)
-  //   {
-  //     this.setState({
-  //       resultsConfig: _.extend({}, resultsConfig, {
-  //         [resultsConfig.name]: true,
-  //       })
-  //     });
-  //   }
-  // }
-  
-  handleColumnResize(width: number, field: string)
+  componentWillReceiveProps(nextProps)
   {
-    this.setState({
-      widths: 
-        _.extend({}, this.state.widths,
-        {
-          [field]: width,
-        }),
-    });
-  }
-  
-  renderCol(field:string, index?: number, arr?: string[], config?: Config)
-  {
-    if(!field || !field.length)
+    if(!_.isEqual(this.props, nextProps))
     {
-      return null;
+      this.setState({
+        config: this.getConfig(nextProps.resultsConfig),
+        random: Math.random(),
+      });
+    }
+  }
+  
+  getConfig(config:Config): Config
+  {
+    if(config && config.enabled)
+    {
+      return config;
     }
     
-    return (
-      <Column
-        header={
-          <Cell>{field}</Cell>
-        }
-        cell={
-          <TextCell
-            data={this.props.resultsWithAllFields}
-            field={field}
-          />
-        }
-        width={this.state.widths[field] || 110}
-        key={index}
-        isResizable={true}
-        columnKey={field}
-        fixed={config && (field === config.name || field === config.score)}
-        allowCellsRecycling={true}
-      />
-    );
+    let result = _.first(this.props.results) || {};
+    let fields = _.keys(result);
+    
+    return {
+      name: "",
+      score: "",
+      fields,
+      enabled: false,
+      formats: {},
+    };
   }
-
-	render()
+  
+  getKey(col: number): string
   {
+    let {config} = this.state;
+    let hasName = this.hasName();
+    let hasScore = this.hasScore();
+    
+    if(col === 0 && hasName)
+    {
+      return config.name;
+    }
+    if(col === 0 && hasScore)
+    {
+      return config.score;
+    }
+    if(col === 1 && hasName && hasScore)
+    {
+      return config.score;
+    }
+    
+    let offset = (hasName ? 1 : 0) + (hasScore ? 1 : 0);
+    return config.fields[col - offset];
+  }
+  
+  getValue(i: number, col: number): string
+  {
+    let field = this.getKey(col);
     let {results, resultsWithAllFields, resultsConfig} = this.props;
-    let config: Config = resultsConfig && resultsConfig.enabled ?
-      resultsConfig : 
-      {
-        name: null,
-        score: null,
-        fields: !this.props.results.length ? null :
-          _.keys(this.props.results[0]).concat(
-            results && results.length ? _.keys(results[0]) : []
-          ),
-        enabled: true,
-      };
+
+    let value =
+      (resultsWithAllFields && resultsWithAllFields[i] && resultsWithAllFields[i][field])
+      || (results && results[i] && results[i][field]);
+    
+    return ResultFormatValue(field, value, resultsConfig);
+  }
+  
+  hasScore(): boolean
+  {
+    return this.state.config.score !== "";
+  }
+  
+  hasName(): boolean
+  {
+    return this.state.config.name !== "";
+  }
+  
+  handleCellClick(r: number, c: number)
+  {
+    this.props.onExpand(r);
+  }
+  
+  render()
+  {
+    if(!this.props.results || !this.props.resultsWithAllFields)
+    {
+      return <InfoArea large='Loading...' />;
+    }
+    
+    let pinnedCols = (this.hasName() ? 1 : 0) + (this.hasScore() ? 1 : 0);
+    let fieldCount = this.state.config.fields.length + pinnedCols;
     
     return (
       <Table
-        rowsCount={resultsWithAllFields ? resultsWithAllFields.length : 0}
-        rowHeight={35}
-        headerHeight={35}
-        width={this.props.containerWidth}
-        height={this.props.containerHeight}
-        onColumnResizeEndCallback={this.handleColumnResize}
-        isColumnResizing={false}
-      >
-        {
-          this.renderCol(config.name, null, null, config)
-        }
-        {
-          this.renderCol(config.score, null, null, config)
-        }
-        {
-          config.fields.map(this.renderCol)
-        }
-      </Table>
-    );
-	}
-}
-
-interface TextCellProps
-{
-  rowIndex?: number;
-  field: string;
-  data: {[field: string]: any}[];  
-}
-
-class TextCell extends Classs<TextCellProps> {
-  render() {
-    let {rowIndex, field, data} = this.props;
-    var value = data && data[rowIndex] ? data[rowIndex][field] : 'Loading';
-    var italics = false;
-    if(typeof value === 'boolean')
-    {
-      value = value ? 'true' : 'false';
-      italics = true;
-    }
-    if(value === null)
-    {
-      value = 'null';
-      italics = true;
-    }
-    if(value === undefined)
-    {
-      value = 'undefined';
-      italics = true;
-    }
-    if(value === '')
-    {
-      value = 'blank';
-      italics = true;
-    }
-    
-    return (
-      <Cell {...this.props} data="">
-        <div className={classNames({
-          'text-cell': true,
-          'text-cell-number': typeof value === 'number',
-          'text-cell-italics': italics,
-        })}>
-          {
-            value
-          }
-        </div>
-      </Cell>
+        getKey={this.getKey}
+        getValue={this.getValue}
+        colCount={fieldCount}
+        rowCount={this.props.results.length}
+        pinnedCols={pinnedCols}
+        random={this.state.random}
+        onCellClick={this.handleCellClick}
+      />
     );
   }
 }
-
-export default Dimensions()(ResultsTable);

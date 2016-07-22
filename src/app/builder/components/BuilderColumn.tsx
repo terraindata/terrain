@@ -53,10 +53,11 @@ import PanelMixin from './layout/PanelMixin.tsx';
 import InputsArea from "./inputs/InputsArea.tsx";
 import CardsArea from "./cards/CardsArea.tsx";
 import ResultsArea from "./results/ResultsArea.tsx";
-import TQLView from '../../tql/components/TQLView.tsx';
 import UserStore from '../../users/data/UserStore.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
+import TQLEditor from '../../tql/components/TQLEditor.tsx';
+import InfoArea from '../../common/components/InfoArea.tsx';
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -177,6 +178,13 @@ var BuilderColumn = React.createClass<any, any>(
           }
           return spotlights;
         }, []) : [];
+        if (this.props.algorithm.mode === "tql")
+        {
+          return <InfoArea
+             large= "TQL Mode"
+             small= "This Variant is in TQL mode, so it doesn’t use Cards. To restore this Variant to its last Card state, change it to Cards mode in the TQL column."
+          />;
+        }
         return <CardsArea 
           cards={algorithm.cards} 
           parentId={parentId} 
@@ -201,8 +209,10 @@ var BuilderColumn = React.createClass<any, any>(
         />;
       
       case COLUMNS.TQL:
-        return <TQLView
+        return <TQLEditor
           algorithm={algorithm}
+          onLoadStart={this.handleLoadStart}
+          onLoadEnd={this.handleLoadEnd}
         />;
         
     }
@@ -240,8 +250,8 @@ var BuilderColumn = React.createClass<any, any>(
   
   render() {
     let {algorithm} = this.props;
-    let canEdit = algorithm.status === BrowserTypes.EVariantStatus.Build
-      && Util.canEdit(algorithm, UserStore, RolesStore)
+    let canEdit = (algorithm.status === BrowserTypes.EVariantStatus.Build
+      && Util.canEdit(algorithm, UserStore, RolesStore))
       || this.state.column === COLUMNS.Inputs;
     let cantEditReason = algorithm.status !== BrowserTypes.EVariantStatus.Build ?
       'This Variant is not in Build status' : 'You are not authorized to edit this Variant';

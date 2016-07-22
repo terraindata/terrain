@@ -88,7 +88,6 @@ RolesReducer[ActionTypes.change] =
     {
       state = state.set(role.groupId, Immutable.Map({}));
     }
-    console.log('here we go', state.setIn([role.groupId, role.username], role));
     return state.setIn([role.groupId, role.username], role);
   }
 
