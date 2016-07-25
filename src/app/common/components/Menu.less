@@ -14,7 +14,7 @@
 
 .menu-wrapper {
   // float: right;
-  //background: @card-menu-bg;
+  background: @card-menu-bg;
 
   border-radius: @menu-collapsed-size;
   position: absolute;
@@ -61,7 +61,6 @@
       height: @menu-icon-small-height;
       left: calc((@menu-collapsed-small-size - @menu-icon-small-width) / 2);
       top: calc((@menu-collapsed-small-size - @menu-icon-small-height) / 2);
-      fill: red !important;
     }
   }
   
@@ -98,15 +97,20 @@
     border-radius: 6px;
     z-index: 1020;
     box-shadow: 0px 0px 3px #888888;
-    top: 23px;
+    top: @menu-collapsed-size;
+    &.menu-wrapper-small {
+      top: @menu-collapsed-small-size;
+    }
     overflow: visible;
     .menu-icon {
-      //display: none;
-      //opacity: 0;
-      //top: -23px;
-      //left: 36px;
-      border: 2px solid white;
       border-radius: 50%;
+      float: right;
+      top: calc(-(@menu-collapsed-size));
+      padding: calc((@menu-collapsed-size - @menu-icon-width) / 2);
+      &.menu-wrapper-small {
+        top: calc(-(@menu-collapsed-small-size));
+        padding: calc((@menu-collapsed-small-size - @menu-icon-small-width) / 2);
+      }
       &:hover {
         background: @card-menu-bg;
       }
