@@ -65,6 +65,7 @@ interface Props
 {
   options: MenuOption[];
   small?: boolean;
+  style?: any,
 }
 
 class Menu extends Classs<Props>
@@ -155,6 +156,7 @@ class Menu extends Classs<Props>
         "menu-wrapper": true,
         "menu-wrapper-small": this.props.small,
       })}
+      style={this.props.style ? this.props.style : null}
     >
       <div 
         className="menu-icon-wrapper"

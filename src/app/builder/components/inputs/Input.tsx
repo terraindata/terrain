@@ -209,10 +209,13 @@ var Input = React.createClass<any, any>({
               id={this.props.input.id}
               keyPath={['key']}
             />
-            <div className='input-close'> 
-              <CloseIcon onClick={this.closeInput}/> 
+            <Menu 
+              options={this.getMenuOptions()} 
+              style={{left: '90%'}}
+            />
+            <div className='input-close' onClick={this.closeInput}> 
+              <CloseIcon /> 
             </div>
-            <Menu options={this.getMenuOptions()} />
           </div>
           <div className='input-bottom-row'>
           {
