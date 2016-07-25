@@ -57,8 +57,8 @@ export interface MenuOption {
   text: string;
   onClick: (index:number) => void;
   disabled?: boolean;
-  icon?: any; //What type should this be?
-  iconColor?: string,
+  icon?: any;
+  iconColor?: string;
 };
 
 interface Props
@@ -140,25 +140,34 @@ class Menu extends Classs<Props>
       return null;
     }
     
+    var width = 14 * options.reduce((max, option) => 
+        option.text.length > max ? option.text.length : max, 1)
+    var leftOffset = -(width) + (this.props.small ? 24 : 18);
     var style = {
-      width: 14 * options.reduce((max, option) => 
-        option.text.length > max ? option.text.length : max, 1),
+      width: width,
       height: options.length * optionHeight,
+      left: leftOffset,
     };
     
     return (
-      <div
-        className={classNames({
-          "menu-wrapper": true,
-          "menu-wrapper-small": this.props.small,
-          "menu-open": this.state.open,        
-        })}
-        style={style}
+    <div 
+      className={classNames({
+        "menu-wrapper": true,
+        "menu-wrapper-small": this.props.small,
+      })}
+    >
+      <div 
+        className="menu-icon-wrapper"
         onClick={this.toggleOpen}
       >
         <MoreIcon className="menu-icon" />
+       </div>
         { !this.state.open ? null :
-          <div className="menu-options-wrapper">
+          <div 
+            className="menu-options-wrapper"
+            style={style} 
+            onClick={this.toggleOpen}
+          >
             {
               options.map(this.renderOption)
             }

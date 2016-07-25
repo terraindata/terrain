@@ -23,9 +23,12 @@
   }
   
   .user-thumbnail-text {
-    display: inline-block;
+    display: block;
     margin: 0px 6px;
     vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   &.user-thumbnail-admin {

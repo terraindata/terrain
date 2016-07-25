@@ -23,17 +23,14 @@
   right: 4px;
   cursor: pointer;
   .transition;
-  overflow: hidden;
+  overflow: visible;
   text-align: center;
   
-  &:not(.menu-open) {
-    width: @menu-collapsed-size !important;
-    height: @menu-collapsed-size !important;
-    
-    &.menu-wrapper-small {
-      width: @menu-collapsed-small-size !important;
-      height: @menu-collapsed-small-size !important;  
-    }
+  width: @menu-collapsed-size !important;
+  height: @menu-collapsed-size !important;
+  &.menu-wrapper-small {
+    width: @menu-collapsed-small-size !important;
+    height: @menu-collapsed-small-size !important;  
   }
   
   .menu-option-icon {
@@ -63,41 +60,16 @@
       top: calc((@menu-collapsed-small-size - @menu-icon-small-height) / 2);
     }
   }
-  
-  .menu-option {
-    opacity: 0;
-    //color: @menu-color;
-    position: relative;
-    height: @option-height;
-    border-radius: 6px;
-    cursor: pointer;
-    .transition;
-    
-    white-space: nowrap;
-    
-    &:hover {
-      background-color: #d1efe7 !important;
-      //background: darken(@card-menu-bg, 5%);
-    }
-    
-    z-index: 1020;
-    
-    &.menu-option-disabled {
-      //background: @dark-grey;
-      //color: @grey;
-    }
-  }
-  
-  &:hover {
-    background-color: #d1efe7;
-  }
-  
-  &.menu-open {
+}
+
+
+  &.menu-options-wrapper {
     background: #ffffff;
     border-radius: 6px;
     z-index: 1020;
     box-shadow: 0px 0px 3px #888888;
     top: @menu-collapsed-size;
+    position: absolute;
     &.menu-wrapper-small {
       top: @menu-collapsed-small-size;
     }
@@ -107,6 +79,8 @@
       float: right;
       top: calc(-(@menu-collapsed-size));
       padding: calc((@menu-collapsed-size - @menu-icon-width) / 2);
+      position: relative;
+      float: right;
       &.menu-wrapper-small {
         top: calc(-(@menu-collapsed-small-size));
         padding: calc((@menu-collapsed-small-size - @menu-icon-small-width) / 2);
@@ -115,14 +89,26 @@
         background: @card-menu-bg;
       }
     }
-    
     .menu-option {
+      //opacity: 0;
+      //color: @menu-color;
       display: block;
       opacity: 1;
       z-index: 1020;
       position: relative;
       background-color: #ffffff;
       color: #1a2e29;
+      height: @option-height;
+      border-radius: 6px;
+      cursor: pointer;
+      .transition;
+      white-space: nowrap;
+      &:hover {
+        background-color: #d1efe7 !important;
+      }      
+      &.menu-option-disabled {
+        background: fade(@grey, 25%);
+        cursor: default;
+      }
     }
   }
-}
