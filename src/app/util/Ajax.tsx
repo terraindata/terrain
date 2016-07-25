@@ -123,7 +123,15 @@ var Ajax = {
       data: JSON.stringify(data),
     }), onSave, onError);
   },
-  
+
+  changePassword(username: string, oldPassword: string, newPassword: string, onSave: (response: any) => void, onError: (response: any) => void)
+  {
+    return Ajax._post(`/users/${username}`, JSON.stringify({
+      oldpassword: oldPassword,
+      password: newPassword,
+    }), onSave, onError);
+  },
+
   adminSaveUser(user: UserTypes.User)
   {
     return Ajax._post(`/users/${user.username}`, JSON.stringify({

@@ -42,29 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./PasswordMeter.less');
+import * as $ from 'jquery';
 import * as _ from 'underscore';
-import * as Immutable from 'immutable';
-import * as ReduxActions from 'redux-actions';
-var Redux = require('redux');
-import Util from './../../util/Util.tsx';
+import * as React from 'react';
+import Util from '../../util/Util.tsx';
+import * as classNames from 'classnames';
+import Classs from './../../common/components/Classs.tsx';
 
-import AuthStore from './../../auth/data/AuthStore.tsx';
-import UserTypes from './../UserTypes.tsx';
-import UserActions from './UserActions.tsx';
-import UserReducers from './UserReducers.tsx';
+const meterSectionValues = [0, 1, 2, 3, 4, 5]
 
-let UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  UserReducers,
-{})), new UserTypes.UserState({}));
+interface Props {
+	value: number,
+}
 
-UserStore.subscribe(() =>
+class PasswordMeter extends Classs<Props>
 {
-  let state = UserStore.getState();
-  if(state.getIn(['users', AuthStore.getState().get('username')]) !== state.get('currentUser'))
-  {
-    // currentUser object changed
-    UserActions.updateCurrentUser();    
-  }
-});
+	renderMeterSection(value) 
+	{
+		return (
+			<div 
+				className={classNames(
+					{
+					'meter-section': true,
+					'burgundy': 		this.props.value === 0,
+					'red': 					this.props.value === 1,
+					'orange': 			this.props.value === 2,
+					'yellow': 			this.props.value === 3,
+					'light-green': 	this.props.value === 4,
+					'green': 				this.props.value === 5,
+					'filled': 			this.props.value >= value
+				})}	
+				key={value}
+			></div>
+		);
+	}
 
-export default UserStore;
+	render() {
+		return (
+			<div className='password-meter'>
+				{meterSectionValues.map(this.renderMeterSection)}
+			</div>
+		);
+	};
+}
+
+export default PasswordMeter;

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./Profile.less');
 import * as React from 'react';
 import { Link } from 'react-router';
 import Classs from './../../common/components/Classs.tsx';
@@ -53,6 +54,8 @@ import UserTypes from './../UserTypes.tsx';
 import AuthStore from './../../auth/data/AuthStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
 import * as classNames from 'classnames';
+
+
 
 interface Props
 {
@@ -83,9 +86,7 @@ class Profile extends Classs<Props>
   infoKeys = [
     'username',
     'whatIDo',
-    'timezone',
     'phone',
-    'email',
     'skype',
   ];
   

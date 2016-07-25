@@ -42,29 +42,108 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+ require('./AccountEntry.less');
+import * as $ from 'jquery';
 import * as _ from 'underscore';
-import * as Immutable from 'immutable';
-import * as ReduxActions from 'redux-actions';
-var Redux = require('redux');
-import Util from './../../util/Util.tsx';
+import * as React from 'react';
+import Util from '../../util/Util.tsx';
+import * as classNames from 'classnames';
+import Classs from './../../common/components/Classs.tsx';
+var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 
-import AuthStore from './../../auth/data/AuthStore.tsx';
-import UserTypes from './../UserTypes.tsx';
-import UserActions from './UserActions.tsx';
-import UserReducers from './UserReducers.tsx';
-
-let UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  UserReducers,
-{})), new UserTypes.UserState({}));
-
-UserStore.subscribe(() =>
+interface Props
 {
-  let state = UserStore.getState();
-  if(state.getIn(['users', AuthStore.getState().get('username')]) !== state.get('currentUser'))
-  {
-    // currentUser object changed
-    UserActions.updateCurrentUser();    
-  }
-});
+  title: string;
+  description?: JSX.Element;
+  content?: JSX.Element;
+  buttonText?: JSX.Element;
+  lastEntry?: boolean;
+}
 
-export default UserStore;
+
+class AccountEntry extends Classs<Props>
+{
+  constructor(props: Props) 
+  {
+    super(props);
+    this.state =
+      {
+        expanded: false,
+      }
+  }
+
+  expand()
+  {
+    this.setState({
+      expanded: !this.state.expanded
+    }); 
+  }
+
+  renderContent()
+  {
+    if (this.state.expanded) 
+    {
+      return this.props.content;
+    }
+  }
+
+  renderDescription()
+  {
+    if (this.props.description)
+     {
+      return <div className='account-entry-description'>{this.props.description}</div>;
+    }
+  }
+
+  renderDefaultButton()
+  {
+    return (
+        <div className='account-entry-expand-button button' onClick={this.expand}>
+            {this.state.expanded ? 'Collapse' : 'Expand'}
+        </div>
+      );
+  }
+
+  renderButton()
+  {
+    if (this.props.buttonText)
+    {
+      return (
+        <div> 
+          {this.props.buttonText} 
+        </div>
+      );
+    }
+    return this.renderDefaultButton();
+  }
+
+  renderLine() 
+  {
+    if(!this.props.lastEntry)
+    {
+      return (<hr className ='account-entry-line'/>);
+    }
+    return <hr className ='account-entry-line settings-line-hidden'/>;
+  }
+
+  render() {
+    return (
+      <div className='account-entry'> 
+      <div className='account-entry-top-bar'> 
+        <div className='account-entry-title'>
+          {this.props.title}   
+        </div> 
+        <div className='account-entry-white-space' />
+        {this.renderButton()}
+      </div> 
+      {this.renderDescription()}
+      <div className='account-entry-expanded-info'>
+        {this.renderContent()}
+      </div>
+      {this.renderLine()}
+    </div>
+    );
+  }
+};
+
+export default AccountEntry;

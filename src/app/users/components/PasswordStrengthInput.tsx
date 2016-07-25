@@ -42,29 +42,85 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./Settings.less')
+import * as $ from 'jquery';
 import * as _ from 'underscore';
-import * as Immutable from 'immutable';
-import * as ReduxActions from 'redux-actions';
-var Redux = require('redux');
-import Util from './../../util/Util.tsx';
+import * as React from 'react';
+import Util from '../../util/Util.tsx';
+import * as classNames from 'classnames';
+import Classs from './../../common/components/Classs.tsx';
+import PasswordMeter from './PasswordMeter.tsx';
+var zxcvbn = require('zxcvbn');
 
-import AuthStore from './../../auth/data/AuthStore.tsx';
-import UserTypes from './../UserTypes.tsx';
-import UserActions from './UserActions.tsx';
-import UserReducers from './UserReducers.tsx';
+interface Props {
+	onChange: (ev: any) => void,
+	value: string,
+	type: string,
+}
 
-let UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  UserReducers,
-{})), new UserTypes.UserState({}));
-
-UserStore.subscribe(() =>
+class PasswordStrengthInput extends Classs<Props>
 {
-  let state = UserStore.getState();
-  if(state.getIn(['users', AuthStore.getState().get('username')]) !== state.get('currentUser'))
-  {
-    // currentUser object changed
-    UserActions.updateCurrentUser();    
-  }
-});
+	constructor(Props) {
+		super(Props);
+		this.state = {
+			score: -1,
+		}
+	}
 
-export default UserStore;
+	handleInput(event) {
+		event.preventDefault();
+		var password = event.target.value;
+		if(password.length === 0)
+		{
+			this.setState({
+				score: -1,
+			});
+			return;
+		}
+		var result = zxcvbn(password);
+		var crack_time = result.crack_times_seconds.online_no_throttling_10_per_second;
+		var score;
+		if(crack_time <= Math.pow(10,2)) 
+		{
+			score = 0;
+		} 
+		else if(crack_time <= Math.pow(10,4)) {
+			score = 1;
+		}
+		else if(crack_time <= Math.pow(10,6)) {
+			score = 2;
+		}
+		else if(crack_time <= Math.pow(10,8)) {
+			score = 3;
+		}
+		else if(crack_time <= Math.pow(10,10)) {
+			score = 4;
+		}
+		else
+		{
+			score = 5;
+		}
+
+		this.setState({
+			score: score,
+		})
+	}
+
+	render()
+	{
+		return(
+			<div>
+				<input 
+					type={this.props.type} 
+					value={this.props.value} 
+					onChange={this.props.onChange}
+					onInput={this.handleInput}
+					className='settings-input password-input'
+				/>
+				<PasswordMeter value={this.state.score}/>
+			</div>
+		);
+	}
+}
+
+export default PasswordStrengthInput;
