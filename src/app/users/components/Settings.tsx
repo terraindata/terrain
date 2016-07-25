@@ -494,36 +494,36 @@ class Settings extends Classs<Props>
       <div className='settings-page-title'>Update your settings</div>
       <AccountEntry 
         title='Username'
-        getContent= {this.renderUsernameContent()}
+        content= {this.renderUsernameContent()}
       /> 
       <AccountEntry 
         title='Password'
-        getContent={this.renderPasswordContent()}
+        content={this.renderPasswordContent()}
       /> 
       <AccountEntry 
         title='Two-Factor Authentication' 
-        getDescription={this.renderAuthenticationDescription()}
-        getContent={this.renderAuthenticationContent()}
+        description={this.renderAuthenticationDescription()}
+        content={this.renderAuthenticationContent()}
        /> 
       <AccountEntry
         title='Email'
-        getDescription={this.renderEmailDescription()}
-        getContent={this.renderEmailContent()}
+        description={this.renderEmailDescription()}
+        content={this.renderEmailContent()}
         /> 
       <AccountEntry
         title='Time Zone'
-        getDescription={this.renderTimeZoneDescription()}
-        getContent={this.renderTimeZoneContent()}
+        description={this.renderTimeZoneDescription()}
+        content={this.renderTimeZoneContent()}
         /> 
       <AccountEntry
         title='Sign out all other sessions'
-        getDescription={this.renderSignOutDescription()}
-        getButtonText={this.renderSignOutButton()}
+        description={this.renderSignOutDescription()}
+        buttonText={this.renderSignOutButton()}
         /> 
       <AccountEntry
         title='Deactivate your account'
-        getDescription={this.renderDeactivateDescription()}
-        getButtonText={this.renderDeactivateButton()}
+        description={this.renderDeactivateDescription()}
+        buttonText={this.renderDeactivateButton()}
         lastEntry={true}
         /> 
       </div >

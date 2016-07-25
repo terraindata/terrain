@@ -410,18 +410,18 @@ class Notifications extends Classs<Props>
       <div className='notifications-page-title'>Update your notifications</div>
       <AccountEntry
         title='Desktop Notifications'
-        getDescription={this.renderDesktopDescription()}
-        getContent={this.renderDesktopNotificationsContent()}
+        description={this.renderDesktopDescription()}
+        content={this.renderDesktopNotificationsContent()}
       />
       <AccountEntry
         title='Email Notifications'
-        getDescription={this.renderEmailDescription()}
-        getContent={this.renderEmailNotificationsContent()}
+        description={this.renderEmailDescription()}
+        content={this.renderEmailNotificationsContent()}
       />
       <AccountEntry
         title='Email News & Updates'
-        getDescription={this.renderEmailNewsDescription()}
-        getContent={this.renderEmailNewsContent()}
+        description={this.renderEmailNewsDescription()}
+        content={this.renderEmailNewsContent()}
         lastEntry={true}
       />
 

@@ -54,9 +54,9 @@ var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 interface Props
 {
   title: string;
-  getDescription?: JSX.Element;
-  getContent?: JSX.Element;
-  getButtonText?: JSX.Element;
+  description?: JSX.Element;
+  content?: JSX.Element;
+  buttonText?: JSX.Element;
   lastEntry?: boolean;
 }
 
@@ -69,7 +69,6 @@ class AccountEntry extends Classs<Props>
     this.state =
       {
         expanded: false,
-        expandedInfo: <div />,
       }
   }
 
@@ -84,15 +83,15 @@ class AccountEntry extends Classs<Props>
   {
     if (this.state.expanded) 
     {
-      return this.props.getContent;
+      return this.props.content;
     }
   }
 
   renderDescription()
   {
-    if (this.props.getDescription)
+    if (this.props.description)
      {
-      return <div className='account-entry-description'>{this.props.getDescription}</div>;
+      return <div className='account-entry-description'>{this.props.description}</div>;
     }
   }
 
@@ -107,11 +106,11 @@ class AccountEntry extends Classs<Props>
 
   renderButton()
   {
-    if (this.props.getButtonText)
+    if (this.props.buttonText)
     {
       return (
         <div> 
-          {this.props.getButtonText} 
+          {this.props.buttonText} 
         </div>
       );
     }
