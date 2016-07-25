@@ -293,7 +293,7 @@ var BuilderColumn = React.createClass<any, any>(
             { this.state.loading ? <div className='builder-column-loading'>Loading...</div> : '' }
           </div>
           <div className='builder-title-bar-options'>
-            <Menu options={this.getMenuOptions()} />
+            <Menu options={this.getMenuOptions()}/>
             {
               this.props.canAddColumn && 
                 <SplitScreenIcon
