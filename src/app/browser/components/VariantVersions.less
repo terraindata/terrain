@@ -1,0 +1,42 @@
+@import "../../common/Common.less";
+
+@version-table-color: #a5a8a1;
+@version-table-bg: #f6f9f2;
+@version-table-hover-bg: #70cdfd;
+
+.versions-table-wrapper {
+	position: relative;
+	top: 50px;
+
+	.versions-table-title {
+		float: left;
+		color: fade(@version-table-color, 80%);
+		margin-left: 6px;
+	}
+
+	.versions-table {
+		background-color: @version-table-bg;
+		font-size: 12px;
+		display: inline-block;
+		width: 100%;
+		whitespace: nowrap;
+		padding: 6px;
+		color: @version-table-color;
+		cursor: pointer;
+		border-radius: 6px;
+		.versions-table-row {
+			display: block;
+			padding: 6px;
+			border-radius: 6px;
+			width: 100%;
+			padding-left: 0px;
+			&:hover {
+				background-color: @version-table-hover-bg;
+				color: @version-table-bg;
+			}
+			.versions-table-right-align {
+				float: right;
+			}
+		}
+	}
+}

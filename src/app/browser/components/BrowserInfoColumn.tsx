@@ -48,6 +48,7 @@ import Classs from './../../common/components/Classs.tsx';
 import BrowserColumn from './BrowserColumn.tsx';
 import BrowserItem from './BrowserItem.tsx';
 import BrowserItemCategory from './BrowserItemCategory.tsx';
+import VariantVersions from './VariantVersions.tsx';
 import CreateItem from '../../common/components/CreateItem.tsx';
 import UserTypes from './../../users/UserTypes.tsx';
 import RoleTypes from './../../roles/RoleTypes.tsx';
@@ -119,7 +120,12 @@ class BrowserInfoColumn extends Classs<Props>
       return null;
     }
     
-    return 'Variant';
+    return (
+    <div>
+      Variant
+      <VariantVersions variant={this.props.variant}/>
+    </div>
+    );
   }
   
   renderAlgorithm()
