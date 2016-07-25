@@ -69,6 +69,7 @@ export module BrowserTypes
     mode: "",
     tql: "",
     status: EVariantStatus.Build,
+    version: true,
 
     cards: Immutable.List([]),
     inputs: Immutable.List([]),
@@ -93,6 +94,7 @@ export module BrowserTypes
     inputs: any;
     mode: string;
     tql: string;
+    version: boolean;
     
     type: string;
     dbFields: string[]; // fields saved directly to DB
