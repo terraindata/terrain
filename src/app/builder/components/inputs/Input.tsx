@@ -50,9 +50,15 @@ import Actions from "../../data/BuilderActions.tsx";
 import PanelMixin from '../layout/PanelMixin.tsx';
 import BuilderTextbox from "../../../common/components/BuilderTextbox.tsx";
 import Menu from '../../../common/components/Menu.tsx';
+import { MenuOption } from '../../../common/components/Menu.tsx';
 import CreateLine from '../../../common/components/CreateLine.tsx';
 import DatePicker from '../../../common/components/DatePicker.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
+
+var TextIcon = require("./../../../../images/icon_textDropdown.svg");
+var DateIcon = require("./../../../../images/icon_dateDropdown.svg");
+var NumberIcon = require("./../../../../images/icon_numberDropdown.svg");
+var CloseIcon = require("./../../../../images/icon_close_8x8.svg");
 
 var Input = React.createClass<any, any>({
 	mixins: [PanelMixin],
@@ -92,7 +98,12 @@ var Input = React.createClass<any, any>({
     Actions.inputs.changeType(this.props.input, BuilderTypes.InputType.TEXT, this.props.index);
   },
   
-  remove()
+  convertToNumber()
+  {
+    Actions.inputs.changeType(this.props.input, BuilderTypes.InputType.NUMBER, this.props.index);
+  },
+
+  closeInput()
   {
     Util.animateToHeight(this.refs.input, 0);
     setTimeout(() => {
@@ -105,32 +116,58 @@ var Input = React.createClass<any, any>({
     Actions.inputs.create(this.props.input.parentId, this.props.index);
   },
   
-  getMenuOptions()
-  {
-    if(this.props.input.type === BuilderTypes.InputType.TEXT)
-    {
-      var convertOption = 
-      {
-        text: 'Convert to Date',
-        onClick: this.convertToDate,
-      };
-    }
-    else
-    {
-      var convertOption = 
-      {
-        text: 'Convert to Text',
-        onClick: this.convertToText,
-      }
-    }
+  // getMenuOptions()
+  // {
+  //   if(this.props.input.type === BuilderTypes.InputType.TEXT)
+  //   {
+  //     var convertOption = 
+  //     {
+  //       text: 'Convert to Date',
+  //       onClick: this.convertToDate,
+  //     };
+  //   }
+  //   else
+  //   {
+  //     var convertOption = 
+  //     {
+  //       text: 'Convert to Text',
+  //       onClick: this.convertToText,
+  //     }
+  //   }
+  //     return [convertOption].concat([
+  //     {
+  //       text: 'Remove',
+  //       onClick: this.remove,
+  //     }
+  //   ]);
+  // },
     
-    return [convertOption].concat([
+
+  getMenuOptions(): MenuOption[]
+  {
+    var options= [
       {
-        text: 'Remove',
-        onClick: this.remove,
+        text: ' Text',
+        onClick: this.convertToText,
+        icon: <TextIcon />, 
+        iconColor: '#31B2BC',
+      },
+      {
+        text: ' Number',
+        onClick: this.convertToNumber,
+        icon: <NumberIcon />, 
+        iconColor: '#805DA8',
+      },
+      {
+        text: ' Date',
+        onClick: this.convertToDate,
+        icon: <DateIcon />, 
+        iconColor: '#FF735B',
       }
-    ]);
+    ];
+    return options;
   },
+
   
   renderInputValue()
   {
@@ -172,12 +209,15 @@ var Input = React.createClass<any, any>({
               id={this.props.input.id}
               keyPath={['key']}
             />
+            <div className='input-close'> 
+              <CloseIcon onClick={this.closeInput}/> 
+            </div>
             <Menu options={this.getMenuOptions()} />
           </div>
           <div className='input-bottom-row'>
-            {
-              this.renderInputValue()
-            }
+          {
+            this.renderInputValue()
+          }
           </div>
         </div>
 			</div>

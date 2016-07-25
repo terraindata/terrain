@@ -228,6 +228,7 @@ export module BuilderTypes
   {
     TEXT,
     DATE,
+    NUMBER,
   }
   
   export interface IInput extends IId, IParentId
