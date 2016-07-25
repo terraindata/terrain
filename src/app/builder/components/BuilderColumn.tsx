@@ -69,10 +69,10 @@ var TQLIcon = require("./../../../images/icon_tql.svg");
 var InputsIcon = require("./../../../images/icon_input.svg");
 
 enum COLUMNS {
+  Builder,
+  Results,
   TQL,
   Inputs,
-  Results,
-  Builder,
 };
 var NUM_COLUMNS = 4;
 

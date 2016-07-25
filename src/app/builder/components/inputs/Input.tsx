@@ -50,7 +50,7 @@ import Actions from "../../data/BuilderActions.tsx";
 import PanelMixin from '../layout/PanelMixin.tsx';
 import BuilderTextbox from "../../../common/components/BuilderTextbox.tsx";
 import Menu from '../../../common/components/Menu.tsx';
-import { MenuOption } from '../../../common/components/Menu.tsx';
+//import { MenuOption } from '../../../common/components/Menu.tsx';
 import CreateLine from '../../../common/components/CreateLine.tsx';
 import DatePicker from '../../../common/components/DatePicker.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
@@ -119,7 +119,7 @@ var Input = React.createClass<any, any>({
     Actions.inputs.create(this.props.input.parentId, this.props.index);
   },
 
-  getMenuOptions(): MenuOption[]
+  getMenuOptions()//: MenuOption[]
   {
     return [
       {
