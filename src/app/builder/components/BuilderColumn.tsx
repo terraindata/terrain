@@ -63,10 +63,10 @@ var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 var LockedIcon = require("./../../../images/icon_lock.svg?name=LockedIcon");
 
-var BuilderIcon = require("./../../../images/icon_builder_18x18.svg");
-var ResultsIcon = require("./../../../images/icon_gear.svg");
-var TQLIcon = require("./../../../images/icon_tql_17x14.svg");
-var InputsIcon = require("./../../../images/icon_icon_17x12.svg");
+var BuilderIcon = require("./../../../images/icon_builder.svg");
+var ResultsIcon = require("./../../../images/icon_resultsDropdown.svg");
+var TQLIcon = require("./../../../images/icon_tql.svg");
+var InputsIcon = require("./../../../images/icon_input.svg");
 
 enum COLUMNS {
   Builder,

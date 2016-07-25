@@ -55,8 +55,8 @@ import { Link } from 'react-router';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
-var LogoutIcon = require("./../../../images/icon_close_8x8.svg");
-var EditIcon = require("./../../../images/icon_close_8x8.svg");
+var LogoutIcon = require("./../../../images/icon_logout.svg");
+var EditIcon = require("./../../../images/icon_edit.svg");
 
 interface Props {
   onLogout: () => void;
