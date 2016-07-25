@@ -118,72 +118,32 @@ var Input = React.createClass<any, any>({
   {
     Actions.inputs.create(this.props.input.parentId, this.props.index);
   },
-  
-  // getMenuOptions()
-  // {
-  //   if(this.props.input.type === BuilderTypes.InputType.TEXT)
-  //   {
-  //     var convertOption = 
-  //     {
-  //       text: 'Convert to Date',
-  //       onClick: this.convertToDate,
-  //     };
-  //   }
-  //   else
-  //   {
-  //     var convertOption = 
-  //     {
-  //       text: 'Convert to Text',
-  //       onClick: this.convertToText,
-  //     }
-  //   }
-  //     return [convertOption].concat([
-  //     {
-  //       text: 'Remove',
-  //       onClick: this.remove,
-  //     }
-  //   ]);
-  // },
-    
 
   getMenuOptions(): MenuOption[]
   {
-    //var options= [
-    //  {
-    //    text: ' Text',
-    //    onClick: this.convertToText,
-    //    icon: <TextIcon />, 
-    //    iconColor: '#31B2BC',
     return [
       {
-        text: 'Number',
+        text: ' Number',
         onClick: this.convertToNumber,
         disabled: this.props.input.type === InputType.NUMBER,
+        icon: <NumberIcon />, 
+        iconColor: '#805DA8',
       },
       {
-        text: 'Text',
+        text: ' Text',
         onClick: this.convertToText,
         disabled: this.props.input.type === InputType.TEXT,
+        icon: <TextIcon />, 
+        iconColor: '#31B2BC',
       },
       {
-        text: 'Date',
+        text: ' Date',
         onClick: this.convertToDate,
         disabled: this.props.input.type === InputType.DATE,
+        icon: <DateIcon />, 
+        iconColor: '#FF735B',
       },
-     // {
-     //   text: ' Number',
-     //   onClick: this.convertToNumber,
-     //   icon: <NumberIcon />, 
-     //   iconColor: '#805DA8',
-     // },
-     // {
-     //   text: ' Date',
-     //   onClick: this.convertToDate,
-     //   icon: <DateIcon />, 
-     //   iconColor: '#FF735B',
-     // }
     ];
-    //return options;
   },
 
   
