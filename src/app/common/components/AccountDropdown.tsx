@@ -60,6 +60,7 @@ var EditIcon = require("./../../../images/icon_edit.svg");
 
 interface Props {
   onLogout: () => void;
+  history?: any;
 }
 
 class AccountDropdown extends Classs<Props>
@@ -129,8 +130,7 @@ class AccountDropdown extends Classs<Props>
   
   editProfile() 
   {
-    //Is this the right way to change page location?
-    window.location.replace('/account/profile/edit');
+    this.props.history.pushState({}, '/profile/edit');
   }
 
   renderDropdown()
