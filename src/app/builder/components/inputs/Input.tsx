@@ -50,7 +50,6 @@ import Actions from "../../data/BuilderActions.tsx";
 import PanelMixin from '../layout/PanelMixin.tsx';
 import BuilderTextbox from "../../../common/components/BuilderTextbox.tsx";
 import Menu from '../../../common/components/Menu.tsx';
-//import { MenuOption } from '../../../common/components/Menu.tsx';
 import CreateLine from '../../../common/components/CreateLine.tsx';
 import DatePicker from '../../../common/components/DatePicker.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
@@ -119,25 +118,25 @@ var Input = React.createClass<any, any>({
     Actions.inputs.create(this.props.input.parentId, this.props.index);
   },
 
-  getMenuOptions()//: MenuOption[]
+  getMenuOptions()
   {
     return [
       {
-        text: ' Number',
+        text: 'Number',
         onClick: this.convertToNumber,
         disabled: this.props.input.type === InputType.NUMBER,
         icon: <NumberIcon />, 
         iconColor: '#805DA8',
       },
       {
-        text: ' Text',
+        text: 'Text',
         onClick: this.convertToText,
         disabled: this.props.input.type === InputType.TEXT,
         icon: <TextIcon />, 
         iconColor: '#31B2BC',
       },
       {
-        text: ' Date',
+        text: 'Date',
         onClick: this.convertToDate,
         disabled: this.props.input.type === InputType.DATE,
         icon: <DateIcon />, 
@@ -195,7 +194,7 @@ var Input = React.createClass<any, any>({
             />
             <Menu 
               options={this.getMenuOptions()} 
-              style={{left: '90%'}}
+              style={{right:'25px'}}
             />
             <div className='input-close' onClick={this.closeInput}> 
               <CloseIcon /> 

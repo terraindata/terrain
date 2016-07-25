@@ -102,7 +102,7 @@ class Menu extends Classs<Props>
           }}>
           {option.icon}
         </div>
-        <div className="dead-center">
+        <div className="dead-center menu-text-padding">
           { option.text }
         </div>
       </div>
