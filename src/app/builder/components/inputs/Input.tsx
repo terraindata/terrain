@@ -60,6 +60,9 @@ var DateIcon = require("./../../../../images/icon_dateDropdown.svg");
 var NumberIcon = require("./../../../../images/icon_numberDropdown.svg");
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg");
 
+type IInput = BuilderTypes.IInput;
+let InputType = BuilderTypes.InputType;
+
 var Input = React.createClass<any, any>({
 	mixins: [PanelMixin],
 
@@ -145,27 +148,42 @@ var Input = React.createClass<any, any>({
 
   getMenuOptions(): MenuOption[]
   {
-    var options= [
+    //var options= [
+    //  {
+    //    text: ' Text',
+    //    onClick: this.convertToText,
+    //    icon: <TextIcon />, 
+    //    iconColor: '#31B2BC',
+    return [
       {
-        text: ' Text',
-        onClick: this.convertToText,
-        icon: <TextIcon />, 
-        iconColor: '#31B2BC',
-      },
-      {
-        text: ' Number',
+        text: 'Number',
         onClick: this.convertToNumber,
-        icon: <NumberIcon />, 
-        iconColor: '#805DA8',
+        disabled: this.props.input.type === InputType.NUMBER,
       },
       {
-        text: ' Date',
+        text: 'Text',
+        onClick: this.convertToText,
+        disabled: this.props.input.type === InputType.TEXT,
+      },
+      {
+        text: 'Date',
         onClick: this.convertToDate,
-        icon: <DateIcon />, 
-        iconColor: '#FF735B',
-      }
+        disabled: this.props.input.type === InputType.DATE,
+      },
+     // {
+     //   text: ' Number',
+     //   onClick: this.convertToNumber,
+     //   icon: <NumberIcon />, 
+     //   iconColor: '#805DA8',
+     // },
+     // {
+     //   text: ' Date',
+     //   onClick: this.convertToDate,
+     //   icon: <DateIcon />, 
+     //   iconColor: '#FF735B',
+     // }
     ];
-    return options;
+    //return options;
   },
 
   
@@ -175,7 +193,11 @@ var Input = React.createClass<any, any>({
     {
       return (
         <div>
-          <DatePicker date={this.props.input.value} onChange={this.changeValue} />
+          <DatePicker
+            date={this.props.input.value}
+            onChange={this.changeValue}
+            canEdit={true}
+          />
         </div>
       );
     }
@@ -183,6 +205,7 @@ var Input = React.createClass<any, any>({
     return (
       <BuilderTextbox
         {...this.props}
+        canEdit={true}
         value={this.props.input.value}
         className="input-text input-text-second"
         id={this.props.input.id}
@@ -204,6 +227,7 @@ var Input = React.createClass<any, any>({
           <div className='input-top-row'>
             <BuilderTextbox
               {...this.props}
+              canEdit={true}
               value={this.props.input.key}
               className="input-text input-text-first"
               id={this.props.input.id}

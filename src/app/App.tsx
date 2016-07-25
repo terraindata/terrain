@@ -59,6 +59,7 @@ window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.
 import LayoutManager from "./builder/components/layout/LayoutManager.tsx";
 import Builder from "./builder/components/Builder.tsx";
 import Browser from './browser/components/Browser.tsx';
+import X from './x/components/X.tsx';
 import Account from './users/components/Account.tsx';
 import Settings from './users/components/Settings.tsx';
 import Notifications from './users/components/Notifications.tsx';
@@ -125,7 +126,6 @@ var App = React.createClass({
         UserActions.fetch();
       }
     });
-    
     
     // Retrieve logged-in state from persistent storage.
     let token = localStorage['authenticationToken'];
@@ -247,6 +247,9 @@ var router = (
       <Route path="/users/:username" component={Profile} />
       
       <Route path="/reporting" component={Placeholder} />
+      
+      <Route path="/x" component={X} />
+      <Route path="/x/:x" component={X} />
     </Route>
   </Router>
 );

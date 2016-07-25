@@ -50,7 +50,10 @@ import Actions from './../data/UserActions.tsx';
 import BrowserTypes from './../UserTypes.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
 import { Link } from 'react-router';
+import * as classNames from 'classnames';
+
 var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
+
 
 interface Props
 {
@@ -62,21 +65,29 @@ class Account extends Classs<Props>
 {
   render()
   {
+
     var title = "Account";
+    var selected = '298px';
+    var linkWidth = -144;
+
     switch(this.props.location.pathname)
     {
       case "/account/profile":
         title = "Profile";
+        selected = '298px';
         break;
       case "/account/notifications":
         title = "Notifications";
+        selected = '154px';
         break;
       case "/account/team":
         title = "Team";
+        selected = 'calc(100% - 10px - 144px)';
         break;
       case "/account/settings":
         title = "Settings";
-        break;      
+        selected = '10px';
+        break;    
     }
     
     return (
@@ -87,16 +98,43 @@ class Account extends Classs<Props>
             { title }
           </div>
           <div className='account-links'>
-            <Link to={'/account/settings'} className='account-link'>
+            <div 
+              className="selected-link-marker" 
+              style={{
+                left: selected,
+              }}
+            />
+            <Link 
+              to={'/account/settings'} 
+              className={classNames({
+                'account-link': true,
+                'active': selected === '10px',
+              })}  
+            >
               Settings
             </Link>
-            <Link to={'/account/notifications'} className='account-link'>
+            <Link 
+              to={'/account/notifications'} 
+              className={classNames({
+                'account-link': true,
+                'active': selected === '154px',
+              })}  >
               Notifications
             </Link>
-            <Link to={'/account/profile'} className='account-link'>
+            <Link 
+              to={'/account/profile'} 
+              className={classNames({
+                'account-link': true,
+                'active': selected === '298px',
+              })}  >
               Profile
             </Link>
-            <Link to={'/account/team'} className='account-link'>
+            <Link 
+              to={'/account/team'} 
+              className={classNames({
+                'account-link': true,
+                'active': selected === 'calc(100% - 10px - 144px)',
+              })}  >
               Team
             </Link>
           </div>

@@ -1,0 +1,74 @@
+@import "../../common/Common.less";
+
+.account-entry {
+	padding-bottom: 10px;
+	margin-left: 84px;
+	margin-right: 84px;
+}
+
+.account-entry-top-bar {
+	width: 100%;
+	height: 30px;
+	display: flex;
+}
+
+.account-entry-title {
+	float: left;
+	font-size: 18px; 
+	font-weight: bold;
+	color: #000000;
+	font-family: "Helvetica Neue", Helvetica, sans-serif;
+	letter-spacing: 0.3;
+}
+
+.account-entry-description {
+	font-size: 14px;
+	float:left;
+	display: flex;
+	width: 100%;
+	color: #000000;
+	font-family: "Helvetica Neue", Helvetica, sans-serif;
+	padding-bottom: 12px;
+	width: 80%;
+	text-align: left;
+}
+
+.account-entry-white-space {
+	flex-grow: 1; 
+}
+
+.account-entry-expand-button {
+	width: 60px;
+	float:right;
+	color: #fff;
+	background: #50594A;
+	font-size: 14px;
+	display: inline-block;
+	padding: 4px 18px;
+	margin-top:2px;
+	padding-top: 5px;
+	letter-spacing: 0.3;
+}
+
+.account-entry-expanded-info{
+	float: left; 
+	color: #000000;
+	font-family: "Helvetica Neue", Helvetica, sans-serif;
+	font-size: 12px;
+	width: 100%;
+	display: flex;
+	margin-bottom: 15px;
+	margin-top: -4px;
+}
+
+.account-entry-line {
+	display: block;
+    border: solid #ccc 0.5px;
+    border-bottom: none;
+	margin-top: 18px;
+	width: 100%;
+	&.settings-line-hidden {
+		visibility: hidden;
+		border: none;
+	}
+}

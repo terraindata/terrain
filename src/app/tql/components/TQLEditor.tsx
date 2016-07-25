@@ -100,7 +100,7 @@ class TQL extends Classs<Props>
     theme_index: number;
   } = {
     tql: null,
-    code: TQLConverter.toTQL(this.props.algorithm.cards),
+    code: TQLConverter.toTQL(this.props.algorithm),
     theme: localStorage.getItem('theme') || 'default',
     highlightedLine: null,
     theme_index: 0,
@@ -144,7 +144,7 @@ class TQL extends Classs<Props>
 
   executeCode() 
   {
-    var code = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm.cards)
+    var code = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm)
     this.setState({
       tql: code
     });
@@ -270,7 +270,7 @@ class TQL extends Classs<Props>
   toggleMode() 
   {
     if (this.props.algorithm.mode === 'tql' 
-      && this.state.code !== TQLConverter.toTQL(this.props.algorithm.cards)
+      && this.state.code !== TQLConverter.toTQL(this.props.algorithm)
       && !confirm("Warning: TQL added to the editor will be lost")) 
     {
       return;
@@ -283,7 +283,7 @@ class TQL extends Classs<Props>
 
     //update when have tql to cards conversion capabilities 
     this.setState({
-      code: TQLConverter.toTQL(this.props.algorithm.cards),
+      code: TQLConverter.toTQL(this.props.algorithm),
     });
   }
 
@@ -340,7 +340,7 @@ class TQL extends Classs<Props>
         foldGutter: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
       };
-    var value = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm.cards);
+    var value = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm);
     return <CodeMirror
       highlightedLine={this.state.highlightedLine}
       onChange={this.updateCode}

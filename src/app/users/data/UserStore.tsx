@@ -48,11 +48,23 @@ import * as ReduxActions from 'redux-actions';
 var Redux = require('redux');
 import Util from './../../util/Util.tsx';
 
+import AuthStore from './../../auth/data/AuthStore.tsx';
 import UserTypes from './../UserTypes.tsx';
+import UserActions from './UserActions.tsx';
 import UserReducers from './UserReducers.tsx';
 
 let UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   UserReducers,
 {})), new UserTypes.UserState({}));
+
+UserStore.subscribe(() =>
+{
+  let state = UserStore.getState();
+  if(state.getIn(['users', AuthStore.getState().get('username')]) !== state.get('currentUser'))
+  {
+    // currentUser object changed
+    UserActions.updateCurrentUser();    
+  }
+});
 
 export default UserStore;

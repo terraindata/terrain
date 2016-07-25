@@ -237,4 +237,10 @@ export module BuilderTypes
     key: string;
     value: string;
   }
+  
+  export interface IExe
+  {
+    cards: ICard[];
+    inputs: IInput[];
+  }
 }

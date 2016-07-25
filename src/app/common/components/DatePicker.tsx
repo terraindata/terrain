@@ -67,6 +67,7 @@ for(var h = 0; h < 24; h ++)
 interface Props {
   date: string;
   onChange: (newDate: string) => void;
+  canEdit: boolean;
 }
 
 class DatePicker extends React.Component<Props, any>
@@ -121,6 +122,7 @@ class DatePicker extends React.Component<Props, any>
     return (
       <div className='date-time-time'>
         <Dropdown 
+          {...this.props}
           options={HOUR_OPTIONS}
           selectedIndex={this.dateToHourIndex(this.getDate())}
           onChange={this.handleHourChange}

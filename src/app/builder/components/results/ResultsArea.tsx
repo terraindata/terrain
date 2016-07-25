@@ -266,6 +266,7 @@ class ResultsArea extends Classs<Props>
         <div className='results-table-wrapper'>
           <ResultsTable
             {...this.state}
+            onExpand={this.handleExpand}
           />
         </div>
       );
@@ -395,7 +396,7 @@ class ResultsArea extends Classs<Props>
   {
     if(!pages)
     {
-      pages = this.state.resultsPages;
+      pages = this.state.resultFormat === 'icon' ? this.state.resultsPages : 50;
     }
     
     if (algorithm.mode === "tql")
@@ -404,7 +405,7 @@ class ResultsArea extends Classs<Props>
     }
     else 
     {
-      tql = TQLConverter.toTQL(algorithm.cards, {
+      tql = TQLConverter.toTQL(algorithm, {
         limit: pages * RESULTS_PAGE_SIZE,
       });
     }
@@ -429,7 +430,7 @@ class ResultsArea extends Classs<Props>
       }
       else 
       {
-        this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm.cards, {
+        this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm, {
             allFields: true,
         // limit: pages * RESULTS_PAGE_SIZE,
         // don't limit the all fields request
