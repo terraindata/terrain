@@ -111,12 +111,12 @@ class Builder extends Classs<Props>
   {
     this.cancelSubscription =
       Store.subscribe(() => {
-        var newState = Store.getState().toJS();
-        this.reduxState = newState.algorithms;
-        this.setState({
-          random: Math.random(),
-          loading: false,
-        });
+          var newState = Store.getState().toJS();
+          this.reduxState = newState.algorithms;
+          this.setState({
+            random: Math.random(),
+            loading: false,
+          });
       });
 
     // Some day in the distant future, you may consider
@@ -148,13 +148,13 @@ class Builder extends Classs<Props>
     let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query.o;
     var newConfig;
-    
+
     if(open)
     {
       if(!storedConfig || storedConfig === 'undefined' || storedConfig === '')
       {
         // no stored config, just load the open tab.
-        newConfig = '!' + open;
+        newConfig = '!' + open;     
       }
       else
       {
@@ -176,6 +176,7 @@ class Builder extends Classs<Props>
       newConfig = storedConfig;
     }
     
+
     if(newConfig)
     {
       props.history.replaceState({}, `/builder/${newConfig}`);
@@ -184,7 +185,6 @@ class Builder extends Classs<Props>
     {
       newConfig = props.params.config;
     }
-    
     localStorage.setItem('config', newConfig || '');
     this.fetch(newConfig);
   }
@@ -195,7 +195,6 @@ class Builder extends Classs<Props>
     {
       return;
     }
-    
     Actions.fetch(Immutable.List(
       config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id)
     ));
