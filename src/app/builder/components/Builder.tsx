@@ -246,6 +246,11 @@ class Builder extends Classs<Props>
   
   save()
   {
+    console.log(BrowserTypes);
+    // if()
+    // {
+
+    // }
     Ajax.saveItem(BrowserTypes.touchVariant(Immutable.fromJS(this.reduxState[this.getSelectedId()])));
   }
   
