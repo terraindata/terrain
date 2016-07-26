@@ -237,7 +237,7 @@ class Tabs extends Classs<TabsProps> {
       if(version)
       {
         id += '@' + version;
-      }
+	}
       return {
         id,
         name,

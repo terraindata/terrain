@@ -59,6 +59,8 @@ import BrowserTypes from '../../browser/BrowserTypes.tsx';
 import TQLEditor from '../../tql/components/TQLEditor.tsx';
 import InfoArea from '../../common/components/InfoArea.tsx';
 import * as moment from 'moment';
+import Ajax from "./../../util/Ajax.tsx";
+import * as Immutable from 'immutable';
 
 var Builder = require('./Builder.tsx');
 
@@ -256,7 +258,8 @@ var BuilderColumn = React.createClass<any, any>(
   {
     if (confirm('Are you sure you want to revert?')) 
     {
-        //revert Variant 
+      Ajax.saveItem(BrowserTypes.touchVariant(Immutable.fromJS(this.props.variant)));
+      //update url
     }
   },
 
@@ -346,6 +349,7 @@ var BuilderColumn = React.createClass<any, any>(
       </div>
     ));
   }
-});
+}
+);
 
 export default BuilderColumn;
