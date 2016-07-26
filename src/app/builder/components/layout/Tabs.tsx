@@ -348,7 +348,7 @@ class Tabs extends Classs<TabsProps> {
       compact: true,
       columns: tabs ? tabs.map((tab, index) => (
       {
-        key: tab.name, //tab.id was not unique
+        key: index, //tab.id was not unique
         content:
           <Tab 
             name={tab.name}

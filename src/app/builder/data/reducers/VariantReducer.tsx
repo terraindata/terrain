@@ -80,7 +80,7 @@ VariantReducer[ActionTypes.fetch] =
                   version.groupId = item.groupId;
                   version.status = item.status;
                   version.algorithmId = item.algorithmId;
-                  Actions.setVariant(variantId, version);
+                  Actions.setVariant(variantId + '@' + versionId, version);
                 });
               }
             );
@@ -105,13 +105,9 @@ VariantReducer[ActionTypes.fetch] =
 
 VariantReducer[ActionTypes.setVariant] =
   (state, action) =>
-  {
-    console.log(action.payload.variantId);
-    console.log(action.payload.variant);
-   return state.setIn(['algorithms', action.payload.variantId],
+   state.setIn(['algorithms', action.payload.variantId],
         new BrowserTypes.Variant(action.payload.variant)
       );  
-  }
 
 
 VariantReducer[ActionTypes.setVariantField] =
