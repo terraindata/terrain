@@ -148,13 +148,23 @@ class Builder extends Classs<Props>
     let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query.o;
     var newConfig;
-    
+
+    //Get the version 
+    // if(open) {
+    //   var parseURL = open.split("@");
+    //   if(parseURL.length > 1) 
+    //   {
+    //     var version = parseURL[1];
+    //   }
+    //   open = parseURL[0];
+    // }
+
     if(open)
     {
       if(!storedConfig || storedConfig === 'undefined' || storedConfig === '')
       {
         // no stored config, just load the open tab.
-        newConfig = '!' + open;
+        newConfig = '!' + open;     
       }
       else
       {
@@ -176,6 +186,7 @@ class Builder extends Classs<Props>
       newConfig = storedConfig;
     }
     
+
     if(newConfig)
     {
       props.history.replaceState({}, `/builder/${newConfig}`);
@@ -184,8 +195,7 @@ class Builder extends Classs<Props>
     {
       newConfig = props.params.config;
     }
-    console.log(newConfig);
-    localStorage.setItem('config', newConfig || '');
+
     this.fetch(newConfig);
   }
   
@@ -195,7 +205,6 @@ class Builder extends Classs<Props>
     {
       return;
     }
-    
     Actions.fetch(Immutable.List(
       config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id)
     ));

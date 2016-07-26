@@ -212,6 +212,22 @@ var Ajax = {
       onLoad(variantVersions);
     });
   },
+
+  getVariantVersion(variant_id: ID, version_id: string, onLoad: (variantVersion: any) => void)
+  {
+    var url = '/variant_versions/' + variant_id;
+    return Ajax._get(url, "", (response: any) =>
+    {
+      let variantVersions = JSON.parse(response);
+      for(let i = 0; i < variantVersions.length; i++)
+      {  
+        if(variantVersions[i].id === version_id) 
+        {
+          onLoad(JSON.parse(variantVersions[i].data));
+        }
+      }
+    });
+  },
   
   saveItem(item: Immutable.Map<string, any>, onLoad?: (resp: any) => void, onError?: (ev:Event) => void)
   {

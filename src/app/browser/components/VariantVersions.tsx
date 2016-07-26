@@ -107,7 +107,6 @@ class VariantVersions extends Classs<Props>
     {
       url += '@' + versionID;
     }
-    console.log(url);
     this.props.history.pushState({}, url);
   }
 
@@ -159,6 +158,7 @@ class VariantVersions extends Classs<Props>
     {
       return null;
     }
+    
     return(
       <div className="versions-table-wrapper">
         <div className="versions-table-title">

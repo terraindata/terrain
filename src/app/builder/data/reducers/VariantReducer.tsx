@@ -57,17 +57,48 @@ VariantReducer[ActionTypes.fetch] =
   {
     action.payload.variantIds.map(
       variantId =>
-        Ajax.getVariant(variantId, (item) =>
         {
-          if(!item)
-          {
-            return;
+          if(variantId.indexOf('@') !== -1) {
+            var versionId = variantId.split('@')[1];
+            variantId = variantId.split('@')[0];
+            Ajax.getVariantVersion(variantId, versionId, (version) =>
+              {
+                if(!version)
+                {
+                  return;
+                }
+                version.cards = Immutable.fromJS(version.cards || []);
+                version.inputs = Immutable.fromJS(version.inputs || []);
+                //Use current version to get missing fields
+                Ajax.getVariant(variantId, (item) => 
+                  {
+                  if(!item) 
+                  {
+                    return;
+                  }
+                  version.id = item.id;
+                  version.groupId = item.groupId;
+                  version.status = item.status;
+                  version.algorithmId = item.algorithmId;
+                  Actions.setVariant(variantId, version);
+                });
+              }
+            );
           }
-          item.cards = Immutable.fromJS(item.cards || []);
-          item.inputs = Immutable.fromJS(item.inputs || []);
-          Actions.setVariant(variantId, item);
+          else {
+            Ajax.getVariant(variantId, (item) =>
+            {
+              if(!item)
+              {
+                return;
+              }
+              item.cards = Immutable.fromJS(item.cards || []);
+              item.inputs = Immutable.fromJS(item.inputs || []);
+              Actions.setVariant(variantId, item);
+            }
+          );
         }
-      )
+      }
     );
     return state.set('loading', true);
   }
