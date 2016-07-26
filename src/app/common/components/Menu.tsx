@@ -102,7 +102,9 @@ class Menu extends Classs<Props>
           }}>
           {option.icon}
         </div>
-        <div className="menu-text-padding">
+        <div 
+          className={option.icon ? "menu-text-padding" : "menu-text-padding-no-icon"}
+        >
           { option.text }
         </div>
       </div>
@@ -141,8 +143,9 @@ class Menu extends Classs<Props>
       return null;
     }
     
-    var width = 14 * options.reduce((max, option) => 
+    var width = 12 * options.reduce((max, option) => 
         option.text.length > max ? option.text.length : max, 1)
+
     var style = {
       width: width,
       height: options.length * optionHeight,
