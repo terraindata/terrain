@@ -32,6 +32,7 @@
 			padding-left: 0px;
 			height: 30px;
 			border-bottom: 1px solid fade(@version-table-color, 50%);
+			position: relative;
 			&:hover {
 				background-color: @version-table-hover-bg;
 				color: @version-table-bg;
@@ -47,10 +48,9 @@
 				}
 			}
 			.versions-table-right-align {
-				float: right !important;
-				padding-right: 3px;
-				position: relative;
-				top: 6px
+				position: absolute;
+				top: 12px;
+				right: 2px;
 			}
 		}
 	}

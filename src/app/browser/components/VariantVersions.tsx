@@ -94,6 +94,7 @@ class VariantVersions extends Classs<Props>
     Ajax.getVariantVersions(this.props.variant.id, (versions) =>
     {
       if(versions) {
+        versions.reverse();
         this.setState({
           versions: versions,
         })
@@ -101,16 +102,16 @@ class VariantVersions extends Classs<Props>
     });
   }
 
-  showVersion(versionID) {
+  showVersion(versionID, i) {
     var url = '/builder/?o=' + this.props.variant.id;
-    if(versionID !== "1") 
+    if(i !== 0) 
     {
       url += '@' + versionID;
     }
     this.props.history.pushState({}, url);
   }
 
-  renderVersion(version) {
+  renderVersion(version, i) {
     //Get the role of the user
     let {roles} = this.state;
     let groupId = this.props.variant.groupId;
@@ -127,13 +128,11 @@ class VariantVersions extends Classs<Props>
       }
     }
 
-    //Note: Make sure that the entries are in reverse chrono order
-    //Current Version might not be first id, might be the last one
     return (
       <div 
         className="versions-table-row"
         key={version.id}
-        onClick={this.showVersion.bind(this, version.id)}
+        onClick={this.showVersion.bind(this, version.id, i)}
       >
         <div className="versions-table-element">
           <UserThumbnail 
@@ -146,7 +145,7 @@ class VariantVersions extends Classs<Props>
           {moment(version.createdAt).fromNow()}
         </div>
         <div className="versions-table-right-align">
-          {version.id === "1" ? "Current Version" : null}
+          {i === 0 ? "Current Version" : null}
         </div>
       </div>
     );
@@ -158,7 +157,7 @@ class VariantVersions extends Classs<Props>
     {
       return null;
     }
-    
+
     return(
       <div className="versions-table-wrapper">
         <div className="versions-table-title">
