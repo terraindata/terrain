@@ -15,7 +15,7 @@
 .menu-wrapper {
   // float: right;
   background: @card-menu-bg;
-
+  font-weight: 200;
   border-radius: @menu-collapsed-size;
   position: absolute;
   // z-index: 999;
@@ -69,10 +69,11 @@
     border-radius: 6px;
     z-index: 1020;
     box-shadow: 0px 0px 3px #888888;
-    top: @menu-collapsed-size;
+    top: 7 + @menu-collapsed-size;
+    right: -6px;
     position: absolute;
     border: 6px solid white;
-    
+    text-align: left;
     &.menu-wrapper-small {
       top: @menu-collapsed-small-size;
     }
@@ -94,6 +95,12 @@
     }
     
     .menu-option {
+<<<<<<< HEAD
+=======
+      //opacity: 0;
+      //color: @menu-color;
+      margin: 0px 6px;
+>>>>>>> 8f311d557da2d31e27102a93b1a776cb56acc7bb
       display: block;
       opacity: 1;
       z-index: 1020;
@@ -118,11 +125,41 @@
     }
   }
 
+.menu-options-wrapper:before, .menu-options-wrapper:after {
+    content: "";
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    right: 12px;
+    top: -6px;
+}
+
+.menu-options-wrapper:before {
+    border-bottom: 7px solid fade(#888888, 50%);
+    border-right: 7px solid transparent;
+    border-left: 7px solid transparent;
+    top: -7px;
+    right: 11px;
+}
+
+.menu-options-wrapper:after {
+    border-bottom: 6px solid #fff;
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+}
+
+
+
+
   .menu-text-padding{
     padding-left: 28px;
     padding-right: 10px;
+<<<<<<< HEAD
     text-align: left;
     top: 50%;
     transform: translateY(-50%);
     position: absolute;
+=======
+    vertical-align: middle;
+>>>>>>> 8f311d557da2d31e27102a93b1a776cb56acc7bb
   }
