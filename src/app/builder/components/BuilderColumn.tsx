@@ -58,6 +58,8 @@ import RolesStore from '../../roles/data/RolesStore.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
 import TQLEditor from '../../tql/components/TQLEditor.tsx';
 import InfoArea from '../../common/components/InfoArea.tsx';
+import * as moment from 'moment';
+
 var Builder = require('./Builder.tsx');
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
@@ -260,26 +262,15 @@ var BuilderColumn = React.createClass<any, any>(
 
   builderVersionToolbar(canEdit)
   {
-    if (this.props.variant.version)
+    if(this.props.variant.version)
     {
-    if (this.state.column === COLUMNS.Builder || this.state.column === COLUMNS.TQL)
-    {
-      var lastEdited = new Date(this.props.variant.lastEdited);
-      var time = " ";
-      var hours = lastEdited.getHours();
-      if (hours > 12)
+      if (this.state.column === COLUMNS.Builder || this.state.column === COLUMNS.TQL)
       {
-        hours -= 12;
-        time += hours + ":" + lastEdited.getMinutes() + "pm";
-      }
-      else 
-        {
-          time += hours + ":" + lastEdited.getMinutes() + "am";
-        }
+        var lastEdited = moment(this.props.variant.lastEdited).format("h:mma on M/D/YY")
         return (
           <div className='builder-revert-toolbar'> 
             <div className='builder-revert-time-message'>
-              Version from {time} on {lastEdited.getMonth()}/{lastEdited.getDate()}/{lastEdited.getFullYear()}
+              Version from {lastEdited}
             </div>
             <div className='builder-white-space'/>
             {
@@ -293,7 +284,6 @@ var BuilderColumn = React.createClass<any, any>(
           );
       }
     }
-  }
   },
 
   render() {

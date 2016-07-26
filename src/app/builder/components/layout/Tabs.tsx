@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./Tabs.less');
+import * as moment from 'moment';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
@@ -223,31 +224,20 @@ class Tabs extends Classs<TabsProps> {
         id = split[0];
         var version = split[1];
       }
+      var name = variants[id].name;
       if(version)
       {
-        name += '@ Version' + version;
+        name += ' @ ' + moment(variants[id].lastEdited).format("ha M/D/YY")
       }
       if(name === '')
       {
         name = 'Untitled';
       }
-      // if(version)
-      // {
-      //   var lastEdited = new Date(variants[id].lastEdited);
-      //   var time = "";
-      //   var hours = lastEdited.getHours();
-      //   if (hours > 12)
-      //   {
-      //     hours -= 12;
-      //     time += hours + "pm";
-      //   }
-      //   else 
-      //   {
-      //     time += hours + "am";
-      //   }
-      //   name += " @ " + time + " " + lastEdited.getMonth() + "/" + lastEdited.getDate() + "/" + lastEdited.getFullYear();
-      // }
-      
+      //Add the version back to the id
+      if(version)
+      {
+        id += '@' + version;
+      }
       return {
         id,
         name,
