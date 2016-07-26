@@ -223,15 +223,31 @@ class Tabs extends Classs<TabsProps> {
         id = split[0];
         var version = split[1];
       }
-      var name = variants[id] && variants[id].name;
-      if(version) 
+      if(version)
       {
-        name += ' @ version ' + version; //change this to be time stamp
+        name += '@ Version' + version;
       }
       if(name === '')
       {
         name = 'Untitled';
       }
+      // if(version)
+      // {
+      //   var lastEdited = new Date(variants[id].lastEdited);
+      //   var time = "";
+      //   var hours = lastEdited.getHours();
+      //   if (hours > 12)
+      //   {
+      //     hours -= 12;
+      //     time += hours + "pm";
+      //   }
+      //   else 
+      //   {
+      //     time += hours + "am";
+      //   }
+      //   name += " @ " + time + " " + lastEdited.getMonth() + "/" + lastEdited.getDate() + "/" + lastEdited.getFullYear();
+      // }
+      
       return {
         id,
         name,

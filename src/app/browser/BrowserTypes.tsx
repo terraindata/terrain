@@ -69,7 +69,7 @@ export module BrowserTypes
     mode: "",
     tql: "",
     status: EVariantStatus.Build,
-    version: true,
+    version: false,
 
     cards: Immutable.List([]),
     inputs: Immutable.List([]),
@@ -84,7 +84,7 @@ export module BrowserTypes
   {
     id: ID;
     name: string;
-    lastEdited: string;
+    lastEdited: any;
     lastUsername: string;
     status: EVariantStatus;
     algorithmId: ID;
@@ -111,13 +111,14 @@ export module BrowserTypes
       .set('lastUsername', localStorage['username']) as Variant;
   }
   
-  
   export enum EAlgorithmStatus
   {
     // This order must be consistent with Midway
     Archive,  
     Live,
   }
+
+
   let _Algorithm = Immutable.Record(
   {
     id: "",

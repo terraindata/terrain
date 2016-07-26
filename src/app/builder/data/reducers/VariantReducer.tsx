@@ -80,6 +80,7 @@ VariantReducer[ActionTypes.fetch] =
                   version.groupId = item.groupId;
                   version.status = item.status;
                   version.algorithmId = item.algorithmId;
+                  version.version = true;
                   Actions.setVariant(variantId + '@' + versionId, version);
                 });
               }
@@ -94,6 +95,7 @@ VariantReducer[ActionTypes.fetch] =
               }
               item.cards = Immutable.fromJS(item.cards || []);
               item.inputs = Immutable.fromJS(item.inputs || []);
+              item.version = false;
               Actions.setVariant(variantId, item);
             }
           );

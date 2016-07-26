@@ -58,6 +58,7 @@ import RolesStore from '../../roles/data/RolesStore.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
 import TQLEditor from '../../tql/components/TQLEditor.tsx';
 import InfoArea from '../../common/components/InfoArea.tsx';
+var Builder = require('./Builder.tsx');
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -97,6 +98,7 @@ var BuilderColumn = React.createClass<any, any>(
     canCloseColumn: React.PropTypes.bool,
     onAddColumn: React.PropTypes.func.isRequired,
     onCloseColumn: React.PropTypes.func.isRequired,
+    variant: React.PropTypes.object.isRequired,
   },
   
   getInitialState()
@@ -248,6 +250,51 @@ var BuilderColumn = React.createClass<any, any>(
     this.props.onCloseColumn(this.props.index);
   },
   
+  revertVersion()
+  {
+    if (confirm('Are you sure you want to revert?')) 
+    {
+        //revert Variant 
+    }
+  },
+
+  builderVersionToolbar(canEdit)
+  {
+    if (this.props.variant.version)
+    {
+      if (this.state.column === COLUMNS.Builder || this.state.column === COLUMNS.TQL)
+      {
+        var lastEdited = new Date(this.props.variant.lastEdited);
+        var time = " ";
+        var hours = lastEdited.getHours();
+        if (hours > 12)
+        {
+          hours -= 12;
+          time += hours + ":" + lastEdited.getMinutes() + "pm";
+        }
+        else 
+        {
+          time += hours + ":" + lastEdited.getMinutes() + "am";
+        }
+        return (
+          <div className='builder-revert-toolbar'> 
+            <div className='builder-revert-time-message'>
+              Version from {time} on {lastEdited.getMonth()}/{lastEdited.getDate()}/{lastEdited.getFullYear()}
+            </div>
+            <div className='builder-white-space'/>
+            {
+              canEdit ? 
+                  <div className='button builder-revert-button' onClick={this.revertVersion}>
+                    Revert to this version
+                  </div>
+                  : <div />
+             }
+          </div>
+          );
+      }
+    }
+  },
+
   render() {
     let {algorithm} = this.props;
     let canEdit = (algorithm.status === BrowserTypes.EVariantStatus.Build
@@ -298,6 +345,7 @@ var BuilderColumn = React.createClass<any, any>(
              }
           </div>
         </div>
+        {this.builderVersionToolbar(canEdit)}
         <div className={
             'builder-column-content' + 
             (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '')

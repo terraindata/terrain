@@ -103,6 +103,7 @@ class VariantVersions extends Classs<Props>
   }
 
   showVersion(versionID, i) {
+    // this.props.variant.set('version', true)
     var url = '/builder/?o=' + this.props.variant.id;
     if(i !== 0) 
     {

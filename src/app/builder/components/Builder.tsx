@@ -205,7 +205,7 @@ class Builder extends Classs<Props>
     var selected = this.props.params.config && this.props.params.config.split(',').find(id => id.indexOf('!') === 0);
     return selected && selected.substr(1);
   }
-  
+ 
   componentWillUnmount()
   {
     this.cancelSubscription();
@@ -246,11 +246,13 @@ class Builder extends Classs<Props>
   
   save()
   {
-    console.log(BrowserTypes);
-    // if()
-    // {
-
-    // }
+    if (this.reduxState[this.getSelectedId()].version) 
+    {
+      if (!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?')) 
+      {
+        return;
+      }
+    }
     Ajax.saveItem(BrowserTypes.touchVariant(Immutable.fromJS(this.reduxState[this.getSelectedId()])));
   }
   
@@ -279,6 +281,7 @@ class Builder extends Classs<Props>
         onCloseColumn={this.handleCloseColumn}
         canAddColumn={colKeys.length < 3}
         canCloseColumn={colKeys.length > 1}
+        variant={this.reduxState[this.getSelectedId()]}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key: colKeys[index],
@@ -370,6 +373,7 @@ class Builder extends Classs<Props>
           history={this.props.history}
           reportEmptyTabs={this.handleEmptyTabs}
         />
+
         {
           !_.keys(this.reduxState).length ? 
             <InfoArea
