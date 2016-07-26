@@ -143,11 +143,9 @@ class Menu extends Classs<Props>
     
     var width = 14 * options.reduce((max, option) => 
         option.text.length > max ? option.text.length : max, 1)
-    var leftOffset = -(width) + (this.props.small ? 24 : 18);
     var style = {
       width: width,
       height: options.length * optionHeight,
-      left: leftOffset,
     };
     
     return (
@@ -155,6 +153,7 @@ class Menu extends Classs<Props>
       className={classNames({
         "menu-wrapper": true,
         "menu-wrapper-small": this.props.small,
+        "menu-open": this.state.open,
       })}
       style={this.props.style ? this.props.style : null}
     >
