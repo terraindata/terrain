@@ -228,8 +228,7 @@ class Tabs extends Classs<TabsProps> {
       {
         name = 'Untitled';
       }
-      
-      if (variants[id].version)
+      if(variants[id].version)
       {
         var lastEdited = new Date(variants[id].lastEdited);
         var time = "";
