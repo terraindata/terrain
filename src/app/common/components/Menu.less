@@ -25,6 +25,7 @@
   .transition;
   overflow: visible;
   text-align: center;
+  font-weight: 200;
   
   width: @menu-collapsed-size !important;
   height: @menu-collapsed-size !important;
@@ -70,6 +71,8 @@
     box-shadow: 0px 0px 3px #888888;
     top: @menu-collapsed-size;
     position: absolute;
+    border: 6px solid white;
+    
     &.menu-wrapper-small {
       top: @menu-collapsed-small-size;
     }
@@ -89,9 +92,8 @@
         background: @card-menu-bg;
       }
     }
+    
     .menu-option {
-      //opacity: 0;
-      //color: @menu-color;
       display: block;
       opacity: 1;
       z-index: 1020;
@@ -104,19 +106,23 @@
       .transition;
       white-space: nowrap;
       &:hover {
-        background-color: #d1efe7 !important;
+        background-color: fade(@grey, 15%) !important;
       }      
       &.menu-option-disabled {
-        background: fade(@grey, 25%);
+        background: #d1efe7; 
         cursor: default;
         &:hover {
-          background-color: fade(@grey, 25%) !important;
+          background-color: #d1efe7 !important; 
         }
       }
     }
   }
 
   .menu-text-padding{
-    padding-left: 20px;
+    padding-left: 28px;
     padding-right: 10px;
+    text-align: left;
+    top: 50%;
+    transform: translateY(-50%);
+    position: absolute;
   }

@@ -188,13 +188,13 @@ var Input = React.createClass<any, any>({
               {...this.props}
               canEdit={true}
               value={this.props.input.key}
-              className="input-text input-text-first"
+              className="input-text input-text-first input-borderless"
               id={this.props.input.id}
               keyPath={['key']}
             />
             <Menu 
               options={this.getMenuOptions()} 
-              style={{right:'25px'}}
+              style={{right:'28px'}}
             />
             <div className='input-close' onClick={this.closeInput}> 
               <CloseIcon /> 

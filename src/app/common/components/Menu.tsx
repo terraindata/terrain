@@ -102,7 +102,7 @@ class Menu extends Classs<Props>
           }}>
           {option.icon}
         </div>
-        <div className="dead-center menu-text-padding">
+        <div className="menu-text-padding">
           { option.text }
         </div>
       </div>
@@ -155,6 +155,7 @@ class Menu extends Classs<Props>
       className={classNames({
         "menu-wrapper": true,
         "menu-wrapper-small": this.props.small,
+        //"menu-open": this.state.open,
       })}
       style={this.props.style ? this.props.style : null}
     >

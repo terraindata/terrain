@@ -66,7 +66,7 @@
 
   .account-dropdown-link {
     color: #0e0e0e !important;
-    width: 130px;
+    width: 100px;
   }
 
   .account-dropdown-content {
@@ -75,10 +75,11 @@
     z-index: 99999999999;
     top: 100%;
     right: 0px;
-    min-width: 100%;
+    width: 120px;
     border-radius: 6px;
     box-shadow: 0px 0px 6px #C7CAC9;
     margin-right: 6px;
+    border-bottom: 6px solid white;
 
     &:after, &:before {
       bottom: 100%;
@@ -104,8 +105,8 @@
     }
 
     .account-dropdown-row {
-      padding: 12px 0px;
-      font-size: 16px;
+      padding: 2px 0px;
+      font-size: 12px;
       line-height: 18px;
       border-radius: 6px;
       color: #0e0e0e !important;
@@ -115,7 +116,7 @@
       margin-top: 6px; 
 
       &:hover {
-        background: #d1efe7;
+        background: fade(@grey, 15%);
       }
       &:last-child {
         margin-bottom: px;
