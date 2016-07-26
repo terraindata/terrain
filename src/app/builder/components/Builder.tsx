@@ -184,7 +184,7 @@ class Builder extends Classs<Props>
     {
       newConfig = props.params.config;
     }
-    
+    console.log(newConfig);
     localStorage.setItem('config', newConfig || '');
     this.fetch(newConfig);
   }

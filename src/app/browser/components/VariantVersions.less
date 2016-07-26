@@ -17,15 +17,15 @@
 
 	.versions-table {
 		background-color: @version-table-bg;
-		font-size: 13px;
+		font-size: 12px;
 		display: inline-block;
-		width: 100%;
-		whitespace: nowrap;
+		width: 95%;
 		padding: 6px;
 		color: @version-table-color;
 		cursor: pointer;
 		border-radius: 6px;
-		padding-right: -6px;
+		overflow-y: auto;
+		max-height: 210px; //5 entries
 		.versions-table-row {
 			padding: 6px;
 			width: 100%;
@@ -48,7 +48,7 @@
 			}
 			.versions-table-right-align {
 				float: right !important;
-				padding-right: 12px;
+				padding-right: 3px;
 				position: relative;
 				top: 6px
 			}

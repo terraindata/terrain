@@ -82,6 +82,7 @@ interface Props
   group: Group;
   algorithm: Algorithm;
   variant: Variant;
+  history?: any;
 }
 
 class BrowserInfoColumn extends Classs<Props>
@@ -123,7 +124,10 @@ class BrowserInfoColumn extends Classs<Props>
     return (
     <div>
       Variant
-      <VariantVersions variant={this.props.variant}/>
+      <VariantVersions 
+        variant={this.props.variant} 
+        history={this.props.history} 
+      />
     </div>
     );
   }

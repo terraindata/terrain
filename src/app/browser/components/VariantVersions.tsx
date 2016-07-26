@@ -49,7 +49,10 @@ import BrowserTypes from './../BrowserTypes.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import UserTypes from './../../users/UserTypes.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
-
+import Ajax from './../../util//Ajax.tsx';
+import * as moment from 'moment';
+import RoleTypes from '../../roles/RoleTypes.tsx';
+import RolesStore from '../../roles/data/RolesStore.tsx';
 
 type Variant = BrowserTypes.Variant;
 type User = UserTypes.User;
@@ -59,16 +62,19 @@ type UserMap = UserTypes.UserMap;
 interface Props
 {
   variant: Variant;
+  history: any;
 }
 
 class VariantVersions extends Classs<Props>
 {
   state: {
     users: UserMap,
-    me: User,
+    versions: any,
+    roles: RoleTypes.RoleMap,
   } = {
     users: null,
-    me: null,
+    versions: null,
+    roles: null, 
   }
   
   constructor(props:Props)
@@ -79,26 +85,69 @@ class VariantVersions extends Classs<Props>
       stateKey: 'users', 
       storeKeyPath: ['users'],
     });
-    this._subscribe(UserStore, {
-      stateKey: 'me', 
-      storeKeyPath: ['currentUser'],
+    this._subscribe(RolesStore, {
+      stateKey: 'roles', 
     });
   }
 
+  componentWillMount() {
+    Ajax.getVariantVersions(this.props.variant.id, (versions) =>
+    {
+      if(versions) {
+        this.setState({
+          versions: versions,
+        })
+      }
+    });
+  }
+
+  showVersion(versionID) {
+    var url = '/builder/?o=' + this.props.variant.id;
+    if(versionID !== "1") 
+    {
+      url += '@' + versionID;
+    }
+    console.log(url);
+    this.props.history.pushState({}, url);
+  }
+
   renderVersion(version) {
+    //Get the role of the user
+    let {roles} = this.state;
+    let groupId = this.props.variant.groupId;
+    var role = "Viewer";
+    if (roles && roles.getIn([groupId, version.username])) 
+    {
+      if (roles && roles.getIn([groupId, version.username]).admin) 
+      {
+        role = "Admin";
+      }
+      else if (roles && roles.getIn([groupId, version.username]).builder) 
+      {
+        role = "Builder";
+      }
+    }
+
+    //Note: Make sure that the entries are in reverse chrono order
+    //Current Version might not be first id, might be the last one
     return (
       <div 
         className="versions-table-row"
-        key={version.index}
+        key={version.id}
+        onClick={this.showVersion.bind(this, version.id)}
       >
         <div className="versions-table-element">
-          <UserThumbnail username={version.user} medium={false}/>
+          <UserThumbnail 
+            username={version.username} 
+            medium={false}
+            extra={role}
+          />
         </div>
         <div className="versions-table-element versions-table-text-element">
-          {version.time}
+          {moment(version.createdAt).fromNow()}
         </div>
         <div className="versions-table-right-align">
-          {version.index === 0 ? "Current Version" : null}
+          {version.id === "1" ? "Current Version" : null}
         </div>
       </div>
     );
@@ -106,31 +155,17 @@ class VariantVersions extends Classs<Props>
   
   render()
   {
-    var versions = [
-      {
-        user: "luser",
-        time: "12 hours ago",
-        index: 0,
-      },
-      {
-        user: "luser",
-        time: "18 hours ago",
-        index: 1,
-      },
-            {
-        user: "test",
-        time: "3 days ago",
-        index: 2,
-      },
-    ];
-
+    if(!this.state.versions) 
+    {
+      return null;
+    }
     return(
       <div className="versions-table-wrapper">
         <div className="versions-table-title">
           Version History
         </div>
       <div className="versions-table">
-        {versions.map(this.renderVersion)}
+        {this.state.versions.map(this.renderVersion)}
       </div>
       </div>
     );
