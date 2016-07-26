@@ -58,6 +58,8 @@ import RolesStore from '../../roles/data/RolesStore.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
 import TQLEditor from '../../tql/components/TQLEditor.tsx';
 import InfoArea from '../../common/components/InfoArea.tsx';
+import Ajax from "./../../util/Ajax.tsx";
+import * as Immutable from 'immutable';
 var Builder = require('./Builder.tsx');
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
@@ -254,7 +256,8 @@ var BuilderColumn = React.createClass<any, any>(
   {
     if (confirm('Are you sure you want to revert?')) 
     {
-        //revert Variant 
+      Ajax.saveItem(BrowserTypes.touchVariant(Immutable.fromJS(this.props.variant)));
+      //update url
     }
   },
 
@@ -293,7 +296,6 @@ var BuilderColumn = React.createClass<any, any>(
           );
       }
     }
-  }
   },
 
   render() {
@@ -356,6 +358,7 @@ var BuilderColumn = React.createClass<any, any>(
       </div>
     ));
   }
-});
+}
+);
 
 export default BuilderColumn;

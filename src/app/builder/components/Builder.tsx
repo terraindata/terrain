@@ -254,6 +254,7 @@ class Builder extends Classs<Props>
       }
     }
     Ajax.saveItem(BrowserTypes.touchVariant(Immutable.fromJS(this.reduxState[this.getSelectedId()])));
+    //update url
   }
   
   getLayout()
