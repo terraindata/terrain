@@ -111,12 +111,12 @@ class Builder extends Classs<Props>
   {
     this.cancelSubscription =
       Store.subscribe(() => {
-        var newState = Store.getState().toJS();
-        this.reduxState = newState.algorithms;
-        this.setState({
-          random: Math.random(),
-          loading: false,
-        });
+          var newState = Store.getState().toJS();
+          this.reduxState = newState.algorithms;
+          this.setState({
+            random: Math.random(),
+            loading: false,
+          });
       });
 
     // Some day in the distant future, you may consider
@@ -148,16 +148,6 @@ class Builder extends Classs<Props>
     let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query.o;
     var newConfig;
-
-    //Get the version 
-    // if(open) {
-    //   var parseURL = open.split("@");
-    //   if(parseURL.length > 1) 
-    //   {
-    //     var version = parseURL[1];
-    //   }
-    //   open = parseURL[0];
-    // }
 
     if(open)
     {
@@ -195,7 +185,7 @@ class Builder extends Classs<Props>
     {
       newConfig = props.params.config;
     }
-
+    localStorage.setItem('config', newConfig || '');
     this.fetch(newConfig);
   }
   

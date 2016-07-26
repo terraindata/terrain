@@ -213,17 +213,25 @@ class Tabs extends Classs<TabsProps> {
   computeTabs(config, variants?)
   {
     variants = variants || this.state.variants;
-    
     var emptyTabs: ID[] = [];
     let tabs = config && variants && config.split(',').map(vId =>
     {
       let id = this.getId(vId);
+      let split = id.split('@');
+      if(split.length > 1)
+      {
+        id = split[0];
+        var version = split[1];
+      }
       var name = variants[id] && variants[id].name;
+      if(version) 
+      {
+        name += ' @ version ' + version; //change this to be time stamp
+      }
       if(name === '')
       {
         name = 'Untitled';
       }
-      
       return {
         id,
         name,
@@ -287,12 +295,13 @@ class Tabs extends Classs<TabsProps> {
     );
   }
   
+  //Get rid of version number in the id
   getId(idStr:string):string
   {
     if(idStr.substr(0, 1) === '!')
     {
       return idStr.substr(1);
-    }
+    }   
     return idStr;
   }
   
@@ -339,7 +348,7 @@ class Tabs extends Classs<TabsProps> {
       compact: true,
       columns: tabs ? tabs.map((tab, index) => (
       {
-        key: tab.id,
+        key: tab.name, //tab.id was not unique
         content:
           <Tab 
             name={tab.name}

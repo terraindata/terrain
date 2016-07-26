@@ -58,34 +58,34 @@ VariantReducer[ActionTypes.fetch] =
     action.payload.variantIds.map(
       variantId =>
         {
-          // if(variantId.indexOf('@') !== -1) {
-          //   var versionId = variantId.split('@')[1];
-          //   variantId = variantId.split('@')[0];
-          //   Ajax.getVariantVersion(variantId, versionId, (version) =>
-          //     {
-          //       if(!version)
-          //       {
-          //         return;
-          //       }
-          //       version.cards = Immutable.fromJS(version.cards || []);
-          //       version.inputs = Immutable.fromJS(version.inputs || []);
-          //       //Use current version to get missing fields
-          //       Ajax.getVariant(variantId, (item) => 
-          //         {
-          //         if(!item) 
-          //         {
-          //           return;
-          //         }
-          //         version.id = item.id;
-          //         version.groupId = item.groupId;
-          //         version.status = item.status;
-          //         version.algorithmId = item.algorithmId;
-          //         Actions.setVariant(variantId, version);
-          //       });
-          //     }
-          //   );
-          // }
-          // else {
+          if(variantId.indexOf('@') !== -1) {
+            var versionId = variantId.split('@')[1];
+            variantId = variantId.split('@')[0];
+            Ajax.getVariantVersion(variantId, versionId, (version) =>
+              {
+                if(!version)
+                {
+                  return;
+                }
+                version.cards = Immutable.fromJS(version.cards || []);
+                version.inputs = Immutable.fromJS(version.inputs || []);
+                //Use current version to get missing fields
+                Ajax.getVariant(variantId, (item) => 
+                  {
+                  if(!item) 
+                  {
+                    return;
+                  }
+                  version.id = item.id;
+                  version.groupId = item.groupId;
+                  version.status = item.status;
+                  version.algorithmId = item.algorithmId;
+                  Actions.setVariant(variantId, version);
+                });
+              }
+            );
+          }
+          else {
             Ajax.getVariant(variantId, (item) =>
             {
               if(!item)
@@ -98,7 +98,7 @@ VariantReducer[ActionTypes.fetch] =
             }
           );
         }
-      //}
+      }
     );
     return state.set('loading', true);
   }
@@ -106,9 +106,11 @@ VariantReducer[ActionTypes.fetch] =
 VariantReducer[ActionTypes.setVariant] =
   (state, action) =>
   {
-    state.setIn(['algorithms', action.payload.variantId],
-      new BrowserTypes.Variant(action.payload.variant)
-    );
+    console.log(action.payload.variantId);
+    console.log(action.payload.variant);
+   return state.setIn(['algorithms', action.payload.variantId],
+        new BrowserTypes.Variant(action.payload.variant)
+      );  
   }
 
 
