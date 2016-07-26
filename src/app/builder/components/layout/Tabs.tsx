@@ -223,27 +223,30 @@ class Tabs extends Classs<TabsProps> {
         id = split[0];
         var version = split[1];
       }
-      var name = variants[id] && variants[id].name;
+      if(version)
+      {
+        name += '@ Version' + version;
+      }
       if(name === '')
       {
         name = 'Untitled';
       }
-      if(variants[id].version)
-      {
-        var lastEdited = new Date(variants[id].lastEdited);
-        var time = "";
-        var hours = lastEdited.getHours();
-        if (hours > 12)
-        {
-          hours -= 12;
-          time += hours + "pm";
-        }
-        else 
-        {
-          time += hours + "am";
-        }
-        name += " @ " + time + " " + lastEdited.getMonth() + "/" + lastEdited.getDate() + "/" + lastEdited.getFullYear();
-      }
+      // if(version)
+      // {
+      //   var lastEdited = new Date(variants[id].lastEdited);
+      //   var time = "";
+      //   var hours = lastEdited.getHours();
+      //   if (hours > 12)
+      //   {
+      //     hours -= 12;
+      //     time += hours + "pm";
+      //   }
+      //   else 
+      //   {
+      //     time += hours + "am";
+      //   }
+      //   name += " @ " + time + " " + lastEdited.getMonth() + "/" + lastEdited.getDate() + "/" + lastEdited.getFullYear();
+      // }
       
       return {
         id,
@@ -361,7 +364,7 @@ class Tabs extends Classs<TabsProps> {
       compact: true,
       columns: tabs ? tabs.map((tab, index) => (
       {
-        key: tab.name, //tab.id was not unique
+        key: index, //tab.id was not unique
         content:
           <Tab 
             name={tab.name}

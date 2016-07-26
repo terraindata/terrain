@@ -147,6 +147,7 @@ class VariantVersions extends Classs<Props>
         <div className="versions-table-right-align">
           {i === 0 ? "Current Version" : null}
         </div>
+        <div className='versions-table-line' />
       </div>
     );
   }

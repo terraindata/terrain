@@ -273,24 +273,25 @@ var BuilderColumn = React.createClass<any, any>(
         time += hours + ":" + lastEdited.getMinutes() + "pm";
       }
       else 
-      {
-        time += hours + ":" + lastEdited.getMinutes() + "am";
-      }
-      return (
-        <div className='builder-revert-toolbar'> 
-          <div className='builder-revert-time-message'>
-            Version from {time} on {lastEdited.getMonth()}/{lastEdited.getDate()}/{lastEdited.getFullYear()}
+        {
+          time += hours + ":" + lastEdited.getMinutes() + "am";
+        }
+        return (
+          <div className='builder-revert-toolbar'> 
+            <div className='builder-revert-time-message'>
+              Version from {time} on {lastEdited.getMonth()}/{lastEdited.getDate()}/{lastEdited.getFullYear()}
+            </div>
+            <div className='builder-white-space'/>
+            {
+              canEdit ? 
+                  <div className='button builder-revert-button' onClick={this.revertVersion}>
+                    Revert to this version
+                  </div>
+                  : <div />
+             }
           </div>
-          <div className='builder-white-space'/>
-          {
-            canEdit ? 
-                <div className='button builder-revert-button' onClick={this.revertVersion}>
-                  Revert to this version
-                </div>
-                : <div />
-           }
-        </div>
-        );
+          );
+      }
     }
   }
   },

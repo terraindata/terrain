@@ -31,11 +31,18 @@
 			width: 100%;
 			padding-left: 0px;
 			height: 30px;
-			border-bottom: 1px solid fade(@version-table-color, 50%);
 			position: relative;
+			border-radius: 6px;
 			&:hover {
 				background-color: @version-table-hover-bg;
 				color: @version-table-bg;
+			}
+			.versions-table-line {
+				width: calc(~"100% - 5px");
+				position: relative;
+				border-bottom: 1px solid fade(@version-table-color, 50%);
+				top: 36px;
+				left: 5px;
 			}
 			.versions-table-element {
 				display: inline-block;
@@ -50,7 +57,7 @@
 			.versions-table-right-align {
 				position: absolute;
 				top: 12px;
-				right: 2px;
+				right: 6px;
 			}
 		}
 	}

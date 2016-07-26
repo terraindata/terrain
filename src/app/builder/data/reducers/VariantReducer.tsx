@@ -80,7 +80,8 @@ VariantReducer[ActionTypes.fetch] =
                   version.groupId = item.groupId;
                   version.status = item.status;
                   version.algorithmId = item.algorithmId;
-                  Actions.setVariant(variantId, version);
+                  version.version = true;
+                  Actions.setVariant(variantId + '@' + versionId, version);
                 });
               }
             );
@@ -94,6 +95,7 @@ VariantReducer[ActionTypes.fetch] =
               }
               item.cards = Immutable.fromJS(item.cards || []);
               item.inputs = Immutable.fromJS(item.inputs || []);
+              item.version = false;
               Actions.setVariant(variantId, item);
             }
           );
@@ -105,11 +107,9 @@ VariantReducer[ActionTypes.fetch] =
 
 VariantReducer[ActionTypes.setVariant] =
   (state, action) =>
-  {
-   return state.setIn(['algorithms', action.payload.variantId],
+   state.setIn(['algorithms', action.payload.variantId],
         new BrowserTypes.Variant(action.payload.variant)
       );  
-  }
 
 
 VariantReducer[ActionTypes.setVariantField] =
