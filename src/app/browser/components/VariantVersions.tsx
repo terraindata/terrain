@@ -87,20 +87,20 @@ class VariantVersions extends Classs<Props>
 
   renderVersion(version) {
     return (
-      <tr 
+      <div 
         className="versions-table-row"
         key={version.index}
       >
-        <td>
+        <div className="versions-table-element">
           <UserThumbnail username={version.user} medium={false}/>
-        </td>
-        <td>
+        </div>
+        <div className="versions-table-element versions-table-text-element">
           {version.time}
-        </td>
-        <td className="versions-table-right-align">
+        </div>
+        <div className="versions-table-right-align">
           {version.index === 0 ? "Current Version" : null}
-        </td>
-      </tr>
+        </div>
+      </div>
     );
   }
   
@@ -129,11 +129,9 @@ class VariantVersions extends Classs<Props>
         <div className="versions-table-title">
           Version History
         </div>
-      <table className="versions-table">
-        <tbody>
+      <div className="versions-table">
         {versions.map(this.renderVersion)}
-        </tbody>
-      </table>
+      </div>
       </div>
     );
   }
