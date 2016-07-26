@@ -69,7 +69,7 @@ export module BrowserTypes
     mode: "",
     tql: "",
     status: EVariantStatus.Build,
-    version: false,
+    version: true,
 
     cards: Immutable.List([]),
     inputs: Immutable.List([]),

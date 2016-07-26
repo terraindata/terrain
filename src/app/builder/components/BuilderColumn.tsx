@@ -260,6 +260,8 @@ var BuilderColumn = React.createClass<any, any>(
 
   builderVersionToolbar(canEdit)
   {
+    if (this.props.variant.version)
+    {
     if (this.state.column === COLUMNS.Builder || this.state.column === COLUMNS.TQL)
     {
       var lastEdited = new Date(this.props.variant.lastEdited);
@@ -290,6 +292,7 @@ var BuilderColumn = React.createClass<any, any>(
         </div>
         );
     }
+  }
   },
 
   render() {
