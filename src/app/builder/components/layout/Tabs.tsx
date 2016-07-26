@@ -223,7 +223,24 @@ class Tabs extends Classs<TabsProps> {
       {
         name = 'Untitled';
       }
-      
+
+      if (variants[id].version)
+      {
+        var lastEdited = new Date(variants[id].lastEdited);
+        var time = "";
+        var hours = lastEdited.getHours();
+        if (hours > 12)
+        {
+          hours -= 12;
+          time += hours + "pm";
+        }
+        else 
+        {
+          time += hours + "am";
+        }
+        name += " @ " + time + " " + lastEdited.getMonth() + "/" + lastEdited.getDate() + "/" + lastEdited.getFullYear();
+      }
+
       return {
         id,
         name,
