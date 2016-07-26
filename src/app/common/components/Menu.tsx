@@ -143,7 +143,12 @@ class Menu extends Classs<Props>
       return null;
     }
     
-    var width = 12 * options.reduce((max, option) => 
+    var multiplier = 10;
+    if(options[0].icon) 
+    {
+      multiplier = 14;
+    } 
+    var width = multiplier * options.reduce((max, option) => 
         option.text.length > max ? option.text.length : max, 1)
 
     var style = {
