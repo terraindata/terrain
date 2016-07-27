@@ -254,7 +254,17 @@ class Builder extends Classs<Props>
       }
     }
     Ajax.saveItem(BrowserTypes.touchVariant(Immutable.fromJS(this.reduxState[this.getSelectedId()])));
-    //update url
+    var configArr = window.location.pathname.split('/')[2].split(',');
+    console.log(configArr);
+    for(let i = 0; i < configArr.length; i++)
+    {
+       if(configArr[i].substr(0,1) === '!')
+      {
+        configArr[i] = configArr[i].split('@')[0];
+      }
+    }
+    var newConfig = configArr.join(',');
+    this.props.history.replaceState({}, `/builder/${newConfig}`);
   }
   
   getLayout()
