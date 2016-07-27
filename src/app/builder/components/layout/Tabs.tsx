@@ -233,11 +233,10 @@ class Tabs extends Classs<TabsProps> {
       {
         name += ' @ ' + moment(variants[id].lastEdited).format("ha M/D/YY")
       }
-      //Add the version back to the id
       if(version)
       {
         id += '@' + version;
-	}
+	    }
       return {
         id,
         name,
@@ -301,7 +300,6 @@ class Tabs extends Classs<TabsProps> {
     );
   }
   
-  //Get rid of version number in the id
   getId(idStr:string):string
   {
     if(idStr.substr(0, 1) === '!')

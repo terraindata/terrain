@@ -58,7 +58,8 @@ VariantReducer[ActionTypes.fetch] =
     action.payload.variantIds.map(
       variantId =>
         {
-          if(variantId.indexOf('@') !== -1) {
+          if(variantId.indexOf('@') !== -1) 
+          {
             var versionId = variantId.split('@')[1];
             variantId = variantId.split('@')[0];
             Ajax.getVariantVersion(variantId, versionId, (version) =>
@@ -86,7 +87,8 @@ VariantReducer[ActionTypes.fetch] =
               }
             );
           }
-          else {
+          else 
+          {
             Ajax.getVariant(variantId, (item) =>
             {
               if(!item)

@@ -132,7 +132,6 @@ class VariantVersions extends Classs<Props>
 
   renderVersion(version, i) 
   {
-    //Get the role of the user
     let {roles} = this.state;
     let groupId = this.props.variant.groupId;
     var role = "Viewer";
