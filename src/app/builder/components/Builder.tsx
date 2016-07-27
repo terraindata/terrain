@@ -283,6 +283,7 @@ class Builder extends Classs<Props>
         canAddColumn={colKeys.length < 3}
         canCloseColumn={colKeys.length > 1}
         variant={this.reduxState[this.getSelectedId()]}
+        history={this.props.history}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key: colKeys[index],
