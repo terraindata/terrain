@@ -53,7 +53,7 @@ const xes =
 {
   cards:
   {
-    name: 'Cards Drag & Drop',
+    name: 'Immutable Builder',
     component: XCards,
   },
 };
