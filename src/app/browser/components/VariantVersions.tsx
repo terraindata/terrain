@@ -102,6 +102,19 @@ class VariantVersions extends Classs<Props>
     });
   }
 
+  componentWillReceiveProps(nextProps)
+  {
+    Ajax.getVariantVersions(nextProps.variant.id, (versions) =>
+    {
+      if(versions) {
+        versions.reverse();
+        this.setState({
+          versions: versions,
+        })
+      }
+    });
+  }
+
   showVersion(versionID, i) {
     var url = '/builder/?o=' + this.props.variant.id;
     if(i !== 0) 
