@@ -240,11 +240,11 @@ class Builder extends Classs<Props>
     {
       text: 'Save',
       icon: <SaveIcon />,
-      onClick: this.save,
+      onClick: this.onSave,
     },
   ]);
   
-  save()
+  onSave()
   {
     if (this.reduxState[this.getSelectedId()].version) 
     {
@@ -253,14 +253,29 @@ class Builder extends Classs<Props>
         return;
       }
     }
+    this.save()
+  }
+
+  save()
+  {
     Ajax.saveItem(BrowserTypes.touchVariant(Immutable.fromJS(this.reduxState[this.getSelectedId()])));
     var configArr = window.location.pathname.split('/')[2].split(',');
-    console.log(configArr);
+    var currentVariant;
+    configArr = configArr.map(function(tab)
+      {
+        if(tab.substr(0,1) === '!')
+        {
+          currentVariant = tab.substr(1).split('@')[0];
+          return '!' + currentVariant;
+        }
+        return tab;
+      }
+    );
     for(let i = 0; i < configArr.length; i++)
     {
-       if(configArr[i].substr(0,1) === '!')
+      if(configArr[i] === currentVariant)
       {
-        configArr[i] = configArr[i].split('@')[0];
+        configArr.splice(i, 1);
       }
     }
     var newConfig = configArr.join(',');
@@ -294,6 +309,7 @@ class Builder extends Classs<Props>
         canCloseColumn={colKeys.length > 1}
         variant={this.reduxState[this.getSelectedId()]}
         history={this.props.history}
+        onRevert={this.save}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key: colKeys[index],

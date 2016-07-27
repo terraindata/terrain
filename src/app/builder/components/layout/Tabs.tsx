@@ -323,7 +323,6 @@ class Tabs extends Classs<TabsProps> {
   
   handleClose(id:ID)
   {
-    console.log("Handle close of " + id);
     this.props.history.pushState({}, this.getCloseTo(id));
   }
   
@@ -337,9 +336,7 @@ class Tabs extends Classs<TabsProps> {
   getCloseTo(id)
   {
     let {tabs} = this.state;
-    console.log(tabs);
     let tab = this.state.tabs.find(tab => tab.id === id);
-    console.log(tab);
     return '/builder/' + (tab.selected && tabs.length > 1 ? '!' : '')
       + tabs.map(tab => 
         tab.id === id ? null : 
