@@ -141,7 +141,10 @@ class VariantVersions extends Classs<Props>
             extra={role}
           />
         </div>
-        <div className="versions-table-element versions-table-text-element">
+        <div 
+          className="versions-table-element versions-table-text-element"
+          data-tip={moment(version.createdAt).format('MMMM Do YYYY, h:mm:ss a') }
+        >
           {moment(version.createdAt).fromNow()}
         </div>
         <div className="versions-table-right-align">
