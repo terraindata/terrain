@@ -147,6 +147,7 @@ class VariantVersions extends Classs<Props>
         >
           {moment(version.createdAt).fromNow()}
         </div>
+        <div className='versions-table-white-space'/>
         <div className="versions-table-right-align">
           {i === 0 ? "Current Version" : null}
         </div>

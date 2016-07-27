@@ -27,7 +27,7 @@
 		overflow-y: auto;
 		max-height: 210px; //5 entries
 		.versions-table-row {
-			padding: 6px;
+			padding: 8px;
 			width: 100%;
 			padding-left: 0px;
 			height: 30px;
@@ -41,9 +41,9 @@
 			}
 			.versions-table-line {
 				width: calc(~"100% - 5px");
-				position: relative;
+				position: absolute;
 				border-bottom: 1px solid fade(@version-table-color, 50%);
-				top: 36px;
+				top: 45px;
 				left: 5px;
 			}
 			.versions-table-element {
@@ -60,6 +60,10 @@
 					max-width: 40%;
 				}
 			}
+			// .versions-table-white-space {
+			// 	flex: 1;
+
+			// }
 			.versions-table-right-align {
 				position: relative;
 				top: 7px;
@@ -67,6 +71,7 @@
 				overflow-y: auto;
 				overflow-x: hidden;
 				white-space: normal;
+				text-align: right;
 			}
 		}
 	}
