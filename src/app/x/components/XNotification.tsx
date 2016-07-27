@@ -42,29 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./X.less');
-import * as React from 'react';
-import * as _ from 'underscore';
 import Classs from './../../common/components/Classs.tsx';
-import XCards from './XCards.tsx';
-import { Link } from 'react-router';
-import XNotification from './XNotification.tsx';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+var NotificationSystem = require('react-notification-system');
 
-const xes =
-{
-  cards:
-  {
-    name: 'Cards Drag & Drop',
-    component: XCards,
-  },
-  notifications:
-  {
-    name: 'In-app Notifications',
-    component: XNotification,
-  }
-};
-
-interface Props
+interface XNotificationProps
 {
   params?: any;
   history?: any;
@@ -73,40 +56,41 @@ interface Props
   };
 }
 
-class X extends Classs<Props>
+class XNotification extends Classs<XNotificationProps>
 {
+  notificationSystem=null;
+  autoDismissTimeout = 5;
+
   constructor(props)
   {
     super(props);
   }
   
+  addNotification() {
+    var system: any = this.refs['notificationSystem'];
+    system.addNotification({
+      title: 'Message',
+      message: 'You just did something great and you deserve a notification',
+      level: 'info',
+      autoDismiss: 5, //This should be setable 
+      dismissible: true, //also setable
+    });
+  }
+
   render()
   {
-    let { x } = this.props.params;
-    
-    if(x && xes[x])
-    {
-      let C =  xes[x].component;
-      return <C {...this.props} />;
-    }
-    
     return (
-      <div className='x-area'>
-        <div className='x-title'>
-          Experiments
-        </div>
-        {
-          _.keys(xes).map(indX =>
-            <Link to={`/x/${indX}`} key={indX}>
-              <div className='x-x'>
-                { xes[indX].name }
-              </div>
-            </Link>
-          )
-        }
+      <div>
+      <div 
+        className='button'
+        onClick={this.addNotification}
+      >
+        Testing
+      </div>
+      <NotificationSystem ref='notificationSystem'/>
       </div>
     );
   }
 }
 
-export default X;
+export default XNotification;
