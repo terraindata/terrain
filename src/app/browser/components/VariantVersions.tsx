@@ -49,7 +49,7 @@ import BrowserTypes from './../BrowserTypes.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import UserTypes from './../../users/UserTypes.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
-import Ajax from './../../util//Ajax.tsx';
+import Ajax from './../../util/Ajax.tsx';
 import * as moment from 'moment';
 import RoleTypes from '../../roles/RoleTypes.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';

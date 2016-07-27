@@ -260,12 +260,11 @@ var BuilderColumn = React.createClass<any, any>(
   {
     if (this.props.variant.version) 
     {
-      if (!confirm('Are you sure you want to revert?')) 
+      if (confirm('Are you sure you want to revert?')) 
       {
-        return;
+        this.props.onRevert();
       }
     }
-    this.props.onRevert();
   },
 
   builderVersionToolbar(canEdit)
