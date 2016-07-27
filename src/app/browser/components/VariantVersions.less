@@ -7,7 +7,7 @@
 .versions-table-wrapper {
 	position: relative;
 	top: 50px;
-
+	max-height: calc(~"100%-50px");
 	.versions-table-title {
 		float: left;
 		color: fade(@version-table-color, 80%);
@@ -25,7 +25,8 @@
 		cursor: pointer;
 		border-radius: 6px;
 		overflow-y: auto;
-		max-height: 210px; //5 entries
+		overflow-x: hidden;
+		//max-height: 210px;
 		.versions-table-row {
 			padding: 8px;
 			width: 100%;
@@ -60,14 +61,10 @@
 					max-width: 40%;
 				}
 			}
-			// .versions-table-white-space {
-			// 	flex: 1;
-
-			// }
 			.versions-table-right-align {
 				position: relative;
 				top: 7px;
-				right: 6px;
+				right:0px;
 				overflow-y: auto;
 				overflow-x: hidden;
 				white-space: normal;
