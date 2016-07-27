@@ -269,7 +269,6 @@ var BuilderColumn = React.createClass<any, any>(
         }
       }
       var newConfig = configArr.join(',');
-      console.log(newConfig);
       this.props.history.replaceState({}, `/builder/${newConfig}`);
     }
   },
@@ -292,7 +291,7 @@ var BuilderColumn = React.createClass<any, any>(
                   <div 
                     className='button builder-revert-button' 
                     onClick={this.revertVersion} 
-                    data-tip="Resets the Variant's contents to this version. You can always ndo the revert, and reverting does not lose any of the Variant's history."
+                    //data-tip="Resets the Variant's contents to this version. You can always undo the revert, and reverting does not lose any of the Variant's history."
                   >
                     Revert to this version
                   </div>
