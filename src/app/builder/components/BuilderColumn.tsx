@@ -63,6 +63,11 @@ var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 var LockedIcon = require("./../../../images/icon_lock.svg?name=LockedIcon");
 
+var BuilderIcon = require("./../../../images/icon_builder.svg");
+var ResultsIcon = require("./../../../images/icon_resultsDropdown.svg");
+var TQLIcon = require("./../../../images/icon_tql.svg");
+var InputsIcon = require("./../../../images/icon_input.svg");
+
 enum COLUMNS {
   Builder,
   Results,
@@ -70,6 +75,13 @@ enum COLUMNS {
   Inputs,
 };
 var NUM_COLUMNS = 4;
+
+var menuIcons = [
+    {icon: <BuilderIcon />, color: '#76a2c1'},
+    {icon: <ResultsIcon />, color: '#71bca2'},
+    {icon: <TQLIcon />, color: '#d47884'},
+    {icon: <InputsIcon />, color: '#c2b694'}
+];
 
 // interface Props
 // {
@@ -231,6 +243,8 @@ var BuilderColumn = React.createClass<any, any>(
     var options: MenuOption[] = _.range(0, NUM_COLUMNS).map(index => ({
       text: COLUMNS[index],
       onClick: this.switchView,
+      icon: menuIcons[index].icon,
+      iconColor: menuIcons[index].color
     }));
     
     options[this.state.column].disabled = true;
@@ -279,7 +293,7 @@ var BuilderColumn = React.createClass<any, any>(
             { this.state.loading ? <div className='builder-column-loading'>Loading...</div> : '' }
           </div>
           <div className='builder-title-bar-options'>
-            <Menu options={this.getMenuOptions()} />
+            <Menu options={this.getMenuOptions()}/>
             {
               this.props.canAddColumn && 
                 <SplitScreenIcon

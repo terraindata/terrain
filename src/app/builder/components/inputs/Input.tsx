@@ -54,6 +54,11 @@ import CreateLine from '../../../common/components/CreateLine.tsx';
 import DatePicker from '../../../common/components/DatePicker.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
 
+var TextIcon = require("./../../../../images/icon_textDropdown.svg");
+var DateIcon = require("./../../../../images/icon_dateDropdown.svg");
+var NumberIcon = require("./../../../../images/icon_numberDropdown.svg");
+var CloseIcon = require("./../../../../images/icon_close_8x8.svg");
+
 type IInput = BuilderTypes.IInput;
 let InputType = BuilderTypes.InputType;
 
@@ -99,8 +104,8 @@ var Input = React.createClass<any, any>({
   {
     Actions.inputs.changeType(this.props.input, BuilderTypes.InputType.NUMBER, this.props.index);
   },
-  
-  remove()
+
+  closeInput()
   {
     Util.animateToHeight(this.refs.input, 0);
     setTimeout(() => {
@@ -112,7 +117,7 @@ var Input = React.createClass<any, any>({
   {
     Actions.inputs.create(this.props.input.parentId, this.props.index);
   },
-  
+
   getMenuOptions()
   {
     return [
@@ -120,23 +125,26 @@ var Input = React.createClass<any, any>({
         text: 'Number',
         onClick: this.convertToNumber,
         disabled: this.props.input.type === InputType.NUMBER,
+        icon: <NumberIcon />, 
+        iconColor: '#805DA8',
       },
       {
         text: 'Text',
         onClick: this.convertToText,
         disabled: this.props.input.type === InputType.TEXT,
+        icon: <TextIcon />, 
+        iconColor: '#31B2BC',
       },
       {
         text: 'Date',
         onClick: this.convertToDate,
         disabled: this.props.input.type === InputType.DATE,
+        icon: <DateIcon />, 
+        iconColor: '#FF735B',
       },
-      {
-        text: 'Remove',
-        onClick: this.remove,
-      }
     ];
   },
+
   
   renderInputValue()
   {
@@ -180,16 +188,22 @@ var Input = React.createClass<any, any>({
               {...this.props}
               canEdit={true}
               value={this.props.input.key}
-              className="input-text input-text-first"
+              className="input-text input-text-first input-borderless"
               id={this.props.input.id}
               keyPath={['key']}
             />
-            <Menu options={this.getMenuOptions()} />
+            <Menu 
+              options={this.getMenuOptions()} 
+              style={{right:'28px'}}
+            />
+            <div className='input-close' onClick={this.closeInput}> 
+              <CloseIcon /> 
+            </div>
           </div>
           <div className='input-bottom-row'>
-            {
-              this.renderInputValue()
-            }
+          {
+            this.renderInputValue()
+          }
           </div>
         </div>
 			</div>

@@ -57,12 +57,15 @@ export interface MenuOption {
   text: string;
   onClick: (index:number) => void;
   disabled?: boolean;
+  icon?: any;
+  iconColor?: string;
 };
 
 interface Props
 {
   options: MenuOption[];
   small?: boolean;
+  style?: any,
 }
 
 class Menu extends Classs<Props>
@@ -90,10 +93,18 @@ class Menu extends Classs<Props>
         option.onClick(index);
       };
     }
-    
     return (
       <div className={"menu-option" + (option.disabled ? " menu-option-disabled" : "")} key={index} onClick={onClick}>
-        <div className="dead-center">
+        <div 
+          className="menu-option-icon" 
+          style={{
+            fill: option.iconColor || 'black',
+          }}>
+          {option.icon}
+        </div>
+        <div 
+          className={option.icon ? "menu-text-padding" : "menu-text-padding-no-icon"}
+        >
           { option.text }
         </div>
       </div>
@@ -132,25 +143,40 @@ class Menu extends Classs<Props>
       return null;
     }
     
+    var multiplier = 10;
+    if(options[0].icon) 
+    {
+      multiplier = 14;
+    } 
+    var width = multiplier * options.reduce((max, option) => 
+        option.text.length > max ? option.text.length : max, 1)
+
     var style = {
-      width: 14 * options.reduce((max, option) => 
-        option.text.length > max ? option.text.length : max, 1),
+      width: width,
       height: options.length * optionHeight,
     };
     
     return (
-      <div
-        className={classNames({
-          "menu-wrapper": true,
-          "menu-wrapper-small": this.props.small,
-          "menu-open": this.state.open,        
-        })}
-        style={style}
+    <div 
+      className={classNames({
+        "menu-wrapper": true,
+        "menu-wrapper-small": this.props.small,
+        "menu-open": this.state.open,
+      })}
+      style={this.props.style ? this.props.style : null}
+    >
+      <div 
+        className="menu-icon-wrapper"
         onClick={this.toggleOpen}
       >
         <MoreIcon className="menu-icon" />
+       </div>
         { !this.state.open ? null :
-          <div className="menu-options-wrapper">
+          <div 
+            className="menu-options-wrapper"
+            style={style} 
+            onClick={this.toggleOpen}
+          >
             {
               options.map(this.renderOption)
             }

@@ -27,21 +27,21 @@
 			margin-bottom: 12px;
 		}
 	}
-  
+    
+  .builder-tb {
+    input {
+      border: none !important;
+    }
+  }
+
   .input-top-row {
     position: relative;
     margin-right: -5px;
-    
+    .builder-tb {
+      width: calc(~"100% - 60px");
+    }
     .input-text {
       width: calc(~"100% - 35px");
-    }
-  }
-  
-  .menu-wrapper {
-    background: #b0be9f;
-    
-    &:hover {
-      background: #828C76;
     }
   }
   
@@ -60,4 +60,14 @@
   .create-line-row {
     opacity: 0;
   }
+}
+
+.input-close {
+  width: 15px;
+  right: 6px;
+  float: right;
+  position: relative;
+  display: inline-block;
+  top: -22px;
+  fill: #abc29f;
 }
