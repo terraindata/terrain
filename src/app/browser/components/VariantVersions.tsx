@@ -81,19 +81,23 @@ class VariantVersions extends Classs<Props>
   {
     super(props);
     
-    this._subscribe(UserStore, {
+    this._subscribe(UserStore, 
+    {
       stateKey: 'users', 
       storeKeyPath: ['users'],
     });
-    this._subscribe(RolesStore, {
+    this._subscribe(RolesStore, 
+    {
       stateKey: 'roles', 
     });
   }
 
-  componentWillMount() {
+  componentWillMount() 
+  {
     Ajax.getVariantVersions(this.props.variant.id, (versions) =>
     {
-      if(versions) {
+      if(versions) 
+      {
         versions.reverse();
         this.setState({
           versions: versions,
@@ -106,7 +110,8 @@ class VariantVersions extends Classs<Props>
   {
     Ajax.getVariantVersions(nextProps.variant.id, (versions) =>
     {
-      if(versions) {
+      if(versions) 
+      {
         versions.reverse();
         this.setState({
           versions: versions,
@@ -115,7 +120,8 @@ class VariantVersions extends Classs<Props>
     });
   }
 
-  showVersion(versionID, i) {
+  showVersion(versionID, i) 
+  {
     var url = '/builder/?o=' + this.props.variant.id;
     if(i !== 0) 
     {
@@ -124,7 +130,8 @@ class VariantVersions extends Classs<Props>
     this.props.history.pushState({}, url);
   }
 
-  renderVersion(version, i) {
+  renderVersion(version, i) 
+  {
     //Get the role of the user
     let {roles} = this.state;
     let groupId = this.props.variant.groupId;

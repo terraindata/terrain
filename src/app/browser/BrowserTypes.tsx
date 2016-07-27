@@ -84,7 +84,7 @@ export module BrowserTypes
   {
     id: ID;
     name: string;
-    lastEdited: any;
+    lastEdited: string;
     lastUsername: string;
     status: EVariantStatus;
     algorithmId: ID;
