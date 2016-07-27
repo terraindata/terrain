@@ -51,35 +51,22 @@ import Input from "../inputs/Input.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateLine from '../../../common/components/CreateLine.tsx';
 import InfoArea from '../../../common/components/InfoArea.tsx';
+import PureClasss from '../../../common/components/PureClasss.tsx';
+import BuilderTypes from '../../BuilderTypes.tsx';
+type IInput = BuilderTypes.IInput;
 
-var InputsArea = React.createClass<any, any>({
-	propTypes:
-	{
-		inputs: React.PropTypes.array.isRequired,
-    parentId: React.PropTypes.string.isRequired,
-	},
-  
-  getInitialState()
-  {
-    return {
-      title: 'Inputs',
-    };
-  },
-  
+interface Props
+{
+  inputs: List<IInput>;
+  queryId: ID;
+}
+
+class InputsArea extends PureClasss<Props>
+{
   createInput()
   {
-    Actions.inputs.create(this.props.parentId, 0);
-  },
-  
-  copyAll()
-  {
-    console.log('copy');
-  },
-  
-  removeAll()
-  {
-    console.log('remove');
-  },
+    Actions.inputs.create(this.props.queryId, 0);
+  }
   
   renderNoInputs()
   {
@@ -90,11 +77,11 @@ var InputsArea = React.createClass<any, any>({
     return (
       <InfoArea large={large} button={button} onClick={onClick} />
     );
-  },
+  }
   
   render()
   {
-    if(this.props.inputs.length === 0)
+    if(this.props.inputs.size === 0)
     {
       return this.renderNoInputs();
     }
@@ -105,7 +92,7 @@ var InputsArea = React.createClass<any, any>({
           content: <Input input={input} index={index} />,
           key: input.id,
         };
-      }),
+      }).toJS(),
       fullHeight: true,
     };
     
@@ -127,7 +114,7 @@ var InputsArea = React.createClass<any, any>({
         <LayoutManager layout={layout} moveTo={moveTo} />
       </div>
     );
-  },
-});
+  }
+}
 
 export default InputsArea;

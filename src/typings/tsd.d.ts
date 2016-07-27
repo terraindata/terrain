@@ -55,6 +55,14 @@ interface Array<T> {
   findIndex(predicate: (search: T) => boolean) : number;
 }
 
+declare type List<T> = Immutable.List<T>;
+declare type Map<K, T> = Immutable.Map<K, T>;
+declare type KeyPath = List<string | number>;
+declare interface IHaveKeyPath
+{
+  keyPath: KeyPath;
+}
+
 declare type ID = string;
 declare interface IId
 {

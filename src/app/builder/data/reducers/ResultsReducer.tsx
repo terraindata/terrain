@@ -50,7 +50,7 @@ var ResultsReducer = {};
 
 ResultsReducer[ActionTypes.results.move] =
   (state, action) =>
-    state.updateIn(['algorithms', action.payload.result.parentId, 'results'], results =>
+    state.updateIn(['queries', action.payload.result.parentId, 'results'], results =>
       Util.immutableMove(results, action.payload.result.id, action.payload.index)
         .map(result => result.get('id') === action.payload.result.id ?
           result.set('pinned', true).set('original_index', results.findIndex(result => result.get('id') === action.payload.result.id)) : result)
@@ -58,14 +58,14 @@ ResultsReducer[ActionTypes.results.move] =
 
 ResultsReducer[ActionTypes.results.spotlight] =
   (state, action) =>
-    state.updateIn(['algorithms', action.payload.result.parentId, 'results'], results =>
+    state.updateIn(['queries', action.payload.result.parentId, 'results'], results =>
       results.update(results.findIndex(result => result.get('id') === action.payload.result.id),
         result => result.set('spotlight', action.payload.value)));
 
 
 ResultsReducer[ActionTypes.results.pin] =
   (state, action) =>
-    state.updateIn(['algorithms', action.payload.result.parentId, 'results'], results =>
+    state.updateIn(['queries', action.payload.result.parentId, 'results'], results =>
       {
         var resultIndex = results.findIndex(result => result.get('id') === action.payload.result.id);
         var newResults: any = results.update(resultIndex,

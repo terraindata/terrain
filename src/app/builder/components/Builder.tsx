@@ -54,14 +54,17 @@ var HTML5Backend = require('react-dnd-html5-backend');
 
 // Data
 import Store from "./../data/BuilderStore.tsx";
+import { BuilderState } from "./../data/BuilderStore.tsx";
 import Actions from "./../data/BuilderActions.tsx";
 import Util from "./../../util/Util.tsx";
 import UserActions from '../../users/data/UserActions.tsx';
 import RolesActions from '../../roles/data/RolesActions.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
+import Types from '../BuilderTypes.tsx';
+type IQuery = Types.IQuery;
 
 // Components
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 import BuilderColumn from "./BuilderColumn.tsx";
 import Tabs from "./layout/Tabs.tsx";
 import LayoutManager from "./layout/LayoutManager.tsx";
@@ -75,6 +78,8 @@ var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
 var DuplicateIcon = require("./../../../images/icon_duplicate_11x12.svg?name=DuplicateIcon");
 var SaveIcon = require("./../../../images/icon_save_10x10.svg?name=SaveIcon");
 
+let { Map, List } = Immutable;
+
 interface Props
 {
   params?: any;
@@ -82,22 +87,14 @@ interface Props
   location?: any;
 }
 
-class Builder extends Classs<Props>
+class Builder extends PureClasss<Props>
 {
-  // This variable is needed because React's state has not been working well with
-  //  Redux's state. For instance, if I just do:
-  //   this.setState(Store.getState().toJS())
-  //  then I can't close tabs. React doesn't seem to pick up
-  //  on keys being deleted from the state correctly.
-  reduxState: any;
-  cancelSubscription = null;
-  
   state: {
-    loading: boolean;
-    colKeys: number[];
+    builder: BuilderState,
+    colKeys: List<number>;
     noColumnAnimation: boolean;
   } = {
-    loading: true,
+    builder: Store.getState(),
     colKeys: null,
     noColumnAnimation: false,
   };
@@ -105,35 +102,24 @@ class Builder extends Classs<Props>
   constructor(props:Props)
   {
     super(props);
+    
+    this._subscribe(Store, {
+      stateKey: 'builder',
+    });
+    
+    if(localStorage.getItem('colKeys'))
+    {
+      var colKeys = List(JSON.parse(localStorage.getItem('colKeys'))) as List<number>;
+    }
+    else
+    {
+      var colKeys = List([Math.random(), Math.random()]);
+    }
+    this.state.colKeys = colKeys;
   }
   
   componentWillMount()
   {
-    this.cancelSubscription =
-      Store.subscribe(() => {
-        var newState = Store.getState().toJS();
-        this.reduxState = newState.algorithms;
-        this.setState({
-          random: Math.random(),
-          loading: false,
-        });
-      });
-
-    // Some day in the distant future, you may consider
-    //  removing this 'toJS()' call and making
-    //  the whole Builder app built upon Immutable state.    
-    this.reduxState = Store.getState().toJS().algorithms;
-    const algorithmId = _.first(_.keys(this.reduxState));
-    
-    var colKeys = [Math.random(), Math.random()];
-    this.setState(
-    {
-      random: Math.random(),
-      algorithmId,
-      colKeys,
-      noColumnAnimation: false,
-    });
-    
     this.checkConfig(this.props);
     RolesActions.fetch();
   }
@@ -207,9 +193,9 @@ class Builder extends Classs<Props>
     return selected && selected.substr(1);
   }
   
-  componentWillUnmount()
+  getQuery(): IQuery
   {
-    this.cancelSubscription();
+    return this.state.builder.queries.get(this.getSelectedId());
   }
   
   createAlgorithm()
@@ -247,57 +233,66 @@ class Builder extends Classs<Props>
   
   save()
   {
-    Ajax.saveItem(BrowserTypes.touchVariant(Immutable.fromJS(this.reduxState[this.getSelectedId()])));
+    Ajax.saveItem(BrowserTypes.touchVariant(this.state.builder.queries.get(this.getSelectedId()) as BrowserTypes.Variant));
   }
   
   getLayout()
   {
     return {
-      stackAt: 650,
       fullHeight: true,
       columns:
-        _.range(0, this.state.colKeys.length).map(index => 
-          this.getColumn(this.reduxState[this.getSelectedId()], index, this.state.colKeys)
+        _.range(0, this.state.colKeys.size).map(index => 
+          this.getColumn(index)
         )
     };
   }
   
-  getColumn(algorithm, index, colKeys: number[])
+  getColumn(index)
   {
+    let key = this.state.colKeys.get(index);
+    let query = this.getQuery();
     return {
       minWidth: 316,
       resizeable: true,
       resizeHandleRef: 'resize-handle',
-      content: algorithm && <BuilderColumn
-        algorithm={algorithm} 
+      content: query && <BuilderColumn
+        colKey={key}
+        query={query}
         index={index}
         onAddColumn={this.handleAddColumn}
         onCloseColumn={this.handleCloseColumn}
-        canAddColumn={colKeys.length < 3}
-        canCloseColumn={colKeys.length > 1}
+        canAddColumn={this.state.colKeys.size < 3}
+        canCloseColumn={this.state.colKeys.size > 1}
       />,
       // hidden: this.state && this.state.closingIndex === index,
-      key: colKeys[index],
+      key,
     }
   }
   
   handleAddColumn(index)
   {
     index = index + 1;
-    var colKeys = _.clone(this.state.colKeys);
-    colKeys.splice(index, 0, Math.random());
+    let colKeys = this.state.colKeys.splice(index, 0, Math.random());
     this.setState({
       colKeys,
     }); 
+    localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
   }
   
   handleCloseColumn(index)
   {
-    var colKeys = _.clone(this.state.colKeys);
-    colKeys.splice(index, 1);
+    let oldKey = this.state.colKeys[index];
+    let colKeys = this.state.colKeys.splice(index, 1);
     this.setState({
       colKeys,
     }); 
+    localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
+    
+    if(localStorage.getItem('colKeyTypes'))
+    {
+      var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes'));
+      delete colKeyTypes[oldKey];
+    }
   }
   
   handleEmptyTabs(tabIds: ID[])
@@ -367,7 +362,7 @@ class Builder extends Classs<Props>
           reportEmptyTabs={this.handleEmptyTabs}
         />
         {
-          !_.keys(this.reduxState).length ? 
+          !this.state.builder.queries.keySeq().size ? 
             <InfoArea
               large='No variants open'
               small='You can open one in the Browser'

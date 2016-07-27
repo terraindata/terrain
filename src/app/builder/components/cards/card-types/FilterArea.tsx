@@ -51,7 +51,7 @@ import BuilderTextbox from "../../../../common/components/BuilderTextbox.tsx";
 import BuilderTextboxCards from "../../../../common/components/BuilderTextboxCards.tsx";
 import CardField from './../CardField.tsx';
 import Dropdown from './../../../../common/components/Dropdown.tsx';
-import { Operators, Combinators } from './../../../CommonVars.tsx';
+import { Operators, Combinators } from './../../../BuilderTypes.tsx';
 import { BuilderTypes } from './../../../BuilderTypes.tsx';
 import Classs from './../../../../common/components/Classs.tsx';
 
@@ -146,7 +146,7 @@ class FilterArea extends Classs<Props>
             />
           </div>
           <div className='builder-operator'>
-            { index === this.props.card.filters.length - 1 ? null :
+            { index === this.props.card.filters.size - 1 ? null :
               <Dropdown
                 {...this.props}
                 circle={true}
@@ -182,15 +182,16 @@ class FilterArea extends Classs<Props>
   }
 
 	render() {
+    // TODO fix key
     return (
       <div>
-        { this.props.card.filters.length === 0 && this.renderNoFilters() }
+        { this.props.card.filters.size === 0 && this.renderNoFilters() }
         <LayoutManager
           layout={{
             reorderable: true,
             rows: this.props.card.filters.map((filter, index) => (
               {
-                key: filter.id,
+                key: index,
                 content: this.renderFilter(filter, index)
               })
             )

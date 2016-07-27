@@ -44,11 +44,14 @@ THE SOFTWARE.
 
 var Immutable = require('immutable');
 import BrowserTypes from './../../../browser/BrowserTypes.tsx';
+import BuilderTypes from './../../BuilderTypes.tsx';
 import Ajax from './../../../util/Ajax.tsx';
 import ActionTypes from './../BuilderActionTypes.tsx';
 import Util from './../../../util/Util.tsx';
 import Actions from './../BuilderActions.tsx';
 import * as _ from 'underscore';
+
+// TODO rename from Variant
 
 var VariantReducer = {};
 
@@ -63,8 +66,10 @@ VariantReducer[ActionTypes.fetch] =
           {
             return;
           }
-          item.cards = Immutable.fromJS(item.cards || []);
-          item.inputs = Immutable.fromJS(item.inputs || []);
+          
+          item.cards = BuilderTypes.recordsFromJS(item.cards || []);
+          item.inputs = BuilderTypes.recordsFromJS(item.inputs || []);
+          console.log('setVariant', item.cards, item.inputs);
           Actions.setVariant(variantId, item);
         }
       )
@@ -74,15 +79,19 @@ VariantReducer[ActionTypes.fetch] =
 
 VariantReducer[ActionTypes.setVariant] =
   (state, action) =>
-    state.setIn(['algorithms', action.payload.variantId],
+    state.setIn(['queries', action.payload.variantId],
       new BrowserTypes.Variant(action.payload.variant)
     );
 
 
 VariantReducer[ActionTypes.setVariantField] =
   (state, action) =>
-    state.setIn(['algorithms', action.payload.variantId, action.payload.field],
+    state.setIn(['queries', action.payload.variantId, action.payload.field],
       action.payload.value
     );
   
+VariantReducer[ActionTypes.change] = 
+  (state, action) =>
+    state.setIn(action.node.keyPath.toJS(), action.node);
+
 export default VariantReducer;

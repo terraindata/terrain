@@ -55,6 +55,10 @@ var $ = (type: string, payload: any) => Store.dispatch({type, payload})
 
 var BuilderActions =
 {
+  change:
+    (node: IHaveKeyPath) =>
+      $(ActionTypes.change, { node }),
+  
   cards:
   {
     create:
@@ -120,11 +124,11 @@ var BuilderActions =
     select:
     {
       move: 
-        (card: BuilderTypes.ISelectCard, property: BuilderTypes.IProperty, index: number) =>
+        (card: BuilderTypes.ISelectCard, property: string, index: number) =>
           $(ActionTypes.cards.select.move, {card, property, index}),
 
       change: 
-        (card: BuilderTypes.ISelectCard, index: number, value: BuilderTypes.IProperty) =>
+        (card: BuilderTypes.ISelectCard, index: number, value: string) =>
           $(ActionTypes.cards.select.change, {card, index, value}),
 
       remove: 

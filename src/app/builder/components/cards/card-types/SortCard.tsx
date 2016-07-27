@@ -48,7 +48,7 @@ import Util from '../../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import Dropdown from './../../../../common/components/Dropdown.tsx';
 import CardField from './../CardField.tsx';
-import { Directions } from './../../../CommonVars.tsx';
+import { Directions } from './../../../BuilderTypes.tsx';
 import { BuilderTypes } from './../../../BuilderTypes.tsx';
 import BuilderTextbox from "../../../../common/components/BuilderTextbox.tsx";
 import Classs from './../../../../common/components/Classs.tsx';
@@ -115,7 +115,7 @@ class SortCard extends Classs<Props>
   
   render()
   {
-    if(this.props.card.sorts.length === 0)
+    if(this.props.card.sorts.size === 0)
     {
       return <div className='info-message info-message-clickable' onClick={this.addSort}>Click to add a sort</div>;
     }
@@ -125,7 +125,7 @@ class SortCard extends Classs<Props>
       layout={{
         reorderable: true,
         rows: this.props.card.sorts.map((sort, index) => ({
-          key: sort.id,
+          key: sort,
           content: this.renderSort(sort, index)
         }))
       }}

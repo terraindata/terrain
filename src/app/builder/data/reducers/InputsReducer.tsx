@@ -50,7 +50,7 @@ var InputsReducer = {};
 
 InputsReducer[ActionTypes.inputs.create] =
   (state, action) =>
-    state.updateIn(['algorithms', action.payload.parentId, 'inputs'], inputs =>
+    state.updateIn(['queries', action.payload.parentId, 'inputs'], inputs =>
       inputs.splice(Util.spliceIndex(action.payload.index, inputs), 0, Immutable.fromJS({
         key: '',
         value: '',
@@ -61,27 +61,27 @@ InputsReducer[ActionTypes.inputs.create] =
 
 InputsReducer[ActionTypes.inputs.move] =
   (state, action) => 
-    state.updateIn(['algorithms', action.payload.input.parentId, 'inputs'], inputs =>
+    state.updateIn(['queries', action.payload.input.parentId, 'inputs'], inputs =>
       Util.immutableMove(inputs, action.payload.input.id, action.payload.index));
 
 InputsReducer[ActionTypes.inputs.changeKey] =
   (state, action) =>
-    state.setIn(['algorithms', action.payload.input.parentId, 'inputs', action.payload.index, 'key'],
+    state.setIn(['queries', action.payload.input.parentId, 'inputs', action.payload.index, 'key'],
       action.payload.value);
 
 InputsReducer[ActionTypes.inputs.changeValue] =
   (state, action) =>
-    state.setIn(['algorithms', action.payload.input.parentId, 'inputs', action.payload.index, 'value'],
+    state.setIn(['queries', action.payload.input.parentId, 'inputs', action.payload.index, 'value'],
       action.payload.value);
 
 InputsReducer[ActionTypes.inputs.changeType] =
   (state, action) =>
-    state.setIn(['algorithms', action.payload.input.parentId, 'inputs', action.payload.index, 'type'],
+    state.setIn(['queries', action.payload.input.parentId, 'inputs', action.payload.index, 'type'],
       action.payload.value);
 
 InputsReducer[ActionTypes.inputs.remove] =
   (state, action) =>
-    state.updateIn(['algorithms', action.payload.input.parentId, 'inputs'], inputs =>
+    state.updateIn(['queries', action.payload.input.parentId, 'inputs'], inputs =>
       inputs.delete(inputs.findIndex(input => input.get('id') === action.payload.input.id)));
 
 export default InputsReducer;

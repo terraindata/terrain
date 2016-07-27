@@ -45,6 +45,7 @@ THE SOFTWARE.
 import Util from './../util/Util.tsx';
 import UserTypes from './../users/UserTypes.tsx';
 import RoleTypes from './../roles/RoleTypes.tsx';
+import BuilderTypes from './../builder/BuilderTypes.tsx';
 import * as Immutable from 'immutable';
 
 export module BrowserTypes
@@ -79,7 +80,7 @@ export module BrowserTypes
     dataFields: ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs'],    
     statusMap: (s:EVariantStatus) => EVariantStatus[s],
   });
-  export class Variant extends _Variant
+  export class Variant extends _Variant implements BuilderTypes.IQuery
   {
     id: ID;
     name: string;
@@ -89,8 +90,9 @@ export module BrowserTypes
     algorithmId: ID;
     groupId: Group;
 
-    cards: any;
-    inputs: any;
+    cards: List<BuilderTypes.ICard>;
+    inputs: List<BuilderTypes.IInput>;
+    
     mode: string;
     tql: string;
     

@@ -51,7 +51,7 @@ import Util from '../../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import Dropdown from './../../../../common/components/Dropdown.tsx';
 import CardField from './../CardField.tsx';
-import { Directions } from './../../../CommonVars.tsx';
+import { Directions } from './../../../BuilderTypes.tsx';
 import { BuilderTypes } from './../../../BuilderTypes.tsx';
 import Classs from './../../../../common/components/Classs.tsx';
 import TransformCardChart from './TransformCardChart.tsx';

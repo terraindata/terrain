@@ -91,7 +91,7 @@ var immutableCardsUpdate =
     {
       keysToUpdate = [keysToUpdate as string];
     }
-    return state.update('algorithms', algorithms => algorithms.map((algorithm) => {
+    return state.update('queries', algorithms => algorithms.map((algorithm) => {
       var a = (keysToUpdate as string[]).reduce(
         (algorithm, keyToUpdate) => immutableCardsUpdateHelper(algorithm, keyToUpdate, id, updater)
       , algorithm);
@@ -101,7 +101,7 @@ var immutableCardsUpdate =
 
 var immutableCardsSetIn = 
   (state: any, id: string, keyPath: string[], value) => {
-    return state.update('algorithms', algorithms => 
+    return state.update('queries', algorithms => 
       immutableCardsUpdateHelper(algorithms, keyPath, id,
         (n) => Immutable.fromJS(value))
   )};
@@ -232,6 +232,7 @@ var Util = {
   
   titleForCard(card: BuilderTypes.ICard): string
   {
+    console.log(card.toJS(), card.type);
     var title = card.type.charAt(0).toUpperCase() + card.type.substr(1);
     if(card.type === 'parentheses')
     {

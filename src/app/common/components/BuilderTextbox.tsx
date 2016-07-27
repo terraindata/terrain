@@ -51,7 +51,7 @@ import Actions from "../../builder/data/BuilderActions.tsx";
 import Util from '../../util/Util.tsx';
 import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
 import Card from '../../builder/components/cards/Card.tsx';
-import { CardColors } from './../../builder/CommonVars.tsx';
+import { CardColors } from './../../builder/BuilderTypes.tsx';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as classNames from 'classnames';
 import Autocomplete from './Autocomplete.tsx';
@@ -142,13 +142,7 @@ class BuilderTextbox extends React.Component<Props, any>
     }
     else if(this.isText())
     {
-      value =
-      {
-        id: 'c-' + Math.random(),
-        parentId: this.props.parentId,
-        type: 'parentheses',
-        cards: [],
-      };
+      value = BuilderTypes._IParenthesesCard();
     }
     
     this.backupValue = this.props.value;
@@ -303,13 +297,7 @@ const btbTarget =
       }
       
       var newId = 'c-' + Math.random();
-      var newCard:BuilderTypes.IParenthesesCard =
-      {
-        id: newId,
-        parentId: props.parentId,
-        type: 'parentheses',
-        cards: [],
-      };
+      var newCard:BuilderTypes.IParenthesesCard = BuilderTypes._IParenthesesCard();
       
       props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
       

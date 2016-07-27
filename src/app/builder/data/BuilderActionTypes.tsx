@@ -71,6 +71,8 @@ var change = '';
 
 var BuilderActionTypes = 
 {
+  change: '',
+  
   cards:
   {
     move,

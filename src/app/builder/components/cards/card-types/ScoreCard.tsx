@@ -86,7 +86,7 @@ class ScoreCard extends Classs<Props>
   
   handleWeightsChange(value, event)
   {
-    Actions.cards.score.changeWeights(this.props.card, _.range(0, this.props.card.weights.length).map(
+    Actions.cards.score.changeWeights(this.props.card, _.range(0, this.props.card.weights.size).map(
       index => ({
         key: this.refs[index]['value'],
         weight: parseFloat(this.refs[index + '-weight']['value']),
@@ -172,7 +172,11 @@ class ScoreCard extends Classs<Props>
   
   renderWeightGraph(weight)
   {
-    var max = _.max(this.props.card.weights.map(weight => Math.abs(weight.weight)));
+    // TODO don't recalc max every time
+    let {weights} = this.props.card;
+    var max = 0;
+    weights.map(weight => max = Math.max(Math.abs(weight.weight), max));
+    
     var perc = Math.abs(weight.weight) / max * 100;
     var style:React.CSSProperties = {
       width: perc / 2 + '%',
@@ -230,7 +234,7 @@ class ScoreCard extends Classs<Props>
           this.renderHeader()
         }
         {
-          this.props.card.weights.length === 0 && 
+          this.props.card.weights.size === 0 && 
             <div className='info-message info-message-clickable'
               onClick={this.addWeight}>Add a weight</div>
         }

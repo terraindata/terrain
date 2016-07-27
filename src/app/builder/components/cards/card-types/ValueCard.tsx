@@ -50,7 +50,7 @@ import BuilderTextbox from "../../../../common/components/BuilderTextbox.tsx";
 import Classs from './../../../../common/components/Classs.tsx';
 
 interface Props {
-  card: BuilderTypes.IValueCard;
+  card: BuilderTypes.ITakeCard | BuilderTypes.ISkipCard;
 }
 
 var placeholders =

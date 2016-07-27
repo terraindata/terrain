@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 var _ = require('underscore');
+import * as Immutable from 'immutable';
 import { Map, List } from 'immutable';
 import * as ReduxActions from 'redux-actions';
 
@@ -50,11 +51,23 @@ var Redux = require('redux');
 import ActionTypes from './BuilderActionTypes.tsx';
 import Util from '../../util/Util.tsx';
 
-import { BuilderTypes } from './../BuilderTypes.tsx';
+import Types from './../BuilderTypes.tsx';
 
-var DefaultState = Map({
-  variantIds: List([]),
-});
+export class BuilderState
+{
+  loading: boolean = false;
+  queries: Map<ID, Types.IQuery> = Map({});
+  selectedCardIds: Map<ID, boolean> = Map({});
+  
+  set: (f: string, v: any) => BuilderState;
+  setIn: (f: string, v: any) => BuilderState;
+}
+let BuilderState_Record = Immutable.Record(new BuilderState());
+let _BuilderState = (config?:any) => {
+  return new BuilderState_Record(config || {}) as any as BuilderState;
+}
+
+var DefaultState = _BuilderState();
 
 import InputsReducer from './reducers/InputsReducer.tsx';
 import ResultsReducer from './reducers/ResultsReducer.tsx';
@@ -69,7 +82,7 @@ import TransformCardReducer from './reducers/TransformCardReducer.tsx';
 import IfCardReducer from './reducers/IfCardReducer.tsx';
 import VariantReducer from './reducers/VariantReducer.tsx';
 
-let BuilderStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
+export const BuilderStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   VariantReducer,
   ResultsReducer,
   CardsReducer,

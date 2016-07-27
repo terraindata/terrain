@@ -58,6 +58,7 @@ import RolesStore from '../../roles/data/RolesStore.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
 import TQLEditor from '../../tql/components/TQLEditor.tsx';
 import InfoArea from '../../common/components/InfoArea.tsx';
+const shallowCompare = require('react-addons-shallow-compare');
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -90,46 +91,62 @@ var BuilderColumn = React.createClass<any, any>(
   
   propTypes:
   {
-    algorithm: React.PropTypes.object.isRequired,
+    query: React.PropTypes.object.isRequired,
     className: React.PropTypes.string,
     index: React.PropTypes.number,
     canAddColumn: React.PropTypes.bool,
     canCloseColumn: React.PropTypes.bool,
     onAddColumn: React.PropTypes.func.isRequired,
     onCloseColumn: React.PropTypes.func.isRequired,
+    colKey: React.PropTypes.number.isRequired,
   },
   
   getInitialState()
   {
+    var column = this.props.index;
+    if(localStorage.getItem('colKeyTypes'))
+    {
+      column = JSON.parse(localStorage.getItem('colKeyTypes'))[this.props.colKey];
+      if(column === undefined)
+      {
+        column = this.props.index;
+      }
+    }
     return {
-      column: this.props.index,
+      column,
       loading: false,
       inputKeys: this.calcinputKeys(this.props),
-      rand: 1,
+      // rand: 1,
     }
+  },
+  
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return shallowCompare(this, nextProps, nextState);
   },
   
   componentWillMount()
   {
-    let rejigger = () => this.setState({ rand: Math.random() });
-    this.unsubUser = UserStore.subscribe(rejigger);
-    this.unsubRoles = RolesStore.subscribe(rejigger);
+    // TODO delete this?
+    // let rejigger = () => this.setState({ rand: Math.random() });
+    // this.unsubUser = UserStore.subscribe(rejigger);
+    // this.unsubRoles = RolesStore.subscribe(rejigger);
   },
   
   componentWillUnmount()
   {
-    this.unsubUser && this.unsubUser();  
-    this.unsubRoles && this.unsubRoles();  
+    // this.unsubUser && this.unsubUser();  
+    // this.unsubRoles && this.unsubRoles();  
   },
   
   calcinputKeys(props)
   {
-    return props.algorithm.inputs.map(input => input.key);
+    return props.query.inputs.map(input => input.key);
   },
   
   willReceiveProps(nextProps)
   {
-    if(!_.isEqual(nextProps.algorithm.inputs, this.props.algorithm.inputs))
+    if(!_.isEqual(nextProps.query.inputs, this.props.query.inputs))
     {
       this.setState({
         inputKeys: this.calcinputKeys(nextProps.state),
@@ -163,14 +180,14 @@ var BuilderColumn = React.createClass<any, any>(
   
   renderContent(canEdit:boolean)
   {
-    var algorithm = this.props.algorithm;
-    var parentId = algorithm.id;
-
+    var query = this.props.query;
+    var parentId = query.id;
+    
     switch(this.state.column)
     {
       case COLUMNS.Builder:
         // this should be temporary; remove when middle tier arrives
-        var spotlights = algorithm.results ? algorithm.results.reduce((spotlights, result) =>
+        var spotlights = query.results ? query.results.reduce((spotlights, result) =>
         {
           if(result.spotlight)
           {
@@ -178,7 +195,7 @@ var BuilderColumn = React.createClass<any, any>(
           }
           return spotlights;
         }, []) : [];
-        if (this.props.algorithm.mode === "tql")
+        if (this.props.query.mode === "tql")
         {
           return <InfoArea
              large= "TQL Mode"
@@ -186,7 +203,7 @@ var BuilderColumn = React.createClass<any, any>(
           />;
         }
         return <CardsArea 
-          cards={algorithm.cards} 
+          cards={query.cards} 
           parentId={parentId} 
           spotlights={spotlights} 
           topLevel={true}
@@ -196,13 +213,13 @@ var BuilderColumn = React.createClass<any, any>(
         
       case COLUMNS.Inputs:
         return <InputsArea
-          inputs={algorithm.inputs}
-          parentId={parentId}
+          inputs={query.inputs}
+          queryId={parentId}
         />;
       
       case COLUMNS.Results:
         return <ResultsArea 
-          algorithm={algorithm}
+          query={query}
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
           canEdit={canEdit}
@@ -210,7 +227,7 @@ var BuilderColumn = React.createClass<any, any>(
       
       case COLUMNS.TQL:
         return <TQLEditor
-          algorithm={algorithm}
+          query={query}
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
         />;
@@ -224,6 +241,10 @@ var BuilderColumn = React.createClass<any, any>(
     this.setState({
       column: index,
     });
+    
+    var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
+    colKeyTypes[this.props.colKey] = index;
+    localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
   },
   
   getMenuOptions(): MenuOption[]
@@ -249,11 +270,11 @@ var BuilderColumn = React.createClass<any, any>(
   },
   
   render() {
-    let {algorithm} = this.props;
-    let canEdit = (algorithm.status === BrowserTypes.EVariantStatus.Build
-      && Util.canEdit(algorithm, UserStore, RolesStore))
+    let {query} = this.props;
+    let canEdit = (query.status === BrowserTypes.EVariantStatus.Build
+      && Util.canEdit(query, UserStore, RolesStore))
       || this.state.column === COLUMNS.Inputs;
-    let cantEditReason = algorithm.status !== BrowserTypes.EVariantStatus.Build ?
+    let cantEditReason = query.status !== BrowserTypes.EVariantStatus.Build ?
       'This Variant is not in Build status' : 'You are not authorized to edit this Variant';
     
     return this.renderPanel((

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -52,52 +53,59 @@ import Actions from "../../data/BuilderActions.tsx";
 import Card from "../cards/Card.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateCardTool from "./CreateCardTool.tsx";
+import PureClasss from './../../../common/components/PureClasss.tsx';
 import { DropTarget } from 'react-dnd';
+import BuilderTypes from '../../BuilderTypes.tsx';
+type ICard = BuilderTypes.ICard;
+type ICards = BuilderTypes.ICards;
 
-var CardsArea = React.createClass<any, any>({
-	propTypes:
-	{
-		cards: React.PropTypes.array.isRequired,
-    parentId: React.PropTypes.string.isRequired,
-    spotlights: React.PropTypes.array.isRequired,
-    topLevel: React.PropTypes.bool,
-    keys: React.PropTypes.array.isRequired,
-    canEdit: React.PropTypes.bool.isRequired,
-    connectDropTarget: React.PropTypes.func,
-  },
+interface Props
+{
+  cards: ICards;
+  parentId: ID; // TODO ?
+  spotlights: List<any>; // TODO spotlight type
+  topLevel: boolean;
+  keys: List<string>;
+  canEdit: boolean;
   
-  hasCardsArea()
+  connectDropTarget?: (el:JSX.Element) => JSX.Element;
+}
+
+class CardsArea extends PureClasss<Props>
+{
+  // state: {
+  //   layout: {
+  //     rows: any[],
+  //   },
+  // };
+  
+  constructor(props:Props)
   {
-    return this.props.topLevel;
-  },
+    super(props);
+    
+  }
   
-  componentWillReceiveProps(nextProps)
-  {
-    this.setState({
-      layout:
-      {
-        rows: this.getRows(nextProps),
-        useDropZones: true,
-      }
-    });
-  },
+  // componentWillReceiveProps(nextProps:Props)
+  // {
+    
+  // }
   
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  },
+  // updateRows(nextProps:Props)
+  // {
+  //   this.setState({
+  //     layout:
+  //     {
+  //       rows: this.getRows(nextProps),
+  //     }
+  //   });
+  // }
   
-  getInitialState()
+  getLayout()
   {
     return {
-      id: Util.randInt(123456789),
-      layout:
-      {
-        rows: this.getRows(this.props),
-        useDropZones: true,
-      }
+      rows: this.getRows(this.props),
     };
-  },
+  }
   
   getKeys(props)
   {
@@ -112,7 +120,7 @@ var CardsArea = React.createClass<any, any>({
         }
       , [])
     );
-  },
+  }
   
   getRows(props)
   {
@@ -144,18 +152,37 @@ var CardsArea = React.createClass<any, any>({
       ),
       key: 'end-tool',
     }]);
-  },
+  }
   
-  copy() {},
+  copy() {}
   
-  clear() {},
+  clear() {}
   
   createFromCard() {
-    Actions.cards.create(this.props.parentId, 'from', this.props.index);
-  },
+    Actions.cards.create(this.props.parentId, 'from', 0);
+  }
   
   render() {
-    if(!this.props.cards.length && this.props.topLevel)
+    let {cards, topLevel, canEdit} = this.props;
+    
+    // TODO is there a better way? store keys in the redux state?
+    console.log(cards, cards.toJS());
+    let keys = this.props.keys.concat(
+      cards.reduce(
+        (memo: List<string>, card: ICard): List<string> => {
+          console.log(card);
+          if(card.type === 'var' || card.type === 'let')
+          {
+            console.log('field', card['field']);
+            memo.push(card['field']);
+          }
+          return memo;
+        }
+      , Immutable.List([]))
+    );
+    console.log('keys', keys);
+    
+    if(!cards.size && topLevel)
     {
       return <InfoArea
         large="No cards have been created, yet."
@@ -164,18 +191,30 @@ var CardsArea = React.createClass<any, any>({
         onClick={this.createFromCard}
         />;
     }
-
+    // TODO add cards
     return this.props.connectDropTarget(
       <div
-        className={'cards-area' + (this.props.topLevel ? ' cards-area-top-level' : '')}
+        className={'cards-area' + (topLevel ? ' cards-area-top-level' : '')}
       >
-        <LayoutManager
-          layout={this.state.layout}
-        />
+        {
+          cards.map((card:ICard, index:number) =>
+            <Card 
+              {...this.props}
+              cards={null}
+              key={card.id}
+              singleCard={false}
+              topLevel={false}
+              index={index}
+              card={card}
+              dndListener={$({})}
+              keys={keys}
+            />
+          )
+        }
       </div>
     );
-  },
-});
+  }
+}
 
 
 

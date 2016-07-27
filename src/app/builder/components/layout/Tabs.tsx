@@ -181,7 +181,7 @@ class Tabs extends Classs<TabsProps> {
       {
         var variants: {[id: string]: BrowserTypes.Variant} = {};
 
-        // todo consider a different approach
+        // TODO consider a different approach
         groups.map(group =>
           group.algorithms.map(algorithm =>
             algorithm.variants.map(variant =>

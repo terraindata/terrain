@@ -51,7 +51,7 @@ import BuilderTextbox from "../../../../common/components/BuilderTextbox.tsx";
 import CardField from './../CardField.tsx';
 import Dropdown from './../../../../common/components/Dropdown.tsx';
 import CardsArea from './../CardsArea.tsx';
-import { Operators } from './../../../CommonVars.tsx';
+import { Operators } from './../../../BuilderTypes.tsx';
 import { BuilderTypes } from './../../../BuilderTypes.tsx';
 import Classs from './../../../../common/components/Classs.tsx';
 import Ajax from './../../../../util/Ajax.tsx';
@@ -134,57 +134,58 @@ class FromCard extends Classs<Props>
   
 	render()
   {
-		return (
-      <div>
-        <CardField
-          draggable={false}
-          removable={false}
-          drag_y={true}
-        >
-          <div className='flex-container'>
-            <div className='flex-card-field'>
-              <BuilderTextbox
-                {...this.props}
-                value={this.props.card.group}
-                options={this.state.tableNames}
-                ref='group'
-                placeholder='Table'
-                help='The name of the table in the database.'
-                id={this.props.card.id}
-                keyPath={this._keyPath('group')}
-              />
-            </div>
-            <div className='builder-operator'>
-              <div className='card-assignment'>
-                as
-              </div>
-            </div>
-            <div className='flex-card-field'>
-              <BuilderTextbox
-                {...this.props}
-                value={this.props.card.iterator}
-                ref='iterator'
-                placeholder='Variable name'
-                help='Refer to elements in the table by this. \
-                  <br/>Example: From a "users" table, you \
-                  <br />could name this variable "user" and then \
-                  <br />refer to "user.id", "user.name", etc.'
-                id={this.props.card.id}
-                keyPath={this._keyPath('iterator')}
-              />
-            </div>
-          </div>  
-        </CardField>
-        <CardsArea 
-          {...this.props}
-          cards={this.props.card.cards}
-          parentId={this.props.card.id}
-          keys={
-            this.props.keys.concat(this.state.tableKeys)
-          }
-        />
-      </div>
-		);
+    return <div>from</div>;
+		// return (
+  //     <div>
+  //       <CardField
+  //         draggable={false}
+  //         removable={false}
+  //         drag_y={true}
+  //       >
+  //         <div className='flex-container'>
+  //           <div className='flex-card-field'>
+  //             <BuilderTextbox
+  //               {...this.props}
+  //               value={this.props.card.table}
+  //               options={this.state.tableNames}
+  //               ref='group'
+  //               placeholder='Table'
+  //               help='The name of the table in the database.'
+  //               id={this.props.card.id}
+  //               keyPath={this._keyPath('group')}
+  //             />
+  //           </div>
+  //           <div className='builder-operator'>
+  //             <div className='card-assignment'>
+  //               as
+  //             </div>
+  //           </div>
+  //           <div className='flex-card-field'>
+  //             <BuilderTextbox
+  //               {...this.props}
+  //               value={this.props.card.iterator}
+  //               ref='iterator'
+  //               placeholder='Variable name'
+  //               help='Refer to elements in the table by this. \
+  //                 <br/>Example: From a "users" table, you \
+  //                 <br />could name this variable "user" and then \
+  //                 <br />refer to "user.id", "user.name", etc.'
+  //               id={this.props.card.id}
+  //               keyPath={this._keyPath('iterator')}
+  //             />
+  //           </div>
+  //         </div>  
+  //       </CardField>
+  //       <CardsArea 
+  //         {...this.props}
+  //         cards={this.props.card.cards}
+  //         parentId={this.props.card.id}
+  //         keys={
+  //           this.props.keys.concat(this.state.tableKeys)
+  //         }
+  //       />
+  //     </div>
+		// );
 	}
 };
 

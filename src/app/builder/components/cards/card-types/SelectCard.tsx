@@ -83,26 +83,22 @@ class SelectCard extends Classs<Props>
   handleChange(value, event)
   {
     var index = +Util.rel(event.target);
-    Actions.cards.select.change(this.props.card, index, 
-      {
-        property: value,
-        id: this.props.card.properties[index].id,
-      });
+    Actions.cards.select.change(this.props.card, index, value);
   }
 
   render() {
-    if(!this.props.card.properties.length)
+    if(!this.props.card.properties.size)
     {
       return <div className='info-message info-message-clickable' onClick={this.addField}>No fields selected, click to add one.</div>;
     }
       
     var properties = this.props.card.properties;
-
+// TODO likely will need updates
 		var layout = {
 			reorderable: true,
-			rows: properties.map((property: BuilderTypes.IProperty, index) => {
+			rows: properties.map((property: string, index) => {
         return {
-          key: property.id,
+          key: index,
           content: (
             <CardField
     					onDelete={this.removeField}
@@ -115,7 +111,7 @@ class SelectCard extends Classs<Props>
               >
               <BuilderTextbox
                 {...this.props}
-                value={property.property}
+                value={property}
                 placeholder='Field name'
                 help='The name of the field in the database.'
                 rel={'' + index}

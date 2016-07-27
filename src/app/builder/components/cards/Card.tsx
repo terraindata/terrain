@@ -66,7 +66,7 @@ import IfCard from './card-types/IfCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
 import Menu from '../../../common/components/Menu.tsx';
 import Actions from "../../data/BuilderActions.tsx";
-import { CardColors } from './../../CommonVars.tsx';
+import { CardColors } from './../../BuilderTypes.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
 import Store from "./../../data/BuilderStore.tsx";
 

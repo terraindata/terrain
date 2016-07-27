@@ -212,11 +212,11 @@ class TransformCardChart extends React.Component<Props, any>
       var newScore = arr[2];
       var value = this.props.card.scorePoints.find(scorePoint => scorePoint.id === scorePointId).value;
       Actions.cards.transform.scorePoint(this.props.card, 
-      {
+      BuilderTypes._IScorePoint({
         id: scorePointId,
         score: newScore,
         value,
-      });
+      }));
     } 
     else
     {
