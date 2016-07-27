@@ -103,6 +103,7 @@ var BuilderColumn = React.createClass<any, any>(
     onAddColumn: React.PropTypes.func.isRequired,
     onCloseColumn: React.PropTypes.func.isRequired,
     variant: React.PropTypes.object.isRequired,
+    history: React.PropTypes.any,
   },
   
   getInitialState()
@@ -259,7 +260,17 @@ var BuilderColumn = React.createClass<any, any>(
     if (confirm('Are you sure you want to revert?')) 
     {
       Ajax.saveItem(BrowserTypes.touchVariant(Immutable.fromJS(this.props.variant)));
-      //update url
+      var configArr = window.location.pathname.split('/')[2].split(',');
+      for(let i = 0; i < configArr.length; i++) 
+      {
+        if(configArr[i].charAt(0) === '!') // change current tab to be version-less
+        {
+          configArr[i] = configArr[i].split('@')[0];
+        }
+      }
+      var newConfig = configArr.join(',');
+      console.log(newConfig);
+      this.props.history.replaceState({}, `/builder/${newConfig}`);
     }
   },
 
