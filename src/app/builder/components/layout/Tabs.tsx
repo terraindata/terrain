@@ -224,14 +224,14 @@ class Tabs extends Classs<TabsProps> {
         id = split[0];
         var version = split[1];
       }
-      var name = variants[id].name;
-      if(version)
-      {
-        name += ' @ ' + moment(variants[id].lastEdited).format("ha M/D/YY")
-      }
+      var name = variants[id] && variants[id].name;
       if(name === '')
       {
         name = 'Untitled';
+      }
+      if(version)
+      {
+        name += ' @ ' + moment(variants[id].lastEdited).format("ha M/D/YY")
       }
       //Add the version back to the id
       if(version)
@@ -354,7 +354,7 @@ class Tabs extends Classs<TabsProps> {
       compact: true,
       columns: tabs ? tabs.map((tab, index) => (
       {
-        key: index, //tab.id was not unique
+        key: tab.id, 
         content:
           <Tab 
             name={tab.name}

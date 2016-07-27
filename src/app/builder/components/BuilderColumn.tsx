@@ -62,8 +62,6 @@ import * as moment from 'moment';
 import Ajax from "./../../util/Ajax.tsx";
 import * as Immutable from 'immutable';
 
-var Builder = require('./Builder.tsx');
-
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 var LockedIcon = require("./../../../images/icon_lock.svg?name=LockedIcon");
