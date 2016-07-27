@@ -283,7 +283,11 @@ var BuilderColumn = React.createClass<any, any>(
             <div className='builder-white-space'/>
             {
               canEdit ? 
-                  <div className='button builder-revert-button' onClick={this.revertVersion}>
+                  <div 
+                    className='button builder-revert-button' 
+                    onClick={this.revertVersion} 
+                    data-tip="Resets the Variant's contents to this version. You can always ndo the revert, and reverting does not lose any of the Variant's history."
+                  >
                     Revert to this version
                   </div>
                   : <div />
