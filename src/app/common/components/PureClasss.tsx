@@ -44,15 +44,21 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import Classs from './Classs.tsx';
+import BuilderTypes from '../../builder/BuilderTypes.tsx';
 const shallowCompare = require('react-addons-shallow-compare');
 
 class PureClasss<T> extends Classs<T>
 {
   shouldComponentUpdate(nextProps: T, nextState: any)
   {
-    console.log('a', shallowCompare(this, nextProps, nextState));
     return shallowCompare(this, nextProps, nextState);
   }
+  
+  // TODO
+  // _myKeyPath(el: BuilderTypes.KeyPathClass)
+  // {
+  //   return this._ikeyPath(el.keyPath, el.id);
+  // }
 }
 
 export default PureClasss;

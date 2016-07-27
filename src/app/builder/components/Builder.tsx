@@ -347,6 +347,7 @@ class Builder extends PureClasss<Props>
   
 	render()
   {
+    // console.log(this.state.builder['toJS']());
     let config = this.props.params.config;
     
     return (

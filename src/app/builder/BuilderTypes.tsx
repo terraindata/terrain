@@ -135,14 +135,21 @@ export module BuilderTypes
   recordFactories["join"] = _IJoin;
   
   
-  
+  // TODO
+  // abstract
+  // export class KeyPathClass
+  // {
+  //   // keyPath points to parent
+  //   // full keyPath to element requires its id
+  //   id: string = "";
+  //   keyPath: KeyPath = List([]);
+  // }
 
   // abstract
   export class ICard
   {
-    type: string = "";
     id: string = "";
-    keyPath: KeyPath = List([]);
+    type: string = "";
     
     set: (f: string, v: any) => ICard;
     setIn: (f: string, v: any) => ICard;
@@ -499,7 +506,6 @@ export module BuilderTypes
     id: string = "";
     key: string = "";
     value: string = "";
-    keyPath: KeyPath = List([]);
     type: InputType;
     
     set: (f: string, v: any) => IInput;
@@ -651,6 +657,28 @@ export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span classN
 //   },
 // };
 
+
+export const CardTypes = 
+[
+  'from',
+  'select',
+  'sort',
+  'filter',
+  'let',
+  'score',
+  'transform',
+  'if',
+  'max',
+  'min',
+  'sum',
+  'avg',
+  'count',
+  'exists',
+  'parentheses',
+  'var',
+  'take',
+  'skip',
+];
 
 export const CardColors = 
 // title is first, body is second

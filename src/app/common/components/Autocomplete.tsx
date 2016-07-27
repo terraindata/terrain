@@ -49,12 +49,12 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 
 interface Props
 {
   value: string;
-  options: string[];
+  options: List<string>;
   onChange: (value: string) => void;
   placeholder?: string;
   help?: string;
@@ -63,9 +63,15 @@ interface Props
   disabled?: boolean;
 }
 
-class Autocomplete extends Classs<Props>
+class Autocomplete extends PureClasss<Props>
 {
   value: string;
+  
+  state: {
+    value: string;
+    open: boolean;
+    selectedIndex: number;
+  };
   
   constructor(props: Props)
   {
@@ -76,7 +82,7 @@ class Autocomplete extends Classs<Props>
       value: props.value,
       open: false,
       selectedIndex: 0,
-    }
+    };
   }
   
   componentWillReceiveProps(nextProps)
@@ -85,11 +91,6 @@ class Autocomplete extends Classs<Props>
     this.setState({
       value: nextProps.value,
     });
-  }
-  
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
   
   handleChange(event)
@@ -207,7 +208,7 @@ class Autocomplete extends Classs<Props>
           ref='input'
           type='text'
           className='ac-input'
-          value={this.state.value}
+          value={this.props.value /* TODO this.state.value*/}
           onChange={this.handleChange}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}

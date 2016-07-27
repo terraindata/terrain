@@ -49,6 +49,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Actions from "../../builder/data/BuilderActions.tsx";
 import Util from '../../util/Util.tsx';
+import PureClasss from '../../common/components/PureClasss.tsx';
 import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
 import Card from '../../builder/components/cards/Card.tsx';
 import { CardColors } from './../../builder/BuilderTypes.tsx';
@@ -61,11 +62,12 @@ var TextIcon = require("./../../../images/icon_text_12x18.svg?name=TextIcon");
 interface Props
 {
   value: BuilderTypes.CardString;
-  id: string;
-  keyPath: (string | number)[];
+  keyPath: KeyPath; // keypath of value
+  
+  id?: string; // TODO remove
 
   canEdit?: boolean;
-  options?: string[];  
+  options?: List<string>;
   placeholder?: string;
   help?: string;
   ref?: string;
@@ -82,7 +84,7 @@ interface Props
   connectDropTarget?: (Element) => JSX.Element;
 }
 
-class BuilderTextbox extends React.Component<Props, any>
+class BuilderTextbox extends PureClasss<Props>
 {
   backupValue: BuilderTypes.CardString;
   
@@ -91,31 +93,27 @@ class BuilderTextbox extends React.Component<Props, any>
     super(props);
     
     // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
-    this.executeChange = _.debounce(this.executeChange, 750);
-    Util.bind(this, ['executeChange', 'handleTextareaChange', 'renderSwitch', 'handleSwitch', 'handleAutocompleteChange']);
+    // TODO?
+    // this.executeChange = _.debounce(this.executeChange, 750);
   }
   
-  componentWillReceiveProps(newProps)
-  {
-    if(this.refs['input'])
-    {
-      if(this.refs['input'] !== document.activeElement)
-      {
-        // if not focused, then update the value
-        this.refs['input']['value'] = newProps.value;
-      } else console.log('tb', (new Date()).getTime());
-    }
-  }
-  
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  }
+  // TODO
+  // componentWillReceiveProps(newProps)
+  // {
+  //   if(this.refs['input'])
+  //   {
+  //     if(this.refs['input'] !== document.activeElement)
+  //     {
+  //       // if not focused, then update the value
+  //       this.refs['input']['value'] = newProps.value;
+  //     }
+  //   }
+  // }
   
   // throttled event handler
   executeChange(value)
   {
-    Actions.cards.change(this.props.id, this.props.keyPath, value)
+    Actions.change(this.props.keyPath, value);
   }
   
   handleTextareaChange(event)
@@ -147,7 +145,7 @@ class BuilderTextbox extends React.Component<Props, any>
     
     this.backupValue = this.props.value;
     // not using executeChange because it is debounced and causes a false delay
-    Actions.cards.change(this.props.id, this.props.keyPath, value)
+    Actions.change(this.props.keyPath, value);
   }
   
   renderSwitch()

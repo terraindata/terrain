@@ -65,7 +65,7 @@ class InputsArea extends PureClasss<Props>
 {
   createInput()
   {
-    Actions.inputs.create(this.props.queryId, 0);
+    Actions.inputs.create(this.props.queryId, -1);
   }
   
   renderNoInputs()
@@ -79,6 +79,11 @@ class InputsArea extends PureClasss<Props>
     );
   }
   
+  moveTo(curIndex, newIndex)
+  {
+    Actions.inputs.move(this.props.queryId, this.props.inputs.get(curIndex), newIndex);
+  }
+  
   render()
   {
     if(this.props.inputs.size === 0)
@@ -89,7 +94,7 @@ class InputsArea extends PureClasss<Props>
     var layout = {
       rows: this.props.inputs.map((input, index) => {
         return {
-          content: <Input input={input} index={index} />,
+          content: <Input input={input} index={index} queryId={this.props.queryId} />,
           key: input.id,
         };
       }).toJS(),
@@ -103,15 +108,10 @@ class InputsArea extends PureClasss<Props>
         </div>
       ),
     });
-
-    var moveTo = (curIndex, newIndex) =>
-    {
-      Actions.inputs.move(this.props.inputs[curIndex], newIndex);
-    };
     
     return (
       <div className='inputs-area'>
-        <LayoutManager layout={layout} moveTo={moveTo} />
+        <LayoutManager layout={layout} moveTo={this.moveTo} />
       </div>
     );
   }

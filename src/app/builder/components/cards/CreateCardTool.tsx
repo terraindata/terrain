@@ -84,11 +84,13 @@ class CreateCardTool extends React.Component<Props, any>
     Util.bind(this, 'createCard');
   }
   
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState)
+  {
     return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
   
-  createCard(event) {
+  createCard(event)
+  {
     if(this.props.open && this.props.onMinimize)
     {
       this.props.onMinimize();
@@ -122,7 +124,8 @@ class CreateCardTool extends React.Component<Props, any>
   //   }
   // }
   
-  renderCardSelector() {
+  renderCardSelector()
+  {
     return (
      <div className='create-card-selector' ref='ccWrapper'>
        <div className='create-card-selector-inner'>
@@ -146,7 +149,8 @@ class CreateCardTool extends React.Component<Props, any>
      );
   }
   
-  render() {
+  render()
+  {
     if(!this.props.open || !this.props.canEdit)
     {
       return null;

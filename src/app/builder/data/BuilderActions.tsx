@@ -56,8 +56,8 @@ var $ = (type: string, payload: any) => Store.dispatch({type, payload})
 var BuilderActions =
 {
   change:
-    (node: IHaveKeyPath) =>
-      $(ActionTypes.change, { node }),
+    (keyPath: KeyPath, value: any) =>
+      $(ActionTypes.change, { keyPath, value }),
   
   cards:
   {
@@ -103,7 +103,8 @@ var BuilderActions =
       },
     },
     
-    sort: {
+    sort:
+    {
       create: 
         (card: BuilderTypes.ISortCard, index?: number) =>
           $(ActionTypes.cards.sort.create, {card, index}),
@@ -211,20 +212,20 @@ var BuilderActions =
   inputs:
   {
     create: 
-      (parentId: string, index: number) =>
-        $(ActionTypes.inputs.create, {parentId, index}),
+      (queryId: string, index: number) =>
+        $(ActionTypes.inputs.create, {queryId, index}),
 
     move: 
-      (input: any, index: number) =>
-        $(ActionTypes.inputs.move, {input, index}),
+      (queryId: ID, input: BuilderTypes.IInput, index: number) =>
+        $(ActionTypes.inputs.move, {queryId, input, index}),
+    // TODO
+    // changeKey: 
+    //   (input: any, value: string, index: number) =>
+    //     $(ActionTypes.inputs.changeKey, {input, value, index}),
 
-    changeKey: 
-      (input: any, value: string, index: number) =>
-        $(ActionTypes.inputs.changeKey, {input, value, index}),
-
-    changeValue: 
-      (input: any, value: string, index: number) =>
-        $(ActionTypes.inputs.changeValue, {input, value, index}),
+    // changeValue: 
+    //   (input: any, value: string, index: number) =>
+    //     $(ActionTypes.inputs.changeValue, {input, value, index}),
     
     changeType:
       (input: BuilderTypes.IInput, value: BuilderTypes.InputType, index: number) =>

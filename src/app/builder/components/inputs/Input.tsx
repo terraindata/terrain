@@ -45,6 +45,7 @@ THE SOFTWARE.
 require('./Input.less');
 var _ = require('underscore');
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import Util from '../../../util/Util.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import PanelMixin from '../layout/PanelMixin.tsx';
@@ -53,6 +54,7 @@ import Menu from '../../../common/components/Menu.tsx';
 import CreateLine from '../../../common/components/CreateLine.tsx';
 import DatePicker from '../../../common/components/DatePicker.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
+const shallowCompare = require('react-addons-shallow-compare');
 
 type IInput = BuilderTypes.IInput;
 let InputType = BuilderTypes.InputType;
@@ -64,7 +66,13 @@ var Input = React.createClass<any, any>({
 	{
 		input: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
+    queryId: React.PropTypes.string.isRequired,
 	},
+  
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return shallowCompare(this, nextProps, nextState);
+  },
 
 	getDefaultProps() 
 	{
@@ -75,29 +83,19 @@ var Input = React.createClass<any, any>({
 		};
 	},
   
-	changeKey(value: string)
-	{
-		Actions.inputs.changeKey(this.props.input, value, this.props.index);
-	},
-
-	changeValue(value: string)
-	{
-		Actions.inputs.changeValue(this.props.input, value, this.props.index);
-	},
-  
   convertToDate()
   {
-    Actions.inputs.changeType(this.props.input, BuilderTypes.InputType.DATE, this.props.index);
+    Actions.inputs.changeType(this.props.queryId, BuilderTypes.InputType.DATE, this.props.index);
   },
   
   convertToText()
   {
-    Actions.inputs.changeType(this.props.input, BuilderTypes.InputType.TEXT, this.props.index);
+    Actions.inputs.changeType(this.props.queryId, BuilderTypes.InputType.TEXT, this.props.index);
   },
   
   convertToNumber()
   {
-    Actions.inputs.changeType(this.props.input, BuilderTypes.InputType.NUMBER, this.props.index);
+    Actions.inputs.changeType(this.props.queryId, BuilderTypes.InputType.NUMBER, this.props.index);
   },
   
   remove()
@@ -110,7 +108,7 @@ var Input = React.createClass<any, any>({
   
   createInput()
   {
-    Actions.inputs.create(this.props.input.parentId, this.props.index);
+    Actions.inputs.create(this.props.queryId, this.props.index);
   },
   
   getMenuOptions()
@@ -155,12 +153,10 @@ var Input = React.createClass<any, any>({
     
     return (
       <BuilderTextbox
-        {...this.props}
         canEdit={true}
         value={this.props.input.value}
         className="input-text input-text-second"
-        id={this.props.input.id}
-        keyPath={['value']}
+        keyPath={Immutable.List(['queries', this.props.queryId, 'inputs', this.props.index, 'value']) /* TODO */}
       />
     );
   },
@@ -177,12 +173,10 @@ var Input = React.createClass<any, any>({
         <div className='input-inner'>
           <div className='input-top-row'>
             <BuilderTextbox
-              {...this.props}
               canEdit={true}
               value={this.props.input.key}
               className="input-text input-text-first"
-              id={this.props.input.id}
-              keyPath={['key']}
+              keyPath={Immutable.List(['queries', this.props.queryId, 'inputs', this.props.index, 'key']) /* TODO */}
             />
             <Menu options={this.getMenuOptions()} />
           </div>

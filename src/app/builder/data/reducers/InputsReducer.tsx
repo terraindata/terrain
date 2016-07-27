@@ -42,37 +42,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Immutable = require('immutable');
+import * as Immutable from 'immutable';
 import ActionTypes from './../BuilderActionTypes.tsx';
 import Util from './../../../util/Util.tsx';
+import BuilderTypes from './../../BuilderTypes.tsx';
 
 var InputsReducer = {};
 
 InputsReducer[ActionTypes.inputs.create] =
   (state, action) =>
-    state.updateIn(['queries', action.payload.parentId, 'inputs'], inputs =>
-      inputs.splice(Util.spliceIndex(action.payload.index, inputs), 0, Immutable.fromJS({
-        key: '',
-        value: '',
-        id: Util.randInt(123456789),
-        parentId: action.payload.parentId,
-        type: 0,
-      })));
+    state.updateIn(['queries', action.payload.queryId, 'inputs'], inputs =>
+      inputs.splice(Util.spliceIndex(action.payload.index, inputs), 0, 
+        BuilderTypes._IInput()
+      ));
 
 InputsReducer[ActionTypes.inputs.move] =
   (state, action) => 
-    state.updateIn(['queries', action.payload.input.parentId, 'inputs'], inputs =>
+    state.updateIn(['queries', action.payload.queryId, 'inputs'], inputs =>
       Util.immutableMove(inputs, action.payload.input.id, action.payload.index));
+// TODO
+// InputsReducer[ActionTypes.inputs.changeKey] =
+//   (state, action) =>
+//     state.setIn(['queries', action.payload.input.parentId, 'inputs', action.payload.index, 'key'],
+//       action.payload.value);
 
-InputsReducer[ActionTypes.inputs.changeKey] =
-  (state, action) =>
-    state.setIn(['queries', action.payload.input.parentId, 'inputs', action.payload.index, 'key'],
-      action.payload.value);
-
-InputsReducer[ActionTypes.inputs.changeValue] =
-  (state, action) =>
-    state.setIn(['queries', action.payload.input.parentId, 'inputs', action.payload.index, 'value'],
-      action.payload.value);
+// InputsReducer[ActionTypes.inputs.changeValue] =
+//   (state, action) =>
+//     state.setIn(['queries', action.payload.input.parentId, 'inputs', action.payload.index, 'value'],
+//       action.payload.value);
 
 InputsReducer[ActionTypes.inputs.changeType] =
   (state, action) =>

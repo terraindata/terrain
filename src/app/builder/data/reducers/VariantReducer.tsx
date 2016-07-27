@@ -92,6 +92,6 @@ VariantReducer[ActionTypes.setVariantField] =
   
 VariantReducer[ActionTypes.change] = 
   (state, action) =>
-    state.setIn(action.node.keyPath.toJS(), action.node);
+    state.setIn(action.payload.keyPath.toJS(), action.payload.value);
 
 export default VariantReducer;

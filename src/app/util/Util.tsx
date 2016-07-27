@@ -154,6 +154,14 @@ var Util = {
     return obj;
   },
   
+  // TODO remove
+  // constructs appropriate object for instantiating a record-class
+  //  with a keypath formed from the action
+  // kp(action)
+  // {
+    
+  // },
+  
   haveRole(groupId: ID, role: string, UserStore, RolesStore)
   {
     let me = UserStore.getState().get('currentUser');
@@ -232,7 +240,6 @@ var Util = {
   
   titleForCard(card: BuilderTypes.ICard): string
   {
-    console.log(card.toJS(), card.type);
     var title = card.type.charAt(0).toUpperCase() + card.type.substr(1);
     if(card.type === 'parentheses')
     {
