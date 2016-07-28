@@ -43,29 +43,56 @@
 	line-height: 18px;
 }
 
+.modal-title-error{
+	background-color: #ffd8d5;
+	display: flex;
+}
+
 .modal-message{
 	text-align: left;
 	font-size: 12px;
 	color: rgba(0, 0, 0, 0.6);
 	padding: 14px 24px;
-	border-bottom: 1px #ccc solid;
+	//border-bottom: 1px #ccc solid;
+}
+
+.modal-message-error{
+	background-color: #d9817b;
+	border-radius: 6px;
+	margin: 12px;
+	margin-bottom: 4px;
+	margin-top: 8px;
+	border-top: 1px #ccc solid;
+	padding: 8px 12px;
 }
 
 .modal-buttons{
-	margin: 8px;
-	margin-right: 48px !important;
+	max-width: 100%;
+	height: 26px;
+	border-top: 1px solid #ccc;
+	padding: 8px;
+	padding-right: 48px !important;
 	font-size: 12px;
-	float: right;
 }
 
 .modal-close-button {
 	color: #636363;
-	border: 1px solid #ccc;
 	background-color: #fff;
+	float: right;
+	border: 1px solid #ccc;
 }
 
 .modal-confirm-button {
 	background-color: #70b9e7;
 	color: white;
+	float: right;
 	margin-left: 8px;
+}
+
+.modal-info-icon {
+	width: 20px;
+	margin-right: 6px;
+	svg {
+		fill: #636363;
+	}
 }
