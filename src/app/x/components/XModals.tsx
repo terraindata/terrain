@@ -56,6 +56,7 @@ interface ModalProps {
 	modalTitle: string;
 	modalMessage: string;
 	modalConfirm: boolean;
+	modalResetState: () => void;
 	modalConfirmMessage?: string;
 	modalConfirmFunction?: () => void; 
 }
@@ -64,17 +65,20 @@ class ModalDialog extends Classs<ModalProps>  {
     state: {
     	open: boolean;
   	} = {
-    	open: false,
+    	open: true,
   	};
 
     openModal () 
     { 
-    	this.setState({open: true}); 
+    	this.setState({
+    		open: true
+    	}); 
     }
 
     closeModal () 
     { 
-    	this.setState({open: false}); 
+    	this.setState({open: false});
+    	this.props.modalResetState();
     }
 
     closeModalSuccess () 
@@ -90,7 +94,6 @@ class ModalDialog extends Classs<ModalProps>  {
     {
       return (
         <div className ='modal-dialog'>
-          <div className='button' onClick={this.openModal}>Open Modal</div>
           <Modal 
           	isOpen={this.state.open} 
           	overlayClassName='modal-overlay' 
@@ -121,29 +124,51 @@ class ModalDialog extends Classs<ModalProps>  {
 
 class XModals extends Classs<XModalsProps>
 {
+	state: {
+    	modalTriggered: boolean;
+  	} = {
+    	modalTriggered: false,
+  	}; 
+	
 	revert()
 	{
 		console.log("reverting");
 	}
 
- 	render()
-  	{
-    	return (
-      	<div> 
-      	<div>Confirm Modal</div>
-      	<ModalDialog 
-      		modalTitle='Confirm Modal'
+ 	createModal()
+ 	{
+ 		return (<ModalDialog
+ 		    modalTitle='Confirm Modal'
       		modalMessage = 'Modal dialog content goes here. Trying to make it longer. LONGERRRRRRRR! How is this now?'
       		modalConfirm = {true}
       		modalConfirmMessage = 'Revert'
       		modalConfirmFunction = {this.revert}
-      	/>
-      	<div>Alert Modal</div>
-      	<ModalDialog 
-      		modalTitle='Alert Modal'
-      		modalMessage = 'Modal dialog content goes here. Trying to make it longer. LONGERRRRRRRR! How is this now?'
-      		modalConfirm = {false}
-      	/>
+      		modalResetState = {this.resetTriggerState}
+ 		/>);
+ 	}
+
+ 	triggerModal()
+ 	{
+ 		this.setState({
+ 			modalTriggered: true
+ 		});
+ 	}
+ 	
+ 	resetTriggerState()
+ 	{
+ 		this.setState({
+ 			modalTriggered: false
+ 		});
+ 	}
+ 	
+ 	render()
+  	{
+    	return (
+      	<div>
+      		<div className='button' onClick={this.triggerModal}> 
+      			Testing
+      		</div>
+      		{this.state.modalTriggered ? this.createModal() : null}
       	</div>
     	);
   	}
