@@ -143,13 +143,13 @@ class Autocomplete extends PureClasss<Props>
       case 40:
         // down
         this.setState({
-          selectedIndex: Math.min(this.state.selectedIndex + 1, visibleOptions.length - 1),
+          selectedIndex: Math.min(this.state.selectedIndex + 1, visibleOptions.size - 1),
         });
         break;
       case 13:
       case 9:
         // enter
-        var value = visibleOptions[this.state.selectedIndex];
+        var value = visibleOptions.get(this.state.selectedIndex);
         if(!value)
         {
           value = event.target.value;
@@ -229,7 +229,7 @@ class Autocomplete extends PureClasss<Props>
               options.map(this.renderOption)
             }
             {
-              options.length ? null : <div className='ac-no-options'>No matches</div>
+              options.size ? null : <div className='ac-no-options'>No matches</div>
             }
           </div>
         }

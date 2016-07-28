@@ -60,7 +60,7 @@ var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon"
 interface Props {
   index: number;
   open?: boolean;
-  parentId: string;
+  keyPath: KeyPath;
   canEdit: boolean;
   dy?: number;
   className?: string;
@@ -72,7 +72,7 @@ interface Props {
 var styles: any = {};
 for(var type in CardTypes)
 {
-  styles[type] =
+  styles[CardTypes[type]] =
   {
     background: CardColors[type] ? CardColors[type][0] : CardColors['none'][0],
     borderColor: CardColors[type] ? CardColors[type][1] : CardColors['none'][1],
@@ -100,7 +100,7 @@ class CreateCardTool extends PureClasss<Props>
     }
     
     var type = Util.rel(event.target);
-    Actions.cards.create(this.props.parentId, type, this.props.index);
+    Actions.cards.create(this.props.keyPath, type, this.props.index);
   }
   
   // componentWillReceiveProps(newProps)
@@ -133,7 +133,7 @@ class CreateCardTool extends PureClasss<Props>
      <div className='create-card-selector' ref='ccWrapper'>
        <div className='create-card-selector-inner'>
          {
-           _.keys(CardTypes).map((type, index) => (
+           _.map(CardTypes, (type) => (
              <a
                className="create-card-button"
                key={type}
@@ -203,7 +203,7 @@ const cardTarget =
       
       setTimeout(() =>
       {
-        Actions.cards.move(item, props.index || 0, props.parentId);
+        Actions.cards.move(item, props.index || 0, props.parentId); // TODO
       }, 250);
     }
   }

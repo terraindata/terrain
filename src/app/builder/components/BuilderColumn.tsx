@@ -248,14 +248,13 @@ var BuilderColumn = React.createClass<any, any>(
     localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
   },
   
-  getMenuOptions(): MenuOption[]
+  getMenuOptions(): List<MenuOption> //TODO
   {
-    var options: MenuOption[] = _.range(0, NUM_COLUMNS).map(index => ({
+    var options: List<MenuOption> = Immutable.List(_.range(0, NUM_COLUMNS).map(index => ({
       text: COLUMNS[index],
       onClick: this.switchView,
-    }));
-    
-    options[this.state.column].disabled = true;
+      disabled: index === this.state.column,
+    })));
     
     return options;
   },

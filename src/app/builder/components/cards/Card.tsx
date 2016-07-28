@@ -49,6 +49,7 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
 import { DragSource, DropTarget } from 'react-dnd';
 var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../../util/Util.tsx';
@@ -64,11 +65,13 @@ import WrapperCard from './card-types/WrapperCard.tsx';
 import ValueCard from './card-types/ValueCard.tsx';
 import IfCard from './card-types/IfCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
-import Menu from '../../../common/components/Menu.tsx';
+import { Menu, MenuOption } from '../../../common/components/Menu.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import { CardColors } from './../../BuilderTypes.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
+let {CardTypes} = BuilderTypes;
 import Store from "./../../data/BuilderStore.tsx";
+import PureClasss from './../../../common/components/PureClasss.tsx';
 
 var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
@@ -126,6 +129,7 @@ const handleCardDragover = (event) =>
   }
 };
 $(document).on('dragover', _.throttle(handleCardDragover, 100));
+// TODO
 // $(document).on('dragend', () => 
 // {
 //   _lastDragOverEl.removeClass(_lastDragOverClassName);
@@ -143,77 +147,83 @@ interface Props
   parentId: string;
   singleCard?: boolean;
   keys: string[];
+  canEdit: boolean;
+  
+  isDragging?: boolean;
+  dndListener?: any;
+  connectDragPreview?: (a?:any) => void;
+  connectDragSource?: (el: El) => El;
+  connectDropTarget?: (el: El) => El;
 }
 
-var Card = React.createClass({
-  propTypes:
-  {
-    card: React.PropTypes.object.isRequired,
-    index: React.PropTypes.number.isRequired,
-    parentId: React.PropTypes.string,
-    singleCard: React.PropTypes.bool, // indicates it's not in a list, it's just a single card
-    keys: React.PropTypes.array.isRequired,
-  },
+class Card extends PureClasss<Props>
+{
+  state: {
+    open: boolean;
+    id: ID;
+    selected: boolean;
+    menuOptions: List<MenuOption>;
+    titleStyle: React.CSSProperties;
+    bodyStyle: React.CSSProperties;
+    
+    addingCardBelow?: boolean;
+    addingCardAbove?: boolean;
+  }
   
-  shouldComponentUpdate(nextProps, nextState)
+  refs: {
+    [k: string]: Ref;
+    cardBody: Ref;
+    cardInner: Ref;
+  }
+  
+  //   cardBody: El;
+  //   cardInner: El;
+  // };
+  
+  constructor(props:Props)
   {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  },
-
-  getInitialState()
-  {
-    return {
+    super(props);
+    this.state = {
       open: true,
       id: this.props.card.id,
       selected: false,
       menuOptions:
-      [
-        {
-          text: 'Copy',
-          onClick: this.handleCopy,
-        },
-        {
-          text: 'Hide',
-          onClick: this.toggleClose,
-        },
-        {
-          text: 'Delete',
-          onClick: this.handleDelete,
-        },
-      ],
+        Immutable.List([
+          {
+            text: 'Copy',
+            onClick: this.handleCopy,
+          },
+          {
+            text: 'Hide',
+            onClick: this.toggleClose,
+          },
+          {
+            text: 'Delete',
+            onClick: this.handleDelete,
+          },
+        ]),
       titleStyle: {
-        background: CardColors[this.props.card.type] ? CardColors[this.props.card.type][0] : CardColors['none'][0],
+        background: CardColors[props.card.type] ? CardColors[props.card.type][0] : CardColors['none'][0],
       },
       bodyStyle: {
-        background: CardColors[this.props.card.type] ? CardColors[this.props.card.type][1] : CardColors['none'][1],
-        borderColor: CardColors[this.props.card.type] ? CardColors[this.props.card.type][0] : CardColors['none'][0],
+        background: CardColors[props.card.type] ? CardColors[props.card.type][1] : CardColors['none'][1],
+        borderColor: CardColors[props.card.type] ? CardColors[props.card.type][0] : CardColors['none'][0],
       },
-    }
-  },
+    };
+    
+    this._subscribe(Store, {
+      stateKey: 'selected',
+      storeKeyPath: ['selectedCardIds', props.card.id],
+    });
+  }
   
   getColor(index:number): string
   {
     return CardColors[this.props.card.type] ? CardColors[this.props.card.type][index] : CardColors['none'][index];
-  },
-  
-  componentWillMount()
-  {
-    this.unsubscribe = Store.subscribe(() =>
-    {
-      let selected = Store.getState().getIn(['selectedCardIds', this.props.card.id]);
-      if((selected && !this.state.selected) || (!selected && this.state.selected))
-      {
-        this.setState({
-          selected
-        });
-      }
-    });
-  },
+  }
   
   componentWillUnmount()
   {
-    this.unsubscribe && this.unsubscribe();
-    this.unsubscribe = null;
     if(this.props.dndListener)
     {
       this.props.dndListener.unbind('draggedAway', this.handleDraggedAway);
@@ -221,8 +231,9 @@ var Card = React.createClass({
       this.props.dndListener.unbind('droppedBelow', this.handleDroppedBelow);
       this.props.dndListener.unbind('droppedAbove', this.handleDroppedAbove);
     }
-  },
+  }
   
+  dragPreview: any;
   componentDidMount()
   {
     this.dragPreview = createDragPreview(
@@ -248,7 +259,7 @@ var Card = React.createClass({
       this.props.dndListener.bind('droppedBelow', this.handleDroppedBelow);
       this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
     }
-  },
+  }
   
   componentDidUpdate()
   {
@@ -259,31 +270,31 @@ var Card = React.createClass({
       this.props.dndListener.bind('droppedBelow', this.handleDroppedBelow);
       this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
     }
-  },
+  }
   
   handleDraggedAway()
   {
     // Util.animateToHeight(this.refs['cardContainer'], 0);
-  },
+  }
   
   handleDropped()
   {
     // Util.animateToAutoHeight(this.refs['cardContainer']);
-  },
+  }
   
   handleDroppedBelow(item)
   {
     this.setState({
       droppedBelow: true,
     });
-  },
+  }
   
   handleDroppedAbove(item)
   {
     this.setState({
       droppedAbove: true,
     });
-  },
+  }
   
 	toggleClose(event)
 	{
@@ -303,7 +314,7 @@ var Card = React.createClass({
        
     event.preventDefault();
     event.stopPropagation();
-	},
+	}
   
   handleTitleClick(event)
   {
@@ -315,12 +326,12 @@ var Card = React.createClass({
     event.stopPropagation();
     event.preventDefault();
     Actions.cards.selectCard(this.props.card.id, event.altKey, event.shiftKey);
-  },
+  }
   
   hasCardsArea(): boolean
   {
     return !! CARD_TYPES_WITH_CARDS.find(type => type === this.props.card.type);
-  },
+  }
   
   handleDelete()
   {
@@ -328,25 +339,25 @@ var Card = React.createClass({
     setTimeout(() => {
       Actions.cards.remove(this.props.card, this.props.parentId);
     }, 250);
-  },
+  }
   
   handleCopy()
   {
-  },
+  }
   
   addCardBelow()
   {
     this.setState({
       addingCardBelow: !this.state.addingCardBelow,
     });
-  },
+  }
   
   addCardAbove()
   {
     this.setState({
       addingCardAbove: !this.state.addingCardAbove,
     });
-  },
+  }
   
   minimizeCreateCard()
   {
@@ -354,7 +365,7 @@ var Card = React.createClass({
       addingCardAbove: false,
       addingCardBelow: false,
     });
-  },
+  }
   
   renderAddCard(isLower?: boolean)
   {
@@ -373,7 +384,7 @@ var Card = React.createClass({
         }
       </div>
     );
-  },
+  }
 
 	render() {
 
@@ -381,43 +392,43 @@ var Card = React.createClass({
 
 		switch(this.props.card.type)
 		{
-			case 'select':
+			case CardTypes.SELECT:
 				CardComponent = SelectCard;
 				break;
-			case 'from':
+			case CardTypes.FROM:
 				CardComponent = FromCard;
 				break;
-   case 'sort':
+   case CardTypes.SORT:
      CardComponent = SortCard;
      break;
-   case 'filter':
+   case CardTypes.FILTER:
     CardComponent = FilterCard;
       break;
-    case 'let':
-    case 'var':
+    case CardTypes.LET:
+    case CardTypes.VAR:
       CardComponent = LetVarCard;
       break;
-    case 'transform':
+    case CardTypes.TRANSFORM:
       CardComponent = TransformCard;
       break;
-    case 'score':
+    case CardTypes.SCORE:
       CardComponent = ScoreCard;
       break;
-    case 'if':
+    case CardTypes.IF:
       CardComponent = IfCard;
       break;
-    case 'count':
-    case 'sum':
-    case 'min':
-    case 'max':
-    case 'avg':
-    case 'exists':
-    case 'parentheses':
+    case CardTypes.COUNT:
+    case CardTypes.SUM:
+    case CardTypes.MIN:
+    case CardTypes.MAX:
+    case CardTypes.AVG:
+    case CardTypes.EXISTS:
+    case CardTypes.PARENTHESES:
       CardComponent = WrapperCard;
       var isWrapperCard = true;
       break;
-    case 'take':
-    case 'skip':
+    case CardTypes.TAKE:
+    case CardTypes.SKIP:
       CardComponent = ValueCard;
       break;
 		}
@@ -453,8 +464,6 @@ var Card = React.createClass({
           { !this.props.singleCard &&
             <CreateCardTool
               {...this.props}
-              index={this.props.index}
-              parentId={this.props.parentId}
               open={this.state.addingCardAbove}
               onMinimize={this.minimizeCreateCard}
             />
@@ -500,7 +509,6 @@ var Card = React.createClass({
             <CreateCardTool
               {...this.props}
               index={this.props.index + 1}
-              parentId={this.props.parentId}
               open={this.state.addingCardBelow}
               onMinimize={this.minimizeCreateCard}
             />
@@ -513,8 +521,8 @@ var Card = React.createClass({
       return connectDropTarget(rendering);
     }
     return rendering;			
-	},
-});
+	}
+}
 
 
 // DnD stuff

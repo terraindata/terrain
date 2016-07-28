@@ -154,11 +154,13 @@ class CardsArea extends PureClasss<Props>
   
   clear() {}
   
-  createFromCard() {
-    Actions.cards.create(this.state.keyPath, 'from', 0);
+  createFromCard()
+  {
+    Actions.cards.create(this.state.keyPath, BuilderTypes.CardTypes.FROM, 0);
   }
   
-  render() {
+  render()
+  {
     let {props} = this;
     let {cards, topLevel, canEdit} = props;
     
@@ -188,6 +190,7 @@ class CardsArea extends PureClasss<Props>
               card={card}
               dndListener={$({})}
               keys={this.state.keys}
+              keyPath={this.state.keyPath}
             />
           )
         }
@@ -218,7 +221,7 @@ const cardTarget =
     if(monitor.isOver({ shallow: true}))
     {
       const card = monitor.getItem();
-      Actions.cards.move(card, props.cards.length, props.parentId);
+      Actions.cards.move(card, props.cards.size, props.parentId); // TODO
     }
   }
 }

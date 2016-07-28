@@ -68,27 +68,35 @@ class TQLConverter
   {
     var {cards, inputs} = query;
     
-    cards = this.applyOptions(cards, options);
-    let cardsTql = removeBlanks(this._cards(cards, ";", options));
+    var cardsTql = "";
+    if(cards && cards.size)
+    {
+      cards = this.applyOptions(cards, options);
+      cardsTql = removeBlanks(this._cards(cards, ";", options));
+    }
     
     var inputsTql = "";
-    inputs.map((input: IInput) => 
-      {
-        var {value} = input;
-        if(input.type === BuilderTypes.InputType.TEXT)
+    if(inputs && inputs.size)
+    {
+      inputs.map((input: IInput) => 
         {
-          value = `"${value}"`;
+          var {value} = input;
+          if(input.type === BuilderTypes.InputType.TEXT)
+          {
+            value = `"${value}"`;
+          }
+          if(input.type == BuilderTypes.InputType.DATE)
+          {
+            value = `"${value}"`;
+          }
+          
+          inputsTql += `var ${input.key} = ${value};\n`;
         }
-        if(input.type == BuilderTypes.InputType.DATE)
-        {
-          value = `"${value}"`;
-        }
-        
-        inputsTql += `var ${input.key} = ${value};\n`;
-      }
-    );
+      );
+      inputsTql += "\n\n";
+    }
     
-    return inputsTql + "\n\n" + cardsTql;
+    return inputsTql + cardsTql;
   }
   
   private static _topFromCard(cards: List<ICard>, fn: (fromCard: IFromCard) => IFromCard): List<ICard>
@@ -142,9 +150,9 @@ class TQLConverter
   //  or functions that are passed in a reference to the card/obj and then return a parse string
   private static TQLF =
   {
-    from: "from '$group' as $iterator $cards",
+    from: "from '$table' as $iterator $cards",
     select: "select $properties",
-      properties: (p, index) => p.property.size ? join(", ", index) + "$property" : "",
+      properties: (p, index) => p.property.size ? join(", ", index) + p : "", // "$property" TODO
     sort: "sort $sorts",
       sorts: (sort, index) => join(", ", index) + "$property " + (sort.direction ? 'desc' : 'asc'),
     filter: "filter $filters",

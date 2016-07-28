@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 
-/// <reference path="react/react.d.ts" />
+/// <reference path="./react/react.d.ts" />
 /// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
 
 /// <reference path="redux-actions/redux-actions.d.ts" />
@@ -62,6 +62,9 @@ declare interface IHaveKeyPath
 {
   keyPath: KeyPath;
 }
+
+declare type El = JSX.Element;
+declare type Ref = React.Component<any, any> | Element;
 
 declare type ID = string;
 declare interface IId

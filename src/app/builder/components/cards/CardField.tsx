@@ -47,6 +47,7 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
+const shallowCompare = require('react-addons-shallow-compare');
 
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 var RemoveIcon = require("./../../../../images/icon_close_8x8.svg?name=RemoveIcon");
@@ -87,7 +88,7 @@ var CardField = React.createClass({
   
   shouldComponentUpdate(nextProps, nextState)
   {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+    return shallowCompare(this, nextProps, nextState);
   },
   
   componentDidMount()
