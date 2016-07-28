@@ -42,66 +42,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import Classs from './../../common/components/Classs.tsx';
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 var NotificationSystem = require('react-notification-system');
-//import NotificationManager from './NotificationManager.tsx';
-import TestComponent from './TestComponent.tsx';
 
-interface XNotificationProps
+
+function NotificationManager()
 {
-  params?: any;
-  history?: any;
-  location?: {
-    pathname: string;
-  };
-}
+  this.system = null;
 
-class XNotification extends Classs<XNotificationProps>
-{
-  notificationManager = {
-    system: null,
-    addNotification:function(message, type)
-    {
-      if(this.system) { 
-        this.system.addNotification({
-          title: 'Terrain Message',
-          message: message,
-          level: type,
-          autoDismiss: type === 'error' ? 0 : 5,
-          dismissible: type !== 'error'
-        });
-      }  
-    }
-  }
-
-  constructor(props)
+  this.addNotification = function(message, type)
   {
-    super(props);
-    this.state = {
-      notificationManager: null
-    }
-  }
-
-  componentDidMount() {
-    console.log("Setting notification manager");
-    this.notificationManager.system = this.refs['notificationSystem'];
-    this.setState({
-       notificationManager: this.notificationManager,
-    })
-  }
-
-  render()
-  {
-    return (
-      <div>
-      <TestComponent message="TEST MESSAGE 1" manager={this.state.notificationManager}/>
-      <TestComponent message="TEST MESSAGE 2!!!!" manager={this.state.notificationManager} />
-      <NotificationSystem ref='notificationSystem'/>
-      </div>
-    );
+    if(this.system) { 
+      this.system.addNotification({
+        title: 'Terrain Message',
+        message: message,
+        level: type,
+        autoDismiss: type === 'error' ? 0 : 5,
+        dismissible: type !== 'error'
+      });
+    }  
   }
 }
 
-export default XNotification;
+export default NotificationManager;

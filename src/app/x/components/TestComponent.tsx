@@ -45,63 +45,51 @@ THE SOFTWARE.
 import Classs from './../../common/components/Classs.tsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-var NotificationSystem = require('react-notification-system');
-//import NotificationManager from './NotificationManager.tsx';
-import TestComponent from './TestComponent.tsx';
+import NotificationManager from './NotificationManager.tsx'; 
 
-interface XNotificationProps
+interface Props
 {
   params?: any;
   history?: any;
   location?: {
     pathname: string;
   };
+  manager: any;
+  message: string;
 }
 
-class XNotification extends Classs<XNotificationProps>
+class TestComponent extends Classs<Props>
 {
-  notificationManager = {
-    system: null,
-    addNotification:function(message, type)
-    {
-      if(this.system) { 
-        this.system.addNotification({
-          title: 'Terrain Message',
-          message: message,
-          level: type,
-          autoDismiss: type === 'error' ? 0 : 5,
-          dismissible: type !== 'error'
-        });
-      }  
-    }
-  }
 
   constructor(props)
   {
     super(props);
-    this.state = {
-      notificationManager: null
-    }
   }
 
-  componentDidMount() {
-    console.log("Setting notification manager");
-    this.notificationManager.system = this.refs['notificationSystem'];
-    this.setState({
-       notificationManager: this.notificationManager,
-    })
+  addNotification() {
+  	console.log("HERE");
+  	console.log(this.props.manager);
+  	if(this.props.manager) 
+  	{
+  		this.props.manager.addNotification(this.props.message, 'info')
+  	}
   }
 
   render()
   {
+  	console.log("Render test component");
+  	console.log(this.props.manager);
     return (
-      <div>
-      <TestComponent message="TEST MESSAGE 1" manager={this.state.notificationManager}/>
-      <TestComponent message="TEST MESSAGE 2!!!!" manager={this.state.notificationManager} />
-      <NotificationSystem ref='notificationSystem'/>
-      </div>
+	    <div>
+		    <div 
+		      className='button'
+		      onClick={this.addNotification}
+		    >
+		      Testing
+		    </div>
+	 	</div>
     );
   }
 }
 
-export default XNotification;
+export default TestComponent;
