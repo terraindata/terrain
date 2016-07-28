@@ -258,14 +258,14 @@ var BuilderColumn = React.createClass<any, any>(
   {
     if (this.props.variant.version) 
     {
-      if (confirm('Are you sure you want to revert?')) 
+      if (confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.')) 
       {
         this.props.onRevert();
       }
     }
   },
 
-  builderVersionToolbar(canEdit)
+  renderBuilderVersionToolbar(canEdit)
   {
     if(this.props.variant.version)
     {
@@ -345,7 +345,7 @@ var BuilderColumn = React.createClass<any, any>(
              }
           </div>
         </div>
-        {this.builderVersionToolbar(canEdit)}
+        {this.renderBuilderVersionToolbar(canEdit)}
         <div className={
             'builder-column-content' + 
             (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '')

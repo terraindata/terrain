@@ -92,9 +92,9 @@ class VariantVersions extends Classs<Props>
     });
   }
 
-  componentWillMount() 
+  fetchVariants(props) 
   {
-    Ajax.getVariantVersions(this.props.variant.id, (versions) =>
+    Ajax.getVariantVersions(props.variant.id, (versions) =>
     {
       if(versions) 
       {
@@ -106,18 +106,14 @@ class VariantVersions extends Classs<Props>
     });
   }
 
+  componentWillMount() 
+  {
+    this.fetchVariants(this.props);
+  }
+
   componentWillReceiveProps(nextProps)
   {
-    Ajax.getVariantVersions(nextProps.variant.id, (versions) =>
-    {
-      if(versions) 
-      {
-        versions.reverse();
-        this.setState({
-          versions: versions,
-        })
-      }
-    });
+    this.fetchVariants(nextProps);
   }
 
   showVersion(versionID, i) 
@@ -176,19 +172,20 @@ class VariantVersions extends Classs<Props>
   
   render()
   {
-    if(!this.state.versions) 
-    {
-      return null;
-    }
-
     return(
       <div className="versions-table-wrapper">
         <div className="versions-table-title">
           Version History
         </div>
-      <div className="versions-table">
-        {this.state.versions.map(this.renderVersion)}
-      </div>
+        {this.state.versions === null ? 
+          <div className='loading'>
+            Loading...
+          </div>
+          :
+        <div className="versions-table">
+          {this.state.versions.map(this.renderVersion)}
+        </div>
+      }
       </div>
     );
   }

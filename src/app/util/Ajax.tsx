@@ -203,9 +203,9 @@ var Ajax = {
     return Ajax.getItem('variant', id, onLoad);
   },
 
-  getVariantVersions(variant_id: ID, onLoad: (variantVersions: any) => void)
+  getVariantVersions(variantId: ID, onLoad: (variantVersions: any) => void)
   {
-    var url = '/variant_versions/' + variant_id;
+    var url = '/variant_versions/' + variantId;
     return Ajax._get(url, "", (response: any) =>
     {
       let variantVersions = JSON.parse(response);
@@ -213,19 +213,12 @@ var Ajax = {
     });
   },
 
-  getVariantVersion(variant_id: ID, version_id: string, onLoad: (variantVersion: any) => void)
+  getVariantVersion(variantId: ID, versionId: string, onLoad: (variantVersion: any) => void)
   {
-    var url = '/variant_versions/' + variant_id;
+    var url = '/variant_versions/' + variantId;
     return Ajax._get(url, "", (response: any) =>
     {
-      let variantVersions = JSON.parse(response);
-      for(let i = 0; i < variantVersions.length; i++)
-      {  
-        if(variantVersions[i].id === version_id) 
-        {
-          onLoad(JSON.parse(variantVersions[i].data));
-        }
-      }
+      JSON.parse(response).map(version => version.id === versionId && onLoad(JSON.parse(version.data)))
     });
   },
   

@@ -217,7 +217,7 @@ class Tabs extends Classs<TabsProps> {
     var emptyTabs: ID[] = [];
     let tabs = config && variants && config.split(',').map(vId =>
     {
-      let id = this.getId(vId);
+      var id = this.getId(vId);
       let split = id.split('@');
       if(split.length > 1)
       {
@@ -232,11 +232,8 @@ class Tabs extends Classs<TabsProps> {
       if(version)
       {
         name += ' @ ' + moment(variants[id].lastEdited).format("ha M/D/YY")
-      }
-      if(version)
-      {
         id += '@' + version;
-	    }
+      }
       return {
         id,
         name,
