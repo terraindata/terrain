@@ -45,6 +45,7 @@ THE SOFTWARE.
 require('./InfoArea.less')
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
+import PureClasss from '../../common/components/PureClasss.tsx';
 
 var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -56,7 +57,7 @@ interface Props {
   onClick?: () => void;
 }
 
-class InfoArea extends React.Component<Props, any>
+class InfoArea extends PureClasss<Props>
 {
   constructor(props)
   {

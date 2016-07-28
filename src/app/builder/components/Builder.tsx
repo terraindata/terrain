@@ -133,7 +133,7 @@ class Builder extends PureClasss<Props>
   {
     let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query.o;
-    var newConfig;
+    var newConfig = props.params.config;
     
     if(open)
     {
@@ -162,13 +162,14 @@ class Builder extends PureClasss<Props>
       newConfig = storedConfig;
     }
     
-    if(newConfig)
+    if(newConfig && newConfig.length && !newConfig.split(',').some(c => c.substr(0,1) === '!'))
+    {
+      newConfig = '!' + newConfig;
+    }
+    
+    if(newConfig !== props.params.config)
     {
       props.history.replaceState({}, `/builder/${newConfig}`);
-    }
-    else
-    {
-      newConfig = props.params.config;
     }
     
     localStorage.setItem('config', newConfig || '');

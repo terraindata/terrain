@@ -62,13 +62,14 @@ var BuilderActions =
   cards:
   {
     create:
-      (parentId: string, type: string, index: number) => 
-        $(ActionTypes.cards.create, {parentId, type, index}),
+      (keyPath: KeyPath, type: string, index: number) => 
+        $(ActionTypes.cards.create, {keyPath, type, index}),
 
     move: 
       (card: BuilderTypes.ICard, index: number, parentId: string) =>
         $(ActionTypes.cards.move, {card, index, parentId}),
     
+    // TODO remove
     change:
       (cardId: string, keyPath: (string | number)[], value: any) =>
         $(ActionTypes.cards.change, {cardId, keyPath, value}),
@@ -80,28 +81,6 @@ var BuilderActions =
     selectCard:
       (cardId: string, altKey: boolean, shiftKey: boolean) =>
         $(ActionTypes.cards.selectCard, {cardId, altKey, shiftKey}),
-
-    from:
-    {
-      change: 
-        (card: BuilderTypes.IFromCard, group: string, iterator: string) =>
-          $(ActionTypes.cards.from.change, {card, group, iterator}),
-
-      join:
-      {
-        create: 
-          (card: BuilderTypes.IFromCard) =>
-            $(ActionTypes.cards.from.join.create, {card}),
-
-        change: 
-          (card: BuilderTypes.IFromCard, index: number, value: BuilderTypes.IJoin) =>
-            $(ActionTypes.cards.from.join.change, {card, index, value}),
-
-        remove: 
-          (card: BuilderTypes.IFromCard, index: number) =>
-            $(ActionTypes.cards.from.join.remove, {card, index}),
-      },
-    },
     
     sort:
     {
@@ -218,22 +197,14 @@ var BuilderActions =
     move: 
       (queryId: ID, input: BuilderTypes.IInput, index: number) =>
         $(ActionTypes.inputs.move, {queryId, input, index}),
-    // TODO
-    // changeKey: 
-    //   (input: any, value: string, index: number) =>
-    //     $(ActionTypes.inputs.changeKey, {input, value, index}),
-
-    // changeValue: 
-    //   (input: any, value: string, index: number) =>
-    //     $(ActionTypes.inputs.changeValue, {input, value, index}),
     
     changeType:
-      (input: BuilderTypes.IInput, value: BuilderTypes.InputType, index: number) =>
-        $(ActionTypes.inputs.changeType, {input, value, index}),
+      (queryId: ID, value: BuilderTypes.InputType, index: number) =>
+        $(ActionTypes.inputs.changeType, {queryId, value, index}),
     
     remove:
-      (input: BuilderTypes.IInput) =>
-        $(ActionTypes.inputs.remove, {input}),
+      (queryId: ID, index: number) =>
+        $(ActionTypes.inputs.remove, {queryId, index}),
   }, // /inputs
 
   results:

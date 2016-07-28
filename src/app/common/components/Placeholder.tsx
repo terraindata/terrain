@@ -44,8 +44,9 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import InfoArea from './InfoArea.tsx';
+import PureClasss from '../../common/components/PureClasss.tsx';
 
-class Placeholder extends React.Component<any, any>
+class Placeholder extends PureClasss<any>
 {
   render() {
     return (

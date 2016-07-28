@@ -50,6 +50,7 @@ var DateUtils = require('react-day-picker').DateUtils;
 import Util from '../../util/Util.tsx';
 import Dropdown from './Dropdown.tsx';
 import LayoutManager from './../../builder/components/layout/LayoutManager.tsx';
+import PureClasss from '../../common/components/PureClasss.tsx';
 
 var MINUTE_INTERVAL = 30;
 var MINUTE_RATIO = (60 / MINUTE_INTERVAL);
@@ -70,7 +71,7 @@ interface Props {
   canEdit: boolean;
 }
 
-class DatePicker extends React.Component<Props, any>
+class DatePicker extends PureClasss<Props>
 {
   constructor(props)
   {

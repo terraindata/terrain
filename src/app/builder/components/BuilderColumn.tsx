@@ -46,6 +46,7 @@ import * as _ from 'underscore';
 require('./BuilderColumn.less');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as Immutable from 'immutable';
 import Util from '../../util/Util.tsx';
 import Menu from '../../common/components/Menu.tsx';
 import { MenuOption } from '../../common/components/Menu.tsx';
@@ -181,20 +182,19 @@ var BuilderColumn = React.createClass<any, any>(
   renderContent(canEdit:boolean)
   {
     var query = this.props.query;
-    var parentId = query.id;
     
     switch(this.state.column)
     {
       case COLUMNS.Builder:
         // this should be temporary; remove when middle tier arrives
-        var spotlights = query.results ? query.results.reduce((spotlights, result) =>
+        var spotlights = Immutable.List(query.results ? query.results.reduce((spotlights, result) =>
         {
           if(result.spotlight)
           {
             spotlights.push(result);
           }
           return spotlights;
-        }, []) : [];
+        }, []) : []);
         if (this.props.query.mode === "tql")
         {
           return <InfoArea
@@ -204,7 +204,8 @@ var BuilderColumn = React.createClass<any, any>(
         }
         return <CardsArea 
           cards={query.cards} 
-          parentId={parentId} 
+          queryId={query.id}
+          keyPath={null}
           spotlights={spotlights} 
           topLevel={true}
           keys={this.state.inputKeys}
@@ -214,7 +215,7 @@ var BuilderColumn = React.createClass<any, any>(
       case COLUMNS.Inputs:
         return <InputsArea
           inputs={query.inputs}
-          queryId={parentId}
+          queryId={query.id}
         />;
       
       case COLUMNS.Results:

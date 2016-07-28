@@ -49,6 +49,43 @@ let Map = Immutable.Map;
 
 export module BuilderTypes
 { 
+  
+  export const CardTypes = 
+  {
+    FROM: 'from',
+    SELECT: 'select',
+    SORT: 'sort',
+    FILTER: 'filter',
+    LET: 'let',
+    SCORE: 'score',
+    TRANSFORM: 'transform',
+    IF: 'if',
+    MAX: 'max',
+    MIN: 'min',
+    SUM: 'sum',
+    AVG: 'avg',
+    COUNT: 'count',
+    EXISTS: 'exists',
+    PARENTHESES: 'parentheses',
+    VAR: 'var',
+    TAKE: 'take',
+    SKIP: 'skip',
+  };
+  
+  export const BlockTypes =
+  {
+    CONDITION: 'conditionblock',
+    SORT: 'sortblock',
+    FILTER: 'filterblock',
+    JOIN: 'joinblock',
+    WEIGHT: 'weight',
+    BAR: 'bar',
+    SCOREPOINT: 'scorepoint',
+    
+    INPUT: 'input,'    
+  };
+ 
+
   export enum Operator {
     EQ,
     NE,
@@ -81,13 +118,13 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ICondition;
     setIn: (f: string, v: any) => ICondition;
-		_recordClassType = "condition";
+		_recordClasstype = BlockTypes.CONDITION;
   }
   let ICondition_Record = Immutable.Record(new ICondition());
   export const _ICondition = (config?:any) => {
     return new ICondition_Record(config || {}) as any as ICondition;
   }
-  recordFactories["condition"] = _ICondition;
+  recordFactories[BlockTypes.CONDITION] = _ICondition;
   
   export class ISort
   {
@@ -96,13 +133,13 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ISort;
     setIn: (f: string, v: any) => ISort;
-		_recordClassType = "sort";
+		_recordClasstype = BlockTypes.SORT;
   }
   let ISort_Record = Immutable.Record(new ISort());
   export const _ISort = (config?:any) => {
     return new ISort_Record(config || {}) as any as ISort;
   }
-  recordFactories["sort"] = _ISort;  
+  recordFactories[BlockTypes.SORT] = _ISort;  
   
   export class IFilter
   {
@@ -111,13 +148,13 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IFilter;
     setIn: (f: string, v: any) => IFilter;
-		_recordClassType = "filter";
+		_recordClasstype = BlockTypes.FILTER;
   }
   let IFilter_Record = Immutable.Record(new IFilter());
   export const _IFilter = (config?:any) => {
     return new IFilter_Record(config || {}) as any as IFilter;
   }
-  recordFactories["filter"] = _IFilter;
+  recordFactories[BlockTypes.FILTER] = _IFilter;
   
   export class IJoin
   {
@@ -126,25 +163,15 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IJoin;
     setIn: (f: string, v: any) => IJoin;
-		_recordClassType = "join";
+		_recordClasstype = BlockTypes.JOIN;
   }
   let IJoin_Record = Immutable.Record(new IJoin());
   export const _IJoin = (config?:any) => {
     return new IJoin_Record(config || {}) as any as IJoin;
   }
-  recordFactories["join"] = _IJoin;
+  recordFactories[BlockTypes.JOIN] = _IJoin;
   
   
-  // TODO
-  // abstract
-  // export class KeyPathClass
-  // {
-  //   // keyPath points to parent
-  //   // full keyPath to element requires its id
-  //   id: string = "";
-  //   keyPath: KeyPath = List([]);
-  // }
-
   // abstract
   export class ICard
   {
@@ -172,195 +199,195 @@ export module BuilderTypes
   
   export class IFromCard extends AbstractWrapperCard
   {
-    type = "from";
+    type = CardTypes.FROM;
     table: string = "";
     iterator: string = "";
     joins: List<IJoin> = List([]);
     
     set: (f: string, v: any) => IFromCard;
     setIn: (f: string, v: any) => IFromCard;
-		_recordClassType = "from";
+		_recordClasstype = CardTypes.FROM;
   }
   let IFromCard_Record = Immutable.Record(new IFromCard());
   export const _IFromCard = (config?:any) => {
     return new IFromCard_Record(config || { id: 'c-' + Math.random(), }) as any as IFromCard;
   }
-  recordFactories["from"] = _IFromCard;
+  recordFactories[CardTypes.FROM] = _IFromCard;
   
   export class ISelectCard extends ICard
   {
-    type = "select";
+    type = CardTypes.SELECT;
     properties: List<string> = List([]);
     
     set: (f: string, v: any) => ISelectCard;
     setIn: (f: string, v: any) => ISelectCard;
-		_recordClassType = "select";
+		_recordClasstype = CardTypes.SELECT;
   }
   let ISelectCard_Record = Immutable.Record(new ISelectCard());
   export const _ISelectCard = (config?:any) => {
     return new ISelectCard_Record(config || { id: 'c-' + Math.random(), }) as any as ISelectCard;
   }
-  recordFactories["select"] = _ISelectCard;
+  recordFactories[CardTypes.SELECT] = _ISelectCard;
   
   
   export class ISortCard extends ICard
   {
-    type = "sort";
+    type = CardTypes.SORT;
     sorts: List<ISort> = List([]);
     
     set: (f: string, v: any) => ISortCard;
     setIn: (f: string, v: any) => ISortCard;
-		_recordClassType = "sort";
+		_recordClasstype = CardTypes.SORT;
   }
   let ISortCard_Record = Immutable.Record(new ISortCard());
   export const _ISortCard = (config?:any) => {
     return new ISortCard_Record(config || { id: 'c-' + Math.random(), }) as any as ISortCard;
   }
-  recordFactories["sort"] = _ISortCard;
+  recordFactories[CardTypes.SORT] = _ISortCard;
   
   export class IFilterCard extends ICard
   {
-    type = "filter";
+    type = CardTypes.FILTER;
     filters: List<IFilter> = List([]);
     
     set: (f: string, v: any) => IFilterCard;
     setIn: (f: string, v: any) => IFilterCard;
-		_recordClassType = "filter";
+		_recordClasstype = CardTypes.FILTER;
   }
   let IFilterCard_Record = Immutable.Record(new IFilterCard());
   export const _IFilterCard = (config?:any) => {
     return new IFilterCard_Record(config || { id: 'c-' + Math.random(), }) as any as IFilterCard;
   }
-  recordFactories["filter"] = _IFilterCard;
+  recordFactories[CardTypes.FILTER] = _IFilterCard;
   
   export type CardString = string | IParenthesesCard;
   
   export class ILetCard extends ICard
   {
-    type = "let";
+    type = CardTypes.LET;
     field: string = "";
     expression: CardString = "";
     
     set: (f: string, v: any) => ILetCard;
     setIn: (f: string, v: any) => ILetCard;
-		_recordClassType = "let";
+		_recordClasstype = CardTypes.LET;
   }
   let ILetCard_Record = Immutable.Record(new ILetCard());
   export const _ILetCard = (config?:any) => {
     return new ILetCard_Record(config || { id: 'c-' + Math.random(), }) as any as ILetCard;
   }
-  recordFactories["let"] = _ILetCard;
+  recordFactories[CardTypes.LET] = _ILetCard;
 
   export class IVarCard extends ICard
   {
-    type = "var";
+    type = CardTypes.VAR;
     field: string = "";
     expression: CardString = "";
     
     set: (f: string, v: any) => IVarCard;
     setIn: (f: string, v: any) => IVarCard;
-		_recordClassType = "var";
+		_recordClasstype = CardTypes.VAR;
   }
   let IVarCard_Record = Immutable.Record(new IVarCard());
   export const _IVarCard = (config?:any) => {
     return new IVarCard_Record(config || { id: 'c-' + Math.random(), }) as any as IVarCard;
   }
-  recordFactories["var"] = _IVarCard;  
+  recordFactories[CardTypes.VAR] = _IVarCard;  
   
   
   
   
   export class ICountCard extends AbstractWrapperCard
   {
-    type = "count";
+    type = CardTypes.COUNT;
     
     set: (f: string, v: any) => ICountCard;
     setIn: (f: string, v: any) => ICountCard;
-		_recordClassType = "count";
+		_recordClasstype = CardTypes.COUNT;
   }
   let ICountCard_Record = Immutable.Record(new ICountCard());
   export const _ICountCard = (config?:any) => {
     return new ICountCard_Record(config || { id: 'c-' + Math.random(), }) as any as ICountCard;
   }
-  recordFactories["count"] = _ICountCard; 
+  recordFactories[CardTypes.COUNT] = _ICountCard; 
   export class IAvgCard extends AbstractWrapperCard
   {
-    type = "avg";
+    type = CardTypes.AVG;
     
     set: (f: string, v: any) => IAvgCard;
     setIn: (f: string, v: any) => IAvgCard;
-		_recordClassType = "avg";
+		_recordClasstype = CardTypes.AVG;
   }
   let IAvgCard_Record = Immutable.Record(new IAvgCard());
   export const _IAvgCard = (config?:any) => {
     return new IAvgCard_Record(config || { id: 'c-' + Math.random(), }) as any as IAvgCard;
   }
-  recordFactories["avg"] = _IAvgCard; 
+  recordFactories[CardTypes.AVG] = _IAvgCard; 
   export class ISumCard extends AbstractWrapperCard
   {
-    type = "sum";
+    type = CardTypes.SUM;
     
     set: (f: string, v: any) => ISumCard;
     setIn: (f: string, v: any) => ISumCard;
-		_recordClassType = "sum";
+		_recordClasstype = CardTypes.SUM;
   }
   let ISumCard_Record = Immutable.Record(new ISumCard());
   export const _ISumCard = (config?:any) => {
     return new ISumCard_Record(config || { id: 'c-' + Math.random(), }) as any as ISumCard;
   }
-  recordFactories["sum"] = _ISumCard; 
+  recordFactories[CardTypes.SUM] = _ISumCard; 
   export class IMinCard extends AbstractWrapperCard
   {
-    type = "min";
+    type = CardTypes.MIN;
     
     set: (f: string, v: any) => IMinCard;
     setIn: (f: string, v: any) => IMinCard;
-		_recordClassType = "min";
+		_recordClasstype = CardTypes.MIN;
   }
   let IMinCard_Record = Immutable.Record(new IMinCard());
   export const _IMinCard = (config?:any) => {
     return new IMinCard_Record(config || { id: 'c-' + Math.random(), }) as any as IMinCard;
   }
-  recordFactories["min"] = _IMinCard; 
+  recordFactories[CardTypes.MIN] = _IMinCard; 
   export class IMaxCard extends AbstractWrapperCard
   {
-    type = "max";
+    type = CardTypes.MAX;
     
     set: (f: string, v: any) => IMaxCard;
     setIn: (f: string, v: any) => IMaxCard;
-		_recordClassType = "max";
+		_recordClasstype = CardTypes.MAX;
   }
   let IMaxCard_Record = Immutable.Record(new IMaxCard());
   export const _IMaxCard = (config?:any) => {
     return new IMaxCard_Record(config || { id: 'c-' + Math.random(), }) as any as IMaxCard;
   }
-  recordFactories["max"] = _IMaxCard; 
+  recordFactories[CardTypes.MAX] = _IMaxCard; 
   export class IExistsCard extends AbstractWrapperCard
   {
-    type = "exists";
+    type = CardTypes.EXISTS;
     
     set: (f: string, v: any) => IExistsCard;
     setIn: (f: string, v: any) => IExistsCard;
-		_recordClassType = "exists";
+		_recordClasstype = CardTypes.EXISTS;
   }
   let IExistsCard_Record = Immutable.Record(new IExistsCard());
   export const _IExistsCard = (config?:any) => {
     return new IExistsCard_Record(config || { id: 'c-' + Math.random(), }) as any as IExistsCard;
   }
-  recordFactories["exists"] = _IExistsCard; 
+  recordFactories[CardTypes.EXISTS] = _IExistsCard; 
   export class IParenthesesCard extends AbstractWrapperCard
   {
-    type = "parentheses";
+    type = CardTypes.PARENTHESES;
     
     set: (f: string, v: any) => IParenthesesCard;
     setIn: (f: string, v: any) => IParenthesesCard;
-		_recordClassType = "parentheses";
+		_recordClasstype = CardTypes.PARENTHESES;
   }
   let IParenthesesCard_Record = Immutable.Record(new IParenthesesCard());
   export const _IParenthesesCard = (config?:any) => {
     return new IParenthesesCard_Record(config || { id: 'c-' + Math.random(), }) as any as IParenthesesCard;
   }
-  recordFactories["parentheses"] = _IParenthesesCard;
+  recordFactories[CardTypes.PARENTHESES] = _IParenthesesCard;
   
   export class IWeight
   {
@@ -369,13 +396,13 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IWeight;
     setIn: (f: string, v: any) => IWeight;
-		_recordClassType = "weight";
+		_recordClasstype = BlockTypes.WEIGHT;
    }
   let IWeight_Record = Immutable.Record(new IWeight());
   export const _IWeight = (config?:any) => {
     return new IWeight_Record(config || {}) as any as IWeight;
   }
-  recordFactories["weight"] = _IWeight;
+  recordFactories[BlockTypes.WEIGHT] = _IWeight;
 
   
   export class IScoreCard extends ICard
@@ -385,13 +412,13 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IScoreCard;
     setIn: (f: string, v: any) => IScoreCard;
-		_recordClassType = "score";
+		_recordClasstype = CardTypes.SCORE;
   }
   let IScoreCard_Record = Immutable.Record(new IScoreCard());
   export const _IScoreCard = (config?:any) => {
     return new IScoreCard_Record(config || { id: 'c-' + Math.random(), }) as any as IScoreCard;
   }
-  recordFactories["score"] = _IScoreCard;
+  recordFactories[CardTypes.SCORE] = _IScoreCard;
   
   
   export class IBar
@@ -409,13 +436,13 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IBar;
     setIn: (f: string, v: any) => IBar;
-		_recordClassType = "bar";
+		_recordClasstype = BlockTypes.BAR;
    }
   let IBar_Record = Immutable.Record(new IBar());
   export const _IBar = (config?:any) => {
     return new IBar_Record(config || { id: 'c-' + Math.random(), }) as any as IBar;
   }
-  recordFactories["bar"] = _IBar;
+  recordFactories[BlockTypes.BAR] = _IBar;
   
   export class IScorePoint
   {
@@ -425,13 +452,13 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IScorePoint;
     setIn: (f: string, v: any) => IScorePoint;
-		_recordClassType = "scorepoint";
+		_recordClasstype = BlockTypes.SCOREPOINT;
    }
   let IScorePoint_Record = Immutable.Record(new IScorePoint());
   export const _IScorePoint = (config?:any) => {
     return new IScorePoint_Record(config || { id: 'c-' + Math.random(), }) as any as IScorePoint;
   }
-  recordFactories["scorepoint"] = _IScorePoint;
+  recordFactories[BlockTypes.SCOREPOINT] = _IScorePoint;
   
   export class ITransformCard extends ICard
   {
@@ -442,13 +469,13 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ITransformCard;
     setIn: (f: string, v: any) => ITransformCard;
-		_recordClassType = "transform";
+		_recordClasstype = CardTypes.TRANSFORM;
   }
   let ITransformCard_Record = Immutable.Record(new ITransformCard());
   export const _ITransformCard = (config?:any) => {
     return new ITransformCard_Record(config || { id: 'c-' + Math.random(), }) as any as ITransformCard;
   }
-  recordFactories["transform"] = _ITransformCard;
+  recordFactories[CardTypes.TRANSFORM] = _ITransformCard;
   
   export class IIfCard extends AbstractWrapperCard
   {
@@ -457,13 +484,13 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IIfCard;
     setIn: (f: string, v: any) => IIfCard;
-		_recordClassType = "if";
+		_recordClasstype = CardTypes.IF;
   }
   let IIfCard_Record = Immutable.Record(new IIfCard());
   export const _IIfCard = (config?:any) => {
     return new IIfCard_Record(config || { id: 'c-' + Math.random(), }) as any as IIfCard;
   }
-  recordFactories["if"] = _IIfCard;
+  recordFactories[CardTypes.IF] = _IIfCard;
   
   export class ITakeCard extends ICard
   {
@@ -471,13 +498,13 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ITakeCard;
     setIn: (f: string, v: any) => ITakeCard;
-		_recordClassType = "take";
+		_recordClasstype = CardTypes.TAKE;
   }
   let ITakeCard_Record = Immutable.Record(new ITakeCard());
   export const _ITakeCard = (config?:any) => {
     return new ITakeCard_Record(config || { id: 'c-' + Math.random(), }) as any as ITakeCard;
   }
-  recordFactories["take"] = _ITakeCard;
+  recordFactories[CardTypes.TAKE] = _ITakeCard;
   
   export class ISkipCard extends ICard
   {
@@ -485,13 +512,13 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ISkipCard;
     setIn: (f: string, v: any) => ISkipCard;
-		_recordClassType = "skip";
+		_recordClasstype = CardTypes.SKIP;
   }
   let ISkipCard_Record = Immutable.Record(new ISkipCard());
   export const _ISkipCard = (config?:any) => {
     return new ISkipCard_Record(config || { id: 'c-' + Math.random(), }) as any as ISkipCard;
   }
-  recordFactories["skip"] = _ISkipCard;
+  recordFactories[CardTypes.SKIP] = _ISkipCard;
   
   
   export enum InputType
@@ -506,17 +533,17 @@ export module BuilderTypes
     id: string = "";
     key: string = "";
     value: string = "";
-    type: InputType;
+    type: InputType = InputType.NUMBER;
     
     set: (f: string, v: any) => IInput;
     setIn: (f: string, v: any) => IInput;
-    _recordClassType = "input";
+    _recordClasstype = BlockTypes.INPUT;
   }
   let IInput_Record = Immutable.Record(new IInput());
   export const _IInput = (config?:any) => {
     return new IInput_Record(config || { id: 'c-' + Math.random(), }) as any as IInput;
   }
-  recordFactories["input"] = _IInput;
+  recordFactories[BlockTypes.INPUT] = _IInput;
   
   
   // A query can be viewed and edited in the Builder
@@ -657,28 +684,6 @@ export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span classN
 //   },
 // };
 
-
-export const CardTypes = 
-[
-  'from',
-  'select',
-  'sort',
-  'filter',
-  'let',
-  'score',
-  'transform',
-  'if',
-  'max',
-  'min',
-  'sum',
-  'avg',
-  'count',
-  'exists',
-  'parentheses',
-  'var',
-  'take',
-  'skip',
-];
 
 export const CardColors = 
 // title is first, body is second

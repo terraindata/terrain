@@ -46,7 +46,6 @@ require('./TransformCard.less');
 
 import * as _ from 'underscore';
 import * as React from 'react';
-import Actions from "../../../data/BuilderActions.tsx";
 import Util from '../../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
 import Dropdown from './../../../../common/components/Dropdown.tsx';

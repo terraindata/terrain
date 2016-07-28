@@ -58,129 +58,109 @@ import { DropTarget } from 'react-dnd';
 import BuilderTypes from '../../BuilderTypes.tsx';
 type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
+let {List} = Immutable;
 
 interface Props
 {
   cards: ICards;
-  parentId: ID; // TODO ?
-  spotlights: List<any>; // TODO spotlight type
   topLevel: boolean;
   keys: List<string>;
   canEdit: boolean;
+  keyPath: KeyPath;
   
+  queryId?: ID;
+  spotlights?: List<any>; // TODO spotlight type
   connectDropTarget?: (el:JSX.Element) => JSX.Element;
+}
+
+interface KeyState {
+  keys: List<string>;
+  keyPath: KeyPath;
 }
 
 class CardsArea extends PureClasss<Props>
 {
-  // state: {
-  //   layout: {
-  //     rows: any[],
-  //   },
-  // };
+  state: KeyState = {
+    keys: List([]),
+    keyPath: null,
+  };
   
   constructor(props:Props)
   {
     super(props);
-    
+    this.state.keys = this.computeKeys(props);
+    this.state.keyPath = this.computeKeyPath(props);
   }
   
-  // componentWillReceiveProps(nextProps:Props)
-  // {
-    
-  // }
-  
-  // updateRows(nextProps:Props)
-  // {
-  //   this.setState({
-  //     layout:
-  //     {
-  //       rows: this.getRows(nextProps),
-  //     }
-  //   });
-  // }
-  
-  getLayout()
+  componentWillReceiveProps(nextProps:Props)
   {
-    return {
-      rows: this.getRows(this.props),
-    };
+    if(nextProps.keys !== this.props.keys || nextProps.cards !== this.props.cards)
+    {
+      this.setState({
+        keys: this.computeKeys(nextProps)
+      });
+    }
+    if(nextProps.keyPath !== this.props.keyPath || nextProps.queryId !== this.props.queryId)
+    {
+      this.setState({
+        keyPath: this.computeKeyPath(nextProps)
+      });
+    }
   }
   
-  getKeys(props)
+  computeKeyPath(props:Props): KeyPath
   {
-    return props.keys.concat(
+    if(props.keyPath)
+    {
+      return this._ikeyPath(props.keyPath, 'cards');
+    }
+    if(props.queryId && props.topLevel)
+    {
+      return List(['queries', props.queryId, 'cards']);
+    }
+    
+    throw new Error("Invalid props combination passed to CardsArea.");
+  }
+  
+  computeKeys(props:Props): List<string>
+  {
+    let newKeysArr: string[] = props.keys.toJS().concat(
       props.cards.reduce(
-        (memo, card) => {
-          if(card.type === 'var' || card.type === 'let')
+        (memo: string[], card): string[] =>
+        {
+          if(card.type === BuilderTypes.CardTypes.VAR || card.type === BuilderTypes.CardTypes.LET)
           {
-            memo.push(card.field);
+            memo.push(
+              (card as (BuilderTypes.IVarCard | BuilderTypes.ILetCard)).field
+            );
           }
           return memo;
         }
       , [])
     );
+    
+    if(newKeysArr.some(key => this.state.keys.indexOf(key) === -1))
+    {
+      // keys have changed
+      return List(newKeysArr);
+    }
+    
+    return this.state.keys;
   }
   
-  getRows(props)
-  {
-    return props.cards.map((card, index) => (
-      {
-        content: <Card 
-          {...props}
-          cards={null}
-          singleCard={false}
-          topLevel={false}
-          index={index}
-          card={card}
-          dndListener={$({})}
-          keys={this.getKeys(props)}
-        />,
-        key: card.id,
-      }
-    ))
-    .concat(!this.props.canEdit ? [] :
-    [{
-      content: (
-        <CreateCardTool
-          {...this.props}
-          index={props.cards.length}
-          open={props.cards.length === 0}
-          parentId={props.parentId}
-          className={props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
-        />
-      ),
-      key: 'end-tool',
-    }]);
-  }
+       
   
   copy() {}
   
   clear() {}
   
   createFromCard() {
-    Actions.cards.create(this.props.parentId, 'from', 0);
+    Actions.cards.create(this.state.keyPath, 'from', 0);
   }
   
   render() {
-    let {cards, topLevel, canEdit} = this.props;
-    
-    // TODO is there a better way? store keys in the redux state?
-    console.log(cards, cards.toJS());
-    let keys = this.props.keys.concat(
-      cards.reduce(
-        (memo: List<string>, card: ICard): List<string> => {
-          console.log(card);
-          if(card.type === 'var' || card.type === 'let')
-          {
-            console.log('field', card['field']);
-            memo.push(card['field']);
-          }
-          return memo;
-        }
-      , Immutable.List([]))
-    );
-    console.log('keys', keys);
+    let {props} = this;
+    let {cards, topLevel, canEdit} = props;
     
     if(!cards.size && topLevel)
     {
@@ -207,10 +187,18 @@ class CardsArea extends PureClasss<Props>
               index={index}
               card={card}
               dndListener={$({})}
-              keys={keys}
+              keys={this.state.keys}
             />
           )
         }
+        
+        <CreateCardTool
+          {...this.props}
+          index={props.cards.size}
+          open={props.cards.size === 0}
+          parentId={props.queryId /* TODO */}
+          className={props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
+        />
       </div>
     );
   }

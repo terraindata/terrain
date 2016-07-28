@@ -48,9 +48,11 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../data/BuilderActions.tsx";
 import Util from '../../../util/Util.tsx';
-import { CardTypes, CardColors } from './../../BuilderTypes.tsx';
+import { BuilderTypes, CardColors } from './../../BuilderTypes.tsx';
+let {CardTypes} = BuilderTypes;
 import CreateLine from "../../../common/components/CreateLine.tsx";
 import { DragSource, DropTarget } from 'react-dnd';
+import PureClasss from '../../../common/components/PureClasss.tsx';
 
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -68,15 +70,16 @@ interface Props {
 }
 
 var styles: any = {};
-_.map(CardTypes as any, ((v, type) => 
+for(var type in CardTypes)
+{
   styles[type] =
   {
     background: CardColors[type] ? CardColors[type][0] : CardColors['none'][0],
     borderColor: CardColors[type] ? CardColors[type][1] : CardColors['none'][1],
   }
-));
+}
 
-class CreateCardTool extends React.Component<Props, any>
+class CreateCardTool extends PureClasss<Props>
 {
   constructor(props:Props)
   {

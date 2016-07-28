@@ -60,25 +60,15 @@ InputsReducer[ActionTypes.inputs.move] =
   (state, action) => 
     state.updateIn(['queries', action.payload.queryId, 'inputs'], inputs =>
       Util.immutableMove(inputs, action.payload.input.id, action.payload.index));
-// TODO
-// InputsReducer[ActionTypes.inputs.changeKey] =
-//   (state, action) =>
-//     state.setIn(['queries', action.payload.input.parentId, 'inputs', action.payload.index, 'key'],
-//       action.payload.value);
-
-// InputsReducer[ActionTypes.inputs.changeValue] =
-//   (state, action) =>
-//     state.setIn(['queries', action.payload.input.parentId, 'inputs', action.payload.index, 'value'],
-//       action.payload.value);
 
 InputsReducer[ActionTypes.inputs.changeType] =
   (state, action) =>
-    state.setIn(['queries', action.payload.input.parentId, 'inputs', action.payload.index, 'type'],
+    state.setIn(['queries', action.payload.queryId, 'inputs', action.payload.index, 'type'],
       action.payload.value);
 
 InputsReducer[ActionTypes.inputs.remove] =
   (state, action) =>
-    state.updateIn(['queries', action.payload.input.parentId, 'inputs'], inputs =>
-      inputs.delete(inputs.findIndex(input => input.get('id') === action.payload.input.id)));
+    state.updateIn(['queries', action.payload.queryId, 'inputs'], inputs =>
+      inputs.splice(action.payload.index, 1));
 
 export default InputsReducer;

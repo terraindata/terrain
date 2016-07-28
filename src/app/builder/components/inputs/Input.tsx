@@ -67,6 +67,9 @@ var Input = React.createClass<any, any>({
 		input: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
     queryId: React.PropTypes.string.isRequired,
+    // since inputs still are regular classes, instead of PureClasss, we construct keyPaths for Actions on execution
+    //  rather than caching. This is fine since inputs aren't nested, there would be no
+    //  benefit to caching keyPaths anyways.
 	},
   
   shouldComponentUpdate(nextProps, nextState)
@@ -102,7 +105,7 @@ var Input = React.createClass<any, any>({
   {
     Util.animateToHeight(this.refs.input, 0);
     setTimeout(() => {
-      Actions.inputs.remove(this.props.input)
+      Actions.inputs.remove(this.props.queryId, this.props.index)
     }, 250);
   },
   
