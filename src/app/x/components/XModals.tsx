@@ -51,21 +51,34 @@ import * as classNames from 'classnames';
 var Modal = require('react-modal');
 var InfoIcon = require('./../../../images/icon_info.svg')
 
-interface XModalsProps
-{
-}
+
+export module XModals {
 
 interface ModalProps {
 	modalMessage: string;
   modalResetState: () => void;
   modalTitle?: string;
-	modalConfirm?: boolean;
   modalError?: boolean;
+	modalConfirm?: boolean;
 	modalConfirmMessage?: string;
 	modalConfirmFunction?: () => void; 
 }
 
-class ModalDialog extends Classs<ModalProps>  {
+export function triggerModal(content: string, modalResetState: () => void, modalTitle?: string, modalError?: boolean, modalConfirm?: boolean, modalConfirmMessage?: string, modalConfirmFunction?: () => void)
+{
+    return(<ModalDialog
+        modalMessage = {content}
+        modalResetState = {modalResetState}
+        modalTitle = {modalTitle}
+        modalError = {modalError}
+        modalConfirm = {modalConfirm}
+        modalConfirmMessage = {modalConfirmMessage}
+        modalConfirmFunction = {modalConfirmFunction}
+     />);
+}
+
+export class ModalDialog extends Classs<ModalProps>  
+  {
     state: {
     	open: boolean;
   	} = {
@@ -74,14 +87,16 @@ class ModalDialog extends Classs<ModalProps>  {
 
     openModal () 
     { 
-    	this.setState({
+      this.setState({
     		open: true
     	}); 
     }
 
     closeModal () 
     { 
-    	this.setState({open: false});
+    	this.setState({
+        open: false
+      });
     	this.props.modalResetState();
     }
 
@@ -93,8 +108,6 @@ class ModalDialog extends Classs<ModalProps>  {
     		this.props.modalConfirmFunction();
     	}
     }
-
-    //{this.props.modalError ? <InfoIcon /> : null}
 
     render () 
     {
@@ -143,88 +156,7 @@ class ModalDialog extends Classs<ModalProps>  {
         </div>
       );
     }
+  }
+
 }
-
-class XModals extends Classs<XModalsProps>
-{
-	state: {
-    	modalConfirmTriggered: boolean;
-      modalErrorTriggered: boolean;
-  	} = {
-    	modalConfirmTriggered: false,
-      modalErrorTriggered: false,
-  	}; 
-	
-	revert()
-	{
-		console.log("reverting");
-	}
-
- 	createConfirmModal()
- 	{
- 		return (<ModalDialog
- 		    //modalTitle='Confirm Modal'
-      	modalMessage = 'Modal dialog content goes here. Trying to make it longer. LONGERRRRRRRR! How is this now?'
-      	modalConfirm = {true}
-        //modalError = {true}
-      	modalConfirmMessage = 'Revert'
-      	modalConfirmFunction = {this.revert}
-      	modalResetState = {this.resetConfirmTriggerState}
- 		/>);
- 	}
-
-   createErrorModal()
-   {
-     return (<ModalDialog
-        modalMessage = 'Modal dialog content goes here. Trying to make it longer. LONGERRRRRRRR! How is this now?'
-        modalError = {true}
-        modalResetState = {this.resetErrorTriggerState}
-     />);
-   }
-
- 	triggerConfirmModal()
- 	{
- 		this.setState({
- 			modalConfirmTriggered: true
- 		});
- 	}
- 	
- 	resetConfirmTriggerState()
- 	{
- 		this.setState({
- 			modalConfirmTriggered: false
- 		});
- 	}
-
-   triggerErrorModal()
-   {
-     this.setState({
-       modalErrorTriggered: true
-     });
-   }
-   
-   resetErrorTriggerState()
-   {
-     this.setState({
-       modalErrorTriggered: false
-     });
-   }
- 	
- 	render()
-  	{
-    	return (
-      	<div>
-      		<div className='button' onClick={this.triggerConfirmModal}> 
-      			Confirm Modal
-      		</div>
-      		{this.state.modalConfirmTriggered ? this.createConfirmModal() : null}
-          <div className='button' onClick={this.triggerErrorModal}> 
-            Error Modal
-          </div>
-          {this.state.modalErrorTriggered ? this.createErrorModal() : null}
-      	</div>
-    	);
-  	}
-}
-
 export default XModals;

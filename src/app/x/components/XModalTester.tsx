@@ -42,72 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./X.less');
-import * as React from 'react';
-import * as _ from 'underscore';
 import Classs from './../../common/components/Classs.tsx';
-import XCards from './XCards.tsx';
-import { Link } from 'react-router';
-import XModals from './XModals.tsx';
-import XModalTester from './XModalTester.tsx';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import XModal from './XModals.tsx';
 
-const xes =
+interface XModalTesterProps
 {
-  cards:
-  {
-    name: 'Cards Drag & Drop',
-    component: XCards,
-  },
-  modals:
-  {
-    name: 'Modals',
-    component: XModalTester,
-  },
-};
 
-interface Props
-{
-  params?: any;
-  history?: any;
-  location?: {
-    pathname: string;
-  };
 }
 
-class X extends Classs<Props>
+class XModalTester extends Classs<XModalTesterProps>
 {
-  constructor(props)
+  state: {
+      open: boolean;
+  } = {
+      open: false,
+  };
+
+  triggerModal()
   {
-    super(props);
+    this.setState({
+      open: true
+    });
   }
-  
+
+  unTriggerModal()
+  {
+    this.setState({
+      open: false
+    });
+  }
+
   render()
   {
-    let { x } = this.props.params;
-    
-    if(x && xes[x])
-    {
-      let C =  xes[x].component;
-      return <C {...this.props} />;
-    }
-    
     return (
-      <div className='x-area'>
-        <div className='x-title'>
-          Experiments
+      <div > 
+        <div id='test'className='button' onClick={this.triggerModal}>
+          Testing
         </div>
-        {
-          _.keys(xes).map(indX =>
-            <Link to={`/x/${indX}`} key={indX}>
-              <div className='x-x'>
-                { xes[indX].name }
-              </div>
-            </Link>
-          )
-        }
+       {this.state.open ? XModal.triggerModal('meep', this.unTriggerModal, 'Trial', true) : null}
       </div>
     );
   }
 }
 
-export default X;
+export default XModalTester;
