@@ -103,10 +103,6 @@ export class ModalDialog extends Classs<ModalDialogProps>
     {
     	this.closeModal();
       this.props.modalConfirmFunction ? this.props.modalConfirmFunction() : null;
-    	// if(this.props.modalConfirmFunction)
-    	// {
-    	// 	this.props.modalConfirmFunction();
-    	// }
     }
 
     render () 
