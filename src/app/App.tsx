@@ -89,6 +89,9 @@ import AuthActions from "./auth/data/AuthActions.tsx";
 import AuthStore from "./auth/data/AuthStore.tsx";
 import UserActions from "./users/data/UserActions.tsx";
 
+import { XNotification } from './x/components/XNotification.tsx';
+
+
 var links = 
 [
   {
@@ -197,7 +200,7 @@ var App = React.createClass({
      
     return <LayoutManager layout={layout} />;
   },
-  
+
   render ()
   {
     return (
@@ -216,10 +219,12 @@ var App = React.createClass({
           class="tooltip"
           hideOnClick={true}
         />
+        <XNotification />
       </div>
     );
-  }
+  },
 });
+
 
 var router = (
   <Router history={history}>

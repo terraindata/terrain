@@ -42,28 +42,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-
+import Classs from './../../common/components/Classs.tsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-var NotificationSystem = require('react-notification-system');
+//import NotificationManager from './NotificationManager.tsx';
+import TestComponent from './TestComponent.tsx';
+import { XNotification } from './XNotification.tsx';
+//import XNotification from './XNotification.tsx';
 
-
-function NotificationManager()
+interface Props
 {
-  this.system = null;
+  params?: any;
+  history?: any;
+  location?: {
+    pathname: string;
+  };
+}
 
-  this.addNotification = function(message, type)
+class TestPage extends Classs<Props>
+{
+  constructor(props)
   {
-    if(this.system) { 
-      this.system.addNotification({
-        title: 'Terrain Message',
-        message: message,
-        level: type,
-        autoDismiss: type === 'error' ? 0 : 5,
-        dismissible: type !== 'error'
-      });
-    }  
+    super(props);
+
+  }
+
+  render()
+  {
+    return (
+      <div>
+        <TestComponent />
+        <TestComponent />
+        <XNotification />
+      </div>
+    );
   }
 }
 
-export default NotificationManager;
+export default TestPage;
+//export default this.addNotification;
+

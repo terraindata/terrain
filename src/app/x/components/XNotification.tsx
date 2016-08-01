@@ -42,12 +42,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+/*
+How to use Notifications:
+In App.tsx: 
+import {XNotification} from './x/components/XNotification/tsx'
+render()
+  ...
+  <XNotification />
+  ...
+
+Anywhere you want to trigger notifications from:
+import {notificationManager} from 'path/XNotification.tsx'
+
+addNotification()
+  notificationManager.addNotification("message", type ("info" or "error"), timeOut (optional, 0=no timeout));
+
+render()
+  ...
+  <div onClick={this.addNotification} >Trigger notification!</div>
+  ...
+*/
+
 import Classs from './../../common/components/Classs.tsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-var NotificationSystem = require('react-notification-system');
+var NotificationSystem = require('./notification-system/NotificationSystem');
 //import NotificationManager from './NotificationManager.tsx';
 import TestComponent from './TestComponent.tsx';
+var styles = require('./notification-system/styles.js');
 
 interface XNotificationProps
 {
@@ -58,23 +80,25 @@ interface XNotificationProps
   };
 }
 
+var notificationManager = {
+  system: null,
+  addNotification:function(message:any, type:string, timeOut?:number)
+  {
+    if(this.system) { 
+      this.system.addNotification({
+        title: 'Terrain Message',
+        message: message,
+        level: type,
+        autoDismiss: timeOut || 5000, 
+        dismissible: true
+      });
+    }  
+  }
+}
+
 class XNotification extends Classs<XNotificationProps>
 {
-  notificationManager = {
-    system: null,
-    addNotification:function(message, type)
-    {
-      if(this.system) { 
-        this.system.addNotification({
-          title: 'Terrain Message',
-          message: message,
-          level: type,
-          autoDismiss: type === 'error' ? 0 : 5,
-          dismissible: type !== 'error'
-        });
-      }  
-    }
-  }
+
 
   constructor(props)
   {
@@ -85,23 +109,20 @@ class XNotification extends Classs<XNotificationProps>
   }
 
   componentDidMount() {
-    console.log("Setting notification manager");
-    this.notificationManager.system = this.refs['notificationSystem'];
+    notificationManager.system = this.refs['notificationSystem'];
     this.setState({
-       notificationManager: this.notificationManager,
-    })
+       notificationManager: notificationManager,
+    });
   }
 
   render()
   {
     return (
       <div>
-      <TestComponent message="TEST MESSAGE 1" manager={this.state.notificationManager}/>
-      <TestComponent message="TEST MESSAGE 2!!!!" manager={this.state.notificationManager} />
-      <NotificationSystem ref='notificationSystem'/>
+        <NotificationSystem allowHTML={true} style={styles} ref='notificationSystem'/>
       </div>
     );
   }
 }
 
-export default XNotification;
+export { XNotification, notificationManager };

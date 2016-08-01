@@ -45,7 +45,9 @@ THE SOFTWARE.
 import Classs from './../../common/components/Classs.tsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import NotificationManager from './NotificationManager.tsx'; 
+var TerrainIcon = require('./../../../images/icon_terrain.svg');
+//import addNotification from './TestPage.tsx';
+var {notificationManager} = require('./XNotification.tsx');
 
 interface Props
 {
@@ -54,8 +56,7 @@ interface Props
   location?: {
     pathname: string;
   };
-  manager: any;
-  message: string;
+ // addNotification: any; //function
 }
 
 class TestComponent extends Classs<Props>
@@ -66,19 +67,13 @@ class TestComponent extends Classs<Props>
     super(props);
   }
 
-  addNotification() {
-  	console.log("HERE");
-  	console.log(this.props.manager);
-  	if(this.props.manager) 
-  	{
-  		this.props.manager.addNotification(this.props.message, 'info')
-  	}
+  addNotification()
+  {
+  	notificationManager.addNotification("hello this is s mese er kl;jnrg alkj naerldgjk nalj re glker n", "info", 0);
   }
 
   render()
   {
-  	console.log("Render test component");
-  	console.log(this.props.manager);
     return (
 	    <div>
 		    <div 
