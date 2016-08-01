@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./XModals.less');
 import Classs from './../../common/components/Classs.tsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -80,11 +81,11 @@ class XModalTester extends Classs<XModalTesterProps>
   {
     return (
       <div > 
-        <div className='button' onClick={this.toggleErrorModal}>
+        <div className='button xmodal-tester-row' onClick={this.toggleErrorModal}>
           Error Modal
         </div>
        {this.state.errorModalOpen ? XModal.triggerModal('This is a sample error modal', this.toggleErrorModal, null, true) : null}
-       <div className='button' onClick={this.toggleConfirmModal}>
+       <div className='button xmodal-tester-row' onClick={this.toggleConfirmModal}>
           Confirm Modal
         </div>
        {this.state.confirmModalOpen ? XModal.triggerModal('This is a sample confirm modal', this.toggleConfirmModal, 'Confirm', false, true) : null}
