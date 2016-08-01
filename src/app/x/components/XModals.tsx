@@ -51,33 +51,32 @@ import * as classNames from 'classnames';
 var Modal = require('react-modal');
 var InfoIcon = require('./../../../images/icon_info.svg')
 
-
 export module XModals {
 
-interface ModalProps {
+interface ModalDialogProps {
 	modalMessage: string;
-  modalResetState: () => void;
+  modalResetFunction: () => void;
   modalTitle?: string;
   modalError?: boolean;
 	modalConfirm?: boolean;
-	modalConfirmMessage?: string;
+	modalConfirmButton?: string;
 	modalConfirmFunction?: () => void; 
 }
 
-export function triggerModal(content: string, modalResetState: () => void, modalTitle?: string, modalError?: boolean, modalConfirm?: boolean, modalConfirmMessage?: string, modalConfirmFunction?: () => void)
+export function triggerModal(content: string, modalResetFunction: () => void, modalTitle?: string, modalError?: boolean, modalConfirm?: boolean, modalConfirmButton?: string, modalConfirmFunction?: () => void)
 {
     return(<ModalDialog
         modalMessage = {content}
-        modalResetState = {modalResetState}
+        modalResetFunction = {modalResetFunction}
         modalTitle = {modalTitle}
         modalError = {modalError}
         modalConfirm = {modalConfirm}
-        modalConfirmMessage = {modalConfirmMessage}
+        modalConfirmButton = {modalConfirmButton}
         modalConfirmFunction = {modalConfirmFunction}
      />);
 }
 
-export class ModalDialog extends Classs<ModalProps>  
+export class ModalDialog extends Classs<ModalDialogProps>  
   {
     state: {
     	open: boolean;
@@ -97,16 +96,17 @@ export class ModalDialog extends Classs<ModalProps>
     	this.setState({
         open: false
       });
-    	this.props.modalResetState();
+    	this.props.modalResetFunction();
     }
 
     closeModalSuccess () 
     {
     	this.closeModal();
-    	if(this.props.modalConfirmFunction)
-    	{
-    		this.props.modalConfirmFunction();
-    	}
+      this.props.modalConfirmFunction ? this.props.modalConfirmFunction() : null;
+    	// if(this.props.modalConfirmFunction)
+    	// {
+    	// 	this.props.modalConfirmFunction();
+    	// }
     }
 
     render () 
@@ -144,7 +144,7 @@ export class ModalDialog extends Classs<ModalProps>
             		{
            				this.props.modalConfirm ? 
            					<div className='button modal-confirm-button' onClick={this.closeModalSuccess}>
-           						{this.props.modalConfirmMessage ? this.props.modalConfirmMessage : 'Ok'}
+           						{this.props.modalConfirmButton ? this.props.modalConfirmButton : 'Ok'}
            					</div> 
            					: 
            					<div />

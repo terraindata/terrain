@@ -55,33 +55,39 @@ interface XModalTesterProps
 class XModalTester extends Classs<XModalTesterProps>
 {
   state: {
-      open: boolean;
+      errorModalOpen: boolean;
+      confirmModalOpen: boolean;
   } = {
-      open: false,
+      errorModalOpen: false,
+      confirmModalOpen: false,
   };
 
-  triggerModal()
+  toggleErrorModal()
   {
-    this.setState({
-      open: true
-    });
+    this.setState ({
+      errorModalOpen: !this.state.errorModalOpen
+    })
   }
 
-  unTriggerModal()
+  toggleConfirmModal()
   {
-    this.setState({
-      open: false
-    });
+    this.setState ({
+      confirmModalOpen: !this.state.confirmModalOpen
+    })
   }
 
   render()
   {
     return (
       <div > 
-        <div id='test'className='button' onClick={this.triggerModal}>
-          Testing
+        <div className='button' onClick={this.toggleErrorModal}>
+          Error Modal
         </div>
-       {this.state.open ? XModal.triggerModal('meep', this.unTriggerModal, 'Trial', true) : null}
+       {this.state.errorModalOpen ? XModal.triggerModal('This is a sample error modal', this.toggleErrorModal, null, true) : null}
+       <div className='button' onClick={this.toggleConfirmModal}>
+          Confirm Modal
+        </div>
+       {this.state.confirmModalOpen ? XModal.triggerModal('This is a sample confirm modal', this.toggleConfirmModal, 'Confirm', false, true) : null}
       </div>
     );
   }
