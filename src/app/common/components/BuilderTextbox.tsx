@@ -80,6 +80,9 @@ interface Props
   
   isOverCurrent?: boolean;
   connectDropTarget?: (Element) => JSX.Element;
+
+  isNumber?: boolean;
+  typeErrorMessage?: string;
 }
 
 class BuilderTextbox extends React.Component<Props, any>
@@ -89,9 +92,15 @@ class BuilderTextbox extends React.Component<Props, any>
   constructor(props: Props)
   {
     super(props);
-    
+    var value: any = this.props.value;
+    this.state = {
+        wrongType: this.props.isNumber ? isNaN(value) : false,
+    }
     // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
-    this.executeChange = _.debounce(this.executeChange, 750);
+    if(!this.props.isNumber)
+    {
+          this.executeChange = _.debounce(this.executeChange, 750);
+    }
     Util.bind(this, ['executeChange', 'handleTextareaChange', 'renderSwitch', 'handleSwitch', 'handleAutocompleteChange']);
   }
   
@@ -126,6 +135,12 @@ class BuilderTextbox extends React.Component<Props, any>
   handleAutocompleteChange(value)
   {
     this.executeChange(value);
+    if(this.props.isNumber)
+    {
+      this.setState({
+        wrongType: isNaN(value),
+      });
+    }
   }
   
   isText()
@@ -181,12 +196,15 @@ class BuilderTextbox extends React.Component<Props, any>
     {
       const { isOverCurrent, connectDropTarget } = this.props;
       return connectDropTarget(
-        <div className={classNames({
-          'builder-tb': true,
-          'builder-tb-drag-over': isOverCurrent,
-          'builder-tb-accepts-cards': this.props.acceptsCards,
-          'card-drop-target': this.props.acceptsCards
-        })}>
+        <div 
+          className={classNames({
+            'builder-tb': true,
+            'builder-tb-drag-over': isOverCurrent,
+            'builder-tb-accepts-cards': this.props.acceptsCards,
+            'card-drop-target': this.props.acceptsCards
+          })}
+          //data-tip={(this.state && this.state.wrongType) ? this.props.typeErrorMessage : null}
+        >
           {
             this.props.textarea ?
               <textarea
@@ -206,7 +224,8 @@ class BuilderTextbox extends React.Component<Props, any>
                 options={this.props.options}
                 onChange={this.handleAutocompleteChange}
                 placeholder={this.props.placeholder}
-                help={this.props.help}
+                help={this.state && this.state.wrongType ? this.props.typeErrorMessage : this.props.help}
+                className={this.state && this.state.wrongType ? 'ac-wrong-type' : null}
               />
           }
           { this.props.acceptsCards && this.renderSwitch() }

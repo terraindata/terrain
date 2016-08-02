@@ -161,6 +161,7 @@ var Input = React.createClass<any, any>({
       );
     }
     
+
     return (
       <BuilderTextbox
         {...this.props}
@@ -169,6 +170,8 @@ var Input = React.createClass<any, any>({
         className="input-text input-text-second"
         id={this.props.input.id}
         keyPath={['value']}
+        isNumber={this.props.input.type === BuilderTypes.InputType.NUMBER}
+        typeErrorMessage="That is not a number"
       />
     );
   },
