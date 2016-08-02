@@ -57,7 +57,8 @@ import PureClasss from '../../../common/components/PureClasss.tsx';
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
 
-interface Props {
+interface Props
+{
   index: number;
   open?: boolean;
   keyPath: KeyPath;
@@ -70,9 +71,10 @@ interface Props {
 }
 
 var styles: any = {};
-for(var type in CardTypes)
+for(var t in CardTypes)
 {
-  styles[CardTypes[type]] =
+  let type = CardTypes[t];
+  styles[type] =
   {
     background: CardColors[type] ? CardColors[type][0] : CardColors['none'][0],
     borderColor: CardColors[type] ? CardColors[type][1] : CardColors['none'][1],
@@ -133,7 +135,7 @@ class CreateCardTool extends PureClasss<Props>
      <div className='create-card-selector' ref='ccWrapper'>
        <div className='create-card-selector-inner'>
          {
-           _.map(CardTypes, (type) => (
+           _.map(CardTypes as any, (type:string) => (
              <a
                className="create-card-button"
                key={type}

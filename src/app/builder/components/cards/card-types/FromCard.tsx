@@ -57,13 +57,11 @@ import { BuilderTypes } from './../../../BuilderTypes.tsx';
 import PureClasss from './../../../../common/components/PureClasss.tsx';
 import Ajax from './../../../../util/Ajax.tsx';
 
-interface Props
+interface Props extends BuilderTypes.CardProps
 {
   card: BuilderTypes.IFromCard;
-  index: number;
   spotlights: any;
   keys: List<string>;
-  keyPath: KeyPath;
 }
 
 var OPERATOR_WIDTH: number = 30;
@@ -205,7 +203,7 @@ class FromCard extends PureClasss<Props>
         <CardsArea 
           {...this.props}
           cards={this.props.card.cards}
-          keyPath={this._ikeyPath(this.props.keyPath, this.props.index, 'cards')}
+          keyPath={this._ikeyPath(this.props.keyPath, this.props.index)}
           keys={
             this.state.keys
           }

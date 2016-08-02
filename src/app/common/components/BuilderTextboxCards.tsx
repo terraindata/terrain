@@ -52,7 +52,6 @@ import Card from '../../builder/components/cards/Card.tsx';
 interface Props
 {
   value: BuilderTypes.CardString;
-  spotlights?: any[];
   parentId?: string;
 }
 

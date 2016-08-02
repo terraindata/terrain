@@ -187,14 +187,17 @@ var BuilderColumn = React.createClass<any, any>(
     {
       case COLUMNS.Builder:
         // this should be temporary; remove when middle tier arrives
-        var spotlights = Immutable.List(query.results ? query.results.reduce((spotlights, result) =>
-        {
-          if(result.spotlight)
-          {
-            spotlights.push(result);
-          }
-          return spotlights;
-        }, []) : []);
+        // var spotlights = Immutable.List(query.results ? query.results.reduce((spotlights, result) =>
+        // {
+        //   if(result.spotlight)
+        //   {
+        //     spotlights.push(result);
+        //   }
+        //   return spotlights;
+        // }, []) : []);
+        // TODO
+        let spotlights = Immutable.List([]);
+        
         if (this.props.query.mode === "tql")
         {
           return <InfoArea

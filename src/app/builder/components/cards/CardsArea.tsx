@@ -197,6 +197,7 @@ class CardsArea extends PureClasss<Props>
         
         <CreateCardTool
           {...this.props}
+          keyPath={this.state.keyPath}
           index={props.cards.size}
           open={props.cards.size === 0}
           parentId={props.queryId /* TODO */}

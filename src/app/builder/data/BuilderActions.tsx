@@ -50,6 +50,7 @@ import { BuilderTypes } from './../BuilderTypes.tsx';
 import * as Immutable from 'immutable';
 import List = Immutable.List;
 import Map = Immutable.Map;
+type CardProps = BuilderTypes.CardProps;
 
 var $ = (type: string, payload: any) => Store.dispatch({type, payload})
 
@@ -65,18 +66,27 @@ var BuilderActions =
       (keyPath: KeyPath, type: string, index: number) => 
         $(ActionTypes.cards.create, {keyPath, type, index}),
 
+    // TODO
     move: 
-      (card: BuilderTypes.ICard, index: number, parentId: string) =>
-        $(ActionTypes.cards.move, {card, index, parentId}),
+      (props: CardProps, index: number, parentId: string) =>
+        $(ActionTypes.cards.move, {props, index, parentId}),
     
-    // TODO remove
+    // TODO remove?
     change:
-      (cardId: string, keyPath: (string | number)[], value: any) =>
-        $(ActionTypes.cards.change, {cardId, keyPath, value}),
+      (props: CardProps, keyPath: (string | number)[], value: any) =>
+        $(ActionTypes.cards.change, {props, keyPath, value}),
+    
+    moveField:
+      (props: CardProps, keyPath: (string | number)[], curIndex: number, newIndex: number) =>
+        $(ActionTypes.cards.change, {props, keyPath, curIndex, newIndex}),
+    
+    createField:
+      (props: CardProps, keyPath: (string | number)[], index: number, blockType: string) =>
+        $(ActionTypes.cards.change, {props, keyPath, index, blockType}),
     
     remove: 
-      (card: BuilderTypes.ICard, parentId: string) =>
-        $(ActionTypes.cards.remove, {card, parentId}),
+      (props: CardProps, parentId: string) =>
+        $(ActionTypes.cards.remove, {props, parentId}),
     
     selectCard:
       (cardId: string, altKey: boolean, shiftKey: boolean) =>
@@ -85,105 +95,105 @@ var BuilderActions =
     sort:
     {
       create: 
-        (card: BuilderTypes.ISortCard, index?: number) =>
-          $(ActionTypes.cards.sort.create, {card, index}),
+        (props: CardProps, index?: number) =>
+          $(ActionTypes.cards.sort.create, {props, index}),
           
       change: 
-        (card: BuilderTypes.ISortCard, index: number, value: BuilderTypes.ISort) =>
-          $(ActionTypes.cards.sort.change, {card, index, value}),
+        (props: CardProps, index: number, value: BuilderTypes.ISort) =>
+          $(ActionTypes.cards.sort.change, {props, index, value}),
           
       move: 
-        (card: BuilderTypes.ISortCard, sort: BuilderTypes.ISort, index: number) =>
-          $(ActionTypes.cards.sort.move, {card, sort, index}),
+        (props: CardProps, sort: BuilderTypes.ISort, index: number) =>
+          $(ActionTypes.cards.sort.move, {props, sort, index}),
 
       remove: 
-          (card: BuilderTypes.ISortCard, index: number) =>
-            $(ActionTypes.cards.sort.remove, {card, index}),
+          (props: CardProps, index: number) =>
+            $(ActionTypes.cards.sort.remove, {props, index}),
     },
 
     select:
     {
       move: 
-        (card: BuilderTypes.ISelectCard, property: string, index: number) =>
-          $(ActionTypes.cards.select.move, {card, property, index}),
+        (props: CardProps, property: string, index: number) =>
+          $(ActionTypes.cards.select.move, {props, property, index}),
 
       change: 
-        (card: BuilderTypes.ISelectCard, index: number, value: string) =>
-          $(ActionTypes.cards.select.change, {card, index, value}),
+        (props: CardProps, index: number, value: string) =>
+          $(ActionTypes.cards.select.change, {props, index, value}),
 
       remove: 
-          (card: BuilderTypes.ISelectCard, index: number) =>
-            $(ActionTypes.cards.select.remove, {card, index}),
+          (props: CardProps, index: number) =>
+            $(ActionTypes.cards.select.remove, {props, index}),
 
       create: 
-        (card: BuilderTypes.ISelectCard, index?: number) =>
-          $(ActionTypes.cards.select.create, {card, index}),
+        (props: CardProps, index?: number) =>
+          $(ActionTypes.cards.select.create, {props, index}),
     },
     
     let:
     {
       change: 
-        (card: BuilderTypes.ILetCard, field: string, expression: string) =>
-          $(ActionTypes.cards.let.change, {card, field, expression}),
+        (props: CardProps, field: string, expression: string) =>
+          $(ActionTypes.cards.let.change, {props, field, expression}),
     },
     
     transform:
     {
       change: 
-        (card: BuilderTypes.ITransformCard, input: string) =>
-          $(ActionTypes.cards.transform.change, {card, input}),
+        (props: CardProps, input: string) =>
+          $(ActionTypes.cards.transform.change, {props, input}),
       
       scorePoint: 
-        (card: BuilderTypes.ITransformCard, scorePoint: BuilderTypes.IScorePoint) =>
-          $(ActionTypes.cards.transform.scorePoint, {card, scorePoint}),
+        (props: CardProps, scorePoint: BuilderTypes.IScorePoint) =>
+          $(ActionTypes.cards.transform.scorePoint, {props, scorePoint}),
       
       scorePoints: 
-        (card: BuilderTypes.ITransformCard, scorePoints: BuilderTypes.IScorePoint[]) =>
-          $(ActionTypes.cards.transform.scorePoints, {card, scorePoints}),
+        (props: CardProps, scorePoints: BuilderTypes.IScorePoint[]) =>
+          $(ActionTypes.cards.transform.scorePoints, {props, scorePoints}),
     },
     
     score:
     {
       changeWeights: 
-        (card: BuilderTypes.IScoreCard, weights: {weight:number, key:string}[]) =>
-          $(ActionTypes.cards.score.changeWeights, {card, weights}),
+        (props: CardProps, weights: {weight:number, key:string}[]) =>
+          $(ActionTypes.cards.score.changeWeights, {props, weights}),
       
       change: 
-        (card: BuilderTypes.IScoreCard, method: string) =>
-          $(ActionTypes.cards.score.change, {card, method}),
+        (props: CardProps, method: string) =>
+          $(ActionTypes.cards.score.change, {props, method}),
       
       create: 
-        (card: BuilderTypes.IScoreCard, index?: number) =>
-          $(ActionTypes.cards.score.create, {card, index}),
+        (props: CardProps, index?: number) =>
+          $(ActionTypes.cards.score.create, {props, index}),
     },
 
     filter:
     {
      create: 
-      (card: BuilderTypes.IFilterCard, index?: number) =>
+      (props: CardProps, index?: number) =>
         $(ActionTypes.cards.filter.create, { card, index }),
 
      change: 
-      (card: BuilderTypes.IFilterCard, index: number, value: BuilderTypes.IFilter) =>
+      (props: CardProps, index: number, value: BuilderTypes.IFilter) =>
         $(ActionTypes.cards.filter.change, { card, index, value }),
      
      move:
-       (card: BuilderTypes.IFilterCard, filter: BuilderTypes.IFilter, index: number) =>
+       (props: CardProps, filter: BuilderTypes.IFilter, index: number) =>
          $(ActionTypes.cards.filter.move, { card, filter, index }),
      
      remove: 
-      (card: BuilderTypes.IFilterCard, index: number) =>
+      (props: CardProps, index: number) =>
         $(ActionTypes.cards.filter.remove, { card, index }),
     },
     
     if:
     {
       change:
-        (card: BuilderTypes.IIfCard, filters: BuilderTypes.IFilter[]) => //, elses: BuilderTypes.IElse[]) =>
+        (props: CardProps, filters: BuilderTypes.IFilter[]) => //, elses: BuilderTypes.IElse[]) =>
           $(ActionTypes.cards.if.change, { card, filters }), //, elses }),
       
       else:
-        (card: BuilderTypes.IIfCard, indexToRemove?: number) =>
+        (props: CardProps, indexToRemove?: number) =>
           $(ActionTypes.cards.if.else, { card, indexToRemove }),
     },
   }, // /cards

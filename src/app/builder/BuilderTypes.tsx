@@ -49,6 +49,11 @@ let Map = Immutable.Map;
 
 export module BuilderTypes
 { 
+  export interface CardProps
+  {
+    index: number;
+    keyPath: KeyPath;
+  }
   
   export const CardTypes = 
   {
@@ -81,6 +86,7 @@ export module BuilderTypes
     WEIGHT: 'weight',
     BAR: 'bar',
     SCOREPOINT: 'scorepoint',
+    SPOTLIGHT: 'spotlight',
     
     INPUT: 'input,'    
   };
@@ -520,6 +526,22 @@ export module BuilderTypes
   }
   recordFactories[CardTypes.SKIP] = _ISkipCard;
   
+  export class ISpotlight
+  {
+    // TODO
+    
+    set: (f: string, v: any) => ISpotlight;
+    setIn: (f: string, v: any) => ISpotlight;
+    _recordClasstype = BlockTypes.SPOTLIGHT;
+  }
+  const ISpotlight_Record = Immutable.Record(new ISpotlight());
+  export const _ISpotlight = (config?:any) => {
+    return new ISpotlight_Record(config || {}) as any as ISpotlight;
+  }
+  recordFactories[BlockTypes.SPOTLIGHT] = _ISpotlight;
+  
+  export type ISpotlights = List<ISpotlight>
+  
   
   export enum InputType
   {
@@ -580,6 +602,8 @@ export module BuilderTypes
     cards = cards.map(recordFromJS);
     return cards as BuilderTypes.ICards;
   }
+  
+  
 }
 
 

@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as React from 'react';
+import * as Immutable from 'immutable';
+
 import Actions from "../../../data/BuilderActions.tsx";
 import Util from '../../../../util/Util.tsx';
 import LayoutManager from "../../layout/LayoutManager.tsx";
@@ -53,35 +55,32 @@ import CardField from './../CardField.tsx';
 import Dropdown from './../../../../common/components/Dropdown.tsx';
 import { Operators, Combinators } from './../../../BuilderTypes.tsx';
 import { BuilderTypes } from './../../../BuilderTypes.tsx';
-import Classs from './../../../../common/components/Classs.tsx';
+import PureClasss from './../../../../common/components/PureClasss.tsx';
+
+let operators = Immutable.List(Operators);
+let combinators = Immutable.List(Combinators);
 
 interface Props
 {
+  index: number;
+  keyPath: KeyPath;
   card: BuilderTypes.IFilterCard | BuilderTypes.IIfCard;
-  spotlights: any[];
+  spotlights: BuilderTypes.ISpotlights;
   hideNoFilterMessage?: boolean;
-  keys: string[];
+  keys: List<string>;
   canEdit?: boolean;
 }
 
-class FilterArea extends Classs<Props>
+class FilterArea extends PureClasss<Props>
 {
   addFilter(index)
   {
-    Actions.cards.filter.create(this.props.card, index + 1);
-  }
-  
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(nextProps.card.filters, this.props.card.filters)
-      || !_.isEqual(nextProps.spotlights, this.props.spotlights)
-      || !_.isEqual(nextProps.keys, this.props.keys)
-      || nextProps.canEdit !== this.props.canEdit;
+    Actions.cards.filter.create(this.props, index + 1);
   }
   
   deleteFilter(index)
   {
-    Actions.cards.filter.remove(this.props.card, index);
+    Actions.cards.filter.remove(this.props, index);
   }
   
   renderFilter(filter: BuilderTypes.IFilter, index: number)
@@ -115,7 +114,7 @@ class FilterArea extends Classs<Props>
               {...this.props}
               value={filter.condition.first}
               id={this.props.card.id}
-              keyPath={this._keyPath('filters', index, 'condition', 'first')}
+              keyPath={this._ikeyPath(this.props.keyPath, 'filters', index, 'condition', 'first')}
               acceptsCards={true}
               parentId={this.props.card.id}
               top={true}
@@ -127,10 +126,10 @@ class FilterArea extends Classs<Props>
             <Dropdown
               {...this.props}
               circle={true}
-              options={Operators}
+              options={operators}
               selectedIndex={filter.condition.operator}
               id={this.props.card.id}
-              keyPath={this._keyPath('filters', index, 'condition', 'operator')}
+              keyPath={this._ikeyPath(this.props.keyPath, 'filters', index, 'condition', 'operator')}
             />
           </div>
           <div className='flex-grow card-padding'>
@@ -138,7 +137,7 @@ class FilterArea extends Classs<Props>
               {...this.props}
               value={filter.condition.second}
               id={this.props.card.id}
-              keyPath={this._keyPath('filters', index, 'condition', 'second')}
+              keyPath={this._ikeyPath(this.props.keyPath, 'filters', index, 'condition', 'second')}
               acceptsCards={true}
               parentId={this.props.card.id}
               options={this.props.keys}
@@ -150,10 +149,10 @@ class FilterArea extends Classs<Props>
               <Dropdown
                 {...this.props}
                 circle={true}
-                options={Combinators}
+                options={combinators}
                 selectedIndex={filter.combinator}
                 id={this.props.card.id}
-                keyPath={this._keyPath('filters', index, 'combinator')}
+                keyPath={this._ikeyPath(this.props.keyPath, 'filters', index, 'combinator')}
               />
             }
           </div>
@@ -164,7 +163,7 @@ class FilterArea extends Classs<Props>
   
   moveFilter(curIndex, newIndex)
   {
-    Actions.cards.filter.move(this.props.card, this.props.card.filters[curIndex], newIndex);
+    Actions.cards.filter.move(this.props, curIndex, newIndex);
   }
   
   renderNoFilters()

@@ -45,6 +45,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import { BuilderTypes } from './../../../BuilderTypes.tsx';
 import FilterArea from './FilterArea';
+import PureClasss from './../../../../common/components/PureClasss.tsx';
 
 interface Props
 {
@@ -53,7 +54,7 @@ interface Props
   keys: string[];
 }
 
-class FilterCard extends React.Component<Props, any>
+class FilterCard extends PureClasss<Props>
 {
   // so simple, but may become more complex in the future, which is why I'm keeping it
 	render() {

@@ -50,16 +50,16 @@ import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import Util from '../../util/Util.tsx';
 import Actions from "../../builder/data/BuilderActions.tsx";
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 
 interface Props
 {
-  options: (string | JSX.Element)[];
+  options: List<string | JSX.Element>;
   selectedIndex: number;
   onChange?: (index: number, event?: any) => void;
   id?: string;
-  keyPath?: (string | number)[];
-  values?: any[]; // maps indices to values, otherwise index will be used as the value
+  keyPath?: KeyPath;
+  values?: List<any>; // maps indices to values, otherwise index will be used as the value
   canEdit?: boolean;
 
   ref?: string;
@@ -67,7 +67,7 @@ interface Props
   circle?: boolean;
 }
 
-class Dropdown extends Classs<Props>
+class Dropdown extends PureClasss<Props>
 {
   constructor(props: Props) {
     super(props);
@@ -89,11 +89,11 @@ class Dropdown extends Classs<Props>
         var pr = this.props;
         if(pr.id && pr.keyPath)
         {
-          Actions.cards.change(pr.id, pr.keyPath, this.props.values ? pr.values[index] : index);
+          Actions.change(pr.keyPath, pr.values ? pr.values[index] : index);
         }
         if(pr.onChange)
         {
-          this.props.onChange(index, {
+          pr.onChange(index, {
             target: ReactDOM.findDOMNode(this)
           });
         }
