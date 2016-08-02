@@ -46,9 +46,11 @@ require('./Login.less')
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import Actions from "../data/AuthActions.tsx";
+import Classs from './../../common/components/Classs.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
-var TerrainIcon = require("./../../../images/icon_terrain_108x17.svg?name=TerrainIcon");
+var TerrainIcon = require("./../../../images/logo_TerrainLong.svg");
+//var TerrainIcon = require("./../../../images/icon_terrain_108x17.svg?name=TerrainIcon");
 
 interface Props {
 }
@@ -108,7 +110,8 @@ class Login extends React.Component<Props, any>
       password: this.state.password,
     }));
   }
-  
+  ////<input type='text' id='login-username' placeholder='username' onChange={this.handleUsernameChange} />
+
   render() {
     return (
       <div className='login'>
@@ -116,14 +119,37 @@ class Login extends React.Component<Props, any>
           <div className='login-logo'>
             <TerrainIcon />
           </div>
+          <div className ='login-arrow-down'/>
           <div className='login-info'>
-            <input type='text' id='login-username' placeholder='username' onChange={this.handleUsernameChange} />
-            <input type='password' id='login-password' placeholder='password' onKeyDown={this.handleKeyDown} onChange={this.handlePasswordChange} />
+            <div className='login-field-title'>Email</div>
+            <input
+              type='text'
+              onChange={this.handleUsernameChange}
+              className='login-input-field'
+              placeholder='e.g. jsmith@redwoodforest.com'
+             />
+            <div className='login-field-title'>Password</div>
+            <input 
+              className ='login-input-field' 
+              type='password' 
+              placeholder='e.g. ********' 
+              onKeyDown={this.handleKeyDown} 
+              onChange={this.handlePasswordChange} 
+            />
           </div>
-          <a className='login-submit' onClick={this.handleLogin}>
+          <div className='login-submit-button button' onClick={this.handleLogin}>
             Login
-          </a>
-        </div>
+          </div>
+
+         <div className = 'login-bottom-toolbar'>
+           <div className = 'login-forgot-password'>
+             Forgot Password? 
+           </div>
+           <div className = 'login-no-account'>
+             Don't have an account yet? <span className='login-green'>Sign Up</span>
+           </div>
+          </div>
+          </div>
       </div>
    );
   }
