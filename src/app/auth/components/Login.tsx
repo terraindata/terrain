@@ -114,20 +114,21 @@ class Login extends React.Component<Props, any>
 
   render() {
     return (
-      <div className='login'>
-        <div className='login-wrapper'>
-          <div className='login-logo'>
-            <TerrainIcon />
-          </div>
-          <div className ='login-arrow-down'/>
+     <div className='login-wrapper'>
+      <div className='login-container'>
+        <div className='login-logo-container'>
+          <TerrainIcon className='login-logo'/>
+        </div>
+        <div className ='login-arrow-down'/>
+        <div className='login-white-box' />
           <div className='login-info'>
             <div className='login-field-title'>Email</div>
-            <input
-              type='text'
-              onChange={this.handleUsernameChange}
-              className='login-input-field'
-              placeholder='e.g. jsmith@redwoodforest.com'
-             />
+              <input
+                type='text'
+                onChange={this.handleUsernameChange}
+                className='login-input-field'
+                placeholder='e.g. jsmith@redwoodforest.com'
+              />
             <div className='login-field-title'>Password</div>
             <input 
               className ='login-input-field' 
@@ -137,19 +138,20 @@ class Login extends React.Component<Props, any>
               onChange={this.handlePasswordChange} 
             />
           </div>
-          <div className='login-submit-button button' onClick={this.handleLogin}>
-            Login
+          <div className = 'login-submit-button-wrapper' >
+            <div className='login-submit-button button' onClick={this.handleLogin}>
+              Login
+            </div>
           </div>
-
-         <div className = 'login-bottom-toolbar'>
-           <div className = 'login-forgot-password'>
-             Forgot Password? 
-           </div>
-           <div className = 'login-no-account'>
-             Don't have an account yet? <span className='login-green'>Sign Up</span>
-           </div>
+        </div>
+        <div className = 'login-bottom-toolbar'>
+          <div className = 'login-forgot-password'>
+            Forgot Password? 
           </div>
+          <div className = 'login-no-account'>
+            Don't have an account yet? <span className='login-green'>Sign Up</span>
           </div>
+        </div>
       </div>
    );
   }
