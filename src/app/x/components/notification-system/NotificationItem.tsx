@@ -387,7 +387,7 @@ class NotificationItem extends Classs<Props> {
                   position: 'relative',
                   width: '48px',
                   display: 'inline-block',
-                  transition: '0.3s ease-in-out',
+                  transition: this.state.visible ? '.3s ease-in-out' : '.2s ease-in-out',
                 }}
             >
               {this.renderLogo()}
