@@ -51,108 +51,73 @@ import * as classNames from 'classnames';
 var Modal = require('react-modal');
 var InfoIcon = require('./../../../images/icon_info.svg')
 
-export module XModals {
-
-interface ModalDialogProps {
-	modalMessage: string;
-  modalResetFunction: () => void;
-  modalTitle?: string;
-  modalError?: boolean;
-	modalConfirm?: boolean;
-	modalConfirmButton?: string;
-	modalConfirmFunction?: () => void; 
+interface Props {
+	message: string;
+  onReset: () => void;
+  open: boolean;
+  title?: string;
+  error?: boolean;
+  confirm?: boolean;
+	confirmButtonText?: string;
+	onConfirm?: () => void; 
 }
 
-export function triggerModal(content: string, modalResetFunction: () => void, modalTitle?: string, modalError?: boolean, modalConfirm?: boolean, modalConfirmButton?: string, modalConfirmFunction?: () => void)
+class XModals extends Classs<Props>   
 {
-    return(<ModalDialog
-        modalMessage = {content}
-        modalResetFunction = {modalResetFunction}
-        modalTitle = {modalTitle}
-        modalError = {modalError}
-        modalConfirm = {modalConfirm}
-        modalConfirmButton = {modalConfirmButton}
-        modalConfirmFunction = {modalConfirmFunction}
-     />);
-}
-
-export class ModalDialog extends Classs<ModalDialogProps>  
+  closeModalSuccess () 
   {
-    state: {
-    	open: boolean;
-  	} = {
-    	open: true,
-  	};
+    this.props.onReset();
+    this.props.onConfirm ? this.props.onConfirm() : null;
+  }
 
-    openModal () 
-    { 
-      this.setState({
-    		open: true
-    	}); 
-    }
-
-    closeModal () 
-    { 
-    	this.setState({
-        open: false
-      });
-    	this.props.modalResetFunction();
-    }
-
-    closeModalSuccess () 
-    {
-    	this.closeModal();
-      this.props.modalConfirmFunction ? this.props.modalConfirmFunction() : null;
-    }
-
-    render () 
-    {
-      var defaultTitle = this.props.modalError ? 'Error Message' : 'Modal Dialog'
+  render () 
+  {
+    var defaultTitle = this.props.error ? 'Error Message' : 'Modal Dialog'
+      
       return (
         <div className ='modal-dialog'>
           <Modal 
-          	isOpen={this.state.open} 
+          	isOpen={this.props.open} 
           	overlayClassName='modal-overlay' 
           	className ='modal-content' 
           >
             <div className ='modal-dialog'> 
             	<div className={classNames({
                 'modal-title': true,
-                'modal-title-error': this.props.modalError,
+                'modal-title-error': this.props.error,
               })}>
                   {
-                    this.props.modalError ? 
+                    this.props.error ? 
                       <div className='modal-info-icon'> 
                         <InfoIcon /> 
                       </div>
                       : 
                       null
                   }
-                  {this.props.modalTitle ? this.props.modalTitle : defaultTitle}
+                  {this.props.title ? this.props.title : defaultTitle}
               </div>
             	<div className={classNames({
                 'modal-message': true,
-                'modal-message-error': this.props.modalError,
+                'modal-message-error': this.props.error,
               })}>
-                {this.props.modalMessage}
+                {this.props.message}
            		</div>
            		<div className ='modal-buttons'>
             		{
-           				this.props.modalConfirm ? 
+           				this.props.confirm ? 
            					<div className='button modal-confirm-button' onClick={this.closeModalSuccess}>
-           						{this.props.modalConfirmButton ? this.props.modalConfirmButton : 'Ok'}
+           						{this.props.confirmButtonText ? this.props.confirmButtonText : 'Ok'}
            					</div> 
            					: 
            					<div />
            			}
-                <div className='button modal-close-button' onClick={this.closeModal}>Close</div>
+                <div className='button modal-close-button' onClick={this.props.onReset}>Close</div>
             	</div>
             </div>
           </Modal>
         </div>
       );
-    }
   }
-
 }
+
 export default XModals;

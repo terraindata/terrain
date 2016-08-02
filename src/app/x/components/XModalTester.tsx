@@ -46,7 +46,9 @@ require('./XModals.less');
 import Classs from './../../common/components/Classs.tsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import XModal from './XModals.tsx';
+
+import XModals from './XModals.tsx';
+
 
 interface XModalTesterProps
 {
@@ -67,7 +69,7 @@ class XModalTester extends Classs<XModalTesterProps>
   {
     this.setState ({
       errorModalOpen: !this.state.errorModalOpen
-    })
+    });
   }
 
   toggleConfirmModal()
@@ -80,15 +82,26 @@ class XModalTester extends Classs<XModalTesterProps>
   render()
   {
     return (
-      <div > 
+      <div> 
         <div className='button xmodal-tester-row' onClick={this.toggleErrorModal}>
-          Error Modal
+           Error Modal
         </div>
-       {this.state.errorModalOpen ? XModal.triggerModal('This is a sample error modal', this.toggleErrorModal, null, true) : null}
-       <div className='button xmodal-tester-row' onClick={this.toggleConfirmModal}>
+        <XModals 
+          message='This is an error modal' 
+          onReset={this.toggleErrorModal} 
+          open={this.state.errorModalOpen} 
+          error={true}
+        />
+        <div className ='button xmodal-tester-row' onClick={this.toggleConfirmModal}>
           Confirm Modal
         </div>
-       {this.state.confirmModalOpen ? XModal.triggerModal('This is a sample confirm modal', this.toggleConfirmModal, 'Confirm', false, true) : null}
+        <XModals 
+          message='This is a confirm modal' 
+          onReset={this.toggleConfirmModal} 
+          open={this.state.confirmModalOpen} 
+          confirm={true} 
+          confirmButtonText='Confirm'
+        />
       </div>
     );
   }
