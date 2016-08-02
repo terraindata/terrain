@@ -109,17 +109,27 @@ class Login extends React.Component<Props, any>
       username,
       password: this.state.password,
     }));
-  }
-  ////<input type='text' id='login-username' placeholder='username' onChange={this.handleUsernameChange} />
+  }  
 
-  render() {
+  handleForgotPassword()
+  {
+    alert("Sorry, resetting your password hasn't been implemented yet.");
+  }
+
+  registerNewUser()
+  {
+    alert("Signing up for Terraformer has not been implemented yet");
+  }
+
+  render() 
+  {
     return (
      <div className='login-wrapper'>
       <div className='login-container'>
         <div className='login-logo-container'>
           <TerrainIcon className='login-logo'/>
         </div>
-        <div className ='login-arrow-down'/>
+        <div className='login-arrow-down'/>
         <div className='login-white-box' />
           <div className='login-info'>
             <div className='login-field-title'>Email</div>
@@ -131,25 +141,34 @@ class Login extends React.Component<Props, any>
               />
             <div className='login-field-title'>Password</div>
             <input 
-              className ='login-input-field' 
+              className='login-input-field' 
               type='password' 
               placeholder='e.g. ********' 
               onKeyDown={this.handleKeyDown} 
               onChange={this.handlePasswordChange} 
             />
           </div>
-          <div className = 'login-submit-button-wrapper' >
+          <div className='login-submit-button-wrapper' >
             <div className='login-submit-button button' onClick={this.handleLogin}>
               Login
             </div>
           </div>
         </div>
-        <div className = 'login-bottom-toolbar'>
-          <div className = 'login-forgot-password'>
+        <div className='login-bottom-toolbar'>
+          <div 
+            className='login-forgot-password'
+            onClick={this.handleForgotPassword}
+          >
             Forgot Password? 
           </div>
-          <div className = 'login-no-account'>
-            Don't have an account yet? <span className='login-green'>Sign Up</span>
+          <div className='login-no-account'>
+            Don't have an account yet? &nbsp; 
+              <span 
+                className='login-green'
+                onClick={this.registerNewUser}
+              >
+                 Sign Up
+              </span>
           </div>
         </div>
       </div>
