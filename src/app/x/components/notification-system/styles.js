@@ -270,7 +270,7 @@ var STYLES = {
 
     info: {
       fill: '#fff',
-      backgroundColor: 'red'
+      backgroundColor: '#fb564d'
     },
   },
 
