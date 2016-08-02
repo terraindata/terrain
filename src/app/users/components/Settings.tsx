@@ -64,8 +64,6 @@ var Select = require('react-select');
 var TimeZones = require('./Timezones.json');
 var LogoutIcon = require("./../../../images/icon_logout.svg");
 
-import {notificationManager} from './../../x/components/XNotification.tsx';
-
 interface Props
 {
   params?: any;
@@ -273,8 +271,7 @@ class Settings extends Classs<Props>
 
   setupAuthentication()
   {
-    notificationManager.addNotification('This button has not yet been implemented', 'info', 20);
-    //alert('This button has not been implemented yet');
+    alert('This button has not been implemented yet');
   }
 
   renderAuthenticationDescription()
