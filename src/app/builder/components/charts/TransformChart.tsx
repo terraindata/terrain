@@ -159,11 +159,6 @@ var TransformChart = {
         return false;
       });
     }
-    // var drawCrossHairs = this._drawCrossHairs;
-    // d3.select(el).on('mousemove', () => {
-    //   var mouse = d3.mouse(d3.select('g').node());
-    //   drawCrossHairs(el, mouse, scales, state.width, state.height);
-    // });
   },
   
   destroy(el)
@@ -695,7 +690,6 @@ var TransformChart = {
       .attr('y', mouse[1] + h-5)
       .attr('text-anchor', 'middle')
       .text(text_x)
-      .attr('opacity', 0)
       .attr('opacity', 1);
 
     crosshairs.append('text')
@@ -703,7 +697,6 @@ var TransformChart = {
       .attr('y', mouse[1] + h +11)
       .attr('text-anchor', 'middle')
       .text(text_y)
-      .attr('opacity', 0)
       .attr('opacity', 1);
 
     crosshairs.append('line')
@@ -720,6 +713,16 @@ var TransformChart = {
       .attr('x2', width)
       .attr('y2', mouse[1]+1);
 
+      d3.select(el).select('.inner-svg').on('mouseleave', function() {
+        crosshairs.on('mousemove', null);
+        crosshairs.attr('visibility', 'hidden');
+      });
+
+    //TODO: Hide crosshairs whenever mouse is pressed, not just on mousedown
+    // crosshairs.on('mousedown', function() {
+    //   console.log(d3.event);
+    //   crosshairs.selectAll('.crosshairs-line').attr('visibility', 'hidden'); 
+    // });
   },
   
   _drawMenu(el, mouse, text, fn, scales)
