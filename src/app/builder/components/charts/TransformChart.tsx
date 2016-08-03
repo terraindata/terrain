@@ -144,7 +144,6 @@ var TransformChart = {
     
     var drawMenu = this._drawMenu;
     var drawCrossHairs = this._drawCrossHairs;
-    //Draw the menu
     if(state.canEdit)
     {
       d3.select(el).select('.inner-svg').on('contextmenu', function() {
@@ -717,12 +716,6 @@ var TransformChart = {
         crosshairs.on('mousemove', null);
         crosshairs.attr('visibility', 'hidden');
       });
-
-    //TODO: Hide crosshairs whenever mouse is pressed, not just on mousedown
-    // crosshairs.on('mousedown', function() {
-    //   console.log(d3.event);
-    //   crosshairs.selectAll('.crosshairs-line').attr('visibility', 'hidden'); 
-    // });
   },
   
   _drawMenu(el, mouse, text, fn, scales)

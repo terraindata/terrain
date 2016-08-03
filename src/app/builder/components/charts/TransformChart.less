@@ -33,11 +33,10 @@
   
   .point {
     cursor: pointer;
-    //transition: stroke-width 0.15s, stroke 0.15s;
+    transition: stroke-width 0.15s, stroke 0.15s;
     fill: #fff;
     stroke: @line;
     stroke-width: 3px;
-    z-index: 9999999;
     &:not(.point-disabled) {
       &:hover,
       &[active="1"] {
@@ -136,6 +135,5 @@
       fill: none;
       stroke-width: 1px;
       stroke: #14849f;
-      z-index: -1;
     }
 }
