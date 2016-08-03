@@ -33,11 +33,11 @@
   
   .point {
     cursor: pointer;
-    transition: stroke-width 0.15s, stroke 0.15s;
+    //transition: stroke-width 0.15s, stroke 0.15s;
     fill: #fff;
     stroke: @line;
     stroke-width: 3px;
-    
+    z-index: 9999999;
     &:not(.point-disabled) {
       &:hover,
       &[active="1"] {
@@ -60,7 +60,7 @@
     stroke: @line;
     stroke-width: 5px;
     fill: none;
-    
+    z-index: 9999999;
     .transition(~"stroke 0.15s");
     
     &:hover:not(.lines-disabled) {
@@ -102,22 +102,40 @@
   
   .right-menu {
     rect {
-      fill: rgba(0,0,0,0.75);
-      .transition;
+       fill: #14849f;
     }
-    
-    &:hover {
-      rect {
-        fill: rgba(0,0,0,0.95);
-      }
+
+    circle {
+      fill: #999;
+      .transition;
     }
     
     text {
       fill: #fff;
-      font-size: 16px;
-      // opacity: 0.95;
+      font-size: 12px;
       font-weight: 200;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
     }
   }
+
+  .crosshairs {
+    rect {
+      fill: #14849f;
+    }
+    
+    
+    text {
+      fill: #fff;
+      font-size: 12px;
+      font-weight: 200;
+      letter-spacing: 0.3px;
+    }
+  }
+
+  .crosshairs-line {
+      fill: none;
+      stroke-width: 1px;
+      stroke: #14849f;
+      z-index: -1;
+    }
 }
