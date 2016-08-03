@@ -143,6 +143,8 @@ var TransformChart = {
     });
     
     var drawMenu = this._drawMenu;
+    var drawCrossHairs = this._drawCrossHairs;
+    //Draw the menu
     if(state.canEdit)
     {
       d3.select(el).select('.inner-svg').on('contextmenu', function() {
@@ -150,21 +152,20 @@ var TransformChart = {
         drawMenu(el, d3.mouse(this), '+ Point', state.onCreate, scales);
         return false;
       });
-    }
 
-    var drawCrossHairs = this._drawCrossHairs;
-    d3.select(el).on('mousemove', () => {
-      var mouse = d3.mouse(d3.select('g').node());
-      drawCrossHairs(el, mouse, scales);
-    });
+      d3.select(el).select('.inner-svg').on('mousemove', function() {
+        d3.event['preventDefault']();
+        drawCrossHairs(el, d3.mouse(this), scales);
+        return false;
+      });
+    }
   },
   
   destroy(el)
   {
     // cleanup here
   },
-  
-  
+
   // "private" stuff
   
   _precomputeBarsData(oBarsData, domain)
@@ -540,15 +541,16 @@ var TransformChart = {
     var line = d3.select(this);
     var initialClasses = line.attr('class');
     line.attr('class', initialClasses + ' line-active');
-    
-    var del = d3.select(el).select('.inner-svg');
+
+    var t = this;
+    var del = d3.select(el);
+
     var move = function(event) {
-      onMove(x, scales.realPointY.invert(d3.mouse(this)[1]));
+      onMove(x, scales.realPointY.invert(d3.mouse(t)[1]));
     }
-    
-    del.on('mousemove', move);
+    del.on("mousemove", move);
     del.on('touchmove', move);
-    
+
     var offFn = () => {
       del.on('mousemove', null)
       del.on('touchmove', null)
@@ -612,6 +614,7 @@ var TransformChart = {
     
     if(canEdit)
     {
+      //lines.on("mousemove", this._mouseMoveFactory(el, scales, this._drawCrossHairs));
       lines.on("mousedown", this._lineMousedownFactory(el, onClick, scales, onMove));
     }
     
@@ -631,7 +634,6 @@ var TransformChart = {
       onSelect(d.id);
     }
     d3.event['stopPropagation']();
-    
     var del = d3.select(el);
     var point = d3.select(this);
     var startY = scales.realPointY.invert(d3.mouse(this)[1]);
@@ -647,7 +649,7 @@ var TransformChart = {
     
     del.on('mousemove', move);
     del.on('touchmove', move);
-    
+
     var offFn = () => {
       del.on('mousemove', null);
       del.on('touchmove', null);
@@ -663,7 +665,7 @@ var TransformChart = {
 
   _drawCrossHairs(el, mouse, scales)
   {
-    var f = d3.format(".1f")
+    var f = d3.format(".2f")
     var x = mouse[0];
     var y = mouse[1];
 
@@ -680,8 +682,6 @@ var TransformChart = {
       .attr('y', mouse[1] + 20)
       .attr('rx', 5)
       .attr('ry', 5)
-      .attr('width', 0)
-      .attr('height', 0)
       .attr('width', w)
       .attr('height', h);
     
@@ -690,10 +690,9 @@ var TransformChart = {
       .attr('y', mouse[1] + h + 11)
       .attr('text-anchor', 'middle')
       .text(text)
-      .attr('opacity', 0)
       .attr('opacity', 1);
   },
-
+  
   _drawMenu(el, mouse, text, fn, scales)
   {
     d3.select(el).select('.right-menu').remove();
@@ -740,7 +739,15 @@ var TransformChart = {
     drawMenu(el, d3.mouse(this), 'Delete', () => onDelete(point.id), scales);
     return false;
   },
-  
+
+  _mouseMoveFactory: (el, scales, drawCrossHairs) => function(point)
+  {
+    d3.event['preventDefault']();
+    d3.event['stopPropagation']();
+    drawCrossHairs(el, d3.mouse(this), scales);
+    return false;
+  },
+
   _drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart, canEdit)
   {
     var g = d3.select(el).selectAll('.points');
@@ -766,7 +773,8 @@ var TransformChart = {
     {
       point.on('mousedown', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
       point.on('touchstart', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
-      point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu))
+      point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu));
+      point.on('mousemove', this._mouseMoveFactory(el, scales, this._drawCrossHairs));
     }
     
     point.exit().remove();
