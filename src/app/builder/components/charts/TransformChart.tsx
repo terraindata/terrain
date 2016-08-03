@@ -678,7 +678,7 @@ var TransformChart = {
     var w = 70;
     var h = 32;
     crosshairs.append('rect')
-      .attr('x', mouse[0]+5)
+      .attr('x', mouse[0] + 5)
       .attr('y', mouse[1] + 4)
       .attr('rx', 5)
       .attr('ry', 5)
@@ -690,7 +690,6 @@ var TransformChart = {
       .attr('y', mouse[1] + h-14)
       .attr('text-anchor', 'middle')
       .text(text_x)
-      .attr('opacity', 0)
       .attr('opacity', 1);
 
     crosshairs.append('text')
@@ -698,22 +697,26 @@ var TransformChart = {
       .attr('y', mouse[1] + h)
       .attr('text-anchor', 'middle')
       .text(text_y)
-      .attr('opacity', 0)
       .attr('opacity', 1);
 
     crosshairs.append('line')
       .attr('class', 'crosshairs-line')
-      .attr('x1', mouse[0])
+      .attr('x1', mouse[0] + 1)
       .attr('y1', 0)
-      .attr('x2', mouse[0])
+      .attr('x2', mouse[0] + 1)
       .attr('y2', height);
 
     crosshairs.append('line')
       .attr('class', 'crosshairs-line')
       .attr('x1', 0)
-      .attr('y1', mouse[1]-8)
+      .attr('y1', mouse[1]-1)
       .attr('x2', width)
-      .attr('y2', mouse[1]-8)
+      .attr('y2', mouse[1]-1)
+
+      d3.select(el).select('.inner-svg').on('mouseleave', function() {
+        crosshairs.on('mousemove', null);
+        crosshairs.attr('visibility', 'hidden');
+      });
 
     //TODO: Hide crosshairs whenever mouse is pressed, not just on mousedown
     // crosshairs.on('mousedown', function() {
