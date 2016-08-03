@@ -159,11 +159,6 @@ var TransformChart = {
         return false;
       });
     }
-    // var drawCrossHairs = this._drawCrossHairs;
-    // d3.select(el).on('mousemove', () => {
-    //   var mouse = d3.mouse(d3.select('g').node());
-    //   drawCrossHairs(el, mouse, scales, state.width, state.height);
-    // });
   },
   
   destroy(el)
@@ -718,8 +713,13 @@ var TransformChart = {
       .attr('x1', 0)
       .attr('y1', mouse[1]-8)
       .attr('x2', width)
-      .attr('y2', mouse[1]-8);
+      .attr('y2', mouse[1]-8)
 
+    //TODO: Hide crosshairs whenever mouse is pressed, not just on mousedown
+    // crosshairs.on('mousedown', function() {
+    //   console.log(d3.event);
+    //   crosshairs.selectAll('.crosshairs-line').attr('visibility', 'hidden'); 
+    // });
   },
   
   _drawMenu(el, mouse, text, fn, scales)
