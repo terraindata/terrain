@@ -33,7 +33,7 @@
   
   .point {
     cursor: pointer;
-    transition: stroke-width 0.15s, stroke 0.15s;
+    //transition: stroke-width 0.15s, stroke 0.15s;
     fill: #fff;
     stroke: @line;
     stroke-width: 3px;
@@ -103,13 +103,16 @@
   .right-menu {
     rect {
        fill: #14849f;
+    }
+
+    circle {
+      fill: #999;
       .transition;
     }
     
     text {
       fill: #fff;
       font-size: 12px;
-      // opacity: 0.95;
       font-weight: 200;
       letter-spacing: 0.3px;
     }
@@ -118,7 +121,6 @@
   .crosshairs {
     rect {
       fill: #14849f;
-      .transition;
     }
     
     

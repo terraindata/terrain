@@ -671,7 +671,7 @@ var TransformChart = {
   {
     var f = d3.format(".2f")
     var x = f(scales.realX.invert(mouse[0]));
-    var y = f(scales.realPointY.invert(mouse[1] -8));
+    var y = f(scales.realPointY.invert(mouse[1]));
     var text_x = 'X:  ' + x;
     var text_y = 'Y:  ' + y;
 
@@ -681,10 +681,10 @@ var TransformChart = {
       .attr('class', 'crosshairs');
     
     var w = 70;
-    var h = 32;
+    var h = 34;
     crosshairs.append('rect')
       .attr('x', mouse[0]+5)
-      .attr('y', mouse[1] + 4)
+      .attr('y', mouse[1]+14)
       .attr('rx', 5)
       .attr('ry', 5)
       .attr('width', w)
@@ -692,7 +692,7 @@ var TransformChart = {
     
     crosshairs.append('text')
       .attr('x', mouse[0] + w / 2 +5)
-      .attr('y', mouse[1] + h-14)
+      .attr('y', mouse[1] + h-5)
       .attr('text-anchor', 'middle')
       .text(text_x)
       .attr('opacity', 0)
@@ -700,7 +700,7 @@ var TransformChart = {
 
     crosshairs.append('text')
       .attr('x', mouse[0] + w / 2 +5)
-      .attr('y', mouse[1] + h)
+      .attr('y', mouse[1] + h +11)
       .attr('text-anchor', 'middle')
       .text(text_y)
       .attr('opacity', 0)
@@ -708,17 +708,17 @@ var TransformChart = {
 
     crosshairs.append('line')
       .attr('class', 'crosshairs-line')
-      .attr('x1', mouse[0])
+      .attr('x1', mouse[0]+1)
       .attr('y1', 0)
-      .attr('x2', mouse[0])
+      .attr('x2', mouse[0]+1)
       .attr('y2', height);
 
     crosshairs.append('line')
       .attr('class', 'crosshairs-line')
       .attr('x1', 0)
-      .attr('y1', mouse[1]-8)
+      .attr('y1', mouse[1]+1)
       .attr('x2', width)
-      .attr('y2', mouse[1]-8);
+      .attr('y2', mouse[1]+1);
 
   },
   
@@ -733,7 +733,7 @@ var TransformChart = {
     var h = 20;
     menu.append('rect')
       .attr('x', mouse[0]-10)
-      .attr('y', mouse[1]-8)
+      .attr('y', mouse[1]-10)
       .attr('rx', 5)
       .attr('ry', 5)
       .attr('width', 0)
@@ -745,7 +745,7 @@ var TransformChart = {
     
     menu.append('text')
       .attr('x', mouse[0] + w / 2 -10)
-      .attr('y', mouse[1] + h - 14)
+      .attr('y', mouse[1] + h - 16)
       .attr('text-anchor', 'middle')
       .text(text)
       .attr('opacity', 0)
@@ -754,11 +754,18 @@ var TransformChart = {
       .duration(50)
       .attr('opacity', 1);
 
+    menu.append('circle')
+      .attr('cx', mouse[0])
+      .attr('cy', mouse[1])
+      .attr('r', 2)
+      .transition()
+      .duration(50);
+
     
     var isvg = d3.select(el).select('.inner-svg');
     menu.on('mousedown', () => fn(
       scales.x.invert(mouse[0] + parseInt(isvg.attr('x'), 10)),
-      scales.realPointY.invert(mouse[1] -8 + parseInt(isvg.attr('y'), 10))
+      scales.realPointY.invert(mouse[1] + parseInt(isvg.attr('y'), 10))
     ));
   },
   
