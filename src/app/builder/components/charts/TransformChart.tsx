@@ -663,17 +663,11 @@ var TransformChart = {
 
   _drawCrossHairs(el, mouse, scales)
   {
-    console.log(scales);
-    // console.log(scales.realX(mouse[0]));
-    // console.log(scales.realPointY(mouse[1]));  
-    //console.log(scales.x.invert(mouse[0] + parseInt(isvg.attr('x'), 10)));
-    //scales.realPointY.invert(mouse[1] + parseInt(isvg.attr('y'), 10)) 
-
     var f = d3.format(".1f")
-    var x = f(mouse[0]);
-    var y = f(mouse[1]);
-    var text = '(' + x + ', ' + y + ')';
+    var x = mouse[0];
+    var y = mouse[1];
 
+    var text = '(' + f(scales.realX.invert(mouse[0])) + ', ' + f(scales.realPointY.invert(mouse[1])) + ')';
     d3.select(el).select('.coordinate-menu').remove();
     
     var coords = d3.select(el).select('.inner-svg').append('g')
