@@ -155,10 +155,15 @@ var TransformChart = {
 
       d3.select(el).select('.inner-svg').on('mousemove', function() {
         d3.event['preventDefault']();
-        drawCrossHairs(el, d3.mouse(this), scales);
+        drawCrossHairs(el, d3.mouse(this), scales, state.width, state.height);
         return false;
       });
     }
+    // var drawCrossHairs = this._drawCrossHairs;
+    // d3.select(el).on('mousemove', () => {
+    //   var mouse = d3.mouse(d3.select('g').node());
+    //   drawCrossHairs(el, mouse, scales, state.width, state.height);
+    // });
   },
   
   destroy(el)
@@ -614,7 +619,6 @@ var TransformChart = {
     
     if(canEdit)
     {
-      //lines.on("mousemove", this._mouseMoveFactory(el, scales, this._drawCrossHairs));
       lines.on("mousedown", this._lineMousedownFactory(el, onClick, scales, onMove));
     }
     
@@ -663,34 +667,59 @@ var TransformChart = {
     del.on('mouseleave', offFn);
   },
 
-  _drawCrossHairs(el, mouse, scales)
+  _drawCrossHairs(el, mouse, scales, width, height)
   {
     var f = d3.format(".2f")
-    var x = mouse[0];
-    var y = mouse[1];
+    var x = f(scales.realX.invert(mouse[0]));
+    var y = f(scales.realPointY.invert(mouse[1] -8));
+    var text_x = 'X:  ' + x;
+    var text_y = 'Y:  ' + y;
 
-    var text = '(' + f(scales.realX.invert(mouse[0])) + ', ' + f(scales.realPointY.invert(mouse[1])) + ')';
-    d3.select(el).select('.coordinate-menu').remove();
+    d3.select(el).select('.crosshairs').remove();
     
-    var coords = d3.select(el).select('.inner-svg').append('g')
-      .attr('class', 'coordinate-menu');
+    var crosshairs = d3.select(el).select('.inner-svg').append('g')
+      .attr('class', 'crosshairs');
     
-    var w = 100;
-    var h = 30;
-    coords.append('rect')
-      .attr('x', mouse[0])
-      .attr('y', mouse[1] + 20)
+    var w = 70;
+    var h = 32;
+    crosshairs.append('rect')
+      .attr('x', mouse[0]+5)
+      .attr('y', mouse[1] + 4)
       .attr('rx', 5)
       .attr('ry', 5)
       .attr('width', w)
       .attr('height', h);
     
-    coords.append('text')
-      .attr('x', mouse[0] + w / 2)
-      .attr('y', mouse[1] + h + 11)
+    crosshairs.append('text')
+      .attr('x', mouse[0] + w / 2 +5)
+      .attr('y', mouse[1] + h-14)
       .attr('text-anchor', 'middle')
-      .text(text)
+      .text(text_x)
+      .attr('opacity', 0)
       .attr('opacity', 1);
+
+    crosshairs.append('text')
+      .attr('x', mouse[0] + w / 2 +5)
+      .attr('y', mouse[1] + h)
+      .attr('text-anchor', 'middle')
+      .text(text_y)
+      .attr('opacity', 0)
+      .attr('opacity', 1);
+
+    crosshairs.append('line')
+      .attr('class', 'crosshairs-line')
+      .attr('x1', mouse[0])
+      .attr('y1', 0)
+      .attr('x2', mouse[0])
+      .attr('y2', height);
+
+    crosshairs.append('line')
+      .attr('class', 'crosshairs-line')
+      .attr('x1', 0)
+      .attr('y1', mouse[1]-8)
+      .attr('x2', width)
+      .attr('y2', mouse[1]-8);
+
   },
   
   _drawMenu(el, mouse, text, fn, scales)
@@ -700,11 +729,11 @@ var TransformChart = {
     var menu = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'right-menu');
     
-    var w = 100;
-    var h = 30;
+    var w = 85;
+    var h = 20;
     menu.append('rect')
-      .attr('x', mouse[0])
-      .attr('y', mouse[1])
+      .attr('x', mouse[0]-10)
+      .attr('y', mouse[1]-8)
       .attr('rx', 5)
       .attr('ry', 5)
       .attr('width', 0)
@@ -715,8 +744,8 @@ var TransformChart = {
       .attr('height', h);
     
     menu.append('text')
-      .attr('x', mouse[0] + w / 2)
-      .attr('y', mouse[1] + h - 9)
+      .attr('x', mouse[0] + w / 2 -10)
+      .attr('y', mouse[1] + h - 14)
       .attr('text-anchor', 'middle')
       .text(text)
       .attr('opacity', 0)
@@ -724,11 +753,12 @@ var TransformChart = {
       .delay(100)
       .duration(50)
       .attr('opacity', 1);
+
     
     var isvg = d3.select(el).select('.inner-svg');
     menu.on('mousedown', () => fn(
       scales.x.invert(mouse[0] + parseInt(isvg.attr('x'), 10)),
-      scales.realPointY.invert(mouse[1] + parseInt(isvg.attr('y'), 10))
+      scales.realPointY.invert(mouse[1] -8 + parseInt(isvg.attr('y'), 10))
     ));
   },
   
@@ -740,15 +770,15 @@ var TransformChart = {
     return false;
   },
 
-  _mouseMoveFactory: (el, scales, drawCrossHairs) => function(point)
+  _mouseMoveFactory: (el, scales, width, height, drawCrossHairs) => function(point)
   {
     d3.event['preventDefault']();
     d3.event['stopPropagation']();
-    drawCrossHairs(el, d3.mouse(this), scales);
+    drawCrossHairs(el, d3.mouse(this), scales, width, height);
     return false;
   },
 
-  _drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart, canEdit)
+  _drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart, canEdit, width, height)
   {
     var g = d3.select(el).selectAll('.points');
     
@@ -774,7 +804,7 @@ var TransformChart = {
       point.on('mousedown', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
       point.on('touchstart', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
       point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu));
-      point.on('mousemove', this._mouseMoveFactory(el, scales, this._drawCrossHairs));
+      point.on('mousemove', this._mouseMoveFactory(el, scales, width, height, this._drawCrossHairs));
     }
     
     point.exit().remove();
@@ -791,7 +821,7 @@ var TransformChart = {
     this._drawBars(el, scales, barsData);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
     this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
-    this._drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart, canEdit);
+    this._drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart, canEdit, width, height);
   },
   
   _scales(el, domain, barsData, stateWidth, stateHeight)
