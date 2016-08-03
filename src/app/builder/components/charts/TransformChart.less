@@ -102,43 +102,37 @@
   
   .right-menu {
     rect {
-      fill: rgba(0,0,0,0.75);
+       fill: #14849f;
       .transition;
-    }
-    
-    &:hover {
-      rect {
-        fill: rgba(0,0,0,0.95);
-      }
     }
     
     text {
       fill: #fff;
-      font-size: 16px;
+      font-size: 12px;
       // opacity: 0.95;
       font-weight: 200;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
     }
   }
 
-  .coordinate-menu {
+  .crosshairs {
     rect {
-      fill: rgba(0,0,0,0.75);
+      fill: #14849f;
       .transition;
     }
     
-    &:hover {
-      rect {
-        fill: rgba(0,0,0,0.95);
-      }
-    }
     
     text {
       fill: #fff;
-      font-size: 16px;
-      // opacity: 0.95;
+      font-size: 12px;
       font-weight: 200;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
     }
   }
+
+  .crosshairs-line {
+      fill: none;
+      stroke-width: 1px;
+      stroke: #14849f;
+    }
 }
