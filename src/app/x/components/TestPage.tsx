@@ -42,29 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./X.less');
-import * as React from 'react';
-import * as _ from 'underscore';
 import Classs from './../../common/components/Classs.tsx';
-import XCards from './XCards.tsx';
-import { Link } from 'react-router';
-//var TestPage = require('./TestPage');
-import TestPage from './TestPage.tsx';
-
-
-const xes =
-{
-  cards:
-  {
-    name: 'Immutable Builder',
-    component: XCards,
-  },
-  notifications:
-  {
-    name: 'In-app Notifications',
-    component: TestPage,
-  }
-};
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+//import NotificationManager from './NotificationManager.tsx';
+import TestComponent from './TestComponent.tsx';
+import { XNotification } from './XNotification.tsx';
+//import XNotification from './XNotification.tsx';
 
 interface Props
 {
@@ -75,40 +59,26 @@ interface Props
   };
 }
 
-class X extends Classs<Props>
+class TestPage extends Classs<Props>
 {
   constructor(props)
   {
     super(props);
+
   }
-  
+
   render()
   {
-    let { x } = this.props.params;
-    
-    if(x && xes[x])
-    {
-      let C =  xes[x].component;
-      return <C {...this.props} />;
-    }
-    
     return (
-      <div className='x-area'>
-        <div className='x-title'>
-          Experiments
-        </div>
-        {
-          _.keys(xes).map(indX =>
-            <Link to={`/x/${indX}`} key={indX}>
-              <div className='x-x'>
-                { xes[indX].name }
-              </div>
-            </Link>
-          )
-        }
+      <div>
+        <TestComponent />
+        <TestComponent />
+        <XNotification />
       </div>
     );
   }
 }
 
-export default X;
+export default TestPage;
+//export default this.addNotification;
+

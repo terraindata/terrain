@@ -42,73 +42,60 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./X.less');
-import * as React from 'react';
-import * as _ from 'underscore';
-import Classs from './../../common/components/Classs.tsx';
-import XCards from './XCards.tsx';
-import { Link } from 'react-router';
-//var TestPage = require('./TestPage');
-import TestPage from './TestPage.tsx';
+/*Adapted from https://github.com/igorprado/react-notification-system*/
 
+var React = require('react');
+var NotificationItem = require('./NotificationItem.tsx');
+var Constants = require('./constants');
 
-const xes =
-{
-  cards:
-  {
-    name: 'Immutable Builder',
-    component: XCards,
+var NotificationContainer = React.createClass({displayName: "NotificationContainer",
+
+  propTypes: {
+    position: React.PropTypes.string.isRequired,
+    notifications: React.PropTypes.array.isRequired,
+    getStyles: React.PropTypes.object
   },
-  notifications:
-  {
-    name: 'In-app Notifications',
-    component: TestPage,
-  }
-};
 
-interface Props
-{
-  params?: any;
-  history?: any;
-  location?: {
-    pathname: string;
-  };
-}
+  _style: {},
 
-class X extends Classs<Props>
-{
-  constructor(props)
-  {
-    super(props);
-  }
-  
-  render()
-  {
-    let { x } = this.props.params;
-    
-    if(x && xes[x])
-    {
-      let C =  xes[x].component;
-      return <C {...this.props} />;
+  componentWillMount: function() {
+    // Fix position if width is overrided
+    this._style = this.props.getStyles.container(this.props.position);
+
+    if (this.props.getStyles.overrideWidth && (this.props.position === Constants.positions.tc || this.props.position === Constants.positions.bc)) {
+      this._style.marginLeft = -(this.props.getStyles.overrideWidth / 2);
     }
-    
+  },
+
+  render: function() {
+    var self = this;
+    var notifications;
+
+    if ([Constants.positions.bl, Constants.positions.br, Constants.positions.bc].indexOf(this.props.position) > -1) {
+      this.props.notifications.reverse();
+    }
+
+    notifications = this.props.notifications.map(function(notification) {
+      return (
+        React.createElement(NotificationItem, {
+          ref:  'notification-' + notification.uid, 
+          key:  notification.uid, 
+          notification:  notification, 
+          getStyles:  self.props.getStyles, 
+          onRemove:  self.props.onRemove, 
+          noAnimation:  self.props.noAnimation, 
+          allowHTML:  self.props.allowHTML}
+        )
+      );
+    });
+
     return (
-      <div className='x-area'>
-        <div className='x-title'>
-          Experiments
-        </div>
-        {
-          _.keys(xes).map(indX =>
-            <Link to={`/x/${indX}`} key={indX}>
-              <div className='x-x'>
-                { xes[indX].name }
-              </div>
-            </Link>
-          )
-        }
-      </div>
+      React.createElement("div", {className:  'notifications-' + this.props.position, style:  this._style}, 
+         notifications 
+      )
     );
   }
-}
+});
 
-export default X;
+
+module.exports = NotificationContainer;

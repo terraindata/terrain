@@ -42,73 +42,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./X.less');
-import * as React from 'react';
-import * as _ from 'underscore';
-import Classs from './../../common/components/Classs.tsx';
-import XCards from './XCards.tsx';
-import { Link } from 'react-router';
-//var TestPage = require('./TestPage');
-import TestPage from './TestPage.tsx';
+/* Adapted from https://github.com/igorprado/react-notification-system */
 
 
-const xes =
-{
-  cards:
-  {
-    name: 'Immutable Builder',
-    component: XCards,
+var CONSTANTS = {
+
+  // Positions
+  positions: {
+    tl: 'tl',
+    tr: 'tr',
+    tc: 'tc',
+    bl: 'bl',
+    br: 'br',
+    bc: 'bc'
   },
-  notifications:
-  {
-    name: 'In-app Notifications',
-    component: TestPage,
+
+  // Levels
+  levels: {
+    success: 'success',
+    error: 'error',
+    warning: 'warning',
+    info: 'info'
+  },
+
+  // Notification defaults
+  notification: {
+    title: null,
+    message: null,
+    level: null,
+    position: 'tr',
+    autoDismiss: 5,
+    dismissible: true,
+    action: null
   }
 };
 
-interface Props
-{
-  params?: any;
-  history?: any;
-  location?: {
-    pathname: string;
-  };
-}
 
-class X extends Classs<Props>
-{
-  constructor(props)
-  {
-    super(props);
-  }
-  
-  render()
-  {
-    let { x } = this.props.params;
-    
-    if(x && xes[x])
-    {
-      let C =  xes[x].component;
-      return <C {...this.props} />;
-    }
-    
-    return (
-      <div className='x-area'>
-        <div className='x-title'>
-          Experiments
-        </div>
-        {
-          _.keys(xes).map(indX =>
-            <Link to={`/x/${indX}`} key={indX}>
-              <div className='x-x'>
-                { xes[indX].name }
-              </div>
-            </Link>
-          )
-        }
-      </div>
-    );
-  }
-}
-
-export default X;
+module.exports = CONSTANTS;

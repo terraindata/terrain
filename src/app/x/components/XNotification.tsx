@@ -42,31 +42,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./X.less');
-import * as React from 'react';
-import * as _ from 'underscore';
+/*
+How to use Notifications:
+In App.tsx: 
+import {XNotification} from './x/components/XNotification/tsx'
+render()
+  ...
+  <XNotification />
+  ...
+
+Anywhere you want to trigger notifications from:
+import {notificationManager} from 'path/XNotification.tsx'
+
+addNotification()
+  notificationManager.addNotification("message", type ("info" or "error"), timeOut (optional, 0=no timeout));
+
+render()
+  ...
+  <div onClick={this.addNotification} >Trigger notification!</div>
+  ...
+*/
+
 import Classs from './../../common/components/Classs.tsx';
-import XCards from './XCards.tsx';
-import { Link } from 'react-router';
-//var TestPage = require('./TestPage');
-import TestPage from './TestPage.tsx';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+var NotificationSystem = require('./notification-system/NotificationSystem');
+//import NotificationManager from './NotificationManager.tsx';
+import TestComponent from './TestComponent.tsx';
+var styles = require('./notification-system/styles.js');
 
-
-const xes =
-{
-  cards:
-  {
-    name: 'Immutable Builder',
-    component: XCards,
-  },
-  notifications:
-  {
-    name: 'In-app Notifications',
-    component: TestPage,
-  }
-};
-
-interface Props
+interface XNotificationProps
 {
   params?: any;
   history?: any;
@@ -75,40 +80,49 @@ interface Props
   };
 }
 
-class X extends Classs<Props>
+var notificationManager = {
+  system: null,
+  addNotification:function(message:any, type:string, timeOut?:number)
+  {
+    if(this.system) { 
+      this.system.addNotification({
+        title: 'Terrain Message',
+        message: message,
+        level: type,
+        autoDismiss: timeOut || 5000, 
+        dismissible: true
+      });
+    }  
+  }
+}
+
+class XNotification extends Classs<XNotificationProps>
 {
+
+
   constructor(props)
   {
     super(props);
+    this.state = {
+      notificationManager: null
+    }
   }
-  
+
+  componentDidMount() {
+    notificationManager.system = this.refs['notificationSystem'];
+    this.setState({
+       notificationManager,
+    });
+  }
+
   render()
   {
-    let { x } = this.props.params;
-    
-    if(x && xes[x])
-    {
-      let C =  xes[x].component;
-      return <C {...this.props} />;
-    }
-    
     return (
-      <div className='x-area'>
-        <div className='x-title'>
-          Experiments
-        </div>
-        {
-          _.keys(xes).map(indX =>
-            <Link to={`/x/${indX}`} key={indX}>
-              <div className='x-x'>
-                { xes[indX].name }
-              </div>
-            </Link>
-          )
-        }
+      <div>
+        <NotificationSystem allowHTML={true} style={styles} ref='notificationSystem'/>
       </div>
     );
   }
 }
 
-export default X;
+export { XNotification, notificationManager };

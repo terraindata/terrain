@@ -42,29 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./X.less');
-import * as React from 'react';
-import * as _ from 'underscore';
 import Classs from './../../common/components/Classs.tsx';
-import XCards from './XCards.tsx';
-import { Link } from 'react-router';
-//var TestPage = require('./TestPage');
-import TestPage from './TestPage.tsx';
-
-
-const xes =
-{
-  cards:
-  {
-    name: 'Immutable Builder',
-    component: XCards,
-  },
-  notifications:
-  {
-    name: 'In-app Notifications',
-    component: TestPage,
-  }
-};
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+var TerrainIcon = require('./../../../images/icon_terrain.svg');
+//import addNotification from './TestPage.tsx';
+var {notificationManager} = require('./XNotification.tsx');
 
 interface Props
 {
@@ -73,42 +56,35 @@ interface Props
   location?: {
     pathname: string;
   };
+ // addNotification: any; //function
 }
 
-class X extends Classs<Props>
+class TestComponent extends Classs<Props>
 {
+
   constructor(props)
   {
     super(props);
   }
-  
+
+  addNotification()
+  {
+  	notificationManager.addNotification("hello this is s mese er kl;jnrg alkj naerldgjk nalj re glker n", "info", 0);
+  }
+
   render()
   {
-    let { x } = this.props.params;
-    
-    if(x && xes[x])
-    {
-      let C =  xes[x].component;
-      return <C {...this.props} />;
-    }
-    
     return (
-      <div className='x-area'>
-        <div className='x-title'>
-          Experiments
-        </div>
-        {
-          _.keys(xes).map(indX =>
-            <Link to={`/x/${indX}`} key={indX}>
-              <div className='x-x'>
-                { xes[indX].name }
-              </div>
-            </Link>
-          )
-        }
-      </div>
+	    <div>
+		    <div 
+		      className='button'
+		      onClick={this.addNotification}
+		    >
+		      Testing
+		    </div>
+	 	</div>
     );
   }
 }
 
-export default X;
+export default TestComponent;

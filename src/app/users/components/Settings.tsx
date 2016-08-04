@@ -64,7 +64,6 @@ var Select = require('react-select');
 var TimeZones = require('./Timezones.json');
 var LogoutIcon = require("./../../../images/icon_logout.svg");
 
-
 interface Props
 {
   params?: any;
