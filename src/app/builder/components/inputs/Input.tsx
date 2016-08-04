@@ -195,10 +195,12 @@ var Input = React.createClass<any, any>({
               id={this.props.input.id}
               keyPath={['key']}
             />
-            <Menu 
-              options={this.getMenuOptions()} 
-              style={{right:'28px'}}
-            />
+            <div className='input-menu'>
+              <Menu 
+                options={this.getMenuOptions()} 
+                style={{right:'28px'}}
+              />
+            </div>
             <div className='input-close' onClick={this.closeInput}> 
               <CloseIcon /> 
             </div>

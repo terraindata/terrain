@@ -68,7 +68,7 @@ var InputsArea = React.createClass<any, any>({
   
   createInput()
   {
-    Actions.inputs.create(this.props.parentId, 0);
+    Actions.inputs.create(this.props.parentId, this.props.inputs.length);
   },
   
   copyAll()

@@ -96,16 +96,16 @@ class BuilderTextbox extends React.Component<Props, any>
     this.state = {
         wrongType: this.props.isNumber ? isNaN(value) : false,
     }
-    // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
-    if(!this.props.isNumber)
-    {
-          this.executeChange = _.debounce(this.executeChange, 750);
-    }
+
     Util.bind(this, ['executeChange', 'handleTextareaChange', 'renderSwitch', 'handleSwitch', 'handleAutocompleteChange']);
   }
   
   componentWillReceiveProps(newProps)
   {
+    var value: any = newProps.value;
+    this.state = {
+        wrongType: newProps.isNumber ? isNaN(value) : false,
+    }
     if(this.refs['input'])
     {
       if(this.refs['input'] !== document.activeElement)
