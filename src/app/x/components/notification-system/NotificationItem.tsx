@@ -305,7 +305,7 @@ class NotificationItem extends Classs<Props> {
   {
     if (this.props.notification.dismissible) {
       return (
-        <span className='notification-dismiss' style={this._styles.dismiss}>
+        <span className='notification-dismiss close' style={this._styles.dismiss}>
            <CloseIcon style={{
              position: 'relative',
              width: '8px',

@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+/*Adapted from https://github.com/igorprado/react-notification-system*/
+
 var React = require('react');
 var NotificationItem = require('./NotificationItem.tsx');
 var Constants = require('./constants');

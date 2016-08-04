@@ -69,6 +69,7 @@ import Card from "./cards/Card.tsx";
 import Result from "./results/Result.tsx";
 import Ajax from "./../../util/Ajax.tsx";
 import InfoArea from '../../common/components/InfoArea.tsx';
+import {notificationManager} from './../../x/components/XNotification.tsx'
 
 var NewIcon = require("./../../../images/icon_new_21x17.svg?name=NewIcon");
 var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
@@ -245,9 +246,31 @@ class Builder extends Classs<Props>
     },
   ]);
   
+  onSaveSuccess()
+  {
+    notificationManager.addNotification(
+      'Variant "' + this.reduxState[this.getSelectedId()].name + '" saved.', 
+      'info', 
+      5
+    );
+  }
+
+  onSaveError()
+  {
+    notificationManager.addNotification(
+      'Error: Variant "' + this.reduxState[this.getSelectedId()].name + '" failed to save.', 
+      'error', 
+      0
+    );
+  }
+
   save()
   {
-    Ajax.saveItem(BrowserTypes.touchVariant(Immutable.fromJS(this.reduxState[this.getSelectedId()])));
+    Ajax.saveItem(BrowserTypes.touchVariant(
+      Immutable.fromJS(this.reduxState[this.getSelectedId()])),
+      this.onSaveSuccess,
+      this.onSaveError
+    );
   }
   
   getLayout()

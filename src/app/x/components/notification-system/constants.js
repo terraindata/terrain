@@ -42,6 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+/* Adapted from https://github.com/igorprado/react-notification-system */
+
+
 var CONSTANTS = {
 
   // Positions

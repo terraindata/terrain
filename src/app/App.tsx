@@ -88,6 +88,7 @@ var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 import AuthActions from "./auth/data/AuthActions.tsx";
 import AuthStore from "./auth/data/AuthStore.tsx";
 import UserActions from "./users/data/UserActions.tsx";
+import { XNotification } from './x/components/XNotification.tsx';
 
 
 var links = 
@@ -217,6 +218,9 @@ var App = React.createClass({
           class="tooltip"
           hideOnClick={true}
         />
+
+        <XNotification />
+        
       </div>
     );
   },

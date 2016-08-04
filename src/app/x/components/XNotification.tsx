@@ -111,7 +111,7 @@ class XNotification extends Classs<XNotificationProps>
   componentDidMount() {
     notificationManager.system = this.refs['notificationSystem'];
     this.setState({
-       notificationManager: notificationManager,
+       notificationManager,
     });
   }
 
