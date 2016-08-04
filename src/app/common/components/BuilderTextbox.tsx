@@ -203,7 +203,6 @@ class BuilderTextbox extends React.Component<Props, any>
             'builder-tb-accepts-cards': this.props.acceptsCards,
             'card-drop-target': this.props.acceptsCards
           })}
-          //data-tip={(this.state && this.state.wrongType) ? this.props.typeErrorMessage : null}
         >
           {
             this.props.textarea ?
