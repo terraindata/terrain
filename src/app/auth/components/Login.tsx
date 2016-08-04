@@ -46,6 +46,7 @@ require('./Login.less')
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import Actions from "../data/AuthActions.tsx";
+import Modal from './../../common/components/Modals.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 var TerrainIcon = require("./../../../images/icon_terrain_108x17.svg?name=TerrainIcon");
@@ -62,7 +63,10 @@ class Login extends React.Component<Props, any>
     this.state = {
       username: '',
       password: '',
+      loginErrorModalOpen: false,
+      errorModalMessage: '',
     }
+    this.toggleErrorModal = this.toggleErrorModal.bind(this);
   }
   
   handleKeyDown = (event) =>
@@ -92,11 +96,17 @@ class Login extends React.Component<Props, any>
     
     let xhr = new XMLHttpRequest();
     xhr.onerror = (ev:Event) => {
-      alert("Error logging in: " + ev);
+      this.setState({
+          errorModalMessage: 'Error logging in:' + ev,
+        });
+        this.toggleErrorModal();
     }
     xhr.onload = (ev:Event) => {
       if (xhr.status != 200) {
-        alert("Failed to log in: " + xhr.responseText);
+        this.setState({
+          errorModalMessage: 'Failed to log in: ' + xhr.responseText,
+        });
+        this.toggleErrorModal();
         return;
       }
       login(xhr.responseText);
@@ -109,6 +119,13 @@ class Login extends React.Component<Props, any>
     }));
   }
   
+  toggleErrorModal()
+  {
+    this.setState ({
+      loginErrorModalOpen: !this.state.loginErrorModalOpen
+    });
+  }
+
   render() {
     return (
       <div className='login'>
@@ -124,6 +141,12 @@ class Login extends React.Component<Props, any>
             Login
           </a>
         </div>
+        <Modal 
+          message={this.state.errorModalMessage}
+          onClose={this.toggleErrorModal} 
+          open={this.state.loginErrorModalOpen} 
+          error={true}
+        /> 
       </div>
    );
   }

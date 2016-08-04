@@ -56,6 +56,7 @@ import CheckBox from './../../common/components/CheckBox.tsx';
 import RadioButtons from './../../common/components/RadioButtons.tsx';
 import Ajax from './../../util/Ajax.tsx';
 import UserTypes from '../UserTypes.tsx';
+import Modal from './../../common/components/Modals.tsx';
 
 var Select = require('react-select');
 var SoundIcon = require("./../../../images/icon_audio.svg");
@@ -133,7 +134,9 @@ class Notifications extends Classs<Props>
     this.state = {
       istate: Store.getState(),
       saving: false,
-      savingReq: null
+      savingReq: null, 
+      errorModalOpen: false,
+      errorModalMessage: ''
     };
     
     this.cancelSubscription = 
@@ -181,7 +184,11 @@ class Notifications extends Classs<Props>
 
   onSaveError(response) 
   {
-    alert("Error saving: " + JSON.stringify(response));
+    this.setState({
+      errorModalMessage: 'Error saving: ' + JSON.stringify(response),
+    });
+    this.toggleErrorModal();
+
   }
 
   onDesktopNotificationsSoundChange(val) 
@@ -403,6 +410,13 @@ class Notifications extends Classs<Props>
     );
   }
 
+  toggleErrorModal()
+  {
+    this.setState ({
+      errorModalOpen: !this.state.errorModalOpen
+    });
+  }
+
   render()
   {
     return (
@@ -424,7 +438,12 @@ class Notifications extends Classs<Props>
         content={this.renderEmailNewsContent()}
         lastEntry={true}
       />
-
+      <Modal 
+          message={this.state.errorModalMessage}
+          onClose={this.toggleErrorModal} 
+          open={this.state.errorModalOpen} 
+          error={true}
+      /> 
       </div>
     );
   }

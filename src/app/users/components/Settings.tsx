@@ -59,7 +59,7 @@ import UserStore from './../../users/data/UserStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
 type User = UserTypes.User;
 import PasswordStrengthInput from './PasswordStrengthInput.tsx';
-import XModals from './../../common/components/Modals.tsx';
+import Modal from './../../common/components/Modals.tsx';
 
 var Select = require('react-select');
 var TimeZones = require('./Timezones.json');
@@ -94,7 +94,8 @@ class Settings extends Classs<Props>
       saving: false,
       savingReq: null,
       newEmail: '',
-      saveUsernameModalOpen: false
+      errorModalOpen: false,
+      errorModalMessage: ''
     };
     
     this.cancelSubscription = 
@@ -124,18 +125,13 @@ class Settings extends Classs<Props>
        savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
      });
   }
-  
-  toggleSaveUsernameModal()
-  {
-    this.setState ({
-      saveUsernameModalOpen: !this.state.saveUsernameModalOpen
-    });
-  }
 
   saveUsername()
   {
-    //alert("Can not create a new username at this time");
-    this.toggleSaveUsernameModal();
+    this.setState({
+      errorModalMessage: 'Not able to change your username at this time',
+    });
+    this.toggleErrorModal();
   }
 
   renderUsernameContent()
@@ -161,12 +157,6 @@ class Settings extends Classs<Props>
             Note that you can only change your username twice per hour. 
           </b> Choose wisely.
         </div>
-        <XModals 
-          message='Can not create a new username at this time' 
-          onClose={this.toggleSaveUsernameModal} 
-          open={this.state.saveUsernameModalOpen} 
-          error={true}
-        />
       </div>
     );
   }
@@ -201,14 +191,20 @@ class Settings extends Classs<Props>
 
     if(newPassword.length < 6)
     {
-      alert('Passwords should be at least six characters long');
+      this.setState({
+        errorModalMessage: 'Passwords should be at least six characters long',
+      });
+      this.toggleErrorModal();
       return;
     }
     
     if(newPassword !== confirmPassword)
     {
-      alert('You entered two different passwords for your new password. \
-       Change one so that they match');
+      this.setState({
+        errorModalMessage: 'You entered two different passwords for your new password. \
+        Change one so that they match',
+      });
+      this.toggleErrorModal();
       return;
     }
 
@@ -220,11 +216,17 @@ class Settings extends Classs<Props>
 
     Ajax.changePassword(username, currentPassword, newPassword, () => {
       Actions.fetch();
-      alert('Your password has been changed.');
+      //TODO: should display message has been changed only when it has been changed, right now it displays even if current password is incorrect aka doesn't change the password
+      this.setState({
+        errorModalMessage: 'Your password has been changed.',
+      });
+      this.toggleErrorModal();
     }, (error) => {
-      alert('Error changing your password: ' + JSON.stringify(error))
+      this.setState({
+        errorModalMessage: 'Error changing your password: ' + JSON.stringify(error),
+      });
+      this.toggleErrorModal();
     });
-
   }
 
   toggleShowPassword()
@@ -288,7 +290,10 @@ class Settings extends Classs<Props>
 
   setupAuthentication()
   {
-    alert('This button has not been implemented yet');
+    this.setState({
+        errorModalMessage: 'This button has not been implemented yet',
+    });
+    this.toggleErrorModal();
   }
 
   renderAuthenticationDescription()
@@ -350,7 +355,10 @@ class Settings extends Classs<Props>
   }
 
   onSaveError(response) {
-    alert("Error saving: " + JSON.stringify(response));
+    this.setState({
+        errorModalMessage: 'Error saving: ' + JSON.stringify(response),
+    });
+    this.toggleErrorModal();
   }
 
   updateNewEmail(event)
@@ -458,7 +466,10 @@ class Settings extends Classs<Props>
 
   signOut()
   {
-    alert('This button has not been implemented.');
+    this.setState({
+        errorModalMessage: 'This button has not been implemented.',
+    });
+    this.toggleErrorModal();
   }
 
   renderSignOutButton()
@@ -491,7 +502,10 @@ class Settings extends Classs<Props>
 
   deactivate()
   {
-    alert('This button has not been implemented.');
+    this.setState({
+        errorModalMessage: 'This button has not been implemented.',
+    });
+    this.toggleErrorModal();
   }
 
   renderDeactivateButton()
@@ -501,6 +515,13 @@ class Settings extends Classs<Props>
         Deactivate your account
       </div>
     );
+  }
+
+  toggleErrorModal()
+  {
+    this.setState ({
+      errorModalOpen: !this.state.errorModalOpen
+    });
   }
 
   render()
@@ -541,6 +562,12 @@ class Settings extends Classs<Props>
         description={this.renderDeactivateDescription()}
         buttonText={this.renderDeactivateButton()}
         lastEntry={true}
+        />
+        <Modal 
+          message={this.state.errorModalMessage}
+          onClose={this.toggleErrorModal} 
+          open={this.state.errorModalOpen} 
+          error={true}
         /> 
       </div >
     );
