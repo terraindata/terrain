@@ -69,7 +69,7 @@ import Card from "./cards/Card.tsx";
 import Result from "./results/Result.tsx";
 import Ajax from "./../../util/Ajax.tsx";
 import InfoArea from '../../common/components/InfoArea.tsx';
-import {notificationManager} from './../../x/components/XNotification.tsx'
+import {notificationManager} from './../../common/components/InAppNotification.tsx'
 
 var NewIcon = require("./../../../images/icon_new_21x17.svg?name=NewIcon");
 var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");

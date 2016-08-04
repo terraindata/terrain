@@ -60,7 +60,7 @@ import UserTypes from '../../users/UserTypes.tsx';
 import UserStore from '../../users/data/UserStore.tsx';
 import RoleTypes from '../../roles/RoleTypes.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
-import {notificationManager} from './../../x/components/XNotification.tsx'
+import {notificationManager} from './../../common/components/InAppNotification.tsx'
 
 var VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
 
