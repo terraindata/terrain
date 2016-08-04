@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./XModals.less');
+require('./Modals.less');
 import Classs from './../../common/components/Classs.tsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';

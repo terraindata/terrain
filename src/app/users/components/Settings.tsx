@@ -59,6 +59,7 @@ import UserStore from './../../users/data/UserStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
 type User = UserTypes.User;
 import PasswordStrengthInput from './PasswordStrengthInput.tsx';
+import XModals from './../../common/components/Modals.tsx';
 
 var Select = require('react-select');
 var TimeZones = require('./Timezones.json');
@@ -92,7 +93,8 @@ class Settings extends Classs<Props>
       showPassword: false,
       saving: false,
       savingReq: null,
-      newEmail: ''
+      newEmail: '',
+      saveUsernameModalOpen: false
     };
     
     this.cancelSubscription = 
@@ -123,9 +125,17 @@ class Settings extends Classs<Props>
      });
   }
   
+  toggleSaveUsernameModal()
+  {
+    this.setState ({
+      saveUsernameModalOpen: !this.state.saveUsernameModalOpen
+    });
+  }
+
   saveUsername()
   {
-    alert("Can not create a new username at this time");
+    //alert("Can not create a new username at this time");
+    this.toggleSaveUsernameModal();
   }
 
   renderUsernameContent()
@@ -151,6 +161,12 @@ class Settings extends Classs<Props>
             Note that you can only change your username twice per hour. 
           </b> Choose wisely.
         </div>
+        <XModals 
+          message='Can not create a new username at this time' 
+          onClose={this.toggleSaveUsernameModal} 
+          open={this.state.saveUsernameModalOpen} 
+          error={true}
+        />
       </div>
     );
   }

@@ -42,69 +42,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./XModals.less');
-import Classs from './../../common/components/Classs.tsx';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+// Type definitions for react-modal v1.3.0
+// Project: https://github.com/reactjs/react-modal
+// Definitions by: Rajab Shakirov <https://github.com/radziksh>
+// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-import XModals from './XModals.tsx';
+/// <reference path="../react/react.d.ts"/>
 
-
-interface XModalTesterProps
-{
-
+declare module "react-modal" {
+    interface ReactModal {
+        isOpen: boolean;
+        style?: {
+            content: {
+                [key: string]: any;
+            },
+            overlay: {
+                [key: string]: any;
+            }
+        },
+        appElement?: HTMLElement | {},
+        onAfterOpen?: Function,
+        onRequestClose?: Function,
+        closeTimeoutMS?: number,
+        ariaHideApp?: boolean,
+        shouldCloseOnOverlayClick?: boolean
+    }
+    let ReactModal: __React.ClassicComponentClass<ReactModal>;
+    export default ReactModal;
 }
-
-class XModalTester extends Classs<XModalTesterProps>
-{
-  state: {
-      errorModalOpen: boolean;
-      confirmModalOpen: boolean;
-  } = {
-      errorModalOpen: false,
-      confirmModalOpen: false,
-  };
-
-  toggleErrorModal()
-  {
-    this.setState ({
-      errorModalOpen: !this.state.errorModalOpen
-    });
-  }
-
-  toggleConfirmModal()
-  {
-    this.setState ({
-      confirmModalOpen: !this.state.confirmModalOpen
-    })
-  }
-
-  render()
-  {
-    return (
-      <div> 
-        <div className='button xmodal-tester-row' onClick={this.toggleErrorModal}>
-           Error Modal
-        </div>
-        <XModals 
-          message='This is an error modal' 
-          onClose={this.toggleErrorModal} 
-          open={this.state.errorModalOpen} 
-          error={true}
-        />
-        <div className ='button xmodal-tester-row' onClick={this.toggleConfirmModal}>
-          Confirm Modal
-        </div>
-        <XModals 
-          message='This is a confirm modal' 
-          onClose={this.toggleConfirmModal} 
-          open={this.state.confirmModalOpen} 
-          confirm={true} 
-          confirmButtonText='Confirm'
-        />
-      </div>
-    );
-  }
-}
-
-export default XModalTester;
