@@ -308,14 +308,12 @@ class TransformCardChart extends React.Component<Props, any>
   
   getChartState(overrideState?: any) {
     overrideState = overrideState || {};
-    
     var pointsData = (overrideState.pointsData || this.props.pointsData).map((scorePoint) => ({
       x: scorePoint.value,
       y: scorePoint.score,
       id: scorePoint.id,
       selected: !! this.state.selectedPointIds.find(id => id === scorePoint.id),
     }));
-    
     var chartState = {
       barsData: overrideState.barsData || this.props.barsData,
       pointsData: pointsData,

@@ -69,7 +69,7 @@ class TransformCard extends Classs<Props>
   constructor(props:Props)
   {
     super(props);
-    
+   
     this.handleDomainChange = this.handleDomainChange.bind(this);
     
     this.state =
@@ -103,7 +103,6 @@ class TransformCard extends Classs<Props>
     {
       inputKey = inputKey.substr(inputKey.indexOf('.') + 1);
     }
-
     return (
       <div className='transform-card'>
         <CardField>

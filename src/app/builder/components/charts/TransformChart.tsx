@@ -148,7 +148,8 @@ var TransformChart = {
     {
       d3.select(el).select('.inner-svg').on('contextmenu', function() {
         d3.event['preventDefault']();
-        drawMenu(el, d3.mouse(this), '+ Point', state.onCreate, scales);
+        drawCrossHairs(el, d3.mouse(this), scales, state.width, state.height);
+        drawMenu(el, d3.mouse(this), '+ Point', state.onCreate, scales, state.width, state.height);
         return false;
       });
 
@@ -671,8 +672,7 @@ var TransformChart = {
 
     d3.select(el).select('.crosshairs').remove();
     
-    //var crosshairs = d3.select(el).select('.inner-svg').insert('g',':first-child')
-    var crosshairs = d3.select(el).select('.inner-svg').append('g')
+    var crosshairs = d3.select(el).select('.inner-svg').insert('g', '.points')
       .attr('class', 'crosshairs');
     
     var w = 70;
@@ -713,13 +713,13 @@ var TransformChart = {
       .attr('x2', width)
       .attr('y2', mouse[1]+1);
 
-      d3.select(el).select('.inner-svg').on('mouseleave', function() {
-        crosshairs.on('mousemove', null);
-        crosshairs.attr('visibility', 'hidden');
-      });
+    d3.select(el).select('.inner-svg').on('mouseleave', function() {
+      crosshairs.on('mousemove', null);
+      crosshairs.attr('visibility', 'hidden');
+    });
   },
   
-  _drawMenu(el, mouse, text, fn, scales)
+  _drawMenu(el, mouse, text, fn, scales, width, height)
   {
     d3.select(el).select('.right-menu').remove();
     
@@ -764,21 +764,15 @@ var TransformChart = {
       scales.x.invert(mouse[0] + parseInt(isvg.attr('x'), 10)),
       scales.realPointY.invert(mouse[1] + parseInt(isvg.attr('y'), 10))
     ));
+
+    d3.select(el).select('.inner-svg').on('mousemove', null);
   },
   
-  _rightClickFactory: (el, onDelete, scales, drawMenu) => function(point)
+  _rightClickFactory: (el, onDelete, scales, drawMenu, width, height) => function(point)
   {
     d3.event['preventDefault']();
     d3.event['stopPropagation']();
-    drawMenu(el, d3.mouse(this), 'Delete', () => onDelete(point.id), scales);
-    return false;
-  },
-
-  _mouseMoveFactory: (el, scales, width, height, drawCrossHairs) => function(point)
-  {
-    d3.event['preventDefault']();
-    d3.event['stopPropagation']();
-    drawCrossHairs(el, d3.mouse(this), scales, width, height);
+    drawMenu(el, d3.mouse(this), 'Delete', () => onDelete(point.id), scales, width, height);
     return false;
   },
 
@@ -807,8 +801,8 @@ var TransformChart = {
     {
       point.on('mousedown', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
       point.on('touchstart', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
-      point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu));
-      point.on('mousemove', this._mouseMoveFactory(el, scales, width, height, this._drawCrossHairs));
+      point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu, width, height));
+    
     }
     
     point.exit().remove();

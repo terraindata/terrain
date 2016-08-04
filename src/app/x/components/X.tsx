@@ -48,7 +48,7 @@ import * as _ from 'underscore';
 import Classs from './../../common/components/Classs.tsx';
 import XCards from './XCards.tsx';
 import { Link } from 'react-router';
-
+import XTransform from './XTransform.tsx';
 const xes =
 {
   cards:
@@ -56,6 +56,11 @@ const xes =
     name: 'Immutable Builder',
     component: XCards,
   },
+  transforms:
+  {
+    name: 'Different Transform Cards',
+    component: XTransform
+  }
 };
 
 interface Props
