@@ -101,12 +101,16 @@
   
   .right-menu {
     rect {
-       fill: #14849f;
+       fill: #14849f;  
     }
 
+    &:hover {
+      rect {
+        fill: #1db7ca;
+      }
+    }
     circle {
       fill: #999;
-      .transition;
     }
     
     text {
@@ -120,14 +124,14 @@
   .crosshairs {
     rect {
       fill: #14849f;
-    }
-    
+    } 
     
     text {
       fill: #fff;
       font-size: 12px;
       font-weight: 200;
       letter-spacing: 0.3px;
+      text-anchor: start;
     }
   }
 

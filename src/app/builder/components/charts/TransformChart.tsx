@@ -671,6 +671,7 @@ var TransformChart = {
 
     d3.select(el).select('.crosshairs').remove();
     
+    //var crosshairs = d3.select(el).select('.inner-svg').insert('g',':first-child')
     var crosshairs = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'crosshairs');
     
@@ -685,14 +686,14 @@ var TransformChart = {
       .attr('height', h);
     
     crosshairs.append('text')
-      .attr('x', mouse[0] + w / 2 +5)
+      .attr('x', mouse[0] + w / 2 -18)
       .attr('y', mouse[1] + h-5)
       .attr('text-anchor', 'middle')
       .text(text_x)
       .attr('opacity', 1);
 
     crosshairs.append('text')
-      .attr('x', mouse[0] + w / 2 +5)
+      .attr('x', mouse[0] + w / 2 - 18)
       .attr('y', mouse[1] + h +11)
       .attr('text-anchor', 'middle')
       .text(text_y)
