@@ -56,6 +56,7 @@ import BuilderActions from './../../builder/data/BuilderActions.tsx';
 import * as _ from 'underscore';
 import Classs from './../../common/components/Classs.tsx';
 import Ajax from "./../../util/Ajax.tsx";
+import Modal from './../../common/components/Modals.tsx';
 
 //Node Modules
 var CodeMirror = require('./Codemirror.js');
@@ -98,12 +99,16 @@ class TQL extends Classs<Props>
     theme: string;
     highlightedLine: number;
     theme_index: number;
+    confirmModalOpen: boolean;
+    confirmModalMessage: string;
   } = {
     tql: null,
     code: TQLConverter.toTQL(this.props.algorithm),
     theme: localStorage.getItem('theme') || 'default',
     highlightedLine: null,
     theme_index: 0,
+    confirmModalOpen: false,
+    confirmModalMessage: ''
   };
 
   constructor(props: Props) 
@@ -270,11 +275,20 @@ class TQL extends Classs<Props>
   toggleMode() 
   {
     if (this.props.algorithm.mode === 'tql' 
-      && this.state.code !== TQLConverter.toTQL(this.props.algorithm)
-      && !confirm("Warning: TQL added to the editor will be lost")) 
+      && this.state.code !== TQLConverter.toTQL(this.props.algorithm))
+      //&& !confirm("Warning: TQL added to the editor will be lost")) 
     {
+      this.setState({
+        confirmModalMessage: 'Warning: TQL added to the editor will be lost',
+      });
+      this.toggleConfirmModal();
       return;
     }
+    this.switchMode();
+  }
+
+  switchMode()
+  {
     BuilderActions.setVariantField
       (this.props.algorithm.id, 
         'mode', 
@@ -361,6 +375,13 @@ class TQL extends Classs<Props>
       />
   }
 
+  toggleConfirmModal()
+  {
+    this.setState ({
+       confirmModalOpen: !this.state.confirmModalOpen
+    });
+  }
+
   render() 
   {
     return (
@@ -370,6 +391,13 @@ class TQL extends Classs<Props>
           { this.renderTqlEditor() }
           { this.renderResults() }
         </div>
+        <Modal 
+          message={this.state.confirmModalMessage}
+          onClose={this.toggleConfirmModal} 
+          open={this.state.confirmModalOpen} 
+          confirm={true}
+          onConfirm = {this.switchMode} 
+        /> 
       </div>
     );
   }

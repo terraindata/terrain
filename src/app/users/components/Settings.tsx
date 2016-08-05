@@ -216,6 +216,7 @@ class Settings extends Classs<Props>
 
     Ajax.changePassword(username, currentPassword, newPassword, () => {
       Actions.fetch();
+      this
       //TODO: should display message has been changed only when it has been changed, right now it displays even if current password is incorrect aka doesn't change the password
       this.setState({
         errorModalMessage: 'Your password has been changed.',
