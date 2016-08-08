@@ -49,7 +49,7 @@ import Actions from "../../../data/BuilderActions.tsx";
 import Util from '../../../../util/Util.tsx';
 import { BuilderTypes } from './../../../BuilderTypes.tsx';
 
-import TransformChart from '../../charts/TransformChart.tsx';
+import TransformChart from '../../charts/TransformChart_4.tsx';
 
 interface Props {
   card: BuilderTypes.ITransformCard;
@@ -233,22 +233,33 @@ class TransformCardChart extends React.Component<Props, any>
     this.dispatchAction(newPointsData);
   }
   
-  onPointMoveStart(initialScore)
+  onPointMoveStart(initialScore, initialValue)
   {
     this.setState({
       initialScore,
+      initialValue,
       initialPoints: Util.deeperCloneArr(this.props.pointsData),
     })
   }
   
-  onPointMove(scorePointId, newScore)
+  onPointMove(scorePointId, newScore, newValue, pointValues)
   {
+    pointValues.sort();
     var scoreDiff = this.state.initialScore - newScore;
+    var valueDiff = this.state.initialValue - newValue;
     var pointIndex = this.props.pointsData.findIndex(scorePoint => scorePoint.id === scorePointId);
     var newPointsData = Util.deeperCloneArr(this.state.initialPoints).map(scorePoint => {
       if(scorePoint.id === scorePointId || this.state.selectedPointIds.find(id => id === scorePoint.id))
       {
         scorePoint.score = Util.valueMinMax(scorePoint.score - scoreDiff, 0, 1);
+        var index = pointValues.indexOf(scorePoint.value);
+        console.log("Index: " + index);
+        console.log(pointValues);
+        var min = (index - 1) >= 0 ? pointValues[index] : 0;
+        var max = (index + 1) < pointValues.length ? pointValues[index] : 100; //should it always be 0-100?
+        console.log("Min: " + min);
+        console.log("Max: " + max);
+        scorePoint.value = Util.valueMinMax(scorePoint.value - valueDiff, min, max);
       }
       return scorePoint;
     });

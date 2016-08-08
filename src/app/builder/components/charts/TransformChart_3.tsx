@@ -140,23 +140,57 @@ var TransformChart = {
         state.onSelect(null);
       }
       d3.select(el).select('.right-menu').remove();
+      d3.select(el).selectAll('.crosshairs').remove();
     });
     
     var drawMenu = this._drawMenu;
     var drawCrossHairs = this._drawCrossHairs;
     if(state.canEdit)
     {
-      d3.select(el).select('.inner-svg').on('contextmenu', function() {
+      //Keep track of what element is in focus (for key events)
+      var currentObject = null;
+      d3.select(el).select('.inner-svg').on('mouseover', function() {currentObject=this});
+      d3.select(el).select('.inner-svg').on('mouseout', function() {currentObject=null});
+
+      //Draw Point + menu on double click
+      d3.select(el).select('.inner-svg').on('dblclick', function() {
         d3.event['preventDefault']();
         drawCrossHairs(el, d3.mouse(this), scales, state.width, state.height);
-        drawMenu(el, d3.mouse(this), '+ Point', state.onCreate, scales, state.width, state.height);
+        drawMenu(el, d3.mouse(this), '+ Point', state.onCreate, scales, state.width, state.height, drawCrossHairs);
         return false;
       });
 
+      //Draw crosshairs when shift/ctrl is pressed
       d3.select(el).select('.inner-svg').on('mousemove', function() {
-        d3.event['preventDefault']();
-        drawCrossHairs(el, d3.mouse(this), scales, state.width, state.height);
+        if(d3.event['ctrlKey'] || d3.event['shiftKey']) //can be any key
+        {
+          drawCrossHairs(el, d3.mouse(this), scales, state.width, state.height, d3.mouse(this)[0]);
+        }
         return false;
+      });
+
+      d3.select('body').on('keyup', function() {
+        //CTRL: 17, SHIFT: 16, ALT: 18, WIN/CMD: 91
+         if(currentObject && (d3.event['keyCode'] === 17 || d3.event['keyCode'] === 16))
+         {
+           d3.select(el).selectAll('.crosshairs').remove()
+         }
+      });
+
+      //Stop normal right click functioning from happening
+      d3.select(el).select('.inner-svg').on('contextmenu', function() {
+        d3.event['preventDefault']();
+      });
+
+      //Delete selected points on del key press
+      var deletePoints = this._deletePoints;
+      d3.select('body').on('keydown', function() {
+        if(currentObject && (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8)) //delete/backspace key
+        {
+          d3.event['preventDefault']();
+          d3.event['stopPropagation']();
+          deletePoints(el, state.onDelete);
+        }
       });
     }
   },
@@ -621,8 +655,19 @@ var TransformChart = {
       .attr("d", lineFunction(this._getLinesData(pointsData, scales, true)));
   },
   
+  _deletePoints(el, onDelete) 
+  { 
+    var selectedIds = d3.select(el).selectAll('.point-selected')[0].map(function(point:any){
+      return point.getAttribute('_id');
+    });
+    selectedIds.map(function(id) {
+      onDelete(id);
+    });
+  },
+
   // needs to be "function" for d3.mouse(this)
-  _mousedownFactory: (el, onMove, scales, onSelect, onPointMoveStart) => function(d) {
+  _mousedownFactory: (el, onMove, scales, onSelect, onPointMoveStart, drawCrossHairs, width, height, point) => function(d) {
+    
     if(d3.event['shiftKey'] || d3.event['altKey'])
     {
       onSelect(d.id, d3.event['shiftKey']);
@@ -640,16 +685,17 @@ var TransformChart = {
     var t = this;
     
     point.attr('active', '1');
-    
     var move = function(event) {
       var newY = scales.realPointY.invert(d3.mouse(t)[1]);
       onMove(point.attr('_id'), newY);
+      drawCrossHairs(el, d3.mouse(this), scales, width, height, parseInt(point.attr('cx')), newY);
     }
     
     del.on('mousemove', move);
     del.on('touchmove', move);
 
     var offFn = () => {
+      d3.select(el).selectAll('.crosshairs').remove();
       del.on('mousemove', null);
       del.on('touchmove', null);
       del.on('mouseup', null);
@@ -662,61 +708,66 @@ var TransformChart = {
     del.on('mouseleave', offFn);
   },
 
-  _drawCrossHairs(el, mouse, scales, width, height)
+  _drawCrossHairs(el, mouse, scales, width, height, x, newY)
   {
+    if(!x)
+    {
+      return;
+    }
     var f = d3.format(".2f")
-    var text_x = 'X:  ' + f(scales.realX.invert(mouse[0]));
-    var text_y = 'Y:  ' + f(scales.realPointY.invert(mouse[1]));
 
-    d3.select(el).selectAll('.crosshairs').remove();
+    var y = newY || scales.realPointY.invert(mouse[1]);
+    var pos_y = scales.realPointY(y);
+    var text_x = 'X:  ' + f(scales.realX.invert(x));
+    var text_y = 'Y:  ' + f(y);
     
+    d3.select(el).selectAll('.crosshairs').remove();
+    d3.select(el).select('.tooltip').remove();
+
     var crosshairs = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'crosshairs');
     
     var w = 70;
     var h = 34;
-    var containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
-    var containerHeight = parseInt(d3.select(el).select('.inner-svg').attr('height'));
-    var x = (mouse[0] + w  - 5) > containerWidth ? mouse[0] - w - 5 : mouse[0] + 5;
-    var y = (mouse[1] + h + 8) > containerHeight ? mouse[1] - h : mouse[1] + 14;
+
     crosshairs.append('rect')
-      .attr('x', x)
-      .attr('y', y)
+      .attr('x', x+5)
+      .attr('y', pos_y+14)
       .attr('rx', 5)
       .attr('ry', 5)
       .attr('width', w)
       .attr('height', h);
     
     crosshairs.append('text')
-      .attr('x', x + w / 2 - 23)
-      .attr('y', y + h - 22)
+      .attr('x', x + w / 2 - 18)
+      .attr('y', pos_y + h-5)
       .attr('text-anchor', 'middle')
       .text(text_x)
       .attr('opacity', 1);
 
     crosshairs.append('text')
-      .attr('x', x + w / 2 - 23)
-      .attr('y', y + h  - 5)
+      .attr('x', x + w / 2 - 18)
+      .attr('y', pos_y + h +11)
       .attr('text-anchor', 'middle')
       .text(text_y)
       .attr('opacity', 1);
 
-    //To put the lines behind the points, but not the crosshair menu, they have to be separated.
+
     var crosshairLines = d3.select(el).select('.inner-svg').insert('g', '.points').attr('class', 'crosshairs');
 
     crosshairLines.append('line')
       .attr('class', 'crosshairs-line')
-      .attr('x1', mouse[0]+1)
+      .attr('x1', x)
       .attr('y1', 0)
-      .attr('x2', mouse[0]+1)
+      .attr('x2', x)
       .attr('y2', height);
 
     crosshairLines.append('line')
       .attr('class', 'crosshairs-line')
       .attr('x1', 0)
-      .attr('y1', mouse[1]+1)
+      .attr('y1', pos_y)
       .attr('x2', width)
-      .attr('y2', mouse[1]+1);
+      .attr('y2', pos_y);
 
     d3.select(el).select('.inner-svg').on('mouseleave', function() {
       crosshairs.on('mousemove', null);
@@ -725,11 +776,53 @@ var TransformChart = {
       crosshairLines.attr('visibility', 'hidden');
     });
   },
+
+  _drawToolTip(el, mouse, scales)
+  {
+    var f = d3.format(".2f")
+    var text_x = 'X: ' + f(scales.realX.invert(mouse[0]));
+    var text_y = 'Y: ' + f(scales.realPointY.invert(mouse[1]));
+    d3.select(el).select('.tooltip').remove();
+    
+    var tooltip = d3.select(el).select('.inner-svg').insert('g', '.points')
+      .attr('class', 'tooltip');
+    
+    var containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
+    var containerHeight = parseInt(d3.select(el).select('.inner-svg').attr('height'));
+    var w = 70;
+    var h = 38;
+    var x = (mouse[0] + w) > containerWidth ? mouse[0] - w - 5 : mouse[0] + 5;
+    var y = (mouse[1] + h) > containerHeight ? mouse[1] - h - 14 : mouse[1] + 14;
+    tooltip.append('rect')
+      .attr('x', x)
+      .attr('y', y)
+      .attr('rx', 5)
+      .attr('ry', 5)
+      .attr('width', w)
+      .attr('height', h);
+    
+    tooltip.append('text')
+      .attr('x', x + w / 2 - 23)
+      .attr('y', y + h - 22)
+      .attr('text-anchor', 'middle')
+      .text(text_x)
+      .attr('opacity', 1);
+
+    tooltip.append('text')
+      .attr('x', x + w / 2 - 23)
+      .attr('y', y + h - 5)
+      .attr('text-anchor', 'middle')
+      .text(text_y)
+      .attr('opacity', 1);
+  },
   
-  _drawMenu(el, mouse, text, fn, scales, width, height)
+  _drawMenu(el, mouse, text, fn, scales, width, height, drawCrossHairs)
   {
     d3.select(el).select('.right-menu').remove();
-    
+    if(text !== 'Delete')
+    {
+      drawCrossHairs(el, mouse, scales, width, height, parseInt(mouse[0]));
+    }
     var menu = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'right-menu');
     
@@ -769,7 +862,6 @@ var TransformChart = {
       .transition()
       .duration(50);
 
-    
     var isvg = d3.select(el).select('.inner-svg');
     menu.on('mousedown', () => fn(
       scales.x.invert(mouse[0] + parseInt(isvg.attr('x'), 10)),
@@ -779,11 +871,32 @@ var TransformChart = {
     d3.select(el).select('.inner-svg').on('mousemove', null);
   },
   
-  _rightClickFactory: (el, onDelete, scales, drawMenu, width, height) => function(point)
+  _rightClickFactory: (el, onDelete, scales, drawMenu, width, height, drawCrossHairs) => function(point)
   {
     d3.event['preventDefault']();
     d3.event['stopPropagation']();
-    drawMenu(el, d3.mouse(this), 'Delete', () => onDelete(point.id), scales, width, height);
+    drawMenu(el, d3.mouse(this), 'Delete', () => onDelete(point.id), scales, width, height, drawCrossHairs);
+    return false;
+  },
+
+  _mouseoverFactory: (el, scales, drawToolTip) => function(point)
+  {
+    d3.event['preventDefault']();
+    d3.event['stopPropagation']();
+    drawToolTip(el, d3.mouse(this), scales);
+    return false;
+  },
+
+  _mouseoutFactory: (el) => function(point)
+  {
+    d3.select(el).select('.tooltip').remove();
+  },
+
+  _mousemoveFactory: (el, scales, drawCrossHairs, height, width) => function(point)
+  {
+    d3.event['preventDefault']();
+    d3.event['stopPropagation']();
+    drawCrossHairs(el, d3.mouse(this), scales, height, width);
     return false;
   },
 
@@ -796,7 +909,7 @@ var TransformChart = {
     
     point.enter()
       .append('circle');
-    
+
     point
       .attr('cx', (d) => scales.realX(d['x']))
       .attr('cy', (d) => scales.realPointY(d['y']))
@@ -807,13 +920,14 @@ var TransformChart = {
     
     point
       .attr('_id', (d) => d['id']);
-      
+
     if(canEdit)
     {
-      point.on('mousedown', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
+      point.on('mousedown', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart, this._drawCrossHairs, width, height, point));
+      point.on('mouseover', this._mouseoverFactory(el, scales, this._drawToolTip));
       point.on('touchstart', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart));
-      point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu, width, height));
-    
+      point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu, width, height, this._drawCrossHairs));
+      point.on('mouseout', this._mouseoutFactory(el));
     }
     
     point.exit().remove();
