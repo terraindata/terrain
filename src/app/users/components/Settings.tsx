@@ -94,8 +94,9 @@ class Settings extends Classs<Props>
       saving: false,
       savingReq: null,
       newEmail: '',
-      errorModalOpen: false,
-      errorModalMessage: ''
+      modalOpen: false,
+      modalMessage: '',
+      errorModal: false
     };
     
     this.cancelSubscription = 
@@ -129,9 +130,10 @@ class Settings extends Classs<Props>
   saveUsername()
   {
     this.setState({
-      errorModalMessage: 'Not able to change your username at this time',
+      modalMessage: 'Not able to change your username at this time',
+      errorModal: true,
     });
-    this.toggleErrorModal();
+    this.toggleModal();
   }
 
   renderUsernameContent()
@@ -192,19 +194,21 @@ class Settings extends Classs<Props>
     if(newPassword.length < 6)
     {
       this.setState({
-        errorModalMessage: 'Passwords should be at least six characters long',
+        modalMessage: 'Passwords should be at least six characters long',
+        errorModal: true,
       });
-      this.toggleErrorModal();
+      this.toggleModal();
       return;
     }
     
     if(newPassword !== confirmPassword)
     {
       this.setState({
-        errorModalMessage: 'You entered two different passwords for your new password. \
+        modalMessage: 'You entered two different passwords for your new password. \
         Change one so that they match',
+        errorModal: true,
       });
-      this.toggleErrorModal();
+      this.toggleModal();
       return;
     }
 
@@ -216,16 +220,18 @@ class Settings extends Classs<Props>
 
     Ajax.changePassword(username, currentPassword, newPassword, () => {
       Actions.fetch();
-      //TODO: should display message has been changed only when it has been changed, right now it displays even if current password is incorrect aka doesn't change the password
+      //TODO: When the current password is incorrect it doesn't call onError, calls onLoad which is incorrect (doesn't update password though)
       this.setState({
-        errorModalMessage: 'Your password has been changed.',
+        modalMessage: 'Your password has been changed.',
+        errorModal: false,
       });
-      this.toggleErrorModal();
+      this.toggleModal();
     }, (error) => {
       this.setState({
-        errorModalMessage: 'Error changing your password: ' + JSON.stringify(error),
+        modalMessage: 'Error changing your password: ' + JSON.stringify(error),
+        errorModal: true,
       });
-      this.toggleErrorModal();
+      this.toggleModal();
     });
   }
 
@@ -291,9 +297,10 @@ class Settings extends Classs<Props>
   setupAuthentication()
   {
     this.setState({
-        errorModalMessage: 'This button has not been implemented yet',
+        modalMessage: 'This button has not been implemented yet',
+        errorModal: true,
     });
-    this.toggleErrorModal();
+    this.toggleModal();
   }
 
   renderAuthenticationDescription()
@@ -356,9 +363,10 @@ class Settings extends Classs<Props>
 
   onSaveError(response) {
     this.setState({
-        errorModalMessage: 'Error saving: ' + JSON.stringify(response),
+        modalMessage: 'Error saving: ' + JSON.stringify(response),
+        errorModal: true,
     });
-    this.toggleErrorModal();
+    this.toggleModal();
   }
 
   updateNewEmail(event)
@@ -467,9 +475,10 @@ class Settings extends Classs<Props>
   signOut()
   {
     this.setState({
-        errorModalMessage: 'This button has not been implemented.',
+        modalMessage: 'This button has not been implemented.',
+        errorModal: true,
     });
-    this.toggleErrorModal();
+    this.toggleModal();
   }
 
   renderSignOutButton()
@@ -503,9 +512,10 @@ class Settings extends Classs<Props>
   deactivate()
   {
     this.setState({
-        errorModalMessage: 'This button has not been implemented.',
+        modalMessage: 'This button has not been implemented.',
+        errorModal: true,
     });
-    this.toggleErrorModal();
+    this.toggleModal();
   }
 
   renderDeactivateButton()
@@ -517,10 +527,10 @@ class Settings extends Classs<Props>
     );
   }
 
-  toggleErrorModal()
+  toggleModal()
   {
     this.setState ({
-      errorModalOpen: !this.state.errorModalOpen
+      modalOpen: !this.state.modalOpen
     });
   }
 
@@ -564,10 +574,10 @@ class Settings extends Classs<Props>
         lastEntry={true}
         />
         <Modal 
-          message={this.state.errorModalMessage}
-          onClose={this.toggleErrorModal} 
-          open={this.state.errorModalOpen} 
-          error={true}
+          message={this.state.modalMessage}
+          onClose={this.toggleModal} 
+          open={this.state.modalOpen} 
+          error={this.state.errorModal}
         /> 
       </div >
     );
