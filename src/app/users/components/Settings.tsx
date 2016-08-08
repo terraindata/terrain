@@ -220,7 +220,6 @@ class Settings extends Classs<Props>
 
     Ajax.changePassword(username, currentPassword, newPassword, () => {
       Actions.fetch();
-      //TODO: When the current password is incorrect it doesn't call onError, calls onLoad which is incorrect (doesn't update password though)
       this.setState({
         modalMessage: 'Your password has been changed.',
         errorModal: false,
@@ -228,7 +227,7 @@ class Settings extends Classs<Props>
       this.toggleModal();
     }, (error) => {
       this.setState({
-        modalMessage: 'Error changing your password: ' + JSON.stringify(error),
+        modalMessage: 'Error changing your password: ' + JSON.stringify(error.error),
         errorModal: true,
       });
       this.toggleModal();
