@@ -306,7 +306,7 @@ var BuilderColumn = React.createClass<any, any>(
               this.props.canCloseColumn && 
                 <CloseIcon
                   onClick={this.handleCloseColumn}
-                  className='bc-options-svg'
+                  className='close close-builder-title-bar'
                   data-tip="Close Column"
                 />
              }

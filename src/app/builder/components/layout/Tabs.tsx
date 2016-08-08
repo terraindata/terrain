@@ -118,7 +118,6 @@ var Tab = React.createClass<any, any>({
       <div
         className='tabs-close'
         onClick={this.close}
-        data-tip='Close'
       >
         <CloseIcon className='close' />
       </div>
