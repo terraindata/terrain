@@ -314,7 +314,8 @@ var BuilderColumn = React.createClass<any, any>(
         </div>
         <div className={
             'builder-column-content' + 
-            (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '')
+            (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '') +
+            (this.state.column === COLUMNS.Inputs ? ' builder-column-content-scroll' : '')
           }>
           { this.renderContent(canEdit) }
         </div>

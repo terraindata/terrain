@@ -8,6 +8,9 @@
   height: 100%;
   overflow: hidden;
   
+  input {
+    font-size: 12px;
+  }
   .builder-title-bar {
     background: @dark-moss;
     padding: 9px;
@@ -132,11 +135,12 @@
     position: relative;
     height: calc(~"100% - @{title-bar-height}");
     border-left: 1px solid @side-border-color;
+    padding-left: 12px !important;
     
     &.builder-column-content-scroll {
       overflow-y: auto;
       overflow-x: auto;
-      margin-right: @standard-margin;
+      margin-right: 6px;
       padding-right: 0px;
     }
   
