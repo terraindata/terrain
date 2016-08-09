@@ -235,6 +235,7 @@ class TransformCardChart extends React.Component<Props, any>
   
   onPointMoveStart(initialScore, initialValue)
   {
+    console.log("START")
     this.setState({
       initialScore,
       initialValue,
@@ -249,6 +250,7 @@ class TransformCardChart extends React.Component<Props, any>
   
   onPointMove(scorePointId, newScore, newValue, pointValues, cx)
   {
+    console.log("on point move");
     var scoreDiff = this.state.initialScore - newScore;
     var valueDiff = this.state.initialValue - newValue;
     pointValues.sort(this.sortNumber);
@@ -273,7 +275,7 @@ class TransformCardChart extends React.Component<Props, any>
                     Math.min(this.state.domain.x[1], pointValues[index + 1]) 
                     : this.state.domain.x[1];
           } 
-          scorePoint.value = Util.valueMinMax(scorePoint.value - valueDiff, min + .5, max - .01);
+          scorePoint.value = Util.valueMinMax(scorePoint.value - valueDiff, min + .2, max - .01);
         }
       }
       return scorePoint;

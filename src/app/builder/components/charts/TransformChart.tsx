@@ -673,7 +673,7 @@ var TransformChart = {
     var crosshairs = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'crosshairs');
     
-    var w = 70;
+    var w = 90;
     var h = 34;
     var containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
     var containerHeight = parseInt(d3.select(el).select('.inner-svg').attr('height'));
