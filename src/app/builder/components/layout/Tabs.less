@@ -98,7 +98,7 @@
     margin-right: -25px;
     position: relative;
     z-index: 1;
-        
+    left: -10px;
     .tab-icon {
       fill: @tab-bg-color;
       height: 32px;
@@ -125,14 +125,11 @@
       background: @tab-bg-color;
       .transition;
       height: 31px;
-      position: relative;
-      top: -17px;      
+      position: relative;     
       padding-top: 7px;
       padding-bottom: 5px;
       margin-left: -2px;
       margin-right: -2px;
-      
-      border-top: 1px solid @tab-border-color;
       
       .tabs-close {
         margin-left: 10px;
@@ -179,6 +176,11 @@
       
       .tab-inner {
         background: @tab-hover-color;
+        stroke:  @tab-hover-color;
+      }
+
+      .tabs-test-right {
+        background: @tab-hover-color;
       }
     }
   }
@@ -189,7 +191,7 @@
     
     .tab-inner {
       background: @tab-selected-bg-color;
-      border-color: @tab-selected-border-color;
+      border-color: @tab-selected-bg-color;
       
       .tabs-close svg {
         fill: @selected-font-color;
@@ -197,6 +199,10 @@
           fill: #fff;
         }
       }
+    }
+
+    .tabs-test-right {
+      background: @tab-selected-bg-color;
     }
     
     .tab-icon {
@@ -230,7 +236,7 @@
       // border-left: 1px solid rgba(255,255,255,0.6);
       // &:first-child, &.tabs-action-no-divider {
       //   border-left: none;
-      // }
+      // } 
       
       .transition;
       
@@ -253,4 +259,35 @@
 .tabs-content {
 	height: calc(~"100% - @{tabs-row-height} - 1px");
   overflow: hidden;
+}
+
+.close-icon {
+  fill: #fff !important;
+}
+
+.tabs-test-right {
+  height: 32px;
+  display: inline-block;
+  position: absolute;
+  width:20px;
+  background:red;
+  padding-top: 7px;
+  padding-bottom: 5px;
+  margin-left: -25px;
+  background: @tab-bg-color;
+  border-top-right-radius: 40px 100px;
+  border-bottom-right-radius: 40px 2px;
+  .transition;
+}
+
+.tabs-test {
+  margin-left: 10px !important;
+  margin-right: 22px !important;
+  height: 32px !important;
+  display: inline-block;
+  position: relative;
+  z-index: 3;  
+  padding-left: 20px;
+  border-top-left-radius: 40px 100px;
+  border-bottom-left-radius: 40px 2px
 }

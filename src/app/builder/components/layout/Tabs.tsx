@@ -119,11 +119,32 @@ var Tab = React.createClass<any, any>({
         className='tabs-close'
         onClick={this.close}
       >
-        <CloseIcon className='close' />
+        <CloseIcon className='close close-icon' />
       </div>
     );
   },
   
+      //   <div 
+      //   className={Util.objToClassname({
+      //     'tabs-tab': true,
+      //     'tabs-tab-selected': this.props.selected,
+      //     'tabs-tab-no-bg': this.props.fixed,
+      //     })}
+      //   key={this.props.id}
+      //   style={this.zIndexStyle()}
+      //   onClick={this.handleClick}>
+      //     { this.props.fixed ? null :
+      //       <TabIcon className='tab-icon tab-icon-left' />
+      //     }
+      //     <div className='tab-inner'>
+      //       { this.props.name }
+      //       { this.renderClose() }
+      //     </div>
+      //     { this.props.fixed ? null :
+      //       <TabIcon className='tab-icon tab-icon-right' />
+      //     }
+      // </div>
+
   render() {
     return this.renderPanel(
       <div 
@@ -135,16 +156,13 @@ var Tab = React.createClass<any, any>({
         key={this.props.id}
         style={this.zIndexStyle()}
         onClick={this.handleClick}>
-          { this.props.fixed ? null :
-            <TabIcon className='tab-icon tab-icon-left' />
-          }
-          <div className='tab-inner'>
+        
+          <div className='tab-inner tabs-test'>
             { this.props.name }
             { this.renderClose() }
           </div>
-          { this.props.fixed ? null :
-            <TabIcon className='tab-icon tab-icon-right' />
-          }
+          <div className ='tabs-test-right' />
+         
       </div>
     );
   },
