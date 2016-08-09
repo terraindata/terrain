@@ -241,25 +241,40 @@ class TransformCardChart extends React.Component<Props, any>
       initialPoints: Util.deeperCloneArr(this.props.pointsData),
     })
   }
-  
-  onPointMove(scorePointId, newScore, newValue, pointValues)
+
+  sortNumber(a, b)
   {
-    pointValues.sort();
+    return a - b;
+  }
+  
+  onPointMove(scorePointId, newScore, newValue, pointValues, cx)
+  {
     var scoreDiff = this.state.initialScore - newScore;
     var valueDiff = this.state.initialValue - newValue;
+    pointValues.sort(this.sortNumber);
     var pointIndex = this.props.pointsData.findIndex(scorePoint => scorePoint.id === scorePointId);
     var newPointsData = Util.deeperCloneArr(this.state.initialPoints).map(scorePoint => {
       if(scorePoint.id === scorePointId || this.state.selectedPointIds.find(id => id === scorePoint.id))
       {
         scorePoint.score = Util.valueMinMax(scorePoint.score - scoreDiff, 0, 1);
-        var index = pointValues.indexOf(scorePoint.value);
-        console.log("Index: " + index);
-        console.log(pointValues);
-        var min = (index - 1) >= 0 ? pointValues[index] : 0;
-        var max = (index + 1) < pointValues.length ? pointValues[index] : 100; //should it always be 0-100?
-        console.log("Min: " + min);
-        console.log("Max: " + max);
-        scorePoint.value = Util.valueMinMax(scorePoint.value - valueDiff, min, max);
+        if(!(this.state.selectedPointIds.length > 1))
+        {
+          var index = pointValues.indexOf(cx);
+          if(index < 0)
+          {
+            var min = scorePoint.value - valueDiff
+            var max = scorePoint.value - valueDiff
+          }
+          else {
+            min = (index - 1) >= 0 ? 
+                    Math.max(this.state.domain.x[0], pointValues[index - 1])
+                    : this.state.domain.x[0];
+            max = (index + 1) < pointValues.length ?  
+                    Math.min(this.state.domain.x[1], pointValues[index + 1]) 
+                    : this.state.domain.x[1];
+          } 
+          scorePoint.value = Util.valueMinMax(scorePoint.value - valueDiff, min + .5, max - .01);
+        }
       }
       return scorePoint;
     });

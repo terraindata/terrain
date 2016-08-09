@@ -694,10 +694,11 @@ var TransformChart = {
     var move = function(event) {
       var newY = scales.realPointY.invert(d3.mouse(t)[1]);
       var newX = scales.realX.invert(d3.mouse(t)[0]);
+      var cx = scales.realX.invert(parseInt(point.attr('cx')));
       var pointValues = d3.select(el).selectAll('.point')[0].map(function(point:any) {
-        return parseInt(point.getAttribute('cx')); 
-      })
-      onMove(point.attr('_id'), newY, newX, pointValues);
+        return scales.realX.invert(parseInt(point.getAttribute('cx'))); 
+      });
+      onMove(point.attr('_id'), newY, newX, pointValues, cx);
       drawCrossHairs(el, d3.mouse(this), scales, width, height, parseInt(point.attr('cx')), newY);
     }
     
