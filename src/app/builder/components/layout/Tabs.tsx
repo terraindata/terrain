@@ -135,14 +135,11 @@ var Tab = React.createClass<any, any>({
         key={this.props.id}
         style={this.zIndexStyle()}
         onClick={this.handleClick}>
-
           <div className='tab-inner'>
             { this.props.name }
             { this.renderClose() }
           </div>
-
           <div className ='tab-inner-right' />
-         
       </div>
     );
   },
