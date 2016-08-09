@@ -123,27 +123,6 @@ var Tab = React.createClass<any, any>({
       </div>
     );
   },
-  
-      //   <div 
-      //   className={Util.objToClassname({
-      //     'tabs-tab': true,
-      //     'tabs-tab-selected': this.props.selected,
-      //     'tabs-tab-no-bg': this.props.fixed,
-      //     })}
-      //   key={this.props.id}
-      //   style={this.zIndexStyle()}
-      //   onClick={this.handleClick}>
-      //     { this.props.fixed ? null :
-      //       <TabIcon className='tab-icon tab-icon-left' />
-      //     }
-      //     <div className='tab-inner'>
-      //       { this.props.name }
-      //       { this.renderClose() }
-      //     </div>
-      //     { this.props.fixed ? null :
-      //       <TabIcon className='tab-icon tab-icon-right' />
-      //     }
-      // </div>
 
   render() {
     return this.renderPanel(
@@ -156,12 +135,13 @@ var Tab = React.createClass<any, any>({
         key={this.props.id}
         style={this.zIndexStyle()}
         onClick={this.handleClick}>
-        
-          <div className='tab-inner tabs-test'>
+
+          <div className='tab-inner'>
             { this.props.name }
             { this.renderClose() }
           </div>
-          <div className ='tabs-test-right' />
+
+          <div className ='tab-inner-right' />
          
       </div>
     );
