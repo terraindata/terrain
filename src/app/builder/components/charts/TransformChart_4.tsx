@@ -142,6 +142,7 @@ var TransformChart = {
           d3.event['target'].tagName !== 'INPUT')
       {
         state.onSelect(null);
+        d3.select(el).select('foreignObject').remove();
       }
       d3.select(el).select('.right-menu').remove();
       d3.select(el).selectAll('.crosshairs').remove();
@@ -159,13 +160,18 @@ var TransformChart = {
 
       //Draw Point + menu on double click
       d3.select(el).select('.inner-svg').on('dblclick', function() {
-        d3.event['preventDefault']();
-        drawCrossHairs(el, d3.mouse(this), scales, state.width, state.height);
-        var isvg = d3.select(el).select('.inner-svg');
-        state.onCreate(
-          scales.x.invert(d3.mouse(this)[0] + parseInt(isvg.attr('x'), 10)),
-          scales.realPointY.invert(d3.mouse(this)[1] + parseInt(isvg.attr('y'), 10))
-        );
+        if(d3.event['target'].tagName !== 'LABEL' && 
+           d3.event['target'].tagName !== 'DIV' &&
+           d3.event['target'].tagName !== 'INPUT')
+        {
+          d3.event['preventDefault']();
+          drawCrossHairs(el, d3.mouse(this), scales, state.width, state.height);
+          var isvg = d3.select(el).select('.inner-svg');
+          state.onCreate(
+            scales.x.invert(d3.mouse(this)[0] + parseInt(isvg.attr('x'), 10)),
+            scales.realPointY.invert(d3.mouse(this)[1] + parseInt(isvg.attr('y'), 10))
+          );
+        }
         return false;
       });
 
@@ -667,6 +673,7 @@ var TransformChart = {
   
   _deletePoints(el, onDelete) 
   { 
+    d3.select('foreignObject').remove(); 
     var selectedIds = d3.select(el).selectAll('.point-selected')[0].map(function(point:any){
       return point.getAttribute('_id');
     });
@@ -699,12 +706,12 @@ var TransformChart = {
     var move = function(event) {
       var newY = scales.realPointY.invert(d3.mouse(t)[1]);
       var newX = scales.realX.invert(d3.mouse(t)[0]);
-      var cx = scales.realX.invert(parseInt(point.attr('cx')));
+      var cx = scales.realX.invert(parseFloat(point.attr('cx')));
       var pointValues = d3.select(el).selectAll('.point')[0].map(function(point:any) {
-        return scales.realX.invert(parseInt(point.getAttribute('cx'))); 
+        return scales.realX.invert(parseFloat(point.getAttribute('cx'))); 
       });
       onMove(point.attr('_id'), newY, newX, pointValues, cx);
-      drawCrossHairs(el, d3.mouse(this), scales, width, height, parseInt(point.attr('cx')), newY);
+      drawCrossHairs(el, d3.mouse(this), scales, width, height, parseFloat(point.attr('cx')), newY);
     }
     
     del.on('mousemove', move);
@@ -739,6 +746,7 @@ var TransformChart = {
     
     d3.select(el).selectAll('.crosshairs').remove();
     d3.select(el).select('.transform-tooltip').remove();
+    d3.select(el).select('foreignObject').remove();
 
     var crosshairs = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'crosshairs');
@@ -803,7 +811,7 @@ var TransformChart = {
     var text_x = 'X: ' + f(scales.realX.invert(mouse[0]));
     var text_y = 'Y: ' + f(scales.realPointY.invert(mouse[1]));
     d3.selectAll('.transform-tooltip').remove();
-    
+
     var tooltip = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'transform-tooltip');
     
@@ -847,27 +855,48 @@ var TransformChart = {
     var cx = scales.realX.invert(parseInt(point.attr('cx')));
     var xValueNode: any = d3.select('#xVal').node();
     var yValueNode: any = d3.select('#yVal').node();
-    onMove(
+    var x = parseFloat(xValueNode.value) || 0;
+    var y = parseFloat(yValueNode.value) || 0;
+    var newPointsData = onMove(
       point.attr('_id'), 
-      parseInt(yValueNode.value), 
-      parseInt(xValueNode.value), 
+      y, 
+      x, 
       pointValues, 
       cx
     ); 
+    for(var i = 0; i < newPointsData.length; i++)
+    {
+      if(newPointsData[i].id === point.attr('_id'))
+      {
+        console.log(newPointsData[i].value);
+        //xValueNode.value = newPointsData[i].value;
+      }
+    }
   },
 
   _drawPointEditMenu(el, mouse, scales, onMove, onPointMoveStart, onPointPosEdit)
   {
+    if(!d3.select(el).select('.point-selected')[0][0])
+    {
+      return;
+    }
     d3.selectAll('foreignObject').remove();
     d3.selectAll('.transform-tooltip').remove();
 
-    var containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
-    var containerHeight = parseInt(d3.select(el).select('.inner-svg').attr('height'));
+    var containerWidth = parseFloat(d3.select(el).select('.inner-svg').attr('width'));
+    var containerHeight = parseFloat(d3.select(el).select('.inner-svg').attr('height'));
     var w = 70;
     var h = 38;
     var x = (mouse[0] + w) > containerWidth ? mouse[0] - w - 5 : mouse[0] + 5;
     var y = (mouse[1] + h) > containerHeight ? mouse[1] - h - 14 : mouse[1] + 14;
-   
+    var f = d3.format(".2f")
+    var value = f(scales.realX.invert(parseFloat(d3.select(el)
+        .select('.point-selected')
+        .attr('cx'))));
+    var score = f(scales.realPointY.invert(parseFloat(d3.select(el)
+      .select('.point-selected')
+      .attr('cy'))));
+
     var foreignObject = d3.select(el).select('.inner-svg')
       .append('foreignObject')
       .attr('x', x)
@@ -901,10 +930,21 @@ var TransformChart = {
         .attr('min', 0) 
         .attr('max', 100) 
         .attr('step', .1)
-        .attr('value', 25)
+        .attr('value', value)
         .attr('id', 'xVal')
         .on('change', function() {
           onPointPosEdit(el, scales, onMove);
+        })
+        .on('input', function() {
+          onPointPosEdit(el, scales, onMove);
+        })
+        .on('keydown', function() {
+          var xNode: any = d3.select(el).select('#xVal').node();
+          var len = xNode.value.toString().length;
+          if(len >= 5 && d3.event['keyCode'] !== 46 && d3.event['keyCode'] !== 8)
+          {
+            d3.event['preventDefault']();
+          }
         });
 
        div2.append('label')
@@ -915,15 +955,18 @@ var TransformChart = {
         .attr('min', 0) 
         .attr('max', 1) 
         .attr('step', .01)
-        .attr('value', 0.50)
+        .attr('value', score)
         .attr('id', 'yVal')
         .on('change', function(value) {
           onPointPosEdit(el, scales, onMove);
+        })
+        .on('input', function() {
+          onPointPosEdit(el, scales, onMove);
         });
 
-      var xValueNode: any = d3.select('#xVal').node();
-      var yValueNode: any = d3.select('#yVal').node();
-      onPointMoveStart(parseInt(yValueNode.value), parseInt(xValueNode.value));
+      // var xValueNode: any = d3.select('#xVal').node();
+      // var yValueNode: any = d3.select('#yVal').node();
+      // onPointMoveStart(parseFloat(yValueNode.value), parseFloat(xValueNode.value));
   },
   
   _drawMenu(el, mouse, text, fn, scales, width, height, drawCrossHairs)
@@ -933,7 +976,7 @@ var TransformChart = {
     var menu = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'right-menu');
     
-    var containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
+    var containerWidth = parseFloat(d3.select(el).select('.inner-svg').attr('width'));
     var w = 85;
     var h = 20;
 
@@ -1048,7 +1091,6 @@ var TransformChart = {
       point.on('mouseover', this._mouseoverFactory(el, scales, this._drawToolTip, onMove, onPointMoveStart));
       point.on('touchstart', this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart, this._drawCrossHairs, width, height, point));
       point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu, width, height, this._drawCrossHairs));
-      //point.on('mouseout', this._mouseoutFactory(el));
       point.on('click', this._mouseclickFactory(el, scales, this._drawPointEditMenu, onMove, onPointMoveStart, this._editPointPosition));
     }
     

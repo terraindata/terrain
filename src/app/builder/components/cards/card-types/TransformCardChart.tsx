@@ -235,7 +235,6 @@ class TransformCardChart extends React.Component<Props, any>
   
   onPointMoveStart(initialScore, initialValue)
   {
-    console.log("START")
     this.setState({
       initialScore,
       initialValue,
@@ -250,7 +249,6 @@ class TransformCardChart extends React.Component<Props, any>
   
   onPointMove(scorePointId, newScore, newValue, pointValues, cx)
   {
-    console.log("on point move");
     var scoreDiff = this.state.initialScore - newScore;
     var valueDiff = this.state.initialValue - newValue;
     pointValues.sort(this.sortNumber);
@@ -282,6 +280,7 @@ class TransformCardChart extends React.Component<Props, any>
     });
     
     this.updatePointsData(newPointsData);
+    return newPointsData;
   }
   
   onLineClick(x, y)
