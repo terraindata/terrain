@@ -862,8 +862,8 @@ var TransformChart = {
       return scales.realX.invert(parseInt(p.getAttribute('cx')));
     });
     var cx = scales.realX.invert(parseInt(point.attr('cx')));
-    var xValueNode: any = inputX.node();
-    var yValueNode: any = inputY.node();
+    var xValueNode:any = inputX.node();
+    var yValueNode:any = inputY.node();
     var x = parseFloat(xValueNode.value) || 0;
     var y = parseFloat(yValueNode.value) || 0;
     var x_raw = parseFloat(inputX.attr('raw_value')) + (x - parseFloat(inputX.attr('value')));
@@ -891,7 +891,7 @@ var TransformChart = {
     var containerHeight = parseFloat(d3.select(el).select('.inner-svg').attr('height'));
     var w = 70;
     var h = 38;
-    var x = (mouse[0] + w) > containerWidth ? mouse[0] - w - 5 : mouse[0] + 5;
+    var x = (mouse[0] + w) > containerWidth ? mouse[0] - w - 7 : mouse[0] + 5;
     var y = (mouse[1] + h) > containerHeight ? mouse[1] - h - 14 : mouse[1] + 14;
     var f = d3.format(".2f")
     var value = scales.realX.invert(parseFloat(d3.select(el)
@@ -933,7 +933,7 @@ var TransformChart = {
         .attr('type', 'number')
         .attr('min', 0) 
         .attr('max', 100) 
-        .attr('step', .01)
+        .attr('step', .1)
         .attr('value', f(value))
         .attr('raw_value', value)
         .attr('id', 'xVal')
@@ -945,8 +945,11 @@ var TransformChart = {
         })
         .on('keydown', function() {
           var xNode: any = d3.select(el).select('#xVal').node();
-          var len = xNode.value.toString().length;
-          if(len >= 5 && d3.event['keyCode'] !== 46 && d3.event['keyCode'] !== 8)
+          var val = String(xNode.value).match(/\d/g)
+          var len = (val && val.length) || 0;
+          console.log(d3.select(el).select('#xVal'));
+          console.log(window.getSelection());
+          if(len >= 4 && d3.event['keyCode'] !== 46 && d3.event['keyCode'] !== 8)
           {
             d3.event['preventDefault']();
           }
@@ -971,8 +974,9 @@ var TransformChart = {
         })
         .on('keydown', function() {
           var xNode: any = d3.select(el).select('#xVal').node();
-          var len = xNode.value.toString().length;
-          if(len >= 5 && d3.event['keyCode'] !== 46 && d3.event['keyCode'] !== 8)
+          var val = String(xNode.value).match(/\d/g)
+          var len = (val && val.length) || 0;
+          if(len >= 4 && d3.event['keyCode'] !== 46 && d3.event['keyCode'] !== 8)
           {
             d3.event['preventDefault']();
           }
@@ -1075,6 +1079,11 @@ var TransformChart = {
     return false;
   },
 
+  _doubleclickFactory: (el) => function(point)
+  {
+    d3.event['stopPropagation']();
+  },
+
   _drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart, canEdit, width, height)
   {
     var g = d3.select(el).selectAll('.points');
@@ -1104,6 +1113,7 @@ var TransformChart = {
       point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu, width, height, this._drawCrossHairs));
       point.on('click', this._mouseclickFactory(el, scales, this._drawPointEditMenu, onMove, onPointMoveStart, this._editPointPosition));
       point.on('mouseout', this._mouseoutFactory(el));
+      point.on('dblclick', this._doubleclickFactory(el));
     }
     
     point.exit().remove();
