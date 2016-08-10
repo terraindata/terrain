@@ -424,6 +424,7 @@ class Settings extends Classs<Props>
            options={timeZonesList}
            onChange={this.changeTimeZone}
            className='settings-timezone-dropdown'
+           searchable={false}
        />
        </div>
     );

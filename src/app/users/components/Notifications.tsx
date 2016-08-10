@@ -224,6 +224,7 @@ class Notifications extends Classs<Props>
          options={this.notificationTypes}
          onChange={this.onDesktopNotificationChange}
          className='notifications-select'
+         searchable={false}
        />
        <div className='notification-subtitle'>
          Desktop notifications use this sound:
@@ -236,6 +237,7 @@ class Notifications extends Classs<Props>
             options={this.desktopNotificationSounds}
             onChange={this.onDesktopNotificationsSoundChange}
             className='notifications-select'
+            searchable={false}
          />
          <div 
            className={sound === 'none' ? 'disabled' : 'preview-button'}
@@ -301,6 +303,7 @@ class Notifications extends Classs<Props>
          options={this.notificationTypes}
          onChange={this.onEmailNotificationTypeChange}
          className='notifications-select'
+         searchable={false}
        />
         {this.renderEmail()}
       </div>
