@@ -93,9 +93,9 @@ class BuilderTextbox extends React.Component<Props, any>
   {
     super(props);
     var value: any = this.props.value;
-    this.state = {
+    this.setState ({
         wrongType: this.props.isNumber ? isNaN(value) : false,
-    }
+    });
 
     Util.bind(this, ['executeChange', 'handleTextareaChange', 'renderSwitch', 'handleSwitch', 'handleAutocompleteChange']);
   }
@@ -103,9 +103,9 @@ class BuilderTextbox extends React.Component<Props, any>
   componentWillReceiveProps(newProps)
   {
     var value: any = newProps.value;
-    this.state = {
+    this.setState ({
         wrongType: newProps.isNumber ? isNaN(value) : false,
-    }
+    });
     if(this.refs['input'])
     {
       if(this.refs['input'] !== document.activeElement)
