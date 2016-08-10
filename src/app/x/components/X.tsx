@@ -48,8 +48,6 @@ import * as _ from 'underscore';
 import Classs from './../../common/components/Classs.tsx';
 import XCards from './XCards.tsx';
 import { Link } from 'react-router';
-import XModals from './XModals.tsx';
-import XModalTester from './XModalTester.tsx';
 
 const xes =
 {
@@ -57,11 +55,6 @@ const xes =
   {
     name: 'Cards Drag & Drop',
     component: XCards,
-  },
-  modals:
-  {
-    name: 'Modals',
-    component: XModalTester,
   },
 };
 
