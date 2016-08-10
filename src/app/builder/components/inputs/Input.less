@@ -1,4 +1,16 @@
-@import "../../../common/Common.less";
+@import "./../../../common/Common.less";
+
+.inputs-area {
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+.layout-manager-full-height {
+  overflow-y: visible !important;
+}
 
 .input {
   .standard-margin;
@@ -7,8 +19,27 @@
 	.input-inner {
 		padding: 12px;
 		background: @light-green;
-		border: 1px solid @medium-dark-green;
-		border-radius: 5px;
+	 border-radius: 6px;
+
+  &:hover {
+    .input-top-row {
+      .input-close {
+        transition: opacity .5s ease-in-out;   
+        opacity: 1;
+      }
+      .input-menu {
+        transition: opacity .5s ease-in-out;   
+        opacity: 1;
+      }
+      .builder-tb {
+        transition: width .25s ease-in-out ;
+        width: calc(~"100% - 60px") !important;
+      }
+      .input-text {
+        width: calc(~"100% - 35px") !important;
+      }
+    }
+  }
 
 		.input-text {
 			display: block;
@@ -17,7 +48,7 @@
 			background: #fff;
 			padding: 7px;
 			color: @gray;
-			border-radius: 3px;
+			border-radius: 6px;
 			width: 100%;
 			font-size: @medium-font-size;
       height: 30px;
@@ -33,15 +64,13 @@
       border: none !important;
     }
   }
-
+  
   .input-top-row {
     position: relative;
     margin-right: -5px;
     .builder-tb {
-      width: calc(~"100% - 60px");
-    }
-    .input-text {
-      width: calc(~"100% - 35px");
+      width: calc(~"100% - 6px");
+      transition: width 0.25s ease-in-out .1s;   
     }
   }
   
@@ -62,12 +91,27 @@
   }
 }
 
+.input-menu {
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out;
+}
+
 .input-close {
-  width: 15px;
+  width: 14px;
+  height: 14px;
   right: 6px;
   float: right;
   position: relative;
   display: inline-block;
   top: -22px;
   fill: #abc29f;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out;
+  &:hover {
+    .close;
+    right: 7px;
+    margin: 1px 0px;
+    transition: 0.15s;
+  }
 }
