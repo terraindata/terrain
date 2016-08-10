@@ -116,7 +116,6 @@ var TransformChart = {
     {
       state._cache = {};
     }
-    
     if(state._cache.domain !== state.domain
       || state._cache.barsData !== state.barsData)
     {
@@ -856,6 +855,7 @@ var TransformChart = {
       scales.realX.invert(parseInt(point.attr('cx')))
     ); 
 
+    //Set x/y coordinates of the menu
     var xPos = parseFloat(point.attr('cx'));
     var yPos = parseFloat(point.attr('cy'));
     var menuXPos = (xPos + containerInfo.w) > containerInfo.containerWidth ? 
@@ -952,9 +952,21 @@ var TransformChart = {
         var xNode: any = d3.select(el).select('#xVal').node();
         var val = String(xNode.value).match(/\d/g)
         var len = (val && val.length) || 0;
-        if(len >= 5 && [46, 8, 37, 38, 39, 40].indexOf(d3.event['keyCode']) < 0)
+        var keyCode = d3.event['keyCode'];
+        //Use left/right arrow keys to change value
+        if(keyCode === 39)
         {
-          d3.event['preventDefault']();
+          xNode.stepUp(1);
+          onPointPosEdit(el, scales, onMove, {containerWidth, containerHeight, w, h});
+        }
+        else if(keyCode === 37)
+        {  
+          xNode.stepDown(1);
+          onPointPosEdit(el, scales, onMove, {containerWidth, containerHeight, w, h});
+        }
+        if(len >= 5 && [46, 8, 38, 40].indexOf(keyCode) < 0)
+        {
+          d3.event['stopPropagation']();
         }
       });
 
@@ -984,6 +996,24 @@ var TransformChart = {
           d3.event['preventDefault']();
         }
       });
+  },
+
+  _movePointEditMenu(el)
+  {
+    if(d3.select(el).select('foreignObject')[0][0])
+    {
+      var point = d3.select(el).select('.point-selected');
+      if(point[0][0])
+      {
+        var w = 70;
+        var h = 34;
+        var containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
+        var containerHeight = parseInt(d3.select(el).select('.inner-svg').attr('height'));
+        var xPos = parseFloat(point.attr('cx'));
+        var menuXPos = (xPos + w) > containerWidth ? xPos - w - 7 : xPos + 5
+        d3.select(el).select('foreignObject').attr('x', menuXPos);
+      }
+    }
   },
   
   _drawMenu(el, mouse, text, fn, scales)
@@ -1117,6 +1147,7 @@ var TransformChart = {
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
     this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     this._drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart, canEdit);
+    this._movePointEditMenu(el);
   },
   
   _scales(el, domain, barsData, stateWidth, stateHeight)
