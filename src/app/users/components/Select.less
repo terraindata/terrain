@@ -54,9 +54,11 @@
   background: #fff;
   border-color: #b3b3b3 #c7cac9 #d9d9d9;
 }
+
 .is-open > .Select-control > .Select-arrow {
   border-color: transparent transparent #999;
   border-width: 0 5px 5px;
+  transform: rotate(0deg);
 }
 .is-searchable.is-focused:not(.is-open) > .Select-control {
   cursor: text;
@@ -198,7 +200,17 @@
   width: 0;
   position: relative;
   top: 2px;
+  transition: 0.2s;
+  transform: rotate(0deg);
 }
+
+.is-open {
+  .Select-arrow {
+    transform: rotate(180deg);
+    top: 1px;
+  }
+}
+
 .is-open .Select-arrow,
 .Select-arrow-zone:hover > .Select-arrow {
   border-top-color: #666;
@@ -221,12 +233,9 @@
 }
 
 .Select-menu-outer {
-  border-bottom-right-radius: 6px;
-  border-bottom-left-radius: 6px;
+  border-radius: 6px;
   background-color: #fff;
-  border: 1px solid #c7cac9;
-  border-top-color: #e6e6e6;
-  box-shadow: 10px 10px .4 4px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 0px 4px 1px #999999;
   box-sizing: border-box;
   margin-top: -1px;
   max-height: 200px;
@@ -253,7 +262,7 @@
   border-radius: 6px;
   line-height: 24px;
   font-size: 12px;
-  padding-left: 10px;
+  padding-left: 12px;
 }
 .Select-option.is-selected {
   background-color: fade(#D1EFE7, 25%);

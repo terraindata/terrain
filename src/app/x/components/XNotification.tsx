@@ -42,92 +42,87 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
-import Actions from "../../data/BuilderActions.tsx";
-import Input from "../inputs/Input.tsx";
-import LayoutManager from "../layout/LayoutManager.tsx";
-import CreateLine from '../../../common/components/CreateLine.tsx';
-import InfoArea from '../../../common/components/InfoArea.tsx';
+/*
+How to use Notifications:
+In App.tsx: 
+import {XNotification} from './x/components/XNotification/tsx'
+render()
+  ...
+  <XNotification />
+  ...
 
-var InputsArea = React.createClass<any, any>({
-	propTypes:
-	{
-		inputs: React.PropTypes.array.isRequired,
-    parentId: React.PropTypes.string.isRequired,
-	},
-  
-  getInitialState()
+Anywhere you want to trigger notifications from:
+import {notificationManager} from 'path/XNotification.tsx'
+
+addNotification()
+  notificationManager.addNotification("message", type ("info" or "error"), timeOut (optional, 0=no timeout));
+
+render()
+  ...
+  <div onClick={this.addNotification} >Trigger notification!</div>
+  ...
+*/
+
+import Classs from './../../common/components/Classs.tsx';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+var NotificationSystem = require('./notification-system/NotificationSystem');
+//import NotificationManager from './NotificationManager.tsx';
+import TestComponent from './TestComponent.tsx';
+var styles = require('./notification-system/styles.js');
+
+interface XNotificationProps
+{
+  params?: any;
+  history?: any;
+  location?: {
+    pathname: string;
+  };
+}
+
+var notificationManager = {
+  system: null,
+  addNotification:function(message:any, type:string, timeOut?:number)
   {
-    return {
-      title: 'Inputs',
-    };
-  },
-  
-  createInput()
+    if(this.system) { 
+      this.system.addNotification({
+        title: 'Terrain Message',
+        message: message,
+        level: type,
+        autoDismiss: timeOut || 5000, 
+        dismissible: true
+      });
+    }  
+  }
+}
+
+class XNotification extends Classs<XNotificationProps>
+{
+
+
+  constructor(props)
   {
-    Actions.inputs.create(this.props.parentId, this.props.inputs.length);
-  },
-  
-  copyAll()
-  {
-    console.log('copy');
-  },
-  
-  removeAll()
-  {
-    console.log('remove');
-  },
-  
-  renderNoInputs()
-  {
-    var large = "No inputs have been added, yet."
-    var button = "Add One";
-    var onClick = this.createInput;
-    
-    return (
-      <InfoArea large={large} button={button} onClick={onClick} />
-    );
-  },
-  
+    super(props);
+    this.state = {
+      notificationManager: null
+    }
+  }
+
+  componentDidMount() {
+    notificationManager.system = this.refs['notificationSystem'];
+    this.setState({
+       notificationManager,
+    });
+  }
+
   render()
   {
-    if(this.props.inputs.length === 0)
-    {
-      return this.renderNoInputs();
-    }
-    
-    var layout = {
-      rows: this.props.inputs.map((input, index) => {
-        return {
-          content: <Input input={input} index={index} />,
-          key: input.id,
-        };
-      }),
-      fullHeight: true,
-    };
-    
-    layout.rows.push({
-      content: (
-        <div className='standard-margin'>
-          <CreateLine open={false} onClick={this.createInput} />
-        </div>
-      ),
-    });
-
-    var moveTo = (curIndex, newIndex) =>
-    {
-      Actions.inputs.move(this.props.inputs[curIndex], newIndex);
-    };
-    
     return (
-      <div className='inputs-area'>
-        <LayoutManager layout={layout} moveTo={moveTo} />
+      <div>
+        <NotificationSystem allowHTML={true} style={styles} ref='notificationSystem'/>
       </div>
     );
-  },
-});
+  }
+}
 
-export default InputsArea;
+export { XNotification, notificationManager };

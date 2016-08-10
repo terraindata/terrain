@@ -42,73 +42,84 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./X.less');
-import * as React from 'react';
-import * as _ from 'underscore';
+require('./Modal.less');
 import Classs from './../../common/components/Classs.tsx';
-import XCards from './XCards.tsx';
-import { Link } from 'react-router';
-//var TestPage = require('./TestPage');
-import TestPage from './TestPage.tsx';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import * as classNames from 'classnames';
 
+var ReactModal = require('react-modal');
+var InfoIcon = require('./../../../images/icon_info.svg')
 
-const xes =
-{
-  cards:
-  {
-    name: 'Immutable Builder',
-    component: XCards,
-  },
-  notifications:
-  {
-    name: 'In-app Notifications',
-    component: TestPage,
-  }
-};
-
-interface Props
-{
-  params?: any;
-  history?: any;
-  location?: {
-    pathname: string;
-  };
+interface Props {
+	message: string;
+  onClose: () => void;
+  open: boolean;
+  title?: string;
+  error?: boolean;
+  confirm?: boolean;
+	confirmButtonText?: string;
+	onConfirm?: () => void; 
 }
 
-class X extends Classs<Props>
+class Modal extends Classs<Props>   
 {
-  constructor(props)
+  closeModalSuccess () 
   {
-    super(props);
+    this.props.onClose();
+    this.props.onConfirm ? this.props.onConfirm() : null;
   }
-  
-  render()
+
+  render () 
   {
-    let { x } = this.props.params;
-    
-    if(x && xes[x])
-    {
-      let C =  xes[x].component;
-      return <C {...this.props} />;
-    }
-    
-    return (
-      <div className='x-area'>
-        <div className='x-title'>
-          Experiments
-        </div>
-        {
-          _.keys(xes).map(indX =>
-            <Link to={`/x/${indX}`} key={indX}>
-              <div className='x-x'>
-                { xes[indX].name }
+    var defaultTitle = this.props.error ? 'Alert' : 'Please Confirm'
+      
+      return (
+        <div className ='modal-dialog'>
+          <ReactModal 
+          	isOpen={this.props.open} 
+          	overlayClassName='modal-overlay' 
+          	className ='modal-content' 
+          >
+            <div className ='modal-dialog'> 
+            	<div className={classNames({
+                'modal-title': true,
+                'modal-title-error': this.props.error,
+              })}>
+                  {
+                    this.props.error ? 
+                      <div className='modal-info-icon'> 
+                        <InfoIcon /> 
+                      </div>
+                      : 
+                      null
+                  }
+                  {this.props.title ? this.props.title : defaultTitle}
               </div>
-            </Link>
-          )
-        }
-      </div>
-    );
+            	<div className={classNames({
+                'modal-message': true,
+                'modal-message-error': this.props.error,
+              })}>
+                {this.props.message}
+           		</div>
+           		<div className ='modal-buttons'>
+            		{
+           				this.props.confirm ? 
+           					<div className='button modal-confirm-button' onClick={this.closeModalSuccess}>
+           						{this.props.confirmButtonText ? this.props.confirmButtonText : 'Ok'}
+           					</div> 
+           					: 
+           					<div />
+           			}
+                <div className='button modal-close-button' onClick={this.props.onClose}>
+                  {this.props.confirm ? 'Cancel' : 'Close'}
+                </div>
+            	</div>
+            </div>
+          </ReactModal>
+        </div>
+      );
   }
 }
 
-export default X;
+export default Modal;

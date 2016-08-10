@@ -42,92 +42,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
-import Actions from "../../data/BuilderActions.tsx";
-import Input from "../inputs/Input.tsx";
-import LayoutManager from "../layout/LayoutManager.tsx";
-import CreateLine from '../../../common/components/CreateLine.tsx';
-import InfoArea from '../../../common/components/InfoArea.tsx';
+/* Adapted from https://github.com/igorprado/react-notification-system */
 
-var InputsArea = React.createClass<any, any>({
-	propTypes:
-	{
-		inputs: React.PropTypes.array.isRequired,
-    parentId: React.PropTypes.string.isRequired,
-	},
-  
-  getInitialState()
-  {
-    return {
-      title: 'Inputs',
-    };
-  },
-  
-  createInput()
-  {
-    Actions.inputs.create(this.props.parentId, this.props.inputs.length);
-  },
-  
-  copyAll()
-  {
-    console.log('copy');
-  },
-  
-  removeAll()
-  {
-    console.log('remove');
-  },
-  
-  renderNoInputs()
-  {
-    var large = "No inputs have been added, yet."
-    var button = "Add One";
-    var onClick = this.createInput;
-    
-    return (
-      <InfoArea large={large} button={button} onClick={onClick} />
-    );
-  },
-  
-  render()
-  {
-    if(this.props.inputs.length === 0)
-    {
-      return this.renderNoInputs();
-    }
-    
-    var layout = {
-      rows: this.props.inputs.map((input, index) => {
-        return {
-          content: <Input input={input} index={index} />,
-          key: input.id,
-        };
-      }),
-      fullHeight: true,
-    };
-    
-    layout.rows.push({
-      content: (
-        <div className='standard-margin'>
-          <CreateLine open={false} onClick={this.createInput} />
-        </div>
-      ),
-    });
 
-    var moveTo = (curIndex, newIndex) =>
-    {
-      Actions.inputs.move(this.props.inputs[curIndex], newIndex);
-    };
-    
-    return (
-      <div className='inputs-area'>
-        <LayoutManager layout={layout} moveTo={moveTo} />
-      </div>
-    );
-  },
-});
+var CONSTANTS = {
 
-export default InputsArea;
+  // Positions
+  positions: {
+    tl: 'tl',
+    tr: 'tr',
+    tc: 'tc',
+    bl: 'bl',
+    br: 'br',
+    bc: 'bc'
+  },
+
+  // Levels
+  levels: {
+    success: 'success',
+    error: 'error',
+    warning: 'warning',
+    info: 'info'
+  },
+
+  // Notification defaults
+  notification: {
+    title: null,
+    message: null,
+    level: null,
+    position: 'tr',
+    autoDismiss: 5,
+    dismissible: true,
+    action: null
+  }
+};
+
+
+module.exports = CONSTANTS;

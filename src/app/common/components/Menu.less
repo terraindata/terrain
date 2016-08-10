@@ -15,6 +15,7 @@
 .menu-wrapper {
   // float: right;
   background: @card-menu-bg;
+  font-weight: 200;
   border-radius: @menu-collapsed-size;
   position: absolute;
   // z-index: 999;
@@ -22,19 +23,24 @@
   right: 4px;
   cursor: pointer;
   .transition;
-  overflow: hidden;
+  overflow: visible;
   text-align: center;
+  font-weight: 200;
   
-  &:not(.menu-open) {
-    width: @menu-collapsed-size !important;
-    height: @menu-collapsed-size !important;
-    
-    &.menu-wrapper-small {
-      width: @menu-collapsed-small-size !important;
-      height: @menu-collapsed-small-size !important;  
-    }
+  width: @menu-collapsed-size !important;
+  height: @menu-collapsed-size !important;
+  &.menu-wrapper-small {
+    width: @menu-collapsed-small-size !important;
+    height: @menu-collapsed-small-size !important;  
   }
   
+  .menu-option-icon {
+    height: 13px;
+    width: 13px;
+    padding-top: 9px;
+    padding-left: 6px;
+  }
+
   .menu-icon {
     fill: @menu-color;
     width: @menu-icon-width;
@@ -55,41 +61,37 @@
       top: calc((@menu-collapsed-small-size - @menu-icon-small-height) / 2);
     }
   }
-  
-  .menu-option {
-    opacity: 0;
-    color: @menu-color;
-    position: relative;
-    
-    height: @option-height;
-    .transition;
-    
-    white-space: nowrap;
-    
-    &:hover:not(.menu-option-disabled) {
-      background: darken(@card-menu-bg, 5%);
-    }
-    
+}
+
+
+  &.menu-options-wrapper {
+    background: #ffffff;
+    border-radius: 6px;
     z-index: 1020;
-    
-    &.menu-option-disabled {
-      background: @dark-grey;
-      color: @grey;
+    box-shadow: 0px 0px 3px #888888;
+    top: 7 + @menu-collapsed-size;
+    right: -6px;
+    position: absolute;
+    border: 6px solid white;
+    text-align: left;
+    &.menu-wrapper-small {
+      top: @menu-collapsed-small-size;
     }
-  }
-  
-  &:hover {
-    background: @card-menu-hover-bg;
-  }
-  
-  &.menu-open {
-    background: @card-menu-hover-bg;
-    border-radius: 5px;
-    z-index: 1020;
-    
+    overflow: visible;
     .menu-icon {
-      display: none;
-      opacity: 0;
+      border-radius: 50%;
+      float: right;
+      top: calc(-(@menu-collapsed-size));
+      padding: calc((@menu-collapsed-size - @menu-icon-width) / 2);
+      position: relative;
+      float: right;
+      &.menu-wrapper-small {
+        top: calc(-(@menu-collapsed-small-size));
+        padding: calc((@menu-collapsed-small-size - @menu-icon-small-width) / 2);
+      }
+      &:hover {
+        background: @card-menu-bg;
+      }
     }
     
     .menu-option {
@@ -97,6 +99,63 @@
       opacity: 1;
       z-index: 1020;
       position: relative;
+      background-color: #ffffff;
+      color: #1a2e29;
+      height: @option-height;
+      border-radius: 6px;
+      cursor: pointer;
+      .transition;
+      white-space: nowrap;
+      &:hover {
+        background-color: fade(@grey, 15%) !important;
+      }      
+      &.menu-option-disabled {
+        background: #d1efe7; 
+        cursor: default;
+        &:hover {
+          background-color: #d1efe7 !important; 
+        }
+      }
     }
   }
+
+.menu-options-wrapper:before, .menu-options-wrapper:after {
+    content: "";
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    right: 6px;
+    top: -12px;
 }
+
+.menu-options-wrapper:before {
+    border-bottom: 7px solid fade(#888888, 50%);
+    border-right: 7px solid transparent;
+    border-left: 7px solid transparent;
+    top: -13px;
+    right: 5px;
+}
+
+.menu-options-wrapper:after {
+    border-bottom: 6px solid #fff;
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+}
+
+  .menu-text-padding{
+    padding-left: 28px;
+    text-align: left;
+    top: 50%;
+    transform: translateY(-50%);
+    position: absolute;
+
+  }
+
+  .menu-text-padding-no-icon {
+    padding-left: 6px;
+    //padding-right: 10px;
+    text-align: left;
+    top: 50%;
+    transform: translateY(-50%);
+    position: absolute;
+  }

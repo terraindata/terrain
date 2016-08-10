@@ -42,92 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
+import Classs from './../../common/components/Classs.tsx';
 import * as React from 'react';
-import Util from '../../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
-import Actions from "../../data/BuilderActions.tsx";
-import Input from "../inputs/Input.tsx";
-import LayoutManager from "../layout/LayoutManager.tsx";
-import CreateLine from '../../../common/components/CreateLine.tsx';
-import InfoArea from '../../../common/components/InfoArea.tsx';
+import * as ReactDOM from 'react-dom';
+var TerrainIcon = require('./../../../images/icon_terrain.svg');
+//import addNotification from './TestPage.tsx';
+var {notificationManager} = require('./XNotification.tsx');
 
-var InputsArea = React.createClass<any, any>({
-	propTypes:
-	{
-		inputs: React.PropTypes.array.isRequired,
-    parentId: React.PropTypes.string.isRequired,
-	},
-  
-  getInitialState()
+interface Props
+{
+  params?: any;
+  history?: any;
+  location?: {
+    pathname: string;
+  };
+ // addNotification: any; //function
+}
+
+class TestComponent extends Classs<Props>
+{
+
+  constructor(props)
   {
-    return {
-      title: 'Inputs',
-    };
-  },
-  
-  createInput()
+    super(props);
+  }
+
+  addNotification()
   {
-    Actions.inputs.create(this.props.parentId, this.props.inputs.length);
-  },
-  
-  copyAll()
-  {
-    console.log('copy');
-  },
-  
-  removeAll()
-  {
-    console.log('remove');
-  },
-  
-  renderNoInputs()
-  {
-    var large = "No inputs have been added, yet."
-    var button = "Add One";
-    var onClick = this.createInput;
-    
-    return (
-      <InfoArea large={large} button={button} onClick={onClick} />
-    );
-  },
-  
+  	notificationManager.addNotification("hello this is s mese er kl;jnrg alkj naerldgjk nalj re glker n", "info", 0);
+  }
+
   render()
   {
-    if(this.props.inputs.length === 0)
-    {
-      return this.renderNoInputs();
-    }
-    
-    var layout = {
-      rows: this.props.inputs.map((input, index) => {
-        return {
-          content: <Input input={input} index={index} />,
-          key: input.id,
-        };
-      }),
-      fullHeight: true,
-    };
-    
-    layout.rows.push({
-      content: (
-        <div className='standard-margin'>
-          <CreateLine open={false} onClick={this.createInput} />
-        </div>
-      ),
-    });
-
-    var moveTo = (curIndex, newIndex) =>
-    {
-      Actions.inputs.move(this.props.inputs[curIndex], newIndex);
-    };
-    
     return (
-      <div className='inputs-area'>
-        <LayoutManager layout={layout} moveTo={moveTo} />
-      </div>
+	    <div>
+		    <div 
+		      className='button'
+		      onClick={this.addNotification}
+		    >
+		      Testing
+		    </div>
+	 	</div>
     );
-  },
-});
+  }
+}
 
-export default InputsArea;
+export default TestComponent;

@@ -42,92 +42,60 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
-import Actions from "../../data/BuilderActions.tsx";
-import Input from "../inputs/Input.tsx";
-import LayoutManager from "../layout/LayoutManager.tsx";
-import CreateLine from '../../../common/components/CreateLine.tsx';
-import InfoArea from '../../../common/components/InfoArea.tsx';
+/*Adapted from https://github.com/igorprado/react-notification-system*/
 
-var InputsArea = React.createClass<any, any>({
-	propTypes:
-	{
-		inputs: React.PropTypes.array.isRequired,
-    parentId: React.PropTypes.string.isRequired,
-	},
-  
-  getInitialState()
-  {
-    return {
-      title: 'Inputs',
-    };
+var React = require('react');
+var NotificationItem = require('./NotificationItem.tsx');
+var Constants = require('./constants');
+
+var NotificationContainer = React.createClass({displayName: "NotificationContainer",
+
+  propTypes: {
+    position: React.PropTypes.string.isRequired,
+    notifications: React.PropTypes.array.isRequired,
+    getStyles: React.PropTypes.object
   },
-  
-  createInput()
-  {
-    Actions.inputs.create(this.props.parentId, this.props.inputs.length);
-  },
-  
-  copyAll()
-  {
-    console.log('copy');
-  },
-  
-  removeAll()
-  {
-    console.log('remove');
-  },
-  
-  renderNoInputs()
-  {
-    var large = "No inputs have been added, yet."
-    var button = "Add One";
-    var onClick = this.createInput;
-    
-    return (
-      <InfoArea large={large} button={button} onClick={onClick} />
-    );
-  },
-  
-  render()
-  {
-    if(this.props.inputs.length === 0)
-    {
-      return this.renderNoInputs();
+
+  _style: {},
+
+  componentWillMount: function() {
+    // Fix position if width is overrided
+    this._style = this.props.getStyles.container(this.props.position);
+
+    if (this.props.getStyles.overrideWidth && (this.props.position === Constants.positions.tc || this.props.position === Constants.positions.bc)) {
+      this._style.marginLeft = -(this.props.getStyles.overrideWidth / 2);
     }
-    
-    var layout = {
-      rows: this.props.inputs.map((input, index) => {
-        return {
-          content: <Input input={input} index={index} />,
-          key: input.id,
-        };
-      }),
-      fullHeight: true,
-    };
-    
-    layout.rows.push({
-      content: (
-        <div className='standard-margin'>
-          <CreateLine open={false} onClick={this.createInput} />
-        </div>
-      ),
+  },
+
+  render: function() {
+    var self = this;
+    var notifications;
+
+    if ([Constants.positions.bl, Constants.positions.br, Constants.positions.bc].indexOf(this.props.position) > -1) {
+      this.props.notifications.reverse();
+    }
+
+    notifications = this.props.notifications.map(function(notification) {
+      return (
+        React.createElement(NotificationItem, {
+          ref:  'notification-' + notification.uid, 
+          key:  notification.uid, 
+          notification:  notification, 
+          getStyles:  self.props.getStyles, 
+          onRemove:  self.props.onRemove, 
+          noAnimation:  self.props.noAnimation, 
+          allowHTML:  self.props.allowHTML}
+        )
+      );
     });
 
-    var moveTo = (curIndex, newIndex) =>
-    {
-      Actions.inputs.move(this.props.inputs[curIndex], newIndex);
-    };
-    
     return (
-      <div className='inputs-area'>
-        <LayoutManager layout={layout} moveTo={moveTo} />
-      </div>
+      React.createElement("div", {className:  'notifications-' + this.props.position, style:  this._style}, 
+         notifications 
+      )
     );
-  },
+  }
 });
 
-export default InputsArea;
+
+module.exports = NotificationContainer;
