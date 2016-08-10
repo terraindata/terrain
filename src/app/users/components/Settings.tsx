@@ -59,6 +59,7 @@ import UserStore from './../../users/data/UserStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
 type User = UserTypes.User;
 import PasswordStrengthInput from './PasswordStrengthInput.tsx';
+import Modal from './../../common/components/Modal.tsx';
 
 var Select = require('react-select');
 var TimeZones = require('./Timezones.json');
@@ -91,7 +92,10 @@ class Settings extends Classs<Props>
       showPassword: false,
       saving: false,
       savingReq: null,
-      newEmail: ''
+      newEmail: '',
+      modalOpen: false,
+      modalMessage: '',
+      errorModal: false
     };
     
     this.cancelSubscription = 
@@ -121,10 +125,14 @@ class Settings extends Classs<Props>
        savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
      });
   }
-  
+
   saveUsername()
   {
-    alert("Can not create a new username at this time");
+    this.setState({
+      modalMessage: 'Not able to change your username at this time',
+      errorModal: true,
+    });
+    this.toggleModal();
   }
 
   renderUsernameContent()
@@ -184,14 +192,22 @@ class Settings extends Classs<Props>
 
     if(newPassword.length < 6)
     {
-      alert('Passwords should be at least six characters long');
+      this.setState({
+        modalMessage: 'Passwords should be at least six characters long',
+        errorModal: true,
+      });
+      this.toggleModal();
       return;
     }
     
     if(newPassword !== confirmPassword)
     {
-      alert('You entered two different passwords for your new password. \
-       Change one so that they match');
+      this.setState({
+        modalMessage: 'You entered two different passwords for your new password. \
+        Change one so that they match',
+        errorModal: true,
+      });
+      this.toggleModal();
       return;
     }
 
@@ -203,11 +219,18 @@ class Settings extends Classs<Props>
 
     Ajax.changePassword(username, currentPassword, newPassword, () => {
       Actions.fetch();
-      alert('Your password has been changed.');
+      this.setState({
+        modalMessage: 'Your password has been changed.',
+        errorModal: false,
+      });
+      this.toggleModal();
     }, (error) => {
-      alert('Error changing your password: ' + JSON.stringify(error))
+      this.setState({
+        modalMessage: 'Error changing your password: ' + JSON.stringify(error.error),
+        errorModal: true,
+      });
+      this.toggleModal();
     });
-
   }
 
   toggleShowPassword()
@@ -271,7 +294,11 @@ class Settings extends Classs<Props>
 
   setupAuthentication()
   {
-    alert('This button has not been implemented yet');
+    this.setState({
+        modalMessage: 'This button has not been implemented yet',
+        errorModal: true,
+    });
+    this.toggleModal();
   }
 
   renderAuthenticationDescription()
@@ -333,7 +360,11 @@ class Settings extends Classs<Props>
   }
 
   onSaveError(response) {
-    alert("Error saving: " + JSON.stringify(response));
+    this.setState({
+        modalMessage: 'Error saving: ' + JSON.stringify(response),
+        errorModal: true,
+    });
+    this.toggleModal();
   }
 
   updateNewEmail(event)
@@ -442,7 +473,11 @@ class Settings extends Classs<Props>
 
   signOut()
   {
-    alert('This button has not been implemented.');
+    this.setState({
+        modalMessage: 'This button has not been implemented.',
+        errorModal: true,
+    });
+    this.toggleModal();
   }
 
   renderSignOutButton()
@@ -475,7 +510,11 @@ class Settings extends Classs<Props>
 
   deactivate()
   {
-    alert('This button has not been implemented.');
+    this.setState({
+        modalMessage: 'This button has not been implemented.',
+        errorModal: true,
+    });
+    this.toggleModal();
   }
 
   renderDeactivateButton()
@@ -485,6 +524,13 @@ class Settings extends Classs<Props>
         Deactivate your account
       </div>
     );
+  }
+
+  toggleModal()
+  {
+    this.setState ({
+      modalOpen: !this.state.modalOpen
+    });
   }
 
   render()
@@ -525,6 +571,12 @@ class Settings extends Classs<Props>
         description={this.renderDeactivateDescription()}
         buttonText={this.renderDeactivateButton()}
         lastEntry={true}
+        />
+        <Modal 
+          message={this.state.modalMessage}
+          onClose={this.toggleModal} 
+          open={this.state.modalOpen} 
+          error={this.state.errorModal}
         /> 
       </div >
     );

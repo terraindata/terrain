@@ -52,7 +52,7 @@ import RoleTypes from './../roles/RoleTypes.tsx';
 import Util from './../util/Util.tsx';
 
 var Ajax = {
-  _req(method: string, url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void) 
+  _req(method: string, url: string, data: any, onLoad: (response: any) => void, onError?: (response: any) => void) 
   {
     let xhr = new XMLHttpRequest();
     xhr.onerror = onError;
@@ -66,7 +66,7 @@ var Ajax = {
       
       if (xhr.status != 200)
       {
-        onLoad({
+        onError({
           error: xhr.responseText
         });
         return;
