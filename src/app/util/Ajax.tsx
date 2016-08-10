@@ -66,9 +66,6 @@ var Ajax = {
       
       if (xhr.status != 200)
       {
-        // console.log(xhr);
-        // console.log(xhr.response);
-        // console.log(xhr.responseText);
         onError({
           error: xhr.responseText
         });
