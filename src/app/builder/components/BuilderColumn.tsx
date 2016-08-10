@@ -58,6 +58,9 @@ import RolesStore from '../../roles/data/RolesStore.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
 import TQLEditor from '../../tql/components/TQLEditor.tsx';
 import InfoArea from '../../common/components/InfoArea.tsx';
+import * as moment from 'moment';
+import Ajax from "./../../util/Ajax.tsx";
+import * as Immutable from 'immutable';
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -109,6 +112,9 @@ var BuilderColumn = React.createClass<any, any>(
     canCloseColumn: React.PropTypes.bool,
     onAddColumn: React.PropTypes.func.isRequired,
     onCloseColumn: React.PropTypes.func.isRequired,
+    variant: React.PropTypes.object.isRequired,
+    history: React.PropTypes.any,
+    onRevert: React.PropTypes.func,
   },
   
   getInitialState()
@@ -262,6 +268,47 @@ var BuilderColumn = React.createClass<any, any>(
     this.props.onCloseColumn(this.props.index);
   },
   
+  revertVersion()
+  {
+    if (this.props.variant.version) 
+    {
+      if (confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.')) 
+      {
+        this.props.onRevert();
+      }
+    }
+  },
+
+  renderBuilderVersionToolbar(canEdit)
+  {
+    if(this.props.variant.version)
+    {
+      if (this.state.column === COLUMNS.Builder || this.state.column === COLUMNS.TQL)
+      {
+        var lastEdited = moment(this.props.variant.lastEdited).format("h:mma on M/D/YY")
+        return (
+          <div className='builder-revert-toolbar'> 
+            <div className='builder-revert-time-message'>
+              Version from {lastEdited}
+            </div>
+            <div className='builder-white-space'/>
+            {
+              canEdit ? 
+                  <div 
+                    className='button builder-revert-button' 
+                    onClick={this.revertVersion} 
+                    //data-tip="Resets the Variant's contents to this version. You can always undo the revert, and reverting does not lose any of the Variant's history."
+                  >
+                    Revert to this version
+                  </div>
+                  : <div />
+             }
+          </div>
+          );
+      }
+    }
+  },
+
   render() {
     let {algorithm} = this.props;
     let canEdit = (algorithm.status === BrowserTypes.EVariantStatus.Build
@@ -312,6 +359,7 @@ var BuilderColumn = React.createClass<any, any>(
              }
           </div>
         </div>
+        {this.renderBuilderVersionToolbar(canEdit)}
         <div className={
             'builder-column-content' + 
             (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '')
@@ -321,6 +369,7 @@ var BuilderColumn = React.createClass<any, any>(
       </div>
     ));
   }
-});
+}
+);
 
 export default BuilderColumn;
