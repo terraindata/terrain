@@ -55,7 +55,7 @@ import UserTypes from '../UserTypes.tsx';
 import UserThumbnail from './UserThumbnail.tsx';
 import CreateItem from '../../common/components/CreateItem.tsx';
 import Ajax from '../../util/Ajax.tsx';
-import Modal from './../../common/components/Modals.tsx';
+import Modal from './../../common/components/Modal.tsx';
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
 

@@ -56,7 +56,7 @@ import BuilderActions from './../../builder/data/BuilderActions.tsx';
 import * as _ from 'underscore';
 import Classs from './../../common/components/Classs.tsx';
 import Ajax from "./../../util/Ajax.tsx";
-import Modal from './../../common/components/Modals.tsx';
+import Modal from './../../common/components/Modal.tsx';
 
 //Node Modules
 var CodeMirror = require('./Codemirror.js');

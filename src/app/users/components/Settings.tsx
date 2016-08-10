@@ -59,7 +59,7 @@ import UserStore from './../../users/data/UserStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
 type User = UserTypes.User;
 import PasswordStrengthInput from './PasswordStrengthInput.tsx';
-import Modal from './../../common/components/Modals.tsx';
+import Modal from './../../common/components/Modal.tsx';
 
 var Select = require('react-select');
 var TimeZones = require('./Timezones.json');

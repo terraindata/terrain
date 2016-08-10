@@ -52,7 +52,7 @@ import { Link } from 'react-router';
 import UserTypes from './../UserTypes.tsx';
 import AuthStore from './../../auth/data/AuthStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
-import Modal from './../../common/components/Modals.tsx';
+import Modal from './../../common/components/Modal.tsx';
 var CameraIcon = require('./../../../images/icon_camera.svg');
 var CloseIcon = require('./../../../images/icon_close_8x8_gray.svg')
 

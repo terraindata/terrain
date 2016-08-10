@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Modals.less');
+require('./Modal.less');
 import Classs from './../../common/components/Classs.tsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -62,7 +62,7 @@ interface Props {
 	onConfirm?: () => void; 
 }
 
-class XModals extends Classs<Props>   
+class Modal extends Classs<Props>   
 {
   closeModalSuccess () 
   {
@@ -72,7 +72,7 @@ class XModals extends Classs<Props>
 
   render () 
   {
-    var defaultTitle = this.props.error ? 'Error Message' : 'Modal Dialog'
+    var defaultTitle = this.props.error ? 'Alert' : 'Please Confirm'
       
       return (
         <div className ='modal-dialog'>
@@ -111,7 +111,9 @@ class XModals extends Classs<Props>
            					: 
            					<div />
            			}
-                <div className='button modal-close-button' onClick={this.props.onClose}>Close</div>
+                <div className='button modal-close-button' onClick={this.props.onClose}>
+                  {this.props.confirm ? 'Cancel' : 'Close'}
+                </div>
             	</div>
             </div>
           </ReactModal>
@@ -120,4 +122,4 @@ class XModals extends Classs<Props>
   }
 }
 
-export default XModals;
+export default Modal;

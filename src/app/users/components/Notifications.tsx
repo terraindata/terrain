@@ -56,7 +56,7 @@ import CheckBox from './../../common/components/CheckBox.tsx';
 import RadioButtons from './../../common/components/RadioButtons.tsx';
 import Ajax from './../../util/Ajax.tsx';
 import UserTypes from '../UserTypes.tsx';
-import Modal from './../../common/components/Modals.tsx';
+import Modal from './../../common/components/Modal.tsx';
 
 var Select = require('react-select');
 var SoundIcon = require("./../../../images/icon_audio.svg");
