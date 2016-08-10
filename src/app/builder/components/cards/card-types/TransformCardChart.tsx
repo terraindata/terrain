@@ -280,7 +280,6 @@ class TransformCardChart extends React.Component<Props, any>
     });
     
     this.updatePointsData(newPointsData);
-    return newPointsData;
   }
   
   onLineClick(x, y)
