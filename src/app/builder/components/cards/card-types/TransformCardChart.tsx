@@ -49,7 +49,7 @@ import Actions from "../../../data/BuilderActions.tsx";
 import Util from '../../../../util/Util.tsx';
 import { BuilderTypes } from './../../../BuilderTypes.tsx';
 
-import TransformChart from '../../charts/TransformChart_4.tsx';
+import TransformChart from '../../charts/TransformChart.tsx';
 
 interface Props {
   card: BuilderTypes.ITransformCard;
@@ -273,7 +273,7 @@ class TransformCardChart extends React.Component<Props, any>
                     Math.min(this.state.domain.x[1], pointValues[index + 1]) 
                     : this.state.domain.x[1];
           } 
-          scorePoint.value = Util.valueMinMax(scorePoint.value - valueDiff, min + .2, max - .01);
+          scorePoint.value = Util.valueMinMax(scorePoint.value - valueDiff, min + 0.01, max - 0.1);
         }
       }
       return scorePoint;
