@@ -37,6 +37,9 @@
     .browser-item-name-input {
       padding-left: 6px;
       margin-left: 20px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     
     .browser-item-name-input {
@@ -69,6 +72,10 @@
     
     .browser-item-line {
       padding: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: calc(~"100% - 30px");
       
       &:last-child {
         display: inline-block;

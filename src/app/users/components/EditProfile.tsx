@@ -52,6 +52,7 @@ import { Link } from 'react-router';
 import UserTypes from './../UserTypes.tsx';
 import AuthStore from './../../auth/data/AuthStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
+import Modal from './../../common/components/Modal.tsx';
 var CameraIcon = require('./../../../images/icon_camera.svg');
 var CloseIcon = require('./../../../images/icon_close_8x8_gray.svg')
 
@@ -73,12 +74,16 @@ class Profile extends Classs<Props>
     saving: boolean,
     savingReq: any,
     showDropDown: boolean,
+    errorModalOpen: boolean,
+    errorModalMessage: string,
   } = {
     user: null,
     loading: false,
     saving: false,
     savingReq: null,
     showDropDown: false,
+    errorModalOpen: false,
+    errorModalMessage: ''
   };
 
   infoKeys = [
@@ -169,7 +174,11 @@ class Profile extends Classs<Props>
 
   onSaveError(response) 
   {
-    alert("Error saving: " + JSON.stringify(response));
+    this.setState({
+      errorModalMessage: 'Error saving: ' + JSON.stringify(response),
+    });
+    this.toggleErrorModal();
+
     this.setState({
       saving: false,
       savingReq: null,
@@ -227,7 +236,10 @@ class Profile extends Classs<Props>
     if(file) {
       if(file.size > 3000000)
       {
-        alert('Maximum allowed file size is 3MB');
+        this.setState({
+          errorModalMessage: 'Maximum allowed file size is 3MB',
+        });
+        this.toggleErrorModal();
         return;
       }
       
@@ -290,6 +302,13 @@ class Profile extends Classs<Props>
     );
   }
 
+  toggleErrorModal()
+  {
+    this.setState ({
+      errorModalOpen: !this.state.errorModalOpen
+    });
+  }
+
   render()
   {
     if(this.state.loading)
@@ -323,6 +342,12 @@ class Profile extends Classs<Props>
             {this.renderProfilePicture()}
           </div>
         </div>
+        <Modal 
+          message={this.state.errorModalMessage}
+          onClose={this.toggleErrorModal} 
+          open={this.state.errorModalOpen} 
+          error={true}
+        /> 
       </div>
     );
 

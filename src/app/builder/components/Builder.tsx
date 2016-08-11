@@ -112,12 +112,12 @@ class Builder extends Classs<Props>
   {
     this.cancelSubscription =
       Store.subscribe(() => {
-        var newState = Store.getState().toJS();
-        this.reduxState = newState.algorithms;
-        this.setState({
-          random: Math.random(),
-          loading: false,
-        });
+          var newState = Store.getState().toJS();
+          this.reduxState = newState.algorithms;
+          this.setState({
+            random: Math.random(),
+            loading: false,
+          });
       });
 
     // Some day in the distant future, you may consider
@@ -149,13 +149,13 @@ class Builder extends Classs<Props>
     let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query.o;
     var newConfig;
-    
+
     if(open)
     {
       if(!storedConfig || storedConfig === 'undefined' || storedConfig === '')
       {
         // no stored config, just load the open tab.
-        newConfig = '!' + open;
+        newConfig = '!' + open;     
       }
       else
       {
@@ -177,6 +177,7 @@ class Builder extends Classs<Props>
       newConfig = storedConfig;
     }
     
+
     if(newConfig)
     {
       props.history.replaceState({}, `/builder/${newConfig}`);
@@ -185,7 +186,6 @@ class Builder extends Classs<Props>
     {
       newConfig = props.params.config;
     }
-    
     localStorage.setItem('config', newConfig || '');
     this.fetch(newConfig);
   }
@@ -196,7 +196,6 @@ class Builder extends Classs<Props>
     {
       return;
     }
-    
     Actions.fetch(Immutable.List(
       config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id)
     ));
@@ -207,7 +206,7 @@ class Builder extends Classs<Props>
     var selected = this.props.params.config && this.props.params.config.split(',').find(id => id.indexOf('!') === 0);
     return selected && selected.substr(1);
   }
-  
+ 
   componentWillUnmount()
   {
     this.cancelSubscription();
@@ -242,10 +241,21 @@ class Builder extends Classs<Props>
     {
       text: 'Save',
       icon: <SaveIcon />,
-      onClick: this.save,
+      onClick: this.onSave,
     },
   ]);
   
+  onSave()
+  {
+    if (this.reduxState[this.getSelectedId()].version) 
+    {
+      if (!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?')) 
+      {
+        return;
+      }
+    }
+    this.save()
+}
   onSaveSuccess()
   {
     notificationManager.addNotification(
@@ -271,6 +281,27 @@ class Builder extends Classs<Props>
       this.onSaveSuccess,
       this.onSaveError
     );
+    var configArr = window.location.pathname.split('/')[2].split(',');
+    var currentVariant;
+    configArr = configArr.map(function(tab)
+      {
+        if(tab.substr(0,1) === '!')
+        {
+          currentVariant = tab.substr(1).split('@')[0];
+          return '!' + currentVariant;
+        }
+        return tab;
+      }
+    );
+    for(let i = 0; i < configArr.length; i++)
+    {
+      if(configArr[i] === currentVariant)
+      {
+        configArr.splice(i, 1);
+      }
+    }
+    var newConfig = configArr.join(',');
+    this.props.history.replaceState({}, `/builder/${newConfig}`);
   }
   
   getLayout()
@@ -298,6 +329,9 @@ class Builder extends Classs<Props>
         onCloseColumn={this.handleCloseColumn}
         canAddColumn={colKeys.length < 3}
         canCloseColumn={colKeys.length > 1}
+        variant={this.reduxState[this.getSelectedId()]}
+        history={this.props.history}
+        onRevert={this.save}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key: colKeys[index],
@@ -389,6 +423,7 @@ class Builder extends Classs<Props>
           history={this.props.history}
           reportEmptyTabs={this.handleEmptyTabs}
         />
+
         {
           !_.keys(this.reduxState).length ? 
             <InfoArea

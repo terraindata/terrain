@@ -55,6 +55,7 @@ import UserTypes from '../UserTypes.tsx';
 import UserThumbnail from './UserThumbnail.tsx';
 import CreateItem from '../../common/components/CreateItem.tsx';
 import Ajax from '../../util/Ajax.tsx';
+import Modal from './../../common/components/Modal.tsx';
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
 
@@ -74,11 +75,15 @@ class Team extends Classs<Props>
     users: UserMap,
     addingUser: boolean,
     showDisabledUsers: boolean,
+    errorModalOpen: boolean,
+      errorModalMessage: string,
   } = {
     users: null,
     loading: true,
     addingUser: false,
     showDisabledUsers: false,
+    errorModalOpen: false,
+    errorModalMessage: '',
   };
   
   constructor(props)
@@ -203,25 +208,37 @@ class Team extends Classs<Props>
     let usernameCheck = username.replace(/[a-zA-Z]/g, "");
     if(usernameCheck.length)
     {
-      alert('Only letters are allowed in the username');
+      this.setState({
+        errorModalMessage: 'Only letters are allowed in the username',
+      });
+      this.toggleErrorModal();
       return;
     }
     
     if(this.state.users.get(username))
     {
-      alert('That username is already taken');
+      this.setState({
+        errorModalMessage: 'That username is already taken',
+      });
+      this.toggleErrorModal();
       return;
     }
     
     if(password.length < 6)
     {
-      alert('Passwords should be at least six characters long');
+      this.setState({
+        errorModalMessage: 'Passwords should be at least six characters long',
+      });
+      this.toggleErrorModal();
       return;
     }
     
     if(password !== confirmPassword)
     {
-      alert('Passwords do not match');
+      this.setState({
+        errorModalMessage: 'Passwords do not match',
+      });
+      this.toggleErrorModal();
       return;
     }
     
@@ -235,7 +252,10 @@ class Team extends Classs<Props>
     Ajax.createUser(username, password, () => {
       Actions.fetch();
     }, (error) => {
-      alert('Error creating user: ' + JSON.stringify(error))
+      this.setState({
+        errorModalMessage: 'Error creating user: ' + JSON.stringify(error),
+      });
+      this.toggleErrorModal();
     });
   }
   
@@ -292,11 +312,19 @@ class Team extends Classs<Props>
     return null;
   }
   
+  toggleErrorModal()
+  {
+    this.setState ({
+      errorModalOpen: !this.state.errorModalOpen
+    });
+  }
+
   render()
   {
     let { users, loading } = this.state;
 
     return (
+      <div>
       <div className='team'>
         <div className='team-page-title'> 
           Team Directory
@@ -309,6 +337,13 @@ class Team extends Classs<Props>
         { this.renderAddUser() }
         { this.renderShowDisabledUsers() }
       </div>
+      <Modal 
+          message={this.state.errorModalMessage}
+          onClose={this.toggleErrorModal} 
+          open={this.state.errorModalOpen} 
+          error={true}
+        /> 
+        </div>
     );
   }
 }

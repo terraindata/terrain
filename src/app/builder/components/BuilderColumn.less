@@ -4,6 +4,7 @@
 @handle-width: 10px;
 @side-border-color: #d3d6d0;
 
+
 .builder-column {
   height: 100%;
   overflow: hidden;
@@ -26,9 +27,11 @@
 
     &:hover {
       .close-builder-title-bar {
+        transition: opacity 0.25s ease-in-out;
         opacity: 1;
       }
       .builder-title-bar-options {
+        transition: opacity 0.25s ease-in-out;
         opacity: 1;
       }
     }
@@ -94,6 +97,7 @@
     float: right;
     position: relative;
     top: -6px;
+    transition: opacity 0.25s ease-in-out;
     opacity: 0;
     .transition;
     
@@ -187,5 +191,35 @@
   height: 14px !important;
   vertical-align: middle;
   margin-left: 2px;
+  transition: opacity 0.25s ease-in-out;
   opacity: 0;
+}
+
+.builder-revert-button {
+  float: right;
+  background-color: #f5f5f5;
+  border: grey 1px solid;
+  font: 11px "Helvetica Neue", Helvetica, sans-serif;
+  color: grey;
+  padding: 8px 18px;
+  margin-top: 0px;
+}
+
+.builder-revert-toolbar {
+  flex: 1;
+  background-color: white;
+  padding: 2px 8px;
+  border-bottom: 1px solid #d2d2d2;
+  height: 30px;
+}
+
+.builder-revert-time-message {
+  color: grey;
+  font: 11px "Helvetica Neue", Helvetica, sans-serif;
+  position: absolute;
+  transform: translateY(60%);
+}
+
+.builder-white-space {
+  flex: 1;
 }

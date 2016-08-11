@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./Tabs.less');
+import * as moment from 'moment';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
@@ -240,17 +241,26 @@ class Tabs extends Classs<TabsProps> {
   computeTabs(config, variants?)
   {
     variants = variants || this.state.variants;
-    
     var emptyTabs: ID[] = [];
     let tabs = config && variants && config.split(',').map(vId =>
     {
-      let id = this.getId(vId);
+      var id = this.getId(vId);
+      let split = id.split('@');
+      if(split.length > 1)
+      {
+        id = split[0];
+        var version = split[1];
+      }
       var name = variants[id] && variants[id].name;
       if(name === '')
       {
         name = 'Untitled';
       }
-      
+      if(version)
+      {
+        name += ' @ ' + moment(variants[id].lastEdited).format("ha M/D/YY")
+        id += '@' + version;
+      }
       return {
         id,
         name,
@@ -319,7 +329,7 @@ class Tabs extends Classs<TabsProps> {
     if(idStr.substr(0, 1) === '!')
     {
       return idStr.substr(1);
-    }
+    }   
     return idStr;
   }
   
@@ -367,7 +377,7 @@ class Tabs extends Classs<TabsProps> {
       compact: true,
       columns: tabs ? tabs.map((tab, index) => (
       {
-        key: tab.id,
+        key: tab.id, 
         content:
           <Tab 
             name={tab.name}
