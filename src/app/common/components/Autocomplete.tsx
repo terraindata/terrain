@@ -201,12 +201,13 @@ class Autocomplete extends Classs<Props>
   render()
   {
     var options = this.props.options && this.props.options.filter(this.showOption);
+    var inputClassName = 'ac-input ' + (this.props.className || '');
     return (
       <div className='autocomplete'>
         <input
           ref='input'
           type='text'
-          className='ac-input'
+          className={inputClassName}
           value={this.state.value}
           onChange={this.handleChange}
           onFocus={this.handleFocus}

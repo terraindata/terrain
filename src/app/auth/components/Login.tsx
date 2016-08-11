@@ -47,6 +47,7 @@ import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import Actions from "../data/AuthActions.tsx";
 import Classs from './../../common/components/Classs.tsx';
+import Modal from './../../common/components/Modal.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 var TerrainIcon = require("./../../../images/logo_TerrainLong.svg");
@@ -64,7 +65,10 @@ class Login extends React.Component<Props, any>
     this.state = {
       username: '',
       password: '',
+      loginErrorModalOpen: false,
+      errorModalMessage: '',
     }
+    this.toggleErrorModal = this.toggleErrorModal.bind(this);
   }
   
   handleKeyDown = (event) =>
@@ -94,11 +98,17 @@ class Login extends React.Component<Props, any>
     
     let xhr = new XMLHttpRequest();
     xhr.onerror = (ev:Event) => {
-      alert("Error logging in: " + ev);
+      this.setState({
+          errorModalMessage: 'Error logging in:' + ev,
+        });
+        this.toggleErrorModal();
     }
     xhr.onload = (ev:Event) => {
       if (xhr.status != 200) {
-        alert("Failed to log in: " + xhr.responseText);
+        this.setState({
+          errorModalMessage: 'Failed to log in: ' + xhr.responseText,
+        });
+        this.toggleErrorModal();
         return;
       }
       login(xhr.responseText);
@@ -121,8 +131,14 @@ class Login extends React.Component<Props, any>
     alert("Signing up for Terraformer has not been implemented yet");
   }
 
-  render() 
+  toggleErrorModal()
   {
+    this.setState ({
+      loginErrorModalOpen: !this.state.loginErrorModalOpen
+    });
+  }
+
+  render() {
     return (
      <div className='login-wrapper'>
       <div className='login-container'>
@@ -171,6 +187,12 @@ class Login extends React.Component<Props, any>
               </span>
           </div>
         </div>
+        <Modal 
+          message={this.state.errorModalMessage}
+          onClose={this.toggleErrorModal} 
+          open={this.state.loginErrorModalOpen} 
+          error={true}
+        /> 
       </div>
    );
   }

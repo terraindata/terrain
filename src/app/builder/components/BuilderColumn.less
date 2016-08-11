@@ -4,10 +4,14 @@
 @handle-width: 10px;
 @side-border-color: #d3d6d0;
 
+
 .builder-column {
   height: 100%;
   overflow: hidden;
   
+  input {
+    font-size: 12px;
+  }
   .builder-title-bar {
     background: @dark-moss;
     padding: 9px;
@@ -20,6 +24,17 @@
     // z-index: 999999;
     position: relative;
     border-left: 1px solid rgba(0,0,0,0.15);
+
+    &:hover {
+      .close-builder-title-bar {
+        transition: opacity 0.25s ease-in-out;
+        opacity: 1;
+      }
+      .builder-title-bar-options {
+        transition: opacity 0.25s ease-in-out;
+        opacity: 1;
+      }
+    }
     
     .builder-title-bar-title {
       text-shadow: 0px 0px 3px rgba(0,0,0,0.15);
@@ -82,24 +97,26 @@
     float: right;
     position: relative;
     top: -6px;
+    transition: opacity 0.25s ease-in-out;
+    opacity: 0;
+    .transition;
     
     .bc-options-svg {
       display: inline-block;
       vertical-align: middle;
       width: 15px;
       fill: #fff;
-      padding: 0px 3px;
-      // opacity: 0.9;
+      margin: 0px 3px;
       position: relative;
-      // top: 5px;
-      
+
+      &:hover {
+        background: rgba(0,0,0,0.2);
+      }
+
       .cls-1 {
         fill: #fff;
       }
-      
-      &:hover {
-        opacity: 1;  
-      }
+
     }
     
     
@@ -118,8 +135,6 @@
       width: 18px !important;
       box-sizing: border-box;
       .menu-icon {
-        // width: 18px;
-        // height: 18px;
         left: 0px;
         top: 0px;
       }
@@ -132,11 +147,12 @@
     position: relative;
     height: calc(~"100% - @{title-bar-height}");
     border-left: 1px solid @side-border-color;
+    padding-left: 12px !important;
     
     &.builder-column-content-scroll {
       overflow-y: auto;
       overflow-x: auto;
-      margin-right: @standard-margin;
+      margin-right: 6px;
       padding-right: 0px;
     }
   
@@ -168,4 +184,42 @@
   .layout-manager-column {
     transition: top 0s ease-out, left 0s ease-out;
   }
+}
+
+.close-builder-title-bar {
+  width: 14px !important;
+  height: 14px !important;
+  vertical-align: middle;
+  margin-left: 2px;
+  transition: opacity 0.25s ease-in-out;
+  opacity: 0;
+}
+
+.builder-revert-button {
+  float: right;
+  background-color: #f5f5f5;
+  border: grey 1px solid;
+  font: 11px "Helvetica Neue", Helvetica, sans-serif;
+  color: grey;
+  padding: 8px 18px;
+  margin-top: 0px;
+}
+
+.builder-revert-toolbar {
+  flex: 1;
+  background-color: white;
+  padding: 2px 8px;
+  border-bottom: 1px solid #d2d2d2;
+  height: 30px;
+}
+
+.builder-revert-time-message {
+  color: grey;
+  font: 11px "Helvetica Neue", Helvetica, sans-serif;
+  position: absolute;
+  transform: translateY(60%);
+}
+
+.builder-white-space {
+  flex: 1;
 }

@@ -56,7 +56,7 @@ import { DragSource, DropTarget } from 'react-dnd';
 import * as classNames from 'classnames';
 import Autocomplete from './Autocomplete.tsx';
 var AddCardIcon = require("./../../../images/icon_addCard_22x17.svg?name=AddCardIcon");
-var TextIcon = require("./../../../images/icon_text_12x18.svg?name=TextIcon");
+var CloseIcon = require("./../../../images/icon_close.svg");
 
 interface Props
 {
@@ -80,6 +80,9 @@ interface Props
   
   isOverCurrent?: boolean;
   connectDropTarget?: (Element) => JSX.Element;
+
+  isNumber?: boolean;
+  typeErrorMessage?: string;
 }
 
 class BuilderTextbox extends React.Component<Props, any>
@@ -89,14 +92,20 @@ class BuilderTextbox extends React.Component<Props, any>
   constructor(props: Props)
   {
     super(props);
-    
-    // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
-    this.executeChange = _.debounce(this.executeChange, 750);
+    var value: any = this.props.value;
+    this.state = {
+        wrongType: this.props.isNumber ? isNaN(value) : false,
+    };
+
     Util.bind(this, ['executeChange', 'handleTextareaChange', 'renderSwitch', 'handleSwitch', 'handleAutocompleteChange']);
   }
   
   componentWillReceiveProps(newProps)
   {
+    var value: any = newProps.value;
+    this.setState ({
+        wrongType: newProps.isNumber ? isNaN(value) : false,
+    });
     if(this.refs['input'])
     {
       if(this.refs['input'] !== document.activeElement)
@@ -126,6 +135,12 @@ class BuilderTextbox extends React.Component<Props, any>
   handleAutocompleteChange(value)
   {
     this.executeChange(value);
+    if(this.props.isNumber)
+    {
+      this.setState({
+        wrongType: isNaN(value),
+      });
+    }
   }
   
   isText()
@@ -165,12 +180,15 @@ class BuilderTextbox extends React.Component<Props, any>
     
     return (
       <a
-        className='builder-tb-switch'
+        className={classNames({
+          'builder-tb-switch': true,
+          'close-icon-builder-textbox': !this.isText(),
+        })}
         onClick={this.handleSwitch}
-        data-tip={this.isText() ? 'Convert to cards' : 'Convert to text'}
+        data-tip={this.isText() ? 'Convert to cards' : ''}
       >
         {
-          this.isText() ? <AddCardIcon /> : <TextIcon />
+          this.isText() ? <AddCardIcon /> : <CloseIcon /> 
         }
       </a>
     );
@@ -181,12 +199,14 @@ class BuilderTextbox extends React.Component<Props, any>
     {
       const { isOverCurrent, connectDropTarget } = this.props;
       return connectDropTarget(
-        <div className={classNames({
-          'builder-tb': true,
-          'builder-tb-drag-over': isOverCurrent,
-          'builder-tb-accepts-cards': this.props.acceptsCards,
-          'card-drop-target': this.props.acceptsCards
-        })}>
+        <div 
+          className={classNames({
+            'builder-tb': true,
+            'builder-tb-drag-over': isOverCurrent,
+            'builder-tb-accepts-cards': this.props.acceptsCards,
+            'card-drop-target': this.props.acceptsCards
+          })}
+        >
           {
             this.props.textarea ?
               <textarea
@@ -206,7 +226,8 @@ class BuilderTextbox extends React.Component<Props, any>
                 options={this.props.options}
                 onChange={this.handleAutocompleteChange}
                 placeholder={this.props.placeholder}
-                help={this.props.help}
+                help={this.state && this.state.wrongType ? this.props.typeErrorMessage : this.props.help}
+                className={this.state && this.state.wrongType ? 'ac-wrong-type' : null}
               />
           }
           { this.props.acceptsCards && this.renderSwitch() }

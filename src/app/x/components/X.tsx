@@ -48,6 +48,9 @@ import * as _ from 'underscore';
 import Classs from './../../common/components/Classs.tsx';
 import XCards from './XCards.tsx';
 import { Link } from 'react-router';
+//var TestPage = require('./TestPage');
+import TestPage from './TestPage.tsx';
+
 
 const xes =
 {
@@ -56,6 +59,11 @@ const xes =
     name: 'Immutable Builder',
     component: XCards,
   },
+  notifications:
+  {
+    name: 'In-app Notifications',
+    component: TestPage,
+  }
 };
 
 interface Props
