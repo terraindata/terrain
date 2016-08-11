@@ -739,11 +739,11 @@ var TransformChart = {
     var text_x = 'X:  ' + f(scales.realX.invert(x));
     var text_y = 'Y:  ' + f(y); 
     var w = 70;
-    var h = 34;
+    var h = 38;
     var containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
     var containerHeight = parseInt(d3.select(el).select('.inner-svg').attr('height')); 
-    var menuX = (x + w - 5) > containerWidth ? x - w - 5 : x + 5;
-    var menuY = (pos_y + h + 8) > containerHeight ? pos_y - h : pos_y + 14;
+    var menuX = (x + w ) > containerWidth ? x - w - 5 : x + 5;
+    var menuY = (pos_y + h) > containerHeight ? pos_y - h -14 : pos_y + 14;
 
     var crosshairs = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'crosshairs');
