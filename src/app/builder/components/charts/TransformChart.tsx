@@ -846,8 +846,7 @@ var TransformChart = {
     var x = parseFloat(xValueNode.value) || 0;
     var y = parseFloat(yValueNode.value) || 0;
     var x_raw = parseFloat(inputX.attr('raw_value')) + (x - parseFloat(inputX.attr('value')));
-    var y_raw = parseFloat(inputY.attr('raw_value')) + (y - parseFloat(inputY.attr('value')));
-    onMove(
+    var y_raw = parseFloat(inputY.attr('raw_value')) + (y - parseFloat(inputY.attr('value')));    onMove(
       point.attr('_id'), 
       y_raw, 
       x_raw, 
@@ -953,18 +952,7 @@ var TransformChart = {
         var val = String(xNode.value).match(/\d/g)
         var len = (val && val.length) || 0;
         var keyCode = d3.event['keyCode'];
-        //Use left/right arrow keys to change value
-        if(keyCode === 39)
-        {
-          xNode.stepUp(1);
-          onPointPosEdit(el, scales, onMove, {containerWidth, containerHeight, w, h});
-        }
-        else if(keyCode === 37)
-        {  
-          xNode.stepDown(1);
-          onPointPosEdit(el, scales, onMove, {containerWidth, containerHeight, w, h});
-        }
-        if(len >= 5 && [46, 8, 38, 40].indexOf(keyCode) < 0)
+        if(len >= 5 && [46, 8, 37, 39].indexOf(keyCode) < 0)
         {
           d3.event['stopPropagation']();
         }

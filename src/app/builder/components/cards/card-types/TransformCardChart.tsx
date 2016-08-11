@@ -267,18 +267,17 @@ class TransformCardChart extends React.Component<Props, any>
           }
           else {
             min = (index - 1) >= 0 ? 
-                    Math.max(this.state.domain.x[0], pointValues[index - 1])
+                    Math.max(this.state.domain.x[0], pointValues[index - 1]+.01)
                     : this.state.domain.x[0];
             max = (index + 1) < pointValues.length ?  
-                    Math.min(this.state.domain.x[1], pointValues[index + 1]) 
+                    Math.min(this.state.domain.x[1], pointValues[index + 1]-.01) 
                     : this.state.domain.x[1];
-          } 
-          scorePoint.value = Util.valueMinMax(scorePoint.value - valueDiff, min + 0.01, max - 0.1);
+          }
+          scorePoint.value = Util.valueMinMax(scorePoint.value - valueDiff, min, max);
         }
       }
       return scorePoint;
     });
-    
     this.updatePointsData(newPointsData);
   }
   
