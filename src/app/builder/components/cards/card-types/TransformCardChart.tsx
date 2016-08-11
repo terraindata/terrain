@@ -247,7 +247,7 @@ class TransformCardChart extends React.Component<Props, any>
     return a - b;
   }
   
-  onPointMove(scorePointId, newScore, newValue, pointValues, cx)
+  onPointMove(scorePointId, newScore, newValue, pointValues, cx, altKey)
   {
     var scoreDiff = this.state.initialScore - newScore;
     var valueDiff = this.state.initialValue - newValue;
@@ -257,7 +257,7 @@ class TransformCardChart extends React.Component<Props, any>
       if(scorePoint.id === scorePointId || this.state.selectedPointIds.find(id => id === scorePoint.id))
       {
         scorePoint.score = Util.valueMinMax(scorePoint.score - scoreDiff, 0, 1);
-        if(!(this.state.selectedPointIds.length > 1))
+        if(!(this.state.selectedPointIds.length > 1) && !altKey)
         {
           var index = pointValues.indexOf(cx);
           if(index < 0)

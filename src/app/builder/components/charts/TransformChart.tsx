@@ -702,7 +702,7 @@ var TransformChart = {
       var pointValues = d3.select(el).selectAll('.point')[0].map(function(point:any) {
         return scales.realX.invert(parseFloat(point.getAttribute('cx'))); 
       });
-      onMove(point.attr('_id'), newY, newX, pointValues, cx);
+      onMove(point.attr('_id'), newY, newX, pointValues, cx, d3.event['altKey']);
       drawCrossHairs(el, d3.mouse(this), scales, parseFloat(point.attr('cx')), newY);
     }
     
@@ -846,12 +846,14 @@ var TransformChart = {
     var x = parseFloat(xValueNode.value) || 0;
     var y = parseFloat(yValueNode.value) || 0;
     var x_raw = parseFloat(inputX.attr('raw_value')) + (x - parseFloat(inputX.attr('value')));
-    var y_raw = parseFloat(inputY.attr('raw_value')) + (y - parseFloat(inputY.attr('value')));    onMove(
+    var y_raw = parseFloat(inputY.attr('raw_value')) + (y - parseFloat(inputY.attr('value')));    
+    onMove(
       point.attr('_id'), 
       y_raw, 
       x_raw, 
       pointValues, 
-      scales.realX.invert(parseInt(point.attr('cx')))
+      scales.realX.invert(parseInt(point.attr('cx'))),
+      d3.event['altKey']  
     ); 
 
     //Set x/y coordinates of the menu
@@ -867,7 +869,7 @@ var TransformChart = {
   _drawPointEditMenu(el, scales, onMove, onPointPosEdit)
   {
     var point = d3.select(el).select('.point-selected');
-    if(!point[0][0])
+    if(!point[0][0] || d3.select(el).selectAll('.point-selected')[0].length > 1)
     {
       return;
     }
@@ -1074,7 +1076,10 @@ var TransformChart = {
 
   _mouseclickFactory: (el, scales, drawPointEditMenu, onMove, onPointPosEdit) => function(point)
   {
-    drawPointEditMenu(el, scales, onMove, onPointPosEdit);
+    if(!d3.event['shiftKey'] && !d3.event['altKey'])
+    {
+      drawPointEditMenu(el, scales, onMove, onPointPosEdit);
+    }
     return false;
   },
 
