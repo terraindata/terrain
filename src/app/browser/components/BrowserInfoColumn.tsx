@@ -291,7 +291,7 @@ interface BrowserInfoUserProps
 
 class BrowserInfoUser extends Classs<BrowserInfoUserProps>
 {
-  changeRole(changeAdmin: (wasAdmin: boolean) => boolean, changeBuilder: (wasBuilder: boolean) => boolean)
+  changeRole(newRole:string)
   {
     let { user, groupRoles } = this.props;
     var role = groupRoles && groupRoles.get(user.username);
@@ -301,24 +301,23 @@ class BrowserInfoUser extends Classs<BrowserInfoUserProps>
     }
     
     RolesActions.change(
-      role.set('builder', changeBuilder(role.builder)).set('admin', changeAdmin(role.admin)) as RoleTypes.Role
+      role.set('builder', newRole === 'Builder').set('admin', newRole === 'Admin') as RoleTypes.Role
     );
   }
   
-  toggleAdmin()
+  changeToAdmin()
   {
-    this.changeRole(
-      (wasAdmin: boolean) => !wasAdmin,
-      (wasBuilder: boolean) => true
-    );
+    this.changeRole('Admin');
   }
-  
-  toggleBuilder()
+
+  changeToBuilder()
   {
-    this.changeRole(
-      (wasAdmin: boolean) => false,
-      (wasBuilder: boolean) => !wasBuilder
-    );
+    this.changeRole('Builder');
+  }
+
+  changeToViewer()
+  {
+    this.changeRole('Viewer');
   }
   
   render()
@@ -340,12 +339,19 @@ class BrowserInfoUser extends Classs<BrowserInfoUserProps>
     let menuOptions = 
     [
       {
-        text: isAdmin ? 'Demote to Builder' : 'Make Admin',
-        onClick: this.toggleAdmin,
+        text: 'Viewer',
+        onClick: this.changeToViewer,
+        disabled: isViewer
       },
       {
-        text: isBuilder || isAdmin ? 'Demote to Viewer' : 'Make Builder',
-        onClick: this.toggleBuilder,
+        text: 'Builder',
+        onClick: this.changeToBuilder,
+        disabled: isBuilder
+      },
+      {
+        text: 'Admin',
+        onClick: this.changeToAdmin,
+        disabled: isAdmin
       }
     ];
     

@@ -353,7 +353,7 @@ var BuilderColumn = React.createClass<any, any>(
               this.props.canCloseColumn && 
                 <CloseIcon
                   onClick={this.handleCloseColumn}
-                  className='bc-options-svg'
+                  className='close close-builder-title-bar'
                   data-tip="Close Column"
                 />
              }
@@ -362,7 +362,8 @@ var BuilderColumn = React.createClass<any, any>(
         {this.renderBuilderVersionToolbar(canEdit)}
         <div className={
             'builder-column-content' + 
-            (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '')
+            (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '') +
+            (this.state.column === COLUMNS.Inputs ? ' builder-column-content-scroll' : '')
           }>
           { this.renderContent(canEdit) }
         </div>

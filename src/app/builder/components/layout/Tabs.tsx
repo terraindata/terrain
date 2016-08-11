@@ -73,7 +73,18 @@ var Tab = React.createClass<any, any>({
     onClick: React.PropTypes.func.isRequired,
     onClose: React.PropTypes.func.isRequired,
   },
-  
+
+  handleResize: function(e) {
+    this.setState({
+      zoom: (window.outerWidth - 8) / window.innerWidth,
+    });
+  },
+
+  componentDidMount: function() {
+    this.handleResize();
+    window.addEventListener('resize', this.handleResize);
+  },
+
   getDefaultProps(): any
   {
     return {
@@ -119,37 +130,53 @@ var Tab = React.createClass<any, any>({
       <div
         className='tabs-close'
         onClick={this.close}
-        data-tip='Close'
       >
-        <CloseIcon className='close' />
+        <CloseIcon className='close close-icon' />
       </div>
     );
   },
-  
-  render() {
-    return this.renderPanel(
-      <div 
-        className={Util.objToClassname({
-          'tabs-tab': true,
-          'tabs-tab-selected': this.props.selected,
-          'tabs-tab-no-bg': this.props.fixed,
-          })}
-        key={this.props.id}
-        style={this.zIndexStyle()}
-        onClick={this.handleClick}>
-          { this.props.fixed ? null :
-            <TabIcon className='tab-icon tab-icon-left' />
-          }
-          <div className='tab-inner'>
-            { this.props.name }
-            { this.renderClose() }
-          </div>
-          { this.props.fixed ? null :
-            <TabIcon className='tab-icon tab-icon-right' />
-          }
-      </div>
-    );
-  },
+
+render() {
+    var topStyle = '-17px';
+    if(this.state.zoom < 0.8)
+    {
+      topStyle = '-15px';
+    } 
+    if(this.state.zoom < 0.7)
+    {
+      topStyle = '-13px';
+    }
+    if(this.state.zoom < 0.6)
+    {
+      topStyle = '-8px';
+    }
+
+    return this.renderPanel(
+      <div 
+        className={Util.objToClassname({
+          'tabs-tab': true,
+          'tabs-tab-selected': this.props.selected,
+          'tabs-tab-no-bg': this.props.fixed,
+          })}
+        key={this.props.id}
+        style={this.zIndexStyle()}
+        onClick={this.handleClick}>
+          { this.props.fixed ? null :
+            <TabIcon className='tab-icon tab-icon-left' />
+          }
+          <div 
+            className='tab-inner'
+            style={{top: topStyle}}
+           >
+            { this.props.name }
+            { this.renderClose() }
+          </div>
+          { this.props.fixed ? null :
+            <TabIcon className='tab-icon tab-icon-right' />
+          }
+      </div>
+    );
+  },
 });
 
 interface TabsProps
@@ -342,6 +369,7 @@ class Tabs extends Classs<TabsProps> {
   
 	render()
   {
+
     let { tabs } = this.state;
     
     var tabsLayout =
