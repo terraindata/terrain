@@ -98,7 +98,7 @@
     margin-right: -25px;
     position: relative;
     z-index: 1;
-    left: -10px;
+        
     .tab-icon {
       fill: @tab-bg-color;
       height: 32px;
@@ -120,20 +120,19 @@
     }
     
     .tab-inner {
+      z-index: 17;
+      display: inline-block;
       background: @tab-bg-color;
-      .transition;   
+      .transition;
+      height: 31px;
+      position: relative;
+      //top: -17px;      
       padding-top: 7px;
       padding-bottom: 5px;
+      margin-left: -2px;
       margin-right: -2px;
-      margin-left: 10px !important;
-      margin-right: 22px !important;
-      height: 32px !important;
-      display: inline-block;
-      position: relative;
-      z-index: 3;  
-      padding-left: 20px;
-      border-top-left-radius: 40px 100px;
-      border-bottom-left-radius: 40px 2px;
+      //margin-top: 11px !important;
+      border-top: 1px solid @tab-border-color;
       
       .tabs-close {
         margin-left: 10px;
@@ -180,16 +179,9 @@
       
       .tab-inner {
         background: @tab-hover-color;
-        stroke:  @tab-hover-color;
-      }
-      .tab-square {
-        background: @tab-hover-color;
-      }
-      .tab-inner-right {
-        background: @tab-hover-color;
       }
     }
-  } 
+  }
 
   .tabs-tab-selected {
     z-index: 9999;
@@ -197,7 +189,7 @@
     
     .tab-inner {
       background: @tab-selected-bg-color;
-      border-color: @tab-selected-bg-color;
+      border-color: @tab-selected-border-color;
       
       .tabs-close svg {
         fill: @selected-font-color;
@@ -206,9 +198,7 @@
         }
       }
     }
-    .tab-inner-right {
-      background: @tab-selected-bg-color;
-    }
+    
     .tab-icon {
       fill: @tab-selected-bg-color;
       stroke: @tab-selected-border-color;
@@ -240,7 +230,7 @@
       // border-left: 1px solid rgba(255,255,255,0.6);
       // &:first-child, &.tabs-action-no-divider {
       //   border-left: none;
-      // } 
+      // }
       
       .transition;
       
@@ -263,23 +253,4 @@
 .tabs-content {
 	height: calc(~"100% - @{tabs-row-height} - 1px");
   overflow: hidden;
-}
-
-.close-icon {
-  fill: #fff !important;
-}
-
-.tab-inner-right {
-  height: 32px;
-  display: inline-block;
-  position: absolute;
-  width:20px;
-  background:red;
-  padding-top: 7px;
-  padding-bottom: 5px;
-  margin-left: -25px;
-  background: @tab-bg-color;
-  border-top-right-radius: 40px 100px;
-  border-bottom-right-radius: 40px 2px;
-  .transition;
 }
