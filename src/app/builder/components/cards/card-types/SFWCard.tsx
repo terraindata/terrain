@@ -241,7 +241,9 @@ class SFWCard extends Classs<Props>
                 rel={'' + index}
                 id={this.props.card.id}
                 keyPath={this._keyPath('properties', index, 'property')}
-                options={this.props.keys}
+                options={
+                  this.props.keys.concat(this.state.tableKeys)
+                }
               />
             </CardField>
           ),
@@ -254,7 +256,9 @@ class SFWCard extends Classs<Props>
   
   renderWhere()
   {
-    return <FilterArea {...this.props} />
+    return <FilterArea {...this.props} keys={
+                  this.props.keys.concat(this.state.tableKeys)
+                } />
   }
   
   render()
@@ -273,6 +277,7 @@ class SFWCard extends Classs<Props>
         {
           this.renderWhere()
         }
+        <div>Do:</div>
         <CardsArea 
           {...this.props}
           cards={this.props.card.cards}
