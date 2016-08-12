@@ -136,7 +136,7 @@ class CreateCardTool extends React.Component<Props, any>
                style={styles[type]}
              >
                <div className="create-card-button-inner" rel={type}>
-                 { type === 'parentheses' ? '( )' : type }
+                 { Util.titleForCardType(type) }
                </div>
              </a>
            ))

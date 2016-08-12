@@ -232,16 +232,21 @@ var Util = {
   
   titleForCard(card: BuilderTypes.ICard): string
   {
-    var title = card.type.charAt(0).toUpperCase() + card.type.substr(1);
-    if(card.type === 'parentheses')
+    return Util.titleForCardType(card.type);
+  },
+  
+  titleForCardType(type: string): string
+  {
+    var title = type.charAt(0).toUpperCase() + type.substr(1);
+    if(type === 'parentheses')
     {
       title = '( )';
     }
-    if(card.type === 'sfw')
+    if(type === 'sfw')
     {
       title = 'Select From Where';
     }
-    if(card.type === 'sort')
+    if(type === 'sort')
     {
       title = 'Order By';
     }
