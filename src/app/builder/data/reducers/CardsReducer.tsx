@@ -59,6 +59,35 @@ CardsReducer[ActionTypes.cards.create] =
       
       switch(action.payload.type)
       {
+        case 'sfw':
+          newCard = 
+          {
+            type: 'from',
+            group: '',
+            iterator: '',
+            joins: [],
+            cards: [],
+            
+            properties: [{
+              property: '',
+              id: '' + Math.random(),
+            }],
+            
+            filters:
+            [
+              {
+                condition:
+                {
+                  first: '',
+                  second: '',
+                  operator: 0,
+                },
+                combinator: 0,
+                id: 'co' + Math.random(),
+              }
+            ],
+          };
+          break;
         case 'select':
           newCard = 
           {
