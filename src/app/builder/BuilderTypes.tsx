@@ -122,6 +122,15 @@ export module BuilderTypes
     joins: IJoin[];
   }
   
+  export interface ISFWCard extends ICard, ICardsContainer
+  {
+    properties: IProperty[];
+    filters: IFilter[];
+    group: string;
+    iterator: string;
+    joins: IJoin[];
+  }
+  
   export interface IJoinCard extends ICard
   {
     group: string;

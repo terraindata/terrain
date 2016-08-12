@@ -49,6 +49,7 @@ export var Combinators: string[] = ['&', 'or'];
 export var Directions: string[] = ['ascending', 'descending'];
 export var CardTypes: string[]  = 
 [
+ 'sfw',
  'from',
  'select',
  'sort',
@@ -80,6 +81,7 @@ export var CardColors =
 // title is first, body is second
 {
   none: ["#B45759", "#EA7E81"],
+  sfw: ["#89B4A7", "#C1EADE"],
   from: ["#89B4A7", "#C1EADE"],
   filter: ["#7EAAB3", "#B9E1E9"],
   select: ["#8AC888", "#B7E9B5"],

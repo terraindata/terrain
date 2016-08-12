@@ -149,10 +149,11 @@ class TQLConverter
   //  or functions that are passed in a reference to the card/obj and then return a parse string
   private static TQLF =
   {
+    sfw: "SELECT $properties \nFROM '$group' as $iterator \nWHERE $filters $cards",
     from: "from '$group' as $iterator $cards",
     select: "select $properties",
       properties: (p, index) => p.property.length ? join(", ", index) + "$property" : "",
-    sort: "sort $sorts",
+    sort: "ORDER BY $sorts",
       sorts: (sort, index) => join(", ", index) + "$property " + (sort.direction ? 'desc' : 'asc'),
     filter: "filter $filters",
       filters: (filter, index, isLast) =>
@@ -182,7 +183,7 @@ class TQLConverter
     avg: "avg ($cards)",
     count: "count ($cards)",
     sum: "sum ($cards)",
-    exists: "exists ($cards)",
+    exists: "EXISTS ($cards)",
     take: "take $value",
     skip: "skip $value",
   }

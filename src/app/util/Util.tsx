@@ -237,6 +237,14 @@ var Util = {
     {
       title = '( )';
     }
+    if(card.type === 'sfw')
+    {
+      title = 'Select From Where';
+    }
+    if(card.type === 'sort')
+    {
+      title = 'Order By';
+    }
     
     return title;
   },
