@@ -250,6 +250,10 @@ var Util = {
     {
       title = 'Order By';
     }
+    if(type === 'filter')
+    {
+      title = 'Compare';
+    }
     
     return title;
   },

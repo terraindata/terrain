@@ -155,7 +155,7 @@ class TQLConverter
       properties: (p, index) => p.property.length ? join(", ", index) + "$property" : "",
     sort: "ORDER BY $sorts",
       sorts: (sort, index) => join(", ", index) + "$property " + (sort.direction ? 'desc' : 'asc'),
-    filter: "filter $filters",
+    filter: "($filters)",
       filters: (filter, index, isLast) =>
         TQLConverter._parse("$first ", filter.condition)
         + OperatorsTQL[filter.condition.operator] + " "

@@ -261,6 +261,42 @@ class SFWCard extends Classs<Props>
                 } />
   }
   
+  showCards()
+  {
+    this.setState({
+      showCards: true,
+    })
+  }
+  
+  renderCardsArea()
+  {
+    if((this.props.card.cards && this.props.card.cards.length) || this.state.showCards)
+    {
+      return (
+        <div>
+          <div><br /><b>(Actions)</b><br /></div>
+          <CardsArea 
+            {...this.props}
+            cards={this.props.card.cards}
+            parentId={this.props.card.id}
+            keys={
+              this.props.keys.concat(this.state.tableKeys)
+            }
+          />
+        </div>
+        );
+    }
+    
+    return (
+      <div>
+        <br />
+        <a onClick={this.showCards}>
+          Add child cards
+        </a>
+      </div>
+    );
+  }
+  
   render()
   {
     return (
@@ -277,15 +313,9 @@ class SFWCard extends Classs<Props>
         {
           this.renderWhere()
         }
-        <div>Do:</div>
-        <CardsArea 
-          {...this.props}
-          cards={this.props.card.cards}
-          parentId={this.props.card.id}
-          keys={
-            this.props.keys.concat(this.state.tableKeys)
-          }
-        />
+        {
+          this.renderCardsArea()
+        }
       </div>
     );
   }
