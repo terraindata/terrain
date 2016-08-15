@@ -167,15 +167,16 @@
 }
 
 .close-icon-builder-textbox {
-  left: 16px;
+  position: absolute;
   z-index: 1;
+  top: 9px;
+  left: 7%;
+  opacity: 0;
+  cursor: pointer;
+  .close;
   svg {
-    width: 10px;
-    height: 10px;
-    fill: @dark-grey;
-    opacity: 1;
-    &:hover {
-      fill: #fff;
-    }
+    width: 8px;
+    position: relative;
+    top: 2px;
   }
 }

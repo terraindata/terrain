@@ -181,7 +181,7 @@ class BuilderTextbox extends React.Component<Props, any>
     return (
       <a
         className={classNames({
-          'builder-tb-switch': true,
+          'builder-tb-switch': this.isText(),
           'close-icon-builder-textbox': !this.isText(),
         })}
         onClick={this.handleSwitch}
