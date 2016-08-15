@@ -85,6 +85,10 @@ var Tab = React.createClass<any, any>({
     window.addEventListener('resize', this.handleResize);
   },
 
+  componentWillUnmount: function() {
+    window.removeEventListener('resize', this.handleResize);
+  },
+
   getDefaultProps(): any
   {
     return {
