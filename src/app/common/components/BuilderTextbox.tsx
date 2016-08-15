@@ -56,7 +56,7 @@ import { DragSource, DropTarget } from 'react-dnd';
 import * as classNames from 'classnames';
 import Autocomplete from './Autocomplete.tsx';
 var AddCardIcon = require("./../../../images/icon_addCard_22x17.svg?name=AddCardIcon");
-var CloseIcon = require("./../../../images/icon_close.svg");
+var TextIcon = require("./../../../images/icon_text_12x18.svg?name=TextIcon");
 
 interface Props
 {
@@ -180,15 +180,12 @@ class BuilderTextbox extends React.Component<Props, any>
     
     return (
       <a
-        className={classNames({
-          'builder-tb-switch': true,
-          'close-icon-builder-textbox': !this.isText(),
-        })}
+        className='builder-tb-switch'
         onClick={this.handleSwitch}
-        data-tip={this.isText() ? 'Convert to cards' : ''}
+        data-tip={this.isText() ? 'Convert to cards' : 'Convert to text'}
       >
         {
-          this.isText() ? <AddCardIcon /> : <CloseIcon /> 
+          this.isText() ? <AddCardIcon /> : <TextIcon />
         }
       </a>
     );

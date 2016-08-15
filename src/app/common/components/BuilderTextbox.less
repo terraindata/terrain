@@ -26,9 +26,6 @@
     .builder-tb-switch {
       opacity: 0.75;
     }
-    .close-icon-builder-textbox {
-      opacity: 1;
-    }
   }
   
   .builder-tb-switch {
@@ -92,7 +89,7 @@
     text-align: center;
     border-radius: 5px;
     color: #fff;
-    width: calc(~"100% - @{card-chip-offset} - 10px");
+    width: calc(~"100% - 2 * @{card-chip-offset}");
     position: absolute;
     top: 3px;
     left: 6px;
@@ -116,7 +113,7 @@
     border-top: 1px solid #47a7ff;
     border-right: 1px solid #47a7ff;
     position: absolute;
-    left: calc(~"100% - 40px");
+    left: calc(~"100% - @{card-chip-offset} - 30px");
     width: @card-chip-offset - 6px;
     height: @input-height / 2 + @standard-margin;
     top: 50%;
@@ -125,7 +122,7 @@
     .builder-tb-cards-arrow-inner {
       .transition;
       position: absolute;
-      left: 14px;
+      left: (@card-chip-offset - 10px) / 2;
       top: -1 * @t;
       width: 0px;
       height: 0px;
@@ -163,19 +160,5 @@
 .card-is-dragging {
   .builder-tb-switch {
     opacity: 0.75;
-  }
-}
-
-.close-icon-builder-textbox {
-  left: 16px;
-  z-index: 1;
-  svg {
-    width: 10px;
-    height: 10px;
-    fill: @dark-grey;
-    opacity: 1;
-    &:hover {
-      fill: #fff;
-    }
   }
 }
