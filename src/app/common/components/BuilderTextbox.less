@@ -26,6 +26,9 @@
     .builder-tb-switch {
       opacity: 0.75;
     }
+    .close-icon-builder-textbox {
+      opacity: 1;
+    }
   }
   
   .builder-tb-switch {
@@ -37,8 +40,6 @@
     height: @input-height;
     width: @switch-width;
     padding-top: 5px;
-    // background: #fff; //#D0D1CF;
-    // border-left: 1px solid #a3a8a6;
     color: rgba(0,0,0,1);
     box-sizing: border-box;
     border-top-right-radius: 5px;
@@ -89,7 +90,7 @@
     text-align: center;
     border-radius: 5px;
     color: #fff;
-    width: calc(~"100% - 2 * @{card-chip-offset}");
+    width: calc(~"100% - @{card-chip-offset} - 10px");
     position: absolute;
     top: 3px;
     left: 6px;
@@ -104,16 +105,13 @@
     vertical-align: middle;
     margin-left: 10px;
     padding-top: 1px;
-    // white-space: nowrap;
-    // overflow: hidden;
-    // text-overflow: ellipsis;
   }
   
   .builder-tb-cards-arrow {
     border-top: 1px solid #47a7ff;
     border-right: 1px solid #47a7ff;
     position: absolute;
-    left: calc(~"100% - @{card-chip-offset} - 30px");
+    left: calc(~"100% - 40px");
     width: @card-chip-offset - 6px;
     height: @input-height / 2 + @standard-margin;
     top: 50%;
@@ -122,7 +120,7 @@
     .builder-tb-cards-arrow-inner {
       .transition;
       position: absolute;
-      left: (@card-chip-offset - 10px) / 2;
+      left: 14px;
       top: -1 * @t;
       width: 0px;
       height: 0px;
@@ -160,5 +158,20 @@
 .card-is-dragging {
   .builder-tb-switch {
     opacity: 0.75;
+  }
+}
+
+.close-icon-builder-textbox {
+  position: absolute;
+  z-index: 1;
+  top: 9px;
+  left: 7%;
+  opacity: 0;
+  cursor: pointer;
+  .close;
+  svg {
+    width: 8px;
+    position: relative;
+    top: 2px;
   }
 }
