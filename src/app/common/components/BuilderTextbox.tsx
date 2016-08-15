@@ -56,8 +56,8 @@ import { DragSource, DropTarget } from 'react-dnd';
 import * as classNames from 'classnames';
 import Autocomplete from './Autocomplete.tsx';
 var AddCardIcon = require("./../../../images/icon_addCard_22x17.svg?name=AddCardIcon");
+var TextIcon = require("./../../../images/icon_text_12x18.svg?name=TextIcon");
 var CloseIcon = require("./../../../images/icon_close.svg");
-
 interface Props
 {
   value: BuilderTypes.CardString;
@@ -188,7 +188,7 @@ class BuilderTextbox extends React.Component<Props, any>
         data-tip={this.isText() ? 'Convert to cards' : ''}
       >
         {
-          this.isText() ? <AddCardIcon /> : <CloseIcon /> 
+          this.isText() ? <AddCardIcon /> : <CloseIcon />
         }
       </a>
     );

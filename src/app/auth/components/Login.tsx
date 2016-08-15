@@ -46,10 +46,12 @@ require('./Login.less')
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import Actions from "../data/AuthActions.tsx";
+import Classs from './../../common/components/Classs.tsx';
 import Modal from './../../common/components/Modal.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
-var TerrainIcon = require("./../../../images/icon_terrain_108x17.svg?name=TerrainIcon");
+var TerrainIcon = require("./../../../images/logo_TerrainLong.svg");
+//var TerrainIcon = require("./../../../images/icon_terrain_108x17.svg?name=TerrainIcon");
 
 interface Props {
 }
@@ -117,8 +119,18 @@ class Login extends React.Component<Props, any>
       username,
       password: this.state.password,
     }));
+  }  
+
+  handleForgotPassword()
+  {
+    alert("Sorry, resetting your password hasn't been implemented yet.");
   }
-  
+
+  registerNewUser()
+  {
+    alert("Signing up for Terraformer has not been implemented yet");
+  }
+
   toggleErrorModal()
   {
     this.setState ({
@@ -128,18 +140,52 @@ class Login extends React.Component<Props, any>
 
   render() {
     return (
-      <div className='login'>
-        <div className='login-wrapper'>
-          <div className='login-logo'>
-            <TerrainIcon />
-          </div>
+     <div className='login-wrapper'>
+      <div className='login-container'>
+        <div className='login-logo-container'>
+          <TerrainIcon className='login-logo'/>
+        </div>
+        <div className='login-arrow-down'/>
+        <div className='login-white-box' />
           <div className='login-info'>
-            <input type='text' id='login-username' placeholder='username' onChange={this.handleUsernameChange} />
-            <input type='password' id='login-password' placeholder='password' onKeyDown={this.handleKeyDown} onChange={this.handlePasswordChange} />
+            <div className='login-field-title'>Email</div>
+              <input
+                type='text'
+                onChange={this.handleUsernameChange}
+                className='login-input-field'
+                placeholder='e.g. jsmith@redwoodforest.com'
+              />
+            <div className='login-field-title'>Password</div>
+            <input 
+              className='login-input-field' 
+              type='password' 
+              placeholder='e.g. ********' 
+              onKeyDown={this.handleKeyDown} 
+              onChange={this.handlePasswordChange} 
+            />
           </div>
-          <a className='login-submit' onClick={this.handleLogin}>
-            Login
-          </a>
+          <div className='login-submit-button-wrapper' >
+            <div className='login-submit-button button' onClick={this.handleLogin}>
+              Login
+            </div>
+          </div>
+        </div>
+        <div className='login-bottom-toolbar'>
+          <div 
+            className='login-forgot-password'
+            onClick={this.handleForgotPassword}
+          >
+            Forgot Password? 
+          </div>
+          <div className='login-no-account'>
+            Don't have an account yet? &nbsp; 
+              <span 
+                className='login-green'
+                onClick={this.registerNewUser}
+              >
+                 Sign Up
+              </span>
+          </div>
         </div>
         <Modal 
           message={this.state.errorModalMessage}
