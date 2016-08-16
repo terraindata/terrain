@@ -52,6 +52,7 @@ import { CardTypes, CardColors } from './../../CommonVars.tsx';
 import CreateLine from "../../../common/components/CreateLine.tsx";
 import { DragSource, DropTarget } from 'react-dnd';
 
+var Manual = require('./../../../manual/ManualConfig.json');
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
 
@@ -134,6 +135,7 @@ class CreateCardTool extends React.Component<Props, any>
                rel={type}
                onClick={this.createCard}
                style={styles[type]}
+               data-tip={Manual[0][Util.titleForCardType(type)] ? Manual[0][Util.titleForCardType(type)].Snippet : ''}
              >
                <div className="create-card-button-inner" rel={type}>
                  { Util.titleForCardType(type) }
