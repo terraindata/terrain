@@ -48,6 +48,8 @@ import Classs from './../../common/components/Classs.tsx';
 import { Link } from 'react-router';
 import * as classNames from 'classnames';
 
+var SearchIcon = require("./../../../images/icon_search.svg");
+var ManualConfig = require('./../ManualConfig.json');
 
 
 interface Props
@@ -58,11 +60,32 @@ interface Props
 
 class Manual extends Classs<Props>
 {
+  renderManualEntries()
+  {
+    return (
+      <div>
+        {
+          Object.keys(ManualConfig[0]).map((result, index) =>
+            <div>
+              {result}
+            </div> 
+          )
+        }
+      </div>
+    );
+  }
+
   render()
   {
     return (
       <div>
-      	<input className ='manual-search-bar'/>
+        <div className='manual-topbar'>
+          <div className ='manual-white-space' />
+          <div className ='manual-search-title'> Search </div>
+          <SearchIcon className ='manual-search-icon'/>
+      	  <input className='manual-search-input' />
+        </div>
+        {this.renderManualEntries()}
       </div>
     );
   }
