@@ -75,6 +75,7 @@ export module BuilderTypes
     VAR: 'var',
     TAKE: 'take',
     SKIP: 'skip',
+    SFW: 'sfw',
   };
   
   export const BlockTypes =
@@ -212,13 +213,32 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IFromCard;
     setIn: (f: string, v: any) => IFromCard;
-		_recordClasstype = CardTypes.FROM;
+    _recordClasstype = CardTypes.FROM;
   }
   let IFromCard_Record = Immutable.Record(new IFromCard());
   export const _IFromCard = (config?:any) => {
     return new IFromCard_Record(config || { id: 'c-' + Math.random(), }) as any as IFromCard;
   }
   recordFactories[CardTypes.FROM] = _IFromCard;
+  
+  export class ISfwCard extends AbstractWrapperCard
+  {
+    type = CardTypes.SFW;
+    table: string = "";
+    iterator: string = "";
+    joins: List<IJoin> = List([]);
+    properties: List<string> = List([]);
+    filters: List<IFilter> = List([]);
+    
+    set: (f: string, v: any) => ISfwCard;
+    setIn: (f: string, v: any) => ISfwCard;
+    _recordClasstype = CardTypes.SFW;
+  }
+  let ISfwCard_Record = Immutable.Record(new ISfwCard());
+  export const _ISfwCard = (config?:any) => {
+    return new ISfwCard_Record(config || { id: 'c-' + Math.random(), }) as any as ISfwCard;
+  }
+  recordFactories[CardTypes.SFW] = _ISfwCard;
   
   export class ISelectCard extends ICard
   {
@@ -397,6 +417,7 @@ export module BuilderTypes
   
   export class IWeight
   {
+    type = BlockTypes.WEIGHT;
     key: string = "";
     weight: number = 0;  
     
@@ -413,6 +434,7 @@ export module BuilderTypes
   
   export class IScoreCard extends ICard
   {
+    type = CardTypes.SCORE;
     weights: List<IWeight> = List([]);
     method: string = "";
     
@@ -429,6 +451,7 @@ export module BuilderTypes
   
   export class IBar
   {
+    type = BlockTypes.BAR;
     id: string = "";
     count: number = 0;
     percentage: number = 0;
@@ -452,6 +475,7 @@ export module BuilderTypes
   
   export class IScorePoint
   {
+    type = BlockTypes.SCOREPOINT;
     id: string = "";
     value: number = 0;
     score: number = 0;
@@ -468,6 +492,7 @@ export module BuilderTypes
   
   export class ITransformCard extends ICard
   {
+    type = CardTypes.TRANSFORM;
     input: string = "";
     range: number[] = [0,100];
     bars: List<IBar> = List([]);
@@ -485,6 +510,7 @@ export module BuilderTypes
   
   export class IIfCard extends AbstractWrapperCard
   {
+    type = CardTypes.IF;
     filters: List<IFilter> = List([]);
     elses: List<IIfCard> = List([]);
     
@@ -500,6 +526,7 @@ export module BuilderTypes
   
   export class ITakeCard extends ICard
   {
+    type = CardTypes.TAKE;
     value: string = "";
     
     set: (f: string, v: any) => ITakeCard;
@@ -514,6 +541,7 @@ export module BuilderTypes
   
   export class ISkipCard extends ICard
   {
+    type = CardTypes.SKIP;
     value: string = "";
     
     set: (f: string, v: any) => ISkipCard;
@@ -528,6 +556,7 @@ export module BuilderTypes
   
   export class ISpotlight
   {
+    type = BlockTypes.SPOTLIGHT;
     // TODO
     
     set: (f: string, v: any) => ISpotlight;
@@ -555,7 +584,7 @@ export module BuilderTypes
     id: string = "";
     key: string = "";
     value: string = "";
-    type: InputType = InputType.NUMBER;
+    type: InputType = InputType.NUMBER; // maybe inputType?
     
     set: (f: string, v: any) => IInput;
     setIn: (f: string, v: any) => IInput;
@@ -584,13 +613,15 @@ export module BuilderTypes
   {
     if(Immutable.Map.isMap(value) && value.get('_recordClassType'))
     {
+      console.log('found something', value.get('_recordClassType'), value);
       value = value.map(recordFromJS);
       value = recordFactories[value.get('_recordClassType')](value);
     }
     else if(Immutable.Iterable.isIterable(value))
     {
+      console.log('found iterable', value);
       value = value.map(recordFromJS);
-    }
+    } else console.log('found nothing', value);
     
     return value;
   }
@@ -714,6 +745,7 @@ export const CardColors =
 {
   none: ["#B45759", "#EA7E81"],
   from: ["#89B4A7", "#C1EADE"],
+  sfw: ["#89B4A7", "#C1EADE"],
   filter: ["#7EAAB3", "#B9E1E9"],
   select: ["#8AC888", "#B7E9B5"],
   let: ["#C0C0BE", "#E2E2E0"],

@@ -42,56 +42,69 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Immutable = require('immutable');
-import BrowserTypes from './../../../browser/BrowserTypes.tsx';
-import BuilderTypes from './../../BuilderTypes.tsx';
-import Ajax from './../../../util/Ajax.tsx';
-import ActionTypes from './../BuilderActionTypes.tsx';
-import Util from './../../../util/Util.tsx';
-import Actions from './../BuilderActions.tsx';
-import * as _ from 'underscore';
+import * as React from 'react';
+import * as Immutable from 'immutable';
+import BuilderComponents from './BuilderComponents.tsx';
+import PureClasss from '../../common/components/PureClasss.tsx';
+import BuilderTextbox from '../../common/components/BuilderTextbox.tsx';
 
-// TODO rename from Variant
+interface Props
+{
+  keyPath: KeyPath;
+  data : any; // record
+  type: string;
+}
 
-var VariantReducer = {};
-
-VariantReducer[ActionTypes.fetch] =
-  (state, action) =>
+class BuilderComponent extends PureClasss<Props>
+{
+  getDataKeyPath(): (string | number)[]
   {
-    action.payload.variantIds.map(
-      variantId =>
-        Ajax.getVariant(variantId, (item) =>
-        {
-          if(!item)
-          {
-            return;
-          }
-          
-          item.cards = BuilderTypes.recordsFromJS(item.cards || []);
-          item.inputs = BuilderTypes.recordsFromJS(item.inputs || []);
-          console.log('setVariant', item.cards, item.inputs, BuilderTypes._IFromCard());
-          Actions.setVariant(variantId, item);
-        }
-      )
-    );
-    return state.set('loading', true);
+    return BuilderComponents[this.props.type].display.keyPath;
   }
-
-VariantReducer[ActionTypes.setVariant] =
-  (state, action) =>
-    state.setIn(['queries', action.payload.variantId],
-      new BrowserTypes.Variant(action.payload.variant)
-    );
-
-
-VariantReducer[ActionTypes.setVariantField] =
-  (state, action) =>
-    state.setIn(['queries', action.payload.variantId, action.payload.field],
-      action.payload.value
-    );
   
-VariantReducer[ActionTypes.change] = 
-  (state, action) =>
-    state.setIn(action.payload.keyPath.toJS(), action.payload.value);
+  getKeyPath(): KeyPath
+  {
+    return this._ikeyPath(this.props.keyPath,
+      this.getDataKeyPath());
+  }
+  
+  renderText()
+  {
+    return (
+      <BuilderTextbox
+        {...this.props}
+        keyPath={this.getKeyPath()}
+        value={this.props.data.getIn(this.getDataKeyPath())}
+      />
+    ); // TODO keypaths
+  }
+    
+  renderNum()
+  {
+    return this.renderText();
+  }
+  
+  render()
+  {
+    let {type, data} = this.props;
+    let {display} = BuilderComponents[type];
+    let text = display && display.text;
+    let num = display && display.num;
+    
+    if(text)
+    {
+      return this.renderText();
+    }
+    
+    if(num)
+    {
+      return this.renderNum();
+    }
+    
+    return (
+      <div>Data type {type} not implemented.</div>
+    );
+  }
+}
 
-export default VariantReducer;
+export default BuilderComponent;

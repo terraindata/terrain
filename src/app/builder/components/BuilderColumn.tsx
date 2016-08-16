@@ -128,16 +128,16 @@ var BuilderColumn = React.createClass<any, any>(
   
   componentWillMount()
   {
-    // TODO delete this?
-    // let rejigger = () => this.setState({ rand: Math.random() });
-    // this.unsubUser = UserStore.subscribe(rejigger);
-    // this.unsubRoles = RolesStore.subscribe(rejigger);
+    // TODO fix
+    let rejigger = () => this.setState({ rand: Math.random() });
+    this.unsubUser = UserStore.subscribe(rejigger);
+    this.unsubRoles = RolesStore.subscribe(rejigger);
   },
   
   componentWillUnmount()
   {
-    // this.unsubUser && this.unsubUser();  
-    // this.unsubRoles && this.unsubRoles();  
+    this.unsubUser && this.unsubUser();  
+    this.unsubRoles && this.unsubRoles();  
   },
   
   calcinputKeys(props)

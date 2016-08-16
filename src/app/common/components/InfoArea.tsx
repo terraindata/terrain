@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./InfoArea.less')
+import * as classNames from 'classnames';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import PureClasss from '../../common/components/PureClasss.tsx';
@@ -55,6 +56,7 @@ interface Props {
   small?: string;
   button?: string;
   onClick?: () => void;
+  inline?: boolean; // render inline, rather than absolutely middle
 }
 
 class InfoArea extends PureClasss<Props>
@@ -80,7 +82,10 @@ class InfoArea extends PureClasss<Props>
   
   render() {
     return (
-     <div className="info-area">
+     <div className={classNames({
+       "info-area": true,
+       "info-area-inline": this.props.inline,
+     })}>
        { this.renderThing('large') }
        { this.renderThing('small') }
        { this.renderThing('button', true) }

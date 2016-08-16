@@ -159,8 +159,13 @@ class Classs<T> extends React.Component<T, any>
       keyPath: Immutable.List<string | number>,
     }
   } = {};
-  _ikeyPath(seed: Immutable.List<string | number>, ...keys: (string | number)[])
+  _ikeyPath(seed: Immutable.List<string | number>, ...keys: (string | number | (string | number)[])[])
   {
+    if(Array.isArray(keys[0]))
+    {
+      keys = keys[0] as any as (string | number)[];
+    }
+    
     let str = keys.join("");
     if(!this._ikeyPaths[str] || this._ikeyPaths[str].seed !== seed)
     {

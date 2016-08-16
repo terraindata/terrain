@@ -150,6 +150,7 @@ class TQLConverter
   //  or functions that are passed in a reference to the card/obj and then return a parse string
   private static TQLF =
   {
+    sfw: "select $properties from '$table' as $iterator where $filters $cards",
     from: "from '$table' as $iterator $cards",
     select: "select $properties",
       properties: (p, index) => p.property.size ? join(", ", index) + p : "", // "$property" TODO
@@ -203,7 +204,7 @@ class TQLConverter
       return this._parse(this.TQLF[card.type], card);
     }
     
-    console.log("No grammar for " + card);
+    console.log("No grammar for: ", card);
     return "";
   }
   

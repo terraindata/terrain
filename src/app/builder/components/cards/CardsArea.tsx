@@ -156,7 +156,7 @@ class CardsArea extends PureClasss<Props>
   
   createFromCard()
   {
-    Actions.cards.create(this.state.keyPath, BuilderTypes.CardTypes.FROM, 0);
+    Actions.cards.create(this.state.keyPath, BuilderTypes.CardTypes.SFW, 0);
   }
   
   render()
@@ -164,15 +164,6 @@ class CardsArea extends PureClasss<Props>
     let {props} = this;
     let {cards, topLevel, canEdit} = props;
     
-    if(!cards.size && topLevel)
-    {
-      return <InfoArea
-        large="No cards have been created, yet."
-        small="Most people start with the From card."
-        button="Create a From card"
-        onClick={this.createFromCard}
-        />;
-    }
     // TODO add cards
     return this.props.connectDropTarget(
       <div
@@ -193,6 +184,18 @@ class CardsArea extends PureClasss<Props>
               keyPath={this.state.keyPath}
             />
           )
+        }
+        
+        {
+          (!cards.size && topLevel) ? 
+            <InfoArea
+              large="No cards have been created, yet."
+              small={canEdit && "Create one below. Most people start with the Select/From card."}
+              button={canEdit && "Create a Select/From card"}
+              onClick={this.createFromCard}
+              inline={true}
+            />
+          : null
         }
         
         <CreateCardTool

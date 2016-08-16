@@ -73,6 +73,8 @@ let {CardTypes} = BuilderTypes;
 import Store from "./../../data/BuilderStore.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
 
+import BuilderComponent from '../BuilderComponent.tsx';
+
 var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
 var CARD_TYPES_WITH_CARDS = ['from', 'count', 'min', 'max', 'avg', 'exists', 'parentheses', 'if']; // 'let', 'var' removed
@@ -148,6 +150,7 @@ interface Props
   singleCard?: boolean;
   keys: string[];
   canEdit: boolean;
+  keyPath: KeyPath;
   
   isDragging?: boolean;
   dndListener?: any;
@@ -387,57 +390,12 @@ class Card extends PureClasss<Props>
   }
 
 	render() {
-
-		var CardComponent;
-
-		switch(this.props.card.type)
-		{
-			case CardTypes.SELECT:
-				CardComponent = SelectCard;
-				break;
-			case CardTypes.FROM:
-				CardComponent = FromCard;
-				break;
-   case CardTypes.SORT:
-     CardComponent = SortCard;
-     break;
-   case CardTypes.FILTER:
-    CardComponent = FilterCard;
-      break;
-    case CardTypes.LET:
-    case CardTypes.VAR:
-      CardComponent = LetVarCard;
-      break;
-    case CardTypes.TRANSFORM:
-      CardComponent = TransformCard;
-      break;
-    case CardTypes.SCORE:
-      CardComponent = ScoreCard;
-      break;
-    case CardTypes.IF:
-      CardComponent = IfCard;
-      break;
-    case CardTypes.COUNT:
-    case CardTypes.SUM:
-    case CardTypes.MIN:
-    case CardTypes.MAX:
-    case CardTypes.AVG:
-    case CardTypes.EXISTS:
-    case CardTypes.PARENTHESES:
-      CardComponent = WrapperCard;
-      var isWrapperCard = true;
-      break;
-    case CardTypes.TAKE:
-    case CardTypes.SKIP:
-      CardComponent = ValueCard;
-      break;
-		}
-    
-    var content = <div>This card has not been implemented yet.</div>;
-    if(CardComponent)
-    {
-      content = <CardComponent {...this.props} />
-    }
+    var content = <BuilderComponent
+      {...this.props}
+      data={this.props.card}
+      type={this.props.card.type}
+      keyPath={this._ikeyPath(this.props.keyPath, this.props.index)}
+    />;
 
 		var contentToDisplay = (
 			<div className={'card-content' + (this.props.singleCard ? ' card-content-single' : '')}>
@@ -456,7 +414,7 @@ class Card extends PureClasss<Props>
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
           'card-drop-target': true,
-          'wrapper-card': isWrapperCard,
+          // 'wrapper-card': isWrapperCard,
         })}
         rel={'card-' + this.props.card.id}
       >

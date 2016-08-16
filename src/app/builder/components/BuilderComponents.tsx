@@ -42,56 +42,93 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Immutable = require('immutable');
-import BrowserTypes from './../../../browser/BrowserTypes.tsx';
-import BuilderTypes from './../../BuilderTypes.tsx';
-import Ajax from './../../../util/Ajax.tsx';
-import ActionTypes from './../BuilderActionTypes.tsx';
-import Util from './../../../util/Util.tsx';
-import Actions from './../BuilderActions.tsx';
-import * as _ from 'underscore';
+import * as React from 'react';
+import * as Immutable from 'immutable';
 
-// TODO rename from Variant
+// pieces:
+//  row, dropdown
+// and these:
+let text = true;
+let num = true;
+let rows = true;
+let cards = true;
 
-var VariantReducer = {};
+let value =
+{
+  num,
+  keyPath: ['value'],
+}
 
-VariantReducer[ActionTypes.fetch] =
-  (state, action) =>
+export const BuilderComponents =
+{
+  sfw:
   {
-    action.payload.variantIds.map(
-      variantId =>
-        Ajax.getVariant(variantId, (item) =>
+    display:
+    [
+      {
+        header: 'Select',
+      },
+      {
+        rows,
+        keyPath: ['properties'],
+        display: 
         {
-          if(!item)
+          text,
+        },
+      },
+      
+      {
+        header: 'From',
+      },
+      
+      {
+        header: 'Where',
+      },
+      {
+        rows,
+        keyPath: ['filters'],
+        row: 
+        [
           {
-            return;
+            keyPath: ['first'],
+            text,
+          },
+          {
+            keyPath: ['operator'],
+            dropdown: ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>],
+          },
+          {
+            keyPath: ['second'],
+            text,
           }
-          
-          item.cards = BuilderTypes.recordsFromJS(item.cards || []);
-          item.inputs = BuilderTypes.recordsFromJS(item.inputs || []);
-          console.log('setVariant', item.cards, item.inputs, BuilderTypes._IFromCard());
-          Actions.setVariant(variantId, item);
-        }
-      )
-    );
-    return state.set('loading', true);
-  }
-
-VariantReducer[ActionTypes.setVariant] =
-  (state, action) =>
-    state.setIn(['queries', action.payload.variantId],
-      new BrowserTypes.Variant(action.payload.variant)
-    );
-
-
-VariantReducer[ActionTypes.setVariantField] =
-  (state, action) =>
-    state.setIn(['queries', action.payload.variantId, action.payload.field],
-      action.payload.value
-    );
+        ],
+      },
+      
+      {
+        cards,
+      },
+    ],
+  },
   
-VariantReducer[ActionTypes.change] = 
-  (state, action) =>
-    state.setIn(action.payload.keyPath.toJS(), action.payload.value);
+  from:
+  {
+    display:
+    {
+      
+      text,
+      keyPath: ['table'],
+    },
+  },
+  
+  take:
+  {
+    display: value,
+  },
+  
+  skip:
+  {
+    display: value,
+  },
+}
 
-export default VariantReducer;
+export default BuilderComponents;

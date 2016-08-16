@@ -42,56 +42,67 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Immutable = require('immutable');
-import BrowserTypes from './../../../browser/BrowserTypes.tsx';
-import BuilderTypes from './../../BuilderTypes.tsx';
-import Ajax from './../../../util/Ajax.tsx';
-import ActionTypes from './../BuilderActionTypes.tsx';
-import Util from './../../../util/Util.tsx';
-import Actions from './../BuilderActions.tsx';
-import * as _ from 'underscore';
+import * as React from 'react';
 
-// TODO rename from Variant
+export var Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
+export var Combinators: string[] = ['&', 'or'];
+export var Directions: string[] = ['ascending', 'descending'];
+export var CardTypes: string[]  = 
+[
+ 'sfw',
+ 'from',
+ 'select',
+ 'sort',
+ 'filter',
+ 'let',
+ 'score',
+ 'transform',
+ 'if',
+ 'max',
+ 'min',
+ 'sum',
+ 'avg',
+ 'count',
+ 'exists',
+ 'parentheses',
+ 'var',
+ 'take',
+ 'skip',
+ // 'slice',
+ // 'text match',
+ // 'exceptions',
+ // 'flatten',
+ // 'insert',
+ // 'update',
+ // 'replace',
+];
 
-var VariantReducer = {};
-
-VariantReducer[ActionTypes.fetch] =
-  (state, action) =>
-  {
-    action.payload.variantIds.map(
-      variantId =>
-        Ajax.getVariant(variantId, (item) =>
-        {
-          if(!item)
-          {
-            return;
-          }
-          
-          item.cards = BuilderTypes.recordsFromJS(item.cards || []);
-          item.inputs = BuilderTypes.recordsFromJS(item.inputs || []);
-          console.log('setVariant', item.cards, item.inputs, BuilderTypes._IFromCard());
-          Actions.setVariant(variantId, item);
-        }
-      )
-    );
-    return state.set('loading', true);
-  }
-
-VariantReducer[ActionTypes.setVariant] =
-  (state, action) =>
-    state.setIn(['queries', action.payload.variantId],
-      new BrowserTypes.Variant(action.payload.variant)
-    );
-
-
-VariantReducer[ActionTypes.setVariantField] =
-  (state, action) =>
-    state.setIn(['queries', action.payload.variantId, action.payload.field],
-      action.payload.value
-    );
-  
-VariantReducer[ActionTypes.change] = 
-  (state, action) =>
-    state.setIn(action.payload.keyPath.toJS(), action.payload.value);
-
-export default VariantReducer;
+export var CardColors = 
+// title is first, body is second
+{
+  none: ["#B45759", "#EA7E81"],
+  sfw: ["#89B4A7", "#C1EADE"],
+  from: ["#89B4A7", "#C1EADE"],
+  filter: ["#7EAAB3", "#B9E1E9"],
+  select: ["#8AC888", "#B7E9B5"],
+  let: ["#C0C0BE", "#E2E2E0"],
+  transform: ["#E7BE70", "#EDD8B1"],
+  score: ["#9DC3B8", "#D1EFE7"],
+  sort: ["#C5AFD5", "#EAD9F7"],
+  skip: ["#CDCF85", "#F5F6B3"],
+  parentheses: ["#b37e7e", "#daa3a3"],
+  count: ["#70B1AC", "#D2F3F0"],
+  max: ["#8299b8", "#acc6ea"],
+  min: ["#cc9898", "#ecbcbc"],
+  sum: ["#8dc4c1", "#bae8e5"],
+  avg: ["#a2b37e", "#c9daa6"],
+  exists: ["#a98abf", "#cfb3e3"],
+  // count: ["#70B1AC", "#70B1AC"], // "#D2F3F0"],
+  // max: ["#8299b8", "#8299b8"], // "#acc6ea"],
+  // min: ["#cc9898", "#cc9898"], // "#ecbcbc"],
+  // sum: ["#8dc4c1", "#8dc4c1"], // "#bae8e5"],
+  // avg: ["#a2b37e", "#a2b37e"], // "#c9daa6"],
+  // exists: ["#a98abf", "#a98abf"], // "#cfb3e3"],
+  if: ["#7eb397", "#a9dec2"],
+  var: ["#b3a37e", "#d7c7a2"],
+};
