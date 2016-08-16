@@ -46,12 +46,8 @@ require('./Login.less')
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import Actions from "../data/AuthActions.tsx";
-<<<<<<< HEAD
 import PureClasss from '../../common/components/PureClasss.tsx';
-=======
-import Classs from './../../common/components/Classs.tsx';
 import Modal from './../../common/components/Modal.tsx';
->>>>>>> master
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 var TerrainIcon = require("./../../../images/logo_TerrainLong.svg");
