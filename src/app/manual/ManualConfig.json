@@ -1,0 +1,61 @@
+[
+  { 
+    "CardName" :"Select", 
+    "Snippet": "Get data", 
+    "Summary": "The select statement returns a result set of records from one or more tables.", 
+    "InDepth": "The SQL SELECT statement returns a result set of records from one or more 
+      tables. A SELECT statement retrieves zero or more rows from one or more database tables or
+      database views. In most applications, SELECT is the most commonly used data manipulation 
+      language (DML) command. As SQL is a declarative programming language, SELECT queries specify 
+      a result set, but do not specify how to calculate it. The database translates the query 
+      into a query plan which may vary between executions, database versions and database software. 
+      This functionality is called the query optimizer as it is responsible for finding the best 
+      possible execution plan for the query, within applicable constraints."
+  },
+  { 
+    "CardName" :"Take", 
+    "Snippet": "Number of results", 
+    "Summary": "Take specifies the number of results to fetch.", 
+    "InDepth": "The SQL SELECT statement returns a result set of records from one or more 
+      tables. A SELECT statement retrieves zero or more rows from one or more database tables or
+      database views. In most applications, SELECT is the most commonly used data manipulation 
+      language (DML) command. As SQL is a declarative programming language, SELECT queries specify 
+      a result set, but do not specify how to calculate it. The database translates the query 
+      into a query plan which may vary between executions, database versions and database software. 
+      This functionality is called the query optimizer as it is responsible for finding the best 
+      possible execution plan for the query, within applicable constraints."
+  },
+    { 
+    "CardName" :"From", 
+    "Snippet": "Table being queried", 
+    "Summary": "From gives the source for a query, i.e. which table is being queried.", 
+    "InDepth": "The SQL From clause is the source of a rowset to be operated upon in a 
+    Data Manipulation Language (DML) statement. From clauses are very common, and will 
+    provide the rowset to be exposed through a Select statement, the source of values 
+    in an Update statement, and the target rows to be deleted in a Delete statement."
+  },
+    { 
+    "CardName" :"SelectFromWhere", 
+    "Snippet": "Results from table with constraints", 
+    "Summary": "Selects results or result fields from a given table, matching conditions in the where clause", 
+    "InDepth": "The SQL SELECT statement returns a result set of records from one or more 
+      tables. A SELECT statement retrieves zero or more rows from one or more database tables or
+      database views. In most applications, SELECT is the most commonly used data manipulation 
+      language (DML) command. As SQL is a declarative programming language, SELECT queries specify 
+      a result set, but do not specify how to calculate it. The database translates the query 
+      into a query plan which may vary between executions, database versions and database software. 
+      This functionality is called the query optimizer as it is responsible for finding the best 
+      possible execution plan for the query, within applicable constraints.
+
+      The SQL From clause is the source of a rowset to be operated upon in a 
+      Data Manipulation Language (DML) statement. From clauses are very common, and will 
+      provide the rowset to be exposed through a Select statement, the source of values 
+      in an Update statement, and the target rows to be deleted in a Delete statement.
+
+      A WHERE clause in SQL specifies that a SQL Data Manipulation Language (DML) statement should only affect 
+      rows that meet specified criteria. The criteria are expressed in the form of predicates. WHERE clauses are 
+      not mandatory clauses of SQL DML statements, but can be used to limit the number of rows affected by a SQL 
+      DML statement or returned by a query. In brief SQL WHERE clause is used to extract only those results from 
+      a SQL statement, such as: SELECT, INSERT, UPDATE, or DELETE statement."
+  },
+]
