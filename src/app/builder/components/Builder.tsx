@@ -72,6 +72,7 @@ import Card from "./cards/Card.tsx";
 import Result from "./results/Result.tsx";
 import Ajax from "./../../util/Ajax.tsx";
 import InfoArea from '../../common/components/InfoArea.tsx';
+import {notificationManager} from './../../common/components/InAppNotification.tsx'
 
 var NewIcon = require("./../../../images/icon_new_21x17.svg?name=NewIcon");
 var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
@@ -134,13 +135,13 @@ class Builder extends PureClasss<Props>
     let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query.o;
     var newConfig = props.params.config;
-    
+
     if(open)
     {
       if(!storedConfig || storedConfig === 'undefined' || storedConfig === '')
       {
         // no stored config, just load the open tab.
-        newConfig = '!' + open;
+        newConfig = '!' + open;     
       }
       else
       {
@@ -171,7 +172,6 @@ class Builder extends PureClasss<Props>
     {
       props.history.replaceState({}, `/builder/${newConfig}`);
     }
-    
     localStorage.setItem('config', newConfig || '');
     this.fetch(newConfig);
   }
@@ -182,7 +182,6 @@ class Builder extends PureClasss<Props>
     {
       return;
     }
-    
     Actions.fetch(Immutable.List(
       config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id)
     ));
@@ -228,13 +227,67 @@ class Builder extends PureClasss<Props>
     {
       text: 'Save',
       icon: <SaveIcon />,
-      onClick: this.save,
+      onClick: this.onSave,
     },
   ]);
   
+  onSave()
+  {
+    if (this.reduxState[this.getSelectedId()].version) 
+    {
+      if (!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?')) 
+      {
+        return;
+      }
+    }
+    this.save()
+}
+  onSaveSuccess()
+  {
+    notificationManager.addNotification(
+      'Variant "' + this.reduxState[this.getSelectedId()].name + '" saved.', 
+      'info', 
+      5
+    );
+  }
+
+  onSaveError()
+  {
+    notificationManager.addNotification(
+      'Error: Variant "' + this.reduxState[this.getSelectedId()].name + '" failed to save.', 
+      'error', 
+      0
+    );
+  }
+
   save()
   {
-    Ajax.saveItem(BrowserTypes.touchVariant(this.state.builder.queries.get(this.getSelectedId()) as BrowserTypes.Variant));
+    Ajax.saveItem(BrowserTypes.touchVariant(
+      this.state.builder.queries.get(this.getSelectedId()) as BrowserTypes.Variant),
+      this.onSaveSuccess,
+      this.onSaveError
+    );
+    var configArr = window.location.pathname.split('/')[2].split(',');
+    var currentVariant;
+    configArr = configArr.map(function(tab)
+      {
+        if(tab.substr(0,1) === '!')
+        {
+          currentVariant = tab.substr(1).split('@')[0];
+          return '!' + currentVariant;
+        }
+        return tab;
+      }
+    );
+    for(let i = 0; i < configArr.length; i++)
+    {
+      if(configArr[i] === currentVariant)
+      {
+        configArr.splice(i, 1);
+      }
+    }
+    var newConfig = configArr.join(',');
+    this.props.history.replaceState({}, `/builder/${newConfig}`);
   }
   
   getLayout()
@@ -264,6 +317,8 @@ class Builder extends PureClasss<Props>
         onCloseColumn={this.handleCloseColumn}
         canAddColumn={this.state.colKeys.size < 3}
         canCloseColumn={this.state.colKeys.size > 1}
+        history={this.props.history}
+        onRevert={this.save}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key,
@@ -363,6 +418,7 @@ class Builder extends PureClasss<Props>
           history={this.props.history}
           reportEmptyTabs={this.handleEmptyTabs}
         />
+
         {
           !this.state.builder.queries.keySeq().size ? 
             <InfoArea

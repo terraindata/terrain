@@ -88,6 +88,8 @@ var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 import AuthActions from "./auth/data/AuthActions.tsx";
 import AuthStore from "./auth/data/AuthStore.tsx";
 import UserActions from "./users/data/UserActions.tsx";
+import { InAppNotification } from './common/components/InAppNotification.tsx';
+
 
 var links = 
 [
@@ -197,7 +199,7 @@ var App = React.createClass({
      
     return <LayoutManager layout={layout} />;
   },
-  
+
   render ()
   {
     return (
@@ -216,10 +218,14 @@ var App = React.createClass({
           class="tooltip"
           hideOnClick={true}
         />
+
+        <InAppNotification />
+        
       </div>
     );
-  }
+  },
 });
+
 
 var router = (
   <Router history={history}>

@@ -255,7 +255,6 @@ export module BuilderTypes
   }
   recordFactories[CardTypes.SELECT] = _ISelectCard;
   
-  
   export class ISortCard extends ICard
   {
     type = CardTypes.SORT;

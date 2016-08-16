@@ -57,7 +57,7 @@ CardsReducer[ActionTypes.cards.create] =
     state.updateIn(action.payload.keyPath, cards =>
       cards.splice(action.payload.index, 0,
         BuilderTypes.recordFactories[action.payload.type]()
-      ))
+      ));
 
 // TODO
 CardsReducer[ActionTypes.cards.move] =

@@ -289,7 +289,7 @@ class SFWCard extends Classs<Props>
     
     return (
       <div>
-        <br /> q  
+        <br />
         <a onClick={this.showCards}>
           Add child cards
         </a>

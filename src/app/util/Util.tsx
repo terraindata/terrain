@@ -240,10 +240,27 @@ var Util = {
   
   titleForCard(card: BuilderTypes.ICard): string
   {
-    var title = card.type.charAt(0).toUpperCase() + card.type.substr(1);
-    if(card.type === 'parentheses')
+    return Util.titleForCardType(card.type);
+  },
+  
+  titleForCardType(type: string): string
+  {
+    var title = type.charAt(0).toUpperCase() + type.substr(1);
+    if(type === 'parentheses')
     {
       title = '( )';
+    }
+    if(type === 'sfw')
+    {
+      title = 'Select From Where';
+    }
+    if(type === 'sort')
+    {
+      title = 'Order By';
+    }
+    if(type === 'filter')
+    {
+      title = 'Compare';
     }
     
     return title;

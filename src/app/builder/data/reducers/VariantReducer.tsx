@@ -60,19 +60,53 @@ VariantReducer[ActionTypes.fetch] =
   {
     action.payload.variantIds.map(
       variantId =>
-        Ajax.getVariant(variantId, (item) =>
         {
-          if(!item)
+          if(variantId.indexOf('@') !== -1) 
           {
-            return;
+            // TODO
+            var versionId = variantId.split('@')[1];
+            variantId = variantId.split('@')[0];
+            Ajax.getVariantVersion(variantId, versionId, (version) =>
+              {
+                if(!version)
+                {
+                  return;
+                }
+                version.cards = Immutable.fromJS(version.cards || []);
+                version.inputs = Immutable.fromJS(version.inputs || []);
+                //Use current version to get missing fields
+                Ajax.getVariant(variantId, (item) => 
+                  {
+                  if(!item) 
+                  {
+                    return;
+                  }
+                  version.id = item.id;
+                  version.groupId = item.groupId;
+                  version.status = item.status;
+                  version.algorithmId = item.algorithmId;
+                  version.version = true;
+                  Actions.setVariant(variantId + '@' + versionId, version);
+                });
+              }
+            );
           }
-          
-          item.cards = BuilderTypes.recordsFromJS(item.cards || []);
-          item.inputs = BuilderTypes.recordsFromJS(item.inputs || []);
-          console.log('setVariant', item.cards, item.inputs, BuilderTypes._IFromCard());
-          Actions.setVariant(variantId, item);
+          else 
+          {
+            Ajax.getVariant(variantId, (item) =>
+            {
+              if(!item)
+              {
+                return;
+              }
+              item.cards = BuilderTypes.recordsFromJS(item.cards || []);
+              item.inputs = BuilderTypes.recordsFromJS(item.inputs || []);
+              item.version = false;
+              Actions.setVariant(variantId, item);
+            }
+          );
         }
-      )
+      }
     );
     return state.set('loading', true);
   }
@@ -82,7 +116,6 @@ VariantReducer[ActionTypes.setVariant] =
     state.setIn(['queries', action.payload.variantId],
       new BrowserTypes.Variant(action.payload.variant)
     );
-
 
 VariantReducer[ActionTypes.setVariantField] =
   (state, action) =>

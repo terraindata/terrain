@@ -60,10 +60,17 @@ import BrowserTypes from '../../browser/BrowserTypes.tsx';
 import TQLEditor from '../../tql/components/TQLEditor.tsx';
 import InfoArea from '../../common/components/InfoArea.tsx';
 const shallowCompare = require('react-addons-shallow-compare');
+import * as moment from 'moment';
+import Ajax from "./../../util/Ajax.tsx";
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 var LockedIcon = require("./../../../images/icon_lock.svg?name=LockedIcon");
+
+var BuilderIcon = require("./../../../images/icon_builder.svg");
+var ResultsIcon = require("./../../../images/icon_resultsDropdown.svg");
+var TQLIcon = require("./../../../images/icon_tql.svg");
+var InputsIcon = require("./../../../images/icon_input.svg");
 
 enum COLUMNS {
   Builder,
@@ -72,6 +79,13 @@ enum COLUMNS {
   Inputs,
 };
 var NUM_COLUMNS = 4;
+
+var menuIcons = [
+    {icon: <BuilderIcon />, color: '#76a2c1'},
+    {icon: <ResultsIcon />, color: '#71bca2'},
+    {icon: <TQLIcon />, color: '#d47884'},
+    {icon: <InputsIcon />, color: '#c2b694'}
+];
 
 // interface Props
 // {
@@ -100,6 +114,8 @@ var BuilderColumn = React.createClass<any, any>(
     onAddColumn: React.PropTypes.func.isRequired,
     onCloseColumn: React.PropTypes.func.isRequired,
     colKey: React.PropTypes.number.isRequired,
+    history: React.PropTypes.any,
+    onRevert: React.PropTypes.func,
   },
   
   getInitialState()
@@ -257,7 +273,9 @@ var BuilderColumn = React.createClass<any, any>(
       text: COLUMNS[index],
       onClick: this.switchView,
       disabled: index === this.state.column,
-    })));
+      icon: menuIcons[index].icon,
+      iconColor: menuIcons[index].color
+    }));
     
     return options;
   },
@@ -272,6 +290,47 @@ var BuilderColumn = React.createClass<any, any>(
     this.props.onCloseColumn(this.props.index);
   },
   
+  revertVersion()
+  {
+    if (this.props.variant.version) 
+    {
+      if (confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.')) 
+      {
+        this.props.onRevert();
+      }
+    }
+  },
+
+  renderBuilderVersionToolbar(canEdit)
+  {
+    if(this.props.variant.version)
+    {
+      if (this.state.column === COLUMNS.Builder || this.state.column === COLUMNS.TQL)
+      {
+        var lastEdited = moment(this.props.variant.lastEdited).format("h:mma on M/D/YY")
+        return (
+          <div className='builder-revert-toolbar'> 
+            <div className='builder-revert-time-message'>
+              Version from {lastEdited}
+            </div>
+            <div className='builder-white-space'/>
+            {
+              canEdit ? 
+                  <div 
+                    className='button builder-revert-button' 
+                    onClick={this.revertVersion} 
+                    //data-tip="Resets the Variant's contents to this version. You can always undo the revert, and reverting does not lose any of the Variant's history."
+                  >
+                    Revert to this version
+                  </div>
+                  : <div />
+             }
+          </div>
+          );
+      }
+    }
+  },
+
   render() {
     let {query} = this.props;
     let canEdit = (query.status === BrowserTypes.EVariantStatus.Build
@@ -303,7 +362,7 @@ var BuilderColumn = React.createClass<any, any>(
             { this.state.loading ? <div className='builder-column-loading'>Loading...</div> : '' }
           </div>
           <div className='builder-title-bar-options'>
-            <Menu options={this.getMenuOptions()} />
+            <Menu options={this.getMenuOptions()}/>
             {
               this.props.canAddColumn && 
                 <SplitScreenIcon
@@ -316,21 +375,24 @@ var BuilderColumn = React.createClass<any, any>(
               this.props.canCloseColumn && 
                 <CloseIcon
                   onClick={this.handleCloseColumn}
-                  className='bc-options-svg'
+                  className='close close-builder-title-bar'
                   data-tip="Close Column"
                 />
              }
           </div>
         </div>
+        {this.renderBuilderVersionToolbar(canEdit)}
         <div className={
             'builder-column-content' + 
-            (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '')
+            (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '') +
+            (this.state.column === COLUMNS.Inputs ? ' builder-column-content-scroll' : '')
           }>
           { this.renderContent(canEdit) }
         </div>
       </div>
     ));
   }
-});
+}
+);
 
 export default BuilderColumn;

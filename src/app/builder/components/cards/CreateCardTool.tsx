@@ -144,7 +144,7 @@ class CreateCardTool extends PureClasss<Props>
                style={styles[type]}
              >
                <div className="create-card-button-inner" rel={type}>
-                 { type === 'parentheses' ? '( )' : type }
+                 { Util.titleForCardType(type) }
                </div>
              </a>
            ))

@@ -65,6 +65,7 @@
     "react-dnd-html5-backend": "^2.1.2",
     "react-dnd-text-dragpreview": "^0.2.3",
     "react-dom": "^15.0.1",
+    "react-modal": "^1.4.0",
     "react-motion": "^0.2.2",
     "react-router": "^1.0.0-beta4",
     "react-select": "^1.0.0-beta13",

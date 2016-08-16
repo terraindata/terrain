@@ -55,6 +55,7 @@ var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
 import SelectCard from './card-types/SelectCard.tsx';
+import SFWCard from './card-types/SFWCard.tsx';
 import FromCard from './card-types/FromCard.tsx';
 import SortCard from './card-types/SortCard.tsx';
 import FilterCard from './card-types/FilterCard.tsx';

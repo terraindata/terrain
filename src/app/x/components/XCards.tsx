@@ -413,6 +413,7 @@ interface XCardsAreaProps
   depth: number;
   connectDropTarget?: (a:any) => any;
 }
+
 class _XCardsArea extends Classs<XCardsAreaProps>
 {
   state: {

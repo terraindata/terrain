@@ -51,11 +51,16 @@ import Classs from '../../common/components/Classs.tsx';
 import UserThumbnail from '../../users/components/UserThumbnail.tsx';
 import AuthStore from '../../auth/data/AuthStore.tsx';
 import UserTypes from '../../users/UserTypes.tsx';
+import { Link } from 'react-router';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
+var LogoutIcon = require("./../../../images/icon_logout.svg");
+var EditIcon = require("./../../../images/icon_edit.svg");
+
 interface Props {
   onLogout: () => void;
+  history?: any;
 }
 
 class AccountDropdown extends Classs<Props>
@@ -123,6 +128,11 @@ class AccountDropdown extends Classs<Props>
     }
   }
   
+  editProfile() 
+  {
+    this.props.history.pushState({}, '/profile/edit');
+  }
+
   renderDropdown()
   {
     if(!this.state.open)
@@ -132,7 +142,18 @@ class AccountDropdown extends Classs<Props>
   
     return (
       <div className="account-dropdown-content">
+        <div className="account-dropdown-row" onMouseDown={this.editProfile}>
+          <div className = 'account-dropdown-icon account-dropdown-icon-red'>
+            <EditIcon/>
+          </div>
+          <Link to={'/account/profile/edit'} className='account-dropdown-link'>
+             Edit
+          </Link>        
+        </div>
         <div className="account-dropdown-row" onMouseDown={this.props.onLogout}>
+          <div className='account-dropdown-icon account-dropdown-icon-blue'>
+            <LogoutIcon/>
+          </div>
           Logout
         </div>
       </div>

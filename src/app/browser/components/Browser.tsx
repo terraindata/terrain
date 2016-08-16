@@ -183,6 +183,7 @@ class Browser extends Classs<Props>
           }}
         />
         <BrowserInfoColumn
+          history={this.props.history}
           {...{
             group,
             algorithm,
