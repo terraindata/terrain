@@ -94,6 +94,7 @@ class ManualEntry extends Classs<Props>
       type: 'select'
     }
 
+
     return (
       <div className ='manual-entry'> 
         <div className ='manual-entry-row'>
@@ -107,54 +108,71 @@ class ManualEntry extends Classs<Props>
           })}
            />
            </div>
+
           <div className ='manual-entry-name'>
              {this.props.entryName}
           </div>
         </div>
+
         <div className ='manual-entry-summary'>
           {ManualConfig[0][this.props.entryName].Summary}
         </div>
+
         {this.state.expanded ? 
-          <div className ='maunual-entry-indepth'>
-           {ManualConfig[0][this.props.entryName].InDepth}
-            {this.props.entryName === 'Select' ?
-              <div className='manual-entry-demo'>
-                <ManualInfo 
-                  information="Use this handle to change the order of fields by clicking and dragging."
-                  style={{ top: 'calc(50% + 25px)',
-                           left: 'calc(25% + 20px)'
-                        }}
-                />
-                <ManualInfo 
-                  information="Enter the attribute to select here."
-                  style={{ top: 'calc(50% + 9px)',
-                           left: 'calc(70% - 27px)'
-                        }}
-                />
-                 <ManualInfo 
-                  information="Use this button to add another field to select."
-                  style={{ top: 'calc(50% + 25px)',
-                           left: 'calc(75% - 45px)'
-                        }}
-                />
-                 <ManualInfo 
-                  information="Use this button to remove the selected field"
-                  style={{ top: 'calc(50% + 25px)',
-                           left: 'calc(75% - 24px)'
-                        }}
-                />
-                <Card
-                  {...this.props}
-                  card={card}
-                  index={0}
-                  parentId='CI2XI'
-                  singleCard={false}
-                  keys={[]}
-               /> 
-             </div>
+          <div className='manual-entry-expanded-area'>
+            <div className ='manual-entry-row'>
+              <b>Type:</b>&nbsp;{ManualConfig[0][this.props.entryName].Type}
+            </div> 
+
+                <div className ='manual-entry-row'>
+                  <b>Syntax:</b>&nbsp;{ManualConfig[0][this.props.entryName].Syntax}
+                </div> 
+
+                <div className ='manual-entry-row'>
+                  <b>Example:</b>&nbsp;{ManualConfig[0][this.props.entryName].Example}
+                </div> 
+
+            <div className ='maunual-entry-indepth'>
+             {ManualConfig[0][this.props.entryName].InDepth}
+              {this.props.entryName === 'Select' ?
+                <div className='manual-entry-demo'>
+                  <ManualInfo 
+                    information="Use this handle to change the order of fields by clicking and dragging."
+                    style={{ top: 'calc(50% + 25px)',
+                             left: 'calc(25% + 20px)'
+                          }}
+                  />
+                  <ManualInfo 
+                    information="Enter the attribute to select here."
+                    style={{ top: 'calc(50% + 9px)',
+                             left: 'calc(70% - 27px)'
+                          }}
+                  />
+                   <ManualInfo 
+                    information="Use this button to add another field to select."
+                    style={{ top: 'calc(50% + 25px)',
+                             left: 'calc(75% - 45px)'
+                          }}
+                  />
+                   <ManualInfo 
+                    information="Use this button to remove the selected field"
+                    style={{ top: 'calc(50% + 25px)',
+                             left: 'calc(75% - 24px)'
+                          }}
+                  />
+                  <Card
+                    {...this.props}
+                    card={card}
+                    index={0}
+                    parentId='CI2XI'
+                    singleCard={false}
+                    keys={[]}
+                 /> 
+               </div>
              : null
            }
           </div> 
+          </div>
           : null
          }
         <br />
