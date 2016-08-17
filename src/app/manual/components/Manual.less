@@ -1,17 +1,15 @@
 @import "../../common/Common.less";
 
 .manual-search-input {
-	width: 95%;
-	margin-right: 8px;
+	width: 210px;
 	font-color: #636363;
 	padding-left: 30px;
 }
 
 .manual-topbar {
-	display: flex;
 	width: 100%;
-	float: right;
 	margin-top: 2px;
+	position: relative;
 }
 
 .manual-search-icon{
@@ -25,13 +23,29 @@
 	fill: #636363;
 }
 
-.manual-search-title {
-	padding-top: 3px;
-	font-size: 16px;
-	opacity: 0;
-}
-
 .manual-area{
 	margin-left: 10px;
 	margin-right: 10px;
+}
+
+.manual-search-bar {
+	display: inline-flex;
+	position: absolute;
+	right: 0px;
+}
+
+.manual-content-area {
+	position: absolute;
+	top: 30px; 
+}
+
+.manual-close-icon {
+	width: 8px;
+	fill: rgba(75, 75, 75, .7);
+	height: 8px;
+	position: absolute;
+	top: 10px;
+	right: 6px;
+	cursor: pointer;
+	opacity: 0;
 }

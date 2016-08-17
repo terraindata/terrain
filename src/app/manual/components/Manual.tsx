@@ -51,7 +51,8 @@ import * as classNames from 'classnames';
 import Autocomplete from './../../common/components/Autocomplete.tsx';
 import ManualEntry from './ManualEntry.tsx';
 
-var SearchIcon = require("./../../../images/icon_search.svg");
+var CloseIcon = require('./../../../images/icon_close.svg');
+var SearchIcon = require('./../../../images/icon_search.svg');
 var ManualConfig = require('./../ManualConfig.json');
 
 interface Props
@@ -65,7 +66,6 @@ class Manual extends Classs<Props>
   constructor(props)
   {
     super(props);
-    this.search = _.debounce(this.search, 200);
     var value = this.props.location && 
                 this.props.location.state && 
                 this.props.location.state.cardName ? 
@@ -85,13 +85,13 @@ class Manual extends Classs<Props>
     if(this.state.visibleKeys.length === 0)
     {
       return (
-        <div>
+        <div className='manual-content-area'>
           No results found.
         </div>
       );
     }
     return (
-      <div>
+      <div className='manual-content-area'>
         {
           this.state.visibleKeys.map((result, index) =>
             <div key ={index}>
@@ -116,21 +116,34 @@ class Manual extends Classs<Props>
     })
   }
 
+  clearInput()
+  {
+    this.search('');
+  }
+
   render()
   {
+    var closeOpacity = this.state.value.length ? 1 : 0;
     return (
       <div className ='manual-area'>
         <div className='manual-topbar'>
-          <div className ='manual-white-space' />
-          <div className ='manual-search-title'> Search </div>
-          <SearchIcon className ='manual-search-icon'/>
-      	  <Autocomplete
-           className='manual-search-input'
-           value={this.state.value}
-           onChange={this.search}
-           placeholder='Search'
-           options={Object.keys(ManualConfig[0])}
-         />
+          <div className='manual-search-bar'>
+            <SearchIcon className ='manual-search-icon'/>
+        	  <Autocomplete
+             className='manual-search-input'
+             value={this.state.value as string}
+             onChange={this.search}
+             placeholder='Search'
+             options={Object.keys(ManualConfig[0])}
+           />
+           <CloseIcon 
+             className='manual-close-icon'
+             style={{
+               opacity: closeOpacity,
+             }}
+             onClick={this.clearInput}
+            />
+         </div>
         </div>
         {this.renderManualEntries()}
       </div>

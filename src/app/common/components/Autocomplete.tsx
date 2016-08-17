@@ -177,7 +177,7 @@ class Autocomplete extends Classs<Props>
     var first = option, second = "", third = "";
     if(this.state.value.length)
     {
-      const i = option.indexOf(this.state.value);
+      const i = option.toLowerCase().indexOf(this.state.value.toLowerCase());
       var first = option.substr(0, i);
       var second = option.substr(i, this.state.value.length);
       var third = option.substr(this.state.value.length + i);
