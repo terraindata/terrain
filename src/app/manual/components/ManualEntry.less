@@ -1,0 +1,36 @@
+@import "../../common/Common.less";
+
+.manual-entry{
+	font-family: "Helvetica Neue", Helvetica, sans-serif;
+}
+
+.manual-entry-name {
+	font-size: 18px;
+	font-weight: bold;
+	letter-spacing: 0.5;
+	color: #3e3c3c;
+}
+
+.manual-entry-row {
+	display: flex;
+	width: 100%;
+}
+
+.manual-entry-white-space {
+	flex-grow:1;
+}
+
+.manual-entry-arrow-icon{
+	height: 12px;
+	width: 12px;
+	display: inline-block;
+    pointer-events: none;
+    .transition;
+    position: relative;
+    top: 3px;
+    margin-right: 4px;
+}
+
+.manual-entry-arrow-icon-open {
+	.rotate90;
+}

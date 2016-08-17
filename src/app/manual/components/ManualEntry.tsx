@@ -42,100 +42,66 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Manual.less');
-var _ = require('underscore');
+require('./ManualEntry.less');
+import * as $ from 'jquery';
+import * as _ from 'underscore';
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
-import { Link } from 'react-router';
+import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
-import Autocomplete from './../../common/components/Autocomplete.tsx';
-import ManualEntry from './ManualEntry.tsx';
-
-var SearchIcon = require("./../../../images/icon_search.svg");
+import Classs from './../../common/components/Classs.tsx';
 var ManualConfig = require('./../ManualConfig.json');
+var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
 
 interface Props
 {
-  location?: any;
-  children?: any;
+  entryName: string;
 }
 
-class Manual extends Classs<Props>
+
+class ManualEntry extends Classs<Props>
 {
-  constructor(props)
+  constructor(props: Props) 
   {
     super(props);
-    this.search = _.debounce(this.search, 200);
-    var value = this.props.location && 
-                this.props.location.state && 
-                this.props.location.state.cardName ? 
-                  this.props.location.state.cardName : '';
-    var keys = Object.keys(ManualConfig[0]).filter((key) =>
-    {
-       return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
-    });
-    this.state = {
-      visibleKeys: keys,
-      value
-    }
+    this.state =
+      {
+        expanded: false,
+      }
   }
 
-  renderManualEntries()
+  expand()
   {
-    if(this.state.visibleKeys.length === 0)
-    {
-      return (
-        <div>
-          No results found.
-        </div>
-      );
-    }
-    return (
-      <div>
-        {
-          this.state.visibleKeys.map((result, index) =>
-            <div key ={index}>
-              <ManualEntry
-                entryName={result}
-              />
-            </div> 
-          )
-        }
-      </div>
-    );
-  }
-
-  search(value)
-  {
-    var visibleKeys = Object.keys(ManualConfig[0]).filter((key) => {
-      return (key.toLowerCase().indexOf(value.toLowerCase()) >= 0);
-    });
     this.setState({
-      visibleKeys,
-      value,
-    })
+      expanded: !this.state.expanded
+    }); 
   }
 
-  render()
-  {
+  render() {
     return (
-      <div className ='manual-area'>
-        <div className='manual-topbar'>
-          <div className ='manual-white-space' />
-          <div className ='manual-search-title'> Search </div>
-          <SearchIcon className ='manual-search-icon'/>
-      	  <Autocomplete
-           className='manual-search-input'
-           value={this.state.value}
-           onChange={this.search}
-           placeholder='Search'
-           options={Object.keys(ManualConfig[0])}
-         />
+      <div className ='manual-entry'> 
+        <div className ='manual-entry-row'>
+          <div onClick={this.expand}>
+          <ArrowIcon className = {classNames ({ 
+            'manual-entry-arrow-icon': true,
+            'manual-entry-arrow-icon-open': this.state.expanded,
+          })}
+           />
+           </div>
+          <div className ='manual-entry-name'>
+             {this.props.entryName}
+          </div>
         </div>
-        {this.renderManualEntries()}
+        <div>
+          {ManualConfig[0][this.props.entryName].Summary}
+        </div>
+        <div>
+          {this.state.expanded ? <div> <br /> <div> {ManualConfig[0][this.props.entryName].InDepth} </div> </div>: ''}
+        </div>
+        <br />
+        <br />
       </div>
     );
   }
-}
+};
 
-export default Manual;
+export default ManualEntry;
