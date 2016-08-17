@@ -64,6 +64,7 @@ var CardsArea = React.createClass<any, any>({
     keys: React.PropTypes.array.isRequired,
     canEdit: React.PropTypes.bool.isRequired,
     connectDropTarget: React.PropTypes.func,
+    history: React.PropTypes.any
   },
   
   hasCardsArea()

@@ -25,16 +25,16 @@
     }
   }
   
-  .menu-wrapper:not(.menu-open) {
+  .menu-wrapper:not(.menu-open), .manual-popup-wrapper:not(.manual-popup-open) {
     opacity: 0;
     .transition;
   }
   &.card-hovering {
-    .menu-wrapper {
+    .menu-wrapper, .manual-popup-wrapper {
       opacity: 1;
     }
     .card {
-      .menu-wrapper:not(.menu-open) {
+      .menu-wrapper:not(.menu-open), .manual-popup-wrapper:not(.manual-popup-open) {
         opacity: 0;
       }
     }

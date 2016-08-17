@@ -210,6 +210,7 @@ var BuilderColumn = React.createClass<any, any>(
           topLevel={true}
           keys={this.state.inputKeys}
           canEdit={canEdit}
+          history={this.props.history}
         />;
         
       case COLUMNS.Inputs:

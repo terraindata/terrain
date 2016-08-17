@@ -66,6 +66,7 @@ import ValueCard from './card-types/ValueCard.tsx';
 import IfCard from './card-types/IfCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
 import Menu from '../../../common/components/Menu.tsx';
+import ManualPopup from './../../../manual/components/ManualPopup.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import { CardColors } from './../../CommonVars.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
@@ -144,6 +145,7 @@ interface Props
   parentId: string;
   singleCard?: boolean;
   keys: string[];
+  history?: any;
 }
 
 var Card = React.createClass({
@@ -488,6 +490,7 @@ var Card = React.createClass({
                   })}>
                     { Util.previewForCard(this.props.card) }
                   </span>
+                  <ManualPopup cardName={Util.titleForCard(this.props.card)} history={this.props.history}/>
                   {
                     this.props.canEdit && <Menu options={this.state.menuOptions} />
                   }

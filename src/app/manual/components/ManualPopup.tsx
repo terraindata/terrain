@@ -42,98 +42,101 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Manual.less');
-var _ = require('underscore');
+require('./ManualPopup.less');
+import * as $ from 'jquery';
+import * as _ from 'underscore';
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
-import { Link } from 'react-router';
+import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
-import Autocomplete from './../../common/components/Autocomplete.tsx';
-
-var SearchIcon = require("./../../../images/icon_search.svg");
-var ManualConfig = require('./../ManualConfig.json');
-
+import Classs from './../../common/components/Classs.tsx';
+var InfoIcon = require('./../../../images/icon_info.svg');
+var Manual = require('./../ManualConfig.json');
 
 interface Props
 {
-  location?: any;
-  children?: any;
+  cardName: string;
+  history?: any;
 }
 
-class Manual extends Classs<Props>
+class ModalPopup extends Classs<Props>
 {
-  constructor(props)
-  {
+  constructor(props: Props) {
     super(props);
-    this.search = _.debounce(this.search, 200);
-    var value = this.props.location && 
-                this.props.location.state && 
-                this.props.location.state.cardName ? 
-                  this.props.location.state.cardName : '';
-    var keys = Object.keys(ManualConfig[0]).filter((key) =>
+    this.state =
     {
-       return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
+      open: false,
+    }
+  }
+  
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  }
+  
+  close()
+  {
+    this.setState({
+      open: false,
+    })
+    $(document).off('click', this.close);
+  }
+  
+  componentWillUnmount()
+  {
+    $(document).off('click', this.close);
+  }
+  
+  toggleOpen()
+  {
+    this.setState({
+      open: !this.state.open,
     });
-    this.state = {
-      visibleKeys: keys,
-      value
+    
+    if(!this.state.open)
+    {
+      $(document).on('click', this.close);
     }
   }
 
-  renderManualEntries()
+  openManual()
   {
-    if(this.state.visibleKeys.length === 0)
-    {
-      return (
-        <div>
-          No results found.
-        </div>
-      );
-    }
+    var cardName = this.props.cardName;
+    this.props.history && this.props.history.pushState({cardName}, '/manual')
+  }
+
+  render() {
     return (
-      <div>
-        {
-          this.state.visibleKeys.map((result, index) =>
-            <div key={index}>
-              {result}
-            </div> 
-          )
+    <div 
+      className={classNames({
+        "manual-popup-wrapper": true,
+        "manual-popup-open": this.state.open,
+      })}
+    >
+      <div 
+        className="manual-popup-icon-wrapper"
+        onClick={this.toggleOpen}
+      >
+        <InfoIcon className="manual-popup-icon" />
+       </div>
+        { !this.state.open ? null :
+          <div 
+            className="manual-popup-content-wrapper"
+            onClick={this.toggleOpen}
+          >
+            {
+              Manual[0][this.props.cardName] ? Manual[0][this.props.cardName].Summary : "No description available"
+            }
+            <div 
+              className='manual-popup-link'
+              onClick={this.openManual}
+            >
+              See full description in Manual
+            </div>
+          </div>
         }
       </div>
     );
   }
+};
 
-  search(value)
-  {
-    var visibleKeys = Object.keys(ManualConfig[0]).filter((key) => {
-      return (key.toLowerCase().indexOf(value.toLowerCase()) >= 0);
-    });
-    this.setState({
-      visibleKeys,
-      value,
-    })
-  }
-
-  render()
-  {
-    return (
-      <div>
-        <div className='manual-topbar'>
-          <div className ='manual-white-space' />
-          <div className ='manual-search-title'> Search </div>
-          <SearchIcon className ='manual-search-icon'/>
-      	  <Autocomplete
-           className='manual-search-input'
-           value={this.state.value}
-           onChange={this.search}
-           placeholder='Search'
-           options={Object.keys(ManualConfig[0])}
-         />
-        </div>
-        {this.renderManualEntries()}
-      </div>
-    );
-  }
-}
-
-export default Manual;
+export default ModalPopup;
