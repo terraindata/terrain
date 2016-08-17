@@ -122,7 +122,6 @@ class Manual extends Classs<Props>
       <div className ='manual-area'>
         <div className='manual-topbar'>
           <div className ='manual-white-space' />
-          <div className ='manual-search-title'> Search </div>
           <SearchIcon className ='manual-search-icon'/>
       	  <Autocomplete
            className='manual-search-input'
