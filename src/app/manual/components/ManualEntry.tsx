@@ -82,6 +82,11 @@ class ManualEntry extends Classs<Props>
   }
 
   render() {
+    var type = this.props.entryName;
+    if (this.props.entryName.toLowerCase() == 'from')
+    {
+      type = 'from';
+    }
     var card: BuilderTypes.IFromCard = {
       cards: [],
       group: '',
@@ -89,7 +94,7 @@ class ManualEntry extends Classs<Props>
       iterator: '',
       joins: [],
       parentId: 'CI2XI',
-      type: 'from',
+      type: type,
     }
 
     return (
@@ -112,17 +117,35 @@ class ManualEntry extends Classs<Props>
         <div className ='manual-entry-summary'>
           {ManualConfig[0][this.props.entryName].Summary}
         </div>
-        <div className ='maunual-entry-indepth'>
-          {this.state.expanded ? <div> {ManualConfig[0][this.props.entryName].InDepth} </div> : ''}
+        <div className ='maunual-entry-expanded-area'>
+          {
+            this.state.expanded ? 
+            <div>
+              <div className ='manual-entry-row'>
+                <b>Type: </b> {ManualConfig[0][this.props.entryName].Type}
+              </div> 
+              <div className ='manual-entry-row'>
+                <b>Syntax: </b> {ManualConfig[0][this.props.entryName].Syntax}
+              </div> 
+              <div className ='manual-entry-row'>
+                <b>Example: </b> {ManualConfig[0][this.props.entryName].Example}
+              </div> 
+              <div className ='manual-entry-indepth'> 
+                {ManualConfig[0][this.props.entryName].InDepth} 
+              </div>
+              <Card
+                {...this.props}
+                card={card}
+                index={0}
+                parentId='CI2XI'
+                singleCard={false}
+                keys={[]}
+              />
+            </div> 
+            : ''
+          }
         </div>
-        <Card
-          {...this.props}
-          card={card}
-          index={0}
-          parentId='CI2XI'
-          singleCard={true}
-          keys={[]}
-         />
+        
         <br />
         <br />
       </div>
