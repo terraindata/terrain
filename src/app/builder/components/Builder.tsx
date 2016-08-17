@@ -193,6 +193,11 @@ class Builder extends PureClasss<Props>
     return selected && selected.substr(1);
   }
   
+  getSelectedQuery(): IQuery
+  {
+    return this.state.builder.queries.get(this.getSelectedId());
+  }
+  
   getQuery(): IQuery
   {
     return this.state.builder.queries.get(this.getSelectedId());
@@ -233,7 +238,7 @@ class Builder extends PureClasss<Props>
   
   onSave()
   {
-    if (this.reduxState[this.getSelectedId()].version) 
+    if (this.getSelectedQuery().version) 
     {
       if (!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?')) 
       {
@@ -245,7 +250,7 @@ class Builder extends PureClasss<Props>
   onSaveSuccess()
   {
     notificationManager.addNotification(
-      'Variant "' + this.reduxState[this.getSelectedId()].name + '" saved.', 
+      'Variant "' + this.getSelectedQuery().name + '" saved.', 
       'info', 
       5
     );
@@ -254,7 +259,7 @@ class Builder extends PureClasss<Props>
   onSaveError()
   {
     notificationManager.addNotification(
-      'Error: Variant "' + this.reduxState[this.getSelectedId()].name + '" failed to save.', 
+      'Error: Variant "' + this.getSelectedQuery().name + '" failed to save.', 
       'error', 
       0
     );

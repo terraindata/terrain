@@ -42,11 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./BuilderComponent.less');
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import BuilderComponents from './BuilderComponents.tsx';
+import {BuilderComponents, Display, DisplayType} from './BuilderComponents.tsx';
 import PureClasss from '../../common/components/PureClasss.tsx';
 import BuilderTextbox from '../../common/components/BuilderTextbox.tsx';
+import BuilderTypes from '../BuilderTypes.tsx';
+import BuilderActions from '../data/BuilderActions.tsx';
+import CardField from './cards/CardField.tsx';
 
 interface Props
 {
@@ -57,53 +61,161 @@ interface Props
 
 class BuilderComponent extends PureClasss<Props>
 {
-  getDataKeyPath(): (string | number)[]
+  _addRow(keyPath: KeyPath, index: number, display: Display)
   {
-    return BuilderComponents[this.props.type].display.keyPath;
+    return this._fn('addRow', keyPath, index, display, () => {
+      BuilderActions.create(keyPath, index, display.factoryType);
+    });
+  }
+  _removeRow(keyPath: KeyPath, index: number, display: Display)
+  {
+    return this._fn('removeRow', keyPath, index, display, () => {
+      BuilderActions.remove(keyPath, index);
+    });
   }
   
-  getKeyPath(): KeyPath
+  renderDisplay(displayArg: Display | Display[], parentKeyPath: KeyPath, data: Map<any, any>): El
   {
-    return this._ikeyPath(this.props.keyPath,
-      this.getDataKeyPath());
-  }
-  
-  renderText()
-  {
-    return (
-      <BuilderTextbox
-        {...this.props}
-        keyPath={this.getKeyPath()}
-        value={this.props.data.getIn(this.getDataKeyPath())}
-      />
-    ); // TODO keypaths
-  }
+    let keySeed = parentKeyPath.join(",");
+    if(Array.isArray(displayArg))
+    {
+      return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data));
+      // return (
+      //   <div key={keySeed + "-list"}>
+      //     {
+      //       displayArg.map(di => this.renderDisplay(di, parentKeyPath, data))
+      //     }
+      //   </div>
+      // );
+    }
     
-  renderNum()
-  {
-    return this.renderText();
+    const d = displayArg as Display;
+    
+    if(d.displayType === DisplayType.LABEL)
+    {
+      // special type that is unrealted to the data
+      return <div 
+        className='builder-label'
+        key={keySeed + '-label'}
+        >
+          {d.label}
+        </div>
+      ;
+    }
+    
+    let keyPath = this._ikeyPath(parentKeyPath, d.key);
+    let value = data.get(d.key);
+    var isNumber = null, typeErrorMessage = null;
+    let key = data.get('id') + ',' + d.key;
+    
+    var content;
+    
+    switch(d.displayType)
+    {
+      case DisplayType.NUM:
+        isNumber = true;
+        typeErrorMessage = "Must be a number";
+        // fall through
+      case DisplayType.TEXT:
+        content = <BuilderTextbox
+          {...this.props}
+          isNumber={isNumber}
+          typeErrorMessage={typeErrorMessage}
+          keyPath={keyPath}
+          value={value}
+          key={key}
+          placeholder={d.placeholder || d.key}
+        />
+        if(!d.header)
+        {
+          return content;
+        }
+        break;
+      // case DisplayType.CARDS:
+      // break;
+      // case DisplayType.CARDTEXT:
+      // break;
+      // case DisplayType.DROPDOWN:
+      // break;
+      case DisplayType.ROWS:
+        content = (
+          <div>
+            {
+              value.map((v, i) => (
+                <CardField
+                  index={i}
+                  onAdd={this._addRow(keyPath, i + 1, d)}
+                  onRemove={this._removeRow(keyPath, i, d)}
+                  key={key + ',' + v.get('id')}
+                >
+                  {
+                    this.renderDisplay(
+                      d.row,
+                      this._ikeyPath(keyPath, i),
+                      v
+                    )
+                  }
+                </CardField>
+              ))
+            }
+            {
+              value.size ? null :
+                <div
+                  className='builder-add-row'
+                  onClick={this._addRow(keyPath, 0, d)}
+                >
+                  Add a {d.english}
+                </div>
+            }
+          </div>
+        );
+        break;
+      default:
+        content = (
+          <div>Data type {DisplayType[d.displayType]} not implemented.</div>
+        );
+    }
+    
+    return (
+      <div key={key}>
+        { ! d.header ? null :
+            <div className='builder-card-header'>
+              { d.header }
+            </div>
+        }
+        { content }
+      </div>
+    );
   }
   
   render()
   {
     let {type, data} = this.props;
-    let {display} = BuilderComponents[type];
-    let text = display && display.text;
-    let num = display && display.num;
-    
-    if(text)
+    let display = BuilderComponents[type];
+
+    if(Array.isArray(display))
     {
-      return this.renderText();
+      return (
+        <div>
+          {
+            display.map((d, i) => this.renderDisplay(
+              d,
+              this.props.keyPath,
+              this.props.data
+              )
+            )
+          }
+        </div>
+      );
     }
-    
-    if(num)
+    else
     {
-      return this.renderNum();
+      return this.renderDisplay(
+        display,
+        this.props.keyPath,
+        this.props.data
+      );
     }
-    
-    return (
-      <div>Data type {type} not implemented.</div>
-    );
   }
 }
 

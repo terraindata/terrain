@@ -60,6 +60,21 @@ var BuilderActions =
     (keyPath: KeyPath, value: any) =>
       $(ActionTypes.change, { keyPath, value }),
   
+  create:
+    (keyPath: KeyPath, index: number, factoryType: string) =>
+      $(ActionTypes.create, { keyPath, factoryType, index }),
+  
+  move:
+    (keyPath: KeyPath, index: number, newIndex: number) =>
+      $(ActionTypes.move, { keyPath, index, newIndex }),
+  
+  remove:
+    (keyPath: KeyPath, index: number) =>
+      $(ActionTypes.remove, { keyPath, index }),
+  
+  
+  // TODO search and destroy
+  
   cards:
   {
     create:
@@ -171,30 +186,30 @@ var BuilderActions =
     {
      create: 
       (props: CardProps, index?: number) =>
-        $(ActionTypes.cards.filter.create, { card, index }),
+        $(ActionTypes.cards.filter.create, { props, index }),
 
      change: 
       (props: CardProps, index: number, value: BuilderTypes.IFilter) =>
-        $(ActionTypes.cards.filter.change, { card, index, value }),
+        $(ActionTypes.cards.filter.change, { props, index, value }),
      
      move:
        (props: CardProps, filter: BuilderTypes.IFilter, index: number) =>
-         $(ActionTypes.cards.filter.move, { card, filter, index }),
+         $(ActionTypes.cards.filter.move, { props, filter, index }),
      
      remove: 
       (props: CardProps, index: number) =>
-        $(ActionTypes.cards.filter.remove, { card, index }),
+        $(ActionTypes.cards.filter.remove, { props, index }),
     },
     
     if:
     {
       change:
         (props: CardProps, filters: BuilderTypes.IFilter[]) => //, elses: BuilderTypes.IElse[]) =>
-          $(ActionTypes.cards.if.change, { card, filters }), //, elses }),
+          $(ActionTypes.cards.if.change, { props, filters }), //, elses }),
       
       else:
         (props: CardProps, indexToRemove?: number) =>
-          $(ActionTypes.cards.if.else, { card, indexToRemove }),
+          $(ActionTypes.cards.if.else, { props, indexToRemove }),
     },
   }, // /cards
 

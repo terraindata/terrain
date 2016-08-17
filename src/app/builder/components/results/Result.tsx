@@ -46,6 +46,8 @@ require('./Result.less');
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
+const {List} = Immutable;
 import { DragSource, DropTarget } from 'react-dnd';
 var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../../util/Util.tsx';
@@ -193,18 +195,18 @@ class Result extends Classs<Props> {
   
   getMenuOptions()
   {
-    var menuOptions = [];
+    var menuOptions = List([]);
     
     if(this.props.data.spotlight)
     {
-      menuOptions.push({
+      menuOptions = menuOptions.push({
         text: 'Un-Spotlight',
         onClick: this.unspotlight,
       });
     }
     else
     {
-      menuOptions.push({
+      menuOptions = menuOptions.push({
         text: 'Spotlight',
         onClick: this.spotlight,
       });

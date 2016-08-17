@@ -46,6 +46,7 @@ require('./Input.less');
 var _ = require('underscore');
 import * as React from 'react';
 import * as Immutable from 'immutable';
+const {List} = Immutable;
 import Util from '../../../util/Util.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import PanelMixin from '../layout/PanelMixin.tsx';
@@ -121,7 +122,7 @@ var Input = React.createClass<any, any>({
 
   getMenuOptions()
   {
-    return [
+    return List([
       {
         text: 'Number',
         onClick: this.convertToNumber,
@@ -143,7 +144,7 @@ var Input = React.createClass<any, any>({
         icon: <DateIcon />, 
         iconColor: '#FF735B',
       },
-    ];
+    ]);
   },
 
   

@@ -54,17 +54,6 @@ import { DragSource, DropTarget } from 'react-dnd';
 var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
-import SelectCard from './card-types/SelectCard.tsx';
-import SFWCard from './card-types/SFWCard.tsx';
-import FromCard from './card-types/FromCard.tsx';
-import SortCard from './card-types/SortCard.tsx';
-import FilterCard from './card-types/FilterCard.tsx';
-import LetVarCard from './card-types/LetVarCard.tsx';
-import ScoreCard from './card-types/ScoreCard.tsx';
-import TransformCard from './card-types/TransformCard.tsx';
-import WrapperCard from './card-types/WrapperCard.tsx';
-import ValueCard from './card-types/ValueCard.tsx';
-import IfCard from './card-types/IfCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
 import { Menu, MenuOption } from '../../../common/components/Menu.tsx';
 import Actions from "../../data/BuilderActions.tsx";
@@ -341,7 +330,7 @@ class Card extends PureClasss<Props>
   {
     Util.animateToHeight(this.refs.cardInner, 0);
     setTimeout(() => {
-      Actions.cards.remove(this.props.card, this.props.parentId);
+      Actions.cards.remove(this.props, this.props.parentId);
     }, 250);
   }
   

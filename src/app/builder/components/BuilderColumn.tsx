@@ -47,6 +47,7 @@ require('./BuilderColumn.less');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as Immutable from 'immutable';
+const {List} = Immutable;
 import Util from '../../util/Util.tsx';
 import Menu from '../../common/components/Menu.tsx';
 import { MenuOption } from '../../common/components/Menu.tsx';
@@ -275,7 +276,7 @@ var BuilderColumn = React.createClass<any, any>(
       disabled: index === this.state.column,
       icon: menuIcons[index].icon,
       iconColor: menuIcons[index].color
-    }));
+    })));
     
     return options;
   },
@@ -292,7 +293,7 @@ var BuilderColumn = React.createClass<any, any>(
   
   revertVersion()
   {
-    if (this.props.variant.version) 
+    if (this.props.query.version) 
     {
       if (confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.')) 
       {
@@ -303,11 +304,11 @@ var BuilderColumn = React.createClass<any, any>(
 
   renderBuilderVersionToolbar(canEdit)
   {
-    if(this.props.variant.version)
+    if(this.props.query.version)
     {
       if (this.state.column === COLUMNS.Builder || this.state.column === COLUMNS.TQL)
       {
-        var lastEdited = moment(this.props.variant.lastEdited).format("h:mma on M/D/YY")
+        var lastEdited = moment(this.props.query.lastEdited).format("h:mma on M/D/YY")
         return (
           <div className='builder-revert-toolbar'> 
             <div className='builder-revert-time-message'>

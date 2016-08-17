@@ -176,6 +176,37 @@ class Classs<T> extends React.Component<T, any>
     }
     return this._ikeyPaths[str].keyPath;
   }
+  
+  _fns: {
+    [name: string]: {
+      args: any[],
+      fn: () => void,
+    }[],
+  } = {};
+  _fn(fnName: string, ...args: any[]): (...args:any[]) => any
+  {
+    let fn = args.splice(args.length - 1, 1)[0];
+    var fns = this._fns[fnName];
+    if(!fns)
+    {
+      this._fns[fnName] = [{
+        args,
+        fn,
+      }];
+      return fn;
+    }
+    
+    for(var obj of fns)
+    {
+      if(obj.args.length === args.length && obj.args.every((e, i) => args[i] === e))
+      {
+        return obj.fn;
+      }
+    }
+    
+    this._fns[fnName].push({ args, fn });
+    return fn;
+  }
 }
 
 export default Classs;

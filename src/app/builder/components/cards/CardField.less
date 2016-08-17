@@ -6,14 +6,18 @@
   position: relative;
   text-align: center;
   min-height: 30px;
-  height: 30px;
+  // height: 30px;
   .transition;
   
   .card-field-inner {
-    display: inline-block;
+    display: flex;
+    left: 40px;
     width: calc(~"100% - 80px");
     position: relative;
-    // z-index: 10;
+    
+    .builder-tb {
+      flex-grow: 1;
+    }
   }
 
   .card-field-tools-left,

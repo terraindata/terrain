@@ -146,14 +146,16 @@ class TQLConverter
     return cards;
   }
 
+  // TODO centralize
   // parse strings where "$key" indicates to replace "$key" with the value of card[key]
   //  or functions that are passed in a reference to the card/obj and then return a parse string
   private static TQLF =
   {
-    from: "from '$table' as $iterator $cards",
-    select: "select $properties",
-      properties: (p, index) => p.property.size ? join(", ", index) + p : "", // "$property" TODO
-    sfw: "SELECT $properties \nFROM '$group' as $iterator \nWHERE $filters $cards",
+    // from: "from '$table' as $iterator $cards",
+    // select: "SELECT $properties",
+    sfw: "SELECT $fields \nFROM $tables \nWHERE $filters $cards",
+      fields: (f, index) => f.field.length ? join(", ", index) + f.field : "",
+      tables: (t, index) => join(", ", index) + "'$table' as $iterator",
     sort: "ORDER BY $sorts",
       sorts: (sort, index) => join(", ", index) + "$property " + (sort.direction ? 'desc' : 'asc'),
     filter: "($filters)",

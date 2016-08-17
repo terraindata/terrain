@@ -44,91 +44,130 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import BuilderTypes from './../BuilderTypes.tsx';
+let {CardTypes, BlockTypes} = BuilderTypes;
 
-// pieces:
-//  row, dropdown
-// and these:
-let text = true;
-let num = true;
-let rows = true;
-let cards = true;
-
-let value =
+export enum DisplayType
 {
-  num,
-  keyPath: ['value'],
+  TEXT,
+  CARDTEXT,
+  NUM,
+  ROWS,
+  CARDS,
+  DROPDOWN,
+  // ...
+  
+  LABEL, // strict text to paste in to HTML
 }
 
-export const BuilderComponents =
+let {TEXT, NUM, ROWS, CARDS, CARDTEXT, DROPDOWN, LABEL} = DisplayType;
+
+export interface Display
+{
+  displayType: DisplayType;
+  key: string;
+  
+  header?: string;
+  options?: (string | Ref | El)[];
+  label?: string;
+  placeholder?: string;
+  
+  // for rows:
+  row?: Display | Display[];
+  english?: string;
+  factoryType?: string;
+}
+
+
+let valueDisplay =
+{
+  displayType: NUM,
+  key: 'value',
+}
+
+let textDisplay =
+{
+  displayType: TEXT,
+  key: [],
+}
+
+export const BuilderComponents: {[type:string]: Display | Display[]} =
 {
   sfw:
-  {
-    display:
-    [
+  [
+    {
+      header: 'Select',
+      displayType: ROWS,
+      key: 'fields',
+      english: 'field',
+      factoryType: BlockTypes.FIELD,
+      row:
       {
-        header: 'Select',
+        displayType: TEXT,
+        key: 'field'
       },
-      {
-        rows,
-        keyPath: ['properties'],
-        display: 
+    },
+    
+    {
+      header: 'From',
+      displayType: ROWS,
+      key: 'tables',
+      english: 'table',
+      factoryType: BlockTypes.TABLE,
+      row: [
         {
-          text,
+          displayType: TEXT,
+          key: 'table',
         },
-      },
-      
-      {
-        header: 'From',
-      },
-      
-      {
-        header: 'Where',
-      },
-      {
-        rows,
-        keyPath: ['filters'],
-        row: 
-        [
-          {
-            keyPath: ['first'],
-            text,
-          },
-          {
-            keyPath: ['operator'],
-            dropdown: ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>],
-          },
-          {
-            keyPath: ['second'],
-            text,
-          }
-        ],
-      },
-      
-      {
-        cards,
-      },
-    ],
-  },
+        {
+          displayType: LABEL,
+          label: 'as',
+          key: null,
+        },
+        {
+          displayType: TEXT,
+          key: 'iterator',
+        },
+      ]
+    },
+    
+    {
+      header: 'Where',
+      displayType: ROWS,
+      key: 'filters',
+      english: 'condition',
+      factoryType: BlockTypes.CONDITION,
+      row: [
+        {
+          displayType: CARDTEXT,
+          key: 'first',
+        },
+        {
+          displayType: DROPDOWN,
+          key: 'operator',
+          options: ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>],
+        },
+        {
+          displayType: CARDTEXT,
+          key: 'second',
+        }
+      ],
+    },
+    
+    {
+      displayType: CARDS,
+      key: 'cards',
+    },
+  ],
   
   from:
   {
-    display:
-    {
-      
-      text,
-      keyPath: ['table'],
-    },
+    displayType: TEXT,
+    key: 'table',
   },
   
-  take:
-  {
-    display: value,
-  },
-  
-  skip:
-  {
-    display: value,
-  },
+  take: valueDisplay,
+  skip: valueDisplay,
 }
 
 export default BuilderComponents;

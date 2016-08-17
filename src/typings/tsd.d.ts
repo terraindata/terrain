@@ -49,6 +49,7 @@ THE SOFTWARE.
 /// <reference path="redux-actions/redux-actions.d.ts" />
 /// <reference path="react/react-dom.d.ts" />
 
+import React = __React;
 
 interface Array<T> {
   find(predicate: (search: T) => boolean) : T;

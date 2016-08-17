@@ -245,6 +245,12 @@ var Util = {
   
   titleForCardType(type: string): string
   {
+    if(!type)
+    {
+      console.log('no type given for title');
+      return '';
+    }
+    
     var title = type.charAt(0).toUpperCase() + type.substr(1);
     if(type === 'parentheses')
     {

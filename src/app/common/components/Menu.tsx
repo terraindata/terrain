@@ -143,7 +143,7 @@ export class Menu extends PureClasss<Props>
     }
     
     var multiplier = 10;
-    if(options[0].icon) 
+    if(options.get(0).icon) 
     {
       multiplier = 14;
     } 

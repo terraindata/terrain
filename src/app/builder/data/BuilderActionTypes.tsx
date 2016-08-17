@@ -71,8 +71,12 @@ var change = '';
 
 var BuilderActionTypes = 
 {
-  change: '',
+  create,
+  change,
+  move,
+  remove,
   
+  // TODO kill all
   cards:
   {
     move,

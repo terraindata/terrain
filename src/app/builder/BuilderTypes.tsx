@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import * as React from 'react';
 import * as Immutable from 'immutable';
 let List = Immutable.List;
@@ -83,11 +84,12 @@ export module BuilderTypes
     CONDITION: 'conditionblock',
     SORT: 'sortblock',
     FILTER: 'filterblock',
-    JOIN: 'joinblock',
+    TABLE: 'tableblock',
     WEIGHT: 'weight',
     BAR: 'bar',
     SCOREPOINT: 'scorepoint',
     SPOTLIGHT: 'spotlight',
+    FIELD: 'field',
     
     INPUT: 'input,'    
   };
@@ -113,11 +115,18 @@ export module BuilderTypes
     AND,
     OR
   }
+
+  // abstract  
+  export class IId
+  {
+    id: string = "";
+  }
   
+  let addId = (a: any) => _.extend({}, { id: "id-" + Math.random() }, a);
   
   export var recordFactories: {[key: string]: (obj?:any) => any} = {};
   
-  export class ICondition
+  export class ICondition extends IId
   {
     first: string = "";
     second: string = "";
@@ -125,64 +134,63 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ICondition;
     setIn: (f: string, v: any) => ICondition;
-		_recordClasstype = BlockTypes.CONDITION;
+		_recordClassType = BlockTypes.CONDITION;
   }
   let ICondition_Record = Immutable.Record(new ICondition());
   export const _ICondition = (config?:any) => {
-    return new ICondition_Record(config || {}) as any as ICondition;
+    return new ICondition_Record(addId(config)) as any as ICondition;
   }
   recordFactories[BlockTypes.CONDITION] = _ICondition;
   
-  export class ISort
+  export class ISort extends IId
   {
     property: string = "";
     direction: Direction = Direction.DESC;
     
     set: (f: string, v: any) => ISort;
     setIn: (f: string, v: any) => ISort;
-		_recordClasstype = BlockTypes.SORT;
+		_recordClassType = BlockTypes.SORT;
   }
   let ISort_Record = Immutable.Record(new ISort());
   export const _ISort = (config?:any) => {
-    return new ISort_Record(config || {}) as any as ISort;
+    return new ISort_Record(addId(config)) as any as ISort;
   }
   recordFactories[BlockTypes.SORT] = _ISort;  
   
-  export class IFilter
+  export class IFilter extends IId
   {
     combinator: Combinator = Combinator.AND;
     condition: ICondition = _ICondition();
     
     set: (f: string, v: any) => IFilter;
     setIn: (f: string, v: any) => IFilter;
-		_recordClasstype = BlockTypes.FILTER;
+		_recordClassType = BlockTypes.FILTER;
   }
   let IFilter_Record = Immutable.Record(new IFilter());
   export const _IFilter = (config?:any) => {
-    return new IFilter_Record(config || {}) as any as IFilter;
+    return new IFilter_Record(addId(config)) as any as IFilter;
   }
   recordFactories[BlockTypes.FILTER] = _IFilter;
   
-  export class IJoin
+  export class ITable extends IId
   {
     table: string = "";
-    filters: List<IFilter> = List([]);
+    iterator: string = "";
     
-    set: (f: string, v: any) => IJoin;
-    setIn: (f: string, v: any) => IJoin;
-		_recordClasstype = BlockTypes.JOIN;
+    set: (f: string, v: any) => ITable;
+    setIn: (f: string, v: any) => ITable;
+		_recordClassType = BlockTypes.TABLE;
   }
-  let IJoin_Record = Immutable.Record(new IJoin());
-  export const _IJoin = (config?:any) => {
-    return new IJoin_Record(config || {}) as any as IJoin;
+  let ITable_Record = Immutable.Record(new ITable());
+  export const _ITable = (config?:any) => {
+    return new ITable_Record(addId(config)) as any as ITable;
   }
-  recordFactories[BlockTypes.JOIN] = _IJoin;
+  recordFactories[BlockTypes.TABLE] = _ITable;
   
   
   // abstract
-  export class ICard
+  export class ICard extends IId
   {
-    id: string = "";
     type: string = "";
     
     set: (f: string, v: any) => ICard;
@@ -209,34 +217,48 @@ export module BuilderTypes
     type = CardTypes.FROM;
     table: string = "";
     iterator: string = "";
-    joins: List<IJoin> = List([]);
+    tables: List<ITable> = List([]);
     
     set: (f: string, v: any) => IFromCard;
     setIn: (f: string, v: any) => IFromCard;
-    _recordClasstype = CardTypes.FROM;
+    _recordClassType = CardTypes.FROM;
   }
   let IFromCard_Record = Immutable.Record(new IFromCard());
   export const _IFromCard = (config?:any) => {
-    return new IFromCard_Record(config || { id: 'c-' + Math.random(), }) as any as IFromCard;
+    return new IFromCard_Record(addId(config)) as any as IFromCard;
   }
   recordFactories[CardTypes.FROM] = _IFromCard;
+  
+  export class IField extends IId
+  {
+    type = BlockTypes.FIELD;
+    field: string = "";
+    id: string = "";
+    
+    set: (f: string, v: any) => IField;
+    setIn: (f: string, v: any) => IField;
+    _recordClassType = BlockTypes.FIELD;
+  }
+  let IField_Record = Immutable.Record(new IField());
+  export const _IField = (config?:any) => {
+    return new IField_Record(addId(config)) as any as IField;
+  }
+  recordFactories[BlockTypes.FIELD] = _IField;
   
   export class ISfwCard extends AbstractWrapperCard
   {
     type = CardTypes.SFW;
-    table: string = "";
-    iterator: string = "";
-    joins: List<IJoin> = List([]);
-    properties: List<string> = List([]);
+    tables: List<ITable> = List([]);
+    fields: List<IField> = List([]);
     filters: List<IFilter> = List([]);
     
     set: (f: string, v: any) => ISfwCard;
     setIn: (f: string, v: any) => ISfwCard;
-    _recordClasstype = CardTypes.SFW;
+    _recordClassType = CardTypes.SFW;
   }
   let ISfwCard_Record = Immutable.Record(new ISfwCard());
   export const _ISfwCard = (config?:any) => {
-    return new ISfwCard_Record(config || { id: 'c-' + Math.random(), }) as any as ISfwCard;
+    return new ISfwCard_Record(addId(config)) as any as ISfwCard;
   }
   recordFactories[CardTypes.SFW] = _ISfwCard;
   
@@ -247,11 +269,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ISelectCard;
     setIn: (f: string, v: any) => ISelectCard;
-		_recordClasstype = CardTypes.SELECT;
+		_recordClassType = CardTypes.SELECT;
   }
   let ISelectCard_Record = Immutable.Record(new ISelectCard());
   export const _ISelectCard = (config?:any) => {
-    return new ISelectCard_Record(config || { id: 'c-' + Math.random(), }) as any as ISelectCard;
+    return new ISelectCard_Record(addId(config)) as any as ISelectCard;
   }
   recordFactories[CardTypes.SELECT] = _ISelectCard;
   
@@ -262,11 +284,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ISortCard;
     setIn: (f: string, v: any) => ISortCard;
-		_recordClasstype = CardTypes.SORT;
+		_recordClassType = CardTypes.SORT;
   }
   let ISortCard_Record = Immutable.Record(new ISortCard());
   export const _ISortCard = (config?:any) => {
-    return new ISortCard_Record(config || { id: 'c-' + Math.random(), }) as any as ISortCard;
+    return new ISortCard_Record(addId(config)) as any as ISortCard;
   }
   recordFactories[CardTypes.SORT] = _ISortCard;
   
@@ -277,11 +299,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IFilterCard;
     setIn: (f: string, v: any) => IFilterCard;
-		_recordClasstype = CardTypes.FILTER;
+		_recordClassType = CardTypes.FILTER;
   }
   let IFilterCard_Record = Immutable.Record(new IFilterCard());
   export const _IFilterCard = (config?:any) => {
-    return new IFilterCard_Record(config || { id: 'c-' + Math.random(), }) as any as IFilterCard;
+    return new IFilterCard_Record(addId(config)) as any as IFilterCard;
   }
   recordFactories[CardTypes.FILTER] = _IFilterCard;
   
@@ -295,11 +317,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ILetCard;
     setIn: (f: string, v: any) => ILetCard;
-		_recordClasstype = CardTypes.LET;
+		_recordClassType = CardTypes.LET;
   }
   let ILetCard_Record = Immutable.Record(new ILetCard());
   export const _ILetCard = (config?:any) => {
-    return new ILetCard_Record(config || { id: 'c-' + Math.random(), }) as any as ILetCard;
+    return new ILetCard_Record(addId(config)) as any as ILetCard;
   }
   recordFactories[CardTypes.LET] = _ILetCard;
 
@@ -311,11 +333,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IVarCard;
     setIn: (f: string, v: any) => IVarCard;
-		_recordClasstype = CardTypes.VAR;
+		_recordClassType = CardTypes.VAR;
   }
   let IVarCard_Record = Immutable.Record(new IVarCard());
   export const _IVarCard = (config?:any) => {
-    return new IVarCard_Record(config || { id: 'c-' + Math.random(), }) as any as IVarCard;
+    return new IVarCard_Record(addId(config)) as any as IVarCard;
   }
   recordFactories[CardTypes.VAR] = _IVarCard;  
   
@@ -328,11 +350,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ICountCard;
     setIn: (f: string, v: any) => ICountCard;
-		_recordClasstype = CardTypes.COUNT;
+		_recordClassType = CardTypes.COUNT;
   }
   let ICountCard_Record = Immutable.Record(new ICountCard());
   export const _ICountCard = (config?:any) => {
-    return new ICountCard_Record(config || { id: 'c-' + Math.random(), }) as any as ICountCard;
+    return new ICountCard_Record(addId(config)) as any as ICountCard;
   }
   recordFactories[CardTypes.COUNT] = _ICountCard; 
   export class IAvgCard extends AbstractWrapperCard
@@ -341,11 +363,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IAvgCard;
     setIn: (f: string, v: any) => IAvgCard;
-		_recordClasstype = CardTypes.AVG;
+		_recordClassType = CardTypes.AVG;
   }
   let IAvgCard_Record = Immutable.Record(new IAvgCard());
   export const _IAvgCard = (config?:any) => {
-    return new IAvgCard_Record(config || { id: 'c-' + Math.random(), }) as any as IAvgCard;
+    return new IAvgCard_Record(addId(config)) as any as IAvgCard;
   }
   recordFactories[CardTypes.AVG] = _IAvgCard; 
   export class ISumCard extends AbstractWrapperCard
@@ -354,11 +376,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ISumCard;
     setIn: (f: string, v: any) => ISumCard;
-		_recordClasstype = CardTypes.SUM;
+		_recordClassType = CardTypes.SUM;
   }
   let ISumCard_Record = Immutable.Record(new ISumCard());
   export const _ISumCard = (config?:any) => {
-    return new ISumCard_Record(config || { id: 'c-' + Math.random(), }) as any as ISumCard;
+    return new ISumCard_Record(addId(config)) as any as ISumCard;
   }
   recordFactories[CardTypes.SUM] = _ISumCard; 
   export class IMinCard extends AbstractWrapperCard
@@ -367,11 +389,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IMinCard;
     setIn: (f: string, v: any) => IMinCard;
-		_recordClasstype = CardTypes.MIN;
+		_recordClassType = CardTypes.MIN;
   }
   let IMinCard_Record = Immutable.Record(new IMinCard());
   export const _IMinCard = (config?:any) => {
-    return new IMinCard_Record(config || { id: 'c-' + Math.random(), }) as any as IMinCard;
+    return new IMinCard_Record(addId(config)) as any as IMinCard;
   }
   recordFactories[CardTypes.MIN] = _IMinCard; 
   export class IMaxCard extends AbstractWrapperCard
@@ -380,11 +402,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IMaxCard;
     setIn: (f: string, v: any) => IMaxCard;
-		_recordClasstype = CardTypes.MAX;
+		_recordClassType = CardTypes.MAX;
   }
   let IMaxCard_Record = Immutable.Record(new IMaxCard());
   export const _IMaxCard = (config?:any) => {
-    return new IMaxCard_Record(config || { id: 'c-' + Math.random(), }) as any as IMaxCard;
+    return new IMaxCard_Record(addId(config)) as any as IMaxCard;
   }
   recordFactories[CardTypes.MAX] = _IMaxCard; 
   export class IExistsCard extends AbstractWrapperCard
@@ -393,11 +415,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IExistsCard;
     setIn: (f: string, v: any) => IExistsCard;
-		_recordClasstype = CardTypes.EXISTS;
+		_recordClassType = CardTypes.EXISTS;
   }
   let IExistsCard_Record = Immutable.Record(new IExistsCard());
   export const _IExistsCard = (config?:any) => {
-    return new IExistsCard_Record(config || { id: 'c-' + Math.random(), }) as any as IExistsCard;
+    return new IExistsCard_Record(addId(config)) as any as IExistsCard;
   }
   recordFactories[CardTypes.EXISTS] = _IExistsCard; 
   export class IParenthesesCard extends AbstractWrapperCard
@@ -406,15 +428,15 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IParenthesesCard;
     setIn: (f: string, v: any) => IParenthesesCard;
-		_recordClasstype = CardTypes.PARENTHESES;
+		_recordClassType = CardTypes.PARENTHESES;
   }
   let IParenthesesCard_Record = Immutable.Record(new IParenthesesCard());
   export const _IParenthesesCard = (config?:any) => {
-    return new IParenthesesCard_Record(config || { id: 'c-' + Math.random(), }) as any as IParenthesesCard;
+    return new IParenthesesCard_Record(addId(config)) as any as IParenthesesCard;
   }
   recordFactories[CardTypes.PARENTHESES] = _IParenthesesCard;
   
-  export class IWeight
+  export class IWeight extends IId
   {
     type = BlockTypes.WEIGHT;
     key: string = "";
@@ -422,11 +444,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IWeight;
     setIn: (f: string, v: any) => IWeight;
-		_recordClasstype = BlockTypes.WEIGHT;
+		_recordClassType = BlockTypes.WEIGHT;
    }
   let IWeight_Record = Immutable.Record(new IWeight());
   export const _IWeight = (config?:any) => {
-    return new IWeight_Record(config || {}) as any as IWeight;
+    return new IWeight_Record(addId(config)) as any as IWeight;
   }
   recordFactories[BlockTypes.WEIGHT] = _IWeight;
 
@@ -439,16 +461,16 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IScoreCard;
     setIn: (f: string, v: any) => IScoreCard;
-		_recordClasstype = CardTypes.SCORE;
+		_recordClassType = CardTypes.SCORE;
   }
   let IScoreCard_Record = Immutable.Record(new IScoreCard());
   export const _IScoreCard = (config?:any) => {
-    return new IScoreCard_Record(config || { id: 'c-' + Math.random(), }) as any as IScoreCard;
+    return new IScoreCard_Record(addId(config)) as any as IScoreCard;
   }
   recordFactories[CardTypes.SCORE] = _IScoreCard;
   
   
-  export class IBar
+  export class IBar extends IId
   {
     type = BlockTypes.BAR;
     id: string = "";
@@ -464,15 +486,15 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IBar;
     setIn: (f: string, v: any) => IBar;
-		_recordClasstype = BlockTypes.BAR;
+		_recordClassType = BlockTypes.BAR;
    }
   let IBar_Record = Immutable.Record(new IBar());
   export const _IBar = (config?:any) => {
-    return new IBar_Record(config || { id: 'c-' + Math.random(), }) as any as IBar;
+    return new IBar_Record(addId(config)) as any as IBar;
   }
   recordFactories[BlockTypes.BAR] = _IBar;
   
-  export class IScorePoint
+  export class IScorePoint extends IId
   {
     type = BlockTypes.SCOREPOINT;
     id: string = "";
@@ -481,11 +503,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IScorePoint;
     setIn: (f: string, v: any) => IScorePoint;
-		_recordClasstype = BlockTypes.SCOREPOINT;
+		_recordClassType = BlockTypes.SCOREPOINT;
    }
   let IScorePoint_Record = Immutable.Record(new IScorePoint());
   export const _IScorePoint = (config?:any) => {
-    return new IScorePoint_Record(config || { id: 'c-' + Math.random(), }) as any as IScorePoint;
+    return new IScorePoint_Record(addId(config)) as any as IScorePoint;
   }
   recordFactories[BlockTypes.SCOREPOINT] = _IScorePoint;
   
@@ -499,11 +521,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ITransformCard;
     setIn: (f: string, v: any) => ITransformCard;
-		_recordClasstype = CardTypes.TRANSFORM;
+		_recordClassType = CardTypes.TRANSFORM;
   }
   let ITransformCard_Record = Immutable.Record(new ITransformCard());
   export const _ITransformCard = (config?:any) => {
-    return new ITransformCard_Record(config || { id: 'c-' + Math.random(), }) as any as ITransformCard;
+    return new ITransformCard_Record(addId(config)) as any as ITransformCard;
   }
   recordFactories[CardTypes.TRANSFORM] = _ITransformCard;
   
@@ -515,11 +537,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IIfCard;
     setIn: (f: string, v: any) => IIfCard;
-		_recordClasstype = CardTypes.IF;
+		_recordClassType = CardTypes.IF;
   }
   let IIfCard_Record = Immutable.Record(new IIfCard());
   export const _IIfCard = (config?:any) => {
-    return new IIfCard_Record(config || { id: 'c-' + Math.random(), }) as any as IIfCard;
+    return new IIfCard_Record(addId(config)) as any as IIfCard;
   }
   recordFactories[CardTypes.IF] = _IIfCard;
   
@@ -530,11 +552,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ITakeCard;
     setIn: (f: string, v: any) => ITakeCard;
-		_recordClasstype = CardTypes.TAKE;
+		_recordClassType = CardTypes.TAKE;
   }
   let ITakeCard_Record = Immutable.Record(new ITakeCard());
   export const _ITakeCard = (config?:any) => {
-    return new ITakeCard_Record(config || { id: 'c-' + Math.random(), }) as any as ITakeCard;
+    return new ITakeCard_Record(addId(config)) as any as ITakeCard;
   }
   recordFactories[CardTypes.TAKE] = _ITakeCard;
   
@@ -545,26 +567,26 @@ export module BuilderTypes
     
     set: (f: string, v: any) => ISkipCard;
     setIn: (f: string, v: any) => ISkipCard;
-		_recordClasstype = CardTypes.SKIP;
+		_recordClassType = CardTypes.SKIP;
   }
   let ISkipCard_Record = Immutable.Record(new ISkipCard());
   export const _ISkipCard = (config?:any) => {
-    return new ISkipCard_Record(config || { id: 'c-' + Math.random(), }) as any as ISkipCard;
+    return new ISkipCard_Record(addId(config)) as any as ISkipCard;
   }
   recordFactories[CardTypes.SKIP] = _ISkipCard;
   
-  export class ISpotlight
+  export class ISpotlight extends IId
   {
     type = BlockTypes.SPOTLIGHT;
     // TODO
     
     set: (f: string, v: any) => ISpotlight;
     setIn: (f: string, v: any) => ISpotlight;
-    _recordClasstype = BlockTypes.SPOTLIGHT;
+    _recordClassType = BlockTypes.SPOTLIGHT;
   }
   const ISpotlight_Record = Immutable.Record(new ISpotlight());
   export const _ISpotlight = (config?:any) => {
-    return new ISpotlight_Record(config || {}) as any as ISpotlight;
+    return new ISpotlight_Record(addId(config)) as any as ISpotlight;
   }
   recordFactories[BlockTypes.SPOTLIGHT] = _ISpotlight;
   
@@ -587,11 +609,11 @@ export module BuilderTypes
     
     set: (f: string, v: any) => IInput;
     setIn: (f: string, v: any) => IInput;
-    _recordClasstype = BlockTypes.INPUT;
+    _recordClassType = BlockTypes.INPUT;
   }
   let IInput_Record = Immutable.Record(new IInput());
   export const _IInput = (config?:any) => {
-    return new IInput_Record(config || { id: 'c-' + Math.random(), }) as any as IInput;
+    return new IInput_Record(addId(config)) as any as IInput;
   }
   recordFactories[BlockTypes.INPUT] = _IInput;
   
@@ -605,6 +627,9 @@ export module BuilderTypes
     inputs: List<IInput>;
     tql: string;
     mode: string;
+    version: boolean;
+    name: string;
+    lastEdited: string;
   }
   
   
@@ -612,15 +637,13 @@ export module BuilderTypes
   {
     if(Immutable.Map.isMap(value) && value.get('_recordClassType'))
     {
-      console.log('found something', value.get('_recordClassType'), value);
       value = value.map(recordFromJS);
       value = recordFactories[value.get('_recordClassType')](value);
     }
     else if(Immutable.Iterable.isIterable(value))
     {
-      console.log('found iterable', value);
       value = value.map(recordFromJS);
-    } else console.log('found nothing', value);
+    }
     
     return value;
   }
@@ -632,8 +655,6 @@ export module BuilderTypes
     cards = cards.map(recordFromJS);
     return cards as BuilderTypes.ICards;
   }
-  
-  
 }
 
 

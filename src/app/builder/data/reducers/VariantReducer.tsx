@@ -122,9 +122,42 @@ VariantReducer[ActionTypes.setVariantField] =
     state.setIn(['queries', action.payload.variantId, action.payload.field],
       action.payload.value
     );
+
+// TODO name of this file
   
 VariantReducer[ActionTypes.change] = 
   (state, action) =>
-    state.setIn(action.payload.keyPath.toJS(), action.payload.value);
+    state.setIn(action.payload.keyPath, action.payload.value);
+  
+VariantReducer[ActionTypes.create] = 
+  (state, action: {
+    payload: { keyPath: KeyPath, index: number, factoryType: string }
+  }) =>
+    state.updateIn(action.payload.keyPath, arr =>
+      arr.splice
+      (
+        action.payload.index === -1 ? arr.size : action.payload.index, 0, 
+        BuilderTypes.recordFactories[action.payload.factoryType]()
+      )
+    );
+    
+VariantReducer[ActionTypes.move] = 
+  (state, action: {
+    payload: { keyPath: KeyPath, index: number, newIndex; number }
+  }) =>
+    state.updateIn(action.payload.keyPath, arr =>
+    {
+      let {index, newIndex} = action.payload;
+      let el = arr.get(index);
+      arr = arr.splice(index, 1);
+      arr = arr.splice(newIndex, 0, el); // TODO potentially correct index
+      return arr;
+    })
 
+VariantReducer[ActionTypes.remove] = 
+  (state, action: {
+    payload: { keyPath: KeyPath, index: number, factoryType: string }
+  }) =>
+    state.removeIn(action.payload.keyPath.push(action.payload.index))
+  
 export default VariantReducer;

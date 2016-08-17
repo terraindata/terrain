@@ -47,6 +47,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+const {List} = Immutable;
 import ResultsView from './ResultsView.tsx';
 import Menu from './../../common/components/Menu.tsx';
 import { MenuOption } from '../../common/components/Menu.tsx';
@@ -212,28 +213,31 @@ class TQL extends Classs<Props>
     }
   }
 
-  getMenuOptions(): MenuOption[] 
+  getMenuOptions(): List<MenuOption> 
   {
-    var options: MenuOption[] =
-      [
+    var options: List<MenuOption> =
+      List([
         {
           text: 'Default',
           onClick: this.changeThemeDefault,
+          disabled: this.getThemeIndex() === 0,
         },
         {
           text: 'Neo',
           onClick: this.changeThemeNeo,
+          disabled: this.getThemeIndex() === 1,
         },
         {
           text: 'Cobalt',
           onClick: this.changeThemeCobalt,
+          disabled: this.getThemeIndex() === 2,
         },
         {
           text: 'Monokai',
           onClick: this.changeThemeMonokai,
+          disabled: this.getThemeIndex() === 3,
         },
-      ];
-    options[this.getThemeIndex()].disabled = true;
+      ]);
     return options;
   }
 
