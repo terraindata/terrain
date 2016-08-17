@@ -50,6 +50,9 @@ import { Link } from 'react-router';
 import * as classNames from 'classnames';
 import Autocomplete from './../../common/components/Autocomplete.tsx';
 import ManualEntry from './ManualEntry.tsx';
+import { DragDropContext } from 'react-dnd';
+var HTML5Backend = require('react-dnd-html5-backend');
+
 
 var CloseIcon = require('./../../../images/icon_close.svg');
 var SearchIcon = require('./../../../images/icon_search.svg');
@@ -97,6 +100,8 @@ class Manual extends Classs<Props>
             <div key ={index}>
               <ManualEntry
                 entryName={result}
+                canEdit={true}
+                spotlights={[]}
               />
             </div> 
           )
@@ -151,4 +156,4 @@ class Manual extends Classs<Props>
   }
 }
 
-export default Manual;
+export default DragDropContext(HTML5Backend)(Manual);

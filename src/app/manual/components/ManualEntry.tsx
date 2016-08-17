@@ -51,10 +51,15 @@ import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
 var ManualConfig = require('./../ManualConfig.json');
 var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
+import FromCard from './../../builder/components/cards/card-types/FromCard.tsx';
+import {BuilderTypes} from './../../builder/BuilderTypes.tsx';
+import Card from './../../builder/components/cards/Card.tsx';
 
 interface Props
 {
   entryName: string;
+  canEdit: boolean;
+  spotlights?: any[];
 }
 
 
@@ -77,10 +82,23 @@ class ManualEntry extends Classs<Props>
   }
 
   render() {
+    var card: BuilderTypes.IFromCard = {
+      cards: [],
+      group: '',
+      id: 'c-2735991550',
+      iterator: '',
+      joins: [],
+      parentId: 'CI2XI',
+      type: 'from',
+    }
+
     return (
       <div className ='manual-entry'> 
         <div className ='manual-entry-row'>
-          <div onClick={this.expand}>
+          <div 
+            onClick={this.expand}
+            className='manual-entry-expand'
+          >
           <ArrowIcon className = {classNames ({ 
             'manual-entry-arrow-icon': true,
             'manual-entry-arrow-icon-open': this.state.expanded,
@@ -97,6 +115,14 @@ class ManualEntry extends Classs<Props>
         <div className ='maunual-entry-indepth'>
           {this.state.expanded ? <div> {ManualConfig[0][this.props.entryName].InDepth} </div> : ''}
         </div>
+        <Card
+          {...this.props}
+          card={card}
+          index={0}
+          parentId='CI2XI'
+          singleCard={true}
+          keys={[]}
+         />
         <br />
         <br />
       </div>

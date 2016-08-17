@@ -137,9 +137,7 @@ class FromCard extends Classs<Props>
 		return (
       <div>
         <CardField
-          draggable={false}
           removable={false}
-          drag_y={true}
         >
           <div className='flex-container'>
             <div className='flex-card-field'>
