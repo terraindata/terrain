@@ -55,6 +55,7 @@ interface Props {
   card: BuilderTypes.ISelectCard;
   keys: string[];
   canEdit?: boolean;
+  demoEdit?: boolean;
 }
 
 class SelectCard extends Classs<Props>
@@ -67,17 +68,26 @@ class SelectCard extends Classs<Props>
   
   addField(index)
   {
-    Actions.cards.select.create(this.props.card, index + 1);
+    if(!this.props.demoEdit)
+    {
+      Actions.cards.select.create(this.props.card, index + 1);
+    }
   }
   
   removeField(index)
   {
-   	Actions.cards.select.remove(this.props.card, index);
+    if(!this.props.demoEdit)
+    {
+   	  Actions.cards.select.remove(this.props.card, index);
+    }
   }
   
   move(curIndex, newIndex)
   {
-    Actions.cards.select.move(this.props.card, this.props.card.properties[curIndex], newIndex);
+    if(!this.props.demoEdit)
+    {
+      Actions.cards.select.move(this.props.card, this.props.card.properties[curIndex], newIndex);
+    }
   }
   
   handleChange(value, event)
@@ -106,11 +116,11 @@ class SelectCard extends Classs<Props>
           content: (
             <CardField
     					onDelete={this.removeField}
-              draggable={this.props.canEdit}
-              removable={this.props.canEdit}
+              draggable={this.props.canEdit || this.props.demoEdit}
+              removable={this.props.canEdit || this.props.demoEdit}
               drag_y={true}
     					dragInsideOnly={true}
-              addable={this.props.canEdit}
+              addable={this.props.canEdit || this.props.demoEdit}
               onAdd={this.addField}
               >
               <BuilderTextbox

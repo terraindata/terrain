@@ -42,106 +42,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./ManualPopup.less');
+require('./ManualInfo.less');
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
-var InfoIcon = require('./../../../images/icon_info.svg');
-var Manual = require('./../ManualConfig.json');
-var OpenIcon = require('./../../../images/icon_open.svg');
 
 interface Props
 {
-  cardName: string;
-  history?: any;
+  information: string,
+  style: any,
 }
 
-class ModalPopup extends Classs<Props>
-{
-  constructor(props: Props) {
-    super(props);
-    this.state =
-    {
-      open: false,
-    }
-  }
-  
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  }
-  
-  close()
-  {
-    this.setState({
-      open: false,
-    })
-    $(document).off('click', this.close);
-  }
-  
-  componentWillUnmount()
-  {
-    $(document).off('click', this.close);
-  }
-  
-  toggleOpen()
-  {
-    this.setState({
-      open: !this.state.open,
-    });
-    
-    if(!this.state.open)
-    {
-      $(document).on('click', this.close);
-    }
-  }
 
-  openManual()
+class ManualEntry extends Classs<Props>
+{
+  constructor(props: Props) 
   {
-    var cardName = this.props.cardName;
-    this.props.history && this.props.history.pushState({cardName}, '/manual')
+    super(props);
+
   }
 
   render() {
     return (
-    <div 
-      className={classNames({
-        "manual-popup-wrapper": true,
-        "manual-popup-open": this.state.open,
-      })}
-    >
-      <div 
-        className="manual-popup-icon-wrapper"
-        onClick={this.toggleOpen}
-      >
-        <InfoIcon className="manual-popup-icon" />
-       </div>
-        { !this.state.open ? null :
-          <div 
-            className="manual-popup-content-wrapper"
-            onClick={this.toggleOpen}
-          >
-            {
-              Manual[0][this.props.cardName] ? Manual[0][this.props.cardName].Summary : "No description available"
-            }
-            <div 
-              className='manual-popup-link'
-              onClick={this.openManual}
-            >
-              See full description in Manual
-              <OpenIcon 
-                className='manual-popup-open-icon' 
-                onClick={this.openManual}
-              />
-            </div>
-          </div>
-        }
+      <div className='manual-info-wrapper' style={this.props.style}>
+        <div className='manual-info-indicator'></div>
+        <div className='manual-info-content'>
+          {this.props.information}  
+        </div>
       </div>
     );
   }
 };
 
-export default ModalPopup;
+export default ManualEntry;

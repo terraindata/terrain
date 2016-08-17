@@ -54,11 +54,13 @@ var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
 import FromCard from './../../builder/components/cards/card-types/FromCard.tsx';
 import {BuilderTypes} from './../../builder/BuilderTypes.tsx';
 import Card from './../../builder/components/cards/Card.tsx';
+import ManualInfo from './ManualInfo.tsx';
 
 interface Props
 {
   entryName: string;
   canEdit: boolean;
+  demoEdit: boolean;
   spotlights?: any[];
 }
 
@@ -82,14 +84,14 @@ class ManualEntry extends Classs<Props>
   }
 
   render() {
-    var card: BuilderTypes.IFromCard = {
-      cards: [],
-      group: '',
+    var card: BuilderTypes.ISelectCard = {
       id: 'c-2735991550',
-      iterator: '',
-      joins: [],
       parentId: 'CI2XI',
-      type: 'from',
+      properties: [{
+        id: "0.9",
+        property: 'person.name'
+      }],
+      type: 'select'
     }
 
     return (
@@ -112,17 +114,49 @@ class ManualEntry extends Classs<Props>
         <div className ='manual-entry-summary'>
           {ManualConfig[0][this.props.entryName].Summary}
         </div>
-        <div className ='maunual-entry-indepth'>
-          {this.state.expanded ? <div> {ManualConfig[0][this.props.entryName].InDepth} </div> : ''}
-        </div>
-        <Card
-          {...this.props}
-          card={card}
-          index={0}
-          parentId='CI2XI'
-          singleCard={true}
-          keys={[]}
-         />
+        {this.state.expanded ? 
+          <div className ='maunual-entry-indepth'>
+           {ManualConfig[0][this.props.entryName].InDepth}
+            {this.props.entryName === 'Select' ?
+              <div className='manual-entry-demo'>
+                <ManualInfo 
+                  information="Use this handle to change the order of fields by clicking and dragging."
+                  style={{ top: 'calc(50% + 25px)',
+                           left: 'calc(25% + 20px)'
+                        }}
+                />
+                <ManualInfo 
+                  information="Enter the attribute to select here."
+                  style={{ top: 'calc(50% + 9px)',
+                           left: 'calc(70% - 27px)'
+                        }}
+                />
+                 <ManualInfo 
+                  information="Use this button to add another field to select."
+                  style={{ top: 'calc(50% + 25px)',
+                           left: 'calc(75% - 45px)'
+                        }}
+                />
+                 <ManualInfo 
+                  information="Use this button to remove the selected field"
+                  style={{ top: 'calc(50% + 25px)',
+                           left: 'calc(75% - 24px)'
+                        }}
+                />
+                <Card
+                  {...this.props}
+                  card={card}
+                  index={0}
+                  parentId='CI2XI'
+                  singleCard={false}
+                  keys={[]}
+               /> 
+             </div>
+             : null
+           }
+          </div> 
+          : null
+         }
         <br />
         <br />
       </div>

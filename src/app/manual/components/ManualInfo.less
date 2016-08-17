@@ -1,0 +1,34 @@
+@import "../../common/Common.less";
+
+.manual-info-wrapper {
+	position: absolute;
+	z-index: 9;
+
+	.manual-info-indicator {
+		background-color: red;
+		height: 8px;
+		width: 8px;
+		border-radius: 50%;
+		cursor: pointer;
+		&:hover {
+			background-color: green;
+			+ .manual-info-content {
+				opacity: 1;
+			}
+		}
+	}
+	.manual-info-content {
+		height: auto;
+		width: 150px;
+		opacity: 0;
+		background-color: rgba(170, 170, 170, 0.85);
+		color: white;
+		position: absolute;
+		top: 8px;
+		left: 8px;
+		border-radius: 6px;
+		padding: 6px;
+		font-size: 12px;
+	}
+
+}
