@@ -91,11 +91,11 @@ class ManualEntry extends Classs<Props>
              {this.props.entryName}
           </div>
         </div>
-        <div>
+        <div className ='manual-entry-summary'>
           {ManualConfig[0][this.props.entryName].Summary}
         </div>
-        <div>
-          {this.state.expanded ? <div> <br /> <div> {ManualConfig[0][this.props.entryName].InDepth} </div> </div>: ''}
+        <div className ='maunual-entry-indepth'>
+          {this.state.expanded ? <div> {ManualConfig[0][this.props.entryName].InDepth} </div> : ''}
         </div>
         <br />
         <br />
