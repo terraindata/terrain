@@ -42,55 +42,66 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Manual.less');
+require('./ManualEntry.less');
+import * as $ from 'jquery';
+import * as _ from 'underscore';
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
-import { Link } from 'react-router';
+import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
-import ManualEntry from './ManualEntry.tsx';
-
-var SearchIcon = require("./../../../images/icon_search.svg");
+import Classs from './../../common/components/Classs.tsx';
 var ManualConfig = require('./../ManualConfig.json');
+var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
 
 interface Props
 {
-  location?: any;
-  children?: any;
+  entryName: string;
 }
 
-class Manual extends Classs<Props>
+
+class ManualEntry extends Classs<Props>
 {
-  renderManualEntries()
+  constructor(props: Props) 
   {
-    return (
-      <div>
-        {
-          Object.keys(ManualConfig[0]).map((result, index) =>
-            <div key ={index}>
-              <ManualEntry
-                entryName={result}
-              />
-            </div> 
-          )
-        }
-      </div>
-    );
+    super(props);
+    this.state =
+      {
+        expanded: false,
+      }
   }
 
-  render()
+  expand()
   {
+    this.setState({
+      expanded: !this.state.expanded
+    }); 
+  }
+
+  render() {
     return (
-      <div className ='manual-area'>
-        <div className='manual-topbar'>
-          <div className ='manual-white-space' />
-          <div className ='manual-search-title'> Search </div>
-          <SearchIcon className ='manual-search-icon'/>
-      	  <input className='manual-search-input' />
+      <div className ='manual-entry'> 
+        <div className ='manual-entry-row'>
+          <div onClick={this.expand}>
+          <ArrowIcon className = {classNames ({ 
+            'manual-entry-arrow-icon': true,
+            'manual-entry-arrow-icon-open': this.state.expanded,
+          })}
+           />
+           </div>
+          <div className ='manual-entry-name'>
+             {this.props.entryName}
+          </div>
         </div>
-        {this.renderManualEntries()}
+        <div>
+          {ManualConfig[0][this.props.entryName].Summary}
+        </div>
+        <div>
+          {this.state.expanded ? <div> <br /> <div> {ManualConfig[0][this.props.entryName].InDepth} </div> </div>: ''}
+        </div>
+        <br />
+        <br />
       </div>
     );
   }
-}
+};
 
-export default Manual;
+export default ManualEntry;
