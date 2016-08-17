@@ -100,7 +100,8 @@ class Manual extends Classs<Props>
             <div key ={index}>
               <ManualEntry
                 entryName={result}
-                canEdit={true}
+                canEdit={false}
+                demoEdit={true}
                 spotlights={[]}
               />
             </div> 
