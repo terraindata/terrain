@@ -106,7 +106,9 @@ class BuilderComponent extends PureClasss<Props>
     
     let keyPath = this._ikeyPath(parentKeyPath, d.key);
     let value = data.get(d.key);
-    var isNumber = null, typeErrorMessage = null;
+    var isNumber = false, typeErrorMessage = null;
+    var isTextbox = false;
+    var acceptsCards = false;
     let key = data.get('id') + ',' + d.key;
     
     var content;
@@ -116,22 +118,17 @@ class BuilderComponent extends PureClasss<Props>
       case DisplayType.NUM:
         isNumber = true;
         typeErrorMessage = "Must be a number";
-        // fall through
+        isTextbox = true;
+        break;
       case DisplayType.TEXT:
-        content = <BuilderTextbox
-          {...this.props}
-          key={key}
-          keyPath={keyPath}
-          isNumber={isNumber}
-          typeErrorMessage={typeErrorMessage}
-          value={value}
-          placeholder={d.placeholder || d.key}
-        />
+        isTextbox = true;
         break;
       // case DisplayType.CARDS:
       // break;
-      // case DisplayType.CARDTEXT:
-      // break;
+      case DisplayType.CARDTEXT:
+        isTextbox = true;
+        acceptsCards = true;
+      break;
       case DisplayType.DROPDOWN:
         content = <Dropdown
           {...this.props}
@@ -178,6 +175,24 @@ class BuilderComponent extends PureClasss<Props>
         content = (
           <div key={key}>Data type {DisplayType[d.displayType]} not implemented.</div>
         );
+    }
+    
+    if(isTextbox)
+    {
+      content = (
+        <BuilderTextbox
+          {...this.props}
+          placeholder={d.placeholder || d.key}
+          {...{
+            key,
+            keyPath,
+            value,
+            acceptsCards,
+            isNumber,
+            typeErrorMessage,
+          }}
+        />
+      );
     }
     
     if(!d.header)
