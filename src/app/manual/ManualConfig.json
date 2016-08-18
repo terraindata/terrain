@@ -5,9 +5,9 @@
       "Snippet": "Get data", 
       "Summary": "The select statement returns a result set of records from one or more tables.",
       "InDepth": "The SQL SELECT statement returns a result set of records from one or more tables. A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints.",
-      "Type": "N/A",
-      "Syntax": "N/A",
-      "Example": "N/A"
+      "Type": "prefix operator",
+      "Syntax": "select field name(s)",
+      "Example": "from 'users' as user select user.name"
     },
     "Take":
     { 
