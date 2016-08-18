@@ -89,7 +89,7 @@ class ManualEntry extends Classs<Props>
       parentId: 'CI2XI',
       properties: [{
         id: "0.9",
-        property: 'person.name'
+        property: 'user.name'
       }],
       type: 'select'
     }
@@ -138,25 +138,25 @@ class ManualEntry extends Classs<Props>
                 <div className='manual-entry-demo'>
                   <ManualInfo 
                     information="Use this handle to change the order of fields by clicking and dragging."
-                    style={{ top: 'calc(50% + 25px)',
+                    style={{ top: 'calc(30% + 25px)',
                              left: 'calc(25% + 20px)'
                           }}
                   />
-                   <ManualInfo 
+                  <ManualInfo 
                     information="Use this button to add another field to select."
-                    style={{ top: 'calc(50% + 25px)',
+                    style={{ top: 'calc(30% + 25px)',
                              left: 'calc(75% - 45px)'
                           }}
                   />
                    <ManualInfo 
                     information="Use this button to remove the selected field"
-                    style={{ top: 'calc(50% + 25px)',
+                    style={{ top: 'calc(30% + 25px)',
                              left: 'calc(75% - 24px)'
                           }}
                   />
                   <ManualInfo 
                     information="Enter the attribute to select here."
-                    style={{ top: 'calc(50% + 9px)',
+                    style={{ top: 'calc(30% + 9px)',
                              left: 'calc(70% - 27px)'
                           }}
                   />
@@ -168,7 +168,19 @@ class ManualEntry extends Classs<Props>
                     singleCard={false}
                     keys={[]}
                  /> 
-               </div>
+                   <div className='manual-entry-code'>
+                     <span className='manual-entry-code-no-style'> 1 </span>
+                     <span className='manual-entry-code-keyword'> from </span>
+                     <span className='manual-entry-code-string'> 'users' </span>
+                     <span className='manual-entry-code-keyword'> as </span>
+                     <span className='manual-entry-code-variable'> from </span>
+                     <br/>
+                     <span className='manual-entry-code-no-style'> 2 </span>
+                     <span className='manual-entry-code-keyword'> select </span>
+                     <span className='manual-entry-code-no-style'> user.</span>
+                     <span className='manual-entry-code-attr'>name </span>
+                   </div>
+                 </div>
              : null
            }
           </div> 
