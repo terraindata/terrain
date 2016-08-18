@@ -83,6 +83,30 @@ class Manual extends Classs<Props>
     }
   }
 
+  renderEntries()
+  {
+    if(this.state.visibleKeys.length === 0)
+    {
+      return (
+        <div className='manual-content-area'>
+          No results found.
+        </div>
+      );
+    }
+    return (
+      <div className='manual-content-area'>
+        {
+          this.state.visibleKeys.map((result, index) =>
+            <div key ={index}>
+              <div> {result} </div>
+              <br />
+            </div> 
+          )
+        }
+      </div>
+    );
+  }
+
   renderManualEntries()
   {
     if(this.state.visibleKeys.length === 0)
@@ -132,26 +156,31 @@ class Manual extends Classs<Props>
     var closeOpacity = this.state.value.length ? 1 : 0;
     return (
       <div className ='manual-area'>
-        <div className='manual-topbar'>
-          <div className='manual-search-bar'>
-            <SearchIcon className ='manual-search-icon'/>
-        	  <Autocomplete
-             className='manual-search-input'
-             value={this.state.value as string}
-             onChange={this.search}
-             placeholder='Search'
-             options={Object.keys(ManualConfig[0])}
-           />
-           <CloseIcon 
-             className='manual-close-icon'
-             style={{
-               opacity: closeOpacity,
-             }}
-             onClick={this.clearInput}
-            />
-         </div>
-        </div>
-        {this.renderManualEntries()}
+        <nav> 
+          <div className='manual-left-column'>
+            <div className='manual-search-bar'>
+              <SearchIcon className ='manual-search-icon'/>
+              <Autocomplete
+               className='manual-search-input'
+               value={this.state.value as string}
+               onChange={this.search}
+               placeholder='Search'
+               options={Object.keys(ManualConfig[0])}
+              />
+              <CloseIcon 
+               className='manual-close-icon'
+               style={{
+                 opacity: closeOpacity,
+               }}
+               onClick={this.clearInput}
+              />
+            </div>
+            {this.renderEntries()}
+          </div>
+        </nav>
+        <article>
+          {this.renderManualEntries()}
+        </article>
       </div>
     );
   }
