@@ -142,12 +142,6 @@ class ManualEntry extends Classs<Props>
                              left: 'calc(25% + 20px)'
                           }}
                   />
-                  <ManualInfo 
-                    information="Enter the attribute to select here."
-                    style={{ top: 'calc(50% + 9px)',
-                             left: 'calc(70% - 27px)'
-                          }}
-                  />
                    <ManualInfo 
                     information="Use this button to add another field to select."
                     style={{ top: 'calc(50% + 25px)',
@@ -158,6 +152,12 @@ class ManualEntry extends Classs<Props>
                     information="Use this button to remove the selected field"
                     style={{ top: 'calc(50% + 25px)',
                              left: 'calc(75% - 24px)'
+                          }}
+                  />
+                  <ManualInfo 
+                    information="Enter the attribute to select here."
+                    style={{ top: 'calc(50% + 9px)',
+                             left: 'calc(70% - 27px)'
                           }}
                   />
                   <Card
