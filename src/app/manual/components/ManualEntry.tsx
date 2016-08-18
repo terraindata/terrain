@@ -97,9 +97,6 @@ class ManualEntry extends Classs<Props>
         <div className ='manual-entry-row'>
           <b>Syntax:</b>&nbsp;{ManualConfig[0][this.props.entryName].Syntax}
         </div> 
-        <div className ='manual-entry-row'>
-          <b>Example:</b>&nbsp;{ManualConfig[0][this.props.entryName].Example}
-        </div> 
 
         <div className ='maunual-entry-indepth'>
           {ManualConfig[0][this.props.entryName].InDepth}
@@ -136,47 +133,38 @@ class ManualEntry extends Classs<Props>
   }
 
   renderCardExample() {
-    var card: BuilderTypes.ISelectCard = {
-      id: 'c-2735991550',
-      parentId: 'CI2XI',
-      properties: [{
-        id: "0.9",
-        property: 'user.name'
-      }],
-      type: 'select'
-    }
+        // <ManualInfo 
+        //   information="Use this handle to change the order of fields by clicking and dragging."
+        //   style={{ top: 'calc(50% + 25px)',
+        //            left: 'calc(25% + 20px)'
+        //   }}
+        // />
+     
+        // <ManualInfo 
+        //   information="Use this button to add another field to select."
+        //   style={{ top: 'calc(50% + 25px)',
+        //            left: 'calc(75% - 45px)'
+        //   }}
+        // />
+                  
+        // <ManualInfo 
+        //   information="Use this button to remove the selected field"
+        //   style={{ top: 'calc(50% + 25px)',
+        //            left: 'calc(75% - 24px)'
+        //         }}
+        // />
+                 
+        // <ManualInfo 
+        //   information="Enter the attribute to select here."
+        //   style={{ top: 'calc(50% + 9px)',
+        //            left: 'calc(70% - 27px)'
+        //         }}
+        // />
     return (
       <div className='manual-entry-demo'>
-        <ManualInfo 
-          information="Use this handle to change the order of fields by clicking and dragging."
-          style={{ top: 'calc(30% + 25px)',
-                   left: 'calc(25% + 20px)'
-          }}
-        />
-     
-        <ManualInfo 
-          information="Use this button to add another field to select."
-          style={{ top: 'calc(30% + 25px)',
-                   left: 'calc(75% - 45px)'
-          }}
-        />
-                  
-        <ManualInfo 
-          information="Use this button to remove the selected field"
-          style={{ top: 'calc(30% + 25px)',
-                   left: 'calc(75% - 24px)'
-                }}
-        />
-                 
-        <ManualInfo 
-          information="Enter the attribute to select here."
-          style={{ top: 'calc(30% + 9px)',
-                   left: 'calc(70% - 27px)'
-                }}
-        />
         <Card
           {...this.props}
-          card={card}
+          card={ManualConfig[0][this.props.entryName].Card}
           index={0}
           parentId='CI2XI'
           singleCard={false}
@@ -187,7 +175,22 @@ class ManualEntry extends Classs<Props>
   }
 
   renderCodeMirrorExample() {
-    return null;
+    var options = {
+      readOnly: true,
+      lineNumbers: true,
+      mode: 'tql',
+      theme: 'monokai',
+      foldGutter: true,
+      gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+    }
+    var value = ManualConfig[0][this.props.entryName].Example;
+    return (
+      <CodeMirror 
+        options={options}
+        value={value}
+        className='manual-entry-codemirror'
+      />
+    );
   }
 
   render() {
@@ -195,8 +198,8 @@ class ManualEntry extends Classs<Props>
       <div className ='manual-entry'> 
         {this.renderEntry()}
         {this.state.expanded ? this.renderEntryDetail() : null }
-        {this.props.entryName === 'Select' && this.state.expanded ? this.renderCardExample() : null}
-        {this.props.entryName === 'Select' && this.state.expanded ? this.renderCodeMirrorExample() : null}
+        {this.state.expanded ? this.renderCardExample() : null}
+        {this.state.expanded ? this.renderCodeMirrorExample() : null}
         <br />
         <br />
       </div>
