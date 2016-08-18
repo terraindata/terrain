@@ -83,22 +83,14 @@ class Manual extends Classs<Props>
     }
   }
 
-  renderEntries()
+  renderEntriesList()
   {
-    if(this.state.visibleKeys.length === 0)
-    {
-      return (
-        <div className='manual-content-area'>
-          No results found.
-        </div>
-      );
-    }
     return (
       <div className='manual-content-area'>
         {
-          this.state.visibleKeys.map((result, index) =>
+          Object.keys(ManualConfig[0]).map((result, index) =>
             <div key ={index}>
-              <div> {result} </div>
+              <div className='manual-left-column-entry'onClick={this.search.bind(this, result)}> {result} </div>
               <br />
             </div> 
           )
@@ -156,9 +148,8 @@ class Manual extends Classs<Props>
     var closeOpacity = this.state.value.length ? 1 : 0;
     return (
       <div className ='manual-area'>
-        <nav> 
-          <div className='manual-left-column'>
-            <div className='manual-search-bar'>
+        <div className ='manual-topbar'>
+          <div className='manual-search-bar'>
               <SearchIcon className ='manual-search-icon'/>
               <Autocomplete
                className='manual-search-input'
@@ -175,12 +166,13 @@ class Manual extends Classs<Props>
                onClick={this.clearInput}
               />
             </div>
-            {this.renderEntries()}
-          </div>
-        </nav>
-        <article>
+        </header>
+        <div className='manual-left-column'>
+          {this.renderEntriesList()}
+        </div>
+        <div className='manual-right-column'>
           {this.renderManualEntries()}
-        </article>
+        </div>
       </div>
     );
   }

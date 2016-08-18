@@ -35,12 +35,14 @@
 .manual-search-bar {
 	display: inline-flex;
 	position: absolute;
+	right: 6px;
 }
 
 .manual-content-area {
 	position: absolute;
 	top: 30px; 
 	margin-right: 10px;
+	padding-top: 20px;
 }
 
 .manual-close-icon {
@@ -54,17 +56,35 @@
 	opacity: 0;
 }
 
-nav {
+.manual-left-column {
     float: left;
-    width: 220px;
-    margin: 0;
+    width: 120px;
     padding: 1em;
-    border-right: 1px solid black;
     height: 100%;
+    float: left;
+    margin: 0;
+    border-right: 1px black solid;
+    margin-top:-20px;
 }
 
-article {
-    margin-left: 170px;
+
+.manual-left-column-entry {
+	cursor: pointer;
+	&:hover {
+		color: blue;
+	}
+}
+
+
+.manual-right-column {
+    margin-left: 120px;
     padding: 1em;
     overflow: hidden;
 }
+
+.manual-topbar{
+    padding: 1em;
+    clear: left;
+    text-align: center;
+}
+
