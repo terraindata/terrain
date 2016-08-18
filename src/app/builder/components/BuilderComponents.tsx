@@ -68,7 +68,7 @@ export interface Display
   key: string;
   
   header?: string;
-  options?: (string | Ref | El)[];
+  options?: List<(string | El)>;
   label?: string;
   placeholder?: string;
   
@@ -136,7 +136,7 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
       displayType: ROWS,
       key: 'filters',
       english: 'condition',
-      factoryType: BlockTypes.CONDITION,
+      factoryType: BlockTypes.FILTER,
       row: [
         {
           displayType: CARDTEXT,
@@ -145,7 +145,7 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
         {
           displayType: DROPDOWN,
           key: 'operator',
-          options: ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>],
+          options: Immutable.List(['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>]),
         },
         {
           displayType: CARDTEXT,

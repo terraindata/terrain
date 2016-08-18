@@ -6,14 +6,16 @@
 .dropdown-wrapper {
  background: @white;
  height: @option-height;
- overflow: hidden;
  border-radius: @border-radius;
  box-sizing: border-box;
  z-index: 0;
- box-shadow: 0px 0px 4px 1px #999999;
  transition: height 0.15s;
- .dropdown-value {
-  // transition: all 0.15s;
+ .transition;
+ 
+ border: 1px solid #fff;
+ &:hover:not(.dropdown-disabled),
+ &.dropdown-open {
+  border-color: #aaa;
  }
  
  &.dropdown-disabled {
@@ -28,44 +30,37 @@
   display: none;
  }
  
- &.dropdown-up.dropdown-open {
-   -webkit-transform: translateY(calc(~"-100% + 29px")); // 2px greater than option-height
-   transform: translateY(calc(~"-100% + 29px")); // 2px greater than option-height
- }
-  
   .dropdown-value {
     position: absolute;
     z-index: 999;
     top: 0;
   }
   
- 
- &:hover:not(.dropdown-disabled),
- &.dropdown-open {
-  border: 1px solid @light-gray;
-  margin-top: -1px;
- }
- 
  &.dropdown-open {
   position: relative;
-  z-index: 1000;
-  height: auto;
+  z-index: 99999;
   
   
   .dropdown-options-wrapper {
     display: block;
-    position: relative;
+    position: absolute;
     max-height: 250px;
     overflow-y: auto;
+    background: #ffffff;
+    border-radius: 6px;
+    padding-bottom: 6px;
+    box-shadow: 0px 0px 4px 1px #999999;
+  }
+  
+  &:not(.dropdown-up) {
+    .dropdown-options-wrapper {
+      top: @option-height;
+    }
   }
   
   &.dropdown-up {
-    padding-top: 0px;
-    
-    .dropdown-value {
-      bottom: 0;
-      top: auto;
-      display: none;
+    .dropdown-options-wrapper {
+      bottom: @option-height;
     }
   }
  }
@@ -77,10 +72,17 @@
     position: relative;
     margin: 0px 6px;
     transition: all 0.05s;
-    background: @white;
     border-radius: @border-radius;
   }
-
+  .dropdown-value {
+    .dropdown-option-inner {
+      padding-top: 3px;
+    }
+  }
+  .dropdown-option {
+    background: @white;
+  }
+  
   .dropdown-option {     
     &:hover {
       background: #d1efe7;
@@ -92,11 +94,6 @@
   }
  
  .dropdown-option-inner {
-    position: absolute;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-    transform: translateY(-50%);
-    //left: 50%;   
-    margin-top: -1px;
+    padding-top: 5px;
  }
 }

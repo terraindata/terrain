@@ -160,9 +160,9 @@ class TQLConverter
       sorts: (sort, index) => join(", ", index) + "$property " + (sort.direction ? 'desc' : 'asc'),
     filter: "($filters)",
       filters: (filter, index, isLast) =>
-        TQLConverter._parse("$first ", filter.condition)
-        + OperatorsTQL[filter.condition.operator] + " "
-        + TQLConverter._parse("$second", filter.condition)
+        "$first "
+        + OperatorsTQL[filter.operator] + " " +
+        "$second"
         + (isLast ? "" : " " + CombinatorsTQL[filter.combinator] + " "),
     
     let: "let $field = $expression",

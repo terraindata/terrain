@@ -54,11 +54,10 @@ import PureClasss from './../../common/components/PureClasss.tsx';
 
 interface Props
 {
-  options: List<string | JSX.Element>;
+  options: List<string | El>;
   selectedIndex: number;
-  onChange?: (index: number, event?: any) => void;
-  id?: string;
-  keyPath?: KeyPath;
+  keyPath?: KeyPath; // TODO required?
+  onChange?: (index: number, event?: any) => void; // TODO remove?
   values?: List<any>; // maps indices to values, otherwise index will be used as the value
   canEdit?: boolean;
 
@@ -87,7 +86,7 @@ class Dropdown extends PureClasss<Props>
       this._clickHandlers[index] = () =>
       {
         var pr = this.props;
-        if(pr.id && pr.keyPath)
+        if(pr.keyPath)
         {
           Actions.change(pr.keyPath, pr.values ? pr.values[index] : index);
         }
@@ -161,31 +160,27 @@ class Dropdown extends PureClasss<Props>
       "dropdown-disabled": !this.props.canEdit,
     });
     
+    let optionsEl = (
+      <div className="dropdown-options-wrapper">
+        {
+          this.props.options.map(this.renderOption)
+        }
+      </div>
+    );
+    
     return (
       <div className={classes} rel={this.props.rel}>
-        { this.state.up && this.state.open ? (
-          <div className="dropdown-options-wrapper">
-            {
-              this.props.options.map(this.renderOption)
-            }
-          </div>
-        ) : null }
+        { this.state.up && this.state.open ? optionsEl : null }
         <div
           className="dropdown-value"
           ref="value"
           onClick={this.toggleOpen}
         >
           <div className="dropdown-option-inner">
-            { this.props.options[this.props.selectedIndex] }
+            { this.props.options.get(this.props.selectedIndex) }
           </div>
         </div>
-        { !this.state.up && this.state.open ? (
-          <div className="dropdown-options-wrapper">
-            {
-              this.props.options.map(this.renderOption)
-            }
-          </div>
-        ) : null }
+        { !this.state.up && this.state.open ? optionsEl : null }
       </div>
     );
   }

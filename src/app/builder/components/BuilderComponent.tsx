@@ -51,6 +51,7 @@ import BuilderTextbox from '../../common/components/BuilderTextbox.tsx';
 import BuilderTypes from '../BuilderTypes.tsx';
 import BuilderActions from '../data/BuilderActions.tsx';
 import CardField from './cards/CardField.tsx';
+import Dropdown from '../../common/components/Dropdown.tsx';
 
 interface Props
 {
@@ -74,12 +75,12 @@ class BuilderComponent extends PureClasss<Props>
     });
   }
   
-  renderDisplay(displayArg: Display | Display[], parentKeyPath: KeyPath, data: Map<any, any>): El
+  renderDisplay(displayArg: Display | Display[], parentKeyPath: KeyPath, data: Map<any, any>): (El | El[])
   {
     let keySeed = parentKeyPath.join(",");
     if(Array.isArray(displayArg))
     {
-      return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data));
+      return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
       // return (
       //   <div key={keySeed + "-list"}>
       //     {
@@ -119,27 +120,30 @@ class BuilderComponent extends PureClasss<Props>
       case DisplayType.TEXT:
         content = <BuilderTextbox
           {...this.props}
+          key={key}
+          keyPath={keyPath}
           isNumber={isNumber}
           typeErrorMessage={typeErrorMessage}
-          keyPath={keyPath}
           value={value}
-          key={key}
           placeholder={d.placeholder || d.key}
         />
-        if(!d.header)
-        {
-          return content;
-        }
         break;
       // case DisplayType.CARDS:
       // break;
       // case DisplayType.CARDTEXT:
       // break;
-      // case DisplayType.DROPDOWN:
-      // break;
+      case DisplayType.DROPDOWN:
+        content = <Dropdown
+          {...this.props}
+          key={key}
+          keyPath={keyPath}
+          options={d.options}
+          selectedIndex={value}
+        />;
+      break;
       case DisplayType.ROWS:
         content = (
-          <div>
+          <div key={key}>
             {
               value.map((v, i) => (
                 <CardField
@@ -172,8 +176,13 @@ class BuilderComponent extends PureClasss<Props>
         break;
       default:
         content = (
-          <div>Data type {DisplayType[d.displayType]} not implemented.</div>
+          <div key={key}>Data type {DisplayType[d.displayType]} not implemented.</div>
         );
+    }
+    
+    if(!d.header)
+    {
+      return content;
     }
     
     return (
@@ -214,7 +223,7 @@ class BuilderComponent extends PureClasss<Props>
         display,
         this.props.keyPath,
         this.props.data
-      );
+      ) as El;
     }
   }
 }

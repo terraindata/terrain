@@ -81,7 +81,7 @@ export module BuilderTypes
   
   export const BlockTypes =
   {
-    CONDITION: 'conditionblock',
+    // CONDITION: 'conditionblock',
     SORT: 'sortblock',
     FILTER: 'filterblock',
     TABLE: 'tableblock',
@@ -126,21 +126,21 @@ export module BuilderTypes
   
   export var recordFactories: {[key: string]: (obj?:any) => any} = {};
   
-  export class ICondition extends IId
-  {
-    first: string = "";
-    second: string = "";
-    operator: Operator = Operator.EQ;
+  // export class ICondition extends IId
+  // {
+  //   first: string = "";
+  //   second: string = "";
+  //   operator: Operator = Operator.EQ;
     
-    set: (f: string, v: any) => ICondition;
-    setIn: (f: string, v: any) => ICondition;
-		_recordClassType = BlockTypes.CONDITION;
-  }
-  let ICondition_Record = Immutable.Record(new ICondition());
-  export const _ICondition = (config?:any) => {
-    return new ICondition_Record(addId(config)) as any as ICondition;
-  }
-  recordFactories[BlockTypes.CONDITION] = _ICondition;
+  //   set: (f: string, v: any) => ICondition;
+  //   setIn: (f: string, v: any) => ICondition;
+		// _recordClassType = BlockTypes.CONDITION;
+  // }
+  // let ICondition_Record = Immutable.Record(new ICondition());
+  // export const _ICondition = (config?:any) => {
+  //   return new ICondition_Record(addId(config)) as any as ICondition;
+  // }
+  // recordFactories[BlockTypes.CONDITION] = _ICondition;
   
   export class ISort extends IId
   {
@@ -159,8 +159,10 @@ export module BuilderTypes
   
   export class IFilter extends IId
   {
+    first: string = "";
+    second: string = "";
+    operator: Operator = Operator.EQ;
     combinator: Combinator = Combinator.AND;
-    condition: ICondition = _ICondition();
     
     set: (f: string, v: any) => IFilter;
     setIn: (f: string, v: any) => IFilter;
