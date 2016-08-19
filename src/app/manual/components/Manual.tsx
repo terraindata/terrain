@@ -79,19 +79,37 @@ class Manual extends Classs<Props>
     });
     this.state = {
       visibleKeys: keys,
-      value
+      value,
+      selectedKey: '',
     }
   }
 
+
+  //manual-entry-left-selected 
+
+    // <div className={classNames({
+    //       'browser-column-content': true,
+    //       'browser-column-content-no-title': !this.props.title,
+    //     })}>
   renderEntriesList()
   {
+    
     return (
       <div className='manual-content-area'>
         {
           Object.keys(ManualConfig[0]).map((result, index) =>
             <div key ={index}>
-              <div className='manual-left-column-entry'onClick={this.search.bind(this, result)}> {result} </div>
+              <div 
+                className={classNames({
+                  'manual-left-column-entry': true,
+                  'manual-entry-left-selected': this.state.selectedKey === result,
+                })}
+                onClick={this.search.bind(this, result)}
+              > 
+                {result} 
+              </div>
               <br />
+           
             </div> 
           )
         }
@@ -132,10 +150,20 @@ class Manual extends Classs<Props>
     var visibleKeys = Object.keys(ManualConfig[0]).filter((key) => {
       return (key.toLowerCase().indexOf(value.toLowerCase()) >= 0);
     });
+
+
+    var selectedKey = '';
+    Object.keys(ManualConfig[0]).forEach(function(key, index) {
+        if (value.toLowerCase() === key.toLowerCase())
+        {
+          selectedKey = key;
+        }
+    });
     this.setState({
       visibleKeys,
       value,
-    })
+      selectedKey,
+    });
   }
 
   clearInput()
@@ -166,7 +194,7 @@ class Manual extends Classs<Props>
                onClick={this.clearInput}
               />
             </div>
-        </header>
+        </div>
         <div className='manual-left-column'>
           {this.renderEntriesList()}
         </div>
