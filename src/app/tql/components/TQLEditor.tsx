@@ -241,7 +241,6 @@ class TQL extends Classs<Props>
   highlightError(lineNumber: number) 
   {
     this.state.highlightedLine = lineNumber - 1; //-1 because they should be 0-indexed
-    //This is a workaround for the missing property syntax error
     var x: any = this.refs['cm'];
     if (x) 
     {
@@ -348,6 +347,11 @@ class TQL extends Classs<Props>
     );
   }
 
+  openManual()
+  {
+    this.props.history.pushState({}, '/manual');
+  }
+
   renderTqlEditor() 
   {
     var options =
@@ -371,6 +375,7 @@ class TQL extends Classs<Props>
       options={options}
       className='codemirror-text'
       value={value}
+      openManual={this.openManual}
       />
   }
 

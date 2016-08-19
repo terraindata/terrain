@@ -60,6 +60,7 @@ var CodeMirror = React.createClass({
 		value: React.PropTypes.string,
 		className: React.PropTypes.any,
 		codeMirrorInstance: React.PropTypes.object,
+		openManual: React.PropTypes.func
 	},
 	foldClass: {
 		open: "CodeMirror-foldgutter-open",
@@ -99,6 +100,14 @@ var CodeMirror = React.createClass({
 		{
 			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
 		}
+		var widget = this.makeWidget("X");
+		var self = this;
+		var codeMirrorInstance = this.getCodeMirrorInstance();
+		//Onclick functions to unfold the code
+		codeMirrorInstance.on(widget, "mousedown", function(e) {
+      		self.props.openManual();
+   		});
+
 	},
 	undoHighlightedLine: function undoHighlightedLine(line) 
 	{
