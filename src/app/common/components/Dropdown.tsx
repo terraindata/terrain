@@ -60,10 +60,7 @@ interface Props
   onChange?: (index: number, event?: any) => void; // TODO remove?
   values?: List<any>; // maps indices to values, otherwise index will be used as the value
   canEdit?: boolean;
-
-  ref?: string;
-  rel?: string;
-  circle?: boolean;
+  className?: string;
 }
 
 class Dropdown extends PureClasss<Props>
@@ -104,14 +101,12 @@ class Dropdown extends PureClasss<Props>
   
   renderOption(option, index)
   {
-    if(index === this.props.selectedIndex)
-    {
-      return null;
-    }
-    
     return (
       <div
-        className="dropdown-option"
+        className={classNames({
+          "dropdown-option": true,
+          "dropdown-option-selected": index === this.props.selectedIndex,
+        })}
         key={index} 
         onClick={this.clickHandler(index)}
       >
@@ -154,11 +149,14 @@ class Dropdown extends PureClasss<Props>
   render() {
     var classes = classNames({
       "dropdown-wrapper": true,
-      "dropdown-wrapper-circle": this.props.circle,
       "dropdown-up": this.state.up,
       "dropdown-open": this.state.open,
       "dropdown-disabled": !this.props.canEdit,
     });
+    if(this.props.className)
+    {
+      classes += " " + this.props.className;
+    }
     
     let optionsEl = (
       <div className="dropdown-options-wrapper">
@@ -169,16 +167,30 @@ class Dropdown extends PureClasss<Props>
     );
     
     return (
-      <div className={classes} rel={this.props.rel}>
+      <div
+        className={classes}
+      >
         { this.state.up && this.state.open ? optionsEl : null }
         <div
           className="dropdown-value"
           ref="value"
           onClick={this.toggleOpen}
         >
-          <div className="dropdown-option-inner">
-            { this.props.options.get(this.props.selectedIndex) }
-          </div>
+          {
+            // map through all of the options so that the dropdown takes the width of the longest one
+            //  CSS hides all but the selected option
+            this.props.options.map((option, index) => (
+              <div
+                key={index}
+                className={classNames({
+                  "dropdown-option-inner": true,
+                  "dropdown-option-value-selected": index === this.props.selectedIndex,
+                })}
+              >
+                { option }
+              </div>
+            ))
+          }
         </div>
         { !this.state.up && this.state.open ? optionsEl : null }
       </div>

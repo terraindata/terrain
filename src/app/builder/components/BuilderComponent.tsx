@@ -52,6 +52,7 @@ import BuilderTypes from '../BuilderTypes.tsx';
 import BuilderActions from '../data/BuilderActions.tsx';
 import CardField from './cards/CardField.tsx';
 import Dropdown from '../../common/components/Dropdown.tsx';
+import CardsArea from './cards/CardsArea.tsx';
 
 interface Props
 {
@@ -91,6 +92,18 @@ class BuilderComponent extends PureClasss<Props>
     }
     
     const d = displayArg as Display;
+    var className = '';
+    if(d.className)
+    {
+      if(typeof d.className === 'function')
+      {
+        className = (d.className as (d:any)=>string)(data);
+      }
+      else
+      {
+        className = d.className as string;
+      }
+    }
     
     if(d.displayType === DisplayType.LABEL)
     {
@@ -123,8 +136,15 @@ class BuilderComponent extends PureClasss<Props>
       case DisplayType.TEXT:
         isTextbox = true;
         break;
-      // case DisplayType.CARDS:
-      // break;
+      case DisplayType.CARDS:
+        content = <CardsArea 
+          {...this.props}
+          key={key}
+          cards={value} 
+          keyPath={keyPath}
+          topLevel={false}
+        />;
+      break;
       case DisplayType.CARDTEXT:
         isTextbox = true;
         acceptsCards = true;
@@ -132,6 +152,7 @@ class BuilderComponent extends PureClasss<Props>
       case DisplayType.DROPDOWN:
         content = <Dropdown
           {...this.props}
+          className={className}
           key={key}
           keyPath={keyPath}
           options={d.options}
@@ -140,7 +161,10 @@ class BuilderComponent extends PureClasss<Props>
       break;
       case DisplayType.ROWS:
         content = (
-          <div key={key}>
+          <div
+            key={key}
+            className={'card-fields ' + className}
+          >
             {
               value.map((v, i) => (
                 <CardField
@@ -190,6 +214,7 @@ class BuilderComponent extends PureClasss<Props>
             acceptsCards,
             isNumber,
             typeErrorMessage,
+            className,
           }}
         />
       );

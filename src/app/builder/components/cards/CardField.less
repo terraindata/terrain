@@ -5,8 +5,7 @@
   margin: 0px -1 * @standard-margin;
   position: relative;
   text-align: center;
-  min-height: 30px;
-  // height: 30px;
+  // min-height: 30px;
   .transition;
   
   .card-field-inner {
@@ -36,6 +35,17 @@
     &:hover {
       border-color: rgba(255,255,255,0.5);
       background: rgba(255,255,255,0.1);
+    }
+  }
+  
+  &.card-field-moving {
+    .card-field-tools-left,
+    .card-field-tools-right {
+      border-color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.1);
+      .card-field-handle {
+        color: #333;
+      }
     }
   }
   

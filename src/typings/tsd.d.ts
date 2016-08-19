@@ -67,6 +67,8 @@ declare interface IHaveKeyPath
 declare type El = JSX.Element;
 declare type Ref = React.Component<any, any> | Element;
 
+declare type MEvent = React.MouseEvent;
+
 declare type ID = string;
 declare interface IId
 {

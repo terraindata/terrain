@@ -3,3 +3,22 @@
   position: relative;
   top: 4px;
 }
+
+.filters-single {
+  .combinator {
+    display: none;
+  }
+  .filters-multiple {
+    .combinator {
+      display: inherit;
+    }
+  }
+}
+
+.filters-multiple {
+  .card-field-wrapper:last-child {
+    .combinator {
+      opacity: 0;
+    }
+  }
+}

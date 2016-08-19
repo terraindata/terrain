@@ -43,11 +43,12 @@ THE SOFTWARE.
 */
 
 require('./CardField.less');
+import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
-const shallowCompare = require('react-addons-shallow-compare');
+import PureClasss from '../../../common/components/PureClasss.tsx';
+const classNames = require('classnames');
 
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 var RemoveIcon = require("./../../../../images/icon_close_8x8.svg?name=RemoveIcon");
@@ -55,74 +56,99 @@ var RemoveIcon = require("./../../../../images/icon_close_8x8.svg?name=RemoveIco
 var FIELD_HEIGHT = 32;
 var STANDARD_MARGIN = 6;
 
-var CardField = React.createClass({
-	mixins: [PanelMixin], // TODO kill it
+interface Props
+{
+  index: number;
+  onAdd: (index: number) => void;
+  onRemove: (index: number) => void;
 
-	propTypes:
-	{
-    index: React.PropTypes.number.isRequired,
-    onAdd: React.PropTypes.func.isRequired,
-    onRemove: React.PropTypes.func.isRequired,
-    // addable: React.PropTypes.bool,
-    // removable: React.PropTypes.bool,
-    // draggable: React.PropTypes.bool,
-    // height: React.PropTypes.number,
-    rightContent: React.PropTypes.node,
-    aboveContent: React.PropTypes.node,
-    belowContent: React.PropTypes.node,
-	},
-
-	getDefaultProps():any 
-	{
-		return {
-			drag_x: false,
-			drag_y: false,
-			dragInsideOnly: true,
-			reorderOnDrag: true,
-			handleRef: 'handle',
-		};
-	},
+  leftContent?: El;
+  rightContent?: El;
+  aboveContent?: El;
+  belowContent?: El;
   
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return shallowCompare(this, nextProps, nextState);
-  },
+  children?: El;
+}
 
+class CardField extends PureClasss<Props>
+{
+  state: {
+    moving: boolean;
+    originalMouseY: number;
+    dY: number;
+    minDY: number;
+    maxDY: number;
+  } = {
+    moving: false,
+    originalMouseY: 0,
+    dY: 0,
+    minDY: 0,
+    maxDY: 0,
+  };
+  
 	removeField(event)
 	{
-		// if(typeof this.props.onRemove === 'function')
-		// {
-      Util.animateToHeight(this.refs.panel, 0, () =>
-			  this.props.onRemove(this.props.index));
-		// }
-	},
+    Util.animateToHeight(this.refs['all'], 0, () =>
+		  this.props.onRemove(this.props.index));
+	}
   
   addField(event)
   {
-    // if(this.props.addable)
-    // {
-      this.props.onAdd(this.props.index);
-    // }
-  },
-
-	render() {
-		var leftContent;
-		var rightContent;
-		// if(this.props.draggable)
-		// {
-			leftContent = (
-				<div className='card-field-handle' ref='handle'>⋮⋮</div>
-			);
-		// }
-    // else 
-    if(this.props.leftContent)
-    {
-      leftContent = this.props.leftContent;
-    }
+    this.props.onAdd(this.props.index);
+  }
+  
+  handleHandleMousedown(event:MEvent)
+  {
+    $('body').on('mousemove', this.handleMouseMove);
+    $('body').on('mouseup', this.handleMouseUp);
+    $('body').on('mouseleave', this.handleMouseUp);
     
-          // this.props.addable &&
-          // this.props.removable && 
-    rightContent = (
+    let cr = this.refs['all']['getBoundingClientRect']();
+    let parentCr = Util.parentNode(this.refs['all'])['getBoundingClientRect']();
+    
+    let minDY = parentCr.top - cr.top;
+    let maxDY = parentCr.bottom - cr.bottom;
+    
+    this.setState({
+      moving: true,
+      originalMouseY: event.pageY,
+      dY: 0,
+      minDY,
+      maxDY,
+    });
+  }
+  
+  handleMouseMove(evt)
+  {
+    this.setState({
+      dY: Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY),
+    });
+  }
+  
+  handleMouseUp(evt)
+  {
+    $('body').off('mousemove', this.handleMouseMove);
+    $('body').off('mouseup', this.handleMouseUp);
+    $('body').off('mouseleave', this.handleMouseUp);
+    
+    this.setState({
+      moving: false,
+      dY: 0,
+    });
+  }
+
+	render()
+  {
+		var leftContent = this.props.leftContent || (
+      <div
+        className='card-field-handle'
+        onMouseDown={this.handleHandleMousedown}
+      >
+        ⋮⋮
+      </div>
+    );
+    
+    var rightContent = this.props.rightContent || (
       <div>
         { 
           <div
@@ -144,23 +170,25 @@ var CardField = React.createClass({
         }
       </div>
 		);
-    
-    if(this.props.rightContent)
-    {
-      rightContent = this.props.rightContent;
-    }
 
-          // style={{ minHeight: this.props.height }}
-    return this.renderPanel((
-      <div>
+    return (
+      <div
+        ref='all'
+        className='card-field-wrapper'
+        style={!this.state.moving ? null : {
+          top: this.state.dY,
+          position: 'relative',
+          zIndex: 999999,
+        }}
+      >
         { this.props.aboveContent ? this.props.aboveContent: null }
-        <div className={Util.objToClassname({
+        <div
+          className={classNames({
             'card-field': true,
-            // 'card-field-no-left': this.props.noLeft,
-            // TODO remove objtoclassname
+            'card-field-moving': this.state.moving,
           })}
           ref='cardField'
-          >
+        >
   				<div className='card-field-tools-left'>
             <div className='card-field-tools-left-inner'>
               { leftContent }
@@ -177,8 +205,8 @@ var CardField = React.createClass({
   			</div>
         { this.props.belowContent ? this.props.belowContent : null }
       </div>
-			), 'card-field-panel-wrapper');
-	},
-});
+	  );
+	}
+}
 
 export default CardField;

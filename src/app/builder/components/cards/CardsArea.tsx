@@ -110,9 +110,11 @@ class CardsArea extends PureClasss<Props>
   
   computeKeyPath(props:Props): KeyPath
   {
+    // TODO make this bettar
     if(props.keyPath)
     {
-      return this._ikeyPath(props.keyPath, 'cards');
+      return props.keyPath;
+      // return this._ikeyPath(props.keyPath, 'cards');
     }
     if(props.queryId && props.topLevel)
     {

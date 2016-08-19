@@ -663,7 +663,6 @@ export module BuilderTypes
 
 export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
-
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
 
 // TODO delete if unneeded

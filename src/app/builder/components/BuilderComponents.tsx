@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import BuilderTypes from './../BuilderTypes.tsx';
+import {BuilderTypes, Directions, Combinators, Operators} from './../BuilderTypes.tsx';
 let {CardTypes, BlockTypes} = BuilderTypes;
 
 export enum DisplayType
@@ -71,6 +71,7 @@ export interface Display
   options?: List<(string | El)>;
   label?: string;
   placeholder?: string;
+  className?: string | ((data: any) => string);
   
   // for rows:
   row?: Display | Display[];
@@ -114,7 +115,7 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
       key: 'tables',
       english: 'table',
       factoryType: BlockTypes.TABLE,
-      row: [
+      row: [  
         {
           displayType: TEXT,
           key: 'table',
@@ -137,6 +138,7 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
       key: 'filters',
       english: 'condition',
       factoryType: BlockTypes.FILTER,
+      className: (data => data.filters.size > 1 ? 'filters-multiple' : 'filters-single'),
       row: [
         {
           displayType: CARDTEXT,
@@ -145,11 +147,17 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
         {
           displayType: DROPDOWN,
           key: 'operator',
-          options: Immutable.List(['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>]),
+          options: Immutable.List(Operators),
         },
         {
           displayType: CARDTEXT,
           key: 'second',
+        },
+        {
+          displayType: DROPDOWN,
+          key: 'combinator',
+          options: Immutable.List(Combinators),
+          className: 'combinator',
         }
       ],
     },

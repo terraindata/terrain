@@ -43,14 +43,12 @@ THE SOFTWARE.
 */
 
 require('./CreateCardTool.less')
-var shallowCompare = require('react-addons-shallow-compare');
 import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../data/BuilderActions.tsx";
 import Util from '../../../util/Util.tsx';
 import { BuilderTypes, CardColors } from './../../BuilderTypes.tsx';
 let {CardTypes} = BuilderTypes;
-import CreateLine from "../../../common/components/CreateLine.tsx";
 import { DragSource, DropTarget } from 'react-dnd';
 import PureClasss from '../../../common/components/PureClasss.tsx';
 
@@ -89,11 +87,6 @@ class CreateCardTool extends PureClasss<Props>
     Util.bind(this, 'createCard');
   }
   
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  }
-  
   createCard(event)
   {
     if(this.props.open && this.props.onMinimize)
@@ -102,7 +95,9 @@ class CreateCardTool extends PureClasss<Props>
     }
     
     var type = Util.rel(event.target);
-    Actions.cards.create(this.props.keyPath, type, this.props.index);
+    console.log(type);
+    console.log(this.props.keyPath);
+    Actions.create(this.props.keyPath, this.props.index, type);
   }
   
   // componentWillReceiveProps(newProps)

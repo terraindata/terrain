@@ -5,7 +5,7 @@
 
 .builder-tb {
   position: relative;
-  min-height: @input-height;
+  // min-height: @input-height;
   
   &.builder-tb-accepts-cards {
     input, textarea {
@@ -37,9 +37,10 @@
     display: block;
     top: 0px;
     right: 0px;
-    height: @input-height;
+    height: @input-height - 2px;
     width: @switch-width;
-    padding-top: 5px;
+    padding-top: 4px;
+    padding-right: 4px;
     color: rgba(0,0,0,1);
     box-sizing: border-box;
     border-top-right-radius: 5px;
