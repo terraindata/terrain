@@ -101,11 +101,17 @@ class ModalPopup extends Classs<Props>
 
   openManual()
   {
-    var cardName = this.props.cardName;
-    this.props.history && this.props.history.pushState({cardName}, '/manual')
+    var cardName = this.props.cardName === 'General' ? {} : {cardName: this.props.cardName};
+    this.props.history && this.props.history.pushState(cardName, '/manual')
   }
 
   render() {
+    var content = Manual[0][this.props.cardName] ? Manual[0][this.props.cardName].Summary : "No description available"
+    if(this.props.cardName === 'General')
+    {
+      content = 'For more information about how to use Terrain Query Language (TQL), see the manual.';
+    }
+
     return (
     <div 
       className={classNames({
@@ -124,9 +130,7 @@ class ModalPopup extends Classs<Props>
             className="manual-popup-content-wrapper"
             onClick={this.toggleOpen}
           >
-            {
-              Manual[0][this.props.cardName] ? Manual[0][this.props.cardName].Summary : "No description available"
-            }
+            {content}
             <div 
               className='manual-popup-link'
               onClick={this.openManual}

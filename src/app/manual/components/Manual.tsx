@@ -166,7 +166,7 @@ class Manual extends Classs<Props>
                onClick={this.clearInput}
               />
             </div>
-        </header>
+        </div>
         <div className='manual-left-column'>
           {this.renderEntriesList()}
         </div>

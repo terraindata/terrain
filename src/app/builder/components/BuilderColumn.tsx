@@ -183,7 +183,6 @@ var BuilderColumn = React.createClass<any, any>(
   {
     var algorithm = this.props.algorithm;
     var parentId = algorithm.id;
-    console.log(algorithm.cards);
     switch(this.state.column)
     {
       case COLUMNS.Builder:
@@ -229,6 +228,7 @@ var BuilderColumn = React.createClass<any, any>(
       
       case COLUMNS.TQL:
         return <TQLEditor
+          history={this.props.history}
           algorithm={algorithm}
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}

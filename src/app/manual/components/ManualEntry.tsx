@@ -188,7 +188,6 @@ class ManualEntry extends Classs<Props>
       <CodeMirror 
         options={options}
         value={value}
-        className='manual-entry-codemirror'
       />
     );
   }
@@ -198,8 +197,15 @@ class ManualEntry extends Classs<Props>
       <div className ='manual-entry'> 
         {this.renderEntry()}
         {this.state.expanded ? this.renderEntryDetail() : null }
-        {this.state.expanded ? this.renderCardExample() : null}
-        {this.state.expanded ? this.renderCodeMirrorExample() : null}
+        {this.state.expanded ? 
+          <div className='manual-entry-demo-box'>
+            {this.renderCardExample()}
+            <div className='manual-entry-codemirror'>
+            {this.renderCodeMirrorExample()}
+            </div>
+          </div>
+          : null
+        }
         <br />
         <br />
       </div>

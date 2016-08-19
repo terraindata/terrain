@@ -82,6 +82,8 @@ import 'codemirror/addon/search/matchesonscrollbar.js';
 import 'codemirror/addon/search/jump-to-line.js';
 import 'codemirror/addon/search/matchesonscrollbar.css';
 
+import ManualPopup from './../../manual/components/ManualPopup.tsx';
+
 interface Props {
   params?: any;
   history?: any;
@@ -309,6 +311,7 @@ class TQL extends Classs<Props>
         return 'monokai-topbar';
       case 'cobalt':
         return 'cobalt-topbar';
+
       case 'neo':
         return 'neo-topbar';
       default:
@@ -334,6 +337,12 @@ class TQL extends Classs<Props>
           }
         </div>
         <div className='white-space' />
+        <div className='tql-editor-manual-popup'>
+          <ManualPopup 
+            cardName='General' 
+            history={this.props.history}
+          />
+        </div>
         <Menu options={this.getMenuOptions() } small={true}/>
       </div>
     );
