@@ -61,6 +61,7 @@ interface Props
   index: number;
   onAdd: (index: number) => void;
   onRemove: (index: number) => void;
+  onMove: (index: number, newIndex: number) => void;
 
   leftContent?: El;
   rightContent?: El;
@@ -70,21 +71,35 @@ interface Props
   children?: El;
 }
 
+interface IMoveState
+{
+  moving: boolean;
+  originalMouseY?: number;
+  originalElTop?: number;
+  elHeight?: number;
+  dY?: number;
+  minDY?: number;
+  maxDY?: number;
+  midpoints?: number[];
+  tops?: number[];
+  movedTo?: number;
+}
+
+const DefaultMoveState =
+{
+  moving: false,
+  movedTo: null,
+}
+
+// TODO consider adding state to the template
 class CardField extends PureClasss<Props>
 {
-  state: {
-    moving: boolean;
-    originalMouseY: number;
-    dY: number;
-    minDY: number;
-    maxDY: number;
-  } = {
-    moving: false,
-    originalMouseY: 0,
-    dY: 0,
-    minDY: 0,
-    maxDY: 0,
-  };
+  state: IMoveState = DefaultMoveState;
+  
+  ss(state: IMoveState)
+  {
+    this.setState(state);
+  }
   
 	removeField(event)
 	{
@@ -103,26 +118,128 @@ class CardField extends PureClasss<Props>
     $('body').on('mouseup', this.handleMouseUp);
     $('body').on('mouseleave', this.handleMouseUp);
     
+    let parent = Util.parentNode(this.refs['all']);
+    
     let cr = this.refs['all']['getBoundingClientRect']();
-    let parentCr = Util.parentNode(this.refs['all'])['getBoundingClientRect']();
+    let parentCr = parent['getBoundingClientRect']();
     
     let minDY = parentCr.top - cr.top;
     let maxDY = parentCr.bottom - cr.bottom;
     
+    let siblings = Util.siblings(this.refs['all']);
+    let midpoints = [];
+    let tops = [];
+    _.range(0, siblings.length).map(i =>
+    {
+      let sibCr = siblings[i]['getBoundingClientRect']();
+      midpoints.push((sibCr.top + sibCr.bottom) / 2 - (i > this.props.index ? cr.height /**/ : 0));
+      tops.push(sibCr.top);
+    });
+    
     this.setState({
       moving: true,
       originalMouseY: event.pageY,
+      originalElTop: cr.top,
+      elHeight: cr.height,
       dY: 0,
       minDY,
       maxDY,
+      midpoints,
+      tops,
+    } as IMoveState);
+  }
+  
+  shiftSiblings(evt, shiftSelf:boolean): ({ dY: number, index: number })
+  {
+    let dY = Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY);
+  
+    // TODO search from the bottom up if dragging downwards  
+    for
+    (
+      var index = 0;
+      this.state.midpoints[index] < this.state.originalElTop + dY;
+      index ++
+    );
+  
+    if(evt.pageY > this.state.originalMouseY)
+    {
+      index += 1;
+    }
+  
+  console.log(index, this.state.midpoints, this.state.originalElTop + dY);
+  
+    let sibs = Util.siblings(this.refs['all']);
+    _.range(0, sibs.length).map(i =>
+    {
+      let el = sibs[i];
+      if(i === this.props.index)
+      {
+        $(el).removeClass('card-field-wrapper-moving');
+        return;
+      }
+      
+      var shift = 0;
+      if(index < this.props.index)
+      {
+        // move things down
+        if(i < this.props.index && i >= index)
+        {
+          shift = 1;
+        }
+      }
+      else
+      {
+        // move up
+        if(i > this.props.index && i <= index)
+        {
+          shift = -1;
+        }
+      }
+      
+      el['style'].top = shift * this.state.elHeight;
+      $(el).addClass('card-field-wrapper-moving');
     });
+    
+    return { dY, index };
   }
   
   handleMouseMove(evt)
   {
     this.setState({
-      dY: Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY),
+      dY: this.shiftSiblings(evt, false).dY,
     });
+  }
+  
+  move()
+  {
+    if(this.props.index !== this.state.movedTo)
+    {
+      this.props.onMove(this.props.index, this.state.movedTo);
+    }
+    else
+    {
+      this.setState({
+        movedTo: null,
+        moving: false,
+      });
+    }
+    
+    $('.card-field-wrapper-moving').removeClass('card-field-wrapper-moving');
+  }
+  
+  componentWillReceiveProps(nextProps: Props)
+  {
+    if(nextProps.index !== this.props.index)
+    {
+      this.setState({
+        movedTo: null,
+        moving: false,
+      });
+      let sibs = Util.siblings(this.refs['all']);
+      _.range(0, sibs.length).map(i =>
+        sibs[i]['style'].top = 0
+      );
+    }
   }
   
   handleMouseUp(evt)
@@ -131,9 +248,12 @@ class CardField extends PureClasss<Props>
     $('body').off('mouseup', this.handleMouseUp);
     $('body').off('mouseleave', this.handleMouseUp);
     
+    let {index} = this.shiftSiblings(evt, true);
+    
+    setTimeout(this.move, 150);
+    
     this.setState({
-      moving: false,
-      dY: 0,
+      movedTo: index,
     });
   }
 
@@ -170,16 +290,30 @@ class CardField extends PureClasss<Props>
         }
       </div>
 		);
+    
+    var style = null;
+    if(this.state.movedTo !== null)
+    {
+      style = {
+        top: this.state.tops[this.state.movedTo] - this.state.originalElTop,
+      };
+    }
+    else if(this.state.moving)
+    {
+      style = {
+        top: this.state.dY,
+        zIndex: 99999,
+      };
+    }
 
     return (
       <div
         ref='all'
-        className='card-field-wrapper'
-        style={!this.state.moving ? null : {
-          top: this.state.dY,
-          position: 'relative',
-          zIndex: 999999,
-        }}
+        className={classNames({
+          'card-field-wrapper': true,
+          'card-field-wrapper-moving': this.state.movedTo !== null,
+        })}
+        style={style}
       >
         { this.props.aboveContent ? this.props.aboveContent: null }
         <div

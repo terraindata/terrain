@@ -75,6 +75,13 @@ class BuilderComponent extends PureClasss<Props>
       BuilderActions.remove(keyPath, index);
     });
   }
+  _moveRow(keyPath: KeyPath)
+  {
+    return this._fn('moveRow', keyPath,
+      (index: number, newIndex: number) =>
+        BuilderActions.move(keyPath, index, newIndex)
+    );
+  }
   
   renderDisplay(displayArg: Display | Display[], parentKeyPath: KeyPath, data: Map<any, any>): (El | El[])
   {
@@ -171,6 +178,7 @@ class BuilderComponent extends PureClasss<Props>
                   index={i}
                   onAdd={this._addRow(keyPath, i + 1, d)}
                   onRemove={this._removeRow(keyPath, i, d)}
+                  onMove={this._moveRow(keyPath)}
                   key={key + ',' + v.get('id')}
                 >
                   {

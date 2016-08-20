@@ -356,6 +356,11 @@ var Util = {
 	{
 		return ReactDOM.findDOMNode(reactNode).parentNode;
 	},
+  
+  siblings(reactNode): NodeList
+  {
+    return Util.parentNode(reactNode).childNodes;
+  },
 
 	valueMinMax(value: number, min: number, max: number)
 	{
