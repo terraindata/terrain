@@ -71,6 +71,7 @@ import 'codemirror/addon/edit/matchbrackets.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/fold/foldgutter.css';
+import 'codemirror/addon/lint/lint.js';
 
 //Searching for code-mirror
 import 'codemirror/addon/dialog/dialog.js';
@@ -365,7 +366,8 @@ class TQL extends Classs<Props>
         matchBrackets: true,
         autoCloseBrackets: true,
         foldGutter: true,
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+        lint: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
       };
     var value = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm);
     return <CodeMirror
