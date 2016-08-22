@@ -120,7 +120,7 @@ class ManualEntry extends Classs<Props>
           />
         </div>
 
-        <div className ='manual-entry-name'>
+        <div className ='manual-entry-name' onClick={this.expand} >
           {this.props.entryName}
         </div>
       </div>
