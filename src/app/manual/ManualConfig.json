@@ -40,7 +40,7 @@
       "InDepth": "The SQL From clause is the source of a rowset to be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.",
       "Type": "unary prefix operator",
       "Syntax": "from source definition",
-      "Example": "from 'users' as use\nfilter user.id == 0",
+      "Example": "from 'users' as user\nfilter user.id == 0",
       "Card": {
         "cards": [],
         "id": "c-2735991550",

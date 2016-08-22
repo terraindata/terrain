@@ -55,6 +55,7 @@ import FromCard from './../../builder/components/cards/card-types/FromCard.tsx';
 import {BuilderTypes} from './../../builder/BuilderTypes.tsx';
 import Card from './../../builder/components/cards/Card.tsx';
 import ManualInfo from './ManualInfo.tsx';
+
 var CodeMirror = require('./../../tql/components/Codemirror.js');
 require('./../../tql/components/tql.js');
 import './../../tql/components/codemirror.less';
@@ -65,7 +66,9 @@ interface Props
   entryName: string;
   canEdit: boolean;
   demoEdit: boolean;
+  openTerm: (any) => void;
   spotlights?: any[];
+  history?: any;
 }
 
 
@@ -87,8 +90,32 @@ class ManualEntry extends Classs<Props>
     }); 
   }
 
+  renderInDepth(text)
+  {
+    var words = text.split(' ');
+    var keywords = Object.keys(ManualConfig[0]).map((word) => word.toUpperCase());
+    return (
+      <div>
+      {words.map((word, index) => 
+        {
+        var term = word;
+        if(word !== word.toLowerCase())
+        {
+          term = word.toUpperCase().replace(',', '').replace('.', '');
+        }
+        return keywords.indexOf(term) >= 0 ? 
+          <span key={index} className='manual-entry-keyword' onClick={this.props.openTerm} >{word + ' '} </span> : 
+          word + ' '
+        }
+      )}
+      </div>
+    );
+
+  }
+
   renderEntryDetail() 
   {
+
     return (
       <div className='manual-entry-expanded-area'>
         <div className ='manual-entry-row'>
@@ -118,6 +145,7 @@ class ManualEntry extends Classs<Props>
             })}
           />
         </div>
+
 
         <div className ='manual-entry-name' onClick={this.expand} >
           {this.props.entryName}
@@ -201,7 +229,7 @@ class ManualEntry extends Classs<Props>
               return (
                 <div key ={index}>
                 {
-                  ManualConfig[0][this.props.entryName].Text[index]
+                  this.renderInDepth(ManualConfig[0][this.props.entryName].Text[index])
                 }
                 </div> 
                 );

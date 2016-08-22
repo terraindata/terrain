@@ -253,6 +253,10 @@ var Card = React.createClass({
     }
   },
   
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps);
+  },
+
   componentDidUpdate()
   {
     if(this.props.dndListener)

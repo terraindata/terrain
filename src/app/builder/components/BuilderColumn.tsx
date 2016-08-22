@@ -73,8 +73,8 @@ var InputsIcon = require("./../../../images/icon_input.svg");
 
 enum COLUMNS {
   Builder,
-  Results,
   TQL,
+  Results,
   Inputs,
 };
 var NUM_COLUMNS = 4;

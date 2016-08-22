@@ -47,7 +47,6 @@ THE SOFTWARE.
 
 var React = require('react');
 var className = require('classnames');
-//var debounce = require('lodash.debounce');
 
 var CodeMirror = React.createClass({
 	displayName: 'CodeMirror',
@@ -89,12 +88,16 @@ var CodeMirror = React.createClass({
 	},
 	componentWillUnmount: function componentWillUnmount() 
 	{
+		var tooltip = document.getElementsByClassName('tooltip')[0];
+		if(tooltip)
+		{
+			tooltip.className = '__react_component_tooltip place-bottom type-dark tooltip';
+		}
+
 		if (this.codeMirror) 
 		{
 			this.codeMirror.toTextArea();
 		}
-		this.codeMirror.on('focus', null);
-		this.codeMirror.on('blur', null);
 	},
 	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
 	{
@@ -103,14 +106,21 @@ var CodeMirror = React.createClass({
 			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
 		}
 		var widget = document.createElement("span");
-		var content = document.createTextNode("X ");
-		widget.appendChild(content);
-
+		var text = document.createElement("div");
+		var content = document.createTextNode("?");
+		widget.appendChild(text);
+		text.appendChild(content);
+		widget.className = 'CodeMirror-error-marker';
+		text.className = 'CodeMirror-error-text';
+		var a = document.createAttribute('data-tip');
+		a.value = 'For more information, open manual';
+		widget.setAttributeNode(a);
 		var self = this;
 		var codeMirrorInstance = this.getCodeMirrorInstance();
 		//Onclick functions to unfold the code
+		var line = this.codeMirror.getLine(lineToHighlight)
 		codeMirrorInstance.on(widget, "mousedown", function(e) {
-      		self.props.openManual();
+      		self.props.openManual(line);
    		});
 		this.codeMirror.setGutterMarker(lineToHighlight, "CodeMirror-lint-markers", widget);
 	},
@@ -119,6 +129,7 @@ var CodeMirror = React.createClass({
 		if(line != null) 
 		{
 			this.codeMirror.removeLineClass(line, 'wrap', 'cm-error');
+		this.codeMirror.clearGutter('CodeMirror-lint-markers');
 		}
 	},
 	addOpenBrace: function addOpenBrace(i, ch, arr) 
@@ -311,10 +322,13 @@ var CodeMirror = React.createClass({
 	},
 	focusChanged: function focusChanged(focused) 
 	{
-		this.setState({
-			isFocused: focused
-		});
-		this.props.onFocusChange && this.props.onFocusChange(focused);
+		if(window.location.pathname.indexOf('builder') >= 0)
+		{
+			this.setState({
+				isFocused: focused
+			});
+			this.props.onFocusChange && this.props.onFocusChange(focused);
+		}
 	},
 	codemirrorValueChanged: function codemirrorValueChanged(doc, change) 
 	{
