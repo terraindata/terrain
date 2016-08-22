@@ -49,7 +49,7 @@ import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
-var ManualConfig = require('./../ManualConfig.json');
+var ManualConfig = require('./../ManualConfig2.json');
 var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
 import FromCard from './../../builder/components/cards/card-types/FromCard.tsx';
 import {BuilderTypes} from './../../builder/BuilderTypes.tsx';
@@ -97,9 +97,8 @@ class ManualEntry extends Classs<Props>
         <div className ='manual-entry-row'>
           <b>Syntax:</b>&nbsp;{ManualConfig[0][this.props.entryName].Syntax}
         </div> 
-
         <div className ='maunual-entry-indepth'>
-          {ManualConfig[0][this.props.entryName].InDepth}
+          {this.renderInDepthDescription()}
         </div>
       </div>
         );
@@ -132,7 +131,7 @@ class ManualEntry extends Classs<Props>
     );
   }
 
-  renderCardExample() {
+  renderCardExample(index) {
         // <ManualInfo 
         //   information="Use this handle to change the order of fields by clicking and dragging."
         //   style={{ top: 'calc(50% + 25px)',
@@ -164,7 +163,7 @@ class ManualEntry extends Classs<Props>
       <div className='manual-entry-demo'>
         <Card
           {...this.props}
-          card={ManualConfig[0][this.props.entryName].Card}
+          card={ManualConfig[0][this.props.entryName].Text[index][0]}
           index={0}
           parentId='CI2XI'
           singleCard={false}
@@ -174,7 +173,7 @@ class ManualEntry extends Classs<Props>
     );
   }
 
-  renderCodeMirrorExample() {
+  renderCodeMirrorExample(index) {
     var options = {
       readOnly: true,
       lineNumbers: true,
@@ -183,7 +182,7 @@ class ManualEntry extends Classs<Props>
       foldGutter: true,
       gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
     }
-    var value = ManualConfig[0][this.props.entryName].Example;
+    var value = ManualConfig[0][this.props.entryName].Text[index][1];
     return (
       <CodeMirror 
         options={options}
@@ -192,20 +191,42 @@ class ManualEntry extends Classs<Props>
     );
   }
 
+  renderInDepthDescription()
+  {
+    return (
+        <div> 
+        {
+          Object.keys(ManualConfig[0][this.props.entryName].Text).map((result, index) => {
+            if (typeof ManualConfig[0][this.props.entryName].Text[index] === 'string'){
+              return (
+                <div key ={index}>
+                {
+                  ManualConfig[0][this.props.entryName].Text[index]
+                }
+                </div> 
+                );
+            }
+            else {
+              return (
+                 <div key ={index} className='manual-entry-demo-box'>
+                   {this.renderCardExample(index)}
+                   <div className='manual-entry-codemirror'>
+                     {this.renderCodeMirrorExample(index)}
+                   </div>
+                 </div>
+              );
+            }
+          })
+        } 
+        </div>
+    );
+  }
+
   render() {
     return (
       <div className ='manual-entry'> 
         {this.renderEntry()}
         {this.state.expanded ? this.renderEntryDetail() : null }
-        {this.state.expanded ? 
-          <div className='manual-entry-demo-box'>
-            {this.renderCardExample()}
-            <div className='manual-entry-codemirror'>
-            {this.renderCodeMirrorExample()}
-            </div>
-          </div>
-          : null
-        }
         <br />
         <br />
       </div>
