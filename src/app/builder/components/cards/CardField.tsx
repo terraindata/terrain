@@ -62,6 +62,8 @@ interface Props
   onAdd: (index: number) => void;
   onRemove: (index: number) => void;
   onMove: (index: number, newIndex: number) => void;
+  
+  isSingle?: boolean;
 
   leftContent?: El;
   rightContent?: El;
@@ -76,6 +78,7 @@ interface IMoveState
   moving: boolean;
   originalMouseY?: number;
   originalElTop?: number;
+  originalElBottom?: number;
   elHeight?: number;
   dY?: number;
   minDY?: number;
@@ -132,7 +135,7 @@ class CardField extends PureClasss<Props>
     _.range(0, siblings.length).map(i =>
     {
       let sibCr = siblings[i]['getBoundingClientRect']();
-      midpoints.push((sibCr.top + sibCr.bottom) / 2 - (i > this.props.index ? cr.height /**/ : 0));
+      midpoints.push((sibCr.top + sibCr.bottom) / 2); // - (i > this.props.index ? cr.height /**/ : 0));
       tops.push(sibCr.top);
     });
     
@@ -140,6 +143,7 @@ class CardField extends PureClasss<Props>
       moving: true,
       originalMouseY: event.pageY,
       originalElTop: cr.top,
+      originalElBottom: cr.bottom,
       elHeight: cr.height,
       dY: 0,
       minDY,
@@ -154,19 +158,25 @@ class CardField extends PureClasss<Props>
     let dY = Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY);
   
     // TODO search from the bottom up if dragging downwards  
-    for
-    (
-      var index = 0;
-      this.state.midpoints[index] < this.state.originalElTop + dY;
-      index ++
-    );
-  
-    if(evt.pageY > this.state.originalMouseY)
+    if(dY < 0)
     {
-      index += 1;
+      // if dragged up, search from top down
+      for
+      (
+        var index = 0;
+        this.state.midpoints[index] < this.state.originalElTop + dY;
+        index ++
+      );
     }
-  
-  console.log(index, this.state.midpoints, this.state.originalElTop + dY);
+    else
+    {
+      for
+      (
+        var index = this.state.midpoints.length - 1;
+        this.state.midpoints[index] > this.state.originalElBottom + dY;
+        index --
+      );
+    }
   
     let sibs = Util.siblings(this.refs['all']);
     _.range(0, sibs.length).map(i =>
@@ -320,6 +330,8 @@ class CardField extends PureClasss<Props>
           className={classNames({
             'card-field': true,
             'card-field-moving': this.state.moving,
+            'card-field-single': this.props.isSingle && !this.props.leftContent,
+            // ^ hides the left drag handle if single
           })}
           ref='cardField'
         >

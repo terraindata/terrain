@@ -180,6 +180,7 @@ class BuilderComponent extends PureClasss<Props>
                   onRemove={this._removeRow(keyPath, i, d)}
                   onMove={this._moveRow(keyPath)}
                   key={key + ',' + v.get('id')}
+                  isSingle={value.size === 1}
                 >
                   {
                     this.renderDisplay(
