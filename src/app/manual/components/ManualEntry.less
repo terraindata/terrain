@@ -73,6 +73,12 @@
 		width: calc(~"100% - 12px");
 		left: 6px;
 		height: 100%;
+		.CodeMirror-vscrollbar {
+			overflow-y: hidden;
+		}
+		.cm-s-monokai {
+			height: 100% !important;
+		}
 	}
 }
 
@@ -91,6 +97,7 @@
 .manual-entry-demo {
 	position: relative;
 	width: 100%;
+
 	.card-add-card-btn {
 		visibility: hidden;
 	}
