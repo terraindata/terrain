@@ -253,8 +253,16 @@ var Card = React.createClass({
     }
   },
   
-  componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
+  componentWillReceiveProps(nextProps:any) {
+      this.setState({
+        titleStyle: {
+        background: CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][0] : CardColors['none'][0],
+      },
+      bodyStyle: {
+        background: CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][1] : CardColors['none'][1],
+        borderColor: CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][0] : CardColors['none'][0],
+      },
+      })
   },
 
   componentDidUpdate()

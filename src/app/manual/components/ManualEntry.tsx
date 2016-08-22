@@ -90,7 +90,7 @@ class ManualEntry extends Classs<Props>
     }); 
   }
 
-  renderInDepth(text)
+  highlightKeyWords(text)
   {
     var words = text.split(' ');
     var keywords = Object.keys(ManualConfig[0]).map((word) => word.toUpperCase());
@@ -153,7 +153,7 @@ class ManualEntry extends Classs<Props>
       </div>
 
       <div className ='manual-entry-summary'>
-        {ManualConfig[0][this.props.entryName].Summary}
+        {this.highlightKeyWords(ManualConfig[0][this.props.entryName].Summary)}
       </div>
     </div>    
     );
@@ -229,16 +229,20 @@ class ManualEntry extends Classs<Props>
               return (
                 <div key ={index}>
                 {
-                  this.renderInDepth(ManualConfig[0][this.props.entryName].Text[index])
+                  this.highlightKeyWords(ManualConfig[0][this.props.entryName].Text[index])
                 }
                 </div> 
                 );
             }
             else {
+              var numLines = ManualConfig[0][this.props.entryName].Text[index][1].split('\n').length;
               return (
                  <div key ={index} className='manual-entry-demo-box'>
                    {this.renderCardExample(index)}
-                   <div className='manual-entry-codemirror'>
+                   <div 
+                     className='manual-entry-codemirror'
+                     style={{height: (numLines * 30) + 'px'}}
+                   >
                      {this.renderCodeMirrorExample(index)}
                    </div>
                  </div>

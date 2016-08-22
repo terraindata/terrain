@@ -60,7 +60,7 @@ var CodeMirror = React.createClass({
 		className: React.PropTypes.any,
 		codeMirrorInstance: React.PropTypes.object,
 		openManual: React.PropTypes.func
-	},
+			},
 	foldClass: {
 		open: "CodeMirror-foldgutter-open",
 		folded: "CodeMirror-foldgutter-folded",
