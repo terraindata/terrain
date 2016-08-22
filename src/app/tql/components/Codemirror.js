@@ -60,6 +60,7 @@ var CodeMirror = React.createClass({
 		value: React.PropTypes.string,
 		className: React.PropTypes.any,
 		codeMirrorInstance: React.PropTypes.object,
+		openManual: React.PropTypes.func
 	},
 	foldClass: {
 		open: "CodeMirror-foldgutter-open",
@@ -92,6 +93,8 @@ var CodeMirror = React.createClass({
 		{
 			this.codeMirror.toTextArea();
 		}
+		this.codeMirror.on('focus', null);
+		this.codeMirror.on('blur', null);
 	},
 	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
 	{
@@ -99,6 +102,17 @@ var CodeMirror = React.createClass({
 		{
 			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
 		}
+		var widget = document.createElement("span");
+		var content = document.createTextNode("X ");
+		widget.appendChild(content);
+
+		var self = this;
+		var codeMirrorInstance = this.getCodeMirrorInstance();
+		//Onclick functions to unfold the code
+		codeMirrorInstance.on(widget, "mousedown", function(e) {
+      		self.props.openManual();
+   		});
+		this.codeMirror.setGutterMarker(lineToHighlight, "CodeMirror-lint-markers", widget);
 	},
 	undoHighlightedLine: function undoHighlightedLine(line) 
 	{
@@ -290,7 +304,7 @@ var CodeMirror = React.createClass({
 	},
 	focus: function focus()
 	 {
-		if (this.codeMirror) 
+	 if (this.codeMirror) 
 		{
 			this.codeMirror.focus();
 		}

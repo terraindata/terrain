@@ -71,6 +71,7 @@ import 'codemirror/addon/edit/matchbrackets.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/fold/foldgutter.css';
+import 'codemirror/addon/lint/lint.js';
 
 //Searching for code-mirror
 import 'codemirror/addon/dialog/dialog.js';
@@ -81,6 +82,8 @@ import 'codemirror/addon/scroll/annotatescrollbar.js';
 import 'codemirror/addon/search/matchesonscrollbar.js';
 import 'codemirror/addon/search/jump-to-line.js';
 import 'codemirror/addon/search/matchesonscrollbar.css';
+
+import ManualPopup from './../../manual/components/ManualPopup.tsx';
 
 interface Props {
   params?: any;
@@ -239,7 +242,6 @@ class TQL extends Classs<Props>
   highlightError(lineNumber: number) 
   {
     this.state.highlightedLine = lineNumber - 1; //-1 because they should be 0-indexed
-    //This is a workaround for the missing property syntax error
     var x: any = this.refs['cm'];
     if (x) 
     {
@@ -309,6 +311,7 @@ class TQL extends Classs<Props>
         return 'monokai-topbar';
       case 'cobalt':
         return 'cobalt-topbar';
+
       case 'neo':
         return 'neo-topbar';
       default:
@@ -334,9 +337,20 @@ class TQL extends Classs<Props>
           }
         </div>
         <div className='white-space' />
+        <div className='tql-editor-manual-popup'>
+          <ManualPopup 
+            cardName='General' 
+            history={this.props.history}
+          />
+        </div>
         <Menu options={this.getMenuOptions() } small={true}/>
       </div>
     );
+  }
+
+  openManual()
+  {
+    this.props.history.pushState({}, '/manual');
   }
 
   renderTqlEditor() 
@@ -352,7 +366,8 @@ class TQL extends Classs<Props>
         matchBrackets: true,
         autoCloseBrackets: true,
         foldGutter: true,
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+        lint: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
       };
     var value = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm);
     return <CodeMirror
@@ -362,6 +377,7 @@ class TQL extends Classs<Props>
       options={options}
       className='codemirror-text'
       value={value}
+      openManual={this.openManual}
       />
   }
 
