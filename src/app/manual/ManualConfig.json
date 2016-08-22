@@ -4,119 +4,154 @@
     { 
       "Snippet": "Get data", 
       "Summary": "The Select statement returns a result set of records from one or more tables.",
-      "InDepth": "The SQL SELECT statement returns a result set of records from one or more tables. A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints.",
       "Type": "prefix operator",
       "Syntax": "select field name(s)",
-      "Example": "from 'users' as user\nselect user.name",
-      "Card": {
-        "id": "c-2735991550",
-        "parentId": "CI2XI",
-        "properties": [{
-          "id": "0.9",
-          "property": "user.name"
-        }],
-        "type": "select"
-      }
+      "Text": 
+      [ 
+        "The SQL SELECT statement returns a result set of records from one or more tables.",
+        [
+          {
+            "id": "c-2735991550",
+            "parentId": "CI2XI",
+            "properties": [{
+              "id": "0.9",
+              "property": "user.name"
+            }],
+            "type": "select"
+          },
+          "from 'users' as user\nselect user.name"
+        ],
+        "A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints."
+      ]
     },
     "Take":
     { 
       "Snippet": "Number of results", 
       "Summary": "Returns a query expression representing the first n results from the left-hand query expression, where n is the value returned by the rhs expression", 
-      "InDepth": "The SQL SELECT statement returns a result set of records from one or more tables. A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints.",
       "Type": "binary infix operator",
       "Syntax": "query expression take expression",
-      "Example": "from 'users' as user\nselect user.name\ntake 10",
-      "Card": {
-        "id": "c-2735991550",
-        "parentId": "CI2XI",
-        "value": "10",
-        "type": "take"
-      }
+      "Text": 
+      [ 
+        "The SQL SELECT statement returns a result set of records from one or more tables.",
+        [
+          {
+            "id": "c-2735991550",
+            "parentId": "CI2XI",
+            "value": "10",
+            "type": "take"
+          },
+          "from 'users' as user\nselect user.name\ntake 10"
+        ],
+        "A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints."
+      ]
     },
     "From":
     { 
       "Snippet": "Table being queried", 
       "Summary": "Returns a query expression representing all elements in the given source.", 
-      "InDepth": "The SQL From clause is the source of a rowset to be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.",
-      "Type": "unary prefix operator",
       "Syntax": "from source definition",
-      "Example": "from 'users' as user\nfilter user.id == 0",
-      "Card": {
-        "cards": [],
-        "id": "c-2735991550",
-        "parentId": "CI2XI",
-        "group": "users",
-        "iterator": "user",
-        "joins": [],
-        "type": "from"
-      }
+      "Text": 
+      [ 
+        "The SQL From clause is the source of a rowset to be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.",
+        [
+          {
+            "cards": [],
+            "id": "c-2735991550",
+            "parentId": "CI2XI",
+            "group": "users",
+            "iterator": "user",
+            "joins": [],
+            "type": "from"
+          },
+          "from 'users' as user\nfilter user.id == 0"
+        ]
+      ]
     },
     "Skip":
     { 
       "Snippet": "Removes first n elements", 
       "Summary": "Returns a query expression representing the left-hand query expression, with the first n elements removed, where n is the result of evaluating the rhs expression.", 
-      "InDepth": "The SQL SELECT statement returns a result set of records from one or more tables. A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints. The SQL From clause is the source of a rowset to be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.A WHERE clause in SQL specifies that a SQL Data Manipulation Language (DML) statement should only affect rows that meet specified criteria. The criteria are expressed in the form of predicates. WHERE clauses are not mandatory clauses of SQL DML statements, but can be used to limit the number of rows affected by a SQL DML statement or returned by a query. In brief SQL WHERE clause is used to extract only those results from a SQL statement, such as: SELECT, INSERT, UPDATE, or DELETE statement.",
       "Type": "binary infix operator",
       "Syntax": "query expression skip expression",
-      "Example": " from 'users' as user\n sort user.name\nskip 10\ntake 10",
-      "Card": {
-        "id": "c-2735991550",
-        "parentId": "CI2XI",
-        "value": "10",
-        "type": "skip"
-      }
-    },
+      "Text": 
+      [ 
+        "The SQL SELECT statement returns a result set of records from one or more tables. A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints. The SQL From clause is the source of a rowset to be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.A WHERE clause in SQL specifies that a SQL Data Manipulation Language (DML) statement should only affect rows that meet specified criteria. The criteria are expressed in the form of predicates. WHERE clauses are not mandatory clauses of SQL DML statements, but can be used to limit the number of rows affected by a SQL DML statement or returned by a query. In brief SQL WHERE clause is used to extract only those results from a SQL statement, such as: SELECT, INSERT, UPDATE, or DELETE statement.",
+        [
+          {
+             "id": "c-2735991550",
+             "parentId": "CI2XI",
+             "value": "10",
+             "type": "skip"
+          },
+          "from 'users' as user\n sort user.name\nskip 10\ntake 10"
+        ]
+      ]
+    }, 
     "Let":
     { 
       "Snippet": "Defines variable", 
       "Summary": "Returns a query expression representing the result of evaluating each the right hand statement for each element.", 
-      "InDepth": "The SQL SELECT statement returns a result set of records from one or more tables. A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints. The SQL From clause is the source of a rowset to be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.A WHERE clause in SQL specifies that a SQL Data Manipulation Language (DML) statement should only affect rows that meet specified criteria. The criteria are expressed in the form of predicates. WHERE clauses are not mandatory clauses of SQL DML statements, but can be used to limit the number of rows affected by a SQL DML statement or returned by a query. In brief SQL WHERE clause is used to extract only those results from a SQL statement, such as: SELECT, INSERT, UPDATE, or DELETE statement.",
       "Type": "binary infix operator",
       "Syntax": "query expression let statement",
-      "Example": "let x = 100;",
-      "Card": {
-        "id": "c-2735991550",
-        "parentId": "CI2XI",
-        "field": "x",
-        "expression": "100",
-        "type": "let"
-      }
+      "Text": 
+      [ 
+        "The SQL SELECT statement returns a result set of records from one or more tables. A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints. The SQL From clause is the source of a rowset to be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.A WHERE clause in SQL specifies that a SQL Data Manipulation Language (DML) statement should only affect rows that meet specified criteria. The criteria are expressed in the form of predicates. WHERE clauses are not mandatory clauses of SQL DML statements, but can be used to limit the number of rows affected by a SQL DML statement or returned by a query. In brief SQL WHERE clause is used to extract only those results from a SQL statement, such as: SELECT, INSERT, UPDATE, or DELETE statement.",
+        [
+          {
+             "id": "c-2735991550",
+             "parentId": "CI2XI",
+             "field": "x",
+             "expression": "100",
+             "type": "let"
+          },
+          "let x = 100;"
+        ]
+      ]
     },
     "Count":
     { 
       "Snippet": "Number of elements", 
       "Summary": "Returns an the number of elements in the right hand expression", 
-      "InDepth": "The SQL SELECT statement returns a result set of records from one or more tables. A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints. The SQL From clause is the source of a rowset to be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.A WHERE clause in SQL specifies that a SQL Data Manipulation Language (DML) statement should only affect rows that meet specified criteria. The criteria are expressed in the form of predicates. WHERE clauses are not mandatory clauses of SQL DML statements, but can be used to limit the number of rows affected by a SQL DML statement or returned by a query. In brief SQL WHERE clause is used to extract only those results from a SQL statement, such as: SELECT, INSERT, UPDATE, or DELETE statement.",
+      "InDepth": "",
       "Type": " binary prefix operator",
       "Syntax": "count expression",
-      "Example": "\ncount (\n\tselect *\n\tfrom 'users' as user\n\twhere user.name == John\n)",
-      "Card": {
-        "cards": [ {
-          "id": "c-2735991550",
-          "parentId": "CI2XI",
-          "cards": [],
-          "filters": [{
-            "combinator": 0,
-            "condition": {
-              "first": "user.name",
-              "operator": 0,
-              "second": "John"
+      "Text": 
+      [ 
+        "The SQL SELECT statement returns a result set of records from one or more tables. A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints. The SQL From clause is the source of a rowset to be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.A WHERE clause in SQL specifies that a SQL Data Manipulation Language (DML) statement should only affect rows that meet specified criteria. The criteria are expressed in the form of predicates. WHERE clauses are not mandatory clauses of SQL DML statements, but can be used to limit the number of rows affected by a SQL DML statement or returned by a query. In brief SQL WHERE clause is used to extract only those results from a SQL statement, such as: SELECT, INSERT, UPDATE, or DELETE statement.",
+        [
+          {
+            "cards": [ {
+              "id": "c-2735991550",
+              "parentId": "CI2XI",
+              "cards": [],
+              "filters": [{
+                "combinator": 0,
+                "condition": {
+                  "first": "user.name",
+                  "operator": 0,
+                  "second": "John"
+                },
+              "id": "co0.766099087301130"
+              }],
+              "group": "users",
+              "iterator": "user",
+              "joins": [],
+              "properties": [{
+                "property": "*",
+                "id": "0.6"
+              }],
+              "type": "sfw"
+            }],
+              "id": "c-2735991550",
+              "parentId": "CI2XI",
+              "type": "count"
             },
-            "id": "co0.766099087301130"
-          }],
-          "group": "users",
-          "iterator": "user",
-          "joins": [],
-          "properties": [{
-            "property": "*",
-            "id": "0.6"
-          }],
-          "type": "sfw"
-        }],
-        "id": "c-2735991550",
-        "parentId": "CI2XI",
-        "type": "count"
-      }
+            "\ncount (\n\tselect *\n\tfrom 'users' as user\n\twhere user.name == John\n)"
+        ]
+      ]
     }
   }
 ]
+
+
+

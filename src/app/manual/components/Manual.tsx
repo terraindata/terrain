@@ -55,7 +55,7 @@ var HTML5Backend = require('react-dnd-html5-backend');
 var CloseIcon = require('./../../../images/icon_close.svg');
 var SearchIcon = require('./../../../images/icon_search.svg');
 var HomeIcon = require('./../../../images/icon_home.svg');
-var ManualConfig = require('./../ManualConfig2.json');
+var ManualConfig = require('./../ManualConfig.json');
 
 interface Props
 {
