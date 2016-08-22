@@ -243,6 +243,7 @@ var Util = {
     return Util.titleForCardType(card.type);
   },
   
+  // TODO centralize
   titleForCardType(type: string): string
   {
     if(!type)
@@ -258,7 +259,7 @@ var Util = {
     }
     if(type === 'sfw')
     {
-      title = 'Select From Where';
+      title = 'Select From';
     }
     if(type === 'sort')
     {
@@ -272,6 +273,8 @@ var Util = {
     return title;
   },
   
+  
+  // TODO centralize
   previewForCard(card: BuilderTypes.ICard): string
   {
     if(!card)
@@ -281,6 +284,40 @@ var Util = {
     
     switch(card.type)
     {
+      case 'sfw':
+        var c = card as any;
+        var str = "";
+        switch(c.tables.size)
+        {
+          case 0:
+            str = "No table set";
+            break;
+          // iterator not useful for cards outside of itself
+          //  and preview is only used for other cards, so...
+          // case 1:
+          //   let t = c.tables.get(0);
+          //   str = `${t.table} as ${t.iterator}`;
+          //   break;
+          default:
+            str = c.tables.map(t => t.table).join(', ');
+        }
+        
+        str += ': ';
+        
+        switch(c.fields.size)
+        {
+          case 0:
+            str += 'no fields'
+            break;
+          case 1:
+            str += c.fields.get(0).field;
+            break;
+          default:
+            str += c.fields.size + ' fields';
+        }
+        
+        return str;
+        
       case 'from':
         return card['group'] + ' as ' + card['iterator'];
       case 'select':
