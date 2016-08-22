@@ -19,10 +19,8 @@
 }
 
 .manual-area {
-	margin-left: 10px;
-	margin-right: 10px;
 	height: 100%; 
-	overflow-y: auto;
+	overflow-y: hidden;
 	position: relative;
 }
 
@@ -30,13 +28,22 @@
 	display: inline-flex;
 	position: absolute;
 	right: 6px;
+	padding-right: 14px;
+	input {
+		border: 1px solid #d2d2d2;
+	}
 }
 
 .manual-content-area {
-	position: absolute;
-	top: 30px; 
-	margin-right: 10px;
-	padding-top: 16px;
+	position: relative; 
+	margin-right: 4px;
+	margin-left: -14px;
+	padding-left: 14px;
+	border-left: 1px solid #3e3c3c;
+	height:  calc(~"100% - 60px");
+	overflow-x: hidden;
+	overflow-y: auto;
+	padding: 10px;
 }
 
 .manual-close-icon {
@@ -45,7 +52,7 @@
 	height: 8px;
 	position: absolute;
 	top: 10px;
-	right: 15px;
+	right: 32px;
 	cursor: pointer;
 	opacity: 0;
 }
@@ -53,34 +60,38 @@
 .manual-left-column {
     float: left;
     position: relative;
-    width: 120px;
+    //width: 120px;
     height: 100%;
     float: left;
     margin: 0;
-    border-right: 1px black solid;
-    margin-top:-20px;
 }
 
 
 .manual-right-column {
-    margin-left: 120px;
+    margin-left: 125px;
     padding: 1em;
-    overflow: hidden;
+    padding-top: 0px;
+    height: 100%;
 }
 
 .manual-topbar{
-    padding: 1em;
+    padding-bottom: 14px;
+    padding-top: 4px;
+    height: 20px;
     clear: left;
     text-align: center;
+    background: white;
 }
 
 .manual-left-column-entry {
 	cursor: pointer;
 	padding-top: 2px;
 	padding-bottom: 2px;
-	padding-left: 12px;
-	width: 100px;
+	padding-left: 14px;
+	width: 84px;
+	margin-left: 6px;
 	border-radius: 6px; 
+	padding-right: 10px;
 	&:hover {
 		background: fade(#D1EFE7, 40%);
 	}
@@ -92,4 +103,12 @@
 	&:hover {
 		background: #D1EFE7;
 	}
+}
+.manual-home-icon {
+	height: 18px;
+	float: left; 
+	padding-top: 6px;
+	padding-left: 14px;
+	fill: #3e3c3c;
+	cursor: pointer;
 }
