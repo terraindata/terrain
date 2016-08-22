@@ -62,6 +62,7 @@ interface Props
 {
   location?: any;
   children?: any;
+  history?: any;
 }
 
 class Manual extends Classs<Props>
@@ -84,13 +85,6 @@ class Manual extends Classs<Props>
     }
   }
 
-
-  //manual-entry-left-selected 
-
-    // <div className={classNames({
-    //       'browser-column-content': true,
-    //       'browser-column-content-no-title': !this.props.title,
-    //     })}>
   renderEntriesList()
   {
     
@@ -117,6 +111,15 @@ class Manual extends Classs<Props>
     );
   }
 
+  openTerm(e)
+  {  
+    var cardName = e.target.textContent.trim().replace(',', '').replace('.', '');
+    this.setState ({
+      value: cardName,
+    });
+    this.search(cardName);
+  }
+
   renderManualEntries()
   {
     if(this.state.visibleKeys.length === 0)
@@ -136,7 +139,9 @@ class Manual extends Classs<Props>
                 entryName={result}
                 canEdit={false}
                 demoEdit={true}
+                openTerm={this.openTerm}
                 spotlights={[]}
+                history={this.props.history}
               />
             </div> 
           )

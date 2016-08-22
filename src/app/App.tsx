@@ -258,7 +258,7 @@ var router = (
       </Route>
       
       <Route path="/manual" component={Manual} />
-
+      
       <Route path="/users/:username" component={Profile} />
       
       <Route path="/reporting" component={Placeholder} />

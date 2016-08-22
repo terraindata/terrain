@@ -84,6 +84,7 @@ import 'codemirror/addon/search/jump-to-line.js';
 import 'codemirror/addon/search/matchesonscrollbar.css';
 
 import ManualPopup from './../../manual/components/ManualPopup.tsx';
+var ManualConfig = require('./../../manual/ManualConfig.json');
 
 interface Props {
   params?: any;
@@ -348,9 +349,17 @@ class TQL extends Classs<Props>
     );
   }
 
-  openManual()
+  openManual(line)
   {
-    this.props.history.pushState({}, '/manual');
+    var keywords = Object.keys(ManualConfig[0]);
+    var cardName = '';
+    keywords.map(function(word) {
+      if(line.toLowerCase().indexOf(word.toLowerCase()) >= 0)
+      {
+        cardName = word;
+      }
+    });
+    this.props.history.pushState({cardName}, '/manual');
   }
 
   renderTqlEditor() 

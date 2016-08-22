@@ -65,7 +65,9 @@ interface Props
   entryName: string;
   canEdit: boolean;
   demoEdit: boolean;
+  openTerm: (any) => void;
   spotlights?: any[];
+  history?: any;
 }
 
 
@@ -87,8 +89,32 @@ class ManualEntry extends Classs<Props>
     }); 
   }
 
+  renderInDepth()
+  {
+    var words = ManualConfig[0][this.props.entryName].InDepth.split(' ');
+    var keywords = Object.keys(ManualConfig[0]).map((word) => word.toUpperCase());
+    return (
+      <div>
+      {words.map((word, index) => 
+        {
+        var term = word;
+        if(word !== word.toLowerCase())
+        {
+          term = word.toUpperCase().replace(',', '').replace('.', '');
+        }
+        return keywords.indexOf(term) >= 0 ? 
+          <span key={index} className='manual-entry-keyword' onClick={this.props.openTerm} >{word + ' '} </span> : 
+          <span key={index} >{word + ' '} </span>
+        }
+      )}
+      </div>
+    );
+
+  }
+
   renderEntryDetail() 
   {
+
     return (
       <div className='manual-entry-expanded-area'>
         <div className ='manual-entry-row'>
@@ -99,7 +125,7 @@ class ManualEntry extends Classs<Props>
         </div> 
 
         <div className ='maunual-entry-indepth'>
-          {ManualConfig[0][this.props.entryName].InDepth}
+          {this.renderInDepth()}
         </div>
       </div>
         );
@@ -120,7 +146,7 @@ class ManualEntry extends Classs<Props>
           />
         </div>
 
-        <div className ='manual-entry-name'>
+        <div className ='manual-entry-name' onClick={this.expand}>
           {this.props.entryName}
         </div>
       </div>
