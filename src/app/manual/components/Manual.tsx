@@ -56,6 +56,7 @@ var HTML5Backend = require('react-dnd-html5-backend');
 
 var CloseIcon = require('./../../../images/icon_close.svg');
 var SearchIcon = require('./../../../images/icon_search.svg');
+var HomeIcon = require('./../../../images/icon_home.svg');
 var ManualConfig = require('./../ManualConfig.json');
 
 interface Props
@@ -84,13 +85,6 @@ class Manual extends Classs<Props>
     }
   }
 
-
-  //manual-entry-left-selected 
-
-    // <div className={classNames({
-    //       'browser-column-content': true,
-    //       'browser-column-content-no-title': !this.props.title,
-    //     })}>
   renderEntriesList()
   {
     
@@ -171,12 +165,17 @@ class Manual extends Classs<Props>
     this.search('');
   }
 
-  render()
+  renderManualTopbar()
   {
     var closeOpacity = this.state.value.length ? 1 : 0;
     return (
-      <div className ='manual-area'>
-        <div className ='manual-topbar'>
+       <div className ='manual-topbar'>
+          <div>
+            <HomeIcon 
+              className = 'manual-home-icon' 
+              onClick= {this.clearInput}
+            />
+          </div>
           <div className='manual-search-bar'>
               <SearchIcon className ='manual-search-icon'/>
               <Autocomplete
@@ -195,6 +194,14 @@ class Manual extends Classs<Props>
               />
             </div>
         </div>
+    );
+  }
+  render()
+  {
+    
+    return (
+      <div className ='manual-area'>
+        {this.renderManualTopbar()}
         <div className='manual-left-column'>
           {this.renderEntriesList()}
         </div>
