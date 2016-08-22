@@ -104,7 +104,7 @@ class ManualEntry extends Classs<Props>
         }
         return keywords.indexOf(term) >= 0 ? 
           <span key={index} className='manual-entry-keyword' onClick={this.props.openTerm} >{word + ' '} </span> : 
-          <span key={index} >{word + ' '} </span>
+          word + ' '
         }
       )}
       </div>
