@@ -110,7 +110,6 @@ var CodeMirror = React.createClass({
 		{
 			this.props.defineTerm(this.codeMirror.getSelection())
 		}
-
 	},
 	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
 	{
