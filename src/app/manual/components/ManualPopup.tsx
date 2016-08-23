@@ -59,7 +59,9 @@ interface Props
   history?: any;
   style?: any;
   addColumn: (number) => void;
-  switchView: (number) => void;
+  canAddColumn: boolean;
+  onCloseColumn: (number) => void;
+  index: number;
 }
 
 class ManualPopup extends Classs<Props>
@@ -70,6 +72,7 @@ class ManualPopup extends Classs<Props>
     {
       open: false,
     }
+    this.addColumn = _.debounce(this.addColumn, 150);
   }
   
   shouldComponentUpdate(nextProps, nextState)
@@ -102,10 +105,27 @@ class ManualPopup extends Classs<Props>
     }
   }
 
+  addColumn()
+  {
+    console.log("ADD COL");
+    this.props.addColumn(0);
+  }
+  closeColumn()
+  {
+    var closeIndex;
+    if (this.props.index === 0 || this.props.index === 1)
+    {
+      closeIndex = 2;
+    }
+    else {
+      closeIndex = 1;
+    }
+    this.props.onCloseColumn(closeIndex);
+    this.addColumn();
+  }
   openManual()
   {
-    //this.props.addColumn(0);
-    //this.props.switchView(4);
+    this.props.canAddColumn ?  this.props.addColumn(0) : this.closeColumn();
     var cardName = this.props.cardName === 'General' ? {} : {cardName: this.props.cardName};
     this.props.history && this.props.history.pushState(cardName, window.location.pathname);
   }

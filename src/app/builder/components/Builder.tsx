@@ -97,10 +97,12 @@ class Builder extends Classs<Props>
     loading: boolean;
     colKeys: number[];
     noColumnAnimation: boolean;
+    column: number;
   } = {
     loading: true,
     colKeys: null,
     noColumnAnimation: false,
+    column: null
   };
   
   constructor(props:Props)
@@ -326,18 +328,31 @@ class Builder extends Classs<Props>
         algorithm={algorithm} 
         index={index}
         onAddColumn={this.handleAddColumn}
+        onAddManualColumn={this.handleAddManualColumn}
         onCloseColumn={this.handleCloseColumn}
         canAddColumn={colKeys.length < 3}
         canCloseColumn={colKeys.length > 1}
         variant={this.reduxState[this.getSelectedId()]}
         history={this.props.history}
         onRevert={this.save}
+        column={this.state.column}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key: colKeys[index],
     }
   }
   
+  handleAddManualColumn(index)
+  {
+    index = index + 1;
+    var colKeys = _.clone(this.state.colKeys);
+    colKeys.splice(index, 0, Math.random());
+    this.setState({
+      colKeys,
+      column: 4,
+    }); 
+  }
+
   handleAddColumn(index)
   {
     index = index + 1;
@@ -353,7 +368,7 @@ class Builder extends Classs<Props>
     var colKeys = _.clone(this.state.colKeys);
     colKeys.splice(index, 1);
     this.setState({
-      colKeys,
+      colKeys: colKeys,
     }); 
   }
   
@@ -410,7 +425,6 @@ class Builder extends Classs<Props>
 	render()
   {
     let config = this.props.params.config;
-    
     return (
       <div className={classNames({
         'builder': true,

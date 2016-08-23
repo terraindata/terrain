@@ -66,7 +66,9 @@ var CardsArea = React.createClass<any, any>({
     connectDropTarget: React.PropTypes.func,
     history: React.PropTypes.any,
     addColumn: React.PropTypes.func,
-    switchView: React.PropTypes.func,
+    canAddColumn: React.PropTypes.bool,
+    onCloseColumn: React.PropTypes.func,
+    index: React.PropTypes.number,
   },
   
   hasCardsArea()
