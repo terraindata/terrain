@@ -58,14 +58,15 @@ export module BuilderTypes
   
   export const CardTypes = 
   {
-    FROM: 'from',
-    SELECT: 'select',
+    // FROM: 'from',
+    // SELECT: 'select',
+    SFW: 'sfw',
     SORT: 'sort',
     FILTER: 'filter',
     LET: 'let',
     SCORE: 'score',
     TRANSFORM: 'transform',
-    IF: 'if',
+    // IF: 'if',
     MAX: 'max',
     MIN: 'min',
     SUM: 'sum',
@@ -76,7 +77,6 @@ export module BuilderTypes
     VAR: 'var',
     TAKE: 'take',
     SKIP: 'skip',
-    SFW: 'sfw',
   };
   
   export const BlockTypes =
@@ -122,25 +122,31 @@ export module BuilderTypes
     id: string = "";
   }
   
-  let addId = (a: any) => _.extend({}, { id: "id-" + Math.random() }, a);
+  let addId = (a: any) => 
+  {
+    
+    if(a)
+    {
+      _cardFieldsToExcludeFromServer.map(field => {
+        if(Immutable.Map.isMap(a))
+        {
+          a = a.delete(field)
+        }
+        else
+        {
+          delete a[field];
+        }
+      });
+    }
+    return _.extend({}, 
+      {
+        id: "id-" + Math.random(),
+      }, 
+      a
+    );
+  }
   
   export var recordFactories: {[key: string]: (obj?:any) => any} = {};
-  
-  // export class ICondition extends IId
-  // {
-  //   first: string = "";
-  //   second: string = "";
-  //   operator: Operator = Operator.EQ;
-    
-  //   set: (f: string, v: any) => ICondition;
-  //   setIn: (f: string, v: any) => ICondition;
-		// _recordClassType = BlockTypes.CONDITION;
-  // }
-  // let ICondition_Record = Immutable.Record(new ICondition());
-  // export const _ICondition = (config?:any) => {
-  //   return new ICondition_Record(addId(config)) as any as ICondition;
-  // }
-  // recordFactories[BlockTypes.CONDITION] = _ICondition;
   
   export class ISort extends IId
   {
@@ -194,6 +200,15 @@ export module BuilderTypes
   export class ICard extends IId
   {
     type: string = "";
+    colors: string[] = ["#89B4A7", "#C1EADE"];
+    title: string = "Card";
+    
+    preview: string | ((c:ICard) => string) = "[type]";
+    // The BuilderTypes.getPreview function constructs
+    // a preview from a card object based on this string.
+    // It replaces anything within [] with the value for that key.
+    // If an array of objects, you can specify: [arrayKey.objectKey]
+    // and it will map through and join the values with ", ";
     
     set: (f: string, v: any) => ICard;
     setIn: (f: string, v: any) => ICard;
@@ -205,31 +220,43 @@ export module BuilderTypes
   export type ICards = List<ICard>;
   
   
+  // private  
+  function wrapperCardPreview(c:AbstractWrapperCard): string
+  {
+    if(c.cards.size)
+    {
+      let card = c.cards.get(0);
+      return getPreview(recordFactories[card.type]());
+    }
+    return "Nothing";
+  }
+  
   // private
   class AbstractWrapperCard extends ICard
   {
     cards: ICards = List([]);
+    preview: string | ((c: AbstractWrapperCard) => string) = wrapperCardPreview;
     
     set: (f: string, v: any) => AbstractWrapperCard;
     setIn: (f: string, v: any) => AbstractWrapperCard;
   }
   
-  export class IFromCard extends AbstractWrapperCard
-  {
-    type = CardTypes.FROM;
-    table: string = "";
-    iterator: string = "";
-    tables: List<ITable> = List([]);
+  // export class IFromCard extends AbstractWrapperCard
+  // {
+  //   type = CardTypes.FROM;
+  //   table: string = "";
+  //   iterator: string = "";
+  //   tables: List<ITable> = List([]);
     
-    set: (f: string, v: any) => IFromCard;
-    setIn: (f: string, v: any) => IFromCard;
-    _recordClassType = CardTypes.FROM;
-  }
-  let IFromCard_Record = Immutable.Record(new IFromCard());
-  export const _IFromCard = (config?:any) => {
-    return new IFromCard_Record(addId(config)) as any as IFromCard;
-  }
-  recordFactories[CardTypes.FROM] = _IFromCard;
+  //   set: (f: string, v: any) => IFromCard;
+  //   setIn: (f: string, v: any) => IFromCard;
+  //   _recordClassType = CardTypes.FROM;
+  // }
+  // let IFromCard_Record = Immutable.Record(new IFromCard());
+  // export const _IFromCard = (config?:any) => {
+  //   return new IFromCard_Record(addId(config)) as any as IFromCard;
+  // }
+  // recordFactories[CardTypes.FROM] = _IFromCard;
   
   export class IField extends IId
   {
@@ -253,6 +280,10 @@ export module BuilderTypes
     tables: List<ITable> = List([]);
     fields: List<IField> = List([]);
     filters: List<IFilter> = List([]);
+    colors = ["#89B4A7", "#C1EADE"];
+    
+    title = "Select/From";
+    preview = "[tables.table]: [fields.field]";
     
     set: (f: string, v: any) => ISfwCard;
     setIn: (f: string, v: any) => ISfwCard;
@@ -264,25 +295,29 @@ export module BuilderTypes
   }
   recordFactories[CardTypes.SFW] = _ISfwCard;
   
-  export class ISelectCard extends ICard
-  {
-    type = CardTypes.SELECT;
-    properties: List<string> = List([]);
+  // export class ISelectCard extends ICard
+  // {
+  //   type = CardTypes.SELECT;
+  //   properties: List<string> = List([]);
+    // colors = ["#8AC888", "#B7E9B5"];
     
-    set: (f: string, v: any) => ISelectCard;
-    setIn: (f: string, v: any) => ISelectCard;
-		_recordClassType = CardTypes.SELECT;
-  }
-  let ISelectCard_Record = Immutable.Record(new ISelectCard());
-  export const _ISelectCard = (config?:any) => {
-    return new ISelectCard_Record(addId(config)) as any as ISelectCard;
-  }
-  recordFactories[CardTypes.SELECT] = _ISelectCard;
+  //   set: (f: string, v: any) => ISelectCard;
+  //   setIn: (f: string, v: any) => ISelectCard;
+		// _recordClassType = CardTypes.SELECT;
+  // }
+  // let ISelectCard_Record = Immutable.Record(new ISelectCard());
+  // export const _ISelectCard = (config?:any) => {
+  //   return new ISelectCard_Record(addId(config)) as any as ISelectCard;
+  // }
+  // recordFactories[CardTypes.SELECT] = _ISelectCard;
   
   export class ISortCard extends ICard
   {
     type = CardTypes.SORT;
     sorts: List<ISort> = List([]);
+    title = "Sort";
+    preview = "[sorts.property]";
+    colors = ["#C5AFD5", "#EAD9F7"];
     
     set: (f: string, v: any) => ISortCard;
     setIn: (f: string, v: any) => ISortCard;
@@ -298,12 +333,16 @@ export module BuilderTypes
   {
     type = CardTypes.FILTER;
     filters: List<IFilter> = List([]);
+    title = "Comparison";
+    preview = "[filters.length] Condition(s)"
+    colors = ["#7EAAB3", "#B9E1E9"];
     
     set: (f: string, v: any) => IFilterCard;
     setIn: (f: string, v: any) => IFilterCard;
 		_recordClassType = CardTypes.FILTER;
   }
   let IFilterCard_Record = Immutable.Record(new IFilterCard());
+  
   export const _IFilterCard = (config?:any) => {
     return new IFilterCard_Record(addId(config)) as any as IFilterCard;
   }
@@ -316,10 +355,13 @@ export module BuilderTypes
     type = CardTypes.LET;
     field: string = "";
     expression: CardString = "";
+    title = "Let";
+    preview = "[field]";
+    colors = ["#C0C0BE", "#E2E2E0"];
     
     set: (f: string, v: any) => ILetCard;
     setIn: (f: string, v: any) => ILetCard;
-		_recordClassType = CardTypes.LET;
+    _recordClassType = CardTypes.LET;
   }
   let ILetCard_Record = Immutable.Record(new ILetCard());
   export const _ILetCard = (config?:any) => {
@@ -332,23 +374,24 @@ export module BuilderTypes
     type = CardTypes.VAR;
     field: string = "";
     expression: CardString = "";
+    colors = ["#b3a37e", "#d7c7a2"];
+    title = "Var";
+    preview = "[field]";
     
     set: (f: string, v: any) => IVarCard;
     setIn: (f: string, v: any) => IVarCard;
-		_recordClassType = CardTypes.VAR;
+    _recordClassType = CardTypes.VAR;
   }
   let IVarCard_Record = Immutable.Record(new IVarCard());
   export const _IVarCard = (config?:any) => {
     return new IVarCard_Record(addId(config)) as any as IVarCard;
   }
   recordFactories[CardTypes.VAR] = _IVarCard;  
-  
-  
-  
-  
   export class ICountCard extends AbstractWrapperCard
   {
     type = CardTypes.COUNT;
+    colors = ["#70B1AC", "#D2F3F0"];
+    title = "Count";
     
     set: (f: string, v: any) => ICountCard;
     setIn: (f: string, v: any) => ICountCard;
@@ -359,9 +402,12 @@ export module BuilderTypes
     return new ICountCard_Record(addId(config)) as any as ICountCard;
   }
   recordFactories[CardTypes.COUNT] = _ICountCard; 
+  
   export class IAvgCard extends AbstractWrapperCard
   {
     type = CardTypes.AVG;
+    colors = ["#a2b37e", "#c9daa6"];
+    title = "Average";
     
     set: (f: string, v: any) => IAvgCard;
     setIn: (f: string, v: any) => IAvgCard;
@@ -372,9 +418,12 @@ export module BuilderTypes
     return new IAvgCard_Record(addId(config)) as any as IAvgCard;
   }
   recordFactories[CardTypes.AVG] = _IAvgCard; 
+  
   export class ISumCard extends AbstractWrapperCard
   {
     type = CardTypes.SUM;
+    colors = ["#8dc4c1", "#bae8e5"];
+    title = "Sum";
     
     set: (f: string, v: any) => ISumCard;
     setIn: (f: string, v: any) => ISumCard;
@@ -388,6 +437,8 @@ export module BuilderTypes
   export class IMinCard extends AbstractWrapperCard
   {
     type = CardTypes.MIN;
+    colors = ["#cc9898", "#ecbcbc"];
+    title = "Min";
     
     set: (f: string, v: any) => IMinCard;
     setIn: (f: string, v: any) => IMinCard;
@@ -401,6 +452,8 @@ export module BuilderTypes
   export class IMaxCard extends AbstractWrapperCard
   {
     type = CardTypes.MAX;
+    colors = ["#8299b8", "#acc6ea"];
+    title = "Max";
     
     set: (f: string, v: any) => IMaxCard;
     setIn: (f: string, v: any) => IMaxCard;
@@ -414,6 +467,8 @@ export module BuilderTypes
   export class IExistsCard extends AbstractWrapperCard
   {
     type = CardTypes.EXISTS;
+    colors = ["#a98abf", "#cfb3e3"];
+    title = "Exists";
     
     set: (f: string, v: any) => IExistsCard;
     setIn: (f: string, v: any) => IExistsCard;
@@ -427,6 +482,8 @@ export module BuilderTypes
   export class IParenthesesCard extends AbstractWrapperCard
   {
     type = CardTypes.PARENTHESES;
+    colors = ["#b37e7e", "#daa3a3"];
+    title = "( )";
     
     set: (f: string, v: any) => IParenthesesCard;
     setIn: (f: string, v: any) => IParenthesesCard;
@@ -460,6 +517,8 @@ export module BuilderTypes
     type = CardTypes.SCORE;
     weights: List<IWeight> = List([]);
     method: string = "";
+    colors = ["#9DC3B8", "#D1EFE7"];
+    title = "Score";
     
     set: (f: string, v: any) => IScoreCard;
     setIn: (f: string, v: any) => IScoreCard;
@@ -520,6 +579,8 @@ export module BuilderTypes
     range: number[] = [0,100];
     bars: List<IBar> = List([]);
     scorePoints: List<IScorePoint> = List([]);
+    colors = ["#E7BE70", "#EDD8B1"];
+    title = "Transform";
     
     set: (f: string, v: any) => ITransformCard;
     setIn: (f: string, v: any) => ITransformCard;
@@ -531,26 +592,29 @@ export module BuilderTypes
   }
   recordFactories[CardTypes.TRANSFORM] = _ITransformCard;
   
-  export class IIfCard extends AbstractWrapperCard
-  {
-    type = CardTypes.IF;
-    filters: List<IFilter> = List([]);
-    elses: List<IIfCard> = List([]);
+  // export class IIfCard extends AbstractWrapperCard
+  // {
+  //   type = CardTypes.IF;
+  //   filters: List<IFilter> = List([]);
+  //   elses: List<IIfCard> = List([]);
+  //   colors = ["#7eb397", "#a9dec2"];
+  //   title = "If/Else";
     
-    set: (f: string, v: any) => IIfCard;
-    setIn: (f: string, v: any) => IIfCard;
-		_recordClassType = CardTypes.IF;
-  }
-  let IIfCard_Record = Immutable.Record(new IIfCard());
-  export const _IIfCard = (config?:any) => {
-    return new IIfCard_Record(addId(config)) as any as IIfCard;
-  }
-  recordFactories[CardTypes.IF] = _IIfCard;
+  //   set: (f: string, v: any) => IIfCard;
+  //   setIn: (f: string, v: any) => IIfCard;
+		// _recordClassType = CardTypes.IF;
+  // }
+  // let IIfCard_Record = Immutable.Record(new IIfCard());
+  // export const _IIfCard = (config?:any) => {
+  //   return new IIfCard_Record(addId(config)) as any as IIfCard;
+  // }
+  // recordFactories[CardTypes.IF] = _IIfCard;
   
   export class ITakeCard extends ICard
   {
     type = CardTypes.TAKE;
     value: string = "";
+    title = "Take";
     
     set: (f: string, v: any) => ITakeCard;
     setIn: (f: string, v: any) => ITakeCard;
@@ -566,6 +630,8 @@ export module BuilderTypes
   {
     type = CardTypes.SKIP;
     value: string = "";
+    colors = ["#CDCF85", "#F5F6B3"];
+    title = "Skip";
     
     set: (f: string, v: any) => ISkipCard;
     setIn: (f: string, v: any) => ISkipCard;
@@ -657,6 +723,40 @@ export module BuilderTypes
     cards = cards.map(recordFromJS);
     return cards as BuilderTypes.ICards;
   }
+  
+  export function getPreview(card:ICard):string
+  {
+    let {preview} = card;
+    if(typeof preview === 'string')
+    {
+      return preview.replace(/\[[a-z\.]*\]/g, str =>
+      {
+        let pattern = str.substr(1, str.length - 2);
+        let keys = pattern.split(".");
+        if(keys.length === 1)
+        {
+          return card[keys[0]];
+        }
+        if(keys[1] === 'length')
+        {
+          return card[keys[0]].size;
+        }
+        return card[keys[0]].toArray().map(v => v[keys[1]]).join(", ");
+      });
+    }
+    else
+    {
+      return preview(card);
+    }
+  }
+  
+  export const _cardFieldsToExcludeFromServer =
+  [
+    'preview',
+    'title',
+    'colors',
+  ];
+
 }
 
 
@@ -664,125 +764,5 @@ export module BuilderTypes
 export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
-
-// TODO delete if unneeded
-// export const CardTypes = 
-// {
-//  from:
-//   {
-//     factory: BuilderTypes._IFromCard,
-//     // colors:
-//   },
-//  select:
-//   {
-//     factory: BuilderTypes._ISelectCard,
-//     // colors:
-//   },
-//  sort:
-//   {
-//     factory: BuilderTypes._ISortCard,
-//     // colors:
-//   },
-//  filter:
-//   {
-//     factory: BuilderTypes._IFilterCard,
-//     // colors:
-//   },
-//  let:
-//   {
-//     factory: BuilderTypes._ILetCard,
-//     // colors:
-//   },
-//  score:
-//   {
-//     factory: BuilderTypes._IScoreCard,
-//     // colors:
-//   },
-//  transform:
-//   {
-//     factory: BuilderTypes._ITransformCard,
-//     // colors:
-//   },
-//  if:
-//   {
-//     factory: BuilderTypes._IIfCard,
-//     // colors:
-//   },
-//  max:
-//   {
-//     factory: BuilderTypes._IMaxCard,
-//     // colors:
-//   },
-//  min:
-//   {
-//     factory: BuilderTypes._IMinCard,
-//     // colors:
-//   },
-//  sum:
-//   {
-//     factory: BuilderTypes._ISumCard,
-//     // colors:
-//   },
-//  avg:
-//   {
-//     factory: BuilderTypes._IAvgCard,
-//     // colors:
-//   },
-//  count:
-//   {
-//     factory: BuilderTypes._ICountCard,
-//     // colors:
-//   },
-//  exists:
-//   {
-//     factory: BuilderTypes._IExistsCard,
-//     // colors:
-//   },
-//  parentheses:
-//   {
-//     factory: BuilderTypes._IParenthesesCard,
-//     // colors:
-//   },
-//  var:
-//   {
-//     factory: BuilderTypes._IVarCard,
-//     // colors:
-//   },
-//  take:
-//   {
-//     factory: BuilderTypes._ITakeCard,
-//     // colors:
-//   },
-//  skip:
-//   {
-//     factory: BuilderTypes._ISkipCard,
-//     // colors:
-//   },
-// };
-
-
-export const CardColors = 
-// title is first, body is second
-{
-  none: ["#B45759", "#EA7E81"],
-  from: ["#89B4A7", "#C1EADE"],
-  sfw: ["#89B4A7", "#C1EADE"],
-  filter: ["#7EAAB3", "#B9E1E9"],
-  select: ["#8AC888", "#B7E9B5"],
-  let: ["#C0C0BE", "#E2E2E0"],
-  transform: ["#E7BE70", "#EDD8B1"],
-  score: ["#9DC3B8", "#D1EFE7"],
-  sort: ["#C5AFD5", "#EAD9F7"],
-  skip: ["#CDCF85", "#F5F6B3"],
-  parentheses: ["#b37e7e", "#daa3a3"],
-  count: ["#70B1AC", "#D2F3F0"],
-  max: ["#8299b8", "#acc6ea"],
-  min: ["#cc9898", "#ecbcbc"],
-  sum: ["#8dc4c1", "#bae8e5"],
-  avg: ["#a2b37e", "#c9daa6"],
-  exists: ["#a98abf", "#cfb3e3"],
-  if: ["#7eb397", "#a9dec2"],
-  var: ["#b3a37e", "#d7c7a2"],
-};
 
 export default BuilderTypes;

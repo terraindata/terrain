@@ -57,8 +57,7 @@ import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateCardTool from './CreateCardTool.tsx';
 import { Menu, MenuOption } from '../../../common/components/Menu.tsx';
 import Actions from "../../data/BuilderActions.tsx";
-import { CardColors } from './../../BuilderTypes.tsx';
-import { BuilderTypes } from './../../BuilderTypes.tsx';
+import BuilderTypes from './../../BuilderTypes.tsx';
 let {CardTypes} = BuilderTypes;
 import Store from "./../../data/BuilderStore.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
@@ -136,9 +135,8 @@ interface Props
 {
   card: BuilderTypes.ICard;
   index: number;
-  parentId: string;
   singleCard?: boolean;
-  keys: string[];
+  keys: List<string>;
   canEdit: boolean;
   keyPath: KeyPath;
   
@@ -156,9 +154,8 @@ class Card extends PureClasss<Props>
     id: ID;
     selected: boolean;
     menuOptions: List<MenuOption>;
-    titleStyle: React.CSSProperties;
-    bodyStyle: React.CSSProperties;
     
+    // TODO
     addingCardBelow?: boolean;
     addingCardAbove?: boolean;
   }
@@ -195,24 +192,12 @@ class Card extends PureClasss<Props>
             onClick: this.handleDelete,
           },
         ]),
-      titleStyle: {
-        background: CardColors[props.card.type] ? CardColors[props.card.type][0] : CardColors['none'][0],
-      },
-      bodyStyle: {
-        background: CardColors[props.card.type] ? CardColors[props.card.type][1] : CardColors['none'][1],
-        borderColor: CardColors[props.card.type] ? CardColors[props.card.type][0] : CardColors['none'][0],
-      },
     };
     
     this._subscribe(Store, {
       stateKey: 'selected',
       storeKeyPath: ['selectedCardIds', props.card.id],
     });
-  }
-  
-  getColor(index:number): string
-  {
-    return CardColors[this.props.card.type] ? CardColors[this.props.card.type][index] : CardColors['none'][index];
   }
   
   componentWillUnmount()
@@ -230,10 +215,10 @@ class Card extends PureClasss<Props>
   componentDidMount()
   {
     this.dragPreview = createDragPreview(
-      Util.titleForCard(this.props.card) + ' (' + Util.previewForCard(this.props.card) + ')',
+      this.props.card.title + ' (' + BuilderTypes.getPreview(this.props.card) + ')',
     {
-      backgroundColor: this.getColor(0),
-      borderColor: this.getColor(1),
+      backgroundColor: this.props.card.colors[1],
+      borderColor: this.props.card.colors[0],
       color: '#fff',
       fontSize: 15,
       fontWeight: 'bold',
@@ -329,9 +314,9 @@ class Card extends PureClasss<Props>
   handleDelete()
   {
     Util.animateToHeight(this.refs.cardInner, 0);
-    setTimeout(() => {
-      Actions.cards.remove(this.props, this.props.parentId);
-    }, 250);
+    setTimeout(() =>
+      Actions.remove(this.props.keyPath, this.props.index)
+    , 250);
   }
   
   handleCopy()
@@ -381,7 +366,8 @@ class Card extends PureClasss<Props>
 
 	render() {
     var content = <BuilderComponent
-      {...this.props}
+      keys={this.props.keys}
+      canEdit={this.props.canEdit}
       data={this.props.card}
       type={this.props.card.type}
       keyPath={this._ikeyPath(this.props.keyPath, this.props.index)}
@@ -393,7 +379,7 @@ class Card extends PureClasss<Props>
 			</div>
 		);
     
-		var title = Util.titleForCard(this.props.card);
+		var {title} = this.props.card;
     const { isDragging, connectDragSource, connectDropTarget } = this.props;
     const rendering = 
       <div
@@ -420,7 +406,10 @@ class Card extends PureClasss<Props>
           <div className='card-stroke card-stroke-above' />
           <div
             className={'card-inner ' + (this.props.singleCard ? 'card-single' : '')}
-            style={this.state.bodyStyle}
+            style={{
+              background: this.props.card.colors[1],
+              borderColor: this.props.card.colors[0],
+            }}
             ref='cardInner'
           >
             { !this.props.singleCard &&
@@ -430,7 +419,9 @@ class Card extends PureClasss<Props>
                     'card-title': true,
                     'card-title-closed': !this.state.open,
                   })}
-                  style={this.state.titleStyle}
+                  style={{
+                    background: this.props.card.colors[0],
+                  }}
                   onClick={this.handleTitleClick}
                   >
                   <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
@@ -439,7 +430,7 @@ class Card extends PureClasss<Props>
                     'card-preview': true,
                     'card-preview-hidden': this.state.open
                   })}>
-                    { Util.previewForCard(this.props.card) }
+                    { BuilderTypes.getPreview(this.props.card) }
                   </span>
                   {
                     this.props.canEdit && <Menu options={this.state.menuOptions} />
@@ -573,7 +564,8 @@ const cardTarget =
           monitor.getItem()
         );
       
-      Actions.cards.move(card, props.index + (below ? 1 : 0), props.parentId)
+      // TODO
+      // Actions.cards.move(card, props.index + (below ? 1 : 0), props.parentId)
     }
   }
 }

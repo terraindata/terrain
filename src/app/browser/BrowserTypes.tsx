@@ -113,6 +113,28 @@ export module BrowserTypes
       .set('lastUsername', localStorage['username']) as Variant;
   }
   
+  // TODO map through everything i guess
+  // function prepareCardsForSave(cs: List<BuilderTypes.ICard>): List<BuilderTypes.ICard>
+  // {
+  //   return cs.map(card =>
+  //   {
+  //     BuilderTypes._cardFieldsToExcludeFromServer.map(
+  //       field => card = card['delete'](field)
+  //     );
+  //     card = card.map(
+  //       value => 
+  //     );
+  //     return card;
+  //   }) as List<BuilderTypes.ICard>;
+  // }
+  
+  export function variantForSave(v: Variant): Variant
+  {
+    v = touchVariant(v);
+    // v = v.set('cards', prepareCardsForSave(v.cards)) as Variant;
+    return v;
+  }
+  
   export enum EAlgorithmStatus
   {
     // This order must be consistent with Midway

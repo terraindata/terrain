@@ -267,8 +267,9 @@ class Builder extends PureClasss<Props>
 
   save()
   {
-    Ajax.saveItem(BrowserTypes.touchVariant(
-      this.state.builder.queries.get(this.getSelectedId()) as BrowserTypes.Variant),
+    Ajax.saveItem(BrowserTypes.variantForSave(
+        this.state.builder.queries.get(this.getSelectedId()) as BrowserTypes.Variant
+      ),
       this.onSaveSuccess,
       this.onSaveError
     );
@@ -408,7 +409,6 @@ class Builder extends PureClasss<Props>
   
 	render()
   {
-    // console.log(this.state.builder['toJS']());
     let config = this.props.params.config;
     
     return (

@@ -47,7 +47,7 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../data/BuilderActions.tsx";
 import Util from '../../../util/Util.tsx';
-import { BuilderTypes, CardColors } from './../../BuilderTypes.tsx';
+import BuilderTypes from './../../BuilderTypes.tsx';
 let {CardTypes} = BuilderTypes;
 import { DragSource, DropTarget } from 'react-dnd';
 import PureClasss from '../../../common/components/PureClasss.tsx';
@@ -68,17 +68,6 @@ interface Props
   connectDropTarget?: (Element) => JSX.Element;
 }
 
-var styles: any = {};
-for(var t in CardTypes)
-{
-  let type = CardTypes[t];
-  styles[type] =
-  {
-    background: CardColors[type] ? CardColors[type][0] : CardColors['none'][0],
-    borderColor: CardColors[type] ? CardColors[type][1] : CardColors['none'][1],
-  }
-}
-
 class CreateCardTool extends PureClasss<Props>
 {
   constructor(props:Props)
@@ -95,8 +84,6 @@ class CreateCardTool extends PureClasss<Props>
     }
     
     var type = Util.rel(event.target);
-    console.log(type);
-    console.log(this.props.keyPath);
     Actions.create(this.props.keyPath, this.props.index, type);
   }
   
@@ -130,19 +117,25 @@ class CreateCardTool extends PureClasss<Props>
      <div className='create-card-selector' ref='ccWrapper'>
        <div className='create-card-selector-inner'>
          {
-           _.map(CardTypes as any, (type:string) => (
-             <a
-               className="create-card-button"
-               key={type}
-               rel={type}
-               onClick={this.createCard}
-               style={styles[type]}
-             >
-               <div className="create-card-button-inner" rel={type}>
-                 { Util.titleForCardType(type) }
-               </div>
-             </a>
-           ))
+           _.map(CardTypes as any, (type:string) => 
+           {
+             let card = BuilderTypes.recordFactories[type]();
+             return (
+               <a
+                 className="create-card-button"
+                 key={type}
+                 rel={type}
+                 onClick={this.createCard}
+                 style={{
+                   backgroundColor: card.colors[0],
+                 }}
+               >
+                 <div className="create-card-button-inner" rel={type}>
+                   { card.title }
+                 </div>
+               </a>
+             );
+           })
          }
        </div>
      </div>

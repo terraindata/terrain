@@ -52,7 +52,6 @@ import Util from '../../util/Util.tsx';
 import PureClasss from '../../common/components/PureClasss.tsx';
 import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
 import Card from '../../builder/components/cards/Card.tsx';
-import { CardColors } from './../../builder/BuilderTypes.tsx';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as classNames from 'classnames';
 import Autocomplete from './Autocomplete.tsx';
@@ -67,7 +66,7 @@ interface Props
   id?: string; // TODO remove
 
   canEdit?: boolean;
-  options?: List<string>;
+  keys?: List<string>;
   placeholder?: string;
   help?: string;
   ref?: string;
@@ -149,7 +148,8 @@ class BuilderTextbox extends PureClasss<Props>
   
   isText()
   {
-    return typeof this.props.value === 'string';
+    // TODO better approach?
+    return typeof this.props.value === 'string' || typeof this.props.value === 'number';
   }
   
   handleSwitch()
@@ -221,7 +221,7 @@ class BuilderTextbox extends PureClasss<Props>
                 ref='input'
                 disabled={!this.props.canEdit}
                 value={this.props.value as string}
-                options={this.props.options}
+                options={this.props.keys}
                 onChange={this.handleAutocompleteChange}
                 placeholder={this.props.placeholder}
                 help={this.state && this.state.wrongType ? this.props.typeErrorMessage : this.props.help}
@@ -237,9 +237,9 @@ class BuilderTextbox extends PureClasss<Props>
     if(cards.length)
     {
       var card = cards[0];
-      var color = CardColors[card.type][0] as string;
-      var title = Util.titleForCard(card);
-      var preview = Util.previewForCard(card);
+      var color = card.colors[0] as string;
+      var title: string = card.title;
+      var preview = BuilderTypes.getPreview(card);
     }
     else
     {

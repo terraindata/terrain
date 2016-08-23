@@ -47,7 +47,6 @@ import * as Immutable from 'immutable';
 import { BuilderTypes } from "../builder/BuilderTypes.tsx";
 type ICard = BuilderTypes.ICard;
 type IInput = BuilderTypes.IInput;
-type IFromCard = BuilderTypes.IFromCard;
 
 
 var OperatorsTQL = ['==', '!=', '>=', '>', '<=', '<', 'in', 'notIn'];
@@ -99,14 +98,14 @@ class TQLConverter
     return inputsTql + cardsTql;
   }
   
-  private static _topFromCard(cards: List<ICard>, fn: (fromCard: IFromCard) => IFromCard): List<ICard>
+  private static _topFromCard(cards: List<ICard>, fn: (fromCard: ICard) => ICard): List<ICard>
   {
     // find top-level 'from' cards
     return cards.map(topCard =>
     {
-      if(topCard.type === 'from')
+      if(topCard.type === 'from' || topCard.type === 'sfw')
       {
-        return fn(topCard as IFromCard);
+        return fn(topCard);
       }
       return topCard;
     }) as List<ICard>;
@@ -116,8 +115,8 @@ class TQLConverter
   {
     if(options.allFields)
     {
-      cards = this._topFromCard(cards, (fromCard: IFromCard) =>
-        fromCard.set('cards', fromCard.cards.map(card =>
+      cards = this._topFromCard(cards, (fromCard: ICard) =>
+        fromCard.set('cards', fromCard['cards'].map(card =>
         {
           if(card.type === 'select')
           {
@@ -129,13 +128,13 @@ class TQLConverter
       ));
     }
     
-    cards = this._topFromCard(cards, (fromCard: IFromCard) =>
+    cards = this._topFromCard(cards, (fromCard: ICard) =>
     {
       // add a take card if none are present
-      if(!fromCard.cards.some(card => card.type === 'take'))
+      if(!fromCard['cards'].some(card => card.type === 'take'))
       {
         let limit = options.limit || 5000; // queries without a limit will crash Tiny
-        return fromCard.set('cards', fromCard.cards.push(BuilderTypes._ITakeCard({
+        return fromCard.set('cards', fromCard['cards'].push(BuilderTypes._ITakeCard({
           value: 5000,
         })));
       }

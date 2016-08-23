@@ -58,11 +58,39 @@ interface Props
 {
   keyPath: KeyPath;
   data : any; // record
-  type: string;
+  
+  type?: string;
+  display?: Display | Display[];
+  
+  keys: List<string>;
+  canEdit: boolean;
 }
-
+  const shallowCompare = require('react-addons-shallow-compare');
 class BuilderComponent extends PureClasss<Props>
 {
+  
+  shouldComponentUpdate(nextProps: Props, nextState: any)
+  {
+    // if(shallowCompare(this, nextProps, nextState))
+    // {
+    //   console.log('update comp', this.props.type, this.props.keyPath.toJS());
+    //   for(var i in this.props)
+    //   {
+    //     if(nextProps[i] !== this.props[i])
+    //     {
+    //       console.log(i, this.props[i], nextProps[i]);
+    //     }
+    //   }
+    //   for(var i in this.state)
+    //   {
+    //     if(nextState[i] !== this.state[i])
+    //     {
+    //       console.log(i, this.state[i], nextState[i]);
+    //     }
+    //   }
+    // }
+    return shallowCompare(this, nextProps, nextState);
+  }
   _addRow(keyPath: KeyPath, index: number, display: Display)
   {
     return this._fn('addRow', keyPath, index, display, () => {
@@ -88,14 +116,16 @@ class BuilderComponent extends PureClasss<Props>
     let keySeed = parentKeyPath.join(",");
     if(Array.isArray(displayArg))
     {
-      return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
-      // return (
-      //   <div key={keySeed + "-list"}>
-      //     {
-      //       displayArg.map(di => this.renderDisplay(di, parentKeyPath, data))
-      //     }
-      //   </div>
-      // );
+      return displayArg.map(di => 
+          <BuilderComponent
+            display={di}
+            keyPath={parentKeyPath}
+            data={data}
+            canEdit={this.props.canEdit}
+            keys={this.props.keys}
+          />
+        ) as El[];
+      // return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
     }
     
     const d = displayArg as Display;
@@ -145,7 +175,8 @@ class BuilderComponent extends PureClasss<Props>
         break;
       case DisplayType.CARDS:
         content = <CardsArea 
-          {...this.props}
+          keys={this.props.keys}
+          canEdit={this.props.canEdit}
           key={key}
           cards={value} 
           keyPath={keyPath}
@@ -158,13 +189,32 @@ class BuilderComponent extends PureClasss<Props>
       break;
       case DisplayType.DROPDOWN:
         content = <Dropdown
-          {...this.props}
+          canEdit={this.props.canEdit}
           className={className}
           key={key}
           keyPath={keyPath}
           options={d.options}
           selectedIndex={value}
         />;
+      break;
+      case DisplayType.FLEX:
+        content = (
+          <div
+            key={key}
+            className='card-flex'
+          >
+            <BuilderComponent
+              display={d.row}
+              keyPath={keyPath}
+              data={data}
+              canEdit={this.props.canEdit}
+              keys={this.props.keys}
+            />
+          </div>
+        );
+            // {
+            //   this.renderDisplay(d.row, keyPath, data)
+            // }
       break;
       case DisplayType.ROWS:
         content = (
@@ -181,16 +231,21 @@ class BuilderComponent extends PureClasss<Props>
                   onMove={this._moveRow(keyPath)}
                   key={key + ',' + v.get('id')}
                   isSingle={value.size === 1}
-                >
-                  {
-                    this.renderDisplay(
-                      d.row,
-                      this._ikeyPath(keyPath, i),
-                      v
-                    )
-                  }
-                </CardField>
+                  
+                    display={d.row}
+                    keyPath={this._ikeyPath(keyPath, i)}
+                    data={v}
+                    canEdit={this.props.canEdit}
+                    keys={this.props.keys}
+                />
               ))
+                  // {
+                  //   this.renderDisplay(
+                  //     d.row,
+                  //     this._ikeyPath(keyPath, i),
+                  //     v
+                  //   )
+                  // }
             }
             {
               value.size ? null :
@@ -214,7 +269,8 @@ class BuilderComponent extends PureClasss<Props>
     {
       content = (
         <BuilderTextbox
-          {...this.props}
+          keys={this.props.keys}
+          canEdit={this.props.canEdit}
           placeholder={d.placeholder || d.key}
           {...{
             key,
@@ -248,13 +304,24 @@ class BuilderComponent extends PureClasss<Props>
   
   render()
   {
-    let {type, data} = this.props;
-    let display = BuilderComponents[type];
-
+    var {type, data, display} = this.props;
+    
+    if(!display)
+    {
+      if(!type)
+      {
+        throw new Error("Insufficient props supplied to BuilderComponent");
+      }
+      
+      display = BuilderComponents[type];
+    }
+    
     if(Array.isArray(display))
     {
       return (
-        <div>
+        <div
+          className='builder-comp-list'
+        >
           {
             display.map((d, i) => this.renderDisplay(
               d,

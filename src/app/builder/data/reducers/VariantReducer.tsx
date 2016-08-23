@@ -151,7 +151,6 @@ VariantReducer[ActionTypes.move] =
       let el = arr.get(index);
       arr = arr.splice(index, 1);
       arr = arr.splice(newIndex, 0, el); // TODO potentially correct index
-      console.log('m', arr.toJS(), index, newIndex);
       return arr;
     })
 

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import {BuilderTypes, Directions, Combinators, Operators} from './../BuilderTypes.tsx';
@@ -55,12 +56,13 @@ export enum DisplayType
   ROWS,
   CARDS,
   DROPDOWN,
+  FLEX,
   // ...
   
   LABEL, // strict text to paste in to HTML
 }
 
-let {TEXT, NUM, ROWS, CARDS, CARDTEXT, DROPDOWN, LABEL} = DisplayType;
+let {TEXT, NUM, ROWS, CARDS, CARDTEXT, DROPDOWN, LABEL, FLEX} = DisplayType;
 
 export interface Display
 {
@@ -73,8 +75,10 @@ export interface Display
   placeholder?: string;
   className?: string | ((data: any) => string);
   
-  // for rows:
+  // for rows and flex:
   row?: Display | Display[];
+  
+  // for rows:
   english?: string;
   factoryType?: string;
 }
@@ -91,6 +95,64 @@ let textDisplay =
   displayType: TEXT,
   key: [],
 }
+
+let filtersDisplay = 
+{
+    displayType: ROWS,
+    key: 'filters',
+    english: 'condition',
+    factoryType: BlockTypes.FILTER,
+    className: (data => data.filters.size > 1 ? 'filters-multiple' : 'filters-single'),
+    row: [
+      {
+        displayType: CARDTEXT,
+        key: 'first',
+      },
+      {
+        displayType: DROPDOWN,
+        key: 'operator',
+        options: Immutable.List(Operators),
+      },
+      {
+        displayType: CARDTEXT,
+        key: 'second',
+      },
+      {
+        displayType: DROPDOWN,
+        key: 'combinator',
+        options: Immutable.List(Combinators),
+        className: 'combinator',
+      }
+    ],
+  };
+
+let wrapperDisplay =
+{
+  displayType: CARDS,
+  key: 'cards',
+};
+
+let letVarDisplay =
+{
+  displayType: FLEX,
+  key: null,
+  row:
+  [
+    {
+      displayType: TEXT,
+      key: 'field',
+    },
+    {
+      displayType: LABEL,
+      label: '=',
+      key: null,
+    },
+    {
+      displayType: CARDTEXT,
+      key: 'expression',
+    },
+  ],
+};
 
 export const BuilderComponents: {[type:string]: Display | Display[]} =
 {
@@ -132,35 +194,12 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
       ]
     },
     
-    {
-      header: 'Where',
-      displayType: ROWS,
-      key: 'filters',
-      english: 'condition',
-      factoryType: BlockTypes.FILTER,
-      className: (data => data.filters.size > 1 ? 'filters-multiple' : 'filters-single'),
-      row: [
-        {
-          displayType: CARDTEXT,
-          key: 'first',
-        },
-        {
-          displayType: DROPDOWN,
-          key: 'operator',
-          options: Immutable.List(Operators),
-        },
-        {
-          displayType: CARDTEXT,
-          key: 'second',
-        },
-        {
-          displayType: DROPDOWN,
-          key: 'combinator',
-          options: Immutable.List(Combinators),
-          className: 'combinator',
-        }
-      ],
-    },
+    _.extend(
+      {
+        header: 'Where',
+      }, 
+      filtersDisplay
+    ),
     
     {
       displayType: CARDS,
@@ -168,14 +207,82 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
     },
   ],
   
-  from:
+  // from:
+  // {
+  //   displayType: TEXT,
+  //   key: 'table',
+  // },
+  
+  sort:
   {
-    displayType: TEXT,
-    key: 'table',
+    displayType: ROWS,
+    key: 'sorts',
+    english: 'sort',
+    factoryType: BlockTypes.SORT,
+    row:
+    [
+      {
+        displayType: TEXT,
+        key: 'property'
+      },
+      {
+        displayType: DROPDOWN,
+        key: 'direction',
+        options: Immutable.List(Directions),
+      },
+    ]
   },
+  
+  filter: filtersDisplay,
+  
+  let: letVarDisplay,
+  var: letVarDisplay,
+  
+  score:
+  {
+    displayType: ROWS,
+    key: 'weights',
+    english: 'weight',
+    factoryType: BlockTypes.WEIGHT,
+    row:
+    [
+      {
+        displayType: TEXT,
+        key: 'key',
+        placeholder: 'Field',
+      },
+      {
+        displayType: NUM,
+        key: 'weight',
+        placeholder: 'Weight',
+      },
+      // TODO
+    ]
+  },
+  
+  transform:
+  [
+    {
+      displayType: TEXT,
+      key: 'input',
+      placeholder: 'Input field',
+    },
+    // TODO
+  ],
+  
+  // TODO
+  // if: {},
   
   take: valueDisplay,
   skip: valueDisplay,
+  
+  max: wrapperDisplay,
+  min: wrapperDisplay,
+  sum: wrapperDisplay,
+  avg: wrapperDisplay,
+  count: wrapperDisplay,
+  exists: wrapperDisplay,
+  parentheses: wrapperDisplay,
 }
 
 export default BuilderComponents;

@@ -48,6 +48,8 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../../util/Util.tsx';
 import PureClasss from '../../../common/components/PureClasss.tsx';
+import BuilderComponent from '../BuilderComponent.tsx';
+import {Display} from '../BuilderComponents.tsx';
 const classNames = require('classnames');
 
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
@@ -70,7 +72,13 @@ interface Props
   aboveContent?: El;
   belowContent?: El;
   
-  children?: El;
+  // children?: El;
+  
+  display: Display | Display[];
+  keyPath: KeyPath;
+  data: any; // record
+  canEdit: boolean;
+  keys: List<string>;
 }
 
 interface IMoveState
@@ -94,6 +102,7 @@ const DefaultMoveState =
   movedTo: null,
 }
 
+  const shallowCompare = require('react-addons-shallow-compare');
 // TODO consider adding state to the template
 class CardField extends PureClasss<Props>
 {
@@ -103,6 +112,30 @@ class CardField extends PureClasss<Props>
   {
     this.setState(state);
   }
+  
+  // TODO
+  // shouldComponentUpdate(nextProps: Props, nextState: any)
+  // {
+  //   if(shallowCompare(this, nextProps, nextState))
+  //   {
+  //     console.log('update');
+  //     for(var i in this.props)
+  //     {
+  //       if(nextProps[i] !== this.props[i])
+  //       {
+  //         console.log(i, this.props[i], nextProps[i]);
+  //       }
+  //     }
+  //     for(var i in this.state)
+  //     {
+  //       if(nextState[i] !== this.state[i])
+  //       {
+  //         console.log(i, this.state[i], nextState[i]);
+  //       }
+  //     }
+  //   }
+  //   return shallowCompare(this, nextProps, nextState);
+  // }
   
 	removeField(event)
 	{
@@ -341,7 +374,13 @@ class CardField extends PureClasss<Props>
             </div>
           </div>
   				<div className='card-field-inner' >
-  					{ this.props.children }
+            <BuilderComponent
+    					display={this.props.display}
+              keyPath={this.props.keyPath}
+              data={this.props.data}
+              canEdit={this.props.canEdit}
+              keys={this.props.keys}
+            />
   				</div>
   				<div className='card-field-tools-right'>
             <div className='card-field-tools-right-inner'>
