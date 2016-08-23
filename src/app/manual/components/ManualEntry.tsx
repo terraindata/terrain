@@ -69,6 +69,7 @@ interface Props
   openTerm: (any) => void;
   spotlights?: any[];
   history?: any;
+  phraseType?: boolean;
 }
 
 
@@ -94,6 +95,7 @@ class ManualEntry extends Classs<Props>
   {
     var words = text.split(' ');
     var keywords = Object.keys(ManualConfig[0]).map((word) => word.toUpperCase());
+    keywords = keywords.concat(Object.keys(ManualConfig[1]).map((word) => word.toUpperCase()));
     return (
       <div>
       {words.map((word, index) => 
@@ -110,10 +112,9 @@ class ManualEntry extends Classs<Props>
       )}
       </div>
     );
-
   }
 
-  renderEntryDetail() 
+  renderTqlCardEntryDetail() 
   {
 
     return (
@@ -122,13 +123,24 @@ class ManualEntry extends Classs<Props>
           <b>Type:</b>&nbsp;{ManualConfig[0][this.props.entryName].Type}
         </div> 
         <div className ='manual-entry-row'>
-          <b>Syntax:</b>&nbsp;{ManualConfig[0][this.props.entryName].Syntax}
+          <b>Syntax:</b>&nbsp;{this.highlightKeyWords(ManualConfig[0][this.props.entryName].Syntax)}
         </div> 
         <div className ='maunual-entry-indepth'>
           {this.renderInDepthDescription()}
         </div>
       </div>
         );
+  }
+
+  renderPhraseTypeEntryDetail()
+  {  
+    return (
+      <div className='manual-entry-expanded-area'>
+        <div className ='maunual-entry-indepth'>
+          {this.highlightKeyWords(ManualConfig[1][this.props.entryName].Text)}
+        </div>
+      </div>
+    );
   }
 
   renderEntry() {
@@ -153,7 +165,7 @@ class ManualEntry extends Classs<Props>
       </div>
 
       <div className ='manual-entry-summary'>
-        {this.highlightKeyWords(ManualConfig[0][this.props.entryName].Summary)}
+        {this.props.phraseType ? ManualConfig[1][this.props.entryName].Summary : this.highlightKeyWords(ManualConfig[0][this.props.entryName].Summary)}
       </div>
     </div>    
     );
@@ -254,11 +266,30 @@ class ManualEntry extends Classs<Props>
     );
   }
 
+  renderTqlCardEntry()
+  {
+    return (
+        <div>
+        {this.renderEntry()}
+        {this.state.expanded ? this.renderTqlCardEntryDetail() : null }
+        </div>
+    );
+  }
+
+  renderPhraseTypeEntry()
+  {
+    return (
+      <div> 
+        {this.renderEntry()}
+         {this.state.expanded ? this.renderPhraseTypeEntryDetail() : null }
+      </div>
+    );
+  }
+
   render() {
     return (
       <div className ='manual-entry'> 
-        {this.renderEntry()}
-        {this.state.expanded ? this.renderEntryDetail() : null }
+        {this.props.phraseType ? this.renderPhraseTypeEntry() : this.renderTqlCardEntry()}
         <br />
         <br />
       </div>

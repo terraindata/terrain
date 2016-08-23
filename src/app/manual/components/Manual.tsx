@@ -56,6 +56,8 @@ var CloseIcon = require('./../../../images/icon_close.svg');
 var SearchIcon = require('./../../../images/icon_search.svg');
 var HomeIcon = require('./../../../images/icon_home.svg');
 var ManualConfig = require('./../ManualConfig.json');
+var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
+
 
 interface Props
 {
@@ -73,25 +75,31 @@ class Manual extends Classs<Props>
                 this.props.location.state && 
                 this.props.location.state.cardName ? 
                   this.props.location.state.cardName : '';
-    var keys = Object.keys(ManualConfig[0]).filter((key) =>
+    var tqlCards = Object.keys(ManualConfig[0]).filter((key) =>
+    {
+       return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
+    });
+    var phraseTypes = Object.keys(ManualConfig[1]).filter((key) =>
     {
        return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
     });
     this.state = {
-      visibleKeys: keys,
+      visibleTqlCards: tqlCards,
+      visiblePhraseTypes: phraseTypes,
       value,
       selectedKey: '',
+      expandTqlCards: false,
+      expandPhraseTypes: false,
     }
   }
 
-  renderEntriesList()
+  renderTqlCardsList()
   {
-    
     return (
-      <div className='manual-content-area'>
+      <div>
         {
           Object.keys(ManualConfig[0]).map((result, index) =>
-            <div key ={index}>
+            <div key ={index} className='manual-left-column-row'>
               <div 
                 className={classNames({
                   'manual-left-column-entry': true,
@@ -110,6 +118,30 @@ class Manual extends Classs<Props>
     );
   }
 
+  renderPhraseTypesList()
+  {
+    return (
+      <div>
+        {
+          Object.keys(ManualConfig[1]).map((result, index) =>
+            <div key ={index} className='manual-left-column-row'>
+              <div 
+                className={classNames({
+                  'manual-left-column-entry': true,
+                  'manual-entry-left-selected': this.state.selectedKey === result,
+                })}
+                onClick={this.search.bind(this, result)}
+              > 
+                {result} 
+              </div>
+              <br />
+            </div> 
+          )
+        }
+      </div>
+    );
+  }
+
   openTerm(e)
   {  
     var cardName = e.target.textContent.trim().replace(',', '').replace('.', '');
@@ -121,7 +153,7 @@ class Manual extends Classs<Props>
 
   renderManualEntries()
   {
-    if(this.state.visibleKeys.length === 0)
+    if(this.state.visibleTqlCards.length === 0 && this.state.visiblePhraseTypes.length === 0)
     {
       return (
         <div className='manual-content-area'>
@@ -132,7 +164,7 @@ class Manual extends Classs<Props>
     return (
       <div className='manual-content-area'>
         {
-          this.state.visibleKeys.map((result, index) =>
+          this.state.visibleTqlCards.map((result, index) =>
             <div key ={index}>
               <ManualEntry
                 entryName={result}
@@ -145,16 +177,34 @@ class Manual extends Classs<Props>
             </div> 
           )
         }
+        {
+          this.state.visiblePhraseTypes.map((result, index) =>
+            <div key={index}>
+              <ManualEntry
+                entryName={result}
+                canEdit={false}
+                demoEdit={true}
+                openTerm={this.openTerm}
+                spotlights={[]}
+                history={this.props.history}
+                phraseType={true}
+              />
+            </div>
+          )
+        }
       </div>
     );
   }
 
   search(value)
   {
-    var visibleKeys = Object.keys(ManualConfig[0]).filter((key) => {
+    var visibleTqlCards = Object.keys(ManualConfig[0]).filter((key) => {
       return (key.toLowerCase().indexOf(value.toLowerCase()) >= 0);
     });
 
+    var visiblePhraseTypes = Object.keys(ManualConfig[1]).filter((key) => {
+      return (key.toLowerCase().indexOf(value.toLowerCase()) >= 0);
+    });
 
     var selectedKey = '';
     Object.keys(ManualConfig[0]).forEach(function(key, index) {
@@ -164,7 +214,8 @@ class Manual extends Classs<Props>
         }
     });
     this.setState({
-      visibleKeys,
+      visibleTqlCards,
+      visiblePhraseTypes,
       value,
       selectedKey,
     });
@@ -206,13 +257,54 @@ class Manual extends Classs<Props>
         </div>
     );
   }
+
+  expandTqlCards()
+  {
+    this.setState({
+      expandTqlCards: !this.state.expandTqlCards
+    });
+  }
+
+  expandPhraseTypes()
+  {
+    this.setState({
+      expandPhraseTypes: !this.state.expandPhraseTypes
+    });
+  }
+
+  renderLeftColumn()
+  {
+    return (
+      <div className ='manual-content-area'>
+        <div className='manual-left-column-section-heading' onClick={this.expandTqlCards}> 
+          <ArrowIcon className = {classNames ({ 
+            'manual-arrow-icon': true,
+            'manual-arrow-icon-open': this.state.expandTqlCards,
+            })}
+          />
+          TQL Cards
+        </div>
+        {this.state.expandTqlCards ? this.renderTqlCardsList() : null}
+        <div className='manual-left-column-section-heading' onClick={this.expandPhraseTypes}> 
+          <ArrowIcon className = {classNames ({ 
+            'manual-arrow-icon': true,
+            'manual-arrow-icon-open': this.state.expandPhraseTypes,
+            })}
+          />
+          Phrase Types 
+        </div>
+        {this.state.expandPhraseTypes ? this.renderPhraseTypesList() : null}
+      </div>
+    );
+  }
+
   render()
   {
     return (
       <div className ='manual-area'>
         {this.renderManualTopbar()}
         <div className='manual-left-column'>
-          {this.renderEntriesList()}
+           {this.renderLeftColumn()}
         </div>
         <div className='manual-right-column'>
           {this.renderManualEntries()}

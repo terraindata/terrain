@@ -254,6 +254,18 @@
         "The avg card does not have a description yet."
       ]
     }
+  },
+  {
+    "Expression":
+    {  
+      "Summary": "Testing",
+      "Text": "Text would go here Select select Reference Expression expression"
+    },
+    "Reference":
+    {
+      "Summary": "Testing",
+      "Text": "Text would go here"
+    }
   }
 ]
 
