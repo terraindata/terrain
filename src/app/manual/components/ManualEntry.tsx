@@ -231,6 +231,7 @@ class ManualEntry extends Classs<Props>
                 {
                   this.highlightKeyWords(ManualConfig[0][this.props.entryName].Text[index])
                 }
+                <br/>
                 </div> 
                 );
             }

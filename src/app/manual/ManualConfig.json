@@ -26,23 +26,53 @@
     },
     "Take":
     { 
-      "Snippet": "Number of results", 
-      "Summary": "Returns a query expression representing the first n results from the left-hand query expression, where n is the value returned by the rhs expression", 
+      "Snippet": "Returns n results", 
+      "Summary": "Returns a query expression representing the first n results from the expression on the left hand side.  The number of results n is the evaluation of the right hand side.", 
       "Type": "binary infix operator",
-      "Syntax": "query expression take expression",
+      "Syntax": "query expression TAKE expression",
       "Text": 
       [ 
-        "The SQL SELECT statement returns a result set of records from one or more tables.",
         [
           {
-            "id": "c-2735991550",
-            "parentId": "CI2XI",
-            "value": "10",
-            "type": "take"
+            "id": "c-4",
+            "parentId": "c-2",
+            "type": "take",
+            "value": "10"
           },
-          "from 'users' as user\nselect user.name\ntake 10"
+          "take 10"
         ],
-        "A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints."
+        "Take is a binary infix operator, meaning it sits between two expressions. Take returns a query expression that is the first n results of the query expression on its left hand side.  The number of results n to be returned is determined from the right hand side. In order to get a specific set of results, the data can be sorted based on some parameter first and then the top n results selected via Take. For example, if you wanted the 10 oldest people in a group, you would sort the people based on descending age and then use 'Take 10'.",
+        "This exampe takes the first 10 results (the names of users) from the table 'users.'",
+        [
+        {
+          "cards": [
+            {
+              "id": "c-3",
+              "parentId": "c-2",
+              "properties": [
+                {
+                  "id": "0.6",
+                  "property": "user.name"
+                }
+              ],
+              "type": "select"
+            },
+            {
+              "id": "c-4",
+              "parentId": "c-2",
+              "type": "take",
+              "value": "10"
+            }
+          ],
+          "group": "users",
+          "id": "c-2",
+          "iterator": "user",
+          "joins": [],
+          "parentId": "8R",
+          "type": "from"
+        },
+          "from 'users' as user\nselect user.name\ntake 10"
+        ]
       ]
     },
     "From":

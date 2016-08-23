@@ -57,12 +57,11 @@ interface Props
 }
 
 
-class ManualEntry extends Classs<Props>
+class ManualInfo extends Classs<Props>
 {
   constructor(props: Props) 
   {
     super(props);
-
   }
 
   render() {
@@ -77,4 +76,4 @@ class ManualEntry extends Classs<Props>
   }
 };
 
-export default ManualEntry;
+export default ManualInfo;

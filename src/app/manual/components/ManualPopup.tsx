@@ -59,7 +59,7 @@ interface Props
   history?: any;
 }
 
-class ModalPopup extends Classs<Props>
+class ManualPopup extends Classs<Props>
 {
   constructor(props: Props) {
     super(props);
@@ -148,4 +148,4 @@ class ModalPopup extends Classs<Props>
   }
 };
 
-export default ModalPopup;
+export default ManualPopup;
