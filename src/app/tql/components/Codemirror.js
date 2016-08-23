@@ -45,7 +45,6 @@ THE SOFTWARE.
 //Adapted from https://github.com/JedWatson/react-codemirror
 'use strict';
 
-var ManualPopup = require('./../../manual/components/ManualPopup.tsx');
 var React = require('react');
 var className = require('classnames');
 
@@ -62,8 +61,8 @@ var CodeMirror = React.createClass({
 		value: React.PropTypes.string,
 		className: React.PropTypes.any,
 		codeMirrorInstance: React.PropTypes.object,
-		getErrorWidget: React.PropTypes.func
-	},
+		openManual: React.PropTypes.func
+			},
 	foldClass: {
 		open: "CodeMirror-foldgutter-open",
 		folded: "CodeMirror-foldgutter-folded",
@@ -109,26 +108,24 @@ var CodeMirror = React.createClass({
 			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
 		}
 
-		var widget = this.props.getErrorWidget(this.codeMirror.getLine(lineToHighlight));
-		console.log(widget);		
+		var widget = document.createElement("span");
+		var text = document.createElement("div");
+		var content = document.createTextNode("?");
+		widget.appendChild(text);
+		text.appendChild(content);
+		widget.className = 'CodeMirror-error-marker';
+		text.className = 'CodeMirror-error-text';
+		var a = document.createAttribute('data-tip');
+		a.value = 'For more information, open manual';
+		widget.setAttributeNode(a);
+		var self = this;
+		var codeMirrorInstance = this.getCodeMirrorInstance();
+		//Onclick functions to unfold the code
+		var line = this.codeMirror.getLine(lineToHighlight)
+		codeMirrorInstance.on(widget, "mousedown", function(e) {
+      		self.props.openManual(e, line);
+   		});
 		this.codeMirror.setGutterMarker(lineToHighlight, "CodeMirror-lint-markers", widget);
-		// var widget = document.createElement("span");
-		// var text = document.createElement("div");
-		// var content = document.createTextNode("?");
-		// widget.appendChild(text);
-		// text.appendChild(content);
-		// widget.className = 'CodeMirror-error-marker';
-		// text.className = 'CodeMirror-error-text';
-		// var a = document.createAttribute('data-tip');
-		// a.value = 'For more information, open manual';
-		// widget.setAttributeNode(a);
-		// var self = this;
-		// var codeMirrorInstance = this.getCodeMirrorInstance();
-		// //Onclick functions to unfold the code
-		// var line = this.codeMirror.getLine(lineToHighlight)
-		// codeMirrorInstance.on(widget, "mousedown", function(e) {
-  //     		self.props.openManual(e, line);
-  //  		});
 	},
 	undoHighlightedLine: function undoHighlightedLine(line) 
 	{

@@ -112,7 +112,7 @@ class TQL extends Classs<Props>
     highlightedLine: null,
     theme_index: 0,
     confirmModalOpen: false,
-    confirmModalMessage: '',
+    confirmModalMessage: ''
   };
 
   constructor(props: Props) 
@@ -349,7 +349,7 @@ class TQL extends Classs<Props>
     );
   }
 
-  getErrorWidget(line)
+  openManual(event, line)
   {
     var keywords = Object.keys(ManualConfig[0]);
     var cardName = '';
@@ -359,10 +359,7 @@ class TQL extends Classs<Props>
         cardName = word;
       }
     });
-    //this.props.history.pushState({cardName}, '/manual');
-    return (
-      <ManualPopup cardName={cardName} history={this.props.history}/>
-    );
+    this.props.history.pushState({cardName}, '/manual');
   }
 
   renderTqlEditor() 
@@ -389,7 +386,7 @@ class TQL extends Classs<Props>
       options={options}
       className='codemirror-text'
       value={value}
-      getErrorWidget={this.getErrorWidget}
+      openManual={this.openManual}
       />
   }
 
