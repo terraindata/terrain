@@ -149,6 +149,110 @@
             "\ncount (\n\tselect *\n\tfrom 'users' as user\n\twhere user.name == John\n)"
         ]
       ]
+    },
+     "Min":
+    { 
+      "Snippet": "Returns minimum element", 
+      "Summary": "Returns an the minimum of all elements in the right hand side", 
+      "Type": "binary prefix operator",
+      "Syntax": "min expression",
+      "Text": 
+      [ 
+        "The syntax for the MIN function in SQL is:",
+        [
+          {
+             "cards": [ {
+              "id": "c-2735991550",
+              "parentId": "CI2XI",
+              "cards": [],
+              "filters": [{
+                "combinator": 0,
+                "condition": {
+                  "first": "user.name",
+                  "operator": 0,
+                  "second": "John"
+                },
+              "id": "co0.766099087301130"
+              }],
+              "group": "users",
+              "iterator": "user",
+              "joins": [],
+              "properties": [{
+                "property": "*",
+                "id": "0.6"
+              }],
+              "type": "sfw"
+            }],
+              "id": "c-2735991550",
+              "parentId": "CI2XI",
+              "type": "min"
+          },
+          "min();"
+        ]
+      ]
+    },
+     "Max":
+    { 
+      "Snippet": "Returns maximum element", 
+      "Summary": "Returns an the maximum of all elements in the right hand side", 
+      "Type": "binary prefix operator",
+      "Syntax": "max expression",
+      "Text": 
+      [ 
+        "The syntax for the MIN function in SQL is:",
+        [
+          {
+             "cards": [ {
+              "id": "c-2735991550",
+              "parentId": "CI2XI",
+              "cards": [],
+              "filters": [{
+                "combinator": 0,
+                "condition": {
+                  "first": "user.name",
+                  "operator": 0,
+                  "second": "John"
+                },
+              "id": "co0.766099087301130"
+              }],
+              "group": "users",
+              "iterator": "user",
+              "joins": [],
+              "properties": [{
+                "property": "*",
+                "id": "0.6"
+              }],
+              "type": "sfw"
+            }],
+              "id": "c-2735991550",
+              "parentId": "CI2XI",
+              "type": "max"
+          },
+          "max();"
+        ]
+      ]
+    },
+    "Sum":
+    { 
+      "Snippet": "Returns the sum", 
+      "Summary": "Returns an the sum of all elements in the right hand side.", 
+      "Type": "binary prefix operator",
+      "Syntax": "sum expression",
+      "Text": 
+      [ 
+        "The sum card does not have a description yet."
+      ]
+    },
+    "Avg":
+    { 
+      "Snippet": "Returns the average", 
+      "Summary": "Returns the average of all elements in the right hand side.", 
+      "Type": "binary prefix operator",
+      "Syntax": "avg expression",
+      "Text": 
+      [ 
+        "The avg card does not have a description yet."
+      ]
     }
   }
 ]
