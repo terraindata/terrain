@@ -311,15 +311,23 @@ class Manual extends Classs<Props>
     );
   }
 
+
   render()
   {
     return (
       <div className ='manual-area'>
         {this.renderManualTopbar()}
-        <div className='manual-left-column'>
+        {
+          this.props.manualTab ? 
+          <div className='manual-left-column'>
            {this.renderLeftColumn()}
-        </div>
-        <div className='manual-right-column'>
+          </div>
+          : 
+          null
+        }
+        <div className={classNames({
+            'manual-right-column': this.props.manualTab,
+        })}>
           {this.renderManualEntries()}
         </div>
       </div>
