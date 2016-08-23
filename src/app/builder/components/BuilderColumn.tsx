@@ -61,6 +61,7 @@ import InfoArea from '../../common/components/InfoArea.tsx';
 import * as moment from 'moment';
 import Ajax from "./../../util/Ajax.tsx";
 import * as Immutable from 'immutable';
+import Manual from './../../manual/components/Manual.tsx';
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -70,20 +71,23 @@ var BuilderIcon = require("./../../../images/icon_builder.svg");
 var ResultsIcon = require("./../../../images/icon_resultsDropdown.svg");
 var TQLIcon = require("./../../../images/icon_tql.svg");
 var InputsIcon = require("./../../../images/icon_input.svg");
+var ManualIcon = require('./../../../images/open-book-top-view.svg');
 
 enum COLUMNS {
   Builder,
   TQL,
   Results,
   Inputs,
+  Manual
 };
-var NUM_COLUMNS = 4;
+var NUM_COLUMNS = 5;
 
 var menuIcons = [
     {icon: <BuilderIcon />, color: '#76a2c1'},
     {icon: <ResultsIcon />, color: '#71bca2'},
     {icon: <TQLIcon />, color: '#d47884'},
-    {icon: <InputsIcon />, color: '#c2b694'}
+    {icon: <InputsIcon />, color: '#c2b694'},
+    {icon: <ManualIcon />, color: "#a98abf"}
 ];
 
 // interface Props
@@ -183,6 +187,7 @@ var BuilderColumn = React.createClass<any, any>(
   {
     var algorithm = this.props.algorithm;
     var parentId = algorithm.id;
+    var term = 'Select';
     switch(this.state.column)
     {
       case COLUMNS.Builder:
@@ -225,7 +230,7 @@ var BuilderColumn = React.createClass<any, any>(
           onLoadEnd={this.handleLoadEnd}
           canEdit={canEdit}
         />;
-      
+
       case COLUMNS.TQL:
         return <TQLEditor
           history={this.props.history}
@@ -234,6 +239,9 @@ var BuilderColumn = React.createClass<any, any>(
           onLoadEnd={this.handleLoadEnd}
         />;
         
+      case COLUMNS.Manual:
+        return <Manual 
+        />;
     }
     return <div>No column content.</div>;
   },
