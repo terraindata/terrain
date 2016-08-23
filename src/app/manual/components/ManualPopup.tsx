@@ -58,6 +58,8 @@ interface Props
   cardName: string;
   history?: any;
   style?: any;
+  addColumn: (number) => void;
+  switchView: (number) => void;
 }
 
 class ManualPopup extends Classs<Props>
@@ -102,8 +104,10 @@ class ManualPopup extends Classs<Props>
 
   openManual()
   {
+    //this.props.addColumn(0);
+    //this.props.switchView(4);
     var cardName = this.props.cardName === 'General' ? {} : {cardName: this.props.cardName};
-    this.props.history && this.props.history.pushState(cardName, '/manual')
+    this.props.history && this.props.history.pushState(cardName, window.location.pathname);
   }
 
   render() {

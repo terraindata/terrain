@@ -507,6 +507,8 @@ var Card = React.createClass({
                     cardName={Util.titleForCard(this.props.card)} 
                     history={this.props.history}
                     style={manualPopupStyle}
+                    addColumn={this.props.addColumn}
+                    switchView={this.props.switchView}
                   />
                   {
                     this.props.canEdit && <Menu options={this.state.menuOptions} />

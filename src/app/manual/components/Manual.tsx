@@ -72,11 +72,10 @@ class Manual extends Classs<Props>
   constructor(props: Props)
   {
     super(props);
-    // var value = this.props.location && 
-    //             this.props.location.state && 
-    //             this.props.location.state.cardName ? 
-    //               this.props.location.state.cardName : '';
-    var value = this.props.term || '';
+    var value = this.props.location && 
+                this.props.location.state && 
+                this.props.location.state.cardName ? 
+                  this.props.location.state.cardName : '';
     var tqlCards = Object.keys(ManualConfig[0]).filter((key) =>
     {
        return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;

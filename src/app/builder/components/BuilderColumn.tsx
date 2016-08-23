@@ -187,7 +187,6 @@ var BuilderColumn = React.createClass<any, any>(
   {
     var algorithm = this.props.algorithm;
     var parentId = algorithm.id;
-    var term = 'Select';
     switch(this.state.column)
     {
       case COLUMNS.Builder:
@@ -215,6 +214,8 @@ var BuilderColumn = React.createClass<any, any>(
           keys={this.state.inputKeys}
           canEdit={canEdit}
           history={this.props.history}
+          addColumn={this.props.onAddColumn}
+          switchView={this.switchView}
         />;
         
       case COLUMNS.Inputs:
