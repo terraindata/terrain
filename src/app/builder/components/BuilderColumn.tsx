@@ -115,16 +115,18 @@ var BuilderColumn = React.createClass<any, any>(
     canAddColumn: React.PropTypes.bool,
     canCloseColumn: React.PropTypes.bool,
     onAddColumn: React.PropTypes.func.isRequired,
+    onAddManualColumn: React.PropTypes.func.isRequired,
     onCloseColumn: React.PropTypes.func.isRequired,
     variant: React.PropTypes.object.isRequired,
     history: React.PropTypes.any,
     onRevert: React.PropTypes.func,
+    column: React.PropTypes.number,
   },
   
   getInitialState()
   {
     return {
-      column: this.props.index,
+      column: this.props.column ? this.props.column : this.props.index,
       loading: false,
       inputKeys: this.calcinputKeys(this.props),
       rand: 1,
@@ -214,8 +216,10 @@ var BuilderColumn = React.createClass<any, any>(
           keys={this.state.inputKeys}
           canEdit={canEdit}
           history={this.props.history}
-          addColumn={this.props.onAddColumn}
-          switchView={this.switchView}
+          addColumn={this.props.onAddManualColumn}
+          canAddColumn={this.props.canAddColumn}
+          onCloseColumn={this.props.onCloseColumn}
+          index={this.props.index}
         />;
         
       case COLUMNS.Inputs:
