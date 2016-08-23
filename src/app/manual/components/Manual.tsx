@@ -78,9 +78,10 @@ class Manual extends Classs<Props>
        return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
     });
     this.state = {
-      visibleKeys: keys,
+      visibleKeys: keys.sort(),
       value,
       selectedKey: '',
+      expanded: false,
     }
   }
 
@@ -90,14 +91,14 @@ class Manual extends Classs<Props>
     return (
       <div className='manual-content-area'>
         {
-          Object.keys(ManualConfig[0]).map((result, index) =>
+          Object.keys(ManualConfig[0]).sort().map((result, index) =>
             <div key ={index}>
               <div 
                 className={classNames({
                   'manual-left-column-entry': true,
                   'manual-entry-left-selected': this.state.selectedKey === result,
                 })}
-                onClick={this.search.bind(this, result)}
+                onClick={this.search.bind(this, result, false)}
               > 
                 {result} 
               </div>
@@ -141,6 +142,7 @@ class Manual extends Classs<Props>
                 openTerm={this.openTerm}
                 spotlights={[]}
                 history={this.props.history}
+                expanded={this.state.expanded}
               />
             </div> 
           )
@@ -149,11 +151,11 @@ class Manual extends Classs<Props>
     );
   }
 
-  search(value)
+  search(value, collapsed?)
   {
     var visibleKeys = Object.keys(ManualConfig[0]).filter((key) => {
       return (key.toLowerCase().indexOf(value.toLowerCase()) >= 0);
-    });
+    }).sort();
 
 
     var selectedKey = '';
@@ -163,16 +165,22 @@ class Manual extends Classs<Props>
           selectedKey = key;
         }
     });
+    var expanded = !collapsed;
+    if(value === '') 
+    {
+      expanded = false;
+    }
     this.setState({
       visibleKeys,
       value,
       selectedKey,
+      expanded,
     });
   }
 
   clearInput()
   {
-    this.search('');
+    this.search('', true);
   }
 
   renderManualTopbar()
@@ -193,7 +201,7 @@ class Manual extends Classs<Props>
                value={this.state.value as string}
                onChange={this.search}
                placeholder='Search'
-               options={Object.keys(ManualConfig[0])}
+               options={Object.keys(ManualConfig[0]).sort()}
               />
               <CloseIcon 
                className='manual-close-icon'

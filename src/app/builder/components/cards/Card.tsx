@@ -452,6 +452,7 @@ var Card = React.createClass({
 			</div>
 		);
     
+    var manualPopupStyle = this.props.canEdit ? {} : {right: '4px'}
 		var title = Util.titleForCard(this.props.card);
     const { isDragging, connectDragSource, connectDropTarget } = this.props;
     const rendering = 
@@ -502,7 +503,11 @@ var Card = React.createClass({
                   })}>
                     { Util.previewForCard(this.props.card) }
                   </span>
-                  <ManualPopup cardName={Util.titleForCard(this.props.card)} history={this.props.history}/>
+                  <ManualPopup 
+                    cardName={Util.titleForCard(this.props.card)} 
+                    history={this.props.history}
+                    style={manualPopupStyle}
+                  />
                   {
                     this.props.canEdit && <Menu options={this.state.menuOptions} />
                   }

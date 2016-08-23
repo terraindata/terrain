@@ -61,7 +61,8 @@ var CodeMirror = React.createClass({
 		value: React.PropTypes.string,
 		className: React.PropTypes.any,
 		codeMirrorInstance: React.PropTypes.object,
-		openManual: React.PropTypes.func
+		toggleSyntaxPopup: React.PropTypes.func,
+		defineTerm: React.PropTypes.func
 			},
 	foldClass: {
 		open: "CodeMirror-foldgutter-open",
@@ -85,6 +86,7 @@ var CodeMirror = React.createClass({
 		this.codeMirror.on('change', this.codemirrorValueChanged);
 		this.codeMirror.on('focus', this.focusChanged.bind(this, true));
 		this.codeMirror.on('blur', this.focusChanged.bind(this, false));
+		this.codeMirror.on('contextmenu', this.handleRightClick);
 		this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
 		this.codeMirror.setSize("100%", "70%");
 	},
@@ -101,6 +103,15 @@ var CodeMirror = React.createClass({
 			this.codeMirror.toTextArea();
 		}
 	},
+	handleRightClick: function handleRightClick(self, event)
+	{
+		event.preventDefault();
+		if(this.props.defineTerm)
+		{
+			this.props.defineTerm(this.codeMirror.getSelection())
+		}
+
+	},
 	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
 	{
 		if(lineToHighlight != null) 
@@ -115,15 +126,12 @@ var CodeMirror = React.createClass({
 		text.appendChild(content);
 		widget.className = 'CodeMirror-error-marker';
 		text.className = 'CodeMirror-error-text';
-		var a = document.createAttribute('data-tip');
-		a.value = 'For more information, open manual';
-		widget.setAttributeNode(a);
 		var self = this;
 		var codeMirrorInstance = this.getCodeMirrorInstance();
 		//Onclick functions to unfold the code
 		var line = this.codeMirror.getLine(lineToHighlight)
 		codeMirrorInstance.on(widget, "mousedown", function(e) {
-      		self.props.openManual(e, line);
+      		self.props.toggleSyntaxPopup(e, line);
    		});
 		this.codeMirror.setGutterMarker(lineToHighlight, "CodeMirror-lint-markers", widget);
 	},

@@ -79,7 +79,7 @@
     { 
       "Snippet": "Table being queried", 
       "Summary": "Returns a query expression representing all elements in the given source.", 
-      "Syntax": "from source definition",
+      "Syntax": "FROM source AS definition",
       "Text": 
       [ 
         "The SQL From clause is the source of a rowset to be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.",

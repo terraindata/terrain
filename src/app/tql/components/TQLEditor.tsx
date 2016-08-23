@@ -85,6 +85,7 @@ import 'codemirror/addon/search/matchesonscrollbar.css';
 
 import ManualPopup from './../../manual/components/ManualPopup.tsx';
 var ManualConfig = require('./../../manual/ManualConfig.json');
+var OpenIcon = require('./../../../images/icon_open.svg');
 
 interface Props {
   params?: any;
@@ -105,6 +106,9 @@ class TQL extends Classs<Props>
     theme_index: number;
     confirmModalOpen: boolean;
     confirmModalMessage: string;
+    syntaxHelpOpen: boolean;
+    syntaxHelpPos: any;
+    cardName: string;
   } = {
     tql: null,
     code: TQLConverter.toTQL(this.props.algorithm),
@@ -112,7 +116,10 @@ class TQL extends Classs<Props>
     highlightedLine: null,
     theme_index: 0,
     confirmModalOpen: false,
-    confirmModalMessage: ''
+    confirmModalMessage: '',
+    syntaxHelpOpen: false,
+    syntaxHelpPos: {},
+    cardName: ''
   };
 
   constructor(props: Props) 
@@ -137,7 +144,8 @@ class TQL extends Classs<Props>
     this.undoError();
     this.setState({
       code: newCode,
-      highlightedLine: null
+      highlightedLine: null,
+      syntaxHelpOpen: false,
     });
     this.executeCode();
   }
@@ -339,17 +347,18 @@ class TQL extends Classs<Props>
         </div>
         <div className='white-space' />
         <div className='tql-editor-manual-popup'>
-          <ManualPopup 
-            cardName='General' 
-            history={this.props.history}
-          />
         </div>
         <Menu options={this.getMenuOptions() } small={true}/>
       </div>
     );
   }
 
-  openManual(event, line)
+  openManual()
+  {
+      this.props.history.pushState({cardName: this.state.cardName}, '/manual');
+  }
+
+  toggleSyntaxPopup(event, line)
   {
     var keywords = Object.keys(ManualConfig[0]);
     var cardName = '';
@@ -359,7 +368,18 @@ class TQL extends Classs<Props>
         cardName = word;
       }
     });
-    this.props.history.pushState({cardName}, '/manual');
+    var left = event.clientX - event.offsetX - 8;
+    var top = event.clientY - event.offsetY + 17;
+    this.setState({
+      syntaxHelpOpen: !this.state.syntaxHelpOpen,
+      syntaxHelpPos: {left, top},
+      cardName
+    });
+  }
+
+  defineTerm(value)
+  {
+    console.log("defining " + value);
   }
 
   renderTqlEditor() 
@@ -386,7 +406,8 @@ class TQL extends Classs<Props>
       options={options}
       className='codemirror-text'
       value={value}
-      openManual={this.openManual}
+      toggleSyntaxPopup={this.toggleSyntaxPopup}
+      defineTerm={this.defineTerm}
       />
   }
 
@@ -414,6 +435,29 @@ class TQL extends Classs<Props>
         { this.renderTopbar() }
         <div className='code-section'>
           { this.renderTqlEditor() }
+          { this.state.syntaxHelpOpen ? 
+            <div 
+              className='tql-editor-syntax-help'
+              style={this.state.syntaxHelpPos}
+            >
+                {
+                  ManualConfig[0][this.state.cardName] ? 
+                  ManualConfig[0][this.state.cardName].Syntax : 
+                  "No syntax help available"
+                }
+              <div 
+                className='manual-popup-link'
+                onClick={this.openManual}
+              >
+                See full description in Manual
+                <OpenIcon 
+                  className='manual-popup-open-icon' 
+                  onClick={this.openManual}
+                />
+              </div>            
+            </div>
+            : null
+          }
           { this.renderResults() }
         </div>
         <Modal 

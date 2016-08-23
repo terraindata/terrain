@@ -69,6 +69,7 @@ interface Props
   openTerm: (any) => void;
   spotlights?: any[];
   history?: any;
+  expanded: boolean;
 }
 
 
@@ -79,8 +80,18 @@ class ManualEntry extends Classs<Props>
     super(props);
     this.state =
       {
-        expanded: false,
+        expanded: this.props.expanded,
       }
+  }
+
+  componentWillReceiveProps(newProps)
+  {
+    if(this.state.expanded !== newProps.expanded)
+    {
+      this.setState({
+        expanded: newProps.expanded
+      });
+    }
   }
 
   expand()
@@ -115,14 +126,13 @@ class ManualEntry extends Classs<Props>
 
   renderEntryDetail() 
   {
-
     return (
       <div className='manual-entry-expanded-area'>
         <div className ='manual-entry-row'>
           <b>Type:</b>&nbsp;{ManualConfig[0][this.props.entryName].Type}
         </div> 
         <div className ='manual-entry-row'>
-          <b>Syntax:</b>&nbsp;{ManualConfig[0][this.props.entryName].Syntax}
+          <b>Syntax:</b>&nbsp;{this.highlightKeyWords(ManualConfig[0][this.props.entryName].Syntax)}
         </div> 
         <div className ='maunual-entry-indepth'>
           {this.renderInDepthDescription()}

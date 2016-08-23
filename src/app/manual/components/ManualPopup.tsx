@@ -57,6 +57,7 @@ interface Props
 {
   cardName: string;
   history?: any;
+  style?: any;
 }
 
 class ManualPopup extends Classs<Props>
@@ -118,6 +119,7 @@ class ManualPopup extends Classs<Props>
         "manual-popup-wrapper": true,
         "manual-popup-open": this.state.open,
       })}
+      style={this.props.style}
     >
       <div 
         className="manual-popup-icon-wrapper"
