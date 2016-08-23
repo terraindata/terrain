@@ -358,6 +358,13 @@ class TQL extends Classs<Props>
       this.props.history.pushState({cardName: this.state.cardName}, '/manual');
   }
 
+  turnSyntaxPopupOff()
+  {
+    this.setState({
+      syntaxHelpOpen: false,
+    })
+  }
+
   toggleSyntaxPopup(event, line)
   {
     var keywords = Object.keys(ManualConfig[0]);
@@ -408,6 +415,7 @@ class TQL extends Classs<Props>
       value={value}
       toggleSyntaxPopup={this.toggleSyntaxPopup}
       defineTerm={this.defineTerm}
+      turnSyntaxPopupOff={this.turnSyntaxPopupOff}
       />
   }
 

@@ -62,8 +62,9 @@ var CodeMirror = React.createClass({
 		className: React.PropTypes.any,
 		codeMirrorInstance: React.PropTypes.object,
 		toggleSyntaxPopup: React.PropTypes.func,
-		defineTerm: React.PropTypes.func
-			},
+		defineTerm: React.PropTypes.func,
+		turnSyntaxPopupOff: React.PropTypes.func,
+	},
 	foldClass: {
 		open: "CodeMirror-foldgutter-open",
 		folded: "CodeMirror-foldgutter-folded",
@@ -88,6 +89,7 @@ var CodeMirror = React.createClass({
 		this.codeMirror.on('blur', this.focusChanged.bind(this, false));
 		this.codeMirror.on('contextmenu', this.handleRightClick);
 		this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
+		this.codeMirror.on('scroll', this.props.turnSyntaxPopupOff);
 		this.codeMirror.setSize("100%", "70%");
 	},
 	componentWillUnmount: function componentWillUnmount() 
@@ -111,6 +113,7 @@ var CodeMirror = React.createClass({
 			this.props.defineTerm(this.codeMirror.getSelection())
 		}
 	},
+
 	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
 	{
 		if(lineToHighlight != null) 

@@ -50,8 +50,7 @@ import { Link } from 'react-router';
 import * as classNames from 'classnames';
 import Autocomplete from './../../common/components/Autocomplete.tsx';
 import ManualEntry from './ManualEntry.tsx';
-import { DragDropContext } from 'react-dnd';
-var HTML5Backend = require('react-dnd-html5-backend');
+
 var CloseIcon = require('./../../../images/icon_close.svg');
 var SearchIcon = require('./../../../images/icon_search.svg');
 var HomeIcon = require('./../../../images/icon_home.svg');
@@ -65,6 +64,7 @@ interface Props
   children?: any;
   history?: any;
   term?: any;
+  selectedKey?: string
 }
 
 class Manual extends Classs<Props>
@@ -72,10 +72,7 @@ class Manual extends Classs<Props>
   constructor(props: Props)
   {
     super(props);
-    var value = this.props.location && 
-                this.props.location.state && 
-                this.props.location.state.cardName ? 
-                  this.props.location.state.cardName : '';
+    var value = this.props.selectedKey || '';
     var tqlCards = Object.keys(ManualConfig[0]).filter((key) =>
     {
        return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
@@ -89,7 +86,7 @@ class Manual extends Classs<Props>
       visibleTqlCards: tqlCards,
       visiblePhraseTypes: phraseTypes,
       value,
-      selectedKey: '',
+      selectedKey: this.props.selectedKey || '',
       expandTqlCards: true,
       expandPhraseTypes: true,
     }
@@ -217,11 +214,13 @@ class Manual extends Classs<Props>
           selectedKey = key;
         }
     });
+
     var expanded = !collapsed;
     if(value === '') 
     {
       expanded = false;
     }
+    this.props.history.pushState({}, '/manual/' + value);
     this.setState({
       visibleTqlCards,
       visiblePhraseTypes,
@@ -324,4 +323,4 @@ class Manual extends Classs<Props>
   }
 }
 
-export default DragDropContext(HTML5Backend)(Manual);
+export default Manual;

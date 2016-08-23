@@ -72,7 +72,7 @@ import Login from "./auth/components/Login.tsx";
 import InfoArea from "./common/components/InfoArea.tsx";
 import Placeholder from "./common/components/Placeholder.tsx";
 import Redirect from "./common/components/Redirect.tsx";
-import Manual from "./manual/components/Manual.tsx";
+import ManualWrapper from "./manual/components/ManualWrapper.tsx";
 var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
 import { Router, Route, IndexRoute } from 'react-router';
 import { createHistory } from 'history';
@@ -257,7 +257,8 @@ var router = (
         <Route path="/account/team" component={Team} />
       </Route>
       
-      <Route path="/manual" component={Manual} />
+      <Route path="/manual" component={ManualWrapper} />
+      <Route path="/manual/:term" component={ManualWrapper} />
       
       <Route path="/users/:username" component={Profile} />
       
