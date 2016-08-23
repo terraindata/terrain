@@ -64,7 +64,8 @@ interface Props
   children?: any;
   history?: any;
   term?: any;
-  selectedKey?: string
+  selectedKey?: string;
+  manualTab?: boolean;
 }
 
 class Manual extends Classs<Props>
@@ -220,7 +221,10 @@ class Manual extends Classs<Props>
     {
       expanded = false;
     }
-    this.props.history.pushState({}, '/manual/' + value);
+    if(this.props.manualTab)
+    {
+      this.props.history.pushState({}, '/manual/' + value);
+    }
     this.setState({
       visibleTqlCards,
       visiblePhraseTypes,

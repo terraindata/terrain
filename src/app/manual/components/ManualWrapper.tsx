@@ -73,6 +73,7 @@ class ManualWrapper extends Classs<Props>
 		return <Manual 
 			selectedKey={selected}
 			history={this.props.history}
+			manualTab={true}
 		/>;
 	}
 }
