@@ -190,7 +190,6 @@ var BuilderColumn = React.createClass<any, any>(
   {
     var algorithm = this.props.algorithm;
     var parentId = algorithm.id;
-    console.log(algorithm.cards);
     switch(this.state.column)
     {
       case COLUMNS.Builder:
@@ -382,9 +381,10 @@ var BuilderColumn = React.createClass<any, any>(
         </div>
         {this.renderBuilderVersionToolbar(canEdit)}
         <div className={
+            (this.state.column === COLUMNS.Manual ? ' builder-column-manual' : '') +
             'builder-column-content' + 
             (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '') +
-            (this.state.column === COLUMNS.Inputs ? ' builder-column-content-scroll' : '')
+            (this.state.column === COLUMNS.Inputs ? ' builder-column-content-scroll' : '') 
           }>
           { this.renderContent(canEdit) }
         </div>

@@ -478,9 +478,9 @@
       "Text": 
       [ 
         "A Tql statement is one of: ",
-        "   - A code block, enclose in curly braces.",
-        "   - An expression that does not begin with a curly brace.",
-        "   - A bare semicolon, which is treated as whitespace."
+        "- A code block, enclose in curly braces.",
+        "- An expression that does not begin with a curly brace.",
+        "- A bare semicolon, which is treated as whitespace."
       ]
     }
   }

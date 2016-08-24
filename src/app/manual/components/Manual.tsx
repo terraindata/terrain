@@ -155,13 +155,19 @@ class Manual extends Classs<Props>
     if(this.state.visibleTqlCards.length === 0 && this.state.visiblePhraseTypes.length === 0)
     {
       return (
-        <div className='manual-content-area'>
+        <div className={classNames({
+            'manual-content-area': true,
+            'manual-content-area-builder-tab': !this.props.manualTab,
+        })}>
           No results found.
         </div>
       );
     }
     return (
-      <div className='manual-content-area'>
+      <div className={classNames({
+            'manual-content-area': true,
+            'manual-content-area-builder-tab': !this.props.manualTab,
+        })}>
         {
           this.state.visibleTqlCards.sort().map((result, index) =>
             <div key ={index}>
