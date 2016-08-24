@@ -311,7 +311,8 @@
               "parentId": "c-2",
               "field":"product.score",
               "expression": ".9 * product.conversionRatio  + .1 * product.promotionBoost",
-              "type": "let"
+              "type": "let",
+              "highlighted": true
             },
             {
               "id": "c-5",
@@ -338,7 +339,8 @@
                 "id": "0.9",
                 "property": "product.id"
               }],
-              "type": "select"
+              "type": "select",
+              "faded": true
             }
           ],
           "group": "products",
