@@ -67,18 +67,18 @@ interface Props
   
   isSingle?: boolean;
 
-  leftContent?: El;
-  rightContent?: El;
   aboveContent?: El;
   belowContent?: El;
-  
-  // children?: El;
   
   display: Display | Display[];
   keyPath: KeyPath;
   data: any; // record
   canEdit: boolean;
   keys: List<string>;
+  
+  parentData?: any;
+  // provide parentData if necessary but avoid if possible
+  // as it will cause re-renders
 }
 
 interface IMoveState
@@ -302,38 +302,6 @@ class CardField extends PureClasss<Props>
 
 	render()
   {
-		var leftContent = this.props.leftContent || (
-      <div
-        className='card-field-handle'
-        onMouseDown={this.handleHandleMousedown}
-      >
-        ⋮⋮
-      </div>
-    );
-    
-    var rightContent = this.props.rightContent || (
-      <div>
-        { 
-          <div
-            className='card-field-add'
-            onClick={this.addField}
-            data-tip='Add another'
-          >
-            <AddIcon />
-          </div> 
-        }
-        { 
-          <div
-            className='card-field-remove'
-            onClick={this.removeField}
-            data-tip='Remove'
-          >
-            <RemoveIcon />
-          </div>
-        }
-      </div>
-		);
-    
     var style = null;
     if(this.state.movedTo !== null)
     {
@@ -363,14 +331,19 @@ class CardField extends PureClasss<Props>
           className={classNames({
             'card-field': true,
             'card-field-moving': this.state.moving,
-            'card-field-single': this.props.isSingle && !this.props.leftContent,
+            'card-field-single': this.props.isSingle,
             // ^ hides the left drag handle if single
           })}
           ref='cardField'
         >
   				<div className='card-field-tools-left'>
             <div className='card-field-tools-left-inner'>
-              { leftContent }
+              <div
+                className='card-field-handle'
+                onMouseDown={this.handleHandleMousedown}
+              >
+                ⋮⋮
+              </div>
             </div>
           </div>
   				<div className='card-field-inner' >
@@ -380,11 +353,27 @@ class CardField extends PureClasss<Props>
               data={this.props.data}
               canEdit={this.props.canEdit}
               keys={this.props.keys}
+              parentData={this.props.parentData}
             />
   				</div>
   				<div className='card-field-tools-right'>
             <div className='card-field-tools-right-inner'>
-              { rightContent }
+              <div>
+                <div
+                  className='card-field-add'
+                  onClick={this.addField}
+                  data-tip='Add another'
+                >
+                  <AddIcon />
+                </div> 
+                <div
+                  className='card-field-remove'
+                  onClick={this.removeField}
+                  data-tip='Remove'
+                >
+                  <RemoveIcon />
+                </div>
+              </div>
             </div>
           </div>
   			</div>

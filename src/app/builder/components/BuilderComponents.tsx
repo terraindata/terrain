@@ -46,6 +46,8 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import {BuilderTypes, Directions, Combinators, Operators} from './../BuilderTypes.tsx';
+import ScoreBar from './charts/ScoreBar.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 let {CardTypes, BlockTypes} = BuilderTypes;
 
 export enum DisplayType
@@ -57,12 +59,11 @@ export enum DisplayType
   CARDS,
   DROPDOWN,
   FLEX,
-  // ...
-  
+  COMPONENT,
   LABEL, // strict text to paste in to HTML
 }
 
-let {TEXT, NUM, ROWS, CARDS, CARDTEXT, DROPDOWN, LABEL, FLEX} = DisplayType;
+let {TEXT, NUM, ROWS, CARDS, CARDTEXT, DROPDOWN, LABEL, FLEX, COMPONENT} = DisplayType;
 
 export interface Display
 {
@@ -75,14 +76,20 @@ export interface Display
   placeholder?: string;
   className?: string | ((data: any) => string);
   
+  provideParentData?: boolean;
+  // if true, it passes the parent data down
+  // this will cause unnecessary re-rendering, so avoid if possible
+  
   // for rows and flex:
   row?: Display | Display[];
   
   // for rows:
   english?: string;
   factoryType?: string;
+  
+  // for components
+  component?: (typeof PureClasss);
 }
-
 
 let valueDisplay =
 {
@@ -244,6 +251,7 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
     key: 'weights',
     english: 'weight',
     factoryType: BlockTypes.WEIGHT,
+    provideParentData: true,
     row:
     [
       {
@@ -256,7 +264,11 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
         key: 'weight',
         placeholder: 'Weight',
       },
-      // TODO
+      {
+        displayType: COMPONENT,
+        component: ScoreBar,
+        key: null,
+      },
     ]
   },
   

@@ -64,33 +64,14 @@ interface Props
   
   keys: List<string>;
   canEdit: boolean;
+  
+  parentData?: any;
+  // provide parentData if necessary but avoid if possible
+  // as it will cause re-renders
 }
-  const shallowCompare = require('react-addons-shallow-compare');
+
 class BuilderComponent extends PureClasss<Props>
 {
-  
-  shouldComponentUpdate(nextProps: Props, nextState: any)
-  {
-    // if(shallowCompare(this, nextProps, nextState))
-    // {
-    //   console.log('update comp', this.props.type, this.props.keyPath.toJS());
-    //   for(var i in this.props)
-    //   {
-    //     if(nextProps[i] !== this.props[i])
-    //     {
-    //       console.log(i, this.props[i], nextProps[i]);
-    //     }
-    //   }
-    //   for(var i in this.state)
-    //   {
-    //     if(nextState[i] !== this.state[i])
-    //     {
-    //       console.log(i, this.state[i], nextState[i]);
-    //     }
-    //   }
-    // }
-    return shallowCompare(this, nextProps, nextState);
-  }
   _addRow(keyPath: KeyPath, index: number, display: Display)
   {
     return this._fn('addRow', keyPath, index, display, () => {
@@ -123,6 +104,7 @@ class BuilderComponent extends PureClasss<Props>
             data={data}
             canEdit={this.props.canEdit}
             keys={this.props.keys}
+            parentData={this.props.parentData}
           />
         ) as El[];
       // return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
@@ -209,6 +191,7 @@ class BuilderComponent extends PureClasss<Props>
               data={data}
               canEdit={this.props.canEdit}
               keys={this.props.keys}
+              parentData={this.props.parentData}
             />
           </div>
         );
@@ -232,11 +215,12 @@ class BuilderComponent extends PureClasss<Props>
                   key={key + ',' + v.get('id')}
                   isSingle={value.size === 1}
                   
-                    display={d.row}
-                    keyPath={this._ikeyPath(keyPath, i)}
-                    data={v}
-                    canEdit={this.props.canEdit}
-                    keys={this.props.keys}
+                  display={d.row}
+                  keyPath={this._ikeyPath(keyPath, i)}
+                  data={v}
+                  canEdit={this.props.canEdit}
+                  keys={this.props.keys}
+                  parentData={d.provideParentData && data}
                 />
               ))
                   // {
@@ -259,6 +243,14 @@ class BuilderComponent extends PureClasss<Props>
           </div>
         );
         break;
+      case DisplayType.COMPONENT:
+        let Comp = d.component;
+        content = React.cloneElement(<Comp />, {
+          keyPath,
+          data,
+          parentData: this.props.parentData,
+        });
+      break;
       default:
         content = (
           <div key={key}>Data type {DisplayType[d.displayType]} not implemented.</div>
