@@ -339,7 +339,8 @@
                 "id": "0.9",
                 "property": "product.id"
               }],
-              "type": "select"
+              "type": "select",
+              "faded": true
             }
           ],
           "group": "products",
