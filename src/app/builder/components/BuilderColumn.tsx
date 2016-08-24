@@ -242,6 +242,10 @@ var BuilderColumn = React.createClass<any, any>(
           algorithm={algorithm}
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
+          addColumn={this.props.onAddManualColumn}
+          canAddColumn={this.props.canAddColumn}
+          onCloseColumn={this.props.onCloseColumn}
+          index={this.props.index}
         />;
         
       case COLUMNS.Manual:

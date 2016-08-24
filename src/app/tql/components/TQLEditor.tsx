@@ -94,6 +94,10 @@ interface Props {
   algorithm?: any;
   onLoadStart: () => void;
   onLoadEnd: () => void;
+  addColumn: (number) => void;
+  canAddColumn: boolean;
+  onCloseColumn: (number) => void;
+  index: number;
 }
 
 class TQL extends Classs<Props>
@@ -352,8 +356,16 @@ class TQL extends Classs<Props>
           }
         </div>
         <div className='white-space' />
-        <div className='tql-editor-manual-popup'>
-        </div>
+          <div className='tql-editor-manual-popup'>
+            <ManualPopup  
+              cardName='General'      
+              history={this.props.history} 
+              addColumn={this.props.addColumn}
+              canAddColumn={this.props.canAddColumn}
+              onCloseColumn={this.props.onCloseColumn}
+              index={this.props.index}     
+            />      
+         </div>
         <Menu options={this.getMenuOptions() } small={true}/>
       </div>
     );
@@ -483,6 +495,11 @@ class TQL extends Classs<Props>
                ManualConfig[0][this.state.cardName].Syntax :
                'No syntax help available'}
                style={this.state.syntaxHelpPos}
+               addColumn={this.props.addColumn}
+               canAddColumn={this.props.canAddColumn}
+               onCloseColumn={this.props.onCloseColumn}
+               index={this.props.index}
+               onClick={this.turnSyntaxPopupOff}  
             />
             : null
           }
@@ -493,6 +510,11 @@ class TQL extends Classs<Props>
                ManualConfig[0][this.state.cardName].Summary :
                'No definition available'}
                style={this.state.termDefinitionPos}
+               addColumn={this.props.addColumn}
+               canAddColumn={this.props.canAddColumn}
+               onCloseColumn={this.props.onCloseColumn}
+               index={this.props.index}  
+               onClick={this.turnSyntaxPopupOff}  
             />
             : null
           }

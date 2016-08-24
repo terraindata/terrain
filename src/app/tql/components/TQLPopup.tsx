@@ -57,10 +57,11 @@ interface Props
   text: string;
   history?: any;
   style?: any;
-  addColumn?: (number) => void;
-  canAddColumn?: boolean;
-  onCloseColumn?: (number) => void;
-  index?: number;
+  addColumn: (number) => void;
+  canAddColumn: boolean;
+  onCloseColumn: (number) => void;
+  index: number;
+  onClick?: () => void;
 }
 
 class TQLPopup extends Classs<Props>
@@ -91,6 +92,7 @@ class TQLPopup extends Classs<Props>
 
   openManual()
   {
+    this.props.onClick && this.props.onClick();
     this.props.canAddColumn ?  this.props.addColumn(0) : this.closeColumn();
   }
 
