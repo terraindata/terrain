@@ -8,7 +8,6 @@
       "Syntax": "select field name(s)",
       "Text": 
       [ 
-        "The SQL SELECT statement returns a result set of records from one or more tables.",
         [
           {
             "id": "c-2735991550",
@@ -21,7 +20,21 @@
           },
           "from 'users' as user\nselect user.name"
         ],
-        "A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints."
+        "The SQL SELECT statement returns a result set of records from one or more tables.",
+        "A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints.",
+        "Select all the product id's purchased by user 1234:",
+        [
+          {
+            "id": "c-2735991550",
+            "parentId": "CI2XI",
+            "properties": [{
+              "id": "0.9",
+              "property": "user.name"
+            }],
+            "type": "select"
+          },
+          "from 'products' as product \n\tfilter product.id in \n\t\t from 'orders' as order \n\t\t\tfilter order.user == 1234 \n\t\t\tselect order.product \n\tselect product.id"
+        ]
       ]
     },
     "Take":
@@ -281,35 +294,51 @@
           "let product.score = \nproduct.age * product.conversionRatio "
         ],
         "The SQL SELECT statement returns a result set of records from one or more tables. A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints. The SQL From clause is the source of a rowset to be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.A WHERE clause in SQL specifies that a SQL Data Manipulation Language (DML) statement should only affect rows that meet specified criteria. The criteria are expressed in the form of predicates. WHERE clauses are not mandatory clauses of SQL DML statements, but can be used to limit the number of rows affected by a SQL DML statement or returned by a query. In brief SQL WHERE clause is used to extract only those results from a SQL statement, such as: SELECT, INSERT, UPDATE, or DELETE statement.",
-        "This example takes the 10 results (the product) from the table 'products' that have the lowest score (age * conversion ratio)",
+        "This example get the id's of the top 10 products, sorted by .9 * conversionRatio + .1 * promotionBoost, using a 1/10 prior on conversion ratio.",
         [
         {
           "cards": [
             {
               "id": "c-3",
               "parentId": "c-2",
-              "field":"product.score",
-              "expression": "product.age * product.conversionRatio",
+              "field":"product.conversionRatio",
+              "expression": "(product.purchases + 1) / (product.views + 10)",
               "type": "let",
               "highlighted": true
             },
             {
               "id": "c-4",
               "parentId": "c-2",
+              "field":"product.score",
+              "expression": ".9 * product.conversionRatio  + .1 * product.promotionBoost",
+              "type": "let"
+            },
+            {
+              "id": "c-5",
+              "parentId": "c-2",
               "sorts": [{
                 "id": "0.9",
                 "direction": 1,
-                "property": "product.score"
+                "property": "product.createdOn"
               }],
               "type": "sort",
               "faded": true
             },
             {
-              "id": "c-5",
+              "id": "c-6",
               "parentId": "c-2",
               "type": "take",
               "value": "10",
               "faded": true
+            },
+            {
+              "id": "c-7",
+              "parentId": "c-2",
+              "properties": [{
+                "id": "0.9",
+                "property": "product.id"
+              }],
+              "type": "select"
             }
           ],
           "group": "products",
@@ -320,7 +349,7 @@
           "type": "from",
           "faded": true
         },
-           "\nfrom 'products' as product \n\t let product.score = \nproduct.age * product.conversionRatio \n\t ORDER BY product.score desc \n\ttake 10"
+           "\nfrom 'products' as product \n\tlet product.concersionRatio =\n(product.purchases + 1) / (product.views + 10) \n\tlet product.score =\n\t\t.9 * product.conversionRatio \n\t\t+ .1 * product.promotionBoost \n\tORDER BY product.createdOn desc \n\ttake 10 \n\tselect product.id"
         ]
       ]
     },
@@ -490,9 +519,9 @@
       "Text": 
       [ 
         "A Tql statement is one of: ",
-        "   - A code block, enclose in curly braces.",
-        "   - An expression that does not begin with a curly brace.",
-        "   - A bare semicolon, which is treated as whitespace."
+        "- A code block, enclose in curly braces.",
+        "- An expression that does not begin with a curly brace.",
+        "- A bare semicolon, which is treated as whitespace."
       ]
     }
   }
