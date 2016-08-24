@@ -46,6 +46,7 @@ require('./TransformChart.less');
 
 import * as d3 from 'd3';
 import * as _ from 'underscore';
+import * as $ from 'jquery';
 
 var xMargin = 45;
 var yMargin = 10;
@@ -192,7 +193,11 @@ var TransformChart = {
       //Delete selected points on del/backspace key press
       var deletePoints = this._deletePoints;
       d3.select('body').on('keydown', function() {
-        if(currentObject && (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8)) //delete/backspace key
+        if(
+          currentObject && 
+          (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) //delete/backspace key
+          && !$("input").is(":focus")
+        )
         {
           d3.event['preventDefault']();
           d3.event['stopPropagation']();
