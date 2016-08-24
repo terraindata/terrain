@@ -63,7 +63,6 @@ interface Props
   location?: any;
   children?: any;
   history?: any;
-  term?: any;
   selectedKey?: string;
   manualTab?: boolean;
 }

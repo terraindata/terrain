@@ -58,7 +58,7 @@ interface Props
   cardName: string;
   history?: any;
   style?: any;
-  addColumn: (number) => void;
+  addColumn: (number, string?) => void;
   canAddColumn: boolean;
   onCloseColumn: (number) => void;
   index: number;
@@ -107,7 +107,7 @@ class ManualPopup extends Classs<Props>
 
   addColumn()
   {
-    this.props.addColumn(0);
+    this.props.addColumn(0, this.props.cardName === 'General' ? '' : this.props.cardName);
   }
   closeColumn()
   {
@@ -124,9 +124,8 @@ class ManualPopup extends Classs<Props>
   }
   openManual()
   {
-    this.props.canAddColumn ?  this.props.addColumn(0) : this.closeColumn();
-    //var cardName = this.props.cardName === 'General' ? {} : {cardName: this.props.cardName};
-    //this.props.history && this.props.history.pushState(cardName, window.location.pathname);
+    this.props.canAddColumn ?  this.props.addColumn(0, this.props.cardName === 'General' ? '' : this.props.cardName) 
+    : this.closeColumn();
   }
 
   render() {

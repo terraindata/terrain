@@ -54,10 +54,11 @@ var OpenIcon = require('./../../../images/icon_open.svg');
 
 interface Props
 {
+  cardName: string;
   text: string;
   history?: any;
   style?: any;
-  addColumn: (number) => void;
+  addColumn: (number, string?) => void;
   canAddColumn: boolean;
   onCloseColumn: (number) => void;
   index: number;
@@ -73,7 +74,7 @@ class TQLPopup extends Classs<Props>
 
   addColumn()
   {
-    this.props.addColumn(0);
+    this.props.addColumn(0, this.props.cardName);
   }
 
   closeColumn()
@@ -93,7 +94,7 @@ class TQLPopup extends Classs<Props>
   openManual()
   {
     this.props.onClick && this.props.onClick();
-    this.props.canAddColumn ?  this.props.addColumn(0) : this.closeColumn();
+    this.props.canAddColumn ?  this.props.addColumn(0, this.props.cardName) : this.closeColumn();
   }
 
   render() {

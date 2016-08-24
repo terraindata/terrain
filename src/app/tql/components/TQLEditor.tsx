@@ -491,6 +491,7 @@ class TQL extends Classs<Props>
           { this.renderTqlEditor() }
           { this.state.syntaxHelpOpen ? 
             <TQLPopup 
+              cardName={this.state.cardName}
               text={ManualConfig[0][this.state.cardName] ? 
                ManualConfig[0][this.state.cardName].Syntax :
                'No syntax help available'}
@@ -506,6 +507,7 @@ class TQL extends Classs<Props>
           {
             this.state.showTermDefinition ? 
             <TQLPopup 
+              cardName={this.state.cardName}
               text={ManualConfig[0][this.state.cardName] ? 
                ManualConfig[0][this.state.cardName].Summary :
                'No definition available'}

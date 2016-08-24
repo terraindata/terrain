@@ -98,11 +98,13 @@ class Builder extends Classs<Props>
     colKeys: number[];
     noColumnAnimation: boolean;
     column: number;
+    cardName: string;
   } = {
     loading: true,
     colKeys: null,
     noColumnAnimation: false,
-    column: null
+    column: null,
+    cardName: '',
   };
   
   constructor(props:Props)
@@ -336,13 +338,14 @@ class Builder extends Classs<Props>
         history={this.props.history}
         onRevert={this.save}
         column={this.state.column}
+        cardName={this.state.cardName}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key: colKeys[index],
     }
   }
   
-  handleAddManualColumn(index)
+  handleAddManualColumn(index, cardName?)
   {
     index = index + 1;
     var colKeys = _.clone(this.state.colKeys);
@@ -350,6 +353,7 @@ class Builder extends Classs<Props>
     this.setState({
       colKeys,
       column: 4,
+      cardName
     }); 
   }
 

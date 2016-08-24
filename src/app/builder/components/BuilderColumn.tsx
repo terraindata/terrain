@@ -121,6 +121,7 @@ var BuilderColumn = React.createClass<any, any>(
     history: React.PropTypes.any,
     onRevert: React.PropTypes.func,
     column: React.PropTypes.number,
+    cardName: React.PropTypes.string
   },
   
   getInitialState()
@@ -250,6 +251,7 @@ var BuilderColumn = React.createClass<any, any>(
         
       case COLUMNS.Manual:
         return <Manual 
+          selectedKey={this.props.cardName}
         />;
     }
     return <div>No column content.</div>;
