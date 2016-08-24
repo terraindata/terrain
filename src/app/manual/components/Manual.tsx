@@ -215,6 +215,12 @@ class Manual extends Classs<Props>
           selectedKey = key;
         }
     });
+    Object.keys(ManualConfig[1]).forEach(function(key, index) {
+        if (value.toLowerCase() === key.toLowerCase())
+        {
+          selectedKey = key;
+        }
+    });
 
     var expanded = !collapsed;
     if(value === '') 
@@ -239,6 +245,12 @@ class Manual extends Classs<Props>
     this.search('', true);
   }
 
+  renderAutocompleteOption()
+  {
+    var options = Object.keys(ManualConfig[0]);
+    options = options.concat(Object.keys(ManualConfig[1]));
+    return options.sort();
+  }
   renderManualTopbar()
   {
     var closeOpacity = this.state.value.length ? 1 : 0;
@@ -257,7 +269,7 @@ class Manual extends Classs<Props>
                value={this.state.value as string}
                onChange={this.search}
                placeholder='Search'
-               options={Object.keys(ManualConfig[0]).sort()}
+               options={this.renderAutocompleteOption()}
               />
               <CloseIcon 
                className='manual-close-icon'
@@ -289,7 +301,7 @@ class Manual extends Classs<Props>
   {
     return (
       <div className ='manual-content-area'>
-        <div className='manual-left-column-section-heading' onClick={this.expandTqlCards}> 
+        <div className='manual-left-column-section-heading-blue' onClick={this.expandTqlCards}> 
           <ArrowIcon className = {classNames ({ 
             'manual-arrow-icon': true,
             'manual-arrow-icon-open': this.state.expandTqlCards,
@@ -298,7 +310,7 @@ class Manual extends Classs<Props>
           TQL Cards
         </div>
         {this.state.expandTqlCards ? this.renderTqlCardsList() : null}
-        <div className='manual-left-column-section-heading' onClick={this.expandPhraseTypes}> 
+        <div className='manual-left-column-section-heading-green' onClick={this.expandPhraseTypes}> 
           <ArrowIcon className = {classNames ({ 
             'manual-arrow-icon': true,
             'manual-arrow-icon-open': this.state.expandPhraseTypes,

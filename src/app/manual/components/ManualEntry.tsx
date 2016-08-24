@@ -106,7 +106,7 @@ class ManualEntry extends Classs<Props>
   {
     var words = text.split(' ');
     var keywords = Object.keys(ManualConfig[0]).map((word) => word.toUpperCase());
-    keywords = keywords.concat(Object.keys(ManualConfig[1]).map((word) => word.toUpperCase()));
+    var phraseTypes = Object.keys(ManualConfig[1]).map((word) => word.toUpperCase());
     return (
       <div>
       {words.map((word, index) => 
@@ -116,11 +116,29 @@ class ManualEntry extends Classs<Props>
         {
           term = word.toUpperCase().replace(',', '').replace('.', '');
         }
-        return keywords.indexOf(term) >= 0 ? 
-          <span key={index} className='manual-entry-keyword' onClick={this.props.openTerm} >{word + ' '} </span> : 
+        var isPhraseType = (phraseTypes.indexOf(word.toUpperCase()) >= 0);
+        return (keywords.indexOf(term) >= 0) ? 
+          <span 
+            key={index} 
+            className='manual-entry-keyword' 
+            onClick={this.props.openTerm}
+          >
+            {word + ' '} 
+          </span> 
+          : 
+          (isPhraseType) ? 
+           <span 
+            key={index} 
+            className='manual-entry-phrase-type' 
+            onClick={this.props.openTerm}
+          >
+            {word + ' '} 
+          </span>
+          :
           word + ' '
         }
       )}
+
       </div>
     );
   }
@@ -147,9 +165,29 @@ class ManualEntry extends Classs<Props>
     return (
       <div className='manual-entry-expanded-area'>
         <div className ='maunual-entry-indepth'>
-          {this.highlightKeyWords(ManualConfig[1][this.props.entryName].Text)}
+          {this.renderPhraseTypeInDepth()}
         </div>
       </div>
+    );
+  }
+
+  renderPhraseTypeInDepth()
+  {
+    return (
+        <div> 
+        {
+          Object.keys(ManualConfig[1][this.props.entryName].Text).map((result, index) => {
+              return (
+                <div key ={index} className='manual-entry-row'>
+                {
+                  this.highlightKeyWords(ManualConfig[1][this.props.entryName].Text[index])
+                }
+                <br/>
+                </div> 
+                );
+          })
+        } 
+        </div>
     );
   }
 
@@ -169,7 +207,12 @@ class ManualEntry extends Classs<Props>
         </div>
 
 
-        <div className ='manual-entry-name' onClick={this.expand} >
+        <div className = 
+          {classNames ({ 
+            'manual-entry-name': true,
+            'manual-entry-name-green': this.props.phraseType,
+            })}
+          onClick={this.expand} >
           {this.props.entryName}
         </div>
       </div>

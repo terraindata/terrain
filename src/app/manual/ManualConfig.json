@@ -288,13 +288,26 @@
   {
     "Expression":
     {  
-      "Summary": "Testing",
-      "Text": "Text would go here Select select Reference Expression expression"
+      "Summary": "A TQL expression is any valid combination of expressions and operators that returns a single value.",
+      "Text": 
+      [ 
+        "Examples: ",
+        "2",
+        "'name'",
+        "2+2",
+        "3+2*4+func('group')"
+      ]
     },
-    "Reference":
+    "Statement":
     {
-      "Summary": "Testing",
-      "Text": "Text would go here"
+      "Summary": "All operations performed using TQL statements",
+      "Text": 
+      [ 
+        "A Tql statement is one of: ",
+        "   - A code block, enclose in curly braces.",
+        "   - An expression that does not begin with a curly brace.",
+        "   - A bare semicolon, which is treated as whitespace."
+      ]
     }
   }
 ]
