@@ -71,6 +71,7 @@ interface Props
   history?: any;
   expanded: boolean;
   phraseType?: boolean;
+  manualTab: boolean;
 }
 
 
@@ -286,6 +287,7 @@ class ManualEntry extends Classs<Props>
 
   renderInDepthDescription()
   {
+    var style = this.props.manualTab ? {} : {width: '90%', left: '0%'};
     return (
         <div> 
         {
@@ -303,7 +305,11 @@ class ManualEntry extends Classs<Props>
             else {
               var numLines = ManualConfig[0][this.props.entryName].Text[index][1].split('\n').length;
               return (
-                 <div key ={index} className='manual-entry-demo-box'>
+                 <div 
+                   key ={index} 
+                   className='manual-entry-demo-box'
+                   style={style}
+                 >
                    {this.renderCardExample(index)}
                    <div 
                      className='manual-entry-codemirror'

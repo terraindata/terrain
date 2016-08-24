@@ -163,7 +163,7 @@ class Manual extends Classs<Props>
     return (
       <div className='manual-content-area'>
         {
-          this.state.visibleTqlCards.map((result, index) =>
+          this.state.visibleTqlCards.sort().map((result, index) =>
             <div key ={index}>
               <ManualEntry
                 entryName={result}
@@ -173,6 +173,7 @@ class Manual extends Classs<Props>
                 spotlights={[]}
                 history={this.props.history}
                 expanded={this.state.expanded}
+                manualTab={this.props.manualTab}
               />
             </div> 
           )
@@ -189,6 +190,7 @@ class Manual extends Classs<Props>
                 history={this.props.history}
                 phraseType={true}
                 expanded={this.state.expanded}
+                manualTab={this.props.manualTab}
               />
             </div>
           )

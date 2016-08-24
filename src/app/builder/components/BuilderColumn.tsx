@@ -190,6 +190,7 @@ var BuilderColumn = React.createClass<any, any>(
   {
     var algorithm = this.props.algorithm;
     var parentId = algorithm.id;
+    console.log(algorithm.cards);
     switch(this.state.column)
     {
       case COLUMNS.Builder:
