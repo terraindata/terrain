@@ -782,13 +782,17 @@ class B
   a = "third";
   c = "fourth";
 }
-function factory<T>(c, config: {[k:string]: any} = {}): T
+function F(c, config: {[k:string]: any} = {}): any
 {
   // TODO set _recordClassType in here
   let r = Immutable.Record(new c());
-  return new r(config) as any as T;
+  return new r(config);
 }
-console.log(typeof A, factory<A>(A, {a: 'abc'}));
+function FT<T>(c, config: {[k:string]: any} = {}): T
+{
+  return F(c, config) as T;
+}
+console.log(typeof A, FT<A>(A, {a: 'abc'}));
 
 // class Factory<T>
 // {
