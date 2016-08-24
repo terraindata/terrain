@@ -56,6 +56,8 @@ export module BuilderTypes
     keyPath: KeyPath;
   }
   
+  // TODO generate dynamically
+  
   export const CardTypes = 
   {
     // FROM: 'from',
@@ -766,3 +768,36 @@ export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
 
 export default BuilderTypes;
+
+
+// TODO try this
+
+class A
+{
+  a = "first";
+  b = "second";
+}
+class B
+{
+  a = "third";
+  c = "fourth";
+}
+function factory<T>(c, config: {[k:string]: any} = {}): T
+{
+  // TODO set _recordClassType in here
+  let r = Immutable.Record(new c());
+  return new r(config) as any as T;
+}
+console.log(typeof A, factory<A>(A, {a: 'abc'}));
+
+// class Factory<T>
+// {
+//   static _(c, config: {[k:string]: any} = {}): T
+//   {
+//     // set _recordClassType in here
+//     let r = Immutable.Record(new c());
+//     return new r(config) as any as T;
+//   }
+// }
+
+// console.log((new Factory<A>())._(A));

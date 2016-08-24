@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 require('./ScoreBar.less');
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import BuilderTypes from '../../BuilderTypes.tsx';
 import PureClasss from './../../../common/components/PureClasss.tsx';
 

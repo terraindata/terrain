@@ -246,6 +246,7 @@ class BuilderComponent extends PureClasss<Props>
       case DisplayType.COMPONENT:
         let Comp = d.component;
         content = React.cloneElement(<Comp />, {
+          key,
           keyPath,
           data,
           parentData: this.props.parentData,
