@@ -75,10 +75,10 @@ var ManualIcon = require('./../../../images/open-book-top-view.svg');
 
 enum COLUMNS {
   Builder,
+  Manual,
   TQL,
   Results,
-  Inputs,
-  Manual
+  Inputs
 };
 var NUM_COLUMNS = 5;
 
