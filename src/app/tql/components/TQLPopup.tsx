@@ -48,66 +48,33 @@ import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
-var InfoIcon = require('./../../../images/icon_info.svg');
-var Manual = require('./../ManualConfig.json');
+
+var Manual = require('./../../manual/ManualConfig.json');
 var OpenIcon = require('./../../../images/icon_open.svg');
 
 interface Props
 {
-  cardName: string;
+  text: string;
   history?: any;
   style?: any;
-  addColumn: (number) => void;
-  canAddColumn: boolean;
-  onCloseColumn: (number) => void;
-  index: number;
+  addColumn?: (number) => void;
+  canAddColumn?: boolean;
+  onCloseColumn?: (number) => void;
+  index?: number;
 }
 
-class ManualPopup extends Classs<Props>
+class TQLPopup extends Classs<Props>
 {
   constructor(props: Props) {
     super(props);
-    this.state =
-    {
-      open: false,
-    }
     this.addColumn = _.debounce(this.addColumn, 50);
-  }
-  
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  }
-  
-  close()
-  {
-    this.setState({
-      open: false,
-    })
-    $(document).off('click', this.close);
-  }
-  
-  componentWillUnmount()
-  {
-    $(document).off('click', this.close);
-  }
-  
-  toggleOpen()
-  {
-    this.setState({
-      open: !this.state.open,
-    });
-    
-    if(!this.state.open)
-    {
-      $(document).on('click', this.close);
-    }
   }
 
   addColumn()
   {
     this.props.addColumn(0);
   }
+
   closeColumn()
   {
     var closeIndex;
@@ -121,55 +88,32 @@ class ManualPopup extends Classs<Props>
     this.props.onCloseColumn(closeIndex);
     this.addColumn();
   }
+
   openManual()
   {
     this.props.canAddColumn ?  this.props.addColumn(0) : this.closeColumn();
-    //var cardName = this.props.cardName === 'General' ? {} : {cardName: this.props.cardName};
-    //this.props.history && this.props.history.pushState(cardName, window.location.pathname);
   }
 
   render() {
-    var content = Manual[0][this.props.cardName] ? Manual[0][this.props.cardName].Summary : "No description available"
-    if(this.props.cardName === 'General')
-    {
-      content = 'For more information about how to use Terrain Query Language (TQL), see the manual.';
-    }
-
     return (
-    <div 
-      className={classNames({
-        "manual-popup-wrapper": true,
-        "manual-popup-open": this.state.open,
-      })}
-      style={this.props.style}
-    >
       <div 
-        className="manual-popup-icon-wrapper"
-        onClick={this.toggleOpen}
+        className='tql-editor-syntax-help'
+        style={this.props.style}
       >
-        <InfoIcon className="manual-popup-icon" />
-       </div>
-        { !this.state.open ? null :
-          <div 
-            className="manual-popup-content-wrapper"
-            onClick={this.toggleOpen}
-          >
-            {content}
-            <div 
-              className='manual-popup-link'
-              onClick={this.openManual}
-            >
-              See full description in Manual
-              <OpenIcon 
-                className='manual-popup-open-icon' 
-                onClick={this.openManual}
-              />
-            </div>
-          </div>
-        }
-      </div>
+        {this.props.text}      
+        <div 
+          className='manual-popup-link'
+          onClick={this.openManual}
+        >
+            See full description in Manual
+          <OpenIcon 
+            className='manual-popup-open-icon' 
+            onClick={this.openManual}
+          />
+        </div>  
+      </div>     
     );
   }
 };
 
-export default ManualPopup;
+export default TQLPopup;

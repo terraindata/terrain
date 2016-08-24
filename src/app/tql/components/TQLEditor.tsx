@@ -86,6 +86,7 @@ import 'codemirror/addon/search/matchesonscrollbar.css';
 import ManualPopup from './../../manual/components/ManualPopup.tsx';
 var ManualConfig = require('./../../manual/ManualConfig.json');
 var OpenIcon = require('./../../../images/icon_open.svg');
+import TQLPopup from './TQLPopup.tsx';
 
 interface Props {
   params?: any;
@@ -360,7 +361,8 @@ class TQL extends Classs<Props>
 
   openManual()
   {
-      this.props.history.pushState({cardName: this.state.cardName}, '/manual');
+
+    //this.props.history.pushState({cardName: this.state.cardName}, '/manual');
   }
 
   turnSyntaxPopupOff()
@@ -468,28 +470,6 @@ class TQL extends Classs<Props>
     });
   }
 
-  renderPopup(style, text)
-  {
-    return (
-      <div 
-        className='tql-editor-syntax-help'
-        style={style}
-      >
-        {text}      
-        <div 
-          className='manual-popup-link'
-          onClick={this.openManual}
-        >
-            See full description in Manual
-          <OpenIcon 
-            className='manual-popup-open-icon' 
-            onClick={this.openManual}
-          />
-        </div>  
-      </div>     
-    );
-  }
-
   render() 
   {
     return (
@@ -498,18 +478,22 @@ class TQL extends Classs<Props>
         <div className='code-section'>
           { this.renderTqlEditor() }
           { this.state.syntaxHelpOpen ? 
-             this.renderPopup(this.state.syntaxHelpPos, 
-               ManualConfig[0][this.state.cardName] ? 
+            <TQLPopup 
+              text={ManualConfig[0][this.state.cardName] ? 
                ManualConfig[0][this.state.cardName].Syntax :
-               'No syntax help available')
+               'No syntax help available'}
+               style={this.state.syntaxHelpPos}
+            />
             : null
           }
           {
             this.state.showTermDefinition ? 
-            this.renderPopup(this.state.termDefinitionPos, 
-               ManualConfig[0][this.state.cardName] ? 
+            <TQLPopup 
+              text={ManualConfig[0][this.state.cardName] ? 
                ManualConfig[0][this.state.cardName].Summary :
-               'No syntax help available')
+               'No definition available'}
+               style={this.state.termDefinitionPos}
+            />
             : null
           }
           { this.renderResults() }
