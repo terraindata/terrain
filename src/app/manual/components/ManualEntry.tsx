@@ -203,11 +203,10 @@ class ManualEntry extends Classs<Props>
           <ArrowIcon className = {classNames ({ 
             'manual-entry-arrow-icon': true,
             'manual-entry-arrow-icon-open': this.state.expanded,
+            'manual-entry-arrow-icon-green': this.props.phraseType
             })}
           />
         </div>
-
-
         <div className = 
           {classNames ({ 
             'manual-entry-name': true,

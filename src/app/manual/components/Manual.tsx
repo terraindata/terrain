@@ -330,6 +330,7 @@ class Manual extends Classs<Props>
           <ArrowIcon className = {classNames ({ 
             'manual-arrow-icon': true,
             'manual-arrow-icon-open': this.state.expandPhraseTypes,
+            'manual-arrow-icon-green': true,
             })}
           />
           Phrase Types 
