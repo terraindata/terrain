@@ -267,7 +267,11 @@ class Manual extends Classs<Props>
   {
     var closeOpacity = this.state.value.length ? 1 : 0;
     return (
-       <div className ='manual-topbar'>
+       <div className = {classNames({
+         'manual-topbar': true,
+         'builder-manual-topbar': !this.props.manualTab
+       })}
+       >
           <div>
             <HomeIcon 
               className = 'manual-home-icon' 

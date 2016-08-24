@@ -311,7 +311,8 @@
               "parentId": "c-2",
               "field":"product.score",
               "expression": ".9 * product.conversionRatio  + .1 * product.promotionBoost",
-              "type": "let"
+              "type": "let",
+              "highlighted": true
             },
             {
               "id": "c-5",

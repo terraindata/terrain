@@ -71,7 +71,7 @@ class ManualWrapper extends Classs<Props>
 		var path = this.props.location.pathname.split('/');
 		var selected = path.length > 2 ? path[2] : '';
 		return <Manual 
-			selectedKey={selected}
+			selectedKey={decodeURIComponent(selected)}
 			history={this.props.history}
 			manualTab={true}
 		/>;
