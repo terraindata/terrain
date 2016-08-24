@@ -106,6 +106,8 @@ export module BuilderTypes
   export interface ICard extends IId, IParentId
   {
     type: string;
+    faded?: boolean;
+    highlighted?: boolean;
   }
   
   export type CardString = string | IParenthesesCard;

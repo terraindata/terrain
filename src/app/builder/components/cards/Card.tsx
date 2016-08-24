@@ -165,6 +165,14 @@ var Card = React.createClass({
 
   getInitialState()
   {
+      var darkCardColor = CardColors[this.props.card.type] ? CardColors[this.props.card.type][0] : CardColors['none'][0];
+      var lightCardColor = CardColors[this.props.card.type] ? CardColors[this.props.card.type][1] : CardColors['none'][1];
+      if(this.props.card.faded)
+      {
+        darkCardColor = this.hex2rgba(darkCardColor);
+        lightCardColor = this.hex2rgba(lightCardColor);
+      }
+      var borderColor = this.props.card.highlighted ? 'red' : darkCardColor;
     return {
       open: true,
       id: this.props.card.id,
@@ -185,11 +193,11 @@ var Card = React.createClass({
         },
       ],
       titleStyle: {
-        background: CardColors[this.props.card.type] ? CardColors[this.props.card.type][0] : CardColors['none'][0],
+        background: darkCardColor,
       },
       bodyStyle: {
-        background: CardColors[this.props.card.type] ? CardColors[this.props.card.type][1] : CardColors['none'][1],
-        borderColor: CardColors[this.props.card.type] ? CardColors[this.props.card.type][0] : CardColors['none'][0],
+        background: lightCardColor,
+        borderColor: borderColor,
       },
     }
   },
@@ -253,14 +261,42 @@ var Card = React.createClass({
     }
   },
   
+  hex2rgba(color: string)
+  {
+      var r, g, b;
+      if(color.charAt(0) == '#')
+      {
+        color = color.substr(1);
+      }
+
+      r = color.charAt(0) +'' + color.charAt(1);
+      g = color.charAt(2) + '' + color.charAt(3);
+      b = color.charAt(4) + '' + color.charAt(5);
+
+      r = parseInt( r,16 );
+      g = parseInt( g,16 );
+      b = parseInt( b ,16);
+      return "rgba(" + r + "," + g + "," + b + ", 0.4)"; 
+  },
+
   componentWillReceiveProps(nextProps:any) {
+      var darkCardColor = CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][0] : CardColors['none'][0];
+      var lightCardColor = CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][1] : CardColors['none'][1];
+      
+      if(nextProps.card.faded)
+      {
+        darkCardColor = this.hex2rgba(darkCardColor);
+        lightCardColor = this.hex2rgba(lightCardColor);
+      }
+      var borderColor = nextProps.card.highlighted ? 'red' : darkCardColor;
+
       this.setState({
         titleStyle: {
-        background: CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][0] : CardColors['none'][0],
+        background: darkCardColor,
       },
       bodyStyle: {
-        background: CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][1] : CardColors['none'][1],
-        borderColor: CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][0] : CardColors['none'][0],
+        background: lightCardColor,
+        borderColor: borderColor,
       },
       })
   },

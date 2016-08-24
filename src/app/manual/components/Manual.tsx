@@ -82,7 +82,7 @@ class Manual extends Classs<Props>
        return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
     });
     this.state = {
-      expanded: false,
+      expanded: this.props.manualTab && this.props.selectedKey,
       visibleTqlCards: tqlCards,
       visiblePhraseTypes: phraseTypes,
       value,
@@ -90,6 +90,11 @@ class Manual extends Classs<Props>
       expandTqlCards: true,
       expandPhraseTypes: true,
     }
+  }
+
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
 
   renderTqlCardsList()
