@@ -44,71 +44,121 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 let {Map, List} = Immutable;
-import * as _ from 'underscore';
+
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import Actions from "../../data/BuilderActions.tsx";
 import Util from '../../../util/Util.tsx';
+import PureClasss from '../../../common/components/PureClasss.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
-import PureClasss from './../../../common/components/PureClasss.tsx';
-// import TransformCardChart from './TransformCardChart.tsx';
-import TransformCardPeriscope from './TransformCardPeriscope.tsx';
+type Bars = BuilderTypes.Bars;
+import Periscope from './Periscope.tsx';
 
-interface Props
+interface Props 
 {
-  key: string;
-  keyPath: KeyPath;
-  data: BuilderTypes.ITransformCard;
-  
-  canEdit?: boolean;
-  spotlights?: any;  
-  // TODO spawtlights
+  barsData: List<BuilderTypes.IBar>;
+  maxDomain: List<number>;
+  domain: List<number>;
+  range: List<number>;
+  onDomainChange: (domain: List<number>) => void;
 }
 
-class TransformCard extends PureClasss<Props>
+class TransformCardPeriscope extends PureClasss<Props>
 {
   state: {
-    domain: List<number>;
-    range: List<number>;
+    width: number,
+    initialDomain: List<number>,
+    chartState: Map<string, any>,
+    initialVal: number,
+  } = {
+    chartState: null,
+    width: 0,
+    initialDomain: null,
+    initialVal: 0,
   };
   
-  constructor(props:Props)
+  componentDidMount()
   {
-    super(props);
-    this.state = {
-      domain: List(props.data.domain),
-      range: List([0,1]),
-    };
+    var el = ReactDOM.findDOMNode(this);
+    var width = el.getBoundingClientRect().width;
+    let chartState = this.getChartState({
+      width,
+    });
+    
+    this.setState({
+      width,
+      chartState,
+    });
+    Periscope.create(el, chartState.toJS());
   }
   
-  handleDomainChange(domain: List<number>)
+  update(overrideState?)
+  {
+    var el = ReactDOM.findDOMNode(this);
+    Periscope.update(el, this.getChartState(overrideState).toJS()); 
+  }
+  
+  handleDomainChangeStart(initialVal)
   {
     this.setState({
+      initialDomain: this.props.domain,
+      initialVal,
+    })
+  }
+  
+  handleDomainChange(handleIndex, newVal)
+  {
+    var domain = 
+      this.state.initialDomain.set(handleIndex, 
+        this.state.initialDomain.get(handleIndex) + newVal - this.state.initialVal
+      );
+      
+    let {maxDomain} = this.props;
+    var buffer = (maxDomain.get(1) - maxDomain.get(0)) * 0.01;
+    domain = domain.set(0, 
+        Util.valueMinMax(domain.get(0), maxDomain.get(0), this.state.initialDomain.get(1) - buffer)
+      );
+    domain = domain.set(1, 
+      Util.valueMinMax(domain.get(1), 
+        this.state.initialDomain.get(0) + buffer, 
+        maxDomain.get(1))
+      );
+    this.props.onDomainChange(domain);
+    this.update({
       domain,
     });
   }
   
-        // <TransformCardChart
-        //   canEdit={this.props.canEdit}
-        //   pointsData={data.scorePoints}
-        //   barsData={data.bars}
-        //   domain={this.state.domain}
-        //   spotlights={this.props.spotlights}
-        // />
+  getChartState(overrideState?): Map<string, any>
+  {
+    var chartState = Map({
+      barsData: this.props.barsData.toJS(),
+      maxDomain: this.props.maxDomain,
+      domain: {
+        x: (overrideState && overrideState.domain && overrideState.domain.toJS()) || this.props.domain.toJS(),
+        y: this.props.range.toJS(),
+      },
+      onDomainChange: this.handleDomainChange,
+      onDomainChangeStart: this.handleDomainChangeStart,
+      width: overrideState.width || this.state.width,
+      height: 60,
+    });
+    
+    return chartState;
+  }
+  
+  componentWillUnmount()
+  {
+    var el = ReactDOM.findDOMNode(this);
+    Periscope.destroy(el);
+  }
+
   render()
   {
-    let {data} = this.props;
     return (
-      <div className='transform-card'>
-        <TransformCardPeriscope
-          onDomainChange={this.handleDomainChange}
-          barsData={data.bars}
-          domain={this.state.domain}
-          range={this.state.range}
-          maxDomain={data.domain}
-        />
-      </div>
+      <div></div>
     );
   }
 };
 
-export default TransformCard;
+export default TransformCardPeriscope;

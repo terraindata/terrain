@@ -47,6 +47,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import {BuilderTypes, Directions, Combinators, Operators} from './../BuilderTypes.tsx';
 import ScoreBar from './charts/ScoreBar.tsx';
+import TransformCard from './charts/TransformCard.tsx';
 import PureClasss from './../../common/components/PureClasss.tsx';
 let {CardTypes, BlockTypes} = BuilderTypes;
 
@@ -278,6 +279,11 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
       displayType: TEXT,
       key: 'input',
       placeholder: 'Input field',
+    },
+    {
+      displayType: COMPONENT,
+      component: TransformCard,
+      key: null,
     },
     // TODO
   ],

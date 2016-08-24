@@ -573,19 +573,46 @@ export module BuilderTypes
     return new IScorePoint_Record(addId(config)) as any as IScorePoint;
   }
   recordFactories[BlockTypes.SCOREPOINT] = _IScorePoint;
+  // abstract
+  // TODO do this
+  export class ICardT<T> extends IId
+  {
+    type: string = "";
+    colors: string[] = ["#89B4A7", "#C1EADE"];
+    title: string = "Card";
+    
+    preview: string | ((c:ICard) => string) = "[type]";
+    // The BuilderTypes.getPreview function constructs
+    // a preview from a card object based on this string.
+    // It replaces anything within [] with the value for that key.
+    // If an array of objects, you can specify: [arrayKey.objectKey]
+    // and it will map through and join the values with ", ";
+    
+    set: (f: string, v: any) => T;
+    setIn: (f: string, v: any) => T;
+    get: (f: string | number) => any;
+    getIn: (f: (string | number)[] | KeyPath) => any;
+    delete: (f: string) => T;
+    deleteIn: (f: (string | number)[] | KeyPath) => T;
+    _recordClassType = "";
+    
+    _isCard: boolean = true;
+  }
   
-  export class ITransformCard extends ICard
+  
+  export type ScorePoints = List<IScorePoint>;
+  export type Bars = List<IBar>;
+  
+  export class ITransformCard extends ICardT<ITransformCard>
   {
     type = CardTypes.TRANSFORM;
     input: string = "";
-    range: number[] = [0,100];
-    bars: List<IBar> = List([]);
-    scorePoints: List<IScorePoint> = List([]);
+    domain: List<number> = List([0,100]);
+    bars: Bars = List([]);
+    scorePoints: ScorePoints = List([]);
     colors = ["#E7BE70", "#EDD8B1"];
     title = "Transform";
     
-    set: (f: string, v: any) => ITransformCard;
-    setIn: (f: string, v: any) => ITransformCard;
 		_recordClassType = CardTypes.TRANSFORM;
   }
   let ITransformCard_Record = Immutable.Record(new ITransformCard());
@@ -792,7 +819,6 @@ function FT<T>(c, config: {[k:string]: any} = {}): T
 {
   return F(c, config) as T;
 }
-console.log(typeof A, FT<A>(A, {a: 'abc'}));
 
 // class Factory<T>
 // {
