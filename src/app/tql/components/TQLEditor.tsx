@@ -109,6 +109,8 @@ class TQL extends Classs<Props>
     syntaxHelpOpen: boolean;
     syntaxHelpPos: any;
     cardName: string;
+    showTermDefinition: boolean;
+    termDefinitionPos: any;
   } = {
     tql: null,
     code: TQLConverter.toTQL(this.props.algorithm),
@@ -119,7 +121,9 @@ class TQL extends Classs<Props>
     confirmModalMessage: '',
     syntaxHelpOpen: false,
     syntaxHelpPos: {},
-    cardName: ''
+    cardName: '',
+    showTermDefinition: false,
+    termDefinitionPos: {}
   };
 
   constructor(props: Props) 
@@ -146,6 +150,7 @@ class TQL extends Classs<Props>
       code: newCode,
       highlightedLine: null,
       syntaxHelpOpen: false,
+      showTermDefinition: false,
     });
     this.executeCode();
   }
@@ -362,11 +367,11 @@ class TQL extends Classs<Props>
   {
     this.setState({
       syntaxHelpOpen: false,
+      showTermDefinition: false
     })
   }
 
-  toggleSyntaxPopup(event, line)
-  {
+  findKeyword(line: string) {
     var keywords = Object.keys(ManualConfig[0]);
     var cardName = '';
     keywords.map(function(word) {
@@ -375,18 +380,44 @@ class TQL extends Classs<Props>
         cardName = word;
       }
     });
+    return cardName;
+  }
+
+  toggleSyntaxPopup(event, line)
+  {
+    var cardName = this.findKeyword(line);
+
     var left = event.clientX - event.offsetX - 8;
     var top = event.clientY - event.offsetY + 17;
     this.setState({
       syntaxHelpOpen: !this.state.syntaxHelpOpen,
       syntaxHelpPos: {left, top},
-      cardName
+      cardName,
+      showTermDefinition: false
     });
   }
 
-  defineTerm(value)
+  defineTerm(value, event)
   {
-    console.log("defining " + value);
+    var cardName = this.findKeyword(value);
+    var left = event.clientX;
+    var top = event.clientY - event.offsetY + 22;
+    if(cardName)
+    {
+      this.setState({
+        showTermDefinition: true,
+        termDefinitionPos: {left, top},
+        cardName,
+        syntaxHelpOpen: false
+      })
+    }
+  }
+
+  hideTermDefinition()
+  {
+    this.setState({
+      showTermDefinition: false,
+    })
   }
 
   renderTqlEditor() 
@@ -416,6 +447,7 @@ class TQL extends Classs<Props>
       toggleSyntaxPopup={this.toggleSyntaxPopup}
       defineTerm={this.defineTerm}
       turnSyntaxPopupOff={this.turnSyntaxPopupOff}
+      hideTermDefinition={this.hideTermDefinition}
       />
   }
 
@@ -426,7 +458,7 @@ class TQL extends Classs<Props>
       onError={this.highlightError}
       onLoadStart={this.props.onLoadStart}
       onLoadEnd={this.props.onLoadEnd}
-      />
+    />
   }
 
   toggleConfirmModal()
@@ -434,6 +466,28 @@ class TQL extends Classs<Props>
     this.setState ({
        confirmModalOpen: !this.state.confirmModalOpen
     });
+  }
+
+  renderPopup(style, text)
+  {
+    return (
+      <div 
+        className='tql-editor-syntax-help'
+        style={style}
+      >
+        {text}      
+        <div 
+          className='manual-popup-link'
+          onClick={this.openManual}
+        >
+            See full description in Manual
+          <OpenIcon 
+            className='manual-popup-open-icon' 
+            onClick={this.openManual}
+          />
+        </div>  
+      </div>     
+    );
   }
 
   render() 
@@ -444,26 +498,18 @@ class TQL extends Classs<Props>
         <div className='code-section'>
           { this.renderTqlEditor() }
           { this.state.syntaxHelpOpen ? 
-            <div 
-              className='tql-editor-syntax-help'
-              style={this.state.syntaxHelpPos}
-            >
-                {
-                  ManualConfig[0][this.state.cardName] ? 
-                  ManualConfig[0][this.state.cardName].Syntax : 
-                  "No syntax help available"
-                }
-              <div 
-                className='manual-popup-link'
-                onClick={this.openManual}
-              >
-                See full description in Manual
-                <OpenIcon 
-                  className='manual-popup-open-icon' 
-                  onClick={this.openManual}
-                />
-              </div>            
-            </div>
+             this.renderPopup(this.state.syntaxHelpPos, 
+               ManualConfig[0][this.state.cardName] ? 
+               ManualConfig[0][this.state.cardName].Syntax :
+               'No syntax help available')
+            : null
+          }
+          {
+            this.state.showTermDefinition ? 
+            this.renderPopup(this.state.termDefinitionPos, 
+               ManualConfig[0][this.state.cardName] ? 
+               ManualConfig[0][this.state.cardName].Summary :
+               'No syntax help available')
             : null
           }
           { this.renderResults() }
