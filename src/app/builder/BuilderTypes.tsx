@@ -617,7 +617,36 @@ export module BuilderTypes
   }
   let ITransformCard_Record = Immutable.Record(new ITransformCard());
   export const _ITransformCard = (config?:any) => {
-    return new ITransformCard_Record(addId(config)) as any as ITransformCard;
+    let c = addId(config);
+    if(!config.scorePoints)
+    {
+      let scorePoints = List([
+        _IScorePoint({
+          id: "a",
+          value: 0,
+          score: 0.5,
+        }),
+        _IScorePoint({
+          id: "b",
+          value: 50,
+          score: 0.5,
+        }),
+        _IScorePoint({
+          id: "c",
+          value: 100,
+          score: 0.5,
+        }),
+      ]);
+      if(Immutable.Map.isMap(c))
+      {
+        c = c.set('scorePoints', scorePoints);
+      }
+      else
+      {
+        c.scorePoints = scorePoints;
+      }
+    }
+    return new ITransformCard_Record(c) as any as ITransformCard;
   }
   recordFactories[CardTypes.TRANSFORM] = _ITransformCard;
   

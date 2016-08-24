@@ -283,7 +283,7 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
     {
       displayType: COMPONENT,
       component: TransformCard,
-      key: null,
+      key: 'scorePoints',
     },
     // TODO
   ],

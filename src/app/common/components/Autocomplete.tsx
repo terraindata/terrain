@@ -127,6 +127,7 @@ class Autocomplete extends PureClasss<Props>
   
   handleKeydown(event)
   {
+    console.log(event.target.value, event.keyCode);
     if(!this.props.options)
     {
       return;
@@ -161,10 +162,10 @@ class Autocomplete extends PureClasss<Props>
         this.props.onChange(value);
         this.refs['input']['blur']();
         break;
-      case 27:
-        // esc
-        this.refs['input']['blur']();
-        break;
+      // case 27:
+      //   // esc
+      //   this.refs['input']['blur']();
+      //   break;
       default:
         this.setState({
           selectedIndex: 0,

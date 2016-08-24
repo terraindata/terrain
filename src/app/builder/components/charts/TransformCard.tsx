@@ -50,7 +50,7 @@ import Actions from "../../data/BuilderActions.tsx";
 import Util from '../../../util/Util.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
 import PureClasss from './../../../common/components/PureClasss.tsx';
-// import TransformCardChart from './TransformCardChart.tsx';
+import TransformCardChart from './TransformCardChart.tsx';
 import TransformCardPeriscope from './TransformCardPeriscope.tsx';
 
 interface Props
@@ -87,18 +87,26 @@ class TransformCard extends PureClasss<Props>
     });
   }
   
-        // <TransformCardChart
-        //   canEdit={this.props.canEdit}
-        //   pointsData={data.scorePoints}
-        //   barsData={data.bars}
-        //   domain={this.state.domain}
-        //   spotlights={this.props.spotlights}
-        // />
+  handleUpdatePoints(points: BuilderTypes.ScorePoints)
+  {
+    Actions.change(this.props.keyPath, points);
+  }
+  
   render()
   {
     let {data} = this.props;
     return (
       <div className='transform-card'>
+        <TransformCardChart
+          canEdit={this.props.canEdit}
+          points={data.scorePoints}
+          bars={data.bars}
+          domain={this.state.domain}
+          range={this.state.range}
+          spotlights={this.props.spotlights}
+          inputKey={data.input}
+          updatePoints={this.handleUpdatePoints}
+        />
         <TransformCardPeriscope
           onDomainChange={this.handleDomainChange}
           barsData={data.bars}

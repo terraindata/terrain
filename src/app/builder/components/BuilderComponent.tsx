@@ -250,6 +250,7 @@ class BuilderComponent extends PureClasss<Props>
           keyPath,
           data,
           parentData: this.props.parentData,
+          canEdit: this.props.canEdit,
         });
       break;
       default:
