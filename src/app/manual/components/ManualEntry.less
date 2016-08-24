@@ -1,18 +1,18 @@
 @import "../../common/Common.less";
 
 .manual-entry-keyword {
-	color:  #00bcd6;
+	color:  #00a7f7;
 	cursor: pointer;
 	&:hover {
-		color: #ff3c46;
+	text-decoration: underline;
 	}
 }
 
 .manual-entry-phrase-type{
-	color: #8ac541;
+	color: #48b14b;
 	cursor: pointer;
 	&:hover {
-		color: #ff3c46;
+		text-decoration: underline;
 	}
 }
 
@@ -25,12 +25,18 @@
 	font-size: 14px;
 	font-weight: bold;
 	letter-spacing: 0.5;
-	color: #00bcd6;
+	color: #00a7f7;
 	cursor: pointer;
+	&:hover {
+		text-decoration: underline;
+	}
 }
 
 .manual-entry-name-green{
-	color: #8ac541;
+	color: #48b14b;
+	&:hover {
+		text-decoration: underline;
+	}
 }
 
 .manual-entry-expanded-area {
@@ -43,6 +49,11 @@
 	display: flex;
 	width: 100%;
 	margin-bottom: 5px;
+	&:hover {
+		.manual-entry-arrow-icon {
+			opacity:1;
+		}
+	}
 }
 
 .manual-entry-white-space {
@@ -51,6 +62,7 @@
 
 .manual-entry-expand {
     cursor: pointer;
+    
 }
 
 .manual-entry-arrow-icon {
@@ -59,9 +71,18 @@
 	display: inline-block;
     .transition;
     position: relative;
-    top: 4px;
+    top: 3px;
     margin-right: 3px;
+    fill: #00a7f7;
+    opacity: 0.5;
+    &:hover {
+		opacity: 1;
+	}
     .rotate90;   
+}
+
+.manual-entry-arrow-icon-green {
+	fill: #48b14b;
 }
 
 .manual-entry-arrow-icon-open {
@@ -99,7 +120,7 @@
 }
 
 .manual-entry-demo-box {
-	background-color: rgba(221, 230, 204, 0.5);
+	background-color: #f6f9f2;
 	position: relative;
 	left: 15%;
 	width: 70%;

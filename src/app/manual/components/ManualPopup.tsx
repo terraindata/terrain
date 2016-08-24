@@ -109,6 +109,7 @@ class ManualPopup extends Classs<Props>
   {
     this.props.addColumn(0, this.props.cardName === 'General' ? '' : this.props.cardName);
   }
+
   closeColumn()
   {
     var closeIndex;
@@ -122,6 +123,7 @@ class ManualPopup extends Classs<Props>
     this.props.onCloseColumn(closeIndex);
     this.addColumn();
   }
+  
   openManual()
   {
     this.props.canAddColumn ?  this.props.addColumn(0, this.props.cardName === 'General' ? '' : this.props.cardName) 
