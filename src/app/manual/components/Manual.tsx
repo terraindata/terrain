@@ -89,7 +89,9 @@ class Manual extends Classs<Props>
       visibleTqlCards: tqlCards,
       visiblePhraseTypes: phraseTypes,
       value,
-      selectedKey: this.props.selectedKey || ''
+      selectedKey: this.props.selectedKey || '',
+      expandTqlCards: true,
+      expandPhraseTypes: true
     }
   }
 
@@ -299,15 +301,17 @@ class Manual extends Classs<Props>
     );
   }
 
-
   showTqlCards()
   {
     this.setState({
       visibleTqlCards: this.allTqlCards,
       visiblePhraseTypes: [],
       expanded: false, 
-      selectedKey: ''
+      selectedKey: '',
+      value: '',
+      expandTqlCards: true
     });
+    this.props.history.pushState({}, '/manual/');
   }
 
   showPhraseTypes()
@@ -316,32 +320,52 @@ class Manual extends Classs<Props>
       visiblePhraseTypes: this.allPhraseTypes,
       visibleTqlCards: [],
       expanded: false, 
-      selectedKey: ''
+      selectedKey: '',
+      value: '',
+      expandPhraseTypes: true
+    });
+    this.props.history.pushState({}, '/manual/');
+  }
+
+  toggleTqlCardList()
+  {
+    this.setState({
+      expandTqlCards: !this.state.expandTqlCards
+    });
+  }
+
+  togglePhraseTypeList()
+  {
+    this.setState({
+      expandPhraseTypes: !this.state.expandPhraseTypes
     });
   }
 
   renderLeftColumn()
   {
-          //     <ArrowIcon className = {classNames ({ 
-          //   'manual-arrow-icon': true,
-          //   'manual-arrow-icon-open': this.state.expandTqlCards,
-          //   })}
-          // />
-          //           <ArrowIcon className = {classNames ({ 
-          //   'manual-arrow-icon': true,
-          //   'manual-arrow-icon-open': this.state.expandPhraseTypes,
-          //   })}
-          // />
     return (
       <div className ='manual-content-area'>
-        <div className='manual-left-column-section-heading-blue' onClick={this.showTqlCards}> 
-          TQL Cards
+        <div className='manual-left-column-section-heading-blue'> 
+          <ArrowIcon className = {classNames ({ 
+            'manual-arrow-icon': true,
+            'manual-arrow-icon-open': this.state.expandTqlCards,
+            })}
+            onClick={this.toggleTqlCardList}
+          />
+          <span onClick={this.showTqlCards}>TQL Cards</span>
         </div>
-        {this.renderTqlCardsList()}
-        <div className='manual-left-column-section-heading-green' onClick={this.showPhraseTypes}> 
-          Phrase Types 
+        {this.state.expandTqlCards ? this.renderTqlCardsList() : null}
+        <div className='manual-left-column-section-heading-green'>
+          <ArrowIcon className = {classNames ({ 
+            'manual-arrow-icon': true,
+            'manual-arrow-icon-open': this.state.expandPhraseTypes,
+            'manual-arrow-icon-green': true
+            })}
+            onClick={this.togglePhraseTypeList}
+          /> 
+          <span onClick={this.showPhraseTypes} >Phrase Types</span>
         </div>
-        {this.renderPhraseTypesList()}
+        {this.state.expandPhraseTypes ? this.renderPhraseTypesList() : null}
       </div>
     );
   }
