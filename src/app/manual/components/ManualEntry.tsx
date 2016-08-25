@@ -114,7 +114,7 @@ class ManualEntry extends Classs<Props>
 
     for(var index in keywords)
     {
-      var matchForms = [" " + keywords[index] + " ", " " + keywords[index] + ", ", " " + keywords[index] + "."];
+      var matchForms = [keywords[index] + " ", " " + keywords[index] + ", ", " " + keywords[index] + "."];
       for (var i in matchForms)
       {
         text = reactStringReplace(text, matchForms[i], (match, i) => (
@@ -130,7 +130,7 @@ class ManualEntry extends Classs<Props>
     }
     for(var index in phraseTypes)
     {
-      var matchForms = [" " + phraseTypes[index] + " ", " " + phraseTypes[index] + ", ", " " + phraseTypes[index] + "."];
+      var matchForms = [phraseTypes[index] + " ", " " + phraseTypes[index] + ", ", " " + phraseTypes[index] + "."];
       for (var i in matchForms)
       {
         text = reactStringReplace(text, matchForms[i], (match, i) => (
