@@ -103,8 +103,11 @@ class Manual extends Classs<Props>
 
   renderTqlCardsList()
   {
+   var height = 22 * Object.keys(ManualConfig[0]).length;
+   var style = this.state.expandTqlCards ? {maxHeight: height + 'px'}
+     : {maxHeight: '0px'}
     return (
-      <div>
+      <div className='manual-sidebar-section' style={style}>
         {
           this.allTqlCards.sort().map((result, index) =>
             <div key ={index} className='manual-left-column-row'>
@@ -128,8 +131,11 @@ class Manual extends Classs<Props>
 
   renderPhraseTypesList()
   {
+    var height = 22 * Object.keys(ManualConfig[1]).length;
+    var style = this.state.expandPhraseTypes ? {maxHeight: height + 'px'}
+     : {maxHeight: '0px'}
     return (
-      <div>
+      <div className='manual-sidebar-section' style={style}>
         {
           this.allPhraseTypes.sort().map((result, index) =>
             <div key ={index} className='manual-left-column-row'>
@@ -397,7 +403,7 @@ class Manual extends Classs<Props>
               style={{paddingRight: '42px'}}
             >TQL Cards</span>
           </div>
-          {this.state.expandTqlCards ? this.renderTqlCardsList() : null}
+          {this.renderTqlCardsList()}
           <div className={classNames({
             'manual-left-column-section-heading': true, 
             'manual-left-column-section-heading-green': true,
@@ -416,7 +422,7 @@ class Manual extends Classs<Props>
               style={{paddingRight: '32px'}}
             >Phrase Types</span>
           </div>
-          {this.state.expandPhraseTypes ? this.renderPhraseTypesList() : null}
+          {this.renderPhraseTypesList()}
         </div>
         : null
       }
