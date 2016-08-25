@@ -131,7 +131,7 @@ class Manual extends Classs<Props>
     return (
       <div>
         {
-          this.allPhraseTypes.map((result, index) =>
+          this.allPhraseTypes.sort().map((result, index) =>
             <div key ={index} className='manual-left-column-row'>
               <div 
                 className={classNames({
