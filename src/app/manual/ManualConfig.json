@@ -5,7 +5,7 @@
       "Snippet": "Get data", 
       "Summary": "The Select statement returns a result set of records from one or more tables.",
       "Type": "prefix operator",
-      "Syntax": "select field name(s)",
+      "Syntax": "SELECT field name(s)",
       "Text": 
       [ 
         [
@@ -20,8 +20,7 @@
           },
           "from 'users' as user\nselect user.name"
         ],
-        "The SQL SELECT statement returns a result set of records from one or more tables.",
-        "A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints.",
+        "The TQL Select statement returns a result set of records from one or more tables. A Select statement retrieves zero or more rows from one or more database tables or database views. In most applications, Select is the most commonly used data manipulation language (DML) command. As TQL is a declarative programming language, Select queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints.",
         "Select all the product id's purchased by user 1234:",
         [
           {
@@ -229,7 +228,7 @@
       "Snippet": "Sorts the elements", 
       "Summary": "Returns a query expression representing the result of sorting the left-hand expression in ascending order of the value returned by the right-hand expression.", 
       "Type": "binary infix operator",
-      "Syntax": "query expression sort expression",
+      "Syntax": "query expression ORDER BY expression",
       "Text": 
       [ 
         [
@@ -280,7 +279,7 @@
       "Snippet": "Defines variable", 
       "Summary": "Returns a query expression representing the result of evaluating each the right hand statement for each element.", 
       "Type": "binary infix operator",
-      "Syntax": "query expression let statement",
+      "Syntax": "query expression LET statement",
       "Text": 
       [ 
         [
@@ -359,12 +358,12 @@
     { 
       "Snippet": "Number of elements", 
       "Summary": "Returns an the number of elements in the right hand expression", 
-      "InDepth": "",
       "Type": " binary prefix operator",
-      "Syntax": "count expression",
+      "Syntax": "COUNT expression",
       "Text": 
       [ 
-        "The SQL SELECT statement returns a result set of records from one or more tables. A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints. The SQL From clause is the source of a rowset to be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.A WHERE clause in SQL specifies that a SQL Data Manipulation Language (DML) statement should only affect rows that meet specified criteria. The criteria are expressed in the form of predicates. WHERE clauses are not mandatory clauses of SQL DML statements, but can be used to limit the number of rows affected by a SQL DML statement or returned by a query. In brief SQL WHERE clause is used to extract only those results from a SQL statement, such as: SELECT, INSERT, UPDATE, or DELETE statement.",
+        "The TQL Count function returns the number of rows in a table satisfying the criteria specified in the Where clause. It sets on the number of rows or non NULL column values. Count returns 0 if there were no matching rows.",
+        "This example returns the number of users with the name John",
         [
           {
             "cards": [ {
@@ -402,7 +401,7 @@
       "Snippet": "Returns minimum element", 
       "Summary": "Returns an the minimum of all elements in the right hand side", 
       "Type": "binary prefix operator",
-      "Syntax": "min expression",
+      "Syntax": "MIN expression",
       "Text": 
       [ 
         "The syntax for the MIN function in SQL is:",
@@ -443,7 +442,7 @@
       "Snippet": "Returns maximum element", 
       "Summary": "Returns an the maximum of all elements in the right hand side", 
       "Type": "binary prefix operator",
-      "Syntax": "max expression",
+      "Syntax": "MAX expression",
       "Text": 
       [ 
         "The syntax for the MIN function in SQL is:",
@@ -484,7 +483,7 @@
       "Snippet": "Returns the sum", 
       "Summary": "Returns an the sum of all elements in the right hand side.", 
       "Type": "binary prefix operator",
-      "Syntax": "sum expression",
+      "Syntax": "SUM expression",
       "Text": 
       [ 
         "The sum card does not have a description yet."
@@ -495,7 +494,7 @@
       "Snippet": "Returns the average", 
       "Summary": "Returns the average of all elements in the right hand side.", 
       "Type": "binary prefix operator",
-      "Syntax": "avg expression",
+      "Syntax": "AVG expression",
       "Text": 
       [ 
         "The avg card does not have a description yet."
