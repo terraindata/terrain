@@ -269,10 +269,7 @@ class Manual extends Classs<Props>
 
   renderManualTopbar()
   {
-            //     <HomeIcon 
-            //   className = 'manual-home-icon' 
-            //   onClick= {this.clearInput}
-            // />
+
     var closeOpacity = this.state.value.length ? 1 : 0;
     return (
        <div className = {classNames({
@@ -367,7 +364,7 @@ class Manual extends Classs<Props>
       <div className={classNames({
         'manual-left-column-title': true,
         'manual-left-column-entry': true,
-        'manual-entry-left-selected': !this.state.selectedKey
+        'manual-entry-left-selected': this.state.value == ''
       })}>
         <ArrowIcon className = {classNames ({
           'manual-arrow-icon': true,
