@@ -91,7 +91,8 @@ class Manual extends Classs<Props>
       value,
       selectedKey: this.props.selectedKey || '',
       expandTqlCards: true,
-      expandPhraseTypes: true
+      expandPhraseTypes: true,
+      expandSidebar: true,
     }
   }
 
@@ -265,20 +266,22 @@ class Manual extends Classs<Props>
     var options = this.allPhraseTypes.concat(this.allTqlCards);
     return options.sort();
   }
+
   renderManualTopbar()
   {
+            //     <HomeIcon 
+            //   className = 'manual-home-icon' 
+            //   onClick= {this.clearInput}
+            // />
     var closeOpacity = this.state.value.length ? 1 : 0;
     return (
        <div className = {classNames({
          'manual-topbar': true,
-         'builder-manual-topbar': !this.props.manualTab
+         'builder-manual-topbar': !this.props.manualTab,
        })}
        >
           <div>
-            <HomeIcon 
-              className = 'manual-home-icon' 
-              onClick= {this.clearInput}
-            />
+
           </div>
           <div className='manual-search-bar'>
               <SearchIcon className ='manual-search-icon'/>
@@ -309,7 +312,7 @@ class Manual extends Classs<Props>
       expanded: false, 
       selectedKey: 'TQL Cards',
       value: '',
-      expandTqlCards: true
+      expandTqlCards: this.state.selectedKey === 'TQL Cards' ? !this.state.expandTqlCards : true
     });
     this.props.history.pushState({}, '/manual/');
   }
@@ -322,7 +325,7 @@ class Manual extends Classs<Props>
       expanded: false, 
       selectedKey: 'Phrase Types',
       value: '',
-      expandPhraseTypes: true
+      expandPhraseTypes: this.state.selectedKey === 'Phrase Types' ? !this.state.expandPhraseTypes : true
     });
     this.props.history.pushState({}, '/manual/');
   }
@@ -341,41 +344,82 @@ class Manual extends Classs<Props>
     });
   }
 
+  toggleSidebar()
+  {
+    this.setState({
+      expandSidebar: !this.state.expandSidebar
+    })
+  }
+
+  showAllTerms()
+  {
+    this.setState({
+      expandSidebar: this.state.selectedKey === '' ? !this.state.expandSidebar : true
+    });
+    this.search('', true);
+  }
+
+
   renderLeftColumn()
   {
     return (
       <div className ='manual-content-area'>
-        <div className={classNames({
-          'manual-left-column-section-heading': true, 
-          'manual-left-column-section-heading-blue': true,
-          'manual-left-column-entry': true,
-          'manual-entry-left-selected': this.state.selectedKey == 'TQL Cards'
+      <div className={classNames({
+        'manual-left-column-title': true,
+        'manual-left-column-entry': true,
+        'manual-entry-left-selected': !this.state.selectedKey
       })}>
-          <ArrowIcon className = {classNames ({ 
-            'manual-arrow-icon': true,
-            'manual-arrow-icon-open': this.state.expandTqlCards,
-            })}
-            onClick={this.toggleTqlCardList}
-          />
-          <span onClick={this.showTqlCards}>TQL Cards</span>
-        </div>
-        {this.state.expandTqlCards ? this.renderTqlCardsList() : null}
-        <div className={classNames({
-          'manual-left-column-section-heading': true, 
-          'manual-left-column-section-heading-green': true,
-          'manual-left-column-entry': true,
-          'manual-entry-left-selected': this.state.selectedKey == 'Phrase Types'
+        <ArrowIcon className = {classNames ({
+          'manual-arrow-icon': true,
+          'manual-arrow-icon-open': this.state.expandSidebar,
+        })} 
+          onClick={this.toggleSidebar}
+        />
+         <span onClick={this.showAllTerms} > Manual </span>
+       </div>
+       {
+         this.state.expandSidebar ?
+       <div className='manual-sidebar'>
+          <div className={classNames({
+            'manual-left-column-section-heading': true, 
+            'manual-left-column-section-heading-blue': true,
+            'manual-left-column-entry': true,
+            'manual-entry-left-selected': this.state.selectedKey == 'TQL Cards'
         })}>
-          <ArrowIcon className = {classNames ({ 
-            'manual-arrow-icon': true,
-            'manual-arrow-icon-open': this.state.expandPhraseTypes,
-            'manual-arrow-icon-green': true
-            })}
-            onClick={this.togglePhraseTypeList}
-          /> 
-          <span onClick={this.showPhraseTypes} >Phrase Types</span>
+            <ArrowIcon className = {classNames ({ 
+              'manual-arrow-icon': true,
+              'manual-arrow-icon-open': this.state.expandTqlCards,
+              })}
+              onClick={this.toggleTqlCardList}
+            />
+            <span 
+              onClick={this.showTqlCards}
+              style={{paddingRight: '42px'}}
+            >TQL Cards</span>
+          </div>
+          {this.state.expandTqlCards ? this.renderTqlCardsList() : null}
+          <div className={classNames({
+            'manual-left-column-section-heading': true, 
+            'manual-left-column-section-heading-green': true,
+            'manual-left-column-entry': true,
+            'manual-entry-left-selected': this.state.selectedKey == 'Phrase Types'
+          })}>
+            <ArrowIcon className = {classNames ({ 
+              'manual-arrow-icon': true,
+              'manual-arrow-icon-open': this.state.expandPhraseTypes,
+              'manual-arrow-icon-green': true
+              })}
+              onClick={this.togglePhraseTypeList}
+            /> 
+            <span 
+              onClick={this.showPhraseTypes} 
+              style={{paddingRight: '32px'}}
+            >Phrase Types</span>
+          </div>
+          {this.state.expandPhraseTypes ? this.renderPhraseTypesList() : null}
         </div>
-        {this.state.expandPhraseTypes ? this.renderPhraseTypesList() : null}
+        : null
+      }
       </div>
     );
   }
