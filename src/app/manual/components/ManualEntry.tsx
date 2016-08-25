@@ -61,6 +61,8 @@ require('./../../tql/components/tql.js');
 import './../../tql/components/codemirror.less';
 import './../../tql/components/monokai.less';
 
+const reactStringReplace = require('react-string-replace')
+
 interface Props
 {
   entryName: string;
@@ -103,46 +105,88 @@ class ManualEntry extends Classs<Props>
     }); 
   }
 
+
   highlightKeyWords(text)
   {
-    if(!text) return;
-    var words = text.split(' ');
+    if (!text) return;
     var keywords = Object.keys(ManualConfig[0]).map((word) => word.toUpperCase());
     var phraseTypes = Object.keys(ManualConfig[1]).map((word) => word.toUpperCase());
-    return (
-      <div>
-      {words.map((word, index) => 
-        {
-        var term = word;
-        if(word !== word.toLowerCase())
-        {
-          term = word.toUpperCase().replace(',', '').replace('.', '');
-        }
-        var isPhraseType = (phraseTypes.indexOf(word.toUpperCase()) >= 0);
-        return (keywords.indexOf(term) >= 0) ? 
-          <span 
-            key={index} 
-            className='manual-entry-keyword' 
-            onClick={this.props.openTerm}
-          >
-            {word + ' '} 
-          </span> 
-          : 
-          (isPhraseType) ? 
-           <span 
-            key={index} 
+    for(var index in keywords)
+    {
+      var matchForms = [" " + keywords[index] + " ", " " + keywords[index] + ", ", " " + keywords[index] + "."];
+      for (var i in matchForms)
+      {
+        text = reactStringReplace(text, matchForms[i], (match, i) => (
+        <span       
+          className='manual-entry-keyword' 
+          onClick={this.props.openTerm}
+        >
+          {match}
+        </span>
+        ));
+      }
+    }
+    for(var index in phraseTypes)
+    {
+      var matchForms = [" " + phraseTypes[index] + " ", " " + phraseTypes[index] + ", ", " " + phraseTypes[index] + "."];
+      for (var i in matchForms)
+      {
+        text = reactStringReplace(text, matchForms[i], (match, i) => (
+          <span         
             className='manual-entry-phrase-type' 
             onClick={this.props.openTerm}
           >
-            {word + ' '} 
+            {match}
           </span>
-          :
-          word + ' '
-        }
-      )}
+        ));
+      }
+    }
+    
 
+    return (
+      <div> 
+        {text}
       </div>
     );
+
+    // if(!text) return;
+    // var words = text.split(' ');
+    // var keywords = Object.keys(ManualConfig[0]).map((word) => word.toUpperCase());
+    // var phraseTypes = Object.keys(ManualConfig[1]).map((word) => word.toUpperCase());
+    // return (
+    //   <div>
+    //   {words.map((word, index) => 
+    //     {
+    //     var term = word;
+    //     if(word !== word.toLowerCase())
+    //     {
+    //       term = word.toUpperCase().replace(',', '').replace('.', '');
+    //     }
+    //     var isPhraseType = (phraseTypes.indexOf(word.toUpperCase()) >= 0);
+    //     return (keywords.indexOf(term) >= 0) ? 
+    //       <span 
+            // key={index} 
+            // className='manual-entry-keyword' 
+            // onClick={this.props.openTerm}
+    //       >
+    //         {word + ' '} 
+    //       </span> 
+    //       : 
+    //       (isPhraseType) ? 
+    //        <span 
+    //         key={index} 
+    //         className='manual-entry-phrase-type' 
+    //         onClick={this.props.openTerm}
+    //       >
+    //         {word + ' '} 
+    //       </span>
+    //       :
+    //       word + ' '
+    //     }
+    //   )}
+
+    //   </div>
+    // );
   }
 
   renderTqlCardEntryDetail() 
