@@ -105,6 +105,7 @@ class ManualEntry extends Classs<Props>
 
   highlightKeyWords(text)
   {
+    if(!text) return;
     var words = text.split(' ');
     var keywords = Object.keys(ManualConfig[0]).map((word) => word.toUpperCase());
     var phraseTypes = Object.keys(ManualConfig[1]).map((word) => word.toUpperCase());
