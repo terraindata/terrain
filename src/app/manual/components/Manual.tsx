@@ -364,7 +364,7 @@ class Manual extends Classs<Props>
       <div className={classNames({
         'manual-left-column-title': true,
         'manual-left-column-entry': true,
-        'manual-entry-left-selected': this.state.value == ''
+        'manual-entry-left-selected': this.state.value == '' && !this.state.selectedKey
       })}>
         <ArrowIcon className = {classNames ({
           'manual-arrow-icon': true,

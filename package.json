@@ -70,6 +70,7 @@
     "react-motion": "^0.2.2",
     "react-router": "^1.0.0-beta4",
     "react-select": "^1.0.0-beta13",
+    "react-string-replace": "^0.3.2",
     "react-svg-loader": "^1.0.1",
     "react-testutils-additions": "^15.0.0",
     "react-tooltip": "^2.0.0",
