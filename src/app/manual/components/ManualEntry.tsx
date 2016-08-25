@@ -109,8 +109,9 @@ class ManualEntry extends Classs<Props>
   highlightKeyWords(text)
   {
     if (!text) return;
-    var keywords = Object.keys(ManualConfig[0]).map((word) => word.toUpperCase());
-    var phraseTypes = Object.keys(ManualConfig[1]).map((word) => word.toUpperCase());
+    var keywords = Object.keys(ManualConfig[0]);
+    var phraseTypes = Object.keys(ManualConfig[1]);
+
     for(var index in keywords)
     {
       var matchForms = [" " + keywords[index] + " ", " " + keywords[index] + ", ", " " + keywords[index] + ".", keywords[index].toUpperCase()];
@@ -120,6 +121,7 @@ class ManualEntry extends Classs<Props>
         <span       
           className='manual-entry-keyword' 
           onClick={this.props.openTerm}
+          key={Math.random()}
         >
           {match}
         </span>
@@ -135,6 +137,7 @@ class ManualEntry extends Classs<Props>
           <span         
             className='manual-entry-phrase-type' 
             onClick={this.props.openTerm}
+            key={Math.random()}
           >
             {match}
           </span>
@@ -148,45 +151,6 @@ class ManualEntry extends Classs<Props>
         {text}
       </div>
     );
-
-    // if(!text) return;
-    // var words = text.split(' ');
-    // var keywords = Object.keys(ManualConfig[0]).map((word) => word.toUpperCase());
-    // var phraseTypes = Object.keys(ManualConfig[1]).map((word) => word.toUpperCase());
-    // return (
-    //   <div>
-    //   {words.map((word, index) => 
-    //     {
-    //     var term = word;
-    //     if(word !== word.toLowerCase())
-    //     {
-    //       term = word.toUpperCase().replace(',', '').replace('.', '');
-    //     }
-    //     var isPhraseType = (phraseTypes.indexOf(word.toUpperCase()) >= 0);
-    //     return (keywords.indexOf(term) >= 0) ? 
-    //       <span 
-            // key={index} 
-            // className='manual-entry-keyword' 
-            // onClick={this.props.openTerm}
-    //       >
-    //         {word + ' '} 
-    //       </span> 
-    //       : 
-    //       (isPhraseType) ? 
-    //        <span 
-    //         key={index} 
-    //         className='manual-entry-phrase-type' 
-    //         onClick={this.props.openTerm}
-    //       >
-    //         {word + ' '} 
-    //       </span>
-    //       :
-    //       word + ' '
-    //     }
-    //   )}
-
-    //   </div>
-    // );
   }
 
   renderTqlCardEntryDetail() 
@@ -357,7 +321,7 @@ class ManualEntry extends Classs<Props>
                    {this.renderCardExample(index)}
                    <div 
                      className='manual-entry-codemirror'
-                     style={{height: (numLines * 20) + 'px'}}
+                     style={{height: (numLines * 14 + 8) + 'px'}}
                    >
                      {this.renderCodeMirrorExample(index)}
                    </div>

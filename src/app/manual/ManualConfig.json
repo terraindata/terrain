@@ -270,7 +270,7 @@
           "type": "from",
           "faded": true
         },
-           "\nfrom 'users' as user \n\t ORDER BY user.name desc"
+           "from 'users' as user \n\t ORDER BY user.name desc"
         ]
       ]
     }, 
@@ -392,7 +392,7 @@
               "parentId": "CI2XI",
               "type": "count"
             },
-            "\ncount (\n\tselect *\n\tfrom 'users' as user\n\twhere user.name == John\n)"
+            "count (\n\tselect *\n\tfrom 'users' as user\n\twhere user.name == John\n)"
         ]
       ]
     },
