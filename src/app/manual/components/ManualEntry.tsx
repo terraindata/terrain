@@ -155,9 +155,8 @@ class ManualEntry extends Classs<Props>
 
   renderTqlCardEntryDetail() 
   {
-    var style = this.state.expanded ? {maxHeight: '1000px'} : {maxHeight: '0px'};
     return (
-      <div className='manual-entry-expanded-area' style={style}>
+      <div className='manual-entry-expanded-area'>
         <div className ='manual-entry-row'>
           <b>Type:</b>&nbsp;{this.highlightKeyWords(ManualConfig[0][this.props.entryName].Type)}
         </div> 
@@ -173,9 +172,8 @@ class ManualEntry extends Classs<Props>
 
   renderPhraseTypeEntryDetail()
   {  
-    var style = this.state.expanded ? {maxHeight: '100px'} : {maxHeight: '0px'};
     return (
-      <div className='manual-entry-expanded-area' style={style}>
+      <div className='manual-entry-expanded-area'>
         <div className ='maunual-entry-indepth'>
           {this.renderPhraseTypeInDepth()}
         </div>
@@ -340,8 +338,8 @@ class ManualEntry extends Classs<Props>
   {
     return (
         <div>
-          {this.renderEntry()}
-          {this.renderTqlCardEntryDetail()}
+        {this.renderEntry()}
+        {this.state.expanded ? this.renderTqlCardEntryDetail() : null }
         </div>
     );
   }
@@ -351,7 +349,7 @@ class ManualEntry extends Classs<Props>
     return (
       <div> 
         {this.renderEntry()}
-         {this.renderPhraseTypeEntryDetail()}
+         {this.state.expanded ? this.renderPhraseTypeEntryDetail() : null }
       </div>
     );
   }
