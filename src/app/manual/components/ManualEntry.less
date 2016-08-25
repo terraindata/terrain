@@ -107,13 +107,19 @@
 		left: 6px;
 		height: 100%;
 		.CodeMirror-vscrollbar {
-			overflow-y: hidden;
+			display: none !important;
 		}
 		.CodeMirror-hscrollbar {
-			display: none;
+			display: none !important;
+		}
+		.CodeMirror-scrollbar-filler {
+			display: none !important;
 		}
 		.cm-s-monokai {
 			height: 100% !important;
+		}
+		.CodeMirror-scroll {
+			overflow-y: hidden !important;
 		}
 	}
 }
