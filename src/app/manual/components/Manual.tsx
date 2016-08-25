@@ -307,7 +307,7 @@ class Manual extends Classs<Props>
       visibleTqlCards: this.allTqlCards,
       visiblePhraseTypes: [],
       expanded: false, 
-      selectedKey: '',
+      selectedKey: 'TQL Cards',
       value: '',
       expandTqlCards: true
     });
@@ -320,7 +320,7 @@ class Manual extends Classs<Props>
       visiblePhraseTypes: this.allPhraseTypes,
       visibleTqlCards: [],
       expanded: false, 
-      selectedKey: '',
+      selectedKey: 'Phrase Types',
       value: '',
       expandPhraseTypes: true
     });
@@ -345,7 +345,12 @@ class Manual extends Classs<Props>
   {
     return (
       <div className ='manual-content-area'>
-        <div className='manual-left-column-section-heading-blue'> 
+        <div className={classNames({
+          'manual-left-column-section-heading': true, 
+          'manual-left-column-section-heading-blue': true,
+          'manual-left-column-entry': true,
+          'manual-entry-left-selected': this.state.selectedKey == 'TQL Cards'
+      })}>
           <ArrowIcon className = {classNames ({ 
             'manual-arrow-icon': true,
             'manual-arrow-icon-open': this.state.expandTqlCards,
@@ -355,7 +360,12 @@ class Manual extends Classs<Props>
           <span onClick={this.showTqlCards}>TQL Cards</span>
         </div>
         {this.state.expandTqlCards ? this.renderTqlCardsList() : null}
-        <div className='manual-left-column-section-heading-green'>
+        <div className={classNames({
+          'manual-left-column-section-heading': true, 
+          'manual-left-column-section-heading-green': true,
+          'manual-left-column-entry': true,
+          'manual-entry-left-selected': this.state.selectedKey == 'Phrase Types'
+        })}>
           <ArrowIcon className = {classNames ({ 
             'manual-arrow-icon': true,
             'manual-arrow-icon-open': this.state.expandPhraseTypes,
