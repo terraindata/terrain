@@ -149,7 +149,7 @@ class ManualEntry extends Classs<Props>
     return (
       <div className='manual-entry-expanded-area'>
         <div className ='manual-entry-row'>
-          <b>Type:</b>&nbsp;{ManualConfig[0][this.props.entryName].Type}
+          <b>Type:</b>&nbsp;{this.highlightKeyWords(ManualConfig[0][this.props.entryName].Type)}
         </div> 
         <div className ='manual-entry-row'>
           <b>Syntax:</b>&nbsp;{this.highlightKeyWords(ManualConfig[0][this.props.entryName].Syntax)}

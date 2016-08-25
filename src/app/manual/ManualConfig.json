@@ -525,6 +525,28 @@
         "- An expression that does not begin with a curly brace.",
         "- A bare semicolon, which is treated as whitespace."
       ]
+    },
+    "Binary Infix":
+    {
+      "Summary": "All operations performed using TQL statements",
+      "Text": 
+      [ 
+        "A Tql statement is one of: ",
+        "- A code block, enclose in curly braces.",
+        "- An expression that does not begin with a curly brace.",
+        "- A bare semicolon, which is treated as whitespace."
+      ]
+    },
+    "Binary Prefix":
+    {
+      "Summary": "All operations performed using TQL statements",
+      "Text": 
+      [ 
+        "A Tql statement is one of: ",
+        "- A code block, enclose in curly braces.",
+        "- An expression that does not begin with a curly brace.",
+        "- A bare semicolon, which is treated as whitespace."
+      ]
     }
   }
 ]
