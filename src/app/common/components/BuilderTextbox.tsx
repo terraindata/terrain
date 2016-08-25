@@ -234,9 +234,10 @@ class BuilderTextbox extends PureClasss<Props>
     }
     
     var cards = this.props.value['cards'];
-    if(cards.length)
+    if(cards.size)
     {
-      var card = cards[0];
+      console.log(cards);
+      var card = cards.get(0);
       var color = card.colors[0] as string;
       var title: string = card.title;
       var preview = BuilderTypes.getPreview(card);

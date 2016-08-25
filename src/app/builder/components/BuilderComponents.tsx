@@ -54,7 +54,8 @@ let {CardTypes, BlockTypes} = BuilderTypes;
 export enum DisplayType
 {
   TEXT,
-  CARDTEXT,
+  CARDTEXT, // textbox that can be cards, must be coupled with:
+  CARDSFORTEXT, // cards that are associated with a textbox
   NUM,
   ROWS,
   CARDS,
@@ -64,7 +65,7 @@ export enum DisplayType
   LABEL, // strict text to paste in to HTML
 }
 
-let {TEXT, NUM, ROWS, CARDS, CARDTEXT, DROPDOWN, LABEL, FLEX, COMPONENT} = DisplayType;
+let {TEXT, NUM, ROWS, CARDS, CARDTEXT, CARDSFORTEXT, DROPDOWN, LABEL, FLEX, COMPONENT} = DisplayType;
 
 export interface Display
 {
@@ -77,12 +78,21 @@ export interface Display
   placeholder?: string;
   className?: string | ((data: any) => string);
   
+  above?: Display;
+  below?: Display;
+  
   provideParentData?: boolean;
   // if true, it passes the parent data down
   // this will cause unnecessary re-rendering, so avoid if possible
   
-  // for rows and flex:
-  row?: Display | Display[];
+  // for rows
+  row?: {
+    inner: Display | Display[];
+    above?: Display | Display[];
+    below?: Display | Display[];
+  };
+  
+  flex?: Display | Display[];
   
   // for rows:
   english?: string;
@@ -111,27 +121,43 @@ let filtersDisplay =
     english: 'condition',
     factoryType: BlockTypes.FILTER,
     className: (data => data.filters.size > 1 ? 'filters-multiple' : 'filters-single'),
-    row: [
+    row: 
+    {
+      above:
       {
-        displayType: CARDTEXT,
+        displayType: CARDSFORTEXT,
         key: 'first',
       },
+      
+      below:
       {
-        displayType: DROPDOWN,
-        key: 'operator',
-        options: Immutable.List(Operators),
-      },
-      {
-        displayType: CARDTEXT,
+        displayType: CARDSFORTEXT,
         key: 'second',
       },
-      {
-        displayType: DROPDOWN,
-        key: 'combinator',
-        options: Immutable.List(Combinators),
-        className: 'combinator',
-      }
-    ],
+      
+      inner:
+      [
+        {
+          displayType: CARDTEXT,
+          key: 'first',
+        },
+        {
+          displayType: DROPDOWN,
+          key: 'operator',
+          options: Immutable.List(Operators),
+        },
+        {
+          displayType: CARDTEXT,
+          key: 'second',
+        },
+        {
+          displayType: DROPDOWN,
+          key: 'combinator',
+          options: Immutable.List(Combinators),
+          className: 'combinator',
+        }
+      ],
+    },
   };
 
 let wrapperDisplay =
@@ -144,7 +170,7 @@ let letVarDisplay =
 {
   displayType: FLEX,
   key: null,
-  row:
+  flex:
   [
     {
       displayType: TEXT,
@@ -160,6 +186,11 @@ let letVarDisplay =
       key: 'expression',
     },
   ],
+  below:
+  {
+    key: 'expression',
+    displayType: CARDSFORTEXT,
+  },
 };
 
 export const BuilderComponents: {[type:string]: Display | Display[]} =
@@ -174,8 +205,11 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
       factoryType: BlockTypes.FIELD,
       row:
       {
-        displayType: TEXT,
-        key: 'field'
+        inner:
+        {
+          displayType: TEXT,
+          key: 'field'
+        },
       },
     },
     
@@ -185,21 +219,25 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
       key: 'tables',
       english: 'table',
       factoryType: BlockTypes.TABLE,
-      row: [  
-        {
-          displayType: TEXT,
-          key: 'table',
-        },
-        {
-          displayType: LABEL,
-          label: 'as',
-          key: null,
-        },
-        {
-          displayType: TEXT,
-          key: 'iterator',
-        },
-      ]
+      row: 
+      {
+        inner:
+        [  
+          {
+            displayType: TEXT,
+            key: 'table',
+          },
+          {
+            displayType: LABEL,
+            label: 'as',
+            key: null,
+          },
+          {
+            displayType: TEXT,
+            key: 'iterator',
+          },
+        ],
+      },
     },
     
     _.extend(
@@ -228,17 +266,20 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
     english: 'sort',
     factoryType: BlockTypes.SORT,
     row:
-    [
-      {
-        displayType: TEXT,
-        key: 'property'
-      },
-      {
-        displayType: DROPDOWN,
-        key: 'direction',
-        options: Immutable.List(Directions),
-      },
-    ]
+    {
+      inner:
+      [
+        {
+          displayType: TEXT,
+          key: 'property'
+        },
+        {
+          displayType: DROPDOWN,
+          key: 'direction',
+          options: Immutable.List(Directions),
+        },
+      ],
+    },
   },
   
   filter: filtersDisplay,
@@ -254,23 +295,26 @@ export const BuilderComponents: {[type:string]: Display | Display[]} =
     factoryType: BlockTypes.WEIGHT,
     provideParentData: true,
     row:
-    [
-      {
-        displayType: TEXT,
-        key: 'key',
-        placeholder: 'Field',
-      },
-      {
-        displayType: NUM,
-        key: 'weight',
-        placeholder: 'Weight',
-      },
-      {
-        displayType: COMPONENT,
-        component: ScoreBar,
-        key: null,
-      },
-    ]
+    {
+      inner:
+      [
+        {
+          displayType: TEXT,
+          key: 'key',
+          placeholder: 'Field',
+        },
+        {
+          displayType: NUM,
+          key: 'weight',
+          placeholder: 'Weight',
+        },
+        {
+          displayType: COMPONENT,
+          component: ScoreBar,
+          key: null,
+        },
+      ],
+    },
   },
   
   transform:

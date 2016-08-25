@@ -365,12 +365,17 @@ class Card extends PureClasss<Props>
   }
 
 	render() {
+    
     var content = <BuilderComponent
       keys={this.props.keys}
       canEdit={this.props.canEdit}
       data={this.props.card}
       type={this.props.card.type}
-      keyPath={this._ikeyPath(this.props.keyPath, this.props.index)}
+      keyPath={
+        this.props.singleCard
+        ? this.props.keyPath
+        : this._ikeyPath(this.props.keyPath, this.props.index)
+      }
     />;
 
 		var contentToDisplay = (

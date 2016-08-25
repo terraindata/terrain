@@ -78,6 +78,7 @@ class Classs<T> extends React.Component<T, any>
     let unmountFn = this['componentWillUnmount'];
     this['componentWillUnmount'] = () =>
     {
+      this._unmounted = true; // antipattern
       this.subscriptions.map(cancelSubscription => cancelSubscription());
       unmountFn && unmountFn();
     }
@@ -85,6 +86,7 @@ class Classs<T> extends React.Component<T, any>
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
   }
   
+  _unmounted = false;
   
   // subscribes to a Redux store
   _subscribe(
@@ -120,6 +122,11 @@ class Classs<T> extends React.Component<T, any>
 
   _update(store: Store, config: Config)
   {
+    if(this._unmounted)
+    {
+      return;
+    }
+    
     config.updater && config.updater(store.getState());
       
     if(config.stateKey)

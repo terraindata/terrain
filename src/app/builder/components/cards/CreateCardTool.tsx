@@ -78,6 +78,7 @@ class CreateCardTool extends PureClasss<Props>
   
   createCard(event)
   {
+    console.log(this.props.keyPath);
     if(this.props.open && this.props.onMinimize)
     {
       this.props.onMinimize();

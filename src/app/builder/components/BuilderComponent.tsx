@@ -53,6 +53,7 @@ import BuilderActions from '../data/BuilderActions.tsx';
 import CardField from './cards/CardField.tsx';
 import Dropdown from '../../common/components/Dropdown.tsx';
 import CardsArea from './cards/CardsArea.tsx';
+import BuilderTextboxCards from '../../common/components/BuilderTextboxCards.tsx';
 
 interface Props
 {
@@ -169,6 +170,14 @@ class BuilderComponent extends PureClasss<Props>
         isTextbox = true;
         acceptsCards = true;
       break;
+      case DisplayType.CARDSFORTEXT:
+        content = <BuilderTextboxCards
+          value={value}
+          canEdit={this.props.canEdit}
+          keyPath={keyPath}
+          keys={this.props.keys}
+        />;
+      break;
       case DisplayType.DROPDOWN:
         content = <Dropdown
           canEdit={this.props.canEdit}
@@ -186,7 +195,7 @@ class BuilderComponent extends PureClasss<Props>
             className='card-flex'
           >
             <BuilderComponent
-              display={d.row}
+              display={d.flex}
               keyPath={keyPath}
               data={data}
               canEdit={this.props.canEdit}
@@ -195,9 +204,6 @@ class BuilderComponent extends PureClasss<Props>
             />
           </div>
         );
-            // {
-            //   this.renderDisplay(d.row, keyPath, data)
-            // }
       break;
       case DisplayType.ROWS:
         content = (
@@ -215,7 +221,7 @@ class BuilderComponent extends PureClasss<Props>
                   key={key + ',' + v.get('id')}
                   isSingle={value.size === 1}
                   
-                  display={d.row}
+                  row={d.row}
                   keyPath={this._ikeyPath(keyPath, i)}
                   data={v}
                   canEdit={this.props.canEdit}
@@ -223,13 +229,6 @@ class BuilderComponent extends PureClasss<Props>
                   parentData={d.provideParentData && data}
                 />
               ))
-                  // {
-                  //   this.renderDisplay(
-                  //     d.row,
-                  //     this._ikeyPath(keyPath, i),
-                  //     v
-                  //   )
-                  // }
             }
             {
               value.size ? null :

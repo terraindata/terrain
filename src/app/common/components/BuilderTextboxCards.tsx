@@ -52,7 +52,9 @@ import Card from '../../builder/components/cards/Card.tsx';
 interface Props
 {
   value: BuilderTypes.CardString;
-  parentId?: string;
+  keyPath: KeyPath;
+  keys: List<string>;
+  canEdit: boolean;
 }
 
 class BuilderTextboxCards extends React.Component<Props, any>
@@ -67,6 +69,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
   }
   
   render() {
+    console.log(this.props.keyPath.toJS(), this.props.value);
     if(this.isText())
     {
       return null;
@@ -80,7 +83,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
           singleCard={true}
           card={this.props.value}
           index={0}
-          />
+        />
       </div>
     );
   }

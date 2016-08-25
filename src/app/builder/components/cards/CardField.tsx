@@ -67,10 +67,11 @@ interface Props
   
   isSingle?: boolean;
 
-  aboveContent?: El;
-  belowContent?: El;
-  
-  display: Display | Display[];
+  row: {
+    inner: Display | Display[];
+    above?: Display | Display[];
+    below?: Display | Display[];
+  }
   keyPath: KeyPath;
   data: any; // record
   canEdit: boolean;
@@ -316,6 +317,8 @@ class CardField extends PureClasss<Props>
         zIndex: 99999,
       };
     }
+    
+    let {row} = this.props;
 
     return (
       <div
@@ -326,7 +329,16 @@ class CardField extends PureClasss<Props>
         })}
         style={style}
       >
-        { this.props.aboveContent ? this.props.aboveContent: null }
+        { ! row.above ? null :
+            <BuilderComponent
+              display={this.props.row.above}
+              keyPath={this.props.keyPath}
+              data={this.props.data}
+              canEdit={this.props.canEdit}
+              keys={this.props.keys}
+              parentData={this.props.parentData}
+            />
+        }
         <div
           className={classNames({
             'card-field': true,
@@ -348,7 +360,7 @@ class CardField extends PureClasss<Props>
           </div>
   				<div className='card-field-inner' >
             <BuilderComponent
-    					display={this.props.display}
+    					display={row.inner}
               keyPath={this.props.keyPath}
               data={this.props.data}
               canEdit={this.props.canEdit}
@@ -377,7 +389,16 @@ class CardField extends PureClasss<Props>
             </div>
           </div>
   			</div>
-        { this.props.belowContent ? this.props.belowContent : null }
+        { ! row.below ? null :
+            <BuilderComponent
+              display={this.props.row.below}
+              keyPath={this.props.keyPath}
+              data={this.props.data}
+              canEdit={this.props.canEdit}
+              keys={this.props.keys}
+              parentData={this.props.parentData}
+            />
+        }
       </div>
 	  );
 	}
