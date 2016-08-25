@@ -109,8 +109,9 @@ class ManualEntry extends Classs<Props>
   highlightKeyWords(text)
   {
     if (!text) return;
-    var keywords = Object.keys(ManualConfig[0]).map((word) => word.toUpperCase());
-    var phraseTypes = Object.keys(ManualConfig[1]).map((word) => word.toUpperCase());
+    var keywords = Object.keys(ManualConfig[0]);
+    var phraseTypes = Object.keys(ManualConfig[1]);
+
     for(var index in keywords)
     {
       var matchForms = [" " + keywords[index] + " ", " " + keywords[index] + ", ", " " + keywords[index] + "."];
@@ -120,6 +121,7 @@ class ManualEntry extends Classs<Props>
         <span       
           className='manual-entry-keyword' 
           onClick={this.props.openTerm}
+          key={Math.random()}
         >
           {match}
         </span>
@@ -135,6 +137,7 @@ class ManualEntry extends Classs<Props>
           <span         
             className='manual-entry-phrase-type' 
             onClick={this.props.openTerm}
+            key={Math.random()}
           >
             {match}
           </span>
@@ -148,51 +151,13 @@ class ManualEntry extends Classs<Props>
         {text}
       </div>
     );
-
-    // if(!text) return;
-    // var words = text.split(' ');
-    // var keywords = Object.keys(ManualConfig[0]).map((word) => word.toUpperCase());
-    // var phraseTypes = Object.keys(ManualConfig[1]).map((word) => word.toUpperCase());
-    // return (
-    //   <div>
-    //   {words.map((word, index) => 
-    //     {
-    //     var term = word;
-    //     if(word !== word.toLowerCase())
-    //     {
-    //       term = word.toUpperCase().replace(',', '').replace('.', '');
-    //     }
-    //     var isPhraseType = (phraseTypes.indexOf(word.toUpperCase()) >= 0);
-    //     return (keywords.indexOf(term) >= 0) ? 
-    //       <span 
-            // key={index} 
-            // className='manual-entry-keyword' 
-            // onClick={this.props.openTerm}
-    //       >
-    //         {word + ' '} 
-    //       </span> 
-    //       : 
-    //       (isPhraseType) ? 
-    //        <span 
-    //         key={index} 
-    //         className='manual-entry-phrase-type' 
-    //         onClick={this.props.openTerm}
-    //       >
-    //         {word + ' '} 
-    //       </span>
-    //       :
-    //       word + ' '
-    //     }
-    //   )}
-
-    //   </div>
-    // );
   }
 
   renderTqlCardEntryDetail() 
   {
+    var style = this.state.expanded ? {maxHeight: '1000px'} : {maxHeight: '0px'};
     return (
-      <div className='manual-entry-expanded-area'>
+      <div className='manual-entry-expanded-area' style={style}>
         <div className ='manual-entry-row'>
           <b>Type:</b>&nbsp;{this.highlightKeyWords(ManualConfig[0][this.props.entryName].Type)}
         </div> 
@@ -208,8 +173,9 @@ class ManualEntry extends Classs<Props>
 
   renderPhraseTypeEntryDetail()
   {  
+    var style = this.state.expanded ? {maxHeight: '100px'} : {maxHeight: '0px'};
     return (
-      <div className='manual-entry-expanded-area'>
+      <div className='manual-entry-expanded-area' style={style}>
         <div className ='maunual-entry-indepth'>
           {this.renderPhraseTypeInDepth()}
         </div>
@@ -374,8 +340,8 @@ class ManualEntry extends Classs<Props>
   {
     return (
         <div>
-        {this.renderEntry()}
-        {this.state.expanded ? this.renderTqlCardEntryDetail() : null }
+          {this.renderEntry()}
+          {this.renderTqlCardEntryDetail()}
         </div>
     );
   }
@@ -385,7 +351,7 @@ class ManualEntry extends Classs<Props>
     return (
       <div> 
         {this.renderEntry()}
-         {this.state.expanded ? this.renderPhraseTypeEntryDetail() : null }
+         {this.renderPhraseTypeEntryDetail()}
       </div>
     );
   }
