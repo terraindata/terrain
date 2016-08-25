@@ -528,24 +528,19 @@
     },
     "Binary Infix":
     {
-      "Summary": "All operations performed using TQL statements",
+      "Summary": "Sits between two expressions",
       "Text": 
       [ 
-        "A Tql statement is one of: ",
-        "- A code block, enclose in curly braces.",
-        "- An expression that does not begin with a curly brace.",
-        "- A bare semicolon, which is treated as whitespace."
+        "Infix notation is the notation commonly used in arithmetical and logical formulae and statements. It is characterized by the placement of operators between operands – 'infixed operators' – such as the plus sign in '2 + 2'.",
+        "In infix notation, unlike in prefix or postfix notations, parentheses surrounding groups of operands and operators are necessary to indicate the intended order in which operations are to be performed. In the absence of parentheses, certain precedence rules determine the order of operations."
       ]
     },
     "Binary Prefix":
     {
-      "Summary": "All operations performed using TQL statements",
+      "Summary": "Precedes it's target",
       "Text": 
       [ 
-        "A Tql statement is one of: ",
-        "- A code block, enclose in curly braces.",
-        "- An expression that does not begin with a curly brace.",
-        "- A bare semicolon, which is treated as whitespace."
+        "You implement a prefix or postfix unary operator by writing the prefix modifier before the func keyword when declaring the operator function."
       ]
     }
   }
