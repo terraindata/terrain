@@ -499,6 +499,95 @@
       [ 
         "The avg card does not have a description yet."
       ]
+    },
+    "Select From Where":
+    {
+      "Snippet": "Retrieves rows from the database", 
+      "Summary": "Retrieves rows from the database if they meet the condition", 
+      "Type": "none",
+      "Syntax": "SELECT FROM source WHERE search condition",
+      "Text": 
+      [ 
+        "The Select From Where card does not have a description yet."
+      ]
+    },
+     "Compare":
+    {
+      "Snippet": "Compare two terms", 
+      "Summary": "The Compare card can be used to compare two values/terms/expressions to one another.", 
+      "Type": "binary infix operator",
+      "Syntax": "expression COMPARATOR expression",
+      "Text": 
+      [ 
+        "The TQL Compare card is used to add comparisons into the queries.  These comparisons test for equality (==), inequality (!=), less than (<), greater than (>), and ‘in’ and ‘not in’.  ‘In’ and ‘not in’ are used to test whether one query expression is in another; for example, to check if a given user is in a table of users."
+      ]
+    },
+     "Score":
+    {
+      "Snippet": "Used to rank result", 
+      "Summary": "Score is used to rank and order results from a query. The score is based on a weighted sum of attributes of the elements.", 
+      "Type": "binary prefix operator",
+      "Syntax": "linearScore[([weight1, attribute1], [weight2, attribute2]...)]",
+      "Text": 
+      [ 
+        "The Score card does not have a description yet."
+      ]
+    },
+     "If":
+    {
+      "Snippet": "Determines if code will be executed", 
+      "Summary": "Will execute a block of code if specified condition is true", 
+      "Type": "None",
+      "Syntax": "IF (condition)",
+      "Text": 
+      [ 
+        "The if statement specifies a block of code to be executed if a condition is true. The else statement specifies a block of code to be executed if the condition is false. The else if statement specifies a new condition if the first condition is false. The condition is an expression that evaluates to true or false. "
+      ]
+    },
+     "Exists":
+    {
+      "Snippet": "Returns if exists", 
+      "Summary": "Tests whether the inner query returns any row.", 
+      "Type": "None",
+      "Syntax": "WHERE EXISTS (subquery)",
+      "Text": 
+      [ 
+        "Exists tests whether the inner query returns any row. If it does, then the outer query proceeds. If not, the outer query does not execute, and the entire SQL statement returns nothing.",
+        "The subquery is a Select statement. If the subquery returns at least one record in its result set, the Exists clause will evaluate to true and the Exists condition will be met. If the subquery does not return any records, the Exists clause will evaluate to false and the Exists condition will not be met."
+      ]
+    },
+     "Var":
+    {
+      "Snippet": "Declares a variable", 
+      "Summary": "Declares a variable", 
+      "Type": "binary infix operator",
+      "Syntax": "VAR name",
+      "Text": 
+      [ 
+        "The Var card does not have a description yet."
+      ]
+    },
+     "Transform":
+    {
+      "Snippet": "None", 
+      "Summary": "None", 
+      "Type": "None",
+      "Syntax": "None",
+      "Text": 
+      [ 
+        "The Transform card does not have a description yet."
+      ]
+    },
+     "()":
+    {
+      "Snippet": "None", 
+      "Summary": "None", 
+      "Type": "None",
+      "Syntax": "None",
+      "Text": 
+      [ 
+        "The () card does not have a description yet."
+      ]
     }
   },
   {
