@@ -497,7 +497,40 @@
       "Syntax": "AVG expression",
       "Text": 
       [ 
-        "The avg card does not have a description yet."
+        "TQL Avg function calculates the average value of a column of numeric type. It returns the average of all non NULL values",
+        "This example computes the average price of products:",
+        [
+           {
+           "cards": [
+            
+             {
+            "cards": [{
+              "id": "c-4",
+              "parentId": "c-3",
+              "properties": [{
+                "id": "s0.1",
+                "property": "product.price"
+              }],
+              "type": "select",
+              "faded": true
+            }],
+            "id": "c-3",
+            "parentId": "C-2",
+            "group": "users",
+            "iterator": "user",
+            "joins": [],
+            "type": "from",
+            "faded": true
+          }
+            
+          ],
+          "id": "c-2",
+          "parentId": "8R",
+          "type": "avg",
+          "highlighted": true
+        },
+          "Avg \n\tfrom 'products' as product \n\tselect product.price"
+        ]
       ]
     },
     "Select From Where":

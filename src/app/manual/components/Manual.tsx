@@ -309,7 +309,6 @@ class Manual extends Classs<Props>
 
   showTqlCards()
   {
-    console.log("here");
     this.setState({
       visibleTqlCards: this.allTqlCards,
       visiblePhraseTypes: [],
