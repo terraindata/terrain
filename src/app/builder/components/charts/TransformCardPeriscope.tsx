@@ -51,12 +51,11 @@ import Actions from "../../data/BuilderActions.tsx";
 import Util from '../../../util/Util.tsx';
 import PureClasss from '../../../common/components/PureClasss.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
-type Bars = BuilderTypes.Bars;
 import Periscope from './Periscope.tsx';
 
 interface Props 
 {
-  barsData: List<BuilderTypes.IBar>;
+  barsData: List<any>;
   maxDomain: List<number>;
   domain: List<number>;
   range: List<number>;

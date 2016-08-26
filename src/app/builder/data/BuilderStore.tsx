@@ -69,32 +69,8 @@ let _BuilderState = (config?:any) => {
 
 var DefaultState = _BuilderState();
 
-import InputsReducer from './reducers/InputsReducer.tsx';
-import ResultsReducer from './reducers/ResultsReducer.tsx';
-import CardsReducer from './reducers/CardsReducer.tsx';
-import FromCardReducer from './reducers/FromCardReducer.tsx';
-import ScoreCardReducer from './reducers/ScoreCardReducer.tsx';
-import LetCardReducer from './reducers/LetCardReducer.tsx';
-import SortCardReducer from './reducers/SortCardReducer.tsx';
-import FilterCardReducer from './reducers/FilterCardReducer.tsx';
-import SelectCardReducer from './reducers/SelectCardReducer.tsx';
-import TransformCardReducer from './reducers/TransformCardReducer.tsx';
-import IfCardReducer from './reducers/IfCardReducer.tsx';
-import VariantReducer from './reducers/VariantReducer.tsx';
+import BuilderReducers from './BuilderReducers.tsx';
 
-export const BuilderStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  VariantReducer,
-  ResultsReducer,
-  CardsReducer,
-  FromCardReducer,
-  InputsReducer,
-  ScoreCardReducer,
-  LetCardReducer,
-  SortCardReducer,
-  FilterCardReducer,
-  SelectCardReducer,
-  TransformCardReducer,
-  IfCardReducer,
-{})), DefaultState);
+export const BuilderStore = Redux.createStore(ReduxActions.handleActions(BuilderReducers), DefaultState);
 
 export default BuilderStore;

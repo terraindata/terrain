@@ -50,7 +50,6 @@ import * as _ from 'underscore';
 
 import BrowserTypes from './../browser/BrowserTypes.tsx';
 
-import { BuilderTypes } from './../builder/BuilderTypes.tsx';
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 var immutableCardsUpdateHelper = (node: any, keyToUpdate: string | string[], id: string, updater: (node: any, key: string | string[]) => any) =>
 {

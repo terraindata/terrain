@@ -78,7 +78,6 @@ class CreateCardTool extends PureClasss<Props>
   
   createCard(event)
   {
-    console.log(this.props.keyPath);
     if(this.props.open && this.props.onMinimize)
     {
       this.props.onMinimize();
@@ -120,7 +119,7 @@ class CreateCardTool extends PureClasss<Props>
          {
            _.map(CardTypes as any, (type:string) => 
            {
-             let card = BuilderTypes.recordFactories[type]();
+             let card = BuilderTypes.F[type]();
              return (
                <a
                  className="create-card-button"
@@ -194,7 +193,7 @@ const cardTarget =
       
       setTimeout(() =>
       {
-        Actions.cards.move(item, props.index || 0, props.parentId); // TODO
+        // Actions.cards.move(item, props.index || 0, props.parentId); // TODO
       }, 250);
     }
   }

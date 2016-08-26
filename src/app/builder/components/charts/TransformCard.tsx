@@ -57,11 +57,10 @@ interface Props
 {
   key: string;
   keyPath: KeyPath;
-  data: BuilderTypes.ITransformCard;
+  data: any; // transform card
   
   canEdit?: boolean;
   spotlights?: any;  
-  // TODO spawtlights
 }
 
 class TransformCard extends PureClasss<Props>
@@ -75,7 +74,7 @@ class TransformCard extends PureClasss<Props>
   {
     super(props);
     this.state = {
-      domain: List(props.data.domain),
+      domain: List(props.data.domain as number[]),
       range: List([0,1]),
     };
   }
@@ -87,7 +86,7 @@ class TransformCard extends PureClasss<Props>
     });
   }
   
-  handleUpdatePoints(points: BuilderTypes.ScorePoints)
+  handleUpdatePoints(points)
   {
     Actions.change(this.props.keyPath, points);
   }

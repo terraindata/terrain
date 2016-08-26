@@ -51,17 +51,21 @@ import Actions from "../../data/BuilderActions.tsx";
 import Util from '../../../util/Util.tsx';
 import PureClasss from '../../../common/components/PureClasss.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
-type Bars = BuilderTypes.Bars;
-type ScorePoints = BuilderTypes.ScorePoints;
-type Bar = BuilderTypes.IBar;
-type ScorePoint = BuilderTypes.IScorePoint;
+
+type ScorePoint = {
+  id: string;
+  score: number;
+  value: number;
+  set: (f: string, v: any) => ScorePoint;
+}
+type ScorePoints = List<ScorePoint>;
 
 import TransformChart from './TransformChart.tsx';
 
 interface Props 
 {
   points: ScorePoints;
-  bars: Bars;
+  bars: any;
   domain: List<number>;
   range: List<number>;
   canEdit: boolean;
@@ -231,7 +235,7 @@ class TransformCardChart extends PureClasss<Props>
     }
 
     this.updatePoints(points.splice(index, 0,
-      BuilderTypes._IScorePoint({
+      BuilderTypes.F.scorePoint({
         value,
         score,
       })

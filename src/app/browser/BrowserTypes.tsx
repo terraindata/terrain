@@ -91,7 +91,7 @@ export module BrowserTypes
     algorithmId: ID;
     groupId: Group;
 
-    cards: List<BuilderTypes.ICard>;
+    cards: List<BuilderTypes.ICard<any>>;
     inputs: List<BuilderTypes.IInput>;
     
     mode: string;

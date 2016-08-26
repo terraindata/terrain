@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./BuilderComponent.less');
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import {BuilderComponents, Display, DisplayType} from './BuilderComponents.tsx';
+import {Display, DisplayType} from './../BuilderTypes.tsx';
 import PureClasss from '../../common/components/PureClasss.tsx';
 import BuilderTextbox from '../../common/components/BuilderTextbox.tsx';
 import BuilderTypes from '../BuilderTypes.tsx';
@@ -164,6 +164,7 @@ class BuilderComponent extends PureClasss<Props>
           cards={value} 
           keyPath={keyPath}
           topLevel={false}
+          className={className}
         />;
       break;
       case DisplayType.CARDTEXT:
@@ -297,16 +298,16 @@ class BuilderComponent extends PureClasss<Props>
   
   render()
   {
-    var {type, data, display} = this.props;
+    var {data, display} = this.props;
     
     if(!display)
     {
-      if(!type)
+      if(!data.display)
       {
         throw new Error("Insufficient props supplied to BuilderComponent");
       }
       
-      display = BuilderComponents[type];
+      display = data.display;
     }
     
     if(Array.isArray(display))

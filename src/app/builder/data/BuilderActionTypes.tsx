@@ -45,23 +45,6 @@ THE SOFTWARE.
 var _ = require('underscore');
 var Immutable = require('immutable');
 
-/*
-
-Terminology:
-- create
-- change
-- move
-- remove
-
-*/
-
-// These are  commonly used type words. Defining them as keys here
-//  allows us to use ES6 short-hand in our ActionTypes object.
-var move = '';
-var create = '';
-var remove = '';
-var change = '';
-
 // Defining our object like this gives us compile-time TypeScript support for ActionTypes
 //  and prevents us from defining duplicate action types.
 // The keys are the action types.
@@ -71,110 +54,10 @@ var change = '';
 
 var BuilderActionTypes = 
 {
-  create,
-  change,
-  move,
-  remove,
-  
-  // TODO kill all
-  cards:
-  {
-    move,
-    create,
-    change, // generic change to card, requires key path
-    remove,
-    selectCard: '',
-    
-    from:
-    {
-      change,
-      
-      join:
-      {
-        create,
-        change,
-        remove,
-      }
-    },
-
-    select: {
-    	create,
-      change,
-      move,
-      remove,
-    },
-
-    sort:
-    {
-      create,
-    	change,
-      move,
-      remove,
-    },
-
-    filter:
-    {
-      create,
-      change,
-      move,
-      remove,
-    },
-
-    let:
-    {
-      change,
-    },
-
-    score:
-    {
-      change,
-      create,
-      changeWeights: '',
-    },
-
-    transform:
-    {
-      change,
-      scorePoint: '',
-      scorePoints: '',
-    },
-    
-    if:
-    {
-      change,
-      else: '',
-    },
-    
-  },
-
-  inputs:
-  {
-    create,
-    changeKey: '',
-    changeValue: '',
-    changeType: '',
-    move,
-    remove,
-  },
-
-  results:
-  {
-    move,
-    spotlight: '',
-    pin: '',
-    changePage: '',
-    query: '',
-    set: '',
-  },
-
-  // algorithm:
-  // {
-  //   create,
-  //   remove,
-  //   duplicate: '',
-  //   load: '',
-  // },
-  
+  create: '',
+  change: '',
+  move: '',
+  remove: '',
   fetch: '',
   setVariant: '',
   setVariantField: '',

@@ -165,22 +165,26 @@ class Result extends Classs<Props> {
   
   spotlight()
   {
-    Actions.results.spotlight(this.props.data, ColorManager.colorForKey(this.props.data.id));
+    // TODO
+    // Actions.results.spotlight(this.props.data, ColorManager.colorForKey(this.props.data.id));
   }
   
   unspotlight()
   {
-    Actions.results.spotlight(this.props.data, false);
+    // TODO
+    // Actions.results.spotlight(this.props.data, false);
   }
   
   pin()
   {
-    Actions.results.pin(this.props.data, true);
+    // TODO
+    // Actions.results.pin(this.props.data, true);
   }
   
   unpin()
   {
-    Actions.results.pin(this.props.data, false);
+    // TODO
+    // Actions.results.pin(this.props.data, false);
   }
   
   renderSpotlight()
@@ -469,7 +473,8 @@ const resultTarget =
   drop(props, monitor, component)
   {
     const item = monitor.getItem();
-    Actions.results.move(item, props.index);
+    // TODO
+    // Actions.results.move(item, props.index);
   }
 }
 

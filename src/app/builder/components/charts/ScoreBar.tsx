@@ -56,8 +56,12 @@ var SCORE_COLORS =
 };
 
 class ScoreBar extends PureClasss<{
-  parentData: BuilderTypes.IScoreCard;
-  data: BuilderTypes.IWeight;
+  parentData: {
+    weights: {weight: number}[];
+  };
+  data: {
+    weight: number;
+  }
   keyPath: KeyPath;
   // weights: List<BuilderTypes.IWeight>,
   // index: number,

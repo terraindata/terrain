@@ -161,7 +161,7 @@ class BuilderTextbox extends PureClasss<Props>
     }
     else if(this.isText())
     {
-      value = BuilderTypes._IParenthesesCard();
+      value = BuilderTypes.F.parentheses;
     }
     
     this.backupValue = this.props.value;
@@ -236,7 +236,6 @@ class BuilderTextbox extends PureClasss<Props>
     var cards = this.props.value['cards'];
     if(cards.size)
     {
-      console.log(cards);
       var card = cards.get(0);
       var color = card.colors[0] as string;
       var title: string = card.title;
@@ -322,16 +321,17 @@ const btbTarget =
         return;  
       }
       
-      var newId = 'c-' + Math.random();
-      var newCard:BuilderTypes.IParenthesesCard = BuilderTypes._IParenthesesCard();
+      //   // TODO
+      // var newId = 'c-' + Math.random();
+      // var newCard:BuilderTypes.IParenthesesCard = BuilderTypes._IParenthesesCard();
       
-      props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
+      // props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
       
-      setTimeout(() =>
-      {
-        Actions.cards.change(props.id, props.keyPath, newCard)
-        Actions.cards.move(item, 0, newId);
-      }, 250);
+      // setTimeout(() =>
+      // {
+      //   // Actions.cards.change(props.id, props.keyPath, newCard)
+      //   // Actions..move(item, 0, newId);
+      // }, 250);
     }
   }
 }

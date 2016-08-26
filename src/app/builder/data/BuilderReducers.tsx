@@ -42,20 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Immutable = require('immutable');
-import BrowserTypes from './../../../browser/BrowserTypes.tsx';
-import BuilderTypes from './../../BuilderTypes.tsx';
-import Ajax from './../../../util/Ajax.tsx';
-import ActionTypes from './../BuilderActionTypes.tsx';
-import Util from './../../../util/Util.tsx';
-import Actions from './../BuilderActions.tsx';
+const Immutable = require('immutable');
+import BrowserTypes from './../../browser/BrowserTypes.tsx';
+import BuilderTypes from './../BuilderTypes.tsx';
+import Ajax from './../../util/Ajax.tsx';
+import ActionTypes from './BuilderActionTypes.tsx';
+import Actions from './BuilderActions.tsx';
 import * as _ from 'underscore';
+import {BuilderState} from './BuilderStore.tsx';
 
-// TODO rename from Variant
-
-var VariantReducer = {};
-
-VariantReducer[ActionTypes.fetch] =
+const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
+{
+  
+[ActionTypes.fetch]:
   (state, action) =>
   {
     action.payload.variantIds.map(
@@ -109,41 +108,45 @@ VariantReducer[ActionTypes.fetch] =
       }
     );
     return state.set('loading', true);
-  }
-
-VariantReducer[ActionTypes.setVariant] =
-  (state, action) =>
+  },
+  
+[ActionTypes.setVariant]: 
+  (state, action:
+  {
+    payload?: { variantId: string, variant: any},
+  }) =>
     state.setIn(['queries', action.payload.variantId],
       new BrowserTypes.Variant(action.payload.variant)
-    );
+    ),
 
-VariantReducer[ActionTypes.setVariantField] =
-  (state, action) =>
+[ActionTypes.setVariantField]: 
+  (state, action:
+  {
+    payload?: { variantId: string, field: string, value: any},
+  }) =>
     state.setIn(['queries', action.payload.variantId, action.payload.field],
       action.payload.value
-    );
+    ),
 
-// TODO name of this file
-  
-VariantReducer[ActionTypes.change] = 
+[ActionTypes.change]:  
   (state, action) =>
-    state.setIn(action.payload.keyPath, action.payload.value);
+    state.setIn(action.payload.keyPath, action.payload.value),
   
-VariantReducer[ActionTypes.create] = 
+[ActionTypes.create]:  
   (state, action: {
-    payload: { keyPath: KeyPath, index: number, factoryType: string }
+    payload?: { keyPath: KeyPath, index: number, factoryType: string }
   }) =>
     state.updateIn(action.payload.keyPath, arr =>
       arr.splice
       (
         action.payload.index === -1 ? arr.size : action.payload.index, 0, 
-        BuilderTypes.recordFactories[action.payload.factoryType]()
+        BuilderTypes.F[action.payload.factoryType]()
       )
-    );
+    ),
     
-VariantReducer[ActionTypes.move] = 
+[ActionTypes.move]:  
   (state, action: {
-    payload: { keyPath: KeyPath, index: number, newIndex; number }
+    payload?: { keyPath: KeyPath, index: number, newIndex; number }
   }) =>
     state.updateIn(action.payload.keyPath, arr =>
     {
@@ -152,12 +155,16 @@ VariantReducer[ActionTypes.move] =
       arr = arr.splice(index, 1);
       arr = arr.splice(newIndex, 0, el); // TODO potentially correct index
       return arr;
-    })
+    }),
 
-VariantReducer[ActionTypes.remove] = 
+[ActionTypes.remove]:  
   (state, action: {
-    payload: { keyPath: KeyPath, index: number, factoryType: string }
+    payload?: { keyPath: KeyPath, index: number, factoryType: string }
   }) =>
     state.removeIn(action.payload.keyPath.push(action.payload.index))
+  ,
   
-export default VariantReducer;
+};
+
+
+export default BuidlerReducers;

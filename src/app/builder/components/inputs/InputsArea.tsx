@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import Util from '../../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/BuilderActions.tsx";
@@ -65,7 +66,7 @@ class InputsArea extends PureClasss<Props>
 {
   createInput()
   {
-    Actions.inputs.create(this.props.queryId, -1);
+    Actions.create(Immutable.List(['queries', this.props.queryId, 'inputs']), -1, 'input');
   }
   
   renderNoInputs()
@@ -81,7 +82,7 @@ class InputsArea extends PureClasss<Props>
   
   moveTo(curIndex, newIndex)
   {
-    Actions.inputs.move(this.props.queryId, this.props.inputs.get(curIndex), newIndex);
+    Actions.move(Immutable.List(['queries', this.props.queryId, 'inputs']), curIndex, newIndex);
   }
   
   render()

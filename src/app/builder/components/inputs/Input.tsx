@@ -78,6 +78,32 @@ var Input = React.createClass<any, any>({
     //  benefit to caching keyPaths anyways.
 	},
   
+  getInitialState()
+  {
+    return this.computeKeyPaths(this.props);
+  },
+  
+  computeKeyPaths(props)
+  {
+    let parentKeyPath = Immutable.List(['queries', props.queryId, 'inputs']);
+    let keyPath = parentKeyPath.push(props.index);
+    return {
+      keyPath,
+      parentKeyPath,
+      valueKeyPath: keyPath.push('value'),
+      keyKeyPath: keyPath.push('key'),
+      typeKeyPath: keyPath.push('inputType'),
+    };
+  },
+  
+  componentWillReceiveProps(nextProps)
+  {
+    if(nextProps.queryId !== this.props.queryId || nextProps.index !== this.props.index)
+    {
+      this.setState(this.computeKeyPaths(nextProps));
+    }
+  },
+  
   shouldComponentUpdate(nextProps, nextState)
   {
     return shallowCompare(this, nextProps, nextState);
@@ -94,30 +120,30 @@ var Input = React.createClass<any, any>({
   
   convertToDate()
   {
-    Actions.inputs.changeType(this.props.queryId, BuilderTypes.InputType.DATE, this.props.index);
+    Actions.change(this.state.typeKeyPath, InputType.DATE);
   },
   
   convertToText()
   {
-    Actions.inputs.changeType(this.props.queryId, BuilderTypes.InputType.TEXT, this.props.index);
+    Actions.change(this.state.typeKeyPath, InputType.TEXT);
   },
   
   convertToNumber()
   {
-    Actions.inputs.changeType(this.props.queryId, BuilderTypes.InputType.NUMBER, this.props.index);
+    Actions.change(this.state.typeKeyPath, InputType.NUMBER);
   },
 
   closeInput()
   {
     Util.animateToHeight(this.refs.input, 0);
     setTimeout(() => {
-      Actions.inputs.remove(this.props.queryId, this.props.index)
+      Actions.remove(this.state.keyPath, this.props.index)
     }, 250);
   },
   
   createInput()
   {
-    Actions.inputs.create(this.props.queryId, this.props.index);
+    Actions.create(this.state.parentKeyPath, this.props.index, 'input');
   },
 
   getMenuOptions()
@@ -126,31 +152,35 @@ var Input = React.createClass<any, any>({
       {
         text: 'Number',
         onClick: this.convertToNumber,
-        disabled: this.props.input.type === InputType.NUMBER,
+        disabled: this.props.input.inputType === InputType.NUMBER,
         icon: <NumberIcon />, 
         iconColor: '#805DA8',
       },
       {
         text: 'Text',
         onClick: this.convertToText,
-        disabled: this.props.input.type === InputType.TEXT,
+        disabled: this.props.input.inputType === InputType.TEXT,
         icon: <TextIcon />, 
         iconColor: '#31B2BC',
       },
       {
         text: 'Date',
         onClick: this.convertToDate,
-        disabled: this.props.input.type === InputType.DATE,
+        disabled: this.props.input.inputType === InputType.DATE,
         icon: <DateIcon />, 
         iconColor: '#FF735B',
       },
     ]);
   },
-
+  
+  changeValue(value)
+  {
+    Actions.change(this.state.valueKeyPath, value);
+  },
   
   renderInputValue()
   {
-    if(this.props.input.type === BuilderTypes.InputType.DATE)
+    if(this.props.input.inputType === BuilderTypes.InputType.DATE)
     {
       return (
         <div>
@@ -169,8 +199,8 @@ var Input = React.createClass<any, any>({
         canEdit={true}
         value={this.props.input.value}
         className="input-text input-text-second"
-        keyPath={Immutable.List(['queries', this.props.queryId, 'inputs', this.props.index, 'value']) /* TODO */}
-        isNumber={this.props.input.type === BuilderTypes.InputType.NUMBER}
+        keyPath={this.state.valueKeyPath}
+        isNumber={this.props.input.inputType === BuilderTypes.InputType.NUMBER}
         typeErrorMessage="That is not a number"
       />
     );
@@ -191,7 +221,7 @@ var Input = React.createClass<any, any>({
               canEdit={true}
               value={this.props.input.key}
               className="input-text input-text-first input-borderless"
-              keyPath={Immutable.List(['queries', this.props.queryId, 'inputs', this.props.index, 'key']) /* TODO */}
+              keyPath={this.state.keyKeyPath}
             />
             <div className='input-menu'>
               <Menu 

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import * as $ from 'jquery';
@@ -56,7 +57,7 @@ import CreateCardTool from "./CreateCardTool.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import { DropTarget } from 'react-dnd';
 import BuilderTypes from '../../BuilderTypes.tsx';
-type ICard = BuilderTypes.ICard;
+type ICard = BuilderTypes.ICard<any>;
 type ICards = BuilderTypes.ICards;
 let {List} = Immutable;
 
@@ -68,8 +69,9 @@ interface Props
   canEdit: boolean;
   keyPath: KeyPath;
   
+  className?: string;
   queryId?: ID;
-  spotlights?: List<any>; // TODO spotlight type
+  spotlights?: List<any>;
   connectDropTarget?: (el:JSX.Element) => JSX.Element;
 }
 
@@ -126,26 +128,27 @@ class CardsArea extends PureClasss<Props>
   
   computeKeys(props:Props): List<string>
   {
-    let newKeysArr: string[] = props.keys.toJS().concat(
-      props.cards.reduce(
-        (memo: string[], card): string[] =>
-        {
-          if(card.type === BuilderTypes.CardTypes.VAR || card.type === BuilderTypes.CardTypes.LET)
-          {
-            memo.push(
-              (card as (BuilderTypes.IVarCard | BuilderTypes.ILetCard)).field
-            );
-          }
-          return memo;
-        }
-      , [])
-    );
+    // TODO
+    // let newKeysArr: string[] = props.keys.toJS().concat(
+    //   props.cards.reduce(
+    //     (memo: string[], card): string[] =>
+    //     {
+    //       if(card.type === BuilderTypes.CardTypes.VAR || card.type === BuilderTypes.CardTypes.LET)
+    //       {
+    //         memo.push(
+    //           (card as (BuilderTypes.IVarCard | BuilderTypes.ILetCard)).field
+    //         );
+    //       }
+    //       return memo;
+    //     }
+    //   , [])
+    // );
     
-    if(newKeysArr.some(key => this.state.keys.indexOf(key) === -1))
-    {
-      // keys have changed
-      return List(newKeysArr);
-    }
+    // if(newKeysArr.some(key => this.state.keys.indexOf(key) === -1))
+    // {
+    //   // keys have changed
+    //   return List(newKeysArr);
+    // }
     
     return this.state.keys;
   }
@@ -158,7 +161,7 @@ class CardsArea extends PureClasss<Props>
   
   createFromCard()
   {
-    Actions.cards.create(this.state.keyPath, BuilderTypes.CardTypes.SFW, 0);
+    Actions.create(this.state.keyPath, 0, 'sfw');
   }
   
   render()
@@ -169,7 +172,11 @@ class CardsArea extends PureClasss<Props>
     // TODO add cards
     return this.props.connectDropTarget(
       <div
-        className={'cards-area' + (topLevel ? ' cards-area-top-level' : '')}
+        className={classNames({
+          'cards-area': true,
+          'cards-area-top-level': topLevel,
+          [this.props.className]: !!this.props.className,
+        })}
       >
         {
           cards.map((card:ICard, index:number) =>
@@ -227,7 +234,7 @@ const cardTarget =
     if(monitor.isOver({ shallow: true}))
     {
       const card = monitor.getItem();
-      Actions.cards.move(card, props.cards.size, props.parentId); // TODO
+      // Actions.cards.move(card, props.cards.size, props.parentId); // TODO
     }
   }
 }

@@ -45,7 +45,7 @@ THE SOFTWARE.
 import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 import { BuilderTypes } from "../builder/BuilderTypes.tsx";
-type ICard = BuilderTypes.ICard;
+type ICard = BuilderTypes.ICard<any>;
 type IInput = BuilderTypes.IInput;
 
 
@@ -80,11 +80,11 @@ class TQLConverter
       inputs.map((input: IInput) => 
         {
           var {value} = input;
-          if(input.type === BuilderTypes.InputType.TEXT)
+          if(input.inputType === BuilderTypes.InputType.TEXT)
           {
             value = `"${value}"`;
           }
-          if(input.type == BuilderTypes.InputType.DATE)
+          if(input.inputType == BuilderTypes.InputType.DATE)
           {
             value = `"${value}"`;
           }
@@ -134,7 +134,7 @@ class TQLConverter
       if(!fromCard['cards'].some(card => card.type === 'take'))
       {
         let limit = options.limit || 5000; // queries without a limit will crash Tiny
-        return fromCard.set('cards', fromCard['cards'].push(BuilderTypes._ITakeCard({
+        return fromCard.set('cards', fromCard['cards'].push(BuilderTypes.F.take({
           value: 5000,
         })));
       }

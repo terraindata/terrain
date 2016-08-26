@@ -69,7 +69,6 @@ class BuilderTextboxCards extends React.Component<Props, any>
   }
   
   render() {
-    console.log(this.props.keyPath.toJS(), this.props.value);
     if(this.isText())
     {
       return null;
