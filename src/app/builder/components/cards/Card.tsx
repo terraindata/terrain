@@ -150,6 +150,7 @@ class Card extends PureClasss<Props>
     open: boolean;
     id: ID;
     selected: boolean;
+    hovering: boolean;
     menuOptions: List<MenuOption>;
     
     // TODO
@@ -174,6 +175,7 @@ class Card extends PureClasss<Props>
       open: true,
       id: this.props.card.id,
       selected: false,
+      hovering: false,
       menuOptions:
         Immutable.List([
           {
@@ -194,6 +196,24 @@ class Card extends PureClasss<Props>
     this._subscribe(Store, {
       stateKey: 'selected',
       storeKeyPath: ['selectedCardIds', props.card.id],
+    });
+    
+    this._subscribe(Store, {
+      updater: (state) =>
+      {
+        if(state.hoveringCardId === this.props.card.id)
+        {
+          this.setState({
+            hovering: true,
+          });
+        }
+        else
+        {
+          this.setState({
+            hovering: false,
+          });
+        }
+      }
     });
   }
   
@@ -356,6 +376,12 @@ class Card extends PureClasss<Props>
       </div>
     );
   }
+  
+  handleMouseMove(event)
+  {
+    event.stopPropagation();
+    Actions.hoverCard(this.props.card.id);
+  }
 
 	render() {
     
@@ -380,7 +406,6 @@ class Card extends PureClasss<Props>
     let {card} = this.props;
 		let {title} = card;
     const { isDragging, connectDragSource, connectDropTarget } = this.props;
-    
     const rendering = 
       <div
         className={classNames({
@@ -394,6 +419,7 @@ class Card extends PureClasss<Props>
           // 'wrapper-card': isWrapperCard,
         })}
         rel={'card-' + card.id}
+        onMouseMove={this.handleMouseMove}
       >
         <div ref='cardContainer' className='card-container'>
           { !this.props.singleCard &&
@@ -419,6 +445,7 @@ class Card extends PureClasss<Props>
                   className={classNames({
                     'card-title': true,
                     'card-title-closed': !this.state.open,
+                    'card-title-card-hovering': this.state.hovering,
                   })}
                   style={{
                     background: card.colors[0],

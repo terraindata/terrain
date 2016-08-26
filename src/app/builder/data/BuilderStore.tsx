@@ -57,7 +57,11 @@ export class BuilderState
 {
   loading: boolean = false;
   queries: Map<ID, Types.IQuery> = Map({});
+  
+  hoveringCardId: ID = "";
   selectedCardIds: Map<ID, boolean> = Map({});
+  
+  tables: Map<string, string[]> = Map({});
   
   set: (f: string, v: any) => BuilderState;
   setIn: (f: string, v: any) => BuilderState;

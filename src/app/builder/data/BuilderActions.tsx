@@ -82,6 +82,14 @@ var BuilderActions =
   setVariantField:
     (variantId: ID, field: string, value: any) =>
       $(ActionTypes.setVariantField, { variantId, field, value }),
+  
+  hoverCard:
+    (cardId: ID) =>
+      $(ActionTypes.hoverCard, { cardId }),
+  
+  selectCard:
+    (cardId: ID, selectPressed: boolean) =>
+      $(ActionTypes.hoverCard, { cardId, selectPressed }),
 };
 
 export default BuilderActions;

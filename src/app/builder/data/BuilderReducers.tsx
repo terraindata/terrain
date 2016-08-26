@@ -162,6 +162,13 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   }) =>
     state.removeIn(action.payload.keyPath.push(action.payload.index))
   ,
+
+[ActionTypes.hoverCard]:
+  (state, action: {
+    payload?: { cardId: ID },
+  }) =>
+    state.set('hoveringCardId', action.payload.cardId)
+  ,
   
 };
 

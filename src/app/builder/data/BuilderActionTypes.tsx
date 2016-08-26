@@ -61,6 +61,9 @@ var BuilderActionTypes =
   fetch: '',
   setVariant: '',
   setVariantField: '',
+  
+  hoverCard: '',
+  selectCard: '',
 };
 
 // I tried using this type to correclty classify this function,
