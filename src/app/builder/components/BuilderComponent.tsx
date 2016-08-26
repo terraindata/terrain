@@ -265,6 +265,7 @@ class BuilderComponent extends PureClasss<Props>
         <BuilderTextbox
           keys={this.props.keys}
           canEdit={this.props.canEdit}
+          top={d.top}
           placeholder={d.placeholder || d.key}
           {...{
             key,

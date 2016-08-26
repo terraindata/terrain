@@ -24,11 +24,15 @@
   }
 }
 
-.card-flex {
-  display: flex;
-}
+//  {
+//   display: flex;
+//   .builder-comp-list {
+//     display: flex;
+//     flex-grow: 1;
+//   }
+// }
 
-.card-field-inner {
+.card-field-inner, .card-flex {
   .builder-comp-list {
     flex-grow: 1;
     display: flex;
@@ -52,12 +56,23 @@
 }
 
 .sfw-card {
-  .card-content {
+  .card-content:not(.card-content-single) {
     padding-top: 0px;
     margin-top: -3px;
   }
   
+  .card .card-content:not(.card-content-single) {
+    padding-top: 7px;
+    margin-top: 0px;
+  }
+  
   .sfw-cards-area {
     margin-top: 6px;
+  }
+}
+
+.card-field-wrapper {
+  .builder-tb-cards-area:last-child {
+    margin-top: -6px;
   }
 }

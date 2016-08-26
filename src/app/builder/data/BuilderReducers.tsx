@@ -62,7 +62,6 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
         {
           if(variantId.indexOf('@') !== -1) 
           {
-            // TODO
             var versionId = variantId.split('@')[1];
             variantId = variantId.split('@')[0];
             Ajax.getVariantVersion(variantId, versionId, (version) =>

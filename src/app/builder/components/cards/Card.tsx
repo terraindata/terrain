@@ -393,7 +393,7 @@ class Card extends PureClasss<Props>
           [card.type + '-card']: true,
           // 'wrapper-card': isWrapperCard,
         })}
-        rel={'card-' + this.props.card.id}
+        rel={'card-' + card.id}
       >
         <div ref='cardContainer' className='card-container'>
           { !this.props.singleCard &&
@@ -408,8 +408,8 @@ class Card extends PureClasss<Props>
           <div
             className={'card-inner ' + (this.props.singleCard ? 'card-single' : '')}
             style={{
-              background: this.props.card.colors[1],
-              borderColor: this.props.card.colors[0],
+              background: card.colors[1],
+              borderColor: card.colors[0],
             }}
             ref='cardInner'
           >
@@ -421,7 +421,7 @@ class Card extends PureClasss<Props>
                     'card-title-closed': !this.state.open,
                   })}
                   style={{
-                    background: this.props.card.colors[0],
+                    background: card.colors[0],
                   }}
                   onClick={this.handleTitleClick}
                   >
@@ -431,7 +431,7 @@ class Card extends PureClasss<Props>
                     'card-preview': true,
                     'card-preview-hidden': this.state.open
                   })}>
-                    { BuilderTypes.getPreview(this.props.card) }
+                    { BuilderTypes.getPreview(card) }
                   </span>
                   {
                     this.props.canEdit && <Menu options={this.state.menuOptions} />

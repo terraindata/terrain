@@ -102,6 +102,9 @@ export interface Display
   english?: string;
   factoryType?: string;
   
+  // for buildertextboxes with cards
+  top?: boolean;
+  
   // for components
   component?: (typeof PureClasss);
 }
@@ -144,6 +147,7 @@ let filtersDisplay =
         {
           displayType: CARDTEXT,
           key: 'first',
+          top: true,
         },
         {
           displayType: DROPDOWN,

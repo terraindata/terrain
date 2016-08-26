@@ -161,7 +161,7 @@ class BuilderTextbox extends PureClasss<Props>
     }
     else if(this.isText())
     {
-      value = BuilderTypes.F.parentheses;
+      value = BuilderTypes.F.parentheses();
     }
     
     this.backupValue = this.props.value;
