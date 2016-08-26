@@ -26,12 +26,9 @@
     border-left: 1px solid rgba(0,0,0,0.15);
 
     &:hover {
-      .close-builder-title-bar {
-        transition: opacity .15s ease-in-out;
-        opacity: 1;
-      }
-      .builder-title-bar-options {
-        transition: opacity .15s ease-in-out;
+      .builder-split-screen,
+      .close-builder-title-bar,
+      .menu-wrapper {
         opacity: 1;
       }
     }
@@ -97,9 +94,6 @@
     float: right;
     position: relative;
     top: -6px;
-    transition: opacity .15s ease-in-out;
-    opacity: 0;
-    .transition;
     
     .bc-options-svg {
       display: inline-block;
@@ -192,7 +186,13 @@
   vertical-align: middle;
   margin-left: 2px;
   transition: opacity 0.15s ease-in-out;
+}
+
+.builder-split-screen,
+.close-builder-title-bar,
+.menu-wrapper:not(.menu-open) {
   opacity: 0;
+  .transition;
 }
 
 .builder-revert-button {

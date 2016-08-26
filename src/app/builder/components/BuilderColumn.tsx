@@ -368,7 +368,7 @@ var BuilderColumn = React.createClass<any, any>(
               this.props.canAddColumn && 
                 <SplitScreenIcon
                   onClick={this.handleAddColumn}
-                  className='bc-options-svg'
+                  className='bc-options-svg builder-split-screen'
                   data-tip="Add Column"
                 />
             }

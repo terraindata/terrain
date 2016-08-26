@@ -711,16 +711,10 @@ export module BuilderTypes
     {
       if(F[value.get('type')])
       {
-        // console.log(value.get('type'));
         value = value.map(recordFromJS);
         value = F[value.get('type')](value);
-        // console.log('f', value);
-        // console.log('fs', value);
       }
-      else
-      {
-        console && console.log && console.log('Error: No factory for ' + value.get('type'), value);
-      }
+      // else not a valid type
     }
     else if(Immutable.Iterable.isIterable(value))
     {
