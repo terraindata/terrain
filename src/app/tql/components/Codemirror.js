@@ -89,9 +89,15 @@ var CodeMirror = React.createClass({
 		this.codeMirror.on('blur', this.focusChanged.bind(this, false));
 		this.codeMirror.on('contextmenu', this.handleRightClick);
 		this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
-		this.codeMirror.on('scroll', this.props.turnSyntaxPopupOff);
+		this.codeMirror.on('scroll', this.turnSyntaxPopupOff);
 		this.codeMirror.setSize("100%", "70%");
 	},
+
+	turnSyntaxPopupOff: function turnSyntaxPopupOff()
+	{
+		this.props.turnSyntaxPopupOff && this.props.turnSyntaxPopupOff();
+	},
+
 	componentWillUnmount: function componentWillUnmount() 
 	{
 		var tooltip = document.getElementsByClassName('tooltip')[0];

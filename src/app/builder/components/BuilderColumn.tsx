@@ -75,10 +75,10 @@ var ManualIcon = require('./../../../images/open-book-top-view.svg');
 
 enum COLUMNS {
   Builder,
-  Manual,
+  Inputs,
   TQL,
   Results,
-  Inputs
+  Manual
 };
 var NUM_COLUMNS = 5;
 
@@ -190,6 +190,7 @@ var BuilderColumn = React.createClass<any, any>(
   {
     var algorithm = this.props.algorithm;
     var parentId = algorithm.id;
+    console.log(algorithm.cards);
     switch(this.state.column)
     {
       case COLUMNS.Builder:

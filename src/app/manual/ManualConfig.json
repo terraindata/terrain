@@ -530,7 +530,106 @@
       "Syntax": "linearScore[([weight1, attribute1], [weight2, attribute2]...)]",
       "Text": 
       [ 
-        "The Score card does not have a description yet."
+        "The Score card does not have a description yet.",
+        [
+          {
+                    "id": "c-8",
+                    "method": "",
+                    "output": "",
+                    "parentId": "c-0.03",
+                    "type": "score",
+                    "weights": [
+                      {
+                        "key": "product.positive_reviews",
+                        "weight": "50"
+                      },
+                      {
+                        "key": "product.negative_reviews",
+                        "weight": "-25"
+                      },
+                      {
+                        "key": "price",
+                        "weight": "10"
+                      }
+                    ]
+                  },
+                  "linearScore([\n\t[50, product.positive_reviews],\n\t[-25, product.negative_reviews],\n\t[10, product.price]]);"
+        ],
+        "In this example, products are scored based on their positive reviews, negative reviews and prices, ranked according to score, and the top 100 products are then selected",
+        [
+          {
+            "cards": [
+              {
+                "id": "c-1",
+                "parentId": "c=0",
+                "properties": [
+                  {
+                    "id": "0.6",
+                    "property": "*"
+                  }
+                ],
+                "type": "select"
+              },
+              {
+                "expression": {
+                  "cards": [{
+                    "id": "c-8",
+                    "method": "",
+                    "output": "",
+                    "parentId": "c-0.03",
+                    "type": "score",
+                    "weights": [
+                      {
+                        "key": "product.positive_reviews",
+                        "weight": "50"
+                      },
+                      {
+                        "key": "product.negative_reviews",
+                        "weight": "-25"
+                      },
+                      {
+                        "key": "price",
+                        "weight": "10"
+                      }
+                    ]
+                  }],
+                  "id": "c-0.03",
+                  "parentId": "c-0",
+                  "type": "parantheses"
+                },
+                "field": "product.score",
+                "id": "c-2",
+                "parentId": "c-0",
+                "type": "let"
+              },
+              {
+                "id": "c-5",
+                "parentId": "c-0.03",
+                "sorts": [
+                  {
+                    "id": "s0",
+                    "direction": 1,
+                    "property": "product.score"
+                  }
+                ],
+                "type": "sort"
+              },
+              {
+                "id": "c-3",
+                "parentId": "c0",
+                "type": "take",
+                "value": "100"
+              }
+            ],
+            "group": "products",
+            "id": "c-0",
+            "iterator": "product",
+            "joins": [],
+            "parentId": "8RXGK",
+            "type": "from"
+          },
+          "from 'products' as product\nselect *\nlet product.score = (\nlinearScore([\n\t[50, product.positive_reviews],\n\t[-25, product.negative_reviews],\n\t[10, product.price]]))\nORDER BY product.score desc\ntake 100;"
+        ]
       ]
     },
      "If":

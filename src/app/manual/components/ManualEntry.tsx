@@ -321,7 +321,7 @@ class ManualEntry extends Classs<Props>
                    {this.renderCardExample(index)}
                    <div 
                      className='manual-entry-codemirror'
-                     style={{height: (numLines * 14 + 8) + 'px'}}
+                     style={{height: (numLines * 14 + 6) + 'px'}}
                    >
                      {this.renderCodeMirrorExample(index)}
                    </div>
