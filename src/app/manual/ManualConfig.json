@@ -350,7 +350,7 @@
           "type": "from",
           "faded": true
         },
-           "\nfrom 'products' as product \n\tlet product.concersionRatio =\n(product.purchases + 1) / (product.views + 10) \n\tlet product.score =\n\t\t.9 * product.conversionRatio \n\t\t+ .1 * product.promotionBoost \n\tORDER BY product.createdOn desc \n\ttake 10 \n\tselect product.id"
+           "from 'products' as product \n\tlet product.concersionRatio =\n(product.purchases + 1) / (product.views + 10) \n\tlet product.score =\n\t\t.9 * product.conversionRatio \n\t\t+ .1 * product.promotionBoost \n\tORDER BY product.createdOn desc \n\ttake 10 \n\tselect product.id"
         ]
       ]
     },
