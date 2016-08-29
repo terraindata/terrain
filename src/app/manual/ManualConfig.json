@@ -601,7 +601,8 @@
                     "property": "*"
                   }
                 ],
-                "type": "select"
+                "type": "select",
+                "faded": true
               },
               {
                 "expression": {
@@ -633,7 +634,8 @@
                 "field": "product.score",
                 "id": "c-2",
                 "parentId": "c-0",
-                "type": "let"
+                "type": "let",
+                "faded": true
               },
               {
                 "id": "c-5",
@@ -645,13 +647,15 @@
                     "property": "product.score"
                   }
                 ],
-                "type": "sort"
+                "type": "sort",
+                "faded": true
               },
               {
                 "id": "c-3",
                 "parentId": "c0",
                 "type": "take",
-                "value": "100"
+                "value": "100",
+                "faded": true
               }
             ],
             "group": "products",
@@ -659,7 +663,8 @@
             "iterator": "product",
             "joins": [],
             "parentId": "8RXGK",
-            "type": "from"
+            "type": "from",
+            "faded": true
           },
           "from 'products' as product\nselect *\nlet product.score = (\nlinearScore([\n\t[50, product.positive_reviews],\n\t[-25, product.negative_reviews],\n\t[10, product.price]]))\nORDER BY product.score desc\ntake 100;"
         ]
@@ -708,17 +713,6 @@
       "Text": 
       [ 
         "The Transform card does not have a description yet."
-      ]
-    },
-     "()":
-    {
-      "Snippet": "None", 
-      "Summary": "None", 
-      "Type": "None",
-      "Syntax": "None",
-      "Text": 
-      [ 
-        "The () card does not have a description yet."
       ]
     }
   },

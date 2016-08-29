@@ -172,7 +172,8 @@ var Card = React.createClass({
         darkCardColor = this.hex2rgba(darkCardColor);
         lightCardColor = this.hex2rgba(lightCardColor);
       }
-      var borderColor = this.props.card.highlighted ? 'red' : darkCardColor;
+      var borderColor = this.props.card.highlighted ? '#f4ff00' : darkCardColor;
+      var borderWidth = this.props.card.highlighted ? '2px' : '1px';
     return {
       open: true,
       id: this.props.card.id,
@@ -198,6 +199,7 @@ var Card = React.createClass({
       bodyStyle: {
         background: lightCardColor,
         borderColor: borderColor,
+        borderWidth: borderWidth
       },
     }
   },
@@ -288,7 +290,8 @@ var Card = React.createClass({
         darkCardColor = this.hex2rgba(darkCardColor);
         lightCardColor = this.hex2rgba(lightCardColor);
       }
-      var borderColor = nextProps.card.highlighted ? 'red' : darkCardColor;
+      var borderColor = nextProps.card.highlighted ? '#f4ff00' : darkCardColor;
+      var borderWidth = nextProps.card.highlighted ? '2px' : '1px';
 
       this.setState({
         titleStyle: {
@@ -297,6 +300,7 @@ var Card = React.createClass({
       bodyStyle: {
         background: lightCardColor,
         borderColor: borderColor,
+        borderWidth: borderWidth,
       },
       })
   },
