@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
+import * as Immutable from 'immutable';
 import { BuilderTypes } from "../builder/BuilderTypes.tsx";
 type ICard = BuilderTypes.ICard;
 type IInput = BuilderTypes.IInput;
-type IFromCard = BuilderTypes.IFromCard;
 
 
 var OperatorsTQL = ['==', '!=', '>=', '>', '<=', '<', 'in', 'notIn'];
@@ -63,80 +63,80 @@ export interface Options {
 
 class TQLConverter
 {
-  static toTQL(exe: BuilderTypes.IExe, options: Options = {}): string
+  static toTQL(query: BuilderTypes.IQuery, options: Options = {}): string
   {
-    var {cards, inputs} = exe;
+    var {cards, inputs} = query;
     
-    cards = JSON.parse(JSON.stringify(cards)) as ICard[];
-    cards = this.applyOptions(cards, options);
-    let cardsTql = removeBlanks(this._cards(cards, ";", options));
+    var cardsTql = "";
+    if(cards && cards.size)
+    {
+      cards = this.applyOptions(cards, options);
+      cardsTql = removeBlanks(this._cards(cards, ";", options));
+    }
     
-    let inputsTql = inputs.map((input: IInput) => 
-      {
-        var {value} = input;
-        if(input.type === BuilderTypes.InputType.TEXT)
+    var inputsTql = "";
+    if(inputs && inputs.size)
+    {
+      inputs.map((input: IInput) => 
         {
-          value = `"${value}"`;
+          var {value} = input;
+          if(input.inputType === BuilderTypes.InputType.TEXT)
+          {
+            value = `"${value}"`;
+          }
+          if(input.inputType == BuilderTypes.InputType.DATE)
+          {
+            value = `"${value}"`;
+          }
+          
+          inputsTql += `var ${input.key} = ${value};\n`;
         }
-        if(input.type == BuilderTypes.InputType.DATE)
-        {
-          value = `"${value}"`;
-        }
-        
-        return `var ${input.key} = ${value};`;
-      }
-    ).join("\n");
+      );
+      inputsTql += "\n\n";
+    }
     
-    return inputsTql + "\n\n" + cardsTql;
+    return inputsTql + cardsTql;
   }
   
-  private static _topFromCard(cards: ICard[], fn: (fromCard: IFromCard) => IFromCard)
+  private static _topFromCard(cards: List<ICard>, fn: (fromCard: ICard) => ICard): List<ICard>
   {
     // find top-level 'from' cards
     return cards.map(topCard =>
     {
-      if(topCard.type === 'from')
+      if(topCard.type === 'from' || topCard.type === 'sfw')
       {
-        return fn(topCard as IFromCard);
+        return fn(topCard);
       }
       return topCard;
-    });
+    }) as List<ICard>;
   }
   
-  private static applyOptions(cards, options): ICard[]
+  private static applyOptions(cards, options): List<ICard>
   {
     if(options.allFields)
     {
-      cards = this._topFromCard(cards, (fromCard: IFromCard) =>
-      {
-        fromCard.cards = fromCard.cards.map(card =>
+      cards = this._topFromCard(cards, (fromCard: ICard) =>
+        fromCard.set('cards', fromCard['cards'].map(card =>
         {
           if(card.type === 'select')
           {
-            card['properties'] = [
-              {
-                property: '*',
-                id: 1,
-              }
-            ];
+            console.log(card);
+            return card.set('properties', Immutable.List(['*']));
           }
           return card;
-        });
-        
-        return fromCard;
-      });
+        })
+      ));
     }
     
-    cards = this._topFromCard(cards, (fromCard: IFromCard) =>
+    cards = this._topFromCard(cards, (fromCard: ICard) =>
     {
       // add a take card if none are present
-      if(!fromCard.cards.some(card => card.type === 'take'))
+      if(!fromCard['cards'].some(card => card.type === 'take'))
       {
         let limit = options.limit || 5000; // queries without a limit will crash Tiny
-        fromCard.cards.push({
-          type: 'take',
-          value: limit,
-        } as BuilderTypes.ITakeCard);
+        return fromCard.set('cards', fromCard['cards'].push(BuilderTypes.make(BuilderTypes.Blocks.take, {
+          value: 5000,
+        })));
       }
       
       return fromCard;
@@ -145,21 +145,23 @@ class TQLConverter
     return cards;
   }
 
+  // TODO centralize
   // parse strings where "$key" indicates to replace "$key" with the value of card[key]
   //  or functions that are passed in a reference to the card/obj and then return a parse string
   private static TQLF =
   {
-    sfw: "SELECT $properties \nFROM '$group' as $iterator \nWHERE $filters $cards",
-    from: "from '$group' as $iterator $cards",
-    select: "select $properties",
-      properties: (p, index) => p.property.length ? join(", ", index) + "$property" : "",
+    // from: "from '$table' as $iterator $cards",
+    // select: "SELECT $properties",
+    sfw: "SELECT $fields \nFROM $tables \nWHERE $filters $cards",
+      fields: (f, index) => f.field.length ? join(", ", index) + f.field : "",
+      tables: (t, index) => join(", ", index) + "'$table' as $iterator",
     sort: "ORDER BY $sorts",
       sorts: (sort, index) => join(", ", index) + "$property " + (sort.direction ? 'desc' : 'asc'),
     filter: "($filters)",
       filters: (filter, index, isLast) =>
-        TQLConverter._parse("$first ", filter.condition)
-        + OperatorsTQL[filter.condition.operator] + " "
-        + TQLConverter._parse("$second", filter.condition)
+        "$first "
+        + OperatorsTQL[filter.operator] + " " +
+        "$second"
         + (isLast ? "" : " " + CombinatorsTQL[filter.combinator] + " "),
     
     let: "let $field = $expression",
@@ -171,8 +173,8 @@ class TQLConverter
       scorePoints: (sp, index) => join(", ", index) + "\n[$score, $value]",
     
     if: (card) => "if $filters {$cards}"
-      + (card.elses.length ? " else " + (
-        card.elses[0].filters.length
+      + (card.elses.size ? " else " + (
+        card.elses[0].filters.size
           ? TQLConverter._parse(TQLConverter.TQLF.if, card.elses[0])
           : TQLConverter._parse("{$cards}", card.elses[0]) 
       ) : ""),
@@ -188,13 +190,13 @@ class TQLConverter
     skip: "skip $value",
   }
   
-  private static _cards(cards: BuilderTypes.ICard[], append?: string, options?: Options): string
+  private static _cards(cards: List<ICard>, append?: string, options?: Options): string
   {
     var glue = "\n" + (append || "");
     return addTabs("\n" + cards.map(this._card, this).join(glue)) + glue;
   }
   
-  private static _card(card: BuilderTypes.ICard): string
+  private static _card(card: ICard): string
   {
     // var {TQLF, _parse} = TQLConverter;
     // var options = this;
@@ -203,12 +205,12 @@ class TQLConverter
       return this._parse(this.TQLF[card.type], card);
     }
     
-    console.log("No grammar for " + card);
+    console.log("No grammar for: ", card);
     return "";
   }
   
   private static _parse(pattern: string | PatternFn, 
-    card: BuilderTypes.ICard, index?: number, isLast?: boolean): string
+    card: ICard, index?: number, isLast?: boolean): string
   {
     if(typeof pattern === 'function')
     {
@@ -229,16 +231,16 @@ class TQLConverter
     return str;
   }
   
-  private static _value(field: string, card: BuilderTypes.ICard)
+  private static _value(field: string, card: ICard)
   {
     if(field === 'cards')
     {
       return this._cards(card['cards']);
     }
-    else if(Array.isArray(card[field]))
+    else if(Array.isArray(card[field]) || Immutable.List.isList(card[field]))
     {
       return card[field].map(
-        (v, index) => this._parse(this.TQLF[field], v, index, index === card[field].length - 1)
+        (v, index) => this._parse(this.TQLF[field], v, index, index === card[field].size - 1)
       ).join("");
     }
     else if(typeof card[field] === 'object')

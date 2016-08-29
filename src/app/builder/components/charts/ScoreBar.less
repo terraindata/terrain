@@ -1,4 +1,4 @@
-@import "../../../../common/Common.less";
+@import "../../../common/Common.less";
 
 .score-weight-key {
   text-align: left;
@@ -16,6 +16,10 @@
   padding: 3px;
   box-sizing: border-box;
   
+  flex-grow: 2;
+  flex-basis: 200px;
+  margin: 0px (@standard-margin / 2);
+  
   .weight-graph-inner {
     width: 100%;
     height: 100%;
@@ -24,7 +28,7 @@
     .weight-graph-bar {
       position: absolute;
       height: 100%;
-      .transition;
+      .transition(~"all 0.25s");
     }
   }
   

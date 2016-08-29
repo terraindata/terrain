@@ -42,35 +42,73 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Immutable = require('immutable');
-import ActionTypes from './../BuilderActionTypes.tsx';
-import Util from './../../../util/Util.tsx';
-import { BuilderTypes } from './../../BuilderTypes.tsx';
+require('./ScoreBar.less');
+import * as React from 'react';
+import * as Immutable from 'immutable';
+import BuilderTypes from '../../BuilderTypes.tsx';
+import PureClasss from './../../../common/components/PureClasss.tsx';
 
-var SortCardReducer = {};
+var BORDER_RADIUS = '5px';
+var SCORE_COLORS = 
+{
+  POSITIVE: ["#DFDE52", "#AFD364", "#9DCF66", "#88C33E"],
+  NEGATIVE: ["#F8B14A", "#FF735B", "#DD333C", "#A50808"],
+};
 
-SortCardReducer[ActionTypes.cards.sort.create] =
-  Util.updateCardField('sorts', (sorts, action) => 
-    sorts.splice(
-      Util.spliceIndex(action.payload.index, sorts),
-      0,
-      Immutable.fromJS({
-        property: "",
-        direction: 0,
-        id: "s" + Util.randInt(23496243),
-      })));
+class ScoreBar extends PureClasss<{
+  parentData: {
+    weights: {weight: number}[];
+  };
+  data: {
+    weight: number;
+  }
+  keyPath: KeyPath;
+  // weights: List<BuilderTypes.IWeight>,
+  // index: number,
+}>
+{
+  render()
+  {
+    let weights = this.props.parentData.weights;
+    let weight = this.props.data;
     
-SortCardReducer[ActionTypes.cards.sort.change] =
-  Util.updateCardField('sorts', (sorts, action) => 
-    sorts.set(action.payload.index, Immutable.fromJS(action.payload.value)));
-
-SortCardReducer[ActionTypes.cards.sort.move] =
-  Util.updateCardField('sorts', (sorts, action) =>
-    Util.immutableMove(sorts, action.payload.sort.id, action.payload.index));
+    var max = 0;
+    weights.map(w => {
+      if(Math.abs(w.weight) > max)
+      {
+        max = Math.abs(w.weight);
+      }
+    })
     
-SortCardReducer[ActionTypes.cards.sort.remove] =
-    Util.updateCardField('sorts', (sorts, action) =>
-      sorts.remove(action.payload.index));
+    var perc = Math.abs(weight.weight) / max * 100;
+    var style:React.CSSProperties = {
+      width: perc / 2 + '%',
+    };
+    
+    if(weight.weight > 0)
+    {
+      style.left = '50%';
+      style['background'] = SCORE_COLORS.POSITIVE[Math.floor((perc - 1) / 25)];
+      style.borderTopRightRadius = BORDER_RADIUS;
+      style.borderBottomRightRadius = BORDER_RADIUS;
+    }
+    else if(weight.weight < 0)
+    {
+      style.right = '50%';
+      style['background'] = SCORE_COLORS.NEGATIVE[Math.floor((perc - 1) / 25)];
+      style.borderTopLeftRadius = BORDER_RADIUS;
+      style.borderBottomLeftRadius = BORDER_RADIUS;
+    }
+    
+    return (
+      <div className='weight-graph'>
+        <div className='weight-graph-inner'>
+          <div className='weight-graph-bar' style={style} />
+        </div>
+        <div className='weight-graph-line' />
+      </div>
+    );
+  }
+}
 
-
-export default SortCardReducer;
+export default ScoreBar;

@@ -50,24 +50,20 @@ import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import Util from '../../util/Util.tsx';
 import Actions from "../../builder/data/BuilderActions.tsx";
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 
 interface Props
 {
-  options: (string | JSX.Element)[];
+  options: List<string | El>;
   selectedIndex: number;
-  onChange?: (index: number, event?: any) => void;
-  id?: string;
-  keyPath?: (string | number)[];
-  values?: any[]; // maps indices to values, otherwise index will be used as the value
+  keyPath?: KeyPath; // TODO required?
+  onChange?: (index: number, event?: any) => void; // TODO remove?
+  values?: List<any>; // maps indices to values, otherwise index will be used as the value
   canEdit?: boolean;
-
-  ref?: string;
-  rel?: string;
-  circle?: boolean;
+  className?: string;
 }
 
-class Dropdown extends Classs<Props>
+class Dropdown extends PureClasss<Props>
 {
   constructor(props: Props) {
     super(props);
@@ -87,13 +83,13 @@ class Dropdown extends Classs<Props>
       this._clickHandlers[index] = () =>
       {
         var pr = this.props;
-        if(pr.id && pr.keyPath)
+        if(pr.keyPath)
         {
-          Actions.cards.change(pr.id, pr.keyPath, this.props.values ? pr.values[index] : index);
+          Actions.change(pr.keyPath, pr.values ? pr.values[index] : index);
         }
         if(pr.onChange)
         {
-          this.props.onChange(index, {
+          pr.onChange(index, {
             target: ReactDOM.findDOMNode(this)
           });
         }
@@ -105,14 +101,12 @@ class Dropdown extends Classs<Props>
   
   renderOption(option, index)
   {
-    if(index === this.props.selectedIndex)
-    {
-      return null;
-    }
-    
     return (
       <div
-        className="dropdown-option"
+        className={classNames({
+          "dropdown-option": true,
+          "dropdown-option-selected": index === this.props.selectedIndex,
+        })}
         key={index} 
         onClick={this.clickHandler(index)}
       >
@@ -155,37 +149,50 @@ class Dropdown extends Classs<Props>
   render() {
     var classes = classNames({
       "dropdown-wrapper": true,
-      "dropdown-wrapper-circle": this.props.circle,
       "dropdown-up": this.state.up,
       "dropdown-open": this.state.open,
       "dropdown-disabled": !this.props.canEdit,
     });
+    if(this.props.className)
+    {
+      classes += " " + this.props.className;
+    }
+    
+    let optionsEl = (
+      <div className="dropdown-options-wrapper">
+        {
+          this.props.options.map(this.renderOption)
+        }
+      </div>
+    );
     
     return (
-      <div className={classes} rel={this.props.rel}>
-        { this.state.up && this.state.open ? (
-          <div className="dropdown-options-wrapper">
-            {
-              this.props.options.map(this.renderOption)
-            }
-          </div>
-        ) : null }
+      <div
+        className={classes}
+      >
+        { this.state.up && this.state.open ? optionsEl : null }
         <div
           className="dropdown-value"
           ref="value"
           onClick={this.toggleOpen}
         >
-          <div className="dropdown-option-inner">
-            { this.props.options[this.props.selectedIndex] }
-          </div>
+          {
+            // map through all of the options so that the dropdown takes the width of the longest one
+            //  CSS hides all but the selected option
+            this.props.options.map((option, index) => (
+              <div
+                key={index}
+                className={classNames({
+                  "dropdown-option-inner": true,
+                  "dropdown-option-value-selected": index === this.props.selectedIndex,
+                })}
+              >
+                { option }
+              </div>
+            ))
+          }
         </div>
-        { !this.state.up && this.state.open ? (
-          <div className="dropdown-options-wrapper">
-            {
-              this.props.options.map(this.renderOption)
-            }
-          </div>
-        ) : null }
+        { !this.state.up && this.state.open ? optionsEl : null }
       </div>
     );
   }

@@ -46,6 +46,8 @@ import * as _ from 'underscore';
 require('./BuilderColumn.less');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as Immutable from 'immutable';
+const {List} = Immutable;
 import Util from '../../util/Util.tsx';
 import Menu from '../../common/components/Menu.tsx';
 import { MenuOption } from '../../common/components/Menu.tsx';
@@ -58,10 +60,12 @@ import RolesStore from '../../roles/data/RolesStore.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
 import TQLEditor from '../../tql/components/TQLEditor.tsx';
 import InfoArea from '../../common/components/InfoArea.tsx';
+const shallowCompare = require('react-addons-shallow-compare');
 import * as moment from 'moment';
 import Ajax from "./../../util/Ajax.tsx";
-import * as Immutable from 'immutable';
+// import * as Immutable from 'immutable';
 import Manual from './../../manual/components/Manual.tsx';
+
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -109,7 +113,7 @@ var BuilderColumn = React.createClass<any, any>(
   
   propTypes:
   {
-    algorithm: React.PropTypes.object.isRequired,
+    query: React.PropTypes.object.isRequired,
     className: React.PropTypes.string,
     index: React.PropTypes.number,
     canAddColumn: React.PropTypes.bool,
@@ -117,7 +121,7 @@ var BuilderColumn = React.createClass<any, any>(
     onAddColumn: React.PropTypes.func.isRequired,
     onAddManualColumn: React.PropTypes.func.isRequired,
     onCloseColumn: React.PropTypes.func.isRequired,
-    variant: React.PropTypes.object.isRequired,
+    colKey: React.PropTypes.number.isRequired,
     history: React.PropTypes.any,
     onRevert: React.PropTypes.func,
     column: React.PropTypes.number,
@@ -126,16 +130,31 @@ var BuilderColumn = React.createClass<any, any>(
   
   getInitialState()
   {
+    var column = this.props.index;
+    if(localStorage.getItem('colKeyTypes'))
+    {
+      column = JSON.parse(localStorage.getItem('colKeyTypes'))[this.props.colKey];
+      if(column === undefined)
+      {
+        column = this.props.index;
+      }
+    }
     return {
       column: this.props.column ? this.props.column : this.props.index,
       loading: false,
       inputKeys: this.calcinputKeys(this.props),
-      rand: 1,
+      // rand: 1,
     }
+  },
+  
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return shallowCompare(this, nextProps, nextState);
   },
   
   componentWillMount()
   {
+    // TODO fix
     let rejigger = () => this.setState({ rand: Math.random() });
     this.unsubUser = UserStore.subscribe(rejigger);
     this.unsubRoles = RolesStore.subscribe(rejigger);
@@ -149,12 +168,12 @@ var BuilderColumn = React.createClass<any, any>(
   
   calcinputKeys(props)
   {
-    return props.algorithm.inputs.map(input => input.key);
+    return props.query.inputs.map(input => input.key);
   },
   
   willReceiveProps(nextProps)
   {
-    if(!_.isEqual(nextProps.algorithm.inputs, this.props.algorithm.inputs))
+    if(!_.isEqual(nextProps.query.inputs, this.props.query.inputs))
     {
       this.setState({
         inputKeys: this.calcinputKeys(nextProps.state),
@@ -188,30 +207,35 @@ var BuilderColumn = React.createClass<any, any>(
   
   renderContent(canEdit:boolean)
   {
-    var algorithm = this.props.algorithm;
-    var parentId = algorithm.id;
+    var query = this.props.query;
+
     switch(this.state.column)
     {
       case COLUMNS.Builder:
         // this should be temporary; remove when middle tier arrives
-        var spotlights = algorithm.results ? algorithm.results.reduce((spotlights, result) =>
-        {
-          if(result.spotlight)
-          {
-            spotlights.push(result);
-          }
-          return spotlights;
-        }, []) : [];
-        if (this.props.algorithm.mode === "tql")
+        // var spotlights = Immutable.List(query.results ? query.results.reduce((spotlights, result) =>
+        // {
+        //   if(result.spotlight)
+        //   {
+        //     spotlights.push(result);
+        //   }
+        //   return spotlights;
+        // }, []) : []);
+        // TODO
+        let spotlights = Immutable.List([]);
+        
+        if (this.props.query.mode === "tql")
         {
           return <InfoArea
              large= "TQL Mode"
              small= "This Variant is in TQL mode, so it doesn’t use Cards. To restore this Variant to its last Card state, change it to Cards mode in the TQL column."
           />;
         }
+        
         return <CardsArea 
-          cards={algorithm.cards} 
-          parentId={parentId} 
+          cards={query.cards} 
+          queryId={query.id}
+          keyPath={null}
           spotlights={spotlights} 
           topLevel={true}
           keys={this.state.inputKeys}
@@ -225,13 +249,13 @@ var BuilderColumn = React.createClass<any, any>(
         
       case COLUMNS.Inputs:
         return <InputsArea
-          inputs={algorithm.inputs}
-          parentId={parentId}
+          inputs={query.inputs}
+          queryId={query.id}
         />;
       
       case COLUMNS.Results:
         return <ResultsArea 
-          algorithm={algorithm}
+          query={query}
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
           canEdit={canEdit}
@@ -239,8 +263,7 @@ var BuilderColumn = React.createClass<any, any>(
 
       case COLUMNS.TQL:
         return <TQLEditor
-          history={this.props.history}
-          algorithm={algorithm}
+          query={query}
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
           addColumn={this.props.onAddManualColumn}
@@ -262,18 +285,21 @@ var BuilderColumn = React.createClass<any, any>(
     this.setState({
       column: index,
     });
+    
+    var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
+    colKeyTypes[this.props.colKey] = index;
+    localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
   },
   
-  getMenuOptions(): MenuOption[]
+  getMenuOptions(): List<MenuOption> //TODO
   {
-    var options: MenuOption[] = _.range(0, NUM_COLUMNS).map(index => ({
+    var options: List<MenuOption> = Immutable.List(_.range(0, NUM_COLUMNS).map(index => ({
       text: COLUMNS[index],
       onClick: this.switchView,
+      disabled: index === this.state.column,
       icon: menuIcons[index].icon,
       iconColor: menuIcons[index].color
-    }));
-    
-    options[this.state.column].disabled = true;
+    })));
     
     return options;
   },
@@ -290,7 +316,7 @@ var BuilderColumn = React.createClass<any, any>(
   
   revertVersion()
   {
-    if (this.props.variant.version) 
+    if (this.props.query.version) 
     {
       if (confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.')) 
       {
@@ -301,11 +327,11 @@ var BuilderColumn = React.createClass<any, any>(
 
   renderBuilderVersionToolbar(canEdit)
   {
-    if(this.props.variant.version)
+    if(this.props.query.version)
     {
       if (this.state.column === COLUMNS.Builder || this.state.column === COLUMNS.TQL)
       {
-        var lastEdited = moment(this.props.variant.lastEdited).format("h:mma on M/D/YY")
+        var lastEdited = moment(this.props.query.lastEdited).format("h:mma on M/D/YY")
         return (
           <div className='builder-revert-toolbar'> 
             <div className='builder-revert-time-message'>
@@ -330,11 +356,11 @@ var BuilderColumn = React.createClass<any, any>(
   },
 
   render() {
-    let {algorithm} = this.props;
-    let canEdit = (algorithm.status === BrowserTypes.EVariantStatus.Build
-      && Util.canEdit(algorithm, UserStore, RolesStore))
+    let {query} = this.props;
+    let canEdit = (query.status === BrowserTypes.EVariantStatus.Build
+      && Util.canEdit(query, UserStore, RolesStore))
       || this.state.column === COLUMNS.Inputs;
-    let cantEditReason = algorithm.status !== BrowserTypes.EVariantStatus.Build ?
+    let cantEditReason = query.status !== BrowserTypes.EVariantStatus.Build ?
       'This Variant is not in Build status' : 'You are not authorized to edit this Variant';
     
     return this.renderPanel((
@@ -365,7 +391,7 @@ var BuilderColumn = React.createClass<any, any>(
               this.props.canAddColumn && 
                 <SplitScreenIcon
                   onClick={this.handleAddColumn}
-                  className='bc-options-svg'
+                  className='bc-options-svg builder-split-screen'
                   data-tip="Add Column"
                 />
             }

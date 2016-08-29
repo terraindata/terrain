@@ -5,7 +5,9 @@
 
 .builder-tb {
   position: relative;
-  min-height: @input-height;
+  flex-grow: 1;
+  margin: 0px 3px;
+  // min-height: @input-height;
   
   &.builder-tb-accepts-cards {
     input, textarea {
@@ -37,9 +39,10 @@
     display: block;
     top: 0px;
     right: 0px;
-    height: @input-height;
+    height: @input-height - 2px;
     width: @switch-width;
-    padding-top: 5px;
+    padding-top: 4px;
+    padding-right: 4px;
     color: rgba(0,0,0,1);
     box-sizing: border-box;
     border-top-right-radius: 5px;
@@ -98,6 +101,8 @@
     overflow: hidden;
     display: flex;
     justify-content: center;
+    
+    height: 18px;
   }
   
   .builder-tb-cards-input-value-text {
@@ -113,8 +118,8 @@
     position: absolute;
     left: calc(~"100% - 40px");
     width: @card-chip-offset - 6px;
-    height: @input-height / 2 + @standard-margin;
-    top: 50%;
+    height: @input-height / 2 + @standard-margin + 1px;
+    top: @input-height / 2 - 1px;
     .transition;
     
     .builder-tb-cards-arrow-inner {
@@ -135,6 +140,7 @@
   &.builder-tb-cards-top {
     .builder-tb-cards-arrow {
       top: -1 * @standard-margin;
+      height: @input-height / 2 + @standard-margin - 1px;
       border-bottom: 1px solid #fff;
       border-top-width: 0px;
       
@@ -168,6 +174,7 @@
   left: 7%;
   opacity: 0;
   cursor: pointer;
+  text-align: center;
   .close;
   svg {
     width: 8px;

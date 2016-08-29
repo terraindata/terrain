@@ -266,6 +266,7 @@ var router = (
       
       <Route path="/x" component={X} />
       <Route path="/x/:x" component={X} />
+
     </Route>
   </Router>
 );

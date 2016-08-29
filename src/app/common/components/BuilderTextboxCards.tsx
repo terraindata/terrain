@@ -52,8 +52,9 @@ import Card from '../../builder/components/cards/Card.tsx';
 interface Props
 {
   value: BuilderTypes.CardString;
-  spotlights?: any[];
-  parentId?: string;
+  keyPath: KeyPath;
+  keys: List<string>;
+  canEdit: boolean;
 }
 
 class BuilderTextboxCards extends React.Component<Props, any>
@@ -81,7 +82,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
           singleCard={true}
           card={this.props.value}
           index={0}
-          />
+        />
       </div>
     );
   }

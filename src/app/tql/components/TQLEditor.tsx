@@ -47,12 +47,14 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+const {List} = Immutable;
 import ResultsView from './ResultsView.tsx';
 import Menu from './../../common/components/Menu.tsx';
 import { MenuOption } from '../../common/components/Menu.tsx';
 import Switch from './../../common/components/Switch.tsx';
 import TQLConverter from '../TQLConverter.tsx';
 import BuilderActions from './../../builder/data/BuilderActions.tsx';
+import BuilderTypes from '../../builder/BuilderTypes.tsx';
 import * as _ from 'underscore';
 import Classs from './../../common/components/Classs.tsx';
 import Ajax from "./../../util/Ajax.tsx";
@@ -90,8 +92,7 @@ import TQLPopup from './TQLPopup.tsx';
 
 interface Props {
   params?: any;
-  history?: any;
-  algorithm?: any;
+  query?: BuilderTypes.IQuery;
   onLoadStart: () => void;
   onLoadEnd: () => void;
   addColumn: (number) => void;
@@ -118,7 +119,7 @@ class TQL extends Classs<Props>
     termDefinitionPos: any;
   } = {
     tql: null,
-    code: TQLConverter.toTQL(this.props.algorithm),
+    code: TQLConverter.toTQL(this.props.query),
     theme: localStorage.getItem('theme') || 'default',
     highlightedLine: null,
     theme_index: 0,
@@ -141,7 +142,7 @@ class TQL extends Classs<Props>
   //are not longer in sync
   componentDidMount() 
   {
-    if (this.props.algorithm.mode !== 'tql') 
+    if (this.props.query.mode !== 'tql') 
     {
       this.executeCode();
     }
@@ -171,12 +172,12 @@ class TQL extends Classs<Props>
 
   executeCode() 
   {
-    var code = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm)
+    var code = this.props.query.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.query)
     this.setState({
       tql: code
     });
     BuilderActions.setVariantField
-      (this.props.algorithm.id,
+      (this.props.query.id,
       'tql',
       code
       );
@@ -233,28 +234,31 @@ class TQL extends Classs<Props>
     }
   }
 
-  getMenuOptions(): MenuOption[] 
+  getMenuOptions(): List<MenuOption> 
   {
-    var options: MenuOption[] =
-      [
+    var options: List<MenuOption> =
+      List([
         {
           text: 'Default',
           onClick: this.changeThemeDefault,
+          disabled: this.getThemeIndex() === 0,
         },
         {
           text: 'Neo',
           onClick: this.changeThemeNeo,
+          disabled: this.getThemeIndex() === 1,
         },
         {
           text: 'Cobalt',
           onClick: this.changeThemeCobalt,
+          disabled: this.getThemeIndex() === 2,
         },
         {
           text: 'Monokai',
           onClick: this.changeThemeMonokai,
+          disabled: this.getThemeIndex() === 3,
         },
-      ];
-    options[this.getThemeIndex()].disabled = true;
+      ]);
     return options;
   }
 
@@ -282,12 +286,12 @@ class TQL extends Classs<Props>
   componentDidUpdate(prevProps, prevState)   
   {
         //When they switch to tql mode, execute code
-     if (prevProps.algorithm.mode !== 'tql' && this.props.algorithm.mode === 'tql')     
+     if (prevProps.query.mode !== 'tql' && this.props.query.mode === 'tql')     
      {
             this.executeCode();
      }
-     else if (this.props.algorithm.mode !== 'tql' &&
-      !(_.isEqual(this.props.algorithm.cards, prevProps.algorithm.cards))) 
+     else if (this.props.query.mode !== 'tql' &&
+      !(_.isEqual(this.props.query.cards, prevProps.query.cards))) 
      {
       this.executeCode();
     }
@@ -295,9 +299,8 @@ class TQL extends Classs<Props>
 
   toggleMode() 
   {
-    if (this.props.algorithm.mode === 'tql' 
-      && this.state.code !== TQLConverter.toTQL(this.props.algorithm))
-      //&& !confirm("Warning: TQL added to the editor will be lost")) 
+    if (this.props.query.mode === 'tql' 
+      && this.state.code !== TQLConverter.toTQL(this.props.query))
     {
       this.setState({
         confirmModalMessage: 'Warning: TQL added to the editor will be lost',
@@ -311,14 +314,14 @@ class TQL extends Classs<Props>
   switchMode()
   {
     BuilderActions.setVariantField
-      (this.props.algorithm.id, 
+      (this.props.query.id, 
         'mode', 
-        this.props.algorithm.mode === 'tql' ? 'cards' : 'tql'
+        this.props.query.mode === 'tql' ? 'cards' : 'tql'
       );
 
     //update when have tql to cards conversion capabilities 
     this.setState({
-      code: TQLConverter.toTQL(this.props.algorithm),
+      code: TQLConverter.toTQL(this.props.query),
     });
   }
 
@@ -347,19 +350,18 @@ class TQL extends Classs<Props>
           first='Cards'
           second='TQL'
           onChange={this.toggleMode}
-          selected={this.props.algorithm.mode === 'tql' ? 2 : 1}
+          selected={this.props.query.mode === 'tql' ? 2 : 1}
           medium={true}
           />
         <div className = 'view-only'>
           {
-            this.props.algorithm.mode === 'tql' ? null : "View-only"
+            this.props.query.mode === 'tql' ? null : "View-only"
           }
         </div>
         <div className='white-space' />
           <div className='tql-editor-manual-popup'>
             <ManualPopup  
               cardName='General'      
-              history={this.props.history} 
               addColumn={this.props.addColumn}
               canAddColumn={this.props.canAddColumn}
               onCloseColumn={this.props.onCloseColumn}
@@ -369,12 +371,6 @@ class TQL extends Classs<Props>
         <Menu options={this.getMenuOptions() } small={true}/>
       </div>
     );
-  }
-
-  openManual()
-  {
-
-    //this.props.history.pushState({cardName: this.state.cardName}, '/manual');
   }
 
   turnSyntaxPopupOff()
@@ -438,7 +434,7 @@ class TQL extends Classs<Props>
   {
     var options =
       {
-        readOnly: (this.props.algorithm.mode === 'tql' ? false : true),
+        readOnly: (this.props.query.mode === 'tql' ? false : true),
         lineNumbers: true,
         mode: 'tql',
         extraKeys: { 'Ctrl-F': 'findPersistent' },
@@ -450,7 +446,7 @@ class TQL extends Classs<Props>
         lint: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
       };
-    var value = this.props.algorithm.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.algorithm);
+    var value = this.props.query.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.query);
     return <CodeMirror
       highlightedLine={this.state.highlightedLine}
       onChange={this.updateCode}

@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 require('./BrowserInfoColumn.less');
 import * as React from 'react';
+import * as Immutable from 'immutable';
+const {List} = Immutable;
 import Classs from './../../common/components/Classs.tsx';
 import BrowserColumn from './BrowserColumn.tsx';
 import BrowserItem from './BrowserItem.tsx';
@@ -336,8 +338,9 @@ class BrowserInfoUser extends Classs<BrowserInfoUserProps>
     
     let imSysAdmin = me.isAdmin;
     let imGroupAdmin = groupRoles && groupRoles.get(me.username) && groupRoles.get(me.username).admin;
+    // TODO
     let menuOptions = 
-    [
+    Immutable.List([
       {
         text: 'Viewer',
         onClick: this.changeToViewer,
@@ -353,7 +356,7 @@ class BrowserInfoUser extends Classs<BrowserInfoUserProps>
         onClick: this.changeToAdmin,
         disabled: isAdmin
       }
-    ];
+    ]);
     
     return (
       <div key={user.username} className='browser-info-user'>

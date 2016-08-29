@@ -48,7 +48,7 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 
 var optionHeight = 30; // coordinate with Menu.less
@@ -63,24 +63,23 @@ export interface MenuOption {
 
 interface Props
 {
-  options: MenuOption[];
+  options: List<MenuOption>;
   small?: boolean;
   style?: any,
 }
 
-class Menu extends Classs<Props>
+export class Menu extends PureClasss<Props>
 {
+  state: {
+    open: boolean;
+  }
+  
   constructor(props: Props) {
     super(props);
     this.state =
     {
       open: false,
     }
-  }
-  
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
   
   renderOption(option, index)
@@ -138,13 +137,13 @@ class Menu extends Classs<Props>
 
   render() {
     let {options} = this.props;
-    if(!options || !options.length)
+    if(!options || !options.size)
     {
       return null;
     }
     
     var multiplier = 10;
-    if(options[0].icon) 
+    if(options.get(0).icon) 
     {
       multiplier = 14;
     } 
@@ -153,7 +152,7 @@ class Menu extends Classs<Props>
 
     var style = {
       width: width,
-      height: options.length * optionHeight,
+      height: options.size * optionHeight,
     };
     
     return (

@@ -49,85 +49,77 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
 import { DragSource, DropTarget } from 'react-dnd';
 var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
-import SelectCard from './card-types/SelectCard.tsx';
-import SFWCard from './card-types/SFWCard.tsx';
-import FromCard from './card-types/FromCard.tsx';
-import SortCard from './card-types/SortCard.tsx';
-import FilterCard from './card-types/FilterCard.tsx';
-import LetVarCard from './card-types/LetVarCard.tsx';
-import ScoreCard from './card-types/ScoreCard.tsx';
-import TransformCard from './card-types/TransformCard.tsx';
-import WrapperCard from './card-types/WrapperCard.tsx';
-import ValueCard from './card-types/ValueCard.tsx';
-import IfCard from './card-types/IfCard.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
-import Menu from '../../../common/components/Menu.tsx';
+// import Menu from '../../../common/components/Menu.tsx';
 import ManualPopup from './../../../manual/components/ManualPopup.tsx';
+import { Menu, MenuOption } from '../../../common/components/Menu.tsx';
 import Actions from "../../data/BuilderActions.tsx";
-import { CardColors } from './../../CommonVars.tsx';
-import { BuilderTypes } from './../../BuilderTypes.tsx';
+import BuilderTypes from './../../BuilderTypes.tsx';
 import Store from "./../../data/BuilderStore.tsx";
+import PureClasss from './../../../common/components/PureClasss.tsx';
+
+import BuilderComponent from '../BuilderComponent.tsx';
 
 var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
-var CARD_TYPES_WITH_CARDS = ['from', 'count', 'min', 'max', 'avg', 'exists', 'parentheses', 'if']; // 'let', 'var' removed
+// var findParentWithClass = 
+//   (n, className, count) => 
+//     count > 100 ? null : (n && !n.is('body') && (n.hasClass(className) && !n.hasClass('single-card') ? n :
+//       findParentWithClass(n.parent(), className, count + 1)));
+// var hoverCard = (event) => {
+//   $('.card-hovering').removeClass('card-hovering');
+//   $('.card-hovering-lower').removeClass('card-hovering-lower');
+//   $('.card-hovering-upper').removeClass('card-hovering-upper');
+//   var c = findParentWithClass($(event.target), 'card', 0);
+//   if(c)
+//   {
+//     c.addClass('card-hovering');
+//     if(event.pageY > c.offset().top + c.height() - 30)
+//     {
+//       c.addClass('card-hovering-lower');
+//     }
+//     if(event.pageY < c.offset().top + 30)
+//     {
+//       c.addClass('card-hovering-upper');
+//     }
+//   }
+// };
+// $('body').mousemove(_.throttle(hoverCard, 100));
 
-var findParentWithClass = 
-  (n, className, count) => 
-    count > 100 ? null : (n && !n.is('body') && (n.hasClass(className) && !n.hasClass('single-card') ? n :
-      findParentWithClass(n.parent(), className, count + 1)));
-var hoverCard = (event) => {
-  $('.card-hovering').removeClass('card-hovering');
-  $('.card-hovering-lower').removeClass('card-hovering-lower');
-  $('.card-hovering-upper').removeClass('card-hovering-upper');
-  var c = findParentWithClass($(event.target), 'card', 0);
-  if(c)
-  {
-    c.addClass('card-hovering');
-    if(event.pageY > c.offset().top + c.height() - 30)
-    {
-      c.addClass('card-hovering-lower');
-    }
-    if(event.pageY < c.offset().top + 30)
-    {
-      c.addClass('card-hovering-upper');
-    }
-  }
-};
-$('body').mousemove(_.throttle(hoverCard, 100));
+// $('body').on('click', (event) =>
+// {
+//   // surely there is a better way to do this?
+//   if(!$(event.target).hasClass('card-title') && !findParentWithClass($(event.target), 'card-title', 0))
+//   {
+//     Actions.selectCard(null, event.altKey, event.shiftKey);
+//   }
+// });
 
-$('body').on('click', (event) =>
-{
-  // surely there is a better way to do this?
-  if(!$(event.target).hasClass('card-title') && !findParentWithClass($(event.target), 'card-title', 0))
-  {
-    Actions.cards.selectCard(null, event.altKey, event.shiftKey);
-  }
-});
-
-var _lastDragOverEl;
-var _lastDragOverClassName;
-const handleCardDragover = (event) => 
-{
-  var el = findParentWithClass($(event.target), 'card-drop-target', 0);
-  if(el)
-  {
-    var lower = event.pageY > el.offset().top + el.height() / 2;
-    var className = lower ? 'card-drag-over-lower' : 'card-drag-over-upper';
-    if(!_lastDragOverEl || el !== _lastDragOverEl || _lastDragOverClassName !== className)
-    {
-      _lastDragOverEl && _lastDragOverEl.removeClass(_lastDragOverClassName);
-      el.addClass(className);
-      _lastDragOverEl = el;
-      _lastDragOverClassName = className;
-    }
-  }
-};
-$(document).on('dragover', _.throttle(handleCardDragover, 100));
+// var _lastDragOverEl;
+// var _lastDragOverClassName;
+// const handleCardDragover = (event) => 
+// {
+//   var el = findParentWithClass($(event.target), 'card-drop-target', 0);
+//   if(el)
+//   {
+//     var lower = event.pageY > el.offset().top + el.height() / 2;
+//     var className = lower ? 'card-drag-over-lower' : 'card-drag-over-upper';
+//     if(!_lastDragOverEl || el !== _lastDragOverEl || _lastDragOverClassName !== className)
+//     {
+//       _lastDragOverEl && _lastDragOverEl.removeClass(_lastDragOverClassName);
+//       el.addClass(className);
+//       _lastDragOverEl = el;
+//       _lastDragOverClassName = className;
+//     }
+//   }
+// };
+// $(document).on('dragover', _.throttle(handleCardDragover, 100));
+// TODO
 // $(document).on('dragend', () => 
 // {
 //   _lastDragOverEl.removeClass(_lastDragOverClassName);
@@ -142,91 +134,111 @@ interface Props
 {
   card: BuilderTypes.ICard;
   index: number;
-  parentId: string;
   singleCard?: boolean;
-  keys: string[];
-  history?: any;
+
+  keys: List<string>;
+  canEdit: boolean;
+  keyPath: KeyPath;
+
+  addColumn?: () => void;
+  canAddColumn?: boolean;
+  onCloseColumn?: (number) => void;
+  colIndex?: number;
+  
+  isDragging?: boolean;
+  dndListener?: any;
+  connectDragPreview?: (a?:any) => void;
+  connectDragSource?: (el: El) => El;
+  connectDropTarget?: (el: El) => El;
+
 }
 
-var Card = React.createClass({
-  propTypes:
-  {
-    card: React.PropTypes.object.isRequired,
-    index: React.PropTypes.number.isRequired,
-    parentId: React.PropTypes.string,
-    singleCard: React.PropTypes.bool, // indicates it's not in a list, it's just a single card
-    keys: React.PropTypes.array.isRequired,
-  },
+class Card extends PureClasss<Props>
+{
+  state: {
+    open: boolean;
+    id: ID;
+    selected: boolean;
+    hovering: boolean;
+    menuOptions: List<MenuOption>;
+    
+    // TODO
+    addingCardBelow?: boolean;
+    addingCardAbove?: boolean;
+  }
   
-  shouldComponentUpdate(nextProps, nextState)
+  refs: {
+    [k: string]: Ref;
+    cardBody: Ref;
+    cardInner: Ref;
+  }
+  
+  //   cardBody: El;
+  //   cardInner: El;
+  // };
+  
+  constructor(props:Props)
   {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  },
-
-  getInitialState()
-  {
-      var darkCardColor = CardColors[this.props.card.type] ? CardColors[this.props.card.type][0] : CardColors['none'][0];
-      var lightCardColor = CardColors[this.props.card.type] ? CardColors[this.props.card.type][1] : CardColors['none'][1];
-      if(this.props.card.faded)
-      {
-        darkCardColor = this.hex2rgba(darkCardColor);
-        lightCardColor = this.hex2rgba(lightCardColor);
-      }
-      var borderColor = this.props.card.highlighted ? '#f4ff00' : darkCardColor;
-      var borderWidth = this.props.card.highlighted ? '2px' : '1px';
-    return {
+      // var darkCardColor = CardColors[this.props.card.type] ? CardColors[this.props.card.type][0] : CardColors['none'][0];
+      // var lightCardColor = CardColors[this.props.card.type] ? CardColors[this.props.card.type][1] : CardColors['none'][1];
+      // if(this.props.card.faded)
+      // {
+      //   darkCardColor = this.hex2rgba(darkCardColor);
+      //   lightCardColor = this.hex2rgba(lightCardColor);
+      // }
+      // var borderColor = this.props.card.highlighted ? '#f4ff00' : darkCardColor;
+      // var borderWidth = this.props.card.highlighted ? '2px' : '1px';
+    // return {
+    super(props);
+    this.state = {
       open: true,
       id: this.props.card.id,
       selected: false,
+      hovering: false,
       menuOptions:
-      [
-        {
-          text: 'Copy',
-          onClick: this.handleCopy,
-        },
-        {
-          text: 'Hide',
-          onClick: this.toggleClose,
-        },
-        {
-          text: 'Delete',
-          onClick: this.handleDelete,
-        },
-      ],
-      titleStyle: {
-        background: darkCardColor,
-      },
-      bodyStyle: {
-        background: lightCardColor,
-        borderColor: borderColor,
-        borderWidth: borderWidth
-      },
-    }
-  },
-  
-  getColor(index:number): string
-  {
-    return CardColors[this.props.card.type] ? CardColors[this.props.card.type][index] : CardColors['none'][index];
-  },
-  
-  componentWillMount()
-  {
-    this.unsubscribe = Store.subscribe(() =>
-    {
-      let selected = Store.getState().getIn(['selectedCardIds', this.props.card.id]);
-      if((selected && !this.state.selected) || (!selected && this.state.selected))
+        Immutable.List([
+          {
+            text: 'Copy',
+            onClick: this.handleCopy,
+          },
+          {
+            text: 'Hide',
+            onClick: this.toggleClose,
+          },
+          {
+            text: 'Delete',
+            onClick: this.handleDelete,
+          },
+        ]),
+    };
+    
+    this._subscribe(Store, {
+      stateKey: 'selected',
+      storeKeyPath: ['selectedCardIds', props.card.id],
+    });
+    
+    this._subscribe(Store, {
+      updater: (state) =>
       {
-        this.setState({
-          selected
-        });
+        if(state.hoveringCardId === this.props.card.id)
+        {
+          this.setState({
+            hovering: true,
+          });
+        }
+        else
+        {
+          this.setState({
+            hovering: false,
+          });
+        }
+
       }
     });
-  },
+  }
   
   componentWillUnmount()
   {
-    this.unsubscribe && this.unsubscribe();
-    this.unsubscribe = null;
     if(this.props.dndListener)
     {
       this.props.dndListener.unbind('draggedAway', this.handleDraggedAway);
@@ -234,15 +246,16 @@ var Card = React.createClass({
       this.props.dndListener.unbind('droppedBelow', this.handleDroppedBelow);
       this.props.dndListener.unbind('droppedAbove', this.handleDroppedAbove);
     }
-  },
+  }
   
+  dragPreview: any;
   componentDidMount()
   {
     this.dragPreview = createDragPreview(
-      Util.titleForCard(this.props.card) + ' (' + Util.previewForCard(this.props.card) + ')',
+      this.props.card.static.title + ' (' + BuilderTypes.getPreview(this.props.card) + ')',
     {
-      backgroundColor: this.getColor(0),
-      borderColor: this.getColor(1),
+      backgroundColor: this.props.card.static.colors[1],
+      borderColor: this.props.card.static.colors[0],
       color: '#fff',
       fontSize: 15,
       fontWeight: 'bold',
@@ -261,49 +274,49 @@ var Card = React.createClass({
       this.props.dndListener.bind('droppedBelow', this.handleDroppedBelow);
       this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
     }
-  },
+  }
   
-  hex2rgba(color: string)
-  {
-      var r, g, b;
-      if(color.charAt(0) == '#')
-      {
-        color = color.substr(1);
-      }
+  // hex2rgba(color: string)
+  // {
+  //     var r, g, b;
+  //     if(color.charAt(0) == '#')
+  //     {
+  //       color = color.substr(1);
+  //     }
 
-      r = color.charAt(0) +'' + color.charAt(1);
-      g = color.charAt(2) + '' + color.charAt(3);
-      b = color.charAt(4) + '' + color.charAt(5);
+  //     r = color.charAt(0) +'' + color.charAt(1);
+  //     g = color.charAt(2) + '' + color.charAt(3);
+  //     b = color.charAt(4) + '' + color.charAt(5);
 
-      r = parseInt( r,16 );
-      g = parseInt( g,16 );
-      b = parseInt( b ,16);
-      return "rgba(" + r + "," + g + "," + b + ", 0.4)"; 
-  },
+  //     r = parseInt( r,16 );
+  //     g = parseInt( g,16 );
+  //     b = parseInt( b ,16);
+  //     return "rgba(" + r + "," + g + "," + b + ", 0.4)"; 
+  // }
 
-  componentWillReceiveProps(nextProps:any) {
-      var darkCardColor = CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][0] : CardColors['none'][0];
-      var lightCardColor = CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][1] : CardColors['none'][1];
+  // componentWillReceiveProps(nextProps:any) {
+  //     var darkCardColor = CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][0] : CardColors['none'][0];
+  //     var lightCardColor = CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][1] : CardColors['none'][1];
       
-      if(nextProps.card.faded)
-      {
-        darkCardColor = this.hex2rgba(darkCardColor);
-        lightCardColor = this.hex2rgba(lightCardColor);
-      }
-      var borderColor = nextProps.card.highlighted ? '#f4ff00' : darkCardColor;
-      var borderWidth = nextProps.card.highlighted ? '2px' : '1px';
+  //     if(nextProps.card.faded)
+  //     {
+  //       darkCardColor = this.hex2rgba(darkCardColor);
+  //       lightCardColor = this.hex2rgba(lightCardColor);
+  //     }
+  //     var borderColor = nextProps.card.highlighted ? '#f4ff00' : darkCardColor;
+  //     var borderWidth = nextProps.card.highlighted ? '2px' : '1px';
 
-      this.setState({
-        titleStyle: {
-        background: darkCardColor,
-      },
-      bodyStyle: {
-        background: lightCardColor,
-        borderColor: borderColor,
-        borderWidth: borderWidth,
-      },
-      })
-  },
+  //     this.setState({
+  //       titleStyle: {
+  //       background: darkCardColor,
+  //     },
+  //     bodyStyle: {
+  //       background: lightCardColor,
+  //       borderColor: borderColor,
+  //       borderWidth: borderWidth,
+  //     },
+  //     })
+  // },
 
   componentDidUpdate()
   {
@@ -314,31 +327,31 @@ var Card = React.createClass({
       this.props.dndListener.bind('droppedBelow', this.handleDroppedBelow);
       this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
     }
-  },
+  }
   
   handleDraggedAway()
   {
     // Util.animateToHeight(this.refs['cardContainer'], 0);
-  },
+  }
   
   handleDropped()
   {
     // Util.animateToAutoHeight(this.refs['cardContainer']);
-  },
+  }
   
   handleDroppedBelow(item)
   {
     this.setState({
       droppedBelow: true,
     });
-  },
+  }
   
   handleDroppedAbove(item)
   {
     this.setState({
       droppedAbove: true,
     });
-  },
+  }
   
 	toggleClose(event)
 	{
@@ -358,7 +371,7 @@ var Card = React.createClass({
        
     event.preventDefault();
     event.stopPropagation();
-	},
+	}
   
   handleTitleClick(event)
   {
@@ -369,39 +382,35 @@ var Card = React.createClass({
     
     event.stopPropagation();
     event.preventDefault();
-    Actions.cards.selectCard(this.props.card.id, event.altKey, event.shiftKey);
-  },
-  
-  hasCardsArea(): boolean
-  {
-    return !! CARD_TYPES_WITH_CARDS.find(type => type === this.props.card.type);
-  },
+    // TODO
+    // Actions.cards.selectCard(this.props.card.id, event.altKey, event.shiftKey);
+  }
   
   handleDelete()
   {
     Util.animateToHeight(this.refs.cardInner, 0);
-    setTimeout(() => {
-      Actions.cards.remove(this.props.card, this.props.parentId);
-    }, 250);
-  },
+    setTimeout(() =>
+      Actions.remove(this.props.keyPath, this.props.index)
+    , 250);
+  }
   
   handleCopy()
   {
-  },
+  }
   
   addCardBelow()
   {
     this.setState({
       addingCardBelow: !this.state.addingCardBelow,
     });
-  },
+  }
   
   addCardAbove()
   {
     this.setState({
       addingCardAbove: !this.state.addingCardAbove,
     });
-  },
+  }
   
   minimizeCreateCard()
   {
@@ -409,7 +418,7 @@ var Card = React.createClass({
       addingCardAbove: false,
       addingCardBelow: false,
     });
-  },
+  }
   
   renderAddCard(isLower?: boolean)
   {
@@ -428,63 +437,26 @@ var Card = React.createClass({
         }
       </div>
     );
-  },
+  }
+  
+  handleMouseMove(event)
+  {
+    event.stopPropagation();
+    Actions.hoverCard(this.props.card.id);
+  }
 
 	render() {
-
-		var CardComponent;
-
-		switch(this.props.card.type)
-		{
-			case 'select':
-				CardComponent = SelectCard;
-				break;
-       case 'sfw':
-         CardComponent = SFWCard;
-         break;
-			case 'from':
-				CardComponent = FromCard;
-				break;
-   case 'sort':
-     CardComponent = SortCard;
-     break;
-   case 'filter':
-    CardComponent = FilterCard;
-      break;
-    case 'let':
-    case 'var':
-      CardComponent = LetVarCard;
-      break;
-    case 'transform':
-      CardComponent = TransformCard;
-      break;
-    case 'score':
-      CardComponent = ScoreCard;
-      break;
-    case 'if':
-      CardComponent = IfCard;
-      break;
-    case 'count':
-    case 'sum':
-    case 'min':
-    case 'max':
-    case 'avg':
-    case 'exists':
-    case 'parentheses':
-      CardComponent = WrapperCard;
-      var isWrapperCard = true;
-      break;
-    case 'take':
-    case 'skip':
-      CardComponent = ValueCard;
-      break;
-		}
     
-    var content = <div>This card has not been implemented yet.</div>;
-    if(CardComponent)
-    {
-      content = <CardComponent {...this.props} />
-    }
+    var content = <BuilderComponent
+      keys={this.props.keys}
+      canEdit={this.props.canEdit}
+      data={this.props.card}
+      keyPath={
+        this.props.singleCard
+        ? this.props.keyPath
+        : this._ikeyPath(this.props.keyPath, this.props.index)
+      }
+    />;
 
 		var contentToDisplay = (
 			<div className={'card-content' + (this.props.singleCard ? ' card-content-single' : '')}>
@@ -493,7 +465,10 @@ var Card = React.createClass({
 		);
     
     var manualPopupStyle = this.props.canEdit ? {} : {right: '4px'}
-		var title = Util.titleForCard(this.props.card);
+		//var title = Util.titleForCard(this.props.card);
+
+    let {card} = this.props;
+		let {title} = card.static;
     const { isDragging, connectDragSource, connectDropTarget } = this.props;
     const rendering = 
       <div
@@ -504,16 +479,16 @@ var Card = React.createClass({
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
           'card-drop-target': true,
-          'wrapper-card': isWrapperCard,
+          [card.type + '-card']: true,
+          // 'wrapper-card': isWrapperCard,
         })}
-        rel={'card-' + this.props.card.id}
+        rel={'card-' + card.id}
+        onMouseMove={this.handleMouseMove}
       >
         <div ref='cardContainer' className='card-container'>
           { !this.props.singleCard &&
             <CreateCardTool
               {...this.props}
-              index={this.props.index}
-              parentId={this.props.parentId}
               open={this.state.addingCardAbove}
               onMinimize={this.minimizeCreateCard}
             />
@@ -522,7 +497,10 @@ var Card = React.createClass({
           <div className='card-stroke card-stroke-above' />
           <div
             className={'card-inner ' + (this.props.singleCard ? 'card-single' : '')}
-            style={this.state.bodyStyle}
+            style={{
+              background: card.static.colors[1],
+              borderColor: card.static.colors[0],
+            }}
             ref='cardInner'
           >
             { !this.props.singleCard &&
@@ -531,8 +509,11 @@ var Card = React.createClass({
                   className={classNames({
                     'card-title': true,
                     'card-title-closed': !this.state.open,
+                    'card-title-card-hovering': this.state.hovering,
                   })}
-                  style={this.state.titleStyle}
+                  style={{
+                    background: card.static.colors[0],
+                  }}
                   onClick={this.handleTitleClick}
                   >
                   <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
@@ -541,16 +522,15 @@ var Card = React.createClass({
                     'card-preview': true,
                     'card-preview-hidden': this.state.open
                   })}>
-                    { Util.previewForCard(this.props.card) }
+                    { BuilderTypes.getPreview(card) }
                   </span>
                   <ManualPopup 
-                    cardName={Util.titleForCard(this.props.card)} 
-                    history={this.props.history}
+                    cardName={card.static.title} 
                     style={manualPopupStyle}
                     addColumn={this.props.addColumn}
                     canAddColumn={this.props.canAddColumn}
                     onCloseColumn={this.props.onCloseColumn}
-                    index={this.props.index}
+                    index={this.props.colIndex}
                   />
                   {
                     this.props.canEdit && <Menu options={this.state.menuOptions} />
@@ -568,7 +548,6 @@ var Card = React.createClass({
             <CreateCardTool
               {...this.props}
               index={this.props.index + 1}
-              parentId={this.props.parentId}
               open={this.state.addingCardBelow}
               onMinimize={this.minimizeCreateCard}
             />
@@ -581,8 +560,8 @@ var Card = React.createClass({
       return connectDropTarget(rendering);
     }
     return rendering;			
-	},
-});
+	}
+}
 
 
 // DnD stuff
@@ -685,7 +664,8 @@ const cardTarget =
           monitor.getItem()
         );
       
-      Actions.cards.move(card, props.index + (below ? 1 : 0), props.parentId)
+      // TODO
+      // Actions.cards.move(card, props.index + (below ? 1 : 0), props.parentId)
     }
   }
 }

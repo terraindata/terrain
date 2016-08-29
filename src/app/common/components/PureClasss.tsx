@@ -42,35 +42,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Immutable = require('immutable');
-import ActionTypes from './../BuilderActionTypes.tsx';
-import Util from './../../../util/Util.tsx';
-import { BuilderTypes } from './../../BuilderTypes.tsx';
+import * as React from 'react';
+import Classs from './Classs.tsx';
+import BuilderTypes from '../../builder/BuilderTypes.tsx';
+const shallowCompare = require('react-addons-shallow-compare');
 
-var FromCardReducer = {};
+class PureClasss<T> extends Classs<T>
+{
+  shouldComponentUpdate(nextProps: T, nextState: any)
+  {
+    return shallowCompare(this, nextProps, nextState);
+  }
+  
+  // TODO
+  // _myKeyPath(el: BuilderTypes.KeyPathClass)
+  // {
+  //   return this._ikeyPath(el.keyPath, el.id);
+  // }
+}
 
-FromCardReducer[ActionTypes.cards.from.change] =
-  Util.setCardFields(['group', 'iterator']);
-
-FromCardReducer[ActionTypes.cards.from.join.create] =
-  Util.updateCardField('joins', (joins, action) =>
-        joins.push({
-          group: '',
-          condition:
-          {
-            first: '',
-            second: '',
-            operator: BuilderTypes.Operator.EQ,
-          },
-          id: "j-"+Util.randInt(2307961512),
-        }));
-    
-FromCardReducer[ActionTypes.cards.from.join.change] =
-  Util.updateCardField('joins', (joins, action) => 
-    joins.set(action.payload.index, Immutable.fromJS(action.payload.value)));
-    
-FromCardReducer[ActionTypes.cards.from.join.remove] =
-    Util.updateCardField('joins', (joins, action) =>
-      joins.remove(action.payload.index));
-
-export default FromCardReducer;
+export default PureClasss;

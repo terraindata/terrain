@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import * as $ from 'jquery';
 import * as React from 'react';
@@ -52,135 +54,176 @@ import Actions from "../../data/BuilderActions.tsx";
 import Card from "../cards/Card.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateCardTool from "./CreateCardTool.tsx";
+import PureClasss from './../../../common/components/PureClasss.tsx';
 import { DropTarget } from 'react-dnd';
+import BuilderTypes from '../../BuilderTypes.tsx';
+type ICard = BuilderTypes.ICard;
+type ICards = BuilderTypes.ICards;
+let {List} = Immutable;
 
-var CardsArea = React.createClass<any, any>({
-	propTypes:
-	{
-		cards: React.PropTypes.array.isRequired,
-    parentId: React.PropTypes.string.isRequired,
-    spotlights: React.PropTypes.array.isRequired,
-    topLevel: React.PropTypes.bool,
-    keys: React.PropTypes.array.isRequired,
-    canEdit: React.PropTypes.bool.isRequired,
-    connectDropTarget: React.PropTypes.func,
-    history: React.PropTypes.any,
-    addColumn: React.PropTypes.func,
-    canAddColumn: React.PropTypes.bool,
-    onCloseColumn: React.PropTypes.func,
-    index: React.PropTypes.number,
-  },
+
+interface Props
+{
+  cards: ICards;
+  topLevel: boolean;
+  keys: List<string>;
+  canEdit: boolean;
+  keyPath: KeyPath;
   
-  hasCardsArea()
+  addColumn?: () => void;
+  canAddColumn?: boolean;
+  onCloseColumn?: (number) => void;
+  index?: number;
+  className?: string;
+  queryId?: ID;
+  spotlights?: List<any>;
+  connectDropTarget?: (el:JSX.Element) => JSX.Element;
+}
+
+interface KeyState {
+  keys: List<string>;
+  keyPath: KeyPath;
+}
+
+class CardsArea extends PureClasss<Props>
+{
+  state: KeyState = {
+    keys: List([]),
+    keyPath: null,
+  };
+  
+  constructor(props:Props)
   {
-    return this.props.topLevel;
-  },
+    super(props);
+    this.state.keys = this.computeKeys(props);
+    this.state.keyPath = this.computeKeyPath(props);
+  }
   
-  componentWillReceiveProps(nextProps)
+  componentWillReceiveProps(nextProps:Props)
   {
-    this.setState({
-      layout:
-      {
-        rows: this.getRows(nextProps),
-        useDropZones: true,
-      }
-    });
-  },
-  
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  },
-  
-  getInitialState()
-  {
-    return {
-      id: Util.randInt(123456789),
-      layout:
-      {
-        rows: this.getRows(this.props),
-        useDropZones: true,
-      }
-    };
-  },
-  
-  getKeys(props)
-  {
-    return props.keys.concat(
-      props.cards.reduce(
-        (memo, card) => {
-          if(card.type === 'var' || card.type === 'let')
-          {
-            memo.push(card.field);
-          }
-          return memo;
-        }
-      , [])
-    );
-  },
-  
-  getRows(props)
-  {
-    return props.cards.map((card, index) => (
-      {
-        content: <Card 
-          {...props}
-          cards={null}
-          singleCard={false}
-          topLevel={false}
-          index={index}
-          card={card}
-          dndListener={$({})}
-          keys={this.getKeys(props)}
-        />,
-        key: card.id,
-      }
-    ))
-    .concat(!this.props.canEdit ? [] :
-    [{
-      content: (
-        <CreateCardTool
-          {...this.props}
-          index={props.cards.length}
-          open={props.cards.length === 0}
-          parentId={props.parentId}
-          className={props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
-        />
-      ),
-      key: 'end-tool',
-    }]);
-  },
-  
-  copy() {},
-  
-  clear() {},
-  
-  createFromCard() {
-    Actions.cards.create(this.props.parentId, 'from', this.props.index);
-  },
-  
-  render() {
-    if(!this.props.cards.length && this.props.topLevel)
+    if(nextProps.keys !== this.props.keys || nextProps.cards !== this.props.cards)
     {
-      return <InfoArea
-        large="No cards have been created, yet."
-        small="Most people start with the From card."
-        button="Create a From card"
-        onClick={this.createFromCard}
-        />;
+      this.setState({
+        keys: this.computeKeys(nextProps)
+      });
     }
-
+    if(nextProps.keyPath !== this.props.keyPath || nextProps.queryId !== this.props.queryId)
+    {
+      this.setState({
+        keyPath: this.computeKeyPath(nextProps)
+      });
+    }
+  }
+  
+  computeKeyPath(props:Props): KeyPath
+  {
+    // TODO make this bettar
+    if(props.keyPath)
+    {
+      return props.keyPath;
+      // return this._ikeyPath(props.keyPath, 'cards');
+    }
+    if(props.queryId && props.topLevel)
+    {
+      return List(['queries', props.queryId, 'cards']);
+    }
+    
+    throw new Error("Invalid props combination passed to CardsArea.");
+  }
+  
+  computeKeys(props:Props): List<string>
+  {
+    // TODO
+    // let newKeysArr: string[] = props.keys.toJS().concat(
+    //   props.cards.reduce(
+    //     (memo: string[], card): string[] =>
+    //     {
+    //       if(card.type === BuilderTypes.CardTypes.VAR || card.type === BuilderTypes.CardTypes.LET)
+    //       {
+    //         memo.push(
+    //           (card as (BuilderTypes.IVarCard | BuilderTypes.ILetCard)).field
+    //         );
+    //       }
+    //       return memo;
+    //     }
+    //   , [])
+    // );
+    
+    // if(newKeysArr.some(key => this.state.keys.indexOf(key) === -1))
+    // {
+    //   // keys have changed
+    //   return List(newKeysArr);
+    // }
+    
+    return this.state.keys;
+  }
+  
+       
+  
+  copy() {}
+  
+  clear() {}
+  
+  createFromCard()
+  {
+    Actions.create(this.state.keyPath, 0, 'sfw');
+  }
+  
+  render()
+  {
+    let {props} = this;
+    let {cards, topLevel, canEdit} = props;
+    
+    // TODO add cards
     return this.props.connectDropTarget(
       <div
-        className={'cards-area' + (this.props.topLevel ? ' cards-area-top-level' : '')}
+        className={classNames({
+          'cards-area': true,
+          'cards-area-top-level': topLevel,
+          [this.props.className]: !!this.props.className,
+        })}
       >
-        <LayoutManager
-          layout={this.state.layout}
+        {
+          cards.map((card:ICard, index:number) =>
+            <Card 
+              {...this.props}
+              cards={null}
+              key={card.id}
+              singleCard={false}
+              topLevel={false}
+              index={index}
+              card={card}
+              dndListener={$({})}
+              keys={this.state.keys}
+              keyPath={this.state.keyPath}
+            />
+          )
+        }
+        
+        {
+          (!cards.size && topLevel) ? 
+            <InfoArea
+              large="No cards have been created, yet."
+              small={canEdit && "Create one below. Most people start with the Select/From card."}
+              button={canEdit && "Create a Select/From card"}
+              onClick={this.createFromCard}
+              inline={true}
+            />
+          : null
+        }
+        
+        <CreateCardTool
+          {...this.props}
+          keyPath={this.state.keyPath}
+          index={props.cards.size}
+          open={props.cards.size === 0}
+          parentId={props.queryId /* TODO */}
+          className={props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
         />
       </div>
     );
-  },
-});
+  }
+}
 
 
 
@@ -196,7 +239,7 @@ const cardTarget =
     if(monitor.isOver({ shallow: true}))
     {
       const card = monitor.getItem();
-      Actions.cards.move(card, props.cards.length, props.parentId);
+      // Actions.cards.move(card, props.cards.size, props.parentId); // TODO
     }
   }
 }

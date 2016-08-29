@@ -46,6 +46,7 @@ require('./Sidebar.less');
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import { Link } from 'react-router';
+import PureClasss from '../../common/components/PureClasss.tsx';
 
 var ExpandIcon = require("./../../../images/icon_expand_12x12.svg?name=ExpandIcon");
 var linkHeight = 36; // Coordinate with Sidebar.less
@@ -65,7 +66,7 @@ interface Props {
   onExpand?: () => void;
 }
 
-class Sidebar extends React.Component<Props, any>
+class Sidebar extends PureClasss<Props>
 {
 	handleClickFactory(index)
 	{

@@ -50,7 +50,6 @@ import * as _ from 'underscore';
 
 import BrowserTypes from './../browser/BrowserTypes.tsx';
 
-import { BuilderTypes } from './../builder/BuilderTypes.tsx';
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 var immutableCardsUpdateHelper = (node: any, keyToUpdate: string | string[], id: string, updater: (node: any, key: string | string[]) => any) =>
 {
@@ -91,7 +90,7 @@ var immutableCardsUpdate =
     {
       keysToUpdate = [keysToUpdate as string];
     }
-    return state.update('algorithms', algorithms => algorithms.map((algorithm) => {
+    return state.update('queries', algorithms => algorithms.map((algorithm) => {
       var a = (keysToUpdate as string[]).reduce(
         (algorithm, keyToUpdate) => immutableCardsUpdateHelper(algorithm, keyToUpdate, id, updater)
       , algorithm);
@@ -101,7 +100,7 @@ var immutableCardsUpdate =
 
 var immutableCardsSetIn = 
   (state: any, id: string, keyPath: string[], value) => {
-    return state.update('algorithms', algorithms => 
+    return state.update('queries', algorithms => 
       immutableCardsUpdateHelper(algorithms, keyPath, id,
         (n) => Immutable.fromJS(value))
   )};
@@ -153,6 +152,14 @@ var Util = {
     }
     return obj;
   },
+  
+  // TODO remove
+  // constructs appropriate object for instantiating a record-class
+  //  with a keypath formed from the action
+  // kp(action)
+  // {
+    
+  // },
   
   haveRole(groupId: ID, role: string, UserStore, RolesStore)
   {
@@ -230,75 +237,6 @@ var Util = {
     return ReactDOM.findDOMNode(target).getAttribute(key);
   },
   
-  titleForCard(card: BuilderTypes.ICard): string
-  {
-    return Util.titleForCardType(card.type);
-  },
-  
-  titleForCardType(type: string): string
-  {
-    var title = type.charAt(0).toUpperCase() + type.substr(1);
-    if(type === 'parentheses')
-    {
-      title = '( )';
-    }
-    if(type === 'sfw')
-    {
-      title = 'Select From Where';
-    }
-    if(type === 'sort')
-    {
-      title = 'Order By';
-    }
-    if(type === 'filter')
-    {
-      title = 'Compare';
-    }
-    
-    return title;
-  },
-  
-  previewForCard(card: BuilderTypes.ICard): string
-  {
-    if(!card)
-    {
-      return 'No cards';
-    }
-    
-    switch(card.type)
-    {
-      case 'from':
-        return card['group'] + ' as ' + card['iterator'];
-      case 'select':
-        return card['properties'].length + ' propert' + (card['properties'].length !== 1 ? 'ies' : 'y');
-      case 'sort':
-        return card['sorts'].length ? card['sorts'][0]['property'] : '';
-      case 'filter':
-        return card['filters'].length + ' condition' + (card['filters'].length === 1 ? '' : 's');
-      case 'let':
-      case 'var':
-        return card['field'];
-      case 'score':
-        return card['weights'].length + ' factor' + (card['weights'].length === 1 ? '' : 's');
-      case 'transform':
-        return card['input'];
-      case 'if':
-        return card['filters'].length + ' condition' + (card['filters'].length === 1 ? '' : 's');
-      case 'parentheses':
-      case 'min':
-      case 'max':
-      case 'avg':
-      case 'count':
-      case 'exists':
-      case 'sum':
-        return Util.previewForCard(card['cards'][0]);
-      case 'skip':
-      case 'take':
-        return card['value'];
-    }
-    return '';
-  },
-  
   // corrects a given index so that it is appropriate
   //  to pass into a `splice` call
   spliceIndex(index: number, array: any[]): number
@@ -342,6 +280,11 @@ var Util = {
 	{
 		return ReactDOM.findDOMNode(reactNode).parentNode;
 	},
+  
+  siblings(reactNode): NodeList
+  {
+    return Util.parentNode(reactNode).childNodes;
+  },
 
 	valueMinMax(value: number, min: number, max: number)
 	{

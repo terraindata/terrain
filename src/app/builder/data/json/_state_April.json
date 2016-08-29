@@ -1,6 +1,6 @@
 {
   "selectedCardIds": {},
-  "algorithms":{
+  "queries":{
     "100": {
       "id": "100",
       "algorithmName": "sitter_ranking.tql",

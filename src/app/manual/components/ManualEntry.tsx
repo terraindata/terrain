@@ -51,7 +51,6 @@ import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
 var ManualConfig = require('./../ManualConfig.json');
 var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
-import FromCard from './../../builder/components/cards/card-types/FromCard.tsx';
 import {BuilderTypes} from './../../builder/BuilderTypes.tsx';
 import Card from './../../builder/components/cards/Card.tsx';
 import ManualInfo from './ManualInfo.tsx';
@@ -297,25 +296,25 @@ class ManualEntry extends Classs<Props>
                 </div> 
                 );
             }
-            else {
-              var numLines = ManualConfig[0][this.props.entryName].Text[index][1].split('\n').length;
-              var padding = numLines === 1 ? 2 : 8;
-              return (
-                 <div 
-                   key ={index} 
-                   className='manual-entry-demo-box'
-                   style={style}
-                 >
-                   {this.renderCardExample(index)}
-                   <div 
-                     className='manual-entry-codemirror'
-                     style={{height: (numLines * 14 + padding) + 'px'}}
-                   >
-                     {this.renderCodeMirrorExample(index)}
-                   </div>
-                 </div>
-              );
-            }
+            // else {
+            //   var numLines = ManualConfig[0][this.props.entryName].Text[index][1].split('\n').length;
+            //   var padding = numLines === 1 ? 2 : 8;
+            //   return (
+            //      <div 
+            //        key ={index} 
+            //        className='manual-entry-demo-box'
+            //        style={style}
+            //      >
+            //        {this.renderCardExample(index)}
+            //        <div 
+            //          className='manual-entry-codemirror'
+            //          style={{height: (numLines * 14 + padding) + 'px'}}
+            //        >
+            //          {this.renderCodeMirrorExample(index)}
+            //        </div>
+            //      </div>
+            //   );
+            // }
           })
         } 
         </div>

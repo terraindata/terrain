@@ -42,38 +42,80 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Immutable = require('immutable');
-import ActionTypes from './../BuilderActionTypes.tsx';
-import Util from './../../../util/Util.tsx';
+import * as Immutable from 'immutable';
+let {Map, List} = Immutable;
+import * as _ from 'underscore';
+import * as React from 'react';
+import Actions from "../../data/BuilderActions.tsx";
+import Util from '../../../util/Util.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
+import PureClasss from './../../../common/components/PureClasss.tsx';
+import TransformCardChart from './TransformCardChart.tsx';
+import TransformCardPeriscope from './TransformCardPeriscope.tsx';
 
-var TransformCardReducer = {};
+interface Props
+{
+  key: string;
+  keyPath: KeyPath;
+  data: any; // transform card
+  
+  canEdit?: boolean;
+  spotlights?: any;  
+}
 
-TransformCardReducer[ActionTypes.cards.transform.scorePoints] = 
-  Util.setCardFields(['scorePoints']);
-
-TransformCardReducer[ActionTypes.cards.transform.scorePoint] =
-  Util.updateCardField('scorePoints', (scorePoints, action) => 
-    {
-      var scorePoint = action.payload.scorePoint;
-      var index = scorePoints.findIndex((sp) => sp.get('id') === scorePoint.id);
-      if(index !== -1)
-      {
-        return scorePoints.set(index, Immutable.fromJS(scorePoint));
-      }
-      
-      // new scorePoint
-      scorePoint.id = "sc" + Util.randInt(7035855195);
-      index = 0;
-      while(scorePoints.get(index) && scorePoints.get(index).get('value') < scorePoint.value)
-      {
-        index ++;
-      }
-      
-      return scorePoints.splice(index, 0, Immutable.fromJS(action.payload.scorePoint));
+class TransformCard extends PureClasss<Props>
+{
+  state: {
+    domain: List<number>;
+    range: List<number>;
+  };
+  
+  constructor(props:Props)
+  {
+    super(props);
+    this.state = {
+      domain: List(props.data.domain as number[]),
+      range: List([0,1]),
+    };
+  }
+  
+  handleDomainChange(domain: List<number>)
+  {
+    this.setState({
+      domain,
     });
+  }
+  
+  handleUpdatePoints(points)
+  {
+    Actions.change(this.props.keyPath, points);
+  }
+  
+  render()
+  {
+    let {data} = this.props;
+    return (
+      <div className='transform-card'>
+        <TransformCardChart
+          canEdit={this.props.canEdit}
+          points={data.scorePoints}
+          bars={data.bars}
+          domain={this.state.domain}
+          range={this.state.range}
+          spotlights={this.props.spotlights}
+          inputKey={data.input}
+          updatePoints={this.handleUpdatePoints}
+        />
+        <TransformCardPeriscope
+          onDomainChange={this.handleDomainChange}
+          barsData={data.bars}
+          domain={this.state.domain}
+          range={this.state.range}
+          maxDomain={data.domain}
+        />
+      </div>
+    );
+  }
+};
 
-TransformCardReducer[ActionTypes.cards.transform.change] =
-  Util.setCardFields(['input']);
-
-export default TransformCardReducer;
+export default TransformCard;

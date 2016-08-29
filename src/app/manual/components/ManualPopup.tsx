@@ -56,7 +56,6 @@ var OpenIcon = require('./../../../images/icon_open.svg');
 interface Props
 {
   cardName: string;
-  history?: any;
   style?: any;
   addColumn: (number, string?) => void;
   canAddColumn: boolean;

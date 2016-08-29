@@ -43,23 +43,24 @@ THE SOFTWARE.
 */
 
 require('./CreateCardTool.less')
-var shallowCompare = require('react-addons-shallow-compare');
 import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../data/BuilderActions.tsx";
 import Util from '../../../util/Util.tsx';
-import { CardTypes, CardColors } from './../../CommonVars.tsx';
-import CreateLine from "../../../common/components/CreateLine.tsx";
+import BuilderTypes from './../../BuilderTypes.tsx';
+let {CardTypes} = BuilderTypes;
 import { DragSource, DropTarget } from 'react-dnd';
+import PureClasss from '../../../common/components/PureClasss.tsx';
 
 var Manual = require('./../../../manual/ManualConfig.json');
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
 
-interface Props {
+interface Props
+{
   index: number;
   open?: boolean;
-  parentId: string;
+  keyPath: KeyPath;
   canEdit: boolean;
   dy?: number;
   className?: string;
@@ -68,16 +69,7 @@ interface Props {
   connectDropTarget?: (Element) => JSX.Element;
 }
 
-var styles: any = {};
-CardTypes.map(type => 
-  styles[type] =
-  {
-    background: CardColors[type] ? CardColors[type][0] : CardColors['none'][0],
-    borderColor: CardColors[type] ? CardColors[type][1] : CardColors['none'][1],
-  }
-);
-
-class CreateCardTool extends React.Component<Props, any>
+class CreateCardTool extends PureClasss<Props>
 {
   constructor(props:Props)
   {
@@ -85,18 +77,15 @@ class CreateCardTool extends React.Component<Props, any>
     Util.bind(this, 'createCard');
   }
   
-  shouldComponentUpdate(nextProps, nextState) {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  }
-  
-  createCard(event) {
+  createCard(event)
+  {
     if(this.props.open && this.props.onMinimize)
     {
       this.props.onMinimize();
     }
     
     var type = Util.rel(event.target);
-    Actions.cards.create(this.props.parentId, type, this.props.index);
+    Actions.create(this.props.keyPath, this.props.index, type);
   }
   
   // componentWillReceiveProps(newProps)
@@ -123,32 +112,40 @@ class CreateCardTool extends React.Component<Props, any>
   //   }
   // }
   
-  renderCardSelector() {
+  renderCardSelector()
+  {
     return (
      <div className='create-card-selector' ref='ccWrapper'>
        <div className='create-card-selector-inner'>
          {
-           CardTypes.map((type, index) => (
-             <a
-               className="create-card-button"
-               key={type}
-               rel={type}
-               onClick={this.createCard}
-               style={styles[type]}
-               data-tip={Manual[0][Util.titleForCardType(type)] ? Manual[0][Util.titleForCardType(type)].Snippet : ''}
-             >
-               <div className="create-card-button-inner" rel={type}>
-                 { Util.titleForCardType(type) }
-               </div>
-             </a>
-           ))
+           _.map(CardTypes as any, (type:string) => 
+           {
+             let card = BuilderTypes.make(BuilderTypes.Blocks[type]);
+             return (
+               <a
+                 className="create-card-button"
+                 key={type}
+                 rel={type}
+                 onClick={this.createCard}
+                 style={{
+                   backgroundColor: card.static.colors[0],
+                 }}
+                 data-tip={Manual[0][card.static.title] ? Manual[0][card.static.title].Snippet : ''}
+               >
+                 <div className="create-card-button-inner" rel={type}>
+                   { card.static.title }
+                 </div>
+               </a>
+             );
+           })
          }
        </div>
      </div>
      );
   }
   
-  render() {
+  render()
+  {
     if(!this.props.open || !this.props.canEdit)
     {
       return null;
@@ -198,7 +195,7 @@ const cardTarget =
       
       setTimeout(() =>
       {
-        Actions.cards.move(item, props.index || 0, props.parentId);
+        // Actions.cards.move(item, props.index || 0, props.parentId); // TODO
       }, 250);
     }
   }

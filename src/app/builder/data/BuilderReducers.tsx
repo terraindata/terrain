@@ -42,17 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var Immutable = require('immutable');
-import BrowserTypes from './../../../browser/BrowserTypes.tsx';
-import Ajax from './../../../util/Ajax.tsx';
-import ActionTypes from './../BuilderActionTypes.tsx';
-import Util from './../../../util/Util.tsx';
-import Actions from './../BuilderActions.tsx';
+import * as Immutable from 'immutable';
+import BrowserTypes from './../../browser/BrowserTypes.tsx';
+import BuilderTypes from './../BuilderTypes.tsx';
+import Ajax from './../../util/Ajax.tsx';
+import ActionTypes from './BuilderActionTypes.tsx';
+import Actions from './BuilderActions.tsx';
 import * as _ from 'underscore';
+import {BuilderState} from './BuilderStore.tsx';
 
-var VariantReducer = {};
-
-VariantReducer[ActionTypes.fetch] =
+const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
+{
+  
+[ActionTypes.fetch]:
   (state, action) =>
   {
     action.payload.variantIds.map(
@@ -95,8 +97,8 @@ VariantReducer[ActionTypes.fetch] =
               {
                 return;
               }
-              item.cards = Immutable.fromJS(item.cards || []);
-              item.inputs = Immutable.fromJS(item.inputs || []);
+              item.cards = BuilderTypes.recordFromJS(item.cards || []);
+              item.inputs = BuilderTypes.recordFromJS(item.inputs || []);
               item.version = false;
               Actions.setVariant(variantId, item);
             }
@@ -105,19 +107,90 @@ VariantReducer[ActionTypes.fetch] =
       }
     );
     return state.set('loading', true);
-  }
-
-VariantReducer[ActionTypes.setVariant] =
-  (state, action) =>
-   state.setIn(['algorithms', action.payload.variantId],
-        new BrowserTypes.Variant(action.payload.variant)
-      );  
-
-
-VariantReducer[ActionTypes.setVariantField] =
-  (state, action) =>
-    state.setIn(['algorithms', action.payload.variantId, action.payload.field],
-      action.payload.value
-    );
+  },
   
-export default VariantReducer;
+[ActionTypes.setVariant]: 
+  (state, action:
+  {
+    payload?: { variantId: string, variant: any},
+  }) =>
+    state.setIn(['queries', action.payload.variantId],
+      new BrowserTypes.Variant(action.payload.variant)
+    ),
+
+[ActionTypes.setVariantField]: 
+  (state, action:
+  {
+    payload?: { variantId: string, field: string, value: any},
+  }) =>
+    state.setIn(['queries', action.payload.variantId, action.payload.field],
+      action.payload.value
+    ),
+
+[ActionTypes.change]:  
+  (state, action) =>
+    state.setIn(action.payload.keyPath, action.payload.value),
+  
+[ActionTypes.create]:  
+  (state, action: {
+    payload?: { keyPath: KeyPath, index: number, factoryType: string }
+  }) =>
+    state.updateIn(action.payload.keyPath, arr =>
+      arr.splice
+      (
+        action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index, 0, 
+        BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType])
+      )
+    )
+  ,
+    
+[ActionTypes.move]:  
+  (state, action: {
+    payload?: { keyPath: KeyPath, index: number, newIndex; number }
+  }) =>
+    state.updateIn(action.payload.keyPath, arr =>
+    {
+      let {index, newIndex} = action.payload;
+      let el = arr.get(index);
+      arr = arr.splice(index, 1);
+      arr = arr.splice(newIndex, 0, el); // TODO potentially correct index
+      return arr;
+    }),
+
+[ActionTypes.remove]:  
+  (state, action: {
+    payload?: { keyPath: KeyPath, index: number, factoryType: string }
+  }) =>
+    state.removeIn(action.payload.keyPath.push(action.payload.index))
+  ,
+
+[ActionTypes.hoverCard]:
+  (state, action: {
+    payload?: { cardId: ID },
+  }) =>
+    state.set('hoveringCardId', action.payload.cardId)
+  ,
+
+[ActionTypes.selectCard]:
+  (state, action: {
+    payload?: { cardId: ID, shiftPressed: boolean, ctrlPressed: boolean },
+  }) =>
+  {
+    let {cardId, shiftPressed, ctrlPressed} = action.payload;
+    if(!shiftPressed && !ctrlPressed)
+    {
+      state = state.set('selectedCardIds', Immutable.Map({}));
+    }
+    if(ctrlPressed)
+    {
+      return state.setIn(['selectedCardIds', cardId],
+        !state.getIn(['selectedCardIds', cardId]));
+    }
+    
+    return state.setIn(['selectedCardIds', cardId], true);
+  },
+  
+};
+
+
+export default BuidlerReducers;

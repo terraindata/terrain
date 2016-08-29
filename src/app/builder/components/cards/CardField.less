@@ -1,19 +1,31 @@
 @import "../../../common/Common.less";
 
+.card-field-wrapper {
+  position: relative;
+}
+
+.card-field-wrapper-moving {
+  .transition;
+}
+
 .card-field {
   padding: @standard-margin;
   margin: 0px -1 * @standard-margin;
   position: relative;
   text-align: center;
-  min-height: 30px;
-  height: 30px;
+  // min-height: 30px;
   .transition;
   
   .card-field-inner {
-    display: inline-block;
+    display: flex;
+    left: 40px;
     width: calc(~"100% - 80px");
     position: relative;
-    // z-index: 10;
+    
+    .builder-tb {
+      flex-grow: 1;
+      flex-basis: 100px;
+    }
   }
 
   .card-field-tools-left,
@@ -31,6 +43,17 @@
     &:hover {
       border-color: rgba(255,255,255,0.5);
       background: rgba(255,255,255,0.1);
+    }
+  }
+  
+  &.card-field-moving {
+    .card-field-tools-left,
+    .card-field-tools-right {
+      border-color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.1);
+      .card-field-handle {
+        color: #333;
+      }
     }
   }
   
@@ -159,6 +182,21 @@
     .card-field-tools-left-inner,
     .card-field-tools-right-inner {
       opacity: 1;
+    }
+  }
+  
+  &.card-field-moving {
+    .card-field-tools-left-inner {
+      opacity: 1;
+    }
+    .card-field-tools-right-inner {
+      opacity: 0;
+    }
+  }
+  
+  &.card-field-single {
+    .card-field-tools-left {
+      display: none;
     }
   }
 }

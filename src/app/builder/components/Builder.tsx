@@ -54,14 +54,17 @@ var HTML5Backend = require('react-dnd-html5-backend');
 
 // Data
 import Store from "./../data/BuilderStore.tsx";
+import { BuilderState } from "./../data/BuilderStore.tsx";
 import Actions from "./../data/BuilderActions.tsx";
 import Util from "./../../util/Util.tsx";
 import UserActions from '../../users/data/UserActions.tsx';
 import RolesActions from '../../roles/data/RolesActions.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
+import Types from '../BuilderTypes.tsx';
+type IQuery = Types.IQuery;
 
 // Components
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 import BuilderColumn from "./BuilderColumn.tsx";
 import Tabs from "./layout/Tabs.tsx";
 import LayoutManager from "./layout/LayoutManager.tsx";
@@ -76,6 +79,8 @@ var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
 var DuplicateIcon = require("./../../../images/icon_duplicate_11x12.svg?name=DuplicateIcon");
 var SaveIcon = require("./../../../images/icon_save_10x10.svg?name=SaveIcon");
 
+let { Map, List } = Immutable;
+
 interface Props
 {
   params?: any;
@@ -83,24 +88,16 @@ interface Props
   location?: any;
 }
 
-class Builder extends Classs<Props>
+class Builder extends PureClasss<Props>
 {
-  // This variable is needed because React's state has not been working well with
-  //  Redux's state. For instance, if I just do:
-  //   this.setState(Store.getState().toJS())
-  //  then I can't close tabs. React doesn't seem to pick up
-  //  on keys being deleted from the state correctly.
-  reduxState: any;
-  cancelSubscription = null;
-  
   state: {
-    loading: boolean;
-    colKeys: number[];
+    builder: BuilderState,
+    colKeys: List<number>;
     noColumnAnimation: boolean;
     column: number;
     cardName: string;
   } = {
-    loading: true,
+    builder: Store.getState(),
     colKeys: null,
     noColumnAnimation: false,
     column: null,
@@ -110,35 +107,24 @@ class Builder extends Classs<Props>
   constructor(props:Props)
   {
     super(props);
+    
+    this._subscribe(Store, {
+      stateKey: 'builder',
+    });
+    
+    if(localStorage.getItem('colKeys'))
+    {
+      var colKeys = List(JSON.parse(localStorage.getItem('colKeys'))) as List<number>;
+    }
+    else
+    {
+      var colKeys = List([Math.random(), Math.random()]);
+    }
+    this.state.colKeys = colKeys;
   }
   
   componentWillMount()
   {
-    this.cancelSubscription =
-      Store.subscribe(() => {
-          var newState = Store.getState().toJS();
-          this.reduxState = newState.algorithms;
-          this.setState({
-            random: Math.random(),
-            loading: false,
-          });
-      });
-
-    // Some day in the distant future, you may consider
-    //  removing this 'toJS()' call and making
-    //  the whole Builder app built upon Immutable state.    
-    this.reduxState = Store.getState().toJS().algorithms;
-    const algorithmId = _.first(_.keys(this.reduxState));
-    
-    var colKeys = [Math.random(), Math.random()];
-    this.setState(
-    {
-      random: Math.random(),
-      algorithmId,
-      colKeys,
-      noColumnAnimation: false,
-    });
-    
     this.checkConfig(this.props);
     RolesActions.fetch();
   }
@@ -152,7 +138,7 @@ class Builder extends Classs<Props>
   {
     let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query.o;
-    var newConfig;
+    var newConfig = props.params.config;
 
     if(open)
     {
@@ -181,14 +167,14 @@ class Builder extends Classs<Props>
       newConfig = storedConfig;
     }
     
-
-    if(newConfig)
+    if(newConfig && newConfig.length && !newConfig.split(',').some(c => c.substr(0,1) === '!'))
+    {
+      newConfig = '!' + newConfig;
+    }
+    
+    if(newConfig !== props.params.config)
     {
       props.history.replaceState({}, `/builder/${newConfig}`);
-    }
-    else
-    {
-      newConfig = props.params.config;
     }
     localStorage.setItem('config', newConfig || '');
     this.fetch(newConfig);
@@ -210,10 +196,15 @@ class Builder extends Classs<Props>
     var selected = this.props.params.config && this.props.params.config.split(',').find(id => id.indexOf('!') === 0);
     return selected && selected.substr(1);
   }
- 
-  componentWillUnmount()
+  
+  getSelectedQuery(): IQuery
   {
-    this.cancelSubscription();
+    return this.state.builder.queries.get(this.getSelectedId());
+  }
+  
+  getQuery(): IQuery
+  {
+    return this.state.builder.queries.get(this.getSelectedId());
   }
   
   createAlgorithm()
@@ -251,7 +242,7 @@ class Builder extends Classs<Props>
   
   onSave()
   {
-    if (this.reduxState[this.getSelectedId()].version) 
+    if (this.getSelectedQuery().version) 
     {
       if (!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?')) 
       {
@@ -263,7 +254,7 @@ class Builder extends Classs<Props>
   onSaveSuccess()
   {
     notificationManager.addNotification(
-      'Variant "' + this.reduxState[this.getSelectedId()].name + '" saved.', 
+      'Variant "' + this.getSelectedQuery().name + '" saved.', 
       'info', 
       5
     );
@@ -272,7 +263,7 @@ class Builder extends Classs<Props>
   onSaveError()
   {
     notificationManager.addNotification(
-      'Error: Variant "' + this.reduxState[this.getSelectedId()].name + '" failed to save.', 
+      'Error: Variant "' + this.getSelectedQuery().name + '" failed to save.', 
       'error', 
       0
     );
@@ -280,8 +271,9 @@ class Builder extends Classs<Props>
 
   save()
   {
-    Ajax.saveItem(BrowserTypes.touchVariant(
-      Immutable.fromJS(this.reduxState[this.getSelectedId()])),
+    Ajax.saveItem(BrowserTypes.variantForSave(
+        this.state.builder.queries.get(this.getSelectedId()) as BrowserTypes.Variant
+      ),
       this.onSaveSuccess,
       this.onSaveError
     );
@@ -311,37 +303,38 @@ class Builder extends Classs<Props>
   getLayout()
   {
     return {
-      stackAt: 650,
       fullHeight: true,
       columns:
-        _.range(0, this.state.colKeys.length).map(index => 
-          this.getColumn(this.reduxState[this.getSelectedId()], index, this.state.colKeys)
+        _.range(0, this.state.colKeys.size).map(index => 
+          this.getColumn(index)
         )
     };
   }
   
-  getColumn(algorithm, index, colKeys: number[])
+  getColumn(index)
   {
+    let key = this.state.colKeys.get(index);
+    let query = this.getQuery();
     return {
       minWidth: 316,
       resizeable: true,
       resizeHandleRef: 'resize-handle',
-      content: algorithm && <BuilderColumn
-        algorithm={algorithm} 
+      content: query && <BuilderColumn
+        colKey={key}
+        query={query}
         index={index}
         onAddColumn={this.handleAddColumn}
         onAddManualColumn={this.handleAddManualColumn}
         onCloseColumn={this.handleCloseColumn}
-        canAddColumn={colKeys.length < 3}
-        canCloseColumn={colKeys.length > 1}
-        variant={this.reduxState[this.getSelectedId()]}
+        canAddColumn={this.state.colKeys.size < 3}
+        canCloseColumn={this.state.colKeys.size > 1}
         history={this.props.history}
         onRevert={this.save}
         column={this.state.column}
         cardName={this.state.cardName}
       />,
       // hidden: this.state && this.state.closingIndex === index,
-      key: colKeys[index],
+      key,
     }
   }
   
@@ -360,20 +353,27 @@ class Builder extends Classs<Props>
   handleAddColumn(index)
   {
     index = index + 1;
-    var colKeys = _.clone(this.state.colKeys);
-    colKeys.splice(index, 0, Math.random());
+    let colKeys = this.state.colKeys.splice(index, 0, Math.random());
     this.setState({
       colKeys,
     }); 
+    localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
   }
   
   handleCloseColumn(index)
   {
-    var colKeys = _.clone(this.state.colKeys);
-    colKeys.splice(index, 1);
+    let oldKey = this.state.colKeys[index];
+    let colKeys = this.state.colKeys.splice(index, 1);
     this.setState({
       colKeys: colKeys,
     }); 
+    localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
+    
+    if(localStorage.getItem('colKeyTypes'))
+    {
+      var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes'));
+      delete colKeyTypes[oldKey];
+    }
   }
   
   handleEmptyTabs(tabIds: ID[])
@@ -443,7 +443,7 @@ class Builder extends Classs<Props>
         />
 
         {
-          !_.keys(this.reduxState).length ? 
+          !this.state.builder.queries.keySeq().size ? 
             <InfoArea
               large='No variants open'
               small='You can open one in the Browser'

@@ -46,7 +46,7 @@ require('./Login.less')
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import Actions from "../data/AuthActions.tsx";
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from '../../common/components/PureClasss.tsx';
 import Modal from './../../common/components/Modal.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
@@ -56,7 +56,7 @@ var TerrainIcon = require("./../../../images/logo_TerrainLong.svg");
 interface Props {
 }
 
-class Login extends React.Component<Props, any>
+class Login extends PureClasss<Props>
 {
   constructor(props:Props)
   {

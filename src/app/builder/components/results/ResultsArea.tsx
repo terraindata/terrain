@@ -54,21 +54,22 @@ import ResultsTable from "../results/ResultsTable.tsx";
 import {Config, ResultsConfig} from "../results/ResultsConfig.tsx";
 import InfoArea from '../../../common/components/InfoArea.tsx';
 import TQLConverter from "../../../tql/TQLConverter.tsx";
-import Classs from './../../../common/components/Classs.tsx';
+import PureClasss from './../../../common/components/PureClasss.tsx';
 import InfiniteScroll from './../../../common/components/InfiniteScroll.tsx';
 import Switch from './../../../common/components/Switch.tsx';
+import BuilderTypes from '../../BuilderTypes.tsx';
 
 const RESULTS_PAGE_SIZE = 25;
 
 interface Props
 {
-  algorithm: any;
+  query: BuilderTypes.IQuery;
   onLoadStart: () => void;
   onLoadEnd: () => void;
   canEdit: boolean;
 }
 
-class ResultsArea extends Classs<Props>
+class ResultsArea extends PureClasss<Props>
 {
   xhr = null;
   allXhr = null;
@@ -113,12 +114,12 @@ class ResultsArea extends Classs<Props>
   {
     super(props);
     
-    this.state.resultsConfig = this.getResultsConfig()[this.props.algorithm.id];
+    this.state.resultsConfig = this.getResultsConfig()[this.props.query.id];
   }
   
   componentDidMount()
   {
-    this.queryResults(this.props.algorithm);
+    this.queryResults(this.props.query);
   }
   
   componentWillUnmount()
@@ -132,10 +133,10 @@ class ResultsArea extends Classs<Props>
   
   componentWillReceiveProps(nextProps)
   {
-    if(!_.isEqual(nextProps.algorithm, this.props.algorithm))
+    if(!_.isEqual(nextProps.query, this.props.query))
     {
-      this.queryResults(nextProps.algorithm);
-      let resultsConfig = this.getResultsConfig()[nextProps.algorithm.id];
+      this.queryResults(nextProps.query);
+      let resultsConfig = this.getResultsConfig()[nextProps.query.id];
       this.setState({
         resultsConfig,
       });
@@ -145,7 +146,7 @@ class ResultsArea extends Classs<Props>
         this.state.onResultsLoaded(false);
       }
       
-      if(nextProps.algorithm.id !== this.props.algorithm.id)
+      if(nextProps.query.id !== this.props.query.id)
       {
         this.setState({
           results: null,
@@ -221,7 +222,7 @@ class ResultsArea extends Classs<Props>
       resultsPages: pages,
       onResultsLoaded,
     });
-    this.queryResults(this.props.algorithm, pages);
+    this.queryResults(this.props.query, pages);
   }
   
   resultsFodderRange = _.range(0, 25);
@@ -392,20 +393,20 @@ class ResultsArea extends Classs<Props>
     })
   }
   
-  queryResults(algorithm, pages?: number)
+  queryResults(query, pages?: number)
   {
     if(!pages)
     {
       pages = this.state.resultFormat === 'icon' ? this.state.resultsPages : 50;
     }
     
-    if (algorithm.mode === "tql")
+    if (query.mode === "tql")
     {
-      var tql = algorithm.tql;
+      var tql = query.tql;
     }
     else 
     {
-      tql = TQLConverter.toTQL(algorithm, {
+      tql = TQLConverter.toTQL(query, {
         limit: pages * RESULTS_PAGE_SIZE,
       });
     }
@@ -421,7 +422,7 @@ class ResultsArea extends Classs<Props>
       this.allXhr && this.allXhr.abort();
       
       this.xhr = Ajax.query(tql, this.handleResultsChange, this.handleError);
-      if (algorithm.mode === "tql")
+      if (query.mode === "tql")
       {
         this.allXhr = Ajax.query(tql, 
           this.handleAllFieldsResponse,
@@ -430,7 +431,7 @@ class ResultsArea extends Classs<Props>
       }
       else 
       {
-        this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm, {
+        this.allXhr = Ajax.query(TQLConverter.toTQL(query, {
             allFields: true,
         // limit: pages * RESULTS_PAGE_SIZE,
         // don't limit the all fields request
@@ -514,7 +515,7 @@ class ResultsArea extends Classs<Props>
     if(this.state.showingConfig)
     {
       return <ResultsConfig
-        config={this.getResultsConfig()[this.props.algorithm.id]}
+        config={this.getResultsConfig()[this.props.query.id]}
         onClose={this.hideConfig}
         onConfigChange={this.handleConfigChange}
         results={this.state.results}
@@ -526,7 +527,7 @@ class ResultsArea extends Classs<Props>
   handleConfigChange(config:Config)
   {
     var resultsConfig = this.getResultsConfig();
-    resultsConfig[this.props.algorithm.id] = config;
+    resultsConfig[this.props.query.id] = config;
     localStorage['resultsConfig'] = JSON.stringify(resultsConfig);
     this.setState({
       resultsConfig: config,

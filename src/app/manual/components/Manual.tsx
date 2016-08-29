@@ -51,6 +51,9 @@ import * as classNames from 'classnames';
 import Autocomplete from './../../common/components/Autocomplete.tsx';
 import ManualEntry from './ManualEntry.tsx';
 
+import * as Immutable from 'immutable';
+const {List} = Immutable;
+
 var CloseIcon = require('./../../../images/icon_close.svg');
 var SearchIcon = require('./../../../images/icon_search.svg');
 var HomeIcon = require('./../../../images/icon_home.svg');
@@ -270,11 +273,13 @@ class Manual extends Classs<Props>
   renderAutocompleteOption()
   {
     var options = this.allPhraseTypes.concat(this.allTqlCards);
-    return options.sort();
+    return Immutable.List(options.sort());
   }
 
   renderManualTopbar()
   {
+
+
 
     var closeOpacity = this.state.value.length ? 1 : 0;
     return (
@@ -289,11 +294,11 @@ class Manual extends Classs<Props>
           <div className='manual-search-bar'>
               <SearchIcon className ='manual-search-icon'/>
               <Autocomplete
-               className='manual-search-input'
-               value={this.state.value as string}
-               onChange={this.search}
-               placeholder='Search'
-               options={this.renderAutocompleteOption()}
+                className='manual-search-input'
+                value={this.state.value as string}
+                onChange={this.search}
+                placeholder='Search'
+                options={this.renderAutocompleteOption()}
               />
               <CloseIcon 
                className='manual-close-icon'
