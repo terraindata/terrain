@@ -111,41 +111,28 @@ class ManualEntry extends Classs<Props>
     var keywords = Object.keys(ManualConfig[0]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
     var phraseTypes = Object.keys(ManualConfig[1]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
 
-    for(var index in keywords)
-    {
-      //Look up how to change this to regex expression, instead of having to loop through all three versions
-      var matchForms = [keywords[index] + " ", " " + keywords[index] + ", ", " " + keywords[index] + "."];
-      for (var i in matchForms)
-      {
-        text = reactStringReplace(text, matchForms[i], (match, i) => (
-        <span       
-          className='manual-entry-keyword' 
-          onClick={this.props.openTerm}
-          key={Math.random()}
-        >
-          {match}
-        </span>
-        ));
-      }
-    }
-    for(var index in phraseTypes)
-    {
-      var matchForms = [phraseTypes[index] + " ", " " + phraseTypes[index] + ", ", " " + phraseTypes[index] + "."];
-      for (var i in matchForms)
-      {
-        text = reactStringReplace(text, matchForms[i], (match, i) => (
-          <span         
-            className='manual-entry-phrase-type' 
-            onClick={this.props.openTerm}
-            key={Math.random()}
-          >
-            {match}
-          </span>
-        ));
-      }
-    }
-    
+    var matchForm = new RegExp('[^A-Za-z](' + keywords.join('|') + ')[^A-Za-z]', 'gi');
+    text = reactStringReplace(text, matchForm, (match, i) => (
+      <span       
+        className='manual-entry-keyword' 
+        onClick={this.props.openTerm}
+        key={Math.random()}
+      >
+        {' ' + match + ' '}
+      </span>
+    ));
 
+    matchForm = new RegExp('(' + phraseTypes.join('|') + ')', 'gi');
+    text = reactStringReplace(text, matchForm, (match, i) => (
+      <span         
+        className='manual-entry-phrase-type' 
+        onClick={this.props.openTerm}
+        key={Math.random()}
+      >
+        {match}
+      </span>
+    ));
+    
     return (
       <div> 
         {text}
@@ -312,6 +299,7 @@ class ManualEntry extends Classs<Props>
             }
             else {
               var numLines = ManualConfig[0][this.props.entryName].Text[index][1].split('\n').length;
+              var padding = numLines === 1 ? 2 : 8;
               return (
                  <div 
                    key ={index} 
@@ -321,7 +309,7 @@ class ManualEntry extends Classs<Props>
                    {this.renderCardExample(index)}
                    <div 
                      className='manual-entry-codemirror'
-                     style={{height: (numLines * 14 + 6) + 'px'}}
+                     style={{height: (numLines * 14 + padding) + 'px'}}
                    >
                      {this.renderCodeMirrorExample(index)}
                    </div>

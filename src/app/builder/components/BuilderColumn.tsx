@@ -75,9 +75,9 @@ var ManualIcon = require('./../../../images/open-book-top-view.svg');
 
 enum COLUMNS {
   Builder,
+  Results,
   Inputs,
   TQL,
-  Results,
   Manual
 };
 var NUM_COLUMNS = 5;
