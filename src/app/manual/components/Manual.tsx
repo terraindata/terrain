@@ -386,7 +386,7 @@ class Manual extends Classs<Props>
           />
           <span 
             onClick={this.showTqlCards}
-            style={{paddingRight: '42px'}}
+            style={{paddingRight: '70px'}}
           >TQL Cards</span>
         </div>
         {this.renderTqlCardsList()}
@@ -405,7 +405,7 @@ class Manual extends Classs<Props>
           /> 
           <span 
             onClick={this.showPhraseTypes} 
-            style={{paddingRight: '32px'}}
+            style={{paddingRight: '52px'}}
           >Phrase Types</span>
         </div>
         {this.renderPhraseTypesList()}
