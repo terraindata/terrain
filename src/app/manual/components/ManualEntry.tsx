@@ -111,8 +111,6 @@ class ManualEntry extends Classs<Props>
     var keywords = Object.keys(ManualConfig[0]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
     var phraseTypes = Object.keys(ManualConfig[1]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
 
-    console.log(keywords);
-
     for(var index in keywords)
     {
       //Look up how to change this to regex expression, instead of having to loop through all three versions
