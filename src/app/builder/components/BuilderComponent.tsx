@@ -58,7 +58,7 @@ import BuilderTextboxCards from '../../common/components/BuilderTextboxCards.tsx
 interface Props
 {
   keyPath: KeyPath;
-  data : any; // record
+  data: any; // record
   display?: Display | Display[];
   
   keys: List<string>;

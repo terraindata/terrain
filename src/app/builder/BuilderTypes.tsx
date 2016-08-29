@@ -69,6 +69,7 @@ export enum DisplayType
   FLEX,
   COMPONENT,
   LABEL, // strict text to paste in to HTML
+  EXPLANATION,
 }
 
 let {TEXT, NUM, ROWS, CARDS, CARDTEXT, CARDSFORTEXT, DROPDOWN, LABEL, FLEX, COMPONENT} = DisplayType;
@@ -83,6 +84,8 @@ export interface Display
   label?: string;
   placeholder?: string;
   className?: string | ((data: any) => string);
+  
+  description?: string;
   
   above?: Display;
   below?: Display;
@@ -823,6 +826,27 @@ export module BuilderTypes
     }
     
     return value;
+  }
+  
+  export const recordsForServer = (value: any) =>
+  {
+    if(Immutable.Iterable.isIterable(value))
+    {
+      let v = value.map(recordsForServer);
+      if(!v)
+      {
+        // records have a map function, but it returns undefined. WTF?
+        v = value.toMap().map(recordsForServer);
+      }
+      value = v;
+    }
+    
+    if(value && value.delete)
+    {
+      value = value.delete('static');
+    }
+    
+    return Immutable.fromJS(value);
   }
 
   export function getPreview(card:ICard):string

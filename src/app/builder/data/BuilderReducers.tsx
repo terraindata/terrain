@@ -98,7 +98,6 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
                 return;
               }
               item.cards = BuilderTypes.recordFromJS(item.cards || []);
-              console.log(item.cards);
               item.inputs = BuilderTypes.recordFromJS(item.inputs || []);
               item.version = false;
               Actions.setVariant(variantId, item);
@@ -136,23 +135,14 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   (state, action: {
     payload?: { keyPath: KeyPath, index: number, factoryType: string }
   }) =>
-  {
-    console.log(action.payload, BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType]));
-    console.log(state.updateIn(action.payload.keyPath, arr =>
-      arr.splice
-      (
-        action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index, 0, 
-        BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType])
-      )
-    ));
-    return state.updateIn(action.payload.keyPath, arr =>
+    state.updateIn(action.payload.keyPath, arr =>
       arr.splice
       (
         action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index, 0, 
         BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType])
       )
     )
-  },
+  ,
     
 [ActionTypes.move]:  
   (state, action: {
