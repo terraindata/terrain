@@ -48,180 +48,18 @@ import * as Immutable from 'immutable';
 let List = Immutable.List;
 let L = () => List([]);
 let Map = Immutable.Map;
-import PureClasss from './../common/components/PureClasss.tsx';
+
 import ScoreBar from './components/charts/ScoreBar.tsx';
 import TransformCardComponent from './components/charts/TransformCard.tsx';
 import Store from './data/BuilderStore.tsx';
+import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, filtersDisplay, wrapperDisplay} from './BuilderDisplays.tsx';
 
 export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
-
-export enum DisplayType
-{
-  TEXT,
-  CARDTEXT, // textbox that can be cards, must be coupled with:
-  CARDSFORTEXT, // cards that are associated with a textbox
-  NUM,
-  ROWS,
-  CARDS,
-  DROPDOWN,
-  FLEX,
-  COMPONENT,
-  LABEL, // strict text to paste in to HTML
-  EXPLANATION,
-}
-
-let {TEXT, NUM, ROWS, CARDS, CARDTEXT, CARDSFORTEXT, DROPDOWN, LABEL, FLEX, COMPONENT} = DisplayType;
-
-export interface Display
-{
-  displayType: DisplayType;
-  key: string;
-  
-  header?: string;
-  options?: List<(string | El)>;
-  label?: string;
-  placeholder?: string;
-  className?: string | ((data: any) => string);
-  
-  description?: string;
-  
-  above?: Display;
-  below?: Display;
-  
-  provideParentData?: boolean;
-  // if true, it passes the parent data down
-  // this will cause unnecessary re-rendering, so avoid if possible
-  
-  // for rows
-  row?: {
-    inner: Display | Display[];
-    above?: Display | Display[];
-    below?: Display | Display[];
-  };
-  
-  flex?: Display | Display[];
-  
-  // for rows:
-  english?: string;
-  factoryType?: string;
-  
-  // for buildertextboxes with cards
-  top?: boolean;
-  
-  // for components
-  component?: (typeof PureClasss);
-}
-
-let valueDisplay =
-{
-  displayType: NUM,
-  key: 'value',
-}
-
-let textDisplay =
-{
-  displayType: TEXT,
-  key: [],
-}
-
-let filtersDisplay = 
-{
-    displayType: ROWS,
-    key: 'filters',
-    english: 'condition',
-    factoryType: 'filterBlock',
-    className: (data => data.filters.size > 1 ? 'filters-multiple' : 'filters-single'),
-    row: 
-    {
-      above:
-      {
-        displayType: CARDSFORTEXT,
-        key: 'first',
-      },
-      
-      below:
-      {
-        displayType: CARDSFORTEXT,
-        key: 'second',
-      },
-      
-      inner:
-      [
-        {
-          displayType: CARDTEXT,
-          key: 'first',
-          top: true,
-        },
-        {
-          displayType: DROPDOWN,
-          key: 'operator',
-          options: Immutable.List(Operators),
-        },
-        {
-          displayType: CARDTEXT,
-          key: 'second',
-        },
-        {
-          displayType: DROPDOWN,
-          key: 'combinator',
-          options: Immutable.List(Combinators),
-          className: 'combinator',
-        }
-      ],
-    },
-  };
-
-let wrapperDisplay =
-{
-  displayType: CARDS,
-  key: 'cards',
-};
-
-let letVarDisplay =
-{
-  displayType: FLEX,
-  key: null,
-  flex:
-  [
-    {
-      displayType: TEXT,
-      key: 'field',
-    },
-    {
-      displayType: LABEL,
-      label: '=',
-      key: null,
-    },
-    {
-      displayType: CARDTEXT,
-      key: 'expression',
-    },
-  ],
-  below:
-  {
-    key: 'expression',
-    displayType: CARDSFORTEXT,
-  },
-};
   
 export module BuilderTypes
 {
-  // A query can be viewed and edited in the Builder
-  // currently, only Variants are Queries, but that may change
-  export interface IQuery
-  {
-    id: string;
-    cards: ICards;
-    inputs: List<any>;
-    tql: string;
-    mode: string;
-    version: boolean;
-    name: string;
-    lastEdited: string;
-  }
-  
   export enum Operator {
     EQ,
     NE,
@@ -249,47 +87,41 @@ export module BuilderTypes
     DATE,
     NUMBER,
   }
-  
-  interface IBlock
+    // TODO include in a common file
+  interface IRecord<T>
   {
     id: string;
     type: string;
-    static?: {[key:string]:any};
-    
-    [field:string]: any;
+    set: (f: string, v: any) => T;
+    setIn: (f: string, v: any) => T;
+    get: (f: string | number) => any;
+    getIn: (f: (string | number)[] | KeyPath) => any;
+    delete: (f: string) => T;
+    deleteIn: (f: (string | number)[] | KeyPath) => T;
   }
   
-  const _block = (config: {[field:string]:any}): IBlock =>
+  // A query can be viewed and edited in the Builder
+  // currently, only Variants are Queries, but that may change
+  export interface IQuery
   {
-    return _.extend({
-      id: "",
-      type: "",
-      static: {},
-    }, config);
+    id: string;
+    cards: ICards;
+    inputs: List<any>;
+    tql: string;
+    mode: string;
+    version: boolean;
+    name: string;
+    lastEdited: string;
   }
   
-  interface ICardConfig
+  export interface IInput extends IRecord<IInput>
   {
-    [field:string]: any;
-    
-    static: {
-      colors: string[];
-      title: string;
-      preview: string | ((c:ICard) => string);
-      display: Display | Display[];
-      // TODO tql here
-      
-      getTerms?: (card: ICard) => string[];
-      init?: (config?:any) => any;
-    }
+    type: string;
+    key: string;
+    value: string;
+    inputType: InputType;
   }
-  const _card = (config:ICardConfig) =>
-    _.extend(config, {
-      id: "",
-      _isCard: true,
-    });
-  
-  // abstract
+    
   export interface ICard extends IRecord<ICard>
   {
     id: string;
@@ -317,13 +149,63 @@ export module BuilderTypes
   
   export type ICards = List<ICard>;
   export type CardString = string | ICard;
+
+
+  // BUILDING BLOCKS
+  // The following large section defines every card
+  //  and every piece of every card.
   
-  // private
+  // IBlock is a card or a distinct piece / group of card pieces
+  interface IBlock
+  {
+    id: string;
+    type: string;
+    static?: {[key:string]:any}; // fields not saved on server
+    
+    [field:string]: any;
+  }
+  
+  // helper function to populate common fields for an IBlock
+  const _block = (config: {[field:string]:any}): IBlock =>
+  {
+    return _.extend({
+      id: "",
+      type: "",
+      static: {},
+    }, config);
+  }
+  
+  // Every Card definition must follow this interface
+  interface ICardConfig
+  {
+    [field:string]: any;
+    
+    static: {
+      colors: string[];
+      title: string;
+      preview: string | ((c:ICard) => string);
+      display: Display | Display[];
+      // TODO tql here
+      
+      getTerms?: (card: ICard) => string[];
+      init?: (config?:any) => any;
+    }
+  }
+  
+  // helper function to populate random card fields
+  const _card = (config:ICardConfig) =>
+    _.extend(config, {
+      id: "",
+      _isCard: true,
+    });
+  
+  // a card that contains other cards
   export interface IWrapperCard extends ICard
   {
     cards: ICards;
   }
   
+  // config to define such a card
   interface IWrapperCardConfig
   {
     colors: string[];
@@ -332,6 +214,7 @@ export module BuilderTypes
     display?: Display | Display[];
     // TODO tql here
   }
+  
   const _wrapperCard = (config:IWrapperCardConfig) =>
   {
     return _card({
@@ -370,7 +253,7 @@ export module BuilderTypes
     })
   );
 
-  // BuildingBlocks
+  // The BuildingBlocks
   export const Blocks =
   { 
     sortBlock: _block(
@@ -414,7 +297,7 @@ export module BuilderTypes
         display: [
           {
             header: 'Select',
-            displayType: ROWS,
+            displayType: DisplayType.ROWS,
             key: 'fields',
             english: 'field',
             factoryType: 'field',
@@ -422,7 +305,7 @@ export module BuilderTypes
             {
               inner:
               {
-                displayType: TEXT,
+                displayType: DisplayType.TEXT,
                 key: 'field'
               },
             },
@@ -430,7 +313,7 @@ export module BuilderTypes
           
           {
             header: 'From',
-            displayType: ROWS,
+            displayType: DisplayType.ROWS,
             key: 'tables',
             english: 'table',
             factoryType: 'table',
@@ -439,16 +322,16 @@ export module BuilderTypes
               inner:
               [  
                 {
-                  displayType: TEXT,
+                  displayType: DisplayType.TEXT,
                   key: 'table',
                 },
                 {
-                  displayType: LABEL,
+                  displayType: DisplayType.LABEL,
                   label: 'as',
                   key: null,
                 },
                 {
-                  displayType: TEXT,
+                  displayType: DisplayType.TEXT,
                   key: 'iterator',
                 },
               ],
@@ -463,7 +346,7 @@ export module BuilderTypes
           ),
           
           {
-            displayType: CARDS,
+            displayType: DisplayType.CARDS,
             key: 'cards',
             className: 'sfw-cards-area',
           },
@@ -491,7 +374,7 @@ export module BuilderTypes
         colors: ["#C5AFD5", "#EAD9F7"],
         
         display: {
-          displayType: ROWS,
+          displayType: DisplayType.ROWS,
           key: 'sorts',
           english: 'sort',
           factoryType: 'sortBlock',
@@ -500,11 +383,11 @@ export module BuilderTypes
             inner:
             [
               {
-                displayType: TEXT,
+                displayType: DisplayType.TEXT,
                 key: 'property'
               },
               {
-                displayType: DROPDOWN,
+                displayType: DisplayType.DROPDOWN,
                 key: 'direction',
                 options: Immutable.List(Directions),
               },
@@ -613,7 +496,7 @@ export module BuilderTypes
         title: "Score",
         preview: "[weights.length] Weight(s)",
         display: {
-          displayType: ROWS,
+          displayType: DisplayType.ROWS,
           key: 'weights',
           english: 'weight',
           factoryType: 'weight',
@@ -623,17 +506,17 @@ export module BuilderTypes
             inner:
             [
               {
-                displayType: TEXT,
+                displayType: DisplayType.TEXT,
                 key: 'key',
                 placeholder: 'Field',
               },
               {
-                displayType: NUM,
+                displayType: DisplayType.NUM,
                 key: 'weight',
                 placeholder: 'Weight',
               },
               {
-                displayType: COMPONENT,
+                displayType: DisplayType.COMPONENT,
                 component: ScoreBar,
                 key: null,
               },
@@ -676,12 +559,12 @@ export module BuilderTypes
         
         display: [
           {
-            displayType: TEXT,
+            displayType: DisplayType.TEXT,
             key: 'input',
             placeholder: 'Input field',
           },
           {
-            displayType: COMPONENT,
+            displayType: DisplayType.COMPONENT,
             component: TransformCardComponent,
             key: 'scorePoints',
           },
@@ -746,14 +629,8 @@ export module BuilderTypes
   // Set the "type" field for all blocks equal to its key
   _.map(Blocks as ({[card:string]:any}), (v, i) => Blocks[i].type = i);
   
-  // private
-  let typeToRecord = _.reduce(Blocks as ({[card:string]:any}), 
-    (memo, v, i) => {
-      memo[i] = Immutable.Record(v)
-      return memo;
-    }
-  , {});
-  
+  // This creates a new instance of a card / block
+  // Usage: BuilderTypes.make(BuilderTypes.Blocks.sort)
   export const make = (block:IBlock, extraConfig?:{[key:string]:any}) =>
   {
     block = _.extend({}, block); // shallow clone
@@ -780,31 +657,18 @@ export module BuilderTypes
     return typeToRecord[type](block);
   }
   
+  // array of different card types
   export const CardTypes = _.compact(_.map(Blocks, (block, k: string) => block._isCard && k ));
   
-  
-  
-  // TODO include in a common file
-  // abstract  
-  interface IRecord<T>
-  {
-    id: string;
-    type: string;
-    set: (f: string, v: any) => T;
-    setIn: (f: string, v: any) => T;
-    get: (f: string | number) => any;
-    getIn: (f: (string | number)[] | KeyPath) => any;
-    delete: (f: string) => T;
-    deleteIn: (f: (string | number)[] | KeyPath) => T;
-  }
-  export interface IInput extends IRecord<IInput>
-  {
-    type: string;
-    key: string;
-    value: string;
-    inputType: InputType;
-  }
-  
+  // private, maps a type (string) to the backing Immutable Record
+  let typeToRecord = _.reduce(Blocks as ({[card:string]:any}), 
+    (memo, v, i) => {
+      memo[i] = Immutable.Record(v)
+      return memo;
+    }
+  , {});
+
+  // Given a plain JS object, construct the Record for it and its children  
   export const recordFromJS = (value: any) =>
   {
     if(Array.isArray(value) || typeof value === 'object')
@@ -828,6 +692,7 @@ export module BuilderTypes
     return value;
   }
   
+  // Prepare cards/records for save, trimming static values
   export const recordsForServer = (value: any) =>
   {
     if(Immutable.Iterable.isIterable(value))
@@ -849,6 +714,7 @@ export module BuilderTypes
     return Immutable.fromJS(value);
   }
 
+  // returns preview for a given card
   export function getPreview(card:ICard):string
   {
     let {preview} = card.static;

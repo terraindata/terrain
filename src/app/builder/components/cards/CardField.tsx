@@ -49,7 +49,7 @@ import * as React from 'react';
 import Util from '../../../util/Util.tsx';
 import PureClasss from '../../../common/components/PureClasss.tsx';
 import BuilderComponent from '../BuilderComponent.tsx';
-import {Display} from '../../BuilderTypes.tsx';
+import {Display} from '../../BuilderDisplays.tsx';
 const classNames = require('classnames');
 
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");

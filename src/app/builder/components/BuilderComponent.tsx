@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./BuilderComponent.less');
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import {Display, DisplayType} from './../BuilderTypes.tsx';
+import {Display, DisplayType} from './../BuilderDisplays.tsx';
 import PureClasss from '../../common/components/PureClasss.tsx';
 import BuilderTextbox from '../../common/components/BuilderTextbox.tsx';
 import BuilderTypes from '../BuilderTypes.tsx';
