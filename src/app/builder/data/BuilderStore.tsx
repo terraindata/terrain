@@ -63,6 +63,9 @@ export class BuilderState
   
   tables: Map<string, string[]> = Map({});
   
+  manual: Map<ID, Types.ICards> = Map({});
+  // Card examples used in the manual are stored here.
+  
   set: (f: string, v: any) => BuilderState;
   setIn: (f: string, v: any) => BuilderState;
 }
