@@ -222,6 +222,7 @@ var BuilderColumn = React.createClass<any, any>(
              small= "This Variant is in TQL mode, so it doesn’t use Cards. To restore this Variant to its last Card state, change it to Cards mode in the TQL column."
           />;
         }
+        console.log(query, query.cards);
         return <CardsArea 
           cards={query.cards} 
           queryId={query.id}

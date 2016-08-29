@@ -57,7 +57,7 @@ import CreateCardTool from "./CreateCardTool.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import { DropTarget } from 'react-dnd';
 import BuilderTypes from '../../BuilderTypes.tsx';
-type ICard = BuilderTypes.ICard<any>;
+type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
 let {List} = Immutable;
 

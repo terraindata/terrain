@@ -235,7 +235,7 @@ class TransformCardChart extends PureClasss<Props>
     }
 
     this.updatePoints(points.splice(index, 0,
-      BuilderTypes.F.scorePoint({
+      BuilderTypes.make(BuilderTypes.Blocks.scorePoint, {
         value,
         score,
       })

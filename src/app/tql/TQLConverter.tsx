@@ -45,7 +45,7 @@ THE SOFTWARE.
 import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 import { BuilderTypes } from "../builder/BuilderTypes.tsx";
-type ICard = BuilderTypes.ICard<any>;
+type ICard = BuilderTypes.ICard;
 type IInput = BuilderTypes.IInput;
 
 
@@ -134,7 +134,7 @@ class TQLConverter
       if(!fromCard['cards'].some(card => card.type === 'take'))
       {
         let limit = options.limit || 5000; // queries without a limit will crash Tiny
-        return fromCard.set('cards', fromCard['cards'].push(BuilderTypes.F.take({
+        return fromCard.set('cards', fromCard['cards'].push(BuilderTypes.make(BuilderTypes.Blocks.take, {
           value: 5000,
         })));
       }

@@ -46,10 +46,12 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import * as Immutable from 'immutable';
 let List = Immutable.List;
+let L = () => List([]);
 let Map = Immutable.Map;
 import PureClasss from './../common/components/PureClasss.tsx';
 import ScoreBar from './components/charts/ScoreBar.tsx';
 import TransformCardComponent from './components/charts/TransformCard.tsx';
+import Store from './data/BuilderStore.tsx';
 
 export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
@@ -203,6 +205,20 @@ let letVarDisplay =
   
 export module BuilderTypes
 {
+  // A query can be viewed and edited in the Builder
+  // currently, only Variants are Queries, but that may change
+  export interface IQuery
+  {
+    id: string;
+    cards: ICards;
+    inputs: List<any>;
+    tql: string;
+    mode: string;
+    version: boolean;
+    name: string;
+    lastEdited: string;
+  }
+  
   export enum Operator {
     EQ,
     NE,
@@ -230,13 +246,547 @@ export module BuilderTypes
     DATE,
     NUMBER,
   }
-
-  // TODO export or include in a common file
-  // abstract  
-  class IRecord<T>
+  
+  interface IBlock
   {
-    id: string = "";
-    type: string = "";
+    id: string;
+    type: string;
+    static?: {[key:string]:any};
+    
+    [field:string]: any;
+  }
+  
+  const _block = (config: {[field:string]:any}): IBlock =>
+  {
+    return _.extend({
+      id: "",
+      type: "",
+      static: {},
+    }, config);
+  }
+  
+  interface ICardConfig
+  {
+    [field:string]: any;
+    
+    static: {
+      colors: string[];
+      title: string;
+      preview: string | ((c:ICard) => string);
+      display: Display | Display[];
+      // TODO tql here
+      
+      getTerms?: (card: ICard) => string[];
+      init?: (config?:any) => any;
+    }
+  }
+  const _card = (config:ICardConfig) =>
+    _.extend(config, {
+      id: "",
+      _isCard: true,
+    });
+  
+  // abstract
+  export interface ICard extends IRecord<ICard>
+  {
+    id: string;
+    type: string;
+    _isCard: boolean;
+    
+    // the following fields are excluded from the server save    
+    static:
+    {
+      colors: string[];
+      title: string;
+      display: Display | Display[];
+      
+      getTerms?: (card: ICard) => string[];
+      // given a card, return the "terms" it generates for autocomplete
+      
+      preview: string | ((c:ICard) => string);
+      // The BuilderTypes.getPreview function constructs
+      // a preview from a card object based on this string.
+      // It replaces anything within [] with the value for that key.
+      // If an array of objects, you can specify: [arrayKey.objectKey]
+      // and it will map through and join the values with ", ";
+    };
+  }
+  
+  export type ICards = List<ICard>;
+  export type CardString = string | ICard;
+  
+  // private
+  export interface IWrapperCard extends ICard
+  {
+    cards: ICards;
+  }
+  
+  interface IWrapperCardConfig
+  {
+    colors: string[];
+    title: string;
+    getTerms?: (card: ICard) => string[];
+    display?: Display | Display[];
+    // TODO tql here
+  }
+  const _wrapperCard = (config:IWrapperCardConfig) =>
+  {
+    return _card({
+      cards: L(),
+      
+      static:
+      {
+        title: config.title,
+        colors: config.colors,
+        getTerms: config.getTerms,
+        
+        preview: (c:IWrapperCard) => {
+          if(c.cards.size)
+          {
+            let card = c.cards.get(0);
+            return getPreview(card);
+          }
+          return "Nothing";
+        },
+        
+        display: (config.display || wrapperDisplay),
+      }
+    })
+  }
+  
+  const _valueCard = (config:{ title: string, colors: string[] }) => (
+    _card({
+      value: 0,
+      
+      static: {
+        title: config.title,
+        colors: config.colors,
+        preview: "[value]",
+        display: valueDisplay,
+      }
+    })
+  );
+
+  // BuildingBlocks
+  export const Blocks =
+  { 
+    sortBlock: _block(
+    {
+      property: "",
+      direction: Direction.DESC,
+    }),
+    
+    filterBlock: _block(
+    {
+      first: "",
+      second: "",
+      operator: Operator.EQ,
+      combinator: Combinator.AND,
+    }),
+    
+    table: _block(
+    {
+      table: "",
+      iterator: "",
+    }),
+    
+    field: _block(
+    {
+      field: "",
+    }),
+    
+    sfw: _card(
+    {
+      tables: L(),
+      fields: L(),
+      filters: L(),
+      cards: L(),
+      
+      static:
+      {
+        colors: ["#89B4A7", "#C1EADE"],
+        title: "Select / From",
+        preview: "[tables.table]: [fields.field]",
+        
+        display: [
+          {
+            header: 'Select',
+            displayType: ROWS,
+            key: 'fields',
+            english: 'field',
+            factoryType: 'field',
+            row:
+            {
+              inner:
+              {
+                displayType: TEXT,
+                key: 'field'
+              },
+            },
+          },
+          
+          {
+            header: 'From',
+            displayType: ROWS,
+            key: 'tables',
+            english: 'table',
+            factoryType: 'table',
+            row: 
+            {
+              inner:
+              [  
+                {
+                  displayType: TEXT,
+                  key: 'table',
+                },
+                {
+                  displayType: LABEL,
+                  label: 'as',
+                  key: null,
+                },
+                {
+                  displayType: TEXT,
+                  key: 'iterator',
+                },
+              ],
+            },
+          },
+          
+          _.extend(
+            {
+              header: 'Where',
+            }, 
+            filtersDisplay
+          ),
+          
+          {
+            displayType: CARDS,
+            key: 'cards',
+            className: 'sfw-cards-area',
+          },
+        ],
+        
+        getTerms:
+          (card: ICard) => _.flatten(
+            card['tables'].map(table =>
+            {
+              var fields = ['ba', 'ca'];
+              return fields.map(f => table.table + '.' + f);
+            }).toArray()
+          )
+      },
+    }),
+    
+    sort: _card(
+    {
+      sorts: List([]),
+      
+      static: 
+      {
+        title: "Sort",
+        preview: "[sorts.property]",
+        colors: ["#C5AFD5", "#EAD9F7"],
+        
+        display: {
+          displayType: ROWS,
+          key: 'sorts',
+          english: 'sort',
+          factoryType: 'sortBlock',
+          row:
+          {
+            inner:
+            [
+              {
+                displayType: TEXT,
+                key: 'property'
+              },
+              {
+                displayType: DROPDOWN,
+                key: 'direction',
+                options: Immutable.List(Directions),
+              },
+            ],
+          },
+        },
+      },
+    }),
+    
+    filter: _card(
+    {
+      filters: List([]),
+      
+      static:
+      {
+        title: "Comparison",
+        preview: "[filters.length] Condition(s)",
+        colors: ["#7EAAB3", "#B9E1E9"],
+        display: filtersDisplay,
+      },
+    }),
+    
+    let: _card(
+    {
+      field: "",
+      expression: "",
+      
+      static: {
+        title: "Let",
+        preview: "[field]",
+        colors: ["#C0C0BE", "#E2E2E0"],
+        display: letVarDisplay,
+      }
+    }),
+
+    var: _card(
+    {
+      field: "",
+      expression: "",
+      
+      static: {
+        colors: ["#b3a37e", "#d7c7a2"],
+        title: "Var",
+        preview: "[field]",
+        display: letVarDisplay,
+        getTerms: (card) => [card['field']],
+      }
+    }),
+
+    count: _wrapperCard(
+    {
+      colors: ["#70B1AC", "#D2F3F0"],
+      title: "Count",
+    }),
+    
+    avg: _wrapperCard(
+    {
+      colors: ["#a2b37e", "#c9daa6"],
+      title: "Average",
+    }),
+    
+    sum: _wrapperCard(
+    {
+      colors: ["#8dc4c1", "#bae8e5"],
+      title: "Sum",
+    }),
+
+    min: _wrapperCard(
+    {
+      colors: ["#cc9898", "#ecbcbc"],
+      title: "Min",
+    }),
+
+    max: _wrapperCard(
+    {
+      colors: ["#8299b8", "#acc6ea"],
+      title: "Max",
+    }),
+
+    exists: _wrapperCard(
+    {
+      colors: ["#a98abf", "#cfb3e3"],
+      title: "Exists",
+    }),
+
+    parentheses: _wrapperCard(
+    {
+      colors: ["#b37e7e", "#daa3a3"],
+      title: "( )",
+    }),
+    
+    weight: _block(
+    {
+      key: "",
+      weight: 0,  
+    }),
+
+    score: _card(
+    {
+      weights: List([]),
+      method: "",
+      
+      static:
+      {
+        colors: ["#9DC3B8", "#D1EFE7"],
+        title: "Score",
+        preview: "[weights.length] Weight(s)",
+        display: {
+          displayType: ROWS,
+          key: 'weights',
+          english: 'weight',
+          factoryType: 'weight',
+          provideParentData: true,
+          row:
+          {
+            inner:
+            [
+              {
+                displayType: TEXT,
+                key: 'key',
+                placeholder: 'Field',
+              },
+              {
+                displayType: NUM,
+                key: 'weight',
+                placeholder: 'Weight',
+              },
+              {
+                displayType: COMPONENT,
+                component: ScoreBar,
+                key: null,
+              },
+            ],
+          },
+        },
+      }
+    }),
+    
+    bar: _block(
+    {
+      id: "",
+      count: 0,
+      percentage: 0,
+      range: {
+        min: 0,
+        max: 0,
+      },
+    }),
+    
+    scorePoint: _block(
+    {
+      id: "",
+      value: 0,
+      score: 0,
+    }),
+    
+    transform: _card(
+    {
+      input: "",
+      domain: List([0,100]),
+      bars: List([]),
+      scorePoints: List([]),
+      
+      static:
+      {
+        colors: ["#E7BE70", "#EDD8B1"],
+        title: "Transform",
+        preview: "[input]",
+        
+        display: [
+          {
+            displayType: TEXT,
+            key: 'input',
+            placeholder: 'Input field',
+          },
+          {
+            displayType: COMPONENT,
+            component: TransformCardComponent,
+            key: 'scorePoints',
+          },
+        ],
+        
+        init: (config?:{[key:string]:any}) => {
+          console.log('init');
+          if(!config)
+          {
+            config = {};
+          }
+          if(!config['scorePoints'] || !config['scorePoints'].size)
+          {
+            config['scorePoints'] = List([
+              make(Blocks.scorePoint, {
+                id: "a",
+                value: 0,
+                score: 0.5,
+              }),
+              make(Blocks.scorePoint, {
+              id: "b",
+                value: 50,
+                score: 0.5,
+              }),
+              make(Blocks.scorePoint, {
+                id: "c",
+                value: 100,
+                score: 0.5,
+              }),
+            ]);
+          }
+          console.log(config);
+          return config;
+        }
+      }
+    }),
+    
+    take: _valueCard(
+    {
+      colors: ["#CDCF85", "#F5F6B3"],
+      title: "Take",
+    }),
+    
+    skip: _valueCard(
+    {
+      colors: ["#CDCF85", "#F5F6B3"],
+      title: "Skip",
+    }),
+    
+    spotlight: _block(
+    {
+      // TODO some day      
+    }),
+    
+    input: _block(
+    {
+      key: "",
+      value: "",
+      inputType: InputType.NUMBER,
+    }),
+  }
+  // Set the "type" field for all blocks equal to its key
+  _.map(Blocks as ({[card:string]:any}), (v, i) => Blocks[i].type = i);
+  
+  // private
+  let typeToRecord = _.reduce(Blocks as ({[card:string]:any}), 
+    (memo, v, i) => {
+      memo[i] = Immutable.Record(v)
+      return memo;
+    }
+  , {});
+  
+  export const make = (block:IBlock, extraConfig?:{[key:string]:any}) =>
+  {
+    block = _.extend({}, block); // shallow clone
+    if(extraConfig)
+    {
+      block = _.extend(block, extraConfig);
+    }
+    
+    if(block.static)
+    {
+      delete block.static;
+    }
+    if(!block.id.length)
+    {
+      block.id = "block-" + Math.random();
+    }
+    
+    let {type} = block;
+    if(Blocks[type].static.init)
+    {
+      block = Blocks[type].static.init(block);
+    }
+    
+    return typeToRecord[type](block);
+  }
+  
+  export const CardTypes = _.compact(_.map(Blocks, (block, k: string) => block._isCard && k ));
+  
+  
+  
+  // TODO include in a common file
+  // abstract  
+  interface IRecord<T>
+  {
+    id: string;
+    type: string;
     set: (f: string, v: any) => T;
     setIn: (f: string, v: any) => T;
     get: (f: string | number) => any;
@@ -244,497 +794,40 @@ export module BuilderTypes
     delete: (f: string) => T;
     deleteIn: (f: (string | number)[] | KeyPath) => T;
   }
-  
-  // abstract
-  export class ICard<T> extends IRecord<T>
+  export interface IInput extends IRecord<IInput>
   {
-    _isCard: boolean = true;
-    
-    // the following fields are excluded from the server save    
-    colors: string[] = ["#89B4A7", "#C1EADE"];
-    title: string = "Card";
-    display: Display | Display[];
-    preview: string | ((c:ICard<any>) => string) = "[type]";
-    // The BuilderTypes.getPreview function constructs
-    // a preview from a card object based on this string.
-    // It replaces anything within [] with the value for that key.
-    // If an array of objects, you can specify: [arrayKey.objectKey]
-    // and it will map through and join the values with ", ";
-  }
-  
-  export type ICards = List<ICard<any>>;
-  export type CardString = string | ICard<any>;
-  
-  // private
-  class AbstractWrapperCard<T> extends ICard<T>
-  {
-    cards: ICards = List([]);
-    preview: string | ((c:AbstractWrapperCard<any>) => string) = (c:AbstractWrapperCard<any>): string => {
-      if(c.cards.size)
-      {
-        let card = c.cards.get(0);
-        return getPreview(F[card.type]());
-      }
-      return "Nothing";
-    }
-    
-    display: Display | Display[] = wrapperDisplay;
-  }
-
-  // BuildingBlocks
-  export const Blocks =
-  { 
-    sortBlock: class Sort extends IRecord<Sort>
-    {
-      property: string = "";
-      direction: Direction = Direction.DESC;
-    },
-    
-    filterBlock: class Filter extends IRecord<Filter>
-    {
-      first: string = "";
-      second: string = "";
-      operator: Operator = Operator.EQ;
-      combinator: Combinator = Combinator.AND;
-    },
-    
-    table: class Table extends IRecord<Table>
-    {
-      table: string = "";
-      iterator: string = "";
-    },
-    
-    field: class Field extends IRecord<Field>
-    {
-      field: string = "";
-    },
-    
-    sfw: class SfwCard extends AbstractWrapperCard<SfwCard>
-    {
-      tables: List<any> = List([]);
-      fields: List<any> = List([]);
-      filters: List<any> = List([]);
-      colors = ["#89B4A7", "#C1EADE"];
-      
-      title = "Select / From";
-      preview = "[tables.table]: [fields.field]";
-      
-      display = [
-        {
-          header: 'Select',
-          displayType: ROWS,
-          key: 'fields',
-          english: 'field',
-          factoryType: 'field',
-          row:
-          {
-            inner:
-            {
-              displayType: TEXT,
-              key: 'field'
-            },
-          },
-        },
-        
-        {
-          header: 'From',
-          displayType: ROWS,
-          key: 'tables',
-          english: 'table',
-          factoryType: 'table',
-          row: 
-          {
-            inner:
-            [  
-              {
-                displayType: TEXT,
-                key: 'table',
-              },
-              {
-                displayType: LABEL,
-                label: 'as',
-                key: null,
-              },
-              {
-                displayType: TEXT,
-                key: 'iterator',
-              },
-            ],
-          },
-        },
-        
-        _.extend(
-          {
-            header: 'Where',
-          }, 
-          filtersDisplay
-        ),
-        
-        {
-          displayType: CARDS,
-          key: 'cards',
-          className: 'sfw-cards-area',
-        },
-      ];
-    },
-    
-    sort: class SortCard extends ICard<SortCard>
-    {
-      sorts: List<any> = List([]);
-      title = "Sort";
-      preview = "[sorts.property]";
-      colors = ["#C5AFD5", "#EAD9F7"];
-      display = {
-        displayType: ROWS,
-        key: 'sorts',
-        english: 'sort',
-        factoryType: 'sort',
-        row:
-        {
-          inner:
-          [
-            {
-              displayType: TEXT,
-              key: 'property'
-            },
-            {
-              displayType: DROPDOWN,
-              key: 'direction',
-              options: Immutable.List(Directions),
-            },
-          ],
-        },
-      };
-    },
-    
-    filter: class FilterCard extends ICard<FilterCard>
-    {
-      filters: List<any> = List([]);
-      title = "Comparison";
-      preview = "[filters.length] Condition(s)"
-      colors = ["#7EAAB3", "#B9E1E9"];
-      display = filtersDisplay;
-    },
-    
-    let: class LetCard extends ICard<LetCard>
-    {
-      field: string = "";
-      expression = "";
-      title = "Let";
-      preview = "[field]";
-      colors = ["#C0C0BE", "#E2E2E0"];
-      display = letVarDisplay;
-    },
-
-    var: class VarCard extends ICard<VarCard>
-    {
-      field: string = "";
-      expression = "";
-      colors = ["#b3a37e", "#d7c7a2"];
-      title = "Var";
-      preview = "[field]";
-      display = letVarDisplay;
-    },
-
-    count: class CountCard extends AbstractWrapperCard<CountCard>
-    {
-      colors = ["#70B1AC", "#D2F3F0"];
-      title = "Count";
-    },
-    
-    avg: class AvgCard extends AbstractWrapperCard<AvgCard>
-    {
-      colors = ["#a2b37e", "#c9daa6"];
-      title = "Average";
-    },
-    
-    sum: class SumCard extends AbstractWrapperCard<SumCard>
-    {
-      colors = ["#8dc4c1", "#bae8e5"];
-      title = "Sum";
-    },
-
-    min: class MinCard extends AbstractWrapperCard<MinCard>
-    {
-      colors = ["#cc9898", "#ecbcbc"];
-      title = "Min";
-    },
-
-    max: class MaxCard extends AbstractWrapperCard<MaxCard>
-    {
-      colors = ["#8299b8", "#acc6ea"];
-      title = "Max";
-    },
-
-    exists: class ExistsCard extends AbstractWrapperCard<ExistsCard>
-    {
-      colors = ["#a98abf", "#cfb3e3"];
-      title = "Exists";
-    },
-
-    parentheses: class ParenthesesCard extends AbstractWrapperCard<ParenthesesCard>
-    {
-      colors = ["#b37e7e", "#daa3a3"];
-      title = "( )";
-    },
-    
-    weight: class Weight extends IRecord<Weight>
-    {
-      key: string = "";
-      weight: number = 0;  
-    },
-
-    score: class ScoreCard extends ICard<ScoreCard>
-    {
-      weights: List<any> = List([]);
-      method: string = "";
-      colors = ["#9DC3B8", "#D1EFE7"];
-      title = "Score";
-      
-      display = {
-        displayType: ROWS,
-        key: 'weights',
-        english: 'weight',
-        factoryType: 'weight',
-        provideParentData: true,
-        row:
-        {
-          inner:
-          [
-            {
-              displayType: TEXT,
-              key: 'key',
-              placeholder: 'Field',
-            },
-            {
-              displayType: NUM,
-              key: 'weight',
-              placeholder: 'Weight',
-            },
-            {
-              displayType: COMPONENT,
-              component: ScoreBar,
-              key: null,
-            },
-          ],
-        },
-      };
-    },
-    
-    bar: class Bar extends IRecord<Bar>
-    {
-      id: string = "";
-      count: number = 0;
-      percentage: number = 0;
-      range: {
-        min: number;
-        max: number;
-      } = {
-        min: 0,
-        max: 0,
-      };
-    },
-    
-    scorePoint: class ScorePoint extends IRecord<ScorePoint>
-    {
-      id: string = "";
-      value: number = 0;
-      score: number = 0;
-    },
-    
-    transform: class TransformCard extends ICard<TransformCard>
-    {
-      input: string = "";
-      domain: List<number> = List([0,100]);
-      bars = List([]);
-      scorePoints = List([]);
-      colors = ["#E7BE70", "#EDD8B1"];
-      title = "Transform";
-      
-      display = [
-        {
-          displayType: TEXT,
-          key: 'input',
-          placeholder: 'Input field',
-        },
-        {
-          displayType: COMPONENT,
-          component: TransformCardComponent,
-          key: 'scorePoints',
-        },
-      ];
-      
-      static init = (config?:any) => {
-        if(!config)
-        {
-          config = {};
-        }
-        if(!config.scorePoints)
-        {
-          let scorePoints = List([
-            F.scorePoint({
-              id: "a",
-              value: 0,
-              score: 0.5,
-            }),
-            F.scorePoint({
-            id: "b",
-              value: 50,
-              score: 0.5,
-            }),
-            F.scorePoint({
-              id: "c",
-              value: 100,
-              score: 0.5,
-            }),
-          ]);
-          if(Immutable.Map.isMap(config))
-          {
-            config = config.set('scorePoints', scorePoints);
-          }
-          else
-          {
-            config.scorePoints = scorePoints;
-          }
-        }
-        return config;
-      }
-    },
-    
-    take: class TakeCard extends ICard<TakeCard>
-    {
-      colors = ["#CDCF85", "#F5F6B3"];
-      value: string = "";
-      title = "Take";
-      display = valueDisplay;
-    },
-    
-    skip: class SkipCard extends ICard<SkipCard>
-    {
-      value: string = "";
-      colors = ["#CDCF85", "#F5F6B3"];
-      title = "Skip";
-      display = valueDisplay;
-    },
-    
-    spotlight: class Spotlight extends IRecord<Spotlight>
-    {
-      
-    },
-  }
-  
-  export const CardTypes = _.compact(_.map(Blocks, (C, k: string) => (new C())._isCard && k ));
-  
-  export class IInput extends IRecord<IInput>
-  {
-    type = "input";
-    key: string = "";
-    value: string = "";
-    inputType: InputType = InputType.NUMBER;
-  }
-  export const _IInput = (config?:any): IInput =>
-  {
-    let r = Immutable.Record(new IInput());
-    return new r(_.extend({}, {id: "input-" + Math.random(), config})) as any as IInput;
-  }
-  
-  // A query can be viewed and edited in the Builder
-  // currently, only Variants are Queries, but that may change
-  export interface IQuery
-  {
-    id: string;
-    cards: ICards;
-    inputs: List<any>;
-    tql: string;
-    mode: string;
-    version: boolean;
-    name: string;
-    lastEdited: string;
-  }
-  
-  // map of type => constructor
-  const AF: {
-    [type: string]: (config?:any) => any
-  } =
-    _.reduce(Blocks, (memo, C: any, type: string) => {
-      memo[type] =
-        (config?) => _F(C, type, config);
-      return memo;
-    }, {} as {[type: string]: (config?:any) => any});
-  AF['input'] = _IInput;
-  
-  // usage: F.sort({ ... })
-  export const F = AF as any;
-
-  var typeToRecord: any = {}; // for memoize-ing records
-  function _F(C, type, config?): any
-  {
-    if(config)
-    {
-      _cardFieldsToExcludeFromServer.map(field => {
-        if(Immutable.Map.isMap(config))
-        {
-          config = config.delete(field)
-        }
-        else
-        {
-          delete config[field];
-        }
-      });
-    }
-    
-    if(C.init)
-    {
-      config = C.init(config);
-    }
-    
-    config = _.extend({}, 
-      {
-        id: "id-" + Math.random(),
-      }, 
-      config,
-      {
-        type,
-      }
-    );
-    
-    if(!typeToRecord[type])
-    {
-      typeToRecord[type] = Immutable.Record(new C());
-    }
-    return new typeToRecord[type](config);
+    type: string;
+    key: string;
+    value: string;
+    inputType: InputType;
   }
   
   export const recordFromJS = (value: any) =>
   {
-    if(Immutable.Map.isMap(value) && value.get('type'))
+    if(Array.isArray(value) || typeof value === 'object')
     {
-      if(F[value.get('type')])
+      value = _.reduce(value, (memo, v, key) =>
       {
-        value = value.map(recordFromJS);
-        value = F[value.get('type')](value);
+        memo[key] = recordFromJS(v);
+        return memo;
+      }, Array.isArray(value) ? [] : {});
+      
+      if(value.type && Blocks[value.type])
+      {
+        value = make(value);
       }
-      // else not a valid type
-    }
-    else if(Immutable.Iterable.isIterable(value))
-    {
-      value = value.map(recordFromJS);
+      else
+      {
+        value = Immutable.fromJS(value);
+      }
     }
     
     return value;
   }
 
-  // TODO check if this is uneeded and above function will suffice
-  export const recordsFromJS = (cardsObj: any[]): BuilderTypes.ICards =>
+  export function getPreview(card:ICard):string
   {
-    var cards = Immutable.fromJS(cardsObj);
-    cards = cards.map(recordFromJS);
-    return cards as BuilderTypes.ICards;
-  }
-
-  export function getPreview(card:ICard<any>):string
-  {
-    let {preview} = card;
+    let {preview} = card.static;
     if(typeof preview === 'string')
     {
       return preview.replace(/\[[a-z\.]*\]/g, str =>
@@ -757,17 +850,7 @@ export module BuilderTypes
       return preview(card);
     }
   }  
-
-  const _cardFieldsToExcludeFromServer =
-  [
-    'preview',
-    'title',
-    'colors',
-    'display',
-  ];
 }
-
-
 
 export default BuilderTypes;
 

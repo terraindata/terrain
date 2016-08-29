@@ -59,8 +59,6 @@ interface Props
 {
   keyPath: KeyPath;
   data : any; // record
-  
-  type?: string;
   display?: Display | Display[];
   
   keys: List<string>;
@@ -193,16 +191,29 @@ class BuilderComponent extends PureClasss<Props>
         content = (
           <div
             key={key}
-            className='card-flex'
           >
-            <BuilderComponent
-              display={d.flex}
-              keyPath={keyPath}
-              data={data}
-              canEdit={this.props.canEdit}
-              keys={this.props.keys}
-              parentData={this.props.parentData}
-            />
+            <div
+              className='card-flex'
+            >
+              <BuilderComponent
+                display={d.flex}
+                keyPath={this.props.keyPath}
+                data={data}
+                canEdit={this.props.canEdit}
+                keys={this.props.keys}
+                parentData={this.props.parentData}
+              />
+            </div>
+            { !d.below ? null : 
+              <BuilderComponent
+                display={d.below}
+                keyPath={this.props.keyPath}
+                data={data}
+                canEdit={this.props.canEdit}
+                keys={this.props.keys}
+                parentData={this.props.parentData}
+              />
+            }
           </div>
         );
       break;
@@ -303,12 +314,12 @@ class BuilderComponent extends PureClasss<Props>
     
     if(!display)
     {
-      if(!data.display)
+      if(!data.static || !data.static.display)
       {
         throw new Error("Insufficient props supplied to BuilderComponent");
       }
       
-      display = data.display;
+      display = data.static.display;
     }
     
     if(Array.isArray(display))

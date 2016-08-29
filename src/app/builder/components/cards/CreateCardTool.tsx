@@ -119,7 +119,7 @@ class CreateCardTool extends PureClasss<Props>
          {
            _.map(CardTypes as any, (type:string) => 
            {
-             let card = BuilderTypes.F[type]();
+             let card = BuilderTypes.make(BuilderTypes.Blocks[type]);
              return (
                <a
                  className="create-card-button"
@@ -127,11 +127,11 @@ class CreateCardTool extends PureClasss<Props>
                  rel={type}
                  onClick={this.createCard}
                  style={{
-                   backgroundColor: card.colors[0],
+                   backgroundColor: card.static.colors[0],
                  }}
                >
                  <div className="create-card-button-inner" rel={type}>
-                   { card.title }
+                   { card.static.title }
                  </div>
                </a>
              );

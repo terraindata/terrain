@@ -130,7 +130,7 @@ var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon"
 
 interface Props
 {
-  card: BuilderTypes.ICard<any>;
+  card: BuilderTypes.ICard;
   index: number;
   singleCard?: boolean;
   keys: List<string>;
@@ -232,10 +232,10 @@ class Card extends PureClasss<Props>
   componentDidMount()
   {
     this.dragPreview = createDragPreview(
-      this.props.card.title + ' (' + BuilderTypes.getPreview(this.props.card) + ')',
+      this.props.card.static.title + ' (' + BuilderTypes.getPreview(this.props.card) + ')',
     {
-      backgroundColor: this.props.card.colors[1],
-      borderColor: this.props.card.colors[0],
+      backgroundColor: this.props.card.static.colors[1],
+      borderColor: this.props.card.static.colors[0],
       color: '#fff',
       fontSize: 15,
       fontWeight: 'bold',
@@ -389,7 +389,6 @@ class Card extends PureClasss<Props>
       keys={this.props.keys}
       canEdit={this.props.canEdit}
       data={this.props.card}
-      type={this.props.card.type}
       keyPath={
         this.props.singleCard
         ? this.props.keyPath
@@ -404,7 +403,7 @@ class Card extends PureClasss<Props>
 		);
     
     let {card} = this.props;
-		let {title} = card;
+		let {title} = card.static;
     const { isDragging, connectDragSource, connectDropTarget } = this.props;
     const rendering = 
       <div
@@ -434,8 +433,8 @@ class Card extends PureClasss<Props>
           <div
             className={'card-inner ' + (this.props.singleCard ? 'card-single' : '')}
             style={{
-              background: card.colors[1],
-              borderColor: card.colors[0],
+              background: card.static.colors[1],
+              borderColor: card.static.colors[0],
             }}
             ref='cardInner'
           >
@@ -448,7 +447,7 @@ class Card extends PureClasss<Props>
                     'card-title-card-hovering': this.state.hovering,
                   })}
                   style={{
-                    background: card.colors[0],
+                    background: card.static.colors[0],
                   }}
                   onClick={this.handleTitleClick}
                   >

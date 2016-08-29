@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const Immutable = require('immutable');
+import * as Immutable from 'immutable';
 import BrowserTypes from './../../browser/BrowserTypes.tsx';
 import BuilderTypes from './../BuilderTypes.tsx';
 import Ajax from './../../util/Ajax.tsx';
@@ -97,8 +97,9 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
               {
                 return;
               }
-              item.cards = BuilderTypes.recordsFromJS(item.cards || []);
-              item.inputs = BuilderTypes.recordsFromJS(item.inputs || []);
+              item.cards = BuilderTypes.recordFromJS(item.cards || []);
+              console.log(item.cards);
+              item.inputs = BuilderTypes.recordFromJS(item.inputs || []);
               item.version = false;
               Actions.setVariant(variantId, item);
             }
@@ -135,13 +136,23 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   (state, action: {
     payload?: { keyPath: KeyPath, index: number, factoryType: string }
   }) =>
-    state.updateIn(action.payload.keyPath, arr =>
+  {
+    console.log(action.payload, BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType]));
+    console.log(state.updateIn(action.payload.keyPath, arr =>
       arr.splice
       (
-        action.payload.index === -1 ? arr.size : action.payload.index, 0, 
-        BuilderTypes.F[action.payload.factoryType]()
+        action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index, 0, 
+        BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType])
       )
-    ),
+    ));
+    return state.updateIn(action.payload.keyPath, arr =>
+      arr.splice
+      (
+        action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index, 0, 
+        BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType])
+      )
+    )
+  },
     
 [ActionTypes.move]:  
   (state, action: {
@@ -169,6 +180,25 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   }) =>
     state.set('hoveringCardId', action.payload.cardId)
   ,
+
+[ActionTypes.selectCard]:
+  (state, action: {
+    payload?: { cardId: ID, shiftPressed: boolean, ctrlPressed: boolean },
+  }) =>
+  {
+    let {cardId, shiftPressed, ctrlPressed} = action.payload;
+    if(!shiftPressed && !ctrlPressed)
+    {
+      state = state.set('selectedCardIds', Immutable.Map({}));
+    }
+    if(ctrlPressed)
+    {
+      return state.setIn(['selectedCardIds', cardId],
+        !state.getIn(['selectedCardIds', cardId]));
+    }
+    
+    return state.setIn(['selectedCardIds', cardId], true);
+  },
   
 };
 

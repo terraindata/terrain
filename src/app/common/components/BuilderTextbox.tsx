@@ -161,7 +161,7 @@ class BuilderTextbox extends PureClasss<Props>
     }
     else if(this.isText())
     {
-      value = BuilderTypes.F.parentheses();
+      value = BuilderTypes.make(BuilderTypes.Blocks.parentheses);
     }
     
     this.backupValue = this.props.value;
@@ -192,7 +192,8 @@ class BuilderTextbox extends PureClasss<Props>
     );
   }
   
-  render() {
+  render()
+  {
     if(this.isText())
     {
       const { isOverCurrent, connectDropTarget } = this.props;
@@ -237,7 +238,7 @@ class BuilderTextbox extends PureClasss<Props>
     if(cards.size)
     {
       var card = cards.get(0);
-      var color = card.colors[0] as string;
+      var color = card.static.colors[0] as string;
       var title: string = card.title;
       var preview = BuilderTypes.getPreview(card);
     }
