@@ -72,7 +72,6 @@ class ManualPopup extends Classs<Props>
     {
       open: false,
     }
-    this.addColumn = _.debounce(this.addColumn, 50);
   }
   
   shouldComponentUpdate(nextProps, nextState)
