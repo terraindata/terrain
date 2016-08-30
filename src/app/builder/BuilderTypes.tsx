@@ -67,8 +67,8 @@ export module BuilderTypes
 {
   export const cardList = 
   {
-    'Select / From': 'sfw',
-    'Take / Limit': 'take',
+    'Select From': 'sfw',
+    'Take Limit': 'take',
     'Sort': 'sort',
     'Var': 'var',
     'Let': 'let',
@@ -81,7 +81,7 @@ export module BuilderTypes
     'Min': 'min',
     'Exists': 'exists',
     '( )': 'parentheses',
-    'Skip / Offset': 'skip',
+    'Skip Offset': 'skip',
     'Comparison': 'filter'
   }
 
@@ -398,7 +398,7 @@ export module BuilderTypes
       
       static:
       {
-        manualEntry: ManualConfig[0]['Select / From'],
+        manualEntry: ManualConfig[0]['Select From'],
         colors: ["#89B4A7", "#C1EADE"],
         title: "Select / From",
         preview: "[tables.table]: [fields.field]",
@@ -749,7 +749,7 @@ export module BuilderTypes
     take: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
-      manualEntry: ManualConfig[0]['Take / Limit'],
+      manualEntry: ManualConfig[0]['Take Limit'],
       title: "Take / Limit",
       tql: "LIMIT $value",
     }),
@@ -757,7 +757,7 @@ export module BuilderTypes
     skip: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
-      manualEntry: ManualConfig[0]['Skip / Offset'],
+      manualEntry: ManualConfig[0]['Skip Offset'],
       title: "Skip / Offset",
       tql: "OFFSET $value",
     }),
