@@ -46,6 +46,7 @@ import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 import { BuilderTypes } from "../builder/BuilderTypes.tsx";
 type ICard = BuilderTypes.ICard;
+type IBlock = BuilderTypes.IBlock;
 type IInput = BuilderTypes.IInput;
 
 
@@ -145,114 +146,68 @@ class TQLConverter
     return cards;
   }
 
-  // TODO centralize
-  // parse strings where "$key" indicates to replace "$key" with the value of card[key]
-  //  or functions that are passed in a reference to the card/obj and then return a parse string
-  private static TQLF =
-  {
-    // from: "from '$table' as $iterator $cards",
-    // select: "SELECT $properties",
-    sfw: "SELECT $fields \nFROM $tables \nWHERE $filters $cards",
-      fields: (f, index) => f.field.length ? join(", ", index) + f.field : "",
-      tables: (t, index) => join(", ", index) + "'$table' as $iterator",
-    sort: "ORDER BY $sorts",
-      sorts: (sort, index) => join(", ", index) + "$property " + (sort.direction ? 'desc' : 'asc'),
-    filter: "($filters)",
-      filters: (filter, index, isLast) =>
-        "$first "
-        + OperatorsTQL[filter.operator] + " " +
-        "$second"
-        + (isLast ? "" : " " + CombinatorsTQL[filter.combinator] + " "),
-    
-    let: "let $field = $expression",
-    var: "var $field = $expression",
-    score: (score) => "linearScore([$weights])",
-      weights: (weight, index) => join(", ", index) + "\n[$weight, $key]",
-    
-    transform: "linearTransform([$scorePoints], $input)",
-      scorePoints: (sp, index) => join(", ", index) + "\n[$score, $value]",
-    
-    if: (card) => "if $filters {$cards}"
-      + (card.elses.size ? " else " + (
-        card.elses[0].filters.size
-          ? TQLConverter._parse(TQLConverter.TQLF.if, card.elses[0])
-          : TQLConverter._parse("{$cards}", card.elses[0]) 
-      ) : ""),
-    
-    parentheses: "($cards)",
-    min: "min ($cards)",
-    max: "max ($cards)",
-    avg: "avg ($cards)",
-    count: "count ($cards)",
-    sum: "sum ($cards)",
-    exists: "EXISTS ($cards)",
-    take: "take $value",
-    skip: "skip $value",
-  }
-  
   private static _cards(cards: List<ICard>, append?: string, options?: Options): string
   {
     var glue = "\n" + (append || "");
-    return addTabs("\n" + cards.map(this._card, this).join(glue)) + glue;
+    return addTabs("\n" + cards.map(
+        (card, i) => this._parse(card, i, i === cards.size)
+      ).join(glue)) + glue;
   }
   
-  private static _card(card: ICard): string
+  private static _parse(block: IBlock, index?: number, isLast?: boolean): string
   {
-    // var {TQLF, _parse} = TQLConverter;
-    // var options = this;
-    if(this.TQLF[card.type])
-    {
-      return this._parse(this.TQLF[card.type], card);
-    }
-    
-    console.log("No grammar for: ", card);
-    return "";
-  }
-  
-  private static _parse(pattern: string | PatternFn, 
-    card: ICard, index?: number, isLast?: boolean): string
-  {
-    if(typeof pattern === 'function')
-    {
-      var str = (pattern as PatternFn)(card, index, isLast);
-    }
-    else
-    {
-      var str = pattern as string;
-    }
+    let str = block.static.tql;
     var index = str.indexOf("$");
     while(index !== -1)
     {
-      var f = str.match("\\$[a-zA-Z]+")[0].substr(1); //str.substring(index + 1, str.indexOf(" ", index));
-      str = str.replace("\$" + f, this._value(f, card));
+      var f = str.match("\\$[a-zA-Z]+")[0].substr(1);
+      str = str.replace("\$" + f, this._value(f, block));
       index = str.indexOf("$");
     }
     
     return str;
   }
   
-  private static _value(field: string, card: ICard)
+  private static _value(field: string, block: IBlock)
   {
     if(field === 'cards')
     {
-      return this._cards(card['cards']);
-    }
-    else if(Array.isArray(card[field]) || Immutable.List.isList(card[field]))
-    {
-      return card[field].map(
-        (v, index) => this._parse(this.TQLF[field], v, index, index === card[field].size - 1)
-      ).join("");
-    }
-    else if(typeof card[field] === 'object')
-    {
-      return this._card(card[field]);
+      return this._cards(block['cards']);
     }
     
-    return card[field];
+    if(Array.isArray(block[field]) || Immutable.List.isList(block[field]))
+    {
+      let pieces = 
+        block[field].map(
+          (v, index) => this._parse(v, index, index === block[field].size - 1)
+        );
+      return pieces.join(", ");
+        
+      // TODO if necessary
+      // if(!block.static.tqlJoiner)
+      // {
+      //   console.log(block.static);
+      // }
+      
+      // return pieces.reduce((str, piece, i) => (
+      //     str + piece + (i === pieces.length - 1 ? "" : '%')
+      //   ), "");
+    }
+    
+    if(typeof block[field] === 'object')
+    {
+      return this._parse(block[field]);
+    }
+    
+    if(field.toUpperCase() === field)
+    {
+      // all caps, look up value from corresponding map
+      return BuilderTypes[field.charAt(0) + field.substr(1).toLowerCase() + 'TQL'][block[field.toLowerCase()]]; 
+    }
+    
+    return block[field];
   }
   
 }
-
-// TQLConverter.toTQL = _.debounce(TQLConverter.toTQL, 1000);
 
 export default TQLConverter;

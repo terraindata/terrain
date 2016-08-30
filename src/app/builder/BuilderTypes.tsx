@@ -52,11 +52,14 @@ let Map = Immutable.Map;
 import ScoreBar from './components/charts/ScoreBar.tsx';
 import TransformCardComponent from './components/charts/TransformCard.tsx';
 import Store from './data/BuilderStore.tsx';
-import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, filtersDisplay, wrapperDisplay} from './BuilderDisplays.tsx';
 
+// Interestingly, these have to be above the BuilderDisplays import
+//  since the import itself imports them
 export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
+
+import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, filtersDisplay, wrapperDisplay} from './BuilderDisplays.tsx';
   
 export module BuilderTypes
 {
@@ -70,15 +73,36 @@ export module BuilderTypes
     IN,
     NIN,
   }
+  
+  export const OperatorTQL = {
+    [Operator.EQ]: '=',
+    [Operator.NE]: '!=',
+    [Operator.GE]: '>=',
+    [Operator.GT]: '>',
+    [Operator.LE]: '<=',
+    [Operator.LT]: '<',
+    [Operator.IN]: 'in',
+    [Operator.NIN]: 'notIn',
+  }
 
   export enum Direction {
     ASC,
     DESC
   }
+  
+  export const DirectionTQL = {
+    [Direction.ASC]: 'ASC',
+    [Direction.DESC]: 'DESC',
+  }
 
   export enum Combinator {
     AND,
     OR
+  }
+  
+  export const CombinatorTQL = {
+    [Combinator.AND]: 'AND',
+    [Combinator.OR]: 'OR',
   }
     
   export enum InputType
@@ -135,6 +159,15 @@ export module BuilderTypes
       title: string;
       display: Display | Display[];
       
+      // the format string used for generating tql
+      // - insert the value of a card member by prepending the field's name with $, e.g. "$expression" or "$filters"
+      // - arrays/Lists are joined with "," by default
+      // - to join List with something else, specify a tqlJoiner
+      // - to map a value to another string, write the field name in all caps. the value will be passed into "[FieldName]TQL" map
+      //    e.g. "$DIRECTION" will look up "DirectionTQL" in BuilderTypes and pass the value into it
+      tql: string;
+      tqlJoiner?: string; // DOESNT WORK
+      
       getTerms?: (card: ICard) => string[];
       // given a card, return the "terms" it generates for autocomplete
       
@@ -156,22 +189,38 @@ export module BuilderTypes
   //  and every piece of every card.
   
   // IBlock is a card or a distinct piece / group of card pieces
-  interface IBlock
+  export interface IBlock
   {
     id: string;
     type: string;
-    static?: {[key:string]:any}; // fields not saved on server
+    
+    // fields not saved on server
+    static:
+    {
+      tql: string;
+      tqlJoiner?: string;
+      [field:string]: any;
+    }
     
     [field:string]: any;
   }
   
+  interface IBlockConfig
+  {
+    static: {
+      tql: string;
+      tqlJoiner?: string;
+    }
+    
+    [field:string]:any;
+  }
+  
   // helper function to populate common fields for an IBlock
-  const _block = (config: {[field:string]:any}): IBlock =>
+  const _block = (config: IBlockConfig): IBlock =>
   {
     return _.extend({
       id: "",
       type: "",
-      static: {},
     }, config);
   }
   
@@ -185,7 +234,8 @@ export module BuilderTypes
       title: string;
       preview: string | ((c:ICard) => string);
       display: Display | Display[];
-      // TODO tql here
+      tql: string;
+      tqlJoiner?: string;
       
       getTerms?: (card: ICard) => string[];
       init?: (config?:any) => any;
@@ -212,7 +262,8 @@ export module BuilderTypes
     title: string;
     getTerms?: (card: ICard) => string[];
     display?: Display | Display[];
-    // TODO tql here
+    tql: string;
+    tqlJoiner?: string;
   }
   
   const _wrapperCard = (config:IWrapperCardConfig) =>
@@ -236,11 +287,13 @@ export module BuilderTypes
         },
         
         display: (config.display || wrapperDisplay),
+        
+        tql: config.tql,
       }
     })
   }
   
-  const _valueCard = (config:{ title: string, colors: string[] }) => (
+  const _valueCard = (config:{ title: string, colors: string[], tql: string }) => (
     _card({
       value: 0,
       
@@ -249,6 +302,7 @@ export module BuilderTypes
         colors: config.colors,
         preview: "[value]",
         display: valueDisplay,
+        tql: config.tql,
       }
     })
   );
@@ -260,6 +314,10 @@ export module BuilderTypes
     {
       property: "",
       direction: Direction.DESC,
+      static:
+      {
+        tql: "$property $DIRECTION",
+      }
     }),
     
     filterBlock: _block(
@@ -268,17 +326,29 @@ export module BuilderTypes
       second: "",
       operator: Operator.EQ,
       combinator: Combinator.AND,
+      
+      static: {
+        tql: "$first $OPERATOR $second",
+      }
     }),
     
     table: _block(
     {
       table: "",
       iterator: "",
+      
+      static: {
+        tql: "$table as $iterator",
+      }
     }),
     
     field: _block(
     {
       field: "",
+      
+      static: {
+        tql: "$field",
+      }
     }),
     
     sfw: _card(
@@ -293,6 +363,7 @@ export module BuilderTypes
         colors: ["#89B4A7", "#C1EADE"],
         title: "Select / From",
         preview: "[tables.table]: [fields.field]",
+        tql: "SELECT $fields \nFROM $tables \nWHERE $filters \n$cards",
         
         display: [
           {
@@ -372,6 +443,7 @@ export module BuilderTypes
         title: "Sort",
         preview: "[sorts.property]",
         colors: ["#C5AFD5", "#EAD9F7"],
+        tql: "ORDER BY $sorts",
         
         display: {
           displayType: DisplayType.ROWS,
@@ -407,6 +479,7 @@ export module BuilderTypes
         preview: "[filters.length] Condition(s)",
         colors: ["#7EAAB3", "#B9E1E9"],
         display: filtersDisplay,
+        tql: "$filters",
       },
     }),
     
@@ -420,6 +493,7 @@ export module BuilderTypes
         preview: "[field]",
         colors: ["#C0C0BE", "#E2E2E0"],
         display: letVarDisplay,
+        tql: "LET $field = $expression",
       }
     }),
 
@@ -434,6 +508,7 @@ export module BuilderTypes
         preview: "[field]",
         display: letVarDisplay,
         getTerms: (card) => [card['field']],
+        tql: "VAR $field = $expression",
       }
     }),
 
@@ -441,48 +516,58 @@ export module BuilderTypes
     {
       colors: ["#70B1AC", "#D2F3F0"],
       title: "Count",
+      tql: "COUNT $cards",
     }),
     
     avg: _wrapperCard(
     {
       colors: ["#a2b37e", "#c9daa6"],
       title: "Average",
+      tql: "AVG $cards",
     }),
     
     sum: _wrapperCard(
     {
       colors: ["#8dc4c1", "#bae8e5"],
       title: "Sum",
+      tql: "SUM $cards",
     }),
 
     min: _wrapperCard(
     {
       colors: ["#cc9898", "#ecbcbc"],
       title: "Min",
+      tql: "MIN $cards",
     }),
 
     max: _wrapperCard(
     {
       colors: ["#8299b8", "#acc6ea"],
       title: "Max",
+      tql: "MAX $cards",
     }),
 
     exists: _wrapperCard(
     {
       colors: ["#a98abf", "#cfb3e3"],
       title: "Exists",
+      tql: "EXISTS $cards",
     }),
 
     parentheses: _wrapperCard(
     {
       colors: ["#b37e7e", "#daa3a3"],
       title: "( )",
+      tql: "($cards)",
     }),
     
     weight: _block(
     {
       key: "",
-      weight: 0,  
+      weight: 0,
+      static: {
+        tql: "[$weight, $key]",
+      }
     }),
 
     score: _card(
@@ -495,6 +580,7 @@ export module BuilderTypes
         colors: ["#9DC3B8", "#D1EFE7"],
         title: "Score",
         preview: "[weights.length] Weight(s)",
+        tql: "linearScore([$weights])",
         display: {
           displayType: DisplayType.ROWS,
           key: 'weights',
@@ -535,6 +621,10 @@ export module BuilderTypes
         min: 0,
         max: 0,
       },
+      
+      static: {
+        tql: null, // N/A
+      }
     }),
     
     scorePoint: _block(
@@ -542,6 +632,10 @@ export module BuilderTypes
       id: "",
       value: 0,
       score: 0,
+      
+      static: {
+        tql: "[$score, $value]"
+      }
     }),
     
     transform: _card(
@@ -556,7 +650,7 @@ export module BuilderTypes
         colors: ["#E7BE70", "#EDD8B1"],
         title: "Transform",
         preview: "[input]",
-        
+        tql: "linearTransform([$scorePoints])",
         display: [
           {
             displayType: DisplayType.TEXT,
@@ -605,17 +699,22 @@ export module BuilderTypes
     take: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
-      title: "Take",
+      title: "Take / Limit",
+      tql: "LIMIT $value",
     }),
     
     skip: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
-      title: "Skip",
+      title: "Skip / Offset",
+      tql: "OFFSET $value",
     }),
     
     spotlight: _block(
     {
+      static: {
+        tql: null, // N/A
+      }
       // TODO some day      
     }),
     
@@ -624,6 +723,9 @@ export module BuilderTypes
       key: "",
       value: "",
       inputType: InputType.NUMBER,
+      static: {
+        tql: "VAR $key = $value;"
+      }
     }),
   }
   // Set the "type" field for all blocks equal to its key
