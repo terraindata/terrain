@@ -51,11 +51,9 @@ import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
 var ManualConfig = require('./../ManualConfig2.json');
 var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
-import {BuilderTypes} from './../../builder/BuilderTypes.tsx';
+import BuilderTypes from './../../builder/BuilderTypes.tsx';
 import Card from './../../builder/components/cards/Card.tsx';
 import ManualInfo from './ManualInfo.tsx';
-
-
 import * as Immutable from 'immutable';
 
 var CodeMirror = require('./../../tql/components/Codemirror.js');
@@ -81,9 +79,15 @@ interface Props
 
 class ManualEntry extends Classs<Props>
 {
+
+  allTqlCards = BuilderTypes.cardList;
+  //manualEntry = BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
+  manualEntry = {text: [], snippet: '', summary: '', notation: '', syntax: ''};
+
   constructor(props: Props) 
   {
     super(props);
+    this.manualEntry = BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
     this.state =
       {
         expanded: this.props.expanded,
@@ -110,8 +114,8 @@ class ManualEntry extends Classs<Props>
   highlightKeyWords(text)
   {
     if (!text) return;
-    var keywords = Object.keys(ManualConfig[0]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
-    var phraseTypes = Object.keys(ManualConfig[1]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
+    var keywords = Object.keys(this.allTqlCards).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
+    //var phraseTypes = Object.keys(ManualConfig[1]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
 
     var matchForm = new RegExp('[^A-Za-z](' + keywords.join('|') + ')[^A-Za-z]', 'gi');
     text = reactStringReplace(text, matchForm, (match, i) => (
@@ -124,16 +128,16 @@ class ManualEntry extends Classs<Props>
       </span>
     ));
 
-    matchForm = new RegExp('(' + phraseTypes.join('|') + ')', 'gi');
-    text = reactStringReplace(text, matchForm, (match, i) => (
-      <span         
-        className='manual-entry-phrase-type' 
-        onClick={this.props.openTerm}
-        key={Math.random()}
-      >
-        {match}
-      </span>
-    ));
+    // matchForm = new RegExp('(' + phraseTypes.join('|') + ')', 'gi');
+    // text = reactStringReplace(text, matchForm, (match, i) => (
+    //   <span         
+    //     className='manual-entry-phrase-type' 
+    //     onClick={this.props.openTerm}
+    //     key={Math.random()}
+    //   >
+    //     {match}
+    //   </span>
+    // ));
     
     return (
       <div> 
@@ -147,13 +151,13 @@ class ManualEntry extends Classs<Props>
     return (
       <div className='manual-entry-expanded-area'>
         <div className ='manual-entry-row'>
-          <b>Type:</b>&nbsp;{this.highlightKeyWords(ManualConfig[0][this.props.entryName].Type)}
+          <b>Notation:</b>&nbsp;{this.highlightKeyWords(this.manualEntry.notation)}
         </div> 
         <div className ='manual-entry-row'>
-          <b>Syntax:</b>&nbsp;{this.highlightKeyWords(ManualConfig[0][this.props.entryName].Syntax)}
+          <b>Syntax:</b>&nbsp;{this.highlightKeyWords(this.manualEntry.syntax)}
         </div> 
         <div className ='maunual-entry-indepth'>
-          {this.renderInDepthDescription()}
+           {this.renderInDepthDescription()}
         </div>
       </div>
         );
@@ -216,7 +220,7 @@ class ManualEntry extends Classs<Props>
       </div>
 
       <div className ='manual-entry-summary'>
-        {this.props.phraseType ? ManualConfig[1][this.props.entryName].Summary : this.highlightKeyWords(ManualConfig[0][this.props.entryName].Summary)}
+        {this.props.phraseType ? ManualConfig[1][this.props.entryName].Summary : this.highlightKeyWords(this.manualEntry.summary)}
       </div>
     </div>    
     );
@@ -224,7 +228,7 @@ class ManualEntry extends Classs<Props>
 
   renderCardExample(index) {
 
-    var cardRecord = Immutable.Record(ManualConfig[0][this.props.entryName].Text[index][0]);
+    var cardRecord = Immutable.Record(this.manualEntry.text[index][0]);
     var card = new cardRecord();
 
     return (
@@ -251,7 +255,7 @@ class ManualEntry extends Classs<Props>
       foldGutter: true,
       gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
     }
-    var value = ManualConfig[0][this.props.entryName].Text[index][1];
+    var value = this.manualEntry.text[index][1];
     return (
       <CodeMirror 
         options={options}
@@ -266,19 +270,19 @@ class ManualEntry extends Classs<Props>
     return (
         <div> 
         {
-          Object.keys(ManualConfig[0][this.props.entryName].Text).map((result, index) => {
-            if (typeof ManualConfig[0][this.props.entryName].Text[index] === 'string'){
+          Object.keys(this.manualEntry.text).map((result, index) => {
+            if (typeof this.manualEntry.text[index] === 'string'){
               return (
                 <div key ={index}>
                 {
-                  this.highlightKeyWords(ManualConfig[0][this.props.entryName].Text[index])
+                  this.highlightKeyWords(this.manualEntry.text[index])
                 }
                 <br/>
                 </div> 
                 );
             }
             else {
-              var numLines = ManualConfig[0][this.props.entryName].Text[index][1].split('\n').length;
+              var numLines = this.manualEntry.text[index][1].split('\n').length;
               var padding = numLines === 1 ? 2 : 8;
               return (
                  <div 

@@ -62,6 +62,26 @@ var ManualConfig = require('./../manual/ManualConfig2.json');
 
 export module BuilderTypes
 {
+  export const cardList = 
+  {
+    'Select / From': 'sfw',
+    'Take': 'take',
+    'Sort': 'sort',
+    'Var': 'var',
+    'Let': 'let',
+    'Score': 'score',
+    'Transform': 'transform',
+    'Count': 'count',
+    'Average': 'avg',
+    'Sum': 'sum',
+    'Max': 'max',
+    'Min': 'min',
+    'Exists': 'exists',
+    '( )': 'parentheses',
+    'Skip': 'skip',
+    'Comparison': 'filter'
+  }
+
   export enum Operator {
     EQ,
     NE,

@@ -53,6 +53,7 @@ import ManualEntry from './ManualEntry.tsx';
 
 import * as Immutable from 'immutable';
 const {List} = Immutable;
+import BuilderTypes from './../../builder/BuilderTypes.tsx';
 
 var CloseIcon = require('./../../../images/icon_close.svg');
 var SearchIcon = require('./../../../images/icon_search.svg');
@@ -72,8 +73,8 @@ interface Props
 
 class Manual extends Classs<Props>
 {
-  allTqlCards = Object.keys(ManualConfig[0]);
-  allPhraseTypes = Object.keys(ManualConfig[1]);
+  allTqlCards = Object.keys(BuilderTypes.cardList);
+  //allPhraseTypes = Object.keys(ManualConfig[1]);
 
   constructor(props: Props)
   {
@@ -83,14 +84,15 @@ class Manual extends Classs<Props>
     {
        return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
     });
-    var phraseTypes = this.allPhraseTypes.filter((key) =>
-    {
-       return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
-    });
+    // var phraseTypes = this.allPhraseTypes.filter((key) =>
+    // {
+    //    return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
+    // });
     this.state = {
       expanded: this.props.selectedKey,
       visibleTqlCards: tqlCards,
-      visiblePhraseTypes: phraseTypes,
+      //visiblePhraseTypes: phraseTypes,
+      visiblePhraseTypes: [],
       value,
       selectedKey: this.props.selectedKey || '',
       expandTqlCards: true,
@@ -106,7 +108,7 @@ class Manual extends Classs<Props>
 
   renderTqlCardsList()
   {
-   var height = 22 * Object.keys(ManualConfig[0]).length;
+   var height = 22 * this.allTqlCards.length;
    var style = this.state.expandTqlCards ? {maxHeight: height + 'px'}
      : {maxHeight: '0px'}
     return (
@@ -134,29 +136,30 @@ class Manual extends Classs<Props>
 
   renderPhraseTypesList()
   {
-    var height = 22 * Object.keys(ManualConfig[1]).length;
-    var style = this.state.expandPhraseTypes ? {maxHeight: height + 'px'}
-     : {maxHeight: '0px'}
-    return (
-      <div className='manual-sidebar-section' style={style}>
-        {
-          this.allPhraseTypes.sort().map((result, index) =>
-            <div key ={index} className='manual-left-column-row'>
-              <div 
-                className={classNames({
-                  'manual-left-column-entry': true,
-                  'manual-entry-left-selected': this.state.selectedKey === result,
-                })}
-                onClick={this.search.bind(this, result, false)}
-              > 
-                {result} 
-              </div>
-              <br />
-            </div> 
-          )
-        }
-      </div>
-    );
+    // //var height = 22 * Object.keys(ManualConfig[1]).length;
+    // var style = this.state.expandPhraseTypes ? {maxHeight: height + 'px'}
+    //  : {maxHeight: '0px'}
+    // return (
+    //   <div className='manual-sidebar-section' style={style}>
+    //     {
+    //       this.allPhraseTypes.sort().map((result, index) =>
+    //         <div key ={index} className='manual-left-column-row'>
+    //           <div 
+    //             className={classNames({
+    //               'manual-left-column-entry': true,
+    //               'manual-entry-left-selected': this.state.selectedKey === result,
+    //             })}
+    //             onClick={this.search.bind(this, result, false)}
+    //           > 
+    //             {result} 
+    //           </div>
+    //           <br />
+    //         </div> 
+    //       )
+    //     }
+    //   </div>
+    // );
+    return null;
   }
 
   openTerm(e)
@@ -229,9 +232,9 @@ class Manual extends Classs<Props>
       return (key.toLowerCase().indexOf(value.toLowerCase()) >= 0);
     }).sort();
 
-    var visiblePhraseTypes = this.allPhraseTypes.filter((key) => {
-      return (key.toLowerCase().indexOf(value.toLowerCase()) >= 0);
-    });
+    // var visiblePhraseTypes = this.allPhraseTypes.filter((key) => {
+    //   return (key.toLowerCase().indexOf(value.toLowerCase()) >= 0);
+    // });
 
     var selectedKey = '';
     this.allTqlCards.forEach(function(key, index) {
@@ -240,12 +243,12 @@ class Manual extends Classs<Props>
           selectedKey = key;
         }
     });
-    this.allPhraseTypes.forEach(function(key, index) {
-        if (value.toLowerCase() === key.toLowerCase())
-        {
-          selectedKey = key;
-        }
-    });
+    // this.allPhraseTypes.forEach(function(key, index) {
+    //     if (value.toLowerCase() === key.toLowerCase())
+    //     {
+    //       selectedKey = key;
+    //     }
+    // });
 
     var expanded = !collapsed;
     if(value === '') 
@@ -258,7 +261,7 @@ class Manual extends Classs<Props>
     }
     this.setState({
       visibleTqlCards,
-      visiblePhraseTypes,
+      //visiblePhraseTypes,
       value,
       selectedKey,
       expanded,
@@ -272,7 +275,8 @@ class Manual extends Classs<Props>
 
   renderAutocompleteOption()
   {
-    var options = this.allPhraseTypes.concat(this.allTqlCards);
+    //var options = this.allPhraseTypes.concat(this.allTqlCards);
+    var options = this.allTqlCards;
     return Immutable.List(options.sort());
   }
 
@@ -328,7 +332,7 @@ class Manual extends Classs<Props>
   showPhraseTypes()
   {
     this.setState({
-      visiblePhraseTypes: this.allPhraseTypes,
+      //visiblePhraseTypes: this.allPhraseTypes,
       visibleTqlCards: [],
       expanded: false, 
       selectedKey: 'Phrase Types',
@@ -369,8 +373,10 @@ class Manual extends Classs<Props>
 
   renderLeftColumnMenu()
   {
-    var height = 22 * (Object.keys(ManualConfig[1]).length + Object.keys(ManualConfig[0]).length)
-                + 2 * 26;
+    // var height = 22 * (this.allPhraseTypes.length + this.allTqlCards.length)
+    //             + 2 * 26;
+    // ;
+    var height = 22 * (this.allTqlCards.length) + 2 * 26;
     ;
     var style = this.state.expandSidebar ? {maxHeight: height + 'px'}
      : {maxHeight: '0px'}; 

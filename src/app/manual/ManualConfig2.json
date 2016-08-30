@@ -23,18 +23,7 @@
           {
             "id": "c-4",
             "type": "take",
-            "value": "10",
-            "static": 
-            {
-              "colors": ["#CDCF85", "#F5F6B3"],
-              "display": 
-              {
-                "displayType": 3,
-                "key": "value"
-              },
-              "preview": "[value]",
-              "title": "Take"
-            }
+            "value": "10"
           },
           "take 10"
         ],
@@ -205,48 +194,6 @@
       "text": 
       [ 
         "none"
-      ]
-    }
-  },
-  {
-    "Expression":
-    {  
-      "Summary": "A TQL expression is any valid combination of expressions and operators that returns a single value.",
-      "Text": 
-      [ 
-        "Examples: ",
-        "2",
-        "'name'",
-        "2+2",
-        "3+2*4+func('group')"
-      ]
-    },
-    "Statement":
-    {
-      "Summary": "All operations performed using TQL statements",
-      "Text": 
-      [ 
-        "A Tql statement is one of: ",
-        "- A code block, enclose in curly braces.",
-        "- An expression that does not begin with a curly brace.",
-        "- A bare semicolon, which is treated as whitespace."
-      ]
-    },
-    "Binary Infix":
-    {
-      "Summary": "Sits between two expressions",
-      "Text": 
-      [ 
-        "Infix notation is the notation commonly used in arithmetical and logical formulae and statements. It is characterized by the placement of operators between operands – 'infixed operators' – such as the plus sign in '2 + 2'.",
-        "In infix notation, unlike in prefix or postfix notations, parentheses surrounding groups of operands and operators are necessary to indicate the intended order in which operations are to be performed. In the absence of parentheses, certain precedence rules determine the order of operations."
-      ]
-    },
-    "Binary Prefix":
-    {
-      "Summary": "Precedes it's target",
-      "Text": 
-      [ 
-        "You implement a prefix or postfix unary operator by writing the prefix modifier before the func keyword when declaring the operator function."
       ]
     }
   }
