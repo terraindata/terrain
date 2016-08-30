@@ -253,20 +253,15 @@ class ManualEntry extends Classs<Props>
     //console.log(ManualConfig[0][this.props.entryName].Text[index][0]);
 
     // let card = BuilderTypes.make(BuilderTypes.Blocks["take"]);
-    // console.log(card);
-    // var cardList = Immutable.List(cardRecord);
+
     var cardRecord = Immutable.Record(ManualConfig[0][this.props.entryName].Text[index][0]);
-    console.log(cardRecord);
-    // var record = new cardRecord();
-    // var arr = [];
-    // arr.push(record);
-    //var cardList = Immutable.List(card);
-    //console.log(cardList);
+    var card = new cardRecord();
+
     return (
       <div className='manual-entry-demo'>
         <Card
           {...this.props}
-          card={cardRecord}
+          card={card}
           index={0}
           parentId='CI2XI'
           singleCard={false}
