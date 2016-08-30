@@ -121,6 +121,7 @@ class CreateCardTool extends PureClasss<Props>
            _.map(CardTypes as any, (type:string) => 
            {
              let card = BuilderTypes.make(BuilderTypes.Blocks[type]);
+           
              return (
                <a
                  className="create-card-button"

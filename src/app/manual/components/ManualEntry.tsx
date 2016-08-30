@@ -49,11 +49,14 @@ import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
-var ManualConfig = require('./../ManualConfig.json');
+var ManualConfig = require('./../ManualConfig2.json');
 var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
 import {BuilderTypes} from './../../builder/BuilderTypes.tsx';
 import Card from './../../builder/components/cards/Card.tsx';
 import ManualInfo from './ManualInfo.tsx';
+
+
+import * as Immutable from 'immutable';
 
 var CodeMirror = require('./../../tql/components/Codemirror.js');
 require('./../../tql/components/tql.js');
@@ -247,15 +250,28 @@ class ManualEntry extends Classs<Props>
         //            left: 'calc(70% - 27px)'
         //         }}
         // />
+    //console.log(ManualConfig[0][this.props.entryName].Text[index][0]);
+
+    // let card = BuilderTypes.make(BuilderTypes.Blocks["take"]);
+    // console.log(card);
+    // var cardList = Immutable.List(cardRecord);
+    var cardRecord = Immutable.Record(ManualConfig[0][this.props.entryName].Text[index][0]);
+    console.log(cardRecord);
+    // var record = new cardRecord();
+    // var arr = [];
+    // arr.push(record);
+    //var cardList = Immutable.List(card);
+    //console.log(cardList);
     return (
       <div className='manual-entry-demo'>
         <Card
           {...this.props}
-          card={ManualConfig[0][this.props.entryName].Text[index][0]}
+          card={cardRecord}
           index={0}
           parentId='CI2XI'
           singleCard={false}
           keys={[]}
+          keyPath = {Immutable.List(["queries", "I8LNT", "cards"])}
         /> 
       </div>
     );
@@ -296,25 +312,25 @@ class ManualEntry extends Classs<Props>
                 </div> 
                 );
             }
-            // else {
-            //   var numLines = ManualConfig[0][this.props.entryName].Text[index][1].split('\n').length;
-            //   var padding = numLines === 1 ? 2 : 8;
-            //   return (
-            //      <div 
-            //        key ={index} 
-            //        className='manual-entry-demo-box'
-            //        style={style}
-            //      >
-            //        {this.renderCardExample(index)}
-            //        <div 
-            //          className='manual-entry-codemirror'
-            //          style={{height: (numLines * 14 + padding) + 'px'}}
-            //        >
-            //          {this.renderCodeMirrorExample(index)}
-            //        </div>
-            //      </div>
-            //   );
-            // }
+            else {
+              var numLines = ManualConfig[0][this.props.entryName].Text[index][1].split('\n').length;
+              var padding = numLines === 1 ? 2 : 8;
+              return (
+                 <div 
+                   key ={index} 
+                   className='manual-entry-demo-box'
+                   style={style}
+                 >
+                   {this.renderCardExample(index)}
+                   <div 
+                     className='manual-entry-codemirror'
+                     style={{height: (numLines * 14 + padding) + 'px'}}
+                   >
+                     {this.renderCodeMirrorExample(index)}
+                   </div>
+                 </div>
+              );
+            }
           })
         } 
         </div>
