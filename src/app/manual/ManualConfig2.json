@@ -82,7 +82,7 @@
         [
           {
             "type": "sort",
-            "id": "a",
+            "id": "3",
             "sorts": [
               {
                 "direction": "1",
@@ -90,7 +90,6 @@
                 "id": "b"
               }
             ]
-            
           },
           "ORDER BY user.id desc"
         ]
@@ -99,7 +98,7 @@
     "Filter":
     { 
       "snippet": "none", 
-      "summary": "none",
+      "summary": "Returns a query expression representing the result of filtering the left-hand expression by evaluating the right-hand expression for each element in the query  expression. Elements that cause the expression to be false are filtered out.",
       "notation": "binary infix operator",
       "syntax": "query expression filter expression",
       "text": 
@@ -120,10 +119,10 @@
     },
     "Var":
     { 
-      "snippet": "none", 
-      "summary": "none",
-      "notation": "none",
-      "syntax": "none",
+      "snippet": "Declares a variable", 
+      "summary": "Declares a variable", 
+      "type": "binary infix operator",
+      "syntax": "VAR name",
       "text": 
       [ 
         "none"
@@ -131,10 +130,10 @@
     },
     "Score":
     { 
-      "snippet": "none", 
-      "summary": "none",
-      "notation": "none",
-      "syntax": "none",
+      "snippet": "Used to rank result", 
+      "summary": "Score is used to rank and order results from a query. The score is based on a weighted sum of attributes of the elements.", 
+      "type": "binary prefix operator",
+      "syntax": "linearScore[([weight1, attribute1], [weight2, attribute2]...)]",
       "text": 
       [ 
         "none"
@@ -218,10 +217,10 @@
     },
     "Exists":
     { 
-      "snippet": "none", 
-      "summary": "none",
-      "notation": "none",
-      "syntax": "none",
+      "snippet": "Returns if exists", 
+      "summary": "Tests whether the inner query returns any row.", 
+      "type": "None",
+      "syntax": "WHERE EXISTS (subquery)",
       "text": 
       [ 
         "none"
@@ -258,6 +257,48 @@
       "text": 
       [ 
         "none"
+      ]
+    }
+  },
+  {
+    "Expression":
+    {  
+      "summary": "A TQL expression is any valid combination of expressions and operators that returns a single value.",
+      "text": 
+      [ 
+        "Examples: ",
+        "2",
+        "'name'",
+        "2+2",
+        "3+2*4+func('group')"
+      ]
+    },
+    "Statement":
+    {
+      "summary": "All operations performed using TQL statements",
+      "text": 
+      [ 
+        "A Tql statement is one of: ",
+        "- A code block, enclose in curly braces.",
+        "- An expression that does not begin with a curly brace.",
+        "- A bare semicolon, which is treated as whitespace."
+      ]
+    },
+    "Binary Infix":
+    {
+      "summary": "Sits between two expressions",
+      "text": 
+      [ 
+        "Infix notation is the notation commonly used in arithmetical and logical formulae and statements. It is characterized by the placement of operators between operands – 'infixed operators' – such as the plus sign in '2 + 2'.",
+        "In infix notation, unlike in prefix or postfix notations, parentheses surrounding groups of operands and operators are necessary to indicate the intended order in which operations are to be performed. In the absence of parentheses, certain precedence rules determine the order of operations."
+      ]
+    },
+    "Binary Prefix":
+    {
+      "summary": "Precedes it's target",
+      "text": 
+      [ 
+        "You implement a prefix or postfix unary operator by writing the prefix modifier before the func keyword when declaring the operator function."
       ]
     }
   }

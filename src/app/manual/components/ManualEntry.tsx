@@ -81,13 +81,12 @@ class ManualEntry extends Classs<Props>
 {
 
   allTqlCards = BuilderTypes.cardList;
-  //manualEntry = BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
-  manualEntry = {text: [], snippet: '', summary: '', notation: '', syntax: ''};
+  manualEntry: any;
 
   constructor(props: Props) 
   {
     super(props);
-    this.manualEntry = BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
+    this.manualEntry = this.props.phraseType ? ManualConfig[1][this.props.entryName] : BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
     this.state =
       {
         expanded: this.props.expanded,
@@ -102,8 +101,7 @@ class ManualEntry extends Classs<Props>
         expanded: newProps.expanded
       });
     }
-    this.manualEntry = BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry;
-
+     this.manualEntry = this.props.phraseType ? ManualConfig[1][newProps.entryName] : BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry;
   }
 
   expand()
@@ -117,7 +115,7 @@ class ManualEntry extends Classs<Props>
   {
     if (!text) return;
     var keywords = Object.keys(this.allTqlCards).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
-    //var phraseTypes = Object.keys(ManualConfig[1]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
+    var phraseTypes = Object.keys(ManualConfig[1]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
     var index = keywords.indexOf('( )');
     keywords.splice(index, 1);
     var matchForm = new RegExp('[^A-Za-z](' + keywords.join('|') + ')[^A-Za-z]', 'gi');
@@ -132,16 +130,16 @@ class ManualEntry extends Classs<Props>
       </span>
     ));
 
-    // matchForm = new RegExp('(' + phraseTypes.join('|') + ')', 'gi');
-    // text = reactStringReplace(text, matchForm, (match, i) => (
-    //   <span         
-    //     className='manual-entry-phrase-type' 
-    //     onClick={this.props.openTerm}
-    //     key={Math.random()}
-    //   >
-    //     {match}
-    //   </span>
-    // ));
+    matchForm = new RegExp('(' + phraseTypes.join('|') + ')', 'gi');
+    text = reactStringReplace(text, matchForm, (match, i) => (
+      <span         
+        className='manual-entry-phrase-type' 
+        onClick={this.props.openTerm}
+        key={Math.random()}
+      >
+        {match}
+      </span>
+    ));
     
     return (
       <div> 
@@ -183,11 +181,11 @@ class ManualEntry extends Classs<Props>
     return (
         <div> 
         {
-          Object.keys(ManualConfig[1][this.props.entryName].Text).map((result, index) => {
+          Object.keys(this.manualEntry.text).map((result, index) => {
               return (
                 <div key ={index} className='manual-entry-row'>
                 {
-                  this.highlightKeyWords(ManualConfig[1][this.props.entryName].Text[index])
+                  this.highlightKeyWords(this.manualEntry.text[index])
                 }
                 <br/>
                 </div> 
@@ -224,7 +222,7 @@ class ManualEntry extends Classs<Props>
       </div>
 
       <div className ='manual-entry-summary'>
-        {this.props.phraseType ? ManualConfig[1][this.props.entryName].Summary : this.highlightKeyWords(this.manualEntry.summary)}
+        {this.highlightKeyWords(this.manualEntry.summary)}
       </div>
     </div>    
     );
