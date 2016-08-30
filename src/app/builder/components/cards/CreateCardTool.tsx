@@ -52,7 +52,6 @@ let {CardTypes} = BuilderTypes;
 import { DragSource, DropTarget } from 'react-dnd';
 import PureClasss from '../../../common/components/PureClasss.tsx';
 
-var Manual = require('./../../../manual/ManualConfig.json');
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
 
@@ -121,7 +120,6 @@ class CreateCardTool extends PureClasss<Props>
            _.map(CardTypes as any, (type:string) => 
            {
              let card = BuilderTypes.make(BuilderTypes.Blocks[type]);
-           
              return (
                <a
                  className="create-card-button"
@@ -131,7 +129,7 @@ class CreateCardTool extends PureClasss<Props>
                  style={{
                    backgroundColor: card.static.colors[0],
                  }}
-                 data-tip={Manual[0][card.static.title] ? Manual[0][card.static.title].Snippet : ''}
+                 data-tip={card.static.manualEntry.snippet}
                >
                  <div className="create-card-button-inner" rel={type}>
                    { card.static.title }

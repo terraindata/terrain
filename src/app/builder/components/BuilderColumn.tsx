@@ -208,7 +208,7 @@ var BuilderColumn = React.createClass<any, any>(
   renderContent(canEdit:boolean)
   {
     var query = this.props.query;
-    console.log(query.cards);
+  //  console.log(query.cards);
     switch(this.state.column)
     {
       case COLUMNS.Builder:

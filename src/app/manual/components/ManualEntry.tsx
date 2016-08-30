@@ -82,7 +82,7 @@ class ManualEntry extends Classs<Props>
 
   allTqlCards = BuilderTypes.cardList;
   //manualEntry = BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
-  manualEntry = {text: [], snippet: '', summary: '', notation: '', syntax: ''};
+  manualEntry: any;
 
   constructor(props: Props) 
   {
@@ -102,6 +102,7 @@ class ManualEntry extends Classs<Props>
         expanded: newProps.expanded
       });
     }
+
     this.manualEntry = BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry;
 
   }

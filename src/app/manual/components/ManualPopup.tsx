@@ -49,8 +49,8 @@ import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
+import BuilderTypes from './../../builder/BuilderTypes.tsx';
 var InfoIcon = require('./../../../images/icon_info.svg');
-var Manual = require('./../ManualConfig.json');
 var OpenIcon = require('./../../../images/icon_open.svg');
 
 interface Props
@@ -71,6 +71,7 @@ class ManualPopup extends Classs<Props>
     {
       open: false,
     }
+    this.addColumn = _.debounce(this.addColumn, 10);
   }
   
   shouldComponentUpdate(nextProps, nextState)
@@ -124,17 +125,17 @@ class ManualPopup extends Classs<Props>
   
   openManual()
   {
-    console.log(this.props.canAddColumn);
     this.props.canAddColumn ?  this.addColumn() : this.closeColumn();
   }
 
   render() {
-    var content = Manual[0][this.props.cardName] ? Manual[0][this.props.cardName].Summary : "No description available"
-    if(this.props.cardName === 'General')
-    {
-      content = 'For more information about how to use Terrain Query Language (TQL), see the manual.';
-    }
 
+    var content = 'For more information about how to use Terrain Query Language (TQL), see the manual.';
+    if(this.props.cardName !== 'General') {
+      var manualEntry = BuilderTypes.cardList[this.props.cardName] 
+        && BuilderTypes.Blocks[BuilderTypes.cardList[this.props.cardName]].static.manualEntry;
+      content = manualEntry ? manualEntry.summary : 'No description available';
+    }
     return (
     <div 
       className={classNames({

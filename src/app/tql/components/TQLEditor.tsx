@@ -86,7 +86,6 @@ import 'codemirror/addon/search/jump-to-line.js';
 import 'codemirror/addon/search/matchesonscrollbar.css';
 
 import ManualPopup from './../../manual/components/ManualPopup.tsx';
-var ManualConfig = require('./../../manual/ManualConfig.json');
 var OpenIcon = require('./../../../images/icon_open.svg');
 import TQLPopup from './TQLPopup.tsx';
 
@@ -382,7 +381,7 @@ class TQL extends Classs<Props>
   }
 
   findKeyword(line: string) {
-    var keywords = Object.keys(ManualConfig[0]);
+    var keywords = Object.keys(BuilderTypes.cardList);
     var cardName = '';
     keywords.map(function(word) {
       if(line.toLowerCase().indexOf(word.toLowerCase()) >= 0)
@@ -480,6 +479,8 @@ class TQL extends Classs<Props>
 
   render() 
   {
+    var manualEntry = BuilderTypes.cardList[this.state.cardName] &&
+        BuilderTypes.Blocks[BuilderTypes.cardList[this.state.cardName]].static.manualEntry;
     return (
       <div className='tql-column'>
         { this.renderTopbar() }
@@ -488,8 +489,8 @@ class TQL extends Classs<Props>
           { this.state.syntaxHelpOpen ? 
             <TQLPopup 
               cardName={this.state.cardName}
-              text={ManualConfig[0][this.state.cardName] ? 
-               ManualConfig[0][this.state.cardName].Syntax :
+              text={manualEntry ? 
+               manualEntry.syntax :
                'No syntax help available'}
                style={this.state.syntaxHelpPos}
                addColumn={this.props.addColumn}
@@ -504,8 +505,8 @@ class TQL extends Classs<Props>
             this.state.showTermDefinition ? 
             <TQLPopup 
               cardName={this.state.cardName}
-              text={ManualConfig[0][this.state.cardName] ? 
-               ManualConfig[0][this.state.cardName].Summary :
+              text={manualEntry ? 
+               manualEntry.summary :
                'No definition available'}
                style={this.state.termDefinitionPos}
                addColumn={this.props.addColumn}

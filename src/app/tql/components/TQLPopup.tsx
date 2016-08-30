@@ -50,7 +50,6 @@ import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
 
-var Manual = require('./../../manual/ManualConfig.json');
 var OpenIcon = require('./../../../images/icon_open.svg');
 
 interface Props
@@ -70,7 +69,7 @@ class TQLPopup extends Classs<Props>
 {
   constructor(props: Props) {
     super(props);
-    this.addColumn = _.debounce(this.addColumn, 50);
+    this.addColumn = _.debounce(this.addColumn, 10);
   }
 
   addColumn()

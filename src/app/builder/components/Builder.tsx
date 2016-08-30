@@ -341,7 +341,7 @@ class Builder extends PureClasss<Props>
   handleAddManualColumn(index, cardName?)
   {
     index = index + 1;
-    var colKeys = this.state.colKeys.splice(index, 0, Math.random());
+    let colKeys = this.state.colKeys.splice(index, 0, Math.random());
     this.setState({
       colKeys,
       column: 4,
@@ -368,7 +368,6 @@ class Builder extends PureClasss<Props>
       colKeys: colKeys,
     }); 
     localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
-    
     if(localStorage.getItem('colKeyTypes'))
     {
       var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes'));
