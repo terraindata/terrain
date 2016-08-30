@@ -2,10 +2,9 @@
   {
    "Select / From":
     { 
-      "snippet": "Get data", 
-      "summary": "The Select statement returns a result set of records from one or more tables.",
-      "notation": "prefix operator",
-      "syntax": "SELECT field name(s)",
+      "summary": "Retrieves rows from the database if they meet the condition", 
+      "type": "none",
+      "syntax": "SELECT FROM source WHERE search condition",
       "text": 
       [ 
         "The TQL Select statement returns a result set of records from one or more tables. A Select statement retrieves zero or more rows from one or more database tables or database views. In most applications, Select is the most commonly used data manipulation language (DML) command. As TQL is a declarative programming language, Select queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints.",
@@ -67,10 +66,10 @@
     },
     "Let":
     { 
-      "snippet": "none", 
-      "summary": "none",
-      "notation": "none",
-      "syntax": "none",
+      "snippet": "Defines variable", 
+      "summary": "Returns a query expression representing the result of evaluating each the right hand statement for each element.", 
+      "type": "binary infix operator",
+      "syntax": "query expression LET statement",
       "text": 
       [ 
         "none"
@@ -111,10 +110,10 @@
     },
     "Count":
     { 
-      "snippet": "none", 
-      "summary": "none",
-      "notation": "none",
-      "syntax": "none",
+      "snippet": "Number of elements", 
+      "summary": "Returns an the number of elements in the right hand expression", 
+      "type": " binary prefix operator",
+      "syntax": "COUNT expression",
       "text": 
       [ 
         "none"
@@ -122,10 +121,10 @@
     },
     "Average":
     { 
-      "snippet": "none", 
-      "summary": "none",
-      "notation": "none",
-      "syntax": "none",
+      "snippet": "Returns the average", 
+      "summary": "Returns the average of all elements in the right hand side.", 
+      "type": "binary prefix operator",
+      "syntax": "AVG expression",
       "text": 
       [ 
         "none"
@@ -133,10 +132,10 @@
     },
     "Sum":
     { 
-      "snippet": "none", 
-      "summary": "none",
-      "notation": "none",
-      "syntax": "none",
+      "snippet": "Returns the sum", 
+      "summary": "Returns an the sum of all elements in the right hand side.", 
+      "type": "binary prefix operator",
+      "syntax": "SUM expression",
       "text": 
       [ 
         "none"
@@ -144,10 +143,10 @@
     },
     "Min":
     { 
-      "snippet": "none", 
-      "summary": "none",
-      "notation": "none",
-      "syntax": "none",
+      "snippet": "Returns minimum element", 
+      "summary": "Returns an the minimum of all elements in the right hand side", 
+      "type": "binary prefix operator",
+      "syntax": "MIN expression",
       "text": 
       [ 
         "none"
@@ -155,10 +154,10 @@
     },
     "Max":
     { 
-      "snippet": "none", 
-      "summary": "none",
-      "notation": "none",
-      "syntax": "none",
+      "snippet": "Returns maximum element", 
+      "summary": "Returns an the maximum of all elements in the right hand side", 
+      "type": "binary prefix operator",
+      "syntax": "MAX expression",
       "text": 
       [ 
         "none"
@@ -199,10 +198,10 @@
     },
     "Skip":
     { 
-      "snippet": "none", 
-      "summary": "none",
-      "notation": "none",
-      "syntax": "none",
+      "snippet": "Removes first n elements", 
+      "summary": "Returns a query expression representing the left-hand query expression, with the first n elements removed, where n is the result of evaluating the right-hand expression.", 
+      "type": "binary infix operator",
+      "syntax": "query expression SKIP expression (n)",
       "text": 
       [ 
         "none"

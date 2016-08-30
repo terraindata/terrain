@@ -323,6 +323,7 @@ class ManualEntry extends Classs<Props>
   }
 
   render() {
+    console.log(BuilderTypes.Blocks);
     return (
       <div className ='manual-entry'> 
         {this.props.phraseType ? this.renderPhraseTypeEntry() : this.renderTqlCardEntry()}
