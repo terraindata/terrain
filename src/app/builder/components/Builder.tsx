@@ -341,13 +341,13 @@ class Builder extends PureClasss<Props>
   handleAddManualColumn(index, cardName?)
   {
     index = index + 1;
-    var colKeys = _.clone(this.state.colKeys);
-    colKeys.splice(index, 0, Math.random());
+    var colKeys = this.state.colKeys.splice(index, 0, Math.random());
     this.setState({
       colKeys,
       column: 4,
       cardName
     }); 
+    localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
   }
 
   handleAddColumn(index)

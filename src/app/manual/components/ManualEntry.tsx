@@ -223,50 +223,15 @@ class ManualEntry extends Classs<Props>
   }
 
   renderCardExample(index) {
-        // <ManualInfo 
-        //   information="Use this handle to change the order of fields by clicking and dragging."
-        //   style={{ top: 'calc(50% + 25px)',
-        //            left: 'calc(25% + 20px)'
-        //   }}
-        // />
-     
-        // <ManualInfo 
-        //   information="Use this button to add another field to select."
-        //   style={{ top: 'calc(50% + 25px)',
-        //            left: 'calc(75% - 45px)'
-        //   }}
-        // />
-                  
-        // <ManualInfo 
-        //   information="Use this button to remove the selected field"
-        //   style={{ top: 'calc(50% + 25px)',
-        //            left: 'calc(75% - 24px)'
-        //         }}
-        // />
-                 
-        // <ManualInfo 
-        //   information="Enter the attribute to select here."
-        //   style={{ top: 'calc(50% + 9px)',
-        //            left: 'calc(70% - 27px)'
-        //         }}
-        // />
-    //console.log(ManualConfig[0][this.props.entryName].Text[index][0]);
-
-    // let card = BuilderTypes.make(BuilderTypes.Blocks["take"]);
-    // console.log(card);
-    // var cardList = Immutable.List(cardRecord);
+    //ASK LUKE A/B BEST WAY TO MAKE CARDS HERE
     var cardRecord = Immutable.Record(ManualConfig[0][this.props.entryName].Text[index][0]);
-    console.log(cardRecord);
-    // var record = new cardRecord();
-    // var arr = [];
-    // arr.push(record);
-    //var cardList = Immutable.List(card);
-    //console.log(cardList);
+    var card = new cardRecord();
+
     return (
       <div className='manual-entry-demo'>
         <Card
           {...this.props}
-          card={cardRecord}
+          card={card}
           index={0}
           parentId='CI2XI'
           singleCard={false}

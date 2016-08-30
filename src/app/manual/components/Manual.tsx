@@ -88,7 +88,7 @@ class Manual extends Classs<Props>
        return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
     });
     this.state = {
-      expanded: this.props.manualTab && this.props.selectedKey,
+      expanded: this.props.selectedKey,
       visibleTqlCards: tqlCards,
       visiblePhraseTypes: phraseTypes,
       value,

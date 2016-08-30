@@ -124,8 +124,8 @@ class ManualPopup extends Classs<Props>
   
   openManual()
   {
-    this.props.canAddColumn ?  this.props.addColumn(0, this.props.cardName === 'General' ? '' : this.props.cardName) 
-    : this.closeColumn();
+    console.log(this.props.canAddColumn);
+    this.props.canAddColumn ?  this.addColumn() : this.closeColumn();
   }
 
   render() {
