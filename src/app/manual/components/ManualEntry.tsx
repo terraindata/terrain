@@ -116,8 +116,10 @@ class ManualEntry extends Classs<Props>
     if (!text) return;
     var keywords = Object.keys(this.allTqlCards).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
     //var phraseTypes = Object.keys(ManualConfig[1]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
-
+    var index = keywords.indexOf('( )');
+    keywords.splice(index, 1);
     var matchForm = new RegExp('[^A-Za-z](' + keywords.join('|') + ')[^A-Za-z]', 'gi');
+
     text = reactStringReplace(text, matchForm, (match, i) => (
       <span       
         className='manual-entry-keyword' 
@@ -228,8 +230,9 @@ class ManualEntry extends Classs<Props>
 
   renderCardExample(index) {
 
-    var cardRecord = Immutable.Record(this.manualEntry.text[index][0]);
-    var card = new cardRecord();
+    //var cardRecord = Immutable.Record(this.manualEntry.text[index][0]);
+    //var card = new cardRecord();
+    var card = BuilderTypes.recordFromJS(this.manualEntry.text[index[0]]);
 
     return (
       <div className='manual-entry-demo'>
@@ -327,7 +330,6 @@ class ManualEntry extends Classs<Props>
   }
 
   render() {
-    console.log(BuilderTypes.Blocks);
     return (
       <div className ='manual-entry'> 
         {this.props.phraseType ? this.renderPhraseTypeEntry() : this.renderTqlCardEntry()}

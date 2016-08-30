@@ -621,7 +621,6 @@ export module BuilderTypes
         ],
         
         init: (config?:{[key:string]:any}) => {
-          console.log('init');
           if(!config)
           {
             config = {};
@@ -646,7 +645,6 @@ export module BuilderTypes
               }),
             ]);
           }
-          console.log(config);
           return config;
         }
       }
