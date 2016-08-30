@@ -21,33 +21,87 @@
       [ 
         [
           {
-            "id": "c-4",
             "type": "take",
-            "value": "10"
+            "value": "10",
+            "id": "a"
           },
           "take 10"
         ],
         "Take is a binary infix operator, meaning it sits between two expressions. Take returns a query expression that is the first n results of the query expression on its left hand side.  The number of results n to be returned is determined from the right hand side. In order to get a specific set of results, the data can be sorted based on some parameter first and then the top n results selected via Take. For example, if you wanted the 10 oldest people in a group, you would sort the people based on descending age and then use 'Take 10'.",
-        "This example takes the first 10 results (the names of users) from the table 'users.'"
+        "This example takes the first 10 results (the names of users) from the table 'users.'",
+        [
+          {
+            "cards": [
+              {
+                "type": "take",
+                "value": 10,
+                "id": "a"
+              }
+            ],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "user.name",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "user.name",
+                "operator": 0,
+                "second": "John",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "iterator": "user",
+              "table": "users",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e"
+          },
+          "SELECT user.name\nFROM 'users' as user\nWHERE user.name == John\ntake 10;"
+        ]
       ]
     },
     "Sort":
     { 
       "snippet": "none", 
-      "summary": "Returns a query expression representing the result of sorting the left-hand expression in ascending order of the value returned by the right-hand expression.",
+      "summary": "Returns a query expression representing the result of filtering the left-hand expression by evaluating the right-hand expression for each element in the query  expression. Elements that cause the expression to be false are filtered out.",
       "notation": "binary infix operator",
       "syntax": "query expression sort expression",
       "text": 
       [ 
-        "from 'users' as user sort user.name"
+        "from 'users' as user sort user.name",
+        [
+          {
+            "type": "sort",
+            "id": "a",
+            "sorts": [
+              {
+                "direction": "1",
+                "property": "user.id",
+                "id": "b"
+              }
+            ]
+            
+          },
+          "ORDER BY user.id desc"
+        ]
       ]
     },
     "Filter":
     { 
       "snippet": "none", 
       "summary": "none",
-      "notation": "none",
-      "syntax": "none",
+      "notation": "binary infix operator",
+      "syntax": "query expression filter expression",
       "text": 
       [ 
         "none"
@@ -105,7 +159,17 @@
       "syntax": "COUNT expression",
       "text": 
       [ 
-        "none"
+        "none",
+        [
+          {
+            "type": "count",
+            "id": "b",
+            "cards": [
+
+            ]
+          },
+          "count"
+        ]
       ]
     },
     "Average":

@@ -102,6 +102,8 @@ class ManualEntry extends Classs<Props>
         expanded: newProps.expanded
       });
     }
+    this.manualEntry = BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry;
+
   }
 
   expand()
@@ -227,10 +229,7 @@ class ManualEntry extends Classs<Props>
   }
 
   renderCardExample(index) {
-
-    var cardRecord = Immutable.Record(this.manualEntry.text[index][0]);
-    var card = new cardRecord();
-
+    var card = BuilderTypes.recordFromJS(this.manualEntry.text[index][0]);
     return (
       <div className='manual-entry-demo'>
         <Card
@@ -327,7 +326,6 @@ class ManualEntry extends Classs<Props>
   }
 
   render() {
-    console.log(BuilderTypes.Blocks);
     return (
       <div className ='manual-entry'> 
         {this.props.phraseType ? this.renderPhraseTypeEntry() : this.renderTqlCardEntry()}
