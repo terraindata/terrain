@@ -101,7 +101,7 @@ class ManualEntry extends Classs<Props>
         expanded: newProps.expanded
       });
     }
-     this.manualEntry = this.props.phraseType ? ManualConfig[1][newProps.entryName] : BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry;
+    this.manualEntry = this.props.phraseType ? ManualConfig[1][newProps.entryName] : BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry;
   }
 
   expand()

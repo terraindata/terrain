@@ -1,6 +1,6 @@
 [
   {
-   "Select / From":
+   "Select From":
     { 
       "summary": "Retrieves rows from the database if they meet the condition", 
       "type": "none",
@@ -11,7 +11,7 @@
         "Select all the product id's purchased by user 1234:"
       ]
     },
-    "Take / Limit":
+    "Take Limit":
     { 
       "snippet": "Returns n results", 
       "summary": "Returns a query expression representing the first n results from the expression on the left hand side.  The number of results n is the evaluation of the right hand side.", 
@@ -248,7 +248,7 @@
         "none"
       ]
     },
-    "Skip / Offset":
+    "Skip Offset":
     { 
       "snippet": "Removes first n elements", 
       "summary": "Returns a query expression representing the left-hand query expression, with the first n elements removed, where n is the result of evaluating the right-hand expression.", 
