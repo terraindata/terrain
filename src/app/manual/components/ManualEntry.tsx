@@ -223,7 +223,7 @@ class ManualEntry extends Classs<Props>
   }
 
   renderCardExample(index) {
-    //ASK LUKE A/B BEST WAY TO MAKE CARDS HERE
+
     var cardRecord = Immutable.Record(ManualConfig[0][this.props.entryName].Text[index][0]);
     var card = new cardRecord();
 
