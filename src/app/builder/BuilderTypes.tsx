@@ -57,7 +57,9 @@ import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, filtersD
 export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
-  
+
+var ManualConfig = require('./../manual/ManualConfig2.json');
+
 export module BuilderTypes
 {
   export enum Operator {
@@ -124,6 +126,15 @@ export module BuilderTypes
     value: string;
     inputType: InputType;
   }
+
+  interface IManualEntry
+  {
+    snippet: string;
+    summary: string;
+    notation: string;
+    syntax: string;
+    text: any[];
+  }
     
   export interface ICard extends IRecord<ICard>
   {
@@ -147,6 +158,7 @@ export module BuilderTypes
       // It replaces anything within [] with the value for that key.
       // If an array of objects, you can specify: [arrayKey.objectKey]
       // and it will map through and join the values with ", ";
+      manualEntry: IManualEntry;
     };
   }
   
@@ -189,7 +201,7 @@ export module BuilderTypes
       preview: string | ((c:ICard) => string);
       display: Display | Display[];
       // TODO tql here
-      
+      manualEntry: IManualEntry;
       getTerms?: (card: ICard) => string[];
       init?: (config?:any) => any;
     }
@@ -213,6 +225,7 @@ export module BuilderTypes
   {
     colors: string[];
     title: string;
+    manualEntry: IManualEntry;
     getTerms?: (card: ICard) => string[];
     display?: Display | Display[];
     // TODO tql here
@@ -228,7 +241,7 @@ export module BuilderTypes
         title: config.title,
         colors: config.colors,
         getTerms: config.getTerms,
-        
+        manualEntry: config.manualEntry,
         preview: (c:IWrapperCard) => {
           if(c.cards.size)
           {
@@ -243,7 +256,7 @@ export module BuilderTypes
     })
   }
   
-  const _valueCard = (config:{ title: string, colors: string[] }) => (
+  const _valueCard = (config:{ title: string, colors: string[], manualEntry: IManualEntry }) => (
     _card({
       value: 0,
       
@@ -252,6 +265,7 @@ export module BuilderTypes
         colors: config.colors,
         preview: "[value]",
         display: valueDisplay,
+        manualEntry: config.manualEntry
       }
     })
   );
@@ -293,6 +307,7 @@ export module BuilderTypes
       
       static:
       {
+        manualEntry: ManualConfig[0]['Select / From'],
         colors: ["#89B4A7", "#C1EADE"],
         title: "Select / From",
         preview: "[tables.table]: [fields.field]",
@@ -375,7 +390,7 @@ export module BuilderTypes
         title: "Sort",
         preview: "[sorts.property]",
         colors: ["#C5AFD5", "#EAD9F7"],
-        
+        manualEntry: ManualConfig[0]['Sort'],
         display: {
           displayType: DisplayType.ROWS,
           key: 'sorts',
@@ -410,6 +425,7 @@ export module BuilderTypes
         preview: "[filters.length] Condition(s)",
         colors: ["#7EAAB3", "#B9E1E9"],
         display: filtersDisplay,
+        manualEntry: ManualConfig[0]['Comparison'],
       },
     }),
     
@@ -423,6 +439,7 @@ export module BuilderTypes
         preview: "[field]",
         colors: ["#C0C0BE", "#E2E2E0"],
         display: letVarDisplay,
+        manualEntry: ManualConfig[0]['Let'],
       }
     }),
 
@@ -437,6 +454,7 @@ export module BuilderTypes
         preview: "[field]",
         display: letVarDisplay,
         getTerms: (card) => [card['field']],
+        manualEntry: ManualConfig[0]['Var'],
       }
     }),
 
@@ -444,42 +462,49 @@ export module BuilderTypes
     {
       colors: ["#70B1AC", "#D2F3F0"],
       title: "Count",
+      manualEntry: ManualConfig[0]['Count'],
     }),
     
     avg: _wrapperCard(
     {
       colors: ["#a2b37e", "#c9daa6"],
       title: "Average",
+      manualEntry: ManualConfig[0]['Average'],
     }),
     
     sum: _wrapperCard(
     {
       colors: ["#8dc4c1", "#bae8e5"],
       title: "Sum",
+      manualEntry: ManualConfig[0]['Sum'],
     }),
 
     min: _wrapperCard(
     {
       colors: ["#cc9898", "#ecbcbc"],
       title: "Min",
+      manualEntry: ManualConfig[0]['Min'],
     }),
 
     max: _wrapperCard(
     {
       colors: ["#8299b8", "#acc6ea"],
       title: "Max",
+      manualEntry: ManualConfig[0]['Max'],
     }),
 
     exists: _wrapperCard(
     {
       colors: ["#a98abf", "#cfb3e3"],
       title: "Exists",
+      manualEntry: ManualConfig[0]['Exists'],
     }),
 
     parentheses: _wrapperCard(
     {
       colors: ["#b37e7e", "#daa3a3"],
       title: "( )",
+      manualEntry: ManualConfig[0]['( )'],
     }),
     
     weight: _block(
@@ -498,6 +523,7 @@ export module BuilderTypes
         colors: ["#9DC3B8", "#D1EFE7"],
         title: "Score",
         preview: "[weights.length] Weight(s)",
+        manualEntry: ManualConfig[0]['Score'],
         display: {
           displayType: DisplayType.ROWS,
           key: 'weights',
@@ -556,6 +582,7 @@ export module BuilderTypes
       
       static:
       {
+        manualEntry: ManualConfig[0]['Transform'],
         colors: ["#E7BE70", "#EDD8B1"],
         title: "Transform",
         preview: "[input]",
@@ -609,12 +636,14 @@ export module BuilderTypes
     {
       colors: ["#CDCF85", "#F5F6B3"],
       title: "Take",
+      manualEntry: ManualConfig[0]['Take'],
     }),
     
     skip: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
       title: "Skip",
+      manualEntry: ManualConfig[0]['Skip'],
     }),
     
     spotlight: _block(

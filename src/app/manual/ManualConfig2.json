@@ -1,12 +1,24 @@
 [
   {
-     "Take":
+   "Select / From":
     { 
-      "Snippet": "Returns n results", 
-      "Summary": "Returns a query expression representing the first n results from the expression on the left hand side.  The number of results n is the evaluation of the right hand side.", 
-      "Type": "binary infix operator",
-      "Syntax": "query expression TAKE expression",
-      "Text": 
+      "snippet": "Get data", 
+      "summary": "The Select statement returns a result set of records from one or more tables.",
+      "notation": "prefix operator",
+      "syntax": "SELECT field name(s)",
+      "text": 
+      [ 
+        "The TQL Select statement returns a result set of records from one or more tables. A Select statement retrieves zero or more rows from one or more database tables or database views. In most applications, Select is the most commonly used data manipulation language (DML) command. As TQL is a declarative programming language, Select queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints.",
+        "Select all the product id's purchased by user 1234:"
+      ]
+    },
+    "Take":
+    { 
+      "snippet": "Returns n results", 
+      "summary": "Returns a query expression representing the first n results from the expression on the left hand side.  The number of results n is the evaluation of the right hand side.", 
+      "notation": "binary infix operator",
+      "syntax": "query expression TAKE expression",
+      "text": 
       [ 
         [
           {
@@ -29,6 +41,171 @@
         ],
         "Take is a binary infix operator, meaning it sits between two expressions. Take returns a query expression that is the first n results of the query expression on its left hand side.  The number of results n to be returned is determined from the right hand side. In order to get a specific set of results, the data can be sorted based on some parameter first and then the top n results selected via Take. For example, if you wanted the 10 oldest people in a group, you would sort the people based on descending age and then use 'Take 10'.",
         "This example takes the first 10 results (the names of users) from the table 'users.'"
+      ]
+    },
+    "Sort":
+    { 
+      "snippet": "none", 
+      "summary": "Returns a query expression representing the result of sorting the left-hand expression in ascending order of the value returned by the right-hand expression.",
+      "notation": "binary infix operator",
+      "syntax": "query expression sort expression",
+      "text": 
+      [ 
+        "from 'users' as user sort user.name"
+      ]
+    },
+    "Filter":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
+      ]
+    },
+    "Let":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
+      ]
+    },
+    "Var":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
+      ]
+    },
+    "Score":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
+      ]
+    },
+    "Transform":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
+      ]
+    },
+    "Count":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
+      ]
+    },
+    "Average":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
+      ]
+    },
+    "Sum":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
+      ]
+    },
+    "Min":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
+      ]
+    },
+    "Max":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
+      ]
+    },
+    "Exists":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
+      ]
+    },
+    "( )":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
+      ]
+    },
+    "Comparison":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
+      ]
+    },
+    "Skip":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none"
       ]
     }
   },
@@ -75,6 +252,3 @@
     }
   }
 ]
-
-
-
