@@ -194,7 +194,7 @@ class BuilderComponent extends PureClasss<Props>
             />
             { this.props.helpOn && d.helpInformation ?
               <ManualInfo
-                information={d.helpInformation || "hey"}
+                information={d.helpInformation}
                 style={{right: '6px', top: 'calc(50% - 5px)'}}
               />
               : null
@@ -321,7 +321,7 @@ class BuilderComponent extends PureClasss<Props>
         {
           this.props.helpOn ?
           <ManualInfo 
-            information={d.helpInformation || "None"}
+            information={d.helpInformation}
             style = {{right:'14px', top: '12px'}}
           />
           : null

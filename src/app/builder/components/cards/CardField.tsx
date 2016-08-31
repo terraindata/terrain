@@ -50,6 +50,7 @@ import Util from '../../../util/Util.tsx';
 import PureClasss from '../../../common/components/PureClasss.tsx';
 import BuilderComponent from '../BuilderComponent.tsx';
 import {Display} from '../../BuilderDisplays.tsx';
+import ManualInfo from '../../../manual/components/ManualInfo.tsx';
 const classNames = require('classnames');
 
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
@@ -354,10 +355,18 @@ class CardField extends PureClasss<Props>
             <div className='card-field-tools-left-inner'>
               <div
                 className='card-field-handle'
-                onMouseDown={this.handleHandleMousedown}
+                onMouseDown={this.props.canEdit ? this.handleHandleMousedown : null}
               >
                 ⋮⋮
               </div>
+              {
+                  this.props.helpOn ?
+                  <ManualInfo 
+                    information="Can move fields around within the current card by dragging and dropping"
+                    style= {{top: '7px', right: '-12px'}}
+                  />
+                  : null
+                }
             </div>
           </div>
   				<div className='card-field-inner' >
@@ -376,15 +385,23 @@ class CardField extends PureClasss<Props>
               <div>
                 <div
                   className='card-field-add'
-                  onClick={this.addField}
-                  data-tip='Add another'
+                  onClick={this.props.canEdit ? this.addField : null}
+                  data-tip={this.props.canEdit ? 'Add another' : null}
                 >
                   <AddIcon />
                 </div> 
+                {
+                  this.props.helpOn ?
+                  <ManualInfo 
+                    information="Can add field using the plus button or remove fields using the x button"
+                    style= {{top: '9px', right: '-10px'}}
+                  />
+                  : null
+                }
                 <div
                   className='card-field-remove'
-                  onClick={this.removeField}
-                  data-tip='Remove'
+                  onClick={this.props.canEdit ? this.removeField : null}
+                  data-tip={this.props.canEdit ? 'Remove' : null}
                 >
                   <RemoveIcon />
                 </div>
