@@ -57,6 +57,7 @@ import CreateCardTool from "./CreateCardTool.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import CardDropArea from './CardDropArea.tsx';
 import BuilderTypes from '../../BuilderTypes.tsx';
+import Switch from './../../../common/components/Switch.tsx';
 type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
 let {List} = Immutable;
@@ -85,6 +86,7 @@ interface Props
 interface KeyState {
   keys: List<string>;
   keyPath: KeyPath;
+  resultFormat: string;
 }
 
 class CardsArea extends PureClasss<Props>
@@ -92,8 +94,9 @@ class CardsArea extends PureClasss<Props>
   state: KeyState = {
     keys: List([]),
     keyPath: null,
+    resultFormat: this.props.helpOn ? 'learning' : 'normal',
   };
-  
+
   constructor(props:Props)
   {
     super(props);
@@ -170,13 +173,61 @@ class CardsArea extends PureClasss<Props>
   {
     Actions.create(this.state.keyPath, 0, 'sfw');
   }
+
+        //   <div className='results-top-summary'>
+        //   {
+        //     this.state.error ? 'Error with query' : 
+        //     (
+        //       this.state.resultsWithAllFields ? 
+        //         `${this.state.resultsWithAllFields.length} results` 
+        //       : 'Text result'
+        //     )
+        //   }
+        // </div>
+        
+        // <Switch
+        //   first='Icons'
+        //   second='Table'
+        //   onChange={this.toggleView}
+        //   selected={this.state.resultFormat === 'icon' ? 1 : 2}
+        //   small={true}
+        // />
+        
+        // <div className='results-top-config' onClick={this.showConfig}>
+        //   Customize view
+        // </div>
   
+  toggleView()
+  {
+    this.setState({
+      resultFormat: this.state.resultFormat === 'normal' ? 'learning' : 'normal',
+    })
+  }
+  
+
+  renderTopbar()
+  {
+    return (
+      <div className='cards-area-top-bar'>
+        <Switch
+          first='Normal'
+          second='Learning'
+          onChange={this.toggleView}
+          selected={this.state.resultFormat === 'normal' ? 1 : 2}
+          small={true}
+        />
+      </div>
+    );
+  }
+
   render()
   {
     let {props} = this;
     let {cards, topLevel, canEdit} = props;
-    
+    //this.props.helpOn
     return (
+      <div> 
+      {this.props.topLevel ? this.renderTopbar() : null}
       <div
         className={classNames({
           'cards-area': true,
@@ -188,7 +239,7 @@ class CardsArea extends PureClasss<Props>
           cards.map((card:ICard, index:number) =>
             <Card 
               {...this.props}
-              helpOn={this.props.helpOn}
+              helpOn={this.state.resultFormat === 'learning' || this.props.helpOn}
               cards={null}
               key={card.id}
               singleCard={false}
@@ -220,6 +271,7 @@ class CardsArea extends PureClasss<Props>
           className={props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
         />
         
+      </div>
       </div>
     );
   }
