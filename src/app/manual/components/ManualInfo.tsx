@@ -53,7 +53,7 @@ import Classs from './../../common/components/Classs.tsx';
 interface Props
 {
   information: string,
-  style: any,
+  style?: any,
 }
 
 

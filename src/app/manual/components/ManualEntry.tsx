@@ -248,7 +248,8 @@ class ManualEntry extends Classs<Props>
           parentId='CI2XI'
           singleCard={false}
           keys={[]}
-          keyPath = {Immutable.List(["queries", "I8LNT", "cards"])}
+          keyPath={Immutable.List(["queries", "I8LNT", "cards"])}
+          helpOn={true}
         /> 
       </div>
     );

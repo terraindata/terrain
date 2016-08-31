@@ -134,7 +134,7 @@ class ManualPopup extends Classs<Props>
     if(this.props.cardName !== 'General') {
       var manualEntry = BuilderTypes.cardList[this.props.cardName] 
         && BuilderTypes.Blocks[BuilderTypes.cardList[this.props.cardName]].static.manualEntry;
-      content = manualEntry ? manualEntry.summary : 'No description available';
+      content = manualEntry ? manualEntry.snippet : 'No description available';
     }
     return (
     <div 

@@ -151,6 +151,7 @@ interface Props
   connectDragSource?: (el: El) => El;
   connectDropTarget?: (el: El) => El;
 
+  helpOn?: boolean;
 }
 
 class Card extends PureClasss<Props>
@@ -446,11 +447,13 @@ class Card extends PureClasss<Props>
   }
 
 	render() {
-    console.log(this.props);
+    console.log("CARD");
+    console.log(this.props.helpOn);
     var content = <BuilderComponent
       keys={this.props.keys}
       canEdit={this.props.canEdit}
       data={this.props.card}
+      helpOn={this.props.helpOn}
       keyPath={
         this.props.singleCard
         ? this.props.keyPath

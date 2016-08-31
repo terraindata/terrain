@@ -54,6 +54,7 @@ import CardField from './cards/CardField.tsx';
 import Dropdown from '../../common/components/Dropdown.tsx';
 import CardsArea from './cards/CardsArea.tsx';
 import BuilderTextboxCards from '../../common/components/BuilderTextboxCards.tsx';
+import ManualInfo from '../../manual/components/ManualInfo.tsx';
 
 interface Props
 {
@@ -65,6 +66,8 @@ interface Props
   canEdit: boolean;
   
   parentData?: any;
+
+  helpOn?: boolean;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
 }
@@ -104,6 +107,7 @@ class BuilderComponent extends PureClasss<Props>
             canEdit={this.props.canEdit}
             keys={this.props.keys}
             parentData={this.props.parentData}
+            helpOn={this.props.helpOn}
           />
         ) as El[];
       // return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
@@ -202,6 +206,7 @@ class BuilderComponent extends PureClasss<Props>
                 canEdit={this.props.canEdit}
                 keys={this.props.keys}
                 parentData={this.props.parentData}
+                helpOn={this.props.helpOn}
               />
             </div>
             { !d.below ? null : 
@@ -212,6 +217,7 @@ class BuilderComponent extends PureClasss<Props>
                 canEdit={this.props.canEdit}
                 keys={this.props.keys}
                 parentData={this.props.parentData}
+                helpOn={this.props.helpOn}
               />
             }
           </div>
@@ -272,7 +278,10 @@ class BuilderComponent extends PureClasss<Props>
     
     if(isTextbox)
     {
+      console.log("BUILDER COMP");
+      console.log(this.props.helpOn);
       content = (
+        <div>
         <BuilderTextbox
           keys={this.props.keys}
           canEdit={this.props.canEdit}
@@ -288,6 +297,15 @@ class BuilderComponent extends PureClasss<Props>
             className,
           }}
         />
+        {
+          this.props.helpOn ?
+          <ManualInfo 
+            information="HELLO"
+            key={Math.random()}
+          />
+          : null
+        }
+        </div>
       );
     }
     
