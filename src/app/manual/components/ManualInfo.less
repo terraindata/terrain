@@ -21,17 +21,36 @@
 		height: auto;
 		width: 125px;
 		visibility: hidden;
-		background-color: #d7d7d7;
-		color: #636363;
+		background-color: #222;
+		color: #fff;
 		position: absolute;
-		top: 8px;
-		left: 8px;
-		border-radius: 6px;
-		padding: 6px;
+		top: 22px;
+		left: -79px;
+		border-radius: 3px;
+		padding: 8px 16px;
 		font-size: 12px;
 		z-index: 9999999;
 		text-align: left;
-		box-shadow: 0px 0px 7px 0px #636363;
 	}
+	.manual-info-content:before, .manual-info-content:after {
+	    content: "";
+	    width: 0px;
+	    height: 0px;
+	    position: absolute;
+	    right: calc(~"50% - 8px");
+	    top: -8px;
+	}
+
+	.manual-info-content:before {
+	    border-right: 10px solid transparent;
+	    border-left: 10px solid transparent;
+	}
+
+	.manual-info-content:after {
+	    border-bottom: 8px solid #222;
+	    border-right: 8px solid transparent;
+	    border-left: 8px solid transparent;
+	}
+
 
 }

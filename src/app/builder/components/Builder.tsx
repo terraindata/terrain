@@ -96,12 +96,14 @@ class Builder extends PureClasss<Props>
     noColumnAnimation: boolean;
     column: number;
     cardName: string;
+    manualIndex: number
   } = {
     builder: Store.getState(),
     colKeys: null,
     noColumnAnimation: false,
     column: null,
     cardName: '',
+    manualIndex: -1,
   };
   
   constructor(props:Props)
@@ -316,6 +318,7 @@ class Builder extends PureClasss<Props>
   {
     let key = this.state.colKeys.get(index);
     let query = this.getQuery();
+    if(this.state.manualIndex != -1) console.log("Manual column open");
     return {
       minWidth: 316,
       resizeable: true,
@@ -338,7 +341,7 @@ class Builder extends PureClasss<Props>
       key,
     }
   }
-  
+
   handleAddManualColumn(index, cardName?)
   {
     index = index + 1;
@@ -346,7 +349,8 @@ class Builder extends PureClasss<Props>
     this.setState({
       colKeys,
       column: 4,
-      cardName
+      cardName,
+      manualIndex: index
     }); 
     localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
   }
@@ -367,6 +371,7 @@ class Builder extends PureClasss<Props>
     let colKeys = this.state.colKeys.splice(index, 1);
     this.setState({
       colKeys: colKeys,
+      manualIndex: (index === this.state.manualIndex) ? -1 : this.state.manualIndex
     }); 
     localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
     if(localStorage.getItem('colKeyTypes'))
