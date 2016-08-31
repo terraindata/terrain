@@ -3,12 +3,111 @@
    "Select From":
     { 
       "summary": "Retrieves rows from the database if they meet the condition", 
-      "type": "none",
-      "syntax": "SELECT FROM source WHERE search condition",
+      "notation": "none",
+      "syntax": "SELECT field(s) FROM source WHERE condition(s)",
       "text": 
       [ 
         "The TQL Select statement returns a result set of records from one or more tables. A Select statement retrieves zero or more rows from one or more database tables or database views. In most applications, Select is the most commonly used data manipulation language (DML) command. As TQL is a declarative programming language, Select queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints.",
-        "Select all the product id's purchased by user 1234:"
+         [
+          {
+            "cards": [],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "user.name",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "user.name",
+                "operator": 0,
+                "second": "John",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "iterator": "user",
+              "table": "users",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e"
+          },
+          "SELECT user.name\nFROM 'users' as user\nWHERE user.name == John;"
+        ],
+        "This example select all the product ids purchased by user 1234:",
+         [
+          {
+            "cards": [],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "product.id",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "product.id",
+                "operator": 6,
+                "second": {
+                  "cards": [{
+                    "cards": [],
+                    "fields": [
+                      { 
+                        "type": "field",
+                        "field": "order.product",
+                        "id": "bb"
+                      }
+                    ],
+                    "filters": [
+                      { 
+                        "combinator": 0,
+                        "first": "order.user",
+                        "operator": 0,
+                        "second": "1234",
+                        "type": "filterBlock",
+                        "id": "cc"
+                      }
+                    ],
+                    "tables": [
+                    {
+                      "iterator": "order",
+                      "table": "'orders'",
+                      "type": "table",
+                      "id": "dd"
+                    }
+                    ],
+                    "type": "sfw",
+                    "id": "ee"
+                  }],
+                  "id": "g",
+                  "type": "parentheses"
+                },
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "iterator": "product",
+              "table": "'products'",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e"
+          },
+          "SELECT product.id\nFROM 'products' as product\nWHERE product.id in (\n\tSELECT order.product\n\tFROM 'orders' as order\n\tWHERE order.user = 1234\n);"
+        ]
       ]
     },
     "Take Limit":
@@ -136,7 +235,116 @@
       "syntax": "linearScore[([weight1, attribute1], [weight2, attribute2]...)]",
       "text": 
       [ 
-        "none"
+        "The Score card does not have a description yet.",
+        [
+          {
+            "id": "a",
+            "method": "",
+            "type": "score",
+            "weights": [
+              {
+                "key": "product.positive_reviews",
+                "weight": "50",
+                "id": "b",
+                "type": "weight"
+              },
+              {
+                "key": "product.negative_reviews",
+                "weight": "-25",
+                "id": "c",
+                "type": "weight"
+              },
+              {
+                "key": "product.price",
+                "weight": "10",
+                "id": "d",
+                "type": "weight"
+              }
+            ]
+          },
+          "linearScore([\n\t[50, product.positive_reviews],\n\t[-25, product.negative_reviews],\n\t[10, product.price]]);"
+        ],
+      "In this example, books are scored based on their positive reviews, negative reviews and prices, ranked according to score, and the top 100 products are then selected",
+        [
+          {
+            "cards": [
+              {
+                "id": "a",
+                "expression": {
+                  "cards": [
+                    {
+                      "id": "a",
+                      "method": "",
+                      "type": "score",
+                      "weights": [
+                        {
+                          "key": "product.positive_reviews",
+                          "weight": "50",
+                          "id": "b",
+                          "type": "weight"
+                        },
+                        {
+                          "key": "product.negative_reviews",
+                          "weight": "-25",
+                          "id": "c",
+                          "type": "weight"
+                        },
+                        {
+                          "key": "product.price",
+                          "weight": "10",
+                          "id": "d",
+                          "type": "weight"
+                        }
+                      ]
+                    }
+                  ],
+                  "id": "g",
+                  "type": "parentheses"
+                },
+                "field": "product.score",
+                "type": "let"
+              },
+              {
+                "id": "e",
+                "type": "sort",
+                "sorts": [{
+                  "direction": 1,
+                  "id": "f",
+                  "property": "product.score",
+                  "type": "sortBlock"
+                }]
+              }
+            ],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "*",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "product.type",
+                "operator": 0,
+                "second": "book",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "iterator": "product",
+              "table": "'products'",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e"
+          },
+          "SELECT *\nFROM 'products' as product\nWHERE product.type = book\nLET product.score = (\n\tlinearScore([[\n\t\t[50, product.positive_reviews],\n\t\t[-25, product.negative_reviews],\n\t\t[10, product.price]\n\t])\n\tORDER BY product.score DESC;"
+        ]
       ]
     },
     "Transform":
@@ -147,7 +355,49 @@
       "syntax": "none",
       "text": 
       [ 
-        "none"
+        "none",
+        [
+          {
+            "bars": [],
+            "domain": [0, 100],
+            "id": "a",
+            "input": "user.experience",
+            "scorePoints": [
+              {
+                "id": "b",
+                "score": 0.1,
+                "type": "scorePoint",
+                "value": 1
+              },
+              {
+                "id": "c",
+                "score": 0.38,
+                "type": "scorePoint",
+                "value": 25
+              },
+              {
+                "id": "d",
+                "score": 0.6,
+                "type": "scorePoint",
+                "value": 50
+              },
+              {
+                "id": "e",
+                "score": 0.75,
+                "type": "scorePoint",
+                "value": 75
+              },
+              {
+                "id": "f",
+                "score": 0.8,
+                "type": "scorePoint",
+                "value": 100
+              }
+            ],
+            "type": "transform"
+          },
+          "linearTransform([\n\t[0.1, 1],\n\t[0.38, 25],\n\t[0.6, 100],\n\t[0.75, 75],\n\t[0.8, 100]\n]);"
+        ]
       ]
     },
     "Count":

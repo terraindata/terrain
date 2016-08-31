@@ -115,7 +115,13 @@ class ManualEntry extends Classs<Props>
   highlightKeyWords(text)
   {
     if (!text) return;
-    var keywords = Object.keys(this.allTqlCards).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
+    var keywords = Object.keys(this.allTqlCards);
+    //Remove ( ) card
+    var index = keywords.indexOf('( )');
+    keywords.splice(index, 1);
+    //Separate multi-word keywords like 'Take Limit' into sep. keywords
+    keywords = keywords.join(' ').split(' ');
+
     var phraseTypes = Object.keys(ManualConfig[1]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
     var index = keywords.indexOf('( )');
     keywords.splice(index, 1);
@@ -230,7 +236,7 @@ class ManualEntry extends Classs<Props>
   }
 
   renderCardExample(index) {
-    var card = BuilderTypes.recordFromJS(this.manualEntry.text[index[0]]);
+    var card = BuilderTypes.recordFromJS(this.manualEntry.text[index][0]);
     return (
       <div className='manual-entry-demo'>
         <Card
