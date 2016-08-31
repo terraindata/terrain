@@ -447,9 +447,7 @@ class Card extends PureClasss<Props>
   }
 
 	render() {
-    console.log("CARD");
-    console.log(this.props.helpOn);
-    var content = <BuilderComponent
+      var content = <BuilderComponent
       keys={this.props.keys}
       canEdit={this.props.canEdit}
       data={this.props.card}

@@ -80,6 +80,7 @@ interface Props
   parentData?: any;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
+  helpOn?: boolean;
 }
 
 interface IMoveState
@@ -337,6 +338,7 @@ class CardField extends PureClasss<Props>
               canEdit={this.props.canEdit}
               keys={this.props.keys}
               parentData={this.props.parentData}
+              helpOn={this.props.helpOn}
             />
         }
         <div
@@ -366,6 +368,7 @@ class CardField extends PureClasss<Props>
               canEdit={this.props.canEdit}
               keys={this.props.keys}
               parentData={this.props.parentData}
+              helpOn={this.props.helpOn}
             />
   				</div>
   				<div className='card-field-tools-right'>
@@ -397,6 +400,7 @@ class CardField extends PureClasss<Props>
               canEdit={this.props.canEdit}
               keys={this.props.keys}
               parentData={this.props.parentData}
+              helpOn={this.props.helpOn}
             />
         }
       </div>

@@ -238,7 +238,6 @@ class ManualEntry extends Classs<Props>
 
   renderCardExample(index) {
     var card = BuilderTypes.recordFromJS(this.manualEntry.text[index][0]);
-    console.log(card);
     return (
       <div className='manual-entry-demo'>
         <Card

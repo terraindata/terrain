@@ -167,6 +167,7 @@ class BuilderComponent extends PureClasss<Props>
           keyPath={keyPath}
           topLevel={false}
           className={className}
+          helpOn={this.props.helpOn}
         />;
       break;
       case DisplayType.CARDTEXT:
@@ -179,6 +180,7 @@ class BuilderComponent extends PureClasss<Props>
           canEdit={this.props.canEdit}
           keyPath={keyPath}
           keys={this.props.keys}
+          helpOn={this.props.helpOn}
         />;
       break;
       case DisplayType.DROPDOWN:
@@ -245,6 +247,7 @@ class BuilderComponent extends PureClasss<Props>
                   canEdit={this.props.canEdit}
                   keys={this.props.keys}
                   parentData={d.provideParentData && data}
+                  helpOn={this.props.helpOn}
                 />
               ))
             }
@@ -278,17 +281,14 @@ class BuilderComponent extends PureClasss<Props>
     
     if(isTextbox)
     {
-      console.log("BUILDER COMP");
-      console.log(this.props.helpOn);
       content = (
-        <div>
+        <div key={key}>
         <BuilderTextbox
           keys={this.props.keys}
           canEdit={this.props.canEdit}
           top={d.top}
           placeholder={d.placeholder || d.key}
           {...{
-            key,
             keyPath,
             value,
             acceptsCards,
@@ -301,7 +301,6 @@ class BuilderComponent extends PureClasss<Props>
           this.props.helpOn ?
           <ManualInfo 
             information="HELLO"
-            key={Math.random()}
           />
           : null
         }

@@ -78,6 +78,8 @@ interface Props
   queryId?: ID;
   spotlights?: List<any>;
   connectDropTarget?: (el:JSX.Element) => JSX.Element;
+
+  helpOn?: boolean;
 }
 
 interface KeyState {
@@ -187,6 +189,7 @@ class CardsArea extends PureClasss<Props>
           cards.map((card:ICard, index:number) =>
             <Card 
               {...this.props}
+              helpOn={this.props.helpOn}
               cards={null}
               key={card.id}
               singleCard={false}
