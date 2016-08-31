@@ -213,7 +213,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
 
 [ActionTypes.remove]:  
   (state, action: {
-    payload?: { keyPath: KeyPath, index: number, factoryType: string }
+    payload?: { keyPath: KeyPath, index: number }
   }) =>
     state.removeIn(
       action.payload.index === null

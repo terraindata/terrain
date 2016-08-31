@@ -66,15 +66,6 @@ import BuilderComponent from '../BuilderComponent.tsx';
 
 var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
-// $('body').on('click', (event) =>
-// {
-//   // surely there is a better way to do this?
-//   if(!$(event.target).hasClass('card-title') && !findParentWithClass($(event.target), 'card-title', 0))
-//   {
-//     Actions.selectCard(null, event.altKey, event.shiftKey);
-//   }
-// });
-
 interface Props
 {
   card: BuilderTypes.ICard;
@@ -210,14 +201,16 @@ class Card extends PureClasss<Props>
   
   handleTitleClick(event)
   {
-    if(!this.props.canEdit)
-    {
-      return;
-    }
+    // TODO decide how selection mechanics work.
+    //  consider limiting selection to neighbors.
+    // if(!this.props.canEdit)
+    // {
+    //   return;
+    // }
     
-    event.stopPropagation();
-    event.preventDefault();
-    Actions.selectCard(this.props.card.id, event.shiftKey, event.altKey);
+    // event.stopPropagation();
+    // event.preventDefault();
+    // Actions.selectCard(this.props.card.id, event.shiftKey, event.altKey);
   }
   
   handleDelete()
