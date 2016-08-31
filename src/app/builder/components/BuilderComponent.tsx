@@ -303,7 +303,7 @@ class BuilderComponent extends PureClasss<Props>
     if(isTextbox)
     {
       content = (
-        <div key={key} style={{width: '100%'}}>
+        <div key={key} style={{width: '100%', position: 'relative'}}>
         <BuilderTextbox
           keys={this.props.keys}
           canEdit={this.props.canEdit}
@@ -321,7 +321,8 @@ class BuilderComponent extends PureClasss<Props>
         {
           this.props.helpOn ?
           <ManualInfo 
-            information={d.helpInformation || "HELLO"}
+            information={d.helpInformation || "None"}
+            style = {{right:'14px', top: '12px'}}
           />
           : null
         }

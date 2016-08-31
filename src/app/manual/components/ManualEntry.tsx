@@ -248,7 +248,7 @@ class ManualEntry extends Classs<Props>
           singleCard={false}
           keys={[]}
           keyPath={Immutable.List(["queries", "I8LNT", "cards"])}
-          helpOn={true}
+          helpOn={this.manualEntry.text[index][0].helpOn}
         /> 
       </div>
     );

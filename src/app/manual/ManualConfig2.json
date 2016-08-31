@@ -37,7 +37,8 @@
             }
             ],
             "type": "sfw",
-            "id": "e"
+            "id": "e",
+            "helpOn": "true"
           },
           "SELECT user.name\nFROM 'users' as user\nWHERE user.name == John;"
         ],
@@ -122,7 +123,8 @@
           {
             "type": "take",
             "value": "10",
-            "id": "a"
+            "id": "a",
+            "helpOn": "true"
           },
           "take 10"
         ],
@@ -187,7 +189,8 @@
                 "property": "user.id",
                 "id": "b"
               }
-            ]
+            ],
+            "helpOn": "true"
           },
           "ORDER BY user.id desc"
         ],
@@ -253,7 +256,8 @@
             "type": "let",
             "id": "3",
             "field": "product.score",
-            "expression": "product.age * product.conversionRatio"
+            "expression": "product.age * product.conversionRatio",
+            "helpOn": "true"
           },
           "LET product.score = \nproduct.age * product.conversionRatio "
         ],
@@ -323,7 +327,8 @@
             "type": "var",
             "id": "3",
             "field": "product.score",
-            "expression": "product.age * product.conversionRatio"
+            "expression": "product.age * product.conversionRatio",
+            "helpOn": "true"
           },
           "VAR product.score = \nproduct.age * product.conversionRatio "
         ]
@@ -362,7 +367,8 @@
                 "id": "d",
                 "type": "weight"
               }
-            ]
+            ],
+            "helpOn": "true"
           },
           "linearScore([\n\t[50, product.positive_reviews],\n\t[-25, product.negative_reviews],\n\t[10, product.price]]);"
         ],
@@ -496,7 +502,8 @@
                 "value": 100
               }
             ],
-            "type": "transform"
+            "type": "transform",
+            "helpOn": "true"
           },
           "linearTransform([\n\t[0.1, 1],\n\t[0.38, 25],\n\t[0.6, 100],\n\t[0.75, 75],\n\t[0.8, 100]\n]);"
         ]
@@ -688,7 +695,8 @@
                     "type": "filterBlock",
                     "id": "c"
                   }
-             ]
+             ],
+            "helpOn": "true"
           },
           "product.price <= 20"
         ],

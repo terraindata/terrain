@@ -416,7 +416,7 @@ export module BuilderTypes
               inner:
               {
                 displayType: DisplayType.TEXT,
-                helpInformation: 'This is the field that you are selecting',
+                helpInformation: 'The field that you are selecting',
                 key: 'field'
               },
             },
@@ -434,6 +434,7 @@ export module BuilderTypes
               [  
                 {
                   displayType: DisplayType.TEXT,
+                  helpInformation: 'The table your are retrieving data from',
                   key: 'table',
                 },
                 {
@@ -443,6 +444,7 @@ export module BuilderTypes
                 },
                 {
                   displayType: DisplayType.TEXT,
+                  helpInformation: 'The name of the variable retrieved from the data',
                   key: 'iterator',
                 },
               ],
@@ -497,6 +499,7 @@ export module BuilderTypes
             [
               {
                 displayType: DisplayType.TEXT,
+                helpInformation: 'The attribute you want the sorting to be done on',
                 key: 'property'
               },
               {
@@ -647,10 +650,12 @@ export module BuilderTypes
               {
                 displayType: DisplayType.TEXT,
                 key: 'key',
+                helpInformation: 'The attribute you want to add weight to',
                 placeholder: 'Field',
               },
               {
                 displayType: DisplayType.NUM,
+                helpInformation: 'Numbered weight value to assign to the attribute',
                 key: 'weight',
                 placeholder: 'Weight',
               },
@@ -709,6 +714,7 @@ export module BuilderTypes
         display: [
           {
             displayType: DisplayType.TEXT,
+            helpInformation: 'The attribute you want to transform',
             key: 'input',
             placeholder: 'Input field',
           },
