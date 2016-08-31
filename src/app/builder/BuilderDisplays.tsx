@@ -70,7 +70,7 @@ export interface Display
   // key can be null for FLEX but nothing else
   
   //Manual information
-  helpInformation?: string;
+  helpInformation?: string | string[];
 
   header?: string;
   className?: string | ((data: any) => string);

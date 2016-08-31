@@ -723,11 +723,11 @@ export module BuilderTypes
             component: TransformCardComponent,
             key: 'scorePoints',
             helpInformation: 
-            'This is a transform chart. The points can be dragged around via click and drag. \
-            Their position can also be manually changed by clicking a point and entering values into \
-            the textboxes that appear. The lines of the graph can also be moved by clicking and dragging. \
-            To delete a point, right click on it. To create a new point, double click anywhere on the chart. \
-            Use the sliders at the bottom to change the domain of the graph.'
+            ['The points can be dragged around via click and drag. Their position can also be manually\
+            changed by clicking a point and entering values into the textboxes that appear.\
+            To delete a point, right click on it. To create a new point, double click anywhere on the chart.', 
+            'The lines of the graph can also be moved by clicking and dragging.',
+            'Use these sliders at the bottom to change the domain of the graph.']
           },
         ],
         

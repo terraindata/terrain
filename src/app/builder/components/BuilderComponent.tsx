@@ -194,8 +194,8 @@ class BuilderComponent extends PureClasss<Props>
             />
             { this.props.helpOn && d.helpInformation ?
               <ManualInfo
-                information={d.helpInformation || "hey"}
-                style={{right: '6px', top: 'calc(50% - 5px)'}}
+                information={d.helpInformation as string}
+                style={{right: '10px', top: 'calc(50% - 4px)'}}
               />
               : null
             }  
@@ -274,7 +274,7 @@ class BuilderComponent extends PureClasss<Props>
         break;
       case DisplayType.COMPONENT:
         let Comp = d.component;
-        var style = d.key === 'scorePoints' ? {left: '32px', top: '16px'} : {right: '9px', top: 'calc(50% - 4px)'};
+        var isTransformCard = d.key === 'scorePoints';
         content = (
           <div key={key} style={{width: '100%', position: 'relative'}}>
             {React.cloneElement(<Comp />, {
@@ -284,11 +284,36 @@ class BuilderComponent extends PureClasss<Props>
               canEdit: this.props.canEdit,
             })}
             { this.props.helpOn && d.helpInformation ?
-              <ManualInfo 
-                information={d.helpInformation}
-                style={style}
-                wide={d.key === 'scorePoints' }
-              /> 
+              (
+                isTransformCard ?
+                (d.helpInformation as string[]).map((info, index) => {
+                  if(index === 0) {
+                    var style = {left: '45%', top: '28%'};
+                    var wide = true;
+                  } 
+                  else if(index === 1)
+                  {
+                    var style = {left: '16%', top: '50%'};
+                    wide = false
+                  }
+                  else 
+                  {
+                    var style = {left: '7%', top: '80%'};
+                    wide = false
+                  }
+                  return <ManualInfo 
+                    information={info as string}
+                    style={style}
+                    wide={wide}
+                    key={'info' + index}
+                  /> 
+                })
+                :
+                <ManualInfo 
+                  information={d.helpInformation as string}
+                  style={{right: '10px', top: 'calc(50% - 4px)'}}
+                /> 
+              )
               : null
             }
           </div>
@@ -319,10 +344,10 @@ class BuilderComponent extends PureClasss<Props>
           }}
         />
         {
-          this.props.helpOn ?
+          this.props.helpOn && d.helpInformation ?
           <ManualInfo 
-            information={d.helpInformation || "None"}
-            style = {{right:'14px', top: '12px'}}
+            information={d.helpInformation as string}
+            style = {{right:'10px', top: 'calc(50% - 4px)'}}
           />
           : null
         }
