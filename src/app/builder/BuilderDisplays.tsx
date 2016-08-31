@@ -156,6 +156,7 @@ export const filtersDisplay =
           displayType: DROPDOWN,
           key: 'operator',
           options: Immutable.List(Operators),
+          helpInformation: 'Operator for comparison, can be =, <, <=, >=, >, not =, in or not in',
         },
         {
           displayType: CARDTEXT,

@@ -54,6 +54,7 @@ interface Props
 {
   information: string,
   style?: any,
+  wide?: boolean,
 }
 
 
@@ -68,7 +69,10 @@ class ManualInfo extends Classs<Props>
     return (
       <div className='manual-info-wrapper' style={this.props.style}>
         <div className='manual-info-indicator'></div>
-        <div className='manual-info-content'>
+        <div 
+          className='manual-info-content'
+          style={this.props.wide ? {width: '300px'} : {}}
+        >
           {this.props.information}  
         </div>
       </div>

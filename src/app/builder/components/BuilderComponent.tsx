@@ -147,7 +147,6 @@ class BuilderComponent extends PureClasss<Props>
     let key = data.get('id') + ',' + d.key;
     
     var content;
-    
     switch(d.displayType)
     {
       case DisplayType.NUM:
@@ -184,14 +183,24 @@ class BuilderComponent extends PureClasss<Props>
         />;
       break;
       case DisplayType.DROPDOWN:
-        content = <Dropdown
-          canEdit={this.props.canEdit}
-          className={className}
-          key={key}
-          keyPath={keyPath}
-          options={d.options}
-          selectedIndex={value}
-        />;
+        content = (
+          <div key={key} style={{position: 'relative'}}>
+            <Dropdown
+              canEdit={this.props.canEdit}
+              className={className}
+              keyPath={keyPath}
+              options={d.options}
+              selectedIndex={value}
+            />
+            { this.props.helpOn && d.helpInformation ?
+              <ManualInfo
+                information={d.helpInformation || "hey"}
+                style={{right: '6px', top: 'calc(50% - 5px)'}}
+              />
+              : null
+            }  
+          </div>
+        );
       break;
       case DisplayType.FLEX:
         content = (
@@ -265,13 +274,25 @@ class BuilderComponent extends PureClasss<Props>
         break;
       case DisplayType.COMPONENT:
         let Comp = d.component;
-        content = React.cloneElement(<Comp />, {
-          key,
-          keyPath,
-          data,
-          parentData: this.props.parentData,
-          canEdit: this.props.canEdit,
-        });
+        var style = d.key === 'scorePoints' ? {left: '32px', top: '16px'} : {right: '9px', top: 'calc(50% - 4px)'};
+        content = (
+          <div key={key} style={{width: '100%', position: 'relative'}}>
+            {React.cloneElement(<Comp />, {
+              keyPath,
+              data,
+              parentData: this.props.parentData,
+              canEdit: this.props.canEdit,
+            })}
+            { this.props.helpOn && d.helpInformation ?
+              <ManualInfo 
+                information={d.helpInformation}
+                style={style}
+                wide={d.key === 'scorePoints' }
+              /> 
+              : null
+            }
+          </div>
+          );
       break;
       default:
         content = (
@@ -281,7 +302,6 @@ class BuilderComponent extends PureClasss<Props>
     
     if(isTextbox)
     {
-      console.log(d);
       content = (
         <div key={key} style={{width: '100%'}}>
         <BuilderTextbox
