@@ -49,8 +49,8 @@ import Actions from "../../data/BuilderActions.tsx";
 import Util from '../../../util/Util.tsx';
 import BuilderTypes from './../../BuilderTypes.tsx';
 let {CardTypes} = BuilderTypes;
-import { DragSource, DropTarget } from 'react-dnd';
 import PureClasss from '../../../common/components/PureClasss.tsx';
+import CardDropArea from './CardDropArea.tsx';
 
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -58,24 +58,17 @@ var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon"
 interface Props
 {
   index: number;
-  open?: boolean;
   keyPath: KeyPath;
   canEdit: boolean;
+  
+  open?: boolean;
   dy?: number;
   className?: string;
   onMinimize?: () => void;
-  isOverCurrent?: boolean;
-  connectDropTarget?: (Element) => JSX.Element;
 }
 
 class CreateCardTool extends PureClasss<Props>
 {
-  constructor(props:Props)
-  {
-    super(props);
-    Util.bind(this, 'createCard');
-  }
-  
   createCard(event)
   {
     if(this.props.open && this.props.onMinimize)
@@ -150,13 +143,10 @@ class CreateCardTool extends PureClasss<Props>
       return null;
     }
     
-    const { isOverCurrent, connectDropTarget } = this.props;
     var classes = Util.objToClassname({
       "create-card-wrapper": true,
       "create-card-open": this.props.open,
       "create-card-closed": !this.props.open,
-      "create-card-wrapper-drag-over": isOverCurrent,
-      "card-drop-target": true
     });
     classes += ' ' + this.props.className;
     
@@ -169,40 +159,45 @@ class CreateCardTool extends PureClasss<Props>
       }
     }
     
-    return connectDropTarget(
+    return (
       <div className={classes} style={style}>
         { this.renderCardSelector() }
+        <CardDropArea
+          index={this.props.index}
+          keyPath={this.props.keyPath}
+        />
      </div>
    );
   }
 };
 
+export default CreateCardTool;
 
-const cardTarget = 
-{
-  canDrop(props, monitor)
-  {
-    return true;
-  },
+// const cardTarget = 
+// {
+//   canDrop(props, monitor)
+//   {
+//     return true;
+//   },
   
-  drop(props, monitor, component)
-  {
-    const item = monitor.getItem();
-    if(monitor.isOver({ shallow: true}))
-    {
-      props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
+//   drop(props, monitor, component)
+//   {
+//     const item = monitor.getItem();
+//     if(monitor.isOver({ shallow: true}))
+//     {
+//       props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
       
-      setTimeout(() =>
-      {
-        // Actions.cards.move(item, props.index || 0, props.parentId); // TODO
-      }, 250);
-    }
-  }
-}
+//       setTimeout(() =>
+//       {
+//         // Actions.cards.move(item, props.index || 0, props.parentId); // TODO
+//       }, 250);
+//     }
+//   }
+// }
 
-const dropCollect = (connect, monitor) =>
-({
-  connectDropTarget: connect.dropTarget(),
-});
+// const dropCollect = (connect, monitor) =>
+// ({
+//   connectDropTarget: connect.dropTarget(),
+// });
 
-export default DropTarget('CARD', cardTarget, dropCollect)(CreateCardTool);
+// export default DropTarget('CARD', cardTarget, dropCollect)(CreateCardTool);

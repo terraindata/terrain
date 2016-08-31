@@ -81,8 +81,8 @@ class BuilderTextboxCards extends React.Component<Props, any>
         <Card
           {...this.props}
           singleCard={true}
-          card={this.props.value}
-          index={0}
+          card={this.props.value as BuilderTypes.ICard}
+          index={null}
         />
       </div>
     );

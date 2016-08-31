@@ -50,6 +50,7 @@ import ActionTypes from './BuilderActionTypes.tsx';
 import Actions from './BuilderActions.tsx';
 import * as _ from 'underscore';
 import {BuilderState} from './BuilderStore.tsx';
+import Util from '../../util/Util.tsx';
 
 const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
 {
@@ -133,13 +134,14 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   
 [ActionTypes.create]:  
   (state, action: {
-    payload?: { keyPath: KeyPath, index: number, factoryType: string }
+    payload?: { keyPath: KeyPath, index: number, factoryType: string, data: any }
   }) =>
     state.updateIn(action.payload.keyPath, arr =>
       arr.splice
       (
         action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index, 0, 
-        BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType])
+        action.payload.data ? action.payload.data :
+          BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType])
       )
     )
   ,
@@ -157,11 +159,67 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       return arr;
     }),
 
+     // first check original keypath
+[ActionTypes.nestedMove]: // a deep move
+  (state, action: {
+    payload?: { itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number }
+  }) =>
+  {
+    let { itemKeyPath, itemIndex, newKeyPath, newIndex } = action.payload;
+    
+    if(itemKeyPath.equals(newKeyPath))
+    {
+      if(itemIndex === newIndex)
+      {
+        return state;
+      }
+      
+      // moving within same list
+      return state.updateIn(itemKeyPath, arr =>
+      {
+        let item = arr.get(itemIndex);
+        return arr.splice(itemIndex, 1).splice(newIndex, 0, item);
+      });
+    }
+    
+    let itemReferenceKeyPath = itemIndex === null ? itemKeyPath : itemKeyPath.push(itemIndex);
+    let item = state.getIn(itemReferenceKeyPath);
+    let tempId = '' + Math.random(); // mark with a temporary ID so we know where to delete
+    state = state.setIn(itemReferenceKeyPath.push('id'), tempId);
+    
+    state = state.updateIn(newKeyPath, obj => {
+      if(Immutable.List.isList(obj))
+      {
+        return obj.splice(newIndex, 0, item);
+      }
+      return item;
+    });
+    
+    if(state.getIn(itemReferenceKeyPath.push('id')) === tempId)
+    {
+      // location remained same, optimized delete
+      state = state.deleteIn(itemReferenceKeyPath);
+    }
+    else
+    {
+      // search and destroy
+      // NOTE: if in the future the same card is open in multiple places, this will break
+      state = state.deleteIn(Util.keyPathForId(state, tempId) as (string | number)[]);
+      // Consider an optimized search if performance becomes an issue.
+    }
+    
+    return state;
+  },
+
 [ActionTypes.remove]:  
   (state, action: {
     payload?: { keyPath: KeyPath, index: number, factoryType: string }
   }) =>
-    state.removeIn(action.payload.keyPath.push(action.payload.index))
+    state.removeIn(
+      action.payload.index === null
+        ? action.payload.keyPath
+        : action.payload.keyPath.push(action.payload.index)
+    )
   ,
 
 [ActionTypes.hoverCard]:
@@ -173,20 +231,19 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
 
 [ActionTypes.selectCard]:
   (state, action: {
-    payload?: { cardId: ID, shiftPressed: boolean, ctrlPressed: boolean },
+    payload?: { cardId: ID, shiftKey: boolean, ctrlKey: boolean },
   }) =>
   {
-    let {cardId, shiftPressed, ctrlPressed} = action.payload;
-    if(!shiftPressed && !ctrlPressed)
+    let {cardId, shiftKey, ctrlKey} = action.payload;
+    if(!shiftKey && !ctrlKey)
     {
       state = state.set('selectedCardIds', Immutable.Map({}));
     }
-    if(ctrlPressed)
+    if(ctrlKey)
     {
       return state.setIn(['selectedCardIds', cardId],
         !state.getIn(['selectedCardIds', cardId]));
     }
-    
     return state.setIn(['selectedCardIds', cardId], true);
   },
   

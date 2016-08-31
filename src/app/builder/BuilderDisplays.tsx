@@ -69,11 +69,17 @@ export interface Display
   key: string;
   // key can be null for FLEX but nothing else
   
+<<<<<<< HEAD
   //Manual information
   helpInformation?: string | string[];
 
   header?: string;
+=======
+>>>>>>> master
   className?: string | ((data: any) => string);
+  
+  header?: string;
+  headerClassName?: string;
   
   // for dropdown
   options?: List<(string | El)>;

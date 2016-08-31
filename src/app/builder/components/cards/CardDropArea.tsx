@@ -42,58 +42,82 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-var Immutable = require('immutable');
+// an invisible area covering the upper or lower half of a card, sensing that a card can be dropped
 
-// Defining our object like this gives us compile-time TypeScript support for ActionTypes
-//  and prevents us from defining duplicate action types.
-// The keys are the action types.
-// The values are initially the empty string (for coding expediency) but a function at the end
-//  of this file sets all of the values equal to the keys.
-// So you end up with ActionTypes.cards.move === 'cards.move'
+require('./CardDropArea.less');
+import * as React from 'react';
+import PureClasss from '../../../common/components/PureClasss.tsx';
+import { DropTarget } from 'react-dnd';
+const classNames = require('classnames');
+import { CardItem } from './Card.tsx';
+import Actions from "../../data/BuilderActions.tsx";
 
-var BuilderActionTypes = 
+interface Props
 {
-  create: '',
-  change: '',
-  move: '',
-  nestedMove: '',
-  remove: '',
-  fetch: '',
-  setVariant: '',
-  setVariantField: '',
+  keyPath: KeyPath;
+  index: number;
   
-  hoverCard: '',
-  selectCard: '',
-};
+  half?: boolean;
+  lower?: boolean;
+  isOver?: boolean;
+  connectDropTarget?: (el: El) => El;
+}
 
-// I tried using this type to correclty classify this function,
-//  but because of how object literals work in TypeScript,
-//  it wasn't useful.
-// Reference: http://stackoverflow.com/questions/22077023/why-cant-i-indirectly-return-an-object-literal-to-satisfy-an-index-signature-re
-// type ObjectOfStrings = { [s: string]: ObjectOfStrings | string };
-
-var setValuesToKeys = (obj: any, prefix: string) =>
+class CardDropArea extends PureClasss<Props>
 {
-  prefix = prefix + (prefix.length > 0 ? '.' : '');
-  for(var key in obj)
+	render()
   {
-    var value = prefix + key;
-    if(typeof obj[key] === 'string')
+    return this.props.connectDropTarget(
+      <div
+        className={classNames({
+          'card-drop-area': true,
+          'card-drop-area-half': this.props.half,
+          'card-drop-area-upper': this.props.half && !this.props.lower,
+          'card-drop-area-lower': this.props.half && this.props.lower,
+          'card-drop-area-over': this.props.isOver,
+        })}
+      />
+	  );
+	}
+}
+
+const cardTarget = 
+{
+  canDrop(targetProps:Props, monitor)
+  {
+    let item = monitor.getItem() as CardItem;
+    let itemKeyPath = item.props.keyPath;
+    let targetKeyPath = targetProps.keyPath;
+    if(targetKeyPath.equals(itemKeyPath))
     {
-      obj[key] = value;
+      return targetProps.index !== item.props.index;
     }
-    else if(typeof obj[key] === 'object')
+    let itemChildKeyPath = itemKeyPath.push(item.props.index);
+    if(targetKeyPath.size >= itemChildKeyPath.size)
     {
-      setValuesToKeys(obj[key], value);
+      // can't drag a card into a card that is within itself
+      // so make sure that the itemKeyPath is not a prefix for the targetKeyPath
+      return ! targetKeyPath.splice(itemChildKeyPath.size, targetKeyPath.size - itemChildKeyPath.size)
+        .equals(itemChildKeyPath);
     }
-    else
+    return true;
+  },
+  
+  drop(targetProps:Props, monitor, component)
+  {
+    if(monitor.isOver({ shallow: true}) && cardTarget.canDrop(targetProps, monitor))
     {
-      throw "Value found in ActionTypes that is neither string or object of strings: key: " + key + ", value: " + obj[key];
+      let cardProps = monitor.getItem().props;
+      Actions.nestedMove(cardProps.keyPath, cardProps.index, targetProps.keyPath, targetProps.index);
     }
   }
 }
 
-setValuesToKeys(BuilderActionTypes, '');
+const dropCollect = (connect, monitor) =>
+({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver({ shallow: true}) && monitor.canDrop(),
+});
 
-export default BuilderActionTypes;
+
+export default DropTarget('CARD', cardTarget, dropCollect)(CardDropArea);

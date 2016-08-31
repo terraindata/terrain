@@ -363,7 +363,7 @@ class BuilderComponent extends PureClasss<Props>
     return (
       <div key={key}>
         { ! d.header ? null :
-            <div className='builder-card-header'>
+            <div className={'builder-card-header ' + (d.headerClassName ? d.headerClassName : '')}>
               { d.header }
             </div>
         }
