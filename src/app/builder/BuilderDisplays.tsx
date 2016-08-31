@@ -115,6 +115,7 @@ export interface Display
 export const valueDisplay =
 {
   displayType: NUM,
+  helpInformation: 'Number value',
   key: 'value',
 }
 
@@ -150,6 +151,7 @@ export const filtersDisplay =
         {
           displayType: CARDTEXT,
           key: 'first',
+          helpInformation: 'Value to compare',
           top: true,
         },
         {
@@ -160,6 +162,7 @@ export const filtersDisplay =
         {
           displayType: CARDTEXT,
           key: 'second',
+          helpInformation: 'Value to compare',
         },
         {
           displayType: DROPDOWN,
@@ -185,6 +188,7 @@ export const letVarDisplay =
   [
     {
       displayType: TEXT,
+      helpInformation: 'Variable name',
       key: 'field',
     },
     {
@@ -194,6 +198,7 @@ export const letVarDisplay =
     },
     {
       displayType: CARDTEXT,
+      helpInformation: 'Value to assign variable',
       key: 'expression',
     },
   ],
