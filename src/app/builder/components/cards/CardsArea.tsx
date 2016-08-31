@@ -55,7 +55,7 @@ import Card from "../cards/Card.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateCardTool from "./CreateCardTool.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
-import { DropTarget } from 'react-dnd';
+import CardDropArea from './CardDropArea.tsx';
 import BuilderTypes from '../../BuilderTypes.tsx';
 type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
@@ -169,8 +169,7 @@ class CardsArea extends PureClasss<Props>
     let {props} = this;
     let {cards, topLevel, canEdit} = props;
     
-    // TODO add cards
-    return this.props.connectDropTarget(
+    return (
       <div
         className={classNames({
           'cards-area': true,
@@ -182,13 +181,10 @@ class CardsArea extends PureClasss<Props>
           cards.map((card:ICard, index:number) =>
             <Card 
               {...this.props}
-              cards={null}
               key={card.id}
               singleCard={false}
-              topLevel={false}
               index={index}
               card={card}
-              dndListener={$({})}
               keys={this.state.keys}
               keyPath={this.state.keyPath}
             />
@@ -208,41 +204,33 @@ class CardsArea extends PureClasss<Props>
         }
         
         <CreateCardTool
-          {...this.props}
+          canEdit={this.props.canEdit}
           keyPath={this.state.keyPath}
           index={props.cards.size}
           open={props.cards.size === 0}
-          parentId={props.queryId /* TODO */}
           className={props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
         />
+        
       </div>
     );
   }
 }
+        // {
+        //   !topLevel ? null : 
+        //     <CardDropArea
+        //       half={true}
+        //       index={0}
+        //       keyPath={this.state.keyPath}
+        //     />
+        // }
+        // {
+        //   !topLevel ? null : 
+        //     <CardDropArea
+        //       half={true}
+        //       lower={true}
+        //       index={props.cards.size}
+        //       keyPath={this.state.keyPath}
+        //     />
+        // }
 
-
-
-const cardTarget = 
-{
-  canDrop(props, monitor)
-  {
-    return true;
-  },
-  
-  drop(props, monitor, component)
-  {
-    if(monitor.isOver({ shallow: true}))
-    {
-      const card = monitor.getItem();
-      // Actions.cards.move(card, props.cards.size, props.parentId); // TODO
-    }
-  }
-}
-
-const dropCollect = (connect, monitor) =>
-({
-  connectDropTarget: connect.dropTarget(),
-});
-
-
-export default DropTarget('CARD', cardTarget, dropCollect)(CardsArea);
+export default CardsArea;

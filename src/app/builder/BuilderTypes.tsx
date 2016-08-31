@@ -122,6 +122,7 @@ export module BuilderTypes
     getIn: (f: (string | number)[] | KeyPath) => any;
     delete: (f: string) => T;
     deleteIn: (f: (string | number)[] | KeyPath) => T;
+    toMap: () => Map<string, any>;
   }
   
   // A query can be viewed and edited in the Builder
@@ -189,7 +190,7 @@ export module BuilderTypes
   //  and every piece of every card.
   
   // IBlock is a card or a distinct piece / group of card pieces
-  export interface IBlock
+  export interface IBlock extends IRecord<IBlock>
   {
     id: string;
     type: string;
@@ -368,6 +369,7 @@ export module BuilderTypes
         display: [
           {
             header: 'Select',
+            headerClassName: 'sfw-select-header',
             displayType: DisplayType.ROWS,
             key: 'fields',
             english: 'field',
@@ -665,7 +667,6 @@ export module BuilderTypes
         ],
         
         init: (config?:{[key:string]:any}) => {
-          console.log('init');
           if(!config)
           {
             config = {};
@@ -690,7 +691,6 @@ export module BuilderTypes
               }),
             ]);
           }
-          console.log(config);
           return config;
         }
       }
@@ -842,6 +842,23 @@ export module BuilderTypes
       return preview(card);
     }
   }  
+  
+  export function getChildIds(_block:IBlock):Map<ID, boolean>
+  {
+    var map: Map<ID, boolean> = Map({});
+    
+    if(Immutable.Iterable.isIterable(_block))
+    {
+      let block = _block.toMap();
+      if(block.get('id'))
+      {
+        map = map.set(block.get('id'), true);
+      }
+      block.map(value => map = map.merge(getChildIds(value)));
+    }
+    
+    return map;
+  }
 }
 
 export default BuilderTypes;

@@ -60,12 +60,16 @@ var BuilderActions =
       $(ActionTypes.change, { keyPath, value }),
   
   create:
-    (keyPath: KeyPath, index: number, factoryType: string) =>
-      $(ActionTypes.create, { keyPath, factoryType, index }),
+    (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
+      $(ActionTypes.create, { keyPath, factoryType, index, data }),
   
   move:
     (keyPath: KeyPath, index: number, newIndex: number) =>
       $(ActionTypes.move, { keyPath, index, newIndex }),
+  
+  nestedMove:
+    (itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number) =>
+      $(ActionTypes.nestedMove, { itemKeyPath, itemIndex, newKeyPath, newIndex }),
   
   remove:
     (keyPath: KeyPath, index: number) =>
@@ -88,8 +92,8 @@ var BuilderActions =
       $(ActionTypes.hoverCard, { cardId }),
   
   selectCard:
-    (cardId: ID, selectPressed: boolean) =>
-      $(ActionTypes.hoverCard, { cardId, selectPressed }),
+    (cardId: ID, shiftKey: boolean, ctrlKey: boolean) =>
+      $(ActionTypes.selectCard, { cardId, shiftKey, ctrlKey }),
 };
 
 export default BuilderActions;

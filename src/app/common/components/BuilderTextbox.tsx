@@ -47,6 +47,7 @@ require('./BuilderTextbox.less');
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import CardDropArea from "../../builder/components/cards/CardDropArea.tsx";
 import Actions from "../../builder/data/BuilderActions.tsx";
 import Util from '../../util/Util.tsx';
 import PureClasss from '../../common/components/PureClasss.tsx';
@@ -230,23 +231,30 @@ class BuilderTextbox extends PureClasss<Props>
               />
           }
           { this.props.acceptsCards && this.renderSwitch() }
+          { this.props.acceptsCards &&
+              <CardDropArea
+                keyPath={this.props.keyPath}
+                index={null}
+              />
+          }
         </div>
       );
     }
     
-    var cards = this.props.value['cards'];
-    if(cards.size)
-    {
-      var card = cards.get(0);
+    var card: BuilderTypes.ICard = this.props.value as BuilderTypes.ICard;
+    // var cards = this.props.value['cards'];
+    // if(cards.size)
+    // {
+      // var card = cards.get(0);
       var color = card.static.colors[0] as string;
-      var title: string = card.title;
+      var title: string = card.static.title;
       var preview = BuilderTypes.getPreview(card);
-    }
-    else
-    {
-      var color = "#aaa";
-      var title = "Add a Card";
-    }
+    // }
+    // else
+    // {
+    //   var color = "#aaa";
+    //   var title = "Add a Card";
+    // }
     
     var chipStyle = 
     {
