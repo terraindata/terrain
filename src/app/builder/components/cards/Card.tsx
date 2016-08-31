@@ -197,15 +197,6 @@ class Card extends PureClasss<Props>
       borderRadius: 10
     });
     this.props.connectDragPreview(this.dragPreview);
-<<<<<<< HEAD
-    
-    if(this.props.dndListener)
-    {
-      this.props.dndListener.bind('draggedAway', this.handleDraggedAway);
-      this.props.dndListener.bind('dropped', this.handleDropped);
-      this.props.dndListener.bind('droppedBelow', this.handleDroppedBelow);
-      this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
-    }
   }
   
   // hex2rgba(color: string)
@@ -249,19 +240,6 @@ class Card extends PureClasss<Props>
   //     },
   //     })
   // },
-
-  componentDidUpdate()
-  {
-    if(this.props.dndListener)
-    {
-      this.props.dndListener.bind('draggedAway', this.handleDraggedAway);
-      this.props.dndListener.bind('dropped', this.handleDropped);
-      this.props.dndListener.bind('droppedBelow', this.handleDroppedBelow);
-      this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
-    }
-=======
->>>>>>> master
-  }
   
   handleDraggedAway()
   {

@@ -146,11 +146,7 @@ export module BuilderTypes
     getIn: (f: (string | number)[] | KeyPath) => any;
     delete: (f: string) => T;
     deleteIn: (f: (string | number)[] | KeyPath) => T;
-<<<<<<< HEAD
-
-=======
     toMap: () => Map<string, any>;
->>>>>>> master
   }
   
   // A query can be viewed and edited in the Builder
