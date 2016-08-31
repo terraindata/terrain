@@ -86,6 +86,7 @@ class ManualEntry extends Classs<Props>
   constructor(props: Props) 
   {
     super(props);
+    
     this.manualEntry = this.props.phraseType ? ManualConfig[1][this.props.entryName] : BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
     this.state =
       {
@@ -230,7 +231,8 @@ class ManualEntry extends Classs<Props>
   }
 
   renderCardExample(index) {
-    var card = BuilderTypes.recordFromJS(this.manualEntry.text[index[0]]);
+    var card = BuilderTypes.recordFromJS(this.manualEntry.text[index][0]);
+    console.log(card);
     return (
       <div className='manual-entry-demo'>
         <Card
