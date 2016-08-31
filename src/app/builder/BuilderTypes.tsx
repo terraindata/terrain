@@ -407,7 +407,6 @@ export module BuilderTypes
         display: [
           {
             header: 'Select',
-            helpInformation: 'This is some information to help with the SELECT card',
             displayType: DisplayType.ROWS,
             key: 'fields',
             english: 'field',
@@ -417,6 +416,7 @@ export module BuilderTypes
               inner:
               {
                 displayType: DisplayType.TEXT,
+                helpInformation: 'This is the field that you are selecting',
                 key: 'field'
               },
             },
