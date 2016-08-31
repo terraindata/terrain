@@ -86,7 +86,7 @@ interface Props
 interface KeyState {
   keys: List<string>;
   keyPath: KeyPath;
-  resultFormat: string;
+  learningMode: string;
 }
 
 class CardsArea extends PureClasss<Props>
@@ -94,7 +94,7 @@ class CardsArea extends PureClasss<Props>
   state: KeyState = {
     keys: List([]),
     keyPath: null,
-    resultFormat: this.props.helpOn ? 'learning' : 'normal',
+    learningMode: this.props.helpOn ? 'learning' : 'normal',
   };
 
   constructor(props:Props)
@@ -173,34 +173,11 @@ class CardsArea extends PureClasss<Props>
   {
     Actions.create(this.state.keyPath, 0, 'sfw');
   }
-
-        //   <div className='results-top-summary'>
-        //   {
-        //     this.state.error ? 'Error with query' : 
-        //     (
-        //       this.state.resultsWithAllFields ? 
-        //         `${this.state.resultsWithAllFields.length} results` 
-        //       : 'Text result'
-        //     )
-        //   }
-        // </div>
-        
-        // <Switch
-        //   first='Icons'
-        //   second='Table'
-        //   onChange={this.toggleView}
-        //   selected={this.state.resultFormat === 'icon' ? 1 : 2}
-        //   small={true}
-        // />
-        
-        // <div className='results-top-config' onClick={this.showConfig}>
-        //   Customize view
-        // </div>
   
   toggleView()
   {
     this.setState({
-      resultFormat: this.state.resultFormat === 'normal' ? 'learning' : 'normal',
+      learningMode: this.state.learningMode === 'normal' ? 'learning' : 'normal',
     })
   }
   
@@ -213,7 +190,7 @@ class CardsArea extends PureClasss<Props>
           first='Normal'
           second='Learning'
           onChange={this.toggleView}
-          selected={this.state.resultFormat === 'normal' ? 1 : 2}
+          selected={this.state.learningMode === 'normal' ? 1 : 2}
           small={true}
         />
       </div>
@@ -239,7 +216,7 @@ class CardsArea extends PureClasss<Props>
           cards.map((card:ICard, index:number) =>
             <Card 
               {...this.props}
-              helpOn={this.state.resultFormat === 'learning' || this.props.helpOn}
+              helpOn={this.state.learningMode === 'learning' || this.props.helpOn}
               cards={null}
               key={card.id}
               singleCard={false}
