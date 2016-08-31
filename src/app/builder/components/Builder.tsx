@@ -119,6 +119,7 @@ class Builder extends PureClasss<Props>
     else
     {
       var colKeys = List([Math.random(), Math.random()]);
+      localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
     }
     this.state.colKeys = colKeys;
   }

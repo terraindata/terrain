@@ -239,7 +239,6 @@ var BuilderColumn = React.createClass<any, any>(
           topLevel={true}
           keys={this.state.inputKeys}
           canEdit={canEdit}
-          history={this.props.history}
           addColumn={this.props.onAddManualColumn}
           canAddColumn={this.props.canAddColumn}
           onCloseColumn={this.props.onCloseColumn}

@@ -15,15 +15,6 @@
     }
   }
   
-  &.card-drag-over-upper,
-  &.card-drag-over-lower {
-    input, textarea {
-      .transition(~"none");
-      border-color: @drag-color;
-      box-shadow: 0px 0px 0px 1px @drag-color;
-    }
-  }
-  
   &:hover {
     .builder-tb-switch {
       opacity: 0.75;
@@ -152,6 +143,10 @@
   }
 }
 
+.builder-tb-cards-area {
+  margin-right: -16px;
+}
+
 .card-dragging {
   .builder-tb-drag-over {
     input, textarea {
@@ -161,7 +156,7 @@
   }
 }
 
-.card-is-dragging {
+.body-card-is-dragging {
   .builder-tb-switch {
     opacity: 0.75;
   }

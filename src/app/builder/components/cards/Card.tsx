@@ -62,34 +62,11 @@ import Actions from "../../data/BuilderActions.tsx";
 import BuilderTypes from './../../BuilderTypes.tsx';
 import Store from "./../../data/BuilderStore.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
+import CardDropArea from './CardDropArea.tsx';
 
 import BuilderComponent from '../BuilderComponent.tsx';
 
 var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
-
-// var findParentWithClass = 
-//   (n, className, count) => 
-//     count > 100 ? null : (n && !n.is('body') && (n.hasClass(className) && !n.hasClass('single-card') ? n :
-//       findParentWithClass(n.parent(), className, count + 1)));
-// var hoverCard = (event) => {
-//   $('.card-hovering').removeClass('card-hovering');
-//   $('.card-hovering-lower').removeClass('card-hovering-lower');
-//   $('.card-hovering-upper').removeClass('card-hovering-upper');
-//   var c = findParentWithClass($(event.target), 'card', 0);
-//   if(c)
-//   {
-//     c.addClass('card-hovering');
-//     if(event.pageY > c.offset().top + c.height() - 30)
-//     {
-//       c.addClass('card-hovering-lower');
-//     }
-//     if(event.pageY < c.offset().top + 30)
-//     {
-//       c.addClass('card-hovering-upper');
-//     }
-//   }
-// };
-// $('body').mousemove(_.throttle(hoverCard, 100));
 
 // $('body').on('click', (event) =>
 // {
@@ -98,36 +75,6 @@ var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon"
 //   {
 //     Actions.selectCard(null, event.altKey, event.shiftKey);
 //   }
-// });
-
-// var _lastDragOverEl;
-// var _lastDragOverClassName;
-// const handleCardDragover = (event) => 
-// {
-//   var el = findParentWithClass($(event.target), 'card-drop-target', 0);
-//   if(el)
-//   {
-//     var lower = event.pageY > el.offset().top + el.height() / 2;
-//     var className = lower ? 'card-drag-over-lower' : 'card-drag-over-upper';
-//     if(!_lastDragOverEl || el !== _lastDragOverEl || _lastDragOverClassName !== className)
-//     {
-//       _lastDragOverEl && _lastDragOverEl.removeClass(_lastDragOverClassName);
-//       el.addClass(className);
-//       _lastDragOverEl = el;
-//       _lastDragOverClassName = className;
-//     }
-//   }
-// };
-// $(document).on('dragover', _.throttle(handleCardDragover, 100));
-// TODO
-// $(document).on('dragend', () => 
-// {
-//   _lastDragOverEl.removeClass(_lastDragOverClassName);
-//   setTimeout(() => {
-//     // hack because the drag handler is throttled so could fire after 'dragend'
-//     _lastDragOverEl.removeClass(_lastDragOverClassName);
-//     _lastDragOverEl = null;
-//   }, 200);
 // });
 
 interface Props
@@ -146,10 +93,8 @@ interface Props
   colIndex?: number;
   
   isDragging?: boolean;
-  dndListener?: any;
   connectDragPreview?: (a?:any) => void;
   connectDragSource?: (el: El) => El;
-  connectDropTarget?: (el: El) => El;
 
   helpOn?: boolean;
 }
@@ -163,7 +108,7 @@ class Card extends PureClasss<Props>
     hovering: boolean;
     menuOptions: List<MenuOption>;
     
-    // TODO
+    // CreateCardTool
     addingCardBelow?: boolean;
     addingCardAbove?: boolean;
   }
@@ -173,10 +118,6 @@ class Card extends PureClasss<Props>
     cardBody: Ref;
     cardInner: Ref;
   }
-  
-  //   cardBody: El;
-  //   cardInner: El;
-  // };
   
   constructor(props:Props)
   {
@@ -238,17 +179,6 @@ class Card extends PureClasss<Props>
     });
   }
   
-  componentWillUnmount()
-  {
-    if(this.props.dndListener)
-    {
-      this.props.dndListener.unbind('draggedAway', this.handleDraggedAway);
-      this.props.dndListener.unbind('dropped', this.handleDropped);
-      this.props.dndListener.unbind('droppedBelow', this.handleDroppedBelow);
-      this.props.dndListener.unbind('droppedAbove', this.handleDroppedAbove);
-    }
-  }
-  
   dragPreview: any;
   componentDidMount()
   {
@@ -267,14 +197,6 @@ class Card extends PureClasss<Props>
       borderRadius: 10
     });
     this.props.connectDragPreview(this.dragPreview);
-    
-    if(this.props.dndListener)
-    {
-      this.props.dndListener.bind('draggedAway', this.handleDraggedAway);
-      this.props.dndListener.bind('dropped', this.handleDropped);
-      this.props.dndListener.bind('droppedBelow', this.handleDroppedBelow);
-      this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
-    }
   }
   
   // hex2rgba(color: string)
@@ -318,17 +240,6 @@ class Card extends PureClasss<Props>
   //     },
   //     })
   // },
-
-  componentDidUpdate()
-  {
-    if(this.props.dndListener)
-    {
-      this.props.dndListener.bind('draggedAway', this.handleDraggedAway);
-      this.props.dndListener.bind('dropped', this.handleDropped);
-      this.props.dndListener.bind('droppedBelow', this.handleDroppedBelow);
-      this.props.dndListener.bind('droppedAbove', this.handleDroppedAbove);
-    }
-  }
   
   handleDraggedAway()
   {
@@ -338,20 +249,6 @@ class Card extends PureClasss<Props>
   handleDropped()
   {
     // Util.animateToAutoHeight(this.refs['cardContainer']);
-  }
-  
-  handleDroppedBelow(item)
-  {
-    this.setState({
-      droppedBelow: true,
-    });
-  }
-  
-  handleDroppedAbove(item)
-  {
-    this.setState({
-      droppedAbove: true,
-    });
   }
   
 	toggleClose(event)
@@ -383,8 +280,7 @@ class Card extends PureClasss<Props>
     
     event.stopPropagation();
     event.preventDefault();
-    // TODO
-    // Actions.cards.selectCard(this.props.card.id, event.altKey, event.shiftKey);
+    Actions.selectCard(this.props.card.id, event.shiftKey, event.altKey);
   }
   
   handleDelete()
@@ -470,8 +366,9 @@ class Card extends PureClasss<Props>
 
     let {card} = this.props;
 		let {title} = card.static;
-    const { isDragging, connectDragSource, connectDropTarget } = this.props;
-    const rendering = 
+    const { isDragging, connectDragSource } = this.props;
+    
+    return ( 
       <div
         className={classNames({
           'card': true,
@@ -479,9 +376,7 @@ class Card extends PureClasss<Props>
           'card-closed' : !this.state.open,
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
-          'card-drop-target': true,
           [card.type + '-card']: true,
-          // 'wrapper-card': isWrapperCard,
         })}
         rel={'card-' + card.id}
         onMouseMove={this.handleMouseMove}
@@ -495,16 +390,15 @@ class Card extends PureClasss<Props>
             />
           }
           { this.renderAddCard() }
-          <div className='card-stroke card-stroke-above' />
           <div
-            className={'card-inner ' + (this.props.singleCard ? 'card-single' : '')}
+            className={'card-inner ' + (this.props.singleCard ? 'single-card-inner' : '')}
             style={{
               background: card.static.colors[1],
               borderColor: card.static.colors[0],
             }}
             ref='cardInner'
           >
-            { !this.props.singleCard &&
+            {
               connectDragSource(
                 <div
                   className={classNames({
@@ -539,11 +433,21 @@ class Card extends PureClasss<Props>
                 </div>
               )
             }
+            <CardDropArea
+              half={true}
+              keyPath={this.props.keyPath}
+              index={this.props.index}
+            />
+            <CardDropArea
+              half={true}
+              lower={true}
+              keyPath={this.props.keyPath}
+              index={this.props.index}
+            />
             <div className='card-body' ref='cardBody'>
               { contentToDisplay }
             </div>
           </div>
-          <div className='card-stroke card-stroke-below' />
           { this.renderAddCard(true) }
           { !this.props.singleCard &&
             <CreateCardTool
@@ -554,65 +458,40 @@ class Card extends PureClasss<Props>
             />
           }
         </div>
-      </div>;
-      
-    if(!this.props.singleCard)
-    {
-      return connectDropTarget(rendering);
-    }
-    return rendering;			
+      </div>
+    );
 	}
 }
 
 
-// DnD stuff
+// Drag and Drop (the bass)
 
-// Defines a draggable result functionality
+export interface CardItem
+{
+  props: Props;
+  childIds: Map<ID, boolean>;
+}
+
 const cardSource = 
 {
-  canDrag(props)
-  {
-    return props.canEdit;
-  },
+  canDrag: (props) => props.canEdit,
   
-  beginDrag(props)
+  beginDrag: (props: Props): CardItem =>
   {
-    const item = props.card;
-    // TODO do something better than this
-    $('body').addClass('card-is-dragging');
-    if(props.dndListener)
-    {
-       props.dndListener.trigger('draggedAway')
+    setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
+    return {
+      props,
+      childIds: BuilderTypes.getChildIds(props.card),
     }
-    // Actions.cards.selectCard(item.id, false, false);
-    return item;
   },
+  // select card?
   
-  endDrag(props, monitor, component)
+  endDrag: () =>
   {
-    // TODO do something better than this
-    $('body').removeClass('card-is-dragging');
-    
-    if(props.dndListener)
-    {
-      setTimeout(() =>
-       props.dndListener.trigger('dropped')
-      , 250);
-    }
-    
-    if(!monitor.didDrop())
-    {
-      return;
-    }
-    
-    const item = monitor.getItem();
-    const dropResult = monitor.getDropResult();
-    
-    var m = monitor.getClientOffset();
+    $('body').removeClass('body-card-is-dragging');
   }
 }
 
-// Defines props to inject into the component
 const dragCollect = (connect, monitor) =>
 ({
   connectDragSource: connect.dragSource(),
@@ -621,59 +500,4 @@ const dragCollect = (connect, monitor) =>
 });
 
 
-
-const cardTarget = 
-{
-  canDrop(props, monitor)
-  {
-    return true;
-  },
-  
-  drop(props, monitor, component)
-  {
-    if(monitor.isOver({ shallow: true}))
-    {
-      const card = monitor.getItem();
-      const id = props.card.id;
-      const findId = (c) =>
-      {
-        for(var i in c)
-        {
-          if(c.hasOwnProperty(i) && typeof c[i] === 'object')
-          {
-            if(c[i].id === id || findId(card[i]))
-            {
-              return true;  
-            }
-          }
-        }
-      }
-      
-      if(findId(card))
-      {
-        return;  
-      }
-      
-      var cr = ReactDOM.findDOMNode(component).getBoundingClientRect();
-      var m = monitor.getClientOffset();
-      if(m.y > (cr.top + cr.bottom) / 2)
-      {
-        var below = true;
-      }
-      
-      props.dndListener && props.dndListener.trigger(below ? 'droppedBelow' : 'droppedAbove',
-          monitor.getItem()
-        );
-      
-      // TODO
-      // Actions.cards.move(card, props.index + (below ? 1 : 0), props.parentId)
-    }
-  }
-}
-
-const dropCollect = (connect, monitor) =>
-({
-  connectDropTarget: connect.dropTarget(),
-});
-
-export default DropTarget('CARD', cardTarget, dropCollect)(DragSource('CARD', cardSource, dragCollect)(Card));
+export default DragSource('CARD', cardSource, dragCollect)(Card);

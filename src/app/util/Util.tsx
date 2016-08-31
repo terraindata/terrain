@@ -51,61 +51,8 @@ import * as _ from 'underscore';
 import BrowserTypes from './../browser/BrowserTypes.tsx';
 
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-var immutableCardsUpdateHelper = (node: any, keyToUpdate: string | string[], id: string, updater: (node: any, key: string | string[]) => any) =>
-{
-  if(node.get('id') === id)
-  {
-    if(typeof keyToUpdate === 'string')
-    {
-      return node.update(keyToUpdate, (node: any) => updater(node, keyToUpdate));
-    }
-    else
-    {
-      if(node.getIn(keyToUpdate) === undefined)
-      {
-        console.log('Potential warning: you are setting a value at a keyPath that had an undefined value.', keyToUpdate, node.toJS());
-      }
-      return node.updateIn(keyToUpdate, (node: any) => updater(node, keyToUpdate));
-    }
-  }
-  let keys = node.keys();
-  var iterator = keys.next();
-  while(!iterator.done) //node.each((value, key) => // used `map` this way because `map` returns `undefined` for Immutable records
-  {
-    let key = iterator.value;
-    let value = node.get(key);
-    if(Immutable.Iterable.isIterable(value))
-    {
-      node = node.set(key, immutableCardsUpdateHelper(value, keyToUpdate, id, updater));
-    }
-    iterator = keys.next();
-  };
-  
-  return node;
-}
 
-var immutableCardsUpdate = 
-  (state: any, keysToUpdate: string | string[], id: string, updater: (node: any, key: string) => any) => {
-    if(typeof keysToUpdate === "string")
-    {
-      keysToUpdate = [keysToUpdate as string];
-    }
-    return state.update('queries', algorithms => algorithms.map((algorithm) => {
-      var a = (keysToUpdate as string[]).reduce(
-        (algorithm, keyToUpdate) => immutableCardsUpdateHelper(algorithm, keyToUpdate, id, updater)
-      , algorithm);
-      return a;
-    }));
-  };
-
-var immutableCardsSetIn = 
-  (state: any, id: string, keyPath: string[], value) => {
-    return state.update('queries', algorithms => 
-      immutableCardsUpdateHelper(algorithms, keyPath, id,
-        (n) => Immutable.fromJS(value))
-  )};
-
-var keyPathForId = (node: any, id: string) =>
+var keyPathForId = (node: any, id: string): ((string | number)[] | boolean) =>
   {
     if(node.get('id') === id)
     {
@@ -253,6 +200,7 @@ var Util = {
     return index;
   },
   
+  // still needed?
   immutableMove: (arr: any, id: any, index: number) => {
     var curIndex = arr.findIndex((obj) => 
       (typeof obj.get === 'function' && (obj.get('id') === id))
@@ -262,8 +210,6 @@ var Util = {
     return arr.splice(index, 0, obj);
   },
   
-  immutableCardsUpdate: immutableCardsUpdate,
-  immutableCardsSetIn: immutableCardsSetIn,
   keyPathForId: keyPathForId,
 
 	isInt(num): boolean
@@ -358,31 +304,7 @@ var Util = {
   },
 
 
- // TODO remove
-	operatorToString(operator: string): string
-	{
-		switch(operator) {
-			case 'eq':
-				return '=';
-			case 'ge':
-				return '≥';
-			case 'gt':
-				return '>';
-			case 'le':
-				return '≤';
-			case 'lt':
-				return '<';
-   case 'in':
-    return 'in';
-			case 'ne':
-				return '≠';
-		}
-
-		console.log('Not a valid operator: ' + operator);
-
-		return "";
-	},
-
+  // REMOVE
 	// accepts object of key/vals like this: { 'className': include? }
 	objToClassname(obj: { [className: string]: boolean }): string
 	{
@@ -401,40 +323,6 @@ var Util = {
     return cards.findIndex(card => card.get('id') === action.payload.card.id);
   },
 
-  // returns a reducing function that updates the given field with the fieldUpdater
-  //  fieldUpdater gets passed (fieldObject, action)
-  updateCardField: (field: string, fieldUpdater: (node: any, action: any) => any) =>
-    (state, action) =>
-      Util.immutableCardsUpdate(state, field, action.payload.card.id,
-        (fieldObj) => fieldUpdater(fieldObj, action)),
-  
-  // Given a function that takes an action and generates a map
-  //  of field => value pairings,
-  //  returns a reducer that
-  //  finds the card specified in an action and sets
-  //  the values of the fields specified in the map
-  // note: outdated and unused
-  // updateCardFields: (fieldMapFactory: (action: any) => {[field: string]: any}) =>
-  //   (state, action) =>
-  //     state.updateIn([action.payload.card.parentId, 'cards'], (cards) =>
-  //       cards.updateIn([cards.findIndex(card => card.get('id') === action.payload.card.id)], 
-  //         card => 
-  //           _.reduce(fieldMapFactory(action), (card, value, field) =>
-  //             card.set(field, value)
-  //           , card)
-  //         )
-  //       ),
-  
-  // Given an array of strings representing fields on a card, 
-  //  returns a reducer that
-  //  finds the card specified in an action and sets
-  //  the value of the fields specified to the values
-  //  of the matching fields in the action's payload.
-  setCardFields: (fields: string[]) =>
-    (state, action) =>
-      Util.immutableCardsUpdate(state, fields, action.payload.card.id, 
-        (fieldVal, field) => Immutable.fromJS(action.payload[field])),
-  
   populateTransformDummyData(transformCard)
   {
     transformCard.range = transformCard.range || [0,100];
