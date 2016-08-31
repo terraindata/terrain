@@ -384,7 +384,18 @@ class TQL extends Classs<Props>
     var keywords = Object.keys(BuilderTypes.cardList);
     var cardName = '';
     keywords.map(function(word) {
-      if(line.toLowerCase().indexOf(word.toLowerCase()) >= 0)
+      var words = word.split(' ');
+      if(words.length > 1)
+      {
+        for(var i = 0; i < words.length; i++)
+        {
+          if(line.toLowerCase().indexOf(words[i].toLowerCase()) >= 0)
+          {
+            cardName = word;
+          }
+        }
+      }
+      else if(line.toLowerCase().indexOf(word.toLowerCase()) >= 0)
       {
         cardName = word;
       }

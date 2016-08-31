@@ -80,8 +80,8 @@ var ManualIcon = require('./../../../images/open-book-top-view.svg');
 enum COLUMNS {
   Builder,
   Results,
-  Inputs,
   TQL,
+  Inputs,
   Manual
 };
 var NUM_COLUMNS = 5;
@@ -140,7 +140,7 @@ var BuilderColumn = React.createClass<any, any>(
       }
     }
     return {
-      column: this.props.column ? this.props.column : this.props.index,
+      column: this.props.column ? this.props.column : column,
       loading: false,
       inputKeys: this.calcinputKeys(this.props),
       // rand: 1,
