@@ -70,8 +70,10 @@ class ManualInfo extends Classs<Props>
       <div className='manual-info-wrapper' style={this.props.style}>
         <div className='manual-info-indicator'></div>
         <div 
-          className='manual-info-content'
-          style={this.props.wide ? {width: '200px'} : {}}
+          className={classNames({
+            'manual-info-content': true,
+            'manual-info-content-wide': this.props.wide,
+          })}
         >
           {this.props.information}  
         </div>

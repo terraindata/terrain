@@ -156,7 +156,6 @@ class TQLConverter
   
   private static _parse(block: IBlock, index?: number, isLast?: boolean): string
   {
-    console.log(block);
     if(!block.static)
     {
       return;
