@@ -186,6 +186,7 @@ class CardsArea extends PureClasss<Props>
   {
     return (
       <div className='cards-area-top-bar'>
+        <div className = 'cards-area-white-space' />
         <Switch
           first='Normal'
           second='Learning'
