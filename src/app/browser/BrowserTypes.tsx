@@ -117,7 +117,6 @@ export module BrowserTypes
   {
     v = touchVariant(v);
     v = v.set('cards', BuilderTypes.recordsForServer(v.cards)) as Variant;
-    console.log(v.cards);
     return v;
   }
   
