@@ -240,8 +240,6 @@ var BuilderColumn = React.createClass<any, any>(
           keys={this.state.inputKeys}
           canEdit={canEdit}
           addColumn={this.props.onAddManualColumn}
-          canAddColumn={this.props.canAddColumn}
-          onCloseColumn={this.props.onCloseColumn}
           index={this.props.index}
         />;
         
@@ -265,8 +263,6 @@ var BuilderColumn = React.createClass<any, any>(
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
           addColumn={this.props.onAddManualColumn}
-          canAddColumn={this.props.canAddColumn}
-          onCloseColumn={this.props.onCloseColumn}
           index={this.props.index}
         />;
         

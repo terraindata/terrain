@@ -82,6 +82,9 @@ interface Props
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
   helpOn?: boolean;
+
+  addColumn?: (number, string?) => void;
+  colIndex?: number;
 }
 
 interface IMoveState
@@ -340,6 +343,8 @@ class CardField extends PureClasss<Props>
               keys={this.props.keys}
               parentData={this.props.parentData}
               helpOn={this.props.helpOn}
+              addColumn={this.props.addColumn}
+              colIndex={this.props.colIndex}
             />
         }
         <div
@@ -378,6 +383,8 @@ class CardField extends PureClasss<Props>
               keys={this.props.keys}
               parentData={this.props.parentData}
               helpOn={this.props.helpOn}
+              addColumn={this.props.addColumn}
+              colIndex={this.props.colIndex}
             />
   				</div>
   				<div className='card-field-tools-right'>
@@ -418,6 +425,8 @@ class CardField extends PureClasss<Props>
               keys={this.props.keys}
               parentData={this.props.parentData}
               helpOn={this.props.helpOn}
+              addColumn={this.props.addColumn}
+              colIndex={this.props.colIndex}
             />
         }
       </div>

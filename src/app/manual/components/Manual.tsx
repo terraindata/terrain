@@ -100,6 +100,20 @@ class Manual extends Classs<Props>
     }
   }
 
+  componentWillReceiveProps(nextProps)
+  {
+    console.log("Component will receive props");
+    console.log("old " + this.state.selectedKey);
+    console.log("new " +  nextProps.selectedKey);
+    if(this.state.selectedKey !== nextProps.selectedKey)
+    {
+      this.setState({
+        selectedKey: nextProps.selectedKey
+      });
+      this.search(nextProps.selectedKey);
+    }
+  }
+
   shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
@@ -280,9 +294,6 @@ class Manual extends Classs<Props>
 
   renderManualTopbar()
   {
-
-
-
     var closeOpacity = this.state.value.length ? 1 : 0;
     return (
        <div className = {classNames({

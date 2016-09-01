@@ -59,8 +59,6 @@ interface Props
   history?: any;
   style?: any;
   addColumn: (number, string?) => void;
-  canAddColumn: boolean;
-  onCloseColumn: (number) => void;
   index: number;
   onClick?: () => void;
 }
@@ -69,32 +67,13 @@ class TQLPopup extends Classs<Props>
 {
   constructor(props: Props) {
     super(props);
-    this.addColumn = _.debounce(this.addColumn, 10);
   }
 
-  addColumn()
-  {
-    this.props.addColumn(0, this.props.cardName);
-  }
-
-  closeColumn()
-  {
-    var closeIndex;
-    if (this.props.index === 0 || this.props.index === 1)
-    {
-      closeIndex = 2;
-    }
-    else {
-      closeIndex = 1;
-    }
-    this.props.onCloseColumn(closeIndex);
-    this.addColumn();
-  }
 
   openManual()
   {
     this.props.onClick && this.props.onClick();
-    this.props.canAddColumn ?  this.props.addColumn(0, this.props.cardName) : this.closeColumn();
+    this.props.addColumn(this.props.index, this.props.cardName);
   }
 
   render() {
