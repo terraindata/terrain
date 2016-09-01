@@ -483,25 +483,34 @@
       [ 
         "This example counts all the visible products.",
         {
-            "type": "count",
-            "id": "b",
-            "cards": [
+            "type": "let",
+            "id": "x",
+            "field": "product.averageSales",
+            "expression":
             {
-                "type": "sfw",
-                "id": "c",
-                "fields": [
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "count",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
                   { 
                     "type": "field",
-                    "field": "product.visible",
+                    "field": "product.sales",
                     "id": "b"
                   }
                 ],
                 "filters": [
                   { 
                   "combinator": 0,
-                  "first": "product.visible",
-                  "operator": 0,
-                  "second": true,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
                   "type": "filterBlock",
                   "id": "c"
                   }
@@ -516,7 +525,10 @@
               ]
             }
           ]
-        }
+                }
+              ]
+            }
+          }
       ]
     },
     "Average":
