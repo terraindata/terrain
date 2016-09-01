@@ -75,7 +75,8 @@ export module BuilderTypes
   }
   
   export const OperatorTQL = {
-    [Operator.EQ]: '=',
+    // [Operator.EQ]: '=', //**
+    [Operator.EQ]: '==',
     [Operator.NE]: '!=',
     [Operator.GE]: '>=',
     [Operator.GT]: '>',
@@ -91,8 +92,10 @@ export module BuilderTypes
   }
   
   export const DirectionTQL = {
-    [Direction.ASC]: 'ASC',
-    [Direction.DESC]: 'DESC',
+    // [Direction.ASC]: 'ASC',
+    // [Direction.DESC]: 'DESC', // **
+    [Direction.ASC]: 'asc',
+    [Direction.DESC]: 'desc',
   }
 
   export enum Combinator {
@@ -101,8 +104,10 @@ export module BuilderTypes
   }
   
   export const CombinatorTQL = {
-    [Combinator.AND]: 'AND',
-    [Combinator.OR]: 'OR',
+    // [Combinator.AND]: 'AND',
+    // [Combinator.OR]: 'OR', // **
+    [Combinator.AND]: '&&',
+    [Combinator.OR]: '||',
   }
     
   export enum InputType
