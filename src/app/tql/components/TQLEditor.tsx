@@ -486,6 +486,7 @@ class TQL extends Classs<Props>
 
   render() 
   {
+    console.log(this.props.query);
     var manualEntry = BuilderTypes.cardList[this.state.cardName] &&
         BuilderTypes.Blocks[BuilderTypes.cardList[this.state.cardName]].static.manualEntry;
     return (

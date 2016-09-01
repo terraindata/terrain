@@ -55,6 +55,8 @@ import BuilderTypes from './../../builder/BuilderTypes.tsx';
 import Card from './../../builder/components/cards/Card.tsx';
 import ManualInfo from './ManualInfo.tsx';
 import * as Immutable from 'immutable';
+import TQLConverter from '../../tql/TQLConverter.tsx';
+
 
 var CodeMirror = require('./../../tql/components/Codemirror.js');
 require('./../../tql/components/tql.js');
@@ -238,7 +240,7 @@ class ManualEntry extends Classs<Props>
 
   renderCardExample(index) {
     var card = BuilderTypes.recordFromJS(this.manualEntry.text[index][0]);
-    var keys = Immutable.List(["product.averageSales"]);
+    var keys = Immutable.List([]);
     var key = Immutable.List(["queries", "I8LNT", "cards"]);
     return (
       <div className='manual-entry-demo'>
@@ -265,11 +267,22 @@ class ManualEntry extends Classs<Props>
       foldGutter: true,
       gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
     }
-    var value = this.manualEntry.text[index][1];
+    //var value = this.manualEntry.text[index][1];
+    var cards = Immutable.List([BuilderTypes.recordFromJS(this.manualEntry.text[index][0])]);
+    var value: BuilderTypes.IQuery = {
+      id: 'a',
+      cards: cards,
+      inputs: Immutable.List([]),
+      tql: '',
+      version: false,
+      mode: '',
+      name: '',
+      lastEdited: '',
+    };
     return (
       <CodeMirror 
         options={options}
-        value={value}
+        value={TQLConverter.toTQL(value)}
       />
     );
   }
