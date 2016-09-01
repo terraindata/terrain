@@ -102,9 +102,6 @@ class Manual extends Classs<Props>
 
   componentWillReceiveProps(nextProps)
   {
-    console.log("Component will receive props");
-    console.log("old " + this.state.selectedKey);
-    console.log("new " +  nextProps.selectedKey);
     if(this.state.selectedKey !== nextProps.selectedKey)
     {
       this.setState({
