@@ -49,7 +49,7 @@ import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
-var ManualConfig = require('./../ManualConfig2.json');
+var ManualConfig = require('./../ManualConfig.json');
 var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
 import BuilderTypes from './../../builder/BuilderTypes.tsx';
 import Card from './../../builder/components/cards/Card.tsx';

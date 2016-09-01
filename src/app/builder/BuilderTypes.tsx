@@ -59,7 +59,7 @@ export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
 
-var ManualConfig = require('./../manual/ManualConfig2.json');
+var ManualConfig = require('./../manual/ManualConfig.json');
 
 import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, filtersDisplay, wrapperDisplay} from './BuilderDisplays.tsx';
 

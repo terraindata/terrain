@@ -58,7 +58,7 @@ import BuilderTypes from './../../builder/BuilderTypes.tsx';
 var CloseIcon = require('./../../../images/icon_close.svg');
 var SearchIcon = require('./../../../images/icon_search.svg');
 var HomeIcon = require('./../../../images/icon_home.svg');
-var ManualConfig = require('./../ManualConfig2.json');
+var ManualConfig = require('./../ManualConfig.json');
 var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
 
 
