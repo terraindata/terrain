@@ -84,6 +84,7 @@ export interface Display
   placeholder?: string;
   // for textboxes with cards
   top?: boolean;
+  getAutoTerms?: () => List<string>; // overrides standard terms
   
   // for rows and FLEX, content to display above/below,   
   above?: Display;

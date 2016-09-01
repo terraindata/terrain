@@ -128,29 +128,25 @@ class CardsArea extends PureClasss<Props>
   
   computeKeys(props:Props): List<string>
   {
-    // TODO
-    // let newKeysArr: string[] = props.keys.toJS().concat(
-    //   props.cards.reduce(
-    //     (memo: string[], card): string[] =>
-    //     {
-    //       if(card.type === BuilderTypes.CardTypes.VAR || card.type === BuilderTypes.CardTypes.LET)
-    //       {
-    //         memo.push(
-    //           (card as (BuilderTypes.IVarCard | BuilderTypes.ILetCard)).field
-    //         );
-    //       }
-    //       return memo;
-    //     }
-    //   , [])
-    // );
+    let newKeys: List<string> = props.keys.merge(
+      props.cards.reduce(
+        (memo: List<string>, card: ICard): List<string> =>
+        {
+          if(card.static.getNeighborTerms)
+          {
+            return memo.merge(card.static.getNeighborTerms(card));
+          }
+          return memo;
+        }
+      , Immutable.List([]))
+    );
     
-    // if(newKeysArr.some(key => this.state.keys.indexOf(key) === -1))
-    // {
-    //   // keys have changed
-    //   return List(newKeysArr);
-    // }
-    
-    return this.state.keys;
+    if(newKeys.equals(this.state.keys))
+    {
+      return this.state.keys;
+    }
+
+    return newKeys;
   }
   
        

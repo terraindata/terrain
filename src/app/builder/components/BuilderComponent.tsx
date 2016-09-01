@@ -262,6 +262,7 @@ class BuilderComponent extends PureClasss<Props>
           data,
           parentData: this.props.parentData,
           canEdit: this.props.canEdit,
+          keys: this.props.keys,
         });
       break;
       default:
@@ -274,7 +275,9 @@ class BuilderComponent extends PureClasss<Props>
     {
       content = (
         <BuilderTextbox
-          keys={this.props.keys}
+          keys={
+            d.getAutoTerms ? d.getAutoTerms() : this.props.keys
+          }
           canEdit={this.props.canEdit}
           top={d.top}
           placeholder={d.placeholder || d.key}

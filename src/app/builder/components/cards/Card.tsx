@@ -89,6 +89,9 @@ class Card extends PureClasss<Props>
     hovering: boolean;
     menuOptions: List<MenuOption>;
     
+    cardTerms: List<string>;
+    allTerms: List<string>;
+    
     // CreateCardTool
     addingCardBelow?: boolean;
     addingCardAbove?: boolean;
@@ -103,11 +106,15 @@ class Card extends PureClasss<Props>
   constructor(props:Props)
   {
     super(props);
+    let cardTerms = this.getCardTerms(props.card);
+    
     this.state = {
       open: true,
       id: this.props.card.id,
       selected: false,
       hovering: false,
+      cardTerms,
+      allTerms: props.keys.merge(cardTerms),
       menuOptions:
         Immutable.List([
           {
@@ -147,6 +154,56 @@ class Card extends PureClasss<Props>
         }
       }
     });
+  }
+  
+  getCardTerms(card:BuilderTypes.ICard): List<string>
+  {
+    var terms: List<string> = Immutable.List([]);
+    
+    if(card.static.getChildTerms)
+    {
+      terms = card.static.getChildTerms(card);
+    }
+    
+    if(card.static.getNeighborTerms)
+    {
+      terms = terms.merge(card.static.getNeighborTerms(card));
+    }
+    
+    return terms;
+  }
+  
+  componentWillReceiveProps(nextProps:Props)
+  {
+    var allTerms = this.props.keys;
+    var {cardTerms} = this.state;
+    var changed = false;
+    
+    if(nextProps.card !== this.props.card)
+    {
+      // check for new terms
+      let terms = this.getCardTerms(nextProps.card);
+      if(!this.state.cardTerms.equals(terms))
+      {
+        changed = true;
+        cardTerms = terms;
+      }
+    }
+    
+    if(this.props.keys !== nextProps.keys || changed)
+    {
+      changed = true;
+      allTerms = nextProps.keys.merge(cardTerms);
+    }
+    
+    
+    if(changed)
+    {
+      this.setState({
+        cardTerms,
+        allTerms,
+      });
+    }
   }
   
   dragPreview: any;
@@ -272,10 +329,10 @@ class Card extends PureClasss<Props>
     Actions.hoverCard(this.props.card.id);
   }
 
-	render() {
-    
+	render()
+  {
     var content = <BuilderComponent
-      keys={this.props.keys}
+      keys={this.state.allTerms}
       canEdit={this.props.canEdit}
       data={this.props.card}
       keyPath={

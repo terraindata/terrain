@@ -182,7 +182,7 @@ class Autocomplete extends PureClasss<Props>
     var first = option, second = "", third = "";
     if(this.state.value.length)
     {
-      const i = option.indexOf(this.state.value);
+      const i = option.toLowerCase().indexOf(this.state.value.toLowerCase());
       var first = option.substr(0, i);
       var second = option.substr(i, this.state.value.length);
       var third = option.substr(this.state.value.length + i);
@@ -213,7 +213,7 @@ class Autocomplete extends PureClasss<Props>
           ref='input'
           type='text'
           className={inputClassName}
-          value={this.props.value /* TODO this.state.value*/}
+          value={this.state.value}
           onChange={this.handleChange}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}

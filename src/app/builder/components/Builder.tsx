@@ -124,6 +124,24 @@ class Builder extends PureClasss<Props>
   {
     this.checkConfig(this.props);
     RolesActions.fetch();
+    
+    Ajax.schema((tables: {name: string, columns: {name: string}[]}[]) => {
+      Actions.change(
+        Immutable.List(['tables']),
+        Immutable.List(tables.map(table => table.name))
+      );
+      
+      Actions.change(
+        Immutable.List(['tableColumns']),
+        tables.reduce(
+          (memo: Map<string, List<string>>, table: {name: string, columns: {name: string}[]}) =>
+            memo.set(table.name, 
+              Immutable.List(table.columns.map(col => col.name))
+            )
+          , Immutable.Map({})
+        )
+      );
+    });
   }
   
   componentWillReceiveProps(nextProps)

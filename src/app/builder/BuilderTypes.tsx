@@ -169,7 +169,8 @@ export module BuilderTypes
       tql: string;
       tqlJoiner?: string; // DOESNT WORK
       
-      getTerms?: (card: ICard) => string[];
+      getChildTerms?: (card: ICard) => List<string>;
+      getNeighborTerms?: (card: ICard) => List<string>;
       // given a card, return the "terms" it generates for autocomplete
       
       preview: string | ((c:ICard) => string);
@@ -238,7 +239,8 @@ export module BuilderTypes
       tql: string;
       tqlJoiner?: string;
       
-      getTerms?: (card: ICard) => string[];
+      getChildTerms?: (card: ICard) => List<string>;
+      getNeighborTerms?: (card: ICard) => List<string>;
       init?: (config?:any) => any;
     }
   }
@@ -261,7 +263,8 @@ export module BuilderTypes
   {
     colors: string[];
     title: string;
-    getTerms?: (card: ICard) => string[];
+    getChildTerms?: (card: ICard) => List<string>;
+    getNeighborTerms?: (card: ICard) => List<string>;
     display?: Display | Display[];
     tql: string;
     tqlJoiner?: string;
@@ -276,7 +279,8 @@ export module BuilderTypes
       {
         title: config.title,
         colors: config.colors,
-        getTerms: config.getTerms,
+        getChildTerms: config.getChildTerms,
+        getNeighborTerms: config.getNeighborTerms,
         
         preview: (c:IWrapperCard) => {
           if(c.cards.size)
@@ -397,6 +401,7 @@ export module BuilderTypes
                 {
                   displayType: DisplayType.TEXT,
                   key: 'table',
+                  getAutoTerms: () => Store.getState().get('tables'),
                 },
                 {
                   displayType: DisplayType.LABEL,
@@ -425,14 +430,14 @@ export module BuilderTypes
           },
         ],
         
-        getTerms:
-          (card: ICard) => _.flatten(
+        getChildTerms:
+          (card: ICard) => Immutable.List(_.flatten(
             card['tables'].map(table =>
             {
               var fields = ['ba', 'ca'];
               return fields.map(f => table.table + '.' + f);
             }).toArray()
-          )
+          ))
       },
     }),
     
@@ -496,6 +501,7 @@ export module BuilderTypes
         colors: ["#C0C0BE", "#E2E2E0"],
         display: letVarDisplay,
         tql: "LET $field = $expression",
+        getNeighborTerms: (card) => List([card['field']]),
       }
     }),
 
@@ -509,7 +515,7 @@ export module BuilderTypes
         title: "Var",
         preview: "[field]",
         display: letVarDisplay,
-        getTerms: (card) => [card['field']],
+        getNeighborTerms: (card) => List([card['field']]),
         tql: "VAR $field = $expression",
       }
     }),
