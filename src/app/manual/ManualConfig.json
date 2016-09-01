@@ -174,7 +174,8 @@
               {
                 "direction": 1,
                 "property": "user.id",
-                "id": "b"
+                "id": "b",
+                "type": "sortBlock"
               }
             ],
             "helpOn": true
@@ -190,7 +191,8 @@
                   {
                     "direction": 2,
                     "property": "user.name",
-                    "id": "b"
+                    "id": "b",
+                    "type": "sortBlock"
                   }
                 ]
               }
@@ -430,7 +432,6 @@
       "syntax": "none",
       "text": 
       [ 
-        "none",
           {
             "bars": [],
             "domain": [0, 100],
@@ -470,7 +471,9 @@
             ],
             "type": "transform",
             "helpOn": true
-          }
+          },
+          "The transform card can be used to manipulate a variable.",
+          "The points on a transform card can be moved by clicking and dragging. When dragging points around there is a y limit made by the points on either side of the current point. You can also move points using the arrow keys or can type into the fields to get a more exact value. You will notice when you move a point around that crosshairs appear to help you determine the x and y coordinate values. To add a new point, double left click. To remove a point, either right click on the point and hit delete or select the point and hit the delete key on your keyboard. You can change the range of visible coordinates using the periscope bar at the bottom of the transform card."
       ]
     },
     "Count":
