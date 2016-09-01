@@ -239,9 +239,9 @@ class ManualEntry extends Classs<Props>
   }
 
   renderCardExample(index) {
-    var card = BuilderTypes.recordFromJS(this.manualEntry.text[index][0]);
+    var card = BuilderTypes.recordFromJS(this.manualEntry.text[index]);
     var keys = Immutable.List([]);
-    var key = Immutable.List(["queries", "I8LNT", "cards"]);
+    var keyPath = Immutable.List(["manual", "a", "cards"]);
     return (
       <div className='manual-entry-demo'>
         <Card
@@ -251,8 +251,8 @@ class ManualEntry extends Classs<Props>
           parentId='CI2XI'
           singleCard={false}
           keys={keys}
-          keyPath={key}
-          helpOn={this.manualEntry.text[index][0].helpOn}
+          keyPath={keyPath}
+          helpOn={this.manualEntry.text[index].helpOn}
         /> 
       </div>
     );
@@ -267,8 +267,7 @@ class ManualEntry extends Classs<Props>
       foldGutter: true,
       gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
     }
-    //var value = this.manualEntry.text[index][1];
-    var cards = Immutable.List([BuilderTypes.recordFromJS(this.manualEntry.text[index][0])]);
+    var cards = Immutable.List([BuilderTypes.recordFromJS(this.manualEntry.text[index])]);
     var query: BuilderTypes.IQuery = {
       id: 'a',
       cards: cards,

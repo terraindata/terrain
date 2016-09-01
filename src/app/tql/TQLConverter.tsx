@@ -121,7 +121,6 @@ class TQLConverter
         {
           if(card.type === 'select')
           {
-            console.log(card);
             return card.set('properties', Immutable.List(['*']));
           }
           return card;
@@ -156,7 +155,6 @@ class TQLConverter
   
   private static _parse(block: IBlock, index?: number, isLast?: boolean): string
   {
-    console.log(block);
     if(!block.static)
     {
       return;

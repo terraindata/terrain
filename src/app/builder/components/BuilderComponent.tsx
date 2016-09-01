@@ -393,7 +393,6 @@ class BuilderComponent extends PureClasss<Props>
   render()
   {
     var {data, display} = this.props;
-    
     if(!display)
     {
       if(!data.static || !data.static.display)

@@ -1,356 +1,506 @@
 [
   {
-    "Select":
+   "Select From":
     { 
-      "snippet": "Get data", 
-      "summary": "The Select statement returns a result set of records from one or more tables.",
-      "type": "prefix operator",
-      "syntax": "SELECT field name(s)",
+      "summary": "Retrieves rows from the database if they meet the condition", 
+      "notation": "none",
+      "syntax": "SELECT field(s) FROM source WHERE condition(s)",
       "text": 
       [ 
-        [
-          {
-            "id": "c-2735991550",
-            "parentId": "CI2XI",
-            "properties": [{
-              "id": "0.9",
-              "property": "user.name"
-            }],
-            "type": "select"
-          },
-          "from 'users' as user\nselect user.name"
-        ],
         "The TQL Select statement returns a result set of records from one or more tables. A Select statement retrieves zero or more rows from one or more database tables or database views. In most applications, Select is the most commonly used data manipulation language (DML) command. As TQL is a declarative programming language, Select queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints.",
-        "Select all the product id's purchased by user 1234:",
-        [
           {
-            "id": "c-2735991550",
-            "parentId": "CI2XI",
-            "properties": [{
-              "id": "0.9",
-              "property": "user.name"
-            }],
-            "type": "select"
+            "cards": [],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "user.name",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "user.name",
+                "operator": 0,
+                "second": "John",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "alias": "user",
+              "table": "users",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e",
+            "helpOn": true
           },
-          "from 'products' as product \n\tfilter product.id in \n\t\t from 'orders' as order \n\t\t\tfilter order.user == 1234 \n\t\t\tselect order.product \n\tselect product.id"
-        ]
+        "This example select all the product ids purchased by user 1234:",
+          {
+            "cards": [],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "product.id",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "product.id",
+                "operator": 6,
+                "second": {
+                  "cards": [{
+                    "cards": [],
+                    "fields": [
+                      { 
+                        "type": "field",
+                        "field": "order.product",
+                        "id": "bb"
+                      }
+                    ],
+                    "filters": [
+                      { 
+                        "combinator": 0,
+                        "first": "order.user",
+                        "operator": 0,
+                        "second": "1234",
+                        "type": "filterBlock",
+                        "id": "cc"
+                      }
+                    ],
+                    "tables": [
+                    {
+                      "alias": "order",
+                      "table": "'orders'",
+                      "type": "table",
+                      "id": "dd"
+                    }
+                    ],
+                    "type": "sfw",
+                    "id": "ee"
+                  }],
+                  "id": "g",
+                  "type": "parentheses"
+                },
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "alias": "product",
+              "table": "'products'",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e"
+          }
+        
       ]
     },
-    "Take":
+    "Take Limit":
     { 
       "snippet": "Returns n results", 
       "summary": "Returns a query expression representing the first n results from the expression on the left hand side.  The number of results n is the evaluation of the right hand side.", 
-      "type": "binary infix operator",
+      "notation": "binary infix operator",
       "syntax": "query expression TAKE expression",
       "text": 
       [ 
         [
           {
-            "id": "c-4",
-            "parentId": "c-2",
             "type": "take",
-            "value": "10"
+            "value": "10",
+            "id": "a",
+            "helpOn": true
           },
           "take 10"
         ],
         "Take is a binary infix operator, meaning it sits between two expressions. Take returns a query expression that is the first n results of the query expression on its left hand side.  The number of results n to be returned is determined from the right hand side. In order to get a specific set of results, the data can be sorted based on some parameter first and then the top n results selected via Take. For example, if you wanted the 10 oldest people in a group, you would sort the people based on descending age and then use 'Take 10'.",
         "This example takes the first 10 results (the names of users) from the table 'users.'",
         [
-        {
-          "cards": [
+          {
+            "cards": [
+              {
+                "type": "take",
+                "value": 10,
+                "id": "a"
+              }
+            ],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "user.name",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "user.name",
+                "operator": 0,
+                "second": "John",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
             {
-              "id": "c-3",
-              "parentId": "c-2",
-              "properties": [
-                {
-                  "id": "0.6",
-                  "property": "user.name"
-                }
-              ],
-              "faded": true,
-              "type": "select"
-            },
-            {
-              "id": "c-4",
-              "parentId": "c-2",
-              "type": "take",
-              "value": "3",
-              "highlighted": true
+              "alias": "user",
+              "table": "users",
+              "type": "table",
+              "id": "d"
             }
-          ],
-          "group": "users",
-          "id": "c-2",
-          "iterator": "user",
-          "joins": [],
-          "parentId": "8R",
-          "type": "from",
-          "faded": true
-        },
-          "from 'users' as user\nselect user.name\ntake 3\n\n//John Smith\n//Sarah Johnson\n//Ann Walter"
+            ],
+            "type": "sfw",
+            "id": "e"
+          },
+          "SELECT user.name\nFROM 'users' as user\nWHERE user.name == John\ntake 10;"
         ]
       ]
     },
-    "From":
+    "Sort":
     { 
-      "snippet": "Elements from specified source", 
-      "summary": "Returns a query expression representing all elements in the given source. The elements are defined as using the expression 'as definition' and can be refered to throughout the query by this definition.", 
-      "syntax": "FROM source AS definition",
+      "snippet": "none", 
+      "summary": "Returns a query expression representing the result of filtering the left-hand expression by evaluating the right-hand expression for each element in the query  expression. Elements that cause the expression to be false are filtered out.",
+      "notation": "binary infix operator",
+      "syntax": "query expression sort expression",
       "text": 
       [ 
-        "The From clause is the source be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.",
         [
           {
-            "cards": [],
-            "id": "c-2735991550",
-            "parentId": "CI2XI",
-            "group": "users",
-            "iterator": "user",
-            "joins": [],
-            "type": "from"
-          },
-          "from 'users' as user"
-        ],
-        "In this example, users are selected from the table named 'users' and sorted or ordered based on their names",
-        [
-          {
-            "cards": [{
-              "id": "c-4",
-              "parentId": "c-2735991550",
-              "sorts": [{
+            "type": "sort",
+            "id": "3",
+            "sorts": [
+              {
                 "direction": 1,
-                "id": "s0.1",
-                "property": "name"
-              }],
-              "type": "sort",
-              "faded": true
-            }],
-            "id": "c-2735991550",
-            "parentId": "CI2XI",
-            "group": "users",
-            "iterator": "user",
-            "joins": [],
-            "type": "from",
-            "highlighted": true
+                "property": "user.id",
+                "id": "b"
+              }
+            ],
+            "helpOn": true
           },
-          "from 'users' as user\nORDER BY user.name desc"
-        ]
-
-      ]
-    },
-    "Skip":
-    { 
-      "snippet": "Removes first n elements", 
-      "summary": "Returns a query expression representing the left-hand query expression, with the first n elements removed, where n is the result of evaluating the right-hand expression.", 
-      "type": "binary infix operator",
-      "syntax": "query expression SKIP expression (n)",
-      "text": 
-      [ 
-        [
-          {
-             "id": "c-2735991550",
-             "parentId": "CI2XI",
-             "value": "10",
-             "type": "skip"
-          },
-          "skip 10"
+          "ORDER BY user.id desc"
         ],
-        "The Skip operator skips the first n elements of the query expression on its left hand side.  The number of elements, n, to skip is the evaluating of the right-hand side. Using Skip skips the first n elements and then takes all of the remaining rows. ",
-        "This example gets the 26th-50th visible products in the 'cool stuff' category, sorted by creation date",
+        "A Sort clause in SQL specifies that a SQL Select statement returns a result set with the rows being sorted by the values of one or more columns. The sort criteria do not have to be included in the result set. The sort criteria can be expressions, including column names, user-defined functions, arithmetic operations, or CASE expressions. The expressions are evaluated and the results are used for the sorting, i.e., the values stored in the column or the results of the function call. ORDER BY is the only way to sort the rows in the result set. Without this clause, the relational database system may return the rows in any order. If an ordering is required, the ORDER BY must be provided in the SELECT statement sent by the application. Although some database systems allow the specification of an ORDER BY clause in subselects or view definitions, the presence there has no effect. A view is a logical relational table, and the relational model mandates that a table is a set of rows, implying no sort order whatsoever. The only exception are constructs like ORDER BY ORDER OF ... (not standardized in SQL:2003) which allow the propagation of sort criteria through nested subselects.",
+        "This example sorts all the users with the name John from'users' in ascending order by their name.",
         [
           {
             "cards": [
               {
-                "id": "c-2",
-                "parentId": "c-1",
-                "sorts": [
-                  { 
-                    "direction": 1,
-                    "id": "s0.1",
-                    "property": "product.createdOn"
-                  } 
-                ],
                 "type": "sort",
-                "faded": true
-              },
-              {
-                "id": "c-3",
-                "parentId": "c-1",
-                "type": "skip",
-                "value": "25",
-                "highlighted": true
-              },
-              {
-                "id": "c-4",
-                "parentId": "c-1",
-                "type": "take",
-                "value": "25",
-                "faded": true
+                "id": "a",
+                "sorts": [
+                  {
+                    "direction": 2,
+                    "property": "user.name",
+                    "id": "b"
+                  }
+                ]
+              }
+            ],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "user.name",
+                "id": "b"
               }
             ],
             "filters": [
-              {
+              { 
                 "combinator": 0,
-                "condition": {
-                  "first": "p.visible",
-                  "operator": 0,
-                  "second": "true"
-                },
-                "id": "co0.5"
-              },
-              {
-                "combinator": 0,
-                "condition": {
-                  "first": "p.category",
-                  "operator": 0,
-                  "second": "'cool stuff'"
-                },
-                "id": "111"
+                "first": "user.name",
+                "operator": 0,
+                "second": "John",
+                "type": "filterBlock",
+                "id": "c"
               }
             ],
-            "group": "products",
-            "iterator": "p",
-            "id": "c-1",
-            "joins": [],
-            "parentId": "c-0",
-            "properties": [{
-              "id": "0.8",
-              "property": "*"
-            }],
-            "type": "sfw",
-            "faded": true
-          },
-          "SELECT *\nFROM 'products' as p\nWHERE p.visible == true \n&& p.group == 'cool stuff'\nORDER BY p.createdOn desc\nskip 25\ntake 25\n;"
-        ]
-      ]
-    }, 
-    "Order By":
-    { 
-      "snippet": "Sorts the elements", 
-      "summary": "Returns a query expression representing the result of sorting the left-hand expression in ascending order of the value returned by the right-hand expression.", 
-      "type": "binary infix operator",
-      "syntax": "query expression ORDER BY expression",
-      "text": 
-      [ 
-        [
-          {
-             "id": "c-2735991550",
-             "parentId": "CI2XI",
-             "value": "10",
-             "sorts": [{
-                "id": "0.9",
-                "direction": 1,
-                "property": "user.name"
-              }],
-             "type": "sort"
-          },
-          "ORDER BY user.name descending"
-        ],
-        "An ORDER BY clause in SQL specifies that a SQL SELECT statement returns a result set with the rows being sorted by the values of one or more columns. The sort criteria do not have to be included in the result set. The sort criteria can be expressions, including column names, user-defined functions, arithmetic operations, or CASE expressions. The expressions are evaluated and the results are used for the sorting, i.e., the values stored in the column or the results of the function call. ORDER BY is the only way to sort the rows in the result set. Without this clause, the relational database system may return the rows in any order. If an ordering is required, the ORDER BY must be provided in the SELECT statement sent by the application. Although some database systems allow the specification of an ORDER BY clause in subselects or view definitions, the presence there has no effect. A view is a logical relational table, and the relational model mandates that a table is a set of rows, implying no sort order whatsoever. The only exception are constructs like ORDER BY ORDER OF ... (not standardized in SQL:2003) which allow the propagation of sort criteria through nested subselects.",
-        "This example sorts the users from'users' in descending order by their name.",
-        [
-        {
-          "cards": [
+            "tables": [
             {
-              "id": "c-4",
-              "parentId": "c-2",
-              "sorts": [{
-                "id": "0.9",
-                "direction": 1,
-                "property": "user.name"
-              }],
-              "type": "sort",
-              "highlighted": true
+              "alias": "user",
+              "table": "users",
+              "type": "table",
+              "id": "d"
             }
-          ],
-          "group": "users",
-          "id": "c-2",
-          "iterator": "user",
-          "joins": [],
-          "parentId": "8R",
-          "type": "from",
-          "faded": true
-        },
-           "from 'users' as user \n\t ORDER BY user.name desc"
+            ],
+            "type": "sfw",
+            "id": "e"
+          },
+          "SELECT user.name \n FROM users as user \n WHERE user.name == John \n\t ORDER BY user.name ASC \n ; " 
         ]
       ]
-    }, 
+    },
     "Let":
     { 
       "snippet": "Defines variable", 
       "summary": "Returns a query expression representing the result of evaluating each the right hand statement for each element.", 
-      "type": "binary infix operator",
+      "notation": "binary infix operator",
       "syntax": "query expression LET statement",
       "text": 
       [ 
         [
           {
-            "id": "c-3",
-              "parentId": "c-2",
-              "field":"product.score",
-              "expression": "product.age * product.conversionRatio",
-              "type": "let"
+            "type": "let",
+            "id": "3",
+            "field": "product.score",
+            "expression": "product.age * product.conversionRatio",
+            "helpOn": true
           },
-          "let product.score = \nproduct.age * product.conversionRatio "
+          "LET product.score = \nproduct.age * product.conversionRatio "
         ],
-        "The SQL SELECT statement returns a result set of records from one or more tables. A SELECT statement retrieves zero or more rows from one or more database tables or database views. In most applications, SELECT is the most commonly used data manipulation language (DML) command. As SQL is a declarative programming language, SELECT queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints. The SQL From clause is the source of a rowset to be operated upon in a Data Manipulation Language (DML) statement. From clauses are very common, and will provide the rowset to be exposed through a Select statement, the source of values in an Update statement, and the target rows to be deleted in a Delete statement.A WHERE clause in SQL specifies that a SQL Data Manipulation Language (DML) statement should only affect rows that meet specified criteria. The criteria are expressed in the form of predicates. WHERE clauses are not mandatory clauses of SQL DML statements, but can be used to limit the number of rows affected by a SQL DML statement or returned by a query. In brief SQL WHERE clause is used to extract only those results from a SQL statement, such as: SELECT, INSERT, UPDATE, or DELETE statement.",
-        "This example get the id's of the top 10 products, sorted by .9 * conversionRatio + .1 * promotionBoost, using a 1/10 prior on conversion ratio.",
+         "This example defines a variable averageSales to be the average sales of all products where ids are less than 10 in products.",
         [
-        {
-          "cards": [
+          {
+            "type": "let",
+            "id": "x",
+            "field": "product.averageSales",
+            "expression":
             {
-              "id": "c-3",
-              "parentId": "c-2",
-              "field":"product.conversionRatio",
-              "expression": "(product.purchases + 1) / (product.views + 10)",
-              "type": "let",
-              "highlighted": true
-            },
-            {
-              "id": "c-4",
-              "parentId": "c-2",
-              "field":"product.score",
-              "expression": ".9 * product.conversionRatio  + .1 * product.promotionBoost",
-              "type": "let",
-              "highlighted": true
-            },
-            {
-              "id": "c-5",
-              "parentId": "c-2",
-              "sorts": [{
-                "id": "0.9",
-                "direction": 1,
-                "property": "product.createdOn"
-              }],
-              "type": "sort",
-              "faded": true
-            },
-            {
-              "id": "c-6",
-              "parentId": "c-2",
-              "type": "take",
-              "value": "10",
-              "faded": true
-            },
-            {
-              "id": "c-7",
-              "parentId": "c-2",
-              "properties": [{
-                "id": "0.9",
-                "property": "product.id"
-              }],
-              "type": "select",
-              "faded": true
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "avg",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
             }
-          ],
-          "group": "products",
-          "id": "c-2",
-          "iterator": "product",
-          "joins": [],
-          "parentId": "8R",
-          "type": "from",
-          "faded": true
-        },
-           "from 'products' as product \n\tlet product.concersionRatio =\n(product.purchases + 1) / (product.views + 10) \n\tlet product.score =\n\t\t.9 * product.conversionRatio \n\t\t+ .1 * product.promotionBoost \n\tORDER BY product.createdOn desc \n\ttake 10 \n\tselect product.id"
+          ]
+                }
+              ]
+            }
+          },
+          "LET product.averageSales = ( \n\t AVG \n\t\tSELECT product.sales \n\t\tFROM products as product \n\t\tWHERE product.id < 10 \n\t) \n;"
+        ]
+      ]
+    },
+    "Var":
+    { 
+      "snippet": "Declares a variable", 
+      "summary": "Declares` a variable", 
+      "notation": "binary infix operator",
+      "syntax": "VAR name",
+      "text": 
+      [ 
+        [
+          {
+            "type": "var",
+            "id": "3",
+            "field": "product.score",
+            "expression": "product.age * product.conversionRatio",
+            "helpOn": true
+          },
+          "VAR product.score = \nproduct.age * product.conversionRatio "
+        ]
+      ]
+    },
+    "Score":
+    { 
+      "snippet": "Used to rank result", 
+      "summary": "Score is used to rank and order results from a query. The score is based on a weighted sum of attributes of the elements.", 
+      "notation": "binary prefix operator",
+      "syntax": "linearScore[([weight1, attribute1], [weight2, attribute2]...)]",
+      "text": 
+      [ 
+        "The Score card does not have a description yet.",
+        [
+          {
+            "id": "a",
+            "method": "",
+            "type": "score",
+            "weights": [
+              {
+                "key": "product.positive_reviews",
+                "weight": "50",
+                "id": "b",
+                "type": "weight"
+              },
+              {
+                "key": "product.negative_reviews",
+                "weight": "-25",
+                "id": "c",
+                "type": "weight"
+              },
+              {
+                "key": "product.price",
+                "weight": "10",
+                "id": "d",
+                "type": "weight"
+              }
+            ],
+            "helpOn": true
+          },
+          "linearScore([\n\t[50, product.positive_reviews],\n\t[-25, product.negative_reviews],\n\t[10, product.price]]);"
+        ],
+      "In this example, books are scored based on their positive reviews, negative reviews and prices, ranked according to score, and the top 100 products are then selected",
+        [
+          {
+            "cards": [
+              {
+                "id": "a",
+                "expression": {
+                  "cards": [
+                    {
+                      "id": "a",
+                      "method": "",
+                      "type": "score",
+                      "weights": [
+                        {
+                          "key": "product.positive_reviews",
+                          "weight": "50",
+                          "id": "b",
+                          "type": "weight"
+                        },
+                        {
+                          "key": "product.negative_reviews",
+                          "weight": "-25",
+                          "id": "c",
+                          "type": "weight"
+                        },
+                        {
+                          "key": "product.price",
+                          "weight": "10",
+                          "id": "d",
+                          "type": "weight"
+                        }
+                      ]
+                    }
+                  ],
+                  "id": "g",
+                  "type": "parentheses"
+                },
+                "field": "product.score",
+                "type": "let"
+              },
+              {
+                "id": "e",
+                "type": "sort",
+                "sorts": [{
+                  "direction": 1,
+                  "id": "f",
+                  "property": "product.score",
+                  "type": "sortBlock"
+                }]
+              }
+            ],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "*",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "product.type",
+                "operator": 0,
+                "second": "book",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "alias": "product",
+              "table": "'products'",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e"
+          },
+          "SELECT *\nFROM 'products' as product\nWHERE product.type = book\nLET product.score = (\n\tlinearScore([[\n\t\t[50, product.positive_reviews],\n\t\t[-25, product.negative_reviews],\n\t\t[10, product.price]\n\t])\n\tORDER BY product.score DESC;"
+        ]
+      ]
+    },
+    "Transform":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "none",
+        [
+          {
+            "bars": [],
+            "domain": [0, 100],
+            "id": "a",
+            "input": "user.experience",
+            "scorePoints": [
+              {
+                "id": "b",
+                "score": 0.1,
+                "type": "scorePoint",
+                "value": 1
+              },
+              {
+                "id": "c",
+                "score": 0.38,
+                "type": "scorePoint",
+                "value": 25
+              },
+              {
+                "id": "d",
+                "score": 0.6,
+                "type": "scorePoint",
+                "value": 50
+              },
+              {
+                "id": "e",
+                "score": 0.75,
+                "type": "scorePoint",
+                "value": 75
+              },
+              {
+                "id": "f",
+                "score": 0.8,
+                "type": "scorePoint",
+                "value": 100
+              }
+            ],
+            "type": "transform",
+            "helpOn": true
+          },
+          "linearTransform([\n\t[0.1, 1],\n\t[0.38, 25],\n\t[0.6, 100],\n\t[0.75, 75],\n\t[0.8, 100]\n]);"
         ]
       ]
     },
@@ -358,123 +508,109 @@
     { 
       "snippet": "Number of elements", 
       "summary": "Returns an the number of elements in the right hand expression", 
-      "type": " binary prefix operator",
+      "notation": " binary prefix operator",
       "syntax": "COUNT expression",
       "text": 
       [ 
-        "The TQL Count function returns the number of rows in a table satisfying the criteria specified in the Where clause. It sets on the number of rows or non NULL column values. Count returns 0 if there were no matching rows.",
-        "This example returns the number of users with the name John",
+        "This example counts all the visible products.",
         [
           {
-            "cards": [ {
-              "id": "c-2735991550",
-              "parentId": "CI2XI",
-              "cards": [],
-              "filters": [{
-                "combinator": 0,
-                "condition": {
-                  "first": "user.name",
+            "type": "count",
+            "id": "b",
+            "cards": [
+            {
+                "type": "sfw",
+                "id": "c",
+                "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.visible",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.visible",
                   "operator": 0,
-                  "second": "John"
-                },
-              "id": "co0.766099087301130"
-              }],
-              "group": "users",
-              "iterator": "user",
-              "joins": [],
-              "properties": [{
-                "property": "*",
-                "id": "0.6"
-              }],
-              "type": "sfw"
-            }],
-              "id": "c-2735991550",
-              "parentId": "CI2XI",
-              "type": "count"
-            },
-            "count (\n\tselect *\n\tfrom 'users' as user\n\twhere user.name == John\n)"
+                  "second": true,
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+          },
+          "COUNT \n\t SELECT product.visible \n\t FROM products as product \n\t WHERE product.visible = true \n;"
         ]
       ]
     },
-     "Min":
+    "Average":
     { 
-      "snippet": "Returns minimum element", 
-      "summary": "Returns an the minimum of all elements in the right hand side", 
-      "type": "binary prefix operator",
-      "syntax": "MIN expression",
+      "snippet": "Returns the average", 
+      "summary": "Returns the average of all elements in the right hand side.", 
+      "notation": "binary prefix operator",
+      "syntax": "AVG expression",
       "text": 
       [ 
-        "The syntax for the MIN function in SQL is:",
+        "This example defines a variable averageSales to be the average sales of all products where ids are less than 10 in products.",
         [
           {
-             "cards": [ {
-              "id": "c-2735991550",
-              "parentId": "CI2XI",
-              "cards": [],
-              "filters": [{
-                "combinator": 0,
-                "condition": {
-                  "first": "user.name",
-                  "operator": 0,
-                  "second": "John"
-                },
-              "id": "co0.766099087301130"
-              }],
-              "group": "users",
-              "iterator": "user",
-              "joins": [],
-              "properties": [{
-                "property": "*",
-                "id": "0.6"
-              }],
-              "type": "sfw"
-            }],
-              "id": "c-2735991550",
-              "parentId": "CI2XI",
-              "type": "min"
+            "type": "let",
+            "id": "x",
+            "field": "product.averageSales",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "avg",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
           },
-          "min();"
-        ]
-      ]
-    },
-     "Max":
-    { 
-      "snippet": "Returns maximum element", 
-      "summary": "Returns an the maximum of all elements in the right hand side", 
-      "type": "binary prefix operator",
-      "syntax": "MAX expression",
-      "text": 
-      [ 
-        "The syntax for the MIN function in SQL is:",
-        [
-          {
-             "cards": [ {
-              "id": "c-2735991550",
-              "parentId": "CI2XI",
-              "cards": [],
-              "filters": [{
-                "combinator": 0,
-                "condition": {
-                  "first": "user.name",
-                  "operator": 0,
-                  "second": "John"
-                },
-              "id": "co0.766099087301130"
-              }],
-              "group": "users",
-              "iterator": "user",
-              "joins": [],
-              "properties": [{
-                "property": "*",
-                "id": "0.6"
-              }],
-              "type": "sfw"
-            }],
-              "id": "c-2735991550",
-              "parentId": "CI2XI",
-              "type": "max"
-          },
-          "max();"
+          "LET product.averageSales = ( \n\t AVG \n\t\tSELECT product.sales \n\t\tFROM products as product \n\t\tWHERE product.id < 10 \n\t) \n;"
         ]
       ]
     },
@@ -482,237 +618,143 @@
     { 
       "snippet": "Returns the sum", 
       "summary": "Returns an the sum of all elements in the right hand side.", 
-      "type": "binary prefix operator",
+      "notation": "binary prefix operator",
       "syntax": "SUM expression",
       "text": 
       [ 
-        "The sum card does not have a description yet."
+        "none"
       ]
     },
-    "Avg":
+    "Min":
     { 
-      "snippet": "Returns the average", 
-      "summary": "Returns the average of all elements in the right hand side.", 
-      "type": "binary prefix operator",
-      "syntax": "AVG expression",
+      "snippet": "Returns minimum element", 
+      "summary": "Returns an the minimum of all elements in the right hand side", 
+      "notation": "binary prefix operator",
+      "syntax": "MIN expression",
       "text": 
       [ 
-        "TQL Avg function calculates the average value of a column of numeric type. It returns the average of all non NULL values",
-        "This example computes the average price of products:",
-        [
-           {
-           "cards": [
-            
-             {
-            "cards": [{
-              "id": "c-4",
-              "parentId": "c-3",
-              "properties": [{
-                "id": "s0.1",
-                "property": "product.price"
-              }],
-              "type": "select",
-              "faded": true
-            }],
-            "id": "c-3",
-            "parentId": "C-2",
-            "group": "users",
-            "iterator": "user",
-            "joins": [],
-            "type": "from",
-            "faded": true
-          }
-            
-          ],
-          "id": "c-2",
-          "parentId": "8R",
-          "type": "avg",
-          "highlighted": true
-        },
-          "Avg \n\tfrom 'products' as product \n\tselect product.price"
-        ]
+        "none"
       ]
     },
-    "Select From Where":
-    {
-      "snippet": "Retrieves rows from the database", 
-      "summary": "Retrieves rows from the database if they meet the condition", 
-      "type": "none",
-      "syntax": "SELECT FROM source WHERE search condition",
+    "Max":
+    { 
+      "snippet": "Returns maximum element", 
+      "summary": "Returns an the maximum of all elements in the right hand side", 
+      "notation": "binary prefix operator",
+      "syntax": "MAX expression",
       "text": 
       [ 
-        "The Select From Where card does not have a description yet."
+        "none"
       ]
     },
-     "Compare":
-    {
-      "snippet": "Compare two terms", 
-      "summary": "The Compare card can be used to compare two values/terms/expressions to one another.", 
-      "type": "binary infix operator",
-      "syntax": "expression COMPARATOR expression",
+    "Exists":
+    { 
+      "snippet": "Returns if exists", 
+      "summary": "Tests whether the inner query returns any row.", 
+      "notation": "None",
+      "syntax": "WHERE EXISTS (subquery)",
       "text": 
       [ 
-        "The TQL Compare card is used to add comparisons into the queries.  These comparisons test for equality (==), inequality (!=), less than (<), greater than (>), and ‘in’ and ‘not in’.  ‘In’ and ‘not in’ are used to test whether one query expression is in another; for example, to check if a given user is in a table of users."
+        "none"
       ]
     },
-     "Score":
-    {
-      "snippet": "Used to rank result", 
-      "summary": "Score is used to rank and order results from a query. The score is based on a weighted sum of attributes of the elements.", 
-      "type": "binary prefix operator",
-      "syntax": "linearScore[([weight1, attribute1], [weight2, attribute2]...)]",
+    "( )":
+    { 
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
       "text": 
       [ 
-        "The Score card does not have a description yet.",
+        "none"
+      ]
+    },
+    "Comparison":
+    { 
+      "snippet": "Returns elements that satisfy the condition", 
+      "summary": "Returns a query expression representing the result of filtering the left-hand expression by evaluating the right-hand expression for each element in the query  expression. Elements that cause the expression to be false are filtered out.",
+      "notation": "binary infix operator",
+      "syntax": "query expression FILTER expression",
+      "text": 
+      [ 
         [
           {
-                    "id": "c-8",
-                    "method": "",
-                    "output": "",
-                    "parentId": "c-0.03",
-                    "type": "score",
-                    "weights": [
-                      {
-                        "key": "product.positive_reviews",
-                        "weight": "50"
-                      },
-                      {
-                        "key": "product.negative_reviews",
-                        "weight": "-25"
-                      },
-                      {
-                        "key": "price",
-                        "weight": "10"
-                      }
-                    ]
-                  },
-                  "linearScore([\n\t[50, product.positive_reviews],\n\t[-25, product.negative_reviews],\n\t[10, product.price]]);"
+            "type": "filter",
+            "id": "a",
+            "filters": [
+                  { 
+                    "combinator": 0,
+                    "first": "product.price",
+                    "operator": 4,
+                    "second": "20",
+                    "type": "filterBlock",
+                    "id": "c"
+                  }
+             ],
+            "helpOn": true
+          },
+          "product.price <= 20"
         ],
-        "In this example, products are scored based on their positive reviews, negative reviews and prices, ranked according to score, and the top 100 products are then selected",
+        "The following example returns all of the cars that are cost less than $5000 from products. ",
         [
           {
             "cards": [
               {
-                "id": "c-1",
-                "parentId": "c=0",
-                "properties": [
-                  {
-                    "id": "0.6",
-                    "property": "*"
+                "type": "filter",
+                "id": "a",
+                "filters": [
+                  { 
+                    "combinator": 0,
+                    "first": "product.price",
+                    "operator": 4,
+                    "second": "5000",
+                    "type": "filterBlock",
+                    "id": "c"
                   }
-                ],
-                "type": "select",
-                "faded": true
-              },
-              {
-                "expression": {
-                  "cards": [{
-                    "id": "c-8",
-                    "method": "",
-                    "output": "",
-                    "parentId": "c-0.03",
-                    "type": "score",
-                    "weights": [
-                      {
-                        "key": "product.positive_reviews",
-                        "weight": "50"
-                      },
-                      {
-                        "key": "product.negative_reviews",
-                        "weight": "-25"
-                      },
-                      {
-                        "key": "price",
-                        "weight": "10"
-                      }
-                    ]
-                  }],
-                  "id": "c-0.03",
-                  "parentId": "c-0",
-                  "type": "parantheses"
-                },
-                "field": "product.score",
-                "id": "c-2",
-                "parentId": "c-0",
-                "type": "let",
-                "faded": true
-              },
-              {
-                "id": "c-5",
-                "parentId": "c-0.03",
-                "sorts": [
-                  {
-                    "id": "s0",
-                    "direction": 1,
-                    "property": "product.score"
-                  }
-                ],
-                "type": "sort",
-                "faded": true
-              },
-              {
-                "id": "c-3",
-                "parentId": "c0",
-                "type": "take",
-                "value": "100",
-                "faded": true
+                ]
               }
             ],
-            "group": "products",
-            "id": "c-0",
-            "iterator": "product",
-            "joins": [],
-            "parentId": "8RXGK",
-            "type": "from",
-            "faded": true
+            "fields": [
+              { 
+                "type": "field",
+                "field": "product.price",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                    "combinator": 0,
+                    "first": "product.type",
+                    "operator": 0,
+                    "second": "car",
+                    "type": "filterBlock",
+                    "id": "g"
+                  }
+            ],
+            "tables": [
+            {
+              "alias": "product",
+              "table": "products",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e"
           },
-          "from 'products' as product\nselect *\nlet product.score = (\nlinearScore([\n\t[50, product.positive_reviews],\n\t[-25, product.negative_reviews],\n\t[10, product.price]]))\nORDER BY product.score desc\ntake 100;"
+          "SELECT products.price \n FROM products as product \n WHERE product.type = car\n\t product.price <= 5000\n ; " 
         ]
       ]
     },
-     "If":
-    {
-      "snippet": "Determines if code will be executed", 
-      "summary": "Will execute a block of code if specified condition is true", 
-      "type": "None",
-      "syntax": "IF (condition)",
+    "Skip Offset":
+    { 
+      "snippet": "Removes first n elements", 
+      "summary": "Returns a query expression representing the left-hand query expression, with the first n elements removed, where n is the result of evaluating the right-hand expression.", 
+      "notation": "binary infix operator",
+      "syntax": "query expression SKIP expression (n)",
       "text": 
       [ 
-        "The if statement specifies a block of code to be executed if a condition is true. The else statement specifies a block of code to be executed if the condition is false. The else if statement specifies a new condition if the first condition is false. The condition is an expression that evaluates to true or false. "
-      ]
-    },
-     "Exists":
-    {
-      "snippet": "Returns if exists", 
-      "summary": "Tests whether the inner query returns any row.", 
-      "type": "None",
-      "syntax": "WHERE EXISTS (subquery)",
-      "text": 
-      [ 
-        "Exists tests whether the inner query returns any row. If it does, then the outer query proceeds. If not, the outer query does not execute, and the entire SQL statement returns nothing.",
-        "The subquery is a Select statement. If the subquery returns at least one record in its result set, the Exists clause will evaluate to true and the Exists condition will be met. If the subquery does not return any records, the Exists clause will evaluate to false and the Exists condition will not be met."
-      ]
-    },
-     "Var":
-    {
-      "snippet": "Declares a variable", 
-      "summary": "Declares a variable", 
-      "type": "binary infix operator",
-      "syntax": "VAR name",
-      "text": 
-      [ 
-        "The Var card does not have a description yet."
-      ]
-    },
-     "Transform":
-    {
-      "snippet": "None", 
-      "summary": "None", 
-      "type": "None",
-      "syntax": "None",
-      "text": 
-      [ 
-        "The Transform card does not have a description yet."
+        "none"
       ]
     }
   },
@@ -759,6 +801,3 @@
     }
   }
 ]
-
-
-
