@@ -107,7 +107,6 @@ class ManualPopup extends Classs<Props>
   }
 
   render() {
-
     var content = 'For more information about how to use Terrain Query Language (TQL), see the manual.';
     if(this.props.cardName !== 'General') {
       var manualEntry = BuilderTypes.cardList[this.props.cardName] 

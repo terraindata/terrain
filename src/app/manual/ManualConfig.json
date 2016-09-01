@@ -2,8 +2,9 @@
   {
    "Select From":
     { 
-      "summary": "Retrieves rows from the database if they meet the condition", 
+      "summary": "The Select From card is fundamental card for TQL. It selects certain attributes of elements from a specified source, as long as those elements meet conditions in the Where clause. To select all attributes, use Select *.", 
       "notation": "none",
+      "snippet": "Retrieves attributes of elements from database if they meet the conditions",
       "syntax": "SELECT field(s) FROM source WHERE condition(s)",
       "text": 
       [ 

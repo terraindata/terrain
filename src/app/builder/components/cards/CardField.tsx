@@ -369,6 +369,7 @@ class CardField extends PureClasss<Props>
                   <ManualInfo 
                     information="Can move fields around within the current card by dragging and dropping"
                     style= {{top: '7px', right: '-12px'}}
+                    leftSide={true}
                   />
                   : null
                 }
@@ -402,6 +403,7 @@ class CardField extends PureClasss<Props>
                   <ManualInfo 
                     information="Can add field using the plus button or remove fields using the x button"
                     style= {{top: '9px', right: '-10px'}}
+                    rightSide={true}
                   />
                   : null
                 }
