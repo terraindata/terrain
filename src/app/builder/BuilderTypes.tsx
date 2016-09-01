@@ -340,10 +340,10 @@ export module BuilderTypes
     table: _block(
     {
       table: "",
-      iterator: "",
+      alias: "",
       
       static: {
-        tql: "$table as $iterator",
+        tql: "$table as $alias",
       }
     }),
     
@@ -369,6 +369,22 @@ export module BuilderTypes
         preview: "[tables.table]: [fields.field]",
         tql: "SELECT $fields \nFROM $tables \n$cards",
         
+        getChildTerms:
+          (card: ICard) =>
+            card['tables'].reduce(
+              (list:List<string>, tableBlock: {table: string, alias: string}): List<string> =>
+              {
+                let cols: List<string> = Store.getState().getIn(['tableColumns', tableBlock.table]);
+                if(cols)
+                {
+                  return list.merge(cols.map(
+                    (col) => tableBlock.alias + '.' + col
+                  ).toList());
+                }
+                return list;
+              }
+            , List([])),
+          
         display: [
           {
             header: 'Select',
@@ -409,7 +425,7 @@ export module BuilderTypes
                 },
                 {
                   displayType: DisplayType.TEXT,
-                  key: 'iterator',
+                  key: 'alias',
                 },
               ],
             },
@@ -421,15 +437,6 @@ export module BuilderTypes
             className: 'sfw-cards-area',
           },
         ],
-        
-        getChildTerms:
-          (card: ICard) => Immutable.List(_.flatten(
-            card['tables'].map(table =>
-            {
-              var fields = ['ba', 'ca'];
-              return fields.map(f => table.table + '.' + f);
-            }).toArray()
-          ))
       },
     }),
     
