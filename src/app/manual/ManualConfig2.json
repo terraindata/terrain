@@ -30,7 +30,7 @@
             ],
             "tables": [
             {
-              "iterator": "user",
+              "alias": "user",
               "table": "users",
               "type": "table",
               "id": "d"
@@ -80,7 +80,7 @@
                     ],
                     "tables": [
                     {
-                      "iterator": "order",
+                      "alias": "order",
                       "table": "'orders'",
                       "type": "table",
                       "id": "dd"
@@ -98,7 +98,7 @@
             ],
             "tables": [
             {
-              "iterator": "product",
+              "alias": "product",
               "table": "'products'",
               "type": "table",
               "id": "d"
@@ -158,7 +158,7 @@
             ],
             "tables": [
             {
-              "iterator": "user",
+              "alias": "user",
               "table": "users",
               "type": "table",
               "id": "d"
@@ -230,7 +230,7 @@
             ],
             "tables": [
             {
-              "iterator": "user",
+              "alias": "user",
               "table": "users",
               "type": "table",
               "id": "d"
@@ -298,7 +298,7 @@
                 ],
                 "tables": [
                 {
-                  "iterator": "product",
+                  "alias": "product",
                   "table": "products",
                   "type": "table",
                   "id": "d"
@@ -442,7 +442,7 @@
             ],
             "tables": [
             {
-              "iterator": "product",
+              "alias": "product",
               "table": "'products'",
               "type": "table",
               "id": "d"
@@ -545,7 +545,7 @@
                 ],
                 "tables": [
                 {
-                  "iterator": "product",
+                  "alias": "product",
                   "table": "products",
                   "type": "table",
                   "id": "d"
@@ -603,7 +603,7 @@
                 ],
                 "tables": [
                 {
-                  "iterator": "product",
+                  "alias": "product",
                   "table": "products",
                   "type": "table",
                   "id": "d"
@@ -738,7 +738,7 @@
             ],
             "tables": [
             {
-              "iterator": "product",
+              "alias": "product",
               "table": "products",
               "type": "table",
               "id": "d"

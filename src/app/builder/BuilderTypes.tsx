@@ -202,7 +202,8 @@ export module BuilderTypes
       tql: string;
       tqlJoiner?: string; // DOESNT WORK
       
-      getTerms?: (card: ICard) => string[];
+      getChildTerms?: (card: ICard) => List<string>;
+      getNeighborTerms?: (card: ICard) => List<string>;
       // given a card, return the "terms" it generates for autocomplete
       
       preview: string | ((c:ICard) => string);
@@ -273,7 +274,8 @@ export module BuilderTypes
       tql: string;
       tqlJoiner?: string;
       
-      getTerms?: (card: ICard) => string[];
+      getChildTerms?: (card: ICard) => List<string>;
+      getNeighborTerms?: (card: ICard) => List<string>;
       init?: (config?:any) => any;
     }
   }
@@ -297,7 +299,8 @@ export module BuilderTypes
     colors: string[];
     title: string;
     manualEntry: IManualEntry;
-    getTerms?: (card: ICard) => string[];
+    getChildTerms?: (card: ICard) => List<string>;
+    getNeighborTerms?: (card: ICard) => List<string>;
     display?: Display | Display[];
     tql: string;
     tqlJoiner?: string;
@@ -312,8 +315,12 @@ export module BuilderTypes
       {
         title: config.title,
         colors: config.colors,
-        getTerms: config.getTerms,
+
         manualEntry: config.manualEntry,
+
+        getChildTerms: config.getChildTerms,
+        getNeighborTerms: config.getNeighborTerms,
+        
         preview: (c:IWrapperCard) => {
           if(c.cards.size)
           {
@@ -373,10 +380,10 @@ export module BuilderTypes
     table: _block(
     {
       table: "",
-      iterator: "",
+      alias: "",
       
       static: {
-        tql: "$table as $iterator",
+        tql: "$table as $alias",
       }
     }),
     
@@ -404,6 +411,22 @@ export module BuilderTypes
         preview: "[tables.table]: [fields.field]",
         tql: "SELECT $fields \nFROM $tables \nWHERE $filters \n$cards",
         
+        getChildTerms:
+          (card: ICard) =>
+            card['tables'].reduce(
+              (list:List<string>, tableBlock: {table: string, alias: string}): List<string> =>
+              {
+                let cols: List<string> = Store.getState().getIn(['tableColumns', tableBlock.table]);
+                if(cols)
+                {
+                  return list.merge(cols.map(
+                    (col) => tableBlock.alias + '.' + col
+                  ).toList());
+                }
+                return list;
+              }
+            , List([])),
+          
         display: [
           {
             header: 'Select',
@@ -437,6 +460,7 @@ export module BuilderTypes
                   displayType: DisplayType.TEXT,
                   helpInformation: 'The table your are retrieving data from',
                   key: 'table',
+                  getAutoTerms: () => Store.getState().get('tables'),
                 },
                 {
                   displayType: DisplayType.LABEL,
@@ -445,8 +469,9 @@ export module BuilderTypes
                 },
                 {
                   displayType: DisplayType.TEXT,
+
                   helpInformation: 'The name of the variable retrieved from the data',
-                  key: 'iterator',
+                  key: 'alias',
                 },
               ],
             },
@@ -465,15 +490,6 @@ export module BuilderTypes
             className: 'sfw-cards-area',
           },
         ],
-        
-        getTerms:
-          (card: ICard) => _.flatten(
-            card['tables'].map(table =>
-            {
-              var fields = ['ba', 'ca'];
-              return fields.map(f => table.table + '.' + f);
-            }).toArray()
-          )
       },
     }),
     
@@ -542,6 +558,7 @@ export module BuilderTypes
         display: letVarDisplay,
         manualEntry: ManualConfig[0]['Let'],
         tql: "LET $field = $expression",
+        getNeighborTerms: (card) => List([card['field']]),
       }
     }),
 
@@ -555,8 +572,10 @@ export module BuilderTypes
         title: "Var",
         preview: "[field]",
         display: letVarDisplay,
-        getTerms: (card) => [card['field']],
+
         manualEntry: ManualConfig[0]['Var'],
+        getNeighborTerms: (card) => List([card['field']]),
+
         tql: "VAR $field = $expression",
       }
     }),

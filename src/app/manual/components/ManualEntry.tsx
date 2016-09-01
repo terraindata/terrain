@@ -238,6 +238,8 @@ class ManualEntry extends Classs<Props>
 
   renderCardExample(index) {
     var card = BuilderTypes.recordFromJS(this.manualEntry.text[index][0]);
+    var keys = Immutable.List(["product.averageSales"]);
+    var key = Immutable.List(["queries", "I8LNT", "cards"]);
     return (
       <div className='manual-entry-demo'>
         <Card
@@ -246,8 +248,8 @@ class ManualEntry extends Classs<Props>
           index={0}
           parentId='CI2XI'
           singleCard={false}
-          keys={[]}
-          keyPath={Immutable.List(["queries", "I8LNT", "cards"])}
+          keys={keys}
+          keyPath={key}
           helpOn={this.manualEntry.text[index][0].helpOn}
         /> 
       </div>

@@ -68,15 +68,6 @@ import BuilderComponent from '../BuilderComponent.tsx';
 
 var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
-// $('body').on('click', (event) =>
-// {
-//   // surely there is a better way to do this?
-//   if(!$(event.target).hasClass('card-title') && !findParentWithClass($(event.target), 'card-title', 0))
-//   {
-//     Actions.selectCard(null, event.altKey, event.shiftKey);
-//   }
-// });
-
 interface Props
 {
   card: BuilderTypes.ICard;
@@ -106,6 +97,9 @@ class Card extends PureClasss<Props>
     hovering: boolean;
     menuOptions: List<MenuOption>;
     
+    cardTerms: List<string>;
+    allTerms: List<string>;
+    
     // CreateCardTool
     addingCardBelow?: boolean;
     addingCardAbove?: boolean;
@@ -130,11 +124,15 @@ class Card extends PureClasss<Props>
       // var borderWidth = this.props.card.highlighted ? '2px' : '1px';
     // return {
     super(props);
+    let cardTerms = this.getCardTerms(props.card);
+    
     this.state = {
       open: true,
       id: this.props.card.id,
       selected: false,
       hovering: false,
+      cardTerms,
+      allTerms: props.keys.merge(cardTerms),
       menuOptions:
         Immutable.List([
           {
@@ -175,6 +173,56 @@ class Card extends PureClasss<Props>
 
       }
     });
+  }
+  
+  getCardTerms(card:BuilderTypes.ICard): List<string>
+  {
+    var terms: List<string> = Immutable.List([]);
+    
+    if(card.static.getChildTerms)
+    {
+      terms = card.static.getChildTerms(card);
+    }
+    
+    if(card.static.getNeighborTerms)
+    {
+      terms = terms.merge(card.static.getNeighborTerms(card));
+    }
+    
+    return terms;
+  }
+  
+  componentWillReceiveProps(nextProps:Props)
+  {
+    var allTerms = this.props.keys;
+    var {cardTerms} = this.state;
+    var changed = false;
+    
+    if(nextProps.card !== this.props.card)
+    {
+      // check for new terms
+      let terms = this.getCardTerms(nextProps.card);
+      if(!this.state.cardTerms.equals(terms))
+      {
+        changed = true;
+        cardTerms = terms;
+      }
+    }
+    
+    if(this.props.keys !== nextProps.keys || changed)
+    {
+      changed = true;
+      allTerms = nextProps.keys.merge(cardTerms);
+    }
+    
+    
+    if(changed)
+    {
+      this.setState({
+        cardTerms,
+        allTerms,
+      });
+    }
   }
   
   dragPreview: any;
@@ -271,14 +319,16 @@ class Card extends PureClasss<Props>
   
   handleTitleClick(event)
   {
-    if(!this.props.canEdit)
-    {
-      return;
-    }
+    // TODO decide how selection mechanics work.
+    //  consider limiting selection to neighbors.
+    // if(!this.props.canEdit)
+    // {
+    //   return;
+    // }
     
-    event.stopPropagation();
-    event.preventDefault();
-    Actions.selectCard(this.props.card.id, event.shiftKey, event.altKey);
+    // event.stopPropagation();
+    // event.preventDefault();
+    // Actions.selectCard(this.props.card.id, event.shiftKey, event.altKey);
   }
   
   handleDelete()
@@ -340,9 +390,10 @@ class Card extends PureClasss<Props>
     Actions.hoverCard(this.props.card.id);
   }
 
-	render() {
-      var content = <BuilderComponent
-      keys={this.props.keys}
+	render()
+  {
+    var content = <BuilderComponent
+      keys={this.state.allTerms}
       canEdit={this.props.canEdit}
       data={this.props.card}
       helpOn={this.props.helpOn}

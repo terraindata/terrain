@@ -213,7 +213,7 @@ class Autocomplete extends PureClasss<Props>
           ref='input'
           type='text'
           className={inputClassName}
-          value={this.props.value /* TODO this.state.value*/}
+          value={this.state.value}
           onChange={this.handleChange}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}

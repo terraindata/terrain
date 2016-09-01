@@ -61,7 +61,8 @@ export class BuilderState
   hoveringCardId: ID = "";
   selectedCardIds: Map<ID, boolean> = Map({});
   
-  tables: Map<string, string[]> = Map({});
+  tables: List<string> = List([]);
+  tableColumns: Map<string, List<string>> = Map({});
   
   manual: Map<ID, Types.ICards> = Map({});
   // Card examples used in the manual are stored here.
