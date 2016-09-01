@@ -368,7 +368,8 @@ export module BuilderTypes
         colors: ["#89B4A7", "#C1EADE"],
         title: "Select / From",
         preview: "[tables.table]: [fields.length]",
-        tql: "SELECT $fields \nFROM $tables \nWHERE $filters \n$cards",
+        // tql: "SELECT $fields \nFROM $tables \nWHERE $filters \n$cards",
+        tql: "from $tables \nfilter $filters \nselect $fields \n$cards",
         
         getChildTerms:
           (card: ICard) =>
@@ -457,7 +458,8 @@ export module BuilderTypes
         title: "Sort",
         preview: "[sorts.property]",
         colors: ["#C5AFD5", "#EAD9F7"],
-        tql: "ORDER BY $sorts",
+        tql: "sort $sorts",
+        // tql: "ORDER BY $sorts",
         
         display: {
           displayType: DisplayType.ROWS,
