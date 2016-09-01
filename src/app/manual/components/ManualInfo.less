@@ -2,7 +2,7 @@
 
 .manual-info-wrapper {
 	position: absolute;
-	z-index: 9999999;
+	
 
 	.manual-info-indicator {
 		background-color: rgba(255,60,70,1);
@@ -10,6 +10,7 @@
 		width: 8px;
 		border-radius: 50%;
 		cursor: pointer;
+		z-index: 999;
 		&:hover {
 			background-color: rgba(255,60,70,0.5);
 			+ .manual-info-content {
@@ -25,15 +26,23 @@
 		color: #fff;
 		position: absolute;
 		top: 22px;
-		left: -79px;
 		border-radius: 3px;
 		padding: 8px 16px;
 		font-size: 12px;
-		z-index: 9999999;
+		z-index: 999999999;
 		text-align: left;
+		&:not(.manual-info-content-right) {
+			left: -75px;
+		}
 		&.manual-info-content-wide {
 			width: 200px;
 			left: -112px;
+		}
+		&.manual-info-content-left {
+			left: 0px;
+		}
+		&.manual-info-content-right {
+			right: 0px;
 		}
 	}
 	.manual-info-content:before, .manual-info-content:after {
@@ -41,8 +50,16 @@
 	    width: 0px;
 	    height: 0px;
 	    position: absolute;
-	    right: calc(~"50% - 8px");
 	    top: -8px;
+	    right: calc(~"50% - 8px");
+	}
+
+	.manual-info-content-left:before, .manual-info-content-left:after{
+		right: calc(~"100% - 20px") !important;
+	}
+
+	.manual-info-content-right:before, .manual-info-content-right:after{
+		right: 2px !important;
 	}
 
 	.manual-info-content:before {

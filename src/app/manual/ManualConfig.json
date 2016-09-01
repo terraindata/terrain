@@ -2,8 +2,9 @@
   {
    "Select From":
     { 
-      "summary": "Retrieves rows from the database if they meet the condition", 
+      "summary": "The Select From card is fundamental card for TQL. It selects certain attributes of elements from a specified source, as long as those elements meet conditions in the Where clause. To select all attributes, use Select *.", 
       "notation": "none",
+      "snippet": "Retrieves attributes of elements from database if they meet the conditions",
       "syntax": "SELECT field(s) FROM source WHERE condition(s)",
       "text": 
       [ 
@@ -726,7 +727,56 @@
       "syntax": "query expression SKIP expression (n)",
       "text": 
       [ 
-        "none"
+        "The Skip operator skips the first n elements of the query expression on its left hand side.  The number of elements, n, to skip is the evaluating of the right-hand side. Using Skip skips the first n elements and then takes all of the remaining rows.",
+        {
+          "id": "a",
+          "type": "skip",
+          "value": 10
+        },
+        "This example gets the 26th-50th visible products in the 'cool stuff' category, sorted by creation date",
+        {
+          "cards": [{
+            "id": "b",
+            "sorts": [{
+              "direction": 1,
+              "id": "c",
+              "property": "p.createdOn",
+              "type": "sortBlock"
+            }],
+            "type": "sort"
+          },
+          {
+            "value": "25",
+            "id": "e",
+            "type": "skip"
+          },
+          {
+            "value": "25",
+            "id": "f",
+            "type": "take"
+          }],
+          "fields": [{
+            "field": "*",
+            "id": "d",
+            "type": "field"
+          }],
+          "filters": [{
+            "combinator": 0,
+            "first": "p.visible",
+            "second": "true",
+            "type":"filterBlock",
+            "operator": 0,
+            "id": "g"
+          }],
+          "tables": [{
+              "alias": "p",
+              "table": "product",
+              "type": "table",
+              "id": "h2"
+          }],
+          "id": "a",
+          "type": "sfw"
+        }
       ]
     }
   },

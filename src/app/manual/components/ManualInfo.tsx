@@ -55,6 +55,8 @@ interface Props
   information: string,
   style?: any,
   wide?: boolean,
+  rightSide?: boolean;
+  leftSide?: boolean
 }
 
 
@@ -73,6 +75,8 @@ class ManualInfo extends Classs<Props>
           className={classNames({
             'manual-info-content': true,
             'manual-info-content-wide': this.props.wide,
+            'manual-info-content-right': this.props.rightSide,
+            'manual-info-content-left': this.props.leftSide
           })}
         >
           {this.props.information}  

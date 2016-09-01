@@ -102,7 +102,7 @@ class Manual extends Classs<Props>
 
   componentWillReceiveProps(nextProps)
   {
-    if(this.state.selectedKey !== nextProps.selectedKey)
+    if(this.props.selectedKey !== nextProps.selectedKey)
     {
       this.setState({
         selectedKey: nextProps.selectedKey
