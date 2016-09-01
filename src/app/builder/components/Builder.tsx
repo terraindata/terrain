@@ -355,10 +355,18 @@ class Builder extends PureClasss<Props>
         onRevert={this.save}
         column={this.state.column}
         cardName={this.state.cardName}
+        switchToManualCol={this.switchToManualCol}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key,
     }
+  }
+
+  switchToManualCol(index)
+  {
+    this.setState({
+      manualIndex: index
+    });
   }
 
   addManualColumn(index, cardName?)

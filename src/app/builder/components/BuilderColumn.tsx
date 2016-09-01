@@ -125,7 +125,8 @@ var BuilderColumn = React.createClass<any, any>(
     history: React.PropTypes.any,
     onRevert: React.PropTypes.func,
     column: React.PropTypes.number,
-    cardName: React.PropTypes.string
+    cardName: React.PropTypes.string,
+    switchToManualCol: React.PropTypes.func,
   },
   
   getInitialState()
@@ -276,6 +277,11 @@ var BuilderColumn = React.createClass<any, any>(
   
   switchView(index)
   {
+    if(index === 4)
+    {
+      this.props.switchToManualCol(this.props.index);
+    }
+    
     this.setState({
       column: index,
     });
