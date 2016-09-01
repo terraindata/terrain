@@ -482,7 +482,7 @@
       "text": 
       [ 
         "This example counts all the visible products.",
-          {
+        {
             "type": "count",
             "id": "b",
             "cards": [
@@ -516,7 +516,7 @@
               ]
             }
           ]
-          }
+        }
       ]
     },
     "Average":

@@ -314,7 +314,7 @@ class BuilderComponent extends PureClasss<Props>
                   }
                   else 
                   {
-                    var style = {left: '7%', top: '80%'};
+                    var style = {left: '0%', top: '90%'};
                     wide = false
                   }
                   return <ManualInfo 
