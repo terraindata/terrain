@@ -58,8 +58,6 @@ interface Props
   cardName: string;
   style?: any;
   addColumn: (number, string?) => void;
-  canAddColumn: boolean;
-  onCloseColumn: (number) => void;
   index: number;
 }
 
@@ -71,7 +69,6 @@ class ManualPopup extends Classs<Props>
     {
       open: false,
     }
-    this.addColumn = _.debounce(this.addColumn, 10);
   }
   
   shouldComponentUpdate(nextProps, nextState)
@@ -103,29 +100,10 @@ class ManualPopup extends Classs<Props>
       $(document).on('click', this.close);
     }
   }
-
-  addColumn()
-  {
-    this.props.addColumn(0, this.props.cardName === 'General' ? '' : this.props.cardName);
-  }
-
-  closeColumn()
-  {
-    var closeIndex;
-    if (this.props.index === 0 || this.props.index === 1)
-    {
-      closeIndex = 2;
-    }
-    else {
-      closeIndex = 1;
-    }
-    this.props.onCloseColumn(closeIndex);
-    this.addColumn();
-  }
   
   openManual()
   {
-    this.props.canAddColumn ?  this.addColumn() : this.closeColumn();
+    this.props.addColumn(this.props.index, this.props.cardName === 'General' ? '' : this.props.cardName);
   }
 
   render() {

@@ -124,6 +124,8 @@ class Builder extends PureClasss<Props>
       localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
     }
     this.state.colKeys = colKeys;
+
+    this.addManualColumn = _.debounce(this.addManualColumn, 1);
   }
   
   componentWillMount()
@@ -318,7 +320,6 @@ class Builder extends PureClasss<Props>
   {
     let key = this.state.colKeys.get(index);
     let query = this.getQuery();
-    if(this.state.manualIndex != -1) console.log("Manual column open");
     return {
       minWidth: 316,
       resizeable: true,
@@ -342,7 +343,7 @@ class Builder extends PureClasss<Props>
     }
   }
 
-  handleAddManualColumn(index, cardName?)
+  addManualColumn(index, cardName?)
   {
     index = index + 1;
     let colKeys = this.state.colKeys.splice(index, 0, Math.random());
@@ -353,6 +354,25 @@ class Builder extends PureClasss<Props>
       manualIndex: index
     }); 
     localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
+  }
+
+  handleAddManualColumn(index, cardName?)
+  {
+    if(this.state.manualIndex !== -1) //Manual column already open
+    {
+      this.setState({
+        cardName
+      });
+    }
+    else 
+    {
+      if(this.state.colKeys.size === 3)
+      {
+        var closeIndex = index < 2 ? 2 : 1;
+        this.handleCloseColumn(closeIndex);
+      }
+        this.addManualColumn(index, cardName);
+    }
   }
 
   handleAddColumn(index)

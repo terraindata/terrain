@@ -71,9 +71,7 @@ interface Props
   canEdit: boolean;
   keyPath: KeyPath;
   
-  addColumn?: () => void;
-  canAddColumn?: boolean;
-  onCloseColumn?: (number) => void;
+  addColumn?: (number, string?) => void;
   index?: number;
   className?: string;
   queryId?: ID;
@@ -217,6 +215,7 @@ class CardsArea extends PureClasss<Props>
           cards.map((card:ICard, index:number) =>
             <Card 
               {...this.props}
+              colIndex={this.props.index}
               helpOn={this.state.learningMode === 'learning' || this.props.helpOn}
               cards={null}
               key={card.id}

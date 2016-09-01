@@ -68,6 +68,9 @@ interface Props
   parentData?: any;
 
   helpOn?: boolean;
+
+  addColumn?: (number, string?) => void;
+  colIndex?: number;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
 }
@@ -108,6 +111,8 @@ class BuilderComponent extends PureClasss<Props>
             keys={this.props.keys}
             parentData={this.props.parentData}
             helpOn={this.props.helpOn}
+            addColumn={this.props.addColumn}
+            colIndex={this.props.colIndex}
           />
         ) as El[];
       // return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
@@ -167,6 +172,8 @@ class BuilderComponent extends PureClasss<Props>
           topLevel={false}
           className={className}
           helpOn={this.props.helpOn}
+          addColumn={this.props.addColumn}
+          index={this.props.colIndex}
         />;
       break;
       case DisplayType.CARDTEXT:
@@ -180,6 +187,8 @@ class BuilderComponent extends PureClasss<Props>
           keyPath={keyPath}
           keys={this.props.keys}
           helpOn={this.props.helpOn}
+          addColumn={this.props.addColumn}
+          colIndex={this.props.colIndex}
         />;
       break;
       case DisplayType.DROPDOWN:
@@ -218,6 +227,8 @@ class BuilderComponent extends PureClasss<Props>
                 keys={this.props.keys}
                 parentData={this.props.parentData}
                 helpOn={this.props.helpOn}
+                addColumn={this.props.addColumn}
+                colIndex={this.props.colIndex}
               />
             </div>
             { !d.below ? null : 
@@ -229,6 +240,8 @@ class BuilderComponent extends PureClasss<Props>
                 keys={this.props.keys}
                 parentData={this.props.parentData}
                 helpOn={this.props.helpOn}
+                addColumn={this.props.addColumn}
+                colIndex={this.props.colIndex}
               />
             }
           </div>
@@ -257,6 +270,8 @@ class BuilderComponent extends PureClasss<Props>
                   keys={this.props.keys}
                   parentData={d.provideParentData && data}
                   helpOn={this.props.helpOn}
+                  addColumn={this.props.addColumn}
+                  colIndex={this.props.colIndex}
                 />
               ))
             }

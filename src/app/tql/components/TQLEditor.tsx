@@ -94,9 +94,7 @@ interface Props {
   query?: BuilderTypes.IQuery;
   onLoadStart: () => void;
   onLoadEnd: () => void;
-  addColumn: (number) => void;
-  canAddColumn: boolean;
-  onCloseColumn: (number) => void;
+  addColumn?: (number, string?) => void;
   index: number;
 }
 
@@ -362,8 +360,6 @@ class TQL extends Classs<Props>
             <ManualPopup  
               cardName='General'      
               addColumn={this.props.addColumn}
-              canAddColumn={this.props.canAddColumn}
-              onCloseColumn={this.props.onCloseColumn}
               index={this.props.index}     
             />      
          </div>
@@ -505,8 +501,6 @@ class TQL extends Classs<Props>
                'No syntax help available'}
                style={this.state.syntaxHelpPos}
                addColumn={this.props.addColumn}
-               canAddColumn={this.props.canAddColumn}
-               onCloseColumn={this.props.onCloseColumn}
                index={this.props.index}
                onClick={this.turnSyntaxPopupOff}  
             />
@@ -521,8 +515,6 @@ class TQL extends Classs<Props>
                'No definition available'}
                style={this.state.termDefinitionPos}
                addColumn={this.props.addColumn}
-               canAddColumn={this.props.canAddColumn}
-               onCloseColumn={this.props.onCloseColumn}
                index={this.props.index}  
                onClick={this.turnSyntaxPopupOff}  
             />

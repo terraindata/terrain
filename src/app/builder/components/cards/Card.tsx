@@ -87,9 +87,7 @@ interface Props
   canEdit: boolean;
   keyPath: KeyPath;
 
-  addColumn?: () => void;
-  canAddColumn?: boolean;
-  onCloseColumn?: (number) => void;
+  addColumn?: (number, string?) => void;
   colIndex?: number;
   
   isDragging?: boolean;
@@ -348,6 +346,8 @@ class Card extends PureClasss<Props>
       canEdit={this.props.canEdit}
       data={this.props.card}
       helpOn={this.props.helpOn}
+      addColumn={this.props.addColumn}
+      colIndex={this.props.colIndex}
       keyPath={
         this.props.singleCard
         ? this.props.keyPath
@@ -423,8 +423,6 @@ class Card extends PureClasss<Props>
                     cardName={card.static.title} 
                     style={manualPopupStyle}
                     addColumn={this.props.addColumn}
-                    canAddColumn={this.props.canAddColumn}
-                    onCloseColumn={this.props.onCloseColumn}
                     index={this.props.colIndex}
                   />
                   {
