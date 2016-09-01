@@ -408,7 +408,7 @@ export module BuilderTypes
         manualEntry: ManualConfig[0]['Select From'],
         colors: ["#89B4A7", "#C1EADE"],
         title: "Select / From",
-        preview: "[tables.table]: [fields.field]",
+        preview: "[tables.table]: [fields.length]",
         tql: "SELECT $fields \nFROM $tables \nWHERE $filters \n$cards",
         
         getChildTerms:
@@ -517,7 +517,7 @@ export module BuilderTypes
               {
                 displayType: DisplayType.TEXT,
                 helpInformation: 'The attribute you want the sorting to be done on',
-                key: 'property'
+                key: 'property',
               },
               {
                 displayType: DisplayType.DROPDOWN,
@@ -690,6 +690,9 @@ export module BuilderTypes
         },
       }
     }),
+    
+    
+    
     
     bar: _block(
     {

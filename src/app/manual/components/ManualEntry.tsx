@@ -238,7 +238,7 @@ class ManualEntry extends Classs<Props>
 
   renderCardExample(index) {
     var card = BuilderTypes.recordFromJS(this.manualEntry.text[index][0]);
-    var keys = Immutable.List(["product.averageSales"]);
+    var keys = Immutable.List([]);
     var key = Immutable.List(["queries", "I8LNT", "cards"]);
     return (
       <div className='manual-entry-demo'>
