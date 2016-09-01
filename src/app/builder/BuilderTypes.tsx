@@ -367,7 +367,7 @@ export module BuilderTypes
       {
         colors: ["#89B4A7", "#C1EADE"],
         title: "Select / From",
-        preview: "[tables.table]: [fields.field]",
+        preview: "[tables.table]: [fields.length]",
         tql: "SELECT $fields \nFROM $tables \nWHERE $filters \n$cards",
         
         getChildTerms:
@@ -470,7 +470,7 @@ export module BuilderTypes
             [
               {
                 displayType: DisplayType.TEXT,
-                key: 'property'
+                key: 'property',
               },
               {
                 displayType: DisplayType.DROPDOWN,
@@ -626,6 +626,9 @@ export module BuilderTypes
         },
       }
     }),
+    
+    
+    
     
     bar: _block(
     {
