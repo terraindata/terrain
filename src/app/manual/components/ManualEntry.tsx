@@ -269,7 +269,7 @@ class ManualEntry extends Classs<Props>
     }
     //var value = this.manualEntry.text[index][1];
     var cards = Immutable.List([BuilderTypes.recordFromJS(this.manualEntry.text[index][0])]);
-    var value: BuilderTypes.IQuery = {
+    var query: BuilderTypes.IQuery = {
       id: 'a',
       cards: cards,
       inputs: Immutable.List([]),
@@ -279,11 +279,21 @@ class ManualEntry extends Classs<Props>
       name: '',
       lastEdited: '',
     };
+
+    var value = TQLConverter.toTQL(query);
+
+    var numLines = value.split('\n').length;
+    var padding = numLines === 1 ? 2 : 8;
     return (
-      <CodeMirror 
-        options={options}
-        value={TQLConverter.toTQL(value)}
-      />
+      <div 
+        className='manual-entry-codemirror'
+        style={{height: (numLines * 14 + padding) + 'px'}}
+      >
+        <CodeMirror 
+          options={options}
+          value={value}
+        />
+      </div>
     );
   }
 
@@ -305,8 +315,6 @@ class ManualEntry extends Classs<Props>
                 );
             }
             else {
-              var numLines = this.manualEntry.text[index][1].split('\n').length;
-              var padding = numLines === 1 ? 2 : 8;
               return (
                  <div 
                    key ={index} 
@@ -314,12 +322,8 @@ class ManualEntry extends Classs<Props>
                    style={style}
                  >
                    {this.renderCardExample(index)}
-                   <div 
-                     className='manual-entry-codemirror'
-                     style={{height: (numLines * 14 + padding) + 'px'}}
-                   >
-                     {this.renderCodeMirrorExample(index)}
-                   </div>
+                   {this.renderCodeMirrorExample(index)}
+
                  </div>
               );
             }

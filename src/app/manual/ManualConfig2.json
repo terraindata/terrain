@@ -38,7 +38,7 @@
             ],
             "type": "sfw",
             "id": "e",
-            "helpOn": "true"
+            "helpOn": true
           },
           "SELECT user.name\nFROM 'users' as user\nWHERE user.name == John;"
         ],
@@ -124,7 +124,7 @@
             "type": "take",
             "value": "10",
             "id": "a",
-            "helpOn": "true"
+            "helpOn": true
           },
           "take 10"
         ],
@@ -190,7 +190,7 @@
                 "id": "b"
               }
             ],
-            "helpOn": "true"
+            "helpOn": true
           },
           "ORDER BY user.id desc"
         ],
@@ -257,7 +257,7 @@
             "id": "3",
             "field": "product.score",
             "expression": "product.age * product.conversionRatio",
-            "helpOn": "true"
+            "helpOn": true
           },
           "LET product.score = \nproduct.age * product.conversionRatio "
         ],
@@ -317,7 +317,7 @@
     "Var":
     { 
       "snippet": "Declares a variable", 
-      "summary": "Declares a variable", 
+      "summary": "Declares` a variable", 
       "notation": "binary infix operator",
       "syntax": "VAR name",
       "text": 
@@ -328,7 +328,7 @@
             "id": "3",
             "field": "product.score",
             "expression": "product.age * product.conversionRatio",
-            "helpOn": "true"
+            "helpOn": true
           },
           "VAR product.score = \nproduct.age * product.conversionRatio "
         ]
@@ -368,7 +368,7 @@
                 "type": "weight"
               }
             ],
-            "helpOn": "true"
+            "helpOn": true
           },
           "linearScore([\n\t[50, product.positive_reviews],\n\t[-25, product.negative_reviews],\n\t[10, product.price]]);"
         ],
@@ -503,7 +503,7 @@
               }
             ],
             "type": "transform",
-            "helpOn": "true"
+            "helpOn": true
           },
           "linearTransform([\n\t[0.1, 1],\n\t[0.38, 25],\n\t[0.6, 100],\n\t[0.75, 75],\n\t[0.8, 100]\n]);"
         ]
@@ -538,7 +538,7 @@
                   "combinator": 0,
                   "first": "product.visible",
                   "operator": 0,
-                  "second": "true",
+                  "second": true,
                   "type": "filterBlock",
                   "id": "c"
                   }
@@ -696,7 +696,7 @@
                     "id": "c"
                   }
              ],
-            "helpOn": "true"
+            "helpOn": true
           },
           "product.price <= 20"
         ],
