@@ -509,7 +509,7 @@ export module BuilderTypes
       static:
       {
         title: "Comparison",
-        preview: (c:ICard) => `${c['first']} ${Operator[c['operator']]} ${c['second']}`,
+        preview: (c:ICard) => `${c['first']} ${Operators[c['operator']]} ${c['second']}`,
         colors: ["#7EAAB3", "#B9E1E9"],
         tql: "$first $OPERATOR $second",
         
@@ -518,6 +518,57 @@ export module BuilderTypes
           key: 'operator',
           options: Immutable.List(Operators),
         }),
+      },
+    }),
+    
+    and: _card(
+    {
+      first: "",
+      second: "",
+      
+      static:
+      {
+        title: "And",
+        preview: (c:ICard) =>
+        {
+          var first = c['first'];
+          var second = c['second'];
+          if(typeof first !== 'string')
+          {
+            first = getPreview(first);
+          }
+          if(typeof second !== 'string')
+          {
+            second = getPreview(second);
+          }
+          
+          return `${first} & ${second}`
+        },
+        colors: ["#47a7ff", "#97d7ff"],
+        tql: "$first AND $second",
+        
+        display: [
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'first',
+          },
+
+          {
+            displayType: DisplayType.CARDTEXT,
+            key: 'first',
+            top: true,
+          },
+          
+          {
+            displayType: DisplayType.CARDTEXT,
+            key: 'second',
+          },
+
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'second',
+          },
+        ],
       },
     }),
     
@@ -530,7 +581,21 @@ export module BuilderTypes
       static:
       {
         title: "And / Or",
-        preview: (c:ICard) => `${c['first']} ${Combinator[c['combinator']]} ${c['second']}`,
+        preview: (c:ICard) =>
+        {
+          var first = c['first'];
+          var second = c['second'];
+          if(typeof first !== 'string')
+          {
+            first = getPreview(first);
+          }
+          if(typeof second !== 'string')
+          {
+            second = getPreview(second);
+          }
+          
+          return `${first} ${Combinators[c['combinator']]} ${second}`
+        },
         colors: ["#47a7ff", "#97d7ff"],
         tql: "$first $COMBINATOR $second",
         

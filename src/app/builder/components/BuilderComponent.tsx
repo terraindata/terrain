@@ -175,6 +175,7 @@ class BuilderComponent extends PureClasss<Props>
           canEdit={this.props.canEdit}
           keyPath={keyPath}
           keys={this.props.keys}
+          key={key + 'cards'}
         />;
       break;
       case DisplayType.DROPDOWN:

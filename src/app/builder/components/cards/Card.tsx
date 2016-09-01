@@ -396,13 +396,15 @@ class Card extends PureClasss<Props>
                   onClick={this.handleTitleClick}
                   >
                   <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
-                  { title }
-                  <span className={classNames({
+                  <div className='card-title-inner'>
+                    { title }
+                  </div>
+                  <div className={classNames({
                     'card-preview': true,
                     'card-preview-hidden': this.state.open
                   })}>
                     { BuilderTypes.getPreview(card) }
-                  </span>
+                  </div>
                   {
                     this.props.canEdit && <Menu options={this.state.menuOptions} />
                   }
