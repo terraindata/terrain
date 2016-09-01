@@ -59,7 +59,7 @@ export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
 
-import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, filtersDisplay, wrapperDisplay} from './BuilderDisplays.tsx';
+import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, firstSecondDisplay, wrapperDisplay} from './BuilderDisplays.tsx';
   
 export module BuilderTypes
 {
@@ -325,17 +325,17 @@ export module BuilderTypes
       }
     }),
     
-    filterBlock: _block(
-    {
-      first: "",
-      second: "",
-      operator: Operator.EQ,
-      combinator: Combinator.AND,
+    // comparisonBlock: _block(
+    // {
+    //   first: "",
+    //   second: "",
+    //   operator: Operator.EQ,
+    //   combinator: Combinator.AND,
       
-      static: {
-        tql: "$first $OPERATOR $second",
-      }
-    }),
+    //   static: {
+    //     tql: "$first $OPERATOR $second",
+    //   }
+    // }),
     
     table: _block(
     {
@@ -360,7 +360,6 @@ export module BuilderTypes
     {
       tables: L(),
       fields: L(),
-      filters: L(),
       cards: L(),
       
       static:
@@ -368,7 +367,7 @@ export module BuilderTypes
         colors: ["#89B4A7", "#C1EADE"],
         title: "Select / From",
         preview: "[tables.table]: [fields.field]",
-        tql: "SELECT $fields \nFROM $tables \nWHERE $filters \n$cards",
+        tql: "SELECT $fields \nFROM $tables \n$cards",
         
         display: [
           {
@@ -416,13 +415,6 @@ export module BuilderTypes
             },
           },
           
-          _.extend(
-            {
-              header: 'Where',
-            }, 
-            filtersDisplay
-          ),
-          
           {
             displayType: DisplayType.CARDS,
             key: 'cards',
@@ -439,6 +431,31 @@ export module BuilderTypes
             }).toArray()
           ))
       },
+    }),
+    
+    where: _card({
+      clause: "",
+      
+      static:
+      {
+        title: "Where",
+        preview: "[clause]",
+        colors: ["#AFC5D5", "#D9EAF7"],
+        tql: "WHERE $clause",
+        
+        display: 
+        [
+          {
+            displayType: DisplayType.CARDTEXT,
+            key: 'clause',
+            placeholder: 'Clause or Condition',
+          },
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'clause',
+          }
+        ]
+      }
     }),
     
     sort: _card(
@@ -476,17 +493,45 @@ export module BuilderTypes
       },
     }),
     
-    filter: _card(
+    comparison: _card(
     {
-      filters: List([]),
+      first: "",
+      second: "",
+      operator: Operator.EQ,
       
       static:
       {
         title: "Comparison",
-        preview: "[filters.length] Condition(s)",
+        preview: (c:ICard) => `${c['first']} ${Operator[c['operator']]} ${c['second']}`,
         colors: ["#7EAAB3", "#B9E1E9"],
-        display: filtersDisplay,
-        tql: "$filters",
+        tql: "$first $OPERATOR $second",
+        
+        display: firstSecondDisplay({
+          displayType: DisplayType.DROPDOWN,
+          key: 'operator',
+          options: Immutable.List(Operators),
+        }),
+      },
+    }),
+    
+    andOr: _card(
+    {
+      first: "",
+      second: "",
+      combinator: Combinator.AND,
+      
+      static:
+      {
+        title: "And / Or",
+        preview: (c:ICard) => `${c['first']} ${Combinator[c['combinator']]} ${c['second']}`,
+        colors: ["#47a7ff", "#97d7ff"],
+        tql: "$first $COMBINATOR $second",
+        
+        display: firstSecondDisplay({
+          displayType: DisplayType.DROPDOWN,
+          key: 'combinator',
+          options: Immutable.List(Combinators),
+        }),
       },
     }),
     

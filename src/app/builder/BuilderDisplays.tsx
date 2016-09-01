@@ -124,52 +124,39 @@ export const textDisplay =
   key: [],
 }
 
-export const filtersDisplay = 
-{
-    displayType: ROWS,
-    key: 'filters',
-    english: 'condition',
-    factoryType: 'filterBlock',
-    className: (data => data.filters.size > 1 ? 'filters-multiple' : 'filters-single'),
-    row: 
+export const firstSecondDisplay = (middle:Display): Display =>
+({
+  displayType: FLEX,
+  key: null,
+  
+  above:
+  {
+    displayType: CARDSFORTEXT,
+    key: 'first',
+  },
+  
+  below:
+  {
+    displayType: CARDSFORTEXT,
+    key: 'second',
+  },
+  
+  flex:
+  [
     {
-      above:
-      {
-        displayType: CARDSFORTEXT,
-        key: 'first',
-      },
-      
-      below:
-      {
-        displayType: CARDSFORTEXT,
-        key: 'second',
-      },
-      
-      inner:
-      [
-        {
-          displayType: CARDTEXT,
-          key: 'first',
-          top: true,
-        },
-        {
-          displayType: DROPDOWN,
-          key: 'operator',
-          options: Immutable.List(Operators),
-        },
-        {
-          displayType: CARDTEXT,
-          key: 'second',
-        },
-        {
-          displayType: DROPDOWN,
-          key: 'combinator',
-          options: Immutable.List(Combinators),
-          className: 'combinator',
-        }
-      ],
+      displayType: CARDTEXT,
+      key: 'first',
+      top: true,
     },
-  };
+    
+    middle,
+    
+    {
+      displayType: CARDTEXT,
+      key: 'second',
+    },
+  ],
+});
 
 export const wrapperDisplay =
 {
