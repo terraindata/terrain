@@ -343,7 +343,8 @@ export module BuilderTypes
       alias: "",
       
       static: {
-        tql: "$table as $alias",
+        // tql: "$table as $alias",
+        tql: "'$table' as $alias", // **
       }
     }),
     
@@ -369,7 +370,7 @@ export module BuilderTypes
         title: "Select / From",
         preview: "[tables.table]: [fields.length]",
         // tql: "SELECT $fields \nFROM $tables \nWHERE $filters \n$cards",
-        tql: "from $tables \nfilter $filters \nselect $fields \n$cards",
+        tql: "from $tables \nfilter $filters \n$cards \nselect $fields",  // **
         
         getChildTerms:
           (card: ICard) =>
@@ -718,14 +719,16 @@ export module BuilderTypes
     {
       colors: ["#CDCF85", "#F5F6B3"],
       title: "Take / Limit",
-      tql: "LIMIT $value",
+      // tql: "LIMIT $value",
+      tql: "take $value", // **
     }),
     
     skip: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
       title: "Skip / Offset",
-      tql: "OFFSET $value",
+      // tql: "OFFSET $value",
+      tql: "skip $value", // **
     }),
     
     spotlight: _block(
