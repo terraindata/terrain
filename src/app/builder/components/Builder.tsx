@@ -409,13 +409,13 @@ class Builder extends PureClasss<Props>
   
   moveColumn(curIndex, newIndex)
   {
-    var colKeys = _.clone(this.state.colKeys);
-    var tmp = colKeys.splice(curIndex, 1)[0];
-    colKeys.splice(newIndex, 0, tmp);
+    var tmp = this.state.colKeys.get(curIndex);
+    var colKeys = this.state.colKeys.splice(curIndex, 1).splice(newIndex, 0, tmp);
     this.setState({
       colKeys,
       noColumnAnimation: true,
     })
+    localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
     setTimeout(() => this.setState({
       noColumnAnimation: false,
     }), 250);
