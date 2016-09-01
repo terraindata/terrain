@@ -91,7 +91,14 @@ class BuilderComponent extends PureClasss<Props>
     );
   }
   
-  renderDisplay(displayArg: Display | Display[], parentKeyPath: KeyPath, data: Map<any, any>): (El | El[])
+  renderDisplay(
+    displayArg: Display | Display[],
+    parentKeyPath: KeyPath,
+    data: Map<any, any>, 
+    options?: {
+      className: string;
+    }
+  ): (El | El[])
   {
     let keySeed = parentKeyPath.join(",");
     if(Array.isArray(displayArg))
@@ -121,6 +128,11 @@ class BuilderComponent extends PureClasss<Props>
       {
         className = d.className as string;
       }
+    }
+    
+    if(options && options.className)
+    {
+      className += ' ' + options.className;
     }
     
     if(d.displayType === DisplayType.LABEL)
@@ -274,6 +286,7 @@ class BuilderComponent extends PureClasss<Props>
           parentData: this.props.parentData,
           canEdit: this.props.canEdit,
           keys: this.props.keys,
+          className,
         });
       break;
       default:
@@ -346,7 +359,10 @@ class BuilderComponent extends PureClasss<Props>
             display.map((d, i) => this.renderDisplay(
               d,
               this.props.keyPath,
-              this.props.data
+              this.props.data,
+              {
+                className: 'builder-comp-list-item',
+              }
               )
             )
           }

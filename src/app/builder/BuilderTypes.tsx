@@ -298,6 +298,57 @@ export module BuilderTypes
     })
   }
   
+  const _andOrCard = (config: { title: string, tql: string }) => _card(
+    {
+      first: "",
+      second: "",
+      
+      static:
+      {
+        title: config.title,
+        preview: (c:ICard) =>
+        {
+          var first = c['first'];
+          var second = c['second'];
+          if(typeof first !== 'string')
+          {
+            first = getPreview(first);
+          }
+          if(typeof second !== 'string')
+          {
+            second = getPreview(second);
+          }
+          
+          return `${first} ${config.tql} ${second}`
+        },
+        colors: ["#47a7ff", "#97d7ff"],
+        tql: "$first " + config.tql + " $second",
+        
+        display: [
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'first',
+          },
+
+          {
+            displayType: DisplayType.CARDTEXT,
+            key: 'first',
+            top: true,
+          },
+          
+          {
+            displayType: DisplayType.CARDTEXT,
+            key: 'second',
+          },
+
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'second',
+          },
+        ],
+      },
+    });
+  
   const _valueCard = (config:{ title: string, colors: string[], tql: string }) => (
     _card({
       value: 0,
@@ -325,17 +376,16 @@ export module BuilderTypes
       }
     }),
     
-    // comparisonBlock: _block(
-    // {
-    //   first: "",
-    //   second: "",
-    //   operator: Operator.EQ,
-    //   combinator: Combinator.AND,
+    comparisonBlock: _block(
+    {
+      first: "",
+      second: "",
+      operator: Operator.EQ,
       
-    //   static: {
-    //     tql: "$first $OPERATOR $second",
-    //   }
-    // }),
+      static: {
+        tql: "$first $OPERATOR $second",
+      }
+    }),
     
     table: _block(
     {
@@ -521,91 +571,50 @@ export module BuilderTypes
       },
     }),
     
-    and: _card(
-    {
-      first: "",
-      second: "",
-      
-      static:
-      {
-        title: "And",
-        preview: (c:ICard) =>
-        {
-          var first = c['first'];
-          var second = c['second'];
-          if(typeof first !== 'string')
-          {
-            first = getPreview(first);
-          }
-          if(typeof second !== 'string')
-          {
-            second = getPreview(second);
-          }
-          
-          return `${first} & ${second}`
-        },
-        colors: ["#47a7ff", "#97d7ff"],
-        tql: "$first AND $second",
-        
-        display: [
-          {
-            displayType: DisplayType.CARDSFORTEXT,
-            key: 'first',
-          },
-
-          {
-            displayType: DisplayType.CARDTEXT,
-            key: 'first',
-            top: true,
-          },
-          
-          {
-            displayType: DisplayType.CARDTEXT,
-            key: 'second',
-          },
-
-          {
-            displayType: DisplayType.CARDSFORTEXT,
-            key: 'second',
-          },
-        ],
-      },
+    and: _andOrCard({
+      title: 'And',
+      tql: 'AND',
     }),
     
-    andOr: _card(
-    {
-      first: "",
-      second: "",
-      combinator: Combinator.AND,
-      
-      static:
-      {
-        title: "And / Or",
-        preview: (c:ICard) =>
-        {
-          var first = c['first'];
-          var second = c['second'];
-          if(typeof first !== 'string')
-          {
-            first = getPreview(first);
-          }
-          if(typeof second !== 'string')
-          {
-            second = getPreview(second);
-          }
-          
-          return `${first} ${Combinators[c['combinator']]} ${second}`
-        },
-        colors: ["#47a7ff", "#97d7ff"],
-        tql: "$first $COMBINATOR $second",
-        
-        display: firstSecondDisplay({
-          displayType: DisplayType.DROPDOWN,
-          key: 'combinator',
-          options: Immutable.List(Combinators),
-        }),
-      },
+    or: _andOrCard({
+      title: 'Or',
+      tql: 'OR',
     }),
+    
+    // andOr: _card(
+    // {
+    //   first: "",
+    //   second: "",
+    //   combinator: Combinator.AND,
+      
+    //   static:
+    //   {
+    //     title: "And / Or",
+    //     preview: (c:ICard) =>
+    //     {
+    //       var first = c['first'];
+    //       var second = c['second'];
+    //       if(typeof first !== 'string')
+    //       {
+    //         first = getPreview(first);
+    //       }
+    //       if(typeof second !== 'string')
+    //       {
+    //         second = getPreview(second);
+    //       }
+          
+    //       return `${first} ${Combinators[c['combinator']]} ${second}`
+    //     },
+    //     colors: ["#47a7ff", "#97d7ff"],
+    //     tql: "$first $COMBINATOR $second",
+        
+    //     display: firstSecondDisplay({
+    //       displayType: DisplayType.DROPDOWN,
+    //       key: 'combinator',
+    //       options: Immutable.List(Combinators),
+    //     }),
+    //   },
+    // }),
     
     let: _card(
     {

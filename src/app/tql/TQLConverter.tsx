@@ -196,7 +196,7 @@ class TQLConverter
     
     if(typeof block[field] === 'object')
     {
-      return this._parse(block[field]);
+      return '(' + this._parse(block[field]) + ')';
     }
     
     if(field.toUpperCase() === field)

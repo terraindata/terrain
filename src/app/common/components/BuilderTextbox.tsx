@@ -204,7 +204,8 @@ class BuilderTextbox extends PureClasss<Props>
             'builder-tb': true,
             'builder-tb-drag-over': isOverCurrent,
             'builder-tb-accepts-cards': this.props.acceptsCards,
-            'card-drop-target': this.props.acceptsCards
+            'card-drop-target': this.props.acceptsCards,
+            [this.props.className]: !!this.props.className,
           })}
         >
           {
@@ -241,59 +242,62 @@ class BuilderTextbox extends PureClasss<Props>
       );
     }
     
-    var card: BuilderTypes.ICard = this.props.value as BuilderTypes.ICard;
-    // var cards = this.props.value['cards'];
-    // if(cards.size)
-    // {
-      // var card = cards.get(0);
-      var color = card.static.colors[0] as string;
-      var title: string = card.static.title;
-      var preview = BuilderTypes.getPreview(card);
-    // }
-    // else
-    // {
-    //   var color = "#aaa";
-    //   var title = "Add a Card";
-    // }
-    
-    var chipStyle = 
-    {
-      background: color,
-    };
-    var arrowLineStyle =
-    {
-      borderColor: color,
-    };
-    var arrowHeadStyle = 
-    {
-      borderLeftColor: color,
-    }
-    
     // We're in card mode
-    return (
-      <div className={classNames({
-        'builder-tb': true,
-        'builder-tb-cards': true,
-        'builder-tb-cards-top': this.props.top
-      })} ref='cards'>
-        <div className='builder-tb-cards-input'>
-          { this.renderSwitch() }
-          <div className='builder-tb-cards-input-value' style={chipStyle}>
-            <div className='builder-tb-cards-input-value-text'>
-              { title }
-            </div>
-            { !preview ? null :
-              <div className='card-preview'>
-                { preview }
-              </div>
-            }
-          </div>
-          <div className='builder-tb-cards-arrow' style={arrowLineStyle}>
-            <div className='builder-tb-cards-arrow-inner' style={arrowHeadStyle} />
-          </div>
-        </div>
-      </div>
-    );
+    
+    return null;
+    
+    // var card: BuilderTypes.ICard = this.props.value as BuilderTypes.ICard;
+    // // var cards = this.props.value['cards'];
+    // // if(cards.size)
+    // // {
+    //   // var card = cards.get(0);
+    //   var color = card.static.colors[0] as string;
+    //   var title: string = ''; //card.static.title;
+    //   var preview = BuilderTypes.getPreview(card);
+    // // }
+    // // else
+    // // {
+    // //   var color = "#aaa";
+    // //   var title = "Add a Card";
+    // // }
+    
+    // var chipStyle = 
+    // {
+    //   background: color,
+    // };
+    // var arrowLineStyle =
+    // {
+    //   borderColor: color,
+    // };
+    // var arrowHeadStyle = 
+    // {
+    //   borderLeftColor: color,
+    // }
+    
+    // return (
+    //   <div className={classNames({
+    //     'builder-tb': true,
+    //     'builder-tb-cards': true,
+    //     'builder-tb-cards-top': this.props.top
+    //   })} ref='cards'>
+    //     <div className='builder-tb-cards-input'>
+    //       { this.renderSwitch() }
+    //       <div className='builder-tb-cards-input-value' style={chipStyle}>
+    //         <div className='builder-tb-cards-input-value-text'>
+    //           { title }
+    //         </div>
+    //         { !preview ? null :
+    //           <div className='card-preview'>
+    //             { preview }
+    //           </div>
+    //         }
+    //       </div>
+    //       <div className='builder-tb-cards-arrow' style={arrowLineStyle}>
+    //         <div className='builder-tb-cards-arrow-inner' style={arrowHeadStyle} />
+    //       </div>
+    //     </div>
+    //   </div>
+    // );
   }
 };
 
