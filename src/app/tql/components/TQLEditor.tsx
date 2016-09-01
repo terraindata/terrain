@@ -496,9 +496,7 @@ class TQL extends Classs<Props>
           { this.state.syntaxHelpOpen ? 
             <TQLPopup 
               cardName={this.state.cardName}
-              text={manualEntry ? 
-               manualEntry.syntax :
-               'No syntax help available'}
+               text={manualEntry ? manualEntry.syntax : 'No syntax help available'}
                style={this.state.syntaxHelpPos}
                addColumn={this.props.addColumn}
                index={this.props.index}
@@ -510,9 +508,7 @@ class TQL extends Classs<Props>
             this.state.showTermDefinition ? 
             <TQLPopup 
               cardName={this.state.cardName}
-              text={manualEntry ? 
-               manualEntry.summary :
-               'No definition available'}
+              text={manualEntry ? manualEntry.summary : 'No definition available'}
                style={this.state.termDefinitionPos}
                addColumn={this.props.addColumn}
                index={this.props.index}  
