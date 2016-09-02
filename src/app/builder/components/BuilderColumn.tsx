@@ -75,7 +75,7 @@ var BuilderIcon = require("./../../../images/icon_builder.svg");
 var ResultsIcon = require("./../../../images/icon_resultsDropdown.svg");
 var TQLIcon = require("./../../../images/icon_tql.svg");
 var InputsIcon = require("./../../../images/icon_input.svg");
-var ManualIcon = require('./../../../images/open-book-top-view.svg');
+var ManualIcon = require('./../../../images/icon_manual.svg');
 
 enum COLUMNS {
   Builder,

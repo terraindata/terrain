@@ -86,7 +86,6 @@ import 'codemirror/addon/search/jump-to-line.js';
 import 'codemirror/addon/search/matchesonscrollbar.css';
 
 import ManualPopup from './../../manual/components/ManualPopup.tsx';
-var OpenIcon = require('./../../../images/icon_open.svg');
 import TQLPopup from './TQLPopup.tsx';
 
 interface Props {
@@ -112,7 +111,7 @@ class TQL extends Classs<Props>
     syntaxHelpOpen: boolean;
     syntaxHelpPos: any;
     cardName: string;
-    showTermDefinition: boolean;
+    termDefinitionOpen: boolean;
     termDefinitionPos: any;
   } = {
     tql: null,
@@ -125,7 +124,7 @@ class TQL extends Classs<Props>
     syntaxHelpOpen: false,
     syntaxHelpPos: {},
     cardName: '',
-    showTermDefinition: false,
+    termDefinitionOpen: false,
     termDefinitionPos: {}
   };
 
@@ -153,7 +152,7 @@ class TQL extends Classs<Props>
       code: newCode,
       highlightedLine: null,
       syntaxHelpOpen: false,
-      showTermDefinition: false,
+      termDefinitionOpen: false,
     });
     this.executeCode();
   }
@@ -261,11 +260,13 @@ class TQL extends Classs<Props>
 
   highlightError(lineNumber: number) 
   {
-    this.state.highlightedLine = lineNumber - 1; //-1 because they should be 0-indexed
     var x: any = this.refs['cm'];
     if (x) 
     {
-      x.updateHighlightedLine(this.state.highlightedLine);
+      x.updateHighlightedLine(lineNumber - 1);
+      this.setState({
+        highlightedLine: lineNumber - 1;
+      });
     }
   }
 
@@ -372,7 +373,7 @@ class TQL extends Classs<Props>
   {
     this.setState({
       syntaxHelpOpen: false,
-      showTermDefinition: false
+      termDefinitionOpen: false
     })
   }
 
@@ -381,6 +382,7 @@ class TQL extends Classs<Props>
     var cardName = '';
     keywords.map(function(word) {
       var words = word.split(' ');
+      //For terms like select from, only need to match one of the words
       if(words.length > 1)
       {
         for(var i = 0; i < words.length; i++)
@@ -409,7 +411,7 @@ class TQL extends Classs<Props>
       syntaxHelpOpen: !this.state.syntaxHelpOpen,
       syntaxHelpPos: {left, top},
       cardName,
-      showTermDefinition: false
+      termDefinitionOpen: false
     });
   }
 
@@ -421,7 +423,7 @@ class TQL extends Classs<Props>
     if(cardName)
     {
       this.setState({
-        showTermDefinition: true,
+        termDefinitionOpen: true,
         termDefinitionPos: {left, top},
         cardName,
         syntaxHelpOpen: false
@@ -432,7 +434,7 @@ class TQL extends Classs<Props>
   hideTermDefinition()
   {
     this.setState({
-      showTermDefinition: false,
+      termDefinitionOpen: false,
     })
   }
 
@@ -495,7 +497,7 @@ class TQL extends Classs<Props>
           { this.renderTqlEditor() }
           { this.state.syntaxHelpOpen ? 
             <TQLPopup 
-              cardName={this.state.cardName}
+               cardName={this.state.cardName}
                text={manualEntry ? manualEntry.syntax : 'No syntax help available'}
                style={this.state.syntaxHelpPos}
                addColumn={this.props.addColumn}
@@ -505,7 +507,7 @@ class TQL extends Classs<Props>
             : null
           }
           {
-            this.state.showTermDefinition ? 
+            this.state.termDefinitionOpen ? 
             <TQLPopup 
               cardName={this.state.cardName}
               text={manualEntry ? manualEntry.summary : 'No definition available'}
