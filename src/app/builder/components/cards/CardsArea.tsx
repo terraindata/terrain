@@ -77,7 +77,6 @@ interface Props
   queryId?: ID;
   spotlights?: List<any>;
   connectDropTarget?: (el:JSX.Element) => JSX.Element;
-
   helpOn?: boolean;
 }
 
@@ -196,7 +195,6 @@ class CardsArea extends PureClasss<Props>
   {
     let {props} = this;
     let {cards, topLevel, canEdit} = props;
-    //this.props.helpOn
     return (
       <div> 
       {this.props.topLevel ? this.renderTopbar() : null}

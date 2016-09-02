@@ -264,7 +264,7 @@ export module BuilderTypes
       type: "",
     }, config);
   }
-  
+    
   // Every Card definition must follow this interface
   interface ICardConfig
   {
@@ -757,7 +757,7 @@ export module BuilderTypes
             changed by clicking a point and entering values into the textboxes that appear.\
             To delete a point, right click on it. To create a new point, double click anywhere on the chart.', 
             'The lines of the graph can also be moved by clicking and dragging.',
-            'Use these sliders at the bottom to change the domain of the graph.']
+            'Use these sliders at the bottom to change the domain of the graph.'],
           },
         ],
         

@@ -96,7 +96,7 @@ class Builder extends PureClasss<Props>
     noColumnAnimation: boolean;
     column: number;
     cardName: string;
-    manualIndex: number
+    manualIndex: number;
   } = {
     builder: Store.getState(),
     colKeys: null,

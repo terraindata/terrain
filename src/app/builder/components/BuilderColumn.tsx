@@ -63,7 +63,6 @@ import InfoArea from '../../common/components/InfoArea.tsx';
 const shallowCompare = require('react-addons-shallow-compare');
 import * as moment from 'moment';
 import Ajax from "./../../util/Ajax.tsx";
-// import * as Immutable from 'immutable';
 import Manual from './../../manual/components/Manual.tsx';
 
 
@@ -82,7 +81,7 @@ enum COLUMNS {
   Results,
   TQL,
   Inputs,
-  Manual
+  Manual,
 };
 var NUM_COLUMNS = 5;
 
@@ -209,7 +208,6 @@ var BuilderColumn = React.createClass<any, any>(
   renderContent(canEdit:boolean)
   {
     var query = this.props.query;
-    console.log(query.cards);
     switch(this.state.column)
     {
       case COLUMNS.Builder:

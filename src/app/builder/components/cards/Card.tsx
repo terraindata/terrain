@@ -113,16 +113,6 @@ class Card extends PureClasss<Props>
   
   constructor(props:Props)
   {
-      // var darkCardColor = CardColors[this.props.card.type] ? CardColors[this.props.card.type][0] : CardColors['none'][0];
-      // var lightCardColor = CardColors[this.props.card.type] ? CardColors[this.props.card.type][1] : CardColors['none'][1];
-      // if(this.props.card.faded)
-      // {
-      //   darkCardColor = this.hex2rgba(darkCardColor);
-      //   lightCardColor = this.hex2rgba(lightCardColor);
-      // }
-      // var borderColor = this.props.card.highlighted ? '#f4ff00' : darkCardColor;
-      // var borderWidth = this.props.card.highlighted ? '2px' : '1px';
-    // return {
     super(props);
     let cardTerms = this.getCardTerms(props.card);
     
@@ -244,48 +234,6 @@ class Card extends PureClasss<Props>
     });
     this.props.connectDragPreview(this.dragPreview);
   }
-  
-  // hex2rgba(color: string)
-  // {
-  //     var r, g, b;
-  //     if(color.charAt(0) == '#')
-  //     {
-  //       color = color.substr(1);
-  //     }
-
-  //     r = color.charAt(0) +'' + color.charAt(1);
-  //     g = color.charAt(2) + '' + color.charAt(3);
-  //     b = color.charAt(4) + '' + color.charAt(5);
-
-  //     r = parseInt( r,16 );
-  //     g = parseInt( g,16 );
-  //     b = parseInt( b ,16);
-  //     return "rgba(" + r + "," + g + "," + b + ", 0.4)"; 
-  // }
-
-  // componentWillReceiveProps(nextProps:any) {
-  //     var darkCardColor = CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][0] : CardColors['none'][0];
-  //     var lightCardColor = CardColors[nextProps.card.type] ? CardColors[nextProps.card.type][1] : CardColors['none'][1];
-      
-  //     if(nextProps.card.faded)
-  //     {
-  //       darkCardColor = this.hex2rgba(darkCardColor);
-  //       lightCardColor = this.hex2rgba(lightCardColor);
-  //     }
-  //     var borderColor = nextProps.card.highlighted ? '#f4ff00' : darkCardColor;
-  //     var borderWidth = nextProps.card.highlighted ? '2px' : '1px';
-
-  //     this.setState({
-  //       titleStyle: {
-  //       background: darkCardColor,
-  //     },
-  //     bodyStyle: {
-  //       background: lightCardColor,
-  //       borderColor: borderColor,
-  //       borderWidth: borderWidth,
-  //     },
-  //     })
-  // },
   
   handleDraggedAway()
   {
@@ -413,8 +361,6 @@ class Card extends PureClasss<Props>
 		);
     
     var manualPopupStyle = this.props.canEdit ? {} : {right: '4px'}
-		//var title = Util.titleForCard(this.props.card);
-
     let {card} = this.props;
 		let {title} = card.static;
     const { isDragging, connectDragSource } = this.props;

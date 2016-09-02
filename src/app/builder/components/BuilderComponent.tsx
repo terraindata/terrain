@@ -303,7 +303,8 @@ class BuilderComponent extends PureClasss<Props>
               (
                 isTransformCard ?
                 (d.helpInformation as string[]).map((info, index) => {
-                  if(index === 0) {
+                  if(index === 0) 
+                  {
                     var style = {left: '45%', top: '28%'};
                     var wide = true;
                   } 
