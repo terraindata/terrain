@@ -75,8 +75,8 @@ export module BuilderTypes
   }
   
   export const OperatorTQL = {
-    // [Operator.EQ]: '=', //**
-    [Operator.EQ]: '==',
+    [Operator.EQ]: '=', //**
+    // [Operator.EQ]: '==',
     [Operator.NE]: '!=',
     [Operator.GE]: '>=',
     [Operator.GT]: '>',
@@ -92,10 +92,10 @@ export module BuilderTypes
   }
   
   export const DirectionTQL = {
-    // [Direction.ASC]: 'ASC',
-    // [Direction.DESC]: 'DESC', // **
-    [Direction.ASC]: 'asc',
-    [Direction.DESC]: 'desc',
+    [Direction.ASC]: 'ASC',
+    [Direction.DESC]: 'DESC', // **
+    // [Direction.ASC]: 'asc',
+    // [Direction.DESC]: 'desc',
   }
 
   export enum Combinator {
@@ -104,10 +104,10 @@ export module BuilderTypes
   }
   
   export const CombinatorTQL = {
-    // [Combinator.AND]: 'AND',
-    // [Combinator.OR]: 'OR', // **
-    [Combinator.AND]: '&&',
-    [Combinator.OR]: '||',
+    [Combinator.AND]: 'AND',
+    [Combinator.OR]: 'OR', // **
+    // [Combinator.AND]: '&&',
+    // [Combinator.OR]: '||',
   }
     
   export enum InputType
@@ -354,6 +354,42 @@ export module BuilderTypes
       },
     });
   
+  const _multiAndOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string }) => _card(
+    {
+      clauses: L(),
+      
+      static:
+      {
+        title: config.title,
+        preview: '[clauses.length]',
+        colors: ["#47a7ff", "#97d7ff"],
+        tql: "$clauses",
+        tqlJoiner: config.tqlGlue,
+        
+        display: {
+          displayType: DisplayType.ROWS,
+          key: 'clauses',
+          english: config.english,
+          factoryType: config.factoryType,
+          row:
+          {
+            above:
+            {
+              displayType: DisplayType.CARDSFORTEXT,
+              key: 'clause',
+            },
+            
+            inner: 
+            {
+              displayType: DisplayType.CARDTEXT,
+              key: 'clause',
+              top: true,
+            },
+          }
+        },
+      },
+    });
+  
   const _valueCard = (config:{ title: string, colors: string[], tql: string }) => (
     _card({
       value: 0,
@@ -371,6 +407,33 @@ export module BuilderTypes
   // The BuildingBlocks
   export const Blocks =
   { 
+    andBlock: _block(
+    {
+      clause: "",
+      static:
+      {
+        tql: "$clause",
+        tqlJoiner: "AND",
+      },
+    }),
+    
+    orBlock: _block(
+    {
+      clause: "",
+      static:
+      {
+        tql: "$clause",
+        tqlJoiner: "OR",
+      },
+    }),
+    
+    multiand: _multiAndOrCard({
+      title: "And-n",
+      factoryType: 'andBlock',
+      english: "'and'",
+      tqlGlue: ' AND ',
+    }),
+    
     sortBlock: _block(
     {
       property: "",
@@ -398,8 +461,8 @@ export module BuilderTypes
       alias: "",
       
       static: {
-        // tql: "$table as $alias",
-        tql: "'$table' as $alias", // **
+        tql: "$table as $alias",
+        // tql: "'$table' as $alias", // **
       }
     }),
     
@@ -634,8 +697,8 @@ export module BuilderTypes
         preview: "[field]",
         colors: ["#C0C0BE", "#E2E2E0"],
         display: letVarDisplay,
-        tql: "let $field = $expression",
-        // tql: "LET $field = $expression", // **
+        // tql: "let $field = $expression",
+        tql: "LET $field = $expression", // **
         getNeighborTerms: (card) => List([card['field']]),
       }
     }),
@@ -651,8 +714,8 @@ export module BuilderTypes
         preview: "[field]",
         display: letVarDisplay,
         getNeighborTerms: (card) => List([card['field']]),
-        // tql: "VAR $field = $expression",
-        tql: "var $field = $expression", // **
+        tql: "VAR $field = $expression",
+        // tql: "var $field = $expression", // **
       }
     }),
 
@@ -845,16 +908,16 @@ export module BuilderTypes
     {
       colors: ["#CDCF85", "#F5F6B3"],
       title: "Take / Limit",
-      // tql: "LIMIT $value",
-      tql: "take $value", // **
+      tql: "LIMIT $value",
+      // tql: "take $value", // **
     }),
     
     skip: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
       title: "Skip / Offset",
-      // tql: "OFFSET $value",
-      tql: "skip $value", // **
+      tql: "OFFSET $value",
+      // tql: "skip $value", // **
     }),
     
     spotlight: _block(

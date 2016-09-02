@@ -53,6 +53,7 @@ import Util from '../../util/Util.tsx';
 import PureClasss from '../../common/components/PureClasss.tsx';
 import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
 import Card from '../../builder/components/cards/Card.tsx';
+import CreateCardTool from '../../builder/components/cards/CreateCardTool.tsx';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as classNames from 'classnames';
 import Autocomplete from './Autocomplete.tsx';
@@ -100,12 +101,14 @@ class BuilderTextbox extends PureClasss<Props>
     var value: any = this.props.value;
     this.state = {
       wrongType: this.props.isNumber ? isNaN(value) : false,
+      isSwitching: false,
     };
   }
   
-  backupValue: BuilderTypes.CardString;
+  // backupValue: BuilderTypes.CardString;
   state: {
     wrongType: boolean;
+    isSwitching: boolean;
   };
   
   // TODO
@@ -155,19 +158,31 @@ class BuilderTextbox extends PureClasss<Props>
   
   handleSwitch()
   {
-    var value: BuilderTypes.CardString = '';
-    if(this.backupValue)
-    {
-      value = this.backupValue;
-    }
-    else if(this.isText())
-    {
-      value = BuilderTypes.make(BuilderTypes.Blocks.parentheses);
-    }
+    this.setState({
+      isSwitching: true,
+    });
     
-    this.backupValue = this.props.value;
-    // not using executeChange because it is debounced and causes a false delay
-    Actions.change(this.props.keyPath, value);
+    // var value: BuilderTypes.CardString = '';
+    // // if(this.backupValue)
+    // // {
+    // //   value = this.backupValue;
+    // // }
+    // // else 
+    // if(this.isText())
+    // {
+    //   value = BuilderTypes.make(BuilderTypes.Blocks.parentheses);
+    // }
+    
+    // // this.backupValue = this.props.value;
+    // // not using executeChange because it is debounced and causes a false delay
+    // Actions.change(this.props.keyPath, value);
+  }
+  
+  handleMinimize()
+  {
+    this.setState({
+      isSwitching: false,
+    });
   }
   
   renderSwitch()
@@ -195,6 +210,19 @@ class BuilderTextbox extends PureClasss<Props>
   
   render()
   {
+    if(this.state.isSwitching)
+    {
+      return (
+        <CreateCardTool
+          canEdit={this.props.canEdit}
+          index={null}
+          keyPath={this.props.keyPath}
+          open={true}
+          onMinimize={this.handleMinimize}
+        />
+      );
+    }
+    
     if(this.isText())
     {
       const { isOverCurrent, connectDropTarget } = this.props;

@@ -181,16 +181,18 @@ class TQLConverter
         block[field].map(
           (v, index) => this._parse(v, index, index === block[field].size - 1)
         );
-      return pieces.join(", ");
-        
-      // TODO if necessary
-      // if(!block.static.tqlJoiner)
-      // {
-      //   console.log(block.static);
-      // }
+
+      var glue = ", ";        
+      if(block.static.tqlJoiner)
+      {
+        glue = block.static.tqlJoiner;
+      }
+      
+      return pieces.join(glue);
       
       // return pieces.reduce((str, piece, i) => (
-      //     str + piece + (i === pieces.length - 1 ? "" : '%')
+      //     str + piece + 
+      //       (i === pieces.length - 1 ? "" : glue)
       //   ), "");
     }
     

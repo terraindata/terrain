@@ -77,7 +77,14 @@ class CreateCardTool extends PureClasss<Props>
     }
     
     var type = Util.rel(event.target);
-    Actions.create(this.props.keyPath, this.props.index, type);
+    if(this.props.index === null)
+    {
+      Actions.change(this.props.keyPath, BuilderTypes.make(BuilderTypes.Blocks[type]));
+    }
+    else
+    {
+      Actions.create(this.props.keyPath, this.props.index, type);
+    }
   }
   
   // componentWillReceiveProps(newProps)
@@ -132,7 +139,7 @@ class CreateCardTool extends PureClasss<Props>
          }
        </div>
      </div>
-     );
+    );
   }
   
   render()

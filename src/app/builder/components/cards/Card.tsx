@@ -411,17 +411,21 @@ class Card extends PureClasss<Props>
                 </div>
               )
             }
-            <CardDropArea
-              half={true}
-              keyPath={this.props.keyPath}
-              index={this.props.index}
-            />
-            <CardDropArea
-              half={true}
-              lower={true}
-              keyPath={this.props.keyPath}
-              index={this.props.index}
-            />
+            { !this.props.singleCard &&
+                <CardDropArea
+                  half={true}
+                  keyPath={this.props.keyPath}
+                  index={this.props.index}
+                />
+            }
+            { !this.props.singleCard &&
+                <CardDropArea
+                  half={true}
+                  lower={true}
+                  keyPath={this.props.keyPath}
+                  index={this.props.index}
+                />
+            }
             <div className='card-body' ref='cardBody'>
               { contentToDisplay }
             </div>
