@@ -75,7 +75,8 @@ export module BuilderTypes
   }
   
   export const OperatorTQL = {
-    [Operator.EQ]: '=',
+    // [Operator.EQ]: '=', //**
+    [Operator.EQ]: '==',
     [Operator.NE]: '!=',
     [Operator.GE]: '>=',
     [Operator.GT]: '>',
@@ -91,8 +92,10 @@ export module BuilderTypes
   }
   
   export const DirectionTQL = {
-    [Direction.ASC]: 'ASC',
-    [Direction.DESC]: 'DESC',
+    // [Direction.ASC]: 'ASC',
+    // [Direction.DESC]: 'DESC', // **
+    [Direction.ASC]: 'asc',
+    [Direction.DESC]: 'desc',
   }
 
   export enum Combinator {
@@ -101,8 +104,10 @@ export module BuilderTypes
   }
   
   export const CombinatorTQL = {
-    [Combinator.AND]: 'AND',
-    [Combinator.OR]: 'OR',
+    // [Combinator.AND]: 'AND',
+    // [Combinator.OR]: 'OR', // **
+    [Combinator.AND]: '&&',
+    [Combinator.OR]: '||',
   }
     
   export enum InputType
@@ -393,7 +398,8 @@ export module BuilderTypes
       alias: "",
       
       static: {
-        tql: "$table as $alias",
+        // tql: "$table as $alias",
+        tql: "'$table' as $alias", // **
       }
     }),
     
@@ -418,6 +424,7 @@ export module BuilderTypes
         title: "Select / From",
         preview: "[tables.table]: [fields.length]",
         tql: "SELECT $fields \nFROM $tables \n$cards",
+        // tql: "from $tables \nfilter $filters \n$cards \nselect $fields",  // **
         
         getChildTerms:
           (card: ICard) =>
@@ -524,7 +531,8 @@ export module BuilderTypes
         title: "Sort",
         preview: "[sorts.property]",
         colors: ["#C5AFD5", "#EAD9F7"],
-        tql: "ORDER BY $sorts",
+        tql: "sort $sorts",
+        // tql: "ORDER BY $sorts",
         
         display: {
           displayType: DisplayType.ROWS,
@@ -626,7 +634,8 @@ export module BuilderTypes
         preview: "[field]",
         colors: ["#C0C0BE", "#E2E2E0"],
         display: letVarDisplay,
-        tql: "LET $field = $expression",
+        tql: "let $field = $expression",
+        // tql: "LET $field = $expression", // **
         getNeighborTerms: (card) => List([card['field']]),
       }
     }),
@@ -642,7 +651,8 @@ export module BuilderTypes
         preview: "[field]",
         display: letVarDisplay,
         getNeighborTerms: (card) => List([card['field']]),
-        tql: "VAR $field = $expression",
+        // tql: "VAR $field = $expression",
+        tql: "var $field = $expression", // **
       }
     }),
 
@@ -835,14 +845,16 @@ export module BuilderTypes
     {
       colors: ["#CDCF85", "#F5F6B3"],
       title: "Take / Limit",
-      tql: "LIMIT $value",
+      // tql: "LIMIT $value",
+      tql: "take $value", // **
     }),
     
     skip: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
       title: "Skip / Offset",
-      tql: "OFFSET $value",
+      // tql: "OFFSET $value",
+      tql: "skip $value", // **
     }),
     
     spotlight: _block(
