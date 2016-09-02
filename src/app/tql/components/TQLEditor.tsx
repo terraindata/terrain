@@ -260,13 +260,11 @@ class TQL extends Classs<Props>
 
   highlightError(lineNumber: number) 
   {
+    this.state.highlightedLine = lineNumber - 1;
     var x: any = this.refs['cm'];
     if (x) 
     {
       x.updateHighlightedLine(lineNumber - 1);
-      this.setState({
-        highlightedLine: lineNumber - 1;
-      });
     }
   }
 

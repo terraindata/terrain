@@ -143,8 +143,6 @@ export module BuilderTypes
   {
     id: string;
     type: string;
-    //faded?: boolean;
-    //highlighted?: boolean;
     set: (f: string, v: any) => T;
     setIn: (f: string, v: any) => T;
     get: (f: string | number) => any;

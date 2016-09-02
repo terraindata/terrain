@@ -155,10 +155,6 @@ class TQLConverter
   
   private static _parse(block: IBlock, index?: number, isLast?: boolean): string
   {
-    if(!block.static)
-    {
-      return;
-    }
     let str = block.static.tql;
     var index = str.indexOf("$");
     while(index !== -1)
