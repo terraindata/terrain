@@ -170,7 +170,7 @@ class TQL extends Classs<Props>
   {
     var code = this.props.query.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.query)
     this.setState({
-      tql: code
+      tql: code,
     });
     BuilderActions.setVariantField
       (this.props.query.id,
@@ -184,7 +184,7 @@ class TQL extends Classs<Props>
     localStorage.setItem('theme', 'default');
     this.setState({
       theme: 'default',
-      theme_index: 0
+      theme_index: 0,
     });
   }
 
@@ -193,7 +193,7 @@ class TQL extends Classs<Props>
     localStorage.setItem('theme', 'neo');
     this.setState({
       theme: 'neo',
-      theme_index: 1
+      theme_index: 1,
     });
   }
 
@@ -202,7 +202,7 @@ class TQL extends Classs<Props>
     localStorage.setItem('theme', 'cobalt');
     this.setState({
       theme: 'cobalt',
-      theme_index: 2
+      theme_index: 2,
     });
   }
 
@@ -211,7 +211,7 @@ class TQL extends Classs<Props>
     localStorage.setItem('theme', 'monokai');
     this.setState({
       theme: 'monokai',
-      theme_index: 3
+      theme_index: 3,
     });
   }
 
@@ -371,11 +371,12 @@ class TQL extends Classs<Props>
   {
     this.setState({
       syntaxHelpOpen: false,
-      termDefinitionOpen: false
+      termDefinitionOpen: false,
     })
   }
 
-  findKeyword(line: string) {
+  findKeyword(line: string) 
+  {
     var keywords = Object.keys(BuilderTypes.cardList);
     var cardName = '';
     keywords.map(function(word) {
@@ -409,7 +410,7 @@ class TQL extends Classs<Props>
       syntaxHelpOpen: !this.state.syntaxHelpOpen,
       syntaxHelpPos: {left, top},
       cardName,
-      termDefinitionOpen: false
+      termDefinitionOpen: false,
     });
   }
 
@@ -424,7 +425,7 @@ class TQL extends Classs<Props>
         termDefinitionOpen: true,
         termDefinitionPos: {left, top},
         cardName,
-        syntaxHelpOpen: false
+        syntaxHelpOpen: false,
       })
     }
   }
@@ -480,7 +481,7 @@ class TQL extends Classs<Props>
   toggleConfirmModal()
   {
     this.setState ({
-       confirmModalOpen: !this.state.confirmModalOpen
+       confirmModalOpen: !this.state.confirmModalOpen,
     });
   }
 
