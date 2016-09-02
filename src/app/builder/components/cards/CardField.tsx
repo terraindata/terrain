@@ -82,7 +82,6 @@ interface Props
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
   helpOn?: boolean;
-
   addColumn?: (number, string?) => void;
   colIndex?: number;
 }

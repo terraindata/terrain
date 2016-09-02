@@ -88,7 +88,6 @@ class ManualEntry extends Classs<Props>
   constructor(props: Props) 
   {
     super(props);
-    
     this.manualEntry = this.props.phraseType ? ManualConfig[1][this.props.entryName] : BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
     this.state =
       {
@@ -206,7 +205,8 @@ class ManualEntry extends Classs<Props>
     );
   }
 
-  renderEntry() {
+  renderEntry() 
+  {
     return(
       <div>
       <div className ='manual-entry-row'>
@@ -238,7 +238,8 @@ class ManualEntry extends Classs<Props>
     );
   }
 
-  renderCardExample(index) {
+  renderCardExample(index) 
+  {
     var card = BuilderTypes.recordFromJS(this.manualEntry.text[index]);
     var keys = Immutable.List([]);
     var keyPath = Immutable.List(["manual", "a", "cards"]);
@@ -258,7 +259,8 @@ class ManualEntry extends Classs<Props>
     );
   }
 
-  renderCodeMirrorExample(index) {
+  renderCodeMirrorExample(index) 
+  {
     var options = {
       readOnly: true,
       lineNumbers: true,
@@ -352,7 +354,8 @@ class ManualEntry extends Classs<Props>
     );
   }
 
-  render() {
+  render() 
+  {
     return (
       <div className ='manual-entry'> 
         {this.props.phraseType ? this.renderPhraseTypeEntry() : this.renderTqlCardEntry()}

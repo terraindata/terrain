@@ -119,8 +119,7 @@ class Manual extends Classs<Props>
   renderTqlCardsList()
   {
    var height = 22 * this.allTqlCards.length;
-   var style = this.state.expandTqlCards ? {maxHeight: height + 'px'}
-     : {maxHeight: '0px'}
+   var style = this.state.expandTqlCards ? {maxHeight: height + 'px'} : {maxHeight: '0px'};
     return (
       <div className='manual-sidebar-section' style={style}>
         {
@@ -147,8 +146,7 @@ class Manual extends Classs<Props>
   renderPhraseTypesList()
   {
     var height = 22 * Object.keys(ManualConfig[1]).length;
-    var style = this.state.expandPhraseTypes ? {maxHeight: height + 'px'}
-     : {maxHeight: '0px'}
+    var style = this.state.expandPhraseTypes ? {maxHeight: height + 'px'} : {maxHeight: '0px'};
     return (
       <div className='manual-sidebar-section' style={style}>
         {
@@ -285,7 +283,6 @@ class Manual extends Classs<Props>
   renderAutocompleteOption()
   {
     var options = this.allPhraseTypes.concat(this.allTqlCards);
-    //var options = this.allTqlCards;
     return Immutable.List(options.sort());
   }
 
@@ -379,13 +376,8 @@ class Manual extends Classs<Props>
 
   renderLeftColumnMenu()
   {
-    var height = 22 * (this.allPhraseTypes.length + this.allTqlCards.length)
-                + 2 * 26;
-    ;
-    // var height = 22 * (this.allTqlCards.length) + 2 * 26;
-    // ;
-    var style = this.state.expandSidebar ? {maxHeight: height + 'px'}
-     : {maxHeight: '0px'}; 
+    var height = 22 * (this.allPhraseTypes.length + this.allTqlCards.length) + 2 * 26;
+    var style = this.state.expandSidebar ? {maxHeight: height + 'px'} : {maxHeight: '0px'}; 
 
      return (
       <div className='manual-sidebar' style={style}>

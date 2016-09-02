@@ -97,7 +97,8 @@ export module BuilderTypes
   }
   
   export const OperatorTQL = {
-    [Operator.EQ]: '=',
+    // [Operator.EQ]: '=', //**
+    [Operator.EQ]: '==',
     [Operator.NE]: '!=',
     [Operator.GE]: '>=',
     [Operator.GT]: '>',
@@ -113,8 +114,10 @@ export module BuilderTypes
   }
   
   export const DirectionTQL = {
-    [Direction.ASC]: 'ASC',
-    [Direction.DESC]: 'DESC',
+    // [Direction.ASC]: 'ASC',
+    // [Direction.DESC]: 'DESC', // **
+    [Direction.ASC]: 'asc',
+    [Direction.DESC]: 'desc',
   }
 
   export enum Combinator {
@@ -123,8 +126,10 @@ export module BuilderTypes
   }
   
   export const CombinatorTQL = {
-    [Combinator.AND]: 'AND',
-    [Combinator.OR]: 'OR',
+    // [Combinator.AND]: 'AND',
+    // [Combinator.OR]: 'OR', // **
+    [Combinator.AND]: '&&',
+    [Combinator.OR]: '||',
   }
     
   export enum InputType
@@ -259,7 +264,7 @@ export module BuilderTypes
       type: "",
     }, config);
   }
-  
+    
   // Every Card definition must follow this interface
   interface ICardConfig
   {
@@ -383,7 +388,8 @@ export module BuilderTypes
       alias: "",
       
       static: {
-        tql: "$table as $alias",
+        // tql: "$table as $alias",
+        tql: "'$table' as $alias", // **
       }
     }),
     
@@ -409,7 +415,8 @@ export module BuilderTypes
         colors: ["#89B4A7", "#C1EADE"],
         title: "Select / From",
         preview: "[tables.table]: [fields.length]",
-        tql: "SELECT $fields \nFROM $tables \nWHERE $filters \n$cards",
+        // tql: "SELECT $fields \nFROM $tables \nWHERE $filters \n$cards",
+        tql: "from $tables \nfilter $filters \n$cards \nselect $fields",  // **
         
         getChildTerms:
           (card: ICard) =>
@@ -503,8 +510,8 @@ export module BuilderTypes
         preview: "[sorts.property]",
         colors: ["#C5AFD5", "#EAD9F7"],
         manualEntry: ManualConfig[0]['Sort'],
-        tql: "ORDER BY $sorts",
-        
+        tql: "sort $sorts",
+        // tql: "ORDER BY $sorts",        
         display: {
           displayType: DisplayType.ROWS,
           key: 'sorts',
@@ -750,7 +757,7 @@ export module BuilderTypes
             changed by clicking a point and entering values into the textboxes that appear.\
             To delete a point, right click on it. To create a new point, double click anywhere on the chart.', 
             'The lines of the graph can also be moved by clicking and dragging.',
-            'Use these sliders at the bottom to change the domain of the graph.']
+            'Use these sliders at the bottom to change the domain of the graph.'],
           },
         ],
         
@@ -789,7 +796,8 @@ export module BuilderTypes
       colors: ["#CDCF85", "#F5F6B3"],
       manualEntry: ManualConfig[0]['Take Limit'],
       title: "Take / Limit",
-      tql: "LIMIT $value",
+      // tql: "LIMIT $value",
+      tql: "take $value", // **
     }),
     
     skip: _valueCard(
@@ -797,7 +805,8 @@ export module BuilderTypes
       colors: ["#CDCF85", "#F5F6B3"],
       manualEntry: ManualConfig[0]['Skip Offset'],
       title: "Skip / Offset",
-      tql: "OFFSET $value",
+      // tql: "OFFSET $value",
+      tql: "skip $value", // **
     }),
     
     spotlight: _block(
