@@ -76,7 +76,8 @@ class TQLPopup extends Classs<Props>
     this.props.addColumn(this.props.index, this.props.cardName);
   }
 
-  render() {
+  render() 
+  {
     return (
       <div 
         className='tql-editor-syntax-help'
