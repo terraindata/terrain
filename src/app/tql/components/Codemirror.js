@@ -48,8 +48,6 @@ THE SOFTWARE.
 var React = require('react');
 var className = require('classnames');
 
-
-
 var CodeMirror = React.createClass({
 	displayName: 'CodeMirror',
 
@@ -64,6 +62,7 @@ var CodeMirror = React.createClass({
 		toggleSyntaxPopup: React.PropTypes.func,
 		defineTerm: React.PropTypes.func,
 		turnSyntaxPopupOff: React.PropTypes.func,
+		hideTermDefinition: React.PropTypes.func
 	},
 	foldClass: {
 		open: "CodeMirror-foldgutter-open",
@@ -100,12 +99,6 @@ var CodeMirror = React.createClass({
 
 	componentWillUnmount: function componentWillUnmount() 
 	{
-		var tooltip = document.getElementsByClassName('tooltip')[0];
-		if(tooltip)
-		{
-			tooltip.className = '__react_component_tooltip place-bottom type-dark tooltip';
-		}
-
 		if (this.codeMirror) 
 		{
 			this.codeMirror.toTextArea();
@@ -117,7 +110,7 @@ var CodeMirror = React.createClass({
 		this.codeMirror.on('mousedown', this.props.hideTermDefinition);
 		if(this.props.defineTerm)
 		{
-			this.props.defineTerm(this.codeMirror.getSelection(), event)
+			this.props.defineTerm(this.codeMirror.getSelection(), event);
 		}
 	},
 
@@ -127,7 +120,7 @@ var CodeMirror = React.createClass({
 		{
 			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
 		}
-
+		//Add info gutter widget
 		var widget = document.createElement("span");
 		var text = document.createElement("div");
 		var content = document.createTextNode("?");
@@ -137,7 +130,6 @@ var CodeMirror = React.createClass({
 		text.className = 'CodeMirror-error-text';
 		var self = this;
 		var codeMirrorInstance = this.getCodeMirrorInstance();
-		//Onclick functions to unfold the code
 		var line = this.codeMirror.getLine(lineToHighlight)
 		codeMirrorInstance.on(widget, "mousedown", function(e) {
       		self.props.toggleSyntaxPopup(e, line);

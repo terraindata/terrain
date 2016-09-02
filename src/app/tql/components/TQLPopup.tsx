@@ -56,7 +56,6 @@ interface Props
 {
   cardName: string;
   text: string;
-  history?: any;
   style?: any;
   addColumn: (number, string?) => void;
   index: number;
@@ -65,11 +64,6 @@ interface Props
 
 class TQLPopup extends Classs<Props>
 {
-  constructor(props: Props) {
-    super(props);
-  }
-
-
   openManual()
   {
     this.props.onClick && this.props.onClick();
@@ -80,7 +74,7 @@ class TQLPopup extends Classs<Props>
   {
     return (
       <div 
-        className='tql-editor-syntax-help'
+        className='tql-editor-popup'
         style={this.props.style}
       >
         {this.props.text}      
