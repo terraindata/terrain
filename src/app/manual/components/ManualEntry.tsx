@@ -69,7 +69,6 @@ interface Props
 {
   entryName: string;
   canEdit: boolean;
-  demoEdit: boolean;
   openTerm: (any) => void;
   spotlights?: any[];
   history?: any;

@@ -202,7 +202,6 @@ class Manual extends Classs<Props>
               <ManualEntry
                 entryName={result}
                 canEdit={false}
-                demoEdit={true}
                 openTerm={this.openTerm}
                 spotlights={[]}
                 history={this.props.history}
@@ -218,7 +217,6 @@ class Manual extends Classs<Props>
               <ManualEntry
                 entryName={result}
                 canEdit={false}
-                demoEdit={true}
                 openTerm={this.openTerm}
                 spotlights={[]}
                 history={this.props.history}
@@ -233,7 +231,7 @@ class Manual extends Classs<Props>
     );
   }
 
-  search(value, collapsed?)
+  search(value)
   {
     var visibleTqlCards = this.allTqlCards.filter((key) => {
       return (key.toLowerCase().indexOf(value.toLowerCase()) >= 0);
@@ -257,11 +255,6 @@ class Manual extends Classs<Props>
         }
     });
 
-    var expanded = !collapsed;
-    if(value === '') 
-    {
-      expanded = false;
-    }
     if(this.props.manualTab)
     {
       this.props.history.pushState({}, '/manual/' + value);
@@ -271,13 +264,13 @@ class Manual extends Classs<Props>
       visiblePhraseTypes,
       value,
       selectedKey,
-      expanded,
+      expanded: (visibleTqlCards.length + visiblePhraseTypes.length) <= 1,
     });
   }
 
   clearInput()
   {
-    this.search('', true);
+    this.search('');
   }
 
   renderAutocompleteOption()
@@ -371,7 +364,7 @@ class Manual extends Classs<Props>
     this.setState({
       expandSidebar: this.state.selectedKey === '' ? !this.state.expandSidebar : true
     });
-    this.search('', true);
+    this.search('');
   }
 
   renderLeftColumnMenu()
