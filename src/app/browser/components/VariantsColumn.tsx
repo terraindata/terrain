@@ -218,7 +218,8 @@ class VariantsColumn extends Classs<Props>
     let {me, roles} = this.state;
     if(me && roles)
     {
-      var canEdit = roles.getIn([this.props.groupId, me.username, 'builder']);
+      var canEdit = roles.getIn([this.props.groupId, me.username, 'builder'])
+        || roles.getIn([this.props.groupId, me.username, 'admin']);
       var canDrag = canEdit && 
         (vriant.status !== BrowserTypes.EVariantStatus.Live || 
           roles.getIn([this.props.groupId, me.username, 'admin']));
