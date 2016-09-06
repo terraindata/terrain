@@ -307,6 +307,54 @@
             "field": "product.score",
             "expression": "product.age * product.conversionRatio",
             "helpOn": true
+          },
+          "This example defines a variable averageSales to be the average sales of all products where ids are less than 10 in products.",
+          {
+            "type": "var",
+            "id": "x",
+            "field": "product.averageSales",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "avg",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
           }
       ]
     },
@@ -601,7 +649,54 @@
       "syntax": "SUM expression",
       "text": 
       [ 
-        "none"
+        "This example defines a variable numSales to be the sum sales of all product sales where ids are less than 10 in products.",
+                 {
+            "type": "let",
+            "id": "x",
+            "field": "product.numSales",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "sum",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
+          }
       ]
     },
     "Min":
@@ -612,7 +707,54 @@
       "syntax": "MIN expression",
       "text": 
       [ 
-        "none"
+        "This example defines a variable minSales to be the minimum sales of all products where ids are less than 10 in products.",
+          {
+            "type": "let",
+            "id": "x",
+            "field": "product.minSales",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "min",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
+          }
       ]
     },
     "Max":
@@ -623,7 +765,54 @@
       "syntax": "MAX expression",
       "text": 
       [ 
-        "none"
+        "This example defines a variable maxSales to be the maximum sales of all products where ids are less than 10 in products.",
+          {
+            "type": "let",
+            "id": "x",
+            "field": "product.maxSales",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "max",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
+          }
       ]
     },
     "Exists":
@@ -748,7 +937,54 @@
       "syntax": "none",
       "text": 
       [ 
-        "none"
+        "This example defines a variable averageSales to be the average sales of all products where ids are less than 10 in products.",
+          {
+            "type": "let",
+            "id": "x",
+            "field": "product.averageSales",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "avg",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
+          }
       ]
     },
     "Comparison":

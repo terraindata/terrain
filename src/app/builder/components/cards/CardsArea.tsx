@@ -91,7 +91,7 @@ class CardsArea extends PureClasss<Props>
   state: KeyState = {
     keys: List([]),
     keyPath: null,
-    learningMode: this.props.helpOn ? 'learning' : 'normal',
+    learningMode: this.props.helpOn ? 'learning' : 'standard',
   };
 
   constructor(props:Props)
@@ -170,7 +170,7 @@ class CardsArea extends PureClasss<Props>
   toggleView()
   {
     this.setState({
-      learningMode: this.state.learningMode === 'normal' ? 'learning' : 'normal',
+      learningMode: this.state.learningMode === 'standard' ? 'learning' : 'standard',
     })
   }
   
@@ -181,10 +181,10 @@ class CardsArea extends PureClasss<Props>
       <div className='cards-area-top-bar'>
         <div className = 'cards-area-white-space' />
         <Switch
-          first='Normal'
+          first='Standard'
           second='Learning'
           onChange={this.toggleView}
-          selected={this.state.learningMode === 'normal' ? 1 : 2}
+          selected={this.state.learningMode === 'standard' ? 1 : 2}
           small={true}
         />
       </div>
