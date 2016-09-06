@@ -192,7 +192,7 @@ export const letVarDisplay =
   [
     {
       displayType: TEXT,
-      helpInformation: 'Variable name',
+      helpInformation: 'Name by which you refer to a variable',
       key: 'field',
     },
     {

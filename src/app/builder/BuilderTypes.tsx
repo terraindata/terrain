@@ -521,7 +521,7 @@ export module BuilderTypes
             [
               {
                 displayType: DisplayType.TEXT,
-                helpInformation: 'The attribute you want the sorting to be done on',
+                helpInformation: 'Field by which to sort. For multiple sort fields, priority goes top to bottom.',
                 key: 'property',
               },
               {
