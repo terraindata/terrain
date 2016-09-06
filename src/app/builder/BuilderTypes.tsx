@@ -407,6 +407,23 @@ export module BuilderTypes
   // The BuildingBlocks
   export const Blocks =
   { 
+    tql: _card({
+      clause: "",
+      
+      static:
+      {
+        title: "TQL",
+        preview: "$clause",
+        colors: ["#37df77", "#97ffd7"],
+        tql: "$clause",
+        
+        display: {
+          displayType: DisplayType.TEXT,
+          key: 'clause',
+        }
+      }
+    }),
+    
     andBlock: _block(
     {
       clause: "",
