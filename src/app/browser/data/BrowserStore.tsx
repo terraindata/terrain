@@ -111,25 +111,6 @@ BrowserStore.subscribe(() =>
       }
     });
   }
-  // if(!state.get('loading'))
-  // {
-  //   // TODO in the future, consider a more effecient approach
-  //   state.get('groups').map(
-  //     group =>
-  //     {
-  //       Ajax.saveItem(group);
-  //       group.get('algorithms').map(
-  //         algorithm =>
-  //         {
-  //           Ajax.saveItem(algorithm);
-  //           algorithm.get('variants').map(
-  //             variant => Ajax.saveItem(variant)
-  //           );
-  //         }
-  //       );
-  //     }
-  //   );
-  // }
 });
 
 export default BrowserStore;

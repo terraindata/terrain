@@ -213,7 +213,7 @@ var App = React.createClass({
       <div className='app'>
         <div className='app-top-bar'>
           <TerrainIcon className='app-top-bar-icon' />
-          { this.state.loggedIn ? <AccountDropdown onLogout={this.handleLogout} /> : null }
+          { this.state.loggedIn && <AccountDropdown onLogout={this.handleLogout} history={this.props.history} /> }
         </div>
         <div className='app-wrapper'>
           { this.renderApp() }

@@ -419,7 +419,11 @@ class Manual extends Classs<Props>
   renderLeftColumn()
   {
     return (
-      <div className ='manual-content-area'>
+      <div 
+        className ='manual-content-area'
+        style={this.props.manualTab ? 
+          {height: 'calc(100% - 60px)'} : {height: 'calc(100% - 25px)'}}
+      >
       <div className={classNames({
         'manual-left-column-title': true,
         'manual-left-column-entry': true,

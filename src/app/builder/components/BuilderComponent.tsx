@@ -323,6 +323,7 @@ class BuilderComponent extends PureClasss<Props>
                     style={style}
                     wide={wide}
                     key={'info' + index}
+                    leftSide={index===2}
                   /> 
                 })
                 :
