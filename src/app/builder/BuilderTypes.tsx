@@ -562,7 +562,8 @@ export module BuilderTypes
         colors: ["#C0C0BE", "#E2E2E0"],
         display: letVarDisplay,
         manualEntry: ManualConfig[0]['Let'],
-        tql: "LET $field = $expression",
+        tql: "let $field = $expression",
+        // tql: "LET $field = $expression", // **
         getNeighborTerms: (card) => List([card['field']]),
       }
     }),
@@ -580,8 +581,8 @@ export module BuilderTypes
 
         manualEntry: ManualConfig[0]['Var'],
         getNeighborTerms: (card) => List([card['field']]),
-
-        tql: "VAR $field = $expression",
+        // tql: "VAR $field = $expression",
+        tql: "var $field = $expression", // **
       }
     }),
 

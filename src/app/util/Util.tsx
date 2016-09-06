@@ -100,14 +100,6 @@ var Util = {
     return obj;
   },
   
-  // TODO remove
-  // constructs appropriate object for instantiating a record-class
-  //  with a keypath formed from the action
-  // kp(action)
-  // {
-    
-  // },
-  
   haveRole(groupId: ID, role: string, UserStore, RolesStore)
   {
     let me = UserStore.getState().get('currentUser');
@@ -132,8 +124,17 @@ var Util = {
     }
     
     let groupId = item.type === 'group' ? item.id : item['groupId'];
-    let role = item.type === 'group' ? 'admin' : 'builder';
-    return !! Util.haveRole(groupId, role, UserStore, RolesStore);
+    if(Util.haveRole(groupId, 'admin', UserStore, RolesStore))
+    {
+      return true;
+    }
+    
+    if(item.type !== 'group')
+    {
+      return Util.haveRole(groupId, 'builder', UserStore, RolesStore)
+    }
+    
+    return false;
   },
   
   getId(): ID
