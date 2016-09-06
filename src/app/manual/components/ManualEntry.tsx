@@ -124,9 +124,6 @@ class ManualEntry extends Classs<Props>
     //Separate multi-word keywords like 'Take Limit' into sep. keywords
     keywords = keywords.join(' ').split(' ');
 
-    var phraseTypes = Object.keys(ManualConfig[1]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
-    var index = keywords.indexOf('( )');
-    keywords.splice(index, 1);
     var matchForm = new RegExp('[^A-Za-z](' + keywords.join('|') + ')[^A-Za-z]', 'gi');
 
     text = reactStringReplace(text, matchForm, (match, i) => (
@@ -139,6 +136,7 @@ class ManualEntry extends Classs<Props>
       </span>
     ));
 
+    var phraseTypes = Object.keys(ManualConfig[1]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
     matchForm = new RegExp('(' + phraseTypes.join('|') + ')', 'gi');
     text = reactStringReplace(text, matchForm, (match, i) => (
       <span         

@@ -634,7 +634,110 @@
       "syntax": "WHERE EXISTS (subquery)",
       "text": 
       [ 
-        "none"
+        "The Exists card returns true if the inner query returns any results.",
+        {
+          "id": "a",
+          "type": "exists",
+          "cards": [{
+            "cards": [],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "*",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "user.name",
+                "operator": 0,
+                "second": "'Susan'",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "alias": "user",
+              "table": "users",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e",
+            "helpOn": true
+          }]
+        },
+        "In this example, users are selected if there exists a product that was bought by that user",
+        {
+            "cards": [],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "*",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": {
+                  "id": "f",
+                  "type": "parentheses",
+                  "cards": [{
+                    "type": "exists",
+                    "id": "g",
+                    "cards": [{
+                      "cards": [],
+                      "fields": [
+                        { 
+                          "type": "field",
+                          "field": "*",
+                          "id": "h"
+                        }
+                      ],
+                      "filters": [
+                        { 
+                          "combinator": 0,
+                          "first": "user.id",
+                          "operator": 6,
+                          "second": "p.buyers",
+                          "type": "filterBlock",
+                          "id": "i"
+                        }
+                      ],
+                      "tables": [
+                        {
+                          "alias": "p",
+                          "table": "products",
+                          "type": "table",
+                          "id": "j"
+                        }
+                      ],
+                      "type": "sfw",
+                      "id": "k"
+                    }]
+                  }]
+                },
+                "operator": 0,
+                "second": "true",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "alias": "user",
+              "table": "users",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e"
+        }
       ]
     },
     "( )":
