@@ -102,7 +102,7 @@ class Manual extends Classs<Props>
 
   componentWillReceiveProps(nextProps)
   {
-    if(this.props.selectedKey !== nextProps.selectedKey)
+    if((this.props.selectedKey !== nextProps.selectedKey) && !this.props.manualTab)
     {
       this.setState({
         selectedKey: nextProps.selectedKey
@@ -341,14 +341,14 @@ class Manual extends Classs<Props>
   toggleTqlCardList()
   {
     this.setState({
-      expandTqlCards: !this.state.expandTqlCards
+      expandTqlCards: !this.state.expandTqlCards,
     });
   }
 
   togglePhraseTypeList()
   {
     this.setState({
-      expandPhraseTypes: !this.state.expandPhraseTypes
+      expandPhraseTypes: !this.state.expandPhraseTypes,
     });
   }
 
@@ -389,7 +389,8 @@ class Manual extends Classs<Props>
           <span 
             onClick={this.showTqlCards}
             style={{paddingRight: '70px'}}
-          >TQL Cards</span>
+          >
+          TQL Cards</span>
         </div>
         {this.renderTqlCardsList()}
         <div className={classNames({
