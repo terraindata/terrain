@@ -27,9 +27,10 @@
 	display: inline-flex;
 	position: absolute;
 	padding-right: 14px;
-	right: 6px;
+	left: 6px;
 	input {
 		border: 1px solid #d2d2d2;
+		font-size: 12px;
 	}
 	.ac-options {
 		min-width: calc(~"(100% - 6px)");
@@ -37,8 +38,17 @@
 		max-height: 335px;
 		overflow: auto;
 		border-right: 6px white solid;
+		font-size: 12px;
 	}
+}
 
+.manual-tab-search-bar {
+	input {
+		font-size: 14px;
+	}
+	.ac-options {
+		font-size: 14px;
+	}
 }
 
 .manual-content-area {
@@ -121,6 +131,7 @@
     	}
     }
 }
+
 
 .manual-left-column-entry {
 	cursor: pointer;
@@ -205,6 +216,8 @@
 	cursor: pointer;
 	padding-left: 0px;
 	width: 94%;
+	padding-top: 2px;
+	margin-top: 34px;
 	.manual-arrow-icon {
 		fill: #636363;
 	}
@@ -229,4 +242,17 @@
 	transition: all .2s ease-in-out;
 	overflow: hidden;
 	width: 200px;
+}
+
+.manual-sidebar-search {
+	width: 180px;
+	margin-left: 28px;
+	.manual-search-input {
+		width: 180px;
+	}
+	.manual-search-icon {
+		margin-left: 0px;
+		margin-right: -30px;
+		margin-top: 2px;
+	}
 }

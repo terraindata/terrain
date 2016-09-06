@@ -288,10 +288,11 @@ class Manual extends Classs<Props>
          'builder-manual-topbar': !this.props.manualTab,
        })}
        >
-          <div>
 
-          </div>
-          <div className='manual-search-bar'>
+          <div className= {classNames({
+           'manual-search-bar': true,
+           'manual-tab-search-bar': this.props.manualTab,
+          })}>
               <SearchIcon className ='manual-search-icon'/>
               <Autocomplete
                 className='manual-search-input'
@@ -415,15 +416,38 @@ class Manual extends Classs<Props>
     );
   }
 
-
   renderLeftColumn()
   {
+    var closeOpacity = this.state.value.length ? 1 : 0;
     return (
       <div 
         className ='manual-content-area'
         style={this.props.manualTab ? 
           {height: 'calc(100% - 60px)'} : {height: 'calc(100% - 25px)'}}
       >
+
+       <div  className= {classNames({
+           'manual-search-bar': true,
+           'manual-tab-search-bar': this.props.manualTab,
+           'manual-sidebar-search': true,
+          })}>
+       <SearchIcon className ='manual-search-icon'/>
+              <Autocomplete
+                className='manual-search-input'
+                value={this.state.value as string}
+                onChange={this.search}
+                placeholder='Search'
+                options={this.renderAutocompleteOption()}
+              />
+              <CloseIcon 
+               className='manual-close-icon'
+               style={{
+                 opacity: closeOpacity,
+               }}
+               onClick={this.clearInput}
+              />
+      </div> 
+
       <div className={classNames({
         'manual-left-column-title': true,
         'manual-left-column-entry': true,
@@ -442,13 +466,11 @@ class Manual extends Classs<Props>
     );
   }
 
-
   render()
   {
     return (
       <div className ='manual-area'>
-        {this.renderManualTopbar()}
-        {
+          {this.props.manualTab ? null : this.renderManualTopbar()}        {
           this.props.manualTab ? 
           <div className='manual-left-column'>
            {this.renderLeftColumn()}
