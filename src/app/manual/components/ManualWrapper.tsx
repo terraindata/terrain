@@ -69,9 +69,9 @@ class ManualWrapper extends Classs<Props>
 
 	render()
 	{
-		var selected = this.props.params['term']
+		var selected = this.props.params['term'] || '';
 		return <Manual 
-			selectedKey={decodeURIComponent(selected)}
+			selectedKey={selected}
 			history={this.props.history}
 			manualTab={true}
 		/>;

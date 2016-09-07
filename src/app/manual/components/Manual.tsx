@@ -203,13 +203,11 @@ class Manual extends Classs<Props>
         </div>
       );
     }
-    var style = this.props.manualTab ? {height: '100%'} : {height: 'calc(100% - 25px)'};
     return (
       <div className={classNames({
             'manual-content-area': true,
             'manual-content-area-builder-tab': !this.props.manualTab,
         })}
-        style={style}
       >
         {
           this.state.visibleTqlCards.sort().map((result, index) =>
@@ -222,6 +220,7 @@ class Manual extends Classs<Props>
                 history={this.props.history}
                 expanded={this.state.expanded}
                 manualTab={this.props.manualTab}
+                bottomLine={!(index === this.state.visibleTqlCards.length - 1 && this.state.visiblePhraseTypes.length === 0)}
               />
             </div> 
           )
@@ -238,6 +237,7 @@ class Manual extends Classs<Props>
                 phraseType={true}
                 expanded={this.state.expanded}
                 manualTab={this.props.manualTab}
+                bottomLine={index !== this.state.visiblePhraseTypes.length - 1 }
               />
             </div>
           )
@@ -421,15 +421,10 @@ class Manual extends Classs<Props>
 
   renderLeftColumn()
   {
-    var style = this.props.manualTab ? {height: '100%'} : {height: 'calc(100% - 25px)'};
     var closeOpacity = this.state.value.length ? 1 : 0;
 
     return (
-      <div 
-        className ='manual-content-area'
-        style={style}
-      >
-
+      <div className = 'manual-content-area'>
        <div  className= {classNames({
            'manual-search-bar': true,
            'manual-tab-search-bar': this.props.manualTab,

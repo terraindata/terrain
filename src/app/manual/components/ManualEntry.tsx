@@ -74,6 +74,7 @@ interface Props
   expanded: boolean;
   phraseType?: boolean;
   manualTab: boolean;
+  bottomLine?: boolean;
 }
 
 
@@ -345,7 +346,7 @@ class ManualEntry extends Classs<Props>
     return (
       <div className ='manual-entry'> 
         {this.props.phraseType ? this.renderPhraseTypeEntry() : this.renderTqlCardEntry()}
-        <hr className ='manual-entry-line'/>
+        {this.props.bottomLine ? <hr className ='manual-entry-line'/> : null}
       </div>
     );
   }
