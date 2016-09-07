@@ -69,12 +69,15 @@ interface Props
   history?: any;
   selectedKey?: string;
   manualTab?: boolean;
+  changeCardName?: (string) => void;
 }
 
 class Manual extends Classs<Props>
 {
   allTqlCards = Object.keys(BuilderTypes.cardList);
-  allPhraseTypes = Object.keys(ManualConfig[1]);
+
+  allPhraseTypes = Object.keys(ManualConfig[1]).sort();
+  autocompleteOptions = Immutable.List(this.allPhraseTypes.concat(this.allTqlCards).sort());
 
   constructor(props: Props)
   {
@@ -102,7 +105,7 @@ class Manual extends Classs<Props>
 
   componentWillReceiveProps(nextProps)
   {
-    if((this.props.selectedKey !== nextProps.selectedKey) && !this.props.manualTab)
+    if((this.state.selectedKey !== nextProps.selectedKey) && !this.props.manualTab)
     {
       this.setState({
         selectedKey: nextProps.selectedKey
@@ -123,7 +126,7 @@ class Manual extends Classs<Props>
     return (
       <div className='manual-sidebar-section' style={style}>
         {
-          this.allTqlCards.sort().map((result, index) =>
+          this.allTqlCards.map((result, index) =>
             <div key ={index} className='manual-left-column-row'>
               <div 
                 className={classNames({
@@ -150,7 +153,7 @@ class Manual extends Classs<Props>
     return (
       <div className='manual-sidebar-section' style={style}>
         {
-          this.allPhraseTypes.sort().map((result, index) =>
+          this.allPhraseTypes.map((result, index) =>
             <div key ={index} className='manual-left-column-row'>
               <div 
                 className={classNames({
@@ -191,11 +194,14 @@ class Manual extends Classs<Props>
         </div>
       );
     }
+    var style = this.props.manualTab ? {height: 'calc(100% - 60px)'} : {height: 'calc(100% - 25px)'};
     return (
       <div className={classNames({
             'manual-content-area': true,
             'manual-content-area-builder-tab': !this.props.manualTab,
-        })}>
+        })}
+        style={style}
+      >
         {
           this.state.visibleTqlCards.sort().map((result, index) =>
             <div key ={index}>
@@ -259,6 +265,7 @@ class Manual extends Classs<Props>
     {
       this.props.history.pushState({}, '/manual/' + value);
     }
+    this.props.changeCardName && this.props.changeCardName(selectedKey);
     this.setState({
       visibleTqlCards,
       visiblePhraseTypes,
@@ -271,12 +278,6 @@ class Manual extends Classs<Props>
   clearInput()
   {
     this.search('');
-  }
-
-  renderAutocompleteOption()
-  {
-    var options = this.allPhraseTypes.concat(this.allTqlCards);
-    return Immutable.List(options.sort());
   }
 
   renderManualTopbar()
@@ -298,7 +299,7 @@ class Manual extends Classs<Props>
                 value={this.state.value as string}
                 onChange={this.search}
                 placeholder='Search'
-                options={this.renderAutocompleteOption()}
+                options={this.autocompleteOptions}
               />
               <CloseIcon 
                className='manual-close-icon'
@@ -419,11 +420,11 @@ class Manual extends Classs<Props>
 
   renderLeftColumn()
   {
+    var style = this.props.manualTab ? {height: 'calc(100% - 60px)'} : {height: 'calc(100% - 25px)'};
     return (
       <div 
         className ='manual-content-area'
-        style={this.props.manualTab ? 
-          {height: 'calc(100% - 60px)'} : {height: 'calc(100% - 25px)'}}
+        style={style}
       >
       <div className={classNames({
         'manual-left-column-title': true,

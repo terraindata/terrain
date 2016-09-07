@@ -1,7 +1,8 @@
 [
   {
-   "Select From":
+   "sfw":
     { 
+      "name": "Select / From",
       "summary": "The Select From card is fundamental card for TQL. It selects certain attributes of elements from a specified source, as long as those elements meet conditions in the Where clause. To select all attributes, use Select *.", 
       "notation": "none",
       "snippet": "Retrieves attributes of elements from database if they meet the conditions",
@@ -106,8 +107,9 @@
           }
       ]
     },
-    "Take Limit":
+    "take":
     { 
+      "name": "Take / Limit",
       "snippet": "Returns n results", 
       "summary": "Returns a query expression representing the first n results from the expression on the left hand side.  The number of results n is the evaluation of the right hand side.", 
       "notation": "binary infix operator",
@@ -160,8 +162,9 @@
           }
       ]
     },
-    "Sort":
+    "sort":
     { 
+      "name": "Sort",
       "snippet": "none", 
       "summary": "Returns a query expression representing the result of filtering the left-hand expression by evaluating the right-hand expression for each element in the query  expression. Elements that cause the expression to be false are filtered out.",
       "notation": "binary infix operator",
@@ -228,12 +231,13 @@
           }
       ]
     },
-    "Let":
+    "let":
     { 
+      "name": "Let",
       "snippet": "Defines variable", 
       "summary": "Returns a query expression representing the result of evaluating each the right hand statement for each element.", 
       "notation": "binary infix operator",
-      "syntax": "query expression LET statement",
+      "syntax": "LET variable name = value",
       "text": 
       [ 
           {
@@ -293,12 +297,13 @@
           }
       ]
     },
-    "Var":
+    "var":
     { 
+      "name": "Var",
       "snippet": "Declares a variable", 
       "summary": "Declares` a variable", 
       "notation": "binary infix operator",
-      "syntax": "VAR name",
+      "syntax": "VAR name = value",
       "text": 
       [ 
           {
@@ -358,8 +363,9 @@
           }
       ]
     },
-    "Score":
+    "score":
     { 
+      "name": "Score",
       "snippet": "Used to rank result", 
       "summary": "Score is used to rank and order results from a query. The score is based on a weighted sum of attributes of the elements.", 
       "notation": "binary prefix operator",
@@ -473,8 +479,9 @@
           }
       ]
     },
-    "Transform":
+    "transform":
     { 
+      "name": "Transform",
       "snippet": "none", 
       "summary": "none",
       "notation": "none",
@@ -525,8 +532,9 @@
           "The points on a transform card can be moved by clicking and dragging. When dragging points around there is a y limit made by the points on either side of the current point. You can also move points using the arrow keys or can type into the fields to get a more exact value. You will notice when you move a point around that crosshairs appear to help you determine the x and y coordinate values. To add a new point, double left click. To remove a point, either right click on the point and hit delete or select the point and hit the delete key on your keyboard. You can change the range of visible coordinates using the periscope bar at the bottom of the transform card."
       ]
     },
-    "Count":
+    "count":
     { 
+      "name": "Count",
       "snippet": "Number of elements", 
       "summary": "Returns an the number of elements in the right hand expression", 
       "notation": " binary prefix operator",
@@ -583,8 +591,9 @@
           }
       ]
     },
-    "Average":
+    "avg":
     { 
+      "name": "Average",
       "snippet": "Returns the average", 
       "summary": "Returns the average of all elements in the right hand side.", 
       "notation": "binary prefix operator",
@@ -641,8 +650,9 @@
           }
       ]
     },
-    "Sum":
+    "sum":
     { 
+      "name": "Sum",
       "snippet": "Returns the sum", 
       "summary": "Returns an the sum of all elements in the right hand side.", 
       "notation": "binary prefix operator",
@@ -699,8 +709,9 @@
           }
       ]
     },
-    "Min":
+    "min":
     { 
+      "name": "Min",
       "snippet": "Returns minimum element", 
       "summary": "Returns an the minimum of all elements in the right hand side", 
       "notation": "binary prefix operator",
@@ -757,8 +768,9 @@
           }
       ]
     },
-    "Max":
+    "max":
     { 
+      "name": "Max",
       "snippet": "Returns maximum element", 
       "summary": "Returns an the maximum of all elements in the right hand side", 
       "notation": "binary prefix operator",
@@ -815,8 +827,9 @@
           }
       ]
     },
-    "Exists":
+    "exists":
     { 
+      "name": "Exists",
       "snippet": "Returns if exists", 
       "summary": "Tests whether the inner query returns any row.", 
       "notation": "None",
@@ -929,8 +942,9 @@
         }
       ]
     },
-    "( )":
+    "parentheses":
     { 
+      "name": "( )",
       "snippet": "none", 
       "summary": "none",
       "notation": "none",
@@ -987,8 +1001,9 @@
           }
       ]
     },
-    "Comparison":
+    "filter":
     { 
+      "name": "Comparison",
       "snippet": "Returns elements that satisfy the condition", 
       "summary": "Returns a query expression representing the result of filtering the left-hand expression by evaluating the right-hand expression for each element in the query  expression. Elements that cause the expression to be false are filtered out.",
       "notation": "binary infix operator",
@@ -1058,8 +1073,9 @@
           }
       ]
     },
-    "Skip Offset":
+    "skip":
     { 
+      "name": "Skip / Offset",
       "snippet": "Removes first n elements", 
       "summary": "Returns a query expression representing the left-hand query expression, with the first n elements removed, where n is the result of evaluating the right-hand expression.", 
       "notation": "binary infix operator",

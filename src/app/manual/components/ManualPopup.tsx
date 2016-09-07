@@ -103,17 +103,15 @@ class ManualPopup extends Classs<Props>
   
   openManual()
   {
-    this.props.addColumn(this.props.index, this.props.cardName === 'General' ? '' : this.props.cardName);
+    this.props.addColumn(this.props.index, this.props.cardName);
   }
 
   render() 
   {
-    var content = 'For more information about how to use Terrain Query Language (TQL), see the manual.';
-    if(this.props.cardName !== 'General') {
-      var manualEntry = BuilderTypes.cardList[this.props.cardName] 
+
+    var manualEntry = BuilderTypes.cardList[this.props.cardName] 
         && BuilderTypes.Blocks[BuilderTypes.cardList[this.props.cardName]].static.manualEntry;
-      content = manualEntry ? manualEntry.snippet : 'No description available';
-    }
+    var content = manualEntry ? manualEntry.snippet : 'No description available';
     return (
     <div 
       className={classNames({

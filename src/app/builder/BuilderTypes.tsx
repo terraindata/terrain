@@ -65,26 +65,6 @@ import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, filtersD
 
 export module BuilderTypes
 {
-  export const cardList = 
-  {
-    'Select From': 'sfw',
-    'Take Limit': 'take',
-    'Sort': 'sort',
-    'Var': 'var',
-    'Let': 'let',
-    'Score': 'score',
-    'Transform': 'transform',
-    'Count': 'count',
-    'Average': 'avg',
-    'Sum': 'sum',
-    'Max': 'max',
-    'Min': 'min',
-    'Exists': 'exists',
-    '( )': 'parentheses',
-    'Skip Offset': 'skip',
-    'Comparison': 'filter'
-  }
-
   export enum Operator {
     EQ,
     NE,
@@ -176,6 +156,7 @@ export module BuilderTypes
 
   interface IManualEntry
   {
+    name: string;
     snippet: string;
     summary: string;
     notation: string;
@@ -409,7 +390,7 @@ export module BuilderTypes
       
       static:
       {
-        manualEntry: ManualConfig[0]['Select From'],
+        manualEntry: ManualConfig[0]['sfw'],
         colors: ["#89B4A7", "#C1EADE"],
         title: "Select / From",
         preview: "[tables.table]: [fields.length]",
@@ -507,7 +488,7 @@ export module BuilderTypes
         title: "Sort",
         preview: "[sorts.property]",
         colors: ["#C5AFD5", "#EAD9F7"],
-        manualEntry: ManualConfig[0]['Sort'],
+        manualEntry: ManualConfig[0]['sort'],
         tql: "sort $sorts",
         // tql: "ORDER BY $sorts",        
         display: {
@@ -546,7 +527,7 @@ export module BuilderTypes
         preview: "[filters.length] Condition(s)",
         colors: ["#7EAAB3", "#B9E1E9"],
         display: filtersDisplay,
-        manualEntry: ManualConfig[0]['Comparison'],
+        manualEntry: ManualConfig[0]['filter'],
         tql: "$filters",
       },
     }),
@@ -561,7 +542,7 @@ export module BuilderTypes
         preview: "[field]",
         colors: ["#C0C0BE", "#E2E2E0"],
         display: letVarDisplay,
-        manualEntry: ManualConfig[0]['Let'],
+        manualEntry: ManualConfig[0]['let'],
         tql: "let $field = $expression",
         // tql: "LET $field = $expression", // **
         getNeighborTerms: (card) => List([card['field']]),
@@ -579,7 +560,7 @@ export module BuilderTypes
         preview: "[field]",
         display: letVarDisplay,
 
-        manualEntry: ManualConfig[0]['Var'],
+        manualEntry: ManualConfig[0]['var'],
         getNeighborTerms: (card) => List([card['field']]),
         // tql: "VAR $field = $expression",
         tql: "var $field = $expression", // **
@@ -590,7 +571,7 @@ export module BuilderTypes
     {
       colors: ["#70B1AC", "#D2F3F0"],
       title: "Count",
-      manualEntry: ManualConfig[0]['Count'],
+      manualEntry: ManualConfig[0]['count'],
       tql: "COUNT $cards",
     }),
     
@@ -598,7 +579,7 @@ export module BuilderTypes
     {
       colors: ["#a2b37e", "#c9daa6"],
       title: "Average",
-      manualEntry: ManualConfig[0]['Average'],
+      manualEntry: ManualConfig[0]['avg'],
       tql: "AVG $cards",
     }),
     
@@ -606,7 +587,7 @@ export module BuilderTypes
     {
       colors: ["#8dc4c1", "#bae8e5"],
       title: "Sum",
-      manualEntry: ManualConfig[0]['Sum'],
+      manualEntry: ManualConfig[0]['sum'],
       tql: "SUM $cards",
     }),
 
@@ -614,7 +595,7 @@ export module BuilderTypes
     {
       colors: ["#cc9898", "#ecbcbc"],
       title: "Min",
-      manualEntry: ManualConfig[0]['Min'],
+      manualEntry: ManualConfig[0]['min'],
       tql: "MIN $cards",
     }),
 
@@ -622,7 +603,7 @@ export module BuilderTypes
     {
       colors: ["#8299b8", "#acc6ea"],
       title: "Max",
-      manualEntry: ManualConfig[0]['Max'],
+      manualEntry: ManualConfig[0]['max'],
       tql: "MAX $cards",
     }),
 
@@ -630,7 +611,7 @@ export module BuilderTypes
     {
       colors: ["#a98abf", "#cfb3e3"],
       title: "Exists",
-      manualEntry: ManualConfig[0]['Exists'],
+      manualEntry: ManualConfig[0]['exists'],
       tql: "EXISTS $cards",
     }),
 
@@ -638,7 +619,7 @@ export module BuilderTypes
     {
       colors: ["#b37e7e", "#daa3a3"],
       title: "( )",
-      manualEntry: ManualConfig[0]['( )'],
+      manualEntry: ManualConfig[0]['parentheses'],
       tql: "($cards)",
     }),
     
@@ -661,7 +642,7 @@ export module BuilderTypes
         colors: ["#9DC3B8", "#D1EFE7"],
         title: "Score",
         preview: "[weights.length] Weight(s)",
-        manualEntry: ManualConfig[0]['Score'],
+        manualEntry: ManualConfig[0]['score'],
         tql: "linearScore([$weights])",
         display: {
           displayType: DisplayType.ROWS,
@@ -735,7 +716,7 @@ export module BuilderTypes
       
       static:
       {
-        manualEntry: ManualConfig[0]['Transform'],
+        manualEntry: ManualConfig[0]['transform'],
         colors: ["#E7BE70", "#EDD8B1"],
         title: "Transform",
         preview: "[input]",
@@ -793,7 +774,7 @@ export module BuilderTypes
     take: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
-      manualEntry: ManualConfig[0]['Take Limit'],
+      manualEntry: ManualConfig[0]['take'],
       title: "Take / Limit",
       // tql: "LIMIT $value",
       tql: "take $value", // **
@@ -802,7 +783,7 @@ export module BuilderTypes
     skip: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
-      manualEntry: ManualConfig[0]['Skip Offset'],
+      manualEntry: ManualConfig[0]['skip'],
       title: "Skip / Offset",
       // tql: "OFFSET $value",
       tql: "skip $value", // **
@@ -859,6 +840,16 @@ export module BuilderTypes
   
   // array of different card types
   export const CardTypes = _.compact(_.map(Blocks, (block, k: string) => block._isCard && k ));
+
+  export const cardList = _.compact(_.map(Blocks, (block, k: string) => {
+    if(block._isCard)
+    {
+      console.log(block.static.manualEntry);
+      var key = block.static.manualEntry.name;
+      var value = k;
+      return {key: value};
+    }
+  }));
   
   // private, maps a type (string) to the backing Immutable Record
   let typeToRecord = _.reduce(Blocks as ({[card:string]:any}), 

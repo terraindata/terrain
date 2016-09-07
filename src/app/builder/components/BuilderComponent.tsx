@@ -201,9 +201,9 @@ class BuilderComponent extends PureClasss<Props>
               options={d.options}
               selectedIndex={value}
             />
-            { this.props.helpOn && d.helpInformation ?
+            { this.props.helpOn && d.help ?
               <ManualInfo
-                information={d.helpInformation as string}
+                information={d.help as string}
                 style={{right: '10px', top: 'calc(50% - 4px)'}}
               />
               : null
@@ -299,10 +299,10 @@ class BuilderComponent extends PureClasss<Props>
               canEdit: this.props.canEdit,
               keys: this.props.keys,
             })}
-            { this.props.helpOn && d.helpInformation ?
+            { this.props.helpOn && d.help ?
               (
                 isTransformCard ?
-                (d.helpInformation as string[]).map((info, index) => {
+                (d.help as string[]).map((info, index) => {
                   if(index === 0) 
                   {
                     var style = {left: '45%', top: '28%'};
@@ -328,7 +328,7 @@ class BuilderComponent extends PureClasss<Props>
                 })
                 :
                 <ManualInfo 
-                  information={d.helpInformation as string}
+                  information={d.help as string}
                   style={{right: '10px', top: 'calc(50% - 4px)'}}
                 /> 
               )
@@ -364,9 +364,9 @@ class BuilderComponent extends PureClasss<Props>
           }}
         />
         {
-          this.props.helpOn && d.helpInformation ?
+          this.props.helpOn && d.help ?
           <ManualInfo 
-            information={d.helpInformation as string}
+            information={d.help as string}
             style = {{right:'10px', top: 'calc(50% - 4px)'}}
           />
           : null

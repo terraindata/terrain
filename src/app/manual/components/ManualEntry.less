@@ -1,5 +1,13 @@
 @import "../../common/Common.less";
 
+.manual-entry-line {
+	display: block;
+    border: solid #ddd 1px;
+    border-bottom: none;
+	margin-top: 18px;
+	margin-right: 6px;
+}
+
 .manual-entry-keyword {
 	color:  #89b4a7;
 	cursor: pointer;
@@ -112,6 +120,9 @@
 		.CodeMirror-vscrollbar {
 			display: none !important;
 		}
+		.CodeMirror-scroll {
+			overlow-x: auto !important;
+		}
 		.CodeMirror-scrollbar-filler {
 			display: none !important;
 		}
@@ -125,7 +136,7 @@
 	width: 70%;
 	padding: 20px;
 	margin-top: 15px;
-	box-shadow: 1px 1px 10px 1px #646464;
+    box-shadow: rgba(0, 0, 0, 0.20) 0px 0px 5px 2px;
 	border-radius: 6px;
 	margin-bottom: 15px;
 }
@@ -142,9 +153,6 @@
 		.card {
 			width: 100%;
 			left: 0%;
-		}
-		.manual-popup-wrapper, .menu-wrapper, .card-arrow-icon {
-			visibility: hidden;
 		}
 		.card-field-tools-right-inner, .card-field-tools-left-inner {
 			opacity: 1;

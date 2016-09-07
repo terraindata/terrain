@@ -94,14 +94,14 @@ class Builder extends PureClasss<Props>
     builder: BuilderState,
     colKeys: List<number>;
     noColumnAnimation: boolean;
-    column: number;
+    columnType: number;
     cardName: string;
     manualIndex: number;
   } = {
     builder: Store.getState(),
     colKeys: null,
     noColumnAnimation: false,
-    column: null,
+    columnType: null,
     cardName: '',
     manualIndex: -1,
   };
@@ -353,9 +353,10 @@ class Builder extends PureClasss<Props>
         canCloseColumn={this.state.colKeys.size > 1}
         history={this.props.history}
         onRevert={this.save}
-        column={this.state.column}
+        columnType={this.state.columnType}
         cardName={this.state.cardName}
         switchToManualCol={this.switchToManualCol}
+        changeCardName={this.changeCardName}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key,
@@ -369,23 +370,37 @@ class Builder extends PureClasss<Props>
     });
   }
 
+  changeCardName(cardName)
+  {
+    this.setState({
+      cardName
+    })
+  }
+
   addManualColumn(index, cardName?)
   {
     index = index + 1;
-    let colKeys = this.state.colKeys.splice(index, 0, Math.random());
+    var newKey = Math.random();
+    let colKeys = this.state.colKeys.splice(index, 0, newKey);
     this.setState({
       colKeys,
-      column: 4,
+      columnType: 4,
       cardName,
       manualIndex: index
     }); 
     localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
+    if(localStorage.getItem('colKeyTypes'))
+    {
+      var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes'));
+      localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
+    }
   }
 
   handleAddManualColumn(index, cardName?)
   {
     if(this.state.manualIndex !== -1) //Manual column already open
     {
+      //issue: this doesn't cause column to update if the cardName doesn't change
       this.setState({
         cardName
       });

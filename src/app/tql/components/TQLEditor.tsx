@@ -85,7 +85,6 @@ import 'codemirror/addon/search/matchesonscrollbar.js';
 import 'codemirror/addon/search/jump-to-line.js';
 import 'codemirror/addon/search/matchesonscrollbar.css';
 
-import ManualPopup from './../../manual/components/ManualPopup.tsx';
 import TQLPopup from './TQLPopup.tsx';
 
 interface Props {
@@ -355,13 +354,6 @@ class TQL extends Classs<Props>
           }
         </div>
         <div className='white-space' />
-          <div className='tql-editor-manual-popup'>
-            <ManualPopup  
-              cardName='General'      
-              addColumn={this.props.addColumn}
-              index={this.props.index}     
-            />      
-         </div>
         <Menu options={this.getMenuOptions() } small={true}/>
       </div>
     );

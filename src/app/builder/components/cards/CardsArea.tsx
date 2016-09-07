@@ -83,7 +83,7 @@ interface Props
 interface KeyState {
   keys: List<string>;
   keyPath: KeyPath;
-  learningMode: string;
+  learningMode: boolean;
 }
 
 class CardsArea extends PureClasss<Props>
@@ -91,7 +91,7 @@ class CardsArea extends PureClasss<Props>
   state: KeyState = {
     keys: List([]),
     keyPath: null,
-    learningMode: this.props.helpOn ? 'learning' : 'standard',
+    learningMode: this.props.helpOn,
   };
 
   constructor(props:Props)
@@ -170,7 +170,7 @@ class CardsArea extends PureClasss<Props>
   toggleView()
   {
     this.setState({
-      learningMode: this.state.learningMode === 'standard' ? 'learning' : 'standard',
+      learningMode: !this.state.learningMode,
     })
   }
   
@@ -184,7 +184,7 @@ class CardsArea extends PureClasss<Props>
           first='Standard'
           second='Learning'
           onChange={this.toggleView}
-          selected={this.state.learningMode === 'standard' ? 1 : 2}
+          selected={this.state.learningMode ? 2 : 1}
           small={true}
         />
       </div>
@@ -210,7 +210,7 @@ class CardsArea extends PureClasss<Props>
             <Card 
               {...this.props}
               colIndex={this.props.index}
-              helpOn={this.state.learningMode === 'learning' || this.props.helpOn}
+              helpOn={this.state.learningMode || this.props.helpOn}
               cards={null}
               key={card.id}
               singleCard={false}

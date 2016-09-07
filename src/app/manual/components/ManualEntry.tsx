@@ -82,6 +82,7 @@ class ManualEntry extends Classs<Props>
 {
 
   allTqlCards = BuilderTypes.cardList;
+  
   manualEntry: any;
 
   constructor(props: Props) 
@@ -285,7 +286,7 @@ class ManualEntry extends Classs<Props>
     return (
       <div 
         className='manual-entry-codemirror'
-        style={{height: (numLines * 14 + padding) + 'px'}}
+        style={{height: (numLines * 17 + padding) + 'px'}}
       >
         <CodeMirror 
           options={options}
@@ -356,8 +357,7 @@ class ManualEntry extends Classs<Props>
     return (
       <div className ='manual-entry'> 
         {this.props.phraseType ? this.renderPhraseTypeEntry() : this.renderTqlCardEntry()}
-        <br />
-        <br />
+        <hr className ='manual-entry-line'/>
       </div>
     );
   }
