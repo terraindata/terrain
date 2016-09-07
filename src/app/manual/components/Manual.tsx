@@ -468,6 +468,7 @@ class Manual extends Classs<Props>
 
   render()
   {
+    console.log(this.allTqlCards);
     return (
       <div className ='manual-area'>
           {this.props.manualTab ? null : this.renderManualTopbar()}        {
