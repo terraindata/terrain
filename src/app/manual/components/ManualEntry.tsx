@@ -130,7 +130,7 @@ class ManualEntry extends Classs<Props>
   highlightKeyWords(text)
   {
     if (!text) return;
-    var keywords = Object.keys(this.allTqlCards);
+    var keywords = Object.keys(this.allTqlCards).map((word) => word.replace('/ ', ''));
     //Remove ( ) card
     var index = keywords.indexOf('( )');
     keywords.splice(index, 1);
@@ -325,8 +325,8 @@ class ManualEntry extends Classs<Props>
   {
     return (
         <div>
-        {this.renderEntry()}
-        {this.state.expanded ? this.renderTqlCardEntryDetail() : null }
+          {this.renderEntry()}
+          {this.state.expanded ? this.renderTqlCardEntryDetail() : null }
         </div>
     );
   }

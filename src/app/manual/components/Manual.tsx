@@ -105,21 +105,30 @@ class Manual extends Classs<Props>
 
   componentWillReceiveProps(nextProps)
   {
-    if((this.state.selectedKey !== nextProps.selectedKey))
+    if((this.state.selectedKey.toLowerCase() !== nextProps.selectedKey.toLowerCase()) && !this.props.manualTab)
     {
-      if(!this.props.manualTab)
-      {
         this.setState({
           selectedKey: nextProps.selectedKey
         });
         this.search(nextProps.selectedKey);
-      } else if(nextProps.selectedKey !== '')
-      {
+    }
+    else if(this.props.selectedKey.toLowerCase() !== nextProps.selectedKey.toLowerCase())
+    {
         this.setState({
           selectedKey: nextProps.selectedKey
         });
-        this.search(nextProps.selectedKey);
-      }
+        if(nextProps.selectedKey === 'TQL Cards')
+        {
+          this.showTqlCards();
+        } 
+        else if (nextProps.selectedKey === 'Phrase Types')
+        {
+          this.showPhraseTypes();
+        }
+        else 
+        {
+          this.search(nextProps.selectedKey);
+        }
     }
   }
 
@@ -183,7 +192,7 @@ class Manual extends Classs<Props>
 
   openTerm(e)
   {  
-    var cardName = e.target.textContent.trim().replace(',', '').replace('.', '');
+    var cardName = e.target.textContent.trim().replace(/[^A-Za-z ]/g, '');
     this.setState ({
       value: cardName,
     });
@@ -325,7 +334,7 @@ class Manual extends Classs<Props>
       value: '',
       expandTqlCards: this.state.selectedKey === 'TQL Cards' ? !this.state.expandTqlCards : true
     });
-    this.props.history.pushState({}, '/manual/');
+    this.props.history.pushState({}, '/manual/TQL%20Cards');
   }
 
   showPhraseTypes()
@@ -338,7 +347,7 @@ class Manual extends Classs<Props>
       value: '',
       expandPhraseTypes: this.state.selectedKey === 'Phrase Types' ? !this.state.expandPhraseTypes : true
     });
-    this.props.history.pushState({}, '/manual/');
+    this.props.history.pushState({}, '/manual/Phrase%20Types');
   }
 
   toggleTqlCardList()
