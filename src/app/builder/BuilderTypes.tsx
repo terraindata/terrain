@@ -852,17 +852,6 @@ export module BuilderTypes
   export const cardList = cards;
   
 
-  export const cardList = _.compact(_.map(Blocks, (block, k: string) => {
-    if(block._isCard)
-    {
-      var key = block.static.manualEntry.name;
-      var value = k;
-      console.log(key);
-      console.log(value);
-      return {key: value};
-    }
-  }));
-
   // private, maps a type (string) to the backing Immutable Record
   let typeToRecord = _.reduce(Blocks as ({[card:string]:any}), 
     (memo, v, i) => {
