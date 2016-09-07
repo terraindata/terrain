@@ -82,13 +82,14 @@ class ManualEntry extends Classs<Props>
 {
 
   allTqlCards = BuilderTypes.cardList;
-  
+
   manualEntry: any;
 
   constructor(props: Props) 
   {
     super(props);
-    this.manualEntry = this.props.phraseType ? ManualConfig[1][this.props.entryName] : BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
+    this.manualEntry = this.props.phraseType ? ManualConfig[1][this.props.entryName] : 
+      BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
     this.state =
       {
         expanded: this.props.expanded,
@@ -103,8 +104,9 @@ class ManualEntry extends Classs<Props>
         expanded: newProps.expanded
       });
     }
+    console.log(newProps.entryName);
     this.manualEntry = this.props.phraseType ? ManualConfig[1][newProps.entryName] : 
-        BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry;
+      BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry;
   }
 
   expand()
