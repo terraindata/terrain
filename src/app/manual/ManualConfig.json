@@ -1,4 +1,5 @@
 {
+  "comment": "For information on how to edit this file and what the fields mean refer to this wiki page: https://wiki.terraindb.com/wiki/tiki-index.php?page=Edit+Manual+Config#Card_Entry_",
   "cards": {
    "sfw":
     { 
@@ -9,7 +10,7 @@
       "syntax": "SELECT field(s) FROM source WHERE condition(s)",
       "text": 
       [ 
-        "The TQL Select statement returns a result set of records from one or more tables. A Select statement retrieves zero or more rows from one or more database tables or database views. In most applications, Select is the most commonly used data manipulation language (DML) command. As TQL is a declarative programming language, Select queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints.",
+          "The TQL Select statement returns a result set of records from one or more tables. A Select statement retrieves zero or more rows from one or more database tables or database views. In most applications, Select is the most commonly used data manipulation language (DML) command. As TQL is a declarative programming language, Select queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints.",
           {
             "cards": [],
             "fields": [
@@ -39,7 +40,8 @@
             ],
             "type": "sfw",
             "id": "e",
-            "helpOn": true
+            "helpOn": true,
+            "title": "Basic Select / From Card"
           },
         "This example select all the product ids purchased by user 1234:",
           {
@@ -103,7 +105,8 @@
             }
             ],
             "type": "sfw",
-            "id": "e"
+            "id": "e",
+            "title": "Select / From Card Example"
           }
       ]
     },
@@ -120,7 +123,8 @@
             "type": "take",
             "value": "10",
             "id": "a",
-            "helpOn": true
+            "helpOn": true,
+            "title": "Basic Take Card"
           },
         "Take is a binary infix operator, meaning it sits between two expressions. Take returns a query expression that is the first n results of the query expression on its left hand side.  The number of results n to be returned is determined from the right hand side. In order to get a specific set of results, the data can be sorted based on some parameter first and then the top n results selected via Take. For example, if you wanted the 10 oldest people in a group, you would sort the people based on descending age and then use 'Take 10'.",
         "This example takes the first 10 results (the names of users) from the table 'users.'",
@@ -158,7 +162,8 @@
             }
             ],
             "type": "sfw",
-            "id": "e"
+            "id": "e",
+            "title": "Take Card Example"
           }
       ]
     },
@@ -182,7 +187,8 @@
                 "type": "sortBlock"
               }
             ],
-            "helpOn": true
+            "helpOn": true,
+            "title": "Basic Sort Card"
           },
         "A Sort clause in SQL specifies that a SQL Select statement returns a result set with the rows being sorted by the values of one or more columns. The sort criteria do not have to be included in the result set. The sort criteria can be expressions, including column names, user-defined functions, arithmetic operations, or CASE expressions. The expressions are evaluated and the results are used for the sorting, i.e., the values stored in the column or the results of the function call. ORDER BY is the only way to sort the rows in the result set. Without this clause, the relational database system may return the rows in any order. If an ordering is required, the ORDER BY must be provided in the SELECT statement sent by the application. Although some database systems allow the specification of an ORDER BY clause in subselects or view definitions, the presence there has no effect. A view is a logical relational table, and the relational model mandates that a table is a set of rows, implying no sort order whatsoever. The only exception are constructs like ORDER BY ORDER OF ... (not standardized in SQL:2003) which allow the propagation of sort criteria through nested subselects.",
         "This example sorts all the users with the name John from'users' in ascending order by their name.",
@@ -227,7 +233,8 @@
             }
             ],
             "type": "sfw",
-            "id": "e"
+            "id": "e",
+            "title": "Sort Card Example"
           }
       ]
     },
@@ -245,13 +252,15 @@
             "id": "3",
             "field": "product.score",
             "expression": "product.age * product.conversionRatio",
-            "helpOn": true
+            "helpOn": true,
+            "title": "Basic Let Card"
           },
          "This example defines a variable averageSales to be the average sales of all products where ids are less than 10 in products.",
           {
             "type": "let",
             "id": "x",
             "field": "product.averageSales",
+            "title": "Let Card Example",
             "expression":
             {
               "id": "z",
@@ -301,7 +310,7 @@
     { 
       "name": "Var",
       "snippet": "Declares a variable", 
-      "summary": "Declares` a variable", 
+      "summary": "Declares a variable", 
       "notation": "binary infix operator",
       "syntax": "VAR name = value",
       "text": 
@@ -311,13 +320,15 @@
             "id": "3",
             "field": "product.score",
             "expression": "product.age * product.conversionRatio",
-            "helpOn": true
+            "helpOn": true,
+            "title": "Basic Var Card"
           },
           "This example defines a variable averageSales to be the average sales of all products where ids are less than 10 in products.",
           {
             "type": "var",
             "id": "x",
             "field": "product.averageSales",
+            "title": "Var Card Example",
             "expression":
             {
               "id": "z",
@@ -397,7 +408,8 @@
                 "type": "weight"
               }
             ],
-            "helpOn": true
+            "helpOn": true,
+            "title": "Basic Score Card"
           },
       "In this example, books are scored based on their positive reviews, negative reviews and prices, ranked according to score, and the top 100 products are then selected",
           {
@@ -475,7 +487,8 @@
             }
             ],
             "type": "sfw",
-            "id": "e"
+            "id": "e",
+            "title": "Score Card Example"
           }
       ]
     },
@@ -488,6 +501,7 @@
       "syntax": "none",
       "text": 
       [ 
+          "The transform card can be used to manipulate a variable.",
           {
             "bars": [],
             "domain": [0, 100],
@@ -526,9 +540,9 @@
               }
             ],
             "type": "transform",
-            "helpOn": true
+            "helpOn": true,
+            "title": "Basic Transform Card"
           },
-          "The transform card can be used to manipulate a variable.",
           "The points on a transform card can be moved by clicking and dragging. When dragging points around there is a y limit made by the points on either side of the current point. You can also move points using the arrow keys or can type into the fields to get a more exact value. You will notice when you move a point around that crosshairs appear to help you determine the x and y coordinate values. To add a new point, double left click. To remove a point, either right click on the point and hit delete or select the point and hit the delete key on your keyboard. You can change the range of visible coordinates using the periscope bar at the bottom of the transform card."
       ]
     },
@@ -546,6 +560,7 @@
             "type": "let",
             "id": "x",
             "field": "product.averageSales",
+            "title": "Count Card Example",
             "expression":
             {
               "id": "z",
@@ -605,6 +620,7 @@
             "type": "let",
             "id": "x",
             "field": "product.averageSales",
+            "title": "Average Card Example",
             "expression":
             {
               "id": "z",
@@ -664,6 +680,7 @@
             "type": "let",
             "id": "x",
             "field": "product.numSales",
+            "title": "Sum Card Example",
             "expression":
             {
               "id": "z",
@@ -723,6 +740,7 @@
             "type": "let",
             "id": "x",
             "field": "product.minSales",
+            "title": "Min Card Example",
             "expression":
             {
               "id": "z",
@@ -782,6 +800,7 @@
             "type": "let",
             "id": "x",
             "field": "product.maxSales",
+            "title": "Max Card Example",
             "expression":
             {
               "id": "z",
@@ -840,6 +859,7 @@
         {
           "id": "a",
           "type": "exists",
+          "title": "Basic Exists Card",
           "cards": [{
             "cards": [],
             "fields": [
@@ -938,7 +958,8 @@
             }
             ],
             "type": "sfw",
-            "id": "e"
+            "id": "e",
+            "title": "Exists Card Example"
         }
       ]
     },
@@ -956,6 +977,7 @@
             "type": "let",
             "id": "x",
             "field": "product.averageSales",
+            "title": "Parentheses Card Example",
             "expression":
             {
               "id": "z",
@@ -1023,7 +1045,8 @@
                     "id": "c"
                   }
              ],
-            "helpOn": true
+            "helpOn": true,
+            "title": "Basic Comparison Card"
           },
         "The following example returns all of the cars that are cost less than $5000 from products. ",
           {
@@ -1069,7 +1092,8 @@
             }
             ],
             "type": "sfw",
-            "id": "e"
+            "id": "e",
+            "title": "Comparison Card Example"
           }
       ]
     },
@@ -1086,7 +1110,8 @@
         {
           "id": "a",
           "type": "skip",
-          "value": 10
+          "value": 10,
+          "title": "Basic Skip Card"
         },
         "This example gets the 26th-50th visible products in the 'cool stuff' category, sorted by creation date",
         {
@@ -1130,7 +1155,8 @@
               "id": "h2"
           }],
           "id": "a",
-          "type": "sfw"
+          "type": "sfw",
+          "title": "Skip Card Example"
         }
       ]
     }

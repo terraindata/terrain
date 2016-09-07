@@ -290,7 +290,8 @@ class ManualEntry extends Classs<Props>
         <div> 
         {
           Object.keys(this.state.manualEntry.text).map((result, index) => {
-            if (typeof this.state.manualEntry.text[index] === 'string'){
+            if (typeof this.state.manualEntry.text[index] === 'string')
+            {
               return (
                 <div key ={index}>
                 {
@@ -309,6 +310,7 @@ class ManualEntry extends Classs<Props>
                       'manual-entry-in-depth': !this.props.manualTab,
                     })}
                  >
+                   {this.state.manualEntry.text[index].title ? <b className ='manual-entry-demo-title'> {this.state.manualEntry.text[index].title} </b>: null} 
                    {this.renderCardExample(index)}
                    {this.renderCodeMirrorExample(index)}
 
