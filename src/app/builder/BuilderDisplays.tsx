@@ -118,7 +118,7 @@ export interface Display
 export const valueDisplay =
 {
   displayType: NUM,
-  help: 'Number value',
+  help: ManualConfig["help"]["value"],
   key: 'value',
 }
 
@@ -154,19 +154,19 @@ export const filtersDisplay =
         {
           displayType: CARDTEXT,
           key: 'first',
-          help: 'Value to compare',
+          help: ManualConfig["help"]["first"],
           top: true,
         },
         {
           displayType: DROPDOWN,
           key: 'operator',
           options: Immutable.List(Operators),
-          help: 'Operator for comparison, can be =, <, <=, >=, >, not =, in or not in',
+          help: ManualConfig["help"]["operator"],
         },
         {
           displayType: CARDTEXT,
           key: 'second',
-          help: 'Value to compare',
+          help: ManualConfig["help"]["second"],
         },
         {
           displayType: DROPDOWN,
@@ -192,7 +192,7 @@ export const letVarDisplay =
   [
     {
       displayType: TEXT,
-      help: 'Name by which you refer to a variable',
+      help: ManualConfig["help"]["let-var-field"],
       key: 'field',
     },
     {
@@ -202,7 +202,7 @@ export const letVarDisplay =
     },
     {
       displayType: CARDTEXT,
-      help: 'Value to assign variable',
+      help: ManualConfig["help"]["expression"],
       key: 'expression',
     },
   ],

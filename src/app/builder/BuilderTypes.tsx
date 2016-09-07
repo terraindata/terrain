@@ -390,7 +390,7 @@ export module BuilderTypes
       
       static:
       {
-        manualEntry: ManualConfig[0]['sfw'],
+        manualEntry: ManualConfig['cards']['sfw'],
         colors: ["#89B4A7", "#C1EADE"],
         title: "Select / From",
         preview: "[tables.table]: [fields.length]",
@@ -426,7 +426,7 @@ export module BuilderTypes
               inner:
               {
                 displayType: DisplayType.TEXT,
-                help: 'The field that you are selecting',
+                help: ManualConfig["help"]["select-field"],
                 key: 'field'
               },
             },
@@ -444,7 +444,7 @@ export module BuilderTypes
               [  
                 {
                   displayType: DisplayType.TEXT,
-                  help: 'The table your are retrieving data from',
+                  help: ManualConfig["help"]["table"],
                   key: 'table',
                   getAutoTerms: () => Store.getState().get('tables'),
                 },
@@ -455,8 +455,7 @@ export module BuilderTypes
                 },
                 {
                   displayType: DisplayType.TEXT,
-
-                  help: 'The name of the variable retrieved from the data',
+                  help: ManualConfig["help"]["alias"],
                   key: 'alias',
                 },
               ],
@@ -488,7 +487,7 @@ export module BuilderTypes
         title: "Sort",
         preview: "[sorts.property]",
         colors: ["#C5AFD5", "#EAD9F7"],
-        manualEntry: ManualConfig[0]['sort'],
+        manualEntry: ManualConfig['cards']['sort'],
         tql: "sort $sorts",
         // tql: "ORDER BY $sorts",        
         display: {
@@ -502,14 +501,14 @@ export module BuilderTypes
             [
               {
                 displayType: DisplayType.TEXT,
-                help: 'Field by which to sort. For multiple sort fields, priority goes top to bottom.',
+                help: ManualConfig["help"]["property"],
                 key: 'property',
               },
               {
                 displayType: DisplayType.DROPDOWN,
                 key: 'direction',
                 options: Immutable.List(Directions),
-                help: 'Direction for sort (ascending or descending).'
+                help: ManualConfig["help"]["direction"],
               },
             ],
           },
@@ -527,7 +526,7 @@ export module BuilderTypes
         preview: "[filters.length] Condition(s)",
         colors: ["#7EAAB3", "#B9E1E9"],
         display: filtersDisplay,
-        manualEntry: ManualConfig[0]['filter'],
+        manualEntry: ManualConfig['cards']['filter'],
         tql: "$filters",
       },
     }),
@@ -542,7 +541,7 @@ export module BuilderTypes
         preview: "[field]",
         colors: ["#C0C0BE", "#E2E2E0"],
         display: letVarDisplay,
-        manualEntry: ManualConfig[0]['let'],
+        manualEntry: ManualConfig['cards']['let'],
         tql: "let $field = $expression",
         // tql: "LET $field = $expression", // **
         getNeighborTerms: (card) => List([card['field']]),
@@ -560,7 +559,7 @@ export module BuilderTypes
         preview: "[field]",
         display: letVarDisplay,
 
-        manualEntry: ManualConfig[0]['var'],
+        manualEntry: ManualConfig['cards']['var'],
         getNeighborTerms: (card) => List([card['field']]),
         // tql: "VAR $field = $expression",
         tql: "var $field = $expression", // **
@@ -571,7 +570,7 @@ export module BuilderTypes
     {
       colors: ["#70B1AC", "#D2F3F0"],
       title: "Count",
-      manualEntry: ManualConfig[0]['count'],
+      manualEntry: ManualConfig['cards']['count'],
       tql: "COUNT $cards",
     }),
     
@@ -579,7 +578,7 @@ export module BuilderTypes
     {
       colors: ["#a2b37e", "#c9daa6"],
       title: "Average",
-      manualEntry: ManualConfig[0]['avg'],
+      manualEntry: ManualConfig['cards']['avg'],
       tql: "AVG $cards",
     }),
     
@@ -587,7 +586,7 @@ export module BuilderTypes
     {
       colors: ["#8dc4c1", "#bae8e5"],
       title: "Sum",
-      manualEntry: ManualConfig[0]['sum'],
+      manualEntry: ManualConfig['cards']['sum'],
       tql: "SUM $cards",
     }),
 
@@ -595,7 +594,7 @@ export module BuilderTypes
     {
       colors: ["#cc9898", "#ecbcbc"],
       title: "Min",
-      manualEntry: ManualConfig[0]['min'],
+      manualEntry: ManualConfig['cards']['min'],
       tql: "MIN $cards",
     }),
 
@@ -603,7 +602,7 @@ export module BuilderTypes
     {
       colors: ["#8299b8", "#acc6ea"],
       title: "Max",
-      manualEntry: ManualConfig[0]['max'],
+      manualEntry: ManualConfig['cards']['max'],
       tql: "MAX $cards",
     }),
 
@@ -611,7 +610,7 @@ export module BuilderTypes
     {
       colors: ["#a98abf", "#cfb3e3"],
       title: "Exists",
-      manualEntry: ManualConfig[0]['exists'],
+      manualEntry: ManualConfig['cards']['exists'],
       tql: "EXISTS $cards",
     }),
 
@@ -619,7 +618,7 @@ export module BuilderTypes
     {
       colors: ["#b37e7e", "#daa3a3"],
       title: "( )",
-      manualEntry: ManualConfig[0]['parentheses'],
+      manualEntry: ManualConfig['cards']['parentheses'],
       tql: "($cards)",
     }),
     
@@ -642,7 +641,7 @@ export module BuilderTypes
         colors: ["#9DC3B8", "#D1EFE7"],
         title: "Score",
         preview: "[weights.length] Weight(s)",
-        manualEntry: ManualConfig[0]['score'],
+        manualEntry: ManualConfig['cards']['score'],
         tql: "linearScore([$weights])",
         display: {
           displayType: DisplayType.ROWS,
@@ -657,20 +656,20 @@ export module BuilderTypes
               {
                 displayType: DisplayType.TEXT,
                 key: 'key',
-                help: 'The attribute you want to add weight to',
+                help: ManualConfig["help"]["key"],
                 placeholder: 'Field',
               },
               {
                 displayType: DisplayType.NUM,
-                help: 'Numbered weight value to assign to the attribute',
+                help: ManualConfig["help"]["weight"],
                 key: 'weight',
                 placeholder: 'Weight',
               },
               {
                 displayType: DisplayType.COMPONENT,
                 component: ScoreBar,
-                key: null,
-                help: 'These bars show the weights of the scores visually',
+                key: 'score',
+                help: ManualConfig["help"]["score"],
               },
             ],
           },
@@ -716,7 +715,7 @@ export module BuilderTypes
       
       static:
       {
-        manualEntry: ManualConfig[0]['transform'],
+        manualEntry: ManualConfig['cards']['transform'],
         colors: ["#E7BE70", "#EDD8B1"],
         title: "Transform",
         preview: "[input]",
@@ -724,7 +723,7 @@ export module BuilderTypes
         display: [
           {
             displayType: DisplayType.TEXT,
-            help: 'The attribute you want to transform',
+            help: ManualConfig["help"]["input"],
             key: 'input',
             placeholder: 'Input field',
           },
@@ -732,12 +731,7 @@ export module BuilderTypes
             displayType: DisplayType.COMPONENT,
             component: TransformCardComponent,
             key: 'scorePoints',
-            help: 
-            ['The points can be dragged around via click and drag. Their position can also be manually\
-            changed by clicking a point and entering values into the textboxes that appear.\
-            To delete a point, right click on it. To create a new point, double click anywhere on the chart.', 
-            'The lines of the graph can also be moved by clicking and dragging.',
-            'Use these sliders at the bottom to change the domain of the graph.'],
+            help: ManualConfig["help"]["scorePoints"],
           },
         ],
         
@@ -774,7 +768,7 @@ export module BuilderTypes
     take: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
-      manualEntry: ManualConfig[0]['take'],
+      manualEntry: ManualConfig['cards']['take'],
       title: "Take / Limit",
       // tql: "LIMIT $value",
       tql: "take $value", // **
@@ -783,7 +777,7 @@ export module BuilderTypes
     skip: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
-      manualEntry: ManualConfig[0]['skip'],
+      manualEntry: ManualConfig['cards']['skip'],
       title: "Skip / Offset",
       // tql: "OFFSET $value",
       tql: "skip $value", // **
