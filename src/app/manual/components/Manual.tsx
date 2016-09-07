@@ -422,7 +422,6 @@ class Manual extends Classs<Props>
   renderLeftColumn()
   {
     var closeOpacity = this.state.value.length ? 1 : 0;
-
     return (
       <div className = 'manual-content-area'>
        <div  className= {classNames({
