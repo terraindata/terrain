@@ -70,7 +70,7 @@ export interface Display
   // key can be null for FLEX but nothing else
   
   //Manual information
-  helpInformation?: string | string[];
+  help?: string | string[];
 
   className?: string | ((data: any) => string);
   
@@ -118,7 +118,7 @@ export interface Display
 export const valueDisplay =
 {
   displayType: NUM,
-  helpInformation: 'Number value',
+  help: 'Number value',
   key: 'value',
 }
 
@@ -154,19 +154,19 @@ export const filtersDisplay =
         {
           displayType: CARDTEXT,
           key: 'first',
-          helpInformation: 'Value to compare',
+          help: 'Value to compare',
           top: true,
         },
         {
           displayType: DROPDOWN,
           key: 'operator',
           options: Immutable.List(Operators),
-          helpInformation: 'Operator for comparison, can be =, <, <=, >=, >, not =, in or not in',
+          help: 'Operator for comparison, can be =, <, <=, >=, >, not =, in or not in',
         },
         {
           displayType: CARDTEXT,
           key: 'second',
-          helpInformation: 'Value to compare',
+          help: 'Value to compare',
         },
         {
           displayType: DROPDOWN,
@@ -192,7 +192,7 @@ export const letVarDisplay =
   [
     {
       displayType: TEXT,
-      helpInformation: 'Name by which you refer to a variable',
+      help: 'Name by which you refer to a variable',
       key: 'field',
     },
     {
@@ -202,7 +202,7 @@ export const letVarDisplay =
     },
     {
       displayType: CARDTEXT,
-      helpInformation: 'Value to assign variable',
+      help: 'Value to assign variable',
       key: 'expression',
     },
   ],

@@ -82,12 +82,14 @@ class ManualEntry extends Classs<Props>
 {
 
   allTqlCards = BuilderTypes.cardList;
+
   manualEntry: any;
 
   constructor(props: Props) 
   {
     super(props);
-    this.manualEntry = this.props.phraseType ? ManualConfig[1][this.props.entryName] : BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
+    this.manualEntry = this.props.phraseType ? ManualConfig[1][this.props.entryName] : 
+      BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
     this.state =
       {
         expanded: this.props.expanded,
@@ -102,8 +104,9 @@ class ManualEntry extends Classs<Props>
         expanded: newProps.expanded
       });
     }
+    console.log(newProps.entryName);
     this.manualEntry = this.props.phraseType ? ManualConfig[1][newProps.entryName] : 
-        BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry;
+      BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry;
   }
 
   expand()
@@ -285,7 +288,7 @@ class ManualEntry extends Classs<Props>
     return (
       <div 
         className='manual-entry-codemirror'
-        style={{height: (numLines * 14 + padding) + 'px'}}
+        style={{height: (numLines * 17 + padding) + 'px'}}
       >
         <CodeMirror 
           options={options}
@@ -356,8 +359,7 @@ class ManualEntry extends Classs<Props>
     return (
       <div className ='manual-entry'> 
         {this.props.phraseType ? this.renderPhraseTypeEntry() : this.renderTqlCardEntry()}
-        <br />
-        <br />
+        <hr className ='manual-entry-line'/>
       </div>
     );
   }

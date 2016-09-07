@@ -156,6 +156,7 @@ export module BuilderTypes
 
   interface IManualEntry
   {
+    name: string;
     snippet: string;
     summary: string;
     notation: string;
@@ -425,7 +426,7 @@ export module BuilderTypes
               inner:
               {
                 displayType: DisplayType.TEXT,
-                helpInformation: 'The field that you are selecting',
+                help: 'The field that you are selecting',
                 key: 'field'
               },
             },
@@ -443,7 +444,7 @@ export module BuilderTypes
               [  
                 {
                   displayType: DisplayType.TEXT,
-                  helpInformation: 'The table your are retrieving data from',
+                  help: 'The table your are retrieving data from',
                   key: 'table',
                   getAutoTerms: () => Store.getState().get('tables'),
                 },
@@ -455,7 +456,7 @@ export module BuilderTypes
                 {
                   displayType: DisplayType.TEXT,
 
-                  helpInformation: 'The name of the variable retrieved from the data',
+                  help: 'The name of the variable retrieved from the data',
                   key: 'alias',
                 },
               ],
@@ -501,14 +502,14 @@ export module BuilderTypes
             [
               {
                 displayType: DisplayType.TEXT,
-                helpInformation: 'Field by which to sort. For multiple sort fields, priority goes top to bottom.',
+                help: 'Field by which to sort. For multiple sort fields, priority goes top to bottom.',
                 key: 'property',
               },
               {
                 displayType: DisplayType.DROPDOWN,
                 key: 'direction',
                 options: Immutable.List(Directions),
-                helpInformation: 'Direction for sort (ascending or descending).'
+                help: 'Direction for sort (ascending or descending).'
               },
             ],
           },
@@ -656,12 +657,12 @@ export module BuilderTypes
               {
                 displayType: DisplayType.TEXT,
                 key: 'key',
-                helpInformation: 'The attribute you want to add weight to',
+                help: 'The attribute you want to add weight to',
                 placeholder: 'Field',
               },
               {
                 displayType: DisplayType.NUM,
-                helpInformation: 'Numbered weight value to assign to the attribute',
+                help: 'Numbered weight value to assign to the attribute',
                 key: 'weight',
                 placeholder: 'Weight',
               },
@@ -669,7 +670,7 @@ export module BuilderTypes
                 displayType: DisplayType.COMPONENT,
                 component: ScoreBar,
                 key: null,
-                helpInformation: 'These bars show the weights of the scores visually',
+                help: 'These bars show the weights of the scores visually',
               },
             ],
           },
@@ -723,7 +724,7 @@ export module BuilderTypes
         display: [
           {
             displayType: DisplayType.TEXT,
-            helpInformation: 'The attribute you want to transform',
+            help: 'The attribute you want to transform',
             key: 'input',
             placeholder: 'Input field',
           },
@@ -731,7 +732,7 @@ export module BuilderTypes
             displayType: DisplayType.COMPONENT,
             component: TransformCardComponent,
             key: 'scorePoints',
-            helpInformation: 
+            help: 
             ['The points can be dragged around via click and drag. Their position can also be manually\
             changed by clicking a point and entering values into the textboxes that appear.\
             To delete a point, right click on it. To create a new point, double click anywhere on the chart.', 
@@ -839,6 +840,16 @@ export module BuilderTypes
   
   // array of different card types
   export const CardTypes = _.compact(_.map(Blocks, (block, k: string) => block._isCard && k ));
+
+  var cards = {};
+  for(var key in Blocks)
+  {
+    if(Blocks[key]._isCard)
+    {
+      cards[Blocks[key].static.manualEntry.name] = key;
+    }
+  }
+  export const cardList = cards;
   
 
   export const cardList = _.compact(_.map(Blocks, (block, k: string) => {

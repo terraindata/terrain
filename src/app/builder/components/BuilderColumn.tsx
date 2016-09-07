@@ -123,9 +123,10 @@ var BuilderColumn = React.createClass<any, any>(
     colKey: React.PropTypes.number.isRequired,
     history: React.PropTypes.any,
     onRevert: React.PropTypes.func,
-    column: React.PropTypes.number,
+    columnType: React.PropTypes.number,
     cardName: React.PropTypes.string,
     switchToManualCol: React.PropTypes.func,
+    changeCardName: React.PropTypes.func,
   },
   
   getInitialState()
@@ -140,7 +141,7 @@ var BuilderColumn = React.createClass<any, any>(
       }
     }
     return {
-      column: this.props.column ? this.props.column : column,
+      column: this.props.columnType ? this.props.columnType : column,
       loading: false,
       inputKeys: this.calcinputKeys(this.props),
       // rand: 1,
@@ -269,6 +270,7 @@ var BuilderColumn = React.createClass<any, any>(
       case COLUMNS.Manual:
         return <Manual 
           selectedKey={this.props.cardName}
+          changeCardName={this.props.changeCardName}
         />;
     }
     return <div>No column content.</div>;
