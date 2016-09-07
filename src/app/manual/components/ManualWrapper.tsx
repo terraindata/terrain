@@ -69,8 +69,7 @@ class ManualWrapper extends Classs<Props>
 
 	render()
 	{
-		var path = this.props.location.pathname.split('/');
-		var selected = path.length > 2 ? path[2] : '';
+		var selected = this.props.params['term']
 		return <Manual 
 			selectedKey={decodeURIComponent(selected)}
 			history={this.props.history}

@@ -105,12 +105,21 @@ class Manual extends Classs<Props>
 
   componentWillReceiveProps(nextProps)
   {
-    if((this.state.selectedKey !== nextProps.selectedKey) && !this.props.manualTab)
+    if((this.state.selectedKey !== nextProps.selectedKey))
     {
-      this.setState({
-        selectedKey: nextProps.selectedKey
-      });
-      this.search(nextProps.selectedKey);
+      if(!this.props.manualTab)
+      {
+        this.setState({
+          selectedKey: nextProps.selectedKey
+        });
+        this.search(nextProps.selectedKey);
+      } else if(nextProps.selectedKey !== '')
+      {
+        this.setState({
+          selectedKey: nextProps.selectedKey
+        });
+        this.search(nextProps.selectedKey);
+      }
     }
   }
 

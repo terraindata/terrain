@@ -478,7 +478,7 @@ export module BuilderTypes
       },
     }),
     
-    sort: _card(
+   sort: _card(
     {
       sorts: List([]),
       
