@@ -46,6 +46,7 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import PureClasss from './../common/components/PureClasss.tsx';
 import {Operators, Combinators} from './BuilderTypes.tsx';
+var ManualConfig = require('./../manual/ManualConfig.json');
 
 var ManualConfig = require('./../manual/ManualConfig.json');
 

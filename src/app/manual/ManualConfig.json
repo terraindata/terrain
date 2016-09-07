@@ -1177,7 +1177,8 @@
       ]
     }
   },
-  "help": {
+  "help": 
+  {
     "value": "Number value",
     "first": "Value to compare",
     "operator": "Operator for comparison, can be =, <, <=, >, >= in or not in",
