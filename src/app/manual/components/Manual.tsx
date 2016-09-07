@@ -76,7 +76,7 @@ class Manual extends Classs<Props>
 {
   allTqlCards = Object.keys(BuilderTypes.cardList).sort();
 
-  allPhraseTypes = Object.keys(ManualConfig[1]).sort();
+  allPhraseTypes = Object.keys(ManualConfig.phraseTypes).sort();
   autocompleteOptions = Immutable.List(this.allPhraseTypes.concat(this.allTqlCards).sort());
 
   constructor(props: Props)
@@ -148,7 +148,7 @@ class Manual extends Classs<Props>
 
   renderPhraseTypesList()
   {
-    var height = 22 * Object.keys(ManualConfig[1]).length;
+    var height = 22 * Object.keys(ManualConfig.phraseTypes).length;
     var style = this.state.expandPhraseTypes ? {maxHeight: height + 'px'} : {maxHeight: '0px'};
     return (
       <div className='manual-sidebar-section' style={style}>
@@ -412,7 +412,7 @@ class Manual extends Classs<Props>
 
   renderLeftColumn()
   {
-    var style = this.props.manualTab ? {height: 'calc(100% - 60px)'} : {height: 'calc(100% - 25px)'};
+    var style = this.props.manualTab ? {height: '100%'} : {height: 'calc(100% - 25px)'};
     var closeOpacity = this.state.value.length ? 1 : 0;
 
     return (
