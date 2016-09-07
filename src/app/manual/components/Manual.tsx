@@ -84,15 +84,30 @@ class Manual extends Classs<Props>
     super(props);
     var value = this.props.selectedKey || '';
     var tqlCards = this.allTqlCards.filter((key) =>
-    {
-       return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
-    });
+      {
+         return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
+      });
+
     var phraseTypes = this.allPhraseTypes.filter((key) =>
     {
        return key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
     });
+
+    if(this.props.selectedKey === 'TQL Cards')
+    {
+      value = '';
+      tqlCards = this.allTqlCards;
+      phraseTypes = [];
+    } 
+    else if(this.props.selectedKey === 'Phrase Types')
+    {
+      value = '';
+      phraseTypes = this.allPhraseTypes;
+      tqlCards = [];
+    }
+
     this.state = {
-      expanded: this.props.selectedKey,
+      expanded: value,
       visibleTqlCards: tqlCards,
       visiblePhraseTypes: phraseTypes,
       value,
@@ -117,18 +132,7 @@ class Manual extends Classs<Props>
         this.setState({
           selectedKey: nextProps.selectedKey
         });
-        if(nextProps.selectedKey === 'TQL Cards')
-        {
-          this.showTqlCards();
-        } 
-        else if (nextProps.selectedKey === 'Phrase Types')
-        {
-          this.showPhraseTypes();
-        }
-        else 
-        {
-          this.search(nextProps.selectedKey);
-        }
+        this.search(nextProps.selectedKey);
     }
   }
 
@@ -257,6 +261,17 @@ class Manual extends Classs<Props>
 
   search(value)
   {
+    if(value === 'TQL Cards')
+    {
+      this.showTqlCards();
+      return;
+    }
+    else if(value === 'Phrase Types')
+    {
+      this.showPhraseTypes();
+      return;
+    }
+
     var visibleTqlCards = this.allTqlCards.filter((key) => {
       return (key.toLowerCase().indexOf(value.toLowerCase()) >= 0);
     }).sort();
