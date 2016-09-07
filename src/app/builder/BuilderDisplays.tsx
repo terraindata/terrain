@@ -48,6 +48,9 @@ import PureClasss from './../common/components/PureClasss.tsx';
 import {Operators, Combinators} from './BuilderTypes.tsx';
 var ManualConfig = require('./../manual/ManualConfig.json');
 
+var ManualConfig = require('./../manual/ManualConfig.json');
+
+
 export enum DisplayType
 {
   TEXT,
@@ -119,7 +122,7 @@ export interface Display
 export const valueDisplay =
 {
   displayType: NUM,
-  help: ManualConfig["help"]["value"],
+  help: ManualConfig.help["value"],
   key: 'value',
 }
 
@@ -155,19 +158,19 @@ export const filtersDisplay =
         {
           displayType: CARDTEXT,
           key: 'first',
-          help: ManualConfig["help"]["first"],
+          help: ManualConfig.help["first"],
           top: true,
         },
         {
           displayType: DROPDOWN,
           key: 'operator',
           options: Immutable.List(Operators),
-          help: ManualConfig["help"]["operator"],
+          help: ManualConfig.help["operator"],
         },
         {
           displayType: CARDTEXT,
           key: 'second',
-          help: ManualConfig["help"]["second"],
+          help: ManualConfig.help["second"],
         },
         {
           displayType: DROPDOWN,
@@ -193,7 +196,7 @@ export const letVarDisplay =
   [
     {
       displayType: TEXT,
-      help: ManualConfig["help"]["let-var-field"],
+      help: ManualConfig.help["let-var-field"],
       key: 'field',
     },
     {
@@ -203,7 +206,7 @@ export const letVarDisplay =
     },
     {
       displayType: CARDTEXT,
-      help: ManualConfig["help"]["expression"],
+      help: ManualConfig.help["expression"],
       key: 'expression',
     },
   ],

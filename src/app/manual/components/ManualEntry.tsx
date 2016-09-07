@@ -291,7 +291,6 @@ class ManualEntry extends Classs<Props>
 
   renderInDepthDescription()
   {
-    var style = this.props.manualTab ? {} : {width: '90%', left: '0%'};
     return (
         <div> 
         {
@@ -310,8 +309,10 @@ class ManualEntry extends Classs<Props>
               return (
                  <div 
                    key ={index} 
-                   className='manual-entry-demo-box'
-                   style={style}
+                    className={classNames({
+                      'manual-entry-demo-box': true,
+                      'manual-entry-in-depth': !this.props.manualTab,
+                    })}
                  >
                    {this.renderCardExample(index)}
                    {this.renderCodeMirrorExample(index)}

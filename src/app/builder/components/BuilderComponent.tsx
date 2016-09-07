@@ -298,6 +298,7 @@ class BuilderComponent extends PureClasss<Props>
               parentData: this.props.parentData,
               canEdit: this.props.canEdit,
               keys: this.props.keys,
+              helpOn: this.props.helpOn,
             })}
             { this.props.helpOn && d.help ?
               (
