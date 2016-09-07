@@ -116,6 +116,23 @@ class ManualEntry extends Classs<Props>
     }); 
   }
 
+  findKeywords(text, words, className)
+  {
+    var matchForm = new RegExp('(' + words.join('[^A-Za-z]|') + '[^A-Za-z])', 'gi');
+
+    text = reactStringReplace(text, matchForm, (match, i) => (
+      <span       
+        className={className} 
+        onClick={this.props.openTerm}
+        key={Math.random()}
+      >
+        {match}
+      </span>
+    ));
+    return text;
+  }
+
+
   highlightKeyWords(text)
   {
     if (!text) return;
@@ -126,30 +143,9 @@ class ManualEntry extends Classs<Props>
     //Separate multi-word keywords like 'Take Limit' into sep. keywords
     keywords = keywords.join(' ').split(' ');
 
-    var matchForm = new RegExp('[^A-Za-z](' + keywords.join('|') + ')[^A-Za-z]', 'gi');
+    text = this.findKeywords(text, keywords, 'manual-entry-keyword');
+    text = this.findKeywords(text, Object.keys(ManualConfig[1]), 'manual-entry-phrase-type');
 
-    text = reactStringReplace(text, matchForm, (match, i) => (
-      <span       
-        className='manual-entry-keyword' 
-        onClick={this.props.openTerm}
-        key={Math.random()}
-      >
-        {' ' + match + ' '}
-      </span>
-    ));
-
-    var phraseTypes = Object.keys(ManualConfig[1]).sort((a, b) => {return b.split(' ').length - a.split(' ').length});
-    matchForm = new RegExp('(' + phraseTypes.join('|') + ')', 'gi');
-    text = reactStringReplace(text, matchForm, (match, i) => (
-      <span         
-        className='manual-entry-phrase-type' 
-        onClick={this.props.openTerm}
-        key={Math.random()}
-      >
-        {match}
-      </span>
-    ));
-    
     return (
       <div> 
         {text}
@@ -188,20 +184,18 @@ class ManualEntry extends Classs<Props>
   renderPhraseTypeInDepth()
   {
     return (
-        <div> 
+      <div> 
         {
-          Object.keys(this.manualEntry.text).map((result, index) => {
-              return (
-                <div key ={index} className='manual-entry-row'>
-                {
-                  this.highlightKeyWords(this.manualEntry.text[index])
-                }
-                <br/>
-                </div> 
-                );
-          })
+        Object.keys(this.manualEntry.text).map((result, index) => {
+          return (
+            <div key ={index} className='manual-entry-row'>
+              {this.highlightKeyWords(result)}
+              <br/>
+            </div> 
+          );
+        })
         } 
-        </div>
+      </div>
     );
   }
 
@@ -241,8 +235,6 @@ class ManualEntry extends Classs<Props>
   renderCardExample(index) 
   {
     var card = BuilderTypes.recordFromJS(this.manualEntry.text[index]);
-    var keys = Immutable.List([]);
-    var keyPath = Immutable.List(["manual", "a", "cards"]);
     return (
       <div className='manual-entry-demo'>
         <Card
@@ -251,8 +243,8 @@ class ManualEntry extends Classs<Props>
           index={0}
           parentId='CI2XI'
           singleCard={false}
-          keys={keys}
-          keyPath={keyPath}
+          keys={Immutable.List([])}
+          keyPath={Immutable.List([])}
           helpOn={this.manualEntry.text[index].helpOn}
         /> 
       </div>

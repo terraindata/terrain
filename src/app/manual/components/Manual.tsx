@@ -74,7 +74,7 @@ interface Props
 
 class Manual extends Classs<Props>
 {
-  allTqlCards = Object.keys(BuilderTypes.cardList);
+  allTqlCards = Object.keys(BuilderTypes.cardList).sort();
 
   allPhraseTypes = Object.keys(ManualConfig[1]).sort();
   autocompleteOptions = Immutable.List(this.allPhraseTypes.concat(this.allTqlCards).sort());
@@ -194,7 +194,7 @@ class Manual extends Classs<Props>
         </div>
       );
     }
-    var style = this.props.manualTab ? {height: 'calc(100% - 60px)'} : {height: 'calc(100% - 25px)'};
+    var style = this.props.manualTab ? {height: '100%'} : {height: 'calc(100% - 25px)'};
     return (
       <div className={classNames({
             'manual-content-area': true,
@@ -263,7 +263,7 @@ class Manual extends Classs<Props>
 
     if(this.props.manualTab)
     {
-      this.props.history.pushState({}, '/manual/' + value);
+      this.props.history.pushState({}, '/manual/' + encodeURIComponent(value));
     }
     this.props.changeCardName && this.props.changeCardName(selectedKey);
     this.setState({

@@ -417,7 +417,7 @@ class Card extends PureClasss<Props>
                     { BuilderTypes.getPreview(card) }
                   </span>
                   <ManualPopup 
-                    cardName={card.static.title.replace(' / ', ' ')} 
+                    cardName={card.static.title} 
                     style={manualPopupStyle}
                     addColumn={this.props.addColumn}
                     index={this.props.colIndex}
