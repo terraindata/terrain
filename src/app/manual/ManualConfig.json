@@ -1177,7 +1177,8 @@
       ]
     }
   },
-  "help": {
+  "help": 
+  {
     "value": "Number value",
     "first": "Value to compare",
     "operator": "Operator for comparison, can be =, <, <=, >, >= in or not in",
@@ -1190,14 +1191,9 @@
     "weight": "Numbered weight value to assign to the attribute",
     "score": "These bars visually show the weights of the scores",
     "input": "The attribute being transformed",
-    "scorePoints": [  
-      "The points can be dragged around via click and drag. Their position can also be manually changed by clicking a point and entering values into the textboxes that appear. To delete a point, right click on it. To create a new point, double click anywhere on the chart.",
-      "The lines of the graph can also be moved by clicking and dragging.",
-      "Use these sliders at the bottom to change the domain of the graph."
-    ],
+    "scorePoints": ["a", "b", "c"],
     "select-field": "The field being selected",
     "table": "The table that data is being retrieved from",
-    "alias": "The alias for the data retrieved from the table",
-    ""
+    "alias": "The alias for the data retrieved from the table"
   }
 }
