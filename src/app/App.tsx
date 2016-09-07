@@ -85,7 +85,7 @@ var BrowserIcon = require("./../images/icon_browser_20x16.svg?name=BrowserIcon")
 var BuilderIcon = require("./../images/icon_reporting_18x18.svg?name=BuilderIcon");
 var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIcon");
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
-var ManualIcon = require ("./../images/icon_manual.svg")
+var ManualIcon = require ("./../images/icon_info.svg")
 
 import AuthActions from "./auth/data/AuthActions.tsx";
 import AuthStore from "./auth/data/AuthStore.tsx";

@@ -414,7 +414,6 @@ class Manual extends Classs<Props>
   {
     var style = this.props.manualTab ? {height: '100%'} : {height: 'calc(100% - 25px)'};
     var closeOpacity = this.state.value.length ? 1 : 0;
-
     return (
       <div 
         className ='manual-content-area'
