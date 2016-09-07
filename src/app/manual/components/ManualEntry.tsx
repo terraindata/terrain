@@ -88,7 +88,7 @@ class ManualEntry extends Classs<Props>
   constructor(props: Props) 
   {
     super(props);
-    this.manualEntry = this.props.phraseType ? ManualConfig[1][this.props.entryName] : 
+    this.manualEntry = this.props.phraseType ? ManualConfig.phraseTypes[this.props.entryName] : 
       BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
     this.state =
       {
@@ -104,7 +104,7 @@ class ManualEntry extends Classs<Props>
         expanded: newProps.expanded
       });
     }
-    this.manualEntry = this.props.phraseType ? ManualConfig[1][newProps.entryName] : 
+    this.manualEntry = this.props.phraseType ? ManualConfig.phraseTypes[newProps.entryName] : 
       BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry;
   }
 
@@ -143,7 +143,7 @@ class ManualEntry extends Classs<Props>
     keywords = keywords.join(' ').split(' ');
 
     text = this.findKeywords(text, keywords, 'manual-entry-keyword');
-    text = this.findKeywords(text, Object.keys(ManualConfig[1]), 'manual-entry-phrase-type');
+    text = this.findKeywords(text, Object.keys(ManualConfig.phraseTypes), 'manual-entry-phrase-type');
 
     return (
       <div> 

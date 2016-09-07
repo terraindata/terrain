@@ -1,5 +1,5 @@
-[
-  {
+{
+  "cards": {
    "sfw":
     { 
       "name": "Select / From",
@@ -1135,7 +1135,7 @@
       ]
     }
   },
-  {
+  "phraseTypes": {
     "Expression":
     {  
       "summary": "A TQL expression is any valid combination of expressions and operators that returns a single value.",
@@ -1176,5 +1176,28 @@
         "You implement a prefix or postfix unary operator by writing the prefix modifier before the func keyword when declaring the operator function."
       ]
     }
+  },
+  "help": {
+    "value": "Number value",
+    "first": "Value to compare",
+    "operator": "Operator for comparison, can be =, <, <=, >, >= in or not in",
+    "second": "Value to compare",
+    "let-var-field": "Name by which variable is referred",
+    "expression": "Value to assign variable",
+    "property": "Field by whicht to sort. For multiple sort fields, priotity goes top to bottom",
+    "direction": "Direction for sort (ascending or descending)",
+    "key": "The attribute being weighted",
+    "weight": "Numbered weight value to assign to the attribute",
+    "score": "These bars visually show the weights of the scores",
+    "input": "The attribute being transformed",
+    "scorePoints": [  
+      "The points can be dragged around via click and drag. Their position can also be manually changed by clicking a point and entering values into the textboxes that appear. To delete a point, right click on it. To create a new point, double click anywhere on the chart.",
+      "The lines of the graph can also be moved by clicking and dragging.",
+      "Use these sliders at the bottom to change the domain of the graph."
+    ],
+    "select-field": "The field being selected",
+    "table": "The table that data is being retrieved from",
+    "alias": "The alias for the data retrieved from the table",
+    ""
   }
-]
+}
