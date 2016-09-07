@@ -284,16 +284,8 @@ class Manual extends Classs<Props>
   {
     var closeOpacity = this.state.value.length ? 1 : 0;
     return (
-       <div className = {classNames({
-         'manual-topbar': true,
-         'builder-manual-topbar': !this.props.manualTab,
-       })}
-       >
-
-          <div className= {classNames({
-           'manual-search-bar': true,
-           'manual-tab-search-bar': this.props.manualTab,
-          })}>
+       <div className = 'manual-topbar builder-manual-topbar'>
+          <div className= 'manual-search-bar'>
               <SearchIcon className ='manual-search-icon'/>
               <Autocomplete
                 className='manual-search-input'
@@ -434,21 +426,21 @@ class Manual extends Classs<Props>
            'manual-tab-search-bar': this.props.manualTab,
            'manual-sidebar-search': true,
           })}>
-       <SearchIcon className ='manual-search-icon'/>
-              <Autocomplete
+            <SearchIcon className ='manual-search-icon'/>
+            <Autocomplete
                 className='manual-search-input'
                 value={this.state.value as string}
                 onChange={this.search}
                 placeholder='Search'
                 options={this.autocompleteOptions}
-              />
-              <CloseIcon 
+            />
+            <CloseIcon 
                className='manual-close-icon'
                style={{
                  opacity: closeOpacity,
                }}
                onClick={this.clearInput}
-              />
+            />
       </div> 
 
       <div className={classNames({

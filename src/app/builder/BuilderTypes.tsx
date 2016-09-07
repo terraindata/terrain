@@ -851,6 +851,7 @@ export module BuilderTypes
   }
   export const cardList = cards;
   
+
   // private, maps a type (string) to the backing Immutable Record
   let typeToRecord = _.reduce(Blocks as ({[card:string]:any}), 
     (memo, v, i) => {
@@ -858,6 +859,8 @@ export module BuilderTypes
       return memo;
     }
   , {});
+
+
 
   // Given a plain JS object, construct the Record for it and its children  
   export const recordFromJS = (value: any) =>
