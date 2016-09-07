@@ -79,7 +79,7 @@ interface Props
   keyPath: KeyPath;
 
   addColumn?: (number, string?) => void;
-  colIndex?: number;
+  columnIndex?: number;
   
   isDragging?: boolean;
   connectDragPreview?: (a?:any) => void;
@@ -346,7 +346,7 @@ class Card extends PureClasss<Props>
       data={this.props.card}
       helpOn={this.props.helpOn}
       addColumn={this.props.addColumn}
-      colIndex={this.props.colIndex}
+      columnIndex={this.props.columnIndex}
       keyPath={
         this.props.singleCard
         ? this.props.keyPath
@@ -360,7 +360,6 @@ class Card extends PureClasss<Props>
 			</div>
 		);
     
-    var manualPopupStyle = this.props.canEdit ? {} : {right: '4px'}
     let {card} = this.props;
 		let {title} = card.static;
     const { isDragging, connectDragSource } = this.props;
@@ -418,9 +417,9 @@ class Card extends PureClasss<Props>
                   </span>
                   <ManualPopup 
                     cardName={card.static.title} 
-                    style={manualPopupStyle}
+                    rightAlign={!this.props.canEdit}
                     addColumn={this.props.addColumn}
-                    index={this.props.colIndex}
+                    columnIndex={this.props.columnIndex}
                   />
                   {
                     this.props.canEdit && <Menu options={this.state.menuOptions} />

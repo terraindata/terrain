@@ -58,7 +58,7 @@ interface Props
   text: string;
   style?: any;
   addColumn: (number, string?) => void;
-  index: number;
+  columnIndex: number;
   onClick?: () => void;
 }
 
@@ -67,7 +67,7 @@ class TQLPopup extends Classs<Props>
   openManual()
   {
     this.props.onClick && this.props.onClick();
-    this.props.addColumn(this.props.index, this.props.cardName);
+    this.props.addColumn(this.props.columnIndex, this.props.cardName);
   }
 
   render() 

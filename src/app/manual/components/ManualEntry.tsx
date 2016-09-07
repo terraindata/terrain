@@ -53,7 +53,6 @@ var ManualConfig = require('./../ManualConfig.json');
 var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
 import BuilderTypes from './../../builder/BuilderTypes.tsx';
 import Card from './../../builder/components/cards/Card.tsx';
-import ManualInfo from './ManualInfo.tsx';
 import * as Immutable from 'immutable';
 import TQLConverter from '../../tql/TQLConverter.tsx';
 
@@ -83,29 +82,24 @@ class ManualEntry extends Classs<Props>
 
   allTqlCards = BuilderTypes.cardList;
 
-  manualEntry: any;
-
   constructor(props: Props) 
   {
     super(props);
-    this.manualEntry = this.props.phraseType ? ManualConfig.phraseTypes[this.props.entryName] : 
-      BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry;
     this.state =
       {
         expanded: this.props.expanded,
+        manualEntry: this.props.phraseType ? ManualConfig.phraseTypes[this.props.entryName] : 
+          BuilderTypes.Blocks[this.allTqlCards[this.props.entryName]].static.manualEntry,
       }
   }
 
   componentWillReceiveProps(newProps)
   {
-    if(this.state.expanded !== newProps.expanded)
-    {
-      this.setState({
-        expanded: newProps.expanded
-      });
-    }
-    this.manualEntry = this.props.phraseType ? ManualConfig.phraseTypes[newProps.entryName] : 
-      BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry;
+    this.setState({
+      expanded: newProps.expanded,
+      manualEntry: this.props.phraseType ? ManualConfig.phraseTypes[newProps.entryName] : 
+        BuilderTypes.Blocks[this.allTqlCards[newProps.entryName]].static.manualEntry,
+    });
   }
 
   expand()
@@ -157,10 +151,10 @@ class ManualEntry extends Classs<Props>
     return (
       <div className='manual-entry-expanded-area'>
         <div className ='manual-entry-row'>
-          <b>Notation:</b>&nbsp;{this.highlightKeyWords(this.manualEntry.notation)}
+          <b>Notation:</b>&nbsp;{this.highlightKeyWords(this.state.manualEntry.notation)}
         </div> 
         <div className ='manual-entry-row'>
-          <b>Syntax:</b>&nbsp;{this.highlightKeyWords(this.manualEntry.syntax)}
+          <b>Syntax:</b>&nbsp;{this.highlightKeyWords(this.state.manualEntry.syntax)}
         </div> 
         <div className ='maunual-entry-indepth'>
            {this.renderInDepthDescription()}
@@ -185,7 +179,7 @@ class ManualEntry extends Classs<Props>
     return (
       <div> 
         {
-        Object.keys(this.manualEntry.text).map((result, index) => {
+        this.state.manualEntry.text.map((result, index) => {
           return (
             <div key ={index} className='manual-entry-row'>
               {this.highlightKeyWords(result)}
@@ -225,7 +219,7 @@ class ManualEntry extends Classs<Props>
       </div>
 
       <div className ='manual-entry-summary'>
-        {this.highlightKeyWords(this.manualEntry.summary)}
+        {this.highlightKeyWords(this.state.manualEntry.summary)}
       </div>
     </div>    
     );
@@ -233,7 +227,7 @@ class ManualEntry extends Classs<Props>
 
   renderCardExample(index) 
   {
-    var card = BuilderTypes.recordFromJS(this.manualEntry.text[index]);
+    var card = BuilderTypes.recordFromJS(this.state.manualEntry.text[index]);
     return (
       <div className='manual-entry-demo'>
         <Card
@@ -244,7 +238,7 @@ class ManualEntry extends Classs<Props>
           singleCard={false}
           keys={Immutable.List([])}
           keyPath={Immutable.List([])}
-          helpOn={this.manualEntry.text[index].helpOn}
+          helpOn={this.state.manualEntry.text[index].helpOn}
         /> 
       </div>
     );
@@ -260,7 +254,7 @@ class ManualEntry extends Classs<Props>
       foldGutter: true,
       gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
     }
-    var cards = Immutable.List([BuilderTypes.recordFromJS(this.manualEntry.text[index])]);
+    var cards = Immutable.List([BuilderTypes.recordFromJS(this.state.manualEntry.text[index])]);
     var query: BuilderTypes.IQuery = {
       id: 'a',
       cards: cards,
@@ -295,12 +289,12 @@ class ManualEntry extends Classs<Props>
     return (
         <div> 
         {
-          Object.keys(this.manualEntry.text).map((result, index) => {
-            if (typeof this.manualEntry.text[index] === 'string'){
+          Object.keys(this.state.manualEntry.text).map((result, index) => {
+            if (typeof this.state.manualEntry.text[index] === 'string'){
               return (
                 <div key ={index}>
                 {
-                  this.highlightKeyWords(this.manualEntry.text[index])
+                  this.highlightKeyWords(this.state.manualEntry.text[index])
                 }
                 <br/>
                 </div> 

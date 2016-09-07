@@ -93,7 +93,7 @@ interface Props {
   onLoadStart: () => void;
   onLoadEnd: () => void;
   addColumn?: (number, string?) => void;
-  index: number;
+  columnIndex: number;
 }
 
 class TQL extends Classs<Props>
@@ -492,7 +492,7 @@ class TQL extends Classs<Props>
                text={manualEntry ? manualEntry.syntax : 'No syntax help available'}
                style={this.state.syntaxHelpPos}
                addColumn={this.props.addColumn}
-               index={this.props.index}
+               columnIndex={this.props.columnIndex}
                onClick={this.turnSyntaxPopupOff}  
             />
             : null
@@ -504,7 +504,7 @@ class TQL extends Classs<Props>
               text={manualEntry ? manualEntry.summary : 'No definition available'}
                style={this.state.termDefinitionPos}
                addColumn={this.props.addColumn}
-               index={this.props.index}  
+               columnIndex={this.props.columnIndex}  
                onClick={this.turnSyntaxPopupOff}  
             />
             : null

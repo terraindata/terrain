@@ -57,6 +57,7 @@ interface Props
 {
   history?: any;
   location?: any;
+  params?: any;
 }
 
 class ManualWrapper extends Classs<Props>

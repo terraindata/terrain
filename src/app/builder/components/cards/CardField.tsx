@@ -83,7 +83,7 @@ interface Props
   // as it will cause re-renders
   helpOn?: boolean;
   addColumn?: (number, string?) => void;
-  colIndex?: number;
+  columnIndex?: number;
 }
 
 interface IMoveState
@@ -343,7 +343,7 @@ class CardField extends PureClasss<Props>
               parentData={this.props.parentData}
               helpOn={this.props.helpOn}
               addColumn={this.props.addColumn}
-              colIndex={this.props.colIndex}
+              columnIndex={this.props.columnIndex}
             />
         }
         <div
@@ -367,7 +367,7 @@ class CardField extends PureClasss<Props>
                   this.props.helpOn ?
                   <ManualInfo 
                     information="Can move fields around within the current card by dragging and dropping"
-                    style= {{top: '7px', right: '-12px'}}
+                    className='card-field-manual-info'
                     leftSide={true}
                   />
                   : null
@@ -384,7 +384,7 @@ class CardField extends PureClasss<Props>
               parentData={this.props.parentData}
               helpOn={this.props.helpOn}
               addColumn={this.props.addColumn}
-              colIndex={this.props.colIndex}
+              columnIndex={this.props.columnIndex}
             />
   				</div>
   				<div className='card-field-tools-right'>
@@ -401,8 +401,8 @@ class CardField extends PureClasss<Props>
                   this.props.helpOn ?
                   <ManualInfo 
                     information="Can add field using the plus button or remove fields using the x button"
-                    style= {{top: '9px', right: '-10px'}}
                     rightSide={true}
+                    className='card-field-manual-info'
                   />
                   : null
                 }
@@ -427,7 +427,7 @@ class CardField extends PureClasss<Props>
               parentData={this.props.parentData}
               helpOn={this.props.helpOn}
               addColumn={this.props.addColumn}
-              colIndex={this.props.colIndex}
+              columnIndex={this.props.columnIndex}
             />
         }
       </div>

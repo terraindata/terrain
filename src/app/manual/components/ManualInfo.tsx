@@ -53,10 +53,10 @@ import Classs from './../../common/components/Classs.tsx';
 interface Props
 {
   information: string,
-  style?: any,
   wide?: boolean,
   rightSide?: boolean;
   leftSide?: boolean
+  className?: string;
 }
 
 
@@ -70,7 +70,7 @@ class ManualInfo extends Classs<Props>
   render() 
   {
     return (
-      <div className='manual-info-wrapper' style={this.props.style}>
+      <div className={'manual-info-wrapper ' + this.props.className} >
         <div className='manual-info-indicator'></div>
         <div 
           className={classNames({

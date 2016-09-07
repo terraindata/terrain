@@ -56,9 +56,9 @@ var OpenIcon = require('./../../../images/icon_open.svg');
 interface Props
 {
   cardName: string;
-  style?: any;
+  rightAlign?: boolean;
   addColumn: (number, string?) => void;
-  index: number;
+  columnIndex: number;
 }
 
 class ManualPopup extends Classs<Props>
@@ -103,7 +103,7 @@ class ManualPopup extends Classs<Props>
   
   openManual()
   {
-    this.props.addColumn(this.props.index, this.props.cardName);
+    this.props.addColumn(this.props.columnIndex, this.props.cardName);
   }
 
   render() 
@@ -117,8 +117,8 @@ class ManualPopup extends Classs<Props>
       className={classNames({
         "manual-popup-wrapper": true,
         "manual-popup-open": this.state.open,
+        "manual-popup-wrapper-right-align": this.props.rightAlign
       })}
-      style={this.props.style}
     >
       <div 
         className="manual-popup-icon-wrapper"

@@ -72,7 +72,7 @@ interface Props
   keyPath: KeyPath;
   
   addColumn?: (number, string?) => void;
-  index?: number;
+  columnIndex?: number;
   className?: string;
   queryId?: ID;
   spotlights?: List<any>;
@@ -209,7 +209,7 @@ class CardsArea extends PureClasss<Props>
           cards.map((card:ICard, index:number) =>
             <Card 
               {...this.props}
-              colIndex={this.props.index}
+              columnIndex={this.props.columnIndex}
               helpOn={this.state.learningMode || this.props.helpOn}
               cards={null}
               key={card.id}

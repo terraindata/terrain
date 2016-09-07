@@ -95,14 +95,14 @@ class Builder extends PureClasss<Props>
     colKeys: List<number>;
     noColumnAnimation: boolean;
     columnType: number;
-    cardName: string;
+    selectedCardName: string;
     manualIndex: number;
   } = {
     builder: Store.getState(),
     colKeys: null,
     noColumnAnimation: false,
     columnType: null,
-    cardName: '',
+    selectedCardName: '',
     manualIndex: -1,
   };
   
@@ -354,9 +354,9 @@ class Builder extends PureClasss<Props>
         history={this.props.history}
         onRevert={this.save}
         columnType={this.state.columnType}
-        cardName={this.state.cardName}
+        selectedCardName={this.state.selectedCardName}
         switchToManualCol={this.switchToManualCol}
-        changeCardName={this.changeCardName}
+        changeSelectedCardName={this.changeSelectedCardName}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key,
@@ -370,14 +370,14 @@ class Builder extends PureClasss<Props>
     });
   }
 
-  changeCardName(cardName)
+  changeSelectedCardName(selectedCardName)
   {
     this.setState({
-      cardName
+      selectedCardName
     })
   }
 
-  addManualColumn(index, cardName?)
+  addManualColumn(index, selectedCardName?)
   {
     index = index + 1;
     var newKey = Math.random();
@@ -385,7 +385,7 @@ class Builder extends PureClasss<Props>
     this.setState({
       colKeys,
       columnType: 4,
-      cardName,
+      selectedCardName,
       manualIndex: index
     }); 
     localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
@@ -396,13 +396,12 @@ class Builder extends PureClasss<Props>
     }
   }
 
-  handleAddManualColumn(index, cardName?)
+  handleAddManualColumn(index, selectedCardName?)
   {
     if(this.state.manualIndex !== -1) //Manual column already open
     {
-      //issue: this doesn't cause column to update if the cardName doesn't change
       this.setState({
-        cardName
+        selectedCardName
       });
     }
     else 
@@ -412,7 +411,7 @@ class Builder extends PureClasss<Props>
         var closeIndex = index < 2 ? 2 : 1;
         this.handleCloseColumn(closeIndex);
       }
-        this.addManualColumn(index, cardName);
+        this.addManualColumn(index, selectedCardName);
     }
   }
 

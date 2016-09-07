@@ -55,6 +55,7 @@ import Dropdown from '../../common/components/Dropdown.tsx';
 import CardsArea from './cards/CardsArea.tsx';
 import BuilderTextboxCards from '../../common/components/BuilderTextboxCards.tsx';
 import ManualInfo from '../../manual/components/ManualInfo.tsx';
+import * as classNames from 'classnames';
 
 interface Props
 {
@@ -70,7 +71,7 @@ interface Props
   helpOn?: boolean;
 
   addColumn?: (number, string?) => void;
-  colIndex?: number;
+  columnIndex?: number;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
 }
@@ -112,7 +113,7 @@ class BuilderComponent extends PureClasss<Props>
             parentData={this.props.parentData}
             helpOn={this.props.helpOn}
             addColumn={this.props.addColumn}
-            colIndex={this.props.colIndex}
+            columnIndex={this.props.columnIndex}
           />
         ) as El[];
       // return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
@@ -173,7 +174,7 @@ class BuilderComponent extends PureClasss<Props>
           className={className}
           helpOn={this.props.helpOn}
           addColumn={this.props.addColumn}
-          index={this.props.colIndex}
+          columnIndex={this.props.columnIndex}
         />;
       break;
       case DisplayType.CARDTEXT:
@@ -188,12 +189,12 @@ class BuilderComponent extends PureClasss<Props>
           keys={this.props.keys}
           helpOn={this.props.helpOn}
           addColumn={this.props.addColumn}
-          colIndex={this.props.colIndex}
+          columnIndex={this.props.columnIndex}
         />;
       break;
       case DisplayType.DROPDOWN:
         content = (
-          <div key={key} style={{position: 'relative'}}>
+          <div key={key} className='builder-component-wrapper'>
             <Dropdown
               canEdit={this.props.canEdit}
               className={className}
@@ -204,7 +205,7 @@ class BuilderComponent extends PureClasss<Props>
             { this.props.helpOn && d.help ?
               <ManualInfo
                 information={d.help as string}
-                style={{right: '10px', top: 'calc(50% - 4px)'}}
+                className='builder-component-help-right'
               />
               : null
             }  
@@ -228,7 +229,7 @@ class BuilderComponent extends PureClasss<Props>
                 parentData={this.props.parentData}
                 helpOn={this.props.helpOn}
                 addColumn={this.props.addColumn}
-                colIndex={this.props.colIndex}
+                columnIndex={this.props.columnIndex}
               />
             </div>
             { !d.below ? null : 
@@ -241,7 +242,7 @@ class BuilderComponent extends PureClasss<Props>
                 parentData={this.props.parentData}
                 helpOn={this.props.helpOn}
                 addColumn={this.props.addColumn}
-                colIndex={this.props.colIndex}
+                columnIndex={this.props.columnIndex}
               />
             }
           </div>
@@ -271,7 +272,7 @@ class BuilderComponent extends PureClasss<Props>
                   parentData={d.provideParentData && data}
                   helpOn={this.props.helpOn}
                   addColumn={this.props.addColumn}
-                  colIndex={this.props.colIndex}
+                  columnIndex={this.props.columnIndex}
                 />
               ))
             }
@@ -291,7 +292,10 @@ class BuilderComponent extends PureClasss<Props>
         let Comp = d.component;
         var isTransformCard = d.key === 'scorePoints';
         content = (
-          <div key={key} style={{width: '100%', position: 'relative'}}>
+          <div 
+            key={key} 
+            className='builder-component-wrapper builder-component-wrapper-wide'
+          >
             {React.cloneElement(<Comp />, {
               keyPath,
               data,
@@ -303,33 +307,22 @@ class BuilderComponent extends PureClasss<Props>
               (
                 isTransformCard ?
                 (d.help as string[]).map((info, index) => {
-                  if(index === 0) 
-                  {
-                    var style = {left: '45%', top: '28%'};
-                    var wide = true;
-                  } 
-                  else if(index === 1)
-                  {
-                    var style = {left: '16%', top: '50%'};
-                    wide = false
-                  }
-                  else 
-                  {
-                    var style = {left: '0%', top: '90%'};
-                    wide = false
-                  }
                   return <ManualInfo 
                     information={info as string}
-                    style={style}
-                    wide={wide}
+                    wide={index === 0}
                     key={'info' + index}
                     leftSide={index===2}
+                    className={classNames({
+                      'builder-component-help-transform-center': index === 0,
+                      'builder-component-help-transform-left': index === 1,
+                      'builder-component-help-transform-bottom': index === 2 
+                    })}
                   /> 
                 })
                 :
                 <ManualInfo 
                   information={d.help as string}
-                  style={{right: '10px', top: 'calc(50% - 4px)'}}
+                  className='builder-component-help-right'
                 /> 
               )
               : null
@@ -346,7 +339,10 @@ class BuilderComponent extends PureClasss<Props>
     if(isTextbox)
     {
       content = (
-        <div key={key} style={{width: '100%', position: 'relative'}}>
+        <div 
+          key={key} 
+          className='builder-component-wrapper builder-component-wrapper-wide'
+        >
         <BuilderTextbox
           keys={
             d.getAutoTerms ? d.getAutoTerms() : this.props.keys
@@ -367,7 +363,7 @@ class BuilderComponent extends PureClasss<Props>
           this.props.helpOn && d.help ?
           <ManualInfo 
             information={d.help as string}
-            style = {{right:'10px', top: 'calc(50% - 4px)'}}
+            className='builder-component-help-right'
           />
           : null
         }
