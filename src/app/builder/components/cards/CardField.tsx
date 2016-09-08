@@ -50,6 +50,7 @@ import Util from '../../../util/Util.tsx';
 import PureClasss from '../../../common/components/PureClasss.tsx';
 import BuilderComponent from '../BuilderComponent.tsx';
 import {Display} from '../../BuilderDisplays.tsx';
+import ManualInfo from '../../../manual/components/ManualInfo.tsx';
 const classNames = require('classnames');
 
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
@@ -80,6 +81,9 @@ interface Props
   parentData?: any;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
+  helpOn?: boolean;
+  addColumn?: (number, string?) => void;
+  columnIndex?: number;
 }
 
 interface IMoveState
@@ -337,6 +341,9 @@ class CardField extends PureClasss<Props>
               canEdit={this.props.canEdit}
               keys={this.props.keys}
               parentData={this.props.parentData}
+              helpOn={this.props.helpOn}
+              addColumn={this.props.addColumn}
+              columnIndex={this.props.columnIndex}
             />
         }
         <div
@@ -352,10 +359,19 @@ class CardField extends PureClasss<Props>
             <div className='card-field-tools-left-inner'>
               <div
                 className='card-field-handle'
-                onMouseDown={this.handleHandleMousedown}
+                onMouseDown={this.props.canEdit ? this.handleHandleMousedown : null}
               >
                 ⋮⋮
               </div>
+              {
+                  this.props.helpOn ?
+                  <ManualInfo 
+                    information="Can move fields around within the current card by dragging and dropping"
+                    className='card-field-manual-info'
+                    leftSide={true}
+                  />
+                  : null
+                }
             </div>
           </div>
   				<div className='card-field-inner' >
@@ -366,6 +382,9 @@ class CardField extends PureClasss<Props>
               canEdit={this.props.canEdit}
               keys={this.props.keys}
               parentData={this.props.parentData}
+              helpOn={this.props.helpOn}
+              addColumn={this.props.addColumn}
+              columnIndex={this.props.columnIndex}
             />
   				</div>
   				<div className='card-field-tools-right'>
@@ -373,15 +392,24 @@ class CardField extends PureClasss<Props>
               <div>
                 <div
                   className='card-field-add'
-                  onClick={this.addField}
-                  data-tip='Add another'
+                  onClick={this.props.canEdit ? this.addField : null}
+                  data-tip={this.props.canEdit ? 'Add another' : null}
                 >
                   <AddIcon />
                 </div> 
+                {
+                  this.props.helpOn ?
+                  <ManualInfo 
+                    information="Can add field using the plus button or remove fields using the x button"
+                    rightSide={true}
+                    className='card-field-manual-info'
+                  />
+                  : null
+                }
                 <div
                   className='card-field-remove'
-                  onClick={this.removeField}
-                  data-tip='Remove'
+                  onClick={this.props.canEdit ? this.removeField : null}
+                  data-tip={this.props.canEdit ? 'Remove' : null}
                 >
                   <RemoveIcon />
                 </div>
@@ -397,6 +425,9 @@ class CardField extends PureClasss<Props>
               canEdit={this.props.canEdit}
               keys={this.props.keys}
               parentData={this.props.parentData}
+              helpOn={this.props.helpOn}
+              addColumn={this.props.addColumn}
+              columnIndex={this.props.columnIndex}
             />
         }
       </div>

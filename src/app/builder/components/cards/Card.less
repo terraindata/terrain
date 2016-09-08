@@ -1,6 +1,7 @@
 @import "../../../common/Common.less";
 
 @card-title-color: @white;
+@top-height: 24px;
 
 .card {
  // .standard-margin;
@@ -25,13 +26,28 @@
     // }
   }
   
-  .menu-wrapper:not(.menu-open) {
+  .menu-wrapper:not(.menu-open), .manual-popup-wrapper:not(.manual-popup-open) {
     opacity: 0;
     .transition;
   }
   
+  &.card-hovering {
+    .menu-wrapper, .manual-popup-wrapper {
+      opacity: 1;
+    }
+    .card {
+      .menu-wrapper:not(.menu-open), .manual-popup-wrapper:not(.manual-popup-open) {
+        opacity: 0;
+      }
+    }
+  }
+
+  
   .card-title-card-hovering {
     .menu-wrapper {
+      opacity: 1;
+    }
+    .manual-popup-wrapper {
       opacity: 1;
     }
   }
@@ -443,4 +459,20 @@
 
 .transform-card {
   text-align: center;
+}
+
+.cards-area-top-bar{
+  background: #fff;
+  padding: 3px;
+  box-sizing: border-box;
+  height: @top-height;
+  display: flex;
+
+  .switch-small{
+    width: 150px !important;
+  }
+}
+
+.cards-area-white-space{
+  flex:1;
 }

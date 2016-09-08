@@ -94,10 +94,16 @@ class Builder extends PureClasss<Props>
     builder: BuilderState,
     colKeys: List<number>;
     noColumnAnimation: boolean;
+    columnType: number;
+    selectedCardName: string;
+    manualIndex: number;
   } = {
     builder: Store.getState(),
     colKeys: null,
     noColumnAnimation: false,
+    columnType: null,
+    selectedCardName: '',
+    manualIndex: -1,
   };
   
   constructor(props:Props)
@@ -117,7 +123,15 @@ class Builder extends PureClasss<Props>
       var colKeys = List([Math.random(), Math.random()]);
       localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
     }
+    
+    if(localStorage.getItem('selectedCardName'))
+    {
+      this.state.selectedCardName = localStorage.getItem('selectedCardName');
+    }
+
     this.state.colKeys = colKeys;
+
+    this.addManualColumn = _.debounce(this.addManualColumn, 1);
   }
   
   componentWillMount()
@@ -339,17 +353,76 @@ class Builder extends PureClasss<Props>
         query={query}
         index={index}
         onAddColumn={this.handleAddColumn}
+        onAddManualColumn={this.handleAddManualColumn}
         onCloseColumn={this.handleCloseColumn}
         canAddColumn={this.state.colKeys.size < 3}
         canCloseColumn={this.state.colKeys.size > 1}
         history={this.props.history}
         onRevert={this.save}
+        columnType={this.state.columnType}
+        selectedCardName={this.state.selectedCardName}
+        switchToManualCol={this.switchToManualCol}
+        changeSelectedCardName={this.changeSelectedCardName}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key,
     }
   }
-  
+
+  switchToManualCol(index)
+  {
+    this.setState({
+      manualIndex: index
+    });
+  }
+
+  changeSelectedCardName(selectedCardName)
+  {
+    this.setState({
+      selectedCardName
+    });
+    localStorage.setItem('selectedCardName', selectedCardName);
+  }
+
+  addManualColumn(index, selectedCardName?)
+  {
+    index = index + 1;
+    var newKey = Math.random();
+    let colKeys = this.state.colKeys.splice(index, 0, newKey);
+    this.setState({
+      colKeys,
+      columnType: 4,
+      selectedCardName,
+      manualIndex: index
+    }); 
+    localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
+    if(localStorage.getItem('colKeyTypes'))
+    {
+      var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes'));
+      colKeyTypes[newKey] = 4;
+      localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
+    } 
+  }
+
+  handleAddManualColumn(index, selectedCardName?)
+  {
+    if(this.state.manualIndex !== -1) //Manual column already open
+    {
+      this.setState({
+        selectedCardName
+      });
+    }
+    else 
+    {
+      if(this.state.colKeys.size === 3)
+      {
+        var closeIndex = index < 2 ? 2 : 1;
+        this.handleCloseColumn(closeIndex);
+      }
+        this.addManualColumn(index, selectedCardName);
+    }
+  }
+
   handleAddColumn(index)
   {
     index = index + 1;
@@ -365,10 +438,11 @@ class Builder extends PureClasss<Props>
     let oldKey = this.state.colKeys[index];
     let colKeys = this.state.colKeys.splice(index, 1);
     this.setState({
-      colKeys,
+      colKeys: colKeys,
+      manualIndex: (index === this.state.manualIndex) ? -1 : this.state.manualIndex,
+      columnType: 0
     }); 
     localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
-    
     if(localStorage.getItem('colKeyTypes'))
     {
       var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes'));
@@ -429,7 +503,6 @@ class Builder extends PureClasss<Props>
 	render()
   {
     let config = this.props.params.config;
-    
     return (
       <div className={classNames({
         'builder': true,

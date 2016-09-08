@@ -121,7 +121,6 @@ class TQLConverter
         {
           if(card.type === 'select')
           {
-            console.log(card);
             return card.set('properties', Immutable.List(['*']));
           }
           return card;

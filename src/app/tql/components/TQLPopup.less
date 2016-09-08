@@ -1,0 +1,41 @@
+@import "../../common/Common.less";
+
+.tql-editor-popup {
+  color: #3e3c3c;
+  background-color: white;
+  height: auto;
+  width: 150px;
+  position: fixed;
+  z-index: 9999;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  padding-bottom: 20px;
+  box-shadow: 0px 0px 3px #888888;
+  .manual-popup-link {
+    padding-bottom: 5px;
+  }
+}
+
+.tql-editor-popup:before, .tql-editor-popup:after {
+    content: "";
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    left: 6px;
+    top: -7px;
+}
+
+.tql-editor-popup:before {
+    border-bottom: 9px solid fade(#888888, 50%);
+    border-right: 8px solid transparent;
+    border-left: 8px solid transparent;
+    top: -8px;
+    left: 5px;
+}
+
+.tql-editor-popup:after {
+    border-bottom: 8px solid #fff;
+    border-right: 7px solid transparent;
+    border-left: 7px solid transparent;
+}

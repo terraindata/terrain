@@ -55,6 +55,8 @@ var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateCardTool from './CreateCardTool.tsx';
+// import Menu from '../../../common/components/Menu.tsx';
+import ManualPopup from './../../../manual/components/ManualPopup.tsx';
 import { Menu, MenuOption } from '../../../common/components/Menu.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import BuilderTypes from './../../BuilderTypes.tsx';
@@ -71,13 +73,19 @@ interface Props
   card: BuilderTypes.ICard;
   index: number;
   singleCard?: boolean;
+
   keys: List<string>;
   canEdit: boolean;
   keyPath: KeyPath;
+
+  addColumn?: (number, string?) => void;
+  columnIndex?: number;
   
   isDragging?: boolean;
   connectDragPreview?: (a?:any) => void;
   connectDragSource?: (el: El) => El;
+
+  helpOn?: boolean;
 }
 
 class Card extends PureClasss<Props>
@@ -152,6 +160,7 @@ class Card extends PureClasss<Props>
             hovering: false,
           });
         }
+
       }
     });
   }
@@ -335,6 +344,9 @@ class Card extends PureClasss<Props>
       keys={this.state.allTerms}
       canEdit={this.props.canEdit}
       data={this.props.card}
+      helpOn={this.props.helpOn}
+      addColumn={this.props.addColumn}
+      columnIndex={this.props.columnIndex}
       keyPath={
         this.props.singleCard
         ? this.props.keyPath
@@ -403,6 +415,12 @@ class Card extends PureClasss<Props>
                   })}>
                     { BuilderTypes.getPreview(card) }
                   </span>
+                  <ManualPopup 
+                    cardName={card.static.title} 
+                    rightAlign={!this.props.canEdit}
+                    addColumn={this.props.addColumn}
+                    columnIndex={this.props.columnIndex}
+                  />
                   {
                     this.props.canEdit && <Menu options={this.state.menuOptions} />
                   }

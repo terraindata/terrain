@@ -55,6 +55,9 @@ interface Props
   keyPath: KeyPath;
   keys: List<string>;
   canEdit: boolean;
+  helpOn?: boolean;
+  addColumn?: (number, string?) => void;
+  columnIndex: number;
 }
 
 class BuilderTextboxCards extends React.Component<Props, any>

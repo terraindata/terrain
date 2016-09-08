@@ -857,7 +857,7 @@ var TransformChart = {
       y_raw, 
       x_raw, 
       pointValues, 
-      scales.realX.invert(parseInt(point.attr('cx'))),
+      scales.realX.invert(parseFloat(point.attr('cx'))),
       d3.event['altKey']  
     ); 
 

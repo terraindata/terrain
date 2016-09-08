@@ -42,108 +42,111 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./AccountEntry.less');
+require('./ManualPopup.less');
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs.tsx';
-var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
+import BuilderTypes from './../../builder/BuilderTypes.tsx';
+var InfoIcon = require('./../../../images/icon_info.svg');
+var OpenIcon = require('./../../../images/icon_open.svg');
 
 interface Props
 {
-  title: string;
-  description?: JSX.Element;
-  content?: JSX.Element;
-  buttonText?: JSX.Element;
-  lastEntry?: boolean;
+  cardName: string;
+  rightAlign?: boolean;
+  addColumn: (number, string?) => void;
+  columnIndex: number;
 }
 
-
-class AccountEntry extends Classs<Props>
+class ManualPopup extends Classs<Props>
 {
-  constructor(props: Props) 
-  {
+  constructor(props: Props) {
     super(props);
     this.state =
-      {
-        expanded: false,
-      }
+    {
+      open: false,
+    }
   }
-
-  expand()
+  
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  }
+  
+  close()
   {
     this.setState({
-      expanded: !this.state.expanded
-    }); 
+      open: false,
+    })
+    $(document).off('click', this.close);
   }
-
-  renderContent()
+  
+  componentWillUnmount()
   {
-    if (this.state.expanded) 
+    $(document).off('click', this.close);
+  }
+  
+  toggleOpen()
+  {
+    this.setState({
+      open: !this.state.open,
+    });
+    
+    if(!this.state.open)
     {
-      return this.props.content;
+      $(document).on('click', this.close);
     }
   }
-
-  renderDescription()
+  
+  openManual()
   {
-    if (this.props.description)
-     {
-      return <div className='account-entry-description'>{this.props.description}</div>;
-    }
+    this.props.addColumn(this.props.columnIndex, this.props.cardName);
   }
 
-  renderDefaultButton()
+  render() 
   {
+
+    var manualEntry = BuilderTypes.cardList[this.props.cardName] 
+        && BuilderTypes.Blocks[BuilderTypes.cardList[this.props.cardName]].static.manualEntry;
+    var content = manualEntry ? manualEntry.snippet : 'No description available';
     return (
-        <div className='account-entry-expand-button button' onClick={this.expand}>
-            {this.state.expanded ? 'Collapse' : 'Expand'}
-        </div>
-      );
-  }
-
-  renderButton()
-  {
-    if (this.props.buttonText)
-    {
-      return (
-        <div> 
-          {this.props.buttonText} 
-        </div>
-      );
-    }
-    return this.renderDefaultButton();
-  }
-
-  renderLine() 
-  {
-    if(!this.props.lastEntry)
-    {
-      return (<hr className ='account-entry-line'/>);
-    }
-    return <hr className ='account-entry-line settings-line-hidden'/>;
-  }
-
-  render() {
-    return (
-      <div className='account-entry'> 
-      <div className='account-entry-top-bar'> 
-        <div className='account-entry-title'>
-          {this.props.title}   
-        </div> 
-        <div className='account-entry-white-space' />
-        {this.renderButton()}
-      </div> 
-      {this.renderDescription()}
-      <div className='account-entry-expanded-info'>
-        {this.renderContent()}
+    <div 
+      className={classNames({
+        "manual-popup-wrapper": true,
+        "manual-popup-open": this.state.open,
+        "manual-popup-wrapper-right-align": this.props.rightAlign
+      })}
+    >
+      <div 
+        className="manual-popup-icon-wrapper"
+        onClick={this.toggleOpen}
+      >
+        <InfoIcon className="manual-popup-icon" />
+       </div>
+        { !this.state.open ? null :
+          <div 
+            className="manual-popup-content-wrapper"
+            onClick={this.toggleOpen}
+          >
+            {content}
+            <div 
+              className='manual-popup-link'
+              onClick={this.openManual}
+            >
+              See full description in Manual
+              <OpenIcon 
+                className='manual-popup-open-icon' 
+                onClick={this.openManual}
+              />
+            </div>
+          </div>
+        }
       </div>
-      {this.renderLine()}
-    </div>
     );
   }
 };
 
-export default AccountEntry;
+export default ManualPopup;
