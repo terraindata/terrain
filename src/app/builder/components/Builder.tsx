@@ -123,6 +123,12 @@ class Builder extends PureClasss<Props>
       var colKeys = List([Math.random(), Math.random()]);
       localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
     }
+    
+    if(localStorage.getItem('selectedCardName'))
+    {
+      this.state.selectedCardName = localStorage.getItem('selectedCardName');
+    }
+
     this.state.colKeys = colKeys;
 
     this.addManualColumn = _.debounce(this.addManualColumn, 1);
@@ -374,7 +380,8 @@ class Builder extends PureClasss<Props>
   {
     this.setState({
       selectedCardName
-    })
+    });
+    localStorage.setItem('selectedCardName', selectedCardName);
   }
 
   addManualColumn(index, selectedCardName?)

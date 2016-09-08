@@ -298,7 +298,9 @@ class Manual extends Classs<Props>
     {
       this.props.history.pushState({}, '/manual/' + encodeURIComponent(value));
     }
-    this.props.changeCardName && this.props.changeCardName(selectedKey);
+
+    this.props.changeCardName && this.props.changeCardName(value);
+
     this.setState({
       visibleTqlCards,
       visiblePhraseTypes,
