@@ -459,6 +459,11 @@
                   "property": "product.score",
                   "type": "sortBlock"
                 }]
+              },
+              {
+                "id": "z",
+                "type": "take",
+                "value": "100"
               }
             ],
             "fields": [
