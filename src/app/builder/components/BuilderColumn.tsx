@@ -147,6 +147,14 @@ var BuilderColumn = React.createClass<any, any>(
       // rand: 1,
     }
   },
+
+  componentDidMount()
+  {
+    if(this.state.column === 4)
+    {
+      this.props.switchToManualCol(this.props.index);
+    }
+  },
   
   shouldComponentUpdate(nextProps, nextState)
   {
@@ -281,6 +289,10 @@ var BuilderColumn = React.createClass<any, any>(
     if(index === 4)
     {
       this.props.switchToManualCol(this.props.index);
+    }
+    else if(this.state.column === 4)
+    {
+      this.props.switchToManualCol(-1);
     }
     
     this.setState({
