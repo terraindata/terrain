@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./BuilderComponent.less');
+
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import {Display, DisplayType} from './../BuilderDisplays.tsx';
@@ -188,6 +189,7 @@ class BuilderComponent extends PureClasss<Props>
           keyPath={keyPath}
           keys={this.props.keys}
           key={key + 'cards'}
+          className={className}
         />;
       break;
       case DisplayType.DROPDOWN:

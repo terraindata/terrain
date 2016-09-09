@@ -291,9 +291,9 @@ export module BuilderTypes
           if(c.cards.size)
           {
             let card = c.cards.get(0);
-            return getPreview(card);
+            return config.title + ": " + getPreview(card);
           }
-          return "Nothing";
+          return config.title + ": Nothing";
         },
         
         display: (config.display || wrapperDisplay),
@@ -361,7 +361,7 @@ export module BuilderTypes
       static:
       {
         title: config.title,
-        preview: '[clauses.length]',
+        preview: '[clauses.length] ' + config.english + ' clauses',
         colors: ["#47a7ff", "#97d7ff"],
         tql: "$clauses",
         tqlJoiner: config.tqlGlue,
@@ -369,21 +369,30 @@ export module BuilderTypes
         display: {
           displayType: DisplayType.ROWS,
           key: 'clauses',
-          english: config.english,
+          english: "'" + config.english + "'",
           factoryType: config.factoryType,
+          className: (card) => {
+            if(card['clauses'].size && typeof card['clauses'].get(0) !== 'string')
+            {
+              return 'multi-field-card-padding';
+            }
+            return '';
+          },
+          
           row:
           {
-            above:
+            below:
             {
               displayType: DisplayType.CARDSFORTEXT,
               key: 'clause',
+              className: 'multi-field-card-padding-row',
             },
             
             inner: 
             {
               displayType: DisplayType.CARDTEXT,
               key: 'clause',
-              top: true,
+              top: false,
             },
           }
         },
@@ -445,10 +454,17 @@ export module BuilderTypes
     }),
     
     multiand: _multiAndOrCard({
-      title: "And-n",
+      title: "And",
       factoryType: 'andBlock',
-      english: "'and'",
+      english: "and",
       tqlGlue: ' AND ',
+    }),
+    
+    multior: _multiAndOrCard({
+      title: "Or",
+      factoryType: 'orBlock',
+      english: "or",
+      tqlGlue: ' OR ',
     }),
     
     sortBlock: _block(
@@ -501,8 +517,8 @@ export module BuilderTypes
       static:
       {
         colors: ["#89B4A7", "#C1EADE"],
-        title: "Select / From",
-        preview: "[tables.table]: [fields.length]",
+        title: "From",
+        preview: "[tables.table]",
         tql: "SELECT $fields \nFROM $tables \n$cards",
         // tql: "from $tables \nfilter $filters \n$cards \nselect $fields",  // **
         
@@ -523,25 +539,8 @@ export module BuilderTypes
             , List([])),
           
         display: [
-          {
-            header: 'Select',
-            headerClassName: 'sfw-select-header',
-            displayType: DisplayType.ROWS,
-            key: 'fields',
-            english: 'field',
-            factoryType: 'field',
-            row:
-            {
-              inner:
-              {
-                displayType: DisplayType.TEXT,
-                key: 'field'
-              },
-            },
-          },
           
           {
-            header: 'From',
             displayType: DisplayType.ROWS,
             key: 'tables',
             english: 'table',
@@ -568,6 +567,22 @@ export module BuilderTypes
             },
           },
           
+          {
+            header: 'Select',
+            headerClassName: 'sfw-select-header',
+            displayType: DisplayType.ROWS,
+            key: 'fields',
+            english: 'field',
+            factoryType: 'field',
+            row:
+            {
+              inner:
+              {
+                displayType: DisplayType.TEXT,
+                key: 'field'
+              },
+            },
+          },
           {
             displayType: DisplayType.CARDS,
             key: 'cards',
@@ -597,6 +612,7 @@ export module BuilderTypes
           {
             displayType: DisplayType.CARDSFORTEXT,
             key: 'clause',
+            className: 'wrapper-cards-content',
           }
         ]
       }
@@ -646,8 +662,21 @@ export module BuilderTypes
       
       static:
       {
-        title: "Comparison",
-        preview: (c:ICard) => `${c['first']} ${Operators[c['operator']]} ${c['second']}`,
+        title: "Compare",
+        preview: (c:ICard) => {
+          var first = c['first'];
+          var second = c['second'];
+          if(typeof first !== 'string')
+          {
+            first = getPreview(first);
+          }
+          if(typeof second !== 'string')
+          {
+            second = getPreview(second);
+          }
+          
+          return `${first} ${Operators[c['operator']]} ${second}`
+        },
         colors: ["#7EAAB3", "#B9E1E9"],
         tql: "$first $OPERATOR $second",
         
@@ -924,7 +953,7 @@ export module BuilderTypes
     take: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
-      title: "Take / Limit",
+      title: "Limit",
       tql: "LIMIT $value",
       // tql: "take $value", // **
     }),
@@ -932,7 +961,7 @@ export module BuilderTypes
     skip: _valueCard(
     {
       colors: ["#CDCF85", "#F5F6B3"],
-      title: "Skip / Offset",
+      title: "Offset",
       tql: "OFFSET $value",
       // tql: "skip $value", // **
     }),

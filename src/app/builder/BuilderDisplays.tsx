@@ -133,6 +133,7 @@ export const firstSecondDisplay = (middle:Display): Display =>
   {
     displayType: CARDSFORTEXT,
     key: 'first',
+    className: 'card-double-first',
   },
   
   below:
@@ -162,6 +163,7 @@ export const wrapperDisplay =
 {
   displayType: CARDS,
   key: 'cards',
+  className: 'wrapper-cards-content',
 };
 
 export const letVarDisplay =
