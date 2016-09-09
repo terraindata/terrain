@@ -284,9 +284,12 @@ var Ajax = {
     // });
     
     return Ajax._req('POST', "/query", JSON.stringify({
-        [btoa("timestamp")]: btoa((new Date()).toISOString()),
-        [btoa("unique_id")]: btoa("" + Math.random()),
-        [btoa("query_string")]: btoa(encode_utf8(tql)),
+        // [btoa("timestamp")]: btoa((new Date()).toISOString()),
+        // [btoa("unique_id")]: btoa("" + Math.random()),
+        // [btoa("query_string")]: btoa(encode_utf8(tql)),
+        "timestamp": (new Date()).toISOString(),
+        "unique_id": "" + Math.random(),
+        "query_string": encode_utf8(tql),
       }),
       (resp) =>
       {
