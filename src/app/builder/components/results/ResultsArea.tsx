@@ -60,6 +60,7 @@ import Switch from './../../../common/components/Switch.tsx';
 import BuilderTypes from '../../BuilderTypes.tsx';
 
 const RESULTS_PAGE_SIZE = 25;
+const MAX_RESULTS = 75;
 
 interface Props
 {
@@ -79,6 +80,7 @@ class ResultsArea extends PureClasss<Props>
     resultsWithAllFields: any[];
     resultText: string;
     resultType: string;
+    numResults: number;
     
     tql: string;
     error: any;
@@ -95,6 +97,7 @@ class ResultsArea extends PureClasss<Props>
     onResultsLoaded: (unchanged?: boolean) => void;
   } = {
     results: null,
+    numResults: null,
     resultsWithAllFields: null,
     resultsConfig: null,
     resultText: null,
@@ -113,7 +116,6 @@ class ResultsArea extends PureClasss<Props>
   constructor(props:Props)
   {
     super(props);
-    
     this.state.resultsConfig = this.getResultsConfig()[this.props.query.id];
   }
   
@@ -211,18 +213,26 @@ class ResultsArea extends PureClasss<Props>
   
   handleRequestMoreResults(onResultsLoaded: (unchanged?: boolean) => void)
   {
-    if(this.state.loadedResultsPages !== this.state.resultsPages)
-    {
-      // still loading a previous request
-      return;
-    }
+    // if(this.state.loadedResultsPages !== this.state.resultsPages)
+    // {
+    //   // still loading a previous request
+    //   return;
+    // }
     
     let pages = this.state.resultsPages + 1;
     this.setState({
       resultsPages: pages,
       onResultsLoaded,
     });
-    this.queryResults(this.props.query, pages);
+    let reachedEnd = this.state.numResults <= this.state.resultsPages * RESULTS_PAGE_SIZE;
+    console.log(reachedEnd);
+    if(!reachedEnd)
+    {
+      setTimeout(() =>
+        onResultsLoaded(reachedEnd)
+      , 250);
+    }
+    // this.queryResults(this.props.query, pages);
   }
   
   resultsFodderRange = _.range(0, 25);
@@ -280,7 +290,13 @@ class ResultsArea extends PureClasss<Props>
       >
         {
           this.state.results.map((result, index) => 
-            <Result
+          {
+            if(index > this.state.resultsPages * RESULTS_PAGE_SIZE)
+            {
+              return null;
+            }
+            
+            return <Result
               data={result}
               allFieldsData={this.state.resultsWithAllFields && this.state.resultsWithAllFields[index]}
               config={this.state.resultsConfig}
@@ -290,6 +306,7 @@ class ResultsArea extends PureClasss<Props>
               key={index}
               format={this.state.resultFormat}
             />
+          }
           )
         }
         {
@@ -299,81 +316,56 @@ class ResultsArea extends PureClasss<Props>
     );
   }
   
-  handleAllFieldsResponse(response)
+  handleAllFieldsResponse(results)
   {
-    this.handleResultsChange(response, true);
+    this.handleResultsChange(results, true);
   }
   
   timeout = null;
   
-  handleResultsChange(response, isAllFields?: boolean)
+  handleResultsChange(results, isAllFields?: boolean)
   {
     let xhrKey = isAllFields ? 'allXhr' : 'xhr';
     if(!this[xhrKey]) return;
     this[xhrKey] = null;
     
-    var result;
-    try {
-      var result = JSON.parse(response).result;
-    } catch(e) {
-      this.setState({
-        error: "No response was returned from the server.",
-        // TODO add error
-      });
-      return; 
-    }
-    
-    this.props.onLoadEnd && this.props.onLoadEnd();
-    if(result)
+    if(results)
     {
-      if(result.error)
+      var numResults = results.length;
+      if(numResults > MAX_RESULTS)
       {
-        this.setState({
-          error: "Error on line " + result.line+": " + result.error,
-          querying: false,
-          results: null,
-          resultType: null,
-        });
+        results.splice(MAX_RESULTS, results.length - MAX_RESULTS);
       }
-      else if(result.raw_result)
+      
+      if(isAllFields)
       {
         this.setState({
-          error: "Error with query: " + result.raw_result,
-          querying: false,
-          results: null,
-          resultType: null,
-        }); 
+          resultsWithAllFields: results,
+        });
       }
       else
       {
-        if(isAllFields)
+        if(this.state.onResultsLoaded && this.state.resultsPages !== this.state.loadedResultsPages)
         {
           this.setState({
-            resultsWithAllFields: result.value,
+            loadedResultsPages: this.state.resultsPages,
           });
-        } else {
-          if(this.state.onResultsLoaded && this.state.resultsPages !== this.state.loadedResultsPages)
-          {
-            this.setState({
-              loadedResultsPages: this.state.resultsPages,
-            });
-            
-            // set a timeout to prevent an infinite loop with InfiniteScroll
-            // could move this somewhere that executes after the results have rendered
-            this.timeout = setTimeout(() =>
-              this.state.onResultsLoaded && this.state.onResultsLoaded(
-                this.state.results &&
-                result.value.length === this.state.results.length
-              ), 1000);
-          }
           
-          this.setState({
-            results: result.value,
-            resultType: result.type,
-            querying: false,
-            error: false,
-          });
+          // set a timeout to prevent an infinite loop with InfiniteScroll
+          // could move this somewhere that executes after the results have rendered
+          let unchanged = results.length < this.state.resultsPages * RESULTS_PAGE_SIZE;
+          this.timeout = setTimeout(() =>
+            this.state.onResultsLoaded && this.state.onResultsLoaded(unchanged)
+            , 1000);
         }
+        
+        this.setState({
+          results,
+          numResults,
+          resultType: 'rel',
+          querying: false,
+          error: false,
+        });
       }
     }
     else
@@ -384,10 +376,16 @@ class ResultsArea extends PureClasss<Props>
         // TODO add error
       });
     }
+    
+    if(!this['xhr'] && !this['allXhr'])
+    {
+      // all done with both
+      this.props.onLoadEnd && this.props.onLoadEnd();
+    }
   }
   
   handleError(ev)
-  {
+  {  
     this.setState({
       error: true,
     })
@@ -407,7 +405,7 @@ class ResultsArea extends PureClasss<Props>
     else 
     {
       tql = TQLConverter.toTQL(query, {
-        limit: pages * RESULTS_PAGE_SIZE,
+        // limit: pages * RESULTS_PAGE_SIZE,
       });
     }
     if(tql !== this.state.tql)
@@ -433,8 +431,7 @@ class ResultsArea extends PureClasss<Props>
       {
         this.allXhr = Ajax.query(TQLConverter.toTQL(query, {
             allFields: true,
-        // limit: pages * RESULTS_PAGE_SIZE,
-        // don't limit the all fields request
+            // limit: pages * RESULTS_PAGE_SIZE,
           }), 
           this.handleAllFieldsResponse,
           this.handleError
@@ -459,8 +456,8 @@ class ResultsArea extends PureClasss<Props>
           {
             this.state.error ? 'Error with query' : 
             (
-              this.state.resultsWithAllFields ? 
-                `${this.state.resultsWithAllFields.length} results` 
+              this.state.results ? 
+                `${this.state.numResults} results` 
               : 'Text result'
             )
           }

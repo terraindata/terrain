@@ -52,10 +52,16 @@ import RoleTypes from './../roles/RoleTypes.tsx';
 import Util from './../util/Util.tsx';
 
 var Ajax = {
-  _req(method: string, url: string, data: any, onLoad: (response: any) => void, onError?: (response: any) => void) 
+  _req(method: string, url: string, data: any, onLoad: (response: any) => void, config:
+    {
+      onError?: (response: any) => void,
+      host?: string,
+      crossDomain?: boolean;
+      noToken?: boolean;
+    } = {}) 
   {
     let xhr = new XMLHttpRequest();
-    xhr.onerror = onError;
+    xhr.onerror = config && config.onError;
     xhr.onload = (ev:Event) =>
     {
       if (xhr.status === 401)
@@ -66,7 +72,7 @@ var Ajax = {
       
       if (xhr.status != 200)
       {
-        onError({
+        config && config.onError && config.onError({
           error: xhr.responseText
         });
         return;
@@ -75,21 +81,31 @@ var Ajax = {
       onLoad(xhr.responseText);
     }
     
-    // NOTE: $SERVER_URL will be replaced by the build process.
-    xhr.open(method, SERVER_URL + url, true);
-    xhr.setRequestHeader('token', Store.getState().get('authenticationToken'));
+    // NOTE: SERVER_URL will be replaced by the build process.
+    let host = config.host || SERVER_URL;
+    xhr.open(method, host + url, true);
+    if(!config.noToken)
+    {
+      xhr.setRequestHeader('token', Store.getState().get('authenticationToken'));
+    }
+    
+    if(config.crossDomain)
+    {
+      xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+      xhr.setRequestHeader('Access-Control-Allow-Headers','Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Origin');
+    }
     xhr.send(data);
     return xhr;  
   },
   
   _post(url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void)
   {
-    return Ajax._req("POST", url, data, onLoad, onError);
+    return Ajax._req("POST", url, data, onLoad, {onError});
   },
   
   _get(url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void)
   {
-    return Ajax._req("GET", url, data, onLoad, onError);
+    return Ajax._req("GET", url, data, onLoad, {onError});
   },
   
   saveRole: (role:RoleTypes.Role) =>
@@ -242,7 +258,70 @@ var Ajax = {
   
 	query(tql: string, onLoad: (response: any) => void, onError?: (ev:Event) => void)
   {
-    return Ajax._post("/query", tql, onLoad, onError);
+    function encode_utf8(s) {
+        return unescape(encodeURIComponent(s));
+    }
+
+    function decode_utf8(s) {
+        return decodeURIComponent(escape(s));
+    }
+
+    //NOTE: keys and values are both encoded in base64 format
+  
+    // var change_conf_dict = {};
+    // var change_conf_dict_mysql = {};
+    // change_conf_dict_mysql[btoa("host")] = btoa(encode_utf8("10.1.0.25"));
+    // change_conf_dict_mysql[btoa("user")] = btoa(encode_utf8("dev"));
+    // change_conf_dict_mysql[btoa("password")] = btoa(encode_utf8("terrain_webscalesql42"));
+    // change_conf_dict_mysql[btoa("db")] = btoa(encode_utf8("urbansitter"));
+    // change_conf_dict[btoa("mysqlconfig")] = change_conf_dict_mysql;
+    // Ajax._req('POST', "/update_config", JSON.stringify(change_conf_dict), (r) => {
+    //   console.log('updateconfig', r);
+    // }, {
+    //   noToken: true,
+    //   host: "http://pa-terraformer02.terrain.int:7344",
+    //   crossDomain: true,
+    // });
+    
+    return Ajax._req('POST', "/query", JSON.stringify({
+        [btoa("timestamp")]: btoa((new Date()).toISOString()),
+        [btoa("unique_id")]: btoa("" + Math.random()),
+        [btoa("query_string")]: btoa(encode_utf8(tql)),
+      }),
+      (resp) =>
+      {
+        let obj = JSON.parse(resp);
+        var results = [];
+        _.map(obj, (serverResult) =>
+        {
+          var result = {};
+          _.map(serverResult as any, (val64:string, key64:string) =>
+          {
+            var value: any;
+            if(val64 === 'NULL')
+            {
+              value = null;
+            }
+            
+            try {
+              value = atob(val64)
+            } catch(e) {
+              // console.log(value, key, e);
+            }
+            
+            result[atob(key64)] = value;
+          }
+          );
+          results.push(result)
+        })
+        onLoad(results);
+      },
+      {
+        noToken: true,
+        onError,
+        host: "http://pa-terraformer02.terrain.int:7344",
+        crossDomain: true,
+      });
   },
   
   schema(onLoad: (tables: {name: string, columns: any[]}[], error?: any) => void, onError?: (ev:Event) => void)

@@ -82,5 +82,8 @@ declare interface IName
 // SERVER_URL is a "compile time" substition done by Webpack.
 declare var SERVER_URL: string;
 
+declare const escape: (s:string) => string;
+declare const unescape: (s:string) => string;
+
 // DEV is a "compile time" substition done by Webpack.
 declare var DEV: boolean;
