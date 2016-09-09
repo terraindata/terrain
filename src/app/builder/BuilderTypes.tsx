@@ -117,7 +117,7 @@ export module BuilderTypes
     NUMBER,
   }
     // TODO include in a common file
-  interface IRecord<T>
+  export class IRecord<T>
   {
     id: string;
     type: string;
