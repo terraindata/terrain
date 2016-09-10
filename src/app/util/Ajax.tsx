@@ -293,31 +293,31 @@ var Ajax = {
       }),
       (resp) =>
       {
-        let obj = JSON.parse(resp);
-        var results = [];
-        _.map(obj, (serverResult) =>
-        {
-          var result = {};
-          _.map(serverResult as any, (val64:string, key64:string) =>
-          {
-            var value: any;
-            if(val64 === 'NULL')
-            {
-              value = null;
-            }
+        // let obj = JSON.parse(resp);
+        // var results = [];
+        // _.map(obj, (serverResult) =>
+        // {
+        //   var result = {};
+        //   _.map(serverResult as any, (val64:string, key64:string) =>
+        //   {
+        //     var value: any;
+        //     if(val64 === 'NULL')
+        //     {
+        //       value = null;
+        //     }
             
-            try {
-              value = atob(val64)
-            } catch(e) {
-              // console.log(value, key, e);
-            }
+        //     try {
+        //       value = atob(val64)
+        //     } catch(e) {
+        //       // console.log(value, key, e);
+        //     }
             
-            result[atob(key64)] = value;
-          }
-          );
-          results.push(result)
-        })
-        onLoad(results);
+        //     result[atob(key64)] = value;
+        //   }
+        //   );
+        //   results.push(result)
+        // })
+        onLoad(JSON.parse(resp));
       },
       {
         noToken: true,
