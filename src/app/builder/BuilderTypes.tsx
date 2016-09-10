@@ -77,8 +77,7 @@ export module BuilderTypes
   }
   
   export const OperatorTQL = {
-    // [Operator.EQ]: '=', //**
-    [Operator.EQ]: '==',
+    [Operator.EQ]: '=',
     [Operator.NE]: '!=',
     [Operator.GE]: '>=',
     [Operator.GT]: '>',
@@ -94,10 +93,8 @@ export module BuilderTypes
   }
   
   export const DirectionTQL = {
-    // [Direction.ASC]: 'ASC',
-    // [Direction.DESC]: 'DESC', // **
-    [Direction.ASC]: 'asc',
-    [Direction.DESC]: 'desc',
+    [Direction.ASC]: 'ASC',
+    [Direction.DESC]: 'DESC',
   }
 
   export enum Combinator {
@@ -106,10 +103,8 @@ export module BuilderTypes
   }
   
   export const CombinatorTQL = {
-    // [Combinator.AND]: 'AND',
-    // [Combinator.OR]: 'OR', // **
-    [Combinator.AND]: '&&',
-    [Combinator.OR]: '||',
+    [Combinator.AND]: 'AND',
+    [Combinator.OR]: 'OR',
   }
     
   export enum InputType
@@ -357,7 +352,7 @@ export module BuilderTypes
       combinator: Combinator.AND,
       
       static: {
-        tql: "$first $OPERATOR $second",
+        tql: "$first $OPERATOR $second $COMBINATOR",
       }
     }),
     
@@ -367,8 +362,7 @@ export module BuilderTypes
       alias: "",
       
       static: {
-        // tql: "$table as $alias",
-        tql: "'$table' as $alias", // **
+        tql: "$table as $alias",
       }
     }),
     
@@ -394,8 +388,7 @@ export module BuilderTypes
         colors: ["#89B4A7", "#C1EADE"],
         title: "Select / From",
         preview: "[tables.table]: [fields.length]",
-        // tql: "SELECT $fields \nFROM $tables \nWHERE $filters \n$cards",
-        tql: "from $tables \nfilter $filters \n$cards \nselect $fields",  // **
+        tql: "SELECT $fields \nFROM $tables \nWHERE $filters 1 \n$cards",
         
         getChildTerms:
           (card: ICard) =>
@@ -457,6 +450,7 @@ export module BuilderTypes
                   displayType: DisplayType.TEXT,
                   help: ManualConfig.help["alias"],
                   key: 'alias',
+                  autoDisabled: true,
                 },
               ],
             },
@@ -770,8 +764,7 @@ export module BuilderTypes
       colors: ["#CDCF85", "#F5F6B3"],
       manualEntry: ManualConfig.cards['take'],
       title: "Take / Limit",
-      // tql: "LIMIT $value",
-      tql: "take $value", // **
+      tql: "LIMIT $value",
     }),
     
     skip: _valueCard(
@@ -779,8 +772,7 @@ export module BuilderTypes
       colors: ["#CDCF85", "#F5F6B3"],
       manualEntry: ManualConfig.cards['skip'],
       title: "Skip / Offset",
-      // tql: "OFFSET $value",
-      tql: "skip $value", // **
+      tql: "OFFSET $value",
     }),
     
     spotlight: _block(

@@ -92,6 +92,7 @@ class Browser extends Classs<Props>
   
   onItemsLoaded(unchanged?: boolean)
   {
+    console.log(unchanged);
     if(!this.unmounted)
     {
       this.setState({

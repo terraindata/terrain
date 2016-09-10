@@ -301,8 +301,10 @@ class VariantsColumn extends Classs<Props>
     }
     
     let {me, roles} = this.state;
-    let canCreate = me && roles && roles.getIn([this.props.groupId, me.username, 'builder']);
     let canMakeLive = me && roles && roles.getIn([this.props.groupId, me.username, 'admin']);
+    let canCreate = canMakeLive || (
+      me && roles && roles.getIn([this.props.groupId, me.username, 'builder'])
+    );
     
     return (
       <BrowserItemCategory

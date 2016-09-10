@@ -346,7 +346,8 @@ class BuilderComponent extends PureClasss<Props>
         >
         <BuilderTextbox
           keys={
-            d.getAutoTerms ? d.getAutoTerms() : this.props.keys
+            d.autoDisabled ? null :
+              d.getAutoTerms ? d.getAutoTerms() : this.props.keys
           }
           canEdit={this.props.canEdit}
           top={d.top}

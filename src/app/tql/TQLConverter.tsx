@@ -131,11 +131,10 @@ class TQLConverter
     cards = this._topFromCard(cards, (fromCard: ICard) =>
     {
       // add a take card if none are present
-      if(!fromCard['cards'].some(card => card.type === 'take'))
+      if(options.limit && !fromCard['cards'].some(card => card.type === 'take'))
       {
-        let limit = options.limit || 5000; // queries without a limit will crash Tiny
         return fromCard.set('cards', fromCard['cards'].push(BuilderTypes.make(BuilderTypes.Blocks.take, {
-          value: 5000,
+          value: options.limit,
         })));
       }
       
