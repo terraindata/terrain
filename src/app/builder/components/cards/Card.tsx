@@ -360,6 +360,7 @@ class Card extends PureClasss<Props>
           'card-closed' : !this.state.open,
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
+          'card-hovering': this.state.hovering,
           [card.type + '-card']: true,
         })}
         rel={'card-' + card.id}

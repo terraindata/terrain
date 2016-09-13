@@ -227,44 +227,55 @@
     }
   }
   
-  .card-add-card-btn {
-    z-index: 9999;
-    
-    @w: 20px;
-    width: @w;
-    height: @w;
-    border-radius: @w;
-    text-align: center;
-    background: #fff;
-    position: absolute;
-    left: calc(~"50% - @{w} / 2");
-    padding-top: 1px;
-    box-sizing: border-box;
-    color: @bright-green;
-    opacity: 0;
-    font-size: 14px;
-    .transition(~"all 0.1s linear");
-    
-    &:not(.card-add-card-btn-lower) {
-      top: calc(@w * -0.5);
-    }
-    &.card-add-card-btn-lower {
-      bottom: calc(@w * -0.5);
-    }
-    
-    &:hover {
-      opacity: 1;
-      width: calc(@w * 1.254);
-      height: calc(@w * 1.254);
-      font-size: 18px;
-      left: calc(~"50% - @{w} * 1.254 / 2");
+    .card-add-card-btn {
+      z-index: 9999;
+      
+      @w: 20px;
+      width: @w;
+      height: @w;
+      border-radius: @w;
+      text-align: center;
+      background: #fff;
+      position: absolute;
+      left: calc(~"50% - @{w} / 2");
+      padding-top: 1px;
+      box-sizing: border-box;
+      color: @bright-green;
+      opacity: 0;
+      font-size: 14px;
+      .transition(~"all 0.1s linear");
       
       &:not(.card-add-card-btn-lower) {
-        top: calc(@w * 1.254 * -0.5);
+        top: calc(@w * -0.5);
       }
       &.card-add-card-btn-lower {
-        bottom: calc(@w * 1.254 * -0.5);
-      }  
+        bottom: calc(@w * -0.5);
+      }
+      
+      &:hover {
+        opacity: 1;
+        width: calc(@w * 1.254);
+        height: calc(@w * 1.254);
+        font-size: 18px;
+        left: calc(~"50% - @{w} * 1.254 / 2");
+        
+        &:not(.card-add-card-btn-lower) {
+          top: calc(@w * 1.254 * -0.5);
+        }
+        &.card-add-card-btn-lower {
+          bottom: calc(@w * 1.254 * -0.5);
+        }  
+      }
+    }
+    
+  &.card-hovering {
+    .card-add-card-btn {
+      opacity: 1;
+    }
+    .card {
+      .card-add-card-btn {
+        opacity: 0;
+      }
     }
   }
   
@@ -282,33 +293,33 @@
   //   }
   // }
   
-  &.card-hovering-lower {
-    .card {
-      .card-add-card-btn-lower {
-        opacity: 0;
-      }
-    }
-    .card-add-card-btn-lower {
-      opacity: 0.9;
-      &:hover {
-        opacity: 1;
-      }
-    }
-  }
+  // &.card-hovering-lower {
+  //   .card {
+  //     .card-add-card-btn-lower {
+  //       opacity: 0;
+  //     }
+  //   }
+  //   .card-add-card-btn-lower {
+  //     opacity: 0.9;
+  //     &:hover {
+  //       opacity: 1;
+  //     }
+  //   }
+  // }
   
-  &.card-hovering-upper {
-    .card {
-      .card-add-card-btn:not(.card-add-card-btn-lower) {
-        opacity: 0;
-      }
-    }
-    .card-add-card-btn:not(.card-add-card-btn-lower) {
-      opacity: 0.9;
-      &:hover {
-        opacity: 1;
-      }
-    }
-  }
+  // &.card-hovering-upper {
+  //   .card {
+  //     .card-add-card-btn:not(.card-add-card-btn-lower) {
+  //       opacity: 0;
+  //     }
+  //   }
+  //   .card-add-card-btn:not(.card-add-card-btn-lower) {
+  //     opacity: 0.9;
+  //     &:hover {
+  //       opacity: 1;
+  //     }
+  //   }
+  // }
 }
 
 .panel-dragging {
@@ -490,7 +501,7 @@
 }
 
 .card-inner {
-  border-left-width: 6px !important;
+  // border-left-width: 6px !important;
 }
 
 .card .cards-area, .builder-tb-cards-area {

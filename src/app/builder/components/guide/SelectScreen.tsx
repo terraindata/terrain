@@ -42,75 +42,102 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
+require('./Guide.less');
+import GuideConfig from './GuideConfig.tsx';
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as ReduxActions from 'redux-actions';
-var Redux = require('redux');
+import * as _ from 'underscore';
+import * as $ from 'jquery';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import Util from '../../../util/Util.tsx';
+import Actions from "../../data/BuilderActions.tsx";
+import Card from "../cards/Card.tsx";
+import PureClasss from './../../../common/components/PureClasss.tsx';
+import BuilderTypes from '../../BuilderTypes.tsx';
+import {IQuery, ICondition, IExpression, EExpressionType, EScreen} from './Guide.tsx';
+let L = Immutable.List;
+let M = Immutable.Map;
 
-import AuthStore from './../../auth/data/AuthStore.tsx';
-import UserStore from './../../users/data/UserStore.tsx';
-import RoleStore from './../../roles/data/RolesStore.tsx';
-import Actions from "./BrowserActions.tsx";
-import BrowserTypes from './../BrowserTypes.tsx';
-import Util from './../../util/Util.tsx';
-
-import Ajax from './../../util/Ajax.tsx';
-
-var DefaultState = Immutable.fromJS({
-  loading: true,
-  // groups: {},
-  // groupsOrder: [],
-});
-
-import BrowserReducers from './BrowserReducers.tsx';
-
-let BrowserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  BrowserReducers,
-{})), DefaultState);
-
-
-BrowserStore.subscribe(() =>
+interface Props
 {
-  let state = BrowserStore.getState();
-  let groups = state.get('groups');
-  let prevGroups = state.get('prevGroups');
-  if(groups !== prevGroups)
-  {
-    groups.map((group: BrowserTypes.Group, groupId: ID) =>
-    {
-      let prevGroup = prevGroups.get(groupId);
-      if(group !== prevGroup)
-      {
-        if(Util.canEdit(group, UserStore, RoleStore))
-        {
-          Ajax.saveItem(group);
-        }
-        
-        group.algorithms.map((alg: BrowserTypes.Algorithm, algId: ID) =>
-        {
-          let prevAlg = prevGroup && prevGroup.algorithms.get(algId);
-          if(prevAlg !== alg)
-          {
-            if(Util.canEdit(alg, UserStore, RoleStore))
-            {
-              Ajax.saveItem(alg);
-            }
-            
-            alg.variants.map((v: BrowserTypes.Variant, vId: ID) =>
-            {
-              if(v !== (prevAlg && prevAlg.variants.get(vId)))
-              {
-                if(Util.canEdit(v, UserStore, RoleStore))
-                {
-                  Ajax.saveItem(v);
-                }
-              }
-            });
-          }
-        });
-      }
-    });
-  }
-});
+  screen: EScreen;
+  query: IQuery;
+  onQueryChange: (query:IQuery) => void;
+  onScreenChange: (screen:EScreen) => void;
+}
 
-export default BrowserStore;
+interface State
+{
+  
+}
+
+class Screen extends PureClasss<Props>
+{
+  state: State = {
+  };
+  
+  constructor(props:Props)
+  {
+    super(props);
+  }
+  
+  handleBackClick()
+  {
+    this.props.onScreenChange(GuideConfig.screens[this.props.screen].back);
+  }
+  
+  handleNextClick()
+  {
+    this.props.onScreenChange(GuideConfig.screens[this.props.screen].next);
+  }
+  
+  render()
+  {
+    let {query} = this.props;
+    let screen = GuideConfig.screens[this.props.screen];
+    
+    return (
+      <div
+        className='screen'
+      >
+        <div className='screen-top guide-title'>
+          {
+            screen.back !== null &&
+              <div
+                className='screen-back'
+                onClick={this.handleBackClick}
+              >
+                &lt; Back
+              </div>
+          }
+          
+          <div className='screen-title'>
+            {
+              screen.title
+            }
+          </div>
+          
+          <div
+            className='screen-next'
+            onClick={this.handleNextClick}
+          >
+            Done &gt;
+          </div>
+        </div>
+        
+        <div className='screen-prompt'>
+          { screen.prompt }
+        </div>
+        
+        <SelectScreen
+          screen={screen}
+          query={query}
+        />
+        
+      </div>
+    );
+  }
+}
+
+export default Screen;

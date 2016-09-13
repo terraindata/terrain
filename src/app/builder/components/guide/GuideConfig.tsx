@@ -42,75 +42,67 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
-import * as ReduxActions from 'redux-actions';
-var Redux = require('redux');
-
-import AuthStore from './../../auth/data/AuthStore.tsx';
-import UserStore from './../../users/data/UserStore.tsx';
-import RoleStore from './../../roles/data/RolesStore.tsx';
-import Actions from "./BrowserActions.tsx";
-import BrowserTypes from './../BrowserTypes.tsx';
-import Util from './../../util/Util.tsx';
-
-import Ajax from './../../util/Ajax.tsx';
-
-var DefaultState = Immutable.fromJS({
-  loading: true,
-  // groups: {},
-  // groupsOrder: [],
-});
-
-import BrowserReducers from './BrowserReducers.tsx';
-
-let BrowserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  BrowserReducers,
-{})), DefaultState);
+import {EScreen, EExpressionType} from './Guide.tsx';
 
 
-BrowserStore.subscribe(() =>
+export enum EScreenType
 {
-  let state = BrowserStore.getState();
-  let groups = state.get('groups');
-  let prevGroups = state.get('prevGroups');
-  if(groups !== prevGroups)
-  {
-    groups.map((group: BrowserTypes.Group, groupId: ID) =>
-    {
-      let prevGroup = prevGroups.get(groupId);
-      if(group !== prevGroup)
-      {
-        if(Util.canEdit(group, UserStore, RoleStore))
-        {
-          Ajax.saveItem(group);
-        }
-        
-        group.algorithms.map((alg: BrowserTypes.Algorithm, algId: ID) =>
-        {
-          let prevAlg = prevGroup && prevGroup.algorithms.get(algId);
-          if(prevAlg !== alg)
-          {
-            if(Util.canEdit(alg, UserStore, RoleStore))
-            {
-              Ajax.saveItem(alg);
-            }
-            
-            alg.variants.map((v: BrowserTypes.Variant, vId: ID) =>
-            {
-              if(v !== (prevAlg && prevAlg.variants.get(vId)))
-              {
-                if(Util.canEdit(v, UserStore, RoleStore))
-                {
-                  Ajax.saveItem(v);
-                }
-              }
-            });
-          }
-        });
-      }
-    });
-  }
-});
+  // given a list of items, choose the applicable one(s)
+  LIST,
+  
+  // add items to a set of items
+  ADD,
+}
 
-export default BrowserStore;
+interface IScreenConfig
+{
+  title: string;
+  prompt: string;
+  next: EScreen;
+  back: EScreen;
+  type: EScreenType;
+  
+  listOptions?: List<string>; // for lists
+  listMulti?: boolean;// multiple options can be chosen
+}
+
+const GuideConfig: {
+  screens: {[screen:number]:IScreenConfig},
+} = {
+  screens: 
+  {
+    [EScreen.FROM]:
+    {
+      title: "Tables",
+      prompt: "Which tables do you need for your query?",
+      next: EScreen.WHERE,
+      back: null,
+      type: EScreenType.LIST,
+      listOptions: Immutable.List(['sitters', 'bookings', 'reviews', 'bookmarks', 'reports']),
+      listMulti: true,
+    },
+    
+    [EScreen.WHERE]:
+    {
+      title: 'Where',
+      prompt: "Would you like to filter a specific set of results?",
+      next: EScreen.SELECT,
+      back: EScreen.FROM,
+      type: EScreenType.ADD,
+    },
+    
+    [EScreen.SELECT]:
+    {
+      title: 'Select',
+      prompt: "Which fields do you need?",
+      next: EScreen.ALL,
+      back: EScreen.WHERE,
+      type: EScreenType.LIST,
+      listOptions: Immutable.List(['uid', 'name', 'maxKids']),
+      listMulti: true,
+    },
+  },
+};
+
+export default GuideConfig;

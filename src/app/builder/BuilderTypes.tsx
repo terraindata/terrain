@@ -93,9 +93,7 @@ export module BuilderTypes
   
   export const DirectionTQL = {
     [Direction.ASC]: 'ASC',
-    [Direction.DESC]: 'DESC', // **
-    // [Direction.ASC]: 'asc',
-    // [Direction.DESC]: 'desc',
+    [Direction.DESC]: 'DESC',
   }
 
   export enum Combinator {
@@ -105,9 +103,7 @@ export module BuilderTypes
   
   export const CombinatorTQL = {
     [Combinator.AND]: 'AND',
-    [Combinator.OR]: 'OR', // **
-    // [Combinator.AND]: '&&',
-    // [Combinator.OR]: '||',
+    [Combinator.OR]: 'OR',
   }
     
   export enum InputType
@@ -484,7 +480,7 @@ export module BuilderTypes
       operator: Operator.EQ,
       
       static: {
-        tql: "$first $OPERATOR $second",
+        tql: "$first $OPERATOR $second $COMBINATOR",
       }
     }),
     
@@ -495,7 +491,6 @@ export module BuilderTypes
       
       static: {
         tql: "$table as $alias",
-        // tql: "'$table' as $alias", // **
       }
     }),
     
@@ -520,7 +515,6 @@ export module BuilderTypes
         title: "From",
         preview: "[tables.table]",
         tql: "SELECT $fields \nFROM $tables \n$cards",
-        // tql: "from $tables \nfilter $filters \n$cards \nselect $fields",  // **
         
         getChildTerms:
           (card: ICard) =>
@@ -530,9 +524,9 @@ export module BuilderTypes
                 let cols: List<string> = Store.getState().getIn(['tableColumns', tableBlock.table]);
                 if(cols)
                 {
-                  return list.merge(cols.map(
+                  return list.concat(cols.map(
                     (col) => tableBlock.alias + '.' + col
-                  ).toList());
+                  ).toList()).toList();
                 }
                 return list;
               }
@@ -562,6 +556,7 @@ export module BuilderTypes
                 {
                   displayType: DisplayType.TEXT,
                   key: 'alias',
+                  autoDisabled: true,
                 },
               ],
             },
@@ -955,7 +950,6 @@ export module BuilderTypes
       colors: ["#CDCF85", "#F5F6B3"],
       title: "Limit",
       tql: "LIMIT $value",
-      // tql: "take $value", // **
     }),
     
     skip: _valueCard(
@@ -963,7 +957,6 @@ export module BuilderTypes
       colors: ["#CDCF85", "#F5F6B3"],
       title: "Offset",
       tql: "OFFSET $value",
-      // tql: "skip $value", // **
     }),
     
     spotlight: _block(

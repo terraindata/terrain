@@ -85,6 +85,8 @@ export interface Display
   // for textboxes with cards
   top?: boolean;
   getAutoTerms?: () => List<string>; // overrides standard terms
+  autoDisabled?: boolean;
+  showWhenCards?: boolean;
   
   // for rows and FLEX, content to display above/below,   
   above?: Display;
@@ -148,6 +150,7 @@ export const firstSecondDisplay = (middle:Display): Display =>
       displayType: CARDTEXT,
       key: 'first',
       top: true,
+      showWhenCards: true,
     },
     
     middle,
@@ -155,6 +158,7 @@ export const firstSecondDisplay = (middle:Display): Display =>
     {
       displayType: CARDTEXT,
       key: 'second',
+      showWhenCards: true,
     },
   ],
 });

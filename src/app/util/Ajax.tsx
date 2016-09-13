@@ -52,10 +52,16 @@ import RoleTypes from './../roles/RoleTypes.tsx';
 import Util from './../util/Util.tsx';
 
 var Ajax = {
-  _req(method: string, url: string, data: any, onLoad: (response: any) => void, onError?: (response: any) => void) 
+  _req(method: string, url: string, data: any, onLoad: (response: any) => void, config:
+    {
+      onError?: (response: any) => void,
+      host?: string,
+      crossDomain?: boolean;
+      noToken?: boolean;
+    } = {}) 
   {
     let xhr = new XMLHttpRequest();
-    xhr.onerror = onError;
+    xhr.onerror = config && config.onError;
     xhr.onload = (ev:Event) =>
     {
       if (xhr.status === 401)
@@ -66,7 +72,7 @@ var Ajax = {
       
       if (xhr.status != 200)
       {
-        onError({
+        config && config.onError && config.onError({
           error: xhr.responseText
         });
         return;
@@ -75,21 +81,48 @@ var Ajax = {
       onLoad(xhr.responseText);
     }
     
-    // NOTE: $SERVER_URL will be replaced by the build process.
-    xhr.open(method, SERVER_URL + url, true);
-    xhr.setRequestHeader('token', Store.getState().get('authenticationToken'));
+    // NOTE: SERVER_URL will be replaced by the build process.
+    let host = config.host || SERVER_URL;
+    xhr.open(method, host + url, true);
+    if(!config.noToken)
+    {
+      xhr.setRequestHeader('token', Store.getState().get('authenticationToken'));
+    }
+    
+    if(config.crossDomain)
+    {
+      xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+      xhr.setRequestHeader('Access-Control-Allow-Headers','Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Origin');
+    }
     xhr.send(data);
     return xhr;  
   },
   
   _post(url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void)
   {
-    return Ajax._req("POST", url, data, onLoad, onError);
+    return Ajax._req("POST", url, data, onLoad, {onError});
   },
   
   _get(url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void)
   {
-    return Ajax._req("GET", url, data, onLoad, onError);
+    return Ajax._req("GET", url, data, onLoad, {onError});
+  },
+  
+  _r(url:string, reqFields: {[f:string]:any}, onLoad: (resp:string) => void, onError?: (ev:Event) => void)
+  {
+    Ajax._req('POST', url, JSON.stringify(_.extend({
+      timestamp: (new Date()).toISOString(),
+      unique_id: "" + Math.random(),
+    }, reqFields)),
+    
+    onLoad,
+    
+    {
+      noToken: true,
+      onError,
+      host: "http://pa-terraformer02.terrain.int:7344",
+      crossDomain: true,
+    });
   },
   
   saveRole: (role:RoleTypes.Role) =>
@@ -242,21 +275,70 @@ var Ajax = {
   
 	query(tql: string, onLoad: (response: any) => void, onError?: (ev:Event) => void)
   {
-    return Ajax._post("/query", tql, onLoad, onError);
+    return Ajax._r("/sql_query", {
+        "query_string": encode_utf8(tql),
+      },
+      
+      (resp) =>
+      {
+        onLoad(JSON.parse(resp));
+      },
+      
+      onError
+    );
   },
   
   schema(onLoad: (tables: {name: string, columns: any[]}[], error?: any) => void, onError?: (ev:Event) => void)
   {
-    return Ajax._post("/schema/" , null, (response) => {
-      try {
-        var tables = JSON.parse(response)['tables'];
-      } catch(e) {
-        onLoad(null, e);
-        return;
-      }
-      onLoad(tables);
-    }, onError);
+    return Ajax._r("/get_tables", {
+        db: 'urbansitter',
+      },
+      
+      (resp:string) =>
+      {
+        let obj = JSON.parse(resp);
+        let tableNames = obj.map(o => o['Tables_in_urbansitter']);
+        
+        let count = 0;
+        
+        var tables = [];
+        
+        tableNames.map(table =>
+          Ajax._r("/get_schema", {
+            db: 'urbansitter',
+            table,
+          },
+          
+          (r) => 
+          {
+            let cols = JSON.parse(r);
+            cols.map(col => col.name = col['Field']);
+            tables.push({
+              name: table,
+              columns: cols,
+            });
+            
+            if(tables.length === tableNames.length)
+            {
+              onLoad(tables);
+            }
+          })
+        );
+      },
+      
+      onError
+      );
   }
 };
+
+function encode_utf8(s) {
+  return unescape(encodeURIComponent(s));
+}
+
+function decode_utf8(s) {
+  return decodeURIComponent(escape(s));
+}
+
+    
 
 export default Ajax;

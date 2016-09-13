@@ -302,11 +302,13 @@ class BuilderComponent extends PureClasss<Props>
       content = (
         <BuilderTextbox
           keys={
-            d.getAutoTerms ? d.getAutoTerms() : this.props.keys
+            d.autoDisabled ? null :
+              d.getAutoTerms ? d.getAutoTerms() : this.props.keys
           }
           canEdit={this.props.canEdit}
           top={d.top}
           placeholder={d.placeholder || d.key}
+          showWhenCards={d.showWhenCards}
           {...{
             key,
             keyPath,

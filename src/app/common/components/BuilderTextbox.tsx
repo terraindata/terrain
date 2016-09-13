@@ -86,6 +86,8 @@ interface Props
 
   isNumber?: boolean;
   typeErrorMessage?: string;
+  
+  showWhenCards?: boolean;
 }
 
 class BuilderTextbox extends PureClasss<Props>
@@ -272,60 +274,63 @@ class BuilderTextbox extends PureClasss<Props>
     
     // We're in card mode
     
-    return null;
+    if(!this.props.showWhenCards)
+    {
+      return null;
+    }
     
-    // var card: BuilderTypes.ICard = this.props.value as BuilderTypes.ICard;
-    // // var cards = this.props.value['cards'];
-    // // if(cards.size)
-    // // {
-    //   // var card = cards.get(0);
-    //   var color = card.static.colors[0] as string;
-    //   var title: string = ''; //card.static.title;
-    //   var preview = BuilderTypes.getPreview(card);
-    // // }
-    // // else
-    // // {
-    // //   var color = "#aaa";
-    // //   var title = "Add a Card";
-    // // }
-    
-    // var chipStyle = 
+    var card: BuilderTypes.ICard = this.props.value as BuilderTypes.ICard;
+    // var cards = this.props.value['cards'];
+    // if(cards.size)
     // {
-    //   background: color,
-    // };
-    // var arrowLineStyle =
+      // var card = cards.get(0);
+      var color = card.static.colors[0] as string;
+      var title: string = ''; //card.static.title;
+      var preview = BuilderTypes.getPreview(card);
+    // }
+    // else
     // {
-    //   borderColor: color,
-    // };
-    // var arrowHeadStyle = 
-    // {
-    //   borderLeftColor: color,
+    //   var color = "#aaa";
+    //   var title = "Add a Card";
     // }
     
-    // return (
-    //   <div className={classNames({
-    //     'builder-tb': true,
-    //     'builder-tb-cards': true,
-    //     'builder-tb-cards-top': this.props.top
-    //   })} ref='cards'>
-    //     <div className='builder-tb-cards-input'>
-    //       { this.renderSwitch() }
-    //       <div className='builder-tb-cards-input-value' style={chipStyle}>
-    //         <div className='builder-tb-cards-input-value-text'>
-    //           { title }
-    //         </div>
-    //         { !preview ? null :
-    //           <div className='card-preview'>
-    //             { preview }
-    //           </div>
-    //         }
-    //       </div>
-    //       <div className='builder-tb-cards-arrow' style={arrowLineStyle}>
-    //         <div className='builder-tb-cards-arrow-inner' style={arrowHeadStyle} />
-    //       </div>
-    //     </div>
-    //   </div>
-    // );
+    var chipStyle = 
+    {
+      background: color,
+    };
+    var arrowLineStyle =
+    {
+      borderColor: color,
+    };
+    var arrowHeadStyle = 
+    {
+      borderLeftColor: color,
+    }
+    
+    return (
+      <div className={classNames({
+        'builder-tb': true,
+        'builder-tb-cards': true,
+        'builder-tb-cards-top': this.props.top
+      })} ref='cards'>
+        <div className='builder-tb-cards-input'>
+          { this.renderSwitch() }
+          <div className='builder-tb-cards-input-value' style={chipStyle}>
+            <div className='builder-tb-cards-input-value-text'>
+              { title }
+            </div>
+            { !preview ? null :
+              <div className='card-preview'>
+                { preview }
+              </div>
+            }
+          </div>
+          <div className='builder-tb-cards-arrow' style={arrowLineStyle}>
+            <div className='builder-tb-cards-arrow-inner' style={arrowHeadStyle} />
+          </div>
+        </div>
+      </div>
+    );
   }
 };
 
@@ -361,18 +366,6 @@ const btbTarget =
       {
         return;  
       }
-      
-      //   // TODO
-      // var newId = 'c-' + Math.random();
-      // var newCard:BuilderTypes.IParenthesesCard = BuilderTypes._IParenthesesCard();
-      
-      // props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
-      
-      // setTimeout(() =>
-      // {
-      //   // Actions.cards.change(props.id, props.keyPath, newCard)
-      //   // Actions..move(item, 0, newId);
-      // }, 250);
     }
   }
 }

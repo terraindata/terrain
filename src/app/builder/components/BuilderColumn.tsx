@@ -361,7 +361,11 @@ var BuilderColumn = React.createClass<any, any>(
                 : null
               }
             </span>
-            { this.state.loading ? <div className='builder-column-loading'>Loading...</div> : '' }
+            {
+              this.state.loading &&
+              (this.state.column === COLUMNS.Results || this.state.column === COLUMNS.TQL) &&
+                <div className='builder-column-loading'>Loading...</div>
+            }
           </div>
           <div className='builder-title-bar-options'>
             <Menu options={this.getMenuOptions()}/>

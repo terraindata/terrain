@@ -78,7 +78,7 @@ export module BrowserTypes
     // for DB storage
     type: "variant",
     dbFields: ['groupId', 'algorithmId', 'status'],
-    dataFields: ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs'],    
+    dataFields: ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs', 'mode', 'tql'],    
     statusMap: (s:EVariantStatus) => EVariantStatus[s],
   });
   export class Variant extends _Variant implements BuilderTypes.IQuery

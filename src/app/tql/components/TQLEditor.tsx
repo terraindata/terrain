@@ -105,7 +105,7 @@ class TQL extends Classs<Props>
     confirmModalMessage: string;
   } = {
     tql: null,
-    code: TQLConverter.toTQL(this.props.query),
+    code: this.props.query.mode === 'tql' ? this.props.query.tql : TQLConverter.toTQL(this.props.query),
     theme: localStorage.getItem('theme') || 'default',
     highlightedLine: null,
     theme_index: 0,
