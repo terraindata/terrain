@@ -21,6 +21,8 @@
     border-radius: @card-border-radius;
     box-sizing: border-box;
     
+    min-height: 35px;
+    
     // &.card-single {
     //   border: 0px;
     // }
@@ -113,6 +115,8 @@
     font-weight: @bold-font-weight;
     .transition;
     
+    z-index: 99;
+    
     .card-title-inner {
       white-space: nowrap;
     }
@@ -156,8 +160,10 @@
     }
     
     &.card-title-closed {
+      width: 100%;
       .card-arrow-icon {
         .rotate(-90deg);
+        top: 11px;
       }
     }
  }
@@ -169,6 +175,7 @@
 
   .card-content{
     padding: @card-padding-vertical @card-padding-horizontal;
+    position: relative;
   }
   
   &.wrapper-card {
@@ -498,6 +505,14 @@
     color: #fff;
     background-color: #89b4a7;
     font-weight: 500;
+    .transition;
+    opacity: 1;
+}
+
+.card-closed {
+  .builder-card-header.sfw-select-header {
+    opacity: 0;
+  }
 }
 
 .card-inner {

@@ -86,6 +86,7 @@ var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIc
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 
 import AuthActions from "./auth/data/AuthActions.tsx";
+import BuilderActions from "./builder/data/BuilderActions.tsx";
 import AuthStore from "./auth/data/AuthStore.tsx";
 import UserActions from "./users/data/UserActions.tsx";
 import { InAppNotification } from './common/components/InAppNotification.tsx';
@@ -199,11 +200,19 @@ var App = React.createClass({
      
     return <LayoutManager layout={layout} />;
   },
+  
+  handleMouseMove(e:Event)
+  {
+    BuilderActions.hoverCard(null);
+  },
 
   render ()
   {
     return (
-      <div className='app'>
+      <div
+        className='app'
+        onMouseMove={this.handleMouseMove}
+      >
         <div className='app-top-bar'>
           <TerrainIcon className='app-top-bar-icon' />
           { this.state.loggedIn && <AccountDropdown onLogout={this.handleLogout} history={this.props.history} /> }

@@ -116,8 +116,20 @@ class ResultsView extends Classs<Props>
               No response was returned from the server.
             </span>
           </div>
-        )
+        );
       }
+      
+      if(typeof this.state.error !== 'string')
+      {
+        return (
+          <div>
+            <span className="error-title">
+              { JSON.stringify(this.state.error) }
+            </span>
+          </div>
+        );
+      }
+      
       console.log(this.state.error);
       var lineNum = (this.state.error).replace(/^\D+|\D+$/g, '');
       lineNum = parseInt(lineNum);

@@ -101,6 +101,7 @@ class Card extends PureClasss<Props>
     [k: string]: Ref;
     cardBody: Ref;
     cardInner: Ref;
+    cardContent: Ref;
   }
   
   constructor(props:Props)
@@ -244,12 +245,12 @@ class Card extends PureClasss<Props>
     if(this.state.open)
     {
       setTimeout(() => 
-      Util.animateToHeight(this.refs.cardBody, 0), 300);
+      Util.animateToHeight(this.refs.cardContent, 0), 300);
     }
     else
     {
       setTimeout(() => 
-      Util.animateToAutoHeight(this.refs.cardBody), 300);
+      Util.animateToAutoHeight(this.refs.cardContent), 300);
     }
        
     event.preventDefault();
@@ -342,12 +343,6 @@ class Card extends PureClasss<Props>
       }
     />;
 
-		var contentToDisplay = (
-			<div className={'card-content' + (this.props.singleCard ? ' card-content-single' : '')}>
-				{content}
-			</div>
-		);
-    
     let {card} = this.props;
 		let {title} = card.static;
     const { isDragging, connectDragSource } = this.props;
@@ -428,7 +423,12 @@ class Card extends PureClasss<Props>
                 />
             }
             <div className='card-body' ref='cardBody'>
-              { contentToDisplay }
+              <div
+                className={'card-content' + (this.props.singleCard ? ' card-content-single' : '')}
+                ref='cardContent'
+              >
+                {content}
+              </div>
             </div>
           </div>
           { this.renderAddCard(true) }

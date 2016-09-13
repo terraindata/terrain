@@ -275,7 +275,7 @@ var Ajax = {
   
 	query(tql: string, onLoad: (response: any) => void, onError?: (ev:Event) => void)
   {
-    return Ajax._r("/sql_query", {
+    return Ajax._r("/query", {
         "query_string": encode_utf8(tql),
       },
       
