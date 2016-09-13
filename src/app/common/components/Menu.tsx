@@ -84,6 +84,11 @@ export class Menu extends PureClasss<Props>
   
   renderOption(option, index)
   {
+    if(option.spacer)
+    {
+      return <div className='menu-option menu-option-spacer' key={index} />;
+    }
+    
     if(!option.disabled)
     {
       var onClick = (event) => {
@@ -93,7 +98,11 @@ export class Menu extends PureClasss<Props>
       };
     }
     return (
-      <div className={"menu-option" + (option.disabled ? " menu-option-disabled" : "")} key={index} onClick={onClick}>
+      <div
+        className={"menu-option" + (option.disabled ? " menu-option-disabled" : "")}
+        key={index}
+        onClick={onClick}
+      >
         <div 
           className="menu-option-icon" 
           style={{
@@ -135,7 +144,8 @@ export class Menu extends PureClasss<Props>
     }
   }
 
-  render() {
+  render()
+  {
     let {options} = this.props;
     if(!options || !options.size)
     {
@@ -148,7 +158,7 @@ export class Menu extends PureClasss<Props>
       multiplier = 14;
     } 
     var width = multiplier * options.reduce((max, option) => 
-        option.text.length > max ? option.text.length : max, 1)
+        option.text && (option.text.length > max) ? option.text.length : max, 1)
 
     var style = {
       width: width,

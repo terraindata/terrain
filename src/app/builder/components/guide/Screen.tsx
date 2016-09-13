@@ -55,6 +55,7 @@ import Card from "../cards/Card.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import BuilderTypes from '../../BuilderTypes.tsx';
 import {IQuery, ICondition, IExpression, EExpressionType, EScreen} from './Guide.tsx';
+import SelectScreen from './SelectScreen.tsx';
 let L = Immutable.List;
 let M = Immutable.Map;
 
@@ -82,7 +83,7 @@ class Screen extends PureClasss<Props>
   
   render()
   {
-    let {screen, query} = this.state;
+    let {screen, query} = this.props;
     
     return (
       <div

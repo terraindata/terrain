@@ -42,7 +42,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Guide.less');
 import GuideConfig from './GuideConfig.tsx';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -64,7 +63,6 @@ interface Props
   screen: EScreen;
   query: IQuery;
   onQueryChange: (query:IQuery) => void;
-  onScreenChange: (screen:EScreen) => void;
 }
 
 interface State
@@ -72,7 +70,7 @@ interface State
   
 }
 
-class Screen extends PureClasss<Props>
+class SelectScreen extends PureClasss<Props>
 {
   state: State = {
   };
@@ -80,16 +78,6 @@ class Screen extends PureClasss<Props>
   constructor(props:Props)
   {
     super(props);
-  }
-  
-  handleBackClick()
-  {
-    this.props.onScreenChange(GuideConfig.screens[this.props.screen].back);
-  }
-  
-  handleNextClick()
-  {
-    this.props.onScreenChange(GuideConfig.screens[this.props.screen].next);
   }
   
   render()
@@ -101,43 +89,11 @@ class Screen extends PureClasss<Props>
       <div
         className='screen'
       >
-        <div className='screen-top guide-title'>
-          {
-            screen.back !== null &&
-              <div
-                className='screen-back'
-                onClick={this.handleBackClick}
-              >
-                &lt; Back
-              </div>
-          }
-          
-          <div className='screen-title'>
-            {
-              screen.title
-            }
-          </div>
-          
-          <div
-            className='screen-next'
-            onClick={this.handleNextClick}
-          >
-            Done &gt;
-          </div>
-        </div>
         
-        <div className='screen-prompt'>
-          { screen.prompt }
-        </div>
-        
-        <SelectScreen
-          screen={screen}
-          query={query}
-        />
         
       </div>
     );
   }
 }
 
-export default Screen;
+export default SelectScreen;

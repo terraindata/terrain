@@ -108,16 +108,17 @@ class ResultsView extends Classs<Props>
 
     if(this.state.error)
     {
-      if (this.state.error === 'No response was returned from the server.')
+      if (this.state.error === 'No response was returned from the server.' || ! this.state.error)
       {
         return (
           <div>
             <span className="error-title">
-            {this.state.error}
+              No response was returned from the server.
             </span>
           </div>
         )
       }
+      console.log(this.state.error);
       var lineNum = (this.state.error).replace(/^\D+|\D+$/g, '');
       lineNum = parseInt(lineNum);
       var errorLineNumber = lineNum ? 'Error on line ' + lineNum : 'Error';
@@ -228,7 +229,8 @@ class ResultsView extends Classs<Props>
   {
     this.setState({
       error: true,
-    })
+      querying: false,
+    });
   }
   
   queryResults(tql)

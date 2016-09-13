@@ -376,7 +376,7 @@ class ResultsArea extends PureClasss<Props>
       });
     }
     
-    if(!this['xhr'] && !this['allXhr'])
+    if(!this['xhr']) // && !this['allXhr']) // TODO
     {
       // all done with both
       this.props.onLoadEnd && this.props.onLoadEnd();
@@ -385,9 +385,11 @@ class ResultsArea extends PureClasss<Props>
   
   handleError(ev)
   {  
+    console.log('a');
     this.setState({
       error: true,
-    })
+    });
+    this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
   queryResults(query, pages?: number)

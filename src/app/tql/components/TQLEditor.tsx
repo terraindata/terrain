@@ -94,8 +94,7 @@ interface Props {
 
 class TQL extends Classs<Props>
 {
-  state:
-  {
+  state: {
     tql: string;
     code: string;
     theme: string;
@@ -212,6 +211,11 @@ class TQL extends Classs<Props>
         return 0;
     }
   }
+  
+  killQueries()
+  {
+    Ajax.killQueries();
+  }
 
   getMenuOptions(): List<MenuOption> 
   {
@@ -237,6 +241,15 @@ class TQL extends Classs<Props>
           onClick: this.changeThemeMonokai,
           disabled: this.getThemeIndex() === 3,
         },
+        {
+          spacer: true,
+          text: null,
+          onClick: null,
+        },
+        {
+          text: 'Kill Running Queries',
+          onClick: this.killQueries,
+        }
       ]);
     return options;
   }
@@ -324,7 +337,7 @@ class TQL extends Classs<Props>
   {
     var currTheme = this.getTopbarClass();
     return (
-      <div className={currTheme}>
+      <div className={'tql-editor-top ' + currTheme}>
         <Switch
           first='Cards'
           second='TQL'

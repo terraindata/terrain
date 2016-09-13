@@ -110,7 +110,7 @@ var Ajax = {
   
   _r(url:string, reqFields: {[f:string]:any}, onLoad: (resp:string) => void, onError?: (ev:Event) => void)
   {
-    Ajax._req('POST', url, JSON.stringify(_.extend({
+    return Ajax._req('POST', url, JSON.stringify(_.extend({
       timestamp: (new Date()).toISOString(),
       unique_id: "" + Math.random(),
     }, reqFields)),
@@ -281,7 +281,11 @@ var Ajax = {
       
       (resp) =>
       {
-        onLoad(JSON.parse(resp));
+        try {
+          onLoad(JSON.parse(resp));
+        } catch(e) {
+          onError(resp as any);
+        }
       },
       
       onError
@@ -296,39 +300,51 @@ var Ajax = {
       
       (resp:string) =>
       {
-        let obj = JSON.parse(resp);
-        let tableNames = obj.map(o => o['Tables_in_urbansitter']);
-        
-        let count = 0;
-        
-        var tables = [];
-        
-        tableNames.map(table =>
-          Ajax._r("/get_schema", {
-            db: 'urbansitter',
-            table,
-          },
+        try {
+          let obj = JSON.parse(resp);
+          let tableNames = obj.map(o => o['Tables_in_urbansitter']);
           
-          (r) => 
-          {
-            let cols = JSON.parse(r);
-            cols.map(col => col.name = col['Field']);
-            tables.push({
-              name: table,
-              columns: cols,
-            });
+          let count = 0;
+          
+          var tables = [];
+          
+          tableNames.map(table =>
+            Ajax._r("/get_schema", {
+              db: 'urbansitter',
+              table,
+            },
             
-            if(tables.length === tableNames.length)
+            (r) => 
             {
-              onLoad(tables);
-            }
-          })
-        );
+              let cols = JSON.parse(r);
+              cols.map(col => col.name = col['Field']);
+              tables.push({
+                name: table,
+                columns: cols,
+              });
+              
+              if(tables.length === tableNames.length)
+              {
+                onLoad(tables);
+              }
+            })
+          );
+        } catch(e) {
+          onError(resp as any);
+        }
       },
       
       onError
       );
-  }
+  },
+  
+  killQueries()
+  {
+    Ajax.query("select concat('kill ',id,';') from information_schema.processlist where user='dev' and command='Query' and time>30;",
+      (a) => console && console.log && console.log('Queries killed:', a),
+      (a) => console && console.log && console.log('Query killing error:', a)
+    );
+  },
 };
 
 function encode_utf8(s) {

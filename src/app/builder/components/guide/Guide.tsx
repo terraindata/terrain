@@ -71,6 +71,9 @@ export enum EScreen
   VAR,
   TRANSFORM,
   SCORE,
+  
+  
+  ALL,
 }
 
 export interface State

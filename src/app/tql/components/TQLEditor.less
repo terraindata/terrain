@@ -88,3 +88,16 @@
 //Placeholder styling for code-mirror, possibly move to differnt fiel
 .CodeMirror-empty.CodeMirror-focused { outline: none; }
 .CodeMirror pre.CodeMirror-placeholder { color: #999; }
+
+.tql-editor-top {
+  .menu-wrapper {
+    z-index: 99;
+   
+    &:not(.menu-open) {
+      opacity: 0.8;
+    }
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
