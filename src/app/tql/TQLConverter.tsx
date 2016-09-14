@@ -118,16 +118,12 @@ class TQLConverter
     if(options.allFields)
     {
       cards = this._topFromCard(cards, (fromCard: ICard) =>
-        fromCard.set('cards', fromCard['cards'].map(card =>
-        {
-          if(card.type === 'select')
-          {
-            console.log(card);
-            return card.set('properties', Immutable.List(['*']));
-          }
-          return card;
-        })
-      ));
+        fromCard.set('fields', Immutable.List([
+          BuilderTypes.make(BuilderTypes.Blocks.field, {
+            field: '*',
+          })
+        ]))
+      );
     }
     
     cards = this._topFromCard(cards, (fromCard: ICard) =>

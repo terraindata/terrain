@@ -73,6 +73,7 @@ import 'codemirror/addon/edit/matchbrackets.js';
 import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/fold/foldgutter.css';
+import 'codemirror/addon/lint/lint.js';
 
 //Searching for code-mirror
 import 'codemirror/addon/dialog/dialog.js';
@@ -84,12 +85,15 @@ import 'codemirror/addon/search/matchesonscrollbar.js';
 import 'codemirror/addon/search/jump-to-line.js';
 import 'codemirror/addon/search/matchesonscrollbar.css';
 
+import TQLPopup from './TQLPopup.tsx';
+
 interface Props {
   params?: any;
-  history?: any;
   query?: BuilderTypes.IQuery;
   onLoadStart: () => void;
   onLoadEnd: () => void;
+  addColumn?: (number, string?) => void;
+  columnIndex: number;
 }
 
 class TQL extends Classs<Props>
@@ -102,6 +106,11 @@ class TQL extends Classs<Props>
     theme_index: number;
     confirmModalOpen: boolean;
     confirmModalMessage: string;
+    syntaxHelpOpen: boolean;
+    syntaxHelpPos: any;
+    cardName: string;
+    termDefinitionOpen: boolean;
+    termDefinitionPos: any;
   } = {
     tql: null,
     code: this.props.query.mode === 'tql' ? this.props.query.tql : TQLConverter.toTQL(this.props.query),
@@ -109,7 +118,12 @@ class TQL extends Classs<Props>
     highlightedLine: null,
     theme_index: 0,
     confirmModalOpen: false,
-    confirmModalMessage: ''
+    confirmModalMessage: '',
+    syntaxHelpOpen: false,
+    syntaxHelpPos: {},
+    cardName: '',
+    termDefinitionOpen: false,
+    termDefinitionPos: {}
   };
 
   constructor(props: Props) 
@@ -134,7 +148,9 @@ class TQL extends Classs<Props>
     this.undoError();
     this.setState({
       code: newCode,
-      highlightedLine: null
+      highlightedLine: null,
+      syntaxHelpOpen: false,
+      termDefinitionOpen: false,
     });
     this.executeCode();
   }
@@ -152,7 +168,7 @@ class TQL extends Classs<Props>
   {
     var code = this.props.query.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.query)
     this.setState({
-      tql: code
+      tql: code,
     });
     BuilderActions.setVariantField
       (this.props.query.id,
@@ -166,7 +182,7 @@ class TQL extends Classs<Props>
     localStorage.setItem('theme', 'default');
     this.setState({
       theme: 'default',
-      theme_index: 0
+      theme_index: 0,
     });
   }
 
@@ -175,7 +191,7 @@ class TQL extends Classs<Props>
     localStorage.setItem('theme', 'neo');
     this.setState({
       theme: 'neo',
-      theme_index: 1
+      theme_index: 1,
     });
   }
 
@@ -184,7 +200,7 @@ class TQL extends Classs<Props>
     localStorage.setItem('theme', 'cobalt');
     this.setState({
       theme: 'cobalt',
-      theme_index: 2
+      theme_index: 2,
     });
   }
 
@@ -193,7 +209,7 @@ class TQL extends Classs<Props>
     localStorage.setItem('theme', 'monokai');
     this.setState({
       theme: 'monokai',
-      theme_index: 3
+      theme_index: 3,
     });
   }
 
@@ -256,12 +272,11 @@ class TQL extends Classs<Props>
 
   highlightError(lineNumber: number) 
   {
-    this.state.highlightedLine = lineNumber - 1; //-1 because they should be 0-indexed
-    //This is a workaround for the missing property syntax error
+    this.state.highlightedLine = lineNumber - 1;
     var x: any = this.refs['cm'];
     if (x) 
     {
-      x.updateHighlightedLine(this.state.highlightedLine);
+      x.updateHighlightedLine(lineNumber - 1);
     }
   }
 
@@ -326,6 +341,7 @@ class TQL extends Classs<Props>
         return 'monokai-topbar';
       case 'cobalt':
         return 'cobalt-topbar';
+
       case 'neo':
         return 'neo-topbar';
       default:
@@ -356,6 +372,76 @@ class TQL extends Classs<Props>
     );
   }
 
+  turnSyntaxPopupOff()
+  {
+    this.setState({
+      syntaxHelpOpen: false,
+      termDefinitionOpen: false,
+    })
+  }
+
+  findKeyword(line: string) 
+  {
+    var keywords = Object.keys(BuilderTypes.cardList);
+    var cardName = '';
+    keywords.map(function(word) {
+      var words = word.split(' ');
+      //For terms like select from, only need to match one of the words
+      if(words.length > 1)
+      {
+        for(var i = 0; i < words.length; i++)
+        {
+          if(line.toLowerCase().indexOf(words[i].toLowerCase()) >= 0)
+          {
+            cardName = word;
+          }
+        }
+      }
+      else if(line.toLowerCase().indexOf(word.toLowerCase()) >= 0)
+      {
+        cardName = word;
+      }
+    });
+    return cardName;
+  }
+
+  toggleSyntaxPopup(event, line)
+  {
+    var cardName = this.findKeyword(line);
+
+    var left = event.clientX - event.offsetX - 8;
+    var top = event.clientY - event.offsetY + 17;
+    this.setState({
+      syntaxHelpOpen: !this.state.syntaxHelpOpen,
+      syntaxHelpPos: {left, top},
+      cardName,
+      termDefinitionOpen: false,
+    });
+  }
+
+  defineTerm(value, event)
+  {
+    var cardName = this.findKeyword(value);
+    var left = event.clientX;
+    var top = event.clientY - event.offsetY + 22;
+    if(cardName)
+    {
+      this.setState({
+        termDefinitionOpen: true,
+        termDefinitionPos: {left, top},
+        cardName,
+        syntaxHelpOpen: false,
+      })
+    }
+  }
+
+  hideTermDefinition()
+  {
+    this.setState({
+      termDefinitionOpen: false,
+    })
+  }
+
   renderTqlEditor() 
   {
     var options =
@@ -369,7 +455,8 @@ class TQL extends Classs<Props>
         matchBrackets: true,
         autoCloseBrackets: true,
         foldGutter: true,
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+        lint: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
       };
     var value = this.props.query.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.query);
     return <CodeMirror
@@ -379,6 +466,10 @@ class TQL extends Classs<Props>
       options={options}
       className='codemirror-text'
       value={value}
+      toggleSyntaxPopup={this.toggleSyntaxPopup}
+      defineTerm={this.defineTerm}
+      turnSyntaxPopupOff={this.turnSyntaxPopupOff}
+      hideTermDefinition={this.hideTermDefinition}
       />
   }
 
@@ -389,23 +480,48 @@ class TQL extends Classs<Props>
       onError={this.highlightError}
       onLoadStart={this.props.onLoadStart}
       onLoadEnd={this.props.onLoadEnd}
-      />
+    />
   }
 
   toggleConfirmModal()
   {
     this.setState ({
-       confirmModalOpen: !this.state.confirmModalOpen
+       confirmModalOpen: !this.state.confirmModalOpen,
     });
   }
 
   render() 
   {
+    var manualEntry = BuilderTypes.cardList[this.state.cardName] &&
+        BuilderTypes.Blocks[BuilderTypes.cardList[this.state.cardName]].static.manualEntry;
     return (
       <div className='tql-column'>
         { this.renderTopbar() }
         <div className='code-section'>
           { this.renderTqlEditor() }
+          { this.state.syntaxHelpOpen ? 
+            <TQLPopup 
+               cardName={this.state.cardName}
+               text={manualEntry ? manualEntry.syntax : 'No syntax help available'}
+               style={this.state.syntaxHelpPos}
+               addColumn={this.props.addColumn}
+               columnIndex={this.props.columnIndex}
+               onClick={this.turnSyntaxPopupOff}  
+            />
+            : null
+          }
+          {
+            this.state.termDefinitionOpen ? 
+            <TQLPopup 
+              cardName={this.state.cardName}
+              text={manualEntry ? manualEntry.summary : 'No definition available'}
+               style={this.state.termDefinitionPos}
+               addColumn={this.props.addColumn}
+               columnIndex={this.props.columnIndex}  
+               onClick={this.turnSyntaxPopupOff}  
+            />
+            : null
+          }
           { this.renderResults() }
         </div>
         <Modal 

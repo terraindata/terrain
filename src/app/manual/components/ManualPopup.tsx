@@ -42,58 +42,111 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as classNames from 'classnames';
+require('./ManualPopup.less');
+import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
-import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
-import Card from '../../builder/components/cards/Card.tsx';
+import * as classNames from 'classnames';
+import Classs from './../../common/components/Classs.tsx';
+import BuilderTypes from './../../builder/BuilderTypes.tsx';
+var InfoIcon = require('./../../../images/icon_info.svg');
+var OpenIcon = require('./../../../images/icon_open.svg');
 
 interface Props
 {
-  value: BuilderTypes.CardString;
-  keyPath: KeyPath;
-  keys: List<string>;
-  canEdit: boolean;
-  className: string;
-  helpOn?: boolean;
-  addColumn?: (number, string?) => void;
+  cardName: string;
+  rightAlign?: boolean;
+  addColumn: (number, string?) => void;
   columnIndex: number;
 }
 
-class BuilderTextboxCards extends React.Component<Props, any>
+class ManualPopup extends Classs<Props>
 {
   constructor(props: Props) {
     super(props);
-  }
-  
-  isText()
-  {
-    return typeof this.props.value === 'string';
-  }
-  
-  render() {
-    if(this.isText())
+    this.state =
     {
-      return null;
+      open: false,
     }
+  }
+  
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  }
+  
+  close()
+  {
+    this.setState({
+      open: false,
+    })
+    $(document).off('click', this.close);
+  }
+  
+  componentWillUnmount()
+  {
+    $(document).off('click', this.close);
+  }
+  
+  toggleOpen()
+  {
+    this.setState({
+      open: !this.state.open,
+    });
     
-    // We're in card mode
+    if(!this.state.open)
+    {
+      $(document).on('click', this.close);
+    }
+  }
+  
+  openManual()
+  {
+    this.props.addColumn(this.props.columnIndex, this.props.cardName);
+  }
+
+  render() 
+  {
+
+    var manualEntry = BuilderTypes.cardList[this.props.cardName] 
+        && BuilderTypes.Blocks[BuilderTypes.cardList[this.props.cardName]].static.manualEntry;
+    var content = manualEntry ? manualEntry.snippet : 'No description available';
     return (
-      <div className={classNames({
-        'builder-tb-cards-area': true,
-        [this.props.className]: !!this.props.className,
-      })} ref='tb'>
-        <Card
-          {...this.props}
-          singleCard={true}
-          card={this.props.value as BuilderTypes.ICard}
-          index={null}
-        />
+    <div 
+      className={classNames({
+        "manual-popup-wrapper": true,
+        "manual-popup-open": this.state.open,
+        "manual-popup-wrapper-right-align": this.props.rightAlign
+      })}
+    >
+      <div 
+        className="manual-popup-icon-wrapper"
+        onClick={this.toggleOpen}
+      >
+        <InfoIcon className="manual-popup-icon" />
+       </div>
+        { !this.state.open ? null :
+          <div 
+            className="manual-popup-content-wrapper"
+            onClick={this.toggleOpen}
+          >
+            {content}
+            <div 
+              className='manual-popup-link'
+              onClick={this.openManual}
+            >
+              See full description in Manual
+              <OpenIcon 
+                className='manual-popup-open-icon' 
+                onClick={this.openManual}
+              />
+            </div>
+          </div>
+        }
       </div>
     );
   }
 };
 
-export default BuilderTextboxCards;
+export default ManualPopup;

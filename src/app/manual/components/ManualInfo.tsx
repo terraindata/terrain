@@ -42,58 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as classNames from 'classnames';
+require('./ManualInfo.less');
+import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
-import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
-import Card from '../../builder/components/cards/Card.tsx';
+import * as classNames from 'classnames';
+import Classs from './../../common/components/Classs.tsx';
 
 interface Props
 {
-  value: BuilderTypes.CardString;
-  keyPath: KeyPath;
-  keys: List<string>;
-  canEdit: boolean;
-  className: string;
-  helpOn?: boolean;
-  addColumn?: (number, string?) => void;
-  columnIndex: number;
+  information: string,
+  wide?: boolean,
+  rightSide?: boolean;
+  leftSide?: boolean
+  className?: string;
 }
 
-class BuilderTextboxCards extends React.Component<Props, any>
+
+class ManualInfo extends Classs<Props>
 {
-  constructor(props: Props) {
+  constructor(props: Props) 
+  {
     super(props);
   }
-  
-  isText()
+
+  render() 
   {
-    return typeof this.props.value === 'string';
-  }
-  
-  render() {
-    if(this.isText())
-    {
-      return null;
-    }
-    
-    // We're in card mode
     return (
-      <div className={classNames({
-        'builder-tb-cards-area': true,
-        [this.props.className]: !!this.props.className,
-      })} ref='tb'>
-        <Card
-          {...this.props}
-          singleCard={true}
-          card={this.props.value as BuilderTypes.ICard}
-          index={null}
-        />
+      <div className={'manual-info-wrapper ' + this.props.className} >
+        <div className='manual-info-indicator'></div>
+        <div 
+          className={classNames({
+            'manual-info-content': true,
+            'manual-info-content-wide': this.props.wide,
+            'manual-info-content-right': this.props.rightSide,
+            'manual-info-content-left': this.props.leftSide
+          })}
+        >
+          {this.props.information}  
+        </div>
       </div>
     );
   }
 };
 
-export default BuilderTextboxCards;
+export default ManualInfo;

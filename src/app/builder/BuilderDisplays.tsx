@@ -46,6 +46,10 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import PureClasss from './../common/components/PureClasss.tsx';
 import {Operators, Combinators} from './BuilderTypes.tsx';
+var ManualConfig = require('./../manual/ManualConfig.json');
+
+var ManualConfig = require('./../manual/ManualConfig.json');
+
 
 export enum DisplayType
 {
@@ -69,6 +73,9 @@ export interface Display
   key: string;
   // key can be null for FLEX but nothing else
   
+  //Manual information
+  help?: string | string[];
+
   className?: string | ((data: any) => string);
   
   header?: string;
@@ -99,6 +106,7 @@ export interface Display
     inner: Display | Display[];
     above?: Display | Display[];
     below?: Display | Display[];
+    hideToolsWhenNotString?: boolean;
   };
   
   // for FLEX, its content
@@ -117,6 +125,7 @@ export interface Display
 export const valueDisplay =
 {
   displayType: NUM,
+  help: ManualConfig.help["value"],
   key: 'value',
 }
 
@@ -151,6 +160,7 @@ export const firstSecondDisplay = (middle:Display): Display =>
       key: 'first',
       top: true,
       showWhenCards: true,
+      help: ManualConfig.help["first"],
     },
     
     middle,
@@ -159,6 +169,7 @@ export const firstSecondDisplay = (middle:Display): Display =>
       displayType: CARDTEXT,
       key: 'second',
       showWhenCards: true,
+      help: ManualConfig.help["second"],
     },
   ],
 });
@@ -178,6 +189,7 @@ export const letVarDisplay =
   [
     {
       displayType: TEXT,
+      help: ManualConfig.help["let-var-field"],
       key: 'field',
     },
     {
@@ -187,6 +199,7 @@ export const letVarDisplay =
     },
     {
       displayType: CARDTEXT,
+      help: ManualConfig.help["expression"],
       key: 'expression',
     },
   ],

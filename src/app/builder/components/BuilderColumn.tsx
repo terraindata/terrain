@@ -63,6 +63,8 @@ import InfoArea from '../../common/components/InfoArea.tsx';
 const shallowCompare = require('react-addons-shallow-compare');
 import * as moment from 'moment';
 import Ajax from "./../../util/Ajax.tsx";
+import Manual from './../../manual/components/Manual.tsx';
+
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -72,20 +74,23 @@ var BuilderIcon = require("./../../../images/icon_builder.svg");
 var ResultsIcon = require("./../../../images/icon_resultsDropdown.svg");
 var TQLIcon = require("./../../../images/icon_tql.svg");
 var InputsIcon = require("./../../../images/icon_input.svg");
+var ManualIcon = require('./../../../images/icon_info.svg');
 
 enum COLUMNS {
   Builder,
   Results,
   TQL,
   Inputs,
+  Manual,
 };
-var NUM_COLUMNS = 4;
+var NUM_COLUMNS = 5;
 
 var menuIcons = [
     {icon: <BuilderIcon />, color: '#76a2c1'},
     {icon: <ResultsIcon />, color: '#71bca2'},
     {icon: <TQLIcon />, color: '#d47884'},
-    {icon: <InputsIcon />, color: '#c2b694'}
+    {icon: <InputsIcon />, color: '#c2b694'},
+    {icon: <ManualIcon />, color: "#a98abf"}
 ];
 
 // interface Props
@@ -113,10 +118,15 @@ var BuilderColumn = React.createClass<any, any>(
     canAddColumn: React.PropTypes.bool,
     canCloseColumn: React.PropTypes.bool,
     onAddColumn: React.PropTypes.func.isRequired,
+    onAddManualColumn: React.PropTypes.func.isRequired,
     onCloseColumn: React.PropTypes.func.isRequired,
     colKey: React.PropTypes.number.isRequired,
     history: React.PropTypes.any,
     onRevert: React.PropTypes.func,
+    columnType: React.PropTypes.number,
+    selectedCardName: React.PropTypes.string,
+    switchToManualCol: React.PropTypes.func,
+    changeSelectedCardName: React.PropTypes.func,
   },
   
   getInitialState()
@@ -131,10 +141,18 @@ var BuilderColumn = React.createClass<any, any>(
       }
     }
     return {
-      column,
+      column: this.props.columnType ? this.props.columnType : column,
       loading: false,
       inputKeys: this.calcinputKeys(this.props),
       // rand: 1,
+    }
+  },
+
+  componentDidMount()
+  {
+    if(this.state.column === 4)
+    {
+      this.props.switchToManualCol(this.props.index);
     }
   },
   
@@ -199,7 +217,6 @@ var BuilderColumn = React.createClass<any, any>(
   renderContent(canEdit:boolean)
   {
     var query = this.props.query;
-    
     switch(this.state.column)
     {
       case COLUMNS.Builder:
@@ -231,6 +248,8 @@ var BuilderColumn = React.createClass<any, any>(
           topLevel={true}
           keys={this.state.inputKeys}
           canEdit={canEdit}
+          addColumn={this.props.onAddManualColumn}
+          columnIndex={this.props.index}
         />;
         
       case COLUMNS.Inputs:
@@ -246,20 +265,36 @@ var BuilderColumn = React.createClass<any, any>(
           onLoadEnd={this.handleLoadEnd}
           canEdit={canEdit}
         />;
-      
+
       case COLUMNS.TQL:
         return <TQLEditor
           query={query}
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
+          addColumn={this.props.onAddManualColumn}
+          columnIndex={this.props.index}
         />;
         
+      case COLUMNS.Manual:
+        return <Manual 
+          selectedKey={this.props.selectedCardName}
+          changeCardName={this.props.changeSelectedCardName}
+        />;
     }
     return <div>No column content.</div>;
   },
   
   switchView(index)
   {
+    if(index === 4)
+    {
+      this.props.switchToManualCol(this.props.index);
+    }
+    else if(this.state.column === 4)
+    {
+      this.props.switchToManualCol(-1);
+    }
+    
     this.setState({
       column: index,
     });
@@ -389,9 +424,10 @@ var BuilderColumn = React.createClass<any, any>(
         </div>
         {this.renderBuilderVersionToolbar(canEdit)}
         <div className={
-            'builder-column-content' + 
+            (this.state.column === COLUMNS.Manual ? 'builder-column-manual ' : '') +
+            'builder-column-content ' + 
             (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '') +
-            (this.state.column === COLUMNS.Inputs ? ' builder-column-content-scroll' : '')
+            (this.state.column === COLUMNS.Inputs ? ' builder-column-content-scroll' : '') 
           }>
           { this.renderContent(canEdit) }
         </div>

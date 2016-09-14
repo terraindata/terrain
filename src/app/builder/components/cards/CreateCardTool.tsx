@@ -129,6 +129,7 @@ class CreateCardTool extends PureClasss<Props>
                  style={{
                    backgroundColor: card.static.colors[0],
                  }}
+                 data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
                >
                  <div className="create-card-button-inner" rel={type}>
                    { card.static.title }

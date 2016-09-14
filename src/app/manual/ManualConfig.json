@@ -1,0 +1,1314 @@
+{
+  "comment": "For information on how to edit this file and what the fields mean refer to this wiki page: https://wiki.terraindb.com/wiki/tiki-index.php?page=Edit+Manual+Config#Card_Entry_",
+  "cards": {
+   "sfw":
+    { 
+      "name": "Select / From",
+      "summary": "The Select From card is the fundamental card for TQL, and is the card that defines a new query. It selects certain attributes of elements from a specified source. To select all attributes, use Select *. Any cards contained within the From card will define the result set.", 
+      "notation": "",
+      "snippet": "Retrieves results from the database",
+      "syntax": "SELECT field(s) FROM table(s)",
+      "text": 
+      [ 
+          "The TQL Select statement returns a result set of records from one or more tables. A Select statement retrieves zero or more rows from one or more database tables or database views. In most applications, Select is the most commonly used data manipulation language (DML) command. As TQL is a declarative programming language, Select queries specify a result set, but do not specify how to calculate it. The database translates the query into a query plan which may vary between executions, database versions and database software. This functionality is called the query optimizer as it is responsible for finding the best possible execution plan for the query, within applicable constraints.",
+          {
+            "cards": [],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "user.name",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "user.name",
+                "operator": 0,
+                "second": "John",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "alias": "user",
+              "table": "users",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e",
+            "helpOn": true,
+            "title": "Basic Select / From Card"
+          },
+        "This example select all the product ids purchased by user 1234:",
+          {
+            "cards": [],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "product.id",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "product.id",
+                "operator": 6,
+                "second": {
+                  "cards": [{
+                    "cards": [],
+                    "fields": [
+                      { 
+                        "type": "field",
+                        "field": "order.product",
+                        "id": "bb"
+                      }
+                    ],
+                    "filters": [
+                      { 
+                        "combinator": 0,
+                        "first": "order.user",
+                        "operator": 0,
+                        "second": "1234",
+                        "type": "filterBlock",
+                        "id": "cc"
+                      }
+                    ],
+                    "tables": [
+                    {
+                      "alias": "order",
+                      "table": "'orders'",
+                      "type": "table",
+                      "id": "dd"
+                    }
+                    ],
+                    "type": "sfw",
+                    "id": "ee"
+                  }],
+                  "id": "g",
+                  "type": "parentheses"
+                },
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "alias": "product",
+              "table": "'products'",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e",
+            "title": "Select / From Card Example"
+          }
+      ]
+    },
+    
+    
+    
+    "take":
+    { 
+      "name": "Take / Limit",
+      "snippet": "Returns n results", 
+      "summary": "Returns a query expression representing the first n results from the expression on the left hand side.  The number of results n is the evaluation of the right hand side.", 
+      "notation": "binary infix operator",
+      "syntax": "query expression TAKE expression",
+      "text": 
+      [ 
+          {
+            "type": "take",
+            "value": "10",
+            "id": "a",
+            "helpOn": true,
+            "title": "Basic Take Card"
+          },
+        "Take is a binary infix operator, meaning it sits between two expressions. Take returns a query expression that is the first n results of the query expression on its left hand side.  The number of results n to be returned is determined from the right hand side. In order to get a specific set of results, the data can be sorted based on some parameter first and then the top n results selected via Take. For example, if you wanted the 10 oldest people in a group, you would sort the people based on descending age and then use 'Take 10'.",
+        "This example takes the first 10 results (the names of users) from the table 'users.'",
+          {
+            "cards": [
+              {
+                "type": "take",
+                "value": 10,
+                "id": "a"
+              }
+            ],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "user.name",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "user.name",
+                "operator": 0,
+                "second": "John",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "alias": "user",
+              "table": "users",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e",
+            "title": "Take Card Example"
+          }
+      ]
+    },
+    
+    "where":
+    { 
+      "name": "Where",
+      "snippet": "Filters through results that meet the conditions", 
+      "summary": "The condition(s) inside the Where card define which results this query will return. This is useful for finding a specific subset of results that all meet specified conditions, e.g. your search terms.", 
+      "notation": "binary infix operator",
+      "syntax": "WHERE condition(s)",
+      "text": 
+      [ 
+        "Coming soon, but don't hold your breath."
+      ]
+    },
+    
+    "and":
+    { 
+      "name": "And",
+      "snippet": "Is true when all conditions are met", 
+      "summary": "Evaluates to either true or false. Evaluates to true if all conditions inside are also true. Evaluates to false if any of the conditions inside are not true.", 
+      "notation": "binary infix operator",
+      "syntax": "condition AND condition",
+      "text": 
+      [ 
+        "Coming soon, but don't hold your breath."
+      ]
+    },
+    
+    "tql":
+    {
+      "name": "TQL Wildcard",
+      "snippet": "Inserts TQL into the query",
+      "summary": "The TQL wildcard simply inserts its contents directly into the query. This is useful for niche TQL/SQL functions that don't have corresponding cards.",
+      "notation": "any",
+      "syntax": "value",
+      "text":
+      [
+        "The value of a TQL card will be inserted verbatim into the query.",
+        {
+          "type": "sfw",
+          "tables":
+          [
+            {
+              "type": "table",
+              "alias": "users",
+              "table": "user"
+            }
+          ],
+          "fields":
+          [
+            {
+              "type": "field",
+              "field": "*"
+            }
+          ],
+          
+          "cards":
+          [
+            {
+              "type": "tql",
+              "clause": "GROUP BY user.age"
+            }
+          ]
+        }
+      ]
+    },
+    
+    "or":
+    { 
+      "name": "Or",
+      "snippet": "Is true when one of its conditions are met", 
+      "summary": "Evaluates to either true or false. Evaluates to true if one or more of its conditions inside are also true. Evaluates to false if all of the conditions inside are not true.", 
+      "notation": "binary infix operator",
+      "syntax": "condition OR condition",
+      "text": 
+      [ 
+        "Coming soon, but don't hold your breath."
+      ]
+    },
+    
+    "sort":
+    { 
+      "name": "Sort",
+      "snippet": "none", 
+      "summary": "Returns a query expression representing the result of filtering the left-hand expression by evaluating the right-hand expression for each element in the query  expression. Elements that cause the expression to be false are filtered out.",
+      "notation": "binary infix operator",
+      "syntax": "query expression sort expression",
+      "text": 
+      [ 
+          {
+            "type": "sort",
+            "id": "3",
+            "sorts": [
+              {
+                "direction": 1,
+                "property": "user.id",
+                "id": "b",
+                "type": "sortBlock"
+              }
+            ],
+            "helpOn": true,
+            "title": "Basic Sort Card"
+          },
+        "A Sort clause in SQL specifies that a SQL Select statement returns a result set with the rows being sorted by the values of one or more columns. The sort criteria do not have to be included in the result set. The sort criteria can be expressions, including column names, user-defined functions, arithmetic operations, or CASE expressions. The expressions are evaluated and the results are used for the sorting, i.e., the values stored in the column or the results of the function call. ORDER BY is the only way to sort the rows in the result set. Without this clause, the relational database system may return the rows in any order. If an ordering is required, the ORDER BY must be provided in the SELECT statement sent by the application. Although some database systems allow the specification of an ORDER BY clause in subselects or view definitions, the presence there has no effect. A view is a logical relational table, and the relational model mandates that a table is a set of rows, implying no sort order whatsoever. The only exception are constructs like ORDER BY ORDER OF ... (not standardized in SQL:2003) which allow the propagation of sort criteria through nested subselects.",
+        "This example sorts all the users with the name John from'users' in ascending order by their name.",
+          {
+            "cards": [
+              {
+                "type": "sort",
+                "id": "a",
+                "sorts": [
+                  {
+                    "direction": 2,
+                    "property": "user.name",
+                    "id": "b",
+                    "type": "sortBlock"
+                  }
+                ]
+              }
+            ],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "user.name",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "user.name",
+                "operator": 0,
+                "second": "John",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "alias": "user",
+              "table": "users",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e",
+            "title": "Sort Card Example"
+          }
+      ]
+    },
+    "let":
+    { 
+      "name": "Let",
+      "snippet": "Defines variable", 
+      "summary": "Returns a query expression representing the result of evaluating each the right hand statement for each element.", 
+      "notation": "binary infix operator",
+      "syntax": "LET variable name = value",
+      "text": 
+      [ 
+          {
+            "type": "let",
+            "id": "3",
+            "field": "product.score",
+            "expression": "product.age * product.conversionRatio",
+            "helpOn": true,
+            "title": "Basic Let Card"
+          },
+         "This example defines a variable averageSales to be the average sales of all products where ids are less than 10 in products.",
+          {
+            "type": "let",
+            "id": "x",
+            "field": "product.averageSales",
+            "title": "Let Card Example",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "avg",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
+          }
+      ]
+    },
+    "var":
+    { 
+      "name": "Var",
+      "snippet": "Declares a variable", 
+      "summary": "Declares a variable", 
+      "notation": "binary infix operator",
+      "syntax": "VAR name = value",
+      "text": 
+      [ 
+          {
+            "type": "var",
+            "id": "3",
+            "field": "product.score",
+            "expression": "product.age * product.conversionRatio",
+            "helpOn": true,
+            "title": "Basic Var Card"
+          },
+          "This example defines a variable averageSales to be the average sales of all products where ids are less than 10 in products.",
+          {
+            "type": "var",
+            "id": "x",
+            "field": "product.averageSales",
+            "title": "Var Card Example",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "avg",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
+          }
+      ]
+    },
+    "score":
+    { 
+      "name": "Score",
+      "snippet": "Used to rank result", 
+      "summary": "Score is used to rank and order results from a query. The score is based on a weighted sum of attributes of the elements.", 
+      "notation": "binary prefix operator",
+      "syntax": "linearScore[([weight1, attribute1], [weight2, attribute2]...)]",
+      "text": 
+      [ 
+        "The Score card does not have a description yet.",
+          {
+            "id": "a",
+            "method": "",
+            "type": "score",
+            "weights": [
+              {
+                "key": "product.positive_reviews",
+                "weight": "50",
+                "id": "b",
+                "type": "weight"
+              },
+              {
+                "key": "product.negative_reviews",
+                "weight": "-25",
+                "id": "c",
+                "type": "weight"
+              },
+              {
+                "key": "product.price",
+                "weight": "10",
+                "id": "d",
+                "type": "weight"
+              }
+            ],
+            "helpOn": true,
+            "title": "Basic Score Card"
+          },
+      "In this example, books are scored based on their positive reviews, negative reviews and prices, ranked according to score, and the top 100 products are then selected",
+          {
+            "cards": [
+              {
+                "id": "a",
+                "expression": {
+                  "cards": [
+                    {
+                      "id": "a",
+                      "method": "",
+                      "type": "score",
+                      "weights": [
+                        {
+                          "key": "product.positive_reviews",
+                          "weight": "50",
+                          "id": "b",
+                          "type": "weight"
+                        },
+                        {
+                          "key": "product.negative_reviews",
+                          "weight": "-25",
+                          "id": "c",
+                          "type": "weight"
+                        },
+                        {
+                          "key": "product.price",
+                          "weight": "10",
+                          "id": "d",
+                          "type": "weight"
+                        }
+                      ]
+                    }
+                  ],
+                  "id": "g",
+                  "type": "parentheses"
+                },
+                "field": "product.score",
+                "type": "let"
+              },
+              {
+                "id": "e",
+                "type": "sort",
+                "sorts": [{
+                  "direction": 1,
+                  "id": "f",
+                  "property": "product.score",
+                  "type": "sortBlock"
+                }]
+              },
+              {
+                "id": "z",
+                "type": "take",
+                "value": "100"
+              }
+            ],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "*",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "product.type",
+                "operator": 0,
+                "second": "book",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "alias": "product",
+              "table": "'products'",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e",
+            "title": "Score Card Example"
+          }
+      ]
+    },
+    "transform":
+    { 
+      "name": "Transform",
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+          "The transform card can be used to manipulate a variable.",
+          {
+            "bars": [],
+            "domain": [0, 100],
+            "id": "a",
+            "input": "user.experience",
+            "scorePoints": [
+              {
+                "id": "b",
+                "score": 0.1,
+                "type": "scorePoint",
+                "value": 1
+              },
+              {
+                "id": "c",
+                "score": 0.38,
+                "type": "scorePoint",
+                "value": 25
+              },
+              {
+                "id": "d",
+                "score": 0.6,
+                "type": "scorePoint",
+                "value": 50
+              },
+              {
+                "id": "e",
+                "score": 0.75,
+                "type": "scorePoint",
+                "value": 75
+              },
+              {
+                "id": "f",
+                "score": 0.8,
+                "type": "scorePoint",
+                "value": 100
+              }
+            ],
+            "type": "transform",
+            "helpOn": true,
+            "title": "Basic Transform Card"
+          },
+          "The points on a transform card can be moved by clicking and dragging. When dragging points around there is a y limit made by the points on either side of the current point. You can also move points using the arrow keys or can type into the fields to get a more exact value. You will notice when you move a point around that crosshairs appear to help you determine the x and y coordinate values. To add a new point, double left click. To remove a point, either right click on the point and hit delete or select the point and hit the delete key on your keyboard. You can change the range of visible coordinates using the periscope bar at the bottom of the transform card."
+      ]
+    },
+    "count":
+    { 
+      "name": "Count",
+      "snippet": "Number of elements", 
+      "summary": "Returns an the number of elements in the right hand expression", 
+      "notation": " binary prefix operator",
+      "syntax": "COUNT expression",
+      "text": 
+      [ 
+        "This example counts all the visible products.",
+        {
+            "type": "let",
+            "id": "x",
+            "field": "product.averageSales",
+            "title": "Count Card Example",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "count",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
+          }
+      ]
+    },
+    "avg":
+    { 
+      "name": "Average",
+      "snippet": "Returns the average", 
+      "summary": "Returns the average of all elements in the right hand side.", 
+      "notation": "binary prefix operator",
+      "syntax": "AVG expression",
+      "text": 
+      [ 
+        "This example defines a variable averageSales to be the average sales of all products where ids are less than 10 in products.",
+          {
+            "type": "let",
+            "id": "x",
+            "field": "product.averageSales",
+            "title": "Average Card Example",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "avg",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
+          }
+      ]
+    },
+    "sum":
+    { 
+      "name": "Sum",
+      "snippet": "Returns the sum", 
+      "summary": "Returns an the sum of all elements in the right hand side.", 
+      "notation": "binary prefix operator",
+      "syntax": "SUM expression",
+      "text": 
+      [ 
+        "This example defines a variable numSales to be the sum sales of all product sales where ids are less than 10 in products.",
+                 {
+            "type": "let",
+            "id": "x",
+            "field": "product.numSales",
+            "title": "Sum Card Example",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "sum",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
+          }
+      ]
+    },
+    "min":
+    { 
+      "name": "Min",
+      "snippet": "Returns minimum element", 
+      "summary": "Returns an the minimum of all elements in the right hand side", 
+      "notation": "binary prefix operator",
+      "syntax": "MIN expression",
+      "text": 
+      [ 
+        "This example defines a variable minSales to be the minimum sales of all products where ids are less than 10 in products.",
+          {
+            "type": "let",
+            "id": "x",
+            "field": "product.minSales",
+            "title": "Min Card Example",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "min",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
+          }
+      ]
+    },
+    "max":
+    { 
+      "name": "Max",
+      "snippet": "Returns maximum element", 
+      "summary": "Returns an the maximum of all elements in the right hand side", 
+      "notation": "binary prefix operator",
+      "syntax": "MAX expression",
+      "text": 
+      [ 
+        "This example defines a variable maxSales to be the maximum sales of all products where ids are less than 10 in products.",
+          {
+            "type": "let",
+            "id": "x",
+            "field": "product.maxSales",
+            "title": "Max Card Example",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "max",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
+          }
+      ]
+    },
+    "exists":
+    { 
+      "name": "Exists",
+      "snippet": "Returns if exists", 
+      "summary": "Tests whether the inner query returns any row.", 
+      "notation": "None",
+      "syntax": "WHERE EXISTS (subquery)",
+      "text": 
+      [ 
+        "The Exists card returns true if the inner query returns any results.",
+        {
+          "id": "a",
+          "type": "exists",
+          "title": "Basic Exists Card",
+          "cards": [{
+            "cards": [],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "*",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": "user.name",
+                "operator": 0,
+                "second": "'Susan'",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "alias": "user",
+              "table": "users",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e",
+            "helpOn": true
+          }]
+        },
+        "In this example, users are selected if there exists a product that was bought by that user",
+        {
+            "cards": [],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "*",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                "combinator": 0,
+                "first": {
+                  "id": "f",
+                  "type": "parentheses",
+                  "cards": [{
+                    "type": "exists",
+                    "id": "g",
+                    "cards": [{
+                      "cards": [],
+                      "fields": [
+                        { 
+                          "type": "field",
+                          "field": "*",
+                          "id": "h"
+                        }
+                      ],
+                      "filters": [
+                        { 
+                          "combinator": 0,
+                          "first": "user.id",
+                          "operator": 6,
+                          "second": "p.buyers",
+                          "type": "filterBlock",
+                          "id": "i"
+                        }
+                      ],
+                      "tables": [
+                        {
+                          "alias": "p",
+                          "table": "products",
+                          "type": "table",
+                          "id": "j"
+                        }
+                      ],
+                      "type": "sfw",
+                      "id": "k"
+                    }]
+                  }]
+                },
+                "operator": 0,
+                "second": "true",
+                "type": "filterBlock",
+                "id": "c"
+              }
+            ],
+            "tables": [
+            {
+              "alias": "user",
+              "table": "users",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e",
+            "title": "Exists Card Example"
+        }
+      ]
+    },
+    "parentheses":
+    { 
+      "name": "( )",
+      "snippet": "none", 
+      "summary": "none",
+      "notation": "none",
+      "syntax": "none",
+      "text": 
+      [ 
+        "This example defines a variable averageSales to be the average sales of all products where ids are less than 10 in products.",
+          {
+            "type": "let",
+            "id": "x",
+            "field": "product.averageSales",
+            "title": "Parentheses Card Example",
+            "expression":
+            {
+              "id": "z",
+              "type": "parentheses",
+              "cards": [
+                {
+                  "type": "avg",
+                  "id": "b",
+                  "cards": [
+                  {
+                  "type": "sfw",
+                  "id": "c",
+                  "fields": [
+                  { 
+                    "type": "field",
+                    "field": "product.sales",
+                    "id": "b"
+                  }
+                ],
+                "filters": [
+                  { 
+                  "combinator": 0,
+                  "first": "product.id",
+                  "operator": 5,
+                  "second": "10",
+                  "type": "filterBlock",
+                  "id": "c"
+                  }
+                ],
+                "tables": [
+                {
+                  "alias": "product",
+                  "table": "products",
+                  "type": "table",
+                  "id": "d"
+                }
+              ]
+            }
+          ]
+                }
+              ]
+            }
+          }
+      ]
+    },
+    "filter":
+    { 
+      "name": "Comparison",
+      "snippet": "Returns elements that satisfy the condition", 
+      "summary": "Returns a query expression representing the result of filtering the left-hand expression by evaluating the right-hand expression for each element in the query  expression. Elements that cause the expression to be false are filtered out.",
+      "notation": "binary infix operator",
+      "syntax": "query expression FILTER expression",
+      "text": 
+      [ 
+          {
+            "type": "filter",
+            "id": "a",
+            "filters": [
+                  { 
+                    "combinator": 0,
+                    "first": "product.price",
+                    "operator": 4,
+                    "second": "20",
+                    "type": "filterBlock",
+                    "id": "c"
+                  }
+             ],
+            "helpOn": true,
+            "title": "Basic Comparison Card"
+          },
+        "The following example returns all of the cars that are cost less than $5000 from products. ",
+          {
+            "cards": [
+              {
+                "type": "filter",
+                "id": "a",
+                "filters": [
+                  { 
+                    "combinator": 0,
+                    "first": "product.price",
+                    "operator": 4,
+                    "second": "5000",
+                    "type": "filterBlock",
+                    "id": "c"
+                  }
+                ]
+              }
+            ],
+            "fields": [
+              { 
+                "type": "field",
+                "field": "product.price",
+                "id": "b"
+              }
+            ],
+            "filters": [
+              { 
+                    "combinator": 0,
+                    "first": "product.type",
+                    "operator": 0,
+                    "second": "car",
+                    "type": "filterBlock",
+                    "id": "g"
+                  }
+            ],
+            "tables": [
+            {
+              "alias": "product",
+              "table": "products",
+              "type": "table",
+              "id": "d"
+            }
+            ],
+            "type": "sfw",
+            "id": "e",
+            "title": "Comparison Card Example"
+          }
+      ]
+    },
+    "skip":
+    { 
+      "name": "Skip / Offset",
+      "snippet": "Removes first n elements", 
+      "summary": "Returns a query expression representing the left-hand query expression, with the first n elements removed, where n is the result of evaluating the right-hand expression.", 
+      "notation": "binary infix operator",
+      "syntax": "query expression SKIP expression (n)",
+      "text": 
+      [ 
+        "The Skip operator skips the first n elements of the query expression on its left hand side.  The number of elements, n, to skip is the evaluating of the right-hand side. Using Skip skips the first n elements and then takes all of the remaining rows.",
+        {
+          "id": "a",
+          "type": "skip",
+          "value": 10,
+          "title": "Basic Skip Card"
+        },
+        "This example gets the 26th-50th visible products in the 'cool stuff' category, sorted by creation date",
+        {
+          "cards": [{
+            "id": "b",
+            "sorts": [{
+              "direction": 1,
+              "id": "c",
+              "property": "p.createdOn",
+              "type": "sortBlock"
+            }],
+            "type": "sort"
+          },
+          {
+            "value": "25",
+            "id": "e",
+            "type": "skip"
+          },
+          {
+            "value": "25",
+            "id": "f",
+            "type": "take"
+          }],
+          "fields": [{
+            "field": "*",
+            "id": "d",
+            "type": "field"
+          }],
+          "filters": [{
+            "combinator": 0,
+            "first": "p.visible",
+            "second": "true",
+            "type":"filterBlock",
+            "operator": 0,
+            "id": "g"
+          }],
+          "tables": [{
+              "alias": "p",
+              "table": "product",
+              "type": "table",
+              "id": "h2"
+          }],
+          "id": "a",
+          "type": "sfw",
+          "title": "Skip Card Example"
+        }
+      ]
+    }
+  },
+  "phraseTypes": {
+    "Expression":
+    {  
+      "summary": "A TQL expression is any valid combination of expressions and operators that returns a single value.",
+      "text": 
+      [ 
+        "Examples: ",
+        "2",
+        "'name'",
+        "2+2",
+        "3+2*4+func('group')"
+      ]
+    },
+    "Statement":
+    {
+      "summary": "All operations performed using TQL statements",
+      "text": 
+      [ 
+        "A Tql statement is one of: ",
+        "- A code block, enclose in curly braces.",
+        "- An expression that does not begin with a curly brace.",
+        "- A bare semicolon, which is treated as whitespace."
+      ]
+    },
+    "Binary Infix":
+    {
+      "summary": "Sits between two expressions",
+      "text": 
+      [ 
+        "Infix notation is the notation commonly used in arithmetical and logical formulae and statements. It is characterized by the placement of operators between operands – 'infixed operators' – such as the plus sign in '2 + 2'.",
+        "In infix notation, unlike in prefix or postfix notations, parentheses surrounding groups of operands and operators are necessary to indicate the intended order in which operations are to be performed. In the absence of parentheses, certain precedence rules determine the order of operations."
+      ]
+    },
+    "Binary Prefix":
+    {
+      "summary": "Precedes it's target",
+      "text": 
+      [ 
+        "You implement a prefix or postfix unary operator by writing the prefix modifier before the func keyword when declaring the operator function."
+      ]
+    }
+  },
+  "help": 
+  {
+    "value": "Number value",
+    "first": "Value to compare",
+    "operator": "Operator for comparison, can be =, <, <=, >, >= in or not in",
+    "second": "Value to compare",
+    "let-var-field": "Name by which variable is referred",
+    "expression": "Value to assign variable",
+    "property": "Field by whicht to sort. For multiple sort fields, priotity goes top to bottom",
+    "direction": "Direction for sort (ascending or descending)",
+    "key": "The attribute being weighted",
+    "weight": "Numbered weight value to assign to the attribute",
+    "score": "These bars visually show the weights of the scores",
+    "input": "The attribute being transformed",
+    "select-field": "The field being selected",
+    "scorePoints": ["The points can be dragged around or their position changed manually through the input box. To delete a point, right click on it. To add a point double click anywhere in the chard",
+      "The lines of the graph can be moved by clicking and dragging",
+      "Use these sliders at the bottom to change the domain of the transform chart"],
+    "table": "The table that data is being retrieved from",
+    "alias": "The alias for the data retrieved from the table"
+  }
+}

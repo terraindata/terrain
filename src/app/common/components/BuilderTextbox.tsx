@@ -57,6 +57,8 @@ import CreateCardTool from '../../builder/components/cards/CreateCardTool.tsx';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as classNames from 'classnames';
 import Autocomplete from './Autocomplete.tsx';
+import ManualInfo from '../../manual/components/ManualInfo.tsx';
+
 var AddCardIcon = require("./../../../images/icon_addCard_22x17.svg?name=AddCardIcon");
 var TextIcon = require("./../../../images/icon_text_12x18.svg?name=TextIcon");
 var CloseIcon = require("./../../../images/icon_close.svg");

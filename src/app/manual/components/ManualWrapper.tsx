@@ -42,58 +42,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as classNames from 'classnames';
+require('./ManualPopup.less');
+import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
-import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
-import Card from '../../builder/components/cards/Card.tsx';
+import * as classNames from 'classnames';
+import Classs from './../../common/components/Classs.tsx';
+import Manual from './Manual.tsx';
+import { DragDropContext } from 'react-dnd';
+var HTML5Backend = require('react-dnd-html5-backend');
 
 interface Props
 {
-  value: BuilderTypes.CardString;
-  keyPath: KeyPath;
-  keys: List<string>;
-  canEdit: boolean;
-  className: string;
-  helpOn?: boolean;
-  addColumn?: (number, string?) => void;
-  columnIndex: number;
+  history?: any;
+  location?: any;
+  params?: any;
 }
 
-class BuilderTextboxCards extends React.Component<Props, any>
+class ManualWrapper extends Classs<Props>
 {
-  constructor(props: Props) {
-    super(props);
-  }
-  
-  isText()
-  {
-    return typeof this.props.value === 'string';
-  }
-  
-  render() {
-    if(this.isText())
-    {
-      return null;
-    }
-    
-    // We're in card mode
-    return (
-      <div className={classNames({
-        'builder-tb-cards-area': true,
-        [this.props.className]: !!this.props.className,
-      })} ref='tb'>
-        <Card
-          {...this.props}
-          singleCard={true}
-          card={this.props.value as BuilderTypes.ICard}
-          index={null}
-        />
-      </div>
-    );
-  }
-};
+	constructor(props)
+	{
+		super(props);
+	}
 
-export default BuilderTextboxCards;
+	render()
+	{
+		var selected = this.props.params['term'] || '';
+		return <Manual 
+			selectedKey={selected}
+			history={this.props.history}
+			manualTab={true}
+		/>;
+	}
+}
+
+export default DragDropContext(HTML5Backend)(ManualWrapper);

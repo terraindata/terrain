@@ -1,0 +1,100 @@
+@import "../../common/Common.less";
+
+@manual-popup-color: #fff;
+@manual-popup-collapsed-size: 24px;
+@manual-popup-icon-width: 14px;
+@manual-popup-icon-height: 14px;
+
+.manual-popup-wrapper {
+  font-weight: 200;
+  position: absolute;
+  top: 3px;
+  right: 30px;
+  cursor: pointer;
+  .transition;
+  overflow: visible;
+  text-align: center;
+  font-weight: 200;
+  width: @manual-popup-collapsed-size !important;
+  height: @manual-popup-collapsed-size !important;
+
+  .manual-popup-icon {
+    fill: @manual-popup-color;
+    width: @manual-popup-icon-width;
+    height: @manual-popup-icon-height;
+    position: absolute;
+    left: calc((@manual-popup-collapsed-size - @manual-popup-icon-width) / 2);
+    top: calc((@manual-popup-collapsed-size - @manual-popup-icon-height) / 2);
+  }
+}
+
+.manual-popup-wrapper-right-align {
+  right: 4px;
+}
+
+  &.manual-popup-content-wrapper {
+    background: #ffffff;
+    border-radius: 6px;
+    z-index: 1020;
+    box-shadow: 0px 0px 3px #888888;
+    top: 7 + @manual-popup-collapsed-size;
+    right: -6px;
+    position: absolute;
+    border: 6px solid white;
+    text-align: left;
+    overflow: visible;
+    color: black;
+    font-size: 12px;
+    width: 200px;
+    height: auto;
+    font-family: inherit;
+    text-transform: none;
+    cursor: default;
+    z-index: 999999999;
+    padding-bottom: 15px;
+  }
+
+.manual-popup-link {
+  font-size: 11px;
+  color: #828c76;
+  position: absolute;
+  bottom: 0px;
+  cursor: pointer;
+  .manual-popup-open-icon {
+    height: 8px;
+    width: 8px;
+    fill: #828c76;
+    cursor: pointer;
+    margin-left: 4px;
+  }
+  &:hover {
+    color: #a2af93;
+    .manual-popup-open-icon {
+      fill: #a2af93;
+    }
+  }
+}
+
+.manual-popup-content-wrapper:before, .manual-popup-content-wrapper:after {
+    content: "";
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    right: 6px;
+    top: -12px;
+}
+
+.manual-popup-content-wrapper:before {
+    border-bottom: 7px solid fade(#888888, 50%);
+    border-right: 7px solid transparent;
+    border-left: 7px solid transparent;
+    top: -13px;
+    right: 5px;
+}
+
+.manual-popup-content-wrapper:after {
+    border-bottom: 6px solid #fff;
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+}
+

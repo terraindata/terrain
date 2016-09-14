@@ -47,7 +47,6 @@ THE SOFTWARE.
 
 var React = require('react');
 var className = require('classnames');
-//var debounce = require('lodash.debounce');
 
 var CodeMirror = React.createClass({
 	displayName: 'CodeMirror',
@@ -60,6 +59,10 @@ var CodeMirror = React.createClass({
 		value: React.PropTypes.string,
 		className: React.PropTypes.any,
 		codeMirrorInstance: React.PropTypes.object,
+		toggleSyntaxPopup: React.PropTypes.func,
+		defineTerm: React.PropTypes.func,
+		turnSyntaxPopupOff: React.PropTypes.func,
+		hideTermDefinition: React.PropTypes.func
 	},
 	foldClass: {
 		open: "CodeMirror-foldgutter-open",
@@ -83,9 +86,17 @@ var CodeMirror = React.createClass({
 		this.codeMirror.on('change', this.codemirrorValueChanged);
 		this.codeMirror.on('focus', this.focusChanged.bind(this, true));
 		this.codeMirror.on('blur', this.focusChanged.bind(this, false));
+		this.codeMirror.on('contextmenu', this.handleRightClick);
 		this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
+		this.codeMirror.on('scroll', this.turnSyntaxPopupOff);
 		this.codeMirror.setSize("100%", "70%");
 	},
+
+	turnSyntaxPopupOff: function turnSyntaxPopupOff()
+	{
+		this.props.turnSyntaxPopupOff && this.props.turnSyntaxPopupOff();
+	},
+
 	componentWillUnmount: function componentWillUnmount() 
 	{
 		if (this.codeMirror) 
@@ -93,18 +104,44 @@ var CodeMirror = React.createClass({
 			this.codeMirror.toTextArea();
 		}
 	},
+	handleRightClick: function handleRightClick(self, event)
+	{
+		event.preventDefault();
+		this.codeMirror.on('mousedown', this.props.hideTermDefinition);
+		if(this.props.defineTerm)
+		{
+			this.props.defineTerm(this.codeMirror.getSelection(), event);
+		}
+	},
+
 	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
 	{
 		if(lineToHighlight != null) 
 		{
 			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
 		}
+		//Add info gutter widget
+		var widget = document.createElement("span");
+		var text = document.createElement("div");
+		var content = document.createTextNode("?");
+		widget.appendChild(text);
+		text.appendChild(content);
+		widget.className = 'CodeMirror-error-marker';
+		text.className = 'CodeMirror-error-text';
+		var self = this;
+		var codeMirrorInstance = this.getCodeMirrorInstance();
+		var line = this.codeMirror.getLine(lineToHighlight)
+		codeMirrorInstance.on(widget, "mousedown", function(e) {
+      		self.props.toggleSyntaxPopup(e, line);
+   		});
+		this.codeMirror.setGutterMarker(lineToHighlight, "CodeMirror-lint-markers", widget);
 	},
 	undoHighlightedLine: function undoHighlightedLine(line) 
 	{
 		if(line != null) 
 		{
 			this.codeMirror.removeLineClass(line, 'wrap', 'cm-error');
+			this.codeMirror.clearGutter('CodeMirror-lint-markers');
 		}
 	},
 	addOpenBrace: function addOpenBrace(i, ch, arr) 
@@ -290,17 +327,20 @@ var CodeMirror = React.createClass({
 	},
 	focus: function focus()
 	 {
-		if (this.codeMirror) 
+	 if (this.codeMirror) 
 		{
 			this.codeMirror.focus();
 		}
 	},
 	focusChanged: function focusChanged(focused) 
 	{
-		this.setState({
-			isFocused: focused
-		});
-		this.props.onFocusChange && this.props.onFocusChange(focused);
+		if(window.location.pathname.indexOf('builder') >= 0)
+		{
+			this.setState({
+				isFocused: focused
+			});
+			this.props.onFocusChange && this.props.onFocusChange(focused);
+		}
 	},
 	codemirrorValueChanged: function codemirrorValueChanged(doc, change) 
 	{

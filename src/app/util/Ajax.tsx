@@ -273,9 +273,9 @@ var Ajax = {
     return Ajax._req("POST", `/${type}s/${id}`, JSON.stringify(obj), onLoad, onError);
   },
   
-	query(tql: string, onLoad: (response: any) => void, onError?: (ev:Event) => void)
+	query(tql: string, onLoad: (response: any) => void, onError?: (ev:Event) => void, sqlQuery?: boolean)
   {
-    return Ajax._r("/query", {
+    return Ajax._r(sqlQuery ? "/sql_query" : "/query", {
         "query_string": encode_utf8(tql),
       },
       
@@ -318,6 +318,10 @@ var Ajax = {
             {
               let cols = JSON.parse(r);
               cols.map(col => col.name = col['Field']);
+              if(cols.some(col => col.name === 'fid'))
+              {
+                console.log(table);
+              }
               tables.push({
                 name: table,
                 columns: cols,

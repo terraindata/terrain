@@ -42,58 +42,55 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as classNames from 'classnames';
+require('./TQLPopup.less');
+import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
-import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
-import Card from '../../builder/components/cards/Card.tsx';
+import * as classNames from 'classnames';
+import Classs from './../../common/components/Classs.tsx';
+
+var OpenIcon = require('./../../../images/icon_open.svg');
 
 interface Props
 {
-  value: BuilderTypes.CardString;
-  keyPath: KeyPath;
-  keys: List<string>;
-  canEdit: boolean;
-  className: string;
-  helpOn?: boolean;
-  addColumn?: (number, string?) => void;
+  cardName: string;
+  text: string;
+  style?: any;
+  addColumn: (number, string?) => void;
   columnIndex: number;
+  onClick?: () => void;
 }
 
-class BuilderTextboxCards extends React.Component<Props, any>
+class TQLPopup extends Classs<Props>
 {
-  constructor(props: Props) {
-    super(props);
-  }
-  
-  isText()
+  openManual()
   {
-    return typeof this.props.value === 'string';
+    this.props.onClick && this.props.onClick();
+    this.props.addColumn(this.props.columnIndex, this.props.cardName);
   }
-  
-  render() {
-    if(this.isText())
-    {
-      return null;
-    }
-    
-    // We're in card mode
+
+  render() 
+  {
     return (
-      <div className={classNames({
-        'builder-tb-cards-area': true,
-        [this.props.className]: !!this.props.className,
-      })} ref='tb'>
-        <Card
-          {...this.props}
-          singleCard={true}
-          card={this.props.value as BuilderTypes.ICard}
-          index={null}
-        />
-      </div>
+      <div 
+        className='tql-editor-popup'
+        style={this.props.style}
+      >
+        {this.props.text}      
+        <div 
+          className='manual-popup-link'
+          onClick={this.openManual}
+        >
+            See full description in Manual
+          <OpenIcon 
+            className='manual-popup-open-icon' 
+            onClick={this.openManual}
+          />
+        </div>  
+      </div>     
     );
   }
 };
 
-export default BuilderTextboxCards;
+export default TQLPopup;

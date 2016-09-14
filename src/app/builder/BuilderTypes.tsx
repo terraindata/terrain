@@ -59,8 +59,9 @@ export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
 
-import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, firstSecondDisplay, wrapperDisplay} from './BuilderDisplays.tsx';
-  
+import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, firstSecondDisplay, wrapperDisplay} from './BuilderDisplays.tsx';  
+var ManualConfig = require('./../manual/ManualConfig.json');
+
 export module BuilderTypes
 {
   export enum Operator {
@@ -147,12 +148,23 @@ export module BuilderTypes
     value: string;
     inputType: InputType;
   }
+
+  interface IManualEntry
+  {
+    name: string;
+    snippet: string;
+    summary: string;
+    notation: string;
+    syntax: string;
+    text: any[];
+  }
     
   export interface ICard extends IRecord<ICard>
   {
     id: string;
     type: string;
     _isCard: boolean;
+    closed: boolean;
     
     // the following fields are excluded from the server save    
     static:
@@ -180,6 +192,7 @@ export module BuilderTypes
       // It replaces anything within [] with the value for that key.
       // If an array of objects, you can specify: [arrayKey.objectKey]
       // and it will map through and join the values with ", ";
+      manualEntry: IManualEntry;
     };
   }
   
@@ -226,7 +239,7 @@ export module BuilderTypes
       type: "",
     }, config);
   }
-  
+    
   // Every Card definition must follow this interface
   interface ICardConfig
   {
@@ -237,6 +250,7 @@ export module BuilderTypes
       title: string;
       preview: string | ((c:ICard) => string);
       display: Display | Display[];
+      manualEntry: IManualEntry;
       tql: string;
       tqlJoiner?: string;
       
@@ -251,6 +265,7 @@ export module BuilderTypes
     _.extend(config, {
       id: "",
       _isCard: true,
+      closed: false,
     });
   
   // a card that contains other cards
@@ -264,6 +279,7 @@ export module BuilderTypes
   {
     colors: string[];
     title: string;
+    manualEntry: IManualEntry;
     getChildTerms?: (card: ICard) => List<string>;
     getNeighborTerms?: (card: ICard) => List<string>;
     display?: Display | Display[];
@@ -280,6 +296,9 @@ export module BuilderTypes
       {
         title: config.title,
         colors: config.colors,
+
+        manualEntry: config.manualEntry,
+
         getChildTerms: config.getChildTerms,
         getNeighborTerms: config.getNeighborTerms,
         
@@ -299,7 +318,7 @@ export module BuilderTypes
     })
   }
   
-  const _andOrCard = (config: { title: string, tql: string }) => _card(
+  const _andOrCard = (config: { title: string, tql: string, manualEntry }) => _card(
     {
       first: "",
       second: "",
@@ -307,6 +326,7 @@ export module BuilderTypes
       static:
       {
         title: config.title,
+        manualEntry: config.manualEntry,
         preview: (c:ICard) =>
         {
           var first = c['first'];
@@ -324,7 +344,7 @@ export module BuilderTypes
         },
         colors: ["#47a7ff", "#97d7ff"],
         tql: "$first " + config.tql + " $second",
-        
+                
         display: [
           {
             displayType: DisplayType.CARDSFORTEXT,
@@ -350,7 +370,7 @@ export module BuilderTypes
       },
     });
   
-  const _multiAndOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string }) => _card(
+  const _multiAndOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, manualEntry }) => _card(
     {
       clauses: L(),
       
@@ -361,6 +381,7 @@ export module BuilderTypes
         colors: ["#47a7ff", "#97d7ff"],
         tql: "$clauses",
         tqlJoiner: config.tqlGlue,
+        manualEntry: config.manualEntry,
         
         display: {
           displayType: DisplayType.ROWS,
@@ -390,12 +411,14 @@ export module BuilderTypes
               key: 'clause',
               top: false,
             },
+            
+            hideToolsWhenNotString: true,
           }
         },
       },
     });
   
-  const _valueCard = (config:{ title: string, colors: string[], tql: string }) => (
+  const _valueCard = (config:{ title: string, colors: string[], manualEntry: IManualEntry, tql: string }) => (
     _card({
       value: 0,
       
@@ -404,6 +427,7 @@ export module BuilderTypes
         colors: config.colors,
         preview: "[value]",
         display: valueDisplay,
+        manualEntry: config.manualEntry,
         tql: config.tql,
       }
     })
@@ -418,9 +442,10 @@ export module BuilderTypes
       static:
       {
         title: "TQL",
-        preview: "$clause",
+        preview: "\n$clause",
         colors: ["#37df77", "#97ffd7"],
         tql: "$clause",
+        manualEntry: ManualConfig.cards.tql,
         
         display: {
           displayType: DisplayType.TEXT,
@@ -434,7 +459,7 @@ export module BuilderTypes
       clause: "",
       static:
       {
-        tql: "$clause",
+        tql: "\n $clause",
         tqlJoiner: "AND",
       },
     }),
@@ -444,7 +469,7 @@ export module BuilderTypes
       clause: "",
       static:
       {
-        tql: "$clause",
+        tql: "\n $clause",
         tqlJoiner: "OR",
       },
     }),
@@ -454,6 +479,7 @@ export module BuilderTypes
       factoryType: 'andBlock',
       english: "and",
       tqlGlue: ' AND ',
+      manualEntry: ManualConfig.cards.and,
     }),
     
     multior: _multiAndOrCard({
@@ -461,6 +487,7 @@ export module BuilderTypes
       factoryType: 'orBlock',
       english: "or",
       tqlGlue: ' OR ',
+      manualEntry: ManualConfig.cards.or,
     }),
     
     sortBlock: _block(
@@ -480,7 +507,7 @@ export module BuilderTypes
       operator: Operator.EQ,
       
       static: {
-        tql: "$first $OPERATOR $second $COMBINATOR",
+        tql: "\n $first $OPERATOR $second",
       }
     }),
     
@@ -490,7 +517,7 @@ export module BuilderTypes
       alias: "",
       
       static: {
-        tql: "$table as $alias",
+        tql: "\n $table as $alias",
       }
     }),
     
@@ -499,7 +526,7 @@ export module BuilderTypes
       field: "",
       
       static: {
-        tql: "$field",
+        tql: "\n $field",
       }
     }),
     
@@ -511,10 +538,11 @@ export module BuilderTypes
       
       static:
       {
+        manualEntry: ManualConfig.cards['sfw'],
         colors: ["#89B4A7", "#C1EADE"],
         title: "From",
         preview: "[tables.table]",
-        tql: "SELECT $fields \nFROM $tables \n$cards",
+        tql: "SELECT\n$fields\nFROM\n$tables\n$cards",
         
         getChildTerms:
           (card: ICard) =>
@@ -533,7 +561,6 @@ export module BuilderTypes
             , List([])),
           
         display: [
-          
           {
             displayType: DisplayType.ROWS,
             key: 'tables',
@@ -545,6 +572,7 @@ export module BuilderTypes
               [  
                 {
                   displayType: DisplayType.TEXT,
+                  help: ManualConfig.help["table"],
                   key: 'table',
                   getAutoTerms: () => Store.getState().get('tables'),
                 },
@@ -555,6 +583,7 @@ export module BuilderTypes
                 },
                 {
                   displayType: DisplayType.TEXT,
+                  help: ManualConfig.help["alias"],
                   key: 'alias',
                   autoDisabled: true,
                 },
@@ -574,7 +603,8 @@ export module BuilderTypes
               inner:
               {
                 displayType: DisplayType.TEXT,
-                key: 'field'
+                help: ManualConfig.help["select-field"],
+                key: 'field',
               },
             },
           },
@@ -596,6 +626,7 @@ export module BuilderTypes
         preview: "[clause]",
         colors: ["#AFC5D5", "#D9EAF7"],
         tql: "WHERE $clause",
+        manualEntry: ManualConfig.cards.where,
         
         display: 
         [
@@ -622,9 +653,8 @@ export module BuilderTypes
         title: "Sort",
         preview: "[sorts.property]",
         colors: ["#C5AFD5", "#EAD9F7"],
-        tql: "sort $sorts",
-        // tql: "ORDER BY $sorts",
-        
+        manualEntry: ManualConfig.cards['sort'],
+        tql: "ORDER BY $sorts",        
         display: {
           displayType: DisplayType.ROWS,
           key: 'sorts',
@@ -636,12 +666,14 @@ export module BuilderTypes
             [
               {
                 displayType: DisplayType.TEXT,
+                help: ManualConfig.help["property"],
                 key: 'property',
               },
               {
                 displayType: DisplayType.DROPDOWN,
                 key: 'direction',
                 options: Immutable.List(Directions),
+                help: ManualConfig.help["direction"],
               },
             ],
           },
@@ -679,18 +711,22 @@ export module BuilderTypes
           displayType: DisplayType.DROPDOWN,
           key: 'operator',
           options: Immutable.List(Operators),
+          help: ManualConfig.help["operator"],
         }),
+        manualEntry: ManualConfig.cards['filter'],
       },
     }),
     
     and: _andOrCard({
       title: 'And',
       tql: 'AND',
+      manualEntry: ManualConfig.cards.and,
     }),
     
     or: _andOrCard({
       title: 'Or',
       tql: 'OR',
+      manualEntry: ManualConfig.cards.or,
     }),
     
     // andOr: _card(
@@ -738,8 +774,8 @@ export module BuilderTypes
         preview: "[field]",
         colors: ["#C0C0BE", "#E2E2E0"],
         display: letVarDisplay,
-        // tql: "let $field = $expression",
-        tql: "LET $field = $expression", // **
+        manualEntry: ManualConfig.cards['let'],
+        tql: "let $field = $expression",
         getNeighborTerms: (card) => List([card['field']]),
       }
     }),
@@ -754,9 +790,10 @@ export module BuilderTypes
         title: "Var",
         preview: "[field]",
         display: letVarDisplay,
+
+        manualEntry: ManualConfig.cards['var'],
         getNeighborTerms: (card) => List([card['field']]),
-        tql: "VAR $field = $expression",
-        // tql: "var $field = $expression", // **
+        tql: "var $field = $expression",
       }
     }),
 
@@ -764,6 +801,7 @@ export module BuilderTypes
     {
       colors: ["#70B1AC", "#D2F3F0"],
       title: "Count",
+      manualEntry: ManualConfig.cards['count'],
       tql: "COUNT $cards",
     }),
     
@@ -771,6 +809,7 @@ export module BuilderTypes
     {
       colors: ["#a2b37e", "#c9daa6"],
       title: "Average",
+      manualEntry: ManualConfig.cards['avg'],
       tql: "AVG $cards",
     }),
     
@@ -778,6 +817,7 @@ export module BuilderTypes
     {
       colors: ["#8dc4c1", "#bae8e5"],
       title: "Sum",
+      manualEntry: ManualConfig.cards['sum'],
       tql: "SUM $cards",
     }),
 
@@ -785,6 +825,7 @@ export module BuilderTypes
     {
       colors: ["#cc9898", "#ecbcbc"],
       title: "Min",
+      manualEntry: ManualConfig.cards['min'],
       tql: "MIN $cards",
     }),
 
@@ -792,6 +833,7 @@ export module BuilderTypes
     {
       colors: ["#8299b8", "#acc6ea"],
       title: "Max",
+      manualEntry: ManualConfig.cards['max'],
       tql: "MAX $cards",
     }),
 
@@ -799,6 +841,7 @@ export module BuilderTypes
     {
       colors: ["#a98abf", "#cfb3e3"],
       title: "Exists",
+      manualEntry: ManualConfig.cards['exists'],
       tql: "EXISTS $cards",
     }),
 
@@ -806,6 +849,7 @@ export module BuilderTypes
     {
       colors: ["#b37e7e", "#daa3a3"],
       title: "( )",
+      manualEntry: ManualConfig.cards['parentheses'],
       tql: "($cards)",
     }),
     
@@ -828,6 +872,7 @@ export module BuilderTypes
         colors: ["#9DC3B8", "#D1EFE7"],
         title: "Score",
         preview: "[weights.length] Weight(s)",
+        manualEntry: ManualConfig.cards['score'],
         tql: "linearScore([$weights])",
         display: {
           displayType: DisplayType.ROWS,
@@ -842,17 +887,20 @@ export module BuilderTypes
               {
                 displayType: DisplayType.TEXT,
                 key: 'key',
+                help: ManualConfig.help["key"],
                 placeholder: 'Field',
               },
               {
                 displayType: DisplayType.NUM,
+                help: ManualConfig.help["weight"],
                 key: 'weight',
                 placeholder: 'Weight',
               },
               {
                 displayType: DisplayType.COMPONENT,
                 component: ScoreBar,
-                key: null,
+                key: 'score',
+                help: ManualConfig.help["score"],
               },
             ],
           },
@@ -898,6 +946,7 @@ export module BuilderTypes
       
       static:
       {
+        manualEntry: ManualConfig.cards['transform'],
         colors: ["#E7BE70", "#EDD8B1"],
         title: "Transform",
         preview: "[input]",
@@ -905,6 +954,7 @@ export module BuilderTypes
         display: [
           {
             displayType: DisplayType.TEXT,
+            help: ManualConfig.help["input"],
             key: 'input',
             placeholder: 'Input field',
           },
@@ -912,6 +962,7 @@ export module BuilderTypes
             displayType: DisplayType.COMPONENT,
             component: TransformCardComponent,
             key: 'scorePoints',
+            help: ManualConfig.help["scorePoints"],
           },
         ],
         
@@ -949,6 +1000,7 @@ export module BuilderTypes
     {
       colors: ["#CDCF85", "#F5F6B3"],
       title: "Limit",
+      manualEntry: ManualConfig.cards['take'],
       tql: "LIMIT $value",
     }),
     
@@ -956,6 +1008,7 @@ export module BuilderTypes
     {
       colors: ["#CDCF85", "#F5F6B3"],
       title: "Offset",
+      manualEntry: ManualConfig.cards['skip'],
       tql: "OFFSET $value",
     }),
     
@@ -1010,7 +1063,18 @@ export module BuilderTypes
   
   // array of different card types
   export const CardTypes = _.compact(_.map(Blocks, (block, k: string) => block._isCard && k ));
+
+  var cards = {};
+  for(var key in Blocks)
+  {
+    if(Blocks[key]._isCard && Blocks[key].static.manualEntry)
+    {
+      cards[Blocks[key].static.manualEntry.name] = key;
+    }
+  }
+  export const cardList = cards;
   
+
   // private, maps a type (string) to the backing Immutable Record
   let typeToRecord = _.reduce(Blocks as ({[card:string]:any}), 
     (memo, v, i) => {
@@ -1018,6 +1082,8 @@ export module BuilderTypes
       return memo;
     }
   , {});
+
+
 
   // Given a plain JS object, construct the Record for it and its children  
   export const recordFromJS = (value: any) =>

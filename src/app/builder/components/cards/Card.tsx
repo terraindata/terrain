@@ -55,6 +55,8 @@ var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateCardTool from './CreateCardTool.tsx';
+// import Menu from '../../../common/components/Menu.tsx';
+import ManualPopup from './../../../manual/components/ManualPopup.tsx';
 import { Menu, MenuOption } from '../../../common/components/Menu.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import BuilderTypes from './../../BuilderTypes.tsx';
@@ -71,13 +73,19 @@ interface Props
   card: BuilderTypes.ICard;
   index: number;
   singleCard?: boolean;
+
   keys: List<string>;
   canEdit: boolean;
   keyPath: KeyPath;
+
+  addColumn?: (number, string?) => void;
+  columnIndex?: number;
   
   isDragging?: boolean;
   connectDragPreview?: (a?:any) => void;
   connectDragSource?: (el: El) => El;
+
+  helpOn?: boolean;
 }
 
 class Card extends PureClasss<Props>
@@ -153,6 +161,7 @@ class Card extends PureClasss<Props>
             hovering: false,
           });
         }
+
       }
     });
   }
@@ -239,10 +248,16 @@ class Card extends PureClasss<Props>
   
 	toggleClose(event)
 	{
-    this.setState({
-      open: ! this.state.open,
-    })
-    if(this.state.open)
+    Actions.change(
+      this._ikeyPath(this.props.keyPath, this.props.index, 'closed'), 
+      !this.props.card.closed
+    );
+    
+    // this.setState({
+    //   open: ! this.state.open,
+    // })
+    
+    if(!this.props.card.closed)
     {
       setTimeout(() => 
       Util.animateToHeight(this.refs.cardContent, 0), 300);
@@ -336,6 +351,9 @@ class Card extends PureClasss<Props>
       keys={this.state.allTerms}
       canEdit={this.props.canEdit}
       data={this.props.card}
+      helpOn={this.props.helpOn}
+      addColumn={this.props.addColumn}
+      columnIndex={this.props.columnIndex}
       keyPath={
         this.props.singleCard
         ? this.props.keyPath
@@ -347,12 +365,20 @@ class Card extends PureClasss<Props>
 		let {title} = card.static;
     const { isDragging, connectDragSource } = this.props;
     
+    // TODO
+    // <ManualPopup 
+    //                 cardName={card.static.title} 
+    //                 rightAlign={!this.props.canEdit}
+    //                 addColumn={this.props.addColumn}
+    //                 columnIndex={this.props.columnIndex}
+    //               />
+    
     return ( 
       <div
         className={classNames({
           'card': true,
           'card-dragging': isDragging,
-          'card-closed' : !this.state.open,
+          'card-closed' : this.props.card.closed,
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
           'card-hovering': this.state.hovering,
@@ -383,7 +409,7 @@ class Card extends PureClasss<Props>
                 <div
                   className={classNames({
                     'card-title': true,
-                    'card-title-closed': !this.state.open,
+                    'card-title-closed': this.props.card.closed,
                     'card-title-card-hovering': this.state.hovering,
                   })}
                   style={{
@@ -397,15 +423,16 @@ class Card extends PureClasss<Props>
                   </div>
                   <div className={classNames({
                     'card-preview': true,
-                    'card-preview-hidden': this.state.open
+                    'card-preview-hidden': !this.props.card.closed,
                   })}>
                     { BuilderTypes.getPreview(card) }
                   </div>
-                  {
-                    this.props.canEdit && <Menu options={this.state.menuOptions} />
-                  }
+                  
                 </div>
               )
+            }
+            {
+              this.props.canEdit && <Menu options={this.state.menuOptions} />
             }
             { !this.props.singleCard &&
                 <CardDropArea
