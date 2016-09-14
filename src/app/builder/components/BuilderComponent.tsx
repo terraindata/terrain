@@ -283,7 +283,7 @@ class BuilderComponent extends PureClasss<Props>
               value.map((v, i) => (
                 <CardField
                   index={i}
-                  onAdd={this._addRow(keyPath, i + 1, d)}
+                  onAdd={this._addRow(keyPath, i, d)}
                   onRemove={this._removeRow(keyPath, i, d)}
                   onMove={this._moveRow(keyPath)}
                   key={key + ',' + v.get('id')}

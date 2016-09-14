@@ -623,7 +623,15 @@ export module BuilderTypes
       static:
       {
         title: "Where",
-        preview: "[clause]",
+        preview: (c:ICard) =>
+        {
+          if(typeof c['clause'] === 'string')
+          {
+            return c['clause'];
+          }
+          return  getPreview(c['clause']);
+        },
+        
         colors: ["#AFC5D5", "#D9EAF7"],
         tql: "WHERE $clause",
         manualEntry: ManualConfig.cards.where,

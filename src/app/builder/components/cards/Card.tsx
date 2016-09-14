@@ -103,6 +103,8 @@ class Card extends PureClasss<Props>
     // CreateCardTool
     addingCardBelow?: boolean;
     addingCardAbove?: boolean;
+    
+    cardIsClosed: boolean;
   }
   
   refs: {
@@ -139,6 +141,8 @@ class Card extends PureClasss<Props>
             onClick: this.handleDelete,
           },
         ]),
+     
+     cardIsClosed: this.props.card.closed,
     };
     
     this._subscribe(Store, {
@@ -260,12 +264,24 @@ class Card extends PureClasss<Props>
     if(!this.props.card.closed)
     {
       setTimeout(() => 
-      Util.animateToHeight(this.refs.cardContent, 0), 300);
+        Util.animateToHeight(this.refs.cardContent, 0, () =>
+          this.setState({
+            cardIsClosed: true,
+          })
+        ),
+      300);
     }
     else
     {
       setTimeout(() => 
-      Util.animateToAutoHeight(this.refs.cardContent), 300);
+        Util.animateToAutoHeight(
+          this.refs.cardContent,
+          () =>
+            this.setState({
+              cardIsClosed: false,
+            })
+        ),
+      300);
     }
        
     event.preventDefault();
@@ -382,6 +398,7 @@ class Card extends PureClasss<Props>
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
           'card-hovering': this.state.hovering,
+          'card-is-closed': this.state.cardIsClosed,
           [card.type + '-card']: true,
         })}
         rel={'card-' + card.id}

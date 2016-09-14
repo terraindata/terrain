@@ -151,7 +151,12 @@ class CardField extends PureClasss<Props>
   
   addField(event)
   {
-    this.props.onAdd(this.props.index);
+    this.props.onAdd(this.props.index + 1);
+  }
+  
+  addFieldTop(event)
+  {
+    this.props.onAdd(0);
   }
   
   handleHandleMousedown(event:MEvent)
@@ -327,8 +332,7 @@ class CardField extends PureClasss<Props>
     
     let {row} = this.props;
     
-    let renderTools = true; // ! row.hideToolsWhenNotString || typeof this.props.data === 'string';
-    // console.log(typeof this.props.data)
+    let renderTools = ! row.hideToolsWhenNotString || typeof this.props.data[this.props.row.inner['key']] === 'string';
 
     return (
       <div
@@ -362,12 +366,22 @@ class CardField extends PureClasss<Props>
           ref='cardField'
         >
           {
-            renderTools &&
+            !renderTools && this.props.canEdit &&
+              <div
+                className='card-field-top-add card-field-add'
+                onClick={this.addFieldTop}
+                data-tip={'Add another'}
+              >
+                <AddIcon />
+              </div>
+          }
+          {
+            renderTools && this.props.canEdit &&
       				<div className='card-field-tools-left'>
                 <div className='card-field-tools-left-inner'>
                   <div
                     className='card-field-handle'
-                    onMouseDown={this.props.canEdit ? this.handleHandleMousedown : null}
+                    onMouseDown={this.handleHandleMousedown}
                   >
                     ⋮⋮
                   </div>
@@ -397,14 +411,14 @@ class CardField extends PureClasss<Props>
             />
   				</div>
           {
-            renderTools &&
+            renderTools && this.props.canEdit &&
       				<div className='card-field-tools-right'>
                 <div className='card-field-tools-right-inner'>
                   <div>
                     <div
                       className='card-field-add'
-                      onClick={this.props.canEdit ? this.addField : null}
-                      data-tip={this.props.canEdit ? 'Add another' : null}
+                      onClick={this.addField}
+                      data-tip={'Add another'}
                     >
                       <AddIcon />
                     </div> 
@@ -419,8 +433,8 @@ class CardField extends PureClasss<Props>
                     }
                     <div
                       className='card-field-remove'
-                      onClick={this.props.canEdit ? this.removeField : null}
-                      data-tip={this.props.canEdit ? 'Remove' : null}
+                      onClick={this.removeField}
+                      data-tip={'Remove'}
                     >
                       <RemoveIcon />
                     </div>

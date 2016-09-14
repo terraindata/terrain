@@ -385,7 +385,6 @@ class ResultsArea extends PureClasss<Props>
   
   handleError(ev)
   {  
-    console.log('a');
     this.setState({
       error: true,
     });

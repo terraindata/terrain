@@ -318,10 +318,6 @@ var Ajax = {
             {
               let cols = JSON.parse(r);
               cols.map(col => col.name = col['Field']);
-              if(cols.some(col => col.name === 'fid'))
-              {
-                console.log(table);
-              }
               tables.push({
                 name: table,
                 columns: cols,
@@ -349,6 +345,15 @@ var Ajax = {
       (a) => console && console.log && console.log('Query killing error:', a)
     );
   },
+  
+  _config()
+  {
+    // change_conf_dict_mysql[btoa("host")] = btoa(encode_utf8("10.1.0.25"));
+    // change_conf_dict_mysql[btoa("user")] = btoa(encode_utf8("dev"));
+    // change_conf_dict_mysql[btoa("password")] = btoa(encode_utf8("terrain_webscalesql42"));
+    // change_conf_dict_mysql[btoa("db")] = btoa(encode_utf8("BookDB"));
+    // change_conf_dict[btoa("mysqlconfig")] = change_conf_dict_mysql;
+  }
 };
 
 function encode_utf8(s) {
