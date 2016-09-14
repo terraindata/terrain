@@ -333,11 +333,18 @@ class Builder extends PureClasss<Props>
   {
     return {
       fullHeight: true,
+      initialColSizes: JSON.parse(localStorage.getItem('colSizes')),
+      onColSizeChange: this.handleColSizeChange,
       columns:
         _.range(0, this.state.colKeys.size).map(index => 
           this.getColumn(index)
         )
     };
+  }
+  
+  handleColSizeChange(adjustments)
+  {
+    localStorage.setItem('colSizes', JSON.stringify(adjustments));
   }
   
   getColumn(index)

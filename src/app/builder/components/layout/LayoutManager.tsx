@@ -85,7 +85,7 @@ var LayoutManager = React.createClass<any, any>({
 			shiftedIndices: [],
 			shiftedHeight: 0,
 			shiftedWidth: 0,
-      sizeAdjustments: {},
+      sizeAdjustments: this.props.layout.initialColSizes || {},
 		};
 	},
   
@@ -374,6 +374,18 @@ var LayoutManager = React.createClass<any, any>({
 		if(indexToMoveTo !== null && this.props.moveTo)
 		{
 			this.props.moveTo(index, indexToMoveTo);
+      
+      if(this.state.sizeAdjustments)
+      {
+        let adjustments = JSON.parse(JSON.stringify(this.state.sizeAdjustments));
+        // TODO not right
+        let a = adjustments[index];
+        adjustments[index] = adjustments[indexToMoveTo];
+        adjustments[indexToMoveTo] = a;
+        this.setState({
+          sizeAdjustments: adjustments,
+        });
+      }
 		}
 
 		this.setState({
@@ -389,6 +401,7 @@ var LayoutManager = React.createClass<any, any>({
   {
     var startX = event.pageX;
     var startSAX = this.state.sizeAdjustments[index].x;
+    var startPrevSAX = this.state.sizeAdjustments[index - 1].x;
     this.setState({
       resizingIndex: index,
     });
@@ -420,6 +433,7 @@ var LayoutManager = React.createClass<any, any>({
       
       var sa = JSON.parse(JSON.stringify(this.state.sizeAdjustments));
       sa[index].x = startSAX + diffX;
+      
       this.setState({
         sizeAdjustments: sa,
       })
@@ -436,6 +450,9 @@ var LayoutManager = React.createClass<any, any>({
       $(document).off('touchmove', move);
       $(document).off('mouseup', endMove);
       $(document).off('touchend', endMove);  
+      
+      this.props.layout.onColSizeChange &&
+        this.props.layout.onColSizeChange(this.state.sizeAdjustments);
     }
     
     $(document).on('mousemove', move);
