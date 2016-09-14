@@ -137,7 +137,7 @@ var Input = React.createClass<any, any>({
   {
     Util.animateToHeight(this.refs.input, 0);
     setTimeout(() => {
-      Actions.remove(this.state.keyPath, this.props.index)
+      Actions.remove(this.state.parentKeyPath, this.props.index)
     }, 250);
   },
   
@@ -223,12 +223,9 @@ var Input = React.createClass<any, any>({
               className="input-text input-text-first input-borderless"
               keyPath={this.state.keyKeyPath}
             />
-            <div className='input-menu'>
-              <Menu 
-                options={this.getMenuOptions()} 
-                style={{right:'28px'}}
-              />
-            </div>
+            <Menu 
+              options={this.getMenuOptions()}
+            />
             <div className='input-close' onClick={this.closeInput}> 
               <CloseIcon /> 
             </div>

@@ -19,43 +19,37 @@
 	.input-inner {
 		padding: 12px;
 		background: @light-green;
-	 border-radius: 6px;
+	  border-radius: 6px;
+    
+    .menu-wrapper {
+      position: absolute;
+      top: 0px;
+      right: 15px;
+      opacity: 0;
+    }
 
-  &:hover {
-    .input-top-row {
-      .input-close {
-        transition: opacity .5s ease-in-out;   
+    &:hover {
+      .menu-wrapper {
         opacity: 1;
       }
-      .input-menu {
-        transition: opacity .5s ease-in-out;   
-        opacity: 1;
-      }
-      .builder-tb {
-        transition: width .25s ease-in-out ;
-        width: calc(~"100% - 60px") !important;
-      }
-      .input-text {
-        width: calc(~"100% - 35px") !important;
+      
+      .input-top-row {
+        .input-close {
+          .transition;
+          opacity: 1;
+        }
+        .builder-tb {
+          .transition;
+          width: calc(~"100% - 60px") !important;
+        }
+        .input-text {
+          width: calc(~"100% - 50px") !important;
+        }
       }
     }
-  }
 
 		.input-text {
-			display: block;
-			-webkit-appearance: none;
-			outline: none;
-			background: #fff;
-			padding: 7px;
-			color: @gray;
-			border-radius: 6px;
-			width: 100%;
 			font-size: @medium-font-size;
-      height: 30px;
-		}
-
-		.input-text-first {
-			margin-bottom: 12px;
 		}
 	}
     
@@ -67,10 +61,9 @@
   
   .input-top-row {
     position: relative;
-    margin-right: -5px;
     .builder-tb {
       width: calc(~"100% - 6px");
-      transition: width 0.25s ease-in-out .1s;   
+      .transition;
     }
   }
   
@@ -82,7 +75,7 @@
 
 .panel-dragging {
   .input-inner {
-  	transition: box-shadow 0.25s ease-out;
+  	.transition;
   	box-shadow: 0px 0px 25px rgba(0,0,0,0.25);
   }
   
@@ -91,27 +84,16 @@
   }
 }
 
-.input-menu {
+.input-close {
+  .close;
+  right: 0px;
+  position: absolute;
+  top: 6px;
   opacity: 0;
-  transition: opacity 0.25s ease-in-out;
+  transition: .transition;
+  fill: #fff;
 }
 
-.input-close {
-  width: 16px !important;
-  height: 16px !important;
-  right: 6px;
-  float: right;
-  position: relative;
-  display: inline-block;
-  top: -22px;
-  fill: #abc29f;
-  border-radius: 50%;
-  opacity: 0;
-  transition: opacity 0.25s ease-in-out;
-  &:hover {
-    .close;
-    right: 7px;
-    margin: 1px 0px;
-    transition: 0.15s;
-  }
+.input-top-row {
+  margin-bottom: 6px;
 }
