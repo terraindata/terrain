@@ -108,7 +108,13 @@ const cardTarget =
     if(monitor.isOver({ shallow: true}) && cardTarget.canDrop(targetProps, monitor))
     {
       let cardProps = monitor.getItem().props;
-      Actions.nestedMove(cardProps.keyPath, cardProps.index, targetProps.keyPath, targetProps.index);
+      var indexOffset = 0;
+      if(targetProps.half && targetProps.lower)
+      {
+        // dropping above target props
+        var indexOffset = 1;
+      }
+      Actions.nestedMove(cardProps.keyPath, cardProps.index, targetProps.keyPath, targetProps.index + indexOffset);
     }
   }
 }

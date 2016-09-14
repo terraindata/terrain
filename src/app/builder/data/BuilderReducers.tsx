@@ -178,7 +178,13 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       return state.updateIn(itemKeyPath, arr =>
       {
         let item = arr.get(itemIndex);
-        return arr.splice(itemIndex, 1).splice(newIndex, 0, item);
+        var indexOffset = 0;
+        if(itemIndex < newIndex)
+        {
+          // dragging down
+          indexOffset = -1;
+        }
+        return arr.splice(itemIndex, 1).splice(newIndex + indexOffset, 0, item);
       });
     }
     
