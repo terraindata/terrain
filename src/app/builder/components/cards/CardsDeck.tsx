@@ -42,148 +42,164 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./CardsDeck.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import * as $ from 'jquery';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import Util from '../../../util/Util.tsx';
 import Actions from "../../data/BuilderActions.tsx";
-import Card from "../cards/Card.tsx";
-import CreateCardTool from "./CreateCardTool.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import BuilderTypes from '../../BuilderTypes.tsx';
+import Switch from './../../../common/components/Switch.tsx';
 type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
-let {List} = Immutable;
-
+let {List, Map} = Immutable;
+let ExpandIcon = require("./../../../../images/icon_expand_12x12.svg?name=ExpandIcon");
+import { DragSource } from 'react-dnd';
 
 interface Props
 {
-  cards: ICards;
-  keys: List<string>;
-  canEdit: boolean;
-  keyPath: KeyPath;
-  
-  addColumn?: (number, string?) => void;
-  columnIndex?: number;
-  className?: string;
-  spotlights?: List<any>;
-  connectDropTarget?: (el:JSX.Element) => JSX.Element;
-  helpOn?: boolean;
+  open: boolean;
 }
 
-interface KeyState {
-  keys: List<string>;
-  keyPath: KeyPath;
-  learningMode: boolean;
-}
-
-class CardsArea extends PureClasss<Props>
+class CardsDeck extends PureClasss<Props>
 {
-  state: KeyState = {
-    keys: List([]),
-    keyPath: null,
-    learningMode: this.props.helpOn,
+  state: {
+    search: string;
+  } = {
+    search: "",
   };
-
-  constructor(props:Props)
-  {
-    super(props);
-    this.state.keys = this.computeKeys(props);
-  }
   
   componentWillReceiveProps(nextProps:Props)
   {
-    if(nextProps.keys !== this.props.keys || nextProps.cards !== this.props.cards)
+    if(!this.props.open && nextProps.open)
     {
-      this.setState({
-        keys: this.computeKeys(nextProps)
-      });
+      this.refs['search']['focus']();
     }
   }
   
-  computeKeys(props:Props): List<string>
-  {
-    let newKeys: List<string> = props.keys.merge(
-      props.cards.reduce(
-        (memo: List<string>, card: ICard): List<string> =>
-        {
-          if(card.static.getNeighborTerms)
-          {
-            return memo.merge(card.static.getNeighborTerms(card));
-          }
-          return memo;
-        }
-      , Immutable.List([]))
-    );
-    
-    if(newKeys.equals(this.state.keys))
-    {
-      return this.state.keys;
-    }
-
-    return newKeys;
-  }
-  
-       
-  
-  copy() {}
-  
-  clear() {}
-  
-  createFromCard()
-  {
-    Actions.create(this.props.keyPath, 0, 'sfw');
-  }
-  
-  toggleView()
+  handleSearchChange(evt)
   {
     this.setState({
-      learningMode: !this.state.learningMode,
-    })
+      search: evt.target.value,
+    });
   }
-
+  
   render()
   {
-    let {props} = this;
-    let {cards, canEdit} = props;
     return (
-      <div> 
+      <div>
         <div
-          className={classNames({
-            'cards-area': true,
-            [this.props.className]: !!this.props.className,
-          })}
+          className='cards-deck-search-wrapper'
+        >
+          <input 
+            type='text' 
+            ref='search' 
+            className='cards-deck-search' 
+            placeholder='Filter Cards'
+            value={this.state.search}
+            onChange={this.handleSearchChange}
+          />
+        </div>
+        <div
+          className='cards-deck-inner'
         >
           {
-            cards.map((card:ICard, index:number) =>
-              <Card 
-                {...this.props}
-                helpOn={this.state.learningMode || this.props.helpOn}
-                cards={null}
-                key={card.id}
-                singleCard={false}
-                index={index}
-                card={card}
-                keys={this.state.keys}
-                keyPath={this.props.keyPath}
+            BuilderTypes.CardTypes.map(type =>
+              <CardDeckCard
+                type={type}
+                search={this.state.search}
+                key={type}
               />
             )
           }
-          
-          <CreateCardTool
-            canEdit={this.props.canEdit}
-            keyPath={this.props.keyPath}
-            index={props.cards.size}
-            open={props.cards.size === 0}
-            className='nested-create-card-tool-wrapper'
-          />
         </div>
       </div>
     );
   }
 }
 
-export default CardsArea;
+interface CardProps
+{
+  type: string;
+  search: string;
+  key: string;
+  
+  isDragging?: boolean;
+  connectDragPreview?: (a?:any) => void;
+  connectDragSource?: (el: El) => El;
+}
+
+class _CardDeckCard extends PureClasss<CardProps>
+{
+  render()
+  {
+    let {type} = this.props;
+    let card = BuilderTypes.Blocks[type].static;
+    let search = this.props.search.toLowerCase();
+    
+    if(card.title.toLowerCase().indexOf(search) !== 0) // && type.indexOf(search) !== 0)
+    {
+      var hidden = true;
+    }
+    
+    return this.props.connectDragSource(
+      <div
+        className={classNames({
+          'cards-deck-card': true,
+          'cards-deck-card-hidden': hidden,
+        })}
+        style={{
+          background: card.colors[0],
+        }}
+      >
+        {
+          card.title
+        }
+      </div>
+    );
+  }
+}
+
+// Drag and Drop (the bass)
+
+export interface CardItem
+{
+  type: string;
+  new: boolean;
+}
+
+const cardSource = 
+{
+  canDrag: (props) => true,
+  
+  beginDrag: (props: CardProps): CardItem =>
+  {
+    setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
+    // TODO unselect cards?
+    
+    return {
+      type: props.type,
+      new: true,
+    };
+  },
+  
+  endDrag: () =>
+  {
+    $('body').removeClass('body-card-is-dragging');
+  }
+}
+
+const dragCollect = (connect, monitor) =>
+({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging(),
+  connectDragPreview: connect.dragPreview()
+});
+
+let CardDeckCard = DragSource('CARD', cardSource, dragCollect)(_CardDeckCard);
+
+
+export default CardsDeck;

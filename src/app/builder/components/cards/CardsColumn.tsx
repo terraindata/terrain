@@ -42,148 +42,161 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./CardsColumn.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import * as $ from 'jquery';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import Util from '../../../util/Util.tsx';
 import Actions from "../../data/BuilderActions.tsx";
-import Card from "../cards/Card.tsx";
-import CreateCardTool from "./CreateCardTool.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import BuilderTypes from '../../BuilderTypes.tsx';
+import Switch from './../../../common/components/Switch.tsx';
+import CardsArea from './CardsArea.tsx';
+import CardDropArea from './CardDropArea.tsx';
+import InfoArea from '../../../common/components/InfoArea.tsx';
+import CardsDeck from './CardsDeck.tsx';
 type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
-let {List} = Immutable;
-
+let {List, Map} = Immutable;
+let ExpandIcon = require("./../../../../images/icon_expand_12x12.svg?name=ExpandIcon");
 
 interface Props
 {
   cards: ICards;
+  queryId: ID;
   keys: List<string>;
   canEdit: boolean;
-  keyPath: KeyPath;
-  
-  addColumn?: (number, string?) => void;
-  columnIndex?: number;
-  className?: string;
-  spotlights?: List<any>;
-  connectDropTarget?: (el:JSX.Element) => JSX.Element;
-  helpOn?: boolean;
+  addColumn: (number, string?) => void;
+  columnIndex: number;
+  spotlights: List<any>;
 }
 
-interface KeyState {
-  keys: List<string>;
-  keyPath: KeyPath;
-  learningMode: boolean;
-}
-
-class CardsArea extends PureClasss<Props>
+class CardsColumn extends PureClasss<Props>
 {
-  state: KeyState = {
-    keys: List([]),
-    keyPath: null,
-    learningMode: this.props.helpOn,
+  state: {
+    keyPath: KeyPath;
+    learningMode: boolean;
+    deckOpen: boolean;
+  } = {
+    keyPath: this.computeKeyPath(this.props),
+    learningMode: false,
+    deckOpen: true,
   };
-
-  constructor(props:Props)
+  
+  computeKeyPath(props:Props):KeyPath
   {
-    super(props);
-    this.state.keys = this.computeKeys(props);
+    return List(this._keyPath('queries', props.queryId, 'cards'));
   }
   
-  componentWillReceiveProps(nextProps:Props)
+  componentWillReceiveProps(props:Props)
   {
-    if(nextProps.keys !== this.props.keys || nextProps.cards !== this.props.cards)
+    if(props.queryId !== this.props.queryId)
     {
       this.setState({
-        keys: this.computeKeys(nextProps)
+        keyPath: this.computeKeyPath(props),
       });
     }
   }
   
-  computeKeys(props:Props): List<string>
-  {
-    let newKeys: List<string> = props.keys.merge(
-      props.cards.reduce(
-        (memo: List<string>, card: ICard): List<string> =>
-        {
-          if(card.static.getNeighborTerms)
-          {
-            return memo.merge(card.static.getNeighborTerms(card));
-          }
-          return memo;
-        }
-      , Immutable.List([]))
-    );
-    
-    if(newKeys.equals(this.state.keys))
-    {
-      return this.state.keys;
-    }
-
-    return newKeys;
-  }
-  
-       
-  
-  copy() {}
-  
-  clear() {}
-  
   createFromCard()
   {
-    Actions.create(this.props.keyPath, 0, 'sfw');
+    Actions.create(this._ikeyPath(this.state.keyPath, 0), 0, 'sfw');
   }
   
-  toggleView()
+  toggleLearningMode()
   {
     this.setState({
       learningMode: !this.state.learningMode,
     })
   }
 
+  renderTopbar()
+  {
+    return (
+      <div className='cards-area-top-bar'>
+        <div className = 'cards-area-white-space' />
+        <Switch
+          first='Standard'
+          second='Learning'
+          onChange={this.toggleLearningMode}
+          selected={this.state.learningMode ? 2 : 1}
+          small={true}
+        />
+      </div>
+    );
+  }
+  
+  toggleDeck()
+  {
+    this.setState({
+      deckOpen: !this.state.deckOpen,
+    });
+  }
+  
   render()
   {
     let {props} = this;
     let {cards, canEdit} = props;
+    let {keyPath} = this.state;
+    
     return (
-      <div> 
-        <div
-          className={classNames({
-            'cards-area': true,
-            [this.props.className]: !!this.props.className,
-          })}
-        >
-          {
-            cards.map((card:ICard, index:number) =>
-              <Card 
-                {...this.props}
-                helpOn={this.state.learningMode || this.props.helpOn}
-                cards={null}
-                key={card.id}
-                singleCard={false}
-                index={index}
-                card={card}
-                keys={this.state.keys}
-                keyPath={this.props.keyPath}
-              />
-            )
-          }
-          
-          <CreateCardTool
-            canEdit={this.props.canEdit}
-            keyPath={this.props.keyPath}
-            index={props.cards.size}
-            open={props.cards.size === 0}
-            className='nested-create-card-tool-wrapper'
+      <div
+        className={classNames({
+          'cards-column': true,
+          'cards-column-deck-open': this.state.deckOpen,
+        })}
+      >
+        <div className='cards-deck'>
+          <CardsDeck
+            open={this.state.deckOpen}
           />
+        </div>
+        <div className='cards-column-cards-area'>
+          <CardDropArea
+            half={true}
+            index={0}
+            keyPath={keyPath}
+            height={12}
+          />
+          <CardDropArea
+            half={true}
+            lower={true}
+            index={cards.size}
+            keyPath={keyPath}
+            heightOffset={12}
+          />
+          <CardsArea 
+            cards={cards}
+            keyPath={keyPath}
+            spotlights={this.props.spotlights} 
+            keys={this.props.keys}
+            canEdit={canEdit}
+            addColumn={this.props.addColumn}
+            columnIndex={this.props.columnIndex}
+          />
+          {
+            !cards.size ? 
+              <InfoArea
+                large="No cards have been created, yet."
+                small={canEdit && "Create one below. Most people start with the Select/From card."}
+                button={canEdit && "Create a Select/From card"}
+                onClick={this.createFromCard}
+                inline={true}
+              />
+            : null
+          }
+        </div>
+        <div
+          className='cards-deck-knob'
+          onClick={this.toggleDeck}
+        >
+          <ExpandIcon />
+          Card Deck
         </div>
       </div>
     );
   }
 }
 
-export default CardsArea;
+export default CardsColumn;

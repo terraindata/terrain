@@ -50,7 +50,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import { DragSource, DropTarget } from 'react-dnd';
+import { DragSource } from 'react-dnd';
 var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
@@ -338,21 +338,23 @@ class Card extends PureClasss<Props>
   
   renderAddCard(isLower?: boolean)
   {
-    if(this.props.singleCard || !this.props.canEdit)
-    {
-      return null;
-    }
+    return null;
     
-    return (
-      <div
-        className={'card-add-card-btn' + (isLower ? ' card-add-card-btn-lower' : '')}
-        onClick={isLower ? this.addCardBelow : this.addCardAbove}
-      >
-        {
-          (isLower ? this.state.addingCardBelow : this.state.addingCardAbove) ? '-' : '+'
-        }
-      </div>
-    );
+    // if(this.props.singleCard || !this.props.canEdit)
+    // {
+    //   return null;
+    // }
+    
+    // return (
+    //   <div
+    //     className={'card-add-card-btn' + (isLower ? ' card-add-card-btn-lower' : '')}
+    //     onClick={isLower ? this.addCardBelow : this.addCardAbove}
+    //   >
+    //     {
+    //       (isLower ? this.state.addingCardBelow : this.state.addingCardAbove) ? '-' : '+'
+    //     }
+    //   </div>
+    // );
   }
   
   handleMouseMove(event)

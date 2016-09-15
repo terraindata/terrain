@@ -53,7 +53,7 @@ import Menu from '../../common/components/Menu.tsx';
 import { MenuOption } from '../../common/components/Menu.tsx';
 import PanelMixin from './layout/PanelMixin.tsx';
 import InputsArea from "./inputs/InputsArea.tsx";
-import CardsArea from "./cards/CardsArea.tsx";
+import CardsColumn from "./cards/CardsColumn.tsx";
 import ResultsArea from "./results/ResultsArea.tsx";
 import UserStore from '../../users/data/UserStore.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
@@ -240,12 +240,10 @@ var BuilderColumn = React.createClass<any, any>(
           />;
         }
         
-        return <CardsArea 
+        return <CardsColumn 
           cards={query.cards} 
           queryId={query.id}
-          keyPath={null}
           spotlights={spotlights} 
-          topLevel={true}
           keys={this.state.inputKeys}
           canEdit={canEdit}
           addColumn={this.props.onAddManualColumn}

@@ -284,7 +284,7 @@ var Ajax = {
         try {
           onLoad(JSON.parse(resp));
         } catch(e) {
-          onError(resp as any);
+          onError && onError(resp as any);
         }
       },
       
@@ -330,7 +330,7 @@ var Ajax = {
             })
           );
         } catch(e) {
-          onError(resp as any);
+          onError && onError(resp as any);
         }
       },
       

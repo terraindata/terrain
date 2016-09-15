@@ -179,7 +179,7 @@ class Autocomplete extends PureClasss<Props>
       return true;
     }
     
-    return option.toLowerCase().indexOf(this.state.value.toLowerCase()) !== -1;
+    return option && option.toLowerCase().indexOf(this.state.value.toLowerCase()) !== -1;
   }
   
   renderOption(option: string, index: number)

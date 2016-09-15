@@ -137,12 +137,22 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     payload?: { keyPath: KeyPath, index: number, factoryType: string, data: any }
   }) =>
     state.updateIn(action.payload.keyPath, arr =>
-      arr.splice
-      (
-        action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index, 0, 
-        action.payload.data ? action.payload.data :
-          BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType])
-      )
+      {
+        let item = action.payload.data ? action.payload.data :
+            BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType]);
+            
+        if(action.payload.index === null)
+        {
+          return item; // creating at that spot
+        }
+        
+        return arr.splice
+        (
+          action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index,
+          0, 
+          item
+        )
+      }
     )
   ,
     

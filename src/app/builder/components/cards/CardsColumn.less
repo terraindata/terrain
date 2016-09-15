@@ -1,0 +1,40 @@
+@import "../../../common/Common.less";
+
+.cards-column {
+  .cards-deck,
+  .cards-column-cards-area {
+    position: absolute;
+    top: 0px;
+    height: 100%;
+    left: 0px;
+    box-sizing: border-box;
+    .transition;
+  }
+  
+  .cards-deck {
+    background: #fff;
+    border-right: 1px solid #ccc;
+    width: 0px;
+  }
+  
+  .cards-column-cards-area {
+    padding: 6px;
+    left: 0px;
+    overflow-y: auto;
+    width: 100%;
+  }
+  
+  @deck-width: 110px;
+  &.cards-column-deck-open {
+    .cards-deck {
+      width: @deck-width;
+    }
+    .cards-column-cards-area {
+      width: calc(~"100% - @{deck-width}");
+      left: @deck-width;
+    }
+    .cards-deck-knob {
+      width: @deck-width - 1px;
+    }
+  }
+}

@@ -318,7 +318,7 @@ export module BuilderTypes
     })
   }
   
-  const _andOrCard = (config: { title: string, tql: string, manualEntry }) => _card(
+  const _andOrCard = (config: { title: string, tql: string, colors: string[], manualEntry }) => _card(
     {
       first: "",
       second: "",
@@ -370,7 +370,7 @@ export module BuilderTypes
       },
     });
   
-  const _multiAndOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, manualEntry }) => _card(
+  const _multiAndOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, colors: string[], manualEntry: any }) => _card(
     {
       clauses: L(),
       
@@ -378,7 +378,7 @@ export module BuilderTypes
       {
         title: config.title,
         preview: '[clauses.length] ' + config.english + ' clauses',
-        colors: ["#47a7ff", "#97d7ff"],
+        colors: config.colors,
         tql: "$clauses",
         tqlJoiner: config.tqlGlue,
         manualEntry: config.manualEntry,
@@ -436,60 +436,6 @@ export module BuilderTypes
   // The BuildingBlocks
   export const Blocks =
   { 
-    tql: _card({
-      clause: "",
-      
-      static:
-      {
-        title: "TQL",
-        preview: "\n$clause",
-        colors: ["#37df77", "#97ffd7"],
-        tql: "$clause",
-        manualEntry: ManualConfig.cards.tql,
-        
-        display: {
-          displayType: DisplayType.TEXT,
-          key: 'clause',
-        }
-      }
-    }),
-    
-    andBlock: _block(
-    {
-      clause: "",
-      static:
-      {
-        tql: "\n $clause",
-        tqlJoiner: "AND",
-      },
-    }),
-    
-    orBlock: _block(
-    {
-      clause: "",
-      static:
-      {
-        tql: "\n $clause",
-        tqlJoiner: "OR",
-      },
-    }),
-    
-    multiand: _multiAndOrCard({
-      title: "And",
-      factoryType: 'andBlock',
-      english: "and",
-      tqlGlue: ' AND ',
-      manualEntry: ManualConfig.cards.and,
-    }),
-    
-    multior: _multiAndOrCard({
-      title: "Or",
-      factoryType: 'orBlock',
-      english: "or",
-      tqlGlue: ' OR ',
-      manualEntry: ManualConfig.cards.or,
-    }),
-    
     sortBlock: _block(
     {
       property: "",
@@ -652,43 +598,24 @@ export module BuilderTypes
       }
     }),
     
-    sort: _card(
-    {
-      sorts: List([]),
-      
-      static: 
-      {
-        title: "Sort",
-        preview: "[sorts.property]",
-        colors: ["#C5AFD5", "#EAD9F7"],
-        manualEntry: ManualConfig.cards['sort'],
-        tql: "ORDER BY $sorts",        
-        display: {
-          displayType: DisplayType.ROWS,
-          key: 'sorts',
-          english: 'sort',
-          factoryType: 'sortBlock',
-          row:
-          {
-            inner:
-            [
-              {
-                displayType: DisplayType.TEXT,
-                help: ManualConfig.help["property"],
-                key: 'property',
-              },
-              {
-                displayType: DisplayType.DROPDOWN,
-                key: 'direction',
-                options: Immutable.List(Directions),
-                help: ManualConfig.help["direction"],
-              },
-            ],
-          },
-        },
-      },
+    multiand: _multiAndOrCard({
+      title: "And",
+      factoryType: 'andBlock',
+      english: "and",
+      tqlGlue: ' AND ',
+      manualEntry: ManualConfig.cards.and,
+      colors: ["#47a7ff", "#97d7ff"],
     }),
     
+    multior: _multiAndOrCard({
+      title: "Or",
+      factoryType: 'orBlock',
+      english: "or",
+      tqlGlue: ' OR ',
+      manualEntry: ManualConfig.cards.or,
+      colors: ["#6777ff", "#a7b7ff"],
+    }),
+   
     comparison: _card(
     {
       first: "",
@@ -725,18 +652,7 @@ export module BuilderTypes
       },
     }),
     
-    and: _andOrCard({
-      title: 'And',
-      tql: 'AND',
-      manualEntry: ManualConfig.cards.and,
-    }),
-    
-    or: _andOrCard({
-      title: 'Or',
-      tql: 'OR',
-      manualEntry: ManualConfig.cards.or,
-    }),
-    
+ 
     // andOr: _card(
     // {
     //   first: "",
@@ -771,6 +687,43 @@ export module BuilderTypes
     //     }),
     //   },
     // }),
+     
+    sort: _card(
+    {
+      sorts: List([]),
+      
+      static: 
+      {
+        title: "Sort",
+        preview: "[sorts.property]",
+        colors: ["#C5AFD5", "#EAD9F7"],
+        manualEntry: ManualConfig.cards['sort'],
+        tql: "ORDER BY $sorts",        
+        display: {
+          displayType: DisplayType.ROWS,
+          key: 'sorts',
+          english: 'sort',
+          factoryType: 'sortBlock',
+          row:
+          {
+            inner:
+            [
+              {
+                displayType: DisplayType.TEXT,
+                help: ManualConfig.help["property"],
+                key: 'property',
+              },
+              {
+                displayType: DisplayType.DROPDOWN,
+                key: 'direction',
+                options: Immutable.List(Directions),
+                help: ManualConfig.help["direction"],
+              },
+            ],
+          },
+        },
+      },
+    }),
     
     let: _card(
     {
@@ -1006,7 +959,7 @@ export module BuilderTypes
     
     take: _valueCard(
     {
-      colors: ["#CDCF85", "#F5F6B3"],
+      colors: ["#8ac541", "#aaf571"],
       title: "Limit",
       manualEntry: ManualConfig.cards['take'],
       tql: "LIMIT $value",
@@ -1014,11 +967,65 @@ export module BuilderTypes
     
     skip: _valueCard(
     {
-      colors: ["#CDCF85", "#F5F6B3"],
+      colors: ["#00bcd6", "#40fce6"],
       title: "Offset",
       manualEntry: ManualConfig.cards['skip'],
       tql: "OFFSET $value",
     }),
+    
+    tql: _card({
+      clause: "",
+      
+      static:
+      {
+        title: "TQL",
+        preview: "\n$clause",
+        colors: ["#37df77", "#97ffd7"],
+        tql: "$clause",
+        manualEntry: ManualConfig.cards.tql,
+        
+        display: {
+          displayType: DisplayType.TEXT,
+          key: 'clause',
+        }
+      }
+    }),
+    
+    and: _andOrCard({
+      title: 'And',
+      tql: 'AND',
+      manualEntry: ManualConfig.cards.and,
+      colors: ["#47a7ff", "#97d7ff"],
+    }),
+    
+    or: _andOrCard({
+      title: 'Or',
+      tql: 'OR',
+      manualEntry: ManualConfig.cards.or,
+      colors: ["#6777ff", "#a7b7ff"],
+    }),
+    
+    
+    andBlock: _block(
+    {
+      clause: "",
+      static:
+      {
+        tql: "\n $clause",
+        tqlJoiner: "AND",
+      },
+    }),
+    
+    orBlock: _block(
+    {
+      clause: "",
+      static:
+      {
+        tql: "\n $clause",
+        tqlJoiner: "OR",
+      },
+    }),
+    
     
     spotlight: _block(
     {

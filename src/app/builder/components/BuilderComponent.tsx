@@ -183,7 +183,6 @@ class BuilderComponent extends PureClasss<Props>
           key={key}
           cards={value} 
           keyPath={keyPath}
-          topLevel={false}
           className={className}
           helpOn={this.props.helpOn}
           addColumn={this.props.addColumn}

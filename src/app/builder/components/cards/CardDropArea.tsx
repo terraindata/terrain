@@ -61,12 +61,29 @@ interface Props
   lower?: boolean;
   isOver?: boolean;
   connectDropTarget?: (el: El) => El;
+  
+  height?: number;
+  heightOffset?: number; // height will be 100% - heightOffset
 }
 
 class CardDropArea extends PureClasss<Props>
 {
 	render()
   {
+    var style = null;
+    if(this.props.height)
+    {
+      style = {
+        height: this.props.height,
+      };
+    }
+    if(this.props.heightOffset)
+    {
+      style = {
+        heightOffset: `100% - ${this.props.heightOffset}`,
+      };
+    }
+    
     return this.props.connectDropTarget(
       <div
         className={classNames({
@@ -76,6 +93,7 @@ class CardDropArea extends PureClasss<Props>
           'card-drop-area-lower': this.props.half && this.props.lower,
           'card-drop-area-over': this.props.isOver,
         })}
+        style={style}
       />
 	  );
 	}
@@ -86,6 +104,11 @@ const cardTarget =
   canDrop(targetProps:Props, monitor)
   {
     let item = monitor.getItem() as CardItem;
+    if(item['new'])
+    {
+      return true;
+    }
+    
     let itemKeyPath = item.props.keyPath;
     let targetKeyPath = targetProps.keyPath;
     if(targetKeyPath.equals(itemKeyPath))
@@ -107,14 +130,25 @@ const cardTarget =
   {
     if(monitor.isOver({ shallow: true}) && cardTarget.canDrop(targetProps, monitor))
     {
-      let cardProps = monitor.getItem().props;
-      var indexOffset = 0;
+      var targetIndex = targetProps.index;
       if(targetProps.half && targetProps.lower)
       {
         // dropping above target props
-        var indexOffset = 1;
+        targetIndex ++;
       }
-      Actions.nestedMove(cardProps.keyPath, cardProps.index, targetProps.keyPath, targetProps.index + indexOffset);
+      
+      let item = monitor.getItem();
+      if(item.new)
+      {
+        // is a new card
+        Actions.create(targetProps.keyPath, targetIndex, item.type);
+        return;
+      }
+      
+      // dragging an existing card
+      let cardProps = item.props;
+      var indexOffset = 0;
+      Actions.nestedMove(cardProps.keyPath, cardProps.index, targetProps.keyPath, targetIndex);
     }
   }
 }
