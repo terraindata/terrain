@@ -257,17 +257,21 @@ class BuilderComponent extends PureClasss<Props>
               />
             </div>
             { !d.below ? null : 
-              <BuilderComponent
-                display={d.below}
-                keyPath={this.props.keyPath}
-                data={data}
-                canEdit={this.props.canEdit}
-                keys={this.props.keys}
-                parentData={this.props.parentData}
-                helpOn={this.props.helpOn}
-                addColumn={this.props.addColumn}
-                columnIndex={this.props.columnIndex}
-              />
+              <div
+                className='card-flex-below'
+              >
+                <BuilderComponent
+                  display={d.below}
+                  keyPath={this.props.keyPath}
+                  data={data}
+                  canEdit={this.props.canEdit}
+                  keys={this.props.keys}
+                  parentData={this.props.parentData}
+                  helpOn={this.props.helpOn}
+                  addColumn={this.props.addColumn}
+                  columnIndex={this.props.columnIndex}
+                />
+              </div>
             }
           </div>
         );

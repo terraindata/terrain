@@ -118,8 +118,9 @@ var LayoutManager = React.createClass<any, any>({
   {
     if(newProps.layout.columns && this.props.layout.columns)
     {
-      var hfn = (sum, col) => sum + (col.hidden ? 1 : 0)
-      if(newProps.layout.columns.reduce(hfn, 0) !== this.props.layout.columns.reduce(hfn, 0))
+      // if using hidden:
+      // var hfn = (sum, col) => sum + (col.hidden ? 1 : 0)
+      if(newProps.layout.columns.length !== this.props.layout.columns.length)
       {
         // number of columns has changed, reset offsets
         for(var index in this.state.sizeAdjustments)

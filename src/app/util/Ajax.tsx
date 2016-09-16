@@ -294,41 +294,35 @@ var Ajax = {
   
   schema(onLoad: (tables: {name: string, columns: any[]}[], error?: any) => void, onError?: (ev:Event) => void)
   {
-    return Ajax._r("/get_tables", {
+    return Ajax._r("/get_schema", {
         db: 'urbansitter',
       },
       
       (resp:string) =>
       {
         try {
-          let obj = JSON.parse(resp);
-          let tableNames = obj.map(o => o['Tables_in_urbansitter']);
+          let cols = JSON.parse(resp);
+          var tables: {[name:string]: {name: string; columns: any[];}} = {};
           
-          let count = 0;
-          
-          var tables = [];
-          
-          tableNames.map(table =>
-            Ajax._r("/get_schema", {
-              db: 'urbansitter',
-              table,
-            },
-            
-            (r) => 
+          cols.map(
+          (
+            col: { TABLE_NAME: string; COLUMN_NAME: string; }
+          ) =>
+          {
+            let column = _.extend(col, { name: col.COLUMN_NAME });
+            let table = col.TABLE_NAME;
+             
+            if(!tables[table])
             {
-              let cols = JSON.parse(r);
-              cols.map(col => col.name = col['Field']);
-              tables.push({
+              tables[table] = {
                 name: table,
-                columns: cols,
-              });
-              
-              if(tables.length === tableNames.length)
-              {
-                onLoad(tables);
-              }
-            })
-          );
+                columns: [],
+              };
+            }
+            
+            tables[table].columns.push(column);
+          });
+          onLoad(_.toArray(tables) as any);
         } catch(e) {
           onError && onError(resp as any);
         }
