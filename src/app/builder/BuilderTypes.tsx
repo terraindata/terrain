@@ -180,7 +180,12 @@ export module BuilderTypes
       // - to map a value to another string, write the field name in all caps. the value will be passed into "[FieldName]TQL" map
       //    e.g. "$DIRECTION" will look up "DirectionTQL" in BuilderTypes and pass the value into it
       tql: string;
-      tqlJoiner?: string; // DOESNT WORK
+      tqlJoiner?: string;
+      
+      // construct returns an object with default values for a new card
+      construct?: () => {
+        [k:string]: any;
+      };
       
       getChildTerms?: (card: ICard) => List<string>;
       getNeighborTerms?: (card: ICard) => List<string>;
@@ -388,13 +393,13 @@ export module BuilderTypes
           key: 'clauses',
           english: "'" + config.english + "'",
           factoryType: config.factoryType,
-          className: (card) => {
-            if(card['clauses'].size && typeof card['clauses'].get(0) !== 'string')
-            {
-              return 'multi-field-card-padding';
-            }
-            return '';
-          },
+          // className: (card) => {
+          //   if(card['clauses'].size && typeof card['clauses'].get(0) !== 'string')
+          //   {
+          //     return 'multi-field-card-padding';
+          //   }
+          //   return '';
+          // },
           
           row:
           {
@@ -402,7 +407,6 @@ export module BuilderTypes
             {
               displayType: DisplayType.CARDSFORTEXT,
               key: 'clause',
-              className: 'multi-field-card-padding-row',
             },
             
             inner: 
@@ -704,6 +708,16 @@ export module BuilderTypes
           key: 'sorts',
           english: 'sort',
           factoryType: 'sortBlock',
+          
+          construct: () =>
+          {
+            return {
+              sorts: List([
+                make(Blocks.sortBlock)
+              ])
+            };
+          },
+          
           row:
           {
             inner:

@@ -210,7 +210,7 @@ class BuilderComponent extends PureClasss<Props>
         content = (
           <div key={key} className='builder-component-wrapper'>
             <Dropdown
-              canEdit={this.props.canEdit}
+              canEdit={this.props.canEdit}  
               className={className}
               keyPath={keyPath}
               options={d.options}
@@ -301,6 +301,7 @@ class BuilderComponent extends PureClasss<Props>
                   helpOn={this.props.helpOn}
                   addColumn={this.props.addColumn}
                   columnIndex={this.props.columnIndex}
+                  isFirstRow={i === 0}
                 />
               ))
             }

@@ -67,6 +67,7 @@ interface Props
   onMove: (index: number, newIndex: number) => void;
   
   isSingle?: boolean;
+  isFirstRow?: boolean;
 
   row: {
     inner: Display | Display[];
@@ -333,13 +334,14 @@ class CardField extends PureClasss<Props>
     let {row} = this.props;
     
     let renderTools = ! row.hideToolsWhenNotString || typeof this.props.data[this.props.row.inner['key']] === 'string';
-
+    
     return (
       <div
         ref='all'
         className={classNames({
           'card-field-wrapper': true,
           'card-field-wrapper-moving': this.state.movedTo !== null,
+          'card-field-wrapper-first': this.props.isFirstRow,
         })}
         style={style}
       >
@@ -444,17 +446,25 @@ class CardField extends PureClasss<Props>
            }
   			</div>
         { ! row.below ? null :
-            <BuilderComponent
-              display={this.props.row.below}
-              keyPath={this.props.keyPath}
-              data={this.props.data}
-              canEdit={this.props.canEdit}
-              keys={this.props.keys}
-              parentData={this.props.parentData}
-              helpOn={this.props.helpOn}
-              addColumn={this.props.addColumn}
-              columnIndex={this.props.columnIndex}
-            />
+            <div
+              className={classNames({
+                'card-field-below': true,
+                'card-field-below-first': this.props.isFirstRow,
+                'card-field-below-data': !renderTools,
+              })}
+            >
+              <BuilderComponent
+                display={this.props.row.below}
+                keyPath={this.props.keyPath}
+                data={this.props.data}
+                canEdit={this.props.canEdit}
+                keys={this.props.keys}
+                parentData={this.props.parentData}
+                helpOn={this.props.helpOn}
+                addColumn={this.props.addColumn}
+                columnIndex={this.props.columnIndex}
+              />
+            </div>
         }
       </div>
 	  );
