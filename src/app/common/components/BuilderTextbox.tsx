@@ -162,10 +162,17 @@ class BuilderTextbox extends PureClasss<Props>
   
   handleSwitch()
   {
+    if(!this.isText())
+    {
+      this.executeChange("");
+      return;
+    }
+    
     this.setState({
       isSwitching: true,
     });
     
+    // backup value
     // var value: BuilderTypes.CardString = '';
     // // if(this.backupValue)
     // // {
