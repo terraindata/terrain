@@ -165,12 +165,14 @@ class BuilderTextbox extends PureClasss<Props>
     if(!this.isText())
     {
       this.executeChange("");
-      return;
     }
     
-    this.setState({
-      isSwitching: true,
-    });
+    return;
+    
+    // switch area:
+    // this.setState({
+    //   isSwitching: true,
+    // });
     
     // backup value
     // var value: BuilderTypes.CardString = '';

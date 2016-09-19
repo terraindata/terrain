@@ -64,6 +64,8 @@ interface Props
   
   height?: number;
   heightOffset?: number; // height will be 100% - heightOffset
+  
+  beforeDrop?: (item:CardItem, targetProps:Props) => void;
 }
 
 class CardDropArea extends PureClasss<Props>
@@ -130,6 +132,13 @@ const cardTarget =
   {
     if(monitor.isOver({ shallow: true}) && cardTarget.canDrop(targetProps, monitor))
     {
+      let item = monitor.getItem();
+      
+      if(targetProps.beforeDrop)
+      {
+        targetProps.beforeDrop(item, targetProps);
+      }
+      
       var targetIndex = targetProps.index;
       if(targetProps.half && targetProps.lower)
       {
@@ -137,8 +146,8 @@ const cardTarget =
         targetIndex ++;
       }
       
-      let item = monitor.getItem();
-      if(item.new)
+      
+      if(item['new'])
       {
         // is a new card
         Actions.create(targetProps.keyPath, targetIndex, item.type);

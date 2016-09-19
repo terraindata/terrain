@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import Util from '../../../util/Util.tsx';
 import Classs from './../../../common/components/Classs.tsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -166,6 +167,7 @@ class NotificationItem extends Classs<Props> {
     }
 
     if (this._isMounted) {
+      Util.animateToHeight(this.refs['item'], 0);
       this.setState({
         visible: false,
         removed: true
@@ -353,7 +355,7 @@ class NotificationItem extends Classs<Props> {
       }
 
       if (this.state.visible && !this.state.removed) {
-        notificationStyle.height = '90px'; 
+        notificationStyle.height = 'auto'; 
         notificationStyle[cssByPos.property] = 0;
       }
 
@@ -374,6 +376,7 @@ class NotificationItem extends Classs<Props> {
           onMouseEnter={this._handleMouseEnter}
           onMouseLeave={this._handleMouseLeave}
           style={notificationStyle}
+          ref='item'
         >
           {this.renderDismiss()}
           <div

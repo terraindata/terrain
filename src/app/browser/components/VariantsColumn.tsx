@@ -147,7 +147,8 @@ class VariantsColumn extends Classs<Props>
       {
         var oldName = this.props.variants.get(id).name || 'Untitled'; 
         notificationManager.addNotification(
-          'Changed name of variant "' + oldName + '" to "' + name + '".',
+          'Renamed',
+          '"' + oldName + '" is now "' + name + '"',
           'info',
           5
         );
@@ -187,7 +188,8 @@ class VariantsColumn extends Classs<Props>
         var algorithmName = targetItem.name || 'Untitled';
         var vrntName = this.props.variants.get(id).name  || 'Untitled';
         notificationManager.addNotification(
-          'Variant "' + vrntName + '" was moved to algorithm "' + algorithmName + '".',
+          'Moved',
+          '"' + vrntName + '" was moved to algorithm "' + algorithmName + '"',
           'info',
           5
         );

@@ -80,13 +80,14 @@ interface Props
 
 var notificationManager = {
   system: null,
-  addNotification:function(message:any, type:string, timeOut?:number)
+  
+  addNotification:function(title: string, message:string, level:string, timeOut?:number)
   {
     if(this.system) { 
       this.system.addNotification({
-        title: 'Terrain Message',
-        message: message,
-        level: type,
+        title,
+        message,
+        level,
         autoDismiss: timeOut || 5000, 
         dismissible: true
       });

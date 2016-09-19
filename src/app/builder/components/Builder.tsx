@@ -282,17 +282,21 @@ class Builder extends PureClasss<Props>
 }
   onSaveSuccess()
   {
+    console.log('a');
     notificationManager.addNotification(
-      'Variant "' + this.getSelectedQuery().name + '" saved.', 
+      'Saved',
+      this.getSelectedQuery().name,
       'info', 
-      5
+      4
     );
   }
 
   onSaveError()
   {
+    console.log('b');
     notificationManager.addNotification(
-      'Error: Variant "' + this.getSelectedQuery().name + '" failed to save.', 
+      'Error Saving',
+      '"' + this.getSelectedQuery().name + '" failed to save.', 
       'error', 
       0
     );

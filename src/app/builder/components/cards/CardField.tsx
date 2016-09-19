@@ -51,6 +51,8 @@ import PureClasss from '../../../common/components/PureClasss.tsx';
 import BuilderComponent from '../BuilderComponent.tsx';
 import {Display} from '../../BuilderDisplays.tsx';
 import ManualInfo from '../../../manual/components/ManualInfo.tsx';
+import { CardItem } from './Card.tsx';
+import CardDropArea from './CardDropArea.tsx';
 const classNames = require('classnames');
 
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
@@ -103,7 +105,7 @@ interface IMoveState
   movedTo?: number;
 }
 
-const DefaultMoveState =
+const DefaultMoveState: IMoveState =
 {
   moving: false,
   movedTo: null,
@@ -119,30 +121,6 @@ class CardField extends PureClasss<Props>
   {
     this.setState(state);
   }
-  
-  // TODO
-  // shouldComponentUpdate(nextProps: Props, nextState: any)
-  // {
-  //   if(shallowCompare(this, nextProps, nextState))
-  //   {
-  //     console.log('update');
-  //     for(var i in this.props)
-  //     {
-  //       if(nextProps[i] !== this.props[i])
-  //       {
-  //         console.log(i, this.props[i], nextProps[i]);
-  //       }
-  //     }
-  //     for(var i in this.state)
-  //     {
-  //       if(nextState[i] !== this.state[i])
-  //       {
-  //         console.log(i, this.state[i], nextState[i]);
-  //       }
-  //     }
-  //   }
-  //   return shallowCompare(this, nextProps, nextState);
-  // }
   
 	removeField(event)
 	{
@@ -313,6 +291,11 @@ class CardField extends PureClasss<Props>
       movedTo: index,
     });
   }
+  
+  beforeTopAddDrop(item:CardItem, targetProps)
+  {
+    this.props.onAdd(0);
+  }
 
 	render()
   {
@@ -364,17 +347,23 @@ class CardField extends PureClasss<Props>
             'card-field-moving': this.state.moving,
             'card-field-single': this.props.isSingle,
             // ^ hides the left drag handle if single
+            'card-field-editable': this.props.canEdit,
           })}
           ref='cardField'
         >
           {
-            !renderTools && this.props.canEdit &&
+            !renderTools && this.props.canEdit && this.props.isFirstRow &&
               <div
                 className='card-field-top-add card-field-add'
                 onClick={this.addFieldTop}
                 data-tip={'Add another'}
               >
                 <AddIcon />
+                <CardDropArea
+                  index={null}
+                  keyPath={this._ikeyPath(this.props.keyPath, (row.inner as Display).key)}
+                  beforeDrop={this.beforeTopAddDrop}
+                />
               </div>
           }
           {
