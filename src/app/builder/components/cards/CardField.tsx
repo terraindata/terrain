@@ -70,6 +70,7 @@ interface Props
   
   isSingle?: boolean;
   isFirstRow?: boolean;
+  isOnlyRow?: boolean;
 
   row: {
     inner: Display | Display[];
@@ -423,13 +424,16 @@ class CardField extends PureClasss<Props>
                       />
                       : null
                     }
-                    <div
-                      className='card-field-remove'
-                      onClick={this.removeField}
-                      data-tip={'Remove'}
-                    >
-                      <RemoveIcon />
-                    </div>
+                    {
+                      !this.props.isOnlyRow &&
+                        <div
+                          className='card-field-remove'
+                          onClick={this.removeField}
+                          data-tip={'Remove'}
+                        >
+                          <RemoveIcon />
+                        </div>
+                    }
                   </div>
                 </div>
               </div>

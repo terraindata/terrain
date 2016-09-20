@@ -302,6 +302,7 @@ class BuilderComponent extends PureClasss<Props>
                   addColumn={this.props.addColumn}
                   columnIndex={this.props.columnIndex}
                   isFirstRow={i === 0}
+                  isOnlyRow={value.size === 1}
                 />
               ))
             }
