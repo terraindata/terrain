@@ -500,7 +500,7 @@ export module BuilderTypes
       {
         manualEntry: ManualConfig.cards['sfw'],
         colors: ["#89B4A7", "#C1EADE"],
-        title: "From",
+        title: "Select",
         preview: "[tables.table]",
         tql: "SELECT\n$fields\nFROM\n$tables\n$cards",
         
@@ -527,6 +527,24 @@ export module BuilderTypes
           
         display: [
           {
+            displayType: DisplayType.ROWS,
+            key: 'fields',
+            english: 'field',
+            factoryType: 'field',
+            row:
+            {
+              inner:
+              {
+                displayType: DisplayType.TEXT,
+                help: ManualConfig.help["select-field"],
+                key: 'field',
+              },
+            },
+          },
+          
+          {
+            header: 'From',
+            headerClassName: 'sfw-select-header',
             displayType: DisplayType.ROWS,
             key: 'tables',
             english: 'table',
@@ -556,23 +574,6 @@ export module BuilderTypes
             },
           },
           
-          {
-            header: 'Select',
-            headerClassName: 'sfw-select-header',
-            displayType: DisplayType.ROWS,
-            key: 'fields',
-            english: 'field',
-            factoryType: 'field',
-            row:
-            {
-              inner:
-              {
-                displayType: DisplayType.TEXT,
-                help: ManualConfig.help["select-field"],
-                key: 'field',
-              },
-            },
-          },
           {
             displayType: DisplayType.CARDS,
             key: 'cards',

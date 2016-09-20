@@ -79,9 +79,9 @@ interface Props
 
 class BuilderComponent extends PureClasss<Props>
 {
-  _addRow(keyPath: KeyPath, index: number, display: Display)
+  _addRow(keyPath: KeyPath, display: Display)
   {
-    return this._fn('addRow', keyPath, index, display, () => {
+    return this._fn('addRow', keyPath, display, (index: number) => {
       BuilderActions.create(keyPath, index, display.factoryType);
     });
   }
@@ -286,7 +286,7 @@ class BuilderComponent extends PureClasss<Props>
               value.map((v, i) => (
                 <CardField
                   index={i}
-                  onAdd={this._addRow(keyPath, i, d)}
+                  onAdd={this._addRow(keyPath, d)}
                   onRemove={this._removeRow(keyPath, i, d)}
                   onMove={this._moveRow(keyPath)}
                   key={key + ',' + v.get('id')}
@@ -309,7 +309,7 @@ class BuilderComponent extends PureClasss<Props>
               value.size ? null :
                 <div
                   className='builder-add-row'
-                  onClick={this._addRow(keyPath, 0, d)}
+                  onClick={this._addRow(keyPath, d)}
                 >
                   Add a {d.english}
                 </div>

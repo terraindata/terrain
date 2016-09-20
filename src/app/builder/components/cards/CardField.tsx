@@ -130,6 +130,7 @@ class CardField extends PureClasss<Props>
   
   addField(event)
   {
+    console.log(this.props.index + 1);
     this.props.onAdd(this.props.index + 1);
   }
   
