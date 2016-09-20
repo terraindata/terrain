@@ -212,8 +212,7 @@ var Input = React.createClass<any, any>({
   },
 
 	render() {
-    // return this.renderPanel((
-		return (
+		return this.renderPanel((
 			<div className='input' ref='input'>
         <CreateLine open={false} onClick={this.createInput} />
         <div className='input-inner'>
@@ -238,7 +237,7 @@ var Input = React.createClass<any, any>({
           </div>
         </div>
 			</div>
-		);
+		));
 	},
 });
 
