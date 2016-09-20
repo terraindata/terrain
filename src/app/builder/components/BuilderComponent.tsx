@@ -306,15 +306,6 @@ class BuilderComponent extends PureClasss<Props>
                 />
               ))
             }
-            {
-              value.size ? null :
-                <div
-                  className='builder-add-row'
-                  onClick={this._addRow(keyPath, d)}
-                >
-                  Add a {d.english}
-                </div>
-            }
           </div>
         );
         break;

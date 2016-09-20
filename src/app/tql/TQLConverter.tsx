@@ -184,7 +184,7 @@ class TQLConverter
         glue = block.static.tqlJoiner;
       }
       
-      return pieces.join(glue);
+      return addTabs(pieces.join(glue));
       
       // return pieces.reduce((str, piece, i) => (
       //     str + piece + 

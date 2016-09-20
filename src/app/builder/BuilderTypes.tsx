@@ -456,7 +456,7 @@ export module BuilderTypes
       direction: Direction.DESC,
       static:
       {
-        tql: "$property $DIRECTION",
+        tql: "\n $property $DIRECTION",
       }
     }),
     
@@ -1044,7 +1044,7 @@ export module BuilderTypes
       clause: "",
       static:
       {
-        tql: "\n $clause",
+        tql: "\n$clause",
         tqlJoiner: "AND",
       },
     }),
@@ -1054,7 +1054,7 @@ export module BuilderTypes
       clause: "",
       static:
       {
-        tql: "\n $clause",
+        tql: "\n$clause",
         tqlJoiner: "OR",
       },
     }),
