@@ -432,9 +432,9 @@ export module BuilderTypes
       },
     });
   
-  const _valueCard = (config:{ title: string, colors: string[], manualEntry: IManualEntry, tql: string }) => (
+  const _valueCard = (config:{ title: string, colors: string[], manualEntry: IManualEntry, tql: string, defaultValue: number, }) => (
     _card({
-      value: 0,
+      value: config.defaultValue,
       
       static: {
         title: config.title,
@@ -993,6 +993,7 @@ export module BuilderTypes
       title: "Limit",
       manualEntry: ManualConfig.cards['take'],
       tql: "LIMIT $value",
+      defaultValue: 25,
     }),
     
     skip: _valueCard(
@@ -1001,6 +1002,7 @@ export module BuilderTypes
       title: "Offset",
       manualEntry: ManualConfig.cards['skip'],
       tql: "OFFSET $value",
+      defaultValue: 25,
     }),
     
     tql: _card({
