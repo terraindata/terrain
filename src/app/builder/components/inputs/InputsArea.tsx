@@ -80,10 +80,10 @@ class InputsArea extends PureClasss<Props>
     );
   }
   
-  moveTo(curIndex, newIndex)
-  {
-    Actions.move(Immutable.List(['queries', this.props.queryId, 'inputs']), curIndex, newIndex);
-  }
+  // moveTo(curIndex, newIndex)
+  // {
+  //   Actions.move(Immutable.List(['queries', this.props.queryId, 'inputs']), curIndex, newIndex);
+  // }
   
   render()
   {
@@ -92,27 +92,42 @@ class InputsArea extends PureClasss<Props>
       return this.renderNoInputs();
     }
     
-    var layout = {
-      rows: this.props.inputs.map((input, index) => {
-        return {
-          content: <Input input={input} index={index} queryId={this.props.queryId} />,
-          key: input.id,
-        };
-      }).toJS(),
-      fullHeight: true,
-    };
+    // var layout = {
+    //   rows: this.props.inputs.map((input, index) => {
+    //     return {
+    //       content: <Input input={input} index={index} queryId={this.props.queryId} />,
+    //       key: input.id,
+    //     };
+    //   }).toJS(),
+    //   fullHeight: true,
+    // };
     
-    layout.rows.push({
-      content: (
-        <div className='standard-margin'>
-          <CreateLine open={false} onClick={this.createInput} />
-        </div>
-      ),
-    });
+    // layout.rows.push({
+    //   content: (
+    //     <div className='standard-margin'>
+    //       <CreateLine open={false} onClick={this.createInput} />
+    //     </div>
+    //   ),
+    // });
+    
+        // <LayoutManager layout={layout} moveTo={this.moveTo} />
     
     return (
       <div className='inputs-area'>
-        <LayoutManager layout={layout} moveTo={this.moveTo} />
+        {
+          this.props.inputs.map((input, index) =>
+            <Input
+              input={input}
+              index={index}
+              queryId={this.props.queryId}
+              key={input.id}
+            />
+          )
+        }
+        
+        <div className='standard-margin'>
+          <CreateLine open={false} onClick={this.createInput} />
+        </div>
       </div>
     );
   }
