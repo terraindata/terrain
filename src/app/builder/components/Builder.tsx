@@ -302,11 +302,6 @@ class Builder extends PureClasss<Props>
 
   save()
   {
-    var sound = new Audio();
-    sound.src = 'http://lukeknepper.com/upload/slide_whistle_up.wav';
-    sound.load();
-    sound.play();
-    
     Ajax.saveItem(BrowserTypes.variantForSave(
         this.state.builder.queries.get(this.getSelectedId()) as BrowserTypes.Variant
       ),

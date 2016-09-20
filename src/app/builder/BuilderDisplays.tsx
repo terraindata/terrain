@@ -129,6 +129,12 @@ export const valueDisplay =
   key: 'value',
 }
 
+export const stringValueDisplay =
+  {
+    displayType: TEXT,
+    key: 'value',
+  };
+
 export const textDisplay =
 {
   displayType: TEXT,

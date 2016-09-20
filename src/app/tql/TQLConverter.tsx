@@ -72,7 +72,7 @@ class TQLConverter
     if(cards && cards.size)
     {
       cards = this.applyOptions(cards, options);
-      cardsTql = removeBlanks(this._cards(cards, ";", options));
+      cardsTql = removeBlanks(this._cards(cards, ";", options, true));
     }
     
     // TODO figure out inputs
@@ -135,24 +135,24 @@ class TQLConverter
           value: options.limit,
         })));
       }
-      
+            
       return fromCard;
     });
     
     return cards;
   }
 
-  private static _cards(cards: List<ICard>, append?: string, options?: Options): string
+  private static _cards(cards: List<ICard>, append?: string, options?: Options, isTop?: boolean): string
   {
     var glue = "\n" + (append || "");
     return addTabs(cards.map(
-        (card, i) => this._parse(card, i, i === cards.size)
+        (card, i) => this._parse(card, i, i === cards.size, isTop)
       ).join(glue)) + glue;
   }
   
-  private static _parse(block: IBlock, index?: number, isLast?: boolean): string
+  private static _parse(block: IBlock, index?: number, isLast?: boolean, isTop?: boolean): string
   {
-    let str = block.static.tql;
+    let str = (isTop && block.static.topTql) || block.static.tql;
     var index = str.indexOf("$");
     while(index !== -1)
     {

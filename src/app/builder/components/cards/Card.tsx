@@ -253,7 +253,7 @@ class Card extends PureClasss<Props>
 	toggleClose(event)
 	{
     Actions.change(
-      this._ikeyPath(this.props.keyPath, this.props.index, 'closed'), 
+      this.getKeyPath().push('closed'), 
       !this.props.card.closed
     );
     
@@ -362,6 +362,13 @@ class Card extends PureClasss<Props>
     event.stopPropagation();
     Actions.hoverCard(this.props.card.id);
   }
+  
+  getKeyPath()
+  {
+    return this.props.singleCard
+        ? this.props.keyPath
+        : this._ikeyPath(this.props.keyPath, this.props.index);
+  }
 
 	render()
   {
@@ -372,11 +379,7 @@ class Card extends PureClasss<Props>
       helpOn={this.props.helpOn}
       addColumn={this.props.addColumn}
       columnIndex={this.props.columnIndex}
-      keyPath={
-        this.props.singleCard
-        ? this.props.keyPath
-        : this._ikeyPath(this.props.keyPath, this.props.index)
-      }
+      keyPath={this.getKeyPath()}
     />;
 
     let {card} = this.props;

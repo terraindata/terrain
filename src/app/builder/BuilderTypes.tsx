@@ -59,7 +59,7 @@ export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
 
-import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, firstSecondDisplay, wrapperDisplay} from './BuilderDisplays.tsx';  
+import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, firstSecondDisplay, wrapperDisplay, stringValueDisplay} from './BuilderDisplays.tsx';  
 var ManualConfig = require('./../manual/ManualConfig.json');
 
 export module BuilderTypes
@@ -84,7 +84,7 @@ export module BuilderTypes
     [Operator.LE]: '<=',
     [Operator.LT]: '<',
     [Operator.IN]: 'in',
-    [Operator.NIN]: 'notIn',
+    [Operator.NIN]: 'not in',
   }
 
   export enum Direction {
@@ -179,8 +179,10 @@ export module BuilderTypes
       // - to join List with something else, specify a tqlJoiner
       // - to map a value to another string, write the field name in all caps. the value will be passed into "[FieldName]TQL" map
       //    e.g. "$DIRECTION" will look up "DirectionTQL" in BuilderTypes and pass the value into it
+      // - topTql is the tql to use if this card is at the top level of a query
       tql: string;
       tqlJoiner?: string;
+      topTql?: string;
       
       // returns an object with default values for a new card
       init?: () => {
@@ -220,6 +222,7 @@ export module BuilderTypes
     {
       tql: string;
       tqlJoiner?: string;
+      topTql?: string;
       [field:string]: any;
     }
     
@@ -258,6 +261,7 @@ export module BuilderTypes
       manualEntry: IManualEntry;
       tql: string;
       tqlJoiner?: string;
+      topTql?: string;
       
       getChildTerms?: (card: ICard) => List<string>;
       getNeighborTerms?: (card: ICard) => List<string>;
@@ -330,6 +334,26 @@ export module BuilderTypes
       }
     })
   }
+  
+  const _selectValueCard = (config: {
+    colors: string[];
+    title: string;
+    manualEntry: IManualEntry;
+    tql: string;
+  }) => _card({
+    value: "",
+    
+    static:
+    {
+      title: config.title,
+      colors: config.colors,
+      manualEntry: config.manualEntry,
+      preview: "$value",
+      tql: config.tql,
+      
+      display: stringValueDisplay,
+    }
+  })
   
   const _andOrCard = (config: { title: string, tql: string, colors: string[], manualEntry }) => _card(
     {
@@ -507,7 +531,8 @@ export module BuilderTypes
         colors: ["#89B4A7", "#C1EADE"],
         title: "Select",
         preview: "[tables.table]",
-        tql: "SELECT\n$fields\nFROM\n$tables\n$cards",
+        topTql: "SELECT\n$fields\nFROM\n$tables\n$cards",
+        tql: "\n(\n SELECT\n$fields\n FROM\n$tables\n$cards)",
         
         init: () => ({
           tables: List([ make(Blocks.table )]),
@@ -540,8 +565,13 @@ export module BuilderTypes
             {
               inner:
               {
-                displayType: DisplayType.TEXT,
+                displayType: DisplayType.CARDTEXT,
                 help: ManualConfig.help["select-field"],
+                key: 'field',
+              },
+              below:
+              {
+                displayType: DisplayType.CARDSFORTEXT,
                 key: 'field',
               },
             },
@@ -794,44 +824,44 @@ export module BuilderTypes
       }
     }),
 
-    count: _wrapperCard(
+    count: _selectValueCard(
     {
       colors: ["#70B1AC", "#D2F3F0"],
       title: "Count",
       manualEntry: ManualConfig.cards['count'],
-      tql: "COUNT $cards",
+      tql: "COUNT($value)",
     }),
     
-    avg: _wrapperCard(
+    avg: _selectValueCard(
     {
       colors: ["#a2b37e", "#c9daa6"],
       title: "Average",
       manualEntry: ManualConfig.cards['avg'],
-      tql: "AVG $cards",
+      tql: "AVG($value)",
     }),
     
-    sum: _wrapperCard(
+    sum: _selectValueCard(
     {
       colors: ["#8dc4c1", "#bae8e5"],
       title: "Sum",
       manualEntry: ManualConfig.cards['sum'],
-      tql: "SUM $cards",
+      tql: "SUM($value)",
     }),
 
-    min: _wrapperCard(
+    min: _selectValueCard(
     {
       colors: ["#cc9898", "#ecbcbc"],
       title: "Min",
       manualEntry: ManualConfig.cards['min'],
-      tql: "MIN $cards",
+      tql: "MIN($value)",
     }),
 
-    max: _wrapperCard(
+    max: _selectValueCard(
     {
       colors: ["#8299b8", "#acc6ea"],
       title: "Max",
       manualEntry: ManualConfig.cards['max'],
-      tql: "MAX $cards",
+      tql: "MAX($value)",
     }),
 
     exists: _wrapperCard(
@@ -839,7 +869,7 @@ export module BuilderTypes
       colors: ["#a98abf", "#cfb3e3"],
       title: "Exists",
       manualEntry: ManualConfig.cards['exists'],
-      tql: "EXISTS $cards",
+      tql: "EXISTS\n(\n$cards)",
     }),
 
     parentheses: _wrapperCard(
