@@ -311,12 +311,17 @@ export module BuilderTypes
         getNeighborTerms: config.getNeighborTerms,
         
         preview: (c:IWrapperCard) => {
+          var prefix = config.title + ': ';
+          if(c.type === 'parentheses')
+          {
+            prefix = '';
+          }
           if(c.cards.size)
           {
             let card = c.cards.get(0);
-            return config.title + ": " + getPreview(card);
+            return prefix + getPreview(card);
           }
-          return config.title + ": Nothing";
+          return prefix + "Nothing";
         },
         
         display: (config.display || wrapperDisplay),
@@ -842,7 +847,7 @@ export module BuilderTypes
       colors: ["#b37e7e", "#daa3a3"],
       title: "( )",
       manualEntry: ManualConfig.cards['parentheses'],
-      tql: "($cards)",
+      tql: "\n(\n$cards)",
     }),
     
     weight: _block(
