@@ -4,6 +4,7 @@
     	[
       		"from",
       		"select",
+          "where",
       		"sort", 
       		"filter",
       		"score",
@@ -16,6 +17,7 @@
       		"count",
       		"exists",
       		"take",
+          "limit",
       		"skip",
       		"desc",
       		"asc",
@@ -25,7 +27,11 @@
 		"keywords2":
 		[
 			"&&",
-			"||"
+			"||",
+      "and",
+      "or",
+      "AND",
+      "OR"
 		],
 		"operators":
 		[
@@ -35,9 +41,7 @@
 			"=",
 			"<",
 			">",
-			"?",
-			"and",
-			"or"
+			"?"
 		],
 		"atom":
 		[

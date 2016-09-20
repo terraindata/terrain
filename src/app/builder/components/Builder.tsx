@@ -282,7 +282,6 @@ class Builder extends PureClasss<Props>
 }
   onSaveSuccess()
   {
-    console.log('a');
     notificationManager.addNotification(
       'Saved',
       this.getSelectedQuery().name,
@@ -293,7 +292,6 @@ class Builder extends PureClasss<Props>
 
   onSaveError()
   {
-    console.log('b');
     notificationManager.addNotification(
       'Error Saving',
       '"' + this.getSelectedQuery().name + '" failed to save.', 
@@ -310,6 +308,7 @@ class Builder extends PureClasss<Props>
       this.onSaveSuccess,
       this.onSaveError
     );
+    
     var configArr = window.location.pathname.split('/')[2].split(',');
     var currentVariant;
     configArr = configArr.map(function(tab)

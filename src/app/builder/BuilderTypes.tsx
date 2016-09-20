@@ -387,7 +387,7 @@ export module BuilderTypes
         title: config.title,
         preview: '[clauses.length] ' + config.english + ' clauses',
         colors: config.colors,
-        tql: "$clauses",
+        tql: "(\n$clauses\n)",
         tqlJoiner: config.tqlGlue,
         manualEntry: config.manualEntry,
         
@@ -598,7 +598,7 @@ export module BuilderTypes
         },
         
         colors: ["#AFC5D5", "#D9EAF7"],
-        tql: "WHERE $clause",
+        tql: "WHERE\n$clause",
         manualEntry: ManualConfig.cards.where,
         
         display: 
@@ -621,7 +621,7 @@ export module BuilderTypes
       title: "And",
       factoryType: 'andBlock',
       english: "and",
-      tqlGlue: ' AND ',
+      tqlGlue: '\nAND ',
       manualEntry: ManualConfig.cards.and,
       colors: ["#47a7ff", "#97d7ff"],
     }),
@@ -630,7 +630,7 @@ export module BuilderTypes
       title: "Or",
       factoryType: 'orBlock',
       english: "or",
-      tqlGlue: ' OR ',
+      tqlGlue: '\nOR ',
       manualEntry: ManualConfig.cards.or,
       colors: ["#6777ff", "#a7b7ff"],
     }),

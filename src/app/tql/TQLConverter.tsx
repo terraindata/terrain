@@ -53,7 +53,7 @@ type IInput = BuilderTypes.IInput;
 var OperatorsTQL = ['==', '!=', '>=', '>', '<=', '<', 'in', 'notIn'];
 var CombinatorsTQL = ['&&', '||'];
 var join = (j, index) => (index === 0 ? "" : j);
-var addTabs = (str) => str.replace(/\n/g, "\n ");
+var addTabs = (str) => " " + str.replace(/\n/g, "\n ");
 var removeBlanks = (str) => str.replace(/\n[ \t]*\n/g, "\n");
 type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
 
@@ -147,7 +147,7 @@ class TQLConverter
     var glue = "\n" + (append || "");
     return addTabs(cards.map(
         (card, i) => this._parse(card, i, i === cards.size)
-      ).join(glue)) + glue;
+      ).join(glue)); // + glue;
   }
   
   private static _parse(block: IBlock, index?: number, isLast?: boolean): string
@@ -194,7 +194,8 @@ class TQLConverter
     
     if(typeof block[field] === 'object')
     {
-      return '(' + this._parse(block[field]) + ')';
+      return this._parse(block[field]);
+      // return '\n(\n' + this._parse(block[field]) + '\n)\n';
     }
     
     if(field.toUpperCase() === field)
