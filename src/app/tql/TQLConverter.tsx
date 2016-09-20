@@ -147,7 +147,7 @@ class TQLConverter
     var glue = "\n" + (append || "");
     return addTabs(cards.map(
         (card, i) => this._parse(card, i, i === cards.size)
-      ).join(glue)); // + glue;
+      ).join(glue)) + glue;
   }
   
   private static _parse(block: IBlock, index?: number, isLast?: boolean): string
