@@ -216,8 +216,9 @@ class AlgorithmsColumn extends Classs<Props>
     algorithm.variants.map(v => scores[v.status].score ++);
     
     let {me, roles} = this.state;
-    let canEdit = me && roles && roles.getIn([algorithm.groupId, me.username, 'builder']);
     let canDrag = me && roles && roles.getIn([algorithm.groupId, me.username, 'admin']);
+    let canEdit = canDrag ||
+      (me && roles && roles.getIn([algorithm.groupId, me.username, 'builder']));
     
     let lastTouched: {date: string, username: string} = 
       algorithm.variants.reduce((lastTouched, v) =>
