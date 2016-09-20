@@ -182,8 +182,8 @@ export module BuilderTypes
       tql: string;
       tqlJoiner?: string;
       
-      // construct returns an object with default values for a new card
-      construct?: () => {
+      // returns an object with default values for a new card
+      init?: () => {
         [k:string]: any;
       };
       
@@ -261,7 +261,10 @@ export module BuilderTypes
       
       getChildTerms?: (card: ICard) => List<string>;
       getNeighborTerms?: (card: ICard) => List<string>;
-      init?: (config?:any) => any;
+      
+      init?: () => {
+        [k:string]: any;
+      };
     }
   }
   
@@ -388,6 +391,13 @@ export module BuilderTypes
         tqlJoiner: config.tqlGlue,
         manualEntry: config.manualEntry,
         
+        init: () => ({
+          clauses: List([
+            make(Blocks[config.factoryType]),
+            make(Blocks[config.factoryType]),
+          ]),
+        }),
+        
         display: {
           displayType: DisplayType.ROWS,
           key: 'clauses',
@@ -493,6 +503,11 @@ export module BuilderTypes
         title: "From",
         preview: "[tables.table]",
         tql: "SELECT\n$fields\nFROM\n$tables\n$cards",
+        
+        init: () => ({
+          tables: List([ make(Blocks.table )]),
+          fields: List([ make(Blocks.field, { field: '*' })]),
+        }),
         
         getChildTerms:
           (card: ICard) =>
@@ -703,20 +718,21 @@ export module BuilderTypes
         colors: ["#C5AFD5", "#EAD9F7"],
         manualEntry: ManualConfig.cards['sort'],
         tql: "ORDER BY $sorts",        
+        
+        init: () =>
+        {
+          return {
+            sorts: List([
+              make(Blocks.sortBlock)
+            ])
+          };
+        },
+        
         display: {
           displayType: DisplayType.ROWS,
           key: 'sorts',
           english: 'sort',
           factoryType: 'sortBlock',
-          
-          construct: () =>
-          {
-            return {
-              sorts: List([
-                make(Blocks.sortBlock)
-              ])
-            };
-          },
           
           row:
           {
@@ -849,6 +865,11 @@ export module BuilderTypes
         preview: "[weights.length] Weight(s)",
         manualEntry: ManualConfig.cards['score'],
         tql: "linearScore([$weights])",
+        init: () => ({
+          weights: List([
+            make(Blocks.weight),
+          ]),
+        }),
         display: {
           displayType: DisplayType.ROWS,
           key: 'weights',
@@ -941,33 +962,28 @@ export module BuilderTypes
           },
         ],
         
-        init: (config?:{[key:string]:any}) => {
-          if(!config)
+        init: () => (
           {
-            config = {};
+            scorePoints:
+              List([
+                make(Blocks.scorePoint, {
+                  id: "a",
+                  value: 0,
+                  score: 0.5,
+                }),
+                make(Blocks.scorePoint, {
+                id: "b",
+                  value: 50,
+                  score: 0.5,
+                }),
+                make(Blocks.scorePoint, {
+                  id: "c",
+                  value: 100,
+                  score: 0.5,
+                }),
+              ]),
           }
-          if(!config['scorePoints'] || !config['scorePoints'].size)
-          {
-            config['scorePoints'] = List([
-              make(Blocks.scorePoint, {
-                id: "a",
-                value: 0,
-                score: 0.5,
-              }),
-              make(Blocks.scorePoint, {
-              id: "b",
-                value: 50,
-                score: 0.5,
-              }),
-              make(Blocks.scorePoint, {
-                id: "c",
-                value: 100,
-                score: 0.5,
-              }),
-            ]);
-          }
-          return config;
-        }
+        )
       }
     }),
     
@@ -1066,7 +1082,15 @@ export module BuilderTypes
   // Usage: BuilderTypes.make(BuilderTypes.Blocks.sort)
   export const make = (block:IBlock, extraConfig?:{[key:string]:any}) =>
   {
+    let {type} = block;
+    
     block = _.extend({}, block); // shallow clone
+    
+    if(Blocks[type].static.init)
+    {
+      block = _.extend({}, block, Blocks[type].static.init());
+    }
+    
     if(extraConfig)
     {
       block = _.extend(block, extraConfig);
@@ -1076,15 +1100,10 @@ export module BuilderTypes
     {
       delete block.static;
     }
+    
     if(!block.id.length)
     {
       block.id = "block-" + Math.random();
-    }
-    
-    let {type} = block;
-    if(Blocks[type].static.init)
-    {
-      block = Blocks[type].static.init(block);
     }
     
     return typeToRecord[type](block);
@@ -1127,7 +1146,7 @@ export module BuilderTypes
       
       if(value.type && Blocks[value.type])
       {
-        value = make(value);
+        value = make(Blocks[value.type], value);
       }
       else
       {

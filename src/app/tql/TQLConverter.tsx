@@ -145,7 +145,7 @@ class TQLConverter
   private static _cards(cards: List<ICard>, append?: string, options?: Options): string
   {
     var glue = "\n" + (append || "");
-    return addTabs("\n" + cards.map(
+    return addTabs(cards.map(
         (card, i) => this._parse(card, i, i === cards.size)
       ).join(glue)) + glue;
   }
