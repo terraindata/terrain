@@ -1,3 +1,4 @@
+
 @import "../../common/Common.less";
 @import "../../builder/components/results/Result.less";
 @import "./cobalt.less";
@@ -15,22 +16,32 @@
 .cobalt-topbar {
   .results-top;
   .cm-s-cobalt.CodeMirror;
+  position: relative;
 }
 
 .neo-topbar {
   .results-top;
   .cm-s-neo.CodeMirror;
+  position: relative;
+  .manual-popup-icon {
+    fill: rgba(0,0,0,0.2);
+  }
 }
 
 .monokai-topbar {
   .results-top;
   .cm-s-monokai.CodeMirror;
+  position: relative;
 }
 
 .default-topbar {
   .results-top;
   color: black;
   background-color: white;
+  position: relative;
+  .manual-popup-icon {
+    fill: rgba(0,0,0,0.2);
+  }
 }
 
 .view-only {
@@ -72,7 +83,8 @@
 
 .tql-column {
   cursor: default;
-  margin: 0px -6px;
+  margin-right: -6px;
+  margin-left: -12px;
 }
 
 .code-section {
@@ -83,3 +95,16 @@
 //Placeholder styling for code-mirror, possibly move to differnt fiel
 .CodeMirror-empty.CodeMirror-focused { outline: none; }
 .CodeMirror pre.CodeMirror-placeholder { color: #999; }
+
+.tql-editor-top {
+  .menu-wrapper {
+    z-index: 99;
+   
+    &:not(.menu-open) {
+      opacity: 0.8;
+    }
+    &:hover {
+      opacity: 1;
+    }
+  }
+}

@@ -45,24 +45,28 @@ THE SOFTWARE.
 require('./DatePicker.less')
 import * as React from 'react';
 import * as moment from 'moment';
+import * as Immutable from 'immutable';
 var ReactDayPicker = require('react-day-picker').default;
 var DateUtils = require('react-day-picker').DateUtils;
 import Util from '../../util/Util.tsx';
 import Dropdown from './Dropdown.tsx';
 import LayoutManager from './../../builder/components/layout/LayoutManager.tsx';
+import PureClasss from '../../common/components/PureClasss.tsx';
 
 var MINUTE_INTERVAL = 30;
 var MINUTE_RATIO = (60 / MINUTE_INTERVAL);
 
-var HOUR_OPTIONS = [];
+var _hours = [];
 for(var h = 0; h < 24; h ++)
 {
   for(var m = 0; m < 60; m += MINUTE_INTERVAL) {
     var hour = (h - 1) % 12 + 1;
     if(h === 0) hour = 12;
-    HOUR_OPTIONS.push(hour + ":" + (m < 10 ? "0" : "") + m + (h < 12 ? 'am' : 'pm'));
+    _hours.push(hour + ":" + (m < 10 ? "0" : "") + m + (h < 12 ? 'am' : 'pm'));
   }
 }
+
+const HOUR_OPTIONS = Immutable.List(_hours);
 
 interface Props {
   date: string;
@@ -70,7 +74,7 @@ interface Props {
   canEdit: boolean;
 }
 
-class DatePicker extends React.Component<Props, any>
+class DatePicker extends PureClasss<Props>
 {
   constructor(props)
   {

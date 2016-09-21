@@ -47,25 +47,30 @@ require('./BuilderTextbox.less');
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import CardDropArea from "../../builder/components/cards/CardDropArea.tsx";
 import Actions from "../../builder/data/BuilderActions.tsx";
 import Util from '../../util/Util.tsx';
+import PureClasss from '../../common/components/PureClasss.tsx';
 import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
 import Card from '../../builder/components/cards/Card.tsx';
-import { CardColors } from './../../builder/CommonVars.tsx';
+import CreateCardTool from '../../builder/components/cards/CreateCardTool.tsx';
 import { DragSource, DropTarget } from 'react-dnd';
 import * as classNames from 'classnames';
 import Autocomplete from './Autocomplete.tsx';
+import ManualInfo from '../../manual/components/ManualInfo.tsx';
+
 var AddCardIcon = require("./../../../images/icon_addCard_22x17.svg?name=AddCardIcon");
 var TextIcon = require("./../../../images/icon_text_12x18.svg?name=TextIcon");
-
+var CloseIcon = require("./../../../images/icon_close.svg");
 interface Props
 {
   value: BuilderTypes.CardString;
-  id: string;
-  keyPath: (string | number)[];
+  keyPath: KeyPath; // keypath of value
+  
+  id?: string; // TODO remove
 
   canEdit?: boolean;
-  options?: string[];  
+  keys?: List<string>;
   placeholder?: string;
   help?: string;
   ref?: string;
@@ -80,42 +85,57 @@ interface Props
   
   isOverCurrent?: boolean;
   connectDropTarget?: (Element) => JSX.Element;
+
+  isNumber?: boolean;
+  typeErrorMessage?: string;
+  
+  showWhenCards?: boolean;
 }
 
-class BuilderTextbox extends React.Component<Props, any>
+class BuilderTextbox extends PureClasss<Props>
 {
-  backupValue: BuilderTypes.CardString;
-  
   constructor(props: Props)
   {
     super(props);
     
     // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
-    this.executeChange = _.debounce(this.executeChange, 750);
-    Util.bind(this, ['executeChange', 'handleTextareaChange', 'renderSwitch', 'handleSwitch', 'handleAutocompleteChange']);
+    // TODO?
+    // this.executeChange = _.debounce(this.executeChange, 750);
+
+    var value: any = this.props.value;
+    this.state = {
+      wrongType: this.props.isNumber ? isNaN(value) : false,
+      isSwitching: false,
+    };
   }
   
+  // backupValue: BuilderTypes.CardString;
+  state: {
+    wrongType: boolean;
+    isSwitching: boolean;
+  };
+  
+  // TODO
   componentWillReceiveProps(newProps)
   {
+    var value: any = newProps.value;
+    this.setState ({
+      wrongType: newProps.isNumber ? isNaN(value) : false,
+    });
     if(this.refs['input'])
     {
       if(this.refs['input'] !== document.activeElement)
       {
         // if not focused, then update the value
         this.refs['input']['value'] = newProps.value;
-      } else console.log('tb', (new Date()).getTime());
+      }
     }
-  }
-  
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
   
   // throttled event handler
   executeChange(value)
   {
-    Actions.cards.change(this.props.id, this.props.keyPath, value)
+    Actions.change(this.props.keyPath, value);
   }
   
   handleTextareaChange(event)
@@ -126,34 +146,56 @@ class BuilderTextbox extends React.Component<Props, any>
   handleAutocompleteChange(value)
   {
     this.executeChange(value);
+    if(this.props.isNumber)
+    {
+      this.setState({
+        wrongType: isNaN(value),
+      });
+    }
   }
   
   isText()
   {
-    return typeof this.props.value === 'string';
+    // TODO better approach?
+    return typeof this.props.value === 'string' || typeof this.props.value === 'number';
   }
   
   handleSwitch()
   {
-    var value: BuilderTypes.CardString = '';
-    if(this.backupValue)
+    if(!this.isText())
     {
-      value = this.backupValue;
-    }
-    else if(this.isText())
-    {
-      value =
-      {
-        id: 'c-' + Math.random(),
-        parentId: this.props.parentId,
-        type: 'parentheses',
-        cards: [],
-      };
+      this.executeChange("");
     }
     
-    this.backupValue = this.props.value;
-    // not using executeChange because it is debounced and causes a false delay
-    Actions.cards.change(this.props.id, this.props.keyPath, value)
+    return;
+    
+    // switch area:
+    // this.setState({
+    //   isSwitching: true,
+    // });
+    
+    // backup value
+    // var value: BuilderTypes.CardString = '';
+    // // if(this.backupValue)
+    // // {
+    // //   value = this.backupValue;
+    // // }
+    // // else 
+    // if(this.isText())
+    // {
+    //   value = BuilderTypes.make(BuilderTypes.Blocks.parentheses);
+    // }
+    
+    // // this.backupValue = this.props.value;
+    // // not using executeChange because it is debounced and causes a false delay
+    // Actions.change(this.props.keyPath, value);
+  }
+  
+  handleMinimize()
+  {
+    this.setState({
+      isSwitching: false,
+    });
   }
   
   renderSwitch()
@@ -165,28 +207,48 @@ class BuilderTextbox extends React.Component<Props, any>
     
     return (
       <a
-        className='builder-tb-switch'
+        className={classNames({
+          'builder-tb-switch': this.isText(),
+          'close-icon-builder-textbox': !this.isText(),
+        })}
         onClick={this.handleSwitch}
-        data-tip={this.isText() ? 'Convert to cards' : 'Convert to text'}
+        data-tip={this.isText() ? 'Convert to cards' : ''}
       >
         {
-          this.isText() ? <AddCardIcon /> : <TextIcon />
+          this.isText() ? <AddCardIcon /> : <CloseIcon />
         }
       </a>
     );
   }
   
-  render() {
+  render()
+  {
+    if(this.state.isSwitching)
+    {
+      return (
+        <CreateCardTool
+          canEdit={this.props.canEdit}
+          index={null}
+          keyPath={this.props.keyPath}
+          open={true}
+          onMinimize={this.handleMinimize}
+        />
+      );
+    }
+    
     if(this.isText())
     {
       const { isOverCurrent, connectDropTarget } = this.props;
       return connectDropTarget(
-        <div className={classNames({
-          'builder-tb': true,
-          'builder-tb-drag-over': isOverCurrent,
-          'builder-tb-accepts-cards': this.props.acceptsCards,
-          'card-drop-target': this.props.acceptsCards
-        })}>
+        <div 
+          className={classNames({
+            'builder-tb': true,
+            'builder-tb-drag-over': isOverCurrent,
+            'builder-tb-accepts-cards': this.props.acceptsCards,
+            'card-drop-target': this.props.acceptsCards,
+            [this.props.className]: !!this.props.className,
+          })}
+        >
           {
             this.props.textarea ?
               <textarea
@@ -203,30 +265,45 @@ class BuilderTextbox extends React.Component<Props, any>
                 ref='input'
                 disabled={!this.props.canEdit}
                 value={this.props.value as string}
-                options={this.props.options}
+                options={this.props.keys}
                 onChange={this.handleAutocompleteChange}
                 placeholder={this.props.placeholder}
-                help={this.props.help}
+                help={this.state && this.state.wrongType ? this.props.typeErrorMessage : this.props.help}
+                className={this.state && this.state.wrongType ? 'ac-wrong-type' : null}
               />
           }
           { this.props.acceptsCards && this.renderSwitch() }
+          { this.props.acceptsCards &&
+              <CardDropArea
+                keyPath={this.props.keyPath}
+                index={null}
+              />
+          }
         </div>
       );
     }
     
-    var cards = this.props.value['cards'];
-    if(cards.length)
+    // We're in card mode
+    
+    if(!this.props.showWhenCards)
     {
-      var card = cards[0];
-      var color = CardColors[card.type][0] as string;
-      var title = Util.titleForCard(card);
-      var preview = Util.previewForCard(card);
+      return null;
     }
-    else
-    {
-      var color = "#aaa";
-      var title = "Add a Card";
-    }
+    
+    var card: BuilderTypes.ICard = this.props.value as BuilderTypes.ICard;
+    // var cards = this.props.value['cards'];
+    // if(cards.size)
+    // {
+      // var card = cards.get(0);
+      var color = card.static.colors[0] as string;
+      var title: string = ''; //card.static.title;
+      var preview = BuilderTypes.getPreview(card);
+    // }
+    // else
+    // {
+    //   var color = "#aaa";
+    //   var title = "Add a Card";
+    // }
     
     var chipStyle = 
     {
@@ -241,7 +318,6 @@ class BuilderTextbox extends React.Component<Props, any>
       borderLeftColor: color,
     }
     
-    // We're in card mode
     return (
       <div className={classNames({
         'builder-tb': true,
@@ -301,23 +377,6 @@ const btbTarget =
       {
         return;  
       }
-      
-      var newId = 'c-' + Math.random();
-      var newCard:BuilderTypes.IParenthesesCard =
-      {
-        id: newId,
-        parentId: props.parentId,
-        type: 'parentheses',
-        cards: [],
-      };
-      
-      props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
-      
-      setTimeout(() =>
-      {
-        Actions.cards.change(props.id, props.keyPath, newCard)
-        Actions.cards.move(item, 0, newId);
-      }, 250);
     }
   }
 }

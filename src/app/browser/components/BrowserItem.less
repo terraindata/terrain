@@ -37,11 +37,14 @@
     .browser-item-name-input {
       padding-left: 6px;
       margin-left: 20px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     
     .browser-item-name-input {
       display: none;
-      
+      width: 90%;
       background: rgba(0,0,0,0.15);
       color: inherit;
       font-size: inherit;
@@ -66,9 +69,15 @@
     background-blend-mode: multiply;
     padding: @standard-margin + 1px;
     box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
     
     .browser-item-line {
       padding: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: calc(~"100% - 30px");
       
       &:last-child {
         display: inline-block;

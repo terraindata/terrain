@@ -76,19 +76,22 @@ var Panel = {
     dragHandleRef: React.PropTypes.string,
 	},
 
-	getInitialState() {
+	getInitialState()
+  {
 		return {
 			dragging: false,
 			moved: false,
 		}
 	},
 
-	isPanel() {
+	isPanel()
+  {
 		return true;
 	},
 
 	// Returns true if this is draggable in the 'x', 'y', or (default) either directions
-	canDrag() {
+	canDrag()
+  {
 		if(arguments.length) {
 			if(arguments[0] === 'x')
 				return this.props.drag_x || this.props.drag_xy;
@@ -177,7 +180,8 @@ var Panel = {
     });
 	},
 
-	stopDrag(x, y) {
+	stopDrag(x, y)
+  {
     this.setState({ dragging: false });
     
     if(this.props.onDrop)
@@ -223,7 +227,7 @@ var Panel = {
 		}
 
 		if(this.startDrag(event.pageX, event.pageY)) {
-			event.stopPropagation();
+			// event.stopPropagation();
 			$(document).on('mousemove', this.move);
 			$(document).on('touchmove', this.move);
 			$(document).on('mouseup', this.up);

@@ -47,6 +47,7 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
+import PureClasss from '../../common/components/PureClasss.tsx';
 
 var HOVER_TIMEOUT_TIME = 1000;
 
@@ -60,7 +61,7 @@ interface Props
   onHoverEnd?: () => void;
 }
 
-class Paging extends React.Component<Props, any>
+class Paging extends PureClasss<Props>
 {
   constructor(props: Props) {
     super(props);

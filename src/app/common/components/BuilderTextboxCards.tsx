@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as classNames from 'classnames';
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -52,8 +53,13 @@ import Card from '../../builder/components/cards/Card.tsx';
 interface Props
 {
   value: BuilderTypes.CardString;
-  spotlights?: any[];
-  parentId?: string;
+  keyPath: KeyPath;
+  keys: List<string>;
+  canEdit: boolean;
+  className: string;
+  helpOn?: boolean;
+  addColumn?: (number, string?) => void;
+  columnIndex: number;
 }
 
 class BuilderTextboxCards extends React.Component<Props, any>
@@ -75,13 +81,16 @@ class BuilderTextboxCards extends React.Component<Props, any>
     
     // We're in card mode
     return (
-      <div className='builder-tb-cards-area' ref='tb'>
+      <div className={classNames({
+        'builder-tb-cards-area': true,
+        [this.props.className]: !!this.props.className,
+      })} ref='tb'>
         <Card
           {...this.props}
           singleCard={true}
-          card={this.props.value}
-          index={0}
-          />
+          card={this.props.value as BuilderTypes.ICard}
+          index={null}
+        />
       </div>
     );
   }

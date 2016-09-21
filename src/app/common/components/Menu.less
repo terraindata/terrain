@@ -106,15 +106,24 @@
       cursor: pointer;
       .transition;
       white-space: nowrap;
-      &:hover {
+      
+      &:hover:not(.menu-option-spacer) {
         background-color: fade(@grey, 15%) !important;
       }      
+      
       &.menu-option-disabled {
         background: #d1efe7; 
         cursor: default;
+        
         &:hover {
           background-color: #d1efe7 !important; 
         }
+      }
+      
+      &.menu-option-spacer {
+        border-top: 1px solid #eee;
+        position: relative;
+        top: @option-height / 2;
       }
     }
   }

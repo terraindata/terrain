@@ -1,6 +1,6 @@
 {
   "selectedCardIds": {},
-  "algorithms": {
+  "queries": {
     "1": {
       "id": "1",
       "algorithmName": "New Algorithm",

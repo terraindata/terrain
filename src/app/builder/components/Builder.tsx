@@ -54,14 +54,17 @@ var HTML5Backend = require('react-dnd-html5-backend');
 
 // Data
 import Store from "./../data/BuilderStore.tsx";
+import { BuilderState } from "./../data/BuilderStore.tsx";
 import Actions from "./../data/BuilderActions.tsx";
 import Util from "./../../util/Util.tsx";
 import UserActions from '../../users/data/UserActions.tsx';
 import RolesActions from '../../roles/data/RolesActions.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
+import Types from '../BuilderTypes.tsx';
+type IQuery = Types.IQuery;
 
 // Components
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 import BuilderColumn from "./BuilderColumn.tsx";
 import Tabs from "./layout/Tabs.tsx";
 import LayoutManager from "./layout/LayoutManager.tsx";
@@ -69,11 +72,14 @@ import Card from "./cards/Card.tsx";
 import Result from "./results/Result.tsx";
 import Ajax from "./../../util/Ajax.tsx";
 import InfoArea from '../../common/components/InfoArea.tsx';
+import {notificationManager} from './../../common/components/InAppNotification.tsx'
 
 var NewIcon = require("./../../../images/icon_new_21x17.svg?name=NewIcon");
 var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
 var DuplicateIcon = require("./../../../images/icon_duplicate_11x12.svg?name=DuplicateIcon");
 var SaveIcon = require("./../../../images/icon_save_10x10.svg?name=SaveIcon");
+
+let { Map, List } = Immutable;
 
 interface Props
 {
@@ -82,60 +88,74 @@ interface Props
   location?: any;
 }
 
-class Builder extends Classs<Props>
+class Builder extends PureClasss<Props>
 {
-  // This variable is needed because React's state has not been working well with
-  //  Redux's state. For instance, if I just do:
-  //   this.setState(Store.getState().toJS())
-  //  then I can't close tabs. React doesn't seem to pick up
-  //  on keys being deleted from the state correctly.
-  reduxState: any;
-  cancelSubscription = null;
-  
   state: {
-    loading: boolean;
-    colKeys: number[];
+    builder: BuilderState,
+    colKeys: List<number>;
     noColumnAnimation: boolean;
+    columnType: number;
+    selectedCardName: string;
+    manualIndex: number;
   } = {
-    loading: true,
+    builder: Store.getState(),
     colKeys: null,
     noColumnAnimation: false,
+    columnType: null,
+    selectedCardName: '',
+    manualIndex: -1,
   };
   
   constructor(props:Props)
   {
     super(props);
+    
+    this._subscribe(Store, {
+      stateKey: 'builder',
+    });
+    
+    if(localStorage.getItem('colKeys'))
+    {
+      var colKeys = List(JSON.parse(localStorage.getItem('colKeys'))) as List<number>;
+    }
+    else
+    {
+      var colKeys = List([Math.random(), Math.random()]);
+      localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
+    }
+    
+    if(localStorage.getItem('selectedCardName'))
+    {
+      this.state.selectedCardName = localStorage.getItem('selectedCardName');
+    }
+
+    this.state.colKeys = colKeys;
+
+    this.addManualColumn = _.debounce(this.addManualColumn, 1);
   }
   
   componentWillMount()
   {
-    this.cancelSubscription =
-      Store.subscribe(() => {
-        var newState = Store.getState().toJS();
-        this.reduxState = newState.algorithms;
-        this.setState({
-          random: Math.random(),
-          loading: false,
-        });
-      });
-
-    // Some day in the distant future, you may consider
-    //  removing this 'toJS()' call and making
-    //  the whole Builder app built upon Immutable state.    
-    this.reduxState = Store.getState().toJS().algorithms;
-    const algorithmId = _.first(_.keys(this.reduxState));
-    
-    var colKeys = [Math.random(), Math.random()];
-    this.setState(
-    {
-      random: Math.random(),
-      algorithmId,
-      colKeys,
-      noColumnAnimation: false,
-    });
-    
     this.checkConfig(this.props);
     RolesActions.fetch();
+    
+    Ajax.schema((tables: {name: string, columns: {name: string}[]}[]) => {
+      Actions.change(
+        Immutable.List(['tables']),
+        Immutable.List(tables.map(table => table.name))
+      );
+      
+      Actions.change(
+        Immutable.List(['tableColumns']),
+        tables.reduce(
+          (memo: Map<string, List<string>>, table: {name: string, columns: {name: string}[]}) =>
+            memo.set(table.name, 
+              Immutable.List(table.columns.map(col => col.name))
+            )
+          , Immutable.Map({})
+        )
+      );
+    });
   }
   
   componentWillReceiveProps(nextProps)
@@ -147,14 +167,14 @@ class Builder extends Classs<Props>
   {
     let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query.o;
-    var newConfig;
-    
+    var newConfig = props.params.config;
+
     if(open)
     {
       if(!storedConfig || storedConfig === 'undefined' || storedConfig === '')
       {
         // no stored config, just load the open tab.
-        newConfig = '!' + open;
+        newConfig = '!' + open;     
       }
       else
       {
@@ -176,15 +196,15 @@ class Builder extends Classs<Props>
       newConfig = storedConfig;
     }
     
-    if(newConfig)
+    if(newConfig && newConfig.length && !newConfig.split(',').some(c => c.substr(0,1) === '!'))
+    {
+      newConfig = '!' + newConfig;
+    }
+    
+    if(newConfig !== props.params.config)
     {
       props.history.replaceState({}, `/builder/${newConfig}`);
     }
-    else
-    {
-      newConfig = props.params.config;
-    }
-    
     localStorage.setItem('config', newConfig || '');
     this.fetch(newConfig);
   }
@@ -195,7 +215,6 @@ class Builder extends Classs<Props>
     {
       return;
     }
-    
     Actions.fetch(Immutable.List(
       config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id)
     ));
@@ -207,9 +226,14 @@ class Builder extends Classs<Props>
     return selected && selected.substr(1);
   }
   
-  componentWillUnmount()
+  getSelectedQuery(): IQuery
   {
-    this.cancelSubscription();
+    return this.state.builder.queries.get(this.getSelectedId());
+  }
+  
+  getQuery(): IQuery
+  {
+    return this.state.builder.queries.get(this.getSelectedId());
   }
   
   createAlgorithm()
@@ -241,63 +265,199 @@ class Builder extends Classs<Props>
     {
       text: 'Save',
       icon: <SaveIcon />,
-      onClick: this.save,
+      onClick: this.onSave,
     },
   ]);
   
+  onSave()
+  {
+    if (this.getSelectedQuery().version) 
+    {
+      if (!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?')) 
+      {
+        return;
+      }
+    }
+    this.save()
+}
+  onSaveSuccess()
+  {
+    notificationManager.addNotification(
+      'Saved',
+      this.getSelectedQuery().name,
+      'info', 
+      4
+    );
+  }
+
+  onSaveError()
+  {
+    notificationManager.addNotification(
+      'Error Saving',
+      '"' + this.getSelectedQuery().name + '" failed to save.', 
+      'error', 
+      0
+    );
+  }
+
   save()
   {
-    Ajax.saveItem(BrowserTypes.touchVariant(Immutable.fromJS(this.reduxState[this.getSelectedId()])));
+    Ajax.saveItem(BrowserTypes.variantForSave(
+        this.state.builder.queries.get(this.getSelectedId()) as BrowserTypes.Variant
+      ),
+      this.onSaveSuccess,
+      this.onSaveError
+    );
+    
+    var configArr = window.location.pathname.split('/')[2].split(',');
+    var currentVariant;
+    configArr = configArr.map(function(tab)
+      {
+        if(tab.substr(0,1) === '!')
+        {
+          currentVariant = tab.substr(1).split('@')[0];
+          return '!' + currentVariant;
+        }
+        return tab;
+      }
+    );
+    for(let i = 0; i < configArr.length; i++)
+    {
+      if(configArr[i] === currentVariant)
+      {
+        configArr.splice(i, 1);
+      }
+    }
+    var newConfig = configArr.join(',');
+    this.props.history.replaceState({}, `/builder/${newConfig}`);
   }
   
   getLayout()
   {
     return {
-      stackAt: 650,
       fullHeight: true,
+      initialColSizes: JSON.parse(localStorage.getItem('colSizes')),
+      onColSizeChange: this.handleColSizeChange,
       columns:
-        _.range(0, this.state.colKeys.length).map(index => 
-          this.getColumn(this.reduxState[this.getSelectedId()], index, this.state.colKeys)
+        _.range(0, this.state.colKeys.size).map(index => 
+          this.getColumn(index)
         )
     };
   }
   
-  getColumn(algorithm, index, colKeys: number[])
+  handleColSizeChange(adjustments)
   {
+    localStorage.setItem('colSizes', JSON.stringify(adjustments));
+  }
+  
+  getColumn(index)
+  {
+    let key = this.state.colKeys.get(index);
+    let query = this.getQuery();
     return {
       minWidth: 316,
       resizeable: true,
       resizeHandleRef: 'resize-handle',
-      content: algorithm && <BuilderColumn
-        algorithm={algorithm} 
+      content: query && <BuilderColumn
+        colKey={key}
+        query={query}
         index={index}
         onAddColumn={this.handleAddColumn}
+        onAddManualColumn={this.handleAddManualColumn}
         onCloseColumn={this.handleCloseColumn}
-        canAddColumn={colKeys.length < 3}
-        canCloseColumn={colKeys.length > 1}
+        canAddColumn={this.state.colKeys.size < 3}
+        canCloseColumn={this.state.colKeys.size > 1}
+        history={this.props.history}
+        onRevert={this.save}
+        columnType={this.state.columnType}
+        selectedCardName={this.state.selectedCardName}
+        switchToManualCol={this.switchToManualCol}
+        changeSelectedCardName={this.changeSelectedCardName}
       />,
       // hidden: this.state && this.state.closingIndex === index,
-      key: colKeys[index],
+      key,
     }
   }
-  
+
+  switchToManualCol(index)
+  {
+    this.setState({
+      manualIndex: index
+    });
+  }
+
+  changeSelectedCardName(selectedCardName)
+  {
+    this.setState({
+      selectedCardName
+    });
+    localStorage.setItem('selectedCardName', selectedCardName);
+  }
+
+  addManualColumn(index, selectedCardName?)
+  {
+    index = index + 1;
+    var newKey = Math.random();
+    let colKeys = this.state.colKeys.splice(index, 0, newKey);
+    this.setState({
+      colKeys,
+      columnType: 4,
+      selectedCardName,
+      manualIndex: index
+    }); 
+    localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
+    if(localStorage.getItem('colKeyTypes'))
+    {
+      var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes'));
+      colKeyTypes[newKey] = 4;
+      localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
+    } 
+  }
+
+  handleAddManualColumn(index, selectedCardName?)
+  {
+    if(this.state.manualIndex !== -1) //Manual column already open
+    {
+      this.setState({
+        selectedCardName
+      });
+    }
+    else 
+    {
+      if(this.state.colKeys.size === 3)
+      {
+        var closeIndex = index < 2 ? 2 : 1;
+        this.handleCloseColumn(closeIndex);
+      }
+        this.addManualColumn(index, selectedCardName);
+    }
+  }
+
   handleAddColumn(index)
   {
     index = index + 1;
-    var colKeys = _.clone(this.state.colKeys);
-    colKeys.splice(index, 0, Math.random());
+    let colKeys = this.state.colKeys.splice(index, 0, Math.random());
     this.setState({
       colKeys,
     }); 
+    localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
   }
   
   handleCloseColumn(index)
   {
-    var colKeys = _.clone(this.state.colKeys);
-    colKeys.splice(index, 1);
+    let oldKey = this.state.colKeys[index];
+    let colKeys = this.state.colKeys.splice(index, 1);
     this.setState({
-      colKeys,
+      colKeys: colKeys,
+      manualIndex: (index === this.state.manualIndex) ? -1 : this.state.manualIndex,
+      columnType: 0
     }); 
+    localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
+    if(localStorage.getItem('colKeyTypes'))
+    {
+      var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes'));
+      delete colKeyTypes[oldKey];
+    }
   }
   
   handleEmptyTabs(tabIds: ID[])
@@ -333,13 +493,13 @@ class Builder extends Classs<Props>
   
   moveColumn(curIndex, newIndex)
   {
-    var colKeys = _.clone(this.state.colKeys);
-    var tmp = colKeys.splice(curIndex, 1)[0];
-    colKeys.splice(newIndex, 0, tmp);
+    var tmp = this.state.colKeys.get(curIndex);
+    var colKeys = this.state.colKeys.splice(curIndex, 1).splice(newIndex, 0, tmp);
     this.setState({
       colKeys,
       noColumnAnimation: true,
     })
+    localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
     setTimeout(() => this.setState({
       noColumnAnimation: false,
     }), 250);
@@ -353,7 +513,6 @@ class Builder extends Classs<Props>
 	render()
   {
     let config = this.props.params.config;
-    
     return (
       <div className={classNames({
         'builder': true,
@@ -366,8 +525,9 @@ class Builder extends Classs<Props>
           history={this.props.history}
           reportEmptyTabs={this.handleEmptyTabs}
         />
+
         {
-          !_.keys(this.reduxState).length ? 
+          !this.state.builder.queries.keySeq().size ? 
             <InfoArea
               large='No variants open'
               small='You can open one in the Browser'

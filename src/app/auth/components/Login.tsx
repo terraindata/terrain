@@ -46,14 +46,17 @@ require('./Login.less')
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import Actions from "../data/AuthActions.tsx";
+import PureClasss from '../../common/components/PureClasss.tsx';
+import Modal from './../../common/components/Modal.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
-var TerrainIcon = require("./../../../images/icon_terrain_108x17.svg?name=TerrainIcon");
+var TerrainIcon = require("./../../../images/logo_TerrainLong.svg");
+//var TerrainIcon = require("./../../../images/icon_terrain_108x17.svg?name=TerrainIcon");
 
 interface Props {
 }
 
-class Login extends React.Component<Props, any>
+class Login extends PureClasss<Props>
 {
   constructor(props:Props)
   {
@@ -62,7 +65,10 @@ class Login extends React.Component<Props, any>
     this.state = {
       username: '',
       password: '',
+      loginErrorModalOpen: false,
+      errorModalMessage: '',
     }
+    this.toggleErrorModal = this.toggleErrorModal.bind(this);
   }
   
   handleKeyDown = (event) =>
@@ -92,11 +98,17 @@ class Login extends React.Component<Props, any>
     
     let xhr = new XMLHttpRequest();
     xhr.onerror = (ev:Event) => {
-      alert("Error logging in: " + ev);
+      this.setState({
+          errorModalMessage: 'Error logging in:' + ev,
+        });
+        this.toggleErrorModal();
     }
     xhr.onload = (ev:Event) => {
       if (xhr.status != 200) {
-        alert("Failed to log in: " + xhr.responseText);
+        this.setState({
+          errorModalMessage: 'Failed to log in: ' + xhr.responseText,
+        });
+        this.toggleErrorModal();
         return;
       }
       login(xhr.responseText);
@@ -107,23 +119,80 @@ class Login extends React.Component<Props, any>
       username,
       password: this.state.password,
     }));
+  }  
+
+  handleForgotPassword()
+  {
+    alert("Sorry, resetting your password hasn't been implemented yet.");
   }
-  
+
+  registerNewUser()
+  {
+    alert("Signing up for Terraformer has not been implemented yet");
+  }
+
+  toggleErrorModal()
+  {
+    this.setState ({
+      loginErrorModalOpen: !this.state.loginErrorModalOpen
+    });
+  }
+
   render() {
     return (
-      <div className='login'>
-        <div className='login-wrapper'>
-          <div className='login-logo'>
-            <TerrainIcon />
-          </div>
-          <div className='login-info'>
-            <input type='text' id='login-username' placeholder='username' onChange={this.handleUsernameChange} />
-            <input type='password' id='login-password' placeholder='password' onKeyDown={this.handleKeyDown} onChange={this.handlePasswordChange} />
-          </div>
-          <a className='login-submit' onClick={this.handleLogin}>
-            Login
-          </a>
+     <div className='login-wrapper'>
+      <div className='login-container'>
+        <div className='login-logo-container'>
+          <TerrainIcon className='login-logo'/>
         </div>
+        <div className='login-arrow-down'/>
+        <div className='login-white-box' />
+          <div className='login-info'>
+            <div className='login-field-title'>Email</div>
+              <input
+                type='text'
+                onChange={this.handleUsernameChange}
+                className='login-input-field'
+                placeholder='e.g. jsmith@redwoodforest.com'
+              />
+            <div className='login-field-title'>Password</div>
+            <input 
+              className='login-input-field' 
+              type='password' 
+              placeholder='e.g. ********' 
+              onKeyDown={this.handleKeyDown} 
+              onChange={this.handlePasswordChange} 
+            />
+          </div>
+          <div className='login-submit-button-wrapper' >
+            <div className='login-submit-button button' onClick={this.handleLogin}>
+              Login
+            </div>
+          </div>
+        </div>
+        <div className='login-bottom-toolbar'>
+          <div 
+            className='login-forgot-password'
+            onClick={this.handleForgotPassword}
+          >
+            Forgot Password? 
+          </div>
+          <div className='login-no-account'>
+            Don't have an account yet? &nbsp; 
+              <span 
+                className='login-green'
+                onClick={this.registerNewUser}
+              >
+                 Sign Up
+              </span>
+          </div>
+        </div>
+        <Modal 
+          message={this.state.errorModalMessage}
+          onClose={this.toggleErrorModal} 
+          open={this.state.loginErrorModalOpen} 
+          error={true}
+        /> 
       </div>
    );
   }

@@ -45,7 +45,6 @@ THE SOFTWARE.
 require('./CreateItem.less');
 import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
-import Menu from './../../common/components/Menu.tsx';
 var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
 
 interface Props

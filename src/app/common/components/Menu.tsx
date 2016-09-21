@@ -48,7 +48,7 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 
 var optionHeight = 30; // coordinate with Menu.less
@@ -63,13 +63,17 @@ export interface MenuOption {
 
 interface Props
 {
-  options: MenuOption[];
+  options: List<MenuOption>;
   small?: boolean;
   style?: any,
 }
 
-class Menu extends Classs<Props>
+export class Menu extends PureClasss<Props>
 {
+  state: {
+    open: boolean;
+  }
+  
   constructor(props: Props) {
     super(props);
     this.state =
@@ -78,13 +82,13 @@ class Menu extends Classs<Props>
     }
   }
   
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  }
-  
   renderOption(option, index)
   {
+    if(option.spacer)
+    {
+      return <div className='menu-option menu-option-spacer' key={index} />;
+    }
+    
     if(!option.disabled)
     {
       var onClick = (event) => {
@@ -94,7 +98,11 @@ class Menu extends Classs<Props>
       };
     }
     return (
-      <div className={"menu-option" + (option.disabled ? " menu-option-disabled" : "")} key={index} onClick={onClick}>
+      <div
+        className={"menu-option" + (option.disabled ? " menu-option-disabled" : "")}
+        key={index}
+        onClick={onClick}
+      >
         <div 
           className="menu-option-icon" 
           style={{
@@ -136,24 +144,25 @@ class Menu extends Classs<Props>
     }
   }
 
-  render() {
+  render()
+  {
     let {options} = this.props;
-    if(!options || !options.length)
+    if(!options || !options.size)
     {
       return null;
     }
     
     var multiplier = 10;
-    if(options[0].icon) 
+    if(options.get(0).icon) 
     {
       multiplier = 14;
     } 
     var width = multiplier * options.reduce((max, option) => 
-        option.text.length > max ? option.text.length : max, 1)
+        option.text && (option.text.length > max) ? option.text.length : max, 1)
 
     var style = {
       width: width,
-      height: options.length * optionHeight,
+      height: options.size * optionHeight,
     };
     
     return (

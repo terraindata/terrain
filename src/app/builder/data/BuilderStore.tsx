@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 var _ = require('underscore');
+import * as Immutable from 'immutable';
 import { Map, List } from 'immutable';
 import * as ReduxActions from 'redux-actions';
 
@@ -50,38 +51,34 @@ var Redux = require('redux');
 import ActionTypes from './BuilderActionTypes.tsx';
 import Util from '../../util/Util.tsx';
 
-import { BuilderTypes } from './../BuilderTypes.tsx';
+import Types from './../BuilderTypes.tsx';
 
-var DefaultState = Map({
-  variantIds: List([]),
-});
+export class BuilderState
+{
+  loading: boolean = false;
+  queries: Map<ID, Types.IQuery> = Map({});
+  
+  hoveringCardId: ID = "";
+  selectedCardIds: Map<ID, boolean> = Map({});
+  
+  tables: List<string> = List([]);
+  tableColumns: Map<string, List<string>> = Map({});
+  
+  manual: Map<ID, Types.ICards> = Map({});
+  // Card examples used in the manual are stored here.
+  
+  set: (f: string, v: any) => BuilderState;
+  setIn: (f: string, v: any) => BuilderState;
+}
+let BuilderState_Record = Immutable.Record(new BuilderState());
+let _BuilderState = (config?:any) => {
+  return new BuilderState_Record(config || {}) as any as BuilderState;
+}
 
-import InputsReducer from './reducers/InputsReducer.tsx';
-import ResultsReducer from './reducers/ResultsReducer.tsx';
-import CardsReducer from './reducers/CardsReducer.tsx';
-import FromCardReducer from './reducers/FromCardReducer.tsx';
-import ScoreCardReducer from './reducers/ScoreCardReducer.tsx';
-import LetCardReducer from './reducers/LetCardReducer.tsx';
-import SortCardReducer from './reducers/SortCardReducer.tsx';
-import FilterCardReducer from './reducers/FilterCardReducer.tsx';
-import SelectCardReducer from './reducers/SelectCardReducer.tsx';
-import TransformCardReducer from './reducers/TransformCardReducer.tsx';
-import IfCardReducer from './reducers/IfCardReducer.tsx';
-import VariantReducer from './reducers/VariantReducer.tsx';
+var DefaultState = _BuilderState();
 
-let BuilderStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  VariantReducer,
-  ResultsReducer,
-  CardsReducer,
-  FromCardReducer,
-  InputsReducer,
-  ScoreCardReducer,
-  LetCardReducer,
-  SortCardReducer,
-  FilterCardReducer,
-  SelectCardReducer,
-  TransformCardReducer,
-  IfCardReducer,
-{})), DefaultState);
+import BuilderReducers from './BuilderReducers.tsx';
+
+export const BuilderStore = Redux.createStore(ReduxActions.handleActions(BuilderReducers), DefaultState);
 
 export default BuilderStore;

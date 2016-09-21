@@ -46,16 +46,16 @@ require('./X.less');
 import * as React from 'react';
 import * as _ from 'underscore';
 import Classs from './../../common/components/Classs.tsx';
-import XCards from './XCards.tsx';
 import { Link } from 'react-router';
+
 
 const xes =
 {
-  cards:
-  {
-    name: 'Immutable Builder',
-    component: XCards,
-  },
+  // cards:
+  // {
+  //   name: 'Immutable Builder',
+  //   component: XCards,
+  // },
 };
 
 interface Props

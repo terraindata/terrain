@@ -45,6 +45,7 @@ THE SOFTWARE.
 import Util from './../util/Util.tsx';
 import UserTypes from './../users/UserTypes.tsx';
 import RoleTypes from './../roles/RoleTypes.tsx';
+import BuilderTypes from './../builder/BuilderTypes.tsx';
 import * as Immutable from 'immutable';
 
 export module BrowserTypes
@@ -69,6 +70,7 @@ export module BrowserTypes
     mode: "",
     tql: "",
     status: EVariantStatus.Build,
+    version: false,
 
     cards: Immutable.List([]),
     inputs: Immutable.List([]),
@@ -76,10 +78,10 @@ export module BrowserTypes
     // for DB storage
     type: "variant",
     dbFields: ['groupId', 'algorithmId', 'status'],
-    dataFields: ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs'],    
+    dataFields: ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs', 'mode', 'tql'],    
     statusMap: (s:EVariantStatus) => EVariantStatus[s],
   });
-  export class Variant extends _Variant
+  export class Variant extends _Variant implements BuilderTypes.IQuery
   {
     id: ID;
     name: string;
@@ -89,10 +91,12 @@ export module BrowserTypes
     algorithmId: ID;
     groupId: Group;
 
-    cards: any;
-    inputs: any;
+    cards: List<BuilderTypes.ICard>;
+    inputs: List<BuilderTypes.IInput>;
+    
     mode: string;
     tql: string;
+    version: boolean;
     
     type: string;
     dbFields: string[]; // fields saved directly to DB
@@ -109,6 +113,12 @@ export module BrowserTypes
       .set('lastUsername', localStorage['username']) as Variant;
   }
   
+  export function variantForSave(v: Variant): Variant
+  {
+    v = touchVariant(v);
+    v = v.set('cards', BuilderTypes.recordsForServer(v.cards)) as Variant;
+    return v;
+  }
   
   export enum EAlgorithmStatus
   {
@@ -116,6 +126,8 @@ export module BrowserTypes
     Archive,  
     Live,
   }
+
+
   let _Algorithm = Immutable.Record(
   {
     id: "",

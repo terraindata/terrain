@@ -43,8 +43,10 @@ THE SOFTWARE.
 */
 
 require('./InfoArea.less')
+import * as classNames from 'classnames';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
+import PureClasss from '../../common/components/PureClasss.tsx';
 
 var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -54,9 +56,10 @@ interface Props {
   small?: string;
   button?: string;
   onClick?: () => void;
+  inline?: boolean; // render inline, rather than absolutely middle
 }
 
-class InfoArea extends React.Component<Props, any>
+class InfoArea extends PureClasss<Props>
 {
   constructor(props)
   {
@@ -79,7 +82,10 @@ class InfoArea extends React.Component<Props, any>
   
   render() {
     return (
-     <div className="info-area">
+     <div className={classNames({
+       "info-area": true,
+       "info-area-inline": this.props.inline,
+     })}>
        { this.renderThing('large') }
        { this.renderThing('small') }
        { this.renderThing('button', true) }

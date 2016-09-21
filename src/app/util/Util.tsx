@@ -50,63 +50,9 @@ import * as _ from 'underscore';
 
 import BrowserTypes from './../browser/BrowserTypes.tsx';
 
-import { BuilderTypes } from './../builder/BuilderTypes.tsx';
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-var immutableCardsUpdateHelper = (node: any, keyToUpdate: string | string[], id: string, updater: (node: any, key: string | string[]) => any) =>
-{
-  if(node.get('id') === id)
-  {
-    if(typeof keyToUpdate === 'string')
-    {
-      return node.update(keyToUpdate, (node: any) => updater(node, keyToUpdate));
-    }
-    else
-    {
-      if(node.getIn(keyToUpdate) === undefined)
-      {
-        console.log('Potential warning: you are setting a value at a keyPath that had an undefined value.', keyToUpdate, node.toJS());
-      }
-      return node.updateIn(keyToUpdate, (node: any) => updater(node, keyToUpdate));
-    }
-  }
-  let keys = node.keys();
-  var iterator = keys.next();
-  while(!iterator.done) //node.each((value, key) => // used `map` this way because `map` returns `undefined` for Immutable records
-  {
-    let key = iterator.value;
-    let value = node.get(key);
-    if(Immutable.Iterable.isIterable(value))
-    {
-      node = node.set(key, immutableCardsUpdateHelper(value, keyToUpdate, id, updater));
-    }
-    iterator = keys.next();
-  };
-  
-  return node;
-}
 
-var immutableCardsUpdate = 
-  (state: any, keysToUpdate: string | string[], id: string, updater: (node: any, key: string) => any) => {
-    if(typeof keysToUpdate === "string")
-    {
-      keysToUpdate = [keysToUpdate as string];
-    }
-    return state.update('algorithms', algorithms => algorithms.map((algorithm) => {
-      var a = (keysToUpdate as string[]).reduce(
-        (algorithm, keyToUpdate) => immutableCardsUpdateHelper(algorithm, keyToUpdate, id, updater)
-      , algorithm);
-      return a;
-    }));
-  };
-
-var immutableCardsSetIn = 
-  (state: any, id: string, keyPath: string[], value) => {
-    return state.update('algorithms', algorithms => 
-      immutableCardsUpdateHelper(algorithms, keyPath, id,
-        (n) => Immutable.fromJS(value))
-  )};
-
-var keyPathForId = (node: any, id: string) =>
+var keyPathForId = (node: any, id: string): ((string | number)[] | boolean) =>
   {
     if(node.get('id') === id)
     {
@@ -178,8 +124,17 @@ var Util = {
     }
     
     let groupId = item.type === 'group' ? item.id : item['groupId'];
-    let role = item.type === 'group' ? 'admin' : 'builder';
-    return !! Util.haveRole(groupId, role, UserStore, RolesStore);
+    if(Util.haveRole(groupId, 'admin', UserStore, RolesStore))
+    {
+      return true;
+    }
+    
+    if(item.type !== 'group')
+    {
+      return Util.haveRole(groupId, 'builder', UserStore, RolesStore)
+    }
+    
+    return false;
   },
   
   getId(): ID
@@ -230,58 +185,6 @@ var Util = {
     return ReactDOM.findDOMNode(target).getAttribute(key);
   },
   
-  titleForCard(card: BuilderTypes.ICard): string
-  {
-    var title = card.type.charAt(0).toUpperCase() + card.type.substr(1);
-    if(card.type === 'parentheses')
-    {
-      title = '( )';
-    }
-    
-    return title;
-  },
-  
-  previewForCard(card: BuilderTypes.ICard): string
-  {
-    if(!card)
-    {
-      return 'No cards';
-    }
-    
-    switch(card.type)
-    {
-      case 'from':
-        return card['group'] + ' as ' + card['iterator'];
-      case 'select':
-        return card['properties'].length + ' propert' + (card['properties'].length !== 1 ? 'ies' : 'y');
-      case 'sort':
-        return card['sorts'].length ? card['sorts'][0]['property'] : '';
-      case 'filter':
-        return card['filters'].length + ' condition' + (card['filters'].length === 1 ? '' : 's');
-      case 'let':
-      case 'var':
-        return card['field'];
-      case 'score':
-        return card['weights'].length + ' factor' + (card['weights'].length === 1 ? '' : 's');
-      case 'transform':
-        return card['input'];
-      case 'if':
-        return card['filters'].length + ' condition' + (card['filters'].length === 1 ? '' : 's');
-      case 'parentheses':
-      case 'min':
-      case 'max':
-      case 'avg':
-      case 'count':
-      case 'exists':
-      case 'sum':
-        return Util.previewForCard(card['cards'][0]);
-      case 'skip':
-      case 'take':
-        return card['value'];
-    }
-    return '';
-  },
-  
   // corrects a given index so that it is appropriate
   //  to pass into a `splice` call
   spliceIndex(index: number, array: any[]): number
@@ -298,6 +201,7 @@ var Util = {
     return index;
   },
   
+  // still needed?
   immutableMove: (arr: any, id: any, index: number) => {
     var curIndex = arr.findIndex((obj) => 
       (typeof obj.get === 'function' && (obj.get('id') === id))
@@ -307,8 +211,6 @@ var Util = {
     return arr.splice(index, 0, obj);
   },
   
-  immutableCardsUpdate: immutableCardsUpdate,
-  immutableCardsSetIn: immutableCardsSetIn,
   keyPathForId: keyPathForId,
 
 	isInt(num): boolean
@@ -325,6 +227,11 @@ var Util = {
 	{
 		return ReactDOM.findDOMNode(reactNode).parentNode;
 	},
+  
+  siblings(reactNode): NodeList
+  {
+    return Util.parentNode(reactNode).childNodes;
+  },
 
 	valueMinMax(value: number, min: number, max: number)
 	{
@@ -398,31 +305,7 @@ var Util = {
   },
 
 
- // TODO remove
-	operatorToString(operator: string): string
-	{
-		switch(operator) {
-			case 'eq':
-				return '=';
-			case 'ge':
-				return '≥';
-			case 'gt':
-				return '>';
-			case 'le':
-				return '≤';
-			case 'lt':
-				return '<';
-   case 'in':
-    return 'in';
-			case 'ne':
-				return '≠';
-		}
-
-		console.log('Not a valid operator: ' + operator);
-
-		return "";
-	},
-
+  // REMOVE
 	// accepts object of key/vals like this: { 'className': include? }
 	objToClassname(obj: { [className: string]: boolean }): string
 	{
@@ -441,40 +324,6 @@ var Util = {
     return cards.findIndex(card => card.get('id') === action.payload.card.id);
   },
 
-  // returns a reducing function that updates the given field with the fieldUpdater
-  //  fieldUpdater gets passed (fieldObject, action)
-  updateCardField: (field: string, fieldUpdater: (node: any, action: any) => any) =>
-    (state, action) =>
-      Util.immutableCardsUpdate(state, field, action.payload.card.id,
-        (fieldObj) => fieldUpdater(fieldObj, action)),
-  
-  // Given a function that takes an action and generates a map
-  //  of field => value pairings,
-  //  returns a reducer that
-  //  finds the card specified in an action and sets
-  //  the values of the fields specified in the map
-  // note: outdated and unused
-  // updateCardFields: (fieldMapFactory: (action: any) => {[field: string]: any}) =>
-  //   (state, action) =>
-  //     state.updateIn([action.payload.card.parentId, 'cards'], (cards) =>
-  //       cards.updateIn([cards.findIndex(card => card.get('id') === action.payload.card.id)], 
-  //         card => 
-  //           _.reduce(fieldMapFactory(action), (card, value, field) =>
-  //             card.set(field, value)
-  //           , card)
-  //         )
-  //       ),
-  
-  // Given an array of strings representing fields on a card, 
-  //  returns a reducer that
-  //  finds the card specified in an action and sets
-  //  the value of the fields specified to the values
-  //  of the matching fields in the action's payload.
-  setCardFields: (fields: string[]) =>
-    (state, action) =>
-      Util.immutableCardsUpdate(state, fields, action.payload.card.id, 
-        (fieldVal, field) => Immutable.fromJS(action.payload[field])),
-  
   populateTransformDummyData(transformCard)
   {
     transformCard.range = transformCard.range || [0,100];

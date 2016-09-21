@@ -42,164 +42,148 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../../util/Util.tsx';
-import InfoArea from '../../../common/components/InfoArea.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import Card from "../cards/Card.tsx";
-import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateCardTool from "./CreateCardTool.tsx";
-import { DropTarget } from 'react-dnd';
+import PureClasss from './../../../common/components/PureClasss.tsx';
+import BuilderTypes from '../../BuilderTypes.tsx';
+type ICard = BuilderTypes.ICard;
+type ICards = BuilderTypes.ICards;
+let {List} = Immutable;
 
-var CardsArea = React.createClass<any, any>({
-	propTypes:
-	{
-		cards: React.PropTypes.array.isRequired,
-    parentId: React.PropTypes.string.isRequired,
-    spotlights: React.PropTypes.array.isRequired,
-    topLevel: React.PropTypes.bool,
-    keys: React.PropTypes.array.isRequired,
-    canEdit: React.PropTypes.bool.isRequired,
-    connectDropTarget: React.PropTypes.func,
-  },
+
+interface Props
+{
+  cards: ICards;
+  keys: List<string>;
+  canEdit: boolean;
+  keyPath: KeyPath;
   
-  hasCardsArea()
+  addColumn?: (number, string?) => void;
+  columnIndex?: number;
+  className?: string;
+  spotlights?: List<any>;
+  connectDropTarget?: (el:JSX.Element) => JSX.Element;
+  helpOn?: boolean;
+}
+
+interface KeyState {
+  keys: List<string>;
+  keyPath: KeyPath;
+  learningMode: boolean;
+}
+
+class CardsArea extends PureClasss<Props>
+{
+  state: KeyState = {
+    keys: List([]),
+    keyPath: null,
+    learningMode: this.props.helpOn,
+  };
+
+  constructor(props:Props)
   {
-    return this.props.topLevel;
-  },
+    super(props);
+    this.state.keys = this.computeKeys(props);
+  }
   
-  componentWillReceiveProps(nextProps)
+  componentWillReceiveProps(nextProps:Props)
   {
-    this.setState({
-      layout:
-      {
-        rows: this.getRows(nextProps),
-        useDropZones: true,
-      }
-    });
-  },
+    if(nextProps.keys !== this.props.keys || nextProps.cards !== this.props.cards)
+    {
+      this.setState({
+        keys: this.computeKeys(nextProps)
+      });
+    }
+  }
   
-  shouldComponentUpdate(nextProps, nextState)
+  computeKeys(props:Props): List<string>
   {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  },
-  
-  getInitialState()
-  {
-    return {
-      id: Util.randInt(123456789),
-      layout:
-      {
-        rows: this.getRows(this.props),
-        useDropZones: true,
-      }
-    };
-  },
-  
-  getKeys(props)
-  {
-    return props.keys.concat(
+    let newKeys: List<string> = props.keys.merge(
       props.cards.reduce(
-        (memo, card) => {
-          if(card.type === 'var' || card.type === 'let')
+        (memo: List<string>, card: ICard): List<string> =>
+        {
+          if(card.static.getNeighborTerms)
           {
-            memo.push(card.field);
+            return memo.merge(card.static.getNeighborTerms(card));
           }
           return memo;
         }
-      , [])
+      , Immutable.List([]))
     );
-  },
-  
-  getRows(props)
-  {
-    return props.cards.map((card, index) => (
-      {
-        content: <Card 
-          {...props}
-          cards={null}
-          singleCard={false}
-          topLevel={false}
-          index={index}
-          card={card}
-          dndListener={$({})}
-          keys={this.getKeys(props)}
-        />,
-        key: card.id,
-      }
-    ))
-    .concat(!this.props.canEdit ? [] :
-    [{
-      content: (
-        <CreateCardTool
-          {...this.props}
-          index={props.cards.length}
-          open={props.cards.length === 0}
-          parentId={props.parentId}
-          className={props.topLevel ? 'standard-margin standard-margin-top' : 'nested-create-card-tool-wrapper'}
-        />
-      ),
-      key: 'end-tool',
-    }]);
-  },
-  
-  copy() {},
-  
-  clear() {},
-  
-  createFromCard() {
-    Actions.cards.create(this.props.parentId, 'from', this.props.index);
-  },
-  
-  render() {
-    if(!this.props.cards.length && this.props.topLevel)
+    
+    if(newKeys.equals(this.state.keys))
     {
-      return <InfoArea
-        large="No cards have been created, yet."
-        small="Most people start with the From card."
-        button="Create a From card"
-        onClick={this.createFromCard}
-        />;
+      return this.state.keys;
     }
 
-    return this.props.connectDropTarget(
-      <div
-        className={'cards-area' + (this.props.topLevel ? ' cards-area-top-level' : '')}
-      >
-        <LayoutManager
-          layout={this.state.layout}
-        />
+    return newKeys;
+  }
+  
+       
+  
+  copy() {}
+  
+  clear() {}
+  
+  createFromCard()
+  {
+    Actions.create(this.props.keyPath, 0, 'sfw');
+  }
+  
+  toggleView()
+  {
+    this.setState({
+      learningMode: !this.state.learningMode,
+    })
+  }
+
+  render()
+  {
+    let {props} = this;
+    let {cards, canEdit} = props;
+    return (
+      <div> 
+        <div
+          className={classNames({
+            'cards-area': true,
+            [this.props.className]: !!this.props.className,
+          })}
+        >
+          {
+            cards.map((card:ICard, index:number) =>
+              <Card 
+                {...this.props}
+                helpOn={this.state.learningMode || this.props.helpOn}
+                cards={null}
+                key={card.id}
+                singleCard={false}
+                index={index}
+                card={card}
+                keys={this.state.keys}
+                keyPath={this.props.keyPath}
+              />
+            )
+          }
+          
+          <CreateCardTool
+            canEdit={this.props.canEdit}
+            keyPath={this.props.keyPath}
+            index={props.cards.size}
+            open={props.cards.size === 0}
+            className='nested-create-card-tool-wrapper'
+          />
+        </div>
       </div>
     );
-  },
-});
-
-
-
-const cardTarget = 
-{
-  canDrop(props, monitor)
-  {
-    return true;
-  },
-  
-  drop(props, monitor, component)
-  {
-    if(monitor.isOver({ shallow: true}))
-    {
-      const card = monitor.getItem();
-      Actions.cards.move(card, props.cards.length, props.parentId);
-    }
   }
 }
 
-const dropCollect = (connect, monitor) =>
-({
-  connectDropTarget: connect.dropTarget(),
-});
-
-
-export default DropTarget('CARD', cardTarget, dropCollect)(CardsArea);
+export default CardsArea;

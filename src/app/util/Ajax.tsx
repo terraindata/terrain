@@ -52,10 +52,16 @@ import RoleTypes from './../roles/RoleTypes.tsx';
 import Util from './../util/Util.tsx';
 
 var Ajax = {
-  _req(method: string, url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void) 
+  _req(method: string, url: string, data: any, onLoad: (response: any) => void, config:
+    {
+      onError?: (response: any) => void,
+      host?: string,
+      crossDomain?: boolean;
+      noToken?: boolean;
+    } = {}) 
   {
     let xhr = new XMLHttpRequest();
-    xhr.onerror = onError;
+    xhr.onerror = config && config.onError;
     xhr.onload = (ev:Event) =>
     {
       if (xhr.status === 401)
@@ -66,7 +72,7 @@ var Ajax = {
       
       if (xhr.status != 200)
       {
-        onLoad({
+        config && config.onError && config.onError({
           error: xhr.responseText
         });
         return;
@@ -75,21 +81,48 @@ var Ajax = {
       onLoad(xhr.responseText);
     }
     
-    // NOTE: $SERVER_URL will be replaced by the build process.
-    xhr.open(method, SERVER_URL + url, true);
-    xhr.setRequestHeader('token', Store.getState().get('authenticationToken'));
+    // NOTE: SERVER_URL will be replaced by the build process.
+    let host = config.host || SERVER_URL;
+    xhr.open(method, host + url, true);
+    if(!config.noToken)
+    {
+      xhr.setRequestHeader('token', Store.getState().get('authenticationToken'));
+    }
+    
+    if(config.crossDomain)
+    {
+      xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+      xhr.setRequestHeader('Access-Control-Allow-Headers','Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Origin');
+    }
     xhr.send(data);
     return xhr;  
   },
   
   _post(url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void)
   {
-    return Ajax._req("POST", url, data, onLoad, onError);
+    return Ajax._req("POST", url, data, onLoad, {onError});
   },
   
   _get(url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void)
   {
-    return Ajax._req("GET", url, data, onLoad, onError);
+    return Ajax._req("GET", url, data, onLoad, {onError});
+  },
+  
+  _r(url:string, reqFields: {[f:string]:any}, onLoad: (resp:string) => void, onError?: (ev:Event) => void)
+  {
+    return Ajax._req('POST', url, JSON.stringify(_.extend({
+      timestamp: (new Date()).toISOString(),
+      unique_id: "" + Math.random(),
+    }, reqFields)),
+    
+    onLoad,
+    
+    {
+      noToken: true,
+      onError,
+      host: "http://pa-terraformer02.terrain.int:7344",
+      crossDomain: true,
+    });
   },
   
   saveRole: (role:RoleTypes.Role) =>
@@ -202,6 +235,25 @@ var Ajax = {
   {
     return Ajax.getItem('variant', id, onLoad);
   },
+
+  getVariantVersions(variantId: ID, onLoad: (variantVersions: any) => void)
+  {
+    var url = '/variant_versions/' + variantId;
+    return Ajax._get(url, "", (response: any) =>
+    {
+      let variantVersions = JSON.parse(response);
+      onLoad(variantVersions);
+    });
+  },
+
+  getVariantVersion(variantId: ID, versionId: string, onLoad: (variantVersion: any) => void)
+  {
+    var url = '/variant_versions/' + variantId;
+    return Ajax._get(url, "", (response: any) =>
+    {
+      JSON.parse(response).map(version => version.id === versionId && onLoad(JSON.parse(version.data)))
+    });
+  },
   
   saveItem(item: Immutable.Map<string, any>, onLoad?: (resp: any) => void, onError?: (ev:Event) => void)
   {
@@ -221,23 +273,91 @@ var Ajax = {
     return Ajax._req("POST", `/${type}s/${id}`, JSON.stringify(obj), onLoad, onError);
   },
   
-	query(tql: string, onLoad: (response: any) => void, onError?: (ev:Event) => void)
+	query(tql: string, onLoad: (response: any) => void, onError?: (ev:Event) => void, sqlQuery?: boolean)
   {
-    return Ajax._post("/query", tql, onLoad, onError);
+    return Ajax._r(sqlQuery ? "/sql_query" : "/sql_query", {
+        "query_string": encode_utf8(tql),
+      },
+      
+      (resp) =>
+      {
+        try {
+          onLoad(JSON.parse(resp));
+        } catch(e) {
+          onError && onError(resp as any);
+        }
+      },
+      
+      onError
+    );
   },
   
   schema(onLoad: (tables: {name: string, columns: any[]}[], error?: any) => void, onError?: (ev:Event) => void)
   {
-    return Ajax._post("/schema/" , null, (response) => {
-      try {
-        var tables = JSON.parse(response)['tables'];
-      } catch(e) {
-        onLoad(null, e);
-        return;
-      }
-      onLoad(tables);
-    }, onError);
+    return Ajax._r("/get_schema", {
+        db: 'urbansitter',
+      },
+      
+      (resp:string) =>
+      {
+        try {
+          let cols = JSON.parse(resp);
+          var tables: {[name:string]: {name: string; columns: any[];}} = {};
+          
+          cols.map(
+          (
+            col: { TABLE_NAME: string; COLUMN_NAME: string; }
+          ) =>
+          {
+            let column = _.extend(col, { name: col.COLUMN_NAME });
+            let table = col.TABLE_NAME;
+             
+            if(!tables[table])
+            {
+              tables[table] = {
+                name: table,
+                columns: [],
+              };
+            }
+            
+            tables[table].columns.push(column);
+          });
+          onLoad(_.toArray(tables) as any);
+        } catch(e) {
+          onError && onError(resp as any);
+        }
+      },
+      
+      onError
+      );
+  },
+  
+  killQueries()
+  {
+    Ajax.query("select concat('kill ',id,';') from information_schema.processlist where user='dev' and command='Query' and time>30;",
+      (a) => console && console.log && console.log('Queries killed:', a),
+      (a) => console && console.log && console.log('Query killing error:', a)
+    );
+  },
+  
+  _config()
+  {
+    // change_conf_dict_mysql[btoa("host")] = btoa(encode_utf8("10.1.0.25"));
+    // change_conf_dict_mysql[btoa("user")] = btoa(encode_utf8("dev"));
+    // change_conf_dict_mysql[btoa("password")] = btoa(encode_utf8("terrain_webscalesql42"));
+    // change_conf_dict_mysql[btoa("db")] = btoa(encode_utf8("BookDB"));
+    // change_conf_dict[btoa("mysqlconfig")] = change_conf_dict_mysql;
   }
 };
+
+function encode_utf8(s) {
+  return unescape(encodeURIComponent(s));
+}
+
+function decode_utf8(s) {
+  return decodeURIComponent(escape(s));
+}
+
+    
 
 export default Ajax;

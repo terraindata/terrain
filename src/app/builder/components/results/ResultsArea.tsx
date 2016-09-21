@@ -54,21 +54,23 @@ import ResultsTable from "../results/ResultsTable.tsx";
 import {Config, ResultsConfig} from "../results/ResultsConfig.tsx";
 import InfoArea from '../../../common/components/InfoArea.tsx';
 import TQLConverter from "../../../tql/TQLConverter.tsx";
-import Classs from './../../../common/components/Classs.tsx';
+import PureClasss from './../../../common/components/PureClasss.tsx';
 import InfiniteScroll from './../../../common/components/InfiniteScroll.tsx';
 import Switch from './../../../common/components/Switch.tsx';
+import BuilderTypes from '../../BuilderTypes.tsx';
 
 const RESULTS_PAGE_SIZE = 25;
+const MAX_RESULTS = 75;
 
 interface Props
 {
-  algorithm: any;
+  query: BuilderTypes.IQuery;
   onLoadStart: () => void;
   onLoadEnd: () => void;
   canEdit: boolean;
 }
 
-class ResultsArea extends Classs<Props>
+class ResultsArea extends PureClasss<Props>
 {
   xhr = null;
   allXhr = null;
@@ -78,6 +80,7 @@ class ResultsArea extends Classs<Props>
     resultsWithAllFields: any[];
     resultText: string;
     resultType: string;
+    numResults: number;
     
     tql: string;
     error: any;
@@ -94,6 +97,7 @@ class ResultsArea extends Classs<Props>
     onResultsLoaded: (unchanged?: boolean) => void;
   } = {
     results: null,
+    numResults: null,
     resultsWithAllFields: null,
     resultsConfig: null,
     resultText: null,
@@ -112,13 +116,12 @@ class ResultsArea extends Classs<Props>
   constructor(props:Props)
   {
     super(props);
-    
-    this.state.resultsConfig = this.getResultsConfig()[this.props.algorithm.id];
+    this.state.resultsConfig = this.getResultsConfig()[this.props.query.id];
   }
   
   componentDidMount()
   {
-    this.queryResults(this.props.algorithm);
+    this.queryResults(this.props.query);
   }
   
   componentWillUnmount()
@@ -132,10 +135,10 @@ class ResultsArea extends Classs<Props>
   
   componentWillReceiveProps(nextProps)
   {
-    if(!_.isEqual(nextProps.algorithm, this.props.algorithm))
+    if(!_.isEqual(nextProps.query, this.props.query))
     {
-      this.queryResults(nextProps.algorithm);
-      let resultsConfig = this.getResultsConfig()[nextProps.algorithm.id];
+      this.queryResults(nextProps.query);
+      let resultsConfig = this.getResultsConfig()[nextProps.query.id];
       this.setState({
         resultsConfig,
       });
@@ -145,7 +148,7 @@ class ResultsArea extends Classs<Props>
         this.state.onResultsLoaded(false);
       }
       
-      if(nextProps.algorithm.id !== this.props.algorithm.id)
+      if(nextProps.query.id !== this.props.query.id)
       {
         this.setState({
           results: null,
@@ -210,18 +213,25 @@ class ResultsArea extends Classs<Props>
   
   handleRequestMoreResults(onResultsLoaded: (unchanged?: boolean) => void)
   {
-    if(this.state.loadedResultsPages !== this.state.resultsPages)
-    {
-      // still loading a previous request
-      return;
-    }
+    // if(this.state.loadedResultsPages !== this.state.resultsPages)
+    // {
+    //   // still loading a previous request
+    //   return;
+    // }
     
     let pages = this.state.resultsPages + 1;
     this.setState({
       resultsPages: pages,
       onResultsLoaded,
     });
-    this.queryResults(this.props.algorithm, pages);
+    let reachedEnd = this.state.numResults <= this.state.resultsPages * RESULTS_PAGE_SIZE;
+    if(!reachedEnd)
+    {
+      setTimeout(() =>
+        onResultsLoaded(reachedEnd)
+      , 250);
+    }
+    // this.queryResults(this.props.query, pages);
   }
   
   resultsFodderRange = _.range(0, 25);
@@ -279,7 +289,13 @@ class ResultsArea extends Classs<Props>
       >
         {
           this.state.results.map((result, index) => 
-            <Result
+          {
+            if(index > this.state.resultsPages * RESULTS_PAGE_SIZE)
+            {
+              return null;
+            }
+            
+            return <Result
               data={result}
               allFieldsData={this.state.resultsWithAllFields && this.state.resultsWithAllFields[index]}
               config={this.state.resultsConfig}
@@ -289,6 +305,7 @@ class ResultsArea extends Classs<Props>
               key={index}
               format={this.state.resultFormat}
             />
+          }
           )
         }
         {
@@ -298,81 +315,56 @@ class ResultsArea extends Classs<Props>
     );
   }
   
-  handleAllFieldsResponse(response)
+  handleAllFieldsResponse(results)
   {
-    this.handleResultsChange(response, true);
+    this.handleResultsChange(results, true);
   }
   
   timeout = null;
   
-  handleResultsChange(response, isAllFields?: boolean)
+  handleResultsChange(results, isAllFields?: boolean)
   {
     let xhrKey = isAllFields ? 'allXhr' : 'xhr';
     if(!this[xhrKey]) return;
     this[xhrKey] = null;
     
-    var result;
-    try {
-      var result = JSON.parse(response).result;
-    } catch(e) {
-      this.setState({
-        error: "No response was returned from the server.",
-        // TODO add error
-      });
-      return; 
-    }
-    
-    this.props.onLoadEnd && this.props.onLoadEnd();
-    if(result)
+    if(results)
     {
-      if(result.error)
+      var numResults = results.length;
+      if(numResults > MAX_RESULTS)
       {
-        this.setState({
-          error: "Error on line " + result.line+": " + result.error,
-          querying: false,
-          results: null,
-          resultType: null,
-        });
+        results.splice(MAX_RESULTS, results.length - MAX_RESULTS);
       }
-      else if(result.raw_result)
+      
+      if(isAllFields)
       {
         this.setState({
-          error: "Error with query: " + result.raw_result,
-          querying: false,
-          results: null,
-          resultType: null,
-        }); 
+          resultsWithAllFields: results,
+        });
       }
       else
       {
-        if(isAllFields)
+        if(this.state.onResultsLoaded && this.state.resultsPages !== this.state.loadedResultsPages)
         {
           this.setState({
-            resultsWithAllFields: result.value,
+            loadedResultsPages: this.state.resultsPages,
           });
-        } else {
-          if(this.state.onResultsLoaded && this.state.resultsPages !== this.state.loadedResultsPages)
-          {
-            this.setState({
-              loadedResultsPages: this.state.resultsPages,
-            });
-            
-            // set a timeout to prevent an infinite loop with InfiniteScroll
-            // could move this somewhere that executes after the results have rendered
-            this.timeout = setTimeout(() =>
-              this.state.onResultsLoaded && this.state.onResultsLoaded(
-                this.state.results &&
-                result.value.length === this.state.results.length
-              ), 1000);
-          }
           
-          this.setState({
-            results: result.value,
-            resultType: result.type,
-            querying: false,
-            error: false,
-          });
+          // set a timeout to prevent an infinite loop with InfiniteScroll
+          // could move this somewhere that executes after the results have rendered
+          let unchanged = results.length < this.state.resultsPages * RESULTS_PAGE_SIZE;
+          this.timeout = setTimeout(() =>
+            this.state.onResultsLoaded && this.state.onResultsLoaded(unchanged)
+            , 1000);
         }
+        
+        this.setState({
+          results,
+          numResults,
+          resultType: 'rel',
+          querying: false,
+          error: false,
+        });
       }
     }
     else
@@ -383,30 +375,37 @@ class ResultsArea extends Classs<Props>
         // TODO add error
       });
     }
+    
+    if(!this['xhr']) // && !this['allXhr']) // TODO
+    {
+      // all done with both
+      this.props.onLoadEnd && this.props.onLoadEnd();
+    }
   }
   
   handleError(ev)
-  {
+  {  
     this.setState({
       error: true,
-    })
+    });
+    this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
-  queryResults(algorithm, pages?: number)
+  queryResults(query, pages?: number)
   {
     if(!pages)
     {
       pages = this.state.resultFormat === 'icon' ? this.state.resultsPages : 50;
     }
     
-    if (algorithm.mode === "tql")
+    if (query.mode === "tql")
     {
-      var tql = algorithm.tql;
+      var tql = query.tql;
     }
     else 
     {
-      tql = TQLConverter.toTQL(algorithm, {
-        limit: pages * RESULTS_PAGE_SIZE,
+      tql = TQLConverter.toTQL(query, {
+        // limit: pages * RESULTS_PAGE_SIZE,
       });
     }
     if(tql !== this.state.tql)
@@ -421,7 +420,7 @@ class ResultsArea extends Classs<Props>
       this.allXhr && this.allXhr.abort();
       
       this.xhr = Ajax.query(tql, this.handleResultsChange, this.handleError);
-      if (algorithm.mode === "tql")
+      if (query.mode === "tql")
       {
         this.allXhr = Ajax.query(tql, 
           this.handleAllFieldsResponse,
@@ -430,10 +429,9 @@ class ResultsArea extends Classs<Props>
       }
       else 
       {
-        this.allXhr = Ajax.query(TQLConverter.toTQL(algorithm, {
+        this.allXhr = Ajax.query(TQLConverter.toTQL(query, {
             allFields: true,
-        // limit: pages * RESULTS_PAGE_SIZE,
-        // don't limit the all fields request
+            // limit: pages * RESULTS_PAGE_SIZE,
           }), 
           this.handleAllFieldsResponse,
           this.handleError
@@ -458,8 +456,8 @@ class ResultsArea extends Classs<Props>
           {
             this.state.error ? 'Error with query' : 
             (
-              this.state.resultsWithAllFields ? 
-                `${this.state.resultsWithAllFields.length} results` 
+              this.state.results ? 
+                `${this.state.numResults} results` 
               : 'Text result'
             )
           }
@@ -514,7 +512,7 @@ class ResultsArea extends Classs<Props>
     if(this.state.showingConfig)
     {
       return <ResultsConfig
-        config={this.getResultsConfig()[this.props.algorithm.id]}
+        config={this.getResultsConfig()[this.props.query.id]}
         onClose={this.hideConfig}
         onConfigChange={this.handleConfigChange}
         results={this.state.results}
@@ -526,7 +524,7 @@ class ResultsArea extends Classs<Props>
   handleConfigChange(config:Config)
   {
     var resultsConfig = this.getResultsConfig();
-    resultsConfig[this.props.algorithm.id] = config;
+    resultsConfig[this.props.query.id] = config;
     localStorage['resultsConfig'] = JSON.stringify(resultsConfig);
     this.setState({
       resultsConfig: config,

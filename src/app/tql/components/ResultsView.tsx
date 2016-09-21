@@ -68,11 +68,13 @@ class ResultsView extends Classs<Props>
     error: any;
     querying: boolean;
     showErrorMessage: boolean;
+    resultsSpliced: number;
   } = {
     results: null,
     error: null,
     querying: false,
     showErrorMessage: false,
+    resultsSpliced: 0,
   };
 
   //If the component updates and the tql command has been changed, then query results
@@ -106,16 +108,29 @@ class ResultsView extends Classs<Props>
 
     if(this.state.error)
     {
-      if (this.state.error === 'No response was returned from the server.')
+      if (this.state.error === 'No response was returned from the server.' || ! this.state.error)
       {
         return (
           <div>
             <span className="error-title">
-            {this.state.error}
+              No response was returned from the server.
             </span>
           </div>
-        )
+        );
       }
+      
+      if(typeof this.state.error !== 'string')
+      {
+        return (
+          <div>
+            <span className="error-title">
+              { JSON.stringify(this.state.error) }
+            </span>
+          </div>
+        );
+      }
+      
+      console.log(this.state.error);
       var lineNum = (this.state.error).replace(/^\D+|\D+$/g, '');
       lineNum = parseInt(lineNum);
       var errorLineNumber = lineNum ? 'Error on line ' + lineNum : 'Error';
@@ -143,63 +158,74 @@ class ResultsView extends Classs<Props>
       return <div>Enter a TQL query above.</div>
     }
     
+    if(typeof this.state.results === 'string')
+    {
+      if(!this.state.results.length)
+      {
+        return <em> "" (empty string)</em>;
+      }
+      return <div>{this.state.results}</div>;
+    }
+    
     if(!this.state.results.length)
     {
-      return <div>"There are no results for your query."</div>;
+      return <div>There are no results for your query.</div>;
     }
+    
     var i = 0;
      return(
         <div>
           <ul className="results-list">
-          {this.state.results.map(function(result, i) {
-           i++;
-           return <li key={i}>{JSON.stringify(result)}</li>;
-          })}
+          {
+            this.state.results.map((result, i) =>
+              <li key={i}>{JSON.stringify(result)}</li>
+            )
+          }
         </ul>
+        {
+          this.state.resultsSpliced ? <em> And {this.state.resultsSpliced} more results </em> : null
+        }
         </div>
       );
   }
   
-  handleResultsChange(response, isAllFields?: boolean)
+  handleResultsChange(results)
   {
-    var result;
-    try {
-      var result = JSON.parse(response).result;
-    } catch(e) {
-      this.setState({
-        error: "No response was returned from the server.",
-        querying: false,
-      });
-      return; 
-    }
-
     this.props.onLoadEnd && this.props.onLoadEnd();
-    if(result)
+    if(results)
     {
-      if(result.error)
+      // if(result.error)
+      // {
+      //   this.setState({
+      //     error: "Error on line " + result.line+ ": " + result.error,
+      //     querying: false,
+      //     results: null,
+      //   });
+      // }
+      var spliced = 0;
+      if(typeof results === 'string')
       {
-        this.setState({
-          error: "Error on line " + result.line+ ": " + result.error,
-          querying: false,
-          results: null,
-        });
-      }
-      else if(result.raw_result)
-      {
-        this.setState({
-          error: "Error with query: " + result.raw_result,
-          querying: false,
-          results: null,
-        }); 
-      }
-      else
-      { 
-          this.setState({
-            results: result.value,
-            querying: false,
-            error: false,
-          });
+        if(results.length > 1000)
+        {
+          spliced = results.length - 1000;
+          results = results.substr(0, 1000) + '...';
         }
+      }
+      if(Array.isArray(results))
+      {
+        if(results.length > 25)
+        {
+          spliced = results.length - 25;
+          results.splice(25, results.length - 25);
+        }
+      }
+      
+      this.setState({
+        results,
+        querying: false,
+        error: false,
+        resultsSpliced: spliced,
+      });
     }
     else
     {
@@ -215,7 +241,8 @@ class ResultsView extends Classs<Props>
   {
     this.setState({
       error: true,
-    })
+      querying: false,
+    });
   }
   
   queryResults(tql)

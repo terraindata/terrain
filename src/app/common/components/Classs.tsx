@@ -78,6 +78,7 @@ class Classs<T> extends React.Component<T, any>
     let unmountFn = this['componentWillUnmount'];
     this['componentWillUnmount'] = () =>
     {
+      this._unmounted = true; // antipattern
       this.subscriptions.map(cancelSubscription => cancelSubscription());
       unmountFn && unmountFn();
     }
@@ -85,6 +86,7 @@ class Classs<T> extends React.Component<T, any>
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
   }
   
+  _unmounted = false;
   
   // subscribes to a Redux store
   _subscribe(
@@ -120,6 +122,11 @@ class Classs<T> extends React.Component<T, any>
 
   _update(store: Store, config: Config)
   {
+    if(this._unmounted)
+    {
+      return;
+    }
+    
     config.updater && config.updater(store.getState());
       
     if(config.stateKey)
@@ -159,17 +166,54 @@ class Classs<T> extends React.Component<T, any>
       keyPath: Immutable.List<string | number>,
     }
   } = {};
-  _ikeyPath(seed: Immutable.List<string | number>, ...keys: (string | number)[])
+  _ikeyPath(seed: Immutable.List<string | number>, ...keys: (string | number | (string | number)[])[])
   {
-    let str = keys.join("");
+    if(Array.isArray(keys[0]))
+    {
+      keys = keys[0] as any as (string | number)[];
+    }
+    
+    let str = seed.toArray().concat(keys as (string | number)[]).join("");
     if(!this._ikeyPaths[str] || this._ikeyPaths[str].seed !== seed)
     {
       this._ikeyPaths[str] = {
-        seed,
+        seed: seed,
         keyPath: seed.concat(keys) as Immutable.List<string | number>,
       }
     }
+    
     return this._ikeyPaths[str].keyPath;
+  }
+  
+  _fns: {
+    [name: string]: {
+      args: any[],
+      fn: () => void,
+    }[],
+  } = {};
+  _fn(fnName: string, ...args: any[]): (...args:any[]) => any
+  {
+    let fn = args.splice(args.length - 1, 1)[0];
+    var fns = this._fns[fnName];
+    if(!fns)
+    {
+      this._fns[fnName] = [{
+        args,
+        fn,
+      }];
+      return fn;
+    }
+    
+    for(var obj of fns)
+    {
+      if(obj.args.length === args.length && obj.args.every((e, i) => args[i] === e))
+      {
+        return obj.fn;
+      }
+    }
+    
+    this._fns[fnName].push({ args, fn });
+    return fn;
   }
 }
 

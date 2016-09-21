@@ -72,6 +72,7 @@ import Login from "./auth/components/Login.tsx";
 import InfoArea from "./common/components/InfoArea.tsx";
 import Placeholder from "./common/components/Placeholder.tsx";
 import Redirect from "./common/components/Redirect.tsx";
+import ManualWrapper from "./manual/components/ManualWrapper.tsx";
 var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
 import { Router, Route, IndexRoute } from 'react-router';
 import { createHistory } from 'history';
@@ -84,10 +85,14 @@ var BrowserIcon = require("./../images/icon_browser_20x16.svg?name=BrowserIcon")
 var BuilderIcon = require("./../images/icon_reporting_18x18.svg?name=BuilderIcon");
 var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIcon");
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
+var ManualIcon = require ("./../images/icon_info.svg")
 
 import AuthActions from "./auth/data/AuthActions.tsx";
+import BuilderActions from "./builder/data/BuilderActions.tsx";
 import AuthStore from "./auth/data/AuthStore.tsx";
 import UserActions from "./users/data/UserActions.tsx";
+import { InAppNotification } from './common/components/InAppNotification.tsx';
+
 
 var links = 
 [
@@ -111,6 +116,11 @@ var links =
     text: 'Builder',
     route: '/builder',
   },
+  {
+    icon: <ManualIcon />,
+    text: 'Manual',
+    route: '/manual',
+  }
 ];
 
 var App = React.createClass({
@@ -198,13 +208,21 @@ var App = React.createClass({
     return <LayoutManager layout={layout} />;
   },
   
+  handleMouseMove(e:Event)
+  {
+    BuilderActions.hoverCard(null);
+  },
+
   render ()
   {
     return (
-      <div className='app'>
+      <div
+        className='app'
+        onMouseMove={this.handleMouseMove}
+      >
         <div className='app-top-bar'>
           <TerrainIcon className='app-top-bar-icon' />
-          { this.state.loggedIn ? <AccountDropdown onLogout={this.handleLogout} /> : null }
+          { this.state.loggedIn && <AccountDropdown onLogout={this.handleLogout} history={this.props.history} /> }
         </div>
         <div className='app-wrapper'>
           { this.renderApp() }
@@ -216,10 +234,14 @@ var App = React.createClass({
           class="tooltip"
           hideOnClick={true}
         />
+
+        <InAppNotification />
+        
       </div>
     );
-  }
+  },
 });
+
 
 var router = (
   <Router history={history}>
@@ -244,12 +266,16 @@ var router = (
         <Route path="/account/team" component={Team} />
       </Route>
       
+      <Route path="/manual" component={ManualWrapper} />
+      <Route path="/manual/:term" component={ManualWrapper} />
+      
       <Route path="/users/:username" component={Profile} />
       
       <Route path="/reporting" component={Placeholder} />
       
       <Route path="/x" component={X} />
       <Route path="/x/:x" component={X} />
+
     </Route>
   </Router>
 );

@@ -43,10 +43,17 @@ THE SOFTWARE.
 */
 
 require('./CardField.less');
+import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
 import Util from '../../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
+import PureClasss from '../../../common/components/PureClasss.tsx';
+import BuilderComponent from '../BuilderComponent.tsx';
+import {Display} from '../../BuilderDisplays.tsx';
+import ManualInfo from '../../../manual/components/ManualInfo.tsx';
+import { CardItem } from './Card.tsx';
+import CardDropArea from './CardDropArea.tsx';
+const classNames = require('classnames');
 
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 var RemoveIcon = require("./../../../../images/icon_close_8x8.svg?name=RemoveIcon");
@@ -54,164 +61,407 @@ var RemoveIcon = require("./../../../../images/icon_close_8x8.svg?name=RemoveIco
 var FIELD_HEIGHT = 32;
 var STANDARD_MARGIN = 6;
 
-var CardField = React.createClass({
-	mixins: [PanelMixin],
-
-	propTypes:
-	{
-		value: React.PropTypes.string,
-    addable: React.PropTypes.bool,
-    onAdd: React.PropTypes.func,
-    removable: React.PropTypes.bool,
-		onDelete: React.PropTypes.func,
-    draggable: React.PropTypes.bool,
-    onChange: React.PropTypes.func,
-    index: React.PropTypes.number,
-    height: React.PropTypes.number,
-    rightContent: React.PropTypes.node,
-    aboveContent: React.PropTypes.node,
-    belowContent: React.PropTypes.node,
-	},
-
-	getDefaultProps():any 
-	{
-		return {
-			drag_x: false,
-			drag_y: false,
-			dragInsideOnly: true,
-			reorderOnDrag: true,
-			value: '',
-			handleRef: 'handle',
-		};
-	},
+interface Props
+{
+  index: number;
+  onAdd: (index: number) => void;
+  onRemove: (index: number) => void;
+  onMove: (index: number, newIndex: number) => void;
   
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  },
+  isSingle?: boolean;
+  isFirstRow?: boolean;
+  isOnlyRow?: boolean;
+
+  row: {
+    inner: Display | Display[];
+    above?: Display | Display[];
+    below?: Display | Display[];
+    hideToolsWhenNotString?: boolean;
+  }
+  keyPath: KeyPath;
+  data: any; // record
+  canEdit: boolean;
+  keys: List<string>;
   
-  componentDidMount()
+  parentData?: any;
+  // provide parentData if necessary but avoid if possible
+  // as it will cause re-renders
+  helpOn?: boolean;
+  addColumn?: (number, string?) => void;
+  columnIndex?: number;
+}
+
+interface IMoveState
+{
+  moving: boolean;
+  originalMouseY?: number;
+  originalElTop?: number;
+  originalElBottom?: number;
+  elHeight?: number;
+  dY?: number;
+  minDY?: number;
+  maxDY?: number;
+  midpoints?: number[];
+  tops?: number[];
+  movedTo?: number;
+}
+
+const DefaultMoveState: IMoveState =
+{
+  moving: false,
+  movedTo: null,
+}
+
+  const shallowCompare = require('react-addons-shallow-compare');
+// TODO consider adding state to the template
+class CardField extends PureClasss<Props>
+{
+  state: IMoveState = DefaultMoveState;
+  
+  ss(state: IMoveState)
   {
-    // $(this.refs.panel).height(0);
-    // Util.animateToAutoHeight(this.refs.panel);
-  },
-
-	willReceiveNewProps(newProps)
+    this.setState(state);
+  }
+  
+	removeField(event)
 	{
-		this.setState({
-			value: newProps.value,
-		});
-	},
-
-	getInitialState()
-	{
-		return {
-			value: this.props.value,
-		};
-	},
-
-	handleChange(event)
-	{
-		this.setState({
-			value: event.target.value,
-		});
-
-		this.props.onChange(event.target.value);
-	},
-
-	deleteField(event)
-	{
-		if(typeof this.props.onDelete === 'function')
-		{
-      Util.animateToHeight(this.refs.panel, 0, () =>
-			  this.props.onDelete(this.props.index));
-		}
-	},
+    Util.animateToHeight(this.refs['all'], 0, () =>
+		  this.props.onRemove(this.props.index));
+	}
   
   addField(event)
   {
-    if(this.props.addable)
+    this.props.onAdd(this.props.index + 1);
+  }
+  
+  addFieldTop(event)
+  {
+    this.props.onAdd(0);
+  }
+  
+  handleHandleMousedown(event:MEvent)
+  {
+    $('body').on('mousemove', this.handleMouseMove);
+    $('body').on('mouseup', this.handleMouseUp);
+    $('body').on('mouseleave', this.handleMouseUp);
+    
+    let parent = Util.parentNode(this.refs['all']);
+    
+    let cr = this.refs['all']['getBoundingClientRect']();
+    let parentCr = parent['getBoundingClientRect']();
+    
+    let minDY = parentCr.top - cr.top;
+    let maxDY = parentCr.bottom - cr.bottom;
+    
+    let siblings = Util.siblings(this.refs['all']);
+    let midpoints = [];
+    let tops = [];
+    _.range(0, siblings.length).map(i =>
     {
-      this.props.onAdd(this.props.index);
+      let sibCr = siblings[i]['getBoundingClientRect']();
+      midpoints.push((sibCr.top + sibCr.bottom) / 2); // - (i > this.props.index ? cr.height /**/ : 0));
+      tops.push(sibCr.top);
+    });
+    
+    this.setState({
+      moving: true,
+      originalMouseY: event.pageY,
+      originalElTop: cr.top,
+      originalElBottom: cr.bottom,
+      elHeight: cr.height,
+      dY: 0,
+      minDY,
+      maxDY,
+      midpoints,
+      tops,
+    } as IMoveState);
+  }
+  
+  shiftSiblings(evt, shiftSelf:boolean): ({ dY: number, index: number })
+  {
+    let dY = Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY);
+  
+    // TODO search from the bottom up if dragging downwards  
+    if(dY < 0)
+    {
+      // if dragged up, search from top down
+      for
+      (
+        var index = 0;
+        this.state.midpoints[index] < this.state.originalElTop + dY;
+        index ++
+      );
     }
-  },
-
-	render() {
-		var leftContent;
-		var rightContent;
-		if(this.props.draggable)
-		{
-			leftContent = (
-				<div className='card-field-handle' ref='handle'>⋮⋮</div>
-			);
-		}
-    else if(this.props.leftContent)
+    else
     {
-      leftContent = this.props.leftContent;
+      for
+      (
+        var index = this.state.midpoints.length - 1;
+        this.state.midpoints[index] > this.state.originalElBottom + dY;
+        index --
+      );
+    }
+  
+    let sibs = Util.siblings(this.refs['all']);
+    _.range(0, sibs.length).map(i =>
+    {
+      let el = sibs[i];
+      if(i === this.props.index)
+      {
+        $(el).removeClass('card-field-wrapper-moving');
+        return;
+      }
+      
+      var shift = 0;
+      if(index < this.props.index)
+      {
+        // move things down
+        if(i < this.props.index && i >= index)
+        {
+          shift = 1;
+        }
+      }
+      else
+      {
+        // move up
+        if(i > this.props.index && i <= index)
+        {
+          shift = -1;
+        }
+      }
+      
+      el['style'].top = shift * this.state.elHeight;
+      $(el).addClass('card-field-wrapper-moving');
+    });
+    
+    return { dY, index };
+  }
+  
+  handleMouseMove(evt)
+  {
+    this.setState({
+      dY: this.shiftSiblings(evt, false).dY,
+    });
+    evt.preventDefault();
+    evt.stopPropagation();
+  }
+  
+  move()
+  {
+    if(this.props.index !== this.state.movedTo)
+    {
+      this.props.onMove(this.props.index, this.state.movedTo);
+    }
+    else
+    {
+      this.setState({
+        movedTo: null,
+        moving: false,
+      });
     }
     
-		rightContent = (
-      <div>
-        { 
-          this.props.addable &&
-          <div
-            className='card-field-add'
-            onClick={this.addField}
-            data-tip='Add another'
-          >
-            <AddIcon />
-          </div> 
-        }
-			  { 
-          this.props.removable && 
-          <div
-            className='card-field-remove'
-            onClick={this.deleteField}
-            data-tip='Remove'
-          >
-            <RemoveIcon />
-          </div>
-        }
-      </div>
-		);
-    
-    if(this.props.rightContent)
+    $('.card-field-wrapper-moving').removeClass('card-field-wrapper-moving');
+  }
+  
+  componentWillReceiveProps(nextProps: Props)
+  {
+    if(nextProps.index !== this.props.index)
     {
-      rightContent = this.props.rightContent;
+      this.setState({
+        movedTo: null,
+        moving: false,
+      });
+      let sibs = Util.siblings(this.refs['all']);
+      _.range(0, sibs.length).map(i =>
+        sibs[i]['style'].top = 0
+      );
     }
+  }
+  
+  handleMouseUp(evt)
+  {
+    $('body').off('mousemove', this.handleMouseMove);
+    $('body').off('mouseup', this.handleMouseUp);
+    $('body').off('mouseleave', this.handleMouseUp);
+    
+    let {index} = this.shiftSiblings(evt, true);
+    
+    setTimeout(this.move, 150);
+    
+    this.setState({
+      movedTo: index,
+    });
+  }
+  
+  beforeTopAddDrop(item:CardItem, targetProps)
+  {
+    this.props.onAdd(0);
+  }
 
-		return this.renderPanel((
-      <div>
-        { this.props.aboveContent }
-			  <div className={Util.objToClassname({
+	render()
+  {
+    var style = null;
+    if(this.state.movedTo !== null)
+    {
+      style = {
+        top: this.state.tops[this.state.movedTo] - this.state.originalElTop,
+      };
+    }
+    else if(this.state.moving)
+    {
+      style = {
+        top: this.state.dY,
+        zIndex: 99999,
+      };
+    }
+    
+    let {row} = this.props;
+    
+    let renderTools = ! row.hideToolsWhenNotString || typeof this.props.data[this.props.row.inner['key']] === 'string';
+    
+    return (
+      <div
+        ref='all'
+        className={classNames({
+          'card-field-wrapper': true,
+          'card-field-wrapper-moving': this.state.movedTo !== null,
+          'card-field-wrapper-first': this.props.isFirstRow,
+        })}
+        style={style}
+      >
+        { ! row.above ? null :
+            <BuilderComponent
+              display={this.props.row.above}
+              keyPath={this.props.keyPath}
+              data={this.props.data}
+              canEdit={this.props.canEdit}
+              keys={this.props.keys}
+              parentData={this.props.parentData}
+              helpOn={this.props.helpOn}
+              addColumn={this.props.addColumn}
+              columnIndex={this.props.columnIndex}
+            />
+        }
+        <div
+          className={classNames({
             'card-field': true,
-            'card-field-no-left': this.props.noLeft,
+            'card-field-moving': this.state.moving,
+            'card-field-single': this.props.isSingle,
+            // ^ hides the left drag handle if single
+            'card-field-editable': this.props.canEdit,
           })}
-          style={{ minHeight: this.props.height }}
           ref='cardField'
-          >
-          { leftContent ? (
-    				<div className='card-field-tools-left'>
-              <div className='card-field-tools-left-inner'>
-                { leftContent }
+        >
+          {
+            !renderTools && this.props.canEdit && this.props.isFirstRow &&
+              <div
+                className='card-field-top-add card-field-add'
+                onClick={this.addFieldTop}
+                data-tip={'Add another'}
+              >
+                <AddIcon />
+                <CardDropArea
+                  index={null}
+                  keyPath={this._ikeyPath(this.props.keyPath, (row.inner as Display).key)}
+                  beforeDrop={this.beforeTopAddDrop}
+                />
               </div>
-            </div>
-          ) : null }
+          }
+          {
+            renderTools && this.props.canEdit &&
+      				<div className='card-field-tools-left'>
+                <div className='card-field-tools-left-inner'>
+                  <div
+                    className='card-field-handle'
+                    onMouseDown={this.handleHandleMousedown}
+                  >
+                    ⋮⋮
+                  </div>
+                  {
+                      this.props.helpOn ?
+                      <ManualInfo 
+                        information="Can move fields around within the current card by dragging and dropping"
+                        className='card-field-manual-info'
+                        leftSide={true}
+                      />
+                      : null
+                    }
+                </div>
+              </div>
+          }
   				<div className='card-field-inner' >
-  					{ this.props.children }
+            <BuilderComponent
+    					display={row.inner}
+              keyPath={this.props.keyPath}
+              data={this.props.data}
+              canEdit={this.props.canEdit}
+              keys={this.props.keys}
+              parentData={this.props.parentData}
+              helpOn={this.props.helpOn}
+              addColumn={this.props.addColumn}
+              columnIndex={this.props.columnIndex}
+            />
   				</div>
-          { rightContent ? (
-  				<div className='card-field-tools-right'>
-            <div className='card-field-tools-right-inner'>
-              { rightContent }
-            </div>
-          </div>
-          ) : null }
+          {
+            renderTools && this.props.canEdit &&
+      				<div className='card-field-tools-right'>
+                <div className='card-field-tools-right-inner'>
+                  <div>
+                    <div
+                      className='card-field-add'
+                      onClick={this.addField}
+                      data-tip={'Add another'}
+                    >
+                      <AddIcon />
+                    </div> 
+                    {
+                      this.props.helpOn ?
+                      <ManualInfo 
+                        information="Can add field using the plus button or remove fields using the x button"
+                        rightSide={true}
+                        className='card-field-manual-info'
+                      />
+                      : null
+                    }
+                    {
+                      !this.props.isOnlyRow &&
+                        <div
+                          className='card-field-remove'
+                          onClick={this.removeField}
+                          data-tip={'Remove'}
+                        >
+                          <RemoveIcon />
+                        </div>
+                    }
+                  </div>
+                </div>
+              </div>
+           }
   			</div>
-        { this.props.belowContent }
+        { ! row.below ? null :
+            <div
+              className={classNames({
+                'card-field-below': true,
+                'card-field-below-first': this.props.isFirstRow,
+                'card-field-below-data': !renderTools,
+              })}
+            >
+              <BuilderComponent
+                display={this.props.row.below}
+                keyPath={this.props.keyPath}
+                data={this.props.data}
+                canEdit={this.props.canEdit}
+                keys={this.props.keys}
+                parentData={this.props.parentData}
+                helpOn={this.props.helpOn}
+                addColumn={this.props.addColumn}
+                columnIndex={this.props.columnIndex}
+              />
+            </div>
+        }
       </div>
-			), 'card-field-panel-wrapper');
-	},
-});
+	  );
+	}
+}
 
 export default CardField;

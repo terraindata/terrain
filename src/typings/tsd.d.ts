@@ -43,17 +43,31 @@ THE SOFTWARE.
 */
 
 
-/// <reference path="react/react.d.ts" />
+/// <reference path="./react/react.d.ts" />
 /// <reference path="../../node_modules/immutable/dist/Immutable.d.ts" />
 
 /// <reference path="redux-actions/redux-actions.d.ts" />
 /// <reference path="react/react-dom.d.ts" />
 
+import React = __React;
 
 interface Array<T> {
   find(predicate: (search: T) => boolean) : T;
   findIndex(predicate: (search: T) => boolean) : number;
 }
+
+declare type List<T> = Immutable.List<T>;
+declare type Map<K, T> = Immutable.Map<K, T>;
+declare type KeyPath = List<string | number>;
+declare interface IHaveKeyPath
+{
+  keyPath: KeyPath;
+}
+
+declare type El = JSX.Element;
+declare type Ref = React.Component<any, any> | Element;
+
+declare type MEvent = React.MouseEvent;
 
 declare type ID = string;
 declare interface IId
@@ -67,6 +81,9 @@ declare interface IName
 
 // SERVER_URL is a "compile time" substition done by Webpack.
 declare var SERVER_URL: string;
+
+declare const escape: (s:string) => string;
+declare const unescape: (s:string) => string;
 
 // DEV is a "compile time" substition done by Webpack.
 declare var DEV: boolean;

@@ -130,7 +130,7 @@ class AccountDropdown extends Classs<Props>
   
   editProfile() 
   {
-    this.props.history.pushState({}, '/profile/edit');
+    this.props.history.pushState({}, '/account/profile/edit');
   }
 
   renderDropdown()

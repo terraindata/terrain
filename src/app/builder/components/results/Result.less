@@ -268,6 +268,9 @@
       overflow: hidden;
       
       .result-field-value {
+        .can-select; 
+        .force-select;
+        
         white-space: normal !important;
         margin-top: 3px;
         
@@ -312,6 +315,7 @@
   .results-area-results {
     height: calc(~"100% - @{top-height}");
     overflow-y: auto;
+    margin-right: 6px;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;

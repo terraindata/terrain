@@ -90,7 +90,7 @@ var Periscope = {
   update(el, state)
   {
     state.numBars = 10;
-    var scales = this._scales(el, state.maxRange, state.domain, state.barsData, state.width, state.height);
+    var scales = this._scales(el, state.maxDomain, state.domain, state.barsData, state.width, state.height);
     this._draw(el, scales, state.domain, state.barsData, state.onDomainChange, state.onDomainChangeStart);
   },
   
@@ -239,9 +239,9 @@ var Periscope = {
     this._drawHandles(el, scales, domain, onDomainChange, onDomainChangeStart);
   },
   
-  _scales(el, range, domain, barsData, stateWidth, stateHeight)
+  _scales(el, maxDomain, domainAndRange, barsData, stateWidth, stateHeight)
   {
-    if(!domain)
+    if(!domainAndRange)
     {
       return null;
     }
@@ -250,19 +250,19 @@ var Periscope = {
     
     var x = d3.scale.linear()
       .range([xMargin, width])
-      .domain(range);
+      .domain(maxDomain);
     
     var realX = d3.scale.linear()
       .range([0, width - xMargin])
-      .domain(range);
+      .domain(maxDomain);
     
     var pointY = d3.scale.linear()
       .range([height - yMargin, 0])
-      .domain(domain.y);
+      .domain(domainAndRange.y);
     
     var realPointY = d3.scale.linear()
       .range([height - yMargin, 0])
-      .domain(domain.y);
+      .domain(domainAndRange.y);
     
     var barsMax = barsData.reduce((max, bar) =>
       (max === false || bar.percentage > max ? bar.percentage : max)

@@ -203,20 +203,20 @@ input {
 }
 
 .can-select {
-  -o-user-select: text;
-    -moz-user-select: text;
-    -webkit-user-select: text;
-    user-select: text;
+  -o-user-select: text !important;
+    -moz-user-select: text !important;
+    -webkit-user-select: text !important;
+    user-select: text !important;
 }
 
 .close {
   display: inline-block;
-  fill: @grey;
+  fill: #fff;
   width: 12px;
   height: 12px;
   border-radius: 12px;
   .transition;
-  background: rgba(255,0,0,0);
+  background: transparent;
 
   &:hover {
     fill: #fff;
@@ -370,5 +370,21 @@ input {
 
 .strike {
   text-decoration: line-through;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -khtml-user-select: none;    /* Konqueror */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* Internet Explorer/Edge */
+  user-select: none;           /* Non-prefixed version, currently */
+}
+
+.force-select {  
+  -webkit-user-select: all;  /* Chrome 49+ */
+  -moz-user-select: all;     /* Firefox 43+ */
+  -ms-user-select: all;      /* No support yet */
+  user-select: all;          /* Likely future */   
 }
 

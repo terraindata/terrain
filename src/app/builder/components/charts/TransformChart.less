@@ -7,10 +7,39 @@
 @bg: #dbf7fb;
 @text: fade(@trans-black, 50%);
 
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+.point-edit-menu {
+  width: 70px;
+  background: #14849f;
+  border-radius: 6px;
+  padding: 4px 8px 6px 8px;
+    input {
+      margin-top: 2px;
+      margin-left: 2px;
+      font-size: 12px;
+      height: 14px;
+      width: 58px;
+      background-color: #c6ebf0;
+      color: #14849f;
+    }
+    label {
+      color: white;
+      font-size: 14px;
+      margin-right: 1px;
+    }
+  }
+
+
 .transform-chart {
   width: 100%;
   height: auto;
   max-width: 700px;
+  margin: @standard-margin 0px;
   
   .bg {
     fill: @bg;
@@ -37,7 +66,6 @@
     fill: #fff;
     stroke: @line;
     stroke-width: 3px;
-    
     &:not(.point-disabled) {
       &:hover,
       &[active="1"] {
@@ -60,7 +88,6 @@
     stroke: @line;
     stroke-width: 5px;
     fill: none;
-    
     .transition(~"stroke 0.15s");
     
     &:hover:not(.lines-disabled) {
@@ -102,22 +129,44 @@
   
   .right-menu {
     rect {
-      fill: rgba(0,0,0,0.75);
-      .transition;
+       fill: #14849f;  
     }
-    
+
     &:hover {
       rect {
-        fill: rgba(0,0,0,0.95);
+        fill: #1db7ca;
       }
+    }
+    circle {
+      fill: #999;
     }
     
     text {
       fill: #fff;
-      font-size: 16px;
-      // opacity: 0.95;
+      font-size: 12px;
       font-weight: 200;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
     }
   }
+
+  .crosshairs, .transform-tooltip {
+    rect {
+      fill: #14849f;
+    } 
+    
+    text {
+      fill: #fff;
+      font-size: 12px;
+      font-weight: 200;
+      letter-spacing: 0.3px;
+      text-anchor: start;
+    }
+  }
+
+  .crosshairs-line {
+      fill: none;
+      stroke-width: 1px;
+      stroke: #14849f;
+      pointer-events: none;
+    }
 }

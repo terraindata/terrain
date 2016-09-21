@@ -43,59 +43,48 @@ THE SOFTWARE.
 */
 
 require('./CreateCardTool.less')
-var shallowCompare = require('react-addons-shallow-compare');
 import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../data/BuilderActions.tsx";
 import Util from '../../../util/Util.tsx';
-import { CardTypes, CardColors } from './../../CommonVars.tsx';
-import CreateLine from "../../../common/components/CreateLine.tsx";
-import { DragSource, DropTarget } from 'react-dnd';
+import BuilderTypes from './../../BuilderTypes.tsx';
+let {CardTypes} = BuilderTypes;
+import PureClasss from '../../../common/components/PureClasss.tsx';
+import CardDropArea from './CardDropArea.tsx';
 
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
 
-interface Props {
+interface Props
+{
   index: number;
-  open?: boolean;
-  parentId: string;
+  keyPath: KeyPath;
   canEdit: boolean;
+  
+  open?: boolean;
   dy?: number;
   className?: string;
   onMinimize?: () => void;
-  isOverCurrent?: boolean;
-  connectDropTarget?: (Element) => JSX.Element;
 }
 
-var styles: any = {};
-CardTypes.map(type => 
-  styles[type] =
-  {
-    background: CardColors[type] ? CardColors[type][0] : CardColors['none'][0],
-    borderColor: CardColors[type] ? CardColors[type][1] : CardColors['none'][1],
-  }
-);
-
-class CreateCardTool extends React.Component<Props, any>
+class CreateCardTool extends PureClasss<Props>
 {
-  constructor(props:Props)
+  createCard(event)
   {
-    super(props);
-    Util.bind(this, 'createCard');
-  }
-  
-  shouldComponentUpdate(nextProps, nextState) {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
-  }
-  
-  createCard(event) {
     if(this.props.open && this.props.onMinimize)
     {
       this.props.onMinimize();
     }
     
     var type = Util.rel(event.target);
-    Actions.cards.create(this.props.parentId, type, this.props.index);
+    if(this.props.index === null)
+    {
+      Actions.change(this.props.keyPath, BuilderTypes.make(BuilderTypes.Blocks[type]));
+    }
+    else
+    {
+      Actions.create(this.props.keyPath, this.props.index, type);
+    }
   }
   
   // componentWillReceiveProps(newProps)
@@ -122,43 +111,49 @@ class CreateCardTool extends React.Component<Props, any>
   //   }
   // }
   
-  renderCardSelector() {
+  renderCardSelector()
+  {
     return (
      <div className='create-card-selector' ref='ccWrapper'>
        <div className='create-card-selector-inner'>
          {
-           CardTypes.map((type, index) => (
-             <a
-               className="create-card-button"
-               key={type}
-               rel={type}
-               onClick={this.createCard}
-               style={styles[type]}
-             >
-               <div className="create-card-button-inner" rel={type}>
-                 { type === 'parentheses' ? '( )' : type }
-               </div>
-             </a>
-           ))
+           _.map(CardTypes as any, (type:string) => 
+           {
+             let card = BuilderTypes.make(BuilderTypes.Blocks[type]);
+             return (
+               <a
+                 className="create-card-button"
+                 key={type}
+                 rel={type}
+                 onClick={this.createCard}
+                 style={{
+                   backgroundColor: card.static.colors[0],
+                 }}
+                 data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
+               >
+                 <div className="create-card-button-inner" rel={type}>
+                   { card.static.title }
+                 </div>
+               </a>
+             );
+           })
          }
        </div>
      </div>
-     );
+    );
   }
   
-  render() {
+  render()
+  {
     if(!this.props.open || !this.props.canEdit)
     {
       return null;
     }
     
-    const { isOverCurrent, connectDropTarget } = this.props;
     var classes = Util.objToClassname({
       "create-card-wrapper": true,
       "create-card-open": this.props.open,
       "create-card-closed": !this.props.open,
-      "create-card-wrapper-drag-over": isOverCurrent,
-      "card-drop-target": true
     });
     classes += ' ' + this.props.className;
     
@@ -171,40 +166,45 @@ class CreateCardTool extends React.Component<Props, any>
       }
     }
     
-    return connectDropTarget(
+    return (
       <div className={classes} style={style}>
         { this.renderCardSelector() }
+        <CardDropArea
+          index={this.props.index}
+          keyPath={this.props.keyPath}
+        />
      </div>
    );
   }
 };
 
+export default CreateCardTool;
 
-const cardTarget = 
-{
-  canDrop(props, monitor)
-  {
-    return true;
-  },
+// const cardTarget = 
+// {
+//   canDrop(props, monitor)
+//   {
+//     return true;
+//   },
   
-  drop(props, monitor, component)
-  {
-    const item = monitor.getItem();
-    if(monitor.isOver({ shallow: true}))
-    {
-      props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
+//   drop(props, monitor, component)
+//   {
+//     const item = monitor.getItem();
+//     if(monitor.isOver({ shallow: true}))
+//     {
+//       props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
       
-      setTimeout(() =>
-      {
-        Actions.cards.move(item, props.index || 0, props.parentId);
-      }, 250);
-    }
-  }
-}
+//       setTimeout(() =>
+//       {
+//         // Actions.cards.move(item, props.index || 0, props.parentId); // TODO
+//       }, 250);
+//     }
+//   }
+// }
 
-const dropCollect = (connect, monitor) =>
-({
-  connectDropTarget: connect.dropTarget(),
-});
+// const dropCollect = (connect, monitor) =>
+// ({
+//   connectDropTarget: connect.dropTarget(),
+// });
 
-export default DropTarget('CARD', cardTarget, dropCollect)(CreateCardTool);
+// export default DropTarget('CARD', cardTarget, dropCollect)(CreateCardTool);

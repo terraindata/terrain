@@ -45,6 +45,8 @@ THE SOFTWARE.
 require('./Input.less');
 var _ = require('underscore');
 import * as React from 'react';
+import * as Immutable from 'immutable';
+const {List} = Immutable;
 import Util from '../../../util/Util.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import PanelMixin from '../layout/PanelMixin.tsx';
@@ -53,6 +55,7 @@ import Menu from '../../../common/components/Menu.tsx';
 import CreateLine from '../../../common/components/CreateLine.tsx';
 import DatePicker from '../../../common/components/DatePicker.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
+const shallowCompare = require('react-addons-shallow-compare');
 
 var TextIcon = require("./../../../../images/icon_textDropdown.svg");
 var DateIcon = require("./../../../../images/icon_dateDropdown.svg");
@@ -69,7 +72,42 @@ var Input = React.createClass<any, any>({
 	{
 		input: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
+    queryId: React.PropTypes.string.isRequired,
+    // since inputs still are regular classes, instead of PureClasss, we construct keyPaths for Actions on execution
+    //  rather than caching. This is fine since inputs aren't nested, there would be no
+    //  benefit to caching keyPaths anyways.
 	},
+  
+  getInitialState()
+  {
+    return this.computeKeyPaths(this.props);
+  },
+  
+  computeKeyPaths(props)
+  {
+    let parentKeyPath = Immutable.List(['queries', props.queryId, 'inputs']);
+    let keyPath = parentKeyPath.push(props.index);
+    return {
+      keyPath,
+      parentKeyPath,
+      valueKeyPath: keyPath.push('value'),
+      keyKeyPath: keyPath.push('key'),
+      typeKeyPath: keyPath.push('inputType'),
+    };
+  },
+  
+  componentWillReceiveProps(nextProps)
+  {
+    if(nextProps.queryId !== this.props.queryId || nextProps.index !== this.props.index)
+    {
+      this.setState(this.computeKeyPaths(nextProps));
+    }
+  },
+  
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return shallowCompare(this, nextProps, nextState);
+  },
 
 	getDefaultProps() 
 	{
@@ -80,75 +118,69 @@ var Input = React.createClass<any, any>({
 		};
 	},
   
-	changeKey(value: string)
-	{
-		Actions.inputs.changeKey(this.props.input, value, this.props.index);
-	},
-
-	changeValue(value: string)
-	{
-		Actions.inputs.changeValue(this.props.input, value, this.props.index);
-	},
-  
   convertToDate()
   {
-    Actions.inputs.changeType(this.props.input, BuilderTypes.InputType.DATE, this.props.index);
+    Actions.change(this.state.typeKeyPath, InputType.DATE);
   },
   
   convertToText()
   {
-    Actions.inputs.changeType(this.props.input, BuilderTypes.InputType.TEXT, this.props.index);
+    Actions.change(this.state.typeKeyPath, InputType.TEXT);
   },
   
   convertToNumber()
   {
-    Actions.inputs.changeType(this.props.input, BuilderTypes.InputType.NUMBER, this.props.index);
+    Actions.change(this.state.typeKeyPath, InputType.NUMBER);
   },
 
   closeInput()
   {
     Util.animateToHeight(this.refs.input, 0);
     setTimeout(() => {
-      Actions.inputs.remove(this.props.input)
+      Actions.remove(this.state.parentKeyPath, this.props.index)
     }, 250);
   },
   
   createInput()
   {
-    Actions.inputs.create(this.props.input.parentId, this.props.index);
+    Actions.create(this.state.parentKeyPath, this.props.index, 'input');
   },
 
   getMenuOptions()
   {
-    return [
+    return List([
       {
         text: 'Number',
         onClick: this.convertToNumber,
-        disabled: this.props.input.type === InputType.NUMBER,
+        disabled: this.props.input.inputType === InputType.NUMBER,
         icon: <NumberIcon />, 
         iconColor: '#805DA8',
       },
       {
         text: 'Text',
         onClick: this.convertToText,
-        disabled: this.props.input.type === InputType.TEXT,
+        disabled: this.props.input.inputType === InputType.TEXT,
         icon: <TextIcon />, 
         iconColor: '#31B2BC',
       },
       {
         text: 'Date',
         onClick: this.convertToDate,
-        disabled: this.props.input.type === InputType.DATE,
+        disabled: this.props.input.inputType === InputType.DATE,
         icon: <DateIcon />, 
         iconColor: '#FF735B',
       },
-    ];
+    ]);
   },
-
+  
+  changeValue(value)
+  {
+    Actions.change(this.state.valueKeyPath, value);
+  },
   
   renderInputValue()
   {
-    if(this.props.input.type === BuilderTypes.InputType.DATE)
+    if(this.props.input.inputType === BuilderTypes.InputType.DATE)
     {
       return (
         <div>
@@ -161,14 +193,15 @@ var Input = React.createClass<any, any>({
       );
     }
     
+
     return (
       <BuilderTextbox
-        {...this.props}
         canEdit={true}
         value={this.props.input.value}
         className="input-text input-text-second"
-        id={this.props.input.id}
-        keyPath={['value']}
+        keyPath={this.state.valueKeyPath}
+        isNumber={this.props.input.inputType === BuilderTypes.InputType.NUMBER}
+        typeErrorMessage="That is not a number"
       />
     );
   },
@@ -179,22 +212,20 @@ var Input = React.createClass<any, any>({
   },
 
 	render() {
-		return this.renderPanel((
+    // return this.renderPanel((
+		return (
 			<div className='input' ref='input'>
         <CreateLine open={false} onClick={this.createInput} />
         <div className='input-inner'>
           <div className='input-top-row'>
             <BuilderTextbox
-              {...this.props}
               canEdit={true}
               value={this.props.input.key}
               className="input-text input-text-first input-borderless"
-              id={this.props.input.id}
-              keyPath={['key']}
+              keyPath={this.state.keyKeyPath}
             />
             <Menu 
-              options={this.getMenuOptions()} 
-              style={{right:'28px'}}
+              options={this.getMenuOptions()}
             />
             <div className='input-close' onClick={this.closeInput}> 
               <CloseIcon /> 
@@ -207,7 +238,7 @@ var Input = React.createClass<any, any>({
           </div>
         </div>
 			</div>
-		));
+		);
 	},
 });
 

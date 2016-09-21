@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./Tabs.less');
+import * as moment from 'moment';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as _ from 'underscore';
@@ -72,7 +73,22 @@ var Tab = React.createClass<any, any>({
     onClick: React.PropTypes.func.isRequired,
     onClose: React.PropTypes.func.isRequired,
   },
-  
+
+  handleResize: function(e) {
+    this.setState({
+      zoom: (window.outerWidth - 8) / window.innerWidth,
+    });
+  },
+
+  componentDidMount: function() {
+    this.handleResize();
+    window.addEventListener('resize', this.handleResize);
+  },
+
+  componentWillUnmount: function() {
+    window.removeEventListener('resize', this.handleResize);
+  },
+
   getDefaultProps(): any
   {
     return {
@@ -118,37 +134,53 @@ var Tab = React.createClass<any, any>({
       <div
         className='tabs-close'
         onClick={this.close}
-        data-tip='Close'
       >
-        <CloseIcon className='close' />
+        <CloseIcon className='close close-icon' />
       </div>
     );
   },
-  
-  render() {
-    return this.renderPanel(
-      <div 
-        className={Util.objToClassname({
-          'tabs-tab': true,
-          'tabs-tab-selected': this.props.selected,
-          'tabs-tab-no-bg': this.props.fixed,
-          })}
-        key={this.props.id}
-        style={this.zIndexStyle()}
-        onClick={this.handleClick}>
-          { this.props.fixed ? null :
-            <TabIcon className='tab-icon tab-icon-left' />
-          }
-          <div className='tab-inner'>
-            { this.props.name }
-            { this.renderClose() }
-          </div>
-          { this.props.fixed ? null :
-            <TabIcon className='tab-icon tab-icon-right' />
-          }
-      </div>
-    );
-  },
+
+render() {
+    var topStyle = '-17px';
+    if(this.state.zoom < 0.8)
+    {
+      topStyle = '-15px';
+    } 
+    if(this.state.zoom < 0.7)
+    {
+      topStyle = '-13px';
+    }
+    if(this.state.zoom < 0.6)
+    {
+      topStyle = '-8px';
+    }
+
+    return this.renderPanel(
+      <div 
+        className={Util.objToClassname({
+          'tabs-tab': true,
+          'tabs-tab-selected': this.props.selected,
+          'tabs-tab-no-bg': this.props.fixed,
+          })}
+        key={this.props.id}
+        style={this.zIndexStyle()}
+        onClick={this.handleClick}>
+          { this.props.fixed ? null :
+            <TabIcon className='tab-icon tab-icon-left' />
+          }
+          <div 
+            className='tab-inner'
+            style={{top: topStyle}}
+           >
+            { this.props.name }
+            { this.renderClose() }
+          </div>
+          { this.props.fixed ? null :
+            <TabIcon className='tab-icon tab-icon-right' />
+          }
+      </div>
+    );
+  },
 });
 
 interface TabsProps
@@ -181,7 +213,7 @@ class Tabs extends Classs<TabsProps> {
       {
         var variants: {[id: string]: BrowserTypes.Variant} = {};
 
-        // todo consider a different approach
+        // TODO consider a different approach
         groups.map(group =>
           group.algorithms.map(algorithm =>
             algorithm.variants.map(variant =>
@@ -213,17 +245,26 @@ class Tabs extends Classs<TabsProps> {
   computeTabs(config, variants?)
   {
     variants = variants || this.state.variants;
-    
     var emptyTabs: ID[] = [];
     let tabs = config && variants && config.split(',').map(vId =>
     {
-      let id = this.getId(vId);
+      var id = this.getId(vId);
+      let split = id.split('@');
+      if(split.length > 1)
+      {
+        id = split[0];
+        var version = split[1];
+      }
       var name = variants[id] && variants[id].name;
       if(name === '')
       {
         name = 'Untitled';
       }
-      
+      if(version)
+      {
+        name += ' @ ' + moment(variants[id].lastEdited).format("ha M/D/YY")
+        id += '@' + version;
+      }
       return {
         id,
         name,
@@ -292,7 +333,7 @@ class Tabs extends Classs<TabsProps> {
     if(idStr.substr(0, 1) === '!')
     {
       return idStr.substr(1);
-    }
+    }   
     return idStr;
   }
   
@@ -332,6 +373,7 @@ class Tabs extends Classs<TabsProps> {
   
 	render()
   {
+
     let { tabs } = this.state;
     
     var tabsLayout =
@@ -339,7 +381,7 @@ class Tabs extends Classs<TabsProps> {
       compact: true,
       columns: tabs ? tabs.map((tab, index) => (
       {
-        key: tab.id,
+        key: tab.id, 
         content:
           <Tab 
             name={tab.name}

@@ -46,6 +46,8 @@ require('./Result.less');
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
+const {List} = Immutable;
 import { DragSource, DropTarget } from 'react-dnd';
 var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../../util/Util.tsx';
@@ -163,22 +165,26 @@ class Result extends Classs<Props> {
   
   spotlight()
   {
-    Actions.results.spotlight(this.props.data, ColorManager.colorForKey(this.props.data.id));
+    // TODO
+    // Actions.results.spotlight(this.props.data, ColorManager.colorForKey(this.props.data.id));
   }
   
   unspotlight()
   {
-    Actions.results.spotlight(this.props.data, false);
+    // TODO
+    // Actions.results.spotlight(this.props.data, false);
   }
   
   pin()
   {
-    Actions.results.pin(this.props.data, true);
+    // TODO
+    // Actions.results.pin(this.props.data, true);
   }
   
   unpin()
   {
-    Actions.results.pin(this.props.data, false);
+    // TODO
+    // Actions.results.pin(this.props.data, false);
   }
   
   renderSpotlight()
@@ -193,18 +199,18 @@ class Result extends Classs<Props> {
   
   getMenuOptions()
   {
-    var menuOptions = [];
+    var menuOptions = List([]);
     
     if(this.props.data.spotlight)
     {
-      menuOptions.push({
+      menuOptions = menuOptions.push({
         text: 'Un-Spotlight',
         onClick: this.unspotlight,
       });
     }
     else
     {
-      menuOptions.push({
+      menuOptions = menuOptions.push({
         text: 'Spotlight',
         onClick: this.spotlight,
       });
@@ -467,7 +473,8 @@ const resultTarget =
   drop(props, monitor, component)
   {
     const item = monitor.getItem();
-    Actions.results.move(item, props.index);
+    // TODO
+    // Actions.results.move(item, props.index);
   }
 }
 

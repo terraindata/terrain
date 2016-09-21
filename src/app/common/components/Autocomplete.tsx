@@ -49,12 +49,12 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
 import * as classNames from 'classnames';
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 
 interface Props
 {
   value: string;
-  options: string[];
+  options: List<string>;
   onChange: (value: string) => void;
   placeholder?: string;
   help?: string;
@@ -63,9 +63,15 @@ interface Props
   disabled?: boolean;
 }
 
-class Autocomplete extends Classs<Props>
+class Autocomplete extends PureClasss<Props>
 {
   value: string;
+  
+  state: {
+    value: string;
+    open: boolean;
+    selectedIndex: number;
+  };
   
   constructor(props: Props)
   {
@@ -76,7 +82,7 @@ class Autocomplete extends Classs<Props>
       value: props.value,
       open: false,
       selectedIndex: 0,
-    }
+    };
   }
   
   componentWillReceiveProps(nextProps)
@@ -85,11 +91,6 @@ class Autocomplete extends Classs<Props>
     this.setState({
       value: nextProps.value,
     });
-  }
-  
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
   
   handleChange(event)
@@ -142,13 +143,13 @@ class Autocomplete extends Classs<Props>
       case 40:
         // down
         this.setState({
-          selectedIndex: Math.min(this.state.selectedIndex + 1, visibleOptions.length - 1),
+          selectedIndex: Math.min(this.state.selectedIndex + 1, visibleOptions.size - 1),
         });
         break;
       case 13:
       case 9:
         // enter
-        var value = visibleOptions[this.state.selectedIndex];
+        var value = visibleOptions.get(this.state.selectedIndex);
         if(!value)
         {
           value = event.target.value;
@@ -160,6 +161,10 @@ class Autocomplete extends Classs<Props>
         this.props.onChange(value);
         this.refs['input']['blur']();
         break;
+      case 27:
+        // esc
+        this.refs['input']['blur']();
+        break;
       default:
         this.setState({
           selectedIndex: 0,
@@ -169,15 +174,20 @@ class Autocomplete extends Classs<Props>
   
   showOption(option: string): boolean
   {
-    return option.toLowerCase().indexOf(this.state.value.toLowerCase()) !== -1;
+    if(!this.state.value)
+    {
+      return true;
+    }
+    
+    return option && option.toLowerCase().indexOf(this.state.value.toLowerCase()) !== -1;
   }
   
   renderOption(option: string, index: number)
   {
     var first = option, second = "", third = "";
-    if(this.state.value.length)
+    if(this.state.value && this.state.value.length)
     {
-      const i = option.indexOf(this.state.value);
+      const i = option.toLowerCase().indexOf(this.state.value.toLowerCase());
       var first = option.substr(0, i);
       var second = option.substr(i, this.state.value.length);
       var third = option.substr(this.state.value.length + i);
@@ -201,12 +211,13 @@ class Autocomplete extends Classs<Props>
   render()
   {
     var options = this.props.options && this.props.options.filter(this.showOption);
+    var inputClassName = 'ac-input ' + (this.props.className || '');
     return (
       <div className='autocomplete'>
         <input
           ref='input'
           type='text'
-          className='ac-input'
+          className={inputClassName}
           value={this.state.value}
           onChange={this.handleChange}
           onFocus={this.handleFocus}
@@ -228,7 +239,7 @@ class Autocomplete extends Classs<Props>
               options.map(this.renderOption)
             }
             {
-              options.length ? null : <div className='ac-no-options'>No matches</div>
+              options.size ? null : <div className='ac-no-options'>No matches</div>
             }
           </div>
         }

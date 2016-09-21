@@ -44,13 +44,14 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import InfoArea from './InfoArea.tsx';
+import PureClasss from '../../common/components/PureClasss.tsx';
 
 interface Props
 {
   history?: any;
 }
 
-class Placeholder extends React.Component<Props, any>
+class Placeholder extends PureClasss<Props>
 {
   componentWillMount()
   {

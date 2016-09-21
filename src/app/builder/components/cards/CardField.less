@@ -1,19 +1,46 @@
 @import "../../../common/Common.less";
 
+.card-field-manual-info {
+  top: calc(~"50% - 4px");
+  right: -10px;
+}
+
+.card-field-wrapper {
+  position: relative;
+}
+
+.card-field-wrapper-moving {
+  .transition;
+}
+
 .card-field {
   padding: @standard-margin;
-  margin: 0px -1 * @standard-margin;
   position: relative;
   text-align: center;
-  min-height: 30px;
-  height: 30px;
+  // min-height: 30px;
   .transition;
   
+  @field-padding-left: 25px;
+  @field-padding-right: 36px;
   .card-field-inner {
-    display: inline-block;
-    width: calc(~"100% - 80px");
+    display: flex;
+    .transition;
     position: relative;
-    // z-index: 10;
+    
+    left: 0px;
+    width: 100%;
+    
+    .builder-tb {
+      flex-grow: 1;
+      flex-basis: 100px;
+    }
+  }
+  
+  &.card-field-editable:hover {
+    .card-field-inner {
+      left: @field-padding-left;
+      width: calc(~"100% - @{field-padding-left} - @{field-padding-right}");
+    }
   }
 
   .card-field-tools-left,
@@ -34,6 +61,18 @@
     }
   }
   
+  &.card-field-moving {
+    z-index: 9999;
+    .card-field-tools-left,
+    .card-field-tools-right {
+      border-color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.1);
+      .card-field-handle {
+        color: #333;
+      }
+    }
+  }
+  
   .card-field-tools-left-inner,
   .card-field-tools-right-inner {
     opacity: 0;
@@ -50,7 +89,7 @@
   }
   
   .card-field-tools-right-inner {
-    right: 6px;
+    right: 2px;
   }
   
   &.card-field-no-left {
@@ -90,7 +129,7 @@
     height: 12px;
     border-radius: 12px;
     // background: #fff;
-    margin-top: 5px;
+    margin-top: 4px;
     
     svg {
       width: 8px;
@@ -116,7 +155,7 @@
     position: relative;
     vertical-align: middle;
     .transition;
-    margin-right: 6px;
+    margin-right: 2px;
     width: 18px;
     height: 18px;
     border-radius: 18px;
@@ -140,6 +179,12 @@
       background: #7ab536;
     }
   }
+  
+  .card-field-top-add {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+  }
 
   &:hover {
     .card {
@@ -161,37 +206,52 @@
       opacity: 1;
     }
   }
-}
-
-.panel-dragging {
-  .card-field-tools-left {
-    background: rgba(255,255,255,0.25) !important;
-    background-blend-mode: multiply;
-    border-color: rgba(255,255,255,1);
+  
+  &.card-field-moving {
+    .card-field-tools-left-inner {
+      opacity: 1;
+    }
+    .card-field-tools-right-inner {
+      opacity: 0;
+    }
   }
   
-  .card-field-tools-left-inner,
-  .card-field-tools-right-inner {
-    opacity: 1;
+  &.card-field-single {
+    .card-field-tools-left {
+      display: none;
+    }
   }
 }
 
-.panel-dragging .panel {
-  // if a parent panel is dragging, it's not the cardfield that's dragging,
-  //  and we shouldn't apply style
+// .panel-dragging {
+//   .card-field-tools-left {
+//     background: rgba(255,255,255,0.25) !important;
+//     background-blend-mode: multiply;
+//     border-color: rgba(255,255,255,1);
+//   }
   
-  .card-field-tools-left {
-    background: rgba(0,0,0,0) !important;
-    border-color: rgba(0,0,0,0);
-  }
-  
-  .card-field-tools-left-inner,
-  .card-field-tools-right-inner {
-    opacity: 0;
-  } 
-}
+//   .card-field-tools-left-inner,
+//   .card-field-tools-right-inner {
+//     opacity: 1;
+//   }
+// }
 
-.card-field-panel-wrapper {
-  // height: 0px;
-  // overflow: hidden;
-}
+// .panel-dragging .panel {
+//   // if a parent panel is dragging, it's not the cardfield that's dragging,
+//   //  and we shouldn't apply style
+  
+//   .card-field-tools-left {
+//     background: rgba(0,0,0,0) !important;
+//     border-color: rgba(0,0,0,0);
+//   }
+  
+//   .card-field-tools-left-inner,
+//   .card-field-tools-right-inner {
+//     opacity: 0;
+//   } 
+// }
+
+// .card-field-panel-wrapper {
+//   // height: 0px;
+//   // overflow: hidden;
+// }

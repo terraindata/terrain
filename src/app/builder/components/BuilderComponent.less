@@ -1,0 +1,95 @@
+.builder-component-wrapper {
+  position: relative;
+  &.builder-component-wrapper-wide {
+    width: 100%;
+  }
+  .builder-component-help-right {
+    right: 10px;
+    top: calc(~"50% - 4px");
+  }
+  .builder-component-help-transform-center {
+    left: 45%;
+    top: 28%;
+  }
+  .builder-component-help-transform-left {
+    left: 16%;
+    top: 50%;
+  }
+  .builder-component-help-transform-bottom {
+    left: 0%;
+    top: 90%;
+  }
+}
+
+.builder-label {
+  width: 58px;
+  position: relative;
+  top: 4px;
+  text-align: center;
+}
+
+.filters-single {
+  .combinator {
+    display: none;
+  }
+  .filters-multiple {
+    .combinator {
+      display: inherit;
+    }
+  }
+}
+
+.filters-multiple {
+  .card-field-wrapper:last-child {
+    .combinator {
+      opacity: 0;
+    }
+  }
+}
+
+.card-field-inner, .card-flex {
+  .builder-comp-list {
+    flex-grow: 1;
+    display: flex;
+  }
+}
+
+.builder-card-header {
+  background: rgba(0,0,0,0.1);
+  // color: #fff;
+  padding: 6px;
+  margin: 3px -15px;
+  background-blend-mode: multiply;
+
+  &.sfw-select-header {
+    margin-top: -7px;
+  }
+}
+
+.builder-add-row {
+  text-align: center;
+  background: rgba(255,255,255,1);
+  padding: 6px;
+  border-radius: 6px;
+  color: #777;
+}
+
+.card-field-wrapper {
+  .builder-tb-cards-area:last-child {
+    // margin-top: -6px; // TODO re-enable if not doing the condensed view
+  }
+}
+
+.builder-comp-list {
+  .builder-comp-list-item {
+    // lone textbox lists need spacing
+    margin-bottom: 6px;
+    &:last-child {
+      margin-bottom: 0px;
+    }
+  }
+}
+
+.card-flex {
+  margin-bottom: -6px;
+}

@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import Util from '../../../util/Util.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/BuilderActions.tsx";
@@ -51,35 +52,22 @@ import Input from "../inputs/Input.tsx";
 import LayoutManager from "../layout/LayoutManager.tsx";
 import CreateLine from '../../../common/components/CreateLine.tsx';
 import InfoArea from '../../../common/components/InfoArea.tsx';
+import PureClasss from '../../../common/components/PureClasss.tsx';
+import BuilderTypes from '../../BuilderTypes.tsx';
+type IInput = BuilderTypes.IInput;
 
-var InputsArea = React.createClass<any, any>({
-	propTypes:
-	{
-		inputs: React.PropTypes.array.isRequired,
-    parentId: React.PropTypes.string.isRequired,
-	},
-  
-  getInitialState()
-  {
-    return {
-      title: 'Inputs',
-    };
-  },
-  
+interface Props
+{
+  inputs: List<IInput>;
+  queryId: ID;
+}
+
+class InputsArea extends PureClasss<Props>
+{
   createInput()
   {
-    Actions.inputs.create(this.props.parentId, 0);
-  },
-  
-  copyAll()
-  {
-    console.log('copy');
-  },
-  
-  removeAll()
-  {
-    console.log('remove');
-  },
+    Actions.create(Immutable.List(['queries', this.props.queryId, 'inputs']), -1, 'input');
+  }
   
   renderNoInputs()
   {
@@ -90,44 +78,59 @@ var InputsArea = React.createClass<any, any>({
     return (
       <InfoArea large={large} button={button} onClick={onClick} />
     );
-  },
+  }
+  
+  // moveTo(curIndex, newIndex)
+  // {
+  //   Actions.move(Immutable.List(['queries', this.props.queryId, 'inputs']), curIndex, newIndex);
+  // }
   
   render()
   {
-    if(this.props.inputs.length === 0)
+    if(this.props.inputs.size === 0)
     {
       return this.renderNoInputs();
     }
     
-    var layout = {
-      rows: this.props.inputs.map((input, index) => {
-        return {
-          content: <Input input={input} index={index} />,
-          key: input.id,
-        };
-      }),
-      fullHeight: true,
-    };
+    // var layout = {
+    //   rows: this.props.inputs.map((input, index) => {
+    //     return {
+    //       content: <Input input={input} index={index} queryId={this.props.queryId} />,
+    //       key: input.id,
+    //     };
+    //   }).toJS(),
+    //   fullHeight: true,
+    // };
     
-    layout.rows.push({
-      content: (
-        <div className='standard-margin'>
-          <CreateLine open={false} onClick={this.createInput} />
-        </div>
-      ),
-    });
-
-    var moveTo = (curIndex, newIndex) =>
-    {
-      Actions.inputs.move(this.props.inputs[curIndex], newIndex);
-    };
+    // layout.rows.push({
+    //   content: (
+    //     <div className='standard-margin'>
+    //       <CreateLine open={false} onClick={this.createInput} />
+    //     </div>
+    //   ),
+    // });
+    
+        // <LayoutManager layout={layout} moveTo={this.moveTo} />
     
     return (
       <div className='inputs-area'>
-        <LayoutManager layout={layout} moveTo={moveTo} />
+        {
+          this.props.inputs.map((input, index) =>
+            <Input
+              input={input}
+              index={index}
+              queryId={this.props.queryId}
+              key={input.id}
+            />
+          )
+        }
+        
+        <div className='standard-margin'>
+          <CreateLine open={false} onClick={this.createInput} />
+        </div>
       </div>
     );
-  },
-});
+  }
+}
 
 export default InputsArea;

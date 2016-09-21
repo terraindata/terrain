@@ -46,18 +46,25 @@ import * as _ from 'underscore';
 require('./BuilderColumn.less');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as Immutable from 'immutable';
+const {List} = Immutable;
 import Util from '../../util/Util.tsx';
 import Menu from '../../common/components/Menu.tsx';
 import { MenuOption } from '../../common/components/Menu.tsx';
 import PanelMixin from './layout/PanelMixin.tsx';
 import InputsArea from "./inputs/InputsArea.tsx";
-import CardsArea from "./cards/CardsArea.tsx";
+import CardsColumn from "./cards/CardsColumn.tsx";
 import ResultsArea from "./results/ResultsArea.tsx";
 import UserStore from '../../users/data/UserStore.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
 import TQLEditor from '../../tql/components/TQLEditor.tsx';
 import InfoArea from '../../common/components/InfoArea.tsx';
+const shallowCompare = require('react-addons-shallow-compare');
+import * as moment from 'moment';
+import Ajax from "./../../util/Ajax.tsx";
+import Manual from './../../manual/components/Manual.tsx';
+
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -67,20 +74,23 @@ var BuilderIcon = require("./../../../images/icon_builder.svg");
 var ResultsIcon = require("./../../../images/icon_resultsDropdown.svg");
 var TQLIcon = require("./../../../images/icon_tql.svg");
 var InputsIcon = require("./../../../images/icon_input.svg");
+var ManualIcon = require('./../../../images/icon_info.svg');
 
 enum COLUMNS {
   Builder,
   Results,
   TQL,
   Inputs,
+  Manual,
 };
-var NUM_COLUMNS = 4;
+var NUM_COLUMNS = 5;
 
 var menuIcons = [
     {icon: <BuilderIcon />, color: '#76a2c1'},
     {icon: <ResultsIcon />, color: '#71bca2'},
     {icon: <TQLIcon />, color: '#d47884'},
-    {icon: <InputsIcon />, color: '#c2b694'}
+    {icon: <InputsIcon />, color: '#c2b694'},
+    {icon: <ManualIcon />, color: "#a98abf"}
 ];
 
 // interface Props
@@ -102,27 +112,58 @@ var BuilderColumn = React.createClass<any, any>(
   
   propTypes:
   {
-    algorithm: React.PropTypes.object.isRequired,
+    query: React.PropTypes.object.isRequired,
     className: React.PropTypes.string,
     index: React.PropTypes.number,
     canAddColumn: React.PropTypes.bool,
     canCloseColumn: React.PropTypes.bool,
     onAddColumn: React.PropTypes.func.isRequired,
+    onAddManualColumn: React.PropTypes.func.isRequired,
     onCloseColumn: React.PropTypes.func.isRequired,
+    colKey: React.PropTypes.number.isRequired,
+    history: React.PropTypes.any,
+    onRevert: React.PropTypes.func,
+    columnType: React.PropTypes.number,
+    selectedCardName: React.PropTypes.string,
+    switchToManualCol: React.PropTypes.func,
+    changeSelectedCardName: React.PropTypes.func,
   },
   
   getInitialState()
   {
+    var column = this.props.index;
+    if(localStorage.getItem('colKeyTypes'))
+    {
+      column = JSON.parse(localStorage.getItem('colKeyTypes'))[this.props.colKey];
+      if(column === undefined)
+      {
+        column = this.props.index;
+      }
+    }
     return {
-      column: this.props.index,
+      column: this.props.columnType ? this.props.columnType : column,
       loading: false,
       inputKeys: this.calcinputKeys(this.props),
-      rand: 1,
+      // rand: 1,
     }
+  },
+
+  componentDidMount()
+  {
+    if(this.state.column === 4)
+    {
+      this.props.switchToManualCol(this.props.index);
+    }
+  },
+  
+  shouldComponentUpdate(nextProps, nextState)
+  {
+    return shallowCompare(this, nextProps, nextState);
   },
   
   componentWillMount()
   {
+    // TODO fix
     let rejigger = () => this.setState({ rand: Math.random() });
     this.unsubUser = UserStore.subscribe(rejigger);
     this.unsubRoles = RolesStore.subscribe(rejigger);
@@ -136,12 +177,12 @@ var BuilderColumn = React.createClass<any, any>(
   
   calcinputKeys(props)
   {
-    return props.algorithm.inputs.map(input => input.key);
+    return props.query.inputs.map(input => input.key);
   },
   
   willReceiveProps(nextProps)
   {
-    if(!_.isEqual(nextProps.algorithm.inputs, this.props.algorithm.inputs))
+    if(!_.isEqual(nextProps.query.inputs, this.props.query.inputs))
     {
       this.setState({
         inputKeys: this.calcinputKeys(nextProps.state),
@@ -175,79 +216,101 @@ var BuilderColumn = React.createClass<any, any>(
   
   renderContent(canEdit:boolean)
   {
-    var algorithm = this.props.algorithm;
-    var parentId = algorithm.id;
-
+    var query = this.props.query;
     switch(this.state.column)
     {
       case COLUMNS.Builder:
         // this should be temporary; remove when middle tier arrives
-        var spotlights = algorithm.results ? algorithm.results.reduce((spotlights, result) =>
-        {
-          if(result.spotlight)
-          {
-            spotlights.push(result);
-          }
-          return spotlights;
-        }, []) : [];
-        if (this.props.algorithm.mode === "tql")
+        // var spotlights = Immutable.List(query.results ? query.results.reduce((spotlights, result) =>
+        // {
+        //   if(result.spotlight)
+        //   {
+        //     spotlights.push(result);
+        //   }
+        //   return spotlights;
+        // }, []) : []);
+        // TODO
+        let spotlights = Immutable.List([]);
+        
+        if (this.props.query.mode === "tql")
         {
           return <InfoArea
              large= "TQL Mode"
              small= "This Variant is in TQL mode, so it doesn’t use Cards. To restore this Variant to its last Card state, change it to Cards mode in the TQL column."
           />;
         }
-        return <CardsArea 
-          cards={algorithm.cards} 
-          parentId={parentId} 
+        
+        return <CardsColumn 
+          cards={query.cards} 
+          queryId={query.id}
           spotlights={spotlights} 
-          topLevel={true}
           keys={this.state.inputKeys}
           canEdit={canEdit}
+          addColumn={this.props.onAddManualColumn}
+          columnIndex={this.props.index}
         />;
         
       case COLUMNS.Inputs:
         return <InputsArea
-          inputs={algorithm.inputs}
-          parentId={parentId}
+          inputs={query.inputs}
+          queryId={query.id}
         />;
       
       case COLUMNS.Results:
         return <ResultsArea 
-          algorithm={algorithm}
+          query={query}
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
           canEdit={canEdit}
         />;
-      
+
       case COLUMNS.TQL:
         return <TQLEditor
-          algorithm={algorithm}
+          query={query}
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
+          addColumn={this.props.onAddManualColumn}
+          columnIndex={this.props.index}
         />;
         
+      case COLUMNS.Manual:
+        return <Manual 
+          selectedKey={this.props.selectedCardName}
+          changeCardName={this.props.changeSelectedCardName}
+        />;
     }
     return <div>No column content.</div>;
   },
   
   switchView(index)
   {
+    if(index === 4)
+    {
+      this.props.switchToManualCol(this.props.index);
+    }
+    else if(this.state.column === 4)
+    {
+      this.props.switchToManualCol(-1);
+    }
+    
     this.setState({
       column: index,
     });
+    
+    var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
+    colKeyTypes[this.props.colKey] = index;
+    localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
   },
   
-  getMenuOptions(): MenuOption[]
+  getMenuOptions(): List<MenuOption> //TODO
   {
-    var options: MenuOption[] = _.range(0, NUM_COLUMNS).map(index => ({
+    var options: List<MenuOption> = Immutable.List(_.range(0, NUM_COLUMNS).map(index => ({
       text: COLUMNS[index],
       onClick: this.switchView,
+      disabled: index === this.state.column,
       icon: menuIcons[index].icon,
       iconColor: menuIcons[index].color
-    }));
-    
-    options[this.state.column].disabled = true;
+    })));
     
     return options;
   },
@@ -262,12 +325,53 @@ var BuilderColumn = React.createClass<any, any>(
     this.props.onCloseColumn(this.props.index);
   },
   
+  revertVersion()
+  {
+    if (this.props.query.version) 
+    {
+      if (confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.')) 
+      {
+        this.props.onRevert();
+      }
+    }
+  },
+
+  renderBuilderVersionToolbar(canEdit)
+  {
+    if(this.props.query.version)
+    {
+      if (this.state.column === COLUMNS.Builder || this.state.column === COLUMNS.TQL)
+      {
+        var lastEdited = moment(this.props.query.lastEdited).format("h:mma on M/D/YY")
+        return (
+          <div className='builder-revert-toolbar'> 
+            <div className='builder-revert-time-message'>
+              Version from {lastEdited}
+            </div>
+            <div className='builder-white-space'/>
+            {
+              canEdit ? 
+                  <div 
+                    className='button builder-revert-button' 
+                    onClick={this.revertVersion} 
+                    //data-tip="Resets the Variant's contents to this version. You can always undo the revert, and reverting does not lose any of the Variant's history."
+                  >
+                    Revert to this version
+                  </div>
+                  : <div />
+             }
+          </div>
+          );
+      }
+    }
+  },
+
   render() {
-    let {algorithm} = this.props;
-    let canEdit = (algorithm.status === BrowserTypes.EVariantStatus.Build
-      && Util.canEdit(algorithm, UserStore, RolesStore))
+    let {query} = this.props;
+    let canEdit = (query.status === BrowserTypes.EVariantStatus.Build
+      && Util.canEdit(query, UserStore, RolesStore))
       || this.state.column === COLUMNS.Inputs;
-    let cantEditReason = algorithm.status !== BrowserTypes.EVariantStatus.Build ?
+    let cantEditReason = query.status !== BrowserTypes.EVariantStatus.Build ?
       'This Variant is not in Build status' : 'You are not authorized to edit this Variant';
     
     return this.renderPanel((
@@ -290,7 +394,11 @@ var BuilderColumn = React.createClass<any, any>(
                 : null
               }
             </span>
-            { this.state.loading ? <div className='builder-column-loading'>Loading...</div> : '' }
+            {
+              this.state.loading &&
+              (this.state.column === COLUMNS.Results || this.state.column === COLUMNS.TQL) &&
+                <div className='builder-column-loading'>Loading...</div>
+            }
           </div>
           <div className='builder-title-bar-options'>
             <Menu options={this.getMenuOptions()}/>
@@ -298,7 +406,7 @@ var BuilderColumn = React.createClass<any, any>(
               this.props.canAddColumn && 
                 <SplitScreenIcon
                   onClick={this.handleAddColumn}
-                  className='bc-options-svg'
+                  className='bc-options-svg builder-split-screen'
                   data-tip="Add Column"
                 />
             }
@@ -306,21 +414,25 @@ var BuilderColumn = React.createClass<any, any>(
               this.props.canCloseColumn && 
                 <CloseIcon
                   onClick={this.handleCloseColumn}
-                  className='bc-options-svg'
+                  className='close close-builder-title-bar'
                   data-tip="Close Column"
                 />
              }
           </div>
         </div>
+        {this.renderBuilderVersionToolbar(canEdit)}
         <div className={
-            'builder-column-content' + 
-            (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '')
+            (this.state.column === COLUMNS.Manual ? 'builder-column-manual ' : '') +
+            'builder-column-content ' + 
+            (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '') +
+            (this.state.column === COLUMNS.Inputs ? ' builder-column-content-scroll' : '') 
           }>
           { this.renderContent(canEdit) }
         </div>
       </div>
     ));
   }
-});
+}
+);
 
 export default BuilderColumn;

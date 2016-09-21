@@ -44,10 +44,13 @@ THE SOFTWARE.
 
 require('./BrowserInfoColumn.less');
 import * as React from 'react';
+import * as Immutable from 'immutable';
+const {List} = Immutable;
 import Classs from './../../common/components/Classs.tsx';
 import BrowserColumn from './BrowserColumn.tsx';
 import BrowserItem from './BrowserItem.tsx';
 import BrowserItemCategory from './BrowserItemCategory.tsx';
+import VariantVersions from './VariantVersions.tsx';
 import CreateItem from '../../common/components/CreateItem.tsx';
 import UserTypes from './../../users/UserTypes.tsx';
 import RoleTypes from './../../roles/RoleTypes.tsx';
@@ -81,6 +84,7 @@ interface Props
   group: Group;
   algorithm: Algorithm;
   variant: Variant;
+  history?: any;
 }
 
 class BrowserInfoColumn extends Classs<Props>
@@ -119,7 +123,15 @@ class BrowserInfoColumn extends Classs<Props>
       return null;
     }
     
-    return 'Variant';
+    return (
+    <div>
+      Variant
+      <VariantVersions 
+        variant={this.props.variant} 
+        history={this.props.history} 
+      />
+    </div>
+    );
   }
   
   renderAlgorithm()
@@ -281,7 +293,7 @@ interface BrowserInfoUserProps
 
 class BrowserInfoUser extends Classs<BrowserInfoUserProps>
 {
-  changeRole(changeAdmin: (wasAdmin: boolean) => boolean, changeBuilder: (wasBuilder: boolean) => boolean)
+  changeRole(newRole:string)
   {
     let { user, groupRoles } = this.props;
     var role = groupRoles && groupRoles.get(user.username);
@@ -291,24 +303,23 @@ class BrowserInfoUser extends Classs<BrowserInfoUserProps>
     }
     
     RolesActions.change(
-      role.set('builder', changeBuilder(role.builder)).set('admin', changeAdmin(role.admin)) as RoleTypes.Role
+      role.set('builder', newRole === 'Builder').set('admin', newRole === 'Admin') as RoleTypes.Role
     );
   }
   
-  toggleAdmin()
+  changeToAdmin()
   {
-    this.changeRole(
-      (wasAdmin: boolean) => !wasAdmin,
-      (wasBuilder: boolean) => true
-    );
+    this.changeRole('Admin');
   }
-  
-  toggleBuilder()
+
+  changeToBuilder()
   {
-    this.changeRole(
-      (wasAdmin: boolean) => false,
-      (wasBuilder: boolean) => !wasBuilder
-    );
+    this.changeRole('Builder');
+  }
+
+  changeToViewer()
+  {
+    this.changeRole('Viewer');
   }
   
   render()
@@ -327,17 +338,25 @@ class BrowserInfoUser extends Classs<BrowserInfoUserProps>
     
     let imSysAdmin = me.isAdmin;
     let imGroupAdmin = groupRoles && groupRoles.get(me.username) && groupRoles.get(me.username).admin;
+    // TODO
     let menuOptions = 
-    [
+    Immutable.List([
       {
-        text: isAdmin ? 'Demote to Builder' : 'Make Admin',
-        onClick: this.toggleAdmin,
+        text: 'Viewer',
+        onClick: this.changeToViewer,
+        disabled: isViewer
       },
       {
-        text: isBuilder || isAdmin ? 'Demote to Viewer' : 'Make Builder',
-        onClick: this.toggleBuilder,
+        text: 'Builder',
+        onClick: this.changeToBuilder,
+        disabled: isBuilder
+      },
+      {
+        text: 'Admin',
+        onClick: this.changeToAdmin,
+        disabled: isAdmin
       }
-    ];
+    ]);
     
     return (
       <div key={user.username} className='browser-info-user'>

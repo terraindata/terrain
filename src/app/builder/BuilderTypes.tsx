@@ -42,7 +42,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// TODO update naming
+import * as _ from 'underscore';
+import * as React from 'react';
+import * as Immutable from 'immutable';
+let List = Immutable.List;
+let L = () => List([]);
+let Map = Immutable.Map;
+
+import ScoreBar from './components/charts/ScoreBar.tsx';
+import TransformCardComponent from './components/charts/TransformCard.tsx';
+import Store from './data/BuilderStore.tsx';
+
+// Interestingly, these have to be above the BuilderDisplays import
+//  since the import itself imports them
+export const Directions: string[] = ['ascending', 'descending'];
+export const Combinators: string[] = ['&', 'or'];
+export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
+
+import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, firstSecondDisplay, wrapperDisplay, stringValueDisplay} from './BuilderDisplays.tsx';  
+var ManualConfig = require('./../manual/ManualConfig.json');
 
 export module BuilderTypes
 {
@@ -57,190 +75,1192 @@ export module BuilderTypes
     NIN,
   }
   
+  export const OperatorTQL = {
+    [Operator.EQ]: '=', //**
+    // [Operator.EQ]: '==',
+    [Operator.NE]: '!=',
+    [Operator.GE]: '>=',
+    [Operator.GT]: '>',
+    [Operator.LE]: '<=',
+    [Operator.LT]: '<',
+    [Operator.IN]: 'in',
+    [Operator.NIN]: 'not in',
+  }
+
   export enum Direction {
     ASC,
     DESC
   }
   
+  export const DirectionTQL = {
+    [Direction.ASC]: 'ASC',
+    [Direction.DESC]: 'DESC',
+  }
+
   export enum Combinator {
     AND,
     OR
   }
   
-  
-  export interface IId
-  {
-    id: string;
+  export const CombinatorTQL = {
+    [Combinator.AND]: 'AND',
+    [Combinator.OR]: 'OR',
   }
-  
-  export interface IParentId
-  {
-    parentId: string;
-  }
-  
-  export interface ICondition
-  {
-    first: string;
-    second: string;
-    operator: Operator;
-  }
-  
-  export interface IJoin extends IId
-  {
-    group: string;
-    condition: ICondition;
-  }
-  
-  export interface ISort extends IId
-  {
-    property: string;
-    direction: Direction;
-  }
-  
-  export interface IFilter extends IId
-  {
-    combinator: Combinator;
-    condition: ICondition;
-  }
-  
-  export interface ICard extends IId, IParentId
-  {
-    type: string;
-  }
-  
-  export type CardString = string | IParenthesesCard;
-  
-  export interface ICardsContainer
-  {
-    cards: ICard[];
-  }
-  
-  export interface IFromCard extends ICard, ICardsContainer
-  {
-    group: string;
-    iterator: string;
-    joins: IJoin[];
-  }
-  
-  export interface IJoinCard extends ICard
-  {
-    group: string;
-    condition: ICondition;
-  }
-  
-  export interface IProperty extends IId
-  {
-    property: string;
-  }
-  
-  export interface ISelectCard extends ICard
-  {
-    properties: IProperty[];
-  }
-  
-  export interface ISortCard extends ICard
-  {
-    sorts: ISort[];
-  }
-  
-  export interface IFilterCard extends ICard
-  {
-    filters: IFilter[];
-  }
-  
-  export interface ILetCard extends ICard
-  {
-    field: string;
-    expression: CardString;
-  }
-  
-  export interface IVarCard extends ICard
-  {
-    field: string;
-    expression: CardString;
-  }
-  
-  export interface ICountCard extends ICard, ICardsContainer {}
-  export interface IAvgCard extends ICard, ICardsContainer {}
-  export interface ISumCard extends ICard, ICardsContainer {}
-  export interface IMinCard extends ICard, ICardsContainer {}
-  export interface IMaxCard extends ICard, ICardsContainer {}
-  export interface IExistsCard extends ICard, ICardsContainer {}
-  export interface IParenthesesCard extends ICard, ICardsContainer {}
-  
-  export interface IWeight
-  {
-    key: string;
-    weight: number;
-  }
-  
-  export interface IScoreCard extends ICard
-  {
-    weights: IWeight[];
-    method: string;
-  }
-  
-  export interface IBar extends IId
-  {
-    count: number;
-    percentage: number;
-    range: {
-      min: number;
-      max: number;
-    }
-  }
-  
-  export interface IScorePoint extends IId
-  {
-    value: number;
-    score: number;
-  }
-  
-  export interface ITransformCard extends ICard
-  {
-    input: string;
     
-    range: number[];
-    bars: IBar[];
-    scorePoints: IScorePoint[];
-  }
-  
-  // export interface IElse extends IId, ICardsContainer
-  // {
-  //   condition?: ICondition; // no condition means it's an unconditional else
-  // }
-  
-  export interface IIfCard extends ICard, ICardsContainer
-  {
-    filters: IFilter[]; // no filters means it's an unconditional else
-    elses: IIfCard[];
-  }
-  
-  export interface IValueCard extends ICard
-  {
-    value: string;  
-  }
-  
-  export interface ITakeCard extends IValueCard {}
-  export interface ISkipCard extends IValueCard {}
-  
   export enum InputType
   {
     TEXT,
     DATE,
     NUMBER,
   }
-  
-  export interface IInput extends IId, IParentId
+    // TODO include in a common file
+  export class IRecord<T>
   {
-    type: InputType;
+    id: string;
+    type: string;
+    set: (f: string, v: any) => T;
+    setIn: (f: string, v: any) => T;
+    get: (f: string | number) => any;
+    getIn: (f: (string | number)[] | KeyPath) => any;
+    delete: (f: string) => T;
+    deleteIn: (f: (string | number)[] | KeyPath) => T;
+    toMap: () => Map<string, any>;
+  }
+  
+  // A query can be viewed and edited in the Builder
+  // currently, only Variants are Queries, but that may change
+  export interface IQuery
+  {
+    id: string;
+    cards: ICards;
+    inputs: List<any>;
+    tql: string;
+    mode: string;
+    version: boolean;
+    name: string;
+    lastEdited: string;
+  }
+  
+  export interface IInput extends IRecord<IInput>
+  {
+    type: string;
     key: string;
     value: string;
+    inputType: InputType;
+  }
+
+  interface IManualEntry
+  {
+    name: string;
+    snippet: string;
+    summary: string;
+    notation: string;
+    syntax: string;
+    text: any[];
+  }
+    
+  export interface ICard extends IRecord<ICard>
+  {
+    id: string;
+    type: string;
+    _isCard: boolean;
+    closed: boolean;
+    
+    // the following fields are excluded from the server save    
+    static:
+    {
+      colors: string[];
+      title: string;
+      display: Display | Display[];
+      
+      // the format string used for generating tql
+      // - insert the value of a card member by prepending the field's name with $, e.g. "$expression" or "$filters"
+      // - arrays/Lists are joined with "," by default
+      // - to join List with something else, specify a tqlJoiner
+      // - to map a value to another string, write the field name in all caps. the value will be passed into "[FieldName]TQL" map
+      //    e.g. "$DIRECTION" will look up "DirectionTQL" in BuilderTypes and pass the value into it
+      // - topTql is the tql to use if this card is at the top level of a query
+      tql: string;
+      tqlJoiner?: string;
+      topTql?: string;
+      
+      // returns an object with default values for a new card
+      init?: () => {
+        [k:string]: any;
+      };
+      
+      getChildTerms?: (card: ICard) => List<string>;
+      getNeighborTerms?: (card: ICard) => List<string>;
+      // given a card, return the "terms" it generates for autocomplete
+      
+      preview: string | ((c:ICard) => string);
+      // The BuilderTypes.getPreview function constructs
+      // a preview from a card object based on this string.
+      // It replaces anything within [] with the value for that key.
+      // If an array of objects, you can specify: [arrayKey.objectKey]
+      // and it will map through and join the values with ", ";
+      manualEntry: IManualEntry;
+    };
   }
   
-  export interface IExe
+  export type ICards = List<ICard>;
+  export type CardString = string | ICard;
+
+
+  // BUILDING BLOCKS
+  // The following large section defines every card
+  //  and every piece of every card.
+  
+  // IBlock is a card or a distinct piece / group of card pieces
+  export interface IBlock extends IRecord<IBlock>
   {
-    cards: ICard[];
-    inputs: IInput[];
+    id: string;
+    type: string;
+    
+    // fields not saved on server
+    static:
+    {
+      tql: string;
+      tqlJoiner?: string;
+      topTql?: string;
+      [field:string]: any;
+    }
+    
+    [field:string]: any;
+  }
+  
+  interface IBlockConfig
+  {
+    static: {
+      tql: string;
+      tqlJoiner?: string;
+    }
+    
+    [field:string]:any;
+  }
+  
+  // helper function to populate common fields for an IBlock
+  const _block = (config: IBlockConfig): IBlock =>
+  {
+    return _.extend({
+      id: "",
+      type: "",
+    }, config);
+  }
+    
+  // Every Card definition must follow this interface
+  interface ICardConfig
+  {
+    [field:string]: any;
+    
+    static: {
+      colors: string[];
+      title: string;
+      preview: string | ((c:ICard) => string);
+      display: Display | Display[];
+      manualEntry: IManualEntry;
+      tql: string;
+      tqlJoiner?: string;
+      topTql?: string;
+      
+      getChildTerms?: (card: ICard) => List<string>;
+      getNeighborTerms?: (card: ICard) => List<string>;
+      
+      init?: () => {
+        [k:string]: any;
+      };
+    }
+  }
+  
+  // helper function to populate random card fields
+  const _card = (config:ICardConfig) =>
+    _.extend(config, {
+      id: "",
+      _isCard: true,
+      closed: false,
+    });
+  
+  // a card that contains other cards
+  export interface IWrapperCard extends ICard
+  {
+    cards: ICards;
+  }
+  
+  // config to define such a card
+  interface IWrapperCardConfig
+  {
+    colors: string[];
+    title: string;
+    manualEntry: IManualEntry;
+    getChildTerms?: (card: ICard) => List<string>;
+    getNeighborTerms?: (card: ICard) => List<string>;
+    display?: Display | Display[];
+    tql: string;
+    tqlJoiner?: string;
+  }
+  
+  const _wrapperCard = (config:IWrapperCardConfig) =>
+  {
+    return _card({
+      cards: L(),
+      
+      static:
+      {
+        title: config.title,
+        colors: config.colors,
+
+        manualEntry: config.manualEntry,
+
+        getChildTerms: config.getChildTerms,
+        getNeighborTerms: config.getNeighborTerms,
+        
+        preview: (c:IWrapperCard) => {
+          var prefix = config.title + ': ';
+          if(c.type === 'parentheses')
+          {
+            prefix = '';
+          }
+          if(c.cards.size)
+          {
+            let card = c.cards.get(0);
+            return prefix + getPreview(card);
+          }
+          return prefix + "Nothing";
+        },
+        
+        display: (config.display || wrapperDisplay),
+        
+        tql: config.tql,
+      }
+    })
+  }
+  
+  const _selectValueCard = (config: {
+    colors: string[];
+    title: string;
+    manualEntry: IManualEntry;
+    tql: string;
+  }) => _card({
+    value: "",
+    
+    static:
+    {
+      title: config.title,
+      colors: config.colors,
+      manualEntry: config.manualEntry,
+      preview: "$value",
+      tql: config.tql,
+      
+      display: stringValueDisplay,
+    }
+  })
+  
+  const _andOrCard = (config: { title: string, tql: string, colors: string[], manualEntry }) => _card(
+    {
+      first: "",
+      second: "",
+      
+      static:
+      {
+        title: config.title,
+        manualEntry: config.manualEntry,
+        preview: (c:ICard) =>
+        {
+          var first = c['first'];
+          var second = c['second'];
+          if(typeof first !== 'string')
+          {
+            first = getPreview(first);
+          }
+          if(typeof second !== 'string')
+          {
+            second = getPreview(second);
+          }
+          
+          return `${first} ${config.tql} ${second}`
+        },
+        colors: ["#47a7ff", "#97d7ff"],
+        tql: "$first " + config.tql + " $second",
+                
+        display: [
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'first',
+          },
+
+          {
+            displayType: DisplayType.CARDTEXT,
+            key: 'first',
+            top: true,
+          },
+          
+          {
+            displayType: DisplayType.CARDTEXT,
+            key: 'second',
+          },
+
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'second',
+          },
+        ],
+      },
+    });
+  
+  const _multiAndOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, colors: string[], manualEntry: any }) => _card(
+    {
+      clauses: L(),
+      
+      static:
+      {
+        title: config.title,
+        preview: '[clauses.length] ' + config.english + ' clauses',
+        colors: config.colors,
+        tql: "(\n$clauses\n)",
+        tqlJoiner: config.tqlGlue,
+        manualEntry: config.manualEntry,
+        
+        init: () => ({
+          clauses: List([
+            make(Blocks[config.factoryType]),
+            make(Blocks[config.factoryType]),
+          ]),
+        }),
+        
+        display: {
+          displayType: DisplayType.ROWS,
+          key: 'clauses',
+          english: "'" + config.english + "'",
+          factoryType: config.factoryType,
+          // className: (card) => {
+          //   if(card['clauses'].size && typeof card['clauses'].get(0) !== 'string')
+          //   {
+          //     return 'multi-field-card-padding';
+          //   }
+          //   return '';
+          // },
+          
+          row:
+          {
+            below:
+            {
+              displayType: DisplayType.CARDSFORTEXT,
+              key: 'clause',
+            },
+            
+            inner: 
+            {
+              displayType: DisplayType.CARDTEXT,
+              key: 'clause',
+              top: false,
+            },
+            
+            hideToolsWhenNotString: true,
+          }
+        },
+      },
+    });
+  
+  const _valueCard = (config:{ title: string, colors: string[], manualEntry: IManualEntry, tql: string, defaultValue: number, }) => (
+    _card({
+      value: config.defaultValue,
+      
+      static: {
+        title: config.title,
+        colors: config.colors,
+        preview: "[value]",
+        display: valueDisplay,
+        manualEntry: config.manualEntry,
+        tql: config.tql,
+      }
+    })
+  );
+
+  // The BuildingBlocks
+  export const Blocks =
+  { 
+    sortBlock: _block(
+    {
+      property: "",
+      direction: Direction.DESC,
+      static:
+      {
+        tql: "\n $property $DIRECTION",
+      }
+    }),
+    
+    comparisonBlock: _block(
+    {
+      first: "",
+      second: "",
+      operator: Operator.EQ,
+      
+      static: {
+        tql: "\n $first $OPERATOR $second",
+      }
+    }),
+    
+    table: _block(
+    {
+      table: "",
+      alias: "",
+      
+      static: {
+        tql: "\n $table as $alias",
+      }
+    }),
+    
+    field: _block(
+    {
+      field: "",
+      
+      static: {
+        tql: "\n $field",
+      }
+    }),
+    
+    sfw: _card(
+    {
+      tables: L(),
+      fields: L(),
+      cards: L(),
+      
+      static:
+      {
+        manualEntry: ManualConfig.cards['sfw'],
+        colors: ["#89B4A7", "#C1EADE"],
+        title: "Select",
+        preview: "[tables.table]",
+        topTql: "SELECT\n$fields\nFROM\n$tables\n$cards",
+        tql: "\n(\n SELECT\n$fields\n FROM\n$tables\n$cards)",
+        
+        init: () => ({
+          tables: List([ make(Blocks.table )]),
+          fields: List([ make(Blocks.field, { field: '*' })]),
+        }),
+        
+        getChildTerms:
+          (card: ICard) =>
+            card['tables'].reduce(
+              (list:List<string>, tableBlock: {table: string, alias: string}): List<string> =>
+              {
+                let cols: List<string> = Store.getState().getIn(['tableColumns', tableBlock.table]);
+                if(cols)
+                {
+                  return list.concat(cols.map(
+                    (col) => tableBlock.alias + '.' + col
+                  ).toList()).toList();
+                }
+                return list;
+              }
+            , List([])),
+          
+        display: [
+          {
+            displayType: DisplayType.ROWS,
+            key: 'fields',
+            english: 'field',
+            factoryType: 'field',
+            row:
+            {
+              inner:
+              {
+                displayType: DisplayType.CARDTEXT,
+                help: ManualConfig.help["select-field"],
+                key: 'field',
+              },
+              below:
+              {
+                displayType: DisplayType.CARDSFORTEXT,
+                key: 'field',
+              },
+            },
+          },
+          
+          {
+            header: 'From',
+            headerClassName: 'sfw-select-header',
+            displayType: DisplayType.ROWS,
+            key: 'tables',
+            english: 'table',
+            factoryType: 'table',
+            row: 
+            {
+              inner:
+              [  
+                {
+                  displayType: DisplayType.TEXT,
+                  help: ManualConfig.help["table"],
+                  key: 'table',
+                  getAutoTerms: () => Store.getState().get('tables'),
+                },
+                {
+                  displayType: DisplayType.LABEL,
+                  label: 'as',
+                  key: null,
+                },
+                {
+                  displayType: DisplayType.TEXT,
+                  help: ManualConfig.help["alias"],
+                  key: 'alias',
+                  autoDisabled: true,
+                },
+              ],
+            },
+          },
+          
+          {
+            displayType: DisplayType.CARDS,
+            key: 'cards',
+            className: 'sfw-cards-area',
+          },
+        ],
+      },
+    }),
+    
+    where: _card({
+      clause: "",
+      
+      static:
+      {
+        title: "Where",
+        preview: (c:ICard) =>
+        {
+          if(typeof c['clause'] === 'string')
+          {
+            return c['clause'];
+          }
+          return  getPreview(c['clause']);
+        },
+        
+        colors: ["#AFC5D5", "#D9EAF7"],
+        tql: "WHERE\n$clause",
+        manualEntry: ManualConfig.cards.where,
+        
+        display: 
+        [
+          {
+            displayType: DisplayType.CARDTEXT,
+            key: 'clause',
+            placeholder: 'Clause or Condition',
+          },
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'clause',
+            className: 'wrapper-cards-content',
+          }
+        ]
+      }
+    }),
+    
+    multiand: _multiAndOrCard({
+      title: "And",
+      factoryType: 'andBlock',
+      english: "and",
+      tqlGlue: '\nAND ',
+      manualEntry: ManualConfig.cards.and,
+      colors: ["#47a7ff", "#97d7ff"],
+    }),
+    
+    multior: _multiAndOrCard({
+      title: "Or",
+      factoryType: 'orBlock',
+      english: "or",
+      tqlGlue: '\nOR ',
+      manualEntry: ManualConfig.cards.or,
+      colors: ["#6777ff", "#a7b7ff"],
+    }),
+   
+    comparison: _card(
+    {
+      first: "",
+      second: "",
+      operator: Operator.EQ,
+      
+      static:
+      {
+        title: "Compare",
+        preview: (c:ICard) => {
+          var first = c['first'];
+          var second = c['second'];
+          if(typeof first !== 'string')
+          {
+            first = getPreview(first);
+          }
+          if(typeof second !== 'string')
+          {
+            second = getPreview(second);
+          }
+          
+          return `${first} ${Operators[c['operator']]} ${second}`
+        },
+        colors: ["#7EAAB3", "#B9E1E9"],
+        tql: "$first $OPERATOR $second",
+        
+        display: firstSecondDisplay({
+          displayType: DisplayType.DROPDOWN,
+          key: 'operator',
+          options: Immutable.List(Operators),
+          help: ManualConfig.help["operator"],
+        }),
+        manualEntry: ManualConfig.cards['filter'],
+      },
+    }),
+    
+ 
+    // andOr: _card(
+    // {
+    //   first: "",
+    //   second: "",
+    //   combinator: Combinator.AND,
+      
+    //   static:
+    //   {
+    //     title: "And / Or",
+    //     preview: (c:ICard) =>
+    //     {
+    //       var first = c['first'];
+    //       var second = c['second'];
+    //       if(typeof first !== 'string')
+    //       {
+    //         first = getPreview(first);
+    //       }
+    //       if(typeof second !== 'string')
+    //       {
+    //         second = getPreview(second);
+    //       }
+          
+    //       return `${first} ${Combinators[c['combinator']]} ${second}`
+    //     },
+    //     colors: ["#47a7ff", "#97d7ff"],
+    //     tql: "$first $COMBINATOR $second",
+        
+    //     display: firstSecondDisplay({
+    //       displayType: DisplayType.DROPDOWN,
+    //       key: 'combinator',
+    //       options: Immutable.List(Combinators),
+    //     }),
+    //   },
+    // }),
+     
+    sort: _card(
+    {
+      sorts: List([]),
+      
+      static: 
+      {
+        title: "Sort",
+        preview: "[sorts.property]",
+        colors: ["#C5AFD5", "#EAD9F7"],
+        manualEntry: ManualConfig.cards['sort'],
+        tql: "ORDER BY $sorts",        
+        
+        init: () =>
+        {
+          return {
+            sorts: List([
+              make(Blocks.sortBlock)
+            ])
+          };
+        },
+        
+        display: {
+          displayType: DisplayType.ROWS,
+          key: 'sorts',
+          english: 'sort',
+          factoryType: 'sortBlock',
+          
+          row:
+          {
+            inner:
+            [
+              {
+                displayType: DisplayType.TEXT,
+                help: ManualConfig.help["property"],
+                key: 'property',
+              },
+              {
+                displayType: DisplayType.DROPDOWN,
+                key: 'direction',
+                options: Immutable.List(Directions),
+                help: ManualConfig.help["direction"],
+              },
+            ],
+          },
+        },
+      },
+    }),
+    
+    let: _card(
+    {
+      field: "",
+      expression: "",
+      
+      static: {
+        title: "Let",
+        preview: "[field]",
+        colors: ["#C0C0BE", "#E2E2E0"],
+        display: letVarDisplay,
+        manualEntry: ManualConfig.cards['let'],
+        tql: "let $field = $expression",
+        getNeighborTerms: (card) => List([card['field']]),
+      }
+    }),
+
+    var: _card(
+    {
+      field: "",
+      expression: "",
+      
+      static: {
+        colors: ["#b3a37e", "#d7c7a2"],
+        title: "Var",
+        preview: "[field]",
+        display: letVarDisplay,
+
+        manualEntry: ManualConfig.cards['var'],
+        getNeighborTerms: (card) => List([card['field']]),
+        tql: "var $field = $expression",
+      }
+    }),
+
+    count: _selectValueCard(
+    {
+      colors: ["#70B1AC", "#D2F3F0"],
+      title: "Count",
+      manualEntry: ManualConfig.cards['count'],
+      tql: "COUNT($value)",
+    }),
+    
+    avg: _selectValueCard(
+    {
+      colors: ["#a2b37e", "#c9daa6"],
+      title: "Average",
+      manualEntry: ManualConfig.cards['avg'],
+      tql: "AVG($value)",
+    }),
+    
+    sum: _selectValueCard(
+    {
+      colors: ["#8dc4c1", "#bae8e5"],
+      title: "Sum",
+      manualEntry: ManualConfig.cards['sum'],
+      tql: "SUM($value)",
+    }),
+
+    min: _selectValueCard(
+    {
+      colors: ["#cc9898", "#ecbcbc"],
+      title: "Min",
+      manualEntry: ManualConfig.cards['min'],
+      tql: "MIN($value)",
+    }),
+
+    max: _selectValueCard(
+    {
+      colors: ["#8299b8", "#acc6ea"],
+      title: "Max",
+      manualEntry: ManualConfig.cards['max'],
+      tql: "MAX($value)",
+    }),
+
+    exists: _wrapperCard(
+    {
+      colors: ["#a98abf", "#cfb3e3"],
+      title: "Exists",
+      manualEntry: ManualConfig.cards['exists'],
+      tql: "EXISTS\n(\n$cards)",
+    }),
+
+    parentheses: _wrapperCard(
+    {
+      colors: ["#b37e7e", "#daa3a3"],
+      title: "( )",
+      manualEntry: ManualConfig.cards['parentheses'],
+      tql: "\n(\n$cards)",
+    }),
+    
+    weight: _block(
+    {
+      key: "",
+      weight: 0,
+      static: {
+        tql: "[$weight, $key]",
+      }
+    }),
+
+    score: _card(
+    {
+      weights: List([]),
+      method: "",
+      
+      static:
+      {
+        colors: ["#9DC3B8", "#D1EFE7"],
+        title: "Score",
+        preview: "[weights.length] Weight(s)",
+        manualEntry: ManualConfig.cards['score'],
+        tql: "linearScore([$weights])",
+        init: () => ({
+          weights: List([
+            make(Blocks.weight),
+          ]),
+        }),
+        display: {
+          displayType: DisplayType.ROWS,
+          key: 'weights',
+          english: 'weight',
+          factoryType: 'weight',
+          provideParentData: true,
+          row:
+          {
+            inner:
+            [
+              {
+                displayType: DisplayType.TEXT,
+                key: 'key',
+                help: ManualConfig.help["key"],
+                placeholder: 'Field',
+              },
+              {
+                displayType: DisplayType.NUM,
+                help: ManualConfig.help["weight"],
+                key: 'weight',
+                placeholder: 'Weight',
+              },
+              {
+                displayType: DisplayType.COMPONENT,
+                component: ScoreBar,
+                key: 'score',
+                help: ManualConfig.help["score"],
+              },
+            ],
+          },
+        },
+      }
+    }),
+    
+    
+    
+    
+    bar: _block(
+    {
+      id: "",
+      count: 0,
+      percentage: 0,
+      range: {
+        min: 0,
+        max: 0,
+      },
+      
+      static: {
+        tql: null, // N/A
+      }
+    }),
+    
+    scorePoint: _block(
+    {
+      id: "",
+      value: 0,
+      score: 0,
+      
+      static: {
+        tql: "[$score, $value]"
+      }
+    }),
+    
+    transform: _card(
+    {
+      input: "",
+      domain: List([0,100]),
+      bars: List([]),
+      scorePoints: List([]),
+      
+      static:
+      {
+        manualEntry: ManualConfig.cards['transform'],
+        colors: ["#E7BE70", "#EDD8B1"],
+        title: "Transform",
+        preview: "[input]",
+        tql: "linearTransform([$scorePoints])",
+        display: [
+          {
+            displayType: DisplayType.TEXT,
+            help: ManualConfig.help["input"],
+            key: 'input',
+            placeholder: 'Input field',
+          },
+          {
+            displayType: DisplayType.COMPONENT,
+            component: TransformCardComponent,
+            key: 'scorePoints',
+            help: ManualConfig.help["scorePoints"],
+          },
+        ],
+        
+        init: () => (
+          {
+            scorePoints:
+              List([
+                make(Blocks.scorePoint, {
+                  id: "a",
+                  value: 0,
+                  score: 0.5,
+                }),
+                make(Blocks.scorePoint, {
+                id: "b",
+                  value: 50,
+                  score: 0.5,
+                }),
+                make(Blocks.scorePoint, {
+                  id: "c",
+                  value: 100,
+                  score: 0.5,
+                }),
+              ]),
+          }
+        )
+      }
+    }),
+    
+    take: _valueCard(
+    {
+      colors: ["#8ac541", "#aaf571"],
+      title: "Limit",
+      manualEntry: ManualConfig.cards['take'],
+      tql: "LIMIT $value",
+      defaultValue: 25,
+    }),
+    
+    skip: _valueCard(
+    {
+      colors: ["#00bcd6", "#40fce6"],
+      title: "Offset",
+      manualEntry: ManualConfig.cards['skip'],
+      tql: "OFFSET $value",
+      defaultValue: 25,
+    }),
+    
+    tql: _card({
+      clause: "",
+      
+      static:
+      {
+        title: "TQL",
+        preview: "\n$clause",
+        colors: ["#37df77", "#97ffd7"],
+        tql: "$clause",
+        manualEntry: ManualConfig.cards.tql,
+        
+        display: {
+          displayType: DisplayType.TEXT,
+          key: 'clause',
+        }
+      }
+    }),
+    
+    and: _andOrCard({
+      title: 'And',
+      tql: 'AND',
+      manualEntry: ManualConfig.cards.and,
+      colors: ["#47a7ff", "#97d7ff"],
+    }),
+    
+    or: _andOrCard({
+      title: 'Or',
+      tql: 'OR',
+      manualEntry: ManualConfig.cards.or,
+      colors: ["#6777ff", "#a7b7ff"],
+    }),
+    
+    
+    andBlock: _block(
+    {
+      clause: "",
+      static:
+      {
+        tql: "\n$clause",
+        tqlJoiner: "AND",
+      },
+    }),
+    
+    orBlock: _block(
+    {
+      clause: "",
+      static:
+      {
+        tql: "\n$clause",
+        tqlJoiner: "OR",
+      },
+    }),
+    
+    
+    spotlight: _block(
+    {
+      static: {
+        tql: null, // N/A
+      }
+      // TODO some day      
+    }),
+    
+    input: _block(
+    {
+      key: "",
+      value: "",
+      inputType: InputType.NUMBER,
+      static: {
+        tql: "VAR $key = $value;"
+      }
+    }),
+  }
+  // Set the "type" field for all blocks equal to its key
+  _.map(Blocks as ({[card:string]:any}), (v, i) => Blocks[i].type = i);
+  
+  // This creates a new instance of a card / block
+  // Usage: BuilderTypes.make(BuilderTypes.Blocks.sort)
+  export const make = (block:IBlock, extraConfig?:{[key:string]:any}) =>
+  {
+    let {type} = block;
+    
+    block = _.extend({}, block); // shallow clone
+    
+    if(Blocks[type].static.init)
+    {
+      block = _.extend({}, block, Blocks[type].static.init());
+    }
+    
+    if(extraConfig)
+    {
+      block = _.extend(block, extraConfig);
+    }
+    
+    if(block.static)
+    {
+      delete block.static;
+    }
+    
+    if(!block.id.length)
+    {
+      block.id = "block-" + Math.random();
+    }
+    
+    return typeToRecord[type](block);
+  }
+  
+  // array of different card types
+  export const CardTypes = _.compact(_.map(Blocks, (block, k: string) => block._isCard && k ));
+
+  var cards = {};
+  for(var key in Blocks)
+  {
+    if(Blocks[key]._isCard && Blocks[key].static.manualEntry)
+    {
+      cards[Blocks[key].static.manualEntry.name] = key;
+    }
+  }
+  export const cardList = cards;
+  
+
+  // private, maps a type (string) to the backing Immutable Record
+  let typeToRecord = _.reduce(Blocks as ({[card:string]:any}), 
+    (memo, v, i) => {
+      memo[i] = Immutable.Record(v)
+      return memo;
+    }
+  , {});
+
+
+
+  // Given a plain JS object, construct the Record for it and its children  
+  export const recordFromJS = (value: any) =>
+  {
+    if(Array.isArray(value) || typeof value === 'object')
+    {
+      value = _.reduce(value, (memo, v, key) =>
+      {
+        memo[key] = recordFromJS(v);
+        return memo;
+      }, Array.isArray(value) ? [] : {});
+      
+      if(value.type && Blocks[value.type])
+      {
+        value = make(Blocks[value.type], value);
+      }
+      else
+      {
+        value = Immutable.fromJS(value);
+      }
+    }
+    
+    return value;
+  }
+  
+  // Prepare cards/records for save, trimming static values
+  export const recordsForServer = (value: any) =>
+  {
+    if(Immutable.Iterable.isIterable(value))
+    {
+      let v = value.map(recordsForServer);
+      if(!v)
+      {
+        // records have a map function, but it returns undefined. WTF?
+        v = value.toMap().map(recordsForServer);
+      }
+      value = v;
+    }
+    
+    if(value && value.delete)
+    {
+      value = value.delete('static');
+    }
+    
+    return Immutable.fromJS(value);
+  }
+
+  // returns preview for a given card
+  export function getPreview(card:ICard):string
+  {
+    let {preview} = card.static;
+    if(typeof preview === 'string')
+    {
+      return preview.replace(/\[[a-z\.]*\]/g, str =>
+      {
+        let pattern = str.substr(1, str.length - 2);
+        let keys = pattern.split(".");
+        if(keys.length === 1)
+        {
+          return card[keys[0]];
+        }
+        if(keys[1] === 'length')
+        {
+          return card[keys[0]].size;
+        }
+        return card[keys[0]].toArray().map(v => v[keys[1]]).join(", ");
+      });
+    }
+    else
+    {
+      return preview(card);
+    }
+  }  
+  
+  export function getChildIds(_block:IBlock):Map<ID, boolean>
+  {
+    var map: Map<ID, boolean> = Map({});
+    
+    if(Immutable.Iterable.isIterable(_block))
+    {
+      let block = _block.toMap();
+      if(block.get('id'))
+      {
+        map = map.set(block.get('id'), true);
+      }
+      block.map(value => map = map.merge(getChildIds(value)));
+    }
+    
+    return map;
   }
 }
+
+export default BuilderTypes;
+

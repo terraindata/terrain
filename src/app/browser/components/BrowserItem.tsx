@@ -45,6 +45,8 @@ THE SOFTWARE.
 require('./BrowserItem.less');
 import * as React from 'react';
 import * as $ from 'jquery';
+import * as Immutable from 'immutable';
+const {List} = Immutable;
 import Classs from './../../common/components/Classs.tsx';
 import Menu from './../../common/components/Menu.tsx';
 import { Link } from 'react-router';
@@ -102,24 +104,24 @@ class BrowserItem extends Classs<Props>
   
   menuOptions =
   {
-    none: [],
+    none: List([]),
     duplicate: 
-    [
+    List([
       {
         text: 'Duplicate',
         // icon: '',
         onClick: this.handleDuplicate,
       },
-    ],
+    ]),
     archive:
-    [
+    List([
       {
         text: 'Archive',
         onClick: this.handleArchive,
       },
-    ],
+    ]),
     duplicateArchive:
-    [
+    List([
       {
         text: 'Duplicate',
         // icon: '',
@@ -129,7 +131,7 @@ class BrowserItem extends Classs<Props>
         text: 'Archive',
         onClick: this.handleArchive,
       },
-    ],
+    ]),
   }
   
   componentDidMount()

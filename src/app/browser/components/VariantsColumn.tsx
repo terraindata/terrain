@@ -60,6 +60,7 @@ import UserTypes from '../../users/UserTypes.tsx';
 import UserStore from '../../users/data/UserStore.tsx';
 import RoleTypes from '../../roles/RoleTypes.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
+import {notificationManager} from './../../common/components/InAppNotification.tsx'
 
 var VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
 
@@ -142,6 +143,17 @@ class VariantsColumn extends Classs<Props>
   
   handleNameChange(id: ID, name: string)
   {
+      if(this.props.variants.get(id).name !== name)
+      {
+        var oldName = this.props.variants.get(id).name || 'Untitled'; 
+        notificationManager.addNotification(
+          'Renamed',
+          '"' + oldName + '" is now "' + name + '"',
+          'info',
+          5
+        );
+      }
+
     Actions.variants.change(
       this.props.variants.get(id)
         .set('name', name) as Variant
@@ -173,6 +185,14 @@ class VariantsColumn extends Classs<Props>
         // Actions.algorithms.move(this.props.algorithms.get(id), undefined, targetItem.id);
         break;
       case "algorithm":
+        var algorithmName = targetItem.name || 'Untitled';
+        var vrntName = this.props.variants.get(id).name  || 'Untitled';
+        notificationManager.addNotification(
+          'Moved',
+          '"' + vrntName + '" was moved to algorithm "' + algorithmName + '"',
+          'info',
+          5
+        );
         if(shiftKey)
         {
           Actions.variants.duplicate(this.props.variants.get(id), 0, targetItem.groupId, targetItem.id);
@@ -200,7 +220,8 @@ class VariantsColumn extends Classs<Props>
     let {me, roles} = this.state;
     if(me && roles)
     {
-      var canEdit = roles.getIn([this.props.groupId, me.username, 'builder']);
+      var canEdit = roles.getIn([this.props.groupId, me.username, 'builder'])
+        || roles.getIn([this.props.groupId, me.username, 'admin']);
       var canDrag = canEdit && 
         (vriant.status !== BrowserTypes.EVariantStatus.Live || 
           roles.getIn([this.props.groupId, me.username, 'admin']));
@@ -282,8 +303,10 @@ class VariantsColumn extends Classs<Props>
     }
     
     let {me, roles} = this.state;
-    let canCreate = me && roles && roles.getIn([this.props.groupId, me.username, 'builder']);
     let canMakeLive = me && roles && roles.getIn([this.props.groupId, me.username, 'admin']);
+    let canCreate = canMakeLive || (
+      me && roles && roles.getIn([this.props.groupId, me.username, 'builder'])
+    );
     
     return (
       <BrowserItemCategory
