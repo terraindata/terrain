@@ -202,6 +202,7 @@ var Input = React.createClass<any, any>({
         keyPath={this.state.valueKeyPath}
         isNumber={this.props.input.inputType === BuilderTypes.InputType.NUMBER}
         typeErrorMessage="That is not a number"
+        placeholder='Sample value'
       />
     );
   },
@@ -223,6 +224,7 @@ var Input = React.createClass<any, any>({
               value={this.props.input.key}
               className="input-text input-text-first input-borderless"
               keyPath={this.state.keyKeyPath}
+              placeholder='Input name'
             />
             <Menu 
               options={this.getMenuOptions()}
