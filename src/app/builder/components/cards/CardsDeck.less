@@ -28,13 +28,14 @@
     color: #fff;
     text-align: center;
     border-radius: 3px;
-    .transition(~"all 0.08s");
+    .transition(~"all .35s");
     opacity: 0.85;
     // border: 2px solid rgba(0,0,0,0);
     height: 24px;
     box-sizing: border-box;
     
     &:hover {
+      .transition(~"all .15s");
       opacity: 1;
       border-color: @bright-green;
     }
@@ -50,7 +51,7 @@
 }
 
 @knob-color: @sea-green;
-@knob-bg: #fff;
+@knob-bg: #4e4f4d;
 .cards-deck-knob {
   width: 16px;
   cursor: pointer;
