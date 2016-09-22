@@ -174,12 +174,22 @@ class Autocomplete extends PureClasss<Props>
   
   showOption(option: string): boolean
   {
+    if(!option)
+    {
+      return false;
+    }
+    
     if(!this.state.value)
     {
       return true;
     }
     
-    return option && option.toLowerCase().indexOf(this.state.value.toLowerCase()) !== -1;
+    let haystack = option.toLowerCase();
+    let needle = this.state.value.toLowerCase();
+    
+    return haystack.indexOf(needle) === 0
+      || haystack.indexOf(" " + needle) !== -1
+      || haystack.indexOf("." + needle) !== -1;
   }
   
   renderOption(option: string, index: number)

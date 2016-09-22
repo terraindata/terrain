@@ -639,6 +639,10 @@ export module BuilderTypes
         tql: "WHERE\n$clause",
         manualEntry: ManualConfig.cards.where,
         
+        // suggestCards: List([
+          
+        // ]),
+        
         display: 
         [
           {

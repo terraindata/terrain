@@ -123,14 +123,18 @@ var LayoutManager = React.createClass<any, any>({
       if(newProps.layout.columns.length !== this.props.layout.columns.length)
       {
         // number of columns has changed, reset offsets
-        for(var index in this.state.sizeAdjustments)
+        var sizeAdjustments = JSON.parse(JSON.stringify(this.state.sizeAdjustments));
+        for(var index in sizeAdjustments)
         {
-          this.state.sizeAdjustments[index] = {x: 0, y: 0};
+          sizeAdjustments[index] = {x: 0, y: 0};
         }
         
         this.setState({
-          sizeAdjustments: this.state.sizeAdjustments,  
+          sizeAdjustments,  
         })
+        
+      this.props.layout.onColSizeChange &&
+        this.props.layout.onColSizeChange(sizeAdjustments);
       }
     }
   },

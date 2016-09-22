@@ -401,7 +401,14 @@ var BuilderColumn = React.createClass<any, any>(
             }
           </div>
           <div className='builder-title-bar-options'>
-            <Menu options={this.getMenuOptions()}/>
+            {
+              this.props.canCloseColumn && 
+                <CloseIcon
+                  onClick={this.handleCloseColumn}
+                  className='close close-builder-title-bar'
+                  data-tip="Close Column"
+                />
+            }
             {
               this.props.canAddColumn && 
                 <SplitScreenIcon
@@ -410,14 +417,7 @@ var BuilderColumn = React.createClass<any, any>(
                   data-tip="Add Column"
                 />
             }
-            {
-              this.props.canCloseColumn && 
-                <CloseIcon
-                  onClick={this.handleCloseColumn}
-                  className='close close-builder-title-bar'
-                  data-tip="Close Column"
-                />
-             }
+            <Menu options={this.getMenuOptions()}/>
           </div>
         </div>
         {this.renderBuilderVersionToolbar(canEdit)}

@@ -360,7 +360,10 @@ class Card extends PureClasss<Props>
   handleMouseMove(event)
   {
     event.stopPropagation();
-    Actions.hoverCard(this.props.card.id);
+    if(!this.state.hovering)
+    {
+      Actions.hoverCard(this.props.card.id);
+    }
   }
   
   getKeyPath()
