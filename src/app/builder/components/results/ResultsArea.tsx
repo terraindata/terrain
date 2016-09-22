@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as Immutable from 'immutable';
+const {Map,List} = Immutable;
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
@@ -51,7 +53,7 @@ import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import Result from "../results/Result.tsx";
 import ResultsTable from "../results/ResultsTable.tsx";
-import {Config, ResultsConfig} from "../results/ResultsConfig.tsx";
+import {IResultsConfig, DefaultIResultsConfig, ResultsConfig} from "../results/ResultsConfig.tsx";
 import InfoArea from '../../../common/components/InfoArea.tsx';
 import TQLConverter from "../../../tql/TQLConverter.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
@@ -86,7 +88,6 @@ class ResultsArea extends PureClasss<Props>
     error: any;
     
     resultFormat: string;
-    resultsConfig: Config;
     showingConfig: boolean;
     
     expanded: boolean;
@@ -99,7 +100,6 @@ class ResultsArea extends PureClasss<Props>
     results: null,
     numResults: null,
     resultsWithAllFields: null,
-    resultsConfig: null,
     resultText: null,
     expanded: false,
     expandedResultIndex: null,
@@ -116,7 +116,6 @@ class ResultsArea extends PureClasss<Props>
   constructor(props:Props)
   {
     super(props);
-    this.state.resultsConfig = this.getResultsConfig()[this.props.query.id];
   }
   
   componentDidMount()
@@ -138,10 +137,6 @@ class ResultsArea extends PureClasss<Props>
     if(!_.isEqual(nextProps.query, this.props.query))
     {
       this.queryResults(nextProps.query);
-      let resultsConfig = this.getResultsConfig()[nextProps.query.id];
-      this.setState({
-        resultsConfig,
-      });
       
       if(this.state.onResultsLoaded)
       {
@@ -199,7 +194,7 @@ class ResultsArea extends PureClasss<Props>
         <Result 
           data={result}
           allFieldsData={resultAllFields}
-          config={this.state.resultsConfig}
+          config={this.getResultsConfig()}
           onExpand={this.handleCollapse}
           expanded={true}
           drag_x={false}
@@ -276,6 +271,7 @@ class ResultsArea extends PureClasss<Props>
         <div className='results-table-wrapper'>
           <ResultsTable
             {...this.state}
+            resultsConfig={this.getResultsConfig()}
             onExpand={this.handleExpand}
           />
         </div>
@@ -298,7 +294,7 @@ class ResultsArea extends PureClasss<Props>
             return <Result
               data={result}
               allFieldsData={this.state.resultsWithAllFields && this.state.resultsWithAllFields[index]}
-              config={this.state.resultsConfig}
+              config={this.getResultsConfig()}
               onExpand={this.handleExpand}
               index={index}
               canDrag={this.props.canEdit}
@@ -494,17 +490,7 @@ class ResultsArea extends PureClasss<Props>
   
   getResultsConfig()
   {
-    var config;
-    try {
-      config = JSON.parse(localStorage['resultsConfig'])
-    } catch(e) {
-      config = {};
-    }
-    if(typeof config !== 'object')
-    {
-      config = {};
-    }
-    return config;
+    return this.props.query.resultsConfig || DefaultIResultsConfig;
   }
   
   renderConfig()
@@ -512,7 +498,7 @@ class ResultsArea extends PureClasss<Props>
     if(this.state.showingConfig)
     {
       return <ResultsConfig
-        config={this.getResultsConfig()[this.props.query.id]}
+        config={this.getResultsConfig()}
         onClose={this.hideConfig}
         onConfigChange={this.handleConfigChange}
         results={this.state.results}
@@ -521,14 +507,9 @@ class ResultsArea extends PureClasss<Props>
     }
   }
   
-  handleConfigChange(config:Config)
+  handleConfigChange(config:IResultsConfig)
   {
-    var resultsConfig = this.getResultsConfig();
-    resultsConfig[this.props.query.id] = config;
-    localStorage['resultsConfig'] = JSON.stringify(resultsConfig);
-    this.setState({
-      resultsConfig: config,
-    });
+    Actions.change(List(['queries', this.props.query.id, 'resultsConfig']), config);
   }
 
 	render()

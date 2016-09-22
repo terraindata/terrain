@@ -47,6 +47,7 @@ import UserTypes from './../users/UserTypes.tsx';
 import RoleTypes from './../roles/RoleTypes.tsx';
 import BuilderTypes from './../builder/BuilderTypes.tsx';
 import * as Immutable from 'immutable';
+import {IResultsConfig} from '../builder/components/results/ResultsConfig.tsx';
 
 export module BrowserTypes
 {
@@ -67,6 +68,7 @@ export module BrowserTypes
     lastUsername: "",
     algorithmId: "",
     groupId: "",
+    resultsConfig: null,
     mode: "",
     tql: "",
     status: EVariantStatus.Build,
@@ -90,6 +92,7 @@ export module BrowserTypes
     status: EVariantStatus;
     algorithmId: ID;
     groupId: Group;
+    resultsConfig: IResultsConfig;
 
     cards: List<BuilderTypes.ICard>;
     inputs: List<BuilderTypes.IInput>;

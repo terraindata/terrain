@@ -44,69 +44,31 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as React from 'react';
-import Classs from '../../../common/components/Classs.tsx';
+import PureClasss from '../../../common/components/PureClasss.tsx';
 import Table from '../../../common/components/Table.tsx';
 import InfoArea from '../../../common/components/InfoArea.tsx';
-import {Config, ResultsConfig} from "../results/ResultsConfig.tsx";
+import {IResultsConfig, ResultsConfig} from "../results/ResultsConfig.tsx";
 import {ResultFormatValue} from './Result.tsx';
 
 interface Props
 {
   results: any[];
   resultsWithAllFields: any[];
-  resultsConfig: Config;
+  resultsConfig: IResultsConfig;
   onExpand: (index:number) => void;
 }
 
-export default class ResultsTable extends Classs<Props>
+export default class ResultsTable extends PureClasss<Props>
 {
   state: {
-    config: Config;
     random: number;
   } = {
-    config: null,
     random: 0,
   };
   
-  constructor(props:Props)
-  {
-    super(props);
-    this.state.config = this.getConfig(props.resultsConfig);
-  }
-  
-  componentWillReceiveProps(nextProps)
-  {
-    if(!_.isEqual(this.props, nextProps))
-    {
-      this.setState({
-        config: this.getConfig(nextProps.resultsConfig),
-        random: Math.random(),
-      });
-    }
-  }
-  
-  getConfig(config:Config): Config
-  {
-    if(config && config.enabled)
-    {
-      return config;
-    }
-    
-    let result = _.first(this.props.results) || {};
-    let fields = _.keys(result);
-    
-    return {
-      name: "",
-      score: "",
-      fields,
-      enabled: false,
-      formats: {},
-    };
-  }
-  
   getKey(col: number): string
   {
-    let {config} = this.state;
+    let config = this.props.resultsConfig;
     let hasName = this.hasName();
     let hasScore = this.hasScore();
     
@@ -141,12 +103,12 @@ export default class ResultsTable extends Classs<Props>
   
   hasScore(): boolean
   {
-    return this.state.config.score !== "";
+    return this.props.resultsConfig.score !== "";
   }
   
   hasName(): boolean
   {
-    return this.state.config.name !== "";
+    return this.props.resultsConfig.name !== "";
   }
   
   handleCellClick(r: number, c: number)
@@ -162,7 +124,7 @@ export default class ResultsTable extends Classs<Props>
     }
     
     let pinnedCols = (this.hasName() ? 1 : 0) + (this.hasScore() ? 1 : 0);
-    let fieldCount = this.state.config.fields.length + pinnedCols;
+    let fieldCount = this.props.resultsConfig.fields.size + pinnedCols;
     
     return (
       <Table

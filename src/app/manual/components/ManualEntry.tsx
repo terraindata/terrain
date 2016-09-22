@@ -265,6 +265,7 @@ class ManualEntry extends Classs<Props>
       mode: '',
       name: '',
       lastEdited: '',
+      resultsConfig: null,
     };
 
     var value = TQLConverter.toTQL(query);

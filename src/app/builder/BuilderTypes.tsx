@@ -61,6 +61,7 @@ export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span classN
 
 import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, firstSecondDisplay, wrapperDisplay, stringValueDisplay} from './BuilderDisplays.tsx';  
 var ManualConfig = require('./../manual/ManualConfig.json');
+import {IResultsConfig} from "./components/results/ResultsConfig.tsx";
 
 export module BuilderTypes
 {
@@ -134,6 +135,8 @@ export module BuilderTypes
     id: string;
     cards: ICards;
     inputs: List<any>;
+    resultsConfig: IResultsConfig;
+    
     tql: string;
     mode: string;
     version: boolean;
@@ -159,6 +162,31 @@ export module BuilderTypes
     text: any[];
   }
     
+
+
+  // BUILDING BLOCKS
+  // The following large section defines every card
+  //  and every piece of every card.
+  
+  // IBlock is a card or a distinct piece / group of card pieces
+  export interface IBlock extends IRecord<IBlock>
+  {
+    id: string;
+    type: string;
+    
+    // fields not saved on server
+    static:
+    {
+      tql: string;
+      tqlJoiner?: string;
+      topTql?: string;
+      accepts?: string[];
+      [field:string]: any;
+    }
+    
+    [field:string]: any;
+  }
+  
   export interface ICard extends IRecord<ICard>
   {
     id: string;
@@ -205,29 +233,6 @@ export module BuilderTypes
   
   export type ICards = List<ICard>;
   export type CardString = string | ICard;
-
-
-  // BUILDING BLOCKS
-  // The following large section defines every card
-  //  and every piece of every card.
-  
-  // IBlock is a card or a distinct piece / group of card pieces
-  export interface IBlock extends IRecord<IBlock>
-  {
-    id: string;
-    type: string;
-    
-    // fields not saved on server
-    static:
-    {
-      tql: string;
-      tqlJoiner?: string;
-      topTql?: string;
-      [field:string]: any;
-    }
-    
-    [field:string]: any;
-  }
   
   interface IBlockConfig
   {
@@ -262,6 +267,7 @@ export module BuilderTypes
       tql: string;
       tqlJoiner?: string;
       topTql?: string;
+      accepts?: string[];
       
       getChildTerms?: (card: ICard) => List<string>;
       getNeighborTerms?: (card: ICard) => List<string>;
@@ -297,6 +303,7 @@ export module BuilderTypes
     display?: Display | Display[];
     tql: string;
     tqlJoiner?: string;
+    accepts: string[];
   }
   
   const _wrapperCard = (config:IWrapperCardConfig) =>
@@ -308,6 +315,7 @@ export module BuilderTypes
       {
         title: config.title,
         colors: config.colors,
+        accepts: config.accepts,
 
         manualEntry: config.manualEntry,
 
@@ -619,44 +627,18 @@ export module BuilderTypes
       },
     }),
     
-    where: _card({
-      clause: "",
+    where: _wrapperCard({
+      title: "Where",
+      colors: ["#44a9cf", "#b9e5f3"],
+      tql: "WHERE\n$clause",
+      manualEntry: ManualConfig.cards.where,
       
-      static:
-      {
-        title: "Where",
-        preview: (c:ICard) =>
-        {
-          if(typeof c['clause'] === 'string')
-          {
-            return c['clause'];
-          }
-          return  getPreview(c['clause']);
-        },
-        
-        colors: ["#44a9cf", "#b9e5f3"],
-        // colors: ["#AFC5D5", "#D9EAF7"],
-        tql: "WHERE\n$clause",
-        manualEntry: ManualConfig.cards.where,
-        
-        // suggestCards: List([
-          
-        // ]),
-        
-        display: 
-        [
-          {
-            displayType: DisplayType.CARDTEXT,
-            key: 'clause',
-            placeholder: 'Clause or Condition',
-          },
-          {
-            displayType: DisplayType.CARDSFORTEXT,
-            key: 'clause',
-            className: 'wrapper-cards-content',
-          }
-        ]
-      }
+      accepts: [
+        'multiAnd',
+        'multiOr',
+        'exists',
+        'tql',
+      ],
     }),
     
     multiand: _multiAndOrCard({
@@ -888,6 +870,7 @@ export module BuilderTypes
       title: "Exists",
       manualEntry: ManualConfig.cards['exists'],
       tql: "EXISTS\n(\n$cards)",
+      accepts: ['sfw'],
     }),
 
     parentheses: _wrapperCard(
@@ -897,6 +880,7 @@ export module BuilderTypes
       title: "( )",
       manualEntry: ManualConfig.cards['parentheses'],
       tql: "\n(\n$cards)",
+      accepts: ['and', 'or', 'exists', 'tql'],
     }),
     
     weight: _block(
@@ -1069,7 +1053,7 @@ export module BuilderTypes
       
       static:
       {
-        title: "TQL",
+        title: "Expression",
         preview: "\n$clause",
         colors: ["#569a55", "#c1debf"],
         // colors: ["#37df77", "#97ffd7"],
@@ -1083,19 +1067,19 @@ export module BuilderTypes
       }
     }),
     
-    and: _andOrCard({
-      title: 'And',
-      tql: 'AND',
-      manualEntry: ManualConfig.cards.and,
-      colors: ["#47a7ff", "#97d7ff"],
-    }),
+    // and: _andOrCard({
+    //   title: 'And',
+    //   tql: 'AND',
+    //   manualEntry: ManualConfig.cards.and,
+    //   colors: ["#47a7ff", "#97d7ff"],
+    // }),
     
-    or: _andOrCard({
-      title: 'Or',
-      tql: 'OR',
-      manualEntry: ManualConfig.cards.or,
-      colors: ["#6777ff", "#a7b7ff"],
-    }),
+    // or: _andOrCard({
+    //   title: 'Or',
+    //   tql: 'OR',
+    //   manualEntry: ManualConfig.cards.or,
+    //   colors: ["#6777ff", "#a7b7ff"],
+    // }),
     
     
     andBlock: _block(

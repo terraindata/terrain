@@ -43,7 +43,8 @@ THE SOFTWARE.
 */
 
 require('./ResultsConfig.less');
-
+import * as Immutable from 'immutable';
+let {List,Map} = Immutable;
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
@@ -51,7 +52,7 @@ import Util from '../../../util/Util.tsx';
 import Ajax from '../../../util/Ajax.tsx';
 import Result from "../results/Result.tsx";
 import InfoArea from '../../../common/components/InfoArea.tsx';
-import Classs from './../../../common/components/Classs.tsx';
+import PureClasss from './../../../common/components/PureClasss.tsx';
 import Switch from './../../../common/components/Switch.tsx';
 import { DragSource, DropTarget } from 'react-dnd';
 
@@ -60,40 +61,53 @@ var GearIcon = require("./../../../../images/icon_gear.svg?name=GearIcon");
 var TextIcon = require("./../../../../images/icon_text_12x18.svg?name=TextIcon");
 var ImageIcon = require("./../../../../images/icon_profile_16x16.svg?name=ImageIcon");
 
-export interface Format
+class Format
 {
-  type: string;
-  template: string;
-  showRaw: boolean;
-  showField: boolean;
+  type: string = "";
+  template: string = "";
+  showRaw: boolean = false;
+  showField: boolean = false;
+  
+  set: (f: string, v: any) => Format;
+  setIn: (f: string[], v: any) => Format;
 }
+const Format_Record = Immutable.Record(new Format());
+const _Format = (config?:any) => {
+  return new Format_Record(config || {}) as any as Format;
+} 
 
-export interface Config
+export class IResultsConfig
 {
-  name: string;
-  score: string;
-  fields: string[];
-  enabled: boolean;
-  formats: {
-    [field: string]: Format
-  }
+  name: string = "";
+  score: string = "";
+  fields: List<string> = List([]);
+  enabled: boolean = false;
+  formats: Map<string, Format> = Map({});
+  
+  set: (f: string, v: any) => IResultsConfig;
+  setIn: (f: string[], v: any) => IResultsConfig;
 }
+const IResultsConfig_Record = Immutable.Record(new IResultsConfig());
+const _IResultsConfig = (config?:any) => {
+  return new IResultsConfig_Record(config || {}) as any as IResultsConfig;
+}
+export const DefaultIResultsConfig = _IResultsConfig();
 
 interface Props
 {
   results: any[];
   resultsWithAllFields: any[];
-  config: Config;
-  onConfigChange: (config:Config) => void;
+  config: IResultsConfig;
+  onConfigChange: (config:IResultsConfig) => void;
   onClose: () => void;
 }
 
-export class ResultsConfig extends Classs<Props>
+export class ResultsConfig extends PureClasss<Props>
 {
   state: {
-    fields: string[];
+    fields: List<string>;
     lastHover: {index: number, field: string},
-    config: Config;
+    config: IResultsConfig;
   } = {
     fields: null,
     lastHover: {index: null, field: null},
@@ -104,61 +118,37 @@ export class ResultsConfig extends Classs<Props>
   {
     super(props);
     this.state.config = props.config;
+    this.state.fields = this.calcFields(this.props.results, this.props.resultsWithAllFields);
   }
   
-  componentWillMount()
+  componentWillReceiveProps(nextProps:Props)
   {
-    this.calcFields(this.props);
-  }
-  
-  componentWillReceiveProps(nextProps)
-  {
-    this.calcFields(nextProps);
-    if(!_.isEqual(nextProps.config, this.props.config))
+    if(nextProps.config !== this.props.config)
     {
       this.setState({
         config: nextProps.config,
       });
     }
-  }
-  
-  calcFields(props:Props)
-  {
-    if(!props.resultsWithAllFields && !props.results)
+    
+    if(this.props.results !== nextProps.results || this.props.resultsWithAllFields !== nextProps.resultsWithAllFields)
     {
       this.setState({
-        fields: [],
-        loading: true,
+        fields: this.calcFields(nextProps.results, nextProps.resultsWithAllFields),
       });
-      return;
     }
-    
-    let fieldReducer = (fields, result) =>
-    {
-      _.map(result, (v, field) => fields[field] = 1);
-      return fields;
-    };
-    let resultsFieldsReduced = props.results ? props.results.reduce(fieldReducer, {}) : {};
-    let allResultsFieldsReduced = props.resultsWithAllFields ? props.resultsWithAllFields.reduce(fieldReducer, {}) : {};
-    
-    let fields = _.keys(_.extend(resultsFieldsReduced, allResultsFieldsReduced));
-    
-    this.setState({
-      loading: false,
-      fields,
-    });
   }
   
-  getConfig():Config
+  calcFields(results:any[], resultsWithAllFields:any[]):List<string>
   {
-    let {config} = this.state;
-    return {
-      name: config && config.name,
-      score: config && config.score,
-      fields: (config && config.fields) || [],
-      enabled: config ? config.enabled : true,
-      formats: (config && config.formats) || {},
-    };
+    var fieldMap = {};
+    let resultsMapFn = (result:any) => _.map(result, (v,field) => fieldMap[field] = 1);
+    console.log(results, resultsWithAllFields);
+    results && results.map(resultsMapFn);
+    resultsWithAllFields && resultsWithAllFields.map(resultsMapFn);
+    
+    let fields = _.keys(resultsMapFn);
+    console.log(fields);
+    return List(fields);
   }
   
   handleDrop(type: string, field: string, index?: number)
@@ -171,20 +161,22 @@ export class ResultsConfig extends Classs<Props>
       return;
     }
     
-    var newConfig = this.getConfig();
+    var {config} = this.state;
     
     // remove if already set
-    if(newConfig.name === field)
+    if(config.name === field)
     {
-      newConfig.name = null;
+      config = config.set('name', null);
     }
-    if(newConfig.score === field)
+    if(config.score === field)
     {
-      newConfig.score = null;
+      config = config.set('score', null);
     }
-    if(newConfig.fields.indexOf(field) !== -1)
+    if(config.fields.indexOf(field) !== -1)
     {
-      newConfig.fields.splice(newConfig.fields.indexOf(field), 1);
+      config = config.set('fields',
+        config.fields.splice(config.fields.indexOf(field), 1)
+      );
     }
 
     // set if needed    
@@ -192,19 +184,19 @@ export class ResultsConfig extends Classs<Props>
     {
       if(index !== undefined)
       {
-        newConfig.fields.splice(index, 0, field);
+        config = config.set('fields', config.fields.splice(index, 0, field));
       }
       else
       {
-        newConfig.fields.push(field);
+        config = config.set('fields', config.fields.push(field));
       }
     }
     else if(type != null)
     {
-      newConfig[type] = field;
+      config = config.set(type, field);
     }
     
-    this.changeConfig(newConfig);
+    this.changeConfig(config);
     
     if(index === undefined)
     {
@@ -214,31 +206,21 @@ export class ResultsConfig extends Classs<Props>
     }
   }
   
-  changeConfig(newConfig:Config)
+  changeConfig(config:IResultsConfig)
   {
     this.setState({
-      config: newConfig,
+      config,
     });
   }
   
   handleEnabledToggle()
   {
-    let config = this.getConfig();
-    this.changeConfig(_.extend({}, config,
-    {
-      enabled: !config.enabled,
-    }));
-  }
-  
-  fieldIsSelected(field)
-  {
-    let {config} = this.props;
-    return config.name === field || config.score === field || config.fields.indexOf(field) !== -1;
+    this.changeConfig(this.state.config.set('enabled', !this.state.config.enabled));
   }
   
   fieldType(field)
   {
-    let {config} = this.props;
+    let {config} = this.state;
     if(!config) return null;
     if(config.name === field)
     {
@@ -273,14 +255,9 @@ export class ResultsConfig extends Classs<Props>
   
   handleFormatChange(field:string, format:Format)
   {
-    let config = this.getConfig();
-    this.changeConfig(_.extend({}, config,
-    {
-      formats: _.extend({}, config.formats,
-      {
-        [field]: format,
-      })
-    }));
+    this.changeConfig(
+      this.state.config.setIn(['formats', field], format)
+    );
   }
   
   handleClose()
@@ -291,9 +268,9 @@ export class ResultsConfig extends Classs<Props>
   
 	render()
   {
-    let config = this.getConfig();
-    let enabled = config.enabled;
-    let formats = config.formats || {};
+    let {config} = this.state;
+    let {enabled, formats} = config;
+    
     return (
       <div className='results-config-wrapper'>
         <div className={classNames({
@@ -332,11 +309,11 @@ export class ResultsConfig extends Classs<Props>
                 </div>
                 { 
                   config && config.name ? 
-                    <ConfigResult
+                    <IResultsConfigResult
                       field={config.name}
                       is='score'
                       onRemove={this.handleRemove}
-                      format={formats[config.name]}
+                      format={formats.get(config.name)}
                       onFormatChange={this.handleFormatChange}
                     />
                   : 
@@ -355,11 +332,11 @@ export class ResultsConfig extends Classs<Props>
                 </div>
                 {
                   config && config.score ?
-                    <ConfigResult
+                    <IResultsConfigResult
                       field={config.score}
                       is='score'
                       onRemove={this.handleRemove}
-                      format={formats[config.score]}
+                      format={formats.get(config.score)}
                       onFormatChange={this.handleFormatChange}
                     />
                   : 
@@ -379,14 +356,14 @@ export class ResultsConfig extends Classs<Props>
                 {
                   config && config.fields.map((field, index) =>
                       <div className='results-config-field-wrapper' key={field}>
-                        <ConfigResult
+                        <IResultsConfigResult
                           field={field}
                           is='field'
                           index={index}
                           onHover={this.handleFieldHover}
                           draggingField={this.state.lastHover.field}
                           onRemove={this.handleRemove}
-                          format={formats[field]}
+                          format={formats.get(field)}
                           onFormatChange={this.handleFormatChange}
                         />
                       </div>
@@ -404,13 +381,13 @@ export class ResultsConfig extends Classs<Props>
             onDrop={this.handleDrop}
           >
             { this.state.fields.map(field =>
-                <ConfigResult
+                <IResultsConfigResult
                   key={field}
                   field={field}
                   is={this.fieldType(field)}
                   isAvailableField={true}
                   onRemove={this.handleRemove}
-                  format={formats[field]}
+                  format={formats.get(field)}
                   onFormatChange={this.handleFormatChange}
                 />
             ) }
@@ -427,7 +404,7 @@ export class ResultsConfig extends Classs<Props>
 	}
 }
 
-interface ConfigResultProps
+interface IResultsConfigResultProps
 {
   field: string;
   is?: string; // 'title', 'score', 'field', or null
@@ -442,7 +419,7 @@ interface ConfigResultProps
   format: Format;
   onFormatChange: (field: string, format:Format) => void;
 }
-class ConfigResultC extends Classs<ConfigResultProps>
+class IResultsConfigResultC extends PureClasss<IResultsConfigResultProps>
 {
   state: {
     showFormat: boolean;
@@ -489,24 +466,23 @@ class ConfigResultC extends Classs<ConfigResultProps>
   
   changeFormat(key:string, val:any)
   {
-    let format: Format = this.props.format || {
+    var format = this.props.format || _Format({
       type: 'text',
       template: '',
       showRaw: false,
       showField: true,
-    };
+    });
     
-    var newFormat = {
-      [key]: val,
-    };
-    
-    this.props.onFormatChange(this.props.field, _.extend({}, format, newFormat));
+    this.props.onFormatChange(this.props.field,
+      this.props.format.set(key, val)
+    );
   }
   
   render()
   {
     let {format} = this.props;
     let image = format && format.type === 'image';
+    
     return this.props.connectDropTarget(this.props.connectDragSource(
       <div className={classNames({
         'results-config-field': true,
@@ -653,7 +629,7 @@ const resultDropCollect = (connect, monitor) =>
 });
 
 
-let ConfigResult = DropTarget('RESULTCONFIG', resultTarget, resultDropCollect)(DragSource('RESULTCONFIG', resultSource, dragCollect)(ConfigResultC));
+let IResultsConfigResult = DropTarget('RESULTCONFIG', resultTarget, resultDropCollect)(DragSource('RESULTCONFIG', resultSource, dragCollect)(IResultsConfigResultC));
 
 
 interface CRTargetProps
@@ -665,7 +641,7 @@ interface CRTargetProps
   children?: any;
   isOver?: boolean;
 }
-class CRTargetC extends Classs<CRTargetProps>
+class CRTargetC extends PureClasss<CRTargetProps>
 {
   render()
   {

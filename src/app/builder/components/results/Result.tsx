@@ -55,7 +55,7 @@ import Menu from '../../../common/components/Menu.tsx';
 import Actions from '../../data/BuilderActions.tsx';
 import ColorManager from '../../../util/ColorManager.tsx';
 import Classs from './../../../common/components/Classs.tsx';
-import {Config} from './ResultsConfig.tsx';
+import {IResultsConfig} from './ResultsConfig.tsx';
 
 var PinIcon = require("./../../../../images/icon_pin_21x21.svg?name=PinIcon");
 var ScoreIcon = require("./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon");
@@ -83,7 +83,7 @@ interface Props
   };
   allFieldsData: any;
   connectDragPreview?: (a:any) => void;
-  config: Config;
+  config: IResultsConfig;
   index: number;
   onExpand: (index:number) => void;
   expanded?: boolean;
@@ -96,7 +96,23 @@ interface Props
 class Result extends Classs<Props> {
   shouldComponentUpdate(nextProps, nextState)
   {
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+    // Note: in the future, convert the results to cached immutable objects
+    /// and compute any differences when the AJAX response returns
+    
+    if(!_.isEqual(this.props.data, nextProps.data))
+    {
+      return true;
+    }
+    
+    for(var k in this.props)
+    {
+      if(k !== 'data' && this.props[k] !== nextProps[k])
+      {
+        return true;
+      }
+    }
+    
+    return false;    
   }
   
   dragPreview: any;
@@ -243,9 +259,9 @@ class Result extends Classs<Props> {
   getFields(): string[]
   {
     let {config, data} = this.props;
-    if(config && config.enabled && config.fields && config.fields.length)
+    if(config && config.enabled && config.fields && config.fields.size)
     {
-      var fields = config.fields;
+      var fields = config.fields.toArray();
     }
     else
     {
@@ -353,7 +369,7 @@ class Result extends Classs<Props> {
 
 
 
-export function ResultFormatValue(field: string, value: string | number, config: Config, overrideFormat?: any): any
+export function ResultFormatValue(field: string, value: string | number, config: IResultsConfig, overrideFormat?: any): any
 {
   let format = config && config.formats && config.formats[field];
   let {showRaw} = overrideFormat || format || { showRaw: false };
