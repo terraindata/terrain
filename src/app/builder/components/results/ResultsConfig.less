@@ -205,14 +205,34 @@
       position: relative;
       padding-left: 30px;
       
+      .results-config-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: calc(~"100% - 25px");
+        display: inline-block;
+      }
+      
       &.results-config-field-used {
         background: @light-green;
-        .results-config-handle {
-          opacity: 0;
-          &:hover {
-            opacity: 0;
-          }
+        // .results-config-handle {
+        //   opacity: 0;
+        //   &:hover {
+        //     opacity: 0;
+        //   }
+        // }
+      }
+      
+      .close {
+        fill: @grey;
+        opacity: 0.5;
+        &:hover {
+          fill: #fff;
+          opacity: 1;
         }
+        position: absolute;
+        right: 6px;
+        top: 14px;
       }
       
       .results-config-handle {
@@ -227,7 +247,6 @@
         letter-spacing: -2px;
       }
       
-      .close,
       .results-config-field-gear {
         float: right;
         margin-top: 2px;
@@ -236,12 +255,9 @@
         &:hover {
           opacity: 1;
         }
-      }
-      
-      .results-config-field-gear {
         width: 11px;
         fill: @aged-moss;
-        margin-right: 6px;
+        margin-right: 10px;
       }
       
       &:hover {

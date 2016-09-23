@@ -50,6 +50,7 @@ import ActionTypes from './BuilderActionTypes.tsx';
 import Actions from './BuilderActions.tsx';
 import * as _ from 'underscore';
 import {BuilderState} from './BuilderStore.tsx';
+import {_IResultsConfig} from './../components/results/ResultsConfig.tsx';
 import Util from '../../util/Util.tsx';
 
 const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
@@ -100,6 +101,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
               }
               item.cards = BuilderTypes.recordFromJS(item.cards || []);
               item.inputs = BuilderTypes.recordFromJS(item.inputs || []);
+              item.resultsConfig = _IResultsConfig(item.resultsConfig);
               item.version = false;
               Actions.setVariant(variantId, item);
             }

@@ -86,7 +86,7 @@ export default class ResultsTable extends PureClasss<Props>
     }
     
     let offset = (hasName ? 1 : 0) + (hasScore ? 1 : 0);
-    return config.fields[col - offset];
+    return config.fields.get(col - offset);
   }
   
   getValue(i: number, col: number): string

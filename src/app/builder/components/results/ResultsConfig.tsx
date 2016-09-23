@@ -86,10 +86,17 @@ export class IResultsConfig
   
   set: (f: string, v: any) => IResultsConfig;
   setIn: (f: string[], v: any) => IResultsConfig;
+  toJS: () => any;
 }
 const IResultsConfig_Record = Immutable.Record(new IResultsConfig());
-const _IResultsConfig = (config?:any) => {
-  return new IResultsConfig_Record(config || {}) as any as IResultsConfig;
+export const _IResultsConfig = (config?:any) => {
+  var conf = new IResultsConfig_Record(config || {}) as any as IResultsConfig;
+  
+  conf = conf.set('formats', Map(conf.formats));
+  conf = conf.set('formats', conf.formats.map(format => _Format(format)));
+  conf = conf.set('fields', List(conf.fields));
+  
+  return conf;
 }
 export const DefaultIResultsConfig = _IResultsConfig();
 
@@ -142,12 +149,10 @@ export class ResultsConfig extends PureClasss<Props>
   {
     var fieldMap = {};
     let resultsMapFn = (result:any) => _.map(result, (v,field) => fieldMap[field] = 1);
-    console.log(results, resultsWithAllFields);
     results && results.map(resultsMapFn);
     resultsWithAllFields && resultsWithAllFields.map(resultsMapFn);
     
-    let fields = _.keys(resultsMapFn);
-    console.log(fields);
+    let fields = _.keys(fieldMap);
     return List(fields);
   }
   
@@ -309,7 +314,7 @@ export class ResultsConfig extends PureClasss<Props>
                 </div>
                 { 
                   config && config.name ? 
-                    <IResultsConfigResult
+                    <ResultsConfigResult
                       field={config.name}
                       is='score'
                       onRemove={this.handleRemove}
@@ -332,7 +337,7 @@ export class ResultsConfig extends PureClasss<Props>
                 </div>
                 {
                   config && config.score ?
-                    <IResultsConfigResult
+                    <ResultsConfigResult
                       field={config.score}
                       is='score'
                       onRemove={this.handleRemove}
@@ -356,7 +361,7 @@ export class ResultsConfig extends PureClasss<Props>
                 {
                   config && config.fields.map((field, index) =>
                       <div className='results-config-field-wrapper' key={field}>
-                        <IResultsConfigResult
+                        <ResultsConfigResult
                           field={field}
                           is='field'
                           index={index}
@@ -381,7 +386,7 @@ export class ResultsConfig extends PureClasss<Props>
             onDrop={this.handleDrop}
           >
             { this.state.fields.map(field =>
-                <IResultsConfigResult
+                <ResultsConfigResult
                   key={field}
                   field={field}
                   is={this.fieldType(field)}
@@ -404,7 +409,7 @@ export class ResultsConfig extends PureClasss<Props>
 	}
 }
 
-interface IResultsConfigResultProps
+interface ResultsConfigResultProps
 {
   field: string;
   is?: string; // 'title', 'score', 'field', or null
@@ -419,7 +424,7 @@ interface IResultsConfigResultProps
   format: Format;
   onFormatChange: (field: string, format:Format) => void;
 }
-class IResultsConfigResultC extends PureClasss<IResultsConfigResultProps>
+class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
 {
   state: {
     showFormat: boolean;
@@ -474,7 +479,7 @@ class IResultsConfigResultC extends PureClasss<IResultsConfigResultProps>
     });
     
     this.props.onFormatChange(this.props.field,
-      this.props.format.set(key, val)
+      format.set(key, val)
     );
   }
   
@@ -495,9 +500,11 @@ class IResultsConfigResultC extends PureClasss<IResultsConfigResultProps>
       })}>
         <div className='results-config-field-body'>
           <span className='results-config-handle'>⋮⋮</span>
-          {
-            this.props.field
-          }
+          <span className='results-config-text'>
+            {
+              this.props.field
+            }
+          </span>
           {
             this.props.is !== null ? 
               <CloseIcon
@@ -551,6 +558,7 @@ class IResultsConfigResultC extends PureClasss<IResultsConfigResultProps>
                 id={'check-f-' + this.props.field}
                 checked={format && format.showField}
                 onChange={this.toggleField}
+                value={"" /* can remove when updated to newest React */}
               />
               <label htmlFor={'check-f-' + this.props.field}>
                 Show field name label
@@ -560,8 +568,9 @@ class IResultsConfigResultC extends PureClasss<IResultsConfigResultProps>
               <input
                 type='checkbox'
                 id={'check-' + this.props.field}
-                checked={format && format.showRaw}
+                checked={!!format && format.showRaw}
                 onChange={this.toggleRaw}
+                value={"" /* can remove when updated to newest React */}
               />
               <label htmlFor={'check-' + this.props.field}>
                 Show raw value, as well
@@ -629,7 +638,7 @@ const resultDropCollect = (connect, monitor) =>
 });
 
 
-let IResultsConfigResult = DropTarget('RESULTCONFIG', resultTarget, resultDropCollect)(DragSource('RESULTCONFIG', resultSource, dragCollect)(IResultsConfigResultC));
+let ResultsConfigResult = DropTarget('RESULTCONFIG', resultTarget, resultDropCollect)(DragSource('RESULTCONFIG', resultSource, dragCollect)(ResultsConfigResultC));
 
 
 interface CRTargetProps

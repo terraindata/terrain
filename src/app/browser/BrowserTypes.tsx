@@ -80,7 +80,7 @@ export module BrowserTypes
     // for DB storage
     type: "variant",
     dbFields: ['groupId', 'algorithmId', 'status'],
-    dataFields: ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs', 'mode', 'tql'],    
+    dataFields: ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs', 'mode', 'tql', 'resultsConfig'],    
     statusMap: (s:EVariantStatus) => EVariantStatus[s],
   });
   export class Variant extends _Variant implements BuilderTypes.IQuery
@@ -120,6 +120,7 @@ export module BrowserTypes
   {
     v = touchVariant(v);
     v = v.set('cards', BuilderTypes.recordsForServer(v.cards)) as Variant;
+    v = v.set('resultsConfig', v.resultsConfig.toJS()) as Variant;
     return v;
   }
   

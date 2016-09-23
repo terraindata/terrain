@@ -630,7 +630,7 @@ export module BuilderTypes
     where: _wrapperCard({
       title: "Where",
       colors: ["#44a9cf", "#b9e5f3"],
-      tql: "WHERE\n$clause",
+      tql: "WHERE\n$cards",
       manualEntry: ManualConfig.cards.where,
       
       accepts: [
@@ -1192,6 +1192,15 @@ export module BuilderTypes
       
       if(value.type && Blocks[value.type])
       {
+        if(value.type === 'where')
+        {
+          if(!value.cards)
+          {
+            value.cards = List([
+              value.clause,
+            ]);
+          }
+        }
         value = make(Blocks[value.type], value);
       }
       else

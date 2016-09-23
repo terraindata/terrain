@@ -156,7 +156,7 @@ class Result extends Classs<Props> {
     
     var value = this.getValue(field, overrideFormat);
     
-    let format = this.props.config && this.props.config.formats && this.props.config.formats[field];
+    let format = this.props.config && this.props.config.formats.get(field);
     let showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
       <div className="result-field" key={field}>
@@ -371,7 +371,7 @@ class Result extends Classs<Props> {
 
 export function ResultFormatValue(field: string, value: string | number, config: IResultsConfig, overrideFormat?: any): any
 {
-  let format = config && config.formats && config.formats[field];
+  let format = config && config.formats && config.formats.get(field);
   let {showRaw} = overrideFormat || format || { showRaw: false };
   var italics = false;
   
