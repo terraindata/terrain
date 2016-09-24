@@ -178,9 +178,9 @@ export module BuilderTypes
     static:
     {
       tql: string;
-      tqlJoiner?: string;
+      tqlGlue?: string;
       topTql?: string;
-      accepts?: string[];
+      accepts?: List<string>;
       [field:string]: any;
     }
     
@@ -204,12 +204,12 @@ export module BuilderTypes
       // the format string used for generating tql
       // - insert the value of a card member by prepending the field's name with $, e.g. "$expression" or "$filters"
       // - arrays/Lists are joined with "," by default
-      // - to join List with something else, specify a tqlJoiner
+      // - to join List with something else, specify a tqlGlue
       // - to map a value to another string, write the field name in all caps. the value will be passed into "[FieldName]TQL" map
       //    e.g. "$DIRECTION" will look up "DirectionTQL" in BuilderTypes and pass the value into it
       // - topTql is the tql to use if this card is at the top level of a query
       tql: string;
-      tqlJoiner?: string;
+      tqlGlue?: string;
       topTql?: string;
       
       // returns an object with default values for a new card
@@ -238,7 +238,8 @@ export module BuilderTypes
   {
     static: {
       tql: string;
-      tqlJoiner?: string;
+      tqlGlue?: string;
+      accepts?: List<string>;
     }
     
     [field:string]:any;
@@ -265,9 +266,9 @@ export module BuilderTypes
       display: Display | Display[];
       manualEntry: IManualEntry;
       tql: string;
-      tqlJoiner?: string;
+      tqlGlue?: string;
       topTql?: string;
-      accepts?: string[];
+      accepts?: List<string>;
       
       getChildTerms?: (card: ICard) => List<string>;
       getNeighborTerms?: (card: ICard) => List<string>;
@@ -302,8 +303,8 @@ export module BuilderTypes
     getNeighborTerms?: (card: ICard) => List<string>;
     display?: Display | Display[];
     tql: string;
-    tqlJoiner?: string;
-    accepts: string[];
+    tqlGlue?: string;
+    accepts: List<string>;
   }
   
   const _wrapperCard = (config:IWrapperCardConfig) =>
@@ -339,6 +340,7 @@ export module BuilderTypes
         display: (config.display || wrapperDisplay),
         
         tql: config.tql,
+        tqlGlue: config.tqlGlue,
       }
     })
   }
@@ -363,59 +365,7 @@ export module BuilderTypes
     }
   })
   
-  const _andOrCard = (config: { title: string, tql: string, colors: string[], manualEntry }) => _card(
-    {
-      first: "",
-      second: "",
-      
-      static:
-      {
-        title: config.title,
-        manualEntry: config.manualEntry,
-        preview: (c:ICard) =>
-        {
-          var first = c['first'];
-          var second = c['second'];
-          if(typeof first !== 'string')
-          {
-            first = getPreview(first);
-          }
-          if(typeof second !== 'string')
-          {
-            second = getPreview(second);
-          }
-          
-          return `${first} ${config.tql} ${second}`
-        },
-        colors: ["#47a7ff", "#97d7ff"],
-        tql: "$first " + config.tql + " $second",
-                
-        display: [
-          {
-            displayType: DisplayType.CARDSFORTEXT,
-            key: 'first',
-          },
-
-          {
-            displayType: DisplayType.CARDTEXT,
-            key: 'first',
-            top: true,
-          },
-          
-          {
-            displayType: DisplayType.CARDTEXT,
-            key: 'second',
-          },
-
-          {
-            displayType: DisplayType.CARDSFORTEXT,
-            key: 'second',
-          },
-        ],
-      },
-    });
-  
-  const _multiAndOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, colors: string[], manualEntry: any }) => _card(
+  const _andOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, colors: string[], manualEntry: any }) => _card(
     {
       clauses: L(),
       
@@ -425,7 +375,7 @@ export module BuilderTypes
         preview: '[clauses.length] ' + config.english + ' clauses',
         colors: config.colors,
         tql: "(\n$clauses\n)",
-        tqlJoiner: config.tqlGlue,
+        tqlGlue: config.tqlGlue,
         manualEntry: config.manualEntry,
         
         init: () => ({
@@ -505,6 +455,8 @@ export module BuilderTypes
       
       static: {
         tql: "\n $first $OPERATOR $second",
+        
+        accepts: List(['score', 'transform', 'from', 'exists']),
       }
     }),
     
@@ -524,6 +476,7 @@ export module BuilderTypes
       
       static: {
         tql: "\n $field",
+        accepts: List(['min', 'max', 'avg', 'sum', 'count', 'distinct']),
       }
     }),
     
@@ -633,32 +586,30 @@ export module BuilderTypes
       tql: "WHERE\n$cards",
       manualEntry: ManualConfig.cards.where,
       
-      accepts: [
-        'multiAnd',
-        'multiOr',
+      accepts: List([
+        'and',
+        'or',
         'exists',
         'tql',
-      ],
+      ]),
     }),
     
-    multiand: _multiAndOrCard({
+    and: _wrapperCard({
       title: "And",
-      factoryType: 'andBlock',
-      english: "and",
-      tqlGlue: '\nAND ',
+      tql: '(\n$cards\n)',
+      tqlGlue: '\nAND\n',
       manualEntry: ManualConfig.cards.and,
       colors: ["#42b4bc", "#b8eaeb"],
-      // colors: ["#47a7ff", "#97d7ff"],
+      accepts: List(['or', 'comparison', 'exists', 'tql']),
     }),
     
-    multior: _multiAndOrCard({
+    or: _wrapperCard({
       title: "Or",
-      factoryType: 'orBlock',
-      english: "or",
-      tqlGlue: '\nOR ',
+      tql: '(\n$cards\n)',
+      tqlGlue: '\nOR\n',
       manualEntry: ManualConfig.cards.or,
       colors: ["#429e8f", "#b8e0d8"],
-      // colors: ["#6777ff", "#a7b7ff"],
+      accepts: List(['and', 'comparison', 'exists', 'tql']),
     }),
    
     comparison: _card(
@@ -685,7 +636,6 @@ export module BuilderTypes
           return `${first} ${Operators[c['operator']]} ${second}`
         },
         colors: ["#6ead6e", "#dbecc8"],
-        // colors: ["#7EAAB3", "#B9E1E9"],
         tql: "$first $OPERATOR $second",
         
         display: firstSecondDisplay({
@@ -870,7 +820,7 @@ export module BuilderTypes
       title: "Exists",
       manualEntry: ManualConfig.cards['exists'],
       tql: "EXISTS\n(\n$cards)",
-      accepts: ['sfw'],
+      accepts: List(['sfw']),
     }),
 
     parentheses: _wrapperCard(
@@ -880,7 +830,7 @@ export module BuilderTypes
       title: "( )",
       manualEntry: ManualConfig.cards['parentheses'],
       tql: "\n(\n$cards)",
-      accepts: ['and', 'or', 'exists', 'tql'],
+      accepts: List(['and', 'or', 'exists', 'tql']),
     }),
     
     weight: _block(
@@ -1067,42 +1017,6 @@ export module BuilderTypes
       }
     }),
     
-    // and: _andOrCard({
-    //   title: 'And',
-    //   tql: 'AND',
-    //   manualEntry: ManualConfig.cards.and,
-    //   colors: ["#47a7ff", "#97d7ff"],
-    // }),
-    
-    // or: _andOrCard({
-    //   title: 'Or',
-    //   tql: 'OR',
-    //   manualEntry: ManualConfig.cards.or,
-    //   colors: ["#6777ff", "#a7b7ff"],
-    // }),
-    
-    
-    andBlock: _block(
-    {
-      clause: "",
-      static:
-      {
-        tql: "\n$clause",
-        tqlJoiner: "AND",
-      },
-    }),
-    
-    orBlock: _block(
-    {
-      clause: "",
-      static:
-      {
-        tql: "\n$clause",
-        tqlJoiner: "OR",
-      },
-    }),
-    
-    
     spotlight: _block(
     {
       static: {
@@ -1190,17 +1104,23 @@ export module BuilderTypes
         return memo;
       }, Array.isArray(value) ? [] : {});
       
+      // conversion, remove when appropriate
+      if(value.type === 'multiand' || value.type === 'multior')
+      {
+        value.type = value.type.substr(5);
+        value.cards = value.clauses.map(block =>
+        {
+          let clause = block.get('clause');
+          if(typeof clause === 'string')
+          {
+            return make(Blocks.tql, { clause });
+          }
+          return clause;
+        });
+      }
+      
       if(value.type && Blocks[value.type])
       {
-        if(value.type === 'where')
-        {
-          if(!value.cards)
-          {
-            value.cards = List([
-              value.clause,
-            ]);
-          }
-        }
         value = make(Blocks[value.type], value);
       }
       else

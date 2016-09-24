@@ -177,6 +177,7 @@ class BuilderComponent extends PureClasss<Props>
         isTextbox = true;
         break;
       case DisplayType.CARDS:
+        var st = data.get('static');
         content = <CardsArea 
           keys={this.props.keys}
           canEdit={this.props.canEdit}
@@ -187,6 +188,7 @@ class BuilderComponent extends PureClasss<Props>
           helpOn={this.props.helpOn}
           addColumn={this.props.addColumn}
           columnIndex={this.props.columnIndex}
+          accepts={st && st.accepts}
         />;
       break;
       case DisplayType.CARDTEXT:

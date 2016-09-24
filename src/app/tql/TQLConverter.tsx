@@ -147,7 +147,7 @@ class TQLConverter
     var glue = "\n" + (append || "");
     return addTabs(cards.map(
         (card, i) => this._parse(card, i, i === cards.size, isTop)
-      ).join(glue)) + glue;
+      ).join(glue)) + (options && options['excludeSuffix'] ? "" : glue);
   }
   
   private static _parse(block: IBlock, index?: number, isLast?: boolean, isTop?: boolean): string
@@ -168,7 +168,14 @@ class TQLConverter
   {
     if(field === 'cards')
     {
-      return this._cards(block['cards']);
+      var append = null;
+      var options = {};
+      if(block.static.tqlGlue)
+      {
+        append = block.static.tqlGlue;
+        options['excludeSuffix'] = true;
+      }
+      return this._cards(block['cards'], append, options);
     }
     
     if(Array.isArray(block[field]) || Immutable.List.isList(block[field]))
@@ -179,9 +186,9 @@ class TQLConverter
         );
 
       var glue = ", ";        
-      if(block.static.tqlJoiner)
+      if(block.static.tqlGlue)
       {
-        glue = block.static.tqlJoiner;
+        glue = block.static.tqlGlue;
       }
       
       return addTabs(pieces.join(glue));

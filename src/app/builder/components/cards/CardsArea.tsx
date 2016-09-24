@@ -72,6 +72,7 @@ interface Props
   spotlights?: List<any>;
   connectDropTarget?: (el:JSX.Element) => JSX.Element;
   helpOn?: boolean;
+  accepts?: List<string>;
 }
 
 interface KeyState {
@@ -179,6 +180,7 @@ class CardsArea extends PureClasss<Props>
             index={props.cards.size}
             open={props.cards.size === 0}
             className='nested-create-card-tool-wrapper'
+            accepts={this.props.accepts}
           />
         </div>
       </div>

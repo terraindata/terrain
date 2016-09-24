@@ -65,6 +65,7 @@ interface Props
   dy?: number;
   className?: string;
   onMinimize?: () => void;
+  accepts?: List<string>;
 }
 
 class CreateCardTool extends PureClasss<Props>
@@ -113,12 +114,18 @@ class CreateCardTool extends PureClasss<Props>
   
   renderCardSelector()
   {
+    console.log('a', this.props.accepts);
     return (
      <div className='create-card-selector' ref='ccWrapper'>
        <div className='create-card-selector-inner'>
          {
            _.map(CardTypes as any, (type:string) => 
            {
+             if(this.props.accepts && this.props.accepts.indexOf(type) === -1)
+             {
+               return null;
+             }
+             
              let card = BuilderTypes.make(BuilderTypes.Blocks[type]);
              return (
                <a
@@ -137,6 +144,9 @@ class CreateCardTool extends PureClasss<Props>
                </a>
              );
            })
+         }
+         {
+           _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
          }
        </div>
      </div>
