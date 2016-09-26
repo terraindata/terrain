@@ -128,14 +128,18 @@ class Card extends PureClasss<Props>
       allTerms: props.keys.merge(cardTerms),
       menuOptions:
         Immutable.List([
+          // {
+          //   text: 'Copy',
+          //   onClick: this.handleCopy,
+          // },
           {
-            text: 'Copy',
-            onClick: this.handleCopy,
+            text: 'Duplicate',
+            onClick: this.handleDuplicate,
           },
-          {
-            text: 'Hide',
-            onClick: this.toggleClose,
-          },
+          // {
+          //   text: 'Hide',
+          //   onClick: this.toggleClose,
+          // },
           {
             text: 'Delete',
             onClick: this.handleDelete,
@@ -283,7 +287,7 @@ class Card extends PureClasss<Props>
         ),
       300);
     }
-       
+    
     event.preventDefault();
     event.stopPropagation();
 	}
@@ -312,6 +316,39 @@ class Card extends PureClasss<Props>
   
   handleCopy()
   {
+  }
+  
+  handleDuplicate()
+  {
+    if(this.props.singleCard)
+    {
+      alert("Can't duplicate this card because it is not in a position where it can have neighborhing cards. Try moving it to another spot on the Builder and duplicating it there.");
+      return;
+    }
+    
+    let removeId = (block) => {
+      if(Immutable.Iterable.isIterable(block))
+      {
+        if(block.get('id'))
+        {
+          block = block.set('id', '');
+        }
+        let b = block.map(removeId);
+        if(!b)
+        {
+          //records don't have a map fn
+          b = block.toMap().map(removeId);
+        }
+        return b;
+      }
+      
+      return block;
+    };
+    
+    let card = BuilderTypes.recordFromJS(BuilderTypes.recordsForServer(removeId(this.props.card)).toJS());
+    
+    Actions.create(this.props.keyPath, this.props.index + 1, card.type, card);
+    
   }
   
   addCardBelow()

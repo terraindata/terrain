@@ -401,7 +401,7 @@ class ResultsArea extends PureClasss<Props>
     else 
     {
       tql = TQLConverter.toTQL(query, {
-        // limit: pages * RESULTS_PAGE_SIZE,
+        limit: pages * RESULTS_PAGE_SIZE,
       });
     }
     if(tql !== this.state.tql)

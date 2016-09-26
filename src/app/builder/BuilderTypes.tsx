@@ -1018,7 +1018,7 @@ export module BuilderTypes
       delete block.static;
     }
     
-    if(!block.id.length)
+    if(!block.id || !block.id.length)
     {
       block.id = "block-" + Math.random();
     }
