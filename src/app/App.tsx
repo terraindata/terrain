@@ -96,16 +96,16 @@ import { InAppNotification } from './common/components/InAppNotification.tsx';
 
 var links = 
 [
-  {
-    icon: <HomeIcon />,
-    text: 'Account',
-    route: '/account',
-  },
-  {
-    icon: <ReportingIcon />,
-    text: 'Reporting',
-    route: '/reporting',
-  },
+  // {
+  //   icon: <HomeIcon />,
+  //   text: 'Account',
+  //   route: '/account',
+  // },
+  // {
+  //   icon: <ReportingIcon />,
+  //   text: 'Reporting',
+  //   route: '/reporting',
+  // },
   {
     icon: <BrowserIcon />,
     text: 'Browser',
@@ -178,10 +178,6 @@ var App = React.createClass({
     
     var sidebarWidth = this.state.sidebarExpanded ? 130 : 36;
     var selectedIndex = links.findIndex(link => this.props.location.pathname.indexOf(link.route) === 0 );
-    if(selectedIndex === -1)
-    {
-      selectedIndex = 0;
-    }
     
     var layout =
       {

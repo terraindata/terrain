@@ -72,7 +72,7 @@ class TQLConverter
     if(cards && cards.size)
     {
       cards = this.applyOptions(cards, options);
-      cardsTql = removeBlanks(this._cards(cards, ";", options, true));
+      cardsTql = removeBlanks(this._cards(cards, ";\n", options, true));
     }
     
     // TODO figure out inputs

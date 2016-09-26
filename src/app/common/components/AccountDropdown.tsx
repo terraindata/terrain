@@ -57,6 +57,7 @@ var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
 var LogoutIcon = require("./../../../images/icon_logout.svg");
 var EditIcon = require("./../../../images/icon_edit.svg");
+var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
 
 interface Props {
   onLogout: () => void;
@@ -105,32 +106,35 @@ class AccountDropdown extends Classs<Props>
   
   close(event)
   {
-    if(event.target !== this.refs['accountDropdownButton'])
-    {
-      this.setState({
-        open: false,
-      });
-    }
-    event.stopPropagation();
-    
+    this.setState({
+      open: false,
+    });
     $("body").unbind('click', this.close);
+    event.stopPropagation();
   }
   
-  toggleOpen(event)
+  open(event)
   {
     this.setState({
-      open: !this.state.open,
+      open: true,
     });
-    
-    if(!this.state.open)
-    {
-      $("body").click(this.close);
-    }
+    $("body").click(this.close);
+    event.stopPropagation();
   }
   
   editProfile() 
   {
-    this.props.history.pushState({}, '/account/profile/edit');
+    this.go('/account/profile/edit');
+  }
+  
+  goTeamGoTeamGo()
+  {
+    this.go('/account/team');
+  }
+  
+  go(url:string)
+  {
+    this.props.history.pushState({}, url);
   }
 
   renderDropdown()
@@ -143,12 +147,20 @@ class AccountDropdown extends Classs<Props>
     return (
       <div className="account-dropdown-content">
         <div className="account-dropdown-row" onMouseDown={this.editProfile}>
-          <div className = 'account-dropdown-icon account-dropdown-icon-red'>
+          <div className='account-dropdown-icon account-dropdown-icon-red'>
             <EditIcon/>
           </div>
-          <Link to={'/account/profile/edit'} className='account-dropdown-link'>
-             Edit
-          </Link>        
+          <div className='account-dropdown-link'>
+             Edit Profile
+          </div>        
+        </div>
+        <div className="account-dropdown-row" onMouseDown={this.goTeamGoTeamGo}>
+          <div className='account-dropdown-icon account-dropdown-icon-blue'>
+            <HomeIcon/>
+          </div>
+          <div className='account-dropdown-link'>
+             My Team
+          </div>        
         </div>
         <div className="account-dropdown-row" onMouseDown={this.props.onLogout}>
           <div className='account-dropdown-icon account-dropdown-icon-blue'>
@@ -163,7 +175,7 @@ class AccountDropdown extends Classs<Props>
   renderTopBar()
   {
     return (
-      <div className="account-dropdown-top-bar" onClick={this.toggleOpen} ref='accountDropdownButton'>
+      <div className="account-dropdown-top-bar" onClick={this.open} ref='accountDropdownButton'>
         <UserThumbnail
           showName={true}
           username={this.state.username}

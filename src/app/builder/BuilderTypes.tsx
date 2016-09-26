@@ -490,7 +490,6 @@ export module BuilderTypes
       {
         manualEntry: ManualConfig.cards['sfw'],
         colors: ["#559dcf", "#c0e0f3"],
-        // colors: ["#89B4A7", "#C1EADE"],
         title: "Select",
         preview: "[tables.table]",
         topTql: "SELECT\n$fields\nFROM\n$tables\n$cards",
@@ -505,8 +504,8 @@ export module BuilderTypes
           'where',
           'sort',
           'let',
-          'limit',
-          'offset',
+          'take',
+          'skip',
           'group',
         ]),
         
@@ -599,7 +598,7 @@ export module BuilderTypes
         'and',
         'or',
         'exists',
-        'tql',
+        'comparison',
       ]),
     }),
     
@@ -609,7 +608,7 @@ export module BuilderTypes
       tqlGlue: '\nAND\n',
       manualEntry: ManualConfig.cards.and,
       colors: ["#42b4bc", "#b8eaeb"],
-      accepts: List(['or', 'comparison', 'exists', 'tql']),
+      accepts: List(['or', 'comparison', 'exists']),
     }),
     
     or: _wrapperCard({
@@ -618,7 +617,7 @@ export module BuilderTypes
       tqlGlue: '\nOR\n',
       manualEntry: ManualConfig.cards.or,
       colors: ["#429e8f", "#b8e0d8"],
-      accepts: List(['and', 'comparison', 'exists', 'tql']),
+      accepts: List(['and', 'comparison', 'exists']),
     }),
    
     comparison: _card(
@@ -656,42 +655,6 @@ export module BuilderTypes
         manualEntry: ManualConfig.cards['filter'],
       },
     }),
-    
- 
-    // andOr: _card(
-    // {
-    //   first: "",
-    //   second: "",
-    //   combinator: Combinator.AND,
-      
-    //   static:
-    //   {
-    //     title: "And / Or",
-    //     preview: (c:ICard) =>
-    //     {
-    //       var first = c['first'];
-    //       var second = c['second'];
-    //       if(typeof first !== 'string')
-    //       {
-    //         first = getPreview(first);
-    //       }
-    //       if(typeof second !== 'string')
-    //       {
-    //         second = getPreview(second);
-    //       }
-          
-    //       return `${first} ${Combinators[c['combinator']]} ${second}`
-    //     },
-    //     colors: ["#47a7ff", "#97d7ff"],
-    //     tql: "$first $COMBINATOR $second",
-        
-    //     display: firstSecondDisplay({
-    //       displayType: DisplayType.DROPDOWN,
-    //       key: 'combinator',
-    //       options: Immutable.List(Combinators),
-    //     }),
-    //   },
-    // }),
      
     sort: _card(
     {
@@ -699,10 +662,9 @@ export module BuilderTypes
       
       static: 
       {
-        title: "Sort",
+        title: "Order By",
         preview: "[sorts.property]",
         colors: ["#94b96a", "#dbecc8"],
-        // colors: ["#C5AFD5", "#EAD9F7"],
         manualEntry: ManualConfig.cards['sort'],
         tql: "ORDER BY $sorts",        
         
@@ -751,7 +713,6 @@ export module BuilderTypes
         title: "Let",
         preview: "[field]",
         colors: ["#bbc760", "#ecf2c4"],
-        // colors: ["#C0C0BE", "#E2E2E0"],
         display: letVarDisplay,
         manualEntry: ManualConfig.cards['let'],
         tql: "let $field = $expression",
@@ -766,7 +727,6 @@ export module BuilderTypes
       
       static: {
         colors: ["#d9b740", "#f9ebb6"],
-        // colors: ["#b3a37e", "#d7c7a2"],
         title: "Var",
         preview: "[field]",
         display: letVarDisplay,
@@ -780,7 +740,6 @@ export module BuilderTypes
     count: _selectValueCard(
     {
       colors: ["#d99f3e", "#f9e1b5"],
-      // colors: ["#70B1AC", "#D2F3F0"],
       title: "Count",
       manualEntry: ManualConfig.cards['count'],
       tql: "COUNT($value)",
@@ -789,7 +748,6 @@ export module BuilderTypes
     avg: _selectValueCard(
     {
       colors: ["#d97852", "#f9d0be"],
-      // colors: ["#a2b37e", "#c9daa6"],
       title: "Average",
       manualEntry: ManualConfig.cards['avg'],
       tql: "AVG($value)",
@@ -798,7 +756,6 @@ export module BuilderTypes
     sum: _selectValueCard(
     {
       colors: ["#ce645b", "#f4c8c2"],
-      // colors: ["#8dc4c1", "#bae8e5"],
       title: "Sum",
       manualEntry: ManualConfig.cards['sum'],
       tql: "SUM($value)",
@@ -807,7 +764,6 @@ export module BuilderTypes
     min: _selectValueCard(
     {
       colors: ["#cc5779", "#f3c2ce"],
-      // colors: ["#cc9898", "#ecbcbc"],
       title: "Min",
       manualEntry: ManualConfig.cards['min'],
       tql: "MIN($value)",
@@ -816,7 +772,6 @@ export module BuilderTypes
     max: _selectValueCard(
     {
       colors: ["#9f5ca7", "#e0c4e2"],
-      // colors: ["#8299b8", "#acc6ea"],
       title: "Max",
       manualEntry: ManualConfig.cards['max'],
       tql: "MAX($value)",
@@ -825,7 +780,6 @@ export module BuilderTypes
     exists: _wrapperCard(
     {
       colors: ["#7f67ab", "#d2c9e4"],
-      // colors: ["#a98abf", "#cfb3e3"],
       title: "Exists",
       manualEntry: ManualConfig.cards['exists'],
       tql: "EXISTS\n(\n$cards)",
@@ -835,7 +789,6 @@ export module BuilderTypes
     parentheses: _wrapperCard(
     {
       colors: ["#6775aa", "#d2c9e4"],
-      // colors: ["#b37e7e", "#daa3a3"],
       title: "( )",
       manualEntry: ManualConfig.cards['parentheses'],
       tql: "\n(\n$cards)",
@@ -859,7 +812,6 @@ export module BuilderTypes
       static:
       {
         colors: ["#3c89c3", "#b6d7ee"],
-        // colors: ["#9DC3B8", "#D1EFE7"],
         title: "Score",
         preview: "[weights.length] Weight(s)",
         manualEntry: ManualConfig.cards['score'],
@@ -943,7 +895,6 @@ export module BuilderTypes
       {
         manualEntry: ManualConfig.cards['transform'],
         colors: ["#2996c3", "#aeddee"],
-        // colors: ["#E7BE70", "#EDD8B1"],
         title: "Transform",
         preview: "[input]",
         tql: "linearTransform([$scorePoints])",
@@ -990,7 +941,6 @@ export module BuilderTypes
     take: _valueCard(
     {
       colors: ["#27a2aa", "#ade2e3"],
-      // colors: ["#8ac541", "#aaf571"],
       title: "Limit",
       manualEntry: ManualConfig.cards['take'],
       tql: "LIMIT $value",
@@ -1000,7 +950,6 @@ export module BuilderTypes
     skip: _valueCard(
     {
       colors: ["#278a79", "#add8cf"],
-      // colors: ["#00bcd6", "#40fce6"],
       title: "Offset",
       manualEntry: ManualConfig.cards['skip'],
       tql: "OFFSET $value",
@@ -1015,7 +964,6 @@ export module BuilderTypes
         title: "Expression",
         preview: "\n$clause",
         colors: ["#569a55", "#c1debf"],
-        // colors: ["#37df77", "#97ffd7"],
         tql: "$clause",
         manualEntry: ManualConfig.cards.tql,
         
