@@ -453,7 +453,7 @@ class ResultsArea extends PureClasss<Props>
             this.state.error ? 'Error with query' : 
             (
               this.state.results ? 
-                `${this.state.numResults} results` 
+                `${this.state.numResults || 'No'} result${this.state.numResults === 1 ? '' : 's'}` 
               : 'Text result'
             )
           }
