@@ -501,6 +501,15 @@ export module BuilderTypes
           fields: List([ make(Blocks.field, { field: '*' })]),
         }),
         
+        accepts: List([
+          'where',
+          'sort',
+          'let',
+          'limit',
+          'offset',
+          'group',
+        ]),
+        
         getChildTerms:
           (card: ICard) =>
             card['tables'].reduce(
