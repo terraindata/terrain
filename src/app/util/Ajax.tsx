@@ -273,13 +273,14 @@ var Ajax = {
     return Ajax._req("POST", `/${type}s/${id}`, JSON.stringify(obj), onLoad, onError);
   },
   
-	query(tql: string, onLoad: (response: any) => void, onError?: (ev:Event) => void, sqlQuery?: boolean)
+	query(tql: string, db: string, onLoad: (response: any) => void, onError?: (ev:Event) => void, sqlQuery?: boolean)
   {
     // kill queries running under the same id
     Ajax.killQueries(); // TODO add id
     
     return Ajax._r(sqlQuery ? "/sql_query" : "/query", {
         "query_string": encode_utf8(tql),
+        "db": db,
       },
       
       (resp) =>

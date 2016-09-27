@@ -477,6 +477,7 @@ class TQL extends Classs<Props>
   {
     return <ResultsView
       tql={this.state.tql}
+      db={this.props.query && this.props.query.db}
       onError={this.highlightError}
       onLoadStart={this.props.onLoadStart}
       onLoadEnd={this.props.onLoadEnd}

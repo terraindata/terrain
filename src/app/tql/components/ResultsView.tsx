@@ -57,6 +57,7 @@ interface Props
   onError: (lineNumber: number) => void;
   onLoadStart: () => void;
   onLoadEnd: () => void;
+  db: string;
 }
 
 class ResultsView extends Classs<Props>
@@ -274,7 +275,7 @@ class ResultsView extends Classs<Props>
       this.setState({
         querying: true,
       });
-      this.xhr = Ajax.query(tql, this.handleResultsChange, this.handleError);
+      this.xhr = Ajax.query(tql, this.props.db, this.handleResultsChange, this.handleError);
     }
   }
   

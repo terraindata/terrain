@@ -317,7 +317,7 @@ class ResultsArea extends PureClasss<Props>
     );
   }
   
-  handleAllFieldsResponse(results)
+  handleAllFieldsResponse(results:any)
   {
     this.handleResultsChange(results, true);
   }
@@ -428,20 +428,24 @@ class ResultsArea extends PureClasss<Props>
       this.xhr && this.xhr.abort();
       this.allXhr && this.allXhr.abort();
       
-      this.xhr = Ajax.query(tql, this.handleResultsChange, this.handleError);
+      this.xhr = Ajax.query(tql, query.db, this.handleResultsChange, this.handleError);
       if (query.mode === "tql")
       {
-        this.allXhr = Ajax.query(tql, 
+        this.allXhr = Ajax.query(
+          tql, 
+          query.db,
           this.handleAllFieldsResponse,
           this.handleError
         );
       }
       else 
       {
-        this.allXhr = Ajax.query(TQLConverter.toTQL(query, {
+        this.allXhr = Ajax.query(
+          TQLConverter.toTQL(query, {
             allFields: true,
             // limit: pages * RESULTS_PAGE_SIZE,
           }), 
+          query.db,
           this.handleAllFieldsResponse,
           this.handleError
         );
