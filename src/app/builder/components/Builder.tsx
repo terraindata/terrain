@@ -97,6 +97,8 @@ class Builder extends PureClasss<Props>
     columnType: number;
     selectedCardName: string;
     manualIndex: number;
+    
+    curDb: string;
   } = {
     builder: Store.getState(),
     colKeys: null,
@@ -104,6 +106,7 @@ class Builder extends PureClasss<Props>
     columnType: null,
     selectedCardName: '',
     manualIndex: -1,
+    curDb: '',
   };
   
   constructor(props:Props)
@@ -138,29 +141,70 @@ class Builder extends PureClasss<Props>
   {
     this.checkConfig(this.props);
     RolesActions.fetch();
+    this.loadTables(this.props);
+  }
+  
+  querySub: any;
+  schemaXhr: XMLHttpRequest;
+  loadTables(props:Props, query?:IQuery)
+  {
+    query = query || this.getSelectedQuery(props);
     
-    Ajax.schema((tables: {name: string, columns: {name: string}[]}[]) => {
-      Actions.change(
-        Immutable.List(['tables']),
-        Immutable.List(tables.map(table => table.name))
-      );
+    if(!query)
+    {
+      var queryId = this.getSelectedId(props);
       
-      Actions.change(
-        Immutable.List(['tableColumns']),
-        tables.reduce(
-          (memo: Map<string, List<string>>, table: {name: string, columns: {name: string}[]}) =>
-            memo.set(table.name, 
-              Immutable.List(table.columns.map(col => col.name))
-            )
-          , Immutable.Map({})
-        )
-      );
-    });
+      if(this.querySub)
+      {
+        this.querySub();
+      }
+      
+      // query hasn't loaded yet
+      this.querySub = Store.subscribe(() => {
+        let state:BuilderState = Store.getState();
+        query = state.queries.get(queryId);
+        
+        if(query && this.querySub)
+        {
+          this.querySub();
+          this.querySub = null;
+          this.loadTables(null, query);
+        }
+      });
+      return;
+    }
+
+    let {db} = query;
+    if(db !== this.state.curDb)
+    {
+      this.schemaXhr && this.schemaXhr.abort();
+      this.schemaXhr = Ajax.schema(db, (tables: {name: string, columns: {name: string}[]}[]) => {
+        Actions.change(
+          Immutable.List(['tables']),
+          Immutable.List(tables.map(table => table.name))
+        );
+        Actions.change(
+          Immutable.List(['tableColumns']),
+          tables.reduce(
+            (memo: Map<string, List<string>>, table: {name: string, columns: {name: string}[]}) =>
+              memo.set(table.name, 
+                Immutable.List(table.columns.map(col => col.name))
+              )
+            , Immutable.Map({})
+          )
+        );
+      });
+      
+      this.setState({
+        curDb: db,
+      });
+    }
   }
   
   componentWillReceiveProps(nextProps)
   {
     this.checkConfig(nextProps);
+    this.loadTables(nextProps);
   }
   
   checkConfig(props:Props)
@@ -220,20 +264,16 @@ class Builder extends PureClasss<Props>
     ));
   }
   
-  getSelectedId()
+  getSelectedId(props?:Props)
   {
-    var selected = this.props.params.config && this.props.params.config.split(',').find(id => id.indexOf('!') === 0);
+    props = props || this.props;
+    var selected = props.params.config && props.params.config.split(',').find(id => id.indexOf('!') === 0);
     return selected && selected.substr(1);
   }
   
-  getSelectedQuery(): IQuery
+  getSelectedQuery(props?:Props): IQuery
   {
-    return this.state.builder.queries.get(this.getSelectedId());
-  }
-  
-  getQuery(): IQuery
-  {
-    return this.state.builder.queries.get(this.getSelectedId());
+    return this.state.builder.queries.get(this.getSelectedId(props));
   }
   
   createAlgorithm()
@@ -353,7 +393,7 @@ class Builder extends PureClasss<Props>
   getColumn(index)
   {
     let key = this.state.colKeys.get(index);
-    let query = this.getQuery();
+    let query = this.getSelectedQuery();
     return {
       minWidth: 316,
       resizeable: true,

@@ -46,6 +46,7 @@ require('./BrowserInfoColumn.less');
 import * as React from 'react';
 import * as Immutable from 'immutable';
 const {List} = Immutable;
+import Ajax from './../../util/Ajax.tsx';
 import Classs from './../../common/components/Classs.tsx';
 import BrowserColumn from './BrowserColumn.tsx';
 import BrowserItem from './BrowserItem.tsx';
@@ -58,12 +59,15 @@ import BrowserTypes from './../BrowserTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
 import Menu from './../../common/components/Menu.tsx';
+import Dropdown from './../../common/components/Dropdown.tsx';
 import Actions from './../data/BrowserActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
+import BuilderStore from './../../builder/data/BuilderStore.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
 import RolesStore from './../../roles/data/RolesStore.tsx';
 import UserActions from './../../users/data/UserActions.tsx';
 import RolesActions from './../../roles/data/RolesActions.tsx';
+import BuilderActions from './../../builder/data/BuilderActions.tsx';
 
 var GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
 var AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
@@ -93,10 +97,12 @@ class BrowserInfoColumn extends Classs<Props>
     users: UserMap,
     roles: RoleMap,
     me: User,
+    dbs: List<string>,
   } = {
     users: null,
     roles: null,
     me: null,
+    dbs: List([]),
   }
   
   constructor(props:Props)
@@ -114,6 +120,22 @@ class BrowserInfoColumn extends Classs<Props>
     this._subscribe(RolesStore, {
       stateKey: 'roles', 
     });
+    this._subscribe(BuilderStore, {
+      stateKey: 'dbs',
+      storeKeyPath: ['dbs'],
+    });
+    
+    Ajax.getDbs((dbs:string[]) => 
+      BuilderActions.change(
+        List(['dbs']), 
+        List(dbs)
+      )
+    );
+  }
+  
+  handleDbChange(dbIndex:number)
+  {
+    Actions.variants.change(this.props.variant.set('db', this.state.dbs.get(dbIndex)) as Variant);
   }
   
   renderVariant()
@@ -123,9 +145,26 @@ class BrowserInfoColumn extends Classs<Props>
       return null;
     }
     
+    // TODO have to make this better
+    var isBuilder = false;
+    var isAdmin = false;
+    let username = this.state.me && this.state.me.username;
+    if(this.state.roles && username)
+    {
+      isBuilder = this.state.roles.getIn([this.props.variant.groupId, username, 'builder']);
+      isAdmin = this.state.roles.getIn([this.props.variant.groupId, username, 'admin']);
+    }
+    
     return (
     <div>
       Variant
+      <Dropdown
+        selectedIndex={this.state.dbs.indexOf(this.props.variant.db)}
+        options={this.state.dbs}
+        onChange={this.handleDbChange}
+        canEdit={isBuilder || isAdmin}
+        className='bic-db-dropdown'
+      />
       <VariantVersions 
         variant={this.props.variant} 
         history={this.props.history} 

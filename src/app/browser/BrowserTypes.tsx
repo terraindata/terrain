@@ -73,6 +73,7 @@ export module BrowserTypes
     tql: "",
     status: EVariantStatus.Build,
     version: false,
+    db: 'urbansitter',
 
     cards: Immutable.List([]),
     inputs: Immutable.List([]),
@@ -80,7 +81,7 @@ export module BrowserTypes
     // for DB storage
     type: "variant",
     dbFields: ['groupId', 'algorithmId', 'status'],
-    dataFields: ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs', 'mode', 'tql', 'resultsConfig'],    
+    dataFields: ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs', 'mode', 'tql', 'resultsConfig', 'db'],    
     statusMap: (s:EVariantStatus) => EVariantStatus[s],
   });
   export class Variant extends _Variant implements BuilderTypes.IQuery
@@ -93,6 +94,7 @@ export module BrowserTypes
     algorithmId: ID;
     groupId: Group;
     resultsConfig: IResultsConfig;
+    db: string;
 
     cards: List<BuilderTypes.ICard>;
     inputs: List<BuilderTypes.IInput>;

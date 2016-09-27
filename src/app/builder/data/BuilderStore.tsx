@@ -61,8 +61,11 @@ export class BuilderState
   hoveringCardId: ID = "";
   selectedCardIds: Map<ID, boolean> = Map({});
   
+  // These are only for the db of the current open variant
   tables: List<string> = List([]);
   tableColumns: Map<string, List<string>> = Map({});
+  
+  dbs: List<string> = List([]);
   
   manual: Map<ID, Types.ICards> = Map({});
   // Card examples used in the manual are stored here.

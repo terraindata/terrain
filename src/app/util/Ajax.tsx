@@ -295,15 +295,16 @@ var Ajax = {
     );
   },
   
-  schema(onLoad: (tables: {name: string, columns: any[]}[], error?: any) => void, onError?: (ev:Event) => void)
+  schema(db: string, onLoad: (tables: {name: string, columns: any[]}[], error?: any) => void, onError?: (ev:Event) => void)
   {
     return Ajax._r("/get_schema", {
-        db: 'urbansitter',
+        db,
       },
       
       (resp:string) =>
       {
-        try {
+        try
+        {
           let cols = JSON.parse(resp);
           var tables: {[name:string]: {name: string; columns: any[];}} = {};
           
@@ -326,13 +327,31 @@ var Ajax = {
             tables[table].columns.push(column);
           });
           onLoad(_.toArray(tables) as any);
-        } catch(e) {
+        }
+        catch(e)
+        {
           onError && onError(resp as any);
         }
       },
       
       onError
       );
+  },
+  
+  getDbs(onLoad: (dbs: string[]) => void, onError?: (ev:Event) => void)
+  {
+    Ajax._r('/get_databases', {}, (resp) =>
+    {
+      try
+      {
+        var list = JSON.parse(resp);
+        onLoad(list.map(obj => obj.schema_name));
+      }
+      catch(e)
+      {
+        onError(e as any);
+      }
+    }, onError)
   },
   
   killQueries()

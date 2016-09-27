@@ -265,6 +265,7 @@ class ManualEntry extends Classs<Props>
       mode: '',
       name: '',
       lastEdited: '',
+      db: '',
       resultsConfig: null,
     };
 
