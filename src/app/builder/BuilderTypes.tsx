@@ -704,38 +704,38 @@ export module BuilderTypes
       },
     }),
     
-    let: _card(
-    {
-      field: "",
-      expression: "",
+    // let: _card(
+    // {
+    //   field: "",
+    //   expression: "",
       
-      static: {
-        title: "Let",
-        preview: "[field]",
-        colors: ["#bbc760", "#ecf2c4"],
-        display: letVarDisplay,
-        manualEntry: ManualConfig.cards['let'],
-        tql: "let $field = $expression",
-        getNeighborTerms: (card) => List([card['field']]),
-      }
-    }),
+    //   static: {
+    //     title: "Let",
+    //     preview: "[field]",
+    //     colors: ["#bbc760", "#ecf2c4"],
+    //     display: letVarDisplay,
+    //     manualEntry: ManualConfig.cards['let'],
+    //     tql: "let $field = $expression",
+    //     getNeighborTerms: (card) => List([card['field']]),
+    //   }
+    // }),
 
-    var: _card(
-    {
-      field: "",
-      expression: "",
+    // var: _card(
+    // {
+    //   field: "",
+    //   expression: "",
       
-      static: {
-        colors: ["#d9b740", "#f9ebb6"],
-        title: "Var",
-        preview: "[field]",
-        display: letVarDisplay,
+    //   static: {
+    //     colors: ["#d9b740", "#f9ebb6"],
+    //     title: "Var",
+    //     preview: "[field]",
+    //     display: letVarDisplay,
 
-        manualEntry: ManualConfig.cards['var'],
-        getNeighborTerms: (card) => List([card['field']]),
-        tql: "var $field = $expression",
-      }
-    }),
+    //     manualEntry: ManualConfig.cards['var'],
+    //     getNeighborTerms: (card) => List([card['field']]),
+    //     tql: "var $field = $expression",
+    //   }
+    // }),
 
     count: _selectValueCard(
     {

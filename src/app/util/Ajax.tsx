@@ -275,6 +275,9 @@ var Ajax = {
   
 	query(tql: string, onLoad: (response: any) => void, onError?: (ev:Event) => void, sqlQuery?: boolean)
   {
+    // kill queries running under the same id
+    Ajax.killQueries(); // TODO add id
+    
     return Ajax._r(sqlQuery ? "/sql_query" : "/query", {
         "query_string": encode_utf8(tql),
       },
@@ -334,9 +337,18 @@ var Ajax = {
   
   killQueries()
   {
-    Ajax.query("select concat('kill ',id,';') from information_schema.processlist where user='dev' and command='Query' and time>30;",
-      (a) => console && console.log && console.log('Queries killed:', a),
-      (a) => console && console.log && console.log('Query killing error:', a)
+    return Ajax._r("/sql_query", {
+        "query_string": encode_utf8("select concat('kill query ',id,';') from information_schema.processlist where user='dev' and command='Query' and time_ms > 1000;"),
+      },
+      
+      (resp) =>
+      {
+        try {
+          console.log(resp);
+        } catch(e) {
+          console.log('err', resp);
+        }
+      }
     );
   },
   

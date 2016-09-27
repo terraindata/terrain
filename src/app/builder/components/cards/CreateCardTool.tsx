@@ -114,7 +114,6 @@ class CreateCardTool extends PureClasss<Props>
   
   renderCardSelector()
   {
-    console.log('a', this.props.accepts);
     return (
      <div className='create-card-selector' ref='ccWrapper'>
        <div className='create-card-selector-inner'>

@@ -241,11 +241,17 @@ class ResultsArea extends PureClasss<Props>
       />
     }
     
-    if(!this.state.results)
+    if(!this.state.results && this.xhr)
     {
       return <InfoArea
         large="Querying results..."
       />;
+    }
+    else if(!this.state.results)
+    {
+      return <InfoArea
+        large="Compose a query to view results here."
+      />
     }
     
     if(this.state.resultType !== 'rel')
@@ -326,6 +332,15 @@ class ResultsArea extends PureClasss<Props>
     
     if(results)
     {
+      if(results.error)
+      {
+        this.setState({
+          error: results.error.substr(0, results.error.length - 1),
+        });
+        this.props.onLoadEnd && this.props.onLoadEnd();
+        return;
+      }
+      
       var numResults = results.length;
       if(numResults > MAX_RESULTS)
       {
@@ -367,12 +382,10 @@ class ResultsArea extends PureClasss<Props>
     {
       this.setState({
         error: "No response was returned from the server.",
-        xhr: null,
-        // TODO add error
       });
     }
     
-    if(!this['xhr']) // && !this['allXhr']) // TODO
+    if(!this['xhr'] && !this['allXhr'])
     {
       // all done with both
       this.props.onLoadEnd && this.props.onLoadEnd();

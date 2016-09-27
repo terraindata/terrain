@@ -69,12 +69,14 @@ class ResultsView extends Classs<Props>
     querying: boolean;
     showErrorMessage: boolean;
     resultsSpliced: number;
+    errorLine: number;
   } = {
     results: null,
     error: null,
     querying: false,
     showErrorMessage: false,
     resultsSpliced: 0,
+    errorLine: NaN,
   };
 
   //If the component updates and the tql command has been changed, then query results
@@ -108,16 +110,17 @@ class ResultsView extends Classs<Props>
 
     if(this.state.error)
     {
-      if (this.state.error === 'No response was returned from the server.' || ! this.state.error)
-      {
-        return (
-          <div>
-            <span className="error-title">
-              No response was returned from the server.
-            </span>
-          </div>
-        );
-      }
+      // TODO figure out the correct title
+      // if (this.state.error === 'No response was returned from the server.' || ! this.state.error)
+      // {
+      //   return (
+      //     <div>
+      //       <span className="error-title">
+      //         No response was returned from the server.
+      //       </span>
+      //     </div>
+      //   );
+      // }
       
       if(typeof this.state.error !== 'string')
       {
@@ -130,32 +133,44 @@ class ResultsView extends Classs<Props>
         );
       }
       
-      console.log(this.state.error);
-      var lineNum = (this.state.error).replace(/^\D+|\D+$/g, '');
-      lineNum = parseInt(lineNum);
-      var errorLineNumber = lineNum ? 'Error on line ' + lineNum : 'Error';
-      var errorMessage = (this.state.error).replace(/Error on line/, '');
-      this.props.onError(lineNum);
+      if(this.state.errorLine !== NaN)
+      {
+        var mainMessage = this.state.errorLine ? 'Error on line ' + this.state.errorLine : this.state.error;
+        var subMessage =this.state.error;
+        this.props.onError(this.state.errorLine);
+      }
+      else
+      {
+        var mainMessage = this.state.error;
+        var subMessage = null;
+      }
+      
       return (
         <div>
           <div onClick={this.toggleError}>
-          <span className="error-detail">
-          {this.state.showErrorMessage ? '\u25BC ' : '\u25B6 '}
-          </span>
-          <span className="error-title">
-            {errorLineNumber}          
-          </span>
+            { 
+              subMessage && 
+              <span className="error-detail">
+                {this.state.showErrorMessage ? '\u25BC ' : '\u25B6 '}
+              </span>
+            }
+            <span className="error-title">
+              Error on line { this.state.errorLine }
+            </span>
           </div>
-          <div className="error-message">
-            {this.state.showErrorMessage ? errorMessage : null}
-          </div>
+          {
+            this.state.showErrorMessage &&
+              <div className="error-message">
+                { subMessage }
+              </div>
+          }
         </div>
       );
     }
 
     if(!this.state.results) 
     {
-      return <div>Enter a TQL query above.</div>
+      return <div>Compose a query to view results here.</div>
     }
     
     if(typeof this.state.results === 'string')
@@ -194,14 +209,20 @@ class ResultsView extends Classs<Props>
     this.props.onLoadEnd && this.props.onLoadEnd();
     if(results)
     {
-      // if(result.error)
-      // {
-      //   this.setState({
-      //     error: "Error on line " + result.line+ ": " + result.error,
-      //     querying: false,
-      //     results: null,
-      //   });
-      // }
+      if(results.error)
+      {
+        let {error} = results;
+        let line = parseInt(error.match(/([0-9]+)\:[0-9]+/)[1]);
+        
+        this.setState({
+          error: error.substr(0, error.length - 1),
+          errorLine: line,
+          querying: false,
+          results: null,
+        });
+        return;
+      }
+      
       var spliced = 0;
       if(typeof results === 'string')
       {
@@ -240,7 +261,7 @@ class ResultsView extends Classs<Props>
   handleError(ev)
   {
     this.setState({
-      error: true,
+      error: ev,
       querying: false,
     });
   }
