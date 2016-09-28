@@ -326,6 +326,7 @@ class ResultsArea extends PureClasss<Props>
   
   handleResultsChange(results, isAllFields?: boolean)
   {
+    console.log('r');
     let xhrKey = isAllFields ? 'allXhr' : 'xhr';
     if(!this[xhrKey]) return;
     this[xhrKey] = null;
@@ -334,9 +335,13 @@ class ResultsArea extends PureClasss<Props>
     {
       if(results.error)
       {
-        this.setState({
-          error: results.error.substr(0, results.error.length - 1),
-        });
+        console.log('err', isAllFields);
+        if(!isAllFields)
+        {
+          this.setState({
+            error: results.error.substr(0, results.error.length - 1),
+          });
+        }
         this.props.onLoadEnd && this.props.onLoadEnd();
         return;
       }
@@ -394,9 +399,15 @@ class ResultsArea extends PureClasss<Props>
   
   handleError(ev)
   {  
+    console.log('err', ev);
     this.setState({
       error: true,
     });
+    this.props.onLoadEnd && this.props.onLoadEnd();
+  }
+  
+  handleAllFieldsError()
+  {
     this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
@@ -435,7 +446,7 @@ class ResultsArea extends PureClasss<Props>
           tql, 
           query.db,
           this.handleAllFieldsResponse,
-          this.handleError
+          this.handleAllFieldsError
         );
       }
       else 
@@ -447,7 +458,7 @@ class ResultsArea extends PureClasss<Props>
           }), 
           query.db,
           this.handleAllFieldsResponse,
-          this.handleError
+          this.handleAllFieldsError
         );
       }
 

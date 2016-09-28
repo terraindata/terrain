@@ -957,6 +957,61 @@ export module BuilderTypes
       defaultValue: 25,
     }),
     
+    groupBy: _card(
+    {
+      fields: L(),
+      
+      static:
+      {
+        manualEntry: ManualConfig.cards['sfw'], // TODO
+        colors: ["#559dcf", "#c0e0f3"],
+        title: "Group By",
+        preview: "[fields.field]",
+        tql: "GROUP BY\n$fields",
+        
+        init: () => ({
+          fields: List([ make(Blocks.field)]),
+        }),
+        
+        display:
+        {
+          displayType: DisplayType.ROWS,
+          key: 'fields',
+          english: 'field',
+          factoryType: 'field',
+          row:
+          {
+            inner:
+            {
+              displayType: DisplayType.CARDTEXT,
+              help: ManualConfig.help["select-field"],
+              key: 'field',
+            },
+            below:
+            {
+              displayType: DisplayType.CARDSFORTEXT,
+              key: 'field',
+            },
+          },
+        },
+      },
+    }),
+    
+    having: _wrapperCard({
+      title: "Having",
+      colors: ["#44a9cf", "#b9e5f3"],
+      tql: "HAVING\n$cards",
+      manualEntry: ManualConfig.cards.where, // TODO
+      
+      accepts: List([
+        'and',
+        'or',
+        'exists',
+        'comparison',
+      ]),
+    }),
+    
+    
     tql: _card({
       clause: "",
       
