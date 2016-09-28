@@ -201,7 +201,8 @@ class CardsArea extends PureClasss<Props>
               />
           }
           
-          { topAdd && cards.size !== 0 &&
+          { 
+            topAdd && cards.size !== 0 && renderCardTool &&
               <div
                 className='card-field-top-add card-field-add'
                 onClick={this._toggle('cardToolOpen')}
@@ -214,6 +215,7 @@ class CardsArea extends PureClasss<Props>
                 />
               </div>
           }
+          
           {
             cards.map((card:ICard, index:number) =>
               <Card 
