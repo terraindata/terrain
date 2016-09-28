@@ -215,6 +215,17 @@ class Classs<T> extends React.Component<T, any>
     this._fns[fnName].push({ args, fn });
     return fn;
   }
+  
+  _togMap: {[stateKey:string]: () => void} = {};
+  _toggle(stateKey: string): (() => void)
+  {
+    return this._togMap[stateKey] || (
+      this._togMap[stateKey] = () =>
+        this.setState({
+          [stateKey]: !this.state[stateKey],
+        })
+    );
+  }
 }
 
 export default Classs;

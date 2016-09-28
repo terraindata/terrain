@@ -5,6 +5,7 @@
   overflow: hidden;
   @create-card-border-radius: 5px;
   border-radius: @create-card-border-radius;
+  padding: 6px;
   
   &.card-drag-over-upper,
   &.card-drag-over-lower {
@@ -64,6 +65,23 @@
       flex-grow: 1;
       flex-basis: 100px;
       // padding: 0px (@standard-margin / 2);
+    }
+  }
+  
+  .create-card-placeholder {
+    @h: 12px;
+    margin-top: @h/2;
+    height: @h/2;
+    border-top: 1px solid #7c7d7b;
+    text-align: center;
+    
+    svg {
+      @sh: @h * 2 / 3;
+      height: @sh;
+      margin-top: -1 * @sh/2;
+      .cls-1 {
+        fill: #7c7d7b;
+      }
     }
   }
 }

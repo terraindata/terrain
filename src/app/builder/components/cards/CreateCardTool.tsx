@@ -54,6 +54,7 @@ import CardDropArea from './CardDropArea.tsx';
 
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
+var AddCardIcon = require("./../../../../images/icon_addCard_22x17.svg?name=AddCardIcon");
 
 interface Props
 {
@@ -66,6 +67,8 @@ interface Props
   className?: string;
   onMinimize?: () => void;
   accepts?: List<string>;
+  onToggle?: () => void;
+  hidePlaceholder?: boolean;
 }
 
 class CreateCardTool extends PureClasss<Props>
@@ -86,6 +89,8 @@ class CreateCardTool extends PureClasss<Props>
     {
       Actions.create(this.props.keyPath, this.props.index, type);
     }
+    
+    this.props.onToggle();
   }
   
   // componentWillReceiveProps(newProps)
@@ -114,6 +119,11 @@ class CreateCardTool extends PureClasss<Props>
   
   renderCardSelector()
   {
+    if(!this.props.open)
+    {
+      return null;
+    }
+    
     return (
      <div className='create-card-selector' ref='ccWrapper'>
        <div className='create-card-selector-inner'>
@@ -152,9 +162,26 @@ class CreateCardTool extends PureClasss<Props>
     );
   }
   
+  renderPlaceholder()
+  {
+    if(this.props.hidePlaceholder)
+    {
+      return null;
+    }
+    
+    return (
+      <div
+        onClick={this.props.onToggle}
+        className='create-card-placeholder'
+      >
+        <AddCardIcon />
+      </div>
+    );
+  }
+  
   render()
   {
-    if(!this.props.open || !this.props.canEdit)
+    if(!this.props.canEdit)
     {
       return null;
     }
@@ -177,6 +204,7 @@ class CreateCardTool extends PureClasss<Props>
     
     return (
       <div className={classes} style={style}>
+        { this.renderPlaceholder() }
         { this.renderCardSelector() }
         <CardDropArea
           index={this.props.index}

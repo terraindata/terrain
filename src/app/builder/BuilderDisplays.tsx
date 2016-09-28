@@ -115,6 +115,9 @@ export interface Display
   // for components
   component?: (typeof PureClasss);
   
+  // for cards areas
+  singleChild?: boolean;
+  
   provideParentData?: boolean;
   // if true, it passes the parent data down
   // this will cause unnecessary re-rendering, so avoid if possible
@@ -180,11 +183,19 @@ export const firstSecondDisplay = (middle:Display): Display =>
   ],
 });
 
-export const wrapperDisplay =
+export const wrapperDisplay: Display =
 {
   displayType: CARDS,
   key: 'cards',
   className: 'wrapper-cards-content',
+};
+
+export const wrapperSingleChildDisplay: Display =
+{
+  displayType: CARDS,
+  key: 'cards',
+  className: 'wrapper-cards-content',
+  singleChild: true,
 };
 
 export const letVarDisplay =

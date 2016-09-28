@@ -57,7 +57,8 @@ import BuilderTypes from '../../BuilderTypes.tsx';
 type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
 let {List} = Immutable;
-
+import CardDropArea from './CardDropArea.tsx';
+var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 
 interface Props
 {
@@ -73,26 +74,34 @@ interface Props
   connectDropTarget?: (el:JSX.Element) => JSX.Element;
   helpOn?: boolean;
   accepts?: List<string>;
+  noCardTool?: boolean;
+  singleChild?: boolean;
 }
 
 interface KeyState {
   keys: List<string>;
   keyPath: KeyPath;
+}
+
+interface State extends KeyState {
   learningMode: boolean;
+  cardToolOpen: boolean;
 }
 
 class CardsArea extends PureClasss<Props>
 {
-  state: KeyState = {
+  state: State = {
     keys: List([]),
     keyPath: null,
     learningMode: this.props.helpOn,
+    cardToolOpen: true,
   };
 
   constructor(props:Props)
   {
     super(props);
     this.state.keys = this.computeKeys(props);
+    this.state.cardToolOpen = props.cards.size === 0;
   }
   
   componentWillReceiveProps(nextProps:Props)
@@ -101,6 +110,13 @@ class CardsArea extends PureClasss<Props>
     {
       this.setState({
         keys: this.computeKeys(nextProps)
+      });
+    }
+    
+    if(nextProps.cards.size === 0)
+    {
+      this.setState({
+        cardToolOpen: true,
       });
     }
   }
@@ -145,11 +161,23 @@ class CardsArea extends PureClasss<Props>
       learningMode: !this.state.learningMode,
     })
   }
+  
+  toggleCardTool()
+  {
+    this.setState({
+      cardToolOpen: !this.state.cardToolOpen,
+    });
+  }
+  
 
   render()
   {
     let {props} = this;
     let {cards, canEdit} = props;
+    var renderCardTool = !this.props.noCardTool && (!this.props.singleChild || cards.size === 0);
+    
+    var topAdd = true;
+    
     return (
       <div> 
         <div
@@ -158,6 +186,34 @@ class CardsArea extends PureClasss<Props>
             [this.props.className]: !!this.props.className,
           })}
         >
+        
+          { 
+            renderCardTool &&
+              <CreateCardTool
+                canEdit={this.props.canEdit}
+                keyPath={this.props.keyPath}
+                index={props.cards.size}
+                open={this.state.cardToolOpen}
+                className='nested-create-card-tool-wrapper'
+                accepts={this.props.accepts}
+                onToggle={this._toggle('cardToolOpen')}
+                hidePlaceholder={this.props.singleChild || cards.size === 0 || topAdd}
+              />
+          }
+          
+          { topAdd && cards.size !== 0 &&
+              <div
+                className='card-field-top-add card-field-add'
+                onClick={this._toggle('cardToolOpen')}
+                data-tip={'Add another card'}
+              >
+                <AddIcon />
+                <CardDropArea
+                  index={0}
+                  keyPath={this.props.keyPath}
+                />
+              </div>
+          }
           {
             cards.map((card:ICard, index:number) =>
               <Card 
@@ -174,14 +230,6 @@ class CardsArea extends PureClasss<Props>
             )
           }
           
-          <CreateCardTool
-            canEdit={this.props.canEdit}
-            keyPath={this.props.keyPath}
-            index={props.cards.size}
-            open={props.cards.size === 0}
-            className='nested-create-card-tool-wrapper'
-            accepts={this.props.accepts}
-          />
         </div>
       </div>
     );

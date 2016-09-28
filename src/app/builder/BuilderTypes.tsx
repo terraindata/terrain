@@ -59,7 +59,7 @@ export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
 
-import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, firstSecondDisplay, wrapperDisplay, stringValueDisplay} from './BuilderDisplays.tsx';  
+import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, firstSecondDisplay, wrapperDisplay, wrapperSingleChildDisplay, stringValueDisplay} from './BuilderDisplays.tsx';  
 var ManualConfig = require('./../manual/ManualConfig.json');
 import {IResultsConfig} from "./components/results/ResultsConfig.tsx";
 
@@ -77,8 +77,7 @@ export module BuilderTypes
   }
   
   export const OperatorTQL = {
-    [Operator.EQ]: '=', //**
-    // [Operator.EQ]: '==',
+    [Operator.EQ]: '=',
     [Operator.NE]: '!=',
     [Operator.GE]: '>=',
     [Operator.GT]: '>',
@@ -306,6 +305,7 @@ export module BuilderTypes
     tql: string;
     tqlGlue?: string;
     accepts: List<string>;
+    singleChild?: boolean;
   }
   
   const _wrapperCard = (config:IWrapperCardConfig) =>
@@ -338,7 +338,9 @@ export module BuilderTypes
           return prefix + "Nothing";
         },
         
-        display: (config.display || wrapperDisplay),
+        display: config.display || (
+          config.singleChild ? wrapperSingleChildDisplay : wrapperDisplay
+        ),
         
         tql: config.tql,
         tqlGlue: config.tqlGlue,
@@ -594,6 +596,7 @@ export module BuilderTypes
       colors: ["#44a9cf", "#b9e5f3"],
       tql: "WHERE\n$cards",
       manualEntry: ManualConfig.cards.where,
+      singleChild: true,
       
       accepts: List([
         'and',

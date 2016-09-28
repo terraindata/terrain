@@ -54,8 +54,6 @@ import { DragSource } from 'react-dnd';
 var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../../util/Util.tsx';
 import LayoutManager from "../layout/LayoutManager.tsx";
-import CreateCardTool from './CreateCardTool.tsx';
-// import Menu from '../../../common/components/Menu.tsx';
 import ManualPopup from './../../../manual/components/ManualPopup.tsx';
 import { Menu, MenuOption } from '../../../common/components/Menu.tsx';
 import Actions from "../../data/BuilderActions.tsx";
@@ -99,10 +97,6 @@ class Card extends PureClasss<Props>
     
     cardTerms: List<string>;
     allTerms: List<string>;
-    
-    // CreateCardTool
-    addingCardBelow?: boolean;
-    addingCardAbove?: boolean;
     
     cardIsClosed: boolean;
   }
@@ -351,49 +345,6 @@ class Card extends PureClasss<Props>
     
   }
   
-  addCardBelow()
-  {
-    this.setState({
-      addingCardBelow: !this.state.addingCardBelow,
-    });
-  }
-  
-  addCardAbove()
-  {
-    this.setState({
-      addingCardAbove: !this.state.addingCardAbove,
-    });
-  }
-  
-  minimizeCreateCard()
-  {
-    this.setState({
-      addingCardAbove: false,
-      addingCardBelow: false,
-    });
-  }
-  
-  renderAddCard(isLower?: boolean)
-  {
-    return null;
-    
-    // if(this.props.singleCard || !this.props.canEdit)
-    // {
-    //   return null;
-    // }
-    
-    // return (
-    //   <div
-    //     className={'card-add-card-btn' + (isLower ? ' card-add-card-btn-lower' : '')}
-    //     onClick={isLower ? this.addCardBelow : this.addCardAbove}
-    //   >
-    //     {
-    //       (isLower ? this.state.addingCardBelow : this.state.addingCardAbove) ? '-' : '+'
-    //     }
-    //   </div>
-    // );
-  }
-  
   handleMouseMove(event)
   {
     event.stopPropagation();
@@ -450,14 +401,6 @@ class Card extends PureClasss<Props>
         onMouseMove={this.handleMouseMove}
       >
         <div ref='cardContainer' className='card-container'>
-          { !this.props.singleCard &&
-            <CreateCardTool
-              {...this.props}
-              open={this.state.addingCardAbove}
-              onMinimize={this.minimizeCreateCard}
-            />
-          }
-          { this.renderAddCard() }
           <div
             className={'card-inner ' + (this.props.singleCard ? 'single-card-inner' : '')}
             style={{
@@ -520,15 +463,6 @@ class Card extends PureClasss<Props>
               </div>
             </div>
           </div>
-          { this.renderAddCard(true) }
-          { !this.props.singleCard &&
-            <CreateCardTool
-              {...this.props}
-              index={this.props.index + 1}
-              open={this.state.addingCardBelow}
-              onMinimize={this.minimizeCreateCard}
-            />
-          }
         </div>
       </div>
     );

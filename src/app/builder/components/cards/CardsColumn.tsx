@@ -174,6 +174,7 @@ class CardsColumn extends PureClasss<Props>
             canEdit={canEdit}
             addColumn={this.props.addColumn}
             columnIndex={this.props.columnIndex}
+            noCardTool={true}
           />
           {
             !cards.size ? 

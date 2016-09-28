@@ -189,6 +189,7 @@ class BuilderComponent extends PureClasss<Props>
           addColumn={this.props.addColumn}
           columnIndex={this.props.columnIndex}
           accepts={st && st.accepts}
+          singleChild={d.singleChild}
         />;
       break;
       case DisplayType.CARDTEXT:
@@ -415,7 +416,12 @@ class BuilderComponent extends PureClasss<Props>
     return (
       <div key={key}>
         { ! d.header ? null :
-            <div className={'builder-card-header ' + (d.headerClassName ? d.headerClassName : '')}>
+            <div
+              className={'builder-card-header ' + (d.headerClassName ? d.headerClassName : '')}
+              style={{
+                backgroundColor: this.props.data.static.colors[0],
+              }}
+            >
               { d.header }
             </div>
         }
