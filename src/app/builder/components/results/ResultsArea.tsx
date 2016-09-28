@@ -446,7 +446,8 @@ class ResultsArea extends PureClasss<Props>
           tql, 
           query.db,
           this.handleAllFieldsResponse,
-          this.handleAllFieldsError
+          this.handleAllFieldsError,
+          true
         );
       }
       else 
@@ -458,7 +459,8 @@ class ResultsArea extends PureClasss<Props>
           }), 
           query.db,
           this.handleAllFieldsResponse,
-          this.handleAllFieldsError
+          this.handleAllFieldsError,
+          true
         );
       }
 
