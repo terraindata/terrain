@@ -185,7 +185,7 @@ class Autocomplete extends PureClasss<Props>
     }
     
     let haystack = option.toLowerCase();
-    let needle = this.state.value ? this.state.value.toLowerCase() : '';
+    let needle = typeof this.state.value === 'string' ? this.state.value.toLowerCase() : '';
     
     return haystack.indexOf(needle) === 0
       || haystack.indexOf(" " + needle) !== -1
