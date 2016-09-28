@@ -118,11 +118,11 @@ class TQLConverter
     if(options.allFields)
     {
       cards = this._topFromCard(cards, (fromCard: ICard) =>
-        fromCard.set('fields', Immutable.List([
+        fromCard.set('fields', fromCard['fields'].unshift(
           BuilderTypes.make(BuilderTypes.Blocks.field, {
             field: '*',
           })
-        ]))
+        ))
       );
     }
     
