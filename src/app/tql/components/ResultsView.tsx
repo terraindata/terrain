@@ -49,7 +49,7 @@ import Util from '../../util/Util.tsx';
 import Ajax from '../../util/Ajax.tsx';
 import Actions from "../../builder/data/BuilderActions.tsx";
 import TQLConverter from "../../tql/TQLConverter.tsx";
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 
 interface Props 
 {
@@ -60,22 +60,22 @@ interface Props
   db: string;
 }
 
-class ResultsView extends Classs<Props>
+class TQLResultsBar extends PureClasss<Props>
 {
   xhr = null;
   
   state: {
+    open: boolean;
     results: any[];
     error: any;
     querying: boolean;
-    showErrorMessage: boolean;
     resultsSpliced: number;
     errorLine: number;
   } = {
+    open: false,
     results: null,
     error: null,
     querying: false,
-    showErrorMessage: false,
     resultsSpliced: 0,
     errorLine: NaN,
   };
@@ -90,17 +90,6 @@ class ResultsView extends Classs<Props>
   }
     
   resultsFodderRange = _.range(0, 25);
-  
-  toggleError() 
-  {
-    this.setState({
-      showErrorMessage: !this.state.showErrorMessage,
-    });
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return !(_.isEqual(this.props, nextProps) && _.isEqual(this.state, nextState));
-  }
 
   renderResults()
   {
@@ -111,18 +100,6 @@ class ResultsView extends Classs<Props>
 
     if(this.state.error)
     {
-      // TODO figure out the correct title
-      // if (this.state.error === 'No response was returned from the server.' || ! this.state.error)
-      // {
-      //   return (
-      //     <div>
-      //       <span className="error-title">
-      //         No response was returned from the server.
-      //       </span>
-      //     </div>
-      //   );
-      // }
-      
       if(typeof this.state.error !== 'string')
       {
         return (
@@ -136,7 +113,7 @@ class ResultsView extends Classs<Props>
       
       if(this.state.errorLine !== NaN)
       {
-        var mainMessage = this.state.errorLine ? 'Error on line ' + this.state.errorLine : this.state.error;
+        var mainMessage = this.state.errorLine ? 'Error on line ' + this.state.errorLine + ': ' : this.state.error;
         var subMessage =this.state.error;
         this.props.onError(this.state.errorLine);
       }
@@ -146,25 +123,17 @@ class ResultsView extends Classs<Props>
         var subMessage = null;
       }
       
+              // <span className="error-detail">
+              //   {this.state.showErrorMessage ? '\u25BC ' : '\u25B6 '}
+              // </span>
       return (
         <div>
-          <div onClick={this.toggleError}>
-            { 
-              subMessage && 
-              <span className="error-detail">
-                {this.state.showErrorMessage ? '\u25BC ' : '\u25B6 '}
-              </span>
-            }
-            <span className="error-title">
-              Error on line { this.state.errorLine }
-            </span>
-          </div>
-          {
-            this.state.showErrorMessage &&
-              <div className="error-message">
-                { subMessage }
-              </div>
-          }
+          <span className="error-title">
+            { mainMessage }
+          </span>
+          <span className="error-message">
+            { subMessage }
+          </span>
         </div>
       );
     }
@@ -289,4 +258,4 @@ class ResultsView extends Classs<Props>
 	}
 }
 
-export default ResultsView;
+export default TQLResultsBar;

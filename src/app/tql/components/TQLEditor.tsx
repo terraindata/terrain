@@ -48,7 +48,7 @@ import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 const {List} = Immutable;
-import ResultsView from './ResultsView.tsx';
+import TQLResultsBar from './TQLResultsBar.tsx';
 import Menu from './../../common/components/Menu.tsx';
 import { MenuOption } from '../../common/components/Menu.tsx';
 import Switch from './../../common/components/Switch.tsx';
@@ -473,17 +473,6 @@ class TQL extends Classs<Props>
       />
   }
 
-  renderResults() 
-  {
-    return <ResultsView
-      tql={this.state.tql}
-      db={this.props.query && this.props.query.db}
-      onError={this.highlightError}
-      onLoadStart={this.props.onLoadStart}
-      onLoadEnd={this.props.onLoadEnd}
-    />
-  }
-
   toggleConfirmModal()
   {
     this.setState ({
@@ -495,36 +484,48 @@ class TQL extends Classs<Props>
   {
     var manualEntry = BuilderTypes.cardList[this.state.cardName] &&
         BuilderTypes.Blocks[BuilderTypes.cardList[this.state.cardName]].static.manualEntry;
+        
     return (
       <div className='tql-column'>
-        { this.renderTopbar() }
+        { 
+          this.renderTopbar()
+        }
         <div className='code-section'>
-          { this.renderTqlEditor() }
-          { this.state.syntaxHelpOpen ? 
-            <TQLPopup 
-               cardName={this.state.cardName}
-               text={manualEntry ? manualEntry.syntax : 'No syntax help available'}
-               style={this.state.syntaxHelpPos}
-               addColumn={this.props.addColumn}
-               columnIndex={this.props.columnIndex}
-               onClick={this.turnSyntaxPopupOff}  
-            />
-            : null
+          {
+            this.renderTqlEditor()
+          }
+          { 
+            this.state.syntaxHelpOpen &&
+              <TQLPopup 
+                 cardName={this.state.cardName}
+                 text={manualEntry ? manualEntry.syntax : 'No syntax help available'}
+                 style={this.state.syntaxHelpPos}
+                 addColumn={this.props.addColumn}
+                 columnIndex={this.props.columnIndex}
+                 onClick={this.turnSyntaxPopupOff}  
+              />
           }
           {
-            this.state.termDefinitionOpen ? 
-            <TQLPopup 
-              cardName={this.state.cardName}
-              text={manualEntry ? manualEntry.summary : 'No definition available'}
-               style={this.state.termDefinitionPos}
-               addColumn={this.props.addColumn}
-               columnIndex={this.props.columnIndex}  
-               onClick={this.turnSyntaxPopupOff}  
-            />
-            : null
+            this.state.termDefinitionOpen &&
+              <TQLPopup 
+                cardName={this.state.cardName}
+                text={manualEntry ? manualEntry.summary : 'No definition available'}
+                 style={this.state.termDefinitionPos}
+                 addColumn={this.props.addColumn}
+                 columnIndex={this.props.columnIndex}  
+                 onClick={this.turnSyntaxPopupOff}  
+              />
           }
-          { this.renderResults() }
+          
+          <TQLResultsBar
+            tql={this.state.tql}
+            db={this.props.query && this.props.query.db}
+            onError={this.highlightError}
+            onLoadStart={this.props.onLoadStart}
+            onLoadEnd={this.props.onLoadEnd}
+          />
         </div>
+        
         <Modal 
           message={this.state.confirmModalMessage}
           onClose={this.toggleConfirmModal} 
