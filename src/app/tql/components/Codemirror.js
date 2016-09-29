@@ -89,7 +89,7 @@ var CodeMirror = React.createClass({
 		this.codeMirror.on('contextmenu', this.handleRightClick);
 		this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
 		this.codeMirror.on('scroll', this.turnSyntaxPopupOff);
-		this.codeMirror.setSize("100%", "70%");
+		this.codeMirror.setSize("100%", "100%");
 	},
 
 	turnSyntaxPopupOff: function turnSyntaxPopupOff()

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./TQLResultsBar.less');
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
@@ -157,21 +158,20 @@ class TQLResultsBar extends PureClasss<Props>
       return <div>There are no results for your query.</div>;
     }
     
-    var i = 0;
-     return(
-        <div>
-          <ul className="results-list">
-          {
-            this.state.results.map((result, i) =>
-              <li key={i}>{JSON.stringify(result)}</li>
-            )
-          }
-        </ul>
+    return(
+      <div>
+        {
+          this.state.results.map((result, i) =>
+            <div key={i}>
+              {JSON.stringify(result)}
+            </div>
+          )
+        }
         {
           this.state.resultsSpliced ? <em> And {this.state.resultsSpliced} more results </em> : null
         }
-        </div>
-      );
+      </div>
+    );
   }
   
   handleResultsChange(results)
@@ -251,8 +251,18 @@ class TQLResultsBar extends PureClasss<Props>
 	render()
   {
     return (
-      <div className="scrolling">
-        { this.renderResults() }
+      <div
+        className={classNames({
+          'tql-results-bar': true,
+          'tql-results-bar-open': this.state.open,
+        })}
+        onClick={this._toggle('open')}
+      >
+        <div className='tql-results-bar-inner'>
+          {
+            this.renderResults()
+          }
+        </div>
       </div>
     );
 	}

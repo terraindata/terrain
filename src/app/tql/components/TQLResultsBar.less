@@ -1,0 +1,46 @@
+@import "../../common/Common.less";
+
+.tql-results-bar {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  height: 24px;
+  width: 100%;
+  z-index: 10;
+    
+  overflow-y: hidden;
+  font-family: 'Courier New', Courier, monospace;
+  
+  .transition;
+  
+  .tql-results-bar-inner {
+    cursor: pointer;
+    .transition;
+    width: 100%;
+    height: 100%;
+    background: rgba(150,160,255,0.05);
+    padding: 3px 6px;
+    box-sizing: border-box;
+    
+    &:hover {
+      background: rgba(150,160,255,0.15);
+    }
+    
+    div {
+      width: 100%;
+      word-wrap: break-word;
+      white-space: nowrap;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  
+  &.tql-results-bar-open {
+    overflow-y: auto;
+    height: 50%;
+    
+    div {
+      white-space: normal;
+    }
+  }
+}

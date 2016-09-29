@@ -101,7 +101,7 @@ class CardsColumn extends PureClasss<Props>
   
   createFromCard()
   {
-    Actions.create(this._ikeyPath(this.state.keyPath, 0), 0, 'sfw');
+    Actions.create(this.state.keyPath, 0, 'sfw');
   }
   
   toggleLearningMode()

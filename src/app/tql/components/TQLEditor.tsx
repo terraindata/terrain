@@ -333,27 +333,10 @@ class TQL extends Classs<Props>
     });
   }
 
-  getTopbarClass() 
-  {
-    switch (this.state.theme) 
-    {
-      case 'monokai':
-        return 'monokai-topbar';
-      case 'cobalt':
-        return 'cobalt-topbar';
-
-      case 'neo':
-        return 'neo-topbar';
-      default:
-        return 'default-topbar';
-    }
-  }
-
   renderTopbar() 
   {
-    var currTheme = this.getTopbarClass();
     return (
-      <div className={'tql-editor-top ' + currTheme}>
+      <div className='tql-editor-top'>
         <Switch
           first='Cards'
           second='TQL'
@@ -459,18 +442,20 @@ class TQL extends Classs<Props>
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
       };
     var value = this.props.query.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.query);
-    return <CodeMirror
-      highlightedLine={this.state.highlightedLine}
-      onChange={this.updateCode}
-      ref="cm"
-      options={options}
-      className='codemirror-text'
-      value={value}
-      toggleSyntaxPopup={this.toggleSyntaxPopup}
-      defineTerm={this.defineTerm}
-      turnSyntaxPopupOff={this.turnSyntaxPopupOff}
-      hideTermDefinition={this.hideTermDefinition}
+    return (
+      <CodeMirror
+        highlightedLine={this.state.highlightedLine}
+        onChange={this.updateCode}
+        ref="cm"
+        options={options}
+        className='codemirror-text'
+        value={value}
+        toggleSyntaxPopup={this.toggleSyntaxPopup}
+        defineTerm={this.defineTerm}
+        turnSyntaxPopupOff={this.turnSyntaxPopupOff}
+        hideTermDefinition={this.hideTermDefinition}
       />
+    );
   }
 
   toggleConfirmModal()
@@ -486,7 +471,12 @@ class TQL extends Classs<Props>
         BuilderTypes.Blocks[BuilderTypes.cardList[this.state.cardName]].static.manualEntry;
         
     return (
-      <div className='tql-column'>
+      <div
+        className={classNames({
+          'tql-column': true,
+          [this.state.theme]: true,
+        })}
+      >
         { 
           this.renderTopbar()
         }
