@@ -177,6 +177,7 @@ class CardsArea extends PureClasss<Props>
     var renderCardTool = !this.props.noCardTool && (!this.props.singleChild || cards.size === 0);
     
     var topAdd = true;
+    topAdd = false;
     
     return (
       <div> 
@@ -188,7 +189,7 @@ class CardsArea extends PureClasss<Props>
         >
         
           { 
-            renderCardTool &&
+            topAdd && renderCardTool &&
               <CreateCardTool
                 canEdit={this.props.canEdit}
                 keyPath={this.props.keyPath}
@@ -230,6 +231,20 @@ class CardsArea extends PureClasss<Props>
                 keyPath={this.props.keyPath}
               />
             )
+          }
+          
+          { 
+            !topAdd && renderCardTool &&
+              <CreateCardTool
+                canEdit={this.props.canEdit}
+                keyPath={this.props.keyPath}
+                index={props.cards.size}
+                open={this.state.cardToolOpen}
+                className='nested-create-card-tool-wrapper'
+                accepts={this.props.accepts}
+                onToggle={this._toggle('cardToolOpen')}
+                hidePlaceholder={this.props.singleChild || cards.size === 0 || topAdd}
+              />
           }
           
         </div>

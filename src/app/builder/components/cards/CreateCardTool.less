@@ -2,7 +2,7 @@
 
 .create-card-wrapper {
   position: relative;
-  overflow: hidden;
+  // overflow: hidden;
   @create-card-border-radius: 5px;
   border-radius: @create-card-border-radius;
   padding: 6px;
@@ -19,6 +19,10 @@
   }
   
   @button-padding: @standard-margin / 2;
+  
+  &.create-card-opening .create-card-selector {
+    height: 0px;
+  }
   
   .create-card-selector {
     // height: 0px;
@@ -67,24 +71,46 @@
       min-width: 100px;
       flex-grow: 1;
       flex-basis: 100px;
-      // padding: 0px (@standard-margin / 2);
     }
   }
   
   .create-card-placeholder {
     @h: 12px;
-    margin-top: @h/2;
-    height: @h/2;
-    border-top: 1px solid #7c7d7b;
+    height: @h;
+    width: @h;
+    background: #fff;
+    display: inline-block;
+    position: relative;
+    left: 50%;
+    border-radius: 200px;
+    margin-top: 4px;
+    margin-bottom: -2px;
     text-align: center;
     
     svg {
       @sh: @h * 2 / 3;
       height: @sh;
-      margin-top: -1 * @sh/2;
-      .cls-1 {
-        fill: #7c7d7b;
-      }
+      margin-top: (@h - @sh)/2;
+      fill: #7c7d7b;
     }
+    
+    opacity: 0.25;
+    .transition;
+  }
+  
+  .create-card-close {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    background: rgba(255,255,255,0.25);
+  }
+}
+
+.card-hovering {
+  .create-card-wrapper .create-card-placeholder {
+    opacity: 1;
+  }
+  .card .create-card-wrapper .create-card-placeholder {
+    opacity: 0.25;
   }
 }

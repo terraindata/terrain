@@ -361,7 +361,7 @@ export module BuilderTypes
       title: config.title,
       colors: config.colors,
       manualEntry: config.manualEntry,
-      preview: "$value",
+      preview: "[value]",
       tql: config.tql,
       
       display: stringValueDisplay,

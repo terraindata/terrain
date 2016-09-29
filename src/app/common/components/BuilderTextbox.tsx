@@ -231,7 +231,7 @@ class BuilderTextbox extends PureClasss<Props>
           index={null}
           keyPath={this.props.keyPath}
           open={true}
-          onMinimize={this.handleMinimize}
+          onToggle={this.handleMinimize}
         />
       );
     }

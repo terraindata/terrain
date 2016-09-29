@@ -73,6 +73,14 @@ interface Props
 
 class CreateCardTool extends PureClasss<Props>
 {
+  state: {
+    closed: boolean;
+    opening: boolean;
+  } = {
+    closed: !this.props.open,
+    opening: false,
+  };
+  
   createCard(event)
   {
     if(this.props.open && this.props.onMinimize)
@@ -93,39 +101,51 @@ class CreateCardTool extends PureClasss<Props>
     this.props.onToggle();
   }
   
-  // componentWillReceiveProps(newProps)
-  // {
-  //   if(newProps.open)
-  //   {
-  //     setTimeout(() =>
-  //       Util.animateToAutoHeight(this.refs['ccWrapper']),
-  //     150);
-  //   }
-  //   else
-  //   {
-  //     setTimeout(() =>
-  //       Util.animateToHeight(this.refs['ccWrapper'], 0),
-  //     150);
-  //   }
-  // }
+  componentWillReceiveProps(newProps)
+  {
+    if(newProps.open !== this.props.open)
+    {
+      if(newProps.open)
+      {
+        // first set state as not closed, so that the element renders
+        // after render, animate element
+        this.setState({
+          closed: false,
+        });
+      }
+      else
+      {
+        this.setState({
+          opening: true,
+        });
+        // first animate closed, then set state closed so it doesn't render
+        Util.animateToHeight(this.refs['selector'], 0, () =>
+          this.setState({
+            closed: true,
+            opening: false,
+          })
+        )
+      }
+    }
+  }
   
-  // componentDidMount()
-  // {
-  //   if(this.props.open)
-  //   {
-  //     Util.animateToAutoHeight(this.refs['ccWrapper']);
-  //   }
-  // }
+  componentDidUpdate(prevProps, prevState)
+  {
+    if(!prevState.opening && this.state.opening)
+    {
+      Util.animateToAutoHeight(this.refs['selector']);
+    }
+  }
   
   renderCardSelector()
   {
-    if(!this.props.open)
+    if(this.state.closed)
     {
       return null;
     }
     
     return (
-     <div className='create-card-selector' ref='ccWrapper'>
+     <div className='create-card-selector' ref='selector'>
        <div className='create-card-selector-inner'>
          {
            _.map(CardTypes as any, (type:string) => 
@@ -158,13 +178,19 @@ class CreateCardTool extends PureClasss<Props>
            _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
          }
        </div>
+       <div
+         className='close create-card-close'
+         onClick={this.props.onToggle}
+       >
+         <CloseIcon />
+       </div>
      </div>
     );
   }
   
   renderPlaceholder()
   {
-    if(this.props.hidePlaceholder)
+    if(this.props.hidePlaceholder || this.props.open)
     {
       return null;
     }
@@ -174,7 +200,7 @@ class CreateCardTool extends PureClasss<Props>
         onClick={this.props.onToggle}
         className='create-card-placeholder'
       >
-        <AddCardIcon />
+        <AddIcon />
       </div>
     );
   }
@@ -190,6 +216,7 @@ class CreateCardTool extends PureClasss<Props>
       "create-card-wrapper": true,
       "create-card-open": this.props.open,
       "create-card-closed": !this.props.open,
+      "create-card-opening": this.state.opening,
     });
     classes += ' ' + this.props.className;
     

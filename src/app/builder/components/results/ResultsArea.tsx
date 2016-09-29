@@ -326,7 +326,6 @@ class ResultsArea extends PureClasss<Props>
   
   handleResultsChange(results, isAllFields?: boolean)
   {
-    console.log('r');
     let xhrKey = isAllFields ? 'allXhr' : 'xhr';
     if(!this[xhrKey]) return;
     this[xhrKey] = null;
@@ -335,7 +334,6 @@ class ResultsArea extends PureClasss<Props>
     {
       if(results.error)
       {
-        console.log('err', isAllFields);
         if(!isAllFields)
         {
           this.setState({
@@ -399,7 +397,6 @@ class ResultsArea extends PureClasss<Props>
   
   handleError(ev)
   {  
-    console.log('err', ev);
     this.setState({
       error: true,
     });
