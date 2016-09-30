@@ -317,7 +317,8 @@ class CardField extends PureClasss<Props>
     
     let {row} = this.props;
     
-    let renderTools = ! row.hideToolsWhenNotString || typeof this.props.data[this.props.row.inner['key']] === 'string';
+    let isData = typeof this.props.data[this.props.row.inner['key']] !== 'string';
+    let renderTools = ! row.hideToolsWhenNotString || ! isData;
     
     return (
       <div
@@ -443,7 +444,7 @@ class CardField extends PureClasss<Props>
               className={classNames({
                 'card-field-below': true,
                 'card-field-below-first': this.props.isFirstRow,
-                'card-field-below-data': !renderTools,
+                'card-field-below-data': isData,
               })}
             >
               <BuilderComponent

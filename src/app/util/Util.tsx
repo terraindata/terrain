@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 import * as $ from 'jquery';
+import * as moment from 'moment';
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
 import * as Immutable from "immutable";
@@ -90,6 +91,11 @@ var Util = {
 
 		return Math.floor(Math.random() * (max - min)) + min;
 	},
+  
+  moment(str:string)
+  {
+    return moment(new Date(str));
+  },
   
   asJS(obj:any)
   {

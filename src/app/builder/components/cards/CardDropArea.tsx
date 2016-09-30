@@ -142,7 +142,11 @@ const cardTarget =
     {
       let item = monitor.getItem();
       
-      if(item.props.card && targetProps['card'] && item.props['card'].id === targetProps['card'].id)
+      if(
+        item.props
+        && item.props.keyPath.equals(targetProps.keyPath)
+        && targetProps.index === item.props.index
+      )
       {
         // dropped on itself
         return;
