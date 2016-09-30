@@ -113,10 +113,18 @@ const cardTarget =
     
     let itemKeyPath = item.props.keyPath;
     let targetKeyPath = targetProps.keyPath;
-    if(targetKeyPath.equals(itemKeyPath))
+    
+    if(itemKeyPath.equals(targetKeyPath))
     {
-      return targetProps.index !== item.props.index;
+      return true;
     }
+    
+    if(targetProps['singleCard'])
+    {
+      // can't drop above/below a singleCard
+      return false;
+    }
+    
     let itemChildKeyPath = itemKeyPath.push(item.props.index);
     if(targetKeyPath.size >= itemChildKeyPath.size)
     {
@@ -133,6 +141,12 @@ const cardTarget =
     if(monitor.isOver({ shallow: true}) && cardTarget.canDrop(targetProps, monitor))
     {
       let item = monitor.getItem();
+      
+      if(item.props.card && targetProps['card'] && item.props['card'].id === targetProps['card'].id)
+      {
+        // dropped on itself
+        return;
+      }
       
       if(targetProps.beforeDrop)
       {

@@ -439,21 +439,17 @@ class Card extends PureClasss<Props>
             {
               this.props.canEdit && <Menu options={this.state.menuOptions} />
             }
-            { !this.props.singleCard &&
                 <CardDropArea
                   half={true}
                   keyPath={this.props.keyPath}
                   index={this.props.index}
                 />
-            }
-            { !this.props.singleCard &&
                 <CardDropArea
                   half={true}
                   lower={true}
                   keyPath={this.props.keyPath}
                   index={this.props.index}
                 />
-            }
             <div className='card-body' ref='cardBody'>
               <div
                 className={'card-content' + (this.props.singleCard ? ' card-content-single' : '')}
@@ -487,8 +483,9 @@ const cardSource =
     setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
     return {
       props,
-      childIds: BuilderTypes.getChildIds(props.card),
-    }
+      childIds: BuilderTypes.getChildIds(props.card)
+        .remove(props.card.id),
+    };
   },
   // select card?
   

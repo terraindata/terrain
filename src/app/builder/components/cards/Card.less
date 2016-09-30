@@ -70,24 +70,12 @@
   }
   
   &.card-dragging {
-    opacity: 0.5;
-    background: #000;
-    border-radius: 5px;
-    .card-body {
-      height: 0px;
-      overflow: hidden;
-      opacity: 0.75;
-      background-blend-mode: multiply;
-    }
-    .card {
-      .card-inner {
-        border-color: initial;
+    .card-drop-area {
+      background: rgba(0,0,0,0.25);
+      &.card-drop-area-over {
         box-shadow: none;
+        border: 0px;
       }
-    }
-    .card-stroke-above,
-    .card-stroke-below {
-      opacity: 0 !important;
     }
   }
   
