@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import * as moment from 'moment';
 import Classs from './../../common/components/Classs.tsx';
 import BrowserColumn from './BrowserColumn.tsx';
 import BrowserItem from './BrowserItem.tsx';
@@ -287,9 +286,9 @@ class AlgorithmsColumn extends Classs<Props>
             </div>
             <div 
               className='browser-item-line'
-              data-tip={moment(date).format('MMMM Do YYYY, h:mm:ss a') }
+              data-tip={Util.moment(date).format('MMMM Do YYYY, h:mm:ss a') }
             >
-              { moment(date).fromNow() }
+              { Util.moment(date).fromNow() }
 
             </div>
           </div>
