@@ -59,9 +59,12 @@ import * as classNames from 'classnames';
 import Autocomplete from './Autocomplete.tsx';
 import ManualInfo from '../../manual/components/ManualInfo.tsx';
 
+type CardString = BuilderTypes.CardString;
+
 var AddCardIcon = require("./../../../images/icon_addCard_22x17.svg?name=AddCardIcon");
 var TextIcon = require("./../../../images/icon_text_12x18.svg?name=TextIcon");
 var CloseIcon = require("./../../../images/icon_close.svg");
+
 interface Props
 {
   value: BuilderTypes.CardString;
@@ -106,6 +109,7 @@ class BuilderTextbox extends PureClasss<Props>
     this.state = {
       wrongType: this.props.isNumber ? isNaN(value) : false,
       isSwitching: false,
+      value,
     };
   }
   
@@ -113,6 +117,8 @@ class BuilderTextbox extends PureClasss<Props>
   state: {
     wrongType: boolean;
     isSwitching: boolean;
+    value: CardString;
+    backupValue?: CardString;
   };
   
   // TODO
@@ -162,36 +168,31 @@ class BuilderTextbox extends PureClasss<Props>
   
   handleSwitch()
   {
+    if(this.state.backupValue)
+    {
+      var newValue = this.state.backupValue;
+      this.setState({
+        value: newValue,
+        backupValue: this.state.value,
+      });
+      
+      this.executeChange(newValue);
+      return;
+    }
+    
     if(!this.isText())
     {
       this.executeChange("");
+      return;
     }
     
-    return;
-    
-    // switch area:
-    // this.setState({
-    //   isSwitching: true,
-    // });
-    
-    // backup value
-    // var value: BuilderTypes.CardString = '';
-    // // if(this.backupValue)
-    // // {
-    // //   value = this.backupValue;
-    // // }
-    // // else 
-    // if(this.isText())
-    // {
-    //   value = BuilderTypes.make(BuilderTypes.Blocks.parentheses);
-    // }
-    
-    // // this.backupValue = this.props.value;
-    // // not using executeChange because it is debounced and causes a false delay
-    // Actions.change(this.props.keyPath, value);
+    // switching to cards for first time
+    this.setState({
+      isSwitching: true,
+    });
   }
   
-  handleMinimize()
+  handleCardToolClose()
   {
     this.setState({
       isSwitching: false,
@@ -231,7 +232,7 @@ class BuilderTextbox extends PureClasss<Props>
           index={null}
           keyPath={this.props.keyPath}
           open={true}
-          onToggle={this.handleMinimize}
+          onToggle={this.handleCardToolClose}
         />
       );
     }

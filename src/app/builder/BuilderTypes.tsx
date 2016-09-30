@@ -59,7 +59,7 @@ export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
 
-import {Display, DisplayType, valueDisplay, letVarDisplay, textDisplay, firstSecondDisplay, wrapperDisplay, wrapperSingleChildDisplay, stringValueDisplay} from './BuilderDisplays.tsx';  
+import {Display, DisplayType, valueDisplay, letVarDisplay, cardStringValueDisplay, firstSecondDisplay, wrapperDisplay, wrapperSingleChildDisplay, stringValueDisplay} from './BuilderDisplays.tsx';  
 var ManualConfig = require('./../manual/ManualConfig.json');
 import {IResultsConfig} from "./components/results/ResultsConfig.tsx";
 
@@ -509,7 +509,7 @@ export module BuilderTypes
           'let',
           'take',
           'skip',
-          'group',
+          'groupBy',
         ]),
         
         getChildTerms:

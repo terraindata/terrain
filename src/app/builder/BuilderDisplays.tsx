@@ -125,24 +125,31 @@ export interface Display
 
 // Section: Re-useable displays
 
-export const valueDisplay =
+export const valueDisplay: Display =
 {
   displayType: NUM,
   help: ManualConfig.help["value"],
   key: 'value',
 }
 
-export const stringValueDisplay =
+export const stringValueDisplay: Display =
   {
     displayType: TEXT,
     key: 'value',
   };
 
-export const textDisplay =
-{
-  displayType: TEXT,
-  key: [],
-}
+export const cardStringValueDisplay: Display[] =
+[
+  {
+    displayType: CARDSFORTEXT,
+    key: 'value',
+    className: 'nested-cards-content',
+  },
+  {
+    displayType: CARDTEXT,
+    key: 'value',
+  },
+];
 
 export const firstSecondDisplay = (middle:Display): Display =>
 ({
@@ -187,14 +194,14 @@ export const wrapperDisplay: Display =
 {
   displayType: CARDS,
   key: 'cards',
-  className: 'wrapper-cards-content',
+  className: 'nested-cards-content',
 };
 
 export const wrapperSingleChildDisplay: Display =
 {
   displayType: CARDS,
   key: 'cards',
-  className: 'wrapper-cards-content',
+  className: 'nested-cards-content',
   singleChild: true,
 };
 
