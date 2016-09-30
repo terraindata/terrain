@@ -1,11 +1,17 @@
 @import "../../../common/Common.less";
 
 .create-card-wrapper {
+  &.create-card-open {
+    background: @builder-bg;
+  }
+  
   position: relative;
   // overflow: hidden;
   @create-card-border-radius: 5px;
-  border-radius: @create-card-border-radius;
+  border-radius: @create-card-border-radius 0px 0px @create-card-border-radius;
   padding: 6px;
+  padding-right: 0px;
+  
   &.create-card-closed {
     padding: 0px;
   }
@@ -32,7 +38,7 @@
     box-sizing: border-box;
     
     .create-card-selector-inner {
-      padding: @standard-margin;
+      padding: @standard-margin / 2;
       display: flex;
       flex-wrap: wrap;
     }
@@ -56,21 +62,18 @@
       .transition;
       height: 23px;
       box-sizing: border-box;
-      // border-bottom: 3px solid #000;
       
-      // &:hover {
-      //   border-bottom-width: 4px;
-      // }
-      
-      // &:active {
-      //   border-bottom-width: 2px;
-      // }
+      opacity: 0.9;
+      &:hover {
+        opacity: 1;
+      }
     }
     
     .create-card-button-fodder {
       min-width: 100px;
       flex-grow: 1;
       flex-basis: 100px;
+      margin: 0px 3px;
     }
   }
   

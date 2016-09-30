@@ -69,6 +69,7 @@ interface Props
   accepts?: List<string>;
   onToggle?: () => void;
   hidePlaceholder?: boolean;
+  cannotClose?: boolean;
 }
 
 class CreateCardTool extends PureClasss<Props>
@@ -156,6 +157,7 @@ class CreateCardTool extends PureClasss<Props>
              }
              
              let card = BuilderTypes.make(BuilderTypes.Blocks[type]);
+                 // data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
              return (
                <a
                  className="create-card-button"
@@ -165,7 +167,6 @@ class CreateCardTool extends PureClasss<Props>
                  style={{
                    backgroundColor: card.static.colors[0],
                  }}
-                 data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
                >
                  <div className="create-card-button-inner" rel={type}>
                    { card.static.title }
@@ -178,12 +179,15 @@ class CreateCardTool extends PureClasss<Props>
            _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
          }
        </div>
-       <div
-         className='close create-card-close'
-         onClick={this.props.onToggle}
-       >
-         <CloseIcon />
-       </div>
+       {
+         !this.props.cannotClose &&
+           <div
+             className='close create-card-close'
+             onClick={this.props.onToggle}
+           >
+             <CloseIcon />
+           </div>
+       }
      </div>
     );
   }

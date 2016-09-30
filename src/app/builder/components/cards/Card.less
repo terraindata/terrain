@@ -132,7 +132,7 @@
     position: absolute !important;
     height: 33px !important;
     box-sizing: border-box;
-    border-top-left-radius: @card-border-radius;
+    border-top-left-radius: calc(@card-border-radius - 1px);
     text-transform: capitalize;
     position: relative; // for menu component
     text-align: left;
@@ -346,7 +346,6 @@
 
   // padding: 6px;
   // padding-right: 0px;
-  // background: #f6f9f2; // TODO
   border-top-left-radius: 9px;
   border-bottom-left-radius: 9px;
   position: relative;

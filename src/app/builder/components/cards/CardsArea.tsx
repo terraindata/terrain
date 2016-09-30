@@ -244,6 +244,7 @@ class CardsArea extends PureClasss<Props>
                 accepts={this.props.accepts}
                 onToggle={this._toggle('cardToolOpen')}
                 hidePlaceholder={this.props.singleChild || cards.size === 0 || topAdd}
+                cannotClose={cards.size === 0}
               />
           }
           

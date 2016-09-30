@@ -1173,6 +1173,11 @@ export module BuilderTypes
   // returns preview for a given card
   export function getPreview(card:ICard):string
   {
+    if(!card)
+    {
+      return;
+    }
+    
     let {preview} = card.static;
     if(typeof preview === 'string')
     {

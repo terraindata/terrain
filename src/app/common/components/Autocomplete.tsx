@@ -95,7 +95,13 @@ class Autocomplete extends PureClasss<Props>
   
   handleChange(event)
   {
-    var value = event.target.value;
+    var {target} = event;
+    while(target && target.value === undefined)
+    {
+      target = target.parentNode;
+    }
+    
+    var {value} = target;
     this.value = value;
     this.props.onChange(value);
     this.setState({

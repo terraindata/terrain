@@ -157,7 +157,7 @@ class BuilderTextbox extends PureClasss<Props>
   isText()
   {
     // TODO better approach?
-    return typeof this.props.value === 'string' || typeof this.props.value === 'number';
+    return typeof this.props.value === 'string' || typeof this.props.value === 'number' || !this.props.value;
   }
   
   handleSwitch()
