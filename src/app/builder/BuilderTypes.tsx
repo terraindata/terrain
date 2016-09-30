@@ -547,6 +547,7 @@ export module BuilderTypes
                 displayType: DisplayType.CARDSFORTEXT,
                 key: 'field',
               },
+              hideToolsWhenNotString: true,
             },
           },
           
