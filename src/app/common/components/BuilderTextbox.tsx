@@ -101,7 +101,6 @@ class BuilderTextbox extends PureClasss<Props>
   {
     super(props);
     
-    // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
     // TODO?
     // this.executeChange = _.debounce(this.executeChange, 750);
 
@@ -110,21 +109,39 @@ class BuilderTextbox extends PureClasss<Props>
       wrongType: this.props.isNumber ? isNaN(value) : false,
       isSwitching: false,
       value,
+      backupString: value,
     };
   }
   
-  // backupValue: BuilderTypes.CardString;
   state: {
     wrongType: boolean;
     isSwitching: boolean;
     value: CardString;
-    backupValue?: CardString;
+    backupString: CardString;
   };
   
   // TODO
   componentWillReceiveProps(newProps)
   {
     var value: any = newProps.value;
+    
+    // If you want two-way backups, use this line
+      // (value && this.props.value === '' && value['type'] === 'creating') ||
+    if(
+      (this.props.value && this.props.value['type'] === 'creating' && value === '')
+    )
+    {
+      if(this.state.backupString)
+      {
+        // was creating, now switched back
+        this.executeChange(this.state.backupString);
+      }
+      this.setState({
+        value: this.state.backupString,
+      });
+      return;
+    }
+    
     this.setState ({
       wrongType: newProps.isNumber ? isNaN(value) : false,
     });
@@ -168,34 +185,20 @@ class BuilderTextbox extends PureClasss<Props>
   
   handleSwitch()
   {
-    if(this.state.backupValue)
-    {
-      var newValue = this.state.backupValue;
-      this.setState({
-        value: newValue,
-        backupValue: this.state.value,
-      });
-      
-      this.executeChange(newValue);
-      return;
-    }
-    
-    if(!this.isText())
-    {
-      this.executeChange("");
-      return;
-    }
-    
-    // switching to cards for first time
+    let value = this.isText() ? BuilderTypes.make(BuilderTypes.Blocks.creating) : '';
     this.setState({
-      isSwitching: true,
+      value,
+      backupString: typeof this.props.value === 'string' ? this.props.value : null,
     });
+    this.executeChange(value);
+    
   }
   
   handleCardToolClose()
   {
+    this.executeChange('');
     this.setState({
-      isSwitching: false,
+      value: '',
     });
   }
   
@@ -224,22 +227,24 @@ class BuilderTextbox extends PureClasss<Props>
   
   render()
   {
-    if(this.state.isSwitching)
+    if(this.props.value && this.props.value['type'] === 'creating')
     {
-      return (
-        <CreateCardTool
-          canEdit={this.props.canEdit}
-          index={null}
-          keyPath={this.props.keyPath}
-          open={true}
-          onToggle={this.handleCardToolClose}
-        />
-      );
+      return null;
+      // return (
+      //   <CreateCardTool
+      //     canEdit={this.props.canEdit}
+      //     index={null}
+      //     keyPath={this.props.keyPath}
+      //     open={true}
+      //     onToggle={this.handleCardToolClose}
+      //   />
+      // );
     }
     
     if(this.isText())
     {
-      const { isOverCurrent, connectDropTarget } = this.props;
+      const { isOverCurrent, connectDropTarget, placeholder } = this.props;
+      
       return connectDropTarget(
         <div 
           className={classNames({
@@ -258,7 +263,7 @@ class BuilderTextbox extends PureClasss<Props>
                 defaultValue={this.props.value as string}
                 onChange={this.handleTextareaChange}
                 className={this.props.className}
-                placeholder={this.props.placeholder}
+                placeholder={placeholder}
                 rel={this.props.rel}
               />
             :
@@ -268,7 +273,7 @@ class BuilderTextbox extends PureClasss<Props>
                 value={this.props.value as string}
                 options={this.props.keys}
                 onChange={this.handleAutocompleteChange}
-                placeholder={this.props.placeholder}
+                placeholder={placeholder}
                 help={this.state && this.state.wrongType ? this.props.typeErrorMessage : this.props.help}
                 className={this.state && this.state.wrongType ? 'ac-wrong-type' : null}
               />

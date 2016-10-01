@@ -68,6 +68,7 @@ interface Props
   onMinimize?: () => void;
   accepts?: List<string>;
   onToggle?: () => void;
+  onClose?: () => void; // like toggle, but only called when explicitly closed
   hidePlaceholder?: boolean;
   cannotClose?: boolean;
 }
@@ -99,7 +100,7 @@ class CreateCardTool extends PureClasss<Props>
       Actions.create(this.props.keyPath, this.props.index, type);
     }
     
-    this.props.onToggle();
+    this.props.onToggle && this.props.onToggle();
   }
   
   componentWillReceiveProps(newProps)
@@ -183,13 +184,25 @@ class CreateCardTool extends PureClasss<Props>
          !this.props.cannotClose &&
            <div
              className='close create-card-close'
-             onClick={this.props.onToggle}
+             onClick={this.handleCloseClick}
            >
              <CloseIcon />
            </div>
        }
      </div>
     );
+  }
+  
+  handleCloseClick()
+  {
+    if(this.props.onClose)
+    {
+      this.props.onClose();
+    }
+    else
+    {
+      this.props.onToggle();
+    }
   }
   
   renderPlaceholder()

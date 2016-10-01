@@ -48,6 +48,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../util/Util.tsx';
 import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
+import { Display } from '../../builder/BuilderDisplays.tsx';
 import Card from '../../builder/components/cards/Card.tsx';
 
 interface Props
@@ -60,6 +61,7 @@ interface Props
   helpOn?: boolean;
   addColumn?: (number, string?) => void;
   columnIndex: number;
+  display: Display;
 }
 
 class BuilderTextboxCards extends React.Component<Props, any>
@@ -73,8 +75,14 @@ class BuilderTextboxCards extends React.Component<Props, any>
     return typeof this.props.value === 'string';
   }
   
+  isCreating()
+  {
+    return false; // TODO
+    // return this.props.value && this.props.value['type'] === 'creating';
+  }
+  
   render() {
-    if(this.isText())
+    if(this.isText() || this.isCreating())
     {
       return null;
     }
@@ -90,6 +98,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
           singleCard={true}
           card={this.props.value as BuilderTypes.ICard}
           index={null}
+          display={this.props.display}
         />
       </div>
     );

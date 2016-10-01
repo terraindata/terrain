@@ -58,10 +58,11 @@ import ManualPopup from './../../../manual/components/ManualPopup.tsx';
 import { Menu, MenuOption } from '../../../common/components/Menu.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import BuilderTypes from './../../BuilderTypes.tsx';
+import { Display } from './../../BuilderDisplays.tsx';
 import Store from "./../../data/BuilderStore.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import CardDropArea from './CardDropArea.tsx';
-
+import CreateCardTool from './CreateCardTool.tsx';
 import BuilderComponent from '../BuilderComponent.tsx';
 
 var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
@@ -84,6 +85,7 @@ interface Props
   connectDragSource?: (el: El) => El;
 
   helpOn?: boolean;
+  display?: Display;
 }
 
 class Card extends PureClasss<Props>
@@ -221,6 +223,11 @@ class Card extends PureClasss<Props>
   dragPreview: any;
   componentDidMount()
   {
+    if(this.props.card.type === 'creating')
+    {
+      return;
+    }
+    
     this.dragPreview = createDragPreview(
       this.props.card.static.title + ' (' + BuilderTypes.getPreview(this.props.card) + ')',
     {
@@ -360,9 +367,37 @@ class Card extends PureClasss<Props>
         ? this.props.keyPath
         : this._ikeyPath(this.props.keyPath, this.props.index);
   }
+  
+  handleCardToolClose()
+  {
+    if(this.props.index === null)
+    {
+      Actions.change(this.props.keyPath, '');
+    }
+    else
+    {
+      Actions.remove(this.props.keyPath, this.props.index);
+    }
+  }
 
 	render()
   {
+    if(this.props.card.type === 'creating')
+    {
+      // not a card at all, in fact. a create card marker
+      console.log(this.props.display);
+      return (
+        <CreateCardTool
+          canEdit={this.props.canEdit}
+          index={this.props.index}
+          keyPath={this.props.keyPath}
+          open={true}
+          onClose={this.handleCardToolClose}
+          accepts={this.props.display && this.props.display.accepts}
+        />
+      );
+    }
+    
     var content = <BuilderComponent
       keys={this.state.allTerms}
       canEdit={this.props.canEdit}

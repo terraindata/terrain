@@ -59,7 +59,7 @@ export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
 
-import {Display, DisplayType, valueDisplay, letVarDisplay, cardStringValueDisplay, firstSecondDisplay, wrapperDisplay, wrapperSingleChildDisplay, stringValueDisplay} from './BuilderDisplays.tsx';  
+import {Display, DisplayType, valueDisplay, letVarDisplay, getCardStringDisplay, firstSecondDisplay, wrapperDisplay, wrapperSingleChildDisplay, stringValueDisplay} from './BuilderDisplays.tsx';  
 var ManualConfig = require('./../manual/ManualConfig.json');
 import {IResultsConfig} from "./components/results/ResultsConfig.tsx";
 
@@ -348,11 +348,12 @@ export module BuilderTypes
     })
   }
   
-  const _selectValueCard = (config: {
+  const _aggregateCard = (config: {
     colors: string[];
     title: string;
     manualEntry: IManualEntry;
     tql: string;
+    defaultValue?: string;
   }) => _card({
     value: "",
     
@@ -364,9 +365,43 @@ export module BuilderTypes
       preview: "[value]",
       tql: config.tql,
       
-      display: stringValueDisplay,
+      display: 
+        config.defaultValue === undefined
+          ? stringValueDisplay
+          : _.extend({}, 
+              stringValueDisplay,
+              {
+                defaultValue: config.defaultValue,
+              }
+            )
+      ,
     }
-  })
+  });
+  
+  const _aggregateNestedCard = (config: {
+    colors: string[];
+    title: string;
+    manualEntry: IManualEntry;
+    tql: string;
+    accepts: List<string>;
+    init?: () => any;
+  }) => _card({
+    value: "",
+    
+    static:
+    {
+      title: config.title,
+      colors: config.colors,
+      manualEntry: config.manualEntry,
+      preview: "[value]",
+      tql: config.tql,
+      init: config.init,
+      
+      display: getCardStringDisplay({
+        accepts: config.accepts,
+      }),
+    }
+  });
   
   const _andOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, colors: string[], manualEntry: any }) => _card(
     {
@@ -436,6 +471,15 @@ export module BuilderTypes
       }
     })
   );
+  
+  const acceptsAggregates = List([
+    'count',
+    'avg',
+    'min',
+    'max',
+    'sum',
+    'distinct',
+  ]);
 
   // The BuildingBlocks
   export const Blocks =
@@ -495,8 +539,9 @@ export module BuilderTypes
         colors: ["#559dcf", "#c0e0f3"],
         title: "Select",
         preview: "[tables.table]",
-        topTql: "SELECT\n$fields\nFROM\n$tables\n$cards",
-        tql: "\n(\n SELECT\n$fields\n FROM\n$tables\n$cards)",
+        tql: "SELECT\n$fields\nFROM\n$tables\n$cards",
+        // topTql: "SELECT\n$fields\nFROM\n$tables\n$cards",
+        // tql: "\n(\n SELECT\n$fields\n FROM\n$tables\n$cards)",
         
         init: () => ({
           tables: List([ make(Blocks.table )]),
@@ -510,6 +555,7 @@ export module BuilderTypes
           'take',
           'skip',
           'groupBy',
+          'having',
         ]),
         
         getChildTerms:
@@ -541,11 +587,13 @@ export module BuilderTypes
                 displayType: DisplayType.CARDTEXT,
                 help: ManualConfig.help["select-field"],
                 key: 'field',
+                accepts: acceptsAggregates,
               },
               below:
               {
                 displayType: DisplayType.CARDSFORTEXT,
                 key: 'field',
+                accepts: acceptsAggregates,
               },
               hideToolsWhenNotString: true,
             },
@@ -656,7 +704,7 @@ export module BuilderTypes
           key: 'operator',
           options: Immutable.List(Operators),
           help: ManualConfig.help["operator"],
-        }),
+        }, List(['sfw'])),
         manualEntry: ManualConfig.cards['filter'],
       },
     }),
@@ -742,15 +790,25 @@ export module BuilderTypes
       }
     }),
 
-    count: _selectValueCard(
+    count: _aggregateNestedCard(
     {
       colors: ["#d99f3e", "#f9e1b5"],
       title: "Count",
       manualEntry: ManualConfig.cards['count'],
       tql: "COUNT($value)",
+      accepts: List(['distinct']),
+      init: () => ({ value: '*' }),
     }),
     
-    avg: _selectValueCard(
+    distinct: _aggregateCard(
+    {
+      colors: ["#d99f3e", "#f9e1b5"],
+      title: "Distinct",
+      manualEntry: ManualConfig.cards['count'], // TODO
+      tql: "DISTINCT $value",
+    }),
+    
+    avg: _aggregateCard(
     {
       colors: ["#d97852", "#f9d0be"],
       title: "Average",
@@ -758,7 +816,7 @@ export module BuilderTypes
       tql: "AVG($value)",
     }),
     
-    sum: _selectValueCard(
+    sum: _aggregateCard(
     {
       colors: ["#ce645b", "#f4c8c2"],
       title: "Sum",
@@ -766,7 +824,7 @@ export module BuilderTypes
       tql: "SUM($value)",
     }),
 
-    min: _selectValueCard(
+    min: _aggregateCard(
     {
       colors: ["#cc5779", "#f3c2ce"],
       title: "Min",
@@ -774,7 +832,7 @@ export module BuilderTypes
       tql: "MIN($value)",
     }),
 
-    max: _selectValueCard(
+    max: _aggregateCard(
     {
       colors: ["#9f5ca7", "#e0c4e2"],
       title: "Max",
@@ -987,13 +1045,8 @@ export module BuilderTypes
           {
             inner:
             {
-              displayType: DisplayType.CARDTEXT,
+              displayType: DisplayType.TEXT,
               help: ManualConfig.help["select-field"],
-              key: 'field',
-            },
-            below:
-            {
-              displayType: DisplayType.CARDSFORTEXT,
               key: 'field',
             },
           },
@@ -1050,6 +1103,13 @@ export module BuilderTypes
       static: {
         tql: "VAR $key = $value;"
       }
+    }),
+    
+    creating: _block( // a placeholder for when a card is being created
+    {
+      static: {
+        tql: "",
+      },
     }),
   }
   // Set the "type" field for all blocks equal to its key
@@ -1199,6 +1259,11 @@ export module BuilderTypes
     }
     else
     {
+      if(!preview)
+      {
+        return 'No preview';
+      }
+      
       return preview(card);
     }
   }  

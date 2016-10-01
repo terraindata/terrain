@@ -207,6 +207,7 @@ class BuilderComponent extends PureClasss<Props>
           helpOn={this.props.helpOn}
           addColumn={this.props.addColumn}
           columnIndex={this.props.columnIndex}
+          display={d}
         />;
       break;
       case DisplayType.DROPDOWN:

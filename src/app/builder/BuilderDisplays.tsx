@@ -89,6 +89,7 @@ export interface Display
   
   // for textboxes
   placeholder?: string;
+  defaultValue?: string;
   // for textboxes with cards
   top?: boolean;
   getAutoTerms?: () => List<string>; // overrides standard terms
@@ -117,6 +118,7 @@ export interface Display
   
   // for cards areas
   singleChild?: boolean;
+  accepts?: List<string>;
   
   provideParentData?: boolean;
   // if true, it passes the parent data down
@@ -130,28 +132,33 @@ export const valueDisplay: Display =
   displayType: NUM,
   help: ManualConfig.help["value"],
   key: 'value',
+  placeholder: 'value',
 }
 
 export const stringValueDisplay: Display =
   {
     displayType: TEXT,
     key: 'value',
+    placeholder: 'value',
   };
 
-export const cardStringValueDisplay: Display[] =
+export const getCardStringDisplay =
+  (config: { accepts?: List<string>, defaultValue?: string, } = {}): Display[] =>
 [
   {
     displayType: CARDSFORTEXT,
     key: 'value',
     className: 'nested-cards-content',
+    accepts: config.accepts,
   },
   {
     displayType: CARDTEXT,
     key: 'value',
+    defaultValue: config.defaultValue,
   },
 ];
 
-export const firstSecondDisplay = (middle:Display): Display =>
+export const firstSecondDisplay = (middle:Display, accepts:List<string>): Display =>
 ({
   displayType: FLEX,
   key: null,
@@ -161,12 +168,14 @@ export const firstSecondDisplay = (middle:Display): Display =>
     displayType: CARDSFORTEXT,
     key: 'first',
     className: 'card-double-first',
+    accepts,
   },
   
   below:
   {
     displayType: CARDSFORTEXT,
     key: 'second',
+    accepts,
   },
   
   flex:
@@ -177,6 +186,7 @@ export const firstSecondDisplay = (middle:Display): Display =>
       top: true,
       showWhenCards: true,
       help: ManualConfig.help["first"],
+      accepts,
     },
     
     middle,
@@ -186,6 +196,7 @@ export const firstSecondDisplay = (middle:Display): Display =>
       key: 'second',
       showWhenCards: true,
       help: ManualConfig.help["second"],
+      accepts,
     },
   ],
 });
