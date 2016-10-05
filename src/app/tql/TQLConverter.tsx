@@ -60,6 +60,7 @@ type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
 export interface Options {
   allFields?: boolean; // amend the final Select card to include all possible fields.
   limit?: number;
+  count?: boolean;
 }
 
 class TQLConverter
@@ -134,6 +135,13 @@ class TQLConverter
         return fromCard.set('cards', fromCard['cards'].push(BuilderTypes.make(BuilderTypes.Blocks.take, {
           value: options.limit,
         })));
+      }
+      
+      if(options.count && fromCard['fields'].size && !fromCard['fields'].some(field => field.field.type === 'count' 
+        || (field.field.substr && field.field.substr(5).toLowerCase() === 'count')))
+      {
+        // no count card, add one
+        fromCard = fromCard.setIn(['fields', 0, 'field'], 'COUNT(*)');
       }
             
       return fromCard;

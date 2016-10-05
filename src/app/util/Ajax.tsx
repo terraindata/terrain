@@ -363,11 +363,11 @@ var Ajax = {
       
       (resp) =>
       {
-        try {
-          console.log(resp);
-        } catch(e) {
-          console.log('err', resp);
-        }
+        // try {
+        //   console.log(resp);
+        // } catch(e) {
+        //   console.log('err', resp);
+        // }
       }
     );
   },

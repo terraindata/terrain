@@ -119,7 +119,7 @@ export module BuilderTypes
     id: string;
     type: string;
     set: (f: string, v: any) => T;
-    setIn: (f: string, v: any) => T;
+    setIn: (f: (string | number)[] | KeyPath, v: any) => T;
     get: (f: string | number) => any;
     getIn: (f: (string | number)[] | KeyPath) => any;
     delete: (f: string) => T;

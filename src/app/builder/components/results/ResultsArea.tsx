@@ -76,13 +76,14 @@ class ResultsArea extends PureClasss<Props>
 {
   xhr = null;
   allXhr = null;
+  countXhr = null;
   
   state: {
     results: any[];
     resultsWithAllFields: any[];
     resultText: string;
     resultType: string;
-    numResults: number;
+    resultsCount: number;
     
     tql: string;
     error: any;
@@ -98,7 +99,7 @@ class ResultsArea extends PureClasss<Props>
     onResultsLoaded: (unchanged?: boolean) => void;
   } = {
     results: null,
-    numResults: null,
+    resultsCount: null,
     resultsWithAllFields: null,
     resultText: null,
     expanded: false,
@@ -127,8 +128,10 @@ class ResultsArea extends PureClasss<Props>
   {
     this.xhr && this.xhr.abort();
     this.allXhr && this.allXhr.abort();
+    this.countXhr && this.countXhr.abort();
     this.xhr = false;
     this.allXhr = false;
+    this.countXhr = false;
     this.timeout && clearTimeout(this.timeout);
   }
   
@@ -219,7 +222,7 @@ class ResultsArea extends PureClasss<Props>
       resultsPages: pages,
       onResultsLoaded,
     });
-    let reachedEnd = this.state.numResults <= this.state.resultsPages * RESULTS_PAGE_SIZE;
+    let reachedEnd = this.state.resultsCount <= this.state.resultsPages * RESULTS_PAGE_SIZE;
     if(!reachedEnd)
     {
       setTimeout(() =>
@@ -322,6 +325,29 @@ class ResultsArea extends PureClasss<Props>
     this.handleResultsChange(results, true);
   }
   
+  handleCountResponse(results:any)
+  {
+    console.log('got count');
+    if(results && results.length === 1)
+    {
+      this.setState({
+        resultsCount: results[0]['count(*)']
+      });
+    }
+    else
+    {
+      this.handleCountError();
+    }
+  }
+  
+  handleCountError()
+  {
+    console.log('no count');
+    this.setState({
+      resultsCount: -1,
+    })
+  }
+  
   timeout = null;
   
   handleResultsChange(results, isAllFields?: boolean)
@@ -344,8 +370,8 @@ class ResultsArea extends PureClasss<Props>
         return;
       }
       
-      var numResults = results.length;
-      if(numResults > MAX_RESULTS)
+      var resultsCount = results.length;
+      if(resultsCount > MAX_RESULTS)
       {
         results.splice(MAX_RESULTS, results.length - MAX_RESULTS);
       }
@@ -374,7 +400,7 @@ class ResultsArea extends PureClasss<Props>
         
         this.setState({
           results,
-          numResults,
+          resultsCount,
           resultType: 'rel',
           querying: false,
           error: false,
@@ -459,6 +485,15 @@ class ResultsArea extends PureClasss<Props>
           this.handleAllFieldsError,
           true
         );
+        
+        this.countXhr = Ajax.query(
+          TQLConverter.toTQL(query, {
+            count: true,
+          }), 
+          query.db,
+          this.handleCountResponse,
+          this.handleCountError
+        );
       }
 
     }
@@ -473,6 +508,7 @@ class ResultsArea extends PureClasss<Props>
   
   renderTopbar()
   {
+    let count = this.state.resultsCount !== -1 ? this.state.resultsCount : (this.state.results ? this.state.results.length : 0);
     return (
       <div className='results-top'>
         <div className='results-top-summary'>
@@ -480,7 +516,7 @@ class ResultsArea extends PureClasss<Props>
             this.state.error ? 'Error with query' : 
             (
               this.state.results ? 
-                `${this.state.numResults || 'No'} result${this.state.numResults === 1 ? '' : 's'}` 
+                `${count || 'No'} result${count === 1 ? '' : 's'}` 
               : 'Text result'
             )
           }
