@@ -6,6 +6,8 @@
 @title-width: 110px;
 
 .card {
+  // min-width: 400px;
+  // width: 600px;
  // .standard-margin;
   // height: 0px;
   position: relative;
@@ -70,12 +72,16 @@
   }
   
   &.card-dragging {
+    // opacity: 0.5;
     .card-drop-area {
       background: rgba(0,0,0,0.25);
       &.card-drop-area-over {
         box-shadow: none;
         border: 0px;
       }
+    }
+    .card .card-drop-area {
+      background: rgba(0,0,0,0);
     }
   }
   

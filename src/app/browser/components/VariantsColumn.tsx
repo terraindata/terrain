@@ -294,14 +294,8 @@ class VariantsColumn extends Classs<Props>
     return this.props.variants.getIn([id, 'status']) === status;
   }
   
-  renderVariantStatus(status)
+  renderVariants(archived?: boolean)
   {
-    if(!/^\d+$/.test(status))
-    {
-      // filter out string keys
-      return null;  
-    }
-    
     let {me, roles} = this.state;
     let canMakeLive = me && roles && roles.getIn([this.props.groupId, me.username, 'admin']);
     let canCreate = canMakeLive || (
@@ -310,31 +304,30 @@ class VariantsColumn extends Classs<Props>
     
     return (
       <BrowserItemCategory
-        status={BrowserTypes.EVariantStatus[status]}
-        key={status}
+        status={archived ? 'Archive' : 'Build'}
+        key={archived ? '1' : '0'}
         type='variant'
         onHover={this.handleVariantStatusHover}
-        dropDisabled={status === BrowserTypes.EVariantStatus.Live && !canMakeLive}
+        titleHidden={!archived}
       >
         {
           this.props.variantsOrder.map((id, index) =>
             this.props.variants.get(id) &&
-              this.hasStatus(id, status) &&
-                this.renderVariant(id, index)
+              (archived ? this.hasStatus(id, BrowserTypes.EVariantStatus.Archive) : !this.hasStatus(id, BrowserTypes.EVariantStatus.Archive))
+              && this.renderVariant(id, index)
           )
         }
         {
-          this.props.variantsOrder.some(id => this.hasStatus(id, status))
+          this.props.variantsOrder.some(id => archived ? this.hasStatus(id, BrowserTypes.EVariantStatus.Archive) : !this.hasStatus(id, BrowserTypes.EVariantStatus.Archive))
           ? null
           : <div className='browser-category-none'>None</div>
         }
         {
-          status === BrowserTypes.EVariantStatus.Build && canCreate
-          ? <CreateItem
+          canCreate && !archived &&
+            <CreateItem
               name='variant'
               onCreate={this.handleCreate}
             />
-          : null
         }
       </BrowserItemCategory>
     );
@@ -353,10 +346,8 @@ class VariantsColumn extends Classs<Props>
               this.props.variants.size ?
               (
                 <div>
-                  { this.renderVariantStatus(BrowserTypes.EVariantStatus.Live) }
-                  { this.renderVariantStatus(BrowserTypes.EVariantStatus.Approve) }
-                  { this.renderVariantStatus(BrowserTypes.EVariantStatus.Build) }
-                  { this.renderVariantStatus(BrowserTypes.EVariantStatus.Archive) }
+                  { this.renderVariants() }
+                  { this.renderVariants(true) }
                 </div>
               )
               :

@@ -172,7 +172,7 @@ class GroupsColumn extends Classs<Props>
         canDuplicate={canDrag}
       >
         {
-          groupRoles && me && groupRoles.get(me.username) &&
+          groupRoles && me && (groupRoles.getIn([me.username, 'builder']) || groupRoles.getIn([me.username, 'admin'])) &&
             <UserThumbnail
               username={me.username}
               medium={true}
@@ -183,7 +183,9 @@ class GroupsColumn extends Classs<Props>
             />
         }
         {
-          groupRoles && groupRoles.toArray().map(
+          groupRoles && groupRoles.toArray()
+          .filter(role => role.builder || role.admin)
+          .map(
             (role, index) => 
               index > 8 || (me && role.username === me.username) ? null : 
                 <UserThumbnail

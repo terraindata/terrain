@@ -539,9 +539,9 @@ export module BuilderTypes
         colors: ["#559dcf", "#c0e0f3"],
         title: "Select",
         preview: "[tables.table]",
-        tql: "SELECT\n$fields\nFROM\n$tables\n$cards",
-        // topTql: "SELECT\n$fields\nFROM\n$tables\n$cards",
-        // tql: "\n(\n SELECT\n$fields\n FROM\n$tables\n$cards)",
+        // tql: "(\nSELECT\n$fields\nFROM\n$tables\n$cards)",
+        topTql: "SELECT\n$fields\nFROM\n$tables\n$cards",
+        tql: "\n(\n SELECT\n$fields\n FROM\n$tables\n$cards)",
         
         init: () => ({
           tables: List([ make(Blocks.table )]),
@@ -1114,6 +1114,44 @@ export module BuilderTypes
   }
   // Set the "type" field for all blocks equal to its key
   _.map(Blocks as ({[card:string]:any}), (v, i) => Blocks[i].type = i);
+  
+  export const CardsDeckOrdering =
+  [
+    [
+      Blocks.sfw,
+    ],
+    [
+      Blocks.where,
+      Blocks.sort,
+      Blocks.take,
+      Blocks.skip,
+      Blocks.groupBy,
+      Blocks.having,
+    ],
+    [
+      Blocks.count,
+      Blocks.avg,
+      Blocks.min,
+      Blocks.max,
+      Blocks.distinct,
+      Blocks.sum,
+    ],
+    [
+      Blocks.comparison,
+      Blocks.and,
+      Blocks.or,
+      Blocks.exists,
+    ],
+    [
+      Blocks.var,
+      Blocks.let,
+      Blocks.transform,
+      Blocks.score,
+    ],
+    [
+      Blocks.tql,
+    ],
+  ];
   
   // This creates a new instance of a card / block
   // Usage: BuilderTypes.make(BuilderTypes.Blocks.sort)

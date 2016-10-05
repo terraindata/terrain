@@ -22,7 +22,11 @@
       		"desc",
       		"asc",
       		"from",
-      		"function"
+      		"function",
+          "having",
+          "order",
+          "group",
+          "by"
     	],
 		"keywords2":
 		[

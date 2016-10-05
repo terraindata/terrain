@@ -328,7 +328,10 @@ class Result extends Classs<Props> {
             All Fields
           </div>
           {
-            allFieldsData ? _.map(allFieldsData, this.renderExpandedField) : 'Loading...'
+            _.map(allFieldsData || this.props.data, this.renderExpandedField)
+          }
+          {
+            allFieldsData ? null : 'Loading more...'
           }
         </div>
       );

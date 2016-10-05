@@ -55,6 +55,9 @@ import BuilderTypes from '../../BuilderTypes.tsx';
 import Switch from './../../../common/components/Switch.tsx';
 type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
+
+const {CardsDeckOrdering} = BuilderTypes;
+
 let {List, Map} = Immutable;
 let ExpandIcon = require("./../../../../images/icon_expand_12x12.svg?name=ExpandIcon");
 import { DragSource } from 'react-dnd';
@@ -107,12 +110,18 @@ class CardsDeck extends PureClasss<Props>
           className='cards-deck-inner'
         >
           {
-            BuilderTypes.CardTypes.map(type =>
-              <CardDeckCard
-                type={type}
-                search={this.state.search}
-                key={type}
-              />
+            CardsDeckOrdering.map((group:ICard[]) =>
+              <div className='cards-deck-group'>
+                {
+                  group.map((card:ICard) =>
+                    <CardDeckCard
+                      card={card}
+                      search={this.state.search}
+                      key={card.type}
+                    />
+                  )
+                }
+              </div>
             )
           }
         </div>
@@ -123,7 +132,7 @@ class CardsDeck extends PureClasss<Props>
 
 interface CardProps
 {
-  type: string;
+  card: ICard;
   search: string;
   key: string;
   
@@ -136,11 +145,11 @@ class _CardDeckCard extends PureClasss<CardProps>
 {
   render()
   {
-    let {type} = this.props;
-    let card = BuilderTypes.Blocks[type].static;
+    let {card} = this.props;
+    let data = card.static;
     let search = this.props.search.toLowerCase();
     
-    if(card.title.toLowerCase().indexOf(search) !== 0) // && type.indexOf(search) !== 0)
+    if(data.title.toLowerCase().indexOf(search) !== 0)
     {
       var hidden = true;
     }
@@ -152,11 +161,11 @@ class _CardDeckCard extends PureClasss<CardProps>
           'cards-deck-card-hidden': hidden,
         })}
         style={{
-          background: card.colors[0],
+          background: data.colors[0],
         }}
       >
         {
-          card.title
+          data.title
         }
       </div>
     );
@@ -181,7 +190,7 @@ const cardSource =
     // TODO unselect cards?
     
     return {
-      type: props.type,
+      type: props.card.type,
       new: true,
     };
   },
