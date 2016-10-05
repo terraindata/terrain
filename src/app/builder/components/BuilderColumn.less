@@ -134,14 +134,20 @@
     }
   }
   
+  &:not(.builder-column-0) {
+    .builder-column-content {
+      border-left: 1px solid @side-border-color;
+    }
+  }
+  
   .builder-column-content {
     background: @builder-bg;
     z-index: 0;
     position: relative;
     height: calc(~"100% - @{title-bar-height}");
-    border-left: 1px solid @side-border-color;
     padding-left: 12px !important;
     cursor: auto;
+    
     
     &.builder-column-content-scroll {
       overflow-y: auto;

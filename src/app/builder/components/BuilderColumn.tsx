@@ -127,6 +127,7 @@ var BuilderColumn = React.createClass<any, any>(
     selectedCardName: React.PropTypes.string,
     switchToManualCol: React.PropTypes.func,
     changeSelectedCardName: React.PropTypes.func,
+    index: React.PropTypes.number,
   },
   
   getInitialState()
@@ -375,7 +376,7 @@ var BuilderColumn = React.createClass<any, any>(
       'This Variant is not in Build status' : 'You are not authorized to edit this Variant';
     
     return this.renderPanel((
-      <div className='builder-column'>
+      <div className={'builder-column builder-column-' + this.props.index}>
         <div className='builder-title-bar'>
           { 
             this.props.index === 0 ? null : (

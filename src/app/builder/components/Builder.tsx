@@ -399,6 +399,7 @@ class Builder extends PureClasss<Props>
       resizeable: true,
       resizeHandleRef: 'resize-handle',
       content: query && <BuilderColumn
+        index={index}
         colKey={key}
         query={query}
         index={index}
