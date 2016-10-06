@@ -110,8 +110,11 @@ class CardsDeck extends PureClasss<Props>
           className='cards-deck-inner'
         >
           {
-            CardsDeckOrdering.map((group:ICard[]) =>
-              <div className='cards-deck-group'>
+            CardsDeckOrdering.map((group:ICard[], index) =>
+              <div
+                className='cards-deck-group'
+                key={index}
+              >
                 {
                   group.map((card:ICard) =>
                     <CardDeckCard

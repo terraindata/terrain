@@ -127,7 +127,6 @@ var BuilderColumn = React.createClass<any, any>(
     selectedCardName: React.PropTypes.string,
     switchToManualCol: React.PropTypes.func,
     changeSelectedCardName: React.PropTypes.func,
-    index: React.PropTypes.number,
   },
   
   getInitialState()

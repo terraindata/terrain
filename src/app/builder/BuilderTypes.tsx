@@ -642,7 +642,8 @@ export module BuilderTypes
     
     where: _wrapperCard({
       title: "Where",
-      colors: ["#44a9cf", "#b9e5f3"],
+      colors: ["#94b96a", "#dbecc8"],
+      // colors: ["#44a9cf", "#b9e5f3"],
       tql: "WHERE\n$cards",
       manualEntry: ManualConfig.cards.where,
       singleChild: true,
@@ -660,7 +661,7 @@ export module BuilderTypes
       tql: '(\n$cards\n)',
       tqlGlue: '\nAND\n',
       manualEntry: ManualConfig.cards.and,
-      colors: ["#42b4bc", "#b8eaeb"],
+      colors: ["#7f67ab", "#d2c9e4"],
       accepts: List(['or', 'comparison', 'exists']),
     }),
     
@@ -669,7 +670,7 @@ export module BuilderTypes
       tql: '(\n$cards\n)',
       tqlGlue: '\nOR\n',
       manualEntry: ManualConfig.cards.or,
-      colors: ["#429e8f", "#b8e0d8"],
+      colors: ["#3c89c3", "#b6d7ee"],
       accepts: List(['and', 'comparison', 'exists']),
     }),
    
@@ -682,6 +683,7 @@ export module BuilderTypes
       static:
       {
         title: "Compare",
+        colors: ["#9f5ca7", "#e0c4e2"],
         preview: (c:ICard) => {
           var first = c['first'];
           var second = c['second'];
@@ -696,7 +698,6 @@ export module BuilderTypes
           
           return `${first} ${Operators[c['operator']]} ${second}`
         },
-        colors: ["#6ead6e", "#dbecc8"],
         tql: "$first $OPERATOR $second",
         
         display: firstSecondDisplay({
@@ -717,7 +718,7 @@ export module BuilderTypes
       {
         title: "Order By",
         preview: "[sorts.property]",
-        colors: ["#94b96a", "#dbecc8"],
+        colors: ["#6ead6e", "#dbecc8"],
         manualEntry: ManualConfig.cards['sort'],
         tql: "ORDER BY $sorts",        
         
@@ -779,11 +780,10 @@ export module BuilderTypes
       expression: "",
       
       static: {
-        colors: ["#d9b740", "#f9ebb6"],
         title: "Var",
         preview: "[field]",
         display: letVarDisplay,
-
+        colors: ["#6ead6e", "#dbecc8"],
         manualEntry: ManualConfig.cards['var'],
         getNeighborTerms: (card) => List([card['field']]),
         tql: "var $field = $expression",
@@ -792,7 +792,7 @@ export module BuilderTypes
 
     count: _aggregateNestedCard(
     {
-      colors: ["#d99f3e", "#f9e1b5"],
+      colors: ["#d9b740", "#f9ebb6"],
       title: "Count",
       manualEntry: ManualConfig.cards['count'],
       tql: "COUNT($value)",
@@ -802,7 +802,7 @@ export module BuilderTypes
     
     distinct: _aggregateCard(
     {
-      colors: ["#d99f3e", "#f9e1b5"],
+      colors: ["#bc4789", "#e3b2de"],
       title: "Distinct",
       manualEntry: ManualConfig.cards['count'], // TODO
       tql: "DISTINCT $value",
@@ -810,7 +810,7 @@ export module BuilderTypes
     
     avg: _aggregateCard(
     {
-      colors: ["#d97852", "#f9d0be"],
+      colors: ["#d99f3e", "#f9e1b5"],
       title: "Average",
       manualEntry: ManualConfig.cards['avg'],
       tql: "AVG($value)",
@@ -818,7 +818,7 @@ export module BuilderTypes
     
     sum: _aggregateCard(
     {
-      colors: ["#ce645b", "#f4c8c2"],
+      colors: ["#cc5779", "#f3c2ce"],
       title: "Sum",
       manualEntry: ManualConfig.cards['sum'],
       tql: "SUM($value)",
@@ -826,7 +826,7 @@ export module BuilderTypes
 
     min: _aggregateCard(
     {
-      colors: ["#cc5779", "#f3c2ce"],
+      colors: ["#d97852", "#f9d0be"],
       title: "Min",
       manualEntry: ManualConfig.cards['min'],
       tql: "MIN($value)",
@@ -834,7 +834,7 @@ export module BuilderTypes
 
     max: _aggregateCard(
     {
-      colors: ["#9f5ca7", "#e0c4e2"],
+      colors: ["#ce645b", "#f4c8c2"],
       title: "Max",
       manualEntry: ManualConfig.cards['max'],
       tql: "MAX($value)",
@@ -842,7 +842,7 @@ export module BuilderTypes
 
     exists: _wrapperCard(
     {
-      colors: ["#7f67ab", "#d2c9e4"],
+      colors: ["#42b4bc", "#b8eaeb"],
       title: "Exists",
       manualEntry: ManualConfig.cards['exists'],
       tql: "EXISTS\n(\n$cards)",
@@ -874,8 +874,8 @@ export module BuilderTypes
       
       static:
       {
-        colors: ["#3c89c3", "#b6d7ee"],
         title: "Score",
+        colors: ["#2996c3", "#aeddee"],
         preview: "[weights.length] Weight(s)",
         manualEntry: ManualConfig.cards['score'],
         tql: "linearScore([$weights])",
@@ -957,7 +957,7 @@ export module BuilderTypes
       static:
       {
         manualEntry: ManualConfig.cards['transform'],
-        colors: ["#2996c3", "#aeddee"],
+        colors: ["#559dcf", "#c0e0f3"],
         title: "Transform",
         preview: "[input]",
         tql: "linearTransform([$scorePoints])",
@@ -1003,7 +1003,7 @@ export module BuilderTypes
     
     take: _valueCard(
     {
-      colors: ["#27a2aa", "#ade2e3"],
+      colors: ["#569a55", "#c1debf"],
       title: "Limit",
       manualEntry: ManualConfig.cards['take'],
       tql: "LIMIT $value",
@@ -1012,7 +1012,7 @@ export module BuilderTypes
     
     skip: _valueCard(
     {
-      colors: ["#278a79", "#add8cf"],
+      colors: ["#429e8f", "#b8e0d8"],
       title: "Offset",
       manualEntry: ManualConfig.cards['skip'],
       tql: "OFFSET $value",
@@ -1026,7 +1026,7 @@ export module BuilderTypes
       static:
       {
         manualEntry: ManualConfig.cards['sfw'], // TODO
-        colors: ["#559dcf", "#c0e0f3"],
+        colors: ["#27a2aa", "#ade2e3"],
         title: "Group By",
         preview: "[fields.field]",
         tql: "GROUP BY\n$fields",
@@ -1056,7 +1056,7 @@ export module BuilderTypes
     
     having: _wrapperCard({
       title: "Having",
-      colors: ["#44a9cf", "#b9e5f3"],
+      colors: ["#2792ba", "#add2f3"],
       tql: "HAVING\n$cards",
       manualEntry: ManualConfig.cards.where, // TODO
       
@@ -1076,7 +1076,7 @@ export module BuilderTypes
       {
         title: "Expression",
         preview: "\n$clause",
-        colors: ["#569a55", "#c1debf"],
+        colors: ["#278a79", "#add8cf"],
         tql: "$clause",
         manualEntry: ManualConfig.cards.tql,
         
@@ -1133,8 +1133,8 @@ export module BuilderTypes
       Blocks.avg,
       Blocks.min,
       Blocks.max,
-      Blocks.distinct,
       Blocks.sum,
+      Blocks.distinct,
     ],
     [
       Blocks.comparison,

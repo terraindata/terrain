@@ -327,7 +327,6 @@ class ResultsArea extends PureClasss<Props>
   
   handleCountResponse(results:any)
   {
-    console.log('got count');
     if(results && results.length === 1)
     {
       this.setState({
@@ -342,7 +341,6 @@ class ResultsArea extends PureClasss<Props>
   
   handleCountError()
   {
-    console.log('no count');
     this.setState({
       resultsCount: -1,
     })
