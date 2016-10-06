@@ -71,20 +71,22 @@ interface Props
 {
   card: BuilderTypes.ICard;
   index: number;
-  singleCard?: boolean;
+  singleCard?: boolean; // for BuilderTextboxCards
+  singleChild?: boolean; // for cards like Where that are wrappers but only accept 1 child
 
   keys: List<string>;
   canEdit: boolean;
   keyPath: KeyPath;
+  accepts: List<string>;
 
   addColumn?: (number, string?) => void;
   columnIndex?: number;
+  helpOn?: boolean;
   
   isDragging?: boolean;
   connectDragPreview?: (a?:any) => void;
   connectDragSource?: (el: El) => El;
 
-  helpOn?: boolean;
   display?: Display;
 }
 
@@ -321,7 +323,7 @@ class Card extends PureClasss<Props>
   
   handleDuplicate()
   {
-    if(this.props.singleCard)
+    if(this.props.singleCard || this.props.singleChild)
     {
       alert("Can't duplicate this card because it is not in a position where it can have neighborhing cards. Try moving it to another spot on the Builder and duplicating it there.");
       return;
@@ -385,7 +387,6 @@ class Card extends PureClasss<Props>
     if(this.props.card.type === 'creating')
     {
       // not a card at all, in fact. a create card marker
-      console.log(this.props.display);
       return (
         <CreateCardTool
           canEdit={this.props.canEdit}
@@ -419,6 +420,8 @@ class Card extends PureClasss<Props>
     //                 addColumn={this.props.addColumn}
     //                 columnIndex={this.props.columnIndex}
     //               />
+    
+    let renderDropAreas = !this.props.singleChild && !this.props.singleCard;
     
     return ( 
       <div
@@ -474,17 +477,26 @@ class Card extends PureClasss<Props>
             {
               this.props.canEdit && <Menu options={this.state.menuOptions} />
             }
+            
+            {
+              renderDropAreas &&
                 <CardDropArea
                   half={true}
                   keyPath={this.props.keyPath}
                   index={this.props.index}
+                  accepts={this.props.accepts}
                 />
+            }
+            {
+              renderDropAreas &&
                 <CardDropArea
                   half={true}
                   lower={true}
                   keyPath={this.props.keyPath}
                   index={this.props.index}
+                  accepts={this.props.accepts}
                 />
+            }
             <div className='card-body' ref='cardBody'>
               <div
                 className={'card-content' + (this.props.singleCard ? ' card-content-single' : '')}

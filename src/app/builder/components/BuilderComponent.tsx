@@ -388,6 +388,7 @@ class BuilderComponent extends PureClasss<Props>
           top={d.top}
           placeholder={d.placeholder || d.key}
           showWhenCards={d.showWhenCards}
+          display={d}
           {...{
             keyPath,
             value,

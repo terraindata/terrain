@@ -253,6 +253,7 @@ class CreateCardTool extends PureClasss<Props>
         <CardDropArea
           index={this.props.index}
           keyPath={this.props.keyPath}
+          accepts={this.props.accepts}
         />
      </div>
    );

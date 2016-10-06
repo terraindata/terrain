@@ -178,7 +178,7 @@ class CardsArea extends PureClasss<Props>
     
     var topAdd = true;
     topAdd = false;
-    
+
     return (
       <div> 
         <div
@@ -213,22 +213,28 @@ class CardsArea extends PureClasss<Props>
                 <CardDropArea
                   index={0}
                   keyPath={this.props.keyPath}
+                  accepts={this.props.accepts}
                 />
               </div>
           }
           
           {
             cards.map((card:ICard, index:number) =>
-              <Card 
-                {...this.props}
-                helpOn={this.state.learningMode || this.props.helpOn}
-                cards={null}
-                key={card.id}
-                singleCard={false}
-                index={index}
+              <Card
                 card={card}
+                index={index}
+                singleCard={false}
                 keys={this.state.keys}
+                canEdit={this.props.canEdit}
                 keyPath={this.props.keyPath}
+                accepts={this.props.accepts}
+                singleChild={this.props.singleChild}
+                
+                addColumn={this.props.addColumn}
+                columnIndex={this.props.columnIndex}
+                helpOn={this.state.learningMode || this.props.helpOn}
+                
+                key={card.id}
               />
             )
           }

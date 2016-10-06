@@ -51,6 +51,7 @@ import CardDropArea from "../../builder/components/cards/CardDropArea.tsx";
 import Actions from "../../builder/data/BuilderActions.tsx";
 import Util from '../../util/Util.tsx';
 import PureClasss from '../../common/components/PureClasss.tsx';
+import { Display } from '../../builder/BuilderDisplays.tsx';
 import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
 import Card from '../../builder/components/cards/Card.tsx';
 import CreateCardTool from '../../builder/components/cards/CreateCardTool.tsx';
@@ -93,6 +94,7 @@ interface Props
   typeErrorMessage?: string;
   
   showWhenCards?: boolean;
+  display?: Display;
 }
 
 class BuilderTextbox extends PureClasss<Props>
@@ -230,22 +232,13 @@ class BuilderTextbox extends PureClasss<Props>
     if(this.props.value && this.props.value['type'] === 'creating')
     {
       return null;
-      // return (
-      //   <CreateCardTool
-      //     canEdit={this.props.canEdit}
-      //     index={null}
-      //     keyPath={this.props.keyPath}
-      //     open={true}
-      //     onToggle={this.handleCardToolClose}
-      //   />
-      // );
     }
     
     if(this.isText())
     {
       const { isOverCurrent, connectDropTarget, placeholder } = this.props;
       
-      return connectDropTarget(
+      return (
         <div 
           className={classNames({
             'builder-tb': true,
@@ -283,6 +276,7 @@ class BuilderTextbox extends PureClasss<Props>
               <CardDropArea
                 keyPath={this.props.keyPath}
                 index={null}
+                accepts={this.props.display && this.props.display.accepts}
               />
           }
         </div>
@@ -351,45 +345,15 @@ class BuilderTextbox extends PureClasss<Props>
   }
 };
 
-const btbTarget = 
-{
-  canDrop(props, monitor)
-  {
-    return props.acceptsCards;
-  },
-  
-  drop(props, monitor, component)
-  {
-    const item = monitor.getItem();
-    if(monitor.isOver({ shallow: true}))
-    {
-      const card = monitor.getItem();
-      const id = props.id;
-      const findId = (c) =>
-      {
-        for(var i in c)
-        {
-          if(c.hasOwnProperty(i) && typeof c[i] === 'object')
-          {
-            if(c[i].id === id || findId(card[i]))
-            {
-              return true;  
-            }
-          }
-        }
-      }
-      
-      if(findId(card))
-      {
-        return;  
-      }
-    }
-  }
-}
+// const btbTarget = 
+// {
+//   canDrop(props, monitor)
+//   {
+//     console.log(props.acceptsCards && props.display 
+//       && props.display.accepts.indexOf(monitor.getItem().type) !== -1);
+//     return props.acceptsCards && props.display 
+//       && props.display.accepts.indexOf(monitor.getItem().type) !== -1;
+//   },
+ 
 
-const dropCollect = (connect, monitor) =>
-({
-  connectDropTarget: connect.dropTarget(),
-});
-
-export default DropTarget<Props>('CARD', btbTarget, dropCollect)(BuilderTextbox);
+export default BuilderTextbox;

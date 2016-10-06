@@ -60,12 +60,14 @@ interface Props
   half?: boolean;
   lower?: boolean;
   isOver?: boolean;
+  canDrop?: boolean;
   connectDropTarget?: (el: El) => El;
   
   height?: number;
   heightOffset?: number; // height will be 100% - heightOffset
   
   beforeDrop?: (item:CardItem, targetProps:Props) => void;
+  accepts?: List<string>;
 }
 
 class CardDropArea extends PureClasss<Props>
@@ -94,6 +96,7 @@ class CardDropArea extends PureClasss<Props>
           'card-drop-area-upper': this.props.half && !this.props.lower,
           'card-drop-area-lower': this.props.half && this.props.lower,
           'card-drop-area-over': this.props.isOver,
+          'card-drop-area-can-drop': this.props.canDrop,
         })}
         style={style}
       />
@@ -106,6 +109,17 @@ const cardTarget =
   canDrop(targetProps:Props, monitor)
   {
     let item = monitor.getItem() as CardItem;
+    var type = item['type'];
+    if(!type && item.props && item.props.card)
+    {
+      type = item.props.card.type;
+    }
+    
+    if(targetProps.accepts && targetProps.accepts.indexOf(type) === -1)
+    {
+      return false;
+    }
+    
     if(item['new'])
     {
       return true;
@@ -138,7 +152,7 @@ const cardTarget =
   
   drop(targetProps:Props, monitor, component)
   {
-    if(monitor.isOver({ shallow: true}) && cardTarget.canDrop(targetProps, monitor))
+    if(monitor.isOver({ shallow: true})) // shouldn't need this: && cardTarget.canDrop(targetProps, monitor))
     {
       let item = monitor.getItem();
       
@@ -183,7 +197,8 @@ const cardTarget =
 const dropCollect = (connect, monitor) =>
 ({
   connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver({ shallow: true}) && monitor.canDrop(),
+  isOver: monitor.isOver({ shallow: true }),
+  canDrop: monitor.isOver({ shallow: true }) && monitor.canDrop(),
 });
 
 
