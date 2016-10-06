@@ -147,11 +147,9 @@ class CardsColumn extends PureClasss<Props>
           'cards-column-deck-open': this.state.deckOpen,
         })}
       >
-        <div className='cards-deck'>
-          <CardsDeck
-            open={this.state.deckOpen}
-          />
-        </div>
+        <CardsDeck
+          open={this.state.deckOpen}
+        />
         <div className='cards-column-cards-area'>
           <CardDropArea
             half={true}

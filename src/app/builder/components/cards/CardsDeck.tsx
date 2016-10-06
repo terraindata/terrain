@@ -93,7 +93,9 @@ class CardsDeck extends PureClasss<Props>
   render()
   {
     return (
-      <div>
+      <div
+        className='cards-deck'
+      >
         <div
           className='cards-deck-search-wrapper'
         >
