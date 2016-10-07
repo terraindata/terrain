@@ -51,6 +51,7 @@ import { DropTarget } from 'react-dnd';
 const classNames = require('classnames');
 import { CardItem } from './Card.tsx';
 import Actions from "../../data/BuilderActions.tsx";
+import BuilderTypes from '../../BuilderTypes.tsx';
 
 interface Props
 {
@@ -68,10 +69,59 @@ interface Props
   
   beforeDrop?: (item:CardItem, targetProps:Props) => void;
   accepts?: List<string>;
+  item?: CardItem;
 }
 
 class CardDropArea extends PureClasss<Props>
 {
+  renderCardPreview()
+  {
+    if(!this.props.isOver || !this.props.canDrop)
+    {
+      return null;
+    }
+    
+    const {item} = this.props;
+    const {type} = item;
+    const {colors} = BuilderTypes.Blocks[type].static;
+    
+    var preview = "New";
+    if(!item.new)
+    {
+      preview = BuilderTypes.getPreview(item.props.card);
+    }
+    
+    return (
+      <div
+        className='card-drop-preview'
+        style={{
+          background: '#fff',
+          borderColor: colors[0],
+        }}
+      >
+        <div
+          className='card-title card-title-closed'
+          style={{
+            background: colors[0],
+          }}
+        >
+          <div className='card-title-inner'>
+            {
+              BuilderTypes.Blocks[type].static.title
+            }
+          </div>
+          <div
+            className='card-preview'
+          >
+            {
+              preview
+            }
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
 	render()
   {
     var style = null;
@@ -97,9 +147,25 @@ class CardDropArea extends PureClasss<Props>
           'card-drop-area-lower': this.props.half && this.props.lower,
           'card-drop-area-over': this.props.isOver,
           'card-drop-area-can-drop': this.props.canDrop,
+          'card-drop-area-shift': window.location.search.indexOf('shift') !== -1,
+          'card-drop-area-no-shift': window.location.search.indexOf('shift') === -1,
         })}
         style={style}
-      />
+      >
+        <div
+          className='card-drop-area-inner'
+          style={
+            window.location.search.indexOf('shift') !== -1 &&
+              {
+                zIndex: 99999999 + this.props.keyPath.size,
+              }
+          }
+        />
+        
+        {
+          this.renderCardPreview()
+        }
+      </div>
 	  );
 	}
 }
@@ -109,11 +175,7 @@ const cardTarget =
   canDrop(targetProps:Props, monitor)
   {
     let item = monitor.getItem() as CardItem;
-    var type = item['type'];
-    if(!type && item.props && item.props.card)
-    {
-      type = item.props.card.type;
-    }
+    const {type} = item;
     
     if(targetProps.accepts && targetProps.accepts.indexOf(type) === -1)
     {
@@ -199,6 +261,7 @@ const dropCollect = (connect, monitor) =>
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver({ shallow: true }),
   canDrop: monitor.isOver({ shallow: true }) && monitor.canDrop(),
+  item: monitor.getItem(),
 });
 
 

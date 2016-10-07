@@ -1187,6 +1187,7 @@ export module BuilderTypes
   // array of different card types
   export const CardTypes = _.compact(_.map(Blocks, (block, k: string) => block._isCard && k ));
 
+  // TODO remove
   var cards = {};
   for(var key in Blocks)
   {

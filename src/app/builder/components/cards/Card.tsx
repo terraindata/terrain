@@ -439,6 +439,15 @@ class Card extends PureClasss<Props>
         onMouseMove={this.handleMouseMove}
       >
         <div ref='cardContainer' className='card-container'>
+          {
+            renderDropAreas && window.location.search.indexOf('shift') !== -1 &&
+              <CardDropArea
+                half={true}
+                keyPath={this.props.keyPath}
+                index={this.props.index}
+                accepts={this.props.accepts}
+              />
+          }
           <div
             className={'card-inner ' + (this.props.singleCard ? 'single-card-inner' : '')}
             style={{
@@ -479,7 +488,7 @@ class Card extends PureClasss<Props>
             }
             
             {
-              renderDropAreas &&
+              renderDropAreas && window.location.search.indexOf('shift') === -1 &&
                 <CardDropArea
                   half={true}
                   keyPath={this.props.keyPath}
@@ -488,7 +497,7 @@ class Card extends PureClasss<Props>
                 />
             }
             {
-              renderDropAreas &&
+              renderDropAreas && window.location.search.indexOf('shift') === -1 &&
                 <CardDropArea
                   half={true}
                   lower={true}
@@ -502,10 +511,22 @@ class Card extends PureClasss<Props>
                 className={'card-content' + (this.props.singleCard ? ' card-content-single' : '')}
                 ref='cardContent'
               >
-                {content}
+                {
+                  content
+                }
               </div>
             </div>
           </div>
+          {
+            renderDropAreas && window.location.search.indexOf('shift') !== -1 &&
+              <CardDropArea
+                half={true}
+                lower={true}
+                keyPath={this.props.keyPath}
+                index={this.props.index}
+                accepts={this.props.accepts}
+              />
+          }
         </div>
       </div>
     );
@@ -517,8 +538,10 @@ class Card extends PureClasss<Props>
 
 export interface CardItem
 {
-  props: Props;
-  childIds: Map<ID, boolean>;
+  props?: Props;
+  childIds?: Map<ID, boolean>;
+  new?: boolean;
+  type?: string;
 }
 
 const cardSource = 
@@ -532,6 +555,7 @@ const cardSource =
       props,
       childIds: BuilderTypes.getChildIds(props.card)
         .remove(props.card.id),
+      type: props.card.type,
     };
   },
   // select card?

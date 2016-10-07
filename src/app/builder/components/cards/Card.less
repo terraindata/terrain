@@ -4,7 +4,11 @@
 @title-height: 18px;
 @top-height: 24px;
 @title-width: 110px;
-
+@stroke-height: 5px;
+@card-border-radius: 6px;
+@card-padding-horizontal: 15px;
+@card-padding-vertical: 7px;
+  
 .card {
   // min-width: 400px;
   // width: 600px;
@@ -12,7 +16,6 @@
   // height: 0px;
   position: relative;
  
- @card-border-radius: 6px;
  border-radius: @card-border-radius;
  
  .card-container {
@@ -73,109 +76,17 @@
   
   &.card-dragging {
     // opacity: 0.5;
-    .card-drop-area {
+    .card-drop-area-half {
       background: rgba(0,0,0,0.25);
       &.card-drop-area-over {
         box-shadow: none;
         border: 0px;
       }
     }
-    .card .card-drop-area {
+    .card .card-drop-area-half {
       background: rgba(0,0,0,0);
     }
   }
-  
-  &.card-dragging-over {
-    .card-stroke-above {
-      opacity: 1;
-    }
-    .card .card-stroke-above {
-      opacity: 0;
-    }
-  }
-  
-  
-  @stroke-height: 5px;
-  .card-stroke {
-    position: absolute;
-    height: 5px;
-    border: 1px solid rgba(255,255,255,0.5);
-    // height: 0px;
-    z-index: 999;
-    width: 100%;
-    left: 0px;
-    background: @drag-color;
-    opacity: 0;
-    box-sizing: border-box;
-    border-radius: 3px;
-    // .transition;
-  }
-  .card-stroke-above {
-    top: @stroke-height / -2;
-  }
-  .card-stroke-below {
-    bottom: @stroke-height / -2;
-  }
-  
-  @card-padding-horizontal: 15px;
-  @card-padding-vertical: 7px;
-  
-  .card-title {
-    width: @title-width;
-    border-bottom-right-radius: 6px;
-    position: absolute !important;
-    height: 33px !important;
-    box-sizing: border-box;
-    border-top-left-radius: calc(@card-border-radius - 1px);
-    text-transform: capitalize;
-    position: relative; // for menu component
-    text-align: left;
-    
-    display: flex;
-    height: @title-height;
-    padding: @card-padding-vertical 17px;
-    color: @card-title-color;
-    font-weight: @bold-font-weight;
-    .transition;
-    
-    z-index: 1;
-    
-    .card-title-inner {
-      white-space: nowrap;
-    }
-  
-    .card-arrow-icon {
-      display: inline-block;
-      fill: rgba(255,255,255,0.5);
-      width: 10px;
-      position: absolute;
-      top: 8px;
-      left: 5px;
-      .transition;
-      opacity: 0;
-      
-      &:hover {
-        fill: #fff;
-      }
-    }
-    
-    &.card-title-closed {
-      width: calc(~"100% - 1px");
-      padding-right: 20px;
-      .card-arrow-icon {
-        .rotate(-90deg);
-        top: 11px;
-        opacity: 1;
-        left: 2px;
-      }
-    }
-    
-    &.card-title-card-hovering {
-      .card-arrow-icon {
-        opacity: 1;
-      }
-    }
- }
  
  .card-sub-bar {
   border-bottom-left-radius: calc(@card-border-radius - 1px);
@@ -239,100 +150,64 @@
       fill: #fff;
     }
   }
+}
+
+.card-title {
+  width: @title-width;
+  border-bottom-right-radius: 6px;
+  position: absolute !important;
+  height: 33px !important;
+  box-sizing: border-box;
+  border-top-left-radius: calc(@card-border-radius - 1px);
+  text-transform: capitalize;
+  position: relative; // for menu component
+  text-align: left;
   
-    .card-add-card-btn {
-      z-index: 9999;
-      
-      @w: 20px;
-      width: @w;
-      height: @w;
-      border-radius: @w;
-      text-align: center;
-      background: #fff;
-      position: absolute;
-      left: calc(~"50% - @{w} / 2");
-      padding-top: 1px;
-      box-sizing: border-box;
-      color: @bright-green;
-      opacity: 0;
-      font-size: 14px;
-      .transition(~"all 0.1s linear");
-      
-      &:not(.card-add-card-btn-lower) {
-        top: calc(@w * -0.5);
-      }
-      &.card-add-card-btn-lower {
-        bottom: calc(@w * -0.5);
-      }
-      
-      &:hover {
-        opacity: 1;
-        width: calc(@w * 1.254);
-        height: calc(@w * 1.254);
-        font-size: 18px;
-        left: calc(~"50% - @{w} * 1.254 / 2");
-        
-        &:not(.card-add-card-btn-lower) {
-          top: calc(@w * 1.254 * -0.5);
-        }
-        &.card-add-card-btn-lower {
-          bottom: calc(@w * 1.254 * -0.5);
-        }  
-      }
-    }
+  display: flex;
+  height: @title-height;
+  padding: @card-padding-vertical 17px;
+  color: @card-title-color;
+  font-weight: @bold-font-weight;
+  .transition;
+  
+  z-index: 1;
+  
+  .card-title-inner {
+    white-space: nowrap;
+  }
+
+  .card-arrow-icon {
+    display: inline-block;
+    fill: rgba(255,255,255,0.5);
+    width: 10px;
+    position: absolute;
+    top: 8px;
+    left: 5px;
+    .transition;
+    opacity: 0;
     
-  &.card-hovering {
-    .card-add-card-btn {
-      opacity: 1;
-    }
-    .card {
-      .card-add-card-btn {
-        opacity: 0;
-      }
+    &:hover {
+      fill: #fff;
     }
   }
   
-  // &.card-hovering {
-  //   .card {
-  //     .card-add-card-btn {
-  //       opacity: 0;
-  //     }
-  //   }
-  //   .card-add-card-btn {
-  //     opacity: 0.9;
-  //     &:hover {
-  //       opacity: 1;
-  //     }
-  //   }
-  // }
+  &.card-title-closed {
+    width: calc(~"100% - 1px");
+    padding-right: 20px;
+    border-radius: calc(@card-border-radius - 1px);
+    .card-arrow-icon {
+      .rotate(-90deg);
+      top: 11px;
+      opacity: 1;
+      left: 2px;
+    }
+  }
   
-  // &.card-hovering-lower {
-  //   .card {
-  //     .card-add-card-btn-lower {
-  //       opacity: 0;
-  //     }
-  //   }
-  //   .card-add-card-btn-lower {
-  //     opacity: 0.9;
-  //     &:hover {
-  //       opacity: 1;
-  //     }
-  //   }
-  // }
-  
-  // &.card-hovering-upper {
-  //   .card {
-  //     .card-add-card-btn:not(.card-add-card-btn-lower) {
-  //       opacity: 0;
-  //     }
-  //   }
-  //   .card-add-card-btn:not(.card-add-card-btn-lower) {
-  //     opacity: 0.9;
-  //     &:hover {
-  //       opacity: 1;
-  //     }
-  //   }
-  // }
+  &.card-title-card-hovering {
+    .card-arrow-icon {
+      opacity: 1;
+    }
+  }
 }
 
 .cards-area {
@@ -462,26 +337,6 @@
       background-blend-mode: multiply;
     }
   }
-  
-  .card {
-    &.card-drag-over-upper {
-      .card-stroke-above {
-        opacity: 1;
-      }
-      .card .card-stroke-above {
-        opacity: 0;
-      }
-    }
-    
-    &.card-drag-over-lower {
-      .card-stroke-below {
-        opacity: 1;
-      }
-      .card .card-stroke-below {
-        opacity: 0;
-      }
-    }
-  }
 }
 
 .transform-card {
@@ -490,10 +345,10 @@
 
 
 .card-body {
-    // top: -32px;
-    position: relative;
-    margin-left: @title-width;
-    padding: 6px 3px;
+  // top: -32px;
+  position: relative;
+  margin-left: @title-width;
+  padding: 6px 3px;
 }
 
 .card-content {

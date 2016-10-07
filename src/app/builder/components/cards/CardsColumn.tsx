@@ -72,6 +72,8 @@ interface Props
   spotlights: List<any>;
 }
 
+const _topLevelAccepts = Immutable.List(['sfw']);
+
 class CardsColumn extends PureClasss<Props>
 {
   state: {
@@ -156,6 +158,7 @@ class CardsColumn extends PureClasss<Props>
             index={0}
             keyPath={keyPath}
             height={12}
+            accepts={_topLevelAccepts}
           />
           <CardDropArea
             half={true}
@@ -163,6 +166,7 @@ class CardsColumn extends PureClasss<Props>
             index={cards.size}
             keyPath={keyPath}
             heightOffset={12}
+            accepts={_topLevelAccepts}
           />
           <CardsArea 
             cards={cards}
@@ -173,6 +177,7 @@ class CardsColumn extends PureClasss<Props>
             addColumn={this.props.addColumn}
             columnIndex={this.props.columnIndex}
             noCardTool={true}
+            accepts={_topLevelAccepts}
           />
           {
             !cards.size ? 

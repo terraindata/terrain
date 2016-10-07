@@ -239,7 +239,7 @@ class CardsArea extends PureClasss<Props>
             )
           }
           
-          { 
+          {
             !topAdd && renderCardTool &&
               <CreateCardTool
                 canEdit={this.props.canEdit}

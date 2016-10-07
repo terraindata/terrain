@@ -1,78 +1,164 @@
 @import "../../../common/Common.less";
 
-@over-border: 1px solid #fff;
+@preview-height: 34px;
 
-.card-drop-area {
-  pointer-events: none;
+// no movement
+.card-drop-area-no-shift {
   position: absolute;
   height: 100%;
   width: 100%;
   left: 0px;
   top: 0px;
   
+  
   &.card-drop-area-half {
     height: 50%;
+    
+    .card-drop-preview {
+      top: @preview-height / -2;
+    }
   }
   &.card-drop-area-lower {
     top: 50%;
+    
+    .card-drop-preview {
+      top: calc(~"100% - @{preview-height} / 2");
+    }
+  }
+}
+.body-card-is-dragging {
+  .card-drop-area-no-shift {
+    pointer-events: auto;
+    z-index: 99999999999;
+  }
+}
+
+// movement
+.card-drop-area-shift {
+  .card-drop-area-inner,
+  &:not(.card-drop-area-half) {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0px;
+    top: 0px;
   }
   
-  &.card-drop-area-over {
+  
+  &.card-drop-area-half {
+    height: 0px; // uncomment these for movement
+    .transition;
     
+    .card-drop-area-inner {
+      height: 50%;
+      // background: rgba(255,0,0,0.25);
+    }
+    
+    .card-drop-preview {
+      top: 0px; //@preview-height / -2;
+    }
+  }
+  &.card-drop-area-lower {
+    .card-drop-area-inner {
+      top: 50%;
+      // background: rgba(0,255,0,0.25);
+    }
+    
+    .card-drop-preview {
+      // bottom: 0px;
+      top: calc(~"100% - @{preview-height}");
+    }
+  }
+  
+  &.card-drop-area-over.card-drop-area-can-drop {
+    &.card-drop-area-half {
+      height: @preview-height;
+    }
+    .card-drop-area-inner {
+      // background: #000;
+    }
+  }
+}
+.body-card-is-dragging {
+  .card-drop-area-shift {
+    .card-drop-area-inner {
+      pointer-events: auto;
+      z-index: 99999999999;
+    }
+  }
+}
+
+
+.card-drop-area {
+  pointer-events: none;
+  
+  .card-drop-preview {
+    width: 100%;
+    height: @preview-height;
+    color: #fff;
+    position: absolute;
+    left: 0px;
+    border-radius: 6px;
+    border: 1px solid #000;
+    box-sizing: border-box;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.5); // rgba(255,255,255,0.5);
+    
+    .card-title {
+      opacity: 0.75;
+      width: 100%;
+    }
+  }
+  
+  &:not(.card-drop-area-half) {
+    .card-drop-preview {
+      height: 100%;
+      max-height: @preview-height;
+    }
+  }
+  
+  
+  &.card-drop-area-over {
     &:not(.card-drop-area-half) {
-      border-radius: 5px;
+      // border-radius: 5px;
       
       &.card-drop-area-can-drop {
-        background: fade(@bright-green, 50%);
+        // background: fade(@bright-green, 50%);
       }
       &:not(.card-drop-area-can-drop) {
-        background: fade(#f00, 50%);
+        // background: fade(#f00, 50%);
       }
     }
     
     &.card-drop-area-upper {
       &.card-drop-area-can-drop {
-        border-top: @over-border;
-        
         /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#89f274+0,5ff442+100&0.44+0,0+100 */
-  background: -moz-linear-gradient(top,  rgba(137,242,116,0.44) 0%, rgba(95,244,66,0) 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(top,  rgba(137,242,116,0.44) 0%,rgba(95,244,66,0) 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(to bottom,  rgba(137,242,116,0.44) 0%,rgba(95,244,66,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7089f274', endColorstr='#005ff442',GradientType=0 ); /* IE6-9 */
+        // background: -moz-linear-gradient(top,  rgba(137,242,116,0.44) 0%, rgba(95,244,66,0) 100%); /* FF3.6-15 */
+        // background: -webkit-linear-gradient(top,  rgba(137,242,116,0.44) 0%,rgba(95,244,66,0) 100%); /* Chrome10-25,Safari5.1-6 */
+        // background: linear-gradient(to bottom,  rgba(137,242,116,0.44) 0%,rgba(95,244,66,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        // filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7089f274', endColorstr='#005ff442',GradientType=0 ); /* IE6-9 */
 
-        box-shadow: 0px -5px 5px fade(@bright-green, 50%);
+        // box-shadow: 0px -5px 5px fade(@bright-green, 50%);
       }
       &:not(.card-drop-area-can-drop) {
-        box-shadow: 0px -5px 5px fade(#f00, 50%); //, inset 0px 5px 5px fade(#f00, 50%);
-        border-top: 1px solid #f00;
+        // box-shadow: 0px -5px 5px fade(#f00, 50%); //, inset 0px 5px 5px fade(#f00, 50%);
       }
     }
     
     &.card-drop-area-lower {
       &.card-drop-area-can-drop {
-        border-bottom: @over-border;
-        
         /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#5ff442+0,89f274+100&0+0,0.44+100 */
-  background: -moz-linear-gradient(top,  rgba(95,244,66,0) 0%, rgba(137,242,116,0.44) 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(top,  rgba(95,244,66,0) 0%,rgba(137,242,116,0.44) 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(to bottom,  rgba(95,244,66,0) 0%,rgba(137,242,116,0.44) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#005ff442', endColorstr='#7089f274',GradientType=0 ); /* IE6-9 */
+        // background: -moz-linear-gradient(top,  rgba(95,244,66,0) 0%, rgba(137,242,116,0.44) 100%); /* FF3.6-15 */
+        // background: -webkit-linear-gradient(top,  rgba(95,244,66,0) 0%,rgba(137,242,116,0.44) 100%); /* Chrome10-25,Safari5.1-6 */
+        // background: linear-gradient(to bottom,  rgba(95,244,66,0) 0%,rgba(137,242,116,0.44) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        // filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#005ff442', endColorstr='#7089f274',GradientType=0 ); /* IE6-9 */
 
-        box-shadow: 0px 5px 5px fade(@bright-green, 50%);
+        // box-shadow: 0px 5px 5px fade(@bright-green, 50%);
       }
       
       &:not(.card-drop-area-can-drop) {
-        box-shadow: 0px 5px 5px fade(#f00, 50%); //, inset 0px 5px 5px fade(#f00, 50%);
-        border-bottom: 1px solid #f00;
+        // box-shadow: 0px 5px 5px fade(#f00, 50%); //, inset 0px 5px 5px fade(#f00, 50%);
       }
     }
     
-  }
-}
-
-.body-card-is-dragging {
-  .card-drop-area {
-    pointer-events: auto;
-    z-index: 99999999999;
   }
 }
