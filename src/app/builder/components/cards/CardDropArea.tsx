@@ -74,9 +74,19 @@ interface Props
 
 class CardDropArea extends PureClasss<Props>
 {
+  overSelf()
+  {
+    const {item} = this.props;
+    return this.props.isOver 
+      && this.props.canDrop
+      && !item.new 
+      && item.props.keyPath === this.props.keyPath
+      && item.props.index === this.props.index;
+  }
+  
   renderCardPreview()
   {
-    if(!this.props.isOver || !this.props.canDrop)
+    if(!this.props.isOver || !this.props.canDrop || this.overSelf())
     {
       return null;
     }
@@ -84,7 +94,6 @@ class CardDropArea extends PureClasss<Props>
     const {item} = this.props;
     const {type} = item;
     const {colors} = BuilderTypes.Blocks[type].static;
-    
     var preview = "New";
     if(!item.new)
     {
@@ -149,13 +158,14 @@ class CardDropArea extends PureClasss<Props>
           'card-drop-area-can-drop': this.props.canDrop,
           'card-drop-area-shift': window.location.search.indexOf('shift') !== -1,
           'card-drop-area-no-shift': window.location.search.indexOf('shift') === -1,
+          'card-drop-area-over-self': this.overSelf(),
         })}
         style={style}
       >
         <div
           className='card-drop-area-inner'
           style={
-            window.location.search.indexOf('shift') !== -1 &&
+            window.location.search.indexOf('shift') === -1 ? null :
               {
                 zIndex: 99999999 + this.props.keyPath.size,
               }
