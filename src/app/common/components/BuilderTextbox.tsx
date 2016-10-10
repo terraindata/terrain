@@ -95,6 +95,9 @@ interface Props
   
   showWhenCards?: boolean;
   display?: Display;
+  
+  onFocus?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent) => void;
+  onBlur?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent) => void;
 }
 
 class BuilderTextbox extends PureClasss<Props>
@@ -196,6 +199,16 @@ class BuilderTextbox extends PureClasss<Props>
     
   }
   
+  handleFocus(event:React.FocusEvent)
+  {
+    this.props.onFocus && this.props.onFocus(this, event.target['value'], event);
+  }
+
+  handleBlur(event:React.FocusEvent)
+  {
+    this.props.onBlur && this.props.onBlur(this, event.target['value'], event);
+  }
+  
   handleCardToolClose()
   {
     this.executeChange('');
@@ -269,6 +282,8 @@ class BuilderTextbox extends PureClasss<Props>
                 placeholder={placeholder}
                 help={this.state && this.state.wrongType ? this.props.typeErrorMessage : this.props.help}
                 className={this.state && this.state.wrongType ? 'ac-wrong-type' : null}
+                onFocus={this.handleFocus}
+                onBlur={this.handleBlur}
               />
           }
           { this.props.acceptsCards && this.renderSwitch() }

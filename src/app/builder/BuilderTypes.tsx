@@ -52,6 +52,8 @@ let Map = Immutable.Map;
 import ScoreBar from './components/charts/ScoreBar.tsx';
 import TransformCardComponent from './components/charts/TransformCard.tsx';
 import Store from './data/BuilderStore.tsx';
+import Actions from './data/BuilderActions.tsx';
+import Util from '../util/Util.tsx';
 
 // Interestingly, these have to be above the BuilderDisplays import
 //  since the import itself imports them
@@ -511,6 +513,7 @@ export module BuilderTypes
     {
       table: "",
       alias: "",
+      aliasWasSuggested: false,
       
       static: {
         tql: "\n $table as $alias",
@@ -615,6 +618,43 @@ export module BuilderTypes
                   help: ManualConfig.help["table"],
                   key: 'table',
                   getAutoTerms: () => Store.getState().get('tables'),
+                  
+                  onFocus: (comp:React.Component<any, any>, value:string) =>
+                  {
+                    comp.setState({
+                      initialTable: value,
+                    });
+                  },
+                  onBlur: (comp:React.Component<any, any>, value:string) =>
+                  {
+                    let initialTable = comp.state.initialTable;
+                    let newTable = value;
+                    
+                    if(initialTable !== newTable)
+                    {
+                      let suggestAlias = (table:string) =>
+                      {
+                        if(table.charAt(table.length - 1).toLowerCase() === 's')
+                        {
+                          return table.substr(0, table.length - 1);
+                        }
+                        return table;
+                      }
+                      
+                      let keyPath: KeyPath = comp.props.keyPath;
+                      let aliasKeyPath = keyPath.set(keyPath.size - 1, 'alias');
+                      let aliasWasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
+                      let initialAlias: string = Store.getState().getIn(aliasKeyPath);
+                      
+                      if(!initialTable || initialTable === '' 
+                        || initialAlias === '' || initialAlias === suggestAlias(initialTable))
+                      {
+                        // alias or table was blank or was the suggested one, so let's suggest an alias
+                        Actions.change(aliasKeyPath, suggestAlias(newTable));
+                        Actions.change(aliasWasSuggestedKeyPath, true);
+                      }
+                    }
+                  },
                 },
                 {
                   displayType: DisplayType.LABEL,
@@ -626,6 +666,17 @@ export module BuilderTypes
                   help: ManualConfig.help["alias"],
                   key: 'alias',
                   autoDisabled: true,
+                  
+                  onFocus: (comp:React.Component<any, any>, value:string, event:React.FocusEvent) =>
+                  {
+                    let keyPath: KeyPath = comp.props.keyPath;
+                    let wasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
+                    if(Store.getState().getIn(wasSuggestedKeyPath))
+                    {
+                      Util.selectText(event.target, 0, event.target['value'].length);
+                      Actions.change(wasSuggestedKeyPath, false);
+                    }
+                  },
                 },
               ],
             },

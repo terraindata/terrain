@@ -61,6 +61,9 @@ interface Props
   ref?: string;
   className?: string;
   disabled?: boolean;
+  
+  onFocus?: (event:React.FocusEvent) => void;
+  onBlur?: (event:React.FocusEvent) => void;
 }
 
 class Autocomplete extends PureClasss<Props>
@@ -109,18 +112,22 @@ class Autocomplete extends PureClasss<Props>
     });
   }
   
-  handleFocus(event)
+  handleFocus(event:React.FocusEvent)
   {
     this.setState({
       open: true,
-    })
+    });
+    
+    this.props.onFocus && this.props.onFocus(event);
   }
   
-  handleBlur(event)
+  handleBlur(event:React.FocusEvent)
   {
     this.setState({
       open: false,
-    })
+    });
+    
+    this.props.onBlur && this.props.onBlur(event);
   }
   
   handleSelect(event)

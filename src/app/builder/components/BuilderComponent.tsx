@@ -388,6 +388,8 @@ class BuilderComponent extends PureClasss<Props>
           top={d.top}
           placeholder={d.placeholder || d.key}
           showWhenCards={d.showWhenCards}
+          onFocus={d.onFocus}
+          onBlur={d.onBlur}
           display={d}
           {...{
             keyPath,
