@@ -92,9 +92,10 @@ class VariantVersions extends Classs<Props>
     });
   }
 
+  xhr: XMLHttpRequest = null;
   fetchVariants(props) 
   {
-    Ajax.getVariantVersions(props.variant.id, (versions) =>
+    this.xhr = Ajax.getVariantVersions(props.variant.id, (versions) =>
     {
       if(versions) 
       {
@@ -109,6 +110,12 @@ class VariantVersions extends Classs<Props>
   componentWillMount() 
   {
     this.fetchVariants(this.props);
+  }
+  
+  componentWillUnmount()
+  {
+    this.xhr && this.xhr.abort();
+    this.xhr = null;
   }
 
   componentWillReceiveProps(nextProps)

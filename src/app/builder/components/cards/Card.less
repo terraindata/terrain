@@ -75,17 +75,29 @@
   }
   
   &.card-dragging {
-    // opacity: 0.5;
-    .card-drop-area-half {
-      background: rgba(0,0,0,0.25);
-      &.card-drop-area-over {
-        box-shadow: none;
-        border: 0px;
-      }
+    &:after {
+      content: "";
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
+      box-shadow: inset 0px 0px 10000px rgba(0,0,0,0.5);
+      pointer-events: none;
+      z-index: 999999;
+      border-radius: 6px;
+      overflow: hidden;
     }
-    .card .card-drop-area-half {
-      background: rgba(0,0,0,0);
-    }
+    // .card-drop-area-half {
+    //   background: rgba(0,0,0,0.25);
+    //   &.card-drop-area-over {
+    //     box-shadow: none;
+    //     border: 0px;
+    //   }
+    // }
+    // .card .card-drop-area-half {
+    //   background: rgba(0,0,0,0);
+    // }
   }
  
  .card-sub-bar {

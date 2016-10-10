@@ -88,6 +88,35 @@
   }
 }
 
+.body-card-is-dragging {
+  .create-card-wrapper .create-card-placeholder,
+  .card-hovering .card .create-card-wrapper .create-card-placeholder {
+    opacity: 1; // TODO gate on acceptable card types
+  }
+}
+
+.nested-create-card-tool-wrapper {
+  .card-drop-area-over.card-drop-area-can-drop {
+    position: relative;
+    height: @preview-height;
+    margin-top: -14px;
+    
+    &.card-drop-area-no-shift {
+      margin-top: -14px - @preview-height / 2;
+    }
+  }
+}
+
+.card-field-top-add {
+  .card-drop-area-over.card-drop-area-can-drop {
+    height: @preview-height;
+    margin-bottom: 30px;
+    top: -10px;
+    margin-left: -350px;
+    width: calc(~"355px + 100%");
+  }
+}
+
 
 .card-drop-area {
   pointer-events: none;
