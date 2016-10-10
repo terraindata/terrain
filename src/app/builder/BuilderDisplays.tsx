@@ -65,6 +65,15 @@ export enum DisplayType
   LABEL, // strict text to paste in to HTML
 }
 
+export interface RowDisplay
+{ // this defines each row
+  inner: Display | Display[];
+  above?: Display | Display[];
+  below?: Display | Display[];
+  hideToolsWhenNotString?: boolean;
+  noDataPadding?: boolean; // don't add extra padding to first row when data
+};
+
 let {TEXT, NUM, ROWS, CARDS, CARDTEXT, CARDSFORTEXT, DROPDOWN, LABEL, FLEX, COMPONENT} = DisplayType;
 
 export interface Display
@@ -105,12 +114,7 @@ export interface Display
   // for rows:
   english?: string; // English term defining each row
   factoryType?: string; // string referencing which BLOCK to create
-  row?: { // this defines each row
-    inner: Display | Display[];
-    above?: Display | Display[];
-    below?: Display | Display[];
-    hideToolsWhenNotString?: boolean;
-  };
+  row?: RowDisplay;
   
   // for FLEX, its content
   flex?: Display | Display[];

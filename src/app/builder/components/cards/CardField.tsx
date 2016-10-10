@@ -49,7 +49,7 @@ import * as React from 'react';
 import Util from '../../../util/Util.tsx';
 import PureClasss from '../../../common/components/PureClasss.tsx';
 import BuilderComponent from '../BuilderComponent.tsx';
-import {Display} from '../../BuilderDisplays.tsx';
+import {Display, RowDisplay} from '../../BuilderDisplays.tsx';
 import ManualInfo from '../../../manual/components/ManualInfo.tsx';
 import { CardItem } from './Card.tsx';
 import CardDropArea from './CardDropArea.tsx';
@@ -72,12 +72,7 @@ interface Props
   isFirstRow?: boolean;
   isOnlyRow?: boolean;
 
-  row: {
-    inner: Display | Display[];
-    above?: Display | Display[];
-    below?: Display | Display[];
-    hideToolsWhenNotString?: boolean;
-  }
+  row: RowDisplay;
   keyPath: KeyPath;
   data: any; // record
   canEdit: boolean;
@@ -444,7 +439,7 @@ class CardField extends PureClasss<Props>
               className={classNames({
                 'card-field-below': true,
                 'card-field-below-first': this.props.isFirstRow,
-                'card-field-below-data': isData,
+                'card-field-below-data': isData && !this.props.row.noDataPadding,
               })}
             >
               <BuilderComponent

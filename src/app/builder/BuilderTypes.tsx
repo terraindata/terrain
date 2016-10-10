@@ -808,9 +808,10 @@ export module BuilderTypes
             inner:
             [
               {
-                displayType: DisplayType.TEXT,
+                displayType: DisplayType.CARDTEXT,
                 help: ManualConfig.help["property"],
                 key: 'property',
+                accepts: List(['score', 'transform']),
               },
               {
                 displayType: DisplayType.DROPDOWN,
@@ -819,6 +820,14 @@ export module BuilderTypes
                 help: ManualConfig.help["direction"],
               },
             ],
+            below:
+            {
+              displayType: DisplayType.CARDSFORTEXT,
+              key: 'property',
+              accepts: List(['score', 'transform']),
+            },
+            hideToolsWhenNotString: false,
+            noDataPadding: true,
           },
         },
       },
