@@ -617,7 +617,22 @@ export module BuilderTypes
                   displayType: DisplayType.TEXT,
                   help: ManualConfig.help["table"],
                   key: 'table',
-                  getAutoTerms: () => Store.getState().get('tables'),
+                  getAutoTerms: (comp:React.Component<any, any>) => 
+                  {
+                    let tables = Store.getState().get('tables');
+                    if(!tables)
+                    {
+                      var unsubscribe = Store.subscribe(() =>
+                      {
+                        if(Store.getState().get('tables'))
+                        {
+                          unsubscribe();
+                          comp.forceUpdate();
+                        }
+                      });
+                    }
+                    return tables;
+                  },
                   
                   onFocus: (comp:React.Component<any, any>, value:string) =>
                   {

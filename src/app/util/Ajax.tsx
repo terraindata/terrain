@@ -327,6 +327,7 @@ var Ajax = {
             
             tables[table].columns.push(column);
           });
+          
           onLoad(_.toArray(tables) as any);
         }
         catch(e)
