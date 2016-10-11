@@ -204,33 +204,34 @@ Note: when adding new tests, make sure to include `t.end()` at the end of every 
 
 ## Useful Tutorials
 
-- [http://jaysoo.ca/2015/09/26/typed-react-and-redux/]
+- [http://jaysoo.ca/2015/09/26/typed-react-and-redux/] -- React + TypeScript + Redux
+- [https://hackernoon.com/avoiding-accidental-complexity-when-structuring-your-app-state-6e6d22ad5e2a#.5mvnsgidm] -- outlines guidelines to use when structuring Redux state models
 
 ## Gotchas
 
 A list of common programming gotchas in this codebase
 
-- `let` scope is different than `var` and can cause unexpected errors
+- `let` scope is different than `var` (thankfully) but can cause unexpected errors
   ```
-  if(false)
+  if(someCondition)
   {
-    var theCowboysAreGood = true;
+    var someVar = "someValue";
   }
-  console.log(theCowboysAreGood); // "undefined"
+  console.log(someVar); // either "someValue" or "undefined"
   
-  if(false)
+  if(someOtherCondition)
   {
-    let theEaglesAreGood = true;
+    let someLet = "someOtherValue";
   }
-  console.log(theEaglesAreGood); // ERROR: cannot find name theEaglesAreGood
+  console.log(someLet); // ERROR: cannot find name someLet
   ```
 - Subscribe to Redux stores within the `componentDidMount` method. Do not subscribe in the constructor, or else you will likely see many React `setState` warnings
 - Do not call `fetch` from within a constructor or you may see similar warnings (React thinks that state changes are happening from a higher component's `render` method)
-- ReactVirtualize: The library uses `shallowCompare` to detect prop changes, so you may need to pass additional props to indicate that data have changed.
+- ReactVirtualized: The library uses `shallowCompare` to detect prop changes, so you may need to pass additional props to indicate that data have changed.
   More here: [https://github.com/bvaughn/react-virtualized#pure-components]
 
 ## Troubleshooting
 
 1. Node or npm errors: `npm install` - you may be missing packages.
 2. Test suite doesn't run all tests: make sure you have added correct `t.plan(x)` or `t.end()` statements to every test, otherwise the test suite will hang.
-3. Assume it's an early sign of the apocalypse. Hide your kids. Run.
+3. Assume it's an early sign of the apocalypse. Hide your kids.
