@@ -52,6 +52,7 @@ const classNames = require('classnames');
 import { CardItem } from './Card.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import BuilderTypes from '../../BuilderTypes.tsx';
+import Store from '../../data/BuilderStore.tsx';
 
 interface Props
 {
@@ -70,6 +71,11 @@ interface Props
   beforeDrop?: (item:CardItem, targetProps:Props) => void;
   accepts?: List<string>;
   item?: CardItem;
+  
+  // if set, wrapper cards which can wrap this type of card can be dropped to wrap it
+  wrapType?: string;
+  
+  singleChild?: boolean; // can't have neighbors, but could still drop a wrapper card
 }
 
 class CardDropArea extends PureClasss<Props>
@@ -95,7 +101,7 @@ class CardDropArea extends PureClasss<Props>
     const {type} = item;
     const {colors} = BuilderTypes.Blocks[type].static;
     var preview = "New";
-    if(!item.new)
+    if(!item['new'])
     {
       preview = BuilderTypes.getPreview(item.props.card);
     }
@@ -180,6 +186,25 @@ class CardDropArea extends PureClasss<Props>
 	}
 }
 
+const cardCanWrap = (targetProps:Props, cardType:string) =>
+{
+  if(targetProps.wrapType)
+  {
+    let {accepts} = BuilderTypes.Blocks[cardType].static;
+    if(accepts && accepts.indexOf(targetProps.wrapType) !== -1)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+// as neighbor
+const cardCanAccept = (targetProps:Props, cardType:string) =>
+{
+  return targetProps.accepts && targetProps.accepts.indexOf(cardType) === -1;
+}
+
 const cardTarget = 
 {
   canDrop(targetProps:Props, monitor)
@@ -187,9 +212,17 @@ const cardTarget =
     let item = monitor.getItem() as CardItem;
     const {type} = item;
     
-    if(targetProps.accepts && targetProps.accepts.indexOf(type) === -1)
+    var canWrap = cardCanWrap(targetProps, type);
+    let canAccept = cardCanAccept(targetProps, type); // as neighbor
+    
+    if(targetProps.singleChild)
     {
-      return false;
+      return canWrap;
+    }
+    
+    if(canAccept)
+    {
+      return canWrap;
     }
     
     if(item['new'])
@@ -227,6 +260,7 @@ const cardTarget =
     if(monitor.isOver({ shallow: true})) // shouldn't need this: && cardTarget.canDrop(targetProps, monitor))
     {
       let item = monitor.getItem();
+      let {type} = item;
       
       if(
         item.props
@@ -250,18 +284,34 @@ const cardTarget =
         targetIndex ++;
       }
       
+      let isWrapping = cardCanWrap(targetProps, type) && 
+        (targetProps.singleChild || !cardCanAccept(targetProps, type));
       
+      if(isWrapping)
+      {
+        targetIndex = targetProps.index;
+        var wrappingData = Store.getState().getIn(targetProps.keyPath);
+        var wrappingKeyPath = targetProps.keyPath.push(targetIndex);
+        Actions.remove(targetProps.keyPath, targetIndex);
+      }
+        
       if(item['new'])
       {
         // is a new card
-        Actions.create(targetProps.keyPath, targetIndex, item.type);
-        return;
+        Actions.create(targetProps.keyPath, targetIndex, type);
+      }
+      else
+      {
+        // dragging an existing card
+        let cardProps = item.props;
+        var indexOffset = 0;
+        Actions.nestedMove(cardProps.keyPath, cardProps.index, targetProps.keyPath, targetIndex);
       }
       
-      // dragging an existing card
-      let cardProps = item.props;
-      var indexOffset = 0;
-      Actions.nestedMove(cardProps.keyPath, cardProps.index, targetProps.keyPath, targetIndex);
+      if(isWrapping)
+      {
+        Actions.change(wrappingKeyPath.push('cards'), wrappingData);
+      }
     }
   }
 }

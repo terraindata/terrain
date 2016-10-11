@@ -113,12 +113,9 @@ class CardsArea extends PureClasss<Props>
       });
     }
     
-    if(nextProps.cards.size === 0)
-    {
-      this.setState({
-        cardToolOpen: true,
-      });
-    }
+    this.setState({
+      cardToolOpen: nextProps.cards.size === 0,
+    });
   }
   
   computeKeys(props:Props): List<string>
@@ -144,8 +141,6 @@ class CardsArea extends PureClasss<Props>
     return newKeys;
   }
   
-       
-  
   copy() {}
   
   clear() {}
@@ -168,7 +163,6 @@ class CardsArea extends PureClasss<Props>
       cardToolOpen: !this.state.cardToolOpen,
     });
   }
-  
 
   render()
   {

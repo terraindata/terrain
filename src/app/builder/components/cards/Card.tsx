@@ -93,7 +93,6 @@ interface Props
 class Card extends PureClasss<Props>
 {
   state: {
-    open: boolean;
     id: ID;
     selected: boolean;
     hovering: boolean;
@@ -118,7 +117,6 @@ class Card extends PureClasss<Props>
     let cardTerms = this.getCardTerms(props.card);
     
     this.state = {
-      open: true,
       id: this.props.card.id,
       selected: false,
       hovering: false,
@@ -263,10 +261,6 @@ class Card extends PureClasss<Props>
       this.getKeyPath().push('closed'), 
       !this.props.card.closed
     );
-    
-    // this.setState({
-    //   open: ! this.state.open,
-    // })
     
     if(!this.props.card.closed)
     {
@@ -421,8 +415,6 @@ class Card extends PureClasss<Props>
     //                 columnIndex={this.props.columnIndex}
     //               />
     
-    let renderDropAreas = !this.props.singleChild && !this.props.singleCard;
-    
     return ( 
       <div
         className={classNames({
@@ -440,12 +432,14 @@ class Card extends PureClasss<Props>
       >
         <div ref='cardContainer' className='card-container'>
           {
-            renderDropAreas && window.location.search.indexOf('shift') !== -1 &&
+            window.location.search.indexOf('shift') !== -1 &&
               <CardDropArea
                 half={true}
                 keyPath={this.props.keyPath}
                 index={this.props.index}
                 accepts={this.props.accepts}
+                wrapType={this.props.card.type}
+                singleChild={this.props.singleChild || this.props.singleCard}
               />
           }
           <div
@@ -488,22 +482,26 @@ class Card extends PureClasss<Props>
             }
             
             {
-              renderDropAreas && window.location.search.indexOf('shift') === -1 &&
+              window.location.search.indexOf('shift') === -1 &&
                 <CardDropArea
                   half={true}
                   keyPath={this.props.keyPath}
                   index={this.props.index}
                   accepts={this.props.accepts}
+                  wrapType={this.props.card.type}
+                  singleChild={this.props.singleChild || this.props.singleCard}
                 />
             }
             {
-              renderDropAreas && window.location.search.indexOf('shift') === -1 &&
+              window.location.search.indexOf('shift') === -1 &&
                 <CardDropArea
                   half={true}
                   lower={true}
                   keyPath={this.props.keyPath}
                   index={this.props.index}
                   accepts={this.props.accepts}
+                  wrapType={this.props.card.type}
+                  singleChild={this.props.singleChild || this.props.singleCard}
                 />
             }
             <div className='card-body' ref='cardBody'>
@@ -518,13 +516,15 @@ class Card extends PureClasss<Props>
             </div>
           </div>
           {
-            renderDropAreas && window.location.search.indexOf('shift') !== -1 &&
+            window.location.search.indexOf('shift') !== -1 &&
               <CardDropArea
                 half={true}
                 lower={true}
                 keyPath={this.props.keyPath}
                 index={this.props.index}
                 accepts={this.props.accepts}
+                wrapType={this.props.card.type}
+                singleChild={this.props.singleChild || this.props.singleCard}
               />
           }
         </div>
