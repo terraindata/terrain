@@ -59,10 +59,12 @@ interface Array<T> {
 declare type List<T> = Immutable.List<T>;
 declare type Map<K, T> = Immutable.Map<K, T>;
 declare type KeyPath = List<string | number>;
-declare interface IHaveKeyPath
-{
-  keyPath: KeyPath;
-}
+declare type Set<T> = (f: string, v: any) => T;
+declare type SetIn<T> = (f: (string | number)[] | KeyPath, v: any) => T
+declare type Get = (f: string | number) => any;
+declare type GetIn = (f: (string | number)[] | KeyPath) => any;
+declare type Delete<T> = (f: string) => T;
+declare type DeleteIn<T> = (f: (string | number)[] | KeyPath) => T;
 
 declare type El = JSX.Element;
 declare type Ref = React.Component<any, any> | Element;

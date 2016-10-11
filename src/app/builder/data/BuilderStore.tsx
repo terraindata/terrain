@@ -46,7 +46,7 @@ var _ = require('underscore');
 import * as Immutable from 'immutable';
 import { Map, List } from 'immutable';
 import * as ReduxActions from 'redux-actions';
-
+import {CardItem} from '../components/cards/Card.tsx';
 var Redux = require('redux');
 import ActionTypes from './BuilderActionTypes.tsx';
 import Util from '../../util/Util.tsx';
@@ -70,8 +70,10 @@ export class BuilderState
   manual: Map<ID, Types.ICards> = Map({});
   // Card examples used in the manual are stored here.
   
-  set: (f: string, v: any) => BuilderState;
-  setIn: (f: string, v: any) => BuilderState;
+  draggingCardItem: CardItem = false;
+  
+  set: Set<BuilderState>;
+  setIn: SetIn<BuilderState>;
 }
 let BuilderState_Record = Immutable.Record(new BuilderState());
 let _BuilderState = (config?:any) => {

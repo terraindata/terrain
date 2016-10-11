@@ -233,12 +233,28 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   (state, action: {
     payload?: { keyPath: KeyPath, index: number }
   }) =>
-    state.removeIn(
-      action.payload.index === null
-        ? action.payload.keyPath
-        : action.payload.keyPath.push(action.payload.index)
-    )
-  ,
+  {
+    let {keyPath, index} = action.payload;
+    if(index !== null)
+    {
+      keyPath = keyPath.push(index);
+    }
+    
+    state = state.removeIn(keyPath);
+    
+    let parentKeyPath = keyPath.splice(keyPath.size - 1, 1).toList();
+    let parentListKeyPath = parentKeyPath.splice(parentKeyPath.size - 1, 1).toList();
+    let st = state.getIn(parentKeyPath.push('static'));
+    
+    if( st && st.removeOnCardRemove
+        && state.getIn(parentListKeyPath).size > 1 // only remove if there are multiple items
+      )
+    {
+      state = state.removeIn(parentKeyPath);
+    }
+    
+    return state;
+  },
 
 [ActionTypes.hoverCard]:
   (state, action: {

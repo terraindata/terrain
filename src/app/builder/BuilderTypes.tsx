@@ -120,12 +120,12 @@ export module BuilderTypes
   {
     id: string;
     type: string;
-    set: (f: string, v: any) => T;
-    setIn: (f: (string | number)[] | KeyPath, v: any) => T;
-    get: (f: string | number) => any;
-    getIn: (f: (string | number)[] | KeyPath) => any;
-    delete: (f: string) => T;
-    deleteIn: (f: (string | number)[] | KeyPath) => T;
+    set: Set<T>;
+    setIn: SetIn<T>;
+    get: Get;
+    getIn: GetIn;
+    delete: Delete<T>;
+    deleteIn: DeleteIn<T>;
     toMap: () => Map<string, any>;
   }
   
@@ -183,6 +183,11 @@ export module BuilderTypes
       tqlGlue?: string;
       topTql?: string;
       accepts?: List<string>;
+      
+      // remove this block if it contains a card and the card is removed
+      //  will not remove field if it is the last in its parents' list
+      removeOnCardRemove?: boolean;
+      
       [field:string]: any;
     }
     
@@ -242,6 +247,7 @@ export module BuilderTypes
       tql: string;
       tqlGlue?: string;
       accepts?: List<string>;
+      removeOnCardRemove?: boolean;
     }
     
     [field:string]:any;
@@ -493,6 +499,7 @@ export module BuilderTypes
       static:
       {
         tql: "\n $property $DIRECTION",
+        removeOnCardRemove: true,
       }
     }),
     
@@ -527,7 +534,8 @@ export module BuilderTypes
       static: {
         tql: "\n $field",
         accepts: List(['min', 'max', 'avg', 'sum', 'count', 'distinct']),
-      }
+        removeOnCardRemove: true,
+      },
     }),
     
     sfw: _card(
@@ -939,6 +947,7 @@ export module BuilderTypes
       weight: 0,
       static: {
         tql: "[$weight, $key]",
+        removeOnCardRemove: true,
       }
     }),
 
