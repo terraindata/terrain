@@ -56,8 +56,7 @@ import Store from '../../data/BuilderStore.tsx';
 
 export const cardWillWrap = (targetProps:Props, cardType:string) =>
 {
-  return cardCanWrap(targetProps, cardType) 
-    && (targetProps.singleChild || !cardCanAccept(targetProps, cardType));
+  return cardCanWrap(targetProps, cardType) && targetProps.singleChild;
 }
 
 export const onCardDrop = (targetProps:Props, monitor, component) =>
@@ -241,6 +240,12 @@ const cardCanWrap = (targetProps:Props, cardType:string) =>
 {
   if(targetProps.wrapType)
   {
+    if(!targetProps.accepts || targetProps.accepts.indexOf(cardType) === -1)
+    {
+      // this card doesn't fit in this area
+      return false;
+    }
+    
     let {accepts} = BuilderTypes.Blocks[cardType].static;
     if(accepts && accepts.indexOf(targetProps.wrapType) !== -1)
     {
@@ -291,22 +296,19 @@ const cardTarget =
       }
     }
     
-    let canWrap = cardCanWrap(targetProps, type);
-    let canAccept = cardCanAccept(targetProps, type); // as neighbor
+    if(cardWillWrap(targetProps, type))
+    {
+      return true;
+    }
     
     if(targetProps.singleChild)
     {
-      return canWrap;
+      return false;
     }
     
-    if(!canAccept)
+    if(!cardCanAccept(targetProps, type))
     {
-      return canWrap;
-    }
-    
-    if(item['new'])
-    {
-      return true;
+      return false;
     }
     
     return true;
@@ -319,14 +321,12 @@ const cardTarget =
       let state = Store.getState();
       var keyPath: KeyPath = null;
       var index: number = null;
-      var isWrapping = false;
       
       if(monitor.canDrop())
       {
         keyPath = targetProps.keyPath;
         index = targetProps.index;
         let {type} = monitor.getItem();
-        isWrapping = cardCanWrap(targetProps, type) && (targetProps.singleChild || !cardCanAccept(targetProps, type));
         
         if(targetProps.lower)
         {
