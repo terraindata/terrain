@@ -54,6 +54,12 @@ import Actions from "../../data/BuilderActions.tsx";
 import BuilderTypes from '../../BuilderTypes.tsx';
 import Store from '../../data/BuilderStore.tsx';
 
+export const cardWillWrap = (targetProps:Props, cardType:string) =>
+{
+  return cardCanWrap(targetProps, cardType) 
+    && (targetProps.singleChild || !cardCanAccept(targetProps, cardType));
+}
+
 export const onCardDrop = (targetProps:Props, monitor, component) =>
 {
   if(monitor.isOver({ shallow: true})) // shouldn't need this: && cardTarget.canDrop(targetProps, monitor))
@@ -85,8 +91,7 @@ export const onCardDrop = (targetProps:Props, monitor, component) =>
       targetIndex ++;
     }
     
-    let isWrapping = cardCanWrap(targetProps, type) && 
-      (targetProps.singleChild || !cardCanAccept(targetProps, type));
+    let isWrapping = cardWillWrap(targetProps, type);
     
     if(isWrapping)
     {
@@ -288,7 +293,6 @@ const cardTarget =
     
     let canWrap = cardCanWrap(targetProps, type);
     let canAccept = cardCanAccept(targetProps, type); // as neighbor
-    
     
     if(targetProps.singleChild)
     {

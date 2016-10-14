@@ -27,6 +27,58 @@
     &.card-drag-preview-in-list {
       height: @preview-height;
     }
+    
+    &.card-drag-preview-wrap {
+      margin-left: -6px;
+      width: calc(~"100% + 6px");
+      position: relative;
+      overflow: visible;
+      
+      .card-drag-preview-wrap-handle {
+        position: absolute;
+        z-index: 999999999999;
+        left: -1px;
+        top: 100%;
+        height: 34px;
+        width: 6px;
+        background: #fff;
+        border: 1px solid #000;
+        
+        .card-drag-preview-wrap-handle-inner {
+          width: 100%;
+          height: 100%;
+          opacity: 0.75;
+        }
+      }
+      
+      &:not(.card-drag-preview-wrap-up) {
+        border-bottom-left-radius: 0px;
+        .card-title {
+          border-bottom-left-radius: 0px;
+        }
+        
+        .card-drag-preview-wrap-handle {
+          top: 100%;
+          border-bottom-right-radius: 6px;
+          border-bottom-left-radius: 6px;
+          border-top-width: 0px;
+        }
+      }
+      
+      &.card-drag-preview-wrap-up {
+        border-top-left-radius: 0px;
+        .card-title {
+          border-top-left-radius: 0px;
+        }
+        
+        .card-drag-preview-wrap-handle {
+          top: -35px;
+          border-top-right-radius: 6px;
+          border-top-left-radius: 6px;
+          border-bottom-width: 0px;
+        }
+      }
+    }
   }
   
   
@@ -37,7 +89,7 @@
   
   .card-title {
     opacity: 0.75;
-    width: 100%;
+    width: 100% !important;
     position: relative;
     top: 0px;
     left: 0px;

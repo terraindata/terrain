@@ -53,7 +53,7 @@ import { CardItem } from './Card.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import BuilderTypes from '../../BuilderTypes.tsx';
 import Store from '../../data/BuilderStore.tsx';
-import {onCardDrop} from './CardDropArea.tsx';
+import {onCardDrop, cardWillWrap} from './CardDropArea.tsx';
 
 interface CDPProps
 {
@@ -67,6 +67,7 @@ interface CDPProps
   
   // if set, wrapper cards which can wrap this type of card can be dropped to wrap it
   wrapType?: string;
+  wrapUp?: boolean; // wrap placeholder should extend up
   
   connectDropTarget?: (el: El) => El;
   singleChild?: boolean; // can't have neighbors, but could still drop a wrapper card
@@ -137,6 +138,9 @@ class CardDragPreview extends PureClasss<CDPProps>
       }
     }
     
+    let willWrap = this.props.cardItem 
+            && cardWillWrap(this.props, this.props.cardItem.type);
+    
     return this.props.connectDropTarget(
       <div
         className={classNames({
@@ -144,6 +148,8 @@ class CardDragPreview extends PureClasss<CDPProps>
           'card-drag-preview-visible': visible,
           'card-drag-preview-in-list': this.props.isInList,
           'card-drag-preview-dropped': this.state.justDropped,
+          'card-drag-preview-wrap': willWrap,
+          'card-drag-preview-wrap-up': willWrap && this.props.wrapUp,
         })}
         
         style={{
@@ -169,6 +175,19 @@ class CardDragPreview extends PureClasss<CDPProps>
               preview
             }
           </div>
+        </div>
+        <div
+          className='card-drag-preview-wrap-handle'
+          style={{
+            borderColor: colors[0],
+          }}
+        >
+          <div
+            className='card-drag-preview-wrap-handle-inner'
+            style={{
+              background: colors[0],
+            }}
+          />
         </div>
       </div>
     );
