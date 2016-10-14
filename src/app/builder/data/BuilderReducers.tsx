@@ -280,8 +280,25 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     }
     return state.setIn(['selectedCardIds', cardId], true);
   },
+
+  [ActionTypes.dragCardOver]:
+    (state, action: {
+      payload?: { keyPath: KeyPath, index: number }
+    }) =>
+    {
+      let {keyPath, index} = action.payload;
+      return state
+        .set('draggingOverKeyPath', keyPath)
+        .set('draggingOverIndex', index);
+    },
   
+  [ActionTypes.dropCard]:
+    (state) => state
+      .set('draggingOverKeyPath', null)
+      .set('draggingOverIndex', null)
+      .set('draggingCardItem', null),
 };
+
 
 
 export default BuidlerReducers;

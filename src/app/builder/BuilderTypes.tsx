@@ -115,19 +115,6 @@ export module BuilderTypes
     DATE,
     NUMBER,
   }
-    // TODO include in a common file
-  export class IRecord<T>
-  {
-    id: string;
-    type: string;
-    set: Set<T>;
-    setIn: SetIn<T>;
-    get: Get;
-    getIn: GetIn;
-    delete: Delete<T>;
-    deleteIn: DeleteIn<T>;
-    toMap: () => Map<string, any>;
-  }
   
   // A query can be viewed and edited in the Builder
   // currently, only Variants are Queries, but that may change

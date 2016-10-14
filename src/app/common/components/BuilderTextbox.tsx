@@ -292,6 +292,7 @@ class BuilderTextbox extends PureClasss<Props>
                 keyPath={this.props.keyPath}
                 index={null}
                 accepts={this.props.display && this.props.display.accepts}
+                renderPreview={true}
               />
           }
         </div>

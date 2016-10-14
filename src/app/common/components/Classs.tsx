@@ -129,19 +129,22 @@ class Classs<T> extends React.Component<T, any>
     
     config.updater && config.updater(store.getState());
       
-    if(config.stateKey)
+    let stateKey = config.stateKey;
+    
+    if(config.storeKeyPath)
     {
-      if(config.storeKeyPath)
-      {
-        let keyPath = typeof config.storeKeyPath === 'function' ? (config.storeKeyPath as (() => string[]))() : config.storeKeyPath;
-        var value = store.getState().getIn(keyPath);
-      } else {
-        var value = store.getState();
-      }
-      var state = {};
-      state[config.stateKey] = value;
-      this.setState(state);
+      let keyPath = typeof config.storeKeyPath === 'function' ? (config.storeKeyPath as (() => string[]))() : config.storeKeyPath;
+      var value = store.getState().getIn(keyPath);
+      stateKey = stateKey || keyPath[keyPath.length - 1];
+    } else {
+      var value = store.getState();
     }
+    
+    stateKey = stateKey || 'state';
+
+    this.setState({
+      [stateKey]: value,
+    });
   }
   
   // for the construction of keyPaths for Redux actions,

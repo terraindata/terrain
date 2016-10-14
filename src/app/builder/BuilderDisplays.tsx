@@ -161,6 +161,7 @@ export const getCardStringDisplay =
     displayType: CARDTEXT,
     key: 'value',
     defaultValue: config.defaultValue,
+    accepts: config.accepts,
   },
 ];
 

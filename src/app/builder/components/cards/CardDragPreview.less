@@ -1,0 +1,53 @@
+@import "../../../common/Common.less";
+
+@preview-height: 34px;
+
+.card-drag-preview {
+  height: 0px;
+  overflow: hidden;
+  
+  &:not(.card-drag-preview-dropped) {
+    .transition;
+  }
+  
+  width: 100%;
+  color: #fff;
+  border-radius: 6px;
+  box-sizing: border-box;
+  position: relative;
+  
+  &.card-drag-preview-visible {
+    &:not(.card-drag-preview-in-list) {
+      left: 0px;
+      position: absolute;
+      height: 100%;
+      max-height: @preview-height;
+    }
+    
+    &.card-drag-preview-in-list {
+      height: @preview-height;
+    }
+  }
+  
+  
+  &.card-drag-preview-visible {
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+    border: 1px solid #000;
+  }
+  
+  .card-title {
+    opacity: 0.75;
+    width: 100%;
+    position: relative;
+    top: 0px;
+    left: 0px;
+  }
+}
+
+.body-card-is-dragging {
+  .card-drag-preview-in-list {
+    pointer-events: auto;
+    z-index: 99999999999;
+  }
+}
+  

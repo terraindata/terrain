@@ -360,6 +360,8 @@ class CardField extends PureClasss<Props>
                   index={null}
                   keyPath={this._ikeyPath(this.props.keyPath, (row.inner as Display).key)}
                   beforeDrop={this.beforeTopAddDrop}
+                  renderPreview={true}
+                  accepts={(this.props.row.inner as Display).accepts}
                 />
               </div>
           }

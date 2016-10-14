@@ -254,6 +254,7 @@ class CreateCardTool extends PureClasss<Props>
           index={this.props.index}
           keyPath={this.props.keyPath}
           accepts={this.props.accepts}
+          renderPreview={typeof this.props.index !== 'number'}
         />
      </div>
    );

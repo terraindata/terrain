@@ -90,7 +90,7 @@ interface Props
   display?: Display;
 }
 
-class Card extends PureClasss<Props>
+class _Card extends PureClasss<Props>
 {
   state: {
     id: ID;
@@ -231,7 +231,7 @@ class Card extends PureClasss<Props>
     this.dragPreview = createDragPreview(
       this.props.card.static.title + ' (' + BuilderTypes.getPreview(this.props.card) + ')',
     {
-      backgroundColor: this.props.card.static.colors[1],
+      backgroundColor: this.props.card.static.colors[0],
       borderColor: this.props.card.static.colors[0],
       color: '#fff',
       fontSize: 15,
@@ -431,17 +431,14 @@ class Card extends PureClasss<Props>
         onMouseMove={this.handleMouseMove}
       >
         <div ref='cardContainer' className='card-container'>
-          {
-            window.location.search.indexOf('shift') !== -1 &&
-              <CardDropArea
-                half={true}
-                keyPath={this.props.keyPath}
-                index={this.props.index}
-                accepts={this.props.accepts}
-                wrapType={this.props.card.type}
-                singleChild={this.props.singleChild || this.props.singleCard}
-              />
-          }
+          <CardDropArea
+            half={true}
+            keyPath={this.props.keyPath}
+            index={this.props.index}
+            accepts={this.props.accepts}
+            wrapType={this.props.card.type}
+            singleChild={this.props.singleChild || this.props.singleCard}
+          />
           <div
             className={'card-inner ' + (this.props.singleCard ? 'single-card-inner' : '')}
             style={{
@@ -480,30 +477,6 @@ class Card extends PureClasss<Props>
             {
               this.props.canEdit && <Menu options={this.state.menuOptions} />
             }
-            
-            {
-              window.location.search.indexOf('shift') === -1 &&
-                <CardDropArea
-                  half={true}
-                  keyPath={this.props.keyPath}
-                  index={this.props.index}
-                  accepts={this.props.accepts}
-                  wrapType={this.props.card.type}
-                  singleChild={this.props.singleChild || this.props.singleCard}
-                />
-            }
-            {
-              window.location.search.indexOf('shift') === -1 &&
-                <CardDropArea
-                  half={true}
-                  lower={true}
-                  keyPath={this.props.keyPath}
-                  index={this.props.index}
-                  accepts={this.props.accepts}
-                  wrapType={this.props.card.type}
-                  singleChild={this.props.singleChild || this.props.singleCard}
-                />
-            }
             <div className='card-body' ref='cardBody'>
               <div
                 className={'card-content' + (this.props.singleCard ? ' card-content-single' : '')}
@@ -515,18 +488,15 @@ class Card extends PureClasss<Props>
               </div>
             </div>
           </div>
-          {
-            window.location.search.indexOf('shift') !== -1 &&
-              <CardDropArea
-                half={true}
-                lower={true}
-                keyPath={this.props.keyPath}
-                index={this.props.index}
-                accepts={this.props.accepts}
-                wrapType={this.props.card.type}
-                singleChild={this.props.singleChild || this.props.singleCard}
-              />
-          }
+          <CardDropArea
+            half={true}
+            lower={true}
+            keyPath={this.props.keyPath}
+            index={this.props.index}
+            accepts={this.props.accepts}
+            wrapType={this.props.card.type}
+            singleChild={this.props.singleChild || this.props.singleCard}
+          />
         </div>
       </div>
     );
@@ -550,19 +520,26 @@ const cardSource =
   
   beginDrag: (props: Props): CardItem =>
   {
+    // TODO
     setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
-    return {
+    let item:CardItem = {
       props,
       childIds: BuilderTypes.getChildIds(props.card)
         .remove(props.card.id),
       type: props.card.type,
     };
+    
+    Actions.dragCard(item);
+    
+    return item;
   },
   // select card?
   
   endDrag: () =>
   {
     $('body').removeClass('body-card-is-dragging');
+    
+    Actions.dragCard(false);
   }
 }
 
@@ -573,5 +550,6 @@ const dragCollect = (connect, monitor) =>
   connectDragPreview: connect.dragPreview()
 });
 
+export const Card = DragSource('CARD', cardSource, dragCollect)(_Card);
 
-export default DragSource('CARD', cardSource, dragCollect)(Card);
+export default Card;

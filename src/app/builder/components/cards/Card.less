@@ -88,16 +88,14 @@
       border-radius: 6px;
       overflow: hidden;
     }
-    // .card-drop-area-half {
-    //   background: rgba(0,0,0,0.25);
-    //   &.card-drop-area-over {
-    //     box-shadow: none;
-    //     border: 0px;
-    //   }
-    // }
-    // .card .card-drop-area-half {
-    //   background: rgba(0,0,0,0);
-    // }
+    
+    .card-inner {
+      .card-drop-area {
+        // can't drop a card inside of itself
+        // already handled by JS but this should be an optimization
+        pointer-events: none;
+      }
+    }
   }
  
  .card-sub-bar {

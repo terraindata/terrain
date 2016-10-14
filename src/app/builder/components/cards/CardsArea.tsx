@@ -50,7 +50,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../../util/Util.tsx';
 import Actions from "../../data/BuilderActions.tsx";
-import Card from "../cards/Card.tsx";
+import Store from "../../data/BuilderStore.tsx";
+import {Card, CardItem} from "../cards/Card.tsx";
 import CreateCardTool from "./CreateCardTool.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import BuilderTypes from '../../BuilderTypes.tsx';
@@ -58,6 +59,7 @@ type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
 let {List} = Immutable;
 import CardDropArea from './CardDropArea.tsx';
+import CardDragPreview from './CardDragPreview.tsx';
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 
 interface Props
@@ -86,6 +88,9 @@ interface KeyState {
 interface State extends KeyState {
   learningMode: boolean;
   cardToolOpen: boolean;
+  draggingCardItem: CardItem;
+  draggingOverKeyPath: KeyPath;
+  draggingOverIndex: number;
 }
 
 class CardsArea extends PureClasss<Props>
@@ -95,6 +100,9 @@ class CardsArea extends PureClasss<Props>
     keyPath: null,
     learningMode: this.props.helpOn,
     cardToolOpen: true,
+    draggingCardItem: false,
+    draggingOverKeyPath: null,
+    draggingOverIndex: -1,
   };
 
   constructor(props:Props)
@@ -102,6 +110,16 @@ class CardsArea extends PureClasss<Props>
     super(props);
     this.state.keys = this.computeKeys(props);
     this.state.cardToolOpen = props.cards.size === 0;
+    
+    this._subscribe(Store, {
+      storeKeyPath: ['draggingCardItem'],
+    });
+    this._subscribe(Store, {
+      storeKeyPath: ['draggingOverKeyPath'],
+    });
+    this._subscribe(Store, {
+      storeKeyPath: ['draggingOverIndex'],
+    });
   }
   
   componentWillReceiveProps(nextProps:Props)
@@ -170,9 +188,9 @@ class CardsArea extends PureClasss<Props>
     let {cards, canEdit} = props;
     var renderCardTool = !this.props.noCardTool && (!this.props.singleChild || cards.size === 0);
     
-    var topAdd = true;
-    topAdd = false;
-
+    let {draggingCardItem, draggingOverIndex, draggingOverKeyPath} = this.state;
+    let {keyPath} = this.props;
+    
     return (
       <div> 
         <div
@@ -181,60 +199,56 @@ class CardsArea extends PureClasss<Props>
             [this.props.className]: !!this.props.className,
           })}
         >
-        
-          { 
-            topAdd && renderCardTool &&
-              <CreateCardTool
-                canEdit={this.props.canEdit}
-                keyPath={this.props.keyPath}
-                index={props.cards.size}
-                open={this.state.cardToolOpen}
-                className='nested-create-card-tool-wrapper'
-                accepts={this.props.accepts}
-                onToggle={this._toggle('cardToolOpen')}
-                hidePlaceholder={this.props.singleChild || cards.size === 0 || topAdd}
-              />
-          }
-          
-          { 
-            topAdd && cards.size !== 0 && renderCardTool &&
-              <div
-                className='card-field-top-add card-field-add'
-                onClick={this._toggle('cardToolOpen')}
-                data-tip={'Add another card'}
-              >
-                <AddIcon />
-                <CardDropArea
-                  index={0}
-                  keyPath={this.props.keyPath}
-                  accepts={this.props.accepts}
-                />
-              </div>
-          }
-          
           {
             cards.map((card:ICard, index:number) =>
-              <Card
-                card={card}
-                index={index}
-                singleCard={false}
-                keys={this.state.keys}
-                canEdit={this.props.canEdit}
-                keyPath={this.props.keyPath}
-                accepts={this.props.accepts}
-                singleChild={this.props.singleChild}
-                
-                addColumn={this.props.addColumn}
-                columnIndex={this.props.columnIndex}
-                helpOn={this.state.learningMode || this.props.helpOn}
-                
+              <div
                 key={card.id}
-              />
+              >
+                <CardDragPreview
+                  cardItem={draggingCardItem}
+                  isInList={true}
+                  visible={
+                    !!draggingCardItem 
+                    && draggingOverKeyPath === keyPath
+                    && draggingOverIndex === index
+                  }
+                  index={index}
+                  keyPath={keyPath}
+                  accepts={this.props.accepts}
+                  
+                />
+                <Card
+                  card={card}
+                  index={index}
+                  singleCard={false}
+                  keys={this.state.keys}
+                  canEdit={this.props.canEdit}
+                  keyPath={this.props.keyPath}
+                  accepts={this.props.accepts}
+                  singleChild={this.props.singleChild}
+                  
+                  addColumn={this.props.addColumn}
+                  columnIndex={this.props.columnIndex}
+                  helpOn={this.state.learningMode || this.props.helpOn}
+                />
+              </div>
             )
           }
           
+          <CardDragPreview
+            cardItem={draggingCardItem}
+            isInList={true}
+            visible={
+              !!draggingCardItem 
+              && draggingOverKeyPath === keyPath
+              && draggingOverIndex === cards.size
+            }
+            index={cards.size}
+            keyPath={keyPath}
+          />
+          
           {
-            !topAdd && renderCardTool &&
+            renderCardTool &&
               <CreateCardTool
                 canEdit={this.props.canEdit}
                 keyPath={this.props.keyPath}
@@ -243,7 +257,7 @@ class CardsArea extends PureClasss<Props>
                 className='nested-create-card-tool-wrapper'
                 accepts={this.props.accepts}
                 onToggle={this._toggle('cardToolOpen')}
-                hidePlaceholder={this.props.singleChild || cards.size === 0 || topAdd}
+                hidePlaceholder={this.props.singleChild || cards.size === 0}
                 cannotClose={cards.size === 0}
               />
           }

@@ -42,6 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+/***********************
+***
+*    STILL IN PROTOTYPING
+***
+******/
+
+
 require('./Guide.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -115,7 +122,8 @@ export interface IConditions
   combinator: BuilderTypes.Combinator;
 }
 
-export class IQuery extends BuilderTypes.IRecord<IQuery>
+// DIFFERENT FROM BROWSERTYPES
+class IQueryClass
 {
   tables: {
     table: string;
@@ -129,7 +137,8 @@ export class IQuery extends BuilderTypes.IRecord<IQuery>
     combinator: BuilderTypes.Combinator.AND,
   }
 }
-const IQuery_Record = Immutable.Record(new IQuery());
+export interface IQuery extends IQueryClass, IRecord<IQuery> {}
+const IQuery_Record = Immutable.Record(new IQueryClass());
 export const _IQuery = (config?:any) => {
   return new IQuery_Record(config || {}) as any as IQuery;
 }

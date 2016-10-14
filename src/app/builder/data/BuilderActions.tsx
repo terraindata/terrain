@@ -45,7 +45,7 @@ THE SOFTWARE.
 var _ = require('underscore');
 import ActionTypes from './BuilderActionTypes.tsx';
 import Store from './BuilderStore.tsx';
-
+import { CardItem } from '../components/cards/Card.tsx';
 import { BuilderTypes } from './../BuilderTypes.tsx';
 import * as Immutable from 'immutable';
 import List = Immutable.List;
@@ -94,6 +94,21 @@ var BuilderActions =
   selectCard:
     (cardId: ID, shiftKey: boolean, ctrlKey: boolean) =>
       $(ActionTypes.selectCard, { cardId, shiftKey, ctrlKey }),
+  
+  dragCard:
+    (cardItem:CardItem) =>
+      $(ActionTypes.change, { 
+        keyPath: Immutable.List(['draggingCardItem']),
+        value: cardItem,
+      }),
+  
+  dragCardOver:
+    (keyPath:KeyPath, index:number) =>
+      $(ActionTypes.dragCardOver, { keyPath, index }),
+  
+  dropCard:
+    () =>
+      $(ActionTypes.dropCard, {}),
 };
 
 export default BuilderActions;

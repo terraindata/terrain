@@ -66,6 +66,30 @@ declare type GetIn = (f: (string | number)[] | KeyPath) => any;
 declare type Delete<T> = (f: string) => T;
 declare type DeleteIn<T> = (f: (string | number)[] | KeyPath) => T;
 
+declare interface IStore<T>
+{
+  getState: () => T;
+  subscribe: (updater: (() => void)) => (() => void);
+  dispatch: (action: { type: string, payload: {[k:string]: any} }) => void;
+}
+
+declare interface IMap<T>
+{
+  set: Set<T>;
+  setIn: SetIn<T>;
+  get: Get;
+  getIn: GetIn;
+  delete: Delete<T>;
+  deleteIn: DeleteIn<T>;
+  toMap: () => Map<string, any>;
+}
+
+declare interface IRecord<T> extends IMap<T>
+{
+  id: string;
+  type: string;
+}
+
 declare type El = JSX.Element;
 declare type Ref = React.Component<any, any> | Element;
 

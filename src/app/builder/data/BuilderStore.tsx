@@ -53,7 +53,7 @@ import Util from '../../util/Util.tsx';
 
 import Types from './../BuilderTypes.tsx';
 
-export class BuilderState
+export class BuilderStateClass
 {
   loading: boolean = false;
   queries: Map<ID, Types.IQuery> = Map({});
@@ -71,11 +71,11 @@ export class BuilderState
   // Card examples used in the manual are stored here.
   
   draggingCardItem: CardItem = false;
-  
-  set: Set<BuilderState>;
-  setIn: SetIn<BuilderState>;
+  draggingOverKeyPath: KeyPath = Immutable.List([]);
+  draggingOverIndex: number = -1;
 }
-let BuilderState_Record = Immutable.Record(new BuilderState());
+export interface BuilderState extends BuilderStateClass, IMap<BuilderState> {}
+let BuilderState_Record = Immutable.Record(new BuilderStateClass());
 let _BuilderState = (config?:any) => {
   return new BuilderState_Record(config || {}) as any as BuilderState;
 }
@@ -84,6 +84,6 @@ var DefaultState = _BuilderState();
 
 import BuilderReducers from './BuilderReducers.tsx';
 
-export const BuilderStore = Redux.createStore(ReduxActions.handleActions(BuilderReducers), DefaultState);
+export const BuilderStore: IStore<BuilderState> = Redux.createStore(ReduxActions.handleActions(BuilderReducers), DefaultState);
 
 export default BuilderStore;

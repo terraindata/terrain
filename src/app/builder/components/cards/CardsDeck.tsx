@@ -194,15 +194,20 @@ const cardSource =
     setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
     // TODO unselect cards?
     
-    return {
+    let item: CardItem = {
       type: props.card.type,
       new: true,
     };
+    
+    Actions.dragCard(item);
+    
+    return item;
   },
   
   endDrag: () =>
   {
     $('body').removeClass('body-card-is-dragging');
+    Actions.dragCard(false);
   }
 }
 

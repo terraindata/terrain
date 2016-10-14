@@ -65,6 +65,9 @@ var BuilderActionTypes =
   
   hoverCard: '',
   selectCard: '',
+  dragCard: '',
+  dragCardOver: '',
+  dropCard: '',
 };
 
 // I tried using this type to correclty classify this function,
