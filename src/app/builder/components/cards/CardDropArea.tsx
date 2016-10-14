@@ -95,7 +95,7 @@ export const onCardDrop = (targetProps:Props, monitor, component) =>
     if(isWrapping)
     {
       targetIndex = targetProps.index;
-      var wrappingData = Store.getState().getIn(targetProps.keyPath);
+      var wrappingCardData = Store.getState().getIn(targetProps.keyPath).get(0);
       var wrappingKeyPath = targetProps.keyPath.push(targetIndex);
       Actions.remove(targetProps.keyPath, targetIndex);
     }
@@ -115,7 +115,7 @@ export const onCardDrop = (targetProps:Props, monitor, component) =>
     
     if(isWrapping)
     {
-      Actions.change(wrappingKeyPath.push('cards'), wrappingData);
+      Actions.create(wrappingKeyPath.push('cards'), 0, null, wrappingCardData);
     }
   }
 };
