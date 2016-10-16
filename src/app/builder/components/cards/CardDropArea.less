@@ -2,7 +2,6 @@
 
 @preview-height: 34px;
 
-// movement
 .card-drop-area {
   pointer-events: none;
   
@@ -13,8 +12,11 @@
     width: 100%;
     left: 0px;
     top: 0px;
+    
+    border-radius: 6px;
+    // border: 0px solid #000;
+    .transition;
   }
-  
   
   &.card-drop-area-half {
     height: 0px;
@@ -26,6 +28,68 @@
   &.card-drop-area-lower {
     .card-drop-area-inner {
       top: 50%;
+    }
+  }
+  
+  &.card-drop-area-could-drop {
+    .card-drop-area-inner,
+    &:not(.card-drop-area-half) {
+      // border-width: 1px;
+    }
+  }
+  
+  &.card-drop-area-could-drop {
+    &:not(.card-drop-area-half) {
+      .card-drop-area-could-drop-marker {
+        @r: 6px;
+        position: absolute;
+        width: @r * 2;
+        height: @r * 2;
+        border-radius: @r;
+        right: @r;
+        top: calc(~"50% - @{r}");
+      }
+    }
+  
+    .card-drop-area-could-drop-marker {
+      -webkit-animation: strobe 0.85s infinite; /* Chrome, Safari, Opera */
+      animation: strobe 0.85s infinite;
+    }
+  }
+  
+}
+
+.card-field-top-add {
+  .card-drop-area-could-drop {
+    .card-drop-area-could-drop-marker {
+      width: 100% !important;
+      height: 100% !important;
+      box-sizing: padding-box !important;
+      background: rgba(0,0,0,0) !important;
+      border-radius: 99999px !important;
+      @r: 4px;
+      top: -1 * @r !important;
+      left: -1 * @r !important;
+      border: @r solid #000;
+    }
+  }
+}
+
+.card-drop-area-half.card-drop-area-could-drop {
+  .card-drop-area-could-drop-marker {
+    width: 100% !important;
+    left: 0px !important;
+    height: 6px !important;
+  }
+  &.card-drop-area-lower {
+    .card-drop-area-could-drop-marker {
+      top: auto !important;
+      bottom: 0px !important;
+    }
+  }
+  &:not(.card-drop-area-lower) {
+    .card-drop-area-could-drop-marker {
+      top: 0px !important;
     }
   }
 }
@@ -59,4 +123,18 @@
     margin-left: -340px;
     width: calc(~"345px + 100%");
   }
+}
+
+/* Chrome, Safari, Opera */
+@-webkit-keyframes strobe {
+  0%   {opacity: 1;}
+  90%  {opacity: 0.5;}
+  100% {opacity: 1;}
+}
+
+/* Standard syntax */
+@keyframes mymove {
+  0%   {opacity: 1;}
+  90%  {opacity: 0.5;}
+  100% {opacity: 1;}
 }

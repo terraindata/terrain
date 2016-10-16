@@ -93,7 +93,6 @@ interface Props
 class _Card extends PureClasss<Props>
 {
   state: {
-    id: ID;
     selected: boolean;
     hovering: boolean;
     menuOptions: List<MenuOption>;
@@ -102,26 +101,11 @@ class _Card extends PureClasss<Props>
     allTerms: List<string>;
     
     cardIsClosed: boolean;
-  }
-  
-  refs: {
-    [k: string]: Ref;
-    cardBody: Ref;
-    cardInner: Ref;
-    cardContent: Ref;
-  }
-  
-  constructor(props:Props)
-  {
-    super(props);
-    let cardTerms = this.getCardTerms(props.card);
-    
-    this.state = {
-      id: this.props.card.id,
+  } = {
       selected: false,
       hovering: false,
-      cardTerms,
-      allTerms: props.keys.merge(cardTerms),
+      cardTerms: this.getCardTerms(this.props.card),
+      allTerms: this.props.keys.merge(this.getCardTerms(this.props.card)),
       menuOptions:
         Immutable.List([
           // {
@@ -144,6 +128,46 @@ class _Card extends PureClasss<Props>
      
      cardIsClosed: this.props.card.closed,
     };
+  
+  refs: {
+    [k: string]: Ref;
+    cardBody: Ref;
+    cardInner: Ref;
+    cardContent: Ref;
+  }
+  
+  constructor(props:Props)
+  {
+    super(props);
+    // let cardTerms = this.getCardTerms(props.card);
+    
+    // this.state = {
+    //   selected: false,
+    //   hovering: false,
+    //   cardTerms,
+    //   allTerms: props.keys.merge(cardTerms),
+    //   menuOptions:
+    //     Immutable.List([
+    //       // {
+    //       //   text: 'Copy',
+    //       //   onClick: this.handleCopy,
+    //       // },
+    //       {
+    //         text: 'Duplicate',
+    //         onClick: this.handleDuplicate,
+    //       },
+    //       // {
+    //       //   text: 'Hide',
+    //       //   onClick: this.toggleClose,
+    //       // },
+    //       {
+    //         text: 'Delete',
+    //         onClick: this.handleDelete,
+    //       },
+    //     ]),
+     
+    //  cardIsClosed: this.props.card.closed,
+    // };
     
     this._subscribe(Store, {
       stateKey: 'selected',
@@ -153,19 +177,18 @@ class _Card extends PureClasss<Props>
     this._subscribe(Store, {
       updater: (state) =>
       {
-        if(state.hoveringCardId === this.props.card.id)
+        if(state.hoveringCardId === this.props.card.id && !this.state.hovering)
         {
           this.setState({
             hovering: true,
           });
         }
-        else
+        else if(this.state.hovering)
         {
           this.setState({
             hovering: false,
           });
         }
-
       }
     });
   }
@@ -189,6 +212,14 @@ class _Card extends PureClasss<Props>
   
   componentWillReceiveProps(nextProps:Props)
   {
+    // for(var i in nextProps)
+    // {
+    //   if(nextProps[i] !== this.props[i])
+    //   {
+    //     console.log('change', i, this.props[i], nextProps[i]);
+    //   }
+    // }
+    
     var allTerms = this.props.keys;
     var {cardTerms} = this.state;
     var changed = false;

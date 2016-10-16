@@ -191,6 +191,26 @@ class CardDropArea extends PureClasss<Props>
     );
   }
   
+  renderCouldDrop()
+  {
+    
+    let color = 'rgba(0,0,0,0)';
+    if(this.state.draggingCardItem)
+    {
+      color = BuilderTypes.Blocks[this.state.draggingCardItem.type].static.colors[0];
+    }
+    
+    return (
+      <div
+        className='card-drop-area-could-drop-marker'
+        style={{
+          background: color,
+          borderColor: color,
+        }}
+      />
+    );
+  }
+  
 	render()
   {
     var style = null;
@@ -215,6 +235,8 @@ class CardDropArea extends PureClasss<Props>
           'card-drop-area-upper': this.props.half && !this.props.lower,
           'card-drop-area-lower': this.props.half && this.props.lower,
           'card-drop-area-over': this.props.isOver,
+          'card-drop-area-could-drop': this.state.draggingCardItem
+            && cardCouldWrap(this.props, this.state.draggingCardItem),
           'card-drop-area-can-drop': this.props.canDrop,
           'card-drop-area-over-self': this.props.isOver && this.selfDragging(),
           'card-drop-area-render-preview': this.props.renderPreview,
@@ -228,6 +250,9 @@ class CardDropArea extends PureClasss<Props>
           }}
         />
         
+        {
+          this.renderCouldDrop()
+        }
         {
           this.renderCardPreview()
         }
@@ -261,57 +286,61 @@ const cardCanAccept = (targetProps:Props, cardType:string) =>
   return targetProps.accepts && targetProps.accepts.indexOf(cardType) !== -1;
 }
 
+const cardCouldWrap = (targetProps:Props, item:CardItem) =>
+{
+  const {type} = item;
+    
+  let isNew = item['new'];
+  if(!isNew)
+  {
+    let itemKeyPath = item.props.keyPath;
+    let targetKeyPath = targetProps.keyPath;
+    
+    if(itemKeyPath.equals(targetKeyPath))
+    {
+      // can drop on itself
+      return true;
+    }
+    
+    let itemChildKeyPath = itemKeyPath.push(item.props.index);
+    if(targetKeyPath.size >= itemChildKeyPath.size)
+    {
+      // can't drag a card into a card that is within itself
+      // so make sure that the itemKeyPath is not a prefix for the targetKeyPath
+      if(
+        targetKeyPath.splice(itemChildKeyPath.size, targetKeyPath.size - itemChildKeyPath.size)
+        .equals(itemChildKeyPath)
+      ){
+        // can't drop in yoself
+        return false;
+      }
+    }
+  }
+  
+  if(cardWillWrap(targetProps, type))
+  {
+    return true;
+  }
+  
+  if(targetProps.singleChild)
+  {
+    return false;
+  }
+  
+  if(!cardCanAccept(targetProps, type))
+  {
+    return false;
+  }
+  
+  return true;
+}
 
 const cardTarget = 
 {
   canDrop(targetProps:Props, monitor)
   {
     let item = monitor.getItem() as CardItem;
-    const {type} = item;
-    
-    let isNew = item['new'];
-    if(!isNew)
-    {
-      let itemKeyPath = item.props.keyPath;
-      let targetKeyPath = targetProps.keyPath;
-      
-      if(itemKeyPath.equals(targetKeyPath))
-      {
-        // can drop on itself
-        return true;
-      }
-      
-      let itemChildKeyPath = itemKeyPath.push(item.props.index);
-      if(targetKeyPath.size >= itemChildKeyPath.size)
-      {
-        // can't drag a card into a card that is within itself
-        // so make sure that the itemKeyPath is not a prefix for the targetKeyPath
-        if(
-          targetKeyPath.splice(itemChildKeyPath.size, targetKeyPath.size - itemChildKeyPath.size)
-          .equals(itemChildKeyPath)
-        ){
-          // can't drop in yoself
-          return false;
-        }
-      }
-    }
-    
-    if(cardWillWrap(targetProps, type))
-    {
-      return true;
-    }
-    
-    if(targetProps.singleChild)
-    {
-      return false;
-    }
-    
-    if(!cardCanAccept(targetProps, type))
-    {
-      return false;
-    }
-    
-    return true;
+    return cardCouldWrap(targetProps, item);
   },
   
   hover(targetProps:Props, monitor)
