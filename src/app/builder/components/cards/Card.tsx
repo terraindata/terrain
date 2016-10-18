@@ -77,7 +77,7 @@ interface Props
   keys: List<string>;
   canEdit: boolean;
   keyPath: KeyPath;
-  accepts: List<string>;
+  accepts?: List<string>;
 
   addColumn?: (number, string?) => void;
   columnIndex?: number;
@@ -101,33 +101,7 @@ class _Card extends PureClasss<Props>
     allTerms: List<string>;
     
     cardIsClosed: boolean;
-  } = {
-      selected: false,
-      hovering: false,
-      cardTerms: this.getCardTerms(this.props.card),
-      allTerms: this.props.keys.merge(this.getCardTerms(this.props.card)),
-      menuOptions:
-        Immutable.List([
-          // {
-          //   text: 'Copy',
-          //   onClick: this.handleCopy,
-          // },
-          {
-            text: 'Duplicate',
-            onClick: this.handleDuplicate,
-          },
-          // {
-          //   text: 'Hide',
-          //   onClick: this.toggleClose,
-          // },
-          {
-            text: 'Delete',
-            onClick: this.handleDelete,
-          },
-        ]),
-     
-     cardIsClosed: this.props.card.closed,
-    };
+  };
   
   refs: {
     [k: string]: Ref;
@@ -139,40 +113,37 @@ class _Card extends PureClasss<Props>
   constructor(props:Props)
   {
     super(props);
-    // let cardTerms = this.getCardTerms(props.card);
+    let cardTerms = this.getCardTerms(props.card);
     
-    // this.state = {
-    //   selected: false,
-    //   hovering: false,
-    //   cardTerms,
-    //   allTerms: props.keys.merge(cardTerms),
-    //   menuOptions:
-    //     Immutable.List([
-    //       // {
-    //       //   text: 'Copy',
-    //       //   onClick: this.handleCopy,
-    //       // },
-    //       {
-    //         text: 'Duplicate',
-    //         onClick: this.handleDuplicate,
-    //       },
-    //       // {
-    //       //   text: 'Hide',
-    //       //   onClick: this.toggleClose,
-    //       // },
-    //       {
-    //         text: 'Delete',
-    //         onClick: this.handleDelete,
-    //       },
-    //     ]),
+    this.state = {
+      selected: false,
+      hovering: false,
+      cardTerms,
+      allTerms: props.keys.merge(cardTerms),
+      menuOptions:
+        Immutable.List([
+          // {
+          //   text: 'Copy',
+          //   onClick: this.handleCopy,
+          // },
+          {
+            text: 'Duplicate',
+            onClick: this.handleDuplicate,
+          },
+          {
+            text: 'Delete',
+            onClick: this.handleDelete,
+          },
+        ]),
      
-    //  cardIsClosed: this.props.card.closed,
-    // };
+     cardIsClosed: this.props.card.closed,
+    };
     
-    this._subscribe(Store, {
-      stateKey: 'selected',
-      storeKeyPath: ['selectedCardIds', props.card.id],
-    });
+    // TODO
+    // this._subscribe(Store, {
+    //   stateKey: 'selected',
+    //   storeKeyPath: ['selectedCardIds', props.card.id],
+    // });
     
     this._subscribe(Store, {
       updater: (state) =>
@@ -212,14 +183,6 @@ class _Card extends PureClasss<Props>
   
   componentWillReceiveProps(nextProps:Props)
   {
-    // for(var i in nextProps)
-    // {
-    //   if(nextProps[i] !== this.props[i])
-    //   {
-    //     console.log('change', i, this.props[i], nextProps[i]);
-    //   }
-    // }
-    
     var allTerms = this.props.keys;
     var {cardTerms} = this.state;
     var changed = false;
@@ -273,6 +236,7 @@ class _Card extends PureClasss<Props>
       paddingLeft: 12,
       borderRadius: 10
     });
+    
     this.props.connectDragPreview(this.dragPreview);
   }
   
@@ -533,7 +497,6 @@ class _Card extends PureClasss<Props>
     );
 	}
 }
-
 
 // Drag and Drop (the bass)
 

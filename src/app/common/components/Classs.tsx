@@ -127,7 +127,11 @@ class Classs<T> extends React.Component<T, any>
       return;
     }
     
-    config.updater && config.updater(store.getState());
+    if(config.updater)
+    {
+      config.updater(store.getState());
+      return;
+    }
       
     let stateKey = config.stateKey;
     
@@ -142,9 +146,12 @@ class Classs<T> extends React.Component<T, any>
     
     stateKey = stateKey || 'state';
 
-    this.setState({
-      [stateKey]: value,
-    });
+    if(this.state[stateKey] !== value)
+    {
+      this.setState({
+        [stateKey]: value,
+      });
+    }
   }
   
   // for the construction of keyPaths for Redux actions,
