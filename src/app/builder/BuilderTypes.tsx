@@ -474,6 +474,7 @@ export module BuilderTypes
     'max',
     'sum',
     'distinct',
+    'score',
   ]);
 
   // The BuildingBlocks
@@ -585,13 +586,13 @@ export module BuilderTypes
                 displayType: DisplayType.CARDTEXT,
                 help: ManualConfig.help["select-field"],
                 key: 'field',
-                accepts: acceptsAggregates,
+                accepts: acceptsAggregates.push('as'),
               },
               below:
               {
                 displayType: DisplayType.CARDSFORTEXT,
                 key: 'field',
-                accepts: acceptsAggregates,
+                accepts: acceptsAggregates.push('as'),
               },
               hideToolsWhenNotString: true,
             },
@@ -699,6 +700,52 @@ export module BuilderTypes
           },
         ],
       },
+    }),
+
+    as: _card({
+      value: "",
+      alias: "",
+      
+      static:
+      {
+        title: "As",
+        colors: ["rgb(185, 47, 150)", "rgb(245, 197, 230)"],
+        preview: '[alias]',
+        tql: "($value) as $alias",
+        manualEntry: ManualConfig.cards.where,
+        display:
+        {
+          displayType: DisplayType.FLEX,
+          key: null,
+          
+          flex:
+          [
+            {
+              displayType: DisplayType.CARDTEXT,
+              key: 'value',
+              top: false,
+              showWhenCards: true,
+              accepts: acceptsAggregates,
+            },
+            {
+              displayType: DisplayType.LABEL,
+              label: 'as',
+              key: null,
+            },
+            {
+              displayType: DisplayType.TEXT,
+              key: 'alias',
+            },
+          ], 
+          
+          below: 
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'value',
+            accepts: acceptsAggregates,
+          }
+        }
+      }
     }),
     
     where: _wrapperCard({
@@ -933,7 +980,7 @@ export module BuilderTypes
       key: "",
       weight: 0,
       static: {
-        tql: "[$weight, $key]",
+        tql: "$weight, $key",
         removeOnCardRemove: true,
       }
     }),
@@ -949,7 +996,7 @@ export module BuilderTypes
         colors: ["#2996c3", "#aeddee"],
         preview: "[weights.length] Weight(s)",
         manualEntry: ManualConfig.cards['score'],
-        tql: "linearScore([$weights])",
+        tql: "linear_score($weights)",
         init: () => ({
           weights: List([
             make(Blocks.weight),
@@ -1192,20 +1239,21 @@ export module BuilderTypes
       Blocks.sfw,
     ],
     [
-      Blocks.where,
-      Blocks.sort,
-      Blocks.take,
-      Blocks.skip,
-      Blocks.groupBy,
-      Blocks.having,
-    ],
-    [
       Blocks.count,
       Blocks.avg,
       Blocks.min,
       Blocks.max,
       Blocks.sum,
       Blocks.distinct,
+      Blocks.as,
+    ],
+    [
+      Blocks.where,
+      Blocks.sort,
+      Blocks.take,
+      Blocks.skip,
+      Blocks.groupBy,
+      Blocks.having,
     ],
     [
       Blocks.comparison,

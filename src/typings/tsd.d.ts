@@ -65,6 +65,8 @@ declare type Get = (f: string | number) => any;
 declare type GetIn = (f: (string | number)[] | KeyPath) => any;
 declare type Delete<T> = (f: string) => T;
 declare type DeleteIn<T> = (f: (string | number)[] | KeyPath) => T;
+declare type Update<T> = (f: string, updater: (n: any) => any) => T;
+declare type UpdateIn<T> = (f: (string | number)[] | KeyPath, updater: (n: any) => any) => T;
 
 declare interface IStore<T>
 {
@@ -81,6 +83,10 @@ declare interface IMap<T>
   getIn: GetIn;
   delete: Delete<T>;
   deleteIn: DeleteIn<T>;
+  remove: Delete<T>;
+  removeIn: DeleteIn<T>;
+  update: Update<T>;
+  updateIn: UpdateIn<T>;
   toMap: () => Map<string, any>;
 }
 

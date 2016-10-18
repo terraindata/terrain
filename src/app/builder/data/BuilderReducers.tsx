@@ -57,7 +57,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
 {
   
 [ActionTypes.fetch]:
-  (state, action) =>
+  (state: BuilderState, action) =>
   {
     action.payload.variantIds.map(
       variantId =>
@@ -113,7 +113,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   },
   
 [ActionTypes.setVariant]: 
-  (state, action:
+  (state: BuilderState, action:
   {
     payload?: { variantId: string, variant: any},
   }) =>
@@ -122,7 +122,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     ),
 
 [ActionTypes.setVariantField]: 
-  (state, action:
+  (state: BuilderState, action:
   {
     payload?: { variantId: string, field: string, value: any},
   }) =>
@@ -131,11 +131,11 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     ),
 
 [ActionTypes.change]:  
-  (state, action) =>
+  (state: BuilderState, action) =>
     state.setIn(action.payload.keyPath, action.payload.value),
   
 [ActionTypes.create]:  
-  (state, action: {
+  (state: BuilderState, action: {
     payload?: { keyPath: KeyPath, index: number, factoryType: string, data: any }
   }) =>
     state.updateIn(action.payload.keyPath, arr =>
@@ -159,7 +159,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   ,
     
 [ActionTypes.move]:  
-  (state, action: {
+  (state: BuilderState, action: {
     payload?: { keyPath: KeyPath, index: number, newIndex; number }
   }) =>
     state.updateIn(action.payload.keyPath, arr =>
@@ -173,7 +173,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
 
      // first check original keypath
 [ActionTypes.nestedMove]: // a deep move
-  (state, action: {
+  (state: BuilderState, action: {
     payload?: { itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number }
   }) =>
   {
@@ -226,11 +226,13 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       // Consider an optimized search if performance becomes an issue.
     }
     
+    state = trimParent(state, itemKeyPath);
+    
     return state;
   },
 
 [ActionTypes.remove]:  
-  (state, action: {
+  (state: BuilderState, action: {
     payload?: { keyPath: KeyPath, index: number }
   }) =>
   {
@@ -241,30 +243,20 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     }
     
     state = state.removeIn(keyPath);
-    
-    let parentKeyPath = keyPath.splice(keyPath.size - 1, 1).toList();
-    let parentListKeyPath = parentKeyPath.splice(parentKeyPath.size - 1, 1).toList();
-    let st = state.getIn(parentKeyPath.push('static'));
-    
-    if( st && st.removeOnCardRemove
-        && state.getIn(parentListKeyPath).size > 1 // only remove if there are multiple items
-      )
-    {
-      state = state.removeIn(parentKeyPath);
-    }
+    state = trimParent(state, keyPath);
     
     return state;
   },
 
 [ActionTypes.hoverCard]:
-  (state, action: {
+  (state: BuilderState, action: {
     payload?: { cardId: ID },
   }) =>
     state.set('hoveringCardId', action.payload.cardId)
   ,
 
 [ActionTypes.selectCard]:
-  (state, action: {
+  (state: BuilderState, action: {
     payload?: { cardId: ID, shiftKey: boolean, ctrlKey: boolean },
   }) =>
   {
@@ -282,7 +274,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   },
 
   [ActionTypes.dragCardOver]:
-    (state, action: {
+    (state: BuilderState, action: {
       payload?: { keyPath: KeyPath, index: number }
     }) =>
     {
@@ -298,6 +290,22 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       .set('draggingOverIndex', null)
       .set('draggingCardItem', null),
 };
+
+function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
+{
+  let parentKeyPath = keyPath.splice(keyPath.size - 1, 1).toList();
+  let parentListKeyPath = parentKeyPath.splice(parentKeyPath.size - 1, 1).toList();
+  let st = state.getIn(parentKeyPath.push('static'));
+  
+  if( st && st.removeOnCardRemove
+      && state.getIn(parentListKeyPath).size > 1 // only remove if there are multiple items
+    )
+  {
+    return state.removeIn(parentKeyPath);
+  }
+  
+  return state;
+}
 
 
 
