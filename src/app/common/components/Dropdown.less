@@ -22,6 +22,8 @@
  }
  .transition;
  
+ text-align: left;
+ 
  border: 1px solid #fff;
  &:hover:not(.dropdown-disabled),
  &.dropdown-open {
@@ -114,4 +116,14 @@
  .dropdown-option-inner {
     padding-top: 5px;
  }
+ 
+ &.dropdown-center {
+  text-align: center;
+  .dropdown-option,
+  .dropdown-value {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+ }
+ 
 }

@@ -92,6 +92,7 @@ export interface Display
   
   // for dropdown
   options?: List<(string | El)>;
+  centerDropdown?: boolean;
   
   // for labels
   label?: string;

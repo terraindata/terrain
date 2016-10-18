@@ -250,6 +250,7 @@ class Builder extends PureClasss<Props>
       props.history.replaceState({}, `/builder/${newConfig}`);
     }
     localStorage.setItem('config', newConfig || '');
+    console.log('fetch');
     this.fetch(newConfig);
   }
   

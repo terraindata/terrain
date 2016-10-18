@@ -219,6 +219,7 @@ class BuilderComponent extends PureClasss<Props>
               keyPath={keyPath}
               options={d.options}
               selectedIndex={value}
+              centerAlign={d.centerDropdown}
             />
             { this.props.helpOn && d.help ?
               <ManualInfo

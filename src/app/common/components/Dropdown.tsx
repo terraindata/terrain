@@ -61,6 +61,7 @@ interface Props
   values?: List<any>; // maps indices to values, otherwise index will be used as the value
   canEdit?: boolean;
   className?: string;
+  centerAlign?: boolean;
 }
 
 class Dropdown extends PureClasss<Props>
@@ -152,6 +153,7 @@ class Dropdown extends PureClasss<Props>
       "dropdown-up": this.state.up,
       "dropdown-open": this.state.open,
       "dropdown-disabled": !this.props.canEdit,
+      "dropdown-center": this.props.centerAlign,
     });
     if(this.props.className)
     {

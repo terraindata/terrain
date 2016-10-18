@@ -59,7 +59,7 @@ import Util from '../util/Util.tsx';
 //  since the import itself imports them
 export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
-export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>];
+export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>, 'like'];
 
 import {Display, DisplayType, valueDisplay, letVarDisplay, getCardStringDisplay, firstSecondDisplay, wrapperDisplay, wrapperSingleChildDisplay, stringValueDisplay} from './BuilderDisplays.tsx';  
 var ManualConfig = require('./../manual/ManualConfig.json');
@@ -76,6 +76,7 @@ export module BuilderTypes
     LT,
     IN,
     NIN,
+    LIKE,
   }
   
   export const OperatorTQL = {
@@ -87,6 +88,7 @@ export module BuilderTypes
     [Operator.LT]: '<',
     [Operator.IN]: 'in',
     [Operator.NIN]: 'not in',
+    [Operator.LIKE]: 'LIKE',
   }
 
   export enum Direction {
@@ -813,6 +815,7 @@ export module BuilderTypes
           key: 'operator',
           options: Immutable.List(Operators),
           help: ManualConfig.help["operator"],
+          centerDropdown: true,
         }, List(['sfw'])),
         manualEntry: ManualConfig.cards['filter'],
       },
