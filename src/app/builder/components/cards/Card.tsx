@@ -60,6 +60,7 @@ import Actions from "../../data/BuilderActions.tsx";
 import BuilderTypes from './../../BuilderTypes.tsx';
 import { Display } from './../../BuilderDisplays.tsx';
 import Store from "./../../data/BuilderStore.tsx";
+import {BuilderScrollState, BuilderScrollStore} from "./../../data/BuilderScrollStore.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import CardDropArea from './CardDropArea.tsx';
 import CreateCardTool from './CreateCardTool.tsx';
@@ -101,13 +102,14 @@ class _Card extends PureClasss<Props>
     allTerms: List<string>;
     
     cardIsClosed: boolean;
+    scrollState: BuilderScrollState;
   };
   
   refs: {
     [k: string]: Ref;
-    cardBody: Ref;
+    card: Ref;
     cardInner: Ref;
-    cardContent: Ref;
+    cardBody: Ref;
   }
   
   constructor(props:Props)
@@ -137,6 +139,8 @@ class _Card extends PureClasss<Props>
         ]),
      
      cardIsClosed: this.props.card.closed,
+     
+     scrollState: BuilderScrollStore.getState(),
     };
     
     // TODO
@@ -162,6 +166,10 @@ class _Card extends PureClasss<Props>
         }
       }
     });
+    
+    this._subscribe(BuilderScrollStore, {
+      stateKey: 'scrollState',
+    })
   }
   
   getCardTerms(card:BuilderTypes.ICard): List<string>
@@ -217,6 +225,10 @@ class _Card extends PureClasss<Props>
   dragPreview: any;
   componentDidMount()
   {
+    this.setState({
+      primed: true,
+    });
+    
     if(this.props.card.type === 'creating')
     {
       return;
@@ -240,16 +252,6 @@ class _Card extends PureClasss<Props>
     this.props.connectDragPreview(this.dragPreview);
   }
   
-  handleDraggedAway()
-  {
-    // Util.animateToHeight(this.refs['cardContainer'], 0);
-  }
-  
-  handleDropped()
-  {
-    // Util.animateToAutoHeight(this.refs['cardContainer']);
-  }
-  
 	toggleClose(event)
 	{
     Actions.change(
@@ -260,7 +262,7 @@ class _Card extends PureClasss<Props>
     if(!this.props.card.closed)
     {
       setTimeout(() => 
-        Util.animateToHeight(this.refs.cardContent, 0, () =>
+        Util.animateToHeight(this.refs.cardBody, 0, () =>
           this.setState({
             cardIsClosed: true,
           })
@@ -271,7 +273,7 @@ class _Card extends PureClasss<Props>
     {
       setTimeout(() => 
         Util.animateToAutoHeight(
-          this.refs.cardContent,
+          this.refs.cardBody,
           () =>
             this.setState({
               cardIsClosed: false,
@@ -373,6 +375,48 @@ class _Card extends PureClasss<Props>
 
 	render()
   {
+    let {id} = this.props.card;
+    if($(document.getElementById(this.props.card.id)).length)
+    {
+      let {columnTop, columnEnd} = this.state.scrollState;
+      let cardEl = $(document.getElementById(this.props.card.id));
+      let cardStart = cardEl.offset().top;
+      let cardHeight = cardEl.height();
+      let cardEnd = cardStart + cardHeight;
+      
+      if(cardEnd < columnTop - 100 || cardStart > columnEnd + 100)
+      {
+        // console.log('out of view', id);
+        return (
+          <div
+            className='card-placeholder'
+            id={id}
+            style={{
+              height: cardHeight,
+            }}
+          />
+        );
+      } 
+      // else console.log('in view', id);
+    }
+    else
+    {
+      // console.log('primer', id);
+      // setTimeout(() => {
+      //   console.log('primed', id);
+      //   this.setState({ primed: true, })
+      // }, 100); // or component did mount
+      return (
+        <div
+          className='card-placeholder'
+          id={this.props.card.id}
+          style={{
+            height: 50,
+          }}
+        />
+      );
+    }
+    
     if(this.props.card.type === 'creating')
     {
       // not a card at all, in fact. a create card marker
@@ -422,77 +466,80 @@ class _Card extends PureClasss<Props>
           'card-is-closed': this.state.cardIsClosed,
           [card.type + '-card']: true,
         })}
-        rel={'card-' + card.id}
+        ref='card'
+        id={this.props.card.id}
         onMouseMove={this.handleMouseMove}
       >
-        <div ref='cardContainer' className='card-container'>
-          <CardDropArea
-            half={true}
-            keyPath={this.props.keyPath}
-            index={this.props.index}
-            accepts={this.props.accepts}
-            wrapType={this.props.card.type}
-            singleChild={this.props.singleChild || this.props.singleCard}
-          />
-          <div
-            className={'card-inner ' + (this.props.singleCard ? 'single-card-inner' : '')}
-            style={{
-              background: card.static.colors[1],
-              borderColor: card.static.colors[0],
-            }}
-            ref='cardInner'
-          >
-            {
-              connectDragSource(
-                <div
-                  className={classNames({
-                    'card-title': true,
-                    'card-title-closed': this.props.card.closed,
-                    'card-title-card-hovering': this.state.hovering,
-                  })}
-                  style={{
-                    background: card.static.colors[0],
-                  }}
-                  onClick={this.handleTitleClick}
-                  >
-                  <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
-                  <div className='card-title-inner'>
-                    { title }
-                  </div>
-                  <div className={classNames({
-                    'card-preview': true,
-                    'card-preview-hidden': !this.props.card.closed,
-                  })}>
-                    { BuilderTypes.getPreview(card) }
-                  </div>
-                  
-                </div>
-              )
-            }
-            {
-              this.props.canEdit && <Menu options={this.state.menuOptions} />
-            }
-            <div className='card-body' ref='cardBody'>
+        <CardDropArea
+          half={true}
+          keyPath={this.props.keyPath}
+          index={this.props.index}
+          accepts={this.props.accepts}
+          wrapType={this.props.card.type}
+          singleChild={this.props.singleChild || this.props.singleCard}
+        />
+        <div
+          className={'card-inner ' + (this.props.singleCard ? 'single-card-inner' : '')}
+          style={{
+            background: card.static.colors[1],
+            borderColor: card.static.colors[0],
+          }}
+          ref='cardInner'
+        >
+          {
+            connectDragSource(
               <div
-                className={'card-content' + (this.props.singleCard ? ' card-content-single' : '')}
-                ref='cardContent'
-              >
+                className={classNames({
+                  'card-title': true,
+                  'card-title-closed': this.props.card.closed,
+                  'card-title-card-hovering': this.state.hovering,
+                })}
+                style={{
+                  background: card.static.colors[0],
+                }}
+                onClick={this.handleTitleClick}
+                >
                 {
-                  content
+                  this.state.hovering &&
+                    <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
                 }
+                <div className='card-title-inner'>
+                  { title }
+                </div>
+                
+                {
+                  this.props.card.closed ? null : 
+                    <div className={classNames({
+                      'card-preview': true,
+                      'card-preview-hidden': !this.props.card.closed,
+                    })}>
+                      { BuilderTypes.getPreview(card) }
+                    </div>
+                }
+                
               </div>
-            </div>
+            )
+          }
+          {
+            this.props.canEdit && 
+            this.state.hovering &&
+              <Menu options={this.state.menuOptions} />
+          }
+          <div className='card-body' ref='cardBody'>
+            {
+              content
+            }
           </div>
-          <CardDropArea
-            half={true}
-            lower={true}
-            keyPath={this.props.keyPath}
-            index={this.props.index}
-            accepts={this.props.accepts}
-            wrapType={this.props.card.type}
-            singleChild={this.props.singleChild || this.props.singleCard}
-          />
         </div>
+        <CardDropArea
+          half={true}
+          lower={true}
+          keyPath={this.props.keyPath}
+          index={this.props.index}
+          accepts={this.props.accepts}
+          wrapType={this.props.card.type}
+          singleChild={this.props.singleChild || this.props.singleCard}
+        />
       </div>
     );
 	}

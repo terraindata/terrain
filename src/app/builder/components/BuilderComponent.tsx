@@ -420,23 +420,31 @@ class BuilderComponent extends PureClasss<Props>
     
     return (
       <div key={key}>
-        { ! d.header ? null :
-            <div
-              className={'builder-card-header ' + (d.headerClassName ? d.headerClassName : '')}
-              style={{
-                backgroundColor: this.props.data.static.colors[0],
-              }}
-            >
-              { d.header }
-            </div>
+        <div
+          className={'builder-card-header ' + (d.headerClassName ? d.headerClassName : '')}
+          style={{
+            backgroundColor: this.props.data.static.colors[0],
+          }}
+        >
+          {
+            d.header
+          }
+        </div>
+        { 
+          content
         }
-        { content }
       </div>
     );
   }
   
   render()
   {
+    // if(!this.state || !this.state['render'])
+    // {
+    //   setTimeout(() => this.setState({ render: true, }), 1000);
+    //   return null;
+    // }
+    
     var {data, display} = this.props;
     if(!display)
     {

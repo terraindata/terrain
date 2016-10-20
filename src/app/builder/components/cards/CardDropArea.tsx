@@ -213,6 +213,11 @@ class CardDropArea extends PureClasss<Props>
   
 	render()
   {
+    if(!this.state.draggingCardItem)
+    {
+      return null;
+    }
+    
     var style = null;
     if(this.props.height)
     {

@@ -106,6 +106,11 @@ class CardDragPreview extends PureClasss<CDPProps>
   {
     const item = this.props.cardItem;
     
+    if(!item)
+    {
+      return <div />;
+    }
+    
     if(item)
     {
       var {type} = item;

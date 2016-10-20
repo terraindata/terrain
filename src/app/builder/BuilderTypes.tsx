@@ -477,6 +477,7 @@ export module BuilderTypes
     'sum',
     'distinct',
     'score',
+    'transform',
   ]);
 
   // The BuildingBlocks

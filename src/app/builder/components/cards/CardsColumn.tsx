@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./CardsColumn.less');
+import * as $ from 'jquery';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
@@ -56,6 +57,9 @@ import CardsArea from './CardsArea.tsx';
 import CardDropArea from './CardDropArea.tsx';
 import InfoArea from '../../../common/components/InfoArea.tsx';
 import CardsDeck from './CardsDeck.tsx';
+import {scrollAction} from '../../data/BuilderScrollStore.tsx';
+const Dimensions = require('react-dimensions');
+
 type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
 let {List, Map} = Immutable;
@@ -70,6 +74,9 @@ interface Props
   addColumn: (number, string?) => void;
   columnIndex: number;
   spotlights: List<any>;
+  
+  containerWidth?: number;
+  containerHeight?: number;
 }
 
 const _topLevelAccepts = Immutable.List(['sfw']);
@@ -86,18 +93,30 @@ class CardsColumn extends PureClasss<Props>
     deckOpen: true,
   };
   
+  componentDidMount()
+  {
+    this.handleScroll();
+  }
+  
   computeKeyPath(props:Props):KeyPath
   {
     return List(this._keyPath('queries', props.queryId, 'cards'));
   }
   
-  componentWillReceiveProps(props:Props)
+  componentWillReceiveProps(nextProps:Props)
   {
-    if(props.queryId !== this.props.queryId)
+    if(nextProps.queryId !== this.props.queryId)
     {
       this.setState({
-        keyPath: this.computeKeyPath(props),
+        keyPath: this.computeKeyPath(nextProps),
       });
+    }
+    
+    if(nextProps.containerHeight !== this.props.containerHeight
+      || nextProps.containerWidth !== this.props.containerWidth)
+    {
+      console.log(nextProps.containerHeight);
+      this.handleScroll();
     }
   }
   
@@ -136,6 +155,13 @@ class CardsColumn extends PureClasss<Props>
     });
   }
   
+  handleScroll()
+  {
+    let el = $('#cards-column');
+    let start = el.offset().top;
+    scrollAction(start, start + el.height(), el.scrollTop());
+  }
+  
   render()
   {
     let {props} = this;
@@ -152,7 +178,11 @@ class CardsColumn extends PureClasss<Props>
         <CardsDeck
           open={this.state.deckOpen}
         />
-        <div className='cards-column-cards-area'>
+        <div
+          className='cards-column-cards-area'
+          onScroll={this.handleScroll}
+          id='cards-column'
+        >
           <CardDropArea
             half={true}
             index={0}
@@ -203,4 +233,4 @@ class CardsColumn extends PureClasss<Props>
   }
 }
 
-export default CardsColumn;
+export default Dimensions()(CardsColumn);

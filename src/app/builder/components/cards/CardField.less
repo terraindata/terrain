@@ -17,7 +17,6 @@
   padding: @standard-margin;
   position: relative;
   text-align: center;
-  // min-height: 30px;
   .transition;
   
   @field-padding-left: 25px;
@@ -36,7 +35,7 @@
     }
   }
   
-  &.card-field-editable:hover {
+  &.card-field-editable { // :hover for animation
     .card-field-inner {
       left: @field-padding-left;
       width: calc(~"100% - @{field-padding-left} - @{field-padding-right}");
