@@ -68,6 +68,8 @@ import BuilderComponent from '../BuilderComponent.tsx';
 
 var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
+const CARD_OVERSCAN = 500;
+
 interface Props
 {
   card: BuilderTypes.ICard;
@@ -373,20 +375,33 @@ class _Card extends PureClasss<Props>
     }
   }
 
+  cardEl: HTMLElement;
+  
 	render()
   {
     let {id} = this.props.card;
-    if($(document.getElementById(this.props.card.id)).length)
+    this.cardEl = document.getElementById(this.props.card.id); // memoize?
+    if(this.cardEl)
     {
-      let {columnTop, columnEnd} = this.state.scrollState;
-      let cardEl = $(document.getElementById(this.props.card.id));
-      let cardStart = cardEl.offset().top;
-      let cardHeight = cardEl.height();
+      let {columnTop, columnEnd, columnScroll} = this.state.scrollState;
+      let visibleStart = columnScroll - CARD_OVERSCAN;
+      let visibleEnd = columnScroll + (columnEnd - columnTop) + CARD_OVERSCAN;
+      
+      let cardStart = 0;
+      let el = this.cardEl;
+      do {
+        cardStart += el.offsetTop; 
+        el = el.offsetParent as any;
+        // console.log(el.offsetParent);
+      } while(el.id !== 'cards-column');
+      
+      // if cards are nested inside position:relative/absolute components, you will
+      //  need to loop through offsetParent until you reach the column, summing offsetTop
+      let cardHeight = this.cardEl.clientHeight;
       let cardEnd = cardStart + cardHeight;
       
-      if(cardEnd < columnTop - 100 || cardStart > columnEnd + 100)
+      if(cardEnd < visibleStart || cardStart > visibleEnd)
       {
-        // console.log('out of view', id);
         return (
           <div
             className='card-placeholder'
@@ -397,15 +412,9 @@ class _Card extends PureClasss<Props>
           />
         );
       } 
-      // else console.log('in view', id);
     }
     else
     {
-      // console.log('primer', id);
-      // setTimeout(() => {
-      //   console.log('primed', id);
-      //   this.setState({ primed: true, })
-      // }, 100); // or component did mount
       return (
         <div
           className='card-placeholder'
@@ -516,14 +525,13 @@ class _Card extends PureClasss<Props>
                       { BuilderTypes.getPreview(card) }
                     </div>
                 }
-                
+                {
+                  this.props.canEdit && 
+                  this.state.hovering &&
+                    <Menu options={this.state.menuOptions} />
+                }
               </div>
             )
-          }
-          {
-            this.props.canEdit && 
-            this.state.hovering &&
-              <Menu options={this.state.menuOptions} />
           }
           <div className='card-body' ref='cardBody'>
             {

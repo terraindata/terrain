@@ -1065,7 +1065,7 @@ export module BuilderTypes
       score: 0,
       
       static: {
-        tql: "[$score, $value]"
+        tql: "$score, $value",
       }
     }),
     
@@ -1082,7 +1082,7 @@ export module BuilderTypes
         colors: ["#559dcf", "#c0e0f3"],
         title: "Transform",
         preview: "[input]",
-        tql: "linearTransform([$scorePoints])",
+        tql: "linear_transform($input, $scorePoints)",
         display: [
           {
             displayType: DisplayType.TEXT,
