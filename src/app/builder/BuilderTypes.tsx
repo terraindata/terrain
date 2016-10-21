@@ -1006,7 +1006,8 @@ export module BuilderTypes
             make(Blocks.weight),
           ]),
         }),
-        display: {
+        display:
+        {
           displayType: DisplayType.ROWS,
           key: 'weights',
           english: 'weight',
@@ -1014,13 +1015,16 @@ export module BuilderTypes
           provideParentData: true,
           row:
           {
+            noDataPadding: true,
             inner:
             [
               {
-                displayType: DisplayType.TEXT,
+                displayType: DisplayType.CARDTEXT,
                 key: 'key',
                 help: ManualConfig.help["key"],
                 placeholder: 'Field',
+                accepts: List(['score', 'transform']),
+                showWhenCards: true,
               },
               {
                 displayType: DisplayType.NUM,
@@ -1035,6 +1039,12 @@ export module BuilderTypes
                 help: ManualConfig.help["score"],
               },
             ],
+            below:
+            {
+              displayType: DisplayType.CARDSFORTEXT,
+              key: 'key',
+              accepts: List(['score', 'transform']),
+            }
           },
         },
       }
