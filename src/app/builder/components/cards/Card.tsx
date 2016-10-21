@@ -68,7 +68,7 @@ import BuilderComponent from '../BuilderComponent.tsx';
 
 var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
-const CARD_OVERSCAN = 500;
+const CARD_OVERSCAN = 200;
 
 interface Props
 {
@@ -227,10 +227,6 @@ class _Card extends PureClasss<Props>
   dragPreview: any;
   componentDidMount()
   {
-    this.setState({
-      primed: true,
-    });
-    
     if(this.props.card.type === 'creating')
     {
       return;
@@ -374,8 +370,15 @@ class _Card extends PureClasss<Props>
       Actions.remove(this.props.keyPath, this.props.index);
     }
   }
+  
+  componentWillUnmount()
+  {
+    this.renderTimeout && clearTimeout(this.renderTimeout);
+  }
 
   cardEl: HTMLElement;
+  renderTimeout: any;
+  prevHeight: number = -1; // check if height is changing to stop weird glitching
   
 	render()
   {
@@ -392,7 +395,6 @@ class _Card extends PureClasss<Props>
       do {
         cardStart += el.offsetTop; 
         el = el.offsetParent as any;
-        // console.log(el.offsetParent);
       } while(el.id !== 'cards-column');
       
       // if cards are nested inside position:relative/absolute components, you will
@@ -404,7 +406,7 @@ class _Card extends PureClasss<Props>
       {
         return (
           <div
-            className='card-placeholder'
+            className='card card-placeholder'
             id={id}
             style={{
               height: cardHeight,
@@ -415,9 +417,13 @@ class _Card extends PureClasss<Props>
     }
     else
     {
+      this.renderTimeout = setTimeout(() => {
+        this.setState({random: Math.random()});
+      }, 10);
+      
       return (
         <div
-          className='card-placeholder'
+          className='card card-placeholder'
           id={this.props.card.id}
           style={{
             height: 50,
@@ -430,14 +436,18 @@ class _Card extends PureClasss<Props>
     {
       // not a card at all, in fact. a create card marker
       return (
-        <CreateCardTool
-          canEdit={this.props.canEdit}
-          index={this.props.index}
-          keyPath={this.props.keyPath}
-          open={true}
-          onClose={this.handleCardToolClose}
-          accepts={this.props.display && this.props.display.accepts}
-        />
+        <div
+          id={id}
+        >
+          <CreateCardTool
+            canEdit={this.props.canEdit}
+            index={this.props.index}
+            keyPath={this.props.keyPath}
+            open={true}
+            onClose={this.handleCardToolClose}
+            accepts={this.props.display && this.props.display.accepts}
+          />
+        </div>
       );
     }
     
