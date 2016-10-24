@@ -69,6 +69,7 @@ import BuilderComponent from '../BuilderComponent.tsx';
 var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
 const CARD_OVERSCAN = 200;
+const CARD_HEIGHT_MAP: {[id:string]:number} = {};
 
 interface Props
 {
@@ -378,7 +379,6 @@ class _Card extends PureClasss<Props>
 
   cardEl: HTMLElement;
   renderTimeout: any;
-  prevHeight: number = -1; // check if height is changing to stop weird glitching
   
 	render()
   {
@@ -401,6 +401,8 @@ class _Card extends PureClasss<Props>
       //  need to loop through offsetParent until you reach the column, summing offsetTop
       let cardHeight = this.cardEl.clientHeight;
       let cardEnd = cardStart + cardHeight;
+
+      CARD_HEIGHT_MAP[id] = cardHeight;
       
       if(cardEnd < visibleStart || cardStart > visibleEnd)
       {
@@ -419,14 +421,14 @@ class _Card extends PureClasss<Props>
     {
       this.renderTimeout = setTimeout(() => {
         this.setState({random: Math.random()});
-      }, 10);
+      }, 5);
       
       return (
         <div
           className='card card-placeholder'
-          id={this.props.card.id}
+          id={id}
           style={{
-            height: 50,
+            minHeight: CARD_HEIGHT_MAP[id] || 50,
           }}
         />
       );
@@ -486,7 +488,7 @@ class _Card extends PureClasss<Props>
           [card.type + '-card']: true,
         })}
         ref='card'
-        id={this.props.card.id}
+        id={id}
         onMouseMove={this.handleMouseMove}
       >
         <CardDropArea

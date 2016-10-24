@@ -115,7 +115,6 @@ class CardsColumn extends PureClasss<Props>
     if(nextProps.containerHeight !== this.props.containerHeight
       || nextProps.containerWidth !== this.props.containerWidth)
     {
-      console.log(nextProps.containerHeight);
       this.handleScroll();
     }
   }
