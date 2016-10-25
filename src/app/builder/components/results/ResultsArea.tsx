@@ -61,8 +61,8 @@ import InfiniteScroll from './../../../common/components/InfiniteScroll.tsx';
 import Switch from './../../../common/components/Switch.tsx';
 import BuilderTypes from '../../BuilderTypes.tsx';
 
-const RESULTS_PAGE_SIZE = 25;
-const MAX_RESULTS = 75;
+const RESULTS_PAGE_SIZE = 200;
+const MAX_RESULTS = 200;
 
 interface Props
 {
