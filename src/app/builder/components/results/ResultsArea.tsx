@@ -327,11 +327,24 @@ class ResultsArea extends PureClasss<Props>
   
   handleCountResponse(results:any)
   {
-    if(results && results.length === 1)
+    if(results)
     {
-      this.setState({
-        resultsCount: results[0]['count(*)']
-      });
+      if(results.length === 1)
+      {
+        this.setState({
+          resultsCount: results[0]['count(*)']
+        });
+      }
+      else if(results.length > 1)
+      {
+        this.setState({
+          resultsCount: results.length,
+        })
+      }
+      else
+      {
+        this.handleCountError();
+      }
     }
     else
     {
