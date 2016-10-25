@@ -116,8 +116,9 @@ var Periscope = {
   {
     var bottomAxis = d3.svg.axis()
       .scale(scales.x)
-      .ticks(10)
+      .ticks(6)
       .tickSize(10)
+      .tickFormat(d3.format(".3g"))
       .orient("bottom");
     d3.select(el).select('.bottomAxis')
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
@@ -166,7 +167,7 @@ var Periscope = {
     d3.select(el).select('.line')
       .attr("x", scales.x(domain.x[0]))
       .attr('width', scales.x(domain.x[1]) - scales.x(domain.x[0]))
-      .attr('y', scaleMin(scales.barY) - height / 2)
+      .attr('y', scaleMin(scales.barY)) // - height / 2) // don't center, actually, so that it doesn't cover up the histogram
       .attr('height', height);
   },
   

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 let {Map, List} = Immutable;
-
+import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Actions from "../../data/BuilderActions.tsx";
@@ -52,15 +52,18 @@ import Util from '../../../util/Util.tsx';
 import PureClasss from '../../../common/components/PureClasss.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
 import Periscope from './Periscope.tsx';
+import {Bar, Bars} from './TransformCard.tsx';
 
 interface Props 
 {
-  barsData: List<any>;
+  barsData: Bars;
   maxDomain: List<number>;
   domain: List<number>;
   range: List<number>;
   onDomainChange: (domain: List<number>) => void;
 }
+
+const MAX_BARS = 100;
 
 class TransformCardPeriscope extends PureClasss<Props>
 {
@@ -69,12 +72,49 @@ class TransformCardPeriscope extends PureClasss<Props>
     initialDomain: List<number>,
     chartState: Map<string, any>,
     initialVal: number,
+    bars: Bars,
   } = {
     chartState: null,
     width: 0,
     initialDomain: null,
     initialVal: 0,
+    bars: null,
   };
+  
+  constructor(props:Props)
+  {
+    super(props);
+    this.state.bars = this.formatBars(props.barsData);
+  }
+  
+  formatBars(bars:Bars):Bars
+  {
+    if(bars.size > MAX_BARS)
+    {
+      var newBars: Bars = List([]);
+      var min = bars.first().range.min;
+      var max = bars.last().range.max;
+      
+      bars.map((bar:Bar) => 
+      {
+        let b = Math.floor((bar.range.min - min) / (max - min) * MAX_BARS);
+        let newBar: Bar = newBars.get(b);
+        if(!newBar)
+        {
+          newBars = newBars.push(JSON.parse(JSON.stringify(bar)));
+        }
+        else
+        {
+          newBar.count += bar.count;
+          newBar.percentage += bar.percentage;
+          newBar.range.max = bar.range.max;
+          newBars = newBars.set(b, newBar);
+        }
+      });
+      return newBars;
+    }
+    return bars;
+  }
   
   componentDidMount()
   {
@@ -95,7 +135,15 @@ class TransformCardPeriscope extends PureClasss<Props>
   {
     if(this.shouldComponentUpdate(nextProps, this.state))
     {
-      this.update(nextProps);
+      var bars = this.state.bars;
+      if(nextProps.barsData !== this.props.barsData)
+      {
+        bars = this.formatBars(nextProps.barsData);
+        this.setState({
+          bars,
+        });
+      }
+      this.update(_.extend({}, nextProps, { bars }));
     }
   }
   
@@ -139,7 +187,7 @@ class TransformCardPeriscope extends PureClasss<Props>
   getChartState(overrideState = {}): Map<string, any>
   {
     var chartState = Map({
-      barsData: (overrideState['barsData'] || this.props.barsData).toJS(),
+      barsData: (overrideState['bars'] || this.state.bars).toJS(),
       maxDomain: (overrideState['maxDomain'] || this.props.maxDomain),
       domain: {
         x: (overrideState['domain'] || this.props.domain).toJS(),

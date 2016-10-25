@@ -53,9 +53,9 @@ import Ajax from '../../../util/Ajax.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import TransformCardChart from './TransformCardChart.tsx';
-import TransformCardPeriscope from './TransformCardPeriscope.tsx';
 
 const NUM_BARS = 1000;
+// const NUM_RESULTS = 
 
 interface Props
 {
@@ -78,6 +78,8 @@ export interface Bar
   }
 }
 export type Bars = List<Bar>;
+
+import TransformCardPeriscope from './TransformCardPeriscope.tsx';
 
 class TransformCard extends PureClasss<Props>
 {
@@ -220,7 +222,7 @@ class TransformCard extends PureClasss<Props>
         }
         
         bars[i].count ++;
-        bars[i].percentage += 1 / NUM_BARS;
+        bars[i].percentage += 1 / results.length;
       });
       
       let domain = List([min, max]);
@@ -232,7 +234,6 @@ class TransformCard extends PureClasss<Props>
       
       if(this.updateDomain)
       {
-        console.log('ud', domain, this.props.keyPath.set(this.props.keyPath.size - 1, 'domain'));
         Actions.change(this.props.keyPath.set(this.props.keyPath.size - 1, 'domain'), domain);
       }
     }
@@ -240,7 +241,7 @@ class TransformCard extends PureClasss<Props>
   
   handleQueryError(error: any)
   {
-    console.log('Transform card query error', error);
+    console.log('Transform card query error');
   }
   
   handleDomainChange(domain: List<number>)

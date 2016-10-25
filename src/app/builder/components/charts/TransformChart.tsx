@@ -622,6 +622,7 @@ var TransformChart = {
         x: scaleMin(scales.x) - range,
         y: linesPointsData[0].y,
         id: '*%*-first',
+        dontScale: true,
       });
       if(isFill)
       {
@@ -629,6 +630,7 @@ var TransformChart = {
           x: scaleMin(scales.x) - range,
           y: -1,
           id: '*%*-first-anchor',
+          dontScale: true,
         });
       }
       
@@ -636,6 +638,7 @@ var TransformChart = {
         x: scaleMax(scales.x) + range,
         y: linesPointsData[linesPointsData.length - 1].y,
         id: '*%*-last',
+        dontScale: true,
       });
       if(isFill)
       {
@@ -643,6 +646,7 @@ var TransformChart = {
           x: scaleMax(scales.x) + range,
           y: -1,
           id: '*%*-last-anchor',
+          dontScale: true,
         });
       }
     }
@@ -652,7 +656,7 @@ var TransformChart = {
   _drawLines(el, scales, pointsData, onClick, onMove, canEdit)
   {
     var lineFunction = d3.svg.line()
-      .x((d) => scales.realX(d['x']))
+      .x((d) => d['dontScale'] ? d['x'] : scales.realX(d['x']))
       .y((d) => scales.realPointY(d['y']));
     
     var lines = d3.select(el).select('.lines')
@@ -798,14 +802,24 @@ var TransformChart = {
 
   _drawToolTip(el, mouse, scales, point)
   {
-    d3.selectAll('.transform-tooltip').remove();
+    d3.select(el).selectAll('.transform-tooltip').remove();
 
-    var f = d3.format(".2f")
-    var text_x = 'X: ' + f(scales.realX.invert(point.cx.baseVal.value));
-    var text_y = 'Y: ' + f(scales.realPointY.invert(point.cy.baseVal.value));
+    // var f = d3.format(".2f")
+    let xVal = scales.realX.invert(point.cx.baseVal.value);
+    let yVal = scales.realPointY.invert(point.cy.baseVal.value);
+    if(Math.abs(xVal) > 1000000 || Math.abs(yVal) < 1)
+    {
+      xVal = xVal.toPrecision(3);
+    }
+    if(Math.abs(yVal) > 1000000 || Math.abs(yVal) < 1)
+    {
+      yVal = yVal.toPrecision(3);
+    }
+    var text_x = 'X: ' + xVal;
+    var text_y = 'Y: ' + yVal;
     var containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
     var containerHeight = parseInt(d3.select(el).select('.inner-svg').attr('height'));
-    var w = 70;
+    var w = 85;
     var h = 38;
     var x = (mouse[0] + w) > containerWidth ? mouse[0] - w - 5 : mouse[0] + 5;
     var y = (mouse[1] + h) > containerHeight ? mouse[1] - h - 14 : mouse[1] + 14;
@@ -878,7 +892,7 @@ var TransformChart = {
     {
       return;
     }
-    d3.selectAll('foreignObject').remove();
+    d3.select(el).selectAll('foreignObject').remove();
     d3.selectAll('.transform-tooltip').remove();
 
     var containerWidth = parseFloat(d3.select(el).select('.inner-svg').attr('width'));
