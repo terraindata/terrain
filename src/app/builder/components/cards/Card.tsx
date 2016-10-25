@@ -186,7 +186,7 @@ class _Card extends PureClasss<Props>
     
     if(card.static.getNeighborTerms)
     {
-      terms = terms.merge(card.static.getNeighborTerms(card));
+      terms = terms.concat(card.static.getNeighborTerms(card)).toList();
     }
     
     return terms;
@@ -212,7 +212,7 @@ class _Card extends PureClasss<Props>
     if(this.props.keys !== nextProps.keys || changed)
     {
       changed = true;
-      allTerms = nextProps.keys.merge(cardTerms);
+      allTerms = nextProps.keys.concat(cardTerms).toList();
     }
     
     
