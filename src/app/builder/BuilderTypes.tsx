@@ -1051,11 +1051,8 @@ export module BuilderTypes
     }),
     
     
-    
-    
     bar: _block(
     {
-      id: "",
       count: 0,
       percentage: 0,
       range: {
@@ -1070,7 +1067,6 @@ export module BuilderTypes
     
     scorePoint: _block(
     {
-      id: "",
       value: 0,
       score: 0,
       
@@ -1115,7 +1111,7 @@ export module BuilderTypes
                 make(Blocks.scorePoint, {
                   id: "a",
                   value: 0,
-                  score: 0.5,
+                  score: 0.0,
                 }),
                 make(Blocks.scorePoint, {
                 id: "b",
@@ -1125,7 +1121,7 @@ export module BuilderTypes
                 make(Blocks.scorePoint, {
                   id: "c",
                   value: 100,
-                  score: 0.5,
+                  score: 1.0,
                 }),
               ]),
           }

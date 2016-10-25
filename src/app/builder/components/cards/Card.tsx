@@ -421,7 +421,7 @@ class _Card extends PureClasss<Props>
     {
       this.renderTimeout = setTimeout(() => {
         this.setState({random: Math.random()});
-      }, 5);
+      }, 15);
       
       return (
         <div

@@ -47,15 +47,18 @@ let {Map, List} = Immutable;
 import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../data/BuilderActions.tsx";
+import BuilderStore from "../../data/BuilderStore.tsx";
 import Util from '../../../util/Util.tsx';
+import Ajax from '../../../util/Ajax.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import TransformCardChart from './TransformCardChart.tsx';
 import TransformCardPeriscope from './TransformCardPeriscope.tsx';
 
+const NUM_BARS = 1000;
+
 interface Props
 {
-  key: string;
   keyPath: KeyPath;
   data: any; // transform card
   
@@ -63,11 +66,25 @@ interface Props
   spotlights?: any;  
 }
 
+export interface Bar
+{
+  id: string;
+  count: number;
+  percentage: number; // of max
+  range:
+  {
+    min: number;
+    max: number;
+  }
+}
+export type Bars = List<Bar>;
+
 class TransformCard extends PureClasss<Props>
 {
   state: {
     domain: List<number>;
     range: List<number>;
+    bars: Bars;
   };
   
   constructor(props:Props)
@@ -76,7 +93,145 @@ class TransformCard extends PureClasss<Props>
     this.state = {
       domain: List(props.data.domain as number[]),
       range: List([0,1]),
+      bars: List([]),
     };
+    this.computeBars(props.data.input);
+  }
+  
+  componentWillReceiveProps(nextProps:Props)
+  {
+    if(nextProps.data.input !== this.props.data.input)
+    {
+      this.computeBars(nextProps.data.input);
+    }
+  }
+  
+  findTableForAlias(data:BuilderTypes.IBlock | List<BuilderTypes.IBlock>, alias:string): string
+  {
+    if(Immutable.List.isList(data))
+    {
+      let list = data as List<BuilderTypes.IBlock>;
+      for(let i = 0; i < list.size; i ++)
+      {
+        let table = this.findTableForAlias(list.get(i), alias);
+        if(table)
+        {
+          return table;
+        }
+      }
+      return null;
+    }
+    
+    if(data['type'] === 'table' && data['alias'] === alias)
+    {
+      return data['table'];
+    }
+    
+    let keys = data.keys();
+    let i = keys.next();
+    while(!i.done)
+    {
+      let value = data[i.value];
+      if(Immutable.Iterable.isIterable(value))
+      {
+        let table = this.findTableForAlias(value, alias);
+        if(table)
+        {
+          return table;
+        }
+      }
+      i = keys.next();
+    }
+  }
+  
+  computeBars(input:string)
+  {
+    if(!input)
+    {
+      return;
+    }
+    // TODO: cache somewhere
+    let parts = input.split('.');
+    if(parts.length === 2)
+    {
+      let alias = parts[0];
+      let field = parts[1];
+      let queryKeyPath = this.props.keyPath.skipLast(this.props.keyPath.size - 2);
+      let query = BuilderStore.getState().getIn(queryKeyPath.toList());
+      let db = query.db;
+      let cards = query.cards;
+      
+      let table = this.findTableForAlias(cards, alias);
+      
+      if(table)
+      {
+        Ajax.query(
+          `SELECT ${field} as value FROM ${table} LIMIT 1000;`, // alias to catch any weird renaming
+          db,
+          this.handleQueryResults,
+          this.handleQueryError
+        );
+      }
+    }
+  }
+  
+  handleQueryResults(results: {value: any}[])
+  {
+    if(results.length)
+    {
+      let max = +results[0].value;
+      let min = +results[0].value;
+      results.map(v =>
+      {
+        let val = +v.value;
+        if(val > max)
+        {
+          max = val;
+        }
+        if(val < min)
+        {
+          min = val;
+        }
+      });
+      
+      let bars: Bar[] = [];
+      for(let j = 0; j < NUM_BARS; j ++)
+      {
+        bars.push({
+          id: "" + j,
+          count: 0,
+          percentage: 0,
+          range: {
+            min: min + (max - min) * j / NUM_BARS,
+            max: min + (max - min) * (j + 1) / NUM_BARS,
+          }
+        });
+      }
+      
+      results.map(v =>
+      {
+        let val = +v.value;
+        let i = Math.floor((val - min) / (max - min) * NUM_BARS);
+        if(i === NUM_BARS)
+        {
+          i = NUM_BARS - 1;
+        }
+        
+        bars[i].count ++;
+        bars[i].percentage += 1 / NUM_BARS;
+      });
+      
+      this.setState({
+        bars: List(bars),
+        domain: List([min, max]),
+        // range: List([min, max]),
+      });
+    }
+  }
+  
+  handleQueryError(error: any)
+  {
+    console.log('Transform card query error', error);
   }
   
   handleDomainChange(domain: List<number>)
@@ -99,7 +254,7 @@ class TransformCard extends PureClasss<Props>
         <TransformCardChart
           canEdit={this.props.canEdit}
           points={data.scorePoints}
-          bars={data.bars}
+          bars={this.state.bars}
           domain={this.state.domain}
           range={this.state.range}
           spotlights={this.props.spotlights}
