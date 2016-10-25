@@ -478,6 +478,7 @@ export module BuilderTypes
     'distinct',
     'score',
     'transform',
+    'sfw',
   ]);
 
   // The BuildingBlocks
