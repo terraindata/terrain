@@ -98,10 +98,12 @@ class TransformCard extends PureClasss<Props>
     this.computeBars(props.data.input);
   }
   
+  updateDomain: boolean = false;
   componentWillReceiveProps(nextProps:Props)
   {
     if(nextProps.data.input !== this.props.data.input)
     {
+      this.updateDomain = true;
       this.computeBars(nextProps.data.input);
     }
   }
@@ -146,7 +148,7 @@ class TransformCard extends PureClasss<Props>
   
   computeBars(input:string)
   {
-    if(!input)
+    if(!input || typeof input !== 'string')
     {
       return;
     }
@@ -166,7 +168,7 @@ class TransformCard extends PureClasss<Props>
       if(table)
       {
         Ajax.query(
-          `SELECT ${field} as value FROM ${table} LIMIT 1000;`, // alias to catch any weird renaming
+          `SELECT ${field} as value FROM ${table};`, // alias to catch any weird renaming
           db,
           this.handleQueryResults,
           this.handleQueryError
@@ -221,11 +223,18 @@ class TransformCard extends PureClasss<Props>
         bars[i].percentage += 1 / NUM_BARS;
       });
       
+      let domain = List([min, max]);
       this.setState({
         bars: List(bars),
-        domain: List([min, max]),
+        domain,
         // range: List([min, max]),
       });
+      
+      if(this.updateDomain)
+      {
+        console.log('ud', domain, this.props.keyPath.set(this.props.keyPath.size - 1, 'domain'));
+        Actions.change(this.props.keyPath.set(this.props.keyPath.size - 1, 'domain'), domain);
+      }
     }
   }
   
@@ -263,7 +272,7 @@ class TransformCard extends PureClasss<Props>
         />
         <TransformCardPeriscope
           onDomainChange={this.handleDomainChange}
-          barsData={data.bars}
+          barsData={this.state.bars}
           domain={this.state.domain}
           range={this.state.range}
           maxDomain={data.domain}

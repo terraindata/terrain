@@ -91,6 +91,15 @@ class TransformCardPeriscope extends PureClasss<Props>
     Periscope.create(el, chartState.toJS());
   }
   
+  componentWillReceiveProps(nextProps:Props)
+  {
+    if(this.shouldComponentUpdate(nextProps, this.state))
+    {
+      console.log(nextProps.maxDomain);
+      this.update(nextProps);
+    }
+  }
+  
   update(overrideState?)
   {
     var el = ReactDOM.findDOMNode(this);
@@ -128,18 +137,20 @@ class TransformCardPeriscope extends PureClasss<Props>
     });
   }
   
-  getChartState(overrideState?): Map<string, any>
+  getChartState(overrideState = {}): Map<string, any>
   {
+    console.log(overrideState);
+    console.log((overrideState['maxDomain'] || this.props.maxDomain).toJS());
     var chartState = Map({
-      barsData: this.props.barsData.toJS(),
-      maxDomain: this.props.maxDomain,
+      barsData: (overrideState['barsData'] || this.props.barsData).toJS(),
+      maxDomain: (overrideState['maxDomain'] || this.props.maxDomain),
       domain: {
-        x: (overrideState && overrideState.domain && overrideState.domain.toJS()) || this.props.domain.toJS(),
-        y: this.props.range.toJS(),
+        x: (overrideState['domain'] || this.props.domain).toJS(),
+        y: (overrideState['range'] || this.props.range).toJS(),
       },
       onDomainChange: this.handleDomainChange,
       onDomainChangeStart: this.handleDomainChangeStart,
-      width: overrideState.width || this.state.width,
+      width: (overrideState && overrideState['width']) || this.state.width,
       height: 60,
     });
     
