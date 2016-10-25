@@ -329,25 +329,30 @@ class ResultsArea extends PureClasss<Props>
   {
     if(results)
     {
+      console.log('rl', results.length);
       if(results.length === 1)
       {
+        console.log(results[0]['count(*)']);
         this.setState({
           resultsCount: results[0]['count(*)']
         });
       }
       else if(results.length > 1)
       {
+        console.log(results.length);
         this.setState({
           resultsCount: results.length,
         })
       }
       else
       {
+        console.log('e1');
         this.handleCountError();
       }
     }
     else
     {
+      console.log('e2');
       this.handleCountError();
     }
   }
@@ -411,7 +416,6 @@ class ResultsArea extends PureClasss<Props>
         
         this.setState({
           results,
-          resultsCount,
           resultType: 'rel',
           querying: false,
           error: false,
