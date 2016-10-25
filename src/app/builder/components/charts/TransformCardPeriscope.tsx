@@ -95,7 +95,6 @@ class TransformCardPeriscope extends PureClasss<Props>
   {
     if(this.shouldComponentUpdate(nextProps, this.state))
     {
-      console.log(nextProps.maxDomain);
       this.update(nextProps);
     }
   }
@@ -139,8 +138,6 @@ class TransformCardPeriscope extends PureClasss<Props>
   
   getChartState(overrideState = {}): Map<string, any>
   {
-    console.log(overrideState);
-    console.log((overrideState['maxDomain'] || this.props.maxDomain).toJS());
     var chartState = Map({
       barsData: (overrideState['barsData'] || this.props.barsData).toJS(),
       maxDomain: (overrideState['maxDomain'] || this.props.maxDomain),
