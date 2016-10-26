@@ -311,7 +311,7 @@ export const Ajax = {
       {
         try
         {
-          let cols = JSON.parse(resp);
+          let cols = JSON.parse(resp).result;
           var tables: {[name:string]: {name: string; columns: any[];}} = {};
           
           cols.map(
@@ -352,7 +352,7 @@ export const Ajax = {
       try
       {
         var list = JSON.parse(resp);
-        onLoad(list.map(obj => obj.schema_name));
+        onLoad(list.result.map(obj => obj.schema_name));
       }
       catch(e)
       {

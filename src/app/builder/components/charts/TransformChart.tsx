@@ -1176,8 +1176,12 @@ var TransformChart = {
       .range([height - yMargin, 0])
       .domain(domain.y);
     
+    console.log(domain.x);
     var barsMax = barsData.reduce((max, bar) =>
-      (max === false || bar.percentage > max ? bar.percentage : max)
+      (
+        (max === false || bar.percentage > max) && (bar.range.max >= domain.x[0] || bar.range.min <= domain.x[1])
+        ? bar.percentage : max
+      )
       , false);
     barsMax = (Math.floor(barsMax * 100) + 1) / 100;
     
