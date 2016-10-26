@@ -13,11 +13,16 @@ input[type=number]::-webkit-outer-spin-button {
   margin: 0; 
 }
 
-.point-edit-menu {
-  width: 70px;
-  background: #14849f;
-  border-radius: 6px;
-  padding: 4px 8px 6px 8px;
+.transform-chart-wrapper {
+  position: relative;
+  
+  .point-edit-menu {
+    position: absolute;
+    width: 70px;
+    background: #14849f;
+    border-radius: 6px;
+    padding: 4px 8px 6px 8px;
+    
     input {
       margin-top: 2px;
       margin-left: 2px;
@@ -27,19 +32,22 @@ input[type=number]::-webkit-outer-spin-button {
       background-color: #c6ebf0;
       color: #14849f;
     }
+    
     label {
       color: white;
       font-size: 14px;
       margin-right: 1px;
     }
   }
+}
+
 
 
 .transform-chart {
   width: 100%;
   height: auto;
   max-width: 700px;
-  margin: @standard-margin 0px;
+  // margin: @standard-margin 0px;
   
   .bg {
     fill: @bg;

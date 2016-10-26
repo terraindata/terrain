@@ -51,7 +51,12 @@ import UserTypes from './../users/UserTypes.tsx';
 import RoleTypes from './../roles/RoleTypes.tsx';
 import Util from './../util/Util.tsx';
 
-var Ajax = {
+export interface QueryResponse
+{
+  result: any[], total_rows: number, error: string
+}
+
+export const Ajax = {
   _req(method: string, url: string, data: any, onLoad: (response: any) => void, config:
     {
       onError?: (response: any) => void,
@@ -273,7 +278,7 @@ var Ajax = {
     return Ajax._req("POST", `/${type}s/${id}`, JSON.stringify(obj), onLoad, onError);
   },
   
-	query(tql: string, db: string, onLoad: (response: any) => void, onError?: (ev:Event) => void, sqlQuery?: boolean)
+	query(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev:Event) => void, sqlQuery?: boolean)
   {
     // kill queries running under the same id
     Ajax.killQueries(); // TODO add id

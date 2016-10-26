@@ -48,7 +48,7 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import Util from '../../../util/Util.tsx';
-import Ajax from '../../../util/Ajax.tsx';
+import {Ajax, QueryResponse} from '../../../util/Ajax.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
 import Actions from "../../data/BuilderActions.tsx";
 import Result from "../results/Result.tsx";
@@ -121,7 +121,7 @@ class ResultsArea extends PureClasss<Props>
   
   componentDidMount()
   {
-    this.queryResults(this.props.query);
+    this.QueryResponses(this.props.query);
   }
   
   componentWillUnmount()
@@ -139,7 +139,7 @@ class ResultsArea extends PureClasss<Props>
   {
     if(!_.isEqual(nextProps.query, this.props.query))
     {
-      this.queryResults(nextProps.query);
+      this.QueryResponses(nextProps.query);
       
       if(this.state.onResultsLoaded)
       {
@@ -229,7 +229,7 @@ class ResultsArea extends PureClasss<Props>
         onResultsLoaded(reachedEnd)
       , 250);
     }
-    // this.queryResults(this.props.query, pages);
+    // this.QueryResponses(this.props.query, pages);
   }
   
   resultsFodderRange = _.range(0, 25);
@@ -320,39 +320,35 @@ class ResultsArea extends PureClasss<Props>
     );
   }
   
-  handleAllFieldsResponse(results:any)
+  handleAllFieldsResponse(response:QueryResponse)
   {
-    this.handleResultsChange(results, true);
+    this.handleResultsChange(response, true);
   }
   
-  handleCountResponse(results:any)
+  handleCountResponse(response:QueryResponse)
   {
+    let results = response.result;
     if(results)
     {
-      console.log('rl', results.length);
       if(results.length === 1)
       {
-        console.log(results[0]['count(*)']);
         this.setState({
           resultsCount: results[0]['count(*)']
         });
       }
       else if(results.length > 1)
       {
-        console.log(results.length);
         this.setState({
           resultsCount: results.length,
         })
       }
       else
       {
-        console.log('e1');
         this.handleCountError();
       }
     }
     else
     {
-      console.log('e2');
       this.handleCountError();
     }
   }
@@ -366,25 +362,27 @@ class ResultsArea extends PureClasss<Props>
   
   timeout = null;
   
-  handleResultsChange(results, isAllFields?: boolean)
+  handleResultsChange(response:QueryResponse, isAllFields?: boolean)
   {
     let xhrKey = isAllFields ? 'allXhr' : 'xhr';
     if(!this[xhrKey]) return;
     this[xhrKey] = null;
     
-    if(results)
+    if(response)
     {
-      if(results.error)
+      if(response.error)
       {
         if(!isAllFields)
         {
           this.setState({
-            error: results.error.substr(0, results.error.length - 1),
+            error: response.error.substr(0, response.error.length - 1),
           });
         }
         this.props.onLoadEnd && this.props.onLoadEnd();
         return;
       }
+      
+      let results = response.result;
       
       var resultsCount = results.length;
       if(resultsCount > MAX_RESULTS)
@@ -449,7 +447,7 @@ class ResultsArea extends PureClasss<Props>
     this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
-  queryResults(query, pages?: number)
+  QueryResponses(query, pages?: number)
   {
     if(!pages)
     {

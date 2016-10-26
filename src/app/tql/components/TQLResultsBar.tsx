@@ -47,7 +47,7 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import Util from '../../util/Util.tsx';
-import Ajax from '../../util/Ajax.tsx';
+import {Ajax, QueryResponse} from '../../util/Ajax.tsx';
 import Actions from "../../builder/data/BuilderActions.tsx";
 import TQLConverter from "../../tql/TQLConverter.tsx";
 import PureClasss from './../../common/components/PureClasss.tsx';
@@ -86,7 +86,7 @@ class TQLResultsBar extends PureClasss<Props>
   {
     if(nextProps.tql !== this.props.tql) 
     {
-      this.queryResults(nextProps.tql);
+      this.QueryResponses(nextProps.tql);
     } 
   }
     
@@ -174,32 +174,33 @@ class TQLResultsBar extends PureClasss<Props>
     );
   }
   
-  handleResultsChange(results)
+  handleResultsChange(response: QueryResponse)
   {
+    if(response.error)
+    {
+      let {error} = response;
+      let line = parseInt(error.match(/([0-9]+)\:[0-9]+/)[1]);
+      
+      this.setState({
+        error: error.substr(0, error.length - 1),
+        errorLine: line,
+        querying: false,
+        results: null,
+      });
+      return;
+    }
+    
+    let results = response.result as (any[] | string);
     this.props.onLoadEnd && this.props.onLoadEnd();
     if(results)
     {
-      if(results.error)
-      {
-        let {error} = results;
-        let line = parseInt(error.match(/([0-9]+)\:[0-9]+/)[1]);
-        
-        this.setState({
-          error: error.substr(0, error.length - 1),
-          errorLine: line,
-          querying: false,
-          results: null,
-        });
-        return;
-      }
-      
       var spliced = 0;
       if(typeof results === 'string')
       {
         if(results.length > 1000)
         {
           spliced = results.length - 1000;
-          results = results.substr(0, 1000) + '...';
+          results = results['substr'](0, 1000) + '...';
         }
       }
       if(Array.isArray(results))
@@ -236,7 +237,7 @@ class TQLResultsBar extends PureClasss<Props>
     });
   }
   
-  queryResults(tql)
+  QueryResponses(tql)
   {
     if(tql) 
     {

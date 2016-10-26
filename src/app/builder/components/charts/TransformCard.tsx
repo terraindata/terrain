@@ -49,7 +49,7 @@ import * as React from 'react';
 import Actions from "../../data/BuilderActions.tsx";
 import BuilderStore from "../../data/BuilderStore.tsx";
 import Util from '../../../util/Util.tsx';
-import Ajax from '../../../util/Ajax.tsx';
+import { Ajax, QueryResponse } from '../../../util/Ajax.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import TransformCardChart from './TransformCardChart.tsx';
@@ -172,15 +172,16 @@ class TransformCard extends PureClasss<Props>
         Ajax.query(
           `SELECT ${field} as value FROM ${table};`, // alias to catch any weird renaming
           db,
-          this.handleQueryResults,
+          this.handleQueryResponse,
           this.handleQueryError
         );
       }
     }
   }
   
-  handleQueryResults(results: {value: any}[])
+  handleQueryResponse(response: QueryResponse )
   {
+    let results = response.result;
     if(results.length)
     {
       let max = +results[0].value;
