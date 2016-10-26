@@ -278,7 +278,7 @@ var TransformChart = {
   {
     var yLeftAxis = d3.svg.axis()
       .scale(scales.pointY)
-      .ticks(height > 200 ? 10 : 5)
+      .ticks(height > 200 ? 8 : 5)
       .tickSize(scaleMin(scales.x) - scaleMax(scales.x), scaleMin(scales.x) - scaleMax(scales.x))
       .orient("left");
     d3.select(el).select('.yLeftAxis')
@@ -287,7 +287,7 @@ var TransformChart = {
     
     var yRightAxis = d3.svg.axis()
       .scale(scales.barY)
-      .ticks(height > 200 ? 10 : 5)
+      .ticks(height > 200 ? 8 : 5)
       .tickSize(0, 0)
       .tickFormat(d3.format(" <-.2p")) // try '%' if more precision is needed
       .orient("right");
@@ -1176,14 +1176,13 @@ var TransformChart = {
       .range([height - yMargin, 0])
       .domain(domain.y);
     
-    console.log(domain.x);
     var barsMax = barsData.reduce((max, bar) =>
       (
-        (max === false || bar.percentage > max) && (bar.range.max >= domain.x[0] || bar.range.min <= domain.x[1])
+        (max === false || bar.percentage > max) && (bar.range.max >= domain.x[0] && bar.range.min <= domain.x[1])
         ? bar.percentage : max
       )
       , false);
-    barsMax = (Math.floor(barsMax * 100) + 1) / 100;
+    barsMax = barsMax * 1.1;
     
     var barY = d3.scale.linear()
       .range([height, yMargin])
