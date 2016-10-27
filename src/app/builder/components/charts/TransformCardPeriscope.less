@@ -1,0 +1,28 @@
+.tp-text-wrapper {
+  position: relative;
+  height: 20px;
+  margin-top: -20px;
+  
+  .tp-tb-left,
+  .tp-tb-right {
+    position: absolute;
+    bottom: -2px;
+    width: calc(~"(100% - 80px) / 2 - 3px");
+    max-width: 80px;
+    
+    input {
+      height: 20px;
+    }
+  }
+  
+  .tp-tb-left {
+    left: 0px;
+  }
+  
+  .tp-tb-right {
+    right: 0px;
+    input {
+      text-align: right;
+    }
+  }
+}

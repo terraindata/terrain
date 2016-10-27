@@ -1088,7 +1088,13 @@ export module BuilderTypes
         manualEntry: ManualConfig.cards['transform'],
         colors: ["#559dcf", "#c0e0f3"],
         title: "Transform",
-        preview: "[input]",
+        preview: (card:any) => {
+          if(card.input._isCard)
+          {
+            return 'Transform ' + getPreview(card.input);
+          }
+          return 'Transform ' + card.input;
+        },
         tql: "linear_transform($input, $scorePoints)",
         display: [
           {

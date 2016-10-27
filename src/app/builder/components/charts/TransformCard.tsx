@@ -109,6 +109,20 @@ class TransformCard extends PureClasss<Props>
       this.updateDomain = true;
       this.computeBars(nextProps.data.input);
     }
+    
+    if(nextProps.data.domain !== this.props.data.domain)
+    {
+      let {domain} = this.state;
+      let low = nextProps.data.domain.get(0);
+      let high = nextProps.data.domain.get(1);
+      var buffer = (high - low) * 0.02;
+      this.setState({
+        domain: List([
+          Util.valueMinMax(domain.get(0), low, high - buffer),
+          Util.valueMinMax(domain.get(1), low + buffer, high),
+        ]),
+      })
+    }
   }
   
   findTableForAlias(data:BuilderTypes.IBlock | List<BuilderTypes.IBlock>, alias:string): string
@@ -332,7 +346,6 @@ class TransformCard extends PureClasss<Props>
   render()
   {
     let {data} = this.props;
-    console.log(this.props.keyPath.toJS());
     return (
       <div className='transform-card'>
         <TransformCardChart
