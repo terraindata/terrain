@@ -51,8 +51,9 @@ var Redux = require('redux');
 export class BuilderScrollStateClass
 {
   columnTop: number = 0;
-  columnEnd: number = 0;
+  columnHeight: number = 0;
   columnScroll: number = 0;
+  totalHeight: number = 0;
 }
 export interface BuilderScrollState extends BuilderScrollStateClass, IMap<BuilderScrollState> {}
 let BuilderScrollState_Record = Immutable.Record(new BuilderScrollStateClass());
@@ -68,8 +69,9 @@ interface BuilderScrollAction
   payload: 
   {
     columnTop: number;
-    columnEnd: number;
+    columnHeight: number;
     columnScroll: number;
+    totalHeight: number;
   }
 }
 
@@ -78,14 +80,18 @@ export const BuilderScrollStore: IStore<BuilderScrollState> = Redux.createStore(
     scroll: 
       (state: BuilderScrollState, action: BuilderScrollAction) =>
       {
-        let {columnTop, columnEnd, columnScroll} = action.payload;
+        let {columnTop, columnHeight, columnScroll, totalHeight} = action.payload;
         
-        if(columnTop !== state.columnTop || columnEnd !== state.columnEnd || columnScroll !== state.columnScroll)
+        if(
+          columnTop !== state.columnTop || columnHeight !== state.columnHeight 
+          || columnScroll !== state.columnScroll || totalHeight !== state.totalHeight
+        )
         {
           return state
             .set('columnTop', columnTop)
-            .set('columnEnd', columnEnd)
-            .set('columnScroll', columnScroll);
+            .set('columnHeight', columnHeight)
+            .set('columnScroll', columnScroll)
+            .set('totalHeight', totalHeight);
         }
         
         return state;
@@ -93,15 +99,16 @@ export const BuilderScrollStore: IStore<BuilderScrollState> = Redux.createStore(
   }), 
 DefaultState);
 
-export function scrollAction(columnTop: number, columnEnd: number, columnScroll: number)
+export function scrollAction(columnTop: number, columnHeight: number, columnScroll: number, totalHeight: number)
 {
   BuilderScrollStore.dispatch({
     type: 'scroll',
     payload:
     {
       columnTop,
-      columnEnd,
+      columnHeight,
       columnScroll,
+      totalHeight,
     }
   })
 }

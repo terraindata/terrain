@@ -386,9 +386,9 @@ class _Card extends PureClasss<Props>
     this.cardEl = document.getElementById(this.props.card.id); // memoize?
     if(this.cardEl)
     {
-      let {columnTop, columnEnd, columnScroll} = this.state.scrollState;
+      let {columnTop, columnHeight, columnScroll} = this.state.scrollState;
       let visibleStart = columnScroll - CARD_OVERSCAN;
-      let visibleEnd = columnScroll + (columnEnd - columnTop) + CARD_OVERSCAN;
+      let visibleEnd = columnScroll + columnHeight + CARD_OVERSCAN;
       
       let cardStart = 0;
       let el = this.cardEl;

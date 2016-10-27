@@ -591,6 +591,7 @@ export module BuilderTypes
                 help: ManualConfig.help["select-field"],
                 key: 'field',
                 accepts: acceptsAggregates.push('as'),
+                showWhenCards: true,
               },
               below:
               {
@@ -598,7 +599,7 @@ export module BuilderTypes
                 key: 'field',
                 accepts: acceptsAggregates.push('as'),
               },
-              hideToolsWhenNotString: true,
+              // hideToolsWhenNotString: true,
             },
           },
           

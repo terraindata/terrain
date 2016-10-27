@@ -156,9 +156,11 @@ class CardsColumn extends PureClasss<Props>
   
   handleScroll()
   {
+    // TODO improve make faster
     let el = $('#cards-column');
     let start = el.offset().top;
-    scrollAction(start, start + el.height(), el.scrollTop());
+    let totalHeight = $('#cards-column-inner').height();
+    scrollAction(start, el.height(), el.scrollTop(), totalHeight);
   }
   
   render()
@@ -182,43 +184,47 @@ class CardsColumn extends PureClasss<Props>
           onScroll={this.handleScroll}
           id='cards-column'
         >
-          <CardDropArea
-            half={true}
-            index={0}
-            keyPath={keyPath}
-            height={12}
-            accepts={_topLevelAccepts}
-          />
-          <CardDropArea
-            half={true}
-            lower={true}
-            index={cards.size}
-            keyPath={keyPath}
-            heightOffset={12}
-            accepts={_topLevelAccepts}
-          />
-          <CardsArea 
-            cards={cards}
-            keyPath={keyPath}
-            spotlights={this.props.spotlights} 
-            keys={this.props.keys}
-            canEdit={canEdit}
-            addColumn={this.props.addColumn}
-            columnIndex={this.props.columnIndex}
-            noCardTool={true}
-            accepts={_topLevelAccepts}
-          />
-          {
-            !cards.size ? 
-              <InfoArea
-                large="No cards have been created, yet."
-                small={canEdit && "Create one below. Most people start with the Select/From card."}
-                button={canEdit && "Create a Select/From card"}
-                onClick={this.createFromCard}
-                inline={true}
-              />
-            : null
-          }
+          <div
+            id='cards-column-inner'
+          >
+            <CardDropArea
+              half={true}
+              index={0}
+              keyPath={keyPath}
+              height={12}
+              accepts={_topLevelAccepts}
+            />
+            <CardDropArea
+              half={true}
+              lower={true}
+              index={cards.size}
+              keyPath={keyPath}
+              heightOffset={12}
+              accepts={_topLevelAccepts}
+            />
+            <CardsArea 
+              cards={cards}
+              keyPath={keyPath}
+              spotlights={this.props.spotlights} 
+              keys={this.props.keys}
+              canEdit={canEdit}
+              addColumn={this.props.addColumn}
+              columnIndex={this.props.columnIndex}
+              noCardTool={true}
+              accepts={_topLevelAccepts}
+            />
+            {
+              !cards.size ? 
+                <InfoArea
+                  large="No cards have been created, yet."
+                  small={canEdit && "Create one below. Most people start with the Select/From card."}
+                  button={canEdit && "Create a Select/From card"}
+                  onClick={this.createFromCard}
+                  inline={true}
+                />
+              : null
+            }
+          </div>
         </div>
         <div
           className='cards-deck-knob'
