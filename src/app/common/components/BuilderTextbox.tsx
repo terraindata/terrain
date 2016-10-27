@@ -68,7 +68,7 @@ var CloseIcon = require("./../../../images/icon_close.svg");
 
 interface Props
 {
-  value: BuilderTypes.CardString;
+  value: BuilderTypes.CardString | number;
   keyPath: KeyPath; // keypath of value
   
   id?: string; // TODO remove
@@ -163,6 +163,11 @@ class BuilderTextbox extends PureClasss<Props>
   // throttled event handler
   executeChange(value)
   {
+    if(this.props.isNumber)
+    {
+      value = +value;
+    }
+    
     Actions.change(this.props.keyPath, value);
   }
   
@@ -242,11 +247,6 @@ class BuilderTextbox extends PureClasss<Props>
   
   render()
   {
-    if(this.props.value && this.props.value['type'] === 'creating')
-    {
-      return null;
-    }
-    
     if(this.isText())
     {
       const { isOverCurrent, connectDropTarget, placeholder } = this.props;

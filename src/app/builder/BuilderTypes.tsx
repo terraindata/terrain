@@ -1092,15 +1092,22 @@ export module BuilderTypes
         tql: "linear_transform($input, $scorePoints)",
         display: [
           {
-            displayType: DisplayType.TEXT,
+            displayType: DisplayType.CARDTEXT,
             help: ManualConfig.help["input"],
             key: 'input',
             placeholder: 'Input field',
+            accepts: List(['score', 'sfw']),
+            showWhenCards: true,
+          },
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'input',
+            accepts: List(['score', 'sfw']),
           },
           {
             displayType: DisplayType.COMPONENT,
             component: TransformCardComponent,
-            key: 'scorePoints',
+            key: null,
             help: ManualConfig.help["scorePoints"],
           },
         ],
@@ -1234,10 +1241,15 @@ export module BuilderTypes
       }
     }),
     
-    creating: _block( // a placeholder for when a card is being created
+    creating: _card( // a placeholder for when a card is being created
     {
       static: {
         tql: "",
+        title: 'New Card',
+        colors: ['#777', '#777'],
+        preview: '',
+        display: null,
+        manualEntry: null,
       },
     }),
   }

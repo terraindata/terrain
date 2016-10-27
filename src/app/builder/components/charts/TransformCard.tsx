@@ -53,6 +53,7 @@ import { Ajax, QueryResponse } from '../../../util/Ajax.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import TransformCardChart from './TransformCardChart.tsx';
+import TQLConverter from '../../../tql/TQLConverter.tsx';
 
 const NUM_BARS = 1000;
 // const NUM_RESULTS = 
@@ -131,52 +132,123 @@ class TransformCard extends PureClasss<Props>
       return data['table'];
     }
     
-    let keys = data.keys();
-    let i = keys.next();
-    while(!i.done)
+    if(Immutable.Iterable.isIterable(data))
     {
-      let value = data[i.value];
-      if(Immutable.Iterable.isIterable(value))
+      let keys = data.keys();
+      let i = keys.next();
+      while(!i.done)
       {
-        let table = this.findTableForAlias(value, alias);
-        if(table)
+        let value = data[i.value];
+        if(Immutable.Iterable.isIterable(value))
         {
-          return table;
+          let table = this.findTableForAlias(value, alias);
+          if(table)
+          {
+            return table;
+          }
         }
+        i = keys.next();
       }
-      i = keys.next();
     }
+    return null;
   }
   
-  computeBars(input:string)
+  computeBars(input: BuilderTypes.CardString)
   {
-    if(!input || typeof input !== 'string')
+    if(typeof input === 'string')
     {
-      return;
+      // TODO: cache somewhere
+      let parts = input.split('.');
+      if(parts.length === 2)
+      {
+        let alias = parts[0];
+        let field = parts[1];
+        let queryKeyPath = this.props.keyPath.skipLast(this.props.keyPath.size - 2);
+        let query = BuilderStore.getState().getIn(queryKeyPath.toList());
+        let db = query.db;
+        let cards = query.cards;
+        
+        let table = this.findTableForAlias(cards, alias);
+        
+        if(table)
+        {
+          Ajax.query(
+            `SELECT ${field} as value FROM ${table};`, // alias select as 'value' to catch any weird renaming
+            db,
+            this.handleQueryResponse,
+            this.handleQueryError
+          );
+          return;
+        }
+      }
     }
-    // TODO: cache somewhere
-    let parts = input.split('.');
-    if(parts.length === 2)
+    else if(input && input._isCard)
     {
-      let alias = parts[0];
-      let field = parts[1];
       let queryKeyPath = this.props.keyPath.skipLast(this.props.keyPath.size - 2);
       let query = BuilderStore.getState().getIn(queryKeyPath.toList());
       let db = query.db;
       let cards = query.cards;
       
-      let table = this.findTableForAlias(cards, alias);
-      
-      if(table)
+      let card = input as BuilderTypes.ICard;
+      if(card.type === 'score' && card['weights'].size)
       {
-        Ajax.query(
-          `SELECT ${field} as value FROM ${table};`, // alias to catch any weird renaming
-          db,
-          this.handleQueryResponse,
-          this.handleQueryError
-        );
+        // only case we know how to handle so far is a score card with a bunch of fields
+        //  that all come from the same table
+        let finalTable: string = '';
+        let finalAlias: string = '';
+        card['weights'].map((weight) =>
+        {
+          if(finalTable === null)
+          {
+            return; // already broke
+          }
+          
+          let key = weight.get('key');
+          if(typeof key === 'string')
+          {
+            let parts = key.split('.');
+            if(parts.length === 2)
+            {
+              let alias = parts[0];
+              if(finalAlias === '')
+              {
+                finalAlias = alias;
+              }
+              if(alias === finalAlias)
+              {
+                let table = this.findTableForAlias(cards, alias);
+                if(!finalTable.length)
+                {
+                  finalTable = table;
+                }
+                if(finalTable === table)
+                {
+                  return; // so far so good, continue
+                }
+              }
+            }
+          }
+          
+          finalTable = null; // Not good, abort!
+        });
+        
+        if(finalTable)
+        {
+          // convert the score to TQL, do the query
+          Ajax.query(
+            `SELECT ${TQLConverter._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
+            db,
+            this.handleQueryResponse,
+            this.handleQueryError
+          );
+        }
       }
+      
+      // TODO, or something
     }
+    this.setState({
+      bars: List([]), // no can do get bars sadly, need to figure it out one day
+    });
   }
   
   handleQueryResponse(response: QueryResponse )
@@ -235,7 +307,7 @@ class TransformCard extends PureClasss<Props>
       
       if(this.updateDomain)
       {
-        Actions.change(this.props.keyPath.set(this.props.keyPath.size - 1, 'domain'), domain);
+        Actions.change(this._ikeyPath(this.props.keyPath, 'domain'), domain);
       }
     }
   }
@@ -254,12 +326,13 @@ class TransformCard extends PureClasss<Props>
   
   handleUpdatePoints(points)
   {
-    Actions.change(this.props.keyPath, points);
+    Actions.change(this._ikeyPath(this.props.keyPath, 'scorePoints'), points);
   }
   
   render()
   {
     let {data} = this.props;
+    console.log(this.props.keyPath.toJS());
     return (
       <div className='transform-card'>
         <TransformCardChart
@@ -278,6 +351,8 @@ class TransformCard extends PureClasss<Props>
           domain={this.state.domain}
           range={this.state.range}
           maxDomain={data.domain}
+          keyPath={this.props.keyPath}
+          canEdit={this.props.canEdit}
         />
       </div>
     );

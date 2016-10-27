@@ -1538,7 +1538,7 @@ declare module d3 {
 
             ticks(count?: number): number[];
 
-            tickFormat(count?: number, format?: string): (n: number) => string;
+            tickFormat(count?: number, format?: (string | ((value: number, index: number) => string))): (n: number) => string;
 
             copy(): Identity;
         }
@@ -2599,7 +2599,7 @@ declare module d3 {
             tickPadding(padding: number): Axis;
 
             tickFormat(): (t: any) => string;
-            tickFormat(format: (t: any) => string): Axis;
+            tickFormat(format: (t: any, i: any) => string): Axis;
             tickFormat(format:string): Axis;
         }
 

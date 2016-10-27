@@ -48,6 +48,7 @@ import * as d3 from 'd3';
 import Util from '../../../util/Util.tsx';
 
 var xMargin = 45;
+// var yMargin = 15;
 var yMargin = 15;
 
 var scaleMin = (scale) => scale.range()[0];
@@ -57,6 +58,8 @@ var Periscope = {
   
   create(el, state)
   {
+    d3.select(el).attr('class', 'periscope-wrapper');
+    
     var svg = d3
       .select(el)
       .append('svg')
@@ -118,6 +121,13 @@ var Periscope = {
       .scale(scales.x)
       .ticks(6)
       .tickSize(10)
+      // .tickFormat((t, i) => {
+      //   if(i === 0 || i >= 4)
+      //   {
+      //     return "";
+      //   }
+      //   return d3.format(".3g")(t);
+      // })
       .tickFormat(d3.format(".3g"))
       .orient("bottom");
     d3.select(el).select('.bottomAxis')

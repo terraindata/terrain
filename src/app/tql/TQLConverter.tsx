@@ -158,7 +158,7 @@ class TQLConverter
       ).join(glue)) + (options && options['excludeSuffix'] ? "" : glue);
   }
   
-  private static _parse(block: IBlock, index?: number, isLast?: boolean, isTop?: boolean): string
+  static _parse(block: IBlock, index?: number, isLast?: boolean, isTop?: boolean): string
   {
     let str = (isTop && block.static.topTql) || block.static.tql;
     var index = str.indexOf("$");

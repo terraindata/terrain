@@ -158,7 +158,7 @@ class BuilderComponent extends PureClasss<Props>
       ;
     }
     
-    let keyPath = this._ikeyPath(parentKeyPath, d.key);
+    let keyPath = d.key !== null ? this._ikeyPath(parentKeyPath, d.key) : parentKeyPath;
     let value = data.get(d.key);
     var isNumber = false, typeErrorMessage = null;
     var isTextbox = false;

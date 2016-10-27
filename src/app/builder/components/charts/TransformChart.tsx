@@ -278,7 +278,7 @@ var TransformChart = {
   {
     var yLeftAxis = d3.svg.axis()
       .scale(scales.pointY)
-      .ticks(height > 200 ? 8 : 5)
+      .ticks(height > 200 ? 10 : 5)
       .tickSize(scaleMin(scales.x) - scaleMax(scales.x), scaleMin(scales.x) - scaleMax(scales.x))
       .orient("left");
     d3.select(el).select('.yLeftAxis')
@@ -287,7 +287,7 @@ var TransformChart = {
     
     var yRightAxis = d3.svg.axis()
       .scale(scales.barY)
-      .ticks(height > 200 ? 8 : 5)
+      .ticks(height > 200 ? 10 : 5)
       .tickSize(0, 0)
       .tickFormat(d3.format(" <-.2p")) // try '%' if more precision is needed
       .orient("right");
@@ -298,7 +298,7 @@ var TransformChart = {
     // var bottomAxisTickFn: any = (tick, index: number): string => index == 0 || index == 10 ? "" : tick;
     var bottomAxis = d3.svg.axis()
       .scale(scales.x)
-      .ticks(width > 500 ? 10 : 5)
+      .ticks(width > 500 ? 6 : 4)
       .tickSize(-1 * scaleMin(scales.pointY) + scaleMax(scales.pointY), -1 * scaleMin(scales.pointY) + scaleMax(scales.pointY))
       .tickFormat(d3.format(".3g"))
       .orient("bottom");
@@ -749,7 +749,7 @@ var TransformChart = {
     var y = newY || scales.realPointY.invert(mouse[1]);
     var pos_y = scales.realPointY(y);
     var text_x = 'X:  ' + formatNumber(scales.realX.invert(x));
-    var text_y = 'Y:  ' + formatNumber(y); 
+    var text_y = 'Y:  ' + formatNumber(y);
     var w = 75;
     var h = 35;
     var containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
@@ -1206,11 +1206,16 @@ var TransformChart = {
 
 function formatNumber(n:number):string
 {
-  if(Math.abs(n) > 100000 || Math.abs(n) < 1)
+  var s = n + "";
+  if(s.length > 8)
   {
-    return n.toPrecision(3);
+    s = n.toPrecision(3);
   }
-  return n + "";
+  if(s.length > 8)
+  {
+    return s.substr(0, 5) + '...';
+  }
+  return s;
 }
 
 export default TransformChart;

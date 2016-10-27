@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./TransformCardPeriscope.less');
 import * as Immutable from 'immutable';
 let {Map, List} = Immutable;
 import * as _ from 'underscore';
@@ -53,6 +54,7 @@ import PureClasss from '../../../common/components/PureClasss.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
 import Periscope from './Periscope.tsx';
 import {Bar, Bars} from './TransformCard.tsx';
+import BuilderTextbox from '../../../common/components/BuilderTextbox.tsx';
 
 interface Props 
 {
@@ -61,6 +63,8 @@ interface Props
   domain: List<number>;
   range: List<number>;
   onDomainChange: (domain: List<number>) => void;
+  keyPath:KeyPath;
+  canEdit: boolean;
 }
 
 const MAX_BARS = 100;
@@ -80,6 +84,11 @@ class TransformCardPeriscope extends PureClasss<Props>
     initialVal: 0,
     bars: null,
   };
+  
+  refs: {
+    [k: string]: Ref;
+    chart: Ref;
+  }
   
   constructor(props:Props)
   {
@@ -118,7 +127,7 @@ class TransformCardPeriscope extends PureClasss<Props>
   
   componentDidMount()
   {
-    var el = ReactDOM.findDOMNode(this);
+    var el = ReactDOM.findDOMNode(this.refs.chart);
     var width = el.getBoundingClientRect().width;
     let chartState = this.getChartState({
       width,
@@ -149,7 +158,7 @@ class TransformCardPeriscope extends PureClasss<Props>
   
   update(overrideState?)
   {
-    var el = ReactDOM.findDOMNode(this);
+    var el = ReactDOM.findDOMNode(this.refs.chart);
     Periscope.update(el, this.getChartState(overrideState).toJS()); 
   }
   
@@ -196,7 +205,7 @@ class TransformCardPeriscope extends PureClasss<Props>
       onDomainChange: this.handleDomainChange,
       onDomainChangeStart: this.handleDomainChangeStart,
       width: (overrideState && overrideState['width']) || this.state.width,
-      height: 60,
+      height: 40,
     });
     
     return chartState;
@@ -204,14 +213,34 @@ class TransformCardPeriscope extends PureClasss<Props>
   
   componentWillUnmount()
   {
-    var el = ReactDOM.findDOMNode(this);
+    var el = ReactDOM.findDOMNode(this.refs.chart);
     Periscope.destroy(el);
   }
 
   render()
   {
     return (
-      <div></div>
+      <div className='transform-periscope-wrapper'>
+        <div ref='chart' />
+        
+        <div className='tp-text-wrapper'>
+          <BuilderTextbox
+            value={this.props.maxDomain.get(0)}
+            keyPath={this._ikeyPath(this.props.keyPath, 'domain', 0)}
+            isNumber={true}
+            className='tp-tb-left'
+            canEdit={this.props.canEdit}
+          />
+          <BuilderTextbox
+            value={this.props.maxDomain.get(1)}
+            keyPath={this._ikeyPath(this.props.keyPath, 'domain', 1)}
+            isNumber={true}
+            className='tp-tb-right'
+            canEdit={this.props.canEdit}
+          />
+        </div>
+        
+      </div>
     );
   }
 };
