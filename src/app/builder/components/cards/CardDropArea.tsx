@@ -117,6 +117,9 @@ export const onCardDrop = (targetProps:Props, monitor, component) =>
     {
       Actions.create(wrappingKeyPath.push('cards'), 0, null, wrappingCardData);
     }
+    
+    targetProps.afterDrop && targetProps.afterDrop(item, targetProps);
+    
   }
 };
 
@@ -140,6 +143,7 @@ interface Props
   heightOffset?: number; // height will be 100% - heightOffset
   
   beforeDrop?: (item:CardItem, targetProps:Props) => void;
+  afterDrop?: (item:CardItem, targetProps:Props) => void;
   accepts?: List<string>;
   
   // if set, wrapper cards which can wrap this type of card can be dropped to wrap it

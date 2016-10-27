@@ -99,6 +99,8 @@ class _Card extends PureClasss<Props>
   state: {
     selected: boolean;
     hovering: boolean;
+    closing: boolean;
+    opening: boolean;
     menuOptions: List<MenuOption>;
     
     cardTerms: List<string>;
@@ -123,6 +125,8 @@ class _Card extends PureClasss<Props>
     this.state = {
       selected: false,
       hovering: false,
+      closing: false,
+      opening: false,
       cardTerms,
       allTerms: props.keys.merge(cardTerms),
       menuOptions:
@@ -223,6 +227,11 @@ class _Card extends PureClasss<Props>
         allTerms,
       });
     }
+    
+    if(nextProps.card.closed !== this.props.card.closed && !this.state.closing && !this.state.opening)
+    {
+      this.toggleClose(null);
+    }
   }
   
   dragPreview: any;
@@ -260,29 +269,39 @@ class _Card extends PureClasss<Props>
     
     if(!this.props.card.closed)
     {
+      this.setState({
+        closing: true,
+      });
+      
       setTimeout(() => 
         Util.animateToHeight(this.refs.cardBody, 0, () =>
           this.setState({
             cardIsClosed: true,
+            closing: false,
           })
         ),
       300);
     }
     else
     {
+      this.setState({
+        cardIsClosed: false,
+        opening: true,
+      })
       setTimeout(() => 
         Util.animateToAutoHeight(
           this.refs.cardBody,
           () =>
             this.setState({
-              cardIsClosed: false,
+              // cardIsClosed: false,
+              opening: false,
             })
         ),
       300);
     }
     
-    event.preventDefault();
-    event.stopPropagation();
+    event && event.preventDefault();
+    event && event.stopPropagation();
 	}
   
   handleTitleClick(event)
@@ -485,6 +504,8 @@ class _Card extends PureClasss<Props>
           'card-selected': this.state.selected,
           'card-hovering': this.state.hovering,
           'card-is-closed': this.state.cardIsClosed,
+          'card-closing': this.state.closing,
+          'card-opening': this.state.opening,
           [card.type + '-card']: true,
         })}
         ref='card'
@@ -529,7 +550,7 @@ class _Card extends PureClasss<Props>
                 </div>
                 
                 {
-                  this.props.card.closed ? null : 
+                  !this.props.card.closed ? null : 
                     <div className={classNames({
                       'card-preview': true,
                       'card-preview-hidden': !this.props.card.closed,
@@ -545,11 +566,17 @@ class _Card extends PureClasss<Props>
               </div>
             )
           }
-          <div className='card-body' ref='cardBody'>
-            {
-              content
-            }
-          </div>
+          
+          {
+            !this.state.cardIsClosed &&
+              <div className='card-body-wrapper' ref='cardBody'>
+                <div className='card-body'>
+                  {
+                    content
+                  }
+                </div>
+              </div>
+          }
         </div>
         <CardDropArea
           half={true}

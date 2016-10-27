@@ -70,6 +70,7 @@ interface Props
 {
   value: BuilderTypes.CardString | number;
   keyPath: KeyPath; // keypath of value
+  onChange?: (value: string | number) => void;
   
   id?: string; // TODO remove
 
@@ -169,6 +170,12 @@ class BuilderTextbox extends PureClasss<Props>
     }
     
     Actions.change(this.props.keyPath, value);
+    this.props.onChange && this.props.onChange(value);
+  }
+  
+  handleCardDrop(item)
+  {
+    this.props.onChange && this.props.onChange(item);
   }
   
   handleTextareaChange(event)
@@ -293,6 +300,7 @@ class BuilderTextbox extends PureClasss<Props>
                 index={null}
                 accepts={this.props.display && this.props.display.accepts}
                 renderPreview={true}
+                afterDrop={this.handleCardDrop}
               />
           }
         </div>

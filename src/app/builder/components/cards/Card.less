@@ -98,11 +98,16 @@
   border-bottom-right-radius: calc(@card-border-radius - 1px);
  }
   
-  &.card-is-closed {
-    .card-body {
+  &.card-opening {
+    .card-body-wrapper {
       height: 0px;
       overflow: hidden;
       padding: 0px;
+    }
+    .card .card-body-wrapper {
+      height: auto;
+      overflow: visible;
+      padding: inherit;
     }
   }
   
@@ -351,9 +356,9 @@
 }
 
 .card-closed {
-  .builder-card-header.sfw-select-header {
-    opacity: 0;
-  }
+  // .builder-card-header.sfw-select-header {
+  //   opacity: 0;
+  // }
 }
 
 .card-inner {

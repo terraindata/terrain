@@ -1081,6 +1081,7 @@ export module BuilderTypes
     {
       input: "",
       domain: List([0,100]),
+      hasCustomDomain: false, // has the user set a custom domain
       bars: List([]),
       scorePoints: List([]),
       

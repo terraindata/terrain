@@ -193,6 +193,11 @@ class TransformCardPeriscope extends PureClasss<Props>
     });
   }
   
+  handleDomainTextChange()
+  {
+    Actions.change(this._ikeyPath(this.props.keyPath, 'hasCustomDomain'), true);
+  }
+  
   getChartState(overrideState = {}): Map<string, any>
   {
     var chartState = Map({
@@ -230,6 +235,7 @@ class TransformCardPeriscope extends PureClasss<Props>
             isNumber={true}
             className='tp-tb-left'
             canEdit={this.props.canEdit}
+            onChange={this.handleDomainTextChange}
           />
           <BuilderTextbox
             value={this.props.maxDomain.get(1)}
@@ -237,6 +243,7 @@ class TransformCardPeriscope extends PureClasss<Props>
             isNumber={true}
             className='tp-tb-right'
             canEdit={this.props.canEdit}
+            onChange={this.handleDomainTextChange}
           />
         </div>
         
