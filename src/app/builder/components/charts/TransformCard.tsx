@@ -98,7 +98,11 @@ class TransformCard extends PureClasss<Props>
       range: List([0,1]),
       bars: List([]),
     };
-    this.computeBars(props.data.input);
+  }
+  
+  componentDidMount()
+  {
+    this.computeBars(this.props.data.input);
   }
   
   updateDomain: boolean = false;
@@ -169,6 +173,8 @@ class TransformCard extends PureClasss<Props>
     return null;
   }
   
+  queryXhr: any;
+  
   computeBars(input: BuilderTypes.CardString)
   {
     if(typeof input === 'string')
@@ -188,7 +194,7 @@ class TransformCard extends PureClasss<Props>
         
         if(table)
         {
-          Ajax.query(
+          this.queryXhr = Ajax.query(
             `SELECT ${field} as value FROM ${table};`, // alias select as 'value' to catch any weird renaming
             db,
             this.handleQueryResponse,
@@ -251,7 +257,7 @@ class TransformCard extends PureClasss<Props>
         if(finalTable)
         {
           // convert the score to TQL, do the query
-          Ajax.query(
+          this.queryXhr = Ajax.query(
             `SELECT ${TQLConverter._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
             db,
             this.handleQueryResponse,
@@ -265,6 +271,11 @@ class TransformCard extends PureClasss<Props>
     this.setState({
       bars: List([]), // no can do get bars sadly, need to figure it out one day
     });
+  }
+  
+  componentWillUnmount()
+  {
+    this.queryXhr && this.queryXhr.abort();
   }
   
   handleQueryResponse(response: QueryResponse)

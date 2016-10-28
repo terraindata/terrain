@@ -147,6 +147,10 @@ class _Card extends PureClasss<Props>
      scrollState: BuilderScrollStore.getState(),
     };
     
+  }
+  
+  componentWillMount()
+  {
     // TODO
     // this._subscribe(Store, {
     //   stateKey: 'selected',
@@ -168,11 +172,13 @@ class _Card extends PureClasss<Props>
             hovering: false,
           });
         }
-      }
+      },
+      isMounted: true,
     });
     
     this._subscribe(BuilderScrollStore, {
       stateKey: 'scrollState',
+      isMounted: true,
     })
   }
   

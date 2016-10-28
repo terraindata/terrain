@@ -163,16 +163,9 @@ class CardsColumn extends PureClasss<Props>
     scrollAction(start, el.height(), el.scrollTop(), totalHeight);
   }
   
-          // <div
-          //   id='cards-column-inner'
-          // >
-  innerHeight: number = 0;
-  render()
+  componentDidUpdate()
   {
-    let {props} = this;
-    let {cards, canEdit} = props;
-    let {keyPath} = this.state;
-    
+    console.log('update');
     let inner = document.getElementById('cards-column-inner');
     if(inner)
     {
@@ -183,6 +176,14 @@ class CardsColumn extends PureClasss<Props>
         this.handleScroll();
       }
     }
+  }
+  
+  innerHeight: number = 0;
+  render()
+  {
+    let {props} = this;
+    let {cards, canEdit} = props;
+    let {keyPath} = this.state;
     
     return (
       <div
