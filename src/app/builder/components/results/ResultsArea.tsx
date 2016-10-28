@@ -121,7 +121,7 @@ class ResultsArea extends PureClasss<Props>
   
   componentDidMount()
   {
-    this.QueryResponses(this.props.query);
+    this.queryResults(this.props.query);
   }
   
   componentWillUnmount()
@@ -139,7 +139,7 @@ class ResultsArea extends PureClasss<Props>
   {
     if(!_.isEqual(nextProps.query, this.props.query))
     {
-      this.QueryResponses(nextProps.query);
+      this.queryResults(nextProps.query);
       
       if(this.state.onResultsLoaded)
       {
@@ -229,7 +229,7 @@ class ResultsArea extends PureClasss<Props>
         onResultsLoaded(reachedEnd)
       , 250);
     }
-    // this.QueryResponses(this.props.query, pages);
+    // this.queryResults(this.props.query, pages);
   }
   
   resultsFodderRange = _.range(0, 25);
@@ -327,7 +327,7 @@ class ResultsArea extends PureClasss<Props>
   
   handleCountResponse(response:QueryResponse)
   {
-    let results = response.result;
+    let results = response.resultSet;
     if(results)
     {
       if(results.length === 1)
@@ -382,7 +382,7 @@ class ResultsArea extends PureClasss<Props>
         return;
       }
       
-      let results = response.result;
+      let results = response.resultSet;
       
       var resultsCount = results.length;
       if(resultsCount > MAX_RESULTS)
@@ -447,7 +447,7 @@ class ResultsArea extends PureClasss<Props>
     this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
-  QueryResponses(query, pages?: number)
+  queryResults(query, pages?: number)
   {
     if(!pages)
     {

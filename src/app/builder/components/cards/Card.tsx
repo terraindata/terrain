@@ -106,7 +106,6 @@ class _Card extends PureClasss<Props>
     cardTerms: List<string>;
     allTerms: List<string>;
     
-    cardIsClosed: boolean;
     scrollState: BuilderScrollState;
   };
   
@@ -144,8 +143,6 @@ class _Card extends PureClasss<Props>
             onClick: this.handleDelete,
           },
         ]),
-     
-     cardIsClosed: this.props.card.closed,
      
      scrollState: BuilderScrollStore.getState(),
     };
@@ -228,9 +225,21 @@ class _Card extends PureClasss<Props>
       });
     }
     
-    if(nextProps.card.closed !== this.props.card.closed && !this.state.closing && !this.state.opening)
+    if(nextProps.card.closed !== this.props.card.closed)
     {
-      this.toggleClose(null);
+      if(this.state.closing || this.state.opening)
+      {
+        // completed closing / opening
+        this.setState({
+          closing: false,
+          opening: false,
+        });
+      }
+      else
+      {
+        // closed it from some outside source? need to close here
+        this.toggleClose(null);
+      }
     }
   }
   
@@ -262,10 +271,10 @@ class _Card extends PureClasss<Props>
   
 	toggleClose(event)
 	{
-    Actions.change(
-      this.getKeyPath().push('closed'), 
-      !this.props.card.closed
-    );
+    if(this.state.closing || this.state.opening)
+    {
+      return; // I just don't want to deal
+    }
     
     if(!this.props.card.closed)
     {
@@ -273,31 +282,36 @@ class _Card extends PureClasss<Props>
         closing: true,
       });
       
-      setTimeout(() => 
-        Util.animateToHeight(this.refs.cardBody, 0, () =>
-          this.setState({
-            cardIsClosed: true,
-            closing: false,
-          })
-        ),
-      300);
+      Util.animateToHeight(this.refs.cardBody, 0, () =>
+      {
+        // do this after the animation so the rest of the app picks up on it
+        Actions.change(
+          this.getKeyPath().push('closed'), 
+          true
+        )
+      });
     }
     else
     {
       this.setState({
-        cardIsClosed: false,
         opening: true,
-      })
-      setTimeout(() => 
-        Util.animateToAutoHeight(
-          this.refs.cardBody,
-          () =>
-            this.setState({
-              // cardIsClosed: false,
-              opening: false,
-            })
-        ),
-      300);
+      });
+      
+      // need to set a timeout so that the Card's render first
+      //  executes (from the opening:true setState) and adds in the 
+      //  card body, for us to animate to.
+      // If you know a better way, please oh please implement it
+      setTimeout(() =>
+        Util.animateToAutoHeight(this.refs.cardBody, () =>
+        {
+          // do this after the animation so the rest of the app picks up on it
+          Actions.change(
+            this.getKeyPath().push('closed'), 
+            false
+          )
+        }),
+        250
+      );
     }
     
     event && event.preventDefault();
@@ -503,7 +517,6 @@ class _Card extends PureClasss<Props>
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
           'card-hovering': this.state.hovering,
-          'card-is-closed': this.state.cardIsClosed,
           'card-closing': this.state.closing,
           'card-opening': this.state.opening,
           [card.type + '-card']: true,
@@ -533,7 +546,7 @@ class _Card extends PureClasss<Props>
               <div
                 className={classNames({
                   'card-title': true,
-                  'card-title-closed': this.props.card.closed,
+                  'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
                   'card-title-card-hovering': this.state.hovering,
                 })}
                 style={{
@@ -553,7 +566,7 @@ class _Card extends PureClasss<Props>
                   !this.props.card.closed ? null : 
                     <div className={classNames({
                       'card-preview': true,
-                      'card-preview-hidden': !this.props.card.closed,
+                      'card-preview-hidden': this.state.opening,
                     })}>
                       { BuilderTypes.getPreview(card) }
                     </div>
@@ -568,7 +581,7 @@ class _Card extends PureClasss<Props>
           }
           
           {
-            !this.state.cardIsClosed &&
+            (!this.props.card.closed || this.state.opening) &&
               <div className='card-body-wrapper' ref='cardBody'>
                 <div className='card-body'>
                   {

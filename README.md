@@ -229,6 +229,18 @@ A list of common programming gotchas in this codebase
 - Do not call `fetch` from within a constructor or you may see similar warnings (React thinks that state changes are happening from a higher component's `render` method)
 - ReactVirtualized: The library uses `shallowCompare` to detect prop changes, so you may need to pass additional props to indicate that data have changed.
   More here: [https://github.com/bvaughn/react-virtualized#pure-components]
+- Inline functions in ES6 don't like comments:
+  ```
+  var works = () =>
+     console.log('success');
+     // log something
+  works(); // logs 'success';
+
+  var doesntWork = () =>
+     // log something
+     console.log('success');
+  doesntWork(); // nothing is logged
+  ```
 
 ## Troubleshooting
 

@@ -86,7 +86,7 @@ class TQLResultsBar extends PureClasss<Props>
   {
     if(nextProps.tql !== this.props.tql) 
     {
-      this.QueryResponses(nextProps.tql);
+      this.queryResults(nextProps.tql);
     } 
   }
     
@@ -190,7 +190,7 @@ class TQLResultsBar extends PureClasss<Props>
       return;
     }
     
-    let results = response.result as (any[] | string);
+    let results = response.resultSet as (any[] | string);
     this.props.onLoadEnd && this.props.onLoadEnd();
     if(results)
     {
@@ -237,7 +237,7 @@ class TQLResultsBar extends PureClasss<Props>
     });
   }
   
-  QueryResponses(tql)
+  queryResults(tql)
   {
     if(tql) 
     {

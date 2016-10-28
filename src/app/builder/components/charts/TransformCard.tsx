@@ -267,9 +267,9 @@ class TransformCard extends PureClasss<Props>
     });
   }
   
-  handleQueryResponse(response: QueryResponse )
+  handleQueryResponse(response: QueryResponse)
   {
-    let results = response.result;
+    let results = response.resultSet;
     if(results.length)
     {
       let max = +results[0].value;

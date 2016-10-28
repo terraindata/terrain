@@ -831,7 +831,20 @@ export module BuilderTypes
       static: 
       {
         title: "Order By",
-        preview: "[sorts.property]",
+        preview: (c:any) =>
+        {
+          let {sorts} = c;
+          if(sorts.size === 1)
+          {
+            let {property} = sorts.get(0);
+            if(typeof property === 'string')
+            {
+              return property;
+            }
+            return getPreview(property);
+          }
+          return sorts.size + ' Factors';
+        },
         colors: ["#6ead6e", "#dbecc8"],
         manualEntry: ManualConfig.cards['sort'],
         tql: "ORDER BY $sorts",        

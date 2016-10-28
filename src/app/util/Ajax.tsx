@@ -53,7 +53,9 @@ import Util from './../util/Util.tsx';
 
 export interface QueryResponse
 {
-  result: any[], total_rows: number, error: string
+  resultSet?: any[];
+  total_rows?: number;
+  error?: string
 }
 
 export const Ajax = {

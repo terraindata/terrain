@@ -163,11 +163,26 @@ class CardsColumn extends PureClasss<Props>
     scrollAction(start, el.height(), el.scrollTop(), totalHeight);
   }
   
+          // <div
+          //   id='cards-column-inner'
+          // >
+  innerHeight: number = 0;
   render()
   {
     let {props} = this;
     let {cards, canEdit} = props;
     let {keyPath} = this.state;
+    
+    let inner = document.getElementById('cards-column-inner');
+    if(inner)
+    {
+      let height = inner.clientHeight;
+      if(height !== this.innerHeight)
+      {
+        this.innerHeight = height;
+        this.handleScroll();
+      }
+    }
     
     return (
       <div
@@ -237,5 +252,48 @@ class CardsColumn extends PureClasss<Props>
     );
   }
 }
+
+
+// wasn't able to get this to work but will leave it around in case some
+//  bright eyed dev comes along and find the solution
+
+// interface InnerProps
+// {
+//   onChange: () => void;
+  
+//   children?: any;
+//   containerWidth?: number;
+//   containerHeight?: number;
+// }
+// class _CardsColumnInner extends PureClasss<InnerProps>
+// {
+//   componentWillReceiveProps(nextProps:InnerProps)
+//   {
+//     if(nextProps.containerHeight !== this.props.containerHeight)
+//     {
+//       console.log('asdf');
+//       // size of the content changed
+//       this.props.onChange();
+//     }
+//     console.log('gpp', nextProps.containerHeight);
+//   }
+  
+//   render()
+//   {
+//     console.log('mdc', this.props.containerHeight);
+//     return (
+//       <div
+//         id='cards-column-inner'
+//       >
+//         {
+//           this.props.children
+//         }
+//       </div>
+//     );
+//   }
+// }
+
+// const CardsColumnInner = Dimensions()(_CardsColumnInner);
+
 
 export default Dimensions()(CardsColumn);
