@@ -165,7 +165,6 @@ class CardsColumn extends PureClasss<Props>
   
   componentDidUpdate()
   {
-    console.log('update');
     let inner = document.getElementById('cards-column-inner');
     if(inner)
     {

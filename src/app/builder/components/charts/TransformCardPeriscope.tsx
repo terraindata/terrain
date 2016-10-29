@@ -202,7 +202,7 @@ class TransformCardPeriscope extends PureClasss<Props>
   {
     var chartState = Map({
       barsData: (overrideState['bars'] || this.state.bars).toJS(),
-      maxDomain: (overrideState['maxDomain'] || this.props.maxDomain),
+      maxDomain: (overrideState['maxDomain'] || this.props.maxDomain).toJS(),
       domain: {
         x: (overrideState['domain'] || this.props.domain).toJS(),
         y: (overrideState['range'] || this.props.range).toJS(),

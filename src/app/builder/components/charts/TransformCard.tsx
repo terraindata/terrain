@@ -120,14 +120,19 @@ class TransformCard extends PureClasss<Props>
       let {domain} = this.state;
       let low = nextProps.data.domain.get(0);
       let high = nextProps.data.domain.get(1);
-      console.log('h', high, Util.valueMinMax(domain.get(1), low + buffer, high));
       var buffer = (high - low) * 0.02;
       this.setState({
         domain: List([
           Util.valueMinMax(domain.get(0), low, high - buffer),
           Util.valueMinMax(domain.get(1), low + buffer, high),
         ]),
-      })
+      });
+      
+      if(nextProps.data.input === this.props.data.input)
+      {
+        // input didn't change but still need to compute bars to get the set within this domain
+        this.computeBars(this.props.data.input);
+      }
     }
   }
   
@@ -263,6 +268,7 @@ class TransformCard extends PureClasss<Props>
             this.handleQueryResponse,
             this.handleQueryError
           );
+          return;
         }
       }
       
@@ -298,6 +304,12 @@ class TransformCard extends PureClasss<Props>
         }
       });
       
+      if(this.props.data.hasCustomDomain)
+      {
+        min = Math.max(min, this.props.data.domain.get(0));
+        max = Math.min(max, this.props.data.domain.get(1));
+      }
+      
       let bars: Bar[] = [];
       for(let j = 0; j < NUM_BARS; j ++)
       {
@@ -320,6 +332,11 @@ class TransformCard extends PureClasss<Props>
         {
           i = NUM_BARS - 1;
         }
+        if(i < 0 || i > NUM_BARS)
+        {
+          // out of bounds for our custom domain
+          return;
+        }
         
         bars[i].count ++;
         bars[i].percentage += 1 / results.length;
@@ -331,9 +348,8 @@ class TransformCard extends PureClasss<Props>
         domain,
       });
       
-      if(this.updateDomain)
+      if(!this.props.data.hasCustomDomain)
       {
-        console.log(domain.toJS());
         Actions.change(this._ikeyPath(this.props.keyPath, 'domain'), domain);
       }
     }
@@ -346,7 +362,6 @@ class TransformCard extends PureClasss<Props>
   
   handleDomainChange(domain: List<number>)
   {
-    console.log('change', domain.toJS());
     this.setState({
       domain,
     });
@@ -360,7 +375,7 @@ class TransformCard extends PureClasss<Props>
   render()
   {
     let {data} = this.props;
-    console.log('sd', this.state.domain);
+    
     return (
       <div className='transform-card'>
         <TransformCardChart
