@@ -143,7 +143,7 @@ var BuilderColumn = React.createClass<any, any>(
     return {
       column: this.props.columnType ? this.props.columnType : column,
       loading: false,
-      inputKeys: this.calcinputKeys(this.props),
+      inputKeys: this.calcInputKeys(this.props),
       // rand: 1,
     }
   },
@@ -175,9 +175,9 @@ var BuilderColumn = React.createClass<any, any>(
     this.unsubRoles && this.unsubRoles();  
   },
   
-  calcinputKeys(props)
+  calcInputKeys(props)
   {
-    return props.query.inputs.map(input => input.key);
+    return props.query.inputs.map(input => 'input.' + input.key);
   },
   
   willReceiveProps(nextProps)
@@ -185,7 +185,7 @@ var BuilderColumn = React.createClass<any, any>(
     if(!_.isEqual(nextProps.query.inputs, this.props.query.inputs))
     {
       this.setState({
-        inputKeys: this.calcinputKeys(nextProps.state),
+        inputKeys: this.calcInputKeys(nextProps.state),
       });
     }
   },

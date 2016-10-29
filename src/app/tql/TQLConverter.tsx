@@ -76,29 +76,32 @@ class TQLConverter
       cardsTql = removeBlanks(this._cards(cards, ";\n", options, true));
     }
     
-    // TODO figure out inputs
-    var inputsTql = "";
-    // if(inputs && inputs.size)
-    // {
-    //   inputs.map((input: IInput) => 
-    //     {
-    //       var {value} = input;
-    //       if(input.inputType === BuilderTypes.InputType.TEXT)
-    //       {
-    //         value = `"${value}"`;
-    //       }
-    //       if(input.inputType == BuilderTypes.InputType.DATE)
-    //       {
-    //         value = `"${value}"`;
-    //       }
+    // TODO update inputs when back-end is ready
+    // var inputsTql = "";
+    if(inputs && inputs.size)
+    {
+      inputs.map((input: IInput) => 
+        {
+          var {value} = input;
+          if(input.inputType === BuilderTypes.InputType.TEXT)
+          {
+            value = `"${value}"`;
+          }
+          if(input.inputType == BuilderTypes.InputType.DATE)
+          {
+            value = `"${value}"`;
+          }
           
-    //       inputsTql += `var ${input.key} = ${value};\n`;
-    //     }
-    //   );
-    //   inputsTql += "\n\n";
-    // }
+          // let key = 'input.' + input.key;
+          let key = 'input\\.' + input.key;
+          cardsTql = cardsTql.replace(new RegExp(key, 'g'), "" + value);
+      //     inputsTql += `var ${input.key} = ${value};\n`;
+        }
+      );
+      // inputsTql += "\n\n";
+    }
     
-    return inputsTql + cardsTql;
+    return cardsTql;
   }
   
   private static _topFromCard(cards: List<ICard>, fn: (fromCard: ICard) => ICard): List<ICard>
