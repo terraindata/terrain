@@ -539,7 +539,7 @@ export module BuilderTypes
       static:
       {
         manualEntry: ManualConfig.cards['sfw'],
-        colors: ["#559dcf", "#c0e0f3"],
+        colors: ["#559dcf", "#b4dbf6"],
         title: "Select",
         preview: "[tables.table]",
         // tql: "(\nSELECT\n$fields\nFROM\n$tables\n$cards)",
@@ -715,7 +715,7 @@ export module BuilderTypes
       static:
       {
         title: "As",
-        colors: ["rgb(185, 47, 150)", "rgb(245, 197, 230)"],
+        colors: ["#d9b540", "#f8e8b3"],
         preview: '[alias]',
         tql: "($value) as $alias",
         manualEntry: ManualConfig.cards.where,
@@ -756,8 +756,7 @@ export module BuilderTypes
     
     where: _wrapperCard({
       title: "Where",
-      colors: ["#94b96a", "#dbecc8"],
-      // colors: ["#44a9cf", "#b9e5f3"],
+      colors: ["#86a860", "#d3e5be"],
       tql: "WHERE\n$cards",
       manualEntry: ManualConfig.cards.where,
       singleChild: true,
@@ -775,7 +774,7 @@ export module BuilderTypes
       tql: '(\n$cards\n)',
       tqlGlue: '\nAND\n',
       manualEntry: ManualConfig.cards.and,
-      colors: ["#7f67ab", "#d2c9e4"],
+      colors: ["#855a9d", "#f0d6fe"],
       accepts: List(['or', 'comparison', 'exists']),
     }),
     
@@ -784,7 +783,7 @@ export module BuilderTypes
       tql: '(\n$cards\n)',
       tqlGlue: '\nOR\n',
       manualEntry: ManualConfig.cards.or,
-      colors: ["#3c89c3", "#b6d7ee"],
+      colors: ["#6288d3", "#b9cffb"],
       accepts: List(['and', 'comparison', 'exists']),
     }),
    
@@ -797,7 +796,7 @@ export module BuilderTypes
       static:
       {
         title: "Compare",
-        colors: ["#9f5ca7", "#e0c4e2"],
+        colors: ["#92589a", "#eecbf3"],
         preview: (c:ICard) => {
           var first = c['first'];
           var second = c['second'];
@@ -846,7 +845,7 @@ export module BuilderTypes
           }
           return sorts.size + ' Factors';
         },
-        colors: ["#6ead6e", "#dbecc8"],
+        colors: ["#659f72", "#c4e1ca"],
         manualEntry: ManualConfig.cards['sort'],
         tql: "ORDER BY $sorts",        
         
@@ -903,7 +902,7 @@ export module BuilderTypes
       static: {
         title: "Let",
         preview: "[field]",
-        colors: ["#bbc760", "#ecf2c4"],
+        colors: ["#a4b356", "#f1fbbf"],
         display: letVarDisplay,
         manualEntry: ManualConfig.cards['let'],
         tql: "let $field = $expression",
@@ -920,7 +919,7 @@ export module BuilderTypes
         title: "Var",
         preview: "[field]",
         display: letVarDisplay,
-        colors: ["#6ead6e", "#dbecc8"],
+        colors: ["#6ca165", "#c8f2c3"],
         manualEntry: ManualConfig.cards['var'],
         getNeighborTerms: (card) => List([card['field']]),
         tql: "var $field = $expression",
@@ -929,7 +928,7 @@ export module BuilderTypes
 
     count: _aggregateNestedCard(
     {
-      colors: ["#d9b740", "#f9ebb6"],
+      colors: ["#d24f42", "#f9cba8"],
       title: "Count",
       manualEntry: ManualConfig.cards['count'],
       tql: "COUNT($value)",
@@ -939,7 +938,7 @@ export module BuilderTypes
     
     distinct: _aggregateCard(
     {
-      colors: ["#bc4789", "#e3b2de"],
+      colors: ["#dba043", "#eedebe"],
       title: "Distinct",
       manualEntry: ManualConfig.cards['count'], // TODO
       tql: "DISTINCT $value",
@@ -947,7 +946,7 @@ export module BuilderTypes
     
     avg: _aggregateCard(
     {
-      colors: ["#d99f3e", "#f9e1b5"],
+      colors: ["#d65a44", "#fbc1b7"],
       title: "Average",
       manualEntry: ManualConfig.cards['avg'],
       tql: "AVG($value)",
@@ -955,7 +954,7 @@ export module BuilderTypes
     
     sum: _aggregateCard(
     {
-      colors: ["#cc5779", "#f3c2ce"],
+      colors: ["#dd8846", "#f9cba8"],
       title: "Sum",
       manualEntry: ManualConfig.cards['sum'],
       tql: "SUM($value)",
@@ -963,7 +962,7 @@ export module BuilderTypes
 
     min: _aggregateCard(
     {
-      colors: ["#d97852", "#f9d0be"],
+      colors: ["#db6746", "#f9bcab"],
       title: "Min",
       manualEntry: ManualConfig.cards['min'],
       tql: "MIN($value)",
@@ -971,7 +970,7 @@ export module BuilderTypes
 
     max: _aggregateCard(
     {
-      colors: ["#ce645b", "#f4c8c2"],
+      colors: ["#dd7547", "#fdcdb8"],
       title: "Max",
       manualEntry: ManualConfig.cards['max'],
       tql: "MAX($value)",
@@ -979,7 +978,7 @@ export module BuilderTypes
 
     exists: _wrapperCard(
     {
-      colors: ["#42b4bc", "#b8eaeb"],
+      colors: ["#319aa9", "#bbdddc"],
       title: "Exists",
       manualEntry: ManualConfig.cards['exists'],
       tql: "EXISTS\n(\n$cards)",
@@ -1013,7 +1012,7 @@ export module BuilderTypes
       static:
       {
         title: "Score",
-        colors: ["#2996c3", "#aeddee"],
+        colors: ["#3a91a6", "#a1eafb"],
         preview: "[weights.length] Weight(s)",
         manualEntry: ManualConfig.cards['score'],
         tql: "linear_score($weights)",
@@ -1102,7 +1101,7 @@ export module BuilderTypes
       static:
       {
         manualEntry: ManualConfig.cards['transform'],
-        colors: ["#559dcf", "#c0e0f3"],
+        colors: ["#4b979a", "#aef3f6"],
         title: "Transform",
         preview: (card:any) => {
           if(card.input._isCard)
@@ -1161,7 +1160,7 @@ export module BuilderTypes
     
     take: _valueCard(
     {
-      colors: ["#569a55", "#c1debf"],
+      colors: ["#4b977e", "#c4e1ca"],
       title: "Limit",
       manualEntry: ManualConfig.cards['take'],
       tql: "LIMIT $value",
@@ -1170,7 +1169,7 @@ export module BuilderTypes
     
     skip: _valueCard(
     {
-      colors: ["#429e8f", "#b8e0d8"],
+      colors: ["#39918b", "#99e4df"],
       title: "Offset",
       manualEntry: ManualConfig.cards['skip'],
       tql: "OFFSET $value",
@@ -1184,7 +1183,7 @@ export module BuilderTypes
       static:
       {
         manualEntry: ManualConfig.cards['sfw'], // TODO
-        colors: ["#27a2aa", "#ade2e3"],
+        colors: ["#2e8c9a", "#8adeea"],
         title: "Group By",
         preview: "[fields.field]",
         tql: "GROUP BY\n$fields",
@@ -1214,7 +1213,7 @@ export module BuilderTypes
     
     having: _wrapperCard({
       title: "Having",
-      colors: ["#2792ba", "#add2f3"],
+      colors: ["#2588aa", "#a2e5fc"],
       tql: "HAVING\n$cards",
       manualEntry: ManualConfig.cards.where, // TODO
       
@@ -1234,7 +1233,7 @@ export module BuilderTypes
       {
         title: "Expression",
         preview: "\n$clause",
-        colors: ["#278a79", "#add8cf"],
+        colors: ["#278172", "#aefcef"],
         tql: "$clause",
         manualEntry: ManualConfig.cards.tql,
         
