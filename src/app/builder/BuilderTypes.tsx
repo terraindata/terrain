@@ -600,6 +600,7 @@ export module BuilderTypes
                 accepts: acceptsAggregates.push('as'),
               },
               // hideToolsWhenNotString: true,
+              noDataPadding: true,
             },
           },
           

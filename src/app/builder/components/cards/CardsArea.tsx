@@ -50,7 +50,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from '../../../util/Util.tsx';
 import Actions from "../../data/BuilderActions.tsx";
-import Store from "../../data/BuilderStore.tsx";
+import {BuilderStore, BuilderState} from "../../data/BuilderStore.tsx";
 import {Card, CardItem} from "../cards/Card.tsx";
 import CreateCardTool from "./CreateCardTool.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
@@ -88,9 +88,9 @@ interface KeyState {
 interface State extends KeyState {
   learningMode: boolean;
   cardToolOpen: boolean;
-  draggingCardItem: CardItem;
-  draggingOverKeyPath: KeyPath;
+  isDraggingCardOver: boolean;
   draggingOverIndex: number;
+  draggingCardItem: CardItem;
 }
 
 class CardsArea extends PureClasss<Props>
@@ -100,9 +100,9 @@ class CardsArea extends PureClasss<Props>
     keyPath: null,
     learningMode: this.props.helpOn,
     cardToolOpen: true,
-    draggingCardItem: false,
-    draggingOverKeyPath: null,
+    isDraggingCardOver: false,
     draggingOverIndex: -1,
+    draggingCardItem: null,
   };
 
   constructor(props:Props)
@@ -111,14 +111,34 @@ class CardsArea extends PureClasss<Props>
     this.state.keys = this.computeKeys(props);
     this.state.cardToolOpen = props.cards.size === 0;
     
-    this._subscribe(Store, {
-      storeKeyPath: ['draggingCardItem'],
-    });
-    this._subscribe(Store, {
-      storeKeyPath: ['draggingOverKeyPath'],
-    });
-    this._subscribe(Store, {
-      storeKeyPath: ['draggingOverIndex'],
+    this._subscribe(BuilderStore, {
+      updater: (state: BuilderState) =>
+      {
+        if(state.draggingCardItem && state.draggingOverKeyPath === this.props.keyPath)
+        {
+          // dragging over
+          if(state.draggingOverIndex !== this.state.draggingOverIndex)
+          {
+            this.setState({
+              isDraggingCardOver: true,
+              draggingOverIndex: state.draggingOverIndex,
+              draggingCardItem: state.draggingCardItem,
+            });
+          }
+        }
+        else
+        {
+          // not dragging over
+          if(this.state.isDraggingCardOver)
+          {
+            this.setState({
+              isDraggingCardOver: false,
+              draggingOverIndex: -1,
+              draggingCardItem: null,
+            })
+          }
+        }
+      }
     });
   }
   
@@ -188,7 +208,7 @@ class CardsArea extends PureClasss<Props>
     let {cards, canEdit} = props;
     var renderCardTool = !this.props.noCardTool && (!this.props.singleChild || cards.size === 0);
     
-    let {draggingCardItem, draggingOverIndex, draggingOverKeyPath} = this.state;
+    let {isDraggingCardOver, draggingCardItem, draggingOverIndex} = this.state;
     let {keyPath} = this.props;
     
     return (
@@ -207,11 +227,7 @@ class CardsArea extends PureClasss<Props>
                 <CardDragPreview
                   cardItem={draggingCardItem}
                   isInList={true}
-                  visible={
-                    !!draggingCardItem 
-                    && draggingOverKeyPath === keyPath
-                    && draggingOverIndex === index
-                  }
+                  visible={isDraggingCardOver && draggingOverIndex === index}
                   index={index}
                   keyPath={keyPath}
                   accepts={this.props.accepts}
@@ -239,11 +255,7 @@ class CardsArea extends PureClasss<Props>
           <CardDragPreview
             cardItem={draggingCardItem}
             isInList={true}
-            visible={
-              !!draggingCardItem 
-              && draggingOverKeyPath === keyPath
-              && draggingOverIndex === cards.size
-            }
+            visible={isDraggingCardOver && draggingOverIndex === cards.size}
             index={cards.size}
             keyPath={keyPath}
             accepts={this.props.accepts}
