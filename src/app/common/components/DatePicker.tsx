@@ -97,13 +97,18 @@ class DatePicker extends PureClasss<Props>
     return date;
   }
   
+  formatDate(date:Date):string
+  {
+    return moment(date).format('YYYY-MM-DD HH:mm:ss');
+  }
+  
   handleDayClick(e, day: Date, modifiers)
   {
     var date = this.getDate();
     date.setDate(day.getDate());
     date.setMonth(day.getMonth());
     date.setFullYear(day.getFullYear());
-    this.props.onChange(date.toString());
+    this.props.onChange(this.formatDate(date));
   }
   
   handleHourChange(hourIndex)
@@ -111,7 +116,7 @@ class DatePicker extends PureClasss<Props>
     var date = this.getDate();
     date.setHours(Math.floor(hourIndex / MINUTE_RATIO));
     date.setMinutes((hourIndex % MINUTE_RATIO) * MINUTE_INTERVAL);
-    this.props.onChange(date.toString()); 
+    this.props.onChange(this.formatDate(date));
   }
   
   dateToHourIndex(date)
@@ -146,6 +151,7 @@ class DatePicker extends PureClasss<Props>
         <ReactDayPicker
           modifiers={modifiers}
           onDayClick={this.handleDayClick}
+          initialMonth={date}
         />
         { this.renderTimePicker() }
       </div>

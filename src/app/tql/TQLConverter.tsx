@@ -89,7 +89,7 @@ class TQLConverter
           }
           if(input.inputType == BuilderTypes.InputType.DATE)
           {
-            value = `"${value}"`;
+            value = `'${value}'`;
           }
           
           // let key = 'input.' + input.key;
