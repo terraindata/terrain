@@ -20,8 +20,10 @@
     &:not(.card-drag-preview-in-list) {
       left: 0px;
       position: absolute;
-      height: 100%;
-      max-height: @preview-height;
+      // height: 100%;
+      // min-height: @preview-height;
+      height: @preview-height;
+      z-index: 99;
     }
     
     &.card-drag-preview-in-list {

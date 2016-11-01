@@ -116,6 +116,9 @@ class _Card extends PureClasss<Props>
     cardBody: Ref;
   }
   
+  // _debugUpdates = true;
+  _debugName = "Card";
+  
   constructor(props:Props)
   {
     super(props);

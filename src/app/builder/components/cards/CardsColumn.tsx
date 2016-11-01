@@ -204,13 +204,6 @@ class CardsColumn extends PureClasss<Props>
           >
             <CardDropArea
               half={true}
-              index={0}
-              keyPath={keyPath}
-              height={12}
-              accepts={_topLevelAccepts}
-            />
-            <CardDropArea
-              half={true}
               lower={true}
               index={cards.size}
               keyPath={keyPath}
@@ -252,6 +245,13 @@ class CardsColumn extends PureClasss<Props>
     );
   }
 }
+            // <CardDropArea
+            //   half={true}
+            //   index={0}
+            //   keyPath={keyPath}
+            //   height={12}
+            //   accepts={_topLevelAccepts}
+            // />
 
 
 // wasn't able to get this to work but will leave it around in case some
