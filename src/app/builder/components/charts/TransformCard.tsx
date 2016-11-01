@@ -105,14 +105,11 @@ class TransformCard extends PureClasss<Props>
     this.computeBars(this.props.data.input);
   }
   
-  updateDomain: boolean = false;
   componentWillReceiveProps(nextProps:Props)
   {
     if(nextProps.data.input !== this.props.data.input)
     {
-      this.updateDomain = true;
       this.computeBars(nextProps.data.input);
-      Actions.change(this._ikeyPath(this.props.keyPath, 'hasCustomDomain'), false);
     }
     
     if(nextProps.data.domain !== this.props.data.domain)

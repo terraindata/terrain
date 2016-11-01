@@ -52,8 +52,8 @@
     }
   
     .card-drop-area-could-drop-marker {
-      -webkit-animation: strobe 0.85s infinite; /* Chrome, Safari, Opera */
-      animation: strobe 0.85s infinite;
+      -webkit-animation: strobe 2s infinite; /* Chrome, Safari, Opera */
+      animation: strobe 2s infinite;
     }
   }
   
@@ -128,13 +128,13 @@
 /* Chrome, Safari, Opera */
 @-webkit-keyframes strobe {
   0%   {opacity: 1;}
-  90%  {opacity: 0.5;}
+  50%  {opacity: 0.5;}
   100% {opacity: 1;}
 }
 
 /* Standard syntax */
 @keyframes mymove {
   0%   {opacity: 1;}
-  90%  {opacity: 0.5;}
+  50%  {opacity: 0.5;}
   100% {opacity: 1;}
 }

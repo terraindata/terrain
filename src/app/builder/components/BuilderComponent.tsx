@@ -80,7 +80,7 @@ interface Props
 class BuilderComponent extends PureClasss<Props>
 {
   
-  _debugUpdates = true;
+  // _debugUpdates = true;
   _debugName = "BC";
   
   _addRow(keyPath: KeyPath, display: Display)

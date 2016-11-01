@@ -252,8 +252,13 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   (state: BuilderState, action: {
     payload?: { cardId: ID },
   }) =>
-    state.set('hoveringCardId', action.payload.cardId)
-  ,
+  {
+    if(action.payload.cardId !== state.hoveringCardId)
+    {
+      return state.set('hoveringCardId', action.payload.cardId);
+    }
+    return state;
+  },
 
 [ActionTypes.selectCard]:
   (state: BuilderState, action: {

@@ -370,7 +370,11 @@ class Builder extends PureClasss<Props>
       }
     }
     var newConfig = configArr.join(',');
-    this.props.history.replaceState({}, `/builder/${newConfig}`);
+    if(newConfig !== this.props.params.config)
+    {
+      console.log('change config');
+      this.props.history.replaceState({}, `/builder/${newConfig}`);
+    }
   }
   
   getLayout()
