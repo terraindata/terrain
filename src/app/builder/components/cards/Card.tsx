@@ -380,7 +380,7 @@ class _Card extends PureClasss<Props>
       return block;
     };
     
-    let card = BuilderTypes.recordFromJS(BuilderTypes.recordsForServer(removeId(this.props.card)).toJS());
+    let card = BuilderTypes.recordFromJS(BuilderTypes.cardsForServer(removeId(this.props.card)).toJS());
     
     Actions.create(this.props.keyPath, this.props.index + 1, card.type, card);
     

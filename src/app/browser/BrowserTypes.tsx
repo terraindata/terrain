@@ -121,7 +121,7 @@ export module BrowserTypes
   export function variantForSave(v: Variant): Variant
   {
     v = touchVariant(v);
-    v = v.set('cards', BuilderTypes.recordsForServer(v.cards)) as Variant;
+    v = v.set('cards', BuilderTypes.cardsForServer(v.cards)) as Variant;
     v = v.set('resultsConfig', v.resultsConfig.toJS()) as Variant;
     return v;
   }

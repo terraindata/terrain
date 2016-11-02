@@ -346,7 +346,8 @@ class BuilderTextbox extends PureClasss<Props>
       <div className={classNames({
         'builder-tb': true,
         'builder-tb-cards': true,
-        'builder-tb-cards-top': this.props.top
+        'builder-tb-cards-top': this.props.top,
+        'builder-tb-cards-closed': card.closed,
       })} ref='cards'>
         <div className='builder-tb-cards-input'>
           { this.renderSwitch() }

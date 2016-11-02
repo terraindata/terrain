@@ -1412,25 +1412,31 @@ export module BuilderTypes
   }
   
   // Prepare cards/records for save, trimming static values
-  export const recordsForServer = (value: any) =>
+  export const cardsForServer = (value: any) =>
   {
     if(Immutable.Iterable.isIterable(value))
     {
-      let v = value.map(recordsForServer);
-      if(!v)
-      {
-        // records have a map function, but it returns undefined. WTF?
-        v = value.toMap().map(recordsForServer);
-      }
-      value = v;
+      value = value.toJS();
     }
     
-    if(value && value.delete)
+    if(value && value.static)
     {
-      value = value.delete('static');
+      delete value.static;
     }
     
-    return Immutable.fromJS(value);
+    if(Array.isArray(value))
+    {
+      value.map(cardsForServer);
+    }
+    else if(typeof value === 'object')
+    {
+      for(var v of value)
+      {
+        cardsForServer(v);
+      }
+    }
+    
+    return value;
   }
 
   // returns preview for a given card

@@ -343,7 +343,8 @@ class Builder extends PureClasss<Props>
 
   save()
   {
-    Ajax.saveItem(BrowserTypes.variantForSave(
+    Ajax.saveItem(
+      BrowserTypes.variantForSave(
         this.state.builder.queries.get(this.getSelectedId()) as BrowserTypes.Variant
       ),
       this.onSaveSuccess,
@@ -372,7 +373,6 @@ class Builder extends PureClasss<Props>
     var newConfig = configArr.join(',');
     if(newConfig !== this.props.params.config)
     {
-      console.log('change config');
       this.props.history.replaceState({}, `/builder/${newConfig}`);
     }
   }
