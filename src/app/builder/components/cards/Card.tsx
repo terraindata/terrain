@@ -291,7 +291,11 @@ class _Card extends PureClasss<Props>
         closing: true,
       });
       
-      Util.animateToHeight(this.refs.cardBody, 0, () =>
+      // animate just the body for normal cards,
+      //  the entire card for cards inside textboxes
+      let ref = this.props.singleCard ? this.refs.card : this.refs.cardBody;
+      
+      Util.animateToHeight(ref, 0, () =>
       {
         // do this after the animation so the rest of the app picks up on it
         Actions.change(

@@ -82,7 +82,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
   }
   
   render() {
-    if(this.isText() || this.isCreating())
+    if(this.isText() || this.isCreating() || this.props.value['closed'])
     {
       return null;
     }

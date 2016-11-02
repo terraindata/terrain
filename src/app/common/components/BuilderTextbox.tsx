@@ -65,6 +65,8 @@ type CardString = BuilderTypes.CardString;
 var AddCardIcon = require("./../../../images/icon_addCard_22x17.svg?name=AddCardIcon");
 var TextIcon = require("./../../../images/icon_text_12x18.svg?name=TextIcon");
 var CloseIcon = require("./../../../images/icon_close.svg");
+var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
+
 
 interface Props
 {
@@ -252,6 +254,11 @@ class BuilderTextbox extends PureClasss<Props>
     );
   }
   
+  toggleClosed()
+  {
+    Actions.change(this.props.keyPath.push('closed'), !this.props.value['closed']);
+  }
+  
   render()
   {
     if(this.isText())
@@ -320,7 +327,7 @@ class BuilderTextbox extends PureClasss<Props>
     // {
       // var card = cards.get(0);
       var color = card.static.colors[0] as string;
-      var title: string = ''; //card.static.title;
+      var title: string = card.closed ? card.static.title : '';
       var preview = BuilderTypes.getPreview(card);
     // }
     // else
@@ -350,8 +357,13 @@ class BuilderTextbox extends PureClasss<Props>
         'builder-tb-cards-closed': card.closed,
       })} ref='cards'>
         <div className='builder-tb-cards-input'>
-          { this.renderSwitch() }
           <div className='builder-tb-cards-input-value' style={chipStyle}>
+            <div
+              className='builder-tb-cards-toggle'
+              onClick={this.toggleClosed}
+            >
+              <ArrowIcon />
+            </div>
             <div className='builder-tb-cards-input-value-text'>
               { title }
             </div>
@@ -360,6 +372,7 @@ class BuilderTextbox extends PureClasss<Props>
                 { preview }
               </div>
             }
+            { this.renderSwitch() }
           </div>
           <div className='builder-tb-cards-arrow' style={arrowLineStyle}>
             <div className='builder-tb-cards-arrow-inner' style={arrowHeadStyle} />
