@@ -275,6 +275,7 @@ class TransformCardChart extends PureClasss<Props>
       width: overrideState.width || this.state.width,
       height: overrideState.height || this.state.height,
       canEdit: this.props.canEdit,
+      inputKey: overrideState.inputKey || this.props.inputKey,
     };
     
     return chartState;

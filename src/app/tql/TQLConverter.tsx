@@ -61,6 +61,7 @@ export interface Options {
   allFields?: boolean; // amend the final Select card to include all possible fields.
   limit?: number;
   count?: boolean;
+  transformAliases?: boolean; // if true, scan the top Select for Transforms, and add an alias row using the transform's ID
 }
 
 class TQLConverter
@@ -145,6 +146,44 @@ class TQLConverter
       {
         // no count card, add one
         fromCard = fromCard.setIn(['fields', 0, 'field'], 'COUNT(*)');
+      }
+      
+      if(options.transformAliases)
+      {
+        // TODO also search throughout the query, as these can be nested throughout. Throughout!
+        // TODO find score fields. Score fields!
+        let transformInputs = fromCard['fields'].filter((field: any) =>
+          field.field.type === 'transform' || 
+            (field.field.type === 'as' && field.field.value && field.field.value.type === 'transform')
+        ).map((field: any) =>
+        {
+          let transformCard = field.field;
+          if(transformCard.type === 'as')
+          {
+            transformCard = transformCard.value;
+          }
+          
+          let {input} = transformCard;
+          if(input._isCard)
+          {
+            input = this._parse(input);
+          }
+          
+          return input + ' as ' + BuilderTypes.transformAlias(transformCard); // need to filter out any non-letters-or-numbers
+        });
+        
+        transformInputs.map(input =>
+        {
+          fromCard = fromCard.update('fields', 
+            fields => fields.push(
+                BuilderTypes.make(BuilderTypes.Blocks.field, {
+                  field: input,
+                })
+              )
+          );
+        })
+        // console.log(transformInputs, fromCard['fields']);
+        // fromCard = fromCard.
       }
             
       return fromCard;

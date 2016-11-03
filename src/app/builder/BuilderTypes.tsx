@@ -1492,6 +1492,11 @@ export module BuilderTypes
     
     return map;
   }
+  
+  export function transformAlias(transformCard:ICard):string
+  {
+    return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, "");
+  }
 }
 
 export default BuilderTypes;

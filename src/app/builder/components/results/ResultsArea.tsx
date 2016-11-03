@@ -491,6 +491,7 @@ class ResultsArea extends PureClasss<Props>
         this.allXhr = Ajax.query(
           TQLConverter.toTQL(query, {
             allFields: true,
+            transformAliases: true,
             // limit: pages * RESULTS_PAGE_SIZE,
           }), 
           query.db,

@@ -48,6 +48,7 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../data/BuilderActions.tsx";
 import BuilderStore from "../../data/BuilderStore.tsx";
+import SpotlightStore from '../../data/SpotlightStore.tsx';
 import Util from '../../../util/Util.tsx';
 import { Ajax, QueryResponse } from '../../../util/Ajax.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
@@ -55,8 +56,7 @@ import PureClasss from './../../../common/components/PureClasss.tsx';
 import TransformCardChart from './TransformCardChart.tsx';
 import TQLConverter from '../../../tql/TQLConverter.tsx';
 
-const NUM_BARS = 1000;
-// const NUM_RESULTS = 
+const NUM_BARS = 1000; 
 
 interface Props
 {
@@ -88,6 +88,7 @@ class TransformCard extends PureClasss<Props>
     domain: List<number>;
     range: List<number>;
     bars: Bars;
+    spotlights: Map<string, any>;
   };
   
   constructor(props:Props)
@@ -97,12 +98,18 @@ class TransformCard extends PureClasss<Props>
       domain: List(props.data.domain as number[]),
       range: List([0,1]),
       bars: List([]),
+      spotlights: null,
     };
   }
   
   componentDidMount()
   {
     this.computeBars(this.props.data.input);
+    this._subscribe(SpotlightStore, {
+      isMounted: true,
+      storeKeyPath: ['spotlights'],
+      stateKey: 'spotlights',
+    });
   }
   
   componentWillReceiveProps(nextProps:Props)
@@ -371,6 +378,7 @@ class TransformCard extends PureClasss<Props>
   
   render()
   {
+    let spotlights = this.state.spotlights;
     let {data} = this.props;
     
     return (
@@ -381,8 +389,8 @@ class TransformCard extends PureClasss<Props>
           bars={this.state.bars}
           domain={this.state.domain}
           range={this.state.range}
-          spotlights={this.props.spotlights}
-          inputKey={data.input}
+          spotlights={spotlights && spotlights.toList().toJS()}
+          inputKey={BuilderTypes.transformAlias(this.props.data)}
           updatePoints={this.handleUpdatePoints}
         />
         <TransformCardPeriscope

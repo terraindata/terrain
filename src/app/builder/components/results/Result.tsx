@@ -53,6 +53,7 @@ var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../../util/Util.tsx';
 import Menu from '../../../common/components/Menu.tsx';
 import Actions from '../../data/BuilderActions.tsx';
+import {spotlightAction} from '../../data/SpotlightStore.tsx';
 import ColorManager from '../../../util/ColorManager.tsx';
 import Classs from './../../../common/components/Classs.tsx';
 import {IResultsConfig} from './ResultsConfig.tsx';
@@ -94,12 +95,20 @@ interface Props
 }
 
 class Result extends Classs<Props> {
+  state: {
+    spotlightId: string;
+    spotlightColor: string;
+  } = {
+    spotlightId: "",
+    spotlightColor: "",
+  };
+  
   shouldComponentUpdate(nextProps, nextState)
   {
     // Note: in the future, convert the results to cached immutable objects
     /// and compute any differences when the AJAX response returns
     
-    if(!_.isEqual(this.props.data, nextProps.data))
+    if(!_.isEqual(this.props.data, nextProps.data) || !_.isEqual(this.state, nextState))
     {
       return true;
     }
@@ -183,7 +192,26 @@ class Result extends Classs<Props> {
   {
     // TODO
     // Actions.results.spotlight(this.props.data, ColorManager.colorForKey(this.props.data.id));
+    let spotlightId = "spotlight-" + Math.floor(Math.random() * 100000);
+    let spotlightColor = ColorManager.colorForKey(spotlightId);
+    this.setState({
+      spotlightId,
+      spotlightColor,
+    });
+    
+    let spotlightData = this.props.allFieldsData || this.props.data;
+    spotlightData['name'] = this.getName();
+    spotlightData['color'] = spotlightColor;
+    spotlightAction(spotlightId, spotlightData);
   }
+  
+  // componentWillUnmount()
+  // {
+  //   if(this.state.spotlightId)
+  //   {
+  //     spotlightAction(this.state.spotlightId, null);
+  //   }
+  // }
   
   unspotlight()
   {
@@ -205,19 +233,26 @@ class Result extends Classs<Props> {
   
   renderSpotlight()
   {
-    if(!this.props.data.spotlight)
+    if(!this.state.spotlightId)
     {
       return null;
     }
     
-    return <div className='result-spotlight' style={{background: this.props.data.spotlight}}></div>;
+    return (
+      <div
+        className='result-spotlight'
+        style={{
+          background: this.state.spotlightColor,
+        }}
+      />
+    );
   }
   
   getMenuOptions()
   {
     var menuOptions = List([]);
     
-    if(this.props.data.spotlight)
+    if(this.state.spotlightId)
     {
       menuOptions = menuOptions.push({
         text: 'Un-Spotlight',
@@ -425,10 +460,17 @@ export function ResultFormatValue(field: string, value: string | number, config:
           </div>
         </div>
       );
+      
       case 'text':
-      // nothing special for now
+        
       break;
     }
+  }
+  
+  if(typeof value === 'number')
+  {
+    value = Math.floor((value as number) * 10000) / 10000;
+    value = value.toLocaleString();
   }
   
   if(italics)

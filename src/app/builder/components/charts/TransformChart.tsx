@@ -368,9 +368,25 @@ var TransformChart = {
     spotlightEnter.append('text');
     
     var getBar = (d) => {
+      if(!barsData)
+      {
+        return null;
+      }
+      
       // find the bar that it fits in
       var x = d[inputKey] !== undefined ? d[inputKey] : 0;
       var i = 0;
+      
+      if(barsData[0] && x < barsData[0].range.min)
+      {
+        return barsData[0];
+      }
+      
+      if(barsData[barsData.length - 1] && x > barsData[barsData.length - 1].range.max)
+      {
+        return barsData[barsData.length - 1];
+      }
+      
       // consider using binary search to speed this up
       while(barsData[i] && !(barsData[i].range.max >= x && barsData[i].range.min <= x))
       {
@@ -385,7 +401,7 @@ var TransformChart = {
       var bar = getBar(d);
       if(!bar)
       {
-        return -12345;
+        return d[inputKey];
       }  
       
       return (bar.range.max + bar.range.min) / 2;
@@ -402,20 +418,16 @@ var TransformChart = {
     
     var getBarY = (d) => {
       var bar = getBar(d);
-      if(!bar)
-      {
-        return -12345;
-      }
+      var x = bar ? (bar.range.max + bar.range.min) / 2 : d[inputKey];
       
-      if(ys[bar.range.min])
+      if(ys[x])
       {
-        ys[bar.range.min].offset += OFFSET;
+        ys[x].offset += OFFSET;
       }
       else
       {
         // Consider using Binary Search to speed this up
         var i = 1;
-        var x = (bar.range.max + bar.range.min) / 2;
         while(pointsData[i] && pointsData[i]['x'] < x)
         {
           i ++;
@@ -426,15 +438,15 @@ var TransformChart = {
         var distanceRatio = (x - first['x']) / (second['x'] - first['x']);
         var yVal = first['y'] * (1 - distanceRatio) + second['y'] * distanceRatio;
         var y = scales.realPointY(yVal);
-        ys[bar.range.min] = 
+        ys[x] = 
         {
-          y: y,
+          y,
           offset: INITIAL_OFFSET,
-          x: (bar.range.min + bar.range.max) / 2
+          x,
         }
       }
       
-      var finalY = ys[bar.range.min].y - ys[bar.range.min].offset;
+      var finalY = ys[x].y - ys[x].offset;
       idToY[d['id']] = finalY;
       return finalY;
     }
@@ -454,17 +466,17 @@ var TransformChart = {
         
         return getBarY(d);
       })
-      .attr('fill', (d) => d['spotlight'])
+      .attr('fill', (d) => d['color'])
       .attr('r',  (d) => d[inputKey] !== undefined ? SPOTLIGHT_SIZE / 2 : 0)
       ;
-    
+
     spotlight
       .select('text')
       .text((d) => d['name'])
       .attr('class', (d) => 'spotlight-tooltip spotlight-tooltip-' + d['id'])
       .attr('y', (d) => idToY[d['id']] + 5)
       .attr('x', (d) => scales.realX(getBarX(d)) + SPOTLIGHT_SIZE / 2 + SPOTLIGHT_PADDING + 3)
-      .attr('fill', (d) => d['spotlight'])
+      .attr('fill', (d) => d['color'])
       ;
     
     spotlight
@@ -537,10 +549,11 @@ var TransformChart = {
       })
       ;
     
-    spotlight //.select('circle')
+    spotlight
       .attr('transform', (d) => {
         var bar = getBar(d);
-        var bg = ys[bar.range.min];
+        var ix = bar ? (bar.range.min + bar.range.max) / 2 : d[inputKey];
+        var bg = ys[ix];
         var x = scales.realX(bg['x']);
         var y = bg['y'];
         var offset = bg['offset'];
@@ -557,7 +570,8 @@ var TransformChart = {
         var translateX = 0;
         
         var bar = getBar(d);
-        var bg = ys[bar.range.min];
+        var ix = bar ? (bar.range.min + bar.range.max) / 2 : d[inputKey];
+        var bg = ys[ix];
         var x = scales.realX(bg['x']);
         var y = bg['y'];
         var offset = bg['offset'];
