@@ -116,6 +116,12 @@ var TransformChart = {
   
   update(el, state)
   {
+    d3.select(el)
+      .select('.transform-chart')
+      .attr('width', state.width)
+      .attr('height', state.height)
+      .attr('viewBox', '0 0 ' + state.width + ' ' + state.height)
+    
     if(!state._cache)
     {
       state._cache = {};

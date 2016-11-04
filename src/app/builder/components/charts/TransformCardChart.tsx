@@ -71,6 +71,7 @@ interface Props
   canEdit: boolean;
   inputKey: string;
   updatePoints: (points:ScorePoints) => void;
+  width: number;
   
   spotlights: any;// TODO spawtlights
 }
@@ -81,8 +82,6 @@ class TransformCardChart extends PureClasss<Props>
 {
   state: {
     selectedPointIds: Map<string, boolean>;
-    width?: number;
-    height?: number;
     lastSelectedPointId?: string;
     initialScore?: number;
     initialValue?: number;
@@ -95,13 +94,7 @@ class TransformCardChart extends PureClasss<Props>
   componentDidMount() 
   {
     var el = ReactDOM.findDOMNode(this);
-    var width = 600;
-    var height = width / 2;
-    TransformChart.create(el, this.getChartState({
-      width,
-      height
-    }));
-    this.setState({ width, height });
+    TransformChart.create(el, this.getChartState());
   }
 
   onSelect(pointId: string, selectRange: boolean): void
@@ -272,8 +265,8 @@ class TransformCardChart extends PureClasss<Props>
       onDelete: this.onDelete,
       onCreate: this.onCreate,
       onPointMoveStart: this.onPointMoveStart,
-      width: overrideState.width || this.state.width,
-      height: overrideState.height || this.state.height,
+      width: overrideState.width || this.props.width,
+      height: 300,
       canEdit: this.props.canEdit,
       inputKey: overrideState.inputKey || this.props.inputKey,
     };
@@ -288,7 +281,7 @@ class TransformCardChart extends PureClasss<Props>
 
 	render() {
     return (
-      <div></div>
+      <div />
 		);
 	}
 };

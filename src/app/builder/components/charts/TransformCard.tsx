@@ -49,12 +49,14 @@ import * as React from 'react';
 import Actions from "../../data/BuilderActions.tsx";
 import BuilderStore from "../../data/BuilderStore.tsx";
 import SpotlightStore from '../../data/SpotlightStore.tsx';
+import BuilderScrollStore from '../../data/BuilderScrollStore.tsx';
 import Util from '../../../util/Util.tsx';
 import { Ajax, QueryResponse } from '../../../util/Ajax.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import TransformCardChart from './TransformCardChart.tsx';
 import TQLConverter from '../../../tql/TQLConverter.tsx';
+const Dimensions = require('react-dimensions');
 
 const NUM_BARS = 1000; 
 
@@ -65,6 +67,8 @@ interface Props
   
   canEdit?: boolean;
   spotlights?: any;  
+  
+  containerWidth?: number;
 }
 
 export interface Bar
@@ -380,9 +384,12 @@ class TransformCard extends PureClasss<Props>
   {
     let spotlights = this.state.spotlights;
     let {data} = this.props;
+    let width = this.props.containerWidth ? this.props.containerWidth + 110 : 300;
     
     return (
-      <div className='transform-card'>
+      <div
+        className='transform-card-inner'
+      >
         <TransformCardChart
           canEdit={this.props.canEdit}
           points={data.scorePoints}
@@ -392,6 +399,7 @@ class TransformCard extends PureClasss<Props>
           spotlights={spotlights && spotlights.toList().toJS()}
           inputKey={BuilderTypes.transformAlias(this.props.data)}
           updatePoints={this.handleUpdatePoints}
+          width={width}
         />
         <TransformCardPeriscope
           onDomainChange={this.handleDomainChange}
@@ -401,10 +409,16 @@ class TransformCard extends PureClasss<Props>
           maxDomain={data.domain}
           keyPath={this.props.keyPath}
           canEdit={this.props.canEdit}
+          width={width}
         />
       </div>
     );
   }
 };
 
-export default TransformCard;
+export default Dimensions({
+  elementResize: true,
+  containerStyle: {
+    height: 'auto',
+  },
+})(TransformCard);

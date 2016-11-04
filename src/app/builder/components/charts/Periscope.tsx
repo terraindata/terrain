@@ -92,6 +92,13 @@ var Periscope = {
   
   update(el, state)
   {
+    d3.select(el)
+      .select('.periscope')
+      .attr('width', state.width)
+      .attr('height', state.height)
+      .attr('viewBox', '0 0 ' + state.width + ' ' + state.height)
+      ;
+    
     state.numBars = 10;
     var scales = this._scales(el, state.maxDomain, state.domain, state.barsData, state.width, state.height);
     this._draw(el, scales, state.domain, state.barsData, state.onDomainChange, state.onDomainChangeStart);

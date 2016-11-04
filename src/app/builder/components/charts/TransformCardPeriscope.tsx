@@ -65,6 +65,7 @@ interface Props
   onDomainChange: (domain: List<number>) => void;
   keyPath:KeyPath;
   canEdit: boolean;
+  width: number;
 }
 
 const MAX_BARS = 100;
@@ -72,14 +73,12 @@ const MAX_BARS = 100;
 class TransformCardPeriscope extends PureClasss<Props>
 {
   state: {
-    width: number,
     initialDomain: List<number>,
     chartState: Map<string, any>,
     initialVal: number,
     bars: Bars,
   } = {
     chartState: null,
-    width: 0,
     initialDomain: null,
     initialVal: 0,
     bars: null,
@@ -128,13 +127,9 @@ class TransformCardPeriscope extends PureClasss<Props>
   componentDidMount()
   {
     var el = ReactDOM.findDOMNode(this.refs.chart);
-    var width = el.getBoundingClientRect().width;
-    let chartState = this.getChartState({
-      width,
-    });
+    let chartState = this.getChartState();
     
     this.setState({
-      width,
       chartState,
     });
     Periscope.create(el, chartState.toJS());
@@ -209,7 +204,7 @@ class TransformCardPeriscope extends PureClasss<Props>
       },
       onDomainChange: this.handleDomainChange,
       onDomainChangeStart: this.handleDomainChangeStart,
-      width: (overrideState && overrideState['width']) || this.state.width,
+      width: (overrideState && overrideState['width']) || this.props.width,
       height: 40,
     });
     
