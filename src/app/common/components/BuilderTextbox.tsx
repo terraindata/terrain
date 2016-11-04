@@ -166,10 +166,10 @@ class BuilderTextbox extends PureClasss<Props>
   // throttled event handler
   executeChange(value)
   {
-    if(this.props.isNumber)
-    {
-      value = +value;
-    }
+    // if(this.props.isNumber)
+    // {
+    //   value = +value;
+    // }
     
     Actions.change(this.props.keyPath, value);
     this.props.onChange && this.props.onChange(value);
