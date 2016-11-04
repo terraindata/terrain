@@ -83,6 +83,7 @@ export class IResultsConfig
   fields: List<string> = List([]);
   enabled: boolean = false;
   formats: Map<string, Format> = Map({});
+  primaryKeys: List<string> = List([]);
   
   set: (f: string, v: any) => IResultsConfig;
   setIn: (f: string[], v: any) => IResultsConfig;
@@ -93,8 +94,10 @@ export const _IResultsConfig = (config?:any) => {
   var conf = new IResultsConfig_Record(config || {}) as any as IResultsConfig;
   
   conf = conf.set('formats', Map(conf.formats));
-  conf = conf.set('formats', conf.formats.map(format => _Format(format)));
-  conf = conf.set('fields', List(conf.fields));
+  conf = conf
+    .set('formats', conf.formats.map(format => _Format(format)))
+    .set('fields', List(conf.fields))
+    .set('primaryKeys', List(conf.primaryKeys));
   
   return conf;
 }
@@ -271,6 +274,13 @@ export class ResultsConfig extends PureClasss<Props>
     this.props.onClose();
   }
   
+  handlePrimaryKeysChange(primaryKeys:List<string>)
+  {
+    this.changeConfig(
+      this.state.config.set('primaryKeys', primaryKeys)
+    );
+  }
+  
 	render()
   {
     let {config} = this.state;
@@ -320,6 +330,8 @@ export class ResultsConfig extends PureClasss<Props>
                       onRemove={this.handleRemove}
                       format={formats.get(config.name)}
                       onFormatChange={this.handleFormatChange}
+                      primaryKeys={config.primaryKeys}
+                      onPrimaryKeysChange={this.handlePrimaryKeysChange}
                     />
                   : 
                     <div className='results-config-placeholder'>
@@ -343,6 +355,8 @@ export class ResultsConfig extends PureClasss<Props>
                       onRemove={this.handleRemove}
                       format={formats.get(config.score)}
                       onFormatChange={this.handleFormatChange}
+                      primaryKeys={config.primaryKeys}
+                      onPrimaryKeysChange={this.handlePrimaryKeysChange}
                     />
                   : 
                     <div className='results-config-placeholder'>
@@ -370,6 +384,8 @@ export class ResultsConfig extends PureClasss<Props>
                           onRemove={this.handleRemove}
                           format={formats.get(field)}
                           onFormatChange={this.handleFormatChange}
+                          primaryKeys={config.primaryKeys}
+                          onPrimaryKeysChange={this.handlePrimaryKeysChange}
                         />
                       </div>
                     )
@@ -394,6 +410,8 @@ export class ResultsConfig extends PureClasss<Props>
                   onRemove={this.handleRemove}
                   format={formats.get(field)}
                   onFormatChange={this.handleFormatChange}
+                  primaryKeys={config.primaryKeys}
+                  onPrimaryKeysChange={this.handlePrimaryKeysChange}
                 />
             ) }
           </CRTarget>
@@ -423,6 +441,8 @@ interface ResultsConfigResultProps
   onRemove: (field: any) => void;
   format: Format;
   onFormatChange: (field: string, format:Format) => void;
+  primaryKeys: List<string>;
+  onPrimaryKeysChange: (primaryKeys: List<string>) => void;
 }
 class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
 {
@@ -483,6 +503,20 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
     );
   }
   
+  handlePrimaryKeyChange()
+  {
+    let {primaryKeys} = this.props;
+    if(primaryKeys.contains(this.props.field))
+    {
+      primaryKeys = primaryKeys.remove(primaryKeys.indexOf(this.props.field));
+    }
+    else
+    {
+      primaryKeys = primaryKeys.push(this.props.field);
+    }
+    this.props.onPrimaryKeysChange(primaryKeys);
+  }
+  
   render()
   {
     let {format} = this.props;
@@ -525,6 +559,21 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
           'results-config-field-format-text': !image,
           'results-config-field-format-image': image,
         })}>
+          <div className='results-config-format-header'>
+            <input
+              type='checkbox'
+              checked={this.props.primaryKeys.contains(this.props.field)}
+              onChange={this.handlePrimaryKeyChange}
+              id={'primaryKey-'+this.props.field}
+              className='rcf-primary-key-input'
+            />
+            <label
+              htmlFor={'primaryKey-'+this.props.field}
+              className='rcf-primary-key-label'
+            >
+              { this.props.field} is a primary key
+            </label>
+          </div>
           <div className='results-config-format-header'>
             Display the value of { this.props.field } as:
           </div>

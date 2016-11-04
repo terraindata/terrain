@@ -234,6 +234,18 @@ class ResultsArea extends PureClasss<Props>
   
   resultsFodderRange = _.range(0, 25);
   
+  getPrimaryKeyFor(result:any, config:IResultsConfig): string
+  {
+    if(config && config.primaryKeys.size)
+    {
+      return config.primaryKeys.map(
+        field => result[field]
+      ).join("and");
+    }
+    
+    return "result-" + Math.floor(Math.random() * 100000000);
+  }
+  
   renderResults()
   {
     if(this.state.error)
@@ -287,6 +299,8 @@ class ResultsArea extends PureClasss<Props>
       );
     }
     
+    let config = this.getResultsConfig();
+    
     return (
       <InfiniteScroll
         className='results-area-results'
@@ -300,16 +314,21 @@ class ResultsArea extends PureClasss<Props>
               return null;
             }
             
-            return <Result
-              data={result}
-              allFieldsData={this.state.resultsWithAllFields && this.state.resultsWithAllFields[index]}
-              config={this.getResultsConfig()}
-              onExpand={this.handleExpand}
-              index={index}
-              canDrag={this.props.canEdit}
-              key={index}
-              format={this.state.resultFormat}
-            />
+            let primaryKey = this.getPrimaryKeyFor(result, config);
+            
+            return (
+              <Result
+                data={result}
+                allFieldsData={this.state.resultsWithAllFields && this.state.resultsWithAllFields[index]}
+                config={this.getResultsConfig()}
+                onExpand={this.handleExpand}
+                index={index}
+                canDrag={this.props.canEdit}
+                key={primaryKey}
+                primaryKey={primaryKey}
+                format={this.state.resultFormat}
+              />
+            );
           }
           )
         }

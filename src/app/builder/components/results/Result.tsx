@@ -92,14 +92,15 @@ interface Props
   connectDragSource: (a:any) => any;
   isOver: boolean;
   connectDropTarget: (a:any) => any;
+  primaryKey: string;
 }
 
 class Result extends Classs<Props> {
   state: {
-    spotlightId: string;
+    isSpotlit: boolean;
     spotlightColor: string;
   } = {
-    spotlightId: "",
+    isSpotlit: false,
     spotlightColor: "",
   };
   
@@ -192,48 +193,49 @@ class Result extends Classs<Props> {
   {
     // TODO
     // Actions.results.spotlight(this.props.data, ColorManager.colorForKey(this.props.data.id));
-    let spotlightId = "spotlight-" + Math.floor(Math.random() * 100000);
-    let spotlightColor = ColorManager.colorForKey(spotlightId);
+    let id = this.props.primaryKey;
+    let spotlightColor = ColorManager.colorForKey(id);
     this.setState({
-      spotlightId,
+      isSpotlit: true,
       spotlightColor,
     });
     
     let spotlightData = this.props.allFieldsData || this.props.data;
     spotlightData['name'] = this.getName();
     spotlightData['color'] = spotlightColor;
-    spotlightAction(spotlightId, spotlightData);
+    spotlightData['id'] = id;
+    spotlightAction(id, spotlightData);
   }
   
-  // componentWillUnmount()
-  // {
-  //   if(this.state.spotlightId)
-  //   {
-  //     spotlightAction(this.state.spotlightId, null);
-  //   }
-  // }
+  componentWillUnmount()
+  {
+    if(this.state.isSpotlit)
+    {
+      spotlightAction(this.props.primaryKey, null);
+    }
+  }
   
   unspotlight()
   {
-    // TODO
-    // Actions.results.spotlight(this.props.data, false);
+    this.setState({
+      isSpotlit: false,
+    });
+    spotlightAction(this.props.primaryKey, null);
   }
   
   pin()
   {
     // TODO
-    // Actions.results.pin(this.props.data, true);
   }
   
   unpin()
   {
     // TODO
-    // Actions.results.pin(this.props.data, false);
   }
   
   renderSpotlight()
   {
-    if(!this.state.spotlightId)
+    if(!this.state.isSpotlit)
     {
       return null;
     }
@@ -252,7 +254,7 @@ class Result extends Classs<Props> {
   {
     var menuOptions = List([]);
     
-    if(this.state.spotlightId)
+    if(this.state.isSpotlit)
     {
       menuOptions = menuOptions.push({
         text: 'Un-Spotlight',

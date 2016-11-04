@@ -433,10 +433,19 @@ var TransformChart = {
           i ++;
         }
         
+        var yVal = 0;
         var first = pointsData[i - 1];
         var second = pointsData[i];
-        var distanceRatio = (x - first['x']) / (second['x'] - first['x']);
-        var yVal = first['y'] * (1 - distanceRatio) + second['y'] * distanceRatio;
+        if(first && second)
+        {
+          var distanceRatio = (x - first['x']) / (second['x'] - first['x']);
+          yVal = first['y'] * (1 - distanceRatio) + second['y'] * distanceRatio;
+        }
+        else
+        {
+          yVal = (first || second)['y'];
+        }
+        
         var y = scales.realPointY(yVal);
         ys[x] = 
         {
