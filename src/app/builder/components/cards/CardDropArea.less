@@ -75,21 +75,41 @@
   }
 }
 
+.create-card-wrapper {
+  .card-drop-area-could-drop {
+    .card-drop-area-could-drop-marker {
+      @cr: 12px;
+      width: @cr !important;
+      height: @cr !important;
+      background: rgba(0,0,0,0) !important;
+      border-radius: 99999px !important;
+      @r: 4px;
+      top: 0px !important;
+      left: calc(~"50% - @{cr} / 2 + 2px") !important;
+      border: @r solid #000;
+    }
+  }
+}
+
 .card-drop-area-half.card-drop-area-could-drop {
   .card-drop-area-could-drop-marker {
     width: 100% !important;
     left: 0px !important;
-    height: 6px !important;
+    height: 4px !important;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 99;
+    border: 1px solid #fff !important;
   }
   &.card-drop-area-lower {
     .card-drop-area-could-drop-marker {
       top: auto !important;
-      bottom: 0px !important;
+      bottom: -3px !important;
     }
   }
   &:not(.card-drop-area-lower) {
     .card-drop-area-could-drop-marker {
-      top: 0px !important;
+      top: -3px !important;
     }
   }
 }
