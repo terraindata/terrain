@@ -71,8 +71,8 @@ class InputsArea extends PureClasss<Props>
   
   renderNoInputs()
   {
-    var large = "No inputs have been added, yet."
-    var button = "Add One";
+    var large = ""; // "No inputs have been added, yet."
+    var button = "Add an Input";
     var onClick = this.createInput;
     
     return (

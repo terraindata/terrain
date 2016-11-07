@@ -222,13 +222,13 @@ class CardsColumn extends PureClasss<Props>
               accepts={_topLevelAccepts}
             />
             {
-              !cards.size ? 
+              !cards.size ? /* "Create your first card." */
                 <InfoArea
-                  large="No cards have been created, yet."
-                  small={canEdit && "Create one below. Most people start with the Select/From card."}
-                  button={canEdit && "Create a Select/From card"}
+                  large={!canEdit && "There aren't any cards in this query."} 
+                  small={false && canEdit && "Create one below. Most people start with the Select/From card."}
+                  button={canEdit && "Create a Select / From Card"}
                   onClick={this.createFromCard}
-                  inline={true}
+                  inline={false}
                 />
               : null
             }
