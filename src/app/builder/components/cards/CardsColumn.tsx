@@ -68,6 +68,7 @@ let ExpandIcon = require("./../../../../images/icon_expand_12x12.svg?name=Expand
 interface Props
 {
   cards: ICards;
+  deckOpen: boolean;
   queryId: ID;
   keys: List<string>;
   canEdit: boolean;
@@ -86,11 +87,9 @@ class CardsColumn extends PureClasss<Props>
   state: {
     keyPath: KeyPath;
     learningMode: boolean;
-    deckOpen: boolean;
   } = {
     keyPath: this.computeKeyPath(this.props),
     learningMode: false,
-    deckOpen: true,
   };
   
   componentDidMount()
@@ -149,9 +148,7 @@ class CardsColumn extends PureClasss<Props>
   
   toggleDeck()
   {
-    this.setState({
-      deckOpen: !this.state.deckOpen,
-    });
+    Actions.toggleDeck(this.props.queryId, ! this.props.deckOpen);
   }
   
   handleScroll()
@@ -188,11 +185,11 @@ class CardsColumn extends PureClasss<Props>
       <div
         className={classNames({
           'cards-column': true,
-          'cards-column-deck-open': this.state.deckOpen,
+          'cards-column-deck-open': this.props.deckOpen,
         })}
       >
         <CardsDeck
-          open={this.state.deckOpen}
+          open={this.props.deckOpen}
         />
         <div
           className='cards-column-cards-area'

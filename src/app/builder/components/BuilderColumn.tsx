@@ -242,6 +242,7 @@ var BuilderColumn = React.createClass<any, any>(
         
         return <CardsColumn 
           cards={query.cards} 
+          deckOpen={query.deckOpen}
           queryId={query.id}
           spotlights={spotlights} 
           keys={this.state.inputKeys}

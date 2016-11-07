@@ -109,6 +109,10 @@ var BuilderActions =
   dropCard:
     () =>
       $(ActionTypes.dropCard, {}),
+  
+  toggleDeck:
+    (queryId: ID, open: boolean) =>
+      $(ActionTypes.toggleDeck, { queryId, open }),
 };
 
 export default BuilderActions;

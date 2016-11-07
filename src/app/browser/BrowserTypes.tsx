@@ -74,6 +74,7 @@ export module BrowserTypes
     status: EVariantStatus.Build,
     version: false,
     db: 'urbansitter',
+    deckOpen: true,
 
     cards: Immutable.List([]),
     inputs: Immutable.List([]),
@@ -81,7 +82,7 @@ export module BrowserTypes
     // for DB storage
     type: "variant",
     dbFields: ['groupId', 'algorithmId', 'status'],
-    dataFields: ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs', 'mode', 'tql', 'resultsConfig', 'db'],    
+    dataFields: ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs', 'mode', 'tql', 'resultsConfig', 'db', 'deckOpen'],    
     statusMap: (s:EVariantStatus) => EVariantStatus[s],
   });
   export class Variant extends _Variant implements BuilderTypes.IQuery
@@ -95,6 +96,7 @@ export module BrowserTypes
     groupId: Group;
     resultsConfig: IResultsConfig;
     db: string;
+    deckOpen: boolean;
 
     cards: List<BuilderTypes.ICard>;
     inputs: List<BuilderTypes.IInput>;

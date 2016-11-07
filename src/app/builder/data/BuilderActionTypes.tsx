@@ -68,6 +68,8 @@ var BuilderActionTypes =
   dragCard: '',
   dragCardOver: '',
   dropCard: '',
+  
+  toggleDeck: '',
 };
 
 // I tried using this type to correclty classify this function,

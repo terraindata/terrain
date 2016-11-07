@@ -267,6 +267,7 @@ class ManualEntry extends Classs<Props>
       lastEdited: '',
       db: '',
       resultsConfig: null,
+      deckOpen: false,
     };
 
     var value = TQLConverter.toTQL(query);

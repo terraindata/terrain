@@ -294,6 +294,10 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       .set('draggingOverKeyPath', null)
       .set('draggingOverIndex', null)
       .set('draggingCardItem', null),
+  
+  [ActionTypes.toggleDeck]:
+    (state: BuilderState, action) => state
+      .setIn(['queries', action.payload.queryId, 'deckOpen'], action.payload.open),
 };
 
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState

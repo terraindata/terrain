@@ -133,6 +133,8 @@ export module BuilderTypes
     name: string;
     lastEdited: string;
     db: string;
+    
+    deckOpen: boolean;
   }
   
   export interface IInput extends IRecord<IInput>
