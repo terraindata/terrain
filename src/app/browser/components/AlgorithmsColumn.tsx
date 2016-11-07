@@ -197,22 +197,28 @@ class AlgorithmsColumn extends Classs<Props>
       {
         score: 0,
         color: archive,
+        name: "Variants in Archived Status",
       },
       {
         score: 0,
         color: build,
+        name: "Variants in Build Status",
       },
       {
         score: 0,
         color: approve,
+        name: "Variants in Approve Status",
       },
       {
         score: 0,
         color: live, 
+        name: "Variants in Live Status",
       },
     ];
    
     algorithm.variants.map(v => scores[v.status].score ++);
+    
+    scores.splice(0, 1); // remove Archived score for now
     
     let {me, roles} = this.state;
     let canDrag = me && roles && roles.getIn([algorithm.groupId, me.username, 'admin']);

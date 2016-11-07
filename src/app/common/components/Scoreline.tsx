@@ -51,6 +51,7 @@ interface Props
   scores: {
     color: string,
     score: number,
+    name?: string,
   }[];
   
   hideZeroes: boolean;
@@ -58,7 +59,7 @@ interface Props
 
 class Scoreline extends Classs<Props>
 {
-  renderScore(score: { color: string, score: number}, index: number)
+  renderScore(score: { color: string, score: number, name?: string }, index: number)
   {
     if(score.score === 0 && this.props.hideZeroes)
     {
@@ -66,7 +67,11 @@ class Scoreline extends Classs<Props>
     }  
     
     return (
-      <div className='scoreline-score' key={index}>
+      <div
+        className='scoreline-score'
+        key={index}
+        data-tip={score.name}
+      >
         <div
           className='scoreline-score-icon'
           style={{ backgroundColor: score.color, }}
