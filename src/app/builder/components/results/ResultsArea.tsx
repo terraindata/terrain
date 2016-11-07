@@ -76,6 +76,7 @@ class ResultsArea extends PureClasss<Props>
 {
   xhr = null;
   allXhr = null;
+  countXhr = null;
   
   state: {
     results: any[];
@@ -127,8 +128,10 @@ class ResultsArea extends PureClasss<Props>
   {
     this.xhr && this.xhr.abort();
     this.allXhr && this.allXhr.abort();
+    this.countXhr && this.countXhr.abort();
     this.xhr = false;
     this.allXhr = false;
+    this.countXhr = false;
     this.timeout && clearTimeout(this.timeout);
   }
   
@@ -341,6 +344,41 @@ class ResultsArea extends PureClasss<Props>
     this.handleResultsChange(response, true);
   }
   
+  handleCountResponse(response:QueryResponse)
+  {
+    let results = response.resultSet;
+    if(results)
+    {
+      if(results.length === 1)
+      {
+        this.setState({
+          resultsCount: results[0]['count(*)']
+        });
+      }
+      else if(results.length > 1)
+      {
+        this.setState({
+          resultsCount: results.length,
+        })
+      }
+      else
+      {
+        this.handleCountError();
+      }
+    }
+    else
+    {
+      this.handleCountError();
+    }
+  }
+  
+  handleCountError()
+  {
+    this.setState({
+      resultsCount: -1,
+    })
+  }
+  
   timeout = null;
   
   handleResultsChange(response:QueryResponse, isAllFields?: boolean)
@@ -395,7 +433,6 @@ class ResultsArea extends PureClasss<Props>
         
         this.setState({
           results,
-          resultsCount,
           resultType: 'rel',
           querying: false,
           error: false,
@@ -480,6 +517,15 @@ class ResultsArea extends PureClasss<Props>
           this.handleAllFieldsResponse,
           this.handleAllFieldsError,
           true
+        );
+        
+        this.countXhr = Ajax.query(
+          TQLConverter.toTQL(query, {
+            count: true,
+          }), 
+          query.db,
+          this.handleCountResponse,
+          this.handleCountError
         );
       }
 
