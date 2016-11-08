@@ -84,7 +84,7 @@ class Autocomplete extends PureClasss<Props>
     {
       value: props.value,
       open: false,
-      selectedIndex: 0,
+      selectedIndex: -1,
     };
   }
   
@@ -116,6 +116,7 @@ class Autocomplete extends PureClasss<Props>
   {
     this.setState({
       open: true,
+      selectedIndex: -1,
     });
     
     this.props.onFocus && this.props.onFocus(event);
@@ -123,8 +124,10 @@ class Autocomplete extends PureClasss<Props>
   
   handleBlur(event:React.FocusEvent)
   {
+    console.log('blur');
     this.setState({
       open: false,
+      selectedIndex: -1,
     });
     
     this.props.onBlur && this.props.onBlur(event);
@@ -135,6 +138,7 @@ class Autocomplete extends PureClasss<Props>
     this.handleChange(event);
     this.setState({
       open: false,
+      selectedIndex: -1,
     });
   }
   
@@ -150,7 +154,7 @@ class Autocomplete extends PureClasss<Props>
       case 38:
         // up
         this.setState({
-          selectedIndex: Math.max(this.state.selectedIndex - 1, 0),
+          selectedIndex: Math.max(this.state.selectedIndex - 1, -1),
         });
         break;
       case 40:
@@ -161,7 +165,7 @@ class Autocomplete extends PureClasss<Props>
         break;
       case 13:
       case 9:
-        // enter
+        // enter or tab
         var value = visibleOptions.get(this.state.selectedIndex);
         if(!value)
         {
@@ -169,6 +173,7 @@ class Autocomplete extends PureClasss<Props>
         }
         this.setState({
           open: false,
+          selectedIndex: -1,
           value,
         });
         this.props.onChange(value);
@@ -262,13 +267,17 @@ class Autocomplete extends PureClasss<Props>
               options.map(this.renderOption)
             }
             {
-              options.size ? null : <div className='ac-no-options'>No matches</div>
+              options.size ? null : null && <div className='ac-no-options'>No matches</div>
             }
           </div>
         }
       </div>
     );
   }
+            // {
+            //   !options.size ? null :
+            //     this.renderOption("", -1)
+            // }
 };
 
 export default Autocomplete;
