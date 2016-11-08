@@ -42,7 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// somebody please rescue this or kill this
+
 require('./LayoutManager.less');
+const Dimensions = require('react-dimensions');
 import * as React from 'react';
 var shallowCompare = require('react-addons-shallow-compare');
 var $ = require('jquery');
@@ -71,6 +74,8 @@ var LayoutManager = React.createClass<any, any>({
 	{
 		layout: React.PropTypes.object.isRequired, // TODO move to TS, describe different keys allowed
     moveTo: React.PropTypes.func,
+    containerWidth: React.PropTypes.number.isRequired,
+    containerHeight: React.PropTypes.number.isRequired,
 	},
   
   shouldComponentUpdate(nextProps, nextState)
@@ -85,13 +90,90 @@ var LayoutManager = React.createClass<any, any>({
 			shiftedIndices: [],
 			shiftedHeight: 0,
 			shiftedWidth: 0,
-      sizeAdjustments: this.props.layout.initialColSizes || {},
+      sizeAdjustments: this.getAdjustments(this.props.layout.initialColSizes, this.props.containerWidth),
 		};
 	},
   
   componentWillMount()
   {
     // this.onDrag = _.throttle(this.onDrag, 500);
+  },
+  
+  getAdjustments(adjustments, containerWidth: number)
+  {
+    if(adjustments)
+    {
+      // check to make sure that none of the col sizes are too big for us
+      let {columns, minColWidth} = this.props.layout;
+      if(columns && minColWidth)
+      {
+        let numColumns = columns.length;
+        
+        let maxSum = containerWidth - numColumns * minColWidth;
+        let sum = _.reduce(adjustments, 
+          (sum, adjustment) => sum + Math.abs(adjustment.x),
+        0);
+        
+        if(sum > maxSum)
+        {
+          let ratio = maxSum / sum;
+          adjustments = JSON.parse(JSON.stringify(adjustments));
+          _.map(adjustments, adjustment => adjustment.x *= ratio);
+        }
+        
+        // Code that could potentially help but doesn't fully work
+        //  because after one pass a column at the end can take width from
+        //  one before it 
+        
+        // let colWidth = containerWidth / numColumns;
+        // _.map(adjustments, (adjustment, key) =>
+        // {
+        //   console.log(key, adjustment, columns, columns[key]);
+        //   let colIndex = columns.findIndex(col => col.colKey === key);
+        //   colIndex = key;
+        //   let column = columns[colIndex];
+        //   if(column)
+        //   {
+        //     let {minWidth} = column;
+        //     let colSize = colWidth + adjustment.x;
+        //     let neighborAdjustment = adjustments[(+colIndex) + 1];
+        //     if(neighborAdjustment)
+        //     {
+        //       console.log(key, 'neig', neighborAdjustment);
+        //       colSize -= neighborAdjustment.x;
+        //     }
+        //     console.log(key, colSize);
+        //     if(colSize < minWidth)
+        //     {
+        //       let difference = minWidth - colSize;
+        //       console.log(key, 'too small', difference);
+        //       if(adjustment.x < 0)
+        //       {
+        //         console.log(key, 'change mine');
+        //         if(difference > Math.abs(adjustment.x))
+        //         {
+        //           difference += adjustment.x;
+        //           adjustment.x = 0;
+        //           console.log(key, 'too little');
+        //         }
+        //         else
+        //         {
+        //           adjustment.x += difference;
+        //         }
+        //       }
+        //       if(difference > 0 && neighborAdjustment)
+        //       {
+        //           console.log(key, 'fix up');
+        //         neighborAdjustment.x -= difference;
+        //       }
+        //     }
+        //     console.log(adjustment, neighborAdjustment);
+        //   }
+        // });
+      }
+    }
+    
+    return adjustments || {};
   },
 
 	updateDimensions()
@@ -116,6 +198,9 @@ var LayoutManager = React.createClass<any, any>({
   
   componentWillReceiveProps(newProps)
   {
+    let {sizeAdjustments} = this.state;
+    let sizeAdjustmentsChanged = false;
+    
     if(newProps.layout.columns && this.props.layout.columns)
     {
       // if using hidden:
@@ -123,19 +208,29 @@ var LayoutManager = React.createClass<any, any>({
       if(newProps.layout.columns.length !== this.props.layout.columns.length)
       {
         // number of columns has changed, reset offsets
-        var sizeAdjustments = JSON.parse(JSON.stringify(this.state.sizeAdjustments));
+        sizeAdjustments = JSON.parse(JSON.stringify(this.state.sizeAdjustments));
         for(var index in sizeAdjustments)
         {
           sizeAdjustments[index] = {x: 0, y: 0};
         }
-        
-        this.setState({
-          sizeAdjustments,  
-        })
-        
+        sizeAdjustmentsChanged = true;
+      }
+    }
+    
+    if(newProps.containerWidth !== this.props.containerWidth)
+    {
+      sizeAdjustments = this.getAdjustments(sizeAdjustments, newProps.containerWidth);
+      sizeAdjustmentsChanged = true;
+    }
+    
+    if(sizeAdjustmentsChanged)
+    {
+      this.setState({
+        sizeAdjustments,  
+      });
+      
       this.props.layout.onColSizeChange &&
         this.props.layout.onColSizeChange(sizeAdjustments);
-      }
     }
   },
 
@@ -747,4 +842,4 @@ var LayoutManager = React.createClass<any, any>({
 	},
 });
 
-export default LayoutManager;
+export default Dimensions({ onResize: true })(LayoutManager);
