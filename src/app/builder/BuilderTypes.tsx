@@ -1048,6 +1048,7 @@ export module BuilderTypes
                 help: ManualConfig.help["weight"],
                 key: 'weight',
                 placeholder: 'Weight',
+                // autoDisabled: true,
               },
               {
                 displayType: DisplayType.COMPONENT,

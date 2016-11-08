@@ -124,7 +124,6 @@ class Autocomplete extends PureClasss<Props>
   
   handleBlur(event:React.FocusEvent)
   {
-    console.log('blur');
     this.setState({
       open: false,
       selectedIndex: -1,
@@ -167,7 +166,7 @@ class Autocomplete extends PureClasss<Props>
       case 9:
         // enter or tab
         var value = visibleOptions.get(this.state.selectedIndex);
-        if(!value)
+        if(!value || this.state.selectedIndex === -1)
         {
           value = event.target.value;
         }
@@ -184,9 +183,10 @@ class Autocomplete extends PureClasss<Props>
         this.refs['input']['blur']();
         break;
       default:
-        this.setState({
-          selectedIndex: 0,
-        })
+        // nada
+        // this.setState({
+        //   selectedIndex: 0,
+        // })
     }
   }
   
