@@ -114,6 +114,7 @@ class TransformCard extends PureClasss<Props>
       storeKeyPath: ['spotlights'],
       stateKey: 'spotlights',
     });
+    
   }
   
   componentWillReceiveProps(nextProps:Props)

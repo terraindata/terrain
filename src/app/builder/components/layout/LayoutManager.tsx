@@ -81,7 +81,8 @@ var LayoutManager = React.createClass<any, any>({
   shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(this.props.layout, nextProps.layout)
-      || !_.isEqual(this.state, nextState);
+      || !_.isEqual(this.state, nextState)
+      || this.state.sizeAdjustments !== nextState.sizeAdjustments;
   },
 
 	getInitialState()
@@ -109,67 +110,55 @@ var LayoutManager = React.createClass<any, any>({
       {
         let numColumns = columns.length;
         
-        let maxSum = containerWidth - numColumns * minColWidth;
-        let sum = _.reduce(adjustments, 
-          (sum, adjustment) => sum + Math.abs(adjustment.x),
-        0);
-        
-        if(sum > maxSum)
-        {
-          let ratio = maxSum / sum;
-          adjustments = JSON.parse(JSON.stringify(adjustments));
-          _.map(adjustments, adjustment => adjustment.x *= ratio);
-        }
-        
         // Code that could potentially help but doesn't fully work
         //  because after one pass a column at the end can take width from
         //  one before it 
         
-        // let colWidth = containerWidth / numColumns;
-        // _.map(adjustments, (adjustment, key) =>
-        // {
-        //   console.log(key, adjustment, columns, columns[key]);
-        //   let colIndex = columns.findIndex(col => col.colKey === key);
-        //   colIndex = key;
-        //   let column = columns[colIndex];
-        //   if(column)
-        //   {
-        //     let {minWidth} = column;
-        //     let colSize = colWidth + adjustment.x;
-        //     let neighborAdjustment = adjustments[(+colIndex) + 1];
-        //     if(neighborAdjustment)
-        //     {
-        //       console.log(key, 'neig', neighborAdjustment);
-        //       colSize -= neighborAdjustment.x;
-        //     }
-        //     console.log(key, colSize);
-        //     if(colSize < minWidth)
-        //     {
-        //       let difference = minWidth - colSize;
-        //       console.log(key, 'too small', difference);
-        //       if(adjustment.x < 0)
-        //       {
-        //         console.log(key, 'change mine');
-        //         if(difference > Math.abs(adjustment.x))
-        //         {
-        //           difference += adjustment.x;
-        //           adjustment.x = 0;
-        //           console.log(key, 'too little');
-        //         }
-        //         else
-        //         {
-        //           adjustment.x += difference;
-        //         }
-        //       }
-        //       if(difference > 0 && neighborAdjustment)
-        //       {
-        //           console.log(key, 'fix up');
-        //         neighborAdjustment.x -= difference;
-        //       }
-        //     }
-        //     console.log(adjustment, neighborAdjustment);
-        //   }
-        // });
+        let colWidth = containerWidth / numColumns;
+        let adjustmentsChanged = false;
+        let newAdjustments = JSON.parse(JSON.stringify(adjustments));
+        _.map(newAdjustments, (adjustment, index) =>
+        {
+          let column = columns[index];
+          if(column)
+          {
+            let {minWidth} = column;
+            let colSize = colWidth + adjustment.x;
+            if(colSize < minWidth)
+            {
+              adjustmentsChanged = true;
+              let difference = minWidth - colSize;
+              
+              // get magnitude of all adjustments
+              let totalAdjustment = _.reduce(newAdjustments, 
+                (sum, adjustment) => 
+                {
+                  return sum + Math.max(adjustment.x, 0);
+                }
+                , 0);
+              
+              if(difference >= totalAdjustment)
+              {
+                // not enough space in the window, reset all
+                _.map(newAdjustments, adjustment => adjustment.x = 0);
+              }
+              else 
+              {
+                adjustment.x += difference;
+                // ratio by which to reduce adjustments
+                let ratio = (totalAdjustment - difference) / totalAdjustment;
+                _.map(newAdjustments, 
+                  adjustment => adjustment.x > 0 && (adjustment.x *= ratio)
+                );
+              }
+            }
+          }
+        });
+        
+        if(adjustmentsChanged)
+        {
+          return newAdjustments;
+        }
       }
     }
     
@@ -200,6 +189,7 @@ var LayoutManager = React.createClass<any, any>({
   {
     let {sizeAdjustments} = this.state;
     let sizeAdjustmentsChanged = false;
+    let windowResized = false;
     
     if(newProps.layout.columns && this.props.layout.columns)
     {
@@ -221,12 +211,14 @@ var LayoutManager = React.createClass<any, any>({
     {
       sizeAdjustments = this.getAdjustments(sizeAdjustments, newProps.containerWidth);
       sizeAdjustmentsChanged = true;
+      windowResized = true;
     }
     
     if(sizeAdjustmentsChanged)
     {
       this.setState({
-        sizeAdjustments,  
+        sizeAdjustments,
+        windowResized,
       });
       
       this.props.layout.onColSizeChange &&
@@ -499,9 +491,11 @@ var LayoutManager = React.createClass<any, any>({
   
   onResize(index, event)
   {
+    var prevIndex = index - 1;
+    
     var startX = event.pageX;
     var startSAX = this.state.sizeAdjustments[index].x;
-    var startPrevSAX = this.state.sizeAdjustments[index - 1].x;
+    var startPrevSAX = this.state.sizeAdjustments[prevIndex].x;
     this.setState({
       resizingIndex: index,
     });
@@ -533,10 +527,11 @@ var LayoutManager = React.createClass<any, any>({
       
       var sa = JSON.parse(JSON.stringify(this.state.sizeAdjustments));
       sa[index].x = startSAX + diffX;
+      sa[prevIndex].x = startPrevSAX - diffX;
       
       this.setState({
         sizeAdjustments: sa,
-      })
+      });
     }.bind(this);
     
     var endMove = () => 
@@ -707,10 +702,6 @@ var LayoutManager = React.createClass<any, any>({
     {
       widthAdjustment += this.state.sizeAdjustments[index].x;
     }
-    if(this.state.sizeAdjustments[index + 1])
-    {
-      widthAdjustment -= this.state.sizeAdjustments[index + 1].x;
-    }
 
     if(column.width !== undefined)
     {
@@ -810,6 +801,16 @@ var LayoutManager = React.createClass<any, any>({
     
     return 1;
   },
+  
+  componentDidUpdate()
+  {
+    if(this.state.windowResized)
+    {
+      this.setState({
+        windowResized: false,
+      });
+    }
+  },
 
 	render() 
 	{
@@ -829,6 +830,10 @@ var LayoutManager = React.createClass<any, any>({
 		{
 			lmClasses.unshift(fullHeightClass);
 		}
+    if(this.state.windowResized)
+    {
+      lmClasses.unshift('lm-window-resized');
+    }
 		var lmClassString = lmClasses.join(" ");
 
     return (
