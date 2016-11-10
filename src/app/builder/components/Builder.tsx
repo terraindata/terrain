@@ -212,7 +212,8 @@ class Builder extends PureClasss<Props>
   {
     let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query.o;
-    var newConfig = props.params.config;
+    let originalConfig = props.params.config || storedConfig;
+    let newConfig = originalConfig;
 
     if(open)
     {
@@ -235,18 +236,15 @@ class Builder extends PureClasss<Props>
         newConfig = configArr.join(',');
       }
     }
-    else if(!props.params.config || !props.params.config.length)
-    {
-      // no 'open' passed in and no config in the url params
-      newConfig = storedConfig;
-    }
     
     if(newConfig && newConfig.length && !newConfig.split(',').some(c => c.substr(0,1) === '!'))
     {
       newConfig = '!' + newConfig;
     }
     
-    if(newConfig !== props.params.config)
+    if(newConfig !== props.params.config 
+      && (props.params.config !== undefined || newConfig.length)
+      )
     {
       props.history.replaceState({}, `/builder/${newConfig}`);
     }
@@ -544,31 +542,28 @@ class Builder extends PureClasss<Props>
   {
     let config = this.props.params.config;
     return (
-      <div className={classNames({
-        'builder': true,
-        'builder-no-column-animation': this.state.noColumnAnimation,
-      })}>
-        <Tabs
-          actions={this.tabActions}
-          config={config}
-          ref='tabs'
-          history={this.props.history}
+      !config || !config.length ? 
+        <InfoArea
+          large='No variants open'
+          small='You can open one in the Browser'
+          button='Go to the Browser'
+          onClick={this.goToBrowser}
         />
-
-        {
-          !this.state.builder.queries.keySeq().size ? 
-            <InfoArea
-              large='No variants open'
-              small='You can open one in the Browser'
-              button='Go to the Browser'
-              onClick={this.goToBrowser}
-            />
-          :
-            <div className='tabs-content'>
-              <LayoutManager layout={this.getLayout()} moveTo={this.moveColumn} />
-            </div>
-        }
-      </div>
+      :
+        <div className={classNames({
+          'builder': true,
+          'builder-no-column-animation': this.state.noColumnAnimation,
+        })}>
+          <Tabs
+            actions={this.tabActions}
+            config={config}
+            ref='tabs'
+            history={this.props.history}
+          />
+          <div className='tabs-content'>
+            <LayoutManager layout={this.getLayout()} moveTo={this.moveColumn} />
+          </div>
+        </div>
     );
 	}
 };

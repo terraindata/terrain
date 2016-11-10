@@ -354,12 +354,15 @@ class Tabs extends Classs<TabsProps> {
   {
     let {tabs} = this.state;
     let tab = this.state.tabs.find(tab => tab.id === id);
-    return '/builder/' + (tab.selected && tabs.length > 1 ? '!' : '')
+    let newConfig = (tab.selected && tabs.length > 1 ? '!' : '')
       + tabs.map(tab => 
         tab.id === id ? null : 
           (tab.selected ? "!" : "") + tab.id
     ).filter(s => s)
      .join(",");
+     
+    localStorage.setItem('config', newConfig); // need to set for closing the last tab to work
+    return '/builder/' + newConfig;
   }
   
 	render()
