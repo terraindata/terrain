@@ -81,6 +81,7 @@
     "style-loader": "^0.12.3",
     "svg-react-loader": "^0.3.3",
     "tape": "^4.4.0",
+    "timezones.json": "^1.1.0",
     "ts-loader": "^0.7.2",
     "tsd": "^0.6.5",
     "typescript": "^1.8.10",

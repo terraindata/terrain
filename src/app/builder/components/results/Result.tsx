@@ -58,7 +58,7 @@ import ColorManager from '../../../util/ColorManager.tsx';
 import Classs from './../../../common/components/Classs.tsx';
 import {IResultsConfig} from './ResultsConfig.tsx';
 
-var PinIcon = require("./../../../../images/icon_pin_21x21.svg?name=PinIcon");
+var PinIcon = require("./../../../../images/icon_pin_21X21.svg?name=PinIcon");
 var ScoreIcon = require("./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon");
 
 var dragPreviewStyle = {
