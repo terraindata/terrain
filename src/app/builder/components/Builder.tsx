@@ -545,8 +545,8 @@ class Builder extends PureClasss<Props>
       !config || !config.length ? 
         <InfoArea
           large='No variants open'
-          small='You can open one in the Browser'
-          button='Go to the Browser'
+          small='You can open one in the Library'
+          button='Go to the Library'
           onClick={this.goToBrowser}
         />
       :

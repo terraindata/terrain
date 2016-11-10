@@ -108,7 +108,7 @@ var links =
   // },
   {
     icon: <BrowserIcon />,
-    text: 'Browser',
+    text: 'Library',
     route: '/browser',
   },
   {
