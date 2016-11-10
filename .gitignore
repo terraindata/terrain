@@ -6,3 +6,6 @@ admin/
 __pycache__
 node_modules
 *.psd
+bundle.js
+bundle.prod.js
+bundle.demo.js

@@ -112,8 +112,9 @@ declare interface IName
   name: string;
 }
 
-// SERVER_URL is a "compile time" substition done by Webpack.
-declare var SERVER_URL: string;
+// these are "compile time" substitions done by Webpack.
+declare var MIDWAY_HOST: string;
+declare var TDB_HOST: string;
 
 declare const escape: (s:string) => string;
 declare const unescape: (s:string) => string;

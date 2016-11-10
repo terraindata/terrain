@@ -62,7 +62,7 @@ import PasswordStrengthInput from './PasswordStrengthInput.tsx';
 import Modal from './../../common/components/Modal.tsx';
 
 var Select = require('react-select');
-var TimeZones = require('timezones.json');
+var TimeZones = require('./timezones.json');
 var LogoutIcon = require("./../../../images/icon_logout.svg");
 
 interface Props

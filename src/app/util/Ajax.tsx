@@ -88,8 +88,8 @@ export const Ajax = {
       onLoad(xhr.responseText);
     }
     
-    // NOTE: SERVER_URL will be replaced by the build process.
-    let host = config.host || SERVER_URL;
+    // NOTE: MIDWAY_HOST will be replaced by the build process.
+    let host = config.host || MIDWAY_HOST;
     xhr.open(method, host + url, true);
     if(!config.noToken)
     {
@@ -127,7 +127,7 @@ export const Ajax = {
     {
       noToken: true,
       onError,
-      host: "http://pa-terraformer02.terrain.int:7344",
+      host: TDB_HOST,
       crossDomain: true,
     });
   },

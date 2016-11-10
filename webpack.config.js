@@ -75,7 +75,8 @@ module.exports = {
     },
     plugins: [
       new webpack.DefinePlugin({
-        'SERVER_URL': "'//pa-terraformer01.terrain.int:40080'",
+        'MIDWAY_HOST': "'//" + process.env.MIDWAY_HOST + ":40080'",
+        'TDB_HOST': "'//" + process.env.TDB_HOST + ":7344'",
         'DEV': "true"
       })
     ]

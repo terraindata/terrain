@@ -113,8 +113,8 @@ class Login extends PureClasss<Props>
       }
       login(xhr.responseText);
     }
-    // NOTE: $SERVER_URL will be replaced by the build process.
-    xhr.open("POST", SERVER_URL + "/auth", true);
+    // NOTE: MIDWAY_HOST will be replaced by the build process.
+    xhr.open("POST", MIDWAY_HOST + "/auth", true);
     xhr.send(JSON.stringify({
       username,
       password: this.state.password,
