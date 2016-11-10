@@ -131,15 +131,15 @@ var BuilderColumn = React.createClass<any, any>(
   
   getInitialState()
   {
-    var column = this.props.index;
-    if(localStorage.getItem('colKeyTypes'))
+    let colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
+    var column = colKeyTypes[this.props.colKey];
+    if(column === undefined)
     {
-      column = JSON.parse(localStorage.getItem('colKeyTypes'))[this.props.colKey];
-      if(column === undefined)
-      {
-        column = this.props.index;
-      }
+      column = this.props.index;
+      colKeyTypes[this.props.colKey] = this.props.index;
+      localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
     }
+
     return {
       column: this.props.columnType ? this.props.columnType : column,
       loading: false,
@@ -324,6 +324,10 @@ var BuilderColumn = React.createClass<any, any>(
   handleCloseColumn()
   {
     this.props.onCloseColumn(this.props.index);
+    
+    var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
+    delete colKeyTypes[this.props.colKey];
+    localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
   },
   
   revertVersion()

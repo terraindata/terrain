@@ -76,8 +76,8 @@ var BuilderActions =
       $(ActionTypes.remove, { keyPath, index }),
   
   fetch:
-    (variantIds: List<ID>) =>
-      $(ActionTypes.fetch, { variantIds }),
+    (variantIds: List<ID>, handleNoVariant?: (variantId:ID) => void) =>
+      $(ActionTypes.fetch, { variantIds, handleNoVariant }),
   
   setVariant:
     (variantId: ID, variant) =>

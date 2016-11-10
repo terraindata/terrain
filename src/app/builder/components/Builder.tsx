@@ -203,6 +203,7 @@ class Builder extends PureClasss<Props>
   
   componentWillReceiveProps(nextProps)
   {
+    // TODO
     this.checkConfig(nextProps);
     this.loadTables(nextProps);
   }
@@ -250,7 +251,7 @@ class Builder extends PureClasss<Props>
       props.history.replaceState({}, `/builder/${newConfig}`);
     }
     localStorage.setItem('config', newConfig || '');
-    console.log('fetch');
+    console.log('fetch', newConfig);
     this.fetch(newConfig);
   }
   
@@ -262,7 +263,21 @@ class Builder extends PureClasss<Props>
     }
     Actions.fetch(Immutable.List(
       config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id)
-    ));
+    ), this.handleNoVariant);
+  }
+  
+  handleNoVariant(variantId: ID)
+  {
+    var newConfigArr = this.props.params.config
+      .split(',')
+      .filter(id => id !== variantId && id !== '!' + variantId);
+    if(newConfigArr.length && !newConfigArr.some(c => c.substr(0,1) === '!'))
+    {
+      newConfigArr[0] = '!' + newConfigArr[0];
+    }
+    
+    let newConfig = newConfigArr.join(',');
+    this.props.history.replaceState({}, `/builder/${newConfig}`);
   }
   
   getSelectedId(props?:Props)
@@ -506,37 +521,6 @@ class Builder extends PureClasss<Props>
     }
   }
   
-  handleEmptyTabs(tabIds: ID[])
-  {
-    if(!this.props.params.config)
-    {
-      return;
-    }
-    
-    let newConfigArr = this.props.params.config.split(',').filter(tabId =>
-    {
-      if(tabId.indexOf('!') === 0)
-      {
-        tabId = tabId.substr(1);
-      }
-      
-      return tabIds.indexOf(tabId) === -1;
-    });
-    
-    if(newConfigArr.length && !newConfigArr.some(tabId => tabId.indexOf('!') === 0))
-    {
-      var prependSelect = true;
-    }
-    
-    let newConfig = (prependSelect ? '!' : '') + newConfigArr.join(',');
-    
-    this.props.history.replaceState({}, `/builder/${newConfig}`);
-    localStorage.setItem('config', newConfig || '');
-    this.setState({
-      random: Math.random(),
-    });
-  }
-  
   moveColumn(curIndex, newIndex)
   {
     var tmp = this.state.colKeys.get(curIndex);
@@ -569,7 +553,6 @@ class Builder extends PureClasss<Props>
           config={config}
           ref='tabs'
           history={this.props.history}
-          reportEmptyTabs={this.handleEmptyTabs}
         />
 
         {

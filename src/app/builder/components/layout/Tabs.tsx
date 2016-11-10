@@ -52,8 +52,9 @@ import LayoutManager from "../layout/LayoutManager.tsx";
 import PanelMixin from "../layout/PanelMixin.tsx";
 import InfoArea from "./../../../common/components/InfoArea.tsx";
 import Classs from './../../../common/components/Classs.tsx';
-import BrowserStore from './../../../browser/data/BrowserStore.tsx';
-import BrowserActions from './../../../browser/data/BrowserActions.tsx';
+// import BrowserStore from './../../../browser/data/BrowserStore.tsx';
+// import BrowserActions from './../../../browser/data/BrowserActions.tsx';
+import BuilderStore from './../../../builder/data/BuilderStore.tsx';
 import BrowserTypes from './../../../browser/BrowserTypes.tsx';
 import * as classNames from 'classnames';
 var ReactTooltip = require("react-tooltip");
@@ -192,40 +193,28 @@ interface TabsProps
     onClick: () => void;
   }>;
   history: any;
-  reportEmptyTabs: (tabs: ID[]) => void;
 }
 
 class Tabs extends Classs<TabsProps> {
   state = {
     variants: null,
     tabs: null,
+    needsVariant: true, // needs variant info from the server
   }
   cancel = null;
   
   componentDidMount()
   {
-    BrowserActions.fetch();
-    
     let a = () => 
     {
-      let groups = BrowserStore.getState().get('groups');
-      if(groups)
+      if(this.state.needsVariant)
       {
-        var variants: {[id: string]: BrowserTypes.Variant} = {};
-
-        // TODO consider a different approach
-        groups.map(group =>
-          group.algorithms.map(algorithm =>
-            algorithm.variants.map(variant =>
-              variants[variant.id] = variant)
-            )
-        );
-        
+        let variants = BuilderStore.getState().get('queries').toJS();
         this.computeTabs(this.props.config, variants);
       }
     }
     
-    this.cancel = BrowserStore.subscribe(a);
+    this.cancel = BuilderStore.subscribe(a);
     a();
   }
   
@@ -287,7 +276,9 @@ class Tabs extends Classs<TabsProps> {
     
     if(emptyTabs.length > 0)
     {
-      this.props.reportEmptyTabs(emptyTabs);
+      this.setState({
+        needsVariant: true,
+      });
     }
     
   }

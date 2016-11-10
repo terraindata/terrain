@@ -70,6 +70,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
               {
                 if(!version)
                 {
+                  action.payload.handleNoVariant && action.payload.handleNoVariant(variantId + '@' + versionId);
                   return;
                 }
                 version.cards = Immutable.fromJS(version.cards || []);
@@ -79,6 +80,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
                   {
                   if(!item) 
                   {
+                    action.payload.handleNoVariant && action.payload.handleNoVariant(variantId + '@' + versionId);
                     return;
                   }
                   version.id = item.id;
@@ -97,6 +99,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
             {
               if(!item)
               {
+                action.payload.handleNoVariant && action.payload.handleNoVariant(variantId);
                 return;
               }
               item.cards = BuilderTypes.recordFromJS(item.cards || []);
