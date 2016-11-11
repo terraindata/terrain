@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "MIDWAY_HOST=pa-terraformer01.terrain.int TDB_HOST=pa-terraformer02.terrain.int webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback",
+    "start-local": "MIDWAY_HOST=localhost TDB_HOST=localhost webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback",
     "start-prod": "MIDWAY_HOST=pa-terraformer01.terrain.int TDB_HOST=pa-terraformer02.terrain.int webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback",
     "test": "karma start karma.conf.js",
     "deploy": "MIDWAY_HOST=pa-terraformer01.terrain.int TDB_HOST=pa-terraformer02.terrain.int webpack --config webpack.config.prod.js --output-filename bundle.js && scp bundle.js pa-terraformer01.terrain.int:/home/jkirk/midway/dist/bundle.js",
