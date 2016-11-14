@@ -109,6 +109,8 @@ class Builder extends PureClasss<Props>
     curDb: '',
   };
   
+  initialColSizes: any;
+  
   constructor(props:Props)
   {
     super(props);
@@ -135,6 +137,13 @@ class Builder extends PureClasss<Props>
     this.state.colKeys = colKeys;
 
     this.addManualColumn = _.debounce(this.addManualColumn, 1);
+    
+    let colSizes = JSON.parse(localStorage.getItem('colSizes') || '{}');
+    if(_.reduce(colSizes, (sum, size) => sum + size['x'], 0) !== 0)
+    {
+      colSizes = {};
+    }
+    this.initialColSizes = colSizes;
   }
   
   componentWillMount()
@@ -249,7 +258,6 @@ class Builder extends PureClasss<Props>
       props.history.replaceState({}, `/builder/${newConfig}`);
     }
     localStorage.setItem('config', newConfig || '');
-    console.log('fetch', newConfig);
     this.fetch(newConfig);
   }
   
@@ -259,6 +267,7 @@ class Builder extends PureClasss<Props>
     {
       return;
     }
+    console.log('fetch it', config);
     Actions.fetch(Immutable.List(
       config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id)
     ), this.handleNoVariant);
@@ -275,6 +284,7 @@ class Builder extends PureClasss<Props>
     }
     
     let newConfig = newConfigArr.join(',');
+    localStorage.setItem('config', newConfig); // so that empty configs don't cause a freak out
     this.props.history.replaceState({}, `/builder/${newConfig}`);
   }
   
@@ -394,7 +404,7 @@ class Builder extends PureClasss<Props>
   {
     return {
       fullHeight: true,
-      initialColSizes: JSON.parse(localStorage.getItem('colSizes')),
+      initialColSizes: this.initialColSizes,
       onColSizeChange: this.handleColSizeChange,
       minColWidth: 316,
       columns:

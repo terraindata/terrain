@@ -875,6 +875,7 @@ export module BuilderTypes
                 help: ManualConfig.help["property"],
                 key: 'property',
                 accepts: List(['score', 'transform']),
+                showWhenCards: true,
               },
               {
                 displayType: DisplayType.DROPDOWN,
