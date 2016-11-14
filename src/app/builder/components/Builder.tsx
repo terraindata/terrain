@@ -138,10 +138,11 @@ class Builder extends PureClasss<Props>
 
     this.addManualColumn = _.debounce(this.addManualColumn, 1);
     
-    let colSizes = JSON.parse(localStorage.getItem('colSizes') || '{}');
-    if(_.reduce(colSizes, (sum, size) => sum + size['x'], 0) !== 0)
+    let colSizes = JSON.parse(localStorage.getItem('colSizes') || '[]');
+    
+    if(!Array.isArray(colSizes) || _.reduce(colSizes, (sum, size) => sum + size['x'], 0) !== 0)
     {
-      colSizes = {};
+      colSizes = [];
     }
     this.initialColSizes = colSizes;
   }

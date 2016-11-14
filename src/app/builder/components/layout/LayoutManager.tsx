@@ -472,11 +472,14 @@ var LayoutManager = React.createClass<any, any>({
         let adjustments = JSON.parse(JSON.stringify(this.state.sizeAdjustments));
         // TODO not right
         let a = adjustments[index];
-        adjustments[index] = adjustments[indexToMoveTo];
-        adjustments[indexToMoveTo] = a;
+        adjustments.splice(index, 1);
+        adjustments.splice(indexToMoveTo, 0, a);
         this.setState({
           sizeAdjustments: adjustments,
         });
+        
+        this.props.layout.onColSizeChange &&
+          this.props.layout.onColSizeChange(this.state.sizeAdjustments);
       }
 		}
 
