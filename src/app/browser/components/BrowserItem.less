@@ -43,6 +43,15 @@
     }
     
     .browser-item-name-input {
+      &::selection {
+        background: #ffffb7; /* WebKit/Blink Browsers */
+      }
+      &::-moz-selection {
+        background: #ffffb7; /* Gecko Browsers */
+      }
+    }
+    
+    .browser-item-name-input {
       display: none;
       width: 90%;
       background: rgba(0,0,0,0.15);

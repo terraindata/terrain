@@ -223,6 +223,11 @@ class BrowserItem extends Classs<Props>
     this.props.onDoubleClick && this.props.onDoubleClick(this.props.id);
   }
   
+  handleFocus(event)
+  {
+    event.target.select();
+  }
+  
   render()
   {
     let { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId } = this.props;
@@ -271,6 +276,7 @@ class BrowserItem extends Classs<Props>
                     defaultValue={ this.props.name }
                     placeholder={this.props.type.substr(0, 1).toUpperCase() + this.props.type.substr(1) + ' name'}
                     onBlur={ this.hideTextfield }
+                    onFocus={this.handleFocus}
                     onKeyDown={ this.handleKeyDown }
                     ref='input'
                   />
