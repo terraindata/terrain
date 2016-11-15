@@ -271,7 +271,23 @@ class VariantsColumn extends Classs<Props>
             <div 
               className='browser-item-line'
             >
-              { Util.formatDate(vriant.lastEdited) }
+              <div
+                className={'browser-variant-status browser-variant-status-' + vriant.status}
+                style={{
+                  background: BrowserTypes.colorForStatus(vriant.status)
+                }}
+              >
+                {
+                  BrowserTypes.nameForStatus(vriant.status)
+                }
+              </div>
+            </div>
+            <div 
+              className='browser-item-line'
+            >
+              {
+                Util.formatDate(vriant.lastEdited)
+              }
             </div>
           </div>
         </div>

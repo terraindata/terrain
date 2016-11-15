@@ -60,11 +60,6 @@ import UserStore from '../../users/data/UserStore.tsx';
 import RoleTypes from '../../roles/RoleTypes.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
 
-let live = '#48b14b';
-let approve = '#bf5bff';
-let build = '#00a7f7';
-let archive = '#ff735b';
-
 var AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
 type Algorithm = BrowserTypes.Algorithm;
@@ -197,22 +192,22 @@ class AlgorithmsColumn extends Classs<Props>
     var scores = [
       {
         score: 0,
-        color: archive,
+        color: BrowserTypes.colorForStatus(BrowserTypes.EVariantStatus.Archive),
         name: "Variants in Archived Status",
       },
       {
         score: 0,
-        color: build,
+        color: BrowserTypes.colorForStatus(BrowserTypes.EVariantStatus.Build),
         name: "Variants in Build Status",
       },
       {
         score: 0,
-        color: approve,
+        color: BrowserTypes.colorForStatus(BrowserTypes.EVariantStatus.Approve),
         name: "Variants in Approve Status",
       },
       {
         score: 0,
-        color: live, 
+        color: BrowserTypes.colorForStatus(BrowserTypes.EVariantStatus.Live),
         name: "Variants in Live Status",
       },
     ];

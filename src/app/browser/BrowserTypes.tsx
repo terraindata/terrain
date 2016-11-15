@@ -218,6 +218,40 @@ export module BrowserTypes
   {
     return new Group(Util.extendId({ id, name, lastEdited, lastUsername, usernames, algorithms, algorithmsOrder, status }));
   }
+  
+  export function nameForStatus(status:EVariantStatus): string
+  {
+    switch(status)
+    {
+      case EVariantStatus.Approve:
+        return 'Approve';
+      case EVariantStatus.Archive:
+        return 'Archive';
+      case EVariantStatus.Build:
+        return 'Build';
+      case EVariantStatus.Live:
+        return 'Live';
+      default:
+        return 'None';
+    }
+  }
+  
+  export function colorForStatus(status:EVariantStatus): string
+  {
+    switch(status)
+    {
+      case EVariantStatus.Approve:
+        return '#bf5bff';
+      case EVariantStatus.Archive:
+        return '#ff735b';
+      case EVariantStatus.Build:
+        return '#00a7f7';
+      case EVariantStatus.Live:
+        return '#48b14b';
+      default:
+        return '#000';
+    }
+  }
 }
 
 export default BrowserTypes;
