@@ -69,9 +69,9 @@ import UserActions from './../../users/data/UserActions.tsx';
 import RolesActions from './../../roles/data/RolesActions.tsx';
 import BuilderActions from './../../builder/data/BuilderActions.tsx';
 
-var GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
-var AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
-var VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
+var GroupIcon = require('./../../../images/icon_badgeGroup.svg');
+var AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
+var VariantIcon = require('./../../../images/icon_badgeVariant.svg');
 
 type Group = BrowserTypes.Group;
 type Algorithm = BrowserTypes.Algorithm;
@@ -297,10 +297,13 @@ class BrowserInfoColumn extends Classs<Props>
               <div
                 className='browser-info-image'
                 style={{
-                  background: ColorManager.colorForKey(groupId),
-                  opacity,
                 }}
               >
+                <style
+                  dangerouslySetInnerHTML={{ __html: '.browser-info-image #Color { \
+                    fill: ' + ColorManager.colorForKey(groupId) + ' !important; \
+                  }'}}
+                />
                 { icon }
               </div>
               <div className='browser-info-name'>
