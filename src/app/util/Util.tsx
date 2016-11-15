@@ -143,6 +143,26 @@ var Util = {
     return false;
   },
   
+  formatDate(date):string
+  {
+    let then = moment(date);
+    let now = moment();
+    
+    if(then.format('MMMM Do YYYY') === now.format('MMMM Do YYYY'))
+    {
+      // it was today
+      return 'Today at ' + then.format('h:mm A');
+    }
+    
+    if(then.format('YYYY') === now.format('YYYY'))
+    {
+      // same year
+      return then.format('MMMM Do, h:mm A')
+    }
+    
+    return then.format('MMM Do YYYY, h:mm A');
+  },
+  
   getId(): ID
   {
     // TODO have this fetch a list of IDs from server,

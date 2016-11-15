@@ -137,6 +137,7 @@ class AlgorithmsColumn extends Classs<Props>
   
   handleArchive(index: number)
   {
+    console.log(index, this.props.algorithms.get(this.props.algorithmsOrder.get(index)));
     Actions.algorithms.change(this.props.algorithms.get(this.props.algorithmsOrder.get(index))
       .set('status', BrowserTypes.EAlgorithmStatus.Archive) as Algorithm);
   }
@@ -292,9 +293,8 @@ class AlgorithmsColumn extends Classs<Props>
             </div>
             <div 
               className='browser-item-line'
-              data-tip={Util.moment(date).format('MMMM Do YYYY, h:mm:ss a') }
             >
-              { Util.moment(date).fromNow() }
+              { Util.formatDate(date) }
 
             </div>
           </div>

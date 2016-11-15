@@ -239,6 +239,7 @@ class VariantsColumn extends Classs<Props>
         role = "Builder";
       }
     }
+    
     return (
       <BrowserItem
         index={index}
@@ -269,9 +270,8 @@ class VariantsColumn extends Classs<Props>
           <div className='flex-grow'>
             <div 
               className='browser-item-line'
-              data-tip={moment(vriant.lastEdited).format('MMMM Do YYYY, h:mm:ss a') }
             >
-              { moment(vriant.lastEdited).fromNow() }
+              { Util.formatDate(vriant.lastEdited) }
             </div>
           </div>
         </div>
