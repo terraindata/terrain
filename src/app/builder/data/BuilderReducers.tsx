@@ -73,8 +73,9 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
                   action.payload.handleNoVariant && action.payload.handleNoVariant(variantId + '@' + versionId);
                   return;
                 }
-                version.cards = Immutable.fromJS(version.cards || []);
-                version.inputs = Immutable.fromJS(version.inputs || []);
+                
+                version.cards = BuilderTypes.recordFromJS(version.cards || []);
+                version.inputs = BuilderTypes.recordFromJS(version.inputs || []);
                 //Use current version to get missing fields
                 Ajax.getVariant(variantId, (item) => 
                   {

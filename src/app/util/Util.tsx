@@ -158,20 +158,21 @@ var Util = {
   {
     let then = moment(date);
     let now = moment();
+    let hour = ' at ' + then.format('h:mma');
     
     if(then.format('MMMM Do YYYY') === now.format('MMMM Do YYYY'))
     {
       // it was today
-      return 'Today at ' + then.format('h:mm A');
+      return 'Today at' + hour;
     }
     
     if(then.format('YYYY') === now.format('YYYY'))
     {
       // same year
-      return then.format('MMMM Do, h:mm A')
+      return then.format('MM/DD/YY') + hour
     }
     
-    return then.format('MMM Do YYYY, h:mm A');
+    return then.format('MM/DD/YY') + hour;
   },
   
   getId(): ID

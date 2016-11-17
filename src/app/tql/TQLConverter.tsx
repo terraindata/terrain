@@ -202,7 +202,18 @@ class TQLConverter
   
   static _parse(block: IBlock, index?: number, isLast?: boolean, isTop?: boolean): string
   {
-    let str = (isTop && block.static.topTql) || block.static.tql;
+    if(!block)
+    {
+      console.log('no block');
+      return;
+    }
+    if(!block.static)
+    {
+      debugger;
+      console.log('no static block');
+      return;
+    }
+    let str = block && block.static && ((isTop && block.static.topTql) || block.static.tql);
     var index = str.indexOf("$");
     while(index !== -1)
     {

@@ -1,77 +1,49 @@
 @import "../../common/Common.less";
 
-@version-table-color: #a5a8a1;
-@version-table-bg: #f6f9f2;
-@version-table-hover-bg: #70cdfd;
+@version-table-color: #535855;
+// @version-table-bg: #f6f9f2;
+@version-table-hover-bg: #D5DCD5;
 
 .versions-table-wrapper {
-	position: relative;
-	top: 50px;
-	max-height: calc(~"100%-50px");
-	.versions-table-title {
-		float: left;
-		color: fade(@version-table-color, 80%);
-		margin-left: 12px;
-		font-size: 14px;
+  margin-top: 24px;
+  padding: 12px;
+	font-size: 12px;
+  text-align: left;
+  
+  .versions-table-title {
+    color: @version-table-color;
 	}
 
 	.versions-table {
-		background-color: @version-table-bg;
-		font-size: 12px;
-		display: inline-block;
-		width: 95%;
 		padding: 6px;
 		color: @version-table-color;
 		cursor: pointer;
 		border-radius: 6px;
-		overflow-y: auto;
-		overflow-x: hidden;
-		height: calc(~"100% - 300px");
-    min-height: 125px;
     
 		.versions-table-row {
-			padding: 8px;
-			width: 100%;
-			padding-left: 0px;
-			height: 30px;
-			position: relative;
+			padding: 3px;
 			border-radius: 6px;
-			overflow-y: hidden;
-			white-space: nowrap;
-			&:hover {
-				background-color: @version-table-hover-bg;
-				color: @version-table-bg;
-			}
-			.versions-table-line {
-				width: calc(~"100% - 5px");
-				position: absolute;
-				border-bottom: 1px solid fade(@version-table-color, 50%);
-				top: 45px;
-				left: 5px;
-			}
+      border-bottom: @version-table-hover-bg 1px solid;
+      
+      &:hover,
+      &.versions-table-row-current {
+        background-color: @version-table-hover-bg;
+      }
+
 			.versions-table-element {
 				display: inline-block;
-				float: left;
 				vertical-align: middle;
-				position: relative;
-				overflow-y: auto;
-				white-space: nowrap;
-				&.versions-table-text-element {
-					top: 6px;
-					padding-right: 6px;
-					white-space: normal;
-					max-width: 40%;
-				}
+        max-width: 50%;
+        overflow-x: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
 			}
-			.versions-table-right-align {
-				position: relative;
-				top: 7px;
-				right:0px;
-				overflow-y: auto;
-				overflow-x: hidden;
-				white-space: normal;
-				text-align: right;
-			}
+      
+			// .versions-table-right-align {
+			// 	position: absolute;
+			// 	top: 7px;
+			// 	right: 0px;
+			// }
 		}
 	}
 }

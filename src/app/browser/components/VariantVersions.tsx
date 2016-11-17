@@ -43,8 +43,9 @@ THE SOFTWARE.
 */
 
 require('./VariantVersions.less');
+const classNames = require('classnames');
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import UserTypes from './../../users/UserTypes.tsx';
@@ -66,7 +67,7 @@ interface Props
   history: any;
 }
 
-class VariantVersions extends Classs<Props>
+class VariantVersions extends PureClasss<Props>
 {
   state: {
     users: UserMap,
@@ -153,9 +154,14 @@ class VariantVersions extends Classs<Props>
 
     return (
       <div 
-        className="versions-table-row"
+        className={classNames({
+          "versions-table-row": true,
+          "versions-table-row-current": i === 0,
+        })}
         key={version.id}
-        onClick={this.showVersion.bind(this, version.id, i)}
+        onClick={
+          this._fn('showVersion', version.id, i, this.showVersion.bind(this, version.id, i))
+        }
       >
         <div className="versions-table-element">
           <UserThumbnail 
@@ -166,18 +172,19 @@ class VariantVersions extends Classs<Props>
           />
         </div>
         <div 
-          className="versions-table-element versions-table-text-element"
+          className="versions-table-element"
         >
           {
             Util.formatDate(version.createdAt)
           }
         </div>
-        <div className="versions-table-right-align">
-          {i === 0 ? "Current Version" : null}
-        </div>
-        <div className='versions-table-line' />
       </div>
     );
+        // <div className="versions-table-right-align">
+        //   {
+        //     i === 0 && "Current"
+        //   }
+        // </div>
   }
   
   render()
@@ -187,15 +194,18 @@ class VariantVersions extends Classs<Props>
         <div className="versions-table-title">
           Version History
         </div>
-        {this.state.versions === null ? 
-          <div className='loading'>
-            Loading...
-          </div>
+        {
+          this.state.versions === null ? 
+            <div className='loading'>
+              Loading...
+            </div>
           :
-        <div className="versions-table">
-          {this.state.versions.map(this.renderVersion)}
-        </div>
-      }
+            <div className="versions-table">
+              {
+                this.state.versions.map(this.renderVersion)
+              }
+            </div>
+        }
       </div>
     );
   }

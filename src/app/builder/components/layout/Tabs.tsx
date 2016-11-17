@@ -234,39 +234,26 @@ class Tabs extends Classs<TabsProps> {
   computeTabs(config, variants?)
   {
     variants = variants || this.state.variants;
-    var emptyTabs: ID[] = [];
+    let needsVariant = false;
     let tabs = config && variants && config.split(',').map(vId =>
     {
-      var id = this.getId(vId);
-      let split = id.split('@');
-      if(split.length > 1)
+      let id = this.getId(vId);
+      let variant = variants[id];
+      let name = "Loading...";
+      needsVariant = needsVariant || !variant;
+      if(variant)
       {
-        id = split[0];
-        var version = split[1];
-      }
-      var name = variants[id] && variants[id].name;
-      if(name === '')
-      {
-        name = 'Untitled';
-      }
-      if(version)
-      {
-        name += ' @ ' + moment(variants[id].lastEdited).format("ha M/D/YY")
-        id += '@' + version;
+        name = variant.name || 'Untitled';
+        if(variant.version)
+        {
+          name += ' @ ' + moment(variants[id].lastEdited).format("ha M/D/YY");
+        }
       }
       return {
         id,
         name,
         selected: this.isSelected(vId),
       };
-    }).filter(tab => 
-    {
-      if(tab.name)
-      {
-        return true;
-      }
-      emptyTabs.push(tab.id);
-      return false;
     });
     
     this.setState({
@@ -274,7 +261,7 @@ class Tabs extends Classs<TabsProps> {
       variants,
     });
     
-    if(emptyTabs.length > 0)
+    if(needsVariant)
     {
       this.setState({
         needsVariant: true,
