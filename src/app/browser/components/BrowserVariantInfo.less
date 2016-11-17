@@ -1,0 +1,23 @@
+@import "../../common/Common.less";
+
+.biv-table-wrapper {
+  display: inline-block;
+}
+
+.biv-table {
+  display: table;
+  text-align: left;
+  .biv-row {
+    display: table-row;
+    .biv-cell-first,
+    .biv-cell-second {
+      display: table-cell;
+      padding: 3px 6px;
+      vertical-align: top;
+    }
+    .biv-cell-first {
+      font-weight: bold;
+      // text-align: right;
+    }
+  }
+}

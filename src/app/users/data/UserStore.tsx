@@ -46,9 +46,10 @@ import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 import * as ReduxActions from 'redux-actions';
 var Redux = require('redux');
-import Util from './../../util/Util.tsx';
 
 import AuthStore from './../../auth/data/AuthStore.tsx';
+import Util from './../../util/Util.tsx';
+
 import UserTypes from './../UserTypes.tsx';
 import UserActions from './UserActions.tsx';
 import UserReducers from './UserReducers.tsx';

@@ -61,6 +61,7 @@ import UserStore from '../../users/data/UserStore.tsx';
 import RoleTypes from '../../roles/RoleTypes.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
 import {notificationManager} from './../../common/components/InAppNotification.tsx'
+import StatusDropdown from './StatusDropdown.tsx';
 
 var VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
 
@@ -143,16 +144,16 @@ class VariantsColumn extends Classs<Props>
   
   handleNameChange(id: ID, name: string)
   {
-      if(this.props.variants.get(id).name !== name)
-      {
-        var oldName = this.props.variants.get(id).name || 'Untitled'; 
-        notificationManager.addNotification(
-          'Renamed',
-          '"' + oldName + '" is now "' + name + '"',
-          'info',
-          5
-        );
-      }
+    if(this.props.variants.get(id).name !== name)
+    {
+      var oldName = this.props.variants.get(id).name || 'Untitled'; 
+      notificationManager.addNotification(
+        'Renamed',
+        '"' + oldName + '" is now "' + name + '"',
+        'info',
+        5
+      );
+    }
 
     Actions.variants.change(
       this.props.variants.get(id)
@@ -268,20 +269,10 @@ class VariantsColumn extends Classs<Props>
           <UserThumbnail username={vriant.lastUsername} medium={true} extra = {role}/>
           
           <div className='flex-grow'>
-            <div 
-              className='browser-item-line'
-            >
-              <div
-                className={'browser-variant-status browser-variant-status-' + vriant.status}
-                style={{
-                  background: BrowserTypes.colorForStatus(vriant.status)
-                }}
-              >
-                {
-                  BrowserTypes.nameForStatus(vriant.status)
-                }
-              </div>
-            </div>
+            <StatusDropdown
+              variant={vriant}
+              noBorder={true}
+            />
             <div 
               className='browser-item-line'
             >

@@ -50,6 +50,7 @@ import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import UserTypes from './../../users/UserTypes.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
 import Ajax from './../../util/Ajax.tsx';
+import Util from './../../util/Util.tsx';
 import * as moment from 'moment';
 import RoleTypes from '../../roles/RoleTypes.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
@@ -159,15 +160,17 @@ class VariantVersions extends Classs<Props>
         <div className="versions-table-element">
           <UserThumbnail 
             username={version.username} 
-            medium={false}
+            small={true}
+            showName={true}
             extra={role}
           />
         </div>
         <div 
           className="versions-table-element versions-table-text-element"
-          data-tip={moment(version.createdAt).format('MMMM Do YYYY, h:mm:ss a') }
         >
-          {moment(version.createdAt).fromNow()}
+          {
+            Util.formatDate(version.createdAt)
+          }
         </div>
         <div className="versions-table-right-align">
           {i === 0 ? "Current Version" : null}

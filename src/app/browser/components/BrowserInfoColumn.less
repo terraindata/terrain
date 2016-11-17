@@ -1,7 +1,7 @@
 @import "../../common/Common.less";
 
 .browser-info {
-  background: rgba(255,255,255,0.5);
+  background: #E4E6E0;
   min-height: 100%;
   
   .browser-info-image {
@@ -20,6 +20,12 @@
   .browser-info-name {
     font-size: 24px;
     color: @dark-grey;
+  }
+  
+  .browser-info-type {
+    font-size: 13px;
+    color: @grey;
+    text-transform: capitalize;
     margin-bottom: 15px;
   }
   
@@ -59,9 +65,5 @@
         opacity: 1;
       }
     }
-  }
-  
-  .bic-db-dropdown {
-    margin: 10px;
   }
 }

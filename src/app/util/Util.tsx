@@ -143,6 +143,17 @@ var Util = {
     return false;
   },
   
+  mapEnum(_enum: any, fn: (e: string) => any)
+  {
+    let ans = [];
+    for (var item in _enum) {
+      if (_enum.hasOwnProperty(item) && /^\d+$/.test(item)) {
+        ans.push(fn(item));
+      }
+    }
+    return ans;
+  },
+
   formatDate(date):string
   {
     let then = moment(date);

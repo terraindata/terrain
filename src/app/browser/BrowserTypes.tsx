@@ -93,7 +93,7 @@ export module BrowserTypes
     lastUsername: string;
     status: EVariantStatus;
     algorithmId: ID;
-    groupId: Group;
+    groupId: ID;
     resultsConfig: IResultsConfig;
     db: string;
     deckOpen: boolean;
