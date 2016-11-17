@@ -99,7 +99,6 @@ class BrowserInfoColumn extends PureClasss<Props>
     
     Ajax.getDbs((dbs:string[]) => 
     {
-      console.log(dbs);
       BuilderActions.change(
         List(['dbs']), 
         List(dbs)
@@ -141,8 +140,6 @@ class BrowserInfoColumn extends PureClasss<Props>
   
   render()
   {
-    console.log(this.state.dbs);
-    console.log(BuilderStore.getState().get('dbs'));
     if(!this.props.variant)
     {
       return null;
