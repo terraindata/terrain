@@ -47,7 +47,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 const {List} = Immutable;
 import Ajax from './../../util/Ajax.tsx';
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 import VariantVersions from './VariantVersions.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
 import Menu from './../../common/components/Menu.tsx';
@@ -69,7 +69,7 @@ interface Props
   history?: any;
 }
 
-class BrowserInfoColumn extends Classs<Props>
+class BrowserInfoColumn extends PureClasss<Props>
 {
   state: {
     isAdmin: boolean,
@@ -86,15 +86,7 @@ class BrowserInfoColumn extends Classs<Props>
     this._subscribe(RolesStore, {
       updater: () =>
       {
-        let isAdmin = Util.haveRole(this.props.variant.groupId, 'admin', UserStore, RolesStore);
-        let isBuilder = Util.haveRole(this.props.variant.groupId, 'builder', UserStore, RolesStore);
-        if(isAdmin !== this.state.isAdmin || isBuilder !== this.state.isBuilder)
-        {
-          this.setState({
-            isAdmin,
-            isBuilder,
-          });
-        }
+        this.checkRoles(this.props);
       },
       isMounted: true,
     });
@@ -102,14 +94,44 @@ class BrowserInfoColumn extends Classs<Props>
     this._subscribe(BuilderStore, {
       stateKey: 'dbs',
       storeKeyPath: ['dbs'],
+      isMounted: true,
     });
     
     Ajax.getDbs((dbs:string[]) => 
+    {
+      console.log(dbs);
       BuilderActions.change(
         List(['dbs']), 
         List(dbs)
       )
+    }
     );
+  }
+  
+  componentWillReceiveProps(nextProps:Props)
+  {
+    if(nextProps.variant !== this.props.variant)
+    {
+      this.checkRoles(nextProps);
+    }
+  }
+  
+  checkRoles(props:Props)
+  {
+    if(!props.variant)
+    {
+      return;
+    }
+    
+    let isAdmin = Util.haveRole(props.variant.groupId, 'admin', UserStore, RolesStore);
+    let isBuilder = Util.haveRole(props.variant.groupId, 'builder', UserStore, RolesStore);
+    if(isAdmin !== this.state.isAdmin || isBuilder !== this.state.isBuilder)
+    {
+      this.setState({
+        isAdmin,
+        isBuilder,
+      });
+    }
   }
   
   handleDbChange(dbIndex:number)
@@ -119,6 +141,8 @@ class BrowserInfoColumn extends Classs<Props>
   
   render()
   {
+    console.log(this.state.dbs);
+    console.log(BuilderStore.getState().get('dbs'));
     if(!this.props.variant)
     {
       return null;

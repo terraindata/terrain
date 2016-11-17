@@ -145,7 +145,7 @@ class StatusDropdown extends PureClasss<Props>
   {
     let {variant} = this.props;
     
-    let tooltip = null;
+    let tooltip = "";
     if(!this.canEdit())
     {
       if(!this.state.isBuilder)
