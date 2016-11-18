@@ -258,7 +258,15 @@ export const Ajax = {
     var url = '/variant_versions/' + variantId;
     return Ajax._get(url, "", (response: any) =>
     {
-      JSON.parse(response).map(version => version.id === versionId && onLoad(JSON.parse(version.data)))
+      let version = JSON.parse(response).find(version => version.id === versionId);
+      if(version)
+      {
+        onLoad(JSON.parse(version.data));
+      }
+      else
+      {
+        onLoad(null);
+      }
     });
   },
   

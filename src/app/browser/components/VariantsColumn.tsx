@@ -362,7 +362,8 @@ class VariantsColumn extends Classs<Props>
               <InfoArea
                 large='No variants created, yet.'
                 button={
-                  Util.haveRole(this.props.groupId, 'builder', UserStore, RolesStore)
+                  Util.haveRole(this.props.groupId, 'builder', UserStore, RolesStore) ||
+                  Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
                     ? 'Create a variant' : null
                 }
                 onClick={this.handleCreate}

@@ -577,7 +577,20 @@ export module BuilderTypes
                 }
                 return list;
               }
-            , List([])),
+            , List([]))
+            .concat(
+              card['fields'].reduce(
+                (list:List<string>, fieldBlock: {field: CardString}): List<string> =>
+                {
+                  if(fieldBlock.field['type'] === 'as')
+                  {
+                    // an as card
+                    return list.push(fieldBlock.field['alias']);
+                  }
+                  return list;
+                }, List([])
+              )
+            ),
           
         display: [
           {
