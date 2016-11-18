@@ -126,14 +126,15 @@ class VariantsColumn extends Classs<Props>
     }
   }
   
-  handleDuplicate(index: number)
+  handleDuplicate(id: ID)
   {
-    Actions.variants.duplicate(this.props.variants.get(this.props.variantsOrder.get(index)), index);
+    Actions.variants.duplicate(this.props.variants.find(v => v.id === id),
+      this.props.variantsOrder.findIndex(iid => iid === id));
   }
   
-  handleArchive(index: number)
+  handleArchive(id: ID)
   {
-    Actions.variants.change(this.props.variants.get(this.props.variantsOrder.get(index))
+    Actions.variants.change(this.props.variants.find(v => v.id === id)
       .set('status', BrowserTypes.EVariantStatus.Archive) as Variant);
   }
   

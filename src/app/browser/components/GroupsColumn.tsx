@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+
 import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
 import BrowserColumn from './BrowserColumn.tsx';
@@ -98,14 +99,15 @@ class GroupsColumn extends Classs<Props>
     });
   }
   
-  handleDuplicate(index: number)
+  handleDuplicate(id: ID)
   {
-    Actions.groups.duplicate(this.props.groups.get(this.props.groupsOrder.get(index)), index);
+    Actions.groups.duplicate(this.props.groups.find(g => g.id === id),
+      this.props.groupsOrder.findIndex(iid => iid === id));
   }
   
-  handleArchive(index: number)
+  handleArchive(id: ID)
   {
-    Actions.groups.change(this.props.groups.get(this.props.groupsOrder.get(index))
+    Actions.groups.change(this.props.groups.find(g => g.id === id)
       .set('status', BrowserTypes.EGroupStatus.Archive) as Group);
   }
   

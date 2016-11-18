@@ -125,15 +125,16 @@ class AlgorithmsColumn extends Classs<Props>
     }
   }
   
-  handleDuplicate(index: number)
+  handleDuplicate(id: ID)
   {
-    Actions.algorithms.duplicate(this.props.algorithms.get(this.props.algorithmsOrder.get(index)), index);
+    Actions.algorithms.duplicate(this.props.algorithms.find(alg => alg.id === id),
+      this.props.algorithmsOrder.findIndex(iid => iid === id));
   }
   
-  handleArchive(index: number)
+  handleArchive(id: ID)
   {
-    console.log(index, this.props.algorithms.get(this.props.algorithmsOrder.get(index)));
-    Actions.algorithms.change(this.props.algorithms.get(this.props.algorithmsOrder.get(index))
+    console.log(id, this.props.algorithms.find(alg => alg.id === id));
+    Actions.algorithms.change(this.props.algorithms.find(alg => alg.id === id)
       .set('status', BrowserTypes.EAlgorithmStatus.Archive) as Algorithm);
   }
   

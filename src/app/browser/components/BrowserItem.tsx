@@ -57,8 +57,8 @@ interface Props
 {
   index: number;
   name: string;
-  onDuplicate: (index: number) => void;
-  onArchive: (index: number) => void;
+  onDuplicate: (id: ID) => void;
+  onArchive: (id: ID) => void;
   canArchive: boolean;
   canDuplicate: boolean;
   icon: any;
@@ -162,12 +162,12 @@ class BrowserItem extends Classs<Props>
   
   handleDuplicate()
   {
-    this.props.onDuplicate(this.props.index);
+    this.props.onDuplicate(this.props.id);
   }
   
   handleArchive()
   {
-    this.props.onArchive(this.props.index);
+    this.props.onArchive(this.props.id);
   }
   
   handleKeyDown(event)
