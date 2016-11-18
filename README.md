@@ -92,6 +92,10 @@ The Terrain search front-end uses these technologies:
   e.g. instead of `.first, .second, .third .thirds-kid, .fourth[type=text]`, put a newline after every comma.
 - CSS classes are named with `-`.
   e.g. `blue-and-black` or `white-and-gold`
+- Only use LESS files; don't use CSS files.
+- In LESS files, nest classes as much as possible.
+- Any component that renders JSX (HTML) with CSS classes should include its own LESS file with appropriate CSS
+- The structure and order of LESS files should mimic the structure and order of the JSX
 - Avoid `// TODO` at all costs
 - Avoid commenting; aim to write code that doesn't need comments
 - Interfaces are named with the letter 'I'
@@ -147,7 +151,7 @@ Contains Actions and Stores for Redux.
 - `[SmallerApp]ActionTypes.tsx`: a static object of strings. Add new action types here.
 - `[SmallerApp]Actions.tsx`: an object of functions that dispatch Actions to that app's Store.
 - `[SmallerApp]Store.tsx`: the Store that defines that app's default state and its reducers
-- `[CommonFunction]Reducers.tsx`: defines reducers relating to a common function in that smaller app. If the smaller app doesn't have many different actions, there may be just one reducers file.
+- `[SmallerApp || CategoryOfFunctions]Reducers.tsx`: defines reducers relating to a common function in that smaller app. If the smaller app doesn't have many different actions, there may be just one reducers file.
 
 ### src/typings
 
@@ -184,13 +188,13 @@ To include another `.tsx` file from within the Terraformer codebase (`/src`), us
 `import DotComponent from './DotComponent.tsx';`
 `import NapoleonDynamite from '../../movies/NapoleonDynamite.tsx';`
 
-To include any file that's not a `.tsx` from within the Terraformer codebase, use `let [ClassName] = require('[relative path]')` e.g.
+To include any file that's not a `.tsx` from within the Terraformer codebase, use `const [ClassName] = require('[relative path]')` e.g.
 `require('./Pay.less');`
-`let EssVeeGee = require('../../images/svg.svg');`
+`const FreddyAnd = require('../../data/FreddyAnd.json');`
 
 To include a package install from `npm`, use `import * as [ClassName] from '[package_name]';` if there are typings available, and `let [ClassName] = require('[package_name]');` if not. e.g.
 `import * as TheForce from 'the-force';`
-`let UnpopularLibrary = require('unpopular-library');`
+`const UnpopularLibrary = require('unpopular-library');`
 
 ## Testing
 

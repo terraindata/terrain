@@ -216,12 +216,20 @@ var App = React.createClass({
         className='app'
         onMouseMove={this.handleMouseMove}
       >
-        <div className='app-top-bar'>
-          <TerrainIcon className='app-top-bar-icon' />
-          { this.state.loggedIn && <AccountDropdown onLogout={this.handleLogout} history={this.props.history} /> }
-        </div>
+        { 
+          this.state.loggedIn &&
+            <div className='app-top-bar'>
+              <TerrainIcon className='app-top-bar-icon' />
+               <AccountDropdown 
+                 onLogout={this.handleLogout} 
+                 history={this.props.history} 
+               />
+            </div>
+        }
         <div className='app-wrapper'>
-          { this.renderApp() }
+          { 
+            this.renderApp()
+          }
         </div>
         
         <ReactTooltip

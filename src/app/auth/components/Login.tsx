@@ -43,6 +43,8 @@ THE SOFTWARE.
 */
 
 require('./Login.less')
+import * as $ from 'jquery';
+import * as classNames from 'classnames';
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
 import Actions from "../data/AuthActions.tsx";
@@ -50,28 +52,51 @@ import PureClasss from '../../common/components/PureClasss.tsx';
 import Modal from './../../common/components/Modal.tsx';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
-var TerrainIcon = require("./../../../images/logo_TerrainLong.svg");
-//var TerrainIcon = require("./../../../images/icon_terrain_108x17.svg?name=TerrainIcon");
+var TerrainIcon = require("./../../../images/logo_mountainCircle.svg?name=TerrainIcon");
 
 interface Props {
 }
 
 class Login extends PureClasss<Props>
 {
-  constructor(props:Props)
+  state = {
+    shifted: false,
+    username: '',
+    password: '',
+    loginErrorModalOpen: false,
+    errorModalMessage: '',
+    opened: false,
+  };
+  
+  componentDidMount()
   {
-    super(props);
-    Util.bind(this, 'handleKeyDown');
-    this.state = {
-      username: '',
-      password: '',
-      loginErrorModalOpen: false,
-      errorModalMessage: '',
-    }
-    this.toggleErrorModal = this.toggleErrorModal.bind(this);
+    $('body').on('keydown', this.handleBodyKeyDown);
+    
+    setTimeout(() =>
+      Util.animateToAutoHeight(this.refs['container'], 
+        () => this.setState({
+          opened: true,
+        }),
+        500
+      ),
+      1000
+    );
   }
   
-  handleKeyDown = (event) =>
+  componentWillUnmount()
+  {
+    $('body').off('keydown', this.handleBodyKeyDown);
+  }
+  
+  handleBodyKeyDown(event)
+  {
+    // delay it, because for some reason, the page does
+    //  not pick up on auto-filled values in the password
+    //  field until after the enter key is pressed
+    setTimeout(() => this.handleKeyDown(event), 100);
+  }
+  
+  handleKeyDown(event)
   {
     if(event.keyCode === 13)
     {
@@ -79,17 +104,54 @@ class Login extends PureClasss<Props>
     }
   }
   
-  handleUsernameChange = (ev:any) =>
+  handleUsernameChange(ev:any)
   {
-    this.setState({ username: ev.target.value });
+    let {value} = ev.target;
+    this.setState({ 
+      username: value
+    });
+    
+    if(value.length)
+    {
+      this.setState({
+        shifted: true,
+      })
+    }
   }
   
-  handlePasswordChange = (ev:any) =>
+  handlePasswordChange(ev:any)
   {
-    this.setState({ password: ev.target.value });
+    let {value} = ev.target;
+    this.setState({ 
+      password: value
+    });
+    
+    if(value.length)
+    {
+      this.setState({
+        shifted: true,
+      })
+    }
   }
   
-  handleLogin = () =>
+  handleFocus()
+  {
+    this.setState({
+      shifted: true,
+    });
+  }
+  
+  handleBlur()
+  {
+    if(!this.state.username && !this.state.password)
+    {
+      this.setState({
+        shifted: false,
+      });
+    }
+  }
+  
+  handleLogin()
   {
     let { username } = this.state;
     let login = (token: string) => {
@@ -140,62 +202,90 @@ class Login extends PureClasss<Props>
 
   render() {
     return (
-     <div className='login-wrapper'>
-      <div className='login-container'>
+      <div
+        className={classNames({
+          'login-wrapper': true,
+          'login-wrapper-shifted': this.state.shifted,
+          'login-wrapper-opened': this.state.opened,
+        })}
+        onKeyDown={this.handleKeyDown} 
+      >
         <div className='login-logo-container'>
           <TerrainIcon className='login-logo'/>
         </div>
-        <div className='login-arrow-down'/>
-        <div className='login-white-box' />
+        <div
+          className='login-container'
+          ref='container'
+        >
           <div className='login-info'>
-            <div className='login-field-title'>Email</div>
+            <div className='login-row'>
               <input
+                id='login-email'
                 type='text'
                 onChange={this.handleUsernameChange}
                 className='login-input-field'
-                placeholder='e.g. jsmith@redwoodforest.com'
+                placeholder=''
+                onFocus={this.handleFocus}
+                onBlur={this.handleBlur}
               />
-            <div className='login-field-title'>Password</div>
-            <input 
-              className='login-input-field' 
-              type='password' 
-              placeholder='e.g. ********' 
-              onKeyDown={this.handleKeyDown} 
-              onChange={this.handlePasswordChange} 
-            />
+              <label
+                htmlFor='login-email'
+                className='login-label'
+              >
+                Email
+              </label>
+            </div>
+            <div className='login-row'>
+              <input 
+                className='login-input-field' 
+                type='password' 
+                id='login-password'
+                placeholder='' 
+                onKeyDown={this.handleKeyDown} 
+                onChange={this.handlePasswordChange} 
+                onFocus={this.handleFocus}
+                onBlur={this.handleBlur}
+              />
+              <label
+                className='login-label'
+                htmlFor='login-password'
+              >
+                Password
+              </label>
+            </div>
           </div>
           <div className='login-submit-button-wrapper' >
             <div className='login-submit-button button' onClick={this.handleLogin}>
               Login
             </div>
           </div>
+          <Modal 
+            message={this.state.errorModalMessage}
+            onClose={this.toggleErrorModal} 
+            open={this.state.loginErrorModalOpen} 
+            error={true}
+          /> 
         </div>
-        <div className='login-bottom-toolbar'>
-          <div 
-            className='login-forgot-password'
-            onClick={this.handleForgotPassword}
-          >
-            Forgot Password? 
-          </div>
-          <div className='login-no-account'>
-            Don't have an account yet? &nbsp; 
-              <span 
-                className='login-green'
-                onClick={this.registerNewUser}
-              >
-                 Sign Up
-              </span>
-          </div>
-        </div>
-        <Modal 
-          message={this.state.errorModalMessage}
-          onClose={this.toggleErrorModal} 
-          open={this.state.loginErrorModalOpen} 
-          error={true}
-        /> 
       </div>
-   );
-  }
+    );
+   }
 };
+        // <div className='login-bottom-toolbar'>
+        //   <div 
+        //     className='login-forgot-password'
+        //     onClick={this.handleForgotPassword}
+        //   >
+        //     Forgot Password? 
+        //   </div>
+        //   <div className='login-no-account'>
+        //     Don't have an account yet? &nbsp; 
+        //       <span 
+        //         className='login-green'
+        //         onClick={this.registerNewUser}
+        //       >
+        //          Sign Up
+        //       </span>
+        //   </div>
+        // </div>
 
 export default Login;

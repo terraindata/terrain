@@ -317,15 +317,15 @@ var Util = {
     }); 
   },
   
-  animateToAutoHeight(node, onComplete?): void
+  animateToAutoHeight(node, onComplete?, duration?): void
   {
     var el = $(node);
     var curHeight = el.height();
     var autoHeight = el.css('height', 'auto').height();
 
-    el.height(curHeight).animate({ height: autoHeight }, 250, function() {
+    el.height(curHeight).animate({ height: autoHeight }, duration || 250, function() {
       el.css('height', 'auto'); 
-      el.css('overflow', 'visible');
+      el.css('overflow-y', 'visible');
       onComplete && onComplete();
     });
   },
