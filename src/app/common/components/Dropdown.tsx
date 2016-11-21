@@ -171,12 +171,12 @@ class Dropdown extends PureClasss<Props>
     return (
       <div
         className={classes}
+        onClick={this.toggleOpen}
       >
         { this.state.up && this.state.open ? optionsEl : null }
         <div
           className="dropdown-value"
           ref="value"
-          onClick={this.toggleOpen}
         >
           {
             // map through all of the options so that the dropdown takes the width of the longest one
