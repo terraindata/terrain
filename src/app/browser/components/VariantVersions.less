@@ -12,10 +12,17 @@
   
   .versions-table-title {
     color: @version-table-color;
+    font-size: 14px;
+    font-weight: bold;
 	}
+  
+  .versions-table-right-align {
+    text-align: right;
+    color: darken(@version-table-hover-bg, 25%);
+    margin-top: -6px;
+  }
 
 	.versions-table {
-		padding: 6px;
 		color: @version-table-color;
 		cursor: pointer;
 		border-radius: 6px;
@@ -28,6 +35,9 @@
       &:hover,
       &.versions-table-row-current {
         background-color: @version-table-hover-bg;
+      }
+      &.versions-table-row-current {
+        // margin-bottom: 6px;
       }
 
 			.versions-table-element {

@@ -55,7 +55,7 @@ var optionHeight = 30; // coordinate with Menu.less
 
 export interface MenuOption {
   text: string;
-  onClick: (index:number) => void;
+  onClick: (index:number, id: string) => void;
   disabled?: boolean;
   icon?: any;
   iconColor?: string;
@@ -65,7 +65,8 @@ interface Props
 {
   options: List<MenuOption>;
   small?: boolean;
-  style?: any,
+  style?: any;
+  id?: ID;
 }
 
 export class Menu extends PureClasss<Props>
@@ -91,10 +92,11 @@ export class Menu extends PureClasss<Props>
     
     if(!option.disabled)
     {
+      // TODO
       var onClick = (event) => {
         event.preventDefault();
         event.stopPropagation();
-        option.onClick(index);
+        option.onClick(index, this.props.id);
       };
     }
     return (

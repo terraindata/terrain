@@ -180,11 +180,6 @@ class VariantVersions extends PureClasss<Props>
         </div>
       </div>
     );
-        // <div className="versions-table-right-align">
-        //   {
-        //     i === 0 && "Current"
-        //   }
-        // </div>
   }
   
   render()
@@ -193,6 +188,9 @@ class VariantVersions extends PureClasss<Props>
       <div className="versions-table-wrapper">
         <div className="versions-table-title">
           Version History
+        </div>
+        <div className="versions-table-right-align">
+          Current Version
         </div>
         {
           this.state.versions === null ? 

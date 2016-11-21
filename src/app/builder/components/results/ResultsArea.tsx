@@ -60,6 +60,7 @@ import PureClasss from './../../../common/components/PureClasss.tsx';
 import InfiniteScroll from './../../../common/components/InfiniteScroll.tsx';
 import Switch from './../../../common/components/Switch.tsx';
 import BuilderTypes from '../../BuilderTypes.tsx';
+import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore.tsx';
 
 const RESULTS_PAGE_SIZE = 200;
 const MAX_RESULTS = 200;
@@ -72,32 +73,35 @@ interface Props
   canEdit: boolean;
 }
 
+interface State
+{
+  results: any[];
+  resultsWithAllFields: any[];
+  resultText: string;
+  resultType: string;
+  resultsCount: number;
+  
+  tql: string;
+  error: any;
+  
+  resultFormat: string;
+  showingConfig: boolean;
+  
+  expanded: boolean;
+  expandedResultIndex: number;
+  
+  resultsPages: number;
+  loadedResultsPages: number;
+  onResultsLoaded: (unchanged?: boolean) => void;
+}
+
 class ResultsArea extends PureClasss<Props>
 {
   xhr = null;
   allXhr = null;
   countXhr = null;
   
-  state: {
-    results: any[];
-    resultsWithAllFields: any[];
-    resultText: string;
-    resultType: string;
-    resultsCount: number;
-    
-    tql: string;
-    error: any;
-    
-    resultFormat: string;
-    showingConfig: boolean;
-    
-    expanded: boolean;
-    expandedResultIndex: number;
-    
-    resultsPages: number;
-    loadedResultsPages: number;
-    onResultsLoaded: (unchanged?: boolean) => void;
-  } = {
+  state: State = {
     results: null,
     resultsCount: null,
     resultsWithAllFields: null,
@@ -234,18 +238,6 @@ class ResultsArea extends PureClasss<Props>
   
   resultsFodderRange = _.range(0, 25);
   
-  getPrimaryKeyFor(result:any, config:IResultsConfig): string
-  {
-    if(config && config.primaryKeys.size)
-    {
-      return config.primaryKeys.map(
-        field => result[field]
-      ).join("and");
-    }
-    
-    return "result-" + Math.floor(Math.random() * 100000000);
-  }
-  
   renderResults()
   {
     if(this.state.error)
@@ -314,7 +306,7 @@ class ResultsArea extends PureClasss<Props>
               return null;
             }
             
-            let primaryKey = this.getPrimaryKeyFor(result, config);
+            let primaryKey = getPrimaryKeyFor(result, config);
             
             return (
               <Result
@@ -450,6 +442,32 @@ class ResultsArea extends PureClasss<Props>
     {
       // all done with both
       this.props.onLoadEnd && this.props.onLoadEnd();
+    }
+  }
+  
+  componentWillUpdate(nextProps, nextState: State)
+  {
+    if(nextState.results !== this.state.results 
+      || nextState.resultsWithAllFields !== this.state.resultsWithAllFields)
+    {
+      // update spotlights
+      let config = this.getResultsConfig();
+      SpotlightStore.getState().spotlights.map(
+        (spotlight, id) =>
+        {
+          let resultIndex = nextState.results && nextState.results.findIndex(
+            r => getPrimaryKeyFor(r, config) === id
+          );
+          if(resultIndex !== -1)
+          {
+            spotlightAction(id, _.extend({}, nextState.results[resultIndex], nextState.resultsWithAllFields[resultIndex]));
+          }
+          else
+          {
+            spotlightAction(id, null);
+          } 
+        }
+      );
     }
   }
   
@@ -624,5 +642,18 @@ class ResultsArea extends PureClasss<Props>
     );
 	}
 }
+
+export function getPrimaryKeyFor(result:any, config:IResultsConfig): string
+{
+  if(config && config.primaryKeys.size)
+  {
+    return config.primaryKeys.map(
+      field => result[field]
+    ).join("and");
+  }
+  
+  return "result-" + Math.floor(Math.random() * 100000000);
+}
+  
 
 export default ResultsArea;

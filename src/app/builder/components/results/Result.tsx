@@ -135,18 +135,9 @@ class Result extends Classs<Props> {
   }
   generateDragPreview(props:Props)
   {
-    this.dragPreview = createDragPreview(this.getName(props), dragPreviewStyle);
+    this.dragPreview = createDragPreview(getResultName(this.props.data, this.props.allFieldsData, 
+      this.props.config), dragPreviewStyle);
     props.connectDragPreview(this.dragPreview);
-  }
-
-  getValue(field, overrideFormat?)
-  {
-    var {data, allFieldsData} = this.props;
-    var dataField = data && data[field];
-    var allDataField = allFieldsData && allFieldsData[field];
-    let value = allDataField || dataField;
-    
-    return ResultFormatValue(field, value, this.props.config, overrideFormat);
   }
 
   renderExpandedField(value, field)
@@ -164,7 +155,7 @@ class Result extends Classs<Props> {
       return null;
     }
     
-    var value = this.getValue(field, overrideFormat);
+    var value = getResultValue(this.props.data, this.props.allFieldsData, field, overrideFormat);
     
     let format = this.props.config && this.props.config.formats.get(field);
     let showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
@@ -189,10 +180,13 @@ class Result extends Classs<Props> {
     );
   }
   
+  getData(): any
+  {
+    return _.extend({}, this.props.allFieldsData, this.props.data);
+  }
+  
   spotlight()
   {
-    // TODO
-    // Actions.results.spotlight(this.props.data, ColorManager.colorForKey(this.props.data.id));
     let id = this.props.primaryKey;
     let spotlightColor = ColorManager.colorForKey(id);
     this.setState({
@@ -200,20 +194,20 @@ class Result extends Classs<Props> {
       spotlightColor,
     });
     
-    let spotlightData = this.props.allFieldsData || this.props.data;
-    spotlightData['name'] = this.getName();
+    let spotlightData = this.getData();
+    spotlightData['name'] = getResultName(this.props.data, this.props.allFieldsData, this.props.config);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightAction(id, spotlightData);
   }
   
-  componentWillUnmount()
-  {
-    if(this.state.isSpotlit)
-    {
-      spotlightAction(this.props.primaryKey, null);
-    }
-  }
+  // componentWillUnmount()
+  // {
+  //   if(this.state.isSpotlit)
+  //   {
+  //     spotlightAction(this.props.primaryKey, null);
+  //   }
+  // }
   
   unspotlight()
   {
@@ -293,39 +287,9 @@ class Result extends Classs<Props> {
     this.props.onExpand(this.props.index);
   }
   
-  getFields(): string[]
-  {
-    let {config, data} = this.props;
-    if(config && config.enabled && config.fields && config.fields.size)
-    {
-      var fields = config.fields.toArray();
-    }
-    else
-    {
-      var fields = _.keys(data);
-    }
-    
-    return fields;
-  }
-  
-  getName(props?:Props)
-  {
-    let {config, data} = props || this.props;
-    if(config && config.name && config.enabled)
-    {
-      var nameField = config.name;
-    }
-    else
-    {
-      var nameField = _.first(this.getFields());
-    }
-    
-    return this.getValue(nameField);
-  }
-  
 	render()
   {
-    const { isDragging, connectDragSource, isOver, connectDropTarget, data, config } = this.props;
+    const { isDragging, connectDragSource, isOver, connectDropTarget, config, data, allFieldsData } = this.props;
     
     var classes = classNames({
       'result': true,
@@ -345,7 +309,8 @@ class Result extends Classs<Props> {
       );
     }
     
-    let fields = this.getFields();
+    let name = getResultName(data, allFieldsData, config);
+    let fields = getResultFields(data, allFieldsData, config);
     
     if(fields.length > 4 && !this.props.expanded)
     {
@@ -358,7 +323,6 @@ class Result extends Classs<Props> {
     
     if(this.props.expanded)
     {
-      var {allFieldsData} = this.props;
       var expanded = (
         <div className='result-expanded-fields'>
           <div className='result-expanded-fields-title'>
@@ -375,7 +339,10 @@ class Result extends Classs<Props> {
     }
     
     return connectDropTarget(connectDragSource(
-      <div className={classes} onDoubleClick={this.expand}>
+      <div
+        className={classes}
+        onDoubleClick={this.expand}
+      >
         <div className='result-inner'>
           <div className='result-name'>
             <div className='result-name-inner'>
@@ -383,7 +350,9 @@ class Result extends Classs<Props> {
               <div className='result-pin-icon'>
                 <PinIcon />
               </div>
-              { this.getName() }
+              { 
+                name
+              }
             </div>
           </div>
           <Menu options={this.getMenuOptions()} />
@@ -392,12 +361,13 @@ class Result extends Classs<Props> {
             {
                 _.map(fields, this.renderField)
             }
-            { bottom }
-            { expanded }
+            { 
+              bottom
+            }
+            { 
+              expanded
+            }
           </div>
-        </div>
-        <div className='result-dragging' ref='drag-handle'>
-          { this.props.data.name }
         </div>
       </div>
     ));
@@ -549,5 +519,41 @@ const dropCollect = (connect, monitor) =>
   canDrop: monitor.canDrop(),
   itemType: monitor.getItemType()
 });
+
+export function getResultValue(resultData, allFieldsData, field: string, config: IResultsConfig, overrideFormat?: IResultsConfig): string
+{
+  var value = (resultData && resultData[field]) ||(allFieldsData && allFieldsData[field]);
+  
+  return ResultFormatValue(field, value, config, overrideFormat);
+}
+
+export function getResultFields(resultData, allFieldsData, config: IResultsConfig): string[]
+{
+  if(config && config.enabled && config.fields && config.fields.size)
+  {
+    var fields = config.fields.toArray();
+  }
+  else
+  {
+    var fields = _.union(_.keys(resultData), _.keys(allFieldsData));
+  }
+  
+  return fields;
+}
+  
+export function getResultName(resultData, allFieldsData, config: IResultsConfig)
+{
+  if(config && config.name && config.enabled)
+  {
+    var nameField = config.name;
+  }
+  else
+  {
+    var nameField = _.first(getResultFields(resultData, allFieldsData, config));
+  }
+  
+  return getResultValue(resultData, allFieldsData, nameField, config);
+}
+
 
 export default DropTarget('RESULT', resultTarget, dropCollect)(DragSource('RESULT', resultSource, dragCollect)(Result));

@@ -44,11 +44,16 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import PureClasss from '../../../common/components/PureClasss.tsx';
 import Table from '../../../common/components/Table.tsx';
 import InfoArea from '../../../common/components/InfoArea.tsx';
 import {IResultsConfig, ResultsConfig} from "../results/ResultsConfig.tsx";
-import {ResultFormatValue} from './Result.tsx';
+import {getResultName, getResultFields, getResultValue} from './Result.tsx';
+import {getPrimaryKeyFor} from './ResultsArea.tsx';
+import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore.tsx';
+import ColorManager from '../../../util/ColorManager.tsx';
+import {MenuOption} from '../../../common/components/Menu.tsx';
 
 interface Props
 {
@@ -62,9 +67,26 @@ export default class ResultsTable extends PureClasss<Props>
 {
   state: {
     random: number;
+    spotlightState: SpotlightState;
   } = {
     random: 0,
+    spotlightState: null,
   };
+  
+  menuOptions: List<MenuOption> = Immutable.List([
+    {
+      text: 'Spotlight',
+      onClick: this.spotlight,
+    }
+  ]);
+  
+  componentDidMount()
+  {
+    this._subscribe(SpotlightStore, {
+      isMounted: true,
+      stateKey: 'spotlightState',
+    })
+  }
   
   getKey(col: number): string
   {
@@ -89,16 +111,31 @@ export default class ResultsTable extends PureClasss<Props>
     return config.fields.get(col - offset);
   }
   
-  getValue(i: number, col: number): string
+  getValue(i: number, col: number): El
   {
     let field = this.getKey(col);
     let {results, resultsWithAllFields, resultsConfig} = this.props;
+    let primaryKey = getPrimaryKeyFor(results && results[i], resultsConfig);
+    let spotlight = this.state.spotlightState 
+      && this.state.spotlightState.getIn(['spotlights', primaryKey]);
 
-    let value =
-      (resultsWithAllFields && resultsWithAllFields[i] && resultsWithAllFields[i][field])
-      || (results && results[i] && results[i][field]);
-    
-    return ResultFormatValue(field, value, resultsConfig);
+    return (
+      <div>
+        {
+          spotlight &&
+            <div
+              className='result-spotlight'
+              style={{
+                background: spotlight,
+              }}
+            />
+        }
+        {
+          getResultValue(results && results[i], 
+            resultsWithAllFields && resultsWithAllFields[i], field, resultsConfig)
+        }
+      </div>
+    );
   }
   
   hasScore(): boolean
@@ -114,6 +151,28 @@ export default class ResultsTable extends PureClasss<Props>
   handleCellClick(r: number, c: number)
   {
     this.props.onExpand(r);
+  }
+  
+  spotlight(menuIndex: number, rc: string)
+  {
+    let row = rc.split('-')[0];
+    let col = rc.split('-')[1];
+    let result = this.props.results && this.props.results[row];
+    let allFieldsResult = this.props.resultsWithAllFields && this.props.resultsWithAllFields[row];
+    let id = getPrimaryKeyFor(result, this.props.resultsConfig);
+    let spotlightColor = ColorManager.colorForKey(id);
+    
+    // TODO
+    // this.setState({
+    //   isSpotlit: true,
+    //   spotlightColor,
+    // });
+    
+    let spotlightData = JSON.parse(JSON.stringify(result));
+    spotlightData['name'] = getResultName(result, allFieldsResult, this.props.resultsConfig);
+    spotlightData['color'] = spotlightColor;
+    spotlightData['id'] = id;
+    spotlightAction(id, spotlightData);
   }
   
   render()

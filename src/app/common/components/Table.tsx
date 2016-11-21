@@ -55,6 +55,7 @@ let scrollbarSize = require('dom-helpers/util/scrollbarSize');
 import * as cn from 'classnames';
 import Classs from './Classs.tsx';
 import Util from '../../util/Util.tsx';
+import {Menu, MenuOption} from '../../common/components/Menu.tsx';
 
 const LEFT_COLOR_FROM = hexToRgb('#a2af93')
 const LEFT_COLOR_TO = hexToRgb('#828c76')
@@ -64,13 +65,14 @@ const TOP_COLOR_TO = hexToRgb('#3e3c3c')
 interface Props
 {
   getKey: (col: number) => string;
-  getValue: (i: number, col: number) => string;
+  getValue: (i: number, col: number) => string | El;
   rowCount: number;
   colCount: number;
   pinnedCols?: number;
   random?: number;
   hardRandom?: number;
   onCellClick?: (r: number, c: number) => void;
+  menuOptions?: List<MenuOption>;
 }
 
 const HEADER_ROW_HEIGHT = 35;
@@ -354,6 +356,13 @@ export default class ResultsTable extends Classs<Props>
         data-col={colIndex}
       >
         {
+          columnIndex === 0 &&
+            <Menu
+              options={this.props.menuOptions}
+              id={rowIndex + '-' + colIndex}
+            />
+        }
+        {
           this.props.getValue(rowIndex, colIndex)
         }
       </div>
@@ -388,6 +397,13 @@ export default class ResultsTable extends Classs<Props>
         data-row={rowIndex}
         data-col={columnIndex}
       >
+        {
+          columnIndex === 0 &&
+            <Menu
+              options={this.props.menuOptions}
+              id={rowIndex + '-' + columnIndex}
+            />
+        }
         {
           this.props.getValue(rowIndex, columnIndex)
         }
