@@ -133,7 +133,6 @@ class AlgorithmsColumn extends Classs<Props>
   
   handleArchive(id: ID)
   {
-    console.log(id, this.props.algorithms.find(alg => alg.id === id));
     Actions.algorithms.change(this.props.algorithms.find(alg => alg.id === id)
       .set('status', BrowserTypes.EAlgorithmStatus.Archive) as Algorithm);
   }

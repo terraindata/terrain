@@ -110,6 +110,8 @@ BrowserStore.subscribe(() =>
         });
       }
     });
+    
+    Actions.groups.prevGroups(groups);
   }
 });
 

@@ -56,6 +56,7 @@ var BrowserActionTypes =
   groups: 
   { 
     create, change, move, duplicate,
+    prevGroups: '',
   },
   
   algorithms: 
@@ -67,6 +68,7 @@ var BrowserActionTypes =
   variants:
   {
     create, change, move, duplicate,
+    status: '',
     switchAlgorithm: '',
     switchGroup: '', // move by itself onto a group, which should also create a new algorithm
   },

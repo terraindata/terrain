@@ -180,6 +180,15 @@ BrowserReducers[ActionTypes.variants.change] =
         action.payload.variant.algorithmId, 'variants', action.payload.variant.id],
       action.payload.variant);
 
+BrowserReducers[ActionTypes.variants.status] =
+  (state, action) =>
+  {
+    let {variant, status} = action.payload;
+    state.setIn(['groups', action.payload.variant.groupId, 'algorithms',
+        action.payload.variant.algorithmId, 'variants', action.payload.variant.id],
+      action.payload.variant);
+  }
+
 BrowserReducers[ActionTypes.variants.move] =
   (state, action) =>
     addVariant(removeVariant(state, action.payload.variant),

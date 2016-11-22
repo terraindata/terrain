@@ -46,6 +46,9 @@ var _ = require('underscore');
 import ActionTypes from './BrowserActionTypes.tsx';
 import Store from './BrowserStore.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
+type Group = BrowserTypes.Group;
+type Algorithm = BrowserTypes.Algorithm;
+type Variant = BrowserTypes.Variant;
 import * as Immutable from 'immutable';
 
 import Ajax from './../../util/Ajax.tsx';
@@ -61,7 +64,7 @@ const Actions =
         $(ActionTypes.groups.create, {}),
     
     change:
-      (group: BrowserTypes.Group) =>
+      (group: Group) =>
         $(ActionTypes.groups.change, { group }),
     
     move:
@@ -69,8 +72,12 @@ const Actions =
         $(ActionTypes.groups.move, { group, index }),
         
     duplicate:
-      (group: BrowserTypes.Group, index: number) =>
+      (group: Group, index: number) =>
         $(ActionTypes.groups.duplicate, { group, index }),
+    
+    prevGroups:
+      (groups: Map<ID, Group>) =>
+        $(ActionTypes.groups.prevGroups, { groups }),
   },
   
   algorithms:
@@ -80,15 +87,15 @@ const Actions =
         $(ActionTypes.algorithms.create, { groupId }),
     
     change:
-      (algorithm: BrowserTypes.Algorithm) =>
+      (algorithm: Algorithm) =>
         $(ActionTypes.algorithms.change, { algorithm }),
     
     move:
-      (algorithm: BrowserTypes.Algorithm, index: number, groupId: ID) =>
+      (algorithm: Algorithm, index: number, groupId: ID) =>
         $(ActionTypes.algorithms.move, { groupId, index, algorithm }),
         
     duplicate:
-      (algorithm: BrowserTypes.Algorithm, index: number, groupId?: ID) =>
+      (algorithm: Algorithm, index: number, groupId?: ID) =>
         $(ActionTypes.algorithms.duplicate, { algorithm, index, groupId }),
   },
   
@@ -99,17 +106,20 @@ const Actions =
         $(ActionTypes.variants.create, { groupId, algorithmId }),
     
     change:
-      (variant: BrowserTypes.Variant) =>
+      (variant: Variant) =>
         $(ActionTypes.variants.change, { variant }),
     
     move:
-      (variant: BrowserTypes.Variant, index: number, groupId: ID, algorithmId: ID) =>
+      (variant: Variant, index: number, groupId: ID, algorithmId: ID) =>
         $(ActionTypes.variants.move, { variant, index, groupId, algorithmId }),
         
     duplicate:
-      (variant: BrowserTypes.Variant, index: number, groupId?: ID, algorithmId?: ID) =>
+      (variant: Variant, index: number, groupId?: ID, algorithmId?: ID) =>
         $(ActionTypes.variants.duplicate, { variant, index, groupId, algorithmId }),
     
+    status:
+      (variant: Variant, status: BrowserTypes.EVariantStatus) =>
+        $(ActionTypes.variants.status, { variant, status }),
   },
   
   loadState:
