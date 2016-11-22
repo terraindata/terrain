@@ -76,38 +76,48 @@ BrowserStore.subscribe(() =>
   let prevGroups = state.get('prevGroups');
   if(groups !== prevGroups)
   {
-    groups.map((group: BrowserTypes.Group, groupId: ID) =>
+    groups && groups.map((group: BrowserTypes.Group, groupId: ID) =>
     {
       let prevGroup = prevGroups.get(groupId);
       if(group !== prevGroup)
       {
+        let saveAlgs = () =>
+          group.algorithms.map((alg: BrowserTypes.Algorithm, algId: ID) =>
+          {
+            let prevAlg = prevGroup && prevGroup.algorithms.get(algId);
+            if(prevAlg !== alg)
+            {
+              let saveVariants = () =>
+                alg.variants.map((v: BrowserTypes.Variant, vId: ID) =>
+                {
+                  if(v !== (prevAlg && prevAlg.variants.get(vId)))
+                  {
+                    if(Util.canEdit(v, UserStore, RoleStore))
+                    {
+                      Ajax.saveItem(v);
+                    }
+                  }
+                });
+                
+              if(Util.canEdit(alg, UserStore, RoleStore))
+              {
+                Ajax.saveItem(alg, saveVariants);
+              }
+              else
+              {
+                saveVariants();
+              }
+            }
+          });
+          
         if(Util.canEdit(group, UserStore, RoleStore))
         {
-          Ajax.saveItem(group);
+          Ajax.saveItem(group, saveAlgs);
         }
-        
-        group.algorithms.map((alg: BrowserTypes.Algorithm, algId: ID) =>
+        else
         {
-          let prevAlg = prevGroup && prevGroup.algorithms.get(algId);
-          if(prevAlg !== alg)
-          {
-            if(Util.canEdit(alg, UserStore, RoleStore))
-            {
-              Ajax.saveItem(alg);
-            }
-            
-            alg.variants.map((v: BrowserTypes.Variant, vId: ID) =>
-            {
-              if(v !== (prevAlg && prevAlg.variants.get(vId)))
-              {
-                if(Util.canEdit(v, UserStore, RoleStore))
-                {
-                  Ajax.saveItem(v);
-                }
-              }
-            });
-          }
-        });
+          saveAlgs();
+        }
       }
     });
     

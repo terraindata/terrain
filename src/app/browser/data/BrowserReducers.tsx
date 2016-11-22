@@ -221,6 +221,10 @@ BrowserReducers[ActionTypes.loadState] =
   (state, action) => 
     action.payload.state.set('prevGroups', action.payload.state.get('groups'));
 
+BrowserReducers[ActionTypes.groups.prevGroups] =
+  (state, action) => 
+    state.set('prevGroups', action.payload['groups']);
+
 export default BrowserReducers;
 
 

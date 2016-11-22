@@ -168,7 +168,6 @@ class AlgorithmsColumn extends Classs<Props>
   {
     switch (targetType) {
       case "group":
-        // duplicate this one to the new group
         if(shiftKey)
         {
           Actions.algorithms.duplicate(this.props.algorithms.get(id), 0, targetItem.id);
