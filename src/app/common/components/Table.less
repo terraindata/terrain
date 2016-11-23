@@ -20,6 +20,7 @@
 .terra-LeftSideGrid {
   overflow: hidden !important;
   padding-bottom: 7px;
+  outline: none;
 }
 .terra-HeaderGrid {
   width: 100%;
@@ -37,9 +38,6 @@
 }
 
 
-@yp: 8px;
-@xp: 8px;
-
 .terra-cell,
 .terra-headerCell,
 .terra-leftCell {
@@ -55,7 +53,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: @yp @xp;
   
   .result-field-value-image {
     max-width: 32px !important;
@@ -66,8 +63,35 @@
   }
 }
 
+@p: 8px;
+
+.terra-headerCell {
+  padding: @p;
+}
+
+.terra-cell-inner {
+  width: 100%;
+  overflow: hidden;
+  .transition;
+  padding: @p;
+}
+
+.terra-menuCell {
+  .menu-wrapper {
+    opacity: 0;
+  }
+  &:hover {
+    .terra-cell-inner {
+      width: calc(~"100% - 50px");
+    }
+    .menu-wrapper {
+      opacity: 1;
+    }
+  }
+}
+
 .terra-cell-wrapper {
-  padding: 0px @xp; // for some reason it seems that y works fine by x padding is not accounted for.terra- not sure if this is accurate
+  padding: 0px @p; // for some reason it seems that y works fine by x padding is not accounted for.terra- not sure if this is accurate
 }
 
 .terra-headerCell,

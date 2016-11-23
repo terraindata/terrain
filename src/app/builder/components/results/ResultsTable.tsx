@@ -116,7 +116,8 @@ export default class ResultsTable extends PureClasss<Props>
     let field = this.getKey(col);
     let {results, resultsWithAllFields, resultsConfig} = this.props;
     let primaryKey = getPrimaryKeyFor(results && results[i], resultsConfig);
-    let spotlight = this.state.spotlightState 
+    let spotlight = col === 0
+      && this.state.spotlightState 
       && this.state.spotlightState.getIn(['spotlights', primaryKey]);
 
     return (
@@ -126,7 +127,7 @@ export default class ResultsTable extends PureClasss<Props>
             <div
               className='result-spotlight'
               style={{
-                background: spotlight,
+                background: spotlight.color,
               }}
             />
         }
@@ -162,13 +163,7 @@ export default class ResultsTable extends PureClasss<Props>
     let id = getPrimaryKeyFor(result, this.props.resultsConfig);
     let spotlightColor = ColorManager.colorForKey(id);
     
-    // TODO
-    // this.setState({
-    //   isSpotlit: true,
-    //   spotlightColor,
-    // });
-    
-    let spotlightData = JSON.parse(JSON.stringify(result));
+    let spotlightData = _.extend({}, result, allFieldsResult);
     spotlightData['name'] = getResultName(result, allFieldsResult, this.props.resultsConfig);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
@@ -194,6 +189,7 @@ export default class ResultsTable extends PureClasss<Props>
         pinnedCols={pinnedCols}
         random={this.state.random}
         onCellClick={this.handleCellClick}
+        menuOptions={this.menuOptions}
       />
     );
   }

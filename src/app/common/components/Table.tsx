@@ -52,7 +52,7 @@ require('./Table.less');
 
 let { AutoSizer, Grid, ScrollSync, CellMeasurer } = require('react-virtualized');
 let scrollbarSize = require('dom-helpers/util/scrollbarSize');
-import * as cn from 'classnames';
+import * as classNames from 'classnames';
 import Classs from './Classs.tsx';
 import Util from '../../util/Util.tsx';
 import {Menu, MenuOption} from '../../common/components/Menu.tsx';
@@ -325,11 +325,14 @@ export default class ResultsTable extends Classs<Props>
   _genericCellRenderer ({ columnIndex, rowIndex }) {
     const rowClass = 
       rowIndex % 2 === 0 ? 'terra-evenRow' : 'terra-oddRow';
-    const classNames = cn(rowClass, 'terra-cell', 'terra-bodyCell')
 
     return (
       <div className='terra-cell-wrapper'>
-        <div className={classNames}> G-
+        <div className={classNames({
+          [rowClass]: true,
+          'terra-cell': true,
+          'terra-bodyCell': true,
+        })}> G-
           {
             rowIndex === 0 ?
               this.props.getKey(columnIndex)
@@ -346,25 +349,35 @@ export default class ResultsTable extends Classs<Props>
     
     const rowClass = 
       rowIndex % 2 === 0 ? 'terra-evenRow' : 'terra-oddRow';
-    const classNames = cn(rowClass, 'terra-cell', 'terra-bodyCell')
+
+    let {menuOptions} = this.props;
 
     return (
       <div
-        className={classNames}
+        className={classNames({
+          [rowClass]: true,
+          'terra-cell': true,
+          'terra-bodyCell': true,
+          'terra-menuCell': columnIndex === 0 && menuOptions && menuOptions.size > 0,
+        })}
         onDoubleClick={this.handleDoubleClick}
         data-row={rowIndex}
         data-col={colIndex}
       >
-        {
-          columnIndex === 0 &&
-            <Menu
-              options={this.props.menuOptions}
-              id={rowIndex + '-' + colIndex}
-            />
-        }
-        {
-          this.props.getValue(rowIndex, colIndex)
-        }
+        <div
+          className='terra-cell-inner'
+        >
+          {
+            columnIndex === 0 &&
+              <Menu
+                options={menuOptions}
+                id={rowIndex + '-' + colIndex}
+              />
+          }
+          {
+            this.props.getValue(rowIndex, colIndex)
+          }
+        </div>
       </div>
     );
   }
@@ -389,24 +402,34 @@ export default class ResultsTable extends Classs<Props>
 
   _renderLeftSideCell ({ columnIndex, rowIndex }) {
     const rowClass = rowIndex % 2 === 0 ?'terra-evenRow' : 'terra-oddRow';
-    const classNames = cn(rowClass, 'terra-cell', 'terra-leftCell')
+    let {menuOptions} = this.props;
+    
     return (
       <div
-        className={classNames}
+        className={classNames({
+          [rowClass]: true,
+          'terra-cell': true,
+          'terra-leftCell': true,
+          'terra-menuCell': columnIndex === 0 && menuOptions && menuOptions.size > 0,
+        })}
         onDoubleClick={this.handleDoubleClick}
         data-row={rowIndex}
         data-col={columnIndex}
       >
-        {
-          columnIndex === 0 &&
-            <Menu
-              options={this.props.menuOptions}
-              id={rowIndex + '-' + columnIndex}
-            />
-        }
-        {
-          this.props.getValue(rowIndex, columnIndex)
-        }
+        <div
+          className='terra-cell-inner'
+        >
+          {
+            columnIndex === 0 &&
+              <Menu
+                options={this.props.menuOptions}
+                id={rowIndex + '-' + columnIndex}
+              />
+          }
+          {
+            this.props.getValue(rowIndex, columnIndex)
+          }
+        </div>
       </div>
     )
   }

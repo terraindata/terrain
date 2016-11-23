@@ -155,7 +155,7 @@ class Result extends Classs<Props> {
       return null;
     }
     
-    var value = getResultValue(this.props.data, this.props.allFieldsData, field, overrideFormat);
+    var value = getResultValue(this.props.data, this.props.allFieldsData, field, this.props.config, overrideFormat);
     
     let format = this.props.config && this.props.config.formats.get(field);
     let showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
@@ -414,7 +414,9 @@ export function ResultFormatValue(field: string, value: string | number, config:
       case 'image':
       var url = format.template.replace(/\[value\]/g, value as string);
       return (
-        <div>
+        <div
+          className='result-field-value-image-wrapper'
+        >
           <div
             className='result-field-value-image'
             style={{
@@ -520,7 +522,7 @@ const dropCollect = (connect, monitor) =>
   itemType: monitor.getItemType()
 });
 
-export function getResultValue(resultData, allFieldsData, field: string, config: IResultsConfig, overrideFormat?: IResultsConfig): string
+export function getResultValue(resultData, allFieldsData, field: string, config: IResultsConfig, overrideFormat?: any): string
 {
   var value = (resultData && resultData[field]) ||(allFieldsData && allFieldsData[field]);
   

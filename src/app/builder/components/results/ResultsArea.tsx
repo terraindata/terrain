@@ -460,7 +460,13 @@ class ResultsArea extends PureClasss<Props>
           );
           if(resultIndex !== -1)
           {
-            spotlightAction(id, _.extend({}, nextState.results[resultIndex], nextState.resultsWithAllFields[resultIndex]));
+            spotlightAction(id, _.extend({
+                color: spotlight.color,
+                name: spotlight.name,  
+              }, 
+              nextState.results[resultIndex], 
+              nextState.resultsWithAllFields[resultIndex])
+            );
           }
           else
           {
