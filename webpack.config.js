@@ -68,6 +68,8 @@ module.exports = {
             { test: /\.ttf$/, loader: "file" },
             { test: /\.eot$/, loader: "file" },
             { test: /\.jpg$/, loader: "file" },
+            { test: /\.gif$/, loader: "url?limit=4000000" },
+            { test: /\.png$/, loader: "url?limit=4000000" },
             { test: require.resolve('jquery'), loader: "expose?jQuery" },
             { test: /\.json$/, loader: 'json' },
             { test: /\.svg(\?name=[a-zA-Z]*)*$/, loader: 'babel?presets[]=react&presets[]=es2015!svg-react' },

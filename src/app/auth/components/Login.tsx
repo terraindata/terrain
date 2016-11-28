@@ -50,6 +50,8 @@ import Util from '../../util/Util.tsx';
 import Actions from "../data/AuthActions.tsx";
 import PureClasss from '../../common/components/PureClasss.tsx';
 import Modal from './../../common/components/Modal.tsx';
+import Loading from './../../common/components/Loading.tsx';
+
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 var TerrainIcon = require("./../../../images/logo_mountainCircle.svg?name=TerrainIcon");
@@ -63,9 +65,12 @@ class Login extends PureClasss<Props>
     shifted: false,
     username: '',
     password: '',
+    token: '',
     loginErrorModalOpen: false,
     errorModalMessage: '',
     opened: false,
+    loggingIn: false,
+    loggedIn: false,
   };
   
   componentDidMount()
@@ -151,11 +156,24 @@ class Login extends PureClasss<Props>
     }
   }
   
+  handleAnimationEnded()
+  {
+    Actions.login(this.state.token, this.state.username);
+  }
+  
   handleLogin()
   {
+    this.setState({
+      loggingIn: true,
+    });
     let { username } = this.state;
     let login = (token: string) => {
-      Actions.login(token, username);
+      this.setState({
+        loggingIn: false,
+        loggedIn: true,
+        token,
+        username,
+      });
     };
     
     let xhr = new XMLHttpRequest();
@@ -196,11 +214,14 @@ class Login extends PureClasss<Props>
   toggleErrorModal()
   {
     this.setState ({
-      loginErrorModalOpen: !this.state.loginErrorModalOpen
+      loggingIn: false,
+      loginErrorModalOpen: !this.state.loginErrorModalOpen,
     });
   }
 
-  render() {
+          // <TerrainIcon className='login-logo'/>
+  render()
+  {
     return (
       <div
         className={classNames({
@@ -211,7 +232,13 @@ class Login extends PureClasss<Props>
         onKeyDown={this.handleKeyDown} 
       >
         <div className='login-logo-container'>
-          <TerrainIcon className='login-logo'/>
+          <Loading
+            width={100}
+            height={100}
+            loading={this.state.loggingIn}
+            loaded={this.state.loggedIn}
+            onLoadedEnd={this.handleAnimationEnded}
+          />
         </div>
         <div
           className='login-container'
