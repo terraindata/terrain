@@ -52,6 +52,8 @@
       background: @tabs-bg;
       z-index: 99999999;
       position: relative;
+      
+      display: flex;
 		}
 
 		.tabs-title {
@@ -212,18 +214,30 @@
     }
   }
   
+  .tabs-inner-wrapper {
+    flex-grow: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    
+    
+    &::-webkit-scrollbar-track {
+      background: lighten(@font-color, 18%);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: lighten(@font-color, 10%);
+    }
+  }
+  
   .tabs-actions {
-    position: absolute;
-    right: 0px;
-    top: 0px;
     height: 100%;
-    background: @tabs-bg;
     padding-left: 12px;
+    padding-right: 6px;
+    padding-top: 2px;
     font-size: @small-font-size;
     
-    // mix-blend-mode: multiply;
-    
     color: rgba(255,255,255,0.8);
+    
     .tabs-action {
       // height: 35px;
       display: inline-block;

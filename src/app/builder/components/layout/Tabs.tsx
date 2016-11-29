@@ -381,8 +381,12 @@ class Tabs extends Classs<TabsProps> {
       <div className='tabs-container'>
         <div className='tabs-row-wrapper'>
           <div className='tabs-row'>
-            <LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />
-            { this.renderActions() }
+            <div className='tabs-inner-wrapper'>
+              <LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />
+            </div>
+            {
+              this.renderActions()
+            }
             <div className='tabs-shadow'></div>
           </div>
         </div>
