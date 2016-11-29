@@ -78,12 +78,9 @@ class Login extends PureClasss<Props>
     $('body').on('keydown', this.handleBodyKeyDown);
     
     setTimeout(() =>
-      Util.animateToAutoHeight(this.refs['container'], 
-        () => this.setState({
-          opened: true,
-        }),
-        500
-      ),
+      this.setState({
+        opened: true,
+      }),
       1000
     );
   }
@@ -180,12 +177,14 @@ class Login extends PureClasss<Props>
     xhr.onerror = (ev:Event) => {
       this.setState({
           errorModalMessage: 'Error logging in:' + ev,
+          loggingIn: false,
         });
         this.toggleErrorModal();
     }
     xhr.onload = (ev:Event) => {
       if (xhr.status != 200) {
         this.setState({
+          loggingIn: false,
           errorModalMessage: 'Failed to log in: ' + xhr.responseText,
         });
         this.toggleErrorModal();
@@ -214,7 +213,6 @@ class Login extends PureClasss<Props>
   toggleErrorModal()
   {
     this.setState ({
-      loggingIn: false,
       loginErrorModalOpen: !this.state.loginErrorModalOpen,
     });
   }
@@ -227,14 +225,14 @@ class Login extends PureClasss<Props>
         className={classNames({
           'login-wrapper': true,
           'login-wrapper-shifted': this.state.shifted,
-          'login-wrapper-opened': this.state.opened,
+          'login-wrapper-open': this.state.opened && !this.state.loggingIn && !this.state.loggedIn,
         })}
         onKeyDown={this.handleKeyDown} 
       >
         <div className='login-logo-container'>
           <Loading
-            width={100}
-            height={100}
+            width={150}
+            height={150}
             loading={this.state.loggingIn}
             loaded={this.state.loggedIn}
             onLoadedEnd={this.handleAnimationEnded}

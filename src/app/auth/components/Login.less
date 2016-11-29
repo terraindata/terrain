@@ -10,7 +10,23 @@
   width: 100%;
   max-width: 300px;
   
-  &:not(.login-wrapper-opened) {
+  .login-logo-container {
+    width: 100%;
+    padding-bottom: @m;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: @m;
+    .transition(~"all 0.5s");
+    
+    .login-logo {
+      height: 140px;
+      width: 140px;
+    }
+  }
+  
+  .login-container {
+    .transition(~"all 0.3s");
+  }
+  &:not(.login-wrapper-open) {
     .login-container {
       height: 0px;
       overflow-y: hidden;
@@ -25,25 +41,15 @@
     }
   }
 
-  .login-logo-container {
-    width: 100%;
-    padding-bottom: @m;
-    border-bottom: 1px solid #ccc;
-    margin-bottom: @m;
-    .transition(~"all 0.5s");
-    
-    .login-logo {
-      height: 140px;
-      width: 140px;
+  &.login-wrapper-open {
+    .login-container {
+      height: 100px;
     }
-  }
-
-  .login-info {
   }
 
   .login-row {
     position: relative;
-    margin-bottom: @m;
+    margin-bottom: @m / 2;
     
     .login-label {
       position: absolute;

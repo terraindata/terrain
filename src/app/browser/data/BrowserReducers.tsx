@@ -46,6 +46,8 @@ import * as _ from 'underscore';
 import ActionTypes from './BrowserActionTypes.tsx';
 import Util from './../../util/Util.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
+const {EVariantStatus} = BrowserTypes;
+
 var Immutable = require('immutable');
 
 var BrowserReducers = {};
@@ -183,10 +185,30 @@ BrowserReducers[ActionTypes.variants.change] =
 BrowserReducers[ActionTypes.variants.status] =
   (state, action) =>
   {
-    let {variant, status} = action.payload;
-    state.setIn(['groups', action.payload.variant.groupId, 'algorithms',
-        action.payload.variant.algorithmId, 'variants', action.payload.variant.id],
-      action.payload.variant);
+    let {variant, status, confirmed} = action.payload;
+    if(variant.status === status)
+    {
+      return state;
+    }
+    
+    if(
+      !confirmed &&
+      (status === EVariantStatus.Live || variant.status === EVariantStatus.Live)
+    )
+    {
+      return state
+        .set('changingStatus', true)
+        .set('changingStatusOf', variant)
+        .set('changingStatusTo', status);
+    }
+    
+    return state
+      .setIn(['groups', variant.groupId, 'algorithms',
+        variant.algorithmId, 'variants', variant.id, 'status'],
+      status)
+      .set('changingStatus', false)
+      .set('changingStatusOf', null)
+      .set('changingStatusTo', null);
   }
 
 BrowserReducers[ActionTypes.variants.move] =

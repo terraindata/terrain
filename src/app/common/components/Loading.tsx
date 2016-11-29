@@ -49,10 +49,10 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import PureClasss from '../../common/components/PureClasss.tsx';
+import Util from '../../util/Util.tsx';
 
 const Sprites = require("./../../../images/spritesheet_terrainLoading_optimized.png");
 
-const fps = 30;
 
 interface Props {
   loading: boolean;
@@ -78,12 +78,7 @@ class Loading extends PureClasss<Props>
   // 2: loading, loop
   // 3: loaded, phase out (freeze after the end)
   
-  stageParams: {
-    loop: boolean;
-    endFrame: number;
-    startFrame: number;
-    followThrough?: boolean;
-  }[] = [
+  stageParams: IStage[] = [
     {
       loop: false,
       startFrame: 0,
@@ -104,83 +99,175 @@ class Loading extends PureClasss<Props>
       loop: false,
       startFrame: 17,
       endFrame: 56,
+      onStageEnd: this.handleEnd,
     },
   ];
   
-  componentWillUnmount()
+  imgLooper: ImgLooper;
+  
+  componentDidMount()
   {
-    
+    this.imgLooper = new ImgLooper(ReactDOM.findDOMNode(this.refs['sprites']) as any, this.props.width, this.stageParams);
   }
   
-  handleClick()
+  componentWillUnmount()
   {
-    this.setState({
-      stage: (this.state.stage + 1) % this.stageParams.length
-    })
+    this.imgLooper && this.imgLooper.dispose();
+  }
+  
+  componentWillReceiveProps(nextProps: Props)
+  {
+    let stage = -1;
+    if(!this.props.loading && nextProps.loading)
+    {
+      stage = 1;
+    }
+    else if(!this.props.loaded && nextProps.loaded)
+    {
+      stage = 3;  
+    }
+    else if(this.props.loading && !nextProps.loading)
+    {
+      stage = 0;
+    }
+    
+    if(stage !== -1)
+    {
+      this.imgLooper.setStage(stage);
+      this.setState({
+        stage,
+      });
+    }
+  }
+
+  handleEnd()
+  {
+    this.props.onLoadedEnd();
   }
 
   render()
   {
-    let params = this.stageParams[this.state.stage];
-    console.log(this.state.stage);
-    
     let {width} = this.props;
-    let {loop, startFrame, endFrame} = params;
-    let frameCount = endFrame - startFrame;
-    
-    
-    let animationCss = this.stageParams.map((p, f) =>
-    {
-      let {loop, startFrame, endFrame} = p;
-      let startMargin = -1 * startFrame * width;
-      let endMargin = -1 * endFrame * width;
-      return `@keyframes loadingPlay${f} { 0% { margin-left: ${startMargin}px; } 100% { margin-left: ${endMargin}px; } }`;
-    }).join('\n');
     
     return (
       <div
         className={classNames({
           'loading-wrapper': true,
         })}
-        onClick={this.handleClick}
         style={{
           height: this.props.height,
           width: this.props.width,
         }}
       >
-        <style
-          dangerouslySetInnerHTML={{
-            __html: animationCss
-          }}
-        />
         <img
           src={Sprites}
           className='moutain-loading-img'
           style={{
-            animation: `loadingPlay${this.state.stage} ${frameCount / fps}s steps(${frameCount}) ${loop ? 'infinite' : ''}`,
             height: this.props.height,
-            marginLeft: -1 * endFrame * width,
           }}
+          ref='sprites'
         />
       </div>
     );
    }
-        // {
-        //   this.stageParams.map((params, stage) =>
-        //     this.state.stage === stage &&
-        //       <SpriteAnimator
-        //         sprite={MountainGif}
-        //         width={288} 
-        //         height={288}
-                
-        //         stopLastFrame={!params.loop}
-        //         startFrame={params.startFrame}
-        //         frameCount={params.endFrame - params.startFrame + 1}
-                
-        //         key={stage}
-        //       />
-        //   )
-        // }
 };
+
+
+const fps = 30;
+
+interface IStage
+{
+  loop: boolean;
+  endFrame: number;
+  startFrame: number;
+  followThrough?: boolean;
+  onStageEnd?: () => void;
+}
+
+class ImgLooper
+{
+  el: HTMLElement;
+  stages: IStage[];
+  stage: number;
+  frame: number;
+  width: number;
+  
+  interval: any;
+  
+  constructor(_el: HTMLElement, _width: number, _stages: IStage[], _stage = 0)
+  {
+    Util.bind(this as any, 'setStage', 'dispose', 'nextFrame', 'showFrame', 'clearInterval');
+    // this.nextFrame = this.nextFrame.bind(this);
+    
+    this.el = _el;
+    this.stages = _stages;
+    this.width = _width;
+    this.setStage(_stage, true);
+    
+  }
+  
+  setStage(_stage: number, showFrame: boolean = false)
+  {
+    let stageParams = this.stages[_stage];
+    if(this.stage === -1 || showFrame || stageParams.endFrame < this.frame)
+    {
+      this.showFrame(stageParams.startFrame)
+    }
+    
+    this.stage = _stage;
+    
+    if(!this.interval)
+    {
+      this.interval = setInterval(this.nextFrame, 1000 / fps);
+    }
+  }
+  
+  dispose()
+  {
+    this.clearInterval();
+  }
+  
+  
+  // only called by the interval
+  private nextFrame()
+  {
+    let {loop, startFrame, endFrame, followThrough, onStageEnd} = this.stages[this.stage];
+
+    if(this.frame === endFrame)
+    {
+      if(followThrough)
+      {
+        this.setStage(this.stage + 1);
+      }
+      else if(loop)
+      {
+        this.showFrame(startFrame);
+      }
+      else
+      {
+        this.clearInterval();
+      }
+      
+      onStageEnd && onStageEnd();
+    }
+    else
+    {
+      this.showFrame(this.frame + 1);
+    }
+  }
+  
+  private showFrame(_frame:number)
+  {
+    let m = -1 * this.width * _frame;
+    this.el.style.marginLeft = m + 'px';
+    this.frame = _frame;
+  }
+  
+  private clearInterval()
+  {
+    this.interval && clearInterval(this.interval);
+    this.interval = null;
+  }
+}
 
 export default Loading;
