@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 require('./Browser.less');
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 import Store from './../data/BrowserStore.tsx';
 import Actions from './../data/BrowserActions.tsx';
 import RolesActions from './../../roles/data/RolesActions.tsx';
@@ -56,6 +56,7 @@ import VariantsColumn from './VariantsColumn.tsx';
 import BrowserInfoColumn from './BrowserInfoColumn.tsx';
 import { DragDropContext } from 'react-dnd';
 import InfoArea from './../../common/components/InfoArea.tsx';
+import Loading from './../../common/components/Loading.tsx';
 var HTML5Backend = require('react-dnd-html5-backend');
 
 interface Props
@@ -67,7 +68,7 @@ interface Props
   };
 }
 
-class Browser extends Classs<Props>
+class Browser extends PureClasss<Props>
 {
   cancelSubscription = null;
   
@@ -75,8 +76,11 @@ class Browser extends Classs<Props>
   {
     super(props);
     
+    let istate = Store.getState();
     this.state = {
-      istate: Store.getState()
+      istate,
+      loadedData: !istate.get('loading'),
+      loaded: !istate.get('loading'),
     };
   }
   
@@ -95,31 +99,49 @@ class Browser extends Classs<Props>
   
   componentDidMount()
   {
-    this.cancelSubscription = 
-      Store.subscribe(() => this.setState({
-        istate: Store.getState()
-      }));
+    this._subscribe(Store, {
+      stateKey: 'istate',
+      updater: (state) =>
+      {
+        if(!this.state.loadedData && !state.get('loading'))
+        {
+          this.setState({
+            loadedData: true,
+          });
+        }
+      },
+      isMounted: true,
+    })
       
     Actions.fetch();
     RolesActions.fetch();
     UserActions.fetch();
   }
   
-  componentWillUnmount()
+  handleLoadedEnd()
   {
-    this.cancelSubscription && this.cancelSubscription();
+    this.setState({
+      loaded: true,
+    });
   }
   
   render()
   {
-    const state = this.state.istate;
-
-    if(state.get('loading'))
+    if(!this.state.loaded)
     {
       return (
-          <InfoArea large='Loading...' />
+        <Loading
+          width={100}
+          height={100}
+          loading={true}
+          loaded={this.state.loadedData}
+          onLoadedEnd={this.handleLoadedEnd}
+          center={true}
+        />
       );
     }
+    
+    const state = this.state.istate;
     
     var { groupId, algorithmId, variantId } = this.props.params;
     if(groupId)

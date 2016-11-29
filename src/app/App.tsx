@@ -128,9 +128,22 @@ var App = React.createClass({
     // Respond to authentication state changes.
     AuthStore.subscribe(() => {
       let token = AuthStore.getState().get('authenticationToken');
+      let loggedIn = token !== null;
       this.setState({
-        loggedIn: token !== null
+        loggedIn,
       });
+      
+      if(loggedIn)
+      {
+        setTimeout(() => this.setState({ loaded: true }), 500);
+      }
+      else
+      {
+        this.setState({
+          loaded: false,
+        });
+      }
+      
       if(token !== null)
       {
         UserActions.fetch();
@@ -150,6 +163,7 @@ var App = React.createClass({
     return {
       selectedPage: 3,
       loggedIn: false,
+      loaded: false,
     };
   },
   
@@ -174,6 +188,11 @@ var App = React.createClass({
     if(!this.state.loggedIn)
     {
       return <Login />;
+    }
+    
+    if(!this.state.loaded)
+    {
+      return null;
     }
     
     var sidebarWidth = this.state.sidebarExpanded ? 130 : 36;

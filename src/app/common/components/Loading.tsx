@@ -58,9 +58,10 @@ interface Props {
   loading: boolean;
   loaded: boolean;
   onLoadedEnd: () => void;
-  
   width: number;
   height: number;
+  
+  center?: boolean;
 }
 
 // Frame Breakdown
@@ -83,6 +84,7 @@ class Loading extends PureClasss<Props>
       loop: false,
       startFrame: 0,
       endFrame: 10,
+      onStageEnd: this.handleFirstEnd,
     },
     {
       loop: false,
@@ -133,10 +135,23 @@ class Loading extends PureClasss<Props>
     
     if(stage !== -1)
     {
-      this.imgLooper.setStage(stage);
-      this.setState({
-        stage,
-      });
+      this.setStage(stage);
+    }
+  }
+  
+  setStage(stage: number)
+  {
+    this.imgLooper.setStage(stage);
+    this.setState({
+      stage,
+    });
+  }
+  
+  handleFirstEnd()
+  {
+    if(this.props.loading)
+    {
+      this.setStage(1);
     }
   }
 
@@ -153,6 +168,7 @@ class Loading extends PureClasss<Props>
       <div
         className={classNames({
           'loading-wrapper': true,
+          'dead-center': this.props.center,
         })}
         style={{
           height: this.props.height,
@@ -173,7 +189,7 @@ class Loading extends PureClasss<Props>
 };
 
 
-const fps = 30;
+const fps = 35;
 
 interface IStage
 {

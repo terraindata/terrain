@@ -155,6 +155,44 @@ input {
  transform: translateX(-50%) translateY(-50%);
 }
 
+
+// TODO less function for all browsers
+@keyframes slide-down {
+  0% {
+    -webkit-transform: translateY(-100%);
+  }
+  // 50% {
+  //   -webkit-transform: translateY(-100%);
+  // }
+  100% {
+    -webkit-transform: translateY(0%);
+  }
+}
+
+// TODO cross-browser
+.slide-down {
+  -webkit-transform: translateY(-100%);
+  animation: slide-down 0.35s linear 0.15s forwards;
+}
+
+@keyframes slide-right {
+  0% {
+    -webkit-transform: translateX(-100%);
+  }
+  100% {
+    -webkit-transform: translateX(0%);
+  }
+}
+
+// TODO cross-browser
+.slide-right {
+  -webkit-transform: translateX(-100%);
+  animation: slide-right 0.35s linear 0.15s forwards;
+}
+
+
+  
+
 .rotate180 {
   -moz-transform: rotate(180deg);
   -webkit-transform: rotate(180deg);

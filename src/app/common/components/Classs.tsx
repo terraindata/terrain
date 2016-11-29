@@ -130,7 +130,11 @@ class Classs<T> extends React.Component<T, any>
     if(config.updater)
     {
       config.updater(store.getState());
-      return;
+      if(!config.stateKey)
+      {
+        // only using the updater
+        return;
+      }
     }
       
     let stateKey = config.stateKey;
