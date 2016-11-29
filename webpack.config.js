@@ -60,10 +60,10 @@ module.exports = {
             // note: this first loader string gets updated in webpack.config.prod.js
             //  keep it first in this list
             { test: /\.tsx$/, loader: 
-              'babel?presets[]=react!ts-loader' },
+              'babel?presets[]=react&presets[]=es2015!ts-loader' },
             { test: /\.css$/, loader: "style!css" },
             { test: /\.less$/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
-            { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
+            { test: /\.js$/, exclude: /node_modules/, loader: 'babel?presets[]=react&presets[]=es2015' },
             { test: /\.woff(2)?$/,   loader: "url?limit=10000&mimetype=application/font-woff" },
             { test: /\.ttf$/, loader: "file" },
             { test: /\.eot$/, loader: "file" },

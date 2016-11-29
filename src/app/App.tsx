@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 /// <reference path="../typings/tsd.d.ts" />
 
+require('babel-polyfill');
+
 // Style
 require("./App.less");
 
