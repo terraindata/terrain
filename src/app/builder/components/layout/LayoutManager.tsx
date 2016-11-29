@@ -162,7 +162,7 @@ var LayoutManager = React.createClass<any, any>({
       }
     }
     
-    return adjustments || {};
+    return adjustments || [];
   },
 
 	updateDimensions()
@@ -471,6 +471,7 @@ var LayoutManager = React.createClass<any, any>({
       {
         let adjustments = JSON.parse(JSON.stringify(this.state.sizeAdjustments));
         // TODO not right
+        console.log(adjustments);
         let a = adjustments[index];
         adjustments.splice(index, 1);
         adjustments.splice(indexToMoveTo, 0, a);
