@@ -70,12 +70,12 @@ conf.plugins = [
 ];
 
 // enable babel plugins on tsx loader
-if(conf.module.loaders[0].loader !== 'babel?presets[]=react!ts-loader')
+if(conf.module.loaders[0].loader !== 'babel?presets[]=react&presets[]=es2015!ts-loader')
 {
-  throw new Error('Expected first loader to be "babel?presets[]=react!ts-loader" but found '
+  throw new Error('Expected first loader to be "babel?presets[]=react&presets[]=es2015!ts-loader" but found '
     + conf.module.loaders[0].loader);
 }
 conf.module.loaders[0].loader =
-  'babel?presets[]=react&plugins[]=transform-react-inline-elements&plugins[]=transform-react-constant-elements!ts-loader';
+  'babel?presets[]=react&plugins[]=transform-react-inline-elements&plugins[]=transform-react-constant-elements&minified=true!ts-loader';
 
 module.exports = conf;

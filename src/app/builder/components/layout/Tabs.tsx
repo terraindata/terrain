@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 require('./Tabs.less');
-import * as classNames from 'classnames';
 import * as moment from 'moment';
 import * as Immutable from 'immutable';
 import * as React from 'react';

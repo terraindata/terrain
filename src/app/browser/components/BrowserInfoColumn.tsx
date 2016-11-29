@@ -272,9 +272,11 @@ class BrowserInfoColumn extends Classs<Props>
               { this.renderGroup() }
             </div>
           :
-            <InfoArea
-              large='Select a Group'
-            />
+            <div className='browser-info'>
+              <InfoArea
+                large='Select a Group'
+              />
+            </div>
             
         }
       </BrowserColumn>
