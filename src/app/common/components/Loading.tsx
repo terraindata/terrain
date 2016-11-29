@@ -51,7 +51,7 @@ import * as ReactDOM from 'react-dom';
 import PureClasss from '../../common/components/PureClasss.tsx';
 import Util from '../../util/Util.tsx';
 
-const Sprites = require("./../../../images/spritesheet_terrainLoading_optimized.png");
+const Sprites = require("./../../../images/spritesheet_terrainLoading.png");
 
 
 interface Props {
@@ -83,24 +83,24 @@ class Loading extends PureClasss<Props>
     {
       loop: false,
       startFrame: 0,
-      endFrame: 10,
+      endFrame: 9,
       onStageEnd: this.handleFirstEnd,
     },
     {
       loop: false,
-      startFrame: 11,
-      endFrame: 16,
+      startFrame: 10,
+      endFrame: 15,
       followThrough: true,
     },
     {
       loop: true,
-      startFrame: 17,
-      endFrame: 50,
+      startFrame: 16,
+      endFrame: 49,
     },
     {
       loop: false,
-      startFrame: 17,
-      endFrame: 56,
+      startFrame: 50,
+      endFrame: 55,
       onStageEnd: this.handleEnd,
     },
   ];
