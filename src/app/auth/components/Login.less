@@ -25,16 +25,16 @@
   
   .login-container {
     .transition(~"all 0.3s");
+    overflow-y: hidden;
+    padding-left: 80px;
+    margin-left: -80px;
+    // ^ to expand the width to the left
+    //   so that the labels don't get clipped off
+    //   by overflow:hidden during animation
   }
   &:not(.login-wrapper-open) {
     .login-container {
       height: 0px;
-      overflow-y: hidden;
-      padding-left: 80px;
-      margin-left: -80px;
-      // ^ to expand the width to the left
-      //   so that the labels don't get clipped off
-      //   by overflow:hidden during animation
     }
     .login-logo-container {
       border-bottom: 1px solid rgba(0,0,0,0);
@@ -84,8 +84,6 @@
   }
 
   .login-submit-button-wrapper {
-    height: 66px;
-    
     .login-submit-button {
       color: #fff;
       background: #50594A;

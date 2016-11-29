@@ -68,6 +68,7 @@ class Login extends PureClasss<Props>
     token: '',
     loginErrorModalOpen: false,
     errorModalMessage: '',
+    showingLogo: false,
     opened: false,
     loggingIn: false,
     loggedIn: false,
@@ -79,9 +80,15 @@ class Login extends PureClasss<Props>
     
     setTimeout(() =>
       this.setState({
+        showingLogo: true,
+      }),
+      250
+    );
+    setTimeout(() =>
+      this.setState({
         opened: true,
       }),
-      1000
+      1250
     );
   }
   
@@ -230,13 +237,16 @@ class Login extends PureClasss<Props>
         onKeyDown={this.handleKeyDown} 
       >
         <div className='login-logo-container'>
-          <Loading
-            width={150}
-            height={150}
-            loading={this.state.loggingIn}
-            loaded={this.state.loggedIn}
-            onLoadedEnd={this.handleAnimationEnded}
-          />
+        {
+          this.state.showingLogo &&
+            <Loading
+              width={150}
+              height={150}
+              loading={this.state.loggingIn}
+              loaded={this.state.loggedIn}
+              onLoadedEnd={this.handleAnimationEnded}
+            />
+        }
         </div>
         <div
           className='login-container'
