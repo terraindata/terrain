@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 require('./Tabs.less');
+import * as classNames from 'classnames';
 import * as moment from 'moment';
 import * as Immutable from 'immutable';
 import * as React from 'react';
@@ -65,7 +66,7 @@ var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon"
 var Tab = React.createClass<any, any>({
   mixins: [PanelMixin],
   
-  propTypes:
+  propTypes: 
   {
     id: React.PropTypes.string.isRequired,
     name: React.PropTypes.string.isRequired,
@@ -75,18 +76,21 @@ var Tab = React.createClass<any, any>({
     onClose: React.PropTypes.func.isRequired,
   },
 
-  handleResize: function(e) {
+  handleResize(e)
+  {
     this.setState({
       zoom: (window.outerWidth - 8) / window.innerWidth,
     });
   },
 
-  componentDidMount: function() {
+  componentDidMount()
+  {
     this.handleResize();
     window.addEventListener('resize', this.handleResize);
   },
 
-  componentWillUnmount: function() {
+  componentWillUnmount()
+  {
     window.removeEventListener('resize', this.handleResize);
   },
 
@@ -96,11 +100,12 @@ var Tab = React.createClass<any, any>({
       drag_x: true,
       reorderOnDrag: true,
       dragInsideOnly: true,
+      onClick: this.handleClick,
     }
   },
     
   // Returns z-index so that tabs are layered in a nice fashion
-  zIndexStyle(): {zIndex?: number}
+  zIndexStyle(): ({zIndex?: number})
   {
     if(!this.props.selected)
     {
@@ -120,12 +125,14 @@ var Tab = React.createClass<any, any>({
     }
   },
   
-  close(event) {
+  close(event)
+  {
     event.stopPropagation();
     this.props.onClose(this.props.id);
   },
   
-  renderClose() {
+  renderClose()
+  {
     if(this.props.fixed)
     {
       return null;
@@ -141,7 +148,8 @@ var Tab = React.createClass<any, any>({
     );
   },
 
-render() {
+  render()
+  {
     var topStyle = '-17px';
     if(this.state.zoom < 0.8)
     {
@@ -158,26 +166,37 @@ render() {
 
     return this.renderPanel(
       <div 
-        className={Util.objToClassname({
+        className={classNames({
           'tabs-tab': true,
           'tabs-tab-selected': this.props.selected,
           'tabs-tab-no-bg': this.props.fixed,
-          })}
+        })}
         key={this.props.id}
+        onClick={this.handleClick}
         style={this.zIndexStyle()}
-        onClick={this.handleClick}>
-          { this.props.fixed ? null :
-            <TabIcon className='tab-icon tab-icon-left' />
+      >
+          {
+            !this.props.fixed &&
+              <TabIcon
+                className='tab-icon tab-icon-left'
+              />
           }
           <div 
             className='tab-inner'
             style={{top: topStyle}}
-           >
-            { this.props.name }
-            { this.renderClose() }
+          >
+            {
+              this.props.name
+            }
+            { 
+              this.renderClose()
+            }
           </div>
-          { this.props.fixed ? null :
-            <TabIcon className='tab-icon tab-icon-right' />
+          {
+            !this.props.fixed &&
+              <TabIcon
+                className='tab-icon tab-icon-right'
+              />
           }
       </div>
     );

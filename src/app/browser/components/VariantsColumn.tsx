@@ -306,9 +306,11 @@ class VariantsColumn extends Classs<Props>
   {
     let {me, roles} = this.state;
     let canMakeLive = me && roles && roles.getIn([this.props.groupId, me.username, 'admin']);
-    let canCreate = canMakeLive || (
-      me && roles && roles.getIn([this.props.groupId, me.username, 'builder'])
-    );
+    let canCreate = canMakeLive;
+    // TODO maybe on the new middle tier, builders can create variants
+    //  || (
+    //   me && roles && roles.getIn([this.props.groupId, me.username, 'builder'])
+    // );
     
     return (
       <BrowserItemCategory

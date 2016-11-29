@@ -182,7 +182,9 @@ var Panel = {
 
 	stopDrag(x, y)
   {
-    this.setState({ dragging: false });
+    this.setState({
+      dragging: false
+    });
     
     if(this.props.onDrop)
     {
@@ -193,7 +195,7 @@ var Panel = {
         x: this.state.ox,
         y: this.state.oy,
       });
-    } else console.log('no drop');
+    }
     
      if(this.props.dragHandleRef)
     {
