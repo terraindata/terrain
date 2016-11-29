@@ -126,15 +126,9 @@ class TransformCard extends PureClasss<Props>
     
     if(nextProps.data.domain !== this.props.data.domain)
     {
-      let {domain} = this.state;
-      let low = nextProps.data.domain.get(0);
-      let high = nextProps.data.domain.get(1);
-      var buffer = (high - low) * 0.02;
+      
       this.setState({
-        domain: List([
-          Util.valueMinMax(domain.get(0), low, high - buffer),
-          Util.valueMinMax(domain.get(1), low + buffer, high),
-        ]),
+        domain: this.trimDomain(this.state.domain, nextProps.data.domain)
       });
       
       if(nextProps.data.input === this.props.data.input)
@@ -143,6 +137,18 @@ class TransformCard extends PureClasss<Props>
         this.computeBars(this.props.data.input);
       }
     }
+  }
+  
+  trimDomain(curStateDomain: List<number>, maxDomain: List<number>): List<number>
+  {
+    let low = maxDomain.get(0);
+    let high = maxDomain.get(1);
+    var buffer = (high - low) * 0.02;
+    
+    return List([
+      Util.valueMinMax(curStateDomain.get(0), low, high - buffer),
+      Util.valueMinMax(curStateDomain.get(1), low + buffer, high),
+    ]);
   }
   
   findTableForAlias(data:BuilderTypes.IBlock | List<BuilderTypes.IBlock>, alias:string): string
@@ -351,14 +357,16 @@ class TransformCard extends PureClasss<Props>
         bars[i].percentage += 1 / results.length;
       });
       
-      let domain = List([min, max]);
       this.setState({
         bars: List(bars),
-        domain,
       });
       
       if(!this.props.data.hasCustomDomain)
       {
+        let domain = List([min, max]);
+        this.setState({
+          domain: this.trimDomain(this.state.domain, domain),
+        });
         Actions.change(this._ikeyPath(this.props.keyPath, 'domain'), domain);
       }
     }
@@ -371,6 +379,7 @@ class TransformCard extends PureClasss<Props>
   
   handleDomainChange(domain: List<number>)
   {
+    console.log('handling domain change', domain.get(0), domain.get(1));
     this.setState({
       domain,
     });
