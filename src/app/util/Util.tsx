@@ -189,28 +189,38 @@ var Util = {
     if(n > 0.01 && n < 1000000000000) // 10^12
     {
       let pwr = Math.floor(Math['log10'](n));
+      let str = n.toPrecision(precision);
+      let suffix = '';
+      
       if(pwr > 0)
       {
-        let suffix = suffixes[Math.floor(pwr / 3)];
+        suffix = suffixes[Math.floor(pwr / 3)];
         let decimalIndex = pwr % 3 + 1;
-        let str = n + "";
+        str = n + "";
         str = str.substr(0, precision);
         if(decimalIndex < str.length)
         {
           str = str.slice(0, decimalIndex) + '.' + str.slice(decimalIndex);
         }
-        return sign + str + suffix;
+        else if(decimalIndex > str.length)
+        {
+          // need to add extra 0's
+          _.range(0, decimalIndex - str.length).map(
+            i => str = str + '0'
+          );
+        }
       }
       
-      let str = n.toPrecision(precision);
       while(str.length > 1 && 
+        str.indexOf('.') > 0 &&
         (str.charAt(str.length - 1) === '0' || str.charAt(str.length - 1) === '.')
       )
       {
+        // if there are extra 0's after the decimal point, trim them (and the point if necessary)
         str = str.substr(0, str.length - 1);
       }
       
-      return sign + str;
+      return sign + str + suffix;
     }
     
     return sign + n.toExponential(precision);
