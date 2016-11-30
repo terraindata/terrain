@@ -203,7 +203,9 @@ var Util = {
       }
       
       let str = n.toPrecision(precision);
-      while(str.length > 1 && str.charAt(str.length) === '0')
+      while(str.length > 1 && 
+        (str.charAt(str.length - 1) === '0' || str.charAt(str.length - 1) === '.')
+      )
       {
         str = str.substr(0, str.length - 1);
       }

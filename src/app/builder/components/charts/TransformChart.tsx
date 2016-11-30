@@ -286,6 +286,7 @@ var TransformChart = {
       .scale(scales.pointY)
       .ticks(height > 200 ? 10 : 5)
       .tickSize(scaleMin(scales.x) - scaleMax(scales.x), scaleMin(scales.x) - scaleMax(scales.x))
+      .tickFormat(Util.formatNumber)
       .orient("left");
     d3.select(el).select('.yLeftAxis')
       .attr('transform', 'translate(' + xMargin + ',0)')
@@ -295,7 +296,7 @@ var TransformChart = {
       .scale(scales.barY)
       .ticks(height > 200 ? 10 : 5)
       .tickSize(0, 0)
-      .tickFormat((d) => Util.formatNumber(d, 3)) // try '%' if more precision is needed
+      .tickFormat(Util.formatNumber) // try '%' if more precision is needed
       // .tickFormat(d3.format(" <-.2p")) // try '%' if more precision is needed
       .orient("right");
     d3.select(el).select('.yRightAxis')
@@ -307,7 +308,7 @@ var TransformChart = {
       .scale(scales.x)
       .ticks(width > 500 ? 6 : 4)
       .tickSize(-1 * scaleMin(scales.pointY) + scaleMax(scales.pointY), -1 * scaleMin(scales.pointY) + scaleMax(scales.pointY))
-      .tickFormat((d) => Util.formatNumber(d, 3))
+      .tickFormat(Util.formatNumber)
       // .tickFormat(d3.format(".3g"))
       .orient("bottom");
     d3.select(el).select('.bottomAxis')
@@ -776,11 +777,10 @@ var TransformChart = {
     d3.select(el).select('.transform-tooltip').remove();
     d3.select(el).select('.point-edit-menu').remove();
 
-    var f = d3.format(".2f")
     var y = newY || scales.realPointY.invert(mouse[1]);
     var pos_y = scales.realPointY(y);
-    var text_x = 'X:  ' + formatNumber(scales.realX.invert(x));
-    var text_y = 'Y:  ' + formatNumber(y);
+    var text_x = 'X:  ' + Util.formatNumber(scales.realX.invert(x));
+    var text_y = 'Y:  ' + Util.formatNumber(y);
     var w = 75;
     var h = 35;
     var containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
@@ -843,8 +843,8 @@ var TransformChart = {
     // var f = d3.format(".2f")
     let xVal = scales.realX.invert(point.cx.baseVal.value);
     let yVal = scales.realPointY.invert(point.cy.baseVal.value);
-    var text_x = 'X: ' + formatNumber(xVal);
-    var text_y = 'Y: ' + formatNumber(yVal);
+    var text_x = 'X: ' + Util.formatNumber(xVal);
+    var text_y = 'Y: ' + Util.formatNumber(yVal);
     var containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
     var containerHeight = parseInt(d3.select(el).select('.inner-svg').attr('height'));
     var w = 75;
@@ -1235,18 +1235,18 @@ var TransformChart = {
   
 };
 
-function formatNumber(n:number):string
-{
-  var s = n + "";
-  if(s.length > 8)
-  {
-    s = n.toPrecision(3);
-  }
-  if(s.length > 8)
-  {
-    return s.substr(0, 5) + '...';
-  }
-  return s;
-}
+// function formatNumber(n:number):string
+// {
+//   var s = n + "";
+//   if(s.length > 8)
+//   {
+//     s = n.toPrecision(3);
+//   }
+//   if(s.length > 8)
+//   {
+//     return s.substr(0, 5) + '...';
+//   }
+//   return s;
+// }
 
 export default TransformChart;

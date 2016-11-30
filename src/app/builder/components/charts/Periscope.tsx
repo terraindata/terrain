@@ -128,14 +128,7 @@ var Periscope = {
       .scale(scales.x)
       .ticks(6)
       .tickSize(10)
-      // .tickFormat((t, i) => {
-      //   if(i === 0 || i >= 4)
-      //   {
-      //     return "";
-      //   }
-      //   return d3.format(".3g")(t);
-      // })
-      .tickFormat(d3.format(".3g"))
+      .tickFormat(Util.formatNumber)
       .orient("bottom");
     d3.select(el).select('.bottomAxis')
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
