@@ -295,7 +295,8 @@ var TransformChart = {
       .scale(scales.barY)
       .ticks(height > 200 ? 10 : 5)
       .tickSize(0, 0)
-      .tickFormat(d3.format(" <-.2p")) // try '%' if more precision is needed
+      .tickFormat((d) => Util.formatNumber(d, 3)) // try '%' if more precision is needed
+      // .tickFormat(d3.format(" <-.2p")) // try '%' if more precision is needed
       .orient("right");
     d3.select(el).select('.yRightAxis')
       .attr('transform', 'translate(' + (scaleMax(scales.x)) + ',0)')
@@ -306,7 +307,8 @@ var TransformChart = {
       .scale(scales.x)
       .ticks(width > 500 ? 6 : 4)
       .tickSize(-1 * scaleMin(scales.pointY) + scaleMax(scales.pointY), -1 * scaleMin(scales.pointY) + scaleMax(scales.pointY))
-      .tickFormat(d3.format(".3g"))
+      .tickFormat((d) => Util.formatNumber(d, 3))
+      // .tickFormat(d3.format(".3g"))
       .orient("bottom");
     d3.select(el).select('.bottomAxis')
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')

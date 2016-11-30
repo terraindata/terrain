@@ -52,6 +52,7 @@ import * as _ from 'underscore';
 import BrowserTypes from './../browser/BrowserTypes.tsx';
 
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+const suffixes = ['', ' k', ' M', ' B'];
 
 var keyPathForId = (node: any, id: string): ((string | number)[] | boolean) =>
   {
@@ -173,6 +174,44 @@ var Util = {
     }
     
     return then.format('MM/DD/YY') + hour;
+  },
+  
+  formatNumber(n: number, precision: number = 3): string
+  {
+    if(!n)
+    {
+      return n + "";
+    }
+    
+    let sign = n < 0 ? '-' : '';
+    n = Math.abs(n);
+    
+    if(n > 0.01 && n < 1000000000000) // 10^12
+    {
+      let pwr = Math.floor(Math['log10'](n));
+      if(pwr > 0)
+      {
+        let suffix = suffixes[Math.floor(pwr / 3)];
+        let decimalIndex = pwr % 3 + 1;
+        let str = n + "";
+        str = str.substr(0, precision);
+        if(decimalIndex < str.length)
+        {
+          str = str.slice(0, decimalIndex) + '.' + str.slice(decimalIndex);
+        }
+        return sign + str + suffix;
+      }
+      
+      let str = n.toPrecision(precision);
+      while(str.length > 1 && str.charAt(str.length) === '0')
+      {
+        str = str.substr(0, str.length - 1);
+      }
+      
+      return sign + str;
+    }
+    
+    return sign + n.toExponential(precision);
   },
   
   getId(): ID
