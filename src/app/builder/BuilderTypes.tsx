@@ -1473,24 +1473,26 @@ export module BuilderTypes
         let keys = pattern.split(".");
         if(keys.length === 1)
         {
-          return card[keys[0]];
+          let value = card[keys[0]];
+          if(value['_isCard'])
+          {
+            return getPreview(value);
+          }
+          return value;
         }
-        if(keys[1] === 'length')
+        if(keys[1] === 'length' || keys[1] === 'size')
         {
           return card[keys[0]].size;
         }
         return card[keys[0]].toArray().map(v => v[keys[1]]).join(", ");
       });
     }
-    else
+    else if(typeof preview === 'function')
     {
-      if(!preview)
-      {
-        return 'No preview';
-      }
-      
       return preview(card);
     }
+    
+    return 'No preview';
   }  
   
   export function getChildIds(_block:IBlock):Map<ID, boolean>

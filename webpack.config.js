@@ -81,5 +81,11 @@ module.exports = {
         'TDB_HOST': "'//" + process.env.TDB_HOST + ":7344'",
         'DEV': "true"
       })
-    ]
+    ],
+    historyApiFallback: {
+      rewrites: [
+          // shows favicon
+          { from: /favicon.ico/, to: 'favicon.ico' },
+      ],
+    },
 };
