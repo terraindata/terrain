@@ -47,29 +47,29 @@ class ColorManager
   private static COLORS =
   [
     '#00A7F7',
+    '#00BCD6',
+    '#009788',
     '#48B14B',
+    '#8AC541',
     '#CCDD1F',
     '#FFEC18',
-    '#00BCD6',
     '#FFC200',
     '#FF9900',
-    '#009788',
     '#5F7D8C',
-    '#8AC541',
   ];
   
   private static DARKER_COLORS =
   [
     '#00809a',
+    '#009086',
+    '#007455',
     '#32882f',
+    '#609728',
     '#8eaa13',
     '#b2b50f',
-    '#009086',
     '#b29500',
     '#b27500',
-    '#007455',
     '#426057',
-    '#609728',
   ];
   
   private static keyToIndex: { [s: string]: number; } = {};

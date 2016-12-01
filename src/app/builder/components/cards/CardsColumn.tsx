@@ -156,11 +156,11 @@ class CardsColumn extends PureClasss<Props>
     // TODO improve make faster
     let el = $('#cards-column');
     let start = el.offset().top;
-    let totalHeight = $('#cards-column-inner').height();
+    let totalHeight = document.getElementById('cards-column-inner').clientHeight;
     scrollAction(start, el.height(), el.scrollTop(), totalHeight);
   }
   
-  componentDidUpdate()
+  componentWillUpdate()
   {
     let inner = document.getElementById('cards-column-inner');
     if(inner)
@@ -168,13 +168,16 @@ class CardsColumn extends PureClasss<Props>
       let height = inner.clientHeight;
       if(height !== this.innerHeight)
       {
+        if(this.innerHeight !== -1)
+        {
+          this.handleScroll();
+        }
         this.innerHeight = height;
-        this.handleScroll();
       }
     }
   }
   
-  innerHeight: number = 0;
+  innerHeight: number = -1;
   render()
   {
     let {props} = this;

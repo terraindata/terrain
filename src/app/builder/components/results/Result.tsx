@@ -48,8 +48,8 @@ import * as React from 'react';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 const {List} = Immutable;
-import { DragSource, DropTarget } from 'react-dnd';
-var { createDragPreview } = require('react-dnd-text-dragpreview');
+// import { DragSource, DropTarget } from 'react-dnd';
+// var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../../util/Util.tsx';
 import Menu from '../../../common/components/Menu.tsx';
 import Actions from '../../data/BuilderActions.tsx';
@@ -61,18 +61,18 @@ import {IResultsConfig} from './ResultsConfig.tsx';
 var PinIcon = require("./../../../../images/icon_pin_21X21.svg?name=PinIcon");
 var ScoreIcon = require("./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon");
 
-var dragPreviewStyle = {
-  backgroundColor: '#cfd7c8',
-  borderColor: '#cfd7c8',
-  color: '#44484d',
-  fontSize: 15,
-  fontWeight: 'bold',
-  paddingTop: 7,
-  paddingRight: 12,
-  paddingBottom: 9,
-  paddingLeft: 12,
-  borderRadius: 10
-}
+// var dragPreviewStyle = {
+//   backgroundColor: '#cfd7c8',
+//   borderColor: '#cfd7c8',
+//   color: '#44484d',
+//   fontSize: 15,
+//   fontWeight: 'bold',
+//   paddingTop: 7,
+//   paddingRight: 12,
+//   paddingBottom: 9,
+//   paddingLeft: 12,
+//   borderRadius: 10
+// }
 
 interface Props
 {
@@ -83,16 +83,17 @@ interface Props
     pinned: boolean;
   };
   allFieldsData: any;
-  connectDragPreview?: (a:any) => void;
   config: IResultsConfig;
   index: number;
+  primaryKey: string;
   onExpand: (index:number) => void;
   expanded?: boolean;
-  isDragging: boolean;
-  connectDragSource: (a:any) => any;
-  isOver: boolean;
-  connectDropTarget: (a:any) => any;
-  primaryKey: string;
+  
+  isOver?: boolean;
+  isDragging?: boolean;
+  connectDragSource?: (a:any) => any;
+  connectDropTarget?: (a:any) => any;
+  connectDragPreview?: (a:any) => void;
 }
 
 class Result extends Classs<Props> {
@@ -125,20 +126,20 @@ class Result extends Classs<Props> {
     return false;    
   }
   
-  dragPreview: any;
-  componentDidMount() {
-    this.generateDragPreview(this.props); 
-  }
-  componentWillReceiveProps(nextProps)
-  {
-    this.generateDragPreview(nextProps);
-  }
-  generateDragPreview(props:Props)
-  {
-    this.dragPreview = createDragPreview(getResultName(this.props.data, this.props.allFieldsData, 
-      this.props.config), dragPreviewStyle);
-    props.connectDragPreview(this.dragPreview);
-  }
+  // dragPreview: any;
+  // componentDidMount() {
+  //   this.generateDragPreview(this.props); 
+  // }
+  // componentWillReceiveProps(nextProps)
+  // {
+  //   this.generateDragPreview(nextProps);
+  // }
+  // generateDragPreview(props:Props)
+  // {
+  //   this.dragPreview = createDragPreview(getResultName(this.props.data, this.props.allFieldsData, 
+  //     this.props.config), dragPreviewStyle);
+  //   props.connectDragPreview(this.dragPreview);
+  // }
 
   renderExpandedField(value, field)
   {
@@ -338,7 +339,8 @@ class Result extends Classs<Props> {
       );
     }
     
-    return connectDropTarget(connectDragSource(
+    // return connectDropTarget(connectDragSource(
+    return ((
       <div
         className={classes}
         onDoubleClick={this.expand}
@@ -377,6 +379,41 @@ class Result extends Classs<Props> {
 	}
 };
 
+
+export function getResultValue(resultData, allFieldsData, field: string, config: IResultsConfig, overrideFormat?: any): string
+{
+  var value = (resultData && resultData[field]) ||(allFieldsData && allFieldsData[field]);
+  
+  return ResultFormatValue(field, value, config, overrideFormat);
+}
+
+export function getResultFields(resultData, allFieldsData, config: IResultsConfig): string[]
+{
+  if(config && config.enabled && config.fields && config.fields.size)
+  {
+    var fields = config.fields.toArray();
+  }
+  else
+  {
+    var fields = _.union(_.keys(resultData), _.keys(allFieldsData));
+  }
+  
+  return fields;
+}
+  
+export function getResultName(resultData, allFieldsData, config: IResultsConfig)
+{
+  if(config && config.name && config.enabled)
+  {
+    var nameField = config.name;
+  }
+  else
+  {
+    var nameField = _.first(getResultFields(resultData, allFieldsData, config));
+  }
+  
+  return getResultValue(resultData, allFieldsData, nameField, config);
+}
 
 
 export function ResultFormatValue(field: string, value: string | number, config: IResultsConfig, overrideFormat?: any): any
@@ -455,107 +492,73 @@ export function ResultFormatValue(field: string, value: string | number, config:
   return value;
 }
 
+export default Result;
 
 // DnD stuff
 
 // Defines a draggable result functionality
-const resultSource = 
-{
-  canDrag(props)
-  {
-    return false; // TODO remove once we get result dragging and pinning working
-    // return props.canDrag;
-  },
+// const resultSource = 
+// {
+//   canDrag(props)
+//   {
+//     return false; // TODO remove once we get result dragging and pinning working
+//     // return props.canDrag;
+//   },
   
-  beginDrag(props)
-  {
-    const item = props.data;
-    return item;
-  },
+//   beginDrag(props)
+//   {
+//     const item = props.data;
+//     return item;
+//   },
   
-  endDrag(props, monitor, component)
-  {
-    if(!monitor.didDrop())
-    {
-      return;
-    }
+//   endDrag(props, monitor, component)
+//   {
+//     if(!monitor.didDrop())
+//     {
+//       return;
+//     }
     
-    const item = monitor.getItem();
-    const dropResult = monitor.getDropResult();
-  }
-}
+//     const item = monitor.getItem();
+//     const dropResult = monitor.getDropResult();
+//   }
+// }
 
-// Defines props to inject into the component
-const dragCollect = (connect, monitor) =>
-({
-  connectDragSource: connect.dragSource(),
-  isDragging: monitor.isDragging(),
-  connectDragPreview: connect.dragPreview()
-});
+// // Defines props to inject into the component
+// const dragCollect = (connect, monitor) =>
+// ({
+//   connectDragSource: connect.dragSource(),
+//   isDragging: monitor.isDragging(),
+//   connectDragPreview: connect.dragPreview()
+// });
 
-const resultTarget = 
-{
-  canDrop(props, monitor)
-  {
-    return true;
-  },
+// const resultTarget = 
+// {
+//   canDrop(props, monitor)
+//   {
+//     return true;
+//   },
   
-  hover(props, monitor, component)
-  {
-    const canDrop = monitor.canDrop();
-  },
+//   hover(props, monitor, component)
+//   {
+//     const canDrop = monitor.canDrop();
+//   },
   
-  drop(props, monitor, component)
-  {
-    const item = monitor.getItem();
-    // TODO
-    // Actions.results.move(item, props.index);
-  }
-}
+//   drop(props, monitor, component)
+//   {
+//     const item = monitor.getItem();
+//     // TODO
+//     // Actions.results.move(item, props.index);
+//   }
+// }
 
-const dropCollect = (connect, monitor) =>
-({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  isOverCurrent: monitor.isOver({ shallow: true }),
-  canDrop: monitor.canDrop(),
-  itemType: monitor.getItemType()
-});
-
-export function getResultValue(resultData, allFieldsData, field: string, config: IResultsConfig, overrideFormat?: any): string
-{
-  var value = (resultData && resultData[field]) ||(allFieldsData && allFieldsData[field]);
-  
-  return ResultFormatValue(field, value, config, overrideFormat);
-}
-
-export function getResultFields(resultData, allFieldsData, config: IResultsConfig): string[]
-{
-  if(config && config.enabled && config.fields && config.fields.size)
-  {
-    var fields = config.fields.toArray();
-  }
-  else
-  {
-    var fields = _.union(_.keys(resultData), _.keys(allFieldsData));
-  }
-  
-  return fields;
-}
-  
-export function getResultName(resultData, allFieldsData, config: IResultsConfig)
-{
-  if(config && config.name && config.enabled)
-  {
-    var nameField = config.name;
-  }
-  else
-  {
-    var nameField = _.first(getResultFields(resultData, allFieldsData, config));
-  }
-  
-  return getResultValue(resultData, allFieldsData, nameField, config);
-}
+// const dropCollect = (connect, monitor) =>
+// ({
+//   connectDropTarget: connect.dropTarget(),
+//   isOver: monitor.isOver(),
+//   isOverCurrent: monitor.isOver({ shallow: true }),
+//   canDrop: monitor.canDrop(),
+//   itemType: monitor.getItemType()
+// });
 
 
-export default DropTarget('RESULT', resultTarget, dropCollect)(DragSource('RESULT', resultSource, dragCollect)(Result));
+// export default DropTarget('RESULT', resultTarget, dropCollect)(DragSource('RESULT', resultSource, dragCollect)(Result));

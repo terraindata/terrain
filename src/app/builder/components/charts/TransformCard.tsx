@@ -49,7 +49,6 @@ import * as React from 'react';
 import Actions from "../../data/BuilderActions.tsx";
 import BuilderStore from "../../data/BuilderStore.tsx";
 import SpotlightStore from '../../data/SpotlightStore.tsx';
-import BuilderScrollStore from '../../data/BuilderScrollStore.tsx';
 import Util from '../../../util/Util.tsx';
 import { Ajax, QueryResponse } from '../../../util/Ajax.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';

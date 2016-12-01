@@ -405,7 +405,6 @@ var TransformChart = {
         let bucket = null;
         _.map(ys, (g, b) =>
         {
-          console.log(b, g, scales.realX(g.x), rx, Math.abs(scales.realX(g.x) - rx));
           if(Math.abs(scales.realX(g.x) - rx) < SPOTLIGHT_SPACING)
           {
             bucket = b;
