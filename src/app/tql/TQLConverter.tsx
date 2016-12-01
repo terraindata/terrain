@@ -145,7 +145,10 @@ class TQLConverter
         || (field.field.substr && field.field.substr(5).toLowerCase() === 'count')))
       {
         // no count card, add one
-        fromCard = fromCard.setIn(['fields', 0, 'field'], 'COUNT(*)');
+        fromCard = fromCard.update('fields', 
+          fields => fields.unshift(BuilderTypes.make(BuilderTypes.Blocks.field, {
+            field: 'COUNT(*)',
+          })));
       }
       
       if(options.transformAliases)
