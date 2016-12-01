@@ -174,6 +174,19 @@ export module BrowserTypes
     return new Algorithm(Util.extendId({ groupId, id, name, lastEdited, lastUsername, variants, variantsOrder, status }));
   }
 
+  export const groupColors =
+  [
+    '#00A7F7',
+    '#00BCD6',
+    '#009788',
+    '#48B14B',
+    '#8AC541',
+    '#CCDD1F',
+    '#FFEC18',
+    '#FFC200',
+    '#FF9900',
+    '#5F7D8C',
+  ];
 
   export enum EGroupStatus
   {

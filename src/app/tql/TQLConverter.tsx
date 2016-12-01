@@ -150,26 +150,20 @@ class TQLConverter
       
       if(options.transformAliases)
       {
-        // TODO also search throughout the query, as these can be nested throughout. Throughout!
         // TODO find score fields. Score fields!
-        let transformInputs = fromCard['fields'].filter((field: any) =>
-          field.field.type === 'transform' || 
-            (field.field.type === 'as' && field.field.value && field.field.value.type === 'transform')
-        ).map((field: any) =>
+        
+        let transformInputs = [];
+        BuilderTypes.forAllCards(fromCard, (card) =>
         {
-          let transformCard = field.field;
-          if(transformCard.type === 'as')
+          if(card.type === 'transform')
           {
-            transformCard = transformCard.value;
+            let input = card['input'];
+            if(input._isCard)
+            {
+              input = this._parse(input);
+            }
+            transformInputs.push(input + ' as ' + BuilderTypes.transformAlias(card)); // need to filter out any non-letters-or-numbers
           }
-          
-          let {input} = transformCard;
-          if(input._isCard)
-          {
-            input = this._parse(input);
-          }
-          
-          return input + ' as ' + BuilderTypes.transformAlias(transformCard); // need to filter out any non-letters-or-numbers
         });
         
         transformInputs.map(input =>

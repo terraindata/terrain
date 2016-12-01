@@ -1510,6 +1510,21 @@ export module BuilderTypes
     return map;
   }
   
+  export function forAllCards(_block:IBlock | List<IBlock>, fn: (card:ICard) => void)
+  {
+    if(_block)
+    {
+      if(_block['_isCard'])
+      {
+        fn(_block as ICard);
+      }
+      if(Immutable.Iterable.isIterable(_block))
+      {
+        (_block.toMap() as any).map(b => forAllCards(b as ICard, fn));
+      }
+    }
+  }
+   
   export function transformAlias(transformCard:ICard):string
   {
     return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, "");
