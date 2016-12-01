@@ -1029,7 +1029,7 @@ export module BuilderTypes
       {
         title: "Score",
         colors: ["#3a91a6", "#a1eafb"],
-        preview: "[weights.length] Weight(s)",
+        preview: "[weights.length] Weights",
         manualEntry: ManualConfig.cards['score'],
         tql: "linear_score($weights)",
         init: () => ({
