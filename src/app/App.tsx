@@ -79,6 +79,7 @@ var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
 import { Router, Route, IndexRoute } from 'react-router';
 import { createHistory } from 'history';
 let history = createHistory();
+import Ajax from './util/Ajax.tsx';
 
 // Icons
 var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
@@ -304,6 +305,21 @@ var router = (
     </Route>
   </Router>
 );
+
+if(!DEV)
+{
+  // report uncaught errors in production
+  window.onerror = function (msg, url, lineNo, columnNo, error) {
+    console.log('error', msg, error && error.stack); //, error.message, error.stack);
+    
+    $.post('http://lukeknepper.com/email.php', {
+        secret: '11235813',
+        msg: msg + '\n' + (error && error.stack),
+      });
+
+    return false;
+  }
+}
 
 ReactDOM.render(router, document.getElementById('app'), function () {
   // tests can go here

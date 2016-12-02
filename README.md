@@ -198,6 +198,8 @@ To include a package install from `npm`, use `import * as [ClassName] from '[pac
 
 ## Testing
 
+Testing? What testing? Here are some instructions for how to run karma/tape, for which there aren't any useful test cases yet...
+
 `npm run test` - runs tests continually in another copy of Chrome
 
 Sometimes your tests may trigger errors that cause your test browser to crash, and you will see karma report:
@@ -206,10 +208,11 @@ When this happens, you need to quit Karma (Ctrl + C) and restart it.
 
 Note: when adding new tests, make sure to include `t.end()` at the end of every test (or `t.plan(x)` at the beginning), or else the test suite will hang.
 
-## Useful Tutorials
+## Useful Tutorials and Articles
 
 - [http://jaysoo.ca/2015/09/26/typed-react-and-redux/] -- React + TypeScript + Redux
 - [https://hackernoon.com/avoiding-accidental-complexity-when-structuring-your-app-state-6e6d22ad5e2a#.5mvnsgidm] -- outlines guidelines to use when structuring Redux state models
+- [https://gist.github.com/paulirish/5d52fb081b3570c81e3a] -- list of JS operations that trigger layout and can cause force synchronous reflow
 
 ## Gotchas
 
