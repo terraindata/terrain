@@ -176,8 +176,10 @@ var Util = {
     return then.format('MM/DD/YY') + hour;
   },
   
-  formatNumber(n: number, precision: number = 3): string
+  formatNumber(n: number): string
   {
+    const precision: number = 3;
+    
     if(!n)
     {
       return n + "";
