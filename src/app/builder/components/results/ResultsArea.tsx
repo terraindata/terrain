@@ -62,7 +62,7 @@ import Switch from './../../../common/components/Switch.tsx';
 import BuilderTypes from '../../BuilderTypes.tsx';
 import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore.tsx';
 
-const RESULTS_PAGE_SIZE = 200;
+const RESULTS_PAGE_SIZE = 20;
 const MAX_RESULTS = 200;
 
 interface Props
@@ -91,7 +91,6 @@ interface State
   expandedResultIndex: number;
   
   resultsPages: number;
-  loadedResultsPages: number;
   onResultsLoaded: (unchanged?: boolean) => void;
 }
 
@@ -113,7 +112,6 @@ class ResultsArea extends PureClasss<Props>
     resultType: null,
     showingConfig: false,
     resultsPages: 1,
-    loadedResultsPages: 1,
     onResultsLoaded: null,
     resultFormat: 'icon',
   };
@@ -147,6 +145,7 @@ class ResultsArea extends PureClasss<Props>
       
       if(this.state.onResultsLoaded)
       {
+        // reset infinite scroll
         this.state.onResultsLoaded(false);
       }
       
@@ -204,9 +203,8 @@ class ResultsArea extends PureClasss<Props>
           config={this.getResultsConfig()}
           onExpand={this.handleCollapse}
           expanded={true}
-          drag_x={false}
-          drag_y={false}
           index={-1}
+          primaryKey={getPrimaryKeyFor(result, this.getResultsConfig())}
           />
       </div>
     );
@@ -215,25 +213,30 @@ class ResultsArea extends PureClasss<Props>
   
   handleRequestMoreResults(onResultsLoaded: (unchanged?: boolean) => void)
   {
-    // if(this.state.loadedResultsPages !== this.state.resultsPages)
-    // {
-    //   // still loading a previous request
-    //   return;
-    // }
+    let {resultsPages} = this.state;
     
-    let pages = this.state.resultsPages + 1;
-    this.setState({
-      resultsPages: pages,
-      onResultsLoaded,
-    });
-    let reachedEnd = this.state.resultsCount <= this.state.resultsPages * RESULTS_PAGE_SIZE;
-    if(!reachedEnd)
+    if(resultsPages * RESULTS_PAGE_SIZE < MAX_RESULTS)
     {
-      setTimeout(() =>
-        onResultsLoaded(reachedEnd)
-      , 250);
+      this.setState({
+        resultsPages: resultsPages + 1,
+        onResultsLoaded,
+      });
     }
-    // this.queryResults(this.props.query, pages);
+    else
+    {
+      onResultsLoaded(true);
+    }
+  }
+  
+  componentDidUpdate()
+  {
+    if(this.state.onResultsLoaded)
+    {
+      this.setState({
+        onResultsLoaded: null,
+      });
+      this.state.onResultsLoaded(false);
+    }
   }
   
   resultsFodderRange = _.range(0, 25);
@@ -315,10 +318,8 @@ class ResultsArea extends PureClasss<Props>
                 config={this.getResultsConfig()}
                 onExpand={this.handleExpand}
                 index={index}
-                canDrag={this.props.canEdit}
                 key={primaryKey}
                 primaryKey={primaryKey}
-                format={this.state.resultFormat}
               />
             );
           }
@@ -409,20 +410,6 @@ class ResultsArea extends PureClasss<Props>
       }
       else
       {
-        if(this.state.onResultsLoaded && this.state.resultsPages !== this.state.loadedResultsPages)
-        {
-          this.setState({
-            loadedResultsPages: this.state.resultsPages,
-          });
-          
-          // set a timeout to prevent an infinite loop with InfiniteScroll
-          // could move this somewhere that executes after the results have rendered
-          let unchanged = results.length < this.state.resultsPages * RESULTS_PAGE_SIZE;
-          this.timeout = setTimeout(() =>
-            this.state.onResultsLoaded && this.state.onResultsLoaded(unchanged)
-            , 1000);
-        }
-        
         this.setState({
           results,
           resultType: 'rel',
@@ -504,7 +491,7 @@ class ResultsArea extends PureClasss<Props>
     else 
     {
       tql = TQLConverter.toTQL(query, {
-        limit: pages * RESULTS_PAGE_SIZE,
+        limit: MAX_RESULTS,
       });
     }
     if(tql !== this.state.tql)
