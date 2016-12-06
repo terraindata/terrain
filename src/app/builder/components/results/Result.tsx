@@ -418,7 +418,7 @@ export function getResultName(resultData, allFieldsData, config: IResultsConfig)
 
 export function ResultFormatValue(field: string, value: string | number, config: IResultsConfig, overrideFormat?: any): any
 {
-  let format = config && config.formats && config.formats.get(field);
+  let format = config && config.enabled && config.formats && config.formats.get(field);
   let {showRaw} = overrideFormat || format || { showRaw: false };
   var italics = false;
   

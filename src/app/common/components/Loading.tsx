@@ -149,7 +149,11 @@ class Loading extends PureClasss<Props>
   
   handleFirstEnd()
   {
-    if(this.props.loading)
+    if(this.props.loaded)
+    {
+      this.setStage(3);
+    }
+    else if(this.props.loading)
     {
       this.setStage(1);
     }

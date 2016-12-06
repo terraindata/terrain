@@ -9,6 +9,7 @@
   padding: 10px 0px;
   
   .browser-category-title {
+    .small-bold-text;
     margin: 1px 10px;
     margin-bottom: 5px;
     padding: 4px;
@@ -26,16 +27,19 @@
       border-radius: @r;
       background: #ddd;
       margin: 0px 6px;
-      position: relative;
-      top: -2px;
+      vertical-align: middle;
+    }
+    
+    .browser-category-title-text {
+      vertical-align: middle;
+      display: inline-block;
     }
     
     &:before {
+      vertical-align: middle;
       display: inline-block;
       content: '';
       .arrow-down;
-      position: relative;
-      top: -2px;
       opacity: 0.5;
       .transition;
     }

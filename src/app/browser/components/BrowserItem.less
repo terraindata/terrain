@@ -13,13 +13,12 @@
   
   @th: 36px;
   .browser-item-title-bar {
+    .title-text;
+    line-height: 19px;
     position: relative;
     height: @th;
-    font-size: 16px;
     padding: 8px;
     box-sizing: border-box;
-    font-weight: 200;
-    letter-spacing: 0.5;
     background-blend-mode: multiply;
     
     svg {
@@ -73,6 +72,10 @@
   }
   
   .browser-item-content {
+    .user-thumbnail {
+      margin-right: @standard-margin;
+    }
+    
     height: @h - @th;
     background: rgba(255,255,255,0.15);
     background-blend-mode: multiply;

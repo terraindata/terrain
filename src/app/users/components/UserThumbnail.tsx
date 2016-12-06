@@ -115,7 +115,9 @@ class UserThumbnail extends Classs<Props>
     let { user } = this.state;
     let name: string = user ? user.name() : 'Loading...';
     let src: string = user ? user.imgSrc : 'http://lukeknepper.com/terrain/assets/img/Terrain_Icon_White.png';
-    let tip = this.props.showName ? null : '<div class="center">' + name + '<br />' + this.props.extra + '</div>';
+    let tip = this.props.showName ? null : 
+      '<div class="user-thumbnail-tip-name">' + name + '</div>' +
+      '<div class="user-thumbnail-tip-details">' + this.props.extra + '</div>';
     let text: string = this.props.showName ? name : null;
     let thumbnail = (
       <div
@@ -138,7 +140,14 @@ class UserThumbnail extends Classs<Props>
             backgroundImage: `url(${src})`,
           }}
         />
-        { text ? <div className='user-thumbnail-text'>{text}</div> : null }
+        { 
+          text &&
+            <div className='user-thumbnail-text'>
+              {
+                text
+              }
+            </div>
+        }
       </div>
     );
     

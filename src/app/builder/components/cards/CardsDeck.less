@@ -1,7 +1,7 @@
 @import "../../../common/Common.less";
 
 .cards-deck {
-  padding-top: 30px;
+  padding-top: 33px;
 }
 
 @search-height: 30px;
@@ -28,19 +28,22 @@
   .cards-deck-card {
     margin: 3px;
     padding: 3px 0px;
-    color: #fff;
     text-align: center;
     border-radius: 3px;
     .transition(~"all .35s");
-    opacity: 0.85;
-    // border: 2px solid rgba(0,0,0,0);
     height: 24px;
     box-sizing: border-box;
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0);  
+    
+    .bold-normal-white-text;
     
     &:hover {
       .transition(~"all .15s");
-      opacity: 1;
-      border-color: @bright-green;
+      border-color: rgba(255,255,255,0.75);
+    }
+    &:active {
+      border-color: #fff;
     }
     
     &.cards-deck-card-hidden {
@@ -87,56 +90,56 @@
   width: 16px;
   cursor: pointer;
   
+  .transition;
+  
   position: absolute;
   top: 0px;
   left: 0px;
   padding: 6px;
-  background: @knob-bg;
-  color: fade(@knob-color, 0%);
-  .transition;
+
   z-index: 9;
   box-sizing: border-box;
-  padding-left: 15px;
+  padding-left: 24px;
   overflow: hidden;
   text-align: center;
   white-space: nowrap;
+  cursor: pointer;
   
-  &:hover {
-    background: @knob-color; 
-    color: fade(@knob-bg, 0%);
-
-    svg {
-      // width: 11px;
-      fill: @knob-bg; 
-      // background: @knob-color;
-    }
-  }
-  
-  svg {
+  .cards-deck-knob-icon {
+    border: 1px solid @knob-bg;
+    
     fill: @knob-color;
+    background: @knob-bg;
     width: 10px;
-    .transition; //(~"all 600ms cubic-bezier(0.23, 1, 0.32, 1)");
+    padding: 6px;
+    border-radius: 3px;
+    .transition;
     
     position: absolute;
     left: 6px;
-    top: 9px;
-    // background: @knob-bg;
+    top: 6px;
+    
+    &:hover {
+      background: #fff; //fade(#fff, 90%);
+      fill: @knob-bg;
+    }
   }
   
-  border-bottom-right-radius: 6px;
+  .cards-deck-knob-text {
+    .semi-bold-normal-white-text;
+    padding-top: 2px;
+  }
 }
 
 .cards-column-deck-open {
   .cards-deck-knob {
-    border-bottom-right-radius: 0px;
-    color: @knob-color;
-
-    svg {
+    .cards-deck-knob-icon {
+      background-color: fade(#fff, 25%);
       .rotate180;
-    }
-    
-    &:hover {
-      color: @knob-bg;
+      &:hover {
+        background: fade(#fff, 90%);
+        fill: @knob-bg;
+      }
     }
   }
 }

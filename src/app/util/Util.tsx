@@ -188,7 +188,7 @@ var Util = {
     let sign = n < 0 ? '-' : '';
     n = Math.abs(n);
     
-    if(n > 0.01 && n < 1000000000000) // 10^12
+    if(n >= 0.001 && n < 1000000000000) // 10^12
     {
       let pwr = Math.floor(Math['log10'](n));
       let str = n.toPrecision(precision);

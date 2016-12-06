@@ -84,7 +84,11 @@ class BrowserItemCategory extends Classs<Props>
         { ! this.props.titleHidden &&
           <div className='browser-category-title' onClick={this.toggleOpen}>
             <div className='browser-category-title-symbol' />
-            { this.props.status }
+            <div className='browser-category-title-text'>
+              { 
+                this.props.status
+              }
+            </div>
           </div>
         }
         <div className='browser-category-content'>

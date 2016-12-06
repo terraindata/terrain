@@ -236,8 +236,12 @@ class CardsColumn extends PureClasss<Props>
           className='cards-deck-knob'
           onClick={this.toggleDeck}
         >
-          <ExpandIcon />
-          Card Deck
+          <ExpandIcon
+            className='cards-deck-knob-icon'
+          />
+          <div className='cards-deck-knob-text'>
+              Card Deck
+          </div>
         </div>
       </div>
     );

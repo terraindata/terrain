@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+require('./ResultsArea.less');
 import * as Immutable from 'immutable';
 const {Map,List} = Immutable;
 import * as _ from 'underscore';
