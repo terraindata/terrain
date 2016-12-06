@@ -173,34 +173,36 @@ class GroupsColumn extends Classs<Props>
         canArchive={canEdit || canDrag}
         canDuplicate={canDrag}
       >
-        {
-          groupRoles && me && (groupRoles.getIn([me.username, 'builder']) || groupRoles.getIn([me.username, 'admin'])) &&
-            <UserThumbnail
-              username={me.username}
-              medium={true}
-              extra={
-                groupRoles.getIn([me.username, 'admin']) ? 'Admin' : 
-                  (groupRoles.getIn([me.username, 'builder']) ? 'Builder' : 'Viewer')
-              }
-            />
-        }
-        {
-          groupRoles && groupRoles.toArray()
-          .filter(role => role.builder || role.admin)
-          .map(
-            (role, index) => 
-              index > 8 || (me && role.username === me.username) ? null : 
-                <UserThumbnail
-                  username={role.username}
-                  key={role.username}
-                  medium={true}
-                  extra={
-                    groupRoles.getIn([role.username, 'admin']) ? 'Admin' : 
-                      (groupRoles.getIn([role.username, 'builder']) ? 'Builder' : 'Viewer')
-                  }
-                />
-          )
-        }
+        <div className='group-browser-info-wrapper'>
+          {
+            groupRoles && me && (groupRoles.getIn([me.username, 'builder']) || groupRoles.getIn([me.username, 'admin'])) &&
+              <UserThumbnail
+                username={me.username}
+                medium={true}
+                extra={
+                  groupRoles.getIn([me.username, 'admin']) ? 'Admin' : 
+                    (groupRoles.getIn([me.username, 'builder']) ? 'Builder' : 'Viewer')
+                }
+              />
+          }
+          {
+            groupRoles && groupRoles.toArray()
+            .filter(role => role.builder || role.admin)
+            .map(
+              (role, index) => 
+                index > 8 || (me && role.username === me.username) ? null : 
+                  <UserThumbnail
+                    username={role.username}
+                    key={role.username}
+                    medium={true}
+                    extra={
+                      groupRoles.getIn([role.username, 'admin']) ? 'Admin' : 
+                        (groupRoles.getIn([role.username, 'builder']) ? 'Builder' : 'Viewer')
+                    }
+                  />
+            )
+          }
+        </div>
       </BrowserItem>
     );
   }
