@@ -135,6 +135,12 @@ export module BuilderTypes
     db: string;
     
     deckOpen: boolean;
+    
+    // TODO include this and make it work
+    // static:
+    // {
+    //   getChildTerms: (query:IQuery) => List<string>;
+    // }
   }
   
   export interface IInput extends IRecord<IInput>
@@ -578,7 +584,7 @@ export module BuilderTypes
                 return list;
               }
             , List([]))
-            .concat(
+            .concat( /* TODO make this better */
               card['fields'].reduce(
                 (list:List<string>, fieldBlock: {field: CardString}): List<string> =>
                 {
@@ -590,7 +596,8 @@ export module BuilderTypes
                   return list;
                 }, List([])
               )
-            ),
+            )
+            ,
           
         display: [
           {
@@ -1275,7 +1282,7 @@ export module BuilderTypes
       value: "",
       inputType: InputType.NUMBER,
       static: {
-        tql: "VAR $key = $value;"
+        tql: "VAR $key = $value;",
       }
     }),
     

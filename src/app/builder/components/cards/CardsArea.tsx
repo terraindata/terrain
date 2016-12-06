@@ -65,7 +65,6 @@ var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 interface Props
 {
   cards: ICards;
-  keys: List<string>;
   canEdit: boolean;
   keyPath: KeyPath;
   
@@ -81,7 +80,6 @@ interface Props
 }
 
 interface KeyState {
-  keys: List<string>;
   keyPath: KeyPath;
 }
 
@@ -96,7 +94,6 @@ interface State extends KeyState {
 class CardsArea extends PureClasss<Props>
 {
   state: State = {
-    keys: List([]),
     keyPath: null,
     learningMode: this.props.helpOn,
     cardToolOpen: true,
@@ -108,7 +105,6 @@ class CardsArea extends PureClasss<Props>
   constructor(props:Props)
   {
     super(props);
-    this.state.keys = this.computeKeys(props);
     this.state.cardToolOpen = props.cards.size === 0;
     
     this._subscribe(BuilderStore, {
@@ -144,39 +140,9 @@ class CardsArea extends PureClasss<Props>
   
   componentWillReceiveProps(nextProps:Props)
   {
-    if(nextProps.keys !== this.props.keys || nextProps.cards !== this.props.cards)
-    {
-      this.setState({
-        keys: this.computeKeys(nextProps)
-      });
-    }
-    
     this.setState({
       cardToolOpen: nextProps.cards.size === 0,
     });
-  }
-  
-  computeKeys(props:Props): List<string>
-  {
-    let newKeys: List<string> = props.keys.merge(
-      props.cards.reduce(
-        (memo: List<string>, card: ICard): List<string> =>
-        {
-          if(card.static.getNeighborTerms)
-          {
-            return memo.merge(card.static.getNeighborTerms(card));
-          }
-          return memo;
-        }
-      , Immutable.List([]))
-    );
-    
-    if(newKeys.equals(this.state.keys))
-    {
-      return this.state.keys;
-    }
-
-    return newKeys;
   }
   
   copy() {}
@@ -238,7 +204,6 @@ class CardsArea extends PureClasss<Props>
                   card={card}
                   index={index}
                   singleCard={false}
-                  keys={this.state.keys}
                   canEdit={this.props.canEdit}
                   keyPath={this.props.keyPath}
                   accepts={this.props.accepts}

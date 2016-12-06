@@ -42,66 +42,82 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as classNames from 'classnames';
-import * as _ from 'underscore';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import Util from '../../util/Util.tsx';
-import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
-import { Display } from '../../builder/BuilderDisplays.tsx';
-import Card from '../../builder/components/cards/Card.tsx';
+import BuilderTypes from './BuilderTypes.tsx';
+import * as Immutable from 'immutable';
+import {BuilderStore, BuilderState} from './data/BuilderStore.tsx';
 
-interface Props
+export module BuilderHelpers
 {
-  value: BuilderTypes.CardString;
-  keyPath: KeyPath;
-  canEdit: boolean;
-  className: string;
-  helpOn?: boolean;
-  addColumn?: (number, string?) => void;
-  columnIndex: number;
-  display: Display;
-}
-
-class BuilderTextboxCards extends React.Component<Props, any>
-{
-  constructor(props: Props) {
-    super(props);
-  }
-  
-  isText()
+  export function getTermsForKeyPath(keyPath:KeyPath): List<string>
   {
-    return typeof this.props.value === 'string';
+    let state = BuilderStore.getState();
+    
+    let terms = getTermsForKeyPathHelper(keyPath, state);
+    
+    // TODO migrate inputs reduction to the Query class if we get a query class
+    let inputs = state.getIn((keyPath.take(2) as KeyPath).push('inputs'));
+    if(inputs && inputs.size)
+    {
+      let inputTerms = inputs.map((input:BuilderTypes.IInput) => 'input.' + input.key);
+      if(terms)
+      {
+        return inputTerms.concat(terms);
+      }
+      return inputTerms;
+    }
+    
+    return terms;
   }
   
-  isCreating()
+  function getTermsForKeyPathHelper(keyPath:KeyPath, state:BuilderState): List<string>
   {
-    return false; // TODO
-    // return this.props.value && this.props.value['type'] === 'creating';
-  }
-  
-  render() {
-    if(this.isText() || this.isCreating() || this.props.value['closed'])
+    if(!keyPath.size)
     {
       return null;
     }
     
-    // We're in card mode
-    return (
-      <div className={classNames({
-        'builder-tb-cards-area': true,
-        [this.props.className]: !!this.props.className,
-      })} ref='tb'>
-        <Card
-          {...this.props}
-          singleCard={true}
-          card={this.props.value as BuilderTypes.ICard}
-          index={null}
-          display={this.props.display}
-        />
-      </div>
-    );
-  }
-};
+    let parentTerms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state);
 
-export default BuilderTextboxCards;
+    let block = BuilderStore.getState().getIn(keyPath);
+    
+    if(block._isCard)
+    {
+      let card = block as BuilderTypes.ICard;
+      
+      let terms = null;
+      
+      if(card.static.getChildTerms)
+      {
+        terms = card.static.getChildTerms(card);
+      }
+      
+      if(card.static.getNeighborTerms)
+      {
+        let neighborTerms = card.static.getNeighborTerms(card);
+        
+        if(terms)
+        {
+          terms = terms.concat(neighborTerms);
+        }
+        else
+        {
+          terms = neighborTerms;
+        }
+      }
+      
+      if(terms)
+      {
+        if(parentTerms)
+        {
+          return terms.concat(parentTerms);
+        }
+        
+        return terms;
+      }
+    }
+    
+    return parentTerms;
+  }
+}
+
+export default BuilderHelpers;

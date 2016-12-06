@@ -64,7 +64,6 @@ interface Props
   data: any; // record
   display?: Display | Display[];
   
-  keys: List<string>;
   canEdit: boolean;
   
   parentData?: any;
@@ -121,7 +120,6 @@ class BuilderComponent extends PureClasss<Props>
             keyPath={parentKeyPath}
             data={data}
             canEdit={this.props.canEdit}
-            keys={this.props.keys}
             parentData={this.props.parentData}
             helpOn={this.props.helpOn}
             addColumn={this.props.addColumn}
@@ -183,7 +181,6 @@ class BuilderComponent extends PureClasss<Props>
       case DisplayType.CARDS:
         var st = data.get('static');
         content = <CardsArea 
-          keys={this.props.keys}
           canEdit={this.props.canEdit}
           key={key}
           cards={value} 
@@ -205,7 +202,6 @@ class BuilderComponent extends PureClasss<Props>
           value={value}
           canEdit={this.props.canEdit}
           keyPath={keyPath}
-          keys={this.props.keys}
           key={key + 'cards'}
           className={className}
           helpOn={this.props.helpOn}
@@ -246,7 +242,6 @@ class BuilderComponent extends PureClasss<Props>
                 keyPath={this.props.keyPath}
                 data={data}
                 canEdit={this.props.canEdit}
-                keys={this.props.keys}
                 parentData={this.props.parentData}
               />
             }
@@ -258,7 +253,6 @@ class BuilderComponent extends PureClasss<Props>
                 keyPath={this.props.keyPath}
                 data={data}
                 canEdit={this.props.canEdit}
-                keys={this.props.keys}
                 parentData={this.props.parentData}
                 helpOn={this.props.helpOn}
                 addColumn={this.props.addColumn}
@@ -274,7 +268,6 @@ class BuilderComponent extends PureClasss<Props>
                   keyPath={this.props.keyPath}
                   data={data}
                   canEdit={this.props.canEdit}
-                  keys={this.props.keys}
                   parentData={this.props.parentData}
                   helpOn={this.props.helpOn}
                   addColumn={this.props.addColumn}
@@ -305,7 +298,6 @@ class BuilderComponent extends PureClasss<Props>
                   keyPath={this._ikeyPath(keyPath, i)}
                   data={v}
                   canEdit={this.props.canEdit}
-                  keys={this.props.keys}
                   parentData={d.provideParentData && data}
                   helpOn={this.props.helpOn}
                   addColumn={this.props.addColumn}
@@ -326,7 +318,6 @@ class BuilderComponent extends PureClasss<Props>
         //   data,
         //   parentData: this.props.parentData,
         //   canEdit: this.props.canEdit,
-        //   keys: this.props.keys,
         //   className,
         // });
         var isTransformCard = d.key === 'scorePoints';
@@ -340,7 +331,6 @@ class BuilderComponent extends PureClasss<Props>
               data,
               parentData: this.props.parentData,
               canEdit: this.props.canEdit,
-              keys: this.props.keys,
               helpOn: this.props.helpOn,
               className,
             })}
@@ -385,10 +375,6 @@ class BuilderComponent extends PureClasss<Props>
           className='builder-component-wrapper builder-component-wrapper-wide'
         >
         <BuilderTextbox
-          keys={
-            d.autoDisabled ? null :
-              d.getAutoTerms ? d.getAutoTerms(this) : this.props.keys
-          }
           canEdit={this.props.canEdit}
           top={d.top}
           placeholder={d.placeholder || d.key}

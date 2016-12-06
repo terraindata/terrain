@@ -143,7 +143,6 @@ var BuilderColumn = React.createClass<any, any>(
     return {
       column: this.props.columnType ? this.props.columnType : column,
       loading: false,
-      inputKeys: this.calcInputKeys(this.props),
       // rand: 1,
     }
   },
@@ -173,21 +172,6 @@ var BuilderColumn = React.createClass<any, any>(
   {
     this.unsubUser && this.unsubUser();  
     this.unsubRoles && this.unsubRoles();  
-  },
-  
-  calcInputKeys(props)
-  {
-    return props.query.inputs.map(input => 'input.' + input.key);
-  },
-  
-  willReceiveProps(nextProps)
-  {
-    if(!_.isEqual(nextProps.query.inputs, this.props.query.inputs))
-    {
-      this.setState({
-        inputKeys: this.calcInputKeys(nextProps.state),
-      });
-    }
   },
   
   getDefaultProps()
@@ -245,7 +229,6 @@ var BuilderColumn = React.createClass<any, any>(
           deckOpen={query.deckOpen}
           queryId={query.id}
           spotlights={spotlights} 
-          keys={this.state.inputKeys}
           canEdit={canEdit}
           addColumn={this.props.onAddManualColumn}
           columnIndex={this.props.index}

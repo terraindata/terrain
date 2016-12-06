@@ -149,6 +149,7 @@ class Builder extends PureClasss<Props>
   
   componentWillMount()
   {
+    console.log('mount');
     this.checkConfig(this.props);
     RolesActions.fetch();
     this.loadTables(this.props);

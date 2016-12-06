@@ -47,12 +47,14 @@ require('./BuilderTextbox.less');
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as Immutable from 'immutable';
 import CardDropArea from "../../builder/components/cards/CardDropArea.tsx";
 import Actions from "../../builder/data/BuilderActions.tsx";
 import Util from '../../util/Util.tsx';
 import PureClasss from '../../common/components/PureClasss.tsx';
 import { Display } from '../../builder/BuilderDisplays.tsx';
 import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
+import BuilderHelpers from '../../builder/BuilderHelpers.tsx';
 import Card from '../../builder/components/cards/Card.tsx';
 import CreateCardTool from '../../builder/components/cards/CreateCardTool.tsx';
 import { DragSource, DropTarget } from 'react-dnd';
@@ -77,7 +79,6 @@ interface Props
   id?: string; // TODO remove
 
   canEdit?: boolean;
-  keys?: List<string>;
   placeholder?: string;
   help?: string;
   ref?: string;
@@ -118,6 +119,7 @@ class BuilderTextbox extends PureClasss<Props>
       isSwitching: false,
       value,
       backupString: value,
+      options: Immutable.List([]),
     };
   }
   
@@ -126,6 +128,7 @@ class BuilderTextbox extends PureClasss<Props>
     isSwitching: boolean;
     value: CardString;
     backupString: CardString;
+    options: List<string>;
   };
   
   // TODO
@@ -216,6 +219,7 @@ class BuilderTextbox extends PureClasss<Props>
   handleFocus(event:React.FocusEvent)
   {
     this.props.onFocus && this.props.onFocus(this, event.target['value'], event);
+    this.computeOptions(); // need to lazily compute autocomplete options when needed
   }
 
   handleBlur(event:React.FocusEvent)
@@ -259,6 +263,20 @@ class BuilderTextbox extends PureClasss<Props>
     Actions.change(this.props.keyPath.push('closed'), !this.props.value['closed']);
   }
   
+  computeOptions()
+  {
+    let options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
+    
+    if(!options.equals(this.state.options))
+    {
+      this.setState({
+        options,
+      });
+    }
+    // TODO
+    return Immutable.List([]);
+  }
+  
   render()
   {
     if(this.isText())
@@ -291,7 +309,7 @@ class BuilderTextbox extends PureClasss<Props>
                 ref='input'
                 disabled={!this.props.canEdit}
                 value={this.props.value as string}
-                options={this.props.keys}
+                options={this.state.options}
                 onChange={this.handleAutocompleteChange}
                 placeholder={placeholder}
                 help={this.state && this.state.wrongType ? this.props.typeErrorMessage : this.props.help}

@@ -76,7 +76,6 @@ interface Props
   keyPath: KeyPath;
   data: any; // record
   canEdit: boolean;
-  keys: List<string>;
   
   parentData?: any;
   // provide parentData if necessary but avoid if possible
@@ -331,7 +330,6 @@ class CardField extends PureClasss<Props>
               keyPath={this.props.keyPath}
               data={this.props.data}
               canEdit={this.props.canEdit}
-              keys={this.props.keys}
               parentData={this.props.parentData}
               helpOn={this.props.helpOn}
               addColumn={this.props.addColumn}
@@ -393,7 +391,6 @@ class CardField extends PureClasss<Props>
               keyPath={this.props.keyPath}
               data={this.props.data}
               canEdit={this.props.canEdit}
-              keys={this.props.keys}
               parentData={this.props.parentData}
               helpOn={this.props.helpOn}
               addColumn={this.props.addColumn}
@@ -449,7 +446,6 @@ class CardField extends PureClasss<Props>
                 keyPath={this.props.keyPath}
                 data={this.props.data}
                 canEdit={this.props.canEdit}
-                keys={this.props.keys}
                 parentData={this.props.parentData}
                 helpOn={this.props.helpOn}
                 addColumn={this.props.addColumn}

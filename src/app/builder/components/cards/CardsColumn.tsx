@@ -70,7 +70,6 @@ interface Props
   cards: ICards;
   deckOpen: boolean;
   queryId: ID;
-  keys: List<string>;
   canEdit: boolean;
   addColumn: (number, string?) => void;
   columnIndex: number;
@@ -214,7 +213,6 @@ class CardsColumn extends PureClasss<Props>
               cards={cards}
               keyPath={keyPath}
               spotlights={this.props.spotlights} 
-              keys={this.props.keys}
               canEdit={canEdit}
               addColumn={this.props.addColumn}
               columnIndex={this.props.columnIndex}

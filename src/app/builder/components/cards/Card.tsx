@@ -78,7 +78,6 @@ interface Props
   singleCard?: boolean; // for BuilderTextboxCards
   singleChild?: boolean; // for cards like Where that are wrappers but only accept 1 child
 
-  keys: List<string>;
   canEdit: boolean;
   keyPath: KeyPath;
   accepts?: List<string>;
@@ -103,9 +102,6 @@ class _Card extends PureClasss<Props>
     opening: boolean;
     menuOptions: List<MenuOption>;
     
-    cardTerms: List<string>;
-    allTerms: List<string>;
-    
     scrollState: BuilderScrollState;
   };
   
@@ -122,15 +118,12 @@ class _Card extends PureClasss<Props>
   constructor(props:Props)
   {
     super(props);
-    let cardTerms = this.getCardTerms(props.card);
     
     this.state = {
       selected: false,
       hovering: false,
       closing: false,
       opening: false,
-      cardTerms,
-      allTerms: props.keys.merge(cardTerms),
       menuOptions:
         Immutable.List([
           // {
@@ -204,36 +197,6 @@ class _Card extends PureClasss<Props>
   
   componentWillReceiveProps(nextProps:Props)
   {
-    var allTerms = this.props.keys;
-    var {cardTerms} = this.state;
-    var changed = false;
-    
-    if(nextProps.card !== this.props.card)
-    {
-      // check for new terms
-      let terms = this.getCardTerms(nextProps.card);
-      if(!this.state.cardTerms.equals(terms))
-      {
-        changed = true;
-        cardTerms = terms;
-      }
-    }
-    
-    if(this.props.keys !== nextProps.keys || changed)
-    {
-      changed = true;
-      allTerms = nextProps.keys.concat(cardTerms).toList();
-    }
-    
-    
-    if(changed)
-    {
-      this.setState({
-        cardTerms,
-        allTerms,
-      });
-    }
-    
     if(nextProps.card.closed !== this.props.card.closed)
     {
       if(this.state.closing || this.state.opening)
@@ -500,7 +463,6 @@ class _Card extends PureClasss<Props>
     }
     
     var content = <BuilderComponent
-      keys={this.state.allTerms}
       canEdit={this.props.canEdit}
       data={this.props.card}
       helpOn={this.props.helpOn}

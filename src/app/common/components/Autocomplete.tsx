@@ -54,8 +54,15 @@ import PureClasss from './../../common/components/PureClasss.tsx';
 interface Props
 {
   value: string;
-  options: List<string>;
   onChange: (value: string) => void;
+  options: List<string>;
+  
+  // NOT TRUE REMOVE
+  // two ways of populating options:
+  //  1. through options prop
+  //  2. through a function that's called when the autocomp is opened
+  // getOptions?: () => List<string>;
+  
   placeholder?: string;
   help?: string;
   ref?: string;
