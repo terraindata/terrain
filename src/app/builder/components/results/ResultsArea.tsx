@@ -319,7 +319,7 @@ class ResultsArea extends PureClasss<Props>
                 config={this.getResultsConfig()}
                 onExpand={this.handleExpand}
                 index={index}
-                key={primaryKey}
+                key={index}
                 primaryKey={primaryKey}
               />
             );
