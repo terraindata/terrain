@@ -155,7 +155,7 @@ class TQLConverter
       {
         // TODO find score fields. Score fields!
         
-        let transformInputs = [];
+        let transformInputs: {input: string, alias: string}[] = [];
         BuilderTypes.forAllCards(fromCard, (card) =>
         {
           if(card.type === 'transform')
@@ -165,22 +165,54 @@ class TQLConverter
             {
               input = this._parse(input);
             }
-            transformInputs.push(input + ' as ' + BuilderTypes.transformAlias(card)); // need to filter out any non-letters-or-numbers
+            transformInputs.push({
+              input,
+              alias: BuilderTypes.transformAlias(card)
+            }); // need to filter out any non-letters-or-numbers
           }
         });
         
-        transformInputs.map(input =>
+        // search for any occurences of alias'd items in the inputs,
+        //  and rewrite with whatever is aliased
+        // remember: you can't use an alias inside of an alias in SQL
+        fromCard['fields'].map((fieldBlock) =>
+        {
+          let {field} = fieldBlock;
+          if(field['_isCard'] && field['type'] === 'as')
+          {
+            let {alias, value} = field;
+            if(typeof value !== 'string')
+            {
+              value = TQLConverter._parse(value);
+            }
+            // replace all instances in the transform inputs with the alias'd content
+            transformInputs = transformInputs.map(transformInput =>
+            ({
+              // these two regexes are probably able to combine into one but I couldn't figure it out.
+              //  first one replaces any instances of the alias that aren't at the start of a line/string
+              //  second replaces instances at the start of the string
+              input: transformInput.input.replace(
+                new RegExp('([^a-zA-Z0-9])' + alias + '($|[^a-zA-Z0-9])', 'g'), 
+                "$1(" + value + ")$2"
+              ).replace( 
+                new RegExp('^' + alias + '($|[^a-zA-Z0-9])', 'g'), 
+                "(" + value + ")$1"
+              ),
+              alias: transformInput.alias,
+            }));
+          }
+        });
+        
+        transformInputs.map(transformInput =>
         {
           fromCard = fromCard.update('fields', 
             fields => fields.push(
                 BuilderTypes.make(BuilderTypes.Blocks.field, {
-                  field: input,
+                  field: transformInput.input + ' as ' + transformInput.alias,
                 })
               )
           );
         })
-        // console.log(transformInputs, fromCard['fields']);
-        // fromCard = fromCard.
       }
             
       return fromCard;
@@ -201,13 +233,10 @@ class TQLConverter
   {
     if(!block)
     {
-      console.log('no block');
       return;
     }
     if(!block.static)
     {
-      debugger;
-      console.log('no static block');
       return;
     }
     let str = block && block.static && ((isTop && block.static.topTql) || block.static.tql);
