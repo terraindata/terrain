@@ -61,6 +61,8 @@ import {IResultsConfig} from './ResultsConfig.tsx';
 var PinIcon = require("./../../../../images/icon_pin_21X21.svg?name=PinIcon");
 var ScoreIcon = require("./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon");
 
+const MAX_DEFAULT_FIELDS = 4;
+
 // var dragPreviewStyle = {
 //   backgroundColor: '#cfd7c8',
 //   borderColor: '#cfd7c8',
@@ -151,7 +153,7 @@ class Result extends Classs<Props> {
   
   renderField(field, index?, fields?, overrideFormat?)
   {
-    if(index >= 4)
+    if(!resultsConfigHasFields(this.props.config) && index >= MAX_DEFAULT_FIELDS)
     {
       return null;
     }
@@ -312,12 +314,13 @@ class Result extends Classs<Props> {
     
     let name = getResultName(data, allFieldsData, config);
     let fields = getResultFields(data, allFieldsData, config);
+    let configHasFields = resultsConfigHasFields(config);
     
-    if(fields.length > 4 && !this.props.expanded)
+    if(!configHasFields && fields.length > 4 && !this.props.expanded)
     {
       var bottom = (
         <div className='result-bottom' onClick={this.expand}>
-          { fields.length - 4 } more fields
+          { fields.length - MAX_DEFAULT_FIELDS } more field{ fields.length - 4 === 1 ? '' : 's' }
         </div>
       );
     }
@@ -387,9 +390,14 @@ export function getResultValue(resultData, allFieldsData, field: string, config:
   return ResultFormatValue(field, value, config, overrideFormat);
 }
 
+export function resultsConfigHasFields(config: IResultsConfig): boolean
+{
+  return config && config.enabled && config.fields && config.fields.size > 0;
+}
+
 export function getResultFields(resultData, allFieldsData, config: IResultsConfig): string[]
 {
-  if(config && config.enabled && config.fields && config.fields.size)
+  if(resultsConfigHasFields(config))
   {
     var fields = config.fields.toArray();
   }
