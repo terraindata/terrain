@@ -214,8 +214,11 @@ class Builder extends PureClasss<Props>
   
   componentWillReceiveProps(nextProps)
   {
-    // TODO
-    this.checkConfig(nextProps);
+    if(nextProps.params.config !== this.props.params.config)
+    {
+      this.checkConfig(nextProps);
+    }
+    
     this.loadTables(nextProps);
   }
   
