@@ -53,6 +53,7 @@ import RoleStore from './../../roles/data/RolesStore.tsx';
 import Actions from "./BrowserActions.tsx";
 import BrowserTypes from './../BrowserTypes.tsx';
 import Util from './../../util/Util.tsx';
+import BuilderActions from '../../builder/data/BuilderActions.tsx';
 
 import Ajax from './../../util/Ajax.tsx';
 
@@ -95,6 +96,7 @@ BrowserStore.subscribe(() =>
                     if(Util.canEdit(v, UserStore, RoleStore))
                     {
                       Ajax.saveItem(v);
+                      BuilderActions.setVariant(v.id, v);
                     }
                   }
                 });
