@@ -488,6 +488,9 @@ export module BuilderTypes
     'transform',
     'sfw',
   ]);
+  
+  const transformScoreInputTypes = 
+    List(['score', 'transform', 'sfw']).concat(acceptsAggregates).toList();
 
   // The BuildingBlocks
   export const Blocks =
@@ -1061,7 +1064,7 @@ export module BuilderTypes
                 key: 'key',
                 help: ManualConfig.help["key"],
                 placeholder: 'Field',
-                accepts: List(['score', 'transform']),
+                accepts: transformScoreInputTypes,
                 showWhenCards: true,
               },
               {
@@ -1082,7 +1085,7 @@ export module BuilderTypes
             {
               displayType: DisplayType.CARDSFORTEXT,
               key: 'key',
-              accepts: List(['score', 'transform']),
+              accepts: transformScoreInputTypes,
             }
           },
         },
@@ -1141,13 +1144,13 @@ export module BuilderTypes
             help: ManualConfig.help["input"],
             key: 'input',
             placeholder: 'Input field',
-            accepts: List(['score', 'sfw']),
+            accepts: transformScoreInputTypes,
             showWhenCards: true,
           },
           {
             displayType: DisplayType.CARDSFORTEXT,
             key: 'input',
-            accepts: List(['score', 'sfw']),
+            accepts: transformScoreInputTypes,
           },
           {
             displayType: DisplayType.COMPONENT,
