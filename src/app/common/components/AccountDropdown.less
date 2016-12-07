@@ -50,8 +50,8 @@
     float: left;
     display: inline-block;
     position: relative;
-    padding-right: 12px;
-    padding-left: 12px;
+    padding-right: 6px;
+    // padding-left: 12px;
     top: 3px;
     &.account-dropdown-icon-red {
       fill: #911352;
@@ -75,9 +75,9 @@
     top: 100%;
     right: 0px;
     width: 120px;
+    padding: 6px 0px;
     border-radius: 6px;
     box-shadow: 0px 0px 6px #C7CAC9;
-    border-bottom: 6px solid white;
     margin-right: 2px;
 
     &:after, &:before {
@@ -104,7 +104,7 @@
     }
 
     .account-dropdown-row {
-      padding: 2px 0px;
+      padding: 6px;
       font-size: 12px;
       line-height: 18px;
       border-radius: 6px;
@@ -112,14 +112,9 @@
       .transition;
       margin-right: 6px;
       margin-left: 6px;
-      margin-top: 6px; 
 
       &:hover {
         background: fade(@grey, 15%);
-      }
-      &:last-child {
-        margin-bottom: px;
-        margin-top: 0px;
       }
     }
   }
