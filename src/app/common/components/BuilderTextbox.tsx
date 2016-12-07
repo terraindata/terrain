@@ -91,6 +91,9 @@ interface Props
   top?: boolean;
   parentId?: string;
   
+  autoDisabled?: boolean;
+  autoTerms?: List<string>;
+  
   isOverCurrent?: boolean;
   connectDropTarget?: (Element) => JSX.Element;
 
@@ -265,6 +268,11 @@ class BuilderTextbox extends PureClasss<Props>
   
   computeOptions()
   {
+    if(this.props.autoTerms || this.props.autoDisabled)
+    {
+      return;
+    }
+    
     let options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
     
     if(!options.equals(this.state.options))
@@ -273,8 +281,6 @@ class BuilderTextbox extends PureClasss<Props>
         options,
       });
     }
-    // TODO
-    return Immutable.List([]);
   }
   
   render()
@@ -282,6 +288,16 @@ class BuilderTextbox extends PureClasss<Props>
     if(this.isText())
     {
       const { isOverCurrent, connectDropTarget, placeholder } = this.props;
+      
+      let {options} = this.state;
+      if(this.props.autoTerms)
+      {
+        options = this.props.autoTerms;
+      }
+      if(this.props.autoDisabled)
+      {
+        options = null;
+      }
       
       return (
         <div 
@@ -309,7 +325,7 @@ class BuilderTextbox extends PureClasss<Props>
                 ref='input'
                 disabled={!this.props.canEdit}
                 value={this.props.value as string}
-                options={this.state.options}
+                options={options}
                 onChange={this.handleAutocompleteChange}
                 placeholder={placeholder}
                 help={this.state && this.state.wrongType ? this.props.typeErrorMessage : this.props.help}

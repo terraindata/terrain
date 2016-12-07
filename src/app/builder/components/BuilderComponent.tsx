@@ -382,6 +382,8 @@ class BuilderComponent extends PureClasss<Props>
           onFocus={d.onFocus}
           onBlur={d.onBlur}
           display={d}
+          autoDisabled={d.autoDisabled}
+          autoTerms={d.getAutoTerms && d.getAutoTerms(this)}
           {...{
             keyPath,
             value,
