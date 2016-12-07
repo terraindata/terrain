@@ -236,14 +236,19 @@
       
       .results-config-handle {
         margin-right: 8px;
-        opacity: 0.5;
+        opacity: 0.25;
         font-weight: bold;
         .transition;
-        font-size: 20px;
         position: absolute;
         left: 6px;
-        top: 6px;
-        letter-spacing: -2px;
+        @h: 16px;
+        top: 50%;
+        margin-top: -1 * @h / 2;
+        
+        svg {
+          height: @h; 
+          fill: @trans-black;
+        }
       }
       
       .results-config-field-gear {
@@ -263,7 +268,7 @@
         border-color: @field-border-color;
         
         .results-config-handle {
-          opacity: 1;
+          opacity: 0.5;
         }
       }
       

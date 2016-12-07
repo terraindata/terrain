@@ -60,6 +60,7 @@ var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon"
 var GearIcon = require("./../../../../images/icon_gear.svg?name=GearIcon");
 var TextIcon = require("./../../../../images/icon_text_12x18.svg?name=TextIcon");
 var ImageIcon = require("./../../../../images/icon_profile_16x16.svg?name=ImageIcon");
+var HandleIcon = require("./../../../../images/icon_handle.svg?name=HandleIcon");
 
 class Format
 {
@@ -533,7 +534,9 @@ class ResultsConfigResultC extends PureClasss<ResultsConfigResultProps>
         'results-config-field-used': this.props.is !== null && this.props.isAvailableField,
       })}>
         <div className='results-config-field-body'>
-          <span className='results-config-handle'>⋮⋮</span>
+          <span className='results-config-handle'>
+            <HandleIcon />
+          </span>
           <span className='results-config-text'>
             {
               this.props.field
