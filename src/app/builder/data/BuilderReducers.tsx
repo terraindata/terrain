@@ -74,8 +74,6 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
                   return;
                 }
                 
-                version.cards = BuilderTypes.recordFromJS(version.cards || []);
-                version.inputs = BuilderTypes.recordFromJS(version.inputs || []);
                 //Use current version to get missing fields
                 Ajax.getVariant(variantId, (item) => 
                   {
@@ -103,9 +101,6 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
                 action.payload.handleNoVariant && action.payload.handleNoVariant(variantId);
                 return;
               }
-              item.cards = BuilderTypes.recordFromJS(item.cards || []);
-              item.inputs = BuilderTypes.recordFromJS(item.inputs || []);
-              item.resultsConfig = _IResultsConfig(item.resultsConfig);
               item.version = false;
               Actions.setVariant(variantId, item);
             }
@@ -121,9 +116,28 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   {
     payload?: { variantId: string, variant: any},
   }) =>
-    state.setIn(['queries', action.payload.variantId],
-      new BrowserTypes.Variant(action.payload.variant)
-    ),
+  {
+    let v = action.payload.variant;
+    let cards = BuilderTypes.recordFromJS(v.cards || []);
+    let inputs = BuilderTypes.recordFromJS(v.inputs || []);
+    let resultsConfig = _IResultsConfig(v.resultsConfig);
+    
+    if(Immutable.Iterable.isIterable(v))
+    {
+      v = v.set('cards', cards).set('inputs', inputs).set('resultsConfig', resultsConfig);
+    }
+    else
+    {
+      v.cards = cards;
+      v.inputs = inputs;
+      v.resultsConfig = resultsConfig;
+      v = new BrowserTypes.Variant(v);
+    }
+    
+    return state.setIn(['queries', action.payload.variantId],
+      v
+    )
+  },
 
 [ActionTypes.setVariantField]: 
   (state: BuilderState, action:

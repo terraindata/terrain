@@ -388,7 +388,7 @@ class ResultsArea extends PureClasss<Props>
         if(!isAllFields)
         {
           this.setState({
-            error: response.error.substr(0, response.error.length - 1),
+            error: response.error,
           });
         }
         this.props.onLoadEnd && this.props.onLoadEnd();
