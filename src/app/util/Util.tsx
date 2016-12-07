@@ -155,7 +155,8 @@ var Util = {
     return ans;
   },
 
-  formatDate(date):string
+  // for displaying in the app
+  formatDate(date:string):string
   {
     let then = moment(date);
     let now = moment();
@@ -174,6 +175,12 @@ var Util = {
     }
     
     return then.format('MM/DD/YY') + hour;
+  },
+  
+  // for SQL
+  formatInputDate(date:Date):string
+  {
+    return moment(date).format('YYYY-MM-DD HH:mm:ss');
   },
   
   formatNumber(n: number): string

@@ -120,6 +120,13 @@ var Input = React.createClass<any, any>({
   
   convertToDate()
   {
+    let date = new Date(this.props.input.value);
+    if(date.toString() === 'Invalid Date')
+    {
+      date = new Date();
+    }
+    let value = Util.formatInputDate(date);
+    Actions.change(this.state.valueKeyPath, value);
     Actions.change(this.state.typeKeyPath, InputType.DATE);
   },
   
@@ -203,6 +210,7 @@ var Input = React.createClass<any, any>({
         isNumber={this.props.input.inputType === BuilderTypes.InputType.NUMBER}
         typeErrorMessage="That is not a number"
         placeholder='Sample value'
+        autoDisabled={true}
       />
     );
   },
@@ -225,6 +233,7 @@ var Input = React.createClass<any, any>({
               className="input-text input-text-first input-borderless"
               keyPath={this.state.keyKeyPath}
               placeholder='Input name'
+              autoDisabled={true}
             />
             <Menu 
               options={this.getMenuOptions()}

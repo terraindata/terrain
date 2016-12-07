@@ -97,18 +97,13 @@ class DatePicker extends PureClasss<Props>
     return date;
   }
   
-  formatDate(date:Date):string
-  {
-    return moment(date).format('YYYY-MM-DD HH:mm:ss');
-  }
-  
   handleDayClick(e, day: Date, modifiers)
   {
     var date = this.getDate();
     date.setDate(day.getDate());
     date.setMonth(day.getMonth());
     date.setFullYear(day.getFullYear());
-    this.props.onChange(this.formatDate(date));
+    this.props.onChange(Util.formatInputDate(date));
   }
   
   handleHourChange(hourIndex)
@@ -116,7 +111,7 @@ class DatePicker extends PureClasss<Props>
     var date = this.getDate();
     date.setHours(Math.floor(hourIndex / MINUTE_RATIO));
     date.setMinutes((hourIndex % MINUTE_RATIO) * MINUTE_INTERVAL);
-    this.props.onChange(this.formatDate(date));
+    this.props.onChange(Util.formatInputDate(date));
   }
   
   dateToHourIndex(date)
