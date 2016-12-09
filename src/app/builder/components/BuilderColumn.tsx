@@ -58,7 +58,7 @@ import ResultsArea from "./results/ResultsArea.tsx";
 import UserStore from '../../users/data/UserStore.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
-import TQLEditor from '../../tql/components/TQLEditor.tsx';
+import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn.tsx';
 import InfoArea from '../../common/components/InfoArea.tsx';
 const shallowCompare = require('react-addons-shallow-compare');
 import * as moment from 'moment';
@@ -249,7 +249,8 @@ var BuilderColumn = React.createClass<any, any>(
         />;
 
       case COLUMNS.TQL:
-        return <TQLEditor
+        return <BuilderTQLColumn
+          canEdit={canEdit}
           query={query}
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}

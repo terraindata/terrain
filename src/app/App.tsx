@@ -95,7 +95,7 @@ import BuilderActions from "./builder/data/BuilderActions.tsx";
 import AuthStore from "./auth/data/AuthStore.tsx";
 import UserActions from "./users/data/UserActions.tsx";
 import { InAppNotification } from './common/components/InAppNotification.tsx';
-
+import DeployModal from './deploy/components/DeployModal.tsx';
 
 var links = 
 [
@@ -253,6 +253,8 @@ var App = React.createClass({
             this.renderApp()
           }
         </div>
+        
+        <DeployModal />
         
         <ReactTooltip
           place="bottom"

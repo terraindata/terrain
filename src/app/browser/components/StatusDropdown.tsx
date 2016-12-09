@@ -92,7 +92,7 @@ class StatusDropdown extends PureClasss<Props>
   handleChange(index:number)
   {
     let status = this.getOrder()[index];
-    BrowserActions.variants.change(this.props.variant.set('status', status) as BrowserTypes.Variant);
+    BrowserActions.variants.status(this.props.variant, status);
   }
   
   canEdit():boolean

@@ -186,6 +186,12 @@ BrowserReducers[ActionTypes.variants.status] =
   (state, action) =>
   {
     let {variant, status, confirmed} = action.payload;
+    
+    if(variant === null)
+    {
+      return state.set('changingStatus', false);
+    }
+    
     if(variant.status === status)
     {
       return state;
@@ -206,9 +212,7 @@ BrowserReducers[ActionTypes.variants.status] =
       .setIn(['groups', variant.groupId, 'algorithms',
         variant.algorithmId, 'variants', variant.id, 'status'],
       status)
-      .set('changingStatus', false)
-      .set('changingStatusOf', null)
-      .set('changingStatusTo', null);
+      .set('changingStatus', false);
   }
 
 BrowserReducers[ActionTypes.variants.move] =

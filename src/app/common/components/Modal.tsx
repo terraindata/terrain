@@ -57,9 +57,11 @@ interface Props {
   open: boolean;
   title?: string;
   error?: boolean;
+  fill?: boolean;
   confirm?: boolean;
 	confirmButtonText?: string;
 	onConfirm?: () => void; 
+  children?: any;
 }
 
 class Modal extends Classs<Props>   
@@ -74,51 +76,68 @@ class Modal extends Classs<Props>
   {
     var defaultTitle = this.props.error ? 'Alert' : 'Please Confirm'
       
-      return (
-        <div className ='modal-dialog'>
-          <ReactModal 
-          	isOpen={this.props.open} 
-          	overlayClassName='modal-overlay' 
-          	className ='modal-content' 
-          >
-            <div className ='modal-dialog'> 
-            	<div className={classNames({
-                'modal-title': true,
-                'modal-title-error': this.props.error,
-              })}>
-                  {
-                    this.props.error ? 
-                      <div className='modal-info-icon'> 
-                        <InfoIcon /> 
-                      </div>
-                      : 
-                      null
-                  }
-                  {this.props.title ? this.props.title : defaultTitle}
-              </div>
-            	<div className={classNames({
-                'modal-message': true,
-                'modal-message-error': this.props.error,
-              })}>
-                {this.props.message}
-           		</div>
-           		<div className ='modal-buttons'>
-            		{
-           				this.props.confirm ? 
-           					<div className='button modal-confirm-button' onClick={this.closeModalSuccess}>
-           						{this.props.confirmButtonText ? this.props.confirmButtonText : 'Ok'}
-           					</div> 
-           					: 
-           					<div />
-           			}
-                <div className='button modal-close-button' onClick={this.props.onClose}>
-                  {this.props.confirm ? 'Cancel' : 'Close'}
-                </div>
-            	</div>
+    return (
+      <div>
+        <ReactModal 
+        	isOpen={this.props.open} 
+        	overlayClassName='modal-overlay' 
+        	className={classNames({
+            'modal-content': true,
+            'modal-content-fill': this.props.fill,
+          })}
+        >
+          <div className ='modal-dialog'> 
+          	<div className={classNames({
+              'modal-title': true,
+              'modal-title-error': this.props.error,
+            })}>
+                {
+                  this.props.error ? 
+                    <div className='modal-info-icon'> 
+                      <InfoIcon /> 
+                    </div>
+                    : 
+                    null
+                }
+                {
+                  this.props.title ? this.props.title : defaultTitle
+                }
             </div>
-          </ReactModal>
-        </div>
-      );
+            {
+              this.props.message &&
+              	<div className={classNames({
+                  'modal-message': true,
+                  'modal-message-error': this.props.error,
+                })}>
+                  {
+                    this.props.message
+                  }
+             		</div>
+            }
+            {
+              this.props.children
+            }
+         		<div className ='modal-buttons'>
+          		{
+         				this.props.confirm ? 
+         					<div className='button modal-confirm-button' onClick={this.closeModalSuccess}>
+         						{
+                       this.props.confirmButtonText ? this.props.confirmButtonText : 'Ok'
+                    }
+         					</div> 
+         					: 
+         					<div />
+         			}
+              <div className='button modal-close-button' onClick={this.props.onClose}>
+                {
+                  this.props.confirm ? 'Cancel' : 'Close'
+                }
+              </div>
+          	</div>
+          </div>
+        </ReactModal>
+      </div>
+    );
   }
 }
 

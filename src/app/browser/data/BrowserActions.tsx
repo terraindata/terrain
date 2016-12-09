@@ -118,8 +118,8 @@ const Actions =
         $(ActionTypes.variants.duplicate, { variant, index, groupId, algorithmId }),
     
     status:
-      (variant: Variant, status: BrowserTypes.EVariantStatus) =>
-        $(ActionTypes.variants.status, { variant, status }),
+      (variant: Variant, status: BrowserTypes.EVariantStatus, confirmed?: boolean) =>
+        $(ActionTypes.variants.status, { variant, status, confirmed }),
   },
   
   loadState:
