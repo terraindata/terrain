@@ -47,6 +47,7 @@ import PureClasss from './../../common/components/PureClasss.tsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
 
 import Modal from '../../common/components/Modal.tsx';
 import TQLEditor from '../../tql/components/TQLEditor.tsx';
@@ -68,10 +69,12 @@ class DeployModal extends PureClasss<Props>
     changingStatus: boolean;
     changingStatusOf: BrowserTypes.Variant;
     changingStatusTo: BrowserTypes.EVariantStatus;
+    defaultChecked: boolean;
   } = {
     changingStatus: false,
     changingStatusOf: null,
     changingStatusTo: null,
+    defaultChecked: false,
   };
   
   componentDidMount()
@@ -91,6 +94,7 @@ class DeployModal extends PureClasss<Props>
             changingStatus,
             changingStatusOf,
             changingStatusTo,
+            defaultChecked: false,
           });
         }
       },
@@ -103,9 +107,11 @@ class DeployModal extends PureClasss<Props>
     BrowserActions.variants.status(null, null);
   }
   
-  handleDeploy(isDefault: boolean)
+  handleDeploy()
   {
-    BrowserActions.variants.status(this.state.changingStatusOf, this.state.changingStatusTo, true);
+    BrowserActions.variants.status(
+      this.state.changingStatusOf, this.state.changingStatusTo, true, this.state.defaultChecked
+    );
   }
   
   renderTQLColumn()
@@ -114,7 +120,7 @@ class DeployModal extends PureClasss<Props>
     return (
       <div className='deploy-modal-tql'>
         {
-          this.renderTQLEditor(variant)
+          this.renderTQLEditor(variant, 'TQL for ' + variant.name)
         }
       </div>
     );
@@ -122,34 +128,59 @@ class DeployModal extends PureClasss<Props>
   
   renderDefaultTQLColumn()
   {
-    // TODO
-    if(true)
+    let state = BrowserStore.getState();
+    let algorithm = state.getIn(['groups', this.state.changingStatusOf.groupId, 'algorithms', this.state.changingStatusOf.algorithmId]) as BrowserTypes.Algorithm;
+    let variant = algorithm.variants.find(v => v.isDefault);
+    
+    if(variant)
     {
-      return null;
+      return (
+        <div className='deploy-modal-tql-default'>
+          {
+            this.renderTQLEditor(variant, 'Current Default TQL for ' + algorithm.name)
+          }
+        </div>
+      );
     }
     
-    // let variant = this.state.changingStatusOf;
-    // return (
-    //   <div className='deploy-modal-tql'>
-    //     {
-    //       this.renderTQLEditor(variant)
-    //     }
-    //   </div>
-    // );
+    return (
+      <div className='deploy-modal-tql-default'>
+        <div className='deploy-modal-tql-default-message'>
+          There is not currently a default variant for algorithm <b>{algorithm.name}</b>.
+        </div>
+      </div>
+    );
   }
   
-  renderTQLEditor(variant:BrowserTypes.Variant)
+  renderTQLEditor(variant:BrowserTypes.Variant, title: string)
   {
-    // TODO change if/when we change structure of variant tql
-    variant = variant.set('cards', BuilderTypes.recordFromJS(variant.cards)) as BrowserTypes.Variant;
-    let tql = variant.mode === 'tql' ? variant.tql : TQLConverter.toTQL(variant);
+    let tql = '';
+    if(variant)
+    {
+      tql = variant.mode === 'tql' ? variant.tql : TQLConverter.toTQL(variant);
+    }
     
     return (
-      <TQLEditor
-        canEdit={false}
-        tql={tql}
-      />
+      <div className='deploy-modal-tql-wrapper'>
+        <div className='deploy-modal-tql-title'>
+          {
+            title
+          }
+        </div>
+        
+        <TQLEditor
+          canEdit={false}
+          tql={tql}
+        />
+      </div>
     );
+  }
+  
+  handleDefaultCheckedChange(defaultChecked: boolean)
+  {
+    this.setState({
+      defaultChecked,
+    });
   }
   
   render() 
@@ -174,17 +205,24 @@ class DeployModal extends PureClasss<Props>
       >
         {
           changingStatusOf &&
-            <div className='deploy-modal'>
-              {
-                this.renderTQLColumn()
-              }
+            <div 
+              className={classNames({
+                'deploy-modal': true,
+                'deploy-modal-3-col': this.state.defaultChecked,
+              })}
+            >
               {
                 this.renderDefaultTQLColumn()
+              }
+              {
+                this.renderTQLColumn()
               }
               <DeployModalColumn
                 variant={changingStatusOf}
                 status={changingStatusTo}
                 onDeploy={this.handleDeploy}
+                defaultChecked={this.state.defaultChecked}
+                onDefaultCheckedChange={this.handleDefaultCheckedChange}
               />
             </div>
         }

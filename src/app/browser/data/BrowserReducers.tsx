@@ -185,16 +185,12 @@ BrowserReducers[ActionTypes.variants.change] =
 BrowserReducers[ActionTypes.variants.status] =
   (state, action) =>
   {
-    let {variant, status, confirmed} = action.payload;
+    let {variant, status, confirmed, isDefault} = action.payload;
+    isDefault = !! isDefault;
     
     if(variant === null)
     {
       return state.set('changingStatus', false);
-    }
-    
-    if(variant.status === status)
-    {
-      return state;
     }
     
     if(
@@ -208,10 +204,24 @@ BrowserReducers[ActionTypes.variants.status] =
         .set('changingStatusTo', status);
     }
     
+    if(isDefault)
+    {
+      // remove any currently default variants
+      state = state.updateIn(
+        ['groups', variant.groupId, 'algorithms', variant.algorithmId, 'variants'],
+        (variants) =>
+          variants.map(
+            v => v.set('isDefault', false)
+          )
+        );
+    }
+    
     return state
-      .setIn(['groups', variant.groupId, 'algorithms',
-        variant.algorithmId, 'variants', variant.id, 'status'],
-      status)
+      .updateIn(
+        ['groups', variant.groupId, 'algorithms', variant.algorithmId, 'variants', variant.id,],
+        (v) => v.set('status', status)
+                .set('isDefault', isDefault)
+      )
       .set('changingStatus', false);
   }
 

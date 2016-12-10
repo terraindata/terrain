@@ -134,6 +134,8 @@ export module BuilderTypes
     lastEdited: string;
     db: string;
     
+    isDefault: boolean;
+    
     deckOpen: boolean;
     
     // TODO include this and make it work
@@ -1402,32 +1404,47 @@ export module BuilderTypes
   // Given a plain JS object, construct the Record for it and its children  
   export const recordFromJS = (value: any) =>
   {
+    if(value && value.static && Immutable.Iterable.isIterable(value))
+    {
+      // already a block / recrod
+      // TODO change to a better way of checking
+      return value;
+    }
+    
     if(Array.isArray(value) || typeof value === 'object')
     {
-      value = _.reduce(value, (memo, v, key) =>
+      if(Immutable.Iterable.isIterable(value))
       {
-        memo[key] = recordFromJS(v);
-        return memo;
-      }, Array.isArray(value) ? [] : {});
-      
-      // conversion, remove when appropriate
-      if(value.type === 'multiand' || value.type === 'multior')
+        value = value.map(v => recordFromJS(v));
+      }
+      else
       {
-        value.type = value.type.substr(5);
-        value.cards = value.clauses.map(block =>
+        value = _.reduce(value, (memo, v, key) =>
         {
-          let clause = block.get('clause');
-          if(typeof clause === 'string')
-          {
-            return make(Blocks.tql, { clause });
-          }
-          return clause;
-        });
+          memo[key] = recordFromJS(v);
+          return memo;
+        }, Array.isArray(value) ? [] : {});
       }
       
-      if(value.type && Blocks[value.type])
+      // conversion, remove when appropriate
+      // if(value.type === 'multiand' || value.type === 'multior')
+      // {
+      //   value.type = value.type.substr(5);
+      //   value.cards = value.clauses.map(block =>
+      //   {
+      //     let clause = block.get('clause');
+      //     if(typeof clause === 'string')
+      //     {
+      //       return make(Blocks.tql, { clause });
+      //     }
+      //     return clause;
+      //   });
+      // }
+      
+      let type = value.type || (typeof value.get === 'function' && value.get('type'));
+      if(type && Blocks[type])
       {
-        value = make(Blocks[value.type], value);
+        value = make(Blocks[type], value);
       }
       else
       {

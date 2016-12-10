@@ -85,17 +85,17 @@ const TEXT =
 interface Props {
   variant: BrowserTypes.Variant;
   status: BrowserTypes.EVariantStatus;
-  onDeploy: (isDefault?: boolean) => void;
+  defaultChecked: boolean;
+  onDefaultCheckedChange(defaultChecked: boolean);
+  onDeploy();
 }
 
 class DeployModalColumn extends PureClasss<Props>   
 {
   state: {
     confirmChecked: boolean;
-    defaultChecked: boolean;
   } = {
     confirmChecked: false,
-    defaultChecked: false,
   };
   
   componentWillReceiveProps(nextProps:Props)
@@ -104,23 +104,20 @@ class DeployModalColumn extends PureClasss<Props>
     {
       this.setState({
         confirmChecked: false,
-        defaultChecked: false,
       });
     }
   }
   
   handleDefaultCheckedChange(c)
   {
-    console.log(c);
+    this.props.onDefaultCheckedChange(!this.props.defaultChecked);
     this.setState({
-      defaultChecked: !this.state.defaultChecked,
       confirmChecked: false,
-    })
+    });
   }
   
   handleConfirmCheckedChange(c)
   {
-    console.log(c);
     this.setState({
       confirmChecked: !this.state.confirmChecked,
     });
@@ -128,7 +125,7 @@ class DeployModalColumn extends PureClasss<Props>
   
   handleDeploy()
   {
-    this.props.onDeploy(this.state.defaultChecked);
+    this.props.onDeploy();
   }
   
   render() 
@@ -145,7 +142,7 @@ class DeployModalColumn extends PureClasss<Props>
     // }
     
     let text = status === EVariantStatus.Live ? TEXT.live : TEXT.notLive;
-    if(this.state.defaultChecked)
+    if(this.props.defaultChecked)
     {
       text = TEXT.default;
     }
@@ -231,12 +228,12 @@ class DeployModalColumn extends PureClasss<Props>
             <div
               className={classNames({
                 'deploy-modal-check-wrapper': true,
-                'deploy-modal-check-wrapper-checked': this.state.defaultChecked,
+                'deploy-modal-check-wrapper-checked': this.props.defaultChecked,
               })}
             >
               <input
                 type='checkbox'
-                checked={this.state.defaultChecked}
+                checked={this.props.defaultChecked}
                 onChange={this.handleDefaultCheckedChange}
                 id='deploy-modal-default-check'
               />

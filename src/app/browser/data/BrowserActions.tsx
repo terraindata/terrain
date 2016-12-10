@@ -46,6 +46,7 @@ var _ = require('underscore');
 import ActionTypes from './BrowserActionTypes.tsx';
 import Store from './BrowserStore.tsx';
 import BrowserTypes from './../BrowserTypes.tsx';
+import BuilderTypes from './../../builder/BuilderTypes.tsx';
 type Group = BrowserTypes.Group;
 type Algorithm = BrowserTypes.Algorithm;
 type Variant = BrowserTypes.Variant;
@@ -118,8 +119,8 @@ const Actions =
         $(ActionTypes.variants.duplicate, { variant, index, groupId, algorithmId }),
     
     status:
-      (variant: Variant, status: BrowserTypes.EVariantStatus, confirmed?: boolean) =>
-        $(ActionTypes.variants.status, { variant, status, confirmed }),
+      (variant: Variant, status: BrowserTypes.EVariantStatus, confirmed?: boolean, isDefault?: boolean) =>
+        $(ActionTypes.variants.status, { variant, status, confirmed, isDefault }),
   },
   
   loadState:
@@ -139,7 +140,11 @@ const Actions =
           {
             alg.variants = Immutable.Map({});
           }
-          alg.variants = alg.variants.set(variant.id, new BrowserTypes.Variant(variant));
+          alg.variants = alg.variants.set(variant.id, 
+            (new BrowserTypes.Variant(variant))
+              .set('cards', BuilderTypes.recordFromJS(variant.cards))
+              .set('inputs', BuilderTypes.recordFromJS(variant.inputs))
+          );
         });
         
         _.map(algorithms, algorithm => {

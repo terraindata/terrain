@@ -5,12 +5,58 @@
   height: 100%;
   
   .deploy-modal-tql,
-  .deploy-modal-deploy-column {
+  .deploy-modal-deploy-column,
+  .deploy-modal-tql-default {
     display: inline-block;
     width: 50%;
     .normal-text;
     height: 100%;
     overflow: auto; 
+    box-sizing: border-box;
+    .transition;
+  }
+  
+  .deploy-modal-tql-default {
+    width: 33.33%;
+    margin-left: -33.33%;
+  }
+  
+  &.deploy-modal-3-col {
+    .deploy-modal-tql,
+    .deploy-modal-deploy-column {
+      width: 33.33%;
+    }
+    
+    .deploy-modal-tql-default {
+      margin-left: 0px;   
+    }
+  }
+  
+  .deploy-modal-tql-wrapper {
+    position: relative;
+    @tql-title-h: 30px;
+    
+    .deploy-modal-tql-title {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 100%;
+      background: rgba(255,255,255,0.75);
+      color: @trans-black;
+      .big-text;
+      z-index: 99;
+      
+      height: 30px;
+      padding: 6px;
+      box-sizing: border-box;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .CodeMirror {
+      padding-top: @tql-title-h;
+    }
   }
   
   .deploy-modal-deploy-column {
@@ -123,6 +169,7 @@
     .title-text;
     background: #eee;
     color: @trans-black;
+    cursor: pointer;
     
     &.deploy-modal-button-lit {
       @bg: @sea-green;

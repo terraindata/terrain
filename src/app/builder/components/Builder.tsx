@@ -60,6 +60,8 @@ import Util from "./../../util/Util.tsx";
 import UserActions from '../../users/data/UserActions.tsx';
 import RolesActions from '../../roles/data/RolesActions.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
+import BrowserStore from '../../browser/data/BrowserStore.tsx';
+import BrowserActions from '../../browser/data/BrowserActions.tsx';
 import Types from '../BuilderTypes.tsx';
 type IQuery = Types.IQuery;
 
@@ -357,6 +359,13 @@ class Builder extends PureClasss<Props>
       'info', 
       4
     );
+    
+    //TODO remove when store changes
+    let v = this.state.builder.queries.get(this.getSelectedId());
+    if(BrowserStore.getState().getIn(['groups', v['groupId'], 'algorithms', v['algorithmId'], 'variants', v.id]))
+    {
+      BrowserActions.variants.change(v as BrowserTypes.Variant);
+    }
   }
 
   onSaveError()
