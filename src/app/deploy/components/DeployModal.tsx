@@ -162,7 +162,10 @@ class DeployModal extends PureClasss<Props>
     
     return (
       <div className='deploy-modal-tql-wrapper'>
-        <div className='deploy-modal-tql-title'>
+        <div className={classNames({
+          'deploy-modal-tql-title': true,
+          [(localStorage.getItem('theme') || 'default') + '-tql-theme']: true,
+        })}>
           {
             title
           }
@@ -202,6 +205,7 @@ class DeployModal extends PureClasss<Props>
         title={title}
         confirm={true}
         fill={true}
+        noBar={true}
       >
         {
           changingStatusOf &&

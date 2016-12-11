@@ -439,7 +439,7 @@ class BuilderTQLColumn extends PureClasss<Props>
       <div
         className={classNames({
           'tql-column': true,
-          [this.state.theme]: true,
+          [this.state.theme + '-tql-theme']: true,
         })}
       >
         { 

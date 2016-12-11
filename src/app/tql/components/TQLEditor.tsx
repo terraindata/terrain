@@ -90,30 +90,6 @@ interface Props {
 
 class TQLEditor extends PureClasss<Props>
 {
-  state: {
-    theme: string;
-    highlightedLine: number;
-    theme_index: number;
-    confirmModalOpen: boolean;
-    confirmModalMessage: string;
-    syntaxHelpOpen: boolean;
-    syntaxHelpPos: any;
-    cardName: string;
-    termDefinitionOpen: boolean;
-    termDefinitionPos: any;
-  } = {
-    theme: localStorage.getItem('theme') || 'default',
-    highlightedLine: null,
-    theme_index: 0,
-    confirmModalOpen: false,
-    confirmModalMessage: '',
-    syntaxHelpOpen: false,
-    syntaxHelpPos: {},
-    cardName: '',
-    termDefinitionOpen: false,
-    termDefinitionPos: {}
-  };
-
   render() 
   {
     var options =

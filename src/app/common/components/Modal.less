@@ -1,6 +1,6 @@
 @import "../../common/Common.less";
 
-.modal-overlay{
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -16,11 +16,37 @@
 			width: 100px;
 		}
 	}
+
+  .modal-title {
+  	padding: 10px;
+  	padding-bottom: 8px;
+  	font-size: 16px;
+  	background-color: #EDEDED;
+  	color: #636363;
+  	font-weight: 500;
+  	line-height: 18px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    
+    &.modal-title-error{
+    	background-color: #ffd8d5;
+    	display: flex;
+    }
+    
+    .modal-title-inner {
+      flex-grow: 1;
+    }
+    
+    .modal-close-x {
+      .close-large;
+      .close-dark;
+    }
+  }
 }
 
-.modal-content{
-	position: absolute;
-  //border: 1px solid #ccc;
+.modal-content {
+  position: absolute;
   background: white;
   overflow: auto;
   WebkitOverflowScrolling: touch;
@@ -43,21 +69,6 @@
       height: 100%;
     }
   }
-}
-
-.modal-title{
-	padding: 10px;
-	padding-bottom: 8px;
-	font-size: 16px;
-	background-color: #EDEDED;
-	color: #636363;
-	font-weight: 500;
-	line-height: 18px;
-}
-
-.modal-title-error{
-	background-color: #ffd8d5;
-	display: flex;
 }
 
 .modal-message{

@@ -1,5 +1,10 @@
 @import "../../common/Common.less";
 
+@import "./cobalt.less";
+@import "./monokai.less";
+@import "./neo.less";
+@import "./codemirror.less";
+
 .codemirror-text {
   height: 100%;
 }
@@ -8,6 +13,35 @@
     flex-grow: 1;
 }
 
+.cobalt-tql-theme {
+  .cm-s-cobalt.CodeMirror;
+}
+
+.neo-tql-theme {
+  .cm-s-neo.CodeMirror;
+  .manual-popup-icon {
+    fill: rgba(0,0,0,0.2);
+  }
+}
+
+.monokai-tql-theme {
+  .cm-s-monokai.CodeMirror;
+}
+
+.default-tql-theme {
+  color: @trans-black;
+  background-color: #fff;
+  .manual-popup-icon {
+    fill: rgba(0,0,0,0.2);
+  }
+}
+
+.cobalt-tql-theme,
+.neo-tql-theme,
+.monokai-tql-theme,
+.default-tql-theme {
+  font-family: 'Courier New', Courier, monospace;
+}
 //Placeholder styling for CodeMirror
 .CodeMirror-empty.CodeMirror-focused { outline: none; }
 .CodeMirror pre.CodeMirror-placeholder { color: #999; }

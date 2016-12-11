@@ -1,50 +1,11 @@
 @import "../../common/Common.less";
 @import "../../builder/components/results/Result.less";
 @import "../../builder/components/results/ResultsArea.less";
-@import "./cobalt.less";
-@import "./monokai.less";
-@import "./neo.less";
-@import "./codemirror.less";
 
 .tql-column {
   .codemirror-text{
     height: calc(~"100% - 24px");
     padding-bottom: 24px;
-  }
-}
-
-.cobalt {
-  .tql-editor-top,
-  .tql-results-bar {
-    .cm-s-cobalt.CodeMirror;
-  }
-}
-
-.neo {
-  .tql-editor-top,
-  .tql-results-bar {
-    .cm-s-neo.CodeMirror;
-    .manual-popup-icon {
-      fill: rgba(0,0,0,0.2);
-    }
-  }
-}
-
-.monokai {
-  .tql-editor-top,
-  .tql-results-bar {
-    .cm-s-monokai.CodeMirror;
-  }
-}
-
-.default {
-  .tql-editor-top,
-  .tql-results-bar {
-    color: black;
-    background-color: white;
-    .manual-popup-icon {
-      fill: rgba(0,0,0,0.2);
-    }
   }
 }
 

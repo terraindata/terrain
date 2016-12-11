@@ -2,7 +2,7 @@
 
 .deploy-modal {
   font-size: 0px;
-  height: 100%;
+  height: calc(~"100% - 38px");
   
   .deploy-modal-tql,
   .deploy-modal-deploy-column,
@@ -41,9 +41,8 @@
       top: 0px;
       left: 0px;
       width: 100%;
-      background: rgba(255,255,255,0.75);
-      color: @trans-black;
       .big-text;
+      
       z-index: 99;
       
       height: 30px;
@@ -56,6 +55,7 @@
     
     .CodeMirror {
       padding-top: @tql-title-h;
+      height: calc(~"100% - @{tql-title-h}") !important;
     }
   }
   
@@ -110,6 +110,7 @@
       }
     }
     .deploy-modal-check-wrapper {
+      display: flex;
       padding: 6px;
       margin: 6px;
       border-radius: 4px;
@@ -129,6 +130,7 @@
       
       label {
         margin-left: 6px;
+        flex-grow: 1;
       }
       
       input {
