@@ -274,7 +274,7 @@ class Builder extends PureClasss<Props>
     {
       return;
     }
-    console.log('fetch it', config);
+    
     Actions.fetch(Immutable.List(
       config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id)
     ), this.handleNoVariant);
@@ -282,17 +282,20 @@ class Builder extends PureClasss<Props>
   
   handleNoVariant(variantId: ID)
   {
-    var newConfigArr = this.props.params.config
-      .split(',')
-      .filter(id => id !== variantId && id !== '!' + variantId);
-    if(newConfigArr.length && !newConfigArr.some(c => c.substr(0,1) === '!'))
+    if(this.props.params.config)
     {
-      newConfigArr[0] = '!' + newConfigArr[0];
+      let newConfigArr = this.props.params.config
+        .split(',')
+        .filter(id => id !== variantId && id !== '!' + variantId);
+      if(newConfigArr.length && !newConfigArr.some(c => c.substr(0,1) === '!'))
+      {
+        newConfigArr[0] = '!' + newConfigArr[0];
+      }
+      
+      let newConfig = newConfigArr.join(',');
+      localStorage.setItem('config', newConfig); // so that empty configs don't cause a freak out
+      this.props.history.replaceState({}, `/builder/${newConfig}`);
     }
-    
-    let newConfig = newConfigArr.join(',');
-    localStorage.setItem('config', newConfig); // so that empty configs don't cause a freak out
-    this.props.history.replaceState({}, `/builder/${newConfig}`);
   }
   
   getSelectedId(props?:Props)
