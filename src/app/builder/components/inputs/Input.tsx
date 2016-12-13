@@ -208,7 +208,7 @@ var Input = React.createClass<any, any>({
         className="input-text input-text-second"
         keyPath={this.state.valueKeyPath}
         isNumber={this.props.input.inputType === BuilderTypes.InputType.NUMBER}
-        typeErrorMessage="That is not a number"
+        typeErrorMessage="Tehis is supposed to be a number"
         placeholder='Sample value'
         autoDisabled={true}
       />

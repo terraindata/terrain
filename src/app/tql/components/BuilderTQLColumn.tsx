@@ -315,7 +315,12 @@ class BuilderTQLColumn extends PureClasss<Props>
   renderTopbar() 
   {
     return (
-      <div className='tql-editor-top'>
+      <div
+        className={classNames({
+          'tql-editor-top': true,
+          [this.state.theme + '-tql-theme']: true,
+        })}
+      >
         <Switch
           first='Cards'
           second='TQL'
