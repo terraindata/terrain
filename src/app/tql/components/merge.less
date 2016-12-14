@@ -1,0 +1,162 @@
+.CodeMirror-merge {
+  position: relative;
+  white-space: pre;
+}
+
+.CodeMirror-merge, .CodeMirror-merge .CodeMirror {
+  // height: 100%;
+}
+
+.CodeMirror-merge-2pane .CodeMirror-merge-pane {
+  width: 50%;
+  @keyframes grow {
+    from { margin-left: -50%; }
+    to { margin-left: 0% }
+  }
+  @keyframes shrink {
+    from { width: 100% }
+    to { width: 50% }
+  }
+  
+  animation: grow 0.15s linear forwards;
+  &.CodeMirror-merge-pane-rightmost {
+    animation: shrink 0.15s linear forwards;
+  }
+}
+
+.CodeMirror-merge-2pane .CodeMirror-merge-gap { display: none; }
+
+.CodeMirror-merge-3pane .CodeMirror-merge-pane { width: 31%; }
+.CodeMirror-merge-3pane .CodeMirror-merge-gap { width: 3.5%; }
+
+.CodeMirror-merge-pane {
+  height: 100%;
+  .CodeMirror {
+    height: 100%;
+  }
+}
+
+.CodeMirror-merge-pane {
+  display: inline-block;
+  white-space: normal;
+  vertical-align: top;
+}
+.CodeMirror-merge-pane-rightmost {
+  position: absolute;
+  right: 0px;
+  z-index: 1;
+}
+
+.CodeMirror-merge-gap {
+  z-index: 2;
+  display: inline-block;
+  height: 100%;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  background: #f8f8f8;
+}
+
+.CodeMirror-merge-scrolllock-wrap {
+  position: absolute;
+  bottom: 0; left: 50%;
+}
+.CodeMirror-merge-scrolllock {
+  position: relative;
+  left: -50%;
+  cursor: pointer;
+  color: #555;
+  line-height: 1;
+}
+
+.CodeMirror-merge-copybuttons-left, .CodeMirror-merge-copybuttons-right {
+  position: absolute;
+  left: 0; top: 0;
+  right: 0; bottom: 0;
+  line-height: 1;
+}
+
+.CodeMirror-merge-copy {
+  position: absolute;
+  cursor: pointer;
+  color: #44c;
+  z-index: 3;
+}
+
+.CodeMirror-merge-copy-reverse {
+  position: absolute;
+  cursor: pointer;
+  color: #44c;
+}
+
+.CodeMirror-merge-copybuttons-left .CodeMirror-merge-copy { left: 2px; }
+.CodeMirror-merge-copybuttons-right .CodeMirror-merge-copy { right: 2px; }
+
+.CodeMirror-merge-r-inserted, .CodeMirror-merge-l-inserted {
+  background: rgba(0,255,0,0.25);
+  background: #c7f0d2; // from gitlab
+  background: rgba(27,239,68,0.35);
+  text-shadow: 0px 0px 1px rgba(0,0,0,0.5);
+  // background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAYAAACddGYaAAAAGUlEQVQI12MwuCXy3+CWyH8GBgYGJgYkAABZbAQ9ELXurwAAAABJRU5ErkJggg==);
+  // background-position: bottom left;
+  // background-repeat: repeat-x;
+}
+
+.CodeMirror-merge-r-deleted, .CodeMirror-merge-l-deleted {
+  background: rgba(255,0,0,0.25);
+  background: fade(#fac5cd, 30%); // from gitlab
+  background: rgba(239,27,68,0.35);
+  text-shadow: 0px 0px 1px rgba(0,0,0,0.5);
+  // background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAYAAACddGYaAAAAGUlEQVQI12M4Kyb2/6yY2H8GBgYGJgYkAABURgPz6Ks7wQAAAABJRU5ErkJggg==);
+  // background-position: bottom left;
+  // background-repeat: repeat-x;
+}
+
+.CodeMirror-merge-pane-rightmost {
+  // inserted
+  @c: rgba(27,239,68,0.15);
+  .CodeMirror-merge-r-chunk { background: @c; }
+  .CodeMirror-merge-r-chunk-start { border-top: 1px solid @c; }
+  .CodeMirror-merge-r-chunk-end { border-bottom: 1px solid @c; }
+  .CodeMirror-merge-r-connect { fill: @c; stroke: @c; stroke-width: 1px; }
+
+  .CodeMirror-merge-l-chunk { background: @c; }
+  .CodeMirror-merge-l-chunk-start { border-top: 1px solid @c; }
+  .CodeMirror-merge-l-chunk-end { border-bottom: 1px solid @c; }
+  .CodeMirror-merge-l-connect { fill: @c; stroke: @c; stroke-width: 1px; }
+}
+.CodeMirror-merge-pane:not(.CodeMirror-merge-pane-rightmost) {
+  // deleted
+  @c: rgba(239,27,68,0.15);
+  .CodeMirror-merge-r-chunk { background: @c; }
+  .CodeMirror-merge-r-chunk-start { border-top: 1px solid @c; }
+  .CodeMirror-merge-r-chunk-end { border-bottom: 1px solid @c; }
+  .CodeMirror-merge-r-connect { fill: @c; stroke: @c; stroke-width: 1px; }
+
+  .CodeMirror-merge-l-chunk { background: @c; }
+  .CodeMirror-merge-l-chunk-start { border-top: 1px solid @c; }
+  .CodeMirror-merge-l-chunk-end { border-bottom: 1px solid @c; }
+  .CodeMirror-merge-l-connect { fill: @c; stroke: @c; stroke-width: 1px; }
+}
+
+
+@nc: rgba(125,125,125,0.25);
+// .CodeMirror-merge-l-chunk.CodeMirror-merge-r-chunk { 
+//   background: @nc;
+// }
+.CodeMirror-merge-l-chunk-start.CodeMirror-merge-r-chunk-start { border-top: 1px solid @nc; }
+.CodeMirror-merge-l-chunk-end.CodeMirror-merge-r-chunk-end { border-bottom: 1px solid @nc; }
+
+.CodeMirror-merge-collapsed-widget:before {
+  content: "(...)";
+}
+.CodeMirror-merge-collapsed-widget {
+  cursor: pointer;
+  color: #88b;
+  background: #eef;
+  font-size: 90%;
+  padding: 0 3px;
+  border-radius: 4px;
+}
+.CodeMirror-merge-collapsed-line .CodeMirror-gutter-elt { display: none; }

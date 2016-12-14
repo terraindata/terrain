@@ -11,25 +11,22 @@
     width: 50%;
     .normal-text;
     height: 100%;
-    overflow: auto; 
     box-sizing: border-box;
     .transition;
+  }
+  
+  .deploy-modal-deploy-column {
+    overflow: auto; 
+  }
+  
+  .deploy-modal-tql,
+  .deploy-modal-tql-default {
+    overflow: hidden;
   }
   
   .deploy-modal-tql-default {
     width: 33.33%;
     margin-left: -33.33%;
-  }
-  
-  &.deploy-modal-3-col {
-    .deploy-modal-tql,
-    .deploy-modal-deploy-column {
-      width: 33.33%;
-    }
-    
-    .deploy-modal-tql-default {
-      margin-left: 0px;   
-    }
   }
   
   .deploy-modal-tql-wrapper {
@@ -54,8 +51,8 @@
     }
     
     .CodeMirror {
-      padding-top: @tql-title-h;
-      height: calc(~"100% - @{tql-title-h}") !important;
+      // padding-top: @tql-title-h;
+      // height: calc(~"100% - @{tql-title-h}") !important;
     }
   }
   

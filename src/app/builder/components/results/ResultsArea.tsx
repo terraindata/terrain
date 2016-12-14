@@ -248,7 +248,7 @@ class ResultsArea extends PureClasss<Props>
     {
       return <InfoArea
         large="There was an error with your query."
-        small={this.state.error}
+        small={this.state.error.replace(/MySQL/g, 'TerrainDB')}
       />
     }
     

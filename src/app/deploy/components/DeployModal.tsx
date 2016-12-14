@@ -117,43 +117,18 @@ class DeployModal extends PureClasss<Props>
   renderTQLColumn()
   {
     let variant = this.state.changingStatusOf;
-    return (
-      <div className='deploy-modal-tql'>
-        {
-          this.renderTQLEditor(variant, 'TQL for ' + variant.name)
-        }
-      </div>
-    );
-  }
-  
-  renderDefaultTQLColumn()
-  {
     let state = BrowserStore.getState();
     let algorithm = state.getIn(['groups', this.state.changingStatusOf.groupId, 'algorithms', this.state.changingStatusOf.algorithmId]) as BrowserTypes.Algorithm;
-    let variant = algorithm.variants.find(v => v.isDefault);
-    
-    if(variant)
+    let defaultTql = 'There is not currently a default Variant for algorithm ' + algorithm.name;
+    if(this.state.defaultChecked)
     {
-      return (
-        <div className='deploy-modal-tql-default'>
-          {
-            this.renderTQLEditor(variant, 'Current Default TQL for ' + algorithm.name)
-          }
-        </div>
-      );
+      let defaultVariant = algorithm.variants.find(v => v.isDefault);
+      if(defaultVariant)
+      {
+        defaultTql = defaultVariant.mode === 'tql' ? defaultVariant.tql : TQLConverter.toTQL(defaultVariant);
+      }
     }
     
-    return (
-      <div className='deploy-modal-tql-default'>
-        <div className='deploy-modal-tql-default-message'>
-          There is not currently a default variant for algorithm <b>{algorithm.name}</b>.
-        </div>
-      </div>
-    );
-  }
-  
-  renderTQLEditor(variant:BrowserTypes.Variant, title: string)
-  {
     let tql = '';
     if(variant)
     {
@@ -161,20 +136,15 @@ class DeployModal extends PureClasss<Props>
     }
     
     return (
-      <div className='deploy-modal-tql-wrapper'>
-        <div className={classNames({
-          'deploy-modal-tql-title': true,
-          [(localStorage.getItem('theme') || 'default') + '-tql-theme']: true,
-        })}>
-          {
-            title
-          }
+      <div className='deploy-modal-tql'>
+        <div className='deploy-modal-tql-wrapper'>
+          <TQLEditor
+            canEdit={false}
+            tql={tql}
+            isDiff={this.state.defaultChecked}
+            diffTql={defaultTql}
+          />
         </div>
-        
-        <TQLEditor
-          canEdit={false}
-          tql={tql}
-        />
       </div>
     );
   }
@@ -188,6 +158,11 @@ class DeployModal extends PureClasss<Props>
   
   render() 
   {
+    if(!this.state.changingStatus)
+    {
+      return null;
+    }
+    
     let {changingStatus, changingStatusOf, changingStatusTo} = this.state;
     let name = (changingStatusOf && changingStatusOf.name);
     
@@ -203,21 +178,16 @@ class DeployModal extends PureClasss<Props>
         message={null}
         onClose={this.handleClose}
         title={title}
-        confirm={true}
+        confirm={false}
         fill={true}
-        noBar={true}
       >
         {
           changingStatusOf &&
             <div 
               className={classNames({
                 'deploy-modal': true,
-                'deploy-modal-3-col': this.state.defaultChecked,
               })}
             >
-              {
-                this.renderDefaultTQLColumn()
-              }
               {
                 this.renderTQLColumn()
               }

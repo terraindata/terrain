@@ -48,10 +48,16 @@ THE SOFTWARE.
 var React = require('react');
 var className = require('classnames');
 
+const CM = require('codemirror');
+const diff_match_patch = require('diff-match-patch');
+require('./merge.js');
+const Dimensions = require('react-dimensions');
+
 var CodeMirror = React.createClass({
 	displayName: 'CodeMirror',
 
-	propTypes: {
+	propTypes:
+  {
 		onChange: React.PropTypes.func,
 		onFocusChange: React.PropTypes.func,
 		options: React.PropTypes.object,
@@ -62,49 +68,71 @@ var CodeMirror = React.createClass({
 		toggleSyntaxPopup: React.PropTypes.func,
 		defineTerm: React.PropTypes.func,
 		turnSyntaxPopupOff: React.PropTypes.func,
-		hideTermDefinition: React.PropTypes.func
+		hideTermDefinition: React.PropTypes.func,
+    
+    isDiff: React.PropTypes.bool,
+    diff: React.PropTypes.string,
+    
+    containerHeight: React.PropTypes.number,
 	},
 	foldClass: {
 		open: "CodeMirror-foldgutter-open",
 		folded: "CodeMirror-foldgutter-folded",
 	},
-	getCodeMirrorInstance: function getCodeMirrorInstance() 
+  
+	getCodeMirrorInstance() 
 	{
-		return this.props.codeMirrorInstance || require('codemirror');
+		return this.props.codeMirrorInstance || (
+      this.props.isDiff ? CM.MergeView : require('codemirror')
+    );
 	},
-	getInitialState: function getInitialState() 
+  
+	getInitialState() 
 	{
 		return {
 			isFocused: false,
 		};
 	},
-	componentDidMount: function componentDidMount() 
+  
+	componentDidMount() 
 	{
 		var textareaNode = this.refs.textarea;
 		var codeMirrorInstance = this.getCodeMirrorInstance();
-		this.codeMirror = codeMirrorInstance.fromTextArea(textareaNode, this.props.options);
-		this.codeMirror.on('change', this.codemirrorValueChanged);
-		this.codeMirror.on('focus', this.focusChanged.bind(this, true));
-		this.codeMirror.on('blur', this.focusChanged.bind(this, false));
-		this.codeMirror.on('contextmenu', this.handleRightClick);
-		this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
-		this.codeMirror.on('scroll', this.turnSyntaxPopupOff);
-		this.codeMirror.setSize("100%", "100%");
+    
+    // different treatement used in CodeMirror for diffs vs. regular editor
+    if(this.props.isDiff)
+    {
+      this.codeMirror = CM.MergeView(this.refs['div'], this.props.options, this.props.containerHeight + 'px');
+      // this.codeMirror.wrap.style.height = this.props.containerHeight + 'px';
+    }
+    else
+    {
+      this.codeMirror = codeMirrorInstance.fromTextArea(textareaNode, this.props.options);
+  		this.codeMirror.on('change', this.codemirrorValueChanged);
+  		this.codeMirror.on('focus', this.focusChanged.bind(this, true));
+  		this.codeMirror.on('blur', this.focusChanged.bind(this, false));
+  		this.codeMirror.on('contextmenu', this.handleRightClick);
+  		this.codeMirror.setValue(this.props.defaultValue || this.props.value || '');
+  		this.codeMirror.on('scroll', this.turnSyntaxPopupOff);
+  		this.codeMirror.setSize("100%", "100%");
+    }
 	},
 
-	turnSyntaxPopupOff: function turnSyntaxPopupOff()
+	turnSyntaxPopupOff()
 	{
 		this.props.turnSyntaxPopupOff && this.props.turnSyntaxPopupOff();
 	},
 
-	componentWillUnmount: function componentWillUnmount() 
+	componentWillUnmount()
 	{
-		if (this.codeMirror) 
+		if(this.codeMirror && this.codeMirror.toTextArea) 
 		{
 			this.codeMirror.toTextArea();
 		}
+    this.codeMirror && this.codeMirror.wrap && this.codeMirror.wrap.remove();
 	},
-	handleRightClick: function handleRightClick(self, event)
+  
+	handleRightClick(self, event)
 	{
 		event.preventDefault();
 		this.codeMirror.on('mousedown', this.props.hideTermDefinition);
@@ -304,13 +332,39 @@ var CodeMirror = React.createClass({
   		return widget;
   	},
 	 
+  
+  componentDidUpdate()
+  {
+    if(this.state.shouldMount)
+    {
+      this.setState({
+        shouldMount: false,
+      });
+      this.componentDidMount();
+    }
+  },
+  
 	componentWillReceiveProps: function componentWillReceiveProps(nextProps)
 	{
+    if(this.props.isDiff !== nextProps.isDiff)
+    {
+      this.componentWillUnmount();
+      this.setState({
+        shouldMount: true,
+      });
+      return;
+    }
+    
+    if(nextProps.containerHeight !== this.props.containerHeight)
+    {
+      this.codeMirror && this.codeMirror.wrap && (this.codeMirror.wrap.style.height = nextProps.containerHeight + 'px');
+    }
+    
 		if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getValue() != nextProps.value) 
 		{
 			this.codeMirror.setValue(nextProps.value);
 		}
-		if (typeof nextProps.options === 'object') 
+		if (typeof nextProps.options === 'object' && this.codeMirror.setOption) 
 		{
 			for (var optionName in nextProps.options) 
 			{
@@ -352,12 +406,25 @@ var CodeMirror = React.createClass({
 	render: function render() 
 	{
 		var editorClassName = className('ReactCodeMirror', this.state.isFocused ? 'ReactCodeMirror--focused' : null, this.props.className);
+    
+    if(this.props.isDiff)
+    {
+      return React.createElement(
+        'div',
+        {
+          className: editorClassName,
+          ref: 'div',
+        });
+    }
+    
 		return React.createElement(
 			'div',
-			{ className: editorClassName },
+			{
+        className: editorClassName,
+      },
 			React.createElement('textarea', { ref: 'textarea', name: this.props.path, placeholder: "Enter TQL here", defaultValue: this.props.value, autoComplete: 'off' })
 		);
 	}
 });
 
-module.exports = CodeMirror;
+module.exports = Dimensions()(CodeMirror);

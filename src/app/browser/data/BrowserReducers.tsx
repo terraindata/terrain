@@ -240,6 +240,7 @@ let duplicateVariant = (variant, id, groupId?, algorithmId?) =>
     .set('groupId', groupId || variant.groupId)
     .set('algorithmId', algorithmId || variant.algorithmId)
     .set('status', BrowserTypes.EVariantStatus.Build)
+    .set('isDefault', false)
     ;
 }
 

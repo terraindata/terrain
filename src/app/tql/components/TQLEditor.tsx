@@ -50,10 +50,11 @@ import * as Immutable from 'immutable';
 const {List} = Immutable;
 import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss.tsx';
+const CodeMirror = require('./Codemirror.js');
 
-var CodeMirror = require('./Codemirror.js');
 
-//Style sheets and addons for code-mirror
+// Style sheets and addons for CodeMirror
+
 require('./tql.js');
 import './codemirror.less';
 import './monokai.less';
@@ -65,7 +66,6 @@ import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/addon/fold/foldgutter.css';
 import 'codemirror/addon/lint/lint.js';
 
-//Searching for code-mirror
 import 'codemirror/addon/dialog/dialog.js';
 import './dialog.less';
 import 'codemirror/addon/search/searchcursor.js';
@@ -75,7 +75,8 @@ import 'codemirror/addon/search/matchesonscrollbar.js';
 import 'codemirror/addon/search/jump-to-line.js';
 import 'codemirror/addon/search/matchesonscrollbar.css';
 
-interface Props {
+interface Props
+{
   tql: string;
   canEdit: boolean;
   
@@ -86,13 +87,16 @@ interface Props {
   hideTermDefinition?();
   theme?: string;
   highlightedLine?: number;
+  
+  isDiff?: boolean;
+  diffTql?: string;
 }
 
 class TQLEditor extends PureClasss<Props>
 {
   render() 
   {
-    var options =
+    const options =
     {
       readOnly: !this.props.canEdit,
       lineNumbers: true,
@@ -105,13 +109,34 @@ class TQLEditor extends PureClasss<Props>
       foldGutter: true,
       lint: true,
       gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
+      
+      revertButtons: false,
+      connect: 'align',
+      
+      value: this.props.tql || '',
+      origLeft: this.props.diffTql,
     };
+    
+    if(this.props.isDiff)
+    {
+      return (
+        <CodeMirror
+          ref="cm2"
+          className='codemirror-text'
+          options={options}
+          
+          isDiff={true}
+          diff={this.props.diffTql}
+        />
+      );
+    }
     
     return (
       <CodeMirror
+        
         ref="cm"
         className='codemirror-text'
-        value={this.props.tql}
+        value={this.props.tql || ''}
         options={options}
         
         highlightedLine={this.props.highlightedLine}
