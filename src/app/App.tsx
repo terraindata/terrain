@@ -77,8 +77,9 @@ import Redirect from "./common/components/Redirect.tsx";
 import ManualWrapper from "./manual/components/ManualWrapper.tsx";
 var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
 import { Router, Route, IndexRoute } from 'react-router';
-import { createHistory } from 'history';
-let history = createHistory();
+const {browserHistory} = require('react-router');
+// import { createHistory } from 'history';
+// let history = createHistory();
 import Ajax from './util/Ajax.tsx';
 
 // Icons
@@ -244,7 +245,6 @@ var App = React.createClass({
               <TerrainIcon className='app-top-bar-icon' />
                <AccountDropdown 
                  onLogout={this.handleLogout} 
-                 history={this.props.history} 
                />
             </div>
         }
@@ -272,7 +272,7 @@ var App = React.createClass({
 
 
 var router = (
-  <Router history={history}>
+  <Router history={browserHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={Redirect} />
     

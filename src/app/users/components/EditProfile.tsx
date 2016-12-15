@@ -55,11 +55,11 @@ import Ajax from './../../util/Ajax.tsx';
 import Modal from './../../common/components/Modal.tsx';
 var CameraIcon = require('./../../../images/icon_camera.svg');
 var CloseIcon = require('./../../../images/icon_close_8x8_gray.svg')
+const {browserHistory} = require('react-router');
 
 interface Props
 {
   params?: any;
-  history?: any;
   children?: any;
 }
 
@@ -169,7 +169,7 @@ class Profile extends Classs<Props>
       saving: false,
       savingReq: null,
     });
-    this.props.history.pushState({}, '/account/profile');
+    browserHistory.push('/account/profile');
   }
 
   onSaveError(response) 

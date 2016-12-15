@@ -62,6 +62,7 @@ import RoleTypes from '../../roles/RoleTypes.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
 import {notificationManager} from './../../common/components/InAppNotification.tsx'
 import StatusDropdown from './StatusDropdown.tsx';
+const {browserHistory} = require('react-router');
 
 var VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
 
@@ -73,7 +74,6 @@ interface Props
   variantsOrder: Immutable.List<ID>;
   groupId: ID;
   algorithmId: ID;
-  history: any;
 }
 
 class VariantsColumn extends Classs<Props>
@@ -212,7 +212,7 @@ class VariantsColumn extends Classs<Props>
   
   handleDoubleClick(id:ID)
   {
-    this.props.history.pushState({}, `/builder/?o=${id}`);
+    browserHistory.push(`/builder/?o=${id}`);
   }
 
   renderVariant(id: ID, index: number)

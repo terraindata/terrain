@@ -50,6 +50,7 @@ import { Link } from 'react-router';
 import * as classNames from 'classnames';
 import Autocomplete from './../../common/components/Autocomplete.tsx';
 import ManualEntry from './ManualEntry.tsx';
+const {browserHistory} = require('react-router');
 
 import * as Immutable from 'immutable';
 const {List} = Immutable;
@@ -66,7 +67,6 @@ interface Props
 {
   location?: any;
   children?: any;
-  history?: any;
   selectedKey?: string;
   manualTab?: boolean;
   changeCardName?: (string) => void;
@@ -230,7 +230,6 @@ class Manual extends Classs<Props>
                 canEdit={false}
                 openTerm={this.openTerm}
                 spotlights={[]}
-                history={this.props.history}
                 expanded={this.state.expanded}
                 manualTab={this.props.manualTab}
                 bottomLine={!(index === this.state.visibleTqlCards.length - 1 && this.state.visiblePhraseTypes.length === 0)}
@@ -246,7 +245,6 @@ class Manual extends Classs<Props>
                 canEdit={false}
                 openTerm={this.openTerm}
                 spotlights={[]}
-                history={this.props.history}
                 phraseType={true}
                 expanded={this.state.expanded}
                 manualTab={this.props.manualTab}
@@ -296,7 +294,7 @@ class Manual extends Classs<Props>
 
     if(this.props.manualTab)
     {
-      this.props.history.pushState({}, '/manual/' + encodeURIComponent(value));
+      browserHistory.push('/manual/' + encodeURIComponent(value));
     }
 
     this.props.changeCardName && this.props.changeCardName(value);
@@ -351,7 +349,7 @@ class Manual extends Classs<Props>
       value: '',
       expandTqlCards: this.state.selectedKey === 'TQL Cards' ? !this.state.expandTqlCards : true
     });
-    this.props.history.pushState({}, '/manual/TQL%20Cards');
+    browserHistory.push('/manual/TQL%20Cards');
   }
 
   showPhraseTypes()
@@ -364,7 +362,7 @@ class Manual extends Classs<Props>
       value: '',
       expandPhraseTypes: this.state.selectedKey === 'Phrase Types' ? !this.state.expandPhraseTypes : true
     });
-    this.props.history.pushState({}, '/manual/Phrase%20Types');
+    browserHistory.push('/manual/Phrase%20Types');
   }
 
   toggleTqlCardList()

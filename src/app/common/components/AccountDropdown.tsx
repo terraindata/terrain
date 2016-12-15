@@ -52,6 +52,7 @@ import UserThumbnail from '../../users/components/UserThumbnail.tsx';
 import AuthStore from '../../auth/data/AuthStore.tsx';
 import UserTypes from '../../users/UserTypes.tsx';
 import { Link } from 'react-router';
+const {browserHistory} = require('react-router');
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
@@ -61,7 +62,6 @@ var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon")
 
 interface Props {
   onLogout: () => void;
-  history?: any;
 }
 
 class AccountDropdown extends Classs<Props>
@@ -134,7 +134,7 @@ class AccountDropdown extends Classs<Props>
   
   go(url:string)
   {
-    this.props.history.pushState({}, url);
+    browserHistory.push(url);
   }
 
   renderDropdown()

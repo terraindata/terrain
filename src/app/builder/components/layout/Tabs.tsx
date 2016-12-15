@@ -58,6 +58,7 @@ import PureClasss from './../../../common/components/PureClasss.tsx';
 import BuilderStore from './../../../builder/data/BuilderStore.tsx';
 import BrowserTypes from './../../../browser/BrowserTypes.tsx';
 import * as classNames from 'classnames';
+const {browserHistory} = require('react-router');
 var ReactTooltip = require("react-tooltip");
 
 var TabIcon = require("./../../../../images/tab_corner_27x31.svg?name=TabIcon");
@@ -212,7 +213,6 @@ interface TabsProps
     onClick: () => void;
     enabled?: boolean;
   }>;
-  history: any;
 }
 
 class Tabs extends PureClasss<TabsProps> {
@@ -300,7 +300,7 @@ class Tabs extends PureClasss<TabsProps> {
     var newTabs = JSON.parse(JSON.stringify(this.state.tabs));
     var tab = newTabs.splice(index, 1)[0];
     newTabs.splice(destination, 0, tab);
-    this.props.history.pushState({}, '/builder/' + 
+    browserHistory.push('/builder/' + 
       newTabs.map(
         tab => (tab.selected ? '!' : '') + tab.id
       ).join(',')
@@ -349,12 +349,12 @@ class Tabs extends PureClasss<TabsProps> {
   
   handleClick(id:ID)
   {
-    this.props.history.pushState({ state: { config: this.props.config }}, this.getTo(id));
+    browserHistory.push(this.getTo(id));
   }
   
   handleClose(id:ID)
   {
-    this.props.history.pushState({}, this.getCloseTo(id));
+    browserHistory.push(this.getCloseTo(id));
   }
   
   getTo(id)

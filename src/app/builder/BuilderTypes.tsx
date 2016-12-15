@@ -134,7 +134,13 @@ export module BuilderTypes
     lastEdited: string;
     db: string;
     
+    status: any;
+    groupId: ID;
+    algorithmId: ID;
+    
     isDefault: boolean;
+    
+    dirty: boolean;
     
     deckOpen: boolean;
     

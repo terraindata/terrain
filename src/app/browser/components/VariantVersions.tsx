@@ -55,6 +55,7 @@ import Util from './../../util/Util.tsx';
 import * as moment from 'moment';
 import RoleTypes from '../../roles/RoleTypes.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
+const {browserHistory} = require('react-router');
 
 type Variant = BrowserTypes.Variant;
 type User = UserTypes.User;
@@ -64,7 +65,6 @@ type UserMap = UserTypes.UserMap;
 interface Props
 {
   variant: Variant;
-  history: any;
 }
 
 class VariantVersions extends PureClasss<Props>
@@ -132,7 +132,7 @@ class VariantVersions extends PureClasss<Props>
     {
       url += '@' + versionID;
     }
-    this.props.history.pushState({}, url);
+    browserHistory.push(url);
   }
 
   renderVersion(version, i) 

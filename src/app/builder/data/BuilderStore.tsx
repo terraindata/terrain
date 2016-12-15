@@ -48,7 +48,7 @@ import { Map, List } from 'immutable';
 import * as ReduxActions from 'redux-actions';
 import {CardItem} from '../components/cards/Card.tsx';
 var Redux = require('redux');
-import ActionTypes from './BuilderActionTypes.tsx';
+import {BuilderActionTypes, BuilderDirtyActionTypes} from './BuilderActionTypes.tsx';
 import Util from '../../util/Util.tsx';
 
 import Types from './../BuilderTypes.tsx';
@@ -73,6 +73,8 @@ export class BuilderStateClass
   draggingCardItem: CardItem = false;
   draggingOverKeyPath: KeyPath = Immutable.List([]);
   draggingOverIndex: number = -1;
+  
+  isDirty: boolean = false;
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> {}
 let BuilderState_Record = Immutable.Record(new BuilderStateClass());
@@ -84,6 +86,19 @@ var DefaultState = _BuilderState();
 
 import BuilderReducers from './BuilderReducers.tsx';
 
-export const BuilderStore: IStore<BuilderState> = Redux.createStore(ReduxActions.handleActions(BuilderReducers), DefaultState);
+export const BuilderStore: IStore<BuilderState> = Redux.createStore(
+  (state = DefaultState, action) =>
+  {
+    if(BuilderReducers[action.type])
+    {
+      state = BuilderReducers[action.type](state, action);
+    }
+    if(BuilderDirtyActionTypes[action.type] && !action.payload.notDirty)
+    {
+      state = state.set('isDirty', true);
+    }
+    return state;
+  }
+, DefaultState);
 
 export default BuilderStore;

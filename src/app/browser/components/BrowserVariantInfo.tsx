@@ -101,7 +101,8 @@ class BrowserInfoColumn extends PureClasss<Props>
     {
       BuilderActions.change(
         List(['dbs']), 
-        List(dbs)
+        List(dbs),
+        true // not dirty
       )
     }
     );

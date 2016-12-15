@@ -51,6 +51,8 @@ import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
 import * as Immutable from 'immutable';
 var HTML5Backend = require('react-dnd-html5-backend');
+const {browserHistory} = require('react-router');
+const { withRouter } = require('react-router');
 
 // Data
 import Store from "./../data/BuilderStore.tsx";
@@ -58,6 +60,8 @@ import { BuilderState } from "./../data/BuilderStore.tsx";
 import Actions from "./../data/BuilderActions.tsx";
 import Util from "./../../util/Util.tsx";
 import UserActions from '../../users/data/UserActions.tsx';
+import UserStore from '../../users/data/UserStore.tsx';
+import RolesStore from '../../roles/data/RolesStore.tsx';
 import RolesActions from '../../roles/data/RolesActions.tsx';
 import BrowserTypes from '../../browser/BrowserTypes.tsx';
 import BrowserStore from '../../browser/data/BrowserStore.tsx';
@@ -75,6 +79,7 @@ import Result from "./results/Result.tsx";
 import Ajax from "./../../util/Ajax.tsx";
 import InfoArea from '../../common/components/InfoArea.tsx';
 import {notificationManager} from './../../common/components/InAppNotification.tsx'
+import Modal from '../../common/components/Modal.tsx';
 
 var NewIcon = require("./../../../images/icon_new_21x17.svg?name=NewIcon");
 var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
@@ -86,8 +91,9 @@ let { Map, List } = Immutable;
 interface Props
 {
   params?: any;
-  history?: any;
   location?: any;
+  router?: any;
+  route?: any;
 }
 
 class Builder extends PureClasss<Props>
@@ -99,10 +105,10 @@ class Builder extends PureClasss<Props>
     columnType: number;
     selectedCardName: string;
     manualIndex: number;
-    
     curDb: string;
     
-    initialQuery: IQuery;
+    leaving: boolean;
+    nextLocation: any;
   } = {
     builder: Store.getState(),
     colKeys: null,
@@ -111,7 +117,9 @@ class Builder extends PureClasss<Props>
     selectedCardName: '',
     manualIndex: -1,
     curDb: '',
-    initialQuery: null,
+    
+    leaving: false,
+    nextLocation: null,
   };
   
   initialColSizes: any;
@@ -120,22 +128,8 @@ class Builder extends PureClasss<Props>
   {
     super(props);
     
-    this.state.initialQuery = this.getSelectedQuery();
-    
     this._subscribe(Store, {
       stateKey: 'builder',
-      updater: (state:BuilderState) => 
-      {
-        let queryId = this.getSelectedId();
-        let query = state.queries.get(queryId);
-        if(!this.state.builder.queries.get(queryId) && query)
-        {
-          // wasn't set before, need to set it now
-          this.setState({
-            initialQuery: query,
-          });
-        }
-      }
     });
     
     if(localStorage.getItem('colKeys'))
@@ -171,6 +165,31 @@ class Builder extends PureClasss<Props>
     this.checkConfig(this.props);
     RolesActions.fetch();
     this.loadTables(this.props);
+  }
+  
+  componentDidMount()
+  {
+    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+  }
+  
+  routerWillLeave(nextLocation): boolean
+  {
+    if(this.confirmedLeave)
+    {
+      this.confirmedLeave = false;
+      return true;
+    }
+    
+    if(this.shouldSave())
+    {
+      this.setState({
+        leaving: true,
+        nextLocation,
+      });
+      return false;
+    }
+    
+    return true;
   }
   
   querySub: any;
@@ -210,7 +229,8 @@ class Builder extends PureClasss<Props>
       this.schemaXhr = Ajax.schema(db, (tables: {name: string, columns: {name: string}[]}[]) => {
         Actions.change(
           Immutable.List(['tables']),
-          Immutable.List(tables.map(table => table.name))
+          Immutable.List(tables.map(table => table.name)),
+          true // not dirty
         );
         Actions.change(
           Immutable.List(['tableColumns']),
@@ -220,7 +240,8 @@ class Builder extends PureClasss<Props>
                 Immutable.List(table.columns.map(col => col.name))
               )
             , Immutable.Map({})
-          )
+          ),
+          true // not dirty
         );
       });
       
@@ -234,7 +255,18 @@ class Builder extends PureClasss<Props>
   {
     if(nextProps.params.config !== this.props.params.config)
     {
+      this.confirmedLeave = false;
       this.checkConfig(nextProps);
+      if(!this.props.location.query || !this.props.location.query.o)
+      {
+        this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+      }
+    }
+    
+    if(this.getSelectedId() !== this.getSelectedId(nextProps))
+    {
+      // focused query changed
+      Actions.change(List(['isDirty']), false, true);
     }
     
     this.loadTables(nextProps);
@@ -243,7 +275,7 @@ class Builder extends PureClasss<Props>
   checkConfig(props:Props)
   {
     let storedConfig = localStorage.getItem('config') || '';
-    let open = props.location.query.o;
+    let open = props.location.query && props.location.query.o;
     let originalConfig = props.params.config || storedConfig;
     let newConfig = originalConfig;
 
@@ -278,7 +310,7 @@ class Builder extends PureClasss<Props>
       && (props.params.config !== undefined || newConfig.length)
       )
     {
-      props.history.replaceState({}, `/builder/${newConfig}`);
+      browserHistory.replace(`/builder/${newConfig}`);
     }
     localStorage.setItem('config', newConfig || '');
     this.fetch(newConfig);
@@ -310,7 +342,7 @@ class Builder extends PureClasss<Props>
       
       let newConfig = newConfigArr.join(',');
       localStorage.setItem('config', newConfig); // so that empty configs don't cause a freak out
-      this.props.history.replaceState({}, `/builder/${newConfig}`);
+      browserHistory.replace(`/builder/${newConfig}`);
     }
   }
   
@@ -378,7 +410,8 @@ class Builder extends PureClasss<Props>
       }
     }
     this.save()
-}
+  }
+  
   onSaveSuccess()
   {
     notificationManager.addNotification(
@@ -408,7 +441,23 @@ class Builder extends PureClasss<Props>
   
   shouldSave(): boolean
   {
-    return this.getSelectedQuery() !== this.state.initialQuery;
+    let query = this.getSelectedQuery();
+    if(query)
+    {
+      if(query.status === BrowserTypes.EVariantStatus.Live)
+      {
+        return false;
+      }
+      if(
+        !Util.haveRole(query.groupId, 'builder', UserStore, RolesStore)
+        && !Util.haveRole(query.groupId, 'admin', UserStore, RolesStore)
+      ) {
+        // not auth
+        return false;
+      }
+    }
+    
+    return this.state.builder.isDirty;
   }
   
   save()
@@ -419,10 +468,6 @@ class Builder extends PureClasss<Props>
       this.onSaveSuccess,
       this.onSaveError
     );
-    
-    this.setState({
-      initialQuery: query,
-    });
     
     var configArr = window.location.pathname.split('/')[2].split(',');
     var currentVariant;
@@ -446,7 +491,7 @@ class Builder extends PureClasss<Props>
     var newConfig = configArr.join(',');
     if(newConfig !== this.props.params.config)
     {
-      this.props.history.replaceState({}, `/builder/${newConfig}`);
+      browserHistory.replace(`/builder/${newConfig}`);
     }
   }
   
@@ -486,7 +531,6 @@ class Builder extends PureClasss<Props>
         onCloseColumn={this.handleCloseColumn}
         canAddColumn={this.state.colKeys.size < 3}
         canCloseColumn={this.state.colKeys.size > 1}
-        history={this.props.history}
         onRevert={this.save}
         columnType={this.state.columnType}
         selectedCardName={this.state.selectedCardName}
@@ -595,39 +639,70 @@ class Builder extends PureClasss<Props>
   
   goToBrowser()
   {
-    this.props.history.pushState({}, '/browser');
+    browserHistory.push('/browser');
+  }
+  
+  handleSaveModalClose()
+  {
+    this.setState({
+      leaving: false,
+    });
+  }
+  
+  confirmedLeave: boolean = false;
+  handleSaveModalConfirm()
+  {
+    this.confirmedLeave = true;
+    this.setState({
+      leaving: false,
+    });
+    browserHistory.push(this.state.nextLocation);
   }
   
 	render()
   {
     let config = this.props.params.config;
+    let query = this.getSelectedQuery();
+
     return (
-      !config || !config.length ? 
-        <InfoArea
-          large='No variants open'
-          small='You can open one in the Library'
-          button='Go to the Library'
-          onClick={this.goToBrowser}
+      <div className={classNames({
+        'builder': true,
+        'builder-no-column-animation': this.state.noColumnAnimation,
+      })}>
+        {
+          !config || !config.length ? 
+            <InfoArea
+              large='No variants open'
+              small='You can open one in the Library'
+              button='Go to the Library'
+              onClick={this.goToBrowser}
+            />
+          :
+            <div>
+              <Tabs
+                actions={
+                  this.shouldSave() ? this.tabActionsShouldSave : this.tabActions
+                }
+                config={config}
+                ref='tabs'
+              />
+              <div className='tabs-content'>
+                <LayoutManager layout={this.getLayout()} moveTo={this.moveColumn} />
+              </div>
+            </div>
+        }
+        <Modal
+          open={this.state.leaving}
+          message={'You have unsaved changes' + (query ? ' to ' + query.name : '') + '. Are you sure you want to leave?'}
+          onClose={this.handleSaveModalClose}
+          onConfirm={this.handleSaveModalConfirm}
+          title='Unsaved Changes'
+          confirmButtonText='Continue and Discard Changes'
+          confirm={true}
         />
-      :
-        <div className={classNames({
-          'builder': true,
-          'builder-no-column-animation': this.state.noColumnAnimation,
-        })}>
-          <Tabs
-            actions={
-              this.shouldSave() ? this.tabActionsShouldSave : this.tabActions
-            }
-            config={config}
-            ref='tabs'
-            history={this.props.history}
-          />
-          <div className='tabs-content'>
-            <LayoutManager layout={this.getLayout()} moveTo={this.moveColumn} />
-          </div>
-        </div>
+      </div>
     );
 	}
 };
 
-export default DragDropContext(HTML5Backend)(Builder);
+export default withRouter(DragDropContext(HTML5Backend)(Builder));

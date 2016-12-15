@@ -77,6 +77,7 @@ export module BrowserTypes
     deckOpen: true,
     
     isDefault: false,
+    dirty: false,
 
     cards: Immutable.List([]),
     inputs: Immutable.List([]),
@@ -101,6 +102,7 @@ export module BrowserTypes
     deckOpen: boolean;
     
     isDefault: boolean;
+    dirty: boolean;
 
     cards: List<BuilderTypes.ICard>;
     inputs: List<BuilderTypes.IInput>;

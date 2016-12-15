@@ -52,7 +52,7 @@ var Immutable = require('immutable');
 //  of this file sets all of the values equal to the keys.
 // So you end up with ActionTypes.cards.move === 'cards.move'
 
-var BuilderActionTypes = 
+export var BuilderActionTypes = 
 {
   create: '',
   change: '',
@@ -100,5 +100,19 @@ var setValuesToKeys = (obj: any, prefix: string) =>
 }
 
 setValuesToKeys(BuilderActionTypes, '');
+
+export let BuilderDirtyActionTypes = {};
+
+// which actions dirty the state?
+[
+  BuilderActionTypes.create,
+  BuilderActionTypes.change,
+  BuilderActionTypes.move,
+  BuilderActionTypes.remove,
+  BuilderActionTypes.nestedMove,
+  BuilderActionTypes.setVariantField,
+  BuilderActionTypes.dropCard,
+  BuilderActionTypes.toggleDeck,
+].map(type => BuilderDirtyActionTypes[type] = true);
 
 export default BuilderActionTypes;

@@ -53,7 +53,7 @@ import {BuilderState} from './BuilderStore.tsx';
 import {_IResultsConfig} from './../components/results/ResultsConfig.tsx';
 import Util from '../../util/Util.tsx';
 
-const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
+let BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
 {
   
 [ActionTypes.fetch]:
@@ -333,7 +333,5 @@ function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
   
   return state;
 }
-
-
 
 export default BuidlerReducers;

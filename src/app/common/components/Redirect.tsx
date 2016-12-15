@@ -45,6 +45,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import InfoArea from './InfoArea.tsx';
 import PureClasss from '../../common/components/PureClasss.tsx';
+const {browserHistory} = require('react-router');
 
 interface Props
 {
@@ -55,7 +56,7 @@ class Placeholder extends PureClasss<Props>
 {
   componentWillMount()
   {
-    this.props.history.replaceState({}, '/browser');
+    browserHistory.replace('/browser');
   }
   
   render() {

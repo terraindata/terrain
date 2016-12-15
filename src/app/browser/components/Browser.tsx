@@ -58,11 +58,11 @@ import { DragDropContext } from 'react-dnd';
 import InfoArea from './../../common/components/InfoArea.tsx';
 import Loading from './../../common/components/Loading.tsx';
 var HTML5Backend = require('react-dnd-html5-backend');
+const {browserHistory} = require('react-router');
 
 interface Props
 {
   params?: any;
-  history?: any;
   location?: {
     pathname: string;
   };
@@ -92,7 +92,7 @@ class Browser extends PureClasss<Props>
       let path = localStorage.getItem('lastBrowserPath');
       if(path)
       {
-        this.props.history.replaceState({}, path);
+        browserHistory.replace(path);
       }
     }
   }
@@ -166,17 +166,17 @@ class Browser extends PureClasss<Props>
               
               if(!variant)
               {
-                this.props.history.replaceState({}, `/browser/${groupId}/${algorithmId}`);    
+                browserHistory.replace(`/browser/${groupId}/${algorithmId}`);    
               }
             }
           } else {
             // !algorithm
-            this.props.history.replaceState({}, `/browser/${groupId}`);
+            browserHistory.replace(`/browser/${groupId}`);
           }
         }
       } else {
         // !group
-        this.props.history.replaceState({}, '/browser');
+        browserHistory.replace('/browser');
       }
     }
     
@@ -196,7 +196,6 @@ class Browser extends PureClasss<Props>
           }}
         />
         <VariantsColumn
-          history={this.props.history}
           {...{
             variants,
             variantsOrder,
@@ -205,7 +204,6 @@ class Browser extends PureClasss<Props>
           }}
         />
         <BrowserInfoColumn
-          history={this.props.history}
           {...{
             group,
             algorithm,

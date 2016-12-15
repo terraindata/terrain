@@ -56,8 +56,8 @@ var $ = (type: string, payload: any) => Store.dispatch({type, payload})
 var BuilderActions =
 {
   change:
-    (keyPath: KeyPath, value: any) =>
-      $(ActionTypes.change, { keyPath, value }),
+    (keyPath: KeyPath, value: any, notDirty = false) =>
+      $(ActionTypes.change, { keyPath, value, notDirty }),
   
   create:
     (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
