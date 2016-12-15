@@ -52,6 +52,7 @@ import LayoutManager from "../layout/LayoutManager.tsx";
 import PanelMixin from "../layout/PanelMixin.tsx";
 import InfoArea from "./../../../common/components/InfoArea.tsx";
 import Classs from './../../../common/components/Classs.tsx';
+import PureClasss from './../../../common/components/PureClasss.tsx';
 // import BrowserStore from './../../../browser/data/BrowserStore.tsx';
 // import BrowserActions from './../../../browser/data/BrowserActions.tsx';
 import BuilderStore from './../../../builder/data/BuilderStore.tsx';
@@ -209,11 +210,12 @@ interface TabsProps
     text: string;
     icon: any;
     onClick: () => void;
+    enabled?: boolean;
   }>;
   history: any;
 }
 
-class Tabs extends Classs<TabsProps> {
+class Tabs extends PureClasss<TabsProps> {
   state = {
     variants: null,
     tabs: null,
@@ -288,10 +290,10 @@ class Tabs extends Classs<TabsProps> {
     
   }
   
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(nextState.tabs, this.state.tabs);
-  }
+  // shouldComponentUpdate(nextProps, nextState)
+  // {
+  //   return !_.isEqual(nextState.tabs, this.state.tabs);
+  // }
   
   moveTabs(index: number, destination: number)
   {
@@ -312,12 +314,19 @@ class Tabs extends Classs<TabsProps> {
         {
           this.props.actions.map((action, index) => 
             <a
-              className='tabs-action'
+              className={classNames({
+                'tabs-action': true,
+                'tabs-action-enabled': action.enabled || action.enabled === undefined,
+              })}
               key={index}
               onClick={action.onClick}
-              data-tip={action.text}
             >
-              {action.icon}
+              <div className='tabs-action-piece'>
+                {action.icon}
+              </div>
+              <div className='tabs-action-piece'>
+              {action.text}
+              </div>
             </a>)
         }
       </div>
@@ -372,7 +381,6 @@ class Tabs extends Classs<TabsProps> {
   
 	render()
   {
-
     let { tabs } = this.state;
     
     var tabsLayout =

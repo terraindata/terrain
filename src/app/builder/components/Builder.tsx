@@ -101,6 +101,8 @@ class Builder extends PureClasss<Props>
     manualIndex: number;
     
     curDb: string;
+    
+    initialQuery: IQuery;
   } = {
     builder: Store.getState(),
     colKeys: null,
@@ -109,6 +111,7 @@ class Builder extends PureClasss<Props>
     selectedCardName: '',
     manualIndex: -1,
     curDb: '',
+    initialQuery: null,
   };
   
   initialColSizes: any;
@@ -117,8 +120,22 @@ class Builder extends PureClasss<Props>
   {
     super(props);
     
+    this.state.initialQuery = this.getSelectedQuery();
+    
     this._subscribe(Store, {
       stateKey: 'builder',
+      updater: (state:BuilderState) => 
+      {
+        let queryId = this.getSelectedId();
+        let query = state.queries.get(queryId);
+        if(!this.state.builder.queries.get(queryId) && query)
+        {
+          // wasn't set before, need to set it now
+          this.setState({
+            initialQuery: query,
+          });
+        }
+      }
     });
     
     if(localStorage.getItem('colKeys'))
@@ -151,7 +168,6 @@ class Builder extends PureClasss<Props>
   
   componentWillMount()
   {
-    console.log('mount');
     this.checkConfig(this.props);
     RolesActions.fetch();
     this.loadTables(this.props);
@@ -326,6 +342,21 @@ class Builder extends PureClasss<Props>
   }
   
   tabActions = Immutable.List([
+    {
+      text: 'Save',
+      icon: <SaveIcon />,
+      onClick: _.noop,
+      enabled: false,
+    },
+  ]);
+  tabActionsShouldSave = Immutable.List([
+    {
+      text: 'Save',
+      icon: <SaveIcon />,
+      onClick: this.onSave,
+      enabled: true,
+    },
+  ]);
   //   {
   //     text: 'Duplicate',
   //     icon: <DuplicateIcon />,
@@ -336,12 +367,6 @@ class Builder extends PureClasss<Props>
   //     icon: <OpenIcon />,
   //     onClick: this.loadAlgorithm,
   //   },
-    {
-      text: 'Save',
-      icon: <SaveIcon />,
-      onClick: this.onSave,
-    },
-  ]);
   
   onSave()
   {
@@ -380,16 +405,24 @@ class Builder extends PureClasss<Props>
       0
     );
   }
-
+  
+  shouldSave(): boolean
+  {
+    return this.getSelectedQuery() !== this.state.initialQuery;
+  }
+  
   save()
   {
+    let query = this.getSelectedQuery();
     Ajax.saveItem(
-      BrowserTypes.variantForSave(
-        this.state.builder.queries.get(this.getSelectedId()) as BrowserTypes.Variant
-      ),
+      BrowserTypes.variantForSave(query as BrowserTypes.Variant),
       this.onSaveSuccess,
       this.onSaveError
     );
+    
+    this.setState({
+      initialQuery: query,
+    });
     
     var configArr = window.location.pathname.split('/')[2].split(',');
     var currentVariant;
@@ -582,7 +615,9 @@ class Builder extends PureClasss<Props>
           'builder-no-column-animation': this.state.noColumnAnimation,
         })}>
           <Tabs
-            actions={this.tabActions}
+            actions={
+              this.shouldSave() ? this.tabActionsShouldSave : this.tabActions
+            }
             config={config}
             ref='tabs'
             history={this.props.history}

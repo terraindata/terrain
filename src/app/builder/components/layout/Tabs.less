@@ -236,17 +236,47 @@
     height: 100%;
     padding-left: 12px;
     padding-right: 6px;
-    padding-top: 2px;
+    padding-top: 0px;
     font-size: @small-font-size;
     
     color: rgba(255,255,255,0.8);
     
     .tabs-action {
       // height: 35px;
+      .bold-normal-white-text;
       display: inline-block;
-      padding: 0px 5px;
-      margin-top: 7px;
+      padding: 4px 6px;
+      margin-top: 6px;
       cursor: pointer;
+      border-radius: 6px;
+      
+      svg {
+        .transition;
+        fill: #fff;
+        opacity: 0.75;
+        width: 14px;
+      }
+      
+      .transition;
+      border: 1px solid rgba(255,255,255,0.5);
+      
+      opacity: 0.5;
+      
+      &.tabs-action-enabled {
+        opacity: 1;
+        &:hover {
+          border-color: rgba(255,255,255,0.75);
+          svg {
+            opacity: 0.9;
+          }
+        }
+        &:active {
+          border-color: #fff;
+          svg {
+            opacity: #fff;
+          }
+        }
+      }
       
       // border-left: 1px solid rgba(255,255,255,0.6);
       // &:first-child, &.tabs-action-no-divider {
@@ -255,18 +285,11 @@
       
       .transition;
       
-      svg {
-        .transition;
-        fill: rgba(255,255,255,0.6);
-        width: 16px;
+      .tabs-action-piece {
+        display: inline-block;
+        vertical-align: middle;
+        padding: 0px 3px;
       }
-     
-      &:hover {
-        color: #fff;
-        svg {
-          fill: #fff;
-        }
-      } 
     }
   }
 }
