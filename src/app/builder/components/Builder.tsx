@@ -427,6 +427,8 @@ class Builder extends PureClasss<Props>
     {
       BrowserActions.variants.change(v as BrowserTypes.Variant);
     }
+    
+    Actions.change(List(['isDirty']), false, true);
   }
 
   onSaveError()

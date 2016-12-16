@@ -2160,7 +2160,9 @@ declare module "react" {
 declare namespace JSX {
     import React = __React;
 
-    interface Element extends React.ReactElement<any> { }
+    interface Element extends React.ReactElement<any> {
+      offsetTop: number;
+    }
     interface ElementClass extends React.Component<any, any> {
         render(): JSX.Element;
     }

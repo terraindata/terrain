@@ -142,6 +142,33 @@ class Autocomplete extends PureClasss<Props>
     });
   }
   
+  selectIndex(index: number)
+  {
+    // scroll option into view if necessary
+    let ac = ReactDOM.findDOMNode(this.refs['ac']);
+    let opt = ReactDOM.findDOMNode(this.refs['opt' + index]);
+    if(ac && opt)
+    {
+      let acMin = ac.scrollTop;
+      let acMax = ac.scrollTop +  ac.clientHeight;
+      let oMin = opt['offsetTop'];
+      let oMax = opt['offsetTop'] + opt.clientHeight;
+      
+      if(oMin < acMin)
+      {
+        ac.scrollTop = oMin;
+      }
+      if(oMax > acMax)
+      {
+        ac.scrollTop += (oMax - acMax);
+      }
+    }
+    
+    this.setState({
+      selectedIndex: index,
+    });
+  }
+  
   handleKeydown(event)
   {
     if(!this.props.options)
@@ -153,15 +180,11 @@ class Autocomplete extends PureClasss<Props>
     {
       case 38:
         // up
-        this.setState({
-          selectedIndex: Math.max(this.state.selectedIndex - 1, -1),
-        });
+        this.selectIndex(Math.max(this.state.selectedIndex - 1, -1));
         break;
       case 40:
         // down
-        this.setState({
-          selectedIndex: Math.min(this.state.selectedIndex + 1, visibleOptions.size - 1),
-        });
+        this.selectIndex(Math.min(this.state.selectedIndex + 1, visibleOptions.size - 1));
         break;
       case 13:
       case 9:
@@ -231,6 +254,7 @@ class Autocomplete extends PureClasss<Props>
         onMouseDown={this.handleSelect}
         value={option}
         key={option}
+        ref={'opt' + index}
       >
         { first }<b>{ second }</b>{ third }
       </div>
@@ -263,6 +287,7 @@ class Autocomplete extends PureClasss<Props>
               'ac-options': true,
               'ac-options-open': this.state.open,
             })}
+            ref='ac'
           >
             { 
               options.map(this.renderOption)
