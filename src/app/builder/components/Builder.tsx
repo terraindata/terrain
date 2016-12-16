@@ -642,7 +642,7 @@ class Builder extends PureClasss<Props>
     browserHistory.push('/browser');
   }
   
-  handleSaveModalClose()
+  handleModalCancel()
   {
     this.setState({
       leaving: false,
@@ -650,8 +650,18 @@ class Builder extends PureClasss<Props>
   }
   
   confirmedLeave: boolean = false;
-  handleSaveModalConfirm()
+  handleModalDontSave()
   {
+    this.confirmedLeave = true;
+    this.setState({
+      leaving: false,
+    });
+    browserHistory.push(this.state.nextLocation);
+  }
+  
+  handleModalSave()
+  {
+    this.save();
     this.confirmedLeave = true;
     this.setState({
       leaving: false,
@@ -693,12 +703,14 @@ class Builder extends PureClasss<Props>
         }
         <Modal
           open={this.state.leaving}
-          message={'You have unsaved changes' + (query ? ' to ' + query.name : '') + '. Are you sure you want to leave?'}
-          onClose={this.handleSaveModalClose}
-          onConfirm={this.handleSaveModalConfirm}
+          message={'Save changes' + (query ? ' to ' + query.name : '') + ' before leaving?'}
           title='Unsaved Changes'
-          confirmButtonText='Continue and Discard Changes'
+          confirmButtonText='Save'
           confirm={true}
+          onClose={this.handleModalCancel}
+          onConfirm={this.handleModalSave}
+          thirdButtonText="Don't Save"
+          onThirdButton={this.handleModalDontSave}
         />
       </div>
     );

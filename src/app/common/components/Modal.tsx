@@ -64,6 +64,8 @@ interface Props
   onConfirm?: () => void; 
   onClose: () => void;
   children?: any;
+  thirdButtonText?: string;
+  onThirdButton?: () => void;
 }
 
 class Modal extends Classs<Props>   
@@ -133,9 +135,23 @@ class Modal extends Classs<Props>
             {
               this.props.confirm &&
              		<div className ='modal-buttons'>
+                  {
+                    this.props.thirdButtonText &&
+                      <div
+                        className='button modal-third-button'
+                        onClick={this.props.onThirdButton}
+                      >
+                        {
+                          this.props.thirdButtonText
+                        }
+                      </div>   
+                  }
               		{
              				this.props.confirm ? 
-             					<div className='button modal-confirm-button' onClick={this.closeModalSuccess}>
+             					<div
+                         className='button modal-confirm-button'
+                         onClick={this.closeModalSuccess}
+                      >
              						{
                            this.props.confirmButtonText ? this.props.confirmButtonText : 'Continue'
                         }
@@ -143,7 +159,10 @@ class Modal extends Classs<Props>
              					: 
              					<div />
              			}
-                  <div className='button modal-close-button' onClick={this.props.onClose}>
+                  <div
+                    className='button modal-close-button'
+                    onClick={this.props.onClose}
+                  >
                     Cancel
                   </div>
               	</div>
