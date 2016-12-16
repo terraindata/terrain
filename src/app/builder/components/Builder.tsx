@@ -186,12 +186,29 @@ class Builder extends PureClasss<Props>
       // ^ need to pass in the most recent state, because when you've navigated away
       // in a dirty state, saved on the navigation prompt, and then returned,
       // Builder's copy of the state gets out of date at this point
+      
+      let path = nextLocation.pathname;
+      let pieces = path.split('/');
+      if(pieces[1] === 'builder' && pieces[2])
+      {
+        let config = pieces[2].split(',');
+        if(config.indexOf('!' + this.getSelectedId()) !== -1)
+        {
+          // current opened variant is still open, move along.
+          // TODO
+          // return  true;
+          // note: don't currently return true because that resets unsaved changes in open v
+          //  but when we redo how the stores work, then that shouldn't happen.
+        }
+      }
+      
       this.setState({
         leaving: true,
         nextLocation,
       });
       return false;
     }
+    
     return true;
   }
   
@@ -277,15 +294,13 @@ class Builder extends PureClasss<Props>
   
   checkConfig(props:Props)
   {
-    console.log('check config');
     let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query && props.location.query.o;
     let originalConfig = props.params.config || storedConfig;
     let newConfig = originalConfig;
-    console.log(open);
+    
     if(open)
     {
-      console.log('open');
       if(!storedConfig || storedConfig === 'undefined' || storedConfig === '')
       {
         // no stored config, just load the open tab.
@@ -304,19 +319,17 @@ class Builder extends PureClasss<Props>
         
         newConfig = configArr.join(',');
       }
-      console.log('after', newConfig);
     }
     
     if(newConfig && newConfig.length && !newConfig.split(',').some(c => c.substr(0,1) === '!'))
     {
       newConfig = '!' + newConfig;
     }
-    console.log('finally', newConfig);
+    
     if(newConfig !== props.params.config 
       && (props.params.config !== undefined || newConfig.length)
       )
     {
-      console.log('replace');
       browserHistory.replace(`/builder/${newConfig}`);
     }
     localStorage.setItem('config', newConfig || '');
