@@ -726,6 +726,7 @@ var TransformChart = {
     point.attr('active', '1');
     var move = function(event) {
       var newY = scales.realPointY.invert(d3.mouse(t)[1]);
+      newY = Util.valueMinMax(newY, 0, 1);
       var newX = scales.realX.invert(d3.mouse(t)[0]);
       var cx = scales.realX.invert(parseFloat(point.attr('cx')));
       var pointValues = d3.select(el).selectAll('.point')[0].map(function(point:any) {
