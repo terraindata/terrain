@@ -169,6 +169,7 @@ class Builder extends PureClasss<Props>
   
   componentDidMount()
   {
+    this.checkConfig(this.props);
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
   
@@ -180,15 +181,17 @@ class Builder extends PureClasss<Props>
       return true;
     }
     
-    if(this.shouldSave())
+    if(this.shouldSave(Store.getState()))
     {
+      // ^ need to pass in the most recent state, because when you've navigated away
+      // in a dirty state, saved on the navigation prompt, and then returned,
+      // Builder's copy of the state gets out of date at this point
       this.setState({
         leaving: true,
         nextLocation,
       });
       return false;
     }
-    
     return true;
   }
   
@@ -256,11 +259,11 @@ class Builder extends PureClasss<Props>
     if(nextProps.params.config !== this.props.params.config)
     {
       this.confirmedLeave = false;
-      this.checkConfig(nextProps);
-      if(!this.props.location.query || !this.props.location.query.o)
+      if(!nextProps.location.query || !nextProps.location.query.o)
       {
-        this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+        this.props.router.setRouteLeaveHook(nextProps.route, this.routerWillLeave);
       }
+      this.checkConfig(nextProps);
     }
     
     if(this.getSelectedId() !== this.getSelectedId(nextProps))
@@ -274,13 +277,15 @@ class Builder extends PureClasss<Props>
   
   checkConfig(props:Props)
   {
+    console.log('check config');
     let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query && props.location.query.o;
     let originalConfig = props.params.config || storedConfig;
     let newConfig = originalConfig;
-
+    console.log(open);
     if(open)
     {
+      console.log('open');
       if(!storedConfig || storedConfig === 'undefined' || storedConfig === '')
       {
         // no stored config, just load the open tab.
@@ -299,17 +304,19 @@ class Builder extends PureClasss<Props>
         
         newConfig = configArr.join(',');
       }
+      console.log('after', newConfig);
     }
     
     if(newConfig && newConfig.length && !newConfig.split(',').some(c => c.substr(0,1) === '!'))
     {
       newConfig = '!' + newConfig;
     }
-    
+    console.log('finally', newConfig);
     if(newConfig !== props.params.config 
       && (props.params.config !== undefined || newConfig.length)
       )
     {
+      console.log('replace');
       browserHistory.replace(`/builder/${newConfig}`);
     }
     localStorage.setItem('config', newConfig || '');
@@ -428,6 +435,7 @@ class Builder extends PureClasss<Props>
       BrowserActions.variants.change(v as BrowserTypes.Variant);
     }
     
+    console.log('action');
     Actions.change(List(['isDirty']), false, true);
   }
 
@@ -441,7 +449,7 @@ class Builder extends PureClasss<Props>
     );
   }
   
-  shouldSave(): boolean
+  shouldSave(overrideState?:BuilderState): boolean
   {
     let query = this.getSelectedQuery();
     if(query)
@@ -459,7 +467,7 @@ class Builder extends PureClasss<Props>
       }
     }
     
-    return this.state.builder.isDirty;
+    return (overrideState || this.state.builder).isDirty;
   }
   
   save()

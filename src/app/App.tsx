@@ -74,6 +74,7 @@ import Login from "./auth/components/Login.tsx";
 import InfoArea from "./common/components/InfoArea.tsx";
 import Placeholder from "./common/components/Placeholder.tsx";
 import Redirect from "./common/components/Redirect.tsx";
+import Logout from "./common/components/Logout.tsx";
 import ManualWrapper from "./manual/components/ManualWrapper.tsx";
 var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
 import { Router, Route, IndexRoute } from 'react-router';
@@ -183,11 +184,6 @@ var App = React.createClass({
     })
   },
   
-  handleLogout()
-  {
-    AuthActions.logout();
-  },
-  
   renderApp()
   {
     if(!this.state.loggedIn)
@@ -244,9 +240,7 @@ var App = React.createClass({
           this.state.loggedIn &&
             <div className='app-top-bar'>
               <TerrainIcon className='app-top-bar-icon' />
-               <AccountDropdown 
-                 onLogout={this.handleLogout} 
-               />
+               <AccountDropdown />
             </div>
         }
         <div className='app-wrapper'>
@@ -302,6 +296,8 @@ var router = (
       <Route path="/users/:username" component={Profile} />
       
       <Route path="/reporting" component={Placeholder} />
+      
+      <Route path="/logout" component={Logout} />
       
       <Route path="/x" component={X} />
       <Route path="/x/:x" component={X} />

@@ -61,7 +61,6 @@ var EditIcon = require("./../../../images/icon_edit.svg");
 var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
 
 interface Props {
-  onLogout: () => void;
 }
 
 class AccountDropdown extends Classs<Props>
@@ -136,6 +135,11 @@ class AccountDropdown extends Classs<Props>
   {
     browserHistory.push(url);
   }
+  
+  handleLogout()
+  {
+    this.go('/logout');
+  }
 
   renderDropdown()
   {
@@ -162,7 +166,7 @@ class AccountDropdown extends Classs<Props>
              My Team
           </div>        
         </div>
-        <div className="account-dropdown-row" onMouseDown={this.props.onLogout}>
+        <div className="account-dropdown-row" onMouseDown={this.handleLogout}>
           <div className='account-dropdown-icon account-dropdown-icon-blue'>
             <LogoutIcon/>
           </div>
