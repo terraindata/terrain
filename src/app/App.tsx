@@ -97,6 +97,7 @@ import AuthStore from "./auth/data/AuthStore.tsx";
 import UserActions from "./users/data/UserActions.tsx";
 import { InAppNotification } from './common/components/InAppNotification.tsx';
 import DeployModal from './deploy/components/DeployModal.tsx';
+import EasterEggs from './x/components/EasterEggs.tsx';
 
 var links = 
 [
@@ -265,6 +266,7 @@ var App = React.createClass({
 
         <InAppNotification />
         
+        <EasterEggs />
       </div>
     );
   },
