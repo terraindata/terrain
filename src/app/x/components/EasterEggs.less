@@ -11,11 +11,17 @@
   
   @keyframes xflash {
     0% { background: rgba(255,100,100,0.15); }
+    15% { background: rgba(255,100,100,0); }
+    
+    35% { background: rgba(100,255,100,0); }
     50% { background: rgba(100,255,100,0.15); }
+    65% { background: rgba(100,255,100,0); }
+    
+    85% { background: rgba(255,100,100,0); }
     100% { background: rgba(255,100,100,0.15); }
   }
   
-  animation: xflash 5s infinite;
+  animation: xflash 10s infinite;
   
   .snow {
     background: #fff;
