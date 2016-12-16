@@ -51,58 +51,103 @@ import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import Util from '../../util/Util.tsx';
-
+const r = 3;
 interface Props {
 }
 
 class EasterEggs extends PureClasss<Props>   
 {
-  state = {
-    christmas: true,
+  state: {
+    christmas: boolean;
+    snow: Immutable.List<{ x: number, y: number, moving: boolean }>;
+    buckets: Immutable.List<number>;
+    w: number;
+    h: number;
+  } = {
+    christmas: false,
+    snow: null,
+    buckets: null,
+    w: 0,
+    h: 0,
   };
   
   componentDidMount()
   {
-    setTimeout(this.startChristmas, 200);
+    // setTimeout(this.startChristmas, 200);
+    let keys = [];
+    $('body').keydown((evt) =>
+    {
+      keys.unshift(evt.keyCode);
+      if(keys[0] === 39 && keys[1] === 37 && keys[2] === 39 && keys[3] === 37 && keys[4] === 40
+        && keys[5] === 40 && keys[6] === 38 && keys[7] === 38)
+      {
+        this.startChristmas();
+        $('body').keydown(null);
+      }
+    })
+  }
+  
+  dropSnow()
+  {
+    let {buckets, snow, w, h} = this.state;
+    if(!buckets || !snow) return;
+    
+    // new snow
+    let c = Util.randInt(4);
+    _.range(0, c).map(q =>
+    {
+      let y = Math.floor(h / r);
+      let x = Util.randInt(w / r);
+      
+      snow = snow.push({ x, y, moving: true });
+    });
+    
+    snow = snow.map(s =>
+    {
+      if(!s.moving)
+      {
+        return s;
+      }
+      
+      let {x, y} = s;
+      if(buckets.get(x) >= y)
+      {
+        buckets = buckets.set(x, buckets.get(x) + 1);
+        return {
+          x, y, moving: false
+        };
+      }
+      
+      y --;
+      let newx = Util.valueMinMax(x + Util.randInt(3) - 1, 0, Math.floor(w / r));
+      if(buckets.get(newx) < y)
+      {
+        x = newx;
+      }
+      
+      return { x, y, moving: true };
+    }).toList();
+    
+    this.setState({
+      snow, buckets
+    })
   }
   
   startChristmas()
   {
     let w = $('body').width();
     let h = $('body').height();
-    let r = 3;
-    let buckets = _.range(0, w / r).map(i => 0);
+    let buckets = Immutable.List(_.range(0, w / r).map(i => 0));
+    let snow = Immutable.List([]);
+    this.setState({
+      buckets,
+      snow,
+      w,
+      h,
+      christmas: true,
+    });
     
-    let dropSnow = () =>
-    {
-      let c = Util.randInt(4);
-      _.range(0, c).map(q =>
-      {
-        let id = 'a' + Util.randInt(1000000);
-        let b = Util.randInt(buckets.length);
-        let y = Math.floor(h / r);
-        let x = b;
-        
-        $('#snow').append(
-          `<div class="snow" id="${id}" style="left:${x * r}px; bottom:${y * r}px; width:${r}px; height:${r}px;"></div>`
-        );
-        
-        let int = setInterval(() =>
-        {
-          y --;
-          x += Util.randInt(3) - 1;
-          
-          if(buckets[x] >= y)
-          {
-            buckets[x] ++;
-            clearInterval(int);
-          }
-          $('#' + id).css('left', x * r + 'px').css('bottom', y * r + 'px');
-        }, 100);
-      });
-    }
-    // dropSnow();
-    setInterval(dropSnow, 100);
+    setInterval(this.dropSnow, 100);
   }
   
   render() 
@@ -110,10 +155,26 @@ class EasterEggs extends PureClasss<Props>
     if(this.state.christmas)
     {
       return (
-        <div className='snow-egg' id='snow'>
+        <div className='snow-egg'>
+          {
+            this.state.snow && this.state.snow.map(s =>
+              <div
+                className='snow'
+                style={{
+                  width: r,
+                  height: r,
+                  left: s.x * r,
+                  bottom: s.y * r,
+                }}
+              />
+            )
+          }
+          <iframe className="youtube-player" type="text/html" src="http://www.youtube.com/embed/6b9BKK27HuQ?wmode=opaque&autohide=1&autoplay=1">&lt;br /&gt;</iframe>
         </div>
       );
     }
+    
+    return null;
   }
 }
 
