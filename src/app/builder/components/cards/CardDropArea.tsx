@@ -292,7 +292,8 @@ const cardCanWrap = (targetProps:Props, cardType:string) =>
 // as neighbor
 const cardCanAccept = (targetProps:Props, cardType:string) =>
 {
-  return targetProps.accepts && targetProps.accepts.indexOf(cardType) !== -1;
+  return (targetProps.accepts && targetProps.accepts.indexOf(cardType) !== -1)
+    || BuilderTypes.Blocks[cardType].static.anythingAccepts;
 }
 
 const cardCouldWrap = (targetProps:Props, item:CardItem) =>

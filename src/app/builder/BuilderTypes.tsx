@@ -224,6 +224,8 @@ export module BuilderTypes
       tqlGlue?: string;
       topTql?: string;
       
+      anythingAccepts?: boolean;
+      
       // returns an object with default values for a new card
       init?: () => {
         [k:string]: any;
@@ -282,6 +284,7 @@ export module BuilderTypes
       tqlGlue?: string;
       topTql?: string;
       accepts?: List<string>;
+      anythingAccepts?: boolean; // if any card accepts this card
       
       getChildTerms?: (card: ICard) => List<string>;
       getNeighborTerms?: (card: ICard) => List<string>;
@@ -1271,6 +1274,7 @@ export module BuilderTypes
         colors: ["#278172", "#aefcef"],
         tql: "$clause",
         manualEntry: ManualConfig.cards.tql,
+        anythingAccepts: true,
         
         display: {
           displayType: DisplayType.TEXT,
