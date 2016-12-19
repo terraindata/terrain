@@ -159,7 +159,6 @@ class Result extends Classs<Props> {
     }
     
     var value = getResultValue(this.props.data, this.props.allFieldsData, field, this.props.config, overrideFormat);
-    
     let format = this.props.config && this.props.config.formats.get(field);
     let showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
@@ -385,8 +384,15 @@ class Result extends Classs<Props> {
 
 export function getResultValue(resultData, allFieldsData, field: string, config: IResultsConfig, overrideFormat?: any): string
 {
-  var value = (resultData && resultData[field]) ||(allFieldsData && allFieldsData[field]);
-  
+  var value: any;
+  if(resultData && resultData[field] !== undefined)
+  {
+    value = resultData[field];
+  }
+  else if(allFieldsData)
+  {
+    value = allFieldsData[field];
+  }
   return ResultFormatValue(field, value, config, overrideFormat);
 }
 
@@ -429,13 +435,11 @@ export function ResultFormatValue(field: string, value: string | number, config:
   let format = config && config.enabled && config.formats && config.formats.get(field);
   let {showRaw} = overrideFormat || format || { showRaw: false };
   var italics = false;
-  
   if(value === undefined)
   {
     value = 'undefined';
     italics = true;
   }
-  
   if(typeof value === 'boolean')
   {
     value = value ? 'true' : 'false';
