@@ -48,7 +48,6 @@ THE SOFTWARE.
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
 
-/// <reference types="react" />
 /// <reference path="./history.d.ts"/>
 
 

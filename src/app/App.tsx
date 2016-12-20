@@ -276,10 +276,18 @@ var router = (
       <Route path="/builder/:config" component={Builder} />
       <Route path="/builder/:config/:splitConfig" component={Builder} />
       
-      <Route path="/browser" component={Browser} />
-      <Route path="/browser/:groupId" component={Browser} />
-      <Route path="/browser/:groupId/:algorithmId" component={Browser} />
-      <Route path="/browser/:groupId/:algorithmId/:variantId" component={Browser} />
+      <Route path="/browser">
+        <IndexRoute component={Browser} />
+        <Route path=":groupId" component={Browser}>
+          <IndexRoute component={Browser} />
+          <Route path=":algorithmId" component={Browser}>
+            <IndexRoute component={Browser} />
+            <Route path=":variantId" component={Browser}>
+              <IndexRoute component={Browser} />
+            </Route>
+          </Route>
+        </Route>
+      </Route>
       
       <Route path="/account" component={Account}>
         <IndexRoute component={Profile} />

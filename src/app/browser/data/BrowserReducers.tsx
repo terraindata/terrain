@@ -82,7 +82,7 @@ let addGroup = (state, group, index?: number) =>
 
 BrowserReducers[ActionTypes.groups.create] =
   (state, action) =>
-    addGroup(state, BrowserTypes.newGroup().set('id', Util.getId()));
+    addGroup(state, BrowserTypes._Group());
 
 BrowserReducers[ActionTypes.groups.change] =
   (state, action) =>
@@ -124,8 +124,17 @@ BrowserReducers[ActionTypes.algorithms.create] =
   {
     let algId = Util.getId();
     return addVariant(
-      addAlgorithm(state, BrowserTypes.newAlgorithm(action.payload.groupId, algId)),
-      BrowserTypes.newVariant(algId, action.payload.groupId)
+      addAlgorithm(
+        state, 
+        BrowserTypes._Algorithm({
+          groupId: action.payload.groupId, 
+          algorithmId: algId,
+        })
+      ),
+      BrowserTypes._Variant({
+        alogirhtmId: algId, 
+        groupId: action.payload.groupId,
+      })
     );
   }
 
@@ -174,7 +183,12 @@ BrowserReducers[ActionTypes.algorithms.duplicate] =
 
 BrowserReducers[ActionTypes.variants.create] =
   (state, action) =>
-    addVariant(state, BrowserTypes.newVariant(action.payload.algorithmId, action.payload.groupId, Util.getId()));
+    addVariant(state, 
+      BrowserTypes._Variant({
+        algorithmId: action.payload.algorithmId, 
+        groupId: action.payload.groupId, 
+      })
+    );
 
 BrowserReducers[ActionTypes.variants.change] =
   (state, action) =>

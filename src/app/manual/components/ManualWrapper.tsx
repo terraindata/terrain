@@ -55,7 +55,6 @@ var HTML5Backend = require('react-dnd-html5-backend');
 
 interface Props
 {
-  history?: any;
   location?: any;
   params?: any;
 }
@@ -72,7 +71,6 @@ class ManualWrapper extends Classs<Props>
 		var selected = this.props.params['term'] || '';
 		return <Manual 
 			selectedKey={selected}
-			history={this.props.history}
 			manualTab={true}
 		/>;
 	}

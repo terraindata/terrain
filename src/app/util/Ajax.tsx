@@ -49,6 +49,7 @@ import Store from './../auth/data/AuthStore.tsx';
 import Actions from './../auth/data/AuthActions.tsx';
 import UserTypes from './../users/UserTypes.tsx';
 import RoleTypes from './../roles/RoleTypes.tsx';
+import BrowserTypes from './../browser/BrowserTypes.tsx';
 import Util from './../util/Util.tsx';
 
 export interface QueryResponse
@@ -270,7 +271,7 @@ export const Ajax = {
     });
   },
   
-  saveItem(item: Immutable.Map<string, any>, onLoad?: (resp: any) => void, onError?: (ev:Event) => void)
+  saveItem(item: BrowserTypes.Variant | BrowserTypes.Algorithm | BrowserTypes.Group, onLoad?: (resp: any) => void, onError?: (ev:Event) => void)
   {
     let id = item.get('id');
     let type = item.get('type');

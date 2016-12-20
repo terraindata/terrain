@@ -60,77 +60,54 @@ export module BrowserTypes
     Live,
   }
 
-  let _Variant = Immutable.Record(
+  class VariantC
   {
-    id: "",
-    name: "",
-    lastEdited: "",
-    lastUsername: "",
-    algorithmId: "",
-    groupId: "",
-    resultsConfig: null,
-    mode: "",
-    tql: "",
-    status: EVariantStatus.Build,
-    version: false,
-    db: 'urbansitter',
-    deckOpen: true,
+    id = "";
+    name = "";
+    lastEdited = "";
+    lastUsername = "";
+    algorithmId = "";
+    groupId = "";
+    resultsConfig = null;
+    mode = "";
+    tql = "";
+    status = EVariantStatus.Build;
+    version = false;
+    db = '';
+    deckOpen = true;
     
-    isDefault: false,
-    dirty: false,
+    isDefault = false;
 
-    cards: Immutable.List([]),
-    inputs: Immutable.List([]),
+    cards = Immutable.List([]);
+    inputs = Immutable.List([]);
     
     // for DB storage
-    type: "variant",
-    dbFields: ['groupId', 'algorithmId', 'status'],
-    dataFields: ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs', 'mode', 'tql', 'resultsConfig', 'db', 'deckOpen', 'isDefault'],    
-    statusMap: (s:EVariantStatus) => EVariantStatus[s],
-  });
-  export class Variant extends _Variant implements BuilderTypes.IQuery
-  {
-    id: ID;
-    name: string;
-    lastEdited: string;
-    lastUsername: string;
-    status: EVariantStatus;
-    algorithmId: ID;
-    groupId: ID;
-    resultsConfig: IResultsConfig;
-    db: string;
-    deckOpen: boolean;
-    
-    isDefault: boolean;
-    dirty: boolean;
-
-    cards: List<BuilderTypes.ICard>;
-    inputs: List<BuilderTypes.IInput>;
-    
-    mode: string;
-    tql: string;
-    version: boolean;
-    
-    type: string;
-    dbFields: string[]; // fields saved directly to DB
-    dataFields: string[]; // fields saved in metadata
+    type = "variant";
+    dbFields = ['groupId', 'algorithmId', 'status'];
+    dataFields = ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs', 'mode', 'tql', 'resultsConfig', 'db', 'deckOpen', 'isDefault'];    
   }
-  export function newVariant(algorithmId: string, groupId: string, id?: ID, name?: string, status?: EVariantStatus):Variant
-  {
-    return touchVariant(new Variant(Util.extendId({ algorithmId, groupId, id, name, status})));
+  export interface Variant extends VariantC, IRecord<Variant> {}
+  const Variant_Record = Immutable.Record(new VariantC());
+  export const _Variant = (config?:any) => {
+    let v = new Variant_Record(Util.extendId(config || {})) as any as Variant;
+    if(!config || !config.lastUsername || !config.lastEdited)
+    {
+      v = touchVariant(v);
+    }
+    return v;
   }
   
   export function touchVariant(v: Variant): Variant
   {
     return v.set('lastEdited', new Date())
-      .set('lastUsername', localStorage['username']) as Variant;
+      .set('lastUsername', localStorage['username']);
   }
   
   export function variantForSave(v: Variant): Variant
   {
     v = touchVariant(v);
-    v = v.set('cards', BuilderTypes.cardsForServer(v.cards)) as Variant;
-    v = v.set('resultsConfig', v.resultsConfig.toJS()) as Variant;
+    v = v.set('cards', BuilderTypes.cardsForServer(v.cards));
+    v = v.set('resultsConfig', v.resultsConfig.toJS());
     return v;
   }
   
@@ -141,43 +118,26 @@ export module BrowserTypes
     Live,
   }
 
-
-  let _Algorithm = Immutable.Record(
+  class AlgorithmC
   {
-    id: "",
-    name: "",
-    lastEdited: "",
-    lastUsername: "",
-    groupId: "",
-    variants: Immutable.Map({}),
-    variantsOrder: Immutable.List([]),
-    status: EAlgorithmStatus.Live,
+    id = "";
+    name = "";
+    lastEdited = "";
+    lastUsername = "";
+    groupId = "";
+    variants = Immutable.Map({});
+    variantsOrder = Immutable.List([]);
+    status = EAlgorithmStatus.Live;
     
     // for DB storage
-    type: "algorithm",
-    dbFields: ['groupId', 'status'],
-    dataFields: ['name', 'lastEdited', 'lastUsername', 'variantsOrder'],
-    statusMap: (s:EAlgorithmStatus) => EAlgorithmStatus[s],
-  });
-  export class Algorithm extends _Algorithm
-  {
-    id: ID;
-    name: string;
-    lastEdited: string;
-    lastUsername: string;
-    groupId: ID;
-    variants: Immutable.Map<ID, Variant>;
-    variantsOrder: Immutable.List<ID>;
-    status: EAlgorithmStatus;
-    
-    type: string;
-    dbFields: string[]; // fields saved directly to DB
-    dataFields: string[]; // fields saved in metadata
+    type = "algorithm";
+    dbFields = ['groupId', 'status'];
+    dataFields = ['name', 'lastEdited', 'lastUsername', 'variantsOrder'];
   }
-  export function newAlgorithm(groupId: string, id?: ID, name?: string, lastEdited?: string, lastUsername?: string,
-    variants?: Immutable.Map<ID, Variant>, variantsOrder?: Immutable.List<ID>, status?: EAlgorithmStatus):Algorithm
-  {
-    return new Algorithm(Util.extendId({ groupId, id, name, lastEdited, lastUsername, variants, variantsOrder, status }));
+  const Algorithm_Record = Immutable.Record(new AlgorithmC());
+  export interface Algorithm extends AlgorithmC, IRecord<Algorithm> {}
+  export const _Algorithm = (config?:any) => {
+    return new Algorithm_Record(Util.extendId(config || {})) as any as Algorithm;
   }
 
   export const groupColors =
@@ -200,42 +160,27 @@ export module BrowserTypes
     Archive,
     Live,
   }
-  let _Group = Immutable.Record(
+  
+  class GroupC
   {
-    id: "",
-    name: "",
-    lastEdited: "",
-    lastUsername: "",
-    usernames: Immutable.List([]),
-    algorithms: Immutable.Map({}),
-    algorithmsOrder: Immutable.List([]),
-    status: EGroupStatus.Live,
+    id = "";
+    name = "";
+    lastEdited = "";
+    lastUsername = "";
+    usernames = Immutable.List([]);
+    algorithms = Immutable.Map({});
+    algorithmsOrder = Immutable.List([]);
+    status = EGroupStatus.Live;
     
     // for DB storage
-    type: "group",
-    dbFields: ['status'],
-    dataFields: ['name', 'lastEdited', 'lastUsername', 'algorithmsOrder'],
-    statusMap: (s:EGroupStatus) => EGroupStatus[s],
-  });
-  export class Group extends _Group
-  {
-    id: ID;
-    name: string;
-    lastEdited: string;
-    lastUsername: string;
-    usernames: string[];
-    algorithms: Immutable.Map<ID, Algorithm>;
-    algorithmsOrder: Immutable.List<ID>;
-    status: EGroupStatus;
-    
-    type: string;
-    dbFields: string[]; // fields saved directly to DB
-    dataFields: string[]; // fields saved in metadata
+    type = "group";
+    dbFields = ['status'];
+    dataFields = ['name', 'lastEdited', 'lastUsername', 'algorithmsOrder'];
   }
-  export function newGroup(id?: ID, name?: string, lastEdited?: string, lastUsername?: string, usernames?: Immutable.List<ID>,
-    algorithms?: Immutable.Map<ID, Algorithm>, algorithmsOrder?: Immutable.List<ID>, status?: EGroupStatus):Group
-  {
-    return new Group(Util.extendId({ id, name, lastEdited, lastUsername, usernames, algorithms, algorithmsOrder, status }));
+  const Group_Record = Immutable.Record(new GroupC());
+  export interface Group extends GroupC, IRecord<Group> {}
+  export const _Group = (config?:any) => {
+    return new Group_Record(Util.extendId(config || {})) as any as Group;
   }
   
   export function nameForStatus(status:EVariantStatus): string

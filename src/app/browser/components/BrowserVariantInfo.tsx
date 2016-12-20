@@ -66,7 +66,6 @@ type Variant = BrowserTypes.Variant;
 interface Props
 {
   variant: Variant;
-  history?: any;
 }
 
 class BrowserInfoColumn extends PureClasss<Props>
@@ -210,7 +209,6 @@ class BrowserInfoColumn extends PureClasss<Props>
       
       <VariantVersions 
         variant={this.props.variant} 
-        history={this.props.history} 
       />
     </div>
     );

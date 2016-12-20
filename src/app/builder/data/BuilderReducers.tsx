@@ -131,7 +131,7 @@ let BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       v.cards = cards;
       v.inputs = inputs;
       v.resultsConfig = resultsConfig;
-      v = new BrowserTypes.Variant(v);
+      v = BrowserTypes._Variant(v);
     }
     
     return state.setIn(['queries', action.payload.variantId],

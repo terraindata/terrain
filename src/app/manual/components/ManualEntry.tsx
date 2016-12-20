@@ -70,7 +70,6 @@ interface Props
   canEdit: boolean;
   openTerm: (any) => void;
   spotlights?: any[];
-  history?: any;
   expanded: boolean;
   phraseType?: boolean;
   manualTab: boolean;
@@ -256,7 +255,7 @@ class ManualEntry extends Classs<Props>
       gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
     }
     var cards = Immutable.List([BuilderTypes.recordFromJS(this.state.manualEntry.text[index])]);
-    var query: BuilderTypes.IQuery = {
+    var query: any = {
       id: 'a',
       cards: cards,
       inputs: Immutable.List([]),

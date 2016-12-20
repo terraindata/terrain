@@ -245,7 +245,12 @@ class BrowserItem extends Classs<Props>
     
     return connectDropTarget((
       <div>
-        <Link to={this.props.to} className='browser-item-link' activeClassName='browser-item-active' onDoubleClick={this.handleDoubleClick}>
+        <Link 
+          to={this.props.to}
+          className='browser-item-link'
+          activeClassName='browser-item-active'
+          onDoubleClick={this.handleDoubleClick}
+        >
           <div
             className={classNames({
               'browser-item-wrapper': true,
@@ -254,10 +259,17 @@ class BrowserItem extends Classs<Props>
               'browser-item-wrapper-dragging': draggingItemId === this.props.id,
               'browser-item-wrapper-drag-over': draggingOver,
             })}
-            style={{borderColor:this.props.color}}
+            style={{
+              borderColor:this.props.color
+            }}
           >
             { connectDragSource(
-              <div className={'browser-item ' + this.props.className} style={{background:this.props.color}}>
+              <div
+                className={'browser-item ' + this.props.className}
+                style={{
+                  background:this.props.color
+                }}
+              >
                 <div
                   className={classNames({
                     'browser-item-title-bar': true,
@@ -269,7 +281,9 @@ class BrowserItem extends Classs<Props>
                     className='browser-item-name'
                     onDoubleClick={this.showTextfield}
                   >
-                    { this.props.name.length ? this.props.name : <em>Untitled</em> }
+                    { 
+                      this.props.name.length ? this.props.name : <em>Untitled</em> 
+                    }
                   </div>
                   <input
                     className='browser-item-name-input'
@@ -285,7 +299,9 @@ class BrowserItem extends Classs<Props>
                   />
                 </div>
                 <div className='browser-item-content'>
-                  { this.props['children'] }
+                  { 
+                    this.props['children']
+                  }
                 </div>
               </div>
             )}

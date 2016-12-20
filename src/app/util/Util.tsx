@@ -244,6 +244,10 @@ var Util = {
   
   extendId(obj: Object): Object
   {
+    if(obj['id'])
+    {
+      return obj;
+    }
     return _.extend({}, { id: Util.getId() }, _.omit(obj, value => value === undefined));
   },
   

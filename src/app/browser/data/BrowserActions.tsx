@@ -141,7 +141,7 @@ const Actions =
             alg.variants = Immutable.Map({});
           }
           alg.variants = alg.variants.set(variant.id, 
-            (new BrowserTypes.Variant(variant))
+            (BrowserTypes._Variant(variant))
               .set('cards', BuilderTypes.recordFromJS(variant.cards))
               .set('inputs', BuilderTypes.recordFromJS(variant.inputs))
           );
@@ -157,7 +157,7 @@ const Actions =
           {
             g.algorithms = Immutable.Map({});
           }
-          g.algorithms = g.algorithms.set(algorithm.id, new BrowserTypes.Algorithm(algorithm));
+          g.algorithms = g.algorithms.set(algorithm.id, BrowserTypes._Algorithm(algorithm));
         });
         
         var groupMap = {};
@@ -166,7 +166,7 @@ const Actions =
           {
             group.algorithmsOrder = Immutable.List(group.algorithmsOrder);
           }
-          groupMap[group.id] = new BrowserTypes.Group(group);
+          groupMap[group.id] = BrowserTypes._Group(group);
         });
         
         Actions.loadState(Immutable.fromJS({
