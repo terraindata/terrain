@@ -46,7 +46,7 @@ require('./VariantVersions.less');
 const classNames = require('classnames');
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss.tsx';
-import BrowserTypes from './../BrowserTypes.tsx';
+import LibraryTypes from './../LibraryTypes.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import UserTypes from './../../users/UserTypes.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
@@ -57,7 +57,7 @@ import RoleTypes from '../../roles/RoleTypes.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
 const {browserHistory} = require('react-router');
 
-type Variant = BrowserTypes.Variant;
+type Variant = LibraryTypes.Variant;
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
 

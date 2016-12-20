@@ -57,7 +57,7 @@ import CardsColumn from "./cards/CardsColumn.tsx";
 import ResultsArea from "./results/ResultsArea.tsx";
 import UserStore from '../../users/data/UserStore.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
-import BrowserTypes from '../../browser/BrowserTypes.tsx';
+import LibraryTypes from '../../library/LibraryTypes.tsx';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn.tsx';
 import InfoArea from '../../common/components/InfoArea.tsx';
 const shallowCompare = require('react-addons-shallow-compare');
@@ -357,10 +357,10 @@ var BuilderColumn = React.createClass<any, any>(
 
   render() {
     let {query} = this.props;
-    let canEdit = (query.status === BrowserTypes.EVariantStatus.Build
+    let canEdit = (query.status === LibraryTypes.EVariantStatus.Build
       && Util.canEdit(query, UserStore, RolesStore))
       || this.state.column === COLUMNS.Inputs;
-    let cantEditReason = query.status !== BrowserTypes.EVariantStatus.Build ?
+    let cantEditReason = query.status !== LibraryTypes.EVariantStatus.Build ?
       'This Variant is not in Build status' : 'You are not authorized to edit this Variant';
     
     return this.renderPanel((

@@ -42,90 +42,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./BrowserItemCategory.less');
+var _ = require('underscore');
+var Immutable = require('immutable');
+import Util from './../../util/Util.tsx';
 
-import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
-import { DragSource, DropTarget } from 'react-dnd';
+var create = '';
+var change = '';
+var move = '';
+var duplicate = '';
 
-interface Props
+var LibraryActionTypes = 
 {
-  status: string;
-  type: string;
-  onHover: (status: string, id: ID) => void;
-  connectDropTarget?: (c: any) => any;
-  titleHidden?: boolean;
-  dropDisabled?: boolean;
-}
-
-class BrowserItemCategory extends Classs<Props>
-{
-  state = {
-    open: true,
-  }
-  
-  constructor(props:Props)
-  {
-    super(props);
-    this.state.open = this.props.status !== 'Archive';
-  }
-  
-  toggleOpen()
-  {
-    this.setState({
-      open: !this.state.open,
-    });
-  }
-  
-  render()
-  { 
-    return this.props.connectDropTarget(
-      <div className={`browser-category browser-category-${this.props.status} browser-category-${this.state.open ? 'open' : 'closed'}`}>
-        { ! this.props.titleHidden &&
-          <div className='browser-category-title' onClick={this.toggleOpen}>
-            <div className='browser-category-title-symbol' />
-            <div className='browser-category-title-text'>
-              { 
-                this.props.status
-              }
-            </div>
-          </div>
-        }
-        <div className='browser-category-content'>
-          { this.props['children'] }
-        </div>
-      </div>
-    );
-  }
-}
-
-let canDrop = (props, monitor) =>
-{
-  let itemType = monitor.getItem().type;
-  if(itemType !== props.type)
-  {
-    return false;
-  }
-  
-  return !props.dropDisabled;
-};
-const target = 
-{
-  canDrop,
-  
-  hover(props, monitor, component)
-  {
-    if(canDrop(props, monitor))
-    {
-      let item = monitor.getItem();
-      props.onHover(props.status, item.id);
-    }
+  groups: 
+  { 
+    create, change, move, duplicate,
+    prevGroups: '',
   },
-}
+  
+  algorithms: 
+  {
+    create, change, move, duplicate,
+    switchGroup: '',
+  },
+  
+  variants:
+  {
+    create, change, move, duplicate,
+    status: '',
+    switchAlgorithm: '',
+    switchGroup: '', // move by itself onto a group, which should also create a new algorithm
+  },
+  
+  loadState: '',
+};
 
-const dropCollect = (connect, monitor) =>
-({
-  connectDropTarget: connect.dropTarget(),
-});
+Util.setValuesToKeys(LibraryActionTypes, '');
 
-export default DropTarget('BROWSER', target, dropCollect)(BrowserItemCategory);
+export default LibraryActionTypes;

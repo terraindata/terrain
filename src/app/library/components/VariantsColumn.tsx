@@ -46,15 +46,15 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import * as moment from 'moment';
 import Classs from './../../common/components/Classs.tsx';
-import BrowserColumn from './BrowserColumn.tsx';
-import BrowserItem from './BrowserItem.tsx';
-import BrowserItemCategory from './BrowserItemCategory.tsx';
+import LibraryColumn from './LibraryColumn.tsx';
+import LibraryItem from './LibraryItem.tsx';
+import LibraryItemCategory from './LibraryItemCategory.tsx';
 import CreateItem from '../../common/components/CreateItem.tsx';
-import BrowserTypes from './../BrowserTypes.tsx';
+import LibraryTypes from './../LibraryTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
 import Util from '../../util/Util.tsx';
-import Actions from './../data/BrowserActions.tsx';
+import Actions from './../data/LibraryActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import UserTypes from '../../users/UserTypes.tsx';
 import UserStore from '../../users/data/UserStore.tsx';
@@ -66,7 +66,7 @@ const {browserHistory} = require('react-router');
 
 var VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
 
-type Variant = BrowserTypes.Variant;
+type Variant = LibraryTypes.Variant;
 
 interface Props
 {
@@ -135,7 +135,7 @@ class VariantsColumn extends Classs<Props>
   handleArchive(id: ID)
   {
     Actions.variants.change(this.props.variants.find(v => v.id === id)
-      .set('status', BrowserTypes.EVariantStatus.Archive) as Variant);
+      .set('status', LibraryTypes.EVariantStatus.Archive) as Variant);
   }
   
   handleCreate()
@@ -225,7 +225,7 @@ class VariantsColumn extends Classs<Props>
       var canEdit = roles.getIn([this.props.groupId, me.username, 'builder'])
         || roles.getIn([this.props.groupId, me.username, 'admin']);
       var canDrag = canEdit && 
-        (vriant.status !== BrowserTypes.EVariantStatus.Live || 
+        (vriant.status !== LibraryTypes.EVariantStatus.Live || 
           roles.getIn([this.props.groupId, me.username, 'admin']));
     }
     
@@ -243,7 +243,7 @@ class VariantsColumn extends Classs<Props>
     }
     
     return (
-      <BrowserItem
+      <LibraryItem
         index={index}
         name={vriant.name}
         icon={<VariantIcon />}
@@ -253,8 +253,8 @@ class VariantsColumn extends Classs<Props>
         canDuplicate={canEdit}
         color={ColorManager.colorForKey(this.props.groupId)}
         key={vriant.id}
-        to={`/browser/${this.props.groupId}/${this.props.algorithmId}/${id}`}
-        className='browser-item-lightest'
+        to={`/library/${this.props.groupId}/${this.props.algorithmId}/${id}`}
+        className='library-item-lightest'
         id={id}
         type='variant'
         onNameChange={this.handleNameChange}
@@ -275,7 +275,7 @@ class VariantsColumn extends Classs<Props>
               noBorder={true}
             />
             <div 
-              className='browser-item-line'
+              className='library-item-line'
             >
               {
                 Util.formatDate(vriant.lastEdited)
@@ -283,21 +283,21 @@ class VariantsColumn extends Classs<Props>
             </div>
           </div>
         </div>
-      </BrowserItem>
+      </LibraryItem>
     );
   }
   
   handleVariantStatusHover(statusString: string, id: ID)
   {
     let v = this.props.variants.get(id);
-    let status = BrowserTypes.EVariantStatus[statusString];
+    let status = LibraryTypes.EVariantStatus[statusString];
     if(v.status !== status)
     {
       Actions.variants.change(v.set('status', status) as Variant);  
     }
   }
   
-  hasStatus(id: ID, status: BrowserTypes.EVariantStatus)
+  hasStatus(id: ID, status: LibraryTypes.EVariantStatus)
   {
     return this.props.variants.getIn([id, 'status']) === status;
   }
@@ -313,7 +313,7 @@ class VariantsColumn extends Classs<Props>
     // );
     
     return (
-      <BrowserItemCategory
+      <LibraryItemCategory
         status={archived ? 'Archive' : 'Build'}
         key={archived ? '1' : '0'}
         type='variant'
@@ -323,14 +323,14 @@ class VariantsColumn extends Classs<Props>
         {
           this.props.variantsOrder.map((id, index) =>
             this.props.variants.get(id) &&
-              (archived ? this.hasStatus(id, BrowserTypes.EVariantStatus.Archive) : !this.hasStatus(id, BrowserTypes.EVariantStatus.Archive))
+              (archived ? this.hasStatus(id, LibraryTypes.EVariantStatus.Archive) : !this.hasStatus(id, LibraryTypes.EVariantStatus.Archive))
               && this.renderVariant(id, index)
           )
         }
         {
-          this.props.variantsOrder.some(id => archived ? this.hasStatus(id, BrowserTypes.EVariantStatus.Archive) : !this.hasStatus(id, BrowserTypes.EVariantStatus.Archive))
+          this.props.variantsOrder.some(id => archived ? this.hasStatus(id, LibraryTypes.EVariantStatus.Archive) : !this.hasStatus(id, LibraryTypes.EVariantStatus.Archive))
           ? null
-          : <div className='browser-category-none'>None</div>
+          : <div className='library-category-none'>None</div>
         }
         {
           canCreate && !archived &&
@@ -339,14 +339,14 @@ class VariantsColumn extends Classs<Props>
               onCreate={this.handleCreate}
             />
         }
-      </BrowserItemCategory>
+      </LibraryItemCategory>
     );
   }
   
   render()
   {
     return (
-      <BrowserColumn
+      <LibraryColumn
         index={3}
         title='Variants'
       >
@@ -373,7 +373,7 @@ class VariantsColumn extends Classs<Props>
             )
           : null
         }
-      </BrowserColumn>
+      </LibraryColumn>
     );
   }
 }

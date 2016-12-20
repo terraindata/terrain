@@ -56,7 +56,7 @@ class Placeholder extends PureClasss<Props>
 {
   componentWillMount()
   {
-    browserHistory.replace('/browser');
+    browserHistory.replace('/library');
   }
   
   render() {

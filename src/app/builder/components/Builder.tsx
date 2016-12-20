@@ -63,9 +63,9 @@ import UserActions from '../../users/data/UserActions.tsx';
 import UserStore from '../../users/data/UserStore.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
 import RolesActions from '../../roles/data/RolesActions.tsx';
-import BrowserTypes from '../../browser/BrowserTypes.tsx';
-import BrowserStore from '../../browser/data/BrowserStore.tsx';
-import BrowserActions from '../../browser/data/BrowserActions.tsx';
+import LibraryTypes from '../../library/LibraryTypes.tsx';
+import LibraryStore from '../../library/data/LibraryStore.tsx';
+import LibraryActions from '../../library/data/LibraryActions.tsx';
 import Types from '../BuilderTypes.tsx';
 type IQuery = Types.IQuery;
 
@@ -443,9 +443,9 @@ class Builder extends PureClasss<Props>
     
     //TODO remove when store changes
     let v = this.state.builder.queries.get(this.getSelectedId());
-    if(BrowserStore.getState().getIn(['groups', v['groupId'], 'algorithms', v['algorithmId'], 'variants', v.id]))
+    if(LibraryStore.getState().getIn(['groups', v['groupId'], 'algorithms', v['algorithmId'], 'variants', v.id]))
     {
-      BrowserActions.variants.change(v as BrowserTypes.Variant);
+      LibraryActions.variants.change(v as LibraryTypes.Variant);
     }
     
     console.log('action');
@@ -467,7 +467,7 @@ class Builder extends PureClasss<Props>
     let query = this.getSelectedQuery();
     if(query)
     {
-      if(query.status === BrowserTypes.EVariantStatus.Live)
+      if(query.status === LibraryTypes.EVariantStatus.Live)
       {
         return false;
       }
@@ -487,7 +487,7 @@ class Builder extends PureClasss<Props>
   {
     let query = this.getSelectedQuery();
     Ajax.saveItem(
-      BrowserTypes.variantForSave(query as BrowserTypes.Variant),
+      LibraryTypes.variantForSave(query as LibraryTypes.Variant),
       this.onSaveSuccess,
       this.onSaveError
     );
@@ -660,9 +660,9 @@ class Builder extends PureClasss<Props>
     }), 250);
   }
   
-  goToBrowser()
+  goToLibrary()
   {
-    browserHistory.push('/browser');
+    browserHistory.push('/library');
   }
   
   handleModalCancel()
@@ -708,7 +708,7 @@ class Builder extends PureClasss<Props>
               large='No variants open'
               small='You can open one in the Library'
               button='Go to the Library'
-              onClick={this.goToBrowser}
+              onClick={this.goToLibrary}
             />
           :
             <div>

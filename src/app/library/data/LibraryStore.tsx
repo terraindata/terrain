@@ -50,8 +50,8 @@ var Redux = require('redux');
 import AuthStore from './../../auth/data/AuthStore.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
 import RoleStore from './../../roles/data/RolesStore.tsx';
-import Actions from "./BrowserActions.tsx";
-import BrowserTypes from './../BrowserTypes.tsx';
+import Actions from "./LibraryActions.tsx";
+import LibraryTypes from './../LibraryTypes.tsx';
 import Util from './../../util/Util.tsx';
 import BuilderActions from '../../builder/data/BuilderActions.tsx';
 
@@ -63,33 +63,33 @@ var DefaultState = Immutable.fromJS({
   // groupsOrder: [],
 });
 
-import BrowserReducers from './BrowserReducers.tsx';
+import LibraryReducers from './LibraryReducers.tsx';
 
-let BrowserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  BrowserReducers,
+let LibraryStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
+  LibraryReducers,
 {})), DefaultState);
 
 
-BrowserStore.subscribe(() =>
+LibraryStore.subscribe(() =>
 {
-  let state = BrowserStore.getState();
+  let state = LibraryStore.getState();
   let groups = state.get('groups');
   let prevGroups = state.get('prevGroups');
   if(groups !== prevGroups)
   {
-    groups && groups.map((group: BrowserTypes.Group, groupId: ID) =>
+    groups && groups.map((group: LibraryTypes.Group, groupId: ID) =>
     {
       let prevGroup = prevGroups.get(groupId);
       if(group !== prevGroup)
       {
         let saveAlgs = () =>
-          group.algorithms.map((alg: BrowserTypes.Algorithm, algId: ID) =>
+          group.algorithms.map((alg: LibraryTypes.Algorithm, algId: ID) =>
           {
             let prevAlg = prevGroup && prevGroup.algorithms.get(algId);
             if(prevAlg !== alg)
             {
               let saveVariants = () =>
-                alg.variants.map((v: BrowserTypes.Variant, vId: ID) =>
+                alg.variants.map((v: LibraryTypes.Variant, vId: ID) =>
                 {
                   if(v !== (prevAlg && prevAlg.variants.get(vId)))
                   {
@@ -127,4 +127,4 @@ BrowserStore.subscribe(() =>
   }
 });
 
-export default BrowserStore;
+export default LibraryStore;

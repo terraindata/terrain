@@ -43,13 +43,13 @@ THE SOFTWARE.
 */
 
 var _ = require('underscore');
-import ActionTypes from './BrowserActionTypes.tsx';
-import Store from './BrowserStore.tsx';
-import BrowserTypes from './../BrowserTypes.tsx';
+import ActionTypes from './LibraryActionTypes.tsx';
+import Store from './LibraryStore.tsx';
+import LibraryTypes from './../LibraryTypes.tsx';
 import BuilderTypes from './../../builder/BuilderTypes.tsx';
-type Group = BrowserTypes.Group;
-type Algorithm = BrowserTypes.Algorithm;
-type Variant = BrowserTypes.Variant;
+type Group = LibraryTypes.Group;
+type Algorithm = LibraryTypes.Algorithm;
+type Variant = LibraryTypes.Variant;
 import * as Immutable from 'immutable';
 
 import Ajax from './../../util/Ajax.tsx';
@@ -119,7 +119,7 @@ const Actions =
         $(ActionTypes.variants.duplicate, { variant, index, groupId, algorithmId }),
     
     status:
-      (variant: Variant, status: BrowserTypes.EVariantStatus, confirmed?: boolean, isDefault?: boolean) =>
+      (variant: Variant, status: LibraryTypes.EVariantStatus, confirmed?: boolean, isDefault?: boolean) =>
         $(ActionTypes.variants.status, { variant, status, confirmed, isDefault }),
   },
   
@@ -141,7 +141,7 @@ const Actions =
             alg.variants = Immutable.Map({});
           }
           alg.variants = alg.variants.set(variant.id, 
-            (BrowserTypes._Variant(variant))
+            (LibraryTypes._Variant(variant))
               .set('cards', BuilderTypes.recordFromJS(variant.cards))
               .set('inputs', BuilderTypes.recordFromJS(variant.inputs))
           );
@@ -157,7 +157,7 @@ const Actions =
           {
             g.algorithms = Immutable.Map({});
           }
-          g.algorithms = g.algorithms.set(algorithm.id, BrowserTypes._Algorithm(algorithm));
+          g.algorithms = g.algorithms.set(algorithm.id, LibraryTypes._Algorithm(algorithm));
         });
         
         var groupMap = {};
@@ -166,7 +166,7 @@ const Actions =
           {
             group.algorithmsOrder = Immutable.List(group.algorithmsOrder);
           }
-          groupMap[group.id] = BrowserTypes._Group(group);
+          groupMap[group.id] = LibraryTypes._Group(group);
         });
         
         Actions.loadState(Immutable.fromJS({

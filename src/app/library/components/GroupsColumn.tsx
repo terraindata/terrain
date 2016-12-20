@@ -45,14 +45,14 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
-import BrowserColumn from './BrowserColumn.tsx';
-import BrowserItem from './BrowserItem.tsx';
-import BrowserItemCategory from './BrowserItemCategory.tsx';
+import LibraryColumn from './LibraryColumn.tsx';
+import LibraryItem from './LibraryItem.tsx';
+import LibraryItemCategory from './LibraryItemCategory.tsx';
 import CreateItem from '../../common/components/CreateItem.tsx';
-import BrowserTypes from './../BrowserTypes.tsx';
+import LibraryTypes from './../LibraryTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
-import Actions from './../data/BrowserActions.tsx';
+import Actions from './../data/LibraryActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import UserTypes from '../../users/UserTypes.tsx';
 import UserStore from '../../users/data/UserStore.tsx';
@@ -61,7 +61,7 @@ import RolesStore from '../../roles/data/RolesStore.tsx';
 
 var GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
 
-type Group = BrowserTypes.Group;
+type Group = LibraryTypes.Group;
 
 interface Props
 {
@@ -108,7 +108,7 @@ class GroupsColumn extends Classs<Props>
   handleArchive(id: ID)
   {
     Actions.groups.change(this.props.groups.find(g => g.id === id)
-      .set('status', BrowserTypes.EGroupStatus.Archive) as Group);
+      .set('status', LibraryTypes.EGroupStatus.Archive) as Group);
   }
   
   handleNameChange(id: ID, name: string)
@@ -152,7 +152,7 @@ class GroupsColumn extends Classs<Props>
     let canDrag = me && me.isAdmin;
       
     return (
-      <BrowserItem
+      <LibraryItem
         index={index}
         name={group.name}
         id={id}
@@ -161,7 +161,7 @@ class GroupsColumn extends Classs<Props>
         onArchive={this.handleArchive}
         color={ColorManager.colorForKey(group.id)}
         key={group.id}
-        to={'/browser/' + group.id}
+        to={'/library/' + group.id}
         onNameChange={this.handleNameChange}
         type='group'
         rendered={this.state.rendered}
@@ -173,7 +173,7 @@ class GroupsColumn extends Classs<Props>
         canArchive={canEdit || canDrag}
         canDuplicate={canDrag}
       >
-        <div className='group-browser-info-wrapper'>
+        <div className='group-library-info-wrapper'>
           {
             groupRoles && me && (groupRoles.getIn([me.username, 'builder']) || groupRoles.getIn([me.username, 'admin'])) &&
               <UserThumbnail
@@ -203,54 +203,54 @@ class GroupsColumn extends Classs<Props>
             )
           }
         </div>
-      </BrowserItem>
+      </LibraryItem>
     );
   }
   
   handleCategoryHover(statusString: string, id: ID)
   {
     let g = this.props.groups.get(id);
-    let status = BrowserTypes.EGroupStatus[statusString];
+    let status = LibraryTypes.EGroupStatus[statusString];
     if(g.status !== status)
     {
       Actions.groups.change(g.set('status', status) as Group);  
     }
   }
   
-  renderCategory(status: BrowserTypes.EGroupStatus)
+  renderCategory(status: LibraryTypes.EGroupStatus)
   {
     var ids = this.props.groupsOrder.filter(id => this.props.groups.get(id).status === status);
     let canCreate = this.state.me && this.state.me.isAdmin;
     
     return (
-      <BrowserItemCategory
-        status={BrowserTypes.EGroupStatus[status]}
+      <LibraryItemCategory
+        status={LibraryTypes.EGroupStatus[status]}
         key={status}
         onHover={this.handleCategoryHover}
         type='group'
-        titleHidden={status === BrowserTypes.EGroupStatus.Live}
+        titleHidden={status === LibraryTypes.EGroupStatus.Live}
       >
         {
           ids.map(this.renderGroup)
         }
         {
-          ids.size === 0 && <div className='browser-category-none'>None</div>
+          ids.size === 0 && <div className='library-category-none'>None</div>
         }
         {
-          status === BrowserTypes.EGroupStatus.Live && canCreate &&
+          status === LibraryTypes.EGroupStatus.Live && canCreate &&
             <CreateItem
               name='group'
               onCreate={this.handleCreate}
             />
         }
-      </BrowserItemCategory>
+      </LibraryItemCategory>
     );
   }
   
   render()
   {
     return (
-      <BrowserColumn
+      <LibraryColumn
         index={1}
         title='Groups'
       >
@@ -258,8 +258,8 @@ class GroupsColumn extends Classs<Props>
           this.props.groups.size ?
             (
               <div>
-                { this.renderCategory(BrowserTypes.EGroupStatus.Live) }
-                { this.renderCategory(BrowserTypes.EGroupStatus.Archive) }
+                { this.renderCategory(LibraryTypes.EGroupStatus.Live) }
+                { this.renderCategory(LibraryTypes.EGroupStatus.Archive) }
               </div>
             )
             :
@@ -269,7 +269,7 @@ class GroupsColumn extends Classs<Props>
               onClick={this.handleCreate}
             />
         }
-      </BrowserColumn>
+      </LibraryColumn>
     );
   }
 }

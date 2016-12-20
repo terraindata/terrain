@@ -1,26 +1,26 @@
 @import "../../common/Common.less";
 
-.browser-column {
+.library-column {
   width: 25%;
   position: absolute;
   top: 0px;
   height: 100%;
   
-  &.browser-column-1 {
+  &.library-column-1 {
     left: 0px;
   }
-  &.browser-column-2 {
+  &.library-column-2 {
     left: 25%;
   }
-  &.browser-column-3 {
+  &.library-column-3 {
     left: 50%;
   }
-  &.browser-column-4 {
+  &.library-column-4 {
     left: 75%;
   }
   
   @title-height: 35px;
-  .browser-column-title {
+  .library-column-title {
     .title-text;
 
     background: #a2af93;
@@ -37,7 +37,7 @@
     border-right: 1px solid rgba(0,0,0,0.15);
   }
   
-  .browser-column-content {
+  .library-column-content {
     position: absolute;
     width: calc(~"100% - 6px");
     box-sizing: border-box;
@@ -46,13 +46,13 @@
     text-align: center;
     overflow-y: auto;
     
-    &.browser-column-content-no-title {
+    &.library-column-content-no-title {
       height: 100%;
       top: 0px;
     }
   }
   
-  .browser-column-border {
+  .library-column-border {
     position: absolute;
     border-right: 1px solid #ddd;
     @col-top-margin: 6px;

@@ -42,18 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Browser.less');
+require('./Library.less');
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss.tsx';
-import Store from './../data/BrowserStore.tsx';
-import Actions from './../data/BrowserActions.tsx';
+import Store from './../data/LibraryStore.tsx';
+import Actions from './../data/LibraryActions.tsx';
 import RolesActions from './../../roles/data/RolesActions.tsx';
 import UserActions from './../../users/data/UserActions.tsx';
-import BrowserTypes from './../BrowserTypes.tsx';
+import LibraryTypes from './../LibraryTypes.tsx';
 import GroupsColumn from './GroupsColumn.tsx';
 import AlgorithmsColumn from './AlgorithmsColumn.tsx';
 import VariantsColumn from './VariantsColumn.tsx';
-import BrowserInfoColumn from './BrowserInfoColumn.tsx';
+import LibraryInfoColumn from './LibraryInfoColumn.tsx';
 import { DragDropContext } from 'react-dnd';
 import InfoArea from './../../common/components/InfoArea.tsx';
 import Loading from './../../common/components/Loading.tsx';
@@ -68,7 +68,7 @@ interface Props
   };
 }
 
-class Browser extends PureClasss<Props>
+class Library extends PureClasss<Props>
 {
   cancelSubscription = null;
   
@@ -88,8 +88,8 @@ class Browser extends PureClasss<Props>
   {
     if(!this.props.params.groupId)
     {
-      // no path given, redirect to last browser path
-      let path = localStorage.getItem('lastBrowserPath');
+      // no path given, redirect to last library path
+      let path = localStorage.getItem('lastLibraryPath');
       if(path)
       {
         browserHistory.replace(path);
@@ -146,7 +146,7 @@ class Browser extends PureClasss<Props>
     var { groupId, algorithmId, variantId } = this.props.params;
     if(groupId)
     {
-      var group = state.getIn(['groups', groupId]) as BrowserTypes.Group;
+      var group = state.getIn(['groups', groupId]) as LibraryTypes.Group;
       
       if(group)
       {
@@ -166,24 +166,24 @@ class Browser extends PureClasss<Props>
               
               if(!variant)
               {
-                browserHistory.replace(`/browser/${groupId}/${algorithmId}`);    
+                browserHistory.replace(`/library/${groupId}/${algorithmId}`);    
               }
             }
           } else {
             // !algorithm
-            browserHistory.replace(`/browser/${groupId}`);
+            browserHistory.replace(`/library/${groupId}`);
           }
         }
       } else {
         // !group
-        browserHistory.replace('/browser');
+        browserHistory.replace('/library');
       }
     }
     
-    localStorage.setItem('lastBrowserPath', this.props.location.pathname);
+    localStorage.setItem('lastLibraryPath', this.props.location.pathname);
     
     return (
-      <div className='browser'>
+      <div className='library'>
         <GroupsColumn
           groups={state.get('groups')}
           groupsOrder={state.get('groupsOrder')}
@@ -203,7 +203,7 @@ class Browser extends PureClasss<Props>
             algorithmId,
           }}
         />
-        <BrowserInfoColumn
+        <LibraryInfoColumn
           {...{
             group,
             algorithm,
@@ -215,4 +215,4 @@ class Browser extends PureClasss<Props>
   }
 }
 
-export default DragDropContext(HTML5Backend)(Browser);
+export default DragDropContext(HTML5Backend)(Library);

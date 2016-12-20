@@ -43,14 +43,14 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
-import ActionTypes from './BrowserActionTypes.tsx';
+import ActionTypes from './LibraryActionTypes.tsx';
 import Util from './../../util/Util.tsx';
-import BrowserTypes from './../BrowserTypes.tsx';
-const {EVariantStatus} = BrowserTypes;
+import LibraryTypes from './../LibraryTypes.tsx';
+const {EVariantStatus} = LibraryTypes;
 
 var Immutable = require('immutable');
 
-var BrowserReducers = {};
+var LibraryReducers = {};
 
 let removeItem = (state, id: ID, parentKeyPath: (string | ID)[], type: string) =>
   state.removeIn(parentKeyPath.concat([type + 's', id]))
@@ -80,19 +80,19 @@ let addAlgorithm = (state, algorithm, index?: number) =>
 let addGroup = (state, group, index?: number) =>
   addItem(state, group, [], 'group', index);
 
-BrowserReducers[ActionTypes.groups.create] =
+LibraryReducers[ActionTypes.groups.create] =
   (state, action) =>
-    addGroup(state, BrowserTypes._Group());
+    addGroup(state, LibraryTypes._Group());
 
-BrowserReducers[ActionTypes.groups.change] =
+LibraryReducers[ActionTypes.groups.change] =
   (state, action) =>
     state.setIn(['groups', action.payload.group.id], action.payload.group);
 
-BrowserReducers[ActionTypes.groups.move] =
+LibraryReducers[ActionTypes.groups.move] =
   (state, action) =>
     addGroup(removeGroup(state, action.payload.group), action.payload.group, action.payload.index);
 
-BrowserReducers[ActionTypes.groups.duplicate] =
+LibraryReducers[ActionTypes.groups.duplicate] =
   (state, action) =>
   {
     var id = Util.getId();
@@ -119,31 +119,31 @@ BrowserReducers[ActionTypes.groups.duplicate] =
 
 
 
-BrowserReducers[ActionTypes.algorithms.create] =
+LibraryReducers[ActionTypes.algorithms.create] =
   (state, action) =>
   {
     let algId = Util.getId();
     return addVariant(
       addAlgorithm(
         state, 
-        BrowserTypes._Algorithm({
+        LibraryTypes._Algorithm({
           groupId: action.payload.groupId, 
           algorithmId: algId,
         })
       ),
-      BrowserTypes._Variant({
+      LibraryTypes._Variant({
         alogirhtmId: algId, 
         groupId: action.payload.groupId,
       })
     );
   }
 
-BrowserReducers[ActionTypes.algorithms.change] =
+LibraryReducers[ActionTypes.algorithms.change] =
   (state, action) =>
     state.setIn(['groups', action.payload.algorithm.groupId, 'algorithms', action.payload.algorithm.id],
       action.payload.algorithm);
 
-BrowserReducers[ActionTypes.algorithms.move] =
+LibraryReducers[ActionTypes.algorithms.move] =
   (state, action) =>
     addAlgorithm(removeAlgorithm(state, action.payload.algorithm),
       action.payload.algorithm
@@ -175,28 +175,28 @@ let duplicateAlgorithm = (algorithm, id, groupId) =>
       order.map(oldId => idMap[oldId]))
 }
 
-BrowserReducers[ActionTypes.algorithms.duplicate] =
+LibraryReducers[ActionTypes.algorithms.duplicate] =
   (state, action) =>
     addAlgorithm(state,
       duplicateAlgorithm(action.payload.algorithm, Util.getId(), action.payload.groupId),
       action.payload.index);
 
-BrowserReducers[ActionTypes.variants.create] =
+LibraryReducers[ActionTypes.variants.create] =
   (state, action) =>
     addVariant(state, 
-      BrowserTypes._Variant({
+      LibraryTypes._Variant({
         algorithmId: action.payload.algorithmId, 
         groupId: action.payload.groupId, 
       })
     );
 
-BrowserReducers[ActionTypes.variants.change] =
+LibraryReducers[ActionTypes.variants.change] =
   (state, action) =>
     state.setIn(['groups', action.payload.variant.groupId, 'algorithms',
         action.payload.variant.algorithmId, 'variants', action.payload.variant.id],
       action.payload.variant);
 
-BrowserReducers[ActionTypes.variants.status] =
+LibraryReducers[ActionTypes.variants.status] =
   (state, action) =>
   {
     let {variant, status, confirmed, isDefault} = action.payload;
@@ -239,7 +239,7 @@ BrowserReducers[ActionTypes.variants.status] =
       .set('changingStatus', false);
   }
 
-BrowserReducers[ActionTypes.variants.move] =
+LibraryReducers[ActionTypes.variants.move] =
   (state, action) =>
     addVariant(removeVariant(state, action.payload.variant),
       action.payload.variant
@@ -253,29 +253,29 @@ let duplicateVariant = (variant, id, groupId?, algorithmId?) =>
     .set('name', 'Copy of ' + variant.name)
     .set('groupId', groupId || variant.groupId)
     .set('algorithmId', algorithmId || variant.algorithmId)
-    .set('status', BrowserTypes.EVariantStatus.Build)
+    .set('status', LibraryTypes.EVariantStatus.Build)
     .set('isDefault', false)
     ;
 }
 
-BrowserReducers[ActionTypes.variants.duplicate] =
+LibraryReducers[ActionTypes.variants.duplicate] =
   (state, action) =>
     addVariant(state, 
       duplicateVariant(
-        BrowserTypes.touchVariant(action.payload.variant), 
+        LibraryTypes.touchVariant(action.payload.variant), 
         Util.getId(), action.payload.groupId, action.payload.algorithmId),
       action.payload.index);
 
 
 
-BrowserReducers[ActionTypes.loadState] =
+LibraryReducers[ActionTypes.loadState] =
   (state, action) => 
     action.payload.state.set('prevGroups', action.payload.state.get('groups'));
 
-BrowserReducers[ActionTypes.groups.prevGroups] =
+LibraryReducers[ActionTypes.groups.prevGroups] =
   (state, action) => 
     state.set('prevGroups', action.payload['groups']);
 
-export default BrowserReducers;
+export default LibraryReducers;
 
 

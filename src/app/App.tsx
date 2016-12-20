@@ -60,7 +60,7 @@ window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.
 // Components
 import LayoutManager from "./builder/components/layout/LayoutManager.tsx";
 import Builder from "./builder/components/Builder.tsx";
-import Browser from './browser/components/Browser.tsx';
+import Library from './library/components/Library.tsx';
 import X from './x/components/X.tsx';
 import Account from './users/components/Account.tsx';
 import Settings from './users/components/Settings.tsx';
@@ -86,7 +86,7 @@ import Ajax from './util/Ajax.tsx';
 // Icons
 var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
 var HomeIcon = require("./../images/icon_profile_16x16.svg?name=HomeIcon");
-var BrowserIcon = require("./../images/icon_browser_20x16.svg?name=BrowserIcon");
+var LibraryIcon = require("./../images/icon_library_20x16.svg?name=LibraryIcon");
 var BuilderIcon = require("./../images/icon_reporting_18x18.svg?name=BuilderIcon");
 var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIcon");
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
@@ -113,9 +113,9 @@ var links =
   //   route: '/reporting',
   // },
   {
-    icon: <BrowserIcon />,
+    icon: <LibraryIcon />,
     text: 'Library',
-    route: '/browser',
+    route: '/library',
   },
   {
     icon: <BuilderIcon />,
@@ -276,14 +276,14 @@ var router = (
       <Route path="/builder/:config" component={Builder} />
       <Route path="/builder/:config/:splitConfig" component={Builder} />
       
-      <Route path="/browser">
-        <IndexRoute component={Browser} />
-        <Route path=":groupId" component={Browser}>
-          <IndexRoute component={Browser} />
-          <Route path=":algorithmId" component={Browser}>
-            <IndexRoute component={Browser} />
-            <Route path=":variantId" component={Browser}>
-              <IndexRoute component={Browser} />
+      <Route path="/library">
+        <IndexRoute component={Library} />
+        <Route path=":groupId" component={Library}>
+          <IndexRoute component={Library} />
+          <Route path=":algorithmId" component={Library}>
+            <IndexRoute component={Library} />
+            <Route path=":variantId" component={Library}>
+              <IndexRoute component={Library} />
             </Route>
           </Route>
         </Route>
@@ -309,6 +309,11 @@ var router = (
       
       <Route path="/x" component={X} />
       <Route path="/x/:x" component={X} />
+      
+      <Route path='/browser' component={Redirect} />
+      <Route path='/browser/:a' component={Redirect} />
+      <Route path='/browser/:a/:b' component={Redirect} />
+      <Route path='/browser/:a/:b/:c' component={Redirect} />
 
     </Route>
   </Router>

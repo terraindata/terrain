@@ -48,7 +48,7 @@ import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
 import Store from './../data/UserStore.tsx';
 import Actions from './../data/UserActions.tsx';
-import BrowserTypes from './../UserTypes.tsx';
+import LibraryTypes from './../UserTypes.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
 import { Link } from 'react-router';
 import AccountEntry from './AccountEntry.tsx';

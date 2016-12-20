@@ -42,40 +42,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-var Immutable = require('immutable');
-import Util from './../../util/Util.tsx';
+require('./LibraryColumn.less');
 
-var create = '';
-var change = '';
-var move = '';
-var duplicate = '';
+import * as React from 'react';
+import Classs from './../../common/components/Classs.tsx';
+import * as classNames from 'classnames';
 
-var BrowserActionTypes = 
+interface Props
 {
-  groups: 
-  { 
-    create, change, move, duplicate,
-    prevGroups: '',
-  },
-  
-  algorithms: 
-  {
-    create, change, move, duplicate,
-    switchGroup: '',
-  },
-  
-  variants:
-  {
-    create, change, move, duplicate,
-    status: '',
-    switchAlgorithm: '',
-    switchGroup: '', // move by itself onto a group, which should also create a new algorithm
-  },
-  
-  loadState: '',
-};
+  index: number;
+  title: string;
+}
 
-Util.setValuesToKeys(BrowserActionTypes, '');
+class LibraryColumn extends Classs<Props>
+{
+  render()
+  {
+    return (
+      <div className={'library-column library-column-' + this.props.index}>
+        { 
+          this.props.title ? 
+            <div className='library-column-title'>
+              { this.props.title }
+            </div>
+          : null
+        }
+        <div className={classNames({
+          'library-column-content': true,
+          'library-column-content-no-title': !this.props.title,
+        })}>
+          { this.props['children'] }
+        </div>
+        <div className='library-column-border' />
+      </div>
+    );
+  }
+}
 
-export default BrowserActionTypes;
+export default LibraryColumn;

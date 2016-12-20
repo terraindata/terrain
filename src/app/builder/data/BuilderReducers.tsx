@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
-import BrowserTypes from './../../browser/BrowserTypes.tsx';
+import LibraryTypes from './../../library/LibraryTypes.tsx';
 import BuilderTypes from './../BuilderTypes.tsx';
 import Ajax from './../../util/Ajax.tsx';
 import ActionTypes from './BuilderActionTypes.tsx';
@@ -131,7 +131,7 @@ let BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       v.cards = cards;
       v.inputs = inputs;
       v.resultsConfig = resultsConfig;
-      v = BrowserTypes._Variant(v);
+      v = LibraryTypes._Variant(v);
     }
     
     return state.setIn(['queries', action.payload.variantId],

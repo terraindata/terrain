@@ -5,10 +5,10 @@
 @build: #00a7f7;
 @archive: #ff735b;
 
-.browser-category {
+.library-category {
   padding: 10px 0px;
   
-  .browser-category-title {
+  .library-category-title {
     .small-bold-text;
     margin: 1px 10px;
     margin-bottom: 5px;
@@ -19,7 +19,7 @@
     text-align: left;
     cursor: pointer;
     
-    .browser-category-title-symbol {
+    .library-category-title-symbol {
       display: inline-block;
       @r: 8px;
       width: @r;
@@ -30,7 +30,7 @@
       vertical-align: middle;
     }
     
-    .browser-category-title-text {
+    .library-category-title-text {
       vertical-align: middle;
       display: inline-block;
     }
@@ -51,7 +51,7 @@
     }
   }
   
-  .browser-category-none {
+  .library-category-none {
     text-align: center;
     padding: 25px;
     color: #828c76;
@@ -59,8 +59,8 @@
     opacity: 0.5;
   }
   
-  &.browser-category-live {
-    .browser-category-title {
+  &.library-category-live {
+    .library-category-title {
       color: @live;
       border-color: @live;
       &:before {
@@ -69,14 +69,14 @@
       svg {
         fill: @live;
       }
-      .browser-category-title-symbol {
+      .library-category-title-symbol {
         background: @live;
       }
     }
   }
   
-  &.browser-category-approve {
-    .browser-category-title {
+  &.library-category-approve {
+    .library-category-title {
       color: @approve;
       border-color: @approve;
       &:before {
@@ -85,14 +85,14 @@
       svg {
         fill: @approve;
       }
-      .browser-category-title-symbol {
+      .library-category-title-symbol {
         background: @approve;
       }
     }
   }
   
-  &.browser-category-build {
-    .browser-category-title {
+  &.library-category-build {
+    .library-category-title {
       color: @build;
       border-color: @build;
       &:before {
@@ -101,14 +101,14 @@
       svg {
         fill: @build;
       }
-      .browser-category-title-symbol {
+      .library-category-title-symbol {
         background: @build;
       }
     }
   }
   
-  &.browser-category-archive {
-    &.browser-category-closed {
+  &.library-category-archive {
+    &.library-category-closed {
       opacity: 0.38;
       .transition;
       &:hover {
@@ -116,7 +116,7 @@
       }
     }
     
-    .browser-category-title {
+    .library-category-title {
       color: @archive;
       border-color: @archive;
       &:before {
@@ -125,18 +125,18 @@
       svg {
         fill: @archive;
       }
-      .browser-category-title-symbol {
+      .library-category-title-symbol {
         background: @archive;
       }
     }
   }
   
-  &.browser-category-closed {
-    .browser-category-content {
+  &.library-category-closed {
+    .library-category-content {
       display: none;
     }
     
-    .browser-category-title {
+    .library-category-title {
       &:before {
         .rotate90;
       }

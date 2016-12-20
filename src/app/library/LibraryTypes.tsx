@@ -49,7 +49,7 @@ import BuilderTypes from './../builder/BuilderTypes.tsx';
 import * as Immutable from 'immutable';
 import {IResultsConfig} from '../builder/components/results/ResultsConfig.tsx';
 
-export module BrowserTypes
+export module LibraryTypes
 {
   export enum EVariantStatus
   {
@@ -218,4 +218,4 @@ export module BrowserTypes
   }
 }
 
-export default BrowserTypes;
+export default LibraryTypes;

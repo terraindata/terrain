@@ -49,7 +49,7 @@ import * as ReactDOM from "react-dom";
 import * as Immutable from "immutable";
 import * as _ from 'underscore';
 
-import BrowserTypes from './../browser/BrowserTypes.tsx';
+import LibraryTypes from './../library/LibraryTypes.tsx';
 
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 const suffixes = ['', ' k', ' M', ' B'];
@@ -118,7 +118,7 @@ var Util = {
     return !! RolesStore.getState().getIn([groupId, me.username, role]);
   },
   
-  canEdit(item: BrowserTypes.Variant | BrowserTypes.Algorithm | BrowserTypes.Group, UserStore, RolesStore)
+  canEdit(item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group, UserStore, RolesStore)
   {
     let me = UserStore.getState().get('currentUser');
     if(!me)

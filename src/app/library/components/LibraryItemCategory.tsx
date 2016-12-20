@@ -42,41 +42,90 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./BrowserColumn.less');
+require('./LibraryItemCategory.less');
 
 import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
-import * as classNames from 'classnames';
+import { DragSource, DropTarget } from 'react-dnd';
 
 interface Props
 {
-  index: number;
-  title: string;
+  status: string;
+  type: string;
+  onHover: (status: string, id: ID) => void;
+  connectDropTarget?: (c: any) => any;
+  titleHidden?: boolean;
+  dropDisabled?: boolean;
 }
 
-class BrowserColumn extends Classs<Props>
+class LibraryItemCategory extends Classs<Props>
 {
-  render()
+  state = {
+    open: true,
+  }
+  
+  constructor(props:Props)
   {
-    return (
-      <div className={'browser-column browser-column-' + this.props.index}>
-        { 
-          this.props.title ? 
-            <div className='browser-column-title'>
-              { this.props.title }
+    super(props);
+    this.state.open = this.props.status !== 'Archive';
+  }
+  
+  toggleOpen()
+  {
+    this.setState({
+      open: !this.state.open,
+    });
+  }
+  
+  render()
+  { 
+    return this.props.connectDropTarget(
+      <div className={`library-category library-category-${this.props.status} library-category-${this.state.open ? 'open' : 'closed'}`}>
+        { ! this.props.titleHidden &&
+          <div className='library-category-title' onClick={this.toggleOpen}>
+            <div className='library-category-title-symbol' />
+            <div className='library-category-title-text'>
+              { 
+                this.props.status
+              }
             </div>
-          : null
+          </div>
         }
-        <div className={classNames({
-          'browser-column-content': true,
-          'browser-column-content-no-title': !this.props.title,
-        })}>
+        <div className='library-category-content'>
           { this.props['children'] }
         </div>
-        <div className='browser-column-border' />
       </div>
     );
   }
 }
 
-export default BrowserColumn;
+let canDrop = (props, monitor) =>
+{
+  let itemType = monitor.getItem().type;
+  if(itemType !== props.type)
+  {
+    return false;
+  }
+  
+  return !props.dropDisabled;
+};
+const target = 
+{
+  canDrop,
+  
+  hover(props, monitor, component)
+  {
+    if(canDrop(props, monitor))
+    {
+      let item = monitor.getItem();
+      props.onHover(props.status, item.id);
+    }
+  },
+}
+
+const dropCollect = (connect, monitor) =>
+({
+  connectDropTarget: connect.dropTarget(),
+});
+
+export default DropTarget('BROWSER', target, dropCollect)(LibraryItemCategory);

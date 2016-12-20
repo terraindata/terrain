@@ -48,15 +48,15 @@ import * as classNames from 'classnames';
 import Util from  '../../util/Util.tsx';
 import UserThumbnail from '../../users/components/UserThumbnail.tsx';
 
-import BrowserStore from '../../browser/data/BrowserStore.tsx';
+import LibraryStore from '../../library/data/LibraryStore.tsx';
 import BuilderTypes from '../../builder/BuilderTypes.tsx';
-import BrowserTypes from '../../browser/BrowserTypes.tsx';
+import LibraryTypes from '../../library/LibraryTypes.tsx';
 
 var GroupIcon = require('./../../../images/icon_badgeGroup.svg');
 var AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
 var VariantIcon = require('./../../../images/icon_badgeVariant.svg');
 
-const {EVariantStatus} = BrowserTypes;
+const {EVariantStatus} = LibraryTypes;
 
 const TEXT = 
 {
@@ -83,8 +83,8 @@ const TEXT =
 }
 
 interface Props {
-  variant: BrowserTypes.Variant;
-  status: BrowserTypes.EVariantStatus;
+  variant: LibraryTypes.Variant;
+  status: LibraryTypes.EVariantStatus;
   defaultChecked: boolean;
   onDefaultCheckedChange(defaultChecked: boolean);
   onDeploy();
@@ -131,9 +131,9 @@ class DeployModalColumn extends PureClasss<Props>
   render() 
   {
     let {variant, status} = this.props;
-    let state = BrowserStore.getState();
-    let group = state.getIn(['groups', variant.groupId]) as BrowserTypes.Group;
-    let algorithm = state.getIn(['groups', variant.groupId, 'algorithms', variant.algorithmId]) as BrowserTypes.Algorithm;
+    let state = LibraryStore.getState();
+    let group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
+    let algorithm = state.getIn(['groups', variant.groupId, 'algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
     
     // let title = 'Deploy "' + name + '" to Live';
     // if(changingStatusTo !== EVariantStatus.Live)

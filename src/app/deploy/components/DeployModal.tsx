@@ -52,13 +52,13 @@ import * as Immutable from 'immutable';
 import Modal from '../../common/components/Modal.tsx';
 import TQLEditor from '../../tql/components/TQLEditor.tsx';
 import TQLConverter from '../../tql/TQLConverter.tsx';
-import BrowserStore from '../../browser/data/BrowserStore.tsx';
-import BrowserActions from '../../browser/data/BrowserActions.tsx';
+import LibraryStore from '../../library/data/LibraryStore.tsx';
+import LibraryActions from '../../library/data/LibraryActions.tsx';
 import BuilderTypes from '../../builder/BuilderTypes.tsx';
-import BrowserTypes from '../../browser/BrowserTypes.tsx';
+import LibraryTypes from '../../library/LibraryTypes.tsx';
 import DeployModalColumn from './DeployModalColumn.tsx';
 
-let {EVariantStatus} = BrowserTypes;
+let {EVariantStatus} = LibraryTypes;
 
 interface Props {
 }
@@ -67,8 +67,8 @@ class DeployModal extends PureClasss<Props>
 {
   state: {
     changingStatus: boolean;
-    changingStatusOf: BrowserTypes.Variant;
-    changingStatusTo: BrowserTypes.EVariantStatus;
+    changingStatusOf: LibraryTypes.Variant;
+    changingStatusTo: LibraryTypes.EVariantStatus;
     defaultChecked: boolean;
   } = {
     changingStatus: false,
@@ -79,7 +79,7 @@ class DeployModal extends PureClasss<Props>
   
   componentDidMount()
   {
-    this._subscribe(BrowserStore, {
+    this._subscribe(LibraryStore, {
       updater: (state) =>
       {
         let changingStatus = state.get('changingStatus');
@@ -104,12 +104,12 @@ class DeployModal extends PureClasss<Props>
   
   handleClose()
   {
-    BrowserActions.variants.status(null, null);
+    LibraryActions.variants.status(null, null);
   }
   
   handleDeploy()
   {
-    BrowserActions.variants.status(
+    LibraryActions.variants.status(
       this.state.changingStatusOf, this.state.changingStatusTo, true, this.state.defaultChecked
     );
   }
@@ -117,8 +117,8 @@ class DeployModal extends PureClasss<Props>
   renderTQLColumn()
   {
     let variant = this.state.changingStatusOf;
-    let state = BrowserStore.getState();
-    let algorithm = state.getIn(['groups', this.state.changingStatusOf.groupId, 'algorithms', this.state.changingStatusOf.algorithmId]) as BrowserTypes.Algorithm;
+    let state = LibraryStore.getState();
+    let algorithm = state.getIn(['groups', this.state.changingStatusOf.groupId, 'algorithms', this.state.changingStatusOf.algorithmId]) as LibraryTypes.Algorithm;
     let defaultTql = 'There is not currently a default Variant for algorithm ' + algorithm.name;
     if(this.state.defaultChecked)
     {

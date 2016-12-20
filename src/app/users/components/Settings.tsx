@@ -47,7 +47,7 @@ import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
 import Store from './../data/UserStore.tsx';
 import Actions from './../data/UserActions.tsx';
-import BrowserTypes from './../UserTypes.tsx';
+import LibraryTypes from './../UserTypes.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
 import { Link } from 'react-router';
 import AuthStore from './../../auth/data/AuthStore.tsx';
@@ -466,7 +466,7 @@ class Settings extends Classs<Props>
     return (
       <div className='settings-shifted-text'> 
         Lost your computer? Left yourself logged in on a public computer? Need a way to sign out 
-        everywhere except your current browser? This is for you.
+        everywhere except your current library? This is for you.
       </div>
     );
   }

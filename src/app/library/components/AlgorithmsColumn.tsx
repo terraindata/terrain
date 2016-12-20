@@ -44,14 +44,14 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import Classs from './../../common/components/Classs.tsx';
-import BrowserColumn from './BrowserColumn.tsx';
-import BrowserItem from './BrowserItem.tsx';
-import BrowserItemCategory from './BrowserItemCategory.tsx';
+import LibraryColumn from './LibraryColumn.tsx';
+import LibraryItem from './LibraryItem.tsx';
+import LibraryItemCategory from './LibraryItemCategory.tsx';
 import CreateItem from '../../common/components/CreateItem.tsx';
-import BrowserTypes from './../BrowserTypes.tsx';
+import LibraryTypes from './../LibraryTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
-import Actions from './../data/BrowserActions.tsx';
+import Actions from './../data/LibraryActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import Scoreline from './../../common/components/Scoreline.tsx';
 import Util from '../../util/Util.tsx';
@@ -62,7 +62,7 @@ import RolesStore from '../../roles/data/RolesStore.tsx';
 
 var AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
-type Algorithm = BrowserTypes.Algorithm;
+type Algorithm = LibraryTypes.Algorithm;
 
 interface Props
 {
@@ -134,7 +134,7 @@ class AlgorithmsColumn extends Classs<Props>
   handleArchive(id: ID)
   {
     Actions.algorithms.change(this.props.algorithms.find(alg => alg.id === id)
-      .set('status', BrowserTypes.EAlgorithmStatus.Archive) as Algorithm);
+      .set('status', LibraryTypes.EAlgorithmStatus.Archive) as Algorithm);
   }
   
   handleCreate()
@@ -191,22 +191,22 @@ class AlgorithmsColumn extends Classs<Props>
     var scores = [
       {
         score: 0,
-        color: BrowserTypes.colorForStatus(BrowserTypes.EVariantStatus.Archive),
+        color: LibraryTypes.colorForStatus(LibraryTypes.EVariantStatus.Archive),
         name: "Variants in Archived Status",
       },
       {
         score: 0,
-        color: BrowserTypes.colorForStatus(BrowserTypes.EVariantStatus.Build),
+        color: LibraryTypes.colorForStatus(LibraryTypes.EVariantStatus.Build),
         name: "Variants in Build Status",
       },
       {
         score: 0,
-        color: BrowserTypes.colorForStatus(BrowserTypes.EVariantStatus.Approve),
+        color: LibraryTypes.colorForStatus(LibraryTypes.EVariantStatus.Approve),
         name: "Variants in Approve Status",
       },
       {
         score: 0,
-        color: BrowserTypes.colorForStatus(BrowserTypes.EVariantStatus.Live),
+        color: LibraryTypes.colorForStatus(LibraryTypes.EVariantStatus.Live),
         name: "Variants in Live Status",
       },
     ];
@@ -254,7 +254,7 @@ class AlgorithmsColumn extends Classs<Props>
       }
     }
     return (
-      <BrowserItem
+      <LibraryItem
         index={index}
         name={algorithm.name}
         icon={<AlgorithmIcon />}
@@ -262,8 +262,8 @@ class AlgorithmsColumn extends Classs<Props>
         onArchive={this.handleArchive}
         color={ColorManager.colorForKey(this.props.groupId)}
         key={algorithm.id}
-        to={`/browser/${this.props.groupId}/${algorithm.id}`}
-        className='browser-item-lighter'
+        to={`/library/${this.props.groupId}/${algorithm.id}`}
+        className='library-item-lighter'
         id={id}
         onNameChange={this.handleNameChange}
         type='algorithm'
@@ -279,35 +279,35 @@ class AlgorithmsColumn extends Classs<Props>
         <div className='flex-container'>
           <UserThumbnail username={username} medium={true} extra={role}/>
           <div className='flex-grow'>
-            <div className='browser-item-line'>
+            <div className='library-item-line'>
               <Scoreline 
                 scores={scores}
                 hideZeroes={true}
               />
             </div>
             <div 
-              className='browser-item-line'
+              className='library-item-line'
             >
               { Util.formatDate(date) }
 
             </div>
           </div>
         </div>
-      </BrowserItem>
+      </LibraryItem>
     );
   }
   
   handleCategoryHover(statusString: string, id: ID)
   {
     let a = this.props.algorithms.get(id);
-    let status = BrowserTypes.EAlgorithmStatus[statusString];
+    let status = LibraryTypes.EAlgorithmStatus[statusString];
     if(a.status !== status)
     {
       Actions.algorithms.change(a.set('status', status) as Algorithm);  
     }
   }
   
-  renderCategory(status: BrowserTypes.EAlgorithmStatus)
+  renderCategory(status: LibraryTypes.EAlgorithmStatus)
   {
     let {algorithms} = this.props;
     var ids = this.props.algorithmsOrder.filter(id => algorithms.get(id) && algorithms.get(id).status === status);
@@ -315,34 +315,34 @@ class AlgorithmsColumn extends Classs<Props>
     let canCreate = me && roles && roles.getIn([this.props.groupId, me.username, 'admin']);
     
     return (
-      <BrowserItemCategory
-        status={BrowserTypes.EAlgorithmStatus[status]}
+      <LibraryItemCategory
+        status={LibraryTypes.EAlgorithmStatus[status]}
         key={status}
         onHover={this.handleCategoryHover}
         type='algorithm'
-        titleHidden={status === BrowserTypes.EAlgorithmStatus.Live}
+        titleHidden={status === LibraryTypes.EAlgorithmStatus.Live}
       >
         {
           ids.map(this.renderAlgorithm)
         }
         {
-          ids.size === 0 && <div className='browser-category-none'>None</div>
+          ids.size === 0 && <div className='library-category-none'>None</div>
         }
         {
-          status === BrowserTypes.EAlgorithmStatus.Live && canCreate &&
+          status === LibraryTypes.EAlgorithmStatus.Live && canCreate &&
             <CreateItem
               name='algorithm'
               onCreate={this.handleCreate}
             />
         }
-      </BrowserItemCategory>
+      </LibraryItemCategory>
     );
   }
   
   render()
   {
     return (
-      <BrowserColumn
+      <LibraryColumn
         index={2}
         title='Algorithms'
       >
@@ -352,8 +352,8 @@ class AlgorithmsColumn extends Classs<Props>
               this.props.algorithms.size ?
               (
                 <div>
-                  { this.renderCategory(BrowserTypes.EAlgorithmStatus.Live) }
-                  { this.renderCategory(BrowserTypes.EAlgorithmStatus.Archive) }
+                  { this.renderCategory(LibraryTypes.EAlgorithmStatus.Live) }
+                  { this.renderCategory(LibraryTypes.EAlgorithmStatus.Archive) }
                 </div>
               )
               :
@@ -368,7 +368,7 @@ class AlgorithmsColumn extends Classs<Props>
             )
           : null
         }
-      </BrowserColumn>
+      </LibraryColumn>
     );
   }
 }

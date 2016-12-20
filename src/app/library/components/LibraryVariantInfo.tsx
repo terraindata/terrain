@@ -42,17 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./BrowserVariantInfo.less');
+require('./LibraryVariantInfo.less');
 import * as React from 'react';
 import * as Immutable from 'immutable';
 const {List} = Immutable;
 import Ajax from './../../util/Ajax.tsx';
 import PureClasss from './../../common/components/PureClasss.tsx';
 import VariantVersions from './VariantVersions.tsx';
-import BrowserTypes from './../BrowserTypes.tsx';
+import LibraryTypes from './../LibraryTypes.tsx';
 import Menu from './../../common/components/Menu.tsx';
 import Dropdown from './../../common/components/Dropdown.tsx';
-import Actions from './../data/BrowserActions.tsx';
+import Actions from './../data/LibraryActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
 import RolesStore from './../../roles/data/RolesStore.tsx';
@@ -61,14 +61,14 @@ import BuilderActions from './../../builder/data/BuilderActions.tsx';
 import Util from './../../util/Util.tsx';
 import StatusDropdown from './StatusDropdown.tsx';
 
-type Variant = BrowserTypes.Variant;
+type Variant = LibraryTypes.Variant;
 
 interface Props
 {
   variant: Variant;
 }
 
-class BrowserInfoColumn extends PureClasss<Props>
+class LibraryInfoColumn extends PureClasss<Props>
 {
   state: {
     isAdmin: boolean,
@@ -151,7 +151,7 @@ class BrowserInfoColumn extends PureClasss<Props>
     // maybe use something other than a table in the future
     return (
     <div
-      className='browser-info-variant'
+      className='library-info-variant'
     >
       <div className='biv-table-wrapper'>
         <div
@@ -216,4 +216,4 @@ class BrowserInfoColumn extends PureClasss<Props>
 }
 
 
-export default BrowserInfoColumn;
+export default LibraryInfoColumn;

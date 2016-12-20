@@ -48,7 +48,7 @@ import { Link } from 'react-router';
 import Classs from './../../common/components/Classs.tsx';
 import UserStore from './../data/UserStore.tsx';
 import Actions from './../data/UserActions.tsx';
-import BrowserTypes from './../UserTypes.tsx';
+import LibraryTypes from './../UserTypes.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
 import UserTypes from './../UserTypes.tsx';
 import AuthStore from './../../auth/data/AuthStore.tsx';

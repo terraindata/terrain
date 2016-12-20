@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./BrowserItem.less');
+require('./LibraryItem.less');
 import * as React from 'react';
 import * as $ from 'jquery';
 import * as Immutable from 'immutable';
@@ -93,7 +93,7 @@ interface Props
   dragItemType? : string;
 }
 
-class BrowserItem extends Classs<Props>
+class LibraryItem extends Classs<Props>
 {
   state = {
     nameEditing: false,
@@ -247,17 +247,17 @@ class BrowserItem extends Classs<Props>
       <div>
         <Link 
           to={this.props.to}
-          className='browser-item-link'
-          activeClassName='browser-item-active'
+          className='library-item-link'
+          activeClassName='library-item-active'
           onDoubleClick={this.handleDoubleClick}
         >
           <div
             className={classNames({
-              'browser-item-wrapper': true,
-              'browser-item-wrapper-shifted': shifted,
-              'browser-item-wrapper-mounted': this.state.mounted,
-              'browser-item-wrapper-dragging': draggingItemId === this.props.id,
-              'browser-item-wrapper-drag-over': draggingOver,
+              'library-item-wrapper': true,
+              'library-item-wrapper-shifted': shifted,
+              'library-item-wrapper-mounted': this.state.mounted,
+              'library-item-wrapper-dragging': draggingItemId === this.props.id,
+              'library-item-wrapper-drag-over': draggingOver,
             })}
             style={{
               borderColor:this.props.color
@@ -265,20 +265,20 @@ class BrowserItem extends Classs<Props>
           >
             { connectDragSource(
               <div
-                className={'browser-item ' + this.props.className}
+                className={'library-item ' + this.props.className}
                 style={{
                   background:this.props.color
                 }}
               >
                 <div
                   className={classNames({
-                    'browser-item-title-bar': true,
-                    'browser-item-title-bar-editing': this.state.nameEditing,
+                    'library-item-title-bar': true,
+                    'library-item-title-bar-editing': this.state.nameEditing,
                   })}
                 >
                   { this.props.icon }
                   <div
-                    className='browser-item-name'
+                    className='library-item-name'
                     onDoubleClick={this.showTextfield}
                   >
                     { 
@@ -286,7 +286,7 @@ class BrowserItem extends Classs<Props>
                     }
                   </div>
                   <input
-                    className='browser-item-name-input'
+                    className='library-item-name-input'
                     defaultValue={ this.props.name }
                     placeholder={this.props.type.substr(0, 1).toUpperCase() + this.props.type.substr(1) + ' name'}
                     onBlur={ this.hideTextfield }
@@ -298,7 +298,7 @@ class BrowserItem extends Classs<Props>
                     options={menuOptions}
                   />
                 </div>
-                <div className='browser-item-content'>
+                <div className='library-item-content'>
                   { 
                     this.props['children']
                   }
@@ -408,4 +408,4 @@ const dropCollect = (connect, monitor) =>
   dragItemType: monitor.getItem() && monitor.getItem().type,
 });
 
-export default DropTarget('BROWSER', target, dropCollect)(DragSource('BROWSER', source, dragCollect)(BrowserItem));
+export default DropTarget('BROWSER', target, dropCollect)(DragSource('BROWSER', source, dragCollect)(LibraryItem));

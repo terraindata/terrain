@@ -64,7 +64,7 @@ interface Props
   children?: any;
 }
 
-class Browser extends Classs<Props>
+class Library extends Classs<Props>
 {
   state: {
     unchanged: boolean;
@@ -143,4 +143,4 @@ class Browser extends Classs<Props>
   }
 }
 
-export default Browser;
+export default Library;

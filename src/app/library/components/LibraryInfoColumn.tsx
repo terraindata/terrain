@@ -42,38 +42,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./BrowserInfoColumn.less');
+require('./LibraryInfoColumn.less');
 import * as React from 'react';
 import * as Immutable from 'immutable';
 const {List} = Immutable;
 import Ajax from './../../util/Ajax.tsx';
 import Classs from './../../common/components/Classs.tsx';
-import BrowserColumn from './BrowserColumn.tsx';
-import BrowserItem from './BrowserItem.tsx';
-import BrowserItemCategory from './BrowserItemCategory.tsx';
+import LibraryColumn from './LibraryColumn.tsx';
+import LibraryItem from './LibraryItem.tsx';
+import LibraryItemCategory from './LibraryItemCategory.tsx';
 import CreateItem from '../../common/components/CreateItem.tsx';
 import UserTypes from './../../users/UserTypes.tsx';
 import RoleTypes from './../../roles/RoleTypes.tsx';
-import BrowserTypes from './../BrowserTypes.tsx';
+import LibraryTypes from './../LibraryTypes.tsx';
 import ColorManager from './../../util/ColorManager.tsx';
 import InfoArea from './../../common/components/InfoArea.tsx';
 import Menu from './../../common/components/Menu.tsx';
-import Actions from './../data/BrowserActions.tsx';
+import Actions from './../data/LibraryActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import BuilderStore from './../../builder/data/BuilderStore.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
 import RolesStore from './../../roles/data/RolesStore.tsx';
 import UserActions from './../../users/data/UserActions.tsx';
 import RolesActions from './../../roles/data/RolesActions.tsx';
-import BrowserVariantInfo from './BrowserVariantInfo.tsx';
+import LibraryVariantInfo from './LibraryVariantInfo.tsx';
 
 var GroupIcon = require('./../../../images/icon_badgeGroup.svg');
 var AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
 var VariantIcon = require('./../../../images/icon_badgeVariant.svg');
 
-type Group = BrowserTypes.Group;
-type Algorithm = BrowserTypes.Algorithm;
-type Variant = BrowserTypes.Variant;
+type Group = LibraryTypes.Group;
+type Algorithm = LibraryTypes.Algorithm;
+type Variant = LibraryTypes.Variant;
 
 type Role = RoleTypes.Role;
 type RoleMap = RoleTypes.RoleMap;
@@ -88,7 +88,7 @@ interface Props
   variant: Variant;
 }
 
-class BrowserInfoColumn extends Classs<Props>
+class LibraryInfoColumn extends Classs<Props>
 {
   state: {
     users: UserMap,
@@ -120,7 +120,7 @@ class BrowserInfoColumn extends Classs<Props>
   renderVariant()
   {
     return (
-      <BrowserVariantInfo
+      <LibraryVariantInfo
         variant={this.props.variant}
       />
     );
@@ -144,7 +144,7 @@ class BrowserInfoColumn extends Classs<Props>
     {
       return null;
     }
-    return <BrowserInfoUser 
+    return <LibraryInfoUser 
       user={user}
       groupRoles={groupRoles}
       me={this.state.me}
@@ -206,7 +206,7 @@ class BrowserInfoColumn extends Classs<Props>
     let isSysAdmin = this.state.me && this.state.me.isAdmin;
     
     return (
-      <div className='browser-info-users'>
+      <div className='library-info-users'>
         { this.renderUser(this.state.me) }
         { this.renderGroupRoles() }
         { this.renderRemainingUsers() }
@@ -216,7 +216,7 @@ class BrowserInfoColumn extends Classs<Props>
   
   render()
   {
-    let item: BrowserTypes.Variant | BrowserTypes.Algorithm | BrowserTypes.Group = 
+    let item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group = 
       this.props.variant || this.props.algorithm || this.props.group;
     
     switch(item && item.type)
@@ -240,29 +240,29 @@ class BrowserInfoColumn extends Classs<Props>
     
     
     return (
-      <BrowserColumn
+      <LibraryColumn
         index={4}
         title={null}
       >
         {
           item ?
-            <div className='browser-info'>
+            <div className='library-info'>
               <div
-                className='browser-info-image'
+                className='library-info-image'
                 style={{
                 }}
               >
                 <style
-                  dangerouslySetInnerHTML={{ __html: '.browser-info-image #Color { \
+                  dangerouslySetInnerHTML={{ __html: '.library-info-image #Color { \
                     fill: ' + ColorManager.colorForKey(groupId) + ' !important; \
                   }'}}
                 />
                 { icon }
               </div>
-              <div className='browser-info-name'>
+              <div className='library-info-name'>
                 { item.name }
               </div>
-              <div className='browser-info-type'>
+              <div className='library-info-type'>
                 { item.type }
               </div>
               { this.renderVariant() }
@@ -270,20 +270,20 @@ class BrowserInfoColumn extends Classs<Props>
               { this.renderGroup() }
             </div>
           :
-            <div className='browser-info'>
+            <div className='library-info'>
               <InfoArea
                 large='Select a Group'
               />
             </div>
             
         }
-      </BrowserColumn>
+      </LibraryColumn>
     );
   }
 }
 
 
-interface BrowserInfoUserProps
+interface LibraryInfoUserProps
 {
   me: User;
   user: User;
@@ -291,7 +291,7 @@ interface BrowserInfoUserProps
   groupId: ID;
 }
 
-class BrowserInfoUser extends Classs<BrowserInfoUserProps>
+class LibraryInfoUser extends Classs<LibraryInfoUserProps>
 {
   changeRole(newRole:string)
   {
@@ -359,13 +359,13 @@ class BrowserInfoUser extends Classs<BrowserInfoUserProps>
     ]);
     
     return (
-      <div key={user.username} className='browser-info-user'>
+      <div key={user.username} className='library-info-user'>
         <UserThumbnail
           username={user.username}
           showName={true}
           link={true}
         />
-        <div className='browser-info-user-roles'>
+        <div className='library-info-user-roles'>
           {
             roleText
           }
@@ -376,4 +376,4 @@ class BrowserInfoUser extends Classs<BrowserInfoUserProps>
   }
 }
 
-export default BrowserInfoColumn;
+export default LibraryInfoColumn;

@@ -49,17 +49,17 @@ const {List} = Immutable;
 import PureClasss from './../../common/components/PureClasss.tsx';
 import Dropdown from './../../common/components/Dropdown.tsx';
 import * as classNames from 'classnames';
-import BrowserTypes from '../BrowserTypes.tsx';
-import BrowserActions from '../data/BrowserActions.tsx';
-type Status = BrowserTypes.EVariantStatus;
-const Status = BrowserTypes.EVariantStatus;
+import LibraryTypes from '../LibraryTypes.tsx';
+import LibraryActions from '../data/LibraryActions.tsx';
+type Status = LibraryTypes.EVariantStatus;
+const Status = LibraryTypes.EVariantStatus;
 import Util from '../../util/Util.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
 import UserStore from '../../users/data/UserStore.tsx';
 
 interface Props
 {
-  variant: BrowserTypes.Variant;
+  variant: LibraryTypes.Variant;
   noBorder?: boolean;
 }
 
@@ -92,7 +92,7 @@ class StatusDropdown extends PureClasss<Props>
   handleChange(index:number)
   {
     let status = this.getOrder()[index];
-    BrowserActions.variants.status(this.props.variant, status);
+    LibraryActions.variants.status(this.props.variant, status);
   }
   
   canEdit():boolean
@@ -187,20 +187,20 @@ function getOption(status:Status)
     <div
       className='status-dropdown-option'
       style={{
-        color: BrowserTypes.colorForStatus(status)
+        color: LibraryTypes.colorForStatus(status)
       }}
     >
       <div
         className='status-dropdown-option-marker'
         style={{
-          background: BrowserTypes.colorForStatus(status)
+          background: LibraryTypes.colorForStatus(status)
         }}
       />
       <div
         className='status-dropdown-option-text'
       >
         {
-          BrowserTypes.nameForStatus(status)
+          LibraryTypes.nameForStatus(status)
         }
       </div>
     </div>
