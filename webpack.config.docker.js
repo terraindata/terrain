@@ -42,16 +42,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Build configuration for webpack when Midway is running under Docker.
+// Production build configuration for webpack.
 
 var webpack = require('webpack');
 var conf = require('./webpack.config');
 
+
+// Disable source map.
+delete conf.devtool;
+
 conf.plugins = [
   new webpack.DefinePlugin({
+    // Signal to React not to include detailed checks.
+    'process.env': {
+      'NODE_ENV': "'production'"
+    },
+    
     'DEV': "false",
-    'SERVER_URL': "'//" + process.env["MIDWAY_HOST"] + ":40080'"
+    
+    // The server simultaneously serves the client and the client's requests.
+    'MIDWAY_HOST': '',
+    'TDB_HOST': "'//:7344'"
   }),
+
+  // Minify code.
+  new webpack.optimize.UglifyJsPlugin()
 ];
+
+// enable babel plugins on tsx loader
+if(conf.module.loaders[0].loader !== 'babel?presets[]=react&presets[]=es2015!ts-loader')
+{
+  throw new Error('Expected first loader to be "babel?presets[]=react&presets[]=es2015!ts-loader" but found '
+    + conf.module.loaders[0].loader);
+}
+conf.module.loaders[0].loader =
+  'babel?presets[]=react&plugins[]=transform-react-inline-elements&plugins[]=transform-react-constant-elements&minified=true!ts-loader';
 
 module.exports = conf;
