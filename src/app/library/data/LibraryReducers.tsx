@@ -128,11 +128,11 @@ LibraryReducers[ActionTypes.algorithms.create] =
         state, 
         LibraryTypes._Algorithm({
           groupId: action.payload.groupId, 
-          algorithmId: algId,
+          id: algId,
         })
       ),
       LibraryTypes._Variant({
-        alogirhtmId: algId, 
+        algorithmId: algId,
         groupId: action.payload.groupId,
       })
     );
