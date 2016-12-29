@@ -50,6 +50,7 @@ import Actions from './../auth/data/AuthActions.tsx';
 import UserTypes from './../users/UserTypes.tsx';
 import RoleTypes from './../roles/RoleTypes.tsx';
 import LibraryTypes from './../library/LibraryTypes.tsx';
+import BuilderTypes from './../builder/BuilderTypes.tsx';
 import Util from './../util/Util.tsx';
 
 export interface QueryResponse
@@ -227,6 +228,7 @@ export const Ajax = {
   {
     return Ajax._get(`/items/${id}`, "", (response: any) =>
     {
+      // TODO change if the middle tier format changes
       let r = JSON.parse(response);
       let all = r && r[type + 's'];
       var item = all && all.find(i => i.id === id);
@@ -239,9 +241,16 @@ export const Ajax = {
     }, onError);
   },
   
-  getVariant(id: ID, onLoad: (variant: any) => void)
+  getVariant(id: ID, onLoad: (variant: LibraryTypes.Variant) => void)
   {
-    return Ajax.getItem('variant', id, onLoad);
+    return Ajax.getItem(
+      'variant', 
+      id,
+      (variantData: Object) =>
+      {
+        onLoad(LibraryTypes._Variant(variantData));
+      }
+    );
   },
 
   getVariantVersions(variantId: ID, onLoad: (variantVersions: any) => void)
@@ -265,7 +274,24 @@ export const Ajax = {
         let version = JSON.parse(response).find(version => version.id === versionId);
         if(version)
         {
-          onLoad(JSON.parse(version.data));
+          let data = JSON.parse(version.data);
+          Ajax.getVariant(variantId, (v: LibraryTypes.Variant) =>
+          {
+            if(v)
+            {
+              data['id'] = v.id;
+              data['groupId'] = v.groupId;
+              data['status'] = v.status;
+              data['algorithmId'] = v.algorithmId;
+              data['version'] = true;
+              
+              onLoad(LibraryTypes._Variant(data));
+            }
+            else
+            {
+              onLoad(null);
+            }
+          })
         }
         else
         {
@@ -274,6 +300,40 @@ export const Ajax = {
       },
       () => onLoad(null)
     );
+  },
+  
+  getQuery(variantId: ID, onLoad: (query: BuilderTypes.Query) => void)
+  {
+    // TODO change if we store queries separate from variants
+    const load = (v: LibraryTypes.Variant) =>
+    {
+      if(!v || !v.query)
+      {
+        onLoad(null);
+      }
+      onLoad(v.query);
+    }
+    
+    if(variantId.indexOf('@') === -1) 
+    {
+      return Ajax.getVariant(
+        variantId,
+        load
+      );
+    }
+    else 
+    {
+      // viewing an old version
+      const pieces = variantId.split('@');
+      const originalVariantId = pieces[0];
+      const versionId = pieces[1];
+      
+      return Ajax.getVariantVersion(
+        originalVariantId, 
+        versionId, 
+        load
+      );
+    }
   },
   
   saveItem(item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group, onLoad?: (resp: any) => void, onError?: (ev:Event) => void)

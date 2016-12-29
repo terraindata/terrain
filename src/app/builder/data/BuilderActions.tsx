@@ -80,16 +80,6 @@ const BuilderActions =
     (mode: string) =>
       $(ActionTypes.changeQueryMode, { mode }),
   
-  // fetches the query from the server
-  fetchQuery:
-    (variantId: ID, handleNoVariant: (variantId:ID) => void) =>
-      $(ActionTypes.fetchQuery, { variantId, handleNoVariant }),
-  
-  // load query from server into state
-  queryLoaded:
-    (variant: LibraryTypes.Variant, xhr: XMLHttpRequest) =>
-      $(ActionTypes.queryLoaded, { variant, xhr }),
-      
   changeTQL:
     (tql: string) =>
       $(ActionTypes.changeTQL, { tql }),
@@ -120,6 +110,17 @@ const BuilderActions =
   toggleDeck:
     (open: boolean) =>
       $(ActionTypes.toggleDeck, { open }),
+  
+  // fetches the query from the server
+  fetchQuery:
+    (variantId: ID, handleNoVariant: (variantId:ID) => void) =>
+      $(ActionTypes.fetchQuery, { variantId, handleNoVariant }),
+  
+  // load query from server into state
+  queryLoaded:
+    (query: BuilderTypes.Query, xhr: XMLHttpRequest) =>
+      $(ActionTypes.queryLoaded, { query, xhr }),
+  
 };
 
 _.map(ActionTypes, 

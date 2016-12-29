@@ -56,8 +56,8 @@ import LibraryTypes from './../../library/LibraryTypes.tsx';
 
 export class BuilderStateClass
 {
-  // TODO consider changing to 'query'
-  variant: LibraryTypes.Variant = null;
+  variantId: ID = "";
+  query: BuilderTypes.Query = null;
   
   loading: boolean = false;
   loadingXhr: XMLHttpRequest = null;

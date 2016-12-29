@@ -72,78 +72,23 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       state.loadingXhr.abort();
     }
     
-    const {variantId} = action.payload;
+    const {variantId, handleNoVariant} = action.payload;
     
-    let xhr: XMLHttpRequest = null;
-    
-    const noVariant = () => 
-      action.payload.handleNoVariant && 
-        action.payload.handleNoVariant(variantId);
-    
-    const variantLoaded = 
-      (v: Object) =>
-        Actions.queryLoaded(
-          LibraryTypes._Variant(v),
-          xhr
-        );
-    
-    if(variantId.indexOf('@') === -1) 
-    {
-      xhr = Ajax.getVariant(
-        variantId,
-        (variantData: Object) =>
+    let xhr: XMLHttpRequest = Ajax.getQuery(
+      variantId, 
+      (query: BuilderTypes.Query) =>
+      {
+        if(query)
         {
-          if(!variantData)
-          {
-            noVariant();
-            return;
-          }
-          variantLoaded(variantData);
+          Actions.queryLoaded(query, xhr);
         }
-      );
-    }
-    else 
-    {
-      // viewing an old version
-      const pieces = variantId.split('@');
-      const originalVariantId = pieces[0];
-      const versionId = pieces[1];
-      
-      xhr = Ajax.getVariantVersion(
-        originalVariantId, 
-        versionId, 
-        (versionData: Object) =>
+        else
         {
-          if(!versionData)
-          {
-            noVariant();
-            return;
-          }
-          
-          //Use current version to get missing fields
-          Ajax.getVariant(
-            originalVariantId, 
-            (variantData: { id: ID, groupId: ID, status: string, algorithmId: ID }) =>
-            {
-              if(!variantData) 
-              {
-                noVariant();
-                return;
-              }
-              
-              versionData['id'] = variantData.id;
-              versionData['groupId'] = variantData.groupId;
-              versionData['status'] = variantData.status;
-              versionData['algorithmId'] = variantData.algorithmId;
-              
-              versionData['version'] = true;
-              
-              variantLoaded(versionData);
-            }
-          );
+          handleNoVariant && 
+            handleNoVariant(variantId);
         }
-      );
-    }
+      }
+    );
     
     return state
       .set('loading', true)
@@ -157,7 +102,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     action:
     {
       payload?: { 
-        variant: LibraryTypes.Variant,
+        query: BuilderTypes.Query,
         xhr: XMLHttpRequest,
       },
     }
@@ -166,11 +111,12 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     if(state.loadingXhr !== action.payload.xhr)
     {
       // wrong XHR
+      console.log('wrong xhr loaded');
       return state;
     }
     
     return state
-      .set('variant', action.payload.variant)
+      .set('query', action.payload.query)
       .set('loading', false)
       .set('xhr', null)
     ;
