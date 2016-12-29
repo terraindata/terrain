@@ -38,6 +38,7 @@ As TerrainDB is not yet ready to be used end-to-end with Terraformer, we current
 1. `npm install`
 1. `npm run start-docker` - dev server now running at [localhost:8080](localhost:8080).
 1. Default user login: `luser` / `secret`
+1. Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans]
 
 Whenever new packages are installed from branches merged to master, run `npm install` locally.
 

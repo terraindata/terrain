@@ -66,7 +66,7 @@ export interface Options {
 
 class TQLConverter
 {
-  static toTQL(query: BuilderTypes.IQuery, options: Options = {}): string
+  static toTQL(query: BuilderTypes.Query, options: Options = {}): string
   {
     var {cards, inputs} = query;
     

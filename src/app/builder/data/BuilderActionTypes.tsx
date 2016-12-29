@@ -54,22 +54,28 @@ var Immutable = require('immutable');
 
 export var BuilderActionTypes = 
 {
+  fetchQuery: '',
+  queryLoaded: '',
+  
   create: '',
   change: '',
   move: '',
   nestedMove: '',
   remove: '',
-  fetch: '',
-  setVariant: '',
-  setVariantField: '',
+  
+  changeQueryMode: '',
+  
+  changeTQL: '',
+  
+  toggleDeck: '',
   
   hoverCard: '',
+  
   selectCard: '',
+  
   dragCard: '',
   dragCardOver: '',
   dropCard: '',
-  
-  toggleDeck: '',
 };
 
 // I tried using this type to correclty classify this function,
@@ -110,7 +116,6 @@ export let BuilderDirtyActionTypes = {};
   BuilderActionTypes.move,
   BuilderActionTypes.remove,
   BuilderActionTypes.nestedMove,
-  BuilderActionTypes.setVariantField,
   BuilderActionTypes.dropCard,
   BuilderActionTypes.toggleDeck,
 ].map(type => BuilderDirtyActionTypes[type] = true);

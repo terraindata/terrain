@@ -59,31 +59,30 @@ type IInput = BuilderTypes.IInput;
 interface Props
 {
   inputs: List<IInput>;
-  queryId: ID;
+  canEdit: boolean;
 }
 
 class InputsArea extends PureClasss<Props>
 {
   createInput()
   {
-    Actions.create(Immutable.List(['queries', this.props.queryId, 'inputs']), -1, 'input');
+    Actions.create(Immutable.List(['inputs']), -1, 'input');
   }
   
   renderNoInputs()
   {
     var large = ""; // "No inputs have been added, yet."
-    var button = "Add an Input";
+    var button =  this.props.canEdit ? "Add an Input" : null;
     var onClick = this.createInput;
     
     return (
-      <InfoArea large={large} button={button} onClick={onClick} />
+      <InfoArea 
+        large={large} 
+        button={button} 
+        onClick={onClick} 
+      />
     );
   }
-  
-  // moveTo(curIndex, newIndex)
-  // {
-  //   Actions.move(Immutable.List(['queries', this.props.queryId, 'inputs']), curIndex, newIndex);
-  // }
   
   render()
   {
@@ -92,26 +91,6 @@ class InputsArea extends PureClasss<Props>
       return this.renderNoInputs();
     }
     
-    // var layout = {
-    //   rows: this.props.inputs.map((input, index) => {
-    //     return {
-    //       content: <Input input={input} index={index} queryId={this.props.queryId} />,
-    //       key: input.id,
-    //     };
-    //   }).toJS(),
-    //   fullHeight: true,
-    // };
-    
-    // layout.rows.push({
-    //   content: (
-    //     <div className='standard-margin'>
-    //       <CreateLine open={false} onClick={this.createInput} />
-    //     </div>
-    //   ),
-    // });
-    
-        // <LayoutManager layout={layout} moveTo={this.moveTo} />
-    
     return (
       <div className='inputs-area'>
         {
@@ -119,14 +98,20 @@ class InputsArea extends PureClasss<Props>
             <Input
               input={input}
               index={index}
-              queryId={this.props.queryId}
+              canEdit={this.props.canEdit}
               key={input.id}
             />
           )
         }
         
         <div className='standard-margin'>
-          <CreateLine open={false} onClick={this.createInput} />
+          {
+            this.props.canEdit &&
+              <CreateLine 
+                open={false} 
+                onClick={this.createInput}
+              />
+          }
         </div>
       </div>
     );

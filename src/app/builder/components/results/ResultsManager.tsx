@@ -81,7 +81,7 @@ THE SOFTWARE.
 
 // interface Props
 // {
-//   query: BuilderTypes.IQuery;
+//   query: BuilderTypes.Query;
 //   onResultsChange(results);
 // }
 

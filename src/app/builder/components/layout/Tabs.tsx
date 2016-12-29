@@ -53,9 +53,8 @@ import PanelMixin from "../layout/PanelMixin.tsx";
 import InfoArea from "./../../../common/components/InfoArea.tsx";
 import Classs from './../../../common/components/Classs.tsx';
 import PureClasss from './../../../common/components/PureClasss.tsx';
-// import LibraryStore from './../../../library/data/LibraryStore.tsx';
-// import LibraryActions from './../../../library/data/LibraryActions.tsx';
 import BuilderStore from './../../../builder/data/BuilderStore.tsx';
+import {LibraryStore, LibraryState} from './../../../library/data/LibraryStore.tsx';
 import LibraryTypes from './../../../library/LibraryTypes.tsx';
 import * as classNames from 'classnames';
 const {browserHistory} = require('react-router');
@@ -229,8 +228,7 @@ class Tabs extends PureClasss<TabsProps> {
     {
       if(this.state.needsVariant)
       {
-        let variants = BuilderStore.getState().get('queries').toJS();
-        this.computeTabs(this.props.config, variants);
+        this.computeTabs(this.props.config);
       }
     }
     
@@ -251,9 +249,9 @@ class Tabs extends PureClasss<TabsProps> {
     }
   }
   
-  computeTabs(config, variants?)
+  computeTabs(config)
   {
-    variants = variants || this.state.variants;
+    let variants = LibraryStore.getState().variants;
     let needsVariant = false;
     let tabs = config && variants && config.split(',').map(vId =>
     {

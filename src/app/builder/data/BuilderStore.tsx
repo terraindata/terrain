@@ -51,23 +51,26 @@ var Redux = require('redux');
 import {BuilderActionTypes, BuilderDirtyActionTypes} from './BuilderActionTypes.tsx';
 import Util from '../../util/Util.tsx';
 
-import Types from './../BuilderTypes.tsx';
+import BuilderTypes from './../BuilderTypes.tsx';
+import LibraryTypes from './../../library/LibraryTypes.tsx';
 
 export class BuilderStateClass
 {
+  // TODO consider changing to 'query'
+  variant: LibraryTypes.Variant = null;
+  
   loading: boolean = false;
-  queries: Map<ID, Types.IQuery> = Map({});
+  loadingXhr: XMLHttpRequest = null;
   
   hoveringCardId: ID = "";
+  
   selectedCardIds: Map<ID, boolean> = Map({});
   
-  // These are only for the db of the current open variant
   tables: List<string> = List([]);
   tableColumns: Map<string, List<string>> = Map({});
-  
-  dbs: List<string> = List([]);
-  
-  manual: Map<ID, Types.ICards> = Map({});
+
+  // TODO move  
+  manual: Map<ID, BuilderTypes.ICards> = Map({});
   // Card examples used in the manual are stored here.
   
   draggingCardItem: CardItem = false;

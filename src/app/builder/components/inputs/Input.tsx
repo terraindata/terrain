@@ -73,6 +73,7 @@ var Input = React.createClass<any, any>({
 		input: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
     queryId: React.PropTypes.string.isRequired,
+    canEdit: React.PropTypes.bool.isRequired,
     // since inputs still are regular classes, instead of PureClasss, we construct keyPaths for Actions on execution
     //  rather than caching. This is fine since inputs aren't nested, there would be no
     //  benefit to caching keyPaths anyways.
@@ -85,7 +86,7 @@ var Input = React.createClass<any, any>({
   
   computeKeyPaths(props)
   {
-    let parentKeyPath = Immutable.List(['queries', props.queryId, 'inputs']);
+    let parentKeyPath = Immutable.List(['inputs']);
     let keyPath = parentKeyPath.push(props.index);
     return {
       keyPath,
@@ -224,11 +225,17 @@ var Input = React.createClass<any, any>({
     // return this.renderPanel((
 		return (
 			<div className='input' ref='input'>
-        <CreateLine open={false} onClick={this.createInput} />
+        {
+          this.props.canEdit &&
+            <CreateLine 
+              open={false} 
+              onClick={this.createInput} 
+            />
+        }
         <div className='input-inner'>
           <div className='input-top-row'>
             <BuilderTextbox
-              canEdit={true}
+              canEdit={this.props.canEdit}
               value={this.props.input.key}
               className="input-text input-text-first input-borderless"
               keyPath={this.state.keyKeyPath}

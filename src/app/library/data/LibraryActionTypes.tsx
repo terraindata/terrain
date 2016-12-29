@@ -51,12 +51,11 @@ var change = '';
 var move = '';
 var duplicate = '';
 
-var LibraryActionTypes = 
+export var LibraryActionTypes = 
 {
   groups: 
   { 
     create, change, move, duplicate,
-    prevGroups: '',
   },
   
   algorithms: 
@@ -74,8 +73,15 @@ var LibraryActionTypes =
   },
   
   loadState: '',
+  setDbs: '',
 };
 
 Util.setValuesToKeys(LibraryActionTypes, '');
+
+export const CleanLibraryActionTypes = // not dirty
+[
+  LibraryActionTypes.loadState,
+  LibraryActionTypes.setDbs,
+];
 
 export default LibraryActionTypes;

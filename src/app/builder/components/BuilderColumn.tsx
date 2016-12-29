@@ -64,7 +64,8 @@ const shallowCompare = require('react-addons-shallow-compare');
 import * as moment from 'moment';
 import Ajax from "./../../util/Ajax.tsx";
 import Manual from './../../manual/components/Manual.tsx';
-
+import BuilderTypes from '../BuilderTypes.tsx';
+type Query = BuilderTypes.Query;
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -127,6 +128,8 @@ var BuilderColumn = React.createClass<any, any>(
     selectedCardName: React.PropTypes.string,
     switchToManualCol: React.PropTypes.func,
     changeSelectedCardName: React.PropTypes.func,
+    canEdit: React.PropTypes.bool.isRequired,
+    cantEditReason: React.PropTypes.string,
   },
   
   getInitialState()
@@ -198,24 +201,12 @@ var BuilderColumn = React.createClass<any, any>(
     });
   },
   
-  renderContent(canEdit:boolean)
+  renderContent()
   {
-    var query = this.props.query;
+    const {canEdit, query} = this.props;
     switch(this.state.column)
     {
       case COLUMNS.Builder:
-        // this should be temporary; remove when middle tier arrives
-        // var spotlights = Immutable.List(query.results ? query.results.reduce((spotlights, result) =>
-        // {
-        //   if(result.spotlight)
-        //   {
-        //     spotlights.push(result);
-        //   }
-        //   return spotlights;
-        // }, []) : []);
-        // TODO
-        let spotlights = Immutable.List([]);
-        
         if (this.props.query.mode === "tql")
         {
           return <InfoArea
@@ -227,8 +218,6 @@ var BuilderColumn = React.createClass<any, any>(
         return <CardsColumn 
           cards={query.cards} 
           deckOpen={query.deckOpen}
-          queryId={query.id}
-          spotlights={spotlights} 
           canEdit={canEdit}
           addColumn={this.props.onAddManualColumn}
           columnIndex={this.props.index}
@@ -237,7 +226,7 @@ var BuilderColumn = React.createClass<any, any>(
       case COLUMNS.Inputs:
         return <InputsArea
           inputs={query.inputs}
-          queryId={query.id}
+          canEdit={canEdit}
         />;
       
       case COLUMNS.Results:
@@ -251,7 +240,6 @@ var BuilderColumn = React.createClass<any, any>(
       case COLUMNS.TQL:
         return <BuilderTQLColumn
           canEdit={canEdit}
-          query={query}
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
           addColumn={this.props.onAddManualColumn}
@@ -314,54 +302,50 @@ var BuilderColumn = React.createClass<any, any>(
     localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
   },
   
-  revertVersion()
-  {
-    if (this.props.query.version) 
-    {
-      if (confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.')) 
-      {
-        this.props.onRevert();
-      }
-    }
-  },
+  // TODO put in builder
+  // revertVersion()
+  // {
+  //   if (this.props.query.version) 
+  //   {
+  //     if (confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.')) 
+  //     {
+  //       this.props.onRevert();
+  //     }
+  //   }
+  // },
 
-  renderBuilderVersionToolbar(canEdit)
-  {
-    if(this.props.query.version)
-    {
-      if (this.state.column === COLUMNS.Builder || this.state.column === COLUMNS.TQL)
-      {
-        var lastEdited = moment(this.props.query.lastEdited).format("h:mma on M/D/YY")
-        return (
-          <div className='builder-revert-toolbar'> 
-            <div className='builder-revert-time-message'>
-              Version from {lastEdited}
-            </div>
-            <div className='builder-white-space'/>
-            {
-              canEdit ? 
-                  <div 
-                    className='button builder-revert-button' 
-                    onClick={this.revertVersion} 
-                    //data-tip="Resets the Variant's contents to this version. You can always undo the revert, and reverting does not lose any of the Variant's history."
-                  >
-                    Revert to this version
-                  </div>
-                  : <div />
-             }
-          </div>
-          );
-      }
-    }
-  },
+  // renderBuilderVersionToolbar(canEdit)
+  // {
+  //   if(this.props.query.version)
+  //   {
+  //     if (this.state.column === COLUMNS.Builder || this.state.column === COLUMNS.TQL)
+  //     {
+  //       var lastEdited = moment(this.props.query.lastEdited).format("h:mma on M/D/YY")
+  //       return (
+  //         <div className='builder-revert-toolbar'> 
+  //           <div className='builder-revert-time-message'>
+  //             Version from {lastEdited}
+  //           </div>
+  //           <div className='builder-white-space'/>
+  //           {
+  //             canEdit ? 
+  //                 <div 
+  //                   className='button builder-revert-button' 
+  //                   onClick={this.revertVersion} 
+  //                   //data-tip="Resets the Variant's contents to this version. You can always undo the revert, and reverting does not lose any of the Variant's history."
+  //                 >
+  //                   Revert to this version
+  //                 </div>
+  //                 : <div />
+  //            }
+  //         </div>
+  //         );
+  //     }
+  //   }
+  // },
 
   render() {
-    let {query} = this.props;
-    let canEdit = (query.status === LibraryTypes.EVariantStatus.Build
-      && Util.canEdit(query, UserStore, RolesStore))
-      || this.state.column === COLUMNS.Inputs;
-    let cantEditReason = query.status !== LibraryTypes.EVariantStatus.Build ?
-      'This Variant is not in Build status' : 'You are not authorized to edit this Variant';
+    let {query, canEdit, cantEditReason} = this.props;
     
     return this.renderPanel((
       <div className={'builder-column builder-column-' + this.props.index}>

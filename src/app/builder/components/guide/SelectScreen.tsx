@@ -54,15 +54,15 @@ import Actions from "../../data/BuilderActions.tsx";
 import Card from "../cards/Card.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import BuilderTypes from '../../BuilderTypes.tsx';
-import {IQuery, ICondition, IExpression, EExpressionType, EScreen} from './Guide.tsx';
+import {Query, ICondition, IExpression, EExpressionType, EScreen} from './Guide.tsx';
 let L = Immutable.List;
 let M = Immutable.Map;
 
 interface Props
 {
   screen: EScreen;
-  query: IQuery;
-  onQueryChange: (query:IQuery) => void;
+  query: Query;
+  onQueryChange: (query:Query) => void;
 }
 
 interface State

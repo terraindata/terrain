@@ -50,113 +50,162 @@ import ActionTypes from './BuilderActionTypes.tsx';
 import Actions from './BuilderActions.tsx';
 import * as _ from 'underscore';
 import {BuilderState} from './BuilderStore.tsx';
-import {_IResultsConfig} from './../components/results/ResultsConfig.tsx';
 import Util from '../../util/Util.tsx';
 
-let BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
+const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
 {
   
-[ActionTypes.fetch]:
-  (state: BuilderState, action) =>
+[ActionTypes.fetchQuery]:
+  (
+    state: BuilderState, 
+    action: { 
+      payload?: { 
+        variantId: ID, 
+        handleNoVariant: (id:ID) => void 
+      }
+    }
+  ) => 
   {
-    action.payload.variantIds.map(
-      variantId =>
+    if(state.loadingXhr)
+    {
+      console.log('loadingXHR still in play');
+      state.loadingXhr.abort();
+    }
+    
+    const {variantId} = action.payload;
+    
+    let xhr: XMLHttpRequest = null;
+    
+    const noVariant = () => 
+      action.payload.handleNoVariant && 
+        action.payload.handleNoVariant(variantId);
+    
+    const variantLoaded = 
+      (v: Object) =>
+        Actions.queryLoaded(
+          LibraryTypes._Variant(v),
+          xhr
+        );
+    
+    if(variantId.indexOf('@') === -1) 
+    {
+      xhr = Ajax.getVariant(
+        variantId,
+        (variantData: Object) =>
         {
-          if(variantId.indexOf('@') !== -1) 
+          if(!variantData)
           {
-            var versionId = variantId.split('@')[1];
-            variantId = variantId.split('@')[0];
-            Ajax.getVariantVersion(variantId, versionId, (version) =>
-              {
-                if(!version)
-                {
-                  action.payload.handleNoVariant && action.payload.handleNoVariant(variantId + '@' + versionId);
-                  return;
-                }
-                
-                //Use current version to get missing fields
-                Ajax.getVariant(variantId, (item) => 
-                  {
-                  if(!item) 
-                  {
-                    action.payload.handleNoVariant && action.payload.handleNoVariant(variantId + '@' + versionId);
-                    return;
-                  }
-                  version.id = item.id;
-                  version.groupId = item.groupId;
-                  version.status = item.status;
-                  version.algorithmId = item.algorithmId;
-                  version.version = true;
-                  Actions.setVariant(variantId + '@' + versionId, version);
-                });
-              }
-            );
+            noVariant();
+            return;
           }
-          else 
+          variantLoaded(variantData);
+        }
+      );
+    }
+    else 
+    {
+      // viewing an old version
+      const pieces = variantId.split('@');
+      const originalVariantId = pieces[0];
+      const versionId = pieces[1];
+      
+      xhr = Ajax.getVariantVersion(
+        originalVariantId, 
+        versionId, 
+        (versionData: Object) =>
+        {
+          if(!versionData)
           {
-            Ajax.getVariant(variantId, (item) =>
+            noVariant();
+            return;
+          }
+          
+          //Use current version to get missing fields
+          Ajax.getVariant(
+            originalVariantId, 
+            (variantData: { id: ID, groupId: ID, status: string, algorithmId: ID }) =>
             {
-              if(!item)
+              if(!variantData) 
               {
-                action.payload.handleNoVariant && action.payload.handleNoVariant(variantId);
+                noVariant();
                 return;
               }
-              item.version = false;
-              Actions.setVariant(variantId, item);
+              
+              versionData['id'] = variantData.id;
+              versionData['groupId'] = variantData.groupId;
+              versionData['status'] = variantData.status;
+              versionData['algorithmId'] = variantData.algorithmId;
+              
+              versionData['version'] = true;
+              
+              variantLoaded(versionData);
             }
           );
         }
-      }
-    );
-    return state.set('loading', true);
+      );
+    }
+    
+    return state
+      .set('loading', true)
+      .set('loadingXhr', xhr)
+    ;
   },
   
-[ActionTypes.setVariant]: 
-  (state: BuilderState, action:
-  {
-    payload?: { variantId: string, variant: any},
-  }) =>
-  {
-    let v = action.payload.variant;
-    let cards = BuilderTypes.recordFromJS(v.cards || []);
-    let inputs = BuilderTypes.recordFromJS(v.inputs || []);
-    let resultsConfig = _IResultsConfig(v.resultsConfig);
-    
-    if(Immutable.Iterable.isIterable(v))
+[ActionTypes.queryLoaded]:
+  (
+    state: BuilderState, 
+    action:
     {
-      v = v.set('cards', cards).set('inputs', inputs).set('resultsConfig', resultsConfig);
+      payload?: { 
+        variant: LibraryTypes.Variant,
+        xhr: XMLHttpRequest,
+      },
     }
-    else
+  ) =>
+  {
+    if(state.loadingXhr !== action.payload.xhr)
     {
-      v.cards = cards;
-      v.inputs = inputs;
-      v.resultsConfig = resultsConfig;
-      v = LibraryTypes._Variant(v);
+      // wrong XHR
+      return state;
     }
     
-    return state.setIn(['queries', action.payload.variantId],
-      v
-    )
+    return state
+      .set('variant', action.payload.variant)
+      .set('loading', false)
+      .set('xhr', null)
+    ;
   },
-
-[ActionTypes.setVariantField]: 
-  (state: BuilderState, action:
-  {
-    payload?: { variantId: string, field: string, value: any},
-  }) =>
-    state.setIn(['queries', action.payload.variantId, action.payload.field],
-      action.payload.value
-    ),
 
 [ActionTypes.change]:  
-  (state: BuilderState, action) =>
-    state.setIn(action.payload.keyPath, action.payload.value),
+  (
+    state: BuilderState, 
+    action: {
+      payload?: {
+        keyPath: KeyPath,
+        value: any,
+      }
+    }
+  ) =>
+    state.setIn(
+      action.payload.keyPath.unshift('variant'), // TODO change to 'query' if BuilderState changes
+      action.payload.value
+    ),
   
 [ActionTypes.create]:  
-  (state: BuilderState, action: {
-    payload?: { keyPath: KeyPath, index: number, factoryType: string, data: any }
-  }) =>
-    state.updateIn(action.payload.keyPath, arr =>
+  (
+    state: BuilderState, 
+    action: {
+      payload?: { 
+        keyPath: KeyPath, 
+        index: number, 
+        factoryType: string, 
+        data: any 
+      }
+    }
+  ) =>
+    state.updateIn(
+      action.payload.keyPath, 
+      (arr) =>
       {
         let item = action.payload.data ? action.payload.data :
             BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType]);
@@ -177,17 +226,27 @@ let BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   ,
     
 [ActionTypes.move]:  
-  (state: BuilderState, action: {
-    payload?: { keyPath: KeyPath, index: number, newIndex; number }
-  }) =>
-    state.updateIn(action.payload.keyPath, arr =>
-    {
-      let {index, newIndex} = action.payload;
-      let el = arr.get(index);
-      arr = arr.splice(index, 1);
-      arr = arr.splice(newIndex, 0, el); // TODO potentially correct index
-      return arr;
-    }),
+  (
+    state: BuilderState, 
+    action: {
+      payload?: { 
+        keyPath: KeyPath, 
+        index: number, 
+        newIndex; number 
+      }
+    }
+  ) =>
+    state.updateIn(
+      action.payload.keyPath.unshift('variant'), 
+      (arr) =>
+      {
+        let {index, newIndex} = action.payload;
+        let el = arr.get(index);
+        arr = arr.splice(index, 1);
+        arr = arr.splice(newIndex, 0, el); // TODO potentially correct index
+        return arr;
+      }
+    ),
 
      // first check original keypath
 [ActionTypes.nestedMove]: // a deep move
@@ -315,7 +374,7 @@ let BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   
   [ActionTypes.toggleDeck]:
     (state: BuilderState, action) => state
-      .setIn(['queries', action.payload.queryId, 'deckOpen'], action.payload.open),
+      .set('deckOpen', action.payload.open),
 };
 
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
@@ -333,5 +392,17 @@ function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
   
   return state;
 }
+
+_.map(ActionTypes as any, 
+  (type: string) =>
+  {
+    if(!BuidlerReducers[type])
+    {
+      let error = 'Missing Builder Reducer for Builder Action Type ' + type;
+      alert(error);
+      throw new Error(error);
+    }
+  }
+);
 
 export default BuidlerReducers;

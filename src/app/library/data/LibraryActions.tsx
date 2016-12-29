@@ -45,6 +45,7 @@ THE SOFTWARE.
 var _ = require('underscore');
 import ActionTypes from './LibraryActionTypes.tsx';
 import Store from './LibraryStore.tsx';
+import {LibraryState, LibraryStore} from './LibraryStore.tsx';
 import LibraryTypes from './../LibraryTypes.tsx';
 import BuilderTypes from './../../builder/BuilderTypes.tsx';
 type Group = LibraryTypes.Group;
@@ -127,6 +128,9 @@ const Actions =
     (state) =>
       $(ActionTypes.loadState, { state }),
   
+  setDbs:
+    (dbs: List<string>) =>
+      $(ActionTypes.setDbs, { dbs }),
   
   // overwrites current state with state from server
   fetch:
@@ -140,10 +144,9 @@ const Actions =
           {
             alg.variants = Immutable.Map({});
           }
-          alg.variants = alg.variants.set(variant.id, 
-            (LibraryTypes._Variant(variant))
-              .set('cards', BuilderTypes.recordFromJS(variant.cards))
-              .set('inputs', BuilderTypes.recordFromJS(variant.inputs))
+          alg.variants = alg.variants.set(
+            variant.id,
+            LibraryTypes._Variant(variant)
           );
         });
         

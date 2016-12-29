@@ -65,7 +65,7 @@ import TQLEditor from './TQLEditor.tsx';
 import TQLPopup from './TQLPopup.tsx';
 
 interface Props {
-  query?: BuilderTypes.IQuery;
+  query?: BuilderTypes.Query;
   canEdit?: boolean;
   
   params?: any;
@@ -149,11 +149,8 @@ class BuilderTQLColumn extends PureClasss<Props>
     this.setState({
       tql: code,
     });
-    BuilderActions.setVariantField
-      (this.props.query.id,
-      'tql',
-      code
-      );
+    
+    BuilderActions.changeTQL(code);
   }
 
   changeThemeDefault() 
@@ -300,11 +297,9 @@ class BuilderTQLColumn extends PureClasss<Props>
 
   switchMode()
   {
-    BuilderActions.setVariantField
-      (this.props.query.id, 
-        'mode', 
-        this.props.query.mode === 'tql' ? 'cards' : 'tql'
-      );
+    BuilderActions.changeQueryMode(
+      this.props.query.mode === 'tql' ? 'cards' : 'tql'
+    );
 
     //update when have tql to cards conversion capabilities 
     this.setState({

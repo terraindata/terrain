@@ -257,18 +257,23 @@ export const Ajax = {
   getVariantVersion(variantId: ID, versionId: string, onLoad: (variantVersion: any) => void)
   {
     var url = '/variant_versions/' + variantId;
-    return Ajax._get(url, "", (response: any) =>
-    {
-      let version = JSON.parse(response).find(version => version.id === versionId);
-      if(version)
+    return Ajax._get(
+      url, 
+      "", 
+      (response: any) =>
       {
-        onLoad(JSON.parse(version.data));
-      }
-      else
-      {
-        onLoad(null);
-      }
-    });
+        let version = JSON.parse(response).find(version => version.id === versionId);
+        if(version)
+        {
+          onLoad(JSON.parse(version.data));
+        }
+        else
+        {
+          onLoad(null);
+        }
+      },
+      () => onLoad(null)
+    );
   },
   
   saveItem(item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group, onLoad?: (resp: any) => void, onError?: (ev:Event) => void)

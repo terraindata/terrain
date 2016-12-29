@@ -62,34 +62,52 @@ export module LibraryTypes
 
   class VariantC
   {
+    type = "variant";
+    
     id = "";
     name = "";
     lastEdited = "";
     lastUsername = "";
     algorithmId = "";
     groupId = "";
-    resultsConfig = null;
-    mode = "";
-    tql = "";
     status = EVariantStatus.Build;
     version = false;
     db = '';
-    deckOpen = true;
-    
     isDefault = false;
-
-    cards = Immutable.List([]);
-    inputs = Immutable.List([]);
     
-    // for DB storage
-    type = "variant";
+    // don't use this!
+    // TODO remove when variants can be saved without queries
+    query: BuilderTypes.Query = null;
+    
+    // for DB storage, hopefully uneeded soon
     dbFields = ['groupId', 'algorithmId', 'status'];
-    dataFields = ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs', 'mode', 'tql', 'resultsConfig', 'db', 'deckOpen', 'isDefault'];    
+    dataFields = ['name', 'lastEdited', 'lastUsername', 'query', 'db', 'isDefault'];    
+    modelVersion = 1;
+    static getDb: (v:Variant) => string;
   }
+  VariantC.getDb = (v:Variant) => v.db;
   export interface Variant extends VariantC, IRecord<Variant> {}
   const Variant_Record = Immutable.Record(new VariantC());
   export const _Variant = (config?:any) => {
-    let v = new Variant_Record(Util.extendId(config || {})) as any as Variant;
+    config = Util.extendId(config || {});
+    
+    if(config.type === 'variant' && !config.modelVersion)
+    {
+      // from modelVersion 0 to 1
+      config.modelVersion = 1;
+      config.query = {
+        cards: config.cards,
+        inputs: config.inputs,
+        resultsConfig: config.resultsConfig,
+        tql: config.tql,
+        mode: config.mode,
+        deckOpen: config.deckOpen,
+      };
+    }
+    
+    config.query = BuilderTypes._Query(config.query);
+    
+    let v = new Variant_Record(config) as any as Variant;
     if(!config || !config.lastUsername || !config.lastEdited)
     {
       v = touchVariant(v);
@@ -125,7 +143,6 @@ export module LibraryTypes
     lastEdited = "";
     lastUsername = "";
     groupId = "";
-    variants = Immutable.Map({});
     variantsOrder = Immutable.List([]);
     status = EAlgorithmStatus.Live;
     
@@ -168,7 +185,6 @@ export module LibraryTypes
     lastEdited = "";
     lastUsername = "";
     usernames = Immutable.List([]);
-    algorithms = Immutable.Map({});
     algorithmsOrder = Immutable.List([]);
     status = EGroupStatus.Live;
     

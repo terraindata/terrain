@@ -51,80 +51,81 @@ import AuthStore from './../../auth/data/AuthStore.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
 import RoleStore from './../../roles/data/RolesStore.tsx';
 import Actions from "./LibraryActions.tsx";
+import {LibraryActionTypes, CleanLibraryActionTypes} from './LibraryActionTypes.tsx';
 import LibraryTypes from './../LibraryTypes.tsx';
+type Group = LibraryTypes.Group;
+type Algorithm = LibraryTypes.Algorithm;
+type Variant = LibraryTypes.Variant;
 import Util from './../../util/Util.tsx';
 import BuilderActions from '../../builder/data/BuilderActions.tsx';
 
 import Ajax from './../../util/Ajax.tsx';
 
-var DefaultState = Immutable.fromJS({
-  loading: true,
-  // groups: {},
-  // groupsOrder: [],
-});
+class LibraryStateC
+{
+  loading = true;
+  dbs: List<string> = Immutable.List([]);
+  
+  groups: Map<ID, Group> = null;
+  algorithms: Map<ID, Algorithm> = null;
+  variants: Map<ID, Variant> = null;
+  
+  prevGroups: Map<ID, Group> = null; // TODO set these on initial load
+  prevAlgorithms: Map<ID, Algorithm> = null;
+  prevVariants: Map<ID, Variant> = null;
+  
+  groupsOrder: List<ID> = Immutable.List([]);
+}
+const LibraryState_Record = Immutable.Record(new LibraryStateC());
+export interface LibraryState extends LibraryStateC, IRecord<LibraryState> {}
+export const _LibraryState = (config?:any) => {
+  return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
+}
+
+var DefaultState = _LibraryState();
 
 import LibraryReducers from './LibraryReducers.tsx';
 
-let LibraryStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  LibraryReducers,
-{})), DefaultState);
-
-
-LibraryStore.subscribe(() =>
-{
-  let state = LibraryStore.getState();
-  let groups = state.get('groups');
-  let prevGroups = state.get('prevGroups');
-  if(groups !== prevGroups)
+export const LibraryStore: IStore<LibraryState> = Redux.createStore(
+  (state: LibraryState = DefaultState, action) =>
   {
-    groups && groups.map((group: LibraryTypes.Group, groupId: ID) =>
+    if(LibraryReducers[action.type])
     {
-      let prevGroup = prevGroups.get(groupId);
-      if(group !== prevGroup)
+      state = LibraryReducers[action.type](state, action);
+    }
+    
+    if(CleanLibraryActionTypes.indexOf(action.type) === -1)
+    {
+      // save the new state
+      saveStateOf(state.groups, state.prevGroups);
+      saveStateOf(state.algorithms, state.prevAlgorithms);
+      saveStateOf(state.variants, state.prevVariants);
+    }
+    
+    state = state
+      .set('prevGroups', state.groups)
+      .set('prevAlgorithms', state.algorithms)
+      .set('prevVariants', state.variants);
+    
+    return state;
+  }
+, DefaultState);
+
+
+const saveStateOf = (current: Map<ID, any>, previous: Map<ID, any>) =>
+{
+  if(current !== previous)
+  {
+    current && previous && current.map((curItem: any, curId: ID) =>
+    {
+      let prevItem = previous.get(curId);
+      if(curItem !== prevItem)
       {
-        let saveAlgs = () =>
-          group.algorithms.map((alg: LibraryTypes.Algorithm, algId: ID) =>
-          {
-            let prevAlg = prevGroup && prevGroup.algorithms.get(algId);
-            if(prevAlg !== alg)
-            {
-              let saveVariants = () =>
-                alg.variants.map((v: LibraryTypes.Variant, vId: ID) =>
-                {
-                  if(v !== (prevAlg && prevAlg.variants.get(vId)))
-                  {
-                    if(Util.canEdit(v, UserStore, RoleStore))
-                    {
-                      Ajax.saveItem(v);
-                      BuilderActions.setVariant(v.id, v);
-                    }
-                  }
-                });
-                
-              if(Util.canEdit(alg, UserStore, RoleStore))
-              {
-                Ajax.saveItem(alg, saveVariants);
-              }
-              else
-              {
-                saveVariants();
-              }
-            }
-          });
-          
-        if(Util.canEdit(group, UserStore, RoleStore))
-        {
-          Ajax.saveItem(group, saveAlgs);
-        }
-        else
-        {
-          saveAlgs();
-        }
+        // should save
+        Ajax.saveItem(curItem);
       }
     });
-    
-    Actions.groups.prevGroups(groups);
   }
-});
+}
 
 export default LibraryStore;

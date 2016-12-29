@@ -159,7 +159,10 @@ class Dropdown extends PureClasss<Props>
       optionsEl = 
         <div className="dropdown-options-wrapper">
           {
-            this.props.options.map(this.renderOption)
+            this.props.options ?
+              this.props.options.map(this.renderOption)
+            :
+              'No options available'
           }
         </div>
     }
@@ -187,7 +190,7 @@ class Dropdown extends PureClasss<Props>
           {
             // map through all of the options so that the dropdown takes the width of the longest one
             //  CSS hides all but the selected option
-            this.props.options.map((option, index) => 
+            this.props.options && this.props.options.map((option, index) => 
               <div
                 key={index}
                 className={classNames({

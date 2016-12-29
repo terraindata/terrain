@@ -67,7 +67,8 @@ import LibraryTypes from '../../library/LibraryTypes.tsx';
 import LibraryStore from '../../library/data/LibraryStore.tsx';
 import LibraryActions from '../../library/data/LibraryActions.tsx';
 import Types from '../BuilderTypes.tsx';
-type IQuery = Types.IQuery;
+type Query = Types.Query;
+type Variant = LibraryTypes.Variant;
 
 // Components
 import PureClasss from './../../common/components/PureClasss.tsx';
@@ -169,8 +170,21 @@ class Builder extends PureClasss<Props>
   
   componentDidMount()
   {
+    window.onbeforeunload = () =>
+    {
+      if(this.shouldSave())
+      {
+        return 'You have unsaved changes to this Variant. If you leave, they will be lost. Are you sure you want to leave?';
+      }
+      return true;
+    }
     this.checkConfig(this.props);
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+  }
+  
+  componentWillUnmount()
+  {
+    window.onbeforeunload = null;
   }
   
   routerWillLeave(nextLocation): boolean
@@ -212,37 +226,36 @@ class Builder extends PureClasss<Props>
     return true;
   }
   
-  querySub: any;
+  variantSub: any;
   schemaXhr: XMLHttpRequest;
-  loadTables(props:Props, query?:IQuery)
+  loadTables(props:Props, variant?:Variant)
   {
-    query = query || this.getSelectedQuery(props);
+    variant = variant || this.getSelectedVariant(props);
     
-    if(!query)
+    if(!variant)
     {
-      var queryId = this.getSelectedId(props);
+      var variantId = this.getSelectedId(props);
       
-      if(this.querySub)
+      if(this.variantSub)
       {
-        this.querySub();
+        this.variantSub();
       }
       
-      // query hasn't loaded yet
-      this.querySub = Store.subscribe(() => {
-        let state:BuilderState = Store.getState();
-        query = state.queries.get(queryId);
+      // variant hasn't loaded yet
+      this.variantSub = Store.subscribe(() => {
+        let v = Store.getState().variant;
         
-        if(query && this.querySub)
+        if(v && this.variantSub)
         {
-          this.querySub();
-          this.querySub = null;
-          this.loadTables(null, query);
+          this.variantSub();
+          this.variantSub = null;
+          this.loadTables(null, v);
         }
       });
       return;
     }
 
-    let {db} = query;
+    let {db} = variant;
     if(db !== this.state.curDb)
     {
       this.schemaXhr && this.schemaXhr.abort();
@@ -373,9 +386,13 @@ class Builder extends PureClasss<Props>
     return selected && selected.substr(1);
   }
   
-  getSelectedQuery(props?:Props): IQuery
+  loadingVariant = LibraryTypes._Variant({
+    loading: true,
+    name: 'Loading',
+  })
+  getSelectedVariant(props?:Props): Variant
   {
-    return this.state.builder.queries.get(this.getSelectedId(props));
+    return this.state.builder.variant || this.loadingVariant;
   }
   
   createAlgorithm()
@@ -422,7 +439,7 @@ class Builder extends PureClasss<Props>
   
   onSave()
   {
-    if (this.getSelectedQuery().version) 
+    if (this.getSelectedVariant().version) 
     {
       if (!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?')) 
       {
@@ -436,19 +453,18 @@ class Builder extends PureClasss<Props>
   {
     notificationManager.addNotification(
       'Saved',
-      this.getSelectedQuery().name,
+      this.getSelectedVariant().name,
       'info', 
       4
     );
     
     //TODO remove when store changes
-    let v = this.state.builder.queries.get(this.getSelectedId());
+    let v = this.state.builder.variant;
     if(LibraryStore.getState().getIn(['groups', v['groupId'], 'algorithms', v['algorithmId'], 'variants', v.id]))
     {
       LibraryActions.variants.change(v as LibraryTypes.Variant);
     }
     
-    console.log('action');
     Actions.change(List(['isDirty']), false, true);
   }
 
@@ -456,7 +472,7 @@ class Builder extends PureClasss<Props>
   {
     notificationManager.addNotification(
       'Error Saving',
-      '"' + this.getSelectedQuery().name + '" failed to save.', 
+      '"' + this.getSelectedVariant().name + '" failed to save.', 
       'error', 
       0
     );
@@ -464,7 +480,7 @@ class Builder extends PureClasss<Props>
   
   shouldSave(overrideState?:BuilderState): boolean
   {
-    let query = this.getSelectedQuery();
+    let query = this.getSelectedVariant();
     if(query)
     {
       if(query.status === LibraryTypes.EVariantStatus.Live)
@@ -485,7 +501,7 @@ class Builder extends PureClasss<Props>
   
   save()
   {
-    let query = this.getSelectedQuery();
+    let query = this.getSelectedVariant();
     Ajax.saveItem(
       LibraryTypes.variantForSave(query as LibraryTypes.Variant),
       this.onSaveSuccess,
@@ -540,7 +556,13 @@ class Builder extends PureClasss<Props>
   getColumn(index)
   {
     let key = this.state.colKeys.get(index);
-    let query = this.getSelectedQuery();
+    let variant = this.getSelectedVariant();
+    let query = variant.query;
+    let canEdit = (variant.status === LibraryTypes.EVariantStatus.Build
+      && Util.canEdit(variant, UserStore, RolesStore))
+    let cantEditReason = variant.status !== LibraryTypes.EVariantStatus.Build ?
+      'This Variant is not in Build status' : 'You are not authorized to edit this Variant';
+
     return {
       minWidth: 316,
       resizeable: true,
@@ -559,6 +581,8 @@ class Builder extends PureClasss<Props>
         selectedCardName={this.state.selectedCardName}
         switchToManualCol={this.switchToManualCol}
         changeSelectedCardName={this.changeSelectedCardName}
+        canEdit={canEdit}
+        cantEditReason={cantEditReason}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key,
@@ -695,7 +719,7 @@ class Builder extends PureClasss<Props>
 	render()
   {
     let config = this.props.params.config;
-    let query = this.getSelectedQuery();
+    let query = this.getSelectedVariant();
 
     return (
       <div className={classNames({

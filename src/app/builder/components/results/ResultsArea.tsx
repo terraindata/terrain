@@ -68,7 +68,7 @@ const MAX_RESULTS = 200;
 
 interface Props
 {
-  query: BuilderTypes.IQuery;
+  query: BuilderTypes.Query;
   onLoadStart: () => void;
   onLoadEnd: () => void;
   canEdit: boolean;
@@ -623,7 +623,7 @@ class ResultsArea extends PureClasss<Props>
   
   handleConfigChange(config:IResultsConfig)
   {
-    Actions.change(List(['queries', this.props.query.id, 'resultsConfig']), config);
+    Actions.change(List(['resultsConfig']), config);
   }
 
 	render()

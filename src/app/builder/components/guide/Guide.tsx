@@ -86,7 +86,7 @@ export enum EScreen
 export interface State
 {
   screen: EScreen;
-  query: IQuery;
+  query: Query;
 }
 
 export enum EExpressionType
@@ -123,7 +123,7 @@ export interface IConditions
 }
 
 // DIFFERENT FROM BROWSERTYPES
-class IQueryClass
+class QueryClass
 {
   tables: {
     table: string;
@@ -137,17 +137,17 @@ class IQueryClass
     combinator: BuilderTypes.Combinator.AND,
   }
 }
-export interface IQuery extends IQueryClass, IRecord<IQuery> {}
-const IQuery_Record = Immutable.Record(new IQueryClass());
-export const _IQuery = (config?:any) => {
-  return new IQuery_Record(config || {}) as any as IQuery;
+export interface Query extends QueryClass, IRecord<Query> {}
+const Query_Record = Immutable.Record(new QueryClass());
+export const _Query = (config?:any) => {
+  return new Query_Record(config || {}) as any as Query;
 }
 
 class Guide extends PureClasss<Props>
 {
   state: State = {
     screen: EScreen.FROM,
-    query: _IQuery(),
+    query: _Query(),
   };
   
   constructor(props:Props)
