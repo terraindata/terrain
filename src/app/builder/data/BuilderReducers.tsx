@@ -272,6 +272,24 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     return state;
   },
 
+[ActionTypes.changeTQL]:
+  (
+    state: BuilderState,
+    action: Action<{
+      tql: string,
+    }>
+  ) =>
+    state.setIn(['query', 'tql'], action.payload.tql),
+
+[ActionTypes.changeQueryMode]:
+  (
+    state: BuilderState,
+    action: Action<{
+      mode: string,
+    }>
+  ) =>
+    state.setIn(['query', 'mode'], action.payload.mode),
+
 [ActionTypes.hoverCard]:
   (state: BuilderState, action: {
     payload?: { cardId: ID },
@@ -302,6 +320,15 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     return state.setIn(['selectedCardIds', cardId], true);
   },
 
+  [ActionTypes.dragCard]:
+    (
+      state: BuilderState,
+      action: Action<{
+        cardItem: any,
+      }>
+    ) =>
+      state.set('draggingCardItem', action.payload.cardItem),
+  
   [ActionTypes.dragCardOver]:
     (state: BuilderState, action: {
       payload?: { keyPath: KeyPath, index: number }

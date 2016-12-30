@@ -86,6 +86,22 @@ var DefaultState = _LibraryState();
 
 import LibraryReducers from './LibraryReducers.tsx';
 
+function saveStateOf(current: Map<ID, any>, previous: Map<ID, any>)
+{
+  if(current !== previous)
+  {
+    current && previous && current.map((curItem: any, curId: ID) =>
+    {
+      let prevItem = previous.get(curId);
+      if(curItem !== prevItem)
+      {
+        // should save
+        Ajax.saveItem(curItem);
+      }
+    });
+  }
+}
+
 export const LibraryStore: IStore<LibraryState> = Redux.createStore(
   (state: LibraryState = DefaultState, action) =>
   {
@@ -111,21 +127,5 @@ export const LibraryStore: IStore<LibraryState> = Redux.createStore(
   }
 , DefaultState);
 
-
-const saveStateOf = (current: Map<ID, any>, previous: Map<ID, any>) =>
-{
-  if(current !== previous)
-  {
-    current && previous && current.map((curItem: any, curId: ID) =>
-    {
-      let prevItem = previous.get(curId);
-      if(curItem !== prevItem)
-      {
-        // should save
-        Ajax.saveItem(curItem);
-      }
-    });
-  }
-}
 
 export default LibraryStore;

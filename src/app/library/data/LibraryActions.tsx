@@ -45,7 +45,7 @@ THE SOFTWARE.
 var _ = require('underscore');
 import ActionTypes from './LibraryActionTypes.tsx';
 import Store from './LibraryStore.tsx';
-import {LibraryState, LibraryStore} from './LibraryStore.tsx';
+import {LibraryState, LibraryStore, _LibraryState} from './LibraryStore.tsx';
 import LibraryTypes from './../LibraryTypes.tsx';
 import BuilderTypes from './../../builder/BuilderTypes.tsx';
 type Group = LibraryTypes.Group;
@@ -125,7 +125,7 @@ const Actions =
   },
   
   loadState:
-    (state) =>
+    (state: LibraryState) =>
       $(ActionTypes.loadState, { state }),
   
   setDbs:
@@ -136,45 +136,38 @@ const Actions =
   fetch:
     () =>
     {
-      Ajax.getItems((groups, algorithms, variants, groupsOrder) =>
+      Ajax.getItems((groupsData, algorithmsData, variantsData, groupsOrder) =>
       {
-        _.map(variants, variant => {
-          let alg = algorithms[variant.algorithmId];
-          if(!alg.variants)
-          {
-            alg.variants = Immutable.Map({});
-          }
-          alg.variants = alg.variants.set(
-            variant.id,
-            LibraryTypes._Variant(variant)
+        let variants = Immutable.Map({});
+        _.map(variantsData, variantData => {
+          variants = variants.set(
+            variantData.id,
+            LibraryTypes._Variant(variantData)
           );
         });
         
-        _.map(algorithms, algorithm => {
-          if(algorithm.variantsOrder)
-          {
-            algorithm.variantsOrder = Immutable.List(algorithm.variantsOrder);
-          }
-          let g = groups[algorithm.groupId];
-          if(!g.algorithms)
-          {
-            g.algorithms = Immutable.Map({});
-          }
-          g.algorithms = g.algorithms.set(algorithm.id, LibraryTypes._Algorithm(algorithm));
+        let algorithms = Immutable.Map({});
+        _.map(algorithmsData, algorithmData => {
+          algorithms = algorithms.set(
+            algorithmData.id,
+            LibraryTypes._Algorithm(algorithmData)
+          );
         });
         
-        var groupMap = {};
-        _.map(groups, group => {
-          if(group.algorithmsOrder)
-          {
-            group.algorithmsOrder = Immutable.List(group.algorithmsOrder);
-          }
-          groupMap[group.id] = LibraryTypes._Group(group);
+        let groups = Immutable.Map({});
+        _.map(groupsData, groupData => {
+          groups = groups.set(
+            groupData.id,
+            LibraryTypes._Group(groupData)
+          );
         });
         
-        Actions.loadState(Immutable.fromJS({
-          groups: Immutable.Map(groupMap),
+        Actions.loadState(_LibraryState({
+          groups,
+          algorithms,
+          variants,
           groupsOrder: Immutable.List(groupsOrder),
+          loading: false,
         }));
       })
     },

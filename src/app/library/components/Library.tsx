@@ -124,6 +124,7 @@ class Library extends PureClasss<Props>
   render()
   {
     const {libraryState} = this.state;
+    
     if(!this.state.loadFinished)
     {
       return (

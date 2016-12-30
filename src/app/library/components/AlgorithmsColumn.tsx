@@ -246,7 +246,7 @@ class AlgorithmsColumn extends PureClasss<Props>
       (lastTouched: Variant, v:Variant) =>
       {
         let date = new Date(v.lastEdited);
-        let lastTouchedDate = new Date(lastTouched.lastEdited);
+        let lastTouchedDate = new Date(lastTouched && lastTouched.lastEdited);
         if(!lastTouched || (lastTouchedDate < date || isNaN(lastTouchedDate.getTime())))
         {
           return v;
@@ -364,15 +364,16 @@ class AlgorithmsColumn extends PureClasss<Props>
   
   render()
   {
+    console.log(this.props);
     return (
       <LibraryColumn
         index={2}
         title='Algorithms'
       >
         { 
-          this.props.algorithms ?
+          this.props.algorithmsOrder ?
             (
-              this.props.algorithms.size ?
+              this.props.algorithmsOrder.size ?
               (
                 <div>
                   { this.renderCategory(LibraryTypes.EAlgorithmStatus.Live) }

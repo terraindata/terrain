@@ -354,9 +354,9 @@ class VariantsColumn extends Classs<Props>
         title='Variants'
       >
         { 
-          this.props.variants ?
+          this.props.variantsOrder ?
             (
-              this.props.variants.size ?
+              this.props.variantsOrder.size ?
               (
                 <div>
                   { this.renderVariants() }

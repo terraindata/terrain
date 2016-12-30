@@ -539,6 +539,7 @@ class Builder extends PureClasss<Props>
         index={index}
         colKey={key}
         query={query}
+        variant={variant}
         onAddColumn={this.handleAddColumn}
         onAddManualColumn={this.handleAddManualColumn}
         onCloseColumn={this.handleCloseColumn}

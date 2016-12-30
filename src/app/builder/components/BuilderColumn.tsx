@@ -114,6 +114,7 @@ var BuilderColumn = React.createClass<any, any>(
   propTypes:
   {
     query: React.PropTypes.object.isRequired,
+    variant: React.PropTypes.object.isRequired,
     className: React.PropTypes.string,
     index: React.PropTypes.number,
     canAddColumn: React.PropTypes.bool,
@@ -244,6 +245,8 @@ var BuilderColumn = React.createClass<any, any>(
           onLoadEnd={this.handleLoadEnd}
           addColumn={this.props.onAddManualColumn}
           columnIndex={this.props.index}
+          query={query}
+          variant={this.props.variant}
         />;
         
       case COLUMNS.Manual:

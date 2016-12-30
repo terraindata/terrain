@@ -59,12 +59,14 @@ import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss.tsx';
 import Ajax from "./../../util/Ajax.tsx";
 import Modal from './../../common/components/Modal.tsx';
+import LibraryTypes from '../../library/LibraryTypes.tsx';
 
 import TQLEditor from './TQLEditor.tsx';
 
 import TQLPopup from './TQLPopup.tsx';
 
 interface Props {
+  variant?: LibraryTypes.Variant;
   query?: BuilderTypes.Query;
   canEdit?: boolean;
   
@@ -474,7 +476,7 @@ class BuilderTQLColumn extends PureClasss<Props>
           
           <TQLResultsBar
             tql={this.state.tql}
-            db={this.props.query && this.props.query.db}
+            db={this.props.variant && this.props.variant.db}
             onError={this.highlightError}
             onLoadStart={this.props.onLoadStart}
             onLoadEnd={this.props.onLoadEnd}

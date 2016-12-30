@@ -94,10 +94,7 @@ const BuilderActions =
   
   dragCard:
     (cardItem: CardItem) =>
-      $(ActionTypes.change, { 
-        keyPath: Immutable.List(['draggingCardItem']),
-        value: cardItem,
-      }),
+      $(ActionTypes.dragCard, { cardItem }),
   
   dragCardOver:
     (keyPath: KeyPath, index: number) =>

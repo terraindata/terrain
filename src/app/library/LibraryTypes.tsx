@@ -48,6 +48,7 @@ import RoleTypes from './../roles/RoleTypes.tsx';
 import BuilderTypes from './../builder/BuilderTypes.tsx';
 import * as Immutable from 'immutable';
 import {IResultsConfig} from '../builder/components/results/ResultsConfig.tsx';
+const {List, Map} = Immutable;
 
 export module LibraryTypes
 {
@@ -143,7 +144,7 @@ export module LibraryTypes
     lastEdited = "";
     lastUsername = "";
     groupId = "";
-    variantsOrder = Immutable.List([]);
+    variantsOrder = List([]);
     status = EAlgorithmStatus.Live;
     
     // for DB storage
@@ -154,7 +155,9 @@ export module LibraryTypes
   const Algorithm_Record = Immutable.Record(new AlgorithmC());
   export interface Algorithm extends AlgorithmC, IRecord<Algorithm> {}
   export const _Algorithm = (config?:any) => {
-    return new Algorithm_Record(Util.extendId(config || {})) as any as Algorithm;
+    config = Util.extendId(config || {});
+    config.variantsOrder = List(config.variantsOrder || []);
+    return new Algorithm_Record(config) as any as Algorithm;
   }
 
   export const groupColors =
@@ -184,8 +187,8 @@ export module LibraryTypes
     name = "";
     lastEdited = "";
     lastUsername = "";
-    usernames = Immutable.List([]);
-    algorithmsOrder = Immutable.List([]);
+    usernames = List([]);
+    algorithmsOrder = List([]);
     status = EGroupStatus.Live;
     
     // for DB storage
@@ -196,7 +199,10 @@ export module LibraryTypes
   const Group_Record = Immutable.Record(new GroupC());
   export interface Group extends GroupC, IRecord<Group> {}
   export const _Group = (config?:any) => {
-    return new Group_Record(Util.extendId(config || {})) as any as Group;
+    config = Util.extendId(config || {});
+    config.usernames = List(config.usernames || []);
+    config.algorithmsOrder = List(config.algorithmsOrder || []);
+    return new Group_Record(config) as any as Group;
   }
   
   export function nameForStatus(status:EVariantStatus): string
