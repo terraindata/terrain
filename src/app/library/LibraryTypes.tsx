@@ -102,6 +102,7 @@ export module LibraryTypes
         tql: config.tql,
         mode: config.mode,
         deckOpen: config.deckOpen,
+        variantId: config.id,
       };
     }
     
@@ -117,16 +118,15 @@ export module LibraryTypes
   
   export function touchVariant(v: Variant): Variant
   {
-    return v.set('lastEdited', new Date())
-      .set('lastUsername', localStorage['username']);
+    return v
+      .set('lastEdited', new Date())
+      .set('lastUsername', localStorage['username'])
+    ;
   }
   
   export function variantForSave(v: Variant): Variant
   {
-    v = touchVariant(v);
-    v = v.set('cards', BuilderTypes.cardsForServer(v.cards));
-    v = v.set('resultsConfig', v.resultsConfig.toJS());
-    return v;
+    return v.set('query', BuilderTypes.queryForSave(v.query));
   }
   
   export enum EAlgorithmStatus
@@ -230,6 +230,24 @@ export module LibraryTypes
         return '#48b14b';
       default:
         return '#000';
+    }
+  }
+  
+  export function getDbFor(item: Variant | Algorithm | Group | BuilderTypes.Query): string
+  {
+    // TODO change when DB is at algorithm level
+    switch(item && item.type)
+    {
+      case 'query':
+        // const variantId = (item as BuilderTypes.Query).variantId;        
+        return null;
+      case 'variant':
+        return (item as Variant).db;
+      case 'algorithm':
+        return null;
+      case 'group':
+      default:
+        return null;
     }
   }
 }

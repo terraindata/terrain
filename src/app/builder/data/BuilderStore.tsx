@@ -66,6 +66,7 @@ export class BuilderStateClass
   
   selectedCardIds: Map<ID, boolean> = Map({});
   
+  db: string = "";
   tables: List<string> = List([]);
   tableColumns: Map<string, List<string>> = Map({});
 

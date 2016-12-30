@@ -123,7 +123,9 @@ export module BuilderTypes
   // currently, only Variants have Queries, 1:1, but that may change
   class QueryC
   {
-    id = "";
+    id: ID = "";
+    variantId: ID = "";
+    
     cards: ICards = List([]);
     inputs: List<any> = List([]);
     resultsConfig: IResultsConfig = null;
@@ -146,6 +148,14 @@ export module BuilderTypes
     config['resultsConfig'] = _IResultsConfig(config['resultsConfig']);
     
     return new Query_Record(config) as any as Query;
+  }
+  
+  export function queryForSave(query: Query): Object
+  {
+    query = query
+      .set('cards', cardsForServer(query.cards))
+      .set('resultsConfig', query.resultsConfig.toJS());
+    return query.toJS();
   }
   
   export interface IInput extends IRecord<IInput>

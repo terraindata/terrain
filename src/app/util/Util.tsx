@@ -177,6 +177,25 @@ var Util = {
     return then.format('MM/DD/YY') + hour;
   },
   
+  assertKeysArePresent(first, second, errorMsg: string, oneWay?: boolean)
+  {
+    _.map(first, 
+      (v, key: string) =>
+      {
+        if(!second[key])
+        {
+          alert(errorMsg + key);
+          throw new Error(errorMsg + key);
+        }
+      }
+    );
+    
+    if(!oneWay)
+    {
+      Util.assertKeysArePresent(second, first, errorMsg, true);
+    }
+  },
+  
   // for SQL
   formatInputDate(date:Date):string
   {

@@ -54,20 +54,15 @@ var Immutable = require('immutable');
 
 export var BuilderActionTypes = 
 {
-  fetchQuery: '',
-  queryLoaded: '',
+  fetchQuery: '', // triggers server xhr
+  queryLoaded: '', // when the call to the server returns
   
+  // these apply to the state's query
   create: '',
   change: '',
-  move: '',
-  nestedMove: '',
+  move: '', // within the same parent
+  nestedMove: '', // can occur between different parts of the tree
   remove: '',
-  
-  changeQueryMode: '',
-  
-  changeTQL: '',
-  
-  toggleDeck: '',
   
   hoverCard: '',
   
@@ -76,6 +71,18 @@ export var BuilderActionTypes =
   dragCard: '',
   dragCardOver: '',
   dropCard: '',
+  
+  // between Cards and TQL
+  changeQueryMode: '',
+  
+  // Change the TQL, whether compiled or hand-written
+  changeTQL: '',
+  
+  toggleDeck: '',
+  
+  changeTables: '', // tables and columns for current query's db
+  
+  save: '', // just tells the store that something was saved
 };
 
 // I tried using this type to correclty classify this function,

@@ -119,6 +119,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       .set('query', action.payload.query)
       .set('loading', false)
       .set('xhr', null)
+      .set('isDirty', false)
     ;
   },
 
@@ -133,7 +134,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     }
   ) =>
     state.setIn(
-      action.payload.keyPath.unshift('variant'), // TODO change to 'query' if BuilderState changes
+      action.payload.keyPath.unshift('query'),
       action.payload.value
     ),
   
@@ -183,7 +184,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     }
   ) =>
     state.updateIn(
-      action.payload.keyPath.unshift('variant'), 
+      action.payload.keyPath.unshift('query'), 
       (arr) =>
       {
         let {index, newIndex} = action.payload;
@@ -321,6 +322,30 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   [ActionTypes.toggleDeck]:
     (state: BuilderState, action) => state
       .set('deckOpen', action.payload.open),
+  
+  [ActionTypes.changeTables]:
+    (
+      state: BuilderState,
+      action: Action<{
+        db: string,
+        tables: Tables,
+        tableColumns: TableColumns,
+      }>
+    ) =>
+      state
+        .set('db', action.payload.db)
+        .set('tables', action.payload.tables)
+        .set('tableColumns', action.payload.tableColumns),
+
+  [ActionTypes.save]:
+    (
+      state: BuilderState,
+      action: Action<{
+        failed?: boolean,
+      }>
+    ) =>
+      state
+        .set('isDirty', action.payload && action.payload.failed),
 };
 
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
@@ -339,16 +364,6 @@ function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
   return state;
 }
 
-_.map(ActionTypes as any, 
-  (type: string) =>
-  {
-    if(!BuidlerReducers[type])
-    {
-      let error = 'Missing Builder Reducer for Builder Action Type ' + type;
-      alert(error);
-      throw new Error(error);
-    }
-  }
-);
+Util.assertKeysArePresent(ActionTypes, BuidlerReducers, 'Missing Builder Reducer for Builder Action Types: ');
 
 export default BuidlerReducers;

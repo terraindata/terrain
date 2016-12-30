@@ -56,6 +56,11 @@ interface Array<T> {
   findIndex(predicate: (search: T) => boolean) : number;
 }
 
+interface Action<T> {
+  type: string;
+  payload?: T;
+}
+
 declare type List<T> = Immutable.List<T>;
 declare type Map<K, T> = Immutable.Map<K, T>;
 declare type KeyPath = List<string | number>;
@@ -67,6 +72,9 @@ declare type Delete<T> = (f: string) => T;
 declare type DeleteIn<T> = (f: (string | number)[] | KeyPath) => T;
 declare type Update<T> = (f: string, updater: (n: any) => any) => T;
 declare type UpdateIn<T> = (f: (string | number)[] | KeyPath, updater: (n: any) => any) => T;
+
+declare type Tables = List<string>;
+declare type TableColumns = Map<string, List<string>>;
 
 declare interface IStore<T>
 {
