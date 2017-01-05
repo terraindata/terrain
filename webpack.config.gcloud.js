@@ -61,7 +61,7 @@ conf.plugins = [
     'DEV': "false",
     
     // Keep this blank, since the default midway host would be the one serving this page.
-    'MIDWAY_HOST': '',
+    'MIDWAY_HOST': "''",
 
     // TDB_HOST would be set at runtime...
     // 'TDB_HOST': "'//" + process.env.TDB_HOST + ":7344'"

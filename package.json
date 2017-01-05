@@ -11,7 +11,7 @@
     "deploy2": "MIDWAY_HOST=pa-terraformer02.terrain.int TDB_HOST=pa-terraformer02.terrain.int webpack --config webpack.config.prod.js --output-filename bundle.js && scp bundle.js pa-terraformer02.terrain.int:midway/dist/bundle.js",
     "build-prod": "MIDWAY_HOST=pa-terraformer01.terrain.int TDB_HOST=pa-terraformer04.terrain.int webpack --config webpack.config.prod.js --output-filename bundle.js",
     "build-demo": "MIDWAY_HOST=localhost TDB_HOST=localhost webpack --config webpack.config.prod.js --output-filename bundle.demo.js",
-    "build-gcloud": "webpack --config webpack.config.gcloud.js --output-filename bundle.js",
+    "build-gcloud": "webpack --config webpack.config.gcloud.js --output-filename bundle.gcloud.js",
     "build": "MIDWAY_HOST=pa-terraformer01.terrain.int TDB_HOST=pa-terraformer04.terrain.int webpack"
   },
   "repository": {
