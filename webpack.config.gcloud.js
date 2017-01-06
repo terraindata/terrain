@@ -60,9 +60,11 @@ conf.plugins = [
     
     'DEV': "false",
     
-    // The server simultaneously serves the client and the client's requests.
-    'MIDWAY_HOST': '',
-    'TDB_HOST': "'//:7344'"
+    // Keep this blank, since the default midway host would be the one serving this page.
+    'MIDWAY_HOST': "''",
+
+    // TDB_HOST would be set at runtime...
+    // 'TDB_HOST': "'//" + process.env.TDB_HOST + ":7344'"
   }),
 
   // Minify code.

@@ -83,6 +83,10 @@ const {browserHistory} = require('react-router');
 // let history = createHistory();
 import Ajax from './util/Ajax.tsx';
 
+import BuilderStore from './builder/data/BuilderStore.tsx';
+import LibraryStore from './library/data/LibraryStore.tsx';
+import UserStore from './users/data/UserStore.tsx';
+
 // Icons
 var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
 var HomeIcon = require("./../images/icon_profile_16x16.svg?name=HomeIcon");
@@ -322,12 +326,33 @@ var router = (
 if(!DEV)
 {
   // report uncaught errors in production
-  window.onerror = function (msg, url, lineNo, columnNo, error) {
-    console.log('error', msg, error && error.stack); //, error.message, error.stack);
+  window.onerror = function (errorMsg, url, lineNo, columnNo, error) {
+    
+    let user = UserStore.getState().get('currentUser');
+    let username = user && user.username;
+    let libraryState = JSON.stringify(LibraryStore.getState().toJS());
+    let builderState = JSON.stringify(BuilderStore.getState().toJS());
+    let location = JSON.stringify(window.location);
+    
+    let msg = `${errorMsg} by ${username}
+      Location:
+      ${location}
+      
+      Library State:
+      ${libraryState}
+      
+      Builder State:
+      ${builderState}
+      
+      Error Stack:
+      ${error && error.stack}
+    `;
+    
+    console.log('error reported', msg); //, error.message, error.stack);
     
     $.post('http://lukeknepper.com/email.php', {
         secret: '11235813',
-        msg: msg + '\n' + (error && error.stack),
+        msg: msg
       });
 
     return false;
