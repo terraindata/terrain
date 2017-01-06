@@ -118,8 +118,9 @@ class DeployModal extends PureClasss<Props>
   {
     let variant = this.state.changingStatusOf;
     let state = LibraryStore.getState();
-    let algorithm = state.getIn(['groups', this.state.changingStatusOf.groupId, 'algorithms', this.state.changingStatusOf.algorithmId]) as LibraryTypes.Algorithm;
+    let algorithm = state.algorithms.get(variant.algorithmId);
     let defaultTql = 'There is not currently a default Variant for algorithm ' + algorithm.name;
+    // TODO
     if(this.state.defaultChecked)
     {
       let defaultVariant = algorithm.variants.find(v => v.isDefault);

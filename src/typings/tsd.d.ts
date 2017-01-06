@@ -97,6 +97,7 @@ declare interface IMap<T>
   updateIn: UpdateIn<T>;
   toMap: () => Map<string, any>;
   keys: () => Immutable.Iterator<any>;
+  toJS: () => Object;
 }
 
 declare interface IRecord<T> extends IMap<T>
