@@ -54,7 +54,7 @@ import Actions from "../../data/BuilderActions.tsx";
 import Card from "../cards/Card.tsx";
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import BuilderTypes from '../../BuilderTypes.tsx';
-import {Query, ICondition, IExpression, EExpressionType, EScreen} from './Guide.tsx';
+import {IQuery, ICondition, IExpression, EExpressionType, EScreen} from './Guide.tsx';
 import SelectScreen from './SelectScreen.tsx';
 let L = Immutable.List;
 let M = Immutable.Map;
@@ -62,7 +62,7 @@ let M = Immutable.Map;
 interface Props
 {
   screen: EScreen;
-  query: Query;
+  query: IQuery;
   onChange: (something) => void;
 }
 

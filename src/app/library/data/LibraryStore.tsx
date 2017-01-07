@@ -63,6 +63,7 @@ import Ajax from './../../util/Ajax.tsx';
 
 class LibraryStateC
 {
+  loaded = false;
   loading = true;
   dbs: List<string> = Immutable.List([]);
   
@@ -70,7 +71,8 @@ class LibraryStateC
   algorithms: Map<ID, Algorithm> = null;
   variants: Map<ID, Variant> = null;
   
-  prevGroups: Map<ID, Group> = null; // TODO set these on initial load
+  // these are set these on initial load
+  prevGroups: Map<ID, Group> = null;
   prevAlgorithms: Map<ID, Algorithm> = null;
   prevVariants: Map<ID, Variant> = null;
   

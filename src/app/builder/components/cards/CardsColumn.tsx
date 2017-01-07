@@ -97,7 +97,7 @@ class CardsColumn extends PureClasss<Props>
   
   computeKeyPath(props:Props):KeyPath
   {
-    return List(this._keyPath('cards'));
+    return List(this._keyPath('query', 'cards'));
   }
   
   componentWillReceiveProps(nextProps:Props)
@@ -178,6 +178,7 @@ class CardsColumn extends PureClasss<Props>
   innerHeight: number = -1;
   render()
   {
+    console.log(this.props.cards.toJS());
     let {props} = this;
     let {cards, canEdit} = props;
     let {keyPath} = this.state;

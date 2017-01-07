@@ -108,8 +108,7 @@ class Library extends PureClasss<Props>
       stateKey: 'libraryState',
       isMounted: true,
     })
-      
-    Actions.fetch();
+    
     RolesActions.fetch();
     UserActions.fetch();
   }

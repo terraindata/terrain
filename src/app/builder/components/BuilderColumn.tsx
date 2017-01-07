@@ -47,6 +47,7 @@ require('./BuilderColumn.less');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as Immutable from 'immutable';
+import * as classNames from 'classnames';
 const {List} = Immutable;
 import Util from '../../util/Util.tsx';
 import Menu from '../../common/components/Menu.tsx';
@@ -348,6 +349,7 @@ var BuilderColumn = React.createClass<any, any>(
   // },
 
   render() {
+    console.log(this.props.query.cards.toJS());
     let {query, canEdit, cantEditReason} = this.props;
     
     return this.renderPanel((
@@ -363,17 +365,24 @@ var BuilderColumn = React.createClass<any, any>(
           }
           <div className='builder-title-bar-title'>
             <span ref='handle'>
-              { COLUMNS[this.state.column] }
+              { 
+                COLUMNS[this.state.column]
+              }
               {
-                !canEdit ? 
-                  <LockedIcon data-tip={cantEditReason} />
-                : null
+                !canEdit &&
+                  <LockedIcon 
+                    data-tip={cantEditReason}
+                  />
               }
             </span>
             {
               this.state.loading &&
               (this.state.column === COLUMNS.Results || this.state.column === COLUMNS.TQL) &&
-                <div className='builder-column-loading'>Loading...</div>
+                <div 
+                  className='builder-column-loading'
+                >
+                  Loading...
+                </div>
             }
           </div>
           <div className='builder-title-bar-options'>
@@ -393,17 +402,23 @@ var BuilderColumn = React.createClass<any, any>(
                   data-tip="Add Column"
                 />
             }
-            <Menu options={this.getMenuOptions()}/>
+            <Menu 
+              options={this.getMenuOptions()}
+            />
           </div>
         </div>
-        {this.renderBuilderVersionToolbar(canEdit)}
-        <div className={
-            (this.state.column === COLUMNS.Manual ? 'builder-column-manual ' : '') +
-            'builder-column-content ' + 
-            (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '') +
-            (this.state.column === COLUMNS.Inputs ? ' builder-column-content-scroll' : '') 
-          }>
-          { this.renderContent(canEdit) }
+        <div
+          className={classNames({
+            'builder-column-content': true,
+            'builder-column-manual': this.state.column === COLUMNS.Manual,
+            'builder-column-content-scroll': 
+              this.state.column === COLUMNS.Builder ||
+                this.state.column === COLUMNS.Inputs,
+          })
+        }>
+          { 
+            this.renderContent(canEdit)
+          }
         </div>
       </div>
     ));

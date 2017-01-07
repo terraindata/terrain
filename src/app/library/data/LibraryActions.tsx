@@ -76,10 +76,6 @@ const Actions =
     duplicate:
       (group: Group, index: number) =>
         $(ActionTypes.groups.duplicate, { group, index }),
-    
-    prevGroups:
-      (groups: Map<ID, Group>) =>
-        $(ActionTypes.groups.prevGroups, { groups }),
   },
   
   algorithms:

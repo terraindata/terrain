@@ -68,7 +68,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   {
     if(state.loadingXhr)
     {
-      console.log('loadingXHR still in play');
+      console.log('loadingXHR still in play', action.payload.variantId);
       state.loadingXhr.abort();
     }
     
@@ -118,7 +118,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     return state
       .set('query', action.payload.query)
       .set('loading', false)
-      .set('xhr', null)
+      .set('loadingXhr', null)
       .set('isDirty', false)
     ;
   },
@@ -134,7 +134,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     }
   ) =>
     state.setIn(
-      action.payload.keyPath.unshift('query'),
+      action.payload.keyPath,
       action.payload.value
     ),
   
@@ -161,7 +161,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
         {
           return item; // creating at that spot
         }
-        
+        console.log(action.payload, arr, item);
         return arr.splice
         (
           action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index,
@@ -184,7 +184,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     }
   ) =>
     state.updateIn(
-      action.payload.keyPath.unshift('query'), 
+      action.payload.keyPath, 
       (arr) =>
       {
         let {index, newIndex} = action.payload;

@@ -364,7 +364,6 @@ class AlgorithmsColumn extends PureClasss<Props>
   
   render()
   {
-    console.log(this.props);
     return (
       <LibraryColumn
         index={2}

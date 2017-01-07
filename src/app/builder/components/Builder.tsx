@@ -55,8 +55,7 @@ const {browserHistory} = require('react-router');
 const { withRouter } = require('react-router');
 
 // Data
-import Store from "./../data/BuilderStore.tsx";
-import { BuilderState } from "./../data/BuilderStore.tsx";
+import { BuilderStore, BuilderState } from "./../data/BuilderStore.tsx";
 import Actions from "./../data/BuilderActions.tsx";
 import Util from "./../../util/Util.tsx";
 import UserActions from '../../users/data/UserActions.tsx';
@@ -64,7 +63,7 @@ import UserStore from '../../users/data/UserStore.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
 import RolesActions from '../../roles/data/RolesActions.tsx';
 import LibraryTypes from '../../library/LibraryTypes.tsx';
-import LibraryStore from '../../library/data/LibraryStore.tsx';
+import { LibraryStore, LibraryState } from '../../library/data/LibraryStore.tsx';
 import LibraryActions from '../../library/data/LibraryActions.tsx';
 import Types from '../BuilderTypes.tsx';
 type Query = Types.Query;
@@ -112,7 +111,7 @@ class Builder extends PureClasss<Props>
     leaving: boolean;
     nextLocation: any;
   } = {
-    builderState: Store.getState(),
+    builderState: BuilderStore.getState(),
     variants: LibraryStore.getState().variants,
     
     colKeys: null,
@@ -131,7 +130,7 @@ class Builder extends PureClasss<Props>
   {
     super(props);
     
-    this._subscribe(Store, {
+    this._subscribe(BuilderStore, {
       stateKey: 'builderState',
     });
     this._subscribe(LibraryStore, {
@@ -176,14 +175,16 @@ class Builder extends PureClasss<Props>
   
   componentDidMount()
   {
-    window.onbeforeunload = () =>
+    window.onbeforeunload = (e) => 
     {
       if(this.shouldSave())
       {
-        return 'You have unsaved changes to this Variant. If you leave, they will be lost. Are you sure you want to leave?';
+        let msg = 'You have unsaved changes to this Variant. If you leave, they will be lost. Are you sure you want to leave?';
+        e && (e.returnValue = msg);
+        return msg;
       }
-      return true;
     }
+    
     this.checkConfig(this.props);
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
@@ -201,7 +202,7 @@ class Builder extends PureClasss<Props>
       return true;
     }
     
-    if(this.shouldSave(Store.getState()))
+    if(this.shouldSave(BuilderStore.getState()))
     {
       // ^ need to pass in the most recent state, because when you've navigated away
       // in a dirty state, saved on the navigation prompt, and then returned,
@@ -378,7 +379,9 @@ class Builder extends PureClasss<Props>
   
   getVariant(props?:Props): LibraryTypes.Variant
   {
-    return 
+    let variant = this.state.variants && 
+      this.state.variants.get(this.getSelectedId(props));
+    return variant || this.loadingVariant;
   }
   
   tabActions = Immutable.List([
@@ -469,6 +472,7 @@ class Builder extends PureClasss<Props>
   save()
   {
     let variant = LibraryTypes.touchVariant(this.getVariant());
+    variant = variant.set('query', this.getQuery());
     Ajax.saveItem(
       LibraryTypes.variantForSave(variant),
       this.onSaveSuccess.bind(this, variant),
@@ -525,12 +529,12 @@ class Builder extends PureClasss<Props>
   {
     let key = this.state.colKeys.get(index);
     let variant = this.getVariant();
-    let query = variant.query;
+    let query = this.getQuery();
     let canEdit = (variant.status === LibraryTypes.EVariantStatus.Build
       && Util.canEdit(variant, UserStore, RolesStore))
     let cantEditReason = variant.status !== LibraryTypes.EVariantStatus.Build ?
       'This Variant is not in Build status' : 'You are not authorized to edit this Variant';
-
+    console.log(query);
     return {
       minWidth: 316,
       resizeable: true,
@@ -687,6 +691,7 @@ class Builder extends PureClasss<Props>
   
 	render()
   {
+    console.log(this.state.builderState);
     let config = this.props.params.config;
     let variant = this.getVariant();
     let query = this.getQuery();

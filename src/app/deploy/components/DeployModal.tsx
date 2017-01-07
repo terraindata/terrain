@@ -117,23 +117,27 @@ class DeployModal extends PureClasss<Props>
   renderTQLColumn()
   {
     let variant = this.state.changingStatusOf;
-    let state = LibraryStore.getState();
-    let algorithm = state.algorithms.get(variant.algorithmId);
+    let libraryState = LibraryStore.getState();
+    let algorithm = libraryState.algorithms.get(variant.algorithmId);
     let defaultTql = 'There is not currently a default Variant for algorithm ' + algorithm.name;
-    // TODO
+    
     if(this.state.defaultChecked)
     {
-      let defaultVariant = algorithm.variants.find(v => v.isDefault);
+      let defaultVariant = libraryState.variants.find(
+        v => v.algorithmId === variant.algorithmId && v.isDefault
+      );
       if(defaultVariant)
       {
-        defaultTql = defaultVariant.mode === 'tql' ? defaultVariant.tql : TQLConverter.toTQL(defaultVariant);
+        // TODO change to simply defaultVariant.tql when the query tql structure changes
+        defaultTql = defaultVariant.query.mode === 'tql' ? defaultVariant.query.tql : TQLConverter.toTQL(defaultVariant.query);
       }
     }
     
     let tql = '';
     if(variant)
     {
-      tql = variant.mode === 'tql' ? variant.tql : TQLConverter.toTQL(variant);
+      // TODO change to simply defaultVariant.tql when the query tql structure changes
+      tql = variant.query.mode === 'tql' ? variant.query.tql : TQLConverter.toTQL(variant.query);
     }
     
     return (

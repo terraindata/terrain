@@ -256,7 +256,7 @@ class Tabs extends PureClasss<TabsProps> {
     let tabs = config && variants && config.split(',').map(vId =>
     {
       let id = this.getId(vId);
-      let variant = variants[id];
+      let variant = variants.get(id);
       let name = "Loading...";
       needsVariant = needsVariant || !variant;
       if(variant)
@@ -264,7 +264,7 @@ class Tabs extends PureClasss<TabsProps> {
         name = variant.name || 'Untitled';
         if(variant.version)
         {
-          name += ' @ ' + moment(variants[id].lastEdited).format("ha M/D/YY");
+          name += ' @ ' + moment(variants.get(id).lastEdited).format("ha M/D/YY");
         }
       }
       return {

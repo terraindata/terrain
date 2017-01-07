@@ -279,6 +279,8 @@ LibraryReducers[ActionTypes.variants.duplicate] =
 LibraryReducers[ActionTypes.loadState] =
   (state, action) => 
     action.payload.state
+      .set('loaded', true)
+      .set('loading', false)
       .set('prevGroups', action.payload.state.groups)
       .set('prevAlgorithms', action.payload.state.algorithms)
       .set('prevVariants', action.payload.state.variants)

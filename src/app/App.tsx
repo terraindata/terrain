@@ -58,6 +58,7 @@ window['PerfStart'] = Perf.start;
 window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); }
 
 // Components
+import PureClasss from './common/components/PureClasss.tsx';
 import LayoutManager from "./builder/components/layout/LayoutManager.tsx";
 import Builder from "./builder/components/Builder.tsx";
 import Library from './library/components/Library.tsx';
@@ -85,6 +86,7 @@ import Ajax from './util/Ajax.tsx';
 
 import BuilderStore from './builder/data/BuilderStore.tsx';
 import LibraryStore from './library/data/LibraryStore.tsx';
+import LibraryActions from './library/data/LibraryActions.tsx';
 import UserStore from './users/data/UserStore.tsx';
 
 // Icons
@@ -104,7 +106,7 @@ import { InAppNotification } from './common/components/InAppNotification.tsx';
 import DeployModal from './deploy/components/DeployModal.tsx';
 import EasterEggs from './x/components/EasterEggs.tsx';
 
-var links = 
+const links = 
 [
   // {
   //   icon: <HomeIcon />,
@@ -133,31 +135,51 @@ var links =
   }
 ];
 
-var App = React.createClass({
-  componentDidMount() {
+interface Props
+{
+  location: {
+    pathname: string,
+  };
+  children: any;
+}
+
+class App extends PureClasss<Props>
+{
+  state = {
+    selectedPage: 3,
+    loggedIn: false,
+    loaded: false,
+    sidebarExpanded: false,
+    loggedInAndLoaded: false,
+  };
+  
+  constructor(props:Props)
+  {
+    super(props);
+    
     // Respond to authentication state changes.
-    AuthStore.subscribe(() => {
-      let token = AuthStore.getState().get('authenticationToken');
-      let loggedIn = token !== null;
-      this.setState({
-        loggedIn,
-      });
-      
-      if(loggedIn)
-      {
-        setTimeout(() => this.setState({ loaded: true }), 500);
-      }
-      else
-      {
+    this._subscribe(AuthStore, {
+      updater: () => {
+        let token = AuthStore.getState().get('authenticationToken');
+        let loggedIn = token !== null;
+        let loggedInAndLoaded = !loggedIn ? false : this.state.loggedInAndLoaded;
+        
         this.setState({
-          loaded: false,
+          loggedIn,
+          loggedInAndLoaded,
         });
+        
+        if(token !== null)
+        {
+          UserActions.fetch();
+          LibraryActions.fetch();
+        }
       }
-      
-      if(token !== null)
-      {
-        UserActions.fetch();
-      }
+    });
+    
+    this._subscribe(LibraryStore, {
+      stateKey: 'loaded',
+      storeKeyPath: ['loaded'],
     });
     
     // Retrieve logged-in state from persistent storage.
@@ -166,38 +188,37 @@ var App = React.createClass({
     if (token !== undefined && token !== null) {
       AuthActions.login(token, username);
     }
-  },
-  
-  getInitialState()
-  {
-    return {
-      selectedPage: 3,
-      loggedIn: false,
-      loaded: false,
-    };
-  },
+  }
   
   selectPage(index)
   {
-  },
+  }
   
   toggleSidebar()
   {
     this.setState({
       sidebarExpanded: !this.state.sidebarExpanded,
     })
-  },
+  }
+  
+  handleLoginLoadComplete()
+  {
+    this.setState({
+      loggedInAndLoaded: true,
+    });
+  }
   
   renderApp()
   {
-    if(!this.state.loggedIn)
+    if(!this.state.loggedInAndLoaded)
     {
-      return <Login />;
-    }
-    
-    if(!this.state.loaded)
-    {
-      return null;
+      return (
+        <Login
+          loggedIn={this.state.loggedIn}
+          appStateLoaded={this.state.loaded}
+          onLoadComplete={this.handleLoginLoadComplete}
+        />
+      );
     }
     
     var sidebarWidth = this.state.sidebarExpanded ? 130 : 36;
@@ -226,14 +247,14 @@ var App = React.createClass({
       };
      
     return <LayoutManager layout={layout} />;
-  },
+  }
   
-  handleMouseMove(e:Event)
+  handleMouseMove(e:MEvent)
   {
     BuilderActions.hoverCard(null);
-  },
+  }
 
-  render ()
+  render()
   {
     return (
       <div
@@ -241,13 +262,19 @@ var App = React.createClass({
         onMouseMove={this.handleMouseMove}
       >
         { 
-          this.state.loggedIn &&
-            <div className='app-top-bar'>
-              <TerrainIcon className='app-top-bar-icon' />
+          this.state.loggedInAndLoaded &&
+            <div 
+              className='app-top-bar'
+            >
+              <TerrainIcon 
+                className='app-top-bar-icon'
+              />
                <AccountDropdown />
             </div>
         }
-        <div className='app-wrapper'>
+        <div 
+          className='app-wrapper'
+        >
           { 
             this.renderApp()
           }
@@ -267,8 +294,8 @@ var App = React.createClass({
         <EasterEggs />
       </div>
     );
-  },
-});
+  }
+}
 
 
 var router = (

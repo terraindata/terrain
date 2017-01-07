@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 /***********************
 ***
-*    STILL IN PROTOTYPING
+*    PROTOTYPING
 ***
 ******/
 
@@ -86,7 +86,7 @@ export enum EScreen
 export interface State
 {
   screen: EScreen;
-  query: Query;
+  query: IQuery;
 }
 
 export enum EExpressionType
@@ -137,10 +137,10 @@ class QueryClass
     combinator: BuilderTypes.Combinator.AND,
   }
 }
-export interface Query extends QueryClass, IRecord<Query> {}
+export interface IQuery extends QueryClass, IRecord<IQuery> {}
 const Query_Record = Immutable.Record(new QueryClass());
 export const _Query = (config?:any) => {
-  return new Query_Record(config || {}) as any as Query;
+  return new Query_Record(config || {}) as any as IQuery;
 }
 
 class Guide extends PureClasss<Props>
