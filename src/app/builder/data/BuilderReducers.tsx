@@ -66,13 +66,21 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     }
   ) => 
   {
+    const {variantId, handleNoVariant} = action.payload;
+    
     if(state.loadingXhr)
     {
+      if(variantId === state.loadingVariantId)
+      {
+        // still loading the same variant
+        console.log('still loading same');
+        return state;
+      }
+      
+      // abort the previous request
       console.log('loadingXHR still in play', action.payload.variantId);
       state.loadingXhr.abort();
     }
-    
-    const {variantId, handleNoVariant} = action.payload;
     
     let xhr: XMLHttpRequest = Ajax.getQuery(
       variantId, 
@@ -93,32 +101,32 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     return state
       .set('loading', true)
       .set('loadingXhr', xhr)
+      .set('loadingVariantId', variantId)
     ;
   },
   
 [ActionTypes.queryLoaded]:
   (
     state: BuilderState, 
-    action:
-    {
-      payload?: { 
-        query: BuilderTypes.Query,
-        xhr: XMLHttpRequest,
-      },
-    }
+    action: Action<{ 
+      query: BuilderTypes.Query,
+      xhr: XMLHttpRequest,
+    }>
   ) =>
   {
     if(state.loadingXhr !== action.payload.xhr)
     {
       // wrong XHR
-      console.log('wrong xhr loaded');
+      console.log('wrong xhr loaded', state.loadingXhr, action.payload.xhr);
       return state;
     }
+    console.log('right xhr loaded');
     
     return state
       .set('query', action.payload.query)
       .set('loading', false)
       .set('loadingXhr', null)
+      .set('loadingVariantId', '')
       .set('isDirty', false)
     ;
   },

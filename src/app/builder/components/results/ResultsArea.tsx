@@ -623,7 +623,7 @@ class ResultsArea extends PureClasss<Props>
   
   handleConfigChange(config:IResultsConfig)
   {
-    Actions.change(List(['resultsConfig']), config);
+    Actions.change(List(['query', 'resultsConfig']), config);
   }
 
 	render()

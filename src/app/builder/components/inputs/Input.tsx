@@ -86,7 +86,7 @@ var Input = React.createClass<any, any>({
   
   computeKeyPaths(props)
   {
-    let parentKeyPath = Immutable.List(['inputs']);
+    let parentKeyPath = Immutable.List(['query', 'inputs']);
     let keyPath = parentKeyPath.push(props.index);
     return {
       keyPath,

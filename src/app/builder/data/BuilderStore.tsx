@@ -61,6 +61,7 @@ export class BuilderStateClass
   
   loading: boolean = false;
   loadingXhr: XMLHttpRequest = null;
+  loadingVariantId: ID = '';
   
   hoveringCardId: ID = "";
   

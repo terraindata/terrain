@@ -45,6 +45,7 @@ THE SOFTWARE.
 require('./Sidebar.less');
 import * as React from 'react';
 import Util from '../../util/Util.tsx';
+import * as classNames from 'classnames';
 import { Link } from 'react-router';
 import PureClasss from '../../common/components/PureClasss.tsx';
 
@@ -60,7 +61,6 @@ interface Link {
 interface Props {
   links: Link[];
   selectedIndex: number;
-  onChange: (selectedIndex: number) => void;
   expandable?: boolean;
   expanded?: boolean;
   onExpand?: () => void;
@@ -68,43 +68,48 @@ interface Props {
 
 class Sidebar extends PureClasss<Props>
 {
-	handleClickFactory(index)
-	{
-		return () => this.props.onChange(index);
-	}
-
-	render() {
+	render() 
+  {
 		return (
-      <div className={Util.objToClassname({
-        'sidebar-container': true,
-        'sidebar-container-expanded': this.props.expanded,
-      })}>
-      <div className="sidebar-selected-square" style={{
-        top: (this.props.selectedIndex * linkHeight) + 'px',
-      }}></div>
-        {
-          this.props.links.map((link, index) => 
-            (
-              <Link
-                to={link.route}
-                key={index}
-              >
-                <div 
-                  className={Util.objToClassname({
-                    'sidebar-link': true,
-                    'sidebar-link-selected': index === this.props.selectedIndex,
-                    })}
-                  onClick={this.handleClickFactory(index)}>
-                    <div className="sidebar-link-inner">
-                      { link.icon }
-                      <div className="sidebar-link-text">{link.text}</div>
-                    </div>
+      <div 
+        className={classNames({
+          'sidebar-container': true,
+          'sidebar-container-expanded': this.props.expanded,
+        })}
+      >
+      <div 
+        className="sidebar-selected-square" 
+        style={{
+          top: (this.props.selectedIndex * linkHeight) + 'px',
+        }}
+      />
+      {
+        this.props.links.map((link, index) => 
+          <Link
+            to={link.route}
+            key={index}
+          >
+            <div 
+              className={Util.objToClassname({
+                'sidebar-link': true,
+                'sidebar-link-selected': index === this.props.selectedIndex,
+                })}
+            >
+              <div className="sidebar-link-inner">
+                { 
+                  link.icon 
+                }
+                <div className="sidebar-link-text">
+                  {
+                    link.text
+                  }
                 </div>
-              </Link>
-            )
+              </div>
+            </div>
+          </Link>
           )
-        }
-        {
+      }
+      {
         this.props.expandable ?
           (
             <div className='sidebar-expand' onClick={this.props.onExpand}>
@@ -114,8 +119,8 @@ class Sidebar extends PureClasss<Props>
             </div>
           )
           : null
-        }
-			</div>
+      }
+	  </div>
 		);
 	}
 };

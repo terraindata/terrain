@@ -205,6 +205,17 @@ var BuilderColumn = React.createClass<any, any>(
   
   renderContent()
   {
+    if(this.props.query.loading)
+    {
+      return (
+        <div
+          className='builder-column-loading'
+        >
+          Loading...
+        </div>
+      );
+    }
+    
     const {canEdit, query} = this.props;
     switch(this.state.column)
     {
@@ -349,7 +360,6 @@ var BuilderColumn = React.createClass<any, any>(
   // },
 
   render() {
-    console.log(this.props.query.cards.toJS());
     let {query, canEdit, cantEditReason} = this.props;
     
     return this.renderPanel((

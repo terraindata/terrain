@@ -169,7 +169,6 @@ class Builder extends PureClasss<Props>
   componentWillMount()
   {
     this.checkConfig(this.props);
-    RolesActions.fetch();
     this.loadTables(this.props);
   }
   
@@ -217,7 +216,7 @@ class Builder extends PureClasss<Props>
         {
           // current opened variant is still open, move along.
           // TODO
-          // return  true;
+          return  true;
           // note: don't currently return true because that resets unsaved changes in open v
           //  but when we redo how the stores work, then that shouldn't happen.
         }
@@ -242,6 +241,8 @@ class Builder extends PureClasss<Props>
     if(!db)
     {
       console.log('No DB for ', this.getVariant(props));
+      Actions.changeTables('', Immutable.List([]), Immutable.Map({}));
+      return;
     }
     
     if(db !== this.state.builderState.db)
@@ -319,22 +320,21 @@ class Builder extends PureClasss<Props>
       browserHistory.replace(`/builder/${newConfig}`);
     }
     localStorage.setItem('config', newConfig || '');
-    this.fetch(newConfig);
-  }
-  
-  fetch(config:string)
-  {
-    if(!config)
+    
+    const pieces = newConfig.split(',');
+    let variantId = pieces.find(
+      piece => piece.indexOf('!') === 0
+    )
+    if(variantId)
     {
-      return;
+      variantId = variantId.substr(1); // trim '!'
     }
     
-    const pieces = config.split(',');
-    const variantId = pieces.find(
-      piece => piece.indexOf('!') === 0
-    ).substr(1);
-    
-    Actions.fetchQuery(variantId, this.handleNoVariant);
+    if(props === this.props || variantId !== this.getSelectedId(this.props))
+    {
+      // need to fetch data for new query
+      Actions.fetchQuery(variantId, this.handleNoVariant);
+    }
   }
   
   handleNoVariant(variantId: ID)
@@ -534,15 +534,15 @@ class Builder extends PureClasss<Props>
       && Util.canEdit(variant, UserStore, RolesStore))
     let cantEditReason = variant.status !== LibraryTypes.EVariantStatus.Build ?
       'This Variant is not in Build status' : 'You are not authorized to edit this Variant';
-    console.log(query);
+    
     return {
       minWidth: 316,
       resizeable: true,
       resizeHandleRef: 'resize-handle',
       content: query && <BuilderColumn
+        query={query}
         index={index}
         colKey={key}
-        query={query}
         variant={variant}
         onAddColumn={this.handleAddColumn}
         onAddManualColumn={this.handleAddManualColumn}
@@ -559,7 +559,7 @@ class Builder extends PureClasss<Props>
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key,
-    }
+    };
   }
 
   switchToManualCol(index)
@@ -691,7 +691,6 @@ class Builder extends PureClasss<Props>
   
 	render()
   {
-    console.log(this.state.builderState);
     let config = this.props.params.config;
     let variant = this.getVariant();
     let query = this.getQuery();

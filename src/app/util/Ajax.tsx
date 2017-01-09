@@ -302,16 +302,24 @@ export const Ajax = {
     );
   },
   
-  getQuery(variantId: ID, onLoad: (query: BuilderTypes.Query) => void)
+  getQuery(
+    variantId: ID, 
+    onLoad: (query: BuilderTypes.Query, variantId: ID) => void
+  )
   {
+    if(!variantId)
+    {
+      return;
+    }
+    
     // TODO change if we store queries separate from variants
     const load = (v: LibraryTypes.Variant) =>
     {
       if(!v || !v.query)
       {
-        onLoad(null);
+        onLoad(null, variantId);
       }
-      onLoad(v.query);
+      onLoad(v.query, variantId);
     }
     
     if(variantId.indexOf('@') === -1) 

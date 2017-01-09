@@ -90,7 +90,8 @@ UserReducers[ActionTypes.setUsers] =
   (state, action) =>
     state.set('users', action.payload.users)
       .set('currentUser', action.payload.users.get(AuthStore.getState().get('username')))
-      .set('loading', false);
+      .set('loading', false)
+      .set('loaded', true);
 
 UserReducers[ActionTypes.updateCurrentUser] =
   (state, action) =>

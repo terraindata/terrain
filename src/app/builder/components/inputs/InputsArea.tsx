@@ -66,7 +66,7 @@ class InputsArea extends PureClasss<Props>
 {
   createInput()
   {
-    Actions.create(Immutable.List(['inputs']), -1, 'input');
+    Actions.create(Immutable.List(['query', 'inputs']), -1, 'input');
   }
   
   renderNoInputs()

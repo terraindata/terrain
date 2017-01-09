@@ -88,6 +88,7 @@ import BuilderStore from './builder/data/BuilderStore.tsx';
 import LibraryStore from './library/data/LibraryStore.tsx';
 import LibraryActions from './library/data/LibraryActions.tsx';
 import UserStore from './users/data/UserStore.tsx';
+import RolesStore from './roles/data/RolesStore.tsx';
 
 // Icons
 var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
@@ -102,6 +103,7 @@ import AuthActions from "./auth/data/AuthActions.tsx";
 import BuilderActions from "./builder/data/BuilderActions.tsx";
 import AuthStore from "./auth/data/AuthStore.tsx";
 import UserActions from "./users/data/UserActions.tsx";
+import RolesActions from "./roles/data/RolesActions.tsx";
 import { InAppNotification } from './common/components/InAppNotification.tsx';
 import DeployModal from './deploy/components/DeployModal.tsx';
 import EasterEggs from './x/components/EasterEggs.tsx';
@@ -148,9 +150,12 @@ class App extends PureClasss<Props>
   state = {
     selectedPage: 3,
     loggedIn: false,
-    loaded: false,
     sidebarExpanded: false,
     loggedInAndLoaded: false,
+    
+    libraryLoaded: false,
+    usersLoaded: false,
+    rolesLoaded: false,
   };
   
   constructor(props:Props)
@@ -171,14 +176,23 @@ class App extends PureClasss<Props>
         
         if(token !== null)
         {
-          UserActions.fetch();
-          LibraryActions.fetch();
+          this.fetchData();
         }
       }
     });
     
     this._subscribe(LibraryStore, {
-      stateKey: 'loaded',
+      stateKey: 'libraryLoaded',
+      storeKeyPath: ['loaded'],
+    });
+    
+    this._subscribe(UserStore, {
+      stateKey: 'usersLoaded',
+      storeKeyPath: ['loaded'],
+    });
+    
+    this._subscribe(RolesStore, {
+      stateKey: 'rolesLoaded',
       storeKeyPath: ['loaded'],
     });
     
@@ -190,8 +204,11 @@ class App extends PureClasss<Props>
     }
   }
   
-  selectPage(index)
+  fetchData()
   {
+    UserActions.fetch();
+    LibraryActions.fetch();
+    RolesActions.fetch();
   }
   
   toggleSidebar()
@@ -208,6 +225,13 @@ class App extends PureClasss<Props>
     });
   }
   
+  isAppStateLoaded(): boolean
+  {
+    return this.state.libraryLoaded 
+      && this.state.rolesLoaded 
+      && this.state.usersLoaded;
+  }
+  
   renderApp()
   {
     if(!this.state.loggedInAndLoaded)
@@ -215,7 +239,7 @@ class App extends PureClasss<Props>
       return (
         <Login
           loggedIn={this.state.loggedIn}
-          appStateLoaded={this.state.loaded}
+          appStateLoaded={this.isAppStateLoaded()}
           onLoadComplete={this.handleLoginLoadComplete}
         />
       );
@@ -234,7 +258,6 @@ class App extends PureClasss<Props>
             content: <Sidebar 
               links={links}
               selectedIndex={selectedIndex}
-              onChange={this.selectPage}
               expandable={true}
               expanded={this.state.sidebarExpanded}
               onExpand={this.toggleSidebar}
