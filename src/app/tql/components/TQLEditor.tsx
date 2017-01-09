@@ -96,7 +96,7 @@ class TQLEditor extends PureClasss<Props>
 {
   render() 
   {
-    const options =
+    let options =
     {
       readOnly: !this.props.canEdit,
       lineNumbers: true,
@@ -113,12 +113,12 @@ class TQLEditor extends PureClasss<Props>
       revertButtons: false,
       connect: 'align',
       
-      value: this.props.tql || '',
       origLeft: this.props.diffTql,
     };
     
     if(this.props.isDiff)
     {
+      options['value'] = this.props.tql || '';
       return (
         <CodeMirror
           ref="cm2"
@@ -133,7 +133,6 @@ class TQLEditor extends PureClasss<Props>
     
     return (
       <CodeMirror
-        
         ref="cm"
         className='codemirror-text'
         value={this.props.tql || ''}
