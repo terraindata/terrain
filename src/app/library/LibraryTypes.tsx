@@ -82,7 +82,7 @@ export module LibraryTypes
     
     // for DB storage, hopefully uneeded soon
     dbFields = ['groupId', 'algorithmId', 'status'];
-    dataFields = ['name', 'lastEdited', 'lastUsername', 'query', 'db', 'isDefault'];    
+    dataFields = ['name', 'lastEdited', 'lastUsername', 'query', 'db', 'isDefault', 'modelVersion'];    
     modelVersion = 1;
     static getDb: (v:Variant) => string;
   }
@@ -90,10 +90,9 @@ export module LibraryTypes
   export interface Variant extends VariantC, IRecord<Variant> {}
   const Variant_Record = Immutable.Record(new VariantC());
   export const _Variant = (config?:any) => {
-    config = Util.extendId(config || {});
-    
-    if(config.type === 'variant' && !config.modelVersion)
+    if(config && !config.modelVersion)
     {
+      console.log('got it', config);
       // from modelVersion 0 to 1
       config.modelVersion = 1;
       config.query = {
@@ -107,6 +106,8 @@ export module LibraryTypes
       };
     }
     
+    config = Util.extendId(config || {});
+    console.log('fin', config);
     config.query = BuilderTypes._Query(config.query);
     
     let v = new Variant_Record(config) as any as Variant;
