@@ -83,7 +83,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     tql: string;
     code: string;
     theme: string;
-    focused: string;
+    focused: boolean;
     highlightedLine: number;
     theme_index: number;
     confirmModalOpen: boolean;

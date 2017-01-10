@@ -205,7 +205,7 @@ var BuilderColumn = React.createClass<any, any>(
   
   renderContent()
   {
-    if(this.props.query.loading)
+    if(!this.props.query)
     {
       return (
         <div

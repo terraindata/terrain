@@ -362,14 +362,14 @@ class Builder extends PureClasss<Props>
     return selected && selected.substr(1);
   }
   
-  loadingQuery = Types._Query({
-    loading: true,
-    name: 'Loading',
-  });
+  // loadingQuery = Types._Query({
+  //   loading: true,
+  //   name: 'Loading',
+  // });
   
   getQuery(props?:Props): Query
   {
-    return this.state.builderState.query || this.loadingQuery;
+    return this.state.builderState.query; // || this.loadingQuery;
   }
   
   loadingVariant = LibraryTypes._Variant({
@@ -381,7 +381,7 @@ class Builder extends PureClasss<Props>
   {
     let variant = this.state.variants && 
       this.state.variants.get(this.getSelectedId(props));
-    return variant || this.loadingVariant;
+    return variant; // || this.loadingVariant;
   }
   
   tabActions = Immutable.List([
