@@ -599,7 +599,7 @@ class Builder extends PureClasss<Props>
 
   handleAddManualColumn(index, selectedCardName?)
   {
-    if(this.state.manualIndex !== -1) //Manual column already open
+    if(this.state.manualIndex !== -1) // Manual column already open
     {
       this.setState({
         selectedCardName

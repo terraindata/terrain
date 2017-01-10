@@ -120,7 +120,6 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       console.log('wrong xhr loaded', state.loadingXhr, action.payload.xhr);
       return state;
     }
-    console.log('right xhr loaded');
     
     return state
       .set('query', action.payload.query)
@@ -169,7 +168,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
         {
           return item; // creating at that spot
         }
-        console.log(action.payload, arr, item);
+        
         return arr.splice
         (
           action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index,

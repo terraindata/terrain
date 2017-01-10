@@ -81,6 +81,8 @@ interface Props
   canEdit: boolean;
   
   onChange?(tql: string);
+  onFocusChange?(focused: boolean);
+  
   toggleSyntaxPopup?(event, line);
   defineTerm?(value, event);
   turnSyntaxPopupOff?();
@@ -144,6 +146,7 @@ class TQLEditor extends PureClasss<Props>
         defineTerm={this.props.defineTerm}
         turnSyntaxPopupOff={this.props.turnSyntaxPopupOff}
         hideTermDefinition={this.props.hideTermDefinition}
+        onFocusChange={this.props.onFocusChange}
       />
     );
   }

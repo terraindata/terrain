@@ -83,6 +83,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     tql: string;
     code: string;
     theme: string;
+    focused: string;
     highlightedLine: number;
     theme_index: number;
     confirmModalOpen: boolean;
@@ -96,6 +97,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     tql: null,
     code: this.props.query.mode === 'tql' ? this.props.query.tql : TQLConverter.toTQL(this.props.query),
     theme: localStorage.getItem('theme') || 'default',
+    focused: false,
     highlightedLine: null,
     theme_index: 0,
     confirmModalOpen: false,
@@ -114,12 +116,20 @@ class BuilderTQLColumn extends PureClasss<Props>
   }
 
   //This function should be here, but whenever executeCode is called, the cards/tql
-  //are not longer in sync
+  //are no longer in sync
   componentDidMount() 
   {
-    if (this.props.query.mode !== 'tql') 
+    if(this.props.query.mode !== 'tql') 
     {
       this.executeCode();
+    }
+  }
+  
+  componentWillReceiveProps(nextProps:Props)
+  {
+    if(!this.state.focused && nextProps.query.tql !== this.state.code && nextProps.query.mode === 'tql')
+    {
+      this.updateCode(nextProps.query.tql);
     }
   }
 
@@ -151,7 +161,6 @@ class BuilderTQLColumn extends PureClasss<Props>
     this.setState({
       tql: code,
     });
-    
     BuilderActions.changeTQL(code);
   }
 
@@ -405,6 +414,13 @@ class BuilderTQLColumn extends PureClasss<Props>
       termDefinitionOpen: false,
     })
   }
+  
+  handleFocusChange(focused)
+  {
+    this.setState({
+      focused,
+    });
+  }
 
   renderTqlEditor() 
   {
@@ -416,6 +432,8 @@ class BuilderTQLColumn extends PureClasss<Props>
         theme={this.state.theme}
         
         onChange={this.updateCode}
+        onFocusChange={this.handleFocusChange}
+        
         highlightedLine={this.state.highlightedLine}
         toggleSyntaxPopup={this.toggleSyntaxPopup}
         defineTerm={this.defineTerm}

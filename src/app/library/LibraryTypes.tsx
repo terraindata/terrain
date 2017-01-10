@@ -92,7 +92,6 @@ export module LibraryTypes
   export const _Variant = (config?:any) => {
     if(config && !config.modelVersion)
     {
-      console.log('got it', config);
       // from modelVersion 0 to 1
       config.modelVersion = 1;
       config.query = {
@@ -107,7 +106,6 @@ export module LibraryTypes
     }
     
     config = Util.extendId(config || {});
-    console.log('fin', config);
     config.query = BuilderTypes._Query(config.query);
     
     let v = new Variant_Record(config) as any as Variant;
