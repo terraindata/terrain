@@ -241,16 +241,26 @@ export const Ajax = {
     }, onError);
   },
   
-  getVariant(id: ID, onLoad: (variant: LibraryTypes.Variant) => void)
+  getVariant(variantId: ID, onLoad: (variant: LibraryTypes.Variant) => void)
   {
-    return Ajax.getItem(
-      'variant', 
-      id,
-      (variantData: Object) =>
-      {
-        onLoad(LibraryTypes._Variant(variantData));
-      }
-    );
+    if(variantId.indexOf('@') === -1) 
+    {
+      return Ajax.getItem(
+        'variant', 
+        variantId,
+        (variantData: Object) =>
+        {
+          onLoad(LibraryTypes._Variant(variantData));
+        }
+      );
+    }
+    else 
+    {
+      return Ajax.getVariantVersion(
+        variantId,
+        onLoad
+      );
+    }
   },
 
   getVariantVersions(variantId: ID, onLoad: (variantVersions: any) => void)
@@ -263,9 +273,20 @@ export const Ajax = {
     });
   },
 
-  getVariantVersion(variantId: ID, versionId: string, onLoad: (variantVersion: any) => void)
+  getVariantVersion(variantId: ID, onLoad: (variantVersion: any) => void)
   {
-    var url = '/variant_versions/' + variantId;
+    if(!variantId || variantId.indexOf('@') === -1)
+    {
+      onLoad(null);
+      return null;
+    }
+    
+    // viewing an old version
+    const pieces = variantId.split('@');
+    const originalVariantId = pieces[0];
+    const versionId = pieces[1];
+    
+    var url = '/variant_versions/' + originalVariantId;
     return Ajax._get(
       url, 
       "", 
@@ -275,7 +296,7 @@ export const Ajax = {
         if(version)
         {
           let data = JSON.parse(version.data);
-          Ajax.getVariant(variantId, (v: LibraryTypes.Variant) =>
+          Ajax.getVariant(originalVariantId, (v: LibraryTypes.Variant) =>
           {
             if(v)
             {
@@ -304,7 +325,7 @@ export const Ajax = {
   
   getQuery(
     variantId: ID, 
-    onLoad: (query: BuilderTypes.Query, variantId: ID) => void
+    onLoad: (query: BuilderTypes.Query, variant: LibraryTypes.Variant) => void
   )
   {
     if(!variantId)
@@ -317,31 +338,15 @@ export const Ajax = {
     {
       if(!v || !v.query)
       {
-        onLoad(null, variantId);
+        onLoad(null, v);
       }
-      onLoad(v.query, variantId);
+      onLoad(v.query, v);
     }
     
-    if(variantId.indexOf('@') === -1) 
-    {
-      return Ajax.getVariant(
-        variantId,
-        load
-      );
-    }
-    else 
-    {
-      // viewing an old version
-      const pieces = variantId.split('@');
-      const originalVariantId = pieces[0];
-      const versionId = pieces[1];
-      
-      return Ajax.getVariantVersion(
-        originalVariantId, 
-        versionId, 
-        load
-      );
-    }
+    return Ajax.getVariant(
+      variantId,
+      load
+    );
   },
   
   saveItem(item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group, onLoad?: (resp: any) => void, onError?: (ev:Event) => void)

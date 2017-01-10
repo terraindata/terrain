@@ -55,6 +55,7 @@ import Classs from './../../../common/components/Classs.tsx';
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import BuilderStore from './../../../builder/data/BuilderStore.tsx';
 import {LibraryStore, LibraryState} from './../../../library/data/LibraryStore.tsx';
+import LibraryActions from '../../../library/data/LibraryActions.tsx';
 import LibraryTypes from './../../../library/LibraryTypes.tsx';
 import * as classNames from 'classnames';
 const {browserHistory} = require('react-router');
@@ -209,31 +210,31 @@ interface TabsProps
   actions: Immutable.List<{
     text: string;
     icon: any;
-    onClick: () => void;
+    onClick();
     enabled?: boolean;
   }>;
+  onNoVariant(variantId: string);
 }
 
 class Tabs extends PureClasss<TabsProps> {
   state = {
-    variants: null,
+    variants: LibraryStore.getState().variants,
     tabs: null,
-    needsVariant: true, // needs variant info from the server
   }
   cancel = null;
   
   componentDidMount()
   {
-    let a = () => 
-    {
-      if(this.state.needsVariant)
+    this._subscribe(LibraryStore, {
+      stateKey: 'variants',
+      storeKeyPath: ['variants'],
+      updater: (state) =>
       {
         this.computeTabs(this.props.config);
-      }
-    }
-    
-    this.cancel = BuilderStore.subscribe(a);
-    a();
+      },
+      isMounted: true,
+    });
+    this.computeTabs(this.props.config);
   }
   
   componentWillUnmount()
@@ -251,14 +252,12 @@ class Tabs extends PureClasss<TabsProps> {
   
   computeTabs(config)
   {
-    let variants = LibraryStore.getState().variants;
-    let needsVariant = false;
+    let {variants} = this.state;
     let tabs = config && variants && config.split(',').map(vId =>
     {
       let id = this.getId(vId);
       let variant = variants.get(id);
       let name = "Loading...";
-      needsVariant = needsVariant || !variant;
       if(variant)
       {
         name = variant.name || 'Untitled';
@@ -266,6 +265,10 @@ class Tabs extends PureClasss<TabsProps> {
         {
           name += ' @ ' + moment(variants.get(id).lastEdited).format("ha M/D/YY");
         }
+      }
+      else
+      {
+        LibraryActions.variants.fetchVersion(id, this.props.onNoVariant);
       }
       return {
         id,
@@ -276,16 +279,7 @@ class Tabs extends PureClasss<TabsProps> {
     
     this.setState({
       tabs,
-      variants,
     });
-    
-    if(needsVariant)
-    {
-      this.setState({
-        needsVariant: true,
-      });
-    }
-    
   }
   
   // shouldComponentUpdate(nextProps, nextState)
@@ -320,10 +314,14 @@ class Tabs extends PureClasss<TabsProps> {
               onClick={action.onClick}
             >
               <div className='tabs-action-piece'>
-                {action.icon}
+                {
+                  action.icon
+                }
               </div>
               <div className='tabs-action-piece'>
-              {action.text}
+                {
+                  action.text
+                }
               </div>
             </a>)
         }
@@ -374,6 +372,7 @@ class Tabs extends PureClasss<TabsProps> {
      .join(",");
      
     localStorage.setItem('config', newConfig); // need to set for closing the last tab to work
+    console.log('set nc', newConfig);
     return '/builder/' + newConfig;
   }
   

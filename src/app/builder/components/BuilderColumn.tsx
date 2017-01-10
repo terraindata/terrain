@@ -125,7 +125,6 @@ var BuilderColumn = React.createClass<any, any>(
     onCloseColumn: React.PropTypes.func.isRequired,
     colKey: React.PropTypes.number.isRequired,
     history: React.PropTypes.any,
-    onRevert: React.PropTypes.func,
     columnType: React.PropTypes.number,
     selectedCardName: React.PropTypes.string,
     switchToManualCol: React.PropTypes.func,
@@ -317,49 +316,8 @@ var BuilderColumn = React.createClass<any, any>(
     localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
   },
   
-  // TODO put in builder
-  // revertVersion()
-  // {
-  //   if (this.props.query.version) 
-  //   {
-  //     if (confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.')) 
-  //     {
-  //       this.props.onRevert();
-  //     }
-  //   }
-  // },
-
-  // renderBuilderVersionToolbar(canEdit)
-  // {
-  //   if(this.props.query.version)
-  //   {
-  //     if (this.state.column === COLUMNS.Builder || this.state.column === COLUMNS.TQL)
-  //     {
-  //       var lastEdited = moment(this.props.query.lastEdited).format("h:mma on M/D/YY")
-  //       return (
-  //         <div className='builder-revert-toolbar'> 
-  //           <div className='builder-revert-time-message'>
-  //             Version from {lastEdited}
-  //           </div>
-  //           <div className='builder-white-space'/>
-  //           {
-  //             canEdit ? 
-  //                 <div 
-  //                   className='button builder-revert-button' 
-  //                   onClick={this.revertVersion} 
-  //                   //data-tip="Resets the Variant's contents to this version. You can always undo the revert, and reverting does not lose any of the Variant's history."
-  //                 >
-  //                   Revert to this version
-  //                 </div>
-  //                 : <div />
-  //            }
-  //         </div>
-  //         );
-  //     }
-  //   }
-  // },
-
-  render() {
+  render() 
+  {
     let {query, canEdit, cantEditReason} = this.props;
     
     return this.renderPanel((

@@ -47,6 +47,7 @@ import ActionTypes from './LibraryActionTypes.tsx';
 import Util from './../../util/Util.tsx';
 import LibraryTypes from './../LibraryTypes.tsx';
 import {LibraryState} from './LibraryStore.tsx';
+import Ajax from '../../util/Ajax.tsx';
 const {EVariantStatus} = LibraryTypes;
 
 var Immutable = require('immutable');
@@ -289,6 +290,16 @@ LibraryReducers[ActionTypes.loadState] =
 LibraryReducers[ActionTypes.setDbs] =
   (state, action) =>
     state.set('dbs', action.payload.dbs);
+
+LibraryReducers[ActionTypes.variants.loadVersion] =
+  (
+    state: LibraryState, 
+    action: Action<{
+      variantId: string,
+      variantVersion: LibraryTypes.Variant,
+    }>
+  ) =>
+    state.setIn(['variants', action.payload.variantId], action.payload.variantVersion);
 
 export default LibraryReducers;
 

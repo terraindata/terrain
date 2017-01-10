@@ -84,7 +84,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     
     let xhr: XMLHttpRequest = Ajax.getQuery(
       variantId, 
-      (query: BuilderTypes.Query) =>
+      (query: BuilderTypes.Query, variant: LibraryTypes.Variant) =>
       {
         if(query)
         {

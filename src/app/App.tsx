@@ -264,7 +264,15 @@ class App extends PureClasss<Props>
             />
           },
           {
-            content: this.props.children,
+            content: 
+              <div
+                className='app-inner'
+              >
+                {
+                  this.props.children
+                }
+              </div>
+            ,
           }
         ],
       };

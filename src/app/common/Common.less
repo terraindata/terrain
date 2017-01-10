@@ -155,40 +155,54 @@ input {
 }
 
 
-// TODO less function for all librarys
 @keyframes slide-down {
   0% {
     -webkit-transform: translateY(-100%);
+    transform: translateY(-100%);
   }
-  // 50% {
-  //   -webkit-transform: translateY(-100%);
-  // }
   100% {
     -webkit-transform: translateY(0%);
+    transform: translateY(0%);
   }
 }
-
-// TODO cross-library
 .slide-down {
   -webkit-transform: translateY(-100%);
-  animation: slide-down 0.35s linear 0.15s forwards;
+  animation: slide-down 0.25s linear 0.15s forwards;
 }
 
 @keyframes slide-right {
   0% {
     -webkit-transform: translateX(-100%);
+    transform: translateX(-100%);
   }
   100% {
     -webkit-transform: translateX(0%);
+    transform: translateX(0%);
   }
 }
 
-// TODO cross-library
 .slide-right {
   -webkit-transform: translateX(-100%);
-  animation: slide-right 0.35s linear 0.15s forwards;
+  animation: slide-right 0.25s linear 0.15s forwards;
 }
 
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.fade-in {
+  opacity: 0;
+  animation: fade-in 0.25s linear 0.15s forwards;
+}
+
+.animation-delay(@s) {
+  -webkit-animation-delay: @s;
+  animation-delay: @s;
+}
 
   
 

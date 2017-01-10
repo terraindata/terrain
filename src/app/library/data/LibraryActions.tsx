@@ -48,6 +48,7 @@ import Store from './LibraryStore.tsx';
 import {LibraryState, LibraryStore, _LibraryState} from './LibraryStore.tsx';
 import LibraryTypes from './../LibraryTypes.tsx';
 import BuilderTypes from './../../builder/BuilderTypes.tsx';
+import '../../util/Ajax.tsx';
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
@@ -118,6 +119,27 @@ const Actions =
     status:
       (variant: Variant, status: LibraryTypes.EVariantStatus, confirmed?: boolean, isDefault?: boolean) =>
         $(ActionTypes.variants.status, { variant, status, confirmed, isDefault }),
+     
+    fetchVersion:
+      (variantId: string, onNoVersion: (variantId: string) => void) =>
+      {
+        Ajax.getVariantVersion(variantId, (variantVersion: LibraryTypes.Variant) =>
+        {
+          if(!variantVersion)
+          {
+            onNoVersion(variantId);
+          }
+          else
+          {
+            Actions.variants.loadVersion(variantId, variantVersion);
+          }
+        });
+      },
+        
+    loadVersion:
+      (variantId: string, variantVersion: LibraryTypes.Variant) =>
+        $(ActionTypes.variants.loadVersion, { variantId, variantVersion }),
+       
   },
   
   loadState:

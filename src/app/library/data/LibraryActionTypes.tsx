@@ -61,15 +61,14 @@ export var LibraryActionTypes =
   algorithms: 
   {
     create, change, move, duplicate,
-    switchGroup: '',
   },
   
   variants:
   {
     create, change, move, duplicate,
     status: '',
-    switchAlgorithm: '',
-    switchGroup: '', // move by itself onto a group, which should also create a new algorithm
+    fetchVersion: '',
+    loadVersion: '',
   },
   
   loadState: '',

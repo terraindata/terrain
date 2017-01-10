@@ -50,6 +50,7 @@ import * as $ from 'jquery';
 import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
 import * as Immutable from 'immutable';
+import * as moment from 'moment';
 var HTML5Backend = require('react-dnd-html5-backend');
 const {browserHistory} = require('react-router');
 const { withRouter } = require('react-router');
@@ -240,7 +241,6 @@ class Builder extends PureClasss<Props>
     const db = LibraryTypes.getDbFor(this.getVariant(props));
     if(!db)
     {
-      console.log('No DB for ', this.getVariant(props));
       Actions.changeTables('', Immutable.List([]), Immutable.Map({}));
       return;
     }
@@ -330,7 +330,7 @@ class Builder extends PureClasss<Props>
       variantId = variantId.substr(1); // trim '!'
     }
     
-    if(props === this.props || variantId !== this.getSelectedId(this.props))
+    if(newConfig && (props === this.props || variantId !== this.getSelectedId(this.props)))
     {
       // need to fetch data for new query
       Actions.fetchQuery(variantId, this.handleNoVariant);
@@ -372,15 +372,19 @@ class Builder extends PureClasss<Props>
     return this.state.builderState.query; // || this.loadingQuery;
   }
   
-  loadingVariant = LibraryTypes._Variant({
-    loading: true,
-    name: 'Loading',
-  });
-  
   getVariant(props?:Props): LibraryTypes.Variant
   {
+    let variantId = this.getSelectedId(props);
     let variant = this.state.variants && 
-      this.state.variants.get(this.getSelectedId(props));
+      this.state.variants.get(variantId);
+    if(variantId && !variant)
+    {
+      LibraryActions.variants.fetchVersion(variantId, () =>
+      {
+        // no version available
+        this.handleNoVariant(variantId);
+      });
+    }
     return variant; // || this.loadingVariant;
   }
   
@@ -525,15 +529,33 @@ class Builder extends PureClasss<Props>
     localStorage.setItem('colSizes', JSON.stringify(adjustments));
   }
   
+  canEdit(): boolean
+  {
+    let variant = this.getVariant();
+    return variant && (variant.status === LibraryTypes.EVariantStatus.Build
+      && Util.canEdit(variant, UserStore, RolesStore))
+  }
+  
+  cantEditReason(): string
+  {
+    let variant = this.getVariant();
+    if(!variant || this.canEdit())
+    {
+      return '';
+    }
+    if(variant.status !== LibraryTypes.EVariantStatus.Build)
+    {
+      return 'This Variant is not in Build status';
+    } 
+    return 'You are not authorized to edit this Variant';
+  }
+  
   getColumn(index)
   {
     let key = this.state.colKeys.get(index);
-    let variant = this.getVariant();
     let query = this.getQuery();
-    let canEdit = (variant.status === LibraryTypes.EVariantStatus.Build
-      && Util.canEdit(variant, UserStore, RolesStore))
-    let cantEditReason = variant.status !== LibraryTypes.EVariantStatus.Build ?
-      'This Variant is not in Build status' : 'You are not authorized to edit this Variant';
+    let variant = this.getVariant();
+ 
     
     return {
       minWidth: 316,
@@ -549,13 +571,12 @@ class Builder extends PureClasss<Props>
         onCloseColumn={this.handleCloseColumn}
         canAddColumn={this.state.colKeys.size < 3}
         canCloseColumn={this.state.colKeys.size > 1}
-        onRevert={this.save}
         columnType={this.state.columnType}
         selectedCardName={this.state.selectedCardName}
         switchToManualCol={this.switchToManualCol}
         changeSelectedCardName={this.changeSelectedCardName}
-        canEdit={canEdit}
-        cantEditReason={cantEditReason}
+        canEdit={this.canEdit()}
+        cantEditReason={this.cantEditReason()}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key,
@@ -657,6 +678,43 @@ class Builder extends PureClasss<Props>
     }), 250);
   }
   
+  revertVersion()
+  {
+    if(confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.')) 
+    {
+      this.save();
+    }
+  }
+
+  renderVersionToolbar()
+  {
+    let variant = this.getVariant();
+
+    if(variant && variant.version)
+    {
+      var lastEdited = moment(variant.lastEdited).format("h:mma on M/D/YY")
+      return (
+        <div className='builder-revert-toolbar'> 
+          <div className='builder-revert-time-message'>
+            Version from {lastEdited}
+          </div>
+          <div className='builder-white-space'/>
+          {
+            this.canEdit() &&
+              <div 
+                className='button builder-revert-button' 
+                onClick={this.revertVersion}
+                data-tip="Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history."
+              >
+                Revert to this version
+              </div>
+           }
+        </div>
+      );
+    }
+    return null;
+  }
+  
   goToLibrary()
   {
     browserHistory.push('/library');
@@ -716,8 +774,12 @@ class Builder extends PureClasss<Props>
                 }
                 config={config}
                 ref='tabs'
+                onNoVariant={this.handleNoVariant}
               />
               <div className='tabs-content'>
+                {
+                  this.renderVersionToolbar()
+                }
                 <LayoutManager layout={this.getLayout()} moveTo={this.moveColumn} />
               </div>
             </div>
