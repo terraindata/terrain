@@ -1,10 +1,10 @@
 @import "../../common/Common.less";
 
+@h: 96px;
 .library-item {
   position: relative;
   
   
-  @h: 96px;
   height: @h;
   text-align: left;
   border-radius: 4px;
@@ -191,4 +191,17 @@
   white-space: normal;
   height: 46px;
   overflow: hidden;
+}
+
+.library-item-shifted-up {
+  padding-bottom: @h;
+}
+.library-item-shifted-down {
+  padding-top: @h;
+}
+
+.library-item-dragging {
+  &.library-item-dragging-hidden {
+    height: 10px;
+  }
 }

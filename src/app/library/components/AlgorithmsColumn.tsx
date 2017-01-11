@@ -77,14 +77,18 @@ class AlgorithmsColumn extends PureClasss<Props>
 {
   state: {
     rendered: boolean,
-    lastMoved: any,
     me: UserTypes.User,
     roles: RoleTypes.RoleMap,
+    lastMoved: string;
+    draggingItemIndex: number;
+    draggingOverIndex: number;
   } = {
     rendered: false,
-    lastMoved: null,
     me: null,
     roles: null,
+    lastMoved: '',
+    draggingItemIndex: -1,
+    draggingOverIndex: -1,
   }
   
   componentWillMount()
@@ -158,15 +162,17 @@ class AlgorithmsColumn extends PureClasss<Props>
     
   handleHover(index: number, type: string, id: ID)
   {
-    var itemIndex = this.props.algorithmsOrder.findIndex(v => v === id);
-    if(type === 'algorithm' && itemIndex !== index 
+    var itemIndex = this.props.algorithmsOrder.indexOf(id);
+    if(type === 'algorithm' 
       && this.state.lastMoved !== index + ' ' + itemIndex)
     {
       this.setState({
         lastMoved: index + ' ' + itemIndex,
+        draggingItemIndex: itemIndex,
+        draggingOverIndex: index,
       });
-      var target = this.props.algorithms.get(this.props.algorithmsOrder.get(index));
-      Actions.algorithms.move(this.props.algorithms.get(id).set('status', target.status) as Algorithm, index, this.props.groupId);
+      // var target = this.props.algorithms.get(this.props.algorithmsOrder.get(index));
+      // Actions.algorithms.move(this.props.algorithms.get(id).set('status', target.status) as Algorithm, index, this.props.groupId);
     }
   }
   
@@ -192,16 +198,27 @@ class AlgorithmsColumn extends PureClasss<Props>
         }
         break;
       case "algorithm":
+        Actions.algorithms.move(
+          this.props.algorithms.get(id), 
+          this.props.algorithmsOrder.indexOf(targetItem.id),
+          this.props.groupId
+        );
         break;
       case "variant":
         // no good
         break;
     }
+    
+    this.setState({
+      draggingItemIndex: -1,
+      draggingOverIndex: -1,
+    });
   }
 
-  renderAlgorithm(id: ID, index: number)
+  renderAlgorithm(id: ID)
   {
     const algorithm = this.props.algorithms.get(id);
+    const index = this.props.algorithmsOrder.indexOf(id);
     var scores = [
       {
         score: 0,
@@ -235,10 +252,12 @@ class AlgorithmsColumn extends PureClasss<Props>
         scores[v.status].score ++
     );
     
-    scores.splice(0, 1); // remove Archived score for now
+    scores.splice(0, 1); // remove Archived count
     
     let {me, roles} = this.state;
-    let canDrag = me && roles && roles.getIn([algorithm.groupId, me.username, 'admin']);
+    let canArchive = me && roles && roles.getIn([algorithm.groupId, me.username, 'admin']);
+    let canDuplicate = canArchive;
+    let canDrag = canArchive; // TODO change to enable Library drag and drop
     let canEdit = canDrag ||
       (me && roles && roles.getIn([algorithm.groupId, me.username, 'builder']));
     
@@ -279,6 +298,8 @@ class AlgorithmsColumn extends PureClasss<Props>
     return (
       <LibraryItem
         index={index}
+        draggingItemIndex={this.state.draggingItemIndex}
+        draggingOverIndex={this.state.draggingOverIndex}
         name={algorithm.name}
         icon={<AlgorithmIcon />}
         onDuplicate={this.handleDuplicate}
@@ -296,8 +317,9 @@ class AlgorithmsColumn extends PureClasss<Props>
         item={algorithm}
         canEdit={canEdit}
         canDrag={canDrag}
-        canArchive={canDrag}
-        canDuplicate={canDrag}
+        canCreate={canDrag}
+        canArchive={canArchive}
+        canDuplicate={canDuplicate}
       >
         <div className='flex-container'>
           <UserThumbnail username={username} medium={true} extra={role}/>

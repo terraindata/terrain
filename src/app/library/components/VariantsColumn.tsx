@@ -268,6 +268,7 @@ class VariantsColumn extends Classs<Props>
         onDoubleClick={this.handleDoubleClick}
         canEdit={canDrag}
         canDrag={canDrag}
+        canCreate={canDrag}
       >
         <div className='flex-container'>
           <UserThumbnail username={variant.lastUsername} medium={true} extra = {role}/>

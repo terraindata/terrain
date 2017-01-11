@@ -151,14 +151,30 @@ LibraryReducers[ActionTypes.algorithms.change] =
 
 LibraryReducers[ActionTypes.algorithms.move] =
   (state, action) =>
-    addAlgorithm(removeAlgorithm(state, action.payload.algorithm),
-      action.payload.algorithm
-        .set('groupId', action.payload.groupId)
-        .update('variants', variants => variants.map(
-          v => v.set('groupId', action.payload.groupId)
-        ))
-      ,
-      action.payload.index);
+  {
+    let {algorithm, groupId} = action.payload;
+    if(groupId !== algorithm.groupId)
+    {
+      state = state.update('variants', 
+        variants => variants.map(
+          (variant: LibraryTypes.Variant) => 
+          {
+            if(variant.algorithmId === algorithm.id)
+            {
+              return variant.set('groupId', groupId);
+            }
+            return variant;
+          }
+        )
+      );
+    }
+    
+    return addAlgorithm(
+        removeAlgorithm(state, algorithm), 
+        algorithm.set('groupId', groupId),
+        action.payload.index
+    );
+  }
 
 let duplicateAlgorithm = (algorithm, id, groupId) =>
 {

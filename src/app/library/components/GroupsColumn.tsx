@@ -148,8 +148,9 @@ class GroupsColumn extends Classs<Props>
     const group = this.props.groups.get(id);
     let {me, roles} = this.state;
     let groupRoles = roles && roles.get(id);
-    let canEdit = me && groupRoles && groupRoles.getIn([me.username, 'admin']);
-    let canDrag = me && me.isAdmin;
+    let canCreate = (me && groupRoles && groupRoles.getIn([me.username, 'admin']));
+    let canEdit = canCreate || (me && me.isAdmin);
+    let canDrag = false;
       
     return (
       <LibraryItem
@@ -171,7 +172,8 @@ class GroupsColumn extends Classs<Props>
         canEdit={canEdit || canDrag}
         canDrag={canDrag}
         canArchive={canEdit || canDrag}
-        canDuplicate={canDrag}
+        canDuplicate={false}
+        canCreate={canCreate}
       >
         <div className='group-library-info-wrapper'>
           {
