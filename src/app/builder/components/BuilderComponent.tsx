@@ -78,11 +78,7 @@ interface Props
 
 class BuilderComponent extends PureClasss<Props>
 {
-  
-  // _debugUpdates = true;
-  _debugName = "BC";
-  
-  addRow(keyPath: KeyPath, display: Display)
+  addRow(keyPath: KeyPath, index: number, display: Display)
   {
     BuilderActions.create(keyPath, index, display.factoryType);
   }
