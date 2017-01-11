@@ -82,9 +82,7 @@ class DeployModal extends PureClasss<Props>
     this._subscribe(LibraryStore, {
       updater: (state) =>
       {
-        let changingStatus = state.get('changingStatus');
-        let changingStatusOf = state.get('changingStatusOf');
-        let changingStatusTo = state.get('changingStatusTo');
+        let {changingStatus, changingStatusOf, changingStatusTo, changingStatusDefault} = state;
         if(
           changingStatus !== this.state.changingStatus ||
           changingStatusOf !== this.state.changingStatusOf ||
@@ -94,7 +92,7 @@ class DeployModal extends PureClasss<Props>
             changingStatus,
             changingStatusOf,
             changingStatusTo,
-            defaultChecked: false,
+            defaultChecked: changingStatusDefault,
           });
         }
       },
@@ -178,7 +176,7 @@ class DeployModal extends PureClasss<Props>
     }
     
     return (
-      <Modal 
+      <Modal
         open={this.state.changingStatus} 
         message={null}
         onClose={this.handleClose}
@@ -188,7 +186,7 @@ class DeployModal extends PureClasss<Props>
       >
         {
           changingStatusOf &&
-            <div 
+            <div
               className={classNames({
                 'deploy-modal': true,
               })}
