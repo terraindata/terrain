@@ -99,11 +99,11 @@ class GroupsColumn extends Classs<Props>
     });
   }
   
-  handleDuplicate(id: ID)
-  {
-    Actions.groups.duplicate(this.props.groups.find(g => g.id === id),
-      this.props.groupsOrder.findIndex(iid => iid === id));
-  }
+  // handleDuplicate(id: ID)
+  // {
+  //   Actions.groups.duplicate(this.props.groups.find(g => g.id === id),
+  //     this.props.groupsOrder.findIndex(iid => iid === id));
+  // }
   
   handleArchive(id: ID)
   {
@@ -152,13 +152,13 @@ class GroupsColumn extends Classs<Props>
     let canEdit = canCreate || (me && me.isAdmin);
     let canDrag = false;
       
+        // onDuplicate={this.handleDuplicate}
     return (
       <LibraryItem
         index={index}
         name={group.name}
         id={id}
         icon={<GroupIcon />}
-        onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
         color={ColorManager.colorForKey(group.id)}
         key={group.id}

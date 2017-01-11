@@ -74,9 +74,9 @@ const Actions =
       (group, index: number) =>
         $(ActionTypes.groups.move, { group, index }),
         
-    duplicate:
-      (group: Group, index: number) =>
-        $(ActionTypes.groups.duplicate, { group, index }),
+    // duplicate:
+    //   (group: Group, index: number) =>
+    //     $(ActionTypes.groups.duplicate, { group, index }),
   },
   
   algorithms:
