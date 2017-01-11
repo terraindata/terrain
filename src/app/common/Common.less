@@ -585,3 +585,28 @@ input {
 /* Colors */
 
 
+.create-card-button-style {
+  padding: 3px 0px;
+  text-align: center;
+  border-radius: 3px;
+  .transition(~"all .25s");
+  height: 24px;
+  box-sizing: border-box;
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0);  
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  .bold-normal-white-text;
+  
+  &:hover {
+    .transition(~"all .15s");
+    border-color: rgba(255,255,255,0.75);
+  }
+  &:active {
+    border-color: #fff;
+  }
+}
+

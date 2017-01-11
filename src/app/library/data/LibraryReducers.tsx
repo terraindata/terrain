@@ -268,7 +268,9 @@ LibraryReducers[ActionTypes.variants.status] =
       return state
         .set('changingStatus', true)
         .set('changingStatusOf', variant)
-        .set('changingStatusTo', status);
+        .set('changingStatusTo', status)
+        .set('changingStatusDefault', isDefault)
+        ;
     }
     
     if(isDefault)

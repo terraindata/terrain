@@ -204,7 +204,7 @@ export module LibraryTypes
     return new Group_Record(config) as any as Group;
   }
   
-  export function nameForStatus(status:EVariantStatus): string
+  export function nameForStatus(status:EVariantStatus | string): string
   {
     switch(status)
     {
@@ -216,12 +216,14 @@ export module LibraryTypes
         return 'Build';
       case EVariantStatus.Live:
         return 'Live';
+      case 'Default':
+        return 'Default'
       default:
         return 'None';
     }
   }
   
-  export function colorForStatus(status:EVariantStatus): string
+  export function colorForStatus(status:EVariantStatus | string): string
   {
     switch(status)
     {
@@ -233,6 +235,8 @@ export module LibraryTypes
         return '#00a7f7';
       case EVariantStatus.Live:
         return '#48b14b';
+      case 'Default':
+        return '#48b17b'
       default:
         return '#000';
     }

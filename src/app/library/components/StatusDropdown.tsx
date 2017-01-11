@@ -92,7 +92,14 @@ class StatusDropdown extends PureClasss<Props>
   handleChange(index:number)
   {
     let status = this.getOrder()[index];
-    LibraryActions.variants.status(this.props.variant, status);
+    let isDefault = false;
+    if(status === DEFAULT)
+    {
+      status = Status.Live;
+      isDefault = true;
+    }
+    console.log(this.props.variant);
+    LibraryActions.variants.status(this.props.variant, status as Status, false, isDefault);
   }
   
   canEdit():boolean
@@ -108,6 +115,11 @@ class StatusDropdown extends PureClasss<Props>
     
     if(!this.canEdit())
     {
+      if(variant.isDefault)
+      {
+        return LockedOptionDefault;
+      }
+      
       return LockedOptions[variant.status];
     }
     
@@ -119,7 +131,7 @@ class StatusDropdown extends PureClasss<Props>
     return AdminOptions;
   }
   
-  getOrder(): Status[]
+  getOrder(): (Status | string)[]
   {
     if(this.state.isBuilder)
     {
@@ -136,7 +148,12 @@ class StatusDropdown extends PureClasss<Props>
       return 0;
     }
     
-    let {status} = this.props.variant;
+    let {status, isDefault} = this.props.variant;
+    
+    if(isDefault)
+    {
+      return this.getOrder().indexOf(DEFAULT);
+    }
     
     return this.getOrder().indexOf(status);
   }
@@ -181,7 +198,7 @@ class StatusDropdown extends PureClasss<Props>
   }
 }
 
-function getOption(status:Status)
+function getOption(status:Status | string)
 {
   return (
     <div
@@ -207,8 +224,11 @@ function getOption(status:Status)
   );
 }
 
+const DEFAULT = 'Default';
+
 const AdminOptionsOrder =
 [
+  DEFAULT,
   Status.Live,
   Status.Approve,
   Status.Build,
@@ -228,6 +248,9 @@ const LockedOptions = Util.mapEnum(Status, status =>
 {
   return List([getOption(+status as any)]);
 });
+const LockedOptionDefault = List([
+  getOption(DEFAULT)
+]);
 
 
 export default StatusDropdown;

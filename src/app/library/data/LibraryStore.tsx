@@ -77,6 +77,11 @@ class LibraryStateC
   prevVariants: Map<ID, Variant> = null;
   
   groupsOrder: List<ID> = Immutable.List([]);
+  
+  changingStatus: boolean = false;
+  changingStatusOf: LibraryTypes.Variant = null;
+  changingStatusTo: LibraryTypes.EVariantStatus = 0;
+  changingStatusDefault: boolean = false;
 }
 const LibraryState_Record = Immutable.Record(new LibraryStateC());
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> {}
