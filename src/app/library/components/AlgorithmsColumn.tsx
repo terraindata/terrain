@@ -171,8 +171,6 @@ class AlgorithmsColumn extends PureClasss<Props>
         draggingItemIndex: itemIndex,
         draggingOverIndex: index,
       });
-      // var target = this.props.algorithms.get(this.props.algorithmsOrder.get(index));
-      // Actions.algorithms.move(this.props.algorithms.get(id).set('status', target.status) as Algorithm, index, this.props.groupId);
     }
   }
   

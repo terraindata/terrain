@@ -83,11 +83,15 @@ class VariantsColumn extends Classs<Props>
     lastMoved: any,
     me: UserTypes.User,
     roles: RoleTypes.RoleMap,
+    draggingItemIndex: number;
+    draggingOverIndex: number;
   } = {
     rendered: false,
     lastMoved: null,
     me: null,
     roles: null,
+    draggingItemIndex: -1,
+    draggingOverIndex: -1,
   }
   
   componentWillMount()
@@ -169,16 +173,18 @@ class VariantsColumn extends Classs<Props>
   handleHover(index: number, type: string, id: ID)
   {
     var itemIndex = this.props.variantsOrder.findIndex(v => v === id);
-    if(type === 'variant' && itemIndex !== index 
+    if(type === 'variant'
       && this.state.lastMoved !== index + ' ' + itemIndex)
     {
       this.setState({
         lastMoved: index + ' ' + itemIndex,
+        draggingItemIndex: itemIndex,
+        draggingOverIndex: index,
       });
       
-      var target = this.props.variants.get(this.props.variantsOrder.get(index));
-      Actions.variants.move(this.props.variants.get(id).set('status', target.status) as Variant,
-        index, this.props.groupId, this.props.algorithmId);
+      // var target = this.props.variants.get(this.props.variantsOrder.get(index));
+      // Actions.variants.move(this.props.variants.get(id).set('status', target.status) as Variant,
+      //   index, this.props.groupId, this.props.algorithmId);
     }
   }
 
@@ -209,9 +215,19 @@ class VariantsColumn extends Classs<Props>
         }
         break;
       case "variant":
-        // maybe the code for moving one variant to a specific spot in another alg goes here?
+        Actions.variants.move(
+          this.props.variants.get(id), 
+          this.props.variantsOrder.indexOf(targetItem.id),
+          this.props.groupId,
+          this.props.algorithmId
+        );
         break;
     }
+    
+    this.setState({
+      draggingItemIndex: -1,
+      draggingOverIndex: -1,
+    });
   }
   
   handleDoubleClick(id:ID)
@@ -219,9 +235,10 @@ class VariantsColumn extends Classs<Props>
     browserHistory.push(`/builder/?o=${id}`);
   }
 
-  renderVariant(id: ID, index: number)
+  renderVariant(id: ID)
   {
     const variant = this.props.variants.get(id);
+    const index = this.props.variantsOrder.indexOf(id);
     let {me, roles} = this.state;
     if(me && roles)
     {
@@ -248,6 +265,8 @@ class VariantsColumn extends Classs<Props>
     return (
       <LibraryItem
         index={index}
+        draggingItemIndex={this.state.draggingItemIndex}
+        draggingOverIndex={this.state.draggingOverIndex}
         name={variant.name}
         icon={<VariantIcon />}
         onDuplicate={this.handleDuplicate}
@@ -328,7 +347,7 @@ class VariantsColumn extends Classs<Props>
           this.props.variantsOrder.map((id, index) =>
             this.props.variants.get(id) &&
               (archived ? this.hasStatus(id, LibraryTypes.EVariantStatus.Archive) : !this.hasStatus(id, LibraryTypes.EVariantStatus.Archive))
-              && this.renderVariant(id, index)
+              && this.renderVariant(id)
           )
         }
         {
