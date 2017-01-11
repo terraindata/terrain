@@ -196,6 +196,11 @@ class TransformCard extends PureClasss<Props>
   
   computeBars(input: BuilderTypes.CardString)
   {
+    // TODO consider putting the query in context
+    let builderState = BuilderStore.getState();
+    let {cards} = builderState.query;
+    let {db} = builderState;
+    
     if(typeof input === 'string')
     {
       // TODO: cache somewhere
@@ -204,10 +209,6 @@ class TransformCard extends PureClasss<Props>
       {
         let alias = parts[0];
         let field = parts[1];
-        // TODO consider putting the query in context
-        let builderState = BuilderStore.getState();
-        let {cards} = builderState.query;
-        let {db} = builderState;
         
         let table = this.findTableForAlias(cards, alias);
         
@@ -225,11 +226,6 @@ class TransformCard extends PureClasss<Props>
     }
     else if(input && input._isCard)
     {
-      let queryKeyPath = this.props.keyPath.skipLast(this.props.keyPath.size - 2);
-      let query = BuilderStore.getState().getIn(queryKeyPath.toList());
-      let db = query.db;
-      let cards = query.cards;
-      
       let card = input as BuilderTypes.ICard;
       if(card.type === 'score' && card['weights'].size)
       {
