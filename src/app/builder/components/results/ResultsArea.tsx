@@ -240,10 +240,25 @@ class ResultsArea extends PureClasss<Props>
     }
   }
   
+  isQueryEmpty(): boolean
+  {
+    let {query} = this.props;
+    return !query
+      || (query.mode === 'tql' && !query.tql)
+      || (query.mode !== 'tql' && !query.cards.size);
+  }
+  
   resultsFodderRange = _.range(0, 25);
   
   renderResults()
   {
+    if(this.isQueryEmpty())
+    {
+      return <InfoArea
+        large="Results will display here as you build your query."
+      />
+    }
+    
     if(this.state.error)
     {
       let error = "";
@@ -564,12 +579,16 @@ class ResultsArea extends PureClasss<Props>
       <div className='results-top'>
         <div className='results-top-summary'>
           {
-            this.state.error ? 'Error with query' : 
-            (
-              this.state.results ? 
-                `${count || 'No'} result${count === 1 ? '' : 's'}` 
-              : 'Text result'
-            )
+            this.isQueryEmpty() ?
+              'Empty query' :
+              (
+                this.state.error ? 'Error with query' : 
+                (
+                  this.state.results ? 
+                    `${count || 'No'} result${count === 1 ? '' : 's'}` 
+                  : 'Text result'
+                )
+              )
           }
         </div>
         
