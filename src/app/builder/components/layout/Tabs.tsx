@@ -372,7 +372,6 @@ class Tabs extends PureClasss<TabsProps> {
      .join(",");
      
     localStorage.setItem('config', newConfig); // need to set for closing the last tab to work
-    console.log('set nc', newConfig);
     return '/builder/' + newConfig;
   }
   

@@ -178,7 +178,6 @@ class CardsColumn extends PureClasss<Props>
   innerHeight: number = -1;
   render()
   {
-    console.log(this.props.cards.toJS());
     let {props} = this;
     let {cards, canEdit} = props;
     let {keyPath} = this.state;
