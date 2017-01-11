@@ -355,7 +355,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   
   [ActionTypes.toggleDeck]:
     (state: BuilderState, action) => state
-      .set('deckOpen', action.payload.open),
+      .setIn(['query', 'deckOpen'], action.payload.open),
   
   [ActionTypes.changeTables]:
     (
