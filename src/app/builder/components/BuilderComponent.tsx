@@ -82,7 +82,7 @@ class BuilderComponent extends PureClasss<Props>
   {
     BuilderActions.create(keyPath, index, display.factoryType);
   }
-  removeRow(keyPath: KeyPath, index: number, display: Display)
+  removeRow(keyPath: KeyPath, index: number)
   {
     BuilderActions.remove(keyPath, index);
   }
@@ -277,8 +277,8 @@ class BuilderComponent extends PureClasss<Props>
               value.map((v, i) => (
                 <CardField
                   index={i}
-                  onAdd={this._fn(this.addRow, keyPath, d)}
-                  onRemove={this._fn(this.removeRow, keyPath, i, d)}
+                  onAdd={this._fn(this.addRow, keyPath, i, d)}
+                  onRemove={this._fn(this.removeRow, keyPath, i)}
                   onMove={this._fn(this.moveRow, keyPath)}
                   key={key + ',' + v.get('id')}
                   isSingle={value.size === 1}
