@@ -160,7 +160,7 @@ class VariantVersions extends PureClasss<Props>
         })}
         key={version.id}
         onClick={
-          this._fn('showVersion', version.id, i, this.showVersion.bind(this, version.id, i))
+          this._fn(this.showVersion, version.id, i)
         }
       >
         <div className="versions-table-element">

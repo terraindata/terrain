@@ -205,12 +205,13 @@ class Classs<T> extends React.Component<T, any>
       fn: () => void,
     }[],
   } = {};
-  _fn(fnName: string, ...args: any[]): (...args:any[]) => any
+  _fn(instanceFn: (...args:any[]) => any, ...args: any[]): (...args:any[]) => any
   {
-    let fn = args.splice(args.length - 1, 1)[0];
+    let fnName = instanceFn.name;
     var fns = this._fns[fnName];
     if(!fns)
     {
+      let fn = this.__getFn(instanceFn, args);
       this._fns[fnName] = [{
         args,
         fn,
@@ -226,8 +227,28 @@ class Classs<T> extends React.Component<T, any>
       }
     }
     
+    let fn = this.__getFn(instanceFn, args);
     this._fns[fnName].push({ args, fn });
     return fn;
+  }
+  
+  __getFn(instanceFn: (...args:any[]) => any, args: any[]): (...args:any[]) => any
+  {
+    switch(args.length)
+    {
+      case 0:
+        return instanceFn.bind(this);
+      case 1:
+        return instanceFn.bind(this, args[0]);
+      case 2:
+        return instanceFn.bind(this, args[0], args[1]);
+      case 3:
+        return instanceFn.bind(this, args[0], args[1], args[2]);
+      case 4:
+        return instanceFn.bind(this, args[0], args[1], args[2], args[3]);
+      default:
+        return instanceFn.bind(this, args);
+    }
   }
   
   _togMap: {[stateKey:string]: () => void} = {};

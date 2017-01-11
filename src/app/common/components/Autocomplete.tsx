@@ -133,10 +133,11 @@ class Autocomplete extends PureClasss<Props>
     this.props.onBlur && this.props.onBlur(event);
   }
   
-  handleSelect(event)
+  handleSelect(value)
   {
-    this.handleChange(event);
+    this.props.onChange(value);
     this.setState({
+      value,
       open: false,
       selectedIndex: -1,
     });
@@ -251,7 +252,7 @@ class Autocomplete extends PureClasss<Props>
           'ac-option': true,
           'ac-option-selected': index === this.state.selectedIndex,
         })}
-        onMouseDown={this.handleSelect}
+        onMouseDown={this._fn(this.handleSelect, option)}
         value={option}
         key={option}
         ref={'opt' + index}

@@ -82,24 +82,17 @@ class BuilderComponent extends PureClasss<Props>
   // _debugUpdates = true;
   _debugName = "BC";
   
-  _addRow(keyPath: KeyPath, display: Display)
+  addRow(keyPath: KeyPath, display: Display)
   {
-    return this._fn('addRow', keyPath, display, (index: number) => {
-      BuilderActions.create(keyPath, index, display.factoryType);
-    });
+    BuilderActions.create(keyPath, index, display.factoryType);
   }
-  _removeRow(keyPath: KeyPath, index: number, display: Display)
+  removeRow(keyPath: KeyPath, index: number, display: Display)
   {
-    return this._fn('removeRow', keyPath, index, display, () => {
-      BuilderActions.remove(keyPath, index);
-    });
+    BuilderActions.remove(keyPath, index);
   }
-  _moveRow(keyPath: KeyPath)
+  moveRow(keyPath: KeyPath, index: number, newIndex: number)
   {
-    return this._fn('moveRow', keyPath,
-      (index: number, newIndex: number) =>
-        BuilderActions.move(keyPath, index, newIndex)
-    );
+    BuilderActions.move(keyPath, index, newIndex)
   }
   
   renderDisplay(
@@ -288,9 +281,9 @@ class BuilderComponent extends PureClasss<Props>
               value.map((v, i) => (
                 <CardField
                   index={i}
-                  onAdd={this._addRow(keyPath, d)}
-                  onRemove={this._removeRow(keyPath, i, d)}
-                  onMove={this._moveRow(keyPath)}
+                  onAdd={this._fn(this.addRow, keyPath, d)}
+                  onRemove={this._fn(this.removeRow, keyPath, i, d)}
+                  onMove={this._fn(this.moveRow, keyPath)}
                   key={key + ',' + v.get('id')}
                   isSingle={value.size === 1}
                   
