@@ -112,18 +112,13 @@ class DeployModal extends PureClasss<Props>
     );
   }
   
-  renderTQLColumn()
+  renderTQLColumn(defaultVariant:LibraryTypes.Variant)
   {
     let variant = this.state.changingStatusOf;
-    let libraryState = LibraryStore.getState();
-    let algorithm = libraryState.algorithms.get(variant.algorithmId);
-    let defaultTql = 'There is not currently a default Variant for algorithm ' + algorithm.name;
+    let defaultTql = null;
     
     if(this.state.defaultChecked)
     {
-      let defaultVariant = libraryState.variants.find(
-        v => v.algorithmId === variant.algorithmId && v.isDefault
-      );
       if(defaultVariant)
       {
         // TODO change to simply defaultVariant.tql when the query tql structure changes
@@ -144,7 +139,7 @@ class DeployModal extends PureClasss<Props>
           <TQLEditor
             canEdit={false}
             tql={tql}
-            isDiff={this.state.defaultChecked}
+            isDiff={this.state.defaultChecked && defaultTql !== null}
             diffTql={defaultTql}
           />
         </div>
@@ -175,6 +170,14 @@ class DeployModal extends PureClasss<Props>
       title = 'Remove "' + name + '" from Live';
     }
     
+    if(this.state.defaultChecked)
+    {
+      let libraryState = LibraryStore.getState();
+      var defaultVariant = libraryState.variants.find(
+        v => v.algorithmId === changingStatusOf.algorithmId && v.isDefault
+      );
+    }
+    
     return (
       <Modal
         open={this.state.changingStatus} 
@@ -192,13 +195,14 @@ class DeployModal extends PureClasss<Props>
               })}
             >
               {
-                this.renderTQLColumn()
+                this.renderTQLColumn(defaultVariant)
               }
               <DeployModalColumn
                 variant={changingStatusOf}
                 status={changingStatusTo}
                 onDeploy={this.handleDeploy}
                 defaultChecked={this.state.defaultChecked}
+                defaultVariant={defaultVariant}
                 onDefaultCheckedChange={this.handleDefaultCheckedChange}
               />
             </div>

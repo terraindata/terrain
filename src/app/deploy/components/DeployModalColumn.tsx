@@ -86,6 +86,7 @@ interface Props {
   variant: LibraryTypes.Variant;
   status: LibraryTypes.EVariantStatus;
   defaultChecked: boolean;
+  defaultVariant: LibraryTypes.Variant;
   onDefaultCheckedChange(defaultChecked: boolean);
   onDeploy();
 }
@@ -225,23 +226,45 @@ class DeployModalColumn extends PureClasss<Props>
         </div>
         {
           status === EVariantStatus.Live &&
-            <div
-              className={classNames({
-                'deploy-modal-check-wrapper': true,
-                'deploy-modal-check-wrapper-checked': this.props.defaultChecked,
-              })}
-            >
-              <input
-                type='checkbox'
-                checked={this.props.defaultChecked}
-                onChange={this.handleDefaultCheckedChange}
-                id='deploy-modal-default-check'
-              />
-              <label
-                htmlFor='deploy-modal-default-check'
+            <div>
+              <div
+                className={classNames({
+                  'deploy-modal-check-wrapper': true,
+                  'deploy-modal-check-wrapper-checked': this.props.defaultChecked,
+                })}
               >
-                Make default for algorithm <b>{algorithm.name}</b>
-              </label>
+                <input
+                  type='checkbox'
+                  checked={this.props.defaultChecked}
+                  onChange={this.handleDefaultCheckedChange}
+                  id='deploy-modal-default-check'
+                />
+                <label
+                  htmlFor='deploy-modal-default-check'
+                >
+                  Make default for algorithm <b>{algorithm.name}</b>
+                </label>
+              </div>
+              {
+                this.props.defaultChecked &&
+                  <div
+                    className='info'
+                  >
+                    <b>{variant.name}</b> will be served for any requests to algorithm <b>{algorithm.name}.</b> &nbsp;
+                    {
+                      this.props.defaultVariant
+                      ?
+                        <span>
+                          This will replace the current default variant <b>{this.props.defaultVariant.name}</b>, 
+                          which will remain Live.
+                        </span>
+                      :
+                        <span>
+                          There is not currently a default variant for algorithm <b>{algorithm.name}</b>.
+                        </span>
+                    }
+                  </div>
+              }
             </div>
         }
         <div
