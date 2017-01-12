@@ -379,9 +379,12 @@ class TransformCard extends PureClasss<Props>
     });
   }
   
-  handleUpdatePoints(points)
+  handleUpdatePoints(points, isConcrete?: boolean)
   {
-    Actions.change(this._ikeyPath(this.props.keyPath, 'scorePoints'), points); 
+    Actions.change(this._ikeyPath(this.props.keyPath, 'scorePoints'), points, !isConcrete);
+    // we pass !isConcrete as the value for "isDirty" in order to tell the Store when to 
+    //  set an Undo checkpoint. Moving the same point in the same movement should not result
+    //  in more than one state on the Undo stack.
   }
   
   render()

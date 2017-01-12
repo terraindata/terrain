@@ -124,7 +124,7 @@ input[type=text], input[type=email], input[type=tel], input[type=num]
     border-color: @dark-green; //#ccc; //fade(#00bcd6, 50%);
   }
   
-  &:focus {
+  &:focus:not(:disabled) {
    border-color: rgba(140,213,106,1); 
   }
 }
