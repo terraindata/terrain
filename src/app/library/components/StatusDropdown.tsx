@@ -57,6 +57,8 @@ import Util from '../../util/Util.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
 import UserStore from '../../users/data/UserStore.tsx';
 
+const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
+
 interface Props
 {
   variant: LibraryTypes.Variant;
@@ -98,7 +100,6 @@ class StatusDropdown extends PureClasss<Props>
       status = Status.Live;
       isDefault = true;
     }
-    console.log(this.props.variant);
     LibraryActions.variants.status(this.props.variant, status as Status, false, isDefault);
   }
   
@@ -207,12 +208,20 @@ function getOption(status:Status | string)
         color: LibraryTypes.colorForStatus(status)
       }}
     >
-      <div
-        className='status-dropdown-option-marker'
-        style={{
-          background: LibraryTypes.colorForStatus(status)
-        }}
-      />
+      {
+        status === DEFAULT
+        ?
+          <StarIcon
+            className='status-dropdown-option-star'
+          />
+        :
+          <div
+            className='status-dropdown-option-marker'
+            style={{
+              background: LibraryTypes.colorForStatus(status)
+            }}
+          />
+      }
       <div
         className='status-dropdown-option-text'
       >

@@ -236,7 +236,7 @@ export module LibraryTypes
       case EVariantStatus.Live:
         return '#48b14b';
       case 'Default':
-        return '#18b19b'
+        return '#957048'
       default:
         return '#000';
     }
