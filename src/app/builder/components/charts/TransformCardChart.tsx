@@ -193,6 +193,10 @@ class TransformCardChart extends PureClasss<Props>
     this.updatePoints(points);
   }
   
+  onPointRelease()
+  {
+  }
+  
   onLineClick(x, y)
   {
     this.setState({
@@ -258,6 +262,7 @@ class TransformCardChart extends PureClasss<Props>
         y: this.props.range.toJS(),
       },
       onMove: this.onPointMove,
+      onRelease: this.onPointRelease,
       onLineClick: this.onLineClick,
       onLineMove: this.onLineMove,
       spotlights: overrideState.spotlights || this.props.spotlights || [], // TODO toJS()

@@ -374,7 +374,6 @@ class TransformCard extends PureClasss<Props>
   
   handleDomainChange(domain: List<number>)
   {
-    console.log('handling domain change', domain.get(0), domain.get(1));
     this.setState({
       domain,
     });
@@ -382,7 +381,7 @@ class TransformCard extends PureClasss<Props>
   
   handleUpdatePoints(points)
   {
-    Actions.change(this._ikeyPath(this.props.keyPath, 'scorePoints'), points);
+    Actions.change(this._ikeyPath(this.props.keyPath, 'scorePoints'), points); 
   }
   
   render()

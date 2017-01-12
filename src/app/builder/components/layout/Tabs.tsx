@@ -204,19 +204,22 @@ var Tab = React.createClass<any, any>({
   },
 });
 
+export interface TabAction
+{
+  text: string;
+  icon: any;
+  onClick();
+  enabled?: boolean;
+}
+
 interface TabsProps
 {
   config: string;
-  actions: Immutable.List<{
-    text: string;
-    icon: any;
-    onClick();
-    enabled?: boolean;
-  }>;
+  actions: List<TabAction>;
   onNoVariant(variantId: string);
 }
 
-class Tabs extends PureClasss<TabsProps> {
+export class Tabs extends PureClasss<TabsProps> {
   state = {
     variants: LibraryStore.getState().variants,
     tabs: null,
@@ -313,11 +316,14 @@ class Tabs extends PureClasss<TabsProps> {
               key={index}
               onClick={action.onClick}
             >
-              <div className='tabs-action-piece'>
-                {
-                  action.icon
-                }
-              </div>
+              {
+                action.icon &&
+                  <div className='tabs-action-piece'>
+                    {
+                      action.icon
+                    }
+                  </div>
+              }
               <div className='tabs-action-piece'>
                 {
                   action.text

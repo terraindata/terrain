@@ -73,7 +73,7 @@ type Variant = LibraryTypes.Variant;
 // Components
 import PureClasss from './../../common/components/PureClasss.tsx';
 import BuilderColumn from "./BuilderColumn.tsx";
-import Tabs from "./layout/Tabs.tsx";
+import {Tabs, TabAction} from "./layout/Tabs.tsx";
 import LayoutManager from "./layout/LayoutManager.tsx";
 import Card from "./cards/Card.tsx";
 import Result from "./results/Result.tsx";
@@ -111,6 +111,7 @@ class Builder extends PureClasss<Props>
     
     leaving: boolean;
     nextLocation: any;
+    tabActions: List<TabAction>;
   } = {
     builderState: BuilderStore.getState(),
     variants: LibraryStore.getState().variants,
@@ -123,6 +124,7 @@ class Builder extends PureClasss<Props>
     
     leaving: false,
     nextLocation: null,
+    tabActions: this.getTabActions(BuilderStore.getState()),
   };
   
   initialColSizes: any;
@@ -133,6 +135,19 @@ class Builder extends PureClasss<Props>
     
     this._subscribe(BuilderStore, {
       stateKey: 'builderState',
+      updater: (builderState:BuilderState) =>
+      {
+        if(
+            builderState.query !== this.state.builderState.query
+            || builderState.pastQueries !== this.state.builderState.pastQueries
+            || builderState.nextQueries !== this.state.builderState.nextQueries
+          )
+        {
+          this.setState({
+            tabActions: this.getTabActions(builderState),
+          });
+        }
+      }
     });
     this._subscribe(LibraryStore, {
       stateKey: 'variants',
@@ -374,6 +389,11 @@ class Builder extends PureClasss<Props>
   
   getVariant(props?:Props): LibraryTypes.Variant
   {
+    if(!this.state)
+    {
+      return null;
+    }
+    
     let variantId = this.getSelectedId(props);
     let variant = this.state.variants && 
       this.state.variants.get(variantId);
@@ -388,23 +408,27 @@ class Builder extends PureClasss<Props>
     return variant; // || this.loadingVariant;
   }
   
-  tabActions = Immutable.List([
-    {
-      text: 'Save',
-      icon: <SaveIcon />,
-      onClick: _.noop,
-      enabled: false,
-    },
-  ]);
-  
-  tabActionsShouldSave = Immutable.List([
-    {
-      text: 'Save',
-      icon: <SaveIcon />,
-      onClick: this.onSave,
-      enabled: true,
-    },
-  ]);
+  getTabActions(builderState:BuilderState): List<TabAction>
+  {
+    return Immutable.List([
+      {
+        text: 'Undo',
+        icon: null,
+        onClick: this.handleUndo,
+        enabled: !!builderState.pastQueries.size,
+      },
+      {
+        text: 'Redo',
+        icon: null,
+        onClick: this.handleRedo,
+        enabled: !!builderState.nextQueries.size,
+      },
+      {
+        text: 'Save',
+        icon: <SaveIcon />,
+        onClick: this.onSave,
+        enabled: this.shouldSave(builderState),
+      },
   //   {
   //     text: 'Duplicate',
   //     icon: <DuplicateIcon />,
@@ -415,6 +439,19 @@ class Builder extends PureClasss<Props>
   //     icon: <OpenIcon />,
   //     onClick: this.loadAlgorithm,
   //   },
+    ]);
+  }
+  
+  handleUndo()
+  {
+    Actions.undo();
+  }
+  
+  handleRedo()
+  {
+    Actions.redo();
+  }
+  
   
   onSave()
   {
@@ -769,9 +806,7 @@ class Builder extends PureClasss<Props>
           :
             <div>
               <Tabs
-                actions={
-                  this.shouldSave() ? this.tabActionsShouldSave : this.tabActions
-                }
+                actions={this.state.tabActions}
                 config={config}
                 ref='tabs'
                 onNoVariant={this.handleNoVariant}

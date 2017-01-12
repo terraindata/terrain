@@ -140,7 +140,7 @@ var TransformChart = {
     
     var barsData = state._cache.computedBarsData;
     var scales = this._scales(el, state.domain, barsData, state.width, state.height);
-    this._draw(el, scales, barsData, state.pointsData, state.onMove,
+    this._draw(el, scales, barsData, state.pointsData, state.onMove, state.onRelease,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
       state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height,
       state.canEdit);
@@ -598,7 +598,7 @@ var TransformChart = {
   },
   
   // needs to be "function" for d3.mouse(this)
-  _lineMousedownFactory: (el, onClick, scales, onMove) => function(event)
+  _lineMousedownFactory: (el, onClick, scales, onMove, onRelease) => function(event)
   {
     var m = d3.mouse(this);
     var x = scales.realX.invert(m[0]);
@@ -625,6 +625,7 @@ var TransformChart = {
       del.on('touchend', null);
       del.on('mouseleave', null);
       line.attr('class', initialClasses);
+      onRelease && onRelease();
     };
     
     del.on('mouseup', offFn);
@@ -673,7 +674,7 @@ var TransformChart = {
     return linesPointsData;
   },
   
-  _drawLines(el, scales, pointsData, onClick, onMove, canEdit)
+  _drawLines(el, scales, pointsData, onClick, onMove, onRelease, canEdit)
   {
     var lineFunction = d3.svg.line()
       .x((d) => d['dontScale'] ? d['x'] : scales.realX(d['x']))
@@ -685,7 +686,7 @@ var TransformChart = {
     
     if(canEdit)
     {
-      lines.on("mousedown", this._lineMousedownFactory(el, onClick, scales, onMove));
+      lines.on("mousedown", this._lineMousedownFactory(el, onClick, scales, onMove, onRelease));
     }
     
     d3.select(el).select('.lines-bg')
@@ -704,7 +705,7 @@ var TransformChart = {
   },
 
   // needs to be "function" for d3.mouse(this)
-  _mousedownFactory: (el, onMove, scales, onSelect, onPointMoveStart, drawCrossHairs, point) => function(d) {
+  _mousedownFactory: (el, onMove, onRelease, scales, onSelect, onPointMoveStart, drawCrossHairs, point) => function(d) {
     
     if(d3.event['shiftKey'] || d3.event['altKey'])
     {
@@ -747,6 +748,7 @@ var TransformChart = {
       del.on('touchend', null);
       del.on('mouseleave', null);
       point.attr('active', '0');
+      onRelease && onRelease();
     };
     del.on('mouseup', offFn);
     del.on('touchend', offFn);
@@ -863,7 +865,7 @@ var TransformChart = {
 
   },
 
-  _editPointPosition(el, scales, onMove, containerInfo)
+  _editPointPosition(el, scales, onMove, onRelease, containerInfo)
   {
     var point = d3.select(el).select('.point-selected');
     if(!point[0][0])
@@ -889,11 +891,12 @@ var TransformChart = {
       pointValues, 
       scales.realX.invert(parseFloat(point.attr('cx'))),
       d3.event['altKey']  
-    ); 
+    );
+    onRelease && onRelease();
     TransformChart._movePointEditMenu(el);
   },
 
-  _drawPointEditMenu(el, scales, onMove, onPointPosEdit)
+  _drawPointEditMenu(el, scales, onMove, onRelease)
   {
     var point = d3.select(el).select('.point-selected');
     if(!point[0][0] || d3.select(el).selectAll('.point-selected')[0].length > 1)
@@ -963,10 +966,10 @@ var TransformChart = {
       .attr('raw_value', value)
       .attr('id', 'xVal')
       .on('change', function() {
-        onPointPosEdit(el, scales, onMove, {containerWidth, containerHeight, w, h});
+         this._editPointPosition(el, scales, onMove, onRelease, {containerWidth, containerHeight, w, h});
       })
       .on('input', function() {
-        onPointPosEdit(el, scales, onMove, {containerWidth, containerHeight, w, h});
+         this._editPointPosition(el, scales, onMove, onRelease, {containerWidth, containerHeight, w, h});
       })
       .on('keydown', function() {
         var xNode: any = d3.select(el).select('#xVal').node();
@@ -991,10 +994,10 @@ var TransformChart = {
       .attr('raw_value', score)
       .attr('id', 'yVal')
       .on('change', function(value) {
-        onPointPosEdit(el, scales, onMove, {containerWidth, containerHeight, w, h});
+         this._editPointPosition(el, scales, onMove, onRelease, {containerWidth, containerHeight, w, h});
       })
       .on('input', function() {
-        onPointPosEdit(el, scales, onMove, {containerWidth, containerHeight, w, h});
+         this._editPointPosition(el, scales, onMove, onRelease, {containerWidth, containerHeight, w, h});
       })
       .on('keydown', function() {
         var yNode: any = d3.select(el).select('#yVal').node();
@@ -1099,14 +1102,14 @@ var TransformChart = {
     return false;
   },
 
-  _mouseclickFactory: (el, scales, drawPointEditMenu, onMove, onPointPosEdit) => function(point)
+  _mouseClickFactory: (el, scales, onMove, onRelease, drawPointEditMenu) => function(point)
   {
     if(!d3.event['shiftKey'] && !d3.event['altKey'])
     {
-      drawPointEditMenu(el, scales, onMove, onPointPosEdit);
+      drawPointEditMenu(el, scales, onMove, onRelease);
     }
     return false;
-  },
+  }.bind(this),
 
   _mouseoutFactory: (el) => function(point)
   {
@@ -1118,7 +1121,7 @@ var TransformChart = {
     d3.event['stopPropagation']();
   },
 
-  _drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart, canEdit)
+  _drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit)
   {
     var g = d3.select(el).selectAll('.points');
     
@@ -1141,11 +1144,11 @@ var TransformChart = {
 
     if(canEdit)
     {
-      point.on('mousedown',   this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point));
-      point.on('touchstart',  this._mousedownFactory(el, onMove, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point));
+      point.on('mousedown',   this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point));
+      point.on('touchstart',  this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point));
       point.on('mouseover',   this._mouseoverFactory(el, scales, this._drawToolTip));
       point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu));
-      point.on('click',       this._mouseclickFactory(el, scales, this._drawPointEditMenu, onMove, this._editPointPosition));
+      point.on('click',       this._mouseClickFactory(el, scales, onMove, onRelease, this._drawPointEditMenu));
       point.on('mouseout',    this._mouseoutFactory(el));
       point.on('dblclick',    this._doubleclickFactory(el));
     }
@@ -1153,7 +1156,7 @@ var TransformChart = {
     point.exit().remove();
   },
   
-  _draw(el, scales, barsData, pointsData, onMove, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit)
+  _draw(el, scales, barsData, pointsData, onMove, onRelease, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -1164,7 +1167,7 @@ var TransformChart = {
     this._drawBars(el, scales, barsData);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
     this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
-    this._drawPoints(el, scales, pointsData, onMove, onSelect, onDelete, onPointMoveStart, canEdit);
+    this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit);
     this._movePointEditMenu(el, height);
   },
   

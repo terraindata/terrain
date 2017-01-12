@@ -59,6 +59,13 @@ export class BuilderStateClass
   variantId: ID = "";
   query: BuilderTypes.Query = null;
   
+  // for undo/redo
+  pastQueries: List<BuilderTypes.Query> = Immutable.List([]);
+  nextQueries: List<BuilderTypes.Query> = Immutable.List([]);
+  lastActionType: string = '';
+  lastActionKeyPath: KeyPath = null;
+  lastActionTime: number = 0;
+  
   loading: boolean = false;
   loadingXhr: XMLHttpRequest = null;
   loadingVariantId: ID = '';
@@ -92,15 +99,43 @@ var DefaultState = _BuilderState();
 import BuilderReducers from './BuilderReducers.tsx';
 
 export const BuilderStore: IStore<BuilderState> = Redux.createStore(
-  (state = DefaultState, action) =>
+  (
+    state: BuilderState = DefaultState, 
+    action: Action<{
+      keyPath: KeyPath;
+      notDirty: boolean;
+    }>
+  ) =>
   {
+    if(BuilderDirtyActionTypes[action.type] && !action.payload.notDirty)
+    {
+      state = state
+        .set('isDirty', true);
+      
+      // back up for undo, check time to prevent overloading the undo stack
+      let time = (new Date()).getTime();
+      if(
+        action.type !== BuilderActionTypes.change
+        || action.type !== state.lastActionType
+        || action.payload.keyPath !== state.lastActionKeyPath
+        || time - state.lastActionTime > 1500
+      )
+      {
+        state = state
+          .set('lastActionType', action.type)
+          .set('lastActionTime', time)
+          .set('lastActionKeyPath', action.payload.keyPath)
+          .set('pastQueries', state.pastQueries.unshift(state.query));
+      }
+        
+      if(state.nextQueries.size)
+      {
+        state = state.set('nextQueries', Immutable.List([]));
+      }
+    }
     if(BuilderReducers[action.type])
     {
       state = BuilderReducers[action.type](state, action);
-    }
-    if(BuilderDirtyActionTypes[action.type] && !action.payload.notDirty)
-    {
-      state = state.set('isDirty', true);
     }
     return state;
   }

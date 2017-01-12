@@ -83,6 +83,10 @@ export var BuilderActionTypes =
   changeTables: '', // tables and columns for current query's db
   
   save: '', // just tells the store that something was saved
+  
+  undo: '',
+  redo: '',
+  checkpoint: '', // inserts an undo checkpoint
 };
 
 // I tried using this type to correclty classify this function,
@@ -125,6 +129,7 @@ export let BuilderDirtyActionTypes = {};
   BuilderActionTypes.nestedMove,
   BuilderActionTypes.dropCard,
   BuilderActionTypes.toggleDeck,
+  BuilderActionTypes.checkpoint,
 ].map(type => BuilderDirtyActionTypes[type] = true);
 
 export default BuilderActionTypes;

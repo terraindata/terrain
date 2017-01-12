@@ -127,6 +127,8 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       .set('loadingXhr', null)
       .set('loadingVariantId', '')
       .set('isDirty', false)
+      .set('pastQueries', Immutable.List([]))
+      .set('nextQueries', Immutable.List([]))
     ;
   },
 
@@ -380,6 +382,47 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     ) =>
       state
         .set('isDirty', action.payload && action.payload.failed),
+  
+  [ActionTypes.undo]:
+    (
+      state: BuilderState,
+      action: Action<{}>
+    ) =>
+    {
+      if(state.pastQueries.size)
+      {
+        let pastQuery = state.pastQueries.get(0);
+        let pastQueries = state.pastQueries.shift();
+        let nextQueries = state.nextQueries.unshift(state.query);
+        return state
+          .set('pastQueries', pastQueries)
+          .set('query', pastQuery)
+          .set('nextQueries', nextQueries);
+      }
+      return state;
+    },
+    
+  [ActionTypes.redo]:
+    (
+      state: BuilderState,
+      action: Action<{}>
+    ) =>
+    {
+      if(state.nextQueries.size)
+      {
+        let nextQuery = state.nextQueries.get(0);
+        let nextQueries = state.nextQueries.shift();
+        let pastQueries = state.pastQueries.unshift(state.query);
+        return state
+          .set('pastQueries', pastQueries)
+          .set('query', nextQuery)
+          .set('nextQueries', nextQueries);
+      }
+      return state;
+    },
+    
+  [ActionTypes.checkpoint]:
+    (state:BuilderState, action: Action<{}>) => state,
 };
 
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState

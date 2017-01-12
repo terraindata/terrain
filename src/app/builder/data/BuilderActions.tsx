@@ -125,6 +125,18 @@ const BuilderActions =
   save:
     (failed?: boolean) =>
       $(ActionTypes.save, { failed }),
+  
+  undo:
+    () =>
+      $(ActionTypes.undo, { }),
+  
+  redo:
+    () =>
+      $(ActionTypes.redo, { }),
+  
+  checkpoint:
+    () =>
+      $(ActionTypes.checkpoint, { }),
 };
 
 _.map(ActionTypes, 
