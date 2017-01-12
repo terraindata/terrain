@@ -53,6 +53,8 @@ import { Link } from 'react-router';
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 
+const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
+
 interface Props
 {
   index: number;
@@ -88,6 +90,7 @@ interface Props
   // optional
   className?: string;
   onDoubleClick?: (id:ID) => void;
+  isStarred?: boolean;
   
   // populated by DnD code
   connectDropTarget?: (html: any) => JSX.Element;
@@ -301,7 +304,13 @@ class LibraryItem extends Classs<Props>
                     'library-item-title-bar-editing': this.state.nameEditing,
                   })}
                 >
-                  { this.props.icon }
+                  <div
+                    className='library-item-icon'
+                  >
+                    { 
+                      this.props.icon
+                    }
+                  </div>
                   <div
                     className='library-item-name'
                     onDoubleClick={this.showTextfield}
@@ -319,6 +328,14 @@ class LibraryItem extends Classs<Props>
                     onKeyDown={ this.handleKeyDown }
                     ref='input'
                   />
+                  {
+                    this.props.isStarred &&
+                      <div
+                        className='library-item-star'
+                      >
+                        <StarIcon />
+                      </div>
+                  }
                   <Menu
                     options={menuOptions}
                   />

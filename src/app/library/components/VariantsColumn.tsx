@@ -288,6 +288,7 @@ class VariantsColumn extends Classs<Props>
         canEdit={canDrag}
         canDrag={canDrag}
         canCreate={canDrag}
+        isStarred={variant.isDefault}
       >
         <div className='flex-container'>
           <UserThumbnail username={variant.lastUsername} medium={true} extra = {role}/>
