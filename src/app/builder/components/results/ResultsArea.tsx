@@ -68,6 +68,7 @@ const MAX_RESULTS = 200;
 
 interface Props
 {
+  db: string;
   query: BuilderTypes.Query;
   onLoadStart: () => void;
   onLoadEnd: () => void;
@@ -527,12 +528,12 @@ class ResultsArea extends PureClasss<Props>
       this.xhr && this.xhr.abort();
       this.allXhr && this.allXhr.abort();
       
-      this.xhr = Ajax.query(tql, query.db, this.handleResultsChange, this.handleError);
-      if (query.mode === "tql")
+      this.xhr = Ajax.query(tql, this.props.db, this.handleResultsChange, this.handleError);
+      if(query.mode === "tql")
       {
         this.allXhr = Ajax.query(
           tql, 
-          query.db,
+          this.props.db,
           this.handleAllFieldsResponse,
           this.handleAllFieldsError,
           true
@@ -546,7 +547,7 @@ class ResultsArea extends PureClasss<Props>
             transformAliases: true,
             // limit: pages * RESULTS_PAGE_SIZE,
           }), 
-          query.db,
+          this.props.db,
           this.handleAllFieldsResponse,
           this.handleAllFieldsError,
           true
@@ -556,7 +557,7 @@ class ResultsArea extends PureClasss<Props>
           TQLConverter.toTQL(query, {
             count: true,
           }), 
-          query.db,
+          this.props.db,
           this.handleCountResponse,
           this.handleCountError
         );

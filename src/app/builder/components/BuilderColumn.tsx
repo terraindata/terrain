@@ -247,6 +247,7 @@ var BuilderColumn = React.createClass<any, any>(
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
           canEdit={canEdit}
+          db={this.props.variant.db}
         />;
 
       case COLUMNS.TQL:

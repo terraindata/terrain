@@ -128,6 +128,8 @@ export let BuilderDirtyActionTypes = {};
   BuilderActionTypes.remove,
   BuilderActionTypes.nestedMove,
   BuilderActionTypes.dropCard,
+  BuilderActionTypes.changeTQL,
+  BuilderActionTypes.changeQueryMode,
   BuilderActionTypes.toggleDeck,
   BuilderActionTypes.checkpoint,
 ].map(type => BuilderDirtyActionTypes[type] = true);
