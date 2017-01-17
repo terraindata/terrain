@@ -56,7 +56,6 @@ import Actions from './../data/LibraryActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
 import RolesStore from './../../roles/data/RolesStore.tsx';
-import LibraryStore from './../data/LibraryStore.tsx';
 import LibraryActions from './../data/LibraryActions.tsx';
 import Util from './../../util/Util.tsx';
 import StatusDropdown from './StatusDropdown.tsx';
@@ -66,73 +65,16 @@ type Variant = LibraryTypes.Variant;
 interface Props
 {
   variant: Variant;
+  dbs: List<string>;
+  isAdmin: boolean;
+  isBuilder: boolean;
 }
 
 class LibraryInfoColumn extends PureClasss<Props>
 {
-  state: {
-    isAdmin: boolean,
-    isBuilder: boolean,
-    dbs: List<string>,
-  } = {
-    isAdmin: false,
-    isBuilder: false,
-    dbs: List([]),
-  }
-  
-  componentDidMount()
-  {
-    this._subscribe(RolesStore, {
-      updater: () =>
-      {
-        this.checkRoles(this.props);
-      },
-      isMounted: true,
-    });
-    
-    this._subscribe(LibraryStore, {
-      stateKey: 'dbs',
-      storeKeyPath: ['dbs'],
-      isMounted: true,
-    });
-    
-    Ajax.getDbs((dbs:string[]) => 
-    {
-      LibraryActions.setDbs(
-        List(dbs)
-      );
-    });
-  }
-  
-  componentWillReceiveProps(nextProps:Props)
-  {
-    if(nextProps.variant !== this.props.variant)
-    {
-      this.checkRoles(nextProps);
-    }
-  }
-  
-  checkRoles(props:Props)
-  {
-    if(!props.variant)
-    {
-      return;
-    }
-    
-    let isAdmin = Util.haveRole(props.variant.groupId, 'admin', UserStore, RolesStore);
-    let isBuilder = Util.haveRole(props.variant.groupId, 'builder', UserStore, RolesStore);
-    if(isAdmin !== this.state.isAdmin || isBuilder !== this.state.isBuilder)
-    {
-      this.setState({
-        isAdmin,
-        isBuilder,
-      });
-    }
-  }
-  
   handleDbChange(dbIndex:number)
   {
-    Actions.variants.change(this.props.variant.set('db', this.state.dbs.get(dbIndex)) as Variant);
+    Actions.variants.change(this.props.variant.set('db', this.props.dbs.get(dbIndex)) as Variant);
   }
   
   render()
@@ -142,7 +84,7 @@ class LibraryInfoColumn extends PureClasss<Props>
       return null;
     }
     
-    let {isBuilder, isAdmin} = this.state;
+    let {isBuilder, isAdmin} = this.props;
     let {variant} = this.props;
     
     return (
@@ -169,8 +111,8 @@ class LibraryInfoColumn extends PureClasss<Props>
               </div>
               <div className='biv-cell-second'>
                 <Dropdown
-                  selectedIndex={this.state.dbs && this.state.dbs.indexOf(this.props.variant.db)}
-                  options={this.state.dbs}
+                  selectedIndex={this.props.dbs && this.props.dbs.indexOf(this.props.variant.db)}
+                  options={this.props.dbs}
                   onChange={this.handleDbChange}
                   canEdit={isBuilder || isAdmin}
                   className='bic-db-dropdown'

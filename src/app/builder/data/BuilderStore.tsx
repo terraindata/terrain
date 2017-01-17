@@ -107,7 +107,6 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
     }>
   ) =>
   {
-    console.log(action.type);
     if(BuilderDirtyActionTypes[action.type] && !action.payload.notDirty)
     {
       state = state
