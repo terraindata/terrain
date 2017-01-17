@@ -176,6 +176,7 @@ class TQLResultsBar extends PureClasss<Props>
   
   handleResultsChange(response: QueryResponse)
   {
+    this.props.onLoadEnd && this.props.onLoadEnd();
     if(response.error)
     {
       let {error} = response;
@@ -192,7 +193,6 @@ class TQLResultsBar extends PureClasss<Props>
     }
     
     let results = response.resultSet as (any[] | string);
-    this.props.onLoadEnd && this.props.onLoadEnd();
     if(results)
     {
       var spliced = 0;
