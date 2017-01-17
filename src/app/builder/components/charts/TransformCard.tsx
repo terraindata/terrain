@@ -362,7 +362,7 @@ class TransformCard extends PureClasss<Props>
         this.setState({
           domain: this.trimDomain(this.state.domain, domain),
         });
-        Actions.change(this._ikeyPath(this.props.keyPath, 'domain'), domain);
+        Actions.change(this._ikeyPath(this.props.keyPath, 'domain'), domain, true);
       }
     }
   }

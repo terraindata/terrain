@@ -286,12 +286,12 @@ class BuilderTQLColumn extends PureClasss<Props>
         //When they switch to tql mode, execute code
      if (prevProps.query.mode !== 'tql' && this.props.query.mode === 'tql')     
      {
-       this.executeCode();
+       this.executeCode(true);
      }
      else if (this.props.query.mode !== 'tql' &&
       !(_.isEqual(this.props.query.cards, prevProps.query.cards))) 
      {
-      this.executeCode();
+      this.executeCode(true);
     }
   }
 
