@@ -16,8 +16,10 @@
       		"avg",
       		"count",
       		"exists",
+          "distinct",
       		"take",
           "limit",
+          "offset",
       		"skip",
       		"desc",
       		"asc",
@@ -45,7 +47,9 @@
 			"=",
 			"<",
 			">",
-			"?"
+			"?",
+      "like",
+      "in"
 		],
 		"atom":
 		[

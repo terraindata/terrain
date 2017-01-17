@@ -51,7 +51,6 @@ import LibraryTypes from '../../library/LibraryTypes.tsx';
 import * as Immutable from 'immutable';
 import List = Immutable.List;
 import Map = Immutable.Map;
-import BuilderCoordinator from './BuilderCoordinator.tsx';
 
 const $ = (type: string, payload: any) => Store.dispatch({type, payload})
 
@@ -83,10 +82,7 @@ const BuilderActions =
   
   changeTQL:
     (tql: string) =>
-    {
-      $(ActionTypes.changeTQL, { tql });
-      BuilderCoordinator.handleTQLChange(tql);
-    },
+      $(ActionTypes.changeTQL, { tql }),
   
   hoverCard:
     (cardId: ID) =>

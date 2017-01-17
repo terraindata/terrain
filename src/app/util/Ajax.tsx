@@ -379,11 +379,14 @@ export const Ajax = {
       
       (resp) =>
       {
+        var respData = null;
         try {
-          onLoad(JSON.parse(resp));
+          respData = JSON.parse(resp);
         } catch(e) {
           onError && onError(resp as any);
+          return;
         }
+        onLoad(respData);
       },
       
       onError
@@ -399,11 +402,15 @@ export const Ajax = {
       
       (resp) =>
       {
+        var respData = null;
         try {
-          onLoad(JSON.parse(resp));
+          resp = resp.replace(/\t/g, ''); // tabs cause the JSON parser to error out
+          respData = JSON.parse(resp);
         } catch(e) {
           onError && onError(resp as any);
+          return;
         }
+        onLoad(respData);
       },
       
       onError

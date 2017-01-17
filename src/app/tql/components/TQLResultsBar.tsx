@@ -179,7 +179,8 @@ class TQLResultsBar extends PureClasss<Props>
     if(response.error)
     {
       let {error} = response;
-      let line = parseInt(error.match(/([0-9]+)\:[0-9]+/)[1]);
+      let matches = error.match(/([0-9]+)\:[0-9]+/);
+      let line = matches && matches.length >= 2 && parseInt(matches[1]);
       
       this.setState({
         error: error.substr(0, error.length - 1),

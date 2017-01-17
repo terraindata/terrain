@@ -71,7 +71,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
   
   isText()
   {
-    return typeof this.props.value === 'string';
+    return typeof this.props.value !== 'object';
   }
   
   isCreating()
