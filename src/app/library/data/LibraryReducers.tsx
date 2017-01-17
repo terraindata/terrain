@@ -127,17 +127,20 @@ LibraryReducers[ActionTypes.algorithms.create] =
   (state, action) =>
   {
     let algId = Util.getId();
+    let db = state.groups.get(action.payload.groupId).db || undefined;
     return addVariant(
       addAlgorithm(
         state, 
         LibraryTypes._Algorithm({
           groupId: action.payload.groupId, 
           id: algId,
+          db,
         })
       ),
       LibraryTypes._Variant({
         algorithmId: algId,
         groupId: action.payload.groupId,
+        db,
       })
     );
   }
@@ -239,6 +242,7 @@ LibraryReducers[ActionTypes.variants.create] =
       LibraryTypes._Variant({
         algorithmId: action.payload.algorithmId, 
         groupId: action.payload.groupId, 
+        db: state.algorithms.get(action.payload.algorithmId).db || undefined,
       })
     );
 

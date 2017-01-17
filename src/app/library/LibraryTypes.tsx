@@ -73,7 +73,7 @@ export module LibraryTypes
     groupId = "";
     status = EVariantStatus.Build;
     version = false;
-    db = '';
+    db = 'urbansitter';
     isDefault = false;
     
     // don't use this!
@@ -145,11 +145,12 @@ export module LibraryTypes
     groupId = "";
     variantsOrder = List([]);
     status = EAlgorithmStatus.Live;
+    db = 'urbansitter';
     
     // for DB storage
     type = "algorithm";
     dbFields = ['groupId', 'status'];
-    dataFields = ['name', 'lastEdited', 'lastUsername', 'variantsOrder'];
+    dataFields = ['name', 'lastEdited', 'lastUsername', 'variantsOrder', 'db'];
   }
   const Algorithm_Record = Immutable.Record(new AlgorithmC());
   export interface Algorithm extends AlgorithmC, IRecord<Algorithm> {}
@@ -189,11 +190,12 @@ export module LibraryTypes
     usernames = List([]);
     algorithmsOrder = List([]);
     status = EGroupStatus.Live;
+    db = 'urbansitter';
     
     // for DB storage
     type = "group";
     dbFields = ['status'];
-    dataFields = ['name', 'lastEdited', 'lastUsername', 'algorithmsOrder'];
+    dataFields = ['name', 'lastEdited', 'lastUsername', 'algorithmsOrder', 'db'];
   }
   const Group_Record = Immutable.Record(new GroupC());
   export interface Group extends GroupC, IRecord<Group> {}

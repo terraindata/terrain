@@ -69,6 +69,7 @@ var CodeMirror = React.createClass({
 		defineTerm: React.PropTypes.func,
 		turnSyntaxPopupOff: React.PropTypes.func,
 		hideTermDefinition: React.PropTypes.func,
+    highlightedLine: React.PropTypes.number,
     
     isDiff: React.PropTypes.bool,
     diff: React.PropTypes.string,
@@ -144,7 +145,7 @@ var CodeMirror = React.createClass({
 
 	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
 	{
-		if(lineToHighlight != null) 
+		if(lineToHighlight !== null) 
 		{
 			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
 		}
@@ -166,7 +167,7 @@ var CodeMirror = React.createClass({
 	},
 	undoHighlightedLine: function undoHighlightedLine(line) 
 	{
-		if(line != null) 
+		if(line !== null) 
 		{
 			this.codeMirror.removeLineClass(line, 'wrap', 'cm-error');
 			this.codeMirror.clearGutter('CodeMirror-lint-markers');
@@ -374,6 +375,19 @@ var CodeMirror = React.createClass({
 				}
 			}
 		}
+    
+    if(nextProps.highlightedLine !== this.props.highlightedLine)
+    {
+      if(typeof this.props.highlightedLine === 'number')
+      {
+        this.undoHighlightedLine(this.props.highlightedLine);
+      }
+      if(typeof nextProps.highlightedLine === 'number')
+      {
+        console.log('highlight', nextProps.highlightedLine);
+        this.updateHighlightedLine(nextProps.highlightedLine);
+      }
+    }
 	},
 	getCodeMirror: function getCodeMirror() 
 	{

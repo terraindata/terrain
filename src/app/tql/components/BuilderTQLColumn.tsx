@@ -121,7 +121,7 @@ class BuilderTQLColumn extends PureClasss<Props>
   {
     if(this.props.query.mode !== 'tql') 
     {
-      this.executeCode();
+      this.executeCode(true);
     }
   }
   
@@ -155,13 +155,17 @@ class BuilderTQLColumn extends PureClasss<Props>
     }
   }
 
-  executeCode() 
+  executeCode(noAction?: boolean) 
   {
     var code = this.props.query.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.query)
     this.setState({
       tql: code,
     });
-    BuilderActions.changeTQL(code);
+    
+    if(!noAction)
+    {
+      BuilderActions.changeTQL(code);
+    }
   }
 
   changeThemeDefault() 
@@ -259,22 +263,21 @@ class BuilderTQLColumn extends PureClasss<Props>
 
   highlightError(lineNumber: number) 
   {
-    this.state.highlightedLine = lineNumber - 1;
-    var x: any = this.refs['cm'];
-    if (x) 
+    if(lineNumber !== null) 
     {
-      x.updateHighlightedLine(lineNumber - 1);
+      this.setState({
+        highlightedLine: lineNumber - 1,
+      });
     }
   }
 
   undoError() 
   {
-    if (this.state.highlightedLine != null) 
+    if(this.state.highlightedLine !== null) 
     {
-      var x: any = this.refs['cm'];
-      if (x) {
-        x.undoHighlightedLine(this.state.highlightedLine);
-      }
+      this.setState({
+        higlightedLine: null,
+      });
     }
   }
 
@@ -283,7 +286,7 @@ class BuilderTQLColumn extends PureClasss<Props>
         //When they switch to tql mode, execute code
      if (prevProps.query.mode !== 'tql' && this.props.query.mode === 'tql')     
      {
-            this.executeCode();
+       this.executeCode();
      }
      else if (this.props.query.mode !== 'tql' &&
       !(_.isEqual(this.props.query.cards, prevProps.query.cards))) 
