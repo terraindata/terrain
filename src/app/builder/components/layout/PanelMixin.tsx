@@ -64,13 +64,13 @@ var Panel = {
 		drag_xy: React.PropTypes.bool,
 		dragInsideOnly: React.PropTypes.bool,
 
-		onDrop: React.PropTypes.func,
+		onPanelDrop: React.PropTypes.func,
     
     onMouseDown: React.PropTypes.func,
     mouseDownRef: React.PropTypes.string,
 
 		fill: React.PropTypes.bool,
-		reorderOnDrag: React.PropTypes.bool,
+		reorderonPanelDrag: React.PropTypes.bool,
 		neighborDragging: React.PropTypes.bool,
 		handleRef: React.PropTypes.string,
     dragHandleRef: React.PropTypes.string,
@@ -164,9 +164,9 @@ var Panel = {
 			draggedTo.dy = this.state.dy;
 		}
 
-		if(this.props.onDrag) 
+		if(this.props.onPanelDrag) 
 		{
-			this.props.onDrag(this.props.index, draggedTo, { 
+			this.props.onPanelDrag(this.props.index, draggedTo, { 
 				x: this.state.ox,
 				y: this.state.oy,
 			});
@@ -186,9 +186,9 @@ var Panel = {
       dragging: false
     });
     
-    if(this.props.onDrop)
+    if(this.props.onPanelDrop)
     {
-      this.props.onDrop(this.props.index, {
+      this.props.onPanelDrop(this.props.index, {
         dx: x - this.state.ox,
         dy: y - this.state.oy,
       }, { 

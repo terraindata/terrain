@@ -70,7 +70,7 @@ interface Props
   range: List<number>;
   canEdit: boolean;
   inputKey: string;
-  updatePoints: (points:ScorePoints) => void;
+  updatePoints: (points:ScorePoints, released?: boolean) => void;
   width: number;
   
   spotlights: any;// TODO spawtlights
@@ -87,8 +87,13 @@ class TransformCardChart extends PureClasss<Props>
     initialValue?: number;
     initialPoints?: ScorePoints;
     initialLineY?: number;
+    // these move seeds are use to identify fluid point movements, which should all be undone in the same action
+    moveSeed: number;
+    movedSeed: number;
   } = {
     selectedPointIds: Map({}),
+    moveSeed: 0,
+    movedSeed: -1,
   };
 
   componentDidMount() 
@@ -139,9 +144,9 @@ class TransformCardChart extends PureClasss<Props>
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState(selectedPointIds));
   }
    
-  updatePoints(points)
+  updatePoints(points, isConcrete?: boolean)
   {
-    this.props.updatePoints(points);
+    this.props.updatePoints(points, isConcrete);
   }
   
   onPointMoveStart(initialScore, initialValue)
@@ -150,6 +155,7 @@ class TransformCardChart extends PureClasss<Props>
       initialScore,
       initialValue,
       initialPoints: this.props.points,
+      moveSeed: this.state.moveSeed + 1,
     });
   }
 
@@ -190,7 +196,16 @@ class TransformCardChart extends PureClasss<Props>
       }
       return scorePoint;
     });
-    this.updatePoints(points);
+    
+    let isConcrete = this.state.moveSeed !== this.state.movedSeed;
+    this.setState({
+      movedSeed: this.state.moveSeed,
+    });
+    this.updatePoints(points, isConcrete);
+  }
+  
+  onPointRelease()
+  {
   }
   
   onLineClick(x, y)
@@ -215,7 +230,7 @@ class TransformCardChart extends PureClasss<Props>
   {
     this.updatePoints(this.props.points.filterNot(
       point => point.id === pointId || this.state.selectedPointIds.get(point.id)
-    ));
+    ), true);
   }
   
   onCreate(value, score)
@@ -232,7 +247,7 @@ class TransformCardChart extends PureClasss<Props>
         value,
         score,
       })
-    ));
+    ), true);
   }
   
   componentDidUpdate()
@@ -258,6 +273,7 @@ class TransformCardChart extends PureClasss<Props>
         y: this.props.range.toJS(),
       },
       onMove: this.onPointMove,
+      onRelease: this.onPointRelease,
       onLineClick: this.onLineClick,
       onLineMove: this.onLineMove,
       spotlights: overrideState.spotlights || this.props.spotlights || [], // TODO toJS()

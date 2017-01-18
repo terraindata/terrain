@@ -53,9 +53,9 @@ import PanelMixin from "../layout/PanelMixin.tsx";
 import InfoArea from "./../../../common/components/InfoArea.tsx";
 import Classs from './../../../common/components/Classs.tsx';
 import PureClasss from './../../../common/components/PureClasss.tsx';
-// import LibraryStore from './../../../library/data/LibraryStore.tsx';
-// import LibraryActions from './../../../library/data/LibraryActions.tsx';
 import BuilderStore from './../../../builder/data/BuilderStore.tsx';
+import {LibraryStore, LibraryState} from './../../../library/data/LibraryStore.tsx';
+import LibraryActions from '../../../library/data/LibraryActions.tsx';
 import LibraryTypes from './../../../library/LibraryTypes.tsx';
 import * as classNames from 'classnames';
 const {browserHistory} = require('react-router');
@@ -204,38 +204,40 @@ var Tab = React.createClass<any, any>({
   },
 });
 
+export interface TabAction
+{
+  text: string;
+  icon: any;
+  onClick();
+  enabled?: boolean;
+}
+
 interface TabsProps
 {
   config: string;
-  actions: Immutable.List<{
-    text: string;
-    icon: any;
-    onClick: () => void;
-    enabled?: boolean;
-  }>;
+  actions: List<TabAction>;
+  onNoVariant(variantId: string);
 }
 
-class Tabs extends PureClasss<TabsProps> {
+export class Tabs extends PureClasss<TabsProps> {
   state = {
-    variants: null,
+    variants: LibraryStore.getState().variants,
     tabs: null,
-    needsVariant: true, // needs variant info from the server
   }
   cancel = null;
   
   componentDidMount()
   {
-    let a = () => 
-    {
-      if(this.state.needsVariant)
+    this._subscribe(LibraryStore, {
+      stateKey: 'variants',
+      storeKeyPath: ['variants'],
+      updater: (state) =>
       {
-        let variants = BuilderStore.getState().get('queries').toJS();
-        this.computeTabs(this.props.config, variants);
-      }
-    }
-    
-    this.cancel = BuilderStore.subscribe(a);
-    a();
+        this.computeTabs(this.props.config);
+      },
+      isMounted: true,
+    });
+    this.computeTabs(this.props.config);
   }
   
   componentWillUnmount()
@@ -251,23 +253,25 @@ class Tabs extends PureClasss<TabsProps> {
     }
   }
   
-  computeTabs(config, variants?)
+  computeTabs(config)
   {
-    variants = variants || this.state.variants;
-    let needsVariant = false;
+    let {variants} = this.state;
     let tabs = config && variants && config.split(',').map(vId =>
     {
       let id = this.getId(vId);
-      let variant = variants[id];
+      let variant = variants.get(id);
       let name = "Loading...";
-      needsVariant = needsVariant || !variant;
       if(variant)
       {
         name = variant.name || 'Untitled';
         if(variant.version)
         {
-          name += ' @ ' + moment(variants[id].lastEdited).format("ha M/D/YY");
+          name += ' @ ' + moment(variants.get(id).lastEdited).format("ha M/D/YY");
         }
+      }
+      else
+      {
+        LibraryActions.variants.fetchVersion(id, this.props.onNoVariant);
       }
       return {
         id,
@@ -278,16 +282,7 @@ class Tabs extends PureClasss<TabsProps> {
     
     this.setState({
       tabs,
-      variants,
     });
-    
-    if(needsVariant)
-    {
-      this.setState({
-        needsVariant: true,
-      });
-    }
-    
   }
   
   // shouldComponentUpdate(nextProps, nextState)
@@ -321,11 +316,18 @@ class Tabs extends PureClasss<TabsProps> {
               key={index}
               onClick={action.onClick}
             >
+              {
+                action.icon &&
+                  <div className='tabs-action-piece'>
+                    {
+                      action.icon
+                    }
+                  </div>
+              }
               <div className='tabs-action-piece'>
-                {action.icon}
-              </div>
-              <div className='tabs-action-piece'>
-              {action.text}
+                {
+                  action.text
+                }
               </div>
             </a>)
         }

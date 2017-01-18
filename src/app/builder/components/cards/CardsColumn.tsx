@@ -73,7 +73,6 @@ interface Props
   canEdit: boolean;
   addColumn: (number, string?) => void;
   columnIndex: number;
-  spotlights: List<any>;
   
   containerWidth?: number;
   containerHeight?: number;
@@ -98,7 +97,7 @@ class CardsColumn extends PureClasss<Props>
   
   computeKeyPath(props:Props):KeyPath
   {
-    return List(this._keyPath('queries', props.queryId, 'cards'));
+    return List(this._keyPath('query', 'cards'));
   }
   
   componentWillReceiveProps(nextProps:Props)
@@ -147,7 +146,7 @@ class CardsColumn extends PureClasss<Props>
   
   toggleDeck()
   {
-    Actions.toggleDeck(this.props.queryId, ! this.props.deckOpen);
+    Actions.toggleDeck(! this.props.deckOpen);
   }
   
   handleScroll()
@@ -212,7 +211,6 @@ class CardsColumn extends PureClasss<Props>
             <CardsArea 
               cards={cards}
               keyPath={keyPath}
-              spotlights={this.props.spotlights} 
               canEdit={canEdit}
               addColumn={this.props.addColumn}
               columnIndex={this.props.columnIndex}

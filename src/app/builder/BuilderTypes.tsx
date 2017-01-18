@@ -54,6 +54,7 @@ import TransformCardComponent from './components/charts/TransformCard.tsx';
 import Store from './data/BuilderStore.tsx';
 import Actions from './data/BuilderActions.tsx';
 import Util from '../util/Util.tsx';
+import {_IResultsConfig} from './components/results/ResultsConfig.tsx';
 
 // Interestingly, these have to be above the BuilderDisplays import
 //  since the import itself imports them
@@ -119,36 +120,42 @@ export module BuilderTypes
   }
   
   // A query can be viewed and edited in the Builder
-  // currently, only Variants are Queries, but that may change
-  export interface IQuery
+  // currently, only Variants have Queries, 1:1, but that may change
+  class QueryC
   {
-    id: string;
-    cards: ICards;
-    inputs: List<any>;
-    resultsConfig: IResultsConfig;
+    id: ID = "";
+    variantId: ID = "";
     
-    tql: string;
-    mode: string;
-    version: boolean;
-    name: string;
-    lastEdited: string;
-    db: string;
-    
-    status: any;
-    groupId: ID;
-    algorithmId: ID;
-    
-    isDefault: boolean;
-    
-    dirty: boolean;
-    
-    deckOpen: boolean;
+    cards: ICards = List([]);
+    inputs: List<any> = List([]);
+    resultsConfig: IResultsConfig = null;
+    tql: string = "";
+    mode: string = "cards";
+    deckOpen: boolean = true;
     
     // TODO include this and make it work
     // static:
     // {
-    //   getChildTerms: (query:IQuery) => List<string>;
+    //   getChildTerms: (query:Query) => List<string>;
     // }
+  }
+  const Query_Record = Immutable.Record(new QueryC());
+  export interface Query extends QueryC, IRecord<Query> {}
+  export const _Query = (config?: Object) => {
+    config = Util.extendId(config || {});
+    config['cards'] = BuilderTypes.recordFromJS(config['cards'] || [])
+    config['inputs'] = BuilderTypes.recordFromJS(config['inputs'] || [])
+    config['resultsConfig'] = _IResultsConfig(config['resultsConfig']);
+    
+    return new Query_Record(config) as any as Query;
+  }
+  
+  export function queryForSave(query: Query): Object
+  {
+    query = query
+      .set('cards', cardsForServer(query.cards))
+      .set('resultsConfig', query.resultsConfig.toJS());
+    return query.toJS();
   }
   
   export interface IInput extends IRecord<IInput>

@@ -97,7 +97,7 @@ var LayoutManager = React.createClass<any, any>({
   
   componentWillMount()
   {
-    // this.onDrag = _.throttle(this.onDrag, 500);
+    // this.onPanelDrag = _.throttle(this.onPanelDrag, 500);
   },
   
   getAdjustments(adjustments, containerWidth: number)
@@ -370,7 +370,7 @@ var LayoutManager = React.createClass<any, any>({
 		return [];
 	},
 
-	onDrag(index, coords, originalCoords)
+	onPanelDrag(index, coords, originalCoords)
 	{
     this.setState({
       dragging: true,
@@ -442,7 +442,7 @@ var LayoutManager = React.createClass<any, any>({
     return arr[index].key;
   },
 
-  onDrop(index, coords, originalCoords)
+  onPanelDrop(index, coords, originalCoords)
   {
     this.setState({
       draggingIndex: -1,
@@ -573,8 +573,8 @@ var LayoutManager = React.createClass<any, any>({
 
 			var props:any = { 
         index: index,
-				onDrag: this.onDrag,
-				onDrop: this.onDrop,
+				onPanelDrag: this.onPanelDrag,
+				onPanelDrop: this.onPanelDrop,
         dy: 0,
         dx: 0,
 			};

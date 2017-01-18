@@ -99,11 +99,11 @@ class GroupsColumn extends Classs<Props>
     });
   }
   
-  handleDuplicate(id: ID)
-  {
-    Actions.groups.duplicate(this.props.groups.find(g => g.id === id),
-      this.props.groupsOrder.findIndex(iid => iid === id));
-  }
+  // handleDuplicate(id: ID)
+  // {
+  //   Actions.groups.duplicate(this.props.groups.find(g => g.id === id),
+  //     this.props.groupsOrder.findIndex(iid => iid === id));
+  // }
   
   handleArchive(id: ID)
   {
@@ -148,16 +148,17 @@ class GroupsColumn extends Classs<Props>
     const group = this.props.groups.get(id);
     let {me, roles} = this.state;
     let groupRoles = roles && roles.get(id);
-    let canEdit = me && groupRoles && groupRoles.getIn([me.username, 'admin']);
-    let canDrag = me && me.isAdmin;
+    let canCreate = (me && groupRoles && groupRoles.getIn([me.username, 'admin']));
+    let canEdit = canCreate || (me && me.isAdmin);
+    let canDrag = false;
       
+        // onDuplicate={this.handleDuplicate}
     return (
       <LibraryItem
         index={index}
         name={group.name}
         id={id}
         icon={<GroupIcon />}
-        onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
         color={ColorManager.colorForKey(group.id)}
         key={group.id}
@@ -171,7 +172,8 @@ class GroupsColumn extends Classs<Props>
         canEdit={canEdit || canDrag}
         canDrag={canDrag}
         canArchive={canEdit || canDrag}
-        canDuplicate={canDrag}
+        canDuplicate={false}
+        canCreate={canCreate}
       >
         <div className='group-library-info-wrapper'>
           {

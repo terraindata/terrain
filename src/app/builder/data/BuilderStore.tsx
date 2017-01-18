@@ -51,23 +51,35 @@ var Redux = require('redux');
 import {BuilderActionTypes, BuilderDirtyActionTypes} from './BuilderActionTypes.tsx';
 import Util from '../../util/Util.tsx';
 
-import Types from './../BuilderTypes.tsx';
+import BuilderTypes from './../BuilderTypes.tsx';
+import LibraryTypes from './../../library/LibraryTypes.tsx';
 
 export class BuilderStateClass
 {
+  variantId: ID = "";
+  query: BuilderTypes.Query = null;
+  
+  // for undo/redo
+  pastQueries: List<BuilderTypes.Query> = Immutable.List([]);
+  nextQueries: List<BuilderTypes.Query> = Immutable.List([]);
+  lastActionType: string = '';
+  lastActionKeyPath: KeyPath = null;
+  lastActionTime: number = 0;
+  
   loading: boolean = false;
-  queries: Map<ID, Types.IQuery> = Map({});
+  loadingXhr: XMLHttpRequest = null;
+  loadingVariantId: ID = '';
   
   hoveringCardId: ID = "";
+  
   selectedCardIds: Map<ID, boolean> = Map({});
   
-  // These are only for the db of the current open variant
+  db: string = "";
   tables: List<string> = List([]);
   tableColumns: Map<string, List<string>> = Map({});
-  
-  dbs: List<string> = List([]);
-  
-  manual: Map<ID, Types.ICards> = Map({});
+
+  // TODO move  
+  manual: Map<ID, BuilderTypes.ICards> = Map({});
   // Card examples used in the manual are stored here.
   
   draggingCardItem: CardItem = false;
@@ -87,15 +99,43 @@ var DefaultState = _BuilderState();
 import BuilderReducers from './BuilderReducers.tsx';
 
 export const BuilderStore: IStore<BuilderState> = Redux.createStore(
-  (state = DefaultState, action) =>
+  (
+    state: BuilderState = DefaultState, 
+    action: Action<{
+      keyPath: KeyPath;
+      notDirty: boolean;
+    }>
+  ) =>
   {
+    if(BuilderDirtyActionTypes[action.type] && !action.payload.notDirty)
+    {
+      state = state
+        .set('isDirty', true);
+      
+      // back up for undo, check time to prevent overloading the undo stack
+      let time = (new Date()).getTime();
+      if(
+        action.type !== BuilderActionTypes.change
+        || action.type !== state.lastActionType
+        || action.payload.keyPath !== state.lastActionKeyPath
+        || time - state.lastActionTime > 1500
+      )
+      {
+        state = state
+          .set('lastActionType', action.type)
+          .set('lastActionTime', time)
+          .set('lastActionKeyPath', action.payload.keyPath)
+          .set('pastQueries', state.pastQueries.unshift(state.query));
+      }
+        
+      if(state.nextQueries.size)
+      {
+        state = state.set('nextQueries', Immutable.List([]));
+      }
+    }
     if(BuilderReducers[action.type])
     {
       state = BuilderReducers[action.type](state, action);
-    }
-    if(BuilderDirtyActionTypes[action.type] && !action.payload.notDirty)
-    {
-      state = state.set('isDirty', true);
     }
     return state;
   }

@@ -116,12 +116,14 @@ export module UserTypes
   export type UserMap = Immutable.Map<ID, UserTypes.User>;
   
   let _UserState = Immutable.Record({
-    loading: true,
+    loading: false,
+    loaded: false,
     users: Immutable.Map<ID, User>({}),
     currentUser: null,
   })
   export class UserState extends _UserState {
     loading: boolean;
+    loaded: boolean;
     users: UserMap;
     currentUser: User;
   }

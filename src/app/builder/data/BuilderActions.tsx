@@ -42,18 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
+const _ = require('underscore');
 import ActionTypes from './BuilderActionTypes.tsx';
 import Store from './BuilderStore.tsx';
 import { CardItem } from '../components/cards/Card.tsx';
 import { BuilderTypes } from './../BuilderTypes.tsx';
+import LibraryTypes from '../../library/LibraryTypes.tsx';
 import * as Immutable from 'immutable';
 import List = Immutable.List;
 import Map = Immutable.Map;
 
-var $ = (type: string, payload: any) => Store.dispatch({type, payload})
+const $ = (type: string, payload: any) => Store.dispatch({type, payload})
 
-var BuilderActions =
+const BuilderActions =
 {
   change:
     (keyPath: KeyPath, value: any, notDirty = false) =>
@@ -75,17 +76,13 @@ var BuilderActions =
     (keyPath: KeyPath, index: number) =>
       $(ActionTypes.remove, { keyPath, index }),
   
-  fetch:
-    (variantIds: List<ID>, handleNoVariant?: (variantId:ID) => void) =>
-      $(ActionTypes.fetch, { variantIds, handleNoVariant }),
+  changeQueryMode:
+    (mode: string) =>
+      $(ActionTypes.changeQueryMode, { mode }),
   
-  setVariant:
-    (variantId: ID, variant) =>
-      $(ActionTypes.setVariant, { variantId, variant }),
-  
-  setVariantField:
-    (variantId: ID, field: string, value: any) =>
-      $(ActionTypes.setVariantField, { variantId, field, value }),
+  changeTQL:
+    (tql: string) =>
+      $(ActionTypes.changeTQL, { tql }),
   
   hoverCard:
     (cardId: ID) =>
@@ -96,14 +93,11 @@ var BuilderActions =
       $(ActionTypes.selectCard, { cardId, shiftKey, ctrlKey }),
   
   dragCard:
-    (cardItem:CardItem) =>
-      $(ActionTypes.change, { 
-        keyPath: Immutable.List(['draggingCardItem']),
-        value: cardItem,
-      }),
+    (cardItem: CardItem) =>
+      $(ActionTypes.dragCard, { cardItem }),
   
   dragCardOver:
-    (keyPath:KeyPath, index:number) =>
+    (keyPath: KeyPath, index: number) =>
       $(ActionTypes.dragCardOver, { keyPath, index }),
   
   dropCard:
@@ -111,8 +105,50 @@ var BuilderActions =
       $(ActionTypes.dropCard, {}),
   
   toggleDeck:
-    (queryId: ID, open: boolean) =>
-      $(ActionTypes.toggleDeck, { queryId, open }),
+    (open: boolean) =>
+      $(ActionTypes.toggleDeck, { open }),
+  
+  changeTables:
+    (db: string, tables: Tables, tableColumns: TableColumns) =>
+      $(ActionTypes.changeTables, { db, tables, tableColumns }),
+  
+  // fetches the query from the server
+  fetchQuery:
+    (variantId: ID, handleNoVariant: (variantId:ID) => void) =>
+      $(ActionTypes.fetchQuery, { variantId, handleNoVariant }),
+  
+  // load query from server into state
+  queryLoaded:
+    (query: BuilderTypes.Query, xhr: XMLHttpRequest) =>
+      $(ActionTypes.queryLoaded, { query, xhr }),
+  
+  save:
+    (failed?: boolean) =>
+      $(ActionTypes.save, { failed }),
+  
+  undo:
+    () =>
+      $(ActionTypes.undo, { }),
+  
+  redo:
+    () =>
+      $(ActionTypes.redo, { }),
+  
+  checkpoint:
+    () =>
+      $(ActionTypes.checkpoint, { }),
 };
+
+_.map(ActionTypes, 
+  (type: string) =>
+  {
+    if(!BuilderActions[type])
+    {
+      let error = 'Missing Builder Action for Builder Action Type ' + type;
+      alert(error);
+      throw new Error(error);
+    }
+  }
+);
 
 export default BuilderActions;

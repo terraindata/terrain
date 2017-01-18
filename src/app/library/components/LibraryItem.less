@@ -1,10 +1,10 @@
 @import "../../common/Common.less";
 
+@h: 96px;
 .library-item {
   position: relative;
   
   
-  @h: 96px;
   height: @h;
   text-align: left;
   border-radius: 4px;
@@ -20,20 +20,24 @@
     padding: 8px;
     box-sizing: border-box;
     background-blend-mode: multiply;
+    display: flex;
     
-    svg {
-      display: inline-block;
-      .dead-center;
-      position: absolute;
-      left: 18px;
-      width: 16px;
-    }
-    svg, .cls-1 {
-      fill: #fff;
+    .library-item-icon {
+      svg {
+        display: inline-block;
+        .dead-center;
+        position: absolute;
+        left: 18px;
+        width: 16px;
+      }
+      svg, .cls-1 {
+        fill: #fff;
+      }
     }
     
     .library-item-name,
     .library-item-name-input {
+      flex-grow: 1;
       padding-left: 6px;
       margin-left: 20px;
       white-space: nowrap;
@@ -69,6 +73,18 @@
         display: block;
       }
     }
+    
+    .library-item-star {
+      margin-top: 2px;
+      svg {
+        height: 14px;
+        fill: #f3d043;
+        stroke: #957048;
+        stroke-width: 2px;
+      }
+      // position: absolute;
+      // right: 0px;
+    }
   }
   
   .library-item-content {
@@ -98,17 +114,22 @@
   }
   
   .menu-wrapper {
-    top: @standard-margin;
-    right: @standard-margin;
+    position: relative;
+    margin-top: -4px;
+    margin-right: -4px;
+    margin-left: -20px;
     opacity: 0;
-    svg {
-      margin-left: -1 * @standard-margin;
-    }
+    // top: @standard-margin;
+    // right: @standard-margin;
+    // svg {
+    //   margin-left: -1 * @standard-margin;
+    // }
   }
   
   &:hover {
     .menu-wrapper {
       opacity: 1;
+      margin-left: 8px;
     }
   }
   
@@ -124,8 +145,10 @@
   &.library-item-lightest {
     .library-item-title-bar {
       background: rgba(255,255,255,0.5);
-      svg, .cls-1 {
-        fill: @trans-black;
+      .library-item-icon {
+        svg, .cls-1 {
+          fill: @trans-black;
+        }
       }
     }
     .library-item-content {
@@ -191,4 +214,17 @@
   white-space: normal;
   height: 46px;
   overflow: hidden;
+}
+
+.library-item-shifted-up {
+  padding-bottom: @h;
+}
+.library-item-shifted-down {
+  padding-top: @h;
+}
+
+.library-item-dragging {
+  &.library-item-dragging-hidden {
+    height: 10px;
+  }
 }

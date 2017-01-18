@@ -71,12 +71,14 @@ RolesReducer[ActionTypes.fetch] =
       
       Actions.setRoles(roles);
     });
-    return state;
+    return state.set('loading', true);
   }
 
 RolesReducer[ActionTypes.setRoles] =
   (state, action) =>
-    action.payload.roles;
+    action.payload.roles
+      .set('loading', false)
+      .set('loaded', true);
 
 RolesReducer[ActionTypes.change] =
   (state, action) =>

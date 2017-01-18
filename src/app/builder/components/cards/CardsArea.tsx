@@ -71,7 +71,6 @@ interface Props
   addColumn?: (number, string?) => void;
   columnIndex?: number;
   className?: string;
-  spotlights?: List<any>;
   connectDropTarget?: (el:JSX.Element) => JSX.Element;
   helpOn?: boolean;
   accepts?: List<string>;

@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 import LibraryColumn from './LibraryColumn.tsx';
 import LibraryItem from './LibraryItem.tsx';
 import LibraryItemCategory from './LibraryItemCategory.tsx';
@@ -63,26 +63,32 @@ import RolesStore from '../../roles/data/RolesStore.tsx';
 var AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
 type Algorithm = LibraryTypes.Algorithm;
+type Variant = LibraryTypes.Variant;
 
 interface Props
 {
   algorithms: Immutable.Map<ID, Algorithm>;
+  variants: Immutable.Map<ID, Variant>;
   algorithmsOrder: Immutable.List<ID>;
   groupId: ID;
 }
 
-class AlgorithmsColumn extends Classs<Props>
+class AlgorithmsColumn extends PureClasss<Props>
 {
   state: {
     rendered: boolean,
-    lastMoved: any,
     me: UserTypes.User,
     roles: RoleTypes.RoleMap,
+    lastMoved: string;
+    draggingItemIndex: number;
+    draggingOverIndex: number;
   } = {
     rendered: false,
-    lastMoved: null,
     me: null,
     roles: null,
+    lastMoved: '',
+    draggingItemIndex: -1,
+    draggingOverIndex: -1,
   }
   
   componentWillMount()
@@ -127,14 +133,18 @@ class AlgorithmsColumn extends Classs<Props>
   
   handleDuplicate(id: ID)
   {
-    Actions.algorithms.duplicate(this.props.algorithms.find(alg => alg.id === id),
-      this.props.algorithmsOrder.findIndex(iid => iid === id));
+    Actions.algorithms.duplicate(
+      this.props.algorithms.get(id),
+      this.props.algorithmsOrder.findIndex(iid => iid === id)
+    );
   }
   
   handleArchive(id: ID)
   {
-    Actions.algorithms.change(this.props.algorithms.find(alg => alg.id === id)
-      .set('status', LibraryTypes.EAlgorithmStatus.Archive) as Algorithm);
+    Actions.algorithms.change(
+      this.props.algorithms.get(id)
+        .set('status', LibraryTypes.EAlgorithmStatus.Archive) as Algorithm
+      );
   }
   
   handleCreate()
@@ -152,15 +162,15 @@ class AlgorithmsColumn extends Classs<Props>
     
   handleHover(index: number, type: string, id: ID)
   {
-    var itemIndex = this.props.algorithmsOrder.findIndex(v => v === id);
-    if(type === 'algorithm' && itemIndex !== index 
+    var itemIndex = this.props.algorithmsOrder.indexOf(id);
+    if(type === 'algorithm' 
       && this.state.lastMoved !== index + ' ' + itemIndex)
     {
       this.setState({
         lastMoved: index + ' ' + itemIndex,
+        draggingItemIndex: itemIndex,
+        draggingOverIndex: index,
       });
-      var target = this.props.algorithms.get(this.props.algorithmsOrder.get(index));
-      Actions.algorithms.move(this.props.algorithms.get(id).set('status', target.status) as Algorithm, index, this.props.groupId);
     }
   }
   
@@ -170,24 +180,43 @@ class AlgorithmsColumn extends Classs<Props>
       case "group":
         if(shiftKey)
         {
-          Actions.algorithms.duplicate(this.props.algorithms.get(id), 0, targetItem.id);
+          Actions.algorithms.duplicate(
+            this.props.algorithms.get(id), 
+            0, 
+            targetItem.id
+          );
         }
         else
         {
-          Actions.algorithms.move(this.props.algorithms.get(id), 0, targetItem.id);
+          Actions.algorithms.move(
+            this.props.algorithms.get(id), 
+            0, 
+            targetItem.id
+          );
         }
         break;
       case "algorithm":
+        Actions.algorithms.move(
+          this.props.algorithms.get(id), 
+          this.props.algorithmsOrder.indexOf(targetItem.id),
+          this.props.groupId
+        );
         break;
       case "variant":
         // no good
         break;
     }
+    
+    this.setState({
+      draggingItemIndex: -1,
+      draggingOverIndex: -1,
+    });
   }
 
-  renderAlgorithm(id: ID, index: number)
+  renderAlgorithm(id: ID)
   {
     const algorithm = this.props.algorithms.get(id);
+    const index = this.props.algorithmsOrder.indexOf(id);
     var scores = [
       {
         score: 0,
@@ -210,35 +239,45 @@ class AlgorithmsColumn extends Classs<Props>
         name: "Variants in Live Status",
       },
     ];
-   
-    algorithm.variants.map(v => scores[v.status].score ++);
     
-    scores.splice(0, 1); // remove Archived score for now
+    const variants = this.props.variants.filter(
+      (v:Variant) => 
+        v.algorithmId === id
+    );
+   
+    variants.map(
+      (v:Variant) => 
+        scores[v.status].score ++
+    );
+    
+    scores.splice(0, 1); // remove Archived count
     
     let {me, roles} = this.state;
-    let canDrag = me && roles && roles.getIn([algorithm.groupId, me.username, 'admin']);
+    let canArchive = me && roles && roles.getIn([algorithm.groupId, me.username, 'admin']);
+    let canDuplicate = canArchive;
+    let canDrag = canArchive; // TODO change to enable Library drag and drop
     let canEdit = canDrag ||
       (me && roles && roles.getIn([algorithm.groupId, me.username, 'builder']));
     
-    let lastTouched: {date: string, username: string} = 
-      algorithm.variants.reduce((lastTouched, v) =>
-    {
-      let date = new Date(v.lastEdited);
-      if(!lastTouched || (lastTouched.date < date || isNaN(lastTouched.date.getTime())))
+    let lastTouched: Variant = variants.reduce(
+      (lastTouched: Variant, v:Variant) =>
       {
-        return ({
-          date,
-          username: v.lastUsername,
-        });
-      }
-      return lastTouched;
-    }, null);
+        let date = new Date(v.lastEdited);
+        let lastTouchedDate = new Date(lastTouched && lastTouched.lastEdited);
+        if(!lastTouched || (lastTouchedDate < date || isNaN(lastTouchedDate.getTime())))
+        {
+          return v;
+        }
+        return lastTouched;
+      }, 
+      null
+    );
+    
+    var date = "There are no variants";
+    var username = "There are no variants";
     if (lastTouched) {
-      var {date, username} = lastTouched;
-    }
-    else {
-      var date= "There are no variants";
-      var username = "There are no variants";
+      date = lastTouched.lastEdited;
+      username = lastTouched.lastUsername;
     }
 
     var role = "Viewer";
@@ -253,9 +292,12 @@ class AlgorithmsColumn extends Classs<Props>
         role = "Builder";
       }
     }
+    
     return (
       <LibraryItem
         index={index}
+        draggingItemIndex={this.state.draggingItemIndex}
+        draggingOverIndex={this.state.draggingOverIndex}
         name={algorithm.name}
         icon={<AlgorithmIcon />}
         onDuplicate={this.handleDuplicate}
@@ -273,8 +315,9 @@ class AlgorithmsColumn extends Classs<Props>
         item={algorithm}
         canEdit={canEdit}
         canDrag={canDrag}
-        canArchive={canDrag}
-        canDuplicate={canDrag}
+        canCreate={canDrag}
+        canArchive={canArchive}
+        canDuplicate={canDuplicate}
       >
         <div className='flex-container'>
           <UserThumbnail username={username} medium={true} extra={role}/>
@@ -347,9 +390,9 @@ class AlgorithmsColumn extends Classs<Props>
         title='Algorithms'
       >
         { 
-          this.props.algorithms ?
+          this.props.algorithmsOrder ?
             (
-              this.props.algorithms.size ?
+              this.props.algorithmsOrder.size ?
               (
                 <div>
                   { this.renderCategory(LibraryTypes.EAlgorithmStatus.Live) }

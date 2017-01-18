@@ -56,8 +56,7 @@ import Actions from './../data/LibraryActions.tsx';
 import UserThumbnail from './../../users/components/UserThumbnail.tsx';
 import UserStore from './../../users/data/UserStore.tsx';
 import RolesStore from './../../roles/data/RolesStore.tsx';
-import BuilderStore from './../../builder/data/BuilderStore.tsx';
-import BuilderActions from './../../builder/data/BuilderActions.tsx';
+import LibraryActions from './../data/LibraryActions.tsx';
 import Util from './../../util/Util.tsx';
 import StatusDropdown from './StatusDropdown.tsx';
 
@@ -66,76 +65,16 @@ type Variant = LibraryTypes.Variant;
 interface Props
 {
   variant: Variant;
+  dbs: List<string>;
+  isAdmin: boolean;
+  isBuilder: boolean;
 }
 
 class LibraryInfoColumn extends PureClasss<Props>
 {
-  state: {
-    isAdmin: boolean,
-    isBuilder: boolean,
-    dbs: List<string>,
-  } = {
-    isAdmin: false,
-    isBuilder: false,
-    dbs: List([]),
-  }
-  
-  componentDidMount()
-  {
-    this._subscribe(RolesStore, {
-      updater: () =>
-      {
-        this.checkRoles(this.props);
-      },
-      isMounted: true,
-    });
-    
-    this._subscribe(BuilderStore, {
-      stateKey: 'dbs',
-      storeKeyPath: ['dbs'],
-      isMounted: true,
-    });
-    
-    Ajax.getDbs((dbs:string[]) => 
-    {
-      BuilderActions.change(
-        List(['dbs']), 
-        List(dbs),
-        true // not dirty
-      )
-    }
-    );
-  }
-  
-  componentWillReceiveProps(nextProps:Props)
-  {
-    if(nextProps.variant !== this.props.variant)
-    {
-      this.checkRoles(nextProps);
-    }
-  }
-  
-  checkRoles(props:Props)
-  {
-    if(!props.variant)
-    {
-      return;
-    }
-    
-    let isAdmin = Util.haveRole(props.variant.groupId, 'admin', UserStore, RolesStore);
-    let isBuilder = Util.haveRole(props.variant.groupId, 'builder', UserStore, RolesStore);
-    if(isAdmin !== this.state.isAdmin || isBuilder !== this.state.isBuilder)
-    {
-      this.setState({
-        isAdmin,
-        isBuilder,
-      });
-    }
-  }
-  
   handleDbChange(dbIndex:number)
   {
-    Actions.variants.change(this.props.variant.set('db', this.state.dbs.get(dbIndex)) as Variant);
+    Actions.variants.change(this.props.variant.set('db', this.props.dbs.get(dbIndex)) as Variant);
   }
   
   render()
@@ -145,72 +84,71 @@ class LibraryInfoColumn extends PureClasss<Props>
       return null;
     }
     
-    let {isBuilder, isAdmin} = this.state;
+    let {isBuilder, isAdmin} = this.props;
     let {variant} = this.props;
     
-    // maybe use something other than a table in the future
     return (
-    <div
-      className='library-info-variant'
-    >
-      <div className='biv-table-wrapper'>
-        <div
-          className='biv-table'
-        >
-          <div className='biv-row'>
-            <div className='biv-cell-first'>
-              Status
+      <div
+        className='library-info-variant'
+      >
+        <div className='biv-table-wrapper'>
+          <div
+            className='biv-table'
+          >
+            <div className='biv-row'>
+              <div className='biv-cell-first'>
+                Status
+              </div>
+              <div className='biv-cell-second'>
+                <StatusDropdown
+                  variant={this.props.variant}
+                />
+              </div>
             </div>
-            <div className='biv-cell-second'>
-              <StatusDropdown
-                variant={this.props.variant}
-              />
+            <div className='biv-row'>
+              <div className='biv-cell-first'>
+                Database
+              </div>
+              <div className='biv-cell-second'>
+                <Dropdown
+                  selectedIndex={this.props.dbs && this.props.dbs.indexOf(this.props.variant.db)}
+                  options={this.props.dbs}
+                  onChange={this.handleDbChange}
+                  canEdit={isBuilder || isAdmin}
+                  className='bic-db-dropdown'
+                />
+              </div>
             </div>
-          </div>
-          <div className='biv-row'>
-            <div className='biv-cell-first'>
-              Database
+            <div className='biv-row'>
+              <div className='biv-cell-first'>
+                Updated At
+              </div>
+              <div className='biv-cell-second'>
+                {
+                  Util.formatDate(variant.lastEdited)
+                }
+              </div>
             </div>
-            <div className='biv-cell-second'>
-              <Dropdown
-                selectedIndex={this.state.dbs.indexOf(this.props.variant.db)}
-                options={this.state.dbs}
-                onChange={this.handleDbChange}
-                canEdit={isBuilder || isAdmin}
-                className='bic-db-dropdown'
-              />
-            </div>
-          </div>
-          <div className='biv-row'>
-            <div className='biv-cell-first'>
-              Updated At
-            </div>
-            <div className='biv-cell-second'>
-              {
-                Util.formatDate(variant.lastEdited)
-              }
-            </div>
-          </div>
-          <div className='biv-row'>
-            <div className='biv-cell-first'>
-              Updated By
-            </div>
-            <div className='biv-cell-second'>
-              <UserThumbnail
-                username={variant.lastUsername}
-                smallest={true}
-                showName={true}
-                link={true}
-              />
+            <div className='biv-row'>
+              <div className='biv-cell-first'>
+                Updated By
+              </div>
+              <div className='biv-cell-second'>
+                <UserThumbnail
+                  username={variant.lastUsername}
+                  smallest={true}
+                  showName={true}
+                  link={true}
+                />
+              </div>
             </div>
           </div>
         </div>
+        
+        <VariantVersions 
+          variant={this.props.variant} 
+        />
       </div>
-      
-      <VariantVersions 
-        variant={this.props.variant} 
-      />
-    </div>
     );
   }
 }

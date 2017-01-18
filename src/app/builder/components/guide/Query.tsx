@@ -60,7 +60,7 @@ let M = Immutable.Map;
 
 interface Props
 {
-  query: IQuery;
+  query: Query;
 }
 
 interface State

@@ -45,8 +45,10 @@ THE SOFTWARE.
 var _ = require('underscore');
 import ActionTypes from './LibraryActionTypes.tsx';
 import Store from './LibraryStore.tsx';
+import {LibraryState, LibraryStore, _LibraryState} from './LibraryStore.tsx';
 import LibraryTypes from './../LibraryTypes.tsx';
 import BuilderTypes from './../../builder/BuilderTypes.tsx';
+import '../../util/Ajax.tsx';
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
@@ -72,13 +74,9 @@ const Actions =
       (group, index: number) =>
         $(ActionTypes.groups.move, { group, index }),
         
-    duplicate:
-      (group: Group, index: number) =>
-        $(ActionTypes.groups.duplicate, { group, index }),
-    
-    prevGroups:
-      (groups: Map<ID, Group>) =>
-        $(ActionTypes.groups.prevGroups, { groups }),
+    // duplicate:
+    //   (group: Group, index: number) =>
+    //     $(ActionTypes.groups.duplicate, { group, index }),
   },
   
   algorithms:
@@ -121,57 +119,73 @@ const Actions =
     status:
       (variant: Variant, status: LibraryTypes.EVariantStatus, confirmed?: boolean, isDefault?: boolean) =>
         $(ActionTypes.variants.status, { variant, status, confirmed, isDefault }),
+     
+    fetchVersion:
+      (variantId: string, onNoVersion: (variantId: string) => void) =>
+      {
+        Ajax.getVariantVersion(variantId, (variantVersion: LibraryTypes.Variant) =>
+        {
+          if(!variantVersion)
+          {
+            onNoVersion(variantId);
+          }
+          else
+          {
+            Actions.variants.loadVersion(variantId, variantVersion);
+          }
+        });
+      },
+        
+    loadVersion:
+      (variantId: string, variantVersion: LibraryTypes.Variant) =>
+        $(ActionTypes.variants.loadVersion, { variantId, variantVersion }),
+       
   },
   
   loadState:
-    (state) =>
+    (state: LibraryState) =>
       $(ActionTypes.loadState, { state }),
   
+  setDbs:
+    (dbs: List<string>) =>
+      $(ActionTypes.setDbs, { dbs }),
   
   // overwrites current state with state from server
   fetch:
     () =>
     {
-      Ajax.getItems((groups, algorithms, variants, groupsOrder) =>
+      Ajax.getItems((groupsData, algorithmsData, variantsData, groupsOrder) =>
       {
-        _.map(variants, variant => {
-          let alg = algorithms[variant.algorithmId];
-          if(!alg.variants)
-          {
-            alg.variants = Immutable.Map({});
-          }
-          alg.variants = alg.variants.set(variant.id, 
-            (LibraryTypes._Variant(variant))
-              .set('cards', BuilderTypes.recordFromJS(variant.cards))
-              .set('inputs', BuilderTypes.recordFromJS(variant.inputs))
+        let variants = Immutable.Map({});
+        _.map(variantsData, variantData => {
+          variants = variants.set(
+            variantData.id,
+            LibraryTypes._Variant(variantData)
           );
         });
         
-        _.map(algorithms, algorithm => {
-          if(algorithm.variantsOrder)
-          {
-            algorithm.variantsOrder = Immutable.List(algorithm.variantsOrder);
-          }
-          let g = groups[algorithm.groupId];
-          if(!g.algorithms)
-          {
-            g.algorithms = Immutable.Map({});
-          }
-          g.algorithms = g.algorithms.set(algorithm.id, LibraryTypes._Algorithm(algorithm));
+        let algorithms = Immutable.Map({});
+        _.map(algorithmsData, algorithmData => {
+          algorithms = algorithms.set(
+            algorithmData.id,
+            LibraryTypes._Algorithm(algorithmData)
+          );
         });
         
-        var groupMap = {};
-        _.map(groups, group => {
-          if(group.algorithmsOrder)
-          {
-            group.algorithmsOrder = Immutable.List(group.algorithmsOrder);
-          }
-          groupMap[group.id] = LibraryTypes._Group(group);
+        let groups = Immutable.Map({});
+        _.map(groupsData, groupData => {
+          groups = groups.set(
+            groupData.id,
+            LibraryTypes._Group(groupData)
+          );
         });
         
-        Actions.loadState(Immutable.fromJS({
-          groups: Immutable.Map(groupMap),
+        Actions.loadState(_LibraryState({
+          groups,
+          algorithms,
+          variants,
           groupsOrder: Immutable.List(groupsOrder),
+          loading: false,
         }));
       })
     },

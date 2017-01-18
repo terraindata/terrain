@@ -46,38 +46,40 @@ import * as _ from 'underscore';
 import ActionTypes from './LibraryActionTypes.tsx';
 import Util from './../../util/Util.tsx';
 import LibraryTypes from './../LibraryTypes.tsx';
+import {LibraryState} from './LibraryStore.tsx';
+import Ajax from '../../util/Ajax.tsx';
 const {EVariantStatus} = LibraryTypes;
 
 var Immutable = require('immutable');
 
 var LibraryReducers = {};
 
-let removeItem = (state, id: ID, parentKeyPath: (string | ID)[], type: string) =>
-  state.removeIn(parentKeyPath.concat([type + 's', id]))
+let removeItem = (state:LibraryState, id: ID, parentKeyPath: (string | ID)[], type: string) =>
+  state.removeIn([type + 's', id])
     .updateIn(parentKeyPath.concat([type + 'sOrder']), order =>
       order.filter(value => value !== id)
     );
 
-let removeVariant = (state, variant) =>
-  removeItem(state, variant.id, ['groups', variant.groupId, 'algorithms', variant.algorithmId], 'variant');
-let removeAlgorithm = (state, algorithm) =>
+let removeVariant = (state:LibraryState, variant) =>
+  removeItem(state, variant.id, ['algorithms', variant.algorithmId], 'variant');
+let removeAlgorithm = (state:LibraryState, algorithm) =>
   removeItem(state, algorithm.id, ['groups', algorithm.groupId], 'algorithm');
-let removeGroup = (state, group) =>
+let removeGroup = (state:LibraryState, group) =>
   removeItem(state, group.id, [], 'group');
 
-let addItem = (state, item, parentKeyPath: (string | ID)[], type: string, index?: number) => {
-  state = state.setIn(parentKeyPath.concat([type + 's', item.id]), item)
+let addItem = (state:LibraryState, item, parentKeyPath: (string | ID)[], type: string, index?: number) => {
+  state = state.setIn([type + 's', item.id], item)
     .updateIn(parentKeyPath.concat([type + 'sOrder']),
       order => order.splice(index === undefined ? order.size : index, 0, item.id));
   return state;
 }
 
 // assumes the objec'ts `groupId` and `algorithmId` keys are set
-let addVariant = (state, variant, index?: number) =>
-  addItem(state, variant, ['groups', variant.groupId, 'algorithms', variant.algorithmId], 'variant', index);
-let addAlgorithm = (state, algorithm, index?: number) =>
+let addVariant = (state:LibraryState, variant, index?: number) =>
+  addItem(state, variant, ['algorithms', variant.algorithmId], 'variant', index);
+let addAlgorithm = (state:LibraryState, algorithm, index?: number) =>
   addItem(state, algorithm, ['groups', algorithm.groupId], 'algorithm', index);
-let addGroup = (state, group, index?: number) =>
+let addGroup = (state:LibraryState, group, index?: number) =>
   addItem(state, group, [], 'group', index);
 
 LibraryReducers[ActionTypes.groups.create] =
@@ -92,94 +94,147 @@ LibraryReducers[ActionTypes.groups.move] =
   (state, action) =>
     addGroup(removeGroup(state, action.payload.group), action.payload.group, action.payload.index);
 
-LibraryReducers[ActionTypes.groups.duplicate] =
-  (state, action) =>
-  {
-    var id = Util.getId();
-    var idMap = {};
-    var { group } = action.payload;
-    return state
-      .setIn(['groups', id], group
-        .set('id', id)
-        .set('name', 'Copy of ' + group.name)
-        .update('algorithms', algorithms =>
-          algorithms.reduce((memo, algorithm, key) =>
-          {
-            let aid = Util.getId();
-            idMap[key] = aid;
-            return memo.set(aid, duplicateAlgorithm(algorithm, aid, id));
-          }, Immutable.Map({}))
-        )
-        .update('algorithmsOrder', order => 
-          order.map(oldId => idMap[oldId]))
-      )
-      .updateIn(['groupsOrder'],
-        order => order.splice(action.payload.index, 0, id))
-  }
-
-
+// LibraryReducers[ActionTypes.groups.duplicate] =
+//   (state, action) =>
+//   {
+//     var id = Util.getId();
+//     var idMap = {};
+//     var { group } = action.payload;
+//     return state
+//       .update('algorithms', algorithms =>
+//         algorithms.reduce((memo, algorithm, key) =>
+//         {
+//           if(algorithm.groupId === action.payload.groupId)
+//           {
+//             let aid = Util.getId();
+//             idMap[key] = aid;
+//             memo = memo.set(aid, duplicateAlgorithm(algorithm, aid, id));
+//           }
+//           return memo.set(algorithm.id, algorithm);
+//         }, Immutable.Map({}))
+//       )
+//       .setIn(['groups', id], group
+//         .set('id', id)
+//         .set('name', 'Copy of ' + group.name)
+//         .update('algorithmsOrder', order => 
+//           order.map(oldId => idMap[oldId]))
+//       )
+//       .updateIn(['groupsOrder'],
+//         order => order.splice(action.payload.index, 0, id))
+//   }
 
 LibraryReducers[ActionTypes.algorithms.create] =
   (state, action) =>
   {
     let algId = Util.getId();
+    let db = state.groups.get(action.payload.groupId).db || undefined;
     return addVariant(
       addAlgorithm(
         state, 
         LibraryTypes._Algorithm({
           groupId: action.payload.groupId, 
           id: algId,
+          db,
         })
       ),
       LibraryTypes._Variant({
         algorithmId: algId,
         groupId: action.payload.groupId,
+        db,
       })
     );
   }
 
 LibraryReducers[ActionTypes.algorithms.change] =
   (state, action) =>
-    state.setIn(['groups', action.payload.algorithm.groupId, 'algorithms', action.payload.algorithm.id],
-      action.payload.algorithm);
+    state.setIn(
+      ['algorithms', action.payload.algorithm.id],
+      action.payload.algorithm
+    );
 
 LibraryReducers[ActionTypes.algorithms.move] =
   (state, action) =>
-    addAlgorithm(removeAlgorithm(state, action.payload.algorithm),
-      action.payload.algorithm
-        .set('groupId', action.payload.groupId)
-        .update('variants', variants => variants.map(
-          v => v.set('groupId', action.payload.groupId)
-        ))
-      ,
-      action.payload.index);
+  {
+    let {algorithm, groupId} = action.payload;
+    if(groupId !== algorithm.groupId)
+    {
+      state = state.update('variants', 
+        variants => variants.map(
+          (variant: LibraryTypes.Variant) => 
+          {
+            if(variant.algorithmId === algorithm.id)
+            {
+              return variant.set('groupId', groupId);
+            }
+            return variant;
+          }
+        )
+      );
+    }
+    
+    return addAlgorithm(
+        removeAlgorithm(state, algorithm), 
+        algorithm.set('groupId', groupId),
+        action.payload.index
+    );
+  }
 
-let duplicateAlgorithm = (algorithm, id, groupId) =>
+let duplicateAlgorithm = (algorithm, id, groupId, variantIdMap) =>
 {
-  var idMap = {};
-  return algorithm.set('id', id)
+  return algorithm
+    .set('id', id)
     .set('name', 'Copy of ' + algorithm.name)
     .set('groupId', groupId || algorithm.groupId)
-    .update('variants', variants => variants.reduce(
-      (memo, value, key) =>
-      {
-        var vid = Util.getId();
-        idMap[key] = vid;
-        return memo.set(vid, value.set('id', vid)
-          .set('groupId', groupId || algorithm.groupId)
-          .set('name', 'Copy of ' + value.name)
-          .set('algorithmId', id));
-      },
-      Immutable.Map({})))
-    .update('variantsOrder', order => 
-      order.map(oldId => idMap[oldId]))
+    .update('variantsOrder', 
+      order => 
+        order.map(oldId => variantIdMap[oldId])
+    )
 }
 
 LibraryReducers[ActionTypes.algorithms.duplicate] =
   (state, action) =>
-    addAlgorithm(state,
-      duplicateAlgorithm(action.payload.algorithm, Util.getId(), action.payload.groupId),
-      action.payload.index);
+  {
+    let {algorithm, groupId, index} = action.payload;
+    groupId = groupId || algorithm.groupId;
+    var variantIdMap = {};
+    const newAlgorithmId = Util.getId();
+    
+    state = state.update(
+      'variants', 
+      variants => 
+        variants.reduce(
+          (variantsMemo, variant, variantId) =>
+          {
+            if(variant.algorithmId === algorithm.id)
+            {
+              var newId = Util.getId();
+              variantIdMap[variantId] = newId;
+              variantsMemo = variantsMemo
+                .set(
+                  newId,
+                  variant
+                    .set('id', newId)
+                    .set('groupId', groupId)
+                    .set('algorithmId', newAlgorithmId)
+                );
+            }
+            return variantsMemo
+              .set(variantId, variant)
+          },
+          Immutable.Map({})
+        )
+    )
+    return addAlgorithm(
+      state,
+      duplicateAlgorithm(
+        algorithm, 
+        newAlgorithmId, 
+        groupId,
+        variantIdMap
+      ),
+      index
+    );
+  }
 
 LibraryReducers[ActionTypes.variants.create] =
   (state, action) =>
@@ -187,14 +242,16 @@ LibraryReducers[ActionTypes.variants.create] =
       LibraryTypes._Variant({
         algorithmId: action.payload.algorithmId, 
         groupId: action.payload.groupId, 
+        db: state.algorithms.get(action.payload.algorithmId).db || undefined,
       })
     );
 
 LibraryReducers[ActionTypes.variants.change] =
   (state, action) =>
-    state.setIn(['groups', action.payload.variant.groupId, 'algorithms',
-        action.payload.variant.algorithmId, 'variants', action.payload.variant.id],
-      action.payload.variant);
+    state.setIn(
+      ['variants', action.payload.variant.id],
+      action.payload.variant
+    );
 
 LibraryReducers[ActionTypes.variants.status] =
   (state, action) =>
@@ -215,24 +272,30 @@ LibraryReducers[ActionTypes.variants.status] =
       return state
         .set('changingStatus', true)
         .set('changingStatusOf', variant)
-        .set('changingStatusTo', status);
+        .set('changingStatusTo', status)
+        .set('changingStatusDefault', isDefault)
+        ;
     }
     
     if(isDefault)
     {
       // remove any currently default variants
       state = state.updateIn(
-        ['groups', variant.groupId, 'algorithms', variant.algorithmId, 'variants'],
+        ['variants'],
         (variants) =>
           variants.map(
-            v => v.set('isDefault', false)
+            (v:LibraryTypes.Variant) => 
+              v.algorithmId === variant.algorithmId ?
+                v.set('isDefault', false)
+              :
+                v
           )
         );
     }
     
     return state
       .updateIn(
-        ['groups', variant.groupId, 'algorithms', variant.algorithmId, 'variants', variant.id,],
+        ['variants', variant.id,],
         (v) => v.set('status', status)
                 .set('isDefault', isDefault)
       )
@@ -266,15 +329,29 @@ LibraryReducers[ActionTypes.variants.duplicate] =
         Util.getId(), action.payload.groupId, action.payload.algorithmId),
       action.payload.index);
 
-
-
 LibraryReducers[ActionTypes.loadState] =
   (state, action) => 
-    action.payload.state.set('prevGroups', action.payload.state.get('groups'));
+    action.payload.state
+      .set('loaded', true)
+      .set('loading', false)
+      .set('prevGroups', action.payload.state.groups)
+      .set('prevAlgorithms', action.payload.state.algorithms)
+      .set('prevVariants', action.payload.state.variants)
+      ;
 
-LibraryReducers[ActionTypes.groups.prevGroups] =
-  (state, action) => 
-    state.set('prevGroups', action.payload['groups']);
+LibraryReducers[ActionTypes.setDbs] =
+  (state, action) =>
+    state.set('dbs', action.payload.dbs);
+
+LibraryReducers[ActionTypes.variants.loadVersion] =
+  (
+    state: LibraryState, 
+    action: Action<{
+      variantId: string,
+      variantVersion: LibraryTypes.Variant,
+    }>
+  ) =>
+    state.setIn(['variants', action.payload.variantId], action.payload.variantVersion);
 
 export default LibraryReducers;
 

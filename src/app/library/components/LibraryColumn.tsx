@@ -59,7 +59,9 @@ class LibraryColumn extends Classs<Props>
   render()
   {
     return (
-      <div className={'library-column library-column-' + this.props.index}>
+      <div
+        className={'library-column library-column-' + this.props.index}
+      >
         { 
           this.props.title ? 
             <div className='library-column-title'>
@@ -71,7 +73,9 @@ class LibraryColumn extends Classs<Props>
           'library-column-content': true,
           'library-column-content-no-title': !this.props.title,
         })}>
-          { this.props['children'] }
+          { 
+            this.props['children']
+          }
         </div>
         <div className='library-column-border' />
       </div>

@@ -66,7 +66,7 @@ export interface Options {
 
 class TQLConverter
 {
-  static toTQL(query: BuilderTypes.IQuery, options: Options = {}): string
+  static toTQL(query: BuilderTypes.Query, options: Options = {}): string
   {
     var {cards, inputs} = query;
     
@@ -123,11 +123,17 @@ class TQLConverter
     if(options.allFields)
     {
       cards = this._topFromCard(cards, (fromCard: ICard) =>
-        fromCard.set('fields', fromCard['fields'].unshift(
-          BuilderTypes.make(BuilderTypes.Blocks.field, {
-            field: '*',
-          })
-        ))
+        fromCard.update('fields', 
+          (fields: List<any>) =>
+          {
+            fields = fields.filter(v => v.field !== '*').toList();
+            return fields.unshift(
+              BuilderTypes.make(BuilderTypes.Blocks.field, {
+                field: '*',
+              })
+            );
+          }
+        )
       );
     }
     
@@ -146,9 +152,12 @@ class TQLConverter
       {
         // no count card, add one
         fromCard = fromCard.update('fields', 
-          fields => fields.unshift(BuilderTypes.make(BuilderTypes.Blocks.field, {
-            field: 'COUNT(*)',
-          })));
+          fields => 
+            fields.filter(v => v.field !== '*').toList()
+              .unshift(BuilderTypes.make(BuilderTypes.Blocks.field, {
+                field: 'COUNT(*)',
+              }))
+        );
       }
       
       if(options.transformAliases)

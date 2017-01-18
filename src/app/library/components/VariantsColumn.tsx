@@ -83,11 +83,15 @@ class VariantsColumn extends Classs<Props>
     lastMoved: any,
     me: UserTypes.User,
     roles: RoleTypes.RoleMap,
+    draggingItemIndex: number;
+    draggingOverIndex: number;
   } = {
     rendered: false,
     lastMoved: null,
     me: null,
     roles: null,
+    draggingItemIndex: -1,
+    draggingOverIndex: -1,
   }
   
   componentWillMount()
@@ -128,14 +132,18 @@ class VariantsColumn extends Classs<Props>
   
   handleDuplicate(id: ID)
   {
-    Actions.variants.duplicate(this.props.variants.find(v => v.id === id),
-      this.props.variantsOrder.findIndex(iid => iid === id));
+    Actions.variants.duplicate(
+      this.props.variants.get(id),
+      this.props.variantsOrder.findIndex(iid => iid === id)
+    );
   }
   
   handleArchive(id: ID)
   {
-    Actions.variants.change(this.props.variants.find(v => v.id === id)
-      .set('status', LibraryTypes.EVariantStatus.Archive) as Variant);
+    Actions.variants.change(
+      this.props.variants.get(id)
+        .set('status', LibraryTypes.EVariantStatus.Archive) as Variant
+    );
   }
   
   handleCreate()
@@ -165,16 +173,18 @@ class VariantsColumn extends Classs<Props>
   handleHover(index: number, type: string, id: ID)
   {
     var itemIndex = this.props.variantsOrder.findIndex(v => v === id);
-    if(type === 'variant' && itemIndex !== index 
+    if(type === 'variant'
       && this.state.lastMoved !== index + ' ' + itemIndex)
     {
       this.setState({
         lastMoved: index + ' ' + itemIndex,
+        draggingItemIndex: itemIndex,
+        draggingOverIndex: index,
       });
       
-      var target = this.props.variants.get(this.props.variantsOrder.get(index));
-      Actions.variants.move(this.props.variants.get(id).set('status', target.status) as Variant,
-        index, this.props.groupId, this.props.algorithmId);
+      // var target = this.props.variants.get(this.props.variantsOrder.get(index));
+      // Actions.variants.move(this.props.variants.get(id).set('status', target.status) as Variant,
+      //   index, this.props.groupId, this.props.algorithmId);
     }
   }
 
@@ -205,9 +215,19 @@ class VariantsColumn extends Classs<Props>
         }
         break;
       case "variant":
-        // maybe the code for moving one variant to a specific spot in another alg goes here?
+        Actions.variants.move(
+          this.props.variants.get(id), 
+          this.props.variantsOrder.indexOf(targetItem.id),
+          this.props.groupId,
+          this.props.algorithmId
+        );
         break;
     }
+    
+    this.setState({
+      draggingItemIndex: -1,
+      draggingOverIndex: -1,
+    });
   }
   
   handleDoubleClick(id:ID)
@@ -215,28 +235,28 @@ class VariantsColumn extends Classs<Props>
     browserHistory.push(`/builder/?o=${id}`);
   }
 
-  renderVariant(id: ID, index: number)
+  renderVariant(id: ID)
   {
-    // Sublime gets messed up with the 'var' in 'variant', hence this pseudonym
-    const vriant = this.props.variants.get(id);
+    const variant = this.props.variants.get(id);
+    const index = this.props.variantsOrder.indexOf(id);
     let {me, roles} = this.state;
     if(me && roles)
     {
       var canEdit = roles.getIn([this.props.groupId, me.username, 'builder'])
         || roles.getIn([this.props.groupId, me.username, 'admin']);
       var canDrag = canEdit && 
-        (vriant.status !== LibraryTypes.EVariantStatus.Live || 
+        (variant.status !== LibraryTypes.EVariantStatus.Live || 
           roles.getIn([this.props.groupId, me.username, 'admin']));
     }
     
     var role = "Viewer";
-    if (roles && roles.getIn([this.props.groupId, vriant.lastUsername])) 
+    if (roles && roles.getIn([this.props.groupId, variant.lastUsername])) 
     {
-      if (roles && roles.getIn([this.props.groupId, vriant.lastUsername]).admin) 
+      if (roles && roles.getIn([this.props.groupId, variant.lastUsername]).admin) 
       {
         role = "Admin";
       }
-      else if (roles && roles.getIn([this.props.groupId, vriant.lastUsername]).builder)
+      else if (roles && roles.getIn([this.props.groupId, variant.lastUsername]).builder)
       {
         role = "Builder";
       }
@@ -245,14 +265,16 @@ class VariantsColumn extends Classs<Props>
     return (
       <LibraryItem
         index={index}
-        name={vriant.name}
+        draggingItemIndex={this.state.draggingItemIndex}
+        draggingOverIndex={this.state.draggingOverIndex}
+        name={variant.name}
         icon={<VariantIcon />}
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
         canArchive={canDrag}
         canDuplicate={canEdit}
         color={ColorManager.colorForKey(this.props.groupId)}
-        key={vriant.id}
+        key={variant.id}
         to={`/library/${this.props.groupId}/${this.props.algorithmId}/${id}`}
         className='library-item-lightest'
         id={id}
@@ -261,24 +283,26 @@ class VariantsColumn extends Classs<Props>
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
-        item={vriant}
+        item={variant}
         onDoubleClick={this.handleDoubleClick}
         canEdit={canDrag}
         canDrag={canDrag}
+        canCreate={canDrag}
+        isStarred={variant.isDefault}
       >
         <div className='flex-container'>
-          <UserThumbnail username={vriant.lastUsername} medium={true} extra = {role}/>
+          <UserThumbnail username={variant.lastUsername} medium={true} extra = {role}/>
           
           <div className='flex-grow'>
             <StatusDropdown
-              variant={vriant}
+              variant={variant}
               noBorder={true}
             />
             <div 
               className='library-item-line'
             >
               {
-                Util.formatDate(vriant.lastEdited)
+                Util.formatDate(variant.lastEdited)
               }
             </div>
           </div>
@@ -324,7 +348,7 @@ class VariantsColumn extends Classs<Props>
           this.props.variantsOrder.map((id, index) =>
             this.props.variants.get(id) &&
               (archived ? this.hasStatus(id, LibraryTypes.EVariantStatus.Archive) : !this.hasStatus(id, LibraryTypes.EVariantStatus.Archive))
-              && this.renderVariant(id, index)
+              && this.renderVariant(id)
           )
         }
         {
@@ -351,9 +375,9 @@ class VariantsColumn extends Classs<Props>
         title='Variants'
       >
         { 
-          this.props.variants ?
+          this.props.variantsOrder ?
             (
-              this.props.variants.size ?
+              this.props.variantsOrder.size ?
               (
                 <div>
                   { this.renderVariants() }

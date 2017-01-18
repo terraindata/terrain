@@ -46,6 +46,7 @@ require('./Library.less');
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss.tsx';
 import Store from './../data/LibraryStore.tsx';
+import {LibraryState} from './../data/LibraryStore.tsx';
 import Actions from './../data/LibraryActions.tsx';
 import RolesActions from './../../roles/data/RolesActions.tsx';
 import UserActions from './../../users/data/UserActions.tsx';
@@ -72,16 +73,20 @@ class Library extends PureClasss<Props>
 {
   cancelSubscription = null;
   
+  state: {
+    libraryState: LibraryState;
+    loadFinished: boolean;
+  } = {
+    libraryState: null,
+    loadFinished: false,
+  };
+  
   constructor(props)
   {
     super(props);
     
-    let istate = Store.getState();
-    this.state = {
-      istate,
-      loadedData: !istate.get('loading'),
-      loaded: !istate.get('loading'),
-    };
+    this.state.libraryState = Store.getState();
+    this.state.loadFinished = !this.state.libraryState.loading;
   }
   
   componentWillMount()
@@ -100,20 +105,10 @@ class Library extends PureClasss<Props>
   componentDidMount()
   {
     this._subscribe(Store, {
-      stateKey: 'istate',
-      updater: (state) =>
-      {
-        if(!this.state.loadedData && !state.get('loading'))
-        {
-          this.setState({
-            loadedData: true,
-          });
-        }
-      },
+      stateKey: 'libraryState',
       isMounted: true,
     })
-      
-    Actions.fetch();
+    
     RolesActions.fetch();
     UserActions.fetch();
   }
@@ -121,36 +116,38 @@ class Library extends PureClasss<Props>
   handleLoadedEnd()
   {
     this.setState({
-      loaded: true,
+      loadFinished: true,
     });
   }
   
   render()
   {
-    if(!this.state.loaded)
+    const {libraryState} = this.state;
+    
+    if(!this.state.loadFinished)
     {
       return (
         <Loading
           width={100}
           height={100}
           loading={true}
-          loaded={this.state.loadedData}
+          loaded={!libraryState.loading}
           onLoadedEnd={this.handleLoadedEnd}
           center={true}
         />
       );
     }
     
-    const state = this.state.istate;
+    const { groups, algorithms, variants, groupsOrder } = libraryState;
+    const { groupId, algorithmId, variantId } = this.props.params;
     
-    var { groupId, algorithmId, variantId } = this.props.params;
     if(groupId)
     {
-      var group = state.getIn(['groups', groupId]) as LibraryTypes.Group;
+      var group = libraryState.getIn(['groups', groupId]) as LibraryTypes.Group;
       
       if(group)
       {
-        var { algorithms, algorithmsOrder } = group;
+        var { algorithmsOrder } = group;
         
         if(algorithmId)
         {
@@ -158,7 +155,7 @@ class Library extends PureClasss<Props>
           
           if(algorithm)
           {
-            var { variants, variantsOrder } = algorithm;
+            var { variantsOrder } = algorithm;
             
             if(variantId)
             {
@@ -185,12 +182,15 @@ class Library extends PureClasss<Props>
     return (
       <div className='library'>
         <GroupsColumn
-          groups={state.get('groups')}
-          groupsOrder={state.get('groupsOrder')}
+          {...{
+            groups,
+            groupsOrder,
+          }}
         />
         <AlgorithmsColumn
           {...{
             algorithms,
+            variants,
             algorithmsOrder,
             groupId
           }}

@@ -53,6 +53,8 @@ import { Link } from 'react-router';
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 
+const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
+
 interface Props
 {
   index: number;
@@ -70,11 +72,15 @@ interface Props
   rendered: boolean;
   canEdit: boolean;
   canDrag: boolean;
+  canCreate: boolean;
   
   onHover: (index: number, type: string, id: ID) => void;
   // ^ called on target
   onDropped: (id: ID, targetType: string, targetItem: any, shiftKey: boolean) => void;
   // ^ called on dragged element
+  
+  draggingItemIndex: number;
+  draggingOverIndex: number;
   
   // partially-optional. need to be provided if available.
   groupId?: ID;
@@ -84,6 +90,7 @@ interface Props
   // optional
   className?: string;
   onDoubleClick?: (id:ID) => void;
+  isStarred?: boolean;
   
   // populated by DnD code
   connectDropTarget?: (html: any) => JSX.Element;
@@ -91,6 +98,7 @@ interface Props
   draggingItemId?: ID;
   isOver?: boolean;
   dragItemType? : string;
+  isDragging?: boolean;
 }
 
 class LibraryItem extends Classs<Props>
@@ -230,7 +238,7 @@ class LibraryItem extends Classs<Props>
   
   render()
   {
-    let { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId } = this.props;
+    let { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging } = this.props;
     let draggingOver = isOver && dragItemType !== this.props.type;
     
     let {canArchive, canDuplicate} = this.props;
@@ -243,8 +251,28 @@ class LibraryItem extends Classs<Props>
         )
       );
     
+    if(this.props.draggingOverIndex !== -1)
+    {
+      // could be shifted
+      if(this.props.index > this.props.draggingItemIndex && this.props.index == this.props.draggingOverIndex)
+      {
+        var shiftedUp = true;
+      }
+      if(this.props.index < this.props.draggingItemIndex && this.props.index == this.props.draggingOverIndex)
+      {
+        var shiftedDown = true;
+      }
+    }
+    
     return connectDropTarget((
-      <div>
+      <div
+        className={classNames({
+          'library-item-shifted-up': shiftedUp,
+          'library-item-shifted-down': shiftedDown,
+          'library-item-dragging': this.props.isDragging,
+          'library-item-dragging-hidden': this.props.isDragging && this.props.draggingOverIndex !== this.props.index,
+        })}
+      >
         <Link 
           to={this.props.to}
           className='library-item-link'
@@ -276,7 +304,13 @@ class LibraryItem extends Classs<Props>
                     'library-item-title-bar-editing': this.state.nameEditing,
                   })}
                 >
-                  { this.props.icon }
+                  <div
+                    className='library-item-icon'
+                  >
+                    { 
+                      this.props.icon
+                    }
+                  </div>
                   <div
                     className='library-item-name'
                     onDoubleClick={this.showTextfield}
@@ -294,6 +328,14 @@ class LibraryItem extends Classs<Props>
                     onKeyDown={ this.handleKeyDown }
                     ref='input'
                   />
+                  {
+                    this.props.isStarred &&
+                      <div
+                        className='library-item-star'
+                      >
+                        <StarIcon />
+                      </div>
+                  }
                   <Menu
                     options={menuOptions}
                   />
@@ -352,13 +394,14 @@ const dragCollect = (connect, monitor) =>
 ({
   connectDragSource: connect.dragSource(),
   draggingItemId: monitor.getItem() && monitor.getItem().id,
+  isDragging: monitor.isDragging(),
   // built-in `isDragging` unreliable if the component is being inserted into other parts of the app during drag
 });
 
 
 let canDrop = (props, monitor) =>
 {
-  if(!props.canEdit)
+  if(!props.canCreate)
   {
     return false;
   }

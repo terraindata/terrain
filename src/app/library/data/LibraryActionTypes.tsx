@@ -51,31 +51,37 @@ var change = '';
 var move = '';
 var duplicate = '';
 
-var LibraryActionTypes = 
+export var LibraryActionTypes = 
 {
   groups: 
   { 
-    create, change, move, duplicate,
-    prevGroups: '',
+    create, change, move, 
+    // duplicate,
   },
   
   algorithms: 
   {
     create, change, move, duplicate,
-    switchGroup: '',
   },
   
   variants:
   {
     create, change, move, duplicate,
     status: '',
-    switchAlgorithm: '',
-    switchGroup: '', // move by itself onto a group, which should also create a new algorithm
+    fetchVersion: '',
+    loadVersion: '',
   },
   
   loadState: '',
+  setDbs: '',
 };
 
 Util.setValuesToKeys(LibraryActionTypes, '');
+
+export const CleanLibraryActionTypes = // not dirty
+[
+  LibraryActionTypes.loadState,
+  LibraryActionTypes.setDbs,
+];
 
 export default LibraryActionTypes;

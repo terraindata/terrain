@@ -66,6 +66,10 @@ import RolesStore from './../../roles/data/RolesStore.tsx';
 import UserActions from './../../users/data/UserActions.tsx';
 import RolesActions from './../../roles/data/RolesActions.tsx';
 import LibraryVariantInfo from './LibraryVariantInfo.tsx';
+import LibraryActions from './../data/LibraryActions.tsx';
+import LibraryStore from './../data/LibraryStore.tsx';
+import Util from './../../util/Util.tsx';
+import Dropdown from './../../common/components/Dropdown.tsx';
 
 var GroupIcon = require('./../../../images/icon_badgeGroup.svg');
 var AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
@@ -94,10 +98,12 @@ class LibraryInfoColumn extends Classs<Props>
     users: UserMap,
     roles: RoleMap,
     me: User,
+    dbs: List<string>,
   } = {
     users: null,
     roles: null,
     me: null,
+    dbs: List([]),
   }
   
   constructor(props:Props)
@@ -115,25 +121,61 @@ class LibraryInfoColumn extends Classs<Props>
     this._subscribe(RolesStore, {
       stateKey: 'roles', 
     });
+    
+    this._subscribe(LibraryStore, {
+      stateKey: 'dbs',
+      storeKeyPath: ['dbs'],
+    });
+    
+    Ajax.getDbs((dbs:string[]) => 
+    {
+      LibraryActions.setDbs(
+        List(dbs)
+      );
+    });
   }
   
-  renderVariant()
+  renderVariant(isAdmin, isBuilder)
   {
     return (
       <LibraryVariantInfo
         variant={this.props.variant}
+        isAdmin={isAdmin}
+        isBuilder={isBuilder}
+        dbs={this.state.dbs}
       />
     );
   }
   
-  renderAlgorithm()
+  handleAlgorithmDbChange(dbIndex:number)
+  {
+    Actions.algorithms.change(this.props.algorithm.set('db', this.state.dbs.get(dbIndex)) as Algorithm);
+  }
+  
+  
+  renderAlgorithm(isAdmin, isBuilder)
   {
     if(! this.props.algorithm || this.props.variant)
     {
       return null;
     }
     
-    return '';
+    return (
+      <div>
+        <div className='library-info-line'>
+          <div>
+          Default Database
+          </div>
+          <Dropdown
+            selectedIndex={this.state.dbs && this.state.dbs.indexOf(this.props.algorithm.db)}
+            options={this.state.dbs}
+            onChange={this.handleAlgorithmDbChange}
+            canEdit={isBuilder || isAdmin}
+            className='bic-db-dropdown'
+          />
+        </div>
+      </div>
+    );
   }
   
   renderUser(user: User): JSX.Element
@@ -191,7 +233,12 @@ class LibraryInfoColumn extends Classs<Props>
       });
   }
   
-  renderGroup()
+  handleGroupDbChange(dbIndex:number)
+  {
+    Actions.groups.change(this.props.group.set('db', this.state.dbs.get(dbIndex)) as Group);
+  }
+  
+  renderGroup(isAdmin, isBuilder)
   {
     let { group } = this.props;
     if(!group || this.props.algorithm || this.props.variant)
@@ -206,10 +253,24 @@ class LibraryInfoColumn extends Classs<Props>
     let isSysAdmin = this.state.me && this.state.me.isAdmin;
     
     return (
-      <div className='library-info-users'>
-        { this.renderUser(this.state.me) }
-        { this.renderGroupRoles() }
-        { this.renderRemainingUsers() }
+      <div>
+        <div className='library-info-line'>
+          <div>
+            Default Database
+          </div>
+          <Dropdown
+            selectedIndex={this.state.dbs && this.state.dbs.indexOf(this.props.group.db)}
+            options={this.state.dbs}
+            onChange={this.handleGroupDbChange}
+            canEdit={isBuilder || isAdmin}
+            className='bic-db-dropdown'
+          />
+        </div>
+        <div className='library-info-users'>
+          { this.renderUser(this.state.me) }
+          { this.renderGroupRoles() }
+          { this.renderRemainingUsers() }
+        </div>
       </div>
     );
   }
@@ -238,6 +299,8 @@ class LibraryInfoColumn extends Classs<Props>
         break;
     }
     
+    let isAdmin = Util.haveRole(groupId, 'admin', UserStore, RolesStore);
+    let isBuilder = Util.haveRole(groupId, 'builder', UserStore, RolesStore);
     
     return (
       <LibraryColumn
@@ -249,25 +312,35 @@ class LibraryInfoColumn extends Classs<Props>
             <div className='library-info'>
               <div
                 className='library-info-image'
-                style={{
-                }}
               >
                 <style
                   dangerouslySetInnerHTML={{ __html: '.library-info-image #Color { \
                     fill: ' + ColorManager.colorForKey(groupId) + ' !important; \
                   }'}}
                 />
-                { icon }
+                { 
+                  icon 
+                }
               </div>
               <div className='library-info-name'>
-                { item.name }
+                { 
+                  item.name 
+                }
               </div>
               <div className='library-info-type'>
-                { item.type }
+                { 
+                  item.type 
+                }
               </div>
-              { this.renderVariant() }
-              { this.renderAlgorithm() }
-              { this.renderGroup() }
+              { 
+                this.renderVariant(isAdmin, isBuilder) 
+              }
+              { 
+                this.renderAlgorithm(isAdmin, isBuilder) 
+              }
+              { 
+                this.renderGroup(isAdmin, isBuilder) 
+              }
             </div>
           :
             <div className='library-info'>

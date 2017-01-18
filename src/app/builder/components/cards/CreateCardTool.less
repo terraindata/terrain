@@ -9,7 +9,7 @@
   // overflow: hidden;
   @create-card-border-radius: 5px;
   border-radius: @create-card-border-radius 0px 0px @create-card-border-radius;
-  padding: 6px;
+  // padding: 6px;
   padding-right: 0px;
   
   &.create-card-closed {
@@ -44,29 +44,14 @@
     }
     
     .create-card-button {
+      .create-card-button-style;
       flex-grow: 1;
       min-width: 100px;
       position: relative;
-      cursor: pointer;
-      color: #fff;
-      padding: @button-padding;
-      text-align: center;
-      box-sizing: border-box;
-      margin: @button-padding;
-      border-radius: @create-card-border-radius;
       display: inline-block;
-      text-transform: capitalize;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      .transition;
-      height: 23px;
-      box-sizing: border-box;
+      margin: 3px;
       
-      opacity: 0.9;
-      &:hover {
-        opacity: 1;
-      }
+      .transition;
     }
     
     .create-card-button-fodder {

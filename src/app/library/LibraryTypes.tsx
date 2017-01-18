@@ -48,6 +48,7 @@ import RoleTypes from './../roles/RoleTypes.tsx';
 import BuilderTypes from './../builder/BuilderTypes.tsx';
 import * as Immutable from 'immutable';
 import {IResultsConfig} from '../builder/components/results/ResultsConfig.tsx';
+const {List, Map} = Immutable;
 
 export module LibraryTypes
 {
@@ -62,34 +63,52 @@ export module LibraryTypes
 
   class VariantC
   {
+    type = "variant";
+    
     id = "";
     name = "";
     lastEdited = "";
     lastUsername = "";
     algorithmId = "";
     groupId = "";
-    resultsConfig = null;
-    mode = "";
-    tql = "";
     status = EVariantStatus.Build;
     version = false;
-    db = '';
-    deckOpen = true;
-    
+    db = 'urbansitter';
     isDefault = false;
-
-    cards = Immutable.List([]);
-    inputs = Immutable.List([]);
     
-    // for DB storage
-    type = "variant";
+    // don't use this!
+    // TODO remove when variants can be saved without queries
+    query: BuilderTypes.Query = null;
+    
+    // for DB storage, hopefully uneeded soon
     dbFields = ['groupId', 'algorithmId', 'status'];
-    dataFields = ['name', 'lastEdited', 'lastUsername', 'cards', 'inputs', 'mode', 'tql', 'resultsConfig', 'db', 'deckOpen', 'isDefault'];    
+    dataFields = ['name', 'lastEdited', 'lastUsername', 'query', 'db', 'isDefault', 'modelVersion'];    
+    modelVersion = 1;
+    static getDb: (v:Variant) => string;
   }
+  VariantC.getDb = (v:Variant) => v.db;
   export interface Variant extends VariantC, IRecord<Variant> {}
   const Variant_Record = Immutable.Record(new VariantC());
   export const _Variant = (config?:any) => {
-    let v = new Variant_Record(Util.extendId(config || {})) as any as Variant;
+    if(config && !config.modelVersion)
+    {
+      // from modelVersion 0 to 1
+      config.modelVersion = 1;
+      config.query = {
+        cards: config.cards,
+        inputs: config.inputs,
+        resultsConfig: config.resultsConfig,
+        tql: config.tql,
+        mode: config.mode,
+        deckOpen: config.deckOpen,
+        variantId: config.id,
+      };
+    }
+    
+    config = Util.extendId(config || {});
+    config.query = BuilderTypes._Query(config.query);
+    
+    let v = new Variant_Record(config) as any as Variant;
     if(!config || !config.lastUsername || !config.lastEdited)
     {
       v = touchVariant(v);
@@ -99,16 +118,15 @@ export module LibraryTypes
   
   export function touchVariant(v: Variant): Variant
   {
-    return v.set('lastEdited', new Date())
-      .set('lastUsername', localStorage['username']);
+    return v
+      .set('lastEdited', new Date())
+      .set('lastUsername', localStorage['username'])
+    ;
   }
   
   export function variantForSave(v: Variant): Variant
   {
-    v = touchVariant(v);
-    v = v.set('cards', BuilderTypes.cardsForServer(v.cards));
-    v = v.set('resultsConfig', v.resultsConfig.toJS());
-    return v;
+    return v.set('query', BuilderTypes.queryForSave(v.query));
   }
   
   export enum EAlgorithmStatus
@@ -125,19 +143,21 @@ export module LibraryTypes
     lastEdited = "";
     lastUsername = "";
     groupId = "";
-    variants = Immutable.Map({});
-    variantsOrder = Immutable.List([]);
+    variantsOrder = List([]);
     status = EAlgorithmStatus.Live;
+    db = 'urbansitter';
     
     // for DB storage
     type = "algorithm";
     dbFields = ['groupId', 'status'];
-    dataFields = ['name', 'lastEdited', 'lastUsername', 'variantsOrder'];
+    dataFields = ['name', 'lastEdited', 'lastUsername', 'variantsOrder', 'db'];
   }
   const Algorithm_Record = Immutable.Record(new AlgorithmC());
   export interface Algorithm extends AlgorithmC, IRecord<Algorithm> {}
   export const _Algorithm = (config?:any) => {
-    return new Algorithm_Record(Util.extendId(config || {})) as any as Algorithm;
+    config = Util.extendId(config || {});
+    config.variantsOrder = List(config.variantsOrder || []);
+    return new Algorithm_Record(config) as any as Algorithm;
   }
 
   export const groupColors =
@@ -167,23 +187,26 @@ export module LibraryTypes
     name = "";
     lastEdited = "";
     lastUsername = "";
-    usernames = Immutable.List([]);
-    algorithms = Immutable.Map({});
-    algorithmsOrder = Immutable.List([]);
+    usernames = List([]);
+    algorithmsOrder = List([]);
     status = EGroupStatus.Live;
+    db = 'urbansitter';
     
     // for DB storage
     type = "group";
     dbFields = ['status'];
-    dataFields = ['name', 'lastEdited', 'lastUsername', 'algorithmsOrder'];
+    dataFields = ['name', 'lastEdited', 'lastUsername', 'algorithmsOrder', 'db'];
   }
   const Group_Record = Immutable.Record(new GroupC());
   export interface Group extends GroupC, IRecord<Group> {}
   export const _Group = (config?:any) => {
-    return new Group_Record(Util.extendId(config || {})) as any as Group;
+    config = Util.extendId(config || {});
+    config.usernames = List(config.usernames || []);
+    config.algorithmsOrder = List(config.algorithmsOrder || []);
+    return new Group_Record(config) as any as Group;
   }
   
-  export function nameForStatus(status:EVariantStatus): string
+  export function nameForStatus(status:EVariantStatus | string): string
   {
     switch(status)
     {
@@ -195,12 +218,14 @@ export module LibraryTypes
         return 'Build';
       case EVariantStatus.Live:
         return 'Live';
+      case 'Default':
+        return 'Default'
       default:
         return 'None';
     }
   }
   
-  export function colorForStatus(status:EVariantStatus): string
+  export function colorForStatus(status:EVariantStatus | string): string
   {
     switch(status)
     {
@@ -212,8 +237,28 @@ export module LibraryTypes
         return '#00a7f7';
       case EVariantStatus.Live:
         return '#48b14b';
+      case 'Default':
+        return '#957048'
       default:
         return '#000';
+    }
+  }
+  
+  export function getDbFor(item: Variant | Algorithm | Group | BuilderTypes.Query): string
+  {
+    // TODO change when DB is at algorithm level
+    switch(item && item.type)
+    {
+      case 'query':
+        // const variantId = (item as BuilderTypes.Query).variantId;        
+        return null;
+      case 'variant':
+        return (item as Variant).db;
+      case 'algorithm':
+        return null;
+      case 'group':
+      default:
+        return null;
     }
   }
 }

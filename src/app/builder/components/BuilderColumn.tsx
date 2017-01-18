@@ -47,6 +47,7 @@ require('./BuilderColumn.less');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as Immutable from 'immutable';
+import * as classNames from 'classnames';
 const {List} = Immutable;
 import Util from '../../util/Util.tsx';
 import Menu from '../../common/components/Menu.tsx';
@@ -64,7 +65,8 @@ const shallowCompare = require('react-addons-shallow-compare');
 import * as moment from 'moment';
 import Ajax from "./../../util/Ajax.tsx";
 import Manual from './../../manual/components/Manual.tsx';
-
+import BuilderTypes from '../BuilderTypes.tsx';
+type Query = BuilderTypes.Query;
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -113,6 +115,7 @@ var BuilderColumn = React.createClass<any, any>(
   propTypes:
   {
     query: React.PropTypes.object.isRequired,
+    variant: React.PropTypes.object.isRequired,
     className: React.PropTypes.string,
     index: React.PropTypes.number,
     canAddColumn: React.PropTypes.bool,
@@ -122,11 +125,12 @@ var BuilderColumn = React.createClass<any, any>(
     onCloseColumn: React.PropTypes.func.isRequired,
     colKey: React.PropTypes.number.isRequired,
     history: React.PropTypes.any,
-    onRevert: React.PropTypes.func,
     columnType: React.PropTypes.number,
     selectedCardName: React.PropTypes.string,
     switchToManualCol: React.PropTypes.func,
     changeSelectedCardName: React.PropTypes.func,
+    canEdit: React.PropTypes.bool.isRequired,
+    cantEditReason: React.PropTypes.string,
   },
   
   getInitialState()
@@ -198,24 +202,23 @@ var BuilderColumn = React.createClass<any, any>(
     });
   },
   
-  renderContent(canEdit:boolean)
+  renderContent()
   {
-    var query = this.props.query;
+    if(!this.props.query)
+    {
+      return (
+        <div
+          className='builder-column-loading'
+        >
+          Loading...
+        </div>
+      );
+    }
+    
+    const {canEdit, query} = this.props;
     switch(this.state.column)
     {
       case COLUMNS.Builder:
-        // this should be temporary; remove when middle tier arrives
-        // var spotlights = Immutable.List(query.results ? query.results.reduce((spotlights, result) =>
-        // {
-        //   if(result.spotlight)
-        //   {
-        //     spotlights.push(result);
-        //   }
-        //   return spotlights;
-        // }, []) : []);
-        // TODO
-        let spotlights = Immutable.List([]);
-        
         if (this.props.query.mode === "tql")
         {
           return <InfoArea
@@ -227,8 +230,6 @@ var BuilderColumn = React.createClass<any, any>(
         return <CardsColumn 
           cards={query.cards} 
           deckOpen={query.deckOpen}
-          queryId={query.id}
-          spotlights={spotlights} 
           canEdit={canEdit}
           addColumn={this.props.onAddManualColumn}
           columnIndex={this.props.index}
@@ -237,7 +238,7 @@ var BuilderColumn = React.createClass<any, any>(
       case COLUMNS.Inputs:
         return <InputsArea
           inputs={query.inputs}
-          queryId={query.id}
+          canEdit={canEdit}
         />;
       
       case COLUMNS.Results:
@@ -246,16 +247,18 @@ var BuilderColumn = React.createClass<any, any>(
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
           canEdit={canEdit}
+          db={this.props.variant.db}
         />;
 
       case COLUMNS.TQL:
         return <BuilderTQLColumn
           canEdit={canEdit}
-          query={query}
           onLoadStart={this.handleLoadStart}
           onLoadEnd={this.handleLoadEnd}
           addColumn={this.props.onAddManualColumn}
           columnIndex={this.props.index}
+          query={query}
+          variant={this.props.variant}
         />;
         
       case COLUMNS.Manual:
@@ -314,54 +317,9 @@ var BuilderColumn = React.createClass<any, any>(
     localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
   },
   
-  revertVersion()
+  render() 
   {
-    if (this.props.query.version) 
-    {
-      if (confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.')) 
-      {
-        this.props.onRevert();
-      }
-    }
-  },
-
-  renderBuilderVersionToolbar(canEdit)
-  {
-    if(this.props.query.version)
-    {
-      if (this.state.column === COLUMNS.Builder || this.state.column === COLUMNS.TQL)
-      {
-        var lastEdited = moment(this.props.query.lastEdited).format("h:mma on M/D/YY")
-        return (
-          <div className='builder-revert-toolbar'> 
-            <div className='builder-revert-time-message'>
-              Version from {lastEdited}
-            </div>
-            <div className='builder-white-space'/>
-            {
-              canEdit ? 
-                  <div 
-                    className='button builder-revert-button' 
-                    onClick={this.revertVersion} 
-                    //data-tip="Resets the Variant's contents to this version. You can always undo the revert, and reverting does not lose any of the Variant's history."
-                  >
-                    Revert to this version
-                  </div>
-                  : <div />
-             }
-          </div>
-          );
-      }
-    }
-  },
-
-  render() {
-    let {query} = this.props;
-    let canEdit = (query.status === LibraryTypes.EVariantStatus.Build
-      && Util.canEdit(query, UserStore, RolesStore))
-      || this.state.column === COLUMNS.Inputs;
-    let cantEditReason = query.status !== LibraryTypes.EVariantStatus.Build ?
-      'This Variant is not in Build status' : 'You are not authorized to edit this Variant';
+    let {query, canEdit, cantEditReason} = this.props;
     
     return this.renderPanel((
       <div className={'builder-column builder-column-' + this.props.index}>
@@ -376,17 +334,24 @@ var BuilderColumn = React.createClass<any, any>(
           }
           <div className='builder-title-bar-title'>
             <span ref='handle'>
-              { COLUMNS[this.state.column] }
+              { 
+                COLUMNS[this.state.column]
+              }
               {
-                !canEdit ? 
-                  <LockedIcon data-tip={cantEditReason} />
-                : null
+                !canEdit &&
+                  <LockedIcon 
+                    data-tip={cantEditReason}
+                  />
               }
             </span>
             {
               this.state.loading &&
               (this.state.column === COLUMNS.Results || this.state.column === COLUMNS.TQL) &&
-                <div className='builder-column-loading'>Loading...</div>
+                <div 
+                  className='builder-column-loading'
+                >
+                  Loading...
+                </div>
             }
           </div>
           <div className='builder-title-bar-options'>
@@ -406,17 +371,23 @@ var BuilderColumn = React.createClass<any, any>(
                   data-tip="Add Column"
                 />
             }
-            <Menu options={this.getMenuOptions()}/>
+            <Menu 
+              options={this.getMenuOptions()}
+            />
           </div>
         </div>
-        {this.renderBuilderVersionToolbar(canEdit)}
-        <div className={
-            (this.state.column === COLUMNS.Manual ? 'builder-column-manual ' : '') +
-            'builder-column-content ' + 
-            (this.state.column === COLUMNS.Builder ? ' builder-column-content-scroll' : '') +
-            (this.state.column === COLUMNS.Inputs ? ' builder-column-content-scroll' : '') 
-          }>
-          { this.renderContent(canEdit) }
+        <div
+          className={classNames({
+            'builder-column-content': true,
+            'builder-column-manual': this.state.column === COLUMNS.Manual,
+            'builder-column-content-scroll': 
+              this.state.column === COLUMNS.Builder ||
+                this.state.column === COLUMNS.Inputs,
+          })
+        }>
+          { 
+            this.renderContent(canEdit)
+          }
         </div>
       </div>
     ));

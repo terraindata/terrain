@@ -155,40 +155,54 @@ input {
 }
 
 
-// TODO less function for all librarys
 @keyframes slide-down {
   0% {
     -webkit-transform: translateY(-100%);
+    transform: translateY(-100%);
   }
-  // 50% {
-  //   -webkit-transform: translateY(-100%);
-  // }
   100% {
     -webkit-transform: translateY(0%);
+    transform: translateY(0%);
   }
 }
-
-// TODO cross-library
 .slide-down {
   -webkit-transform: translateY(-100%);
-  animation: slide-down 0.35s linear 0.15s forwards;
+  animation: slide-down 0.25s linear 0.15s forwards;
 }
 
 @keyframes slide-right {
   0% {
     -webkit-transform: translateX(-100%);
+    transform: translateX(-100%);
   }
   100% {
     -webkit-transform: translateX(0%);
+    transform: translateX(0%);
   }
 }
 
-// TODO cross-library
 .slide-right {
   -webkit-transform: translateX(-100%);
-  animation: slide-right 0.35s linear 0.15s forwards;
+  animation: slide-right 0.25s linear 0.15s forwards;
 }
 
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.fade-in {
+  opacity: 0;
+  animation: fade-in 0.25s linear 0.15s forwards;
+}
+
+.animation-delay(@s) {
+  -webkit-animation-delay: @s;
+  animation-delay: @s;
+}
 
   
 
@@ -570,4 +584,29 @@ input {
 
 /* Colors */
 
+
+.create-card-button-style {
+  padding: 3px 0px;
+  text-align: center;
+  border-radius: 3px;
+  .transition(~"all .25s");
+  height: 24px;
+  box-sizing: border-box;
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0);  
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  .bold-normal-white-text;
+  
+  &:hover {
+    .transition(~"all .15s");
+    border-color: rgba(255,255,255,0.75);
+  }
+  &:active {
+    border-color: #fff;
+  }
+}
 

@@ -72,36 +72,20 @@ var Input = React.createClass<any, any>({
 	{
 		input: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
-    queryId: React.PropTypes.string.isRequired,
+    canEdit: React.PropTypes.bool.isRequired,
     // since inputs still are regular classes, instead of PureClasss, we construct keyPaths for Actions on execution
     //  rather than caching. This is fine since inputs aren't nested, there would be no
     //  benefit to caching keyPaths anyways.
 	},
   
-  getInitialState()
+  getKeyPath(type?: string)
   {
-    return this.computeKeyPaths(this.props);
-  },
-  
-  computeKeyPaths(props)
-  {
-    let parentKeyPath = Immutable.List(['queries', props.queryId, 'inputs']);
-    let keyPath = parentKeyPath.push(props.index);
-    return {
-      keyPath,
-      parentKeyPath,
-      valueKeyPath: keyPath.push('value'),
-      keyKeyPath: keyPath.push('key'),
-      typeKeyPath: keyPath.push('inputType'),
-    };
-  },
-  
-  componentWillReceiveProps(nextProps)
-  {
-    if(nextProps.queryId !== this.props.queryId || nextProps.index !== this.props.index)
+    let keyPath = Immutable.List(['query', 'inputs']);
+    if(type)
     {
-      this.setState(this.computeKeyPaths(nextProps));
+      return keyPath.push(this.props.index).push(type);
     }
+    return keyPath;
   },
   
   shouldComponentUpdate(nextProps, nextState)
@@ -126,31 +110,31 @@ var Input = React.createClass<any, any>({
       date = new Date();
     }
     let value = Util.formatInputDate(date);
-    Actions.change(this.state.valueKeyPath, value);
-    Actions.change(this.state.typeKeyPath, InputType.DATE);
+    Actions.change(this.getKeyPath('value'), value);
+    Actions.change(this.getKeyPath('inputType'), InputType.DATE);
   },
   
   convertToText()
   {
-    Actions.change(this.state.typeKeyPath, InputType.TEXT);
+    Actions.change(this.getKeyPath('inputType'), InputType.TEXT);
   },
   
   convertToNumber()
   {
-    Actions.change(this.state.typeKeyPath, InputType.NUMBER);
+    Actions.change(this.getKeyPath('inputType'), InputType.NUMBER);
   },
 
   closeInput()
   {
     Util.animateToHeight(this.refs.input, 0);
     setTimeout(() => {
-      Actions.remove(this.state.parentKeyPath, this.props.index)
+      Actions.remove(this.getKeyPath(), this.props.index)
     }, 250);
   },
   
   createInput()
   {
-    Actions.create(this.state.parentKeyPath, this.props.index, 'input');
+    Actions.create(this.getKeyPath(), this.props.index, 'input');
   },
 
   getMenuOptions()
@@ -182,7 +166,7 @@ var Input = React.createClass<any, any>({
   
   changeValue(value)
   {
-    Actions.change(this.state.valueKeyPath, value);
+    Actions.change(this.getKeyPath('value'), value);
   },
   
   renderInputValue()
@@ -206,9 +190,9 @@ var Input = React.createClass<any, any>({
         canEdit={true}
         value={this.props.input.value}
         className="input-text input-text-second"
-        keyPath={this.state.valueKeyPath}
+        keyPath={this.getKeyPath('value')}
         isNumber={this.props.input.inputType === BuilderTypes.InputType.NUMBER}
-        typeErrorMessage="Tehis is supposed to be a number"
+        typeErrorMessage="This input is in number mode\nthis should be a number."
         placeholder='Sample value'
         autoDisabled={true}
       />
@@ -224,14 +208,20 @@ var Input = React.createClass<any, any>({
     // return this.renderPanel((
 		return (
 			<div className='input' ref='input'>
-        <CreateLine open={false} onClick={this.createInput} />
+        {
+          this.props.canEdit &&
+            <CreateLine 
+              open={false} 
+              onClick={this.createInput} 
+            />
+        }
         <div className='input-inner'>
           <div className='input-top-row'>
             <BuilderTextbox
-              canEdit={true}
+              canEdit={this.props.canEdit}
               value={this.props.input.key}
               className="input-text input-text-first input-borderless"
-              keyPath={this.state.keyKeyPath}
+              keyPath={this.getKeyPath('key')}
               placeholder='Input name'
               autoDisabled={true}
             />

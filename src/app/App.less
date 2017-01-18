@@ -54,7 +54,7 @@ body {
   height: 100%;
 }
 
-@top-bar-height: 36px; // coordinate this with .app-wrapper below
+@top-bar-height: 36px;
 @icon-height: 17px;
 @icon-padding: calc((@top-bar-height - @icon-height) / 2);
 
@@ -76,7 +76,12 @@ body {
 }
 
 .app-wrapper {
-  height: calc(~"100% - 36px"); // put top bar height heres
+  height: calc(~"100% - @{top-bar-height}");
+}
+
+.app-inner {
+  .fade-in;
+  .animation-delay(0.75s);
 }
 
 
@@ -119,7 +124,7 @@ input[type=text], input[type=email], input[type=tel], input[type=num]
     border-color: @dark-green; //#ccc; //fade(#00bcd6, 50%);
   }
   
-  &:focus {
+  &:focus:not(:disabled) {
    border-color: rgba(140,213,106,1); 
   }
 }

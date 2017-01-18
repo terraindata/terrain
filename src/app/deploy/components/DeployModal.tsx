@@ -82,9 +82,7 @@ class DeployModal extends PureClasss<Props>
     this._subscribe(LibraryStore, {
       updater: (state) =>
       {
-        let changingStatus = state.get('changingStatus');
-        let changingStatusOf = state.get('changingStatusOf');
-        let changingStatusTo = state.get('changingStatusTo');
+        let {changingStatus, changingStatusOf, changingStatusTo, changingStatusDefault} = state;
         if(
           changingStatus !== this.state.changingStatus ||
           changingStatusOf !== this.state.changingStatusOf ||
@@ -94,7 +92,7 @@ class DeployModal extends PureClasss<Props>
             changingStatus,
             changingStatusOf,
             changingStatusTo,
-            defaultChecked: false,
+            defaultChecked: changingStatusDefault,
           });
         }
       },
@@ -114,25 +112,25 @@ class DeployModal extends PureClasss<Props>
     );
   }
   
-  renderTQLColumn()
+  renderTQLColumn(defaultVariant:LibraryTypes.Variant)
   {
     let variant = this.state.changingStatusOf;
-    let state = LibraryStore.getState();
-    let algorithm = state.getIn(['groups', this.state.changingStatusOf.groupId, 'algorithms', this.state.changingStatusOf.algorithmId]) as LibraryTypes.Algorithm;
-    let defaultTql = 'There is not currently a default Variant for algorithm ' + algorithm.name;
+    let defaultTql = null;
+    
     if(this.state.defaultChecked)
     {
-      let defaultVariant = algorithm.variants.find(v => v.isDefault);
       if(defaultVariant)
       {
-        defaultTql = defaultVariant.mode === 'tql' ? defaultVariant.tql : TQLConverter.toTQL(defaultVariant);
+        // TODO change to simply defaultVariant.tql when the query tql structure changes
+        defaultTql = defaultVariant.query.mode === 'tql' ? defaultVariant.query.tql : TQLConverter.toTQL(defaultVariant.query);
       }
     }
     
     let tql = '';
     if(variant)
     {
-      tql = variant.mode === 'tql' ? variant.tql : TQLConverter.toTQL(variant);
+      // TODO change to simply defaultVariant.tql when the query tql structure changes
+      tql = variant.query.mode === 'tql' ? variant.query.tql : TQLConverter.toTQL(variant.query);
     }
     
     return (
@@ -141,7 +139,7 @@ class DeployModal extends PureClasss<Props>
           <TQLEditor
             canEdit={false}
             tql={tql}
-            isDiff={this.state.defaultChecked}
+            isDiff={this.state.defaultChecked && defaultTql !== null}
             diffTql={defaultTql}
           />
         </div>
@@ -172,8 +170,16 @@ class DeployModal extends PureClasss<Props>
       title = 'Remove "' + name + '" from Live';
     }
     
+    if(this.state.defaultChecked)
+    {
+      let libraryState = LibraryStore.getState();
+      var defaultVariant = libraryState.variants.find(
+        v => v.algorithmId === changingStatusOf.algorithmId && v.isDefault
+      );
+    }
+    
     return (
-      <Modal 
+      <Modal
         open={this.state.changingStatus} 
         message={null}
         onClose={this.handleClose}
@@ -183,19 +189,20 @@ class DeployModal extends PureClasss<Props>
       >
         {
           changingStatusOf &&
-            <div 
+            <div
               className={classNames({
                 'deploy-modal': true,
               })}
             >
               {
-                this.renderTQLColumn()
+                this.renderTQLColumn(defaultVariant)
               }
               <DeployModalColumn
                 variant={changingStatusOf}
                 status={changingStatusTo}
                 onDeploy={this.handleDeploy}
                 defaultChecked={this.state.defaultChecked}
+                defaultVariant={defaultVariant}
                 onDefaultCheckedChange={this.handleDefaultCheckedChange}
               />
             </div>

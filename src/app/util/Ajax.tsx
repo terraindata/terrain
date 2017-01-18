@@ -50,6 +50,7 @@ import Actions from './../auth/data/AuthActions.tsx';
 import UserTypes from './../users/UserTypes.tsx';
 import RoleTypes from './../roles/RoleTypes.tsx';
 import LibraryTypes from './../library/LibraryTypes.tsx';
+import BuilderTypes from './../builder/BuilderTypes.tsx';
 import Util from './../util/Util.tsx';
 
 export interface QueryResponse
@@ -227,6 +228,7 @@ export const Ajax = {
   {
     return Ajax._get(`/items/${id}`, "", (response: any) =>
     {
+      // TODO change if the middle tier format changes
       let r = JSON.parse(response);
       let all = r && r[type + 's'];
       var item = all && all.find(i => i.id === id);
@@ -239,9 +241,26 @@ export const Ajax = {
     }, onError);
   },
   
-  getVariant(id: ID, onLoad: (variant: any) => void)
+  getVariant(variantId: ID, onLoad: (variant: LibraryTypes.Variant) => void)
   {
-    return Ajax.getItem('variant', id, onLoad);
+    if(variantId.indexOf('@') === -1) 
+    {
+      return Ajax.getItem(
+        'variant', 
+        variantId,
+        (variantData: Object) =>
+        {
+          onLoad(LibraryTypes._Variant(variantData));
+        }
+      );
+    }
+    else 
+    {
+      return Ajax.getVariantVersion(
+        variantId,
+        onLoad
+      );
+    }
   },
 
   getVariantVersions(variantId: ID, onLoad: (variantVersions: any) => void)
@@ -254,21 +273,80 @@ export const Ajax = {
     });
   },
 
-  getVariantVersion(variantId: ID, versionId: string, onLoad: (variantVersion: any) => void)
+  getVariantVersion(variantId: ID, onLoad: (variantVersion: any) => void)
   {
-    var url = '/variant_versions/' + variantId;
-    return Ajax._get(url, "", (response: any) =>
+    if(!variantId || variantId.indexOf('@') === -1)
     {
-      let version = JSON.parse(response).find(version => version.id === versionId);
-      if(version)
+      onLoad(null);
+      return null;
+    }
+    
+    // viewing an old version
+    const pieces = variantId.split('@');
+    const originalVariantId = pieces[0];
+    const versionId = pieces[1];
+    
+    var url = '/variant_versions/' + originalVariantId;
+    return Ajax._get(
+      url, 
+      "", 
+      (response: any) =>
       {
-        onLoad(JSON.parse(version.data));
-      }
-      else
+        let version = JSON.parse(response).find(version => version.id === versionId);
+        if(version)
+        {
+          let data = JSON.parse(version.data);
+          Ajax.getVariant(originalVariantId, (v: LibraryTypes.Variant) =>
+          {
+            if(v)
+            {
+              data['id'] = v.id;
+              data['groupId'] = v.groupId;
+              data['status'] = v.status;
+              data['algorithmId'] = v.algorithmId;
+              data['version'] = true;
+              
+              onLoad(LibraryTypes._Variant(data));
+            }
+            else
+            {
+              onLoad(null);
+            }
+          })
+        }
+        else
+        {
+          onLoad(null);
+        }
+      },
+      () => onLoad(null)
+    );
+  },
+  
+  getQuery(
+    variantId: ID, 
+    onLoad: (query: BuilderTypes.Query, variant: LibraryTypes.Variant) => void
+  )
+  {
+    if(!variantId)
+    {
+      return;
+    }
+    
+    // TODO change if we store queries separate from variants
+    const load = (v: LibraryTypes.Variant) =>
+    {
+      if(!v || !v.query)
       {
-        onLoad(null);
+        onLoad(null, v);
       }
-    });
+      onLoad(v.query, v);
+    }
+    
+    return Ajax.getVariant(
+      variantId,
+      load
+    );
   },
   
   saveItem(item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group, onLoad?: (resp: any) => void, onError?: (ev:Event) => void)
@@ -301,18 +379,21 @@ export const Ajax = {
       
       (resp) =>
       {
+        var respData = null;
         try {
-          onLoad(JSON.parse(resp));
+          respData = JSON.parse(resp);
         } catch(e) {
           onError && onError(resp as any);
+          return;
         }
+        onLoad(respData);
       },
       
       onError
     );
   },
   
-  parseTree(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev:Event) => void, sqlQuery?: boolean)
+  parseTree(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev:Event) => void)
   {
     return Ajax._r("/get_tql_tree", {
         "query_string": encode_utf8(tql),
@@ -321,11 +402,15 @@ export const Ajax = {
       
       (resp) =>
       {
+        var respData = null;
         try {
-          onLoad(JSON.parse(resp));
+          resp = resp.replace(/\t/g, ''); // tabs cause the JSON parser to error out
+          respData = JSON.parse(resp);
         } catch(e) {
           onError && onError(resp as any);
+          return;
         }
+        onLoad(respData);
       },
       
       onError

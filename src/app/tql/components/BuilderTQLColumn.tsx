@@ -59,13 +59,15 @@ import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss.tsx';
 import Ajax from "./../../util/Ajax.tsx";
 import Modal from './../../common/components/Modal.tsx';
+import LibraryTypes from '../../library/LibraryTypes.tsx';
 
 import TQLEditor from './TQLEditor.tsx';
 
 import TQLPopup from './TQLPopup.tsx';
 
 interface Props {
-  query?: BuilderTypes.IQuery;
+  variant?: LibraryTypes.Variant;
+  query?: BuilderTypes.Query;
   canEdit?: boolean;
   
   params?: any;
@@ -81,6 +83,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     tql: string;
     code: string;
     theme: string;
+    focused: boolean;
     highlightedLine: number;
     theme_index: number;
     confirmModalOpen: boolean;
@@ -94,6 +97,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     tql: null,
     code: this.props.query.mode === 'tql' ? this.props.query.tql : TQLConverter.toTQL(this.props.query),
     theme: localStorage.getItem('theme') || 'default',
+    focused: false,
     highlightedLine: null,
     theme_index: 0,
     confirmModalOpen: false,
@@ -112,12 +116,20 @@ class BuilderTQLColumn extends PureClasss<Props>
   }
 
   //This function should be here, but whenever executeCode is called, the cards/tql
-  //are not longer in sync
+  //are no longer in sync
   componentDidMount() 
   {
-    if (this.props.query.mode !== 'tql') 
+    if(this.props.query.mode !== 'tql') 
     {
-      this.executeCode();
+      this.executeCode(true);
+    }
+  }
+  
+  componentWillReceiveProps(nextProps:Props)
+  {
+    if(!this.state.focused && nextProps.query.tql !== this.state.code && nextProps.query.mode === 'tql')
+    {
+      this.updateCode(nextProps.query.tql);
     }
   }
 
@@ -143,17 +155,17 @@ class BuilderTQLColumn extends PureClasss<Props>
     }
   }
 
-  executeCode() 
+  executeCode(noAction?: boolean) 
   {
     var code = this.props.query.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.query)
     this.setState({
       tql: code,
     });
-    BuilderActions.setVariantField
-      (this.props.query.id,
-      'tql',
-      code
-      );
+    
+    if(!noAction)
+    {
+      BuilderActions.changeTQL(code);
+    }
   }
 
   changeThemeDefault() 
@@ -251,22 +263,21 @@ class BuilderTQLColumn extends PureClasss<Props>
 
   highlightError(lineNumber: number) 
   {
-    this.state.highlightedLine = lineNumber - 1;
-    var x: any = this.refs['cm'];
-    if (x) 
+    if(lineNumber !== null) 
     {
-      x.updateHighlightedLine(lineNumber - 1);
+      this.setState({
+        highlightedLine: lineNumber - 1,
+      });
     }
   }
 
   undoError() 
   {
-    if (this.state.highlightedLine != null) 
+    if(this.state.highlightedLine !== null) 
     {
-      var x: any = this.refs['cm'];
-      if (x) {
-        x.undoHighlightedLine(this.state.highlightedLine);
-      }
+      this.setState({
+        higlightedLine: null,
+      });
     }
   }
 
@@ -275,12 +286,12 @@ class BuilderTQLColumn extends PureClasss<Props>
         //When they switch to tql mode, execute code
      if (prevProps.query.mode !== 'tql' && this.props.query.mode === 'tql')     
      {
-            this.executeCode();
+       this.executeCode(true);
      }
      else if (this.props.query.mode !== 'tql' &&
       !(_.isEqual(this.props.query.cards, prevProps.query.cards))) 
      {
-      this.executeCode();
+      this.executeCode(true);
     }
   }
 
@@ -300,11 +311,9 @@ class BuilderTQLColumn extends PureClasss<Props>
 
   switchMode()
   {
-    BuilderActions.setVariantField
-      (this.props.query.id, 
-        'mode', 
-        this.props.query.mode === 'tql' ? 'cards' : 'tql'
-      );
+    BuilderActions.changeQueryMode(
+      this.props.query.mode === 'tql' ? 'cards' : 'tql'
+    );
 
     //update when have tql to cards conversion capabilities 
     this.setState({
@@ -408,6 +417,13 @@ class BuilderTQLColumn extends PureClasss<Props>
       termDefinitionOpen: false,
     })
   }
+  
+  handleFocusChange(focused)
+  {
+    this.setState({
+      focused,
+    });
+  }
 
   renderTqlEditor() 
   {
@@ -419,6 +435,8 @@ class BuilderTQLColumn extends PureClasss<Props>
         theme={this.state.theme}
         
         onChange={this.updateCode}
+        onFocusChange={this.handleFocusChange}
+        
         highlightedLine={this.state.highlightedLine}
         toggleSyntaxPopup={this.toggleSyntaxPopup}
         defineTerm={this.defineTerm}
@@ -479,7 +497,7 @@ class BuilderTQLColumn extends PureClasss<Props>
           
           <TQLResultsBar
             tql={this.state.tql}
-            db={this.props.query && this.props.query.db}
+            db={this.props.variant && this.props.variant.db}
             onError={this.highlightError}
             onLoadStart={this.props.onLoadStart}
             onLoadEnd={this.props.onLoadEnd}

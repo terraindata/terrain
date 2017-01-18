@@ -176,10 +176,12 @@ class TQLResultsBar extends PureClasss<Props>
   
   handleResultsChange(response: QueryResponse)
   {
+    this.props.onLoadEnd && this.props.onLoadEnd();
     if(response.error)
     {
       let {error} = response;
-      let line = parseInt(error.match(/([0-9]+)\:[0-9]+/)[1]);
+      let matches = error.match(/([0-9]+)\:[0-9]+/);
+      let line = matches && matches.length >= 2 && parseInt(matches[1]);
       
       this.setState({
         error: error.substr(0, error.length - 1),
@@ -191,7 +193,6 @@ class TQLResultsBar extends PureClasss<Props>
     }
     
     let results = response.resultSet as (any[] | string);
-    this.props.onLoadEnd && this.props.onLoadEnd();
     if(results)
     {
       var spliced = 0;

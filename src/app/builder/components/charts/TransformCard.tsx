@@ -196,6 +196,11 @@ class TransformCard extends PureClasss<Props>
   
   computeBars(input: BuilderTypes.CardString)
   {
+    // TODO consider putting the query in context
+    let builderState = BuilderStore.getState();
+    let {cards} = builderState.query;
+    let {db} = builderState;
+    
     if(typeof input === 'string')
     {
       // TODO: cache somewhere
@@ -204,10 +209,6 @@ class TransformCard extends PureClasss<Props>
       {
         let alias = parts[0];
         let field = parts[1];
-        let queryKeyPath = this.props.keyPath.skipLast(this.props.keyPath.size - 2);
-        let query = BuilderStore.getState().getIn(queryKeyPath.toList());
-        let db = query.db;
-        let cards = query.cards;
         
         let table = this.findTableForAlias(cards, alias);
         
@@ -225,11 +226,6 @@ class TransformCard extends PureClasss<Props>
     }
     else if(input && input._isCard)
     {
-      let queryKeyPath = this.props.keyPath.skipLast(this.props.keyPath.size - 2);
-      let query = BuilderStore.getState().getIn(queryKeyPath.toList());
-      let db = query.db;
-      let cards = query.cards;
-      
       let card = input as BuilderTypes.ICard;
       if(card.type === 'score' && card['weights'].size)
       {
@@ -366,7 +362,7 @@ class TransformCard extends PureClasss<Props>
         this.setState({
           domain: this.trimDomain(this.state.domain, domain),
         });
-        Actions.change(this._ikeyPath(this.props.keyPath, 'domain'), domain);
+        Actions.change(this._ikeyPath(this.props.keyPath, 'domain'), domain, true);
       }
     }
   }
@@ -378,15 +374,17 @@ class TransformCard extends PureClasss<Props>
   
   handleDomainChange(domain: List<number>)
   {
-    console.log('handling domain change', domain.get(0), domain.get(1));
     this.setState({
       domain,
     });
   }
   
-  handleUpdatePoints(points)
+  handleUpdatePoints(points, isConcrete?: boolean)
   {
-    Actions.change(this._ikeyPath(this.props.keyPath, 'scorePoints'), points);
+    Actions.change(this._ikeyPath(this.props.keyPath, 'scorePoints'), points, !isConcrete);
+    // we pass !isConcrete as the value for "isDirty" in order to tell the Store when to 
+    //  set an Undo checkpoint. Moving the same point in the same movement should not result
+    //  in more than one state on the Undo stack.
   }
   
   render()

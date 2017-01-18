@@ -68,7 +68,8 @@ const MAX_RESULTS = 200;
 
 interface Props
 {
-  query: BuilderTypes.IQuery;
+  db: string;
+  query: BuilderTypes.Query;
   onLoadStart: () => void;
   onLoadEnd: () => void;
   canEdit: boolean;
@@ -240,10 +241,25 @@ class ResultsArea extends PureClasss<Props>
     }
   }
   
+  isQueryEmpty(): boolean
+  {
+    let {query} = this.props;
+    return !query
+      || (query.mode === 'tql' && !query.tql)
+      || (query.mode !== 'tql' && !query.cards.size);
+  }
+  
   resultsFodderRange = _.range(0, 25);
   
   renderResults()
   {
+    if(this.isQueryEmpty())
+    {
+      return <InfoArea
+        large="Results will display here as you build your query."
+      />
+    }
+    
     if(this.state.error)
     {
       let error = "";
@@ -346,6 +362,7 @@ class ResultsArea extends PureClasss<Props>
   
   handleCountResponse(response:QueryResponse)
   {
+    this.countXhr = null;
     let results = response.resultSet;
     if(results)
     {
@@ -374,6 +391,7 @@ class ResultsArea extends PureClasss<Props>
   
   handleCountError()
   {
+    this.countXhr = null;
     this.setState({
       resultsCount: -1,
     })
@@ -481,6 +499,7 @@ class ResultsArea extends PureClasss<Props>
   
   handleAllFieldsError()
   {
+    this.allXhr = null;
     this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
@@ -512,15 +531,14 @@ class ResultsArea extends PureClasss<Props>
       this.xhr && this.xhr.abort();
       this.allXhr && this.allXhr.abort();
       
-      this.xhr = Ajax.query(tql, query.db, this.handleResultsChange, this.handleError);
-      if (query.mode === "tql")
+      this.xhr = Ajax.query(tql, this.props.db, this.handleResultsChange, this.handleError);
+      if(query.mode === "tql")
       {
         this.allXhr = Ajax.query(
           tql, 
-          query.db,
+          this.props.db,
           this.handleAllFieldsResponse,
-          this.handleAllFieldsError,
-          true
+          this.handleAllFieldsError
         );
       }
       else 
@@ -529,19 +547,18 @@ class ResultsArea extends PureClasss<Props>
           TQLConverter.toTQL(query, {
             allFields: true,
             transformAliases: true,
-            // limit: pages * RESULTS_PAGE_SIZE,
+            limit: pages * RESULTS_PAGE_SIZE,
           }), 
-          query.db,
+          this.props.db,
           this.handleAllFieldsResponse,
-          this.handleAllFieldsError,
-          true
+          this.handleAllFieldsError
         );
         
         this.countXhr = Ajax.query(
           TQLConverter.toTQL(query, {
             count: true,
           }), 
-          query.db,
+          this.props.db,
           this.handleCountResponse,
           this.handleCountError
         );
@@ -564,12 +581,16 @@ class ResultsArea extends PureClasss<Props>
       <div className='results-top'>
         <div className='results-top-summary'>
           {
-            this.state.error ? 'Error with query' : 
-            (
-              this.state.results ? 
-                `${count || 'No'} result${count === 1 ? '' : 's'}` 
-              : 'Text result'
-            )
+            this.isQueryEmpty() ?
+              'Empty query' :
+              (
+                this.state.error ? 'Error with query' : 
+                (
+                  this.state.results ? 
+                    `${count || 'No'} result${count === 1 ? '' : 's'}` 
+                  : 'Text result'
+                )
+              )
           }
         </div>
         
@@ -623,7 +644,7 @@ class ResultsArea extends PureClasss<Props>
   
   handleConfigChange(config:IResultsConfig)
   {
-    Actions.change(List(['queries', this.props.query.id, 'resultsConfig']), config);
+    Actions.change(List(['query', 'resultsConfig']), config);
   }
 
 	render()

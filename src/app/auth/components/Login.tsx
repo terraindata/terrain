@@ -52,11 +52,13 @@ import PureClasss from '../../common/components/PureClasss.tsx';
 import Modal from './../../common/components/Modal.tsx';
 import Loading from './../../common/components/Loading.tsx';
 
-
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 var TerrainIcon = require("./../../../images/logo_mountainCircle.svg?name=TerrainIcon");
 
 interface Props {
+  appStateLoaded: boolean;
+  loggedIn: boolean;
+  onLoadComplete: () => void;
 }
 
 class Login extends PureClasss<Props>
@@ -71,7 +73,6 @@ class Login extends PureClasss<Props>
     showingLogo: false,
     opened: false,
     loggingIn: false,
-    loggedIn: false,
   };
   
   componentDidMount()
@@ -162,7 +163,7 @@ class Login extends PureClasss<Props>
   
   handleAnimationEnded()
   {
-    Actions.login(this.state.token, this.state.username);
+    this.props.onLoadComplete();
   }
   
   handleLogin()
@@ -172,12 +173,7 @@ class Login extends PureClasss<Props>
     });
     let { username } = this.state;
     let login = (token: string) => {
-      this.setState({
-        loggingIn: false,
-        loggedIn: true,
-        token,
-        username,
-      });
+      Actions.login(token, username);
     };
     
     let xhr = new XMLHttpRequest();
@@ -227,12 +223,16 @@ class Login extends PureClasss<Props>
           // <TerrainIcon className='login-logo'/>
   render()
   {
+    // show loading if you are logging in, or if you are already logged in
+    //  but the app state is still loading
+    let loading = (this.state.loggingIn && !this.props.loggedIn) ||
+      (this.props.loggedIn && !this.props.appStateLoaded);
     return (
       <div
         className={classNames({
           'login-wrapper': true,
           'login-wrapper-shifted': this.state.shifted,
-          'login-wrapper-open': this.state.opened && !this.state.loggingIn && !this.state.loggedIn,
+          'login-wrapper-open': this.state.opened && !this.state.loggingIn && !this.props.loggedIn,
         })}
         onKeyDown={this.handleKeyDown} 
       >
@@ -242,8 +242,8 @@ class Login extends PureClasss<Props>
             <Loading
               width={150}
               height={150}
-              loading={this.state.loggingIn}
-              loaded={this.state.loggedIn}
+              loading={loading}
+              loaded={this.props.loggedIn && this.props.appStateLoaded}
               onLoadedEnd={this.handleAnimationEnded}
             />
         }

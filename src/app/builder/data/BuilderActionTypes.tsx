@@ -54,22 +54,39 @@ var Immutable = require('immutable');
 
 export var BuilderActionTypes = 
 {
+  fetchQuery: '', // triggers server xhr
+  queryLoaded: '', // when the call to the server returns
+  
+  // these apply to the state's query
   create: '',
   change: '',
-  move: '',
-  nestedMove: '',
+  move: '', // within the same parent
+  nestedMove: '', // can occur between different parts of the tree
   remove: '',
-  fetch: '',
-  setVariant: '',
-  setVariantField: '',
   
   hoverCard: '',
+  
   selectCard: '',
+  
   dragCard: '',
   dragCardOver: '',
   dropCard: '',
   
+  // between Cards and TQL
+  changeQueryMode: '',
+  
+  // Change the TQL, whether compiled or hand-written
+  changeTQL: '',
+  
   toggleDeck: '',
+  
+  changeTables: '', // tables and columns for current query's db
+  
+  save: '', // just tells the store that something was saved
+  
+  undo: '',
+  redo: '',
+  checkpoint: '', // inserts an undo checkpoint
 };
 
 // I tried using this type to correclty classify this function,
@@ -110,9 +127,11 @@ export let BuilderDirtyActionTypes = {};
   BuilderActionTypes.move,
   BuilderActionTypes.remove,
   BuilderActionTypes.nestedMove,
-  BuilderActionTypes.setVariantField,
   BuilderActionTypes.dropCard,
+  BuilderActionTypes.changeTQL,
+  BuilderActionTypes.changeQueryMode,
   BuilderActionTypes.toggleDeck,
+  BuilderActionTypes.checkpoint,
 ].map(type => BuilderDirtyActionTypes[type] = true);
 
 export default BuilderActionTypes;

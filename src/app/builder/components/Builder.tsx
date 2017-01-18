@@ -50,13 +50,13 @@ import * as $ from 'jquery';
 import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
 import * as Immutable from 'immutable';
+import * as moment from 'moment';
 var HTML5Backend = require('react-dnd-html5-backend');
 const {browserHistory} = require('react-router');
 const { withRouter } = require('react-router');
 
 // Data
-import Store from "./../data/BuilderStore.tsx";
-import { BuilderState } from "./../data/BuilderStore.tsx";
+import { BuilderStore, BuilderState } from "./../data/BuilderStore.tsx";
 import Actions from "./../data/BuilderActions.tsx";
 import Util from "./../../util/Util.tsx";
 import UserActions from '../../users/data/UserActions.tsx';
@@ -64,15 +64,16 @@ import UserStore from '../../users/data/UserStore.tsx';
 import RolesStore from '../../roles/data/RolesStore.tsx';
 import RolesActions from '../../roles/data/RolesActions.tsx';
 import LibraryTypes from '../../library/LibraryTypes.tsx';
-import LibraryStore from '../../library/data/LibraryStore.tsx';
+import { LibraryStore, LibraryState } from '../../library/data/LibraryStore.tsx';
 import LibraryActions from '../../library/data/LibraryActions.tsx';
 import Types from '../BuilderTypes.tsx';
-type IQuery = Types.IQuery;
+type Query = Types.Query;
+type Variant = LibraryTypes.Variant;
 
 // Components
 import PureClasss from './../../common/components/PureClasss.tsx';
 import BuilderColumn from "./BuilderColumn.tsx";
-import Tabs from "./layout/Tabs.tsx";
+import {Tabs, TabAction} from "./layout/Tabs.tsx";
 import LayoutManager from "./layout/LayoutManager.tsx";
 import Card from "./cards/Card.tsx";
 import Result from "./results/Result.tsx";
@@ -99,27 +100,31 @@ interface Props
 class Builder extends PureClasss<Props>
 {
   state: {
-    builder: BuilderState,
+    builderState: BuilderState,
+    variants: Map<ID, Variant>,
+    
     colKeys: List<number>;
     noColumnAnimation: boolean;
     columnType: number;
     selectedCardName: string;
     manualIndex: number;
-    curDb: string;
     
     leaving: boolean;
     nextLocation: any;
+    tabActions: List<TabAction>;
   } = {
-    builder: Store.getState(),
+    builderState: BuilderStore.getState(),
+    variants: LibraryStore.getState().variants,
+    
     colKeys: null,
     noColumnAnimation: false,
     columnType: null,
     selectedCardName: '',
     manualIndex: -1,
-    curDb: '',
     
     leaving: false,
     nextLocation: null,
+    tabActions: this.getTabActions(BuilderStore.getState()),
   };
   
   initialColSizes: any;
@@ -128,8 +133,25 @@ class Builder extends PureClasss<Props>
   {
     super(props);
     
-    this._subscribe(Store, {
-      stateKey: 'builder',
+    this._subscribe(BuilderStore, {
+      stateKey: 'builderState',
+      updater: (builderState:BuilderState) =>
+      {
+        if(
+            builderState.query !== this.state.builderState.query
+            || builderState.pastQueries !== this.state.builderState.pastQueries
+            || builderState.nextQueries !== this.state.builderState.nextQueries
+          )
+        {
+          this.setState({
+            tabActions: this.getTabActions(builderState),
+          });
+        }
+      }
+    });
+    this._subscribe(LibraryStore, {
+      stateKey: 'variants',
+      storeKeyPath: ['variants'],
     });
     
     if(localStorage.getItem('colKeys'))
@@ -163,14 +185,28 @@ class Builder extends PureClasss<Props>
   componentWillMount()
   {
     this.checkConfig(this.props);
-    RolesActions.fetch();
     this.loadTables(this.props);
   }
   
   componentDidMount()
   {
+    window.onbeforeunload = (e) => 
+    {
+      if(this.shouldSave())
+      {
+        let msg = 'You have unsaved changes to this Variant. If you leave, they will be lost. Are you sure you want to leave?';
+        e && (e.returnValue = msg);
+        return msg;
+      }
+    }
+    
     this.checkConfig(this.props);
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+  }
+  
+  componentWillUnmount()
+  {
+    window.onbeforeunload = null;
   }
   
   routerWillLeave(nextLocation): boolean
@@ -181,7 +217,7 @@ class Builder extends PureClasss<Props>
       return true;
     }
     
-    if(this.shouldSave(Store.getState()))
+    if(this.shouldSave(BuilderStore.getState()))
     {
       // ^ need to pass in the most recent state, because when you've navigated away
       // in a dirty state, saved on the navigation prompt, and then returned,
@@ -196,7 +232,7 @@ class Builder extends PureClasss<Props>
         {
           // current opened variant is still open, move along.
           // TODO
-          // return  true;
+          return  true;
           // note: don't currently return true because that resets unsaved changes in open v
           //  but when we redo how the stores work, then that shouldn't happen.
         }
@@ -212,61 +248,33 @@ class Builder extends PureClasss<Props>
     return true;
   }
   
-  querySub: any;
+  // variantSub: any;
   schemaXhr: XMLHttpRequest;
-  loadTables(props:Props, query?:IQuery)
+  loadTables(props:Props)
   {
-    query = query || this.getSelectedQuery(props);
-    
-    if(!query)
+    // TODO consider moving this to a reducer, or its own monitoring component
+    const db = LibraryTypes.getDbFor(this.getVariant(props));
+    if(!db)
     {
-      var queryId = this.getSelectedId(props);
-      
-      if(this.querySub)
-      {
-        this.querySub();
-      }
-      
-      // query hasn't loaded yet
-      this.querySub = Store.subscribe(() => {
-        let state:BuilderState = Store.getState();
-        query = state.queries.get(queryId);
-        
-        if(query && this.querySub)
-        {
-          this.querySub();
-          this.querySub = null;
-          this.loadTables(null, query);
-        }
-      });
+      Actions.changeTables('', Immutable.List([]), Immutable.Map({}));
       return;
     }
-
-    let {db} = query;
-    if(db !== this.state.curDb)
+    
+    if(db !== this.state.builderState.db)
     {
       this.schemaXhr && this.schemaXhr.abort();
       this.schemaXhr = Ajax.schema(db, (tables: {name: string, columns: {name: string}[]}[]) => {
-        Actions.change(
-          Immutable.List(['tables']),
+        Actions.changeTables(
+          db,
           Immutable.List(tables.map(table => table.name)),
-          true // not dirty
-        );
-        Actions.change(
-          Immutable.List(['tableColumns']),
           tables.reduce(
-            (memo: Map<string, List<string>>, table: {name: string, columns: {name: string}[]}) =>
+            (memo: TableColumns, table: {name: string, columns: {name: string}[]}) =>
               memo.set(table.name, 
                 Immutable.List(table.columns.map(col => col.name))
               )
             , Immutable.Map({})
-          ),
-          true // not dirty
+          )
         );
-      });
-      
-      this.setState({
-        curDb: db,
       });
     }
   }
@@ -281,12 +289,6 @@ class Builder extends PureClasss<Props>
         this.props.router.setRouteLeaveHook(nextProps.route, this.routerWillLeave);
       }
       this.checkConfig(nextProps);
-    }
-    
-    if(this.getSelectedId() !== this.getSelectedId(nextProps))
-    {
-      // focused query changed
-      Actions.change(List(['isDirty']), false, true);
     }
     
     this.loadTables(nextProps);
@@ -333,19 +335,21 @@ class Builder extends PureClasss<Props>
       browserHistory.replace(`/builder/${newConfig}`);
     }
     localStorage.setItem('config', newConfig || '');
-    this.fetch(newConfig);
-  }
-  
-  fetch(config:string)
-  {
-    if(!config)
+    
+    const pieces = newConfig.split(',');
+    let variantId = pieces.find(
+      piece => piece.indexOf('!') === 0
+    )
+    if(variantId)
     {
-      return;
+      variantId = variantId.substr(1); // trim '!'
     }
     
-    Actions.fetch(Immutable.List(
-      config.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id)
-    ), this.handleNoVariant);
+    if(newConfig && (props === this.props || variantId !== this.getSelectedId(this.props)))
+    {
+      // need to fetch data for new query
+      Actions.fetchQuery(variantId, this.handleNoVariant);
+    }
   }
   
   handleNoVariant(variantId: ID)
@@ -373,42 +377,58 @@ class Builder extends PureClasss<Props>
     return selected && selected.substr(1);
   }
   
-  getSelectedQuery(props?:Props): IQuery
+  // loadingQuery = Types._Query({
+  //   loading: true,
+  //   name: 'Loading',
+  // });
+  
+  getQuery(props?:Props): Query
   {
-    return this.state.builder.queries.get(this.getSelectedId(props));
+    return this.state.builderState.query; // || this.loadingQuery;
   }
   
-  createAlgorithm()
+  getVariant(props?:Props): LibraryTypes.Variant
   {
-    // Actions.algorithm.create();
-  }
-  
-  duplicateAlgorithm()
-  {
-    // Actions.algorithm.duplicate(this.state.algorithmId);
-  }
-  
-  loadAlgorithm()
-  {
-    // Actions.algorithm.load(JSON.parse(prompt("Paste Algorithm state here")));
-  }
-  
-  tabActions = Immutable.List([
+    if(!this.state)
     {
-      text: 'Save',
-      icon: <SaveIcon />,
-      onClick: _.noop,
-      enabled: false,
-    },
-  ]);
-  tabActionsShouldSave = Immutable.List([
+      return null;
+    }
+    
+    let variantId = this.getSelectedId(props);
+    let variant = this.state.variants && 
+      this.state.variants.get(variantId);
+    if(variantId && !variant)
     {
-      text: 'Save',
-      icon: <SaveIcon />,
-      onClick: this.onSave,
-      enabled: true,
-    },
-  ]);
+      LibraryActions.variants.fetchVersion(variantId, () =>
+      {
+        // no version available
+        this.handleNoVariant(variantId);
+      });
+    }
+    return variant; // || this.loadingVariant;
+  }
+  
+  getTabActions(builderState:BuilderState): List<TabAction>
+  {
+    return Immutable.List([
+      {
+        text: 'Undo',
+        icon: null,
+        onClick: this.handleUndo,
+        enabled: !!builderState.pastQueries.size,
+      },
+      {
+        text: 'Redo',
+        icon: null,
+        onClick: this.handleRedo,
+        enabled: !!builderState.nextQueries.size,
+      },
+      {
+        text: 'Save',
+        icon: <SaveIcon />,
+        onClick: this.onSave,
+        enabled: this.shouldSave(builderState),
+      },
   //   {
   //     text: 'Duplicate',
   //     icon: <DuplicateIcon />,
@@ -419,12 +439,25 @@ class Builder extends PureClasss<Props>
   //     icon: <OpenIcon />,
   //     onClick: this.loadAlgorithm,
   //   },
+    ]);
+  }
+  
+  handleUndo()
+  {
+    Actions.undo();
+  }
+  
+  handleRedo()
+  {
+    Actions.redo();
+  }
+  
   
   onSave()
   {
-    if (this.getSelectedQuery().version) 
+    if(this.getVariant().version) 
     {
-      if (!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?')) 
+      if(!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?')) 
       {
         return;
       }
@@ -432,31 +465,25 @@ class Builder extends PureClasss<Props>
     this.save()
   }
   
-  onSaveSuccess()
+  onSaveSuccess(variant: Variant)
   {
     notificationManager.addNotification(
       'Saved',
-      this.getSelectedQuery().name,
+      variant.name,
       'info', 
       4
     );
     
-    //TODO remove when store changes
-    let v = this.state.builder.queries.get(this.getSelectedId());
-    if(LibraryStore.getState().getIn(['groups', v['groupId'], 'algorithms', v['algorithmId'], 'variants', v.id]))
-    {
-      LibraryActions.variants.change(v as LibraryTypes.Variant);
-    }
-    
-    console.log('action');
-    Actions.change(List(['isDirty']), false, true);
+    //TODO remove if queries/variants model changes
+    LibraryActions.variants.change(variant);
   }
 
-  onSaveError()
+  onSaveError(variant: Variant)
   {
+    Actions.save(false);
     notificationManager.addNotification(
       'Error Saving',
-      '"' + this.getSelectedQuery().name + '" failed to save.', 
+      '"' + variant.name + '" failed to save.', 
       'error', 
       0
     );
@@ -464,33 +491,35 @@ class Builder extends PureClasss<Props>
   
   shouldSave(overrideState?:BuilderState): boolean
   {
-    let query = this.getSelectedQuery();
-    if(query)
+    let variant = this.getVariant();
+    if(variant)
     {
-      if(query.status === LibraryTypes.EVariantStatus.Live)
+      if(variant.status === LibraryTypes.EVariantStatus.Live)
       {
         return false;
       }
       if(
-        !Util.haveRole(query.groupId, 'builder', UserStore, RolesStore)
-        && !Util.haveRole(query.groupId, 'admin', UserStore, RolesStore)
+        !Util.haveRole(variant.groupId, 'builder', UserStore, RolesStore)
+        && !Util.haveRole(variant.groupId, 'admin', UserStore, RolesStore)
       ) {
         // not auth
         return false;
       }
     }
     
-    return (overrideState || this.state.builder).isDirty;
+    return (overrideState || this.state.builderState).isDirty;
   }
   
   save()
   {
-    let query = this.getSelectedQuery();
+    let variant = LibraryTypes.touchVariant(this.getVariant());
+    variant = variant.set('query', this.getQuery());
     Ajax.saveItem(
-      LibraryTypes.variantForSave(query as LibraryTypes.Variant),
-      this.onSaveSuccess,
-      this.onSaveError
+      LibraryTypes.variantForSave(variant),
+      this.onSaveSuccess.bind(this, variant),
+      this.onSaveError.bind(this, variant)
     );
+    Actions.save();
     
     var configArr = window.location.pathname.split('/')[2].split(',');
     var currentVariant;
@@ -537,32 +566,58 @@ class Builder extends PureClasss<Props>
     localStorage.setItem('colSizes', JSON.stringify(adjustments));
   }
   
+  canEdit(): boolean
+  {
+    let variant = this.getVariant();
+    return variant && (variant.status === LibraryTypes.EVariantStatus.Build
+      && Util.canEdit(variant, UserStore, RolesStore))
+  }
+  
+  cantEditReason(): string
+  {
+    let variant = this.getVariant();
+    if(!variant || this.canEdit())
+    {
+      return '';
+    }
+    if(variant.status !== LibraryTypes.EVariantStatus.Build)
+    {
+      return 'This Variant is not in Build status';
+    } 
+    return 'You are not authorized to edit this Variant';
+  }
+  
   getColumn(index)
   {
     let key = this.state.colKeys.get(index);
-    let query = this.getSelectedQuery();
+    let query = this.getQuery();
+    let variant = this.getVariant();
+ 
+    
     return {
       minWidth: 316,
       resizeable: true,
       resizeHandleRef: 'resize-handle',
       content: query && <BuilderColumn
+        query={query}
         index={index}
         colKey={key}
-        query={query}
+        variant={variant}
         onAddColumn={this.handleAddColumn}
         onAddManualColumn={this.handleAddManualColumn}
         onCloseColumn={this.handleCloseColumn}
         canAddColumn={this.state.colKeys.size < 3}
         canCloseColumn={this.state.colKeys.size > 1}
-        onRevert={this.save}
         columnType={this.state.columnType}
         selectedCardName={this.state.selectedCardName}
         switchToManualCol={this.switchToManualCol}
         changeSelectedCardName={this.changeSelectedCardName}
+        canEdit={this.canEdit()}
+        cantEditReason={this.cantEditReason()}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key,
-    }
+    };
   }
 
   switchToManualCol(index)
@@ -602,7 +657,7 @@ class Builder extends PureClasss<Props>
 
   handleAddManualColumn(index, selectedCardName?)
   {
-    if(this.state.manualIndex !== -1) //Manual column already open
+    if(this.state.manualIndex !== -1) // Manual column already open
     {
       this.setState({
         selectedCardName
@@ -660,6 +715,43 @@ class Builder extends PureClasss<Props>
     }), 250);
   }
   
+  revertVersion()
+  {
+    if(confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.')) 
+    {
+      this.save();
+    }
+  }
+
+  renderVersionToolbar()
+  {
+    let variant = this.getVariant();
+
+    if(variant && variant.version)
+    {
+      var lastEdited = moment(variant.lastEdited).format("h:mma on M/D/YY")
+      return (
+        <div className='builder-revert-toolbar'> 
+          <div className='builder-revert-time-message'>
+            Version from {lastEdited}
+          </div>
+          <div className='builder-white-space'/>
+          {
+            this.canEdit() &&
+              <div 
+                className='button builder-revert-button' 
+                onClick={this.revertVersion}
+                data-tip="Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history."
+              >
+                Revert to this version
+              </div>
+           }
+        </div>
+      );
+    }
+    return null;
+  }
+  
   goToLibrary()
   {
     browserHistory.push('/library');
@@ -695,7 +787,8 @@ class Builder extends PureClasss<Props>
 	render()
   {
     let config = this.props.params.config;
-    let query = this.getSelectedQuery();
+    let variant = this.getVariant();
+    let query = this.getQuery();
 
     return (
       <div className={classNames({
@@ -713,20 +806,22 @@ class Builder extends PureClasss<Props>
           :
             <div>
               <Tabs
-                actions={
-                  this.shouldSave() ? this.tabActionsShouldSave : this.tabActions
-                }
+                actions={this.state.tabActions}
                 config={config}
                 ref='tabs'
+                onNoVariant={this.handleNoVariant}
               />
               <div className='tabs-content'>
+                {
+                  this.renderVersionToolbar()
+                }
                 <LayoutManager layout={this.getLayout()} moveTo={this.moveColumn} />
               </div>
             </div>
         }
         <Modal
           open={this.state.leaving}
-          message={'Save changes' + (query ? ' to ' + query.name : '') + ' before leaving?'}
+          message={'Save changes' + (variant ? ' to ' + variant.name : '') + ' before leaving?'}
           title='Unsaved Changes'
           confirmButtonText='Save'
           confirm={true}
