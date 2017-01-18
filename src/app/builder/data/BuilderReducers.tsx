@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import LibraryTypes from './../../library/LibraryTypes.tsx';
-import BuilderTypes from './../BuilderTypes.tsx';
+import {BuilderTypes} from './../BuilderTypes.tsx';
 import Ajax from './../../util/Ajax.tsx';
 import ActionTypes from './BuilderActionTypes.tsx';
 import Actions from './BuilderActions.tsx';

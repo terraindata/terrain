@@ -81,6 +81,7 @@ import Ajax from "./../../util/Ajax.tsx";
 import InfoArea from '../../common/components/InfoArea.tsx';
 import {notificationManager} from './../../common/components/InAppNotification.tsx'
 import Modal from '../../common/components/Modal.tsx';
+import {BuilderCoordinator} from './../data/BuilderCoordinator.tsx';
 
 var NewIcon = require("./../../../images/icon_new_21x17.svg?name=NewIcon");
 var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
@@ -127,11 +128,13 @@ class Builder extends PureClasss<Props>
     tabActions: this.getTabActions(BuilderStore.getState()),
   };
   
+  builderCoordinator = new BuilderCoordinator();
   initialColSizes: any;
-  
+
   constructor(props:Props)
   {
     super(props);
+    
     
     this._subscribe(BuilderStore, {
       stateKey: 'builderState',
@@ -141,11 +144,21 @@ class Builder extends PureClasss<Props>
             builderState.query !== this.state.builderState.query
             || builderState.pastQueries !== this.state.builderState.pastQueries
             || builderState.nextQueries !== this.state.builderState.nextQueries
+            || builderState.isDirty !== this.state.builderState.isDirty
           )
         {
           this.setState({
             tabActions: this.getTabActions(builderState),
           });
+        }
+        
+        if(
+          builderState.query 
+          && this.state.builderState.query 
+          && builderState.query.mode === 'tql' 
+          && builderState.query.tql !== this.state.builderState.query.tql
+        ) {
+          this.builderCoordinator.handleTQLChange(builderState.query.tql);
         }
       }
     });
@@ -507,7 +520,7 @@ class Builder extends PureClasss<Props>
       }
     }
     
-    return (overrideState || this.state.builderState).isDirty;
+    return !!(overrideState || this.state.builderState).isDirty;
   }
   
   save()

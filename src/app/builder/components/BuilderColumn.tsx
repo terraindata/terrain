@@ -219,14 +219,6 @@ var BuilderColumn = React.createClass<any, any>(
     switch(this.state.column)
     {
       case COLUMNS.Builder:
-        if (this.props.query.mode === "tql")
-        {
-          return <InfoArea
-             large= "TQL Mode"
-             small= "This Variant is in TQL mode, so it doesn’t use Cards. To restore this Variant to its last Card state, change it to Cards mode in the TQL column."
-          />;
-        }
-        
         return <CardsColumn 
           cards={query.cards} 
           deckOpen={query.deckOpen}

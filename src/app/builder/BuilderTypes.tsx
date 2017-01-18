@@ -49,14 +49,12 @@ let List = Immutable.List;
 let L = () => List([]);
 let Map = Immutable.Map;
 
-import ScoreBar from './components/charts/ScoreBar.tsx';
 import TransformCardComponent from './components/charts/TransformCard.tsx';
+import ScoreBar from './components/charts/ScoreBar.tsx';
 import Store from './data/BuilderStore.tsx';
-import Actions from './data/BuilderActions.tsx';
 import Util from '../util/Util.tsx';
-import {_IResultsConfig} from './components/results/ResultsConfig.tsx';
 
-// Interestingly, these have to be above the BuilderDisplays import
+// These have to be above the BuilderDisplays import
 //  since the import itself imports them
 export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
@@ -64,7 +62,6 @@ export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span classN
 
 import {Display, DisplayType, valueDisplay, letVarDisplay, getCardStringDisplay, firstSecondDisplay, wrapperDisplay, wrapperSingleChildDisplay, stringValueDisplay} from './BuilderDisplays.tsx';  
 var ManualConfig = require('./../manual/ManualConfig.json');
-import {IResultsConfig} from "./components/results/ResultsConfig.tsx";
 
 export module BuilderTypes
 {
@@ -1576,6 +1573,10 @@ export module BuilderTypes
     return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, "");
   }
 }
+
+import Actions from './data/BuilderActions.tsx';
+import {IResultsConfig, _IResultsConfig} from "./components/results/ResultsConfig.tsx";
+
 
 export default BuilderTypes;
 

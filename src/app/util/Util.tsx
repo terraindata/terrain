@@ -413,6 +413,18 @@ var Util = {
     });
   },
   
+  bindAll(instance, Clss?: { prototype: any })
+  {
+    for(var m in instance)
+    {
+      // auto-bind child methods to this
+      if((!Clss || !Clss.prototype[m]) && typeof instance[m] === 'function')
+      {
+        instance[m] = instance[m].bind(instance);
+      }
+    }
+    
+  },
   
   bind(component: React.Component<any, any>, ...args: any[])
   {

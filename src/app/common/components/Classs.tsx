@@ -66,14 +66,7 @@ class Classs<T> extends React.Component<T, any>
   {
     super(props);
     
-    for(var m in this)
-    {
-      // auto-bind child methods to this
-      if(!Classs.prototype[m] && typeof this[m] === 'function')
-      {
-        this[m] = this[m].bind(this);
-      }
-    }
+    Util.bindAll(this, Classs);
     
     let unmountFn = this['componentWillUnmount'];
     this['componentWillUnmount'] = () =>
