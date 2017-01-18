@@ -207,7 +207,7 @@ class Classs<T> extends React.Component<T, any>
   } = {};
   _fn(instanceFn: (...args:any[]) => any, ...args: any[]): (...args:any[]) => any
   {
-    let fnName = instanceFn.name;
+    let fnName = instanceFn['name'];
     var fns = this._fns[fnName];
     if(!fns)
     {

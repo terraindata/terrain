@@ -184,7 +184,7 @@ class TQLResultsBar extends PureClasss<Props>
       let line = matches && matches.length >= 2 && parseInt(matches[1]);
       
       this.setState({
-        error: error.substr(0, error.length - 1),
+        error: error.substr(0, error.length - 1).replace(/MySQL/g, 'TerrainDB'),
         errorLine: line,
         querying: false,
         results: null,
