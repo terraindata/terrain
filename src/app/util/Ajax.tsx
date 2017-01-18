@@ -393,7 +393,7 @@ export const Ajax = {
     );
   },
   
-  parseTree(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev:Event) => void, sqlQuery?: boolean)
+  parseTree(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev:Event) => void)
   {
     return Ajax._r("/get_tql_tree", {
         "query_string": encode_utf8(tql),

@@ -362,6 +362,7 @@ class ResultsArea extends PureClasss<Props>
   
   handleCountResponse(response:QueryResponse)
   {
+    this.countXhr = null;
     let results = response.resultSet;
     if(results)
     {
@@ -390,6 +391,7 @@ class ResultsArea extends PureClasss<Props>
   
   handleCountError()
   {
+    this.countXhr = null;
     this.setState({
       resultsCount: -1,
     })
@@ -497,6 +499,7 @@ class ResultsArea extends PureClasss<Props>
   
   handleAllFieldsError()
   {
+    this.allXhr = null;
     this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
@@ -535,8 +538,7 @@ class ResultsArea extends PureClasss<Props>
           tql, 
           this.props.db,
           this.handleAllFieldsResponse,
-          this.handleAllFieldsError,
-          true
+          this.handleAllFieldsError
         );
       }
       else 
@@ -545,12 +547,11 @@ class ResultsArea extends PureClasss<Props>
           TQLConverter.toTQL(query, {
             allFields: true,
             transformAliases: true,
-            // limit: pages * RESULTS_PAGE_SIZE,
+            limit: pages * RESULTS_PAGE_SIZE,
           }), 
           this.props.db,
           this.handleAllFieldsResponse,
-          this.handleAllFieldsError,
-          true
+          this.handleAllFieldsError
         );
         
         this.countXhr = Ajax.query(
