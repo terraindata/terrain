@@ -141,6 +141,7 @@ class Builder extends PureClasss<Props>
             builderState.query !== this.state.builderState.query
             || builderState.pastQueries !== this.state.builderState.pastQueries
             || builderState.nextQueries !== this.state.builderState.nextQueries
+            || builderState.isDirty !== this.state.builderState.isDirty
           )
         {
           this.setState({
@@ -507,7 +508,7 @@ class Builder extends PureClasss<Props>
       }
     }
     
-    return (overrideState || this.state.builderState).isDirty;
+    return !!(overrideState || this.state.builderState).isDirty;
   }
   
   save()

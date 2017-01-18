@@ -384,7 +384,6 @@ var CodeMirror = React.createClass({
       }
       if(typeof nextProps.highlightedLine === 'number')
       {
-        console.log('highlight', nextProps.highlightedLine);
         this.updateHighlightedLine(nextProps.highlightedLine);
       }
     }
