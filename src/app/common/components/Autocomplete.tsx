@@ -64,7 +64,7 @@ interface Props
   disabled?: boolean;
   
   onFocus?: (event:React.FocusEvent) => void;
-  onBlur?: (event:React.FocusEvent) => void;
+  onBlur?: (event:React.FocusEvent, value: string) => void;
 }
 
 class Autocomplete extends PureClasss<Props>
@@ -123,14 +123,15 @@ class Autocomplete extends PureClasss<Props>
     this.props.onFocus && this.props.onFocus(event);
   }
   
+  blurValue: string = '';
   handleBlur(event:React.FocusEvent)
   {
     this.setState({
       open: false,
       selectedIndex: -1,
     });
-    
-    this.props.onBlur && this.props.onBlur(event);
+    this.props.onBlur && this.props.onBlur(event, this.blurValue || this.state.value);
+    this.blurValue = '';
   }
   
   handleSelect(value)
@@ -200,6 +201,7 @@ class Autocomplete extends PureClasss<Props>
           selectedIndex: -1,
           value,
         });
+        this.blurValue = value;
         this.props.onChange(value);
         this.refs['input']['blur']();
         break;

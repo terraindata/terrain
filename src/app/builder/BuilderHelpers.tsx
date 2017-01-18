@@ -55,13 +55,15 @@ export module BuilderHelpers
     let terms = getTermsForKeyPathHelper(keyPath, state);
     
     // TODO migrate inputs reduction to the Query class if we get a query class
-    let inputs = state.getIn((keyPath.take(2) as KeyPath).push('inputs'));
+    let inputs = state.query && state.query.inputs;
     if(inputs && inputs.size)
     {
-      let inputTerms = inputs.map((input:BuilderTypes.IInput) => 'input.' + input.key);
+      let inputTerms = inputs.map(
+        (input:BuilderTypes.IInput) => 'input.' + input.key
+      ).toList();
       if(terms)
       {
-        return inputTerms.concat(terms);
+        return inputTerms.concat(terms).toList();
       }
       return inputTerms;
     }

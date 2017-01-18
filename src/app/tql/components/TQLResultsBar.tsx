@@ -248,6 +248,12 @@ class TQLResultsBar extends PureClasss<Props>
       });
       this.xhr = Ajax.query(tql, this.props.db, this.handleResultsChange, this.handleError);
     }
+    else
+    {
+      this.setState({
+        results: null,
+      });
+    }
   }
   
 	render()

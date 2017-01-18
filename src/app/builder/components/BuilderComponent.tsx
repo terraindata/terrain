@@ -80,7 +80,7 @@ class BuilderComponent extends PureClasss<Props>
 {
   addRow(keyPath: KeyPath, index: number, display: Display)
   {
-    BuilderActions.create(keyPath, index, display.factoryType);
+    BuilderActions.create(keyPath, index + 1, display.factoryType);
   }
   removeRow(keyPath: KeyPath, index: number)
   {

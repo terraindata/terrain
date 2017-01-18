@@ -55,6 +55,7 @@ import Store from './data/BuilderStore.tsx';
 import Actions from './data/BuilderActions.tsx';
 import Util from '../util/Util.tsx';
 import {_IResultsConfig} from './components/results/ResultsConfig.tsx';
+import {OperatorsTQL} from '../tql/TQLConverter.tsx';
 
 // Interestingly, these have to be above the BuilderDisplays import
 //  since the import itself imports them
@@ -784,6 +785,7 @@ export module BuilderTypes
             {
               displayType: DisplayType.TEXT,
               key: 'alias',
+              autoDisabled: true,
             },
           ], 
           
@@ -852,17 +854,20 @@ export module BuilderTypes
             second = getPreview(second);
           }
           
-          return `${first} ${Operators[c['operator']]} ${second}`
+          return `${first} ${OperatorsTQL[c['operator']]} ${second}`
         },
         tql: "$first $OPERATOR $second",
         
-        display: firstSecondDisplay({
-          displayType: DisplayType.DROPDOWN,
-          key: 'operator',
-          options: Immutable.List(Operators),
-          help: ManualConfig.help["operator"],
-          centerDropdown: true,
-        }, List(['sfw'])),
+        display: firstSecondDisplay(
+          {
+            displayType: DisplayType.DROPDOWN,
+            key: 'operator',
+            options: Immutable.List(Operators),
+            help: ManualConfig.help["operator"],
+            centerDropdown: true,
+          }, 
+          List(['sfw', 'exists'])
+        ),
         manualEntry: ManualConfig.cards['filter'],
       },
     }),
