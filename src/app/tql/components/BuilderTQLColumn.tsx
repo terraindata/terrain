@@ -113,6 +113,7 @@ class BuilderTQLColumn extends PureClasss<Props>
   {
     super(props);
     this.executeCode = _.debounce(this.executeCode, 1000);
+    console.log(this.state.code, this.props.query);
   }
 
   //This function should be here, but whenever executeCode is called, the cards/tql
@@ -129,7 +130,10 @@ class BuilderTQLColumn extends PureClasss<Props>
   {
     if(!this.state.focused && nextProps.query.tql !== this.state.code && nextProps.query.mode === 'tql')
     {
-      this.updateCode(nextProps.query.tql);
+      if(this.props.query.mode === nextProps.query.mode)
+      {
+        this.updateCode(nextProps.query.tql);
+      }
     }
   }
 

@@ -299,11 +299,13 @@ class Builder extends PureClasss<Props>
   {
     let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query && props.location.query.o;
+    console.log('open', open);
     let originalConfig = props.params.config || storedConfig;
     let newConfig = originalConfig;
-    
+    console.log('original', originalConfig);
     if(open)
     {
+      console.log('got open');
       if(!storedConfig || storedConfig === 'undefined' || storedConfig === '')
       {
         // no stored config, just load the open tab.
@@ -322,19 +324,22 @@ class Builder extends PureClasss<Props>
         
         newConfig = configArr.join(',');
       }
-    }
+      console.log('resulted in', newConfig);
+    } else console.log('no open');
     
     if(newConfig && newConfig.length && !newConfig.split(',').some(c => c.substr(0,1) === '!'))
     {
       newConfig = '!' + newConfig;
+      console.log('highlight new');
     }
     
     if(newConfig !== props.params.config 
       && (props.params.config !== undefined || newConfig.length)
       )
     {
+      console.log('replace config', props.params.config, newConfig.length);
       browserHistory.replace(`/builder/${newConfig}`);
-    }
+    } else console.log('dont replace', props.params.config, newConfig.length);
     localStorage.setItem('config', newConfig || '');
     
     const pieces = newConfig.split(',');
