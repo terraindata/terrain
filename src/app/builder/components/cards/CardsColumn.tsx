@@ -181,17 +181,21 @@ class CardsColumn extends PureClasss<Props>
     let {props} = this;
     let {cards, canEdit} = props;
     let {keyPath} = this.state;
+    let canHaveDeck = canEdit;
     
     return (
       <div
         className={classNames({
           'cards-column': true,
-          'cards-column-deck-open': this.props.deckOpen,
+          'cards-column-deck-open': canHaveDeck && this.props.deckOpen,
         })}
       >
-        <CardsDeck
-          open={this.props.deckOpen}
-        />
+        {
+          canHaveDeck &&
+            <CardsDeck
+              open={this.props.deckOpen}
+            />
+        }
         <div
           className='cards-column-cards-area'
           onScroll={this.handleScroll}
@@ -230,17 +234,20 @@ class CardsColumn extends PureClasss<Props>
             }
           </div>
         </div>
-        <div
-          className='cards-deck-knob'
-          onClick={this.toggleDeck}
-        >
-          <ExpandIcon
-            className='cards-deck-knob-icon'
-          />
-          <div className='cards-deck-knob-text'>
-              Card Deck
-          </div>
-        </div>
+        {
+          canHaveDeck &&
+            <div
+              className='cards-deck-knob'
+              onClick={this.toggleDeck}
+            >
+              <ExpandIcon
+                className='cards-deck-knob-icon'
+              />
+              <div className='cards-deck-knob-text'>
+                  Card Deck
+              </div>
+            </div>
+        }
       </div>
     );
   }

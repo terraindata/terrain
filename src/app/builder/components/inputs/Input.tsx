@@ -209,11 +209,13 @@ var Input = React.createClass<any, any>({
 		return (
 			<div className='input' ref='input'>
         {
-          this.props.canEdit &&
+          this.props.canEdit ?
             <CreateLine 
               open={false} 
               onClick={this.createInput} 
             />
+          :
+            <div className='input-spacing' />
         }
         <div className='input-inner'>
           <div className='input-top-row'>

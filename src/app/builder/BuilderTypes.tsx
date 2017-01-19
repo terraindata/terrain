@@ -828,7 +828,7 @@ export module BuilderTypes
       tql: '(\n$cards\n)',
       tqlGlue: '\nOR\n',
       manualEntry: ManualConfig.cards.or,
-      colors: ["#476aa3", "#a5c6fc"],
+      colors: ["#b161bc", "#f8cefe"],
       accepts: List(['and', 'comparison', 'exists']),
     }),
    
@@ -841,7 +841,7 @@ export module BuilderTypes
       static:
       {
         title: "Compare",
-        colors: ["#b161bc", "#f8cefe"],
+        colors: ["#476aa3", "#a5c6fc"],
         preview: (c:ICard) => {
           var first = c['first'];
           var second = c['second'];
@@ -1357,8 +1357,8 @@ export module BuilderTypes
       Blocks.exists,
     ],
     [
-      Blocks.var,
-      Blocks.let,
+      // Blocks.var,
+      // Blocks.let,
       Blocks.transform,
       Blocks.score,
     ],
