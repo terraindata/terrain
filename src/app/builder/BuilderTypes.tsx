@@ -893,7 +893,7 @@ export module BuilderTypes
           }
           return sorts.size + ' Factors';
         },
-        colors: ["#659f72", "#c4e1ca"],
+        colors: ["#39918b", "#99e4df"],
         manualEntry: ManualConfig.cards['sort'],
         tql: "ORDER BY $sorts",        
         
@@ -1210,7 +1210,7 @@ export module BuilderTypes
     
     take: _valueCard(
     {
-      colors: ["#4b977e", "#c4e1ca"],
+      colors: ["#2e8c9a", "#8adeea"],
       title: "Limit",
       manualEntry: ManualConfig.cards['take'],
       tql: "LIMIT $value",
@@ -1219,7 +1219,7 @@ export module BuilderTypes
     
     skip: _valueCard(
     {
-      colors: ["#39918b", "#99e4df"],
+      colors: ["#2588aa", "#a2e5fc"],
       title: "Offset",
       manualEntry: ManualConfig.cards['skip'],
       tql: "OFFSET $value",
@@ -1233,7 +1233,7 @@ export module BuilderTypes
       static:
       {
         manualEntry: ManualConfig.cards['sfw'], // TODO
-        colors: ["#2e8c9a", "#8adeea"],
+        colors: ["#659f72", "#c4e1ca"],
         title: "Group By",
         preview: "[fields.field]",
         tql: "GROUP BY\n$fields",
@@ -1263,7 +1263,7 @@ export module BuilderTypes
     
     having: _wrapperCard({
       title: "Having",
-      colors: ["#2588aa", "#a2e5fc"],
+      colors: ["#4b977e", "#c4e1ca"],
       tql: "HAVING\n$cards",
       manualEntry: ManualConfig.cards.where, // TODO
       
@@ -1344,11 +1344,11 @@ export module BuilderTypes
     ],
     [
       Blocks.where,
+      Blocks.groupBy,
+      Blocks.having,
       Blocks.sort,
       Blocks.take,
       Blocks.skip,
-      Blocks.groupBy,
-      Blocks.having,
     ],
     [
       Blocks.comparison,

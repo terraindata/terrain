@@ -367,6 +367,7 @@ export const Ajax = {
     return Ajax._req("POST", `/${type}s/${id}`, JSON.stringify(obj), onLoad, onError);
   },
   
+  // run query, consider renaming
   query(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev:Event) => void, sqlQuery?: boolean)
   {
     // kill queries running under the same id
@@ -381,6 +382,7 @@ export const Ajax = {
       {
         var respData = null;
         try {
+          resp = resp.replace(/\t/g, ' ').replace(/\n/g, ' ');
           respData = JSON.parse(resp);
         } catch(e) {
           onError && onError(resp as any);
