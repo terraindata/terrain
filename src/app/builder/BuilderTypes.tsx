@@ -658,12 +658,21 @@ export module BuilderTypes
             factoryType: 'table',
             row: 
             {
+              below: 
+              {
+                displayType: DisplayType.CARDSFORTEXT,
+                key: 'table',
+                accepts: List(['sfw']),
+              },
+              noDataPadding: true,
               inner:
               [  
                 {
-                  displayType: DisplayType.TEXT,
-                  help: ManualConfig.help["table"],
+                  displayType: DisplayType.CARDTEXT,
                   key: 'table',
+                  help: ManualConfig.help["table"],
+                  accepts: List(['sfw']),
+                  showWhenCards: true,
                   getAutoTerms: (comp:React.Component<any, any>) => 
                   {
                     let tables = Store.getState().get('tables');
