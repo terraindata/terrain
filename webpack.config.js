@@ -84,8 +84,8 @@ module.exports = {
     ],
     historyApiFallback: {
       rewrites: [
-          // shows favicon
-          { from: /favicon.ico/, to: 'favicon.ico' },
+        // shows favicon
+        { from: /favicon.ico/, to: 'favicon.ico' },
       ],
     },
 };

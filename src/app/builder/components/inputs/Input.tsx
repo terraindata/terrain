@@ -204,8 +204,8 @@ var Input = React.createClass<any, any>({
     Util.animateToAutoHeight(this.refs.input);
   },
 
-	render() {
-    // return this.renderPanel((
+	render() 
+  {
 		return (
 			<div className='input' ref='input'>
         {

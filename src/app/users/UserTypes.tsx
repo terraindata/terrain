@@ -127,6 +127,20 @@ export module UserTypes
     users: UserMap;
     currentUser: User;
   }
+  
+  export function profileUrlFor(user:User): string
+  {
+    if(user && user.imgSrc)
+    {
+      return user.imgSrc;
+    }
+    
+    let code = (user ? user.username : 'a').charCodeAt(0);
+    let index = (code % numProfileImages) + 1;
+    return '/dist/profiles/profile' + index + '.jpg';
+  }
 }
+
+const numProfileImages = 9;
 
 export default UserTypes;
