@@ -547,7 +547,7 @@ class ResultsArea extends PureClasss<Props>
           TQLConverter.toTQL(query, {
             allFields: true,
             transformAliases: true,
-            limit: pages * RESULTS_PAGE_SIZE,
+            limit: MAX_RESULTS,
           }), 
           this.props.db,
           this.handleAllFieldsResponse,

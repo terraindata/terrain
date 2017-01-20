@@ -182,16 +182,17 @@ export class Menu extends PureClasss<Props>
       >
         <MoreIcon className="menu-icon" />
        </div>
-        { !this.state.open ? null :
-          <div 
-            className="menu-options-wrapper"
-            style={style} 
-            onClick={this.toggleOpen}
-          >
-            {
-              options.map(this.renderOption)
-            }
-          </div>
+        { 
+          this.state.open &&
+            <div 
+              className="menu-options-wrapper"
+              style={style} 
+              onClick={this.toggleOpen}
+            >
+              {
+                options.map(this.renderOption)
+              }
+            </div>
         }
       </div>
     );

@@ -73,12 +73,10 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       if(variantId === state.loadingVariantId)
       {
         // still loading the same variant
-        console.log('still loading same');
         return state;
       }
       
       // abort the previous request
-      console.log('loadingXHR still in play', action.payload.variantId);
       state.loadingXhr.abort();
     }
     
@@ -117,7 +115,6 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     if(state.loadingXhr !== action.payload.xhr)
     {
       // wrong XHR
-      console.log('wrong xhr loaded', state.loadingXhr, action.payload.xhr);
       return state;
     }
     

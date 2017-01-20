@@ -297,7 +297,7 @@ class TransformCard extends PureClasss<Props>
   handleQueryResponse(response: QueryResponse)
   {
     let results = response.resultSet;
-    if(results.length)
+    if(results && results.length)
     {
       let max = +results[0].value;
       let min = +results[0].value;
@@ -342,7 +342,7 @@ class TransformCard extends PureClasss<Props>
         {
           i = NUM_BARS - 1;
         }
-        if(i < 0 || i > NUM_BARS)
+        if(i < 0 || i >= bars.length)
         {
           // out of bounds for our custom domain
           return;
@@ -369,7 +369,7 @@ class TransformCard extends PureClasss<Props>
   
   handleQueryError(error: any)
   {
-    console.log('Transform card query error');
+    
   }
   
   handleDomainChange(domain: List<number>)

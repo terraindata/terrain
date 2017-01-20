@@ -93,6 +93,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     cardName: string;
     termDefinitionOpen: boolean;
     termDefinitionPos: any;
+    resultsBarOpen: boolean;
   } = {
     tql: null,
     code: this.props.query.mode === 'tql' ? this.props.query.tql : TQLConverter.toTQL(this.props.query),
@@ -106,7 +107,8 @@ class BuilderTQLColumn extends PureClasss<Props>
     syntaxHelpPos: {},
     cardName: '',
     termDefinitionOpen: false,
-    termDefinitionPos: {}
+    termDefinitionPos: {},
+    resultsBarOpen: false,
   };
 
   constructor(props: Props) 
@@ -129,7 +131,10 @@ class BuilderTQLColumn extends PureClasss<Props>
   {
     if(!this.state.focused && nextProps.query.tql !== this.state.code && nextProps.query.mode === 'tql')
     {
-      this.updateCode(nextProps.query.tql);
+      if(this.props.query.mode === nextProps.query.mode)
+      {
+        this.updateCode(nextProps.query.tql);
+      }
     }
   }
 
@@ -452,7 +457,7 @@ class BuilderTQLColumn extends PureClasss<Props>
        confirmModalOpen: !this.state.confirmModalOpen,
     });
   }
-
+  
   render() 
   {
     var manualEntry = BuilderTypes.cardList[this.state.cardName] &&
@@ -463,6 +468,7 @@ class BuilderTQLColumn extends PureClasss<Props>
         className={classNames({
           'tql-column': true,
           [this.state.theme + '-tql-theme']: true,
+          'tql-column-results-bar-open': this.state.resultsBarOpen,
         })}
       >
         { 
@@ -501,6 +507,8 @@ class BuilderTQLColumn extends PureClasss<Props>
             onError={this.highlightError}
             onLoadStart={this.props.onLoadStart}
             onLoadEnd={this.props.onLoadEnd}
+            open={this.state.resultsBarOpen}
+            onToggle={this._toggle('resultsBarOpen')}
           />
         </div>
         

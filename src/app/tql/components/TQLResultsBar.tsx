@@ -59,6 +59,8 @@ interface Props
   onLoadStart: () => void;
   onLoadEnd: () => void;
   db: string;
+  open: boolean;
+  onToggle: () => void;
 }
 
 class TQLResultsBar extends PureClasss<Props>
@@ -66,16 +68,16 @@ class TQLResultsBar extends PureClasss<Props>
   xhr = null;
   
   state: {
-    open: boolean;
     results: any[];
-    error: any;
+    error: boolean;
+    mainErrorMessage?: string;
+    subErrorMessage?: string;
     querying: boolean;
     resultsSpliced: number;
     errorLine: number;
   } = {
-    open: false,
     results: null,
-    error: null,
+    error: false,
     querying: false,
     resultsSpliced: 0,
     errorLine: NaN,
@@ -101,39 +103,22 @@ class TQLResultsBar extends PureClasss<Props>
 
     if(this.state.error)
     {
-      if(typeof this.state.error !== 'string')
-      {
-        return (
-          <div>
-            <span className="error-title">
-              { JSON.stringify(this.state.error) }
-            </span>
-          </div>
-        );
-      }
-      
-      if(this.state.errorLine !== NaN)
-      {
-        var mainMessage = this.state.errorLine ? 'Error on line ' + this.state.errorLine + ': ' : this.state.error;
-        var subMessage =this.state.error;
-        this.props.onError(this.state.errorLine);
-      }
-      else
-      {
-        var mainMessage = this.state.error;
-        var subMessage = null;
-      }
-      
-              // <span className="error-detail">
-              //   {this.state.showErrorMessage ? '\u25BC ' : '\u25B6 '}
-              // </span>
       return (
         <div>
+          <span className="error-detail">
+            {
+              this.props.open ? '\u25BC ' : '\u25B6 '
+            }
+          </span>
           <span className="error-title">
-            { mainMessage }
+            { 
+              this.state.mainErrorMessage 
+            }
           </span>
           <span className="error-message">
-            { subMessage }
+            { 
+              this.state.subErrorMessage 
+            }
           </span>
         </div>
       );
@@ -180,11 +165,26 @@ class TQLResultsBar extends PureClasss<Props>
     if(response.error)
     {
       let {error} = response;
+      error = error.substr(0, error.length - 1).replace(/MySQL/g, 'TerrainDB');
       let matches = error.match(/([0-9]+)\:[0-9]+/);
       let line = matches && matches.length >= 2 && parseInt(matches[1]);
       
+      if(line !== NaN)
+      {
+        var mainErrorMessage = 'Error on line ' + line + ': ';
+        var subErrorMessage = error;
+        this.props.onError(line);
+      }
+      else
+      {
+        var mainErrorMessage = error;
+        var subErrorMessage: string = null;
+      }
+      
       this.setState({
-        error: error.substr(0, error.length - 1).replace(/MySQL/g, 'TerrainDB'),
+        error: true,
+        mainErrorMessage,
+        subErrorMessage,
         errorLine: line,
         querying: false,
         results: null,
@@ -217,6 +217,7 @@ class TQLResultsBar extends PureClasss<Props>
         results,
         querying: false,
         error: false,
+        errorLine: null,
         resultsSpliced: spliced,
       });
     }
@@ -240,6 +241,7 @@ class TQLResultsBar extends PureClasss<Props>
   
   queryResults(tql)
   {
+    this.xhr && this.xhr.abort();
     if(tql) 
     {
       this.props.onLoadStart && this.props.onLoadStart();
@@ -247,6 +249,12 @@ class TQLResultsBar extends PureClasss<Props>
         querying: true,
       });
       this.xhr = Ajax.query(tql, this.props.db, this.handleResultsChange, this.handleError);
+    }
+    else
+    {
+      this.setState({
+        results: null,
+      });
     }
   }
   
@@ -256,9 +264,9 @@ class TQLResultsBar extends PureClasss<Props>
       <div
         className={classNames({
           'tql-results-bar': true,
-          'tql-results-bar-open': this.state.open,
+          'tql-results-bar-open': this.props.open,
         })}
-        onClick={this._toggle('open')}
+        onClick={this.props.onToggle}
       >
         <div className='tql-results-bar-inner'>
           {

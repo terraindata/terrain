@@ -149,17 +149,16 @@ class Profile extends Classs<Props>
 
   handleSave() 
   {
-    var newUser = this.state.user
-      .set('imgSrc', this.refs['profilePicImg']['src']);
+    var newUser = this.state.user;
     this.infoKeys.map(infoKey => {
-      newUser = newUser.set(infoKey.key, this.refs[infoKey.key]['value']);
+      newUser = newUser.set(infoKey.key, this.refs[infoKey.key]['value']) as UserTypes.User;
     });
 
     Actions.change(newUser as UserTypes.User);
 
     this.setState({
       saving: true,
-      savingReq: Ajax.saveUser(newUser as UserTypes.User, this.onSave, this.onSaveError),
+      savingReq: Ajax.saveUser(newUser, this.onSave, this.onSaveError),
     });
   }
 
@@ -220,7 +219,11 @@ class Profile extends Classs<Props>
 
   removeProfilePicture()
   {
-    this.refs['profilePicImg']['src'] = null; 
+    let user = this.state.user.set('imgSrc', null) as UserTypes.User;
+    this.setState({
+      user,
+    });
+    this.refs['profilePicImg']['src'] = UserTypes.profileUrlFor(user);
   }
 
   handleProfilePicChange(event)
@@ -229,6 +232,9 @@ class Profile extends Classs<Props>
 
     reader.addEventListener("load", () => {
       this.refs['profilePicImg']['src'] = reader.result;
+      this.setState({
+        user: this.state.user.set('imgSrc', reader.result)
+      });
     }, false);
     
     let file = event.target.files[0];
@@ -280,7 +286,7 @@ class Profile extends Classs<Props>
         </div>
         <img
           className='profile-pic-image'
-          src={this.state.user.imgSrc}
+          src={UserTypes.profileUrlFor(this.state.user)}
           ref='profilePicImg'
         />
         <div className='profile-pic-overlay'>

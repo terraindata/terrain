@@ -225,9 +225,9 @@ class BuilderTextbox extends PureClasss<Props>
     this.computeOptions(); // need to lazily compute autocomplete options when needed
   }
 
-  handleBlur(event:React.FocusEvent)
+  handleBlur(event:React.FocusEvent, value: string)
   {
-    this.props.onBlur && this.props.onBlur(this, event.target['value'], event);
+    this.props.onBlur && this.props.onBlur(this, value, event);
   }
   
   handleCardToolClose()

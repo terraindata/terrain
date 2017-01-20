@@ -53,6 +53,7 @@ import TransformCardComponent from './components/charts/TransformCard.tsx';
 import ScoreBar from './components/charts/ScoreBar.tsx';
 import Store from './data/BuilderStore.tsx';
 import Util from '../util/Util.tsx';
+import {OperatorsTQL} from '../tql/TQLConverter.tsx';
 
 // These have to be above the BuilderDisplays import
 //  since the import itself imports them
@@ -502,6 +503,7 @@ export module BuilderTypes
     'score',
     'transform',
     'sfw',
+    'exists',
   ]);
   
   const transformScoreInputTypes = 
@@ -653,12 +655,21 @@ export module BuilderTypes
             factoryType: 'table',
             row: 
             {
+              below: 
+              {
+                displayType: DisplayType.CARDSFORTEXT,
+                key: 'table',
+                accepts: List(['sfw']),
+              },
+              noDataPadding: true,
               inner:
               [  
                 {
-                  displayType: DisplayType.TEXT,
-                  help: ManualConfig.help["table"],
+                  displayType: DisplayType.CARDTEXT,
                   key: 'table',
+                  help: ManualConfig.help["table"],
+                  accepts: List(['sfw']),
+                  showWhenCards: true,
                   getAutoTerms: (comp:React.Component<any, any>) => 
                   {
                     let tables = Store.getState().get('tables');
@@ -781,6 +792,7 @@ export module BuilderTypes
             {
               displayType: DisplayType.TEXT,
               key: 'alias',
+              autoDisabled: true,
             },
           ], 
           
@@ -823,7 +835,7 @@ export module BuilderTypes
       tql: '(\n$cards\n)',
       tqlGlue: '\nOR\n',
       manualEntry: ManualConfig.cards.or,
-      colors: ["#476aa3", "#a5c6fc"],
+      colors: ["#b161bc", "#f8cefe"],
       accepts: List(['and', 'comparison', 'exists']),
     }),
    
@@ -836,7 +848,7 @@ export module BuilderTypes
       static:
       {
         title: "Compare",
-        colors: ["#b161bc", "#f8cefe"],
+        colors: ["#476aa3", "#a5c6fc"],
         preview: (c:ICard) => {
           var first = c['first'];
           var second = c['second'];
@@ -849,17 +861,20 @@ export module BuilderTypes
             second = getPreview(second);
           }
           
-          return `${first} ${Operators[c['operator']]} ${second}`
+          return `${first} ${OperatorsTQL[c['operator']]} ${second}`
         },
         tql: "$first $OPERATOR $second",
         
-        display: firstSecondDisplay({
-          displayType: DisplayType.DROPDOWN,
-          key: 'operator',
-          options: Immutable.List(Operators),
-          help: ManualConfig.help["operator"],
-          centerDropdown: true,
-        }, List(['sfw'])),
+        display: firstSecondDisplay(
+          {
+            displayType: DisplayType.DROPDOWN,
+            key: 'operator',
+            options: Immutable.List(Operators),
+            help: ManualConfig.help["operator"],
+            centerDropdown: true,
+          }, 
+          List(['sfw', 'exists'])
+        ),
         manualEntry: ManualConfig.cards['filter'],
       },
     }),
@@ -885,7 +900,7 @@ export module BuilderTypes
           }
           return sorts.size + ' Factors';
         },
-        colors: ["#659f72", "#c4e1ca"],
+        colors: ["#39918b", "#99e4df"],
         manualEntry: ManualConfig.cards['sort'],
         tql: "ORDER BY $sorts",        
         
@@ -1202,7 +1217,7 @@ export module BuilderTypes
     
     take: _valueCard(
     {
-      colors: ["#4b977e", "#c4e1ca"],
+      colors: ["#2e8c9a", "#8adeea"],
       title: "Limit",
       manualEntry: ManualConfig.cards['take'],
       tql: "LIMIT $value",
@@ -1211,7 +1226,7 @@ export module BuilderTypes
     
     skip: _valueCard(
     {
-      colors: ["#39918b", "#99e4df"],
+      colors: ["#2588aa", "#a2e5fc"],
       title: "Offset",
       manualEntry: ManualConfig.cards['skip'],
       tql: "OFFSET $value",
@@ -1225,7 +1240,7 @@ export module BuilderTypes
       static:
       {
         manualEntry: ManualConfig.cards['sfw'], // TODO
-        colors: ["#2e8c9a", "#8adeea"],
+        colors: ["#659f72", "#c4e1ca"],
         title: "Group By",
         preview: "[fields.field]",
         tql: "GROUP BY\n$fields",
@@ -1255,7 +1270,7 @@ export module BuilderTypes
     
     having: _wrapperCard({
       title: "Having",
-      colors: ["#2588aa", "#a2e5fc"],
+      colors: ["#4b977e", "#c4e1ca"],
       tql: "HAVING\n$cards",
       manualEntry: ManualConfig.cards.where, // TODO
       
@@ -1336,11 +1351,11 @@ export module BuilderTypes
     ],
     [
       Blocks.where,
+      Blocks.groupBy,
+      Blocks.having,
       Blocks.sort,
       Blocks.take,
       Blocks.skip,
-      Blocks.groupBy,
-      Blocks.having,
     ],
     [
       Blocks.comparison,
@@ -1349,8 +1364,8 @@ export module BuilderTypes
       Blocks.exists,
     ],
     [
-      Blocks.var,
-      Blocks.let,
+      // Blocks.var,
+      // Blocks.let,
       Blocks.transform,
       Blocks.score,
     ],

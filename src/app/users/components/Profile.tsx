@@ -245,7 +245,7 @@ immediately be logged out of any existing sessions. \
         >
           <img
             className='profile-pic-image'
-            src={this.state.user.imgSrc}
+            src={UserTypes.profileUrlFor(this.state.user)}
             ref='profilePicImg'
           />
         </div>

@@ -44,18 +44,19 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as Immutable from 'immutable';
-import { BuilderTypes } from "../builder/BuilderTypes.tsx";
 type ICard = BuilderTypes.ICard;
 type IBlock = BuilderTypes.IBlock;
 type IInput = BuilderTypes.IInput;
 
 
-var OperatorsTQL = ['==', '!=', '>=', '>', '<=', '<', 'in', 'notIn'];
-var CombinatorsTQL = ['&&', '||'];
+export var OperatorsTQL = ['==', '!=', '>=', '>', '<=', '<', 'in', 'notIn'];
+export var CombinatorsTQL = ['&&', '||'];
 var join = (j, index) => (index === 0 ? "" : j);
 var addTabs = (str) => " " + str.replace(/\n/g, "\n ");
 var removeBlanks = (str) => str.replace(/\n[ \t]*\n/g, "\n");
 type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
+
+import { BuilderTypes } from "../builder/BuilderTypes.tsx";
 
 export interface Options {
   allFields?: boolean; // amend the final Select card to include all possible fields.

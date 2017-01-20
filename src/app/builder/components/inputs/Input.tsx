@@ -204,16 +204,18 @@ var Input = React.createClass<any, any>({
     Util.animateToAutoHeight(this.refs.input);
   },
 
-	render() {
-    // return this.renderPanel((
+	render() 
+  {
 		return (
 			<div className='input' ref='input'>
         {
-          this.props.canEdit &&
+          this.props.canEdit ?
             <CreateLine 
               open={false} 
               onClick={this.createInput} 
             />
+          :
+            <div className='input-spacing' />
         }
         <div className='input-inner'>
           <div className='input-top-row'>
