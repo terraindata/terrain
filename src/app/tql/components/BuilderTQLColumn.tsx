@@ -113,7 +113,6 @@ class BuilderTQLColumn extends PureClasss<Props>
   {
     super(props);
     this.executeCode = _.debounce(this.executeCode, 1000);
-    console.log(this.state.code, this.props.query);
   }
 
   //This function should be here, but whenever executeCode is called, the cards/tql

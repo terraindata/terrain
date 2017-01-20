@@ -6,7 +6,7 @@
   width: @size;
   height: @size;
   border-radius: @size;
-  border: 1px solid #a2af93;
+  border: 1px solid #5f7d8c;
   background: #fff;
   position: relative;
   margin: @margin-top 0px;
@@ -24,12 +24,18 @@
   }
   
   &:hover {
-    @amp: 4px;
-    width: @size + @amp;
-    height: @size + @amp;
-    border-radius: @size + @amp;    
-    margin-left: -0.5 * @amp;
-    margin-bottom: @margin-top - 0.5 * @amp;
-    margin-top: @margin-top - 0.5 * @amp;
+    background: #5f7d8c;
+    svg {
+      .st0 {
+        fill: #fff;
+      }
+    }
+    // @amp: 4px;
+    // width: @size + @amp;
+    // height: @size + @amp;
+    // border-radius: @size + @amp;    
+    // margin-left: -0.5 * @amp;
+    // margin-bottom: @margin-top - 0.5 * @amp;
+    // margin-top: @margin-top - 0.5 * @amp;
   }
 }
