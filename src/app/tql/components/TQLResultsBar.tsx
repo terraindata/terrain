@@ -59,6 +59,8 @@ interface Props
   onLoadStart: () => void;
   onLoadEnd: () => void;
   db: string;
+  open: boolean;
+  onToggle: () => void;
 }
 
 class TQLResultsBar extends PureClasss<Props>
@@ -66,7 +68,6 @@ class TQLResultsBar extends PureClasss<Props>
   xhr = null;
   
   state: {
-    open: boolean;
     results: any[];
     error: boolean;
     mainErrorMessage?: string;
@@ -75,7 +76,6 @@ class TQLResultsBar extends PureClasss<Props>
     resultsSpliced: number;
     errorLine: number;
   } = {
-    open: false,
     results: null,
     error: false,
     querying: false,
@@ -106,7 +106,9 @@ class TQLResultsBar extends PureClasss<Props>
       return (
         <div>
           <span className="error-detail">
-            {this.state.open ? '\u25BC ' : '\u25B6 '}
+            {
+              this.props.open ? '\u25BC ' : '\u25B6 '
+            }
           </span>
           <span className="error-title">
             { 
@@ -262,9 +264,9 @@ class TQLResultsBar extends PureClasss<Props>
       <div
         className={classNames({
           'tql-results-bar': true,
-          'tql-results-bar-open': this.state.open,
+          'tql-results-bar-open': this.props.open,
         })}
-        onClick={this._toggle('open')}
+        onClick={this.props.onToggle}
       >
         <div className='tql-results-bar-inner'>
           {

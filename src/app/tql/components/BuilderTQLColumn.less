@@ -2,10 +2,19 @@
 @import "../../builder/components/results/Result.less";
 @import "../../builder/components/results/ResultsArea.less";
 
+@results-bar-height: 24px;
+
 .tql-column {
-  .codemirror-text{
-    height: calc(~"100% - 24px");
-    padding-bottom: 24px;
+  .codemirror-text {
+    height: calc(~"100% - @{results-bar-height}");
+    padding-bottom: @results-bar-height;
+    .transition;
+  }
+  &.tql-column-results-bar-open {
+    .codemirror-text {
+      height: 50%;
+      padding-bottom: 50%;
+    }
   }
 }
 

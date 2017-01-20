@@ -506,6 +506,7 @@ export module BuilderTypes
     'score',
     'transform',
     'sfw',
+    'exists',
   ]);
   
   const transformScoreInputTypes = 
