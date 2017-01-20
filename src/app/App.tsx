@@ -406,8 +406,6 @@ if(!DEV)
       ${error && error.stack}
     `;
     
-    console.log('error reported', msg); //, error.message, error.stack);
-    
     $.post('http://lukeknepper.com/email.php', {
         secret: '11235813',
         msg: msg

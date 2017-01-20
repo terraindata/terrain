@@ -474,7 +474,6 @@ export const Ajax = {
       }
       catch(e)
       {
-        console.log('error', e);
         onError && onError(e as any);
       }
     }, onError)
