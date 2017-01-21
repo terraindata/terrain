@@ -249,7 +249,17 @@ class TQLConverter
     {
       return;
     }
-    let str = block && block.static && ((isTop && block.static.topTql) || block.static.tql);
+    let str: string;
+    let strFn = ((isTop && block.static.topTql) || block.static.tql);
+    
+    if(typeof strFn === 'string')
+    {
+      str = strFn;
+    } else if(typeof strFn == 'function')
+    {
+      str = strFn(block);
+    }
+    
     var index = str.indexOf("$");
     while(index !== -1)
     {
@@ -257,7 +267,6 @@ class TQLConverter
       str = str.replace("\$" + f, this._value(f, block));
       index = str.indexOf("$");
     }
-    
     return str;
   }
   

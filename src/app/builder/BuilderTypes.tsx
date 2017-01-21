@@ -192,7 +192,7 @@ export module BuilderTypes
     // fields not saved on server
     static:
     {
-      tql: string;
+      tql: string | ((block:IBlock) => string);
       tqlGlue?: string;
       topTql?: string;
       accepts?: List<string>;
@@ -228,7 +228,7 @@ export module BuilderTypes
       // - to map a value to another string, write the field name in all caps. the value will be passed into "[FieldName]TQL" map
       //    e.g. "$DIRECTION" will look up "DirectionTQL" in BuilderTypes and pass the value into it
       // - topTql is the tql to use if this card is at the top level of a query
-      tql: string;
+      tql: string | ((block:IBlock) => string);
       tqlGlue?: string;
       topTql?: string;
       
@@ -288,9 +288,9 @@ export module BuilderTypes
       preview: string | ((c:ICard) => string);
       display: Display | Display[];
       manualEntry: IManualEntry;
-      tql: string;
+      tql: string | ((block:IBlock) => string);
       tqlGlue?: string;
-      topTql?: string;
+      topTql?: string | ((block:IBlock) => string);
       accepts?: List<string>;
       anythingAccepts?: boolean; // if any card accepts this card
       
@@ -574,8 +574,26 @@ export module BuilderTypes
         title: "Select",
         preview: "[tables.table]",
         // tql: "(\nSELECT\n$fields\nFROM\n$tables\n$cards)",
-        topTql: "SELECT\n$fields\nFROM\n$tables\n$cards",
-        tql: "\n(\n SELECT\n$fields\n FROM\n$tables\n$cards)",
+        topTql: (fromCard) =>
+        {
+          let fromStr = '';
+          if(fromCard['tables'].get(0) && fromCard['tables'].get(0).table !== 'none')
+          {
+            fromStr = ' FROM\n$tables\n';
+          }
+          
+          return "\n SELECT\n$fields\n" + fromStr  +"$cards";
+        },
+        tql: (fromCard) =>
+        {
+          let fromStr = '';
+          if(fromCard['tables'].get(0) && fromCard['tables'].get(0).table !== 'none')
+          {
+            fromStr = ' FROM\n$tables\n';
+          }
+          
+          return "\n(\n SELECT\n$fields\n" + fromStr  +"$cards)";
+        },
         
         init: () => ({
           tables: List([ make(Blocks.table )]),
