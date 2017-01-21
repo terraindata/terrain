@@ -53,7 +53,6 @@ import TransformCardComponent from './components/charts/TransformCard.tsx';
 import ScoreBar from './components/charts/ScoreBar.tsx';
 import Store from './data/BuilderStore.tsx';
 import Util from '../util/Util.tsx';
-import {OperatorsTQL} from '../tql/TQLConverter.tsx';
 
 // These have to be above the BuilderDisplays import
 //  since the import itself imports them
@@ -852,16 +851,16 @@ export module BuilderTypes
         preview: (c:ICard) => {
           var first = c['first'];
           var second = c['second'];
-          if(typeof first !== 'string')
+          if(first._isCard)
           {
             first = getPreview(first);
           }
-          if(typeof second !== 'string')
+          if(second._isCard)
           {
             second = getPreview(second);
           }
           
-          return `${first} ${OperatorsTQL[c['operator']]} ${second}`
+          return `${first} ${OperatorTQL[c['operator']]} ${second}`
         },
         tql: "$first $OPERATOR $second",
         

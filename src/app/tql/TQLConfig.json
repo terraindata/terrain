@@ -45,17 +45,25 @@
 			"+",
 			"-",
 			"=",
+      "!=",
 			"<",
 			">",
 			"?",
       "like",
-      "in"
+      "LIKE",
+      "in",
+      "IN",
+      "not",
+      "NOT"
 		],
 		"atom":
 		[
 			"false",
+      "FALSE",
 			"null",
-			"true"
+      "NULL",
+			"true",
+      "TRUE"
 		],
 		"var":
 		[

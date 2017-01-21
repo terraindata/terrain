@@ -48,9 +48,6 @@ type ICard = BuilderTypes.ICard;
 type IBlock = BuilderTypes.IBlock;
 type IInput = BuilderTypes.IInput;
 
-
-export var OperatorsTQL = ['==', '!=', '>=', '>', '<=', '<', 'in', 'notIn'];
-export var CombinatorsTQL = ['&&', '||'];
 var join = (j, index) => (index === 0 ? "" : j);
 var addTabs = (str) => " " + str.replace(/\n/g, "\n ");
 var removeBlanks = (str) => str.replace(/\n[ \t]*\n/g, "\n");

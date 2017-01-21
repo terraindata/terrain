@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
+const _ = require('underscore');
 import * as Immutable from 'immutable';
 import { BuilderTypes } from '../builder/BuilderTypes.tsx';
 type Cards = BuilderTypes.ICards;
@@ -87,11 +87,12 @@ function parseNode(node:Node | string): CardString
   }
   else
   {
-    if(opProcessors[node.op])
+    if(generalProcessors[node.op])
     {
-      return opProcessors[node.op](node);
+      return generalProcessors[node.op](node);
     }
-    else if(sfwProcessors[node.op])
+    
+    if(sfwProcessors[node.op])
     {
       let sfw = parseNode(node.left_child) as Card;
       let rightNodes = flattenCommas(node.right_child);
@@ -104,6 +105,14 @@ function parseNode(node:Node | string): CardString
         sfw['cards'].push(card)
       );
     }
+    
+    console.log(comparisonProcessors);
+    if(comparisonProcessors[node.op])
+    {
+      console.log(comparisonProcessor(node));
+      return comparisonProcessor(node);
+    }
+    
     console.log('no op', node);
     return make(Blocks.tql, {
       clause: node.op,
@@ -111,7 +120,19 @@ function parseNode(node:Node | string): CardString
   }
 }
 
-const opProcessors: {
+const andOrProcessor = (op: string) =>
+  (node: Node): Card =>
+  {
+    let childNodes = flattenOp(op, node.left_child)
+      .concat(flattenOp(op, node.right_child));
+    return make(Blocks[op], {
+      cards: List(
+        childNodes.map(parseNode)
+      ),
+    })
+  };
+
+const generalProcessors: {
   [opType:string]: (
     node: Node
   ) => CardString
@@ -203,15 +224,30 @@ const opProcessors: {
       }),
   
   and:
-    (node) =>
-      make(Blocks.and, {
-        cards: List([
-          parseNode(node.left_child),
-          parseNode(node.right_child),
-        ]),
-      }),
+    andOrProcessor('and'),
+  
+  or:
+    andOrProcessor('or'),
 };
 
+const comparisonProcessors = _.reduce(
+  BuilderTypes.OperatorTQL,
+  (memo, val: string) =>
+  {
+    memo[val.toLowerCase()] = true;
+    return memo;
+  }, {}
+);
+function comparisonProcessor(node: Node): Card
+{
+  return make(Blocks.comparison, {
+    first: parseNode(node.left_child),
+    second: parseNode(node.right_child),
+    operator: + _.findKey(BuilderTypes.OperatorTQL, 
+      (op: string) => op.toLowerCase() === node.op
+    ),
+  });
+}
 
 // The following types are contained with the From card,
 //  are above the From node on the parse tree, and have
@@ -270,35 +306,39 @@ const sfwProcessors: {
         )
       }),
    
-  // filter:
-  //   (childNodes) =>
-  //     make(
-  //       Blocks.where,
-  //       {
-  //         cards:
-  //       }
-  //     ),
-  //   {
-  //     // filter doesn't use commas, will only have one node
-  //     let childNode = childNodes[0];
-  //     re
-  //   },
+  filter:
+    (childNodes) =>
+      make(
+        Blocks.where,
+        {
+          // filter doesn't use commas, will only have one node
+          cards: List([
+            parseNode(childNodes[0]),
+          ]),
+        }
+      ),
 }
 
 
-// takes a tree of commas and turns it into an array of Node
-function flattenCommas(node:Node | string): (Node | string)[]
+// takes a tree of a certain op (e.g. commas, and/or) 
+//  and turns it into an array of Node
+function flattenOp(op: string, node:Node | string): (Node | string)[]
 {
-  if(typeof node !== 'object' || node.op !== ',')
+  if(typeof node !== 'object' || node.op !== op)
   {
     return [node];
   }
   else
   {
-    return flattenCommas(node.left_child).concat(
-      flattenCommas(node.right_child)
+    return flattenOp(op,node.left_child).concat(
+      flattenOp(op, node.right_child)
     );
   }
+}
+
+function flattenCommas(node:Node | string)
+{
+  return flattenOp(',', node);
 }
 
 interface Statement
