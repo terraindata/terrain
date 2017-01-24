@@ -579,7 +579,12 @@ export module BuilderTypes
         tql: "\n(\n SELECT\n$fields\n$cards)",
         
         init: () => ({
-          fields: List([ make(Blocks.field, { field: '*' })]),
+          fields: List([ 
+            make(Blocks.field, { field: '*' })
+          ]),
+          cards: List([
+            make(Blocks.from)
+          ]),
         }),
         
         accepts: List([
