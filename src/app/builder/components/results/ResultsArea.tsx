@@ -48,6 +48,7 @@ const {Map,List} = Immutable;
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
+import * as moment from 'moment';
 import Util from '../../../util/Util.tsx';
 import {Ajax, QueryResponse} from '../../../util/Ajax.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
@@ -506,6 +507,10 @@ class ResultsArea extends PureClasss<Props>
   exportXhr: XMLHttpRequest;
   handleExport()
   {
+    this.setState({
+      exporting: true,
+    });
+    
     this.exportXhr && this.exportXhr.abort();
     this.exportXhr = Ajax.query(
       this.props.query.tql, 
@@ -522,12 +527,51 @@ class ResultsArea extends PureClasss<Props>
     {
       alert('There was an error exporting your data: ' + response.error);
     }
-    if(response.resultSet)
+    let {resultSet} = response;
+    if(resultSet)
     {
-      console.log(response.resultSet);
+      let headers: (string | number)[] = [];
+      let headersMap: any = {};
+      let body: (string | number)[][] = [];
+      
+      if(!Array.isArray(resultSet))
+      {
+        headers = ['Text result'];
+        body = [[JSON.stringify(resultSet)]];
+      }
+      else
+      {
+        resultSet.map(
+          (obj) =>
+          {
+            let row: (string | number)[] = [];
+            
+            // add data which already has a header
+            headers.map(
+              headerField =>
+                row.push(obj[headerField])
+            );
+            
+            // add data which doesn't already have a header, and add the header
+            for(let key in obj)
+            {
+              if(!headersMap[key])
+              {
+                headersMap[key] = true;
+                headers.push(key);
+                row.push(obj[key]);
+              }
+            }
+            
+            body.push(row);
+          }
+        );
+      }
+      
+      body.unshift(headers);
       Util.exportToCSV(
-        response.resultSet,
-        this.props.variantName
+        body,
+        this.props.variantName + ' on ' + moment().format('MM/DD/YY')
       );
     }
     this.setState({
