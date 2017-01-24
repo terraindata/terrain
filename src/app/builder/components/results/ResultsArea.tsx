@@ -73,6 +73,7 @@ interface Props
   onLoadStart: () => void;
   onLoadEnd: () => void;
   canEdit: boolean;
+  variantName: string;
 }
 
 interface State
@@ -94,6 +95,8 @@ interface State
   
   resultsPages: number;
   onResultsLoaded: (unchanged?: boolean) => void;
+  
+  exporting: boolean;
 }
 
 class ResultsArea extends PureClasss<Props>
@@ -116,6 +119,7 @@ class ResultsArea extends PureClasss<Props>
     resultsPages: 1,
     onResultsLoaded: null,
     resultFormat: 'icon',
+    exporting: false,
   };
   
   constructor(props:Props)
@@ -133,9 +137,11 @@ class ResultsArea extends PureClasss<Props>
     this.xhr && this.xhr.abort();
     this.allXhr && this.allXhr.abort();
     this.countXhr && this.countXhr.abort();
-    this.xhr = false;
-    this.allXhr = false;
-    this.countXhr = false;
+    this.exportXhr && this.exportXhr.abort();
+    this.xhr = null;
+    this.allXhr = null;
+    this.countXhr = null;
+    this.exportXhr = null;
     this.timeout && clearTimeout(this.timeout);
   }
   
@@ -497,6 +503,46 @@ class ResultsArea extends PureClasss<Props>
     this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
+  exportXhr: XMLHttpRequest;
+  handleExport()
+  {
+    this.exportXhr && this.exportXhr.abort();
+    this.exportXhr = Ajax.query(
+      this.props.query.tql, 
+      this.props.db, 
+      this.handleExportDataLoaded,
+      this.handleExportError
+    );
+      
+  }
+  
+  handleExportDataLoaded(response: QueryResponse)
+  {
+    if(response.error)
+    {
+      alert('There was an error exporting your data: ' + response.error);
+    }
+    if(response.resultSet)
+    {
+      console.log(response.resultSet);
+      Util.exportToCSV(
+        response.resultSet,
+        this.props.variantName
+      );
+    }
+    this.setState({
+      exporting: false,
+    });
+  }
+  
+  handleExportError(error)
+  {
+    alert('There was an error connecting to the server to export your data: ' + error);
+    this.setState({
+      exporting: false,
+    });
+  }
+  
   handleAllFieldsError()
   {
     this.allXhr = null;
@@ -594,6 +640,31 @@ class ResultsArea extends PureClasss<Props>
           }
         </div>
         
+        {
+          this.state.exporting
+          ?
+            <div
+              className='results-top-config results-top-config-unclickable'
+            >
+              Exporting...
+            </div>
+          :
+            <div
+              className='results-top-config'
+              onClick={this.handleExport}
+            >
+              Export
+            </div>
+        }
+        
+        
+        <div
+          className='results-top-config'
+          onClick={this.showConfig}
+        >
+          Customize view
+        </div>
+        
         <Switch
           first='Icons'
           second='Table'
@@ -601,10 +672,6 @@ class ResultsArea extends PureClasss<Props>
           selected={this.state.resultFormat === 'icon' ? 1 : 2}
           small={true}
         />
-        
-        <div className='results-top-config' onClick={this.showConfig}>
-          Customize view
-        </div>
       </div>
     );
   }
