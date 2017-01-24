@@ -239,9 +239,11 @@ export module BuilderTypes
         [k:string]: any;
       };
       
+      // given a card, return the "terms" it generates for autocomplete
       getChildTerms?: (card: ICard) => List<string>;
       getNeighborTerms?: (card: ICard) => List<string>;
-      // given a card, return the "terms" it generates for autocomplete
+      getParentTerms?: (card: ICard) => List<string>;
+        // returns terms for its parent and its neighbors (but not its parent's neighbors)
       
       preview: string | ((c:ICard) => string);
       // The BuilderTypes.getPreview function constructs
@@ -296,6 +298,7 @@ export module BuilderTypes
       
       getChildTerms?: (card: ICard) => List<string>;
       getNeighborTerms?: (card: ICard) => List<string>;
+      getParentTerms?: (card: ICard) => List<string>;
       
       init?: () => {
         [k:string]: any;
@@ -563,7 +566,6 @@ export module BuilderTypes
     
     sfw: _card(
     {
-      tables: L(),
       fields: L(),
       cards: L(),
       
@@ -572,35 +574,16 @@ export module BuilderTypes
         manualEntry: ManualConfig.cards['sfw'],
         colors: ["#559dcf", "#b4dbf6"],
         title: "Select",
-        preview: "[tables.table]",
-        // tql: "(\nSELECT\n$fields\nFROM\n$tables\n$cards)",
-        topTql: (fromCard) =>
-        {
-          let fromStr = '';
-          if(fromCard['tables'].get(0) && fromCard['tables'].get(0).table !== 'none')
-          {
-            fromStr = ' FROM\n$tables\n';
-          }
-          
-          return "\n SELECT\n$fields\n" + fromStr  +"$cards";
-        },
-        tql: (fromCard) =>
-        {
-          let fromStr = '';
-          if(fromCard['tables'].get(0) && fromCard['tables'].get(0).table !== 'none')
-          {
-            fromStr = ' FROM\n$tables\n';
-          }
-          
-          return "\n(\n SELECT\n$fields\n" + fromStr  +"$cards)";
-        },
+        preview: "[fields.field]",
+        topTql: "\n SELECT\n$fields\n$cards",
+        tql: "\n(\n SELECT\n$fields\n$cards)",
         
         init: () => ({
-          tables: List([ make(Blocks.table )]),
           fields: List([ make(Blocks.field, { field: '*' })]),
         }),
         
         accepts: List([
+          'from',
           'where',
           'sort',
           'let',
@@ -612,33 +595,18 @@ export module BuilderTypes
         
         getChildTerms:
           (card: ICard) =>
-            card['tables'].reduce(
-              (list:List<string>, tableBlock: {table: string, alias: string}): List<string> =>
+            card['fields'].reduce(
+              (list:List<string>, fieldBlock: {field: CardString}): List<string> =>
               {
-                let cols: List<string> = Store.getState().getIn(['tableColumns', tableBlock.table]);
-                if(cols)
+                 /* TODO make this better */
+                if(fieldBlock.field['type'] === 'as')
                 {
-                  return list.concat(cols.map(
-                    (col) => tableBlock.alias + '.' + col
-                  ).toList()).toList();
+                  // an as card
+                  return list.push(fieldBlock.field['alias']);
                 }
                 return list;
-              }
-            , List([]))
-            .concat( /* TODO make this better */
-              card['fields'].reduce(
-                (list:List<string>, fieldBlock: {field: CardString}): List<string> =>
-                {
-                  if(fieldBlock.field['type'] === 'as')
-                  {
-                    // an as card
-                    return list.push(fieldBlock.field['alias']);
-                  }
-                  return list;
-                }, List([])
-              )
-            )
-            ,
+              }, List([])
+            ),
           
         display: [
           {
@@ -668,116 +636,149 @@ export module BuilderTypes
           },
           
           {
-            header: 'From',
-            headerClassName: 'sfw-select-header',
-            displayType: DisplayType.ROWS,
-            key: 'tables',
-            english: 'table',
-            factoryType: 'table',
-            row: 
-            {
-              below: 
-              {
-                displayType: DisplayType.CARDSFORTEXT,
-                key: 'table',
-                accepts: List(['sfw']),
-              },
-              noDataPadding: true,
-              inner:
-              [  
-                {
-                  displayType: DisplayType.CARDTEXT,
-                  key: 'table',
-                  help: ManualConfig.help["table"],
-                  accepts: List(['sfw']),
-                  showWhenCards: true,
-                  getAutoTerms: (comp:React.Component<any, any>) => 
-                  {
-                    let tables = Store.getState().get('tables');
-                    if(!tables)
-                    {
-                      var unsubscribe = Store.subscribe(() =>
-                      {
-                        if(Store.getState().get('tables'))
-                        {
-                          unsubscribe();
-                          comp.forceUpdate();
-                        }
-                      });
-                    }
-                    return tables;
-                  },
-                  
-                  onFocus: (comp:React.Component<any, any>, value:string) =>
-                  {
-                    comp.setState({
-                      initialTable: value,
-                    });
-                  },
-                  onBlur: (comp:React.Component<any, any>, value:string) =>
-                  {
-                    let initialTable = comp.state.initialTable;
-                    let newTable = value;
-                    
-                    if(initialTable !== newTable)
-                    {
-                      let suggestAlias = (table:string) =>
-                      {
-                        if(table.charAt(table.length - 1).toLowerCase() === 's')
-                        {
-                          return table.substr(0, table.length - 1);
-                        }
-                        return table;
-                      }
-                      
-                      let keyPath: KeyPath = comp.props.keyPath;
-                      let aliasKeyPath = keyPath.set(keyPath.size - 1, 'alias');
-                      let aliasWasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
-                      let initialAlias: string = Store.getState().getIn(aliasKeyPath);
-                      
-                      if(!initialTable || initialTable === '' 
-                        || initialAlias === '' || initialAlias === suggestAlias(initialTable))
-                      {
-                        // alias or table was blank or was the suggested one, so let's suggest an alias
-                        Actions.change(aliasKeyPath, suggestAlias(newTable));
-                        Actions.change(aliasWasSuggestedKeyPath, true);
-                      }
-                    }
-                  },
-                },
-                {
-                  displayType: DisplayType.LABEL,
-                  label: 'as',
-                  key: null,
-                },
-                {
-                  displayType: DisplayType.TEXT,
-                  help: ManualConfig.help["alias"],
-                  key: 'alias',
-                  autoDisabled: true,
-                  
-                  onFocus: (comp:React.Component<any, any>, value:string, event:React.FocusEvent) =>
-                  {
-                    let keyPath: KeyPath = comp.props.keyPath;
-                    let wasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
-                    if(Store.getState().getIn(wasSuggestedKeyPath))
-                    {
-                      Util.selectText(event.target, 0, event.target['value'].length);
-                      Actions.change(wasSuggestedKeyPath, false);
-                    }
-                  },
-                },
-              ],
-            },
-          },
-          
-          {
             displayType: DisplayType.CARDS,
             key: 'cards',
             className: 'sfw-cards-area',
           },
         ],
       },
+    }),
+
+    from: _card({
+      tables: L(),
+      
+      static:
+      {
+        manualEntry: ManualConfig.cards['sfw'],
+        colors: ["#3a7dcf", "#94b9f6"],
+        title: "From",
+        preview: "[tables.table]",
+        tql: "FROM\n$tables",
+        
+        init: () => ({
+          tables: List([ make(Blocks.table )]),
+        }),
+        
+        getParentTerms:
+          (card: ICard) =>
+            card['tables'].reduce(
+              (list:List<string>, tableBlock: {table: string, alias: string}): List<string> =>
+              {
+                let cols: List<string> = Store.getState().getIn(['tableColumns', tableBlock.table]);
+                if(cols)
+                {
+                  return list.concat(cols.map(
+                    (col) => tableBlock.alias + '.' + col
+                  ).toList()).toList();
+                }
+                return list;
+              },
+              List([])
+            ),
+        
+        display:
+        {
+          displayType: DisplayType.ROWS,
+          key: 'tables',
+          english: 'table',
+          factoryType: 'table',
+          row: 
+          {
+            below: 
+            {
+              displayType: DisplayType.CARDSFORTEXT,
+              key: 'table',
+              accepts: List(['sfw']),
+            },
+            noDataPadding: true,
+            inner:
+            [  
+              {
+                displayType: DisplayType.CARDTEXT,
+                key: 'table',
+                help: ManualConfig.help["table"],
+                accepts: List(['sfw']),
+                showWhenCards: true,
+                getAutoTerms: (comp:React.Component<any, any>) => 
+                {
+                  let tables = Store.getState().get('tables');
+                  if(!tables)
+                  {
+                    var unsubscribe = Store.subscribe(() =>
+                    {
+                      if(Store.getState().get('tables'))
+                      {
+                        unsubscribe();
+                        comp.forceUpdate();
+                      }
+                    });
+                  }
+                  return tables;
+                },
+                
+                onFocus: (comp:React.Component<any, any>, value:string) =>
+                {
+                  comp.setState({
+                    initialTable: value,
+                  });
+                },
+                onBlur: (comp:React.Component<any, any>, value:string) =>
+                {
+                  let initialTable = comp.state.initialTable;
+                  let newTable = value;
+                  
+                  if(initialTable !== newTable)
+                  {
+                    let suggestAlias = (table:string) =>
+                    {
+                      if(table.charAt(table.length - 1).toLowerCase() === 's')
+                      {
+                        return table.substr(0, table.length - 1);
+                      }
+                      return table;
+                    }
+                    
+                    let keyPath: KeyPath = comp.props.keyPath;
+                    let aliasKeyPath = keyPath.set(keyPath.size - 1, 'alias');
+                    let aliasWasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
+                    let initialAlias: string = Store.getState().getIn(aliasKeyPath);
+                    
+                    if(!initialTable || initialTable === '' 
+                      || initialAlias === '' || initialAlias === suggestAlias(initialTable))
+                    {
+                      // alias or table was blank or was the suggested one, so let's suggest an alias
+                      Actions.change(aliasKeyPath, suggestAlias(newTable));
+                      Actions.change(aliasWasSuggestedKeyPath, true);
+                    }
+                  }
+                },
+              },
+              {
+                displayType: DisplayType.LABEL,
+                label: 'as',
+                key: null,
+              },
+              {
+                displayType: DisplayType.TEXT,
+                help: ManualConfig.help["alias"],
+                key: 'alias',
+                autoDisabled: true,
+                
+                onFocus: (comp:React.Component<any, any>, value:string, event:React.FocusEvent) =>
+                {
+                  let keyPath: KeyPath = comp.props.keyPath;
+                  let wasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
+                  if(Store.getState().getIn(wasSuggestedKeyPath))
+                  {
+                    Util.selectText(event.target, 0, event.target['value'].length);
+                    Actions.change(wasSuggestedKeyPath, false);
+                  }
+                },
+              },
+            ],
+          },
+        },
+      }
     }),
 
     as: _card({
@@ -1360,6 +1361,7 @@ export module BuilderTypes
   [
     [
       Blocks.sfw,
+      Blocks.from,
     ],
     [
       Blocks.count,
@@ -1411,6 +1413,17 @@ export module BuilderTypes
     if(extraConfig)
     {
       block = _.extend(block, extraConfig);
+      
+      if(block.type === 'sfw' && block['tables'] && block['tables'].size && block['tables'].get(0).table !== 'none')
+      {
+        // convert old format, where tables were included, to new format with separate from card
+        // TODO remove once sufficiently antiquated
+        block['cards'] = block['cards'].unshift(
+          make(Blocks.from, {
+            tables: block['tables']
+          })
+        );
+      }
     }
     
     if(block.static)
@@ -1456,7 +1469,7 @@ export module BuilderTypes
   {
     if(value && value.static && Immutable.Iterable.isIterable(value))
     {
-      // already a block / recrod
+      // already a block / record
       // TODO change to a better way of checking
       return value;
     }

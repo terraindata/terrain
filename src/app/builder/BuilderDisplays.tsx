@@ -87,9 +87,6 @@ export interface Display
 
   className?: string | ((data: any) => string);
   
-  header?: string;
-  headerClassName?: string;
-  
   // for dropdown
   options?: List<(string | El)>;
   centerDropdown?: boolean;
