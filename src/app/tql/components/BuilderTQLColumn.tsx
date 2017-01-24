@@ -58,7 +58,6 @@ import BuilderTypes from '../../builder/BuilderTypes.tsx';
 import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss.tsx';
 import Ajax from "./../../util/Ajax.tsx";
-import Modal from './../../common/components/Modal.tsx';
 import LibraryTypes from '../../library/LibraryTypes.tsx';
 
 import TQLEditor from './TQLEditor.tsx';
@@ -81,13 +80,10 @@ class BuilderTQLColumn extends PureClasss<Props>
 {
   state: {
     tql: string;
-    code: string;
     theme: string;
     focused: boolean;
     highlightedLine: number;
     theme_index: number;
-    confirmModalOpen: boolean;
-    confirmModalMessage: string;
     syntaxHelpOpen: boolean;
     syntaxHelpPos: any;
     cardName: string;
@@ -95,14 +91,11 @@ class BuilderTQLColumn extends PureClasss<Props>
     termDefinitionPos: any;
     resultsBarOpen: boolean;
   } = {
-    tql: null,
-    code: this.props.query.mode === 'tql' ? this.props.query.tql : TQLConverter.toTQL(this.props.query),
+    tql: this.props.query.tql,
     theme: localStorage.getItem('theme') || 'default',
     focused: false,
     highlightedLine: null,
     theme_index: 0,
-    confirmModalOpen: false,
-    confirmModalMessage: '',
     syntaxHelpOpen: false,
     syntaxHelpPos: {},
     cardName: '',
@@ -114,63 +107,46 @@ class BuilderTQLColumn extends PureClasss<Props>
   constructor(props: Props) 
   {
     super(props);
-    this.executeCode = _.debounce(this.executeCode, 1000);
+    // this.sendTqlAction = _.debounce(this.sendTqlAction, 1000);
   }
 
-  //This function should be here, but whenever executeCode is called, the cards/tql
-  //are no longer in sync
-  componentDidMount() 
-  {
-    if(this.props.query.mode !== 'tql') 
-    {
-      this.executeCode(true);
-    }
-  }
-  
   componentWillReceiveProps(nextProps:Props)
   {
-    if(!this.state.focused && nextProps.query.tql !== this.state.code && nextProps.query.mode === 'tql')
+    if(!this.state.focused && nextProps.query.tql !== this.state.tql)
     {
-      if(this.props.query.mode === nextProps.query.mode)
-      {
-        this.updateCode(nextProps.query.tql);
-      }
+      this.updateTql(nextProps.query.tql);
     }
   }
 
-  updateCode(newCode) 
+  updateTql(tql: string, noAction?: boolean) 
   {
-    this.checkForFolding(newCode);
-    this.undoError();
+    // this.checkForFolding(tql);
     this.setState({
-      code: newCode,
+      tql,
       highlightedLine: null,
       syntaxHelpOpen: false,
       termDefinitionOpen: false,
     });
-    this.executeCode();
-  }
-
-  checkForFolding(newCode) 
-  {
-    var x: any = this.refs['cm'];
-    if (x) 
-    {
-      x.findCodeToFold();
-    }
-  }
-
-  executeCode(noAction?: boolean) 
-  {
-    var code = this.props.query.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.query)
-    this.setState({
-      tql: code,
-    });
     
     if(!noAction)
     {
-      BuilderActions.changeTQL(code);
+      this.sendTqlAction();
     }
+  }
+
+  // TODO move
+  // checkForFolding(newTql) 
+  // {
+  //   var x: any = this.refs['cm'];
+  //   if (x) 
+  //   {
+  //     x.findTqlToFold();
+  //   }
+  // }
+
+  sendTqlAction()
+  {
+    BuilderActions.changeTQL(this.state.tql);
   }
 
   changeThemeDefault() 
@@ -253,15 +229,15 @@ class BuilderTQLColumn extends PureClasss<Props>
           onClick: this.changeThemeMonokai,
           disabled: this.getThemeIndex() === 3,
         },
-        {
-          spacer: true,
-          text: null,
-          onClick: null,
-        },
-        {
-          text: 'Kill Running Queries',
-          onClick: this.killQueries,
-        }
+        // {
+        //   spacer: true,
+        //   text: null,
+        //   onClick: null,
+        // },
+        // {
+        //   text: 'Kill Running Queries',
+        //   onClick: this.killQueries,
+        // }
       ]);
     return options;
   }
@@ -274,83 +250,6 @@ class BuilderTQLColumn extends PureClasss<Props>
         highlightedLine: lineNumber - 1,
       });
     }
-  }
-
-  undoError() 
-  {
-    if(this.state.highlightedLine !== null) 
-    {
-      this.setState({
-        higlightedLine: null,
-      });
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState)   
-  {
-        //When they switch to tql mode, execute code
-     if (prevProps.query.mode !== 'tql' && this.props.query.mode === 'tql')     
-     {
-       this.executeCode(true);
-     }
-     else if (this.props.query.mode !== 'tql' &&
-      !(_.isEqual(this.props.query.cards, prevProps.query.cards))) 
-     {
-      this.executeCode(true);
-    }
-  }
-
-  toggleMode() 
-  {
-    if (this.props.query.mode === 'tql' 
-      && this.state.code !== TQLConverter.toTQL(this.props.query))
-    {
-      this.setState({
-        confirmModalMessage: 'Warning: TQL added to the editor will be lost',
-      });
-      this.toggleConfirmModal();
-      return;
-    }
-    this.switchMode();
-  }
-
-  switchMode()
-  {
-    BuilderActions.changeQueryMode(
-      this.props.query.mode === 'tql' ? 'cards' : 'tql'
-    );
-
-    //update when have tql to cards conversion capabilities 
-    this.setState({
-      code: TQLConverter.toTQL(this.props.query),
-    });
-  }
-
-  renderTopbar() 
-  {
-    return (
-      <div
-        className={classNames({
-          'tql-editor-top': true,
-          [this.state.theme + '-tql-theme']: true,
-        })}
-      >
-        <Switch
-          first='Cards'
-          second='TQL'
-          onChange={this.toggleMode}
-          selected={this.props.query.mode === 'tql' ? 2 : 1}
-          medium={true}
-          />
-        <div className = 'view-only'>
-          {
-            this.props.query.mode === 'tql' ? null : "View-only"
-          }
-        </div>
-        <div className='white-space' />
-        <Menu options={this.getMenuOptions() } small={true}/>
-      </div>
-    );
   }
 
   turnSyntaxPopupOff()
@@ -430,34 +329,6 @@ class BuilderTQLColumn extends PureClasss<Props>
     });
   }
 
-  renderTqlEditor() 
-  {
-    let tql = this.props.query.mode === 'tql' ? this.state.code : TQLConverter.toTQL(this.props.query);
-    return (
-      <TQLEditor
-        tql={tql}
-        canEdit={this.props.query.mode === 'tql' && this.props.canEdit}
-        theme={this.state.theme}
-        
-        onChange={this.updateCode}
-        onFocusChange={this.handleFocusChange}
-        
-        highlightedLine={this.state.highlightedLine}
-        toggleSyntaxPopup={this.toggleSyntaxPopup}
-        defineTerm={this.defineTerm}
-        turnSyntaxPopupOff={this.turnSyntaxPopupOff}
-        hideTermDefinition={this.hideTermDefinition}
-      />
-    );
-  }
-
-  toggleConfirmModal()
-  {
-    this.setState ({
-       confirmModalOpen: !this.state.confirmModalOpen,
-    });
-  }
-  
   render() 
   {
     var manualEntry = BuilderTypes.cardList[this.state.cardName] &&
@@ -471,13 +342,44 @@ class BuilderTQLColumn extends PureClasss<Props>
           'tql-column-results-bar-open': this.state.resultsBarOpen,
         })}
       >
-        { 
-          this.renderTopbar()
-        }
-        <div className='code-section'>
+        <div
+          className={classNames({
+            'tql-editor-top': true,
+            [this.state.theme + '-tql-theme']: true,
+          })}
+        >
           {
-            this.renderTqlEditor()
+            !this.props.canEdit &&
+              <div className = 'view-only'>
+                View-only
+              </div>
           }
+          <div 
+            className='white-space' 
+          />
+          <Menu 
+            options={this.getMenuOptions()} 
+            small={true}
+          />
+        </div>
+        
+        <div
+          className='tql-section'
+        >
+          <TQLEditor
+            tql={this.state.tql}
+            canEdit={this.props.canEdit}
+            theme={this.state.theme}
+            
+            onChange={this.updateTql}
+            onFocusChange={this.handleFocusChange}
+            
+            highlightedLine={this.state.highlightedLine}
+            toggleSyntaxPopup={this.toggleSyntaxPopup}
+            defineTerm={this.defineTerm}
+            turnSyntaxPopupOff={this.turnSyntaxPopupOff}
+            hideTermDefinition={this.hideTermDefinition}
+          />
           { 
             this.state.syntaxHelpOpen &&
               <TQLPopup 
@@ -511,14 +413,6 @@ class BuilderTQLColumn extends PureClasss<Props>
             onToggle={this._toggle('resultsBarOpen')}
           />
         </div>
-        
-        <Modal 
-          message={this.state.confirmModalMessage}
-          onClose={this.toggleConfirmModal} 
-          open={this.state.confirmModalOpen} 
-          confirm={true}
-          onConfirm = {this.switchMode} 
-        /> 
       </div>
     );
   }

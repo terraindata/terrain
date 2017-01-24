@@ -278,6 +278,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     return state;
   },
 
+// change handwritten tql
 [ActionTypes.changeTQL]:
   (
     state: BuilderState,
@@ -285,33 +286,68 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       tql: string,
     }>
   ) =>
-    state.setIn(['query', 'tql'], action.payload.tql),
+  {
+    state.parseTreeReq && state.parseTreeReq.abort();
+    return state
+      .update('query', query =>
+        query
+          .set('tql', action.payload.tql)
+          .set('tqlCardsInSync', false)
+      )
+      .set('parseTreeError', null)
+      .set('parseTreeReq', 
+        Ajax.parseTree(
+          action.payload.tql, 
+          state.db,
+          Actions.parseTreeLoaded,
+          Actions.parseTreeError
+        )
+      );
+  },
 
-[ActionTypes.changeQueryMode]:
+[ActionTypes.parseTreeLoaded]:
   (
     state: BuilderState,
     action: Action<{
-      mode: string,
+      response: {
+        result: Object
+      }
     }>
   ) =>
-    state.setIn(['query', 'mode'], action.payload.mode),
+    state
+      .update('query',
+        query =>
+          query
+            .set('cards', TQLToCards.convert(action.payload.response.result))
+            .set('tqlCardsInSync', true)
+      )
+      .set('parseTreeReq', null),
+
+[ActionTypes.parseTreeError]:
+  (
+    state: BuilderState,
+    action: Action<{
+      error: any,
+    }>
+  ) =>
+    state
+      .set('parseTreeError', action.payload.error)
+      .set('parseTreeReq', null)
+      .setIn(['query', 'tqlCardsInSync'], false),
 
 [ActionTypes.hoverCard]:
-  (state: BuilderState, action: {
-    payload?: { cardId: ID },
-  }) =>
-  {
-    if(action.payload.cardId !== state.hoveringCardId)
-    {
-      return state.set('hoveringCardId', action.payload.cardId);
-    }
-    return state;
-  },
+  (state: BuilderState, action: Action<{
+    cardId: ID,
+  }>) =>
+    state.set('hoveringCardId', action.payload.cardId),
+    // if hovered over same card, will return original state object
 
 [ActionTypes.selectCard]:
-  (state: BuilderState, action: {
-    payload?: { cardId: ID, shiftKey: boolean, ctrlKey: boolean },
-  }) =>
+  (state: BuilderState, action: Action<{
+    cardId: ID, 
+    shiftKey: boolean, 
+    ctrlKey: boolean,
+  }>) =>
   {
     let {cardId, shiftKey, ctrlKey} = action.payload;
     if(!shiftKey && !ctrlKey)
@@ -437,6 +473,22 @@ function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
   
   return state;
 }
+
+
+// function handleParseTreeLoad(response)
+// {
+//   this.req = null;
+//   let cards = TQLToCards.convert(response.result);
+//   console.log(cards);
+//   Actions.change(Immutable.List(['query', 'cards']), cards);
+// }
+
+// function handleParseTreeError(error)
+// {
+//   console.log('error', error);
+// }
+
+import TQLToCards from '../../tql/TQLToCards.tsx';
 
 Util.assertKeysArePresent(ActionTypes, BuidlerReducers, 'Missing Builder Reducer for Builder Action Types: ');
 

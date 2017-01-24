@@ -42,52 +42,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
-import * as Immutable from 'immutable';
-import Actions from './BuilderActions.tsx';
-import { BuilderTypes } from './../BuilderTypes.tsx';
-import List = Immutable.List;
-import Map = Immutable.Map;
-import Ajax from '../../util/Ajax.tsx';
-import TQLToCards from '../../tql/TQLToCards.tsx';
-import BuilderStore from './BuilderStore.tsx';
-import Util from '../../util/Util.tsx';
+// import * as _ from 'underscore';
+// import * as Immutable from 'immutable';
+// import Actions from './BuilderActions.tsx';
+// import { BuilderTypes } from './../BuilderTypes.tsx';
+// import List = Immutable.List;
+// import Map = Immutable.Map;
+// import Ajax from '../../util/Ajax.tsx';
+// import TQLToCards from '../../tql/TQLToCards.tsx';
+// import BuilderStore from './BuilderStore.tsx';
+// import Util from '../../util/Util.tsx';
 
-export class BuilderCoordinator
-{
-  req: XMLHttpRequest = null;
+// export class BuilderCoordinator
+// {
+//   req: XMLHttpRequest = null;
   
-  constructor()
-  {
-    Util.bindAll(this);
-  }
+//   constructor()
+//   {
+//     Util.bindAll(this);
+//   }
   
-  handleTQLChange(tql: string)
-  {
-    if(this.req)
-    {
-      this.req.abort();
-    }
-    this.req = Ajax.parseTree(
-      tql, 
-      BuilderStore.getState().db,
-      this.handleParseTreeLoad,
-      this.handleParseTreeError
-    );
-  }
+//   handleTQLChange(tql: string)
+//   {
+//     if(this.req)
+//     {
+//       this.req.abort();
+//     }
+//     this.req = Ajax.parseTree(
+//       tql, 
+//       BuilderStore.getState().db,
+//       this.handleParseTreeLoad,
+//       this.handleParseTreeError
+//     );
+//   }
   
-  handleParseTreeLoad(response)
-  {
-    this.req = null;
-    let cards = TQLToCards.convert(response.result);
-    console.log(cards);
-    Actions.change(Immutable.List(['query', 'cards']), cards);
-  }
+//   handleParseTreeLoad(response)
+//   {
+//     this.req = null;
+//     let cards = TQLToCards.convert(response.result);
+//     console.log(cards);
+//     Actions.change(Immutable.List(['query', 'cards']), cards);
+//   }
   
-  handleParseTreeError(error)
-  {
-    console.log('error', error);
-  }
-}
+//   handleParseTreeError(error)
+//   {
+//     console.log('error', error);
+//   }
+// }
 
-export default BuilderCoordinator;
+// export default BuilderCoordinator;

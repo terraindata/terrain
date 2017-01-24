@@ -81,6 +81,11 @@ export const TQLToCards =
 
 function parseNode(node:Node | string): CardString
 {
+  if(!node)
+  {
+    return make(Blocks.tql);
+  }
+  
   if(typeof node !== 'object')
   {
     return node;
@@ -106,10 +111,8 @@ function parseNode(node:Node | string): CardString
       );
     }
     
-    console.log(comparisonProcessors);
     if(comparisonProcessors[node.op])
     {
-      console.log(comparisonProcessor(node));
       return comparisonProcessor(node);
     }
     
@@ -120,6 +123,21 @@ function parseNode(node:Node | string): CardString
   }
 }
 
+// same as parse node, but always returns a card
+function parseNodeAsCard(node: Node | string): Card
+{
+  let val = parseNode(node);
+  
+  if(!val['_isCard'])
+  {
+    return make(Blocks.tql, {
+      clause: val,
+    });
+  }
+  
+  return val as Card;
+}
+
 const andOrProcessor = (op: string) =>
   (node: Node): Card =>
   {
@@ -127,7 +145,7 @@ const andOrProcessor = (op: string) =>
       .concat(flattenOp(op, node.right_child));
     return make(Blocks[op], {
       cards: List(
-        childNodes.map(parseNode)
+        childNodes.map(parseNodeAsCard)
       ),
     })
   };
@@ -228,6 +246,17 @@ const generalProcessors: {
   
   or:
     andOrProcessor('or'),
+  
+  exists:
+    (node) =>
+      make(
+        Blocks.exists,
+        {
+          cards: List([
+            parseNodeAsCard(node.child),
+          ]),
+        }
+      ),
 };
 
 const comparisonProcessors = _.reduce(
@@ -313,7 +342,18 @@ const sfwProcessors: {
         {
           // filter doesn't use commas, will only have one node
           cards: List([
-            parseNode(childNodes[0]),
+            parseNodeAsCard(childNodes[0]),
+          ]),
+        }
+      ),
+  
+  having:
+    (childNodes) =>
+      make(
+        Blocks.having,
+        {
+          cards: List([
+            parseNodeAsCard(childNodes[0]),
           ]),
         }
       ),

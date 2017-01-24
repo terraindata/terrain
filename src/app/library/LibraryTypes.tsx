@@ -99,7 +99,6 @@ export module LibraryTypes
         inputs: config.inputs,
         resultsConfig: config.resultsConfig,
         tql: config.tql,
-        mode: config.mode,
         deckOpen: config.deckOpen,
         variantId: config.id,
       };

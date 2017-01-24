@@ -102,7 +102,6 @@ class TQLEditor extends PureClasss<Props>
     {
       readOnly: !this.props.canEdit,
       lineNumbers: true,
-      mode: 'tql', // ?
       extraKeys: { 'Ctrl-F': 'findPersistent' },
       lineWrapping: true,
       theme: this.props.theme || localStorage.getItem('theme') || 'default',

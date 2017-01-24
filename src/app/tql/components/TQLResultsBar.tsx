@@ -165,7 +165,11 @@ class TQLResultsBar extends PureClasss<Props>
     if(response.error)
     {
       let {error} = response;
-      error = error.substr(0, error.length - 1).replace(/MySQL/g, 'TerrainDB');
+      error = error.replace(/MySQL/g, 'TerrainDB');
+      if(error.charAt(error.length - 1) === '^')
+      {
+        error = error.substr(0, error.length - 1);
+      }
       let matches = error.match(/([0-9]+)\:[0-9]+/);
       let line = matches && matches.length >= 2 && parseInt(matches[1]);
       

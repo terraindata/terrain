@@ -249,7 +249,6 @@ class ManualEntry extends Classs<Props>
     var options = {
       readOnly: true,
       lineNumbers: true,
-      mode: 'tql',
       theme: 'monokai',
       foldGutter: true,
       gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
@@ -261,7 +260,6 @@ class ManualEntry extends Classs<Props>
       inputs: Immutable.List([]),
       tql: '',
       version: false,
-      mode: '',
       name: '',
       lastEdited: '',
       db: '',

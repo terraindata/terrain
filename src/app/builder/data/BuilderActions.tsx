@@ -76,9 +76,17 @@ const BuilderActions =
     (keyPath: KeyPath, index: number) =>
       $(ActionTypes.remove, { keyPath, index }),
   
-  changeQueryMode:
-    (mode: string) =>
-      $(ActionTypes.changeQueryMode, { mode }),
+  dragCard:
+    (cardItem: CardItem) =>
+      $(ActionTypes.dragCard, { cardItem }),
+  
+  dragCardOver:
+    (keyPath: KeyPath, index: number) =>
+      $(ActionTypes.dragCardOver, { keyPath, index }),
+  
+  dropCard:
+    () =>
+      $(ActionTypes.dropCard, {}),
   
   changeTQL:
     (tql: string) =>
@@ -91,18 +99,6 @@ const BuilderActions =
   selectCard:
     (cardId: ID, shiftKey: boolean, ctrlKey: boolean) =>
       $(ActionTypes.selectCard, { cardId, shiftKey, ctrlKey }),
-  
-  dragCard:
-    (cardItem: CardItem) =>
-      $(ActionTypes.dragCard, { cardItem }),
-  
-  dragCardOver:
-    (keyPath: KeyPath, index: number) =>
-      $(ActionTypes.dragCardOver, { keyPath, index }),
-  
-  dropCard:
-    () =>
-      $(ActionTypes.dropCard, {}),
   
   toggleDeck:
     (open: boolean) =>
@@ -137,6 +133,18 @@ const BuilderActions =
   checkpoint:
     () =>
       $(ActionTypes.checkpoint, { }),
+  
+  parseTreeLoaded:
+    (response) =>
+      $(ActionTypes.parseTreeLoaded, { 
+        response,
+      }),
+  
+  parseTreeError:
+    (error) =>
+      $(ActionTypes.parseTreeError, { 
+        error,
+      }),    
 };
 
 _.map(ActionTypes, 
@@ -145,7 +153,6 @@ _.map(ActionTypes,
     if(!BuilderActions[type])
     {
       let error = 'Missing Builder Action for Builder Action Type ' + type;
-      alert(error);
       throw new Error(error);
     }
   }

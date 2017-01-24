@@ -87,6 +87,9 @@ export class BuilderStateClass
   draggingOverIndex: number = -1;
   
   isDirty: boolean = false;
+  
+  parseTreeReq: XMLHttpRequest = null;
+  parseTreeError: any = null;
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> {}
 let BuilderState_Record = Immutable.Record(new BuilderStateClass());

@@ -115,23 +115,9 @@ class DeployModal extends PureClasss<Props>
   renderTQLColumn(defaultVariant:LibraryTypes.Variant)
   {
     let variant = this.state.changingStatusOf;
-    let defaultTql = null;
-    
-    if(this.state.defaultChecked)
-    {
-      if(defaultVariant)
-      {
-        // TODO change to simply defaultVariant.tql when the query tql structure changes
-        defaultTql = defaultVariant.query.mode === 'tql' ? defaultVariant.query.tql : TQLConverter.toTQL(defaultVariant.query);
-      }
-    }
-    
-    let tql = '';
-    if(variant)
-    {
-      // TODO change to simply defaultVariant.tql when the query tql structure changes
-      tql = variant.query.mode === 'tql' ? variant.query.tql : TQLConverter.toTQL(variant.query);
-    }
+    let defaultTql = 
+      (this.state.defaultChecked && defaultVariant) ? defaultVariant.query.tql : null;
+    let tql = variant ? variant.query.tql : '';
     
     return (
       <div className='deploy-modal-tql'>

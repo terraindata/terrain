@@ -63,20 +63,19 @@ export var BuilderActionTypes =
   move: '', // within the same parent
   nestedMove: '', // can occur between different parts of the tree
   remove: '',
+  dragCard: '',
+  dragCardOver: '',
+  dropCard: '',
   
   hoverCard: '',
   
   selectCard: '',
   
-  dragCard: '',
-  dragCardOver: '',
-  dropCard: '',
   
-  // between Cards and TQL
-  changeQueryMode: '',
-  
-  // Change the TQL, whether compiled or hand-written
+  // Change the hand-writen TQL
   changeTQL: '',
+  parseTreeLoaded: '',
+  parseTreeError: '',
   
   toggleDeck: '',
   
@@ -118,9 +117,8 @@ var setValuesToKeys = (obj: any, prefix: string) =>
 
 setValuesToKeys(BuilderActionTypes, '');
 
-export let BuilderDirtyActionTypes = {};
-
 // which actions dirty the state?
+export let BuilderDirtyActionTypes = {};
 [
   BuilderActionTypes.create,
   BuilderActionTypes.change,
@@ -129,9 +127,19 @@ export let BuilderDirtyActionTypes = {};
   BuilderActionTypes.nestedMove,
   BuilderActionTypes.dropCard,
   BuilderActionTypes.changeTQL,
-  BuilderActionTypes.changeQueryMode,
   BuilderActionTypes.toggleDeck,
   BuilderActionTypes.checkpoint,
 ].map(type => BuilderDirtyActionTypes[type] = true);
+
+// which actions modify cards?
+export let BuilderCardActionTypes = {};
+[
+  BuilderActionTypes.create,
+  BuilderActionTypes.change,
+  BuilderActionTypes.move,
+  BuilderActionTypes.nestedMove,
+  BuilderActionTypes.remove,
+  BuilderActionTypes.dropCard,
+].map(type => BuilderCardActionTypes[type] = true);
 
 export default BuilderActionTypes;

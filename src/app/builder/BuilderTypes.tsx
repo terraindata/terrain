@@ -127,14 +127,9 @@ export module BuilderTypes
     inputs: List<any> = List([]);
     resultsConfig: IResultsConfig = null;
     tql: string = "";
-    mode: string = "cards";
     deckOpen: boolean = true;
     
-    // TODO include this and make it work
-    // static:
-    // {
-    //   getChildTerms: (query:Query) => List<string>;
-    // }
+    tqlCardsInSync: boolean = false;
   }
   const Query_Record = Immutable.Record(new QueryC());
   export interface Query extends QueryC, IRecord<Query> {}

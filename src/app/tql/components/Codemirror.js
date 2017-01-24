@@ -435,7 +435,7 @@ var CodeMirror = React.createClass({
 			{
         className: editorClassName,
       },
-			React.createElement('textarea', { ref: 'textarea', name: this.props.path, placeholder: "Enter TQL here", defaultValue: this.props.value, autoComplete: 'off' })
+			React.createElement('textarea', { ref: 'textarea', name: this.props.path, placeholder: "Write TQL here", defaultValue: this.props.value, autoComplete: 'off' })
 		);
 	}
 });

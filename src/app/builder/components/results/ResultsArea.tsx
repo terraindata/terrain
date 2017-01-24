@@ -244,9 +244,7 @@ class ResultsArea extends PureClasss<Props>
   isQueryEmpty(): boolean
   {
     let {query} = this.props;
-    return !query
-      || (query.mode === 'tql' && !query.tql)
-      || (query.mode !== 'tql' && !query.cards.size);
+    return !query || (!query.tql && !query.cards.size);
   }
   
   resultsFodderRange = _.range(0, 25);
@@ -262,15 +260,9 @@ class ResultsArea extends PureClasss<Props>
     
     if(this.state.error)
     {
-      let error = "";
-      if(typeof this.state.error === 'string')
-      {
-        error = this.state.error.replace(/MySQL/g, 'TerrainDB')
-      }
-      
       return <InfoArea
         large="There was an error with your query."
-        small={error}
+        small={this.state.error}
       />
     }
     
@@ -411,8 +403,18 @@ class ResultsArea extends PureClasss<Props>
       {
         if(!isAllFields)
         {
+          let {error} = response;
+          if(typeof this.state.error === 'string')
+          {
+            if(error.charAt(error.length - 1) === '^')
+            {
+              error = error.substr(0, error.length - 1);
+            }
+            error = this.state.error.replace(/MySQL/g, 'TerrainDB');
+          }
+          
           this.setState({
-            error: response.error,
+            error,
           });
         }
         this.props.onLoadEnd && this.props.onLoadEnd();
@@ -510,16 +512,10 @@ class ResultsArea extends PureClasss<Props>
       pages = this.state.resultFormat === 'icon' ? this.state.resultsPages : 50;
     }
     
-    if (query.mode === "tql")
-    {
-      var tql = query.tql;
-    }
-    else 
-    {
-      tql = TQLConverter.toTQL(query, {
-        limit: MAX_RESULTS,
-      });
-    }
+    var tql = TQLConverter.toTQL(query, {
+      limit: MAX_RESULTS,
+    });
+    
     if(tql !== this.state.tql)
     {
       this.setState({
@@ -532,38 +528,26 @@ class ResultsArea extends PureClasss<Props>
       this.allXhr && this.allXhr.abort();
       
       this.xhr = Ajax.query(tql, this.props.db, this.handleResultsChange, this.handleError);
-      if(query.mode === "tql")
-      {
-        this.allXhr = Ajax.query(
-          tql, 
-          this.props.db,
-          this.handleAllFieldsResponse,
-          this.handleAllFieldsError
-        );
-      }
-      else 
-      {
-        this.allXhr = Ajax.query(
-          TQLConverter.toTQL(query, {
-            allFields: true,
-            transformAliases: true,
-            limit: MAX_RESULTS,
-          }), 
-          this.props.db,
-          this.handleAllFieldsResponse,
-          this.handleAllFieldsError
-        );
-        
-        this.countXhr = Ajax.query(
-          TQLConverter.toTQL(query, {
-            count: true,
-          }), 
-          this.props.db,
-          this.handleCountResponse,
-          this.handleCountError
-        );
-      }
-
+      
+      this.allXhr = Ajax.query(
+        TQLConverter.toTQL(query, {
+          allFields: true,
+          transformAliases: true,
+          limit: MAX_RESULTS,
+        }), 
+        this.props.db,
+        this.handleAllFieldsResponse,
+        this.handleAllFieldsError
+      );
+      
+      this.countXhr = Ajax.query(
+        TQLConverter.toTQL(query, {
+          count: true,
+        }), 
+        this.props.db,
+        this.handleCountResponse,
+        this.handleCountError
+      );
     }
   }
   
