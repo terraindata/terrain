@@ -64,7 +64,6 @@ export const TQLToCards =
     
     if(currentCards)
     {
-      console.log(currentCards, reconcileCards(currentCards, cards), cards);
       return reconcileCards(currentCards, cards);
     }
     
@@ -74,7 +73,7 @@ export const TQLToCards =
 
 function parseNode(node:Node | string): CardString
 {
-  if(!node)
+  if(node === null || node === undefined)
   {
     return make(Blocks.tql);
   }
@@ -199,6 +198,10 @@ const generalProcessors: {
       return node.left_child + '.' + node.right_child;
     },
   
+  '-':
+    (node) =>
+      '-' + parseNode(node.child),
+  
   call:
     (node) =>
     {
@@ -206,6 +209,45 @@ const generalProcessors: {
       if(typeof type === 'string')
       {
         type = type.trim();
+        
+        if(type === 'linear_score')
+        {
+          let weightNodes = flattenCommas(node.right_child);
+          let weights = List([]);
+          for(let i = 0; i < weightNodes.length; i += 2)
+          {
+            weights = weights.push(
+              make(Blocks.weight, {
+                weight: parseNode(weightNodes[i]),
+                key: parseNode(weightNodes[i + 1]),
+              })
+            );
+          }
+          return make(Blocks.score, {
+            weights,
+          });
+        }
+        
+        if(type === 'linear_transform')
+        {
+          let scorePointNodes = flattenCommas(node.right_child);
+          let scorePoints = List([]);
+          
+          for(let i = 1; i < scorePointNodes.length; i += 2)
+          {
+            scorePoints = scorePoints.push(
+              make(Blocks.scorePoint, {
+                score: scorePointNodes[i],
+                value: scorePointNodes[i + 1],
+              })
+            );
+          }
+          return make(Blocks.transform, {
+            input: parseNode(scorePointNodes[0]),
+            scorePoints,
+          });
+        }
+        
         if(Blocks[type])
         {
           return make(Blocks[type], {
@@ -213,7 +255,7 @@ const generalProcessors: {
           });
         }
       }
-      console.log('no call for', node);
+      
       return make(Blocks.tql, { clause: 'call', });
     },
   
@@ -357,7 +399,7 @@ const sfwProcessors: {
 //  and turns it into an array of Node
 function flattenOp(op: string, node:Node | string): (Node | string)[]
 {
-  if(typeof node !== 'object' || node.op !== op)
+  if(typeof node !== 'object' || !node || node.op !== op)
   {
     return [node];
   }
@@ -408,7 +450,7 @@ function reconcileCards(currentCards: Cards, newCards: Cards): Cards
       
       if(tempIndex !== currentCards.size)
       {
-        // found a matching card, assing the id and update currentCardIndex
+        // found a matching card, assign the id and meta fields, and update currentCardIndex
         let currentCard = currentCards.get(tempIndex);
         card = card.set('id', currentCard.id);
         card.static.metaFields.map(

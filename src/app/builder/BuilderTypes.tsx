@@ -1180,10 +1180,10 @@ export module BuilderTypes
     transform: _card(
     {
       input: "",
+      scorePoints: List([]),
+      
       domain: List([0,100]),
       hasCustomDomain: false, // has the user set a custom domain
-      bars: List([]),
-      scorePoints: List([]),
       
       static:
       {
@@ -1241,7 +1241,9 @@ export module BuilderTypes
                 }),
               ]),
           }
-        )
+        ),
+        
+        metaFields: ['domain', 'hasCustomDomain'],
       }
     }),
     
@@ -1361,7 +1363,8 @@ export module BuilderTypes
         manualEntry: null,
       },
     }),
-  }
+  };
+  
   // Set the "type" field for all blocks equal to its key
   _.map(Blocks as ({[card:string]:any}), (v, i) => Blocks[i].type = i);
   
