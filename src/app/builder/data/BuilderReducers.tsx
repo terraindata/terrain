@@ -310,7 +310,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     state: BuilderState,
     action: Action<{
       response: {
-        result: Object
+        result: any
       }
     }>
   ) =>
@@ -318,7 +318,9 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       .update('query',
         query =>
           query
-            .set('cards', TQLToCards.convert(action.payload.response.result))
+            .set('cards', 
+              TQLToCards.convert(action.payload.response.result, state.query.cards)
+            )
             .set('tqlCardsInSync', true)
       )
       .set('parseTreeReq', null),

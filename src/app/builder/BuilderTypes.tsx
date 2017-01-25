@@ -241,6 +241,9 @@ export module BuilderTypes
       // If an array of objects, you can specify: [arrayKey.objectKey]
       // and it will map through and join the values with ", ";
       manualEntry: IManualEntry;
+      
+      // a list of which fields on this card are just metadata, e.g. 'closed'
+      metaFields: string[];
     };
   }
   
@@ -288,6 +291,8 @@ export module BuilderTypes
       getChildTerms?: (card: ICard) => List<string>;
       getNeighborTerms?: (card: ICard) => List<string>;
       
+      metaFields?: string[];
+      
       init?: () => {
         [k:string]: any;
       };
@@ -296,11 +301,24 @@ export module BuilderTypes
   
   // helper function to populate random card fields
   const _card = (config:ICardConfig) =>
-    _.extend(config, {
+  {
+    config = _.extend(config, {
       id: "",
       _isCard: true,
       closed: false,
     });
+    
+    if(config.static.metaFields)
+    {
+      config.static.metaFields.push('closed');
+    }
+    else
+    {
+      config.static.metaFields = ['closed'];
+    }
+    
+    return config;
+  }
   
   // a card that contains other cards
   export interface IWrapperCard extends ICard

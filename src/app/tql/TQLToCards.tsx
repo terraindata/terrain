@@ -56,27 +56,20 @@ const {Blocks, make} = BuilderTypes;
 
 export const TQLToCards =
 {
-  convert(statement: Statement): Cards
+  convert(statement: Statement, currentCards?: Cards): Cards
   {
-    let statements = statement.statements.map(
-      (node) =>
-      {
-        let cardString = parseNode(node);
-        if(typeof cardString === 'string')
-        {
-          return make(Blocks.tql, {
-            clause: cardString,
-          });
-        }
-        else
-        {
-          return cardString;
-        }
-      }
-    );
-    return List(statements);
+    let statements = statement.statements.map(parseNodeAsCard);
+    
+    let cards: Cards = List(statements);
+    
+    if(currentCards)
+    {
+      console.log(currentCards, reconcileCards(currentCards, cards), cards);
+      return reconcileCards(currentCards, cards);
+    }
+    
+    return cards;
   },
-  
 };
 
 function parseNode(node:Node | string): CardString
@@ -396,6 +389,46 @@ interface Node
   child?: Node;
 }
 
+
+function reconcileCards(currentCards: Cards, newCards: Cards): Cards
+{
+  let currentCardIndex = 0;
+  return newCards.map(
+    (card, index) =>
+    {
+      // search for a card of the same type
+      let tempIndex = currentCardIndex;
+      while(
+        tempIndex < currentCards.size &&
+          currentCards.get(tempIndex).type !== card.type
+      )
+      {
+        tempIndex ++;
+      }
+      
+      if(tempIndex !== currentCards.size)
+      {
+        // found a matching card, assing the id and update currentCardIndex
+        let currentCard = currentCards.get(tempIndex);
+        card = card.set('id', currentCard.id);
+        card.static.metaFields.map(
+          metaField =>
+            card = card.set(metaField, currentCard[metaField])
+        );
+        currentCardIndex = tempIndex + 1;
+        if(card['cards'])
+        {
+          card = card.set('cards', 
+            reconcileCards(currentCard['cards'], card['cards'])
+          );
+        }
+        // TODO search through other properties
+      }
+      // else, no matching card found, move on
+      return card;
+    }
+  ).toList();
+}
 
 
 export default TQLToCards;
