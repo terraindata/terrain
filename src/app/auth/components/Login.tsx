@@ -198,7 +198,6 @@ class Login extends PureClasss<Props>
       }
       let token = this.xhr.responseText;
       this.xhr = null;
-      console.log('received token', token);
       login(token);
     }
     // NOTE: MIDWAY_HOST will be replaced by the build process.

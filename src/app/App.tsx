@@ -166,7 +166,6 @@ class App extends PureClasss<Props>
     this._subscribe(AuthStore, {
       updater: (state) => {
         let token = AuthStore.getState().get('authenticationToken');
-        console.log('Got a token in App', state.get('authenticationToken'), AuthStore.getState().get('authenticationToken'));
         let loggedIn = token !== null;
         let loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
         

@@ -95,7 +95,6 @@ export const Ajax = {
     xhr.open(method, host + url, true);
     if(!config.noToken)
     {
-      console.log('req with token', AuthStore.getState().get('authenticationToken'));
       xhr.setRequestHeader('token', AuthStore.getState().get('authenticationToken'));
     }
     
