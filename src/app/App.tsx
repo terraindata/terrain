@@ -164,10 +164,11 @@ class App extends PureClasss<Props>
     
     // Respond to authentication state changes.
     this._subscribe(AuthStore, {
-      updater: () => {
+      updater: (state) => {
         let token = AuthStore.getState().get('authenticationToken');
+        console.log('Got a token in App', state.get('authenticationToken'), AuthStore.getState().get('authenticationToken'));
         let loggedIn = token !== null;
-        let loggedInAndLoaded = !loggedIn ? false : this.state.loggedInAndLoaded;
+        let loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
         
         this.setState({
           loggedIn,
