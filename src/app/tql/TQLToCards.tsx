@@ -171,7 +171,12 @@ const generalProcessors: {
         );
       
       return make(Blocks.sfw, {
-        tables: List(tables),
+        cards:
+          List([
+            make(Blocks.from, {
+              tables: List(tables),
+            })
+          ])
       });
     },
     
