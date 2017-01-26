@@ -108,9 +108,16 @@ class TQLConverter
     // find top-level 'from' cards
     return cards.map(topCard =>
     {
-      if(topCard.type === 'from' || topCard.type === 'sfw')
+      if(topCard.type === 'sfw')
       {
-        return fn(topCard);
+        if(topCard['cards'].some(
+            card =>
+              card.type === 'from'
+          ))
+        {
+          // we only want to apply these functions to Select cards that also have a From
+          return fn(topCard);
+        }
       }
       return topCard;
     }) as List<ICard>;

@@ -177,6 +177,24 @@ var Util = {
     return then.format('MM/DD/YY') + hour;
   },
   
+  exportToCSV(data: (string | number)[][], fileName: string)
+  {
+    // from http://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
+    let csvContent = "data:text/csv;charset=utf-8,";
+    data.forEach((infoArray, index) => {
+       let dataString = infoArray.join(",");
+       csvContent += index < data.length ? dataString+ "\n" : dataString;
+    });
+    
+    let encodedUri = encodeURI(csvContent);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", fileName + ".csv");
+    document.body.appendChild(link); // Required for FF
+    link.click();
+    link.remove();
+  },
+  
   assertKeysArePresent(first, second, errorMsg: string, oneWay?: boolean)
   {
     _.map(first, 

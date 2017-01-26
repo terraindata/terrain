@@ -166,6 +166,7 @@ class Login extends PureClasss<Props>
     this.props.onLoadComplete();
   }
   
+  xhr: XMLHttpRequest;
   handleLogin()
   {
     this.setState({
@@ -176,28 +177,32 @@ class Login extends PureClasss<Props>
       Actions.login(token, username);
     };
     
-    let xhr = new XMLHttpRequest();
-    xhr.onerror = (ev:Event) => {
+    this.xhr && this.xhr.abort();
+    this.xhr = new XMLHttpRequest();
+    this.xhr.onerror = (ev:Event) => {
       this.setState({
-          errorModalMessage: 'Error logging in:' + ev,
-          loggingIn: false,
-        });
-        this.toggleErrorModal();
+        errorModalMessage: 'Error logging in:' + ev,
+        loggingIn: false,
+      });
+      this.toggleErrorModal();
+      this.xhr = null;
     }
-    xhr.onload = (ev:Event) => {
-      if (xhr.status != 200) {
+    this.xhr.onload = (ev:Event) => {
+      if(this.xhr.status != 200) {
         this.setState({
           loggingIn: false,
-          errorModalMessage: 'Failed to log in: ' + xhr.responseText,
+          errorModalMessage: 'Failed to log in: ' + this.xhr.responseText,
         });
         this.toggleErrorModal();
         return;
       }
-      login(xhr.responseText);
+      let token = this.xhr.responseText;
+      this.xhr = null;
+      login(token);
     }
     // NOTE: MIDWAY_HOST will be replaced by the build process.
-    xhr.open("POST", MIDWAY_HOST + "/auth", true);
-    xhr.send(JSON.stringify({
+    this.xhr.open("POST", MIDWAY_HOST + "/auth", true);
+    this.xhr.send(JSON.stringify({
       username,
       password: this.state.password,
     }));

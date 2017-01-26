@@ -301,14 +301,6 @@ class BuilderComponent extends PureClasss<Props>
         break;
       case DisplayType.COMPONENT:
         let Comp = d.component;
-        // content = React.cloneElement(<Comp />, {
-        //   key,
-        //   keyPath,
-        //   data,
-        //   parentData: this.props.parentData,
-        //   canEdit: this.props.canEdit,
-        //   className,
-        // });
         var isTransformCard = d.key === 'scorePoints';
         content = (
           <div 
@@ -394,38 +386,11 @@ class BuilderComponent extends PureClasss<Props>
       );
     }
     
-    if(!d.header)
-    {
-      return content;
-    }
-    
-    return (
-      <div key={key}>
-        <div
-          className={'builder-card-header ' + (d.headerClassName ? d.headerClassName : '')}
-          style={{
-            backgroundColor: this.props.data.static.colors[0],
-          }}
-        >
-          {
-            d.header
-          }
-        </div>
-        { 
-          content
-        }
-      </div>
-    );
+    return content;
   }
   
   render()
   {
-    // if(!this.state || !this.state['render'])
-    // {
-    //   setTimeout(() => this.setState({ render: true, }), 1000);
-    //   return null;
-    // }
-    
     var {data, display} = this.props;
     if(!display)
     {

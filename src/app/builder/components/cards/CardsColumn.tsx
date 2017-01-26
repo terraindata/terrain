@@ -224,9 +224,8 @@ class CardsColumn extends PureClasss<Props>
             {
               !cards.size ? /* "Create your first card." */
                 <InfoArea
-                  large={!canEdit && "There aren't any cards in this query."} 
-                  small={false && canEdit && "Create one below. Most people start with the Select/From card."}
-                  button={canEdit && "Create a Select / From Card"}
+                  large={"There aren't any cards in this query."} 
+                  button={canEdit && "Create a Select Card"}
                   onClick={this.createFromCard}
                   inline={false}
                 />

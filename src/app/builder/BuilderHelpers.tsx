@@ -75,10 +75,10 @@ export module BuilderHelpers
   {
     if(!keyPath.size)
     {
-      return null;
+      return Immutable.List([]);
     }
     
-    let parentTerms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state);
+    let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state);
 
     let block = BuilderStore.getState().getIn(keyPath);
     
@@ -86,39 +86,31 @@ export module BuilderHelpers
     {
       let card = block as BuilderTypes.ICard;
       
-      let terms = null;
-      
       if(card.static.getChildTerms)
       {
-        terms = card.static.getChildTerms(card);
+        terms = terms.concat(card.static.getChildTerms(card)).toList();
       }
       
       if(card.static.getNeighborTerms)
       {
-        let neighborTerms = card.static.getNeighborTerms(card);
-        
-        if(terms)
-        {
-          terms = terms.concat(neighborTerms);
-        }
-        else
-        {
-          terms = neighborTerms;
-        }
+        terms = terms.concat(card.static.getNeighborTerms(card)).toList(); 
       }
       
-      if(terms)
+      if(card['cards'])
       {
-        if(parentTerms)
-        {
-          return terms.concat(parentTerms);
-        }
-        
-        return terms;
+        card['cards'].map(
+          (childCard: BuilderTypes.ICard) =>
+          {
+            if(childCard.static.getParentTerms)
+            {
+              terms = terms.concat(childCard.static.getParentTerms(childCard)).toList();
+            }
+          }
+        );
       }
     }
     
-    return parentTerms;
+    return terms;
   }
 }
 

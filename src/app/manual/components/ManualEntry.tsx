@@ -227,62 +227,71 @@ class ManualEntry extends Classs<Props>
 
   renderCardExample(index) 
   {
-    var card = BuilderTypes.recordFromJS(this.state.manualEntry.text[index]);
-    return (
-      <div className='manual-entry-demo'>
-        <Card
-          {...this.props}
-          card={card}
-          index={0}
-          parentId='CI2XI'
-          singleCard={false}
-          keys={Immutable.List([])}
-          keyPath={Immutable.List([])}
-          helpOn={this.state.manualEntry.text[index].helpOn}
-        /> 
-      </div>
-    );
+    return <div>Temporarily disabled</div>;
+    // if(BuilderTypes.Blocks[this.state.manualEntry.text[index].type])
+    // {
+    //   var card = BuilderTypes.make(
+    //     BuilderTypes.Blocks[this.state.manualEntry.text[index].type],
+    //     this.state.manualEntry.text[index]
+    //   );
+    //   return (
+    //     <div className='manual-entry-demo'>
+    //       <Card
+    //         {...this.props}
+    //         card={card}
+    //         index={0}
+    //         parentId='CI2XI'
+    //         singleCard={false}
+    //         keys={Immutable.List([])}
+    //         keyPath={Immutable.List([])}
+    //         helpOn={this.state.manualEntry.text[index].helpOn}
+    //       /> 
+    //     </div>
+    //   );
+    // }
   }
 
   renderCodeMirrorExample(index) 
   {
-    var options = {
-      readOnly: true,
-      lineNumbers: true,
-      theme: 'monokai',
-      foldGutter: true,
-      gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-    }
-    var cards = Immutable.List([BuilderTypes.recordFromJS(this.state.manualEntry.text[index])]);
-    var query: any = {
-      id: 'a',
-      cards: cards,
-      inputs: Immutable.List([]),
-      tql: '',
-      version: false,
-      name: '',
-      lastEdited: '',
-      db: '',
-      resultsConfig: null,
-      deckOpen: false,
-      isDefault: false,
-    };
+    return <div>Temporarily disabled</div>;
+    // var options = {
+    //   readOnly: true,
+    //   lineNumbers: true,
+    //   theme: 'monokai',
+    //   foldGutter: true,
+    //   gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+    // }
+    // var cards = Immutable.List([BuilderTypes.recordFromJS(this.state.manualEntry.text[index])]);
+    // var query: any = {
+    //   id: 'a',
+    //   cards: cards,
+    //   inputs: Immutable.List([]),
+    //   tql: '',
+    //   version: false,
+    //   mode: '',
+    //   name: '',
+    //   lastEdited: '',
+    //   db: '',
+    //   resultsConfig: null,
+    //   deckOpen: false,
+    //   isDefault: false,
+    // };
 
-    var value = TQLConverter.toTQL(query);
+    // var value = TQLConverter.toTQL(query);
 
-    var numLines = value.split('\n').length;
-    var padding = numLines === 1 ? 2 : 8;
-    return (
-      <div 
-        className='manual-entry-codemirror'
-        style={{height: (numLines * 17 + padding) + 'px'}}
-      >
-        <CodeMirror 
-          options={options}
-          value={value}
-        />
-      </div>
-    );
+    // var numLines = value.split('\n').length;
+    // var padding = numLines === 1 ? 2 : 8;
+    // return (
+    //   <div 
+    //     className='manual-entry-codemirror'
+    //     style={{height: (numLines * 17 + padding) + 'px'}}
+    //   >
+    //     <CodeMirror 
+    //       options={options}
+    //       value={value}
+    //     />
+    //   </div>
+    // );
   }
 
   renderInDepthDescription()

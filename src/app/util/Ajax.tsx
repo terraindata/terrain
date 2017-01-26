@@ -45,7 +45,7 @@ THE SOFTWARE.
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 
-import Store from './../auth/data/AuthStore.tsx';
+import AuthStore from './../auth/data/AuthStore.tsx';
 import Actions from './../auth/data/AuthActions.tsx';
 import UserTypes from './../users/UserTypes.tsx';
 import RoleTypes from './../roles/RoleTypes.tsx';
@@ -95,7 +95,7 @@ export const Ajax = {
     xhr.open(method, host + url, true);
     if(!config.noToken)
     {
-      xhr.setRequestHeader('token', Store.getState().get('authenticationToken'));
+      xhr.setRequestHeader('token', AuthStore.getState().get('authenticationToken'));
     }
     
     if(config.crossDomain)

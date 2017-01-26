@@ -48,6 +48,7 @@ const {Map,List} = Immutable;
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
+import * as moment from 'moment';
 import Util from '../../../util/Util.tsx';
 import {Ajax, QueryResponse} from '../../../util/Ajax.tsx';
 import PanelMixin from '../layout/PanelMixin.tsx';
@@ -73,6 +74,7 @@ interface Props
   onLoadStart: () => void;
   onLoadEnd: () => void;
   canEdit: boolean;
+  variantName: string;
 }
 
 interface State
@@ -94,6 +96,8 @@ interface State
   
   resultsPages: number;
   onResultsLoaded: (unchanged?: boolean) => void;
+  
+  exporting: boolean;
 }
 
 class ResultsArea extends PureClasss<Props>
@@ -116,6 +120,7 @@ class ResultsArea extends PureClasss<Props>
     resultsPages: 1,
     onResultsLoaded: null,
     resultFormat: 'icon',
+    exporting: false,
   };
   
   constructor(props:Props)
@@ -133,9 +138,11 @@ class ResultsArea extends PureClasss<Props>
     this.xhr && this.xhr.abort();
     this.allXhr && this.allXhr.abort();
     this.countXhr && this.countXhr.abort();
-    this.xhr = false;
-    this.allXhr = false;
-    this.countXhr = false;
+    this.exportXhr && this.exportXhr.abort();
+    this.xhr = null;
+    this.allXhr = null;
+    this.countXhr = null;
+    this.exportXhr = null;
     this.timeout && clearTimeout(this.timeout);
   }
   
@@ -499,6 +506,89 @@ class ResultsArea extends PureClasss<Props>
     this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
+  exportXhr: XMLHttpRequest;
+  handleExport()
+  {
+    this.setState({
+      exporting: true,
+    });
+    
+    this.exportXhr && this.exportXhr.abort();
+    this.exportXhr = Ajax.query(
+      this.props.query.tql, 
+      this.props.db, 
+      this.handleExportDataLoaded,
+      this.handleExportError
+    );
+      
+  }
+  
+  handleExportDataLoaded(response: QueryResponse)
+  {
+    if(response.error)
+    {
+      alert('There was an error exporting your data: ' + response.error);
+    }
+    let {resultSet} = response;
+    if(resultSet)
+    {
+      let headers: (string | number)[] = [];
+      let headersMap: any = {};
+      let body: (string | number)[][] = [];
+      
+      if(!Array.isArray(resultSet))
+      {
+        headers = ['Text result'];
+        body = [[JSON.stringify(resultSet)]];
+      }
+      else
+      {
+        resultSet.map(
+          (obj) =>
+          {
+            let row: (string | number)[] = [];
+            
+            // add data which already has a header
+            headers.map(
+              headerField =>
+                row.push(obj[headerField])
+            );
+            
+            // add data which doesn't already have a header, and add the header
+            for(let key in obj)
+            {
+              if(!headersMap[key])
+              {
+                headersMap[key] = true;
+                headers.push(key);
+                row.push(obj[key]);
+              }
+            }
+            
+            body.push(row);
+          }
+        );
+      }
+      
+      body.unshift(headers);
+      Util.exportToCSV(
+        body,
+        this.props.variantName + ' on ' + moment().format('MM/DD/YY')
+      );
+    }
+    this.setState({
+      exporting: false,
+    });
+  }
+  
+  handleExportError(error)
+  {
+    alert('There was an error connecting to the server to export your data: ' + error);
+    this.setState({
+      exporting: false,
+    });
+  }
+  
   handleAllFieldsError()
   {
     this.allXhr = null;
@@ -578,6 +668,31 @@ class ResultsArea extends PureClasss<Props>
           }
         </div>
         
+        {
+          this.state.exporting
+          ?
+            <div
+              className='results-top-config results-top-config-unclickable'
+            >
+              Exporting...
+            </div>
+          :
+            <div
+              className='results-top-config'
+              onClick={this.handleExport}
+            >
+              Export
+            </div>
+        }
+        
+        
+        <div
+          className='results-top-config'
+          onClick={this.showConfig}
+        >
+          Customize view
+        </div>
+        
         <Switch
           first='Icons'
           second='Table'
@@ -585,10 +700,6 @@ class ResultsArea extends PureClasss<Props>
           selected={this.state.resultFormat === 'icon' ? 1 : 2}
           small={true}
         />
-        
-        <div className='results-top-config' onClick={this.showConfig}>
-          Customize view
-        </div>
       </div>
     );
   }

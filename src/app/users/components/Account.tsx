@@ -73,29 +73,45 @@ class Account extends Classs<Props>
     switch(this.props.location.pathname)
     {
       case "/account/profile":
+        var profileActive = true;
         title = "Profile";
-        selected = '298px';
+        // selected = '298px'; // use this when we add notifications back in
+        selected = '154px';
         break;
       case "/account/notifications":
+        var notificationsActive = true;
         title = "Notifications";
         selected = '154px';
         break;
       case "/account/team":
+        var teamActive = true;
         title = "Team";
         selected = 'calc(100% - 10px - 144px)';
         break;
       case "/account/settings":
+        var settingsActive = true;
         title = "Settings";
         selected = '10px';
         break;    
     }
     
+      // add this back in when ready
+            // <Link 
+            //   to={'/account/notifications'} 
+            //   className={classNames({
+            //     'account-link': true,
+            //     'active': notificationsActive,
+            //   })}  >
+            //   Notifications
+            // </Link>
     return (
       <div className='account'>
         <div className='account-wrapper'>
           <div className='account-title'>
             <HomeIcon />
-            { title }
+            { 
+              title
+            }
           </div>
           <div className='account-links'>
             <div 
@@ -108,24 +124,16 @@ class Account extends Classs<Props>
               to={'/account/settings'} 
               className={classNames({
                 'account-link': true,
-                'active': selected === '10px',
+                'active': settingsActive,
               })}  
             >
               Settings
             </Link>
             <Link 
-              to={'/account/notifications'} 
-              className={classNames({
-                'account-link': true,
-                'active': selected === '154px',
-              })}  >
-              Notifications
-            </Link>
-            <Link 
               to={'/account/profile'} 
               className={classNames({
                 'account-link': true,
-                'active': selected === '298px',
+                'active': profileActive,
               })}  >
               Profile
             </Link>
@@ -133,13 +141,15 @@ class Account extends Classs<Props>
               to={'/account/team'} 
               className={classNames({
                 'account-link': true,
-                'active': selected === 'calc(100% - 10px - 144px)',
+                'active': teamActive,
               })}  >
               Team
             </Link>
           </div>
           <div className='account-inner'>
-            { this.props.children }
+            { 
+              this.props.children 
+            }
           </div>
         </div>
       </div>
