@@ -77,6 +77,7 @@ import Placeholder from "./common/components/Placeholder.tsx";
 import Redirect from "./common/components/Redirect.tsx";
 import Logout from "./common/components/Logout.tsx";
 import ManualWrapper from "./manual/components/ManualWrapper.tsx";
+import InfoArea from './common/components/InfoArea.tsx';
 var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
 import { Router, Route, IndexRoute } from 'react-router';
 const {browserHistory} = require('react-router');
@@ -156,11 +157,22 @@ class App extends PureClasss<Props>
     libraryLoaded: false,
     usersLoaded: false,
     rolesLoaded: false,
+    
+    noLocalStorage: false,
   };
   
   constructor(props:Props)
   {
     super(props);
+    
+    try {
+      // check to see if we can use localStorage
+      localStorage['test'] = 'test';
+    } catch(e)
+    {
+      this.state.noLocalStorage = true;
+      return;
+    }
     
     // Respond to authentication state changes.
     this._subscribe(AuthStore, {
@@ -287,6 +299,15 @@ class App extends PureClasss<Props>
 
   render()
   {
+    if(this.state.noLocalStorage)
+    {
+      return (
+        <InfoArea
+          large="Terraformer cannot be used successfully on this browser in 'private' / 'icognito' mode. Plesae switch to another browser or turn off incognito mode."
+        />
+      );
+    }
+    
     return (
       <div
         className='app'
