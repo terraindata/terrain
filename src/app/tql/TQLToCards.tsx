@@ -471,14 +471,17 @@ function reconcileBlock(currentBlock: Block, newBlock: Block): Block
 {
   if(!currentBlock || currentBlock.type !== newBlock.type)
   {
+    console.log('short circuit because', !currentBlock, currentBlock.type !== newBlock.type)
     return newBlock;
   }
   
   let block = newBlock; 
+  
   block.static.metaFields && block.static.metaFields.map(
     metaField => 
-      block.set(metaField, currentBlock[metaField])
+      block = block.set(metaField, currentBlock[metaField])
   );
+  
   if(block['cards'])
   {
     block = block.set('cards', 

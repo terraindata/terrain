@@ -48,8 +48,9 @@ import { Map, List } from 'immutable';
 import * as ReduxActions from 'redux-actions';
 import {CardItem} from '../components/cards/Card.tsx';
 var Redux = require('redux');
-import {BuilderActionTypes, BuilderDirtyActionTypes} from './BuilderActionTypes.tsx';
+import {BuilderActionTypes, BuilderDirtyActionTypes, BuilderCardActionTypes} from './BuilderActionTypes.tsx';
 import Util from '../../util/Util.tsx';
+import TQLConverter from '../../tql/TQLConverter.tsx';
 
 import BuilderTypes from './../BuilderTypes.tsx';
 import LibraryTypes from './../../library/LibraryTypes.tsx';
@@ -136,10 +137,23 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
         state = state.set('nextQueries', Immutable.List([]));
       }
     }
+    
     if(BuilderReducers[action.type])
     {
       state = BuilderReducers[action.type](state, action);
     }
+    
+    if(BuilderCardActionTypes[action.type])
+    {
+      // a card changed and we need to re-translate the tql
+      //  needs to be after the card change has affected the state
+      state = state
+        .setIn(['query', 'tql'], 
+          TQLConverter.toTQL(state.query)
+        )
+        .setIn(['query', 'tqlCardsInSync'], true);
+    }
+    
     return state;
   }
 , DefaultState);

@@ -177,6 +177,10 @@ var Util = {
     return then.format('MM/DD/YY') + hour;
   },
   
+  roundNumber(num, decimalPoints) {
+    return Math.round(num * Math.pow(10, decimalPoints)) / Math.pow(10, decimalPoints);
+  },
+  
   exportToCSV(data: (string | number)[][], fileName: string)
   {
     // from http://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side

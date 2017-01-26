@@ -114,12 +114,17 @@ class BuilderTQLColumn extends PureClasss<Props>
   {
     if(!this.state.focused && nextProps.query.tql !== this.state.tql)
     {
-      this.updateTql(nextProps.query.tql);
+      this.updateTql(nextProps.query.tql, true);
     }
   }
 
   updateTql(tql: string, noAction?: boolean) 
   {
+    if(tql === this.state.tql)
+    {
+      return;
+    }
+    
     // this.checkForFolding(tql);
     this.setState({
       tql,
@@ -128,7 +133,7 @@ class BuilderTQLColumn extends PureClasss<Props>
       termDefinitionOpen: false,
     });
     
-    if(!noAction)
+    if(!noAction && tql !== this.props.query.tql)
     {
       this.sendTqlAction();
     }

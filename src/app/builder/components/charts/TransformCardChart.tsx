@@ -47,7 +47,6 @@ let {List, Map} = Immutable;
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import Actions from "../../data/BuilderActions.tsx";
 import Util from '../../../util/Util.tsx';
 import PureClasss from '../../../common/components/PureClasss.tsx';
 import { BuilderTypes } from './../../BuilderTypes.tsx';
@@ -144,8 +143,14 @@ class TransformCardChart extends PureClasss<Props>
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState(selectedPointIds));
   }
    
-  updatePoints(points, isConcrete?: boolean)
+  updatePoints(points: ScorePoints, isConcrete?: boolean)
   {
+    points = points.map(
+      scorePoint =>
+        scorePoint
+          .set('score', Util.roundNumber(scorePoint.score, 4))
+          .set('value', Util.roundNumber(scorePoint.value, 4))
+    ).toList();
     this.props.updatePoints(points, isConcrete);
   }
   
@@ -201,7 +206,7 @@ class TransformCardChart extends PureClasss<Props>
     this.setState({
       movedSeed: this.state.moveSeed,
     });
-    this.updatePoints(points, isConcrete);
+    this.updatePoints(points.toList(), isConcrete);
   }
   
   onPointRelease()
@@ -223,14 +228,14 @@ class TransformCardChart extends PureClasss<Props>
     
     this.updatePoints(this.state.initialPoints.map(
       point => point.set('score', Util.valueMinMax(point.score + scoreDiff, 0, 1))
-    ));
+    ).toList());
   }
   
   onDelete(pointId)
   {
     this.updatePoints(this.props.points.filterNot(
       point => point.id === pointId || this.state.selectedPointIds.get(point.id)
-    ), true);
+    ).toList(), true);
   }
   
   onCreate(value, score)
@@ -247,7 +252,7 @@ class TransformCardChart extends PureClasss<Props>
         value,
         score,
       })
-    ), true);
+    ).toList(), true);
   }
   
   componentDidUpdate()
