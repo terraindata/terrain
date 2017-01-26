@@ -533,24 +533,36 @@ class Settings extends Classs<Props>
     });
   }
 
+  // add these back when ready
+      // <AccountEntry 
+      //   title='Username'
+      //   content= {this.renderUsernameContent()}
+      // /> 
+      // <AccountEntry 
+      //   title='Two-Factor Authentication' 
+      //   description={this.renderAuthenticationDescription()}
+      //   content={this.renderAuthenticationContent()}
+      //  /> 
+      // <AccountEntry
+      //   title='Sign out all other sessions'
+      //   description={this.renderSignOutDescription()}
+      //   buttonText={this.renderSignOutButton()}
+      //   /> 
+      // <AccountEntry
+      //   title='Deactivate your account'
+      //   description={this.renderDeactivateDescription()}
+      //   buttonText={this.renderDeactivateButton()}
+      //   lastEntry={true}
+      //   />
   render()
   {
     return (
       <div>
       <div className='settings-page-title'>Update your settings</div>
       <AccountEntry 
-        title='Username'
-        content= {this.renderUsernameContent()}
-      /> 
-      <AccountEntry 
         title='Password'
         content={this.renderPasswordContent()}
       /> 
-      <AccountEntry 
-        title='Two-Factor Authentication' 
-        description={this.renderAuthenticationDescription()}
-        content={this.renderAuthenticationContent()}
-       /> 
       <AccountEntry
         title='Email'
         description={this.renderEmailDescription()}
@@ -561,17 +573,6 @@ class Settings extends Classs<Props>
         description={this.renderTimeZoneDescription()}
         content={this.renderTimeZoneContent()}
         /> 
-      <AccountEntry
-        title='Sign out all other sessions'
-        description={this.renderSignOutDescription()}
-        buttonText={this.renderSignOutButton()}
-        /> 
-      <AccountEntry
-        title='Deactivate your account'
-        description={this.renderDeactivateDescription()}
-        buttonText={this.renderDeactivateButton()}
-        lastEntry={true}
-        />
         <Modal 
           message={this.state.modalMessage}
           onClose={this.toggleModal} 

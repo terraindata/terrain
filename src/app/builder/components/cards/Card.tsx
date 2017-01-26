@@ -404,27 +404,30 @@ class _Card extends PureClasss<Props>
       do {
         cardStart += el.offsetTop; 
         el = el.offsetParent as any;
-      } while(el.id !== 'cards-column');
+      } while(el && el.id !== 'cards-column');
       
-      // if cards are nested inside position:relative/absolute components, you will
-      //  need to loop through offsetParent until you reach the column, summing offsetTop
-      let cardHeight = this.cardEl.clientHeight;
-      let cardEnd = cardStart + cardHeight;
-
-      CARD_HEIGHT_MAP[id] = cardHeight;
-      
-      if(cardEnd < visibleStart || cardStart > visibleEnd)
+      if(el)
       {
-        return (
-          <div
-            className='card card-placeholder'
-            id={id}
-            style={{
-              height: cardHeight,
-            }}
-          />
-        );
-      } 
+        // if cards are nested inside position:relative/absolute components, you will
+        //  need to loop through offsetParent until you reach the column, summing offsetTop
+        let cardHeight = this.cardEl.clientHeight;
+        let cardEnd = cardStart + cardHeight;
+
+        CARD_HEIGHT_MAP[id] = cardHeight;
+        
+        if(cardEnd < visibleStart || cardStart > visibleEnd)
+        {
+          return (
+            <div
+              className='card card-placeholder'
+              id={id}
+              style={{
+                height: cardHeight,
+              }}
+            />
+          );
+        } 
+      }
     }
     else
     {
