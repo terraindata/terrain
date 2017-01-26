@@ -1316,7 +1316,7 @@ export module BuilderTypes
       static:
       {
         title: "Expression",
-        preview: "\n$clause",
+        preview: "[clause]",
         colors: ["#278172", "#aefcef"],
         tql: "$clause",
         manualEntry: ManualConfig.cards.tql,

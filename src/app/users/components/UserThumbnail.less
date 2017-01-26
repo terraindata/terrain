@@ -2,6 +2,8 @@
 
 .user-thumbnail {
   display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
   // margin: 0px @standard-margin;
 
   .user-thumbnail-image {
@@ -29,6 +31,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 80%;
   }
   
   &.user-thumbnail-admin {
