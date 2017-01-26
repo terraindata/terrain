@@ -113,7 +113,6 @@ class TransformCard extends PureClasss<Props>
       storeKeyPath: ['spotlights'],
       stateKey: 'spotlights',
     });
-    
   }
   
   componentWillReceiveProps(nextProps:Props)
@@ -123,9 +122,8 @@ class TransformCard extends PureClasss<Props>
       this.computeBars(nextProps.data.input);
     }
     
-    if(nextProps.data.domain !== this.props.data.domain)
+    if(!nextProps.data.domain.equals(this.props.data.domain))
     {
-      
       this.setState({
         domain: this.trimDomain(this.state.domain, nextProps.data.domain)
       });

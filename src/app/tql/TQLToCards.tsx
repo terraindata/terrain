@@ -456,25 +456,52 @@ function reconcileCards(currentCards: Cards, newCards: Cards): Cards
       if(tempIndex !== currentCards.size)
       {
         // found a matching card, assign the id and meta fields, and update currentCardIndex
-        let currentCard = currentCards.get(tempIndex);
-        card = card.set('id', currentCard.id);
-        card.static.metaFields.map(
-          metaField =>
-            card = card.set(metaField, currentCard[metaField])
-        );
+        let currentCard = currentCards.get(tempIndex) as Card;
         currentCardIndex = tempIndex + 1;
-        if(card['cards'])
-        {
-          card = card.set('cards', 
-            reconcileCards(currentCard['cards'], card['cards'])
-          );
-        }
-        // TODO search through other properties
+        return reconcileBlock(currentCard, card) as Card;
+        
       }
       // else, no matching card found, move on
       return card;
     }
   ).toList();
+}
+
+function reconcileBlock(currentBlock: Block, newBlock: Block): Block
+{
+  if(!currentBlock || currentBlock.type !== newBlock.type)
+  {
+    return newBlock;
+  }
+  
+  let block = newBlock; 
+  block.static.metaFields && block.static.metaFields.map(
+    metaField => 
+      block.set(metaField, currentBlock[metaField])
+  );
+  if(block['cards'])
+  {
+    block = block.set('cards', 
+      reconcileCards(currentBlock['cards'], block['cards'])
+    );
+  }
+  
+  BuilderTypes.forAllBlocks(
+    block,
+    (childBlock, keyPath) =>
+    {
+      let currentChildBlock = currentBlock.getIn(keyPath);
+      if(keyPath.size && currentChildBlock)
+      {
+        block = block.setIn(keyPath, reconcileBlock(currentChildBlock, childBlock));
+      }
+    },
+    List([]),
+    true,
+    true
+  );
+  
+  return block;
 }
 
 

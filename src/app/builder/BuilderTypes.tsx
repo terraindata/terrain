@@ -179,6 +179,7 @@ export module BuilderTypes
   {
     id: string;
     type: string;
+    _isBlock: boolean;
     
     // fields not saved on server
     static:
@@ -192,6 +193,8 @@ export module BuilderTypes
       //  will not remove field if it is the last in its parents' list
       removeOnCardRemove?: boolean;
       
+      metaFields: string[];
+      
       [field:string]: any;
     }
     
@@ -203,6 +206,7 @@ export module BuilderTypes
     id: string;
     type: string;
     _isCard: boolean;
+    _isBlock: boolean;
     closed: boolean;
     
     // the following fields are excluded from the server save    
@@ -259,18 +263,33 @@ export module BuilderTypes
       tqlGlue?: string;
       accepts?: List<string>;
       removeOnCardRemove?: boolean;
+      metaFields?: string[];
     }
     
     [field:string]:any;
   }
   
+  const allBlocksMetaFields = ['id'];
+  
   // helper function to populate common fields for an IBlock
   const _block = (config: IBlockConfig): IBlock =>
   {
-    return _.extend({
+    let blockConfig: IBlock = _.extend({
       id: "",
       type: "",
+      _isBlock: true,
     }, config);
+    
+    if(blockConfig.static.metaFields)
+    {
+      blockConfig.static.metaFields = blockConfig.static.metaFields.concat(allBlocksMetaFields);
+    }
+    else
+    {
+      blockConfig.static.metaFields = allBlocksMetaFields;
+    }
+    
+    return blockConfig;
   }
     
   // Every Card definition must follow this interface
@@ -302,22 +321,25 @@ export module BuilderTypes
     }
   }
   
+  const allCardsMetaFields = allBlocksMetaFields.concat(['closed']);
+  
   // helper function to populate random card fields
   const _card = (config:ICardConfig) =>
   {
     config = _.extend(config, {
       id: "",
       _isCard: true,
+      _isBlock: true,
       closed: false,
     });
     
     if(config.static.metaFields)
     {
-      config.static.metaFields.push('closed');
+      config.static.metaFields = config.static.metaFields.concat(allCardsMetaFields);
     }
     else
     {
-      config.static.metaFields = ['closed'];
+      config.static.metaFields = allCardsMetaFields;
     }
     
     return config;
@@ -1619,17 +1641,56 @@ export module BuilderTypes
     return map;
   }
   
-  export function forAllCards(_block:IBlock | List<IBlock>, fn: (card:ICard) => void)
-  {
-    if(_block)
-    {
-      if(_block['_isCard'])
+  export function forAllCards(
+    block:IBlock | List<IBlock>, 
+    fn: (card:ICard, keyPath: KeyPath) => void
+  ) {
+    forAllBlocks(
+      block,
+      (block: IBlock, keyPath: KeyPath) =>
       {
-        fn(_block as ICard);
+        if(block['_isCard'])
+        {
+          fn(block as any, keyPath);
+        }
       }
-      if(Immutable.Iterable.isIterable(_block))
+    );
+  }
+  
+  export function forAllBlocks(
+    block: IBlock | List<IBlock>, 
+    fn: (block: IBlock, keyPath: KeyPath) => void, 
+    keyPath: KeyPath = List([]), 
+    stopAtFirstBlock?: boolean, 
+    excludeWrappedCards?: boolean
+  ) 
+  {
+    if(block)
+    {
+      if(block['_isBlock'])
       {
-        (_block.toMap() as any).map(b => forAllCards(b as ICard, fn));
+        fn(block as IBlock, keyPath);
+      }
+      if(
+        Immutable.Iterable.isIterable(block)
+        && (!stopAtFirstBlock || !block['_isBlock'] || !keyPath.size)
+      )
+      {
+        (block.toMap() as any).map(
+          (b, key) =>
+          {
+            if(!excludeWrappedCards || key !== 'cards')
+            {
+              forAllBlocks(
+                b as IBlock, 
+                fn, 
+                keyPath.push(key), 
+                stopAtFirstBlock, 
+                excludeWrappedCards
+              );
+            }
+          }
+        );
       }
     }
   }
