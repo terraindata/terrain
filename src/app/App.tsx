@@ -77,7 +77,7 @@ import Placeholder from "./common/components/Placeholder.tsx";
 import Redirect from "./common/components/Redirect.tsx";
 import Logout from "./common/components/Logout.tsx";
 import ManualWrapper from "./manual/components/ManualWrapper.tsx";
-import InfoArea from './common/components/InfoArea.tsx';
+
 var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
 import { Router, Route, IndexRoute } from 'react-router';
 const {browserHistory} = require('react-router');
@@ -90,6 +90,7 @@ import LibraryStore from './library/data/LibraryStore.tsx';
 import LibraryActions from './library/data/LibraryActions.tsx';
 import UserStore from './users/data/UserStore.tsx';
 import RolesStore from './roles/data/RolesStore.tsx';
+import Util from './util/Util.tsx';
 
 // Icons
 var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
@@ -172,6 +173,11 @@ class App extends PureClasss<Props>
     {
       this.state.noLocalStorage = true;
       return;
+    }
+    
+    if(Util.getIEVersion())
+    {
+      alert('Terraformer is not meant to work in Internet Explorer. Please try another browser.');
     }
     
     // Respond to authentication state changes.
