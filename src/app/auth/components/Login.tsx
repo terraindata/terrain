@@ -46,6 +46,7 @@ require('./Login.less')
 import * as $ from 'jquery';
 import * as classNames from 'classnames';
 import * as React from 'react';
+import * as _ from 'underscore';
 import Util from '../../util/Util.tsx';
 import Actions from "../data/AuthActions.tsx";
 import PureClasss from '../../common/components/PureClasss.tsx';
@@ -169,6 +170,12 @@ class Login extends PureClasss<Props>
   xhr: XMLHttpRequest;
   handleLogin()
   {
+    if(this.state.loggingIn)
+    {
+      // already logging in
+      return;
+    }
+    
     this.setState({
       loggingIn: true,
     });
