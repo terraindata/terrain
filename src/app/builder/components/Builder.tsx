@@ -112,6 +112,8 @@ class Builder extends PureClasss<Props>
     leaving: boolean;
     nextLocation: any;
     tabActions: List<TabAction>;
+    
+    nonexistentVariantIds: List<ID>;
   } = {
     builderState: BuilderStore.getState(),
     variants: LibraryStore.getState().variants,
@@ -125,6 +127,8 @@ class Builder extends PureClasss<Props>
     leaving: false,
     nextLocation: null,
     tabActions: this.getTabActions(BuilderStore.getState()),
+    
+    nonexistentVariantIds: List([]),
   };
   
   initialColSizes: any;
@@ -329,7 +333,6 @@ class Builder extends PureClasss<Props>
     {
       newConfig = '!' + newConfig;
     }
-    
     if(newConfig !== props.params.config 
       && (props.params.config !== undefined || newConfig.length)
       )
@@ -346,7 +349,6 @@ class Builder extends PureClasss<Props>
     {
       variantId = variantId.substr(1); // trim '!'
     }
-    
     if(newConfig && (props === this.props || variantId !== this.getSelectedId(this.props)))
     {
       // need to fetch data for new query
@@ -356,9 +358,12 @@ class Builder extends PureClasss<Props>
   
   handleNoVariant(variantId: ID)
   {
-    if(this.props.params.config)
+    if(this.props.params.config && this.state.nonexistentVariantIds.indexOf(variantId) === -1)
     {
-      let newConfigArr = this.props.params.config
+      this.setState({
+        nonexistentVariantIds: this.state.nonexistentVariantIds.push(variantId),
+      })
+      let newConfigArr = localStorage['config']
         .split(',')
         .filter(id => id !== variantId && id !== '!' + variantId);
       if(newConfigArr.length && !newConfigArr.some(c => c.substr(0,1) === '!'))
