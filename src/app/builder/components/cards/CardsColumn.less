@@ -1,6 +1,11 @@
 @import "../../../common/Common.less";
 
 .cards-column {
+  overflow: hidden;
+  height: 100%;
+  position: relative;
+  margin-left: -13px;
+  
   .cards-deck,
   .cards-column-cards-area {
     position: absolute;
@@ -9,6 +14,11 @@
     left: 0px;
     box-sizing: border-box;
     .transition;
+    
+    &.cards-column-cards-area-faded {
+      opacity: 0.65;
+      .transition(~"all 0.15s, opacity 0.15s 0.65s");
+    }
   }
   
   .cards-deck {
@@ -35,6 +45,32 @@
     }
     .cards-deck-knob {
       width: @deck-width - 1px;
+    }
+  }
+  
+  @error-height: 40px;
+  .cards-column-tql-parse-error {
+    position: absolute;
+    width: 100%;
+    top: 100%;
+    left: 0px;
+    
+    .big-text;
+    height: @error-height;
+    background: rgba(255,255,255,0.75);
+    border-top: 1px solid #ccc;
+    box-sizing: border-box;
+    padding: 12px;
+    text-align: center;
+    
+    .transition;
+  }
+  
+  &.cards-column-has-tql-parse-error {
+    // padding-bottom: @error-height;
+    
+    .cards-column-tql-parse-error {
+      top: calc(~"100% - @{error-height}");
     }
   }
 }

@@ -73,6 +73,8 @@ interface Props
   canEdit: boolean;
   addColumn: (number, string?) => void;
   columnIndex: number;
+  tqlCardsInSync: boolean;
+  parseTreeError: string;
   
   containerWidth?: number;
   containerHeight?: number;
@@ -188,6 +190,7 @@ class CardsColumn extends PureClasss<Props>
         className={classNames({
           'cards-column': true,
           'cards-column-deck-open': canHaveDeck && this.props.deckOpen,
+          'cards-column-has-tql-parse-error': !!this.props.parseTreeError,
         })}
       >
         {
@@ -197,7 +200,10 @@ class CardsColumn extends PureClasss<Props>
             />
         }
         <div
-          className='cards-column-cards-area'
+          className={classNames({
+            'cards-column-cards-area': true,
+            'cards-column-cards-area-faded': !this.props.tqlCardsInSync,
+          })}
           onScroll={this.handleScroll}
           id='cards-column'
         >
@@ -247,6 +253,14 @@ class CardsColumn extends PureClasss<Props>
               </div>
             </div>
         }
+        
+        <div
+          className='cards-column-tql-parse-error'
+        >
+          {
+            "There is a parsing error with your TQL." || "All good!" 
+          }
+        </div>
       </div>
     );
   }

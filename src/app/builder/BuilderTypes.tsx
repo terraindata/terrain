@@ -130,6 +130,7 @@ export module BuilderTypes
     deckOpen: boolean = true;
     
     tqlCardsInSync: boolean = false;
+    parseTreeError: string = null;
   }
   const Query_Record = Immutable.Record(new QueryC());
   export interface Query extends QueryC, IRecord<Query> {}

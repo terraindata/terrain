@@ -215,7 +215,8 @@ var BuilderColumn = React.createClass<any, any>(
       );
     }
     
-    const {canEdit, query} = this.props;
+    let query: BuilderTypes.Query = this.props.query;
+    const {canEdit} = this.props;
     switch(this.state.column)
     {
       case COLUMNS.Builder:
@@ -225,6 +226,8 @@ var BuilderColumn = React.createClass<any, any>(
           canEdit={canEdit}
           addColumn={this.props.onAddManualColumn}
           columnIndex={this.props.index}
+          tqlCardsInSync={query.tqlCardsInSync}
+          parseTreeError={query.parseTreeError}
         />;
         
       case COLUMNS.Inputs:

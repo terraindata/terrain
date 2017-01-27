@@ -293,8 +293,8 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
         query
           .set('tql', action.payload.tql)
           .set('tqlCardsInSync', false)
+          .set('parseTreeError', null)
       )
-      .set('parseTreeError', null)
       .set('parseTreeReq', 
         Ajax.parseTree(
           action.payload.tql, 
@@ -333,7 +333,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     }>
   ) =>
     state
-      .set('parseTreeError', action.payload.error)
+      .setIn(['query', 'parseTreeError'], JSON.stringify(action.payload.error))
       .set('parseTreeReq', null)
       .setIn(['query', 'tqlCardsInSync'], false),
 
