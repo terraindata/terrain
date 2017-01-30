@@ -591,7 +591,6 @@ export module BuilderTypes
           'from',
           'where',
           'sort',
-          'let',
           'take',
           'skip',
           'groupBy',
