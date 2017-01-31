@@ -253,15 +253,15 @@ class BuilderTQLColumn extends PureClasss<Props>
           onClick: this.changeThemeMonokai,
           disabled: this.getThemeIndex() === 3,
         },
-        {
-          spacer: true,
-          text: null,
-          onClick: null,
-        },
-        {
-          text: 'Kill Running Queries',
-          onClick: this.killQueries,
-        }
+        // {
+        //   spacer: true,
+        //   text: null,
+        //   onClick: null,
+        // },
+        // {
+        //   text: 'Kill Running Queries',
+        //   onClick: this.killQueries,
+        // }
       ]);
     return options;
   }
