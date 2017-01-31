@@ -132,11 +132,11 @@ const links =
     text: 'Builder',
     route: '/builder',
   },
-  {
-    icon: <ManualIcon />,
-    text: 'Manual',
-    route: '/manual',
-  }
+  // {
+  //   icon: <ManualIcon />,
+  //   text: 'Manual',
+  //   route: '/manual',
+  // }
 ];
 
 interface Props
