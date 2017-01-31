@@ -97,7 +97,7 @@ class BuilderTQLColumn extends PureClasss<Props>
   } = {
     tql: null,
     code: this.props.query.mode === 'tql' ? this.props.query.tql : TQLConverter.toTQL(this.props.query),
-    theme: localStorage.getItem('theme') || 'default',
+    theme: localStorage.getItem('theme') || 'monokai',
     focused: false,
     highlightedLine: null,
     theme_index: 0,
@@ -234,7 +234,7 @@ class BuilderTQLColumn extends PureClasss<Props>
     var options: List<MenuOption> =
       List([
         {
-          text: 'Default',
+          text: 'Plain',
           onClick: this.changeThemeDefault,
           disabled: this.getThemeIndex() === 0,
         },
