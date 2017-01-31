@@ -130,40 +130,59 @@ class Team extends Classs<Props>
           </div>
           <div className='team-item-names'>
             <div className='team-name'>
-              { user.name() }
+              { 
+                user.name() 
+              }
             </div>
             <div className='team-role'>
-              { user.isDisabled ? <b>Disabled</b> : user.whatIDo }
+              { 
+                user.isDisabled ? <b>Disabled</b> : user.whatIDo 
+              }
             </div>
             <div className='team-username'>
               @{ user.username }
             </div>
           </div>
           <div className='team-item-info'>
-            <div className='team-item-info-row'>
-              <div className='team-item-info-label'>
-                Phone Number
-              </div>
-              <div className='team-item-info-value'>
-                { user.phone }
-              </div>
-            </div>
-            <div className='team-item-info-row'>
-              <div className='team-item-info-label'>
-                Email
-              </div>
-              <div className='team-item-info-value'>
-                { user.email }
-              </div>
-            </div>
-            <div className='team-item-info-row'>
-              <div className='team-item-info-label'>
-                Skype
-              </div>
-              <div className='team-item-info-value'>
-                { user.skype }
-              </div>
-            </div>
+            {
+              !!user.phone &&
+                <div className='team-item-info-row'>
+                  <div className='team-item-info-label'>
+                    Phone Number
+                  </div>
+                  <div className='team-item-info-value'>
+                    { 
+                      user.phone 
+                    }
+                  </div>
+                </div>
+            }
+            {
+              !!user.email &&
+                <div className='team-item-info-row'>
+                  <div className='team-item-info-label'>
+                    Email
+                  </div>
+                  <div className='team-item-info-value'>
+                    { 
+                      user.email 
+                    }
+                  </div>
+                </div>
+            }
+            {
+              !!user.skype &&
+                <div className='team-item-info-row'>
+                  <div className='team-item-info-label'>
+                    Skype
+                  </div>
+                  <div className='team-item-info-value'>
+                    { 
+                      user.skype 
+                    }
+                  </div>
+                </div>
+            }
           </div>
         </div>
       </Link>
