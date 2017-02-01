@@ -205,7 +205,6 @@ class Builder extends PureClasss<Props>
       }
     }
     
-    this.checkConfig(this.props);
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
   
@@ -284,9 +283,15 @@ class Builder extends PureClasss<Props>
     }
   }
   
-  componentWillReceiveProps(nextProps)
+  componentWillReceiveProps(nextProps: Props)
   {
-    if(nextProps.params.config !== this.props.params.config)
+    let currentOpen = this.props.location.query && this.props.location.query.o;
+    let nextOpen = nextProps.location.query && nextProps.location.query.o;
+    
+    if(
+      nextProps.params.config !== this.props.params.config
+      || currentOpen !== nextOpen
+    )
     {
       this.confirmedLeave = false;
       if(!nextProps.location.query || !nextProps.location.query.o)
