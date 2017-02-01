@@ -784,53 +784,6 @@ export module BuilderTypes
         },
       }
     }),
-
-    as: _card({
-      value: "",
-      alias: "",
-      
-      static:
-      {
-        title: "As",
-        colors: ["#d9b540", "#f8e8b3"],
-        preview: '[alias]',
-        tql: "($value) as $alias",
-        manualEntry: ManualConfig.cards.where,
-        display:
-        {
-          displayType: DisplayType.FLEX,
-          key: null,
-          
-          flex:
-          [
-            {
-              displayType: DisplayType.CARDTEXT,
-              key: 'value',
-              top: false,
-              showWhenCards: true,
-              accepts: acceptsAggregates,
-            },
-            {
-              displayType: DisplayType.LABEL,
-              label: 'as',
-              key: null,
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'alias',
-              autoDisabled: true,
-            },
-          ], 
-          
-          below: 
-          {
-            displayType: DisplayType.CARDSFORTEXT,
-            key: 'value',
-            accepts: acceptsAggregates,
-          }
-        }
-      }
-    }),
     
     where: _wrapperCard({
       title: "Where",
@@ -1008,54 +961,101 @@ export module BuilderTypes
       }
     }),
 
+    as: _card({
+      value: "",
+      alias: "",
+      
+      static:
+      {
+        title: "As",
+        colors: ["#d24f42", "#f9cba8"],
+        preview: '[alias]',
+        tql: "($value) as $alias",
+        manualEntry: ManualConfig.cards.where,
+        display:
+        {
+          displayType: DisplayType.FLEX,
+          key: null,
+          
+          flex:
+          [
+            {
+              displayType: DisplayType.CARDTEXT,
+              key: 'value',
+              top: false,
+              showWhenCards: true,
+              accepts: acceptsAggregates,
+            },
+            {
+              displayType: DisplayType.LABEL,
+              label: 'as',
+              key: null,
+            },
+            {
+              displayType: DisplayType.TEXT,
+              key: 'alias',
+              autoDisabled: true,
+            },
+          ], 
+          
+          below: 
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'value',
+            accepts: acceptsAggregates,
+          }
+        }
+      }
+    }),
+    
     count: _aggregateNestedCard(
     {
-      colors: ["#d24f42", "#f9cba8"],
       title: "Count",
+      colors: ["#d65a44", "#fbc1b7"],
       manualEntry: ManualConfig.cards['count'],
       tql: "COUNT($value)",
       accepts: List(['distinct']),
       init: () => ({ value: '*' }),
     }),
     
-    distinct: _aggregateCard(
-    {
-      colors: ["#dba043", "#eedebe"],
-      title: "Distinct",
-      manualEntry: ManualConfig.cards['count'], // TODO
-      tql: "DISTINCT $value",
-    }),
-    
     avg: _aggregateCard(
     {
-      colors: ["#d65a44", "#fbc1b7"],
       title: "Average",
+      colors: ["#db6746", "#f9bcab"],
       manualEntry: ManualConfig.cards['avg'],
       tql: "AVG($value)",
-    }),
-    
-    sum: _aggregateCard(
-    {
-      colors: ["#dd8846", "#f9cba8"],
-      title: "Sum",
-      manualEntry: ManualConfig.cards['sum'],
-      tql: "SUM($value)",
     }),
 
     min: _aggregateCard(
     {
-      colors: ["#db6746", "#f9bcab"],
       title: "Min",
+      colors: ["#dd7547", "#fdcdb8"],
       manualEntry: ManualConfig.cards['min'],
       tql: "MIN($value)",
     }),
-
+    
     max: _aggregateCard(
     {
-      colors: ["#dd7547", "#fdcdb8"],
       title: "Max",
+      colors: ["#dd8846", "#f9cba8"],
       manualEntry: ManualConfig.cards['max'],
       tql: "MAX($value)",
+    }),
+    
+    sum: _aggregateCard(
+    {
+      title: "Sum",
+      colors: ["#dba043", "#eedebe"],
+      manualEntry: ManualConfig.cards['sum'],
+      tql: "SUM($value)",
+    }),
+
+    distinct: _aggregateCard(
+    {
+      title: "Distinct",
+      colors: ["#d9b540", "#f8e8b3"],
+      manualEntry: ManualConfig.cards['count'], // TODO
+      tql: "DISTINCT $value",
     }),
 
     exists: _wrapperCard(
@@ -1368,13 +1368,13 @@ export module BuilderTypes
       Blocks.from,
     ],
     [
+      Blocks.as,
       Blocks.count,
       Blocks.avg,
       Blocks.min,
       Blocks.max,
       Blocks.sum,
       Blocks.distinct,
-      Blocks.as,
     ],
     [
       Blocks.where,
