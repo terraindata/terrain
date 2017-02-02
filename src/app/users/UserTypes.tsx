@@ -104,7 +104,7 @@ export module UserTypes
     {
       if(!this.firstName.length && !this.lastName.length)
       {
-        return this.username;
+        return this.username.substr(0, 1).toUpperCase() + this.username.substr(1);
       }
       
       return `${this.firstName} ${this.lastName}`;
