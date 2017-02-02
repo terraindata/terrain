@@ -58,6 +58,7 @@ const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 interface Props
 {
   index: number;
+  fadeIndex: number;
   name: string;
   onDuplicate: (id: ID) => void;
   onArchive: (id: ID) => void;
@@ -151,7 +152,7 @@ class LibraryItem extends Classs<Props>
           this.setState({
             mounted: true,
           })
-        }, this.props.rendered ? 0 : Math.min(this.props.index * 100, 1000)),
+        }, this.props.rendered ? 0 : Math.min(this.props.fadeIndex * 100, 1000)), // re-add this when we get real indexes
     })
     
     if(!this.props.name.length)

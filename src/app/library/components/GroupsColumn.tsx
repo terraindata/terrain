@@ -156,6 +156,7 @@ class GroupsColumn extends Classs<Props>
     return (
       <LibraryItem
         index={index}
+        fadeIndex={index}
         name={group.name}
         id={id}
         icon={<GroupIcon />}

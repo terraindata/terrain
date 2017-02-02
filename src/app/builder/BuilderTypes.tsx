@@ -354,17 +354,17 @@ export module BuilderTypes
         getNeighborTerms: config.getNeighborTerms,
         
         preview: (c:IWrapperCard) => {
-          var prefix = config.title + ': ';
-          if(c.type === 'parentheses')
-          {
-            prefix = '';
-          }
+          // var prefix = config.title + ': ';
+          // if(c.type === 'parentheses')
+          // {
+          //   prefix = '';
+          // }
           if(c.cards.size)
           {
             let card = c.cards.get(0);
-            return prefix + getPreview(card);
+            return getPreview(card);
           }
-          return prefix + "Nothing";
+          return "Nothing";
         },
         
         display: config.display || (
@@ -1583,6 +1583,15 @@ export module BuilderTypes
       return;
     }
     
+    if(!card.static)
+    {
+      try {
+        return JSON.stringify(card);
+      } catch(e) {
+        return 'No preview';
+      }
+    }
+    
     let {preview} = card.static;
     if(typeof preview === 'string')
     {
@@ -1603,7 +1612,10 @@ export module BuilderTypes
         {
           return card[keys[0]].size;
         }
-        return card[keys[0]].toArray().map(v => v[keys[1]]).join(", ");
+        return card[keys[0]].toArray().map(
+          v => 
+            getPreview(v[keys[1]])
+        ).join(", ");
       });
     }
     else if(typeof preview === 'function')
