@@ -279,6 +279,8 @@ export module BuilderTypes
     }, config);
   }
     
+  type TQLFn = string | ((block:IBlock) => string);  
+    
   // Every Card definition must follow this interface
   interface ICardConfig
   {
@@ -290,7 +292,7 @@ export module BuilderTypes
       preview: string | ((c:ICard) => string);
       display: Display | Display[];
       manualEntry: IManualEntry;
-      tql: string | ((block:IBlock) => string);
+      tql: TQLFn;
       tqlGlue?: string;
       topTql?: string | ((block:IBlock) => string);
       accepts?: List<string>;
@@ -329,7 +331,7 @@ export module BuilderTypes
     getChildTerms?: (card: ICard) => List<string>;
     getNeighborTerms?: (card: ICard) => List<string>;
     display?: Display | Display[];
-    tql: string;
+    tql: TQLFn;
     tqlGlue?: string;
     accepts: List<string>;
     singleChild?: boolean;
@@ -510,6 +512,7 @@ export module BuilderTypes
     'transform',
     'sfw',
     'exists',
+    'not',
   ]);
   
   const transformScoreInputTypes = 
@@ -538,7 +541,7 @@ export module BuilderTypes
       static: {
         tql: "\n $first $OPERATOR $second",
         
-        accepts: List(['score', 'transform', 'from', 'exists']),
+        accepts: List(['score', 'transform', 'from', 'exists', 'not']),
       }
     }),
     
@@ -796,6 +799,7 @@ export module BuilderTypes
         'and',
         'or',
         'exists',
+        'not',
         'comparison',
       ]),
     }),
@@ -806,7 +810,7 @@ export module BuilderTypes
       tqlGlue: '\nAND\n',
       manualEntry: ManualConfig.cards.and,
       colors: ["#824ba1", "#ecc9ff"],
-      accepts: List(['or', 'comparison', 'exists']),
+      accepts: List(['or', 'comparison', 'exists', 'not']),
     }),
     
     or: _wrapperCard({
@@ -815,7 +819,7 @@ export module BuilderTypes
       tqlGlue: '\nOR\n',
       manualEntry: ManualConfig.cards.or,
       colors: ["#b161bc", "#f8cefe"],
-      accepts: List(['and', 'comparison', 'exists']),
+      accepts: List(['and', 'comparison', 'exists', 'not']),
     }),
    
     comparison: _card(
@@ -852,7 +856,7 @@ export module BuilderTypes
             help: ManualConfig.help["operator"],
             centerDropdown: true,
           }, 
-          List(['sfw', 'exists'])
+          List(['sfw', 'exists', 'not'])
         ),
         manualEntry: ManualConfig.cards['filter'],
       },
@@ -1058,6 +1062,7 @@ export module BuilderTypes
       tql: "DISTINCT $value",
     }),
 
+
     exists: _wrapperCard(
     {
       colors: ["#319aa9", "#bbdddc"],
@@ -1067,13 +1072,32 @@ export module BuilderTypes
       accepts: List(['sfw']),
     }),
 
+    not: _wrapperCard(
+    {
+      colors: ["#21aab9", "#abedec"],
+      title: "Not",
+      manualEntry: ManualConfig.cards['exists'],
+      tql: (notCard) =>
+      {
+        let cards = notCard['cards'];
+        if(cards && cards.size && cards.get(0).type === 'exists')
+        {
+          return 'NOT$cards';
+        }
+        return 'NOT (\n$cards)';
+      },
+      accepts: List(['exists', 'compare', 'and', 'or']),
+    }),
+
+
+    // remove
     parentheses: _wrapperCard(
     {
       colors: ["#6775aa", "#d2c9e4"],
       title: "( )",
       manualEntry: ManualConfig.cards['parentheses'],
       tql: "\n(\n$cards)",
-      accepts: List(['and', 'or', 'exists', 'tql']),
+      accepts: List(['and', 'or', 'exists', 'tql', 'not']),
     }),
     
     weight: _block(
@@ -1389,6 +1413,7 @@ export module BuilderTypes
       Blocks.and,
       Blocks.or,
       Blocks.exists,
+      Blocks.not,
     ],
     [
       // Blocks.var,

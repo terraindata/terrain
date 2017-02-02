@@ -376,7 +376,7 @@ class ResultsArea extends PureClasss<Props>
       if(results.length === 1)
       {
         this.setState({
-          resultsCount: results[0]['count(*)']
+          resultsCount: results[0]['count(*)'] || results[0]['COUNT(*)']
         });
       }
       else if(results.length > 1)
@@ -664,6 +664,11 @@ class ResultsArea extends PureClasss<Props>
     })
   }
   
+  isLoading(): boolean
+  {
+    return !! this.xhr || !! this.allXhr || !! this.countXhr;
+  }
+  
   renderTopbar()
   {
     let count = this.state.resultsCount !== -1 ? this.state.resultsCount : (this.state.results ? this.state.results.length : 0);
@@ -671,15 +676,19 @@ class ResultsArea extends PureClasss<Props>
       <div className='results-top'>
         <div className='results-top-summary'>
           {
-            this.isQueryEmpty() ?
-              'Empty query' :
+            this.isLoading() ?
+              'Loading..' :
               (
-                this.state.error ? 'Error with query' : 
-                (
-                  this.state.results ? 
-                    `${count || 'No'} result${count === 1 ? '' : 's'}` 
-                  : 'Text result'
-                )
+                this.isQueryEmpty() ?
+                  'Empty query' :
+                  (
+                    this.state.error ? 'Error with query' : 
+                    (
+                      this.state.results ? 
+                        `${count || 'No'} result${count === 1 ? '' : 's'}` 
+                      : 'Text result'
+                    )
+                  )
               )
           }
         </div>
