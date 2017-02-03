@@ -61,14 +61,51 @@ export interface QueryResponse
 }
 
 export const Ajax = {
-  _req(method: string, url: string, data: any, onLoad: (response: any) => void, config:
-    {
+  _req(
+    method: string, 
+    url: string, 
+    data: string, 
+    onLoad: (response: any) => void, 
+    config: {
       onError?: (response: any) => void,
       host?: string,
       crossDomain?: boolean;
       noToken?: boolean;
-    } = {}) 
+      download?: boolean;
+      downloadFilename?: string;
+    } = {}
+  ) 
   {
+    let host = config.host || MIDWAY_HOST;
+    let fullUrl = host + url;
+    let token = AuthStore.getState().get('authenticationToken');
+    
+    if(config.download)
+    {
+      let form = document.createElement("form");
+      form.setAttribute("action", fullUrl);
+      form.setAttribute("method", "post");
+      
+      let dataObj: _.Dictionary<string> = {
+        data,
+        token,
+        filename: config.downloadFilename,
+      }
+      _.map(dataObj, (value, key) =>
+      {
+        let input = document.createElement("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("name", key + "");
+        input.setAttribute("value", value);
+        form.appendChild(input);
+      });
+      
+      document.body.appendChild(form); // Required for FF
+      form.submit();
+      form.remove();
+      return;
+    }
+    
     let xhr = new XMLHttpRequest();
     xhr.onerror = config && config.onError;
     xhr.onload = (ev:Event) =>
@@ -91,11 +128,11 @@ export const Ajax = {
     }
     
     // NOTE: MIDWAY_HOST will be replaced by the build process.
-    let host = config.host || MIDWAY_HOST;
-    xhr.open(method, host + url, true);
+    xhr.open(method, fullUrl, true);
+    
     if(!config.noToken)
     {
-      xhr.setRequestHeader('token', AuthStore.getState().get('authenticationToken'));
+      xhr.setRequestHeader('token', token);
     }
     
     if(config.crossDomain)
@@ -103,6 +140,7 @@ export const Ajax = {
       xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
       xhr.setRequestHeader('Access-Control-Allow-Headers','Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Origin');
     }
+    
     xhr.send(data);
     return xhr;  
   },
@@ -117,7 +155,17 @@ export const Ajax = {
     return Ajax._req("GET", url, data, onLoad, {onError});
   },
   
-  _r(url:string, reqFields: {[f:string]:any}, onLoad: (resp:string) => void, onError?: (ev:Event) => void)
+  _r(
+    url:string, 
+    reqFields: {[f:string]:any}, 
+    onLoad: (resp:string) => void, 
+    onError?: (ev:Event) => void,
+    options: {
+      download?: boolean;
+      downloadFilename?: string;
+      useMidway?: boolean;
+    } = {}
+  )
   {
     return Ajax._req('POST', url, JSON.stringify(_.extend({
       timestamp: (new Date()).toISOString(),
@@ -129,8 +177,10 @@ export const Ajax = {
     {
       noToken: true,
       onError,
-      host: TDB_HOST,
-      crossDomain: true,
+      host: options.useMidway ? undefined : TDB_HOST,
+      crossDomain: ! options.useMidway,
+      download: options.download,
+      downloadFilename: options.downloadFilename,
     });
   },
   
@@ -368,14 +418,35 @@ export const Ajax = {
   },
   
   // run query, consider renaming
-  query(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev:Event) => void, sqlQuery?: boolean)
+  query(
+    tql: string, 
+    db: string, 
+    onLoad: (response: QueryResponse) => void, 
+    onError?: (ev:Event) => void, 
+    sqlQuery?: boolean,
+    options: {
+      csv?: boolean,
+      csvName?: string,
+    } = {}
+  )
   {
     // kill queries running under the same id
     // Ajax.killQueries(); // TODO add id
     
-    return Ajax._r(sqlQuery ? "/sql_query" : "/query", {
+    let dest = '/query';
+    if(options.csv)
+    {
+      dest = '/query_csv'
+    }
+    else if(sqlQuery)
+    {
+      dest = '/sql_query'
+    }
+    
+    return Ajax._r(dest, {
         "query_string": encode_utf8(tql),
         "db": db,
+        "format": options.csv ? 'csv' : undefined,
       },
       
       (resp) =>
@@ -391,7 +462,13 @@ export const Ajax = {
         onLoad(respData);
       },
       
-      onError
+      onError,
+      
+      {
+        download: options.csv,
+        downloadFilename: options.csvName || 'Results.csv',
+        useMidway: options.csv,
+      }
     );
   },
   

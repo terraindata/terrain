@@ -131,6 +131,7 @@ var BuilderColumn = React.createClass<any, any>(
     changeSelectedCardName: React.PropTypes.func,
     canEdit: React.PropTypes.bool.isRequired,
     cantEditReason: React.PropTypes.string,
+    onNavigationException: React.PropTypes.func,
   },
   
   getInitialState()
@@ -249,6 +250,7 @@ var BuilderColumn = React.createClass<any, any>(
           canEdit={canEdit}
           db={this.props.variant.db}
           variantName={this.props.variant.name}
+          onNavigationException={this.props.onNavigationException}
         />;
 
       case COLUMNS.TQL:

@@ -114,6 +114,8 @@ class Builder extends PureClasss<Props>
     tabActions: List<TabAction>;
     
     nonexistentVariantIds: List<ID>;
+    
+    navigationException: boolean; // does Builder need to allow navigation w/o confirm dialog?
   } = {
     builderState: BuilderStore.getState(),
     variants: LibraryStore.getState().variants,
@@ -129,6 +131,8 @@ class Builder extends PureClasss<Props>
     tabActions: this.getTabActions(BuilderStore.getState()),
     
     nonexistentVariantIds: List([]),
+    
+    navigationException: false,
   };
   
   initialColSizes: any;
@@ -197,6 +201,14 @@ class Builder extends PureClasss<Props>
   {
     window.onbeforeunload = (e) => 
     {
+      if(this.state.navigationException)
+      {
+        this.setState({
+          navigationException: false,
+        });
+        return;
+      }
+      
       if(this.shouldSave())
       {
         let msg = 'You have unsaved changes to this Variant. If you leave, they will be lost. Are you sure you want to leave?';
@@ -500,6 +512,14 @@ class Builder extends PureClasss<Props>
     );
   }
   
+  // called by a child if needing to navigate without save dialog
+  handleNavigationException()
+  {
+    this.setState({
+      navigationException: true,
+    });
+  }
+  
   shouldSave(overrideState?:BuilderState): boolean
   {
     let variant = this.getVariant();
@@ -625,6 +645,7 @@ class Builder extends PureClasss<Props>
         changeSelectedCardName={this.changeSelectedCardName}
         canEdit={this.canEdit()}
         cantEditReason={this.cantEditReason()}
+        onNavigationException={this.handleNavigationException}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key,
