@@ -513,6 +513,7 @@ class ResultsArea extends PureClasss<Props>
       false,
       {
         csv: true,
+        csvName: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.csv',
       }
     );
     
