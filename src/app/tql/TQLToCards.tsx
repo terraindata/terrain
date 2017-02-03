@@ -150,10 +150,15 @@ const generalProcessors: {
   from:
     (node) =>
     {
-      let tables = flattenCommas(node.child)
+      let tables = _.compact(
+        flattenCommas(node.child)
         .map(
           tableNode => 
           {
+            if(!tableNode)
+            {
+              return null;
+            }
             if(typeof tableNode !== 'object' || tableNode.op !== 'as')
             {
               return make(Blocks.table, {
@@ -163,12 +168,12 @@ const generalProcessors: {
             else
             {
               return make(Blocks.table, {
-                table: tableNode.left_child,
+                table: parseNode(tableNode.left_child),
                 alias: tableNode.right_child,
               });
             }
           }
-        );
+        ));
       
       return make(Blocks.sfw, {
         cards:
@@ -471,7 +476,6 @@ function reconcileBlock(currentBlock: Block, newBlock: Block): Block
 {
   if(!currentBlock || currentBlock.type !== newBlock.type)
   {
-    console.log('short circuit because', !currentBlock, currentBlock.type !== newBlock.type)
     return newBlock;
   }
   
