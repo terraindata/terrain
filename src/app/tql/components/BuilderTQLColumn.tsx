@@ -347,26 +347,10 @@ class BuilderTQLColumn extends PureClasss<Props>
           'tql-column-results-bar-open': this.state.resultsBarOpen,
         })}
       >
-        <div
-          className={classNames({
-            'tql-editor-top': true,
-            [this.state.theme + '-tql-theme']: true,
-          })}
-        >
-          {
-            !this.props.canEdit &&
-              <div className = 'view-only'>
-                View-only
-              </div>
-          }
-          <div 
-            className='white-space' 
-          />
-          <Menu 
-            options={this.getMenuOptions()} 
-            small={true}
-          />
-        </div>
+        <Menu 
+          options={this.getMenuOptions()} 
+          small={true}
+        />
         
         <div
           className='tql-section'

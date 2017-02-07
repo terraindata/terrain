@@ -45,3 +45,16 @@
 //Placeholder styling for CodeMirror
 .CodeMirror-empty.CodeMirror-focused { outline: none; }
 .CodeMirror pre.CodeMirror-placeholder { color: #999; }
+
+.cm-s-monokai,
+.cm-s-cobalt {
+  .CodeMirror-vscrollbar {
+    &::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.25);
+      margin-top: 25px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.3);
+    }
+  } 
+}

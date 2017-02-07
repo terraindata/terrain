@@ -2,9 +2,13 @@
 @import "../../builder/components/results/Result.less";
 @import "../../builder/components/results/ResultsArea.less";
 
-@results-bar-height: 24px;
+@results-bar-height: 21px;
 
 .tql-column {
+  cursor: default;
+  margin-right: -6px;
+  margin-left: -12px;
+  
   .codemirror-text {
     height: calc(~"100% - @{results-bar-height}");
     padding-bottom: @results-bar-height;
@@ -16,28 +20,6 @@
       padding-bottom: 50%;
     }
   }
-}
-
-.view-only {
-  font-size: 10;
-  margin-left: 6px;
-  margin-top: 2px;
-}
-
-.tql-column {
-  cursor: default;
-  margin-right: -6px;
-  margin-left: -12px;
-}
-
-.code-section {
-  position: relative;
-  height: calc(~"100% - 24px");
-}
-
-.tql-editor-top {
-  position: relative;
-  .results-top;
   
   .menu-wrapper {
     z-index: 99;
@@ -47,6 +29,16 @@
     }
     &:hover {
       opacity: 1;
+    }
+  }
+  
+  .CodeMirror-scroll {
+    padding-top: 3px;
+  }
+  
+  .CodeMirror-vscrollbar {
+    &::-webkit-scrollbar-track {
+      margin-top: 25px;
     }
   }
 }

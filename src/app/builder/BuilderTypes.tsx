@@ -610,7 +610,7 @@ export module BuilderTypes
         colors: ["#559dcf", "#b4dbf6"],
         title: "Select",
         preview: "[fields.field]",
-        topTql: "\n SELECT\n$fields\n$cards",
+        topTql: "SELECT\n$fields\n$cards",
         tql: "\n(\n SELECT\n$fields\n$cards)",
         
         init: () => ({

@@ -353,6 +353,7 @@ class ResultsArea extends PureClasss<Props>
   
   handleAllFieldsResponse(response:QueryResponse)
   {
+    this.allXhr = null;
     this.handleResultsChange(response, true);
   }
   
@@ -596,7 +597,7 @@ column if you have set a custom results view.');
         <div className='results-top-summary'>
           {
             this.isLoading() ?
-              'Loading..' :
+              'Loading...' :
               (
                 this.isQueryEmpty() ?
                   'Empty query' :
