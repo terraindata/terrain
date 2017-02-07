@@ -140,7 +140,23 @@ export module BuilderTypes
     config['inputs'] = BuilderTypes.recordFromJS(config['inputs'] || [])
     config['resultsConfig'] = _IResultsConfig(config['resultsConfig']);
     
-    return new Query_Record(config) as any as Query;
+    let query = new Query_Record(config) as any as Query;
+    
+    switch(config['mode'])
+    {
+      case 'tql':
+        // since tql to cards conversion is async and we don't know where this
+        //  query will be used, this is all we can do for now.
+        query = query.set('tqlCardsInSync', false);
+        break;
+      case 'cards':
+        query = query
+          .set('tql', TQLConverter.toTQL(query))
+          .set('tqlCardsInSync', true);
+        break;
+    }
+    
+    return query;
   }
   
   export function queryForSave(query: Query): Object
@@ -611,7 +627,7 @@ export module BuilderTypes
         title: "Select",
         preview: "[fields.field]",
         topTql: "SELECT\n$fields\n$cards",
-        tql: "\n(\n SELECT\n$fields\n$cards)",
+        tql: "(\n SELECT\n $fields\n$cards )",
         
         init: () => ({
           fields: List([ 
@@ -1006,7 +1022,7 @@ export module BuilderTypes
         title: "As",
         colors: ["#d24f42", "#f9cba8"],
         preview: '[alias]',
-        tql: "($value) as $alias",
+        tql: "$value as $alias",
         manualEntry: ManualConfig.cards.where,
         display:
         {
@@ -1100,7 +1116,7 @@ export module BuilderTypes
       colors: ["#319aa9", "#bbdddc"],
       title: "Exists",
       manualEntry: ManualConfig.cards['exists'],
-      tql: "EXISTS\n(\n$cards)",
+      tql: "EXISTS\n$cards",
       accepts: List(['sfw']),
     }),
 
@@ -1741,6 +1757,7 @@ export module BuilderTypes
 import Actions from './data/BuilderActions.tsx';
 import {IResultsConfig, _IResultsConfig} from "./components/results/ResultsConfig.tsx";
 
-
 export default BuilderTypes;
 
+import TQLToCards from '../tql/TQLToCards.tsx';
+import TQLConverter from '../tql/TQLConverter.tsx';

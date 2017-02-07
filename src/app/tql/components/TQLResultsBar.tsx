@@ -82,6 +82,11 @@ class TQLResultsBar extends PureClasss<Props>
     resultsSpliced: 0,
     errorLine: NaN,
   };
+  
+  componentWillMount()
+  {
+    this.queryResults(this.props.tql);
+  }
 
   //If the component updates and the tql command has been changed, then query results
   componentWillReceiveProps(nextProps) 

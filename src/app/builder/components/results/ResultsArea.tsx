@@ -89,6 +89,7 @@ interface State
   
   tql: string;
   error: any;
+  allFieldsError: boolean;
   
   resultFormat: string;
   showingConfig: boolean;
@@ -98,13 +99,15 @@ interface State
   
   resultsPages: number;
   onResultsLoaded: (unchanged?: boolean) => void;
+  
+  xhr: XMLHttpRequest;
+  allXhr: XMLHttpRequest;
+  countXhr: XMLHttpRequest;  
 }
 
 class ResultsArea extends PureClasss<Props>
 {
-  xhr = null;
-  allXhr = null;
-  countXhr = null;
+  
   
   state: State = {
     results: null,
@@ -120,6 +123,10 @@ class ResultsArea extends PureClasss<Props>
     resultsPages: 1,
     onResultsLoaded: null,
     resultFormat: 'icon',
+    allFieldsError: false,
+    xhr: null,
+    allXhr: null,
+    countXhr: null,
   };
   
   constructor(props:Props)
@@ -127,19 +134,21 @@ class ResultsArea extends PureClasss<Props>
     super(props);
   }
   
-  componentDidMount()
+  componentWillMount()
   {
     this.queryResults(this.props.query);
   }
   
   componentWillUnmount()
   {
-    this.xhr && this.xhr.abort();
-    this.allXhr && this.allXhr.abort();
-    this.countXhr && this.countXhr.abort();
-    this.xhr = null;
-    this.allXhr = null;
-    this.countXhr = null;
+    this.state.xhr && this.state.xhr.abort();
+    this.state.allXhr && this.state.allXhr.abort();
+    this.state.countXhr && this.state.countXhr.abort();
+    this.setState({
+      xhr: null,
+      allXhr: null,
+      countXhr: null,
+    });
     this.timeout && clearTimeout(this.timeout);
   }
   
@@ -270,14 +279,15 @@ class ResultsArea extends PureClasss<Props>
       />
     }
     
-    if(!this.state.results && this.xhr)
+    if(!this.state.results)
     {
-      return <InfoArea
-        large="Querying results..."
-      />;
-    }
-    else if(!this.state.results)
-    {
+      if(this.isLoading())
+      {
+        return <InfoArea
+          large="Querying results..."
+        />;
+      }
+      
       return <InfoArea
         large="Compose a query to view results here."
       />
@@ -353,20 +363,21 @@ class ResultsArea extends PureClasss<Props>
   
   handleAllFieldsResponse(response:QueryResponse)
   {
-    this.allXhr = null;
     this.handleResultsChange(response, true);
   }
   
   handleCountResponse(response:QueryResponse)
   {
-    this.countXhr = null;
+    this.setState({
+      countXhr: null,
+    });
     let results = response.resultSet;
     if(results)
     {
       if(results.length === 1)
       {
         this.setState({
-          resultsCount: results[0]['count(*)'] || results[0]['COUNT(*)']
+          resultsCount: results[0]['COUNT(*)']
         });
       }
       else if(results.length > 1)
@@ -388,8 +399,8 @@ class ResultsArea extends PureClasss<Props>
   
   handleCountError()
   {
-    this.countXhr = null;
     this.setState({
+      countXhr: null,
       resultsCount: -1,
     })
   }
@@ -399,8 +410,9 @@ class ResultsArea extends PureClasss<Props>
   handleResultsChange(response:QueryResponse, isAllFields?: boolean)
   {
     let xhrKey = isAllFields ? 'allXhr' : 'xhr';
-    if(!this[xhrKey]) return;
-    this[xhrKey] = null;
+    this.setState({
+      [xhrKey]: null,
+    });
     
     if(response)
     {
@@ -422,6 +434,13 @@ class ResultsArea extends PureClasss<Props>
             error,
           });
         }
+        else
+        {
+          this.setState({
+            allFieldsError: true,
+          });
+        }
+        
         this.props.onLoadEnd && this.props.onLoadEnd();
         return;
       }
@@ -445,19 +464,28 @@ class ResultsArea extends PureClasss<Props>
         this.setState({
           results,
           resultType: 'rel',
-          querying: false,
           error: false,
         });
       }
     }
     else
     {
-      this.setState({
-        error: "No response was returned from the server.",
-      });
+      // no response
+      if(!isAllFields)
+      {
+        this.setState({
+          error: "No response was returned from the server.",
+        });
+      }
+      else
+      {
+        this.setState({
+          allFieldsError: true,
+        });
+      }
     }
     
-    if(!this['xhr'] && !this['allXhr'])
+    if(!this.state.xhr && !this.state.allXhr)
     {
       // all done with both
       this.props.onLoadEnd && this.props.onLoadEnd();
@@ -499,6 +527,9 @@ class ResultsArea extends PureClasss<Props>
   handleError(ev)
   {  
     this.setState({
+      xhr: null,
+    });
+    this.setState({
       error: true,
     });
     this.props.onLoadEnd && this.props.onLoadEnd();
@@ -527,7 +558,9 @@ column if you have set a custom results view.');
   
   handleAllFieldsError()
   {
-    this.allXhr = null;
+    this.setState({
+      allXhr: null,
+    });
     this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
@@ -545,35 +578,49 @@ column if you have set a custom results view.');
     if(tql !== this.state.tql)
     {
       this.setState({
-        querying: true,
-        tql
+        tql,
+        allFieldsError: false,
       });
       
       this.props.onLoadStart && this.props.onLoadStart();
-      this.xhr && this.xhr.abort();
-      this.allXhr && this.allXhr.abort();
+      this.state.xhr && this.state.xhr.abort();
+      this.state.allXhr && this.state.allXhr.abort();
       
-      this.xhr = Ajax.query(tql, this.props.db, this.handleResultsChange, this.handleError);
+      this.setState({
+        xhr: 
+          Ajax.query(
+            tql, 
+            this.props.db, 
+            this.handleResultsChange, 
+            this.handleError
+          ),
+      });
       
-      this.allXhr = Ajax.query(
-        TQLConverter.toTQL(query, {
-          allFields: true,
-          transformAliases: true,
-          limit: MAX_RESULTS,
-        }), 
-        this.props.db,
-        this.handleAllFieldsResponse,
-        this.handleAllFieldsError
-      );
+      this.setState({
+        allXhr:
+          Ajax.query(
+            TQLConverter.toTQL(query, {
+              allFields: true,
+              transformAliases: true,
+              limit: MAX_RESULTS,
+            }), 
+            this.props.db,
+            this.handleAllFieldsResponse,
+            this.handleAllFieldsError
+          )
+      });
       
-      this.countXhr = Ajax.query(
-        TQLConverter.toTQL(query, {
-          count: true,
-        }), 
-        this.props.db,
-        this.handleCountResponse,
-        this.handleCountError
-      );
+      this.setState({
+        countXhr: 
+          Ajax.query(
+            TQLConverter.toTQL(query, {
+              count: true,
+            }), 
+            this.props.db,
+            this.handleCountResponse,
+            this.handleCountError
+          ),
+      });
     }
   }
   
@@ -586,7 +633,7 @@ column if you have set a custom results view.');
   
   isLoading(): boolean
   {
-    return !! this.xhr || !! this.allXhr || !! this.countXhr;
+    return !! this.state.xhr || !! this.state.allXhr || !! this.state.countXhr;
   }
   
   renderTopbar()

@@ -60,6 +60,7 @@ export interface Options {
   limit?: number;
   count?: boolean;
   transformAliases?: boolean; // if true, scan the top Select for Transforms, and add an alias row using the transform's ID
+  replaceInputs?: boolean; // replaces occurences of inputs with their values
 }
 
 class TQLConverter
@@ -77,7 +78,7 @@ class TQLConverter
     
     // TODO update inputs when back-end is ready
     // var inputsTql = "";
-    if(inputs && inputs.size)
+    if(inputs && inputs.size && options.replaceInputs)
     {
       inputs.map((input: IInput) => 
         {
@@ -293,7 +294,8 @@ class TQLConverter
     {
       let pieces = 
         block[field].map(
-          (v, index) => this._parse(v, index, index === block[field].size - 1)
+          (v, index) => 
+            this._parse(v, index, index === block[field].size - 1)
         );
 
       var glue = ", ";        
@@ -313,7 +315,6 @@ class TQLConverter
     if(typeof block[field] === 'object')
     {
       return this._parse(block[field]);
-      // return '\n(\n' + this._parse(block[field]) + '\n)\n';
     }
     
     if(field.toUpperCase() === field)
