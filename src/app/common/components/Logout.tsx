@@ -53,7 +53,7 @@ interface Props
   history?: any;
 }
 
-class Placeholder extends PureClasss<Props>
+class Logout extends PureClasss<Props>
 {
   componentWillMount()
   {
@@ -63,9 +63,9 @@ class Placeholder extends PureClasss<Props>
   
   render() {
     return (
-       <InfoArea large="Redirecting..." />
+       <InfoArea large="Logging out..." />
      );
   }
 };
 
-export default Placeholder;
+export default Logout;

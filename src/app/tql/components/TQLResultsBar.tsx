@@ -169,7 +169,7 @@ class TQLResultsBar extends PureClasss<Props>
       let matches = error.match(/([0-9]+)\:[0-9]+/);
       let line = matches && matches.length >= 2 && parseInt(matches[1]);
       
-      if(line !== NaN)
+      if(line !== NaN && line !== null && line !== undefined)
       {
         var mainErrorMessage = 'Error on line ' + line + ': ';
         var subErrorMessage = error;

@@ -175,10 +175,10 @@ export const Ajax = {
     onLoad,
     
     {
-      noToken: true,
+      // noToken: true,
       onError,
-      host: options.useMidway ? undefined : TDB_HOST,
-      crossDomain: ! options.useMidway,
+      // host: options.useMidway ? undefined : TDB_HOST,
+      // crossDomain: ! options.useMidway,
       download: options.download,
       downloadFilename: options.downloadFilename,
     });
