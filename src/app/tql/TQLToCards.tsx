@@ -147,7 +147,7 @@ const generalProcessors: {
     node: Node
   ) => CardString
 } = {
-  from:
+  FROM:
     (node) =>
     {
       let tables = _.compact(
@@ -159,7 +159,7 @@ const generalProcessors: {
             {
               return null;
             }
-            if(typeof tableNode !== 'object' || tableNode.op !== 'as')
+            if(typeof tableNode !== 'object' || tableNode.op !== 'AS')
             {
               return make(Blocks.table, {
                 table: 'Bad Input',
@@ -185,7 +185,7 @@ const generalProcessors: {
       });
     },
     
-  select:
+  SELECT:
     (node) =>
     {
       let sfw = parseNode(node.left_child) as Card;
@@ -212,7 +212,7 @@ const generalProcessors: {
     (node) =>
       '-' + parseNode(node.child),
   
-  call:
+  CALL:
     (node) =>
     {
       let type = node.left_child as string;
@@ -269,33 +269,44 @@ const generalProcessors: {
       return make(Blocks.tql, { clause: 'call', });
     },
   
-  distinct:
+  DISTINCT:
     (node) =>
       make(Blocks.distinct, {
         value: parseNode(node.child),
       }),
   
-  expr:
+  EXPR:
     (node) =>
       parseNode(node.child),
   
-  as:
+  AS:
     (node) =>
       make(Blocks.as, {
         value: parseNode(node.left_child),
         alias: node.right_child,
       }),
   
-  and:
+  AND:
     andOrProcessor('and'),
   
-  or:
+  OR:
     andOrProcessor('or'),
   
-  exists:
+  EXISTS:
     (node) =>
       make(
         Blocks.exists,
+        {
+          cards: List([
+            parseNodeAsCard(node.child),
+          ]),
+        }
+      ),
+  
+  NOT:
+    (node) =>
+      make(
+        Blocks.not,
         {
           cards: List([
             parseNodeAsCard(node.child),
@@ -332,19 +343,19 @@ const sfwProcessors: {
   ) => CardString
 } = {
   
-  take:
+  TAKE:
     (rightNodes) =>
       make(Blocks.take, {
         value: rightNodes[0],
       }),
     
-  skip:
+  SKIP:
     (rightNodes) =>
       make(Blocks.skip, {
         value: rightNodes[0],
       }),
   
-  sort:
+  SORT:
     (sortNodes) =>
       make(Blocks.sort, {
         sorts: List( 
@@ -358,7 +369,7 @@ const sfwProcessors: {
               {
                 config = {
                   property: parseNode(node.child),
-                  direction: node.op === 'asc' ? BuilderTypes.Direction.ASC : BuilderTypes.Direction.DESC
+                  direction: node.op === 'ASC' ? BuilderTypes.Direction.ASC : BuilderTypes.Direction.DESC
                 };
               }
               return make(Blocks.sortBlock, config);
@@ -367,7 +378,7 @@ const sfwProcessors: {
         ),
       }),
   
-  group:
+  GROUP:
     (fieldNodes) =>
       make(Blocks.groupBy, {
         fields: List(
@@ -380,7 +391,7 @@ const sfwProcessors: {
         )
       }),
    
-  filter:
+  FILTER:
     (childNodes) =>
       make(
         Blocks.where,
@@ -392,7 +403,7 @@ const sfwProcessors: {
         }
       ),
   
-  having:
+  HAVING:
     (childNodes) =>
       make(
         Blocks.having,

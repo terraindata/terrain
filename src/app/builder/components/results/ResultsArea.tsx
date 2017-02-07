@@ -508,7 +508,7 @@ class ResultsArea extends PureClasss<Props>
     this.props.onNavigationException();
     
     Ajax.query(
-      this.props.query.mode === 'tql' ? this.props.query.tql : TQLConverter.toTQL(this.props.query), 
+      this.props.query.tql,
       this.props.db, 
       _.noop,
       _.noop,
