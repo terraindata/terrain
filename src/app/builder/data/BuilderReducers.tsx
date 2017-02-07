@@ -118,6 +118,19 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       return state;
     }
     
+    if(!action.payload.query.tqlCardsInSync)
+    {
+      state = state
+        .set('parseTreeReq', 
+          Ajax.parseTree(
+            action.payload.query.tql,
+            state.db,
+            Actions.parseTreeLoaded,
+            Actions.parseTreeError
+          )
+        );
+    }
+    
     return state
       .set('query', action.payload.query)
       .set('loading', false)

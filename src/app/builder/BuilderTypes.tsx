@@ -147,6 +147,7 @@ export module BuilderTypes
       case 'tql':
         // since tql to cards conversion is async and we don't know where this
         //  query will be used, this is all we can do for now.
+        // When this is loaded into the Builder, it will do the conversion.
         query = query.set('tqlCardsInSync', false);
         break;
       case 'cards':
