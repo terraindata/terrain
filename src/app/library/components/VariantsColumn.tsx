@@ -235,7 +235,7 @@ class VariantsColumn extends Classs<Props>
     browserHistory.push(`/builder/?o=${id}`);
   }
 
-  renderVariant(id: ID)
+  renderVariant(id: ID, fadeIndex: number)
   {
     const variant = this.props.variants.get(id);
     const index = this.props.variantsOrder.indexOf(id);
@@ -265,6 +265,7 @@ class VariantsColumn extends Classs<Props>
     return (
       <LibraryItem
         index={index}
+        fadeIndex={fadeIndex}
         draggingItemIndex={this.state.draggingItemIndex}
         draggingOverIndex={this.state.draggingOverIndex}
         name={variant.name}
@@ -336,6 +337,8 @@ class VariantsColumn extends Classs<Props>
     //   me && roles && roles.getIn([this.props.groupId, me.username, 'builder'])
     // );
     
+    let fadeIndex = 0;
+    
     return (
       <LibraryItemCategory
         status={archived ? 'Archive' : 'Build'}
@@ -348,7 +351,7 @@ class VariantsColumn extends Classs<Props>
           this.props.variantsOrder.map((id, index) =>
             this.props.variants.get(id) &&
               (archived ? this.hasStatus(id, LibraryTypes.EVariantStatus.Archive) : !this.hasStatus(id, LibraryTypes.EVariantStatus.Archive))
-              && this.renderVariant(id)
+              && this.renderVariant(id, fadeIndex ++)
           )
         }
         {

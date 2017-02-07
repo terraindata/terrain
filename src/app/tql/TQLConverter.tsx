@@ -91,13 +91,14 @@ class TQLConverter
             value = `'${value}'`;
           }
           
-          // let key = 'input.' + input.key;
-          let key = 'input\\.' + input.key;
-          cardsTql = cardsTql.replace(new RegExp(key, 'g'), "" + value);
-      //     inputsTql += `var ${input.key} = ${value};\n`;
+          let key = '([^a-zA-Z_.]|^)' + 'input\\.' + input.key + '([^a-zA-Z_.]|$)';
+
+          cardsTql = cardsTql.replace(
+            new RegExp(key, 'g'), 
+            (...args) => args[1] + value + args[2]
+          );
         }
       );
-      // inputsTql += "\n\n";
     }
     
     return cardsTql;

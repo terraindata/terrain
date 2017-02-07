@@ -48,9 +48,14 @@ import * as React from 'react';
 import Actions from "../../data/BuilderActions.tsx";
 import Util from '../../../util/Util.tsx';
 import BuilderTypes from './../../BuilderTypes.tsx';
-let {CardTypes} = BuilderTypes;
 import PureClasss from '../../../common/components/PureClasss.tsx';
 import CardDropArea from './CardDropArea.tsx';
+
+const cardsOrdering: string[] = 
+  _.flatten(BuilderTypes.CardsDeckOrdering)
+    .map(
+      cardConfig => cardConfig.type
+    );
 
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -150,7 +155,7 @@ class CreateCardTool extends PureClasss<Props>
      <div className='create-card-selector' ref='selector'>
        <div className='create-card-selector-inner'>
          {
-           _.map(CardTypes as any, (type:string) => 
+           cardsOrdering.map((type:string) => 
            {
              if(this.props.accepts && this.props.accepts.indexOf(type) === -1)
              {
@@ -170,7 +175,9 @@ class CreateCardTool extends PureClasss<Props>
                  }}
                >
                  <div className="create-card-button-inner" rel={type}>
-                   { card.static.title }
+                   { 
+                     card.static.title 
+                   }
                  </div>
                </a>
              );

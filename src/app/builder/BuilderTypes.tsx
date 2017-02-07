@@ -293,6 +293,8 @@ export module BuilderTypes
     return blockConfig;
   }
     
+  type TQLFn = string | ((block:IBlock) => string);  
+    
   // Every Card definition must follow this interface
   interface ICardConfig
   {
@@ -304,7 +306,7 @@ export module BuilderTypes
       preview: string | ((c:ICard) => string);
       display: Display | Display[];
       manualEntry: IManualEntry;
-      tql: string | ((block:IBlock) => string);
+      tql: TQLFn;
       tqlGlue?: string;
       topTql?: string | ((block:IBlock) => string);
       accepts?: List<string>;
@@ -361,7 +363,7 @@ export module BuilderTypes
     getChildTerms?: (card: ICard) => List<string>;
     getNeighborTerms?: (card: ICard) => List<string>;
     display?: Display | Display[];
-    tql: string;
+    tql: TQLFn;
     tqlGlue?: string;
     accepts: List<string>;
     singleChild?: boolean;
@@ -384,17 +386,17 @@ export module BuilderTypes
         getNeighborTerms: config.getNeighborTerms,
         
         preview: (c:IWrapperCard) => {
-          var prefix = config.title + ': ';
-          if(c.type === 'parentheses')
-          {
-            prefix = '';
-          }
+          // var prefix = config.title + ': ';
+          // if(c.type === 'parentheses')
+          // {
+          //   prefix = '';
+          // }
           if(c.cards.size)
           {
             let card = c.cards.get(0);
-            return prefix + getPreview(card);
+            return getPreview(card);
           }
-          return prefix + "Nothing";
+          return "Nothing";
         },
         
         display: config.display || (
@@ -542,6 +544,7 @@ export module BuilderTypes
     'transform',
     'sfw',
     'exists',
+    'not',
   ]);
   
   const transformScoreInputTypes = 
@@ -570,7 +573,7 @@ export module BuilderTypes
       static: {
         tql: "\n $first $OPERATOR $second",
         
-        accepts: List(['score', 'transform', 'from', 'exists']),
+        accepts: List(['score', 'transform', 'from', 'exists', 'not']),
       }
     }),
     
@@ -623,7 +626,6 @@ export module BuilderTypes
           'from',
           'where',
           'sort',
-          'let',
           'take',
           'skip',
           'groupBy',
@@ -817,53 +819,6 @@ export module BuilderTypes
         },
       }
     }),
-
-    as: _card({
-      value: "",
-      alias: "",
-      
-      static:
-      {
-        title: "As",
-        colors: ["#d9b540", "#f8e8b3"],
-        preview: '[alias]',
-        tql: "($value) as $alias",
-        manualEntry: ManualConfig.cards.where,
-        display:
-        {
-          displayType: DisplayType.FLEX,
-          key: null,
-          
-          flex:
-          [
-            {
-              displayType: DisplayType.CARDTEXT,
-              key: 'value',
-              top: false,
-              showWhenCards: true,
-              accepts: acceptsAggregates,
-            },
-            {
-              displayType: DisplayType.LABEL,
-              label: 'as',
-              key: null,
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'alias',
-              autoDisabled: true,
-            },
-          ], 
-          
-          below: 
-          {
-            displayType: DisplayType.CARDSFORTEXT,
-            key: 'value',
-            accepts: acceptsAggregates,
-          }
-        }
-      }
-    }),
     
     where: _wrapperCard({
       title: "Where",
@@ -876,6 +831,7 @@ export module BuilderTypes
         'and',
         'or',
         'exists',
+        'not',
         'comparison',
       ]),
     }),
@@ -886,7 +842,7 @@ export module BuilderTypes
       tqlGlue: '\nAND\n',
       manualEntry: ManualConfig.cards.and,
       colors: ["#824ba1", "#ecc9ff"],
-      accepts: List(['or', 'comparison', 'exists']),
+      accepts: List(['or', 'comparison', 'exists', 'not']),
     }),
     
     or: _wrapperCard({
@@ -895,7 +851,7 @@ export module BuilderTypes
       tqlGlue: '\nOR\n',
       manualEntry: ManualConfig.cards.or,
       colors: ["#b161bc", "#f8cefe"],
-      accepts: List(['and', 'comparison', 'exists']),
+      accepts: List(['and', 'comparison', 'exists', 'not']),
     }),
    
     comparison: _card(
@@ -932,7 +888,7 @@ export module BuilderTypes
             help: ManualConfig.help["operator"],
             centerDropdown: true,
           }, 
-          List(['sfw', 'exists'])
+          List(['sfw', 'exists', 'not'])
         ),
         manualEntry: ManualConfig.cards['filter'],
       },
@@ -1041,55 +997,103 @@ export module BuilderTypes
       }
     }),
 
+    as: _card({
+      value: "",
+      alias: "",
+      
+      static:
+      {
+        title: "As",
+        colors: ["#d24f42", "#f9cba8"],
+        preview: '[alias]',
+        tql: "($value) as $alias",
+        manualEntry: ManualConfig.cards.where,
+        display:
+        {
+          displayType: DisplayType.FLEX,
+          key: null,
+          
+          flex:
+          [
+            {
+              displayType: DisplayType.CARDTEXT,
+              key: 'value',
+              top: false,
+              showWhenCards: true,
+              accepts: acceptsAggregates,
+            },
+            {
+              displayType: DisplayType.LABEL,
+              label: 'as',
+              key: null,
+            },
+            {
+              displayType: DisplayType.TEXT,
+              key: 'alias',
+              autoDisabled: true,
+            },
+          ], 
+          
+          below: 
+          {
+            displayType: DisplayType.CARDSFORTEXT,
+            key: 'value',
+            accepts: acceptsAggregates,
+          }
+        }
+      }
+    }),
+    
     count: _aggregateNestedCard(
     {
-      colors: ["#d24f42", "#f9cba8"],
       title: "Count",
+      colors: ["#d65a44", "#fbc1b7"],
       manualEntry: ManualConfig.cards['count'],
       tql: "COUNT($value)",
       accepts: List(['distinct']),
       init: () => ({ value: '*' }),
     }),
     
-    distinct: _aggregateCard(
-    {
-      colors: ["#dba043", "#eedebe"],
-      title: "Distinct",
-      manualEntry: ManualConfig.cards['count'], // TODO
-      tql: "DISTINCT $value",
-    }),
-    
     avg: _aggregateCard(
     {
-      colors: ["#d65a44", "#fbc1b7"],
       title: "Average",
+      colors: ["#db6746", "#f9bcab"],
       manualEntry: ManualConfig.cards['avg'],
       tql: "AVG($value)",
-    }),
-    
-    sum: _aggregateCard(
-    {
-      colors: ["#dd8846", "#f9cba8"],
-      title: "Sum",
-      manualEntry: ManualConfig.cards['sum'],
-      tql: "SUM($value)",
     }),
 
     min: _aggregateCard(
     {
-      colors: ["#db6746", "#f9bcab"],
       title: "Min",
+      colors: ["#dd7547", "#fdcdb8"],
       manualEntry: ManualConfig.cards['min'],
       tql: "MIN($value)",
     }),
-
+    
     max: _aggregateCard(
     {
-      colors: ["#dd7547", "#fdcdb8"],
       title: "Max",
+      colors: ["#dd8846", "#f9cba8"],
       manualEntry: ManualConfig.cards['max'],
       tql: "MAX($value)",
     }),
+    
+    sum: _aggregateCard(
+    {
+      title: "Sum",
+      colors: ["#dba043", "#eedebe"],
+      manualEntry: ManualConfig.cards['sum'],
+      tql: "SUM($value)",
+    }),
+
+    distinct: _aggregateCard(
+    {
+      title: "Distinct",
+      colors: ["#d9b540", "#f8e8b3"],
+      manualEntry: ManualConfig.cards['count'], // TODO
+      tql: "DISTINCT $value",
+    }),
+
 
     exists: _wrapperCard(
     {
@@ -1100,13 +1104,32 @@ export module BuilderTypes
       accepts: List(['sfw']),
     }),
 
+    not: _wrapperCard(
+    {
+      colors: ["#21aab9", "#abedec"],
+      title: "Not",
+      manualEntry: ManualConfig.cards['exists'],
+      tql: (notCard) =>
+      {
+        let cards = notCard['cards'];
+        if(cards && cards.size && cards.get(0).type === 'exists')
+        {
+          return 'NOT$cards';
+        }
+        return 'NOT (\n$cards)';
+      },
+      accepts: List(['exists', 'compare', 'and', 'or']),
+    }),
+
+
+    // remove
     parentheses: _wrapperCard(
     {
       colors: ["#6775aa", "#d2c9e4"],
       title: "( )",
       manualEntry: ManualConfig.cards['parentheses'],
       tql: "\n(\n$cards)",
-      accepts: List(['and', 'or', 'exists', 'tql']),
+      accepts: List(['and', 'or', 'exists', 'tql', 'not']),
     }),
     
     weight: _block(
@@ -1404,13 +1427,13 @@ export module BuilderTypes
       Blocks.from,
     ],
     [
+      Blocks.as,
       Blocks.count,
       Blocks.avg,
       Blocks.min,
       Blocks.max,
       Blocks.sum,
       Blocks.distinct,
-      Blocks.as,
     ],
     [
       Blocks.where,
@@ -1425,6 +1448,7 @@ export module BuilderTypes
       Blocks.and,
       Blocks.or,
       Blocks.exists,
+      Blocks.not,
     ],
     [
       // Blocks.var,
@@ -1594,6 +1618,15 @@ export module BuilderTypes
       return;
     }
     
+    if(!card.static)
+    {
+      try {
+        return JSON.stringify(card);
+      } catch(e) {
+        return 'No preview';
+      }
+    }
+    
     let {preview} = card.static;
     if(typeof preview === 'string')
     {
@@ -1614,7 +1647,10 @@ export module BuilderTypes
         {
           return card[keys[0]].size;
         }
-        return card[keys[0]].toArray().map(v => v[keys[1]]).join(", ");
+        return card[keys[0]].toArray().map(
+          v => 
+            getPreview(v[keys[1]])
+        ).join(", ");
       });
     }
     else if(typeof preview === 'function')

@@ -190,7 +190,7 @@ class Result extends Classs<Props> {
   spotlight()
   {
     let id = this.props.primaryKey;
-    let spotlightColor = ColorManager.colorForKey(id);
+    let spotlightColor = ColorManager.altColorForKey(id);
     this.setState({
       isSpotlit: true,
       spotlightColor,

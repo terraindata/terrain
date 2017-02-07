@@ -121,12 +121,9 @@ declare interface IName
   name: string;
 }
 
-// these are "compile time" substitions done by Webpack.
+// this is a / these are build time substition(s) done by Webpack.
+declare var DEV: boolean;
 declare var MIDWAY_HOST: string;
-declare var TDB_HOST: string;
 
 declare const escape: (s:string) => string;
 declare const unescape: (s:string) => string;
-
-// DEV is a "compile time" substition done by Webpack.
-declare var DEV: boolean;

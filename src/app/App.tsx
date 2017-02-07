@@ -77,6 +77,7 @@ import Placeholder from "./common/components/Placeholder.tsx";
 import Redirect from "./common/components/Redirect.tsx";
 import Logout from "./common/components/Logout.tsx";
 import ManualWrapper from "./manual/components/ManualWrapper.tsx";
+
 var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
 import { Router, Route, IndexRoute } from 'react-router';
 const {browserHistory} = require('react-router');
@@ -89,6 +90,7 @@ import LibraryStore from './library/data/LibraryStore.tsx';
 import LibraryActions from './library/data/LibraryActions.tsx';
 import UserStore from './users/data/UserStore.tsx';
 import RolesStore from './roles/data/RolesStore.tsx';
+import Util from './util/Util.tsx';
 
 // Icons
 var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
@@ -130,11 +132,11 @@ const links =
     text: 'Builder',
     route: '/builder',
   },
-  {
-    icon: <ManualIcon />,
-    text: 'Manual',
-    route: '/manual',
-  }
+  // {
+  //   icon: <ManualIcon />,
+  //   text: 'Manual',
+  //   route: '/manual',
+  // }
 ];
 
 interface Props
@@ -156,11 +158,27 @@ class App extends PureClasss<Props>
     libraryLoaded: false,
     usersLoaded: false,
     rolesLoaded: false,
+    
+    noLocalStorage: false,
   };
   
   constructor(props:Props)
   {
     super(props);
+    
+    try {
+      // check to see if we can use localStorage
+      localStorage['test'] = 'test';
+    } catch(e)
+    {
+      this.state.noLocalStorage = true;
+      return;
+    }
+    
+    if(Util.getIEVersion())
+    {
+      alert('Terraformer is not meant to work in Internet Explorer. Please try another browser.');
+    }
     
     // Respond to authentication state changes.
     this._subscribe(AuthStore, {
@@ -287,6 +305,15 @@ class App extends PureClasss<Props>
 
   render()
   {
+    if(this.state.noLocalStorage)
+    {
+      return (
+        <InfoArea
+          large="Terraformer cannot be used successfully on this browser in 'private' / 'icognito' mode. Plesae switch to another browser or turn off incognito mode."
+        />
+      );
+    }
+    
     return (
       <div
         className='app'

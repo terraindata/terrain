@@ -213,7 +213,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     });
   }
 
-  renderAlgorithm(id: ID)
+  renderAlgorithm(id: ID, fadeIndex: number)
   {
     const algorithm = this.props.algorithms.get(id);
     const index = this.props.algorithmsOrder.indexOf(id);
@@ -296,6 +296,7 @@ class AlgorithmsColumn extends PureClasss<Props>
     return (
       <LibraryItem
         index={index}
+        fadeIndex={fadeIndex}
         draggingItemIndex={this.state.draggingItemIndex}
         draggingOverIndex={this.state.draggingOverIndex}
         name={algorithm.name}

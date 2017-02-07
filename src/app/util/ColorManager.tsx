@@ -72,6 +72,20 @@ class ColorManager
     '#426057',
   ];
   
+  private static ALT_COLORS =
+  [
+    '#00A7F7',
+    '#009788',
+    '#8AC541',
+    '#FFEC18',
+    '#FF9900',
+    '#00BCD6',
+    '#48B14B',
+    '#CCDD1F',
+    '#FFC200',
+    '#5F7D8C',
+  ];
+  
   private static keyToIndex: { [s: string]: number; } = {};
   
   private static secondaryKeyToKey: { [s: string]: string; } = {};
@@ -136,6 +150,11 @@ class ColorManager
   static colorForKey(key: string, secondaryKey?: string): string
   {
     return this.COLORS[this.indexForKey(key, secondaryKey)];
+  }
+  
+  static altColorForKey(key: string, secondaryKey?: string): string
+  {
+    return this.ALT_COLORS[this.indexForKey(key, secondaryKey)];
   }
   
   static darkerColorForKey(key: string, secondaryKey?: string): string

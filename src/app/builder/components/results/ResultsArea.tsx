@@ -75,6 +75,8 @@ interface Props
   onLoadEnd: () => void;
   canEdit: boolean;
   variantName: string;
+  
+  onNavigationException: () => void;
 }
 
 interface State
@@ -96,8 +98,6 @@ interface State
   
   resultsPages: number;
   onResultsLoaded: (unchanged?: boolean) => void;
-  
-  exporting: boolean;
 }
 
 class ResultsArea extends PureClasss<Props>
@@ -120,7 +120,6 @@ class ResultsArea extends PureClasss<Props>
     resultsPages: 1,
     onResultsLoaded: null,
     resultFormat: 'icon',
-    exporting: false,
   };
   
   constructor(props:Props)
@@ -138,11 +137,9 @@ class ResultsArea extends PureClasss<Props>
     this.xhr && this.xhr.abort();
     this.allXhr && this.allXhr.abort();
     this.countXhr && this.countXhr.abort();
-    this.exportXhr && this.exportXhr.abort();
     this.xhr = null;
     this.allXhr = null;
     this.countXhr = null;
-    this.exportXhr = null;
     this.timeout && clearTimeout(this.timeout);
   }
   
@@ -368,7 +365,7 @@ class ResultsArea extends PureClasss<Props>
       if(results.length === 1)
       {
         this.setState({
-          resultsCount: results[0]['count(*)']
+          resultsCount: results[0]['count(*)'] || results[0]['COUNT(*)']
         });
       }
       else if(results.length > 1)
@@ -506,87 +503,25 @@ class ResultsArea extends PureClasss<Props>
     this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
-  exportXhr: XMLHttpRequest;
   handleExport()
   {
-    this.setState({
-      exporting: true,
-    });
+    this.props.onNavigationException();
     
-    this.exportXhr && this.exportXhr.abort();
-    this.exportXhr = Ajax.query(
-      this.props.query.tql, 
+    Ajax.query(
+      this.props.query.mode === 'tql' ? this.props.query.tql : TQLConverter.toTQL(this.props.query), 
       this.props.db, 
-      this.handleExportDataLoaded,
-      this.handleExportError
+      _.noop,
+      _.noop,
+      false,
+      {
+        csv: true,
+        csvName: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.csv',
+      }
     );
-      
-  }
-  
-  handleExportDataLoaded(response: QueryResponse)
-  {
-    if(response.error)
-    {
-      alert('There was an error exporting your data: ' + response.error);
-    }
-    let {resultSet} = response;
-    if(resultSet)
-    {
-      let headers: (string | number)[] = [];
-      let headersMap: any = {};
-      let body: (string | number)[][] = [];
-      
-      if(!Array.isArray(resultSet))
-      {
-        headers = ['Text result'];
-        body = [[JSON.stringify(resultSet)]];
-      }
-      else
-      {
-        resultSet.map(
-          (obj) =>
-          {
-            let row: (string | number)[] = [];
-            
-            // add data which already has a header
-            headers.map(
-              headerField =>
-                row.push(obj[headerField])
-            );
-            
-            // add data which doesn't already have a header, and add the header
-            for(let key in obj)
-            {
-              if(!headersMap[key])
-              {
-                headersMap[key] = true;
-                headers.push(key);
-                row.push(obj[key]);
-              }
-            }
-            
-            body.push(row);
-          }
-        );
-      }
-      
-      body.unshift(headers);
-      Util.exportToCSV(
-        body,
-        this.props.variantName + ' on ' + moment().format('MM/DD/YY')
-      );
-    }
-    this.setState({
-      exporting: false,
-    });
-  }
-  
-  handleExportError(error)
-  {
-    alert('There was an error connecting to the server to export your data: ' + error);
-    this.setState({
-      exporting: false,
-    });
+    
+    alert('Your data are being prepared for export, and will automatically download when ready.\n\
+Note: this exports the results of your query, which may be different from the results in the Results \
+column if you have set a custom results view.');
   }
   
   handleAllFieldsError()
@@ -648,6 +583,11 @@ class ResultsArea extends PureClasss<Props>
     })
   }
   
+  isLoading(): boolean
+  {
+    return !! this.xhr || !! this.allXhr || !! this.countXhr;
+  }
+  
   renderTopbar()
   {
     let count = this.state.resultsCount !== -1 ? this.state.resultsCount : (this.state.results ? this.state.results.length : 0);
@@ -655,36 +595,29 @@ class ResultsArea extends PureClasss<Props>
       <div className='results-top'>
         <div className='results-top-summary'>
           {
-            this.isQueryEmpty() ?
-              'Empty query' :
+            this.isLoading() ?
+              'Loading..' :
               (
-                this.state.error ? 'Error with query' : 
-                (
-                  this.state.results ? 
-                    `${count || 'No'} result${count === 1 ? '' : 's'}` 
-                  : 'Text result'
-                )
+                this.isQueryEmpty() ?
+                  'Empty query' :
+                  (
+                    this.state.error ? 'Error with query' : 
+                    (
+                      this.state.results ? 
+                        `${count || 'No'} result${count === 1 ? '' : 's'}` 
+                      : 'Text result'
+                    )
+                  )
               )
           }
         </div>
         
-        {
-          this.state.exporting
-          ?
-            <div
-              className='results-top-config results-top-config-unclickable'
-            >
-              Exporting...
-            </div>
-          :
-            <div
-              className='results-top-config'
-              onClick={this.handleExport}
-            >
-              Export
-            </div>
-        }
-        
+        <div
+          className='results-top-config'
+          onClick={this.handleExport}
+        >
+          Export
+        </div>
         
         <div
           className='results-top-config'
