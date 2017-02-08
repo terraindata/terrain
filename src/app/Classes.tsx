@@ -63,7 +63,7 @@ export class BaseClass
 
 let records: {[class_name: string]: Immutable.Record.Class} = {};
 
-export function New<T>(instance, config: {[field: string]: any} = {}): T
+export function New<T>(instance, config: {[field: string]: any} = {}): T & IRecord<T>
 {
   let class_name = instance.__proto__.constructor.name;
   if(!records[class_name])
@@ -76,5 +76,7 @@ export function New<T>(instance, config: {[field: string]: any} = {}): T
       instance[key] = value
   );
   
-  return new records[class_name](instance) as any as T;
+  return new records[class_name](instance) as any;
 }
+
+let b = New<BaseClass>(new BaseClass());

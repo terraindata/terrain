@@ -64,14 +64,14 @@ interface Action<T> {
 declare type List<T> = Immutable.List<T>;
 declare type Map<K, T> = Immutable.Map<K, T>;
 declare type KeyPath = List<string | number>;
-declare type Set<T> = (f: string, v: any) => T;
-declare type SetIn<T> = (f: (string | number)[] | KeyPath, v: any) => T
+declare type Set<T> = (f: string, v: any) => T & IRecord<T>;
+declare type SetIn<T> = (f: (string | number)[] | KeyPath, v: any) => T & IRecord<T>;
 declare type Get = (f: string | number) => any;
 declare type GetIn = (f: (string | number)[] | KeyPath) => any;
-declare type Delete<T> = (f: string) => T;
-declare type DeleteIn<T> = (f: (string | number)[] | KeyPath) => T;
-declare type Update<T> = (f: string, updater: (n: any) => any) => T;
-declare type UpdateIn<T> = (f: (string | number)[] | KeyPath, updater: (n: any) => any) => T;
+declare type Delete<T> = (f: string) => T & IRecord<T>;
+declare type DeleteIn<T> = (f: (string | number)[] | KeyPath) => T & IRecord<T>;
+declare type Update<T> = (f: string, updater: (n: any) => any) => T & IRecord<T>;
+declare type UpdateIn<T> = (f: (string | number)[] | KeyPath, updater: (n: any) => any) => T & IRecord<T>;
 
 declare type Tables = List<string>;
 declare type TableColumns = Map<string, List<string>>;
