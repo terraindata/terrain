@@ -154,7 +154,8 @@ class ResultsArea extends PureClasss<Props>
   
   componentWillReceiveProps(nextProps)
   {
-    if(!_.isEqual(nextProps.query, this.props.query))
+    if(nextProps.query.cards !== this.props.query 
+      || nextProps.query.inputs !== this.props.query.inputs)
     {
       this.queryResults(nextProps.query);
       

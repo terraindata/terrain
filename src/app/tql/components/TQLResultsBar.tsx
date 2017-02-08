@@ -92,9 +92,10 @@ class TQLResultsBar extends PureClasss<Props>
   }
 
   //If the component updates and the tql command has been changed, then query results
-  componentWillReceiveProps(nextProps) 
+  componentWillReceiveProps(nextProps:Props) 
   {
-    if(nextProps.query.cards !== this.props.query.cards) 
+    if(nextProps.query.cards !== this.props.query.cards
+      || nextProps.query.inputs !== this.props.query.inputs) 
     {
       this.queryResults(nextProps.query);
     } 
