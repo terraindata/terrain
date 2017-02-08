@@ -489,20 +489,6 @@ function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
   return state;
 }
 
-
-// function handleParseTreeLoad(response)
-// {
-//   this.req = null;
-//   let cards = TQLToCards.convert(response.result);
-//   console.log(cards);
-//   Actions.change(Immutable.List(['query', 'cards']), cards);
-// }
-
-// function handleParseTreeError(error)
-// {
-//   console.log('error', error);
-// }
-
 import TQLToCards from '../../tql/TQLToCards.tsx';
 
 Util.assertKeysArePresent(ActionTypes, BuidlerReducers, 'Missing Builder Reducer for Builder Action Types: ');

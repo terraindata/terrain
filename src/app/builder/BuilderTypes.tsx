@@ -84,8 +84,8 @@ export module BuilderTypes
     [Operator.GT]: '>',
     [Operator.LE]: '<=',
     [Operator.LT]: '<',
-    [Operator.IN]: 'in',
-    [Operator.NIN]: 'not in',
+    [Operator.IN]: 'IN',
+    [Operator.NIN]: 'NOT IN',
     [Operator.LIKE]: 'LIKE',
   }
 

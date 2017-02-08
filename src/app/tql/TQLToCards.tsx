@@ -58,6 +58,7 @@ export const TQLToCards =
 {
   convert(statement: Statement, currentCards?: Cards): Cards
   {
+    console.log(statement, currentCards);
     let statements = statement.statements.map(parseNodeAsCard);
     
     let cards: Cards = List(statements);
@@ -211,7 +212,13 @@ const generalProcessors: {
   
   '-':
     (node) =>
-      '-' + parseNode(node.child),
+    {
+      if(node.child)
+      {
+        return '-' + parseNode(node.child);
+      }
+      return parseNode(node.left_child) + ' - ' + parseNode  (node.right_child);
+    },
   
   CALL:
     (node) =>
@@ -249,8 +256,8 @@ const generalProcessors: {
           {
             scorePoints = scorePoints.push(
               make(Blocks.scorePoint, {
-                score: scorePointNodes[i],
-                value: scorePointNodes[i + 1],
+                score: parseNode(scorePointNodes[i]),
+                value: parseNode(scorePointNodes[i + 1]),
               })
             );
           }
@@ -373,16 +380,34 @@ const generalProcessors: {
           ]),
         }
       ),
+  
+  // TODO migrate to card when available
+  'IS NOT NULL':
+    (node) =>
+      node.child + ' IS NOT NULL',
+  
+  '+':
+    (node) =>
+      parseNode(node.left_child) + ' + ' + parseNode(node.right_child),
+  
+  '*':
+    (node) =>
+      parseNode(node.left_child) + ' * ' + parseNode(node.right_child),
+  
+  '/':
+    (node) =>
+      parseNode(node.left_child) + ' / ' + parseNode(node.right_child),
 };
 
 const comparisonProcessors = _.reduce(
   BuilderTypes.OperatorTQL,
   (memo, val: string) =>
   {
-    memo[val.toLowerCase()] = true;
+    memo[val] = true;
     return memo;
   }, {}
 );
+
 function comparisonProcessor(node: Node): Card
 {
   return make(Blocks.comparison, {

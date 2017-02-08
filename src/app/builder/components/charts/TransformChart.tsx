@@ -1069,7 +1069,7 @@ var TransformChart = {
       .delay(100)
       .duration(50)
       .attr('opacity', 1);
-
+    console.log(mouse[0]);
     menu.append('circle')
       .attr('cx', mouse[0])
       .attr('cy', mouse[1])
@@ -1130,7 +1130,7 @@ var TransformChart = {
     
     point.enter()
       .append('circle');
-
+    
     point
       .attr('cx', (d) => scales.realX(d['x']))
       .attr('cy', (d) => scales.realPointY(d['y']))
