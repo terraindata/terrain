@@ -122,6 +122,7 @@ function parseNodeAsCard(node: Node | string): Card
   
   if(!val['_isCard'])
   {
+    console.log('not card', val);
     return make(Blocks.tql, {
       clause: val,
     });
@@ -216,6 +217,64 @@ const generalProcessors: {
     (node) =>
     {
       let type = node.left_child as string;
+      
+      if(typeof type === 'string')
+      {
+        type = type.trim().toLowerCase();
+        
+        if(type === 'linear_score')
+        {
+          let weightNodes = flattenCommas(node.right_child);
+          let weights = List([]);
+          for(let i = 0; i < weightNodes.length; i += 2)
+          {
+            weights = weights.push(
+              make(Blocks.weight, {
+                weight: parseNode(weightNodes[i]),
+                key: parseNode(weightNodes[i + 1]),
+              })
+            );
+          }
+          return make(Blocks.score, {
+            weights,
+          });
+        }
+        
+        if(type === 'linear_transform')
+        {
+          let scorePointNodes = flattenCommas(node.right_child);
+          let scorePoints = List([]);
+          
+          for(let i = 1; i < scorePointNodes.length; i += 2)
+          {
+            scorePoints = scorePoints.push(
+              make(Blocks.scorePoint, {
+                score: scorePointNodes[i],
+                value: scorePointNodes[i + 1],
+              })
+            );
+          }
+          return make(Blocks.transform, {
+            input: parseNode(scorePointNodes[0]),
+            scorePoints,
+          });
+        }
+        
+        if(Blocks[type])
+        {
+          return make(Blocks[type], {
+            value: parseNode(node.right_child),
+          });
+        }
+      }
+      
+      return make(Blocks.tql, { clause: 'call', });
+    },
+  
+  call:
+      (node) =>
+    {
+      let type = node.left_child as string;
       if(typeof type === 'string')
       {
         type = type.trim();
@@ -268,6 +327,7 @@ const generalProcessors: {
       
       return make(Blocks.tql, { clause: 'call', });
     },
+  
   
   DISTINCT:
     (node) =>

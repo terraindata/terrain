@@ -573,6 +573,7 @@ column if you have set a custom results view.');
     
     var tql = TQLConverter.toTQL(query, {
       limit: MAX_RESULTS,
+      replaceInputs: true,
     });
     
     if(tql !== this.state.tql)
@@ -603,6 +604,7 @@ column if you have set a custom results view.');
               allFields: true,
               transformAliases: true,
               limit: MAX_RESULTS,
+              replaceInputs: true,
             }), 
             this.props.db,
             this.handleAllFieldsResponse,
@@ -615,6 +617,7 @@ column if you have set a custom results view.');
           Ajax.query(
             TQLConverter.toTQL(query, {
               count: true,
+              replaceInputs: true,
             }), 
             this.props.db,
             this.handleCountResponse,

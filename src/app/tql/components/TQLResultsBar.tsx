@@ -51,10 +51,12 @@ import {Ajax, QueryResponse} from '../../util/Ajax.tsx';
 import Actions from "../../builder/data/BuilderActions.tsx";
 import TQLConverter from "../../tql/TQLConverter.tsx";
 import PureClasss from './../../common/components/PureClasss.tsx';
+import BuilderTypes from '../../builder/BuilderTypes.tsx';
 
 interface Props 
 {
   tql: string;
+  query: BuilderTypes.Query; // may not be necessary once we can pass inputs to TDBD
   onError: (lineNumber: number) => void;
   onLoadStart: () => void;
   onLoadEnd: () => void;
@@ -75,6 +77,7 @@ class TQLResultsBar extends PureClasss<Props>
     querying: boolean;
     resultsSpliced: number;
     errorLine: number;
+    queriedTql?: string;
   } = {
     results: null,
     error: false,
@@ -85,15 +88,15 @@ class TQLResultsBar extends PureClasss<Props>
   
   componentWillMount()
   {
-    this.queryResults(this.props.tql);
+    this.queryResults(this.props.query);
   }
 
   //If the component updates and the tql command has been changed, then query results
   componentWillReceiveProps(nextProps) 
   {
-    if(nextProps.tql !== this.props.tql) 
+    if(nextProps.query.cards !== this.props.query.cards) 
     {
-      this.queryResults(nextProps.tql);
+      this.queryResults(nextProps.query);
     } 
   }
     
@@ -248,16 +251,29 @@ class TQLResultsBar extends PureClasss<Props>
     });
   }
   
-  queryResults(tql)
+  queryResults(query:BuilderTypes.Query)
   {
     this.xhr && this.xhr.abort();
-    if(tql) 
+    
+    let tql = TQLConverter.toTQL(query, {
+      replaceInputs: true,
+    });
+    
+    if(tql)
     {
-      this.props.onLoadStart && this.props.onLoadStart();
-      this.setState({
-        querying: true,
-      });
-      this.xhr = Ajax.query(tql, this.props.db, this.handleResultsChange, this.handleError);
+      if(tql !== this.state.queriedTql)
+      {
+        this.props.onLoadStart && this.props.onLoadStart();
+        this.setState({
+          querying: true,
+          limit: 200,
+        });
+        this.xhr = Ajax.query(tql, this.props.db, this.handleResultsChange, this.handleError);
+        
+        this.setState({
+          queriedTql: tql,
+        });
+      }
     }
     else
     {

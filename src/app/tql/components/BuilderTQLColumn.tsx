@@ -394,6 +394,7 @@ class BuilderTQLColumn extends PureClasss<Props>
           
           <TQLResultsBar
             tql={this.state.tql}
+            query={this.props.query}
             db={this.props.variant && this.props.variant.db}
             onError={this.highlightError}
             onLoadStart={this.props.onLoadStart}
