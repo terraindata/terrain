@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 import Util from './../util/Util.tsx';
 import UserTypes from './../users/UserTypes.tsx';
 import RoleTypes from './../roles/RoleTypes.tsx';
@@ -49,6 +50,7 @@ import BuilderTypes from './../builder/BuilderTypes.tsx';
 import * as Immutable from 'immutable';
 import {IResultsConfig} from '../builder/components/results/ResultsConfig.tsx';
 const {List, Map} = Immutable;
+import {New, BaseClass} from '../Classes.tsx';
 
 export module LibraryTypes
 {
