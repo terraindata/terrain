@@ -323,20 +323,32 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     state: BuilderState,
     action: Action<{
       response: {
-        result: any
+        result?: any,
+        error?: string,
       }
     }>
   ) =>
-    state
+  {
+    let {error, result} = action.payload.response;
+    if(error)
+    {
+      return state
+        .setIn(['query', 'parseTreeError'], error)
+        .set('parseTreeReq', null)
+        .setIn(['query', 'tqlCardsInSync'], false);     
+    }
+    
+    return state
       .update('query',
         query =>
           query
             .set('cards', 
-              TQLToCards.convert(action.payload.response.result, state.query.cards)
+              TQLToCards.convert(result, state.query.cards)
             )
             .set('tqlCardsInSync', true)
       )
-      .set('parseTreeReq', null),
+      .set('parseTreeReq', null);
+  },
 
 [ActionTypes.parseTreeError]:
   (

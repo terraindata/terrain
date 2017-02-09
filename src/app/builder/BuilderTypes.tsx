@@ -982,37 +982,37 @@ export module BuilderTypes
       },
     }),
     
-    let: _card(
-    {
-      field: "",
-      expression: "",
+    // let: _card(
+    // {
+    //   field: "",
+    //   expression: "",
       
-      static: {
-        title: "Let",
-        preview: "[field]",
-        colors: ["#a4b356", "#f1fbbf"],
-        display: letVarDisplay,
-        manualEntry: ManualConfig.cards['let'],
-        tql: "let $field = $expression",
-        getNeighborTerms: (card) => List([card['field']]),
-      }
-    }),
+    //   static: {
+    //     title: "Let",
+    //     preview: "[field]",
+    //     colors: ["#a4b356", "#f1fbbf"],
+    //     display: letVarDisplay,
+    //     manualEntry: ManualConfig.cards['let'],
+    //     tql: "let $field = $expression",
+    //     getNeighborTerms: (card) => List([card['field']]),
+    //   }
+    // }),
 
-    var: _card(
-    {
-      field: "",
-      expression: "",
+    // var: _card(
+    // {
+    //   field: "",
+    //   expression: "",
       
-      static: {
-        title: "Var",
-        preview: "[field]",
-        display: letVarDisplay,
-        colors: ["#6ca165", "#c8f2c3"],
-        manualEntry: ManualConfig.cards['var'],
-        getNeighborTerms: (card) => List([card['field']]),
-        tql: "var $field = $expression",
-      }
-    }),
+    //   static: {
+    //     title: "Var",
+    //     preview: "[field]",
+    //     display: letVarDisplay,
+    //     colors: ["#6ca165", "#c8f2c3"],
+    //     manualEntry: ManualConfig.cards['var'],
+    //     getNeighborTerms: (card) => List([card['field']]),
+    //     tql: "var $field = $expression",
+    //   }
+    // }),
 
     as: _card({
       value: "",
@@ -1023,7 +1023,7 @@ export module BuilderTypes
         title: "As",
         colors: ["#d24f42", "#f9cba8"],
         preview: '[alias]',
-        tql: "$value as $alias",
+        tql: "$value AS $alias",
         manualEntry: ManualConfig.cards.where,
         display:
         {

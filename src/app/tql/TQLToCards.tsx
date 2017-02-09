@@ -58,7 +58,6 @@ export const TQLToCards =
 {
   convert(statement: Statement, currentCards?: Cards): Cards
   {
-    console.log(statement, currentCards);
     let statements = statement.statements.map(parseNodeAsCard);
     
     let cards: Cards = List(statements);
@@ -104,7 +103,7 @@ function parseNode(node:Node | string): CardString
       );
     }
     
-    if(comparisonProcessors[node.op])
+    if(comparisonProcessors[node.op.toUpperCase()])
     {
       return comparisonProcessor(node);
     }
@@ -123,7 +122,6 @@ function parseNodeAsCard(node: Node | string): Card
   
   if(!val['_isCard'])
   {
-    console.log('not card', val);
     return make(Blocks.tql, {
       clause: val,
     });
@@ -403,7 +401,7 @@ const comparisonProcessors = _.reduce(
   BuilderTypes.OperatorTQL,
   (memo, val: string) =>
   {
-    memo[val] = true;
+    memo[val.toUpperCase()] = true;
     return memo;
   }, {}
 );
@@ -414,7 +412,7 @@ function comparisonProcessor(node: Node): Card
     first: parseNode(node.left_child),
     second: parseNode(node.right_child),
     operator: + _.findKey(BuilderTypes.OperatorTQL, 
-      (op: string) => op.toLowerCase() === node.op
+      (op: string) => op.toUpperCase() === node.op.toUpperCase()
     ),
   });
 }
