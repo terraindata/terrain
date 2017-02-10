@@ -562,11 +562,83 @@ export module BuilderTypes
     'sfw',
     'exists',
     'not',
+    'add',
   ]);
   
   const transformScoreInputTypes = 
     List(['score', 'transform', 'sfw']).concat(acceptsAggregates).toList();
-
+  
+  const _acceptsMath = (list: List<string>) =>
+    list.concat(
+      List([
+        'add',
+        'subtract',
+        'divide',
+        'multiply',
+      ])
+    ).toList();
+  
+  const mathsAccept = _acceptsMath(
+    List([
+      'select',
+      'comparison',
+      'score',
+      'transform',
+    ])
+  );
+    
+  const _mathCard = (config: {
+    title: string;
+    tqlGlue: string;
+    colors: string[];
+  }) =>
+    _card({
+      fields: L(),
+      
+      static:
+      {
+        manualEntry: null,
+        colors: config.colors,
+        title: config.title,
+        preview: "[fields.field]",
+        tql: "($fields )",
+        tqlGlue: config.tqlGlue,
+        
+        init: () => ({
+          fields: List([ 
+            make(Blocks.field, { field: '' })
+          ]),
+        }),
+        
+        display: [
+          {
+            displayType: DisplayType.ROWS,
+            key: 'fields',
+            english: 'field',
+            factoryType: 'field',
+            row:
+            {
+              inner:
+              {
+                displayType: DisplayType.CARDTEXT,
+                key: 'field',
+                accepts: mathsAccept,
+                showWhenCards: true,
+              },
+              below:
+              {
+                displayType: DisplayType.CARDSFORTEXT,
+                key: 'field',
+                accepts: mathsAccept,
+              },
+              // hideToolsWhenNotString: true,
+              noDataPadding: true,
+            },
+          },
+        ],
+      },
+    });
+  
   // The BuildingBlocks
   export const Blocks =
   { 
@@ -590,7 +662,7 @@ export module BuilderTypes
       static: {
         tql: "\n $first $OPERATOR $second",
         
-        accepts: List(['score', 'transform', 'from', 'exists', 'not']),
+        accepts: _acceptsMath(List(['score', 'transform', 'from', 'exists', 'not'])),
       }
     }),
     
@@ -610,8 +682,8 @@ export module BuilderTypes
       field: "",
       
       static: {
-        tql: "\n $field",
-        accepts: List(['min', 'max', 'avg', 'sum', 'count', 'distinct']),
+        tql: "$field",
+        accepts: _acceptsMath(List(['min', 'max', 'avg', 'sum', 'count', 'distinct'])),
         removeOnCardRemove: true,
       },
     }),
@@ -959,7 +1031,7 @@ export module BuilderTypes
                 displayType: DisplayType.CARDTEXT,
                 help: ManualConfig.help["property"],
                 key: 'property',
-                accepts: List(['score', 'transform']),
+                accepts: _acceptsMath(List(['score', 'transform'])),
                 showWhenCards: true,
               },
               {
@@ -973,7 +1045,7 @@ export module BuilderTypes
             {
               displayType: DisplayType.CARDSFORTEXT,
               key: 'property',
-              accepts: List(['score', 'transform']),
+              accepts: _acceptsMath(List(['score', 'transform'])),
             },
             hideToolsWhenNotString: false,
             noDataPadding: true,
@@ -1403,6 +1475,30 @@ export module BuilderTypes
       }
     }),
     
+    add: _mathCard({
+      title: 'Add',
+      tqlGlue: ' + ',
+      colors: ["#d24f42", "#f9cba8"],
+    }),
+    
+    subtract: _mathCard({
+      title: 'Subtract',
+      tqlGlue: ' - ',
+      colors: ["#d65a44", "#fbc1b7"],
+    }),
+    
+    multiply: _mathCard({
+      title: 'Multiply',
+      tqlGlue: ' - ',
+      colors: ["#db6746", "#f9bcab"],
+    }),
+    
+    divide: _mathCard({
+      title: 'Divide',
+      tqlGlue: ' / ',
+      colors: ["#dd7547", "#fdcdb8"],
+    }),
+    
     spotlight: _block(
     {
       static: {
@@ -1433,7 +1529,7 @@ export module BuilderTypes
       },
     }),
   };
-  
+
   // Set the "type" field for all blocks equal to its key
   _.map(Blocks as ({[card:string]:any}), (v, i) => Blocks[i].type = i);
   
@@ -1468,10 +1564,14 @@ export module BuilderTypes
       Blocks.not,
     ],
     [
-      // Blocks.var,
-      // Blocks.let,
       Blocks.transform,
       Blocks.score,
+    ],
+    [
+      Blocks.add,
+      Blocks.subtract,
+      Blocks.multiply,
+      Blocks.divide,
     ],
     [
       Blocks.tql,
@@ -1637,6 +1737,11 @@ export module BuilderTypes
     
     if(!card.static)
     {
+      if(typeof card === 'string' || typeof card === 'number')
+      {
+        return card + "";
+      }
+      
       try {
         return JSON.stringify(card);
       } catch(e) {
