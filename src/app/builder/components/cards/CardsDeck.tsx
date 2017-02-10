@@ -48,11 +48,11 @@ import * as Immutable from 'immutable';
 import * as _ from 'underscore';
 import * as $ from 'jquery';
 import * as React from 'react';
-import Util from '../../../util/Util.tsx';
-import Actions from "../../data/BuilderActions.tsx";
-import PureClasss from './../../../common/components/PureClasss.tsx';
-import BuilderTypes from '../../BuilderTypes.tsx';
-import Switch from './../../../common/components/Switch.tsx';
+import Util from '../../../util/Util';
+import Actions from "../../data/BuilderActions";
+import PureClasss from './../../../common/components/PureClasss';
+import BuilderTypes from '../../BuilderTypes';
+import Switch from './../../../common/components/Switch';
 type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
 

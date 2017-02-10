@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
-import Ajax from './../../util/Ajax.tsx';
-import ActionTypes from './RolesActionTypes.tsx';
-import Actions from './RolesActions.tsx';
-import RoleTypes from './../RoleTypes.tsx';
+import Ajax from './../../util/Ajax';
+import ActionTypes from './RolesActionTypes';
+import Actions from './RolesActions';
+import RoleTypes from './../RoleTypes';
 var Immutable = require('immutable');
 
 let RolesReducer = {};

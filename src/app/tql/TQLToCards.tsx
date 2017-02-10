@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 const _ = require('underscore');
 import * as Immutable from 'immutable';
-import { BuilderTypes } from '../builder/BuilderTypes.tsx';
+import { BuilderTypes } from '../builder/BuilderTypes';
 type Cards = BuilderTypes.ICards;
 type Card = BuilderTypes.ICard;
 type CardString = BuilderTypes.CardString;

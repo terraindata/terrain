@@ -43,11 +43,11 @@ THE SOFTWARE.
 */
 
 const _ = require('underscore');
-import ActionTypes from './BuilderActionTypes.tsx';
-import Store from './BuilderStore.tsx';
-import { CardItem } from '../components/cards/Card.tsx';
-import { BuilderTypes } from './../BuilderTypes.tsx';
-import LibraryTypes from '../../library/LibraryTypes.tsx';
+import ActionTypes from './BuilderActionTypes';
+import Store from './BuilderStore';
+import { CardItem } from '../components/cards/Card';
+import { BuilderTypes } from './../BuilderTypes';
+import LibraryTypes from '../../library/LibraryTypes';
 import * as Immutable from 'immutable';
 import List = Immutable.List;
 import Map = Immutable.Map;

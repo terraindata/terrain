@@ -47,7 +47,7 @@ require('./TransformChart.less');
 import * as d3 from 'd3';
 import * as _ from 'underscore';
 import * as $ from 'jquery';
-import Util from '../../../util/Util.tsx';
+import Util from '../../../util/Util';
 
 var xMargin = 45;
 var yMargin = 10;

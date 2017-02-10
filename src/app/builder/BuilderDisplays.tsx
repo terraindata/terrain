@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import PureClasss from './../common/components/PureClasss.tsx';
-import {Operators, Combinators} from './BuilderTypes.tsx';
+import PureClasss from './../common/components/PureClasss';
+import {Operators, Combinators} from './BuilderTypes';
 var ManualConfig = require('./../manual/ManualConfig.json');
 
 var ManualConfig = require('./../manual/ManualConfig.json');

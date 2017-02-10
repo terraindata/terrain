@@ -46,9 +46,9 @@ require('./AccountEntry.less');
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
-import Util from '../../util/Util.tsx';
+import Util from '../../util/Util';
 import * as classNames from 'classnames';
-import Classs from './../../common/components/Classs.tsx';
+import Classs from './../../common/components/Classs';
 var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 
 interface Props

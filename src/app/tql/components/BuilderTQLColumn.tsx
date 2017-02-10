@@ -48,21 +48,21 @@ import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 const {List} = Immutable;
-import TQLResultsBar from './TQLResultsBar.tsx';
-import Menu from './../../common/components/Menu.tsx';
-import { MenuOption } from '../../common/components/Menu.tsx';
-import Switch from './../../common/components/Switch.tsx';
-import TQLConverter from '../TQLConverter.tsx';
-import BuilderActions from './../../builder/data/BuilderActions.tsx';
-import BuilderTypes from '../../builder/BuilderTypes.tsx';
+import TQLResultsBar from './TQLResultsBar';
+import Menu from './../../common/components/Menu';
+import { MenuOption } from '../../common/components/Menu';
+import Switch from './../../common/components/Switch';
+import TQLConverter from '../TQLConverter';
+import BuilderActions from './../../builder/data/BuilderActions';
+import BuilderTypes from '../../builder/BuilderTypes';
 import * as _ from 'underscore';
-import PureClasss from './../../common/components/PureClasss.tsx';
-import Ajax from "./../../util/Ajax.tsx";
-import LibraryTypes from '../../library/LibraryTypes.tsx';
+import PureClasss from './../../common/components/PureClasss';
+import Ajax from "./../../util/Ajax";
+import LibraryTypes from '../../library/LibraryTypes';
 
-import TQLEditor from './TQLEditor.tsx';
+import TQLEditor from './TQLEditor';
 
-import TQLPopup from './TQLPopup.tsx';
+import TQLPopup from './TQLPopup';
 
 interface Props {
   variant?: LibraryTypes.Variant;

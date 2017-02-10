@@ -47,12 +47,12 @@ import * as Immutable from 'immutable';
 import * as ReduxActions from 'redux-actions';
 var Redux = require('redux');
 
-import AuthStore from './../../auth/data/AuthStore.tsx';
-import Util from './../../util/Util.tsx';
+import AuthStore from './../../auth/data/AuthStore';
+import Util from './../../util/Util';
 
-import UserTypes from './../UserTypes.tsx';
-import UserActions from './UserActions.tsx';
-import UserReducers from './UserReducers.tsx';
+import UserTypes from './../UserTypes';
+import UserActions from './UserActions';
+import UserReducers from './UserReducers';
 
 let UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   UserReducers,

@@ -58,39 +58,39 @@ window['PerfStart'] = Perf.start;
 window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); }
 
 // Components
-import PureClasss from './common/components/PureClasss.tsx';
-import LayoutManager from "./builder/components/layout/LayoutManager.tsx";
-import Builder from "./builder/components/Builder.tsx";
-import Library from './library/components/Library.tsx';
-import X from './x/components/X.tsx';
-import Account from './users/components/Account.tsx';
-import Settings from './users/components/Settings.tsx';
-import Notifications from './users/components/Notifications.tsx';
-import Profile from './users/components/Profile.tsx';
-import EditProfile from './users/components/EditProfile.tsx';
-import Team from './users/components/Team.tsx';
-import Sidebar from "./common/components/Sidebar.tsx";
-import AccountDropdown from "./common/components/AccountDropdown.tsx";
-import Login from "./auth/components/Login.tsx";
-import InfoArea from "./common/components/InfoArea.tsx";
-import Placeholder from "./common/components/Placeholder.tsx";
-import Redirect from "./common/components/Redirect.tsx";
-import Logout from "./common/components/Logout.tsx";
-import ManualWrapper from "./manual/components/ManualWrapper.tsx";
+import PureClasss from './common/components/PureClasss';
+import LayoutManager from "./builder/components/layout/LayoutManager";
+import Builder from "./builder/components/Builder";
+import Library from './library/components/Library';
+import X from './x/components/X';
+import Account from './users/components/Account';
+import Settings from './users/components/Settings';
+import Notifications from './users/components/Notifications';
+import Profile from './users/components/Profile';
+import EditProfile from './users/components/EditProfile';
+import Team from './users/components/Team';
+import Sidebar from "./common/components/Sidebar";
+import AccountDropdown from "./common/components/AccountDropdown";
+import Login from "./auth/components/Login";
+import InfoArea from "./common/components/InfoArea";
+import Placeholder from "./common/components/Placeholder";
+import Redirect from "./common/components/Redirect";
+import Logout from "./common/components/Logout";
+import ManualWrapper from "./manual/components/ManualWrapper";
 
 var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
 import { Router, Route, IndexRoute } from 'react-router';
 const {browserHistory} = require('react-router');
 // import { createHistory } from 'history';
 // let history = createHistory();
-import Ajax from './util/Ajax.tsx';
+import Ajax from './util/Ajax';
 
-import BuilderStore from './builder/data/BuilderStore.tsx';
-import LibraryStore from './library/data/LibraryStore.tsx';
-import LibraryActions from './library/data/LibraryActions.tsx';
-import UserStore from './users/data/UserStore.tsx';
-import RolesStore from './roles/data/RolesStore.tsx';
-import Util from './util/Util.tsx';
+import BuilderStore from './builder/data/BuilderStore';
+import LibraryStore from './library/data/LibraryStore';
+import LibraryActions from './library/data/LibraryActions';
+import UserStore from './users/data/UserStore';
+import RolesStore from './roles/data/RolesStore';
+import Util from './util/Util';
 
 // Icons
 var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
@@ -101,14 +101,14 @@ var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIc
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 var ManualIcon = require ("./../images/icon_info.svg")
 
-import AuthActions from "./auth/data/AuthActions.tsx";
-import BuilderActions from "./builder/data/BuilderActions.tsx";
-import AuthStore from "./auth/data/AuthStore.tsx";
-import UserActions from "./users/data/UserActions.tsx";
-import RolesActions from "./roles/data/RolesActions.tsx";
-import { InAppNotification } from './common/components/InAppNotification.tsx';
-import DeployModal from './deploy/components/DeployModal.tsx';
-import EasterEggs from './x/components/EasterEggs.tsx';
+import AuthActions from "./auth/data/AuthActions";
+import BuilderActions from "./builder/data/BuilderActions";
+import AuthStore from "./auth/data/AuthStore";
+import UserActions from "./users/data/UserActions";
+import RolesActions from "./roles/data/RolesActions";
+import { InAppNotification } from './common/components/InAppNotification';
+import DeployModal from './deploy/components/DeployModal';
+import EasterEggs from './x/components/EasterEggs';
 
 const links = 
 [

@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 require('./Sidebar.less');
 import * as React from 'react';
-import Util from '../../util/Util.tsx';
+import Util from '../../util/Util';
 import * as classNames from 'classnames';
 import { Link } from 'react-router';
-import PureClasss from '../../common/components/PureClasss.tsx';
+import PureClasss from '../../common/components/PureClasss';
 
 var ExpandIcon = require("./../../../images/icon_expand_12x12.svg?name=ExpandIcon");
 var linkHeight = 36; // Coordinate with Sidebar.less

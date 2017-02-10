@@ -56,11 +56,11 @@ import * as _ from 'underscore';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import Util from '../../../util/Util.tsx';
-import Actions from "../../data/BuilderActions.tsx";
-import Card from "../cards/Card.tsx";
-import PureClasss from './../../../common/components/PureClasss.tsx';
-import BuilderTypes from '../../BuilderTypes.tsx';
+import Util from '../../../util/Util';
+import Actions from "../../data/BuilderActions";
+import Card from "../cards/Card";
+import PureClasss from './../../../common/components/PureClasss';
+import BuilderTypes from '../../BuilderTypes';
 let L = Immutable.List;
 let M = Immutable.Map;
 

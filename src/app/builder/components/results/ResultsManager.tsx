@@ -46,13 +46,13 @@ THE SOFTWARE.
 // const {Map,List} = Immutable;
 // import * as _ from 'underscore';
 // import * as React from 'react';
-// import Util from '../../../util/Util.tsx';
-// import {Ajax, QueryResponse} from '../../../util/Ajax.tsx';
-// import {IResultsConfig, DefaultIResultsConfig, ResultsConfig} from "../results/ResultsConfig.tsx";
-// import TQLConverter from "../../../tql/TQLConverter.tsx";
-// import PureClasss from './../../../common/components/PureClasss.tsx';
-// import BuilderTypes from '../../BuilderTypes.tsx';
-// import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore.tsx';
+// import Util from '../../../util/Util';
+// import {Ajax, QueryResponse} from '../../../util/Ajax';
+// import {IResultsConfig, DefaultIResultsConfig, ResultsConfig} from "../results/ResultsConfig";
+// import TQLConverter from "../../../tql/TQLConverter";
+// import PureClasss from './../../../common/components/PureClasss';
+// import BuilderTypes from '../../BuilderTypes';
+// import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore';
 
 // const MAX_RESULTS = 200;
 

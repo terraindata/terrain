@@ -43,18 +43,18 @@ THE SOFTWARE.
 */
 
 var _ = require('underscore');
-import ActionTypes from './LibraryActionTypes.tsx';
-import Store from './LibraryStore.tsx';
-import {LibraryState, LibraryStore, _LibraryState} from './LibraryStore.tsx';
-import LibraryTypes from './../LibraryTypes.tsx';
-import BuilderTypes from './../../builder/BuilderTypes.tsx';
-import '../../util/Ajax.tsx';
+import ActionTypes from './LibraryActionTypes';
+import Store from './LibraryStore';
+import {LibraryState, LibraryStore, _LibraryState} from './LibraryStore';
+import LibraryTypes from './../LibraryTypes';
+import BuilderTypes from './../../builder/BuilderTypes';
+import '../../util/Ajax';
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
 import * as Immutable from 'immutable';
 
-import Ajax from './../../util/Ajax.tsx';
+import Ajax from './../../util/Ajax';
 
 var $ = (type: string, payload: any) => Store.dispatch({type, payload})
 

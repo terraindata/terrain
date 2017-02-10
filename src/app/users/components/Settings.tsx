@@ -44,22 +44,22 @@ THE SOFTWARE.
 
 require('./Settings.less');
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
-import Store from './../data/UserStore.tsx';
-import Actions from './../data/UserActions.tsx';
-import LibraryTypes from './../UserTypes.tsx';
-import InfoArea from './../../common/components/InfoArea.tsx';
+import Classs from './../../common/components/Classs';
+import Store from './../data/UserStore';
+import Actions from './../data/UserActions';
+import LibraryTypes from './../UserTypes';
+import InfoArea from './../../common/components/InfoArea';
 import { Link } from 'react-router';
-import AuthStore from './../../auth/data/AuthStore.tsx';
-import AuthActions from './../../auth/data/AuthActions.tsx';
-import AccountEntry from './AccountEntry.tsx';
-import CheckBox from './../../common/components/CheckBox.tsx';
-import UserTypes from '../UserTypes.tsx';
-import UserStore from './../../users/data/UserStore.tsx';
-import Ajax from './../../util/Ajax.tsx';
+import AuthStore from './../../auth/data/AuthStore';
+import AuthActions from './../../auth/data/AuthActions';
+import AccountEntry from './AccountEntry';
+import CheckBox from './../../common/components/CheckBox';
+import UserTypes from '../UserTypes';
+import UserStore from './../../users/data/UserStore';
+import Ajax from './../../util/Ajax';
 type User = UserTypes.User;
-import PasswordStrengthInput from './PasswordStrengthInput.tsx';
-import Modal from './../../common/components/Modal.tsx';
+import PasswordStrengthInput from './PasswordStrengthInput';
+import Modal from './../../common/components/Modal';
 
 var Select = require('react-select');
 var TimeZones = require('./timezones.json');

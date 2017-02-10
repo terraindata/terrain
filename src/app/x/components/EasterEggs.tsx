@@ -43,14 +43,14 @@ THE SOFTWARE.
 */
 
 require('./EasterEggs.less');
-import PureClasss from './../../common/components/PureClasss.tsx';
+import PureClasss from './../../common/components/PureClasss';
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import Util from '../../util/Util.tsx';
+import Util from '../../util/Util';
 const r = 3;
 interface Props {
 }

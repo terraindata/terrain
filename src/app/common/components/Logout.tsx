@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import InfoArea from './InfoArea.tsx';
-import PureClasss from '../../common/components/PureClasss.tsx';
+import InfoArea from './InfoArea';
+import PureClasss from '../../common/components/PureClasss';
 const {browserHistory} = require('react-router');
-import AuthActions from "../../auth/data/AuthActions.tsx";
+import AuthActions from "../../auth/data/AuthActions";
 
 interface Props
 {

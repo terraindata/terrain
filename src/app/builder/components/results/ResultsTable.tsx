@@ -45,15 +45,15 @@ THE SOFTWARE.
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import PureClasss from '../../../common/components/PureClasss.tsx';
-import Table from '../../../common/components/Table.tsx';
-import InfoArea from '../../../common/components/InfoArea.tsx';
-import {IResultsConfig, ResultsConfig} from "../results/ResultsConfig.tsx";
-import {getResultName, getResultFields, getResultValue} from './Result.tsx';
-import {getPrimaryKeyFor} from './ResultsArea.tsx';
-import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore.tsx';
-import ColorManager from '../../../util/ColorManager.tsx';
-import {MenuOption} from '../../../common/components/Menu.tsx';
+import PureClasss from '../../../common/components/PureClasss';
+import Table from '../../../common/components/Table';
+import InfoArea from '../../../common/components/InfoArea';
+import {IResultsConfig, ResultsConfig} from "../results/ResultsConfig";
+import {getResultName, getResultFields, getResultValue} from './Result';
+import {getPrimaryKeyFor} from './ResultsArea';
+import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore';
+import ColorManager from '../../../util/ColorManager';
+import {MenuOption} from '../../../common/components/Menu';
 
 interface Props
 {

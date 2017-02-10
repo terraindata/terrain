@@ -46,15 +46,15 @@ import * as Immutable from 'immutable';
 let {Map, List} = Immutable;
 import * as _ from 'underscore';
 import * as React from 'react';
-import Actions from "../../data/BuilderActions.tsx";
-import BuilderStore from "../../data/BuilderStore.tsx";
-import SpotlightStore from '../../data/SpotlightStore.tsx';
-import Util from '../../../util/Util.tsx';
-import { Ajax, QueryResponse } from '../../../util/Ajax.tsx';
-import { BuilderTypes } from './../../BuilderTypes.tsx';
-import PureClasss from './../../../common/components/PureClasss.tsx';
-import TransformCardChart from './TransformCardChart.tsx';
-import TQLConverter from '../../../tql/TQLConverter.tsx';
+import Actions from "../../data/BuilderActions";
+import BuilderStore from "../../data/BuilderStore";
+import SpotlightStore from '../../data/SpotlightStore';
+import Util from '../../../util/Util';
+import { Ajax, QueryResponse } from '../../../util/Ajax';
+import { BuilderTypes } from './../../BuilderTypes';
+import PureClasss from './../../../common/components/PureClasss';
+import TransformCardChart from './TransformCardChart';
+import TQLConverter from '../../../tql/TQLConverter';
 const Dimensions = require('react-dimensions');
 
 const NUM_BARS = 1000; 
@@ -83,7 +83,7 @@ export interface Bar
 }
 export type Bars = List<Bar>;
 
-import TransformCardPeriscope from './TransformCardPeriscope.tsx';
+import TransformCardPeriscope from './TransformCardPeriscope';
 
 class TransformCard extends PureClasss<Props>
 {

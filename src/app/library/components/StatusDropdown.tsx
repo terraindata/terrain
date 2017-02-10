@@ -46,16 +46,16 @@ require('./StatusDropdown.less');
 import * as React from 'react';
 import * as Immutable from 'immutable';
 const {List} = Immutable;
-import PureClasss from './../../common/components/PureClasss.tsx';
-import Dropdown from './../../common/components/Dropdown.tsx';
+import PureClasss from './../../common/components/PureClasss';
+import Dropdown from './../../common/components/Dropdown';
 import * as classNames from 'classnames';
-import LibraryTypes from '../LibraryTypes.tsx';
-import LibraryActions from '../data/LibraryActions.tsx';
+import LibraryTypes from '../LibraryTypes';
+import LibraryActions from '../data/LibraryActions';
 type Status = LibraryTypes.EVariantStatus;
 const Status = LibraryTypes.EVariantStatus;
-import Util from '../../util/Util.tsx';
-import RolesStore from '../../roles/data/RolesStore.tsx';
-import UserStore from '../../users/data/UserStore.tsx';
+import Util from '../../util/Util';
+import RolesStore from '../../roles/data/RolesStore';
+import UserStore from '../../users/data/UserStore';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 

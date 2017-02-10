@@ -46,10 +46,10 @@ import * as classNames from 'classnames';
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import Util from '../../util/Util.tsx';
-import { BuilderTypes } from '../../builder/BuilderTypes.tsx';
-import { Display } from '../../builder/BuilderDisplays.tsx';
-import Card from '../../builder/components/cards/Card.tsx';
+import Util from '../../util/Util';
+import { BuilderTypes } from '../../builder/BuilderTypes';
+import { Display } from '../../builder/BuilderDisplays';
+import Card from '../../builder/components/cards/Card';
 
 interface Props
 {

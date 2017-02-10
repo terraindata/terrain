@@ -47,7 +47,7 @@ import * as React from 'react';
 var _ = require('underscore');
 var shallowCompare = require('react-addons-shallow-compare');
 import * as ReactDOM from "react-dom";
-import Util from '../../../util/Util.tsx';
+import Util from '../../../util/Util';
 var $ = require('jquery');
 
 var Panel = {

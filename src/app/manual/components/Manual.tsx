@@ -45,16 +45,16 @@ THE SOFTWARE.
 require('./Manual.less');
 var _ = require('underscore');
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
+import Classs from './../../common/components/Classs';
 import { Link } from 'react-router';
 import * as classNames from 'classnames';
-import Autocomplete from './../../common/components/Autocomplete.tsx';
-import ManualEntry from './ManualEntry.tsx';
+import Autocomplete from './../../common/components/Autocomplete';
+import ManualEntry from './ManualEntry';
 const {browserHistory} = require('react-router');
 
 import * as Immutable from 'immutable';
 const {List} = Immutable;
-import BuilderTypes from './../../builder/BuilderTypes.tsx';
+import BuilderTypes from './../../builder/BuilderTypes';
 
 var CloseIcon = require('./../../../images/icon_close.svg');
 var SearchIcon = require('./../../../images/icon_search.svg');

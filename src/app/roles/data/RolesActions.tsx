@@ -43,9 +43,9 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
-import ActionTypes from './RolesActionTypes.tsx';
-import Store from './RolesStore.tsx';
-import RoleTypes from './../RoleTypes.tsx';
+import ActionTypes from './RolesActionTypes';
+import Store from './RolesStore';
+import RoleTypes from './../RoleTypes';
 
 var $ = (type: string, payload: any) => Store.dispatch({type, payload})
 

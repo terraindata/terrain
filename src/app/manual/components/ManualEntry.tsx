@@ -46,15 +46,15 @@ require('./ManualEntry.less');
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
-import Util from '../../util/Util.tsx';
+import Util from '../../util/Util';
 import * as classNames from 'classnames';
-import Classs from './../../common/components/Classs.tsx';
+import Classs from './../../common/components/Classs';
 var ManualConfig = require('./../ManualConfig.json');
 var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
-import BuilderTypes from './../../builder/BuilderTypes.tsx';
-import Card from './../../builder/components/cards/Card.tsx';
+import BuilderTypes from './../../builder/BuilderTypes';
+import Card from './../../builder/components/cards/Card';
 import * as Immutable from 'immutable';
-import TQLConverter from '../../tql/TQLConverter.tsx';
+import TQLConverter from '../../tql/TQLConverter';
 
 
 var CodeMirror = require('./../../tql/components/Codemirror.js');

@@ -43,12 +43,12 @@ THE SOFTWARE.
 */
 
 var _ = require('underscore');
-import ActionTypes from './UserActionTypes.tsx';
-import Store from './UserStore.tsx';
-import UserTypes from './../UserTypes.tsx';
+import ActionTypes from './UserActionTypes';
+import Store from './UserStore';
+import UserTypes from './../UserTypes';
 import * as Immutable from 'immutable';
 
-import Ajax from './../../util/Ajax.tsx';
+import Ajax from './../../util/Ajax';
 
 var $ = (type: string, payload: any) => Store.dispatch({type, payload})
 

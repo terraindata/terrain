@@ -43,8 +43,8 @@ THE SOFTWARE.
 */
 
 var _ = require('underscore');
-import ActionTypes from './AuthActionTypes.tsx';
-import Store from './AuthStore.tsx';
+import ActionTypes from './AuthActionTypes';
+import Store from './AuthStore';
 
 var $ = (type: string, payload: any) => Store.dispatch({type, payload})
 

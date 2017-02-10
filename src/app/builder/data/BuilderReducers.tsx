@@ -43,14 +43,14 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
-import LibraryTypes from './../../library/LibraryTypes.tsx';
-import {BuilderTypes} from './../BuilderTypes.tsx';
-import Ajax from './../../util/Ajax.tsx';
-import ActionTypes from './BuilderActionTypes.tsx';
-import Actions from './BuilderActions.tsx';
+import LibraryTypes from './../../library/LibraryTypes';
+import {BuilderTypes} from './../BuilderTypes';
+import Ajax from './../../util/Ajax';
+import ActionTypes from './BuilderActionTypes';
+import Actions from './BuilderActions';
 import * as _ from 'underscore';
-import {BuilderState} from './BuilderStore.tsx';
-import Util from '../../util/Util.tsx';
+import {BuilderState} from './BuilderStore';
+import Util from '../../util/Util';
 
 const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
 {
@@ -501,7 +501,7 @@ function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
   return state;
 }
 
-import TQLToCards from '../../tql/TQLToCards.tsx';
+import TQLToCards from '../../tql/TQLToCards';
 
 Util.assertKeysArePresent(ActionTypes, BuidlerReducers, 'Missing Builder Reducer for Builder Action Types: ');
 

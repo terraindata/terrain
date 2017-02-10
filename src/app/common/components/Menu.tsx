@@ -46,9 +46,9 @@ require('./Menu.less');
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
-import Util from '../../util/Util.tsx';
+import Util from '../../util/Util';
 import * as classNames from 'classnames';
-import PureClasss from './../../common/components/PureClasss.tsx';
+import PureClasss from './../../common/components/PureClasss';
 var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 
 var optionHeight = 30; // coordinate with Menu.less

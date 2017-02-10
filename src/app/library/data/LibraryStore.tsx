@@ -47,19 +47,19 @@ import * as Immutable from 'immutable';
 import * as ReduxActions from 'redux-actions';
 var Redux = require('redux');
 
-import AuthStore from './../../auth/data/AuthStore.tsx';
-import UserStore from './../../users/data/UserStore.tsx';
-import RoleStore from './../../roles/data/RolesStore.tsx';
-import Actions from "./LibraryActions.tsx";
-import {LibraryActionTypes, CleanLibraryActionTypes} from './LibraryActionTypes.tsx';
-import LibraryTypes from './../LibraryTypes.tsx';
+import AuthStore from './../../auth/data/AuthStore';
+import UserStore from './../../users/data/UserStore';
+import RoleStore from './../../roles/data/RolesStore';
+import Actions from "./LibraryActions";
+import {LibraryActionTypes, CleanLibraryActionTypes} from './LibraryActionTypes';
+import LibraryTypes from './../LibraryTypes';
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
-import Util from './../../util/Util.tsx';
-import BuilderActions from '../../builder/data/BuilderActions.tsx';
+import Util from './../../util/Util';
+import BuilderActions from '../../builder/data/BuilderActions';
 
-import Ajax from './../../util/Ajax.tsx';
+import Ajax from './../../util/Ajax';
 
 class LibraryStateC
 {
@@ -91,7 +91,7 @@ export const _LibraryState = (config?:any) => {
 
 var DefaultState = _LibraryState();
 
-import LibraryReducers from './LibraryReducers.tsx';
+import LibraryReducers from './LibraryReducers';
 
 function saveStateOf(current: Map<ID, any>, previous: Map<ID, any>)
 {

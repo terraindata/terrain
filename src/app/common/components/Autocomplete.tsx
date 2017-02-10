@@ -47,9 +47,9 @@ require('./Autocomplete.less');
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import Util from '../../util/Util.tsx';
+import Util from '../../util/Util';
 import * as classNames from 'classnames';
-import PureClasss from './../../common/components/PureClasss.tsx';
+import PureClasss from './../../common/components/PureClasss';
 
 interface Props
 {

@@ -42,8 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import RoleTypes from './../../roles/RoleTypes.tsx';
-import UserTypes from './../UserTypes.tsx';
+import RoleTypes from './../../roles/RoleTypes';
+import UserTypes from './../UserTypes';
 
 export const patty = new UserTypes.User({
   id: "patty",

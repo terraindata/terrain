@@ -43,16 +43,16 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
-import UserStore from './../data/UserStore.tsx';
-import Actions from './../data/UserActions.tsx';
-import LibraryTypes from './../UserTypes.tsx';
-import InfoArea from './../../common/components/InfoArea.tsx';
+import Classs from './../../common/components/Classs';
+import UserStore from './../data/UserStore';
+import Actions from './../data/UserActions';
+import LibraryTypes from './../UserTypes';
+import InfoArea from './../../common/components/InfoArea';
 import { Link } from 'react-router';
-import UserTypes from './../UserTypes.tsx';
-import AuthStore from './../../auth/data/AuthStore.tsx';
-import Ajax from './../../util/Ajax.tsx';
-import Modal from './../../common/components/Modal.tsx';
+import UserTypes from './../UserTypes';
+import AuthStore from './../../auth/data/AuthStore';
+import Ajax from './../../util/Ajax';
+import Modal from './../../common/components/Modal';
 var CameraIcon = require('./../../../images/icon_camera.svg');
 var CloseIcon = require('./../../../images/icon_close_8x8_gray.svg')
 const {browserHistory} = require('react-router');

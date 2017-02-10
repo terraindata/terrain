@@ -45,14 +45,14 @@ THE SOFTWARE.
 require('./Profile.less');
 import * as React from 'react';
 import { Link } from 'react-router';
-import Classs from './../../common/components/Classs.tsx';
-import UserStore from './../data/UserStore.tsx';
-import Actions from './../data/UserActions.tsx';
-import LibraryTypes from './../UserTypes.tsx';
-import InfoArea from './../../common/components/InfoArea.tsx';
-import UserTypes from './../UserTypes.tsx';
-import AuthStore from './../../auth/data/AuthStore.tsx';
-import Ajax from './../../util/Ajax.tsx';
+import Classs from './../../common/components/Classs';
+import UserStore from './../data/UserStore';
+import Actions from './../data/UserActions';
+import LibraryTypes from './../UserTypes';
+import InfoArea from './../../common/components/InfoArea';
+import UserTypes from './../UserTypes';
+import AuthStore from './../../auth/data/AuthStore';
+import Ajax from './../../util/Ajax';
 import * as classNames from 'classnames';
 
 

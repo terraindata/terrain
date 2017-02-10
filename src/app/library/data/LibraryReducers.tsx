@@ -43,11 +43,11 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
-import ActionTypes from './LibraryActionTypes.tsx';
-import Util from './../../util/Util.tsx';
-import LibraryTypes from './../LibraryTypes.tsx';
-import {LibraryState} from './LibraryStore.tsx';
-import Ajax from '../../util/Ajax.tsx';
+import ActionTypes from './LibraryActionTypes';
+import Util from './../../util/Util';
+import LibraryTypes from './../LibraryTypes';
+import {LibraryState} from './LibraryStore';
+import Ajax from '../../util/Ajax';
 const {EVariantStatus} = LibraryTypes;
 
 var Immutable = require('immutable');

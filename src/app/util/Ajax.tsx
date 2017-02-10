@@ -45,13 +45,13 @@ THE SOFTWARE.
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 
-import AuthStore from './../auth/data/AuthStore.tsx';
-import Actions from './../auth/data/AuthActions.tsx';
-import UserTypes from './../users/UserTypes.tsx';
-import RoleTypes from './../roles/RoleTypes.tsx';
-import LibraryTypes from './../library/LibraryTypes.tsx';
-import BuilderTypes from './../builder/BuilderTypes.tsx';
-import Util from './../util/Util.tsx';
+import AuthStore from './../auth/data/AuthStore';
+import Actions from './../auth/data/AuthActions';
+import UserTypes from './../users/UserTypes';
+import RoleTypes from './../roles/RoleTypes';
+import LibraryTypes from './../library/LibraryTypes';
+import BuilderTypes from './../builder/BuilderTypes';
+import Util from './../util/Util';
 
 export interface QueryResponse
 {

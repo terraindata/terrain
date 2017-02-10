@@ -43,20 +43,20 @@ THE SOFTWARE.
 */
 
 require('./DeployModal.less');
-import PureClasss from './../../common/components/PureClasss.tsx';
+import PureClasss from './../../common/components/PureClasss';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 
-import Modal from '../../common/components/Modal.tsx';
-import TQLEditor from '../../tql/components/TQLEditor.tsx';
-import TQLConverter from '../../tql/TQLConverter.tsx';
-import LibraryStore from '../../library/data/LibraryStore.tsx';
-import LibraryActions from '../../library/data/LibraryActions.tsx';
-import BuilderTypes from '../../builder/BuilderTypes.tsx';
-import LibraryTypes from '../../library/LibraryTypes.tsx';
-import DeployModalColumn from './DeployModalColumn.tsx';
+import Modal from '../../common/components/Modal';
+import TQLEditor from '../../tql/components/TQLEditor';
+import TQLConverter from '../../tql/TQLConverter';
+import LibraryStore from '../../library/data/LibraryStore';
+import LibraryActions from '../../library/data/LibraryActions';
+import BuilderTypes from '../../builder/BuilderTypes';
+import LibraryTypes from '../../library/LibraryTypes';
+import DeployModalColumn from './DeployModalColumn';
 
 let {EVariantStatus} = LibraryTypes;
 

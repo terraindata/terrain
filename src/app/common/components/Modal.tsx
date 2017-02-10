@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 require('./Modal.less');
-import PureClasss from './../../common/components/PureClasss.tsx';
+import PureClasss from './../../common/components/PureClasss';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';

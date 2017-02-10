@@ -46,10 +46,10 @@ require('./ManualPopup.less');
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
-import Util from '../../util/Util.tsx';
+import Util from '../../util/Util';
 import * as classNames from 'classnames';
-import Classs from './../../common/components/Classs.tsx';
-import BuilderTypes from './../../builder/BuilderTypes.tsx';
+import Classs from './../../common/components/Classs';
+import BuilderTypes from './../../builder/BuilderTypes';
 var InfoIcon = require('./../../../images/icon_info.svg');
 var OpenIcon = require('./../../../images/icon_open.svg');
 

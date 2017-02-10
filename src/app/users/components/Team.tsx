@@ -44,18 +44,18 @@ THE SOFTWARE.
 
 require('./Team.less');
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
-import Store from './../data/UserStore.tsx';
-import AuthStore from './../../auth/data/AuthStore.tsx';
-import Actions from './../data/UserActions.tsx';
-import LibraryTypes from './../UserTypes.tsx';
-import InfoArea from './../../common/components/InfoArea.tsx';
+import Classs from './../../common/components/Classs';
+import Store from './../data/UserStore';
+import AuthStore from './../../auth/data/AuthStore';
+import Actions from './../data/UserActions';
+import LibraryTypes from './../UserTypes';
+import InfoArea from './../../common/components/InfoArea';
 import { Link } from 'react-router';
-import UserTypes from '../UserTypes.tsx';
-import UserThumbnail from './UserThumbnail.tsx';
-import CreateItem from '../../common/components/CreateItem.tsx';
-import Ajax from '../../util/Ajax.tsx';
-import Modal from './../../common/components/Modal.tsx';
+import UserTypes from '../UserTypes';
+import UserThumbnail from './UserThumbnail';
+import CreateItem from '../../common/components/CreateItem';
+import Ajax from '../../util/Ajax';
+import Modal from './../../common/components/Modal';
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
 

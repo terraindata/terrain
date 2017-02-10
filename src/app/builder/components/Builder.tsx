@@ -56,31 +56,31 @@ const {browserHistory} = require('react-router');
 const { withRouter } = require('react-router');
 
 // Data
-import { BuilderStore, BuilderState } from "./../data/BuilderStore.tsx";
-import Actions from "./../data/BuilderActions.tsx";
-import Util from "./../../util/Util.tsx";
-import UserActions from '../../users/data/UserActions.tsx';
-import UserStore from '../../users/data/UserStore.tsx';
-import RolesStore from '../../roles/data/RolesStore.tsx';
-import RolesActions from '../../roles/data/RolesActions.tsx';
-import LibraryTypes from '../../library/LibraryTypes.tsx';
-import { LibraryStore, LibraryState } from '../../library/data/LibraryStore.tsx';
-import LibraryActions from '../../library/data/LibraryActions.tsx';
-import Types from '../BuilderTypes.tsx';
+import { BuilderStore, BuilderState } from "./../data/BuilderStore";
+import Actions from "./../data/BuilderActions";
+import Util from "./../../util/Util";
+import UserActions from '../../users/data/UserActions';
+import UserStore from '../../users/data/UserStore';
+import RolesStore from '../../roles/data/RolesStore';
+import RolesActions from '../../roles/data/RolesActions';
+import LibraryTypes from '../../library/LibraryTypes';
+import { LibraryStore, LibraryState } from '../../library/data/LibraryStore';
+import LibraryActions from '../../library/data/LibraryActions';
+import Types from '../BuilderTypes';
 type Query = Types.Query;
 type Variant = LibraryTypes.Variant;
 
 // Components
-import PureClasss from './../../common/components/PureClasss.tsx';
-import BuilderColumn from "./BuilderColumn.tsx";
-import {Tabs, TabAction} from "./layout/Tabs.tsx";
-import LayoutManager from "./layout/LayoutManager.tsx";
-import Card from "./cards/Card.tsx";
-import Result from "./results/Result.tsx";
-import Ajax from "./../../util/Ajax.tsx";
-import InfoArea from '../../common/components/InfoArea.tsx';
-import {notificationManager} from './../../common/components/InAppNotification.tsx'
-import Modal from '../../common/components/Modal.tsx';
+import PureClasss from './../../common/components/PureClasss';
+import BuilderColumn from "./BuilderColumn";
+import {Tabs, TabAction} from "./layout/Tabs";
+import LayoutManager from "./layout/LayoutManager";
+import Card from "./cards/Card";
+import Result from "./results/Result";
+import Ajax from "./../../util/Ajax";
+import InfoArea from '../../common/components/InfoArea';
+import {notificationManager} from './../../common/components/InAppNotification'
+import Modal from '../../common/components/Modal';
 
 var NewIcon = require("./../../../images/icon_new_21x17.svg?name=NewIcon");
 var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");

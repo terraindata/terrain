@@ -47,11 +47,11 @@ import * as $ from 'jquery';
 import * as classNames from 'classnames';
 import * as React from 'react';
 import * as _ from 'underscore';
-import Util from '../../util/Util.tsx';
-import Actions from "../data/AuthActions.tsx";
-import PureClasss from '../../common/components/PureClasss.tsx';
-import Modal from './../../common/components/Modal.tsx';
-import Loading from './../../common/components/Loading.tsx';
+import Util from '../../util/Util';
+import Actions from "../data/AuthActions";
+import PureClasss from '../../common/components/PureClasss';
+import Modal from './../../common/components/Modal';
+import Loading from './../../common/components/Loading';
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 var TerrainIcon = require("./../../../images/logo_mountainCircle.svg?name=TerrainIcon");

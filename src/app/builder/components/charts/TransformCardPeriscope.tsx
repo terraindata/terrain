@@ -48,13 +48,13 @@ let {Map, List} = Immutable;
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import Actions from "../../data/BuilderActions.tsx";
-import Util from '../../../util/Util.tsx';
-import PureClasss from '../../../common/components/PureClasss.tsx';
-import { BuilderTypes } from './../../BuilderTypes.tsx';
-import Periscope from './Periscope.tsx';
-import {Bar, Bars} from './TransformCard.tsx';
-import BuilderTextbox from '../../../common/components/BuilderTextbox.tsx';
+import Actions from "../../data/BuilderActions";
+import Util from '../../../util/Util';
+import PureClasss from '../../../common/components/PureClasss';
+import { BuilderTypes } from './../../BuilderTypes';
+import Periscope from './Periscope';
+import {Bar, Bars} from './TransformCard';
+import BuilderTextbox from '../../../common/components/BuilderTextbox';
 
 interface Props 
 {

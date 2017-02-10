@@ -47,9 +47,9 @@ let {List, Map} = Immutable;
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import Util from '../../../util/Util.tsx';
-import PureClasss from '../../../common/components/PureClasss.tsx';
-import { BuilderTypes } from './../../BuilderTypes.tsx';
+import Util from '../../../util/Util';
+import PureClasss from '../../../common/components/PureClasss';
+import { BuilderTypes } from './../../BuilderTypes';
 
 type ScorePoint = {
   id: string;
@@ -59,7 +59,7 @@ type ScorePoint = {
 }
 type ScorePoints = List<ScorePoint>;
 
-import TransformChart from './TransformChart.tsx';
+import TransformChart from './TransformChart';
 
 interface Props 
 {

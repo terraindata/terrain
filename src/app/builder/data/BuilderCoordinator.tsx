@@ -44,14 +44,14 @@ THE SOFTWARE.
 
 // import * as _ from 'underscore';
 // import * as Immutable from 'immutable';
-// import Actions from './BuilderActions.tsx';
-// import { BuilderTypes } from './../BuilderTypes.tsx';
+// import Actions from './BuilderActions';
+// import { BuilderTypes } from './../BuilderTypes';
 // import List = Immutable.List;
 // import Map = Immutable.Map;
-// import Ajax from '../../util/Ajax.tsx';
-// import TQLToCards from '../../tql/TQLToCards.tsx';
-// import BuilderStore from './BuilderStore.tsx';
-// import Util from '../../util/Util.tsx';
+// import Ajax from '../../util/Ajax';
+// import TQLToCards from '../../tql/TQLToCards';
+// import BuilderStore from './BuilderStore';
+// import Util from '../../util/Util';
 
 // export class BuilderCoordinator
 // {

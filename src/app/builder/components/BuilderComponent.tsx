@@ -46,16 +46,16 @@ require('./BuilderComponent.less');
 
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import {Display, DisplayType} from './../BuilderDisplays.tsx';
-import PureClasss from '../../common/components/PureClasss.tsx';
-import BuilderTextbox from '../../common/components/BuilderTextbox.tsx';
-import BuilderTypes from '../BuilderTypes.tsx';
-import BuilderActions from '../data/BuilderActions.tsx';
-import CardField from './cards/CardField.tsx';
-import Dropdown from '../../common/components/Dropdown.tsx';
-import CardsArea from './cards/CardsArea.tsx';
-import BuilderTextboxCards from '../../common/components/BuilderTextboxCards.tsx';
-import ManualInfo from '../../manual/components/ManualInfo.tsx';
+import {Display, DisplayType} from './../BuilderDisplays';
+import PureClasss from '../../common/components/PureClasss';
+import BuilderTextbox from '../../common/components/BuilderTextbox';
+import BuilderTypes from '../BuilderTypes';
+import BuilderActions from '../data/BuilderActions';
+import CardField from './cards/CardField';
+import Dropdown from '../../common/components/Dropdown';
+import CardsArea from './cards/CardsArea';
+import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
+import ManualInfo from '../../manual/components/ManualInfo';
 import * as classNames from 'classnames';
 
 interface Props

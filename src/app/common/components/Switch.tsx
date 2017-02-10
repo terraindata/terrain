@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./Switch.less');
 import * as React from 'react';
 import * as classNames from 'classnames';
-import Classs from './../../common/components/Classs.tsx';
+import Classs from './../../common/components/Classs';
 
 interface Props
 {

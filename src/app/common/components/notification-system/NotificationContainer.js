@@ -45,7 +45,7 @@ THE SOFTWARE.
 /*Adapted from https://github.com/igorprado/react-notification-system*/
 
 var React = require('react');
-var NotificationItem = require('./NotificationItem.tsx');
+var NotificationItem = require('./NotificationItem');
 var Constants = require('./constants');
 
 var NotificationContainer = React.createClass({displayName: "NotificationContainer",

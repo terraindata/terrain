@@ -53,9 +53,9 @@ require('./Table.less');
 let { AutoSizer, Grid, ScrollSync, CellMeasurer } = require('react-virtualized');
 let scrollbarSize = require('dom-helpers/util/scrollbarSize');
 import * as classNames from 'classnames';
-import Classs from './Classs.tsx';
-import Util from '../../util/Util.tsx';
-import {Menu, MenuOption} from '../../common/components/Menu.tsx';
+import Classs from './Classs';
+import Util from '../../util/Util';
+import {Menu, MenuOption} from '../../common/components/Menu';
 
 const LEFT_COLOR_FROM = hexToRgb('#a2af93')
 const LEFT_COLOR_TO = hexToRgb('#828c76')

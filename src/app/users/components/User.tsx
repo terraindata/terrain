@@ -44,11 +44,11 @@ THE SOFTWARE.
 
 require('./Account.less');
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
-import Store from './../data/UserStore.tsx';
-import Actions from './../data/UserActions.tsx';
-import LibraryTypes from './../UserTypes.tsx';
-import InfoArea from './../../common/components/InfoArea.tsx';
+import Classs from './../../common/components/Classs';
+import Store from './../data/UserStore';
+import Actions from './../data/UserActions';
+import LibraryTypes from './../UserTypes';
+import InfoArea from './../../common/components/InfoArea';
 import { Link } from 'react-router';
 var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
 

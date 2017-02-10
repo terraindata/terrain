@@ -43,22 +43,22 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import PureClasss from './../../common/components/PureClasss.tsx';
-import LibraryColumn from './LibraryColumn.tsx';
-import LibraryItem from './LibraryItem.tsx';
-import LibraryItemCategory from './LibraryItemCategory.tsx';
-import CreateItem from '../../common/components/CreateItem.tsx';
-import LibraryTypes from './../LibraryTypes.tsx';
-import ColorManager from './../../util/ColorManager.tsx';
-import InfoArea from './../../common/components/InfoArea.tsx';
-import Actions from './../data/LibraryActions.tsx';
-import UserThumbnail from './../../users/components/UserThumbnail.tsx';
-import Scoreline from './../../common/components/Scoreline.tsx';
-import Util from '../../util/Util.tsx';
-import UserTypes from '../../users/UserTypes.tsx';
-import UserStore from '../../users/data/UserStore.tsx';
-import RoleTypes from '../../roles/RoleTypes.tsx';
-import RolesStore from '../../roles/data/RolesStore.tsx';
+import PureClasss from './../../common/components/PureClasss';
+import LibraryColumn from './LibraryColumn';
+import LibraryItem from './LibraryItem';
+import LibraryItemCategory from './LibraryItemCategory';
+import CreateItem from '../../common/components/CreateItem';
+import LibraryTypes from './../LibraryTypes';
+import ColorManager from './../../util/ColorManager';
+import InfoArea from './../../common/components/InfoArea';
+import Actions from './../data/LibraryActions';
+import UserThumbnail from './../../users/components/UserThumbnail';
+import Scoreline from './../../common/components/Scoreline';
+import Util from '../../util/Util';
+import UserTypes from '../../users/UserTypes';
+import UserStore from '../../users/data/UserStore';
+import RoleTypes from '../../roles/RoleTypes';
+import RolesStore from '../../roles/data/RolesStore';
 
 var AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 

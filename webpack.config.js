@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+
 var webpack = require('webpack');
 var path = require('path');
 
@@ -53,7 +54,7 @@ module.exports = {
         filename: "bundle.js"
     },
     resolve: {
-        extensions: [ '', '.js', '.css', '.less', '.tsx', '.json', '.svg' ],
+        extensions: [ '', '.js', '.css', '.less', '.jsx', '.ts', '.tsx', '.json', '.svg' ],
     },
     module: {
         loaders: [

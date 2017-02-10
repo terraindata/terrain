@@ -45,15 +45,15 @@ THE SOFTWARE.
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import Util from '../../../util/Util.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
-import Actions from "../../data/BuilderActions.tsx";
-import Input from "../inputs/Input.tsx";
-import LayoutManager from "../layout/LayoutManager.tsx";
-import CreateLine from '../../../common/components/CreateLine.tsx';
-import InfoArea from '../../../common/components/InfoArea.tsx';
-import PureClasss from '../../../common/components/PureClasss.tsx';
-import BuilderTypes from '../../BuilderTypes.tsx';
+import Util from '../../../util/Util';
+import PanelMixin from '../layout/PanelMixin';
+import Actions from "../../data/BuilderActions";
+import Input from "../inputs/Input";
+import LayoutManager from "../layout/LayoutManager";
+import CreateLine from '../../../common/components/CreateLine';
+import InfoArea from '../../../common/components/InfoArea';
+import PureClasss from '../../../common/components/PureClasss';
+import BuilderTypes from '../../BuilderTypes';
 type IInput = BuilderTypes.IInput;
 
 interface Props
