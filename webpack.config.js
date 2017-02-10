@@ -72,7 +72,11 @@ module.exports = {
             { test: /\.png$/, loader: "url?limit=4000000" },
             { test: require.resolve('jquery'), loader: "expose?jQuery" },
             { test: /\.json$/, loader: 'json' },
-            { test: /\.svg(\?name=[a-zA-Z]*)*$/, loader: 'babel?presets[]=react&presets[]=es2015!svg-react' },
+            { 
+		      test: /\.svg(\?name=[a-zA-Z]*)*$/, loader: 'babel?presets[]=react&presets[]=es2015!svg-react' + 
+		              // removes data-name attributes
+		              '!string-replace?search=%20data-name%3D%22%5B%5Cw%5Cs_-%5D*%22&replace=&flags=ig'
+	        },
         ]
     },
     plugins: [

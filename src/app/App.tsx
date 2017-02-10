@@ -282,6 +282,7 @@ class App extends PureClasss<Props>
             />
           },
           {
+            noProps: true,
             content: 
               <div
                 className='app-inner'

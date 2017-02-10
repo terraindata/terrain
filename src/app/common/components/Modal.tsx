@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 require('./Modal.less');
-import Classs from './../../common/components/Classs.tsx';
+import PureClasss from './../../common/components/PureClasss.tsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
@@ -68,7 +68,7 @@ interface Props
   onThirdButton?: () => void;
 }
 
-class Modal extends Classs<Props>   
+class Modal extends PureClasss<Props>   
 {
   closeModalSuccess() 
   {
@@ -83,6 +83,7 @@ class Modal extends Classs<Props>
     return (
       <div>
         <ReactModal 
+          contentLabel={''}
         	isOpen={this.props.open} 
         	overlayClassName='modal-overlay' 
         	className={classNames({
