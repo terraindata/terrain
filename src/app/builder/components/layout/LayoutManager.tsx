@@ -569,59 +569,67 @@ var LayoutManager = React.createClass<any, any>({
 		if(obj.content)
 		{
 			// if obj.content is null or undef, then React.cloneElement will error and cause the whole app to break
-
-			var props:any = { 
-        index: index,
-				onPanelDrag: this.onPanelDrag,
-				onPanelDrop: this.onPanelDrop,
-        dy: 0,
-        dx: 0,
-			};
-      
-			if(this.state.dragging && this.state.draggingIndex !== index)
-			{
-				props.neighborDragging = true;
-			}
-
-			if(this.state.shiftedIndices.indexOf(index) !== -1 && !this.props.layout.useDropZones)
-			{
-				props.dy = this.state.shiftedHeight;
-				props.dx = this.state.shiftedWidth;
-
-				if(this.props.layout.cells)
-				{
-          var numCells = this.getNumCellsInRow();
-					if(index < this.state.draggingIndex)
-					{
-						// should shift forward and down
-						props.dx = this.state.shiftedWidth;
-						props.dy = 0;
-						if((index + 1) % numCells === 0)
-						{
-							props.dx = -1 * this.state.shiftedWidth * (numCells - 1);
-							props.dy = this.state.shiftedHeight;
-						}
-					}
-
-					if(index > this.state.draggingIndex)
-					{
-						// should shift backward and up
-						props.dx = -1 * this.state.shiftedWidth;
-						props.dy = 0;
-						if(index % numCells === 0)
-						{
-							props.dx = this.state.shiftedWidth * (numCells - 1);
-							props.dy = -1 * this.state.shiftedHeight;
-						}
-					}
-				}
-			}
-      
-      if(obj.resizeable)
+      let props: any;
+      if(obj.noProps)
       {
-        props.mouseDownRef = obj.resizeHandleRef;
-        props.onMouseDown = this.onResize;
+        props = {}
       }
+      else
+      {
+        props = { 
+          index: index,
+          onPanelDrag: this.onPanelDrag,
+          onPanelDrop: this.onPanelDrop,
+          dy: 0,
+          dx: 0,
+        };
+
+        if(this.state.dragging && this.state.draggingIndex !== index)
+        {
+          props.neighborDragging = true;
+        }
+
+        if(this.state.shiftedIndices.indexOf(index) !== -1 && !this.props.layout.useDropZones)
+        {
+          props.dy = this.state.shiftedHeight;
+          props.dx = this.state.shiftedWidth;
+
+          if(this.props.layout.cells)
+          {
+            var numCells = this.getNumCellsInRow();
+            if(index < this.state.draggingIndex)
+            {
+              // should shift forward and down
+              props.dx = this.state.shiftedWidth;
+              props.dy = 0;
+              if((index + 1) % numCells === 0)
+              {
+                props.dx = -1 * this.state.shiftedWidth * (numCells - 1);
+                props.dy = this.state.shiftedHeight;
+              }
+            }
+
+            if(index > this.state.draggingIndex)
+            {
+              // should shift backward and up
+              props.dx = -1 * this.state.shiftedWidth;
+              props.dy = 0;
+              if(index % numCells === 0)
+              {
+                props.dx = this.state.shiftedWidth * (numCells - 1);
+                props.dy = -1 * this.state.shiftedHeight;
+              }
+            }
+          }
+        }
+        
+        if(obj.resizeable)
+        {
+          props.mouseDownRef = obj.resizeHandleRef;
+          props.onMouseDown = this.onResize;
+        }
+      }
+
 
 			var content:any = React.cloneElement(obj.content, props);
 		}
