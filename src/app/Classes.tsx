@@ -57,8 +57,11 @@ export class BaseClass
 }
 
 // example instantiation function for a sub class
-// let _TestClass = (config?: {[key:string]: any}) => 
-//   New<TestClass>(new TestClass(config), config);
+// class TestClassC extends BaseClass
+// { ... }
+// export type TestClass = TestClassC & IRecord<TestClassC>;
+// export const _TestClass = (config?: {[key:string]: any}) => 
+//   New<TestClass>(new TestClassC(config), config);
   
 
 let records: {[class_name: string]: Immutable.Record.Class} = {};
