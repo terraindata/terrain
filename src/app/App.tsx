@@ -54,6 +54,8 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
 import * as Perf from 'react-addons-perf';
+import { Router, Route, IndexRoute } from 'react-router';
+const {browserHistory} = require('react-router');
 window['PerfStart'] = Perf.start;
 window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); }
 
@@ -77,20 +79,26 @@ import Placeholder from "./common/components/Placeholder";
 import Redirect from "./common/components/Redirect";
 import Logout from "./common/components/Logout";
 import ManualWrapper from "./manual/components/ManualWrapper";
-
 var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
-import { Router, Route, IndexRoute } from 'react-router';
-const {browserHistory} = require('react-router');
-// import { createHistory } from 'history';
-// let history = createHistory();
+import { InAppNotification } from './common/components/InAppNotification';
+import DeployModal from './deploy/components/DeployModal';
+import EasterEggs from './x/components/EasterEggs';
 import Ajax from './util/Ajax';
+import Util from './util/Util';
 
-import BuilderStore from './builder/data/BuilderStore';
+import BuilderStore from './builder/data/BuilderStore'; // for error reporting
+import BuilderActions from "./builder/data/BuilderActions"; // for card hovering
+
+// data that needs to be loaded
 import LibraryStore from './library/data/LibraryStore';
 import LibraryActions from './library/data/LibraryActions';
 import UserStore from './users/data/UserStore';
+import UserActions from "./users/data/UserActions";
 import RolesStore from './roles/data/RolesStore';
-import Util from './util/Util';
+import RolesActions from "./roles/data/RolesActions";
+import AuthStore from "./auth/data/AuthStore";
+import AuthActions from "./auth/data/AuthActions";
+import {SchemaStore, SchemaActions} from './schema/data/SchemaStore';
 
 // Icons
 var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
@@ -100,15 +108,6 @@ var BuilderIcon = require("./../images/icon_reporting_18x18.svg?name=BuilderIcon
 var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIcon");
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
 var ManualIcon = require ("./../images/icon_info.svg")
-
-import AuthActions from "./auth/data/AuthActions";
-import BuilderActions from "./builder/data/BuilderActions";
-import AuthStore from "./auth/data/AuthStore";
-import UserActions from "./users/data/UserActions";
-import RolesActions from "./roles/data/RolesActions";
-import { InAppNotification } from './common/components/InAppNotification';
-import DeployModal from './deploy/components/DeployModal';
-import EasterEggs from './x/components/EasterEggs';
 
 const links = 
 [
@@ -158,6 +157,7 @@ class App extends PureClasss<Props>
     libraryLoaded: false,
     usersLoaded: false,
     rolesLoaded: false,
+    schemaLoaded: false,
     
     noLocalStorage: false,
   };
@@ -214,6 +214,11 @@ class App extends PureClasss<Props>
       storeKeyPath: ['loaded'],
     });
     
+    this._subscribe(SchemaStore, {
+      stateKey: 'schemaLoaded',
+      storeKeyPath: ['loaded'],
+    });
+    
     // Retrieve logged-in state from persistent storage.
     let token = localStorage['authenticationToken'];
     let username = localStorage['username'];
@@ -227,6 +232,7 @@ class App extends PureClasss<Props>
     UserActions.fetch();
     LibraryActions.fetch();
     RolesActions.fetch();
+    SchemaActions.fetch();
   }
   
   toggleSidebar()

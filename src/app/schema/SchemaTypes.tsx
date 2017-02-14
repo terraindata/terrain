@@ -42,20 +42,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import Classes from '../Classes';
 import * as Immutable from 'immutable';
 const {List, Map} = Immutable;
 import {New, BaseClass} from '../Classes';
 import Util from '../util/Util';
 
-type IDList = (ID[] | List<ID>);
+type IDList = ID[] | List<ID>;
+
 function checkIds(ids: IDList): List<ID>
 {
 	if(Array.isArray(ids))
 	{
 		return List(ids);
 	}
-	return ids;
+	return ids as List<ID>;
 }
 
 export module SchemaTypes
@@ -65,39 +65,56 @@ export module SchemaTypes
 		type = "";
 	}
 	
-	class SchemaState extends SchemaBaseClass
+	class SchemaStateC extends SchemaBaseClass
 	{
 		databases: Map<ID, Database>;
 		tables: Map<ID, Table>;
 		columns: Map<ID, Column>;
 		indexes: Map<ID, Index>;
 		
+		dbCount: number = -1;
 		loading: boolean = false;
 		loaded: boolean = false;
 		schemaError: boolean = false;
 	}
-	let _SchemaState = (config?: {[key:string]: any}) => 
-	  New<SchemaState>(new SchemaState(config), config);
+	export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
+	export const _SchemaState = (config?: {[key:string]: any}) => 
+	  New<SchemaState>(new SchemaStateC(config), config);
 	
-	class Database extends SchemaBaseClass
+	
+	
+	export function databaseId(databaseName: string)
+	{
+		return databaseName;
+	}
+	
+	class DatabaseC extends SchemaBaseClass
 	{
 		type = "database";
 		name = "";
 		
 		tableIds: List<ID> = List([]);
 	}
+	export type Database = DatabaseC & IRecord<DatabaseC>;
 	export const _Database = 
 		(config: { 
 			name: string, 
 			tableIds?: IDList, 
 			id?: ID 
 		}) => {
-		  config.id = name;
+		  config.id = databaseId(name);
 		 	config.tableIds = checkIds(config.tableIds);
-		  return New<Database>(new Database(config), config);
+		  return New<Database>(new DatabaseC(config), config);
 		}  
 	
-	class Table extends SchemaBaseClass
+	
+	
+	export function tableId(databaseName: string, tableName: string)
+	{
+		return databaseName + '.' + tableName;
+	}
+	
+	class TableC extends SchemaBaseClass
 	{
 		type = "table";
 		name = "";
@@ -106,6 +123,7 @@ export module SchemaTypes
 		columnIds: List<ID> = List([]);
 		indexIds: List<ID> = List([]);
 	}
+	export type Table = TableC & IRecord<TableC>;
 	export const _Table = (config: { 
 		name: string, 
 		databaseId: ID,
@@ -113,13 +131,20 @@ export module SchemaTypes
 		indexIds?: IDList,
 		id?: ID 
 	}) => {
-	  config.id = config.databaseId + '.' + config.name;
+	  config.id = tableId(config.databaseId, config.name);
 	  config.columnIds = checkIds(config.columnIds);
 	  config.indexIds = checkIds(config.indexIds);
-	  return New<Table>(new Table(config), config);
+	  return New<Table>(new TableC(config), config);
 	}  
 	
-	class Column extends SchemaBaseClass
+	
+	
+	export function columnId(databaseName: string, tableName: string, columnName: string)
+	{
+		return databaseName + '.' + tableName + '.c.' + columnName;
+	}
+	
+	class ColumnC extends SchemaBaseClass
 	{
 		type = "column";
 		name = "";
@@ -129,8 +154,10 @@ export module SchemaTypes
 		indexIds: List<ID> = List([]);
 		datatype = "";
 		defaultValue = "";
-		nullable = false;
+		isNullable = false;
+		isPrimaryKey = false;
 	}
+	export type Column = ColumnC & IRecord<ColumnC>;
 	export const _Column = (config: { 
 		name: string, 
 		databaseId: ID,
@@ -138,16 +165,25 @@ export module SchemaTypes
 		
 		defaultValue: string,
 		datatype: string,
-		nullable: boolean,
+		isNullable: boolean,
+		isPrimaryKey: boolean,
+		
 		indexIds?: IDList, 
 		id?: ID 
 	}) => {
-	  config.id = config.databaseId + '.' + config.tableId + '.c.' + config.tableId;
+	  config.id = columnId(config.databaseId, config.tableId, config.tableId);
 	  config.indexIds = checkIds(config.indexIds);
-	  return New<Column>(new Column(config), config);
+	  return New<Column>(new ColumnC(config), config);
 	}  
 	
-	class Index extends SchemaBaseClass
+	
+	
+	export function indexId(databaseName: string, tableName: string, indexName: string)
+	{
+		return databaseName + '.' + tableName + '.i.' + indexName;
+	}
+	
+	class IndexC extends SchemaBaseClass
 	{
 		type = "index";
 		name = "";
@@ -157,6 +193,7 @@ export module SchemaTypes
 		indexType = "";
 		columnIds: List<ID> = List([]);
 	}
+	export type Index = IndexC & IRecord<IndexC>;
 	export const _Index = (config: { 
 		name: string, 
 		databaseId: ID,
@@ -166,10 +203,10 @@ export module SchemaTypes
 		columnIds?: IDList, 
 		id?: ID 
 	}) => {
-	  config.id = config.databaseId + '.' + config.tableId + '.i.' + config.tableId;
+	  config.id = indexId(config.databaseId, config.tableId, config.tableId);
 	  config.columnIds = checkIds(config.columnIds);
-	  return New<Index>(new Index(config), config);
-	}  
+	  return New<Index>(new IndexC(config), config);
+	}
 }
 
 export default SchemaTypes;

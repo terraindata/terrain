@@ -67,6 +67,7 @@ export module SchemaParser
 		let database = SchemaTypes._Database({
 			name: db,
 		});
+		let databaseId = database.id;
 		
 		let tables: Map<ID, Table> = Immutable.Map({} as {[key:string]: Table});
 		let columns: Map<ID, Column> = Immutable.Map({} as {[key:string]: Column});
@@ -99,23 +100,40 @@ export module SchemaParser
       }
     ) =>
     {
-      let column = _.extend(col, { 
-        name: col.COLUMN_NAME,
-        
-      });
-      let table = col.TABLE_NAME;
+    	let tableId = SchemaTypes.tableId(db, col.TABLE_NAME);
+    	let table = tables.get(tableId);
+    	
+    	if(!table)
+    	{
+    		table = SchemaTypes._Table({
+    			name: col.TABLE_NAME,
+    			databaseId,
+    		});
+    		tables = tables.set(tableId, table);
+    		database = database.set(
+    			'tableIds', database.tableIds.push(tableId)
+    		);
+    	}
+    	
+    	let column = SchemaTypes._Column({
+    		name: col.COLUMN_NAME,
+    		databaseId,
+    		tableId,
+    		defaultValue: col.COLUMN_DEFAULT,
+    		datatype: col.DATA_TYPE,
+    		isNullable: col.IS_NULLABLE === 'YES',
+    		isPrimaryKey: col.COLUMN_KEY === 'PRI',
+    	});
        
-      if(!tables[table])
-      {
-        tables[table] = {
-          name: table,
-          columns: [],
-        };
-      }
-      
-      tables[table].columns.push(column);
+      columns = columns.set(column.id, column);
+      tables = tables.setIn(
+      	[tableId, 'columnIds'],
+      	table.columnIds.push(column.id)
+      );
     });
     
     setDbAction(database, tables, columns, indexes);    
 	}
 }
+
+export default SchemaParser;

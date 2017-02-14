@@ -46,9 +46,10 @@ import Util from './../../util/Util';
 
 export let SchemaActionTypes = 
 {
-  load: '',
+  fetch: '',
   setDatabase: '', // sets the schema for a database
   error: '',
+  dbCount: '',
 };
 
 Util.setValuesToKeys(SchemaActionTypes, '');

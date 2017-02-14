@@ -56,15 +56,16 @@ type Table = SchemaTypes.Table;
 type Column = SchemaTypes.Column;
 type Index = SchemaTypes.Index;
 
-const SchemaStore: IStore<SchemaState> = 
+export const SchemaStore: IStore<SchemaState> = 
 	Redux.createStore(ReduxActions.handleActions(
 		{
-			[SchemaActionTypes.load]:
+			[SchemaActionTypes.fetch]:
 				(state: SchemaState) =>
 				{
 					Ajax.getDbs(
 						(dbs: string[]) =>
 						{
+							SchemaActions.dbCount(dbs.length);
 							dbs.map(
 								db =>
 									Ajax.schema(db, 
@@ -72,7 +73,7 @@ const SchemaStore: IStore<SchemaState> =
 										{
 											if(!error)
 											{
-												SchemaParser.parseTables(db, colsData, SchemaActions.setDatabase);
+												SchemaParser.parseDb(db, colsData, SchemaActions.setDatabase);
 											}
 										},
 										(error) =>
@@ -91,6 +92,15 @@ const SchemaStore: IStore<SchemaState> =
 						.set('loading', true);
 				},
 			
+			[SchemaActionTypes.dbCount]:
+				(
+					state: SchemaState,
+					action: Action<{
+						dbCount: number,
+					}>
+				) =>
+					state.set('dbCount', action.payload.dbCount),
+			
 			[SchemaActionTypes.setDatabase]:
 				(
 					state: SchemaState, 
@@ -103,6 +113,11 @@ const SchemaStore: IStore<SchemaState> =
 				) =>
 				{
 					let {database, tables, columns, indexes} = action.payload;
+					if(state.databases.size === state.dbCount - 1)
+					{
+						state = state.set('loading', false).set('loaded', true);
+					}
+					console.log(state);
 					return state
 						.setIn(['databases', database.id], database)
 						.set('tables', state.tables.merge(tables))
@@ -115,11 +130,15 @@ const SchemaStore: IStore<SchemaState> =
 
 const $ = (type: string, payload: any) => SchemaStore.dispatch({type, payload})
 
-const SchemaActions =
+export const SchemaActions =
 {
-  load:
+  fetch:
     () =>
-      $(SchemaActionTypes.load, {} ),
+      $(SchemaActionTypes.fetch, {} ),
+  
+  dbCount:
+  	(dbCount: number) =>
+  		$(SchemaActionTypes.dbCount, { dbCount }),
   
   error:
   	(error: string) =>
