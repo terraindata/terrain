@@ -496,46 +496,23 @@ export const Ajax = {
     );
   },
   
-  schema(db: string, onLoad: (tables: {name: string, columns: any[]}[], error?: any) => void, onError?: (ev:Event) => void)
+  schema(db: string, onLoad: (columns: any[], error?: any) => void, onError?: (ev:Event) => void)
   {
     return Ajax._r("/get_schema", {
         db,
       },
-      
       (resp:string) =>
       {
         try
         {
           let cols = JSON.parse(resp).resultSet;
-          var tables: {[name:string]: {name: string; columns: any[];}} = {};
-          
-          cols.map(
-          (
-            col: { TABLE_NAME: string; COLUMN_NAME: string; }
-          ) =>
-          {
-            let column = _.extend(col, { name: col.COLUMN_NAME });
-            let table = col.TABLE_NAME;
-             
-            if(!tables[table])
-            {
-              tables[table] = {
-                name: table,
-                columns: [],
-              };
-            }
-            
-            tables[table].columns.push(column);
-          });
-          
-          onLoad(_.toArray(tables) as any);
+          onLoad(cols as any);
         }
         catch(e)
         {
           onError && onError(resp as any);
         }
       },
-      
       onError
       );
   },

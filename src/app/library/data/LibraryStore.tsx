@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as Immutable from 'immutable';
-import * as ReduxActions from 'redux-actions';
 var Redux = require('redux');
 
 import AuthStore from './../../auth/data/AuthStore';
