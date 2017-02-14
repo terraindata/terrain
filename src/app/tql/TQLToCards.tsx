@@ -135,7 +135,7 @@ const andOrProcessor = (op: string) =>
   {
     let childNodes = flattenOp(op, node.left_child)
       .concat(flattenOp(op, node.right_child));
-    return make(Blocks[op], {
+    return make(Blocks[op.toLowerCase()], {
       cards: List(
         childNodes.map(parseNodeAsCard)
       ),
@@ -352,10 +352,10 @@ const generalProcessors: {
       }),
   
   AND:
-    andOrProcessor('and'),
+    andOrProcessor('AND'),
   
   OR:
-    andOrProcessor('or'),
+    andOrProcessor('OR'),
   
   EXISTS:
     (node) =>
