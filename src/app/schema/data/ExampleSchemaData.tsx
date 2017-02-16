@@ -45,94 +45,54 @@ THE SOFTWARE.
 import SchemaTypes from '../SchemaTypes';
 import * as Immutable from 'immutable';
 
-type Database = SchemaTypes.Database;
-type Table = SchemaTypes.Table;
-type Column = SchemaTypes.Column;
-type Index = SchemaTypes.Index;
+let databases = Immutable.Map({});
+let tables = Immutable.Map({});
+let columns = Immutable.Map({});
 
-export module SchemaParser
-{
-	export function parseDb(
-		db: string, 
-		colsData: any[], 
-		setDbAction: 
-			(
-	      database: Database, 
-	      tables: Map<ID, Table>, 
-	      columns: Map<ID, Column>, 
-	      indexes: Map<ID, Index>
-	    ) => void
-	) {
-		let database = SchemaTypes._Database({
-			name: db,
-		});
-		let databaseId = database.id;
+['movieDB', 'baseballDB'].map(
+	name =>
+	{
+		let db = SchemaTypes._Database({ name });
 		
-		let tables: Map<ID, Table> = Immutable.Map<ID, Table>({});
-		let columns: Map<ID, Column> = Immutable.Map<ID, Column>({});
-		let indexes: Map<ID, Index> = Immutable.Map<ID, Index>({});
+		['movies', 'actors', 'reviews', 'characters', 'users'].map(
+			tableName =>
+			{
+				let table = SchemaTypes._Table({ name: tableName, databaseId: db.id });
+				db = db.set('tableIds', db.tableIds.push(table.id));
+				
+				['first', 'second', 'third', 'fourth', 'fifth'].map(
+					colName =>
+					{
+						let column = SchemaTypes._Column({ 
+							name: colName, 
+							tableId: table.id, 
+							databaseId: db.id,
+							datatype: 'VARCHAR',
+							isNullable: true,
+							defaultValue: '',
+							isPrimaryKey: false,
+						});
+						
+						columns = columns.set(column.id, column);
+						
+						table = table.set('columnIds', table.columnIds.push(column.id));
+					}
+				);
+				
+				tables = tables.set(table.id, table);
+			}
+		);
 		
-    colsData.map(
-    (
-      col: { 
-      	TABLE_CATALOG: string,
-	      TABLE_SCHEMA: string,
-	      TABLE_NAME: string,
-	      COLUMN_NAME: string,
-	      ORDINAL_POSITION: number,
-	      COLUMN_DEFAULT: string,
-	      IS_NULLABLE: string,
-	      DATA_TYPE: string,
-	      CHARACTER_MAXIMUM_LENGTH: number,
-	      CHARACTER_OCTET_LENGTH: number,
-	      NUMERIC_PRECISION: number,
-	      NUMERIC_SCALE: number,
-	      DATETIME_PRECISION: number,
-	      CHARACTER_SET_NAME: string,
-	      COLLATION_NAME: string,
-	      COLUMN_TYPE: string,
-	      COLUMN_KEY: string,
-	      EXTRA: string,
-	      PRIVILEGES: string,
-	      COLUMN_COMMENT: string,
-	      GENERATION_EXPRESSION: string
-      }
-    ) =>
-    {
-    	let tableId = SchemaTypes.tableId(db, col.TABLE_NAME);
-    	let table = tables.get(tableId);
-    	
-    	if(!table)
-    	{
-    		table = SchemaTypes._Table({
-    			name: col.TABLE_NAME,
-    			databaseId,
-    		});
-    		tables = tables.set(tableId, table);
-    		database = database.set(
-    			'tableIds', database.tableIds.push(tableId)
-    		);
-    	}
-    	
-    	let column = SchemaTypes._Column({
-    		name: col.COLUMN_NAME,
-    		databaseId,
-    		tableId,
-    		defaultValue: col.COLUMN_DEFAULT,
-    		datatype: col.DATA_TYPE,
-    		isNullable: col.IS_NULLABLE === 'YES',
-    		isPrimaryKey: col.COLUMN_KEY === 'PRI',
-    	});
-       
-      columns = columns.set(column.id, column);
-      tables = tables.setIn(
-      	[tableId, 'columnIds'],
-      	table.columnIds.push(column.id)
-      );
-    });
-    
-    setDbAction(database, tables, columns, indexes);    
+		databases = databases.set(db.id, db);
 	}
-}
+);
 
-export default SchemaParser;
+const ExampleSchemaData =
+	SchemaTypes._SchemaState()
+		.set('databases', databases)
+		.set('columns', columns)
+		.set('tables', tables)
+		.set('loading', false)
+		.set('loaded', true);
+
+export default ExampleSchemaData;

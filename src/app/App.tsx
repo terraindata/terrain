@@ -64,6 +64,7 @@ import PureClasss from './common/components/PureClasss';
 import LayoutManager from "./builder/components/layout/LayoutManager";
 import Builder from "./builder/components/Builder";
 import Library from './library/components/Library';
+import SchemaPage from "./schema/components/SchemaPage";
 import X from './x/components/X';
 import Account from './users/components/Account';
 import Settings from './users/components/Settings';
@@ -130,6 +131,11 @@ const links =
     icon: <BuilderIcon />,
     text: 'Builder',
     route: '/builder',
+  },
+  {
+    icon: <ReportingIcon />,
+    text: 'Schema',
+    route: '/schema',
   },
   // {
   //   icon: <ManualIcon />,
@@ -410,7 +416,8 @@ var router = (
       <Route path='/browser/:a' component={Redirect} />
       <Route path='/browser/:a/:b' component={Redirect} />
       <Route path='/browser/:a/:b/:c' component={Redirect} />
-
+      
+      <Route path='/schema' component={SchemaPage} />
     </Route>
   </Router>
 );

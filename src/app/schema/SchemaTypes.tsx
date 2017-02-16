@@ -49,28 +49,20 @@ import Util from '../util/Util';
 
 type IDList = ID[] | List<ID>;
 
-function checkIds(ids: IDList): List<ID>
-{
-	if(Array.isArray(ids))
-	{
-		return List(ids);
-	}
-	return ids as List<ID>;
-}
-
 export module SchemaTypes
 {
 	export class SchemaBaseClass extends BaseClass
 	{
 		type = "";
+		name = "";
 	}
 	
 	class SchemaStateC extends SchemaBaseClass
 	{
-		databases: Map<ID, Database>;
-		tables: Map<ID, Table>;
-		columns: Map<ID, Column>;
-		indexes: Map<ID, Index>;
+		databases: DatabaseMap= Map<ID, Database>({});
+		tables: TableMap = Map<ID, Table>({});
+		columns: ColumnMap = Map<ID, Column>({});
+		indexes: IndexMap = Map<ID, Index>({});
 		
 		dbCount: number = -1;
 		loading: boolean = false;
@@ -99,14 +91,12 @@ export module SchemaTypes
 	export const _Database = 
 		(config: { 
 			name: string, 
-			tableIds?: IDList, 
 			id?: ID 
 		}) => {
-		  config.id = databaseId(name);
-		 	config.tableIds = checkIds(config.tableIds);
+		  config.id = databaseId(config.name);
 		  return New<Database>(new DatabaseC(config), config);
 		}  
-	
+	export type DatabaseMap = Map<ID, Database>;
 	
 	
 	export function tableId(databaseName: string, tableName: string)
@@ -127,21 +117,18 @@ export module SchemaTypes
 	export const _Table = (config: { 
 		name: string, 
 		databaseId: ID,
-		columnIds?: IDList, 
-		indexIds?: IDList,
 		id?: ID 
 	}) => {
 	  config.id = tableId(config.databaseId, config.name);
-	  config.columnIds = checkIds(config.columnIds);
-	  config.indexIds = checkIds(config.indexIds);
 	  return New<Table>(new TableC(config), config);
 	}  
+	export type TableMap = Map<ID, Table>;
 	
 	
 	
-	export function columnId(databaseName: string, tableName: string, columnName: string)
+	export function columnId(tableId: string, columnName: string)
 	{
-		return databaseName + '.' + tableName + '.c.' + columnName;
+		return tableId + '.c.' + columnName;
 	}
 	
 	class ColumnC extends SchemaBaseClass
@@ -168,14 +155,12 @@ export module SchemaTypes
 		isNullable: boolean,
 		isPrimaryKey: boolean,
 		
-		indexIds?: IDList, 
 		id?: ID 
 	}) => {
-	  config.id = columnId(config.databaseId, config.tableId, config.tableId);
-	  config.indexIds = checkIds(config.indexIds);
+	  config.id = columnId(config.tableId, config.name);
 	  return New<Column>(new ColumnC(config), config);
 	}  
-	
+	export type ColumnMap = Map<ID, Column>;
 	
 	
 	export function indexId(databaseName: string, tableName: string, indexName: string)
@@ -200,13 +185,31 @@ export module SchemaTypes
 		tableId: ID,
 		
 		indexType: string,
-		columnIds?: IDList, 
 		id?: ID 
 	}) => {
 	  config.id = indexId(config.databaseId, config.tableId, config.tableId);
-	  config.columnIds = checkIds(config.columnIds);
 	  return New<Index>(new IndexC(config), config);
 	}
+	export type IndexMap = Map<ID, Index>;
+	
+	
+	export const typeToStoreKey =
+	{
+		database: 'databases',
+		table: 'tables',
+		column: 'columns',
+		index: 'indexes',
+	}
+
+
+	
+	// used to define how to render tree item children in tree list
+	export type ISchemaTreeChildrenConfig = [
+		{
+			label?: string;
+			type: string;
+		}
+	];
 }
 
 export default SchemaTypes;

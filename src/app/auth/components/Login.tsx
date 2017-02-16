@@ -53,7 +53,6 @@ import PureClasss from '../../common/components/PureClasss';
 import Modal from './../../common/components/Modal';
 import Loading from './../../common/components/Loading';
 
-var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 var TerrainIcon = require("./../../../images/logo_mountainCircle.svg?name=TerrainIcon");
 
 interface Props {

@@ -50,6 +50,7 @@ type SchemaState = SchemaTypes.SchemaState;
 import Ajax from './../../util/Ajax';
 import SchemaActionTypes from './SchemaActionTypes';
 import SchemaParser from './SchemaParser';
+import ExampleSchemaData from './ExampleSchemaData';
 
 type Database = SchemaTypes.Database;
 type Table = SchemaTypes.Table;
@@ -117,7 +118,7 @@ export const SchemaStore: IStore<SchemaState> =
 					{
 						state = state.set('loading', false).set('loaded', true);
 					}
-					console.log(state);
+					
 					return state
 						.setIn(['databases', database.id], database)
 						.set('tables', state.tables.merge(tables))
@@ -125,7 +126,8 @@ export const SchemaStore: IStore<SchemaState> =
 						.set('indexes', state.indexes.merge(indexes));
 				},
 		}
-	), SchemaTypes._SchemaState());
+	// ), SchemaTypes._SchemaState());
+	), ExampleSchemaData);
 
 
 const $ = (type: string, payload: any) => SchemaStore.dispatch({type, payload})

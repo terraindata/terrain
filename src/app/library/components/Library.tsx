@@ -57,7 +57,6 @@ import VariantsColumn from './VariantsColumn';
 import LibraryInfoColumn from './LibraryInfoColumn';
 import { DragDropContext } from 'react-dnd';
 import InfoArea from './../../common/components/InfoArea';
-import Loading from './../../common/components/Loading';
 var HTML5Backend = require('react-dnd-html5-backend');
 const {browserHistory} = require('react-router');
 
@@ -75,10 +74,8 @@ class Library extends PureClasss<Props>
   
   state: {
     libraryState: LibraryState;
-    loadFinished: boolean;
   } = {
     libraryState: null,
-    loadFinished: false,
   };
   
   constructor(props)
@@ -86,7 +83,6 @@ class Library extends PureClasss<Props>
     super(props);
     
     this.state.libraryState = Store.getState();
-    this.state.loadFinished = !this.state.libraryState.loading;
   }
   
   componentWillMount()
@@ -113,30 +109,9 @@ class Library extends PureClasss<Props>
     UserActions.fetch();
   }
   
-  handleLoadedEnd()
-  {
-    this.setState({
-      loadFinished: true,
-    });
-  }
-  
   render()
   {
     const {libraryState} = this.state;
-    
-    if(!this.state.loadFinished)
-    {
-      return (
-        <Loading
-          width={100}
-          height={100}
-          loading={true}
-          loaded={!libraryState.loading}
-          onLoadedEnd={this.handleLoadedEnd}
-          center={true}
-        />
-      );
-    }
     
     const { groups, algorithms, variants, groupsOrder } = libraryState;
     const { groupId, algorithmId, variantId } = this.props.params;

@@ -503,14 +503,19 @@ export const Ajax = {
       },
       (resp:string) =>
       {
+        let cols: any = null;
         try
         {
-          let cols = JSON.parse(resp).resultSet;
-          onLoad(cols as any);
+          cols = JSON.parse(resp).resultSet;
         }
         catch(e)
         {
           onError && onError(resp as any);
+        }
+        
+        if(cols)
+        {
+          onLoad(cols as any);
         }
       },
       onError
