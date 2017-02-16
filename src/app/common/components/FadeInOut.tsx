@@ -42,51 +42,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import SchemaTypes from '../SchemaTypes';
-import SchemaStore from '../data/SchemaStore';
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
-import SchemaTreeList from './SchemaTreeList';
-import Styles from './SchemaTreeStyles';
+const {VelocityTransitionGroup, VelocityComponent} = require('velocity-react');
+
 
 interface Props
 {
-	fullPage?: boolean;
+	open: boolean;
+	children?: any;
 }
 
-class SchemaView extends PureClasss<Props>
+class FadeInOut extends PureClasss<Props>
 {
-	state: {
-		databases: SchemaTypes.DatabaseMap,
-	} = {
-		databases: null,
-	};
-	
-	constructor(props:Props)
-	{
-		super(props);
-		
-		this._subscribe(SchemaStore, {
-			stateKey: 'databases',
-			storeKeyPath: ['databases'],
-		});
-	}
-	
   render()
   {
     return (
-      <div
-      	style={Styles.schemaView}
-      >
-      	<SchemaTreeList
-      		itemType='database'
-      		itemIds={this.state.databases && this.state.databases.keySeq().toList()}
-      		label={'Databases'}
-      		topLevel={true}
-      	/>
-      </div>
+    	<VelocityComponent 
+    		animation={{ 
+    			opacity: this.props.open ? 1 : 0,
+    			translateY: this.props.open ? 0 : 20,
+    		}}
+    		duration={250}
+    	>
+    		<div>
+	      	<VelocityTransitionGroup 
+	      		enter={
+	      			{animation: "slideDown", duration: 250, easing: 'easeOut' }
+	      		} 
+	      		leave={
+	      			{animation: "slideUp", duration: 250, easing: 'easeOut' }
+	      		}
+	      	>
+		      	{
+		    			this.props.children
+		      	}
+	      	</VelocityTransitionGroup>
+	      </div>
+      </VelocityComponent>
     );
   }
 }
 
-export default SchemaView;
+export default FadeInOut;

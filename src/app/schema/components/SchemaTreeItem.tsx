@@ -54,6 +54,8 @@ const Radium = require('radium');
 import Styles from './SchemaTreeStyles';
 const ArrowIcon = require("./../../../images/icon_arrow.svg?name=ArrowIcon");
 import SchemaTreeList from './SchemaTreeList';
+import FadeInOut from '../../common/components/FadeInOut';
+
 
 interface Props
 {
@@ -65,6 +67,7 @@ class State
 {
 	open: boolean = false;
 	item: SchemaTypes.SchemaBaseClass = null;
+	childCount: number = 0;
 }
 
 const typeToRendering: {
@@ -111,6 +114,21 @@ class SchemaTreeItem extends PureClasss<Props>
 			stateKey: 'item',
 			storeKeyPath: 
 				[ SchemaTypes.typeToStoreKey[this.props.type], this.props.id ],
+			updater: (state) =>
+			{
+				let item = state.getIn([ SchemaTypes.typeToStoreKey[this.props.type], this.props.id ]);
+				if(item)
+				{
+					let count = 0;
+					typeToRendering[item['type']].childConfig.map(
+						section =>
+							count += item[section.type + 'Ids'].size
+					);
+					this.setState({
+						childCount: count,
+					});
+				}
+			}
 		});
 	}
 	
@@ -188,6 +206,8 @@ class SchemaTreeItem extends PureClasss<Props>
 		);
 	}
 	
+	
+	
   render()
   {
   	let {item} = this.state;
@@ -222,9 +242,13 @@ class SchemaTreeItem extends PureClasss<Props>
 		    	</div>
 	      </div>
       	
-      	{
-    			this.renderItemChildren()
-      	}
+      	<FadeInOut
+      		open={this.state.open}
+      	>
+	      	{
+	    			this.renderItemChildren()
+	      	}
+		    </FadeInOut>
 		  </div>
     );
   }

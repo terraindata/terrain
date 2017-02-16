@@ -51,12 +51,20 @@ const itemHeaderHeight = 22;
 const arrowSvgStyles = {
 	width: '12px',
 	fill: Styles.colors.transBlack,
+	// fill: 'rgba(0,0,0,0)',
+	// stroke: Styles.colors.transBlack,
+	// strokeWidth: 20,
 	cursor: 'pointer',
 	marginLeft: 6,
 };
 
 const SchemaTreeStyles =
 {
+	schemaView: {
+		height: '100%',
+		overflow: 'auto',
+	},
+	
 	label: {
 		color: Styles.colors.text.light,
 	},
@@ -81,20 +89,25 @@ const SchemaTreeStyles =
 		arrowSvgStyles,
 		{
 			fill: Styles.colors.active,
+			// stroke: Styles.colors.active,
 		},
 		Styles.rotate180,
 		Styles.transition
 	),
 	
-	treeItemHeader: {
-		display: 'flex',
-		cursor: 'pointer',
-		height: itemHeaderHeight,
-		
-		':hover': {
-			background: color(Styles.colors.active).fade('0.8').string(),
-		}
-	},
+	treeItemHeader: [{
+			display: 'flex',
+			cursor: 'pointer',
+			height: itemHeaderHeight,
+			
+			borderRadius: 4,
+			
+			':hover': {
+				background: color(Styles.colors.active).fade('0.85').string(),
+			}
+		},
+		Styles.transition,
+	],
 	
 	name: {
 		marginRight: Styles.margin * 3,
@@ -109,6 +122,10 @@ const SchemaTreeStyles =
 	
 	childrenWrapper: {
 		paddingLeft: 11,
+		// marginBottom: 6,
+		// paddingBottom: 6,
+		// borderBottom: '0.5px solid rgba(0,0,0,0.1)',
+		// margin: '0px 6px',
 	},
 	
 	childSection: {

@@ -50,6 +50,7 @@ const shallowCompare = require('react-addons-shallow-compare');
 
 class PureClasss<T> extends Classs<T>
 {
+  props: T;
   _debugUpdates = false;
   _debugName = "Not set";
   

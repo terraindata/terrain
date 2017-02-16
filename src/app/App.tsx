@@ -56,8 +56,11 @@ import * as ReactDOM from "react-dom";
 import * as Perf from 'react-addons-perf';
 import { Router, Route, IndexRoute } from 'react-router';
 const {browserHistory} = require('react-router');
+require('velocity-animate');
+require('velocity-animate/velocity.ui');
 window['PerfStart'] = Perf.start;
 window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); }
+
 
 // Components
 import PureClasss from './common/components/PureClasss';

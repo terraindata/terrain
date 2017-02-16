@@ -56,14 +56,58 @@ interface Props
 	itemIds: List<ID>;
 	itemType: string;
 	label?: string;
+  topLevel: boolean;
+}
+
+class State
+{
+  renderCount: number = 30;
+  intervalId: number = -1; 
 }
 
 @Radium
 class SchemaTreeList extends PureClasss<Props>
 {
+  state = new State();
+  
+  componentDidMount()
+  {
+    if(this.props.itemIds && this.props.itemIds.size > this.state.renderCount)
+    {
+      this.setState({
+        intervalId: setInterval(this.increaseRenderCount, 50),
+      })
+    }
+  }
+  
+  componentWillReceiveProps(nextProps: Props)
+  {
+    if(this.props.itemIds && this.props.itemIds.size > this.state.renderCount && this.state.intervalId === -1)
+    {
+      this.setState({
+        intervalId: setInterval(this.increaseRenderCount),
+      })
+    }
+  }
+
+  increaseRenderCount()
+  {
+    let renderCount = this.state.renderCount + 10;
+    this.setState({
+      renderCount,
+    });
+    
+    if(this.props.itemIds.size < renderCount)
+    {
+      clearInterval(this.state.intervalId);
+      this.setState({
+        intervalId: -1,
+      });
+    }
+  }
+  
   render()
   {
-  	console.log(this.props);
   	if(!this.props.itemIds)
   	{
   		return (
@@ -78,7 +122,7 @@ class SchemaTreeList extends PureClasss<Props>
     return (
       <div
       	style={{
-      		borderLeft: '0.5px solid ' + Styles.colors.active,
+      		borderLeft: !this.props.topLevel && ('0.5px solid ' + Styles.colors.active),
       		paddingLeft: Styles.margin,
       	}}
       >
@@ -106,12 +150,13 @@ class SchemaTreeList extends PureClasss<Props>
       	
       	{
       		this.props.itemIds.map(
-      			id =>
-      				<SchemaTreeItem
-      					id={id}
-      					type={this.props.itemType}
-      					key={id}
-      				/>
+      			(id, index) =>
+              index < this.state.renderCount &&
+        				<SchemaTreeItem
+        					id={id}
+        					type={this.props.itemType}
+        					key={id}
+        				/>
       		)
       	}
       </div>
