@@ -109,6 +109,14 @@ const SchemaTreeStyles =
 		Styles.transition,
 	],
 	
+	treeItemHeaderSelected:
+	{
+		background: color(Styles.colors.active).fade('0.75').string(),
+		':hover': {
+			background: color(Styles.colors.active).fade('0.75').string(),
+		}
+	},
+	
 	name: {
 		marginRight: Styles.margin * 3,
 		marginLeft: Styles.margin,
@@ -149,6 +157,7 @@ const SchemaTreeStyles =
 	
 	
 	loadingText: Styles.loadingText,
+	margin: Styles.margin,
 }
 
 export default SchemaTreeStyles;

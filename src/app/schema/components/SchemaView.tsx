@@ -51,15 +51,27 @@ import Styles from './SchemaTreeStyles';
 
 interface Props
 {
-	fullPage?: boolean;
+	fullPage: boolean;
+	showSearch: boolean;
+	search?: string;
 }
+
+const horizontalDivide = 50;
+const verticalDivide = 75;
+const searchHeight = 42;
 
 class SchemaView extends PureClasss<Props>
 {
 	state: {
 		databases: SchemaTypes.DatabaseMap,
+		selectedItem: SchemaTypes.SchemaBaseClass,
+		onItemUnselect: () => void,
+		search: string,
 	} = {
 		databases: null,
+		selectedItem: null,
+		onItemUnselect: null,
+		search: "",
 	};
 	
 	constructor(props:Props)
@@ -72,18 +84,77 @@ class SchemaView extends PureClasss<Props>
 		});
 	}
 	
+	handleSelectItem(selectedItem: SchemaTypes.SchemaBaseClass, onItemUnselect: () => void)
+	{
+		console.log(selectedItem);
+		this.state.onItemUnselect && this.state.onItemUnselect();
+		this.setState({
+			selectedItem,
+			onItemUnselect,
+		});
+	}
+	
+	handleSearchChange(event)
+	{
+		let search = event.target.value as string;
+		this.setState({
+			search,
+		});
+	}
+	
   render()
   {
+  	let search = this.props.search || this.state.search;
+  	let {showSearch} = this.props;
+  	
     return (
       <div
       	style={Styles.schemaView}
       >
-      	<SchemaTreeList
-      		itemType='database'
-      		itemIds={this.state.databases && this.state.databases.keySeq().toList()}
-      		label={'Databases'}
-      		topLevel={true}
-      	/>
+      	<div
+      		style={{
+      			position: 'absolute',
+      			left: 0,
+      			top: 0,
+      			width: this.props.fullPage ? horizontalDivide + '%' : '100%',
+      			height: this.props.fullPage ? '100%' : verticalDivide + '%',
+      			overflow: 'auto',
+      			paddingRight: Styles.margin,
+      		}}
+      	>
+      		{
+      			showSearch &&
+		      		<div
+		      			style={{
+		      				height: searchHeight,
+		      			}}
+		      		>
+		      			<input
+		      				type='text'
+		      				value={search}
+		      				onChange={this.handleSearchChange}
+		      				style={{
+		      					borderColor: '#ccc',
+		      					margin: '6px',
+		      				}}
+		      			/>
+		      		</div>
+      		}
+      		<div
+      			style={showSearch && {
+      				height: 'calc(100% - ' + searchHeight + ')px',
+      			}}
+      		>
+		      	<SchemaTreeList
+		      		itemType='database'
+		      		itemIds={this.state.databases && this.state.databases.keySeq().toList()}
+		      		label={'Databases'}
+		      		topLevel={true}
+		      		search={search}
+		      		onSelectItem={this.handleSelectItem}
+		      	/>
+		      </div>
+	      </div>
       </div>
     );
   }

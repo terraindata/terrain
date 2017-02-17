@@ -65,6 +65,7 @@ class SchemaPage extends PureClasss<Props>
     return (
       <SchemaView
         fullPage={true}
+        showSearch={true}
       />
     );
   }

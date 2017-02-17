@@ -61,6 +61,8 @@ interface Props
 {
 	id: ID;
 	type: string;
+	onSelectItem: (selectedItem: SchemaTypes.SchemaBaseClass, onItemUnselect: () => void) => void;
+  search: string;
 }
 
 class State
@@ -68,36 +70,42 @@ class State
 	open: boolean = false;
 	item: SchemaTypes.SchemaBaseClass = null;
 	childCount: number = 0;
+	isSelected = false;
 }
 
 const typeToRendering: {
 	[type: string]: {
 		component: any,
 		childConfig: SchemaTypes.ISchemaTreeChildrenConfig,
+		canSelect: boolean,
 	}
 } = {
 	database: 
 	{
 		component: DatabaseTreeInfo,
 		childConfig: databaseChildrenConfig,
+		canSelect: false,
 	},
 	
 	table: 
 	{
 		component: TableTreeInfo,
 		childConfig: tableChildrenConfig,
+		canSelect: true,
 	},
 	
 	column:
 	{
 		component: ColumnTreeInfo,
 		childConfig: columnChildrenConfig,
+		canSelect: true,
 	},
 	
 	index: 
 	{
 		component: IndexTreeInfo,
 		childConfig: indexChildrenConfig,
+		canSelect: true,
 	},
 };
 
@@ -152,19 +160,6 @@ class SchemaTreeItem extends PureClasss<Props>
 		}
 		
 		return <div>No item type information</div>;
-		// switch(this.state.item.type)
-		// {
-		// 	case 'database':
-		// 		return this.renderDatabaseInfo();
-		// 	case 'table':
-		// 		return this.renderTableInfo();
-		// 	case 'column':
-		// 		return this.renderColumnInfo();
-		// 	case 'index':
-		// 		return this.renderIndexInfo();
-		// 	default:
-		// 		return <div>No item type information</div>;
-		// }
 	}
 	
 	renderItemChildren()
@@ -199,6 +194,8 @@ class SchemaTreeItem extends PureClasss<Props>
 								label={childSection.label}
 								itemIds={item[childSection.type + 'Ids']}
 								key={index}
+								onSelectItem={this.props.onSelectItem}
+								search={this.props.search}
 							/>
 					)
 				}
@@ -206,44 +203,113 @@ class SchemaTreeItem extends PureClasss<Props>
 		);
 	}
 	
+	handleHeaderClick()
+	{
+		let {item, isSelected} = this.state;
+		if(item && typeToRendering[item.type].canSelect)
+		{
+			if(!isSelected)
+			{
+				this.setState({
+					isSelected: true,
+					open: !this.state.open, // need to decide whether or not to keep this in
+				});
+				this.props.onSelectItem(item, this.handleUnselect);
+			}
+			else
+			{
+				this.setState({
+					isSelected: false,
+				});
+				this.props.onSelectItem(null, null);
+			}
+		}
+		else
+		{
+			// can't select
+			this.setState({
+				open: !this.state.open,
+			});
+		}
+	}
 	
+	handleArrowClick(event)
+	{
+		this.setState({
+			open: !this.state.open,
+		});
+		event.stopPropagation();
+	}
+	
+	handleUnselect()
+	{
+		!this.hasUnmounted &&
+			this.setState({
+				isSelected: false,
+			});
+	}
+	
+	hasUnmounted: boolean = false;
+	componentWillUnmount()
+	{
+		// anti-pattern, but is the best I can think of
+		this.hasUnmounted = true;
+	}
 	
   render()
   {
   	let {item} = this.state;
   	
+  	let showing = !this.props.search ||
+  		item.name.indexOf(this.props.search) !== -1;
+  	console.log(showing);
     return (
       <div
       	style={Styles.treeItem}
       >
-      	<div
-      		style={Styles.treeItemHeader}
-      		onClick={this._toggle('open')}
+      	<FadeInOut
+      		open={showing}
+      		key='one'
       	>
-	      	<ArrowIcon
-	      		style={
-	      			this.state.open ? Styles.arrowOpen : Styles.arrow
-	      		}
-	      	/>
-	      	<div
-	      		style={Styles.name}
-	      	>
-	      		{
-	      			item ? item.name : 'Loading...'
-	      		}
-	      	</div>
-	      	
-	      	<div
-	      		style={Styles.itemInfoRow as any}
-	      	>
-		    		{
-		    			this.renderItemInfo()
-		    		}
-		    	</div>
-	      </div>
+      		{
+      			showing &&
+      				<div>
+				      	<div
+				      		style={[
+				      			Styles.treeItemHeader,
+				      			this.state.isSelected && Styles.treeItemHeaderSelected,
+				      		]}
+				      		onClick={this.handleHeaderClick}
+				      	>
+					      	<ArrowIcon
+					      		onClick={this.handleArrowClick}
+					      		style={
+					      			this.state.open ? Styles.arrowOpen : Styles.arrow
+					      		}
+					      	/>
+					      	<div
+					      		style={Styles.name}
+					      	>
+					      		{
+					      			item ? item.name : 'Loading...'
+					      		}
+					      	</div>
+					      	
+					      	<div
+					      		style={Styles.itemInfoRow as any}
+					      	>
+						    		{
+						    			this.renderItemInfo()
+						    		}
+						    	</div>
+					      </div>
+					    </div>
+      		}
+      	</FadeInOut>
       	
       	<FadeInOut
       		open={this.state.open}
+      		key='two'
       	>
 	      	{
 	    			this.renderItemChildren()

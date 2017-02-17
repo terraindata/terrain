@@ -56,7 +56,9 @@ interface Props
 	itemIds: List<ID>;
 	itemType: string;
 	label?: string;
-  topLevel: boolean;
+  topLevel?: boolean;
+  onSelectItem: (selectedItem: SchemaTypes.SchemaBaseClass, onItemUnselect: () => void) => void;
+  search: string;
 }
 
 class State
@@ -119,28 +121,30 @@ class SchemaTreeList extends PureClasss<Props>
   		);
   	}
   	
+    let {itemIds, itemType, onSelectItem, search, label, topLevel} = this.props;
+    
     return (
       <div
       	style={{
-      		borderLeft: !this.props.topLevel && ('0.5px solid ' + Styles.colors.active),
+      		borderLeft: !topLevel && ('0.5px solid ' + Styles.colors.active),
       		paddingLeft: Styles.margin,
       	}}
       >
       	{
-      		this.props.label &&
+      		label &&
 		      	<div
 		      		style={
 		      			SchemaTreeStyles.label
 		      		}
 		      	>
 		      		{
-		      			this.props.label
+		      			label
 		      		}
 		      	</div>
       	}
       	
       	{
-      		!this.props.itemIds.size &&
+      		!itemIds.size &&
       			<div
       				style={SchemaTreeStyles.none}
       			>
@@ -149,13 +153,15 @@ class SchemaTreeList extends PureClasss<Props>
       	}
       	
       	{
-      		this.props.itemIds.map(
+      		itemIds.map(
       			(id, index) =>
               index < this.state.renderCount &&
         				<SchemaTreeItem
         					id={id}
-        					type={this.props.itemType}
+        					type={itemType}
         					key={id}
+                  onSelectItem={onSelectItem}
+                  search={search}
         				/>
       		)
       	}
