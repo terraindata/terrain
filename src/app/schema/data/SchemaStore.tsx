@@ -125,9 +125,12 @@ export const SchemaStore: IStore<SchemaState> =
 						.set('columns', state.columns.merge(columns))
 						.set('indexes', state.indexes.merge(indexes));
 				},
+			
+			[SchemaActionTypes.selectItem]:
+				(state: SchemaState, action: Action<{ item: SchemaTypes.SchemaBaseClass }>) =>
+					state.set('selectedItem', action.payload.item),
 		}
-	// ), SchemaTypes._SchemaState());
-	), ExampleSchemaData);
+	), DEV ? ExampleSchemaData : SchemaTypes._SchemaState());
 
 
 const $ = (type: string, payload: any) => SchemaStore.dispatch({type, payload})
@@ -159,6 +162,12 @@ export const SchemaActions =
         columns,
         indexes,
       }),
+  
+  selectItem:
+  	(item: SchemaTypes.SchemaBaseClass) =>
+  		$(SchemaActionTypes.selectItem, {
+  			item
+  		}),
 }
 
 

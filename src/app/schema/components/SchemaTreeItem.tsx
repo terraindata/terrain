@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 import SchemaTypes from '../SchemaTypes';
-import SchemaStore from '../data/SchemaStore';
+import {SchemaStore, SchemaActions} from '../data/SchemaStore';
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
 import {DatabaseTreeInfo, databaseChildrenConfig} from './items/DatabaseTreeInfo';
@@ -61,7 +61,6 @@ interface Props
 {
 	id: ID;
 	type: string;
-	onSelectItem: (selectedItem: SchemaTypes.SchemaBaseClass, onItemUnselect: () => void) => void;
   search: string;
 }
 
@@ -122,18 +121,22 @@ class SchemaTreeItem extends PureClasss<Props>
 			stateKey: 'item',
 			storeKeyPath: 
 				[ SchemaTypes.typeToStoreKey[this.props.type], this.props.id ],
-			updater: (state) =>
+			updater: (state: SchemaTypes.SchemaState) =>
 			{
 				let item = state.getIn([ SchemaTypes.typeToStoreKey[this.props.type], this.props.id ]);
 				if(item)
 				{
-					let count = 0;
+					let childCount = 0;
 					typeToRendering[item['type']].childConfig.map(
 						section =>
-							count += item[section.type + 'Ids'].size
+							childCount += item[section.type + 'Ids'].size
 					);
+					
+					let isSelected = state.selectedItem === item;
+					
 					this.setState({
-						childCount: count,
+						childCount,
+						isSelected,
 					});
 				}
 			}
@@ -171,14 +174,12 @@ class SchemaTreeItem extends PureClasss<Props>
 			return null;
 		}
 		
-		if(!item)
+		if(!item || true)
 		{
 			return (
 				<div
-					style={Styles.loadingText}
-				>
-					Loading...
-				</div>
+					className='loading-text'
+				/>
 			);
 		}
 		
@@ -194,7 +195,6 @@ class SchemaTreeItem extends PureClasss<Props>
 								label={childSection.label}
 								itemIds={item[childSection.type + 'Ids']}
 								key={index}
-								onSelectItem={this.props.onSelectItem}
 								search={this.props.search}
 							/>
 					)
@@ -203,66 +203,74 @@ class SchemaTreeItem extends PureClasss<Props>
 		);
 	}
 	
+	lastHeaderClickTime: number = 0;
+	
 	handleHeaderClick()
 	{
-		let {item, isSelected} = this.state;
-		if(item && typeToRendering[item.type].canSelect)
+		let time = (new Date()).getTime();
+		if(time - this.lastHeaderClickTime > 1000)
 		{
+			this.lastHeaderClickTime = time;
+			let {item, isSelected} = this.state;
 			if(!isSelected)
 			{
 				this.setState({
 					isSelected: true,
-					open: !this.state.open, // need to decide whether or not to keep this in
+					// open: !this.state.open, // need to decide whether or not to keep this in
 				});
-				this.props.onSelectItem(item, this.handleUnselect);
+				SchemaActions.selectItem(item);
 			}
 			else
 			{
 				this.setState({
 					isSelected: false,
 				});
-				this.props.onSelectItem(null, null);
+				SchemaActions.selectItem(null);
 			}
 		}
-		else
-		{
-			// can't select
-			this.setState({
-				open: !this.state.open,
-			});
-		}
+		
+		// if(item && typeToRendering[item.type].canSelect)
+		// {
+		// }
+		// else
+		// {
+		// 	// can't select
+		// 	this.setState({
+		// 		open: !this.state.open,
+		// 	});
+		// }
 	}
 	
+	lastArrowClickTime: number = 0;
 	handleArrowClick(event)
 	{
 		this.setState({
 			open: !this.state.open,
 		});
 		event.stopPropagation();
+		this.lastArrowClickTime = (new Date()).getTime();
+		// used to stop triggering of double click handler
 	}
 	
-	handleUnselect()
+	handleHeaderDoubleClick(event)
 	{
-		!this.hasUnmounted &&
+		if((new Date()).getTime() - this.lastArrowClickTime > 100)
+		{
+			// ^ need to double check this wasn't trigged for the arrow
 			this.setState({
-				isSelected: false,
+				open: !this.state.open,
 			});
-	}
-	
-	hasUnmounted: boolean = false;
-	componentWillUnmount()
-	{
-		// anti-pattern, but is the best I can think of
-		this.hasUnmounted = true;
+			event.stopPropagation();
+		}
 	}
 	
   render()
   {
-  	let {item} = this.state;
+  	let {item, isSelected} = this.state;
   	
-  	let showing = !this.props.search ||
-  		item.name.indexOf(this.props.search) !== -1;
-  	console.log(showing);
+  	let showing = !this.props.search || 
+  		(item && item.name.indexOf(this.props.search) !== -1);
+  	
     return (
       <div
       	style={Styles.treeItem}
@@ -277,9 +285,10 @@ class SchemaTreeItem extends PureClasss<Props>
 				      	<div
 				      		style={[
 				      			Styles.treeItemHeader,
-				      			this.state.isSelected && Styles.treeItemHeaderSelected,
+				      			isSelected && Styles.treeItemHeaderSelected,
 				      		]}
 				      		onClick={this.handleHeaderClick}
+				      		onDoubleClick={this.handleHeaderDoubleClick}
 				      	>
 					      	<ArrowIcon
 					      		onClick={this.handleArrowClick}
@@ -291,7 +300,7 @@ class SchemaTreeItem extends PureClasss<Props>
 					      		style={Styles.name}
 					      	>
 					      		{
-					      			item ? item.name : 'Loading...'
+					      			item ? item.name : <span className='loading-text' />
 					      		}
 					      	</div>
 					      	

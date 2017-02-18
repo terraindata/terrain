@@ -65,9 +65,7 @@ const SchemaTreeStyles =
 		overflow: 'auto',
 	},
 	
-	label: {
-		color: Styles.colors.text.light,
-	},
+	label: Styles.font.semiBoldNormal,
 	
 	none: {
 		
@@ -156,7 +154,6 @@ const SchemaTreeStyles =
 	},
 	
 	
-	loadingText: Styles.loadingText,
 	margin: Styles.margin,
 }
 

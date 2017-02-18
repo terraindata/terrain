@@ -57,7 +57,7 @@ export module SchemaTypes
 		name = "";
 	}
 	
-	class SchemaStateC extends SchemaBaseClass
+	class SchemaStateC
 	{
 		databases: DatabaseMap= Map<ID, Database>({});
 		tables: TableMap = Map<ID, Table>({});
@@ -68,10 +68,13 @@ export module SchemaTypes
 		loading: boolean = false;
 		loaded: boolean = false;
 		schemaError: boolean = false;
+		
+		// view state
+		selectedItem: SchemaBaseClass = null;
 	}
 	export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
 	export const _SchemaState = (config?: {[key:string]: any}) => 
-	  New<SchemaState>(new SchemaStateC(config), config);
+	  New<SchemaState>(new SchemaStateC(), config);
 	
 	
 	

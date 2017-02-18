@@ -53,6 +53,8 @@ export const Styles =
 			light: '#aaa',
 			white: '#fff',
 			black: 'rgba(0,0,0,0.8)',
+			
+			loading: '#aaa',
 		},
 		
 		active: '#00A7F7',
@@ -60,10 +62,46 @@ export const Styles =
 		transBlack: 'rgba(0,0,0,0.75)',
 	},
 	
-	loadingText:
+	font:
 	{
-		color: '#aaa',
+		title: {
+		  fontWeight: 'bold',
+		  fontSize: '16px',
+		},
+		semiBoldBig: {
+		  fontWeight: '600',
+		  fontSize: '14px',
+		},
+		big: {
+		  fontWeight: '400',
+		  fontSize: '14px',
+		},
+		boldNormal: {
+		  fontWeight: 'bold',
+		  fontSize: '12px',
+		},
+		semiBoldNormal: {
+		  fontWeight: '500',
+		  fontSize: '12px',
+		},
+		normal: {
+		  fontWeight: '400',
+		  fontSize: '12px',
+		},
+		smallBold: {
+		  fontWeight: 'bold',
+		  fontSize: '10px',
+		},
+		small: {
+		  fontWeight: '400',
+		  fontSize: '10px',
+		},
+		smallest: {
+		  fontWeight: '400',
+		  fontSize: '9px',
+		},
 	},
+	
 	
 	rotate90neg:
 	{
@@ -95,8 +133,7 @@ export const Styles =
 	{
 	  'WebkitTransition': 'all 0.15s',
 	  'transition': 'all 0.15s',
-	}
-
+	},
 };
 
 export default Styles;

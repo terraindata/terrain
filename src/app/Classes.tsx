@@ -81,5 +81,3 @@ export function New<T>(instance, config: {[field: string]: any} = {}): T & IReco
   
   return new records[class_name](instance) as any;
 }
-
-let b = New<BaseClass>(new BaseClass());

@@ -42,38 +42,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+const Radium = require('radium');
 import SchemaTypes from '../SchemaTypes';
 import SchemaStore from '../data/SchemaStore';
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
-import SchemaTreeList from './SchemaTreeList';
-import Styles from './SchemaTreeStyles';
+import SchematreeStyles from './SchemaTreeStyles';
+import Styles from '../../Styles';
 import FadeInOut from '../../common/components/FadeInOut';
-import SchemaSearchResults from './SchemaSearchResults';
+import SchemaTreeItem from './SchemaTreeItem';
 
 interface Props
 {
-	fullPage: boolean;
-	showSearch: boolean;
-	search?: string;
+	search: string;
 }
 
-const horizontalDivide = 50;
-const verticalDivide = 75;
-const searchHeight = 42;
-
-class SchemaView extends PureClasss<Props>
+@Radium
+class SchemaSearchResults extends PureClasss<Props>
 {
 	state: {
-		databases: SchemaTypes.DatabaseMap,
-		selectedItem: SchemaTypes.SchemaBaseClass,
-		onItemUnselect: () => void,
-		search: string,
+		schemaState: SchemaTypes.SchemaState;
 	} = {
-		databases: null,
-		selectedItem: null,
-		onItemUnselect: null,
-		search: "",
+		schemaState: SchemaStore.getState(),
 	};
 	
 	constructor(props:Props)
@@ -81,79 +71,88 @@ class SchemaView extends PureClasss<Props>
 		super(props);
 		
 		this._subscribe(SchemaStore, {
-			stateKey: 'databases',
-			storeKeyPath: ['databases'],
+			stateKey: 'schemaState',
 		});
 	}
 	
-	handleSearchChange(event)
+	renderSection(stateKey: string, type: string, label: string)
 	{
-		let search = event.target.value as string;
-		this.setState({
-			search,
-		});
+		return (
+			<div
+				style={{
+					marginTop: Styles.margin,
+					marginLeft: Styles.margin,
+				}}
+			>
+				<div
+					style={Styles.font.semiBoldNormal}
+				>
+					{
+						label
+					}
+				</div>
+				
+				{
+					this.state.schemaState.get(stateKey).map(
+						item =>
+							<SchemaTreeItem
+								id={item.id}
+								type={type}
+								search={this.props.search || "!@#$%^&*&%$!%!$#%!@"}
+								key={item.id}
+							/>
+					).valueSeq()
+				}
+			</div>
+		);
 	}
 	
   render()
   {
-  	let search = this.props.search || this.state.search;
-  	let {showSearch} = this.props;
+  	let {search} = this.props;
+  	let {schemaState} = this.state;
   	
     return (
-      <div
-      	style={Styles.schemaView}
-      >
-      	<div
-      		style={{
-      			position: 'absolute',
-      			left: 0,
-      			top: 0,
-      			width: this.props.fullPage ? horizontalDivide + '%' : '100%',
-      			height: this.props.fullPage ? '100%' : verticalDivide + '%',
-      			overflow: 'auto',
-      			padding: Styles.margin,
-      		}}
-      	>
-      		{
-      			showSearch &&
-		      		<div
-		      			style={{
-		      				height: searchHeight,
-		      			}}
-		      		>
-		      			<input
-		      				type='text'
-		      				placeholder='Search schema'
-		      				value={search}
-		      				onChange={this.handleSearchChange}
-		      				style={{
-		      					borderColor: '#ccc',
-		      				}}
-		      			/>
-		      		</div>
-      		}
-      		<div
-      			style={showSearch && {
-      				height: 'calc(100% - ' + searchHeight + ')px',
-      			}}
-      		>
-		      	<SchemaTreeList
-		      		itemType='database'
-		      		itemIds={this.state.databases && this.state.databases.keySeq().toList()}
-		      		label={'Databases'}
-		      		topLevel={true}
-		      		search={search}
-		      	/>
+    	<div
+    		style={[
+    			Styles.transition,
+    			{
+    				opacity: search ? 1 : 0,
+    			}
+    		]}
+    	>
+		      <div
+		      	style={{
+		      		marginTop: 2 * Styles.margin,
+		      	}}
+		      >
+		      	<div
+		      		style={[
+		      			Styles.font.semiBoldBig,
+		      		]}
+		      	>
+		      		All Results
+		      	</div>
 		      	
-			      <SchemaSearchResults
-			      	search={this.state.search}
-			      />
+		      	{
+		      		this.renderSection('databases', 'database', 'Databases')
+		      	}
+		      	
+		      	{
+		      		this.renderSection('tables', 'table', 'Tables')
+		      	}
+		      	
+		      	{
+		      		this.renderSection('columns', 'column', 'Columns')
+		      	}
+		      	
+		      	{
+		      		this.renderSection('indexes', 'index', 'Indexes')
+		      	}
 		      </div>
-		      
-	      </div>
-      </div>
+    	</div>
     );
   }
 }
 
-export default SchemaView;
+export default SchemaSearchResults;

@@ -57,7 +57,6 @@ interface Props
 	itemType: string;
 	label?: string;
   topLevel?: boolean;
-  onSelectItem: (selectedItem: SchemaTypes.SchemaBaseClass, onItemUnselect: () => void) => void;
   search: string;
 }
 
@@ -114,14 +113,12 @@ class SchemaTreeList extends PureClasss<Props>
   	{
   		return (
   			<div
-  				style={Styles.loadingText}
-  			>
-  				Loading...
-  			</div>
+          className='loading-text'
+        />
   		);
   	}
   	
-    let {itemIds, itemType, onSelectItem, search, label, topLevel} = this.props;
+    let {itemIds, itemType, search, label, topLevel} = this.props;
     
     return (
       <div
@@ -160,7 +157,6 @@ class SchemaTreeList extends PureClasss<Props>
         					id={id}
         					type={itemType}
         					key={id}
-                  onSelectItem={onSelectItem}
                   search={search}
         				/>
       		)
