@@ -58,6 +58,9 @@ const arrowSvgStyles = {
 	marginLeft: 6,
 };
 
+const headerHighlightedColor = color(Styles.colors.active).fade('0.85').string();
+const headerSelectedColor = color(Styles.colors.active).fade('0.75').string();
+
 const SchemaTreeStyles =
 {
 	schemaView: {
@@ -101,7 +104,7 @@ const SchemaTreeStyles =
 			borderRadius: 4,
 			
 			':hover': {
-				background: color(Styles.colors.active).fade('0.85').string(),
+				background: headerHighlightedColor,
 			}
 		},
 		Styles.transition,
@@ -109,10 +112,15 @@ const SchemaTreeStyles =
 	
 	treeItemHeaderSelected:
 	{
-		background: color(Styles.colors.active).fade('0.75').string(),
+		background: headerSelectedColor,
 		':hover': {
-			background: color(Styles.colors.active).fade('0.75').string(),
+			background: headerSelectedColor,
 		}
+	},
+	
+	treeItemHeaderHighlighted:
+	{
+		background: headerHighlightedColor,
 	},
 	
 	name: {

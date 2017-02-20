@@ -50,7 +50,9 @@ export let SchemaActionTypes =
   setDatabase: '', // sets the schema for a database
   error: '',
   dbCount: '',
-  selectItem: '',
+  
+  highlightId: '',
+  selectId: '',
 };
 
 Util.setValuesToKeys(SchemaActionTypes, '');

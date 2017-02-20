@@ -43,13 +43,15 @@ THE SOFTWARE.
 */
 
 import SchemaTypes from '../SchemaTypes';
-import SchemaStore from '../data/SchemaStore';
+import {SchemaStore, SchemaActions} from '../data/SchemaStore';
 import * as React from 'react';
+import * as $ from 'jquery';
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeList from './SchemaTreeList';
 import Styles from './SchemaTreeStyles';
 import FadeInOut from '../../common/components/FadeInOut';
 import SchemaSearchResults from './SchemaSearchResults';
+import Util from '../../util/Util';
 
 interface Props
 {
@@ -65,15 +67,20 @@ const searchHeight = 42;
 class SchemaView extends PureClasss<Props>
 {
 	state: {
-		databases: SchemaTypes.DatabaseMap,
-		selectedItem: SchemaTypes.SchemaBaseClass,
-		onItemUnselect: () => void,
-		search: string,
+		highlightedIndex: number;
+		search: string;
+		
+		// from Store
+		databases: SchemaTypes.DatabaseMap;
+		highlightedId: ID;
+		
 	} = {
-		databases: null,
-		selectedItem: null,
-		onItemUnselect: null,
+		highlightedIndex: -1,
 		search: "",
+		
+		// from Store
+		databases: null,
+		highlightedId: null,
 	};
 	
 	constructor(props:Props)
@@ -84,6 +91,11 @@ class SchemaView extends PureClasss<Props>
 			stateKey: 'databases',
 			storeKeyPath: ['databases'],
 		});
+		
+		this._subscribe(SchemaStore, {
+			stateKey: 'highlightedId',
+			storeKeyPath: ['highlightedId'],
+		});
 	}
 	
 	handleSearchChange(event)
@@ -92,6 +104,61 @@ class SchemaView extends PureClasss<Props>
 		this.setState({
 			search,
 		});
+	}
+	
+	handleSearchKeyDown(event)
+	{
+		let {highlightedIndex} = this.state;
+		let offset: number = 0;
+		
+		switch(event.keyCode)
+    {
+      case 38:
+        // up
+        offset = -1;
+      case 40:
+        // down
+        offset = offset || 1;
+				let items = $("[data-rel='schema-item']");
+        let index = Util.valueMinMax(highlightedIndex + offset, 0, items.length);
+        let id = $(items[index]).attr('data-id');
+        
+        this.setState({
+        	highlightedIndex: index,
+        });
+        
+        SchemaActions.highlightId(id);
+        
+        break;
+        
+      case 13:
+      case 9:
+        // enter or tab
+      	
+      	if(this.state.highlightedId)
+      	{
+      		SchemaActions.selectId(this.state.highlightedId);
+      	}
+      	
+        // var value = visibleOptions.get(this.state.selectedIndex);
+        // if(!value || this.state.selectedIndex === -1)
+        // {
+        //   value = event.target.value;
+        // }
+        // this.setState({
+        //   open: false,
+        //   selectedIndex: -1,
+        //   value,
+        // });
+        // this.blurValue = value;
+        // this.props.onChange(value);
+        // this.refs['input']['blur']();
+        break;
+      case 27:
+        // esc
+        // this.refs['input']['blur']();
+        break;
+    }
 	}
 	
   render()
@@ -126,6 +193,7 @@ class SchemaView extends PureClasss<Props>
 		      				placeholder='Search schema'
 		      				value={search}
 		      				onChange={this.handleSearchChange}
+		      				onKeyDown={this.handleSearchKeyDown}
 		      				style={{
 		      					borderColor: '#ccc',
 		      				}}

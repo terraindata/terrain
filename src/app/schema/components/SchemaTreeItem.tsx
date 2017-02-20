@@ -68,8 +68,9 @@ class State
 {
 	open: boolean = false;
 	item: SchemaTypes.SchemaBaseClass = null;
-	childCount: number = 0;
+	childCount: number = -1;
 	isSelected = false;
+	isHighlighted = false;
 }
 
 const typeToRendering: {
@@ -121,21 +122,33 @@ class SchemaTreeItem extends PureClasss<Props>
 			stateKey: 'item',
 			storeKeyPath: 
 				[ SchemaTypes.typeToStoreKey[this.props.type], this.props.id ],
+				
 			updater: (state: SchemaTypes.SchemaState) =>
 			{
-				let item = state.getIn([ SchemaTypes.typeToStoreKey[this.props.type], this.props.id ]);
-				if(item)
+				if(this.state.childCount === -1) // assumes that schema data does not change
 				{
-					let childCount = 0;
-					typeToRendering[item['type']].childConfig.map(
-						section =>
-							childCount += item[section.type + 'Ids'].size
-					);
-					
-					let isSelected = state.selectedItem === item;
-					
+					let item = state.getIn([ SchemaTypes.typeToStoreKey[this.props.type], this.props.id ]);
+					if(item)
+					{
+						let childCount = 0;
+						typeToRendering[item['type']].childConfig.map(
+							section =>
+								childCount += item[section.type + 'Ids'].size
+						);
+						
+						this.setState({
+							childCount,
+						});
+					}
+				}
+				
+				let isHighlighted = this.props.id === state.highlightedId;
+				let isSelected = this.props.id === state.selectedId;
+				
+				if(isHighlighted !== this.state.isHighlighted || isSelected !== this.state.isSelected)
+				{
 					this.setState({
-						childCount,
+						isHighlighted,
 						isSelected,
 					});
 				}
@@ -174,7 +187,7 @@ class SchemaTreeItem extends PureClasss<Props>
 			return null;
 		}
 		
-		if(!item || true)
+		if(!item)
 		{
 			return (
 				<div
@@ -218,14 +231,14 @@ class SchemaTreeItem extends PureClasss<Props>
 					isSelected: true,
 					// open: !this.state.open, // need to decide whether or not to keep this in
 				});
-				SchemaActions.selectItem(item);
+				SchemaActions.selectId(this.props.id);
 			}
 			else
 			{
 				this.setState({
 					isSelected: false,
 				});
-				SchemaActions.selectItem(null);
+				SchemaActions.selectId(null);
 			}
 		}
 		
@@ -266,7 +279,7 @@ class SchemaTreeItem extends PureClasss<Props>
 	
   render()
   {
-  	let {item, isSelected} = this.state;
+  	let {item, isSelected, isHighlighted} = this.state;
   	
   	let showing = !this.props.search || 
   		(item && item.name.indexOf(this.props.search) !== -1);
@@ -274,6 +287,8 @@ class SchemaTreeItem extends PureClasss<Props>
     return (
       <div
       	style={Styles.treeItem}
+      	data-rel='schema-item'
+      	data-id={this.props.id}
       >
       	<FadeInOut
       		open={showing}
@@ -285,6 +300,7 @@ class SchemaTreeItem extends PureClasss<Props>
 				      	<div
 				      		style={[
 				      			Styles.treeItemHeader,
+				      			isHighlighted && Styles.treeItemHeaderHighlighted,
 				      			isSelected && Styles.treeItemHeaderSelected,
 				      		]}
 				      		onClick={this.handleHeaderClick}

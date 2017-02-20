@@ -126,9 +126,13 @@ export const SchemaStore: IStore<SchemaState> =
 						.set('indexes', state.indexes.merge(indexes));
 				},
 			
-			[SchemaActionTypes.selectItem]:
-				(state: SchemaState, action: Action<{ item: SchemaTypes.SchemaBaseClass }>) =>
-					state.set('selectedItem', action.payload.item),
+			[SchemaActionTypes.selectId]:
+				(state: SchemaState, action: Action<{ id: ID }>) =>
+					state.set('selectedId', action.payload.id),
+					
+			[SchemaActionTypes.highlightId]:
+				(state: SchemaState, action: Action<{ id: ID }>) =>
+					state.set('highlightedId', action.payload.id),
 		}
 	), DEV ? ExampleSchemaData : SchemaTypes._SchemaState());
 
@@ -163,11 +167,18 @@ export const SchemaActions =
         indexes,
       }),
   
-  selectItem:
-  	(item: SchemaTypes.SchemaBaseClass) =>
-  		$(SchemaActionTypes.selectItem, {
-  			item
+ 	highlightId:
+ 		(id: ID) =>
+ 			$(SchemaActionTypes.highlightId, {
+ 				id,
+ 			}),
+ 			
+  selectId:
+  	(id: ID) =>
+  		$(SchemaActionTypes.selectId, {
+  			id
   		}),
+ 	
 }
 
 

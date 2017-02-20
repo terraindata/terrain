@@ -70,7 +70,8 @@ export module SchemaTypes
 		schemaError: boolean = false;
 		
 		// view state
-		selectedItem: SchemaBaseClass = null;
+		selectedId: ID = null;
+		highlightedId: ID = null;
 	}
 	export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
 	export const _SchemaState = (config?: {[key:string]: any}) => 
