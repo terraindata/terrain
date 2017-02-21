@@ -386,7 +386,16 @@ const generalProcessors: {
   
   '+':
     (node) =>
-      parseNode(node.left_child) + ' + ' + parseNode(node.right_child),
+    {
+      let nodes = flattenOp('+', node);
+      let fields = nodes.map(parseNode);
+      return make(
+        Blocks.add,
+        {
+          fields: List(fields),
+        }
+      );
+    },
   
   '*':
     (node) =>

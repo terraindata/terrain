@@ -239,7 +239,7 @@ class TQLConverter
 
   private static _cards(cards: List<ICard>, append?: string, options?: Options, isTop?: boolean): string
   {
-    var glue = "\n" + (append || "");
+    var glue = append || "\n";
     return addTabs(cards.map(
         (card, i) => this._parse(card, i, i === cards.size, isTop)
       ).join(glue)) + (options && options['excludeSuffix'] ? "" : glue);
@@ -261,7 +261,8 @@ class TQLConverter
     if(typeof strFn === 'string')
     {
       str = strFn;
-    } else if(typeof strFn == 'function')
+    } 
+    else if(typeof strFn == 'function')
     {
       str = strFn(block);
     }
@@ -280,9 +281,9 @@ class TQLConverter
   {
     if(field === 'cards')
     {
-      var append = null;
+      var append = '\n';
       var options = {};
-      if(block.static.tqlGlue)
+      if(block.static.tqlGlue !== undefined)
       {
         append = block.static.tqlGlue;
         options['excludeSuffix'] = true;
