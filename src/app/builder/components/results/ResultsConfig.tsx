@@ -55,6 +55,7 @@ import InfoArea from '../../../common/components/InfoArea.tsx';
 import PureClasss from './../../../common/components/PureClasss.tsx';
 import Switch from './../../../common/components/Switch.tsx';
 import { DragSource, DropTarget } from 'react-dnd';
+import {Results, MAX_RESULTS} from './ResultsManager.tsx';
 
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
 var GearIcon = require("./../../../../images/icon_gear.svg?name=GearIcon");
@@ -106,8 +107,7 @@ export const DefaultIResultsConfig = _IResultsConfig();
 
 interface Props
 {
-  results: any[];
-  resultsWithAllFields: any[];
+  results: Results;
   config: IResultsConfig;
   onConfigChange: (config:IResultsConfig) => void;
   onClose: () => void;

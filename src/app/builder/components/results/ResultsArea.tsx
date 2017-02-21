@@ -63,16 +63,15 @@ import InfiniteScroll from './../../../common/components/InfiniteScroll.tsx';
 import Switch from './../../../common/components/Switch.tsx';
 import BuilderTypes from '../../BuilderTypes.tsx';
 import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore.tsx';
+import {ResultsState, MAX_RESULTS} from './ResultsManager.tsx';
 
 const RESULTS_PAGE_SIZE = 20;
-const MAX_RESULTS = 200;
 
 interface Props
 {
+  resultsState: ResultsState;
   db: string;
   query: BuilderTypes.Query;
-  onLoadStart: () => void;
-  onLoadEnd: () => void;
   canEdit: boolean;
   variantName: string;
   
@@ -81,16 +80,6 @@ interface Props
 
 interface State
 {
-  results: any[];
-  resultsWithAllFields: any[];
-  resultText: string;
-  resultType: string;
-  resultsCount: number;
-  
-  tql: string;
-  error: any;
-  allFieldsError: boolean;
-  
   resultFormat: string;
   showingConfig: boolean;
   
@@ -99,34 +88,17 @@ interface State
   
   resultsPages: number;
   onResultsLoaded: (unchanged?: boolean) => void;
-  
-  xhr: XMLHttpRequest;
-  allXhr: XMLHttpRequest;
-  countXhr: XMLHttpRequest;  
 }
 
 class ResultsArea extends PureClasss<Props>
 {
-  
-  
   state: State = {
-    results: null,
-    resultsCount: null,
-    resultsWithAllFields: null,
-    resultText: null,
     expanded: false,
     expandedResultIndex: null,
-    tql: "",
-    error: null,
-    resultType: null,
     showingConfig: false,
     resultsPages: 1,
     onResultsLoaded: null,
     resultFormat: 'icon',
-    allFieldsError: false,
-    xhr: null,
-    allXhr: null,
-    countXhr: null,
   };
   
   constructor(props:Props)
@@ -134,44 +106,15 @@ class ResultsArea extends PureClasss<Props>
     super(props);
   }
   
-  componentWillMount()
-  {
-    this.queryResults(this.props.query);
-  }
-  
-  componentWillUnmount()
-  {
-    this.state.xhr && this.state.xhr.abort();
-    this.state.allXhr && this.state.allXhr.abort();
-    this.state.countXhr && this.state.countXhr.abort();
-    this.setState({
-      xhr: null,
-      allXhr: null,
-      countXhr: null,
-    });
-    this.timeout && clearTimeout(this.timeout);
-  }
-  
   componentWillReceiveProps(nextProps)
   {
     if(nextProps.query.cards !== this.props.query 
       || nextProps.query.inputs !== this.props.query.inputs)
     {
-      this.queryResults(nextProps.query);
-      
       if(this.state.onResultsLoaded)
       {
         // reset infinite scroll
         this.state.onResultsLoaded(false);
-      }
-      
-      if(nextProps.query.id !== this.props.query.id)
-      {
-        this.setState({
-          results: null,
-          resultsWithAllFields: null,
-          resultText: 'Loading',
-        })
       }
     }
   }
@@ -197,35 +140,33 @@ class ResultsArea extends PureClasss<Props>
   
   renderExpandedResult()
   {
-    let {results, resultsWithAllFields, expandedResultIndex} = this.state;
+    let {expandedResultIndex} = this.state;
+    let {results} = this.props.resultsState;
+    
     if(results)
     {
-      var result = results[expandedResultIndex];
+      var result = results.get(expandedResultIndex);
     }
-    if(resultsWithAllFields)
-    {
-      var resultAllFields = resultsWithAllFields[expandedResultIndex];
-    }
+    
     if(!result)
     {
       return null;
     }
+    
     return (
       <div className={'result-expanded-wrapper' + (this.state.expanded ? '' : ' result-collapsed-wrapper')}>
         <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
         <Result 
-          data={result}
-          allFieldsData={resultAllFields}
+          result={result}
           config={this.getResultsConfig()}
           onExpand={this.handleCollapse}
           expanded={true}
           index={-1}
           primaryKey={getPrimaryKeyFor(result, this.getResultsConfig())}
-          />
+        />
       </div>
     );
   }
-  
   
   handleRequestMoreResults(onResultsLoaded: (unchanged?: boolean) => void)
   {
@@ -272,17 +213,30 @@ class ResultsArea extends PureClasss<Props>
       />
     }
     
-    if(this.state.error)
+    let {resultsState} = this.props;
+    
+    if(resultsState.hasError)
     {
       return <InfoArea
         large="There was an error with your query."
-        small={this.state.error}
-      />
+        small={resultsState.errorMessage}
+      />;
     }
     
-    if(!this.state.results)
+    if(!resultsState.results)
     {
-      if(this.isLoading())
+      if(resultsState.rawResult)
+      {
+        return (
+          <div className='result-text'>
+            {
+              resultsState.rawResult
+            }
+          </div>
+        );
+      }
+      
+      if(resultsState.loading)
       {
         return <InfoArea
           large="Querying results..."
@@ -294,20 +248,13 @@ class ResultsArea extends PureClasss<Props>
       />
     }
     
-    if(this.state.resultType !== 'rel')
-    {
-      return (
-        <div className='result-text'>
-          {this.state.results}
-        </div>
-      );
-    }
+    let {results} = resultsState;
     
-    if(!this.state.results.length)
+    if(!results.size)
     {
       return <InfoArea
         large="There are no results for your query."
-        small="The query was successful, but there were no matches in the database."
+        small="The query was successful, but there were no matches."
       />;
     }
     
@@ -316,7 +263,7 @@ class ResultsArea extends PureClasss<Props>
       return (
         <div className='results-table-wrapper'>
           <ResultsTable
-            {...this.state}
+            results={results}
             resultsConfig={this.getResultsConfig()}
             onExpand={this.handleExpand}
           />
@@ -332,208 +279,33 @@ class ResultsArea extends PureClasss<Props>
         onRequestMoreItems={this.handleRequestMoreResults}
       >
         {
-          this.state.results.map((result, index) => 
+          results.map((result, index) => 
           {
             if(index > this.state.resultsPages * RESULTS_PAGE_SIZE)
             {
               return null;
             }
             
-            let primaryKey = getPrimaryKeyFor(result, config);
-            
             return (
               <Result
-                data={result}
-                allFieldsData={this.state.resultsWithAllFields && this.state.resultsWithAllFields[index]}
+                result={result}
                 config={this.getResultsConfig()}
                 onExpand={this.handleExpand}
                 index={index}
                 key={index}
-                primaryKey={primaryKey}
+                primaryKey={getPrimaryKeyFor(result, config)}
               />
             );
-          }
-          )
+          })
         }
         {
-          this.resultsFodderRange.map(i => <div className='results-area-fodder' key={i} />)
+          this.resultsFodderRange.map(
+            i => 
+              <div className='results-area-fodder' key={i} />
+          )
         }
       </InfiniteScroll>
     );
-  }
-  
-  handleAllFieldsResponse(response:QueryResponse)
-  {
-    this.handleResultsChange(response, true);
-  }
-  
-  handleCountResponse(response:QueryResponse)
-  {
-    this.setState({
-      countXhr: null,
-    });
-    let results = response.resultSet;
-    if(results)
-    {
-      if(results.length === 1)
-      {
-        this.setState({
-          resultsCount: results[0]['COUNT(*)']
-        });
-      }
-      else if(results.length > 1)
-      {
-        this.setState({
-          resultsCount: results.length,
-        })
-      }
-      else
-      {
-        this.handleCountError();
-      }
-    }
-    else
-    {
-      this.handleCountError();
-    }
-  }
-  
-  handleCountError()
-  {
-    this.setState({
-      countXhr: null,
-      resultsCount: -1,
-    })
-  }
-  
-  timeout = null;
-  
-  handleResultsChange(response:QueryResponse, isAllFields?: boolean)
-  {
-    let xhrKey = isAllFields ? 'allXhr' : 'xhr';
-    this.setState({
-      [xhrKey]: null,
-    });
-    
-    if(response)
-    {
-      if(response.error)
-      {
-        if(!isAllFields)
-        {
-          let {error} = response;
-          if(typeof this.state.error === 'string')
-          {
-            if(error.charAt(error.length - 1) === '^')
-            {
-              error = error.substr(0, error.length - 1);
-            }
-            error = this.state.error.replace(/MySQL/g, 'TerrainDB');
-          }
-          
-          this.setState({
-            error,
-          });
-        }
-        else
-        {
-          this.setState({
-            allFieldsError: true,
-          });
-        }
-        
-        this.props.onLoadEnd && this.props.onLoadEnd();
-        return;
-      }
-      
-      let results = response.resultSet;
-      
-      var resultsCount = results.length;
-      if(resultsCount > MAX_RESULTS)
-      {
-        results.splice(MAX_RESULTS, results.length - MAX_RESULTS);
-      }
-      
-      if(isAllFields)
-      {
-        this.setState({
-          resultsWithAllFields: results,
-        });
-      }
-      else
-      {
-        this.setState({
-          results,
-          resultType: 'rel',
-          error: false,
-        });
-      }
-    }
-    else
-    {
-      // no response
-      if(!isAllFields)
-      {
-        this.setState({
-          error: "No response was returned from the server.",
-        });
-      }
-      else
-      {
-        this.setState({
-          allFieldsError: true,
-        });
-      }
-    }
-    
-    if(!this.state.xhr && !this.state.allXhr)
-    {
-      // all done with both
-      this.props.onLoadEnd && this.props.onLoadEnd();
-    }
-  }
-  
-  componentWillUpdate(nextProps, nextState: State)
-  {
-    if(nextState.results !== this.state.results 
-      || nextState.resultsWithAllFields !== this.state.resultsWithAllFields)
-    {
-      // update spotlights
-      let config = this.getResultsConfig();
-      SpotlightStore.getState().spotlights.map(
-        (spotlight, id) =>
-        {
-          let resultIndex = nextState.results && nextState.results.findIndex(
-            r => getPrimaryKeyFor(r, config) === id
-          );
-          if(resultIndex !== -1)
-          {
-            spotlightAction(id, _.extend({
-                color: spotlight.color,
-                name: spotlight.name,  
-              }, 
-              nextState.results[resultIndex], 
-              nextState.resultsWithAllFields[resultIndex])
-            );
-          }
-          else
-          {
-            spotlightAction(id, null);
-          } 
-        }
-      );
-    }
-  }
-  
-  handleError(ev)
-  {  
-    this.setState({
-      xhr: null,
-    });
-    this.setState({
-      error: true,
-    });
-    this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
   handleExport()
@@ -557,77 +329,6 @@ Note: this exports the results of your query, which may be different from the re
 column if you have set a custom results view.');
   }
   
-  handleAllFieldsError()
-  {
-    this.setState({
-      allXhr: null,
-    });
-    this.props.onLoadEnd && this.props.onLoadEnd();
-  }
-  
-  queryResults(query, pages?: number)
-  {
-    if(!pages)
-    {
-      pages = this.state.resultFormat === 'icon' ? this.state.resultsPages : 50;
-    }
-    
-    var tql = TQLConverter.toTQL(query, {
-      limit: MAX_RESULTS,
-      replaceInputs: true,
-    });
-    
-    if(tql !== this.state.tql)
-    {
-      this.setState({
-        tql,
-        allFieldsError: false,
-      });
-      
-      this.props.onLoadStart && this.props.onLoadStart();
-      this.state.xhr && this.state.xhr.abort();
-      this.state.allXhr && this.state.allXhr.abort();
-      
-      this.setState({
-        xhr: 
-          Ajax.query(
-            tql, 
-            this.props.db, 
-            this.handleResultsChange, 
-            this.handleError
-          ),
-      });
-      
-      this.setState({
-        allXhr:
-          Ajax.query(
-            TQLConverter.toTQL(query, {
-              allFields: true,
-              transformAliases: true,
-              limit: MAX_RESULTS,
-              replaceInputs: true,
-            }), 
-            this.props.db,
-            this.handleAllFieldsResponse,
-            this.handleAllFieldsError
-          )
-      });
-      
-      this.setState({
-        countXhr: 
-          Ajax.query(
-            TQLConverter.toTQL(query, {
-              count: true,
-              replaceInputs: true,
-            }), 
-            this.props.db,
-            this.handleCountResponse,
-            this.handleCountError
-          ),
-      });
-    }
-  }
-  
   toggleView()
   {
     this.setState({
@@ -635,32 +336,37 @@ column if you have set a custom results view.');
     })
   }
   
-  isLoading(): boolean
-  {
-    return !! this.state.xhr || !! this.state.allXhr || !! this.state.countXhr;
-  }
-  
   renderTopbar()
   {
-    let count = this.state.resultsCount !== -1 ? this.state.resultsCount : (this.state.results ? this.state.results.length : 0);
+    let {resultsState} = this.props;
+    
+    var text = '';
+    if(resultsState.loading)
+    {
+      text = 'Loading...';
+    }
+    else if(this.isQueryEmpty())
+    {
+      text = 'Empty query';
+    }
+    else if(resultsState.hasError)
+    {
+      text = 'Error with query';
+    }
+    else if(resultsState.results)
+    {
+      text = `${resultsState.count || 'No'} result${resultsState.count === 1 ? '' : 's'}`;
+    }
+    else
+    {
+      text = 'Text result';
+    }
+    
     return (
       <div className='results-top'>
         <div className='results-top-summary'>
           {
-            this.isLoading() ?
-              'Loading...' :
-              (
-                this.isQueryEmpty() ?
-                  'Empty query' :
-                  (
-                    this.state.error ? 'Error with query' : 
-                    (
-                      this.state.results ? 
-                        `${count || 'No'} result${count === 1 ? '' : 's'}` 
-                      : 'Text result'
-                    )
-                  )
-              )
+            text
           }
         </div>
         
@@ -716,15 +422,14 @@ column if you have set a custom results view.');
         config={this.getResultsConfig()}
         onClose={this.hideConfig}
         onConfigChange={this.handleConfigChange}
-        results={this.state.results}
-        resultsWithAllFields={this.state.resultsWithAllFields}
+        results={this.props.resultsState.results}
       />;
     }
   }
   
   handleConfigChange(config:IResultsConfig)
   {
-    Actions.change(List(['query', 'resultsConfig']), config);
+    Actions.changeResultsConfig(config);
   }
 
 	render()

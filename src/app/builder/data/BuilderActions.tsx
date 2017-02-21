@@ -144,7 +144,19 @@ const BuilderActions =
     (error) =>
       $(ActionTypes.parseTreeError, { 
         error,
-      }),    
+      }),   
+  
+  changeResultsConfig:
+    (resultsConfig) =>
+      $(ActionTypes.changeResultsConfig, {
+        resultsConfig,
+      }),
+  
+  results:
+    (resultsState) =>
+      $(ActionTypes.results, {
+        resultsState,
+      }),
 };
 
 _.map(ActionTypes, 

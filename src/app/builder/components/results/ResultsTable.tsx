@@ -54,11 +54,11 @@ import {getPrimaryKeyFor} from './ResultsArea.tsx';
 import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore.tsx';
 import ColorManager from '../../../util/ColorManager.tsx';
 import {MenuOption} from '../../../common/components/Menu.tsx';
+import {Results, MAX_RESULTS} from './ResultsManager.tsx';
 
 interface Props
 {
-  results: any[];
-  resultsWithAllFields: any[];
+  results: Results;
   resultsConfig: IResultsConfig;
   onExpand: (index:number) => void;
 }

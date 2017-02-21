@@ -57,6 +57,7 @@ import {spotlightAction} from '../../data/SpotlightStore.tsx';
 import ColorManager from '../../../util/ColorManager.tsx';
 import Classs from './../../../common/components/Classs.tsx';
 import {IResultsConfig} from './ResultsConfig.tsx';
+import {ResultClass, MAX_RESULTS} from './ResultsManager.tsx';
 
 var PinIcon = require("./../../../../images/icon_pin_21X21.svg?name=PinIcon");
 var ScoreIcon = require("./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon");
@@ -78,13 +79,8 @@ const MAX_DEFAULT_FIELDS = 4;
 
 interface Props
 {
-  data: {
-    id: string;
-    name: string;
-    spotlight: any;
-    pinned: boolean;
-  };
-  allFieldsData: any;
+  result: ResultClass;
+  
   config: IResultsConfig;
   index: number;
   primaryKey: string;

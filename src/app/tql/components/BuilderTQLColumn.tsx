@@ -59,19 +59,17 @@ import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss.tsx';
 import Ajax from "./../../util/Ajax.tsx";
 import LibraryTypes from '../../library/LibraryTypes.tsx';
-
 import TQLEditor from './TQLEditor.tsx';
-
 import TQLPopup from './TQLPopup.tsx';
+import {ResultsState} from '../../builder/components/results/ResultsManager.tsx';
 
 interface Props {
   variant?: LibraryTypes.Variant;
   query?: BuilderTypes.Query;
   canEdit?: boolean;
+  resultsState: ResultsState;
   
   params?: any;
-  onLoadStart: () => void;
-  onLoadEnd: () => void;
   addColumn?: (number, string?) => void;
   columnIndex: number;
 }
@@ -397,8 +395,6 @@ class BuilderTQLColumn extends PureClasss<Props>
             query={this.props.query}
             db={this.props.variant && this.props.variant.db}
             onError={this.highlightError}
-            onLoadStart={this.props.onLoadStart}
-            onLoadEnd={this.props.onLoadEnd}
             open={this.state.resultsBarOpen}
             onToggle={this._toggle('resultsBarOpen')}
           />

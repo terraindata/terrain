@@ -42,337 +42,369 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// import * as Immutable from 'immutable';
-// const {Map,List} = Immutable;
-// import * as _ from 'underscore';
-// import * as React from 'react';
-// import Util from '../../../util/Util.tsx';
-// import {Ajax, QueryResponse} from '../../../util/Ajax.tsx';
-// import {IResultsConfig, DefaultIResultsConfig, ResultsConfig} from "../results/ResultsConfig.tsx";
-// import TQLConverter from "../../../tql/TQLConverter.tsx";
-// import PureClasss from './../../../common/components/PureClasss.tsx';
-// import BuilderTypes from '../../BuilderTypes.tsx';
-// import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore.tsx';
+import * as Immutable from 'immutable';
+const {Map,List} = Immutable;
+import * as _ from 'underscore';
+import * as React from 'react';
+import Util from '../../../util/Util.tsx';
+import {Ajax, QueryResponse} from '../../../util/Ajax.tsx';
+import {IResultsConfig, DefaultIResultsConfig, ResultsConfig} from "../results/ResultsConfig.tsx";
+import TQLConverter from "../../../tql/TQLConverter.tsx";
+import BuilderTypes from '../../BuilderTypes.tsx';
+import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore.tsx';
+import {BaseClass, New} from '../../../Classes.tsx';
+import PureClasss from './../../../common/components/PureClasss.tsx';
+import BuilderActions from '../../data/BuilderActions.tsx';
 
-// const MAX_RESULTS = 200;
+export const MAX_RESULTS = 200;
 
-// // TODO records? immutable?
-
-// export interface IResult
-// {
-//   fields: Map<string, string>; // includes all fields
-//   rawFields: Map<string, string>;
-//   transformFields: Map<string, string>;
-// }
-
-// export type IResultState =
-// {
-//   results: List<IResult>;
-//   primaryKeyToIndex: Map<string, number>;
-//   hasError: boolean;
-//   errorMessage: string;
-//   count: number;
+export class ResultClass extends BaseClass
+{
+  // all available fields for display
+  fields: Map<string, string>;
   
-//   valid: boolean; // are these results still valid for the given query?
-//   loaded: boolean; // have all of the fields loaded?
+  // spotlight: any;
+  // pinned: boolean;
   
-//   rawResult: string;
-// };
+  rawFields: Map<string, string>;
+  transformFields: Map<string, string>;
+}
+let _ResultClass = (config: Object = {}) => 
+  New<ResultClass>(new ResultClass(config), config);
 
-// interface Props
-// {
-//   query: BuilderTypes.Query;
-//   onResultsChange(results);
-// }
+export type Results = List<ResultClass>;
 
-// interface State
-// {
-//   resultState: IResultState;
+export class ResultsState extends BaseClass
+{
+  results: Results;
+  count: number;
+  rawResult: string;
   
-//   queriedTql: string;
+  primaryKeyToIndex: Map<string, number>;
   
-//   queryId: string;
-//   allQueryId: string;
-//   countQueryId: string;
-//   transformQueryId: string;
-// }
+  hasError: boolean;
+  errorMessage: string;
+  hasAllFieldsError: boolean;
+  
+  valid: boolean; // are these results still valid for the given query?
+  loaded: boolean; // have all of the fields loaded?
+  
+  loading: boolean;
+}
+export let _ResultsState = (config: Object = {}) => 
+  New<ResultsState>(new ResultsState(config), config);
 
-// class ResultsManager extends PureClasss<Props>
-// {
-//   xhr = null;
-//   allXhr = null;
-//   countXhr = null;
+interface Props
+{
+  query: BuilderTypes.Query;
+  resultsState: ResultsState;
+  db: string;
+}
+
+interface State
+{
+  queriedTql?: string;
   
-//   state: State = {
-//     resultState: null,
-  
-//     queriedTql: '',
+  queryId?: string;
+  allQueryId?: string;
+  countQueryId?: string;
+  transformQueryId?: string;
     
-//     queryId: '',
-//     allQueryId: '',
-//     countQueryId: '',
-//     transformQueryId: '', 
-//   };
+  xhr?: XMLHttpRequest;
+  allXhr?: XMLHttpRequest;
+  countXhr?: XMLHttpRequest;  
+  transformXhr?: XMLHttpRequest;
+}
+
+class ResultsManager extends PureClasss<Props>
+{
+  state: State = {};
   
-//   constructor(props:Props)
-//   {
-//     super(props);
-//   }
+  componentWillMount()
+  {
+    this.queryResults(this.props.query);
+  }
   
-//   componentDidMount()
-//   {
-//     this.queryResults(this.props.query);
-//   }
+  componentWillUnmount()
+  {
+    this.state.xhr && this.state.xhr.abort();
+    this.state.allXhr && this.state.allXhr.abort();
+    this.state.countXhr && this.state.countXhr.abort();
+    this.setState({
+      xhr: null,
+      allXhr: null,
+      countXhr: null,
+    });
+  }
   
-//   componentWillUnmount()
-//   {
-//     this.xhr && this.xhr.abort();
-//     this.allXhr && this.allXhr.abort();
-//     this.countXhr && this.countXhr.abort();
-//     this.xhr = false;
-//     this.allXhr = false;
-//     this.countXhr = false;
-//     this.timeout && clearTimeout(this.timeout);
-//   }
-  
-//   componentWillReceiveProps(nextProps)
-//   {
-//     if(this.props.query !== nextProps.query)
-//     {
-//       this.queryResults(this.props.query);
-//     }
-//   }
-  
-//   handleAllFieldsResponse(response:QueryResponse)
-//   {
-//     this.handleResultsChange(response, true);
-//   }
-  
-//   handleCountResponse(response:QueryResponse)
-//   {
-//     let results = response.resultSet;
-//     if(results)
-//     {
-//       if(results.length === 1)
-//       {
-//         this.setState({
-//           resultsCount: results[0]['count(*)']
-//         });
-//       }
-//       else if(results.length > 1)
-//       {
-//         this.setState({
-//           resultsCount: results.length,
-//         })
-//       }
-//       else
-//       {
-//         this.handleCountError();
-//       }
-//     }
-//     else
-//     {
-//       this.handleCountError();
-//     }
-//   }
-  
-//   handleCountError()
-//   {
-//     this.setState({
-//       resultsCount: -1,
-//     })
-//   }
-  
-//   timeout = null;
-  
-//   handleResultsChange(response:QueryResponse, isAllFields?: boolean)
-//   {
-//     let xhrKey = isAllFields ? 'allXhr' : 'xhr';
-//     if(!this[xhrKey]) return;
-//     this[xhrKey] = null;
+  componentWillReceiveProps(nextProps: Props)
+  {
+    if(nextProps.query.cards !== this.props.query.cards 
+      || nextProps.query.inputs !== this.props.query.inputs)
+    {
+      this.queryResults(nextProps.query);
+      
+      if(nextProps.query.id !== this.props.query.id)
+      {
+        BuilderActions.results(_ResultsState({
+          loading: true,
+        }));
+      }
+    }
     
-//     if(response)
-//     {
-//       if(response.error)
-//       {
-//         if(!isAllFields)
-//         {
-//           this.setState({
-//             error: response.error,
-//           });
-//         }
-//         this.props.onLoadEnd && this.props.onLoadEnd();
-//         return;
-//       }
-      
-//       let results = response.resultSet;
-      
-//       var resultsCount = results.length;
-//       if(resultsCount > MAX_RESULTS)
-//       {
-//         results.splice(MAX_RESULTS, results.length - MAX_RESULTS);
-//       }
-      
-//       if(isAllFields)
-//       {
-//         this.setState({
-//           resultsWithAllFields: results,
-//         });
-//       }
-//       else
-//       {
-//         this.setState({
-//           results,
-//           resultType: 'rel',
-//           querying: false,
-//           error: false,
-//         });
-//       }
-//     }
-//     else
-//     {
-//       this.setState({
-//         error: "No response was returned from the server.",
-//       });
-//     }
+    if(nextProps.resultsState.results !== this.props.resultsState.results)
+    {
+      // update spotlights
+      let config = this.getResultsConfig();
+      SpotlightStore.getState().spotlights.map(
+        (spotlight, id) =>
+        {
+          let resultIndex = nextState.results && nextState.results.findIndex(
+            r => getPrimaryKeyFor(r, config) === id
+          );
+          if(resultIndex !== -1)
+          {
+            spotlightAction(id, _.extend({
+                color: spotlight.color,
+                name: spotlight.name,  
+              }, 
+              nextState.results[resultIndex], 
+              nextState.resultsWithAllFields[resultIndex])
+            );
+          }
+          else
+          {
+            spotlightAction(id, null);
+          } 
+        }
+      );
+    }
+  }
+  
+  handleAllFieldsResponse(response:QueryResponse)
+  {
+    this.handleResultsChange(response, true);
+  }
+  
+  handleCountResponse(response:QueryResponse)
+  {
+    this.setState({
+      countXhr: null,
+    });
+    let results = response.resultSet;
+    if(results)
+    {
+      if(results.length === 1)
+      {
+        this.setState({
+          resultsCount: results[0]['COUNT(*)']
+        });
+      }
+      else if(results.length > 1)
+      {
+        this.setState({
+          resultsCount: results.length,
+        })
+      }
+      else
+      {
+        this.handleCountError();
+      }
+    }
+    else
+    {
+      this.handleCountError();
+    }
+  }
+  
+  handleCountError()
+  {
+    this.setState({
+      countXhr: null,
+      resultsCount: -1,
+    })
+  }
+  
+  handleResultsChange(response:QueryResponse, isAllFields?: boolean)
+  {
+    let xhrKey = isAllFields ? 'allXhr' : 'xhr';
+    this.setState({
+      [xhrKey]: null,
+    });
     
-//     if(!this['xhr'] && !this['allXhr'])
-//     {
-//       // all done with both
-//       this.props.onLoadEnd && this.props.onLoadEnd();
-//     }
-//   }
-  
-//   componentWillUpdate(nextProps, nextState: State)
-//   {
-//     if(nextState.results !== this.state.results 
-//       || nextState.resultsWithAllFields !== this.state.resultsWithAllFields)
-//     {
-//       // update spotlights
-//       let config = this.getResultsConfig();
-//       SpotlightStore.getState().spotlights.map(
-//         (spotlight, id) =>
-//         {
-//           let resultIndex = nextState.results && nextState.results.findIndex(
-//             r => getPrimaryKeyFor(r, config) === id
-//           );
-//           if(resultIndex !== -1)
-//           {
-//             spotlightAction(id, _.extend({
-//                 color: spotlight.color,
-//                 name: spotlight.name,  
-//               }, 
-//               nextState.results[resultIndex], 
-//               nextState.resultsWithAllFields[resultIndex])
-//             );
-//           }
-//           else
-//           {
-//             spotlightAction(id, null);
-//           } 
-//         }
-//       );
-//     }
-//   }
-  
-//   handleError(ev)
-//   {  
-//     this.setState({
-//       error: true,
-//     });
-//     this.props.onLoadEnd && this.props.onLoadEnd();
-//   }
-  
-//   handleAllFieldsError()
-//   {
-//     this.props.onLoadEnd && this.props.onLoadEnd();
-//   }
-  
-//   queryResults(query, pages?: number)
-//   {
-//     if(!pages)
-//     {
-//       pages = this.state.resultFormat === 'icon' ? this.state.resultsPages : 50;
-//     }
-    
-//     if (query.mode === "tql")
-//     {
-//       var tql = query.tql;
-//     }
-//     else 
-//     {
-//       tql = TQLConverter.toTQL(query, {
-//         limit: MAX_RESULTS,
-//       });
-//     }
-//     if(tql !== this.state.tql)
-//     {
-//       this.setState({
-//         querying: true,
-//         tql
-//       });
-      
-//       this.props.onLoadStart && this.props.onLoadStart();
-//       this.xhr && this.xhr.abort();
-//       this.allXhr && this.allXhr.abort();
-      
-//       this.xhr = Ajax.query(tql, query.db, this.handleResultsChange, this.handleError);
-//       if (query.mode === "tql")
-//       {
-//         this.allXhr = Ajax.query(
-//           tql, 
-//           query.db,
-//           this.handleAllFieldsResponse,
-//           this.handleAllFieldsError,
-//           true
-//         );
-//       }
-//       else 
-//       {
-//         this.allXhr = Ajax.query(
-//           TQLConverter.toTQL(query, {
-//             allFields: true,
-//             transformAliases: true,
-//             // limit: pages * RESULTS_PAGE_SIZE,
-//           }), 
-//           query.db,
-//           this.handleAllFieldsResponse,
-//           this.handleAllFieldsError,
-//           true
-//         );
+    if(response)
+    {
+      if(response.error)
+      {
+        if(!isAllFields)
+        {
+          let {error} = response;
+          if(typeof this.state.error === 'string')
+          {
+            if(error.charAt(error.length - 1) === '^')
+            {
+              error = error.substr(0, error.length - 1);
+            }
+            error = this.state.error.replace(/MySQL/g, 'TerrainDB');
+          }
+          
+          this.setState({
+            error,
+          });
+        }
+        else
+        {
+          this.setState({
+            allFieldsError: true,
+          });
+        }
         
-//         this.countXhr = Ajax.query(
-//           TQLConverter.toTQL(query, {
-//             count: true,
-//           }), 
-//           query.db,
-//           this.handleCountResponse,
-//           this.handleCountError
-//         );
-//       }
-
-//     }
-//   }
+        this.props.onLoadEnd && this.props.onLoadEnd();
+        return;
+      }
+      
+      let results = response.resultSet;
+      
+      var resultsCount = results.length;
+      if(resultsCount > MAX_RESULTS)
+      {
+        results.splice(MAX_RESULTS, results.length - MAX_RESULTS);
+      }
+      
+      if(isAllFields)
+      {
+        this.setState({
+          resultsWithAllFields: results,
+        });
+      }
+      else
+      {
+        this.setState({
+          results,
+          resultType: 'rel',
+          error: false,
+        });
+      }
+    }
+    else
+    {
+      // no response
+      if(!isAllFields)
+      {
+        this.setState({
+          error: "No response was returned from the server.",
+        });
+      }
+      else
+      {
+        this.setState({
+          allFieldsError: true,
+        });
+      }
+    }
+  }
   
-// 	render()
-//   {
-//     return (
-//       <div />
-//     );
-// 	}
-// }
-
-// export function getPrimaryKeyFor(result:any, config:IResultsConfig): string
-// {
-//   if(config && config.primaryKeys.size)
-//   {
-//     return config.primaryKeys.map(
-//       field => result[field]
-//     ).join("and");
-//   }
+  handleError(ev)
+  {  
+    this.setState({
+      xhr: null,
+    });
+    this.setState({
+      error: true,
+    });
+    this.props.onLoadEnd && this.props.onLoadEnd();
+  }
   
-//   return "result-" + Math.floor(Math.random() * 100000000);
-// }
+  handleAllFieldsError()
+  {
+    this.setState({
+      allXhr: null,
+    });
+    this.props.onLoadEnd && this.props.onLoadEnd();
+  }
+  
+  queryResults(query, pages?: number)
+  {
+    if(!pages)
+    {
+      pages = this.state.resultFormat === 'icon' ? this.state.resultsPages : 50;
+    }
+    
+    var tql = TQLConverter.toTQL(query, {
+      limit: MAX_RESULTS,
+      replaceInputs: true,
+    });
+    
+    if(tql !== this.state.tql)
+    {
+      this.setState({
+        tql,
+        allFieldsError: false,
+      });
+      
+      this.props.onLoadStart && this.props.onLoadStart();
+      this.state.xhr && this.state.xhr.abort();
+      this.state.allXhr && this.state.allXhr.abort();
+      
+      this.setState({
+        xhr: 
+          Ajax.query(
+            tql, 
+            this.props.db, 
+            this.handleResultsChange, 
+            this.handleError
+          ),
+      });
+      
+      this.setState({
+        allXhr:
+          Ajax.query(
+            TQLConverter.toTQL(query, {
+              allFields: true,
+              transformAliases: true,
+              limit: MAX_RESULTS,
+              replaceInputs: true,
+            }), 
+            this.props.db,
+            this.handleAllFieldsResponse,
+            this.handleAllFieldsError
+          )
+      });
+      
+      this.setState({
+        countXhr: 
+          Ajax.query(
+            TQLConverter.toTQL(query, {
+              count: true,
+              replaceInputs: true,
+            }), 
+            this.props.db,
+            this.handleCountResponse,
+            this.handleCountError
+          ),
+      });
+    }
+  }
+  
+	render()
+  {
+    return (
+      <div />
+    );
+	}
+}
+
+export function getPrimaryKeyFor(result:any, config:IResultsConfig): string
+{
+  if(config && config.primaryKeys.size)
+  {
+    return config.primaryKeys.map(
+      field => result[field]
+    ).join("and");
+  }
+  
+  return "result-" + Math.floor(Math.random() * 100000000);
+}
   
 
-// export default ResultsManager;
+export default ResultsManager;

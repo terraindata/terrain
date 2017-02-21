@@ -58,8 +58,6 @@ interface Props
   tql: string;
   query: BuilderTypes.Query; // may not be necessary once we can pass inputs to TDBD
   onError: (lineNumber: number) => void;
-  onLoadStart: () => void;
-  onLoadEnd: () => void;
   db: string;
   open: boolean;
   onToggle: () => void;
@@ -170,7 +168,6 @@ class TQLResultsBar extends PureClasss<Props>
   
   handleResultsChange(response: QueryResponse)
   {
-    this.props.onLoadEnd && this.props.onLoadEnd();
     if(response.error)
     {
       let {error} = response;
@@ -264,7 +261,6 @@ class TQLResultsBar extends PureClasss<Props>
     {
       if(tql !== this.state.queriedTql)
       {
-        this.props.onLoadStart && this.props.onLoadStart();
         this.setState({
           querying: true,
           limit: 200,

@@ -51,6 +51,7 @@ var Redux = require('redux');
 import {BuilderActionTypes, BuilderDirtyActionTypes, BuilderCardActionTypes} from './BuilderActionTypes.tsx';
 import Util from '../../util/Util.tsx';
 import TQLConverter from '../../tql/TQLConverter.tsx';
+import {ResultsState, _ResultsState} from '../components/results/ResultsManager.tsx';
 
 import BuilderTypes from './../BuilderTypes.tsx';
 import LibraryTypes from './../../library/LibraryTypes.tsx';
@@ -90,6 +91,8 @@ export class BuilderStateClass
   isDirty: boolean = false;
   
   parseTreeReq: XMLHttpRequest = null;
+  
+  resultsState: ResultsState = _ResultsState();
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> {}
 let BuilderState_Record = Immutable.Record(new BuilderStateClass());

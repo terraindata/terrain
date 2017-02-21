@@ -76,7 +76,6 @@ import BuilderColumn from "./BuilderColumn.tsx";
 import {Tabs, TabAction} from "./layout/Tabs.tsx";
 import LayoutManager from "./layout/LayoutManager.tsx";
 import Card from "./cards/Card.tsx";
-import Result from "./results/Result.tsx";
 import Ajax from "./../../util/Ajax.tsx";
 import InfoArea from '../../common/components/InfoArea.tsx';
 import {notificationManager} from './../../common/components/InAppNotification.tsx'
@@ -632,6 +631,7 @@ class Builder extends PureClasss<Props>
       resizeHandleRef: 'resize-handle',
       content: query && <BuilderColumn
         query={query}
+        resultState={this.state.builderState.resultsState}
         index={index}
         colKey={key}
         variant={variant}
