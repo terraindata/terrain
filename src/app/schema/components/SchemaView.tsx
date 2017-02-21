@@ -175,10 +175,11 @@ class SchemaView extends PureClasss<Props>
       			position: 'absolute',
       			left: 0,
       			top: 0,
-      			width: this.props.fullPage ? horizontalDivide + '%' : '100%',
+      			width: this.props.fullPage ? horizontalDivide + '%' : 'calc(100% - 6px)',
       			height: this.props.fullPage ? '100%' : verticalDivide + '%',
       			overflow: 'auto',
       			padding: Styles.margin,
+      			boxSizing: 'border-box',
       		}}
       	>
       		{
