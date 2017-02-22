@@ -73,7 +73,7 @@ export type Result = ResultClass & IRecord<ResultClass>;
 let _Result = (config: Object = {}) => 
   New<Result>(new ResultClass(config), config);
 
-export type Results = List<ResultClass>;
+export type Results = List<Result>;
 
 export class ResultsState extends BaseClass
 {

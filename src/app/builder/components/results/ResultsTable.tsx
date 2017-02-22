@@ -114,8 +114,8 @@ export default class ResultsTable extends PureClasss<Props>
   getValue(i: number, col: number): El
   {
     let field = this.getKey(col);
-    let {results, resultsWithAllFields, resultsConfig} = this.props;
-    let primaryKey = getPrimaryKeyFor(results && results[i], resultsConfig);
+    let {results, resultsConfig} = this.props;
+    let primaryKey = getPrimaryKeyFor(results && results.get(i), resultsConfig);
     let spotlight = col === 0
       && this.state.spotlightState 
       && this.state.spotlightState.getIn(['spotlights', primaryKey]);
@@ -132,8 +132,7 @@ export default class ResultsTable extends PureClasss<Props>
             />
         }
         {
-          getResultValue(results && results[i], 
-            resultsWithAllFields && resultsWithAllFields[i], field, resultsConfig)
+          getResultValue(results && results.get(i), field, resultsConfig)
         }
       </div>
     );
@@ -156,15 +155,15 @@ export default class ResultsTable extends PureClasss<Props>
   
   spotlight(menuIndex: number, rc: string)
   {
+    // TODO
     let row = rc.split('-')[0];
     let col = rc.split('-')[1];
-    let result = this.props.results && this.props.results[row];
-    let allFieldsResult = this.props.resultsWithAllFields && this.props.resultsWithAllFields[row];
+    let result = this.props.results && this.props.results.get(+row);
     let id = getPrimaryKeyFor(result, this.props.resultsConfig);
     let spotlightColor = ColorManager.colorForKey(id);
     
-    let spotlightData = _.extend({}, result, allFieldsResult);
-    spotlightData['name'] = getResultName(result, allFieldsResult, this.props.resultsConfig);
+    let spotlightData = _.extend({}, result);
+    spotlightData['name'] = getResultName(result, this.props.resultsConfig);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightAction(id, spotlightData);
@@ -172,7 +171,7 @@ export default class ResultsTable extends PureClasss<Props>
   
   render()
   {
-    if(!this.props.results || !this.props.resultsWithAllFields)
+    if(!this.props.results)
     {
       return <InfoArea large='Loading...' />;
     }
@@ -185,7 +184,7 @@ export default class ResultsTable extends PureClasss<Props>
         getKey={this.getKey}
         getValue={this.getValue}
         colCount={fieldCount}
-        rowCount={this.props.results.length}
+        rowCount={this.props.results.size}
         pinnedCols={pinnedCols}
         random={this.state.random}
         onCellClick={this.handleCellClick}
