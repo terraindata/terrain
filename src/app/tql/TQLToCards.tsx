@@ -208,16 +208,6 @@ const generalProcessors: {
       return node.left_child + '.' + node.right_child;
     },
   
-  '-':
-    (node) =>
-    {
-      if(node.child)
-      {
-        return '-' + parseNode(node.child);
-      }
-      return parseNode(node.left_child) + ' - ' + parseNode  (node.right_child);
-    },
-  
   CALL:
     (node) =>
     {
@@ -386,25 +376,64 @@ const generalProcessors: {
   
   '+':
     (node) =>
+      parseMathNode(node, '+', Blocks.add),
+  
+  '-':
+    (node) =>
     {
-      let nodes = flattenOp('+', node);
-      let fields = nodes.map(parseNode);
-      return make(
-        Blocks.add,
+      // could be negative, or could be subract
+      if(node.child)
+      {
+        // negative
+        let contents = parseNode(node.child);
+        if(typeof contents === 'string')
         {
-          fields: List(fields),
+          return '-' + contents;
         }
-      );
+        
+        return make(Blocks.subtract,
+        {
+          fields: List([
+            make(Blocks.field, {
+              field: '0',
+            }),
+            make(Blocks.field, {
+              field: contents,
+            }),
+          ]),
+        });
+      }
+      return parseMathNode(node, '-', Blocks.subtract);
     },
   
   '*':
     (node) =>
-      parseNode(node.left_child) + ' * ' + parseNode(node.right_child),
+      parseMathNode(node, '*', Blocks.multiply),
   
   '/':
     (node) =>
-      parseNode(node.left_child) + ' / ' + parseNode(node.right_child),
+      parseMathNode(node, '/', Blocks.divide),
+
 };
+
+function parseMathNode(node:Node, op: string, mathCardBlock): Card
+{
+  let nodes = flattenOp(op, node);
+  let fields = nodes.map(parseNode).map(
+    fieldValue =>
+      make(Blocks.field,
+      {
+        field: fieldValue,
+      })
+  );
+  
+  return make(
+    mathCardBlock,
+    {
+      fields: List(fields),
+    }
+  );
+}
 
 const comparisonProcessors = _.reduce(
   BuilderTypes.OperatorTQL,

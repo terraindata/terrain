@@ -600,7 +600,13 @@ export module BuilderTypes
         manualEntry: null,
         colors: config.colors,
         title: config.title,
-        preview: "[fields.field]",
+        preview: 
+          (card) =>
+            card['fields'].map(
+              field =>
+                typeof field.field !== 'object' ? field.field : getPreview(field.field)
+            ).join(config.tqlGlue),
+            
         tql: "($fields )",
         tqlGlue: config.tqlGlue,
         
@@ -1779,7 +1785,6 @@ export module BuilderTypes
     {
       return preview(card);
     }
-    
     return 'No preview';
   }  
   
