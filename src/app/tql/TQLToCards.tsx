@@ -386,7 +386,7 @@ const generalProcessors: {
       {
         // negative
         let contents = parseNode(node.child);
-        if(typeof contents === 'string')
+        if(typeof contents !== 'object')
         {
           return '-' + contents;
         }
