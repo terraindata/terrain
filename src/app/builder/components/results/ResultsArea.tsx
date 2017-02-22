@@ -598,33 +598,40 @@ column if you have set a custom results view.');
           ),
       });
       
-      this.setState({
-        allXhr:
-          Ajax.query(
-            TQLConverter.toTQL(query, {
-              allFields: true,
-              transformAliases: true,
-              limit: MAX_RESULTS,
-              replaceInputs: true,
-            }), 
-            this.props.db,
-            this.handleAllFieldsResponse,
-            this.handleAllFieldsError
-          )
-      });
+      if(!query.cards.get(0).cards.some(
+        card => card.type === 'groupBy'
+        ))
+      {
+        // temporary, don't dispatch select * if has group by
+        this.setState({
+          allXhr:
+            Ajax.query(
+              TQLConverter.toTQL(query, {
+                allFields: true,
+                transformAliases: true,
+                limit: MAX_RESULTS,
+                replaceInputs: true,
+              }), 
+              this.props.db,
+              this.handleAllFieldsResponse,
+              this.handleAllFieldsError
+            )
+        });
+      }
       
-      this.setState({
-        countXhr: 
-          Ajax.query(
-            TQLConverter.toTQL(query, {
-              count: true,
-              replaceInputs: true,
-            }), 
-            this.props.db,
-            this.handleCountResponse,
-            this.handleCountError
-          ),
-      });
+      // temporarily disable count
+      // this.setState({
+      //   countXhr: 
+      //     Ajax.query(
+      //       TQLConverter.toTQL(query, {
+      //         count: true,
+      //         replaceInputs: true,
+      //       }), 
+      //       this.props.db,
+      //       this.handleCountResponse,
+      //       this.handleCountError
+      //     ),
+      // });
     }
   }
   
@@ -642,7 +649,13 @@ column if you have set a custom results view.');
   
   renderTopbar()
   {
-    let count = this.state.resultsCount !== -1 ? this.state.resultsCount : (this.state.results ? this.state.results.length : 0);
+    // let count = this.state.resultsCount !== -1 ? this.state.resultsCount : (this.state.results ? this.state.results.length : 0);
+    // TODO temporary
+    let count: string | number = this.state.results ? this.state.results.length : 0;
+    if(count === MAX_RESULTS)
+    {
+      count = count + '+';
+    }
     return (
       <div className='results-top'>
         <div className='results-top-summary'>
