@@ -53,7 +53,7 @@ var addTabs = (str) => " " + str.replace(/\n/g, "\n ");
 var removeBlanks = (str) => str.replace(/\n[ \t]*\n/g, "\n");
 type PatternFn = (obj: any, index?: number, isLast?: boolean) => string;
 
-import { BuilderTypes } from "../builder/BuilderTypes.tsx";
+import { BuilderTypes } from "../builder/BuilderTypes";
 
 export interface Options {
   allFields?: boolean; // amend the final Select card to include all possible fields.

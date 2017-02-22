@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 var _ = require('underscore');
 var Immutable = require('immutable');
-import Util from './../../util/Util.tsx';
+import Util from './../../util/Util';
 
 var create = '';
 var change = '';

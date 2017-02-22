@@ -42,9 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import BuilderTypes from './BuilderTypes.tsx';
+import BuilderTypes from './BuilderTypes';
 import * as Immutable from 'immutable';
-import {BuilderStore, BuilderState} from './data/BuilderStore.tsx';
+import {BuilderStore, BuilderState} from './data/BuilderStore';
 
 export module BuilderHelpers
 {

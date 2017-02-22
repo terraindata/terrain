@@ -45,12 +45,12 @@ THE SOFTWARE.
 require('./AccountDropdown.less')
 import * as $ from 'jquery';
 import * as React from 'react';
-import Actions from "../../builder/data/BuilderActions.tsx";
-import Util from '../../util/Util.tsx';
-import Classs from '../../common/components/Classs.tsx';
-import UserThumbnail from '../../users/components/UserThumbnail.tsx';
-import AuthStore from '../../auth/data/AuthStore.tsx';
-import UserTypes from '../../users/UserTypes.tsx';
+import Actions from "../../builder/data/BuilderActions";
+import Util from '../../util/Util';
+import Classs from '../../common/components/Classs';
+import UserThumbnail from '../../users/components/UserThumbnail';
+import AuthStore from '../../auth/data/AuthStore';
+import UserTypes from '../../users/UserTypes';
 import { Link } from 'react-router';
 const {browserHistory} = require('react-router');
 

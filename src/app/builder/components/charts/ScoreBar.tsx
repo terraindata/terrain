@@ -45,8 +45,8 @@ THE SOFTWARE.
 require('./ScoreBar.less');
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import BuilderTypes from '../../BuilderTypes.tsx';
-import PureClasss from './../../../common/components/PureClasss.tsx';
+import BuilderTypes from '../../BuilderTypes';
+import PureClasss from './../../../common/components/PureClasss';
 
 var BORDER_RADIUS = '5px';
 var SCORE_COLORS = 

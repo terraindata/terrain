@@ -45,11 +45,11 @@ THE SOFTWARE.
 require('./CreateCardTool.less')
 import * as _ from 'underscore';
 import * as React from 'react';
-import Actions from "../../data/BuilderActions.tsx";
-import Util from '../../../util/Util.tsx';
-import BuilderTypes from './../../BuilderTypes.tsx';
-import PureClasss from '../../../common/components/PureClasss.tsx';
-import CardDropArea from './CardDropArea.tsx';
+import Actions from "../../data/BuilderActions";
+import Util from '../../../util/Util';
+import BuilderTypes from './../../BuilderTypes';
+import PureClasss from '../../../common/components/PureClasss';
+import CardDropArea from './CardDropArea';
 
 const cardsOrdering: string[] = 
   _.flatten(BuilderTypes.CardsDeckOrdering)

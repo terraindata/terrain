@@ -43,13 +43,13 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
-import ActionTypes from './UserActionTypes.tsx';
-import Actions from './UserActions.tsx';
-import Util from './../../util/Util.tsx';
-import Ajax from './../../util/Ajax.tsx';
-import UserTypes from './../UserTypes.tsx';
+import ActionTypes from './UserActionTypes';
+import Actions from './UserActions';
+import Util from './../../util/Util';
+import Ajax from './../../util/Ajax';
+import UserTypes from './../UserTypes';
 
-import AuthStore from './../../auth/data/AuthStore.tsx';
+import AuthStore from './../../auth/data/AuthStore';
 AuthStore.subscribe(Actions.updateCurrentUser);
 
 var Immutable = require('immutable');

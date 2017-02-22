@@ -48,10 +48,10 @@ import * as moment from 'moment';
 import * as Immutable from 'immutable';
 var ReactDayPicker = require('react-day-picker').default;
 var DateUtils = require('react-day-picker').DateUtils;
-import Util from '../../util/Util.tsx';
-import Dropdown from './Dropdown.tsx';
-import LayoutManager from './../../builder/components/layout/LayoutManager.tsx';
-import PureClasss from '../../common/components/PureClasss.tsx';
+import Util from '../../util/Util';
+import Dropdown from './Dropdown';
+import LayoutManager from './../../builder/components/layout/LayoutManager';
+import PureClasss from '../../common/components/PureClasss';
 
 var MINUTE_INTERVAL = 30;
 var MINUTE_RATIO = (60 / MINUTE_INTERVAL);

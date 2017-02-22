@@ -49,10 +49,10 @@ let List = Immutable.List;
 let L = () => List([]);
 let Map = Immutable.Map;
 
-import TransformCardComponent from './components/charts/TransformCard.tsx';
-import ScoreBar from './components/charts/ScoreBar.tsx';
-import Store from './data/BuilderStore.tsx';
-import Util from '../util/Util.tsx';
+import TransformCardComponent from './components/charts/TransformCard';
+import ScoreBar from './components/charts/ScoreBar';
+import Store from './data/BuilderStore';
+import Util from '../util/Util';
 
 // These have to be above the BuilderDisplays import
 //  since the import itself imports them
@@ -60,7 +60,7 @@ export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>, 'like'];
 
-import {Display, DisplayType, valueDisplay, letVarDisplay, getCardStringDisplay, firstSecondDisplay, wrapperDisplay, wrapperSingleChildDisplay, stringValueDisplay} from './BuilderDisplays.tsx';  
+import {Display, DisplayType, valueDisplay, letVarDisplay, getCardStringDisplay, firstSecondDisplay, wrapperDisplay, wrapperSingleChildDisplay, stringValueDisplay} from './BuilderDisplays';  
 var ManualConfig = require('./../manual/ManualConfig.json');
 
 export module BuilderTypes
@@ -592,7 +592,13 @@ export module BuilderTypes
         manualEntry: null,
         colors: config.colors,
         title: config.title,
-        preview: "[fields.field]",
+        preview: 
+          (card) =>
+            card['fields'].map(
+              field =>
+                typeof field.field !== 'object' ? field.field : getPreview(field.field)
+            ).join(config.tqlGlue),
+            
         tql: "($fields )",
         tqlGlue: config.tqlGlue,
         
@@ -1762,7 +1768,6 @@ export module BuilderTypes
     {
       return preview(card);
     }
-    
     return 'No preview';
   }  
   
@@ -1843,10 +1848,10 @@ export module BuilderTypes
   }
 }
 
-import Actions from './data/BuilderActions.tsx';
-import {IResultsConfig, _IResultsConfig} from "./components/results/ResultsConfig.tsx";
+import Actions from './data/BuilderActions';
+import {IResultsConfig, _IResultsConfig} from "./components/results/ResultsConfig";
 
 export default BuilderTypes;
 
-import TQLToCards from '../tql/TQLToCards.tsx';
-import TQLConverter from '../tql/TQLConverter.tsx';
+import TQLToCards from '../tql/TQLToCards';
+import TQLConverter from '../tql/TQLConverter';

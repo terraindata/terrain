@@ -46,15 +46,15 @@ var _ = require('underscore');
 import * as Immutable from 'immutable';
 import { Map, List } from 'immutable';
 import * as ReduxActions from 'redux-actions';
-import {CardItem} from '../components/cards/Card.tsx';
+import {CardItem} from '../components/cards/Card';
 var Redux = require('redux');
-import {BuilderActionTypes, BuilderDirtyActionTypes, BuilderCardActionTypes} from './BuilderActionTypes.tsx';
-import Util from '../../util/Util.tsx';
-import TQLConverter from '../../tql/TQLConverter.tsx';
-import {ResultsState, _ResultsState} from '../components/results/ResultsManager.tsx';
+import {BuilderActionTypes, BuilderDirtyActionTypes, BuilderCardActionTypes} from './BuilderActionTypes';
+import Util from '../../util/Util';
+import TQLConverter from '../../tql/TQLConverter';
+import {ResultsState, _ResultsState} from '../components/results/ResultsManager';
 
-import BuilderTypes from './../BuilderTypes.tsx';
-import LibraryTypes from './../../library/LibraryTypes.tsx';
+import BuilderTypes from './../BuilderTypes';
+import LibraryTypes from './../../library/LibraryTypes';
 
 export class BuilderStateClass
 {
@@ -102,7 +102,7 @@ let _BuilderState = (config?:any) => {
 
 var DefaultState = _BuilderState();
 
-import BuilderReducers from './BuilderReducers.tsx';
+import BuilderReducers from './BuilderReducers';
 
 export const BuilderStore: IStore<BuilderState> = Redux.createStore(
   (

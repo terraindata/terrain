@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
-import ActionTypes from './AuthActionTypes.tsx';
+import ActionTypes from './AuthActionTypes';
 var Immutable = require('immutable');
 
 let AuthReducer = {};

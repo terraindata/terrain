@@ -46,10 +46,10 @@ require('./ManualPopup.less');
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
-import Util from '../../util/Util.tsx';
+import Util from '../../util/Util';
 import * as classNames from 'classnames';
-import Classs from './../../common/components/Classs.tsx';
-import Manual from './Manual.tsx';
+import Classs from './../../common/components/Classs';
+import Manual from './Manual';
 import { DragDropContext } from 'react-dnd';
 var HTML5Backend = require('react-dnd-html5-backend');
 

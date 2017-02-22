@@ -48,12 +48,12 @@ let {List,Map} = Immutable;
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
-import Util from '../../../util/Util.tsx';
-import Ajax from '../../../util/Ajax.tsx';
-import Result from "../results/Result.tsx";
-import InfoArea from '../../../common/components/InfoArea.tsx';
-import PureClasss from './../../../common/components/PureClasss.tsx';
-import Switch from './../../../common/components/Switch.tsx';
+import Util from '../../../util/Util';
+import Ajax from '../../../util/Ajax';
+import Result from "../results/Result";
+import InfoArea from '../../../common/components/InfoArea';
+import PureClasss from './../../../common/components/PureClasss';
+import Switch from './../../../common/components/Switch';
 import { DragSource, DropTarget } from 'react-dnd';
 import {Results, MAX_RESULTS} from './ResultsManager.tsx';
 

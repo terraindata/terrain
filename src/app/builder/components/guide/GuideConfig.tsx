@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
-import {EScreen, EExpressionType} from './Guide.tsx';
+import {EScreen, EExpressionType} from './Guide';
 
 
 export enum EScreenType

@@ -49,7 +49,7 @@ import * as ReactDOM from "react-dom";
 import * as Immutable from "immutable";
 import * as _ from 'underscore';
 
-import LibraryTypes from './../library/LibraryTypes.tsx';
+import LibraryTypes from './../library/LibraryTypes';
 
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 const suffixes = ['', ' k', ' M', ' B'];

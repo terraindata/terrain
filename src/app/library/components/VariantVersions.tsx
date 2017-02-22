@@ -45,16 +45,16 @@ THE SOFTWARE.
 require('./VariantVersions.less');
 const classNames = require('classnames');
 import * as React from 'react';
-import PureClasss from './../../common/components/PureClasss.tsx';
-import LibraryTypes from './../LibraryTypes.tsx';
-import UserThumbnail from './../../users/components/UserThumbnail.tsx';
-import UserTypes from './../../users/UserTypes.tsx';
-import UserStore from './../../users/data/UserStore.tsx';
-import Ajax from './../../util/Ajax.tsx';
-import Util from './../../util/Util.tsx';
+import PureClasss from './../../common/components/PureClasss';
+import LibraryTypes from './../LibraryTypes';
+import UserThumbnail from './../../users/components/UserThumbnail';
+import UserTypes from './../../users/UserTypes';
+import UserStore from './../../users/data/UserStore';
+import Ajax from './../../util/Ajax';
+import Util from './../../util/Util';
 import * as moment from 'moment';
-import RoleTypes from '../../roles/RoleTypes.tsx';
-import RolesStore from '../../roles/data/RolesStore.tsx';
+import RoleTypes from '../../roles/RoleTypes';
+import RolesStore from '../../roles/data/RolesStore';
 const {browserHistory} = require('react-router');
 
 type Variant = LibraryTypes.Variant;

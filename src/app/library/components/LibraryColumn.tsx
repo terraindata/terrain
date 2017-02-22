@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./LibraryColumn.less');
 
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
+import Classs from './../../common/components/Classs';
 import * as classNames from 'classnames';
 
 interface Props

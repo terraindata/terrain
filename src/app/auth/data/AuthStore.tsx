@@ -46,9 +46,9 @@ var _ = require('underscore');
 var Immutable = require('immutable');
 var Redux = require('redux');
 import * as ReduxActions from 'redux-actions';
-import ActionTypes from './AuthActionTypes.tsx';
+import ActionTypes from './AuthActionTypes';
 
-import AuthReducers from './AuthReducers.tsx';
+import AuthReducers from './AuthReducers';
 
 let AuthStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   AuthReducers,

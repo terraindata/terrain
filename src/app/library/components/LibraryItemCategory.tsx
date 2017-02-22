@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./LibraryItemCategory.less');
 
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
+import Classs from './../../common/components/Classs';
 import { DragSource, DropTarget } from 'react-dnd';
 
 interface Props

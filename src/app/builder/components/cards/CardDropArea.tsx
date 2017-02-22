@@ -46,13 +46,13 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 require('./CardDropArea.less');
 import * as React from 'react';
-import PureClasss from '../../../common/components/PureClasss.tsx';
+import PureClasss from '../../../common/components/PureClasss';
 import { DropTarget } from 'react-dnd';
 const classNames = require('classnames');
-import { CardItem } from './Card.tsx';
-import Actions from "../../data/BuilderActions.tsx";
-import BuilderTypes from '../../BuilderTypes.tsx';
-import Store from '../../data/BuilderStore.tsx';
+import { CardItem } from './Card';
+import Actions from "../../data/BuilderActions";
+import BuilderTypes from '../../BuilderTypes';
+import Store from '../../data/BuilderStore';
 
 export const cardWillWrap = (targetProps:Props, cardType:string) =>
 {
@@ -124,7 +124,7 @@ export const onCardDrop = (targetProps:Props, monitor, component) =>
 };
 
 // needs to be below above function on which it depends
-import CardDragPreview from './CardDragPreview.tsx';
+import CardDragPreview from './CardDragPreview';
 
 interface Props
 {

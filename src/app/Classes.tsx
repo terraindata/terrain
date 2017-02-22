@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as Immutable from 'immutable';
-import Util from './util/Util.tsx';
+import Util from './util/Util';
 
 export class BaseClass
 {

@@ -42,8 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import Util from '../../../util/Util.tsx';
-import Classs from './../../../common/components/Classs.tsx';
+import Util from '../../../util/Util';
+import Classs from './../../../common/components/Classs';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 

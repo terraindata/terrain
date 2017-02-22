@@ -44,20 +44,20 @@ THE SOFTWARE.
 
 require('./Library.less');
 import * as React from 'react';
-import PureClasss from './../../common/components/PureClasss.tsx';
-import Store from './../data/LibraryStore.tsx';
-import {LibraryState} from './../data/LibraryStore.tsx';
-import Actions from './../data/LibraryActions.tsx';
-import RolesActions from './../../roles/data/RolesActions.tsx';
-import UserActions from './../../users/data/UserActions.tsx';
-import LibraryTypes from './../LibraryTypes.tsx';
-import GroupsColumn from './GroupsColumn.tsx';
-import AlgorithmsColumn from './AlgorithmsColumn.tsx';
-import VariantsColumn from './VariantsColumn.tsx';
-import LibraryInfoColumn from './LibraryInfoColumn.tsx';
+import PureClasss from './../../common/components/PureClasss';
+import Store from './../data/LibraryStore';
+import {LibraryState} from './../data/LibraryStore';
+import Actions from './../data/LibraryActions';
+import RolesActions from './../../roles/data/RolesActions';
+import UserActions from './../../users/data/UserActions';
+import LibraryTypes from './../LibraryTypes';
+import GroupsColumn from './GroupsColumn';
+import AlgorithmsColumn from './AlgorithmsColumn';
+import VariantsColumn from './VariantsColumn';
+import LibraryInfoColumn from './LibraryInfoColumn';
 import { DragDropContext } from 'react-dnd';
-import InfoArea from './../../common/components/InfoArea.tsx';
-import Loading from './../../common/components/Loading.tsx';
+import InfoArea from './../../common/components/InfoArea';
+import Loading from './../../common/components/Loading';
 var HTML5Backend = require('react-dnd-html5-backend');
 const {browserHistory} = require('react-router');
 

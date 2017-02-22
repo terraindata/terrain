@@ -28,7 +28,7 @@ As TerrainDB is not yet ready to be used end-to-end with Terraformer, we current
 
 ## Setup
 
-1. Install `midway` and `tiny` and get them up and running with Docker.
+1. Install and run `midway` (optional)
 1. Install Homebrew
   `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
 1. Install Node
@@ -36,21 +36,13 @@ As TerrainDB is not yet ready to be used end-to-end with Terraformer, we current
 1. Install npm
   `brew install npm`
 1. `npm install`
-1. `npm run start-docker` - dev server now running at [localhost:8080](localhost:8080).
-1. Default user login: `luser` / `secret`
+1. `npm install -g tsd`
+1. `npm install -g babel`
+1. `npm run start-local` (with local midway) or `npm start` (without midway) - dev server now running at [localhost:8080](localhost:8080).
+1. Default user login: `luser` / `secret` (for local midway) or ask Luke for your hosted account details (without midway)
 1. Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans]
 
 Whenever new packages are installed from branches merged to master, run `npm install` locally.
-
-## Running with Midway (via Docker)
-
-1. Install Docker and Docker Compose (these are both included in the [Docker Toolbox for Mac](https://docs.docker.com/mac/step_one/)).
-1. Clone [Midway](http://git.terrain.int/terrain/midway).
-1. In Midway's directory, run `make docker`.
-1. Clone [Tiny](http://git.terrain.int/rbeerman/tiny).
-1. In Tiny's directory, run `docker build --tag=tiny .`.
-1. In this directory, run `docker-compose up`. (NOTE: This launches a long-running process that takes over your terminal, so subsequent commands must be run in new terminals.)
-1. Also in this directory, run `MIDWAY_HOST=$(docker-machine ip default) npm run start-docker` if on OS X. If on Linux, `MIDWAY_HOST=localhost npm run start-docker` may work instead, but I have not tested that.
 
 ## Major Dependencies
 

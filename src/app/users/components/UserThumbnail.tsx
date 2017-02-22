@@ -44,12 +44,12 @@ THE SOFTWARE.
 
 require('./UserThumbnail.less');
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
+import Classs from './../../common/components/Classs';
 import { Link } from 'react-router';
 import * as classNames from 'classnames';
-import UserTypes from './../UserTypes.tsx';
-import UserStore from './../data/UserStore.tsx';
-import ColorManager from './../../util/ColorManager.tsx';
+import UserTypes from './../UserTypes';
+import UserStore from './../data/UserStore';
+import ColorManager from './../../util/ColorManager';
 
 type User = UserTypes.User;
 

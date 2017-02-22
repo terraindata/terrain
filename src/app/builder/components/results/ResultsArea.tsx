@@ -49,21 +49,22 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as moment from 'moment';
-import Util from '../../../util/Util.tsx';
-import {Ajax, QueryResponse} from '../../../util/Ajax.tsx';
-import PanelMixin from '../layout/PanelMixin.tsx';
-import Actions from "../../data/BuilderActions.tsx";
-import Result from "../results/Result.tsx";
-import ResultsTable from "../results/ResultsTable.tsx";
-import {IResultsConfig, DefaultIResultsConfig, ResultsConfig} from "../results/ResultsConfig.tsx";
-import InfoArea from '../../../common/components/InfoArea.tsx';
-import TQLConverter from "../../../tql/TQLConverter.tsx";
-import PureClasss from './../../../common/components/PureClasss.tsx';
-import InfiniteScroll from './../../../common/components/InfiniteScroll.tsx';
-import Switch from './../../../common/components/Switch.tsx';
-import BuilderTypes from '../../BuilderTypes.tsx';
-import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore.tsx';
-import {ResultsState, MAX_RESULTS} from './ResultsManager.tsx';
+
+import Util from '../../../util/Util';
+import {Ajax, QueryResponse} from '../../../util/Ajax';
+import PanelMixin from '../layout/PanelMixin';
+import Actions from "../../data/BuilderActions";
+import Result from "../results/Result";
+import ResultsTable from "../results/ResultsTable";
+import {IResultsConfig, DefaultIResultsConfig, ResultsConfig} from "../results/ResultsConfig";
+import InfoArea from '../../../common/components/InfoArea';
+import TQLConverter from "../../../tql/TQLConverter";
+import PureClasss from './../../../common/components/PureClasss';
+import InfiniteScroll from './../../../common/components/InfiniteScroll';
+import Switch from './../../../common/components/Switch';
+import BuilderTypes from '../../BuilderTypes';
+import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore';
+import {ResultsState, MAX_RESULTS} from './ResultsManager';
 
 const RESULTS_PAGE_SIZE = 20;
 

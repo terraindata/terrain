@@ -48,18 +48,18 @@ import * as _ from 'underscore';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import Util from '../../../util/Util.tsx';
-import Actions from "../../data/BuilderActions.tsx";
-import {BuilderStore, BuilderState} from "../../data/BuilderStore.tsx";
-import {Card, CardItem} from "../cards/Card.tsx";
-import CreateCardTool from "./CreateCardTool.tsx";
-import PureClasss from './../../../common/components/PureClasss.tsx';
-import BuilderTypes from '../../BuilderTypes.tsx';
+import Util from '../../../util/Util';
+import Actions from "../../data/BuilderActions";
+import {BuilderStore, BuilderState} from "../../data/BuilderStore";
+import {Card, CardItem} from "../cards/Card";
+import CreateCardTool from "./CreateCardTool";
+import PureClasss from './../../../common/components/PureClasss';
+import BuilderTypes from '../../BuilderTypes';
 type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
 let {List} = Immutable;
-import CardDropArea from './CardDropArea.tsx';
-import CardDragPreview from './CardDragPreview.tsx';
+import CardDropArea from './CardDropArea';
+import CardDragPreview from './CardDragPreview';
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 
 interface Props

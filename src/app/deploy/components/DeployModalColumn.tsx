@@ -42,15 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import PureClasss from './../../common/components/PureClasss.tsx';
+import PureClasss from './../../common/components/PureClasss';
 import * as React from 'react';
 import * as classNames from 'classnames';
-import Util from  '../../util/Util.tsx';
-import UserThumbnail from '../../users/components/UserThumbnail.tsx';
+import Util from  '../../util/Util';
+import UserThumbnail from '../../users/components/UserThumbnail';
 
-import LibraryStore from '../../library/data/LibraryStore.tsx';
-import BuilderTypes from '../../builder/BuilderTypes.tsx';
-import LibraryTypes from '../../library/LibraryTypes.tsx';
+import LibraryStore from '../../library/data/LibraryStore';
+import BuilderTypes from '../../builder/BuilderTypes';
+import LibraryTypes from '../../library/LibraryTypes';
 
 var GroupIcon = require('./../../../images/icon_badgeGroup.svg');
 var AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');

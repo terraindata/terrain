@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as React from 'react';
-import Classs from './Classs.tsx';
-import BuilderTypes from '../../builder/BuilderTypes.tsx';
+import Classs from './Classs';
+import BuilderTypes from '../../builder/BuilderTypes';
 const shallowCompare = require('react-addons-shallow-compare');
 
 class PureClasss<T> extends Classs<T>

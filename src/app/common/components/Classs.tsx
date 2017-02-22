@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import Util from '../../util/Util.tsx';
+import Util from '../../util/Util';
 
 // type StoreKeyPath = string[] | (() => string[]);
 interface Config

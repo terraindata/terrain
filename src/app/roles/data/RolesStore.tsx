@@ -46,9 +46,9 @@ var _ = require('underscore');
 var Immutable = require('immutable');
 var Redux = require('redux');
 import * as ReduxActions from 'redux-actions';
-import ActionTypes from './RolesActionTypes.tsx';
+import ActionTypes from './RolesActionTypes';
 
-import RolesReducers from './RolesReducers.tsx';
+import RolesReducers from './RolesReducers';
 
 let RolesStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   RolesReducers,

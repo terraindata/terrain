@@ -45,14 +45,14 @@ THE SOFTWARE.
 /*
 How to use Notifications:
 In App.tsx: 
-import {InAppNotification} from './common/components/InAppNotification.tsx'
+import {InAppNotification} from './common/components/InAppNotification'
 render()
   ...
   <InAppNotification />
   ...
 
 Anywhere you want to trigger notifications from:
-import {notificationManager} from 'path/InAppNotification.tsx'
+import {notificationManager} from 'path/InAppNotification'
 
 addNotification()
   notificationManager.addNotification("message", type ("info" or "error"), timeOut (optional, 0=no timeout));
@@ -63,7 +63,7 @@ render()
   ...
 */
 
-import Classs from './../../common/components/Classs.tsx';
+import Classs from './../../common/components/Classs';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 var NotificationSystem = require('./notification-system/NotificationSystem');

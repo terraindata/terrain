@@ -48,8 +48,8 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import PureClasss from '../../common/components/PureClasss.tsx';
-import Util from '../../util/Util.tsx';
+import PureClasss from '../../common/components/PureClasss';
+import Util from '../../util/Util';
 
 const Sprites = require("./../../../images/spritesheet_terrainLoading.png");
 

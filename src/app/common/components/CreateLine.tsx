@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 require('./CreateLine.less')
 import * as React from 'react';
-import Util from '../../util/Util.tsx';
-import PureClasss from '../../common/components/PureClasss.tsx';
+import Util from '../../util/Util';
+import PureClasss from '../../common/components/PureClasss';
 
 var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");

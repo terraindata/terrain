@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./X.less');
 import * as React from 'react';
 import * as _ from 'underscore';
-import Classs from './../../common/components/Classs.tsx';
+import Classs from './../../common/components/Classs';
 import { Link } from 'react-router';
 
 

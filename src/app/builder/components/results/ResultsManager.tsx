@@ -46,15 +46,15 @@ import * as Immutable from 'immutable';
 const {Map,List} = Immutable;
 import * as _ from 'underscore';
 import * as React from 'react';
-import Util from '../../../util/Util.tsx';
-import {Ajax, QueryResponse} from '../../../util/Ajax.tsx';
-import {IResultsConfig, DefaultIResultsConfig, ResultsConfig} from "../results/ResultsConfig.tsx";
-import TQLConverter from "../../../tql/TQLConverter.tsx";
-import BuilderTypes from '../../BuilderTypes.tsx';
-import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore.tsx';
-import {BaseClass, New} from '../../../Classes.tsx';
-import PureClasss from './../../../common/components/PureClasss.tsx';
-import BuilderActions from '../../data/BuilderActions.tsx';
+import Util from '../../../util/Util';
+import {Ajax, QueryResponse} from '../../../util/Ajax';
+import {IResultsConfig, DefaultIResultsConfig, ResultsConfig} from "../results/ResultsConfig";
+import TQLConverter from "../../../tql/TQLConverter";
+import BuilderTypes from '../../BuilderTypes';
+import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore';
+import {BaseClass, New} from '../../../Classes';
+import PureClasss from './../../../common/components/PureClasss';
+import BuilderActions from '../../data/BuilderActions';
 
 export const MAX_RESULTS = 200;
 

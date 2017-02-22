@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import RoleTypes from './../roles/RoleTypes.tsx';
+import RoleTypes from './../roles/RoleTypes';
 import * as Immutable from 'immutable';
 
 export module UserTypes

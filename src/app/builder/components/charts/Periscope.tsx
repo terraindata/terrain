@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./Periscope.less');
 
 import * as d3 from 'd3';
-import Util from '../../../util/Util.tsx';
+import Util from '../../../util/Util';
 
 var xMargin = 45;
 // var yMargin = 15;

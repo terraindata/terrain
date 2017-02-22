@@ -46,12 +46,12 @@ require('./TQLResultsBar.less');
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
-import Util from '../../util/Util.tsx';
-import {Ajax, QueryResponse} from '../../util/Ajax.tsx';
-import Actions from "../../builder/data/BuilderActions.tsx";
-import TQLConverter from "../../tql/TQLConverter.tsx";
-import PureClasss from './../../common/components/PureClasss.tsx';
-import BuilderTypes from '../../builder/BuilderTypes.tsx';
+import Util from '../../util/Util';
+import {Ajax, QueryResponse} from '../../util/Ajax';
+import Actions from "../../builder/data/BuilderActions";
+import TQLConverter from "../../tql/TQLConverter";
+import PureClasss from './../../common/components/PureClasss';
+import BuilderTypes from '../../builder/BuilderTypes';
 
 interface Props 
 {

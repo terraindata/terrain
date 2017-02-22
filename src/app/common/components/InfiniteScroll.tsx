@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as React from 'react';
-import Classs from './../../common/components/Classs.tsx';
+import Classs from './../../common/components/Classs';
 
 const SCROLL_SENSITIVITY = 500;
 
