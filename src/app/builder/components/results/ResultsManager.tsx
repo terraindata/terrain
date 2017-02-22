@@ -58,7 +58,7 @@ import BuilderActions from '../../data/BuilderActions';
 
 export const MAX_RESULTS = 200;
 
-export class ResultClass extends BaseClass
+class ResultClass extends BaseClass
 {
   // all available fields for display
   fields: Map<string, string>;
@@ -69,8 +69,9 @@ export class ResultClass extends BaseClass
   rawFields: Map<string, string>;
   transformFields: Map<string, string>;
 }
-let _ResultClass = (config: Object = {}) => 
-  New<ResultClass>(new ResultClass(config), config);
+export type Result = ResultClass & IRecord<ResultClass>;
+let _Result = (config: Object = {}) => 
+  New<Result>(new ResultClass(config), config);
 
 export type Results = List<ResultClass>;
 

@@ -57,7 +57,7 @@ import {spotlightAction} from '../../data/SpotlightStore';
 import ColorManager from '../../../util/ColorManager';
 import Classs from './../../../common/components/Classs';
 import {IResultsConfig} from './ResultsConfig';
-import {ResultClass, MAX_RESULTS} from './ResultsManager';
+import {Result, MAX_RESULTS} from './ResultsManager';
 
 var PinIcon = require("./../../../../images/icon_pin_21X21.svg?name=PinIcon");
 var ScoreIcon = require("./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon");
@@ -79,7 +79,7 @@ const MAX_DEFAULT_FIELDS = 4;
 
 interface Props
 {
-  result: ResultClass;
+  result: Result;
   
   config: IResultsConfig;
   index: number;
@@ -94,7 +94,7 @@ interface Props
   connectDragPreview?: (a:any) => void;
 }
 
-class Result extends Classs<Props> {
+class ResultComponent extends Classs<Props> {
   state: {
     isSpotlit: boolean;
     spotlightColor: string;
@@ -102,27 +102,6 @@ class Result extends Classs<Props> {
     isSpotlit: false,
     spotlightColor: "",
   };
-  
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    // Note: in the future, convert the results to cached immutable objects
-    /// and compute any differences when the AJAX response returns
-    
-    if(!_.isEqual(this.props.data, nextProps.data) || !_.isEqual(this.state, nextState))
-    {
-      return true;
-    }
-    
-    for(var k in this.props)
-    {
-      if(k !== 'data' && this.props[k] !== nextProps[k])
-      {
-        return true;
-      }
-    }
-    
-    return false;    
-  }
   
   // dragPreview: any;
   // componentDidMount() {
@@ -307,8 +286,8 @@ class Result extends Classs<Props> {
       );
     }
     
-    let name = getResultName(data, allFieldsData, config);
-    let fields = getResultFields(data, allFieldsData, config);
+    let name = getResultName(data, config);
+    let fields = getResultFields(data, config);
     let configHasFields = resultsConfigHasFields(config);
     
     if(!configHasFields && fields.length > 4 && !this.props.expanded)
@@ -327,12 +306,7 @@ class Result extends Classs<Props> {
           <div className='result-expanded-fields-title'>
             All Fields
           </div>
-          {
-            _.map(allFieldsData || this.props.data, this.renderExpandedField)
-          }
-          {
-            allFieldsData ? null : 'Loading more...'
-          }
+          TODO
         </div>
       );
     }
@@ -378,16 +352,12 @@ class Result extends Classs<Props> {
 };
 
 
-export function getResultValue(resultData, allFieldsData, field: string, config: IResultsConfig, overrideFormat?: any): string
+export function getResultValue(result: Result, field: string, config: IResultsConfig, overrideFormat?: any): string
 {
   var value: any;
-  if(resultData && resultData[field] !== undefined)
+  if(result)
   {
-    value = resultData[field];
-  }
-  else if(allFieldsData)
-  {
-    value = allFieldsData[field];
+    value = result.get(field);
   }
   return ResultFormatValue(field, value, config, overrideFormat);
 }
@@ -397,7 +367,7 @@ export function resultsConfigHasFields(config: IResultsConfig): boolean
   return config && config.enabled && config.fields && config.fields.size > 0;
 }
 
-export function getResultFields(resultData, allFieldsData, config: IResultsConfig): string[]
+export function getResultFields(result: Result, config: IResultsConfig): string[]
 {
   if(resultsConfigHasFields(config))
   {
@@ -405,13 +375,13 @@ export function getResultFields(resultData, allFieldsData, config: IResultsConfi
   }
   else
   {
-    var fields = _.union(_.keys(resultData), _.keys(allFieldsData));
+    var fields = result.keysSeq().toArray();
   }
   
   return fields;
 }
   
-export function getResultName(resultData, allFieldsData, config: IResultsConfig)
+export function getResultName(result: Result, config: IResultsConfig)
 {
   if(config && config.name && config.enabled)
   {
@@ -419,10 +389,10 @@ export function getResultName(resultData, allFieldsData, config: IResultsConfig)
   }
   else
   {
-    var nameField = _.first(getResultFields(resultData, allFieldsData, config));
+    var nameField = _.first(getResultFields(result, config));
   }
   
-  return getResultValue(resultData, allFieldsData, nameField, config);
+  return getResultValue(result, nameField, config);
 }
 
 
@@ -500,7 +470,7 @@ export function ResultFormatValue(field: string, value: string | number, config:
   return value;
 }
 
-export default Result;
+export default ResultComponent;
 
 // DnD stuff
 
@@ -515,7 +485,7 @@ export default Result;
   
 //   beginDrag(props)
 //   {
-//     const item = props.data;
+//     const item = props.result;
 //     return item;
 //   },
   

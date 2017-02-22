@@ -502,7 +502,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       state: BuilderState,
       action: Action<{ resultsState }>
     ) =>
-      state.set('resultsState', resultsState),
+      state.set('resultsState', action.payload.resultsState),
 };
 
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
