@@ -190,7 +190,8 @@ class TransformCard extends PureClasss<Props>
     return null;
   }
   
-  queryXhr: any;
+  queryXhr: XMLHttpRequest;
+  queryId: string;
   
   computeBars(input: BuilderTypes.CardString)
   {
@@ -212,12 +213,14 @@ class TransformCard extends PureClasss<Props>
         
         if(table)
         {
-          this.queryXhr = Ajax.query(
+          let parts = Ajax.query(
             `SELECT ${field} as value FROM ${table};`, // alias select as 'value' to catch any weird renaming
             db,
             this.handleQueryResponse,
             this.handleQueryError
           );
+          this.queryXhr = parts.xhr;
+          this.queryId = parts.queryId;
           return;
         }
       }
@@ -270,12 +273,14 @@ class TransformCard extends PureClasss<Props>
         if(finalTable)
         {
           // convert the score to TQL, do the query
-          this.queryXhr = Ajax.query(
+          let parts = Ajax.query(
             `SELECT ${TQLConverter._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
             db,
             this.handleQueryResponse,
             this.handleQueryError
           );
+          this.queryXhr = parts.xhr;
+          this.queryId = parts.queryId;
           return;
         }
       }

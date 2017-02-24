@@ -204,11 +204,6 @@ class BuilderTQLColumn extends PureClasss<Props>
         return 0;
     }
   }
-  
-  killQueries()
-  {
-    Ajax.killQueries();
-  }
 
   getMenuOptions(): List<MenuOption> 
   {

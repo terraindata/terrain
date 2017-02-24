@@ -67,28 +67,35 @@ interface Props
 
 class TQLResultsBar extends PureClasss<Props>
 {
-  xhr = null;
-  
   state: {
-    results: any[];
-    error: boolean;
+    xhr?: XMLHttpRequest;
+    results?: any[];
+    error?: boolean;
     mainErrorMessage?: string;
     subErrorMessage?: string;
-    querying: boolean;
-    resultsSpliced: number;
-    errorLine: number;
+    querying?: boolean;
+    resultsSpliced?: number;
+    errorLine?: number;
     queriedTql?: string;
   } = {
-    results: null,
-    error: false,
-    querying: false,
-    resultsSpliced: 0,
-    errorLine: NaN,
   };
   
   componentWillMount()
   {
     this.queryResults(this.props.query);
+  }
+  
+  componentWillUnmount()
+  {
+    this.killQuery();
+  }
+  
+  killQuery()
+  {
+    if(this.state.queryId)
+    {
+      Ajax.killQuery(this.state.queryId);
+    }
   }
 
   //If the component updates and the tql command has been changed, then query results
@@ -171,9 +178,14 @@ class TQLResultsBar extends PureClasss<Props>
   handleResultsChange(response: QueryResponse)
   {
     this.props.onLoadEnd && this.props.onLoadEnd();
-    if(response.error)
+    this.setState({
+      xhr: null,
+      queryId: null,
+    });
+    
+    if(response.tdb_error)
     {
-      let {error} = response;
+      let error = response.tdb_error;
       error = error.replace(/MySQL/g, 'TerrainDB');
       if(error.charAt(error.length - 1) === '^')
       {
@@ -254,8 +266,6 @@ class TQLResultsBar extends PureClasss<Props>
   
   queryResults(query:BuilderTypes.Query)
   {
-    this.xhr && this.xhr.abort();
-    
     let tql = TQLConverter.toTQL(query, {
       replaceInputs: true,
     });
@@ -264,15 +274,20 @@ class TQLResultsBar extends PureClasss<Props>
     {
       if(tql !== this.state.queriedTql)
       {
+        this.killQuery();
+        this.state.xhr && this.state.xhr.abort();
         this.props.onLoadStart && this.props.onLoadStart();
+        
         this.setState({
           querying: true,
           limit: 200,
         });
-        this.xhr = Ajax.query(tql, this.props.db, this.handleResultsChange, this.handleError);
+        let {xhr, queryId} = Ajax.query(tql, this.props.db, this.handleResultsChange, this.handleError);
         
         this.setState({
           queriedTql: tql,
+          xhr,
+          queryId,
         });
       }
     }

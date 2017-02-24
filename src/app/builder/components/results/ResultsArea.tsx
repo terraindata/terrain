@@ -81,52 +81,39 @@ interface Props
 
 interface State
 {
-  results: any[];
-  resultsWithAllFields: any[];
-  resultText: string;
-  resultType: string;
-  resultsCount: number;
+  results?: any[];
+  resultsWithAllFields?: any[];
+  resultText?: string;
+  resultType?: string;
+  resultsCount?: number;
   
-  tql: string;
-  error: any;
-  allFieldsError: boolean;
+  tql?: string;
+  error?: any;
+  allFieldsError?: boolean;
   
   resultFormat: string;
-  showingConfig: boolean;
+  showingConfig?: boolean;
   
-  expanded: boolean;
-  expandedResultIndex: number;
+  expanded?: boolean;
+  expandedResultIndex?: number;
   
   resultsPages: number;
-  onResultsLoaded: (unchanged?: boolean) => void;
+  onResultsLoaded?: (unchanged?: boolean) => void;
   
-  xhr: XMLHttpRequest;
-  allXhr: XMLHttpRequest;
-  countXhr: XMLHttpRequest;  
+  xhr?: XMLHttpRequest;
+  allXhr?: XMLHttpRequest;
+  countXhr?: XMLHttpRequest;
+  
+  queryId?: string;
+  allQueryId?: string;
+  countQueryId?: string;  
 }
 
 class ResultsArea extends PureClasss<Props>
 {
-  
-  
   state: State = {
-    results: null,
-    resultsCount: null,
-    resultsWithAllFields: null,
-    resultText: null,
-    expanded: false,
-    expandedResultIndex: null,
-    tql: "",
-    error: null,
-    resultType: null,
-    showingConfig: false,
     resultsPages: 1,
-    onResultsLoaded: null,
     resultFormat: 'icon',
-    allFieldsError: false,
-    xhr: null,
-    allXhr: null,
-    countXhr: null,
   };
   
   constructor(props:Props)
@@ -141,6 +128,7 @@ class ResultsArea extends PureClasss<Props>
   
   componentWillUnmount()
   {
+    this.killQueries();
     this.state.xhr && this.state.xhr.abort();
     this.state.allXhr && this.state.allXhr.abort();
     this.state.countXhr && this.state.countXhr.abort();
@@ -150,6 +138,21 @@ class ResultsArea extends PureClasss<Props>
       countXhr: null,
     });
     this.timeout && clearTimeout(this.timeout);
+  }
+  
+  killQueries()
+  {
+    console.log('kill kill', this.state);
+    [this.state.queryId, this.state.allQueryId, this.state.countQueryId]
+      .map(
+        queryId =>
+        {
+          if(queryId)
+          {
+            Ajax.killQuery(queryId);
+          }
+        }
+      );
   }
   
   componentWillReceiveProps(nextProps)
@@ -276,8 +279,8 @@ class ResultsArea extends PureClasss<Props>
     {
       return <InfoArea
         large="There was an error with your query."
-        small={this.state.error}
-      />
+        small={typeof this.state.error === 'string' ? this.state.error : ''}
+      />;
     }
     
     if(!this.state.results)
@@ -417,11 +420,11 @@ class ResultsArea extends PureClasss<Props>
     
     if(response)
     {
-      if(response.error)
+      if(response.tdb_error)
       {
         if(!isAllFields)
         {
-          let {error} = response;
+          let error = response.tdb_error;
           if(typeof this.state.error === 'string')
           {
             if(error.charAt(error.length - 1) === '^')
@@ -540,7 +543,7 @@ class ResultsArea extends PureClasss<Props>
   {
     this.props.onNavigationException();
     
-    Ajax.query(
+    let {xhr, queryId} = Ajax.query(
       this.props.query.tql,
       this.props.db, 
       _.noop,
@@ -551,6 +554,12 @@ class ResultsArea extends PureClasss<Props>
         csvName: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.csv',
       }
     );
+    
+    // TODO kill this on unmount
+    this.setState({
+      csvXhr: xhr,
+      csvQueryId: queryId,
+    });
     
     alert('Your data are being prepared for export, and will automatically download when ready.\n\
 Note: this exports the results of your query, which may be different from the results in the Results \
@@ -576,9 +585,11 @@ column if you have set a custom results view.');
       limit: MAX_RESULTS,
       replaceInputs: true,
     });
-    
+    console.log(tql, this.state.tql);
     if(tql !== this.state.tql)
     {
+      this.killQueries();
+      
       this.setState({
         tql,
         allFieldsError: false,
@@ -588,34 +599,36 @@ column if you have set a custom results view.');
       this.state.xhr && this.state.xhr.abort();
       this.state.allXhr && this.state.allXhr.abort();
       
-      this.setState({
-        xhr: 
-          Ajax.query(
-            tql, 
-            this.props.db, 
-            this.handleResultsChange, 
-            this.handleError
-          ),
-      });
+      this.setState(
+        Ajax.query(
+          tql, 
+          this.props.db, 
+          this.handleResultsChange, 
+          this.handleError
+        )
+      );
       
       if(!query.cards.get(0).cards.some(
         card => card.type === 'groupBy'
         ))
       {
         // temporary, don't dispatch select * if has group by
+        
+        let {xhr, queryId} = Ajax.query(
+          TQLConverter.toTQL(query, {
+            allFields: true,
+            transformAliases: true,
+            limit: MAX_RESULTS,
+            replaceInputs: true,
+          }), 
+          this.props.db,
+          this.handleAllFieldsResponse,
+          this.handleAllFieldsError
+        );
+        
         this.setState({
-          allXhr:
-            Ajax.query(
-              TQLConverter.toTQL(query, {
-                allFields: true,
-                transformAliases: true,
-                limit: MAX_RESULTS,
-                replaceInputs: true,
-              }), 
-              this.props.db,
-              this.handleAllFieldsResponse,
-              this.handleAllFieldsError
-            )
+          allXhr: xhr,
+          allQueryId: queryId,
         });
       }
       

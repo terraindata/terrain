@@ -292,7 +292,7 @@ class Builder extends PureClasss<Props>
             , Immutable.Map({})
           )
         );
-      });
+      }).xhr;
     }
   }
   

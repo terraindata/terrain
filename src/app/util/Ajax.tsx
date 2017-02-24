@@ -56,8 +56,7 @@ import Util from './../util/Util';
 export interface QueryResponse
 {
   resultSet?: any[];
-  total_rows?: number;
-  error?: string
+  tdb_error?: string;
 }
 
 export const Ajax = {
@@ -165,23 +164,30 @@ export const Ajax = {
       downloadFilename?: string;
       useMidway?: boolean;
     } = {}
-  )
+  ): { xhr: XMLHttpRequest, queryId: string }
   {
-    return Ajax._req('POST', url, JSON.stringify(_.extend({
-      timestamp: (new Date()).toISOString(),
-      unique_id: "" + Math.random(),
-    }, reqFields)),
-    
-    onLoad,
-    
-    {
-      // noToken: true,
-      onError,
-      // host: options.useMidway ? undefined : TDB_HOST,
-      // crossDomain: ! options.useMidway,
-      download: options.download,
-      downloadFilename: options.downloadFilename,
-    });
+    let unique_id = "" + Math.random();
+    return {
+      xhr: 
+        Ajax._req('POST', url, JSON.stringify(_.extend(
+          {
+            timestamp: (new Date()).toISOString(),
+            unique_id,
+          }, reqFields)),
+        
+          onLoad,
+          
+          {
+            // noToken: true,
+            onError,
+            // host: options.useMidway ? undefined : TDB_HOST,
+            // crossDomain: ! options.useMidway,
+            download: options.download,
+            downloadFilename: options.downloadFilename,
+          }
+        ),
+      queryId: unique_id,
+    };
   },
   
   saveRole: (role:RoleTypes.Role) =>
@@ -556,19 +562,16 @@ export const Ajax = {
     }, onError)
   },
   
-  killQueries()
+  killQuery(id: string)
   {
-    return Ajax._r("/sql_query", {
-        "query_string": encode_utf8("select concat('kill query ',id,';') from information_schema.processlist where user='dev' and command='Query' and time_ms > 1000;"),
+    return Ajax._r("/kill_query_by_id", {
+        "query_id": id,
       },
       
       (resp) =>
       {
-        // try {
-        //   console.log(resp);
-        // } catch(e) {
-        //   console.log('err', resp);
-        // }
+        console.log('aok');  
+        
       }
     );
   },
