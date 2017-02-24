@@ -57,7 +57,6 @@ import BuilderActions from './../../builder/data/BuilderActions';
 import BuilderTypes from '../../builder/BuilderTypes';
 import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss';
-import Ajax from "./../../util/Ajax";
 import LibraryTypes from '../../library/LibraryTypes';
 import TQLEditor from './TQLEditor';
 import TQLPopup from './TQLPopup';
@@ -201,11 +200,6 @@ class BuilderTQLColumn extends PureClasss<Props>
       default:
         return 0;
     }
-  }
-  
-  killQueries()
-  {
-    Ajax.killQueries();
   }
 
   getMenuOptions(): List<MenuOption> 

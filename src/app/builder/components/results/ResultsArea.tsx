@@ -82,13 +82,21 @@ interface Props
 interface State
 {
   resultFormat: string;
-  showingConfig: boolean;
+  showingConfig?: boolean;
   
-  expanded: boolean;
-  expandedResultIndex: number;
+  expanded?: boolean;
+  expandedResultIndex?: number;
   
   resultsPages: number;
-  onResultsLoaded: (unchanged?: boolean) => void;
+  onResultsLoaded?: (unchanged?: boolean) => void;
+  
+  xhr?: XMLHttpRequest;
+  allXhr?: XMLHttpRequest;
+  countXhr?: XMLHttpRequest;
+  
+  queryId?: string;
+  allQueryId?: string;
+  countQueryId?: string;  
 }
 
 class ResultsArea extends PureClasss<Props>
@@ -98,13 +106,48 @@ class ResultsArea extends PureClasss<Props>
     expandedResultIndex: null,
     showingConfig: false,
     resultsPages: 1,
-    onResultsLoaded: null,
     resultFormat: 'icon',
   };
   
   constructor(props:Props)
   {
     super(props);
+  }
+  
+  componentWillMount()
+  {
+    Util.addBeforeLeaveHandler(this.killQueries);
+    this.queryResults(this.props.query);
+  }
+  
+  componentWillUnmount()
+  {
+    this.killQueries();
+    this.state.xhr && this.state.xhr.abort();
+    this.state.allXhr && this.state.allXhr.abort();
+    this.state.countXhr && this.state.countXhr.abort();
+    this.setState({
+      xhr: null,
+      allXhr: null,
+      countXhr: null,
+    });
+  }
+  
+  killQueries()
+  {
+    [
+      this && this.state && this.state.queryId, 
+      this && this.state && this.state.allQueryId, 
+      this && this.state && this.state.countQueryId,
+    ].map(
+        queryId =>
+        {
+          if(queryId)
+          {
+            Ajax.killQuery(queryId);
+          }
+        }
+      );
   }
   
   componentWillReceiveProps(nextProps)
@@ -309,11 +352,188 @@ class ResultsArea extends PureClasss<Props>
     );
   }
   
+<<<<<<< HEAD
+=======
+  handleAllFieldsResponse(response:QueryResponse)
+  {
+    this.handleResultsChange(response, true);
+  }
+  
+  handleCountResponse(response:QueryResponse)
+  {
+    this.setState({
+      countXhr: null,
+      countQueryId: null,
+    });
+    
+    let results = response.resultSet;
+    if(results)
+    {
+      if(results.length === 1)
+      {
+        this.setState({
+          resultsCount: results[0]['COUNT(*)']
+        });
+      }
+      else if(results.length > 1)
+      {
+        this.setState({
+          resultsCount: results.length,
+        })
+      }
+      else
+      {
+        this.handleCountError();
+      }
+    }
+    else
+    {
+      this.handleCountError();
+    }
+  }
+  
+  handleCountError()
+  {
+    this.setState({
+      countXhr: null,
+      resultsCount: -1,
+    })
+  }
+  
+  handleResultsChange(response:QueryResponse, isAllFields?: boolean)
+  {
+    this.setState({
+      [isAllFields ? 'allXhr' : 'xhr']: null,
+      [isAllFields ? 'allQueryId' : 'queryId']: null,
+    });
+    
+    if(response)
+    {
+      if(response.tdb_error)
+      {
+        if(!isAllFields)
+        {
+          let error = response.tdb_error;
+          if(typeof this.state.error === 'string')
+          {
+            if(error.charAt(error.length - 1) === '^')
+            {
+              error = error.substr(0, error.length - 1);
+            }
+            error = this.state.error.replace(/MySQL/g, 'TerrainDB');
+          }
+          
+          this.setState({
+            error,
+          });
+        }
+        else
+        {
+          this.setState({
+            allFieldsError: true,
+          });
+        }
+        
+        this.props.onLoadEnd && this.props.onLoadEnd();
+        return;
+      }
+      
+      let results = response.resultSet;
+      
+      var resultsCount = results.length;
+      if(resultsCount > MAX_RESULTS)
+      {
+        results.splice(MAX_RESULTS, results.length - MAX_RESULTS);
+      }
+      
+      if(isAllFields)
+      {
+        this.setState({
+          resultsWithAllFields: results,
+        });
+      }
+      else
+      {
+        this.setState({
+          results,
+          resultType: 'rel',
+          error: false,
+        });
+      }
+    }
+    else
+    {
+      // no response
+      if(!isAllFields)
+      {
+        this.setState({
+          error: "No response was returned from the server.",
+        });
+      }
+      else
+      {
+        this.setState({
+          allFieldsError: true,
+        });
+      }
+    }
+    
+    if(!this.state.xhr && !this.state.allXhr)
+    {
+      // all done with both
+      this.props.onLoadEnd && this.props.onLoadEnd();
+    }
+  }
+  
+  componentWillUpdate(nextProps, nextState: State)
+  {
+    if(nextState.results !== this.state.results 
+      || nextState.resultsWithAllFields !== this.state.resultsWithAllFields)
+    {
+      // update spotlights
+      let config = this.getResultsConfig();
+      SpotlightStore.getState().spotlights.map(
+        (spotlight, id) =>
+        {
+          let resultIndex = nextState.results && nextState.results.findIndex(
+            r => getPrimaryKeyFor(r, config) === id
+          );
+          if(resultIndex !== -1)
+          {
+            spotlightAction(id, _.extend({
+                color: spotlight.color,
+                name: spotlight.name,  
+              }, 
+              nextState.results[resultIndex], 
+              nextState.resultsWithAllFields[resultIndex])
+            );
+          }
+          else
+          {
+            spotlightAction(id, null);
+          } 
+        }
+      );
+    }
+  }
+  
+  handleError(ev)
+  {  
+    this.setState({
+      xhr: null,
+    });
+    this.setState({
+      error: true,
+    });
+    this.props.onLoadEnd && this.props.onLoadEnd();
+  }
+  
+>>>>>>> master
   handleExport()
   {
     this.props.onNavigationException();
     
-    Ajax.query(
+    let {xhr, queryId} = Ajax.query(
       this.props.query.tql,
       this.props.db, 
       _.noop,
@@ -325,11 +545,102 @@ class ResultsArea extends PureClasss<Props>
       }
     );
     
+    // TODO kill this on unmount
+    this.setState({
+      csvXhr: xhr,
+      csvQueryId: queryId,
+    });
+    
     alert('Your data are being prepared for export, and will automatically download when ready.\n\
 Note: this exports the results of your query, which may be different from the results in the Results \
 column if you have set a custom results view.');
   }
   
+<<<<<<< HEAD
+=======
+  handleAllFieldsError()
+  {
+    this.setState({
+      allXhr: null,
+    });
+    this.props.onLoadEnd && this.props.onLoadEnd();
+  }
+  
+  queryResults(query, pages?: number)
+  {
+    if(!pages)
+    {
+      pages = this.state.resultFormat === 'icon' ? this.state.resultsPages : 50;
+    }
+    
+    var tql = TQLConverter.toTQL(query, {
+      limit: MAX_RESULTS,
+      replaceInputs: true,
+    });
+    
+    if(tql !== this.state.tql)
+    {
+      this.killQueries();
+      
+      this.setState({
+        tql,
+        allFieldsError: false,
+      });
+      
+      this.props.onLoadStart && this.props.onLoadStart();
+      this.state.xhr && this.state.xhr.abort();
+      this.state.allXhr && this.state.allXhr.abort();
+      
+      this.setState(
+        Ajax.query(
+          tql, 
+          this.props.db, 
+          this.handleResultsChange, 
+          this.handleError
+        )
+      );
+      
+      if(!query.cards.get(0).cards.some(
+        card => card.type === 'groupBy'
+        ))
+      {
+        // temporary, don't dispatch select * if has group by
+        
+        let {xhr, queryId} = Ajax.query(
+          TQLConverter.toTQL(query, {
+            allFields: true,
+            transformAliases: true,
+            limit: MAX_RESULTS,
+            replaceInputs: true,
+          }), 
+          this.props.db,
+          this.handleAllFieldsResponse,
+          this.handleAllFieldsError
+        );
+        
+        this.setState({
+          allXhr: xhr,
+          allQueryId: queryId,
+        });
+      }
+      
+      // temporarily disable count
+      // this.setState({
+      //   countXhr: 
+      //     Ajax.query(
+      //       TQLConverter.toTQL(query, {
+      //         count: true,
+      //         replaceInputs: true,
+      //       }), 
+      //       this.props.db,
+      //       this.handleCountResponse,
+      //       this.handleCountError
+      //     ),
+      // });
+    }
+  }
+  
+>>>>>>> master
   toggleView()
   {
     this.setState({
@@ -339,6 +650,7 @@ column if you have set a custom results view.');
   
   renderTopbar()
   {
+<<<<<<< HEAD
     let {resultsState} = this.props;
     
     var text = '';
@@ -363,6 +675,15 @@ column if you have set a custom results view.');
       text = 'Text result';
     }
     
+=======
+    // let count = this.state.resultsCount !== -1 ? this.state.resultsCount : (this.state.results ? this.state.results.length : 0);
+    // TODO temporary
+    let count: string | number = this.state.results ? this.state.results.length : 0;
+    if(count === MAX_RESULTS)
+    {
+      count = count + '+';
+    }
+>>>>>>> master
     return (
       <div className='results-top'>
         <div className='results-top-summary'>
