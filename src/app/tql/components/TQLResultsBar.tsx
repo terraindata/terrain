@@ -77,11 +77,13 @@ class TQLResultsBar extends PureClasss<Props>
     resultsSpliced?: number;
     errorLine?: number;
     queriedTql?: string;
+    queryId?: string;
   } = {
   };
   
   componentWillMount()
   {
+    Util.addBeforeLeaveHandler(this.killQuery);
     this.queryResults(this.props.query);
   }
   
@@ -92,7 +94,7 @@ class TQLResultsBar extends PureClasss<Props>
   
   killQuery()
   {
-    if(this.state.queryId)
+    if(this && this.state && this.state.queryId)
     {
       Ajax.killQuery(this.state.queryId);
     }

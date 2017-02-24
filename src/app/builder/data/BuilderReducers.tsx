@@ -127,7 +127,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
             state.db,
             Actions.parseTreeLoaded,
             Actions.parseTreeError
-          )
+          ).xhr
         );
     }
     
@@ -314,7 +314,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
           state.db,
           Actions.parseTreeLoaded,
           Actions.parseTreeError
-        )
+        ).xhr
       );
   },
 

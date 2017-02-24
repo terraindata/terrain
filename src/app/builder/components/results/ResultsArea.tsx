@@ -123,6 +123,7 @@ class ResultsArea extends PureClasss<Props>
   
   componentWillMount()
   {
+    Util.addBeforeLeaveHandler(this.killQueries);
     this.queryResults(this.props.query);
   }
   
@@ -142,9 +143,11 @@ class ResultsArea extends PureClasss<Props>
   
   killQueries()
   {
-    console.log('kill kill', this.state);
-    [this.state.queryId, this.state.allQueryId, this.state.countQueryId]
-      .map(
+    [
+      this && this.state && this.state.queryId, 
+      this && this.state && this.state.allQueryId, 
+      this && this.state && this.state.countQueryId,
+    ].map(
         queryId =>
         {
           if(queryId)
@@ -374,7 +377,9 @@ class ResultsArea extends PureClasss<Props>
   {
     this.setState({
       countXhr: null,
+      countQueryId: null,
     });
+    
     let results = response.resultSet;
     if(results)
     {
@@ -413,9 +418,9 @@ class ResultsArea extends PureClasss<Props>
   
   handleResultsChange(response:QueryResponse, isAllFields?: boolean)
   {
-    let xhrKey = isAllFields ? 'allXhr' : 'xhr';
     this.setState({
-      [xhrKey]: null,
+      [isAllFields ? 'allXhr' : 'xhr']: null,
+      [isAllFields ? 'allQueryId' : 'queryId']: null,
     });
     
     if(response)
@@ -585,7 +590,7 @@ column if you have set a custom results view.');
       limit: MAX_RESULTS,
       replaceInputs: true,
     });
-    console.log(tql, this.state.tql);
+    
     if(tql !== this.state.tql)
     {
       this.killQueries();

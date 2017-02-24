@@ -202,6 +202,8 @@ class Builder extends PureClasss<Props>
   {
     window.onbeforeunload = (e) => 
     {
+      Util.executeBeforeLeaveHandlers();
+      
       if(this.state.navigationException)
       {
         this.setState({
