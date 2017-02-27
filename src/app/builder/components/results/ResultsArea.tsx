@@ -456,7 +456,7 @@ class ResultsArea extends PureClasss<Props>
       
       let results = response.resultSet;
       
-      var resultsCount = results.length;
+      var resultsCount = results ? results.length : 0;
       if(resultsCount > MAX_RESULTS)
       {
         results.splice(MAX_RESULTS, results.length - MAX_RESULTS);

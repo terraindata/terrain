@@ -570,8 +570,6 @@ export const Ajax = {
       
       (resp) =>
       {
-        console.log('aok');  
-        
       }
     );
   },
