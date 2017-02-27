@@ -162,7 +162,7 @@ const generalProcessors: {
             if(typeof tableNode !== 'object' || tableNode.op !== 'AS')
             {
               return make(Blocks.table, {
-                table: 'Bad Input',
+                table: tableNode,
               });
             }
             else

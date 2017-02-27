@@ -277,7 +277,7 @@ export module BuilderTypes
   interface IBlockConfig
   {
     static: {
-      tql: string;
+      tql: TQLFn;
       tqlGlue?: string;
       accepts?: List<string>;
       removeOnCardRemove?: boolean;
@@ -681,7 +681,15 @@ export module BuilderTypes
       aliasWasSuggested: false,
       
       static: {
-        tql: "\n $table as $alias",
+        tql: (tableBlock: IBlock) =>
+        {
+          let suffix = "";
+          if(tableBlock['alias'])
+          {
+            suffix = " as $alias";
+          }
+          return "\n $table" + suffix;
+        }
       }
     }),
     

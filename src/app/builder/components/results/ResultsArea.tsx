@@ -425,11 +425,11 @@ class ResultsArea extends PureClasss<Props>
     
     if(response)
     {
-      if(response.tdb_error)
+      if(response.error)
       {
         if(!isAllFields)
         {
-          let error = response.tdb_error;
+          let error = response.error;
           if(typeof this.state.error === 'string')
           {
             if(error.charAt(error.length - 1) === '^')
