@@ -102,40 +102,65 @@ interface Props
   db: string;
 }
 
+interface ResultsQuery
+{
+  xhr: XMLHttpRequest;
+  queryId: string;
+}
+
 interface State
 {
   queriedTql?: string;
   
-  queryId?: string;
-  allQueryId?: string;
-  countQueryId?: string;
-  transformQueryId?: string;
-    
-  xhr?: XMLHttpRequest;
-  allXhr?: XMLHttpRequest;
-  countXhr?: XMLHttpRequest;  
-  transformXhr?: XMLHttpRequest;
+  query?: ResultsQuery;
+  allQuery?: ResultsQuery;
+  countQuery?: ResultsQuery;
+  transformQuery?: ResultsQuery;
 }
+
+const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
 
 class ResultsManager extends PureClasss<Props>
 {
   state: State = {};
   
+  // apply a function to all active queries
+  mapQueries(fn: (query: ResultsQuery, stateKey: string) => void)
+  {
+    stateQueries.map(
+      stateKey =>
+        this && this.state && this.state[stateKey] && 
+          fn(this.state[stateKey], stateKey)
+    );
+  }
+  
   componentWillMount()
   {
+    Util.addBeforeLeaveHandler(this.killQueries);
     this.queryResults(this.props.query);
   }
   
   componentWillUnmount()
   {
-    this.state.xhr && this.state.xhr.abort();
-    this.state.allXhr && this.state.allXhr.abort();
-    this.state.countXhr && this.state.countXhr.abort();
-    this.setState({
-      xhr: null,
-      allXhr: null,
-      countXhr: null,
-    });
+    this.killQueries();
+    
+    this.mapQueries(
+      (query, stateKey) =>
+        this.setState({
+          [stateKey]: null,
+        })
+    );
+  }
+  
+  killQueries()
+  {
+    this.mapQueries(
+      (query) =>
+      {
+        Ajax.killQuery(query.queryId);
+        query.xhr.abort();
+      }
+    );
   }
   
   componentWillReceiveProps(nextProps: Props)
@@ -191,6 +216,7 @@ class ResultsManager extends PureClasss<Props>
   {
     this.setState({
       countXhr: null,
+      countQueryId: null,
     });
     let results = response.resultSet;
     if(results)
@@ -324,13 +350,8 @@ class ResultsManager extends PureClasss<Props>
     this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
-  queryResults(query, pages?: number)
+    queryResults(query)
   {
-    if(!pages)
-    {
-      pages = this.state.resultFormat === 'icon' ? this.state.resultsPages : 50;
-    }
-    
     var tql = TQLConverter.toTQL(query, {
       limit: MAX_RESULTS,
       replaceInputs: true,
@@ -338,6 +359,8 @@ class ResultsManager extends PureClasss<Props>
     
     if(tql !== this.state.tql)
     {
+      this.killQueries();
+      
       this.setState({
         tql,
         allFieldsError: false,
@@ -347,45 +370,55 @@ class ResultsManager extends PureClasss<Props>
       this.state.xhr && this.state.xhr.abort();
       this.state.allXhr && this.state.allXhr.abort();
       
-      this.setState({
-        xhr: 
-          Ajax.query(
-            tql, 
-            this.props.db, 
-            this.handleResultsChange, 
-            this.handleError
-          ),
-      });
+      this.setState(
+        Ajax.query(
+          tql, 
+          this.props.db, 
+          this.handleResultsChange, 
+          this.handleError
+        )
+      );
       
-      this.setState({
-        allXhr:
-          Ajax.query(
-            TQLConverter.toTQL(query, {
-              allFields: true,
-              transformAliases: true,
-              limit: MAX_RESULTS,
-              replaceInputs: true,
-            }), 
-            this.props.db,
-            this.handleAllFieldsResponse,
-            this.handleAllFieldsError
-          )
-      });
+      if(!query.cards.get(0).cards.some(
+        card => card.type === 'groupBy'
+        ))
+      {
+        // temporary, don't dispatch select * if has group by
+        
+        let {xhr, queryId} = Ajax.query(
+          TQLConverter.toTQL(query, {
+            allFields: true,
+            transformAliases: true,
+            limit: MAX_RESULTS,
+            replaceInputs: true,
+          }), 
+          this.props.db,
+          this.handleAllFieldsResponse,
+          this.handleAllFieldsError
+        );
+        
+        this.setState({
+          allXhr: xhr,
+          allQueryId: queryId,
+        });
+      }
       
-      this.setState({
-        countXhr: 
-          Ajax.query(
-            TQLConverter.toTQL(query, {
-              count: true,
-              replaceInputs: true,
-            }), 
-            this.props.db,
-            this.handleCountResponse,
-            this.handleCountError
-          ),
-      });
+      // temporarily disable count
+      // this.setState({
+      //   countXhr: 
+      //     Ajax.query(
+      //       TQLConverter.toTQL(query, {
+      //         count: true,
+      //         replaceInputs: true,
+      //       }), 
+      //       this.props.db,
+      //       this.handleCountResponse,
+      //       this.handleCountError
+      //     ),
+      // });
     }
   }
+  
   
 	render()
   {

@@ -81,7 +81,7 @@ interface Props
 {
   result: Result;
   
-  config: IResultsConfig;
+  resultsConfig: IResultsConfig;
   index: number;
   primaryKey: string;
   onExpand: (index:number) => void;
@@ -114,7 +114,7 @@ class ResultComponent extends Classs<Props> {
   // generateDragPreview(props:Props)
   // {
   //   this.dragPreview = createDragPreview(getResultName(this.props.data, this.props.allFieldsData, 
-  //     this.props.config), dragPreviewStyle);
+  //     this.props.resultsConfig), dragPreviewStyle);
   //   props.connectDragPreview(this.dragPreview);
   // }
 
@@ -128,13 +128,13 @@ class ResultComponent extends Classs<Props> {
   
   renderField(field, index?, fields?, overrideFormat?)
   {
-    if(!resultsConfigHasFields(this.props.config) && index >= MAX_DEFAULT_FIELDS)
+    if(!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS)
     {
       return null;
     }
     
-    var value = getResultValue(this.props.data, this.props.allFieldsData, field, this.props.config, overrideFormat);
-    let format = this.props.config && this.props.config.formats.get(field);
+    var value = getResultValue(this.props.data, this.props.allFieldsData, field, this.props.resultsConfig, overrideFormat);
+    let format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     let showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
       <div className="result-field" key={field}>
@@ -172,7 +172,7 @@ class ResultComponent extends Classs<Props> {
     });
     
     let spotlightData = this.getData();
-    spotlightData['name'] = getResultName(this.props.data, this.props.allFieldsData, this.props.config);
+    spotlightData['name'] = getResultName(this.props.data, this.props.allFieldsData, this.props.resultsConfig);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightAction(id, spotlightData);

@@ -50,11 +50,10 @@ import Table from '../../../common/components/Table';
 import InfoArea from '../../../common/components/InfoArea';
 import {IResultsConfig, ResultsConfig} from "../results/ResultsConfig";
 import {getResultName, getResultFields, getResultValue} from './Result';
-import {getPrimaryKeyFor} from './ResultsArea';
 import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore';
 import ColorManager from '../../../util/ColorManager';
 import {MenuOption} from '../../../common/components/Menu';
-import {Results, MAX_RESULTS} from './ResultsManager';
+import {Results, MAX_RESULTS, getPrimaryKeyFor} from './ResultsManager';
 
 interface Props
 {
