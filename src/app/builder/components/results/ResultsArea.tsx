@@ -345,11 +345,11 @@ class ResultsArea extends PureClasss<Props>
     
     if(response)
     {
-      if(response.tdb_error)
+      if(response.error)
       {
         if(!isAllFields)
         {
-          let error = response.tdb_error;
+          let error = response.error;
           if(typeof this.state.error === 'string')
           {
             if(error.charAt(error.length - 1) === '^')
@@ -376,7 +376,7 @@ class ResultsArea extends PureClasss<Props>
       
       let results = response.resultSet;
       
-      var resultsCount = results.length;
+      var resultsCount = results ? results.length : 0;
       if(resultsCount > MAX_RESULTS)
       {
         results.splice(MAX_RESULTS, results.length - MAX_RESULTS);

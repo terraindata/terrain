@@ -56,7 +56,7 @@ import Util from './../util/Util';
 export interface QueryResponse
 {
   resultSet?: any[];
-  tdb_error?: string;
+  error?: string;
 }
 
 export const Ajax = {
@@ -570,8 +570,6 @@ export const Ajax = {
       
       (resp) =>
       {
-        console.log('aok');  
-        
       }
     );
   },

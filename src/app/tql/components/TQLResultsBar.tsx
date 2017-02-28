@@ -182,9 +182,9 @@ class TQLResultsBar extends PureClasss<Props>
       queryId: null,
     });
     
-    if(response.tdb_error)
+    if(response.error)
     {
-      let error = response.tdb_error;
+      let error = response.error;
       error = error.replace(/MySQL/g, 'TerrainDB');
       if(error.charAt(error.length - 1) === '^')
       {

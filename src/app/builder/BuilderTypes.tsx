@@ -275,7 +275,7 @@ export module BuilderTypes
   interface IBlockConfig
   {
     static: {
-      tql: string;
+      tql: TQLFn;
       tqlGlue?: string;
       accepts?: List<string>;
       removeOnCardRemove?: boolean;
@@ -542,24 +542,6 @@ export module BuilderTypes
     })
   );
   
-  const acceptsAggregates = List([
-    'count',
-    'avg',
-    'min',
-    'max',
-    'sum',
-    'distinct',
-    'score',
-    'transform',
-    'sfw',
-    'exists',
-    'not',
-    'add',
-  ]);
-  
-  const transformScoreInputTypes = 
-    List(['score', 'transform', 'sfw']).concat(acceptsAggregates).toList();
-  
   const _acceptsMath = (list: List<string>) =>
     list.concat(
       List([
@@ -578,6 +560,26 @@ export module BuilderTypes
       'transform',
     ])
   );
+  
+  const acceptsAggregates = _acceptsMath(
+    List([
+      'count',
+      'avg',
+      'min',
+      'max',
+      'sum',
+      'distinct',
+      'score',
+      'transform',
+      'sfw',
+      'exists',
+      'not',
+      'add',
+    ])
+  );
+  
+  const transformScoreInputTypes = 
+    List(['score', 'transform', 'sfw']).concat(acceptsAggregates).toList();
     
   const _mathCard = (config: {
     title: string;
@@ -670,7 +672,15 @@ export module BuilderTypes
       aliasWasSuggested: false,
       
       static: {
-        tql: "\n $table as $alias",
+        tql: (tableBlock: IBlock) =>
+        {
+          let suffix = "";
+          if(tableBlock['alias'])
+          {
+            suffix = " as $alias";
+          }
+          return "\n $table" + suffix;
+        }
       }
     }),
     
@@ -971,7 +981,9 @@ export module BuilderTypes
             help: ManualConfig.help["operator"],
             centerDropdown: true,
           }, 
-          List(['sfw', 'exists', 'not'])
+          _acceptsMath(
+            List(['sfw', 'exists', 'not'])
+          )
         ),
         manualEntry: ManualConfig.cards['filter'],
       },
@@ -1465,25 +1477,25 @@ export module BuilderTypes
     }),
     
     add: _mathCard({
-      title: 'Add',
+      title: '+',
       tqlGlue: ' + ',
       colors: ["#d24f42", "#f9cba8"],
     }),
     
     subtract: _mathCard({
-      title: 'Subtract',
+      title: '-',
       tqlGlue: ' - ',
       colors: ["#d65a44", "#fbc1b7"],
     }),
     
     multiply: _mathCard({
-      title: 'Multiply',
-      tqlGlue: ' - ',
+      title: '×',
+      tqlGlue: ' * ',
       colors: ["#db6746", "#f9bcab"],
     }),
     
     divide: _mathCard({
-      title: 'Divide',
+      title: '/',
       tqlGlue: ' / ',
       colors: ["#dd7547", "#fdcdb8"],
     }),
