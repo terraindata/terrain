@@ -95,12 +95,15 @@ export class ResultsState extends BaseClass
 export let _ResultsState = (config: Object = {}) => 
   New<ResultsState>(new ResultsState(config), config);
 
+
+
 interface Props
 {
   query: BuilderTypes.Query;
   resultsState: ResultsState;
   db: string;
 }
+
 
 interface ResultsQuery
 {
@@ -270,18 +273,18 @@ class ResultsManager extends PureClasss<Props>
     
     if(response)
     {
-      if(response.error)
+      if(response.errorMessage)
       {
         if(!isAllFields)
         {
-          let {error} = response;
-          if(typeof this.state.error === 'string')
+          let error = response.errorMessage;
+          if(typeof error === 'string')
           {
             if(error.charAt(error.length - 1) === '^')
             {
               error = error.substr(0, error.length - 1);
             }
-            error = this.state.error.replace(/MySQL/g, 'TerrainDB');
+            error = error.replace(/MySQL/g, 'TerrainDB');
           }
           
           this.setState({

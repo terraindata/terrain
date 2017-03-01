@@ -1343,9 +1343,9 @@ export module BuilderTypes
         preview: (card:any) => {
           if(card.input._isCard)
           {
-            return 'Transform ' + getPreview(card.input);
+            return '' + getPreview(card.input);
           }
-          return 'Transform ' + card.input;
+          return '' + card.input;
         },
         tql: "linear_transform($input, $scorePoints)",
         display: [
