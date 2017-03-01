@@ -232,6 +232,8 @@ export module BuilderTypes
       title: string;
       display: Display | Display[];
       
+      isAggregate: boolean;
+      
       // the format string used for generating tql
       // - insert the value of a card member by prepending the field's name with $, e.g. "$expression" or "$filters"
       // - arrays/Lists are joined with "," by default
@@ -320,6 +322,7 @@ export module BuilderTypes
       title: string;
       preview: string | ((c:ICard) => string);
       display: Display | Display[];
+      isAggregate?: boolean;
       manualEntry: IManualEntry;
       tql: TQLFn;
       tqlGlue?: string;
@@ -382,6 +385,7 @@ export module BuilderTypes
     tqlGlue?: string;
     accepts: List<string>;
     singleChild?: boolean;
+    isAggregate?: boolean;
   }
   
   const _wrapperCard = (config:IWrapperCardConfig) =>
@@ -438,6 +442,7 @@ export module BuilderTypes
       manualEntry: config.manualEntry,
       preview: "[value]",
       tql: config.tql,
+      isAggregate: true,
       
       display: 
         config.defaultValue === undefined
@@ -469,6 +474,7 @@ export module BuilderTypes
       preview: "[value]",
       tql: config.tql,
       init: config.init,
+      isAggregate: true,
       
       display: getCardStringDisplay({
         accepts: config.accepts,

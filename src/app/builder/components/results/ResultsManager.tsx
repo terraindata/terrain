@@ -290,7 +290,7 @@ class ResultsManager extends PureClasss<Props>
         return;
       }
       
-      let results = response.resultSet;
+      let results = response.results;
       
       var resultsCount = results.length;
       if(resultsCount > MAX_RESULTS)

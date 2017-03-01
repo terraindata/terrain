@@ -55,8 +55,8 @@ import Util from './../util/Util';
 
 export interface QueryResponse
 {
-  resultSet?: any[];
-  error?: string;
+  results?: any[];
+  errorMessage?: string;
 }
 
 export const Ajax = {
@@ -495,6 +495,13 @@ export const Ajax = {
           onError && onError(resp as any);
           return;
         }
+        
+        if(respData.errorMessage)
+        {
+          onError(respData);
+          return;
+        }
+        
         onLoad(respData);
       },
       
@@ -512,7 +519,7 @@ export const Ajax = {
       {
         try
         {
-          let cols = JSON.parse(resp).resultSet;
+          let cols = JSON.parse(resp).results;
           var tables: {[name:string]: {name: string; columns: any[];}} = {};
           
           cols.map(
@@ -548,12 +555,14 @@ export const Ajax = {
   
   getDbs(onLoad: (dbs: string[]) => void, onError?: (ev:Event) => void)
   {
-    Ajax._r('/get_databases', {}, (resp) =>
+    Ajax._r('/get_databases', {
+      db: 'information_schema',
+    }, (resp) =>
     {
       try
       {
         var list = JSON.parse(resp);
-        onLoad(list.resultSet.map(obj => obj.schema_name));
+        onLoad(list.results.map(obj => obj.schema_name));
       }
       catch(e)
       {
