@@ -270,6 +270,7 @@ class TQLResultsBar extends PureClasss<Props>
   {
     let tql = TQLConverter.toTQL(query, {
       replaceInputs: true,
+      limit: 50,
     });
     
     if(tql)

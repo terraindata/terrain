@@ -338,7 +338,7 @@ class ResultsArea extends PureClasss<Props>
         onRequestMoreItems={this.handleRequestMoreResults}
       >
         {
-          this.state.results.map((result, index) => 
+          this.state.results.map(((result, index) => 
           {
             if(index > this.state.resultsPages * RESULTS_PAGE_SIZE)
             {
@@ -358,7 +358,7 @@ class ResultsArea extends PureClasss<Props>
                 primaryKey={primaryKey}
               />
             );
-          }
+          }).bind(this)
           )
         }
         {
