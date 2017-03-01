@@ -150,7 +150,7 @@ THE SOFTWARE.
   
 //   handleCountResponse(response:QueryResponse)
 //   {
-//     let results = response.resultSet;
+//     let results = response.results;
 //     if(results)
 //     {
 //       if(results.length === 1)
@@ -205,7 +205,7 @@ THE SOFTWARE.
 //         return;
 //       }
       
-//       let results = response.resultSet;
+//       let results = response.results;
       
 //       var resultsCount = results.length;
 //       if(resultsCount > MAX_RESULTS)

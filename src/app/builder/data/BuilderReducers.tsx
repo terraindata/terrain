@@ -354,11 +354,11 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   (
     state: BuilderState,
     action: Action<{
-      error: any,
+      errorMessage: string,
     }>
   ) =>
     state
-      .setIn(['query', 'parseTreeError'], JSON.stringify(action.payload.error))
+      .setIn(['query', 'parseTreeError'], action.payload.errorMessage || true)
       .set('parseTreeReq', null)
       .setIn(['query', 'tqlCardsInSync'], false),
 

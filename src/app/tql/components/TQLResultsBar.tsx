@@ -185,9 +185,9 @@ class TQLResultsBar extends PureClasss<Props>
       queryId: null,
     });
     
-    if(response.error)
+    if(response.errorMessage)
     {
-      let error = response.error;
+      let error = response.errorMessage;
       error = error.replace(/MySQL/g, 'TerrainDB');
       if(error.charAt(error.length - 1) === '^')
       {
@@ -219,7 +219,7 @@ class TQLResultsBar extends PureClasss<Props>
       return;
     }
     
-    let results = response.resultSet as (any[] | string);
+    let results = response.results as (any[] | string);
     if(results)
     {
       var spliced = 0;

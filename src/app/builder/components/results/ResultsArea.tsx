@@ -380,7 +380,7 @@ class ResultsArea extends PureClasss<Props>
       countQueryId: null,
     });
     
-    let results = response.resultSet;
+    let results = response.results;
     if(results)
     {
       if(results.length === 1)
@@ -425,18 +425,20 @@ class ResultsArea extends PureClasss<Props>
     
     if(response)
     {
-      if(response.error)
+      console.log(response);
+      if(response.errorMessage)
       {
         if(!isAllFields)
         {
-          let error = response.error;
-          if(typeof this.state.error === 'string')
+          let error = response.errorMessage;
+          console.log(error);
+          if(typeof error === 'string')
           {
             if(error.charAt(error.length - 1) === '^')
             {
               error = error.substr(0, error.length - 1);
             }
-            error = this.state.error.replace(/MySQL/g, 'TerrainDB');
+            error = error.replace(/MySQL/g, 'TerrainDB');
           }
           
           this.setState({
@@ -454,7 +456,7 @@ class ResultsArea extends PureClasss<Props>
         return;
       }
       
-      let results = response.resultSet;
+      let results = response.results;
       
       var resultsCount = results ? results.length : 0;
       if(resultsCount > MAX_RESULTS)
@@ -613,9 +615,16 @@ column if you have set a custom results view.');
         )
       );
       
-      if(!query.cards.get(0).cards.some(
-        card => card.type === 'groupBy'
-        ))
+      let selectCard = query.cards.get(0);
+      if(
+        selectCard 
+        && !selectCard.cards.some(
+            card => card.type === 'groupBy'
+          ) 
+        && !selectCard.fields.some(
+            field => field.field.static && field.field.static.isAggregate
+          )
+      )
       {
         // temporary, don't dispatch select * if has group by
         

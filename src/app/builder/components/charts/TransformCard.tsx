@@ -311,7 +311,7 @@ class TransformCard extends PureClasss<Props>
       queryId: null,
     });
     
-    let results = response.resultSet;
+    let results = response.results;
     if(results && results.length)
     {
       let max = +results[0].value;
