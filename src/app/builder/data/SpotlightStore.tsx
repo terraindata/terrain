@@ -47,18 +47,31 @@ import * as Immutable from 'immutable';
 import { Map, List } from 'immutable';
 import * as ReduxActions from 'redux-actions';
 var Redux = require('redux');
+import {BaseClass, New} from '../../Classes';
 
-export class SpotlightStateClass
+
+class SpotlightStateC extends BaseClass
 {
   spotlights: Map<string, any> = Map({});
 }
-export interface SpotlightState extends SpotlightStateClass, IMap<SpotlightState> {}
-let SpotlightState_Record = Immutable.Record(new SpotlightStateClass());
-let _SpotlightState = (config?:any) => {
-  return new SpotlightState_Record(config || {}) as any as SpotlightState;
-}
+export type SpotlightState = SpotlightStateC & IRecord<SpotlightStateC>;
+export const _SpotlightState = (config?: {[key:string]: any}) => 
+  New<SpotlightState>(new SpotlightStateC(config), config);
 
-var DefaultState = _SpotlightState();
+const DefaultState = _SpotlightState();
+
+// TODO something better like this
+// class SpotlightC extends BaseClass
+// {
+//   name: string;
+//   color: string;
+  
+// }
+// export type Spotlight = SpotlightC & IRecord<Spotlight>;
+// export const _Spotlight = (config?: {[key:string]: any}) => 
+//   New<Spotlight>(new SpotlightC(config), config);
+
+
 
 interface SpotlightAction
 {

@@ -181,22 +181,31 @@ class ResultsManager extends PureClasss<Props>
     if(nextProps.resultsState.results !== this.props.resultsState.results)
     {
       // update spotlights
-      let config = this.getResultsConfig();
+      let nextState = nextProps.resultsState;
+      let {resultsConfig} = nextProps.query;
+      
       SpotlightStore.getState().spotlights.map(
         (spotlight, id) =>
         {
           let resultIndex = nextState.results && nextState.results.findIndex(
-            r => getPrimaryKeyFor(r, config) === id
+            r => getPrimaryKeyFor(r, resultsConfig) === id
           );
           if(resultIndex !== -1)
           {
             spotlightAction(id, _.extend({
                 color: spotlight.color,
-                name: spotlight.name,  
-              }, 
-              nextState.results[resultIndex], 
-              nextState.resultsWithAllFields[resultIndex])
-            );
+                name: spotlight.name,
+              },
+              nextState.results.get(resultIndex).toJS()
+            ));
+            // TODO something more like this
+            // spotlightAction(id, 
+            //   {
+            //     color: spotlight.color,
+            //     name: spotlight.name,  
+            //     result: nextState.results.get(resultIndex),
+            //   }
+            // );
           }
           else
           {
@@ -218,7 +227,7 @@ class ResultsManager extends PureClasss<Props>
       countXhr: null,
       countQueryId: null,
     });
-    let results = response.resultSet;
+    let results = response.results;
     if(results)
     {
       if(results.length === 1)
@@ -339,7 +348,6 @@ class ResultsManager extends PureClasss<Props>
     this.setState({
       error: true,
     });
-    this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
   handleAllFieldsError()
@@ -347,7 +355,6 @@ class ResultsManager extends PureClasss<Props>
     this.setState({
       allXhr: null,
     });
-    this.props.onLoadEnd && this.props.onLoadEnd();
   }
   
     queryResults(query)
