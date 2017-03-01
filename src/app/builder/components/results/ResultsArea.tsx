@@ -425,13 +425,11 @@ class ResultsArea extends PureClasss<Props>
     
     if(response)
     {
-      console.log(response);
       if(response.errorMessage)
       {
         if(!isAllFields)
         {
           let error = response.errorMessage;
-          console.log(error);
           if(typeof error === 'string')
           {
             if(error.charAt(error.length - 1) === '^')
