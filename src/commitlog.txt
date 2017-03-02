@@ -1,3 +1,21 @@
+commit 6a6d84dfa0bbad89e3d30b5d29e7d48d4fb1354e
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu Mar 2 11:28:34 2017 -0800
+
+    Update deploy scripts
+
+commit 499b2d88b9f81d7c45a2255ac08124da03df8bbb
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu Mar 2 11:21:39 2017 -0800
+
+    Adding gitignore for commit log
+
+commit 2c0102471a1d3e25908dc7100f3b9ea2223955e5
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu Mar 2 11:21:10 2017 -0800
+
+    Addnig a commit log to the interface
+
 commit f504d1714d914275fc1fdd3a80de99fa4fa66700
 Author: Luke Knepper <luke@terraindb.com>
 Date:   Wed Mar 1 11:53:35 2017 -0800
@@ -80,21 +98,3 @@ Date:   Tue Feb 14 11:04:34 2017 -0800
 commit a99805b999b1cab552130a1670e029e640edabbd
 Author: Luke Knepper <luke@terraindb.com>
 Date:   Fri Feb 10 17:49:08 2017 -0800
-
-    Fix issue with extensions not resolving correctly
-
-commit 2219f1e09e2bf97d7918e485811cd4a8a5ad43a7
-Author: Luke Knepper <luke@terraindb.com>
-Date:   Fri Feb 10 15:59:34 2017 -0800
-
-    Un-extend the extensions
-
-commit 825a49d73940189fec80051343b3b710bac96d4b
-Merge: 9ba9f77 dd5b5a8
-Author: Luke Knepper <luke@terraindb.com>
-Date:   Fri Feb 10 15:31:40 2017 -0800
-
-    Merge branch 'master' into tql2cards
-
-commit dd5b5a833161c063c398ff235edb5486a7bfa964
-Author: Luke Knepper <luke@terraindb.com>
