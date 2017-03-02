@@ -271,9 +271,10 @@ class ResultsManager extends PureClasss<Props>
   
   handleResultsChange(response:QueryResponse, isAllFields?: boolean)
   {
-    let xhrKey = isAllFields ? 'allXhr' : 'xhr';
+    let queryKey = isAllFields ? 'allQuery' : 'query';
+
     this.setState({
-      [xhrKey]: null,
+      [queryKey]: null,
     });
     
     if(response)
