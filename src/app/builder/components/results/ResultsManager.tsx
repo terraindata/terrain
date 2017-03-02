@@ -75,7 +75,7 @@ let _Result = (config: Object = {}) =>
 
 export type Results = List<Result>;
 
-export class ResultsState extends BaseClass
+class ResultsStateC extends BaseClass
 {
   results: Results;
   count: number;
@@ -92,8 +92,9 @@ export class ResultsState extends BaseClass
   
   loading: boolean;
 }
+export type ResultsState = ResultsStateC & IRecord<ResultsStateC>;
 export let _ResultsState = (config: Object = {}) => 
-  New<ResultsState>(new ResultsState(config), config);
+  New<ResultsState>(new ResultsStateC(config), config);
 
 
 
@@ -186,7 +187,7 @@ class ResultsManager extends PureClasss<Props>
       // update spotlights
       let nextState = nextProps.resultsState;
       let {resultsConfig} = nextProps.query;
-      
+
       SpotlightStore.getState().spotlights.map(
         (spotlight, id) =>
         {
@@ -227,9 +228,9 @@ class ResultsManager extends PureClasss<Props>
   handleCountResponse(response:QueryResponse)
   {
     this.setState({
-      countXhr: null,
-      countQueryId: null,
+      countQuery: null,
     });
+    
     let results = response.results;
     if(results)
     {
@@ -259,9 +260,13 @@ class ResultsManager extends PureClasss<Props>
   handleCountError()
   {
     this.setState({
-      countXhr: null,
-      resultsCount: -1,
-    })
+      countQuery: null,
+    });
+    // probably not needed
+    // BuilderActions.results(
+    //   this.props.resultsState
+    //     .set('resultsLongCount', 0)
+    // );
   }
   
   handleResultsChange(response:QueryResponse, isAllFields?: boolean)
@@ -298,7 +303,6 @@ class ResultsManager extends PureClasss<Props>
           });
         }
         
-        this.props.onLoadEnd && this.props.onLoadEnd();
         return;
       }
       
@@ -346,39 +350,38 @@ class ResultsManager extends PureClasss<Props>
   handleError(ev)
   {  
     this.setState({
-      xhr: null,
+      query: null,
     });
-    this.setState({
-      error: true,
-    });
+    
+    BuilderActions.results(
+      this.props.resultsState
+        .set('hasError', true)
+        .set('errorMessage', (ev && ev.errorMessage) || 'There was a problem communicating with the server.')
+    );
   }
   
   handleAllFieldsError()
   {
     this.setState({
-      allXhr: null,
+      allQuery: null,
     });
   }
   
-    queryResults(query)
+  queryResults(query)
   {
     var tql = TQLConverter.toTQL(query, {
       limit: MAX_RESULTS,
       replaceInputs: true,
     });
     
-    if(tql !== this.state.tql)
+    if(tql !== this.state.queriedTql)
     {
       this.killQueries();
       
       this.setState({
-        tql,
+        querieidTql: tql,
         allFieldsError: false,
       });
-      
-      this.props.onLoadStart && this.props.onLoadStart();
-      this.state.xhr && this.state.xhr.abort();
-      this.state.allXhr && this.state.allXhr.abort();
       
       this.setState(
         Ajax.query(
@@ -389,27 +392,31 @@ class ResultsManager extends PureClasss<Props>
         )
       );
       
-      if(!query.cards.get(0).cards.some(
-        card => card.type === 'groupBy'
-        ))
+      let selectCard = query.cards.get(0);
+      if(
+        selectCard 
+        && !selectCard.cards.some(
+            card => card.type === 'groupBy'
+          ) 
+        && !selectCard.fields.some(
+            field => field.field.static && field.field.static.isAggregate
+          )
+      )
       {
-        // temporary, don't dispatch select * if has group by
-        
-        let {xhr, queryId} = Ajax.query(
-          TQLConverter.toTQL(query, {
-            allFields: true,
-            transformAliases: true,
-            limit: MAX_RESULTS,
-            replaceInputs: true,
-          }), 
-          this.props.db,
-          this.handleAllFieldsResponse,
-          this.handleAllFieldsError
-        );
+        // temporary, don't dispatch select * if query has group by
         
         this.setState({
-          allXhr: xhr,
-          allQueryId: queryId,
+          allQuery: Ajax.query(
+            TQLConverter.toTQL(query, {
+              allFields: true,
+              transformAliases: true,
+              limit: MAX_RESULTS,
+              replaceInputs: true,
+            }), 
+            this.props.db,
+            this.handleAllFieldsResponse,
+            this.handleAllFieldsError
+          )
         });
       }
       
