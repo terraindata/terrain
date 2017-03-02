@@ -47,30 +47,32 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import Actions from "../../builder/data/BuilderActions";
 import Util from '../../util/Util';
-import Classs from '../../common/components/Classs';
+import PureClasss from '../../common/components/PureClasss';
 import UserThumbnail from '../../users/components/UserThumbnail';
-import AuthStore from '../../auth/data/AuthStore';
+import UserStore from '../../users/data/UserStore';
 import UserTypes from '../../users/UserTypes';
 import { Link } from 'react-router';
 const {browserHistory} = require('react-router');
+import Modal from './Modal';
+const CommitLog = require('../../../commitlog.txt');
 
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
 var LogoutIcon = require("./../../../images/icon_logout.svg");
 var EditIcon = require("./../../../images/icon_edit.svg");
 var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
+const InfoIcon = require('../../../images/icon_info.svg?name=InfoIcon');
 
 interface Props {
 }
 
-class AccountDropdown extends Classs<Props>
+class AccountDropdown extends PureClasss<Props>
 {
   state: {
-    open: boolean,
-    username: string,
+    open?: boolean,
+    user?: UserTypes.User,
+    commitLogOpen?: boolean,
   } = {
-    open: false,
-    username: null,
   };
   
   unsubscribe = null;
@@ -78,29 +80,18 @@ class AccountDropdown extends Classs<Props>
   constructor(props:Props)
   {
     super(props);
-  }
-  
-  componentWillMount()
-  {
-    this.unsubscribe = AuthStore.subscribe(this.updateUser)
-    this.updateUser();
+    this._subscribe(
+      UserStore,
+      {
+        storeKeyPath: ['currentUser'],
+        stateKey: 'user',
+      }
+    );
   }
   
   componentWillUnmount()
   {
     $("body").unbind('click', this.close); 
-    this.unsubscribe && this.unsubscribe();
-  }
-  
-  updateUser()
-  {
-    let state = AuthStore.getState();
-    if(state)
-    {
-      this.setState({
-        username: state.get('username'),
-      })
-    }
   }
   
   close(event)
@@ -166,6 +157,17 @@ class AccountDropdown extends Classs<Props>
              My Team
           </div>        
         </div>
+        {
+          this.state.user && this.state.user.isAdmin &&
+            <div className="account-dropdown-row" onMouseDown={this._toggle('commitLogOpen')}>
+              <div className='account-dropdown-icon account-dropdown-icon-blue'>
+                <InfoIcon />
+              </div>
+              <div className='account-dropdown-link'>
+                 Commit Log
+              </div>        
+            </div>
+        }
         <div className="account-dropdown-row" onMouseDown={this.handleLogout}>
           <div className='account-dropdown-icon account-dropdown-icon-blue'>
             <LogoutIcon/>
@@ -182,7 +184,7 @@ class AccountDropdown extends Classs<Props>
       <div className="account-dropdown-top-bar" onClick={this.open} ref='accountDropdownButton'>
         <UserThumbnail
           showName={true}
-          username={this.state.username}
+          username={this.state.user && this.state.user.username}
           hideAdmin={true}
         />
         <ArrowIcon className="account-arrow-icon" />
@@ -199,8 +201,20 @@ class AccountDropdown extends Classs<Props>
     
     return (
       <div className={classes}>
-        { this.renderTopBar() }
-        { this.renderDropdown() }
+        { 
+          this.renderTopBar() 
+        }
+        { 
+          this.renderDropdown() 
+        }
+        
+        <Modal
+          message={CommitLog}
+          open={this.state.commitLogOpen}
+          title={'Commit Log'}
+          onClose={this._toggle('commitLogOpen')}
+          pre={true}
+        />
       </div>
    );
   }

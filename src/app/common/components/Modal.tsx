@@ -66,6 +66,7 @@ interface Props
   children?: any;
   thirdButtonText?: string;
   onThirdButton?: () => void;
+  pre?: boolean;
 }
 
 class Modal extends PureClasss<Props>   
@@ -80,6 +81,8 @@ class Modal extends PureClasss<Props>
   {
     var defaultTitle = this.props.error ? 'Alert' : 'Please Confirm'
       
+    let msgTag = this.props.pre ? <pre /> : <div />;
+    
     return (
       <div>
         <ReactModal 
@@ -121,14 +124,16 @@ class Modal extends PureClasss<Props>
             </div>
             {
               this.props.message &&
-              	<div className={classNames({
-                  'modal-message': true,
-                  'modal-message-error': this.props.error,
-                })}>
+                React.cloneElement(
+                  msgTag,
                   {
-                    this.props.message
+                    className: classNames({
+                      'modal-message': true,
+                      'modal-message-error': this.props.error,
+                    }),
+                    children: this.props.message,
                   }
-             		</div>
+                )
             }
             {
               this.props.children

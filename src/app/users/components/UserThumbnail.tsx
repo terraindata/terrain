@@ -70,10 +70,10 @@ interface Props
 
 class UserThumbnail extends Classs<Props>
 {
-  state: { user: User } = {
-    user: null,
+  state: { 
+    user?: User 
+  } = {
   }
-  unsubscribe = null;
   
   constructor(props:Props)
   {
@@ -82,26 +82,29 @@ class UserThumbnail extends Classs<Props>
   
   componentDidMount()
   {
+    this.subscribeUser();
+  }
+  
+  subscribeUser(nextProps?: Props)
+  {
+    this._unsubscribe();
     this._subscribe(UserStore, {
       stateKey: 'user',
-      storeKeyPath: this.getStoreKeyPath(),
+      storeKeyPath: this.getStoreKeyPath(nextProps),
       isMounted: true,
     });
   }
   
-  getStoreKeyPath()
+  getStoreKeyPath(props?:Props)
   {
-    return ['users', this.props.username];
+    return ['users', (props || this.props).username];
   }
   
   componentWillReceiveProps(nextProps)
   {
     if(nextProps.username !== this.props.username)
     {
-      this._update(UserStore, {
-        stateKey: 'user',
-        storeKeyPath: this.getStoreKeyPath(),
-      });
+      this.subscribeUser(nextProps);
     }  
   }
   

@@ -1,0 +1,100 @@
+commit f504d1714d914275fc1fdd3a80de99fa4fa66700
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Wed Mar 1 11:53:35 2017 -0800
+
+    limit tql results call
+
+commit 52280f22315b9915551758d08ff3109ad22e5484
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Wed Mar 1 10:55:40 2017 -0800
+
+    no comment
+
+commit e6a0ca77e0bc6550b21cbcbf4e00556d7b3f557f
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Wed Mar 1 10:05:31 2017 -0800
+
+    Error -> errorMessage
+
+commit 23d0b8c249afaada94b1d99391087aaac741d2a0
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Tue Feb 28 14:48:38 2017 -0800
+
+    deploy updates
+
+commit f1b6165762e53952add01fb00e9fb70943799e80
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Mon Feb 27 15:27:10 2017 -0800
+
+    Allow blank aliases
+
+commit 0ee8c726ec308f5f292a17cd81364ea18c37963a
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Mon Feb 27 13:56:39 2017 -0800
+
+    new scrolbar size; maths cards go in more places
+
+commit 087c4db980ca6fbebd08ecc5458ecc74b49459bd
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Fri Feb 24 13:28:22 2017 -0800
+
+    Touch-ups on killing queries
+
+commit 215e7f77e9be70c7c86e59edfd6bb619c083ca4c
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Fri Feb 24 12:46:03 2017 -0800
+
+    Fixing the error -> tdb_error bug; basic query killing
+
+commit 1c371dd13802118733414d778bef758ffd6a1ced
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Wed Feb 22 14:33:49 2017 -0800
+
+    Temporarily disable the count call, and the select * call for group by
+
+commit 8e1bfb8304a8a3bbb79b0c10d8060c05dfa67713
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Wed Feb 22 12:43:11 2017 -0800
+
+    Fix quick bug with negatives in tql to cards
+
+commit 14a18591dc4036d72d0b2164a88113da579e60fb
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Tue Feb 21 16:04:50 2017 -0800
+
+    Math cards. Math is fun.
+
+commit 6c5529b08fd3c2e073d94199c3977732a8365f81
+Merge: a728745 a9db57d
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Tue Feb 21 15:34:16 2017 -0800
+
+    Merge remote-tracking branch 'origin/tql2cards-math' into tql2cards
+
+commit a728745e9b996c09da5d11c7248eecec2ef91668
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Tue Feb 14 11:04:34 2017 -0800
+
+    Fix bug with multiple and/or cards
+
+commit a99805b999b1cab552130a1670e029e640edabbd
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Fri Feb 10 17:49:08 2017 -0800
+
+    Fix issue with extensions not resolving correctly
+
+commit 2219f1e09e2bf97d7918e485811cd4a8a5ad43a7
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Fri Feb 10 15:59:34 2017 -0800
+
+    Un-extend the extensions
+
+commit 825a49d73940189fec80051343b3b710bac96d4b
+Merge: 9ba9f77 dd5b5a8
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Fri Feb 10 15:31:40 2017 -0800
+
+    Merge branch 'master' into tql2cards
+
+commit dd5b5a833161c063c398ff235edb5486a7bfa964
+Author: Luke Knepper <luke@terraindb.com>
