@@ -10,3 +10,4 @@ bundle.js
 bundle.prod.js
 bundle.demo.js
 src/commitlog.txt
+npm-debug.log
