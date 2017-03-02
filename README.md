@@ -38,6 +38,7 @@ As TerrainDB is not yet ready to be used end-to-end with Terraformer, we current
 1. `npm install`
 1. `npm install -g tsd`
 1. `npm install -g babel`
+1. `git update-index --assume-unchanged src/commitlog.txt`
 1. `npm run start-local` (with local midway) or `npm start` (without midway) - dev server now running at [localhost:8080](localhost:8080).
 1. Default user login: `luser` / `secret` (for local midway) or ask Luke for your hosted account details (without midway)
 1. Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans]
