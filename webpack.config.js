@@ -82,6 +82,7 @@ module.exports = {
 		              // removes data-name attributes
 		              '!string-replace?search=%20data-name%3D%22%5B%5Cw%5Cs_-%5D*%22&replace=&flags=ig'
 	        },
+            { test: /\.txt$/, loader: 'raw-loader' }, 
         ]
     },
     plugins: [

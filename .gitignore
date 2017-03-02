@@ -9,3 +9,4 @@ node_modules
 bundle.js
 bundle.prod.js
 bundle.demo.js
+src/commitlog.txt
