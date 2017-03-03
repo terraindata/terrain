@@ -84,7 +84,7 @@ export class IResultsConfig
   score: string = "";
   fields: List<string> = List([]);
   enabled: boolean = false;
-  formats: Map<string, Format> = Map({});
+  formats: Map<string, Format> = Map<string, Format>({});
   primaryKeys: List<string> = List([]);
   
   set: (f: string, v: any) => IResultsConfig;

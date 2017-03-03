@@ -279,7 +279,7 @@ class ResultsArea extends PureClasss<Props>
             return (
               <Result
                 result={result}
-                config={resultsConfig}
+                resultsConfig={resultsConfig}
                 onExpand={this.handleExpand}
                 index={index}
                 key={index}
@@ -296,161 +296,6 @@ class ResultsArea extends PureClasss<Props>
         }
       </InfiniteScroll>
     );
-  }
-  
-  
-  handleCountResponse(response:QueryResponse)
-  {
-    
-    let results = response.results;
-    if(results)
-    {
-      if(results.length === 1)
-      {
-        this.setState({
-          resultsCount: results[0]['COUNT(*)']
-        });
-      }
-      else if(results.length > 1)
-      {
-        this.setState({
-          resultsCount: results.length,
-        })
-      }
-      else
-      {
-        this.handleCountError();
-      }
-    }
-    else
-    {
-      this.handleCountError();
-    }
-  }
-  
-  handleCountError()
-  {
-    this.setState({
-      countXhr: null,
-      resultsCount: -1,
-    })
-  }
-  
-  handleResultsChange(response:QueryResponse, isAllFields?: boolean)
-  {
-    this.setState({
-      [isAllFields ? 'allXhr' : 'xhr']: null,
-      [isAllFields ? 'allQueryId' : 'queryId']: null,
-    });
-    
-    if(response)
-    {
-      if(response.errorMessage)
-      {
-        if(!isAllFields)
-        {
-          let error = response.errorMessage;
-          if(typeof error === 'string')
-          {
-            if(error.charAt(error.length - 1) === '^')
-            {
-              error = error.substr(0, error.length - 1);
-            }
-            error = error.replace(/MySQL/g, 'TerrainDB');
-          }
-          
-          this.setState({
-            error,
-          });
-        }
-        else
-        {
-          this.setState({
-            allFieldsError: true,
-          });
-        }
-        
-        this.props.onLoadEnd && this.props.onLoadEnd();
-        return;
-      }
-      
-      let results = response.results;
-      
-      var resultsCount = results ? results.length : 0;
-      if(resultsCount > MAX_RESULTS)
-      {
-        results.splice(MAX_RESULTS, results.length - MAX_RESULTS);
-      }
-      
-      if(isAllFields)
-      {
-        this.setState({
-          resultsWithAllFields: results,
-        });
-      }
-      else
-      {
-        this.setState({
-          results,
-          resultType: 'rel',
-          error: false,
-        });
-      }
-    }
-    else
-    {
-      // no response
-      if(!isAllFields)
-      {
-        this.setState({
-          error: "No response was returned from the server.",
-        });
-      }
-      else
-      {
-        this.setState({
-          allFieldsError: true,
-        });
-      }
-    }
-    
-    if(!this.state.xhr && !this.state.allXhr)
-    {
-      // all done with both
-      this.props.onLoadEnd && this.props.onLoadEnd();
-    }
-  }
-  
-  componentWillUpdate(nextProps, nextState: State)
-  {
-    if(nextState.results !== this.state.results 
-      || nextState.resultsWithAllFields !== this.state.resultsWithAllFields)
-    {
-      // update spotlights
-      let config = this.getResultsConfig();
-      SpotlightStore.getState().spotlights.map(
-        (spotlight, id) =>
-        {
-          let resultIndex = nextState.results && nextState.results.findIndex(
-            r => getPrimaryKeyFor(r, config) === id
-          );
-          if(resultIndex !== -1)
-          {
-            spotlightAction(id, _.extend({
-                color: spotlight.color,
-                name: spotlight.name,  
-              }, 
-              nextState.results[resultIndex], 
-              nextState.resultsWithAllFields[resultIndex])
-            );
-          }
-          else
-          {
-            spotlightAction(id, null);
-          } 
-        }
-      );
-    }
   }
 
   handleExport()
@@ -566,9 +411,9 @@ column if you have set a custom results view.');
     {
       return <ResultsConfig
         config={this.props.query.resultsConfig}
+        fields={this.props.resultsState.fields}
         onClose={this.hideConfig}
         onConfigChange={this.handleConfigChange}
-        results={this.props.resultsState.results}
       />;
     }
   }

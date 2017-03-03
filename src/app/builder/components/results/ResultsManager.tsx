@@ -63,7 +63,7 @@ class ResultClass extends BaseClass
   // all available fields for display
   fields: Map<string, string> = Map<string, string>({});
   
-  // spotlight: any;
+  spotlight: any;
   
   rawFields: Map<string, string> = Map<string, string>({});
   transformFields: Map<string, string> = Map<string, string>({});
