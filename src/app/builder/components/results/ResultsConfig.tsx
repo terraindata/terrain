@@ -105,9 +105,11 @@ export const _IResultsConfig = (config?:any) => {
 }
 export const DefaultIResultsConfig = _IResultsConfig();
 
+
+
 interface Props
 {
-  results: Results;
+  fields: List<string>;
   config: IResultsConfig;
   onConfigChange: (config:IResultsConfig) => void;
   onClose: () => void;
@@ -116,11 +118,9 @@ interface Props
 export class ResultsConfig extends PureClasss<Props>
 {
   state: {
-    fields: List<string>;
     lastHover: {index: number, field: string},
     config: IResultsConfig;
   } = {
-    fields: null,
     lastHover: {index: null, field: null},
     config: null,
   };
@@ -129,7 +129,6 @@ export class ResultsConfig extends PureClasss<Props>
   {
     super(props);
     this.state.config = props.config;
-    this.state.fields = this.calcFields(this.props.results, this.props.resultsWithAllFields);
   }
   
   componentWillReceiveProps(nextProps:Props)
@@ -140,24 +139,6 @@ export class ResultsConfig extends PureClasss<Props>
         config: nextProps.config,
       });
     }
-    
-    if(this.props.results !== nextProps.results || this.props.resultsWithAllFields !== nextProps.resultsWithAllFields)
-    {
-      this.setState({
-        fields: this.calcFields(nextProps.results, nextProps.resultsWithAllFields),
-      });
-    }
-  }
-  
-  calcFields(results:any[], resultsWithAllFields:any[]):List<string>
-  {
-    var fieldMap = {};
-    let resultsMapFn = (result:any) => _.map(result, (v,field) => fieldMap[field] = 1);
-    results && results.map(resultsMapFn);
-    resultsWithAllFields && resultsWithAllFields.map(resultsMapFn);
-    
-    let fields = _.keys(fieldMap);
-    return List(fields);
   }
   
   handleDrop(type: string, field: string, index?: number)
@@ -402,7 +383,8 @@ export class ResultsConfig extends PureClasss<Props>
             type={null}
             onDrop={this.handleDrop}
           >
-            { this.state.fields.map(field =>
+            { 
+              this.props.fields.map(field =>
                 <ResultsConfigResult
                   key={field}
                   field={field}
@@ -414,7 +396,8 @@ export class ResultsConfig extends PureClasss<Props>
                   primaryKeys={config.primaryKeys}
                   onPrimaryKeysChange={this.handlePrimaryKeysChange}
                 />
-            ) }
+              ) 
+            }
           </CRTarget>
           <div className='results-config-disabled-veil'>
             <div className='results-config-disabled-veil-inner'>
