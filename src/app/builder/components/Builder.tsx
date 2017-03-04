@@ -635,7 +635,7 @@ class Builder extends PureClasss<Props>
       resizeHandleRef: 'resize-handle',
       content: query && <BuilderColumn
         query={query}
-        resultState={this.state.builderState.resultsState}
+        resultsState={this.state.builderState.resultsState}
         index={index}
         colKey={key}
         variant={variant}
@@ -826,6 +826,7 @@ class Builder extends PureClasss<Props>
     let config = this.props.params.config;
     let variant = this.getVariant();
     let query = this.getQuery();
+    console.log(this.state.builderState.db);
 
     return (
       <div className={classNames({
@@ -867,6 +868,7 @@ class Builder extends PureClasss<Props>
           thirdButtonText="Don't Save"
           onThirdButton={this.handleModalDontSave}
         />
+        
         <ResultsManager
           query={query}
           resultsState={this.state.builderState.resultsState}

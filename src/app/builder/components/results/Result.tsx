@@ -157,7 +157,7 @@ class ResultComponent extends Classs<Props> {
   
   renderSpotlight()
   {
-    if(!this.state.isSpotlit)
+    if(!this.props.result.spotlight)
     {
       return null;
     }

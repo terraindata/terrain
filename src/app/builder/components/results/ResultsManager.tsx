@@ -86,6 +86,7 @@ class ResultsStateC extends BaseClass
   hasError: boolean = false;
   errorMessage: string = '';
   hasAllFieldsError: boolean = false;
+  allFieldsErrorMessage: string = '';
   
   valid: boolean = false; // are these results still valid for the given query?
   
@@ -140,8 +141,10 @@ class ResultsManager extends PureClasss<Props>
   
   componentWillMount()
   {
+    console.log('a');
     Util.addBeforeLeaveHandler(this.killQueries);
-    this.queryResults(this.props.query);
+    this.queryResults(this.props.query, this.props.db);
+    console.log('b');
   }
   
   componentWillUnmount()
@@ -156,8 +159,13 @@ class ResultsManager extends PureClasss<Props>
     );
   }
   
-  queryResults(query)
+  queryResults(query: BuilderTypes.Query, db: string)
   {
+    if(!query || !db)
+    {
+      return;
+    }
+    
     var tql = TQLConverter.toTQL(query, {
       limit: MAX_RESULTS,
       replaceInputs: true,
@@ -166,13 +174,13 @@ class ResultsManager extends PureClasss<Props>
     if(tql !== this.state.queriedTql)
     {
       this.killQueries();
-      
+      console.log('8', db);
       this.setState({
         queriedTql: tql,
         query:
           Ajax.query(
             tql, 
-            this.props.db, 
+            db, 
             this.handleResultsResponse, 
             this.handleError
           )
@@ -199,7 +207,7 @@ class ResultsManager extends PureClasss<Props>
               limit: MAX_RESULTS,
               replaceInputs: true,
             }), 
-            this.props.db,
+            db,
             this.handleAllFieldsResponse,
             this.handleAllFieldsError
           )
@@ -214,7 +222,7 @@ class ResultsManager extends PureClasss<Props>
       //         count: true,
       //         replaceInputs: true,
       //       }), 
-      //       this.props.db,
+      //       db,
       //       this.handleCountResponse,
       //       this.handleCountError
       //     ),
@@ -240,12 +248,19 @@ class ResultsManager extends PureClasss<Props>
   
   componentWillReceiveProps(nextProps: Props)
   {
-    if(nextProps.query.cards !== this.props.query.cards 
-      || nextProps.query.inputs !== this.props.query.inputs)
+    if(
+      nextProps.query &&
+      (
+        (!this.props.query && !nextProps.resultsState.loading)
+        || nextProps.query.cards !== this.props.query.cards 
+        || nextProps.query.inputs !== this.props.query.inputs
+        || nextProps.db !== this.props.db
+      )
+    )
     {
-      this.queryResults(nextProps.query);
+      this.queryResults(nextProps.query, nextProps.db);
       
-      if(nextProps.query.id !== this.props.query.id)
+      if(!this.props.query || nextProps.query.id !== this.props.query.id)
       {
         this.changeResults({
           results: List([]),
@@ -253,42 +268,42 @@ class ResultsManager extends PureClasss<Props>
       }
     }
     
-    if(nextProps.resultsState.results !== this.props.resultsState.results)
-    {
-      // update spotlights
-      let nextState = nextProps.resultsState;
-      let {resultsConfig} = nextProps.query;
+    // if(nextProps.resultsState.results !== this.props.resultsState.results)
+    // {
+    //   // update spotlights
+    //   let nextState = nextProps.resultsState;
+    //   let {resultsConfig} = nextProps.query;
 
-      SpotlightStore.getState().spotlights.map(
-        (spotlight, id) =>
-        {
-          let resultIndex = nextState.results && nextState.results.findIndex(
-            r => getPrimaryKeyFor(r, resultsConfig) === id
-          );
-          if(resultIndex !== -1)
-          {
-            spotlightAction(id, _.extend({
-                color: spotlight.color,
-                name: spotlight.name,
-              },
-              nextState.results.get(resultIndex).toJS()
-            ));
-            // TODO something more like this
-            // spotlightAction(id, 
-            //   {
-            //     color: spotlight.color,
-            //     name: spotlight.name,  
-            //     result: nextState.results.get(resultIndex),
-            //   }
-            // );
-          }
-          else
-          {
-            spotlightAction(id, null);
-          } 
-        }
-      );
-    }
+    //   SpotlightStore.getState().spotlights.map(
+    //     (spotlight, id) =>
+    //     {
+    //       let resultIndex = nextState.results && nextState.results.findIndex(
+    //         r => getPrimaryKeyFor(r, resultsConfig) === id
+    //       );
+    //       if(resultIndex !== -1)
+    //       {
+    //         spotlightAction(id, _.extend({
+    //             color: spotlight.color,
+    //             name: spotlight.name,
+    //           },
+    //           nextState.results.get(resultIndex).toJS()
+    //         ));
+    //         // TODO something more like this
+    //         // spotlightAction(id, 
+    //         //   {
+    //         //     color: spotlight.color,
+    //         //     name: spotlight.name,  
+    //         //     result: nextState.results.get(resultIndex),
+    //         //   }
+    //         // );
+    //       }
+    //       else
+    //       {
+    //         spotlightAction(id, null);
+    //       } 
+    //     }
+    //   );
+    // }
   }
   
   handleResultsResponse(response:QueryResponse, isAllFields?: boolean)
@@ -308,7 +323,6 @@ class ResultsManager extends PureClasss<Props>
     }
       
     let resultsData = response.results;
-    
     let resultsCount = resultsData.length;
     if(resultsData.length > MAX_RESULTS)
     {
@@ -331,6 +345,8 @@ class ResultsManager extends PureClasss<Props>
         {
           result = result.set('rawFields', Map(resultData));
         }
+        
+        results = results.set(index, result);
       }
     )
     
@@ -344,7 +360,7 @@ class ResultsManager extends PureClasss<Props>
       results,
       fields,
       hasError: false,
-      loading: false,
+      loading: resultsState.hasLoadedNewResults,
       hasLoadedNewResults: true,
     });
   }
