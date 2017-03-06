@@ -91,7 +91,11 @@ class ResultsStateC extends BaseClass
   valid: boolean = false; // are these results still valid for the given query?
   
   loading: boolean = false; // if we're still loading any fields, besides for the count
-  hasLoadedNewResults: boolean = false; // if we have received a response for any of the new results
+  
+  hasLoadedResults: boolean = false;
+  hasLoadedAllFields: boolean = false; 
+  hasLoadedCount: boolean = false;
+  hasLoadedTransform: boolean = false;
 }
 export type ResultsState = ResultsStateC & IRecord<ResultsStateC>;
 export let _ResultsState = (config: Object = {}) => 
@@ -141,10 +145,8 @@ class ResultsManager extends PureClasss<Props>
   
   componentWillMount()
   {
-    console.log('a');
     Util.addBeforeLeaveHandler(this.killQueries);
     this.queryResults(this.props.query, this.props.db);
-    console.log('b');
   }
   
   componentWillUnmount()
@@ -174,7 +176,6 @@ class ResultsManager extends PureClasss<Props>
     if(tql !== this.state.queriedTql)
     {
       this.killQueries();
-      console.log('8', db);
       this.setState({
         queriedTql: tql,
         query:
@@ -189,10 +190,10 @@ class ResultsManager extends PureClasss<Props>
       let selectCard = query.cards.get(0);
       if(
         selectCard 
-        && !selectCard.cards.some(
+        && !selectCard['cards'].some(
             card => card.type === 'groupBy'
           ) 
-        && !selectCard.fields.some(
+        && !selectCard['fields'].some(
             field => field.field.static && field.field.static.isAggregate
           )
       )
@@ -230,7 +231,10 @@ class ResultsManager extends PureClasss<Props>
       
       this.changeResults({
         loading: true,
-        hasLoadedNewResults: false,
+        hasLoadedResults: false,
+        hasLoadedAllFields: false,
+        hasLoadedCount: false,
+        hasLoadedTransform: false,
       });
     }
   }
@@ -329,8 +333,9 @@ class ResultsManager extends PureClasss<Props>
       resultsData.splice(MAX_RESULTS, resultsData.length - MAX_RESULTS);
     }
     
-    let results: Results = resultsState.hasLoadedNewResults 
-      ? resultsState.results : List([]);
+    let results: Results = 
+      (resultsState.hasLoadedResults || resultsState.hasLoadedAllFields)
+        ? resultsState.results : List([]);
     
     resultsData.map(
       (resultData, index) =>
@@ -360,8 +365,8 @@ class ResultsManager extends PureClasss<Props>
       results,
       fields,
       hasError: false,
-      loading: resultsState.hasLoadedNewResults,
-      hasLoadedNewResults: true,
+      loading: resultsState.hasLoadedResults && resultsState.hasLoadedAllFields,
+      [isAllFields ? 'hasLoadedAllFields' : 'hasLoadedResults']: true,
     });
   }
   

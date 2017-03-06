@@ -385,12 +385,10 @@ class BuilderTQLColumn extends PureClasss<Props>
           }
           
           <TQLResultsBar
-            tql={this.state.tql}
-            query={this.props.query}
-            db={this.props.variant && this.props.variant.db}
             onError={this.highlightError}
             open={this.state.resultsBarOpen}
             onToggle={this._toggle('resultsBarOpen')}
+            resultsState={this.props.resultsState}
           />
         </div>
       </div>

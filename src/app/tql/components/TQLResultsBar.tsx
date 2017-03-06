@@ -52,13 +52,11 @@ import Actions from "../../builder/data/BuilderActions";
 import TQLConverter from "../../tql/TQLConverter";
 import PureClasss from './../../common/components/PureClasss';
 import BuilderTypes from '../../builder/BuilderTypes';
-
+import {ResultsState} from '../../builder/components/results/ResultsManager';
 interface Props 
 {
-  tql: string;
-  query: BuilderTypes.Query; // may not be necessary once we can pass inputs to TDBD
+  resultsState: ResultsState;
   onError: (lineNumber: number) => void;
-  db: string;
   open: boolean;
   onToggle: () => void;
 }
@@ -66,9 +64,6 @@ interface Props
 class TQLResultsBar extends PureClasss<Props>
 {
   state: {
-    xhr?: XMLHttpRequest;
-    results?: any[];
-    error?: boolean;
     mainErrorMessage?: string;
     subErrorMessage?: string;
     querying?: boolean;
@@ -79,45 +74,23 @@ class TQLResultsBar extends PureClasss<Props>
   } = {
   };
   
-  componentWillMount()
-  {
-    Util.addBeforeLeaveHandler(this.killQuery);
-    this.queryResults(this.props.query);
-  }
-  
-  componentWillUnmount()
-  {
-    this.killQuery();
-  }
-  
-  killQuery()
-  {
-    if(this && this.state && this.state.queryId)
-    {
-      Ajax.killQuery(this.state.queryId);
-    }
-  }
-
-  //If the component updates and the tql command has been changed, then query results
   componentWillReceiveProps(nextProps:Props) 
   {
-    if(nextProps.query.cards !== this.props.query.cards
-      || nextProps.query.inputs !== this.props.query.inputs) 
-    {
-      this.queryResults(nextProps.query);
-    } 
+    // check for an error line?
   }
     
   resultsFodderRange = _.range(0, 25);
 
   renderResults()
   {
-    if(this.state.querying)
+    let {resultsState} = this.props;
+    
+    if(!resultsState.hasLoadedResults)
     {
       return <div>Querying results...</div>
-    } 
+    }
 
-    if(this.state.error)
+    if(resultsState.hasError)
     {
       return (
         <div>
@@ -140,160 +113,74 @@ class TQLResultsBar extends PureClasss<Props>
       );
     }
 
-    if(!this.state.results) 
+    let {results} = resultsState;
+
+    if(!results) 
     {
       return <div>Compose a query to view results here.</div>
     }
     
-    if(typeof this.state.results === 'string')
+    if(typeof results === 'string')
     {
-      if(!this.state.results.length)
+      if(!results['length'])
       {
         return <em> "" (empty string)</em>;
       }
-      return <div>{this.state.results}</div>;
+      return (
+        <div>
+          {
+            results
+          }
+        </div>
+      );
     }
     
-    if(!this.state.results.length)
+    if(!results.size)
     {
       return <div>There are no results for your query.</div>;
     }
     
-    return(
+    return (
       <div>
         {
-          this.state.results.map((result, i) =>
+          results.map((result, i) =>
             <div key={i}>
-              {JSON.stringify(result)}
+              {
+                JSON.stringify(result.toJS())
+              }
             </div>
           )
-        }
-        {
-          this.state.resultsSpliced ? <em> And {this.state.resultsSpliced} more results </em> : null
         }
       </div>
     );
   }
   
-  handleResultsChange(response: QueryResponse)
-  {
-    this.setState({
-      xhr: null,
-      queryId: null,
-    });
+  // handleResultsChange(response: QueryResponse)
+  // {
     
-    if(response.errorMessage)
-    {
-      let error = response.errorMessage;
-      error = error.replace(/MySQL/g, 'TerrainDB');
-      if(error.charAt(error.length - 1) === '^')
-      {
-        error = error.substr(0, error.length - 1);
-      }
-      let matches = error.match(/([0-9]+)\:[0-9]+/);
-      let line = matches && matches.length >= 2 && parseInt(matches[1]);
+  //   if(response.errorMessage)
+  //   {
+  //     let error = response.errorMessage;
+  //     error = error.replace(/MySQL/g, 'TerrainDB');
+  //     if(error.charAt(error.length - 1) === '^')
+  //     {
+  //       error = error.substr(0, error.length - 1);
+  //     }
+  //     let matches = error.match(/([0-9]+)\:[0-9]+/);
+  //     let line = matches && matches.length >= 2 && parseInt(matches[1]);
       
-      if(line !== NaN && line !== null && line !== undefined)
-      {
-        var mainErrorMessage = 'Error on line ' + line + ': ';
-        var subErrorMessage = error;
-        this.props.onError(line);
-      }
-      else
-      {
-        var mainErrorMessage = error;
-        var subErrorMessage: string = null;
-      }
-      
-      this.setState({
-        error: true,
-        mainErrorMessage,
-        subErrorMessage,
-        errorLine: line,
-        querying: false,
-        results: null,
-      });
-      return;
-    }
-    
-    let results = response.results as (any[] | string);
-    if(results)
-    {
-      var spliced = 0;
-      if(typeof results === 'string')
-      {
-        if(results.length > 1000)
-        {
-          spliced = results.length - 1000;
-          results = results['substr'](0, 1000) + '...';
-        }
-      }
-      if(Array.isArray(results))
-      {
-        if(results.length > 25)
-        {
-          spliced = results.length - 25;
-          results.splice(25, results.length - 25);
-        }
-      }
-      
-      this.setState({
-        results,
-        querying: false,
-        error: false,
-        errorLine: null,
-        resultsSpliced: spliced,
-      });
-    }
-    else
-    {
-      this.setState({
-        error: "No response was returned from the server.",
-        xhr: null,
-        querying: false,
-      });
-    }
-  }
-  
-  handleError(ev)
-  {
-    this.setState({
-      error: ev,
-      querying: false,
-    });
-  }
-  
-  queryResults(query:BuilderTypes.Query)
-  {
-    let tql = TQLConverter.toTQL(query, {
-      replaceInputs: true,
-    });
-    
-    if(tql)
-    {
-      if(tql !== this.state.queriedTql)
-      {
-        this.killQuery();
-        this.state.xhr && this.state.xhr.abort();
-
-        let {xhr, queryId} = Ajax.query(tql, this.props.db, this.handleResultsChange, this.handleError);
-        
-        this.setState({
-          querying: true,
-          limit: 200,
-          queriedTql: tql,
-          xhr,
-          queryId,
-        });
-      }
-    }
-    else
-    {
-      this.setState({
-        results: null,
-      });
-    }
-  }
+  //     if(line !== NaN && line !== null && line !== undefined)
+  //     {
+  //       var mainErrorMessage = 'Error on line ' + line + ': ';
+  //       var subErrorMessage = error;
+  //       this.props.onError(line);
+  //     }
+  //     else
+  //     {
+  //       var mainErrorMessage = error;
+  //       var subErrorMessage: string = null;
+  //     }
+  // }
   
 	render()
   {
