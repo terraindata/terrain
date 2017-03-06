@@ -205,6 +205,16 @@ export module SchemaTypes
 		index: 'indexes',
 	}
 
+	export function searchIncludes(item: SchemaBaseClass, search:string): boolean
+	{
+		return !search || 
+  		(
+  			item && 
+  			item.name.toLowerCase().indexOf(
+  				search.toLowerCase()
+  			) !== -1
+  		);
+	}
 
 	
 	// used to define how to render tree item children in tree list

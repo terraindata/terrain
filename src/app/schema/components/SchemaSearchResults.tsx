@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+import * as _ from 'underscore';
 const Radium = require('radium');
 import SchemaTypes from '../SchemaTypes';
 import SchemaStore from '../data/SchemaStore';
@@ -57,13 +58,23 @@ interface Props
 	search: string;
 }
 
+const INIT_SHOWING_COUNT: {[type:string]: number} = {};
+_.map(SchemaTypes.typeToStoreKey,
+	(storeKey, type) => 
+		INIT_SHOWING_COUNT[type] = 15
+);
+console.log(INIT_SHOWING_COUNT);
+
+
 @Radium
 class SchemaSearchResults extends PureClasss<Props>
 {
 	state: {
 		schemaState: SchemaTypes.SchemaState;
+		showingCount: {[type:string]: number};
 	} = {
 		schemaState: SchemaStore.getState(),
+		showingCount: INIT_SHOWING_COUNT,
 	};
 	
 	constructor(props:Props)
@@ -77,6 +88,16 @@ class SchemaSearchResults extends PureClasss<Props>
 	
 	renderSection(stateKey: string, type: string, label: string)
 	{
+		let count = 0, index = 0;
+		let items = Immutable.List<SchemaTypes.SchemaBaseClass>([]);
+		// TODO store valueseq of this in state, instead of the map
+		this.state.schemaState.get(stateKey).map(
+			(item: SchemaTypes.SchemaBaseClass) =>
+			{
+				
+			}
+		);
+		
 		return (
 			<div
 				style={{
@@ -94,13 +115,14 @@ class SchemaSearchResults extends PureClasss<Props>
 				
 				{
 					this.state.schemaState.get(stateKey).map(
-						item =>
-							<SchemaTreeItem
-								id={item.id}
-								type={type}
-								search={this.props.search || "!@#$%^&*&%$!%!$#%!@"}
-								key={item.id}
-							/>
+						(item, index) =>
+							index <  &&
+								<SchemaTreeItem
+									id={item.id}
+									type={type}
+									search={this.props.search || "!@#$%^&*&%$!%!$#%!@"}
+									key={item.id}
+								/>
 					).valueSeq()
 				}
 			</div>
