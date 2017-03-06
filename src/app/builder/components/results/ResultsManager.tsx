@@ -361,13 +361,20 @@ class ResultsManager extends PureClasss<Props>
       fields = results.get(0).fields.keySeq().toList();
     }
     
-    this.changeResults({
+    let changes: any = {
       results,
       fields,
       hasError: false,
       loading: resultsState.hasLoadedResults && resultsState.hasLoadedAllFields,
       [isAllFields ? 'hasLoadedAllFields' : 'hasLoadedResults']: true,
-    });
+    };
+    
+    if(!resultsState.hasLoadedCount)
+    {
+      changes['count'] = results.size;
+    }
+    
+    this.changeResults(changes);
   }
   
   handleAllFieldsResponse(response:QueryResponse)
@@ -446,6 +453,10 @@ class ResultsManager extends PureClasss<Props>
         .set(
           isAllFields ? 'allFieldsErrorMessage' : 'errorMessage', 
           errorMessage
+        )
+        .set(
+          isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
+          true
         )
     );
   }

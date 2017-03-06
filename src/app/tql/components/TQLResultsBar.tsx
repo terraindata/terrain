@@ -101,12 +101,11 @@ class TQLResultsBar extends PureClasss<Props>
           </span>
           <span className="error-title">
             { 
-              this.state.mainErrorMessage 
+              resultsState.errorMessage
             }
           </span>
           <span className="error-message">
             { 
-              this.state.subErrorMessage 
             }
           </span>
         </div>
@@ -146,7 +145,7 @@ class TQLResultsBar extends PureClasss<Props>
           results.map((result, i) =>
             <div key={i}>
               {
-                JSON.stringify(result.toJS())
+                JSON.stringify(result.rawFields.toJS())
               }
             </div>
           )
