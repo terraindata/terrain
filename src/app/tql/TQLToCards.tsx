@@ -189,6 +189,7 @@ const generalProcessors: {
     (node) =>
     {
       let sfw = parseNode(node.left_child) as Card;
+      console.log(node, sfw);
       let fieldNodes = flattenCommas(node.right_child);
       let fieldBlocks: Block[] = fieldNodes.map(
         fieldNode =>
@@ -216,6 +217,11 @@ const generalProcessors: {
       if(typeof type === 'string')
       {
         type = type.trim().toLowerCase();
+        
+        if(type === 'date')
+        {
+          return '"' + parseNode(node.right_child) + '"';
+        }
         
         if(type === 'linear_score')
         {
@@ -262,7 +268,7 @@ const generalProcessors: {
           });
         }
       }
-      
+      console.log(node);
       return make(Blocks.tql, { clause: 'call', });
     },
   
