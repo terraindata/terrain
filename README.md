@@ -24,8 +24,6 @@ Terraformer is built in Javascript. It runs on the user's browser. The user's br
 
 The back-end for Terraformer is called "midway." Midway stores and serves all of Terraformer's data (user accounts, groups, algorithms, variants, etc.), authenticates users when they log in, and passes queries from Terraformer to TerrainDB and returns the results. Midway is built in Go and has a CRUD-like API.
 
-As TerrainDB is not yet ready to be used end-to-end with Terraformer, we currently use a mock DB called "tiny." Tiny is written in erlang and accepts TQL. Tiny does not have the performance that TerrainDB will, but it offers a great stand-in for the time being.
-
 ## Setup
 
 1. Install and run `midway` (optional)

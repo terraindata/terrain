@@ -200,9 +200,8 @@ export module BuilderTypes
     _isBlock: boolean;
     
     // fields not saved on server
-    static:
-    {
-      tql: string | ((block:IBlock) => string);
+    static: {
+      tql: (string | ((block:IBlock) => string));
       tqlGlue?: string;
       topTql?: string;
       accepts?: List<string>;
@@ -228,8 +227,7 @@ export module BuilderTypes
     closed: boolean;
     
     // the following fields are excluded from the server save    
-    static:
-    {
+    static: {
       colors: string[];
       title: string;
       display: Display | Display[];
@@ -395,8 +393,7 @@ export module BuilderTypes
     return _card({
       cards: L(),
       
-      static:
-      {
+      static: {
         title: config.title,
         colors: config.colors,
         accepts: config.accepts,
@@ -439,8 +436,7 @@ export module BuilderTypes
   }) => _card({
     value: "",
     
-    static:
-    {
+    static: {
       title: config.title,
       colors: config.colors,
       manualEntry: config.manualEntry,
@@ -462,17 +458,16 @@ export module BuilderTypes
   });
   
   const _aggregateNestedCard = (config: {
-    colors: string[];
-    title: string;
-    manualEntry: IManualEntry;
-    tql: string;
-    accepts: List<string>;
-    init?: () => any;
+    colors: string[],
+    title: string,
+    manualEntry: IManualEntry,
+    tql: string,
+    accepts: List<string>,
+    init?: () => any,
   }) => _card({
     value: "",
     
-    static:
-    {
+    static: {
       title: config.title,
       colors: config.colors,
       manualEntry: config.manualEntry,
@@ -487,12 +482,10 @@ export module BuilderTypes
     }
   });
   
-  const _andOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, colors: string[], manualEntry: any }) => _card(
-    {
+  const _andOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, colors: string[], manualEntry: any }) => _card({
       clauses: L(),
       
-      static:
-      {
+      static: {
         title: config.title,
         preview: '[clauses.length] ' + config.english + ' clauses',
         colors: config.colors,
@@ -520,8 +513,7 @@ export module BuilderTypes
           //   return '';
           // },
           
-          row:
-          {
+          row: {
             below:
             {
               displayType: DisplayType.CARDSFORTEXT,
@@ -660,8 +652,7 @@ export module BuilderTypes
     {
       property: "",
       direction: Direction.DESC,
-      static:
-      {
+      static: {
         tql: "\n $property $DIRECTION",
         removeOnCardRemove: true,
       }
@@ -715,8 +706,7 @@ export module BuilderTypes
       fields: L(),
       cards: L(),
       
-      static:
-      {
+      static: {
         manualEntry: ManualConfig.cards['sfw'],
         colors: ["#559dcf", "#b4dbf6"],
         title: "Select",
@@ -797,8 +787,7 @@ export module BuilderTypes
     from: _card({
       tables: L(),
       
-      static:
-      {
+      static: {
         manualEntry: ManualConfig.cards['sfw'],
         colors: ["#3a7dcf", "#94b9f6"],
         title: "From",
@@ -971,8 +960,7 @@ export module BuilderTypes
       second: "",
       operator: Operator.EQ,
       
-      static:
-      {
+      static: {
         title: "Compare",
         colors: ["#476aa3", "#a5c6fc"],
         preview: (c:ICard) => {
@@ -1114,8 +1102,7 @@ export module BuilderTypes
       value: "",
       alias: "",
       
-      static:
-      {
+      static: {
         title: "As",
         colors: ["#d24f42", "#f9cba8"],
         preview: '[alias]',
@@ -1260,8 +1247,7 @@ export module BuilderTypes
       weights: List([]),
       method: "",
       
-      static:
-      {
+      static: {
         title: "Score",
         colors: ["#3a91a6", "#a1eafb"],
         preview: "[weights.length] Weights",
@@ -1350,17 +1336,16 @@ export module BuilderTypes
       domain: List([0,100]),
       hasCustomDomain: false, // has the user set a custom domain
       
-      static:
-      {
+      static: {
         manualEntry: ManualConfig.cards['transform'],
         colors: ["#4b979a", "#aef3f6"],
         title: "Transform",
         preview: (card:any) => {
           if(card.input._isCard)
           {
-            return 'Transform ' + getPreview(card.input);
+            return '' + getPreview(card.input);
           }
-          return 'Transform ' + card.input;
+          return '' + card.input;
         },
         tql: "linear_transform($input, $scorePoints)",
         display: [
@@ -1434,8 +1419,7 @@ export module BuilderTypes
     {
       fields: L(),
       
-      static:
-      {
+      static: {
         manualEntry: ManualConfig.cards['sfw'], // TODO
         colors: ["#659f72", "#c4e1ca"],
         title: "Group By",
@@ -1483,8 +1467,7 @@ export module BuilderTypes
     tql: _card({
       clause: "",
       
-      static:
-      {
+      static: {
         title: "Expression",
         preview: "[clause]",
         colors: ["#278172", "#aefcef"],

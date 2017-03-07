@@ -115,6 +115,7 @@ var BuilderColumn = React.createClass<any, any>(
   propTypes:
   {
     query: React.PropTypes.object.isRequired,
+    resultsState: React.PropTypes.object.isRequired,
     variant: React.PropTypes.object.isRequired,
     className: React.PropTypes.string,
     index: React.PropTypes.number,
@@ -147,8 +148,6 @@ var BuilderColumn = React.createClass<any, any>(
 
     return {
       column: this.props.columnType ? this.props.columnType : column,
-      loading: false,
-      // rand: 1,
     }
   },
 
@@ -189,20 +188,6 @@ var BuilderColumn = React.createClass<any, any>(
     };
   },
   
-  handleLoadStart()
-  {
-    this.setState({
-      loading: true,
-    })
-  },
-  
-  handleLoadEnd()
-  {
-    this.setState({
-      loading: false,
-    });
-  },
-  
   renderContent()
   {
     if(!this.props.query)
@@ -240,23 +225,21 @@ var BuilderColumn = React.createClass<any, any>(
       case COLUMNS.Results:
         return <ResultsArea 
           query={query}
-          onLoadStart={this.handleLoadStart}
-          onLoadEnd={this.handleLoadEnd}
           canEdit={canEdit}
           db={this.props.variant.db}
           variantName={this.props.variant.name}
           onNavigationException={this.props.onNavigationException}
+          resultsState={this.props.resultsState}
         />;
 
       case COLUMNS.TQL:
         return <BuilderTQLColumn
           canEdit={canEdit}
-          onLoadStart={this.handleLoadStart}
-          onLoadEnd={this.handleLoadEnd}
           addColumn={this.props.onAddManualColumn}
           columnIndex={this.props.index}
           query={query}
           variant={this.props.variant}
+          resultsState={this.props.resultsState}
         />;
         
       case COLUMNS.Manual:
@@ -342,15 +325,6 @@ var BuilderColumn = React.createClass<any, any>(
                   />
               }
             </span>
-            {
-              this.state.loading &&
-              (this.state.column === COLUMNS.Results || this.state.column === COLUMNS.TQL) &&
-                <div 
-                  className='builder-column-loading'
-                >
-                  Loading...
-                </div>
-            }
           </div>
           <div className='builder-title-bar-options'>
             {

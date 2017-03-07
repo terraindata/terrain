@@ -81,6 +81,9 @@ export var BuilderActionTypes =
   
   changeTables: '', // tables and columns for current query's db
   
+  changeResultsConfig: '',
+  results: '',
+  
   save: '', // just tells the store that something was saved
   
   undo: '',
@@ -129,6 +132,7 @@ export let BuilderDirtyActionTypes = {};
   BuilderActionTypes.changeTQL,
   BuilderActionTypes.toggleDeck,
   BuilderActionTypes.checkpoint,
+  BuilderActionTypes.changeResultsConfig,
 ].map(type => BuilderDirtyActionTypes[type] = true);
 
 // which actions modify cards?

@@ -55,6 +55,7 @@ import InfoArea from '../../../common/components/InfoArea';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
 import { DragSource, DropTarget } from 'react-dnd';
+import {Results, MAX_RESULTS} from './ResultsManager.tsx';
 
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
 var GearIcon = require("./../../../../images/icon_gear.svg?name=GearIcon");
@@ -83,7 +84,7 @@ export class IResultsConfig
   score: string = "";
   fields: List<string> = List([]);
   enabled: boolean = false;
-  formats: Map<string, Format> = Map({});
+  formats: Map<string, Format> = Map<string, Format>({});
   primaryKeys: List<string> = List([]);
   
   set: (f: string, v: any) => IResultsConfig;
@@ -104,10 +105,11 @@ export const _IResultsConfig = (config?:any) => {
 }
 export const DefaultIResultsConfig = _IResultsConfig();
 
+
+
 interface Props
 {
-  results: any[];
-  resultsWithAllFields: any[];
+  fields: List<string>;
   config: IResultsConfig;
   onConfigChange: (config:IResultsConfig) => void;
   onClose: () => void;
@@ -116,11 +118,9 @@ interface Props
 export class ResultsConfig extends PureClasss<Props>
 {
   state: {
-    fields: List<string>;
     lastHover: {index: number, field: string},
     config: IResultsConfig;
   } = {
-    fields: null,
     lastHover: {index: null, field: null},
     config: null,
   };
@@ -129,7 +129,6 @@ export class ResultsConfig extends PureClasss<Props>
   {
     super(props);
     this.state.config = props.config;
-    this.state.fields = this.calcFields(this.props.results, this.props.resultsWithAllFields);
   }
   
   componentWillReceiveProps(nextProps:Props)
@@ -140,24 +139,6 @@ export class ResultsConfig extends PureClasss<Props>
         config: nextProps.config,
       });
     }
-    
-    if(this.props.results !== nextProps.results || this.props.resultsWithAllFields !== nextProps.resultsWithAllFields)
-    {
-      this.setState({
-        fields: this.calcFields(nextProps.results, nextProps.resultsWithAllFields),
-      });
-    }
-  }
-  
-  calcFields(results:any[], resultsWithAllFields:any[]):List<string>
-  {
-    var fieldMap = {};
-    let resultsMapFn = (result:any) => _.map(result, (v,field) => fieldMap[field] = 1);
-    results && results.map(resultsMapFn);
-    resultsWithAllFields && resultsWithAllFields.map(resultsMapFn);
-    
-    let fields = _.keys(fieldMap);
-    return List(fields);
   }
   
   handleDrop(type: string, field: string, index?: number)
@@ -402,7 +383,8 @@ export class ResultsConfig extends PureClasss<Props>
             type={null}
             onDrop={this.handleDrop}
           >
-            { this.state.fields.map(field =>
+            { 
+              this.props.fields.map(field =>
                 <ResultsConfigResult
                   key={field}
                   field={field}
@@ -414,7 +396,8 @@ export class ResultsConfig extends PureClasss<Props>
                   primaryKeys={config.primaryKeys}
                   onPrimaryKeysChange={this.handlePrimaryKeysChange}
                 />
-            ) }
+              ) 
+            }
           </CRTarget>
           <div className='results-config-disabled-veil'>
             <div className='results-config-disabled-veil-inner'>

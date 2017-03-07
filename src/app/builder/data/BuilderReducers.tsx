@@ -433,6 +433,19 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
         .set('tables', action.payload.tables)
         .set('tableColumns', action.payload.tableColumns),
 
+  [ActionTypes.changeResultsConfig]:
+    (
+      state: BuilderState,
+      action: Action<{
+        resultsConfig: any
+      }>
+    ) =>
+      state
+        .update('query',
+          query =>
+            query.set('resultsConfig', action.payload.resultsConfig)
+        ),
+
   [ActionTypes.save]:
     (
       state: BuilderState,
@@ -483,6 +496,13 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     
   [ActionTypes.checkpoint]:
     (state:BuilderState, action: Action<{}>) => state,
+  
+  [ActionTypes.results]:
+    (
+      state: BuilderState,
+      action: Action<{ resultsState }>
+    ) =>
+      state.set('resultsState', action.payload.resultsState),
 };
 
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
