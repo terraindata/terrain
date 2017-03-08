@@ -63,6 +63,7 @@ import Switch from './../../../common/components/Switch';
 import BuilderTypes from '../../BuilderTypes';
 import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore';
 import {ResultsState, MAX_RESULTS, getPrimaryKeyFor} from './ResultsManager';
+import TQLConverter from '../../../tql/TQLConverter';
 
 const RESULTS_PAGE_SIZE = 20;
 
@@ -303,7 +304,12 @@ class ResultsArea extends PureClasss<Props>
     this.props.onNavigationException();
     
     let {xhr, queryId} = Ajax.query(
-      this.props.query.tql,
+      TQLConverter.toTQL(
+        this.props.query,
+        {
+          replaceInputs: true,
+        },
+      ),
       this.props.db, 
       _.noop,
       _.noop,
