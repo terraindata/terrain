@@ -308,7 +308,7 @@ class ResultsArea extends PureClasss<Props>
         this.props.query,
         {
           replaceInputs: true,
-        },
+        }
       ),
       this.props.db, 
       _.noop,
