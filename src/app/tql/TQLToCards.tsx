@@ -175,13 +175,19 @@ const generalProcessors: {
           }
         ));
       
+      let cards = List([]);
+      if(tables.length)
+      {
+        // If there are no tables, this is an empty From statement, and we shouldn't make a card for it
+        cards = List([
+          make(Blocks.from, {
+            tables: List(tables),
+          })
+        ]);
+      }
+      
       return make(Blocks.sfw, {
-        cards:
-          List([
-            make(Blocks.from, {
-              tables: List(tables),
-            })
-          ])
+        cards,
       });
     },
     
@@ -189,7 +195,6 @@ const generalProcessors: {
     (node) =>
     {
       let sfw = parseNode(node.left_child) as Card;
-      console.log(node, sfw);
       let fieldNodes = flattenCommas(node.right_child);
       let fieldBlocks: Block[] = fieldNodes.map(
         fieldNode =>
@@ -268,7 +273,6 @@ const generalProcessors: {
           });
         }
       }
-      console.log(node);
       return make(Blocks.tql, { clause: 'call', });
     },
   
