@@ -54,11 +54,11 @@ delete conf.devtool;
 conf.plugins = [
   new webpack.DefinePlugin({
     // Signal to React not to include detailed checks.
-    'process.env': {
-      'NODE_ENV': "'production'"
-    },
+	  //    'process.env': {
+	  //      'NODE_ENV': "'production'"
+	  //    },
     
-    'DEV': "false",
+	      'DEV': "false",
     
     // Keep this blank, since the default midway host would be the one serving this page.
     'MIDWAY_HOST': "''",
@@ -68,7 +68,7 @@ conf.plugins = [
   }),
 
   // Minify code.
-  new webpack.optimize.UglifyJsPlugin()
+  //  new webpack.optimize.UglifyJsPlugin()
 ];
 
 // enable babel plugins on tsx loader

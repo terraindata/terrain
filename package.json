@@ -10,7 +10,7 @@
     "start-local-prod": "MIDWAY_HOST=localhost webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback",
     "test": "karma start karma.conf.js",
     "deploy": "MIDWAY_HOST=pa-terraformer01.terrain.int webpack --config webpack.config.js --output-filename bundle.js && scp bundle.js pa-terraformer01.terrain.int:/home/lknepper/midway/dist/bundle.js",
-    "deploy2": "MIDWAY_HOST=pa-terraformer02.terrain.int webpack --config webpack.config.prod.js --output-filename bundle.js && scp bundle.js pa-terraformer02.terrain.int:midway/dist/bundle.js",
+    "deploy2": "MIDWAY_HOST=pa-terraformer02.terrain.int webpack --config webpack.config.js --output-filename bundle.js && scp bundle.js pa-terraformer02.terrain.int:midway/dist/bundle.js",
     "commit-log": "git log | head -n 100 > src/commitlog.txt",
     "build-prod": "npm run commit-log && MIDWAY_HOST=pa-terraformer01.terrain.int webpack --config webpack.config.prod.js --output-filename bundle.js",
     "build-demo": "npm run commit-log && MIDWAY_HOST=localhost webpack --config webpack.config.prod.js --output-filename bundle.demo.js",

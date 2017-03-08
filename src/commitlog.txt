@@ -1,3 +1,9 @@
+commit fe9dae21d8cace24c958091f546d7561688677fd
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Mon Mar 6 23:01:34 2017 -0700
+
+    Fixing date bug with tql to cards
+
 commit d718399e6da0cd665359db5913d91681f7b5f0fe
 Merge: 862e034 76a063d
 Author: Luke Knepper <luke@terraindb.com>
@@ -91,10 +97,4 @@ Date:   Thu Mar 2 09:57:00 2017 -0800
     Merge progress
 
 commit 360a527f90126dfac795e013a354616281743a9d
-Author: Luke Knepper <luke@terraindb.com>
-Date:   Wed Mar 1 15:34:43 2017 -0800
-
-    results manager progress
-
-commit f504d1714d914275fc1fdd3a80de99fa4fa66700
 Author: Luke Knepper <luke@terraindb.com>
