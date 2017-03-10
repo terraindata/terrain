@@ -66,8 +66,8 @@ let INIT_ITEMS: Map<string, List<SchemaBaseClass>> =
 let INIT_PREV_ITEMS: Map<string, Map<string, SchemaBaseClass>> = 
 	Immutable.Map<string, Map<string, SchemaBaseClass>>({});
 
-_.map(SchemaTypes.typeToStoreKey,
-	(storeKey, type) => 
+_.map(SchemaTypes.typeToStoreKey as any,
+	(storeKey: string, type) => 
 	{
 		INIT_SHOWING_COUNT = INIT_SHOWING_COUNT.set(storeKey, 15);
 		INIT_ITEMS = INIT_ITEMS.set(storeKey, Immutable.List([]));
@@ -193,6 +193,7 @@ class SchemaSearchResults extends PureClasss<Props>
 					<div
 						style={Styles.link}
 						onClick={this._fn(this.handleShowMore, stateKey)}
+						key={'show-more-' + stateKey}
 					>
 						Show More
 					</div>
