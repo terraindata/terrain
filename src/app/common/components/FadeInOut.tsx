@@ -75,7 +75,8 @@ class FadeInOut extends PureClasss<Props>
 	      		}
 	      	>
 		      	{
-		    			this.props.children
+		      		this.props.open &&
+		    				this.props.children
 		      	}
 	      	</VelocityTransitionGroup>
 	      </div>

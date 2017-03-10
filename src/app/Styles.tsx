@@ -42,6 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+const color = require('color');
+let active = '#00A7F7';
+let lighterActive = color(active).lighten(0.25).string();
+
 export const Styles =
 {
 	margin: 6,
@@ -57,9 +61,20 @@ export const Styles =
 			loading: '#aaa',
 		},
 		
-		active: '#00A7F7',
+		active,
 		
 		transBlack: 'rgba(0,0,0,0.75)',
+	},
+	
+	link:
+	{
+		color: active,
+		cursor: 'pointer',
+		
+		':hover':
+		{
+			color: lighterActive,
+		}
 	},
 	
 	font:

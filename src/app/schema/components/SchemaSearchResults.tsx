@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
+import * as Immutable from 'immutable';
 const Radium = require('radium');
 import SchemaTypes from '../SchemaTypes';
 import SchemaStore from '../data/SchemaStore';
@@ -52,37 +53,47 @@ import SchematreeStyles from './SchemaTreeStyles';
 import Styles from '../../Styles';
 import FadeInOut from '../../common/components/FadeInOut';
 import SchemaTreeItem from './SchemaTreeItem';
+type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 
 interface Props
 {
 	search: string;
 }
 
-let INIT_SHOWING_COUNT: {[type:string]: number} = {};
-let INIT_ITEMS: Map<string, List<SchemaTypes.SchemaBaseClass>> = 
-	Immutable.Map<string, List<SchemaTypes.SchemaBaseClass>>({});
+let INIT_SHOWING_COUNT: Map<string, number> = Immutable.Map<string, number>({});
+let INIT_ITEMS: Map<string, List<SchemaBaseClass>> = 
+	Immutable.Map<string, List<SchemaBaseClass>>({});
+let INIT_PREV_ITEMS: Map<string, Map<string, SchemaBaseClass>> = 
+	Immutable.Map<string, Map<string, SchemaBaseClass>>({});
 
 _.map(SchemaTypes.typeToStoreKey,
 	(storeKey, type) => 
 	{
-		INIT_SHOWING_COUNT[type] = 15;
-		INIT_ITEMS = INIT_ITEMS.set(type, Immutable.List([]));
+		INIT_SHOWING_COUNT = INIT_SHOWING_COUNT.set(storeKey, 15);
+		INIT_ITEMS = INIT_ITEMS.set(storeKey, Immutable.List([]));
+		INIT_PREV_ITEMS = INIT_PREV_ITEMS.set(storeKey, Immutable.Map<any, any>({}));
 	}
 );
+const SHOW_MORE_INCREMENT = 50;
 console.log(INIT_SHOWING_COUNT);
-
+console.log(INIT_ITEMS);
+console.log(INIT_PREV_ITEMS)
 
 @Radium
 class SchemaSearchResults extends PureClasss<Props>
 {
 	state: {
-		items: Map<string, List<SchemaTypes.SchemaBaseClass>>,
-		schemaState: SchemaTypes.SchemaState;
-		showingCount: {[type:string]: number};
+		// since search results are rendered as a list, we want
+		//  to store them in a list, instead of the Map stored in the SchemaState
+		items: Map<string, List<SchemaBaseClass>>,
+		// but we need to memoize the Map reference so that we can avoid unnecessarily
+		//  generating the lists
+		prevItems: Map<string, Map<string, SchemaBaseClass>>,
+		showingCount: Map<string, number>;
 	} = {
-		schemaState: SchemaStore.getState(),
 		showingCount: INIT_SHOWING_COUNT,
 		items: INIT_ITEMS,
+		prevItems: INIT_PREV_ITEMS,
 	};
 	
 	constructor(props:Props)
@@ -90,21 +101,64 @@ class SchemaSearchResults extends PureClasss<Props>
 		super(props);
 		
 		this._subscribe(SchemaStore, {
-			stateKey: 'schemaState',
+			updater: (storeSate:SchemaTypes.SchemaState) =>
+			{
+				let {items, prevItems} = this.state;
+				items.map((v, storeKey) =>
+				{
+					let storeValue = storeSate.get(storeKey);
+					if(prevItems.get(storeKey) !== storeValue)
+					{
+						// reference changed
+						items = items.set(storeKey, storeValue.valueSeq().toList());
+						prevItems = prevItems.set(storeKey, storeValue);
+					}
+				});
+				console.log(items, prevItems);
+				this.setState({
+					items,
+					prevItems,
+				});
+			}
 		});
+	}
+	
+	componentWillReceiveProps(nextProps: Props)
+	{
+		if(nextProps.search !== this.props.search)
+		{
+			this.setState({
+				showingCount: INIT_SHOWING_COUNT,
+			});
+		}
 	}
 	
 	renderSection(stateKey: string, type: string, label: string)
 	{
-		let count = 0, index = 0;
-		let items = Immutable.List<SchemaTypes.SchemaBaseClass>([]);
-		// TODO store valueseq of this in state, instead of the mapÏ
-		this.state.schemaState.get(stateKey).map(
-			(item: SchemaTypes.SchemaBaseClass) =>
+		let index = 0;
+		let max = this.state.showingCount.get(stateKey);
+		let items = this.state.items.get(stateKey);
+		let renderItems: SchemaBaseClass[] = [];
+		let couldShowMore = false; // are there additional entries to show?
+		
+		while(renderItems.length <= max && index < items.size && !couldShowMore)
+		{
+			let item = items.get(index);
+			if(SchemaTypes.searchIncludes(item, this.props.search))
 			{
-				
+				if(renderItems.length < max)
+				{
+					renderItems.push(item);
+				}
+				else
+				{
+					couldShowMore = true;
+				}
 			}
-		);
+			index ++;
+		}
+		
+		console.log(renderItems);
 		
 		return (
 			<div
@@ -122,25 +176,43 @@ class SchemaSearchResults extends PureClasss<Props>
 				</div>
 				
 				{
-					this.state.schemaState.get(stateKey).map(
+					renderItems.map(
 						(item, index) =>
-							index <  &&
-								<SchemaTreeItem
-									id={item.id}
-									type={type}
-									search={this.props.search || "!@#$%^&*&%$!%!$#%!@"}
-									key={item.id}
-								/>
-					).valueSeq()
+							<SchemaTreeItem
+								id={item.id}
+								type={type}
+								search={this.props.search || "!@#$%^&*&%$!%!$#%!@"}
+								key={item.id}
+							/>
+					)
 				}
+				
+				<FadeInOut
+					open={couldShowMore}
+				>
+					<div
+						style={Styles.link}
+						onClick={this._fn(this.handleShowMore, stateKey)}
+					>
+						Show More
+					</div>
+				</FadeInOut>
 			</div>
 		);
+	}
+	
+	handleShowMore(stateKey: string)
+	{
+		let {showingCount} = this.state;
+		showingCount = showingCount.set(stateKey, showingCount.get(stateKey) + SHOW_MORE_INCREMENT);
+		this.setState({
+			showingCount,
+		});
 	}
 	
   render()
   {
   	let {search} = this.props;
-  	let {schemaState} = this.state;
   	
     return (
     	<div
