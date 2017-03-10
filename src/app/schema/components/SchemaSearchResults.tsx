@@ -58,10 +58,16 @@ interface Props
 	search: string;
 }
 
-const INIT_SHOWING_COUNT: {[type:string]: number} = {};
+let INIT_SHOWING_COUNT: {[type:string]: number} = {};
+let INIT_ITEMS: Map<string, List<SchemaTypes.SchemaBaseClass>> = 
+	Immutable.Map<string, List<SchemaTypes.SchemaBaseClass>>({});
+
 _.map(SchemaTypes.typeToStoreKey,
 	(storeKey, type) => 
-		INIT_SHOWING_COUNT[type] = 15
+	{
+		INIT_SHOWING_COUNT[type] = 15;
+		INIT_ITEMS = INIT_ITEMS.set(type, Immutable.List([]));
+	}
 );
 console.log(INIT_SHOWING_COUNT);
 
@@ -70,11 +76,13 @@ console.log(INIT_SHOWING_COUNT);
 class SchemaSearchResults extends PureClasss<Props>
 {
 	state: {
+		items: Map<string, List<SchemaTypes.SchemaBaseClass>>,
 		schemaState: SchemaTypes.SchemaState;
 		showingCount: {[type:string]: number};
 	} = {
 		schemaState: SchemaStore.getState(),
 		showingCount: INIT_SHOWING_COUNT,
+		items: INIT_ITEMS,
 	};
 	
 	constructor(props:Props)
@@ -90,7 +98,7 @@ class SchemaSearchResults extends PureClasss<Props>
 	{
 		let count = 0, index = 0;
 		let items = Immutable.List<SchemaTypes.SchemaBaseClass>([]);
-		// TODO store valueseq of this in state, instead of the map
+		// TODO store valueseq of this in state, instead of the mapÏ
 		this.state.schemaState.get(stateKey).map(
 			(item: SchemaTypes.SchemaBaseClass) =>
 			{
