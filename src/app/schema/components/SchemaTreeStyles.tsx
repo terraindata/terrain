@@ -172,6 +172,11 @@ const SchemaTreeStyles =
 		fontWeight: 'bold',
 	},
 	
+	searchTextEmphasis: {
+		fontWeight: 'bold',
+		color: Styles.colors.active,
+	},
+	
 	
 	margin: Styles.margin,
 }

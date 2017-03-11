@@ -291,24 +291,49 @@ class SchemaTreeItem extends PureClasss<Props>
 		
 		if(item)
 		{
-			// show plain name
-			nameText = item.name;
-			
 			if(this.props.search)
 			{
 				// show search details
-				['table', 'database'].map(
-					(type) =>
-					{
-						let id = item[type + 'Id'];
-						
-						if(id)
+				let {name} = item;
+				let searchStartIndex = item.name.indexOf(this.props.search);
+				let searchEndIndex = searchStartIndex + this.props.search.length;
+				nameText = (
+					<div>
 						{
-							let parentItem = SchemaStore.getState().getIn([type + 's', id]);
-							nameText = (parentItem && parentItem.name) + ' > ' + nameText;
+							['table', 'database'].map(
+								(type) =>
+								{
+									let id = item[type + 'Id'];
+									
+									if(id)
+									{
+										let parentItem = SchemaStore.getState().getIn([type + 's', id]);
+										return parentItem && parentItem.name + ' > ';
+									}
+								}
+							)
 						}
-					}
+						
+						{
+							name.substr(0, searchStartIndex)
+						}
+						<span
+							style={Styles.searchTextEmphasis}
+						>
+							{
+								name.substring(searchStartIndex, searchEndIndex)
+							}
+						</span>
+						{
+							name.substr(searchEndIndex)
+						}
+					</div>
 				);
+			}
+			else
+			{
+				// show plain name
+				nameText = item.name;
 			}
 		}
 		
