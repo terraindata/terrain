@@ -201,7 +201,10 @@ class SchemaTreeItem extends PureClasss<Props>
 		
 		return (
 			<div
-				style={Styles.childrenWrapper}
+				style={
+					this.props.search ? Styles.childrenWrapper.search
+						: Styles.childrenWrapper.normal
+				}
 			>
 				{
 					typeToRendering[item.type].childConfig.map(
@@ -280,6 +283,46 @@ class SchemaTreeItem extends PureClasss<Props>
 		}
 	}
 	
+	renderName()
+	{
+		let {item} = this.state;
+		
+		let nameText: string | El = <span className='loading-text' />;
+		
+		if(item)
+		{
+			// show plain name
+			nameText = item.name;
+			
+			if(this.props.search)
+			{
+				// show search details
+				['table', 'database'].map(
+					(type) =>
+					{
+						let id = item[type + 'Id'];
+						
+						if(id)
+						{
+							let parentItem = SchemaStore.getState().getIn([type + 's', id]);
+							nameText = (parentItem && parentItem.name) + ' > ' + nameText;
+						}
+					}
+				);
+			}
+		}
+		
+		return (
+			<div
+	  		style={Styles.name}
+	  	>
+	  		{
+	  			nameText
+	  		}
+	  	</div>
+		);
+	}
+	
   render()
   {
   	let {item, isSelected, isHighlighted} = this.state;
@@ -316,13 +359,10 @@ class SchemaTreeItem extends PureClasss<Props>
 					      			this.state.open ? Styles.arrowOpen : Styles.arrow
 					      		}
 					      	/>
-					      	<div
-					      		style={Styles.name}
-					      	>
-					      		{
-					      			item ? item.name : <span className='loading-text' />
-					      		}
-					      	</div>
+					      	
+					      	{
+					      		this.renderName()
+					      	}
 					      	
 					      	<div
 					      		style={Styles.itemInfoRow as any}

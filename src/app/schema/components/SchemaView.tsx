@@ -103,7 +103,9 @@ class SchemaView extends PureClasss<Props>
 		let search = event.target.value as string;
 		this.setState({
 			search,
+			highlightedIndex: -1,
 		});
+		SchemaActions.highlightId(null, false);
 	}
 	
 	handleSearchKeyDown(event)
@@ -208,6 +210,16 @@ class SchemaView extends PureClasss<Props>
       				height: 'calc(100% - ' + searchHeight + ')px',
       			}}
       		>
+      			<FadeInOut
+      				open={!!this.state.search}
+      			>
+      				<div
+			      		style={Styles.schemaHeading}
+			      	>
+			      		Visible Results
+			      	</div>
+      			</FadeInOut>
+      			
 		      	<SchemaTreeList
 		      		itemType='database'
 		      		itemIds={this.state.databases && this.state.databases.keySeq().toList()}

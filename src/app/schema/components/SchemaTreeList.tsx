@@ -50,6 +50,7 @@ import SchemaTreeItem from './SchemaTreeItem';
 const Radium = require('radium');
 import Styles from '../../Styles';
 import SchemaTreeStyles from './SchemaTreeStyles';
+import FadeInOut from '../../common/components/FadeInOut';
 
 interface Props
 {
@@ -65,6 +66,20 @@ class State
   renderCount: number = 30;
   intervalId: number = -1; 
 }
+
+const NORMAL_STYLE = {
+  borderLeft: ('0.5px solid ' + Styles.colors.active),
+  paddingLeft: Styles.margin,
+};
+
+const TOP_LEVEL_STYLE = {
+  borderLeft: '',
+};
+
+const SEARCH_STYLE = {
+  borderLeft: '',
+  paddingLeft: '',
+};
 
 @Radium
 class SchemaTreeList extends PureClasss<Props>
@@ -122,32 +137,37 @@ class SchemaTreeList extends PureClasss<Props>
     
     return (
       <div
-      	style={{
-      		borderLeft: !topLevel && ('0.5px solid ' + Styles.colors.active),
-      		paddingLeft: Styles.margin,
-      	}}
+      	style={[
+          NORMAL_STYLE,
+          this.props.search && SEARCH_STYLE,
+          this.props.topLevel && TOP_LEVEL_STYLE,
+        ]}
       >
       	{
       		label &&
-		      	<div
-		      		style={
-		      			SchemaTreeStyles.label
-		      		}
-		      	>
-		      		{
-		      			label
-		      		}
-		      	</div>
-      	}
-      	
-      	{
-      		!itemIds.size &&
-      			<div
-      				style={SchemaTreeStyles.none}
-      			>
-      				None
-      			</div>
-      	}
+            <FadeInOut
+              open={!this.props.search}
+            >
+  		      	<div
+  		      		style={
+  		      			SchemaTreeStyles.label
+  		      		}
+  		      	>
+  		      		{
+  		      			label
+  		      		}
+  		      	</div>
+              
+            	{
+            		!itemIds.size &&
+            			<div
+            				style={SchemaTreeStyles.none}
+            			>
+            				None
+            			</div>
+            	}
+            </FadeInOut>
+        }
       	
       	{
       		itemIds.map(

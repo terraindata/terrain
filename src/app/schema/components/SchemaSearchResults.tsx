@@ -49,7 +49,7 @@ import SchemaTypes from '../SchemaTypes';
 import SchemaStore from '../data/SchemaStore';
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
-import SchematreeStyles from './SchemaTreeStyles';
+import SchemaTreeStyles from './SchemaTreeStyles';
 import Styles from '../../Styles';
 import FadeInOut from '../../common/components/FadeInOut';
 import SchemaTreeItem from './SchemaTreeItem';
@@ -75,9 +75,6 @@ _.map(SchemaTypes.typeToStoreKey as any,
 	}
 );
 const SHOW_MORE_INCREMENT = 50;
-console.log(INIT_SHOWING_COUNT);
-console.log(INIT_ITEMS);
-console.log(INIT_PREV_ITEMS)
 
 @Radium
 class SchemaSearchResults extends PureClasss<Props>
@@ -114,7 +111,7 @@ class SchemaSearchResults extends PureClasss<Props>
 						prevItems = prevItems.set(storeKey, storeValue);
 					}
 				});
-				console.log(items, prevItems);
+				
 				this.setState({
 					items,
 					prevItems,
@@ -158,48 +155,52 @@ class SchemaSearchResults extends PureClasss<Props>
 			index ++;
 		}
 		
-		console.log(renderItems);
+		let showSection = !!renderItems.length;
 		
 		return (
-			<div
-				style={{
-					marginTop: Styles.margin,
-					marginLeft: Styles.margin,
-				}}
+			<FadeInOut
+				open={showSection}
 			>
 				<div
-					style={Styles.font.semiBoldNormal}
-				>
-					{
-						label
-					}
-				</div>
-				
-				{
-					renderItems.map(
-						(item, index) =>
-							<SchemaTreeItem
-								id={item.id}
-								type={type}
-								search={this.props.search || "!@#$%^&*&%$!%!$#%!@"}
-								key={item.id}
-								inSearchResults={true}
-							/>
-					)
-				}
-				
-				<FadeInOut
-					open={couldShowMore}
+					style={{
+						marginTop: Styles.margin,
+						marginLeft: Styles.margin,
+					}}
 				>
 					<div
-						style={Styles.link}
-						onClick={this._fn(this.handleShowMore, stateKey)}
-						key={'show-more-' + stateKey}
+						style={Styles.font.semiBoldNormal}
 					>
-						Show More
+						{
+							label
+						}
 					</div>
-				</FadeInOut>
-			</div>
+					
+					{
+						renderItems.map(
+							(item, index) =>
+								<SchemaTreeItem
+									id={item.id}
+									type={type}
+									search={this.props.search || "!@#$%^&*&%$!%!$#%!@"}
+									key={item.id}
+									inSearchResults={true}
+								/>
+						)
+					}
+					
+					<FadeInOut
+						open={couldShowMore}
+					>
+						<div
+							style={Styles.link}
+							onClick={this._fn(this.handleShowMore, stateKey)}
+							key={'show-more-' + stateKey}
+						>
+							Show More
+						</div>
+					</FadeInOut>
+				</div>
+			</FadeInOut>
 		);
 	}
 	
@@ -231,9 +232,7 @@ class SchemaSearchResults extends PureClasss<Props>
 		      	}}
 		      >
 		      	<div
-		      		style={[
-		      			Styles.font.semiBoldBig,
-		      		]}
+		      		style={SchemaTreeStyles.schemaHeading}
 		      	>
 		      		All Results
 		      	</div>

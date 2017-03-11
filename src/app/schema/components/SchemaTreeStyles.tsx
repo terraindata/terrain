@@ -68,6 +68,10 @@ const SchemaTreeStyles =
 		overflow: 'auto',
 	},
 	
+	schemaHeading: [
+		Styles.font.big,
+	],
+	
 	label: Styles.font.semiBoldNormal,
 	
 	none: {
@@ -75,9 +79,9 @@ const SchemaTreeStyles =
 	},
 	
 	
-	treeItem: {
-		
-	},
+	treeItem: [
+		Styles.transition,
+	],
 	
 	arrow: _.extend(
 		arrowSvgStyles,
@@ -135,11 +139,18 @@ const SchemaTreeStyles =
 	},
 	
 	childrenWrapper: {
-		paddingLeft: 11,
-		// marginBottom: 6,
-		// paddingBottom: 6,
-		// borderBottom: '0.5px solid rgba(0,0,0,0.1)',
-		// margin: '0px 6px',
+		normal: [
+			{
+				paddingLeft: 11,
+				// marginBottom: 6,
+				// paddingBottom: 6,
+				// borderBottom: '0.5px solid rgba(0,0,0,0.1)',
+				// margin: '0px 6px',
+			},
+			Styles.transition
+		],
+		
+		search: Styles.transition,
 	},
 	
 	childSection: {
