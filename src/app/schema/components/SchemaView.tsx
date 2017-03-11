@@ -121,13 +121,15 @@ class SchemaView extends PureClasss<Props>
         offset = offset || 1;
 				let items = $("[data-rel='schema-item']");
         let index = Util.valueMinMax(highlightedIndex + offset, 0, items.length);
-        let id = $(items[index]).attr('data-id');
+        let el = $(items[index]);
+        let id = el.attr('data-id');
+        let inSearchResults = !!el.attr('data-search');
         
         this.setState({
         	highlightedIndex: index,
         });
         
-        SchemaActions.highlightId(id);
+        SchemaActions.highlightId(id, inSearchResults);
         
         break;
         

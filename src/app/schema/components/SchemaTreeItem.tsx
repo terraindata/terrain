@@ -62,6 +62,8 @@ interface Props
 	id: ID;
 	type: string;
   search: string;
+  
+  inSearchResults?: boolean;
 }
 
 class State
@@ -142,7 +144,8 @@ class SchemaTreeItem extends PureClasss<Props>
 					}
 				}
 				
-				let isHighlighted = this.props.id === state.highlightedId;
+				let isHighlighted = this.props.id === state.highlightedId
+					&& !!this.props.inSearchResults == state.highlightedInSearchResults;
 				let isSelected = this.props.id === state.selectedId;
 				
 				if(isHighlighted !== this.state.isHighlighted || isSelected !== this.state.isSelected)
@@ -286,8 +289,6 @@ class SchemaTreeItem extends PureClasss<Props>
     return (
       <div
       	style={Styles.treeItem}
-      	data-rel='schema-item'
-      	data-id={this.props.id}
       >
       	<FadeInOut
       		open={showing}
@@ -295,7 +296,11 @@ class SchemaTreeItem extends PureClasss<Props>
       	>
       		{
       			showing &&
-      				<div>
+      				<div
+      					data-rel='schema-item'
+				      	data-id={this.props.id}
+				      	data-search={this.props.inSearchResults}
+      				>
 				      	<div
 				      		style={[
 				      			Styles.treeItemHeader,

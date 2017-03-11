@@ -183,6 +183,7 @@ class SchemaSearchResults extends PureClasss<Props>
 								type={type}
 								search={this.props.search || "!@#$%^&*&%$!%!$#%!@"}
 								key={item.id}
+								inSearchResults={true}
 							/>
 					)
 				}

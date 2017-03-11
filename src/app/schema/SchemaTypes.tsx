@@ -72,6 +72,7 @@ export module SchemaTypes
 		// view state
 		selectedId: ID = null;
 		highlightedId: ID = null;
+		highlightedInSearchResults: boolean = false;
 	}
 	export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
 	export const _SchemaState = (config?: {[key:string]: any}) => 

@@ -131,8 +131,12 @@ export const SchemaStore: IStore<SchemaState> =
 					state.set('selectedId', action.payload.id),
 					
 			[SchemaActionTypes.highlightId]:
-				(state: SchemaState, action: Action<{ id: ID }>) =>
-					state.set('highlightedId', action.payload.id),
+				(state: SchemaState, action: Action<{ 
+					id: ID, 
+					inSearchResults: boolean 
+				}>) =>
+					state.set('highlightedId', action.payload.id)
+						.set('highlightedInSearchResults', action.payload.inSearchResults),
 		}
 	), DEV ? ExampleSchemaData : SchemaTypes._SchemaState());
 
@@ -168,9 +172,10 @@ export const SchemaActions =
       }),
   
  	highlightId:
- 		(id: ID) =>
+ 		(id: ID, inSearchResults: boolean) =>
  			$(SchemaActionTypes.highlightId, {
  				id,
+ 				inSearchResults,
  			}),
  			
   selectId:
