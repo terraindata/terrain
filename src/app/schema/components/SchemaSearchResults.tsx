@@ -98,12 +98,12 @@ class SchemaSearchResults extends PureClasss<Props>
 		super(props);
 		
 		this._subscribe(SchemaStore, {
-			updater: (storeSate:SchemaTypes.SchemaState) =>
+			updater: (storeState:SchemaTypes.SchemaState) =>
 			{
 				let {items, prevItems} = this.state;
 				items.map((v, storeKey) =>
 				{
-					let storeValue = storeSate.get(storeKey);
+					let storeValue = storeState.get(storeKey);
 					if(prevItems.get(storeKey) !== storeValue)
 					{
 						// reference changed
