@@ -71,12 +71,13 @@ type Query = Types.Query;
 type Variant = LibraryTypes.Variant;
 
 // Components
+
 import PureClasss from './../../common/components/PureClasss';
 import BuilderColumn from "./BuilderColumn";
 import {Tabs, TabAction} from "./layout/Tabs";
 import LayoutManager from "./layout/LayoutManager";
 import Card from "./cards/Card";
-import Result from "./results/Result";
+import ResultsManager from './results/ResultsManager';
 import Ajax from "./../../util/Ajax";
 import InfoArea from '../../common/components/InfoArea';
 import {notificationManager} from './../../common/components/InAppNotification'
@@ -202,6 +203,8 @@ class Builder extends PureClasss<Props>
   {
     window.onbeforeunload = (e) => 
     {
+      Util.executeBeforeLeaveHandlers();
+      
       if(this.state.navigationException)
       {
         this.setState({
@@ -292,7 +295,7 @@ class Builder extends PureClasss<Props>
             , Immutable.Map({})
           )
         );
-      });
+      }).xhr;
     }
   }
   
@@ -632,6 +635,7 @@ class Builder extends PureClasss<Props>
       resizeHandleRef: 'resize-handle',
       content: query && <BuilderColumn
         query={query}
+        resultsState={this.state.builderState.resultsState}
         index={index}
         colKey={key}
         variant={variant}
@@ -862,6 +866,12 @@ class Builder extends PureClasss<Props>
           onConfirm={this.handleModalSave}
           thirdButtonText="Don't Save"
           onThirdButton={this.handleModalDontSave}
+        />
+        
+        <ResultsManager
+          query={query}
+          resultsState={this.state.builderState.resultsState}
+          db={this.state.builderState.db}
         />
       </div>
     );

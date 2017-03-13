@@ -107,6 +107,23 @@ var Util = {
     return obj;
   },
   
+  addBeforeLeaveHandler(handler: () => void)
+  {
+    if(!window['beforeLeaveHandlers'])
+    {
+      window['beforeLeaveHandlers'] = [];
+    }
+    window['beforeLeaveHandlers'].push(handler);
+  },
+  
+  executeBeforeLeaveHandlers()
+  {
+    window['beforeLeaveHandlers'] && 
+      window['beforeLeaveHandlers'].map(
+        fn => fn && fn()
+      );
+  },
+  
   haveRole(groupId: ID, role: string, UserStore, RolesStore)
   {
     let me = UserStore.getState().get('currentUser');

@@ -200,9 +200,8 @@ export module BuilderTypes
     _isBlock: boolean;
     
     // fields not saved on server
-    static:
-    {
-      tql: string | ((block:IBlock) => string);
+    static: {
+      tql: (string | ((block:IBlock) => string));
       tqlGlue?: string;
       topTql?: string;
       accepts?: List<string>;
@@ -228,11 +227,12 @@ export module BuilderTypes
     closed: boolean;
     
     // the following fields are excluded from the server save    
-    static:
-    {
+    static: {
       colors: string[];
       title: string;
       display: Display | Display[];
+      
+      isAggregate: boolean;
       
       // the format string used for generating tql
       // - insert the value of a card member by prepending the field's name with $, e.g. "$expression" or "$filters"
@@ -277,7 +277,7 @@ export module BuilderTypes
   interface IBlockConfig
   {
     static: {
-      tql: string;
+      tql: TQLFn;
       tqlGlue?: string;
       accepts?: List<string>;
       removeOnCardRemove?: boolean;
@@ -322,6 +322,7 @@ export module BuilderTypes
       title: string;
       preview: string | ((c:ICard) => string);
       display: Display | Display[];
+      isAggregate?: boolean;
       manualEntry: IManualEntry;
       tql: TQLFn;
       tqlGlue?: string;
@@ -384,6 +385,7 @@ export module BuilderTypes
     tqlGlue?: string;
     accepts: List<string>;
     singleChild?: boolean;
+    isAggregate?: boolean;
   }
   
   const _wrapperCard = (config:IWrapperCardConfig) =>
@@ -391,8 +393,7 @@ export module BuilderTypes
     return _card({
       cards: L(),
       
-      static:
-      {
+      static: {
         title: config.title,
         colors: config.colors,
         accepts: config.accepts,
@@ -435,13 +436,13 @@ export module BuilderTypes
   }) => _card({
     value: "",
     
-    static:
-    {
+    static: {
       title: config.title,
       colors: config.colors,
       manualEntry: config.manualEntry,
       preview: "[value]",
       tql: config.tql,
+      isAggregate: true,
       
       display: 
         config.defaultValue === undefined
@@ -457,23 +458,23 @@ export module BuilderTypes
   });
   
   const _aggregateNestedCard = (config: {
-    colors: string[];
-    title: string;
-    manualEntry: IManualEntry;
-    tql: string;
-    accepts: List<string>;
-    init?: () => any;
+    colors: string[],
+    title: string,
+    manualEntry: IManualEntry,
+    tql: string,
+    accepts: List<string>,
+    init?: () => any,
   }) => _card({
     value: "",
     
-    static:
-    {
+    static: {
       title: config.title,
       colors: config.colors,
       manualEntry: config.manualEntry,
       preview: "[value]",
       tql: config.tql,
       init: config.init,
+      isAggregate: true,
       
       display: getCardStringDisplay({
         accepts: config.accepts,
@@ -481,12 +482,10 @@ export module BuilderTypes
     }
   });
   
-  const _andOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, colors: string[], manualEntry: any }) => _card(
-    {
+  const _andOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, colors: string[], manualEntry: any }) => _card({
       clauses: L(),
       
-      static:
-      {
+      static: {
         title: config.title,
         preview: '[clauses.length] ' + config.english + ' clauses',
         colors: config.colors,
@@ -514,8 +513,7 @@ export module BuilderTypes
           //   return '';
           // },
           
-          row:
-          {
+          row: {
             below:
             {
               displayType: DisplayType.CARDSFORTEXT,
@@ -550,23 +548,103 @@ export module BuilderTypes
     })
   );
   
-  const acceptsAggregates = List([
-    'count',
-    'avg',
-    'min',
-    'max',
-    'sum',
-    'distinct',
-    'score',
-    'transform',
-    'sfw',
-    'exists',
-    'not',
-  ]);
+  const _acceptsMath = (list: List<string>) =>
+    list.concat(
+      List([
+        'add',
+        'subtract',
+        'divide',
+        'multiply',
+      ])
+    ).toList();
+  
+  const mathsAccept = _acceptsMath(
+    List([
+      'select',
+      'comparison',
+      'score',
+      'transform',
+    ])
+  );
+  
+  const acceptsAggregates = _acceptsMath(
+    List([
+      'count',
+      'avg',
+      'min',
+      'max',
+      'sum',
+      'distinct',
+      'score',
+      'transform',
+      'sfw',
+      'exists',
+      'not',
+      'add',
+    ])
+  );
   
   const transformScoreInputTypes = 
     List(['score', 'transform', 'sfw']).concat(acceptsAggregates).toList();
-
+    
+  const _mathCard = (config: {
+    title: string;
+    tqlGlue: string;
+    colors: string[];
+  }) =>
+    _card({
+      fields: L(),
+      
+      static:
+      {
+        manualEntry: null,
+        colors: config.colors,
+        title: config.title,
+        preview: 
+          (card) =>
+            card['fields'].map(
+              field =>
+                typeof field.field !== 'object' ? field.field : getPreview(field.field)
+            ).join(config.tqlGlue),
+            
+        tql: "($fields )",
+        tqlGlue: config.tqlGlue,
+        
+        init: () => ({
+          fields: List([ 
+            make(Blocks.field, { field: '' })
+          ]),
+        }),
+        
+        display: [
+          {
+            displayType: DisplayType.ROWS,
+            key: 'fields',
+            english: 'field',
+            factoryType: 'field',
+            row:
+            {
+              inner:
+              {
+                displayType: DisplayType.CARDTEXT,
+                key: 'field',
+                accepts: mathsAccept,
+                showWhenCards: true,
+              },
+              below:
+              {
+                displayType: DisplayType.CARDSFORTEXT,
+                key: 'field',
+                accepts: mathsAccept,
+              },
+              // hideToolsWhenNotString: true,
+              noDataPadding: true,
+            },
+          },
+        ],
+      },
+    });
+  
   // The BuildingBlocks
   export const Blocks =
   { 
@@ -574,8 +652,7 @@ export module BuilderTypes
     {
       property: "",
       direction: Direction.DESC,
-      static:
-      {
+      static: {
         tql: "\n $property $DIRECTION",
         removeOnCardRemove: true,
       }
@@ -590,7 +667,7 @@ export module BuilderTypes
       static: {
         tql: "\n $first $OPERATOR $second",
         
-        accepts: List(['score', 'transform', 'from', 'exists', 'not']),
+        accepts: _acceptsMath(List(['score', 'transform', 'from', 'exists', 'not'])),
       }
     }),
     
@@ -601,7 +678,15 @@ export module BuilderTypes
       aliasWasSuggested: false,
       
       static: {
-        tql: "\n $table as $alias",
+        tql: (tableBlock: IBlock) =>
+        {
+          let suffix = "";
+          if(tableBlock['alias'])
+          {
+            suffix = " as $alias";
+          }
+          return "\n $table" + suffix;
+        }
       }
     }),
     
@@ -610,8 +695,8 @@ export module BuilderTypes
       field: "",
       
       static: {
-        tql: "\n $field",
-        accepts: List(['min', 'max', 'avg', 'sum', 'count', 'distinct']),
+        tql: "$field",
+        accepts: _acceptsMath(List(['min', 'max', 'avg', 'sum', 'count', 'distinct'])),
         removeOnCardRemove: true,
       },
     }),
@@ -621,8 +706,7 @@ export module BuilderTypes
       fields: L(),
       cards: L(),
       
-      static:
-      {
+      static: {
         manualEntry: ManualConfig.cards['sfw'],
         colors: ["#559dcf", "#b4dbf6"],
         title: "Select",
@@ -703,8 +787,7 @@ export module BuilderTypes
     from: _card({
       tables: L(),
       
-      static:
-      {
+      static: {
         manualEntry: ManualConfig.cards['sfw'],
         colors: ["#3a7dcf", "#94b9f6"],
         title: "From",
@@ -877,8 +960,7 @@ export module BuilderTypes
       second: "",
       operator: Operator.EQ,
       
-      static:
-      {
+      static: {
         title: "Compare",
         colors: ["#476aa3", "#a5c6fc"],
         preview: (c:ICard) => {
@@ -905,7 +987,9 @@ export module BuilderTypes
             help: ManualConfig.help["operator"],
             centerDropdown: true,
           }, 
-          List(['sfw', 'exists', 'not'])
+          _acceptsMath(
+            List(['sfw', 'exists', 'not'])
+          )
         ),
         manualEntry: ManualConfig.cards['filter'],
       },
@@ -959,7 +1043,7 @@ export module BuilderTypes
                 displayType: DisplayType.CARDTEXT,
                 help: ManualConfig.help["property"],
                 key: 'property',
-                accepts: List(['score', 'transform']),
+                accepts: _acceptsMath(List(['score', 'transform'])),
                 showWhenCards: true,
               },
               {
@@ -973,7 +1057,7 @@ export module BuilderTypes
             {
               displayType: DisplayType.CARDSFORTEXT,
               key: 'property',
-              accepts: List(['score', 'transform']),
+              accepts: _acceptsMath(List(['score', 'transform'])),
             },
             hideToolsWhenNotString: false,
             noDataPadding: true,
@@ -1018,8 +1102,7 @@ export module BuilderTypes
       value: "",
       alias: "",
       
-      static:
-      {
+      static: {
         title: "As",
         colors: ["#d24f42", "#f9cba8"],
         preview: '[alias]',
@@ -1164,8 +1247,7 @@ export module BuilderTypes
       weights: List([]),
       method: "",
       
-      static:
-      {
+      static: {
         title: "Score",
         colors: ["#3a91a6", "#a1eafb"],
         preview: "[weights.length] Weights",
@@ -1254,17 +1336,16 @@ export module BuilderTypes
       domain: List([0,100]),
       hasCustomDomain: false, // has the user set a custom domain
       
-      static:
-      {
+      static: {
         manualEntry: ManualConfig.cards['transform'],
         colors: ["#4b979a", "#aef3f6"],
         title: "Transform",
         preview: (card:any) => {
           if(card.input._isCard)
           {
-            return 'Transform ' + getPreview(card.input);
+            return '' + getPreview(card.input);
           }
-          return 'Transform ' + card.input;
+          return '' + card.input;
         },
         tql: "linear_transform($input, $scorePoints)",
         display: [
@@ -1338,8 +1419,7 @@ export module BuilderTypes
     {
       fields: L(),
       
-      static:
-      {
+      static: {
         manualEntry: ManualConfig.cards['sfw'], // TODO
         colors: ["#659f72", "#c4e1ca"],
         title: "Group By",
@@ -1387,8 +1467,7 @@ export module BuilderTypes
     tql: _card({
       clause: "",
       
-      static:
-      {
+      static: {
         title: "Expression",
         preview: "[clause]",
         colors: ["#278172", "#aefcef"],
@@ -1401,6 +1480,30 @@ export module BuilderTypes
           key: 'clause',
         }
       }
+    }),
+    
+    add: _mathCard({
+      title: '+',
+      tqlGlue: ' + ',
+      colors: ["#d24f42", "#f9cba8"],
+    }),
+    
+    subtract: _mathCard({
+      title: '-',
+      tqlGlue: ' - ',
+      colors: ["#d65a44", "#fbc1b7"],
+    }),
+    
+    multiply: _mathCard({
+      title: '×',
+      tqlGlue: ' * ',
+      colors: ["#db6746", "#f9bcab"],
+    }),
+    
+    divide: _mathCard({
+      title: '/',
+      tqlGlue: ' / ',
+      colors: ["#dd7547", "#fdcdb8"],
     }),
     
     spotlight: _block(
@@ -1433,7 +1536,7 @@ export module BuilderTypes
       },
     }),
   };
-  
+
   // Set the "type" field for all blocks equal to its key
   _.map(Blocks as ({[card:string]:any}), (v, i) => Blocks[i].type = i);
   
@@ -1468,10 +1571,14 @@ export module BuilderTypes
       Blocks.not,
     ],
     [
-      // Blocks.var,
-      // Blocks.let,
       Blocks.transform,
       Blocks.score,
+    ],
+    [
+      Blocks.add,
+      Blocks.subtract,
+      Blocks.multiply,
+      Blocks.divide,
     ],
     [
       Blocks.tql,
@@ -1637,6 +1744,11 @@ export module BuilderTypes
     
     if(!card.static)
     {
+      if(typeof card === 'string' || typeof card === 'number')
+      {
+        return card + "";
+      }
+      
       try {
         return JSON.stringify(card);
       } catch(e) {
@@ -1674,7 +1786,6 @@ export module BuilderTypes
     {
       return preview(card);
     }
-    
     return 'No preview';
   }  
   

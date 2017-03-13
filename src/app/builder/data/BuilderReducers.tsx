@@ -120,15 +120,24 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     
     if(!action.payload.query.tqlCardsInSync)
     {
-      state = state
-        .set('parseTreeReq', 
-          Ajax.parseTree(
-            action.payload.query.tql,
-            state.db,
-            Actions.parseTreeLoaded,
-            Actions.parseTreeError
-          )
-        );
+      if(action.payload.query.tql)
+      {
+        state = state
+          .set('parseTreeReq', 
+            Ajax.parseTree(
+              action.payload.query.tql,
+              state.db,
+              Actions.parseTreeLoaded,
+              Actions.parseTreeError
+            ).xhr
+          );
+      }
+      else
+      {
+        // blank
+        action.payload.query = action.payload.query
+          .set('tqlCardsInSync', true);
+      }
     }
     
     return state
@@ -314,7 +323,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
           state.db,
           Actions.parseTreeLoaded,
           Actions.parseTreeError
-        )
+        ).xhr
       );
   },
 
@@ -354,11 +363,11 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
   (
     state: BuilderState,
     action: Action<{
-      error: any,
+      errorMessage: string,
     }>
   ) =>
     state
-      .setIn(['query', 'parseTreeError'], JSON.stringify(action.payload.error))
+      .setIn(['query', 'parseTreeError'], action.payload.errorMessage || true)
       .set('parseTreeReq', null)
       .setIn(['query', 'tqlCardsInSync'], false),
 
@@ -433,6 +442,19 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
         .set('tables', action.payload.tables)
         .set('tableColumns', action.payload.tableColumns),
 
+  [ActionTypes.changeResultsConfig]:
+    (
+      state: BuilderState,
+      action: Action<{
+        resultsConfig: any
+      }>
+    ) =>
+      state
+        .update('query',
+          query =>
+            query.set('resultsConfig', action.payload.resultsConfig)
+        ),
+
   [ActionTypes.save]:
     (
       state: BuilderState,
@@ -483,6 +505,13 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     
   [ActionTypes.checkpoint]:
     (state:BuilderState, action: Action<{}>) => state,
+  
+  [ActionTypes.results]:
+    (
+      state: BuilderState,
+      action: Action<{ resultsState }>
+    ) =>
+      state.set('resultsState', action.payload.resultsState),
 };
 
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState

@@ -82,10 +82,14 @@ class SchemaResults extends PureClasss<Props>
 					storeState.getIn(['columns', selectedId]) ||
 					storeState.getIn(['indexes', selectedId]);
 				
-				this.setState({
-					selectedId,
-					selectedItem,
-				})
+				if(selectedItem !== this.state.selectedItem)
+				{
+					this.setState({
+						selectedId,
+						selectedItem,
+					});
+					
+				}
 			}
 		});
 	}
@@ -95,6 +99,7 @@ class SchemaResults extends PureClasss<Props>
   	
     return (
     	<div
+    		
     	>
     	</div>
     );

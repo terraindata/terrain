@@ -52,65 +52,45 @@ import Actions from "../../builder/data/BuilderActions";
 import TQLConverter from "../../tql/TQLConverter";
 import PureClasss from './../../common/components/PureClasss';
 import BuilderTypes from '../../builder/BuilderTypes';
-
+import {ResultsState} from '../../builder/components/results/ResultsManager';
 interface Props 
 {
-  tql: string;
-  query: BuilderTypes.Query; // may not be necessary once we can pass inputs to TDBD
+  resultsState: ResultsState;
   onError: (lineNumber: number) => void;
-  onLoadStart: () => void;
-  onLoadEnd: () => void;
-  db: string;
   open: boolean;
   onToggle: () => void;
 }
 
 class TQLResultsBar extends PureClasss<Props>
 {
-  xhr = null;
-  
   state: {
-    results: any[];
-    error: boolean;
     mainErrorMessage?: string;
     subErrorMessage?: string;
-    querying: boolean;
-    resultsSpliced: number;
-    errorLine: number;
+    querying?: boolean;
+    resultsSpliced?: number;
+    errorLine?: number;
     queriedTql?: string;
+    queryId?: string;
   } = {
-    results: null,
-    error: false,
-    querying: false,
-    resultsSpliced: 0,
-    errorLine: NaN,
   };
   
-  componentWillMount()
-  {
-    this.queryResults(this.props.query);
-  }
-
-  //If the component updates and the tql command has been changed, then query results
   componentWillReceiveProps(nextProps:Props) 
   {
-    if(nextProps.query.cards !== this.props.query.cards
-      || nextProps.query.inputs !== this.props.query.inputs) 
-    {
-      this.queryResults(nextProps.query);
-    } 
+    // check for an error line?
   }
     
   resultsFodderRange = _.range(0, 25);
 
   renderResults()
   {
-    if(this.state.querying)
+    let {resultsState} = this.props;
+    
+    if(!resultsState.hasLoadedResults)
     {
       return <div>Querying results...</div>
-    } 
+    }
 
-    if(this.state.error)
+    if(resultsState.hasError)
     {
       return (
         <div>
@@ -121,168 +101,84 @@ class TQLResultsBar extends PureClasss<Props>
           </span>
           <span className="error-title">
             { 
-              this.state.mainErrorMessage 
+              resultsState.errorMessage
             }
           </span>
           <span className="error-message">
             { 
-              this.state.subErrorMessage 
             }
           </span>
         </div>
       );
     }
 
-    if(!this.state.results) 
+    let {results} = resultsState;
+
+    if(!results) 
     {
       return <div>Compose a query to view results here.</div>
     }
     
-    if(typeof this.state.results === 'string')
+    if(typeof results === 'string')
     {
-      if(!this.state.results.length)
+      if(!results['length'])
       {
         return <em> "" (empty string)</em>;
       }
-      return <div>{this.state.results}</div>;
+      return (
+        <div>
+          {
+            results
+          }
+        </div>
+      );
     }
     
-    if(!this.state.results.length)
+    if(!results.size)
     {
       return <div>There are no results for your query.</div>;
     }
     
-    return(
+    return (
       <div>
         {
-          this.state.results.map((result, i) =>
+          results.map((result, i) =>
             <div key={i}>
-              {JSON.stringify(result)}
+              {
+                JSON.stringify(result.rawFields.toJS())
+              }
             </div>
           )
-        }
-        {
-          this.state.resultsSpliced ? <em> And {this.state.resultsSpliced} more results </em> : null
         }
       </div>
     );
   }
   
-  handleResultsChange(response: QueryResponse)
-  {
-    this.props.onLoadEnd && this.props.onLoadEnd();
-    if(response.error)
-    {
-      let {error} = response;
-      error = error.replace(/MySQL/g, 'TerrainDB');
-      if(error.charAt(error.length - 1) === '^')
-      {
-        error = error.substr(0, error.length - 1);
-      }
-      let matches = error.match(/([0-9]+)\:[0-9]+/);
-      let line = matches && matches.length >= 2 && parseInt(matches[1]);
-      
-      if(line !== NaN && line !== null && line !== undefined)
-      {
-        var mainErrorMessage = 'Error on line ' + line + ': ';
-        var subErrorMessage = error;
-        this.props.onError(line);
-      }
-      else
-      {
-        var mainErrorMessage = error;
-        var subErrorMessage: string = null;
-      }
-      
-      this.setState({
-        error: true,
-        mainErrorMessage,
-        subErrorMessage,
-        errorLine: line,
-        querying: false,
-        results: null,
-      });
-      return;
-    }
+  // handleResultsChange(response: QueryResponse)
+  // {
     
-    let results = response.resultSet as (any[] | string);
-    if(results)
-    {
-      var spliced = 0;
-      if(typeof results === 'string')
-      {
-        if(results.length > 1000)
-        {
-          spliced = results.length - 1000;
-          results = results['substr'](0, 1000) + '...';
-        }
-      }
-      if(Array.isArray(results))
-      {
-        if(results.length > 25)
-        {
-          spliced = results.length - 25;
-          results.splice(25, results.length - 25);
-        }
-      }
-      
-      this.setState({
-        results,
-        querying: false,
-        error: false,
-        errorLine: null,
-        resultsSpliced: spliced,
-      });
-    }
-    else
-    {
-      this.setState({
-        error: "No response was returned from the server.",
-        xhr: null,
-        querying: false,
-      });
-    }
-  }
-  
-  handleError(ev)
-  {
-    this.setState({
-      error: ev,
-      querying: false,
-    });
-  }
-  
-  queryResults(query:BuilderTypes.Query)
-  {
-    this.xhr && this.xhr.abort();
-    
-    let tql = TQLConverter.toTQL(query, {
-      replaceInputs: true,
-    });
-    
-    if(tql)
-    {
-      if(tql !== this.state.queriedTql)
-      {
-        this.props.onLoadStart && this.props.onLoadStart();
-        this.setState({
-          querying: true,
-          limit: 200,
-        });
-        this.xhr = Ajax.query(tql, this.props.db, this.handleResultsChange, this.handleError);
-        
-        this.setState({
-          queriedTql: tql,
-        });
-      }
-    }
-    else
-    {
-      this.setState({
-        results: null,
-      });
-    }
-  }
+  //   if(response.errorMessage)
+  //   {
+  //     let error = response.errorMessage;
+  //     error = error.replace(/MySQL/g, 'TerrainDB');
+  //     if(error.charAt(error.length - 1) === '^')
+  //     {
+  //       error = error.substr(0, error.length - 1);
+  //     }
+  //     let matches = error.match(/([0-9]+)\:[0-9]+/);
+  //     let line = matches && matches.length >= 2 && parseInt(matches[1]);
+  //     if(line !== NaN && line !== null && line !== undefined)
+  //     {
+  //       var mainErrorMessage = 'Error on line ' + line + ': ';
+  //       var subErrorMessage = error;
+  //       this.props.onError(line);
+  //     }
+  //     else
+  //     {
+  //       var mainErrorMessage = error;
+  //       var subErrorMessage: string = null;
+  //     }
+  // }
   
 	render()
   {

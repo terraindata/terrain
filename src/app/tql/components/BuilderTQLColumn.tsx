@@ -57,21 +57,18 @@ import BuilderActions from './../../builder/data/BuilderActions';
 import BuilderTypes from '../../builder/BuilderTypes';
 import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss';
-import Ajax from "./../../util/Ajax";
 import LibraryTypes from '../../library/LibraryTypes';
-
 import TQLEditor from './TQLEditor';
-
 import TQLPopup from './TQLPopup';
+import {ResultsState} from '../../builder/components/results/ResultsManager';
 
 interface Props {
   variant?: LibraryTypes.Variant;
   query?: BuilderTypes.Query;
   canEdit?: boolean;
+  resultsState: ResultsState;
   
   params?: any;
-  onLoadStart: () => void;
-  onLoadEnd: () => void;
   addColumn?: (number, string?) => void;
   columnIndex: number;
 }
@@ -203,11 +200,6 @@ class BuilderTQLColumn extends PureClasss<Props>
       default:
         return 0;
     }
-  }
-  
-  killQueries()
-  {
-    Ajax.killQueries();
   }
 
   getMenuOptions(): List<MenuOption> 
@@ -393,14 +385,10 @@ class BuilderTQLColumn extends PureClasss<Props>
           }
           
           <TQLResultsBar
-            tql={this.state.tql}
-            query={this.props.query}
-            db={this.props.variant && this.props.variant.db}
             onError={this.highlightError}
-            onLoadStart={this.props.onLoadStart}
-            onLoadEnd={this.props.onLoadEnd}
             open={this.state.resultsBarOpen}
             onToggle={this._toggle('resultsBarOpen')}
+            resultsState={this.props.resultsState}
           />
         </div>
       </div>

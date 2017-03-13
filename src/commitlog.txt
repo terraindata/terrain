@@ -1,0 +1,100 @@
+commit fe9dae21d8cace24c958091f546d7561688677fd
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Mon Mar 6 23:01:34 2017 -0700
+
+    Fixing date bug with tql to cards
+
+commit d718399e6da0cd665359db5913d91681f7b5f0fe
+Merge: 862e034 76a063d
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Mon Mar 6 16:41:48 2017 -0800
+
+    Merge branch 'results-manager'
+
+commit 76a063d3038bda8c8df449da532013608a9af7cc
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Mon Mar 6 10:59:13 2017 -0800
+
+    Polishes on results manager
+
+commit ff732fe47135801d6ab7efe6cbe3443d78697fba
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Mon Mar 6 10:02:37 2017 -0800
+
+    TQL column uses results manager
+
+commit 9e4cb209279a3390d7cef7a9933f4b859705a515
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Fri Mar 3 16:50:15 2017 -0800
+
+    What has resulted from the results manager
+
+commit 3aa53be8d54fd1e16d6a0fbc849f7df4376bde09
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Fri Mar 3 13:49:18 2017 -0800
+
+    results are ready for debugging
+
+commit 14ef325bcdf4b5bb165dc56dcf149365d3a8a883
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Fri Mar 3 11:17:06 2017 -0800
+
+    Results manager ready for some testing
+
+commit 862e034b95fe1c9b57992b8c8bb1ba50fa6010f0
+Merge: c360970 66f08c3
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu Mar 2 14:50:48 2017 -0800
+
+    Merge branch 'master' of git.terrain.int:terrain/Search
+
+commit c360970bba55834fc4a8460257a4a4710e938a87
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu Mar 2 14:50:42 2017 -0800
+
+    README change
+
+commit 66f08c32bfe528a25fe2b5e5f828be88642da47a
+Author: Abhishek Kulkarni <abhishek.kulkarni@terraindata.com>
+Date:   Thu Mar 2 12:06:12 2017 -0800
+
+    Fix build-gcloud webpack target.
+
+commit 1b3dd63fe99dccbea763098d994ec2d33700c7ce
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu Mar 2 11:29:21 2017 -0800
+
+    README update
+
+commit 6a6d84dfa0bbad89e3d30b5d29e7d48d4fb1354e
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu Mar 2 11:28:34 2017 -0800
+
+    Update deploy scripts
+
+commit 499b2d88b9f81d7c45a2255ac08124da03df8bbb
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu Mar 2 11:21:39 2017 -0800
+
+    Adding gitignore for commit log
+
+commit 2c0102471a1d3e25908dc7100f3b9ea2223955e5
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu Mar 2 11:21:10 2017 -0800
+
+    Addnig a commit log to the interface
+
+commit c36beb7cc42116c963b3d1993677e1d8c66049ba
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu Mar 2 10:38:46 2017 -0800
+
+    merge more
+
+commit ea365802689e4d92c95e70198ca1119ce58daf7b
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Thu Mar 2 09:57:00 2017 -0800
+
+    Merge progress
+
+commit 360a527f90126dfac795e013a354616281743a9d
+Author: Luke Knepper <luke@terraindb.com>

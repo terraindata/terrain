@@ -70,9 +70,9 @@ conf.plugins = [
 ];
 
 // enable babel plugins on tsx loader
-if(conf.module.loaders[0].loader !== 'babel?presets[]=react&presets[]=es2015!ts-loader')
+if(conf.module.loaders[0].loader !== 'babel?presets[]=react&presets[]=latest!ts-loader')
 {
-  throw new Error('Expected first loader to be "babel?presets[]=react&presets[]=es2015!ts-loader" but found '
+  throw new Error('Expected first loader to be "babel?presets[]=react&presets[]=latest!ts-loader" but found '
     + conf.module.loaders[0].loader);
 }
 conf.module.loaders[0].loader =

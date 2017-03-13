@@ -48,8 +48,6 @@ import * as React from 'react';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 const {List} = Immutable;
-// import { DragSource, DropTarget } from 'react-dnd';
-// var { createDragPreview } = require('react-dnd-text-dragpreview');
 import Util from '../../../util/Util';
 import Menu from '../../../common/components/Menu';
 import Actions from '../../data/BuilderActions';
@@ -57,35 +55,18 @@ import {spotlightAction} from '../../data/SpotlightStore';
 import ColorManager from '../../../util/ColorManager';
 import Classs from './../../../common/components/Classs';
 import {IResultsConfig} from './ResultsConfig';
+import {Result, MAX_RESULTS} from './ResultsManager';
 
 var PinIcon = require("./../../../../images/icon_pin_21X21.svg?name=PinIcon");
 var ScoreIcon = require("./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon");
 
 const MAX_DEFAULT_FIELDS = 4;
 
-// var dragPreviewStyle = {
-//   backgroundColor: '#cfd7c8',
-//   borderColor: '#cfd7c8',
-//   color: '#44484d',
-//   fontSize: 15,
-//   fontWeight: 'bold',
-//   paddingTop: 7,
-//   paddingRight: 12,
-//   paddingBottom: 9,
-//   paddingLeft: 12,
-//   borderRadius: 10
-// }
-
 interface Props
 {
-  data: {
-    id: string;
-    name: string;
-    spotlight: any;
-    pinned: boolean;
-  };
-  allFieldsData: any;
-  config: IResultsConfig;
+  result: Result;
+  
+  resultsConfig: IResultsConfig;
   index: number;
   primaryKey: string;
   onExpand: (index:number) => void;
@@ -98,51 +79,15 @@ interface Props
   connectDragPreview?: (a:any) => void;
 }
 
-class Result extends Classs<Props> {
-  state: {
-    isSpotlit: boolean;
-    spotlightColor: string;
-  } = {
-    isSpotlit: false,
-    spotlightColor: "",
-  };
+class ResultComponent extends Classs<Props> {
+  // state: {
+  //   isSpotlit: boolean;
+  //   spotlightColor: string;
+  // } = {
+  //   isSpotlit: false,
+  //   spotlightColor: "",
+  // };
   
-  shouldComponentUpdate(nextProps, nextState)
-  {
-    // Note: in the future, convert the results to cached immutable objects
-    /// and compute any differences when the AJAX response returns
-    
-    if(!_.isEqual(this.props.data, nextProps.data) || !_.isEqual(this.state, nextState))
-    {
-      return true;
-    }
-    
-    for(var k in this.props)
-    {
-      if(k !== 'data' && this.props[k] !== nextProps[k])
-      {
-        return true;
-      }
-    }
-    
-    return false;    
-  }
-  
-  // dragPreview: any;
-  // componentDidMount() {
-  //   this.generateDragPreview(this.props); 
-  // }
-  // componentWillReceiveProps(nextProps)
-  // {
-  //   this.generateDragPreview(nextProps);
-  // }
-  // generateDragPreview(props:Props)
-  // {
-  //   this.dragPreview = createDragPreview(getResultName(this.props.data, this.props.allFieldsData, 
-  //     this.props.config), dragPreviewStyle);
-  //   props.connectDragPreview(this.dragPreview);
-  // }
-
   renderExpandedField(value, field)
   {
     return this.renderField(field, 0, null, {
@@ -153,20 +98,22 @@ class Result extends Classs<Props> {
   
   renderField(field, index?, fields?, overrideFormat?)
   {
-    if(!resultsConfigHasFields(this.props.config) && index >= MAX_DEFAULT_FIELDS)
+    if(!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS)
     {
       return null;
     }
     
-    var value = getResultValue(this.props.data, this.props.allFieldsData, field, this.props.config, overrideFormat);
-    let format = this.props.config && this.props.config.formats.get(field);
+    var value = getResultValue(this.props.result, field, this.props.resultsConfig, overrideFormat);
+    let format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     let showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
       <div className="result-field" key={field}>
         {
           showField &&
             <div className="result-field-name">
-              { field }
+              { 
+                field 
+              }
             </div>
         }
         <div
@@ -176,15 +123,12 @@ class Result extends Classs<Props> {
             'result-field-value-number': typeof value === 'number',
           })}
         >
-          {value}
+          {
+            value
+          }
         </div>
       </div>
     );
-  }
-  
-  getData(): any
-  {
-    return _.extend({}, this.props.allFieldsData, this.props.data);
   }
   
   spotlight()
@@ -196,20 +140,12 @@ class Result extends Classs<Props> {
       spotlightColor,
     });
     
-    let spotlightData = this.getData();
-    spotlightData['name'] = getResultName(this.props.data, this.props.allFieldsData, this.props.config);
+    let spotlightData = this.props.result.toJS();
+    spotlightData['name'] = getResultName(this.props.result, this.props.resultsConfig);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightAction(id, spotlightData);
   }
-  
-  // componentWillUnmount()
-  // {
-  //   if(this.state.isSpotlit)
-  //   {
-  //     spotlightAction(this.props.primaryKey, null);
-  //   }
-  // }
   
   unspotlight()
   {
@@ -219,19 +155,9 @@ class Result extends Classs<Props> {
     spotlightAction(this.props.primaryKey, null);
   }
   
-  pin()
-  {
-    // TODO
-  }
-  
-  unpin()
-  {
-    // TODO
-  }
-  
   renderSpotlight()
   {
-    if(!this.state.isSpotlit)
+    if(!this.props.result.spotlight)
     {
       return null;
     }
@@ -246,43 +172,22 @@ class Result extends Classs<Props> {
     );
   }
   
-  getMenuOptions()
-  {
-    var menuOptions = List([]);
-    
-    if(this.state.isSpotlit)
-    {
-      menuOptions = menuOptions.push({
-        text: 'Un-Spotlight',
-        onClick: this.unspotlight,
-      });
-    }
-    else
-    {
-      menuOptions = menuOptions.push({
+  menuOptions =
+  [
+    List([
+      {
         text: 'Spotlight',
         onClick: this.spotlight,
-      });
-    }
+      },
+    ]),
     
-    // TODO add back in once we have Result pinning
-    // if(this.props.data && this.props.data.pinned)
-    // {
-    //   menuOptions.push({
-    //     text: 'Un-Pin',
-    //     onClick: this.unpin,
-    //   });
-    // }
-    // else
-    // {
-    //   menuOptions.push({
-    //     text: 'Pin',
-    //     onClick: this.pin,
-    //   })
-    // }
-    
-    return menuOptions;
-  }
+    List([
+      {
+        text: 'Un-Spotlight',
+        onClick: this.unspotlight,
+      },
+    ]),
+  ];
   
   expand()
   {
@@ -291,29 +196,30 @@ class Result extends Classs<Props> {
   
 	render()
   {
-    const { isDragging, connectDragSource, isOver, connectDropTarget, config, data, allFieldsData } = this.props;
+    const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, result } = this.props;
     
     var classes = classNames({
       'result': true,
-      'result-pinned': this.props.data && this.props.data.pinned,
       'result-expanded': this.props.expanded,
       'result-dragging': isDragging,
       'result-drag-over': isOver,
     });
     
-    if(config && config.score && config.enabled)
+    if(resultsConfig && resultsConfig.score && resultsConfig.enabled)
     {
           // <ScoreIcon className='result-score-icon' />
       var scoreArea = (
         <div className='result-score'>
-          { this.renderField(config.score) }
+          { 
+            this.renderField(resultsConfig.score) 
+          }
     		</div>
       );
     }
     
-    let name = getResultName(data, allFieldsData, config);
-    let fields = getResultFields(data, allFieldsData, config);
-    let configHasFields = resultsConfigHasFields(config);
+    let name = getResultName(result, resultsConfig);
+    let fields = getResultFields(result, resultsConfig);
+    let configHasFields = resultsConfigHasFields(resultsConfig);
     
     if(!configHasFields && fields.length > 4 && !this.props.expanded)
     {
@@ -332,16 +238,15 @@ class Result extends Classs<Props> {
             All Fields
           </div>
           {
-            _.map(allFieldsData || this.props.data, this.renderExpandedField)
-          }
-          {
-            allFieldsData ? null : 'Loading more...'
+            result.fields.map(
+              (value, key) =>
+                this.renderExpandedField(value, key)
+            )
           }
         </div>
       );
     }
     
-    // return connectDropTarget(connectDragSource(
     return ((
       <div
         className={classes}
@@ -350,7 +255,9 @@ class Result extends Classs<Props> {
         <div className='result-inner'>
           <div className='result-name'>
             <div className='result-name-inner'>
-              {this.renderSpotlight()}
+              {
+                this.renderSpotlight()
+              }
               <div className='result-pin-icon'>
                 <PinIcon />
               </div>
@@ -359,8 +266,17 @@ class Result extends Classs<Props> {
               }
             </div>
           </div>
-          <Menu options={this.getMenuOptions()} />
-          { scoreArea }
+          
+          <Menu 
+            options={
+              this.menuOptions[result.spotlight ? 1 : 0]
+            } 
+          />
+          
+          { 
+            scoreArea 
+          }
+          
           <div className='result-fields-wrapper'>
             {
                 _.map(fields, this.renderField)
@@ -375,23 +291,16 @@ class Result extends Classs<Props> {
         </div>
       </div>
     ));
-              // this.props.expanded
-              //   ? _.map(this.props.result, this.renderField)
-              //   : fields.map(this.renderField)
 	}
 };
 
 
-export function getResultValue(resultData, allFieldsData, field: string, config: IResultsConfig, overrideFormat?: any): string
+export function getResultValue(result: Result, field: string, config: IResultsConfig, overrideFormat?: any): string
 {
   var value: any;
-  if(resultData && resultData[field] !== undefined)
+  if(result)
   {
-    value = resultData[field];
-  }
-  else if(allFieldsData)
-  {
-    value = allFieldsData[field];
+    value = result.fields.get(field);
   }
   return ResultFormatValue(field, value, config, overrideFormat);
 }
@@ -401,7 +310,7 @@ export function resultsConfigHasFields(config: IResultsConfig): boolean
   return config && config.enabled && config.fields && config.fields.size > 0;
 }
 
-export function getResultFields(resultData, allFieldsData, config: IResultsConfig): string[]
+export function getResultFields(result: Result, config: IResultsConfig): string[]
 {
   if(resultsConfigHasFields(config))
   {
@@ -409,13 +318,13 @@ export function getResultFields(resultData, allFieldsData, config: IResultsConfi
   }
   else
   {
-    var fields = _.union(_.keys(resultData), _.keys(allFieldsData));
+    var fields = result.fields.keySeq().toArray();
   }
   
   return fields;
 }
   
-export function getResultName(resultData, allFieldsData, config: IResultsConfig)
+export function getResultName(result: Result, config: IResultsConfig)
 {
   if(config && config.name && config.enabled)
   {
@@ -423,10 +332,10 @@ export function getResultName(resultData, allFieldsData, config: IResultsConfig)
   }
   else
   {
-    var nameField = _.first(getResultFields(resultData, allFieldsData, config));
+    var nameField = _.first(getResultFields(result, config));
   }
   
-  return getResultValue(resultData, allFieldsData, nameField, config);
+  return getResultValue(result, nameField, config);
 }
 
 
@@ -504,7 +413,7 @@ export function ResultFormatValue(field: string, value: string | number, config:
   return value;
 }
 
-export default Result;
+export default ResultComponent;
 
 // DnD stuff
 
@@ -519,7 +428,7 @@ export default Result;
   
 //   beginDrag(props)
 //   {
-//     const item = props.data;
+//     const item = props.result;
 //     return item;
 //   },
   
