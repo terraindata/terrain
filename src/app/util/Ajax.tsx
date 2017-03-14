@@ -520,28 +520,30 @@ export const Ajax = {
         try
         {
           let cols = JSON.parse(resp).results;
-          var tables: {[name:string]: {name: string; columns: any[];}} = {};
+          // var tables: {[name:string]: {name: string; columns: any[];}} = {};
           
-          cols.map(
-          (
-            col: { TABLE_NAME: string; COLUMN_NAME: string; }
-          ) =>
-          {
-            let column = _.extend(col, { name: col.COLUMN_NAME });
-            let table = col.TABLE_NAME;
+          // cols.map(
+          // (
+          //   col: { TABLE_NAME: string; COLUMN_NAME: string; }
+          // ) =>
+          // {
+          //   let column = _.extend(col, { name: col.COLUMN_NAME });
+          //   let table = col.TABLE_NAME;
              
-            if(!tables[table])
-            {
-              tables[table] = {
-                name: table,
-                columns: [],
-              };
-            }
+          //   if(!tables[table])
+          //   {
+          //     console.log('add table', table);
+          //     tables[table] = {
+          //       name: table,
+          //       columns: [],
+          //     };
+          //   }
             
-            tables[table].columns.push(column);
-          });
+          //   tables[table].columns.push(column);
+          // });
           
-          onLoad(_.toArray(tables) as any);
+          // onLoad(_.toArray(tables) as any);
+          onLoad(cols);
         }
         catch(e)
         {

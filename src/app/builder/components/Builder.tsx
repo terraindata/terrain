@@ -872,6 +872,7 @@ class Builder extends PureClasss<Props>
           query={query}
           resultsState={this.state.builderState.resultsState}
           db={this.state.builderState.db}
+          onResultsStateChange={Actions.results}
         />
       </div>
     );

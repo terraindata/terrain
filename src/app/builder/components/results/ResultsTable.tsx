@@ -48,7 +48,7 @@ import * as Immutable from 'immutable';
 import PureClasss from '../../../common/components/PureClasss';
 import Table from '../../../common/components/Table';
 import InfoArea from '../../../common/components/InfoArea';
-import {IResultsConfig, ResultsConfig} from "../results/ResultsConfig";
+import {IResultsConfig, _IResultsConfig} from "../results/ResultsConfig";
 import {getResultName, getResultFields, getResultValue} from './Result';
 import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore';
 import ColorManager from '../../../util/ColorManager';
@@ -58,7 +58,7 @@ import {Results, MAX_RESULTS, getPrimaryKeyFor} from './ResultsManager';
 interface Props
 {
   results: Results;
-  resultsConfig: IResultsConfig;
+  resultsConfig?: IResultsConfig;
   onExpand: (index:number) => void;
 }
 
@@ -67,9 +67,11 @@ export default class ResultsTable extends PureClasss<Props>
   state: {
     random: number;
     spotlightState: SpotlightState;
+    resultsConfig: IResultsConfig;
   } = {
     random: 0,
     spotlightState: null,
+    resultsConfig: this.getResultsConfig(this.props),
   };
   
   menuOptions: List<MenuOption> = Immutable.List([
@@ -78,6 +80,31 @@ export default class ResultsTable extends PureClasss<Props>
       onClick: this.spotlight,
     }
   ]);
+  
+  componentWillReceiveProps(nextProps:Props)
+  {
+    if(nextProps.results !== this.props.results || nextProps.resultsConfig !== this.props.resultsConfig)
+    {
+      // force the table to update
+      this.setState({
+        random: Math.random(),
+        resultsConfig: this.getResultsConfig(nextProps),
+      });
+    }
+  }
+  
+  getResultsConfig(props:Props): IResultsConfig
+  {
+    if(props.resultsConfig)
+    {
+      return props.resultsConfig;
+    }
+    
+    let resultFields = props.results.size ? props.results.get(0).fields : Immutable.Map({});
+    return _IResultsConfig({
+      fields: resultFields.keySeq().toList(),
+    });
+  }
   
   componentDidMount()
   {
@@ -89,7 +116,7 @@ export default class ResultsTable extends PureClasss<Props>
   
   getKey(col: number): string
   {
-    let config = this.props.resultsConfig;
+    let config = this.state.resultsConfig;
     let hasName = this.hasName();
     let hasScore = this.hasScore();
     
@@ -107,13 +134,15 @@ export default class ResultsTable extends PureClasss<Props>
     }
     
     let offset = (hasName ? 1 : 0) + (hasScore ? 1 : 0);
-    return config.fields.get(col - offset);
+    let fieldIndex = col - offset;
+    return config.fields.get(fieldIndex);
   }
   
   getValue(i: number, col: number): El
   {
     let field = this.getKey(col);
-    let {results, resultsConfig} = this.props;
+    let {results} = this.props;
+    let {resultsConfig} = this.state;
     let primaryKey = getPrimaryKeyFor(results && results.get(i), resultsConfig);
     let spotlight = col === 0
       && this.state.spotlightState 
@@ -139,12 +168,12 @@ export default class ResultsTable extends PureClasss<Props>
   
   hasScore(): boolean
   {
-    return this.props.resultsConfig.score !== "";
+    return this.state.resultsConfig.score !== "";
   }
   
   hasName(): boolean
   {
-    return this.props.resultsConfig.name !== "";
+    return this.state.resultsConfig.name !== "";
   }
   
   handleCellClick(r: number, c: number)
@@ -158,11 +187,11 @@ export default class ResultsTable extends PureClasss<Props>
     let row = rc.split('-')[0];
     let col = rc.split('-')[1];
     let result = this.props.results && this.props.results.get(+row);
-    let id = getPrimaryKeyFor(result, this.props.resultsConfig);
+    let id = getPrimaryKeyFor(result, this.state.resultsConfig);
     let spotlightColor = ColorManager.colorForKey(id);
     
     let spotlightData = _.extend({}, result);
-    spotlightData['name'] = getResultName(result, this.props.resultsConfig);
+    spotlightData['name'] = getResultName(result, this.state.resultsConfig);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightAction(id, spotlightData);
@@ -176,8 +205,14 @@ export default class ResultsTable extends PureClasss<Props>
     }
     
     let pinnedCols = (this.hasName() ? 1 : 0) + (this.hasScore() ? 1 : 0);
-    let fieldCount = this.props.resultsConfig.fields.size + pinnedCols;
+    let fieldCount = this.state.resultsConfig.fields.size + pinnedCols;
     
+    if(!fieldCount && this.props.results.size)
+    {
+      fieldCount = this.props.results.get(0).fields.size;
+    }
+    console.log(this.state.resultsConfig.fields.size);
+    console.log(fieldCount, this.props.results.size, this.state.random);
     return (
       <Table
         getKey={this.getKey}

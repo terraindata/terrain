@@ -210,7 +210,7 @@ export module SchemaTypes
 	{
 		return !search || 
   		(
-  			item && 
+  			item && typeof item.name === 'string' &&
 	  			item.name.toLowerCase().indexOf(
 	  				search.toLowerCase()
 	  			) !== -1

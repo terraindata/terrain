@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+const Radium = require('radium');
 import SchemaTypes from '../SchemaTypes';
 import {SchemaStore, SchemaActions} from '../data/SchemaStore';
 import * as React from 'react';
@@ -52,6 +53,7 @@ import Styles from './SchemaTreeStyles';
 import FadeInOut from '../../common/components/FadeInOut';
 import SchemaSearchResults from './SchemaSearchResults';
 import Util from '../../util/Util';
+import SchemaResults from './SchemaResults';
 
 interface Props
 {
@@ -64,6 +66,7 @@ const horizontalDivide = 50;
 const verticalDivide = 75;
 const searchHeight = 42;
 
+@Radium
 class SchemaView extends PureClasss<Props>
 {
 	state: {
@@ -71,16 +74,11 @@ class SchemaView extends PureClasss<Props>
 		search: string;
 		
 		// from Store
-		databases: SchemaTypes.DatabaseMap;
-		highlightedId: ID;
-		
+		databases?: SchemaTypes.DatabaseMap;
+		highlightedId?: ID;
 	} = {
 		highlightedIndex: -1,
 		search: "",
-		
-		// from Store
-		databases: null,
-		highlightedId: null,
 	};
 	
 	constructor(props:Props)
@@ -175,16 +173,14 @@ class SchemaView extends PureClasss<Props>
       	style={Styles.schemaView}
       >
       	<div
-      		style={{
-      			position: 'absolute',
-      			left: 0,
-      			top: 0,
-      			width: this.props.fullPage ? horizontalDivide + '%' : 'calc(100% - 6px)',
-      			height: this.props.fullPage ? '100%' : verticalDivide + '%',
-      			overflow: 'auto',
-      			padding: Styles.margin,
-      			boxSizing: 'border-box',
-      		}}
+      		style={[
+      			SECTION_STYLE,
+      			this.props.fullPage ? SCHEMA_STYLE_FULL_PAGE : SCHEMA_STYLE_COLUMN,
+      			{
+      				padding: Styles.margin,
+							overflow: 'auto',
+      			},
+      		]}
       	>
       		{
       			showSearch &&
@@ -232,11 +228,55 @@ class SchemaView extends PureClasss<Props>
 			      	search={this.state.search}
 			      />
 		      </div>
-		      
+	      </div>
+	      
+	      <div
+	      	style={[
+      			SECTION_STYLE,
+      			this.props.fullPage ? RESULTS_STYLE_FULL_PAGE : RESULTS_STYLE_COLUMN
+      		]}
+	      >
+	      	<SchemaResults
+	      		databases={this.state.databases}
+	      	/>
 	      </div>
       </div>
     );
   }
 }
+
+const SECTION_STYLE = {
+	position: 'absolute',
+	boxSizing: 'border-box',
+}
+
+const SCHEMA_STYLE_FULL_PAGE = {
+	left: 0,
+	top: 0,
+	width: horizontalDivide + '%',
+	height: '100%',
+};
+
+const SCHEMA_STYLE_COLUMN = {
+	left: 0,
+	top: 0,
+	width: 'calc(100% - 6px)',
+	height: verticalDivide + '%',
+};
+
+const RESULTS_STYLE_FULL_PAGE = {
+	left: horizontalDivide + '%',
+	top: 0,
+	width: (100 - horizontalDivide) + '%',
+	height: '100%',
+};
+
+const RESULTS_STYLE_COLUMN = {
+	left: 0,
+	top: verticalDivide + '%',
+	width: '100%',
+	height: (100 - verticalDivide) + '%',
+};
+
 
 export default SchemaView;

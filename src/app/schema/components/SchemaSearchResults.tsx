@@ -141,6 +141,7 @@ class SchemaSearchResults extends PureClasss<Props>
 		while(renderItems.length <= max && index < items.size && !couldShowMore)
 		{
 			let item = items.get(index);
+			
 			if(SchemaTypes.searchIncludes(item, this.props.search))
 			{
 				if(renderItems.length < max)

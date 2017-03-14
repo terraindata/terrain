@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as Immutable from 'immutable';
+let {List, Map} = Immutable;
 const Radium = require('radium');
 import SchemaTypes from '../SchemaTypes';
 import SchemaStore from '../data/SchemaStore';
@@ -52,10 +53,15 @@ import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeStyles from './SchemaTreeStyles';
 import Styles from '../../Styles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
+import ResultsTable from '../../builder/components/results/ResultsTable';
+import {ResultsManager, ResultsState, _ResultsState} from '../../builder/components/results/ResultsManager';
+import BuilderTypes from '../../builder/BuilderTypes';
+
+const NUM_ROWS = 200;
 
 interface Props
 {
-	
+	databases: SchemaTypes.DatabaseMap;
 }
 
 @Radium
@@ -64,7 +70,12 @@ class SchemaResults extends PureClasss<Props>
 	state: {
 		selectedId?: ID,
 		selectedItem?: SchemaBaseClass,
+		
+		resultsState?: ResultsState;
+		resultsQuery?: BuilderTypes.Query;
+		resultsDb?: string;
 	} = {
+		resultsState: _ResultsState(),
 	};
 	
 	constructor(props:Props)
@@ -89,18 +100,150 @@ class SchemaResults extends PureClasss<Props>
 						selectedItem,
 					});
 					
+					if(this.showsResults(selectedItem))
+					{
+						let resultsDb = this.props.databases 
+							&& this.props.databases.get(selectedItem['databaseId']).name;
+						let field: string, table: string;
+						
+						switch(selectedItem.type)
+						{
+							case 'table':	
+								field = '*';
+								table = selectedItem.name;
+								break;
+							case 'column':
+								field = selectedItem.name;
+								table = SchemaStore.getState().tables.get(selectedItem['tableId']).name;
+								break;
+							case 'index':
+								//TODO
+								break;
+						}
+						console.log(field, table);
+						
+						let resultsQuery = this.getQuery(field, table);
+						
+						this.setState({
+							resultsQuery,
+							resultsDb,
+							resultsState: _ResultsState(),
+						});
+					}
+					else
+					{
+						this.handleResultsStateChange(_ResultsState());
+					}
 				}
 			}
 		});
 	}
 	
+	getQuery(field: string, table: string): BuilderTypes.Query
+	{
+		let tql = "SELECT " + field + " FROM " + table + " LIMIT " + NUM_ROWS + ";";
+		
+		let inputs = [
+			{
+				key: 'table',
+				value: table,
+			},
+			{
+				key: 'field',
+				value: field,
+			},
+			{
+				key: 'numRows',
+				value: NUM_ROWS,
+			},
+		].map(
+			inputConfig =>
+				BuilderTypes.make(
+					BuilderTypes.Blocks.input,
+					inputConfig
+				)
+		);
+		
+		return BuilderTypes._Query({
+			inputs: List(inputs),
+			
+			cards: List([
+				BuilderTypes.make(
+					BuilderTypes.Blocks.sfw,
+					{
+						fields: List([
+							BuilderTypes.make(
+								BuilderTypes.Blocks.field,
+								{
+									field: 'input.field',
+								}
+							),
+						]),
+						
+						cards: List([
+							BuilderTypes.make(
+								BuilderTypes.Blocks.from,
+								{
+									tables: List([
+										BuilderTypes.make(
+											BuilderTypes.Blocks.table,
+											{
+												table: 'input.table',
+											}
+										),
+									]),
+								}
+							),
+							
+							BuilderTypes.make(
+								BuilderTypes.Blocks.take,
+								{
+									value: 'input.numRows',
+								}
+							),
+						]),
+					}
+				),
+			]),
+		});
+	}
+	
+	showsResults(selectedItem: SchemaBaseClass): boolean
+	{
+		return selectedItem && selectedItem.type !== 'database';
+	}
+	
+	handleResultsStateChange(resultsState: ResultsState)
+	{
+		this.setState({
+			resultsState,
+		});
+	}
+	
   render()
   {
-  	
+  	console.log(this.state.resultsState.results.size);
     return (
     	<div
-    		
+    		style={{
+    			width: '100%',
+    			height: '100%',
+    		}}
     	>
+    		{
+    			!!this.state.resultsState.results.size &&
+		    		<ResultsTable
+		    			results={this.state.resultsState.results}
+		    			onExpand={_.noop}
+		    		/>
+    		}
+    		<ResultsManager
+    			db={this.state.resultsDb}
+    			onResultsStateChange={this.handleResultsStateChange}
+    			resultsState={this.state.resultsState}
+    			query={this.state.resultsQuery}
+    			noExtraFields={true}
+    		/>
     	</div>
     );
   }
