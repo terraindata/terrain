@@ -230,13 +230,11 @@ class SchemaResults extends PureClasss<Props>
     			height: '100%',
     		}}
     	>
-    		{
-    			!!this.state.resultsState.results.size &&
-		    		<ResultsTable
-		    			results={this.state.resultsState.results}
-		    			onExpand={_.noop}
-		    		/>
-    		}
+    		<ResultsTable
+    			results={this.state.resultsState.results}
+    			onExpand={_.noop}
+    		/>
+    		
     		<ResultsManager
     			db={this.state.resultsDb}
     			onResultsStateChange={this.handleResultsStateChange}
