@@ -51,6 +51,7 @@ import Actions from './BuilderActions';
 import * as _ from 'underscore';
 import {BuilderState} from './BuilderStore';
 import Util from '../../util/Util';
+import LibraryStore from '../../library/data/LibraryStore';
 
 const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
 {
@@ -148,6 +149,9 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
       .set('isDirty', false)
       .set('pastQueries', Immutable.List([]))
       .set('nextQueries', Immutable.List([]))
+      .set('db', LibraryStore.getState().getIn(
+        ['variants', state.loadingVariantId, 'db']
+      ))
     ;
   },
 
@@ -428,20 +432,6 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
     (state: BuilderState, action) => state
       .setIn(['query', 'deckOpen'], action.payload.open),
   
-  [ActionTypes.changeTables]:
-    (
-      state: BuilderState,
-      action: Action<{
-        db: string,
-        tables: Tables,
-        tableColumns: TableColumns,
-      }>
-    ) =>
-      state
-        .set('db', action.payload.db)
-        .set('tables', action.payload.tables)
-        .set('tableColumns', action.payload.tableColumns),
-
   [ActionTypes.changeResultsConfig]:
     (
       state: BuilderState,

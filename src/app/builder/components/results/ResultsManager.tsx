@@ -164,10 +164,12 @@ export class ResultsManager extends PureClasss<Props>
   
   queryResults(query: BuilderTypes.Query, db: string)
   {
+    console.log('a', query, db);
     if(!query || !db)
     {
       return;
     }
+    console.log('c');
     
     var tql = TQLConverter.toTQL(query, {
       limit: MAX_RESULTS,
@@ -176,6 +178,7 @@ export class ResultsManager extends PureClasss<Props>
     
     if(tql !== this.state.queriedTql)
     {
+    console.log('d');
       this.killQueries();
       this.setState({
         queriedTql: tql,

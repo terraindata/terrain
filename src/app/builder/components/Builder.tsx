@@ -826,7 +826,7 @@ class Builder extends PureClasss<Props>
     let config = this.props.params.config;
     let variant = this.getVariant();
     let query = this.getQuery();
-
+    console.log(this.state.builderState);
     return (
       <div className={classNames({
         'builder': true,

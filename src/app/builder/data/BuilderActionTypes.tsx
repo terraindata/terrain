@@ -79,8 +79,6 @@ export var BuilderActionTypes =
   
   toggleDeck: '',
   
-  changeTables: '', // tables and columns for current query's db
-  
   changeResultsConfig: '',
   results: '',
   
