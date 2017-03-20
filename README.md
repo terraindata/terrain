@@ -57,67 +57,15 @@ The Terrain search front-end uses these technologies:
 - npm
 - Tape, for testing (https://github.com/substack/tape)
 
-## Standards / Conventions
+## README Purpose
 
-- This README is the place where information about building and programming in Terraformer lives. 
-  Processes, standards, guides, hints, etc. should be added here and merged into the repo accordingly.
-  Do not add wiki pages for anything that is specific to Terraformer code.
-  Use proper Markdown syntax in this README.
-  Add additional sub-READMEs in sub-folders if necessary, and link to them from this README.
-- Capitalize all class names, React component names, and filenames
-  e.g. `class MillenniumFalcon {..}`, `MillenniumFalcon.tsx` and `MillenniumFalcon.less`
-- Camel case function names. 
-  e.g. `doABarrelRoll()`
-- `{` and `}` are both on their own lines, for legibility.
-  Same applies to `[` and `]` when appropriate.
-  e.g.
-  ```
-  let castSpell = (spell: Spell) =>
-  {
-    ...
-  }
-  ```
-- Use JSX optimizations whenever possible
-  e.g. `() => { ... }` instead of `function() { }`, `useTheForce() { ... }` instead of `useTheForce: function() { ... }`
-- Selectors in stylesheets should each go on their own line.
-  e.g. instead of `.first, .second, .third .thirds-kid, .fourth[type=text]`, put a newline after every comma.
-- CSS classes are named with `-`.
-  e.g. `blue-and-black` or `white-and-gold`
-- Only use LESS files; don't use CSS files.
-- In LESS files, nest classes as much as possible.
-- Any component that renders JSX (HTML) with CSS classes should include its own LESS file with appropriate CSS
-- The structure and order of LESS files should mimic the structure and order of the JSX
-- Avoid `// TODO` at all costs
-- Avoid commenting; aim to write code that doesn't need comments
-- Interfaces are named with the letter 'I'
-  e.g. `IRobot`, `IAyeAye`
-- Enums are named with the letter 'E' and are singular
-  e.g. `enum ECharacter { MichaelScott, JimHalpert, PamBeesley }; // let myFavoriteCharacter = ECharacter.JimHalpert`
-- Name functions that return HTML like: `render[Description]`
-  e.g. `renderLizLemon()`, `renderJackDonaghy()`
-- Use 'single quotes' in Javascript, "double quotes" in HTML
-- `{ ... }` should follow every `if`, `for`, `while`, etc.
-- Don't mix `||` and `&&` without `()`.
-  Who knows boolean order of operations anyways?
-- Comma after the last line in an object.`,`
-  This makes adding new lines to objects easier and allows for a cleaner merge.`,`
-  Note: You can't do this in JSON.`,`
-- Name variables clearly.
-  E.g. `user` or `users` for user objects, `userId` or `userIds` for ids
-- Booleans should be named clearly with `is` or `can`, e.g. `isWizard` or `canDoTheCanCan`
-- Constants are named with all caps and underscores
-  e.g. `const ANSWER_TO_THE_ULTIMATE_QUESTION = 42;`
-- Only one variable per `var` / `let`, for legibility. Don't separate variables by commas.
-  e.g. Don't do `var first = 'Regina George', second = 'Gretchen Wieners', third = 'Glenn Cocoo';` etc. Instead, put each variable on its on line.
-- In React, name props that accept event handlers `on[EventName]`, and name the handler functions `handle[EventName]`
-  e.g. `onTransformToSuperSaiyan={this.handleTransformToSuperSaiyan}`
-- Follow React's paradigm of building smaller apps within apps (decomposition). Try to keep your files under 200 lines of code.
-- Be keen on adding to this README, and keen on trimming it down.
-- None of these standards are set in stone; if you have an idea for a way to improve these, make it known.
-- No code is set in stone, either. Refactor when you find something that you know you could do better.
-  Refactor responsibly: test your changes, and before you start be certain that your time will be well-used.
-- We only deploy from `master`.
-- Believe in yourself.
+Any specific guidelines for Terraformer JS code should be documented in this README and any appropriate sub-READMEs in nested folders. Do not add wiki pages for anything that is specific to Terraformer code. Use proper Markdown syntax in this README.
+
+General coding standards for Javascript are located in the TechDocs repo, not in this README.
+
+## Coding Standards
+
+Coding standards are in the TechDocs repo under `JS Coding Guidelines.md`. Please familiarize yourself with them and contribute to them.
 
 ## Directory Overview
 
