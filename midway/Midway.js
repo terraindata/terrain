@@ -48,7 +48,6 @@ const Koa = require('koa');
 const app = new Koa();
 const winston = require('winston');
 const cmdLineArgs = require('command-line-args');
-const webpackMiddleware = require("koa-webpack-dev-middleware");
 const webpack = require('webpack');
 const webpackConfig = require('../webpack.config.js');
 let index = "nope";
@@ -64,108 +63,6 @@ const optDefs = [
 ];
 
 const args = cmdLineArgs(optDefs);
-
-// app.use(webpackMiddleware(
-// 	webpack({
-//     entry: "./src/app/App.tsx",
-//     devtool: 'eval',
-//     output: {
-//         path: __dirname,
-//         filename: "bundle.js"
-//     },
-//     resolve: {
-//         // it is important that .tsx is before .less, so that it resolves first, so that files that share a name resolve correctly
-//         extensions: [ '', '.js', '.tsx', '.jsx', '.ts', '.css', '.less', '.json', '.svg' ],
-//     },
-//     module: {
-//         loaders: [
-//             // note: this first loader string gets updated in webpack.config.prod.js
-//             //  keep it first in this list
-//             // { test: /\/[a-zA-Z]*$/, loader: 
-//             //   'babel?presets[]=react&presets[]=latest!ts-loader' },
-//             { test: /\.tsx?$/, loader: 
-//               'babel?presets[]=react&presets[]=latest!ts-loader' },
-//             { test: /\.css$/, loader: "style!css" },
-//             { test: /\.less$/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
-//             { test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel?presets[]=react&presets[]=latest' },
-//             { test: /\.woff(2)?$/,   loader: "url?limit=10000&mimetype=application/font-woff" },
-//             { test: /\.ttf$/, loader: "file" },
-//             { test: /\.eot$/, loader: "file" },
-//             { test: /\.jpg$/, loader: "file" },
-//             { test: /\.gif$/, loader: "url?limit=4000000" },
-//             { test: /\.png$/, loader: "url?limit=4000000" },
-//             { test: require.resolve('jquery'), loader: "expose?jQuery" },
-//             { test: /\.json$/, loader: 'json' },
-//             { 
-// 		      test: /\.svg(\?name=[a-zA-Z]*)*$/, loader: 'babel?presets[]=react&presets[]=latest!svg-react' + 
-// 		              // removes data-name attributes
-// 		              '!string-replace?search=%20data-name%3D%22%5B%5Cw%5Cs_-%5D*%22&replace=&flags=ig'
-// 	        },
-//             { test: /\.txt$/, loader: 'raw-loader' }, 
-//         ]
-//     },
-//     plugins: [
-//         new webpack.DefinePlugin({
-//         'MIDWAY_HOST': "'//" + process.env.MIDWAY_HOST + ":40080'",
-//         'TDB_HOST': "'//" + process.env.TDB_HOST + ":7344'",
-//         'DEV': "true"
-//         }),
-
-//         // new CircularDependencyPlugin({
-//         //   // exclude detection of files based on a RegExp 
-//         //   exclude: /node_modules/,
-//         //   // add errors to webpack instead of warnings 
-//         //   failOnError: true
-//         // })
-//     ],
-//     historyApiFallback: {
-//       rewrites: [
-//         // shows favicon
-//         { from: /favicon.ico/, to: 'favicon.ico' },
-//       ],
-//     },
-// }),
-// 	{
-// 		// publicPath is required, whereas all other options are optional
-
-// 		noInfo: false,
-// 		// display no info to console (only warnings and errors)
-
-// 		quiet: false,
-// 		// display nothing to the console
-
-// 		lazy: true,
-// 		// switch into lazy mode
-// 		// that means no watching, but recompilation on every request
-
-// 		watchOptions: {
-// 			aggregateTimeout: 300,
-// 			poll: true
-// 		},
-// 		// watch options (only lazy: false)
-
-// 		publicPath: "/",
-// 		// public path to bind the middleware to
-// 		// use the same as in webpack
-		
-// 		index: "index.html",
-// 		// the index path for web server
-
-// 		headers: { "X-Custom-Header": "yes" },
-// 		// custom headers
-
-// 		stats: {
-// 			colors: true
-// 		},
-// 		// options for formating the statistics
-
-// 		reporter: null,
-// 		// Provide a custom reporter to change the way how logs are shown.
-
-// 		serverSideRender: false,
-// 		// Turn off the server-side rendering mode. See Server-Side Rendering part for more info.
-// 	}
-// ));
 
 app.use(function *()
 {
@@ -213,3 +110,9 @@ app.use(function *()
 
 //app.use('/', express.static(__dirname + "/dist", { index: 'index.html' }));
 app.listen(args.port);
+
+// TODO list
+// - import HTML rather than writing directly inline
+// - kick off webpack dev server when in DEV mode (and kill it when server stops)
+// - difference between prod and dev mode: prod references bundle.js static file
+

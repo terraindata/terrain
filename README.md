@@ -36,7 +36,7 @@ The back-end for Terraformer is called "midway." Midway stores and serves all of
 1. Install npm
   `brew install npm` on Mac
 1. `npm install`
-1. `npm install -g tsd babel webpack-dev-server babel-cli`
+1. `npm install -g tsd webpack-dev-server babel-cli`
 1. `npm run start-local` (with local midway) or `npm start` (without midway) - dev server now running at [localhost:8080](localhost:8080).
 1. Default user login: `luser` / `secret` (for local midway) or ask Luke for your hosted account details (without midway)
 1. Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans]
