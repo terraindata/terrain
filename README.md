@@ -24,18 +24,26 @@ Terraformer is built in Javascript. It runs on the user's browser. The user's br
 
 The back-end for Terraformer is called "midway." Midway stores and serves all of Terraformer's data (user accounts, groups, algorithms, variants, etc.), authenticates users when they log in, and passes queries from Terraformer to TerrainDB and returns the results. Midway is built in Go and has a CRUD-like API.
 
+## README Purpose
+
+Any specific guidelines for Terraformer JS code should be documented in this README and any appropriate sub-READMEs in nested folders. Do not add wiki pages for anything that is specific to Terraformer code. Use proper Markdown syntax in this README.
+
+General coding standards for Javascript are located in the TechDocs repo, not in this README.
+
+
 ## Setup
 
 1. Install and run `midway` (optional)
-1. Install Homebrew
-  `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
-1. Install Node
-  `brew install node`
+1. Install Node, npm
+  * on Mac:
+    * Install Homebrew
+    *  `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
+    * Install Node
+    *  `brew install node`
 1. Install npm
-  `brew install npm`
+  `brew install npm` on Mac
 1. `npm install`
-1. `npm install -g tsd`
-1. `npm install -g babel`
+1. `npm install -g tsd webpack-dev-server babel-cli`
 1. `npm run start-local` (with local midway) or `npm start` (without midway) - dev server now running at [localhost:8080](localhost:8080).
 1. Default user login: `luser` / `secret` (for local midway) or ask Luke for your hosted account details (without midway)
 1. Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans]
@@ -44,50 +52,35 @@ Whenever new packages are installed from branches merged to master, run `npm ins
 
 ## Major Dependencies
 
-The Terrain search front-end uses these technologies:
+You should familiarize yourself with these technologies before pursuing any whole-hearted foray into Terraformer development. (Of course, a pursuer of a half-assed foray need not bother him/herself.)
+
+Links are to relevant overviews and tutorials.
+
+### Full Stack
+
+- [JSX / ES6 - the newest version of Javascript](http://ccoenraets.github.io/es6-tutorial/)
+- [Typescript](https://www.typescriptlang.org/docs/tutorial.html)
+- [Immutable](https://facebook.github.io/immutable-js/)
+- npm
+- [Tape, for testing](https://github.com/substack/tape)
+
+### Front-End
 
 - React
-- Typescript
-- JSX / ES6
 - Redux
-- Immutable
 - LESS
 - ReactRouter
 - Webpack
-- npm
-- Tape, for testing (https://github.com/substack/tape)
 
-## README Purpose
+### Back-End
 
-Any specific guidelines for Terraformer JS code should be documented in this README and any appropriate sub-READMEs in nested folders. Do not add wiki pages for anything that is specific to Terraformer code. Use proper Markdown syntax in this README.
+- Node
+- Koa and Koa Router
 
-General coding standards for Javascript are located in the TechDocs repo, not in this README.
 
 ## Coding Standards
 
 Coding standards are in the TechDocs repo under `JS Coding Guidelines.md`. Please familiarize yourself with them and contribute to them.
-
-## Editors
-
-There are two recommended editors:
-
-### Sublime Text 3
-
-1. Download (Google search for it)
-1. Install the package manager: [https://packagecontrol.io/installation]
-1. Install the following packages: (Cmd + Shift + P --> type "Install" and then hit Enter to select the Install Packages command)
-    - ReactJS
-    - Typescript
-    - LESS
-1. Install themes (optional)
-   Recommended: FlatGrammer and BroGrammer themes. 
-   Tip: To have the Flatgrammer / Brogrammer themes style your complete editor, add this line to your Settings file (Cmd + ,)
-   `"color_scheme": "Packages/Theme - Flatgrammer/Flatgrammer.tmTheme",` (or replace with Brogrammer)
-
-### VS Code
-
-With built-in support for Typescript, VS Code is not a bad option. If you find specific configuration settings that help with our codebase, please add them here.
-
 
 ## Directory Overview
 
@@ -139,7 +132,7 @@ For example, to add `truffle-oil` to my app, I would:
 1. `npm install truffle-oil --save`
 1. `git add package.json`
 1. `cd src`
-1. `tsd install truffle-oil` (may or may not install a package, depending on if one exists or not)
+1. `tsd install truffle-oil`
 1. `cd ..`
 1. `git add typings`
 
@@ -149,9 +142,9 @@ To include another `.tsx` file from within the Terraformer codebase (`/src`), us
 `import DotComponent from './DotComponent.tsx';`
 `import NapoleonDynamite from '../../movies/NapoleonDynamite.tsx';`
 
-To include any file that's not a `.tsx` from within the Terraformer codebase, use `require('[relative/path]')` and optionally assign it to a variable e.g.
+To include any file that's not a `.tsx` from within the Terraformer codebase, use `const [ClassName] = require('[relative path]')` e.g.
 `require('./Pay.less');`
-`const FreddyData = require('../../data/FreddyAnd.json');`
+`const FreddyAnd = require('../../data/FreddyAnd.json');`
 
 To include a package install from `npm`, use `import * as [ClassName] from '[package_name]';` if there are typings available, and `let [ClassName] = require('[package_name]');` if not. e.g.
 `import * as TheForce from 'the-force';`
