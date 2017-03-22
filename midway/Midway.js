@@ -48,7 +48,6 @@ const Koa = require('koa');
 const app = new Koa();
 const winston = require('winston');
 const cmdLineArgs = require('command-line-args');
-const webpackMiddleware = require("koa-webpack-dev-middleware");
 const webpack = require('webpack');
 const webpackConfig = require('../webpack.config.js');
 const oauthserver = require('oauth2-server');
@@ -124,7 +123,7 @@ app.oauth = oauthserver({
 // `;
 // 	}
 // });
-
+// 
 // console.log(app.use);
 // app.get(function *() {
 //   this.body = this.webpack.fileSystem.readFileSync('index.html');
@@ -136,3 +135,9 @@ app.oauth = oauthserver({
 
 //app.use('/', express.static(__dirname + "/dist", { index: 'index.html' }));
 app.listen(args.port);
+
+// TODO list
+// - import HTML rather than writing directly inline
+// - kick off webpack dev server when in DEV mode (and kill it when server stops)
+// - difference between prod and dev mode: prod references bundle.js static file
+
