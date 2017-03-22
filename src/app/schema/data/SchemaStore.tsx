@@ -110,10 +110,12 @@ export const SchemaStore: IStore<SchemaState> =
 						tables: Map<ID, Table>;
 						columns: Map<ID, Column>;
 						indexes: Map<ID, Index>;
+						tableNames: List<string>;
+						columnNames: List<string>;
 					}>
 				) =>
 				{
-					let {database, tables, columns, indexes} = action.payload;
+					let {database, tables, columns, indexes, tableNames, columnNames} = action.payload;
 					if(state.databases.size === state.dbCount - 1)
 					{
 						state = state.set('loading', false).set('loaded', true);
@@ -123,7 +125,10 @@ export const SchemaStore: IStore<SchemaState> =
 						.setIn(['databases', database.id], database)
 						.set('tables', state.tables.merge(tables))
 						.set('columns', state.columns.merge(columns))
-						.set('indexes', state.indexes.merge(indexes));
+						.set('indexes', state.indexes.merge(indexes))
+						.set('tableNamesById', state.tableNamesByDb.set(database.name, tableNames))
+						.set('columnNamesById', state.columnNamesByDb.set(database.name, columnNames))
+						;
 				},
 			
 			[SchemaActionTypes.selectId]:
@@ -162,13 +167,17 @@ export const SchemaActions =
       database: SchemaTypes.Database, 
       tables: Map<ID, SchemaTypes.Table>, 
       columns: Map<ID, SchemaTypes.Column>, 
-      indexes: Map<ID, SchemaTypes.Index>
+      indexes: Map<ID, SchemaTypes.Index>,
+      tableNames: List<string>,
+      columnNames: List<string>
     ) =>
       $(SchemaActionTypes.setDatabase, {
         database,
         tables,
         columns,
         indexes,
+        tableNames,
+        columnNames,
       }),
   
  	highlightId:

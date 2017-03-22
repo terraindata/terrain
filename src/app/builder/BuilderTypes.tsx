@@ -52,6 +52,7 @@ let Map = Immutable.Map;
 import TransformCardComponent from './components/charts/TransformCard';
 import ScoreBar from './components/charts/ScoreBar';
 import Store from './data/BuilderStore';
+import SchemaStore from '../schema/data/SchemaStore';
 import Util from '../util/Util';
 
 // These have to be above the BuilderDisplays import
@@ -803,6 +804,8 @@ export module BuilderTypes
             card['tables'].reduce(
               (list:List<string>, tableBlock: {table: string, alias: string}): List<string> =>
               {
+                let db = Store.getState().db;
+                let tables = SchemaStore
                 let cols: List<string> = Store.getState().getIn(['tableColumns', tableBlock.table]);
                 if(cols)
                 {

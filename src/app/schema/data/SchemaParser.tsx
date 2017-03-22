@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 import SchemaTypes from '../SchemaTypes';
 import * as Immutable from 'immutable';
+let {Map, List} = Immutable;
 
 type Database = SchemaTypes.Database;
 type Table = SchemaTypes.Table;
@@ -60,7 +61,9 @@ export module SchemaParser
 	      database: Database, 
 	      tables: Map<ID, Table>, 
 	      columns: Map<ID, Column>, 
-	      indexes: Map<ID, Index>
+	      indexes: Map<ID, Index>,
+	      columnNames: List<string>,
+	      tableNames: List<string>
 	    ) => void
 	) {
 		let database = SchemaTypes._Database({
@@ -68,9 +71,12 @@ export module SchemaParser
 		});
 		let databaseId = database.id;
 		
-		let tables: Map<ID, Table> = Immutable.Map<ID, Table>({});
-		let columns: Map<ID, Column> = Immutable.Map<ID, Column>({});
-		let indexes: Map<ID, Index> = Immutable.Map<ID, Index>({});
+		let tables: Map<ID, Table> = Map<ID, Table>({});
+		let columns: Map<ID, Column> =  Map<ID, Column>({});
+		let indexes: Map<ID, Index> =  Map<ID, Index>({});
+		
+		let tableNames = List<string>([]);
+		let columnNames = List<string>([]);
 		
     colsData.map(
     (
@@ -109,6 +115,7 @@ export module SchemaParser
     			databaseId,
     		});
     		tables = tables.set(tableId, table);
+    		tableNames = tableNames.push(table.name);
     		database = database.set(
     			'tableIds', database.tableIds.push(tableId)
     		);
@@ -125,13 +132,14 @@ export module SchemaParser
     	});
        
       columns = columns.set(column.id, column);
+      columnNames = columnNames.push(table.name + '.' + column.name);
       tables = tables.setIn(
       	[tableId, 'columnIds'],
       	table.columnIds.push(column.id)
       );
     });
     
-    setDbAction(database, tables, columns, indexes);    
+    setDbAction(database, tables, columns, indexes, tableNames, columnNames);    
 	}
 }
 

@@ -268,37 +268,6 @@ class Builder extends PureClasss<Props>
     return true;
   }
   
-  // variantSub: any;
-  schemaXhr: XMLHttpRequest;
-  loadTables(props:Props)
-  {
-    // TODO consider moving this to a reducer, or its own monitoring component
-    const db = LibraryTypes.getDbFor(this.getVariant(props));
-    if(!db)
-    {
-      Actions.changeTables('', Immutable.List([]), Immutable.Map({}));
-      return;
-    }
-    
-    if(db !== this.state.builderState.db)
-    {
-      this.schemaXhr && this.schemaXhr.abort();
-      this.schemaXhr = Ajax.schema(db, (tables: {name: string, columns: {name: string}[]}[]) => {
-        Actions.changeTables(
-          db,
-          Immutable.List(tables.map(table => table.name)),
-          tables.reduce(
-            (memo: TableColumns, table: {name: string, columns: {name: string}[]}) =>
-              memo.set(table.name, 
-                Immutable.List(table.columns.map(col => col.name))
-              )
-            , Immutable.Map({})
-          )
-        );
-      }).xhr;
-    }
-  }
-  
   componentWillReceiveProps(nextProps: Props)
   {
     let currentOpen = this.props.location.query && this.props.location.query.o;
@@ -316,8 +285,6 @@ class Builder extends PureClasss<Props>
       }
       this.checkConfig(nextProps);
     }
-    
-    this.loadTables(nextProps);
   }
   
   checkConfig(props:Props)

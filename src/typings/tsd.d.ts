@@ -73,9 +73,6 @@ declare type DeleteIn<T> = (f: (string | number)[] | KeyPath) => T & IRecord<T>;
 declare type Update<T> = (f: string, updater: (n: any) => any) => T & IRecord<T>;
 declare type UpdateIn<T> = (f: (string | number)[] | KeyPath, updater: (n: any) => any) => T & IRecord<T>;
 
-declare type Tables = List<string>;
-declare type TableColumns = Map<string, List<string>>;
-
 declare interface IStore<T>
 {
   getState: () => T;
