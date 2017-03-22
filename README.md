@@ -67,6 +67,28 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 
 Coding standards are in the TechDocs repo under `JS Coding Guidelines.md`. Please familiarize yourself with them and contribute to them.
 
+## Editors
+
+There are two recommended editors:
+
+### Sublime Text 3
+
+1. Download (Google search for it)
+1. Install the package manager: [https://packagecontrol.io/installation]
+1. Install the following packages: (Cmd + Shift + P --> type "Install" and then hit Enter to select the Install Packages command)
+    - ReactJS
+    - Typescript
+    - LESS
+1. Install themes (optional)
+   Recommended: FlatGrammer and BroGrammer themes. 
+   Tip: To have the Flatgrammer / Brogrammer themes style your complete editor, add this line to your Settings file (Cmd + ,)
+   `"color_scheme": "Packages/Theme - Flatgrammer/Flatgrammer.tmTheme",` (or replace with Brogrammer)
+
+### VS Code
+
+With built-in support for Typescript, VS Code is not a bad option. If you find specific configuration settings that help with our codebase, please add them here.
+
+
 ## Directory Overview
 
 ### src
@@ -117,7 +139,7 @@ For example, to add `truffle-oil` to my app, I would:
 1. `npm install truffle-oil --save`
 1. `git add package.json`
 1. `cd src`
-1. `tsd install truffle-oil`
+1. `tsd install truffle-oil` (may or may not install a package, depending on if one exists or not)
 1. `cd ..`
 1. `git add typings`
 
@@ -127,9 +149,9 @@ To include another `.tsx` file from within the Terraformer codebase (`/src`), us
 `import DotComponent from './DotComponent.tsx';`
 `import NapoleonDynamite from '../../movies/NapoleonDynamite.tsx';`
 
-To include any file that's not a `.tsx` from within the Terraformer codebase, use `const [ClassName] = require('[relative path]')` e.g.
+To include any file that's not a `.tsx` from within the Terraformer codebase, use `require('[relative/path]')` and optionally assign it to a variable e.g.
 `require('./Pay.less');`
-`const FreddyAnd = require('../../data/FreddyAnd.json');`
+`const FreddyData = require('../../data/FreddyAnd.json');`
 
 To include a package install from `npm`, use `import * as [ClassName] from '[package_name]';` if there are typings available, and `let [ClassName] = require('[package_name]');` if not. e.g.
 `import * as TheForce from 'the-force';`
