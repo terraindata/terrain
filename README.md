@@ -24,6 +24,13 @@ Terraformer is built in Javascript. It runs on the user's browser. The user's br
 
 The back-end for Terraformer is called "midway." Midway stores and serves all of Terraformer's data (user accounts, groups, algorithms, variants, etc.), authenticates users when they log in, and passes queries from Terraformer to TerrainDB and returns the results. Midway is built in Go and has a CRUD-like API.
 
+## README Purpose
+
+Any specific guidelines for Terraformer JS code should be documented in this README and any appropriate sub-READMEs in nested folders. Do not add wiki pages for anything that is specific to Terraformer code. Use proper Markdown syntax in this README.
+
+General coding standards for Javascript are located in the TechDocs repo, not in this README.
+
+
 ## Setup
 
 1. Install and run `midway` (optional)
@@ -45,24 +52,31 @@ Whenever new packages are installed from branches merged to master, run `npm ins
 
 ## Major Dependencies
 
-The Terrain search front-end uses these technologies:
+You should familiarize yourself with these technologies before pursuing any whole-hearted foray into Terraformer development. (Of course, a pursuer of a half-assed foray need not bother him/herself.)
+
+Links are to relevant overviews and tutorials.
+
+### Full Stack
+
+- [JSX / ES6 - the newest version of Javascript](http://ccoenraets.github.io/es6-tutorial/)
+- [Typescript](https://www.typescriptlang.org/docs/tutorial.html)
+- [Immutable](https://facebook.github.io/immutable-js/)
+- npm
+- [Tape, for testing](https://github.com/substack/tape)
+
+### Front-End
 
 - React
-- Typescript
-- JSX / ES6
 - Redux
-- Immutable
 - LESS
 - ReactRouter
 - Webpack
-- npm
-- Tape, for testing (https://github.com/substack/tape)
 
-## README Purpose
+### Back-End
 
-Any specific guidelines for Terraformer JS code should be documented in this README and any appropriate sub-READMEs in nested folders. Do not add wiki pages for anything that is specific to Terraformer code. Use proper Markdown syntax in this README.
+- Node
+- Koa and Koa Router
 
-General coding standards for Javascript are located in the TechDocs repo, not in this README.
 
 ## Coding Standards
 
