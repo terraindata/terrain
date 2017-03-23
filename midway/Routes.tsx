@@ -42,9 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const users = require('./users/UserRoutes.tsx');
-const midway = require('./midway/MidwayRoutes.tsx');
-const router = require('koa-router')();
+let users = require('./users/UserRoutes.tsx');
+let midway = require('./midway/MidwayRoutes.tsx');
+let router = require('koa-router')();
 
 router.use('/users', users.routes(), users.allowedMethods());
 router.use('/midway', midway.routes(), midway.allowedMethods());

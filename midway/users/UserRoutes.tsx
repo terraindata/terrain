@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 require('babel-polyfill');
-const router = require('koa-router')();
+let router = require('koa-router')();
 
 router.post('/', async (next) => 
 { 
