@@ -804,16 +804,9 @@ export module BuilderTypes
             card['tables'].reduce(
               (list:List<string>, tableBlock: {table: string, alias: string}): List<string> =>
               {
-                let db = Store.getState().db;
-                let tables = SchemaStore
-                let cols: List<string> = Store.getState().getIn(['tableColumns', tableBlock.table]);
-                if(cols)
-                {
-                  return list.concat(cols.map(
-                    (col) => tableBlock.alias + '.' + col
-                  ).toList()).toList();
-                }
-                return list;
+                let dbName = Store.getState().db;
+                let columns = SchemaStore.getState().columnNamesByDb.get(dbName) || Immutable.List([]);
+                return list.concat(columns).toList();
               },
               List([])
             ),

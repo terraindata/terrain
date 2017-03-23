@@ -49,6 +49,9 @@ import Util from '../util/Util';
 
 type IDList = ID[] | List<ID>;
 
+export type TableNamesByDb = Map<string, List<string>>;
+export type ColumnNamesByDb = Map<string, Map<string, List<string>>>;
+
 export module SchemaTypes
 {
 	export class SchemaBaseClass extends BaseClass
@@ -76,7 +79,7 @@ export module SchemaTypes
 		
 		// for the builder, a list of names for each db
 		tableNamesByDb = Map<string, List<string>>({});
-		columnNamesByDb = Map<string, List<string>>({});
+		columnNamesByDb = Map<string, Map<string, List<string>>>({});
 	}
 	export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
 	export const _SchemaState = (config?: {[key:string]: any}) => 
