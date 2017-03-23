@@ -42,10 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const users = require('./users/userRoutes.js').r;
+require('babel-polyfill');
 const router = require('koa-router')();
 
-router.use('/users', users.routes(), users.allowedMethods());
-module.exports = {
-    r: router
-}
+router.post('/', async (next) => 
+{ 
+  console.log('user root'); 
+});
+
+router.post('/create', async (next) => 
+{ 
+  console.log('user create'); 
+});
+
+module.exports = router

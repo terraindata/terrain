@@ -42,13 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('babel-core/register');
 require('babel-polyfill');
 const router = require('koa-router')();
 
-router.post('/', function*(next) { console.log('user root'); });
-router.post('/create', function*(next) { console.log('user create'); });
+router.post('/', async (next) => 
+{
+  next.body = "";
+  console.log('midway root'); 
+});
 
-module.exports = {
-    r: router
-}
+router.post('/midway_example_route', async (next) => 
+{
+  next.body = ""; 
+  console.log('midway example route'); 
+});
+
+module.exports = router
