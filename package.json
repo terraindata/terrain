@@ -16,7 +16,7 @@
     "build-prod": "npm run commit-log && MIDWAY_HOST=pa-terraformer01.terrain.int webpack --config webpack.config.prod.js --output-filename bundle.js",
     "build-demo": "npm run commit-log && MIDWAY_HOST=localhost webpack --config webpack.config.prod.js --output-filename bundle.demo.js",
     "build-gcloud": "npm run commit-log && webpack --config webpack.config.gcloud.js --output-filename bundle.js",
-    "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node --harmony -- ./midway/Midway.tsx"
+    "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node --harmony -- ./midway/App.tsx"
   },
   "repository": {
     "type": "git",
@@ -96,6 +96,7 @@
     "react-virtualized": "^7.12.1",
     "redux": "^3.0.5",
     "redux-actions": "^0.9.0",
+    "request": "^2.81.0",
     "request-promise": "^4.2.0",
     "require-text": "0.0.1",
     "sort-by": "^1.1.0",
@@ -119,6 +120,7 @@
     "@types/koa": "^2.0.39",
     "@types/koa-router": "^7.0.22",
     "@types/node": "^7.0.8",
+    "@types/request": "0.0.42",
     "@types/webpack": "^2.2.12",
     "@types/winston": "^2.3.0",
     "babel-cli": "^6.22.2",

@@ -50,13 +50,13 @@ const cmdLineArgs = require('command-line-args');
 import * as webpack from 'webpack';
 const webpackConfig = require('../webpack.config.js');
 const bodyParser = require('koa-bodyparser');
-const request = require('koa-request');
 const reqText = require('require-text');
 const index = require('require-text')('../src/app/index.html', require);
+import * as request from 'request';
 
 const app = new Koa();
 
-import Router from 'Router';
+import Router from './Router';
 
 const optDefs = [
   {name: 'port', alias: 'p', type: Number, defaultValue: 3000},
@@ -67,25 +67,33 @@ const args = cmdLineArgs(optDefs);
 
 app.use(bodyParser());
 
-router.post('/oauth2', async (next) => {
-  console.log(next);
+Router.post('/oauth2', async function(ctx, next) {
+  console.log(ctx, next);
 });
 
-router.get('/bundle.js', async (next) => {
-	// TODO render this if DEV, otherwise render compiled bundle.js
-  let response = await request({
-    method: 'GET',
-    url: 'http://localhost:8080/bundle.js',
-    headers: { 'content-type': 'application/json' },
+function doRequest(url) {
+  return new Promise(function (resolve, reject) {
+    request(url, function (error, res, body) {
+      if (!error && res.statusCode == 200) {
+        resolve(body);
+      } else {
+        reject(error);
+      }
+    });
   });
-  next.body = response.body;
+}
+
+Router.get('/bundle.js', async function(ctx, next) {
+	// TODO render this if DEV, otherwise render compiled bundle.js
+  let response = await doRequest('http://localhost:8080/bundle.js');
+  ctx.body = response;
 });
 
-router.get('/', async (next) => {
-  next.body = index.toString();
+Router.get('/', async function(ctx, next) {
+  ctx.body = index.toString();
 });
 
-app.use(router.routes());
+app.use(Router.routes());
 
 app.listen(args.port);
 
