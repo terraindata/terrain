@@ -44,17 +44,18 @@ THE SOFTWARE.
 
 // MIDWAY head file
 require('babel-core/register');
-const Koa = require('koa');
-const app = new Koa();
-const winston = require('winston');
+import * as Koa from 'koa';
+import * as winston from 'winston';
 const cmdLineArgs = require('command-line-args');
-const webpack = require('webpack');
+import * as webpack from 'webpack';
 const webpackConfig = require('../webpack.config.js');
 const bodyParser = require('koa-body-parser');
 const request = require('koa-request');
-
 const reqText = require('require-text');
 const index = require('require-text')('../src/app/index.html', require);
+
+const app = new Koa();
+
 
 const router = require('./Routes.tsx');
 
@@ -72,20 +73,20 @@ router.post('/oauth2', async (next) => {
 });
 
 router.get('/bundle.js', async (next) => {
-//   let response = yield request({
-//     method: 'GET',
-//     url: 'http://localhost:8080/bundle.js',
-//     headers: { 'content-type': 'application/json' },
-//     body: JSON.stringify({ param1: 'Hello World from A' })
-//   });
-//   next.body = response.body;
+	// TODO render this if DEV, otherwise render compiled bundle.js
+  let response = await request({
+    method: 'GET',
+    url: 'http://localhost:8080/bundle.js',
+    headers: { 'content-type': 'application/json' },
+  });
+  next.body = response.body;
 });
 
 router.get('/', async (next) => {
   next.body = index.toString();
 });
 
-app.use(router.routes(), router.allowedMethods());
+app.use(router.routes());
 
 app.listen(args.port);
 

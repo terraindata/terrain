@@ -142,13 +142,15 @@ To include another `.tsx` file from within the Terraformer codebase (`/src`), us
 `import DotComponent from './DotComponent.tsx';`
 `import NapoleonDynamite from '../../movies/NapoleonDynamite.tsx';`
 
-To include any file that's not a `.tsx` from within the Terraformer codebase, use `const [ClassName] = require('[relative path]')` e.g.
-`require('./Pay.less');`
-`const FreddyAnd = require('../../data/FreddyAnd.json');`
+To include any file that's not a `.tsx` from within the Terraformer codebase, use `const [ClassName] = require('[relative path]')` 
+e.g.  
+`require('./Pay.less');`  
+`const FreddyAnd = require('../../data/FreddyAnd.json');`  
+`const CarrieMathison = require('./CarrieMathison.js');`
 
-To include a package install from `npm`, use `import * as [ClassName] from '[package_name]';` if there are typings available, and `let [ClassName] = require('[package_name]');` if not. e.g.
-`import * as TheForce from 'the-force';`
-`const UnpopularLibrary = require('unpopular-library');`
+To include a package install from `npm`, use `import * as [ClassName] from '[package_name]';` if there are typings available, and `const [ClassName] = require('[package_name]');` if not. e.g.
+`import * as TheForce from 'the-force';`  
+`const UnpopularLibrary = require('unpopular-library');`  
 
 ## Testing
 

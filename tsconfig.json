@@ -4,7 +4,9 @@
 		"jsx": "react",
     "module": "commonjs",
 	  "sourceMap": true,
-	  "target": "es6"
+	  "target": "es6",
+	  "typeRoots" : ["./src/typings", "./node_modules/@types"],
+	  "allowJs": true
   },
   
   "exclude": 
