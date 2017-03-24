@@ -42,29 +42,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as KoaRouter from 'koa-router';
-import UserRoutes from './users/UserRoutes';
-import ItemRoutes from './items/ItemRoutes';
-import VersionRoutes from './versions/VersionRoutes';
-import SchemaRoutes from './schema/SchemaRoutes';
-
 require('babel-polyfill');
+import * as KoaRouter from 'koa-router';
+let Router = new KoaRouter();
 
-let appRouter = new KoaRouter;
+Router.get('/', async (ctx, next) => 
+{
+	// return all versions
+	ctx.body = '';
+  console.log('version root');
+});
 
-appRouter.use('/users', users.routes(), users.allowedMethods());
-appRouter.use('/items', items.routes(), items.allowedMethods());
-appRouter.use('/versions', versions.routes(), versions.allowedMethods());
-appRouter.use('/schema', schema.routes(), schema.allowedMethods());
-// Add future routes here.
+Router.post('/', async (ctx, next) => 
+{
+	// not allowed
+	ctx.body = '';
+  console.log('version post'); 
+});
 
 
-// Prefix all routes with /midway
-//  This is so that we can allow the front-end to use all other routes.
-//  Any route not prefixed with /midway will just serve the front-end.
-
-let midwayRouter = new KoaRouter();
-
-midwayRouter.use('/midway', appRouter.routes(), appRouter.allowedMethods());
-
-export default midwayRouter;
+export default Router;

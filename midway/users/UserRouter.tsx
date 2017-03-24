@@ -42,56 +42,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// MIDWAY head file
-require('babel-core/register');
-import * as Koa from 'koa';
-import * as winston from 'winston';
-const cmdLineArgs = require('command-line-args');
-import * as webpack from 'webpack';
-const webpackConfig = require('../webpack.config.js');
-const bodyParser = require('koa-bodyparser');
-const request = require('koa-request');
-const reqText = require('require-text');
-const index = require('require-text')('../src/app/index.html', require);
+require('babel-polyfill');
+import * as KoaRouter from 'koa-router';
+let Router = new KoaRouter();
 
-const app = new Koa();
-
-
-const router = require('./Routes.tsx');
-
-const optDefs = [
-  {name: 'port', alias: 'p', type: Number, defaultValue: 3000},
-  {name: 'db', alias: 'r', type: String, defaultValue: 'mysql'},
-];
-
-const args = cmdLineArgs(optDefs);
-
-app.use(bodyParser());
-
-router.post('/oauth2', async (next) => {
-  console.log(next);
+Router.get('/', async (ctx, next) => 
+{
+	// return all items, or item by id
+	ctx.body = '';
+  console.log('user root'); 
 });
 
-router.get('/bundle.js', async (next) => {
-	// TODO render this if DEV, otherwise render compiled bundle.js
-  let response = await request({
-    method: 'GET',
-    url: 'http://localhost:8080/bundle.js',
-    headers: { 'content-type': 'application/json' },
-  });
-  next.body = response.body;
+Router.post('/', async (ctx, next) => 
+{
+	// change or create a user
+	ctx.body = '';
+  console.log('user post'); 
 });
 
-router.get('/', async (next) => {
-  next.body = index.toString();
-});
 
-app.use(router.routes());
-
-app.listen(args.port);
-
-// TODO list
-// - import HTML rather than writing directly inline
-// - kick off webpack dev server when in DEV mode (and kill it when server stops)
-// - difference between prod and dev mode: prod references bundle.js static file
-
+export default Router;

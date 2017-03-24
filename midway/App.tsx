@@ -42,19 +42,55 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('babel-polyfill');
-let router = require('koa-router')();
+// MIDWAY head file
+require('babel-core/register');
+import * as Koa from 'koa';
+import * as winston from 'winston';
+const cmdLineArgs = require('command-line-args');
+import * as webpack from 'webpack';
+const webpackConfig = require('../webpack.config.js');
+const bodyParser = require('koa-bodyparser');
+const request = require('koa-request');
+const reqText = require('require-text');
+const index = require('require-text')('../src/app/index.html', require);
 
-router.post('/', async (next) => 
-{
-//   next.body = '';
-  console.log('item root'); 
+const app = new Koa();
+
+import Router from 'Router';
+
+const optDefs = [
+  {name: 'port', alias: 'p', type: Number, defaultValue: 3000},
+  {name: 'db', alias: 'r', type: String, defaultValue: 'mysql'},
+];
+
+const args = cmdLineArgs(optDefs);
+
+app.use(bodyParser());
+
+router.post('/oauth2', async (next) => {
+  console.log(next);
 });
 
-router.post('/item_example_route', async (next) => 
-{
-//   next.body = ''; 
-  console.log('item example route'); 
+router.get('/bundle.js', async (next) => {
+	// TODO render this if DEV, otherwise render compiled bundle.js
+  let response = await request({
+    method: 'GET',
+    url: 'http://localhost:8080/bundle.js',
+    headers: { 'content-type': 'application/json' },
+  });
+  next.body = response.body;
 });
 
-export default router;
+router.get('/', async (next) => {
+  next.body = index.toString();
+});
+
+app.use(router.routes());
+
+app.listen(args.port);
+
+// TODO list
+// - import HTML rather than writing directly inline
+// - kick off webpack dev server when in DEV mode (and kill it when server stops)
+// - difference between prod and dev mode: prod references bundle.js static file
+

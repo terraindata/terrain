@@ -43,18 +43,22 @@ THE SOFTWARE.
 */
 
 require('babel-polyfill');
-let router = require('koa-router')();
+import * as KoaRouter from 'koa-router';
+let Router = new KoaRouter();
 
-router.post('/', async (next) => 
+Router.get('/', async (ctx, next) => 
 {
-//   next.body = '';
-  console.log('version root'); 
+	// return all items, or item by id
+	ctx.body = '';
+  console.log('item root'); 
 });
 
-router.post('/version_example_route', async (next) => 
+Router.post('/', async (ctx, next) => 
 {
-//   next.body = ''; 
-  console.log('version example route'); 
+	// change an item
+	ctx.body = '';
+  console.log('item root'); 
 });
 
-module.exports = router
+
+export default Router;
