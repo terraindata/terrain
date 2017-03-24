@@ -50,7 +50,7 @@ const winston = require('winston');
 const cmdLineArgs = require('command-line-args');
 const webpack = require('webpack');
 const webpackConfig = require('../webpack.config.js');
-const bodyParser = require('koa-body-parser');
+const bodyParser = require('koa-bodyparser');
 const request = require('koa-request');
 
 const reqText = require('require-text');
