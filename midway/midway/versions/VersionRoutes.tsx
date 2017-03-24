@@ -42,55 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// MIDWAY head file
-require('babel-core/register');
-const Koa = require('koa');
-const app = new Koa();
-const winston = require('winston');
-const cmdLineArgs = require('command-line-args');
-const webpack = require('webpack');
-const webpackConfig = require('../webpack.config.js');
-const bodyParser = require('koa-body-parser');
-const request = require('koa-request');
+require('babel-polyfill');
+let router = require('koa-router')();
 
-const reqText = require('require-text');
-const index = require('require-text')('../src/app/index.html', require);
-
-const router = require('./Routes.tsx');
-
-const optDefs = [
-  {name: 'port', alias: 'p', type: Number, defaultValue: 3000},
-  {name: 'db', alias: 'r', type: String, defaultValue: 'mysql'},
-];
-
-const args = cmdLineArgs(optDefs);
-
-app.use(bodyParser());
-
-router.post('/oauth2', async (next) => {
-  console.log(next);
+router.post('/', async (next) => 
+{
+//   next.body = '';
+  console.log('version root'); 
 });
 
-router.get('/bundle.js', async (next) => {
-//   let response = yield request({
-//     method: 'GET',
-//     url: 'http://localhost:8080/bundle.js',
-//     headers: { 'content-type': 'application/json' },
-//     body: JSON.stringify({ param1: 'Hello World from A' })
-//   });
-//   next.body = response.body;
+router.post('/version_example_route', async (next) => 
+{
+//   next.body = ''; 
+  console.log('version example route'); 
 });
 
-router.get('/', async (next) => {
-  next.body = index.toString();
-});
-
-app.use(router.routes(), router.allowedMethods());
-
-app.listen(args.port);
-
-// TODO list
-// - import HTML rather than writing directly inline
-// - kick off webpack dev server when in DEV mode (and kill it when server stops)
-// - difference between prod and dev mode: prod references bundle.js static file
-
+module.exports = router

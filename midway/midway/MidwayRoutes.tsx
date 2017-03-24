@@ -42,6 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+let users = require('./users/UserRoutes.tsx');
+let items = require('./items/ItemRoutes.tsx');
+let versions = require('./versions/VersionRoutes.tsx');
+let schema = require('./schema/SchemaRoutes.tsx');
 require('babel-polyfill');
 let router = require('koa-router')();
 
@@ -50,11 +54,16 @@ router.post('/', async (next) =>
   next.body = "";
   console.log('midway root'); 
 });
+// 
+// router.post('/midway_example_route', async (next) => 
+// {
+//   next.body = ""; 
+//   console.log('midway example route'); 
+// });
 
-router.post('/midway_example_route', async (next) => 
-{
-  next.body = ""; 
-  console.log('midway example route'); 
-});
+router.use('/users', users.routes(), users.allowedMethods());
+router.use('/items', items.routes(), items.allowedMethods());
+router.use('/versions', versions.routes(), versions.allowedMethods());
+router.use('/schema', schema.routes(), schema.allowedMethods());
 
 module.exports = router

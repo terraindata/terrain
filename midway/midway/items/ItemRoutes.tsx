@@ -46,13 +46,15 @@ require('babel-polyfill');
 let router = require('koa-router')();
 
 router.post('/', async (next) => 
-{ 
-  console.log('user root'); 
+{
+//   next.body = '';
+  console.log('item root'); 
 });
 
-router.post('/create', async (next) => 
-{ 
-  console.log('user create'); 
+router.post('/item_example_route', async (next) => 
+{
+//   next.body = ''; 
+  console.log('item example route'); 
 });
 
 module.exports = router
