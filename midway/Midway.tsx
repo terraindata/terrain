@@ -49,7 +49,7 @@ import * as winston from 'winston';
 const cmdLineArgs = require('command-line-args');
 import * as webpack from 'webpack';
 const webpackConfig = require('../webpack.config.js');
-const bodyParser = require('koa-body-parser');
+const bodyParser = require('koa-bodyparser');
 const request = require('koa-request');
 const reqText = require('require-text');
 const index = require('require-text')('../src/app/index.html', require);
