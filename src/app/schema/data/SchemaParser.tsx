@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import SchemaTypes from '../SchemaTypes';
+import {SchemaTypes, TableNamesByDb, ColumnNamesByDb} from '../SchemaTypes';
 import * as Immutable from 'immutable';
 let {Map, List} = Immutable;
 
@@ -63,7 +63,7 @@ export module SchemaParser
 	      columns: Map<ID, Column>, 
 	      indexes: Map<ID, Index>,
 	      columnNames: List<string>,
-	      tableNames: List<string>
+	      tableNames: Map<string, List<string>>,
 	    ) => void
 	) {
 		let database = SchemaTypes._Database({
@@ -76,7 +76,7 @@ export module SchemaParser
 		let indexes: Map<ID, Index> =  Map<ID, Index>({});
 		
 		let tableNames = List<string>([]);
-		let columnNames = List<string>([]);
+		let columnNames = Map<string, List<string>>([]);
 		
     colsData.map(
     (

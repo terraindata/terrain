@@ -78,8 +78,8 @@ export module SchemaTypes
 		highlightedInSearchResults: boolean = false;
 		
 		// for the builder, a list of names for each db
-		tableNamesByDb = Map<string, List<string>>({});
-		columnNamesByDb = Map<string, Map<string, List<string>>>({});
+		tableNamesByDb: TableNamesByDb = Map<string, List<string>>({});
+		columnNamesByDb: ColumnNamesByDb = Map<string, Map<string, List<string>>>({});
 	}
 	export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
 	export const _SchemaState = (config?: {[key:string]: any}) => 

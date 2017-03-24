@@ -153,7 +153,8 @@ interface Props
     pathname: string,
   };
   children: any;
-}
+};
+
 
 class App extends PureClasss<Props>
 {
