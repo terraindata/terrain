@@ -47,14 +47,14 @@ let router = require('koa-router')();
 
 router.post('/', async (next) => 
 {
-//   next.body = '';
-  console.log('item root'); 
-});
-
-router.post('/item_example_route', async (next) => 
-{
 //   next.body = ''; 
-  console.log('item example route'); 
+  console.log('user root'); 
 });
 
-module.exports = router
+router.post('/create', async (next) => 
+{ 
+//   next.body = ''; 
+  console.log('user create'); 
+});
+
+export default router;
