@@ -49,9 +49,7 @@ import * as winston from 'winston';
 
 import * as webpack from 'webpack';
 const webpackConfig = require('../webpack.config.js');
-const bodyParser = require('koa-bodyparser');
 const reqText = require('require-text');
-const index = require('require-text')('../src/app/index.html', require);
 import Util from './Util';
 
 
@@ -66,8 +64,6 @@ const optDefs = [
 
 const cmdLineArgs = require('command-line-args');
 const args = cmdLineArgs(optDefs);
-
-app.use(bodyParser());
 
 Router.post('/oauth2', async function(ctx, next) {
   console.log(ctx, next);

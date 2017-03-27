@@ -47,6 +47,8 @@ import UserRouter from './users/UserRouter';
 import ItemRouter from './items/ItemRouter';
 import VersionRouter from './versions/VersionRouter';
 import SchemaRouter from './schema/SchemaRouter';
+import AuthRouter from './auth/AuthRouter';
+
 
 let AppRouter = new KoaRouter();
 
