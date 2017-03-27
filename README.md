@@ -76,6 +76,7 @@ Links are to relevant overviews and tutorials.
 
 - Node
 - Koa
+- Tape, Sinon, and Chai for testing
 
 
 ## Coding Standards
@@ -154,9 +155,21 @@ To include a package install from `npm`, use `import * as [ClassName] from '[pac
 
 ## Testing
 
+### Back-end
+
+Included in the `midway/test` folder.
+
+Run the `npm run test-back` command to run the back-end tests.
+
+TODO: Integrate with Karma and Tap to get continuous testing and code coverage reports.
+
+### Front-end
+
 Testing? What testing? Here are some instructions for how to run karma/tape, for which there aren't any useful test cases yet...
 
-`npm run test` - runs tests continually in another copy of Chrome
+`npm run test-front` - runs tests continually in another copy of Chrome
+
+### General Testing Gotchas
 
 Sometimes your tests may trigger errors that cause your test browser to crash, and you will see karma report:
 `No captured browser.`
@@ -167,6 +180,7 @@ Note: when adding new tests, make sure to include `t.end()` at the end of every 
 ## Useful Tutorials and Articles
 
 - [http://jaysoo.ca/2015/09/26/typed-react-and-redux/] -- React + TypeScript + Redux
+- [A long Node tutorial covering basics, testing, and some advanced topics](https://blog.risingstack.com/node-hero-tutorial-getting-started-with-node-js/)
 - [https://blog.risingstack.com/node-hero-node-js-unit-testing-tutorial/] -- great testing overview for Javascript
 - [https://hackernoon.com/avoiding-accidental-complexity-when-structuring-your-app-state-6e6d22ad5e2a#.5mvnsgidm] -- outlines guidelines to use when structuring Redux state models
 - [https://gist.github.com/paulirish/5d52fb081b3570c81e3a] -- list of JS operations that trigger layout and can cause force synchronous reflow
@@ -182,6 +196,7 @@ Note: when adding new tests, make sure to include `t.end()` at the end of every 
 1. Writing `debugger;` in your code will insert a breakpoint and cause Chrome to pause at that point of execution, allowing you to inspect variable values and step forward / into functions. (You have to have the Chrome Console open in order for the breakpoint to catch.)
 1. If you want to inspect the state and props of React components, you can use the React tab in the Chrome Dev Tools to find the component and see its props and state. Tip: Use the element selection tool (top left corner of your dev tools) to quickly select the component you care about.
 1. If you are getting React errors about setting state in the wrong place (e.g. inside of a render method, or after the component has unmounted), you can find the code that is causing the error by going into the Source dev tab, enabling the Pause on Exceptions and Pause on Caught Exceptions options (top right of the pane), triggering the error, and then going a few levels up the stack into the class that caused the error. (Note that on page load there will be a good dozen of these caught exceptions that you will need to skip over).
+
 
 ### Back-end
 
