@@ -47,17 +47,17 @@ let Router = new KoaRouter();
 
 Router.get('/', async (ctx, next) =>
 {
-	// return all items, or item by id
 	ctx.body = '';
-  console.log('schema root');
+  console.log('auth root');
 });
 
 Router.post('/', async (ctx, next) =>
 {
-	// not allowed right now
 	ctx.body = '';
-  console.log('schema post');
+  console.log('auth root');
 });
 
+const passport = require('koa-passport');
+const LocalStrategy = require('passport-local').Strategy;
 
 export default Router;

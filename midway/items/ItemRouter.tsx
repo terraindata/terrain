@@ -42,23 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('babel-polyfill');
 import * as KoaRouter from 'koa-router';
 let Router = new KoaRouter();
 
-Router.get('/', async (ctx, next) => 
+Router.get('/', async (ctx, next) =>
 {
 	// return all items, or item by id
 	ctx.body = '';
-  console.log('item root'); 
+  console.log('item root');
 });
 
-Router.post('/', async (ctx, next) => 
+Router.post('/', async (ctx, next) =>
 {
 	// change an item
 	ctx.body = '';
-  console.log('item root'); 
+  console.log('item root');
 });
-
 
 export default Router;
