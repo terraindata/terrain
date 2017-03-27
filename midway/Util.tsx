@@ -42,51 +42,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// MIDWAY head file
-require('babel-core/register');
-import * as Koa from 'koa';
-import * as winston from 'winston';
-const cmdLineArgs = require('command-line-args');
-import * as webpack from 'webpack';
-const webpackConfig = require('../webpack.config.js');
-const bodyParser = require('koa-bodyparser');
-const reqText = require('require-text');
-const index = require('require-text')('../src/app/index.html', require);
-import Util from './Util';
+import * as request from 'request';
 
-const app = new Koa();
+module Util
+{
+	export function getRequest(url) {
+	  return new Promise(function (resolve, reject) {
+	    request(url, function (error, res, body) {
+	      if (!error && res.statusCode == 200) {
+	        resolve(body);
+	      } else {
+	        reject(error);
+	      }
+	    });
+	  });
+	}
+	
+}
 
-import Router from './Router';
-
-const optDefs = [
-  {name: 'port', alias: 'p', type: Number, defaultValue: 3000},
-  {name: 'db', alias: 'r', type: String, defaultValue: 'mysql'},
-];
-
-const args = cmdLineArgs(optDefs);
-
-app.use(bodyParser());
-
-Router.post('/oauth2', async function(ctx, next) {
-  console.log(ctx, next);
-});
-
-Router.get('/bundle.js', async function(ctx, next) {
-	// TODO render this if DEV, otherwise render compiled bundle.js
-  let response = await Util.getRequest('http://localhost:8080/bundle.js');
-  ctx.body = response;
-});
-
-Router.get('/', async function(ctx, next) {
-  ctx.body = index.toString();
-});
-
-app.use(Router.routes());
-
-app.listen(args.port);
-
-// TODO list
-// - import HTML rather than writing directly inline
-// - kick off webpack dev server when in DEV mode (and kill it when server stops)
-// - difference between prod and dev mode: prod references bundle.js static file
-
+export default Util;
