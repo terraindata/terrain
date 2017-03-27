@@ -48,16 +48,14 @@ import ItemRouter from './items/ItemRouter';
 import VersionRouter from './versions/VersionRouter';
 import SchemaRouter from './schema/SchemaRouter';
 
-require('babel-polyfill');
-
 let AppRouter = new KoaRouter();
 
+AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
 AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
 AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
 AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
 AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
 // Add future routes here.
-
 
 // Prefix all routes with /midway
 //  This is so that we can allow the front-end to use all other routes.
