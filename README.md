@@ -33,22 +33,22 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 
 ## Setup
 
-1. Install and run `midway` (optional)
 1. Install Node, npm
   * on Mac:
     * Install Homebrew
     *  `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
     * Install Node
     *  `brew install node`
-1. Install npm
+1. Install npm.  
   `brew install npm` on Mac
 1. `npm install`
-1. `npm install -g tsd webpack-dev-server babel-cli`
-1. `npm run start-local` (with local midway) or `npm start` (without midway) - dev server now running at [localhost:8080](localhost:8080).
-1. Default user login: `luser` / `secret` (for local midway) or ask Luke for your hosted account details (without midway)
-1. Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans]
+1. `npm install -g webpack-dev-server`
+1. `npm start` - starts the Midway server, now running at localhost:3000
+1. `npm run start-koa` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the dev front-end server on start (and kill it on end)
+1. Default user login: `luser` / `secret`
+1. Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans] - helps things go faster because your browser won't have to fetch Open Sans on each load
 
-Whenever new packages are installed from branches merged to master, run `npm install` locally.
+Whenever new packages are installed by other devs / on other branches, run `npm install` to get the new package locally.
 
 ## Major Dependencies
 
@@ -75,7 +75,7 @@ Links are to relevant overviews and tutorials.
 ### Back-End
 
 - Node
-- Koa and Koa Router
+- Koa
 
 
 ## Coding Standards
@@ -167,46 +167,63 @@ Note: when adding new tests, make sure to include `t.end()` at the end of every 
 ## Useful Tutorials and Articles
 
 - [http://jaysoo.ca/2015/09/26/typed-react-and-redux/] -- React + TypeScript + Redux
+- [https://blog.risingstack.com/node-hero-node-js-unit-testing-tutorial/] -- great testing overview for Javascript
 - [https://hackernoon.com/avoiding-accidental-complexity-when-structuring-your-app-state-6e6d22ad5e2a#.5mvnsgidm] -- outlines guidelines to use when structuring Redux state models
 - [https://gist.github.com/paulirish/5d52fb081b3570c81e3a] -- list of JS operations that trigger layout and can cause force synchronous reflow
+
+
+## Debugging
+
+### Front-end
+
+1. Make sure you install the [React Dev Tools for Chrome](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en)
+1. For debugging in the browser, you'll want to use the browser's JS Consle (CMD + Shift + J on Mac)
+1. Writing `console.log` in your JS code will log output to this console -- this can be useful for basic debugging
+1. Writing `debugger;` in your code will insert a breakpoint and cause Chrome to pause at that point of execution, allowing you to inspect variable values and step forward / into functions. (You have to have the Chrome Console open in order for the breakpoint to catch.)
+1. If you want to inspect the state and props of React components, you can use the React tab in the Chrome Dev Tools to find the component and see its props and state. Tip: Use the element selection tool (top left corner of your dev tools) to quickly select the component you care about.
+1. If you are getting React errors about setting state in the wrong place (e.g. inside of a render method, or after the component has unmounted), you can find the code that is causing the error by going into the Source dev tab, enabling the Pause on Exceptions and Pause on Caught Exceptions options (top right of the pane), triggering the error, and then going a few levels up the stack into the class that caused the error. (Note that on page load there will be a good dozen of these caught exceptions that you will need to skip over).
+
+### Back-end
+
+1. Anything from `console.log` will logged to your terminal in the same process.
+1. Please post any other debugging tips here.
+
+
 
 ## Gotchas
 
 A list of common programming gotchas in this codebase
 
-- `let` scope is different than `var` (thankfully) but can cause unexpected errors
-  ```
-  if(someCondition)
+- `let` scope is different than `var` (thankfully) but can cause unexpected errors. For example:  
+  ```if(isJoey)
   {
-    var someVar = "someValue";
+    var catchphrase = "How you doin'?";
   }
-  console.log(someVar); // either "someValue" or "undefined"
-  
-  if(someOtherCondition)
+  console.log(catchphrase); // either the string or undefined```  
+  Versus:  
+  ```if(isPhoebe)
   {
-    let someLet = "someOtherValue";
+    let catchphrase = "Oh no.";
   }
-  console.log(someLet); // ERROR: cannot find name someLet
+  console.log(catchphrase); // ERROR: cannot find name catchphrase
   ```
 - Subscribe to Redux stores within the `componentDidMount` method. Do not subscribe in the constructor, or else you will likely see many React `setState` warnings
 - Do not call `fetch` from within a constructor or you may see similar warnings (React thinks that state changes are happening from a higher component's `render` method)
-- ReactVirtualized: The library uses `shallowCompare` to detect prop changes, so you may need to pass additional props to indicate that data have changed.
-  More here: [https://github.com/bvaughn/react-virtualized#pure-components]
-- Inline functions in ES6 don't like comments:
+- Inline functions in ES6 don't like comments if you don't include `{...}`:
   ```
-  var works = () =>
+  let works = () =>
      console.log('success');
      // log something
   works(); // logs 'success';
 
-  var doesntWork = () =>
+  let doesntWork = () =>
      // log something
-     console.log('success');
+     console.log('success'); // executed and logged at runtime
   doesntWork(); // nothing is logged
   ```
 
 ## Troubleshooting
 
+1. Don't panic.
 1. Node or npm errors: `npm install` - you may be missing packages.
-2. Test suite doesn't run all tests: make sure you have added correct `t.plan(x)` or `t.end()` statements to every test, otherwise the test suite will hang.
-3. Assume it's an early sign of the apocalypse. Hide your kids.
+1. Test suite doesn't run all tests: make sure you have added correct `t.plan(x)` or `t.end()` statements to every test, otherwise the test suite will hang.
