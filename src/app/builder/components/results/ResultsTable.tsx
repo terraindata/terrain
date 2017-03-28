@@ -60,6 +60,7 @@ interface Props
   results: Results;
   resultsConfig?: IResultsConfig;
   onExpand: (index:number) => void;
+  resultsLoading: boolean;
 }
 
 export default class ResultsTable extends PureClasss<Props>
@@ -141,14 +142,27 @@ export default class ResultsTable extends PureClasss<Props>
       );
     }
     
+    // NOTE: Passing any empty cols array will cause our table library to crashhhh
     if(cols.length === 0)
     {
-      cols = [
-        {
-          key: 'loading',
-          name: 'Loading...',
-        },
-      ];
+      if(this.props.resultsLoading)
+      {
+        cols = [
+          {
+            key: 'loading',
+            name: 'Loading...',
+          },
+        ];
+      }
+      else
+      {
+        cols = [
+          {
+            key: 'none',
+            name: 'No results',
+          }
+        ];
+      }
     }
     
     return Immutable.List(cols);

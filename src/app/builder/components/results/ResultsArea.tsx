@@ -257,6 +257,7 @@ class ResultsArea extends PureClasss<Props>
             results={results}
             resultsConfig={this.props.query.resultsConfig}
             onExpand={this.handleExpand}
+            resultsLoading={resultsState.loading}
           />
         </div>
       );
@@ -341,7 +342,6 @@ column if you have set a custom results view.');
   renderTopbar()
   {
     let {resultsState} = this.props;
-    
     var text: any = '';
     if(resultsState.loading)
     {

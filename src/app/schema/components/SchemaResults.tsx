@@ -56,6 +56,7 @@ type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 import ResultsTable from '../../builder/components/results/ResultsTable';
 import {ResultsManager, ResultsState, _ResultsState} from '../../builder/components/results/ResultsManager';
 import BuilderTypes from '../../builder/BuilderTypes';
+import InfoArea from '../../common/components/InfoArea';
 
 const NUM_ROWS = 200;
 
@@ -99,15 +100,23 @@ class SchemaResults extends PureClasss<Props>
 						selectedId,
 						selectedItem,
 					});
-					
+
 					if(this.showsResults(selectedItem))
 					{
-						let resultsDb = this.props.databases 
-							&& this.props.databases.get(selectedItem['databaseId']).name;
-						let field: string, table: string;
+						let resultsDb = 
+							selectedItem.type === 'database' ? selectedItem.name :
+								this.props.databases 
+									&& this.props.databases.get(selectedItem['databaseId']).name;
+						
+						let field: string, table: string, where: string;
 						
 						switch(selectedItem.type)
 						{
+							case 'database':
+								field = 'TABLE_NAME, TABLE_ROWS, AVG_ROW_LENGTH, DATA_LENGTH';
+								table = 'INFORMATION_SCHEMA.TABLES';
+								where = `TABLE_SCHEMA = '${selectedItem.name}'`;
+								break;
 							case 'table':	
 								field = '*';
 								table = selectedItem.name;
@@ -120,9 +129,8 @@ class SchemaResults extends PureClasss<Props>
 								//TODO
 								break;
 						}
-						console.log(field, table);
 						
-						let resultsQuery = this.getQuery(field, table);
+						let resultsQuery = this.getQuery(field, table, where);
 						
 						this.setState({
 							resultsQuery,
@@ -139,9 +147,9 @@ class SchemaResults extends PureClasss<Props>
 		});
 	}
 	
-	getQuery(field: string, table: string): BuilderTypes.Query
+	getQuery(field: string, table: string, where: string = "1"): BuilderTypes.Query
 	{
-		let tql = "SELECT " + field + " FROM " + table + " LIMIT " + NUM_ROWS + ";";
+		let tql = "SELECT " + field + " FROM " + table + " " + where + " LIMIT " + NUM_ROWS + ";";
 		
 		let inputs = [
 			{
@@ -196,6 +204,20 @@ class SchemaResults extends PureClasss<Props>
 							),
 							
 							BuilderTypes.make(
+								BuilderTypes.Blocks.where,
+								{
+									cards: List([
+										BuilderTypes.make(
+											BuilderTypes.Blocks.tql,
+											{
+												clause: where,
+											}
+										),
+									]),
+								}
+							),
+							
+							BuilderTypes.make(
 								BuilderTypes.Blocks.take,
 								{
 									value: 'input.numRows',
@@ -210,7 +232,7 @@ class SchemaResults extends PureClasss<Props>
 	
 	showsResults(selectedItem: SchemaBaseClass): boolean
 	{
-		return selectedItem && selectedItem.type !== 'database';
+		return selectedItem && selectedItem.type !== 'index';
 	}
 	
 	handleResultsStateChange(resultsState: ResultsState)
@@ -222,7 +244,6 @@ class SchemaResults extends PureClasss<Props>
 	
   render()
   {
-  	console.log(this.state.resultsState.results.size);
     return (
     	<div
     		style={{
@@ -230,10 +251,18 @@ class SchemaResults extends PureClasss<Props>
     			height: '100%',
     		}}
     	>
-    		<ResultsTable
-    			results={this.state.resultsState.results}
-    			onExpand={_.noop}
-    		/>
+    		{
+    			this.showsResults(this.state.selectedItem) ?
+		    		<ResultsTable
+		    			results={this.state.resultsState.results}
+		    			onExpand={_.noop}
+		    			resultsLoading={this.state.resultsState.loading}
+		    		/>
+		    	:
+    				<InfoArea
+    					large='Select an item to see its contents here.'
+    				/>
+    		}
     		
     		<ResultsManager
     			db={this.state.resultsDb}
