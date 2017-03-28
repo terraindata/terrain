@@ -46,9 +46,9 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PureClasss from '../../../common/components/PureClasss';
-import Table from '../../../common/components/Table';
+import {Table, IColumn} from '../../../common/components/Table';
 import InfoArea from '../../../common/components/InfoArea';
-import {IResultsConfig, ResultsConfig} from "../results/ResultsConfig";
+import {IResultsConfig, _IResultsConfig} from "../results/ResultsConfig";
 import {getResultName, getResultFields, getResultValue} from './Result';
 import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore';
 import ColorManager from '../../../util/ColorManager';
@@ -58,8 +58,9 @@ import {Results, MAX_RESULTS, getPrimaryKeyFor} from './ResultsManager';
 interface Props
 {
   results: Results;
-  resultsConfig: IResultsConfig;
+  resultsConfig?: IResultsConfig;
   onExpand: (index:number) => void;
+  resultsLoading: boolean;
 }
 
 export default class ResultsTable extends PureClasss<Props>
@@ -67,9 +68,11 @@ export default class ResultsTable extends PureClasss<Props>
   state: {
     random: number;
     spotlightState: SpotlightState;
+    columns: List<IColumn>;
   } = {
     random: 0,
     spotlightState: null,
+    columns: this.getColumns(this.props),
   };
   
   menuOptions: List<MenuOption> = Immutable.List([
@@ -79,6 +82,92 @@ export default class ResultsTable extends PureClasss<Props>
     }
   ]);
   
+  componentWillReceiveProps(nextProps:Props)
+  {
+    if(nextProps.results !== this.props.results || nextProps.resultsConfig !== this.props.resultsConfig)
+    {
+      // force the table to update
+      this.setState({
+        random: Math.random(),
+        columns: this.getColumns(nextProps),
+      });
+    }
+  }
+  
+  getColumns(props:Props): List<IColumn>
+  {
+    let {resultsConfig} = props;
+    let cols: IColumn[] = [];
+  
+    if(resultsConfig)
+    {
+      
+      if(resultsConfig.name)
+      {
+        cols.push({
+          key: resultsConfig.name,
+          name: resultsConfig.name,
+          resizable: true,
+        });
+      }
+      if(resultsConfig.score)
+      {
+        cols.push({
+          key: resultsConfig.score,
+          name: resultsConfig.score,
+          resizable: true,
+        });
+      }
+      
+      resultsConfig.fields.map(
+        field =>
+          cols.push({
+            key: field,
+            name: field,
+            resizable: true,
+          })
+      );
+      
+    }
+    else
+    {
+      let resultFields = props.results.size ? props.results.get(0).fields : Immutable.Map({});
+      resultFields.map(
+        (value, field) =>
+          cols.push({
+            key: field,
+            name: field,
+            resizable: true,
+          })
+      );
+    }
+    
+    // NOTE: Passing any empty cols array will cause our table library to crashhhh
+    if(cols.length === 0)
+    {
+      if(this.props.resultsLoading)
+      {
+        cols = [
+          {
+            key: 'loading',
+            name: 'Loading...',
+          },
+        ];
+      }
+      else
+      {
+        cols = [
+          {
+            key: 'none',
+            name: 'No results',
+          }
+        ];
+      }
+    }
+    
+    return Immutable.List(cols);
+  }
+  
   componentDidMount()
   {
     this._subscribe(SpotlightStore, {
@@ -87,65 +176,69 @@ export default class ResultsTable extends PureClasss<Props>
     })
   }
   
-  getKey(col: number): string
-  {
-    let config = this.props.resultsConfig;
-    let hasName = this.hasName();
-    let hasScore = this.hasScore();
+  // getKey(col: number): string
+  // {
+  //   let config = this.state.resultsConfig;
+  //   let hasName = this.hasName();
+  //   let hasScore = this.hasScore();
     
-    if(col === 0 && hasName)
-    {
-      return config.name;
-    }
-    if(col === 0 && hasScore)
-    {
-      return config.score;
-    }
-    if(col === 1 && hasName && hasScore)
-    {
-      return config.score;
-    }
+  //   if(col === 0 && hasName)
+  //   {
+  //     return config.name;
+  //   }
+  //   if(col === 0 && hasScore)
+  //   {
+  //     return config.score;
+  //   }
+  //   if(col === 1 && hasName && hasScore)
+  //   {
+  //     return config.score;
+  //   }
     
-    let offset = (hasName ? 1 : 0) + (hasScore ? 1 : 0);
-    return config.fields.get(col - offset);
-  }
+  //   let offset = (hasName ? 1 : 0) + (hasScore ? 1 : 0);
+  //   let fieldIndex = col - offset;
+  //   return config.fields.get(fieldIndex);
+  // }
   
-  getValue(i: number, col: number): El
+  getRow(i: number): Object
   {
-    let field = this.getKey(col);
-    let {results, resultsConfig} = this.props;
-    let primaryKey = getPrimaryKeyFor(results && results.get(i), resultsConfig);
-    let spotlight = col === 0
-      && this.state.spotlightState 
-      && this.state.spotlightState.getIn(['spotlights', primaryKey]);
+    // TODO
+    return this.props.results.get(i).fields.toJS();
+    // let field = this.getKey(col);
+    // let {results} = this.props;
+    // let {resultsConfig} = this.state;
+    // let primaryKey = getPrimaryKeyFor(results && results.get(i), resultsConfig);
+    // let spotlight = col === 0
+    //   && this.state.spotlightState 
+    //   && this.state.spotlightState.getIn(['spotlights', primaryKey]);
 
-    return (
-      <div>
-        {
-          spotlight &&
-            <div
-              className='result-spotlight'
-              style={{
-                background: spotlight.color,
-              }}
-            />
-        }
-        {
-          getResultValue(results && results.get(i), field, resultsConfig)
-        }
-      </div>
-    );
+    // return (
+    //   <div>
+    //     {
+    //       spotlight &&
+    //         <div
+    //           className='result-spotlight'
+    //           style={{
+    //             background: spotlight.color,
+    //           }}
+    //         />
+    //     }
+    //     {
+    //       getResultValue(results && results.get(i), field, resultsConfig)
+    //     }
+    //   </div>
+    // );
   }
   
-  hasScore(): boolean
-  {
-    return this.props.resultsConfig.score !== "";
-  }
+  // hasScore(): boolean
+  // {
+  //   return this.state.resultsConfig.score !== "";
+  // }
   
-  hasName(): boolean
-  {
-    return this.props.resultsConfig.name !== "";
-  }
+  // hasName(): boolean
+  // {
+  //   return this.state.resultsConfig.name !== "";
+  // }
   
   handleCellClick(r: number, c: number)
   {
@@ -175,19 +268,23 @@ export default class ResultsTable extends PureClasss<Props>
       return <InfoArea large='Loading...' />;
     }
     
-    let pinnedCols = (this.hasName() ? 1 : 0) + (this.hasScore() ? 1 : 0);
-    let fieldCount = this.props.resultsConfig.fields.size + pinnedCols;
+    // let pinnedCols = (this.hasName() ? 1 : 0) + (this.hasScore() ? 1 : 0);
+    // let fieldCount = this.state.resultsConfig.fields.size + pinnedCols;
     
+    // if(!fieldCount && this.props.results.size)
+    // {
+    //   fieldCount = this.props.results.get(0).fields.size;
+    // }
+    console.log(this.state.columns);
     return (
       <Table
-        getKey={this.getKey}
-        getValue={this.getValue}
-        colCount={fieldCount}
-        rowCount={this.props.results.size}
-        pinnedCols={pinnedCols}
+        columns={this.state.columns}
+        rowGetter={this.getRow}
+        rowsCount={this.props.results.size}
         random={this.state.random}
         onCellClick={this.handleCellClick}
         menuOptions={this.menuOptions}
+        rowKey={'id' /*TODO*/}
       />
     );
   }

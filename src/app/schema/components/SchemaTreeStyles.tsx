@@ -43,54 +43,142 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
-import * as React from 'react';
-import Classs from './Classs';
-import BuilderTypes from '../../builder/BuilderTypes';
-const shallowCompare = require('react-addons-shallow-compare');
+import Styles from '../../Styles';
+const color = require('color');
 
-class PureClasss<T> extends Classs<T>
+const itemHeaderHeight = 22;
+
+const arrowSvgStyles = {
+	width: '12px',
+	fill: Styles.colors.transBlack,
+	// fill: 'rgba(0,0,0,0)',
+	// stroke: Styles.colors.transBlack,
+	// strokeWidth: 20,
+	cursor: 'pointer',
+	marginLeft: 6,
+};
+
+const headerHighlightedColor = color(Styles.colors.active).fade('0.85').string();
+const headerSelectedColor = color(Styles.colors.active).fade('0.75').string();
+
+const SchemaTreeStyles =
 {
-  props: T;
-  _debugUpdates = false;
-  _debugName = "Not set";
-  
-  shouldComponentUpdate(nextProps: T, nextState: any)
-  {
-    let shouldUpdate = shallowCompare(this, nextProps, nextState);
-    
-    if(this._debugUpdates && shouldUpdate)
-    {
-      this._compareSets(this.props, nextProps, 'props');
-      this._compareSets(this.state, nextState, 'state');
-    }
-    
-    return shouldUpdate;
-  }
-  
-  _compareSets(first: any, second: any, setName: string)
-  {
-    let firstKeys = _.keys(first);
-    for(var key of firstKeys)
-    {
-      if(first[key] !== second[key])
-      {
-        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
-      }
-    }
-    for(var key in second)
-    {
-      if(firstKeys.indexOf(key) === -1)
-      {
-        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
-      }
-    }
-  }
-  
-  // TODO
-  // _myKeyPath(el: BuilderTypes.KeyPathClass)
-  // {
-  //   return this._ikeyPath(el.keyPath, el.id);
-  // }
+	schemaView: {
+		height: '100%',
+		overflow: 'auto',
+	},
+	
+	schemaHeading: [
+		Styles.font.big,
+	],
+	
+	label: Styles.font.semiBoldNormal,
+	
+	none: {
+		
+	},
+	
+	
+	treeItem: [
+		Styles.transition,
+	],
+	
+	arrow: _.extend(
+		arrowSvgStyles,
+		Styles.rotate90,
+		Styles.transition
+	),
+	
+	arrowOpen: _.extend(
+		{},
+		arrowSvgStyles,
+		{
+			fill: Styles.colors.active,
+			// stroke: Styles.colors.active,
+		},
+		Styles.rotate180,
+		Styles.transition
+	),
+	
+	treeItemHeader: [{
+			display: 'flex',
+			cursor: 'pointer',
+			height: itemHeaderHeight,
+			
+			borderRadius: 4,
+			
+			':hover': {
+				background: headerHighlightedColor,
+			}
+		},
+		Styles.transition,
+	],
+	
+	treeItemHeaderSelected:
+	{
+		background: headerSelectedColor,
+		':hover': {
+			background: headerSelectedColor,
+		}
+	},
+	
+	treeItemHeaderHighlighted:
+	{
+		background: headerHighlightedColor,
+	},
+	
+	name: {
+		marginRight: Styles.margin * 3,
+		marginLeft: Styles.margin,
+		// fontWeight: 'bold',
+		fontSize: 16,
+	},
+	
+	itemInfoRow: {
+		'flexGrow': '1',
+	},
+	
+	childrenWrapper: {
+		normal: [
+			{
+				paddingLeft: 11,
+				// marginBottom: 6,
+				// paddingBottom: 6,
+				// borderBottom: '0.5px solid rgba(0,0,0,0.1)',
+				// margin: '0px 6px',
+			},
+			Styles.transition
+		],
+		
+		search: Styles.transition,
+	},
+	
+	childSection: {
+		
+	},
+	
+	
+	// SchemaTreeInfo
+	infoPieces: {
+		display: 'flex',
+		paddingTop: '2px',
+	},
+	
+	infoPiece: {
+		marginRight: Styles.margin * 2,
+	},
+	
+	infoPieceNumber: {
+		fontWeight: 'bold',
+	},
+	
+	searchTextEmphasis: {
+		fontWeight: 'bold',
+		color: Styles.colors.active,
+	},
+	
+	
+	margin: Styles.margin,
 }
 
-export default PureClasss;
+export default SchemaTreeStyles;

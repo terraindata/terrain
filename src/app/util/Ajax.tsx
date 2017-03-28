@@ -509,46 +509,52 @@ export const Ajax = {
     );
   },
   
-  schema(db: string, onLoad: (tables: {name: string, columns: any[]}[], error?: any) => void, onError?: (ev:Event) => void)
+  schema(db: string, onLoad: (columns: any[], error?: any) => void, onError?: (ev:Event) => void)
   {
     return Ajax._r("/get_schema", {
         db,
       },
-      
       (resp:string) =>
       {
+        let cols: any = null;
         try
         {
           let cols = JSON.parse(resp).results;
-          var tables: {[name:string]: {name: string; columns: any[];}} = {};
+          // var tables: {[name:string]: {name: string; columns: any[];}} = {};
           
-          cols.map(
-          (
-            col: { TABLE_NAME: string; COLUMN_NAME: string; }
-          ) =>
-          {
-            let column = _.extend(col, { name: col.COLUMN_NAME });
-            let table = col.TABLE_NAME;
+          // cols.map(
+          // (
+          //   col: { TABLE_NAME: string; COLUMN_NAME: string; }
+          // ) =>
+          // {
+          //   let column = _.extend(col, { name: col.COLUMN_NAME });
+          //   let table = col.TABLE_NAME;
              
-            if(!tables[table])
-            {
-              tables[table] = {
-                name: table,
-                columns: [],
-              };
-            }
+          //   if(!tables[table])
+          //   {
+          //     console.log('add table', table);
+          //     tables[table] = {
+          //       name: table,
+          //       columns: [],
+          //     };
+          //   }
             
-            tables[table].columns.push(column);
-          });
+          //   tables[table].columns.push(column);
+          // });
           
-          onLoad(_.toArray(tables) as any);
+          // onLoad(_.toArray(tables) as any);
+          onLoad(cols);
         }
         catch(e)
         {
           onError && onError(resp as any);
         }
+        
+        if(cols)
+        {
+          onLoad(cols as any);
+        }
       },
-      
       onError
       );
   },

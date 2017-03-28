@@ -196,7 +196,6 @@ class Builder extends PureClasss<Props>
   componentWillMount()
   {
     this.checkConfig(this.props);
-    this.loadTables(this.props);
   }
   
   componentDidMount()
@@ -268,37 +267,6 @@ class Builder extends PureClasss<Props>
     return true;
   }
   
-  // variantSub: any;
-  schemaXhr: XMLHttpRequest;
-  loadTables(props:Props)
-  {
-    // TODO consider moving this to a reducer, or its own monitoring component
-    const db = LibraryTypes.getDbFor(this.getVariant(props));
-    if(!db)
-    {
-      Actions.changeTables('', Immutable.List([]), Immutable.Map({}));
-      return;
-    }
-    
-    if(db !== this.state.builderState.db)
-    {
-      this.schemaXhr && this.schemaXhr.abort();
-      this.schemaXhr = Ajax.schema(db, (tables: {name: string, columns: {name: string}[]}[]) => {
-        Actions.changeTables(
-          db,
-          Immutable.List(tables.map(table => table.name)),
-          tables.reduce(
-            (memo: TableColumns, table: {name: string, columns: {name: string}[]}) =>
-              memo.set(table.name, 
-                Immutable.List(table.columns.map(col => col.name))
-              )
-            , Immutable.Map({})
-          )
-        );
-      }).xhr;
-    }
-  }
-  
   componentWillReceiveProps(nextProps: Props)
   {
     let currentOpen = this.props.location.query && this.props.location.query.o;
@@ -316,8 +284,6 @@ class Builder extends PureClasss<Props>
       }
       this.checkConfig(nextProps);
     }
-    
-    this.loadTables(nextProps);
   }
   
   checkConfig(props:Props)
@@ -826,7 +792,7 @@ class Builder extends PureClasss<Props>
     let config = this.props.params.config;
     let variant = this.getVariant();
     let query = this.getQuery();
-
+    
     return (
       <div className={classNames({
         'builder': true,
@@ -872,6 +838,7 @@ class Builder extends PureClasss<Props>
           query={query}
           resultsState={this.state.builderState.resultsState}
           db={this.state.builderState.db}
+          onResultsStateChange={Actions.results}
         />
       </div>
     );

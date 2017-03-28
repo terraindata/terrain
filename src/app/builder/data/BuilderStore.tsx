@@ -74,14 +74,12 @@ export class BuilderStateClass
   
   hoveringCardId: ID = "";
   
-  selectedCardIds: Map<ID, boolean> = Map({});
+  selectedCardIds = Map<ID, boolean>({});
   
   db: string = "";
-  tables: List<string> = List([]);
-  tableColumns: Map<string, List<string>> = Map({});
 
   // TODO move  
-  manual: Map<ID, BuilderTypes.ICards> = Map({});
+  manual = Map<ID, BuilderTypes.ICards>({});
   // Card examples used in the manual are stored here.
   
   draggingCardItem: CardItem = false;

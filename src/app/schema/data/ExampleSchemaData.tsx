@@ -42,55 +42,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
-import * as React from 'react';
-import Classs from './Classs';
-import BuilderTypes from '../../builder/BuilderTypes';
-const shallowCompare = require('react-addons-shallow-compare');
+import SchemaTypes from '../SchemaTypes';
+import * as Immutable from 'immutable';
 
-class PureClasss<T> extends Classs<T>
-{
-  props: T;
-  _debugUpdates = false;
-  _debugName = "Not set";
-  
-  shouldComponentUpdate(nextProps: T, nextState: any)
-  {
-    let shouldUpdate = shallowCompare(this, nextProps, nextState);
-    
-    if(this._debugUpdates && shouldUpdate)
-    {
-      this._compareSets(this.props, nextProps, 'props');
-      this._compareSets(this.state, nextState, 'state');
-    }
-    
-    return shouldUpdate;
-  }
-  
-  _compareSets(first: any, second: any, setName: string)
-  {
-    let firstKeys = _.keys(first);
-    for(var key of firstKeys)
-    {
-      if(first[key] !== second[key])
-      {
-        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
-      }
-    }
-    for(var key in second)
-    {
-      if(firstKeys.indexOf(key) === -1)
-      {
-        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
-      }
-    }
-  }
-  
-  // TODO
-  // _myKeyPath(el: BuilderTypes.KeyPathClass)
-  // {
-  //   return this._ikeyPath(el.keyPath, el.id);
-  // }
-}
+let databases = Immutable.Map({});
+let tables = Immutable.Map({});
+let columns = Immutable.Map({});
 
-export default PureClasss;
+['movieDB', 'baseballDB'].map(
+	name =>
+	{
+		let db = SchemaTypes._Database({ name });
+		
+		['movies', 'actors', 'reviews', 'characters', 'users'].map(
+			tableName =>
+			{
+				let table = SchemaTypes._Table({ name: tableName, databaseId: db.id });
+				db = db.set('tableIds', db.tableIds.push(table.id));
+				
+				['first', 'second', 'third', 'fourth', 'fifth'].map(
+					colName =>
+					{
+						let column = SchemaTypes._Column({ 
+							name: colName, 
+							tableId: table.id, 
+							databaseId: db.id,
+							datatype: 'VARCHAR',
+							isNullable: true,
+							defaultValue: '',
+							isPrimaryKey: false,
+						});
+						
+						columns = columns.set(column.id, column);
+						
+						table = table.set('columnIds', table.columnIds.push(column.id));
+					}
+				);
+				
+				tables = tables.set(table.id, table);
+			}
+		);
+		
+		databases = databases.set(db.id, db);
+	}
+);
+
+const ExampleSchemaData =
+	SchemaTypes._SchemaState()
+		.set('databases', databases)
+		.set('columns', columns)
+		.set('tables', tables)
+		.set('loading', false)
+		.set('loaded', true);
+
+export default ExampleSchemaData;

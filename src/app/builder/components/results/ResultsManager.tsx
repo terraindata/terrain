@@ -54,7 +54,6 @@ import BuilderTypes from '../../BuilderTypes';
 import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore';
 import {BaseClass, New} from '../../../Classes';
 import PureClasss from './../../../common/components/PureClasss';
-import BuilderActions from '../../data/BuilderActions';
 
 export const MAX_RESULTS = 200;
 
@@ -87,6 +86,7 @@ class ResultsStateC extends BaseClass
   errorMessage: string = '';
   hasAllFieldsError: boolean = false;
   allFieldsErrorMessage: string = '';
+  mainError
   
   valid: boolean = false; // are these results still valid for the given query?
   
@@ -108,6 +108,8 @@ interface Props
   query: BuilderTypes.Query;
   resultsState: ResultsState;
   db: string;
+  onResultsStateChange: (resultsState: ResultsState) => void;
+  noExtraFields?: boolean;
 }
 
 
@@ -129,7 +131,7 @@ interface State
 
 const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
 
-class ResultsManager extends PureClasss<Props>
+export class ResultsManager extends PureClasss<Props>
 {
   state: State = {};
   
@@ -189,7 +191,8 @@ class ResultsManager extends PureClasss<Props>
       
       let selectCard = query.cards.get(0);
       if(
-        selectCard 
+        !this.props.noExtraFields
+        && selectCard 
         && !selectCard['cards'].some(
             card => card.type === 'groupBy'
           ) 
@@ -360,13 +363,16 @@ class ResultsManager extends PureClasss<Props>
     {
       fields = results.get(0).fields.keySeq().toList();
     }
-    
+
     let changes: any = {
       results,
       fields,
       hasError: false,
-      loading: resultsState.hasLoadedResults && resultsState.hasLoadedAllFields,
+      loading: (isAllFields && !resultsState.hasLoadedResults) || (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields),
       [isAllFields ? 'hasLoadedAllFields' : 'hasLoadedResults']: true,
+      errorLine: null,
+      mainErrorMessage: null,
+      subErrorMessage: null,
     };
     
     if(!resultsState.hasLoadedCount)
@@ -420,7 +426,7 @@ class ResultsManager extends PureClasss<Props>
       countQuery: null,
     });
     // probably not needed
-    // BuilderActions.results(
+    // this.props.onResultsStateChange(
     //   this.props.resultsState
     //     .set('resultsLongCount', 0)
     // );
@@ -430,6 +436,7 @@ class ResultsManager extends PureClasss<Props>
   {  
     let {errorMessage} = response || { errorMessage: '' };
     errorMessage = errorMessage || 'There was no response from the server.';
+    let {resultsState} = this.props;
     
     if(typeof errorMessage === 'string')
     {
@@ -438,14 +445,33 @@ class ResultsManager extends PureClasss<Props>
         errorMessage = errorMessage.substr(0, errorMessage.length - 1);
       }
       errorMessage = errorMessage.replace(/MySQL/g, 'TerrainDB');
+      
+      if(!isAllFields)
+      {
+        let matches = errorMessage.match(/([0-9]+)\:[0-9]+/);
+        let line = matches && matches.length >= 2 && parseInt(matches[1]);
+        let mainErrorMessage = error;
+        let subErrorMessage: string = null;
+        
+        if(line !== NaN && line !== null && line !== undefined)
+        {
+          mainErrorMessage = 'Error on line ' + line + ': ';
+          subErrorMessage = error;
+        }
+        console.log(mainErrorMessage, subErrorMessage, errorLine);
+        resultsState = resultsState
+          .set('mainErrorMessage', mainErrorMessage)
+          .set('subErrorMessage', subErrorMessage)
+          .set('errorLine', errorLine);
+      }
     }
     
     this.setState({
       [isAllFields ? 'query' : 'allQuery']: null,
     });
     
-    BuilderActions.results(
-      this.props.resultsState
+    this.props.onResultsStateChange(
+      resultsState
         .set(
           isAllFields ? 'hasAllFieldsError' : 'hasError', 
           true
@@ -457,6 +483,10 @@ class ResultsManager extends PureClasss<Props>
         .set(
           isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
           true
+        )
+        .set(
+          'loading',
+          false
         )
     );
   }
@@ -474,7 +504,7 @@ class ResultsManager extends PureClasss<Props>
         resultsState = resultsState.set(key, value)
     );
     
-    BuilderActions.results(resultsState);
+    this.props.onResultsStateChange(resultsState);
   }
   
 	render()

@@ -6,11 +6,12 @@
 	  "sourceMap": true,
 	  "target": "es6",
 	  "typeRoots" : ["./src/typings", "./node_modules/@types"],
-	  "allowJs": true
+	  "experimentalDecorators": true
+    "allowJs": true
   },
   
   "exclude": 
   [
-  	"node_modules"
+    "node_modules"
   ]
 }

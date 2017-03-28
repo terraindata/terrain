@@ -42,55 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
-import * as React from 'react';
-import Classs from './Classs';
-import BuilderTypes from '../../builder/BuilderTypes';
-const shallowCompare = require('react-addons-shallow-compare');
+import Util from './../../util/Util';
 
-class PureClasss<T> extends Classs<T>
+export let SchemaActionTypes = 
 {
-  props: T;
-  _debugUpdates = false;
-  _debugName = "Not set";
+  fetch: '',
+  setDatabase: '', // sets the schema for a database
+  error: '',
+  dbCount: '',
   
-  shouldComponentUpdate(nextProps: T, nextState: any)
-  {
-    let shouldUpdate = shallowCompare(this, nextProps, nextState);
-    
-    if(this._debugUpdates && shouldUpdate)
-    {
-      this._compareSets(this.props, nextProps, 'props');
-      this._compareSets(this.state, nextState, 'state');
-    }
-    
-    return shouldUpdate;
-  }
-  
-  _compareSets(first: any, second: any, setName: string)
-  {
-    let firstKeys = _.keys(first);
-    for(var key of firstKeys)
-    {
-      if(first[key] !== second[key])
-      {
-        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
-      }
-    }
-    for(var key in second)
-    {
-      if(firstKeys.indexOf(key) === -1)
-      {
-        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
-      }
-    }
-  }
-  
-  // TODO
-  // _myKeyPath(el: BuilderTypes.KeyPathClass)
-  // {
-  //   return this._ikeyPath(el.keyPath, el.id);
-  // }
-}
+  highlightId: '',
+  selectId: '',
+};
 
-export default PureClasss;
+Util.setValuesToKeys(SchemaActionTypes, '');
+
+export default SchemaActionTypes;

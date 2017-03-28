@@ -52,6 +52,7 @@ let Map = Immutable.Map;
 import TransformCardComponent from './components/charts/TransformCard';
 import ScoreBar from './components/charts/ScoreBar';
 import Store from './data/BuilderStore';
+import SchemaStore from '../schema/data/SchemaStore';
 import Util from '../util/Util';
 
 // These have to be above the BuilderDisplays import
@@ -803,14 +804,13 @@ export module BuilderTypes
             card['tables'].reduce(
               (list:List<string>, tableBlock: {table: string, alias: string}): List<string> =>
               {
-                let cols: List<string> = Store.getState().getIn(['tableColumns', tableBlock.table]);
-                if(cols)
-                {
-                  return list.concat(cols.map(
-                    (col) => tableBlock.alias + '.' + col
-                  ).toList()).toList();
-                }
-                return list;
+                let dbName = Store.getState().db;
+                let columnNames = SchemaStore.getState().columnNamesByDb.getIn([dbName, dbName + '.' + tableBlock.table]) 
+                  || Immutable.List([]);
+                columnNames = columnNames.map(
+                  columnName => tableBlock.alias + '.' + columnName
+                );
+                return list.concat(columnNames).toList();
               },
               List([])
             ),
@@ -840,19 +840,20 @@ export module BuilderTypes
                 showWhenCards: true,
                 getAutoTerms: (comp:React.Component<any, any>) => 
                 {
-                  let tables = Store.getState().get('tables');
-                  if(!tables)
+                  let db = Store.getState().db;
+                  let tableNames = SchemaStore.getState().tableNamesByDb.get(db);
+                  if(!tableNames)
                   {
-                    var unsubscribe = Store.subscribe(() =>
+                    var unsubscribe = SchemaStore.subscribe(() =>
                     {
-                      if(Store.getState().get('tables'))
+                      if(SchemaStore.getState().tableNamesByDb.get(db))
                       {
                         unsubscribe();
                         comp.forceUpdate();
                       }
                     });
                   }
-                  return tables;
+                  return tableNames;
                 },
                 
                 onFocus: (comp:React.Component<any, any>, value:string) =>

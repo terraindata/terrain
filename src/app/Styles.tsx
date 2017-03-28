@@ -42,55 +42,113 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
-import * as React from 'react';
-import Classs from './Classs';
-import BuilderTypes from '../../builder/BuilderTypes';
-const shallowCompare = require('react-addons-shallow-compare');
+const color = require('color');
+let active = '#00A7F7';
+let lighterActive = color(active).lighten(0.25).string();
 
-class PureClasss<T> extends Classs<T>
+export const Styles =
 {
-  props: T;
-  _debugUpdates = false;
-  _debugName = "Not set";
-  
-  shouldComponentUpdate(nextProps: T, nextState: any)
-  {
-    let shouldUpdate = shallowCompare(this, nextProps, nextState);
-    
-    if(this._debugUpdates && shouldUpdate)
-    {
-      this._compareSets(this.props, nextProps, 'props');
-      this._compareSets(this.state, nextState, 'state');
-    }
-    
-    return shouldUpdate;
-  }
-  
-  _compareSets(first: any, second: any, setName: string)
-  {
-    let firstKeys = _.keys(first);
-    for(var key of firstKeys)
-    {
-      if(first[key] !== second[key])
-      {
-        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
-      }
-    }
-    for(var key in second)
-    {
-      if(firstKeys.indexOf(key) === -1)
-      {
-        console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
-      }
-    }
-  }
-  
-  // TODO
-  // _myKeyPath(el: BuilderTypes.KeyPathClass)
-  // {
-  //   return this._ikeyPath(el.keyPath, el.id);
-  // }
-}
+	margin: 6,
+	
+	colors: 
+	{
+		text:
+		{
+			light: '#aaa',
+			white: '#fff',
+			black: 'rgba(0,0,0,0.8)',
+			
+			loading: '#aaa',
+		},
+		
+		active,
+		
+		transBlack: 'rgba(0,0,0,0.75)',
+	},
+	
+	link:
+	{
+		color: active,
+		cursor: 'pointer',
+		
+		':hover':
+		{
+			color: lighterActive,
+		}
+	},
+	
+	font:
+	{
+		title: {
+		  fontWeight: 'bold',
+		  fontSize: '16px',
+		},
+		semiBoldBig: {
+		  fontWeight: '600',
+		  fontSize: '14px',
+		},
+		big: {
+		  fontWeight: '400',
+		  fontSize: '14px',
+		},
+		boldNormal: {
+		  fontWeight: 'bold',
+		  fontSize: '12px',
+		},
+		semiBoldNormal: {
+		  fontWeight: '500',
+		  fontSize: '12px',
+		},
+		normal: {
+		  fontWeight: '400',
+		  fontSize: '12px',
+		},
+		smallBold: {
+		  fontWeight: 'bold',
+		  fontSize: '10px',
+		},
+		small: {
+		  fontWeight: '400',
+		  fontSize: '10px',
+		},
+		smallest: {
+		  fontWeight: '400',
+		  fontSize: '9px',
+		},
+	},
+	
+	
+	rotate90neg:
+	{
+	  'MozTransform': 'rotate(-90deg)',
+	  'WebkitTransform': 'rotate(-90deg)',
+	  'OTransform': 'rotate(-90deg)',
+	  'msTransform': 'rotate(-90deg)',
+	  'transform': 'rotate(-90deg)',
+	},
+	
+	rotate90:
+	{
+	  'MozTransform': 'rotate(90deg)',
+	  'WebkitTransform': 'rotate(90deg)',
+	  'OTransform': 'rotate(90deg)',
+	  'msTransform': 'rotate(90deg)',
+	  'transform': 'rotate(90deg)',
+	},
+	
+	rotate180: {
+	  'MozTransform': 'rotate(180deg)',
+	  'WebkitTransform': 'rotate(180deg)',
+	  'OTransform': 'rotate(180deg)',
+	  'msTransform': 'rotate(180deg)',
+	  'transform': 'rotate(180deg)',
+	},
+	
+	transition:
+	{
+	  'WebkitTransition': 'all 0.15s',
+	  'transition': 'all 0.15s',
+	},
+};
 
-export default PureClasss;
+export default Styles;
