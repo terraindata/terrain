@@ -51,14 +51,14 @@ Router.get('/', async (ctx, next) =>
 {
 	// return all items, or item by id
 	ctx.body = '';
-  console.log('item root');
+ console.log('item root');
 });
 
 Router.post('/', async (ctx, next) =>
 {
 	// change an item
 	ctx.body = '';
-  console.log('item root');
+ console.log('item root');
 });
 
 export default Router;

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyNodeTypes from "./TastyNodeType";
+import TastyNodeTypes from './TastyNodeType';
 
 export default class TastyNode
 {
@@ -77,7 +77,7 @@ export default class TastyNode
         if (value === null)
             return new TastyNode('null', value);
 
-        var valueType = typeof value;
+        let valueType = typeof value;
         if (valueType == 'number')
             return new TastyNode('number', value);
         if (valueType == 'string')
@@ -96,7 +96,7 @@ export default class TastyNode
     getChild(index: number)
     {
         if (this.numChildren <= index || index < 0)
-            throw new Error("Accessing child index out of bounds.");
+            throw new Error('Accessing child index out of bounds.');
         return this.value[index];
     }
 

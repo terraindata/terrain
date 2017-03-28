@@ -63,7 +63,7 @@ class SQLGeneratorMapping
     }
 }
 
-export var TypeMap = Object.freeze({
+export let TypeMap = Object.freeze({
     'null': new SQLGeneratorMapping('NULL', FixEnum.nullary),
     'reference': new SQLGeneratorMapping(null, FixEnum.nullary),
     'string': new SQLGeneratorMapping(null, FixEnum.nullary),

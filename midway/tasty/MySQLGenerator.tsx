@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyQuery from "./TastyQuery";
-import * as SQLGenerator from "./SQLGenerator";
+import * as SQLGenerator from './SQLGenerator';
+import TastyQuery from './TastyQuery';
 
 export default class MySQLGenerator
 {
@@ -59,11 +59,11 @@ export default class MySQLGenerator
         this.queryString += 'SELECT ';
         this.indent();
 
-        var columns = [];
+        let columns = [];
 
         if (query.isSelectingAll())
         {
-            this.queryString += "* "; //handle "select all" condition
+            this.queryString += '* '; //handle "select all" condition
         } else
         {
             //put selected vars into the select list
@@ -175,7 +175,7 @@ export default class MySQLGenerator
     newLine()
     {
         this.queryString += '\n';
-        for (var i = 0; i < this.indentation; ++i)
+        for (let i = 0; i < this.indentation; ++i)
             this.queryString += '  ';
     }
 
@@ -207,7 +207,7 @@ export default class MySQLGenerator
         }
 
         this.indent();
-        for (var i = 0; ;)
+        for (let i = 0; ; )
         {
             onEach(elements[i]);
 
@@ -233,8 +233,8 @@ export default class MySQLGenerator
         if (!(node.type in SQLGenerator.TypeMap))
             throw new Error('Node type "' + node.type + '" is not supported by MySQLGenerator.');
 
-        var sqlTypeInfo = SQLGenerator.TypeMap[node.type];
-        var fix = sqlTypeInfo.fix;
+        let sqlTypeInfo = SQLGenerator.TypeMap[node.type];
+        let fix = sqlTypeInfo.fix;
         if (node.numChildren == 0)
         {
             //base case
@@ -287,7 +287,7 @@ export default class MySQLGenerator
 
     sqlName(node)
     {
-        var sqlTypeInfo = SQLGenerator.TypeMap[node.type];
+        let sqlTypeInfo = SQLGenerator.TypeMap[node.type];
         if (sqlTypeInfo.sqlName != null)
             return sqlTypeInfo.sqlName;
 
@@ -310,23 +310,23 @@ export default class MySQLGenerator
                 {
                     switch (char)
                     {
-                        case "\0":
-                            return "\\0";
-                        case "\x08":
-                            return "\\b";
-                        case "\x09":
-                            return "\\t";
-                        case "\x1a":
-                            return "\\z";
-                        case "\n":
-                            return "\\n";
-                        case "\r":
-                            return "\\r";
-                        case "\"":
+                        case '\0':
+                            return '\\0';
+                        case '\x08':
+                            return '\\b';
+                        case '\x09':
+                            return '\\t';
+                        case '\x1a':
+                            return '\\z';
+                        case '\n':
+                            return '\\n';
+                        case '\r':
+                            return '\\r';
+                        case '\"':
                         case "'":
-                        case "\\":
-                        case "%":
-                            return "\\" + char;
+                        case '\\':
+                        case '%':
+                            return '\\' + char;
                     }
                 }) + "'";
     }

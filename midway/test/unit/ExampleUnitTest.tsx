@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as test from 'tape';
 import * as chai from 'chai';
+import * as test from 'tape';
 const {assert} = chai;
 import * as sinon from 'sinon';
 
@@ -89,10 +89,9 @@ test('SmartClass constructor accepts an initial count function', (t) => {
   // verify everything
   assert(stub.calledOnce);
   t.equal(myClass.getCount(), initMyCount, 'count is set correctly');
-  t.equal(SmartClass.getTotalCount(), initTotalCount, 'static count is unchanged')
+  t.equal(SmartClass.getTotalCount(), initTotalCount, 'static count is unchanged');
   t.end();
 });
-
 
 // Even though these two test cases re-use a good amount of the same code, it is best to split
 //  your tests into different groups that test each specific behavior. This way, when a test fails,
@@ -113,6 +112,6 @@ test('SmartClass increment() increments instance count and static count', functi
 
   // verify everything
   t.equal(myClass.getCount(), initMyCount + 1, 'instance count is incremented');
-  t.equal(SmartClass.getTotalCount(), initTotalCount + 1, 'static count is incremented')
+  t.equal(SmartClass.getTotalCount(), initTotalCount + 1, 'static count is incremented');
   t.end();
 });

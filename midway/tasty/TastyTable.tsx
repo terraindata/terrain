@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyColumn from "./TastyColumn";
+import TastyColumn from './TastyColumn';
 
 export default class TastyTable
 {

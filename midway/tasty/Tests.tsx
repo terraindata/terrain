@@ -44,11 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Tasty from "./Tasty";
+import * as Tasty from './Tasty';
 
-var DBUsers = new Tasty.TastyTable('users', ['id'], ['name', 'joinDate']);
+let DBUsers = new Tasty.TastyTable('users', ['id'], ['name', 'joinDate']);
 
-var query = new Tasty.TastyQuery(DBUsers);
+let query = new Tasty.TastyQuery(DBUsers);
 console.log(Tasty.MySQLGenerator.convert(query));
 
 query.select([DBUsers.id, DBUsers.name, DBUsers.joinDate]);
@@ -67,7 +67,7 @@ console.log(Tasty.MySQLGenerator.convert(query));
 query.skip(20);
 console.log(Tasty.MySQLGenerator.convert(query));
 
-var q = new Tasty.TastyQuery(DBUsers).select([DBUsers.id, DBUsers.name, DBUsers.joinDate]).filter(DBUsers.id.neq(2134));
+let q = new Tasty.TastyQuery(DBUsers).select([DBUsers.id, DBUsers.name, DBUsers.joinDate]).filter(DBUsers.id.neq(2134));
 q.filter(DBUsers.joinDate.gte('2007-03-24')).filter(DBUsers.joinDate.lt('2017-03-24'));
 q.sort(DBUsers.name, 'asc').sort(DBUsers.id, 'desc').sort(DBUsers.joinDate, 'asc');
 q.take(10).skip(20);

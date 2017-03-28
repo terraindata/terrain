@@ -45,17 +45,17 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // Query objects
-import TastyColumn from "./TastyColumn";
-import TastyTable from "./TastyTable";
-import TastyQuery from "./TastyQuery";
+import TastyColumn from './TastyColumn';
+import TastyQuery from './TastyQuery';
+import TastyTable from './TastyTable';
 
-export * from "./TastyColumn";
-export * from "./TastyTable";
-export * from "./TastyQuery";
+export * from './TastyColumn';
+export * from './TastyTable';
+export * from './TastyQuery';
 
 // Query Generators
-import MySQLGenerator from "./MySQLGenerator";
-import ElasticSearchGenerator from "./ElasticSearchGenerator";
+import ElasticSearchGenerator from './ElasticSearchGenerator';
+import MySQLGenerator from './MySQLGenerator';
 
-export * from "./MySQLGenerator";
-export * from "./ElasticSearchGenerator";
+export * from './MySQLGenerator';
+export * from './ElasticSearchGenerator';

@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyTable from "./TastyTable";
-import TastyNode from "./TastyNode";
+import TastyNode from './TastyNode';
+import TastyTable from './TastyTable';
 
 export default class TastyQuery
 {
@@ -100,13 +100,13 @@ export default class TastyQuery
         if (order != 'asc' && order != 'desc')
             throw new Error('Unknown order "' + order + '".');
 
-        this.sorts.push({node: node, order: order});
+        this.sorts.push({node, order});
         return this;
     }
 
     as(name, node): TastyQuery
     {
-        this.aliases.push({name: name, node: node});
+        this.aliases.push({name, node});
         return this;
     }
 

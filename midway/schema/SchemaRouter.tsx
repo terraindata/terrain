@@ -51,15 +51,14 @@ Router.get('/', async (ctx, next) =>
 {
 	// return all items, or item by id
 	ctx.body = '';
-  console.log('schema root');
+ console.log('schema root');
 });
 
 Router.post('/', async (ctx, next) =>
 {
 	// not allowed right now
 	ctx.body = '';
-  console.log('schema post');
+ console.log('schema post');
 });
-
 
 export default Router;

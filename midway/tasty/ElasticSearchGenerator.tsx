@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyQuery from "./TastyQuery";
-import * as SQLGenerator from "./SQLGenerator";
+import * as SQLGenerator from './SQLGenerator';
+import TastyQuery from './TastyQuery';
 
 export default class ElasticSearchGenerator
 {
@@ -67,11 +67,11 @@ export default class ElasticSearchGenerator
         //stored_fields clause
         if (!query.isSelectingAll())
         {
-            var storedFields = this.getSubclauseList(this.queryObject, 'stored_fields');
-            for(var i  = 0; i < query.selected.length; ++i)
+            let storedFields = this.getSubclauseList(this.queryObject, 'stored_fields');
+            for (let i  = 0; i < query.selected.length; ++i)
             {
-                var column = query.selected[i];
-                var columnName = this.getColumnName(column);
+                let column = query.selected[i];
+                let columnName = this.getColumnName(column);
                 storedFields.push(columnName);
             }
         }
@@ -106,10 +106,10 @@ export default class ElasticSearchGenerator
         //filter clause
         if (query.filters.length > 0)
         {
-            var filterClause = this.getNestedSubclauseObject(this.queryObject, 'query', 'filter');
-            for (var i = 0; i < query.filters.length; ++i)
+            let filterClause = this.getNestedSubclauseObject(this.queryObject, 'query', 'filter');
+            for (let i = 0; i < query.filters.length; ++i)
             {
-                var filter = query.filters[i];
+                let filter = query.filters[i];
                 this.accumulateFilters(filterClause, filter);
             }
         }
@@ -117,14 +117,14 @@ export default class ElasticSearchGenerator
         //sort clause
         if (query.sorts.length > 0)
         {
-            var sortClause = this.getSubclauseList(this.queryObject, 'sort');
+            let sortClause = this.getSubclauseList(this.queryObject, 'sort');
 
-            for (var i = 0; i < query.sorts.length; ++i)
+            for (let i = 0; i < query.sorts.length; ++i)
             {
-                var sort = query.sorts[i];
+                let sort = query.sorts[i];
 
-                var clause = new Object();
-                var column = this.getColumnName(sort.node);
+                let clause = new Object();
+                let column = this.getColumnName(sort.node);
                 clause[column] = (sort.order == 'asc' ? 'asc' : 'desc');
 
                 sortClause.push(clause);
@@ -149,9 +149,8 @@ export default class ElasticSearchGenerator
             throw new Error('Filtering on non-binary expression "' + JSON.stringify(expression) + '".');
 
         //NB: could be made to accept the column on the rhs too, but currently only supports column on lhs
-        var columnName = this.getColumnName(expression.lhs);
-        var value = expression.rhs.value; //could be checked for validity
-
+        let columnName = this.getColumnName(expression.lhs);
+        let value = expression.rhs.value; //could be checked for validity
 
         if (expression.type == '==')
         {
@@ -180,7 +179,7 @@ export default class ElasticSearchGenerator
         }
         else if (expression.type == '||')
         {
-            var shouldClause = this.getSubclauseList(filterClause, 'should');
+            let shouldClause = this.getSubclauseList(filterClause, 'should');
             this.accumulateFilters(shouldClause, expression.lhs);
             this.accumulateFilters(shouldClause, expression.rhs);
         }
@@ -206,36 +205,36 @@ export default class ElasticSearchGenerator
 
     getNestedSubclauseObject(parentClause, clauseName, subclauseName)
     {
-        var clause = this.getSubclauseObject(parentClause, clauseName);
+        let clause = this.getSubclauseObject(parentClause, clauseName);
         return this.getSubclauseObject(clause, subclauseName);
     }
 
     getNestedSubclauseList(parentClause, clauseName, subclauseName)
     {
-        var clause = this.getSubclauseObject(parentClause, clauseName);
+        let clause = this.getSubclauseObject(parentClause, clauseName);
         return this.getSubclauseList(clause, subclauseName);
     }
 
     setRangeClauseIfLesser(filterClause, columnName, filterOperator, value)
     {
-        var columnClause = this.getNestedSubclauseObject(filterClause, 'range', columnName);
+        let columnClause = this.getNestedSubclauseObject(filterClause, 'range', columnName);
         if (!(filterOperator in columnClause) || value < columnClause[filterOperator])
             columnClause[filterOperator] = value;
     }
 
     setRangeClauseIfGreater(filterClause, columnName, filterOperator, value)
     {
-        var columnClause = this.getNestedSubclauseObject(filterClause, 'range', columnName);
+        let columnClause = this.getNestedSubclauseObject(filterClause, 'range', columnName);
         if (!(filterOperator in columnClause) || value > columnClause[filterOperator])
             columnClause[filterOperator] = value;
     }
 
     addFilterTerm(filterClause, clause, subclause, columnName, value)
     {
-        var subclause = this.getNestedSubclauseList(filterClause, clause, subclause);
-        var termKVP = new Object();
+        let subclause = this.getNestedSubclauseList(filterClause, clause, subclause);
+        let termKVP = new Object();
         termKVP[columnName] = value;
-        subclause.push({'term': termKVP});
+        subclause.push({term: termKVP});
     }
 
     getColumnName(expression)
@@ -243,8 +242,8 @@ export default class ElasticSearchGenerator
         if (expression.type != '.' || expression.numChildren != 2)
             throw new Error('Could not find column name in expression "' + JSON.stringify(expression) + '".');
 
-        var table = expression.lhs;
-        var column = expression.rhs;
+        let table = expression.lhs;
+        let column = expression.rhs;
 
         if (table.type != 'reference')
             throw new Error('Could not find table name in expression "' + JSON.stringify(expression) + '".');

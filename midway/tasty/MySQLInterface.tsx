@@ -44,41 +44,41 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import MySQLGenerator from "./MySQLGenerator";
+import MySQLGenerator from './MySQLGenerator';
 
 export default class MySQLInterface
 {
     select(query)
     {
-        var queryString = MySQLGenerator.convert(query);
-        throw new Error("Not implemented.");
+        let queryString = MySQLGenerator.convert(query);
+        throw new Error('Not implemented.');
         //return list of selected objects/rows
     }
 
     update(query)
     {
-        throw new Error("Not implemented.");
+        throw new Error('Not implemented.');
     }
 
     delete(query)
     {
-        throw new Error("Not implemented.");
+        throw new Error('Not implemented.');
     }
 
     insertObjects(table, listOfObjects)
     {
-        throw new Error("Not implemented.");
+        throw new Error('Not implemented.');
     }
 
     updateObjects(table, listOfObjects)
     {
         //replaces objects with given list based on primary key
-        throw new Error("Not implemented.");
+        throw new Error('Not implemented.');
     }
 
     deleteObjects(table, listOfObjects)
     {
         //deletes objects based on primary key
-        throw new Error("Not implemented.");
+        throw new Error('Not implemented.');
     }
 }

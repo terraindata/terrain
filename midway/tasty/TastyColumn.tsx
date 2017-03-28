@@ -44,13 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyNode from "./TastyNode";
-import TastyTable from "./TastyTable";
+import TastyNode from './TastyNode';
+import TastyTable from './TastyTable';
 
 export default class TastyColumn extends TastyNode
 {
     constructor(table: TastyTable, name: any)
     {
-        super('.', [new TastyNode('reference', table.name), new TastyNode('reference', name),]);
+        super('.', [new TastyNode('reference', table.name), new TastyNode('reference', name)]);
     }
 }
