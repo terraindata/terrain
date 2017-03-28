@@ -42,19 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as KoaRouter from 'koa-router';
-let Router = new KoaRouter();
-
-Router.get('/', async (ctx, next) =>
-{
-	ctx.body = '';
-  console.log('auth root');
-});
-
-Router.post('/', async (ctx, next) =>
-{
-	ctx.body = '';
-  console.log('auth post');
-});
-
-export default Router;
+exports.responseTime = require('koa-response-time');
+exports.logger = require('koa-logger');
+exports.compress = require('koa-compress');
+exports.favicon = require('koa-favicon');
+exports.bodyParser = require('koa-bodyparser');
+exports.passport = require('koa-passport');

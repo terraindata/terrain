@@ -46,17 +46,12 @@ THE SOFTWARE.
 require('babel-core/register');
 import * as Koa from 'koa';
 import * as winston from 'winston';
-
 import * as webpack from 'webpack';
 const webpackConfig = require('../webpack.config.js');
-const reqText = require('require-text');
+import Router from './Router';
 import Util from './Util';
 
-
-const app = new Koa();
-
-import Router from './Router';
-
+// process command-line arguments
 const optDefs = [
   {name: 'port', alias: 'p', type: Number, defaultValue: 3000},
   {name: 'db', alias: 'r', type: String, defaultValue: 'mysql'},
@@ -65,29 +60,32 @@ const optDefs = [
 const cmdLineArgs = require('command-line-args');
 const args = cmdLineArgs(optDefs);
 
-Router.post('/oauth2', async function(ctx, next) {
-  console.log(ctx, next);
-});
-
+const reqText = require('require-text');
+const index = reqText('../src/app/index.html', require);
 Router.get('/bundle.js', async function(ctx, next) {
 	// TODO render this if DEV, otherwise render compiled bundle.js
   let response = await Util.getRequest('http://localhost:8080/bundle.js');
   ctx.body = response;
 });
 
-const index = require('require-text')('../src/app/index.html', require);
 Router.get('/', async function(ctx, next) {
+  await next();
   ctx.body = index.toString();
 });
 
+
+const app = new Koa();
+
 app.proxy = true;
 
-const bodyParser = require('koa-bodyparser');
-app.use(bodyParser());
-
-const passport = require('koa-passport');
-app.use(passport.initialize());
-app.use(passport.session());
+const Middleware = require('./Middleware');
+app.use(Middleware.bodyParser());
+app.use(Middleware.favicon());
+app.use(Middleware.logger());
+app.use(Middleware.responseTime());
+app.use(Middleware.compress());
+app.use(Middleware.passport.initialize());
+app.use(Middleware.passport.session());
 
 app.use(Router.routes());
 

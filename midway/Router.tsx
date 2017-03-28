@@ -49,7 +49,6 @@ import VersionRouter from './versions/VersionRouter';
 import SchemaRouter from './schema/SchemaRouter';
 import AuthRouter from './auth/AuthRouter';
 
-
 let AppRouter = new KoaRouter();
 
 AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
@@ -64,7 +63,6 @@ AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
 //  Any route not prefixed with /midway will just serve the front-end.
 
 let MidwayRouter = new KoaRouter();
-
-MidwayRouter.use('/midway', AppRouter.routes(), AppRouter.allowedMethods());
+MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
 
 export default MidwayRouter;

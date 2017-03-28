@@ -45,19 +45,12 @@ THE SOFTWARE.
 import * as KoaRouter from 'koa-router';
 let Router = new KoaRouter();
 
-Router.get('/', async (ctx, next) =>
-{
-	ctx.body = '';
-  console.log('auth root');
-});
+const passport = require('koa-passport');
 
 Router.post('/', async (ctx, next) =>
 {
-	ctx.body = '';
-  console.log('auth root');
 });
 
-const passport = require('koa-passport');
 const LocalStrategy = require('passport-local').Strategy;
 
 export default Router;
