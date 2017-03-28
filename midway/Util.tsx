@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as request from 'request';
 
 module Util
@@ -57,7 +59,7 @@ module Util
 	    });
 	  });
 	}
-	
+
 }
 
 export default Util;

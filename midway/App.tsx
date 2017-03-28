@@ -42,11 +42,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// MIDWAY head file
+// Copyright 2017 Terrain Data, Inc.
+
 require('babel-core/register');
 import * as Koa from 'koa';
-import * as winston from 'winston';
 import * as webpack from 'webpack';
+import * as winston from 'winston';
 const webpackConfig = require('../webpack.config.js');
 import Router from './Router';
 import Util from './Util';
@@ -72,7 +73,6 @@ Router.get('/', async function(ctx, next) {
   await next();
   ctx.body = index.toString();
 });
-
 
 const app = new Koa();
 
