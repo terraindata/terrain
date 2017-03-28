@@ -86,7 +86,9 @@ class ResultsStateC extends BaseClass
   errorMessage: string = '';
   hasAllFieldsError: boolean = false;
   allFieldsErrorMessage: string = '';
-  mainError
+  mainErrorMessage: string = '';
+  subErrorMessage: string = '';
+  errorLine: number = -1;
   
   valid: boolean = false; // are these results still valid for the given query?
   
@@ -450,19 +452,19 @@ export class ResultsManager extends PureClasss<Props>
       {
         let matches = errorMessage.match(/([0-9]+)\:[0-9]+/);
         let line = matches && matches.length >= 2 && parseInt(matches[1]);
-        let mainErrorMessage = error;
+        let mainErrorMessage = errorMessage;
         let subErrorMessage: string = null;
         
         if(line !== NaN && line !== null && line !== undefined)
         {
           mainErrorMessage = 'Error on line ' + line + ': ';
-          subErrorMessage = error;
+          subErrorMessage = errorMessage;
         }
-        console.log(mainErrorMessage, subErrorMessage, errorLine);
+        
         resultsState = resultsState
           .set('mainErrorMessage', mainErrorMessage)
           .set('subErrorMessage', subErrorMessage)
-          .set('errorLine', errorLine);
+          .set('errorLine', line);
       }
     }
     

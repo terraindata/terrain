@@ -114,9 +114,9 @@ class BuilderTQLColumn extends PureClasss<Props>
       this.updateTql(nextProps.query.tql, true);
     }
     
-    if(nextProps.errorLine)
+    if(nextProps.resultsState.errorLine)
     {
-      this.highlightError(nextProps.errorLine);
+      this.highlightError(nextProps.resultsState.errorLine);
     }
   }
 
