@@ -63,22 +63,6 @@ interface Props
 
 class TQLResultsBar extends PureClasss<Props>
 {
-  state: {
-    mainErrorMessage?: string;
-    subErrorMessage?: string;
-    querying?: boolean;
-    resultsSpliced?: number;
-    errorLine?: number;
-    queriedTql?: string;
-    queryId?: string;
-  } = {
-  };
-  
-  componentWillReceiveProps(nextProps:Props) 
-  {
-    // check for an error line?
-  }
-    
   resultsFodderRange = _.range(0, 25);
 
   renderResults()
@@ -101,11 +85,12 @@ class TQLResultsBar extends PureClasss<Props>
           </span>
           <span className="error-title">
             { 
-              resultsState.errorMessage
+              resultsState.mainErrorMessage
             }
           </span>
           <span className="error-message">
             { 
+              resultsState.subErrorMessage
             }
           </span>
         </div>
@@ -153,32 +138,7 @@ class TQLResultsBar extends PureClasss<Props>
       </div>
     );
   }
-  
-  // handleResultsChange(response: QueryResponse)
-  // {
-    
-  //   if(response.errorMessage)
-  //   {
-  //     let error = response.errorMessage;
-  //     error = error.replace(/MySQL/g, 'TerrainDB');
-  //     if(error.charAt(error.length - 1) === '^')
-  //     {
-  //       error = error.substr(0, error.length - 1);
-  //     }
-  //     let matches = error.match(/([0-9]+)\:[0-9]+/);
-  //     let line = matches && matches.length >= 2 && parseInt(matches[1]);
-  //     if(line !== NaN && line !== null && line !== undefined)
-  //     {
-  //       var mainErrorMessage = 'Error on line ' + line + ': ';
-  //       var subErrorMessage = error;
-  //       this.props.onError(line);
-  //     }
-  //     else
-  //     {
-  //       var mainErrorMessage = error;
-  //       var subErrorMessage: string = null;
-  //     }
-  // }
+
   
 	render()
   {

@@ -86,6 +86,7 @@ class ResultsStateC extends BaseClass
   errorMessage: string = '';
   hasAllFieldsError: boolean = false;
   allFieldsErrorMessage: string = '';
+  mainError
   
   valid: boolean = false; // are these results still valid for the given query?
   
@@ -369,6 +370,9 @@ export class ResultsManager extends PureClasss<Props>
       hasError: false,
       loading: (isAllFields && !resultsState.hasLoadedResults) || (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields),
       [isAllFields ? 'hasLoadedAllFields' : 'hasLoadedResults']: true,
+      errorLine: null,
+      mainErrorMessage: null,
+      subErrorMessage: null,
     };
     
     if(!resultsState.hasLoadedCount)
@@ -432,6 +436,7 @@ export class ResultsManager extends PureClasss<Props>
   {  
     let {errorMessage} = response || { errorMessage: '' };
     errorMessage = errorMessage || 'There was no response from the server.';
+    let {resultsState} = this.props;
     
     if(typeof errorMessage === 'string')
     {
@@ -440,6 +445,25 @@ export class ResultsManager extends PureClasss<Props>
         errorMessage = errorMessage.substr(0, errorMessage.length - 1);
       }
       errorMessage = errorMessage.replace(/MySQL/g, 'TerrainDB');
+      
+      if(!isAllFields)
+      {
+        let matches = errorMessage.match(/([0-9]+)\:[0-9]+/);
+        let line = matches && matches.length >= 2 && parseInt(matches[1]);
+        let mainErrorMessage = error;
+        let subErrorMessage: string = null;
+        
+        if(line !== NaN && line !== null && line !== undefined)
+        {
+          mainErrorMessage = 'Error on line ' + line + ': ';
+          subErrorMessage = error;
+        }
+        console.log(mainErrorMessage, subErrorMessage, errorLine);
+        resultsState = resultsState
+          .set('mainErrorMessage', mainErrorMessage)
+          .set('subErrorMessage', subErrorMessage)
+          .set('errorLine', errorLine);
+      }
     }
     
     this.setState({
@@ -447,7 +471,7 @@ export class ResultsManager extends PureClasss<Props>
     });
     
     this.props.onResultsStateChange(
-      this.props.resultsState
+      resultsState
         .set(
           isAllFields ? 'hasAllFieldsError' : 'hasError', 
           true
