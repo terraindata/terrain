@@ -54,7 +54,6 @@ import BuilderTypes from '../../BuilderTypes';
 import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore';
 import {BaseClass, New} from '../../../Classes';
 import PureClasss from './../../../common/components/PureClasss';
-import BuilderActions from '../../data/BuilderActions';
 
 export const MAX_RESULTS = 200;
 
@@ -108,6 +107,8 @@ interface Props
   query: BuilderTypes.Query;
   resultsState: ResultsState;
   db: string;
+  onResultsStateChange: (resultsState: ResultsState) => void;
+  noExtraFields?: boolean;
 }
 
 
@@ -129,7 +130,7 @@ interface State
 
 const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
 
-class ResultsManager extends PureClasss<Props>
+export class ResultsManager extends PureClasss<Props>
 {
   state: State = {};
   
@@ -189,7 +190,8 @@ class ResultsManager extends PureClasss<Props>
       
       let selectCard = query.cards.get(0);
       if(
-        selectCard 
+        !this.props.noExtraFields
+        && selectCard 
         && !selectCard['cards'].some(
             card => card.type === 'groupBy'
           ) 
@@ -360,12 +362,12 @@ class ResultsManager extends PureClasss<Props>
     {
       fields = results.get(0).fields.keySeq().toList();
     }
-    
+
     let changes: any = {
       results,
       fields,
       hasError: false,
-      loading: resultsState.hasLoadedResults && resultsState.hasLoadedAllFields,
+      loading: (isAllFields && !resultsState.hasLoadedResults) || (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields),
       [isAllFields ? 'hasLoadedAllFields' : 'hasLoadedResults']: true,
     };
     
@@ -420,7 +422,7 @@ class ResultsManager extends PureClasss<Props>
       countQuery: null,
     });
     // probably not needed
-    // BuilderActions.results(
+    // this.props.onResultsStateChange(
     //   this.props.resultsState
     //     .set('resultsLongCount', 0)
     // );
@@ -444,7 +446,7 @@ class ResultsManager extends PureClasss<Props>
       [isAllFields ? 'query' : 'allQuery']: null,
     });
     
-    BuilderActions.results(
+    this.props.onResultsStateChange(
       this.props.resultsState
         .set(
           isAllFields ? 'hasAllFieldsError' : 'hasError', 
@@ -457,6 +459,10 @@ class ResultsManager extends PureClasss<Props>
         .set(
           isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
           true
+        )
+        .set(
+          'loading',
+          false
         )
     );
   }
@@ -474,7 +480,7 @@ class ResultsManager extends PureClasss<Props>
         resultsState = resultsState.set(key, value)
     );
     
-    BuilderActions.results(resultsState);
+    this.props.onResultsStateChange(resultsState);
   }
   
 	render()

@@ -1,113 +1,13 @@
 @import "../../common/Common.less";
 
-.terra-GridRow {
-  position: relative;
-  display: flex;
-  flex-direction: row;
+.react-grid-Grid {
+  border: 0px;
 }
 
-.terra-GridColumn {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
+.react-grid-HeaderRow {
+  overflow: hidden;
 }
 
-.terra-LeftSideGridContainer {
-  flex: 0 0 75px;
-  z-index: 10;
-}
-
-.terra-LeftSideGrid {
-  overflow: hidden !important;
-  padding-bottom: 7px;
-  outline: none;
-}
-.terra-HeaderGrid {
-  width: 100%;
-  overflow: hidden !important;
-}
-.terra-BodyGrid {
-  width: 100%;
-  outline: none;
-}
-
-.terra-evenRow {
-}
-.terra-oddRow {
-  background-color: rgba(0, 0, 0, .1);
-}
-
-
-.terra-cell,
-.terra-headerCell,
-.terra-leftCell {
-  width: 100%;
-  height: 100%;
-  // display: flex;
-  // flex-direction: column;
-  // justify-content: center;
-  // align-items: center;
-  text-align: left;
-  
+.react-grid-Cell {
   box-sizing: border-box;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  
-  .result-field-value-image {
-    max-width: 32px !important;
-    max-height: 32px !important;
-    margin: -4px 0px;
-    height: calc(~"100% + 8px");
-    width: calc(~"100% + 4px");
-  }
-}
-
-@p: 8px;
-
-.terra-headerCell {
-  padding: @p;
-}
-
-.terra-cell-inner {
-  width: 100%;
-  overflow: hidden;
-  .transition;
-  padding: @p;
-}
-
-.terra-menuCell {
-  .menu-wrapper {
-    opacity: 0;
-  }
-  &:hover {
-    .terra-cell-inner {
-      width: calc(~"100% - 50px");
-    }
-    .menu-wrapper {
-      opacity: 1;
-    }
-  }
-}
-
-.terra-cell-wrapper {
-  padding: 0px @p; // for some reason it seems that y works fine by x padding is not accounted for.terra- not sure if this is accurate
-}
-
-.terra-headerCell,
-.terra-leftCell {
-  font-weight: bold;
-  border-left: 1px solid mix(#555, @aged-moss);
-}
-.terra-headerCell {
-}
-
-.terra-bodyCell {
-  background: #fff;
-  color: @grey;
-  border-left: 1px solid mix(@fresh-moss, #fff);
-  
-  &.terra-oddRow {
-    background: @builder-bg;
-  }
 }

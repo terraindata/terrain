@@ -295,6 +295,37 @@ input {
 }
 
 
+@keyframes loading-keyframes {
+  0% {
+    content: 'Loading'
+  }
+  17% {
+    content: 'Loading.'
+  }
+  34% {
+    content: 'Loading..'
+  }
+  51% {
+    content: 'Loading...'
+  }
+  68% {
+    content: 'Loading..'
+  }
+  85% {
+    content: 'Loading.'
+  }
+  100% {
+    content: 'Loading'
+  }
+}
+.loading-text {
+  &:after {
+    content: 'Loading';
+    display: block;
+    animation: loading-keyframes 1.5s linear infinite;
+  }
+}
+
 
 /* Mixins */
 

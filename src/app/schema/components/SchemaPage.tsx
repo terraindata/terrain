@@ -42,106 +42,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
-import * as _ from 'underscore';
-const ReactDataGrid = require('react-data-grid');
+import PureClasss from './../../common/components/PureClasss';
+var HTML5Backend = require('react-dnd-html5-backend');
+import { DragDropContext } from 'react-dnd';
+const {browserHistory} = require('react-router');
 
-require('./Table.less');
-
-import * as classNames from 'classnames';
-import PureClasss from './PureClasss';
-import Util from '../../util/Util';
-import {Menu, MenuOption} from '../../common/components/Menu';
-const Dimensions = require('react-dimensions');
-
-const LEFT_COLOR_FROM = hexToRgb('#a2af93')
-const LEFT_COLOR_TO = hexToRgb('#828c76')
-const TOP_COLOR_FROM = hexToRgb('#565d4e')
-const TOP_COLOR_TO = hexToRgb('#3e3c3c')
-
-export interface IColumn
-{
-  key: string;
-  name: string;
-  resizable?: boolean;
-  width?: number;
-}
+import SchemaView from './SchemaView';
 
 interface Props
 {
-  columns: List<IColumn>;
-  rowGetter: (index: number) => Object;
-  rowsCount: number;
-  // rows: List<Map<any, any>>;
-  random?: number;
-  onCellClick?: (r: number, c: number) => void;
-  menuOptions?: List<MenuOption>;
-  rowKey: string;
-  rowHeight?: number;
-  
-  containerWidth?: number;
-  containerHeight?: number;
+  params?: any;
+  location?: {
+    pathname: string;
+  };
 }
 
-const HEADER_ROW_HEIGHT = 35;
-const MAX_INIT_HEIGHT = 40;
-const MAX_INIT_WIDTH = 300;
-
-class _Table extends PureClasss<Props>
+class SchemaPage extends PureClasss<Props>
 {
-  state: {
-  } = {
-  };
-  
-  constructor(props:Props)
-  {
-    super(props);
-  }
-  
   render()
   {
-    console.log(this.props.containerHeight);
     return (
-      <ReactDataGrid
-        {...this.props}
-        columns={this.props.columns.toJS()}
-        minHeight={this.props.containerHeight}
-        minWidth={this.props.containerWidth}
+      <SchemaView
+        fullPage={true}
+        showSearch={true}
       />
     );
   }
 }
 
-export const Table = Dimensions({
-  elementResize: true,
-  containerStyle: {
-    height: '100%',
-  },
-})(_Table);
-
-function hexToRgb (hex) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : null
-}
-
-/**
- * Ported from sass implementation in C
- * https://github.com/sass/libsass/blob/0e6b4a2850092356aa3ece07c6b249f0221caced/functions.cpp#L209
- */
-function mixColors (color1, color2, amount) {
-  const weight1 = amount
-  const weight2 = 1 - amount
-
-  const r = Math.round(weight1 * color1.r + weight2 * color2.r)
-  const g = Math.round(weight1 * color1.g + weight2 * color2.g)
-  const b = Math.round(weight1 * color1.b + weight2 * color2.b)
-
-  return { r, g, b }
-}
-
-export default Table;
+export default DragDropContext(HTML5Backend)(SchemaPage);

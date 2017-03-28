@@ -104,10 +104,6 @@ const BuilderActions =
     (open: boolean) =>
       $(ActionTypes.toggleDeck, { open }),
   
-  changeTables:
-    (db: string, tables: Tables, tableColumns: TableColumns) =>
-      $(ActionTypes.changeTables, { db, tables, tableColumns }),
-  
   // fetches the query from the server
   fetchQuery:
     (variantId: ID, handleNoVariant: (variantId:ID) => void) =>

@@ -53,20 +53,22 @@ import Util from '../../util/Util';
 import Menu from '../../common/components/Menu';
 import { MenuOption } from '../../common/components/Menu';
 import PanelMixin from './layout/PanelMixin';
-import InputsArea from "./inputs/InputsArea";
-import CardsColumn from "./cards/CardsColumn";
-import ResultsArea from "./results/ResultsArea";
 import UserStore from '../../users/data/UserStore';
 import RolesStore from '../../roles/data/RolesStore';
 import LibraryTypes from '../../library/LibraryTypes';
-import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import InfoArea from '../../common/components/InfoArea';
 const shallowCompare = require('react-addons-shallow-compare');
 import * as moment from 'moment';
 import Ajax from "./../../util/Ajax";
-import Manual from './../../manual/components/Manual';
 import BuilderTypes from '../BuilderTypes';
 type Query = BuilderTypes.Query;
+
+import InputsArea from "./inputs/InputsArea";
+import CardsColumn from "./cards/CardsColumn";
+import ResultsArea from "./results/ResultsArea";
+import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
+import Manual from './../../manual/components/Manual';
+import SchemaView from '../../schema/components/SchemaView';
 
 var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
@@ -83,8 +85,9 @@ enum COLUMNS {
   Results,
   TQL,
   Inputs,
-  Manual,
+  Schema,
 };
+  // Manual,
 var NUM_COLUMNS = 5;
 
 var menuIcons = [
@@ -92,8 +95,8 @@ var menuIcons = [
     {icon: <ResultsIcon />, color: '#71bca2'},
     {icon: <TQLIcon />, color: '#d47884'},
     {icon: <InputsIcon />, color: '#c2b694'},
-    {icon: <ManualIcon />, color: "#a98abf"}
-];
+    {icon: <ManualIcon />, color: "#a98abf"},
+]; // TODO add schema icon above
 
 // interface Props
 // {
@@ -242,11 +245,16 @@ var BuilderColumn = React.createClass<any, any>(
           resultsState={this.props.resultsState}
         />;
         
-      case COLUMNS.Manual:
-        return <Manual 
-          selectedKey={this.props.selectedCardName}
-          changeCardName={this.props.changeSelectedCardName}
+      case COLUMNS.Schema:
+        return <SchemaView
+          fullPage={false}
+          showSearch={true}
         />;
+      // case COLUMNS.Manual:
+      //   return <Manual 
+      //     selectedKey={this.props.selectedCardName}
+      //     changeCardName={this.props.changeSelectedCardName}
+      //   />;
     }
     return <div>No column content.</div>;
   },
@@ -351,7 +359,7 @@ var BuilderColumn = React.createClass<any, any>(
         <div
           className={classNames({
             'builder-column-content': true,
-            'builder-column-manual': this.state.column === COLUMNS.Manual,
+            // 'builder-column-manual': this.state.column === COLUMNS.Manual,
             'builder-column-content-scroll': 
               this.state.column === COLUMNS.Builder ||
                 this.state.column === COLUMNS.Inputs,
