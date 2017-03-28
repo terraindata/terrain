@@ -196,7 +196,6 @@ class Builder extends PureClasss<Props>
   componentWillMount()
   {
     this.checkConfig(this.props);
-    this.loadTables(this.props);
   }
   
   componentDidMount()

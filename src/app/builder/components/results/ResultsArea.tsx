@@ -357,7 +357,8 @@ column if you have set a custom results view.');
     }
     else if(resultsState.results)
     {
-      text = `${resultsState.count || 'No'} result${resultsState.count === 1 ? '' : 's'}`;
+      let {count} = resultsState;
+      text = `${count || 'No'}${count === MAX_RESULTS ? '+' : ''} result${count === 1 ? '' : 's'}`;
     }
     else
     {

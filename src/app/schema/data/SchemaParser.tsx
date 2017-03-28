@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import {SchemaTypes, TableNamesByDb, ColumnNamesByDb} from '../SchemaTypes';
+import SchemaTypes from '../SchemaTypes';
 import * as Immutable from 'immutable';
 let {Map, List} = Immutable;
 
@@ -56,15 +56,7 @@ export module SchemaParser
 	export function parseDb(
 		db: string, 
 		colsData: any[], 
-		setDbAction: 
-			(
-	      database: Database, 
-	      tables: Map<ID, Table>, 
-	      columns: Map<ID, Column>, 
-	      indexes: Map<ID, Index>,
-	      columnNames: List<string>,
-	      tableNames: Map<string, List<string>>,
-	    ) => void
+		setDbAction: (payload: SchemaTypes.SetDbActionPayload) => void
 	) {
 		let database = SchemaTypes._Database({
 			name: db,
@@ -76,7 +68,7 @@ export module SchemaParser
 		let indexes: Map<ID, Index> =  Map<ID, Index>({});
 		
 		let tableNames = List<string>([]);
-		let columnNames = Map<string, List<string>>([]);
+		let columnNamesByTable = Map<string, List<string>>([]);
 		
     colsData.map(
     (
@@ -132,14 +124,29 @@ export module SchemaParser
     	});
        
       columns = columns.set(column.id, column);
-      columnNames = columnNames.push(table.name + '.' + column.name);
+      
+      if(!columnNamesByTable.get(table.id))
+      {
+      	columnNamesByTable = columnNamesByTable.set(table.id, List([]));
+      }
+      columnNamesByTable = columnNamesByTable.update(table.id,
+      	list => list.push(column.name)
+      );
+      
       tables = tables.setIn(
       	[tableId, 'columnIds'],
       	table.columnIds.push(column.id)
       );
     });
     
-    setDbAction(database, tables, columns, indexes, tableNames, columnNames);    
+    setDbAction({
+    	database, 
+    	tables, 
+    	columns, 
+    	indexes, 
+    	tableNames, 
+    	columnNames: columnNamesByTable,
+    });
 	}
 }
 

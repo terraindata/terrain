@@ -365,12 +365,13 @@ export class ResultsManager extends PureClasss<Props>
     {
       fields = results.get(0).fields.keySeq().toList();
     }
-    
+    console.log('loaded ' + (isAllFields ? 'all' : 'none'), (!isAllFields || resultsState.hasLoadedResults) && (isAllFields || resultsState.hasLoadedAllFields || !this.props.noExtraFields)
+      , !isAllFields, resultsState.hasLoadedResults, isAllFields, resultsState.hasLoadedAllFields);
     let changes: any = {
       results,
       fields,
       hasError: false,
-      loading: resultsState.hasLoadedResults && (resultsState.hasLoadedAllFields || !this.props.noExtraFields),
+      loading: (isAllFields && !resultsState.hasLoadedResults) || (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields),
       [isAllFields ? 'hasLoadedAllFields' : 'hasLoadedResults']: true,
     };
     
@@ -462,6 +463,10 @@ export class ResultsManager extends PureClasss<Props>
         .set(
           isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
           true
+        )
+        .set(
+          'loading',
+          false
         )
     );
   }

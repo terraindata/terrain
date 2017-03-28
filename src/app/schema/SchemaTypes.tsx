@@ -49,9 +49,6 @@ import Util from '../util/Util';
 
 type IDList = ID[] | List<ID>;
 
-export type TableNamesByDb = Map<string, List<string>>;
-export type ColumnNamesByDb = Map<string, Map<string, List<string>>>;
-
 export module SchemaTypes
 {
 	export class SchemaBaseClass extends BaseClass
@@ -232,6 +229,20 @@ export module SchemaTypes
 			type: string;
 		}
 	];
+	
+	
+	export type TableNamesByDb = Map<string, List<string>>;
+	export type ColumnNamesByDb = Map<string, Map<string, List<string>>>;
+	export interface SetDbActionPayload
+	{
+		database: Database;
+		tables: Map<ID, Table>;
+		columns: Map<ID, Column>;
+		indexes: Map<ID, Index>;
+		columnNames: Map<string, List<string>>;
+		tableNames: List<string>;
+	};
+
 }
 
 export default SchemaTypes;
