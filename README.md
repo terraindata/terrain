@@ -108,12 +108,6 @@ Contains Actions and Stores for Redux.
 - `[SmallerApp]Store.tsx`: the Store that defines that app's default state and its reducers
 - `[SmallerApp || CategoryOfFunctions]Reducers.tsx`: defines reducers relating to a common function in that smaller app. If the smaller app doesn't have many different actions, there may be just one reducers file.
 
-### src/typings
-
-Contains TypeScript typings.
-
-*Note*: When installing new types, make sure to `cd src` before you `tsd install`
-
 ## Packages and Imports
 
 ### To install a package from npm
@@ -124,18 +118,16 @@ This will install the package and also add a reference to it in your `package.js
 
 If you forget to add `--save`, no line will be added to `package.json`
 
-You will then need to `cd` into `src` and run `tsd install [package_name]` to install any associated typing files. This will add a new directory to `src/typings`, which you should include in your commit.
+You will then need to try to install any Typescript types that are available for the package: `npm install @types/[package-name] --save`. If this succeeds, Typescript types are available and you can import this package with the `import * as Package from 'package-name';` syntax. If this does not succeed, then there are no publicly available types, and you have to use `const Package = require('package');`
 
-If there are no public typings available for this package, then `tsd` will tell you that it has written 0 files. In that case, you cannot use the `import` syntax to include the package, but must use the `require` syntax.
+You can also combine these two installs into one line. You can also use `npm i` as a shortcut for `npm install`
 
 For example, to add `truffle-oil` to my app, I would:
 1. `cd ~/git/Search`
-1. `npm install truffle-oil --save`
+1. `npm install truffle-oil @types/truffle-oil --save`
 1. `git add package.json`
-1. `cd src`
-1. `tsd install truffle-oil`
-1. `cd ..`
-1. `git add typings`
+1. Commit the changes
+
 
 ### Importing / requiring files
 
