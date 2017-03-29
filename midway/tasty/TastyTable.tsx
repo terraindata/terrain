@@ -50,6 +50,7 @@ export default class TastyTable
 {
     name: string;
     primaryKey: string[];
+
     constructor(name: string, primaryKey: string[], columns: string[])
     {
         //primary key is a list, so that composite keys can be supported

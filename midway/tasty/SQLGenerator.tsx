@@ -56,6 +56,7 @@ class SQLGeneratorMapping
 {
     sqlName: string;
     fix: FixEnum;
+
     constructor(sqlName: string, fixType: FixEnum)
     {
         this.sqlName = sqlName;

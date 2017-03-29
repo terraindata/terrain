@@ -51,6 +51,7 @@ export default class TastyNode
     type: string;
     value: any;
     chidlren: any;
+
     constructor(type: string, value: any)
     {
         if (!(type in TastyNodeTypes))

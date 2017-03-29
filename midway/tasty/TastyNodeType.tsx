@@ -48,11 +48,13 @@ class TastyNodeType
 {
     readonly name: string;
     readonly code: number;
+
     constructor(name: string, code: number)
     {
         this.name = name;
         this.code = code;
     }
+
     toString(): string
     {
         return JSON.stringify(this, null, 2);

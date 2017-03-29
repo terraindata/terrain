@@ -51,6 +51,7 @@ export default class MySQLGenerator
 {
     queryString: string;
     private indentation: number;
+
     constructor(query: TastyQuery)
     {
         this.queryString = '';

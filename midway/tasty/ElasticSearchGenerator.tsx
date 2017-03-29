@@ -51,6 +51,7 @@ export default class ElasticSearchGenerator
 {
     queryObject: any;
     tableName: string;
+
     constructor(query)
     {
         this.queryObject = {};
