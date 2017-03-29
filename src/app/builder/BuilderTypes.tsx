@@ -1236,7 +1236,7 @@ export module BuilderTypes
     weight: _block(
     {
       key: "",
-      weight: 0,
+      weight: 1,
       static: {
         tql: "$weight, $key",
         removeOnCardRemove: true,
