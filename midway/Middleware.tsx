@@ -44,9 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-exports.responseTime = require('koa-response-time');
-exports.logger = require('koa-logger');
-exports.compress = require('koa-compress');
-exports.favicon = require('koa-favicon');
-exports.bodyParser = require('koa-bodyparser');
-exports.passport = require('koa-passport');
+import * as koaLogger from 'koa-logger';
+import * as koaCompress from 'koa-compress';
+import * as koaFavicon from 'koa-favicon';
+import * as koaBodyParser from 'koa-bodyparser';
+import * as koaPassport from 'koa-passport';
+
+namespace Middleware {
+  export const responseTime = require('koa-response-time');
+  export const logger = koaLogger;
+  export const compress = koaCompress;
+  export const favicon = koaFavicon;
+  export const bodyParser = koaBodyParser;
+  export const passport = koaPassport;
+}
+
+export default Middleware;

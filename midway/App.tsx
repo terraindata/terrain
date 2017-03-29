@@ -78,7 +78,7 @@ const app = new Koa();
 
 app.proxy = true;
 
-const Middleware = require('./Middleware');
+import Middleware from './Middleware';
 app.use(Middleware.bodyParser());
 app.use(Middleware.favicon());
 app.use(Middleware.logger());
