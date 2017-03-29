@@ -1,0 +1,15 @@
+{
+    "lintOptions": {
+        "typeCheck": true
+    },
+    "extends": "tslint:recommended",
+    "rules": {
+        "quotemark": [true,
+            "single",
+            "avoid-escape"
+        ],
+        "file-header": [true,
+            "Copyright \\d{4} Terrain Data, Inc."
+        ]
+    }
+}

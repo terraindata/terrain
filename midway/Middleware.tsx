@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 exports.responseTime = require('koa-response-time');
 exports.logger = require('koa-logger');
 exports.compress = require('koa-compress');

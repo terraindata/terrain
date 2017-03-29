@@ -42,12 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as KoaRouter from 'koa-router';
-import UserRouter from './users/UserRouter';
-import ItemRouter from './items/ItemRouter';
-import VersionRouter from './versions/VersionRouter';
-import SchemaRouter from './schema/SchemaRouter';
 import AuthRouter from './auth/AuthRouter';
+import ItemRouter from './items/ItemRouter';
+import SchemaRouter from './schema/SchemaRouter';
+import UserRouter from './users/UserRouter';
+import VersionRouter from './versions/VersionRouter';
 
 let AppRouter = new KoaRouter();
 
