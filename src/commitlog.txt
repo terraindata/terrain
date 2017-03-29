@@ -1,100 +1,100 @@
-commit fe9dae21d8cace24c958091f546d7561688677fd
+commit 015113a53adc12d3f1ed181d7fffeb5007bd7b06
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Mon Mar 6 23:01:34 2017 -0700
+Date:   Tue Mar 28 15:07:43 2017 -0700
 
-    Fixing date bug with tql to cards
+    Quick fixing some typos with the errors
 
-commit d718399e6da0cd665359db5913d91681f7b5f0fe
-Merge: 862e034 76a063d
+commit 0ebb31e0152776b0f7381965614e7899ca806044
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Mon Mar 6 16:41:48 2017 -0800
+Date:   Tue Mar 28 14:51:06 2017 -0700
 
-    Merge branch 'results-manager'
+    Re-add tql error line support
 
-commit 76a063d3038bda8c8df449da532013608a9af7cc
+commit a17874bc099f6cc79338ff536e3e85cd999c321c
+Merge: 52d0a22 4b9007c
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Mon Mar 6 10:59:13 2017 -0800
+Date:   Tue Mar 28 12:21:54 2017 -0700
 
-    Polishes on results manager
+    Merge branch 'schema'
 
-commit ff732fe47135801d6ab7efe6cbe3443d78697fba
+commit 4b9007cc6160c4b49005de7932b0f1bb86b486ee
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Mon Mar 6 10:02:37 2017 -0800
+Date:   Tue Mar 28 12:19:07 2017 -0700
 
-    TQL column uses results manager
+    bg fff
 
-commit 9e4cb209279a3390d7cef7a9933f4b859705a515
+commit 20e89bbc9fb04f91ef54b668cf9d995060f99225
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Fri Mar 3 16:50:15 2017 -0800
+Date:   Tue Mar 28 12:18:23 2017 -0700
 
-    What has resulted from the results manager
+    Information for schema results when databsae is selected; blank message otherwise
 
-commit 3aa53be8d54fd1e16d6a0fbc849f7df4376bde09
+commit 03d97030b1f9f4a7502ca44f1821d8b36430ea03
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Fri Mar 3 13:49:18 2017 -0800
+Date:   Tue Mar 28 11:18:16 2017 -0700
 
-    results are ready for debugging
+    Adapting builder to new schema format finished
 
-commit 14ef325bcdf4b5bb165dc56dcf149365d3a8a883
+commit 1490711cbc007163ba99c7bf6b0e2de6cf7f20a8
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Fri Mar 3 11:17:06 2017 -0800
+Date:   Fri Mar 24 11:59:51 2017 -0700
 
-    Results manager ready for some testing
+    Progress on adapting new schema
 
-commit 862e034b95fe1c9b57992b8c8bb1ba50fa6010f0
-Merge: c360970 66f08c3
+commit b839fdb2bbde1bb7a4a240588cf53a305ac7f619
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Thu Mar 2 14:50:48 2017 -0800
+Date:   Wed Mar 22 20:32:14 2017 -0700
 
-    Merge branch 'master' of git.terrain.int:terrain/Search
+    More progress on schema and builder interaction
 
-commit c360970bba55834fc4a8460257a4a4710e938a87
+commit 52d0a22f042f32605a3fb2d0a6410d037c1ca423
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Thu Mar 2 14:50:42 2017 -0800
+Date:   Wed Mar 22 14:32:34 2017 -0700
 
-    README change
+    README additions for major dependencies
 
-commit 66f08c32bfe528a25fe2b5e5f828be88642da47a
-Author: Abhishek Kulkarni <abhishek.kulkarni@terraindata.com>
-Date:   Thu Mar 2 12:06:12 2017 -0800
-
-    Fix build-gcloud webpack target.
-
-commit 1b3dd63fe99dccbea763098d994ec2d33700c7ce
+commit 2e76e59e0d6de88ed6ad03a23f44d8c0d8ae16d0
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Thu Mar 2 11:29:21 2017 -0800
+Date:   Wed Mar 22 11:08:22 2017 -0700
 
-    README update
+    README additions for editors
 
-commit 6a6d84dfa0bbad89e3d30b5d29e7d48d4fb1354e
+commit e47d7e5351260c0ddedde231e00706e90fe8d8c9
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Thu Mar 2 11:28:34 2017 -0800
+Date:   Wed Mar 22 10:40:57 2017 -0700
 
-    Update deploy scripts
+    Progress on adapting Builder to new schema store
 
-commit 499b2d88b9f81d7c45a2255ac08124da03df8bbb
+commit 9eebf88f3e155a156446977e92382e93a497e3e4
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Thu Mar 2 11:21:39 2017 -0800
+Date:   Mon Mar 20 14:53:00 2017 -0700
 
-    Adding gitignore for commit log
+    README changes for new syntax
 
-commit 2c0102471a1d3e25908dc7100f3b9ea2223955e5
+commit ebfd12126b7c8f24a6e483135f23901c4f9f0018
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Thu Mar 2 11:21:10 2017 -0800
+Date:   Fri Mar 17 18:47:40 2017 -0700
 
-    Addnig a commit log to the interface
+    Progress on diagnosing schema bugs and updating builder to new schema
 
-commit c36beb7cc42116c963b3d1993677e1d8c66049ba
+commit 3368ea47d3230d4ac0d530e0d8f44c741608c70e
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Thu Mar 2 10:38:46 2017 -0800
+Date:   Wed Mar 15 12:16:11 2017 -0700
 
-    merge more
+    A new table library, much better than the old one
 
-commit ea365802689e4d92c95e70198ca1119ce58daf7b
+commit 6163ad8b7ae2203f711a9c00b222db65cf541500
 Author: Luke Knepper <luke@terraindb.com>
-Date:   Thu Mar 2 09:57:00 2017 -0800
+Date:   Tue Mar 14 10:20:51 2017 -0700
 
-    Merge progress
+    Schema results table, basic version
 
-commit 360a527f90126dfac795e013a354616281743a9d
+commit aa12bfbcca9e8eca63bb38b49549f43f63f2595a
+Merge: 933f0d4 39d3382
+Author: Luke Knepper <luke@terraindb.com>
+Date:   Mon Mar 13 09:37:19 2017 -0700
+
+    Merge branch 'master' into schema
+
+commit 933f0d4b06107aed7a54261b11adde831469868c
 Author: Luke Knepper <luke@terraindb.com>
