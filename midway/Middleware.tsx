@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as koaLogger from 'koa-logger';
+import * as koaBodyParser from 'koa-bodyparser';
 import * as koaCompress from 'koa-compress';
 import * as koaFavicon from 'koa-favicon';
-import * as koaBodyParser from 'koa-bodyparser';
+import * as koaLogger from 'koa-logger';
 import * as koaPassport from 'koa-passport';
 
 namespace Middleware {
