@@ -49,16 +49,16 @@ let Router = new KoaRouter();
 
 Router.get('/', async (ctx, next) =>
 {
-	// return all items, or item by id
-	ctx.body = '';
- console.log('user root');
+  // return all items, or item by id
+  ctx.body = '';
+  console.log('user root');
 });
 
 Router.post('/', async (ctx, next) =>
 {
-	// change or create a user
-	ctx.body = '';
- console.log('user post');
+  // change or create a user
+  ctx.body = '';
+  console.log('user post');
 });
 
 export default Router;

@@ -49,286 +49,323 @@ import TastyQuery from './TastyQuery';
 
 export default class MySQLGenerator
 {
-    queryString: string;
-    private indentation: number;
+  private queryString: string;
+  private indentation: number;
 
-    constructor(query: TastyQuery)
+  constructor(query: TastyQuery)
+  {
+    this.queryString = '';
+    this.indentation = 0;
+
+    this.queryString += 'SELECT ';
+    this.indent();
+
+    let columns = [];
+
+    if (query.isSelectingAll())
     {
-        this.queryString = '';
-        this.indentation = 0;
+      this.queryString += '* '; // handle "select all" condition
+    } else
+    {
+      // put selected vars into the select list
+      if (query.selected != null)
+      {
+        this.appendStandardClause(
+          null,
+          false,
+          query.selected,
+          (column) =>
+          {
+            columns.push(column);
+            this.appendSubexpression(column);
+          },
+          () =>
+          {
+            this.queryString += ', ';
+          });
+      }
 
-        this.queryString += 'SELECT ';
-        this.indent();
+      // put alias expressions into the select list
+      this.appendStandardClause(
+        null,
+        true,
+        query.aliases,
+        (alias) => {
+          columns.push(alias.name);
+          this.appendSubexpression(alias.query);
+          this.queryString += ' AS ';
+          this.queryString += this.escapeString(alias.name);
+        },
+        () => {
+          this.queryString += ', ';
+          this.newLine();
+        });
 
-        let columns = [];
+      this.queryString += ' ';
+    }
 
-        if (query.isSelectingAll())
+    // write FROM clause
+    this.newLine();
+    this.queryString += 'FROM ';
+    this.queryString += this.escapeString(query.table.name);
+
+    // write WHERE clause
+    if (query.filters.length > 0)
+    {
+      this.appendStandardClause(
+        'WHERE',
+        true,
+        query.filters,
+        (filter) =>
         {
-            this.queryString += '* '; //handle "select all" condition
-        } else
+          this.appendSubexpression(filter);
+        },
+        () =>
         {
-            //put selected vars into the select list
-            if (query.selected != null)
-            {
-                this.appendStandardClause(
-                    null,
-                    false,
-                    query.selected,
-                    (column) =>
-                    {
-                        columns.push(column);
-                        this.appendSubexpression(column);
-                    },
-                    () =>
-                    {
-                        this.queryString += ', ';
-                    });
-            }
+          this.newLine();
+          this.queryString += ' AND ';
+        });
+    }
 
-            //put alias expressions into the select list
-            this.appendStandardClause(
-                null,
-                true,
-                query.aliases,
-                (alias) =>
-                {
-                    columns.push(alias.name);
-                    this.appendSubexpression(alias.query);
-                    this.queryString += ' AS ';
-                    this.queryString += this.escapeString(alias.name);
-                },
-                () =>
-                {
-                    this.queryString += ', ';
-                    this.newLine();
-                });
+    // write ORDER BY clause
+    if (query.sorts.length > 0)
+    {
+      this.appendStandardClause(
+        'ORDER BY',
+        true,
+        query.sorts,
+        (sort) =>
+        {
+          this.appendSubexpression(sort.node);
+          this.queryString += ' ';
+          this.queryString += (sort.order === 'asc' ? 'ASC' : 'DESC');
+        },
+        () =>
+        {
+          this.queryString += ', ';
+        });
+    }
 
-            this.queryString += ' ';
+    if (query.numTaken != null || query.numSkipped != null)
+    {
+      this.newLine();
+
+      if (query.numTaken != null)
+      {
+        this.queryString += 'LIMIT ' + query.numTaken;
+        if (query.numSkipped !== null)
+        {
+          this.queryString += ' ';
+        }
+      }
+
+      if (query.numSkipped != null)
+      {
+        this.queryString += 'OFFSET ' + query.numSkipped;
+      }
+    }
+
+    this.queryString += ';';
+  }
+
+  static convert(node)
+  {
+    return new MySQLGenerator(node).queryString;
+  }
+
+  private newLine()
+  {
+    this.queryString += '\n';
+    for (let i = 0; i < this.indentation; ++i)
+    {
+      this.queryString += '  ';
+    }
+  }
+
+  private indent()
+  {
+    this.indentation++;
+  }
+
+  private unindent()
+  {
+    this.indentation = Math.max(this.indentation - 1, 0);
+  }
+
+  private appendStandardClause(clauseName, onNewLine, elements, onEach, onSeparator)
+  {
+    // skip empty clauses
+    if (elements.length === 0)
+    {
+      return;
+    }
+
+    if (onNewLine)
+    {
+      this.newLine();
+    }
+
+    // ignore null clause names
+    if (clauseName != null)
+    {
+      if (!onNewLine)
+      {
+        this.queryString += ' ';
+      }
+      this.queryString += clauseName + ' ';
+    }
+
+    this.indent();
+    for (let i = 0; ; )
+    {
+      onEach(elements[i]);
+
+      ++i;
+      if (i >= elements.length)
+      {
+        break;
+      }
+
+      onSeparator();
+    }
+    this.unindent();
+  }
+
+  private appendSubexpression(node)
+  {
+    this.indent();
+    this.appendExpression(node);
+    this.unindent();
+  }
+
+  private appendExpression(node)
+  {
+    // depth first in order
+    if (!(node.type in SQLGenerator.TypeMap))
+    {
+      throw new Error('Node type "' + node.type + '" is not supported by MySQLGenerator.');
+    }
+
+    let sqlTypeInfo = SQLGenerator.TypeMap[node.type];
+    let fix = sqlTypeInfo.fix;
+    if (node.numChildren === 0)
+    {
+      // base case
+      if (fix !== SQLGenerator.FixEnum.nullary)
+      {
+        throw new Error("Non-operator node that isn't nullary.");
+      }
+
+      this.queryString += this.sqlName(node);
+    } else
+    {
+      // recursive case
+
+      if (fix === SQLGenerator.FixEnum.prefix)
+      {
+        if (node.value.length !== 1)
+        {
+          throw new Error('Prefix operator of type "' + node.type + '" has the wrong number of operators.');
         }
 
-        //write FROM clause
-        this.newLine();
-        this.queryString += 'FROM ';
-        this.queryString += this.escapeString(query.table.name);
-
-        //write WHERE clause
-        if (query.filters.length > 0)
+        this.queryString += this.sqlName(node);
+        this.queryString += ' ';
+        this.appendExpression(node.lhs);
+      } else if (fix === SQLGenerator.FixEnum.postfix)
+      {
+        if (node.value.length !== 1)
         {
-            this.appendStandardClause(
-                'WHERE',
-                true,
-                query.filters,
-                (filter) =>
-                {
-                    this.appendSubexpression(filter);
-                },
-                () =>
-                {
-                    this.newLine();
-                    this.queryString += ' AND ';
-                });
+          throw new Error('Postfix operator of type "' + node.type + '" has the wrong number of operators.');
         }
 
-        //write ORDER BY clause
-        if (query.sorts.length > 0)
+        this.appendExpression(node.lhs);
+        this.queryString += ' ';
+        this.queryString += this.sqlName(node);
+      } else if (fix === SQLGenerator.FixEnum.infix)
+      {
+        if (node.value.length !== 2)
         {
-            this.appendStandardClause(
-                'ORDER BY',
-                true,
-                query.sorts,
-                (sort) =>
-                {
-                    this.appendSubexpression(sort.node);
-                    this.queryString += ' ';
-                    this.queryString += (sort.order == 'asc' ? 'ASC' : 'DESC');
-                },
-                () =>
-                {
-                    this.queryString += ', ';
-                });
+          throw new Error('Infix operator of type "' + node.type + '" has the wrong number of operators.');
         }
 
-        if (query.numTaken != null || query.numSkipped != null)
+        this.appendExpression(node.value[0]);
+        this.queryString += ' ';
+        this.queryString += this.sqlName(node);
+        this.queryString += ' ';
+        this.appendExpression(node.rhs);
+      } else if (fix === SQLGenerator.FixEnum.infixWithoutSpaces)
+      {
+        if (node.value.length !== 2)
         {
-            this.newLine();
-
-            if (query.numTaken != null)
-            {
-                this.queryString += 'LIMIT ' + query.numTaken;
-                if (query.numSkipped != null)
-                    this.queryString += ' ';
-            }
-
-            if (query.numSkipped != null)
-                this.queryString += 'OFFSET ' + query.numSkipped;
+          throw new Error('InfixWithoutSpaces operator of type "' + node.type
+          + '" has the wrong number of operators.');
         }
 
-        this.queryString += ';';
+        this.appendExpression(node.lhs);
+        this.queryString += this.sqlName(node);
+        this.appendExpression(node.rhs);
+      } else
+      {
+        throw new Error('Operator node "' + node.type + '" is not a known fix type.');
+      }
     }
+  }
 
-    static convert(node)
+  private sqlName(node)
+  {
+    let sqlTypeInfo = SQLGenerator.TypeMap[node.type];
+    if (sqlTypeInfo.sqlName !== null)
     {
-        return new MySQLGenerator(node).queryString;
+      return sqlTypeInfo.sqlName;
     }
 
-    //private ----
-
-    newLine()
+    if (node.type === 'reference')
     {
-        this.queryString += '\n';
-        for (let i = 0; i < this.indentation; ++i)
-            this.queryString += '  ';
+      return this.escapeString(node.value);
     }
-
-    indent()
+    if (node.type === 'string')
     {
-        this.indentation++;
+      return this.escapeString(node.value);
     }
-
-    unindent()
+    if (node.type === 'number')
     {
-        this.indentation = Math.max(this.indentation - 1, 0);
+      return node.value.toString();
     }
-
-    appendStandardClause(clauseName, onNewLine, elements, onEach, onSeparator)
+    if (node.type === 'boolean')
     {
-        //skip empty clauses
-        if (elements.length == 0)
-            return;
-
-        if (onNewLine)
-            this.newLine();
-
-        //ignore null clause names
-        if (clauseName != null)
-        {
-            if (!onNewLine)
-                this.queryString += ' ';
-            this.queryString += clauseName + ' ';
-        }
-
-        this.indent();
-        for (let i = 0; ; )
-        {
-            onEach(elements[i]);
-
-            ++i;
-            if (i >= elements.length)
-                break;
-
-            onSeparator();
-        }
-        this.unindent();
+      return node.value ? 'TRUE' : 'FALSE';
     }
 
-    appendSubexpression(node)
+    throw new Error('Unsupported node type "' + node.type + '".');
+  }
+
+  private escapeString(value)
+  {
+    return "'" + value.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g,
+    (char) =>
     {
-        this.indent();
-        this.appendExpression(node);
-        this.unindent();
-    }
-
-    appendExpression(node)
-    {
-        //depth first in order
-        if (!(node.type in SQLGenerator.TypeMap))
-            throw new Error('Node type "' + node.type + '" is not supported by MySQLGenerator.');
-
-        let sqlTypeInfo = SQLGenerator.TypeMap[node.type];
-        let fix = sqlTypeInfo.fix;
-        if (node.numChildren == 0)
-        {
-            //base case
-            if (fix != SQLGenerator.FixEnum.nullary)
-                throw new Error("Non-operator node that isn't nullary.");
-
-            this.queryString += this.sqlName(node);
-        } else
-        {
-            //recursive case
-
-            if (fix == SQLGenerator.FixEnum.prefix)
-            {
-                if (node.value.length != 1)
-                    throw new Error('Prefix operator of type "' + node.type + '" has the wrong number of operators.');
-
-                this.queryString += this.sqlName(node);
-                this.queryString += ' ';
-                this.appendExpression(node.lhs);
-            } else if (fix == SQLGenerator.FixEnum.postfix)
-            {
-                if (node.value.length != 1)
-                    throw new Error('Postfix operator of type "' + node.type + '" has the wrong number of operators.');
-
-                this.appendExpression(node.lhs);
-                this.queryString += ' ';
-                this.queryString += this.sqlName(node);
-            } else if (fix == SQLGenerator.FixEnum.infix)
-            {
-                if (node.value.length != 2)
-                    throw new Error('Infix operator of type "' + node.type + '" has the wrong number of operators.');
-
-                this.appendExpression(node.value[0]);
-                this.queryString += ' ';
-                this.queryString += this.sqlName(node);
-                this.queryString += ' ';
-                this.appendExpression(node.rhs);
-            } else if (fix == SQLGenerator.FixEnum.infixWithoutSpaces)
-            {
-                if (node.value.length != 2)
-                    throw new Error('InfixWithoutSpaces operator of type "' + node.type + '" has the wrong number of operators.');
-
-                this.appendExpression(node.lhs);
-                this.queryString += this.sqlName(node);
-                this.appendExpression(node.rhs);
-            } else
-                throw new Error('Operator node "' + node.type + '" is not a known fix type.');
-        }
-    }
-
-    sqlName(node)
-    {
-        let sqlTypeInfo = SQLGenerator.TypeMap[node.type];
-        if (sqlTypeInfo.sqlName != null)
-            return sqlTypeInfo.sqlName;
-
-        if (node.type == 'reference')
-            return this.escapeString(node.value);
-        if (node.type == 'string')
-            return this.escapeString(node.value);
-        if (node.type == 'number')
-            return node.value.toString();
-        if (node.type == 'boolean')
-            return node.value ? 'TRUE' : 'FALSE';
-
-        throw new Error('Unsupported node type "' + node.type + '".');
-    }
-
-    escapeString(value)
-    {
-        return "'" + value.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g,
-                (char) =>
-                {
-                    switch (char)
-                    {
-                        case '\0':
-                            return '\\0';
-                        case '\x08':
-                            return '\\b';
-                        case '\x09':
-                            return '\\t';
-                        case '\x1a':
-                            return '\\z';
-                        case '\n':
-                            return '\\n';
-                        case '\r':
-                            return '\\r';
-                        case '\"':
-                        case "'":
-                        case '\\':
-                        case '%':
-                            return '\\' + char;
-                    }
-                }) + "'";
-    }
+      switch (char)
+      {
+        case '\0':
+        return '\\0';
+        case '\x08':
+        return '\\b';
+        case '\x09':
+        return '\\t';
+        case '\x1a':
+        return '\\z';
+        case '\n':
+        return '\\n';
+        case '\r':
+        return '\\r';
+        case '\"':
+        case "'":
+        case '\\':
+        case '%':
+        return '\\' + char;
+        default:
+        return char;
+      }
+    }) + "'";
+  }
 }

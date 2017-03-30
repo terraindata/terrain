@@ -48,37 +48,37 @@ import MySQLGenerator from './MySQLGenerator';
 
 export default class MySQLInterface
 {
-    select(query)
-    {
-        let queryString = MySQLGenerator.convert(query);
-        throw new Error('Not implemented.');
-        //return list of selected objects/rows
-    }
+  public select(query)
+  {
+    let queryString = MySQLGenerator.convert(query);
+    throw new Error('Not implemented.');
+    // return list of selected objects/rows
+  }
 
-    update(query)
-    {
-        throw new Error('Not implemented.');
-    }
+  public update(query)
+  {
+    throw new Error('Not implemented.');
+  }
 
-    delete(query)
-    {
-        throw new Error('Not implemented.');
-    }
+  public delete(query)
+  {
+    throw new Error('Not implemented.');
+  }
 
-    insertObjects(table, listOfObjects)
-    {
-        throw new Error('Not implemented.');
-    }
+  public insertObjects(table, listOfObjects)
+  {
+    throw new Error('Not implemented.');
+  }
 
-    updateObjects(table, listOfObjects)
-    {
-        //replaces objects with given list based on primary key
-        throw new Error('Not implemented.');
-    }
+  public updateObjects(table, listOfObjects)
+  {
+    // replaces objects with given list based on primary key
+    throw new Error('Not implemented.');
+  }
 
-    deleteObjects(table, listOfObjects)
-    {
-        //deletes objects based on primary key
-        throw new Error('Not implemented.');
-    }
+  public deleteObjects(table, listOfObjects)
+  {
+    // deletes objects based on primary key
+    throw new Error('Not implemented.');
+  }
 }

@@ -47,12 +47,14 @@ THE SOFTWARE.
 import * as KoaRouter from 'koa-router';
 let Router = new KoaRouter();
 
-const passport = require('koa-passport');
+import * as passport from 'koa-passport';
+import * as passportLocal from 'passport-local';
 
 Router.post('/', async (ctx, next) =>
 {
+  ctx.body = '';
 });
 
-const LocalStrategy = require('passport-local').Strategy;
+const LocalStrategy = passportLocal.Strategy;
 
 export default Router;

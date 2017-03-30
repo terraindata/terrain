@@ -49,16 +49,16 @@ let Router = new KoaRouter();
 
 Router.get('/', async (ctx, next) =>
 {
-	// return all items, or item by id
-	ctx.body = '';
- console.log('schema root');
+  // return all items, or item by id
+  ctx.body = '';
+  console.log('schema root');
 });
 
 Router.post('/', async (ctx, next) =>
 {
-	// not allowed right now
-	ctx.body = '';
- console.log('schema post');
+  // not allowed right now
+  ctx.body = '';
+  console.log('schema post');
 });
 
 export default Router;

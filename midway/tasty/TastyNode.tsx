@@ -48,146 +48,160 @@ import TastyNodeTypes from './TastyNodeType';
 
 export default class TastyNode
 {
-    type: string;
-    value: any;
-    chidlren: any;
+  private type: string;
+  private value: any;
+  private chidlren: any;
 
-    constructor(type: string, value: any)
+  constructor(type: string, value: any)
+  {
+    if (!(type in TastyNodeTypes))
     {
-        if (!(type in TastyNodeTypes))
-            throw new Error('Type "' + type + '" is not a known TastyNodeType.');
-        this.type = type;
-        this.value = value;
+      throw new Error('Type "' + type + '" is not a known TastyNodeType.');
+    }
+    this.type = type;
+    this.value = value;
+  }
+
+  public toString(): string
+  {
+    return JSON.stringify(this, null, 2);
+  }
+
+  get tastyType()
+  {
+    return TastyNodeTypes[this.type];
+  }
+
+  static make(value): TastyNode
+  {
+    if (value instanceof TastyNode)
+    {
+      return value;
     }
 
-    toString(): string
+    if (value === null)
     {
-        return JSON.stringify(this, null, 2);
+      return new TastyNode('null', value);
     }
 
-    get tastyType()
+    let valueType = typeof value;
+    if (valueType === 'number')
     {
-        return TastyNodeTypes[this.type];
+      return new TastyNode('number', value);
+    }
+    if (valueType === 'string')
+    {
+      return new TastyNode('string', value);
+    }
+    if (valueType === 'boolean')
+    {
+      return new TastyNode('boolean', value);
     }
 
-    static make(value): TastyNode
+    throw new Error('Trying to make a TastyNode from an unsupported value type.');
+  }
+
+  get numChildren(): number
+  {
+    return Array.isArray(this.value) ? this.value.length : 0;
+  }
+
+  private getChild(index: number)
+  {
+    if (this.numChildren <= index || index < 0)
     {
-        if (value instanceof TastyNode)
-            return value;
-
-        if (value === null)
-            return new TastyNode('null', value);
-
-        let valueType = typeof value;
-        if (valueType == 'number')
-            return new TastyNode('number', value);
-        if (valueType == 'string')
-            return new TastyNode('string', value);
-        if (valueType == 'boolean')
-            return new TastyNode('boolean', value);
-
-        throw new Error('Trying to make a TastyNode from an unsupported value type.');
+      throw new Error('Accessing child index out of bounds.');
     }
+    return this.value[index];
+  }
 
-    get numChildren(): number
-    {
-        return Array.isArray(this.value) ? this.value.length : 0;
-    }
+  private get lhs()
+  {
+    return this.getChild(0);
+  }
 
-    getChild(index: number)
-    {
-        if (this.numChildren <= index || index < 0)
-            throw new Error('Accessing child index out of bounds.');
-        return this.value[index];
-    }
+  private get rhs()
+  {
+    return this.getChild(1);
+  }
 
-    get lhs()
-    {
-        return this.getChild(0);
-    }
+  private buildAsLHS(type, rhs): TastyNode
+  {
+    return new TastyNode(type, [this, TastyNode.make(rhs)]);
+  }
 
-    get rhs()
-    {
-        return this.getChild(1);
-    }
+  private equals(rhs): TastyNode
+  {
+    return this.buildAsLHS('==', rhs);
+  }
 
-    buildAsLHS(type, rhs): TastyNode
-    {
-        return new TastyNode(type, [this, TastyNode.make(rhs)]);
-    }
+  private eq(rhs): TastyNode
+  {
+    return this.equals(rhs);
+  }
 
-    equals(rhs): TastyNode
-    {
-        return this.buildAsLHS('==', rhs);
-    }
+  private doesNotEqual(rhs): TastyNode
+  {
+    return this.buildAsLHS('!=', rhs);
+  }
 
-    eq(rhs): TastyNode
-    {
-        return this.equals(rhs);
-    }
+  private neq(rhs): TastyNode
+  {
+    return this.doesNotEqual(rhs);
+  }
 
-    doesNotEqual(rhs): TastyNode
-    {
-        return this.buildAsLHS('!=', rhs);
-    }
+  private greaterThan(rhs): TastyNode
+  {
+    return this.buildAsLHS('>', rhs);
+  }
 
-    neq(rhs): TastyNode
-    {
-        return this.doesNotEqual(rhs);
-    }
+  private gt(rhs): TastyNode
+  {
+    return this.greaterThan(rhs);
+  }
 
-    greaterThan(rhs): TastyNode
-    {
-        return this.buildAsLHS('>', rhs);
-    }
+  private greaterThanOrEqualTo(rhs): TastyNode
+  {
+    return this.buildAsLHS('>=', rhs);
+  }
 
-    gt(rhs): TastyNode
-    {
-        return this.greaterThan(rhs);
-    }
+  private gte(rhs): TastyNode
+  {
+    return this.greaterThanOrEqualTo(rhs);
+  }
 
-    greaterThanOrEqualTo(rhs): TastyNode
-    {
-        return this.buildAsLHS('>=', rhs);
-    }
+  private lessThan(rhs): TastyNode
+  {
+    return this.buildAsLHS('<', rhs);
+  }
 
-    gte(rhs): TastyNode
-    {
-        return this.greaterThanOrEqualTo(rhs);
-    }
+  private lt(rhs): TastyNode
+  {
+    return this.lessThan(rhs);
+  }
 
-    lessThan(rhs): TastyNode
-    {
-        return this.buildAsLHS('<', rhs);
-    }
+  private lessThanOrEqualTo(rhs): TastyNode
+  {
+    return this.buildAsLHS('<=', rhs);
+  }
 
-    lt(rhs): TastyNode
-    {
-        return this.lessThan(rhs);
-    }
+  private lte(rhs): TastyNode
+  {
+    return this.lessThanOrEqualTo(rhs);
+  }
 
-    lessThanOrEqualTo(rhs): TastyNode
-    {
-        return this.buildAsLHS('<=', rhs);
-    }
+  private and(rhs): TastyNode
+  {
+    return this.buildAsLHS('&&', rhs);
+  }
 
-    lte(rhs): TastyNode
-    {
-        return this.lessThanOrEqualTo(rhs);
-    }
+  private or(rhs): TastyNode
+  {
+    return this.buildAsLHS('||', rhs);
+  }
 
-    and(rhs): TastyNode
-    {
-        return this.buildAsLHS('&&', rhs);
-    }
-
-    or(rhs): TastyNode
-    {
-        return this.buildAsLHS('||', rhs);
-    }
-
-    not(): TastyNode
-    {
-        return new TastyNode('!', [this]);
-    }
+  private not(): TastyNode
+  {
+    return new TastyNode('!', [this]);
+  }
 }
