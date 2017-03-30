@@ -48,8 +48,8 @@ import TastyColumn from './TastyColumn';
 
 export default class TastyTable
 {
-  private name: string;
-  private primaryKey: string[];
+  public name: string;
+  public primaryKey: string[];
 
   constructor(name: string, primaryKey: string[], columns: string[])
   {

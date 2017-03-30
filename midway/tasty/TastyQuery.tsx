@@ -50,12 +50,12 @@ import TastyTable from './TastyTable';
 export default class TastyQuery
 {
   public table: TastyTable;
-  private aliases: any;
-  private filters: any;
-  private sorts: any;
-  private selected: any;
-  private numTaken: number;
-  private numSkipped: number;
+  public aliases: any;
+  public filters: any;
+  public sorts: any;
+  public selected: any;
+  public numTaken: number;
+  public numSkipped: number;
 
   constructor(table)
   {

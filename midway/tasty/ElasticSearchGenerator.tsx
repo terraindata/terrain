@@ -185,7 +185,7 @@ export default class ElasticSearchGenerator
     }
   }
 
-  static public convert(node)
+  public static convert(node)
   {
     return new ElasticSearchGenerator(node).queryObject;
   }

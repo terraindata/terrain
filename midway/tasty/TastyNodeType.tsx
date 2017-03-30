@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 class TastyNodeType
 {
-  readonly public name: string;
-  readonly public code: number;
+  public readonly name: string;
+  public readonly code: number;
 
   constructor(name: string, code: number)
   {
