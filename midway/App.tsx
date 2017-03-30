@@ -46,9 +46,7 @@ THE SOFTWARE.
 
 import 'babel-core/register';
 import * as Koa from 'koa';
-import * as webpack from 'webpack';
 import * as winston from 'winston';
-import webpackConfig = require('../webpack.config.js');
 import Middleware from './Middleware';
 import Router from './Router';
 import Util from './Util';
