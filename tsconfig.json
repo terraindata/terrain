@@ -3,6 +3,7 @@
         "jsx": "react",
         "module": "commonjs",
         "sourceMap": true,
+        "inlineSources": true,
         "target": "es6",
         "typeRoots": ["./src/typings", "./node_modules/@types"],
         "experimentalDecorators": true,
