@@ -49,7 +49,7 @@ import TastyQuery from './TastyQuery';
 
 export default class MySQLGenerator
 {
-  private queryString: string;
+  public queryString: string;
   private indentation: number;
 
   constructor(query: TastyQuery)
@@ -107,7 +107,7 @@ export default class MySQLGenerator
     // write FROM clause
     this.newLine();
     this.queryString += 'FROM ';
-    this.queryString += this.escapeString(query.table.name);
+    this.queryString += this.escapeString(query.table.__tableName);
 
     // write WHERE clause
     if (query.filters.length > 0)
@@ -168,7 +168,7 @@ export default class MySQLGenerator
     this.queryString += ';';
   }
 
-  static convert(node)
+  public static convert(node): string
   {
     return new MySQLGenerator(node).queryString;
   }
@@ -311,7 +311,7 @@ export default class MySQLGenerator
     }
   }
 
-  private sqlName(node)
+  private sqlName(node): string
   {
     let sqlTypeInfo = SQLGenerator.TypeMap[node.type];
     if (sqlTypeInfo.sqlName !== null)
@@ -339,7 +339,7 @@ export default class MySQLGenerator
     throw new Error('Unsupported node type "' + node.type + '".');
   }
 
-  private escapeString(value)
+  private escapeString(value: string): string
   {
     return "'" + value.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g,
     (char) =>

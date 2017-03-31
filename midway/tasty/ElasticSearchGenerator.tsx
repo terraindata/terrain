@@ -55,7 +55,7 @@ export default class ElasticSearchGenerator
   constructor(query)
   {
     this.queryObject = {};
-    this.tableName = query.table.name;
+    this.tableName = query.table.__tableName;
 
     // from clause
     if (query.numSkipped != null)

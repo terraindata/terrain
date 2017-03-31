@@ -48,14 +48,14 @@ import TastyColumn from './TastyColumn';
 
 export default class TastyTable
 {
-  public name: string;
-  public primaryKey: string[];
+  public __tableName: string;
+  public __primaryKey: string[];
 
   constructor(name: string, primaryKey: string[], columns: string[])
   {
     // primary key is a list, so that composite keys can be supported
-    this.name = name;
-    this.primaryKey = primaryKey;
+    this.__tableName = name;
+    this.__primaryKey = primaryKey;
 
     primaryKey.forEach(
       (columnName) =>
