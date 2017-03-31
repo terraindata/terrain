@@ -42,21 +42,54 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// https://github.com/ortoo/oauth2orize/blob/master/examples/express2/db/users.js
+// TODO DO NOT USE THIS IN PRODUCTION ETC 
 
-import * as KoaRouter from 'koa-router';
-import * as passport from 'koa-passport';
+import * as srs from 'secure-random-string';
 
-let Router = new KoaRouter();
+let users = [
+    { id: '1', username: 'bob', password: 'secret', name: 'Bob Smith', access_token: '' },
+    { id: '2', username: 'joe', password: 'password', name: 'Joe Davis', access_token: '' },
+    { id: '3', username: 'luser', password: 'secret', name: 'Linux User', access_token: '' }
+      
+];
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) => {
-  console.log(ctx.state.user);
-  ctx.body = "item root as "+ctx.state.user.username;
-});
+namespace Users {
+  export const find = function(id) {
+    for (let i = 0, len = users.length; i < len; i++) {
+      let user = users[i];
+      if (user.id === id) {
+        return user;
+      }
+    }
+    return null;
+  };
 
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) => {
-  console.log(ctx.state.user);
-  ctx.body = "item root as "+ctx.state.user.username;
-});
+  export const findByUsername = function(username, password) {
+    for (let i = 0, len = users.length; i < len; i++) {
+      let user = users[i];
+      if (user.username === username && user.password === password) {
+        if(user.access_token.length === 0) 
+        {
+          let accesstoken = srs({length: 256});
+          user.access_token = accesstoken;
+        }
+        return user;
+      }
+    }
+    return null;
+  };
 
-export default Router;
+  export const findByAccessToken = function(username, access_token) {
+    for (let i = 0, len = users.length; i < len; i++) {
+      let user = users[i];
+      if (user.username === username && user.access_token.length > 0 && user.access_token === access_token) {
+        return user;
+      }
+    }
+    return null;
+  };
+
+}
+
+export default Users;

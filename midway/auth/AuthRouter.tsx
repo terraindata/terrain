@@ -45,14 +45,30 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as KoaRouter from 'koa-router';
+import * as passport from 'koa-passport';
+
 let Router = new KoaRouter();
 
-const passport = require('koa-passport');
+Router.get('/', async (ctx, next) =>
+{
+  console.log('root');
+  ctx.body = "";
+});
 
 Router.post('/', async (ctx, next) =>
 {
+  console.log('root');
+  ctx.body = "";
 });
 
-const LocalStrategy = require('passport-local').Strategy;
+Router.get('/login', passport.authenticate('local'), async (ctx, next) => {
+  ctx.body = ctx.state.user.access_token;
+  // ctx.state.login(ctx.state.user);
+  ctx.redirect('/midway/v1/'); //?username='+ctx.state.user.username+'&access_token='+ctx.state.user.access_token);
+});
+
+Router.post('/api_login', passport.authenticate('local'), async (ctx, next) => {
+  ctx.body = {"username": ctx.state.user.username, "access_token": ctx.state.user.access_token};
+});
 
 export default Router;

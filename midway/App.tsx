@@ -46,11 +46,19 @@ THE SOFTWARE.
 
 require('babel-core/register');
 import * as Koa from 'koa';
+import * as koaroute from 'koa-route';
+import * as passport from 'koa-passport';
+let LocalStrategy = require('passport-local').Strategy;
+
 import * as webpack from 'webpack';
 import * as winston from 'winston';
 const webpackConfig = require('../webpack.config.js');
 import Router from './Router';
 import Util from './Util';
+import Users from './db/Users';
+
+import * as convert from 'koa-convert';
+import * as session from'koa-generic-session';
 
 // process command-line arguments
 const optDefs = [
@@ -69,14 +77,10 @@ Router.get('/bundle.js', async function(ctx, next) {
   ctx.body = response;
 });
 
-Router.get('/', async function(ctx, next) {
-  await next();
-  ctx.body = index.toString();
-});
-
 const app = new Koa();
-
 app.proxy = true;
+app.keys = ['your-session-secret'];
+app.use(convert(session()));
 
 const Middleware = require('./Middleware');
 app.use(Middleware.bodyParser());
@@ -86,6 +90,38 @@ app.use(Middleware.responseTime());
 app.use(Middleware.compress());
 app.use(Middleware.passport.initialize());
 app.use(Middleware.passport.session());
+
+Middleware.passport.use('access-token-local', new LocalStrategy( 
+  {usernameField: "username", passwordField: "access_token" }, 
+  (username, access_token, done) => {
+    return done(null, Users.findByAccessToken(username, access_token));
+}));
+
+Middleware.passport.use('local', new LocalStrategy( (username, password, done) => {
+  return done(null, Users.findByUsername(username, password));
+}));
+
+Middleware.passport.serializeUser( (user, done) => {
+  if(user) {
+    done(null, user.id);
+  }
+});
+
+Middleware.passport.deserializeUser( (id, done) => {
+  done(null, Users.find(id));
+});
+
+// app.use(koaroute.get('/', async (ctx, next) => {
+//   if(ctx.isAuthenticated()) 
+//   {
+//     console.log(ctx.state.user);
+//     ctx.body = "authenticated as "+ctx.state.user.username;
+//   }
+//   else 
+//   {
+//     ctx.body = "Not authenticated";
+//   }
+// }));
 
 app.use(Router.routes());
 
