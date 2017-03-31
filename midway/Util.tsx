@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import * as request from 'request';
 
-namespace Util {
-  export function getRequest(url) {
+const Util = {
+  getRequest: (url) => {
     return new Promise((resolve, reject) => {
       request(url, (error, res, body) => {
         if (!error && res.statusCode === 200) {
@@ -58,6 +58,6 @@ namespace Util {
       });
     });
   }
-}
+};
 
 export default Util;

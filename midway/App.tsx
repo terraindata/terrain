@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import 'babel-core/register';
+import BabelRegister = require('babel-register');
 import * as Koa from 'koa';
 import * as winston from 'winston';
 import Middleware from './Middleware';
@@ -63,9 +63,8 @@ const args = cmdLineArgs(optDefs);
 const index = reqText('../src/app/index.html', require);
 
 Router.get('/bundle.js', async (ctx, next) => {
-	// TODO render this if DEV, otherwise render compiled bundle.js
-  let response = await Util.getRequest('http://localhost:8080/bundle.js');
-  ctx.body = response;
+  // TODO render this if DEV, otherwise render compiled bundle.js
+  ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
 });
 
 Router.get('/', async (ctx, next) => {
