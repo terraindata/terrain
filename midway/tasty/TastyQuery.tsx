@@ -49,92 +49,99 @@ import TastyTable from './TastyTable';
 
 export default class TastyQuery
 {
-    table: TastyTable;
-    aliases: any;
-    filters: any;
-    sorts: any;
-    selected: any;
-    numTaken: number;
-    numSkipped: number;
+  public table: TastyTable;
+  public aliases: any;
+  public filters: any;
+  public sorts: any;
+  public selected: any;
+  public numTaken: number;
+  public numSkipped: number;
 
-    constructor(table)
+  constructor(table)
+  {
+    this.table = table;
+    this.aliases = [];
+    this.filters = [];
+    this.sorts = [];
+    this.selected = null;
+    this.numTaken = 0;
+    this.numSkipped = 0;
+
+    // this.root = new TastyNode('select', null,
+    //     [
+    //         new TastyNode('reference', tableName, []),
+    //     ]);
+  }
+
+  public toString(): string
+  {
+    return JSON.stringify(this, null, 1);
+  }
+
+  public select(columns): TastyQuery
+  {
+    this.selected = columns;
+    return this;
+  }
+
+  public filter(node): TastyQuery
+  {
+    this.filters.push(node);
+    return this;
+  }
+
+  public sort(node, order): TastyQuery
+  {
+    if (order === 'ascending')
     {
-        this.table = table;
-        this.aliases = [];
-        this.filters = [];
-        this.sorts = [];
-        this.selected = null;
-        this.numTaken = 0;
-        this.numSkipped = 0;
-
-        // this.root = new TastyNode('select', null,
-        //     [
-        //         new TastyNode('reference', tableName, []),
-        //     ]);
+      order = 'asc';
+    } else if (order === 'descending')
+    {
+      order = 'desc';
     }
 
-    toString(): string
+    if (order !== 'asc' && order !== 'desc')
     {
-        return JSON.stringify(this, null, 1);
+      throw new Error('Unknown order "' + order + '".');
     }
 
-    select(columns): TastyQuery
+    this.sorts.push({node, order});
+    return this;
+  }
+
+  public as(name, node): TastyQuery
+  {
+    this.aliases.push({name, node});
+    return this;
+  }
+
+  public isSelectingAll(): boolean
+  {
+    return this.selected === null && this.aliases.length === 0;
+  }
+
+  public take(num: number): TastyQuery
+  {
+    this.numTaken = num;
+    return this;
+  }
+
+  public skip(num: number): TastyQuery
+  {
+    this.numSkipped = num;
+    return this;
+  }
+
+  private isTastyNode(node: TastyNode): boolean
+  {
+    return node instanceof TastyNode;
+  }
+
+  private ensureTastyNode(node: TastyNode): void
+  {
+    if (!this.isTastyNode(node))
     {
-        this.selected = columns;
-        return this;
+      throw Error('node argument is not a TastyNode.');
     }
-
-    filter(node): TastyQuery
-    {
-        this.filters.push(node);
-        return this;
-    }
-
-    sort(node, order): TastyQuery
-    {
-        if (order == 'ascending')
-            order = 'asc';
-        else if (order == 'descending')
-            order = 'desc';
-
-        if (order != 'asc' && order != 'desc')
-            throw new Error('Unknown order "' + order + '".');
-
-        this.sorts.push({node, order});
-        return this;
-    }
-
-    as(name, node): TastyQuery
-    {
-        this.aliases.push({name, node});
-        return this;
-    }
-
-    isSelectingAll(): boolean
-    {
-        return this.selected == null && this.aliases.length == 0;
-    }
-
-    take(num: number): TastyQuery
-    {
-        this.numTaken = num;
-        return this;
-    }
-
-    skip(num: number): TastyQuery
-    {
-        this.numSkipped = num;
-        return this;
-    }
-
-    private isTastyNode(node: TastyNode): boolean
-    {
-        return node instanceof TastyNode;
-    }
-
-    private ensureTastyNode(node: TastyNode): void
-    {
-        if (!this.isTastyNode(node))
-            throw Error('node argument is not a TastyNode.');
-    }
+  }
 }

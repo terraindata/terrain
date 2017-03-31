@@ -49,16 +49,16 @@ let Router = new KoaRouter();
 
 Router.get('/', async (ctx, next) =>
 {
-	// return all versions
-	ctx.body = '';
- console.log('version root');
+  // return all versions
+  ctx.body = '';
+  console.log('version root');
 });
 
 Router.post('/', async (ctx, next) =>
 {
-	// not allowed
-	ctx.body = '';
- console.log('version post');
+  // not allowed
+  ctx.body = '';
+  console.log('version post');
 });
 
 export default Router;

@@ -44,33 +44,38 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Tasty from './Tasty';
+import * as chai from 'chai';
+import * as test from 'tape';
+const {assert} = chai;
+import * as sinon from 'sinon';
 
-let DBUsers = new Tasty.TastyTable('users', ['id'], ['name', 'joinDate']);
+import Tasty from '../../tasty/Tasty';
 
-let query = new Tasty.TastyQuery(DBUsers);
-console.log(Tasty.MySQLGenerator.convert(query));
+let DBUsers = new Tasty.Table('users', ['id'], ['name', 'joinDate']);
+
+let query = new Tasty.Query(DBUsers);
+console.log(Tasty.MySQL.convert(query));
 
 query.select([DBUsers.id, DBUsers.name, DBUsers.joinDate]);
 
-console.log(Tasty.MySQLGenerator.convert(query));
+console.log(Tasty.MySQL.convert(query));
 query.filter(DBUsers.id.equals(123));
-console.log(Tasty.MySQLGenerator.convert(query));
+console.log(Tasty.MySQL.convert(query));
 query.filter(DBUsers.name.doesNotEqual('notMyUser'));
-console.log(Tasty.MySQLGenerator.convert(query));
+console.log(Tasty.MySQL.convert(query));
 query.sort(DBUsers.name, 'asc');
-console.log(Tasty.MySQLGenerator.convert(query));
+console.log(Tasty.MySQL.convert(query));
 query.sort(DBUsers.id, 'desc');
-console.log(Tasty.MySQLGenerator.convert(query));
+console.log(Tasty.MySQL.convert(query));
 query.take(10);
-console.log(Tasty.MySQLGenerator.convert(query));
+console.log(Tasty.MySQL.convert(query));
 query.skip(20);
-console.log(Tasty.MySQLGenerator.convert(query));
+console.log(Tasty.MySQL.convert(query));
 
-let q = new Tasty.TastyQuery(DBUsers).select([DBUsers.id, DBUsers.name, DBUsers.joinDate]).filter(DBUsers.id.neq(2134));
+let q = new Tasty.Query(DBUsers).select([DBUsers.id, DBUsers.name, DBUsers.joinDate]).filter(DBUsers.id.neq(2134));
 q.filter(DBUsers.joinDate.gte('2007-03-24')).filter(DBUsers.joinDate.lt('2017-03-24'));
 q.sort(DBUsers.name, 'asc').sort(DBUsers.id, 'desc').sort(DBUsers.joinDate, 'asc');
 q.take(10).skip(20);
-console.log(Tasty.MySQLGenerator.convert(q));
+console.log(Tasty.MySQL.convert(q));
 
-console.log(JSON.stringify(Tasty.ElasticSearchGenerator.convert(q)));
+console.log(JSON.stringify(Tasty.Elastic.convert(q)));
