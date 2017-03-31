@@ -49,8 +49,8 @@ import * as test from 'tape';
 const {assert} = chai;
 import * as sinon from 'sinon';
 
-import TastyNodeTypes from '../../tasty/TastyNodeType';
 import Tasty from '../../tasty/Tasty';
+import TastyNodeTypes from '../../tasty/TastyNodeType';
 
 test('Skip node type', (t) => {
   t.equal(TastyNodeTypes['skip'].name, 'skip');
