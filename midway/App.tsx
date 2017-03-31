@@ -44,21 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-require('babel-core/register');
+import 'babel-core/register';
 import * as Koa from 'koa';
-import * as koaroute from 'koa-route';
 import * as passport from 'koa-passport';
-let LocalStrategy = require('passport-local').Strategy;
-
-import * as webpack from 'webpack';
 import * as winston from 'winston';
-const webpackConfig = require('../webpack.config.js');
+import * as convert from 'koa-convert';
+import * as session from'koa-generic-session';
+import Middleware from './Middleware';
 import Router from './Router';
 import Util from './Util';
 import Users from './db/Users';
 
-import * as convert from 'koa-convert';
-import * as session from'koa-generic-session';
+
+let LocalStrategy = require('passport-local').Strategy;
+import cmdLineArgs = require('command-line-args');
+import reqText = require('require-text');
 
 // process command-line arguments
 const optDefs = [
@@ -66,15 +66,18 @@ const optDefs = [
   {name: 'db', alias: 'r', type: String, defaultValue: 'mysql'},
 ];
 
-const cmdLineArgs = require('command-line-args');
 const args = cmdLineArgs(optDefs);
-
-const reqText = require('require-text');
 const index = reqText('../src/app/index.html', require);
-Router.get('/bundle.js', async function(ctx, next) {
+
+Router.get('/bundle.js', async (ctx, next) => {
 	// TODO render this if DEV, otherwise render compiled bundle.js
   let response = await Util.getRequest('http://localhost:8080/bundle.js');
   ctx.body = response;
+});
+
+Router.get('/', async (ctx, next) => {
+  await next();
+  ctx.body = index.toString();
 });
 
 const app = new Koa();
@@ -82,9 +85,8 @@ app.proxy = true;
 app.keys = ['your-session-secret'];
 app.use(convert(session()));
 
-const Middleware = require('./Middleware');
 app.use(Middleware.bodyParser());
-app.use(Middleware.favicon());
+app.use(Middleware.favicon('../src/app/favicon.ico'));
 app.use(Middleware.logger());
 app.use(Middleware.responseTime());
 app.use(Middleware.compress());

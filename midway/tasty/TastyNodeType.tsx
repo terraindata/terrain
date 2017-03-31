@@ -46,61 +46,63 @@ THE SOFTWARE.
 
 class TastyNodeType
 {
-    readonly name: string;
-    readonly code: number;
-    constructor(name: string, code: number)
-    {
-        this.name = name;
-        this.code = code;
-    }
-    toString(): string
-    {
-        return JSON.stringify(this, null, 2);
-    }
+  public readonly name: string;
+  public readonly code: number;
+
+  constructor(name: string, code: number)
+  {
+    this.name = name;
+    this.code = code;
+  }
+
+  public toString(): string
+  {
+    return JSON.stringify(this, null, 2);
+  }
 }
 
 let TastyNodeTypes = Object.freeze([
-    'null',
-    'reference',
-    'string',
-    'number',
-    'boolean',
+  'null',
+  'reference',
+  'string',
+  'number',
+  'boolean',
 
-    'select',
-    'filter',
-    'sort',
-    'take',
-    'skip',
+  'select',
+  'filter',
+  'sort',
+  'take',
+  'skip',
 
-    '.',
+  '.',
 
-    '+',
-    '-',
-    '/',
-    '*',
+  '+',
+  '-',
+  '/',
+  '*',
 
-    '==',
-    '!=',
-    '>',
-    '<',
-    '>=',
-    '<=',
+  '==',
+  '!=',
+  '>',
+  '<',
+  '>=',
+  '<=',
 
-    '!',
-    '&&',
-    '||',
+  '!',
+  '&&',
+  '||',
 
-    'isNull',
-    'isNotNull',
+  'isNull',
+  'isNotNull',
 
-    'ascending',
-    'descending'].reduce(
+  'ascending',
+  'descending'].reduce(
     (state, typeName) =>
     {
-        state.map[typeName] = new TastyNodeType(typeName, state.count++);
-        return state;
+      state.map[typeName] = new TastyNodeType(typeName, state.count++);
+      return state;
     }, {
-        map: new Map<string, {name: string, code: number}>(), count: 1,
+      map: new Map<string, {name: string, code: number}>(), count: 1,
     }).map);
 
 export default TastyNodeTypes;

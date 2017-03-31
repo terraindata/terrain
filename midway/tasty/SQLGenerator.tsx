@@ -45,58 +45,59 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 export const enum FixEnum {
-    nullary = 1,
-    infix,
-    infixWithoutSpaces,
-    prefix,
-    postfix,
+  nullary = 1,
+  infix,
+  infixWithoutSpaces,
+  prefix,
+  postfix,
 }
 
 class SQLGeneratorMapping
 {
-    sqlName: string;
-    fix: FixEnum;
-    constructor(sqlName: string, fixType: FixEnum)
-    {
-        this.sqlName = sqlName;
-        this.fix = fixType;
-    }
+  sqlName: string;
+  fix: FixEnum;
+
+  constructor(sqlName: string, fixType: FixEnum)
+  {
+    this.sqlName = sqlName;
+    this.fix = fixType;
+  }
 }
 
 export let TypeMap = Object.freeze({
-    'null': new SQLGeneratorMapping('NULL', FixEnum.nullary),
-    'reference': new SQLGeneratorMapping(null, FixEnum.nullary),
-    'string': new SQLGeneratorMapping(null, FixEnum.nullary),
-    'number': new SQLGeneratorMapping(null, FixEnum.nullary),
-    'boolean': new SQLGeneratorMapping(null, FixEnum.nullary),
+  'null': new SQLGeneratorMapping('NULL', FixEnum.nullary),
+  'reference': new SQLGeneratorMapping(null, FixEnum.nullary),
+  'string': new SQLGeneratorMapping(null, FixEnum.nullary),
+  'number': new SQLGeneratorMapping(null, FixEnum.nullary),
+  'boolean': new SQLGeneratorMapping(null, FixEnum.nullary),
 
-    'select': new SQLGeneratorMapping('SELECT', FixEnum.nullary),
-    'filter': new SQLGeneratorMapping('WHERE', FixEnum.nullary),
-    'sort': new SQLGeneratorMapping('ORDER BY', FixEnum.nullary),
-    'take': new SQLGeneratorMapping('LIMIT', FixEnum.nullary),
-    'skip': new SQLGeneratorMapping('OFFSET', FixEnum.nullary),
+  'select': new SQLGeneratorMapping('SELECT', FixEnum.nullary),
+  'filter': new SQLGeneratorMapping('WHERE', FixEnum.nullary),
+  'sort': new SQLGeneratorMapping('ORDER BY', FixEnum.nullary),
+  'take': new SQLGeneratorMapping('LIMIT', FixEnum.nullary),
+  'skip': new SQLGeneratorMapping('OFFSET', FixEnum.nullary),
 
-    '.': new SQLGeneratorMapping('.', FixEnum.infixWithoutSpaces),
+  '.': new SQLGeneratorMapping('.', FixEnum.infixWithoutSpaces),
 
-    '+': new SQLGeneratorMapping('+', FixEnum.infix),
-    '-': new SQLGeneratorMapping('-', FixEnum.infix),
-    '/': new SQLGeneratorMapping('/', FixEnum.infix),
-    '*': new SQLGeneratorMapping('*', FixEnum.infix),
+  '+': new SQLGeneratorMapping('+', FixEnum.infix),
+  '-': new SQLGeneratorMapping('-', FixEnum.infix),
+  '/': new SQLGeneratorMapping('/', FixEnum.infix),
+  '*': new SQLGeneratorMapping('*', FixEnum.infix),
 
-    '==': new SQLGeneratorMapping('=', FixEnum.infix),
-    '!=': new SQLGeneratorMapping('<>', FixEnum.infix),
-    '>': new SQLGeneratorMapping('>', FixEnum.infix),
-    '<': new SQLGeneratorMapping('<', FixEnum.infix),
-    '>=': new SQLGeneratorMapping('>=', FixEnum.infix),
-    '<=': new SQLGeneratorMapping('<=', FixEnum.infix),
+  '==': new SQLGeneratorMapping('=', FixEnum.infix),
+  '!=': new SQLGeneratorMapping('<>', FixEnum.infix),
+  '>': new SQLGeneratorMapping('>', FixEnum.infix),
+  '<': new SQLGeneratorMapping('<', FixEnum.infix),
+  '>=': new SQLGeneratorMapping('>=', FixEnum.infix),
+  '<=': new SQLGeneratorMapping('<=', FixEnum.infix),
 
-    '!': new SQLGeneratorMapping('NOT', FixEnum.prefix),
-    '&&': new SQLGeneratorMapping('AND', FixEnum.infix),
-    '||': new SQLGeneratorMapping('OR', FixEnum.infix),
+  '!': new SQLGeneratorMapping('NOT', FixEnum.prefix),
+  '&&': new SQLGeneratorMapping('AND', FixEnum.infix),
+  '||': new SQLGeneratorMapping('OR', FixEnum.infix),
 
-    'isNull': new SQLGeneratorMapping('IS NULL', FixEnum.postfix),
-    'isNotNull': new SQLGeneratorMapping('IS NOT NULL', FixEnum.postfix),
+  'isNull': new SQLGeneratorMapping('IS NULL', FixEnum.postfix),
+  'isNotNull': new SQLGeneratorMapping('IS NOT NULL', FixEnum.postfix),
 
-    'ascending': new SQLGeneratorMapping('ASC', FixEnum.postfix),
-    'descending': new SQLGeneratorMapping('DESC', FixEnum.postfix),
+  'ascending': new SQLGeneratorMapping('ASC', FixEnum.postfix),
+  'descending': new SQLGeneratorMapping('DESC', FixEnum.postfix),
 });

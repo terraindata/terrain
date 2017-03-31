@@ -46,20 +46,18 @@ THE SOFTWARE.
 
 import * as request from 'request';
 
-module Util
-{
-	export function getRequest(url) {
-	  return new Promise(function (resolve, reject) {
-	    request(url, function (error, res, body) {
-	      if (!error && res.statusCode == 200) {
-	        resolve(body);
-	      } else {
-	        reject(error);
-	      }
-	    });
-	  });
-	}
-
+namespace Util {
+  export function getRequest(url) {
+    return new Promise((resolve, reject) => {
+      request(url, (error, res, body) => {
+        if (!error && res.statusCode === 200) {
+          resolve(body);
+        } else {
+          reject(error);
+        }
+      });
+    });
+  }
 }
 
 export default Util;
