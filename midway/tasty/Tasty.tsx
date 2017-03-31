@@ -49,13 +49,16 @@ import TastyColumn from './TastyColumn';
 import TastyQuery from './TastyQuery';
 import TastyTable from './TastyTable';
 
-export * from './TastyColumn';
-export * from './TastyTable';
-export * from './TastyQuery';
-
 // Query Generators
 import ElasticSearchGenerator from './ElasticSearchGenerator';
 import MySQLGenerator from './MySQLGenerator';
 
-export * from './MySQLGenerator';
-export * from './ElasticSearchGenerator';
+namespace Tasty {
+  export const Column = TastyColumn;
+  export const Table = TastyTable;
+  export const Query = TastyQuery;
+  export const MySQL = MySQLGenerator;
+  export const Elastic = ElasticSearchGenerator;
+}
+
+export default Tasty;
