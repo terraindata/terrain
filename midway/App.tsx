@@ -62,20 +62,32 @@ import reqText = require('require-text');
 
 // process command-line arguments
 const optDefs = [
-  {name: 'port', alias: 'p', type: Number, defaultValue: 3000},
-  {name: 'db', alias: 'r', type: String, defaultValue: 'mysql'},
+  {
+    name: 'port', 
+    alias: 'p', 
+    type: Number, 
+    defaultValue: 3000
+  },
+  {
+    name: 'db', 
+    alias: 'r', 
+    type: String, 
+    defaultValue: 'mysql'
+  },
 ];
 
 const args = cmdLineArgs(optDefs);
 const index = reqText('../src/app/index.html', require);
 
-Router.get('/bundle.js', async (ctx, next) => {
+Router.get('/bundle.js', async (ctx, next) => 
+{
 	// TODO render this if DEV, otherwise render compiled bundle.js
   let response = await Util.getRequest('http://localhost:8080/bundle.js');
   ctx.body = response;
 });
 
-Router.get('/', async (ctx, next) => {
+Router.get('/', async (ctx, next) => 
+{
   await next();
   ctx.body = index.toString();
 });
@@ -94,36 +106,33 @@ app.use(Middleware.passport.initialize());
 app.use(Middleware.passport.session());
 
 Middleware.passport.use('access-token-local', new LocalStrategy( 
-  {usernameField: "username", passwordField: "access_token" }, 
-  (username, access_token, done) => {
+  {
+    usernameField: "username", 
+    passwordField: "access_token" 
+  }, 
+  async (username, access_token, done) => 
+  {
     return done(null, Users.findByAccessToken(username, access_token));
 }));
 
-Middleware.passport.use('local', new LocalStrategy( (username, password, done) => {
-  return done(null, Users.findByUsername(username, password));
+Middleware.passport.use('local', new LocalStrategy( async (username, password, done) => 
+{
+  let user = await Users.findByUsername(username, password);
+  done(null, user);
 }));
 
-Middleware.passport.serializeUser( (user, done) => {
-  if(user) {
+Middleware.passport.serializeUser( (user, done) => 
+{
+  if(user) 
+  {
     done(null, user.id);
   }
 });
 
-Middleware.passport.deserializeUser( (id, done) => {
+Middleware.passport.deserializeUser( (id, done) => 
+{
   done(null, Users.find(id));
 });
-
-// app.use(koaroute.get('/', async (ctx, next) => {
-//   if(ctx.isAuthenticated()) 
-//   {
-//     console.log(ctx.state.user);
-//     ctx.body = "authenticated as "+ctx.state.user.username;
-//   }
-//   else 
-//   {
-//     ctx.body = "Not authenticated";
-//   }
-// }));
 
 app.use(Router.routes());
 

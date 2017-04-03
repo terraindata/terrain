@@ -43,53 +43,94 @@ THE SOFTWARE.
 */
 
 // https://github.com/ortoo/oauth2orize/blob/master/examples/express2/db/users.js
-// TODO DO NOT USE THIS IN PRODUCTION ETC 
+// TODO THIS IS A STUB. REPLACE WITH ORM
 
 import * as srs from 'secure-random-string';
+import * as bcrypt from 'bcrypt-nodejs';
 
 let users = [
-    { id: '1', username: 'bob', password: 'secret', name: 'Bob Smith', access_token: '' },
-    { id: '2', username: 'joe', password: 'password', name: 'Joe Davis', access_token: '' },
-    { id: '3', username: 'luser', password: 'secret', name: 'Linux User', access_token: '' }
-      
+    { 
+      id: '1', 
+      username: 'bob', 
+      password: bcrypt.hashSync('secret'), 
+      name: 'Bob Smith', 
+      access_token: ''
+    },
+    { 
+      id: '2', 
+      username: 'joe', 
+      password: bcrypt.hashSync('password'), 
+      name: 'Joe Davis', 
+      access_token: ''
+    },
+    { 
+      id: '3', 
+      username: 'luser', 
+      password: bcrypt.hashSync('secret'), 
+      name: 'Linux User', 
+      access_token: ''
+    },
 ];
 
-namespace Users {
-  export const find = function(id) {
-    for (let i = 0, len = users.length; i < len; i++) {
+namespace Users 
+{
+  export const find = (id) => 
+  {
+    for (let i = 0, len = users.length; i < len; i++) 
+    {
       let user = users[i];
-      if (user.id === id) {
+      if (user.id === id) 
+      {
         return user;
       }
     }
     return null;
   };
 
-  export const findByUsername = function(username, password) {
-    for (let i = 0, len = users.length; i < len; i++) {
+  export const findByUsername = (username, password) => 
+  {
+    for (let i = 0, len = users.length; i < len; i++) 
+    {
       let user = users[i];
-      if (user.username === username && user.password === password) {
-        if(user.access_token.length === 0) 
-        {
-          let accesstoken = srs({length: 256});
-          user.access_token = accesstoken;
-        }
+      if (user.username === username) 
+      {
+        return new Promise((resolve, reject) => {
+          bcrypt.compare(password, user.password, function(err, res) 
+          {
+            if(res)
+            {
+              if(user.access_token.length === 0) 
+              {
+                let accesstoken = srs(
+                  { 
+                    length: 256 
+                  });
+                user.access_token = accesstoken;
+              }
+              resolve(user);
+            }
+            else
+            {
+              resolve(null);
+            }
+          });
+        });
+      }
+    }
+  };
+
+  export const findByAccessToken = (username, access_token) => 
+  {
+    for (let i = 0, len = users.length; i < len; i++) 
+    {
+      let user = users[i];
+      if (user.username === username && user.access_token.length > 0 && user.access_token === access_token) 
+      {
         return user;
       }
     }
     return null;
   };
-
-  export const findByAccessToken = function(username, access_token) {
-    for (let i = 0, len = users.length; i < len; i++) {
-      let user = users[i];
-      if (user.username === username && user.access_token.length > 0 && user.access_token === access_token) {
-        return user;
-      }
-    }
-    return null;
-  };
-
 }
 
 export default Users;

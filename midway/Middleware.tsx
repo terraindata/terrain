@@ -50,7 +50,8 @@ import * as koaFavicon from 'koa-favicon';
 import * as koaLogger from 'koa-logger';
 import * as koaPassport from 'koa-passport';
 
-namespace Middleware {
+namespace Middleware 
+{
   export const responseTime = require('koa-response-time');
   export const logger = koaLogger;
   export const compress = koaCompress;

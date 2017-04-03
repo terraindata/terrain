@@ -65,10 +65,11 @@ AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
 //  This is so that we can allow the front-end to use all other routes.
 //  Any route not prefixed with /midway will just serve the front-end.
 
-AppRouter.get('/', async (ctx, next) => {
+AppRouter.get('/', async (ctx, next) => 
+{
   if(ctx.state.user)
   {
-    ctx.body = "authenticated as "+ctx.state.user.username;
+    ctx.body = "authenticated as " + ctx.state.user.username;
   }
   else
   {
@@ -76,8 +77,9 @@ AppRouter.get('/', async (ctx, next) => {
   }
 });
 
-AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) => {
-  ctx.body = "authenticated as "+ctx.state.user.username;
+AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) => 
+{
+  ctx.body = "authenticated as " + ctx.state.user.username;
 });
 
 let MidwayRouter = new KoaRouter();

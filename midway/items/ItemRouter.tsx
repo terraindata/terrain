@@ -49,13 +49,13 @@ import * as passport from 'koa-passport';
 
 let Router = new KoaRouter();
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) => {
-  console.log(ctx.state.user);
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) => 
+{
   ctx.body = "item root as "+ctx.state.user.username;
 });
 
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) => {
-  console.log(ctx.state.user);
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) => 
+{
   ctx.body = "item root as "+ctx.state.user.username;
 });
 
