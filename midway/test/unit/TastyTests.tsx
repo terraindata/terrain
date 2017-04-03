@@ -62,7 +62,7 @@ let DBUsers = new Tasty.Table('users', ['id'], ['name', 'joinDate']);
 
 test('Simple Tasty Query (select all)', (t) => {
   let query = new Tasty.Query(DBUsers);
-  let qstr = Tasty.MySQL.convert(query);
+  let qstr = Tasty.MySQL.generate(query);
   t.equal(qstr, `SELECT * \n  FROM 'users'\n  LIMIT 0 OFFSET 0;`);
   t.end();
 });
@@ -70,7 +70,7 @@ test('Simple Tasty Query (select all)', (t) => {
 test('Simple Tasty Query (select columns)', (t) => {
   let query = new Tasty.Query(DBUsers);
   query.select([DBUsers['id'], DBUsers['name'], DBUsers['joinDate']]);
-  let qstr = Tasty.MySQL.convert(query);
+  let qstr = Tasty.MySQL.generate(query);
   t.equal(qstr, `SELECT 'users'.'id', 'users'.'name', 'users'.'joinDate' \n  FROM 'users'\n  LIMIT 0 OFFSET 0;`);
   t.end();
 });
@@ -78,7 +78,7 @@ test('Simple Tasty Query (select columns)', (t) => {
 test('Simple Tasty Query (filter equals)', (t) => {
   let query = new Tasty.Query(DBUsers);
   query.filter(DBUsers['id'].equals(123));
-  let qstr = Tasty.MySQL.convert(query);
+  let qstr = Tasty.MySQL.generate(query);
   t.equal(qstr, `SELECT * \n  FROM 'users'\n  WHERE 'users'.\'id\' = 123\n  LIMIT 0 OFFSET 0;`);
   t.end();
 });
@@ -86,7 +86,7 @@ test('Simple Tasty Query (filter equals)', (t) => {
 test('Simple Tasty Query (filter doesNotEqual)', (t) => {
   let query = new Tasty.Query(DBUsers);
   query.filter(DBUsers['name'].doesNotEqual('notMyUser'));
-  let qstr = Tasty.MySQL.convert(query);
+  let qstr = Tasty.MySQL.generate(query);
   t.equal(qstr, `SELECT * \n  FROM 'users'\n  WHERE 'users'.'name' <> 'notMyUser'\n  LIMIT 0 OFFSET 0;`);
   t.end();
 });
@@ -94,7 +94,7 @@ test('Simple Tasty Query (filter doesNotEqual)', (t) => {
 test('Simple Tasty Query (sort asc)', (t) => {
   let query = new Tasty.Query(DBUsers);
   query.sort(DBUsers['name'], 'asc');
-  let qstr = Tasty.MySQL.convert(query);
+  let qstr = Tasty.MySQL.generate(query);
   t.equal(qstr, `SELECT * \n  FROM 'users'\n  ORDER BY 'users'.'name' ASC\n  LIMIT 0 OFFSET 0;`);
   t.end();
 });
@@ -102,7 +102,7 @@ test('Simple Tasty Query (sort asc)', (t) => {
 test('Simple Tasty Query (sort desc)', (t) => {
   let query = new Tasty.Query(DBUsers);
   query.sort(DBUsers['name'], 'desc');
-  let qstr = Tasty.MySQL.convert(query);
+  let qstr = Tasty.MySQL.generate(query);
   t.equal(qstr, `SELECT * \n  FROM 'users'\n  ORDER BY 'users'.'name' DESC\n  LIMIT 0 OFFSET 0;`);
   t.end();
 });
@@ -110,7 +110,7 @@ test('Simple Tasty Query (sort desc)', (t) => {
 test('Simple Tasty Query (take)', (t) => {
   let query = new Tasty.Query(DBUsers);
   query.take(10);
-  let qstr = Tasty.MySQL.convert(query);
+  let qstr = Tasty.MySQL.generate(query);
   t.equal(qstr, `SELECT * \n  FROM 'users'\n  LIMIT 10 OFFSET 0;`);
   t.end();
 });
@@ -118,7 +118,7 @@ test('Simple Tasty Query (take)', (t) => {
 test('Simple Tasty Query (skip)', (t) => {
   let query = new Tasty.Query(DBUsers);
   query.skip(20);
-  let qstr = Tasty.MySQL.convert(query);
+  let qstr = Tasty.MySQL.generate(query);
   t.equal(qstr, `SELECT * \n  FROM 'users'\n  LIMIT 0 OFFSET 20;`);
   t.end();
 });
@@ -129,7 +129,7 @@ test('Complex Tasty Query (MySQL)', (t) => {
   query.sort(DBUsers['name'], 'asc').sort(DBUsers['id'], 'desc').sort(DBUsers['joinDate'], 'asc');
   query.take(10).skip(20);
 
-  let qstr = Tasty.MySQL.convert(query);
+  let qstr = Tasty.MySQL.generate(query);
   t.equal(qstr, `SELECT 'users'.'id', 'users'.'name', 'users'.'joinDate' \n  FROM 'users'\n  WHERE 'users'.'id' <> 2134\n     AND 'users'.'joinDate' >= '2007-03-24'\n     AND 'users'.'joinDate' < '2017-03-24'\n  ORDER BY 'users'.'name' ASC, 'users'.'id' DESC, 'users'.'joinDate' ASC\n  LIMIT 10 OFFSET 20;`);
   t.end();
 });
@@ -140,7 +140,7 @@ test('Complex Tasty Query (Elastic)', (t) => {
   query.sort(DBUsers['name'], 'asc').sort(DBUsers['id'], 'desc').sort(DBUsers['joinDate'], 'asc');
   query.take(10).skip(20);
 
-  let qstr = JSON.stringify(Tasty.Elastic.convert(query));
+  let qstr = JSON.stringify(Tasty.Elastic.generate(query));
   t.equal(qstr, `{"from":20,"size":10,"stored_fields":["id","name","joinDate"],"query":{"filter":{"bool":{"must_not":[{"term":{"id":2134}}]},"range":{"joinDate":{"gte":"2007-03-24","lt":"2017-03-24"}}}},"sort":[{"name":"asc"},{"id":"desc"},{"joinDate":"asc"}]}`);
   t.end();
 });

@@ -168,7 +168,7 @@ export default class MySQLGenerator
     this.queryString += ';';
   }
 
-  public static convert(node): string
+  public static generate(node): string
   {
     return new MySQLGenerator(node).queryString;
   }
