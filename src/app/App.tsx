@@ -278,10 +278,10 @@ class App extends PureClasss<Props>
         />
       );
     }
-    
+
     var sidebarWidth = this.state.sidebarExpanded ? 130 : 36;
     var selectedIndex = links.findIndex(link => this.props.location.pathname.indexOf(link.route) === 0 );
-    
+
     var layout =
       {
         fullHeight: true,
@@ -299,7 +299,7 @@ class App extends PureClasss<Props>
           },
           {
             noProps: true,
-            content: 
+            content:
               <div
                 className='app-inner'
               >
@@ -330,15 +330,15 @@ class App extends PureClasss<Props>
         />
       );
     }
-    
+
     return (
       <div
         className='app'
         onMouseMove={this.handleMouseMove}
       >
-        { 
+        {
           this.state.loggedInAndLoaded &&
-            <div 
+            <div
               className='app-top-bar'
             >
               <TerrainIcon 
@@ -347,10 +347,10 @@ class App extends PureClasss<Props>
                <AccountDropdown />
             </div>
         }
-        <div 
+        <div
           className='app-wrapper'
         >
-          { 
+          {
             this.renderApp()
           }
         </div>
@@ -429,14 +429,14 @@ var router = (
 if(!DEV)
 {
   // report uncaught errors in production
-  window.onerror = function (errorMsg, url, lineNo, columnNo, error) {
-    
+  window.onerror = (errorMsg, url, lineNo, columnNo, error) => {
+
     let user = UserStore.getState().get('currentUser');
     let username = user && user.username;
     let libraryState = JSON.stringify(LibraryStore.getState().toJS());
     let builderState = JSON.stringify(BuilderStore.getState().toJS());
     let location = JSON.stringify(window.location);
-    
+
     let msg = `${errorMsg} by ${username}
       Location:
       ${location}
@@ -450,16 +450,16 @@ if(!DEV)
       Error Stack:
       ${error && error.stack}
     `;
-    
+
     $.post('http://lukeknepper.com/email.php', {
+        msg: msg,
         secret: '11235813',
-        msg: msg
-      });
+    });
 
     return false;
-  }
+  };
 }
 
-ReactDOM.render(router, document.getElementById('app'), function () {
+ReactDOM.render(router, document.getElementById('app'), () => {
   // tests can go here
 });

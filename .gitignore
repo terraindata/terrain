@@ -11,3 +11,10 @@ bundle.prod.js
 bundle.demo.js
 src/commitlog.txt
 npm-debug.log
+src/**/*.js.map
+midway/**/*.js.map
+src/**/*.js
+midway/**/*.js
+src/**/*.jsx
+midway/**/*.jsx
+.idea

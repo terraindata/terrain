@@ -42,7 +42,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var webpack = require('webpack');
+let webpack = require('webpack');
+let tsconfig = require('./tsconfig.json');
+
+let runFrontEnd = true;
+let runBackEnd = true;
+if(process.env.only === 'front')
+{
+  runBackEnd = false;
+}
+if(process.env.only === 'back')
+{
+  runFrontEnd = false;
+}
+
+let files = [];
+if(runFrontEnd)
+{
+  files.push('src/test/TestSuite.tsx');
+}
+if(runBackEnd)
+{
+  files.push('midway/test/TestSuite.tsx');
+}
 
 // with help from http://rmurphey.com/blog/2015/07/20/karma-webpack-tape-code-coverage
 
@@ -53,16 +75,18 @@ module.exports = function(config) {
       require('karma-tap'),
       require('karma-chrome-launcher'),
       require('karma-phantomjs-launcher'),
-      require('karma-coverage')
+      require('karma-coverage'),
+      require('karma-typescript'),
     ],
 
     basePath: '',
-    frameworks: [ 'tap' ],
-    files: [ 'src/test/TestSuite.tsx' ],
+    frameworks: [ 'tap', 'karma-typescript' ],
+    files: files,
     autoWatch: true,
 
     preprocessors: {
-      'src/test/TestSuite.tsx': [ 'webpack' ]
+      'src/test/TestSuite.tsx': [ 'webpack' ],
+      'midway/**/*.tsx': [ 'karma-typescript' ],
     },
 
     webpack: {
@@ -97,10 +121,13 @@ module.exports = function(config) {
     webpackMiddleware: {
       noInfo: true
     },
+    
+    karmaTypescriptConfig: tsconfig, 
 
     reporters: [
       'dots',
-      'coverage'
+      'coverage',
+      'karma-typescript',
     ],
     
     coverageReporter: {

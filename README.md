@@ -33,22 +33,22 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 
 ## Setup
 
-1. Install and run `midway` (optional)
 1. Install Node, npm
   * on Mac:
     * Install Homebrew
     *  `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
     * Install Node
     *  `brew install node`
-1. Install npm
+1. Install npm.  
   `brew install npm` on Mac
 1. `npm install`
-1. `npm install -g tsd webpack-dev-server babel-cli`
-1. `npm run start-local` (with local midway) or `npm start` (without midway) - dev server now running at [localhost:8080](localhost:8080).
-1. Default user login: `luser` / `secret` (for local midway) or ask Luke for your hosted account details (without midway)
-1. Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans]
+1. `npm install -g webpack-dev-server`
+1. `npm start` - starts the Midway server, now running at localhost:3000
+1. `npm run start-koa` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the dev front-end server on start (and kill it on end)
+1. Default user login: `luser` / `secret`
+1. Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans] - helps things go faster because your browser won't have to fetch Open Sans on each load
 
-Whenever new packages are installed from branches merged to master, run `npm install` locally.
+Whenever new packages are installed by other devs / on other branches, run `npm install` to get the new package locally.
 
 ## Major Dependencies
 
@@ -75,7 +75,8 @@ Links are to relevant overviews and tutorials.
 ### Back-End
 
 - Node
-- Koa and Koa Router
+- Koa
+- Tape, Sinon, and Chai for testing
 
 
 ## Coding Standards
@@ -107,12 +108,6 @@ Contains Actions and Stores for Redux.
 - `[SmallerApp]Store.tsx`: the Store that defines that app's default state and its reducers
 - `[SmallerApp || CategoryOfFunctions]Reducers.tsx`: defines reducers relating to a common function in that smaller app. If the smaller app doesn't have many different actions, there may be just one reducers file.
 
-### src/typings
-
-Contains TypeScript typings.
-
-*Note*: When installing new types, make sure to `cd src` before you `tsd install`
-
 ## Packages and Imports
 
 ### To install a package from npm
@@ -123,18 +118,16 @@ This will install the package and also add a reference to it in your `package.js
 
 If you forget to add `--save`, no line will be added to `package.json`
 
-You will then need to `cd` into `src` and run `tsd install [package_name]` to install any associated typing files. This will add a new directory to `src/typings`, which you should include in your commit.
+You will then need to try to install any Typescript types that are available for the package: `npm install @types/[package-name] --save`. If this succeeds, Typescript types are available and you can import this package with the `import * as Package from 'package-name';` syntax. If this does not succeed, then there are no publicly available types, and you have to use `const Package = require('package');`
 
-If there are no public typings available for this package, then `tsd` will tell you that it has written 0 files. In that case, you cannot use the `import` syntax to include the package, but must use the `require` syntax.
+You can also combine these two installs into one line. You can also use `npm i` as a shortcut for `npm install`
 
 For example, to add `truffle-oil` to my app, I would:
 1. `cd ~/git/Search`
-1. `npm install truffle-oil --save`
+1. `npm install truffle-oil @types/truffle-oil --save`
 1. `git add package.json`
-1. `cd src`
-1. `tsd install truffle-oil`
-1. `cd ..`
-1. `git add typings`
+1. Commit the changes
+
 
 ### Importing / requiring files
 
@@ -142,19 +135,33 @@ To include another `.tsx` file from within the Terraformer codebase (`/src`), us
 `import DotComponent from './DotComponent.tsx';`
 `import NapoleonDynamite from '../../movies/NapoleonDynamite.tsx';`
 
-To include any file that's not a `.tsx` from within the Terraformer codebase, use `const [ClassName] = require('[relative path]')` e.g.
-`require('./Pay.less');`
-`const FreddyAnd = require('../../data/FreddyAnd.json');`
+To include any file that's not a `.tsx` from within the Terraformer codebase, use `const [ClassName] = require('[relative path]')` 
+e.g.  
+`require('./Pay.less');`  
+`const FreddyAnd = require('../../data/FreddyAnd.json');`  
+`const CarrieMathison = require('./CarrieMathison.js');`
 
-To include a package install from `npm`, use `import * as [ClassName] from '[package_name]';` if there are typings available, and `let [ClassName] = require('[package_name]');` if not. e.g.
-`import * as TheForce from 'the-force';`
-`const UnpopularLibrary = require('unpopular-library');`
+To include a package install from `npm`, use `import * as [ClassName] from '[package_name]';` if there are typings available, and `const [ClassName] = require('[package_name]');` if not. e.g.
+`import * as TheForce from 'the-force';`  
+`const UnpopularLibrary = require('unpopular-library');`  
 
 ## Testing
 
+### Back-end
+
+Included in the `midway/test` folder.
+
+Run the `npm run test-back` command to run the back-end tests.
+
+TODO: Integrate with Karma and Tap to get continuous testing and code coverage reports.
+
+### Front-end
+
 Testing? What testing? Here are some instructions for how to run karma/tape, for which there aren't any useful test cases yet...
 
-`npm run test` - runs tests continually in another copy of Chrome
+`npm run test-front` - runs tests continually in another copy of Chrome
+
+### General Testing Gotchas
 
 Sometimes your tests may trigger errors that cause your test browser to crash, and you will see karma report:
 `No captured browser.`
@@ -165,46 +172,65 @@ Note: when adding new tests, make sure to include `t.end()` at the end of every 
 ## Useful Tutorials and Articles
 
 - [http://jaysoo.ca/2015/09/26/typed-react-and-redux/] -- React + TypeScript + Redux
+- [A long Node tutorial covering basics, testing, and some advanced topics](https://blog.risingstack.com/node-hero-tutorial-getting-started-with-node-js/)
+- [https://blog.risingstack.com/node-hero-node-js-unit-testing-tutorial/] -- great testing overview for Javascript
 - [https://hackernoon.com/avoiding-accidental-complexity-when-structuring-your-app-state-6e6d22ad5e2a#.5mvnsgidm] -- outlines guidelines to use when structuring Redux state models
 - [https://gist.github.com/paulirish/5d52fb081b3570c81e3a] -- list of JS operations that trigger layout and can cause force synchronous reflow
+
+
+## Debugging
+
+### Front-end
+
+1. Make sure you install the [React Dev Tools for Chrome](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en)
+1. For debugging in the browser, you'll want to use the browser's JS Consle (CMD + Shift + J on Mac)
+1. Writing `console.log` in your JS code will log output to this console -- this can be useful for basic debugging
+1. Writing `debugger;` in your code will insert a breakpoint and cause Chrome to pause at that point of execution, allowing you to inspect variable values and step forward / into functions. (You have to have the Chrome Console open in order for the breakpoint to catch.)
+1. If you want to inspect the state and props of React components, you can use the React tab in the Chrome Dev Tools to find the component and see its props and state. Tip: Use the element selection tool (top left corner of your dev tools) to quickly select the component you care about.
+1. If you are getting React errors about setting state in the wrong place (e.g. inside of a render method, or after the component has unmounted), you can find the code that is causing the error by going into the Source dev tab, enabling the Pause on Exceptions and Pause on Caught Exceptions options (top right of the pane), triggering the error, and then going a few levels up the stack into the class that caused the error. (Note that on page load there will be a good dozen of these caught exceptions that you will need to skip over).
+
+
+### Back-end
+
+1. Anything from `console.log` will logged to your terminal in the same process.
+1. Please post any other debugging tips here.
+
+
 
 ## Gotchas
 
 A list of common programming gotchas in this codebase
 
-- `let` scope is different than `var` (thankfully) but can cause unexpected errors
-  ```
-  if(someCondition)
+- `let` scope is different than `var` (thankfully) but can cause unexpected errors. For example:  
+  ```if(isJoey)
   {
-    var someVar = "someValue";
+    var catchphrase = "How you doin'?";
   }
-  console.log(someVar); // either "someValue" or "undefined"
-  
-  if(someOtherCondition)
+  console.log(catchphrase); // either the string or undefined```  
+  Versus:  
+  ```if(isPhoebe)
   {
-    let someLet = "someOtherValue";
+    let catchphrase = "Oh no.";
   }
-  console.log(someLet); // ERROR: cannot find name someLet
+  console.log(catchphrase); // ERROR: cannot find name catchphrase
   ```
 - Subscribe to Redux stores within the `componentDidMount` method. Do not subscribe in the constructor, or else you will likely see many React `setState` warnings
 - Do not call `fetch` from within a constructor or you may see similar warnings (React thinks that state changes are happening from a higher component's `render` method)
-- ReactVirtualized: The library uses `shallowCompare` to detect prop changes, so you may need to pass additional props to indicate that data have changed.
-  More here: [https://github.com/bvaughn/react-virtualized#pure-components]
-- Inline functions in ES6 don't like comments:
+- Inline functions in ES6 don't like comments if you don't include `{...}`:
   ```
-  var works = () =>
+  let works = () =>
      console.log('success');
      // log something
   works(); // logs 'success';
 
-  var doesntWork = () =>
+  let doesntWork = () =>
      // log something
-     console.log('success');
+     console.log('success'); // executed and logged at runtime
   doesntWork(); // nothing is logged
   ```
 
 ## Troubleshooting
 
+1. Don't panic.
 1. Node or npm errors: `npm install` - you may be missing packages.
-2. Test suite doesn't run all tests: make sure you have added correct `t.plan(x)` or `t.end()` statements to every test, otherwise the test suite will hang.
-3. Assume it's an early sign of the apocalypse. Hide your kids.
+1. Test suite doesn't run all tests: make sure you have added correct `t.plan(x)` or `t.end()` statements to every test, otherwise the test suite will hang.
