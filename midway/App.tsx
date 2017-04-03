@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import BabelRegister = require('babel-register');
+import dateFormat = require('date-format');
 import * as Koa from 'koa';
 import * as winston from 'winston';
 import Middleware from './Middleware';
@@ -78,13 +79,28 @@ app.proxy = true;
 
 app.use(Middleware.bodyParser());
 app.use(Middleware.favicon('../src/app/favicon.ico'));
-app.use(Middleware.logger());
+app.use(Middleware.logger(winston));
 app.use(Middleware.responseTime());
 app.use(Middleware.compress());
 app.use(Middleware.passport.initialize());
 app.use(Middleware.passport.session());
 
 app.use(Router.routes());
+
+winston.configure({
+  transports: [
+    new (winston.transports.Console)({
+      formatter: (options) => {
+      return options.timestamp() + ' [' + process.pid + '] ' + winston.config.colorize(options.level) + ': ' +
+          (options.message ? options.message : '') + (options.meta && Object.keys(options.meta).length ? '\n\t' +
+          JSON.stringify(options.meta) : '' );
+      },
+      timestamp: () => {
+        return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
+      },
+    }),
+  ],
+});
 
 app.listen(args.port);
 
