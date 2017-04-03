@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import 'babel-core/register';
+import BabelRegister = require('babel-register');
 import * as Koa from 'koa';
 import * as passport from 'koa-passport';
 import * as winston from 'winston';
@@ -81,9 +81,8 @@ const index = reqText('../src/app/index.html', require);
 
 Router.get('/bundle.js', async (ctx, next) => 
 {
-	// TODO render this if DEV, otherwise render compiled bundle.js
-  let response = await Util.getRequest('http://localhost:8080/bundle.js');
-  ctx.body = response;
+  // TODO render this if DEV, otherwise render compiled bundle.js
+  ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
 });
 
 Router.get('/', async (ctx, next) => 
@@ -110,15 +109,14 @@ Middleware.passport.use('access-token-local', new LocalStrategy(
     usernameField: "username", 
     passwordField: "access_token" 
   }, 
-  async (username, access_token, done) => 
+  (username, access_token, done) => 
   {
     return done(null, Users.findByAccessToken(username, access_token));
 }));
 
 Middleware.passport.use('local', new LocalStrategy( async (username, password, done) => 
 {
-  let user = await Users.findByUsername(username, password);
-  done(null, user);
+  done(null, await Users.findByUsername(username, password));
 }));
 
 Middleware.passport.serializeUser( (user, done) => 

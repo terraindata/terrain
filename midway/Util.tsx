@@ -46,9 +46,10 @@ THE SOFTWARE.
 
 import * as request from 'request';
 
-namespace Util 
+
+const Util = 
 {
-  export function getRequest(url) 
+  getRequest: (url) => 
   {
     return new Promise((resolve, reject) => 
     {
@@ -65,6 +66,6 @@ namespace Util
       });
     });
   }
-}
+};
 
 export default Util;

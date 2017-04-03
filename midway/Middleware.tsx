@@ -49,15 +49,16 @@ import * as koaCompress from 'koa-compress';
 import * as koaFavicon from 'koa-favicon';
 import * as koaLogger from 'koa-logger';
 import * as koaPassport from 'koa-passport';
+import koaResponseTime = require('koa-response-time');
 
-namespace Middleware 
+const Middleware = 
 {
-  export const responseTime = require('koa-response-time');
-  export const logger = koaLogger;
-  export const compress = koaCompress;
-  export const favicon = koaFavicon;
-  export const bodyParser = koaBodyParser;
-  export const passport = koaPassport;
-}
+  bodyParser: koaBodyParser,
+  compress: koaCompress,
+  favicon: koaFavicon,
+  logger: koaLogger,
+  passport: koaPassport,
+  responseTime: koaResponseTime,
+};
 
 export default Middleware;
