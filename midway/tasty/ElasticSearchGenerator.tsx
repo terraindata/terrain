@@ -142,7 +142,6 @@ export default class ElasticSearchGenerator
     // https://www.elastic.co/guide/en/elasticsearch/guide/current/combining-filters.html#bool-filter
     // currently only supports the basic operators, with the column on the lhs, as well as && and ||
 
-    console.log(expression.toString());
     if (expression.numChildren !== 2)
     {
       throw new Error('Filtering on non-binary expression "' + JSON.stringify(expression) + '".');
