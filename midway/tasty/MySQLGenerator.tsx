@@ -325,7 +325,7 @@ export default class MySQLGenerator
     }
     if (node.type === 'string')
     {
-      return this.escapeString(node.value);
+      return "'" + this.escapeString(node.value) + "'";
     }
     if (node.type === 'number')
     {
@@ -341,7 +341,7 @@ export default class MySQLGenerator
 
   private escapeString(value: string): string
   {
-    return "'" + value.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g,
+    return value.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g,
     (char) =>
     {
       switch (char)
@@ -366,6 +366,6 @@ export default class MySQLGenerator
         default:
         return char;
       }
-    }) + "'";
+    });
   }
 }
