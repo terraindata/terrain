@@ -50,7 +50,7 @@ import TastyQuery from './TastyQuery';
 import TastyTable from './TastyTable';
 
 // Query Generators
-import ElasticSearchGenerator from './ElasticSearchGenerator';
+import ElasticGenerator from './ElasticGenerator';
 import MySQLGenerator from './MySQLGenerator';
 
 namespace Tasty {
@@ -58,7 +58,7 @@ namespace Tasty {
   export const Table = TastyTable;
   export const Query = TastyQuery;
   export const MySQL = MySQLGenerator;
-  export const Elastic = ElasticSearchGenerator;
+  export const Elastic = ElasticGenerator;
 }
 
 export default Tasty;

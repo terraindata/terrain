@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as SQLGenerator from './SQLGenerator';
 import TastyQuery from './TastyQuery';
 
-export default class ElasticSearchGenerator
+export default class ElasticGenerator
 {
   private queryObject: any;
   private tableName: string;
@@ -186,7 +186,7 @@ export default class ElasticSearchGenerator
 
   public static generate(node)
   {
-    return new ElasticSearchGenerator(node).queryObject;
+    return new ElasticGenerator(node).queryObject;
   }
 
   private getSubclauseList(parentClause, clauseName)
