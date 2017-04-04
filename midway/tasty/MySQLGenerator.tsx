@@ -146,20 +146,20 @@ export default class MySQLGenerator
         });
     }
 
-    if (query.numTaken != null || query.numSkipped != null)
+    if (query.numTaken != 0 || query.numSkipped != 0)
     {
       this.newLine();
 
-      if (query.numTaken != null)
+      if (query.numTaken != 0)
       {
         this.queryString += 'LIMIT ' + query.numTaken;
-        if (query.numSkipped !== null)
+        if (query.numSkipped !== 0)
         {
           this.queryString += ' ';
         }
       }
 
-      if (query.numSkipped != null)
+      if (query.numSkipped != 0)
       {
         this.queryString += 'OFFSET ' + query.numSkipped;
       }
