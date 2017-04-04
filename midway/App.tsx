@@ -91,7 +91,7 @@ winston.configure({
   transports: [
     new (winston.transports.Console)({
       formatter: (options) => {
-      return options.timestamp() + ' [' + process.pid + '] ' + winston.config.colorize(options.level) + ': ' +
+      return options.timestamp() + ' [' + process.pid + '] ' + options.level + ': ' +
           (options.message ? options.message : '') + (options.meta && Object.keys(options.meta).length ? '\n\t' +
           JSON.stringify(options.meta) : '' );
       },
