@@ -49,6 +49,11 @@ import TastyQuery from './TastyQuery';
 
 export default class MySQLGenerator
 {
+  public static generate(node): string
+  {
+    return new MySQLGenerator(node).queryString;
+  }
+
   public queryString: string;
   private indentation: number;
 
@@ -166,11 +171,6 @@ export default class MySQLGenerator
     }
 
     this.queryString += ';';
-  }
-
-  public static generate(node): string
-  {
-    return new MySQLGenerator(node).queryString;
   }
 
   private newLine()

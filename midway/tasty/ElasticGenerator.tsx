@@ -49,6 +49,11 @@ import TastyQuery from './TastyQuery';
 
 export default class ElasticGenerator
 {
+  public static generate(node)
+  {
+    return new ElasticGenerator(node).queryObject;
+  }
+
   private queryObject: any;
   private tableName: string;
 
@@ -182,11 +187,6 @@ export default class ElasticGenerator
     {
       throw new Error('Filtering on unsupported expression "' + JSON.stringify(expression) + '".');
     }
-  }
-
-  public static generate(node)
-  {
-    return new ElasticGenerator(node).queryObject;
   }
 
   private getSubclauseList(parentClause, clauseName)
