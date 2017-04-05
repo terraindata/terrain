@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// require individual test files.
-
-import './unit/ExampleUnitTest';
-import './unit/TastyExecutorTests';
-import './unit/TastyGeneratorTests';
+export default class ElasticExecutor
+{
+}

@@ -44,8 +44,72 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// require individual test files.
+import * as mysql from 'mysql';
 
-import './unit/ExampleUnitTest';
-import './unit/TastyExecutorTests';
-import './unit/TastyGeneratorTests';
+const defaultMySQLConfig: mysql.IPoolConfig = {
+  connectionLimit: 20,
+  database : 'tdbdtest',
+  host     : 'localhost',
+  password : 'r3curs1v3$',
+  user     : 't3rr41n-demo',
+};
+
+export default class MySQLExecutor
+{
+  private pool;
+
+  constructor(config?: mysql.IPoolConfig)
+  {
+    if (config === undefined)
+    {
+      config = defaultMySQLConfig;
+    }
+
+    this.pool = mysql.createPool(config);
+    this.pool.getConnection((error, connection) =>
+    {
+      if (error)
+      {
+        throw error;
+      }
+      connection.release();
+    });
+
+    this.pool.on('acquire', (connection) =>
+    {
+      console.log('Connection %d acquired', connection.threadId);
+    });
+
+    this.pool.on('release', (connection) =>
+    {
+      console.log('Connection %d released', connection.threadId);
+    });
+  }
+
+  public query(queryStr: string)
+  {
+    return new Promise((resolve, reject) =>
+    {
+      this.pool.query(queryStr, (error, results, fields) =>
+      {
+        if (error)
+        {
+          reject(error);
+        } else {
+          resolve({results, fields});
+        }
+      });
+    });
+  }
+
+  public end()
+  {
+    this.pool.end((error) =>
+    {
+      if (error)
+      {
+        throw error;
+      }
+    });
+  }
+}

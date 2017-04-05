@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import MySQLExecutor from './MySQLExecutor';
 import MySQLGenerator from './MySQLGenerator';
 
 export default class MySQLInterface
