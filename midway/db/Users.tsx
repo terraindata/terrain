@@ -42,47 +42,91 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// https://github.com/ortoo/oauth2orize/blob/master/examples/express2/db/users.js
+// TODO THIS IS A STUB. REPLACE WITH ORM
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import AuthRouter from './auth/AuthRouter';
-import ItemRouter from './items/ItemRouter';
-import SchemaRouter from './schema/SchemaRouter';
-import UserRouter from './users/UserRouter';
-import VersionRouter from './versions/VersionRouter';
+import * as bcrypt from 'bcrypt-nodejs';
 
-let AppRouter = new KoaRouter();
+import srs = require('secure-random-string');
 
-AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
-AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
-AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
-AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
-AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
-// Add future routes here.
-
-// Prefix all routes with /midway
-//  This is so that we can allow the front-end to use all other routes.
-//  Any route not prefixed with /midway will just serve the front-end.
-
-AppRouter.get('/', async (ctx, next) => 
-{
-  if(ctx.state.user)
+let users = [
   {
-    ctx.body = "authenticated as " + ctx.state.user.username;
-  }
-  else
+    accessToken: '',
+    id: '1',
+    name: 'Bob Smith',
+    password: bcrypt.hashSync('secret'),
+    username: 'bob',
+  },
   {
-    ctx.body = "not authenticated";
-  }
-});
+    accessToken: '',
+    id: '2',
+    name: 'Joe Davis',
+    password: bcrypt.hashSync('password'),
+    username: 'joe',
+  },
+  {
+    accessToken: '',
+    id: '3',
+    name: 'Linux User',
+    password: bcrypt.hashSync('secret'),
+    username: 'luser',
+  },
+];
 
-AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) => 
+const Users =
 {
-  ctx.body = "authenticated as " + ctx.state.user.username;
-});
+  find: (id) =>
+  {
+    for (let i = 0, len = users.length; i < len; i++)
+    {
+      let user = users[i];
+      if (user.id === id)
+      {
+        return user;
+      }
+    }
+    return null;
+  },
+  findByAccessToken: (username, accessToken) =>
+  {
+    for (let i = 0, len = users.length; i < len; i++)
+    {
+      let user = users[i];
+      if (user.username === username && user.accessToken.length > 0 && user.accessToken === accessToken)
+      {
+        return user;
+      }
+    }
+    return null;
+  },
+  findByUsername: (username, password) =>
+  {
+    for (let i = 0, len = users.length; i < len; i++)
+    {
+      let user = users[i];
+      if (user.username === username)
+      {
+        return new Promise((resolve, reject) => {
+          bcrypt.compare(password, user.password, (err, res) =>
+          {
+            if (res)
+            {
+              if (user.accessToken.length === 0)
+              {
+                user.accessToken = srs(
+                  {
+                    length: 256,
+                  });
+              }
+              resolve(user);
+            } else {
+              resolve(null);
+            }
+          });
+        });
+      }
+    }
+  },
+};
 
-let MidwayRouter = new KoaRouter();
-MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
-
-export default MidwayRouter;
+export default Users;
