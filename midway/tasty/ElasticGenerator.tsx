@@ -58,13 +58,13 @@ export default class ElasticGenerator
     this.tableName = query.table.__tableName;
 
     // from clause
-    if (query.numSkipped != 0)
+    if (query.numSkipped !== 0)
     {
       this.queryObject['from'] = query.numSkipped;
     }
 
     // size clause
-    if (query.numTaken != 0)
+    if (query.numTaken !== 0)
     {
       this.queryObject['size'] = query.numTaken;
     }
