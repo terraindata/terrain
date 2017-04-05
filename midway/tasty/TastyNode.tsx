@@ -48,30 +48,6 @@ import TastyNodeTypes from './TastyNodeType';
 
 export default class TastyNode
 {
-  private type: string;
-  private value: any;
-  private chidlren: any;
-
-  constructor(type: string, value: any)
-  {
-    if (!(type in TastyNodeTypes))
-    {
-      throw new Error('Type "' + type + '" is not a known TastyNodeType.');
-    }
-    this.type = type;
-    this.value = value;
-  }
-
-  private toString(): string
-  {
-    return JSON.stringify(this, null, 2);
-  }
-
-  private get tastyType()
-  {
-    return TastyNodeTypes[this.type];
-  }
-
   private static make(value): TastyNode
   {
     if (value instanceof TastyNode)
@@ -99,6 +75,30 @@ export default class TastyNode
     }
 
     throw new Error('Trying to make a TastyNode from an unsupported value type.');
+  }
+
+  private type: string;
+  private value: any;
+  private chidlren: any;
+
+  constructor(type: string, value: any)
+  {
+    if (!(type in TastyNodeTypes))
+    {
+      throw new Error('Type "' + type + '" is not a known TastyNodeType.');
+    }
+    this.type = type;
+    this.value = value;
+  }
+
+  private toString(): string
+  {
+    return JSON.stringify(this, null, 2);
+  }
+
+  private get tastyType()
+  {
+    return TastyNodeTypes[this.type];
   }
 
   private get numChildren(): number

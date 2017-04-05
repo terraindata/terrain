@@ -60,7 +60,7 @@ export default class ElasticGenerator
   constructor(query)
   {
     this.queryObject = {};
-    this.tableName = query.table.__tableName;
+    this.tableName = query.table._tastyTableName;
 
     // from clause
     if (query.numSkipped !== 0)
@@ -111,7 +111,7 @@ export default class ElasticGenerator
     // //write FROM clause
     // this.newLine();
     // this.queryString += 'FROM ';
-    // this.queryString += this.escapeString(query.table.__tableName);
+    // this.queryString += this.escapeString(query.table.__tastyTableName);
 
     // filter clause
     if (query.filters.length > 0)

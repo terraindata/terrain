@@ -102,7 +102,7 @@ let TastyNodeTypes = Object.freeze([
       state.map[typeName] = new TastyNodeType(typeName, state.count++);
       return state;
     }, {
-      map: new Map<string, {name: string, code: number}>(), count: 1,
+      count: 1, map: new Map<string, {name: string, code: number}>(),
     }).map);
 
 export default TastyNodeTypes;

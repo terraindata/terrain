@@ -182,8 +182,4 @@ test('pool destroy', (t) =>
     return;
   }
   t.end();
-
-  // FIX: end the testsuite gracefully making sure that we do not have
-  // any leaked handles
-  process.exit();
 });

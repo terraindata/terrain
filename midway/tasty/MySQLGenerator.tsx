@@ -112,7 +112,7 @@ export default class MySQLGenerator
     // write FROM clause
     this.newLine();
     this.queryString += 'FROM ';
-    this.queryString += this.escapeString(query.table.__tableName);
+    this.queryString += this.escapeString(query.table._tastyTableName);
 
     // write WHERE clause
     if (query.filters.length > 0)
