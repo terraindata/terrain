@@ -167,7 +167,11 @@ test('execute complex query (MySQL)', async (t) => {
     t.end();
     return;
   }
-  let h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n  WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'\n     AND movies.releasedate < '2017-03-24'\n  ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC\n  LIMIT 10 OFFSET 20;`);
+  let h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n
+                          WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'\n
+                          AND movies.releasedate < '2017-03-24'\n
+                          ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC\n
+                          LIMIT 10 OFFSET 20;`);
   t.equal(h, `f1c34d8cbc4877c9fe93e7e1f3f82d4b84bc63d3`);
   t.end();
 });

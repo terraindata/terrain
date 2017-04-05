@@ -124,23 +124,27 @@ test('generate simple query (skip)', (t) => {
 });
 
 test('generate complex query (MySQL)', (t) => {
-  let query = new Tasty.Query(DBMovies).select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).filter(DBMovies['movieid'].neq(2134));
+  let query = new Tasty.Query(DBMovies);
+  query.select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).filter(DBMovies['movieid'].neq(2134));
   query.filter(DBMovies['releasedate'].gte('2007-03-24')).filter(DBMovies['releasedate'].lt('2017-03-24'));
   query.sort(DBMovies['title'], 'asc').sort(DBMovies['movieid'], 'desc').sort(DBMovies['releasedate'], 'asc');
   query.take(10).skip(20);
 
   let qstr = Tasty.MySQL.generate(query);
+  /* tslint:disable-next-line:max-line-length */
   t.equal(qstr, `SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n  WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'\n     AND movies.releasedate < '2017-03-24'\n  ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC\n  LIMIT 10 OFFSET 20;`);
   t.end();
 });
 
 test('generate complex query (Elastic)', (t) => {
-  let query = new Tasty.Query(DBMovies).select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).filter(DBMovies['movieid'].neq(2134));
+  let query = new Tasty.Query(DBMovies);
+  query.select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).filter(DBMovies['movieid'].neq(2134));
   query.filter(DBMovies['releasedate'].gte('2007-03-24')).filter(DBMovies['releasedate'].lt('2017-03-24'));
   query.sort(DBMovies['title'], 'asc').sort(DBMovies['movieid'], 'desc').sort(DBMovies['releasedate'], 'asc');
   query.take(10).skip(20);
 
   let qstr = JSON.stringify(Tasty.Elastic.generate(query));
+  /* tslint:disable-next-line:max-line-length */
   t.equal(qstr, `{"from":20,"size":10,"stored_fields":["movieid","title","releasedate"],"query":{"filter":{"bool":{"must_not":[{"term":{"movieid":2134}}]},"range":{"releasedate":{"gte":"2007-03-24","lt":"2017-03-24"}}}},"sort":[{"title":"asc"},{"movieid":"desc"},{"releasedate":"asc"}]}`);
   t.end();
 });
