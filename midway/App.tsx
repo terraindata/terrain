@@ -44,48 +44,50 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import BabelRegister = require('babel-register');
-import convert = require('koa-convert');
-import session = require('koa-generic-session');
 import * as Koa from 'koa';
-import * as passport from 'koa-passport';
 import * as winston from 'winston';
+
+import BabelRegister = require('babel-register');
+import cmdLineArgs = require('command-line-args');
+import convert = require('koa-convert');
+import dateFormat = require('date-format');
+import passportLocal = require('passport-local');
+import reqText = require('require-text');
+import session = require('koa-generic-session');
+
+import Users from './db/Users';
 import Middleware from './Middleware';
 import Router from './Router';
 import Util from './Util';
-import Users from './db/Users';
 
-
-let LocalStrategy = require('passport-local').Strategy;
-import cmdLineArgs = require('command-line-args');
-import reqText = require('require-text');
+let LocalStrategy = passportLocal.Strategy;
 
 // process command-line arguments
 const optDefs = [
   {
-    name: 'port', 
-    alias: 'p', 
-    type: Number, 
-    defaultValue: 3000
+    alias: 'p',
+    defaultValue: 3000,
+    name: 'port',
+    type: Number,
   },
   {
-    name: 'db', 
-    alias: 'r', 
-    type: String, 
-    defaultValue: 'mysql'
+    alias: 'r',
+    defaultValue: 'mysql',
+    name: 'db',
+    type: String,
   },
 ];
 
 const args = cmdLineArgs(optDefs);
 const index = reqText('../src/app/index.html', require);
 
-Router.get('/bundle.js', async (ctx, next) => 
+Router.get('/bundle.js', async (ctx, next) =>
 {
   // TODO render this if DEV, otherwise render compiled bundle.js
   ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
 });
 
-Router.get('/', async (ctx, next) => 
+Router.get('/', async (ctx, next) =>
 {
   await next();
   ctx.body = index.toString();
@@ -98,7 +100,7 @@ app.use(convert(session()));
 
 app.use(Middleware.bodyParser());
 app.use(Middleware.favicon('../src/app/favicon.ico'));
-app.use(Middleware.logger());
+app.use(Middleware.logger(winston));
 app.use(Middleware.responseTime());
 app.use(Middleware.compress());
 app.use(Middleware.passport.initialize());
@@ -106,33 +108,50 @@ app.use(Middleware.passport.session());
 
 Middleware.passport.use('access-token-local', new LocalStrategy(
   {
-    usernameField: "username", 
-    passwordField: "access_token" 
-  }, 
-  (username, access_token, done) => 
+    passwordField: 'accessToken',
+    usernameField: 'username',
+  },
+  (username, accessToken, done) =>
   {
-    return done(null, Users.findByAccessToken(username, access_token));
+    return done(null, Users.findByAccessToken(username, accessToken));
 }));
 
-Middleware.passport.use('local', new LocalStrategy(async (username, password, done) => 
+Middleware.passport.use('local', new LocalStrategy(async (username, password, done) =>
 {
   done(null, await Users.findByUsername(username, password));
 }));
 
-Middleware.passport.serializeUser((user, done) => 
+Middleware.passport.serializeUser((user, done) =>
 {
-  if(user) 
+  if (user)
   {
     done(null, user.id);
   }
 });
 
-Middleware.passport.deserializeUser((id, done) => 
+Middleware.passport.deserializeUser((id, done) =>
 {
   done(null, Users.find(id));
 });
 
 app.use(Router.routes());
+
+winston.configure({
+  transports: [
+    new (winston.transports.Console)({
+      formatter: (options) =>
+      {
+        return options.timestamp() + ' [' + process.pid + '] ' + options.level + ': ' +
+            (options.message ? options.message : '') + (options.meta && Object.keys(options.meta).length ? '\n\t' +
+            JSON.stringify(options.meta) : '' );
+      },
+      timestamp: () =>
+      {
+        return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
+      },
+    }),
+  ],
+});
 
 app.listen(args.port);
 

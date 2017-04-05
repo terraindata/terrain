@@ -47,11 +47,11 @@ THE SOFTWARE.
 import * as koaBodyParser from 'koa-bodyparser';
 import * as koaCompress from 'koa-compress';
 import * as koaFavicon from 'koa-favicon';
-import * as koaLogger from 'koa-logger';
+import * as koaLogger from 'koa-logger-winston';
 import * as koaPassport from 'koa-passport';
 import koaResponseTime = require('koa-response-time');
 
-const Middleware = 
+const Middleware =
 {
   bodyParser: koaBodyParser,
   compress: koaCompress,
