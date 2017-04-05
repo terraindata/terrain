@@ -46,6 +46,5 @@ THE SOFTWARE.
 
 // require individual test files.
 
-import './unit/ExampleUnitTest';
 import './unit/TastyExecutorTests';
 import './unit/TastyGeneratorTests';
