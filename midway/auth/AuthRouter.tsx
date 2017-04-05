@@ -45,10 +45,11 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as KoaRouter from 'koa-router';
-let Router = new KoaRouter();
-
 import * as passport from 'koa-passport';
 import * as passportLocal from 'passport-local';
+import * as winston from 'winston';
+
+let Router = new KoaRouter();
 
 Router.post('/', async (ctx, next) =>
 {

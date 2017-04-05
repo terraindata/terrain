@@ -45,20 +45,22 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
+
 let Router = new KoaRouter();
 
 Router.get('/', async (ctx, next) =>
 {
   // return all items, or item by id
   ctx.body = '';
-  console.log('user root');
+  winston.info('user root');
 });
 
 Router.post('/', async (ctx, next) =>
 {
   // change or create a user
   ctx.body = '';
-  console.log('user post');
+  winston.info('user post');
 });
 
 export default Router;
