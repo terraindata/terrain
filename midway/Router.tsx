@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import AuthRouter from './auth/AuthRouter';
 import ItemRouter from './items/ItemRouter';
@@ -63,6 +64,23 @@ AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
 // Prefix all routes with /midway
 //  This is so that we can allow the front-end to use all other routes.
 //  Any route not prefixed with /midway will just serve the front-end.
+
+AppRouter.get('/', async (ctx, next) => 
+{
+  if(ctx.state.user)
+  {
+    ctx.body = "authenticated as " + ctx.state.user.username;
+  }
+  else
+  {
+    ctx.body = "not authenticated";
+  }
+});
+
+AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) => 
+{
+  ctx.body = "authenticated as " + ctx.state.user.username;
+});
 
 let MidwayRouter = new KoaRouter();
 MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());

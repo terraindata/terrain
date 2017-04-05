@@ -42,30 +42,95 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// https://github.com/ortoo/oauth2orize/blob/master/examples/express2/db/users.js
+// TODO THIS IS A STUB. REPLACE WITH ORM
 
-import * as request from 'request';
+let srs = require('secure-random-string');
+import * as bcrypt from 'bcrypt-nodejs';
 
+let users = [
+    { 
+      id: '1', 
+      username: 'bob', 
+      password: bcrypt.hashSync('secret'), 
+      name: 'Bob Smith', 
+      access_token: ''
+    },
+    { 
+      id: '2', 
+      username: 'joe', 
+      password: bcrypt.hashSync('password'), 
+      name: 'Joe Davis', 
+      access_token: ''
+    },
+    { 
+      id: '3', 
+      username: 'luser', 
+      password: bcrypt.hashSync('secret'), 
+      name: 'Linux User', 
+      access_token: ''
+    },
+];
 
-const Util = 
+namespace Users 
 {
-  getRequest: (url) => 
+  export const find = (id) => 
   {
-    return new Promise((resolve, reject) => 
+    for (let i = 0, len = users.length; i < len; i++) 
     {
-      request(url, (error, res, body) => 
+      let user = users[i];
+      if (user.id === id) 
       {
-        if (!error && res.statusCode === 200) 
-        {
-          resolve(body);
-        } 
-        else 
-        {
-          reject(error);
-        }
-      });
-    });
-  }
-};
+        return user;
+      }
+    }
+    return null;
+  };
 
-export default Util;
+  export const findByUsername = (username, password) => 
+  {
+    for (let i = 0, len = users.length; i < len; i++) 
+    {
+      let user = users[i];
+      if (user.username === username) 
+      {
+        return new Promise((resolve, reject) => {
+          bcrypt.compare(password, user.password, function(err, res) 
+          {
+            if(res)
+            {
+              if(user.access_token.length === 0) 
+              {
+                let accesstoken = srs(
+                  { 
+                    length: 256 
+                  });
+                user.access_token = accesstoken;
+              }
+              resolve(user);
+            }
+            else
+            {
+              resolve(null);
+            }
+          });
+        });
+      }
+    }
+  };
+
+  export const findByAccessToken = (username, access_token) => 
+  {
+    for (let i = 0, len = users.length; i < len; i++) 
+    {
+      let user = users[i];
+      if (user.username === username && user.access_token.length > 0 && user.access_token === access_token) 
+      {
+        return user;
+      }
+    }
+    return null;
+  };
+}
+
+export default Users;

@@ -54,6 +54,7 @@
     "babel-preset-stage-2": "^6.5.0",
     "babel-register": "^6.24.0",
     "babel-runtime": "^6.6.1",
+    "bcrypt-nodejs": "0.0.3",
     "chai": "^3.5.0",
     "classnames": "^2.2.5",
     "codemirror": "^5.16.0",
@@ -75,7 +76,9 @@
     "koa": "^2.2.0",
     "koa-bodyparser": "^4.2.0",
     "koa-compress": "^2.0.0",
+    "koa-convert": "^1.2.0",
     "koa-favicon": "^2.0.0",
+    "koa-generic-session": "^1.11.5",
     "koa-logger": "^2.0.1",
     "koa-passport": "^3.0.0",
     "koa-request": "^1.0.0",
@@ -111,6 +114,7 @@
     "request": "^2.81.0",
     "request-promise": "^4.2.0",
     "require-text": "0.0.1",
+    "secure-random-string": "^1.0.0",
     "sinon": "^2.1.0",
     "sort-by": "^1.1.0",
     "string-replace-loader": "^1.0.5",
@@ -131,6 +135,7 @@
     "zxcvbn": "^4.3.0"
   },
   "devDependencies": {
+    "@types/bcrypt-nodejs": "0.0.30",
     "@types/chai": "^3.4.35",
     "@types/classnames": "0.0.32",
     "@types/d3": "^4.7.0",

@@ -45,36 +45,56 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import BabelRegister = require('babel-register');
+import convert = require('koa-convert');
+import session = require('koa-generic-session');
 import * as Koa from 'koa';
+import * as passport from 'koa-passport';
 import * as winston from 'winston';
 import Middleware from './Middleware';
 import Router from './Router';
 import Util from './Util';
+import Users from './db/Users';
+
+
+let LocalStrategy = require('passport-local').Strategy;
 import cmdLineArgs = require('command-line-args');
 import reqText = require('require-text');
 
 // process command-line arguments
 const optDefs = [
-  {name: 'port', alias: 'p', type: Number, defaultValue: 3000},
-  {name: 'db', alias: 'r', type: String, defaultValue: 'mysql'},
+  {
+    name: 'port', 
+    alias: 'p', 
+    type: Number, 
+    defaultValue: 3000
+  },
+  {
+    name: 'db', 
+    alias: 'r', 
+    type: String, 
+    defaultValue: 'mysql'
+  },
 ];
 
 const args = cmdLineArgs(optDefs);
 const index = reqText('../src/app/index.html', require);
 
-Router.get('/bundle.js', async (ctx, next) => {
+Router.get('/bundle.js', async (ctx, next) => 
+{
   // TODO render this if DEV, otherwise render compiled bundle.js
   ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
 });
 
-Router.get('/', async (ctx, next) => {
+Router.get('/', async (ctx, next) => 
+{
   await next();
   ctx.body = index.toString();
 });
 
 const app = new Koa();
-
 app.proxy = true;
+app.keys = ['your-session-secret'];
+app.use(convert(session()));
 
 app.use(Middleware.bodyParser());
 app.use(Middleware.favicon('../src/app/favicon.ico'));
@@ -83,6 +103,34 @@ app.use(Middleware.responseTime());
 app.use(Middleware.compress());
 app.use(Middleware.passport.initialize());
 app.use(Middleware.passport.session());
+
+Middleware.passport.use('access-token-local', new LocalStrategy(
+  {
+    usernameField: "username", 
+    passwordField: "access_token" 
+  }, 
+  (username, access_token, done) => 
+  {
+    return done(null, Users.findByAccessToken(username, access_token));
+}));
+
+Middleware.passport.use('local', new LocalStrategy(async (username, password, done) => 
+{
+  done(null, await Users.findByUsername(username, password));
+}));
+
+Middleware.passport.serializeUser((user, done) => 
+{
+  if(user) 
+  {
+    done(null, user.id);
+  }
+});
+
+Middleware.passport.deserializeUser((id, done) => 
+{
+  done(null, Users.find(id));
+});
 
 app.use(Router.routes());
 

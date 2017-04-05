@@ -51,7 +51,8 @@ import * as koaLogger from 'koa-logger';
 import * as koaPassport from 'koa-passport';
 import koaResponseTime = require('koa-response-time');
 
-const Middleware = {
+const Middleware = 
+{
   bodyParser: koaBodyParser,
   compress: koaCompress,
   favicon: koaFavicon,
