@@ -45,7 +45,7 @@ THE SOFTWARE.
 // https://github.com/ortoo/oauth2orize/blob/master/examples/express2/db/users.js
 // TODO THIS IS A STUB. REPLACE WITH ORM
 
-import * as srs from 'secure-random-string';
+let srs = require('secure-random-string');
 import * as bcrypt from 'bcrypt-nodejs';
 
 let users = [

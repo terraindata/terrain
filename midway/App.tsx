@@ -45,11 +45,11 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import BabelRegister = require('babel-register');
+import convert = require('koa-convert');
+import session = require('koa-generic-session');
 import * as Koa from 'koa';
 import * as passport from 'koa-passport';
 import * as winston from 'winston';
-import * as convert from 'koa-convert';
-import * as session from'koa-generic-session';
 import Middleware from './Middleware';
 import Router from './Router';
 import Util from './Util';
@@ -104,7 +104,7 @@ app.use(Middleware.compress());
 app.use(Middleware.passport.initialize());
 app.use(Middleware.passport.session());
 
-Middleware.passport.use('access-token-local', new LocalStrategy( 
+Middleware.passport.use('access-token-local', new LocalStrategy(
   {
     usernameField: "username", 
     passwordField: "access_token" 
@@ -114,12 +114,12 @@ Middleware.passport.use('access-token-local', new LocalStrategy(
     return done(null, Users.findByAccessToken(username, access_token));
 }));
 
-Middleware.passport.use('local', new LocalStrategy( async (username, password, done) => 
+Middleware.passport.use('local', new LocalStrategy(async (username, password, done) => 
 {
   done(null, await Users.findByUsername(username, password));
 }));
 
-Middleware.passport.serializeUser( (user, done) => 
+Middleware.passport.serializeUser((user, done) => 
 {
   if(user) 
   {
@@ -127,7 +127,7 @@ Middleware.passport.serializeUser( (user, done) =>
   }
 });
 
-Middleware.passport.deserializeUser( (id, done) => 
+Middleware.passport.deserializeUser((id, done) => 
 {
   done(null, Users.find(id));
 });
