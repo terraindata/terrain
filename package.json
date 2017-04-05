@@ -135,6 +135,7 @@
     "zxcvbn": "^4.3.0"
   },
   "devDependencies": {
+    "@types/bcrypt-nodejs": "0.0.30",
     "@types/chai": "^3.4.35",
     "@types/classnames": "0.0.32",
     "@types/d3": "^4.7.0",
