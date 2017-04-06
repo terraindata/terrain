@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as mysql from 'mysql';
+import * as winston from 'winston';
 
 const defaultMySQLConfig: mysql.IPoolConfig = {
   connectionLimit: 20,
@@ -77,12 +78,12 @@ export default class MySQLExecutor
 
     this.pool.on('acquire', (connection) =>
     {
-      console.log('Connection %d acquired', connection.threadId);
+      winston.info('Connection %d acquired', connection.threadId);
     });
 
     this.pool.on('release', (connection) =>
     {
-      console.log('Connection %d released', connection.threadId);
+      winston.info('Connection %d released', connection.threadId);
     });
   }
 

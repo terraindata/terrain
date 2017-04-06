@@ -64,6 +64,7 @@ class SQLGeneratorMapping
   }
 }
 
+/* tslint:disable:object-literal-sort-keys */
 export let TypeMap = Object.freeze({
   'boolean': new SQLGeneratorMapping(null, FixEnum.nullary),
   'null': new SQLGeneratorMapping('NULL', FixEnum.nullary),
@@ -71,11 +72,11 @@ export let TypeMap = Object.freeze({
   'reference': new SQLGeneratorMapping(null, FixEnum.nullary),
   'string': new SQLGeneratorMapping(null, FixEnum.nullary),
 
-  'select': new SQLGeneratorMapping('SELECT', FixEnum.nullary),
   'filter': new SQLGeneratorMapping('WHERE', FixEnum.nullary),
+  'select': new SQLGeneratorMapping('SELECT', FixEnum.nullary),
+  'skip': new SQLGeneratorMapping('OFFSET', FixEnum.nullary),
   'sort': new SQLGeneratorMapping('ORDER BY', FixEnum.nullary),
   'take': new SQLGeneratorMapping('LIMIT', FixEnum.nullary),
-  'skip': new SQLGeneratorMapping('OFFSET', FixEnum.nullary),
 
   '.': new SQLGeneratorMapping('.', FixEnum.infixWithoutSpaces),
 
@@ -101,3 +102,4 @@ export let TypeMap = Object.freeze({
   'ascending': new SQLGeneratorMapping('ASC', FixEnum.postfix),
   'descending': new SQLGeneratorMapping('DESC', FixEnum.postfix),
 });
+/* tslint:enable:object-literal-sort-keys */
