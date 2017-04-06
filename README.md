@@ -33,7 +33,7 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 
 ## Setup
 
-1. Install Node, npm
+* Install Node, npm
   * For Mac:
     * Install Homebrew `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
     * Install Node `brew install node`
@@ -42,24 +42,24 @@ General coding standards for Javascript are located in the TechDocs repo, not in
     * Install nodejs, npm, and n `curl -L https://git.io/n-install | bash`
     * Reinit your bash environment `source ~/.bashrc`
     * Install the latest LTS node version (6.10.2): `n lts`
-1. `npm install`
-1. `npm install -g webpack-dev-server`
-1. `npm start` - starts the Midway server, now running at localhost:3000
-1. `npm run start-koa` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the dev front-end server on start (and kill it on end)
-1. Default user login: `luser` / `secret`
-1. Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans] - helps things go faster because your browser won't have to fetch Open Sans on each load
+* `npm install`
+* `npm install -g webpack-dev-server`
+* `npm start` - starts the Midway server, now running at localhost:3000
+* `npm run start-koa` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the dev front-end server on start (and kill it on end)
+* Default user login: `luser` / `secret`
+* Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans] - helps things go faster because your browser won't have to fetch Open Sans on each load
 
 Whenever new packages are installed by other devs / on other branches, run `npm install` to get the new package locally.
 
 ### Configuring Webstorm IDE
 
 To setup a node project using typescript for debugging inside webstorm:
-1. Download and extract Webstorm to somewhere like ~/programs/webstorm https://www.jetbrains.com/webstorm/download/#section=linux
-1. Run Webstorm and select 'Open existing project...'
+* Download and extract Webstorm to somewhere like ~/programs/webstorm https://www.jetbrains.com/webstorm/download/#section=linux
+* Run Webstorm and select 'Open existing project...'
   * Select the root directory of the Search repo, for example ~/terrain/Search/
-1. Set up a Run & Debug configuration:
-  1. From the 'Run' menu, select 'Run/Debug Configurations'
-  1. To run one of the configured scripts via npm:
+* Set up a Run & Debug configuration:
+  * From the 'Run' menu, select 'Run/Debug Configurations'
+  * To run one of the configured scripts via npm:
     * Click '+' to add a configuration
     * Select 'npm' from the list of configuration types
     * Put a name in for this configuration
@@ -69,7 +69,7 @@ To setup a node project using typescript for debugging inside webstorm:
     * Set any other args or options you like
     * Now you can run the script inside Webstorm!
     * It isn't yet known how to get webstorm to debug via npm launched scripts
-  1. To run a project on node and be able to debug it inside webstorm:
+  * To run a project on node and be able to debug it inside webstorm:
     * Click '+' to add a configuration
     * Select 'Node.js' from the list of configuration types
     * Put a name in for this configuration
@@ -154,10 +154,10 @@ You will then need to try to install any Typescript types that are available for
 You can also combine these two installs into one line. You can also use `npm i` as a shortcut for `npm install`
 
 For example, to add `truffle-oil` to my app, I would:
-1. `cd ~/git/Search`
-1. `npm install truffle-oil @types/truffle-oil --save`
-1. `git add package.json`
-1. Commit the changes
+* `cd ~/git/Search`
+* `npm install truffle-oil @types/truffle-oil --save`
+* `git add package.json`
+* Commit the changes
 
 
 ### Importing / requiring files
@@ -213,18 +213,18 @@ Note: when adding new tests, make sure to include `t.end()` at the end of every 
 
 ### Front-end
 
-1. Make sure you install the [React Dev Tools for Chrome](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en)
-1. For debugging in the browser, you'll want to use the browser's JS Consle (CMD + Shift + J on Mac)
-1. Writing `console.log` in your JS code will log output to this console -- this can be useful for basic debugging
-1. Writing `debugger;` in your code will insert a breakpoint and cause Chrome to pause at that point of execution, allowing you to inspect variable values and step forward / into functions. (You have to have the Chrome Console open in order for the breakpoint to catch.)
-1. If you want to inspect the state and props of React components, you can use the React tab in the Chrome Dev Tools to find the component and see its props and state. Tip: Use the element selection tool (top left corner of your dev tools) to quickly select the component you care about.
-1. If you are getting React errors about setting state in the wrong place (e.g. inside of a render method, or after the component has unmounted), you can find the code that is causing the error by going into the Source dev tab, enabling the Pause on Exceptions and Pause on Caught Exceptions options (top right of the pane), triggering the error, and then going a few levels up the stack into the class that caused the error. (Note that on page load there will be a good dozen of these caught exceptions that you will need to skip over).
+* Make sure you install the [React Dev Tools for Chrome](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en)
+* For debugging in the browser, you'll want to use the browser's JS Consle (CMD + Shift + J on Mac)
+* Writing `console.log` in your JS code will log output to this console -- this can be useful for basic debugging
+* Writing `debugger;` in your code will insert a breakpoint and cause Chrome to pause at that point of execution, allowing you to inspect variable values and step forward / into functions. (You have to have the Chrome Console open in order for the breakpoint to catch.)
+* If you want to inspect the state and props of React components, you can use the React tab in the Chrome Dev Tools to find the component and see its props and state. Tip: Use the element selection tool (top left corner of your dev tools) to quickly select the component you care about.
+* If you are getting React errors about setting state in the wrong place (e.g. inside of a render method, or after the component has unmounted), you can find the code that is causing the error by going into the Source dev tab, enabling the Pause on Exceptions and Pause on Caught Exceptions options (top right of the pane), triggering the error, and then going a few levels up the stack into the class that caused the error. (Note that on page load there will be a good dozen of these caught exceptions that you will need to skip over).
 
 
 ### Back-end
 
-1. Anything from `console.log` will logged to your terminal in the same process.
-1. Please post any other debugging tips here.
+* Anything from `console.log` will logged to your terminal in the same process.
+* Please post any other debugging tips here.
 
 
 
@@ -262,6 +262,6 @@ A list of common programming gotchas in this codebase
 
 ## Troubleshooting
 
-1. Don't panic.
-1. Node or npm errors: `npm install` - you may be missing packages.
-1. Test suite doesn't run all tests: make sure you have added correct `t.plan(x)` or `t.end()` statements to every test, otherwise the test suite will hang.
+* Don't panic.
+* Node or npm errors: `npm install` - you may be missing packages.
+* Test suite doesn't run all tests: make sure you have added correct `t.plan(x)` or `t.end()` statements to every test, otherwise the test suite will hang.
