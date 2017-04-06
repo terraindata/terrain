@@ -156,7 +156,7 @@ test('execute complex query (MySQL)', async (t) => {
 test('pool destroy', async (t) =>
 {
   try {
-    await mysql.end();
+    await mysql.destroy();
     t.pass();
   } catch (e)
   {
