@@ -44,65 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-class TastyNodeType
+export default class ElasticExecutor
 {
-  public readonly name: string;
-  public readonly code: number;
-
-  constructor(name: string, code: number)
-  {
-    this.name = name;
-    this.code = code;
-  }
-
-  public toString(): string
-  {
-    return JSON.stringify(this, null, 2);
-  }
 }
-
-let TastyNodeTypes = Object.freeze([
-  'null',
-  'reference',
-  'string',
-  'number',
-  'boolean',
-
-  'select',
-  'filter',
-  'sort',
-  'take',
-  'skip',
-
-  '.',
-
-  '+',
-  '-',
-  '/',
-  '*',
-
-  '==',
-  '!=',
-  '>',
-  '<',
-  '>=',
-  '<=',
-
-  '!',
-  '&&',
-  '||',
-
-  'isNull',
-  'isNotNull',
-
-  'ascending',
-  'descending'].reduce(
-    (state, typeName) =>
-    {
-      state.map[typeName] = new TastyNodeType(typeName, state.count++);
-      return state;
-    }, {
-      count: 1, map: new Map<string, {name: string, code: number}>(),
-    }).map);
-
-export default TastyNodeTypes;

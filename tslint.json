@@ -15,6 +15,14 @@
       "check-catch",
       "check-else",
       "check-finally",
-      "check-whitespace"]
-    }
+      "check-whitespace"
+    ],
+    "variable-name": [true,
+      "check-format",
+      "allow-pascal-case",
+      "allow-leading-underscore"
+    ],
+    "no-string-literal": false,
+    "prefer-for-of": false
   }
+}
