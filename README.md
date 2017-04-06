@@ -60,25 +60,25 @@ To setup a node project using typescript for debugging inside webstorm:
 1. Set up a Run & Debug configuration:
   1. From the 'Run' menu, select 'Run/Debug Configurations'
   1. To run one of the configured scripts via npm:
-    1. Click '+' to add a configuration
-    1. Select 'npm' from the list of configuration types
-    1. Put a name in for this configuration
-    1. Set the command to 'run'
-    1. Set the script to one of the options listed in package.json, like 'test-back'
-    1. Make sure the node intepreter is set correctly (on linux with above config, it should be ~/n/bin/node)
-    1. Set any other args or options you like
-    1. Now you can run the script inside Webstorm!
-    1. It isn't yet known how to get webstorm to debug via npm launched scripts
+    * Click '+' to add a configuration
+    * Select 'npm' from the list of configuration types
+    * Put a name in for this configuration
+    * Set the command to 'run'
+    * Set the script to one of the options listed in package.json, like 'test-back'
+    * Make sure the node intepreter is set correctly (on linux with above config, it should be ~/n/bin/node)
+    * Set any other args or options you like
+    * Now you can run the script inside Webstorm!
+    * It isn't yet known how to get webstorm to debug via npm launched scripts
   1. To run a project on node and be able to debug it inside webstorm:
-    1. Click '+' to add a configuration
-    1. Select 'Node.js' from the list of configuration types
-    1. Put a name in for this configuration
-    1. Make sure the node interpreter is set correctly (on linux with above config, it should be ~/n/bin/node)
-    1. Fill out any node parameters (typically '--harmony')
-    1. Set the working directory (typically the root Search repo dir, like /home/charles/terrain/Search)
-    1. Choose the entry point js file, such as 'midwway/test/TestSuite.js'. If the file is a typescript file, choose the transpiled js version.
-    1. Fill out any additional settings you like
-    1. You can now run and debug your node code inside webstorm!
+    * Click '+' to add a configuration
+    * Select 'Node.js' from the list of configuration types
+    * Put a name in for this configuration
+    * Make sure the node interpreter is set correctly (on linux with above config, it should be ~/n/bin/node)
+    * Fill out any node parameters (typically '--harmony')
+    * Set the working directory (typically the root Search repo dir, like /home/charles/terrain/Search)
+    * Choose the entry point js file, such as 'midwway/test/TestSuite.js'. If the file is a typescript file, choose the transpiled js version.
+    * Fill out any additional settings you like
+    * You can now run and debug your node code inside webstorm!
 
 
 ## Major Dependencies
