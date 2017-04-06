@@ -61,7 +61,7 @@ class TastyNodeType
   }
 }
 
-let TastyNodeTypes = Object.freeze([
+enum TastyNodeTypes {
   'null',
   'reference',
   'string',
@@ -96,13 +96,7 @@ let TastyNodeTypes = Object.freeze([
   'isNotNull',
 
   'ascending',
-  'descending'].reduce(
-    (state, typeName) =>
-    {
-      state.map[typeName] = new TastyNodeType(typeName, state.count++);
-      return state;
-    }, {
-      count: 1, map: new Map<string, {name: string, code: number}>(),
-    }).map);
+  'descending',
+};
 
 export default TastyNodeTypes;

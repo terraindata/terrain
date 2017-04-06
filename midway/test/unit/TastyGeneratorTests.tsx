@@ -53,8 +53,8 @@ import Tasty from '../../tasty/Tasty';
 import TastyNodeTypes from '../../tasty/TastyNodeType';
 
 test('skip node type', (t) => {
-  t.equal(TastyNodeTypes['skip'].name, 'skip');
-  t.equal(TastyNodeTypes['skip'].code, 10);
+  t.equal(TastyNodeTypes[TastyNodeTypes.skip], 'skip');
+  t.equal(TastyNodeTypes.skip, 9);
   t.end();
 });
 
