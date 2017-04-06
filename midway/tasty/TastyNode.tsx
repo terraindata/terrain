@@ -60,7 +60,7 @@ export default class TastyNode
       return new TastyNode('null', value);
     }
 
-    let valueType = typeof value;
+    const valueType = typeof value;
     if (valueType === 'number')
     {
       return new TastyNode('number', value);

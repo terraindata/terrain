@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 // https://github.com/ortoo/oauth2orize/blob/master/examples/express2/db/users.js
 // TODO THIS IS A STUB. REPLACE WITH ORM
 
@@ -49,7 +51,7 @@ import * as bcrypt from 'bcrypt-nodejs';
 
 import srs = require('secure-random-string');
 
-let users = [
+const users = [
   {
     accessToken: '',
     id: '1',
@@ -79,7 +81,7 @@ const Users =
   {
     for (let i = 0, len = users.length; i < len; i++)
     {
-      let user = users[i];
+      const user = users[i];
       if (user.id === id)
       {
         return user;
@@ -91,7 +93,7 @@ const Users =
   {
     for (let i = 0, len = users.length; i < len; i++)
     {
-      let user = users[i];
+      const user = users[i];
       if (user.username === username && user.accessToken.length > 0 && user.accessToken === accessToken)
       {
         return user;
@@ -103,7 +105,7 @@ const Users =
   {
     for (let i = 0, len = users.length; i < len; i++)
     {
-      let user = users[i];
+      const user = users[i];
       if (user.username === username)
       {
         return new Promise((resolve, reject) => {

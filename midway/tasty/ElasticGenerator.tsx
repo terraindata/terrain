@@ -77,11 +77,11 @@ export default class ElasticGenerator
     // stored_fields clause
     if (!query.isSelectingAll())
     {
-      let storedFields = this.getSubclauseList(this.queryObject, 'stored_fields');
+      const storedFields = this.getSubclauseList(this.queryObject, 'stored_fields');
       for (let i = 0; i < query.selected.length; ++i)
       {
-        let column = query.selected[i];
-        let columnName = this.getColumnName(column);
+        const column = query.selected[i];
+        const columnName = this.getColumnName(column);
         storedFields.push(columnName);
       }
     }
@@ -116,10 +116,10 @@ export default class ElasticGenerator
     // filter clause
     if (query.filters.length > 0)
     {
-      let filterClause = this.getNestedSubclauseObject(this.queryObject, 'query', 'filter');
+      const filterClause = this.getNestedSubclauseObject(this.queryObject, 'query', 'filter');
       for (let i = 0; i < query.filters.length; ++i)
       {
-        let filter = query.filters[i];
+        const filter = query.filters[i];
         this.accumulateFilters(filterClause, filter);
       }
     }
@@ -127,14 +127,14 @@ export default class ElasticGenerator
     // sort clause
     if (query.sorts.length > 0)
     {
-      let sortClause = this.getSubclauseList(this.queryObject, 'sort');
+      const sortClause = this.getSubclauseList(this.queryObject, 'sort');
 
       for (let i = 0; i < query.sorts.length; ++i)
       {
-        let sort = query.sorts[i];
+        const sort = query.sorts[i];
 
-        let clause = new Object();
-        let column = this.getColumnName(sort.node);
+        const clause = new Object();
+        const column = this.getColumnName(sort.node);
         clause[column] = (sort.order === 'asc' ? 'asc' : 'desc');
 
         sortClause.push(clause);
@@ -153,8 +153,8 @@ export default class ElasticGenerator
     }
 
     // NB: could be made to accept the column on the rhs too, but currently only supports column on lhs
-    let columnName = this.getColumnName(expression.lhs);
-    let value = expression.rhs.value; // could be checked for validity
+    const columnName = this.getColumnName(expression.lhs);
+    const value = expression.rhs.value; // could be checked for validity
 
     if (expression.type === '==')
     {
@@ -180,7 +180,7 @@ export default class ElasticGenerator
       this.accumulateFilters(filterClause, expression.rhs);
     } else if (expression.type === '||')
     {
-      let shouldClause = this.getSubclauseList(filterClause, 'should');
+      const shouldClause = this.getSubclauseList(filterClause, 'should');
       this.accumulateFilters(shouldClause, expression.lhs);
       this.accumulateFilters(shouldClause, expression.rhs);
     } else
@@ -209,19 +209,19 @@ export default class ElasticGenerator
 
   private getNestedSubclauseObject(parentClause, clauseName, subclauseName)
   {
-    let clause = this.getSubclauseObject(parentClause, clauseName);
+    const clause = this.getSubclauseObject(parentClause, clauseName);
     return this.getSubclauseObject(clause, subclauseName);
   }
 
   private getNestedSubclauseList(parentClause, clauseName, subclauseName)
   {
-    let clause = this.getSubclauseObject(parentClause, clauseName);
+    const clause = this.getSubclauseObject(parentClause, clauseName);
     return this.getSubclauseList(clause, subclauseName);
   }
 
   private setRangeClauseIfLesser(filterClause, columnName, filterOperator, value)
   {
-    let columnClause = this.getNestedSubclauseObject(filterClause, 'range', columnName);
+    const columnClause = this.getNestedSubclauseObject(filterClause, 'range', columnName);
     if (!(filterOperator in columnClause) || value < columnClause[filterOperator])
     {
       columnClause[filterOperator] = value;
@@ -230,7 +230,7 @@ export default class ElasticGenerator
 
   private setRangeClauseIfGreater(filterClause, columnName, filterOperator, value)
   {
-    let columnClause = this.getNestedSubclauseObject(filterClause, 'range', columnName);
+    const columnClause = this.getNestedSubclauseObject(filterClause, 'range', columnName);
     if (!(filterOperator in columnClause) || value > columnClause[filterOperator])
     {
       columnClause[filterOperator] = value;
@@ -239,8 +239,8 @@ export default class ElasticGenerator
 
   private addFilterTerm(filterClause, clause, subclause, columnName, value)
   {
-    let sc = this.getNestedSubclauseList(filterClause, clause, subclause);
-    let termKVP = new Object();
+    const sc = this.getNestedSubclauseList(filterClause, clause, subclause);
+    const termKVP = new Object();
     termKVP[columnName] = value;
     sc.push({term: termKVP});
   }
@@ -252,8 +252,8 @@ export default class ElasticGenerator
       throw new Error('Could not find column name in expression "' + JSON.stringify(expression) + '".');
     }
 
-    let table = expression.lhs;
-    let column = expression.rhs;
+    const table = expression.lhs;
+    const column = expression.rhs;
 
     if (table.type !== 'reference')
     {

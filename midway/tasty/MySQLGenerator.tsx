@@ -65,7 +65,7 @@ export default class MySQLGenerator
     this.queryString += 'SELECT ';
     this.indent();
 
-    let columns = [];
+    const columns = [];
 
     if (query.isSelectingAll())
     {
@@ -246,8 +246,8 @@ export default class MySQLGenerator
       throw new Error('Node type "' + node.type + '" is not supported by MySQLGenerator.');
     }
 
-    let sqlTypeInfo = SQLGenerator.TypeMap[node.type];
-    let fix = sqlTypeInfo.fix;
+    const sqlTypeInfo = SQLGenerator.TypeMap[node.type];
+    const fix = sqlTypeInfo.fix;
     if (node.numChildren === 0)
     {
       // base case
@@ -313,7 +313,7 @@ export default class MySQLGenerator
 
   private sqlName(node): string
   {
-    let sqlTypeInfo = SQLGenerator.TypeMap[node.type];
+    const sqlTypeInfo = SQLGenerator.TypeMap[node.type];
     if (sqlTypeInfo.sqlName !== null)
     {
       return sqlTypeInfo.sqlName;

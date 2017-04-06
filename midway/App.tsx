@@ -60,7 +60,7 @@ import Middleware from './Middleware';
 import Router from './Router';
 import Util from './Util';
 
-let LocalStrategy = passportLocal.Strategy;
+const LocalStrategy = passportLocal.Strategy;
 
 // process command-line arguments
 const optDefs = [

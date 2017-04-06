@@ -51,7 +51,7 @@ export default class MySQLInterface
 {
   public select(query)
   {
-    let queryString = MySQLGenerator.generate(query);
+    const queryString = MySQLGenerator.generate(query);
     throw new Error('Not implemented.');
     // return list of selected objects/rows
   }

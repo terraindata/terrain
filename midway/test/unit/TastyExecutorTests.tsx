@@ -64,14 +64,14 @@ test('pool connect', async (t) => {
 
 async function runQuery(qstr: string)
 {
-  let results = await mysql.query(qstr);
+  const results = await mysql.query(qstr);
   return hash(results);
 }
 
 test('execute simple query (select all)', async (t) =>
 {
   try {
-    let h = await runQuery(`SELECT * \n  FROM movies LIMIT 2;`);
+    const h = await runQuery(`SELECT * \n  FROM movies LIMIT 2;`);
     t.equal(h, `38877538d52f8f6f7e81a95d38e2aeaaad9f5043`);
   } catch (e) {
     t.skip(e);
@@ -81,7 +81,7 @@ test('execute simple query (select all)', async (t) =>
 
 test('execute simple query (select columns)', async (t) => {
   try {
-    let h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies LIMIT 2;`);
+    const h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies LIMIT 2;`);
     t.equal(h, `dc07a13cda832dfd0be10b26ad68b87d3272d11d`);
   } catch (e) {
     t.skip(e);
@@ -91,7 +91,7 @@ test('execute simple query (select columns)', async (t) => {
 
 test('execute simple query (filter equals)', async (t) => {
   try {
-    let h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`);
+    const h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`);
     t.equal(h, `24b3b17d77c1a849692a7a2a4a5f1de1978816f4`);
   } catch (e) {
     t.skip(e);
@@ -101,7 +101,7 @@ test('execute simple query (filter equals)', async (t) => {
 
 test('execute simple query (filter doesNotEqual)', async (t) => {
   try {
-    let h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)' LIMIT 2;`);
+    const h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)' LIMIT 2;`);
     t.equal(h, `0ea0dca172bcfc6d8b32da35259390e320cbc53b`);
   } catch (e) {
     t.skip(e);
@@ -111,7 +111,7 @@ test('execute simple query (filter doesNotEqual)', async (t) => {
 
 test('execute simple query (sort asc)', async (t) => {
   try {
-    let h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title ASC LIMIT 10;`);
+    const h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title ASC LIMIT 10;`);
     t.equal(h, `d865452b582b20d92d5e00c538f5a0645df4cfdf`);
   } catch (e) {
     t.skip(e);
@@ -121,7 +121,7 @@ test('execute simple query (sort asc)', async (t) => {
 
 test('execute simple query (sort desc)', async (t) => {
   try {
-    let h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title DESC LIMIT 10;`);
+    const h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title DESC LIMIT 10;`);
     t.equal(h, `464d75bb6d519b4aa11f5aa435bb30d80be48837`);
   } catch (e) {
     t.skip(e);
@@ -131,7 +131,7 @@ test('execute simple query (sort desc)', async (t) => {
 
 test('execute simple query (take+skip)', async (t) => {
   try {
-    let h = await runQuery(`SELECT * \n  FROM movies\n  LIMIT 2 OFFSET 20;`);
+    const h = await runQuery(`SELECT * \n  FROM movies\n  LIMIT 2 OFFSET 20;`);
     t.equal(h, `0f319cfcf59f21e1804f4da6fd5b902f2dc8810a`);
   } catch (e) {
     t.skip(e);
@@ -141,7 +141,7 @@ test('execute simple query (take+skip)', async (t) => {
 
 test('execute complex query (MySQL)', async (t) => {
   try {
-    let h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n
+    const h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n
                             WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'\n
                             AND movies.releasedate < '2017-03-24'\n
                             ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC\n

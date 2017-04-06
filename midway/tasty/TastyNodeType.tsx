@@ -97,6 +97,6 @@ enum TastyNodeTypes {
 
   'ascending',
   'descending',
-};
+}
 
 export default TastyNodeTypes;
