@@ -81,7 +81,7 @@ export default class SQLiteExecutor
     });
   }
 
-  public end()
+  public destroy()
   {
     return new Promise((resolve, reject) =>
     {
