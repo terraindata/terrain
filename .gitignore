@@ -18,3 +18,4 @@ midway/**/*.js
 src/**/*.jsx
 midway/**/*.jsx
 .idea
+.vscode
