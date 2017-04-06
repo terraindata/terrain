@@ -44,74 +44,87 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as chai from 'chai';
-import * as test from 'tape';
-const {assert} = chai;
-import * as sinon from 'sinon';
+import * as mysql from 'mysql';
+import * as winston from 'winston';
 
-// normally you would require the files to test here, but instead we'll declare an example class:
-class SmartClass
+const defaultMySQLConfig: mysql.IPoolConfig = {
+  connectionLimit: 20,
+  database : 'tdbdtest',
+  host     : 'localhost',
+  password : 'r3curs1v3$',
+  user     : 't3rr41n-demo',
+};
+
+export default class MySQLExecutor
 {
-  static sharedCount: number = 0;
-  myCount: number = 0;
+  private pool;
 
-  constructor(getCount: () => number)
+  constructor(config?: mysql.IPoolConfig)
   {
-    this.myCount = getCount();
+    if (config === undefined)
+    {
+      config = defaultMySQLConfig;
+    }
+
+    this.pool = mysql.createPool(config);
+
+    this.pool.on('acquire', (connection) =>
+    {
+      winston.info('Connection %d acquired', connection.threadId);
+    });
+
+    this.pool.on('release', (connection) =>
+    {
+      winston.info('Connection %d released', connection.threadId);
+    });
   }
 
-  getCount(): number
+  public query(queryStr: string)
   {
-    return this.myCount;
+    return new Promise((resolve, reject) =>
+    {
+      this.pool.query(queryStr, (error, results, fields) =>
+      {
+        if (error)
+        {
+          reject(error);
+        } else {
+          resolve({results, fields});
+        }
+      });
+    });
   }
 
-  increment(): void
+  public end()
   {
-    this.myCount ++;
-    SmartClass.sharedCount ++;
+    return new Promise((resolve, reject) =>
+    {
+      this.pool.end((error) =>
+      {
+        if (error)
+        {
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
+    });
   }
 
-  static getTotalCount(): number
+  private getConnection()
   {
-    return this.sharedCount;
+    return new Promise((resolve, reject) =>
+    {
+      this.pool.getConnection((error, connection) =>
+      {
+        if (error)
+        {
+          reject(error);
+        } else {
+          resolve(connection);
+        }
+      });
+    });
   }
+
 }
-
-test('SmartClass constructor accepts an initial count function', (t) => {
-  // initialize any mocks, spys, stubs
-  const initMyCount = 24;
-  let stub = sinon.stub().returns(initMyCount);
-  let initTotalCount = SmartClass.getTotalCount();
-
-  // run the tested code
-  let myClass = new SmartClass(stub);
-
-  // verify everything
-  assert(stub.calledOnce);
-  t.equal(myClass.getCount(), initMyCount, 'count is set correctly');
-  t.equal(SmartClass.getTotalCount(), initTotalCount, 'static count is unchanged');
-  t.end();
-});
-
-// Even though these two test cases re-use a good amount of the same code, it is best to split
-//  your tests into different groups that test each specific behavior. This way, when a test fails,
-//. you will know exactly where to look for the failure.
-// In this example, if there was an issue with the constructor, the first group would fail and you
-//. would know without a doubt to look in the constructor. But if the first passed and the second failed,
-//. you would know that the constructor is fine, and that you should instead look at the increment function.
-
-test('SmartClass increment() increments instance count and static count', function(t) {
-  // initialize any mocks, spys, stubs
-  const initMyCount = 17;
-  let stub = sinon.stub().returns(initMyCount);
-  let initTotalCount = SmartClass.getTotalCount();
-
-  // run the tested code
-  let myClass = new SmartClass(stub);
-  myClass.increment();
-
-  // verify everything
-  t.equal(myClass.getCount(), initMyCount + 1, 'instance count is incremented');
-  t.equal(SmartClass.getTotalCount(), initTotalCount + 1, 'static count is incremented');
-  t.end();
-});

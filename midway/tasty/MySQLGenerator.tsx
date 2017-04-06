@@ -49,6 +49,11 @@ import TastyQuery from './TastyQuery';
 
 export default class MySQLGenerator
 {
+  public static generate(node): string
+  {
+    return new MySQLGenerator(node).queryString;
+  }
+
   public queryString: string;
   private indentation: number;
 
@@ -107,7 +112,7 @@ export default class MySQLGenerator
     // write FROM clause
     this.newLine();
     this.queryString += 'FROM ';
-    this.queryString += this.escapeString(query.table.__tableName);
+    this.queryString += this.escapeString(query.table._tastyTableName);
 
     // write WHERE clause
     if (query.filters.length > 0)
@@ -146,31 +151,26 @@ export default class MySQLGenerator
         });
     }
 
-    if (query.numTaken != null || query.numSkipped != null)
+    if (query.numTaken !== 0 || query.numSkipped !== 0)
     {
       this.newLine();
 
-      if (query.numTaken != null)
+      if (query.numTaken !== 0)
       {
         this.queryString += 'LIMIT ' + query.numTaken;
-        if (query.numSkipped !== null)
+        if (query.numSkipped !== 0)
         {
           this.queryString += ' ';
         }
       }
 
-      if (query.numSkipped != null)
+      if (query.numSkipped !== 0)
       {
         this.queryString += 'OFFSET ' + query.numSkipped;
       }
     }
 
     this.queryString += ';';
-  }
-
-  public static convert(node): string
-  {
-    return new MySQLGenerator(node).queryString;
   }
 
   private newLine()
@@ -325,7 +325,7 @@ export default class MySQLGenerator
     }
     if (node.type === 'string')
     {
-      return this.escapeString(node.value);
+      return "'" + this.escapeString(node.value) + "'";
     }
     if (node.type === 'number')
     {
@@ -341,7 +341,7 @@ export default class MySQLGenerator
 
   private escapeString(value: string): string
   {
-    return "'" + value.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g,
+    return value.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g,
     (char) =>
     {
       switch (char)
@@ -366,6 +366,6 @@ export default class MySQLGenerator
         default:
         return char;
       }
-    }) + "'";
+    });
   }
 }

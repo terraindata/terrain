@@ -47,24 +47,29 @@ THE SOFTWARE.
 import * as SQLGenerator from './SQLGenerator';
 import TastyQuery from './TastyQuery';
 
-export default class ElasticSearchGenerator
+export default class ElasticGenerator
 {
+  public static generate(node)
+  {
+    return new ElasticGenerator(node).queryObject;
+  }
+
   private queryObject: any;
   private tableName: string;
 
   constructor(query)
   {
     this.queryObject = {};
-    this.tableName = query.table.__tableName;
+    this.tableName = query.table._tastyTableName;
 
     // from clause
-    if (query.numSkipped != null)
+    if (query.numSkipped !== 0)
     {
       this.queryObject['from'] = query.numSkipped;
     }
 
     // size clause
-    if (query.numTaken != null)
+    if (query.numTaken !== 0)
     {
       this.queryObject['size'] = query.numTaken;
     }
@@ -106,7 +111,7 @@ export default class ElasticSearchGenerator
     // //write FROM clause
     // this.newLine();
     // this.queryString += 'FROM ';
-    // this.queryString += this.escapeString(query.table.__tableName);
+    // this.queryString += this.escapeString(query.table.__tastyTableName);
 
     // filter clause
     if (query.filters.length > 0)
@@ -142,7 +147,6 @@ export default class ElasticSearchGenerator
     // https://www.elastic.co/guide/en/elasticsearch/guide/current/combining-filters.html#bool-filter
     // currently only supports the basic operators, with the column on the lhs, as well as && and ||
 
-    console.log(expression.toString());
     if (expression.numChildren !== 2)
     {
       throw new Error('Filtering on non-binary expression "' + JSON.stringify(expression) + '".');
@@ -183,11 +187,6 @@ export default class ElasticSearchGenerator
     {
       throw new Error('Filtering on unsupported expression "' + JSON.stringify(expression) + '".');
     }
-  }
-
-  public static convert(node)
-  {
-    return new ElasticSearchGenerator(node).queryObject;
   }
 
   private getSubclauseList(parentClause, clauseName)

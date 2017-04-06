@@ -44,13 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import MySQLExecutor from './MySQLExecutor';
 import MySQLGenerator from './MySQLGenerator';
 
 export default class MySQLInterface
 {
   public select(query)
   {
-    let queryString = MySQLGenerator.convert(query);
+    let queryString = MySQLGenerator.generate(query);
     throw new Error('Not implemented.');
     // return list of selected objects/rows
   }

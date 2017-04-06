@@ -46,18 +46,23 @@ THE SOFTWARE.
 
 import * as request from 'request';
 
-const Util = {
-  getRequest: (url) => {
-    return new Promise((resolve, reject) => {
-      request(url, (error, res, body) => {
-        if (!error && res.statusCode === 200) {
+const Util =
+{
+  getRequest: (url) =>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      request(url, (error, res, body) =>
+      {
+        if (!error && res.statusCode === 200)
+        {
           resolve(body);
         } else {
           reject(error);
         }
       });
     });
-  }
+  },
 };
 
 export default Util;
