@@ -67,14 +67,6 @@ export default class MySQLExecutor
     }
 
     this.pool = mysql.createPool(config);
-    this.pool.getConnection((error, connection) =>
-    {
-      if (error)
-      {
-        throw error;
-      }
-      connection.release();
-    });
 
     this.pool.on('acquire', (connection) =>
     {
@@ -105,12 +97,34 @@ export default class MySQLExecutor
 
   public end()
   {
-    this.pool.end((error) =>
+    return new Promise((resolve, reject) =>
     {
-      if (error)
+      this.pool.end((error) =>
       {
-        throw error;
-      }
+        if (error)
+        {
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
     });
   }
+
+  private getConnection()
+  {
+    return new Promise((resolve, reject) =>
+    {
+      this.pool.getConnection((error, connection) =>
+      {
+        if (error)
+        {
+          reject(error);
+        } else {
+          resolve(connection);
+        }
+      });
+    });
+  }
+
 }

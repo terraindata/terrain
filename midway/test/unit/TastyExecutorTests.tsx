@@ -50,20 +50,15 @@ import * as test from 'tape-async';
 import MySQLExecutor from '../../tasty/MySQLExecutor';
 import Tasty from '../../tasty/Tasty';
 
-let skip: boolean = false;
 let mysql;
 
 test('pool connect', async (t) => {
   try {
     mysql = new MySQLExecutor();
-  } catch (e)
-  {
+    t.pass();
+  } catch (e) {
     t.fail(e);
-    t.end();
-    skip = true;
-    return;
   }
-  t.pass();
   t.end();
 });
 
@@ -75,115 +70,97 @@ async function runQuery(qstr: string)
 
 test('execute simple query (select all)', async (t) =>
 {
-  if (skip === true)
-  {
-    t.skip();
-    t.end();
-    return;
+  try {
+    let h = await runQuery(`SELECT * \n  FROM movies LIMIT 2;`);
+    t.equal(h, `38877538d52f8f6f7e81a95d38e2aeaaad9f5043`);
+  } catch (e) {
+    t.skip(e);
   }
-
-  let h = await runQuery(`SELECT * \n  FROM movies LIMIT 2;`);
-  t.equal(h, `38877538d52f8f6f7e81a95d38e2aeaaad9f5043`);
   t.end();
 });
 
 test('execute simple query (select columns)', async (t) => {
-  if (skip === true)
-  {
-    t.skip();
-    t.end();
-    return;
+  try {
+    let h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies LIMIT 2;`);
+    t.equal(h, `dc07a13cda832dfd0be10b26ad68b87d3272d11d`);
+  } catch (e) {
+    t.skip(e);
   }
-
-  let h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies LIMIT 2;`);
-  t.equal(h, `dc07a13cda832dfd0be10b26ad68b87d3272d11d`);
   t.end();
 });
 
 test('execute simple query (filter equals)', async (t) => {
-  if (skip === true)
-  {
-    t.skip();
-    t.end();
-    return;
+  try {
+    let h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`);
+    t.equal(h, `24b3b17d77c1a849692a7a2a4a5f1de1978816f4`);
+  } catch (e) {
+    t.skip(e);
   }
-  let h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`);
-  t.equal(h, `24b3b17d77c1a849692a7a2a4a5f1de1978816f4`);
   t.end();
 });
 
 test('execute simple query (filter doesNotEqual)', async (t) => {
-  if (skip === true)
-  {
-    t.skip();
-    t.end();
-    return;
+  try {
+    let h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)' LIMIT 2;`);
+    t.equal(h, `0ea0dca172bcfc6d8b32da35259390e320cbc53b`);
+  } catch (e) {
+    t.skip(e);
   }
-  let h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)' LIMIT 2;`);
-  t.equal(h, `0ea0dca172bcfc6d8b32da35259390e320cbc53b`);
   t.end();
 });
 
 test('execute simple query (sort asc)', async (t) => {
-  if (skip === true)
-  {
-    t.skip();
-    t.end();
-    return;
+  try {
+    let h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title ASC LIMIT 10;`);
+    t.equal(h, `d865452b582b20d92d5e00c538f5a0645df4cfdf`);
+  } catch (e) {
+    t.skip(e);
   }
-  let h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title ASC LIMIT 10;`);
-  t.equal(h, `d865452b582b20d92d5e00c538f5a0645df4cfdf`);
   t.end();
 });
 
 test('execute simple query (sort desc)', async (t) => {
-  if (skip === true)
-  {
-    t.skip();
-    t.end();
-    return;
+  try {
+    let h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title DESC LIMIT 10;`);
+    t.equal(h, `464d75bb6d519b4aa11f5aa435bb30d80be48837`);
+  } catch (e) {
+    t.skip(e);
   }
-  let h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title DESC LIMIT 10;`);
-  t.equal(h, `464d75bb6d519b4aa11f5aa435bb30d80be48837`);
   t.end();
 });
 
 test('execute simple query (take+skip)', async (t) => {
-  if (skip === true)
-  {
-    t.skip();
-    t.end();
-    return;
+  try {
+    let h = await runQuery(`SELECT * \n  FROM movies\n  LIMIT 2 OFFSET 20;`);
+    t.equal(h, `0f319cfcf59f21e1804f4da6fd5b902f2dc8810a`);
+  } catch (e) {
+    t.skip(e);
   }
-  let h = await runQuery(`SELECT * \n  FROM movies\n  LIMIT 2 OFFSET 20;`);
-  t.equal(h, `0f319cfcf59f21e1804f4da6fd5b902f2dc8810a`);
   t.end();
 });
 
 test('execute complex query (MySQL)', async (t) => {
-  if (skip === true)
-  {
-    t.skip();
-    t.end();
-    return;
+  try {
+    let h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n
+                            WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'\n
+                            AND movies.releasedate < '2017-03-24'\n
+                            ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC\n
+                            LIMIT 10 OFFSET 20;`);
+    t.equal(h, `f1c34d8cbc4877c9fe93e7e1f3f82d4b84bc63d3`);
+  } catch (e) {
+    t.skip(e);
   }
-  let h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n
-                          WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'\n
-                          AND movies.releasedate < '2017-03-24'\n
-                          ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC\n
-                          LIMIT 10 OFFSET 20;`);
-  t.equal(h, `f1c34d8cbc4877c9fe93e7e1f3f82d4b84bc63d3`);
   t.end();
 });
 
-test('pool destroy', (t) =>
+test('pool destroy', async (t) =>
 {
   try {
-    mysql.end();
+    await mysql.end();
+    t.pass();
   } catch (e)
   {
-    t.fail(e);
-    return;
+    t.skip(e);
   }
   t.end();
 });
