@@ -54,65 +54,65 @@ let elasticSearch;
 
 test('elastic connect', async (t) =>
 {
-    try
-    {
-        elasticSearch = new ElasticExecutor();
-        t.pass();
-    } catch (e)
-    {
-        t.fail(e);
-    }
-    t.end();
+  try
+  {
+    elasticSearch = new ElasticExecutor();
+    t.pass();
+  } catch (e)
+  {
+    t.fail(e);
+  }
+  t.end();
 });
 
 test('elastic health', async (t) =>
 {
-    try
-    {
-        const h = await elasticSearch.health();
-        //t.equal(h, `63f0e555f54a998e2837489c5e16a48cc3465bfe`);
-        console.log(h);
-    } catch (e)
-    {
-        t.skip(e);
-    }
-    t.end();
+  try
+  {
+    const h = await elasticSearch.health();
+    //t.equal(h, `63f0e555f54a998e2837489c5e16a48cc3465bfe`);
+    console.log(h);
+  } catch (e)
+  {
+    t.skip(e);
+  }
+  t.end();
 });
 
 test('basic query', async (t) =>
 {
-    try
-    {
-        const h = await elasticSearch.fullQuery(
-            {
-                index:  'urbansitter',
-                'size': 0,
-                body:   {
-                    'aggregations': {
-                        'count_by_type': {
-                            'terms': {
-                                'field': '_type',
-                                'size':  1000,
-                            },
-                        },
-                        'fields':   {
-                            'terms': {
-                                'field': '_field_names',
-                                'size':  1000,
-                            },
-                        },
-                    },
-                },
+  try
+  {
+    const h = await elasticSearch.fullQuery(
+      {
+        index:  'urbansitter',
+        'size': 0,
+        body:   {
+          'aggregations': {
+            'count_by_type': {
+              'terms': {
+                'field': '_type',
+                'size':  1000,
+              },
             },
-        );
-        console.log(JSON.stringify(h, null, 2));
-        // console.log(h.hits.hits.forEach(
-        //     (result) => {console.log(JSON.stringify(result, null, 2));}));
-    } catch (e)
-    {
-        t.skip(e);
-    }
-    t.end();
+            'fields':        {
+              'terms': {
+                'field': '_field_names',
+                'size':  1000,
+              },
+            },
+          },
+        },
+      },
+    );
+    console.log(JSON.stringify(h, null, 2));
+    // console.log(h.hits.hits.forEach(
+    //     (result) => {console.log(JSON.stringify(result, null, 2));}));
+  } catch (e)
+  {
+    t.skip(e);
+  }
+  t.end();
 });
 
 // async function runQuery(qstr: string)

@@ -46,82 +46,85 @@ THE SOFTWARE.
 
 import * as elasticSearch from 'elasticsearch';
 
-const defaultElasticConfig = {
+const defaultElasticConfig =
+  {
     hosts: ['http://10.1.0.30:9200'],
-};
+  };
 
 export default class ElasticExecutor
 {
-    private config;
-    private client;
+  private config;
+  private client;
 
-    constructor(config?: any)
+  constructor(config?: any)
+  {
+    if (config === undefined)
     {
-        if (config === undefined)
-            config = defaultElasticConfig;
-
-        this.config = config;
-        this.client = new elasticSearch.Client(config);
+      config = defaultElasticConfig;
     }
 
-    public health()
+    this.config = config;
+    this.client = new elasticSearch.Client(config);
+  }
+
+  public health()
+  {
+    return new Promise((resolve, reject) =>
     {
-        return new Promise((resolve, reject) =>
+      this.client.cluster.health(
+        {},
+        (error, response, status) =>
         {
-            this.client.cluster.health(
-                {},
-                (error, response, status) =>
-                {
-                    if (error)
-                    {
-                        reject(error);
-                    } else
-                    {
-                        resolve(response);
-                    }
-                });
+          if (error)
+          {
+            reject(error);
+          } else
+          {
+            resolve(response);
+          }
         });
-    }
+    });
+  }
 
-    /**
-     * Returns the entire ES response object.
-     */
-    public fullQuery(queryObject: object)
+  /**
+   * Returns the entire ES response object.
+   */
+  public fullQuery(queryObject: object)
+  {
+    return new Promise((resolve, reject) =>
     {
-        return new Promise((resolve, reject) =>
+      this.client.search(
+        queryObject,
+        (error, response, status) =>
         {
-            this.client.search(
-                queryObject,
-                (error, response, status) =>
-                {
-                    if (error)
-                    {
-                        reject(error);
-                    } else
-                    {
-                        resolve(response);
-                    }
-                });
+          if (error)
+          {
+            reject(error);
+          } else
+          {
+            resolve(response);
+          }
         });
-    }
+    });
+  }
 
-    /**
-     * returns only the query hits
-     */
-    public async query(queryObject: object)
-    {
-        let result : any = await this.rawQuery(queryObject);
-        // if('body' in queryObject)
-        // {
-        //     let body = queryObject.body;
-        //     if('aggregations' in body)
-        //         return result.
-        // }
-        return result.hits;
-    }
+  /**
+   * returns only the query hits
+   */
+  public async query(queryObject: object)
+  {
+    let result: any = await this.rawQuery(queryObject);
+    // if('body' in queryObject)
+    // {
+    //     let body = queryObject.body;
+    //     if('aggregations' in body)
+    //         return result.
+    // }
+    return result.hits;
+  }
 
-    public end()
-    {
-        this.client.close();
-    }
+  public end()
+  {
+    this.client.close();
+  }
 };
