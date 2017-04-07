@@ -49,3 +49,4 @@ THE SOFTWARE.
 import './unit/TastyGeneratorTests';
 import './unit/TastyMySQLExecutor';
 import './unit/TastySQLiteExecutor';
+import './unit/TastyElasticExecutor';

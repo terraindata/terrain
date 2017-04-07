@@ -4,13 +4,19 @@
         "module": "commonjs",
         "sourceMap": true,
         "inlineSources": true,
+        "inlineSourceMap": true,
         "target": "es6",
-        "typeRoots": ["./src/typings", "./node_modules/@types"],
+        "typeRoots": [
+            "./src/typings",
+            "./node_modules/@types"
+        ],
         "experimentalDecorators": true,
-        "allowJs": true
+        "allowJs": true,
+        "declaration": true,
+        "outDir": "./build/"
     },
-
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "build"
     ]
 }
