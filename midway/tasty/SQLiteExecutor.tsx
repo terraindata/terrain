@@ -44,8 +44,56 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// require individual test files.
+import * as sqlite3 from 'sqlite3';
+import * as winston from 'winston';
 
-import './unit/TastyGeneratorTests';
-import './unit/TastyMySQLExecutor';
-import './unit/TastySQLiteExecutor';
+const defaultSQLiteConfig = {
+  filename: 'nodeway.db',
+};
+
+export default class SQLiteExecutor
+{
+  private db;
+
+  constructor(config?: any)
+  {
+    if (config === undefined)
+    {
+      config = defaultSQLiteConfig;
+    }
+
+    this.db = new sqlite3.Database(config.filename);
+  }
+
+  public query(queryStr: string)
+  {
+    return new Promise((resolve, reject) =>
+    {
+      this.db.all(queryStr, (error, rows) =>
+      {
+        if (error)
+        {
+          reject(error);
+        } else {
+          resolve({rows});
+        }
+      });
+    });
+  }
+
+  public end()
+  {
+    return new Promise((resolve, reject) =>
+    {
+      this.db.close((error) =>
+      {
+        if (error)
+        {
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+}
