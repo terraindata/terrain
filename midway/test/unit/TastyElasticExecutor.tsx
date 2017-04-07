@@ -85,20 +85,20 @@ test('basic query', async (t) =>
   {
     const h = await elasticSearch.fullQuery(
       {
-        index:  'urbansitter',
-        'size': 0,
-        body:   {
-          'aggregations': {
-            'count_by_type': {
-              'terms': {
-                'field': '_type',
-                'size':  1000,
+        index: 'urbansitter',
+        size:  0,
+        body:  {
+          aggregations: {
+            count_by_type: {
+              terms: {
+                field: '_type',
+                size:  1000,
               },
             },
-            'fields':        {
-              'terms': {
-                'field': '_field_names',
-                'size':  1000,
+            fields:        {
+              terms: {
+                field: '_field_names',
+                size:  1000,
               },
             },
           },
