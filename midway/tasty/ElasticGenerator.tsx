@@ -62,6 +62,9 @@ export default class ElasticGenerator
     this.queryObject = {};
     this.tableName = query.table._tastyTableName;
 
+    //set table (index) name
+    this.queryObject.index = this.tableName;
+
     // from clause
     if (query.numSkipped !== 0)
     {
@@ -86,6 +89,11 @@ export default class ElasticGenerator
       }
     }
 
+    if (query.aliases.length != 0)
+    {
+      throw new Error('Aliases are not yet supported by ElasticGenerator.');
+    }
+
     //
     //     //put alias expressions into the select list
     //     this.appendStandardClause(
@@ -107,11 +115,6 @@ export default class ElasticGenerator
     //
     //     this.queryString += ' ';
     // }
-
-    // //write FROM clause
-    // this.newLine();
-    // this.queryString += 'FROM ';
-    // this.queryString += this.escapeString(query.table.__tastyTableName);
 
     // filter clause
     if (query.filters.length > 0)
