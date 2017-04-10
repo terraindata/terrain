@@ -48,6 +48,8 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import Items from './Items';
+
 let Router = new KoaRouter();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -55,6 +57,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   // return all items, or item by id
   winston.info('item root');
   ctx.body = 'item root as ' + ctx.state.user.username;
+  ctx.body = Items.getAll();
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -62,6 +65,28 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   // change an item
   winston.info('item root');
   ctx.body = 'item root as ' + ctx.state.user.username;
+});
+
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  // get item by ID
+  winston.info('item root');
+  let items = Items.find(ctx.params.id);
+  ctx.body = items;
+});
+
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  // get item by ID
+  winston.info('item root');
+  let newItem =
+  {
+    id: ctx.params.id,
+    key0: ctx.req.key0,
+    key1: ctx.req.key1,
+  };
+  let items = Items.replace(ctx.params.id, newItem);
+  ctx.body = items;
 });
 
 export default Router;

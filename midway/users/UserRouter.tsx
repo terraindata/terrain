@@ -47,6 +47,8 @@ THE SOFTWARE.
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import Users from './Users';
+
 let Router = new KoaRouter();
 
 Router.get('/', async (ctx, next) =>
@@ -59,6 +61,31 @@ Router.get('/', async (ctx, next) =>
 Router.post('/', async (ctx, next) =>
 {
   // change or create a user
+  ctx.body = '';
+  winston.info('user post');
+});
+
+Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  // change or create a user
+  console.log(ctx.req);
+  if(ctx.req && ctx.req.username && ctx.req.password)
+  {
+      let name = ctx.req.name ? ctx.req.name : '';
+      await Users.create(ctx.req.username, ctx.req.password, name);
+  }
+  ctx.body = '';
+  winston.info('user post');
+});
+
+Router.post('/update', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  // change or create a user
+  console.log(ctx.req);
+  if(ctx.req && ctx.req.username && ctx.req.oldpassword && ctx.req.newpassword)
+  {
+      await Users.update(ctx.req.username, ctx.req.oldpassword, ctx.req.newpassword);
+  }
   ctx.body = '';
   winston.info('user post');
 });

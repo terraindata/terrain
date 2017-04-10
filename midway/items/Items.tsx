@@ -42,91 +42,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// https://github.com/ortoo/oauth2orize/blob/master/examples/express2/db/users.js
-// TODO THIS IS A STUB. REPLACE WITH ORM
+// Copyright 2017 Terrain Data, Inc.
+// TODO replace all MySQL with SQLite
 
-import * as bcrypt from 'bcrypt-nodejs';
+import MySQLExecutor from '../tasty/MySQLExecutor';
+import Tasty from '../tasty/Tasty';
 
-import srs = require('secure-random-string');
+let Item = new Tasty.Table('items', ['id'], ['field0', 'field1']);
 
-let users = [
-  {
-    accessToken: '',
-    id: '1',
-    name: 'Bob Smith',
-    password: bcrypt.hashSync('secret'),
-    username: 'bob',
-  },
-  {
-    accessToken: '',
-    id: '2',
-    name: 'Joe Davis',
-    password: bcrypt.hashSync('password'),
-    username: 'joe',
-  },
-  {
-    accessToken: '',
-    id: '3',
-    name: 'Linux User',
-    password: bcrypt.hashSync('secret'),
-    username: 'luser',
-  },
-];
-
-const Users =
+const Items =
 {
   find: (id) =>
   {
-    for (let i = 0, len = users.length; i < len; i++)
-    {
-      let user = users[i];
-      if (user.id === id)
-      {
-        return user;
-      }
-    }
-    return null;
+    let query = new Tasty.Query(Items);
+    query.filter(Items['id'].equals(id));
+    let qstr = Tasty.MySQL.generate(query);
+    let sqlite = new MySQLExecutor();
+    let items = await sqlite.query(qstr);
+    return items;
   },
-  findByAccessToken: (username, accessToken) =>
+  getAll: () =>
   {
-    for (let i = 0, len = users.length; i < len; i++)
-    {
-      let user = users[i];
-      if (user.username === username && user.accessToken.length > 0 && user.accessToken === accessToken)
-      {
-        return user;
-      }
-    }
-    return null;
+    let query = new Tasty.Query(Items);
+    let qstr = Tasty.MySQL.generate(query);
+    let sqlite = new MySQLExecutor();
+    let items = await sqlite.query(qstr);
+    return items;
   },
-  findByUsername: (username, password) =>
+  replace: (item) =>
   {
-    for (let i = 0, len = users.length; i < len; i++)
-    {
-      let user = users[i];
-      if (user.username === username)
-      {
-        return new Promise((resolve, reject) => {
-          bcrypt.compare(password, user.password, (err, res) =>
-          {
-            if (res)
-            {
-              if (user.accessToken.length === 0)
-              {
-                user.accessToken = srs(
-                  {
-                    length: 256,
-                  });
-              }
-              resolve(user);
-            } else {
-              resolve(null);
-            }
-          });
-        });
-      }
-    }
+    let query = new Tasty.Query(Items);
+    query.replace(item);
+    let qstr = Tasty.MySQL.generate(query);
+    let sqlite = new MySQLExecutor();
+    let replaceStatus = await sqlite.query(qstr);
+    return replaceStatus;
   },
 };
 
-export default Users;
+export default Items;
