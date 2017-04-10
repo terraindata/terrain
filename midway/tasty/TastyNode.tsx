@@ -44,11 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyNodeTypes from './TastyNodeType';
+import TastyNodeTypes from './TastyNodeTypes';
 
 export default class TastyNode
 {
-  private static make(value): TastyNode
+  public static make(value): TastyNode
   {
     if (value instanceof TastyNode)
     {
@@ -89,45 +89,6 @@ export default class TastyNode
     }
     this.type = type;
     this.value = value;
-  }
-
-  private toString(): string
-  {
-    return JSON.stringify(this, null, 2);
-  }
-
-  public get tastyType(): string
-  {
-    return TastyNodeTypes[this.type];
-  }
-
-  private get numChildren(): number
-  {
-    return Array.isArray(this.value) ? this.value.length : 0;
-  }
-
-  private getChild(index: number)
-  {
-    if (this.numChildren <= index || index < 0)
-    {
-      throw new Error('Accessing child index out of bounds.');
-    }
-    return this.value[index];
-  }
-
-  private get lhs()
-  {
-    return this.getChild(0);
-  }
-
-  private get rhs()
-  {
-    return this.getChild(1);
-  }
-
-  private buildAsLHS(type: string, rhs): TastyNode
-  {
-    return new TastyNode(type, [this, TastyNode.make(rhs)]);
   }
 
   public equals(rhs): TastyNode
@@ -203,5 +164,44 @@ export default class TastyNode
   public not(): TastyNode
   {
     return new TastyNode('!', [this]);
+  }
+
+  private toString(): string
+  {
+    return JSON.stringify(this, null, 2);
+  }
+
+  public get tastyType(): number
+  {
+    return TastyNodeTypes[this.type];
+  }
+
+  private get numChildren(): number
+  {
+    return Array.isArray(this.value) ? this.value.length : 0;
+  }
+
+  private getChild(index: number)
+  {
+    if (this.numChildren <= index || index < 0)
+    {
+      throw new Error('Accessing child index out of bounds.');
+    }
+    return this.value[index];
+  }
+
+  private get lhs()
+  {
+    return this.getChild(0);
+  }
+
+  private get rhs()
+  {
+    return this.getChild(1);
+  }
+
+  private buildAsLHS(type: string, rhs): TastyNode
+  {
+    return new TastyNode(type, [this, TastyNode.make(rhs)]);
   }
 }

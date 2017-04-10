@@ -52,6 +52,8 @@ enum TastyNodeTypes {
   'boolean',
 
   'select',
+  'upsert',
+  'delete',
   'filter',
   'sort',
   'take',

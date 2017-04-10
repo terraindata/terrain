@@ -50,11 +50,11 @@ const {assert} = chai;
 import * as sinon from 'sinon';
 
 import Tasty from '../../tasty/Tasty';
-import TastyNodeTypes from '../../tasty/TastyNodeType';
+import TastyNodeTypes from '../../tasty/TastyNodeTypes';
 
 test('skip node type', (t) => {
   t.equal(TastyNodeTypes[TastyNodeTypes.skip], 'skip');
-  t.equal(TastyNodeTypes.skip, 9);
+  t.equal(TastyNodeTypes.skip, 11);
   t.end();
 });
 
@@ -120,6 +120,29 @@ test('generate simple query (skip)', (t) => {
   query.skip(20);
   const qstr = Tasty.MySQL.generate(query);
   t.equal(qstr, `SELECT * \n  FROM movies\n  OFFSET 20;`);
+  t.end();
+});
+
+test('generate simple query (upsert)', (t) => {
+  const movie = {
+    movieid: 13371337,
+    releasedate: new Date('01/01/17').toISOString().substring(0, 10),
+    title: 'My New Movie',
+  };
+  const query = new Tasty.Query(DBMovies).upsert(movie);
+  const qstr = Tasty.MySQL.generate(query);
+  t.equal(qstr,
+    `REPLACE \n  INTO movies\n  SET movieid = 13371337, releasedate = '2017-01-01', title = 'My New Movie';`);
+  t.end();
+});
+
+test('generate simple query (delete)', (t) => {
+  const query = new Tasty.Query(DBMovies).delete();
+  const qstr1 = Tasty.MySQL.generate(query);
+  t.equal(qstr1, `DELETE \n  FROM movies;`);
+  query.filter(DBMovies['movieid'].equals(13371337));
+  const qstr2 = Tasty.MySQL.generate(query);
+  t.equal(qstr2, `DELETE \n  FROM movies\n  WHERE movies.movieid = 13371337;`);
   t.end();
 });
 
