@@ -89,7 +89,7 @@ export default class MySQLExecutor
         {
           reject(error);
         } else {
-          resolve({results, fields});
+          resolve(results);
         }
       });
     });
