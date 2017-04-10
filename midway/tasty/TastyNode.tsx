@@ -96,7 +96,7 @@ export default class TastyNode
     return JSON.stringify(this, null, 2);
   }
 
-  private get tastyType()
+  public get tastyType(): string
   {
     return TastyNodeTypes[this.type];
   }
@@ -125,82 +125,82 @@ export default class TastyNode
     return this.getChild(1);
   }
 
-  private buildAsLHS(type, rhs): TastyNode
+  private buildAsLHS(type: string, rhs): TastyNode
   {
     return new TastyNode(type, [this, TastyNode.make(rhs)]);
   }
 
-  private equals(rhs): TastyNode
+  public equals(rhs): TastyNode
   {
     return this.buildAsLHS('==', rhs);
   }
 
-  private eq(rhs): TastyNode
+  public eq(rhs): TastyNode
   {
     return this.equals(rhs);
   }
 
-  private doesNotEqual(rhs): TastyNode
+  public doesNotEqual(rhs): TastyNode
   {
     return this.buildAsLHS('!=', rhs);
   }
 
-  private neq(rhs): TastyNode
+  public neq(rhs): TastyNode
   {
     return this.doesNotEqual(rhs);
   }
 
-  private greaterThan(rhs): TastyNode
+  public greaterThan(rhs): TastyNode
   {
     return this.buildAsLHS('>', rhs);
   }
 
-  private gt(rhs): TastyNode
+  public gt(rhs): TastyNode
   {
     return this.greaterThan(rhs);
   }
 
-  private greaterThanOrEqualTo(rhs): TastyNode
+  public greaterThanOrEqualTo(rhs): TastyNode
   {
     return this.buildAsLHS('>=', rhs);
   }
 
-  private gte(rhs): TastyNode
+  public gte(rhs): TastyNode
   {
     return this.greaterThanOrEqualTo(rhs);
   }
 
-  private lessThan(rhs): TastyNode
+  public lessThan(rhs): TastyNode
   {
     return this.buildAsLHS('<', rhs);
   }
 
-  private lt(rhs): TastyNode
+  public lt(rhs): TastyNode
   {
     return this.lessThan(rhs);
   }
 
-  private lessThanOrEqualTo(rhs): TastyNode
+  public lessThanOrEqualTo(rhs): TastyNode
   {
     return this.buildAsLHS('<=', rhs);
   }
 
-  private lte(rhs): TastyNode
+  public lte(rhs): TastyNode
   {
     return this.lessThanOrEqualTo(rhs);
   }
 
-  private and(rhs): TastyNode
+  public and(rhs): TastyNode
   {
     return this.buildAsLHS('&&', rhs);
   }
 
-  private or(rhs): TastyNode
+  public or(rhs): TastyNode
   {
     return this.buildAsLHS('||', rhs);
   }
 
-  private not(): TastyNode
+  public not(): TastyNode
   {
     return new TastyNode('!', [this]);
   }
