@@ -44,23 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-class TastyNodeType
-{
-  public readonly name: string;
-  public readonly code: number;
-
-  constructor(name: string, code: number)
-  {
-    this.name = name;
-    this.code = code;
-  }
-
-  public toString(): string
-  {
-    return JSON.stringify(this, null, 2);
-  }
-}
-
 enum TastyNodeTypes {
   'null',
   'reference',
