@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as elasticSearch from 'elasticsearch';
+import TastyTable from './TastyTable';
 
 const defaultElasticConfig =
   {
@@ -73,16 +74,7 @@ export default class ElasticExecutor
     {
       this.client.cluster.health(
         {},
-        (error, response, status) =>
-        {
-          if (error)
-          {
-            reject(error);
-          } else
-          {
-            resolve(response);
-          }
-        });
+        this.makePromiseCallback(resolve, reject));
     });
   }
 
@@ -95,16 +87,7 @@ export default class ElasticExecutor
     {
       this.client.search(
         queryObject,
-        (error, response, status) =>
-        {
-          if (error)
-          {
-            reject(error);
-          } else
-          {
-            resolve(response);
-          }
-        });
+        this.makePromiseCallback(resolve, reject));
     });
   }
 
@@ -113,7 +96,7 @@ export default class ElasticExecutor
    */
   public async query(queryObject: object)
   {
-    let result: any = await this.rawQuery(queryObject);
+    let result: any = await this.fullQuery(queryObject);
     // if('body' in queryObject)
     // {
     //     let body = queryObject.body;
@@ -126,5 +109,87 @@ export default class ElasticExecutor
   public end()
   {
     this.client.close();
+  }
+
+  public async upsert(table: TastyTable, elements)
+  {
+    if (elements.length > 4)
+    {
+      await this.bulkUpsert(table, elements);
+      return;
+    }
+
+    let promises = [];
+    for (let i = 0; i < elements.length; ++i)
+    {
+      let element = elements[i];
+      promises.push(
+        new Promise((resolve, reject) =>
+        {
+          let query = {
+            index: table._tastyTableName,
+            type:  table._tastyTableName,
+            id:    this.makeID(table, element),
+            body:  element,
+          };
+
+          this.client.index(
+            query,
+            this.makePromiseCallback(resolve, reject));
+        }));
+    }
+
+    for (let promise in promises)
+    {
+      await promise;
+    }
+  }
+
+  private bulkUpsert(table: TastyTable, elements)
+  {
+    let body = [];
+    for (let i = 0; i < elements.length; ++i)
+    {
+      let element = elements[i];
+      let command = {
+        index: {
+          _index: table._tastyTableName,
+          _type:  table._tastyTableName,
+          _id:    this.makeID(table, element),
+        },
+      };
+
+      body.push(command);
+      body.push(element);
+    }
+
+    return new Promise(
+      (resolve, reject) =>
+      {
+        this.client.bulk(
+          {
+            body: body,
+          },
+          this.makePromiseCallback(resolve, reject));
+      });
+  }
+
+  private makeID(table: TastyTable, element: object)
+  {
+    return table.getPrimaryKey(element).join('-');
+  }
+
+  private makePromiseCallback(resolve, reject)
+  {
+    return (error, response) =>
+    {
+      if (error)
+      {
+        reject(error);
+      } else
+      {
+        resolve(response);
+      }
+    };
   }
 };

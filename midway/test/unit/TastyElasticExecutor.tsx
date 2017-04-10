@@ -46,11 +46,14 @@ THE SOFTWARE.
 
 import * as hash from 'object-hash';
 import * as test from 'tape-async';
+import * as fs from 'fs';
 
 import ElasticExecutor from '../../tasty/ElasticExecutor';
 import Tasty from '../../tasty/Tasty';
 
 let elasticSearch;
+
+const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
 
 test('elastic connect', async (t) =>
 {
@@ -87,7 +90,7 @@ test('basic query', async (t) =>
       {
         index: 'urbansitter',
         size:  0,
-        body:  {
+        query: {
           aggregations: {
             count_by_type: {
               terms: {
@@ -114,6 +117,38 @@ test('basic query', async (t) =>
   }
   t.end();
 });
+
+// test('write movies', async (t) =>
+// {
+//   try
+//   {
+//     let fileData : any = await
+//       new Promise((resolve, reject) =>
+//       {
+//         fs.readFile('./log.txt', 'utf8',
+//           (error, data) =>
+//           {
+//             if (error)
+//             {
+//               reject(error);
+//             }
+//             else
+//             {
+//               resolve(data);
+//             }
+//           });
+//       });
+//
+//     let elements = JSON.parse(fileData);
+//
+//     await elasticSearch.upsert(DBMovies, elements);
+//
+//   } catch (e)
+//   {
+//     t.skip(e);
+//   }
+//   t.end();
+// });
 
 // async function runQuery(qstr: string)
 // {
