@@ -68,6 +68,9 @@ export default class ElasticExecutor
     this.client = new elasticSearch.Client(config);
   }
 
+  /**
+   * ES specific extension -- gets the health of the ES cluster
+   */
   public health()
   {
     return new Promise((resolve, reject) =>
@@ -111,9 +114,12 @@ export default class ElasticExecutor
     this.client.close();
   }
 
-  public async upsert(table: TastyTable, elements)
+  /**
+   * Upserts the given objects, based on primary key ('id' in elastic).
+   */
+  public async upsertObjects(table: TastyTable, elements)
   {
-    if (elements.length > 4)
+    if (elements.length > 2)
     {
       await this.bulkUpsert(table, elements);
       return;
@@ -143,6 +149,14 @@ export default class ElasticExecutor
     {
       await promise;
     }
+  }
+
+  /**
+   * Deletes the given objects based on their primary key
+   */
+  public deleteObjects(table: TastyTable, listOfObjects)
+  {
+    throw new Error('Not implemented.');
   }
 
   private bulkUpsert(table: TastyTable, elements)
