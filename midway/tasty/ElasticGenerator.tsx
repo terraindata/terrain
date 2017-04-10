@@ -62,7 +62,7 @@ export default class ElasticGenerator
     this.queryObject = {};
     this.tableName = query.table._tastyTableName;
 
-    //set table (index) name
+    // set table (index) name
     this.queryObject.index = this.tableName;
 
     // from clause
@@ -89,7 +89,7 @@ export default class ElasticGenerator
       }
     }
 
-    if (query.aliases.length != 0)
+    if (query.aliases.length !== 0)
     {
       throw new Error('Aliases are not yet supported by ElasticGenerator.');
     }
