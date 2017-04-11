@@ -44,23 +44,44 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+enum TastyNodeTypes {
+  'null',
+  'reference',
+  'string',
+  'number',
+  'boolean',
 
-const Router = new KoaRouter();
+  'select',
+  'upsert',
+  'delete',
+  'filter',
+  'sort',
+  'take',
+  'skip',
 
-Router.get('/', async (ctx, next) =>
-{
-  // return all versions
-  ctx.body = '';
-  winston.info('version root');
-});
+  '.',
 
-Router.post('/', async (ctx, next) =>
-{
-  // not allowed
-  ctx.body = '';
-  winston.info('version post');
-});
+  '+',
+  '-',
+  '/',
+  '*',
 
-export default Router;
+  '==',
+  '!=',
+  '>',
+  '<',
+  '>=',
+  '<=',
+
+  '!',
+  '&&',
+  '||',
+
+  'isNull',
+  'isNotNull',
+
+  'ascending',
+  'descending',
+}
+
+export default TastyNodeTypes;

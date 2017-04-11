@@ -52,7 +52,7 @@ import SchemaRouter from './schema/SchemaRouter';
 import UserRouter from './users/UserRouter';
 import VersionRouter from './versions/VersionRouter';
 
-let AppRouter = new KoaRouter();
+const AppRouter = new KoaRouter();
 
 AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
 AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
@@ -80,7 +80,7 @@ AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, nex
   ctx.body = 'authenticated as ' + ctx.state.user.username;
 });
 
-let MidwayRouter = new KoaRouter();
+const MidwayRouter = new KoaRouter();
 MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
 
 export default MidwayRouter;

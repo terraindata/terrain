@@ -44,59 +44,56 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-class TastyNodeType
-{
-  public readonly name: string;
-  public readonly code: number;
+import * as sqlite3 from 'sqlite3';
+import * as winston from 'winston';
 
-  constructor(name: string, code: number)
-  {
-    this.name = name;
-    this.code = code;
-  }
-
-  public toString(): string
-  {
-    return JSON.stringify(this, null, 2);
-  }
-}
-
-enum TastyNodeTypes {
-  'null',
-  'reference',
-  'string',
-  'number',
-  'boolean',
-
-  'select',
-  'filter',
-  'sort',
-  'take',
-  'skip',
-
-  '.',
-
-  '+',
-  '-',
-  '/',
-  '*',
-
-  '==',
-  '!=',
-  '>',
-  '<',
-  '>=',
-  '<=',
-
-  '!',
-  '&&',
-  '||',
-
-  'isNull',
-  'isNotNull',
-
-  'ascending',
-  'descending',
+const defaultSQLiteConfig = {
+  filename: 'nodeway.db',
 };
 
-export default TastyNodeTypes;
+export default class SQLiteExecutor
+{
+  private db;
+
+  constructor(config?: any)
+  {
+    if (config === undefined)
+    {
+      config = defaultSQLiteConfig;
+    }
+
+    this.db = new sqlite3.Database(config.filename);
+  }
+
+  public query(queryStr: string)
+  {
+    return new Promise((resolve, reject) =>
+    {
+      this.db.all(queryStr, (error, rows) =>
+      {
+        if (error)
+        {
+          reject(error);
+        } else {
+          resolve({rows});
+        }
+      });
+    });
+  }
+
+  public destroy()
+  {
+    return new Promise((resolve, reject) =>
+    {
+      this.db.close((error) =>
+      {
+        if (error)
+        {
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+}

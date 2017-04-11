@@ -44,16 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import TastyColumn from './TastyColumn';
 import TastyNode from './TastyNode';
+import TastyNodeTypes from './TastyNodeTypes';
 import TastyTable from './TastyTable';
 
 export default class TastyQuery
 {
   public table: TastyTable;
-  public aliases: any;
-  public filters: any;
-  public sorts: any;
-  public selected: any;
+  public command: TastyNode;
+  public aliases: any[];
+  public filters: any[];
+  public sorts: any[];
+  public selected: TastyColumn[];
+  public upserts: any[];
   public numTaken: number;
   public numSkipped: number;
 
@@ -63,14 +67,12 @@ export default class TastyQuery
     this.aliases = [];
     this.filters = [];
     this.sorts = [];
-    this.selected = null;
+    this.selected = [];
+    this.upserts = [];
     this.numTaken = 0;
     this.numSkipped = 0;
 
-    // this.root = new TastyNode('select', null,
-    //     [
-    //         new TastyNode('reference', tableName, []),
-    //     ]);
+    this.command = new TastyNode('select', null);
   }
 
   public toString(): string
@@ -78,9 +80,22 @@ export default class TastyQuery
     return JSON.stringify(this, null, 1);
   }
 
-  public select(columns): TastyQuery
+  public select(columns: TastyColumn[]): TastyQuery
   {
     this.selected = columns;
+    return this;
+  }
+
+  public upsert(object): TastyQuery
+  {
+    this.command = new TastyNode('update', null);
+    this.upserts.push(object);
+    return this;
+  }
+
+  public delete(): TastyQuery
+  {
+    this.command = new TastyNode('delete', null);
     return this;
   }
 
@@ -117,7 +132,9 @@ export default class TastyQuery
 
   public isSelectingAll(): boolean
   {
-    return this.selected === null && this.aliases.length === 0;
+    return (this.command.tastyType === TastyNodeTypes.select) &&
+      (this.selected.length === 0) &&
+      (this.aliases.length === 0);
   }
 
   public take(num: number): TastyQuery

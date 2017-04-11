@@ -50,7 +50,7 @@ import * as winston from 'winston';
 
 import Items from './Items';
 
-let Router = new KoaRouter();
+const Router = new KoaRouter();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {

@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as SQLGenerator from './SQLGenerator';
+import TastyNode from './TastyNode';
+import TastyNodeTypes from './TastyNodeTypes';
 import TastyQuery from './TastyQuery';
 
 export default class MySQLGenerator
@@ -62,111 +64,136 @@ export default class MySQLGenerator
     this.queryString = '';
     this.indentation = 0;
 
-    this.queryString += 'SELECT ';
+    this.appendExpression(query.command);
+    this.queryString += ' ';
     this.indent();
 
-    let columns = [];
-
-    if (query.isSelectingAll())
+    if (query.command.tastyType === TastyNodeTypes.select)
     {
-      this.queryString += '* '; // handle "select all" condition
-    } else
-    {
-      // put selected vars into the select list
-      if (query.selected != null)
+      const columns = [];
+      if (query.isSelectingAll())
       {
+        this.queryString += '* '; // handle "select all" condition
+      } else
+      {
+        // put selected vars into the select list
+        if (query.selected.length > 0)
+        {
+          this.appendStandardClause(
+            null,
+            false,
+            query.selected,
+            (column) =>
+            {
+              columns.push(column);
+              this.appendSubexpression(column);
+            },
+            () =>
+            {
+              this.queryString += ', ';
+            });
+        }
+
+        // put alias expressions into the select list
         this.appendStandardClause(
           null,
-          false,
-          query.selected,
-          (column) =>
+          true,
+          query.aliases,
+          (alias) =>
           {
-            columns.push(column);
-            this.appendSubexpression(column);
+            columns.push(alias.name);
+            this.appendSubexpression(alias.query);
+            this.queryString += ' AS ';
+            this.queryString += this.escapeString(alias.name);
           },
-          () =>
-          {
+          () => {
+            this.queryString += ', ';
+            this.newLine();
+          });
+
+        this.queryString += ' ';
+      }
+
+      // write FROM clause
+      this.newLine();
+      this.queryString += 'FROM ';
+      this.queryString += this.escapeString(query.table._tastyTableName);
+
+      // write WHERE clause
+      if (query.filters.length > 0) {
+        this.appendStandardClause(
+          'WHERE',
+          true,
+          query.filters,
+          (filter) => {
+            this.appendSubexpression(filter);
+          },
+          () => {
+            this.newLine();
+            this.queryString += ' AND ';
+          });
+      }
+
+      // write ORDER BY clause
+      if (query.sorts.length > 0) {
+        this.appendStandardClause(
+          'ORDER BY',
+          true,
+          query.sorts,
+          (sort) => {
+            this.appendSubexpression(sort.node);
+            this.queryString += ' ';
+            this.queryString += (sort.order === 'asc' ? 'ASC' : 'DESC');
+          },
+          () => {
             this.queryString += ', ';
           });
       }
 
-      // put alias expressions into the select list
-      this.appendStandardClause(
-        null,
-        true,
-        query.aliases,
-        (alias) => {
-          columns.push(alias.name);
-          this.appendSubexpression(alias.query);
-          this.queryString += ' AS ';
-          this.queryString += this.escapeString(alias.name);
-        },
-        () => {
-          this.queryString += ', ';
-          this.newLine();
-        });
+      if (query.numTaken !== 0 || query.numSkipped !== 0) {
+        this.newLine();
 
-      this.queryString += ' ';
-    }
+        if (query.numTaken !== 0) {
+          this.queryString += 'LIMIT ' + query.numTaken;
+          if (query.numSkipped !== 0) {
+            this.queryString += ' ';
+          }
+        }
 
-    // write FROM clause
-    this.newLine();
-    this.queryString += 'FROM ';
-    this.queryString += this.escapeString(query.table._tastyTableName);
-
-    // write WHERE clause
-    if (query.filters.length > 0)
-    {
-      this.appendStandardClause(
-        'WHERE',
-        true,
-        query.filters,
-        (filter) =>
-        {
-          this.appendSubexpression(filter);
-        },
-        () =>
-        {
-          this.newLine();
-          this.queryString += ' AND ';
-        });
-    }
-
-    // write ORDER BY clause
-    if (query.sorts.length > 0)
-    {
-      this.appendStandardClause(
-        'ORDER BY',
-        true,
-        query.sorts,
-        (sort) =>
-        {
-          this.appendSubexpression(sort.node);
-          this.queryString += ' ';
-          this.queryString += (sort.order === 'asc' ? 'ASC' : 'DESC');
-        },
-        () =>
-        {
-          this.queryString += ', ';
-        });
-    }
-
-    if (query.numTaken !== 0 || query.numSkipped !== 0)
-    {
-      this.newLine();
-
-      if (query.numTaken !== 0)
-      {
-        this.queryString += 'LIMIT ' + query.numTaken;
-        if (query.numSkipped !== 0)
-        {
-          this.queryString += ' ';
+        if (query.numSkipped !== 0) {
+          this.queryString += 'OFFSET ' + query.numSkipped;
         }
       }
-
-      if (query.numSkipped !== 0)
+    } else if (query.command.tastyType === TastyNodeTypes.upsert)
+    {
+      if (query.upserts.length > 0)
       {
-        this.queryString += 'OFFSET ' + query.numSkipped;
+        // write INTO clause
+        this.newLine();
+        this.queryString += 'INTO ';
+        this.queryString += this.escapeString(query.table._tastyTableName);
+
+        // write SET clause
+        this.appendStandardClause(
+            'SET',
+            true,
+            query.upserts,
+            (obj) =>
+            {
+              for (const prop in obj)
+              {
+                if (obj.hasOwnProperty(prop))
+                {
+                  this.appendSubexpression(prop);
+                  this.queryString += ' = ';
+                  this.appendSubexpression(obj[prop]);
+                }
+              }
+            },
+            () =>
+            {
+              this.queryString += ', ';
+            });
       }
     }
 
@@ -246,8 +273,8 @@ export default class MySQLGenerator
       throw new Error('Node type "' + node.type + '" is not supported by MySQLGenerator.');
     }
 
-    let sqlTypeInfo = SQLGenerator.TypeMap[node.type];
-    let fix = sqlTypeInfo.fix;
+    const sqlTypeInfo = SQLGenerator.TypeMap[node.type];
+    const fix = sqlTypeInfo.fix;
     if (node.numChildren === 0)
     {
       // base case
@@ -313,7 +340,7 @@ export default class MySQLGenerator
 
   private sqlName(node): string
   {
-    let sqlTypeInfo = SQLGenerator.TypeMap[node.type];
+    const sqlTypeInfo = SQLGenerator.TypeMap[node.type];
     if (sqlTypeInfo.sqlName !== null)
     {
       return sqlTypeInfo.sqlName;

@@ -49,7 +49,7 @@ import * as winston from 'winston';
 
 import Users from './Users';
 
-let Router = new KoaRouter();
+const Router = new KoaRouter();
 
 Router.get('/', async (ctx, next) =>
 {

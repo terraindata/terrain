@@ -47,14 +47,14 @@ THE SOFTWARE.
 import * as hash from 'object-hash';
 import * as test from 'tape-async';
 
-import MySQLExecutor from '../../tasty/MySQLExecutor';
+import SQLiteExecutor from '../../tasty/SQLiteExecutor';
 import Tasty from '../../tasty/Tasty';
 
-let mysql;
+let sqlite;
 
 test('pool connect', async (t) => {
   try {
-    mysql = new MySQLExecutor();
+    sqlite = new SQLiteExecutor();
     t.pass();
   } catch (e) {
     t.fail(e);
@@ -64,15 +64,15 @@ test('pool connect', async (t) => {
 
 async function runQuery(qstr: string)
 {
-  let results = await mysql.query(qstr);
+  const results = await sqlite.query(qstr);
   return hash(results);
 }
 
 test('execute simple query (select all)', async (t) =>
 {
   try {
-    let h = await runQuery(`SELECT * \n  FROM movies LIMIT 2;`);
-    t.equal(h, `38877538d52f8f6f7e81a95d38e2aeaaad9f5043`);
+    const h = await runQuery(`SELECT * \n  FROM movies LIMIT 2;`);
+    t.equal(h, `63f0e555f54a998e2837489c5e16a48cc3465bfe`);
   } catch (e) {
     t.skip(e);
   }
@@ -81,8 +81,8 @@ test('execute simple query (select all)', async (t) =>
 
 test('execute simple query (select columns)', async (t) => {
   try {
-    let h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies LIMIT 2;`);
-    t.equal(h, `dc07a13cda832dfd0be10b26ad68b87d3272d11d`);
+    const h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies LIMIT 2;`);
+    t.equal(h, `1dbce9ceb168544435792b40737b91b342a73a45`);
   } catch (e) {
     t.skip(e);
   }
@@ -91,8 +91,8 @@ test('execute simple query (select columns)', async (t) => {
 
 test('execute simple query (filter equals)', async (t) => {
   try {
-    let h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`);
-    t.equal(h, `24b3b17d77c1a849692a7a2a4a5f1de1978816f4`);
+    const h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`);
+    t.equal(h, `8f1223a111269da3d83a4fcc58c19acbb1c1f939`);
   } catch (e) {
     t.skip(e);
   }
@@ -101,8 +101,8 @@ test('execute simple query (filter equals)', async (t) => {
 
 test('execute simple query (filter doesNotEqual)', async (t) => {
   try {
-    let h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)' LIMIT 2;`);
-    t.equal(h, `0ea0dca172bcfc6d8b32da35259390e320cbc53b`);
+    const h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)' LIMIT 2;`);
+    t.equal(h, `e5ab1bafd5dad1f90efc676bcdaed0de952f1856`);
   } catch (e) {
     t.skip(e);
   }
@@ -111,8 +111,8 @@ test('execute simple query (filter doesNotEqual)', async (t) => {
 
 test('execute simple query (sort asc)', async (t) => {
   try {
-    let h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title ASC LIMIT 10;`);
-    t.equal(h, `d865452b582b20d92d5e00c538f5a0645df4cfdf`);
+    const h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title ASC LIMIT 10;`);
+    t.equal(h, `17f7b5e32ef4f39b7a441f85c2b376297e5ea331`);
   } catch (e) {
     t.skip(e);
   }
@@ -121,8 +121,8 @@ test('execute simple query (sort asc)', async (t) => {
 
 test('execute simple query (sort desc)', async (t) => {
   try {
-    let h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title DESC LIMIT 10;`);
-    t.equal(h, `464d75bb6d519b4aa11f5aa435bb30d80be48837`);
+    const h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title DESC LIMIT 10;`);
+    t.equal(h, `a7ddf3bf437bc21655feb24c174dd9fe8a7c6396`);
   } catch (e) {
     t.skip(e);
   }
@@ -131,8 +131,8 @@ test('execute simple query (sort desc)', async (t) => {
 
 test('execute simple query (take+skip)', async (t) => {
   try {
-    let h = await runQuery(`SELECT * \n  FROM movies\n  LIMIT 2 OFFSET 20;`);
-    t.equal(h, `0f319cfcf59f21e1804f4da6fd5b902f2dc8810a`);
+    const h = await runQuery(`SELECT * \n  FROM movies\n  LIMIT 2 OFFSET 20;`);
+    t.equal(h, `d4059924a51d84c36df9c07868b7c8b0c5d9a1ff`);
   } catch (e) {
     t.skip(e);
   }
@@ -141,12 +141,12 @@ test('execute simple query (take+skip)', async (t) => {
 
 test('execute complex query (MySQL)', async (t) => {
   try {
-    let h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n
+    const h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n
                             WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'\n
                             AND movies.releasedate < '2017-03-24'\n
                             ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC\n
                             LIMIT 10 OFFSET 20;`);
-    t.equal(h, `f1c34d8cbc4877c9fe93e7e1f3f82d4b84bc63d3`);
+    t.equal(h, `5a8145ab48d8d81bd05cc3ff80f8c07b34129d5c`);
   } catch (e) {
     t.skip(e);
   }
@@ -156,7 +156,7 @@ test('execute complex query (MySQL)', async (t) => {
 test('pool destroy', async (t) =>
 {
   try {
-    await mysql.end();
+    await sqlite.destroy();
     t.pass();
   } catch (e)
   {

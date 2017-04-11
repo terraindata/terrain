@@ -48,7 +48,7 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-let Router = new KoaRouter();
+const Router = new KoaRouter();
 
 Router.get('/', async (ctx, next) =>
 {
