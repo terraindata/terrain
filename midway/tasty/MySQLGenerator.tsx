@@ -177,25 +177,19 @@ export default class MySQLGenerator
         this.queryString += 'INTO ';
         this.queryString += this.escapeString(query.table._tastyTableName);
 
-        // write SET clause
-        this.appendStandardClause(
-            'SET',
-            true,
-            query.upserts,
-            (obj) =>
+        let keys = '';
+        let values = '';
+        for (let i = 0; i < query.upserts.length; i++)
+        {
+          const obj = query.upserts[i];
+          keys += Object.keys(obj). join(', ');
+          values += Object.keys(obj).map((prop) =>
             {
-              this.queryString += Object.keys(obj).map((prop) =>
-              {
-                let str = this.escapeString(prop);
-                str += ' = ';
-                str += this.sqlName(TastyNode.make(obj[prop]));
-                return str;
-              }).join(', ');
-            },
-            () =>
-            {
-              this.queryString += ', ';
-            });
+              return this.sqlName(TastyNode.make(obj[prop]));
+            }).join(', ');
+        }
+
+        this.queryString += ' (' + keys + ') VALUES (' + values + ')';
       }
     }
 
