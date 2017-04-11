@@ -44,9 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as fs from 'fs';
 import * as hash from 'object-hash';
 import * as test from 'tape-async';
-import * as fs from 'fs';
+import * as winston from 'winston';
 
 import ElasticExecutor from '../../tasty/ElasticExecutor';
 import Tasty from '../../tasty/Tasty';
@@ -73,8 +74,7 @@ test('elastic health', async (t) =>
   try
   {
     const h = await elasticSearch.health();
-    //t.equal(h, `63f0e555f54a998e2837489c5e16a48cc3465bfe`);
-    console.log(h);
+    winston.info(h);
   } catch (e)
   {
     t.skip(e);
@@ -89,7 +89,6 @@ test('basic query', async (t) =>
     const h = await elasticSearch.fullQuery(
       {
         index: 'urbansitter',
-        size:  0,
         query: {
           aggregations: {
             count_by_type: {
@@ -106,9 +105,10 @@ test('basic query', async (t) =>
             },
           },
         },
+        size:  0,
       },
     );
-    console.log(JSON.stringify(h, null, 2));
+    winston.info(JSON.stringify(h, null, 2));
     // console.log(h.hits.hits.forEach(
     //     (result) => {console.log(JSON.stringify(result, null, 2));}));
   } catch (e)

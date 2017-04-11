@@ -96,7 +96,7 @@ export default class ElasticExecutor
    */
   public async query(queryObject: object)
   {
-    let result: any = await this.fullQuery(queryObject);
+    const result: any = await this.fullQuery(queryObject);
     // if('body' in queryObject)
     // {
     //     let body = queryObject.body;
@@ -119,18 +119,18 @@ export default class ElasticExecutor
       return;
     }
 
-    let promises = [];
+    const promises = [];
     for (let i = 0; i < elements.length; ++i)
     {
-      let element = elements[i];
+      const element = elements[i];
       promises.push(
         new Promise((resolve, reject) =>
         {
-          let query = {
+          const query = {
+            body:  element,
+            id:    this.makeID(table, element),
             index: table._tastyTableName,
             type:  table._tastyTableName,
-            id:    this.makeID(table, element),
-            body:  element,
           };
 
           this.client.index(
@@ -139,23 +139,26 @@ export default class ElasticExecutor
         }));
     }
 
-    for (let promise in promises)
+    for (const promise in promises)
     {
-      await promise;
+      if (promises.hasOwnProperty(promise))
+      {
+        await promise;
+      }
     }
   }
 
   private bulkUpsert(table: TastyTable, elements)
   {
-    let body = [];
+    const body = [];
     for (let i = 0; i < elements.length; ++i)
     {
-      let element = elements[i];
-      let command = {
+      const element = elements[i];
+      const command = {
         index: {
+          _id:    this.makeID(table, element),
           _index: table._tastyTableName,
           _type:  table._tastyTableName,
-          _id:    this.makeID(table, element),
         },
       };
 
@@ -168,7 +171,7 @@ export default class ElasticExecutor
       {
         this.client.bulk(
           {
-            body: body,
+            body,
           },
           this.makePromiseCallback(resolve, reject));
       });
@@ -192,4 +195,4 @@ export default class ElasticExecutor
       }
     };
   }
-};
+}
