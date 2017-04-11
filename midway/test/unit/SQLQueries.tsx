@@ -44,72 +44,43 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as hash from 'object-hash';
-import * as test from 'tape-async';
+const SQLQueries: Array<[string, string]> = [
+['simple query (select all)',
+  `SELECT * \n  FROM movies\n  LIMIT 10;`],
 
-import SQLiteExecutor from '../../tasty/SQLiteExecutor';
-import Tasty from '../../tasty/Tasty';
-import SQLQueries from './SQLQueries';
+['simple query (select columns)',
+  `SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n  LIMIT 10;`],
 
-const resultHash: string[] = [
-  '2adee52a184092a6a42f811cd6eea1ea7d2d81d4',
-  '5ac5e0b9a2cafe9398e4b2c4d4a5cdaaa03eaa45',
-  '8f1223a111269da3d83a4fcc58c19acbb1c1f939',
-  '9be5ae8272296ee66655a0b0c6dfc9d6a5d1a9b5',
-  '17f7b5e32ef4f39b7a441f85c2b376297e5ea331',
-  'a7ddf3bf437bc21655feb24c174dd9fe8a7c6396',
-  '2adee52a184092a6a42f811cd6eea1ea7d2d81d4',
-  '302450931f1f3453647e89bde20ad3c390e51c91',
-  'b4f979a73611f0cc67ec894bae438a8d10b8fcac',
-  'b4f979a73611f0cc67ec894bae438a8d10b8fcac',
-  '5a8145ab48d8d81bd05cc3ff80f8c07b34129d5c',
+['simple query (filter equals)',
+  `SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`],
+
+['simple query (filter doesNotEqual)',
+  `SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)'\n  LIMIT 10;`],
+
+['simple query (sort asc)',
+  `SELECT * \n  FROM movies\n  ORDER BY movies.title ASC\n  LIMIT 10;`],
+
+['simple query (sort desc)',
+  `SELECT * \n  FROM movies\n  ORDER BY movies.title DESC\n  LIMIT 10;`],
+
+['simple query (take)',
+  `SELECT * \n  FROM movies\n  LIMIT 10;`],
+
+['simple query (skip)',
+  `SELECT * \n  FROM movies\n  LIMIT 10 OFFSET 20;`],
+
+['simple query (upsert)',
+  `REPLACE \n  INTO movies (movieid, releasedate, title) VALUES (13371337, '2017-01-01', 'My New Movie');`],
+
+['simple query (delete)',
+  `DELETE \n  FROM movies\n  WHERE movies.movieid = 13371337;`],
+
+['complex query (MySQL)',
+  `SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies
+  WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'
+     AND movies.releasedate < '2017-03-24'
+  ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC
+  LIMIT 10 OFFSET 20;`],
 ];
 
-let sqlite;
-
-async function runQuery(qstr: string)
-{
-  const results = await sqlite.query(qstr);
-  return hash(results);
-}
-
-function runTest(index: number)
-{
-  test('SQLite: execute ' + SQLQueries[index][0], async (t) =>
-  {
-    try {
-      const h = await runQuery(SQLQueries[index][1]);
-      t.equal(h, resultHash[index]);
-    } catch (e) {
-      t.skip(e);
-    }
-    t.end();
-  });
-}
-
-test('pool connect', async (t) => {
-  try {
-    sqlite = new SQLiteExecutor();
-    t.pass();
-  } catch (e) {
-    t.fail(e);
-  }
-  t.end();
-});
-
-for (let i = 0; i < SQLQueries.length; i++)
-{
-  runTest(i);
-}
-
-test('pool destroy', async (t) =>
-{
-  try {
-    await sqlite.destroy();
-    t.pass();
-  } catch (e)
-  {
-    t.skip(e);
-  }
-  t.end();
-});
+export default SQLQueries;

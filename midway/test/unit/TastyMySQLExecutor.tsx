@@ -49,8 +49,43 @@ import * as test from 'tape-async';
 
 import MySQLExecutor from '../../tasty/MySQLExecutor';
 import Tasty from '../../tasty/Tasty';
+import SQLQueries from './SQLQueries';
+
+const resultHash: string[] = [
+  '229037c41de0bc3458a75022a90a658bd5cf688f',
+  '72919e12f8080d2e6f5e71384744b0345bc0de01',
+  'e75d1f03dfe3ac0647c430986808be602913b14a',
+  '9b9e4b2647b4d26d2f450fa6b4c8ea1c9646f1d1',
+  '40a132ce95fd02fbf1dcc54ccf0923c64f1ba3b5',
+  '180dd258a833585bd3b01dcd576fafa4590aeb75',
+  '229037c41de0bc3458a75022a90a658bd5cf688f',
+  '817afc5b747e341d7d785e2c86fbd6bc019605a1',
+  'cdba91e06d43ac1d85aee145552d7192fa9886cf',
+  'cdba91e06d43ac1d85aee145552d7192fa9886cf',
+  '6a56be8acf875c3c02db6ab69931e017747582d0',
+];
 
 let mysql;
+
+async function runQuery(qstr: string)
+{
+  const results = await mysql.query(qstr);
+  return hash(results);
+}
+
+function runTest(index: number)
+{
+  test('MySQL: execute ' + SQLQueries[index][0], async (t) =>
+  {
+    try {
+      const h = await runQuery(SQLQueries[index][1]);
+      t.equal(h, resultHash[index]);
+    } catch (e) {
+      t.skip(e);
+    }
+    t.end();
+  });
+}
 
 test('pool connect', async (t) => {
   try {
@@ -62,96 +97,10 @@ test('pool connect', async (t) => {
   t.end();
 });
 
-async function runQuery(qstr: string)
+for (let i = 0; i < SQLQueries.length; i++)
 {
-  const results = await mysql.query(qstr);
-  return hash(results);
+  runTest(i);
 }
-
-test('execute simple query (select all)', async (t) =>
-{
-  try {
-    const h = await runQuery(`SELECT * \n  FROM movies LIMIT 2;`);
-    t.equal(h, `d15b5db30ab0646594e9d9fdceb15d4cd15abb21`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute simple query (select columns)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies LIMIT 2;`);
-    t.equal(h, `c4a600914b91978fba05c5395b0e8af0e57a2bb7`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute simple query (filter equals)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`);
-    t.equal(h, `e75d1f03dfe3ac0647c430986808be602913b14a`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute simple query (filter doesNotEqual)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)' LIMIT 2;`);
-    t.equal(h, `99c6355f77ad75be42df72613ed3183c7e04393b`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute simple query (sort asc)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title ASC LIMIT 10;`);
-    t.equal(h, `40a132ce95fd02fbf1dcc54ccf0923c64f1ba3b5`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute simple query (sort desc)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title DESC LIMIT 10;`);
-    t.equal(h, `180dd258a833585bd3b01dcd576fafa4590aeb75`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute simple query (take+skip)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT * \n  FROM movies\n  LIMIT 2 OFFSET 20;`);
-    t.equal(h, `3860e6b2713bbf474e826002d353b0abb2aad84a`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute complex query (MySQL)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n
-                            WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'\n
-                            AND movies.releasedate < '2017-03-24'\n
-                            ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC\n
-                            LIMIT 10 OFFSET 20;`);
-    t.equal(h, `6a56be8acf875c3c02db6ab69931e017747582d0`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
 
 test('pool destroy', async (t) =>
 {
