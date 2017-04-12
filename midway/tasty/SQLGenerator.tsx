@@ -52,7 +52,7 @@ export const enum FixEnum {
   postfix,
 }
 
-class SQLGeneratorMapping
+export class SQLGeneratorMapping
 {
   private sqlName: string;
   private fix: FixEnum;
@@ -65,7 +65,7 @@ class SQLGeneratorMapping
 }
 
 /* tslint:disable:object-literal-sort-keys */
-export let TypeMap = Object.freeze({
+export const TypeMap = Object.freeze({
   'boolean': new SQLGeneratorMapping(null, FixEnum.nullary),
   'null': new SQLGeneratorMapping('NULL', FixEnum.nullary),
   'number': new SQLGeneratorMapping(null, FixEnum.nullary),
