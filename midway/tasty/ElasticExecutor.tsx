@@ -49,7 +49,7 @@ import TastyTable from './TastyTable';
 
 const defaultElasticConfig =
   {
-    hosts: ['http://10.1.0.30:9200'],
+    hosts: ['http://localhost:9200'],
   };
 
 export default class ElasticExecutor
