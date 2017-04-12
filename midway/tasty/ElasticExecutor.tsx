@@ -106,7 +106,7 @@ export default class ElasticExecutor
     return result.hits;
   }
 
-  public end()
+  public destroy()
   {
     this.client.close();
   }
