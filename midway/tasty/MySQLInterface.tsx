@@ -56,28 +56,12 @@ export default class MySQLInterface
     // return list of selected objects/rows
   }
 
-  public update(query)
+  public upsert(table, objects: any[])
   {
     throw new Error('Not implemented.');
   }
 
-  public delete(query)
-  {
-    throw new Error('Not implemented.');
-  }
-
-  public insertObjects(table, listOfObjects)
-  {
-    throw new Error('Not implemented.');
-  }
-
-  public updateObjects(table, listOfObjects)
-  {
-    // replaces objects with given list based on primary key
-    throw new Error('Not implemented.');
-  }
-
-  public deleteObjects(table, listOfObjects)
+  public delete(table, objects: any[])
   {
     // deletes objects based on primary key
     throw new Error('Not implemented.');

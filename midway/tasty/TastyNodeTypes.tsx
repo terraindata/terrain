@@ -44,72 +44,44 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as hash from 'object-hash';
-import * as test from 'tape-async';
+enum TastyNodeTypes {
+  'null',
+  'reference',
+  'string',
+  'number',
+  'boolean',
 
-import SQLiteExecutor from '../../tasty/SQLiteExecutor';
-import Tasty from '../../tasty/Tasty';
-import SQLQueries from './SQLQueries';
+  'select',
+  'upsert',
+  'delete',
+  'filter',
+  'sort',
+  'take',
+  'skip',
 
-const resultHash: string[] = [
-  '2adee52a184092a6a42f811cd6eea1ea7d2d81d4',
-  '5ac5e0b9a2cafe9398e4b2c4d4a5cdaaa03eaa45',
-  '8f1223a111269da3d83a4fcc58c19acbb1c1f939',
-  '9be5ae8272296ee66655a0b0c6dfc9d6a5d1a9b5',
-  '17f7b5e32ef4f39b7a441f85c2b376297e5ea331',
-  'a7ddf3bf437bc21655feb24c174dd9fe8a7c6396',
-  '2adee52a184092a6a42f811cd6eea1ea7d2d81d4',
-  '302450931f1f3453647e89bde20ad3c390e51c91',
-  'b4f979a73611f0cc67ec894bae438a8d10b8fcac',
-  'b4f979a73611f0cc67ec894bae438a8d10b8fcac',
-  '5a8145ab48d8d81bd05cc3ff80f8c07b34129d5c',
-];
+  '.',
 
-let sqlite;
+  '+',
+  '-',
+  '/',
+  '*',
 
-async function runQuery(qstr: string)
-{
-  const results = await sqlite.query(qstr);
-  return hash(results);
+  '==',
+  '!=',
+  '>',
+  '<',
+  '>=',
+  '<=',
+
+  '!',
+  '&&',
+  '||',
+
+  'isNull',
+  'isNotNull',
+
+  'ascending',
+  'descending',
 }
 
-function runTest(index: number)
-{
-  test('SQLite: execute ' + SQLQueries[index][0], async (t) =>
-  {
-    try {
-      const h = await runQuery(SQLQueries[index][1]);
-      t.equal(h, resultHash[index]);
-    } catch (e) {
-      t.skip(e);
-    }
-    t.end();
-  });
-}
-
-test('pool connect', async (t) => {
-  try {
-    sqlite = new SQLiteExecutor();
-    t.pass();
-  } catch (e) {
-    t.fail(e);
-  }
-  t.end();
-});
-
-for (let i = 0; i < SQLQueries.length; i++)
-{
-  runTest(i);
-}
-
-test('pool destroy', async (t) =>
-{
-  try {
-    await sqlite.destroy();
-    t.pass();
-  } catch (e)
-  {
-    t.skip(e);
-  }
-  t.end();
-});
+export default TastyNodeTypes;
