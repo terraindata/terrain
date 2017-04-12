@@ -63,6 +63,8 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   // change an item
+  // console.log(ctx);
+  console.log(ctx.state.authInfo);
   winston.info('item root');
   ctx.body = 'item root as ' + ctx.state.user.username;
 });
@@ -82,8 +84,8 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   let newItem =
   {
     id: ctx.params.id,
-    key0: ctx.req.key0,
-    key1: ctx.req.key1,
+    key0: ctx.req,
+    key1: ctx.req,
   };
   let items = Items.replace(ctx.params.id, newItem);
   ctx.body = items;

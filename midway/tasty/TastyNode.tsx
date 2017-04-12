@@ -48,7 +48,7 @@ import TastyNodeTypes from './TastyNodeTypes';
 
 export default class TastyNode
 {
-  private static make(value): TastyNode
+  public static make(value): TastyNode
   {
     if (value instanceof TastyNode)
     {

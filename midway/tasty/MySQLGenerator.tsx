@@ -64,21 +64,21 @@ export default class MySQLGenerator
     this.queryString = '';
     this.indentation = 0;
 
-    this.appendExpression(query.command);
-    this.queryString += ' ';
-    this.indent();
-
-    if (query.command.tastyType === TastyNodeTypes.select)
+    if (query.command.tastyType === TastyNodeTypes.select || query.command.tastyType === TastyNodeTypes.delete)
     {
+      this.appendExpression(query.command);
+      this.indent();
+
       const columns = [];
       if (query.isSelectingAll())
       {
-        this.queryString += '* '; // handle "select all" condition
+        this.queryString += ' * '; // handle "select all" condition
       } else
       {
         // put selected vars into the select list
         if (query.selected.length > 0)
         {
+          this.queryString += ' ';
           this.appendStandardClause(
             null,
             false,
@@ -168,32 +168,28 @@ export default class MySQLGenerator
     {
       if (query.upserts.length > 0)
       {
+        this.appendExpression(query.command);
+        this.queryString += ' ';
+        this.indent();
+
         // write INTO clause
         this.newLine();
         this.queryString += 'INTO ';
         this.queryString += this.escapeString(query.table._tastyTableName);
 
-        // write SET clause
-        this.appendStandardClause(
-            'SET',
-            true,
-            query.upserts,
-            (obj) =>
+        let keys = '';
+        let values = '';
+        for (let i = 0; i < query.upserts.length; i++)
+        {
+          const obj = query.upserts[i];
+          keys += Object.keys(obj). join(', ');
+          values += Object.keys(obj).map((prop) =>
             {
-              for (const prop in obj)
-              {
-                if (obj.hasOwnProperty(prop))
-                {
-                  this.appendSubexpression(prop);
-                  this.queryString += ' = ';
-                  this.appendSubexpression(obj[prop]);
-                }
-              }
-            },
-            () =>
-            {
-              this.queryString += ', ';
-            });
+              return this.sqlName(TastyNode.make(obj[prop]));
+            }).join(', ');
+        }
+
+        this.queryString += ' (' + keys + ') VALUES (' + values + ')';
       }
     }
 

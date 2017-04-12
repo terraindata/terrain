@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
@@ -69,11 +70,11 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
 {
   // change or create a user
   console.log(ctx.req);
-  if(ctx.req && ctx.req.username && ctx.req.password)
-  {
-      let name = ctx.req.name ? ctx.req.name : '';
-      await Users.create(ctx.req.username, ctx.req.password, name);
-  }
+  // if(ctx.req && ctx.req.username && ctx.req.password)
+  // {
+  //     let name = ctx.req.name ? ctx.req.name : '';
+  //     await Users.create(ctx.req.username, ctx.req.password, name);
+  // }
   ctx.body = '';
   winston.info('user post');
 });
@@ -82,10 +83,10 @@ Router.post('/update', passport.authenticate('access-token-local'), async (ctx, 
 {
   // change or create a user
   console.log(ctx.req);
-  if(ctx.req && ctx.req.username && ctx.req.oldpassword && ctx.req.newpassword)
-  {
-      await Users.update(ctx.req.username, ctx.req.oldpassword, ctx.req.newpassword);
-  }
+  // if(ctx.req && ctx.req.username && ctx.req.oldpassword && ctx.req.newpassword)
+  // {
+  //     await Users.update(ctx.req.username, ctx.req.oldpassword, ctx.req.newpassword);
+  // }
   ctx.body = '';
   winston.info('user post');
 });

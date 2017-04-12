@@ -107,13 +107,14 @@ app.use(Middleware.passport.initialize());
 app.use(Middleware.passport.session());
 
 Middleware.passport.use('access-token-local', new LocalStrategy(
-  {
-    passwordField: 'accessToken',
-    usernameField: 'username',
-  },
-  (username, accessToken, done) =>
-  {
-    return done(null, Users.findByAccessToken(username, accessToken));
+{
+  passReqToCallback: true,
+  passwordField: 'accessToken',
+  usernameField: 'username',
+},
+async (req, username, accessToken, done) =>
+{
+  done(null, await Users.findByAccessToken(username, accessToken), req.body);
 }));
 
 Middleware.passport.use('local', new LocalStrategy(async (username, password, done) =>

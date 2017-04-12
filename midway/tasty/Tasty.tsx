@@ -58,6 +58,7 @@ const Tasty = {
   Elastic: ElasticGenerator,
   MySQL: MySQLGenerator,
   Query: TastyQuery,
+  SQLite: MySQLGenerator,
   Table: TastyTable,
 };
 

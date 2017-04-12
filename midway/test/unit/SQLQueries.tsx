@@ -43,41 +43,44 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// TODO replace all MySQL with SQLite
 
-import MySQLExecutor from '../tasty/MySQLExecutor';
-import Tasty from '../tasty/Tasty';
+const SQLQueries: Array<[string, string]> = [
+['simple query (select all)',
+  `SELECT * \n  FROM movies\n  LIMIT 10;`],
 
-let Item = new Tasty.Table('items', ['id'], ['field0', 'field1']);
+['simple query (select columns)',
+  `SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n  LIMIT 10;`],
 
-const Items =
-{
-  find: async (id) =>
-  {
-    let query = new Tasty.Query(Items);
-    query.filter(Items['id'].equals(id));
-    let qstr = Tasty.MySQL.generate(query);
-    let sqlite = new MySQLExecutor();
-    let items = await sqlite.query(qstr);
-    return items;
-  },
-  getAll: async () =>
-  {
-    let query = new Tasty.Query(Items);
-    let qstr = Tasty.MySQL.generate(query);
-    let sqlite = new MySQLExecutor();
-    let items = await sqlite.query(qstr);
-    return items;
-  },
-  replace: async (item, newItem) =>
-  {
-    let query = new Tasty.Query(Items);
-    query.upsert(newItem);
-    let qstr = Tasty.MySQL.generate(query);
-    let sqlite = new MySQLExecutor();
-    let replaceStatus = await sqlite.query(qstr);
-    return replaceStatus;
-  },
-};
+['simple query (filter equals)',
+  `SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`],
 
-export default Items;
+['simple query (filter doesNotEqual)',
+  `SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)'\n  LIMIT 10;`],
+
+['simple query (sort asc)',
+  `SELECT * \n  FROM movies\n  ORDER BY movies.title ASC\n  LIMIT 10;`],
+
+['simple query (sort desc)',
+  `SELECT * \n  FROM movies\n  ORDER BY movies.title DESC\n  LIMIT 10;`],
+
+['simple query (take)',
+  `SELECT * \n  FROM movies\n  LIMIT 10;`],
+
+['simple query (skip)',
+  `SELECT * \n  FROM movies\n  LIMIT 10 OFFSET 20;`],
+
+['simple query (upsert)',
+  `REPLACE \n  INTO movies (movieid, releasedate, title) VALUES (13371337, '2017-01-01', 'My New Movie');`],
+
+['simple query (delete)',
+  `DELETE \n  FROM movies\n  WHERE movies.movieid = 13371337;`],
+
+['complex query (MySQL)',
+  `SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies
+  WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'
+     AND movies.releasedate < '2017-03-24'
+  ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC
+  LIMIT 10 OFFSET 20;`],
+];
+
+export default SQLQueries;

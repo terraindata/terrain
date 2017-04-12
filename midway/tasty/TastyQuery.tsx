@@ -88,7 +88,7 @@ export default class TastyQuery
 
   public upsert(object): TastyQuery
   {
-    this.command = new TastyNode('update', null);
+    this.command = new TastyNode('upsert', null);
     this.upserts.push(object);
     return this;
   }

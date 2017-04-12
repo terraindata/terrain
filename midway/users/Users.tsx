@@ -46,8 +46,9 @@ THE SOFTWARE.
 // TODO THIS IS A STUB. REPLACE WITH ORM
 
 import * as bcrypt from 'bcrypt';
+import * as winston from 'winston';
 
-import MySQLExecutor from '../tasty/MySQLExecutor';
+import SQLiteExecutor from '../tasty/SQLiteExecutor';
 import srs = require('secure-random-string');
 import Tasty from '../tasty/Tasty';
 
@@ -75,28 +76,30 @@ import Tasty from '../tasty/Tasty';
 //   },
 // ];
 
-let User = new Tasty.Table('users', ['username'], ['accessToken', 'id', 'name', 'password']);
+const saltRounds = 10;
+let User = new Tasty.Table('users', ['username'], ['accessToken', 'id', 'isAdmin', 'name', 'password']);
 
 const Users =
 {
   create: async (usernameInput, passwordInput, nameInput) =>
   {
-    const saltRounds = 10;
-    bcrypt.hash(passwordInput, saltRounds, (err, hash) =>
+    return new Promise(async (resolve, reject) =>
     {
-      return new Promise((resolve, reject) =>
+      bcrypt.hash(passwordInput, saltRounds, async (err, hash) =>
       {
-        let query = new Tasty.Query(User,
-          {
-            accessToken: '',
-            name: nameInput,
-            password: hash,
-            username: usernameInput,
-          });
-        let qstr = Tasty.MySQL.generate(query);
-        let sqlite = new MySQLExecutor();
-        let users = resolve(sqlite.query(qstr));
-        // resolve(true);
+        let newUser = {
+          accessToken: '',
+          isAdmin: false,
+          name: nameInput,
+          password: hash,
+          username: usernameInput,
+        };
+        let query = new Tasty.Query(User).upsert(
+          newUser);
+        let qstr = Tasty.SQLite.generate(query);
+        let sqlite = new SQLiteExecutor();
+        let users = await sqlite.query(qstr);
+        resolve(newUser);
       });
     });
   },
@@ -104,50 +107,48 @@ const Users =
   {
     let query = new Tasty.Query(User);
     query.filter(User['id'].equals(id));
-    let qstr = Tasty.MySQL.generate(query);
-    let sqlite = new MySQLExecutor();
-    return new Promise((resolve, reject) =>
-    {
-      let users = await sqlite.query(qstr);
-      if (users.length > 0)
-      {
-        resolve(users[0]);
-      }
-      resolve(null);
-    });
+    let qstr = Tasty.SQLite.generate(query);
+    let sqlite = new SQLiteExecutor();
+    let results = await sqlite.query(qstr);
+    return results;
+    // return null;
   },
   findByAccessToken: async (username, accessToken) =>
   {
     let query = new Tasty.Query(User);
     query.filter(User['username'].equals(username)).filter(User['accessToken'].equals(accessToken));
-    let qstr = Tasty.MySQL.generate(query);
-    let sqlite = new MySQLExecutor();
-    let users = await sqlite.query(qstr);
-    if (users.length > 0)
+    let qstr = Tasty.SQLite.generate(query);
+    let sqlite = new SQLiteExecutor();
+    let results = await sqlite.query(qstr);
+    return new Promise(async (resolve, reject) =>
     {
-      return users[0];
-    }
-    return null;
+      if (results['rows'].length > 0)
+      {
+        resolve(results['rows'][0]);
+      } else {
+        resolve(null);
+      }
+    });
   },
   findByUsername: async (username, password) =>
   {
     let query = new Tasty.Query(User);
     query.filter(User['username'].equals(username));
-    let qstr = Tasty.MySQL.generate(query);
-    let sqlite = new MySQLExecutor();
-    let users = await sqlite.query(qstr);
-    if (users.length !== 1)
+    let qstr = Tasty.SQLite.generate(query);
+    let sqlite = new SQLiteExecutor();
+    let results = await sqlite.query(qstr);
+    if (results['row'] && results['row'].length === 0)
     {
-      return new Promise((resolve, reject) =>
+      return new Promise(async (resolve, reject) =>
       {
         resolve(null);
       });
     }
 
-    let user = users[0];
-    return new Promise((resolve, reject) =>
+    let user = results['rows'][0];
+    return new Promise(async (resolve, reject) =>
     {
-      bcrypt.compare(password, user.password, (err, res) =>
+      bcrypt.compare(password, user.password, async (err, res) =>
       {
         if (res)
         {
@@ -157,10 +158,9 @@ const Users =
               {
                 length: 256,
               });
-            let updateQuery = new Tasty.Query(User);
-            updateQuery.replace(user);
-            qstr = Tasty.MySQL.generate(updateQuery);
-            let success = resolve(sqlite.query(qstr));
+            let updateQuery = new Tasty.Query(User).upsert(user);
+            qstr = Tasty.SQLite.generate(updateQuery);
+            let success = await sqlite.query(qstr);
           }
           resolve(user);
         } else {
@@ -169,37 +169,40 @@ const Users =
       });
     });
   },
-  update: async (usernameInput, oldPassword, newPassword) =>
+  update: async (username, oldPassword, newPassword) =>
   {
     let query = new Tasty.Query(User);
     query.filter(User['username'].equals(username));
-    let qstr = Tasty.MySQL.generate(query);
-    let sqlite = new MySQLExecutor();
-    let users = await sqlite.query(qstr);
-    if (users.length !== 1)
+    let qstr = Tasty.SQLite.generate(query);
+    let sqlite = new SQLiteExecutor();
+    let results = await sqlite.query(qstr);
+    if (results['row'] && results['row'].length === 0)
     {
-      return new Promise((resolve, reject) =>
+      return new Promise(async (resolve, reject) =>
       {
         resolve(null);
       });
     }
 
-    let user = users[0];
-    return new Promise((resolve, reject) =>
+    let user = results['rows'][0];
+    return new Promise(async (resolve, reject) =>
     {
-      bcrypt.compare(oldPassword, user.password, (err, res) =>
+      bcrypt.compare(oldPassword, user.password, async (err, res) =>
       {
         if (res)
         {
-          const saltRounds = 10;
-          bcrypt.hash(newPassword, saltRounds, (newErr, hash) =>
+          user.accessToken = srs(
+            {
+              length: 256,
+            });
+
+          bcrypt.hash(newPassword, saltRounds, async (errHashing, hash) =>
           {
-            query = new Tasty.Query(User);
             user.password = hash;
-            query.update(user);
-            qstr = Tasty.MySQL.generate(query);
-            let updateResult = resolve(sqlite.query(qstr));
-            // resolve(true);
+            let updateQuery = new Tasty.Query(User).upsert(user);
+            qstr = Tasty.SQLite.generate(updateQuery);
+            let success = await sqlite.query(qstr);
+            resolve(user);
           });
         } else {
           resolve(null);
