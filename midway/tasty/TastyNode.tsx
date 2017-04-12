@@ -44,11 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyNodeTypes from './TastyNodeType';
+import TastyNodeTypes from './TastyNodeTypes';
 
 export default class TastyNode
 {
-  private static make(value): TastyNode
+  public static make(value): TastyNode
   {
     if (value instanceof TastyNode)
     {
@@ -91,12 +91,87 @@ export default class TastyNode
     this.value = value;
   }
 
+  public equals(rhs): TastyNode
+  {
+    return this.buildAsLHS('==', rhs);
+  }
+
+  public eq(rhs): TastyNode
+  {
+    return this.equals(rhs);
+  }
+
+  public doesNotEqual(rhs): TastyNode
+  {
+    return this.buildAsLHS('!=', rhs);
+  }
+
+  public neq(rhs): TastyNode
+  {
+    return this.doesNotEqual(rhs);
+  }
+
+  public greaterThan(rhs): TastyNode
+  {
+    return this.buildAsLHS('>', rhs);
+  }
+
+  public gt(rhs): TastyNode
+  {
+    return this.greaterThan(rhs);
+  }
+
+  public greaterThanOrEqualTo(rhs): TastyNode
+  {
+    return this.buildAsLHS('>=', rhs);
+  }
+
+  public gte(rhs): TastyNode
+  {
+    return this.greaterThanOrEqualTo(rhs);
+  }
+
+  public lessThan(rhs): TastyNode
+  {
+    return this.buildAsLHS('<', rhs);
+  }
+
+  public lt(rhs): TastyNode
+  {
+    return this.lessThan(rhs);
+  }
+
+  public lessThanOrEqualTo(rhs): TastyNode
+  {
+    return this.buildAsLHS('<=', rhs);
+  }
+
+  public lte(rhs): TastyNode
+  {
+    return this.lessThanOrEqualTo(rhs);
+  }
+
+  public and(rhs): TastyNode
+  {
+    return this.buildAsLHS('&&', rhs);
+  }
+
+  public or(rhs): TastyNode
+  {
+    return this.buildAsLHS('||', rhs);
+  }
+
+  public not(): TastyNode
+  {
+    return new TastyNode('!', [this]);
+  }
+
   private toString(): string
   {
     return JSON.stringify(this, null, 2);
   }
 
-  private get tastyType()
+  public get tastyType(): number
   {
     return TastyNodeTypes[this.type];
   }
@@ -125,83 +200,8 @@ export default class TastyNode
     return this.getChild(1);
   }
 
-  private buildAsLHS(type, rhs): TastyNode
+  private buildAsLHS(type: string, rhs): TastyNode
   {
     return new TastyNode(type, [this, TastyNode.make(rhs)]);
-  }
-
-  private equals(rhs): TastyNode
-  {
-    return this.buildAsLHS('==', rhs);
-  }
-
-  private eq(rhs): TastyNode
-  {
-    return this.equals(rhs);
-  }
-
-  private doesNotEqual(rhs): TastyNode
-  {
-    return this.buildAsLHS('!=', rhs);
-  }
-
-  private neq(rhs): TastyNode
-  {
-    return this.doesNotEqual(rhs);
-  }
-
-  private greaterThan(rhs): TastyNode
-  {
-    return this.buildAsLHS('>', rhs);
-  }
-
-  private gt(rhs): TastyNode
-  {
-    return this.greaterThan(rhs);
-  }
-
-  private greaterThanOrEqualTo(rhs): TastyNode
-  {
-    return this.buildAsLHS('>=', rhs);
-  }
-
-  private gte(rhs): TastyNode
-  {
-    return this.greaterThanOrEqualTo(rhs);
-  }
-
-  private lessThan(rhs): TastyNode
-  {
-    return this.buildAsLHS('<', rhs);
-  }
-
-  private lt(rhs): TastyNode
-  {
-    return this.lessThan(rhs);
-  }
-
-  private lessThanOrEqualTo(rhs): TastyNode
-  {
-    return this.buildAsLHS('<=', rhs);
-  }
-
-  private lte(rhs): TastyNode
-  {
-    return this.lessThanOrEqualTo(rhs);
-  }
-
-  private and(rhs): TastyNode
-  {
-    return this.buildAsLHS('&&', rhs);
-  }
-
-  private or(rhs): TastyNode
-  {
-    return this.buildAsLHS('||', rhs);
-  }
-
-  private not(): TastyNode
-  {
-    return new TastyNode('!', [this]);
   }
 }

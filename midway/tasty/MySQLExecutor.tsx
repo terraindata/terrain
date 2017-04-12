@@ -95,7 +95,7 @@ export default class MySQLExecutor
     });
   }
 
-  public end()
+  public destroy()
   {
     return new Promise((resolve, reject) =>
     {
