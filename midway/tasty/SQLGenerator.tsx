@@ -74,6 +74,8 @@ export const TypeMap = Object.freeze({
 
   'filter': new SQLGeneratorMapping('WHERE', FixEnum.nullary),
   'select': new SQLGeneratorMapping('SELECT', FixEnum.nullary),
+  'upsert': new SQLGeneratorMapping('REPLACE', FixEnum.nullary),
+  'delete': new SQLGeneratorMapping('DELETE', FixEnum.nullary),
   'skip': new SQLGeneratorMapping('OFFSET', FixEnum.nullary),
   'sort': new SQLGeneratorMapping('ORDER BY', FixEnum.nullary),
   'take': new SQLGeneratorMapping('LIMIT', FixEnum.nullary),
