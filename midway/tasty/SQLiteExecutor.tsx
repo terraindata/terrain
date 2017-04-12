@@ -75,7 +75,7 @@ export default class SQLiteExecutor
         {
           reject(error);
         } else {
-          resolve({rows});
+          resolve(rows);
         }
       });
     });

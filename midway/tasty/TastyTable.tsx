@@ -74,4 +74,13 @@ export default class TastyTable
   {
     return JSON.stringify(this, null, 2);
   }
+
+  public getPrimaryKey(object)
+  {
+    return this._tastyPrimaryKey.map(
+      (column) =>
+      {
+        return object[column];
+      });
+  }
 }

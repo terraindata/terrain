@@ -44,64 +44,122 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export const enum FixEnum {
-  nullary = 1,
-  infix,
-  infixWithoutSpaces,
-  prefix,
-  postfix,
-}
+import * as fs from 'fs';
+import * as hash from 'object-hash';
+import * as test from 'tape-async';
+import * as winston from 'winston';
 
-export class SQLGeneratorMapping
+import ElasticExecutor from '../../tasty/ElasticExecutor';
+import Tasty from '../../tasty/Tasty';
+
+let elasticSearch;
+
+const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
+
+test('connection establish', async (t) =>
 {
-  private sqlName: string;
-  private fix: FixEnum;
-
-  constructor(sqlName: string, fixType: FixEnum)
+  try
   {
-    this.sqlName = sqlName;
-    this.fix = fixType;
+    elasticSearch = new ElasticExecutor();
+    t.pass();
+  } catch (e)
+  {
+    t.skip(e);
   }
-}
-
-/* tslint:disable:object-literal-sort-keys */
-export const TypeMap = Object.freeze({
-  'boolean': new SQLGeneratorMapping(null, FixEnum.nullary),
-  'null': new SQLGeneratorMapping('NULL', FixEnum.nullary),
-  'number': new SQLGeneratorMapping(null, FixEnum.nullary),
-  'reference': new SQLGeneratorMapping(null, FixEnum.nullary),
-  'string': new SQLGeneratorMapping(null, FixEnum.nullary),
-
-  'filter': new SQLGeneratorMapping('WHERE', FixEnum.nullary),
-  'select': new SQLGeneratorMapping('SELECT', FixEnum.nullary),
-  'upsert': new SQLGeneratorMapping('REPLACE', FixEnum.nullary),
-  'delete': new SQLGeneratorMapping('DELETE', FixEnum.nullary),
-  'skip': new SQLGeneratorMapping('OFFSET', FixEnum.nullary),
-  'sort': new SQLGeneratorMapping('ORDER BY', FixEnum.nullary),
-  'take': new SQLGeneratorMapping('LIMIT', FixEnum.nullary),
-
-  '.': new SQLGeneratorMapping('.', FixEnum.infixWithoutSpaces),
-
-  '+': new SQLGeneratorMapping('+', FixEnum.infix),
-  '-': new SQLGeneratorMapping('-', FixEnum.infix),
-  '/': new SQLGeneratorMapping('/', FixEnum.infix),
-  '*': new SQLGeneratorMapping('*', FixEnum.infix),
-
-  '==': new SQLGeneratorMapping('=', FixEnum.infix),
-  '!=': new SQLGeneratorMapping('<>', FixEnum.infix),
-  '>': new SQLGeneratorMapping('>', FixEnum.infix),
-  '<': new SQLGeneratorMapping('<', FixEnum.infix),
-  '>=': new SQLGeneratorMapping('>=', FixEnum.infix),
-  '<=': new SQLGeneratorMapping('<=', FixEnum.infix),
-
-  '!': new SQLGeneratorMapping('NOT', FixEnum.prefix),
-  '&&': new SQLGeneratorMapping('AND', FixEnum.infix),
-  '||': new SQLGeneratorMapping('OR', FixEnum.infix),
-
-  'isNull': new SQLGeneratorMapping('IS NULL', FixEnum.postfix),
-  'isNotNull': new SQLGeneratorMapping('IS NOT NULL', FixEnum.postfix),
-
-  'ascending': new SQLGeneratorMapping('ASC', FixEnum.postfix),
-  'descending': new SQLGeneratorMapping('DESC', FixEnum.postfix),
+  t.end();
 });
-/* tslint:enable:object-literal-sort-keys */
+
+test('elastic health', async (t) =>
+{
+  try
+  {
+    const h = await elasticSearch.health();
+    winston.info(h);
+    t.pass();
+  } catch (e)
+  {
+    t.skip(e);
+  }
+  t.end();
+});
+
+test('basic query', async (t) =>
+{
+  try
+  {
+    const h = await elasticSearch.fullQuery(
+      {
+        index: 'movies',
+        query: {
+          aggregations: {
+            count_by_type: {
+              terms: {
+                field: '_type',
+                size:  1000,
+              },
+            },
+            fields:        {
+              terms: {
+                field: '_field_names',
+                size:  1000,
+              },
+            },
+          },
+        },
+        size:  0,
+      },
+    );
+    winston.info(JSON.stringify(h, null, 2));
+    t.pass();
+    // console.log(h.hits.hits.forEach(
+    //     (result) => {console.log(JSON.stringify(result, null, 2));}));
+  } catch (e)
+  {
+    t.skip(e);
+  }
+  t.end();
+});
+
+// test('write movies', async (t) =>
+// {
+//   try
+//   {
+//     let fileData : any = await
+//       new Promise((resolve, reject) =>
+//       {
+//         fs.readFile('./log.txt', 'utf8',
+//           (error, data) =>
+//           {
+//             if (error)
+//             {
+//               reject(error);
+//             }
+//             else
+//             {
+//               resolve(data);
+//             }
+//           });
+//       });
+//
+//     let elements = JSON.parse(fileData);
+//
+//     await elasticSearch.upsert(DBMovies, elements);
+//
+//   } catch (e)
+//   {
+//     t.skip(e);
+//   }
+//   t.end();
+// });
+
+test('connection destroy', async (t) =>
+{
+  try {
+    await elasticSearch.destroy();
+    t.pass();
+  } catch (e)
+  {
+    t.skip(e);
+  }
+  t.end();
+});

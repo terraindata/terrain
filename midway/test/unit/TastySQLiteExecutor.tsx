@@ -52,17 +52,17 @@ import Tasty from '../../tasty/Tasty';
 import SQLQueries from './SQLQueries';
 
 const resultHash: string[] = [
-  '2adee52a184092a6a42f811cd6eea1ea7d2d81d4',
-  '5ac5e0b9a2cafe9398e4b2c4d4a5cdaaa03eaa45',
-  '8f1223a111269da3d83a4fcc58c19acbb1c1f939',
-  '9be5ae8272296ee66655a0b0c6dfc9d6a5d1a9b5',
-  '17f7b5e32ef4f39b7a441f85c2b376297e5ea331',
-  'a7ddf3bf437bc21655feb24c174dd9fe8a7c6396',
-  '2adee52a184092a6a42f811cd6eea1ea7d2d81d4',
-  '302450931f1f3453647e89bde20ad3c390e51c91',
-  'b4f979a73611f0cc67ec894bae438a8d10b8fcac',
-  'b4f979a73611f0cc67ec894bae438a8d10b8fcac',
-  '5a8145ab48d8d81bd05cc3ff80f8c07b34129d5c',
+  '25947fb6a68505be72373babb0499bd51b5e44fb',
+  '3da7fb2ac116d0ceb112a1f7593b94dd4c4b3112',
+  '289dbad322d227eee7385af01e964dbcecb0b4a2',
+  '2699d0b1d7879de7fcfc34b921e43404f552b39e',
+  '3bbef0194391e54c7642693a0a5357e8d16611b8',
+  'f93adfaaa1986dc5d1dedc54e73eee59faab3985',
+  '25947fb6a68505be72373babb0499bd51b5e44fb',
+  '5b95dc900d820ee93091e4861e2aeea16e7ead43',
+  '989db2448f309bfdd99b513f37c84b8f5794d2b5',
+  '989db2448f309bfdd99b513f37c84b8f5794d2b5',
+  'c95266c7ea79135e06bf67a60e78204a3491a2f2',
 ];
 
 let sqlite;
