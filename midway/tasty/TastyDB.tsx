@@ -44,97 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as mysql from 'mysql';
-import * as winston from 'winston';
+import TastyTable from './TastyTable';
 
-import TastySchema from './TastySchema';
-
-const defaultMySQLConfig: mysql.IPoolConfig = {
-  connectionLimit: 20,
-  database : 'tdbdtest',
-  host     : 'localhost',
-  password : 'r3curs1v3$',
-  user     : 't3rr41n-demo',
-};
-
-export default class MySQLExecutor
+export default class TastyDB
 {
-  private pool;
+    public _name: string;
+    public _tables: TastyTable[];
 
-  constructor(config?: mysql.IPoolConfig)
-  {
-    if (config === undefined)
+    constructor(name: string, tables: TastyTable[])
     {
-      config = defaultMySQLConfig;
+        this._name = name;
+        this._tables = tables;
     }
-
-    this.pool = mysql.createPool(config);
-
-    this.pool.on('acquire', (connection) =>
-    {
-      winston.info('Connection %d acquired', connection.threadId);
-    });
-
-    this.pool.on('release', (connection) =>
-    {
-      winston.info('Connection %d released', connection.threadId);
-    });
-  }
-
-  public async schema()
-  {
-    const result: any = await this.query('SELECT table_schema, table_name, column_name, data_type ' +
-        'FROM information_schema.columns ' +
-        'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'mysql\', \'sys\');');
-    return TastySchema.fromMySQLResultSet(result);
-  }
-
-  public query(queryStr: string)
-  {
-    return new Promise((resolve, reject) =>
-    {
-      this.pool.query(queryStr, (error, results, fields) =>
-      {
-        if (error)
-        {
-          reject(error);
-        } else {
-          resolve(results);
-        }
-      });
-    });
-  }
-
-  public destroy()
-  {
-    return new Promise((resolve, reject) =>
-    {
-      this.pool.end((error) =>
-      {
-        if (error)
-        {
-          reject(error);
-        } else {
-          resolve();
-        }
-      });
-    });
-  }
-
-  private getConnection()
-  {
-    return new Promise((resolve, reject) =>
-    {
-      this.pool.getConnection((error, connection) =>
-      {
-        if (error)
-        {
-          reject(error);
-        } else {
-          resolve(connection);
-        }
-      });
-    });
-  }
-
 }

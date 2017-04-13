@@ -19,3 +19,4 @@ src/**/*.jsx
 midway/**/*.jsx
 .idea
 .vscode
+nodeway.db

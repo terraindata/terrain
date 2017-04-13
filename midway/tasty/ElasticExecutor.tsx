@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as elasticSearch from 'elasticsearch';
+import TastySchema from './TastySchema';
 import TastyTable from './TastyTable';
 
 const defaultElasticConfig =
@@ -76,6 +77,12 @@ export default class ElasticExecutor
         {},
         this.makePromiseCallback(resolve, reject));
     });
+  }
+
+  public async schema()
+  {
+    const result: any = await this.client.indices.getMapping();
+    return TastySchema.fromElasticTree(result);
   }
 
   /**

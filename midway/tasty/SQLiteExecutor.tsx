@@ -47,6 +47,8 @@ THE SOFTWARE.
 import * as sqlite3 from 'sqlite3';
 import * as winston from 'winston';
 
+import TastySchema from './TastySchema';
+
 const defaultSQLiteConfig = {
   filename: 'nodeway.db',
 };
@@ -54,6 +56,7 @@ const defaultSQLiteConfig = {
 export default class SQLiteExecutor
 {
   private db;
+  private filename;
 
   constructor(config?: any)
   {
@@ -63,6 +66,29 @@ export default class SQLiteExecutor
     }
 
     this.db = new sqlite3.Database(config.filename);
+    this.filename = config.filename;
+  }
+
+  public async schema()
+  {
+    const results = { };
+    results[this.filename] = {};
+    const tableListResult: any = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
+    for (const table of tableListResult)
+    {
+      results[this.filename][table.name] = {};
+      const colResult: any = await this.query('pragma table_info(' + table.name + ');');
+      for (const col of colResult)
+      {
+        results[this.filename][table.name][col.name] =
+            {
+              type: col.type,
+            };
+      }
+    }
+    const schema = new TastySchema();
+    schema._tree = results;
+    return schema;
   }
 
   public query(queryStr: string)
