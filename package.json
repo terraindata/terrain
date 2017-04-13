@@ -126,7 +126,7 @@
     "timezones.json": "^1.1.0",
     "ts-loader": "^0.7.2",
     "tsd": "^0.6.5",
-    "tslint": "*",
+    "tslint": "^5.1.0",
     "typescript": "^2.2.2",
     "underscore": "^1.8.3",
     "url-loader": "^0.5.6",
