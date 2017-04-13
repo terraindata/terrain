@@ -44,64 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as mysql from 'mysql';
-import * as winston from 'winston';
-import { makePromiseCallback } from './Utils';
-
-const defaultMySQLConfig: mysql.IPoolConfig = {
-  connectionLimit: 20,
-  database : 'tdbdtest',
-  host     : 'localhost',
-  password : 'r3curs1v3$',
-  user     : 't3rr41n-demo',
-};
-
-export default class MySQLExecutor
+export function makePromiseCallback(resolve, reject)
 {
-  private pool;
-
-  constructor(config?: mysql.IPoolConfig)
+  return (error, response) =>
   {
-    if (config === undefined)
+    if (error)
     {
-      config = defaultMySQLConfig;
+      reject(error);
+    } else
+    {
+      resolve(response);
     }
-
-    this.pool = mysql.createPool(config);
-
-    this.pool.on('acquire', (connection) =>
-    {
-      winston.info('Connection %d acquired', connection.threadId);
-    });
-
-    this.pool.on('release', (connection) =>
-    {
-      winston.info('Connection %d released', connection.threadId);
-    });
-  }
-
-  public query(queryStr: string)
-  {
-    return new Promise((resolve, reject) =>
-    {
-      this.pool.query(queryStr, makePromiseCallback(resolve, reject));
-    });
-  }
-
-  public destroy()
-  {
-    return new Promise((resolve, reject) =>
-    {
-      this.pool.end(makePromiseCallback(resolve, reject));
-    });
-  }
-
-  private getConnection()
-  {
-    return new Promise((resolve, reject) =>
-    {
-      this.pool.getConnection(makePromiseCallback(resolve, reject));
-    });
-  }
-
+  };
 }

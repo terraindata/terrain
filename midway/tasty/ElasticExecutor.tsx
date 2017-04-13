@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as elasticSearch from 'elasticsearch';
 import TastyTable from './TastyTable';
+import { makePromiseCallback } from './Utils';
 
 const defaultElasticConfig =
   {
@@ -76,7 +77,7 @@ export default class ElasticExecutor
     {
       this.client.cluster.health(
           {},
-          this.makePromiseCallback(resolve, reject));
+          makePromiseCallback(resolve, reject));
     });
   }
 
@@ -89,7 +90,7 @@ export default class ElasticExecutor
     {
       this.client.search(
           queryObject,
-          this.makePromiseCallback(resolve, reject));
+          makePromiseCallback(resolve, reject));
     });
   }
 
@@ -140,7 +141,7 @@ export default class ElasticExecutor
 
             this.client.index(
                 query,
-                this.makePromiseCallback(resolve, reject));
+                makePromiseCallback(resolve, reject));
           }));
     }
     await Promise.all(promises);
@@ -165,7 +166,7 @@ export default class ElasticExecutor
 
             this.client.delete(
                 params,
-                this.makePromiseCallback(resolve, reject));
+                makePromiseCallback(resolve, reject));
           }));
     }
     await Promise.all(promises);
@@ -196,26 +197,12 @@ export default class ElasticExecutor
           {
             body,
           },
-          this.makePromiseCallback(resolve, reject));
+          makePromiseCallback(resolve, reject));
       });
   }
 
   private makeID(table: TastyTable, element: object)
   {
     return table.getPrimaryKey(element).join('-');
-  }
-
-  private makePromiseCallback(resolve, reject)
-  {
-    return (error, response) =>
-    {
-      if (error)
-      {
-        reject(error);
-      } else
-      {
-        resolve(response);
-      }
-    };
   }
 }

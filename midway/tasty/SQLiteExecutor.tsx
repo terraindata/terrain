@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as sqlite3 from 'sqlite3';
 import * as winston from 'winston';
+import { makePromiseCallback } from './Utils';
 
 const defaultSQLiteConfig = {
   filename: 'nodeway.db',
@@ -69,15 +70,7 @@ export default class SQLiteExecutor
   {
     return new Promise((resolve, reject) =>
     {
-      this.db.all(queryStr, (error, rows) =>
-      {
-        if (error)
-        {
-          reject(error);
-        } else {
-          resolve(rows);
-        }
-      });
+      this.db.all(queryStr, makePromiseCallback(resolve, reject));
     });
   }
 
@@ -85,15 +78,7 @@ export default class SQLiteExecutor
   {
     return new Promise((resolve, reject) =>
     {
-      this.db.close((error) =>
-      {
-        if (error)
-        {
-          reject(error);
-        } else {
-          resolve();
-        }
-      });
+      this.db.close(makePromiseCallback(resolve, reject));
     });
   }
 }
