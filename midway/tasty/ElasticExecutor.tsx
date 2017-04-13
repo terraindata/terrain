@@ -52,15 +52,12 @@ const defaultElasticConfig =
     hosts: ['http://localhost:9200'],
   };
 
-export default class ElasticExecutor
-{
+export default class ElasticExecutor {
   private config;
   private client;
 
-  constructor(config?: any)
-  {
-    if (config === undefined)
-    {
+  constructor(config?: any) {
+    if (config === undefined) {
       config = defaultElasticConfig;
     }
 
@@ -71,34 +68,29 @@ export default class ElasticExecutor
   /**
    * ES specific extension -- gets the health of the ES cluster
    */
-  public health()
-  {
-    return new Promise((resolve, reject) =>
-    {
+  public health() {
+    return new Promise((resolve, reject) => {
       this.client.cluster.health(
-        {},
-        this.makePromiseCallback(resolve, reject));
+          {},
+          this.makePromiseCallback(resolve, reject));
     });
   }
 
   /**
    * Returns the entire ES response object.
    */
-  public fullQuery(queryObject: object)
-  {
-    return new Promise((resolve, reject) =>
-    {
+  public fullQuery(queryObject: object) {
+    return new Promise((resolve, reject) => {
       this.client.search(
-        queryObject,
-        this.makePromiseCallback(resolve, reject));
+          queryObject,
+          this.makePromiseCallback(resolve, reject));
     });
   }
 
   /**
    * returns only the query hits
    */
-  public async query(queryObject: object)
-  {
+  public async query(queryObject: object) {
     let result: any = await this.fullQuery(queryObject);
     // if('body' in queryObject)
     // {
@@ -109,54 +101,67 @@ export default class ElasticExecutor
     return result.hits;
   }
 
-  public end()
-  {
+  public end() {
     this.client.close();
   }
 
   /**
    * Upserts the given objects, based on primary key ('id' in elastic).
    */
-  public async upsertObjects(table: TastyTable, elements)
-  {
-    if (elements.length > 2)
-    {
+  public async upsertObjects(table: TastyTable, elements) {
+    if (elements.length > 2) {
       await this.bulkUpsert(table, elements);
       return;
     }
 
-    let promises = [];
-    for (let i = 0; i < elements.length; ++i)
-    {
-      let element = elements[i];
+    const promises = [];
+    for (const element of elements) {
       promises.push(
-        new Promise((resolve, reject) =>
-        {
-          let query = {
-            index: table._tastyTableName,
-            type:  table._tastyTableName,
-            id:    this.makeID(table, element),
-            body:  element,
-          };
+          new Promise((resolve, reject) => {
+            const query = {
+              index: table._tastyTableName,
+              type: table._tastyTableName,
+              id: this.makeID(table, element),
+              body: element,
+            };
 
-          this.client.index(
-            query,
-            this.makePromiseCallback(resolve, reject));
-        }));
+            this.client.index(
+                query,
+                this.makePromiseCallback(resolve, reject));
+          }));
     }
 
-    for (let promise in promises)
-    {
-      await promise;
-    }
+    await Promise.all(promises);
   }
 
-  /**
+  /*
    * Deletes the given objects based on their primary key
    */
-  public deleteObjects(table: TastyTable, listOfObjects)
+  public async deleteDocumentsByID(table: TastyTable, elements) {
+
+    const promises = [];
+
+    for (const element of elements) {
+      promises.push(
+          new Promise((resolve, reject) => {
+            const params = {
+              index: table._tastyTableName,
+              type: table._tastyTableName,
+              id: this.makeID(table, element),
+            };
+
+            this.client.delete(
+                params,
+                this.makePromiseCallback(resolve, reject));
+          }));
+    }
+
+    await Promise.all(promises);
+  }
+
+  public deleteDocumentsByQuery(table: TastyTable, deletequery)
   {
-    throw new Error('Not implemented.');
+
   }
 
   private bulkUpsert(table: TastyTable, elements)

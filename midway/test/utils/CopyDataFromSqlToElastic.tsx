@@ -100,13 +100,25 @@ async function syncCheckElasticHealth(elastic: ElasticExecutor) {
     }
 }
 
-async function copyTable(table, mysql: MySQLExecutor, elastic: ElasticExecutor)
-{
+async function readTable(table, mysql: MySQLExecutor) {
     const query = new Tasty.Query(table);
     try {
         let sqlStr = Tasty.MySQL.generate(query);
         console.log(sqlStr);
         const elements = await syncSqlQuery(sqlStr, mysql);
+        console.log("read " + (elements as Array<object>).length + " elements");
+        return elements;
+    } catch (e) {
+        console.log('Error: ', e.message);
+        process.exit(1);
+    }
+}
+
+
+async function copyTable(table, mysql: MySQLExecutor, elastic: ElasticExecutor)
+{
+    try {
+        const elements = await readTable(table, mysql);
         console.log("Copy " + (elements as Array<object>).length + " elements");
         elastic.upsertObjects(table, elements);
     } catch (e) {
@@ -115,7 +127,14 @@ async function copyTable(table, mysql: MySQLExecutor, elastic: ElasticExecutor)
     }
 }
 
+
 syncCheckElasticHealth(elasticSearch);
 const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
-copyTable(DBMovies, mysqlConnection, elasticSearch)
+(async () => {
+    await copyTable(DBMovies, mysqlConnection, elasticSearch);
+    const elements = await readTable(DBMovies, mysqlConnection);
+    await elasticSearch.deleteDocumentsByID(DBMovies, elements);
+    console.log("Copied the table movies.");
+})();
+
 
