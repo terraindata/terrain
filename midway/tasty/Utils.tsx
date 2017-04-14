@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export function makePromiseCallback(resolve, reject)
+export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
 {
-  return (error, response) =>
+  return (error: Error, response: T) =>
   {
     if (error)
     {

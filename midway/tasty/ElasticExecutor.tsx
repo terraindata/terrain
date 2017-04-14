@@ -117,7 +117,7 @@ export default class ElasticExecutor
   /**
    * Upserts the given objects, based on primary key ('id' in elastic).
    */
-  public async upsertObjects(table: TastyTable, elements)
+  public async upsertObjects(table: TastyTable, elements: object[])
   {
     if (elements.length > 2)
     {
@@ -150,10 +150,9 @@ export default class ElasticExecutor
   /*
    * Deletes the given objects based on their primary key
    */
-  public async deleteDocumentsByID(table: TastyTable, elements)
+  public async deleteDocumentsByID(table: TastyTable, elements: object[])
   {
     const promises = [];
-
     for (const element of elements)
     {
       promises.push(
@@ -172,7 +171,7 @@ export default class ElasticExecutor
     await Promise.all(promises);
   }
 
-  private bulkUpsert(table: TastyTable, elements)
+  private async bulkUpsert(table: TastyTable, elements: object[]): Promise<any>
   {
     const body = [];
     for (let i = 0; i < elements.length; ++i)
@@ -201,8 +200,8 @@ export default class ElasticExecutor
       });
   }
 
-  private makeID(table: TastyTable, element: object)
+  private makeID(table: TastyTable, element: object): string
   {
-    return table.getPrimaryKey(element).join('-');
+    return table.getPrimaryKeys(element).join('-');
   }
 }

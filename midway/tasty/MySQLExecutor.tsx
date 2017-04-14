@@ -51,7 +51,7 @@ import { makePromiseCallback } from './Utils';
 const defaultMySQLConfig: mysql.IPoolConfig =
 {
   connectionLimit: 20,
-  database : 'tdbdtest',
+  database : 'moviesdb',
   host     : 'localhost',
   password : 'r3curs1v3$',
   user     : 't3rr41n-demo',
@@ -81,25 +81,25 @@ export default class MySQLExecutor
     });
   }
 
-  public query(queryStr: string)
+  public async query(queryStr: string): Promise<object[]>
   {
-    return new Promise((resolve, reject) =>
+    return new Promise<object[]>((resolve, reject) =>
     {
       this.pool.query(queryStr, makePromiseCallback(resolve, reject));
     });
   }
 
-  public destroy()
+  public async destroy(): Promise<void>
   {
-    return new Promise((resolve, reject) =>
+    return new Promise<void>((resolve, reject) =>
     {
       this.pool.end(makePromiseCallback(resolve, reject));
     });
   }
 
-  private getConnection()
+  private async getConnection(): Promise<mysql.IConnection>
   {
-    return new Promise((resolve, reject) =>
+    return new Promise<mysql.IConnection>((resolve, reject) =>
     {
       this.pool.getConnection(makePromiseCallback(resolve, reject));
     });

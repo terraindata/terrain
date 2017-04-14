@@ -75,12 +75,12 @@ export default class TastyTable
     return JSON.stringify(this, null, 2);
   }
 
-  public getPrimaryKey(object)
+  public getPrimaryKeys(obj: object): string[]
   {
     return this._tastyPrimaryKey.map(
       (column) =>
       {
-        return object[column];
+        return obj[column];
       });
   }
 }

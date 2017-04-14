@@ -181,15 +181,6 @@ export default class TastyNode
     return Array.isArray(this.value) ? this.value.length : 0;
   }
 
-  private getChild(index: number)
-  {
-    if (this.numChildren <= index || index < 0)
-    {
-      throw new Error('Accessing child index out of bounds.');
-    }
-    return this.value[index];
-  }
-
   public get lhs()
   {
     return this.getChild(0);
@@ -198,6 +189,15 @@ export default class TastyNode
   public get rhs()
   {
     return this.getChild(1);
+  }
+
+  private getChild(index: number)
+  {
+    if (this.numChildren <= index || index < 0)
+    {
+      throw new Error('Accessing child index out of bounds.');
+    }
+    return this.value[index];
   }
 
   private buildAsLHS(type: string, rhs): TastyNode
