@@ -136,22 +136,28 @@ Middleware.passport.deserializeUser((id, done) =>
 
 app.use(Router.routes());
 
-winston.configure({
-  transports: [
-    new (winston.transports.Console)({
-      formatter: (options) =>
-      {
-        return options.timestamp() + ' [' + process.pid + '] ' + options.level + ': ' +
-            (options.message ? options.message : '') + (options.meta && Object.keys(options.meta).length ? '\n\t' +
-            JSON.stringify(options.meta) : '' );
-      },
-      timestamp: () =>
-      {
-        return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
-      },
-    }),
-  ],
-});
+winston.configure(
+  {
+    transports:
+      [
+        new (winston.transports.Console)(
+          {
+            formatter: (options) =>
+              {
+                const message = options.message || '';
+                const meta = options.meta && Object.keys(options.meta).length ? '\n\t' + JSON.stringify(options.meta)
+                             : '';
+                return `${options.timestamp()} [${process.pid}] ${options.level}: ${message} ${meta}`;
+              },
+            timestamp: () =>
+              {
+                return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
+              },
+          }
+        ),
+      ],
+  }
+);
 
 app.listen(args.port);
 
