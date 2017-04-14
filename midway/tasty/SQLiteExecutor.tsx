@@ -77,13 +77,13 @@ export default class SQLiteExecutor
     for (const table of tableListResult)
     {
       results[this.filename][table.name] = {};
-      const colResult: any = await this.query('pragma table_info(' + table.name + ');');
+      const colResult: any = await this.query(`pragma table_info(${table.name});`);
       for (const col of colResult)
       {
         results[this.filename][table.name][col.name] =
-            {
-              type: col.type,
-            };
+          {
+            type: col.type,
+          };
       }
     }
     const schema = new TastySchema();

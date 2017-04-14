@@ -84,8 +84,8 @@ export default class MySQLExecutor
   public async schema()
   {
     const result: any = await this.query('SELECT table_schema, table_name, column_name, data_type ' +
-        'FROM information_schema.columns ' +
-        'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'mysql\', \'sys\');');
+      'FROM information_schema.columns ' +
+      'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'mysql\', \'sys\');');
     return TastySchema.fromMySQLResultSet(result);
   }
 

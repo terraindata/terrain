@@ -49,72 +49,70 @@ import TastyTable from './TastyTable';
 
 export default class TastySchema
 {
-    // NB: elasticTree should probably be object; https://github.com/Microsoft/TypeScript/issues/14187
-    public static fromElasticTree(elasticTree: any): TastySchema
+  // NB: elasticTree should probably be object; https://github.com/Microsoft/TypeScript/issues/14187
+  public static fromElasticTree(elasticTree: any): TastySchema
+  {
+    const schema: TastySchema = new TastySchema();
+    for (const db in elasticTree)
     {
-        const schema: TastySchema = new TastySchema();
-        for (const db in elasticTree)
+      if (elasticTree.hasOwnProperty(db))
+      {
+        schema._tree[db] = {};
+        if (elasticTree[db].hasOwnProperty('mappings'))
         {
-            if (elasticTree.hasOwnProperty(db))
+          for (const mapping in elasticTree[db]['mappings'])
+          {
+            if (elasticTree[db]['mappings'].hasOwnProperty(mapping))
             {
-                schema._tree[db] = {};
-                if (elasticTree[db].hasOwnProperty('mappings'))
+              schema._tree[db][mapping] = {};
+              if (elasticTree[db]['mappings'][mapping].hasOwnProperty('properties'))
+              {
+                for (const field in elasticTree[db]['mappings'][mapping]['properties'])
                 {
-                    for (const mapping in elasticTree[db]['mappings'])
-                    {
-                        if (elasticTree[db]['mappings'].hasOwnProperty(mapping))
-                        {
-                            schema._tree[db][mapping] = {};
-                            if (elasticTree[db]['mappings'][mapping].hasOwnProperty('properties'))
-                            {
-                                for (const field in elasticTree[db]['mappings'][mapping]['properties'])
-                                {
-                                    if (elasticTree[db]['mappings'][mapping]['properties'].hasOwnProperty(field))
-                                    {
-                                        schema._tree[db][mapping][field] =
-                                            elasticTree[db]['mappings'][mapping]['properties'][field];
-                                    }
-                                }
-                            }
-                        }
-                    }
+                  if (elasticTree[db]['mappings'][mapping]['properties'].hasOwnProperty(field))
+                  {
+                    schema._tree[db][mapping][field] =
+                      elasticTree[db]['mappings'][mapping]['properties'][field];
+                  }
                 }
+              }
             }
+          }
         }
-        return schema;
+      }
     }
+    return schema;
+  }
 
-    public static fromMySQLResultSet(resultSet: any): TastySchema
-    {
-        const schema: TastySchema = new TastySchema();
+  public static fromMySQLResultSet(resultSet: any): TastySchema
+  {
+    const schema: TastySchema = new TastySchema();
+    resultSet.forEach((row) => {
+      if (!schema._tree.hasOwnProperty(row.table_schema))
+      {
+        schema._tree[row.table_schema] = {};
+      }
+      if (!schema._tree[row.table_schema].hasOwnProperty(row.table_name))
+      {
+        schema._tree[row.table_schema][row.table_name] = {};
+      }
+      schema._tree[row.table_schema][row.table_name][row.column_name] =
+        {
+          type: row.data_type,
+        };
+    });
+    return schema;
+  }
 
-        resultSet.forEach((row) => {
-            if (!schema._tree.hasOwnProperty(row.table_schema))
-            {
-                schema._tree[row.table_schema] = {};
-            }
-            if (!schema._tree[row.table_schema].hasOwnProperty(row.table_name))
-            {
-                schema._tree[row.table_schema][row.table_name] = {};
-            }
-            schema._tree[row.table_schema][row.table_name][row.column_name] =
-                {
-                    type: row.data_type,
-                };
-        });
+  public _tree: object;
 
-        return schema;
-    }
+  constructor()
+  {
+    this._tree = {};
+  }
 
-    public _tree: object;
-
-    constructor()
-    {
-        this._tree = {};
-    }
-
-    public toString(pretty: boolean = false): string
-    {
-        return JSON.stringify(this._tree, null, pretty ? 2 : 0);
-    }
+  public toString(pretty: boolean = false): string
+  {
+    return JSON.stringify(this._tree, null, pretty ? 2 : 0);
+  }
 }
