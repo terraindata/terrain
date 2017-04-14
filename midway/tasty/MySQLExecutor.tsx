@@ -48,7 +48,8 @@ import * as mysql from 'mysql';
 import * as winston from 'winston';
 import { makePromiseCallback } from './Utils';
 
-const defaultMySQLConfig: mysql.IPoolConfig = {
+const defaultMySQLConfig: mysql.IPoolConfig =
+{
   connectionLimit: 20,
   database : 'tdbdtest',
   host     : 'localhost',
@@ -58,7 +59,7 @@ const defaultMySQLConfig: mysql.IPoolConfig = {
 
 export default class MySQLExecutor
 {
-  private pool;
+  private pool: mysql.IPool;
 
   constructor(config?: mysql.IPoolConfig)
   {
