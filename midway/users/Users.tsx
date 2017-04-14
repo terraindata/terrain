@@ -77,7 +77,7 @@ import Tasty from '../tasty/Tasty';
 // ];
 
 const saltRounds = 10;
-let User = new Tasty.Table('users', ['username'], ['accessToken', 'id', 'isAdmin', 'name', 'password']);
+let User = new Tasty.Table('users', ['id'], ['accessToken', 'isAdmin', 'name', 'password', 'username']);
 
 const Users =
 {
@@ -111,20 +111,20 @@ const Users =
     let sqlite = new SQLiteExecutor();
     let results = await sqlite.query(qstr);
     return results;
-    // return null;
   },
-  findByAccessToken: async (username, accessToken) =>
+  findByAccessToken: async (id, accessToken) =>
   {
     let query = new Tasty.Query(User);
-    query.filter(User['username'].equals(username)).filter(User['accessToken'].equals(accessToken));
+    query.filter(User['id'].equals(id)).filter(User['accessToken'].equals(accessToken));
     let qstr = Tasty.SQLite.generate(query);
     let sqlite = new SQLiteExecutor();
     let results = await sqlite.query(qstr);
     return new Promise(async (resolve, reject) =>
     {
-      if (results['rows'].length > 0)
+      if (results.length > 0)
       {
-        resolve(results['rows'][0]);
+        console.log(results[0]);
+        resolve(results[0]);
       } else {
         resolve(null);
       }
@@ -137,7 +137,7 @@ const Users =
     let qstr = Tasty.SQLite.generate(query);
     let sqlite = new SQLiteExecutor();
     let results = await sqlite.query(qstr);
-    if (results['row'] && results['row'].length === 0)
+    if (results && results.length === 0)
     {
       return new Promise(async (resolve, reject) =>
       {
@@ -145,7 +145,7 @@ const Users =
       });
     }
 
-    let user = results['rows'][0];
+    let user = results[0];
     return new Promise(async (resolve, reject) =>
     {
       bcrypt.compare(password, user.password, async (err, res) =>
@@ -169,14 +169,14 @@ const Users =
       });
     });
   },
-  update: async (username, oldPassword, newPassword) =>
+  update: async (id, oldPassword, newPassword) =>
   {
     let query = new Tasty.Query(User);
-    query.filter(User['username'].equals(username));
+    query.filter(User['id'].equals(id));
     let qstr = Tasty.SQLite.generate(query);
     let sqlite = new SQLiteExecutor();
     let results = await sqlite.query(qstr);
-    if (results['row'] && results['row'].length === 0)
+    if (results && results.length === 0)
     {
       return new Promise(async (resolve, reject) =>
       {
@@ -184,7 +184,7 @@ const Users =
       });
     }
 
-    let user = results['rows'][0];
+    let user = results[0];
     return new Promise(async (resolve, reject) =>
     {
       bcrypt.compare(oldPassword, user.password, async (err, res) =>

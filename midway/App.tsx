@@ -110,14 +110,19 @@ Middleware.passport.use('access-token-local', new LocalStrategy(
 {
   passReqToCallback: true,
   passwordField: 'accessToken',
-  usernameField: 'username',
+  session: false,
+  usernameField: 'id',
 },
-async (req, username, accessToken, done) =>
+async (req, id, accessToken, done) =>
 {
-  done(null, await Users.findByAccessToken(username, accessToken), req.body);
+  done(null, await Users.findByAccessToken(id, accessToken), req.body);
 }));
 
-Middleware.passport.use('local', new LocalStrategy(async (username, password, done) =>
+Middleware.passport.use('local', new LocalStrategy(
+{
+  passReqToCallback: true,
+},
+async (req, username, password, done) =>
 {
   done(null, await Users.findByUsername(username, password));
 }));

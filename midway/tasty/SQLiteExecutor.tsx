@@ -65,7 +65,7 @@ export default class SQLiteExecutor
     this.db = new sqlite3.Database(config.filename);
   }
 
-  public query(queryStr: string)
+  public query(queryStr: string): Promise<Array<any>>
   {
     return new Promise((resolve, reject) =>
     {

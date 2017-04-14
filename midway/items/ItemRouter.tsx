@@ -60,14 +60,13 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   ctx.body = Items.getAll();
 });
 
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  // change an item
-  // console.log(ctx);
-  console.log(ctx.state.authInfo);
-  winston.info('item root');
-  ctx.body = 'item root as ' + ctx.state.user.username;
-});
+// Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+// {
+//   // change an item
+//   console.log(ctx.state.authInfo);
+//   winston.info('item root');
+//   ctx.body = 'item root as ' + ctx.state.user.username;
+// });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -81,13 +80,21 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 {
   // get item by ID
   winston.info('item root');
+  let req = ctx.state.authInfo;
+
+  let items = Items.find(ctx.params.id);
+  // createOrUpdate(ctx.params.id);
+  // if (ctx.state.user.isAdmin && (items && items.length === 0))
+  // {
+  //   Items.create()
+  // }
   let newItem =
   {
     id: ctx.params.id,
     key0: ctx.req,
     key1: ctx.req,
   };
-  let items = Items.replace(ctx.params.id, newItem);
+  // let items = Items.replace(ctx.params.id, newItem);
   ctx.body = items;
 });
 
