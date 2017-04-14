@@ -77,8 +77,8 @@ export default class TastyNode
     throw new Error('Trying to make a TastyNode from an unsupported value type.');
   }
 
-  private type: string;
-  private value: any;
+  public type: string;
+  public value: any;
   private chidlren: any;
 
   constructor(type: string, value: any)
@@ -176,7 +176,7 @@ export default class TastyNode
     return TastyNodeTypes[this.type];
   }
 
-  private get numChildren(): number
+  public get numChildren(): number
   {
     return Array.isArray(this.value) ? this.value.length : 0;
   }
@@ -190,12 +190,12 @@ export default class TastyNode
     return this.value[index];
   }
 
-  private get lhs()
+  public get lhs()
   {
     return this.getChild(0);
   }
 
-  private get rhs()
+  public get rhs()
   {
     return this.getChild(1);
   }

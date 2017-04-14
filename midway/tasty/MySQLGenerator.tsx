@@ -51,7 +51,7 @@ import TastyQuery from './TastyQuery';
 
 export default class MySQLGenerator
 {
-  public static generate(node): string
+  public static generate(node: TastyQuery): string
   {
     return new MySQLGenerator(node).queryString;
   }
@@ -254,14 +254,14 @@ export default class MySQLGenerator
     this.unindent();
   }
 
-  private appendSubexpression(node)
+  private appendSubexpression(node: TastyNode)
   {
     this.indent();
     this.appendExpression(node);
     this.unindent();
   }
 
-  private appendExpression(node)
+  private appendExpression(node: TastyNode)
   {
     // depth first in order
     if (!(node.type in SQLGenerator.TypeMap))
@@ -334,7 +334,7 @@ export default class MySQLGenerator
     }
   }
 
-  private sqlName(node): string
+  private sqlName(node: TastyNode): string
   {
     const sqlTypeInfo = SQLGenerator.TypeMap[node.type];
     if (sqlTypeInfo.sqlName !== null)
