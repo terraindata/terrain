@@ -75,16 +75,11 @@ else
 	 echo "Starting elastic on NON-STANDARD port $elastic_port..."
 fi
 
-./teardown_env.sh --mysql-port=$mysql_port --elastic-port=$elastic_port
-
-set -e
+${DIR}/teardown_env.sh --mysql-port=$mysql_port --elastic-port=$elastic_port
 
 docker pull $mysql_image
+docker run -d -p $mysql_port:3306 $mysql_image
+
 docker pull $elastic_image
-
-echo "Starting moviesdb docker mysql image..."
-docker run --rm -p $mysql_port:3306 $mysql_image &
-
-echo "Starting moviesdb docker elastic image..."
-docker run --rm -p $elastic_port:9200 $elastic_image &
+docker run -d -p $elastic_port:9200 $elastic_image
 
