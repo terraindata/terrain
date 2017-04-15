@@ -159,7 +159,9 @@ winston.configure(
   }
 );
 
-app.listen(args.port);
+const request = app.listen(args.port);
+
+export default request;
 
 // TODO list
 // - import HTML rather than writing directly inline
