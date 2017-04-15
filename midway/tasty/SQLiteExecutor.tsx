@@ -71,7 +71,7 @@ export default class SQLiteExecutor
 
   public async schema()
   {
-    const results = { };
+    const results = {};
     results[this.filename] = {};
     const tableListResult: any = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
     for (const table of tableListResult)
