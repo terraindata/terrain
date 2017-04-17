@@ -70,6 +70,16 @@ export default class TastyTable
       });
   }
 
+  public get tableName(): string
+  {
+    return this._tastyTableName;
+  }
+
+  public get primaryKeys(): string[]
+  {
+    return this._tastyPrimaryKey;
+  }
+
   public toString(): string
   {
     return JSON.stringify(this, null, 2);
