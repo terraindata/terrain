@@ -47,8 +47,7 @@ THE SOFTWARE.
 import * as hash from 'object-hash';
 import * as test from 'tape-async';
 
-import SQLiteExecutor from '../../tasty/SQLiteExecutor';
-import Tasty from '../../tasty/Tasty';
+import * as Tasty from '../../tasty/Tasty';
 import SQLQueries from './SQLQueries';
 
 const resultHash: string[] = [
@@ -65,11 +64,11 @@ const resultHash: string[] = [
   'c95266c7ea79135e06bf67a60e78204a3491a2f2',
 ];
 
-let sqlite;
+let tasty: Tasty.Tasty;
 
 async function runQuery(qstr: string)
 {
-  const results = await sqlite.query(qstr);
+  const results = await tasty.execute(qstr);
   return hash(results);
 }
 
@@ -88,8 +87,13 @@ function runTest(index: number)
 }
 
 test('pool connect', async (t) => {
+  const config: Tasty.SQLiteConfig =
+  {
+    filename : 'nodeway.db',
+  };
+
   try {
-    sqlite = new SQLiteExecutor();
+    tasty = new Tasty.Tasty(Tasty.SQLite, config);
     t.pass();
   } catch (e) {
     t.fail(e);
@@ -105,7 +109,7 @@ for (let i = 0; i < SQLQueries.length; i++)
 test('pool destroy', async (t) =>
 {
   try {
-    await sqlite.destroy();
+    await tasty.destroy();
     t.pass();
   } catch (e)
   {

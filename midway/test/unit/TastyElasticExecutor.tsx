@@ -50,7 +50,7 @@ import * as test from 'tape-async';
 import * as winston from 'winston';
 
 import ElasticExecutor from '../../tasty/ElasticExecutor';
-import Tasty from '../../tasty/Tasty';
+import * as Tasty from '../../tasty/Tasty';
 
 let elasticSearch;
 
@@ -119,38 +119,6 @@ test('basic query', async (t) =>
   }
   t.end();
 });
-
-// test('write movies', async (t) =>
-// {
-//   try
-//   {
-//     let fileData : any = await
-//       new Promise((resolve, reject) =>
-//       {
-//         fs.readFile('./log.txt', 'utf8',
-//           (error, data) =>
-//           {
-//             if (error)
-//             {
-//               reject(error);
-//             }
-//             else
-//             {
-//               resolve(data);
-//             }
-//           });
-//       });
-//
-//     let elements = JSON.parse(fileData);
-//
-//     await elasticSearch.upsert(DBMovies, elements);
-//
-//   } catch (e)
-//   {
-//     t.skip(e);
-//   }
-//   t.end();
-// });
 
 test('connection destroy', async (t) =>
 {

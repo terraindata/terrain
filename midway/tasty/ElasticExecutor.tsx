@@ -49,21 +49,23 @@ import TastyExecutor from './TastyExecutor';
 import TastyTable from './TastyTable';
 import { makePromiseCallback } from './Utils';
 
-const defaultElasticConfig: elasticSearch.ConfigOptions =
+export type Config = elasticSearch.ConfigOptions;
+
+export const defaultConfig: Config =
   {
     hosts: ['http://localhost:9200'],
   };
 
-export default class ElasticExecutor implements TastyExecutor
+export class ElasticExecutor implements TastyExecutor
 {
-  private config: elasticSearch.ConfigOptions;
+  private config: Config;
   private client: elasticSearch.Client;
 
   constructor(config?: any)
   {
     if (config === undefined)
     {
-      config = defaultElasticConfig;
+      config = defaultConfig;
     }
 
     this.config = config;
@@ -206,3 +208,5 @@ export default class ElasticExecutor implements TastyExecutor
     return table.getPrimaryKeys(element).join('-');
   }
 }
+
+export default ElasticExecutor;

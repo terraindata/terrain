@@ -49,24 +49,26 @@ import * as winston from 'winston';
 import TastyExecutor from './TastyExecutor';
 import { makePromiseCallback, makePromiseCallback0 } from './Utils';
 
-interface ISQLiteConfig {
+export interface ISQLiteConfig {
   filename: string;
 }
 
-const defaultSQLiteConfig: ISQLiteConfig = {
+export type Config = ISQLiteConfig;
+
+export const defaultConfig: Config = {
   filename: 'nodeway.db',
 };
 
-export default class SQLiteExecutor implements TastyExecutor
+export class SQLiteExecutor implements TastyExecutor
 {
-  private config: ISQLiteConfig;
+  private config: Config;
   private db: sqlite3.Database;
 
   constructor(config?: any)
   {
     if (config === undefined)
     {
-      config = defaultSQLiteConfig;
+      config = defaultConfig;
     }
 
     this.config = config;
@@ -89,3 +91,5 @@ export default class SQLiteExecutor implements TastyExecutor
     });
   }
 }
+
+export default SQLiteExecutor;

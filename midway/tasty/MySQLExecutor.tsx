@@ -49,25 +49,24 @@ import * as winston from 'winston';
 import TastyExecutor from './TastyExecutor';
 import { makePromiseCallback } from './Utils';
 
-const defaultMySQLConfig: mysql.IPoolConfig =
+export type Config = mysql.IPoolConfig;
+
+export const defaultConfig: Config =
 {
   connectionLimit: 20,
-  database : 'moviesdb',
   host     : 'localhost',
-  password : 'r3curs1v3$',
-  user     : 't3rr41n-demo',
 };
 
-export default class MySQLExecutor implements TastyExecutor
+export class MySQLExecutor implements TastyExecutor
 {
-  private config: mysql.IPoolConfig;
+  private config: Config;
   private pool: mysql.IPool;
 
-  constructor(config?: mysql.IPoolConfig)
+  constructor(config?: Config)
   {
     if (config === undefined)
     {
-      config = defaultMySQLConfig;
+      config = defaultConfig;
     }
 
     this.config = config;
@@ -107,5 +106,6 @@ export default class MySQLExecutor implements TastyExecutor
       this.pool.getConnection(makePromiseCallback(resolve, reject));
     });
   }
-
 }
+
+export default MySQLExecutor;

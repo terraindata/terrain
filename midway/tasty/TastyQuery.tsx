@@ -49,7 +49,7 @@ import TastyNode from './TastyNode';
 import TastyNodeTypes from './TastyNodeTypes';
 import TastyTable from './TastyTable';
 
-export default class TastyQuery
+export class TastyQuery
 {
   public table: TastyTable;
   public command: TastyNode;
@@ -162,3 +162,5 @@ export default class TastyQuery
     }
   }
 }
+
+export default TastyQuery;

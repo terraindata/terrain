@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import TastyNodeTypes from './TastyNodeTypes';
 
-export default class TastyNode
+export class TastyNode
 {
   public static make(value): TastyNode
   {
@@ -205,3 +205,5 @@ export default class TastyNode
     return new TastyNode(type, [this, TastyNode.make(rhs)]);
   }
 }
+
+export default TastyNode;

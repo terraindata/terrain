@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import TastyColumn from './TastyColumn';
 
-export default class TastyTable
+export class TastyTable
 {
   public _tastyTableName: string;
   public _tastyPrimaryKey: string[];
@@ -94,3 +94,5 @@ export default class TastyTable
       });
   }
 }
+
+export default TastyTable;
