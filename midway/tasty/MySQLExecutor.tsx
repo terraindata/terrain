@@ -49,7 +49,7 @@ import * as winston from 'winston';
 
 const defaultMySQLConfig: mysql.IPoolConfig = {
   connectionLimit: 20,
-  database : 'tdbdtest',
+  database : 'moviesdb',
   host     : 'localhost',
   password : 'r3curs1v3$',
   user     : 't3rr41n-demo',

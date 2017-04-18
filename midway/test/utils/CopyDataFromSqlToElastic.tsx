@@ -121,9 +121,11 @@ async function copyTable(table, mysql: MySQLExecutor, elastic: ElasticExecutor)
 
 syncCheckElasticHealth(elasticSearch);
 const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
-(async () => {
+(async () =>
+{
     await copyTable(DBMovies, mysqlConnection, elasticSearch);
     const elements = await readTable(DBMovies, mysqlConnection);
-    //await elasticSearch.deleteDocumentsByID(DBMovies, elements);
+    //await elasticSearch.deleteTable();
     console.log('Copied the table movies.');
+    process.exit(0);
 })();

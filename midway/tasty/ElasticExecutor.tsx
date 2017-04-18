@@ -48,7 +48,8 @@ import * as elasticSearch from 'elasticsearch';
 import TastyTable from './TastyTable';
 
 const defaultElasticConfig = {
-    hosts: ['http://localhost:9200'],
+  hosts: ['http://localhost:9200'],
+  index: 'moviesdb',
 };
 
 export default class ElasticExecutor
@@ -134,16 +135,34 @@ export default class ElasticExecutor
             const query = {
               body: element,
               id: this.makeID(table, element),
-              index: table._tastyTableName,
+              index: this.config.index,
               type: table._tastyTableName,
             };
 
-            this.client.index(
+            this.client.indices.index(
                 query,
                 this.makePromiseCallback(resolve, reject));
           }));
     }
     await Promise.all(promises);
+  }
+
+
+  /*
+   * Deletes the given objects based on their primary key
+   */
+  public async deleteIndex()
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const params = {
+        index: this.config.index,
+      };
+
+      this.client.indices.delete(
+          params,
+          this.makePromiseCallback(resolve, reject));
+    });
   }
 
   /*
@@ -159,7 +178,7 @@ export default class ElasticExecutor
           new Promise((resolve, reject) => {
             const params = {
               id: this.makeID(table, element),
-              index: table._tastyTableName,
+              index: this.config.index,
               type: table._tastyTableName,
             };
 
@@ -180,7 +199,7 @@ export default class ElasticExecutor
       const command = {
         index: {
           _id:    this.makeID(table, element),
-          _index: table._tastyTableName,
+          _index: this.config.index,
           _type:  table._tastyTableName,
         },
       };
