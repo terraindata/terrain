@@ -49,7 +49,8 @@ import TastyTable from './TastyTable';
 
 const defaultElasticConfig =
   {
-    hosts: ['http://10.1.0.30:9200'],
+    //hosts: ['http://10.1.0.30:9200'],
+    hosts: ['http://127.0.0.1:9200'],
   };
 
 export default class ElasticExecutor
@@ -112,6 +113,17 @@ export default class ElasticExecutor
   public end()
   {
     this.client.close();
+  }
+
+  public storeProcedure(procedure)
+  {
+    return new Promise(
+      (resolve, reject) =>
+      {
+        this.client.putScript(
+          procedure,
+          this.makePromiseCallback(resolve, reject));
+      });
   }
 
   /**
