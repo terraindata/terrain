@@ -70,7 +70,7 @@ Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   // if admin can change existing item, otherwise don't change
-  // can only create items as regular user
+  // can only create items or modify build status items as regular user
   // get item by ID
   winston.info('create/modify items');
   let req = ctx.state.authInfo;
@@ -78,7 +78,9 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   delete req.accessToken;
   let returnStatus = 'Incorrect parameters';
   let items = await Items.find(ctx.state.authInfo.itemId);
-  if ((ctx.state.user.isSuperUser && items && items.length !== 0) || !(items && items.length === 0))
+  if (ctx.state.user.isSuperUser
+    || !(items && items.length === 0)
+    || (items && items.length !== 0 && items[0].status === 'build'))
   {
     // define which other parameters need to be present for create/update
     if (req.parentItemId !== undefined && req.name !== undefined)
