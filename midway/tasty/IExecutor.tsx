@@ -44,68 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as mysql from 'mysql';
-import * as winston from 'winston';
-import IExecutor from './IExecutor';
-import { makePromiseCallback } from './Utils';
+import { TastyBackends } from './Tasty';
 
-const defaultMySQLConfig: mysql.IPoolConfig =
+import ElasticExecutor from './ElasticExecutor';
+import MySQLExecutor from './MySQLExecutor';
+import SQLiteExecutor from './SQLiteExecutor';
+
+interface IExecutor
 {
-  connectionLimit: 20,
-  database : 'moviesdb',
-  host     : 'localhost',
-  password : 'r3curs1v3$',
-  user     : 't3rr41n-demo',
-};
-
-export default class MySQLExecutor implements IExecutor
-{
-  private config: mysql.IPoolConfig;
-  private pool: mysql.IPool;
-
-  constructor(config?: mysql.IPoolConfig)
-  {
-    if (config === undefined)
-    {
-      config = defaultMySQLConfig;
-    }
-
-    this.config = config;
-    this.pool = mysql.createPool(config);
-
-    this.pool.on('acquire', (connection) =>
-    {
-      winston.info('Connection %d acquired', connection.threadId);
-    });
-
-    this.pool.on('release', (connection) =>
-    {
-      winston.info('Connection %d released', connection.threadId);
-    });
-  }
-
-  public async query(queryStr: string): Promise<object[]>
-  {
-    return new Promise<object[]>((resolve, reject) =>
-    {
-      this.pool.query(queryStr, makePromiseCallback(resolve, reject));
-    });
-  }
-
-  public async destroy(): Promise<void>
-  {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.pool.end(makePromiseCallback(resolve, reject));
-    });
-  }
-
-  private async getConnection(): Promise<mysql.IConnection>
-  {
-    return new Promise<mysql.IConnection>((resolve, reject) =>
-    {
-      this.pool.getConnection(makePromiseCallback(resolve, reject));
-    });
-  }
-
+  query(query: string | object): Promise<object[]>;
+  destroy(): Promise<void>;
 }
+
+export default IExecutor;

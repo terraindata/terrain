@@ -46,14 +46,20 @@ THE SOFTWARE.
 
 import * as sqlite3 from 'sqlite3';
 import * as winston from 'winston';
+import IExecutor from './IExecutor';
 import { makePromiseCallback } from './Utils';
 
-const defaultSQLiteConfig = {
+interface ISQLiteConfig {
+  filename: string;
+}
+
+const defaultSQLiteConfig: ISQLiteConfig = {
   filename: 'nodeway.db',
 };
 
-export default class SQLiteExecutor
+export default class SQLiteExecutor implements IExecutor
 {
+  private config: ISQLiteConfig;
   private db;
 
   constructor(config?: any)
@@ -63,20 +69,21 @@ export default class SQLiteExecutor
       config = defaultSQLiteConfig;
     }
 
+    this.config = config;
     this.db = new sqlite3.Database(config.filename);
   }
 
-  public query(queryStr: string)
+  public async query(queryStr: string): Promise<object[]>
   {
-    return new Promise((resolve, reject) =>
+    return new Promise<object[]>((resolve, reject) =>
     {
       this.db.all(queryStr, makePromiseCallback(resolve, reject));
     });
   }
 
-  public destroy()
+  public async destroy(): Promise<void>
   {
-    return new Promise((resolve, reject) =>
+    return new Promise<void>((resolve, reject) =>
     {
       this.db.close(makePromiseCallback(resolve, reject));
     });
