@@ -66,11 +66,13 @@ const resultHash: string[] = [
 ];
 
 let sqlite;
+
 async function runQuery(qstr: string)
 {
   const results = await sqlite.query(qstr);
   return hash(results);
 }
+
 function runTest(index: number)
 {
   test('SQLite: execute ' + SQLQueries[index][0], async (t) =>
@@ -84,6 +86,7 @@ function runTest(index: number)
     t.end();
   });
 }
+
 test('pool connect', async (t) => {
   try {
     sqlite = new SQLiteExecutor();
@@ -93,10 +96,12 @@ test('pool connect', async (t) => {
   }
   t.end();
 });
+
 for (let i = 0; i < SQLQueries.length; i++)
 {
   runTest(i);
 }
+
 test('pool destroy', async (t) =>
 {
   try {
