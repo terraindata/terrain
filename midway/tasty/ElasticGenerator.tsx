@@ -45,19 +45,20 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as SQLGenerator from './SQLGenerator';
+import TastyNode from './TastyNode';
 import TastyQuery from './TastyQuery';
 
 export default class ElasticGenerator
 {
-  public static generate(node)
+  public static generate(query: TastyQuery)
   {
-    return new ElasticGenerator(node).queryObject;
+    return new ElasticGenerator(query).queryObject;
   }
 
   private queryObject: any;
   private tableName: string;
 
-  constructor(query)
+  constructor(query: TastyQuery)
   {
     this.queryObject = {};
     this.tableName = query.table._tastyTableName;
@@ -94,28 +95,6 @@ export default class ElasticGenerator
       throw new Error('Aliases are not yet supported by ElasticGenerator.');
     }
 
-    //
-    //     //put alias expressions into the select list
-    //     this.appendStandardClause(
-    //         null,
-    //         true,
-    //         query.aliases,
-    //         (alias) =>
-    //         {
-    //             columns.push(alias.name);
-    //             this.appendSubexpression(alias.query);
-    //             this.queryString += ' AS ';
-    //             this.queryString += this.escapeString(alias.name);
-    //         },
-    //         () =>
-    //         {
-    //             this.queryString += ', ';
-    //             this.newLine();
-    //         });
-    //
-    //     this.queryString += ' ';
-    // }
-
     // filter clause
     if (query.filters.length > 0)
     {
@@ -145,7 +124,7 @@ export default class ElasticGenerator
     }
   }
 
-  private accumulateFilters(filterClause, expression)
+  private accumulateFilters(filterClause: object, expression: TastyNode)
   {
     // https://www.elastic.co/guide/en/elasticsearch/guide/current/combining-filters.html#bool-filter
     // currently only supports the basic operators, with the column on the lhs, as well as && and ||
@@ -192,7 +171,7 @@ export default class ElasticGenerator
     }
   }
 
-  private getSubclauseList(parentClause, clauseName)
+  private getSubclauseList(parentClause: {}, clauseName: string)
   {
     if (!(clauseName in parentClause))
     {
@@ -201,7 +180,7 @@ export default class ElasticGenerator
     return parentClause[clauseName];
   }
 
-  private getSubclauseObject(parentClause, clauseName)
+  private getSubclauseObject(parentClause: {}, clauseName: string)
   {
     if (!(clauseName in parentClause))
     {
@@ -210,19 +189,19 @@ export default class ElasticGenerator
     return parentClause[clauseName];
   }
 
-  private getNestedSubclauseObject(parentClause, clauseName, subclauseName)
+  private getNestedSubclauseObject(parentClause: object, clauseName: string, subclauseName: string)
   {
     const clause = this.getSubclauseObject(parentClause, clauseName);
     return this.getSubclauseObject(clause, subclauseName);
   }
 
-  private getNestedSubclauseList(parentClause, clauseName, subclauseName)
+  private getNestedSubclauseList(parentClause: object, clauseName: string, subclauseName: string)
   {
     const clause = this.getSubclauseObject(parentClause, clauseName);
     return this.getSubclauseList(clause, subclauseName);
   }
 
-  private setRangeClauseIfLesser(filterClause, columnName, filterOperator, value)
+  private setRangeClauseIfLesser(filterClause: object, columnName: string, filterOperator: string, value: any)
   {
     const columnClause = this.getNestedSubclauseObject(filterClause, 'range', columnName);
     if (!(filterOperator in columnClause) || value < columnClause[filterOperator])
@@ -231,7 +210,7 @@ export default class ElasticGenerator
     }
   }
 
-  private setRangeClauseIfGreater(filterClause, columnName, filterOperator, value)
+  private setRangeClauseIfGreater(filterClause: object, columnName: string, filterOperator: string, value: any)
   {
     const columnClause = this.getNestedSubclauseObject(filterClause, 'range', columnName);
     if (!(filterOperator in columnClause) || value > columnClause[filterOperator])
@@ -240,7 +219,7 @@ export default class ElasticGenerator
     }
   }
 
-  private addFilterTerm(filterClause, clause, subclause, columnName, value)
+  private addFilterTerm(filterClause: object, clause: string, subclause: string, columnName: string, value: any)
   {
     const sc = this.getNestedSubclauseList(filterClause, clause, subclause);
     const termKVP = new Object();
@@ -248,7 +227,7 @@ export default class ElasticGenerator
     sc.push({term: termKVP});
   }
 
-  private getColumnName(expression)
+  private getColumnName(expression: TastyNode)
   {
     if (expression.type !== '.' || expression.numChildren !== 2)
     {

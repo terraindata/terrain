@@ -57,3 +57,17 @@ export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => 
     }
   };
 }
+
+export function makePromiseCallback0(resolve: () => void, reject: (Error) => void)
+{
+  return (error: Error) =>
+  {
+    if (error)
+    {
+      reject(error);
+    } else
+    {
+      resolve();
+    }
+  };
+}
