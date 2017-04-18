@@ -51,9 +51,9 @@ import TastyQuery from './TastyQuery';
 
 export default class MySQLGenerator
 {
-  public static generate(node: TastyQuery): string
+  public static generate(query: TastyQuery): string
   {
-    return new MySQLGenerator(node).queryString;
+    return new MySQLGenerator(query).queryString;
   }
 
   public queryString: string;

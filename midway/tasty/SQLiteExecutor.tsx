@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as sqlite3 from 'sqlite3';
 import * as winston from 'winston';
 import IExecutor from './IExecutor';
-import { makePromiseCallback } from './Utils';
+import { makePromiseCallback, makePromiseCallback0 } from './Utils';
 
 interface ISQLiteConfig {
   filename: string;
@@ -60,7 +60,7 @@ const defaultSQLiteConfig: ISQLiteConfig = {
 export default class SQLiteExecutor implements IExecutor
 {
   private config: ISQLiteConfig;
-  private db;
+  private db: sqlite3.Database;
 
   constructor(config?: any)
   {
@@ -85,7 +85,7 @@ export default class SQLiteExecutor implements IExecutor
   {
     return new Promise<void>((resolve, reject) =>
     {
-      this.db.close(makePromiseCallback(resolve, reject));
+      this.db.close(makePromiseCallback0(resolve, reject));
     });
   }
 }

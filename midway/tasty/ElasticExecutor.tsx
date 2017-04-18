@@ -49,15 +49,15 @@ import IExecutor from './IExecutor';
 import TastyTable from './TastyTable';
 import { makePromiseCallback } from './Utils';
 
-const defaultElasticConfig =
+const defaultElasticConfig: elasticSearch.ConfigOptions =
   {
     hosts: ['http://localhost:9200'],
   };
 
 export default class ElasticExecutor implements IExecutor
 {
-  private config;
-  private client;
+  private config: elasticSearch.ConfigOptions;
+  private client: elasticSearch.Client;
 
   constructor(config?: any)
   {
@@ -112,7 +112,7 @@ export default class ElasticExecutor implements IExecutor
 
   public async destroy()
   {
-    this.client.close();
+    // this.client.close();
   }
 
   /**
