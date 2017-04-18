@@ -43,38 +43,68 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// TODO replace all MySQL with SQLite
 
-import MySQLExecutor from '../tasty/MySQLExecutor';
+import SQLiteExecutor from '../tasty/SQLiteExecutor';
 import Tasty from '../tasty/Tasty';
 
-let Item = new Tasty.Table('items', ['id'], ['field0', 'field1']);
+// CREATE TABLE items (id integer PRIMARY KEY, meta text NOT NULL, name text NOT NULL, \
+// parentItemId integer NOT NULL, status text NOT NULL, type text NOT NULL);
+let Item = new Tasty.Table('items', ['id'], ['meta', 'name', 'parentItemId', 'status', 'type']);
+
+export interface IItemConfig
+{
+  id?: number;
+  meta?: string;
+  name?: string;
+  parentItemId?: number;
+  status?: string;
+  type?: string;
+};
 
 const Items =
 {
   find: async (id) =>
   {
-    let query = new Tasty.Query(Items);
-    query.filter(Items['id'].equals(id));
-    let qstr = Tasty.MySQL.generate(query);
-    let sqlite = new MySQLExecutor();
+    if (!id)
+    {
+      return null;
+    }
+    let query = new Tasty.Query(Item);
+    query.filter(Item['id'].equals(id));
+    let qstr = Tasty.SQLite.generate(query);
+    let sqlite = new SQLiteExecutor();
     let items = await sqlite.query(qstr);
     return items;
   },
   getAll: async () =>
   {
-    let query = new Tasty.Query(Items);
-    let qstr = Tasty.MySQL.generate(query);
-    let sqlite = new MySQLExecutor();
+    let query = new Tasty.Query(Item);
+    let qstr = Tasty.SQLite.generate(query);
+    let sqlite = new SQLiteExecutor();
     let items = await sqlite.query(qstr);
     return items;
   },
-  replace: async (item, newItem) =>
+  getTemplate: async () =>
   {
-    let query = new Tasty.Query(Items);
-    query.upsert(newItem);
-    let qstr = Tasty.MySQL.generate(query);
-    let sqlite = new MySQLExecutor();
+    let emptyObj: IItemConfig =
+    {
+      meta: '',
+      name: '',
+      status: '',
+      type: '',
+    };
+    return emptyObj;
+  },
+  replace: async (item, id?) =>
+  {
+    let query = new Tasty.Query(Item);
+    if (id)
+    {
+      item['id'] = id;
+    }
+    query.upsert(item);
+    let qstr = Tasty.SQLite.generate(query);
+    let sqlite = new SQLiteExecutor();
     let replaceStatus = await sqlite.query(qstr);
     return replaceStatus;
   },

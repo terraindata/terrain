@@ -48,54 +48,45 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import Util from '../Util';
 import Items from './Items';
+import { IItemConfig as ItemConfig } from './Items';
 
 const Router = new KoaRouter();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  // return all items, or item by id
-  winston.info('item root');
-  ctx.body = 'item root as ' + ctx.state.user.username;
-  ctx.body = Items.getAll();
+  winston.info('getting all items');
+  ctx.body = await Items.getAll();
 });
-
-// Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-// {
-//   // change an item
-//   console.log(ctx.state.authInfo);
-//   winston.info('item root');
-//   ctx.body = 'item root as ' + ctx.state.user.username;
-// });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  // get item by ID
-  winston.info('item root');
-  let items = Items.find(ctx.params.id);
+  winston.info('getting item ID ' + ctx.params.id);
+  let items = await Items.find(ctx.params.id);
   ctx.body = items;
 });
 
-Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  // if admin can change existing item, otherwise don't change
+  // can only create items as regular user
   // get item by ID
-  winston.info('item root');
+  winston.info('create/modify items');
   let req = ctx.state.authInfo;
-
-  let items = Items.find(ctx.params.id);
-  // createOrUpdate(ctx.params.id);
-  // if (ctx.state.user.isAdmin && (items && items.length === 0))
-  // {
-  //   Items.create()
-  // }
-  let newItem =
+  delete req.id;
+  delete req.accessToken;
+  let returnStatus = 'Incorrect parameters';
+  let items = await Items.find(ctx.state.authInfo.itemId);
+  if ((ctx.state.user.isSuperUser && items && items.length !== 0) || !(items && items.length === 0))
   {
-    id: ctx.params.id,
-    key0: ctx.req,
-    key1: ctx.req,
-  };
-  // let items = Items.replace(ctx.params.id, newItem);
-  ctx.body = items;
+    // define which other parameters need to be present for create/update
+    if (req.parentItemId !== undefined && req.name !== undefined)
+    {
+      returnStatus = await Util.createOrUpdate(Items, req);
+    }
+  }
+  ctx.body = returnStatus;
 });
 
 export default Router;

@@ -45,9 +45,40 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as request from 'request';
+import * as _ from 'underscore';
 
 const Util =
 {
+  createOrUpdate: async (objName, config, primaryKey?) =>
+  {
+    let id;
+    let obj = await objName.getTemplate();
+    if (!primaryKey)
+    {
+      primaryKey = 'id';
+    }
+    let findObj = await objName.find(config[primaryKey]);
+    if (findObj && findObj.length !== 0)
+    {
+      obj = findObj[0];
+      id = config[primaryKey];
+    }
+    // if there are special permissions
+    for (let key in config)
+    {
+      if (config.hasOwnProperty(key))
+      {
+        if (key === 'parentItemId')
+        {
+          // check that you have permissions in both places (for post-MVP permissions)
+        }
+        obj[key] = config[key];
+      }
+    }
+    // if there aren't any
+    _.extend(obj, config);
+    return await objName.replace(obj, id);
+  },
   getRequest: (url) =>
   {
     return new Promise((resolve, reject) =>

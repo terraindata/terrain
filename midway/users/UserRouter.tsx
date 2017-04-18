@@ -48,47 +48,65 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import Util from '../Util';
 import Users from './Users';
+import { IUserConfig as UserConfig } from './Users';
 
 const Router = new KoaRouter();
 
 Router.get('/', async (ctx, next) =>
 {
-  // return all items, or item by id
   ctx.body = '';
   winston.info('user root');
 });
 
 Router.post('/', async (ctx, next) =>
 {
-  // change or create a user
   ctx.body = '';
   winston.info('user post');
+});
+
+Router.post('/:id/update', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  // update user, must be super user or authenticated user updating own info
+  winston.info('user update');
+  let returnStatus: any = 'Incorrect parameters';
+  let req = ctx.state.authInfo;
+  req.id = ctx.params.id;
+  delete req.accessToken;
+  // if superuser or id to be updated is current user
+  if (ctx.state.user.isSuperUser || ctx.state.authInfo.id === req.id)
+  {
+    returnStatus = await Users.createOrUpdate(req);
+  }
+  if (returnStatus instanceof Array)
+  {
+    ctx.body = 'Success';
+  } else {
+    ctx.body = returnStatus;
+  }
 });
 
 Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  // change or create a user
-  console.log(ctx.req);
-  // if(ctx.req && ctx.req.username && ctx.req.password)
-  // {
-  //     let name = ctx.req.name ? ctx.req.name : '';
-  //     await Users.create(ctx.req.username, ctx.req.password, name);
-  // }
-  ctx.body = '';
-  winston.info('user post');
-});
+  // create a user, must be admin
+  winston.info('create/modify items');
+  let req = ctx.state.authInfo;
+  delete req.id;
+  delete req.accessToken;
+  let returnStatus: any = 'Incorrect parameters';
 
-Router.post('/update', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  // change or create a user
-  console.log(ctx.req);
-  // if(ctx.req && ctx.req.username && ctx.req.oldpassword && ctx.req.newpassword)
-  // {
-  //     await Users.update(ctx.req.username, ctx.req.oldpassword, ctx.req.newpassword);
-  // }
-  ctx.body = '';
-  winston.info('user post');
+  if (ctx.state.user.isSuperUser)
+  {
+    // define which other parameters need to be present for create/update
+    returnStatus = await Users.createOrUpdate(req);
+  }
+  if (returnStatus instanceof Array)
+  {
+    ctx.body = 'Success';
+  } else {
+    ctx.body = returnStatus;
+  }
 });
 
 export default Router;

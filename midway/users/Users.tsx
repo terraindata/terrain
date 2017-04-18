@@ -52,54 +52,61 @@ import SQLiteExecutor from '../tasty/SQLiteExecutor';
 import srs = require('secure-random-string');
 import Tasty from '../tasty/Tasty';
 
-// let users = [
-//   {
-//     accessToken: '',
-//     id: '1',
-//     name: 'Bob Smith',
-//     password: bcrypt.hashSync('secret'),
-//     username: 'bob',
-//   },
-//   {
-//     accessToken: '',
-//     id: '2',
-//     name: 'Joe Davis',
-//     password: bcrypt.hashSync('password'),
-//     username: 'joe',
-//   },
-//   {
-//     accessToken: '',
-//     id: '3',
-//     name: 'Linux User',
-//     password: bcrypt.hashSync('secret'),
-//     username: 'luser',
-//   },
-// ];
-
 const saltRounds = 10;
-let User = new Tasty.Table('users', ['id'], ['accessToken', 'isAdmin', 'name', 'password', 'username']);
+// CREATE TABLE users (id integer PRIMARY KEY, accessToken text NOT NULL, email text NOT NULL, isDisabled bool NOT NULL
+// , isSuperUser bool NOT NULL, name text NOT NULL, password text NOT NULL, timezone string NOT NULL)
+let User = new Tasty.Table('users', ['id'], ['accessToken', 'email', 'isDisabled', 'isSuperUser', 'Meta', 'name',
+  'password', 'timezone']);
+
+export interface IUserConfig
+{
+  accessToken?: string;
+  email: string;
+  id?: number;
+  isDisabled?: boolean | number;
+  isSuperUser?: boolean | number;
+  name?: string;
+  password: string;
+  timezone?: string;
+};
 
 const Users =
 {
-  create: async (usernameInput, passwordInput, nameInput) =>
+  createOrUpdate: async (req) =>
   {
+    if (!req.password)
+    {
+      return new Promise(async (resolve, reject) =>
+        {
+          resolve(null);
+        });
+    }
     return new Promise(async (resolve, reject) =>
     {
-      bcrypt.hash(passwordInput, saltRounds, async (err, hash) =>
+      bcrypt.hash(req.password, saltRounds, async (err, hash) =>
       {
-        let newUser = {
+
+        let newUser: IUserConfig =
+        {
           accessToken: '',
-          isAdmin: false,
-          name: nameInput,
+          email: req.email,
+          id : req.id ? req.id : -1,
+          isDisabled: req.isDisabled ? 1 : 0,
+          isSuperUser: req.isSuperUser ? 1 : 0,
+          name: req.name ? req.name : '',
           password: hash,
-          username: usernameInput,
+          timezone: req.timezone ? req.timezone : 'PST', // or whatever default timezone we want
         };
+        if (!req.id)
+        {
+          delete newUser.id;
+        }
         let query = new Tasty.Query(User).upsert(
           newUser);
         let qstr = Tasty.SQLite.generate(query);
         let sqlite = new SQLiteExecutor();
         let users = await sqlite.query(qstr);
-        resolve(newUser);
+        resolve(users);
       });
     });
   },
@@ -123,17 +130,16 @@ const Users =
     {
       if (results.length > 0)
       {
-        console.log(results[0]);
         resolve(results[0]);
       } else {
         resolve(null);
       }
     });
   },
-  findByUsername: async (username, password) =>
+  findByUsername: async (email, password) =>
   {
     let query = new Tasty.Query(User);
-    query.filter(User['username'].equals(username));
+    query.filter(User['email'].equals(email));
     let qstr = Tasty.SQLite.generate(query);
     let sqlite = new SQLiteExecutor();
     let results = await sqlite.query(qstr);
@@ -169,46 +175,17 @@ const Users =
       });
     });
   },
-  update: async (id, oldPassword, newPassword) =>
+  getTemplate: async () =>
   {
-    let query = new Tasty.Query(User);
-    query.filter(User['id'].equals(id));
-    let qstr = Tasty.SQLite.generate(query);
-    let sqlite = new SQLiteExecutor();
-    let results = await sqlite.query(qstr);
-    if (results && results.length === 0)
+    let emptyObj: IUserConfig =
     {
-      return new Promise(async (resolve, reject) =>
-      {
-        resolve(null);
-      });
-    }
-
-    let user = results[0];
-    return new Promise(async (resolve, reject) =>
-    {
-      bcrypt.compare(oldPassword, user.password, async (err, res) =>
-      {
-        if (res)
-        {
-          user.accessToken = srs(
-            {
-              length: 256,
-            });
-
-          bcrypt.hash(newPassword, saltRounds, async (errHashing, hash) =>
-          {
-            user.password = hash;
-            let updateQuery = new Tasty.Query(User).upsert(user);
-            qstr = Tasty.SQLite.generate(updateQuery);
-            let success = await sqlite.query(qstr);
-            resolve(user);
-          });
-        } else {
-          resolve(null);
-        }
-      });
-    });
+      accessToken: '',
+      email: '',
+      name: '',
+      password: '',
+      timezone: '',
+    };
+    return emptyObj;
   },
 };
 
