@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as elasticSearch from 'elasticsearch';
-import IExecutor from './IExecutor';
+import TastyExecutor from './TastyExecutor';
 import TastyTable from './TastyTable';
 import { makePromiseCallback } from './Utils';
 
@@ -54,7 +54,7 @@ const defaultElasticConfig: elasticSearch.ConfigOptions =
     hosts: ['http://localhost:9200'],
   };
 
-export default class ElasticExecutor implements IExecutor
+export default class ElasticExecutor implements TastyExecutor
 {
   private config: elasticSearch.ConfigOptions;
   private client: elasticSearch.Client;

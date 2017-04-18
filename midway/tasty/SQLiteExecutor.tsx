@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import * as sqlite3 from 'sqlite3';
 import * as winston from 'winston';
-import IExecutor from './IExecutor';
+import TastyExecutor from './TastyExecutor';
 import { makePromiseCallback, makePromiseCallback0 } from './Utils';
 
 interface ISQLiteConfig {
@@ -57,7 +57,7 @@ const defaultSQLiteConfig: ISQLiteConfig = {
   filename: 'nodeway.db',
 };
 
-export default class SQLiteExecutor implements IExecutor
+export default class SQLiteExecutor implements TastyExecutor
 {
   private config: ISQLiteConfig;
   private db: sqlite3.Database;

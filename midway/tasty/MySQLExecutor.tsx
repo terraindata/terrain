@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import * as mysql from 'mysql';
 import * as winston from 'winston';
-import IExecutor from './IExecutor';
+import TastyExecutor from './TastyExecutor';
 import { makePromiseCallback } from './Utils';
 
 const defaultMySQLConfig: mysql.IPoolConfig =
@@ -58,7 +58,7 @@ const defaultMySQLConfig: mysql.IPoolConfig =
   user     : 't3rr41n-demo',
 };
 
-export default class MySQLExecutor implements IExecutor
+export default class MySQLExecutor implements TastyExecutor
 {
   private config: mysql.IPoolConfig;
   private pool: mysql.IPool;

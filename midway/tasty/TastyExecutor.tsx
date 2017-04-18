@@ -44,16 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { TastyBackends } from './Tasty';
-
-import ElasticExecutor from './ElasticExecutor';
-import MySQLExecutor from './MySQLExecutor';
-import SQLiteExecutor from './SQLiteExecutor';
-
-interface IExecutor
+abstract class TastyExecutor
 {
-  query(query: string | object): Promise<object[]>;
-  destroy(): Promise<void>;
+  public async abstract query(query: string | object): Promise<object[]>;
+  public async abstract destroy(): Promise<void>;
 }
 
-export default IExecutor;
+export default TastyExecutor;
