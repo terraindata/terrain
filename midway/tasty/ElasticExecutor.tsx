@@ -105,7 +105,7 @@ export default class ElasticExecutor
     //     if('aggregations' in body)
     //         return result.
     // }
-    return result.hits;
+    return result.hits.hits;
   }
 
   public destroy()

@@ -39,6 +39,7 @@
   ],
   "private": true,
   "dependencies": {
+    "@types/deep-equal": "^1.0.0",
     "babel-cli": "^6.24.0",
     "babel-core": "^6.7.7",
     "babel-loader": "^6.2.4",
@@ -60,6 +61,7 @@
     "css-loader": "^0.10.1",
     "d3": "^3.5.14",
     "date-format": "^1.1.0",
+    "deep-equal": "^1.0.1",
     "diff-match-patch": "^1.0.0",
     "dom-helpers": "^2.4.0",
     "elasticsearch": "^13.0.0-rc2",
