@@ -46,38 +46,39 @@ THE SOFTWARE.
 
 import * as request from 'request';
 import * as _ from 'underscore';
+import Tasty from './tasty/Tasty';
 
 const Util =
 {
-  createOrUpdate: async (objName, config, primaryKey?) =>
+  createOrUpdate: async (tastyTable, newObject: Object, primaryKey?: string) =>
   {
     let id;
-    let obj = await objName.getTemplate();
+    let obj = await tastyTable.getTemplate();
     if (!primaryKey)
     {
       primaryKey = 'id';
     }
-    let findObj = await objName.find(config[primaryKey]);
+    let findObj = await tastyTable.find(newObject[primaryKey]);
     if (findObj && findObj.length !== 0)
     {
       obj = findObj[0];
-      id = config[primaryKey];
+      id = newObject[primaryKey];
     }
     // if there are special permissions
-    for (let key in config)
+    for (let key in newObject)
     {
-      if (config.hasOwnProperty(key))
+      if (newObject.hasOwnProperty(key))
       {
         if (key === 'parentItemId')
         {
           // check that you have permissions in both places (for post-MVP permissions)
         }
-        obj[key] = config[key];
+        obj[key] = newObject[key];
       }
     }
     // if there aren't any
-    _.extend(obj, config);
-    return await objName.replace(obj, id);
+    _.extend(obj, newObject);
+    return await tastyTable.replace(obj, id);
   },
   getRequest: (url) =>
   {
