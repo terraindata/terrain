@@ -75,13 +75,13 @@ export default class SQLiteExecutor
         {
           reject(error);
         } else {
-          resolve({rows});
+          resolve(rows);
         }
       });
     });
   }
 
-  public end()
+  public destroy()
   {
     return new Promise((resolve, reject) =>
     {

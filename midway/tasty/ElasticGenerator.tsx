@@ -275,4 +275,4 @@ export default class ElasticGenerator
 
     return column.value;
   }
-};
+}

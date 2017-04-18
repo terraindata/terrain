@@ -44,9 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as fs from 'fs';
 import * as hash from 'object-hash';
 import * as test from 'tape-async';
-import * as fs from 'fs';
+import * as winston from 'winston';
 
 import ElasticExecutor from '../../tasty/ElasticExecutor';
 import Tasty from '../../tasty/Tasty';
@@ -55,7 +56,7 @@ let elasticSearch;
 
 const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
 
-test('elastic connect', async (t) =>
+test('connection establish', async (t) =>
 {
   try
   {
@@ -63,7 +64,7 @@ test('elastic connect', async (t) =>
     t.pass();
   } catch (e)
   {
-    t.fail(e);
+    t.skip(e);
   }
   t.end();
 });
@@ -73,8 +74,8 @@ test('elastic health', async (t) =>
   try
   {
     const h = await elasticSearch.health();
-    //t.equal(h, `63f0e555f54a998e2837489c5e16a48cc3465bfe`);
-    console.log(h);
+    winston.info(h);
+    t.pass();
   } catch (e)
   {
     t.skip(e);
@@ -88,8 +89,7 @@ test('basic query', async (t) =>
   {
     const h = await elasticSearch.fullQuery(
       {
-        index: 'urbansitter',
-        size:  0,
+        index: 'movies',
         query: {
           aggregations: {
             count_by_type: {
@@ -106,9 +106,11 @@ test('basic query', async (t) =>
             },
           },
         },
+        size:  0,
       },
     );
-    console.log(JSON.stringify(h, null, 2));
+    winston.info(JSON.stringify(h, null, 2));
+    t.pass();
     // console.log(h.hits.hits.forEach(
     //     (result) => {console.log(JSON.stringify(result, null, 2));}));
   } catch (e)
@@ -150,105 +152,14 @@ test('basic query', async (t) =>
 //   t.end();
 // });
 
-// async function runQuery(qstr: string)
-// {
-//   const results = await sqlite.query(qstr);
-//   return hash(results);
-// }
-//
-// test('execute simple query (select all)', async (t) =>
-// {
-//   try {
-//     const h = await runQuery(`SELECT * \n  FROM movies LIMIT 2;`);
-//     t.equal(h, `63f0e555f54a998e2837489c5e16a48cc3465bfe`);
-//   } catch (e) {
-//     t.skip(e);
-//   }
-//   t.end();
-// });
-//
-// test('execute simple query (select columns)', async (t) => {
-//   try {
-//     const h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies LIMIT 2;`);
-//     t.equal(h, `1dbce9ceb168544435792b40737b91b342a73a45`);
-//   } catch (e) {
-//     t.skip(e);
-//   }
-//   t.end();
-// });
-//
-// test('execute simple query (filter equals)', async (t) => {
-//   try {
-//     const h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`);
-//     t.equal(h, `8f1223a111269da3d83a4fcc58c19acbb1c1f939`);
-//   } catch (e) {
-//     t.skip(e);
-//   }
-//   t.end();
-// });
-//
-// test('execute simple query (filter doesNotEqual)', async (t) => {
-//   try {
-//     const h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)' LIMIT 2;`);
-//     t.equal(h, `e5ab1bafd5dad1f90efc676bcdaed0de952f1856`);
-//   } catch (e) {
-//     t.skip(e);
-//   }
-//   t.end();
-// });
-//
-// test('execute simple query (sort asc)', async (t) => {
-//   try {
-//     const h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title ASC LIMIT 10;`);
-//     t.equal(h, `17f7b5e32ef4f39b7a441f85c2b376297e5ea331`);
-//   } catch (e) {
-//     t.skip(e);
-//   }
-//   t.end();
-// });
-//
-// test('execute simple query (sort desc)', async (t) => {
-//   try {
-//     const h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title DESC LIMIT 10;`);
-//     t.equal(h, `a7ddf3bf437bc21655feb24c174dd9fe8a7c6396`);
-//   } catch (e) {
-//     t.skip(e);
-//   }
-//   t.end();
-// });
-//
-// test('execute simple query (take+skip)', async (t) => {
-//   try {
-//     const h = await runQuery(`SELECT * \n  FROM movies\n  LIMIT 2 OFFSET 20;`);
-//     t.equal(h, `d4059924a51d84c36df9c07868b7c8b0c5d9a1ff`);
-//   } catch (e) {
-//     t.skip(e);
-//   }
-//   t.end();
-// });
-//
-// test('execute complex query (MySQL)', async (t) => {
-//   try {
-//     const h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n
-//                             WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'\n
-//                             AND movies.releasedate < '2017-03-24'\n
-//                             ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC\n
-//                             LIMIT 10 OFFSET 20;`);
-//     t.equal(h, `5a8145ab48d8d81bd05cc3ff80f8c07b34129d5c`);
-//   } catch (e) {
-//     t.skip(e);
-//   }
-//   t.end();
-// });
-//
-// test('pool destroy', async (t) =>
-// {
-//   try {
-//     await sqlite.end();
-//     t.pass();
-//   } catch (e)
-//   {
-//     t.skip(e);
-//   }
-//   t.end();
-// });
+test('connection destroy', async (t) =>
+{
+  try {
+    await elasticSearch.destroy();
+    t.pass();
+  } catch (e)
+  {
+    t.skip(e);
+  }
+  t.end();
+});

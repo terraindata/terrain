@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // require individual test files.
 
+import './unit/TastyElasticExecutor';
 import './unit/TastyGeneratorTests';
 import './unit/TastyMySQLExecutor';
 import './unit/TastySQLiteExecutor';
-import './unit/TastyElasticExecutor';

@@ -18,7 +18,8 @@
     "build-prod": "npm run commit-log && MIDWAY_HOST=pa-terraformer01.terrain.int webpack --config webpack.config.prod.js --output-filename bundle.js",
     "build-demo": "npm run commit-log && MIDWAY_HOST=localhost webpack --config webpack.config.prod.js --output-filename bundle.demo.js",
     "build-gcloud": "npm run commit-log && webpack --config webpack.config.gcloud.js --output-filename bundle.js",
-    "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node --harmony -- ./midway/App.tsx"
+    "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node --harmony -- ./midway/App.tsx",
+    "lint": "./node_modules/.bin/tslint -c tslint.json --fix midway/**/*.tsx"
   },
   "repository": {
     "type": "git",
@@ -126,7 +127,7 @@
     "timezones.json": "^1.1.0",
     "ts-loader": "^0.7.2",
     "tsd": "^0.6.5",
-    "tslint": "*",
+    "tslint": "^5.1.0",
     "typescript": "^2.2.2",
     "underscore": "^1.8.3",
     "url-loader": "^0.5.6",

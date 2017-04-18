@@ -49,8 +49,43 @@ import * as test from 'tape-async';
 
 import SQLiteExecutor from '../../tasty/SQLiteExecutor';
 import Tasty from '../../tasty/Tasty';
+import SQLQueries from './SQLQueries';
+
+const resultHash: string[] = [
+  '25947fb6a68505be72373babb0499bd51b5e44fb',
+  '3da7fb2ac116d0ceb112a1f7593b94dd4c4b3112',
+  '289dbad322d227eee7385af01e964dbcecb0b4a2',
+  '2699d0b1d7879de7fcfc34b921e43404f552b39e',
+  '3bbef0194391e54c7642693a0a5357e8d16611b8',
+  'f93adfaaa1986dc5d1dedc54e73eee59faab3985',
+  '25947fb6a68505be72373babb0499bd51b5e44fb',
+  '5b95dc900d820ee93091e4861e2aeea16e7ead43',
+  '989db2448f309bfdd99b513f37c84b8f5794d2b5',
+  '989db2448f309bfdd99b513f37c84b8f5794d2b5',
+  'c95266c7ea79135e06bf67a60e78204a3491a2f2',
+];
 
 let sqlite;
+
+async function runQuery(qstr: string)
+{
+  const results = await sqlite.query(qstr);
+  return hash(results);
+}
+
+function runTest(index: number)
+{
+  test('SQLite: execute ' + SQLQueries[index][0], async (t) =>
+  {
+    try {
+      const h = await runQuery(SQLQueries[index][1]);
+      t.equal(h, resultHash[index]);
+    } catch (e) {
+      t.skip(e);
+    }
+    t.end();
+  });
+}
 
 test('pool connect', async (t) => {
   try {
@@ -62,101 +97,15 @@ test('pool connect', async (t) => {
   t.end();
 });
 
-async function runQuery(qstr: string)
+for (let i = 0; i < SQLQueries.length; i++)
 {
-  const results = await sqlite.query(qstr);
-  return hash(results);
+  runTest(i);
 }
-
-test('execute simple query (select all)', async (t) =>
-{
-  try {
-    const h = await runQuery(`SELECT * \n  FROM movies LIMIT 2;`);
-    t.equal(h, `63f0e555f54a998e2837489c5e16a48cc3465bfe`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute simple query (select columns)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies LIMIT 2;`);
-    t.equal(h, `1dbce9ceb168544435792b40737b91b342a73a45`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute simple query (filter equals)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`);
-    t.equal(h, `8f1223a111269da3d83a4fcc58c19acbb1c1f939`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute simple query (filter doesNotEqual)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)' LIMIT 2;`);
-    t.equal(h, `e5ab1bafd5dad1f90efc676bcdaed0de952f1856`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute simple query (sort asc)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title ASC LIMIT 10;`);
-    t.equal(h, `17f7b5e32ef4f39b7a441f85c2b376297e5ea331`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute simple query (sort desc)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT * \n  FROM movies\n  ORDER BY movies.title DESC LIMIT 10;`);
-    t.equal(h, `a7ddf3bf437bc21655feb24c174dd9fe8a7c6396`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute simple query (take+skip)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT * \n  FROM movies\n  LIMIT 2 OFFSET 20;`);
-    t.equal(h, `d4059924a51d84c36df9c07868b7c8b0c5d9a1ff`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
-
-test('execute complex query (MySQL)', async (t) => {
-  try {
-    const h = await runQuery(`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n
-                            WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'\n
-                            AND movies.releasedate < '2017-03-24'\n
-                            ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC\n
-                            LIMIT 10 OFFSET 20;`);
-    t.equal(h, `5a8145ab48d8d81bd05cc3ff80f8c07b34129d5c`);
-  } catch (e) {
-    t.skip(e);
-  }
-  t.end();
-});
 
 test('pool destroy', async (t) =>
 {
   try {
-    await sqlite.end();
+    await sqlite.destroy();
     t.pass();
   } catch (e)
   {

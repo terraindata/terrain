@@ -49,8 +49,7 @@ import TastyTable from './TastyTable';
 
 const defaultElasticConfig =
   {
-    //hosts: ['http://10.1.0.30:9200'],
-    hosts: ['http://127.0.0.1:9200'],
+    hosts: ['http://localhost:9200'],
   };
 
 export default class ElasticExecutor
@@ -72,13 +71,12 @@ export default class ElasticExecutor
   /**
    * ES specific extension -- gets the health of the ES cluster
    */
-  public health()
-  {
+  public health() {
     return new Promise((resolve, reject) =>
     {
       this.client.cluster.health(
-        {},
-        this.makePromiseCallback(resolve, reject));
+          {},
+          this.makePromiseCallback(resolve, reject));
     });
   }
 
@@ -90,8 +88,8 @@ export default class ElasticExecutor
     return new Promise((resolve, reject) =>
     {
       this.client.search(
-        queryObject,
-        this.makePromiseCallback(resolve, reject));
+          queryObject,
+          this.makePromiseCallback(resolve, reject));
     });
   }
 
@@ -100,7 +98,7 @@ export default class ElasticExecutor
    */
   public async query(queryObject: object)
   {
-    let result: any = await this.fullQuery(queryObject);
+    const result: any = await this.fullQuery(queryObject);
     // if('body' in queryObject)
     // {
     //     let body = queryObject.body;
@@ -110,7 +108,7 @@ export default class ElasticExecutor
     return result.hits;
   }
 
-  public end()
+  public destroy()
   {
     this.client.close();
   }
@@ -137,51 +135,64 @@ export default class ElasticExecutor
       return;
     }
 
-    let promises = [];
-    for (let i = 0; i < elements.length; ++i)
+    const promises = [];
+
+    for (const element of elements)
     {
-      let element = elements[i];
       promises.push(
-        new Promise((resolve, reject) =>
-        {
-          let query = {
-            index: table._tastyTableName,
-            type:  table._tastyTableName,
-            id:    this.makeID(table, element),
-            body:  element,
-          };
+          new Promise((resolve, reject) =>
+          {
+            const query = {
+              body: element,
+              id: this.makeID(table, element),
+              index: table._tastyTableName,
+              type: table._tastyTableName,
+            };
 
-          this.client.index(
-            query,
-            this.makePromiseCallback(resolve, reject));
-        }));
+            this.client.index(
+                query,
+                this.makePromiseCallback(resolve, reject));
+          }));
     }
-
-    for (let promise in promises)
-    {
-      await promise;
-    }
+    await Promise.all(promises);
   }
 
-  /**
+  /*
    * Deletes the given objects based on their primary key
    */
-  public deleteObjects(table: TastyTable, listOfObjects)
+  public async deleteDocumentsByID(table: TastyTable, elements)
   {
-    throw new Error('Not implemented.');
+    const promises = [];
+
+    for (const element of elements)
+    {
+      promises.push(
+          new Promise((resolve, reject) => {
+            const params = {
+              id: this.makeID(table, element),
+              index: table._tastyTableName,
+              type: table._tastyTableName,
+            };
+
+            this.client.delete(
+                params,
+                this.makePromiseCallback(resolve, reject));
+          }));
+    }
+    await Promise.all(promises);
   }
 
   private bulkUpsert(table: TastyTable, elements)
   {
-    let body = [];
+    const body = [];
     for (let i = 0; i < elements.length; ++i)
     {
-      let element = elements[i];
-      let command = {
+      const element = elements[i];
+      const command = {
         index: {
+          _id:    this.makeID(table, element),
           _index: table._tastyTableName,
           _type:  table._tastyTableName,
-          _id:    this.makeID(table, element),
         },
       };
 
@@ -194,7 +205,7 @@ export default class ElasticExecutor
       {
         this.client.bulk(
           {
-            body: body,
+            body,
           },
           this.makePromiseCallback(resolve, reject));
       });
@@ -218,4 +229,4 @@ export default class ElasticExecutor
       }
     };
   }
-};
+}
