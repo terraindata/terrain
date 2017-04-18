@@ -43,17 +43,17 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
 import * as mysql from 'mysql';
-import * as hash from 'object-hash';
 import ElasticExecutor from '../../tasty/ElasticExecutor';
 import MySQLExecutor from '../../tasty/MySQLExecutor';
 import Tasty from '../../tasty/Tasty';
 
-//run this test `./node_modules/.bin/ts-node --harmony ./midway/test/utils/CopyDataFromSqlToElastic.tsx`
+// run this test `./node_modules/.bin/ts-node --harmony ./midway/test/utils/CopyDataFromSqlToElastic.tsx`
 
 const td1MySQLConfig: mysql.IPoolConfig = {
     connectionLimit: 20,
-    database: 'tdbdtest',
+    database: 'moviesdb',
     host: 'localhost',
     password: 'r3curs1v3$',
     user: 't3rr41n-demo',
@@ -124,6 +124,6 @@ const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']
 (async () => {
     await copyTable(DBMovies, mysqlConnection, elasticSearch);
     const elements = await readTable(DBMovies, mysqlConnection);
-    await elasticSearch.deleteDocumentsByID(DBMovies, elements);
+    //await elasticSearch.deleteDocumentsByID(DBMovies, elements);
     console.log('Copied the table movies.');
 })();
