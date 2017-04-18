@@ -47,10 +47,9 @@ THE SOFTWARE.
 import * as elasticSearch from 'elasticsearch';
 import TastyTable from './TastyTable';
 
-const defaultElasticConfig =
-  {
+const defaultElasticConfig = {
     hosts: ['http://localhost:9200'],
-  };
+};
 
 export default class ElasticExecutor
 {
@@ -71,7 +70,8 @@ export default class ElasticExecutor
   /**
    * ES specific extension -- gets the health of the ES cluster
    */
-  public health() {
+  public health()
+  {
     return new Promise((resolve, reject) =>
     {
       this.client.cluster.health(
