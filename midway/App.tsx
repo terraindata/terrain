@@ -137,7 +137,7 @@ Middleware.passport.deserializeUser((id, done) =>
 app.use(Router.routes());
 
 winston.configure(
-  {
+{
     transports:
       [
         new (winston.transports.Console)(
@@ -153,11 +153,10 @@ winston.configure(
               {
                 return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
               },
-          }
+          },
         ),
       ],
-  }
-);
+});
 
 app.listen(args.port);
 

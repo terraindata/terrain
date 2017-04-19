@@ -136,8 +136,8 @@ export default class ElasticExecutor
           const query = {
             body:  element,
             id:    this.makeID(table, element),
-            index: table._tastyTableName,
-            type:  table._tastyTableName,
+            index: table.tastyTableName,
+            type:  table.tastyTableName,
           };
 
           this.client.index(
@@ -164,8 +164,8 @@ export default class ElasticExecutor
       const command = {
         index: {
           _id:    this.makeID(table, element),
-          _index: table._tastyTableName,
-          _type:  table._tastyTableName,
+          _index: table.tastyTableName,
+          _type:  table.tastyTableName,
         },
       };
 

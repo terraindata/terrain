@@ -49,38 +49,19 @@ import TastyTable from './TastyTable';
 
 export default class TastySchema
 {
-  // NB: elasticTree should probably be object; https://github.com/Microsoft/TypeScript/issues/14187
-  public static fromElasticTree(elasticTree: any): TastySchema
+  public static fromElasticTree(elasticTree: object): TastySchema
   {
     const schema: TastySchema = new TastySchema();
-    for (const db in elasticTree)
-    {
-      if (elasticTree.hasOwnProperty(db))
-      {
-        schema._tree[db] = {};
-        if (elasticTree[db].hasOwnProperty('mappings'))
-        {
-          for (const mapping in elasticTree[db]['mappings'])
-          {
-            if (elasticTree[db]['mappings'].hasOwnProperty(mapping))
-            {
-              schema._tree[db][mapping] = {};
-              if (elasticTree[db]['mappings'][mapping].hasOwnProperty('properties'))
-              {
-                for (const field in elasticTree[db]['mappings'][mapping]['properties'])
-                {
-                  if (elasticTree[db]['mappings'][mapping]['properties'].hasOwnProperty(field))
-                  {
-                    schema._tree[db][mapping][field] =
-                      elasticTree[db]['mappings'][mapping]['properties'][field];
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+    Object.keys(elasticTree).map((db: string) => {
+      schema.tree[db] = {};
+      Object.keys(elasticTree[db]['mappings']).map((mapping: string) => {
+        schema.tree[db][mapping] = {};
+        Object.keys(elasticTree[db]['mappings'][mapping]['properties']).map((field: string) => {
+          schema.tree[db][mapping][field] =
+              elasticTree[db]['mappings'][mapping]['properties'][field];
+        });
+      });
+    });
     return schema;
   }
 
@@ -88,15 +69,15 @@ export default class TastySchema
   {
     const schema: TastySchema = new TastySchema();
     resultSet.forEach((row) => {
-      if (!schema._tree.hasOwnProperty(row.table_schema))
+      if (!schema.tree.hasOwnProperty(row.table_schema))
       {
-        schema._tree[row.table_schema] = {};
+        schema.tree[row.table_schema] = {};
       }
-      if (!schema._tree[row.table_schema].hasOwnProperty(row.table_name))
+      if (!schema.tree[row.table_schema].hasOwnProperty(row.table_name))
       {
-        schema._tree[row.table_schema][row.table_name] = {};
+        schema.tree[row.table_schema][row.table_name] = {};
       }
-      schema._tree[row.table_schema][row.table_name][row.column_name] =
+      schema.tree[row.table_schema][row.table_name][row.column_name] =
         {
           type: row.data_type,
         };
@@ -104,15 +85,82 @@ export default class TastySchema
     return schema;
   }
 
-  public _tree: object;
+  private tree: object;
 
   constructor()
   {
-    this._tree = {};
+    this.tree = {};
   }
 
   public toString(pretty: boolean = false): string
   {
-    return JSON.stringify(this._tree, null, pretty ? 2 : 0);
+    return JSON.stringify(this.tree, null, pretty ? 2 : 0);
+  }
+
+  public databases(): object
+  {
+    return this.tree;
+  }
+
+  public tables(database?: string): object
+  {
+    if (database)
+    {
+      return this.tree[database];
+    }
+    else
+    {
+      const tables: object = {};
+      Object.keys(this.tree).map((db: string) => {
+        Object.keys(this.tree[db]).map((table: string) => {
+          tables[db + '.' + table] = this.tree[db][table];
+        });
+      });
+      return tables;
+    }
+  }
+
+  public fields(database?: string, table?: string): object
+  {
+    let fields: object = {};
+    if (database)
+    {
+      if (table)
+      {
+        fields = this.tree[database][table];
+      }
+      else
+      {
+        Object.keys(this.tree[database]).map((t: string) => {
+          Object.keys(this.tree[database][t]).map((field: string) => {
+            fields[t + '.' + field] = this.tree[database][t][field];
+          });
+        });
+      }
+    }
+    else if (table)
+    {
+      Object.keys(this.tree).map((db: string) => {
+        Object.keys(this.tree[db]).map((t: string) => {
+          if (t === table)
+          {
+            Object.keys(this.tree[db][t]).map((field: string) => {
+              fields[db + '.' + t + '.' + field] = this.tree[db][t][field];
+            });
+          }
+        });
+      });
+    }
+    else
+    {
+      Object.keys(this.tree).map((db: string) => {
+        Object.keys(this.tree[db]).map((t: string) => {
+            Object.keys(this.tree[db][t]).map((field: string) => {
+              fields[db + '.' + t + '.' + field] = this.tree[db][t][field];
+            });
+        });
+      });
+    }
+    return fields;
   }
 }

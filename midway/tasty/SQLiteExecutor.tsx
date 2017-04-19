@@ -87,7 +87,7 @@ export default class SQLiteExecutor
       }
     }
     const schema = new TastySchema();
-    schema._tree = results;
+    schema.tree = results;
     return schema;
   }
 
