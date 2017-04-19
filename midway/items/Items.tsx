@@ -72,9 +72,10 @@ export const Items =
     delete req.accessToken;
     let returnStatus = 'Incorrect parameters';
     let items = await Items.find(req.itemId);
-    if (user.isSuperUser
-      || !(items && items.length !== 0)
-      || (items && items.length !== 0 && items[0].status === 'build'))
+    let itemExists: boolean = (items && items.length !== 0) ? true : false;
+    if ((!itemExists)
+      || (user.isSuperUser && itemExists && items[0].status !== 'BUILD')
+      || (!user.isSuperUser && itemExists && !(items[0].status === 'LIVE' || items[0].status === 'DEFAULT')))
     {
       // define which other parameters need to be present for create/update
       if (req.parentItemId !== undefined && req.name !== undefined)
