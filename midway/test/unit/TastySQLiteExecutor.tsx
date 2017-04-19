@@ -76,26 +76,31 @@ function runTest(index: number)
 {
   test('SQLite: execute ' + SQLQueries[index][0], async (t) =>
   {
-    try {
+    try
+    {
       const h = await runQuery(SQLQueries[index][1]);
       t.equal(h, resultHash[index]);
-    } catch (e) {
+    } catch (e)
+    {
       t.skip(e);
     }
     t.end();
   });
 }
 
-test('pool connect', async (t) => {
+test('pool connect', async (t) =>
+{
   const config: Tasty.SQLiteConfig =
   {
     filename : 'nodeway.db',
   };
 
-  try {
+  try
+  {
     tasty = new Tasty.Tasty(Tasty.SQLite, config);
     t.pass();
-  } catch (e) {
+  } catch (e)
+  {
     t.fail(e);
   }
   t.end();
@@ -108,7 +113,8 @@ for (let i = 0; i < SQLQueries.length; i++)
 
 test('pool destroy', async (t) =>
 {
-  try {
+  try
+  {
     await tasty.destroy();
     t.pass();
   } catch (e)
