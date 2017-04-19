@@ -23,6 +23,7 @@
       "allow-leading-underscore"
     ],
     "no-string-literal": false,
-    "prefer-for-of": false
+    "prefer-for-of": false,
+    "interface-name": [true, "never-prefix"]
   }
 }
