@@ -46,12 +46,13 @@ THE SOFTWARE.
 
 import SQLiteExecutor from '../tasty/SQLiteExecutor';
 import Tasty from '../tasty/Tasty';
+import Util from '../Util';
 
 // CREATE TABLE items (id integer PRIMARY KEY, meta text NOT NULL, name text NOT NULL, \
 // parentItemId integer NOT NULL, status text NOT NULL, type text NOT NULL);
 let Item = new Tasty.Table('items', ['id'], ['meta', 'name', 'parentItemId', 'status', 'type']);
 
-export interface IItemConfig
+export interface ItemConfig
 {
   id?: number;
   meta?: string;
@@ -61,8 +62,28 @@ export interface IItemConfig
   type?: string;
 };
 
-const Items =
+export const Items =
 {
+  createOrUpdateItem: async (user, req) =>
+  {
+    // only superusers can change existing items
+    // can only create items or modify build status items as regular user
+    delete req.id;
+    delete req.accessToken;
+    let returnStatus = 'Incorrect parameters';
+    let items = await Items.find(req.itemId);
+    if (user.isSuperUser
+      || !(items && items.length !== 0)
+      || (items && items.length !== 0 && items[0].status === 'build'))
+    {
+      // define which other parameters need to be present for create/update
+      if (req.parentItemId !== undefined && req.name !== undefined)
+      {
+        returnStatus = await Util.createOrUpdate(Items, req);
+      }
+    }
+    return returnStatus;
+  },
   find: async (id) =>
   {
     if (!id)
@@ -86,7 +107,7 @@ const Items =
   },
   getTemplate: async () =>
   {
-    let emptyObj: IItemConfig =
+    let emptyObj: ItemConfig =
     {
       meta: '',
       name: '',

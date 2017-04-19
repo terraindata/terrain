@@ -58,7 +58,7 @@ const saltRounds = 10;
 let User = new Tasty.Table('users', ['id'], ['accessToken', 'email', 'isDisabled', 'isSuperUser', 'Meta', 'name',
   'password', 'timezone']);
 
-export interface IUserConfig
+export interface UserConfig
 {
   accessToken?: string;
   email: string;
@@ -70,7 +70,7 @@ export interface IUserConfig
   timezone?: string;
 };
 
-const Users =
+export const Users =
 {
   createOrUpdate: async (req) =>
   {
@@ -85,10 +85,18 @@ const Users =
     {
       bcrypt.hash(req.password, saltRounds, async (err, hash) =>
       {
-
-        let newUser: IUserConfig =
+        let storedAccessToken = '';
+        if (req.id)
         {
-          accessToken: '',
+          let user = await Users.find(req.id);
+          if (user && user.length !== 0)
+          {
+            storedAccessToken = user[0].accessToken;
+          }
+        }
+        let newUser: UserConfig =
+        {
+          accessToken: storedAccessToken,
           email: req.email,
           id : req.id ? req.id : -1,
           isDisabled: req.isDisabled ? 1 : 0,
@@ -177,7 +185,7 @@ const Users =
   },
   getTemplate: async () =>
   {
-    let emptyObj: IUserConfig =
+    let emptyObj: UserConfig =
     {
       accessToken: '',
       email: '',

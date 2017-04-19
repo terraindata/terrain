@@ -49,8 +49,7 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import Util from '../Util';
-import Users from './Users';
-import { IUserConfig as UserConfig } from './Users';
+import { UserConfig, Users } from './Users';
 
 const Router = new KoaRouter();
 

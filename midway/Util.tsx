@@ -65,19 +65,11 @@ const Util =
       id = newObject[primaryKey];
     }
     // if there are special permissions
-    for (let key in newObject)
+    _.mapObject(newObject, (val, key) =>
     {
-      if (newObject.hasOwnProperty(key))
-      {
-        if (key === 'parentItemId')
-        {
-          // check that you have permissions in both places (for post-MVP permissions)
-        }
-        obj[key] = newObject[key];
-      }
-    }
-    // if there aren't any
-    _.extend(obj, newObject);
+      // TODO create field permission checking
+      obj[key] = val;
+    });
     return await tastyTable.replace(obj, id);
   },
   getRequest: (url) =>

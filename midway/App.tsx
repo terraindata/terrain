@@ -106,6 +106,7 @@ app.use(Middleware.compress());
 app.use(Middleware.passport.initialize());
 app.use(Middleware.passport.session());
 
+// authenticate with id and accessToken
 Middleware.passport.use('access-token-local', new LocalStrategy(
 {
   passReqToCallback: true,
@@ -118,13 +119,15 @@ async (req, id, accessToken, done) =>
   done(null, await Users.findByAccessToken(id, accessToken), req.body);
 }));
 
+// authenticate with email and password
 Middleware.passport.use('local', new LocalStrategy(
 {
   passReqToCallback: true,
+  usernameField: 'email',
 },
-async (req, username, password, done) =>
+async (req, email, password, done) =>
 {
-  done(null, await Users.findByUsername(username, password));
+  done(null, await Users.findByUsername(email, password));
 }));
 
 Middleware.passport.serializeUser((user, done) =>
