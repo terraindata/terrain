@@ -63,6 +63,7 @@ test('GET /midway/v1/schema', (t) =>
   request(App)
       .get('/midway/v1/schema')
       .then((response) => {
+        // TODO @david check against expected value for schema, not just non-emptiness
         if (response.text !== '')
         {
           t.pass();
