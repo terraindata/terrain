@@ -66,16 +66,21 @@ export const Items =
 {
   createOrUpdateItem: async (user, req) =>
   {
-    // only superusers can change existing items
-    // can only create items or modify build status items as regular user
+    // both regular and superusers can create items
+    // only superusers can change existing items that are not BUILD status
+    // both regular and superusers can change items thar are not LIVE or DEFAULT status
     delete req.id;
     delete req.accessToken;
     let returnStatus = 'Incorrect parameters';
     let items = await Items.find(req.itemId);
     let itemExists: boolean = (items && items.length !== 0) ? true : false;
+    if (user.isSuperUser && req.status)
+    {
+      delete req.status;
+    }
     if ((!itemExists)
       || (user.isSuperUser && itemExists && items[0].status !== 'BUILD')
-      || (!user.isSuperUser && itemExists && !(items[0].status === 'LIVE' || items[0].status === 'DEFAULT')))
+      || (itemExists && !(items[0].status === 'LIVE' || items[0].status === 'DEFAULT')))
     {
       // define which other parameters need to be present for create/update
       if (req.parentItemId !== undefined && req.name !== undefined)

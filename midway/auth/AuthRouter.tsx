@@ -48,6 +48,8 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import { Users } from '../users/Users';
+
 const Router = new KoaRouter();
 
 Router.get('/', async (ctx, next) =>
@@ -75,6 +77,18 @@ Router.post('/api_login', passport.authenticate('local'), async (ctx, next) =>
     accessToken: ctx.state.user.accessToken,
     username: ctx.state.user.username,
   };
+});
+
+Router.post('/api_logout', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('User ' + ctx.state.user.username + ' has successfully logged out');
+  let returnStatus: any = await Users.logout(ctx.state.authInfo.id, ctx.state.authInfo.accessToken);
+  if (returnStatus instanceof Array)
+  {
+    ctx.body = 'Success';
+  } else {
+    ctx.body = returnStatus;
+  }
 });
 
 export default Router;

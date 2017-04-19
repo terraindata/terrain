@@ -195,6 +195,28 @@ export const Users =
     };
     return emptyObj;
   },
+  logout: async (id, accessToken) =>
+  {
+    let query = new Tasty.Query(User);
+    query.filter(User['id'].equals(id)).filter(User['accessToken'].equals(accessToken));
+    let qstr = Tasty.SQLite.generate(query);
+    let sqlite = new SQLiteExecutor();
+    let results = await sqlite.query(qstr);
+    if (results && results.length === 0)
+    {
+      return new Promise(async (resolve, reject) =>
+      {
+        resolve(null);
+      });
+    }
+
+    let user = results[0];
+    user.accessToken = '';
+    let updateQuery = new Tasty.Query(User).upsert(user);
+    qstr = Tasty.SQLite.generate(updateQuery);
+    let success = await sqlite.query(qstr);
+    return success;
+  },
 };
 
 export default Users;
