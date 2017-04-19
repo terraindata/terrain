@@ -105,12 +105,23 @@ export default class ElasticExecutor
     //     if('aggregations' in body)
     //         return result.
     // }
-    return result.hits;
+    return result.hits.hits;
   }
 
   public destroy()
   {
     this.client.close();
+  }
+
+  public storeProcedure(procedure)
+  {
+    return new Promise(
+      (resolve, reject) =>
+      {
+        this.client.putScript(
+          procedure,
+          this.makePromiseCallback(resolve, reject));
+      });
   }
 
   /**
