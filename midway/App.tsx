@@ -56,8 +56,8 @@ import reqText = require('require-text');
 import session = require('koa-generic-session');
 
 import Middleware from './Middleware';
-import Users from './users/Users';
 import Router from './Router';
+import Users from './users/Users';
 import Util from './Util';
 
 const LocalStrategy = passportLocal.Strategy;

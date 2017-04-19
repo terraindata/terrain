@@ -217,6 +217,19 @@ export const Users =
     let success = await sqlite.query(qstr);
     return success;
   },
+  replace: async (user, id?) =>
+  {
+    let query = new Tasty.Query(User);
+    if (id)
+    {
+      user['id'] = id;
+    }
+    query.upsert(user);
+    let qstr = Tasty.SQLite.generate(query);
+    let sqlite = new SQLiteExecutor();
+    let replaceStatus = await sqlite.query(qstr);
+    return replaceStatus;
+  },
 };
 
 export default Users;

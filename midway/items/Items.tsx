@@ -56,8 +56,8 @@ export interface ItemConfig
 {
   id?: number;
   meta?: string;
-  name?: string;
-  parentItemId?: number;
+  name: string;
+  parentItemId: number;
   status?: string;
   type?: string;
 };
@@ -78,9 +78,10 @@ export const Items =
     {
       delete req.status;
     }
-    if ((!itemExists)
-      || (user.isSuperUser && itemExists && items[0].status !== 'BUILD')
-      || (itemExists && !(items[0].status === 'LIVE' || items[0].status === 'DEFAULT')))
+    if ((!itemExists || user.isSuperUser)
+      || (!user.isSuperUser && itemExists
+        && !(items[0].status === 'LIVE' || items[0].status === 'DEFAULT')
+        && req.status && !(req.status === 'LIVE' || req.status === 'DEFAULT')))
     {
       // define which other parameters need to be present for create/update
       if (req.parentItemId !== undefined && req.name !== undefined)
@@ -117,6 +118,7 @@ export const Items =
     {
       meta: '',
       name: '',
+      parentItemId: 0,
       status: '',
       type: '',
     };

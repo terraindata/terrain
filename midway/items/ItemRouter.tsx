@@ -49,7 +49,6 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import Util from '../Util';
-// import Items from './Items';
 import { ItemConfig, Items } from './Items';
 
 const Router = new KoaRouter();
