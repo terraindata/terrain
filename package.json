@@ -18,7 +18,8 @@
     "build-prod": "npm run commit-log && MIDWAY_HOST=pa-terraformer01.terrain.int webpack --config webpack.config.prod.js --output-filename bundle.js",
     "build-demo": "npm run commit-log && MIDWAY_HOST=localhost webpack --config webpack.config.prod.js --output-filename bundle.demo.js",
     "build-gcloud": "npm run commit-log && webpack --config webpack.config.gcloud.js --output-filename bundle.js",
-    "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node --harmony -- ./midway/App.tsx"
+    "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node --harmony -- ./midway/App.tsx",
+    "lint": "./node_modules/.bin/tslint -c tslint.json --fix midway/**/*.tsx"
   },
   "repository": {
     "type": "git",
@@ -38,6 +39,7 @@
   ],
   "private": true,
   "dependencies": {
+    "@types/deep-equal": "^1.0.0",
     "babel-cli": "^6.24.0",
     "babel-core": "^6.7.7",
     "babel-loader": "^6.2.4",
@@ -59,6 +61,7 @@
     "css-loader": "^0.10.1",
     "d3": "^3.5.14",
     "date-format": "^1.1.0",
+    "deep-equal": "^1.0.1",
     "diff-match-patch": "^1.0.0",
     "dom-helpers": "^2.4.0",
     "elasticsearch": "^13.0.0-rc2",
@@ -126,7 +129,7 @@
     "timezones.json": "^1.1.0",
     "ts-loader": "^0.7.2",
     "tsd": "^0.6.5",
-    "tslint": "*",
+    "tslint": "^5.1.0",
     "typescript": "^2.2.2",
     "underscore": "^1.8.3",
     "url-loader": "^0.5.6",
