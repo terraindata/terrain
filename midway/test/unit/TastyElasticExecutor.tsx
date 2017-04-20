@@ -121,10 +121,10 @@ test('store terrain_PWLScore script', async (t) =>
   {
     await elasticSearch.storeProcedure(
       {
-        'id':   'terrain_PWLScore',
-        'lang': 'painless',
-        'body': {
-          'script': `
+        id:   'terrain_PWLScore',
+        lang: 'painless',
+        body: {
+          script: `
 double pwlTransform(def ranges, def outputs, def input)
 {
 if (input <= ranges[0])
@@ -202,68 +202,68 @@ test('stored PWL transform sort query', async (t) =>
   {
     const results = await elasticSearch.query(
       {
-        'index': 'movies',
-        'type':  'data',
-        'from':  0,
-        'size':  5,
-        'body':  {
-          'query': {
-            'bool': {
-              'must':                 [
-                {'match': {'status': 'Released'}},
-                {'match': {'language': 'en'}},
+        index: 'movies',
+        type:  'data',
+        from:  0,
+        size:  5,
+        body:  {
+          query: {
+            bool: {
+              must:                 [
+                {match: {status: 'Released'}},
+                {match: {language: 'en'}},
               ],
-              'must_not':             [
-                {'term': {'budget': 0}},
-                {'term': {'revenue': 0}},
+              must_not:             [
+                {term: {budget: 0}},
+                {term: {revenue: 0}},
               ],
-              'minimum_should_match': 1,
-              'should':               [
-                {'match': {'genres': 'Thriller'}},
-                {'match': {'genres': 'Action'}},
+              minimum_should_match: 1,
+              should:               [
+                {match: {genres: 'Thriller'}},
+                {match: {genres: 'Action'}},
               ],
             },
           },
-          'sort':  {
-            '_script': {
-              'type':   'number',
-              'order':  'desc',
-              'script': {
-                'stored': 'terrain_PWLScore',
-                'params': {
-                  'method':  'sum',
-                  'factors': [
+          sort:  {
+            _script: {
+              type:   'number',
+              order:  'desc',
+              script: {
+                stored: 'terrain_PWLScore',
+                params: {
+                  method:  'sum',
+                  factors: [
                     {
-                      'weight':  .1,
-                      'ranges':  [-100.0, 100.0],
-                      'outputs': [0.0, 1.0],
+                      weight:  .1,
+                      ranges:  [-100.0, 100.0],
+                      outputs: [0.0, 1.0],
                     },
                     {
-                      'weight':       .2,
-                      'a':            0.0,
-                      'b':            1.0,
-                      'numerators':   [['popularity', 1]],
-                      'denominators': [],
-                      'ranges':       [0.0, 2.5, 5.0, 10.0, 50.0],
-                      'outputs':      [0.0, 0.2, 0.5, 0.8, 1.0],
+                      weight:       .2,
+                      a:            0.0,
+                      b:            1.0,
+                      numerators:   [['popularity', 1]],
+                      denominators: [],
+                      ranges:       [0.0, 2.5, 5.0, 10.0, 50.0],
+                      outputs:      [0.0, 0.2, 0.5, 0.8, 1.0],
                     },
                     {
-                      'weight':       .2,
-                      'a':            25.0,
-                      'b':            10.0,
-                      'numerators':   [['voteaverage', 1]],
-                      'denominators': [['votecount', 1]],
-                      'ranges':       [0.0, 4.0, 5.0, 10.0],
-                      'outputs':      [0.0, 0.1, 0.5, 1.0],
+                      weight:       .2,
+                      a:            25.0,
+                      b:            10.0,
+                      numerators:   [['voteaverage', 1]],
+                      denominators: [['votecount', 1]],
+                      ranges:       [0.0, 4.0, 5.0, 10.0],
+                      outputs:      [0.0, 0.1, 0.5, 1.0],
                     },
                     {
-                      'weight':       .5,
-                      'a':            0.0,
-                      'b':            1.0,
-                      'numerators':   [['revenue', 1], ['budget', -1]],
-                      'denominators': [['budget', 1]],
-                      'ranges':       [-10.0, 1.0, 2.0, 10.0],
-                      'outputs':      [0.0, 0.1, 0.5, 1.0],
+                      weight:       .5,
+                      a:            0.0,
+                      b:            1.0,
+                      numerators:   [['revenue', 1], ['budget', -1]],
+                      denominators: [['budget', 1]],
+                      ranges:       [-10.0, 1.0, 2.0, 10.0],
+                      outputs:      [0.0, 0.1, 0.5, 1.0],
                     },
                   ],
                 },
@@ -273,13 +273,13 @@ test('stored PWL transform sort query', async (t) =>
         },
       });
     // console.log(JSON.stringify(results, null, 2));
-    let expected = [
+    const expected = [
       {
-        '_index':  'movies',
-        '_type':   'data',
-        '_id':     'AVtLODwPFGpkkkhizu3Q',
-        '_score':  null,
-        '_source': {
+        _index:  'movies',
+        _type:   'data',
+        _id:     'AVtLODwPFGpkkkhizu3Q',
+        _score:  null,
+        _source: {
           'overview':     'Based on the real life story of legendary cryptanalyst Alan Turing, the film portrays the nail-biting race against time by Turing and his brilliant team of code-breakers at Britain\'s top-secret Government Code and Cypher School at Bletchley Park, during the darkest days of World War II.',
           'votecount':    3268,
           'posterpath':   '/noUp0XOqIcmgefRnRZa1nhtRvWO.jpg',
@@ -300,16 +300,16 @@ test('stored PWL transform sort query', async (t) =>
           'budget':       14000000,
           'homepage':     'http://theimitationgamemovie.com/',
         },
-        'sort':    [
+        sort:    [
           0.7044360129081163,
         ],
       },
       {
-        '_index':  'movies',
-        '_type':   'data',
-        '_id':     'AVtLODj7FGpkkkhizuiv',
-        '_score':  null,
-        '_source': {
+        _index:  'movies',
+        _type:   'data',
+        _id:     'AVtLODj7FGpkkkhizuiv',
+        _score:  null,
+        _source: {
           'overview':     'A woman, accidentally caught in a dark deal, turns the tables on her captors and transforms into a merciless warrior evolved beyond human logic.',
           'votecount':    3554,
           'posterpath':   '/rwn876MeqienhOVSSjtUPnwxn0Z.jpg',
@@ -330,16 +330,16 @@ test('stored PWL transform sort query', async (t) =>
           'budget':       40000000,
           'homepage':     'http://lucymovie.com/',
         },
-        'sort':    [
+        sort:    [
           0.6807745937088925,
         ],
       },
       {
-        '_index':  'movies',
-        '_type':   'data',
-        '_id':     'AVtLN-tXFGpkkkhizo5d',
-        '_score':  null,
-        '_source': {
+        _index:  'movies',
+        _type:   'data',
+        _id:     'AVtLN-tXFGpkkkhizo5d',
+        _score:  null,
+        _source: {
           'overview':     'Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire.',
           'votecount':    4206,
           'posterpath':   '/tvSlBzAdRE29bZe5yYWrJ2ds137.jpg',
@@ -360,16 +360,16 @@ test('stored PWL transform sort query', async (t) =>
           'budget':       11000000,
           'homepage':     'http://www.starwars.com/films/star-wars-episode-iv-a-new-hope',
         },
-        'sort':    [
+        sort:    [
           0.6749814962066102,
         ],
       },
       {
-        '_index':  'movies',
-        '_type':   'data',
-        '_id':     'AVtLN-tXFGpkkkhizo6B',
-        '_score':  null,
-        '_source': {
+        _index:  'movies',
+        _type:   'data',
+        _id:     'AVtLN-tXFGpkkkhizo6B',
+        _score:  null,
+        _source: {
           'overview':     'A burger-loving hit man, his philosophical partner, a drug-addled gangster\'s moll and a washed-up boxer converge in this sprawling, comedic crime caper. Their adventures unfurl in three stories that ingeniously trip back and forth in time.',
           'votecount':    5096,
           'posterpath':   '/dM2w364MScsjFf8pfMbaWUcWrR.jpg',
@@ -390,16 +390,16 @@ test('stored PWL transform sort query', async (t) =>
           'budget':       8000000,
           'homepage':     '',
         },
-        'sort':    [
+        sort:    [
           0.6619847933324328,
         ],
       },
       {
-        '_index':  'movies',
-        '_type':   'data',
-        '_id':     'AVtLN_cnFGpkkkhizpiK',
-        '_score':  null,
-        '_source': {
+        _index:  'movies',
+        _type:   'data',
+        _id:     'AVtLN_cnFGpkkkhizpiK',
+        _score:  null,
+        _source: {
           'overview':     'In the film that launched the James Bond saga, Agent 007 (Sean Connery) battles mysterious Dr. No, a scientific genius bent on destroying the U.S. space program. As the countdown to disaster begins, Bond must go to Jamaica, where he encounters beautiful Honey Ryder (Ursula Andress), to confront a megalomaniacal villain in his massive island headquarters.',
           'votecount':    532,
           'posterpath':   '/c3zP1U1P2OpD0504izo2KhyJfLU.jpg',
@@ -420,7 +420,7 @@ test('stored PWL transform sort query', async (t) =>
           'budget':       1100000,
           'homepage':     'http://www.mgm.com/view/movie/566/Dr.-No/',
         },
-        'sort':    [
+        sort:    [
           0.6599492334800453,
         ],
       },
@@ -439,69 +439,69 @@ test('stored PWL transform sort query using function_score', async (t) =>
   {
     const results = await elasticSearch.query(
       {
-        'index': 'movies',
-        'type':  'data',
-        'from':  0,
-        'size':  2,
-        'body':  {
-          'query': {
-            'function_score': {
-              'query':      {
-                'bool': {
-                  'must':                 [
-                    {'match': {'status': 'Released'}},
-                    {'match': {'language': 'en'}},
+        index: 'movies',
+        type:  'data',
+        from:  0,
+        size:  2,
+        body:  {
+          query: {
+            function_score: {
+              query:      {
+                bool: {
+                  must:                 [
+                    {match: {status: 'Released'}},
+                    {match: {language: 'en'}},
                   ],
-                  'must_not':             [
-                    {'term': {'budget': 0}},
-                    {'term': {'revenue': 0}},
+                  must_not:             [
+                    {term: {budget: 0}},
+                    {term: {revenue: 0}},
                   ],
-                  'minimum_should_match': 1,
-                  'should':               [
-                    {'match': {'genres': 'Thriller'}},
-                    {'match': {'genres': 'Action'}},
+                  minimum_should_match: 1,
+                  should:               [
+                    {match: {genres: 'Thriller'}},
+                    {match: {genres: 'Action'}},
                   ],
                 },
               },
-              'functions':  [
+              functions:  [
                 {
-                  'script_score': {
-                    'script': {
-                      'stored': 'terrain_PWLScore',
-                      'params': {
-                        'method':  'log',
-                        'factors': [
+                  script_score: {
+                    script: {
+                      stored: 'terrain_PWLScore',
+                      params: {
+                        method:  'log',
+                        factors: [
                           {
-                            'weight':  .1,
-                            'ranges':  [-100.0, 100.0],
-                            'outputs': [0.0, 1.0],
+                            weight:  .1,
+                            ranges:  [-100.0, 100.0],
+                            outputs: [0.0, 1.0],
                           },
                           {
-                            'weight':       .3,
-                            'a':            0.0,
-                            'b':            1.0,
-                            'numerators':   [['popularity', 1]],
-                            'denominators': [],
-                            'ranges':       [0.0, 2.5, 5.0, 10.0, 50.0],
-                            'outputs':      [0.0, 0.2, 0.0, 1.0, 0.0],
+                            weight:       .3,
+                            a:            0.0,
+                            b:            1.0,
+                            numerators:   [['popularity', 1]],
+                            denominators: [],
+                            ranges:       [0.0, 2.5, 5.0, 10.0, 50.0],
+                            outputs:      [0.0, 0.2, 0.0, 1.0, 0.0],
                           },
                           {
-                            'weight':       .4,
-                            'a':            25.0,
-                            'b':            10.0,
-                            'numerators':   [['voteaverage', 1]],
-                            'denominators': [['votecount', 1]],
-                            'ranges':       [0.0, 10.0],
-                            'outputs':      [0.0, 1.0],
+                            weight:       .4,
+                            a:            25.0,
+                            b:            10.0,
+                            numerators:   [['voteaverage', 1]],
+                            denominators: [['votecount', 1]],
+                            ranges:       [0.0, 10.0],
+                            outputs:      [0.0, 1.0],
                           },
                           {
-                            'weight':       .2,
-                            'a':            0.0,
-                            'b':            1.0,
-                            'numerators':   [['revenue', 1], ['budget', -1]],
-                            'denominators': [['budget', 1]],
-                            'ranges':       [-10.0, 10.0],
-                            'outputs':      [0.0, 1.0],
+                            weight:       .2,
+                            a:            0.0,
+                            b:            1.0,
+                            numerators:   [['revenue', 1], ['budget', -1]],
+                            denominators: [['budget', 1]],
+                            ranges:       [-10.0, 10.0],
+                            outputs:      [0.0, 1.0],
                           },
                         ],
                       },
@@ -509,20 +509,20 @@ test('stored PWL transform sort query using function_score', async (t) =>
                   },
                 },
               ],
-              'score_mode': 'first',
-              'boost_mode': 'replace',
+              score_mode: 'first',
+              boost_mode: 'replace',
             },
           },
         },
       });
-    console.log(JSON.stringify(results, null, 2));
-    let expected = [
+    winston.info(JSON.stringify(results, null, 2));
+    const expected = [
       {
-        '_index':  'movies',
-        '_type':   'data',
-        '_id':     'AVtLOAYGFGpkkkhizqnN',
-        '_score':  -11.855362,
-        '_source': {
+        _index:  'movies',
+        _type:   'data',
+        _id:     'AVtLOAYGFGpkkkhizqnN',
+        _score:  -11.855362,
+        _source: {
           'overview':     'Star studded comedy about a early 20th century air race from Britain to France.',
           'votecount':    18,
           'posterpath':   '/xB4tZIOGfyL41MHGUUEBsy5fQ5y.jpg',
@@ -545,11 +545,11 @@ test('stored PWL transform sort query using function_score', async (t) =>
         },
       },
       {
-        '_index':  'movies',
-        '_type':   'data',
-        '_id':     'AVtLN_YpFGpkkkhizpbf',
-        '_score':  -12.032226,
-        '_source': {
+        _index:  'movies',
+        _type:   'data',
+        _id:     'AVtLN_YpFGpkkkhizpbf',
+        _score:  -12.032226,
+        _source: {
           'overview':     '"Something hit us...the crew is dead...help us, please, please help us!" With these terrifying words, 22 of Hollywood\'s greatest stars find themselves aboard a pilotless jumbo jet headed on a collision course with destruction in the nerve chilling sequel to the greatest disaster movie ever made.',
           'votecount':    30,
           'posterpath':   '/53M89n1LDl20ZCAhqEadjTVc0Ml.jpg',
