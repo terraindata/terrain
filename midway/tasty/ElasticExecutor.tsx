@@ -124,7 +124,7 @@ export class ElasticExecutor implements TastyExecutor
       {
         this.client.putScript(
           procedure,
-          this.makePromiseCallback(resolve, reject));
+          makePromiseCallback(resolve, reject));
       });
   }
 
@@ -170,8 +170,10 @@ export class ElasticExecutor implements TastyExecutor
     for (const element of elements)
     {
       promises.push(
-          new Promise((resolve, reject) => {
-            const params = {
+          new Promise((resolve, reject) =>
+          {
+            const params =
+            {
               id: this.makeID(table, element),
               index: table._tastyTableName,
               type: table._tastyTableName,
@@ -191,7 +193,8 @@ export class ElasticExecutor implements TastyExecutor
     for (let i = 0; i < elements.length; ++i)
     {
       const element = elements[i];
-      const command = {
+      const command =
+      {
         index: {
           _id:    this.makeID(table, element),
           _index: table._tastyTableName,
@@ -203,8 +206,7 @@ export class ElasticExecutor implements TastyExecutor
       body.push(element);
     }
 
-    return new Promise(
-      (resolve, reject) =>
+    return new Promise((resolve, reject) =>
       {
         this.client.bulk(
           {

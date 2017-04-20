@@ -62,7 +62,8 @@ test('connection establish', async (t) =>
   {
     elasticSearch = new ElasticExecutor();
     t.pass();
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }
@@ -76,7 +77,8 @@ test('elastic health', async (t) =>
     const h = await elasticSearch.health();
     winston.info(h);
     t.pass();
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }
@@ -113,7 +115,8 @@ test('basic query', async (t) =>
     t.pass();
     // console.log(h.hits.hits.forEach(
     //     (result) => {console.log(JSON.stringify(result, null, 2));}));
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }
@@ -194,7 +197,8 @@ for(int i = 0; i < factors.length; ++i)
 return total;`,
         },
       });
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }
@@ -431,7 +435,8 @@ test('stored PWL transform sort query', async (t) =>
       },
     ];
     t.deepEqual(results, expected);
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }
@@ -578,7 +583,8 @@ test('stored PWL transform sort query using function_score', async (t) =>
       },
     ];
     t.deepEqual(results, expected);
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }
@@ -591,7 +597,8 @@ test('connection destroy', async (t) =>
   {
     await elasticSearch.destroy();
     t.pass();
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }

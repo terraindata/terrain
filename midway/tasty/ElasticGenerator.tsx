@@ -141,31 +141,39 @@ export default class ElasticGenerator
     if (expression.type === '==')
     {
       this.addFilterTerm(filterClause, 'bool', 'must', columnName, value);
-    } else if (expression.type === '!=')
+    }
+    else if (expression.type === '!=')
     {
       this.addFilterTerm(filterClause, 'bool', 'must_not', columnName, value);
-    } else if (expression.type === '<')
+    }
+    else if (expression.type === '<')
     {
       this.setRangeClauseIfLesser(filterClause, columnName, 'lt', value);
-    } else if (expression.type === '<=')
+    }
+    else if (expression.type === '<=')
     {
       this.setRangeClauseIfLesser(filterClause, columnName, 'lte', value);
-    } else if (expression.type === '>')
+    }
+    else if (expression.type === '>')
     {
       this.setRangeClauseIfGreater(filterClause, columnName, 'gt', value);
-    } else if (expression.type === '>=')
+    }
+    else if (expression.type === '>=')
     {
       this.setRangeClauseIfGreater(filterClause, columnName, 'gte', value);
-    } else if (expression.type === '&&')
+    }
+    else if (expression.type === '&&')
     {
       this.accumulateFilters(filterClause, expression.lhs);
       this.accumulateFilters(filterClause, expression.rhs);
-    } else if (expression.type === '||')
+    }
+    else if (expression.type === '||')
     {
       const shouldClause = this.getSubclauseList(filterClause, 'should');
       this.accumulateFilters(shouldClause, expression.lhs);
       this.accumulateFilters(shouldClause, expression.rhs);
-    } else
+    }
+    else
     {
       throw new Error('Filtering on unsupported expression "' + JSON.stringify(expression) + '".');
     }

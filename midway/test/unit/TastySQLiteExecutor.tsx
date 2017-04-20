@@ -80,7 +80,8 @@ function runTest(index: number)
     {
       const h = await runQuery(SQLQueries[index][1]);
       t.equal(h, resultHash[index]);
-    } catch (e)
+    }
+    catch (e)
     {
       t.skip(e);
     }
@@ -99,7 +100,8 @@ test('pool connect', async (t) =>
   {
     tasty = new Tasty.Tasty(Tasty.SQLite, config);
     t.pass();
-  } catch (e)
+  }
+  catch (e)
   {
     t.fail(e);
   }
@@ -117,7 +119,8 @@ test('pool destroy', async (t) =>
   {
     await tasty.destroy();
     t.pass();
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }

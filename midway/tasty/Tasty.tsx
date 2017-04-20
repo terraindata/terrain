@@ -110,10 +110,12 @@ export class Tasty
     if (backend === Backend.ElasticSearch)
     {
       return ElasticGenerator.generate(query);
-    } else if (backend === Backend.MySQL)
+    }
+    else if (backend === Backend.MySQL)
     {
       return MySQLGenerator.generate(query);
-    } else if (backend === Backend.SQLite)
+    }
+    else if (backend === Backend.SQLite)
     {
       return MySQLGenerator.generate(query);
     }
@@ -138,16 +140,19 @@ export class Tasty
       {
         this.executor = new ElasticExecutor.ElasticExecutor(config);
         this.generator = ElasticGenerator;
-      } else if (backend === Backend.MySQL)
+      }
+      else if (backend === Backend.MySQL)
       {
         this.executor = new MySQLExecutor.MySQLExecutor(config);
         this.generator = MySQLGenerator;
-      } else if (backend === Backend.SQLite)
+      }
+      else if (backend === Backend.SQLite)
       {
         this.executor = new SQLiteExecutor.SQLiteExecutor(config);
         this.generator = MySQLGenerator;
       }
-    } catch (error) {
+    }
+    catch (error) {
       throw Error('Failed to initialize backend ' + Backend[backend] + ':' + error);
     }
   }
@@ -170,7 +175,8 @@ export class Tasty
     if (typeof query === 'string')
     {
       return await this.executor.query(query);
-    } else
+    }
+    else
     {
       const queryString = this.generator.generate(query);
       return await this.executor.query(queryString);
@@ -220,13 +226,15 @@ export class Tasty
         if (node === null)
         {
           node = this.filterPrimaryKeys(table, o);
-        } else
+        }
+        else
         {
           node = node.or(this.filterPrimaryKeys(table, o));
         }
       });
       query.filter(node);
-    } else
+    }
+    else
     {
       node = this.filterPrimaryKeys(table, filter);
       query.filter(node);
@@ -256,7 +264,8 @@ export class Tasty
           promises.push(this.upsert(table, o));
         });
       return await Promise.all(promises);
-    } else
+    }
+    else
     {
       query.upsert(obj);
     }
@@ -279,7 +288,8 @@ export class Tasty
     if (obj === null || obj === undefined || obj === {})
     {
       query.delete();
-    } else if (obj instanceof Array)
+    }
+    else if (obj instanceof Array)
     {
       const promises = [];
       obj.map(
@@ -288,7 +298,8 @@ export class Tasty
           promises.push(this.upsert(table, o));
         });
       return await Promise.all(promises);
-    } else
+    }
+    else
     {
       const node: TastyNode = this.filterPrimaryKeys(table, obj);
       query.filter(node);
@@ -306,7 +317,8 @@ export class Tasty
       if (node === null)
       {
         node = table[key].equals(obj[key]);
-      } else
+      }
+      else
       {
         if (obj.hasOwnProperty(key))
         {

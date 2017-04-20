@@ -49,13 +49,15 @@ import * as winston from 'winston';
 import TastyExecutor from './TastyExecutor';
 import { makePromiseCallback, makePromiseCallback0 } from './Utils';
 
-export interface ISQLiteConfig {
+export interface ISQLiteConfig
+{
   filename: string;
 }
 
 export type Config = ISQLiteConfig;
 
-export const defaultConfig: Config = {
+export const defaultConfig: Config =
+{
   filename: 'nodeway.db',
 };
 
