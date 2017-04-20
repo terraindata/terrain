@@ -19,7 +19,7 @@
     "build-demo": "npm run commit-log && MIDWAY_HOST=localhost webpack --config webpack.config.prod.js --output-filename bundle.demo.js",
     "build-gcloud": "npm run commit-log && webpack --config webpack.config.gcloud.js --output-filename bundle.js",
     "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node --harmony -- ./midway/App.tsx",
-    "lint": "./node_modules/.bin/tslint -c tslint.json --fix midway/**/*.tsx"
+    "lint": "./node_modules/.bin/tslint -c tslint.json --fix 'midway/**/*.ts{,x}'"
   },
   "repository": {
     "type": "git",
