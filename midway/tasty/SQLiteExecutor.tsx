@@ -46,54 +46,52 @@ THE SOFTWARE.
 
 import * as sqlite3 from 'sqlite3';
 import * as winston from 'winston';
+import TastyExecutor from './TastyExecutor';
+import { makePromiseCallback, makePromiseCallback0 } from './Utils';
 
-const defaultSQLiteConfig = {
+export interface ISQLiteConfig
+{
+  filename: string;
+}
+
+export type Config = ISQLiteConfig;
+
+export const defaultConfig: Config =
+{
   filename: 'nodeway.db',
 };
 
-export default class SQLiteExecutor
+export class SQLiteExecutor implements TastyExecutor
 {
-  private db;
+  private config: Config;
+  private db: sqlite3.Database;
 
   constructor(config?: any)
   {
     if (config === undefined)
     {
-      config = defaultSQLiteConfig;
+      config = defaultConfig;
     }
 
+    this.config = config;
     this.db = new sqlite3.Database(config.filename);
   }
 
-  public query(queryStr: string)
+  public async query(queryStr: string): Promise<object[]>
   {
-    return new Promise((resolve, reject) =>
+    return new Promise<object[]>((resolve, reject) =>
     {
-      this.db.all(queryStr, (error, rows) =>
-      {
-        if (error)
-        {
-          reject(error);
-        } else {
-          resolve(rows);
-        }
-      });
+      this.db.all(queryStr, makePromiseCallback(resolve, reject));
     });
   }
 
-  public destroy()
+  public async destroy(): Promise<void>
   {
-    return new Promise((resolve, reject) =>
+    return new Promise<void>((resolve, reject) =>
     {
-      this.db.close((error) =>
-      {
-        if (error)
-        {
-          reject(error);
-        } else {
-          resolve();
-        }
-      });
+      this.db.close(makePromiseCallback0(resolve, reject));
     });
   }
 }
+
+export default SQLiteExecutor;
