@@ -44,57 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyColumn from './TastyColumn';
-
-export class TastyTable
+abstract class TastyExecutor
 {
-  public tastyDatabaseName: string;
-  public tastyTableName: string;
-  public tastyPrimaryKey: string[];
-
-  constructor(name: string, primaryKey: string[], columns: string[], database?: string)
-  {
-    // primary key is a list, so that composite keys can be supported
-    this.tastyDatabaseName = database || 'tdbdtest';
-    this.tastyTableName = name;
-    this.tastyPrimaryKey = primaryKey;
-
-    primaryKey.forEach(
-      (columnName) =>
-      {
-        this[columnName] = new TastyColumn(this, columnName);
-      });
-
-    columns.forEach(
-      (columnName) =>
-      {
-        this[columnName] = new TastyColumn(this, columnName);
-      });
-  }
-
-  public get tableName(): string
-  {
-    return this.tastyTableName;
-  }
-
-  public get primaryKeys(): string[]
-  {
-    return this.tastyPrimaryKey;
-  }
-
-  public toString(): string
-  {
-    return JSON.stringify(this, null, 2);
-  }
-
-  public getPrimaryKeys(obj: object): string[]
-  {
-    return this.tastyPrimaryKey.map(
-      (column) =>
-      {
-        return obj[column];
-      });
-  }
+  public async abstract query(query: string | object): Promise<object[]>;
+  public async abstract destroy(): Promise<void>;
 }
 
-export default TastyTable;
+export default TastyExecutor;

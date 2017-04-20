@@ -87,9 +87,16 @@ export default class TastySchema
 
   private tree: object;
 
-  constructor()
+  constructor(tree?: object)
   {
-    this.tree = {};
+    if (tree)
+    {
+      this.tree = tree;
+    }
+    else
+    {
+      this.tree = {};
+    }
   }
 
   public toString(pretty: boolean = false): string

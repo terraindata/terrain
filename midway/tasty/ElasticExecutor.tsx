@@ -45,24 +45,28 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as elasticSearch from 'elasticsearch';
+import TastyExecutor from './TastyExecutor';
 import TastySchema from './TastySchema';
 import TastyTable from './TastyTable';
+import { makePromiseCallback } from './Utils';
 
-const defaultElasticConfig =
+export type Config = elasticSearch.ConfigOptions;
+
+export const defaultConfig: Config =
   {
     hosts: ['http://localhost:9200'],
   };
 
-export default class ElasticExecutor
+export class ElasticExecutor implements TastyExecutor
 {
-  private config;
-  private client;
+  private config: Config;
+  private client: elasticSearch.Client;
 
   constructor(config?: any)
   {
     if (config === undefined)
     {
-      config = defaultElasticConfig;
+      config = defaultConfig;
     }
 
     this.config = config;
@@ -77,13 +81,18 @@ export default class ElasticExecutor
     {
       this.client.cluster.health(
           {},
-          this.makePromiseCallback(resolve, reject));
+          makePromiseCallback(resolve, reject));
     });
   }
 
-  public async schema()
+  public async schema(): Promise<TastySchema>
   {
-    const result: any = await this.client.indices.getMapping();
+    const result = await new Promise((resolve, reject) =>
+    {
+      this.client.indices.getMapping(
+        {},
+        makePromiseCallback(resolve, reject));
+    });
     return TastySchema.fromElasticTree(result);
   }
 
@@ -96,7 +105,7 @@ export default class ElasticExecutor
     {
       this.client.search(
           queryObject,
-          this.makePromiseCallback(resolve, reject));
+          makePromiseCallback(resolve, reject));
     });
   }
 
@@ -115,9 +124,9 @@ export default class ElasticExecutor
     return result.hits.hits;
   }
 
-  public destroy()
+  public async destroy()
   {
-    this.client.close();
+    // this.client.close();
   }
 
   public storeProcedure(procedure)
@@ -127,14 +136,14 @@ export default class ElasticExecutor
       {
         this.client.putScript(
           procedure,
-          this.makePromiseCallback(resolve, reject));
+          makePromiseCallback(resolve, reject));
       });
   }
 
   /**
    * Upserts the given objects, based on primary key ('id' in elastic).
    */
-  public async upsertObjects(table: TastyTable, elements)
+  public async upsertObjects(table: TastyTable, elements: object[])
   {
     if (elements.length > 2)
     {
@@ -147,19 +156,19 @@ export default class ElasticExecutor
     for (const element of elements)
     {
       promises.push(
-        new Promise((resolve, reject) =>
-        {
-          const query = {
-            body:  element,
-            id:    this.makeID(table, element),
-            index: table.tastyTableName,
-            type:  table.tastyTableName,
-          };
+          new Promise((resolve, reject) =>
+          {
+            const query = {
+              body: element,
+              id: this.makeID(table, element),
+              index: table.tastyTableName,
+              type: table.tastyTableName,
+            };
 
-          this.client.index(
-            query,
-            this.makePromiseCallback(resolve, reject));
-        }));
+            this.client.index(
+                query,
+                makePromiseCallback(resolve, reject));
+          }));
     }
     await Promise.all(promises);
   }
@@ -167,35 +176,37 @@ export default class ElasticExecutor
   /*
    * Deletes the given objects based on their primary key
    */
-  public async deleteDocumentsByID(table: TastyTable, elements)
+  public async deleteDocumentsByID(table: TastyTable, elements: object[])
   {
     const promises = [];
-
     for (const element of elements)
     {
       promises.push(
-          new Promise((resolve, reject) => {
-            const params = {
+          new Promise((resolve, reject) =>
+          {
+            const params =
+            {
               id: this.makeID(table, element),
-              index: table._tastyTableName,
-              type: table._tastyTableName,
+              index: table.tastyTableName,
+              type: table.tastyTableName,
             };
 
             this.client.delete(
                 params,
-                this.makePromiseCallback(resolve, reject));
+                makePromiseCallback(resolve, reject));
           }));
     }
     await Promise.all(promises);
   }
 
-  private bulkUpsert(table: TastyTable, elements)
+  private async bulkUpsert(table: TastyTable, elements: object[]): Promise<any>
   {
     const body = [];
     for (let i = 0; i < elements.length; ++i)
     {
       const element = elements[i];
-      const command = {
+      const command =
+      {
         index: {
           _id:    this.makeID(table, element),
           _index: table.tastyTableName,
@@ -207,33 +218,20 @@ export default class ElasticExecutor
       body.push(element);
     }
 
-    return new Promise(
-      (resolve, reject) =>
+    return new Promise((resolve, reject) =>
       {
         this.client.bulk(
           {
             body,
           },
-          this.makePromiseCallback(resolve, reject));
+          makePromiseCallback(resolve, reject));
       });
   }
 
-  private makeID(table: TastyTable, element: object)
+  private makeID(table: TastyTable, element: object): string
   {
-    return table.getPrimaryKey(element).join('-');
-  }
-
-  private makePromiseCallback(resolve, reject)
-  {
-    return (error, response) =>
-    {
-      if (error)
-      {
-        reject(error);
-      } else
-      {
-        resolve(response);
-      }
-    };
+    return table.getPrimaryKeys(element).join('-');
   }
 }
+
+export default ElasticExecutor;
