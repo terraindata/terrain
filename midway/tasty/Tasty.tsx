@@ -101,7 +101,7 @@ export class Tasty
    * Generate a query string from the Tasty query object.
    *
    * @param {TastyQuery} query A Tasty query object.
-   * @returns {Promise<string>} A query string for the chosen backend.
+   * @returns {string} A query string for the chosen backend.
    *
    * @memberOf Tasty
    */
@@ -276,16 +276,18 @@ export class Tasty
   /**
    * Delete an object or a list of objects based on their primary keys.
    *
+   * To delete all of the rows in a table, use '*'.
+   *
    * @param {TastyTable} table The table to delete an object from.
-   * @param {(object | object[])} obj  An object or a list of objects to delete.
+   * @param {(object | object[] | string)} obj  An object or a list of objects to delete.
    * @returns {Promise<object[]>}
    *
    * @memberOf TastyInterface
    */
-  public async delete(table: TastyTable, obj: object | object[]): Promise<object[]>
+  public async delete(table: TastyTable, obj: object | object[] | string): Promise<object[]>
   {
     const query = new TastyQuery(table);
-    if (obj === null || obj === undefined || obj === {})
+    if (typeof obj === 'string' && obj === '*')
     {
       query.delete();
     }
@@ -299,7 +301,7 @@ export class Tasty
         });
       return await Promise.all(promises);
     }
-    else
+    else if (typeof obj === 'object')
     {
       const node: TastyNode = this.filterPrimaryKeys(table, obj);
       query.filter(node);
