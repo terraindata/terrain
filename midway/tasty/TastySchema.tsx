@@ -52,11 +52,14 @@ export default class TastySchema
   public static fromElasticTree(elasticTree: object): TastySchema
   {
     const schema: TastySchema = new TastySchema();
-    Object.keys(elasticTree).map((db: string) => {
+    Object.keys(elasticTree).map((db: string) =>
+    {
       schema.tree[db] = {};
-      Object.keys(elasticTree[db]['mappings']).map((mapping: string) => {
+      Object.keys(elasticTree[db]['mappings']).map((mapping: string) =>
+      {
         schema.tree[db][mapping] = {};
-        Object.keys(elasticTree[db]['mappings'][mapping]['properties']).map((field: string) => {
+        Object.keys(elasticTree[db]['mappings'][mapping]['properties']).map((field: string) =>
+        {
           schema.tree[db][mapping][field] =
               elasticTree[db]['mappings'][mapping]['properties'][field];
         });
@@ -68,7 +71,8 @@ export default class TastySchema
   public static fromMySQLResultSet(resultSet: any): TastySchema
   {
     const schema: TastySchema = new TastySchema();
-    resultSet.forEach((row) => {
+    resultSet.forEach((row) =>
+    {
       if (!schema.tree.hasOwnProperty(row.table_schema))
       {
         schema.tree[row.table_schema] = {};
@@ -118,8 +122,10 @@ export default class TastySchema
     else
     {
       const tables: object = {};
-      Object.keys(this.tree).map((db: string) => {
-        Object.keys(this.tree[db]).map((table: string) => {
+      Object.keys(this.tree).map((db: string) =>
+      {
+        Object.keys(this.tree[db]).map((table: string) =>
+        {
           tables[db + '.' + table] = this.tree[db][table];
         });
       });
@@ -138,21 +144,26 @@ export default class TastySchema
       }
       else
       {
-        Object.keys(this.tree[database]).map((t: string) => {
-          Object.keys(this.tree[database][t]).map((field: string) => {
-            fields[t + '.' + field] = this.tree[database][t][field];
+        Object.keys(this.tree[database]).map((tab: string) =>
+        {
+          Object.keys(this.tree[database][tab]).map((field: string) =>
+          {
+            fields[tab + '.' + field] = this.tree[database][tab][field];
           });
         });
       }
     }
     else if (table)
     {
-      Object.keys(this.tree).map((db: string) => {
-        Object.keys(this.tree[db]).map((t: string) => {
-          if (t === table)
+      Object.keys(this.tree).map((db: string) =>
+      {
+        Object.keys(this.tree[db]).map((tab: string) =>
+        {
+          if (tab === table)
           {
-            Object.keys(this.tree[db][t]).map((field: string) => {
-              fields[db + '.' + t + '.' + field] = this.tree[db][t][field];
+            Object.keys(this.tree[db][tab]).map((field: string) =>
+            {
+              fields[db + '.' + tab + '.' + field] = this.tree[db][tab][field];
             });
           }
         });
@@ -160,10 +171,13 @@ export default class TastySchema
     }
     else
     {
-      Object.keys(this.tree).map((db: string) => {
-        Object.keys(this.tree[db]).map((t: string) => {
-            Object.keys(this.tree[db][t]).map((field: string) => {
-              fields[db + '.' + t + '.' + field] = this.tree[db][t][field];
+      Object.keys(this.tree).map((db: string) =>
+      {
+        Object.keys(this.tree[db]).map((tab: string) =>
+        {
+            Object.keys(this.tree[db][tab]).map((field: string) =>
+            {
+              fields[db + '.' + tab + '.' + field] = this.tree[db][tab][field];
             });
         });
       });

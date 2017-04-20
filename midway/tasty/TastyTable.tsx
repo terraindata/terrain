@@ -55,7 +55,7 @@ export class TastyTable
   constructor(name: string, primaryKey: string[], columns: string[], database?: string)
   {
     // primary key is a list, so that composite keys can be supported
-    this.tastyDatabaseName = database || 'tdbdtest';
+    this.tastyDatabaseName = database;
     this.tastyTableName = name;
     this.tastyPrimaryKey = primaryKey;
 
