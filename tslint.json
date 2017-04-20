@@ -12,9 +12,6 @@
       "Copyright \\d{4} Terrain Data, Inc."
     ],
     "one-line": [true,
-      "check-catch",
-      "check-else",
-      "check-finally",
       "check-whitespace"
     ],
     "variable-name": [true,
@@ -25,6 +22,8 @@
     "no-string-literal": false,
     "prefer-for-of": false,
     "object-literal-sort-keys": false,
-    "interface-name": [true, "never-prefix"]
+    "interface-name": [true,
+      "never-prefix"
+    ]
   }
 }
