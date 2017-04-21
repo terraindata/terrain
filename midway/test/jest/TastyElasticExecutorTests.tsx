@@ -46,21 +46,39 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as hash from 'object-hash';
+import * as request from 'supertest';
 import * as winston from 'winston';
 
+import App from '../../App';
 import ElasticExecutor from '../../tasty/ElasticExecutor';
-import Tasty from '../../tasty/Tasty';
+import * as Tasty from '../../tasty/Tasty';
 
 let elasticSearch;
 
 const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
+
+test('GET /midway/v1/schema', (done) =>
+{
+  request(App)
+    .get('/midway/v1/schema')
+    .then((response) =>
+    {
+      // TODO @david check against expected value for schema, not just non-emptiness
+      if (response.text === '')
+      {
+        fail('GET /schema request returned empty response body');
+      }
+    });
+  done();
+});
 
 test('connection establish', async (done) =>
 {
   try
   {
     elasticSearch = new ElasticExecutor();
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }
@@ -73,44 +91,38 @@ test('elastic health', async (done) =>
   {
     const h = await elasticSearch.health();
     winston.info(h);
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }
   done();
 });
 
-// test('write movies', async (done) =>
-// {
-//   try
-//   {
-//     let fileData : any = await
-//       new Promise((resolve, reject) =>
-//       {
-//         fs.readFile('./log.txt', 'utf8',
-//           (error, data) =>
-//           {
-//             if (error)
-//             {
-//               reject(error);
-//             }
-//             else
-//             {
-//               resolve(data);
-//             }
-//           });
-//       });
-//
-//     let elements = JSON.parse(fileData);
-//
-//     await elasticSearch.upsert(DBMovies, elements);
-//
-//   } catch (e)
-//   {
-//     fail(e);
-//   }
-//   done();
-// });
+test('basic query', async (done) =>
+{
+  try
+  {
+    const h = await elasticSearch.fullQuery(
+      {
+        index: 'movies',
+        type:  'data',
+        body:  {
+          query: {},
+        },
+        size:  1,
+      },
+    );
+    // winston.info(JSON.stringify(h, null, 2));
+    // console.log(h.hits.hits.forEach(
+    //     (result) => {console.log(JSON.stringify(result, null, 2));}));
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+  done();
+});
 
 test('store terrain_PWLScore script', async (done) =>
 {
@@ -186,7 +198,8 @@ for(int i = 0; i < factors.length; ++i)
 return total;`,
         },
       });
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }
@@ -413,7 +426,8 @@ test('stored PWL transform sort query', async (done) =>
       },
     ];
     expect(results).toEqual(expected);
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }
@@ -502,7 +516,7 @@ test('stored PWL transform sort query using function_score', async (done) =>
           },
         },
       });
-    // winston.info(JSON.stringify(results, null, 2));
+    winston.info(JSON.stringify(results, null, 2));
     const expected = [
       {
         '_id':     'AVtpT40bECWm4N1o7f05',
@@ -560,7 +574,8 @@ test('stored PWL transform sort query using function_score', async (done) =>
       },
     ];
     expect(results).toEqual(expected);
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }
@@ -572,7 +587,8 @@ test('connection destroy', async (done) =>
   try
   {
     await elasticSearch.destroy();
-  } catch (e)
+  }
+  catch (e)
   {
     fail(e);
   }

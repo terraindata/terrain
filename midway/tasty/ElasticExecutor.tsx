@@ -70,7 +70,8 @@ export class ElasticExecutor implements TastyExecutor
     }
 
     this.config = config;
-    this.client = new elasticSearch.Client(config);
+    // Do not reuse objects to configure the elasticsearch Client class: https://github.com/elasticsearch/elasticsearch-js/issues/33
+    this.client = new elasticSearch.Client(JSON.parse(JSON.stringify(config)));
   }
 
   /**
