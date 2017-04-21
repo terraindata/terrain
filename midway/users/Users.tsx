@@ -48,6 +48,7 @@ import * as bcrypt from 'bcrypt';
 import * as winston from 'winston';
 
 import srs = require('secure-random-string');
+import DB from '../DB';
 import * as Tasty from '../tasty/Tasty';
 import Util from '../Util';
 
@@ -104,12 +105,15 @@ export const Users =
         newUser['accessToken'] = user[0].accessToken;
         newUser['email'] = req.email ? req.email : user[0].email;
         newUser['id'] = req.id;
-        newUser['isDisabled'] = req.isDisabled ? 1 : (user[0].isDisabled ? 1 : 0);
-        newUser['isSuperUser'] = req.isSuperUser ? 1 : (user[0].isSuperUser ? 1 : 0);
-        newUser['name'] = req.name ? req.name : '';
-        newUser['password'] = userExists ? user[0].password : '';
+        newUser['isDisabled'] = req['callingUser'] && req['callingUser'].isSuperUser && req.isDisabled !== undefined
+          ? req.isDisabled : user[0].isDisabled;
+        newUser['isSuperUser'] = req['callingUser'] && req['callingUser'].isSuperUser && req.isSuperUser !== undefined
+          ? req.isSuperUser : user[0].isSuperUser;
+        newUser['name'] = req.name || user[0].name;
+        newUser['password'] = user[0].password;
         newUser['timezone'] = req.timezone ? req.timezone : 'PST'; // or whatever default timezone we want
-      } else // create
+      }
+      else // create
       {
         if (!req.email || !req.password)
         {
@@ -126,13 +130,13 @@ export const Users =
         newUser['isDisabled'] = req.isDisabled ? 1 : 0;
         newUser['isSuperUser'] = req.isSuperUser ? 1 : 0;
         newUser['name'] = req.name ? req.name : '';
+        newUser['timezone'] = req.timezone ? req.timezone : 'PST'; // or whatever default timezone we want
         bcrypt.hash(req.password, saltRounds, async (errHash, hash) =>
         {
           newUser['password'] = hash;
           resolve(Users.upsert(newUser));
           return;
         });
-        newUser['timezone'] = req.timezone ? req.timezone : 'PST'; // or whatever default timezone we want
       }
 
       // update passwords, if necessary
@@ -148,30 +152,35 @@ export const Users =
               resolve(Users.upsert(newUser));
               return;
             });
-          } else
+          }
+          else
           {
             resolve('Invalid password');
             return;
           }
         });
-      } else if (requirePassword && req.password && !req.oldPassword) // email change
+      }
+      else if (requirePassword && req.password && !req.oldPassword) // email change
       {
         bcrypt.compare(req.password, user[0].password, async (err, res) =>
         {
           if (res)
           {
             resolve(Users.upsert(newUser));
-          } else
+          }
+          else
           {
             resolve('Invalid password');
             return;
           }
         });
-      } else if (requirePassword && !req.password) // if password isn't provided
+      }
+      else if (requirePassword && !req.password) // if password isn't provided
       {
         resolve('Password required');
         return;
-      } else
+      }
+      else
       {
         resolve(Users.upsert(newUser)); // anything else
       }
@@ -180,14 +189,23 @@ export const Users =
 
   find: async (id) =>
   {
-    const query = new Tasty.Query(User);
-    query.filter(User['id'].equals(id));
-    const qstr = Tasty.Tasty.generate(Tasty.SQLite, query);
-    const results = await Util.execute(qstr);
-    return results;
+    return await DB.select(User, [], { id, name: 'jeff'});
   },
 
-  findByAccessToken: async (id, accessToken) =>
+  getTemplate: async () =>
+  {
+    const emptyObj: UserConfig =
+    {
+      accessToken: '',
+      email: '',
+      name: '',
+      password: '',
+      timezone: '',
+    };
+    return emptyObj;
+  },
+
+  loginWithAccessToken: async (id, accessToken) =>
   {
     const query = new Tasty.Query(User);
     query.filter(User['id'].equals(id)).filter(User['accessToken'].equals(accessToken));
@@ -198,13 +216,14 @@ export const Users =
       if (results.length > 0)
       {
         resolve(results[0]);
-      } else {
+      }
+      else {
         resolve(null);
       }
     });
   },
 
-  findByEmail: async (email, password) =>
+  loginWithEmail: async (email, password) =>
   {
     const query = new Tasty.Query(User);
     query.filter(User['email'].equals(email));
@@ -216,7 +235,8 @@ export const Users =
       {
         resolve(null);
       });
-    } else
+    }
+    else
     {
       const user = results[0];
       return new Promise(async (resolve, reject) =>
@@ -236,25 +256,13 @@ export const Users =
               const success = await Util.execute(qstr);
             }
             resolve(user);
-          } else {
+          }
+          else {
             resolve(null);
           }
         });
       });
     }
-  },
-
-  getTemplate: async () =>
-  {
-    const emptyObj: UserConfig =
-    {
-      accessToken: '',
-      email: '',
-      name: '',
-      password: '',
-      timezone: '',
-    };
-    return emptyObj;
   },
 
   logout: async (id, accessToken) =>
@@ -290,6 +298,7 @@ export const Users =
 
   upsert: async (newUser) =>
   {
+    return Util.execute
     const query = new Tasty.Query(User);
     query.upsert(newUser);
     const qstr = Tasty.Tasty.generate(Tasty.SQLite, query);

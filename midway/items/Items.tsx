@@ -77,13 +77,15 @@ export const Items =
     {
       req.id = req.itemId;
       delete req.itemId;
-    } else if (!itemExists && req.itemId !== undefined)
+    }
+    else if (!itemExists && req.itemId !== undefined)
     {
       return new Promise(async (resolve, reject) =>
       {
         resolve('Invalid item id passed');
       });
-    } else
+    }
+    else
     {
       delete req.id;
     }
@@ -115,7 +117,8 @@ export const Items =
     if (results instanceof Array)
     {
       return 'Success';
-    } else
+    }
+    else
     {
       return results;
     }

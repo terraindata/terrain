@@ -116,7 +116,7 @@ Middleware.passport.use('access-token-local', new LocalStrategy(
 },
 async (req, id, accessToken, done) =>
 {
-  done(null, await Users.findByAccessToken(id, accessToken), req.body);
+  done(null, await Users.loginWithAccessToken(id, accessToken), req.body);
 }));
 
 // authenticate with email and password
@@ -127,7 +127,7 @@ Middleware.passport.use('local', new LocalStrategy(
 },
 async (req, email, password, done) =>
 {
-  done(null, await Users.findByEmail(email, password));
+  done(null, await Users.loginWithEmail(email, password));
 }));
 
 Middleware.passport.serializeUser((user, done) =>

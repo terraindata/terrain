@@ -70,7 +70,8 @@ AppRouter.get('/', async (ctx, next) =>
   if (ctx.state.user)
   {
     ctx.body = 'authenticated as ' + ctx.state.user.username;
-  } else {
+  }
+  else {
     ctx.body = 'not authenticated';
   }
 });

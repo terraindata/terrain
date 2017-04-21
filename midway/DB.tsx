@@ -44,53 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import * as Tasty from './tasty/Tasty';
 
-import { Users } from '../users/Users';
-
-const Router = new KoaRouter();
-
-Router.get('/', async (ctx, next) =>
+const config: Tasty.SQLiteConfig =
 {
-  ctx.body = '';
-});
+  filename : 'nodeway.db',
+};
 
-Router.post('/', async (ctx, next) =>
-{
-  ctx.body = '';
-});
+let DB = new Tasty.Tasty(Tasty.SQLite, config);
 
-Router.get('/login', passport.authenticate('local'), async (ctx, next) =>
-{
-  ctx.body = ctx.state.user.accessToken;
-  winston.info('User is successfully authenticated as ' + ctx.state.user.email);
-  ctx.redirect('/midway/v1/');
-});
+// export const DB =
+// {
+//   DB,
+// };
 
-Router.post('/api_login', passport.authenticate('local'), async (ctx, next) =>
-{
-  winston.info('User has successfully authenticated as ' + ctx.state.user.email);
-  ctx.body =
-  {
-    accessToken: ctx.state.user.accessToken,
-    username: ctx.state.user.username,
-  };
-});
-
-Router.post('/api_logout', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  let returnStatus: any = await Users.logout(ctx.state.authInfo.id, ctx.state.authInfo.accessToken);
-  // TODO revise this once error handling is implemented in Tasty
-  if (returnStatus instanceof Array)
-  {
-    ctx.body = 'Success';
-    winston.info('User ' + ctx.state.user.email + ' has successfully logged out');
-  }
-  else {
-    ctx.body = returnStatus;
-  }
-});
-
-export default Router;
+export default DB;

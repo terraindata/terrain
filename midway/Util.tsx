@@ -52,9 +52,8 @@ const config: Tasty.SQLiteConfig =
 {
   filename : 'nodeway.db',
 };
-const tasty = new Tasty.Tasty(Tasty.SQLite, config);
 
-const Util =
+export const Util =
 {
   createOrUpdate: async (tastyTable, newObject: object, primaryKey?: string) =>
   {
@@ -77,11 +76,6 @@ const Util =
       obj[key] = val;
     });
     return await tastyTable.replace(obj, id);
-  },
-
-  execute: async (qstr: string) =>
-  {
-    return await tasty.execute(qstr);
   },
 
   getRequest: (url) =>

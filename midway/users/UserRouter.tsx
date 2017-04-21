@@ -70,8 +70,9 @@ Router.post('/:id/update', passport.authenticate('access-token-local'), async (c
   // update user, must be super user or authenticated user updating own info
   winston.info('user update');
   let returnStatus: any = 'Incorrect parameters';
-  let req = ctx.state.authInfo;
+  const req = ctx.state.authInfo;
   req.id = ctx.params.id;
+  req['callingUser'] = ctx.state.user;
   delete req.accessToken;
   // if superuser or id to be updated is current user
   if (ctx.state.user.isSuperUser || ctx.state.authInfo.id === req.id)
@@ -82,7 +83,8 @@ Router.post('/:id/update', passport.authenticate('access-token-local'), async (c
   if (returnStatus instanceof Array)
   {
     ctx.body = 'Success';
-  } else {
+  }
+  else {
     ctx.body = returnStatus;
   }
 });
@@ -90,8 +92,8 @@ Router.post('/:id/update', passport.authenticate('access-token-local'), async (c
 Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   // create a user, must be admin
-  winston.info('create/modify items');
-  let req = ctx.state.authInfo;
+  winston.info('create user');
+  const req = ctx.state.authInfo;
   delete req.id;
   delete req.accessToken;
   let returnStatus: any = 'Incorrect parameters';
@@ -105,7 +107,8 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
   if (returnStatus instanceof Array)
   {
     ctx.body = 'Success';
-  } else {
+  }
+  else {
     ctx.body = returnStatus;
   }
 });
