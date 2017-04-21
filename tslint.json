@@ -1,28 +1,52 @@
 {
-  "lintOptions": {
-    "typeCheck": true
+  "lintOptions" : {
+    "typeCheck" : true
   },
-  "extends": "tslint:recommended",
-  "rules": {
-    "quotemark": [true,
+  "extends" : "tslint:recommended",
+  "rules" : {
+    "quotemark" : [
+      true,
       "single",
       "avoid-escape"
     ],
-    "file-header": [true,
+    "file-header" : [
+      true,
       "Copyright \\d{4} Terrain Data, Inc."
     ],
-    "one-line": [true,
+    "one-line" : [
+      true,
       "check-whitespace"
     ],
-    "variable-name": [true,
+    "variable-name" : [
+      true,
       "check-format",
       "allow-pascal-case",
       "allow-leading-underscore"
     ],
-    "no-string-literal": false,
-    "prefer-for-of": false,
-    "object-literal-sort-keys": false,
-    "interface-name": [true,
+    "indent" : [true, "spaces"],
+    "linebreak-style" : [true, "LF"],
+    "align" : [
+      "parameters",
+      "arguments",
+      "statements"
+    ],
+    "newline-before-return" : true,
+    "new-parens" : true,
+    "return-undefined" : true,
+    "semicolon" : [true, "always"],
+    "no-floating-promises" : true,
+    "no-invalid-template-strings" : true,
+    "no-invalid-this" : true,
+    "no-misused-new" : true,
+    "no-switch-case-fall-through" : true,
+    "switch-default" : true,
+    "restrict-plus-operands" : true,
+    "no-string-literal" : false,
+    "prefer-for-of" : false,
+    "strict-boolean-expressions" : true,
+    "object-literal-sort-keys" : false,
+    "interface-name" : [
+      true,
       "never-prefix"
     ]
   }
