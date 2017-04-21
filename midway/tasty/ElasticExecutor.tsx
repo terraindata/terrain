@@ -168,7 +168,8 @@ export class ElasticExecutor implements TastyExecutor
             this.client.index(
                 query,
                 makePromiseCallback(resolve, reject));
-          }));
+          }),
+      );
     }
     await Promise.all(promises);
   }

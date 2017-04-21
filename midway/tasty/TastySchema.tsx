@@ -44,9 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TastyColumn from './TastyColumn';
-import TastyTable from './TastyTable';
-
 export default class TastySchema
 {
   public static fromElasticTree(elasticTree: object): TastySchema
@@ -74,11 +71,11 @@ export default class TastySchema
     const schema: TastySchema = new TastySchema();
     resultSet.forEach((row) =>
     {
-      if (!schema.tree.hasOwnProperty(row.table_schema))
+      if (schema.tree[row.table_schema] === undefined)
       {
         schema.tree[row.table_schema] = {};
       }
-      if (!schema.tree[row.table_schema].hasOwnProperty(row.table_name))
+      if (schema.tree[row.table_schema][row.table_name] === undefined)
       {
         schema.tree[row.table_schema][row.table_name] = {};
       }
