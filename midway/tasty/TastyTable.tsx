@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import TastyColumn from './TastyColumn';
 
-export default class TastyTable
+export class TastyTable
 {
   public _tastyTableName: string;
   public _tastyPrimaryKey: string[];
@@ -70,17 +70,29 @@ export default class TastyTable
       });
   }
 
+  public get tableName(): string
+  {
+    return this._tastyTableName;
+  }
+
+  public get primaryKeys(): string[]
+  {
+    return this._tastyPrimaryKey;
+  }
+
   public toString(): string
   {
     return JSON.stringify(this, null, 2);
   }
 
-  public getPrimaryKey(object)
+  public getPrimaryKeys(obj: object): string[]
   {
     return this._tastyPrimaryKey.map(
       (column) =>
       {
-        return object[column];
+        return obj[column];
       });
   }
 }
+
+export default TastyTable;

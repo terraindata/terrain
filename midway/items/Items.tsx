@@ -45,12 +45,12 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import SQLiteExecutor from '../tasty/SQLiteExecutor';
-import Tasty from '../tasty/Tasty';
+import * as Tasty from '../tasty/Tasty';
 import Util from '../Util';
 
 // CREATE TABLE items (id integer PRIMARY KEY, meta text NOT NULL, name text NOT NULL, \
 // parentItemId integer NOT NULL, status text NOT NULL, type text NOT NULL);
-let Item = new Tasty.Table('items', ['id'], ['meta', 'name', 'parentItemId', 'status', 'type']);
+const Item = new Tasty.Table('items', ['id'], ['meta', 'name', 'parentItemId', 'status', 'type']);
 
 export interface ItemConfig
 {
@@ -60,7 +60,7 @@ export interface ItemConfig
   parentItemId: number;
   status?: string;
   type?: string;
-};
+}
 
 export const Items =
 {
@@ -69,11 +69,24 @@ export const Items =
     // both regular and superusers can create items
     // only superusers can change existing items that are not BUILD status
     // both regular and superusers can change items thar are not LIVE or DEFAULT status
-    delete req.id;
     delete req.accessToken;
-    let returnStatus = 'Incorrect parameters';
-    let items = await Items.find(req.itemId);
-    let itemExists: boolean = !!items && items.length !== 0;
+    const returnStatus = 'Incorrect parameters';
+    const items = await Items.find(req.itemId);
+    const itemExists: boolean = !!items && items.length !== 0;
+    if (itemExists && req.itemId !== undefined)
+    {
+      req.id = req.itemId;
+      delete req.itemId;
+    } else if (!itemExists && req.itemId !== undefined)
+    {
+      return new Promise(async (resolve, reject) =>
+      {
+        resolve('Invalid item id passed');
+      });
+    } else
+    {
+      delete req.id;
+    }
     if (!user.isSuperUser)
     {
       if (req.status === 'LIVE' || req.status === 'DEFAULT')
@@ -91,14 +104,21 @@ export const Items =
         });
       }
     }
-    if (req.parentItemId !== undefined && req.name !== undefined)
+    if (req.parentItemId === undefined || req.name === undefined)
     {
       return new Promise(async (resolve, reject) =>
         {
           resolve('Insufficient parameters passed');
         });
     }
-    return await Util.createOrUpdate(Items, req);
+    const results = await Util.createOrUpdate(Items, req);
+    if (results instanceof Array)
+    {
+      return 'Success';
+    } else
+    {
+      return results;
+    }
   },
 
   find: async (id) =>
@@ -107,26 +127,24 @@ export const Items =
     {
       return null;
     }
-    let query = new Tasty.Query(Item);
+    const query = new Tasty.Query(Item);
     query.filter(Item['id'].equals(id));
-    let qstr = Tasty.SQLite.generate(query);
-    let sqlite = new SQLiteExecutor();
-    let items = await sqlite.query(qstr);
+    const qstr = Tasty.Tasty.generate(Tasty.SQLite, query);
+    const items = await Util.execute(qstr);
     return items;
   },
 
   getAll: async () =>
   {
-    let query = new Tasty.Query(Item);
-    let qstr = Tasty.SQLite.generate(query);
-    let sqlite = new SQLiteExecutor();
-    let items = await sqlite.query(qstr);
+    const query = new Tasty.Query(Item);
+    const qstr = Tasty.Tasty.generate(Tasty.SQLite, query);
+    const items = await Util.execute(qstr);
     return items;
   },
 
   getTemplate: async () =>
   {
-    let emptyObj: ItemConfig =
+    const emptyObj: ItemConfig =
     {
       meta: '',
       name: '',
@@ -136,18 +154,17 @@ export const Items =
     };
     return emptyObj;
   },
-  
+
   replace: async (item, id?) =>
   {
-    let query = new Tasty.Query(Item);
+    const query = new Tasty.Query(Item);
     if (id)
     {
       item['id'] = id;
     }
     query.upsert(item);
-    let qstr = Tasty.SQLite.generate(query);
-    let sqlite = new SQLiteExecutor();
-    let replaceStatus = await sqlite.query(qstr);
+    const qstr = Tasty.Tasty.generate(Tasty.SQLite, query);
+    const replaceStatus = await Util.execute(qstr);
     return replaceStatus;
   },
 };

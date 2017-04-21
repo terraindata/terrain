@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import TastyNodeTypes from './TastyNodeTypes';
 
-export default class TastyNode
+export class TastyNode
 {
   public static make(value): TastyNode
   {
@@ -77,8 +77,8 @@ export default class TastyNode
     throw new Error('Trying to make a TastyNode from an unsupported value type.');
   }
 
-  private type: string;
-  private value: any;
+  public type: string;
+  public value: any;
   private chidlren: any;
 
   constructor(type: string, value: any)
@@ -176,9 +176,19 @@ export default class TastyNode
     return TastyNodeTypes[this.type];
   }
 
-  private get numChildren(): number
+  public get numChildren(): number
   {
     return Array.isArray(this.value) ? this.value.length : 0;
+  }
+
+  public get lhs()
+  {
+    return this.getChild(0);
+  }
+
+  public get rhs()
+  {
+    return this.getChild(1);
   }
 
   private getChild(index: number)
@@ -190,18 +200,10 @@ export default class TastyNode
     return this.value[index];
   }
 
-  private get lhs()
-  {
-    return this.getChild(0);
-  }
-
-  private get rhs()
-  {
-    return this.getChild(1);
-  }
-
   private buildAsLHS(type: string, rhs): TastyNode
   {
     return new TastyNode(type, [this, TastyNode.make(rhs)]);
   }
 }
+
+export default TastyNode;

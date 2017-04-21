@@ -47,14 +47,14 @@ THE SOFTWARE.
 import * as bcrypt from 'bcrypt';
 import * as winston from 'winston';
 
-import SQLiteExecutor from '../tasty/SQLiteExecutor';
 import srs = require('secure-random-string');
-import Tasty from '../tasty/Tasty';
+import * as Tasty from '../tasty/Tasty';
+import Util from '../Util';
 
 const saltRounds = 10;
 // CREATE TABLE users (id integer PRIMARY KEY, accessToken text NOT NULL, email text NOT NULL, isDisabled bool NOT NULL
 // , isSuperUser bool NOT NULL, name text NOT NULL, password text NOT NULL, timezone string NOT NULL)
-let User = new Tasty.Table('users', ['id'], ['accessToken', 'email', 'isDisabled', 'isSuperUser', 'Meta', 'name',
+const User = new Tasty.Table('users', ['id'], ['accessToken', 'email', 'isDisabled', 'isSuperUser', 'Meta', 'name',
   'password', 'timezone']);
 
 export interface UserConfig
@@ -67,7 +67,7 @@ export interface UserConfig
   name?: string;
   password: string;
   timezone?: string;
-};
+}
 
 export const Users =
 {
@@ -77,7 +77,7 @@ export const Users =
     {
       let requirePassword: boolean = false;
       let user;
-      let newUser: UserConfig =
+      const newUser: UserConfig =
       {
         email: '',
         password: '',
@@ -86,7 +86,7 @@ export const Users =
       if (req.id)
       {
         user = await Users.find(req.id);
-        let userExists: boolean = !!user && user.length !== 0;
+        const userExists: boolean = !!user && user.length !== 0;
         if (!userExists)
         {
           resolve('User with that id not found');
@@ -171,27 +171,28 @@ export const Users =
       {
         resolve('Password required');
         return;
+      } else
+      {
+        resolve(Users.upsert(newUser)); // anything else
       }
     });
   },
 
   find: async (id) =>
   {
-    let query = new Tasty.Query(User);
+    const query = new Tasty.Query(User);
     query.filter(User['id'].equals(id));
-    let qstr = Tasty.SQLite.generate(query);
-    let sqlite = new SQLiteExecutor();
-    let results = await sqlite.query(qstr);
+    const qstr = Tasty.Tasty.generate(Tasty.SQLite, query);
+    const results = await Util.execute(qstr);
     return results;
   },
 
   findByAccessToken: async (id, accessToken) =>
   {
-    let query = new Tasty.Query(User);
+    const query = new Tasty.Query(User);
     query.filter(User['id'].equals(id)).filter(User['accessToken'].equals(accessToken));
-    let qstr = Tasty.SQLite.generate(query);
-    let sqlite = new SQLiteExecutor();
-    let results = await sqlite.query(qstr);
+    const qstr = Tasty.Tasty.generate(Tasty.SQLite, query);
+    const results = await Util.execute(qstr);
     return new Promise(async (resolve, reject) =>
     {
       if (results.length > 0)
@@ -205,47 +206,47 @@ export const Users =
 
   findByEmail: async (email, password) =>
   {
-    let query = new Tasty.Query(User);
+    const query = new Tasty.Query(User);
     query.filter(User['email'].equals(email));
-    let qstr = Tasty.SQLite.generate(query);
-    let sqlite = new SQLiteExecutor();
-    let results = await sqlite.query(qstr);
+    let qstr = Tasty.Tasty.generate(Tasty.SQLite, query);
+    const results = await Util.execute(qstr);
     if (results && results.length === 0)
     {
       return new Promise(async (resolve, reject) =>
       {
         resolve(null);
       });
-    }
-
-    let user = results[0];
-    return new Promise(async (resolve, reject) =>
+    } else
     {
-      bcrypt.compare(password, user.password, async (err, res) =>
+      const user = results[0];
+      return new Promise(async (resolve, reject) =>
       {
-        if (res)
+        bcrypt.compare(password, user['password'], async (err, res) =>
         {
-          if (user.accessToken.length === 0)
+          if (res)
           {
-            user.accessToken = srs(
-              {
-                length: 256,
-              });
-            let updateQuery = new Tasty.Query(User).upsert(user);
-            qstr = Tasty.SQLite.generate(updateQuery);
-            let success = await sqlite.query(qstr);
+            if (user['accessToken'].length === 0)
+            {
+              user['accessToken'] = srs(
+                {
+                  length: 256,
+                });
+              const updateQuery = new Tasty.Query(User).upsert(user);
+              qstr = Tasty.Tasty.generate(Tasty.SQLite, updateQuery);
+              const success = await Util.execute(qstr);
+            }
+            resolve(user);
+          } else {
+            resolve(null);
           }
-          resolve(user);
-        } else {
-          resolve(null);
-        }
+        });
       });
-    });
+    }
   },
 
   getTemplate: async () =>
   {
-    let emptyObj: UserConfig =
+    const emptyObj: UserConfig =
     {
       accessToken: '',
       email: '',
@@ -258,43 +259,41 @@ export const Users =
 
   logout: async (id, accessToken) =>
   {
-    let query = new Tasty.Query(User);
+    const query = new Tasty.Query(User);
     query.filter(User['id'].equals(id)).filter(User['accessToken'].equals(accessToken));
-    let qstr = Tasty.SQLite.generate(query);
-    let sqlite = new SQLiteExecutor();
-    let results = await sqlite.query(qstr);
+    let qstr = Tasty.Tasty.generate(Tasty.SQLite, query);
+    const results = await Util.execute(qstr);
     if (results && results.length === 0)
     {
       return null;
     }
-    let user = results[0];
-    user.accessToken = '';
-    let updateQuery = new Tasty.Query(User).upsert(user);
-    qstr = Tasty.SQLite.generate(updateQuery);
-    let success = await sqlite.query(qstr);
+    const user = results[0];
+    user['accessToken'] = '';
+    const updateQuery = new Tasty.Query(User).upsert(user);
+    qstr = Tasty.Tasty.generate(Tasty.SQLite, updateQuery);
+    const success = await Util.execute(qstr);
     return success;
   },
 
   replace: async (user, id?) =>
   {
-    let query = new Tasty.Query(User);
+    const query = new Tasty.Query(User);
     if (id)
     {
       user['id'] = id;
     }
     query.upsert(user);
-    let qstr = Tasty.SQLite.generate(query);
-    let sqlite = new SQLiteExecutor();
-    let replaceStatus = await sqlite.query(qstr);
-    return replaceStatus;
+    const qstr = Tasty.Tasty.generate(Tasty.SQLite, query);
+    return await Util.execute(qstr);
+
   },
 
   upsert: async (newUser) =>
   {
-    let query = new Tasty.Query(User).upsert(newUser);
-    let qstr = Tasty.SQLite.generate(query);
-    let sqlite = new SQLiteExecutor();
-    let users = await sqlite.query(qstr);
+    const query = new Tasty.Query(User);
+    query.upsert(newUser);
+    const qstr = Tasty.Tasty.generate(Tasty.SQLite, query);
+    const users = await Util.execute(qstr);
     return 'Success';
   },
 };

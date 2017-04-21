@@ -65,13 +65,13 @@ Router.post('/', async (ctx, next) =>
 Router.get('/login', passport.authenticate('local'), async (ctx, next) =>
 {
   ctx.body = ctx.state.user.accessToken;
-  winston.info('User is successfully authenticated as ' + ctx.state.user.username);
+  winston.info('User is successfully authenticated as ' + ctx.state.user.email);
   ctx.redirect('/midway/v1/');
 });
 
 Router.post('/api_login', passport.authenticate('local'), async (ctx, next) =>
 {
-  winston.info('User has successfully authenticated as ' + ctx.state.user.username);
+  winston.info('User has successfully authenticated as ' + ctx.state.user.email);
   ctx.body =
   {
     accessToken: ctx.state.user.accessToken,
@@ -86,7 +86,7 @@ Router.post('/api_logout', passport.authenticate('access-token-local'), async (c
   if (returnStatus instanceof Array)
   {
     ctx.body = 'Success';
-    winston.info('User ' + ctx.state.user.username + ' has successfully logged out');
+    winston.info('User ' + ctx.state.user.email + ' has successfully logged out');
   } else {
     ctx.body = returnStatus;
   }

@@ -43,13 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import MySQLExecutor from '../../tasty/MySQLExecutor';
-import ElasticExecutor from '../../tasty/ElasticExecutor';
-import Tasty from '../../tasty/Tasty';
 import * as mysql from 'mysql';
 import * as hash from 'object-hash';
+import * as winston from 'winston';
+import ElasticExecutor from '../../tasty/ElasticExecutor';
+import MySQLExecutor from '../../tasty/MySQLExecutor';
+import Tasty from '../../tasty/Tasty';
 
-//run this test `./node_modules/.bin/ts-node --harmony ./midway/test/utils/CopyDataFromSqlToElastic.tsx`
+// run this test `./node_modules/.bin/ts-node --harmony ./midway/test/utils/CopyDataFromSqlToElastic.tsx`
 
 const td1MySQLConfig: mysql.IPoolConfig = {
     connectionLimit: 20,
@@ -66,26 +67,26 @@ try {
     mysqlConnection = new MySQLExecutor(td1MySQLConfig);
     elasticSearch = new ElasticExecutor();
 } catch (err) {
-    console.log('Error: ', err.message);
+    winston.info('Error: ', err.message);
     process.exit(1);
 }
 
 // let elements = results as Array<object>;
-// console.log("type of results is " + typeof (results));
+// winston.info("type of results is " + typeof (results));
 // await elasticSearch.upsertObjects(DBMovies, elements);
 //
-// console.log(results);
+// winston.info(results);
 // for (const item of elements) {
-//     console.log("ID" + item["movieid"] + " payload: " + item);
+//     winston.info("ID" + item["movieid"] + " payload: " + item);
 // }
 
 async function syncSqlQuery(qstr: string, mysql: MySQLExecutor) {
     try {
-        let results = await mysql.query(qstr);
-        let elements = results as Array<object>;
+        const results = await mysql.query(qstr);
+        const elements = results as object[];
         return elements;
     } catch (err) {
-        console.log('Error: ', err.message);
+        winston.info('Error: ', err.message);
         process.exit(1);
     }
 }
@@ -93,9 +94,9 @@ async function syncSqlQuery(qstr: string, mysql: MySQLExecutor) {
 async function syncCheckElasticHealth(elastic: ElasticExecutor) {
     try {
         const h = await elastic.health();
-        console.log("Health state: " + h);
+        winston.info('Health state: ' + h);
     } catch (e) {
-        console.log('Error: ', e.message);
+        winston.info('Error: ', e.message);
         process.exit(1);
     }
 }
@@ -103,30 +104,28 @@ async function syncCheckElasticHealth(elastic: ElasticExecutor) {
 async function readTable(table, mysql: MySQLExecutor) {
     const query = new Tasty.Query(table);
     try {
-        let sqlStr = Tasty.MySQL.generate(query);
-        console.log(sqlStr);
+        const sqlStr = Tasty.MySQL.generate(query);
+        winston.info(sqlStr);
         const elements = await syncSqlQuery(sqlStr, mysql);
-        console.log("read " + (elements as Array<object>).length + " elements");
+        winston.info('read ' + (elements as object[]).length + ' elements');
         return elements;
     } catch (e) {
-        console.log('Error: ', e.message);
+        winston.info('Error: ', e.message);
         process.exit(1);
     }
 }
-
 
 async function copyTable(table, mysql: MySQLExecutor, elastic: ElasticExecutor)
 {
     try {
         const elements = await readTable(table, mysql);
-        console.log("Copy " + (elements as Array<object>).length + " elements");
+        winston.info('Copy ' + (elements as object[]).length + ' elements');
         elastic.upsertObjects(table, elements);
     } catch (e) {
-        console.log('Error: ', e.message);
+        winston.info('Error: ', e.message);
         process.exit(1);
     }
 }
-
 
 syncCheckElasticHealth(elasticSearch);
 const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
@@ -134,7 +133,5 @@ const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']
     await copyTable(DBMovies, mysqlConnection, elasticSearch);
     const elements = await readTable(DBMovies, mysqlConnection);
     await elasticSearch.deleteDocumentsByID(DBMovies, elements);
-    console.log("Copied the table movies.");
+    winston.info('Copied the table movies.');
 })();
-
-

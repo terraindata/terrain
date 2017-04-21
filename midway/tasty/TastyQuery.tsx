@@ -49,19 +49,19 @@ import TastyNode from './TastyNode';
 import TastyNodeTypes from './TastyNodeTypes';
 import TastyTable from './TastyTable';
 
-export default class TastyQuery
+export class TastyQuery
 {
   public table: TastyTable;
   public command: TastyNode;
-  public aliases: any[];
-  public filters: any[];
-  public sorts: any[];
+  public aliases: Array<{name: string, node: TastyNode}>;
+  public filters: TastyNode[];
+  public sorts: Array<{node: TastyNode, order: string}>;
   public selected: TastyColumn[];
-  public upserts: any[];
+  public upserts: object[];
   public numTaken: number;
   public numSkipped: number;
 
-  constructor(table)
+  constructor(table: TastyTable)
   {
     this.table = table;
     this.aliases = [];
@@ -86,10 +86,10 @@ export default class TastyQuery
     return this;
   }
 
-  public upsert(object): TastyQuery
+  public upsert(obj: object): TastyQuery
   {
     this.command = new TastyNode('upsert', null);
-    this.upserts.push(object);
+    this.upserts.push(obj);
     return this;
   }
 
@@ -99,13 +99,13 @@ export default class TastyQuery
     return this;
   }
 
-  public filter(node): TastyQuery
+  public filter(node: TastyNode): TastyQuery
   {
     this.filters.push(node);
     return this;
   }
 
-  public sort(node, order): TastyQuery
+  public sort(node: TastyNode, order: string): TastyQuery
   {
     if (order === 'ascending')
     {
@@ -124,7 +124,7 @@ export default class TastyQuery
     return this;
   }
 
-  public as(name, node): TastyQuery
+  public as(name: string, node: TastyNode): TastyQuery
   {
     this.aliases.push({name, node});
     return this;
@@ -162,3 +162,5 @@ export default class TastyQuery
     }
   }
 }
+
+export default TastyQuery;
