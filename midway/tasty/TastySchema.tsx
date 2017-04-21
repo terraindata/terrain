@@ -58,11 +58,12 @@ export default class TastySchema
       Object.keys(elasticTree[db]['mappings']).map((mapping: string) =>
       {
         schema.tree[db][mapping] = {};
-        Object.keys(elasticTree[db]['mappings'][mapping]['properties']).map((field: string) =>
-        {
-          schema.tree[db][mapping][field] =
-              elasticTree[db]['mappings'][mapping]['properties'][field];
-        });
+        Object.keys(elasticTree[db]['mappings'][mapping]['properties']).map(
+          (field: string) =>
+          {
+            schema.tree[db][mapping][field] =
+                elasticTree[db]['mappings'][mapping]['properties'][field];
+          });
       });
     });
     return schema;

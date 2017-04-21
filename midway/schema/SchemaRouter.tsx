@@ -52,12 +52,9 @@ import * as winston from 'winston';
 //      (depending on current Tasty config? e.g. Tasty.Executor?)
 
 import ElasticExecutor from '../tasty/ElasticExecutor';
-import MySQLExecutor from '../tasty/MySQLExecutor';
-import SQLiteExecutor from '../tasty/SQLiteExecutor';
 
- const Executor = new ElasticExecutor();
-// const Executor = new MySQLExecutor();
-// const Executor = new SQLiteExecutor({ filename: '/home/david/Downloads/Chinook_Sqlite.sqlite' });
+const Executor = new ElasticExecutor();
+
 const Router = new KoaRouter();
 
 // TODO @jason / @david add passport.authenticate('access-token-local') below

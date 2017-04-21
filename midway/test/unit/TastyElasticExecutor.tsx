@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as hash from 'object-hash';
+import * as request from 'supertest';
 import * as test from 'tape-async';
 import * as winston from 'winston';
-import * as request from 'supertest';
 
 import App from '../../App';
 import ElasticExecutor from '../../tasty/ElasticExecutor';
