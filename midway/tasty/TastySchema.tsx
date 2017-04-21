@@ -44,142 +44,79 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export default class TastySchema
-{
-  public static fromElasticTree(elasticTree: object): TastySchema
-  {
-    const schema: TastySchema = new TastySchema();
-    Object.keys(elasticTree).map((db: string) =>
-    {
-      schema.tree[db] = {};
-      Object.keys(elasticTree[db]['mappings']).map((mapping: string) =>
-      {
-        schema.tree[db][mapping] = {};
-        Object.keys(elasticTree[db]['mappings'][mapping]['properties']).map(
-          (field: string) =>
-          {
-            schema.tree[db][mapping][field] =
-                elasticTree[db]['mappings'][mapping]['properties'][field];
-          });
-      });
-    });
-    return schema;
-  }
-
-  public static fromMySQLResultSet(resultSet: any): TastySchema
-  {
-    const schema: TastySchema = new TastySchema();
-    resultSet.forEach((row) =>
-    {
-      if (schema.tree[row.table_schema] === undefined)
-      {
-        schema.tree[row.table_schema] = {};
-      }
-      if (schema.tree[row.table_schema][row.table_name] === undefined)
-      {
-        schema.tree[row.table_schema][row.table_name] = {};
-      }
-      schema.tree[row.table_schema][row.table_name][row.column_name] =
-        {
-          type: row.data_type,
-        };
-    });
-    return schema;
-  }
-
-  private tree: object;
-
-  constructor(tree?: object)
-  {
-    if (tree)
-    {
-      this.tree = tree;
-    }
-    else
-    {
-      this.tree = {};
-    }
-  }
-
-  public toString(pretty: boolean = false): string
-  {
-    return JSON.stringify(this.tree, null, pretty ? 2 : 0);
-  }
-
-  public databases(): object
-  {
-    return this.tree;
-  }
-
-  public tables(database?: string): object
-  {
-    if (database)
-    {
-      return this.tree[database];
-    }
-    else
-    {
-      const tables: object = {};
-      Object.keys(this.tree).map((db: string) =>
-      {
-        Object.keys(this.tree[db]).map((table: string) =>
-        {
-          tables[db + '.' + table] = this.tree[db][table];
-        });
-      });
-      return tables;
-    }
-  }
-
-  public fields(database?: string, table?: string): object
-  {
-    let fields: object = {};
-    if (database)
-    {
-      if (table)
-      {
-        fields = this.tree[database][table];
-      }
-      else
-      {
-        Object.keys(this.tree[database]).map((tab: string) =>
-        {
-          Object.keys(this.tree[database][tab]).map((field: string) =>
-          {
-            fields[tab + '.' + field] = this.tree[database][tab][field];
-          });
-        });
-      }
-    }
-    else if (table)
-    {
-      Object.keys(this.tree).map((db: string) =>
-      {
-        Object.keys(this.tree[db]).map((tab: string) =>
-        {
-          if (tab === table)
-          {
-            Object.keys(this.tree[db][tab]).map((field: string) =>
-            {
-              fields[db + '.' + tab + '.' + field] = this.tree[db][tab][field];
-            });
-          }
-        });
-      });
-    }
-    else
-    {
-      Object.keys(this.tree).map((db: string) =>
-      {
-        Object.keys(this.tree[db]).map((tab: string) =>
-        {
-            Object.keys(this.tree[db][tab]).map((field: string) =>
-            {
-              fields[db + '.' + tab + '.' + field] = this.tree[db][tab][field];
+export default class TastySchema {
+    public static fromElasticTree(elasticTree: object): TastySchema {
+        const schema: TastySchema = new TastySchema();
+        Object.keys(elasticTree).map((db: string) => {
+            schema.tree[db] = {};
+            Object.keys(elasticTree[db]['mappings']).map((mapping: string) => {
+                schema.tree[db][mapping] = {};
+                Object.keys(elasticTree[db]['mappings'][mapping]['properties']).map(
+                    (field: string) => {
+                        schema.tree[db][mapping][field] =
+                            elasticTree[db]['mappings'][mapping]['properties'][field];
+                    });
             });
         });
-      });
+        return schema;
     }
-    return fields;
-  }
+
+    public static fromMySQLResultSet(resultSet: any): TastySchema {
+        const schema: TastySchema = new TastySchema();
+        resultSet.forEach((row) => {
+            if (schema.tree[row.table_schema] === undefined) {
+                schema.tree[row.table_schema] = {};
+            }
+            if (schema.tree[row.table_schema][row.table_name] === undefined) {
+                schema.tree[row.table_schema][row.table_name] = {};
+            }
+            schema.tree[row.table_schema][row.table_name][row.column_name] =
+                {
+                    type: row.data_type,
+                };
+        });
+        return schema;
+    }
+
+    private tree: object;
+
+    constructor(tree?: object) {
+        if (tree) {
+            this.tree = tree;
+        }
+        else {
+            this.tree = {};
+        }
+    }
+
+    public toString(pretty: boolean = false): string {
+        return JSON.stringify(this.tree, null, pretty ? 2 : 0);
+    }
+
+    public databases(): object {
+        return this.tree;
+    }
+
+    public databaseNames(): string[] {
+        return Object.keys(this.tree);
+    }
+
+    public tables(database: string): object {
+        return this.tree[database];
+    }
+
+    public tableNames(database: string): string[]
+    {
+        return Object.keys(this.tree[database]);
+    }
+
+    public fields(database: string, table: string): object
+    {
+        return this.tree[database][table];
+    }
+
+    public fieldNames(database: string, table: string): string[]
+    {
+        return Object.keys(this.tree[database][table]);
+    }
 }
