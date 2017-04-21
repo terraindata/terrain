@@ -127,7 +127,7 @@ Middleware.passport.use('local', new LocalStrategy(
 },
 async (req, email, password, done) =>
 {
-  done(null, await Users.findByUsername(email, password));
+  done(null, await Users.findByEmail(email, password));
 }));
 
 Middleware.passport.serializeUser((user, done) =>

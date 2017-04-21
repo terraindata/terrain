@@ -73,24 +73,34 @@ export const Items =
     delete req.accessToken;
     let returnStatus = 'Incorrect parameters';
     let items = await Items.find(req.itemId);
-    let itemExists: boolean = (items && items.length !== 0) ? true : false;
-    if (user.isSuperUser && req.status)
+    let itemExists: boolean = !!items && items.length !== 0;
+    if (!user.isSuperUser)
     {
-      delete req.status;
-    }
-    if ((!itemExists || user.isSuperUser)
-      || (!user.isSuperUser && itemExists
-        && !(items[0].status === 'LIVE' || items[0].status === 'DEFAULT')
-        && req.status && !(req.status === 'LIVE' || req.status === 'DEFAULT')))
-    {
-      // define which other parameters need to be present for create/update
-      if (req.parentItemId !== undefined && req.name !== undefined)
+      if (req.status === 'LIVE' || req.status === 'DEFAULT')
       {
-        returnStatus = await Util.createOrUpdate(Items, req);
+        return new Promise(async (resolve, reject) =>
+        {
+          resolve('Unauthorized');
+        });
+      }
+      if (itemExists && (items[0].status === 'LIVE' || items[0].status === 'DEFAULT'))
+      {
+        return new Promise(async (resolve, reject) =>
+        {
+          resolve('Unauthorized');
+        });
       }
     }
-    return returnStatus;
+    if (req.parentItemId !== undefined && req.name !== undefined)
+    {
+      return new Promise(async (resolve, reject) =>
+        {
+          resolve('Insufficient parameters passed');
+        });
+    }
+    return await Util.createOrUpdate(Items, req);
   },
+
   find: async (id) =>
   {
     if (!id)
@@ -104,6 +114,7 @@ export const Items =
     let items = await sqlite.query(qstr);
     return items;
   },
+
   getAll: async () =>
   {
     let query = new Tasty.Query(Item);
@@ -112,6 +123,7 @@ export const Items =
     let items = await sqlite.query(qstr);
     return items;
   },
+
   getTemplate: async () =>
   {
     let emptyObj: ItemConfig =
@@ -124,6 +136,7 @@ export const Items =
     };
     return emptyObj;
   },
+  
   replace: async (item, id?) =>
   {
     let query = new Tasty.Query(Item);

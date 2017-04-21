@@ -42,8 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// https://github.com/ortoo/oauth2orize/blob/master/examples/express2/db/users.js
-// TODO THIS IS A STUB. REPLACE WITH ORM
+// Copyright 2017 Terrain Data, Inc.
 
 import * as bcrypt from 'bcrypt';
 import * as winston from 'winston';
@@ -74,50 +73,108 @@ export const Users =
 {
   createOrUpdate: async (req) =>
   {
-    if (!req.password)
-    {
-      return new Promise(async (resolve, reject) =>
-        {
-          resolve(null);
-        });
-    }
     return new Promise(async (resolve, reject) =>
     {
-      bcrypt.hash(req.password, saltRounds, async (err, hash) =>
+      let requirePassword: boolean = false;
+      let user;
+      let newUser: UserConfig =
       {
-        let storedAccessToken = '';
-        if (req.id)
+        email: '',
+        password: '',
+      };
+      // update
+      if (req.id)
+      {
+        user = await Users.find(req.id);
+        let userExists: boolean = !!user && user.length !== 0;
+        if (!userExists)
         {
-          let user = await Users.find(req.id);
-          if (user && user.length !== 0)
+          resolve('User with that id not found');
+          return;
+        }
+        if (req.email !== user[0].email || req.password)
+        {
+          requirePassword = true;
+          if (!req.password)
           {
-            storedAccessToken = user[0].accessToken;
+            resolve('Must provide password if updating email');
+            return;
           }
         }
-        let newUser: UserConfig =
+        newUser['accessToken'] = user[0].accessToken;
+        newUser['email'] = req.email ? req.email : user[0].email;
+        newUser['id'] = req.id;
+        newUser['isDisabled'] = req.isDisabled ? 1 : (user[0].isDisabled ? 1 : 0);
+        newUser['isSuperUser'] = req.isSuperUser ? 1 : (user[0].isSuperUser ? 1 : 0);
+        newUser['name'] = req.name ? req.name : '';
+        newUser['password'] = userExists ? user[0].password : '';
+        newUser['timezone'] = req.timezone ? req.timezone : 'PST'; // or whatever default timezone we want
+      } else // create
+      {
+        if (!req.email || !req.password)
         {
-          accessToken: storedAccessToken,
-          email: req.email,
-          id : req.id ? req.id : -1,
-          isDisabled: req.isDisabled ? 1 : 0,
-          isSuperUser: req.isSuperUser ? 1 : 0,
-          name: req.name ? req.name : '',
-          password: hash,
-          timezone: req.timezone ? req.timezone : 'PST', // or whatever default timezone we want
-        };
-        if (!req.id)
-        {
-          delete newUser.id;
+          resolve('Require both email and password for user creation');
+          return;
         }
-        let query = new Tasty.Query(User).upsert(
-          newUser);
-        let qstr = Tasty.SQLite.generate(query);
-        let sqlite = new SQLiteExecutor();
-        let users = await sqlite.query(qstr);
-        resolve(users);
-      });
+        if (req.oldPassword)
+        {
+          resolve('No existing password for non-existent user');
+          return;
+        }
+        newUser['accessToken'] = '';
+        newUser['email'] = req.email;
+        newUser['isDisabled'] = req.isDisabled ? 1 : 0;
+        newUser['isSuperUser'] = req.isSuperUser ? 1 : 0;
+        newUser['name'] = req.name ? req.name : '';
+        bcrypt.hash(req.password, saltRounds, async (errHash, hash) =>
+        {
+          newUser['password'] = hash;
+          resolve(Users.upsert(newUser));
+          return;
+        });
+        newUser['timezone'] = req.timezone ? req.timezone : 'PST'; // or whatever default timezone we want
+      }
+
+      // update passwords, if necessary
+      if (requirePassword && req.password && req.oldPassword)
+      {
+        bcrypt.compare(req.oldPassword, user[0].password, async (err, res) =>
+        {
+          if (res)
+          {
+            bcrypt.hash(req.password, saltRounds, async (errHash, hash) =>
+            {
+              newUser.password = hash;
+              resolve(Users.upsert(newUser));
+              return;
+            });
+          } else
+          {
+            resolve('Invalid password');
+            return;
+          }
+        });
+      } else if (requirePassword && req.password && !req.oldPassword) // email change
+      {
+        bcrypt.compare(req.password, user[0].password, async (err, res) =>
+        {
+          if (res)
+          {
+            resolve(Users.upsert(newUser));
+          } else
+          {
+            resolve('Invalid password');
+            return;
+          }
+        });
+      } else if (requirePassword && !req.password) // if password isn't provided
+      {
+        resolve('Password required');
+        return;
+      }
     });
   },
+
   find: async (id) =>
   {
     let query = new Tasty.Query(User);
@@ -127,6 +184,7 @@ export const Users =
     let results = await sqlite.query(qstr);
     return results;
   },
+
   findByAccessToken: async (id, accessToken) =>
   {
     let query = new Tasty.Query(User);
@@ -144,7 +202,8 @@ export const Users =
       }
     });
   },
-  findByUsername: async (email, password) =>
+
+  findByEmail: async (email, password) =>
   {
     let query = new Tasty.Query(User);
     query.filter(User['email'].equals(email));
@@ -183,6 +242,7 @@ export const Users =
       });
     });
   },
+
   getTemplate: async () =>
   {
     let emptyObj: UserConfig =
@@ -195,6 +255,7 @@ export const Users =
     };
     return emptyObj;
   },
+
   logout: async (id, accessToken) =>
   {
     let query = new Tasty.Query(User);
@@ -204,12 +265,8 @@ export const Users =
     let results = await sqlite.query(qstr);
     if (results && results.length === 0)
     {
-      return new Promise(async (resolve, reject) =>
-      {
-        resolve(null);
-      });
+      return null;
     }
-
     let user = results[0];
     user.accessToken = '';
     let updateQuery = new Tasty.Query(User).upsert(user);
@@ -217,6 +274,7 @@ export const Users =
     let success = await sqlite.query(qstr);
     return success;
   },
+
   replace: async (user, id?) =>
   {
     let query = new Tasty.Query(User);
@@ -229,6 +287,15 @@ export const Users =
     let sqlite = new SQLiteExecutor();
     let replaceStatus = await sqlite.query(qstr);
     return replaceStatus;
+  },
+
+  upsert: async (newUser) =>
+  {
+    let query = new Tasty.Query(User).upsert(newUser);
+    let qstr = Tasty.SQLite.generate(query);
+    let sqlite = new SQLiteExecutor();
+    let users = await sqlite.query(qstr);
+    return 'Success';
   },
 };
 

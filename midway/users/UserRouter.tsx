@@ -78,6 +78,7 @@ Router.post('/:id/update', passport.authenticate('access-token-local'), async (c
   {
     returnStatus = await Users.createOrUpdate(req);
   }
+  // TODO revise this once error handling is implemented in Tasty
   if (returnStatus instanceof Array)
   {
     ctx.body = 'Success';
@@ -100,6 +101,7 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
     // define which other parameters need to be present for create/update
     returnStatus = await Users.createOrUpdate(req);
   }
+  // TODO revise this once error handling is implemented in Tasty
   if (returnStatus instanceof Array)
   {
     ctx.body = 'Success';

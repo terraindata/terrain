@@ -81,11 +81,12 @@ Router.post('/api_login', passport.authenticate('local'), async (ctx, next) =>
 
 Router.post('/api_logout', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('User ' + ctx.state.user.username + ' has successfully logged out');
   let returnStatus: any = await Users.logout(ctx.state.authInfo.id, ctx.state.authInfo.accessToken);
+  // TODO revise this once error handling is implemented in Tasty
   if (returnStatus instanceof Array)
   {
     ctx.body = 'Success';
+    winston.info('User ' + ctx.state.user.username + ' has successfully logged out');
   } else {
     ctx.body = returnStatus;
   }

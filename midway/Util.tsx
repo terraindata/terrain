@@ -72,6 +72,7 @@ const Util =
     });
     return await tastyTable.replace(obj, id);
   },
+  
   getRequest: (url) =>
   {
     return new Promise((resolve, reject) =>
