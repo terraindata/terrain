@@ -1790,9 +1790,9 @@ export module BuilderTypes
     return 'No preview';
   }  
   
-  export function getChildIds(_block:IBlock):Map<ID, boolean>
+  export function getChildIds(_block:IBlock):IMMap<ID, boolean>
   {
-    var map: Map<ID, boolean> = Map({});
+    var map = Map<ID, boolean>({});
     
     if(Immutable.Iterable.isIterable(_block))
     {

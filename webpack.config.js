@@ -47,27 +47,37 @@ var webpack = require('webpack');
 var path = require('path');
 var CircularDependencyPlugin = require('circular-dependency-plugin');
 
-module.exports = {
+module.exports = 
+{
     entry: "./src/app/App.tsx",
     devtool: 'eval',
-    output: {
+    
+    output: 
+    {
         path: __dirname,
         filename: "bundle.js"
     },
-    resolve: {
+    
+    resolve: 
+    {
         // it is important that .tsx is before .less, so that it resolves first, so that files that share a name resolve correctly
         extensions: [ '', '.js', '.tsx', '.jsx', '.ts', '.css', '.less', '.json', '.svg' ],
     },
-    module: {
-        loaders: [
+    
+    module: 
+    {
+        loaders: 
+        [
             // note: this first loader string gets updated in webpack.config.prod.js
             //  keep it first in this list
-            // { test: /\/[a-zA-Z]*$/, loader: 
-            //   'babel?presets[]=react&presets[]=latest!ts-loader' },
-            { test: /\.tsx?$/, loader: 
-              'babel?presets[]=react&presets[]=latest!ts-loader' },
-            { test: /\.css$/, loader: "style!css" },
-            { test: /\.less$/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
+            { 
+                test: /\.tsx$/, 
+                exclude: /midway/,
+                loader: 
+                    'babel?presets[]=react&presets[]=latest!ts-loader' 
+            },
+            { test: /\.css$/, exclude: /midway/, loader: "style!css" },
+            { test: /\.less$/, exclude: /midway/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
             { test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel?presets[]=react&presets[]=latest' },
             { test: /\.woff(2)?$/,   loader: "url?limit=10000&mimetype=application/font-woff" },
             { test: /\.ttf$/, loader: "file" },
@@ -76,16 +86,18 @@ module.exports = {
             { test: /\.gif$/, loader: "url?limit=4000000" },
             { test: /\.png$/, loader: "url?limit=4000000" },
             { test: require.resolve('jquery'), loader: "expose?jQuery" },
-            { test: /\.json$/, loader: 'json' },
+            { test: /\.json$/, exclude: /midway/, loader: 'json' },
             { 
 		      test: /\.svg(\?name=[a-zA-Z]*)*$/, loader: 'babel?presets[]=react&presets[]=latest!svg-react' + 
 		              // removes data-name attributes
 		              '!string-replace?search=%20data-name%3D%22%5B%5Cw%5Cs_-%5D*%22&replace=&flags=ig'
 	        },
-            { test: /\.txt$/, loader: 'raw-loader' }, 
+            { test: /\.txt$/, exclude: /midway/, loader: 'raw-loader' }, 
         ]
     },
-    plugins: [
+    
+    plugins: 
+    [
         new webpack.DefinePlugin({
         'MIDWAY_HOST': "'//" + process.env.MIDWAY_HOST + ":40080'",
         'TDB_HOST': "'//" + process.env.TDB_HOST + ":7344'",
@@ -99,8 +111,11 @@ module.exports = {
         //   failOnError: true
         // })
     ],
-    historyApiFallback: {
-      rewrites: [
+    
+    historyApiFallback: 
+    {
+      rewrites: 
+      [
         // shows favicon
         { from: /favicon.ico/, to: 'favicon.ico' },
       ],

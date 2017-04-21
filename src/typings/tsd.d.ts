@@ -62,9 +62,9 @@ interface Action<T> {
 }
 
 declare type List<T> = Immutable.List<T>;
-declare type Map<K, T> = Immutable.Map<K, T>;
+declare type IMMap<K, T> = Immutable.Map<K, T>;
 declare type KeyPath = List<string | number>;
-declare type Set<T> = (f: string, v: any) => T & IRecord<T>;
+declare type IMSet<T> = (f: string, v: any) => T & IRecord<T>;
 declare type SetIn<T> = (f: (string | number)[] | KeyPath, v: any) => T & IRecord<T>;
 declare type Get = (f: string | number) => any;
 declare type GetIn = (f: (string | number)[] | KeyPath) => any;
@@ -92,7 +92,7 @@ declare interface IMap<T>
   removeIn: DeleteIn<T>;
   update: Update<T>;
   updateIn: UpdateIn<T>;
-  toMap: () => Map<string, any>;
+  toMap: () => Immutable.Map<string, any>;
   keys: () => Immutable.Iterator<any>;
   toJS: () => Object;
 }

@@ -40,6 +40,7 @@
   "private": true,
   "dependencies": {
     "@types/deep-equal": "^1.0.0",
+    "@types/passport-local": "^1.0.30",
     "babel-cli": "^6.24.0",
     "babel-core": "^6.7.7",
     "babel-loader": "^6.2.4",
@@ -159,6 +160,7 @@
     "@types/react": "^15.0.21",
     "@types/react-day-picker": "^5.2.1",
     "@types/react-dnd": "^2.0.32",
+    "@types/react-dom": "^15.5.0",
     "@types/react-modal": "^1.6.6",
     "@types/react-router": "^4.0.3",
     "@types/redux-actions": "^1.2.3",
