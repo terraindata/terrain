@@ -47,10 +47,12 @@ THE SOFTWARE.
 import TastyNode from './TastyNode';
 import TastyTable from './TastyTable';
 
-export default class TastyColumn extends TastyNode
+export class TastyColumn extends TastyNode
 {
   constructor(table: TastyTable, name: any)
   {
-    super('.', [new TastyNode('reference', table._tastyTableName), new TastyNode('reference', name)]);
+    super('.', [new TastyNode('reference', table.tastyTableName), new TastyNode('reference', name)]);
   }
 }
+
+export default TastyColumn;

@@ -46,15 +46,34 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as hash from 'object-hash';
+import * as request from 'supertest';
 import * as test from 'tape-async';
 import * as winston from 'winston';
 
+import App from '../../App';
 import ElasticExecutor from '../../tasty/ElasticExecutor';
-import Tasty from '../../tasty/Tasty';
+import * as Tasty from '../../tasty/Tasty';
 
 let elasticSearch;
 
 const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
+
+test('GET /midway/v1/schema', (t) =>
+{
+  request(App)
+      .get('/midway/v1/schema')
+      .then((response) => {
+        // TODO @david check against expected value for schema, not just non-emptiness
+        if (response.text !== '')
+        {
+          t.pass();
+        } else
+        {
+          t.skip('GET /schema request returned empty response body');
+        }
+      });
+  t.end();
+});
 
 test('connection establish', async (t) =>
 {
@@ -62,7 +81,8 @@ test('connection establish', async (t) =>
   {
     elasticSearch = new ElasticExecutor();
     t.pass();
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }
@@ -76,44 +96,51 @@ test('elastic health', async (t) =>
     const h = await elasticSearch.health();
     winston.info(h);
     t.pass();
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }
   t.end();
 });
 
-// test('write movies', async (t) =>
-// {
-//   try
-//   {
-//     let fileData : any = await
-//       new Promise((resolve, reject) =>
-//       {
-//         fs.readFile('./log.txt', 'utf8',
-//           (error, data) =>
-//           {
-//             if (error)
-//             {
-//               reject(error);
-//             }
-//             else
-//             {
-//               resolve(data);
-//             }
-//           });
-//       });
-//
-//     let elements = JSON.parse(fileData);
-//
-//     await elasticSearch.upsert(DBMovies, elements);
-//
-//   } catch (e)
-//   {
-//     t.skip(e);
-//   }
-//   t.end();
-// });
+test('basic query', async (t) =>
+{
+  try
+  {
+    const h = await elasticSearch.fullQuery(
+      {
+        index: 'movies',
+        query: {
+          aggregations: {
+            count_by_type: {
+              terms: {
+                field: '_type',
+                size:  1000,
+              },
+            },
+            fields:        {
+              terms: {
+                field: '_field_names',
+                size:  1000,
+              },
+            },
+          },
+        },
+        size:  0,
+      },
+    );
+    winston.info(JSON.stringify(h, null, 2));
+    t.pass();
+    // console.log(h.hits.hits.forEach(
+    //     (result) => {console.log(JSON.stringify(result, null, 2));}));
+  }
+  catch (e)
+  {
+    t.skip(e);
+  }
+  t.end();
+});
 
 test('store terrain_PWLScore script', async (t) =>
 {
@@ -189,7 +216,8 @@ for(int i = 0; i < factors.length; ++i)
 return total;`,
         },
       });
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }
@@ -426,7 +454,8 @@ test('stored PWL transform sort query', async (t) =>
       },
     ];
     t.deepEqual(results, expected);
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }
@@ -573,7 +602,8 @@ test('stored PWL transform sort query using function_score', async (t) =>
       },
     ];
     t.deepEqual(results, expected);
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }
@@ -586,7 +616,8 @@ test('connection destroy', async (t) =>
   {
     await elasticSearch.destroy();
     t.pass();
-  } catch (e)
+  }
+  catch (e)
   {
     t.skip(e);
   }

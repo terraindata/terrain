@@ -44,76 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as sqlite3 from 'sqlite3';
-import * as winston from 'winston';
-import TastyExecutor from './TastyExecutor';
-import TastySchema from './TastySchema';
-import { makePromiseCallback, makePromiseCallback0 } from './Utils';
-
-export interface ISQLiteConfig
+abstract class TastyExecutor
 {
-  filename: string;
+  public async abstract query(query: string | object): Promise<object[]>;
+  public async abstract destroy(): Promise<void>;
 }
 
-export type Config = ISQLiteConfig;
-
-export const defaultConfig: Config =
-{
-  filename: 'nodeway.db',
-};
-
-export class SQLiteExecutor implements TastyExecutor
-{
-  private config: Config;
-  private db: sqlite3.Database;
-
-  constructor(config?: any)
-  {
-    if (config === undefined)
-    {
-      config = defaultConfig;
-    }
-
-    this.config = config;
-    this.db = new sqlite3.Database(config.filename);
-  }
-
-  public async schema(): Promise<TastySchema>
-  {
-    const results = {};
-    results[this.config.filename] = {};
-
-    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
-    for (const table of tableListResult)
-    {
-      results[this.config.filename][table.name] = {};
-      const colResult: any = await this.query(`pragma table_info(${table.name});`);
-      for (const col of colResult)
-      {
-        results[this.config.filename][table.name][col.name] =
-          {
-            type: col.type,
-          };
-      }
-    }
-    return new TastySchema(results);
-  }
-
-  public async query(queryStr: string): Promise<object[]>
-  {
-    return new Promise<object[]>((resolve, reject) =>
-    {
-      this.db.all(queryStr, makePromiseCallback(resolve, reject));
-    });
-  }
-
-  public async destroy(): Promise<void>
-  {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.db.close(makePromiseCallback0(resolve, reject));
-    });
-  }
-}
-
-export default SQLiteExecutor;
+export default TastyExecutor;

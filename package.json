@@ -20,7 +20,8 @@
     "build-demo": "npm run commit-log && MIDWAY_HOST=localhost webpack --config webpack.config.prod.js --output-filename bundle.demo.js",
     "build-gcloud": "npm run commit-log && webpack --config webpack.config.gcloud.js --output-filename bundle.js",
     "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node --harmony -- ./midway/App.tsx",
-    "lint": "./node_modules/.bin/tslint -c tslint.json --fix 'midway/**/*.ts{,x}'"
+    "lint": "./node_modules/.bin/tslint -c tslint.json --fix 'midway/**/*.ts{,x}'",
+    "style": "find midway -name '*.tsx' -exec ./node_modules/.bin/tsfmt -r {} \\;"
   },
   "repository": {
     "type": "git",
@@ -145,7 +146,6 @@
     "ts-jest": "^19.0.10",
     "ts-loader": "^0.7.2",
     "tsd": "^0.6.5",
-    "tslint": "^5.1.0",
     "typescript": "^2.2.2",
     "underscore": "^1.8.3",
     "url-loader": "^0.5.6",
@@ -183,6 +183,7 @@
     "@types/request": "0.0.42",
     "@types/sinon": "^2.1.1",
     "@types/sqlite3": "^2.2.33",
+    "@types/supertest": "^2.0.0",
     "@types/tape": "^4.2.29",
     "@types/underscore": "^1.8.0",
     "@types/webpack": "^2.2.14",
@@ -205,8 +206,11 @@
     "react-addons-perf": "^15.0.1",
     "react-addons-test-utils": "^15.0.1",
     "react-testutils-additions": "^15.0.0",
+    "supertest": "^3.0.0",
     "tape": "^4.4.0",
     "ts-jest": "^19.0.10",
-    "ts-node": "^3.0.2"
+    "ts-node": "^3.0.2",
+    "tslint": "^5.1.0",
+    "typescript-formatter": "^5.1.3"
   }
 }

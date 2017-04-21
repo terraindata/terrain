@@ -51,9 +51,9 @@ import TastyQuery from './TastyQuery';
 
 export default class MySQLGenerator
 {
-  public static generate(node): string
+  public static generate(query: TastyQuery): string
   {
-    return new MySQLGenerator(node).queryString;
+    return new MySQLGenerator(query).queryString;
   }
 
   public queryString: string;
@@ -73,7 +73,8 @@ export default class MySQLGenerator
       if (query.isSelectingAll())
       {
         this.queryString += ' * '; // handle "select all" condition
-      } else
+      }
+      else
       {
         // put selected vars into the select list
         if (query.selected.length > 0)
@@ -106,7 +107,8 @@ export default class MySQLGenerator
             this.queryString += ' AS ';
             this.queryString += this.escapeString(alias.name);
           },
-          () => {
+          () =>
+          {
             this.queryString += ', ';
             this.newLine();
           });
@@ -117,50 +119,60 @@ export default class MySQLGenerator
       // write FROM clause
       this.newLine();
       this.queryString += 'FROM ';
-      this.queryString += this.escapeString(query.table._tastyTableName);
+      this.queryString += this.escapeString(query.table.tastyTableName);
 
       // write WHERE clause
-      if (query.filters.length > 0) {
+      if (query.filters.length > 0)
+      {
         this.appendStandardClause(
           'WHERE',
           true,
           query.filters,
-          (filter) => {
+          (filter) =>
+          {
             this.appendSubexpression(filter);
           },
-          () => {
+          () =>
+          {
             this.newLine();
             this.queryString += ' AND ';
           });
       }
 
       // write ORDER BY clause
-      if (query.sorts.length > 0) {
+      if (query.sorts.length > 0)
+      {
         this.appendStandardClause(
           'ORDER BY',
           true,
           query.sorts,
-          (sort) => {
+          (sort) =>
+          {
             this.appendSubexpression(sort.node);
             this.queryString += ' ';
             this.queryString += (sort.order === 'asc' ? 'ASC' : 'DESC');
           },
-          () => {
+          () =>
+          {
             this.queryString += ', ';
           });
       }
 
-      if (query.numTaken !== 0 || query.numSkipped !== 0) {
+      if (query.numTaken !== 0 || query.numSkipped !== 0)
+      {
         this.newLine();
 
-        if (query.numTaken !== 0) {
+        if (query.numTaken !== 0)
+        {
           this.queryString += 'LIMIT ' + query.numTaken;
-          if (query.numSkipped !== 0) {
+          if (query.numSkipped !== 0)
+          {
             this.queryString += ' ';
           }
         }
 
-        if (query.numSkipped !== 0) {
+        if (query.numSkipped !== 0)
+        {
           this.queryString += 'OFFSET ' + query.numSkipped;
         }
       }
@@ -175,7 +187,7 @@ export default class MySQLGenerator
         // write INTO clause
         this.newLine();
         this.queryString += 'INTO ';
-        this.queryString += this.escapeString(query.table._tastyTableName);
+        this.queryString += this.escapeString(query.table.tastyTableName);
 
         let keys = '';
         let values = '';
@@ -254,14 +266,14 @@ export default class MySQLGenerator
     this.unindent();
   }
 
-  private appendSubexpression(node)
+  private appendSubexpression(node: TastyNode)
   {
     this.indent();
     this.appendExpression(node);
     this.unindent();
   }
 
-  private appendExpression(node)
+  private appendExpression(node: TastyNode)
   {
     // depth first in order
     if (!(node.type in SQLGenerator.TypeMap))
@@ -280,7 +292,8 @@ export default class MySQLGenerator
       }
 
       this.queryString += this.sqlName(node);
-    } else
+    }
+    else
     {
       // recursive case
 
@@ -294,7 +307,8 @@ export default class MySQLGenerator
         this.queryString += this.sqlName(node);
         this.queryString += ' ';
         this.appendExpression(node.lhs);
-      } else if (fix === SQLGenerator.FixEnum.postfix)
+      }
+      else if (fix === SQLGenerator.FixEnum.postfix)
       {
         if (node.value.length !== 1)
         {
@@ -304,7 +318,8 @@ export default class MySQLGenerator
         this.appendExpression(node.lhs);
         this.queryString += ' ';
         this.queryString += this.sqlName(node);
-      } else if (fix === SQLGenerator.FixEnum.infix)
+      }
+      else if (fix === SQLGenerator.FixEnum.infix)
       {
         if (node.value.length !== 2)
         {
@@ -316,7 +331,8 @@ export default class MySQLGenerator
         this.queryString += this.sqlName(node);
         this.queryString += ' ';
         this.appendExpression(node.rhs);
-      } else if (fix === SQLGenerator.FixEnum.infixWithoutSpaces)
+      }
+      else if (fix === SQLGenerator.FixEnum.infixWithoutSpaces)
       {
         if (node.value.length !== 2)
         {
@@ -327,14 +343,15 @@ export default class MySQLGenerator
         this.appendExpression(node.lhs);
         this.queryString += this.sqlName(node);
         this.appendExpression(node.rhs);
-      } else
+      }
+      else
       {
         throw new Error('Operator node "' + node.type + '" is not a known fix type.');
       }
     }
   }
 
-  private sqlName(node): string
+  private sqlName(node: TastyNode): string
   {
     const sqlTypeInfo = SQLGenerator.TypeMap[node.type];
     if (sqlTypeInfo.sqlName !== null)

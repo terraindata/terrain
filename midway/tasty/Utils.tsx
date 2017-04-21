@@ -44,26 +44,30 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import MySQLExecutor from './MySQLExecutor';
-import MySQLGenerator from './MySQLGenerator';
-
-export default class MySQLInterface
+export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
 {
-  public select(query)
+  return (error: Error, response: T) =>
   {
-    const queryString = MySQLGenerator.generate(query);
-    throw new Error('Not implemented.');
-    // return list of selected objects/rows
-  }
+    if (error)
+    {
+      reject(error);
+    } else
+    {
+      resolve(response);
+    }
+  };
+}
 
-  public upsert(table, objects: any[])
+export function makePromiseCallback0(resolve: () => void, reject: (Error) => void)
+{
+  return (error: Error) =>
   {
-    throw new Error('Not implemented.');
-  }
-
-  public delete(table, objects: any[])
-  {
-    // deletes objects based on primary key
-    throw new Error('Not implemented.');
-  }
+    if (error)
+    {
+      reject(error);
+    } else
+    {
+      resolve();
+    }
+  };
 }
