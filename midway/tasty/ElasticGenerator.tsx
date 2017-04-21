@@ -61,7 +61,7 @@ export default class ElasticGenerator
   constructor(query: TastyQuery)
   {
     this.queryObject = {};
-    this.tableName = query.table._tastyTableName;
+    this.tableName = query.table.tastyTableName;
 
     // set table (index) name
     this.queryObject.index = this.tableName;

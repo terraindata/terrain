@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as elasticSearch from 'elasticsearch';
 import TastyExecutor from './TastyExecutor';
+import TastySchema from './TastySchema';
 import TastyTable from './TastyTable';
 import { makePromiseCallback } from './Utils';
 
@@ -82,6 +83,17 @@ export class ElasticExecutor implements TastyExecutor
           {},
           makePromiseCallback(resolve, reject));
     });
+  }
+
+  public async schema(): Promise<TastySchema>
+  {
+    const result = await new Promise((resolve, reject) =>
+    {
+      this.client.indices.getMapping(
+        {},
+        makePromiseCallback(resolve, reject));
+    });
+    return TastySchema.fromElasticTree(result);
   }
 
   /**
@@ -149,14 +161,15 @@ export class ElasticExecutor implements TastyExecutor
             const query = {
               body: element,
               id: this.makeID(table, element),
-              index: table._tastyTableName,
-              type: table._tastyTableName,
+              index: table.tastyTableName,
+              type: table.tastyTableName,
             };
 
             this.client.index(
                 query,
                 makePromiseCallback(resolve, reject));
-          }));
+          }),
+      );
     }
     await Promise.all(promises);
   }
@@ -175,8 +188,8 @@ export class ElasticExecutor implements TastyExecutor
             const params =
             {
               id: this.makeID(table, element),
-              index: table._tastyTableName,
-              type: table._tastyTableName,
+              index: table.tastyTableName,
+              type: table.tastyTableName,
             };
 
             this.client.delete(
@@ -197,8 +210,8 @@ export class ElasticExecutor implements TastyExecutor
       {
         index: {
           _id:    this.makeID(table, element),
-          _index: table._tastyTableName,
-          _type:  table._tastyTableName,
+          _index: table.tastyTableName,
+          _type:  table.tastyTableName,
         },
       };
 

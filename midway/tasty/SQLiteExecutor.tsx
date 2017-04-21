@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as sqlite3 from 'sqlite3';
 import * as winston from 'winston';
 import TastyExecutor from './TastyExecutor';
+import TastySchema from './TastySchema';
 import { makePromiseCallback, makePromiseCallback0 } from './Utils';
 
 export interface ISQLiteConfig
@@ -75,6 +76,27 @@ export class SQLiteExecutor implements TastyExecutor
 
     this.config = config;
     this.db = new sqlite3.Database(config.filename);
+  }
+
+  public async schema(): Promise<TastySchema>
+  {
+    const results = {};
+    results[this.config.filename] = {};
+
+    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
+    for (const table of tableListResult)
+    {
+      results[this.config.filename][table.name] = {};
+      const colResult: any = await this.query(`pragma table_info(${table.name});`);
+      for (const col of colResult)
+      {
+        results[this.config.filename][table.name][col.name] =
+          {
+            type: col.type,
+          };
+      }
+    }
+    return new TastySchema(results);
   }
 
   public async query(queryStr: string): Promise<object[]>

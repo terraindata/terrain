@@ -46,15 +46,34 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as hash from 'object-hash';
+import * as request from 'supertest';
 import * as test from 'tape-async';
 import * as winston from 'winston';
 
+import App from '../../App';
 import ElasticExecutor from '../../tasty/ElasticExecutor';
 import * as Tasty from '../../tasty/Tasty';
 
 let elasticSearch;
 
 const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
+
+test('GET /midway/v1/schema', (t) =>
+{
+  request(App)
+      .get('/midway/v1/schema')
+      .then((response) => {
+        // TODO @david check against expected value for schema, not just non-emptiness
+        if (response.text !== '')
+        {
+          t.pass();
+        } else
+        {
+          t.skip('GET /schema request returned empty response body');
+        }
+      });
+  t.end();
+});
 
 test('connection establish', async (t) =>
 {
