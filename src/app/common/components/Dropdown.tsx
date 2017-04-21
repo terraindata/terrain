@@ -52,7 +52,7 @@ import Util from '../../util/Util';
 import Actions from "../../builder/data/BuilderActions";
 import PureClasss from './../../common/components/PureClasss';
 
-interface Props
+export interface Props
 {
   options: List<string | El>;
   selectedIndex: number;

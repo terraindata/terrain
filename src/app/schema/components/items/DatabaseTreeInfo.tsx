@@ -48,7 +48,7 @@ import PureClasss from './../../../common/components/PureClasss';
 import Styles from '../SchemaTreeStyles';
 const Radium = require('radium');
 
-interface Props
+export interface Props
 {
 	item: SchemaTypes.Database;
 }

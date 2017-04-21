@@ -56,7 +56,7 @@ import Periscope from './Periscope';
 import {Bar, Bars} from './TransformCard';
 import BuilderTextbox from '../../../common/components/BuilderTextbox';
 
-interface Props 
+export interface Props 
 {
   barsData: Bars;
   maxDomain: List<number>;

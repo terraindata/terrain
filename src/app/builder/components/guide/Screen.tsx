@@ -59,7 +59,7 @@ import SelectScreen from './SelectScreen';
 let L = Immutable.List;
 let M = Immutable.Map;
 
-interface Props
+export interface Props
 {
   screen: EScreen;
   query: IQuery;

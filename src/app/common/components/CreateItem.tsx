@@ -47,7 +47,7 @@ import * as React from 'react';
 import Classs from './../../common/components/Classs';
 var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
 
-interface Props
+export interface Props
 {
   name: string;
   onCreate: () => void;

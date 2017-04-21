@@ -126,7 +126,7 @@ export const onCardDrop = (targetProps:Props, monitor, component) =>
 // needs to be below above function on which it depends
 import CardDragPreview from './CardDragPreview';
 
-interface Props
+export interface Props
 {
   keyPath: KeyPath;
   index: number;

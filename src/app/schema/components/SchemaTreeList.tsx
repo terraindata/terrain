@@ -52,7 +52,7 @@ import Styles from '../../Styles';
 import SchemaTreeStyles from './SchemaTreeStyles';
 import FadeInOut from '../../common/components/FadeInOut';
 
-interface Props
+export interface Props
 {
 	itemIds: List<ID>;
 	itemType: string;

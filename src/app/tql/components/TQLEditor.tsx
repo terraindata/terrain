@@ -75,7 +75,7 @@ import 'codemirror/addon/search/matchesonscrollbar.js';
 import 'codemirror/addon/search/jump-to-line.js';
 import 'codemirror/addon/search/matchesonscrollbar.css';
 
-interface Props
+export interface Props
 {
   tql: string;
   canEdit: boolean;

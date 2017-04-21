@@ -63,7 +63,7 @@ var EditIcon = require("./../../../images/icon_edit.svg");
 var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
 const InfoIcon = require('../../../images/icon_info.svg?name=InfoIcon');
 
-interface Props {
+export interface Props {
 }
 
 class AccountDropdown extends PureClasss<Props>

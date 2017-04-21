@@ -57,7 +57,7 @@ import * as classNames from 'classnames';
 
 
 
-interface Props
+export interface Props
 {
   params?: any;
   history?: any;

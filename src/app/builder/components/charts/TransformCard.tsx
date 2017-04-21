@@ -59,7 +59,7 @@ const Dimensions = require('react-dimensions');
 
 const NUM_BARS = 1000; 
 
-interface Props
+export interface Props
 {
   keyPath: KeyPath;
   data: any; // transform card

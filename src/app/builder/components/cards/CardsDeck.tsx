@@ -62,7 +62,7 @@ let {List, Map} = Immutable;
 let ExpandIcon = require("./../../../../images/icon_expand_12x12.svg?name=ExpandIcon");
 import { DragSource } from 'react-dnd';
 
-interface Props
+export interface Props
 {
   open: boolean;
 }

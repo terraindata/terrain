@@ -60,7 +60,7 @@ import InfoArea from '../../common/components/InfoArea';
 
 const NUM_ROWS = 200;
 
-interface Props
+export interface Props
 {
 	databases: SchemaTypes.DatabaseMap;
 }

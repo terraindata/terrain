@@ -68,7 +68,7 @@ for(var h = 0; h < 24; h ++)
 
 const HOUR_OPTIONS = Immutable.List(_hours);
 
-interface Props {
+export interface Props {
   date: string;
   onChange: (newDate: string) => void;
   canEdit: boolean;

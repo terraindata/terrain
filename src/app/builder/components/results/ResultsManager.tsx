@@ -105,7 +105,7 @@ export let _ResultsState = (config: Object = {}) =>
 
 
 
-interface Props
+export interface Props
 {
   query: BuilderTypes.Query;
   resultsState: ResultsState;

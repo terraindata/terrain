@@ -57,7 +57,7 @@ var CameraIcon = require('./../../../images/icon_camera.svg');
 var CloseIcon = require('./../../../images/icon_close_8x8_gray.svg')
 const {browserHistory} = require('react-router');
 
-interface Props
+export interface Props
 {
   params?: any;
   children?: any;

@@ -64,7 +64,7 @@ import BuilderTypes from '../../BuilderTypes';
 let L = Immutable.List;
 let M = Immutable.Map;
 
-interface Props
+export interface Props
 {
 }
 

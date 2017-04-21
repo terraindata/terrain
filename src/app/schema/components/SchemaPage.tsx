@@ -50,7 +50,7 @@ const {browserHistory} = require('react-router');
 
 import SchemaView from './SchemaView';
 
-interface Props
+export interface Props
 {
   params?: any;
   location?: {

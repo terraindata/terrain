@@ -61,7 +61,7 @@ var RemoveIcon = require("./../../../../images/icon_close_8x8.svg?name=RemoveIco
 var FIELD_HEIGHT = 32;
 var STANDARD_MARGIN = 6;
 
-interface Props
+export interface Props
 {
   index: number;
   onAdd: (index: number) => void;

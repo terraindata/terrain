@@ -52,7 +52,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import Util from '../../util/Util';
 const r = 3;
-interface Props {
+export interface Props {
 }
 
 class EasterEggs extends PureClasss<Props>   

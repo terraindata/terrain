@@ -51,7 +51,7 @@ import PureClasss from '../../common/components/PureClasss';
 var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 
-interface Props {
+export interface Props {
   large?: string;
   small?: string;
   button?: string;

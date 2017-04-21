@@ -70,7 +70,7 @@ var whichTransitionEvent = function() {
   }
 };
 
-interface Props 
+export interface Props 
 {
   notification: any;
     getStyles: any;

@@ -46,7 +46,7 @@ require('./Scoreline.less');
 import * as React from 'react';
 import Classs from './../../common/components/Classs';
 
-interface Props
+export interface Props
 {
   scores: {
     color: string,

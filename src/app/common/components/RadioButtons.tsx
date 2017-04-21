@@ -50,7 +50,7 @@ import Util from '../../util/Util';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs';
 
-interface Props {
+export interface Props {
 	selected?: string;
 	options: {
 			value: string;

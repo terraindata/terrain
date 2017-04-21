@@ -62,7 +62,7 @@ import CardDropArea from './CardDropArea';
 import CardDragPreview from './CardDragPreview';
 var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 
-interface Props
+export interface Props
 {
   cards: ICards;
   canEdit: boolean;

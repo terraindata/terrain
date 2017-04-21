@@ -53,7 +53,7 @@ import ColorManager from './../../util/ColorManager';
 
 type User = UserTypes.User;
 
-interface Props
+export interface Props
 {
   username: string;
   showName?: boolean;

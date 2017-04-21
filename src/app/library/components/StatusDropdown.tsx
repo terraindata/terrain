@@ -59,7 +59,7 @@ import UserStore from '../../users/data/UserStore';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
-interface Props
+export interface Props
 {
   variant: LibraryTypes.Variant;
   noBorder?: boolean;

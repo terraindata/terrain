@@ -70,7 +70,7 @@ var CloseIcon = require("./../../../images/icon_close.svg");
 var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
 
 
-interface Props
+export interface Props
 {
   value: BuilderTypes.CardString | number;
   keyPath: KeyPath; // keypath of value

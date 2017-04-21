@@ -82,7 +82,7 @@ const TEXT =
   },
 }
 
-interface Props {
+export interface Props {
   variant: LibraryTypes.Variant;
   status: LibraryTypes.EVariantStatus;
   defaultChecked: boolean;

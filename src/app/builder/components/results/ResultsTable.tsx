@@ -55,7 +55,7 @@ import ColorManager from '../../../util/ColorManager';
 import {MenuOption} from '../../../common/components/Menu';
 import {Results, MAX_RESULTS, getPrimaryKeyFor} from './ResultsManager';
 
-interface Props
+export interface Props
 {
   results: Results;
   resultsConfig?: IResultsConfig;

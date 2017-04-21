@@ -62,7 +62,7 @@ import TQLEditor from './TQLEditor';
 import TQLPopup from './TQLPopup';
 import {ResultsState} from '../../builder/components/results/ResultsManager';
 
-interface Props {
+export interface Props {
   variant?: LibraryTypes.Variant;
   query?: BuilderTypes.Query;
   canEdit?: boolean;

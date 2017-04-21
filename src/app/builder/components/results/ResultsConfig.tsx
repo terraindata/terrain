@@ -107,7 +107,7 @@ export const DefaultIResultsConfig = _IResultsConfig();
 
 
 
-interface Props
+export interface Props
 {
   fields: List<string>;
   config: IResultsConfig;

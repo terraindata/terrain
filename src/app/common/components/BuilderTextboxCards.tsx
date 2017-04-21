@@ -51,7 +51,7 @@ import { BuilderTypes } from '../../builder/BuilderTypes';
 import { Display } from '../../builder/BuilderDisplays';
 import Card from '../../builder/components/cards/Card';
 
-interface Props
+export interface Props
 {
   value: BuilderTypes.CardString;
   keyPath: KeyPath;

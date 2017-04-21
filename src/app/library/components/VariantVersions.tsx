@@ -62,7 +62,7 @@ type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
 
 
-interface Props
+export interface Props
 {
   variant: Variant;
 }

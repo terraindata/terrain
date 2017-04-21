@@ -55,7 +55,7 @@ import Loading from './../../common/components/Loading';
 
 var TerrainIcon = require("./../../../images/logo_mountainCircle.svg?name=TerrainIcon");
 
-interface Props {
+export interface Props {
   appStateLoaded: boolean;
   loggedIn: boolean;
   onLoadComplete: () => void;

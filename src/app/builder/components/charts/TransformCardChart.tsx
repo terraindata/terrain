@@ -61,7 +61,7 @@ type ScorePoints = List<ScorePoint>;
 
 import TransformChart from './TransformChart';
 
-interface Props 
+export interface Props 
 {
   points: ScorePoints;
   bars: any;

@@ -90,7 +90,7 @@ var SaveIcon = require("./../../../images/icon_save_10x10.svg?name=SaveIcon");
 
 let { Map, List } = Immutable;
 
-interface Props
+export interface Props
 {
   params?: any;
   location?: any;

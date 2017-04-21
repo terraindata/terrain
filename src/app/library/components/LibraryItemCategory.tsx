@@ -48,7 +48,7 @@ import * as React from 'react';
 import Classs from './../../common/components/Classs';
 import { DragSource, DropTarget } from 'react-dnd';
 
-interface Props
+export interface Props
 {
   status: string;
   type: string;

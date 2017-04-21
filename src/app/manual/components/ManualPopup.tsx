@@ -53,7 +53,7 @@ import BuilderTypes from './../../builder/BuilderTypes';
 var InfoIcon = require('./../../../images/icon_info.svg');
 var OpenIcon = require('./../../../images/icon_open.svg');
 
-interface Props
+export interface Props
 {
   cardName: string;
   rightAlign?: boolean;

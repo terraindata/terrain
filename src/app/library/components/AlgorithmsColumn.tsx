@@ -65,7 +65,7 @@ var AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=Alg
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
 
-interface Props
+export interface Props
 {
   algorithms: Immutable.Map<ID, Algorithm>;
   variants: Immutable.Map<ID, Variant>;

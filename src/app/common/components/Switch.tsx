@@ -47,7 +47,7 @@ import * as React from 'react';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs';
 
-interface Props
+export interface Props
 {
   first: string;
   second: string;

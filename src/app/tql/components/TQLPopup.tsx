@@ -52,7 +52,7 @@ import Classs from './../../common/components/Classs';
 
 var OpenIcon = require('./../../../images/icon_open.svg');
 
-interface Props
+export interface Props
 {
   cardName: string;
   text: string;

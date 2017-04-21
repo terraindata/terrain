@@ -47,7 +47,7 @@ import InfoArea from './InfoArea';
 import PureClasss from '../../common/components/PureClasss';
 const {browserHistory} = require('react-router');
 
-interface Props
+export interface Props
 {
   history?: any;
 }

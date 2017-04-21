@@ -52,7 +52,7 @@ import Classs from './../../common/components/Classs';
 
 const meterSectionValues = [0, 1, 2, 3, 4, 5]
 
-interface Props {
+export interface Props {
 	value: number,
 }
 

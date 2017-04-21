@@ -51,7 +51,7 @@ import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs';
 var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
 
-interface Props
+export interface Props
 {
   title: string;
   description?: JSX.Element;

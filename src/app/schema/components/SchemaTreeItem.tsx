@@ -57,7 +57,7 @@ import SchemaTreeList from './SchemaTreeList';
 import FadeInOut from '../../common/components/FadeInOut';
 
 
-interface Props
+export interface Props
 {
 	id: ID;
 	type: string;

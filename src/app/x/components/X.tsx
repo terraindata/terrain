@@ -58,7 +58,7 @@ const xes =
   // },
 };
 
-interface Props
+export interface Props
 {
   params?: any;
   history?: any;

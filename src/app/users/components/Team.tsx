@@ -59,7 +59,7 @@ import Modal from './../../common/components/Modal';
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
 
-interface Props
+export interface Props
 {
   params?: any;
   history?: any;

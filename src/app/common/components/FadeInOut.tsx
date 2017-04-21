@@ -47,7 +47,7 @@ import PureClasss from './../../common/components/PureClasss';
 const {VelocityTransitionGroup, VelocityComponent} = require('velocity-react');
 
 
-interface Props
+export interface Props
 {
 	open: boolean;
 	children?: any;

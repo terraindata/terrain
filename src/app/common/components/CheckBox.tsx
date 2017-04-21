@@ -52,7 +52,7 @@ import Classs from './../../common/components/Classs';
 var CheckMark = require("./../../../images/icon_checkMark.svg");
 
 
-interface Props {
+export interface Props {
 	checked: boolean;
 	onChange: () => void;
 }

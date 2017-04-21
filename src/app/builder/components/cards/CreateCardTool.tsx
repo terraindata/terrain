@@ -61,7 +61,7 @@ var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
 var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
 var AddCardIcon = require("./../../../../images/icon_addCard_22x17.svg?name=AddCardIcon");
 
-interface Props
+export interface Props
 {
   index: number;
   keyPath: KeyPath;

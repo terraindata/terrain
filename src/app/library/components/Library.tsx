@@ -60,7 +60,7 @@ import InfoArea from './../../common/components/InfoArea';
 var HTML5Backend = require('react-dnd-html5-backend');
 const {browserHistory} = require('react-router');
 
-interface Props
+export interface Props
 {
   params?: any;
   location?: {

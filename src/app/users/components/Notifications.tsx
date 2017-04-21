@@ -61,7 +61,7 @@ import Modal from './../../common/components/Modal';
 var Select = require('react-select');
 var SoundIcon = require("./../../../images/icon_audio.svg");
 
-interface Props
+export interface Props
 {
   params?: any;
   history?: any;

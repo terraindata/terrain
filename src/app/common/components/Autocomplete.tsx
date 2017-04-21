@@ -51,7 +51,7 @@ import Util from '../../util/Util';
 import * as classNames from 'classnames';
 import PureClasss from './../../common/components/PureClasss';
 
-interface Props
+export interface Props
 {
   value: string;
   onChange: (value: string) => void;

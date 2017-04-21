@@ -55,7 +55,7 @@ import * as classNames from 'classnames';
 var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
 
 
-interface Props
+export interface Props
 {
   location?: any;
   children?: any;

@@ -56,7 +56,7 @@ import PureClasss from '../../../common/components/PureClasss';
 import BuilderTypes from '../../BuilderTypes';
 type IInput = BuilderTypes.IInput;
 
-interface Props
+export interface Props
 {
   inputs: List<IInput>;
   canEdit: boolean;

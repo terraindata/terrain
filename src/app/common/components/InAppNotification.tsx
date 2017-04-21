@@ -69,7 +69,7 @@ import * as ReactDOM from 'react-dom';
 var NotificationSystem = require('./notification-system/NotificationSystem');
 var styles = require('./notification-system/styles.js');
 
-interface Props
+export interface Props
 {
   params?: any;
   history?: any;

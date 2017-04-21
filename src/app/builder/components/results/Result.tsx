@@ -62,7 +62,7 @@ var ScoreIcon = require("./../../../../images/icon_terrain_27x16.svg?name=ScoreI
 
 const MAX_DEFAULT_FIELDS = 4;
 
-interface Props
+export interface Props
 {
   result: Result;
   

@@ -65,7 +65,7 @@ type ICards = BuilderTypes.ICards;
 let {List, Map} = Immutable;
 let ExpandIcon = require("./../../../../images/icon_expand_12x12.svg?name=ExpandIcon");
 
-interface Props
+export interface Props
 {
   cards: ICards;
   deckOpen: boolean;

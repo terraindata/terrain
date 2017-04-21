@@ -62,7 +62,7 @@ import StatusDropdown from './StatusDropdown';
 
 type Variant = LibraryTypes.Variant;
 
-interface Props
+export interface Props
 {
   variant: Variant;
   dbs: List<string>;

@@ -55,7 +55,7 @@ import SchemaSearchResults from './SchemaSearchResults';
 import Util from '../../util/Util';
 import SchemaResults from './SchemaResults';
 
-interface Props
+export interface Props
 {
 	fullPage: boolean;
 	showSearch: boolean;

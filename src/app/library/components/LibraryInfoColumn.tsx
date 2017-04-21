@@ -85,7 +85,7 @@ type GroupRoleMap = RoleTypes.GroupRoleMap;
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
 
-interface Props
+export interface Props
 {
   group: Group;
   algorithm: Algorithm;

@@ -67,7 +67,7 @@ import TQLConverter from '../../../tql/TQLConverter';
 
 const RESULTS_PAGE_SIZE = 20;
 
-interface Props
+export interface Props
 {
   resultsState: ResultsState;
   db: string;

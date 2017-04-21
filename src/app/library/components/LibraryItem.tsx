@@ -55,7 +55,7 @@ import { DragSource, DropTarget } from 'react-dnd';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
-interface Props
+export interface Props
 {
   index: number;
   fadeIndex: number;

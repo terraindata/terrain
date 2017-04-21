@@ -51,7 +51,7 @@ import PureClasss from '../../common/components/PureClasss';
 
 var HOVER_TIMEOUT_TIME = 1000;
 
-interface Props
+export interface Props
 {
   page: number;
   pages: number;

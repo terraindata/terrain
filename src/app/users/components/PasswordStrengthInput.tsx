@@ -52,7 +52,7 @@ import Classs from './../../common/components/Classs';
 import PasswordMeter from './PasswordMeter';
 var zxcvbn = require('zxcvbn');
 
-interface Props {
+export interface Props {
 	onChange: (ev: any) => void,
 	value: string,
 	type: string,

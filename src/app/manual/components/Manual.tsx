@@ -63,7 +63,7 @@ var ManualConfig = require('./../ManualConfig.json');
 var ArrowIcon = require("./../../../images/icon_smallArrow.svg");
 
 
-interface Props
+export interface Props
 {
   location?: any;
   children?: any;

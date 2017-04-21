@@ -64,7 +64,7 @@ import './../../tql/components/monokai.less';
 
 const reactStringReplace = require('react-string-replace')
 
-interface Props
+export interface Props
 {
   entryName: string;
   canEdit: boolean;

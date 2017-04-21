@@ -53,7 +53,7 @@ import TQLConverter from "../../tql/TQLConverter";
 import PureClasss from './../../common/components/PureClasss';
 import BuilderTypes from '../../builder/BuilderTypes';
 import {ResultsState} from '../../builder/components/results/ResultsManager';
-interface Props 
+export interface Props 
 {
   resultsState: ResultsState;
   onError: (lineNumber: number) => void;

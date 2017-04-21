@@ -54,7 +54,7 @@ import Util from '../../util/Util';
 const Sprites = require("./../../../images/spritesheet_terrainLoading.png");
 
 
-interface Props {
+export interface Props {
   loading: boolean;
   loaded: boolean;
   onLoadedEnd: () => void;

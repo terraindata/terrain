@@ -48,7 +48,7 @@ import PureClasss from '../../common/components/PureClasss';
 const {browserHistory} = require('react-router');
 import AuthActions from "../../auth/data/AuthActions";
 
-interface Props
+export interface Props
 {
   history?: any;
 }

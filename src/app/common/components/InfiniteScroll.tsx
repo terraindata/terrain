@@ -48,7 +48,7 @@ import Classs from './../../common/components/Classs';
 
 const SCROLL_SENSITIVITY = 500;
 
-interface Props
+export interface Props
 {
   onRequestMoreItems:
     (

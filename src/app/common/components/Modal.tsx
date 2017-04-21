@@ -52,7 +52,7 @@ const ReactModal = require('react-modal');
 const InfoIcon = require('./../../../images/icon_info.svg')
 const CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 
-interface Props
+export interface Props
 {
 	message: string;
   open: boolean;

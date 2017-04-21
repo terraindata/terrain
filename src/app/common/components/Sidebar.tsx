@@ -58,7 +58,7 @@ interface Link {
   route: string;
 }
 
-interface Props {
+export interface Props {
   links: Link[];
   selectedIndex: number;
   expandable?: boolean;

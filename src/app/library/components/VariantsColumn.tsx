@@ -68,7 +68,7 @@ var VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=Variant
 
 type Variant = LibraryTypes.Variant;
 
-interface Props
+export interface Props
 {
   variants: Immutable.Map<ID, Variant>;
   variantsOrder: Immutable.List<ID>;

@@ -61,7 +61,7 @@ export interface MenuOption {
   iconColor?: string;
 };
 
-interface Props
+export interface Props
 {
   options: List<MenuOption>;
   small?: boolean;

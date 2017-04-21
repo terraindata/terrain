@@ -63,7 +63,7 @@ var GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon')
 
 type Group = LibraryTypes.Group;
 
-interface Props
+export interface Props
 {
   groups: Immutable.Map<ID, Group>;
   groupsOrder: Immutable.List<ID>;

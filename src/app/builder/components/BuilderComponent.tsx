@@ -58,7 +58,7 @@ import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
 import ManualInfo from '../../manual/components/ManualInfo';
 import * as classNames from 'classnames';
 
-interface Props
+export interface Props
 {
   keyPath: KeyPath;
   data: any; // record

@@ -52,7 +52,7 @@ import InfoArea from './../../common/components/InfoArea';
 import { Link } from 'react-router';
 var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
 
-interface Props
+export interface Props
 {
   params?: any;
   history?: any;

@@ -53,7 +53,7 @@ import Manual from './Manual';
 import { DragDropContext } from 'react-dnd';
 var HTML5Backend = require('react-dnd-html5-backend');
 
-interface Props
+export interface Props
 {
   location?: any;
   params?: any;

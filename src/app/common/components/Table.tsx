@@ -68,7 +68,7 @@ export interface IColumn
   width?: number;
 }
 
-interface Props
+export interface Props
 {
   columns: List<IColumn>;
   rowGetter: (index: number) => Object;

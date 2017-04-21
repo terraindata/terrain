@@ -60,7 +60,7 @@ import DeployModalColumn from './DeployModalColumn';
 
 let {EVariantStatus} = LibraryTypes;
 
-interface Props {
+export interface Props {
 }
 
 class DeployModal extends PureClasss<Props>   

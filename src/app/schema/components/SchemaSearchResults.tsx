@@ -55,7 +55,7 @@ import FadeInOut from '../../common/components/FadeInOut';
 import SchemaTreeItem from './SchemaTreeItem';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 
-interface Props
+export interface Props
 {
 	search: string;
 }
