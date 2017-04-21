@@ -44,15 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export default class TastySchema {
-    public static fromElasticTree(elasticTree: object): TastySchema {
+export default class TastySchema
+{
+    public static fromElasticTree(elasticTree: object): TastySchema
+    {
         const schema: TastySchema = new TastySchema();
-        Object.keys(elasticTree).map((db: string) => {
+        Object.keys(elasticTree).map((db: string) =>
+        {
             schema.tree[db] = {};
-            Object.keys(elasticTree[db]['mappings']).map((mapping: string) => {
+            Object.keys(elasticTree[db]['mappings']).map((mapping: string) =>
+            {
                 schema.tree[db][mapping] = {};
                 Object.keys(elasticTree[db]['mappings'][mapping]['properties']).map(
-                    (field: string) => {
+                    (field: string) =>
+                    {
                         schema.tree[db][mapping][field] =
                             elasticTree[db]['mappings'][mapping]['properties'][field];
                     });
@@ -61,13 +66,16 @@ export default class TastySchema {
         return schema;
     }
 
-    public static fromMySQLResultSet(resultSet: any): TastySchema {
+    public static fromMySQLResultSet(resultSet: any): TastySchema
+    {
         const schema: TastySchema = new TastySchema();
         resultSet.forEach((row) => {
-            if (schema.tree[row.table_schema] === undefined) {
+            if (schema.tree[row.table_schema] === undefined)
+            {
                 schema.tree[row.table_schema] = {};
             }
-            if (schema.tree[row.table_schema][row.table_name] === undefined) {
+            if (schema.tree[row.table_schema][row.table_name] === undefined)
+            {
                 schema.tree[row.table_schema][row.table_name] = {};
             }
             schema.tree[row.table_schema][row.table_name][row.column_name] =
@@ -80,28 +88,35 @@ export default class TastySchema {
 
     private tree: object;
 
-    constructor(tree?: object) {
-        if (tree) {
+    constructor(tree?: object)
+    {
+        if (tree)
+        {
             this.tree = tree;
         }
-        else {
+        else
+        {
             this.tree = {};
         }
     }
 
-    public toString(pretty: boolean = false): string {
+    public toString(pretty: boolean = false): string
+    {
         return JSON.stringify(this.tree, null, pretty ? 2 : 0);
     }
 
-    public databases(): object {
+    public databases(): object
+    {
         return this.tree;
     }
 
-    public databaseNames(): string[] {
+    public databaseNames(): string[]
+    {
         return Object.keys(this.tree);
     }
 
-    public tables(database: string): object {
+    public tables(database: string): object
+    {
         return this.tree[database];
     }
 
