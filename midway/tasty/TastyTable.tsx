@@ -48,16 +48,16 @@ import TastyColumn from './TastyColumn';
 
 export class TastyTable
 {
-  public _tastyTableName: string;
-  public _tastyPrimaryKey: string[];
+  private tableName: string;
+  private primaryKeys: string[];
 
-  constructor(name: string, primaryKey: string[], columns: string[])
+  constructor(name: string, primaryKeys: string[], columns: string[])
   {
     // primary key is a list, so that composite keys can be supported
-    this._tastyTableName = name;
-    this._tastyPrimaryKey = primaryKey;
+    this.tableName = name;
+    this.primaryKeys = primaryKeys;
 
-    primaryKey.forEach(
+    primaryKeys.forEach(
       (columnName) =>
       {
         this[columnName] = new TastyColumn(this, columnName);
@@ -70,28 +70,39 @@ export class TastyTable
       });
   }
 
-  public get tableName(): string
+  public getTableName(): string
   {
-    return this._tastyTableName;
+    return this.tableName;
   }
 
-  public get primaryKeys(): string[]
+  public getPrimaryKeys(obj?: object): string[]
   {
-    return this._tastyPrimaryKey;
+    if (obj === undefined)
+    {
+      return this.primaryKeys;
+    }
+
+    return this.primaryKeys.map(
+      (column) =>
+      {
+        return obj[column];
+      });
+  }
+
+  public getColumnNames(): string[]
+  {
+    return Object.keys(this).filter((item) =>
+    {
+      if (item !== 'tableName' && item !== 'primaryKeys')
+      {
+        return item;
+      }
+    });
   }
 
   public toString(): string
   {
     return JSON.stringify(this, null, 2);
-  }
-
-  public getPrimaryKeys(obj: object): string[]
-  {
-    return this._tastyPrimaryKey.map(
-      (column) =>
-      {
-        return obj[column];
-      });
   }
 }
 

@@ -166,11 +166,11 @@ export class Tasty
    * Execute a query.
    *
    * @param {TastyQuery | string} query The Tasty Query to execute.
-   * @returns {Promise<object[]>} Returns a promise that would return a list of objects.
+   * @returns {Promise<Object[]>} Returns a promise that would return a list of objects.
    *
    * @memberOf TastyInterface
    */
-  public async execute(query: TastyQuery | string): Promise<object[]>
+  public async execute(query: TastyQuery | string): Promise<Object[]>
   {
     if (typeof query === 'string')
     {
@@ -199,25 +199,28 @@ export class Tasty
    * select: Retrieve an object from the table.
    *
    * @param {TastyTable} table A Tasty Table
-   * @param {TastyColumn[]} columns List of columns to select
-   * @param {object) filter A filter object populated with keys corresponding to table
+   * @param {string[]} columns List of columns to select
+   * @param {Object) filter A filter object populated with keys corresponding to table
    *                        columns and values to filter on.
    *
-   * @returns {Promise<object>}
+   * @returns {Promise<Object[]>}
    *
    * @memberOf TastyInterface
    */
-  public async select(table: TastyTable, columns: TastyColumn[], filter: object): Promise<object[]>
+  public async select(table: TastyTable, columns?: string[], filter?: Object): Promise<Object[]>
   {
     const query = new TastyQuery(table);
-    if (columns)
+    if (columns === undefined || columns.length === 0)
     {
-      query.select(columns);
+      columns = table.getColumnNames();
     }
+
+    const selectedColumns = columns.map((col) => table[col]);
+    query.select(selectedColumns);
 
     try
     {
-      const node: TastyNode = this.filterPrimaryKeys(table, filter);
+      const node: TastyNode = this.filterColumns(table, filter);
       if (node)
       {
         query.filter(node);
@@ -236,12 +239,12 @@ export class Tasty
    * Update or insert an object or a list of objects.
    *
    * @param {TastyTable} table The table to upsert the object in.
-   * @param {(object | object[])} obj An object or a list of objects to upsert.
-   * @returns
+   * @param {(Object | Object[])} obj An object or a list of objects to upsert.
+   * @returns {Promise<Object[]>}
    *
    * @memberOf TastyInterface
    */
-  public async upsert(table: TastyTable, obj: object | object[]): Promise<object[]>
+  public async upsert(table: TastyTable, obj: Object | Object[]): Promise<Object[]>
   {
     const query = new TastyQuery(table);
     if (obj instanceof Array)
@@ -268,12 +271,12 @@ export class Tasty
    * To delete all of the rows in a table, use '*'.
    *
    * @param {TastyTable} table The table to delete an object from.
-   * @param {(object | object[] | string)} obj  An object or a list of objects to delete.
-   * @returns {Promise<object[]>}
+   * @param {(Object | Object[] | string)} obj  An object or a list of objects to delete.
+   * @returns {Promise<Object[]>}
    *
    * @memberOf TastyInterface
    */
-  public async delete(table: TastyTable, obj: object | object[] | string): Promise<object[]>
+  public async delete(table: TastyTable, obj: Object | Object[] | string): Promise<Object[]>
   {
     const query = new TastyQuery(table);
     if (typeof obj === 'string' && obj === '*')
@@ -292,7 +295,7 @@ export class Tasty
     }
     else if (typeof obj === 'object')
     {
-      const node: TastyNode = this.filterPrimaryKeys(table, obj);
+      const node: TastyNode = this.filterColumns(table, obj);
       query.filter(node);
       query.delete();
     }
@@ -300,20 +303,22 @@ export class Tasty
     return await this.executor.query(queryString);
   }
 
-  private filterPrimaryKeys(table: TastyTable, obj: object): TastyNode
+  private filterColumns(table: TastyTable, obj: Object): TastyNode
   {
     let node: TastyNode = null;
-    Object.keys(table).map((key) =>
+    const columns = table.getColumnNames();
+
+    columns.map((col) =>
     {
-      if (node === null)
+      if (obj[col] !== undefined)
       {
-        node = table[key].equals(obj[key]);
-      }
-      else
-      {
-        if (obj[key] !== undefined)
+        if (node === null)
         {
-          node = node.and(table[key].equals(obj[key]));
+          node = table[col].equals(obj[col]);
+        }
+        else
+        {
+          node = node.and(table[col].equals(obj[col]));
         }
       }
     });
