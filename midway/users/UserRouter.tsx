@@ -71,21 +71,27 @@ Router.post('/:id/update', passport.authenticate('access-token-local'), async (c
   winston.info('user update');
   let returnStatus: any = 'Incorrect parameters';
   const req = ctx.state.authInfo;
-  req.id = ctx.params.id;
-  req['callingUser'] = ctx.state.user;
-  delete req.accessToken;
-  // if superuser or id to be updated is current user
-  if (ctx.state.user.isSuperUser || ctx.state.authInfo.id === req.id)
+  if (!req['body'])
   {
-    returnStatus = await Users.createOrUpdate(req);
+    ctx.body = 'Fields required';
   }
-  // TODO revise this once error handling is implemented in Tasty
-  if (returnStatus instanceof Array)
+  else
   {
-    ctx.body = 'Success';
-  }
-  else {
-    ctx.body = returnStatus;
+    req['body']['id'] = ctx.params.id;
+    req['callingUser'] = ctx.state.user;
+    // if superuser or id to be updated is current user
+    if (ctx.state.user.isSuperUser || ctx.state.authInfo.id === req['body']['id'])
+    {
+      returnStatus = await Users.createOrUpdate(req);
+    }
+    // TODO revise this once error handling is implemented in Tasty
+    if (returnStatus instanceof Array)
+    {
+      ctx.body = 'Success';
+    }
+    else {
+      ctx.body = returnStatus;
+    }
   }
 });
 
@@ -94,22 +100,30 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
   // create a user, must be admin
   winston.info('create user');
   const req = ctx.state.authInfo;
-  delete req.id;
-  delete req.accessToken;
   let returnStatus: any = 'Incorrect parameters';
-
-  if (ctx.state.user.isSuperUser)
+  if (!req.body)
   {
-    // define which other parameters need to be present for create/update
-    returnStatus = await Users.createOrUpdate(req);
+    ctx.body = 'Fields required';
   }
-  // TODO revise this once error handling is implemented in Tasty
-  if (returnStatus instanceof Array)
+  else
   {
-    ctx.body = 'Success';
-  }
-  else {
-    ctx.body = returnStatus;
+    if (req.body && req.body['id'])
+    {
+      delete req.body['id'];
+    }
+    if (ctx.state.user.isSuperUser)
+    {
+      // define which other parameters need to be present for create/update
+      returnStatus = await Users.createOrUpdate(req);
+    }
+    // TODO revise this once error handling is implemented in Tasty
+    if (returnStatus instanceof Array)
+    {
+      ctx.body = 'Success';
+    }
+    else {
+      ctx.body = returnStatus;
+    }
   }
 });
 

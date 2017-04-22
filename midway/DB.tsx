@@ -53,9 +53,4 @@ const config: Tasty.SQLiteConfig =
 
 let DB = new Tasty.Tasty(Tasty.SQLite, config);
 
-// export const DB =
-// {
-//   DB,
-// };
-
 export default DB;

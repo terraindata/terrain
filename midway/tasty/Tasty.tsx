@@ -200,47 +200,36 @@ export class Tasty
    *
    * @param {TastyTable} table A Tasty Table
    * @param {TastyColumn[]} columns List of columns to select
-   * @param {object| object[]) filter An object or an array of filter objects populated with their primary key fields.
+   * @param {object) filter A filter object populated with keys corresponding to table
+   *                        columns and values to filter on.
    *
-   *            If filter is not defined or null or {}, all of the specified columns are retrieved.
-   *
-   *            If a singleton object is specified with its primary key field(s) populated, then all
-   *            of the specified columns of that object are retrieved.
-   *
-   *            If an array of objects with their primary key field(s) populated are specified, then all
-   *            all of those objects with all of their specified columns are retrieved and returned.
-   *
-   * @returns {Promise<object[]>}
+   * @returns {Promise<object>}
    *
    * @memberOf TastyInterface
    */
-  public async select(table: TastyTable, columns: TastyColumn[], filter: object | object[]): Promise<object[]>
+  public async select(table: TastyTable, columns: TastyColumn[], filter: object): Promise<object[]>
   {
     const query = new TastyQuery(table);
-    query.select(columns);
-    let node: TastyNode = null;
-    if (filter instanceof Array)
+    if (columns)
     {
-      filter.map((o) =>
+      query.select(columns);
+    }
+
+    try
+    {
+      const node: TastyNode = this.filterPrimaryKeys(table, filter);
+      if (node)
       {
-        if (node === null)
-        {
-          node = this.filterPrimaryKeys(table, o);
-        }
-        else
-        {
-          node = node.or(this.filterPrimaryKeys(table, o));
-        }
-      });
-      query.filter(node);
+        query.filter(node);
+      }
+
+      const queryString = this.generator.generate(query);
+      return await this.executor.query(queryString);
     }
-    else
+    catch (e)
     {
-      node = this.filterPrimaryKeys(table, filter);
-      query.filter(node);
+      throw(e);
     }
-    const queryString = this.generator.generate(query);
-    return await this.executor.query(queryString);
   }
 
   /**
@@ -314,7 +303,7 @@ export class Tasty
   private filterPrimaryKeys(table: TastyTable, obj: object): TastyNode
   {
     let node: TastyNode = null;
-    table.primaryKeys.map((key) =>
+    Object.keys(table).map((key) =>
     {
       if (node === null)
       {
@@ -322,7 +311,7 @@ export class Tasty
       }
       else
       {
-        if (obj.hasOwnProperty(key))
+        if (obj[key] !== undefined)
         {
           node = node.and(table[key].equals(obj[key]));
         }
