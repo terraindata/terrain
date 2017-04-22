@@ -119,7 +119,7 @@ export default class MySQLGenerator
       // write FROM clause
       this.newLine();
       this.queryString += 'FROM ';
-      this.queryString += this.escapeString(query.table._tastyTableName);
+      this.queryString += this.escapeString(query.table.getTableName());
 
       // write WHERE clause
       if (query.filters.length > 0)
@@ -187,7 +187,7 @@ export default class MySQLGenerator
         // write INTO clause
         this.newLine();
         this.queryString += 'INTO ';
-        this.queryString += this.escapeString(query.table._tastyTableName);
+        this.queryString += this.escapeString(query.table.getTableName());
 
         let keys = '';
         let values = '';
