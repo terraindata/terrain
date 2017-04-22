@@ -54,7 +54,7 @@ import * as Tasty from '../tasty/Tasty';
 const saltRounds = 10;
 // CREATE TABLE users (id integer PRIMARY KEY, accessToken text NOT NULL, email text NOT NULL, isDisabled bool NOT NULL
 // , isSuperUser bool NOT NULL, name text NOT NULL, password text NOT NULL, timezone string NOT NULL)
-const User = new Tasty.Table('users', ['id'], ['accessToken', 'email', 'isDisabled', 'isSuperUser', 'Meta', 'name',
+const User = new Tasty.Table('users', ['id'], ['accessToken', 'email', 'isDisabled', 'isSuperUser', 'name',
   'password', 'timezone']);
 
 export interface UserConfig
@@ -222,9 +222,7 @@ export const Users =
 
   loginWithEmail: async (email: string, password: string) =>
   {
-    console.log('what');
-    const results = await DB.select(User, [], { email, password });
-    console.log('well that worked');
+    const results = await DB.select(User, [], { email });
     if (results && results.length === 0)
     {
       return new Promise(async (resolve, reject) =>

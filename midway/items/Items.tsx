@@ -131,7 +131,6 @@ export const Items =
 
   getAll: async () =>
   {
-    console.log('wot');
     return await DB.select(Item, [], {});
   },
 
