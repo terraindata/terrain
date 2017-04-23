@@ -44,36 +44,42 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as elasticSearch from 'elasticsearch';
+import * as ElasticSearch from 'elasticsearch';
+import {Client, ConfigOptions} from 'elasticsearch';
 import TastyTable from './TastyTable';
 
-const defaultElasticConfig = {
-  hosts: ['http://localhost:9200'],
-  index: 'moviesdb',
-};
+export interface ElasticExecutorConfig extends ConfigOptions
+{
+  indexName: string;
+}
 
 export default class ElasticExecutor
 {
-  private config;
-  private client;
+  private config: ElasticExecutorConfig;
+  private client: Client;
+  private defaultElasticConfig: ElasticExecutorConfig = {
+    hosts: ['http://localhost:9200'],
+    indexName: 'moviesdb',
+  };
 
-  constructor(config?: any)
+  constructor(config?: ElasticExecutorConfig)
   {
     if (config === undefined)
     {
-      config = defaultElasticConfig;
+      this.config = this.defaultElasticConfig;
+    } else
+    {
+      this.config = this.defaultElasticConfig;
     }
-
-    this.config = config;
-    this.client = new elasticSearch.Client(config);
+    this.client = new Client(config);
   }
 
   /**
    * ES specific extension -- gets the health of the ES cluster
    */
-  public health()
+  public async health(): Promise<object>
   {
-    return new Promise((resolve, reject) =>
+    return await new Promise((resolve, reject) =>
     {
       this.client.cluster.health(
           {},
@@ -84,7 +90,7 @@ export default class ElasticExecutor
   /**
    * Returns the entire ES response object.
    */
-  public fullQuery(queryObject: object)
+  public async fullQuery(queryObject: object)
   {
     return new Promise((resolve, reject) =>
     {
@@ -109,11 +115,6 @@ export default class ElasticExecutor
     return result.hits;
   }
 
-  public destroy()
-  {
-    this.client.close();
-  }
-
   /**
    * Upserts the given objects, based on primary key ('id' in elastic).
    */
@@ -135,11 +136,11 @@ export default class ElasticExecutor
             const query = {
               body: element,
               id: this.makeID(table, element),
-              index: this.config.index,
+              index: this.config.indexName,
               type: table._tastyTableName,
             };
 
-            this.client.indices.index(
+            this.client.index(
                 query,
                 this.makePromiseCallback(resolve, reject));
           }));
@@ -156,7 +157,7 @@ export default class ElasticExecutor
     return new Promise((resolve, reject) =>
     {
       const params = {
-        index: this.config.index,
+        index: this.config.indexName,
       };
 
       this.client.indices.delete(
@@ -178,7 +179,7 @@ export default class ElasticExecutor
           new Promise((resolve, reject) => {
             const params = {
               id: this.makeID(table, element),
-              index: this.config.index,
+              index: this.config.indexName,
               type: table._tastyTableName,
             };
 
@@ -199,7 +200,7 @@ export default class ElasticExecutor
       const command = {
         index: {
           _id:    this.makeID(table, element),
-          _index: this.config.index,
+          _index: this.config.indexName,
           _type:  table._tastyTableName,
         },
       };
@@ -224,6 +225,7 @@ export default class ElasticExecutor
     return table.getPrimaryKey(element).join('-');
   }
 
+  // (resolve: (response: any) => any, reject: (error: any) => any): (error: any, response: any) => any
   private makePromiseCallback(resolve, reject)
   {
     return (error, response) =>

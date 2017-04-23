@@ -62,7 +62,8 @@ const td1MySQLConfig: mysql.IPoolConfig = {
 let mysqlConnection;
 let elasticSearch;
 
-try {
+try
+{
     mysqlConnection = new MySQLExecutor(td1MySQLConfig);
     elasticSearch = new ElasticExecutor();
 } catch (err)
