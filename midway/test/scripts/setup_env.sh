@@ -1,4 +1,5 @@
 #!/bin/bash
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # this is the tagged version of moviedb docker image we are using
@@ -9,7 +10,7 @@ sqlite_image="terrain/moviesdb-sqlite:$deploy_version"
 
 mysql_port=3306
 elastic_port=9200
-sqlite_path=$(pwd)
+sqlite_path=${DIR}/../../../
 
 function usage {
 	 echo "Help!"
@@ -82,4 +83,7 @@ docker run -d -p $mysql_port:3306 $mysql_image
 
 docker pull $elastic_image
 docker run -d -p $elastic_port:9200 $elastic_image
+
+docker pull $sqlite_image
+docker run -v${sqlite_path}:/data/ -u$(id -u):$(id -g) $sqlite_image
 

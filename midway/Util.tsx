@@ -57,7 +57,9 @@ const Util =
         if (!error && res.statusCode === 200)
         {
           resolve(body);
-        } else {
+        }
+        else
+        {
           reject(error);
         }
       });

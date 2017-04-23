@@ -49,7 +49,7 @@ import * as test from 'tape';
 const {assert} = chai;
 import * as sinon from 'sinon';
 
-import Tasty from '../../tasty/Tasty';
+import * as Tasty from '../../tasty/Tasty';
 import TastyNodeTypes from '../../tasty/TastyNodeTypes';
 import SQLQueries from './SQLQueries';
 
@@ -63,7 +63,8 @@ function testQuery(index: number)
   return SQLQueries[index][1];
 }
 
-test('node type: skip', (t) => {
+test('node type: skip', (t) =>
+{
   t.equal(TastyNodeTypes[TastyNodeTypes.skip], 'skip');
   t.equal(TastyNodeTypes.skip, 11);
   t.end();
@@ -71,113 +72,125 @@ test('node type: skip', (t) => {
 
 const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
 
-test(testName(0), (t) => {
+test(testName(0), (t) =>
+{
   const query = new Tasty.Query(DBMovies).take(10);
-  const qstr = Tasty.MySQL.generate(query);
+  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
   t.equal(qstr, testQuery(0));
   t.end();
 });
 
-test(testName(1), (t) => {
+test(testName(1), (t) =>
+{
   const query = new Tasty.Query(DBMovies);
   query.select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).take(10);
-  const qstr = Tasty.MySQL.generate(query);
+  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
   t.equal(qstr, testQuery(1));
   t.end();
 });
 
-test(testName(2), (t) => {
+test(testName(2), (t) =>
+{
   const query = new Tasty.Query(DBMovies);
   query.filter(DBMovies['movieid'].equals(123));
-  const qstr = Tasty.MySQL.generate(query);
+  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
   t.equal(qstr, testQuery(2));
   t.end();
 });
 
-test(testName(3), (t) => {
+test(testName(3), (t) =>
+{
   const query = new Tasty.Query(DBMovies);
   query.filter(DBMovies['title'].doesNotEqual('Toy Story (1995)')).take(10);
-  const qstr = Tasty.MySQL.generate(query);
+  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
   t.equal(qstr, testQuery(3));
   t.end();
 });
 
-test(testName(4), (t) => {
+test(testName(4), (t) =>
+{
   const query = new Tasty.Query(DBMovies);
   query.sort(DBMovies['title'], 'asc').take(10);
-  const qstr = Tasty.MySQL.generate(query);
+  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
   t.equal(qstr, testQuery(4));
   t.end();
 });
 
-test(testName(5), (t) => {
+test(testName(5), (t) =>
+{
   const query = new Tasty.Query(DBMovies);
   query.sort(DBMovies['title'], 'desc').take(10);
-  const qstr = Tasty.MySQL.generate(query);
+  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
   t.equal(qstr, testQuery(5));
   t.end();
 });
 
-test(testName(6), (t) => {
+test(testName(6), (t) =>
+{
   const query = new Tasty.Query(DBMovies);
   query.take(10);
-  const qstr = Tasty.MySQL.generate(query);
+  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
   t.equal(qstr, testQuery(6));
   t.end();
 });
 
-test(testName(7), (t) => {
+test(testName(7), (t) =>
+{
   const query = new Tasty.Query(DBMovies);
   query.take(10);
   query.skip(20);
-  const qstr = Tasty.MySQL.generate(query);
+  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
   t.equal(qstr, testQuery(7));
   t.end();
 });
 
-test(testName(8), (t) => {
+test(testName(8), (t) =>
+{
   const movie = {
     movieid: 13371337,
     releasedate: new Date('01/01/17').toISOString().substring(0, 10),
     title: 'My New Movie',
   };
   const query = new Tasty.Query(DBMovies).upsert(movie);
-  const qstr = Tasty.MySQL.generate(query);
+  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
   t.equal(qstr, testQuery(8));
   t.end();
 });
 
-test(testName(9), (t) => {
+test(testName(9), (t) =>
+{
   const query = new Tasty.Query(DBMovies).delete();
-  const qstr1 = Tasty.MySQL.generate(query);
+  const qstr1 = Tasty.Tasty.generate(Tasty.MySQL, query);
   t.equal(qstr1, `DELETE \n  FROM movies;`);
   query.filter(DBMovies['movieid'].equals(13371337));
-  const qstr2 = Tasty.MySQL.generate(query);
+  const qstr2 = Tasty.Tasty.generate(Tasty.MySQL, query);
   t.equal(qstr2, testQuery(9));
   t.end();
 });
 
-test(testName(10), (t) => {
+test(testName(10), (t) =>
+{
   const query = new Tasty.Query(DBMovies);
   query.select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).filter(DBMovies['movieid'].neq(2134));
   query.filter(DBMovies['releasedate'].gte('2007-03-24')).filter(DBMovies['releasedate'].lt('2017-03-24'));
   query.sort(DBMovies['title'], 'asc').sort(DBMovies['movieid'], 'desc').sort(DBMovies['releasedate'], 'asc');
   query.take(10).skip(20);
 
-  const qstr = Tasty.MySQL.generate(query);
+  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
   /* tslint:disable-next-line:max-line-length */
   t.equal(qstr, testQuery(10));
   t.end();
 });
 
-test('generate complex query (Elastic)', (t) => {
+test('generate complex query (Elastic)', (t) =>
+{
   const query = new Tasty.Query(DBMovies);
   query.select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).filter(DBMovies['movieid'].neq(2134));
   query.filter(DBMovies['releasedate'].gte('2007-03-24')).filter(DBMovies['releasedate'].lt('2017-03-24'));
   query.sort(DBMovies['title'], 'asc').sort(DBMovies['movieid'], 'desc').sort(DBMovies['releasedate'], 'asc');
   query.take(10).skip(20);
 
-  const qstr = JSON.stringify(Tasty.Elastic.generate(query));
+  const qstr = JSON.stringify(Tasty.Tasty.generate(Tasty.ElasticSearch, query));
   /* tslint:disable-next-line:max-line-length */
   t.equal(qstr, `{"index":"movies","from":20,"size":10,"stored_fields":["movieid","title","releasedate"],"query":{"filter":{"bool":{"must_not":[{"term":{"movieid":2134}}]},"range":{"releasedate":{"gte":"2007-03-24","lt":"2017-03-24"}}}},"sort":[{"title":"asc"},{"movieid":"desc"},{"releasedate":"asc"}]}`);
   t.end();

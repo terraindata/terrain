@@ -64,8 +64,8 @@ export class SQLGeneratorMapping
   }
 }
 
-/* tslint:disable:object-literal-sort-keys */
-export const TypeMap = Object.freeze({
+export const TypeMap = Object.freeze(
+{
   'boolean': new SQLGeneratorMapping(null, FixEnum.nullary),
   'null': new SQLGeneratorMapping('NULL', FixEnum.nullary),
   'number': new SQLGeneratorMapping(null, FixEnum.nullary),
@@ -104,4 +104,3 @@ export const TypeMap = Object.freeze({
   'ascending': new SQLGeneratorMapping('ASC', FixEnum.postfix),
   'descending': new SQLGeneratorMapping('DESC', FixEnum.postfix),
 });
-/* tslint:enable:object-literal-sort-keys */

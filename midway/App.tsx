@@ -136,24 +136,32 @@ Middleware.passport.deserializeUser((id, done) =>
 
 app.use(Router.routes());
 
-winston.configure({
-  transports: [
-    new (winston.transports.Console)({
-      formatter: (options) =>
-      {
-        return options.timestamp() + ' [' + process.pid + '] ' + options.level + ': ' +
-            (options.message ? options.message : '') + (options.meta && Object.keys(options.meta).length ? '\n\t' +
-            JSON.stringify(options.meta) : '' );
-      },
-      timestamp: () =>
-      {
-        return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
-      },
-    }),
-  ],
+winston.configure(
+{
+    transports:
+      [
+        new (winston.transports.Console)(
+          {
+            formatter: (options) =>
+              {
+                const message = options.message || '';
+                const level = winston.config.colorize(options.level);
+                const meta = options.meta && Object.keys(options.meta).length ? '\n\t' + JSON.stringify(options.meta)
+                             : '';
+                return `${options.timestamp()} [${process.pid}] ${level}: ${message} ${meta}`;
+              },
+            timestamp: () =>
+              {
+                return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
+              },
+          },
+        ),
+      ],
 });
 
-app.listen(args.port);
+const request = app.listen(args.port);
+
+export default request;
 
 // TODO list
 // - import HTML rather than writing directly inline

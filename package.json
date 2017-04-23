@@ -19,7 +19,8 @@
     "build-demo": "npm run commit-log && MIDWAY_HOST=localhost webpack --config webpack.config.prod.js --output-filename bundle.demo.js",
     "build-gcloud": "npm run commit-log && webpack --config webpack.config.gcloud.js --output-filename bundle.js",
     "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node --harmony -- ./midway/App.tsx",
-    "lint": "./node_modules/.bin/tslint -c tslint.json --fix midway/**/*.tsx"
+    "lint": "./node_modules/.bin/tslint -c tslint.json --fix 'midway/**/*.ts{,x}'",
+    "style": "find midway -name '*.tsx' -exec ./node_modules/.bin/tsfmt -r {} \\;"
   },
   "repository": {
     "type": "git",
@@ -39,6 +40,7 @@
   ],
   "private": true,
   "dependencies": {
+    "@types/deep-equal": "^1.0.0",
     "babel-cli": "^6.24.0",
     "babel-core": "^6.7.7",
     "babel-loader": "^6.2.4",
@@ -60,6 +62,7 @@
     "css-loader": "^0.10.1",
     "d3": "^3.5.14",
     "date-format": "^1.1.0",
+    "deep-equal": "^1.0.1",
     "diff-match-patch": "^1.0.0",
     "dom-helpers": "^2.4.0",
     "elasticsearch": "^13.0.0-rc2",
@@ -127,7 +130,6 @@
     "timezones.json": "^1.1.0",
     "ts-loader": "^0.7.2",
     "tsd": "^0.6.5",
-    "tslint": "^5.1.0",
     "typescript": "^2.2.2",
     "underscore": "^1.8.3",
     "url-loader": "^0.5.6",
@@ -163,10 +165,11 @@
     "@types/request": "0.0.42",
     "@types/sinon": "^2.1.1",
     "@types/sqlite3": "^2.2.33",
+    "@types/supertest": "^2.0.0",
     "@types/tape": "^4.2.29",
     "@types/underscore": "^1.8.0",
     "@types/webpack": "^2.2.14",
-    "@types/winston": "^2.3.0",
+    "@types/winston": ">=2.3.1",
     "babel-cli": "^6.22.2",
     "babel-plugin-transform-async-to-generator": "^6.22.0",
     "babel-plugin-transform-regenerator": "^6.22.0",
@@ -185,7 +188,10 @@
     "react-addons-perf": "^15.0.1",
     "react-addons-test-utils": "^15.0.1",
     "react-testutils-additions": "^15.0.0",
+    "supertest": "^3.0.0",
     "tape": "^4.4.0",
-    "ts-node": "^3.0.2"
+    "ts-node": "^3.0.2",
+    "tslint": "^5.1.0",
+    "typescript-formatter": "^5.1.3"
   }
 }
