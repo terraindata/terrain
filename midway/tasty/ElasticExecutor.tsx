@@ -175,7 +175,6 @@ export class ElasticExecutor implements TastyExecutor
     await Promise.all(promises);
   }
 
-
   /*
    * Deletes the given objects based on their primary key
    */
