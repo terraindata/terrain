@@ -76,7 +76,7 @@ General coding standards for Javascript are located in the TechDocs repo, not in
   * Install the latest LTS node version (6.10.2): `n lts`
 * `yarn`
 * `yarn global add webpack-dev-server`
-* `yarn run start` - starts the Midway server, now running at localhost:3000
+* `yarn start` - starts the Midway server, now running at localhost:3000
 * `yarn run start-koa` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the
                         dev front-end server on start (and kill it on end)
 * Default user login: `luser` / `secret`
