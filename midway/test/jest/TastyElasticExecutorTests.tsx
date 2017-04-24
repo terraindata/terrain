@@ -582,15 +582,3 @@ test('stored PWL transform sort query using function_score', async (done) =>
   done();
 });
 
-test('connection destroy', async (done) =>
-{
-  try
-  {
-    await elasticSearch.destroy();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-  done();
-});

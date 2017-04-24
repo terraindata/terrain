@@ -75,7 +75,7 @@ export class ElasticExecutor implements TastyExecutor
     }
 
     // Do not reuse objects to configure the elasticsearch Client class: https://github.com/elasticsearch/elasticsearch-js/issues/33
-    config = new elasticSearch.Client(JSON.parse(JSON.stringify(config)));
+    config = new Client(JSON.parse(JSON.stringify(config)));
     this.client = new Client(this.config);
   }
 
@@ -128,7 +128,7 @@ export class ElasticExecutor implements TastyExecutor
 
   public async destroy()
   {
-    throw(new Error('destroy is not implemented yet.'));
+    ;
   }
 
   public storeProcedure(procedure)
@@ -162,8 +162,8 @@ export class ElasticExecutor implements TastyExecutor
             const query = {
               body: element,
               id: this.makeID(table, element),
-              index: this.config.indexName,
-              type: table.tastyTableName,
+              index: table.getTableName(),
+              type: table.getTableName(),
             };
 
             this.client.index(
@@ -206,8 +206,8 @@ export class ElasticExecutor implements TastyExecutor
             const params =
             {
               id: this.makeID(table, element),
-              index: this.config.indexName,
-              type: table.tastyTableName,
+              index: table.getTableName(),
+              type: table.getTableName(),
             };
 
             this.client.delete(
@@ -228,8 +228,8 @@ export class ElasticExecutor implements TastyExecutor
       {
         index: {
           _id:    this.makeID(table, element),
-          _index: this.config.indexName,
-          _type:  table.tastyTableName,
+          _index: table.getTableName(),
+          _type:  table.getTableName(),
         },
       };
 

@@ -72,28 +72,39 @@ export class TastyTable
       });
   }
 
-  public get tableName(): string
+  public getTableName(): string
   {
     return this.tastyTableName;
   }
 
-  public get primaryKeys(): string[]
+  public getPrimaryKeys(obj?: object): string[]
   {
-    return this.tastyPrimaryKey;
-  }
+    if (obj === undefined)
+    {
+      return this.tastyPrimaryKey;
+    }
 
-  public toString(): string
-  {
-    return JSON.stringify(this, null, 2);
-  }
-
-  public getPrimaryKeys(obj: object): string[]
-  {
     return this.tastyPrimaryKey.map(
       (column) =>
       {
         return obj[column];
       });
+  }
+
+  public getColumnNames(): string[]
+  {
+    return Object.keys(this).filter((item) =>
+    {
+      if (item !== 'tableName' && item !== 'primaryKeys')
+      {
+        return item;
+      }
+    });
+  }
+
+  public toString(): string
+  {
+    return JSON.stringify(this, null, 2);
   }
 }
 

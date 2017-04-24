@@ -44,23 +44,87 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
+
+import Util from '../Util';
+import { UserConfig, Users } from './Users';
 
 const Router = new KoaRouter();
 
 Router.get('/', async (ctx, next) =>
 {
-  // return all items, or item by id
   ctx.body = '';
   winston.info('user root');
 });
 
 Router.post('/', async (ctx, next) =>
 {
-  // change or create a user
   ctx.body = '';
   winston.info('user post');
+});
+
+Router.post('/:id/update', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  // update user, must be super user or authenticated user updating own info
+  winston.info('user update');
+  let returnStatus: any = 'Incorrect parameters';
+  const req = ctx.state.authInfo;
+  if (!req['body'])
+  {
+    ctx.body = 'Fields required';
+  }
+  else
+  {
+    req['body']['id'] = ctx.params.id;
+    req['callingUser'] = ctx.state.user;
+    // if superuser or id to be updated is current user
+    if (ctx.state.user.isSuperUser || ctx.state.authInfo.id === req['body']['id'])
+    {
+      returnStatus = await Users.createOrUpdate(req);
+    }
+    // TODO revise this once error handling is implemented in Tasty
+    if (returnStatus instanceof Array)
+    {
+      ctx.body = 'Success';
+    }
+    else {
+      ctx.body = returnStatus;
+    }
+  }
+});
+
+Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  // create a user, must be admin
+  winston.info('create user');
+  const req = ctx.state.authInfo;
+  let returnStatus: any = 'Incorrect parameters';
+  if (!req.body)
+  {
+    ctx.body = 'Fields required';
+  }
+  else
+  {
+    if (req.body && req.body['id'])
+    {
+      delete req.body['id'];
+    }
+    if (ctx.state.user.isSuperUser)
+    {
+      // define which other parameters need to be present for create/update
+      returnStatus = await Users.createOrUpdate(req);
+    }
+    // TODO revise this once error handling is implemented in Tasty
+    if (returnStatus instanceof Array)
+    {
+      ctx.body = 'Success';
+    }
+    else {
+      ctx.body = returnStatus;
+    }
+  }
 });
 
 export default Router;
