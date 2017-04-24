@@ -1,6 +1,6 @@
 #!/bin/bash
 
 npm install
-npm lint
+npm fix
 npm run test-back
 
