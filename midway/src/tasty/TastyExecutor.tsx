@@ -44,9 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import TastySchema from './TastySchema';
+
 abstract class TastyExecutor
 {
   public async abstract query(query: string | object): Promise<object[]>;
+  public async schema(): Promise<TastySchema>;
   public async abstract destroy(): Promise<void>;
 }
 
