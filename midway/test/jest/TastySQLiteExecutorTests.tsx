@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as hash from 'object-hash';
 
 import SQLiteExecutor from '../../tasty/SQLiteExecutor';
-import Tasty from '../../tasty/Tasty';
+import * as Tasty from '../../tasty/Tasty';
 import SQLQueries from './SQLQueries';
 
 const resultHash: string[] = [
@@ -64,11 +64,11 @@ const resultHash: string[] = [
   'c95266c7ea79135e06bf67a60e78204a3491a2f2',
 ];
 
-let sqlite;
+let tasty: Tasty.Tasty;
 
 async function runQuery(qstr: string)
 {
-  const results = await sqlite.query(qstr);
+  const results = await tasty.execute(qstr);
   return hash(results);
 }
 
@@ -90,9 +90,14 @@ function runTest(index: number)
 
 test('pool connect', async (done) =>
 {
+  const config: Tasty.SQLiteConfig =
+    {
+      filename: 'moviesdb.db',
+    };
+
   try
   {
-    sqlite = new SQLiteExecutor({filename: 'moviesdb.db'});
+    tasty = new Tasty.Tasty(Tasty.SQLite, config);
   } catch (e)
   {
     fail(e);
@@ -105,11 +110,21 @@ for (let i = 0; i < SQLQueries.length; i++)
   runTest(i);
 }
 
+const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
+
+test('tasty select', async (done) =>
+{
+  const movieid = 123;
+  const results = await tasty.select(DBMovies, [], {movieid: 123});
+  expect(results[0]).toEqual({ movieid: 123, releasedate: '1994-07-14 00:00:00', title: 'Chungking Express (Chung Hing sam lam) (1994)' });
+  done();
+});
+
 test('pool destroy', async (done) =>
 {
   try
   {
-    await sqlite.destroy();
+    await tasty.destroy();
   } catch (e)
   {
     fail(e);

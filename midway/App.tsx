@@ -55,9 +55,9 @@ import passportLocal = require('passport-local');
 import reqText = require('require-text');
 import session = require('koa-generic-session');
 
-import Users from './db/Users';
 import Middleware from './Middleware';
 import Router from './Router';
+import Users from './users/Users';
 import Util from './Util';
 
 const LocalStrategy = passportLocal.Strategy;
@@ -106,19 +106,28 @@ app.use(Middleware.compress());
 app.use(Middleware.passport.initialize());
 app.use(Middleware.passport.session());
 
+// authenticate with id and accessToken
 Middleware.passport.use('access-token-local', new LocalStrategy(
-  {
-    passwordField: 'accessToken',
-    usernameField: 'username',
-  },
-  (username, accessToken, done) =>
-  {
-    return done(null, Users.findByAccessToken(username, accessToken));
+{
+  passReqToCallback: true,
+  passwordField: 'accessToken',
+  session: false,
+  usernameField: 'id',
+},
+async (req, id, accessToken, done) =>
+{
+  done(null, await Users.loginWithAccessToken(id, accessToken), { body: req.body.body });
 }));
 
-Middleware.passport.use('local', new LocalStrategy(async (username, password, done) =>
+// authenticate with email and password
+Middleware.passport.use('local', new LocalStrategy(
 {
-  done(null, await Users.findByUsername(username, password));
+  passReqToCallback: true,
+  usernameField: 'email',
+},
+async (req, email, password, done) =>
+{
+  done(null, await Users.loginWithEmail(email, password), { body: req.body.body });
 }));
 
 Middleware.passport.serializeUser((user, done) =>

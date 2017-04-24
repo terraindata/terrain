@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as hash from 'object-hash';
 
 import MySQLExecutor from '../../tasty/MySQLExecutor';
-import Tasty from '../../tasty/Tasty';
+import * as Tasty from '../../tasty/Tasty';
 import SQLQueries from './SQLQueries';
 
 const resultHash: string[] = [
@@ -64,11 +64,11 @@ const resultHash: string[] = [
   '6a56be8acf875c3c02db6ab69931e017747582d0',
 ];
 
-let mysql;
+let tasty: Tasty.Tasty;
 
 async function runQuery(qstr: string)
 {
-  const results = await mysql.query(qstr);
+  const results = await tasty.execute(qstr);
   return hash(results);
 }
 
@@ -90,9 +90,18 @@ function runTest(index: number)
 
 test('pool connect', async (done) =>
 {
+  const config: Tasty.MySQLConfig =
+    {
+      connectionLimit: 20,
+      database : 'moviesdb',
+      host     : 'localhost',
+      password : 'r3curs1v3$',
+      user     : 't3rr41n-demo',
+    };
+
   try
   {
-    mysql = new MySQLExecutor();
+    tasty = new Tasty.Tasty(Tasty.MySQL, config);
   } catch (e)
   {
     // fail(e);
@@ -109,7 +118,7 @@ test('pool destroy', async (done) =>
 {
   try
   {
-    await mysql.destroy();
+    await tasty.destroy();
   } catch (e)
   {
     // fail(e);

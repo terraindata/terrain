@@ -156,10 +156,10 @@ test(testName(9), (done) =>
 {
   const query = new Tasty.Query(DBMovies).delete();
   const qstr1 = Tasty.Tasty.generate(Tasty.MySQL, query);
-  expect(qstr1, `DELETE \n  FROM movies;`);
+  expect(qstr1).toEqual(`DELETE \n  FROM movies;`);
   query.filter(DBMovies['movieid'].equals(13371337));
   const qstr2 = Tasty.Tasty.generate(Tasty.MySQL, query);
-  expect(qstr2, testQuery(9));
+  expect(qstr2).toEqual(testQuery(9));
   done();
 });
 

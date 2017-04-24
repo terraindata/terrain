@@ -44,91 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// https://github.com/ortoo/oauth2orize/blob/master/examples/express2/db/users.js
-// TODO THIS IS A STUB. REPLACE WITH ORM
+import * as Tasty from './tasty/Tasty';
 
-import * as bcrypt from 'bcrypt-nodejs';
-
-import srs = require('secure-random-string');
-
-const users = [
-  {
-    accessToken: '',
-    id: '1',
-    name: 'Bob Smith',
-    password: bcrypt.hashSync('secret'),
-    username: 'bob',
-  },
-  {
-    accessToken: '',
-    id: '2',
-    name: 'Joe Davis',
-    password: bcrypt.hashSync('password'),
-    username: 'joe',
-  },
-  {
-    accessToken: '',
-    id: '3',
-    name: 'Linux User',
-    password: bcrypt.hashSync('secret'),
-    username: 'luser',
-  },
-];
-
-const Users =
+const config: Tasty.SQLiteConfig =
 {
-  find: (id) =>
-  {
-    for (let i = 0, len = users.length; i < len; i++)
-    {
-      const user = users[i];
-      if (user.id === id)
-      {
-        return user;
-      }
-    }
-    return null;
-  },
-  findByAccessToken: (username, accessToken) =>
-  {
-    for (let i = 0, len = users.length; i < len; i++)
-    {
-      const user = users[i];
-      if (user.username === username && user.accessToken.length > 0 && user.accessToken === accessToken)
-      {
-        return user;
-      }
-    }
-    return null;
-  },
-  findByUsername: (username, password) =>
-  {
-    for (let i = 0, len = users.length; i < len; i++)
-    {
-      const user = users[i];
-      if (user.username === username)
-      {
-        return new Promise((resolve, reject) => {
-          bcrypt.compare(password, user.password, (err, res) =>
-          {
-            if (res)
-            {
-              if (user.accessToken.length === 0)
-              {
-                user.accessToken = srs(
-                  {
-                    length: 256,
-                  });
-              }
-              resolve(user);
-            } else {
-              resolve(null);
-            }
-          });
-        });
-      }
-    }
-  },
+  filename : 'nodeway.db',
 };
 
-export default Users;
+let DB = new Tasty.Tasty(Tasty.SQLite, config);
+
+export default DB;
