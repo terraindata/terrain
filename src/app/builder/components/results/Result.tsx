@@ -65,13 +65,13 @@ const MAX_DEFAULT_FIELDS = 4;
 interface Props
 {
   result: Result;
-  
+
   resultsConfig: IResultsConfig;
   index: number;
   primaryKey: string;
   onExpand: (index:number) => void;
   expanded?: boolean;
-  
+
   isOver?: boolean;
   isDragging?: boolean;
   connectDragSource?: (a:any) => any;
@@ -87,7 +87,7 @@ class ResultComponent extends Classs<Props> {
   //   isSpotlit: false,
   //   spotlightColor: "",
   // };
-  
+
   renderExpandedField(value, field)
   {
     return this.renderField(field, 0, null, {
@@ -95,14 +95,14 @@ class ResultComponent extends Classs<Props> {
       showRaw: true,
     });
   }
-  
+
   renderField(field, index?, fields?, overrideFormat?)
   {
     if(!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS)
     {
       return null;
     }
-    
+
     var value = getResultValue(this.props.result, field, this.props.resultsConfig, overrideFormat);
     let format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     let showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
@@ -111,8 +111,8 @@ class ResultComponent extends Classs<Props> {
         {
           showField &&
             <div className="result-field-name">
-              { 
-                field 
+              {
+                field
               }
             </div>
         }
@@ -130,7 +130,7 @@ class ResultComponent extends Classs<Props> {
       </div>
     );
   }
-  
+
   spotlight()
   {
     let id = this.props.primaryKey;
@@ -139,14 +139,14 @@ class ResultComponent extends Classs<Props> {
       isSpotlit: true,
       spotlightColor,
     });
-    
+
     let spotlightData = this.props.result.toJS();
     spotlightData['name'] = getResultName(this.props.result, this.props.resultsConfig);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightAction(id, spotlightData);
   }
-  
+
   unspotlight()
   {
     this.setState({
@@ -154,14 +154,14 @@ class ResultComponent extends Classs<Props> {
     });
     spotlightAction(this.props.primaryKey, null);
   }
-  
+
   renderSpotlight()
   {
     if(!this.props.result.spotlight)
     {
       return null;
     }
-    
+
     return (
       <div
         className='result-spotlight'
@@ -171,7 +171,7 @@ class ResultComponent extends Classs<Props> {
       />
     );
   }
-  
+
   menuOptions =
   [
     List([
@@ -180,7 +180,7 @@ class ResultComponent extends Classs<Props> {
         onClick: this.spotlight,
       },
     ]),
-    
+
     List([
       {
         text: 'Un-Spotlight',
@@ -188,39 +188,39 @@ class ResultComponent extends Classs<Props> {
       },
     ]),
   ];
-  
+
   expand()
   {
     this.props.onExpand(this.props.index);
   }
-  
+
 	render()
   {
     const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, result } = this.props;
-    
+
     var classes = classNames({
       'result': true,
       'result-expanded': this.props.expanded,
       'result-dragging': isDragging,
       'result-drag-over': isOver,
     });
-    
+
     if(resultsConfig && resultsConfig.score && resultsConfig.enabled)
     {
           // <ScoreIcon className='result-score-icon' />
       var scoreArea = (
         <div className='result-score'>
-          { 
-            this.renderField(resultsConfig.score) 
+          {
+            this.renderField(resultsConfig.score)
           }
     		</div>
       );
     }
-    
+
     let name = getResultName(result, resultsConfig);
     let fields = getResultFields(result, resultsConfig);
     let configHasFields = resultsConfigHasFields(resultsConfig);
-    
+
     if(!configHasFields && fields.length > 4 && !this.props.expanded)
     {
       var bottom = (
@@ -229,7 +229,7 @@ class ResultComponent extends Classs<Props> {
         </div>
       );
     }
-    
+
     if(this.props.expanded)
     {
       var expanded = (
@@ -246,7 +246,7 @@ class ResultComponent extends Classs<Props> {
         </div>
       );
     }
-    
+
     return ((
       <div
         className={classes}
@@ -261,30 +261,30 @@ class ResultComponent extends Classs<Props> {
               <div className='result-pin-icon'>
                 <PinIcon />
               </div>
-              { 
+              {
                 name
               }
             </div>
           </div>
-          
-          <Menu 
+
+          <Menu
             options={
               this.menuOptions[result.spotlight ? 1 : 0]
-            } 
+            }
           />
-          
-          { 
-            scoreArea 
+
+          {
+            scoreArea
           }
-          
+
           <div className='result-fields-wrapper'>
             {
                 _.map(fields, this.renderField)
             }
-            { 
+            {
               bottom
             }
-            { 
+            {
               expanded
             }
           </div>
@@ -292,9 +292,7 @@ class ResultComponent extends Classs<Props> {
       </div>
     ));
 	}
-};
-
-
+}
 export function getResultValue(result: Result, field: string, config: IResultsConfig, overrideFormat?: any): string
 {
   var value: any;
@@ -320,10 +318,10 @@ export function getResultFields(result: Result, config: IResultsConfig): string[
   {
     var fields = result.fields.keySeq().toArray();
   }
-  
+
   return fields;
 }
-  
+
 export function getResultName(result: Result, config: IResultsConfig)
 {
   if(config && config.name && config.enabled)
@@ -334,7 +332,7 @@ export function getResultName(result: Result, config: IResultsConfig)
   {
     var nameField = _.first(getResultFields(result, config));
   }
-  
+
   return getResultValue(result, nameField, config);
 }
 
@@ -364,7 +362,7 @@ export function ResultFormatValue(field: string, value: string | number, config:
     value = 'null';
     italics = true;
   }
-  
+
   if(format)
   {
     switch(format.type)
@@ -392,24 +390,24 @@ export function ResultFormatValue(field: string, value: string | number, config:
           </div>
         </div>
       );
-      
+
       case 'text':
-        
+
       break;
     }
   }
-  
+
   if(typeof value === 'number')
   {
     value = Math.floor((value as number) * 10000) / 10000;
     value = value.toLocaleString();
   }
-  
+
   if(italics)
   {
     return <em>{value}</em>;
   }
-  
+
   return value;
 }
 
@@ -418,27 +416,27 @@ export default ResultComponent;
 // DnD stuff
 
 // Defines a draggable result functionality
-// const resultSource = 
+// const resultSource =
 // {
 //   canDrag(props)
 //   {
 //     return false; // TODO remove once we get result dragging and pinning working
 //     // return props.canDrag;
 //   },
-  
+
 //   beginDrag(props)
 //   {
 //     const item = props.result;
 //     return item;
 //   },
-  
+
 //   endDrag(props, monitor, component)
 //   {
 //     if(!monitor.didDrop())
 //     {
 //       return;
 //     }
-    
+
 //     const item = monitor.getItem();
 //     const dropResult = monitor.getDropResult();
 //   }
@@ -452,18 +450,18 @@ export default ResultComponent;
 //   connectDragPreview: connect.dragPreview()
 // });
 
-// const resultTarget = 
+// const resultTarget =
 // {
 //   canDrop(props, monitor)
 //   {
 //     return true;
 //   },
-  
+
 //   hover(props, monitor, component)
 //   {
 //     const canDrop = monitor.canDrop();
 //   },
-  
+
 //   drop(props, monitor, component)
 //   {
 //     const item = monitor.getItem();

@@ -89,8 +89,8 @@ class AlgorithmsColumn extends PureClasss<Props>
     lastMoved: '',
     draggingItemIndex: -1,
     draggingOverIndex: -1,
-  }
-  
+  };
+
   componentWillMount()
   {
     this._subscribe(UserStore, {
@@ -99,18 +99,18 @@ class AlgorithmsColumn extends PureClasss<Props>
       // isMounted: true,
     });
     this._subscribe(RolesStore, {
-      stateKey: 'roles', 
+      stateKey: 'roles',
       // isMounted: true
     });
   }
-  
+
   componetDidMount()
   {
     this.setState({
       rendered: true,
     })
   }
-  
+
   componentDidUpdate()
   {
     if(!this.state.rendered)
@@ -120,7 +120,7 @@ class AlgorithmsColumn extends PureClasss<Props>
       });
     }
   }
-  
+
   componentWillReceiveProps(nextProps)
   {
     if(nextProps.groupId !== this.props.groupId)
@@ -130,7 +130,7 @@ class AlgorithmsColumn extends PureClasss<Props>
       });
     }
   }
-  
+
   handleDuplicate(id: ID)
   {
     Actions.algorithms.duplicate(
@@ -138,7 +138,7 @@ class AlgorithmsColumn extends PureClasss<Props>
       this.props.algorithmsOrder.findIndex(iid => iid === id)
     );
   }
-  
+
   handleArchive(id: ID)
   {
     Actions.algorithms.change(
@@ -146,12 +146,12 @@ class AlgorithmsColumn extends PureClasss<Props>
         .set('status', LibraryTypes.EAlgorithmStatus.Archive) as Algorithm
       );
   }
-  
+
   handleCreate()
   {
     Actions.algorithms.create(this.props.groupId);
   }
-  
+
   handleNameChange(id: ID, name: string)
   {
     Actions.algorithms.change(
@@ -159,11 +159,11 @@ class AlgorithmsColumn extends PureClasss<Props>
         .set('name', name) as Algorithm
     );
   }
-    
+
   handleHover(index: number, type: string, id: ID)
   {
     var itemIndex = this.props.algorithmsOrder.indexOf(id);
-    if(type === 'algorithm' 
+    if(type === 'algorithm'
       && this.state.lastMoved !== index + ' ' + itemIndex)
     {
       this.setState({
@@ -173,7 +173,7 @@ class AlgorithmsColumn extends PureClasss<Props>
       });
     }
   }
-  
+
   handleDropped(id: ID, targetType: string, targetItem: any, shiftKey: boolean)
   {
     switch (targetType) {
@@ -181,23 +181,23 @@ class AlgorithmsColumn extends PureClasss<Props>
         if(shiftKey)
         {
           Actions.algorithms.duplicate(
-            this.props.algorithms.get(id), 
-            0, 
+            this.props.algorithms.get(id),
+            0,
             targetItem.id
           );
         }
         else
         {
           Actions.algorithms.move(
-            this.props.algorithms.get(id), 
-            0, 
+            this.props.algorithms.get(id),
+            0,
             targetItem.id
           );
         }
         break;
       case "algorithm":
         Actions.algorithms.move(
-          this.props.algorithms.get(id), 
+          this.props.algorithms.get(id),
           this.props.algorithmsOrder.indexOf(targetItem.id),
           this.props.groupId
         );
@@ -206,7 +206,7 @@ class AlgorithmsColumn extends PureClasss<Props>
         // no good
         break;
     }
-    
+
     this.setState({
       draggingItemIndex: -1,
       draggingOverIndex: -1,
@@ -239,26 +239,26 @@ class AlgorithmsColumn extends PureClasss<Props>
         name: "Variants in Live Status",
       },
     ];
-    
+
     const variants = this.props.variants.filter(
-      (v:Variant) => 
+      (v:Variant) =>
         v.algorithmId === id
     );
-   
+
     variants.map(
-      (v:Variant) => 
+      (v:Variant) =>
         scores[v.status].score ++
     );
-    
+
     scores.splice(0, 1); // remove Archived count
-    
+
     let {me, roles} = this.state;
     let canArchive = me && roles && roles.getIn([algorithm.groupId, me.username, 'admin']);
     let canDuplicate = canArchive;
     let canDrag = canArchive; // TODO change to enable Library drag and drop
     let canEdit = canDrag ||
       (me && roles && roles.getIn([algorithm.groupId, me.username, 'builder']));
-    
+
     let lastTouched: Variant = variants.reduce(
       (lastTouched: Variant, v:Variant) =>
       {
@@ -269,10 +269,10 @@ class AlgorithmsColumn extends PureClasss<Props>
           return v;
         }
         return lastTouched;
-      }, 
+      },
       null
     );
-    
+
     var date = "There are no variants";
     var username = "There are no variants";
     if (lastTouched) {
@@ -281,18 +281,18 @@ class AlgorithmsColumn extends PureClasss<Props>
     }
 
     var role = "Viewer";
-    if (roles && roles.getIn([this.props.groupId, username])) 
+    if (roles && roles.getIn([this.props.groupId, username]))
     {
-      if (roles && roles.getIn([this.props.groupId, username]).admin) 
+      if (roles && roles.getIn([this.props.groupId, username]).admin)
       {
         role = "Admin";
       }
-      else if (roles && roles.getIn([this.props.groupId, username]).builder) 
+      else if (roles && roles.getIn([this.props.groupId, username]).builder)
       {
         role = "Builder";
       }
     }
-    
+
     return (
       <LibraryItem
         index={index}
@@ -324,12 +324,12 @@ class AlgorithmsColumn extends PureClasss<Props>
           <UserThumbnail username={username} medium={true} extra={role}/>
           <div className='flex-grow'>
             <div className='library-item-line'>
-              <Scoreline 
+              <Scoreline
                 scores={scores}
                 hideZeroes={true}
               />
             </div>
-            <div 
+            <div
               className='library-item-line'
             >
               { Util.formatDate(date) }
@@ -340,24 +340,24 @@ class AlgorithmsColumn extends PureClasss<Props>
       </LibraryItem>
     );
   }
-  
+
   handleCategoryHover(statusString: string, id: ID)
   {
     let a = this.props.algorithms.get(id);
     let status = LibraryTypes.EAlgorithmStatus[statusString];
     if(a.status !== status)
     {
-      Actions.algorithms.change(a.set('status', status) as Algorithm);  
+      Actions.algorithms.change(a.set('status', status) as Algorithm);
     }
   }
-  
+
   renderCategory(status: LibraryTypes.EAlgorithmStatus)
   {
     let {algorithms} = this.props;
     var ids = this.props.algorithmsOrder.filter(id => algorithms.get(id) && algorithms.get(id).status === status);
     let {me, roles} = this.state;
     let canCreate = me && roles && roles.getIn([this.props.groupId, me.username, 'admin']);
-    
+
     return (
       <LibraryItemCategory
         status={LibraryTypes.EAlgorithmStatus[status]}
@@ -382,7 +382,7 @@ class AlgorithmsColumn extends PureClasss<Props>
       </LibraryItemCategory>
     );
   }
-  
+
   render()
   {
     return (
@@ -390,7 +390,7 @@ class AlgorithmsColumn extends PureClasss<Props>
         index={2}
         title='Algorithms'
       >
-        { 
+        {
           this.props.algorithmsOrder ?
             (
               this.props.algorithmsOrder.size ?

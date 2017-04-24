@@ -81,8 +81,8 @@ class GroupsColumn extends Classs<Props>
     lastMoved: null,
     me: null,
     roles: null,
-  }
-  
+  };
+
   componentDidMount()
   {
     this.setState({
@@ -94,23 +94,23 @@ class GroupsColumn extends Classs<Props>
       isMounted: true,
     });
     this._subscribe(RolesStore, {
-      stateKey: 'roles', 
+      stateKey: 'roles',
       isMounted: true
     });
   }
-  
+
   // handleDuplicate(id: ID)
   // {
   //   Actions.groups.duplicate(this.props.groups.find(g => g.id === id),
   //     this.props.groupsOrder.findIndex(iid => iid === id));
   // }
-  
+
   handleArchive(id: ID)
   {
     Actions.groups.change(this.props.groups.find(g => g.id === id)
       .set('status', LibraryTypes.EGroupStatus.Archive) as Group);
   }
-  
+
   handleNameChange(id: ID, name: string)
   {
     Actions.groups.change(
@@ -118,16 +118,16 @@ class GroupsColumn extends Classs<Props>
         .set('name', name) as Group
     );
   }
-  
+
   handleCreate()
   {
     Actions.groups.create();
   }
-  
+
   handleHover(index: number, type: string, id: ID)
   {
     var itemIndex = this.props.groupsOrder.findIndex(v => v === id);
-    if(type === 'group' && itemIndex !== index 
+    if(type === 'group' && itemIndex !== index
       && this.state.lastMoved !== index + ' ' + itemIndex)
     {
       this.setState({
@@ -140,9 +140,9 @@ class GroupsColumn extends Classs<Props>
 
   handleDropped(id: ID, targetType: string, targetItem: any, shifted: boolean)
   {
-    
-  }  
-  
+
+  }
+
   renderGroup(id: ID, index: number)
   {
     const group = this.props.groups.get(id);
@@ -151,7 +151,7 @@ class GroupsColumn extends Classs<Props>
     let canCreate = (me && groupRoles && groupRoles.getIn([me.username, 'admin']));
     let canEdit = canCreate || (me && me.isAdmin);
     let canDrag = false;
-      
+
         // onDuplicate={this.handleDuplicate}
     return (
       <LibraryItem
@@ -183,7 +183,7 @@ class GroupsColumn extends Classs<Props>
                 username={me.username}
                 medium={true}
                 extra={
-                  groupRoles.getIn([me.username, 'admin']) ? 'Admin' : 
+                  groupRoles.getIn([me.username, 'admin']) ? 'Admin' :
                     (groupRoles.getIn([me.username, 'builder']) ? 'Builder' : 'Viewer')
                 }
               />
@@ -192,14 +192,14 @@ class GroupsColumn extends Classs<Props>
             groupRoles && groupRoles.toArray()
             .filter(role => role.builder || role.admin)
             .map(
-              (role, index) => 
-                index > 8 || (me && role.username === me.username) ? null : 
+              (role, index) =>
+                index > 8 || (me && role.username === me.username) ? null :
                   <UserThumbnail
                     username={role.username}
                     key={role.username}
                     medium={true}
                     extra={
-                      groupRoles.getIn([role.username, 'admin']) ? 'Admin' : 
+                      groupRoles.getIn([role.username, 'admin']) ? 'Admin' :
                         (groupRoles.getIn([role.username, 'builder']) ? 'Builder' : 'Viewer')
                     }
                   />
@@ -209,22 +209,22 @@ class GroupsColumn extends Classs<Props>
       </LibraryItem>
     );
   }
-  
+
   handleCategoryHover(statusString: string, id: ID)
   {
     let g = this.props.groups.get(id);
     let status = LibraryTypes.EGroupStatus[statusString];
     if(g.status !== status)
     {
-      Actions.groups.change(g.set('status', status) as Group);  
+      Actions.groups.change(g.set('status', status) as Group);
     }
   }
-  
+
   renderCategory(status: LibraryTypes.EGroupStatus)
   {
     var ids = this.props.groupsOrder.filter(id => this.props.groups.get(id).status === status);
     let canCreate = this.state.me && this.state.me.isAdmin;
-    
+
     return (
       <LibraryItemCategory
         status={LibraryTypes.EGroupStatus[status]}
@@ -249,7 +249,7 @@ class GroupsColumn extends Classs<Props>
       </LibraryItemCategory>
     );
   }
-  
+
   render()
   {
     return (

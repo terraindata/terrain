@@ -59,7 +59,7 @@ const {browserHistory} = require('react-router');
 require('velocity-animate');
 require('velocity-animate/velocity.ui');
 window['PerfStart'] = Perf.start;
-window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); }
+window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); };
 
 
 // Components
@@ -111,9 +111,9 @@ var LibraryIcon = require("./../images/icon_library_20x16.svg?name=LibraryIcon")
 var BuilderIcon = require("./../images/icon_reporting_18x18.svg?name=BuilderIcon");
 var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIcon");
 var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
-var ManualIcon = require ("./../images/icon_info.svg")
+var ManualIcon = require ("./../images/icon_info.svg");
 
-const links = 
+const links =
 [
   // {
   //   icon: <HomeIcon />,
@@ -153,9 +153,7 @@ interface Props
     pathname: string,
   };
   children: any;
-};
-
-
+}
 class App extends PureClasss<Props>
 {
   state = {
@@ -163,19 +161,19 @@ class App extends PureClasss<Props>
     loggedIn: false,
     sidebarExpanded: false,
     loggedInAndLoaded: false,
-    
+
     libraryLoaded: false,
     usersLoaded: false,
     rolesLoaded: false,
     schemaLoaded: false,
-    
+
     noLocalStorage: false,
   };
-  
+
   constructor(props:Props)
   {
     super(props);
-    
+
     try {
       // check to see if we can use localStorage
       localStorage['test'] = 'test';
@@ -184,51 +182,51 @@ class App extends PureClasss<Props>
       this.state.noLocalStorage = true;
       return;
     }
-    
+
     if(Util.getIEVersion())
     {
       alert('Terraformer is not meant to work in Internet Explorer. Please try another browser.');
     }
-    
+
     // Respond to authentication state changes.
     this._subscribe(AuthStore, {
       updater: (state) => {
         let token = AuthStore.getState().get('authenticationToken');
         let loggedIn = token !== null;
         let loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
-        
+
         this.setState({
           loggedIn,
           loggedInAndLoaded,
         });
-        
+
         if(token !== null)
         {
           this.fetchData();
         }
       }
     });
-    
+
     this._subscribe(LibraryStore, {
       stateKey: 'libraryLoaded',
       storeKeyPath: ['loaded'],
     });
-    
+
     this._subscribe(UserStore, {
       stateKey: 'usersLoaded',
       storeKeyPath: ['loaded'],
     });
-    
+
     this._subscribe(RolesStore, {
       stateKey: 'rolesLoaded',
       storeKeyPath: ['loaded'],
     });
-    
+
     this._subscribe(SchemaStore, {
       stateKey: 'schemaLoaded',
       storeKeyPath: ['loaded'],
     });
-    
+
     // Retrieve logged-in state from persistent storage.
     let token = localStorage['authenticationToken'];
     let username = localStorage['username'];
@@ -236,7 +234,7 @@ class App extends PureClasss<Props>
       AuthActions.login(token, username);
     }
   }
-  
+
   fetchData()
   {
     UserActions.fetch();
@@ -244,28 +242,28 @@ class App extends PureClasss<Props>
     RolesActions.fetch();
     SchemaActions.fetch();
   }
-  
+
   toggleSidebar()
   {
     this.setState({
       sidebarExpanded: !this.state.sidebarExpanded,
     })
   }
-  
+
   handleLoginLoadComplete()
   {
     this.setState({
       loggedInAndLoaded: true,
     });
   }
-  
+
   isAppStateLoaded(): boolean
   {
-    return this.state.libraryLoaded 
-      && this.state.rolesLoaded 
+    return this.state.libraryLoaded
+      && this.state.rolesLoaded
       && this.state.usersLoaded;
   }
-  
+
   renderApp()
   {
     if(!this.state.loggedInAndLoaded)
@@ -289,7 +287,7 @@ class App extends PureClasss<Props>
         [
           {
             width: sidebarWidth,
-            content: <Sidebar 
+            content: <Sidebar
               links={links}
               selectedIndex={selectedIndex}
               expandable={true}
@@ -311,10 +309,10 @@ class App extends PureClasss<Props>
           }
         ],
       };
-     
+
     return <LayoutManager layout={layout} />;
   }
-  
+
   handleMouseMove(e:MEvent)
   {
     BuilderActions.hoverCard(null);
@@ -341,7 +339,7 @@ class App extends PureClasss<Props>
             <div
               className='app-top-bar'
             >
-              <TerrainIcon 
+              <TerrainIcon
                 className='app-top-bar-icon'
               />
                <AccountDropdown />
@@ -354,9 +352,9 @@ class App extends PureClasss<Props>
             this.renderApp()
           }
         </div>
-        
+
         <DeployModal />
-        
+
         <ReactTooltip
           place="bottom"
           effect="solid"
@@ -365,7 +363,7 @@ class App extends PureClasss<Props>
         />
 
         <InAppNotification />
-        
+
         <EasterEggs />
       </div>
     );
@@ -377,11 +375,11 @@ var router = (
   <Router history={browserHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={Redirect} />
-    
+
       <Route path="/builder" component={Builder} />
       <Route path="/builder/:config" component={Builder} />
       <Route path="/builder/:config/:splitConfig" component={Builder} />
-      
+
       <Route path="/library">
         <IndexRoute component={Library} />
         <Route path=":groupId" component={Library}>
@@ -394,7 +392,7 @@ var router = (
           </Route>
         </Route>
       </Route>
-      
+
       <Route path="/account" component={Account}>
         <IndexRoute component={Profile} />
         <Route path="/account/profile" component={Profile} />
@@ -403,24 +401,24 @@ var router = (
         <Route path="/account/notifications" component={Notifications} />
         <Route path="/account/team" component={Team} />
       </Route>
-      
+
       <Route path="/manual" component={ManualWrapper} />
       <Route path="/manual/:term" component={ManualWrapper} />
-      
+
       <Route path="/users/:username" component={Profile} />
-      
+
       <Route path="/reporting" component={Placeholder} />
-      
+
       <Route path="/logout" component={Logout} />
-      
+
       <Route path="/x" component={X} />
       <Route path="/x/:x" component={X} />
-      
+
       <Route path='/browser' component={Redirect} />
       <Route path='/browser/:a' component={Redirect} />
       <Route path='/browser/:a/:b' component={Redirect} />
       <Route path='/browser/:a/:b/:c' component={Redirect} />
-      
+
       <Route path='/schema' component={SchemaPage} />
     </Route>
   </Router>

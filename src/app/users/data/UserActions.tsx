@@ -50,25 +50,25 @@ import * as Immutable from 'immutable';
 
 import Ajax from './../../util/Ajax';
 
-var $ = (type: string, payload: any) => Store.dispatch({type, payload})
+var $ = (type: string, payload: any) => Store.dispatch({type, payload});
 
 const Actions =
 {
   change:
     (user: UserTypes.User) =>
       $(ActionTypes.change, { user }),
-  
+
   fetch:
     () =>
       $(ActionTypes.fetch, {}),
-  
+
   setUsers:
     (users: UserTypes.UserMap) =>
       $(ActionTypes.setUsers, { users }),
-  
+
   updateCurrentUser:
     () =>
       $(ActionTypes.updateCurrentUser, {}),
-}
+};
 
 export default Actions;

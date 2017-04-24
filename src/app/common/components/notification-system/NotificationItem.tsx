@@ -51,7 +51,7 @@ var Constants = require('./constants');
 var Helpers = require('./helpers');
 var merge = require('object-assign');
 var CloseIcon = require('./../../../../images/icon_close.svg');
-var TerrainLogo = require('./../../../../images/logo_terrainCircle.svg')
+var TerrainLogo = require('./../../../../images/logo_terrainCircle.svg');
 /* From Modernizr */
 var whichTransitionEvent = function() {
   var t;
@@ -70,7 +70,7 @@ var whichTransitionEvent = function() {
   }
 };
 
-interface Props 
+interface Props
 {
   notification: any;
     getStyles: any;
@@ -267,7 +267,7 @@ class NotificationItem extends Classs<Props> {
   renderLogo()
   {
     return (
-      <TerrainLogo 
+      <TerrainLogo
         style={{
           position: 'relative',
           width: '48px',
@@ -276,7 +276,7 @@ class NotificationItem extends Classs<Props> {
     );
   }
 
-  renderTitle() 
+  renderTitle()
   {
     var notification = this.props.notification;
     if (notification.title) {
@@ -298,7 +298,7 @@ class NotificationItem extends Classs<Props> {
         <div className='notification-message' style={this._styles.messageWrapper}>
           {notification.message}
         </div>
-      ); 
+      );
     }
     return null;
   }
@@ -332,7 +332,7 @@ class NotificationItem extends Classs<Props> {
     }
   }
 
-  render() 
+  render()
   {
     var notification = this.props.notification;
     var notificationClassName = 'notification notification-' + notification.level;
@@ -355,7 +355,7 @@ class NotificationItem extends Classs<Props> {
       }
 
       if (this.state.visible && !this.state.removed) {
-        notificationStyle.height = 'auto'; 
+        notificationStyle.height = 'auto';
         notificationStyle[cssByPos.property] = 0;
       }
 
@@ -370,9 +370,9 @@ class NotificationItem extends Classs<Props> {
     }
 
     return(
-        <div 
-          className={notificationClassName} 
-          onClick={this._dismiss} 
+        <div
+          className={notificationClassName}
+          onClick={this._dismiss}
           onMouseEnter={this._handleMouseEnter}
           onMouseLeave={this._handleMouseLeave}
           style={notificationStyle}
@@ -384,7 +384,7 @@ class NotificationItem extends Classs<Props> {
               display: 'inline-block',
             }}
           >
-            <div 
+            <div
                 style={{
                   opacity: this.state.visible ? .95 : 0,
                   position: 'relative',
@@ -398,7 +398,7 @@ class NotificationItem extends Classs<Props> {
             <div
               style={{
                 position: 'absolute',
-                paddingLeft: '10px', 
+                paddingLeft: '10px',
                 width: '196px',
                 display: 'inline-block',
               }}

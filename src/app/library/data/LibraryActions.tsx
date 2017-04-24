@@ -56,7 +56,7 @@ import * as Immutable from 'immutable';
 
 import Ajax from './../../util/Ajax';
 
-var $ = (type: string, payload: any) => Store.dispatch({type, payload})
+var $ = (type: string, payload: any) => Store.dispatch({type, payload});
 
 const Actions =
 {
@@ -65,61 +65,61 @@ const Actions =
     create:
       () =>
         $(ActionTypes.groups.create, {}),
-    
+
     change:
       (group: Group) =>
         $(ActionTypes.groups.change, { group }),
-    
+
     move:
       (group, index: number) =>
         $(ActionTypes.groups.move, { group, index }),
-        
+
     // duplicate:
     //   (group: Group, index: number) =>
     //     $(ActionTypes.groups.duplicate, { group, index }),
   },
-  
+
   algorithms:
   {
     create:
       (groupId: ID) =>
         $(ActionTypes.algorithms.create, { groupId }),
-    
+
     change:
       (algorithm: Algorithm) =>
         $(ActionTypes.algorithms.change, { algorithm }),
-    
+
     move:
       (algorithm: Algorithm, index: number, groupId: ID) =>
         $(ActionTypes.algorithms.move, { groupId, index, algorithm }),
-        
+
     duplicate:
       (algorithm: Algorithm, index: number, groupId?: ID) =>
         $(ActionTypes.algorithms.duplicate, { algorithm, index, groupId }),
   },
-  
+
   variants:
   {
     create:
       (groupId: ID, algorithmId: ID) =>
         $(ActionTypes.variants.create, { groupId, algorithmId }),
-    
+
     change:
       (variant: Variant) =>
         $(ActionTypes.variants.change, { variant }),
-    
+
     move:
       (variant: Variant, index: number, groupId: ID, algorithmId: ID) =>
         $(ActionTypes.variants.move, { variant, index, groupId, algorithmId }),
-        
+
     duplicate:
       (variant: Variant, index: number, groupId?: ID, algorithmId?: ID) =>
         $(ActionTypes.variants.duplicate, { variant, index, groupId, algorithmId }),
-    
+
     status:
       (variant: Variant, status: LibraryTypes.EVariantStatus, confirmed?: boolean, isDefault?: boolean) =>
         $(ActionTypes.variants.status, { variant, status, confirmed, isDefault }),
-     
+
     fetchVersion:
       (variantId: string, onNoVersion: (variantId: string) => void) =>
       {
@@ -135,21 +135,21 @@ const Actions =
           }
         });
       },
-        
+
     loadVersion:
       (variantId: string, variantVersion: LibraryTypes.Variant) =>
         $(ActionTypes.variants.loadVersion, { variantId, variantVersion }),
-       
+
   },
-  
+
   loadState:
     (state: LibraryState) =>
       $(ActionTypes.loadState, { state }),
-  
+
   setDbs:
     (dbs: List<string>) =>
       $(ActionTypes.setDbs, { dbs }),
-  
+
   // overwrites current state with state from server
   fetch:
     () =>
@@ -163,7 +163,7 @@ const Actions =
             LibraryTypes._Variant(variantData)
           );
         });
-        
+
         let algorithms = Immutable.Map({});
         _.map(algorithmsData, algorithmData => {
           algorithms = algorithms.set(
@@ -171,7 +171,7 @@ const Actions =
             LibraryTypes._Algorithm(algorithmData)
           );
         });
-        
+
         let groups = Immutable.Map({});
         _.map(groupsData, groupData => {
           groups = groups.set(
@@ -179,7 +179,7 @@ const Actions =
             LibraryTypes._Group(groupData)
           );
         });
-        
+
         Actions.loadState(_LibraryState({
           groups,
           algorithms,
@@ -189,6 +189,6 @@ const Actions =
         }));
       })
     },
-}
+};
 
 export default Actions;

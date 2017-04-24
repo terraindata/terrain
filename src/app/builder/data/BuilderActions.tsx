@@ -52,102 +52,102 @@ import * as Immutable from 'immutable';
 import List = Immutable.List;
 import Map = Immutable.Map;
 
-const $ = (type: string, payload: any) => Store.dispatch({type, payload})
+const $ = (type: string, payload: any) => Store.dispatch({type, payload});
 
 const BuilderActions =
 {
   change:
     (keyPath: KeyPath, value: any, notDirty = false) =>
       $(ActionTypes.change, { keyPath, value, notDirty }),
-  
+
   create:
     (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
       $(ActionTypes.create, { keyPath, factoryType, index, data }),
-  
+
   move:
     (keyPath: KeyPath, index: number, newIndex: number) =>
       $(ActionTypes.move, { keyPath, index, newIndex }),
-  
+
   nestedMove:
     (itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number) =>
       $(ActionTypes.nestedMove, { itemKeyPath, itemIndex, newKeyPath, newIndex }),
-  
+
   remove:
     (keyPath: KeyPath, index: number) =>
       $(ActionTypes.remove, { keyPath, index }),
-  
+
   dragCard:
     (cardItem: CardItem) =>
       $(ActionTypes.dragCard, { cardItem }),
-  
+
   dragCardOver:
     (keyPath: KeyPath, index: number) =>
       $(ActionTypes.dragCardOver, { keyPath, index }),
-  
+
   dropCard:
     () =>
       $(ActionTypes.dropCard, {}),
-  
+
   changeTQL:
     (tql: string) =>
       $(ActionTypes.changeTQL, { tql }),
-  
+
   hoverCard:
     (cardId: ID) =>
       $(ActionTypes.hoverCard, { cardId }),
-  
+
   selectCard:
     (cardId: ID, shiftKey: boolean, ctrlKey: boolean) =>
       $(ActionTypes.selectCard, { cardId, shiftKey, ctrlKey }),
-  
+
   toggleDeck:
     (open: boolean) =>
       $(ActionTypes.toggleDeck, { open }),
-  
+
   // fetches the query from the server
   fetchQuery:
     (variantId: ID, handleNoVariant: (variantId:ID) => void) =>
       $(ActionTypes.fetchQuery, { variantId, handleNoVariant }),
-  
+
   // load query from server into state
   queryLoaded:
     (query: BuilderTypes.Query, xhr: XMLHttpRequest) =>
       $(ActionTypes.queryLoaded, { query, xhr }),
-  
+
   save:
     (failed?: boolean) =>
       $(ActionTypes.save, { failed }),
-  
+
   undo:
     () =>
       $(ActionTypes.undo, { }),
-  
+
   redo:
     () =>
       $(ActionTypes.redo, { }),
-  
+
   checkpoint:
     () =>
       $(ActionTypes.checkpoint, { }),
-  
+
   parseTreeLoaded:
     (response) =>
-      $(ActionTypes.parseTreeLoaded, { 
+      $(ActionTypes.parseTreeLoaded, {
         response,
       }),
-  
+
   parseTreeError:
     (error) =>
-      $(ActionTypes.parseTreeError, { 
+      $(ActionTypes.parseTreeError, {
         error,
-      }),   
-  
+      }),
+
   changeResultsConfig:
     (resultsConfig) =>
       $(ActionTypes.changeResultsConfig, {
         resultsConfig,
       }),
-  
+
   results:
     (resultsState) =>
       $(ActionTypes.results, {
@@ -155,7 +155,7 @@ const BuilderActions =
       }),
 };
 
-_.map(ActionTypes, 
+_.map(ActionTypes,
   (type: string) =>
   {
     if(!BuilderActions[type])

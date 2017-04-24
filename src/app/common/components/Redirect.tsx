@@ -58,12 +58,11 @@ class Placeholder extends PureClasss<Props>
   {
     browserHistory.replace('/library');
   }
-  
+
   render() {
     return (
        <InfoArea large="Redirecting..." />
      );
   }
-};
-
+}
 export default Placeholder;

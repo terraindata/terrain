@@ -56,7 +56,7 @@ interface Props
   page: number;
   pages: number;
   onChange: (page: number) => void;
-  
+
   onHover?: (page: number) => boolean;
   onHoverEnd?: () => void;
 }
@@ -69,67 +69,67 @@ class Paging extends PureClasss<Props>
       'goFirst', 'goPrevious', 'goNext', 'goLast',
       'handlePageMouseOver', 'handleMouseOut',
       'goHover', 'handleFirstHover', 'handlePreviousHover',
-      'handleNextHover', 'handleLastHover'); 
+      'handleNextHover', 'handleLastHover');
       // 'handleHoverTimeout', 'clearHoverTimeout');
     this.state = {
       open: false,
-      
+
       overPage: null,
       // hoverTimeout: null,
     };
   }
-  
+
   pageFromEvent(event): number
   {
     return parseInt(Util.rel(event.target), 10);
   }
-  
+
   changePage(page): void
   {
     this.setState({
       open: false,
     });
-    
+
     if(page !== this.props.page && page > 0 && page <= this.props.pages)
     {
       this.props.onChange(page);
     }
   }
-  
+
   handlePageClick(event): void
   {
     this.changePage(this.pageFromEvent(event));
   }
-  
+
   handleAllPages(): void
   {
     this.setState({
       open: ! this.state.open,
     })
   }
-  
+
   goFirst(): void
   {
     this.changePage(1);
   }
-  
+
   goPrevious(): void
   {
     this.changePage(this.props.page - 1);
   }
-  
+
   goNext(): void
   {
     this.changePage(this.props.page + 1);
   }
-  
+
   goLast(): void
   {
     this.changePage(this.props.pages);
   }
-  
+
   // mouseovers
-  
+
   goHover(page): void
   {
     if(this.props.onHover && this.props.onHover(page))
@@ -140,17 +140,17 @@ class Paging extends PureClasss<Props>
       });
     }
   }
-  
+
   handlePageMouseOver(event): void
   {
     this.goHover(this.pageFromEvent(event));
   }
-  
+
   handleFirstHover(): void
   {
     this.goHover(1);
   }
-  
+
   handlePreviousHover(): void
   {
     if(this.props.page !== 1)
@@ -158,7 +158,7 @@ class Paging extends PureClasss<Props>
       this.goHover(this.props.page - 1);
     }
   }
-  
+
   handleNextHover(): void
   {
     if(this.props.page !== this.props.pages)
@@ -166,35 +166,35 @@ class Paging extends PureClasss<Props>
       this.goHover(this.props.page + 1);
     }
   }
-  
+
   handleLastHover(): void
   {
     this.goHover(this.props.pages)
   }
-  
+
   handleMouseOut(event): void
   {
     // this.clearHoverTimeout();
-    
+
     this.setState({
       overPage: null,
-      // hoverTimeout: null,  
+      // hoverTimeout: null,
     });
-    
+
     if(this.props.onHoverEnd)
     {
       this.props.onHoverEnd();
     }
   }
-  
+
   // In the future, if we want some kind of "long hover to go into"
   //  when dragging, here's a start at the code for it
-  
+
   // handleHoverTimeout()
   // {
   //   this.changePage(this.state.overPage);
   // }
-  
+
   // clearHoverTimeout()
   // {
   //   if(this.state.hoverTimeout)
@@ -202,12 +202,12 @@ class Paging extends PureClasss<Props>
   //     clearTimeout(this.state.hoverTimeout);
   //   }
   // }
-  
+
   // componentWillUnmount()
   // {
   //   this.clearHoverTimeout();
   // }
-  
+
   render() {
     return (
       <div className={Util.objToClassname(
@@ -238,9 +238,9 @@ class Paging extends PureClasss<Props>
               if(!this.state.open && this.props.page - page > 3) {
                 return null;
               }
-              
+
               return (
-              <div 
+              <div
                 className={Util.objToClassname(
                 {
                   'paging-page': true,
@@ -281,6 +281,5 @@ class Paging extends PureClasss<Props>
       </div>
     );
   }
-};
-
+}
 export default Paging;

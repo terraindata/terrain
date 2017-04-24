@@ -53,9 +53,9 @@ var onlyContainsType = (obj, type: string) => {
   return _.every(obj, (val) => {
     return typeof val === type || (typeof val === 'object' && onlyContainsType(val, type));
   });
-}
+};
 
-test('ActionTypes', (t) => {  
+test('ActionTypes', (t) => {
   t.ok(onlyContainsType(ActionTypes, 'string'), 'ActionTypes only contains strings');
   t.end();
 });
@@ -67,11 +67,11 @@ test('Actions', (t) => {
       {
         return containSameKeys(first[key], second[key]);
       }
-      
+
       return typeof second[key] === 'function';
     });
-  }
-  
+  };
+
   t.ok(containSameKeys(ActionTypes, Actions),
     'There is an action for every action type.');
   t.end();
