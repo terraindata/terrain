@@ -79,9 +79,9 @@ const optDefs = [
 ];
 
 const args = cmdLineArgs(optDefs,
-{
-  partial: true,
-});
+  {
+    partial: true,
+  });
 const index = reqText('../../src/app/index.html', require);
 
 Router.get('/bundle.js', async (ctx, next) =>
