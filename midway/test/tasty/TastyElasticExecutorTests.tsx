@@ -90,7 +90,7 @@ test('elastic health', async (done) =>
   try
   {
     const h = await elasticSearch.health();
-    winston.info(h);
+    winston.debug(h);
   }
   catch (e)
   {
@@ -507,7 +507,6 @@ test('stored PWL transform sort query using function_score', async (done) =>
           },
         },
       });
-    winston.info(JSON.stringify(results, null, 2));
     const expected = [
       {
         _id: '7394',

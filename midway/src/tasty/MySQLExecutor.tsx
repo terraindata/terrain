@@ -75,12 +75,12 @@ export class MySQLExecutor implements TastyExecutor
 
     this.pool.on('acquire', (connection) =>
     {
-      winston.info('Connection %d acquired', connection.threadId);
+      winston.debug('Connection %d acquired', connection.threadId);
     });
 
     this.pool.on('release', (connection) =>
     {
-      winston.info('Connection %d released', connection.threadId);
+      winston.debug('Connection %d released', connection.threadId);
     });
   }
 
