@@ -1,6 +1,6 @@
 #!/bin/bash
 
 npm install
-npm fix
+npm run fix
 npm run test-back
 
