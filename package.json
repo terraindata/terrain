@@ -23,7 +23,8 @@
     "build-gcloud": "npm run commit-log && webpack --config webpack.config.gcloud.js --output-filename bundle.js",
     "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node --harmony -- ./midway/src/App.tsx",
     "lint": "./node_modules/.bin/tslint -c tslint.json --fix 'midway/**/*.ts{,x}'",
-    "style": "find midway -name '*.tsx' -exec ./node_modules/.bin/tsfmt -r {} \\;"
+    "style": "find midway -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\;",
+    "fix" : "npm run lint; npm run style;"
   },
   "repository": {
     "type": "git",
