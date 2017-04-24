@@ -44,40 +44,46 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as elasticSearch from 'elasticsearch';
+import {Client, ConfigOptions, SearchParams} from 'elasticsearch';
 import TastyExecutor from './TastyExecutor';
 import TastySchema from './TastySchema';
 import TastyTable from './TastyTable';
 import { makePromiseCallback } from './Utils';
 
-export type Config = elasticSearch.ConfigOptions;
+export interface ElasticExecutorConfig extends ConfigOptions
+{
+  indexName: string;
+}
 
-export const defaultConfig: Config =
-  {
-    hosts: ['http://localhost:9200'],
-  };
+export type Config = ElasticExecutorConfig;
 
 export class ElasticExecutor implements TastyExecutor
 {
-  private config: Config;
-  private client: elasticSearch.Client;
+
+  private config: ElasticExecutorConfig;
+  private client: Client;
+  private defaultElasticConfig: ElasticExecutorConfig = {
+    hosts: ['http://localhost:9200'],
+    indexName: 'moviesdb',
+  };
 
   constructor(config?: any)
   {
     if (config === undefined)
     {
-      config = defaultConfig;
+      config = this.defaultElasticConfig;
     }
 
-    this.config = config;
     // Do not reuse objects to configure the elasticsearch Client class: https://github.com/elasticsearch/elasticsearch-js/issues/33
-    this.client = new elasticSearch.Client(JSON.parse(JSON.stringify(config)));
+    config = new Client(JSON.parse(JSON.stringify(config)));
+    this.client = new Client(this.config);
   }
 
   /**
    * ES specific extension -- gets the health of the ES cluster
    */
-  public health() {
+  public async health(): Promise<any>
+  {
     return new Promise((resolve, reject) =>
     {
       this.client.cluster.health(
@@ -94,13 +100,14 @@ export class ElasticExecutor implements TastyExecutor
         {},
         makePromiseCallback(resolve, reject));
     });
+
     return TastySchema.fromElasticTree(result);
   }
 
   /**
    * Returns the entire ES response object.
    */
-  public fullQuery(queryObject: object)
+  public async fullQuery(queryObject: SearchParams): Promise<any>
   {
     return new Promise((resolve, reject) =>
     {
@@ -113,21 +120,15 @@ export class ElasticExecutor implements TastyExecutor
   /**
    * returns only the query hits
    */
-  public async query(queryObject: object)
+  public async query(queryObject: SearchParams)
   {
-    const result: any = await this.fullQuery(queryObject);
-    // if('body' in queryObject)
-    // {
-    //     let body = queryObject.body;
-    //     if('aggregations' in body)
-    //         return result.
-    // }
+    const result = await this.fullQuery(queryObject);
     return result.hits.hits;
   }
 
   public async destroy()
   {
-    // this.client.close();
+    ;
   }
 
   public storeProcedure(procedure)
@@ -148,8 +149,7 @@ export class ElasticExecutor implements TastyExecutor
   {
     if (elements.length > 2)
     {
-      await this.bulkUpsert(table, elements);
-      return;
+      return this.bulkUpsert(table, elements);
     }
 
     const promises = [];
@@ -162,8 +162,8 @@ export class ElasticExecutor implements TastyExecutor
             const query = {
               body: element,
               id: this.makeID(table, element),
-              index: table.tastyTableName,
-              type: table.tastyTableName,
+              index: table.getTableName(),
+              type: table.getTableName(),
             };
 
             this.client.index(
@@ -173,6 +173,23 @@ export class ElasticExecutor implements TastyExecutor
       );
     }
     await Promise.all(promises);
+  }
+
+  /*
+   * Deletes the given objects based on their primary key
+   */
+  public async deleteIndex()
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const params = {
+        index: this.config.indexName,
+      };
+
+      this.client.indices.delete(
+          params,
+          makePromiseCallback(resolve, reject));
+    });
   }
 
   /*
@@ -189,8 +206,8 @@ export class ElasticExecutor implements TastyExecutor
             const params =
             {
               id: this.makeID(table, element),
-              index: table.tastyTableName,
-              type: table.tastyTableName,
+              index: table.getTableName(),
+              type: table.getTableName(),
             };
 
             this.client.delete(
@@ -211,8 +228,8 @@ export class ElasticExecutor implements TastyExecutor
       {
         index: {
           _id:    this.makeID(table, element),
-          _index: table.tastyTableName,
-          _type:  table.tastyTableName,
+          _index: table.getTableName(),
+          _type:  table.getTableName(),
         },
       };
 

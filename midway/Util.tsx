@@ -45,9 +45,39 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as request from 'request';
+import * as _ from 'underscore';
+import * as Tasty from './tasty/Tasty';
 
-const Util =
+const config: Tasty.SQLiteConfig =
 {
+  filename : 'nodeway.db',
+};
+
+export const Util =
+{
+  createOrUpdate: async (tastyTable, newObject: object, primaryKey?: string) =>
+  {
+    let id;
+    let obj = await tastyTable.getTemplate();
+    if (!primaryKey)
+    {
+      primaryKey = 'id';
+    }
+    const findObj = await tastyTable.find(newObject[primaryKey]);
+    if (findObj && findObj.length !== 0)
+    {
+      obj = findObj[0];
+      id = newObject[primaryKey];
+    }
+    // if there are special permissions
+    _.mapObject(newObject, (val, key) =>
+    {
+      // TODO create field permission checking
+      obj[key] = val;
+    });
+    return await tastyTable.replace(obj, id);
+  },
+
   getRequest: (url) =>
   {
     return new Promise((resolve, reject) =>

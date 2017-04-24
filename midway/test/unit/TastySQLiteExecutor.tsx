@@ -93,7 +93,7 @@ test('pool connect', async (t) =>
 {
   const config: Tasty.SQLiteConfig =
   {
-    filename : 'nodeway.db',
+    filename : 'moviesdb.db',
   };
 
   try
@@ -112,6 +112,15 @@ for (let i = 0; i < SQLQueries.length; i++)
 {
   runTest(i);
 }
+
+const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
+
+test('tasty select', async (t) =>
+{
+  const movieid = 123;
+  const results = await tasty.select(DBMovies, [], {movieid: 123});
+  t.deepEqual(results[0], { movieid: 123, releasedate: '1994-07-14 00:00:00', title: 'Chungking Express (Chung Hing sam lam) (1994)' });
+});
 
 test('pool destroy', async (t) =>
 {

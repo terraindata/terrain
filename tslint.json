@@ -30,7 +30,6 @@
       "arguments",
       "statements"
     ],
-    "newline-before-return" : true,
     "new-parens" : true,
     "return-undefined" : true,
     "semicolon" : [true, "always"],
