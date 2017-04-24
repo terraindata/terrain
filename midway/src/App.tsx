@@ -78,8 +78,11 @@ const optDefs = [
   },
 ];
 
-const args = cmdLineArgs(optDefs);
-const index = reqText('../src/app/index.html', require);
+const args = cmdLineArgs(optDefs,
+{
+  partial: true,
+});
+const index = reqText('../../src/app/index.html', require);
 
 Router.get('/bundle.js', async (ctx, next) =>
 {
