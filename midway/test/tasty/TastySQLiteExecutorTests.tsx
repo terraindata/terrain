@@ -88,7 +88,7 @@ function runTest(index: number)
   });
 }
 
-test('pool connect', async (done) =>
+beforeAll(async () =>
 {
   const config: Tasty.SQLiteConfig =
     {
@@ -102,7 +102,6 @@ test('pool connect', async (done) =>
   {
     fail(e);
   }
-  done();
 });
 
 for (let i = 0; i < SQLQueries.length; i++)
@@ -120,7 +119,7 @@ test('tasty select', async (done) =>
   done();
 });
 
-test('pool destroy', async (done) =>
+afterAll(async () =>
 {
   try
   {
@@ -129,5 +128,4 @@ test('pool destroy', async (done) =>
   {
     fail(e);
   }
-  done();
 });

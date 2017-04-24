@@ -58,14 +58,19 @@ function testQuery(index: number)
   return SQLQueries[index][1];
 }
 
+let DBMovies: any;
+
+beforeAll(() =>
+{
+  DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
+});
+
 test('node type: skip', (done) =>
 {
   expect(TastyNodeTypes[TastyNodeTypes.skip]).toEqual('skip');
   expect(TastyNodeTypes.skip).toEqual(11);
   done();
 });
-
-const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
 
 test(testName(0), (done) =>
 {
