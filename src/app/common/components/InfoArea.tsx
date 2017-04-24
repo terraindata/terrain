@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./InfoArea.less')
+require('./InfoArea.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
 import Util from '../../util/Util';
@@ -66,20 +66,20 @@ class InfoArea extends PureClasss<Props>
     super(props);
     Util.bind(this, 'renderThing');
   }
-  
+
   renderThing(thing: string, onClick?: boolean) {
     if(!this.props[thing])
     {
       return null;
     }
-    
+
     return (
       <div className={"info-area-"+thing} onClick={onClick ? this.props.onClick : null}>
         { this.props[thing] }
       </div>
     );
   }
-  
+
   render() {
     return (
      <div className={classNames({
@@ -92,6 +92,5 @@ class InfoArea extends PureClasss<Props>
      </div>
      );
   }
-};
-
+}
 export default InfoArea;

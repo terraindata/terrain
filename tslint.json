@@ -4,6 +4,7 @@
   },
   "extends" : "tslint:recommended",
   "rules" : {
+    "max-line-length": false,
     "quotemark" : [
       true,
       "single",
@@ -30,6 +31,7 @@
       "arguments",
       "statements"
     ],
+    "newline-before-return" : false,
     "new-parens" : true,
     "return-undefined" : true,
     "semicolon" : [true, "always"],

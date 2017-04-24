@@ -52,7 +52,7 @@ export module UserTypes
     username: "",
     isAdmin: false,
     isDisabled: false,
-    
+
     // metadata fields
     firstName: "",
     lastName: "",
@@ -69,16 +69,16 @@ export module UserTypes
     emailNotificationTiming: "Once every 15 minutes",
     desktopNotificationType: "Activities of any kind",
     emailNews: 'on',
-    
+
     // exlcude the db-level fields from the meta-data save
     excludeFields: ["isAdmin", "username", "disabled"],
-    
+
     // groupRoles: Immutable.Map({}),
   });
   export class User extends _User
   {
     username: string;
-    
+
     // data fields
     firstName: string;
     lastName: string;
@@ -88,7 +88,7 @@ export module UserTypes
     timeZone: number;
     phone: string;
     imgSrc: string;
-    
+
     sound: string;
     emailNotificationType: string;
     emailNotificationTiming: string;
@@ -97,44 +97,44 @@ export module UserTypes
 
     isAdmin: boolean;
     isDisabled: boolean;
-    
+
     excludeFields: string[];
-    
+
     name(): string
     {
       if(!this.firstName.length && !this.lastName.length)
       {
         return this.username.substr(0, 1).toUpperCase() + this.username.substr(1);
       }
-      
+
       return `${this.firstName} ${this.lastName}`;
     }
-    
+
     // groupRoles: {[groupId: string]: RoleTypes.GroupUserRole;}
   }
-  
+
   export type UserMap = Immutable.Map<ID, UserTypes.User>;
-  
+
   let _UserState = Immutable.Record({
     loading: false,
     loaded: false,
     users: Immutable.Map<ID, User>({}),
     currentUser: null,
-  })
+  });
   export class UserState extends _UserState {
     loading: boolean;
     loaded: boolean;
     users: UserMap;
     currentUser: User;
   }
-  
+
   export function profileUrlFor(user:User): string
   {
     if(user && user.imgSrc)
     {
       return user.imgSrc;
     }
-    
+
     let code = (user ? user.username : 'a').charCodeAt(0);
     let index = (code % numProfileImages) + 1;
     return '/dist/profiles/profile' + index + '.jpg';

@@ -58,7 +58,7 @@ var VariantIcon = require('./../../../images/icon_badgeVariant.svg');
 
 const {EVariantStatus} = LibraryTypes;
 
-const TEXT = 
+const TEXT =
 {
   live:
   {
@@ -66,21 +66,21 @@ const TEXT =
     confirm: 'I approve of deploying this TQL to Live for this variant.',
     button: 'Deploy to Live',
   },
-  
+
   default:
   {
     main: 'You are deploying the following variant to Live. Its TQL will be stored on production servers, it will be indexed, and it will be accessible for production queries.',
     confirm: 'I approve of deploying this TQL to Live for this variant, and making it the Default for this algorithm.',
     button: 'Deploy to Live and Make Default',
   },
-  
+
   notLive:
   {
     main: 'You are removing the following variant from Live. Its TQL will be removed from production servers, and it will not be accessible for production queries.',
     confirm: 'I approve of removing this TQL from Live for this variant.',
     button: 'Remove from Live',
   },
-}
+};
 
 interface Props {
   variant: LibraryTypes.Variant;
@@ -91,14 +91,14 @@ interface Props {
   onDeploy();
 }
 
-class DeployModalColumn extends PureClasss<Props>   
+class DeployModalColumn extends PureClasss<Props>
 {
   state: {
     confirmChecked: boolean;
   } = {
     confirmChecked: false,
   };
-  
+
   componentWillReceiveProps(nextProps:Props)
   {
     if(nextProps.variant !== this.props.variant || nextProps.status !== this.props.status)
@@ -108,7 +108,7 @@ class DeployModalColumn extends PureClasss<Props>
       });
     }
   }
-  
+
   handleDefaultCheckedChange(c)
   {
     this.props.onDefaultCheckedChange(!this.props.defaultChecked);
@@ -116,38 +116,38 @@ class DeployModalColumn extends PureClasss<Props>
       confirmChecked: false,
     });
   }
-  
+
   handleConfirmCheckedChange(c)
   {
     this.setState({
       confirmChecked: !this.state.confirmChecked,
     });
   }
-  
+
   handleDeploy()
   {
     this.props.onDeploy();
   }
-  
-  render() 
+
+  render()
   {
     let {variant, status} = this.props;
     let state = LibraryStore.getState();
     let group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
     let algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
-    
+
     // let title = 'Deploy "' + name + '" to Live';
     // if(changingStatusTo !== EVariantStatus.Live)
     // {
     //   title = 'Remove "' + name + '" from Live';
     // }
-    
+
     let text = status === EVariantStatus.Live ? TEXT.live : TEXT.notLive;
     if(this.props.defaultChecked)
     {
       text = TEXT.default;
     }
-    
+
     return (
       <div
         className='deploy-modal-deploy-column'
@@ -205,7 +205,7 @@ class DeployModalColumn extends PureClasss<Props>
           </div>
           <div className='deploy-modal-info-row-lower deploy-modal-info-status-row'>
             <span>
-              Current status: 
+              Current status:
             </span>
             <span className='deploy-modal-info-bold'>
               {
@@ -215,7 +215,7 @@ class DeployModalColumn extends PureClasss<Props>
           </div>
           <div className='deploy-modal-info-row-lower'>
             <span>
-              Changing to status: 
+              Changing to status:
             </span>
             <span className='deploy-modal-info-bold'>
               {
@@ -255,7 +255,7 @@ class DeployModalColumn extends PureClasss<Props>
                       this.props.defaultVariant
                       ?
                         <span>
-                          This will replace the current default variant <b>{this.props.defaultVariant.name}</b>, 
+                          This will replace the current default variant <b>{this.props.defaultVariant.name}</b>,
                           which will remain Live.
                         </span>
                       :
@@ -287,7 +287,7 @@ class DeployModalColumn extends PureClasss<Props>
             }
           </label>
         </div>
-        
+
         <div
           className={classNames({
             'deploy-modal-button': true,

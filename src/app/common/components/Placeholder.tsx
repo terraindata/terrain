@@ -53,6 +53,5 @@ class Placeholder extends PureClasss<any>
        <InfoArea large="In progress." />
      );
   }
-};
-
+}
 export default Placeholder;

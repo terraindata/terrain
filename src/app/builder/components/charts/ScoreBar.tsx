@@ -49,7 +49,7 @@ import BuilderTypes from '../../BuilderTypes';
 import PureClasss from './../../../common/components/PureClasss';
 
 var BORDER_RADIUS = '5px';
-var SCORE_COLORS = 
+var SCORE_COLORS =
 {
   POSITIVE: ["#DFDE52", "#AFD364", "#9DCF66", "#88C33E"],
   NEGATIVE: ["#F8B14A", "#FF735B", "#DD333C", "#A50808"],
@@ -71,20 +71,20 @@ class ScoreBar extends PureClasss<{
   {
     let weights = this.props.parentData.weights;
     let weight = this.props.data;
-    
+
     var max = 0;
     weights.map(w => {
       if(Math.abs(w.weight) > max)
       {
         max = Math.abs(w.weight);
       }
-    })
-    
+    });
+
     var perc = Math.abs(weight.weight) / max * 100;
     var style:React.CSSProperties = {
       width: perc / 2 + '%',
     };
-    
+
     if(weight.weight > 0)
     {
       style.left = '50%';
@@ -99,7 +99,7 @@ class ScoreBar extends PureClasss<{
       style.borderTopLeftRadius = BORDER_RADIUS;
       style.borderBottomLeftRadius = BORDER_RADIUS;
     }
-    
+
     return (
       <div className='weight-graph'>
         <div className='weight-graph-inner'>

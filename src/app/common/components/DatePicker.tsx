@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./DatePicker.less')
+require('./DatePicker.less');
 import * as React from 'react';
 import * as moment from 'moment';
 import * as Immutable from 'immutable';
@@ -79,11 +79,11 @@ class DatePicker extends PureClasss<Props>
   constructor(props)
   {
     super(props);
-    
+
     Util.bind(this, ['handleDayClick', 'getDate', 'renderTimePicker',
       'handleHourChange']);
   }
-  
+
   getDate(): Date
   {
     var date = new Date(this.props.date);
@@ -93,10 +93,10 @@ class DatePicker extends PureClasss<Props>
       date = new Date();
       date.setMinutes(0);
     }
-    
+
     return date;
   }
-  
+
   handleDayClick(e, day: Date, modifiers)
   {
     var date = this.getDate();
@@ -105,7 +105,7 @@ class DatePicker extends PureClasss<Props>
     date.setFullYear(day.getFullYear());
     this.props.onChange(Util.formatInputDate(date));
   }
-  
+
   handleHourChange(hourIndex)
   {
     var date = this.getDate();
@@ -113,19 +113,19 @@ class DatePicker extends PureClasss<Props>
     date.setMinutes((hourIndex % MINUTE_RATIO) * MINUTE_INTERVAL);
     this.props.onChange(Util.formatInputDate(date));
   }
-  
+
   dateToHourIndex(date)
   {
     return date.getHours() * (60 / MINUTE_INTERVAL) + (date.getMinutes() / MINUTE_INTERVAL);
   }
-  
+
   renderTimePicker()
   {
     var date = this.getDate();
-    
+
     return (
       <div className='date-time-time'>
-        <Dropdown 
+        <Dropdown
           {...this.props}
           options={HOUR_OPTIONS}
           selectedIndex={this.dateToHourIndex(this.getDate())}
@@ -133,14 +133,14 @@ class DatePicker extends PureClasss<Props>
         />
       </div>);
   }
-  
+
   render() {
     var date = this.getDate();
-    const modifiers = 
+    const modifiers =
     {
       selected: day => DateUtils.isSameDay(day, date),
-    }
-    
+    };
+
     return (
       <div className='date-picker'>
         <ReactDayPicker
@@ -152,6 +152,5 @@ class DatePicker extends PureClasss<Props>
       </div>
      );
   }
-};
-
+}
 export default DatePicker;

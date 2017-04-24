@@ -61,7 +61,7 @@ type ScorePoints = List<ScorePoint>;
 
 import TransformChart from './TransformChart';
 
-interface Props 
+interface Props
 {
   points: ScorePoints;
   bars: any;
@@ -71,7 +71,7 @@ interface Props
   inputKey: string;
   updatePoints: (points:ScorePoints, released?: boolean) => void;
   width: number;
-  
+
   spotlights: any;// TODO spawtlights
 }
 
@@ -95,7 +95,7 @@ class TransformCardChart extends PureClasss<Props>
     movedSeed: -1,
   };
 
-  componentDidMount() 
+  componentDidMount()
   {
     var el = ReactDOM.findDOMNode(this);
     TransformChart.create(el, this.getChartState());
@@ -105,7 +105,7 @@ class TransformCardChart extends PureClasss<Props>
   {
     let {points} = this.props;
     var {selectedPointIds} = this.state;
-    
+
     if(pointId)
     {
       if(selectRange)
@@ -118,7 +118,7 @@ class TransformCardChart extends PureClasss<Props>
           _.range(
             Math.min(firstIndex, secondIndex),
             Math.max(secondIndex, firstIndex)
-          ).map(index => 
+          ).map(index =>
             selectedPointIds = selectedPointIds.set(points.get(index).id, true)
           );
         }
@@ -134,15 +134,15 @@ class TransformCardChart extends PureClasss<Props>
       selectedPointIds = Map({});
     }
     // else, a click to unselect things
-    
+
     this.setState({
       selectedPointIds,
       lastSelectedPointId: pointId,
-    }); 
-    
+    });
+
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState(selectedPointIds));
   }
-   
+
   updatePoints(points: ScorePoints, isConcrete?: boolean)
   {
     points = points.map(
@@ -153,7 +153,7 @@ class TransformCardChart extends PureClasss<Props>
     ).toList();
     this.props.updatePoints(points, isConcrete);
   }
-  
+
   onPointMoveStart(initialScore, initialValue)
   {
     this.setState({
@@ -168,7 +168,7 @@ class TransformCardChart extends PureClasss<Props>
   {
     return a - b;
   }
-  
+
   onPointMove(pointId, newScore, newValue, pointValues, cx, altKey)
   {
     var scoreDiff = this.state.initialScore - newScore;
@@ -187,13 +187,13 @@ class TransformCardChart extends PureClasss<Props>
             var min = scorePoint.value - valueDiff;
             var max = scorePoint.value - valueDiff;
           }
-          else 
+          else
           {
-            min = (index - 1) >= 0 ? 
+            min = (index - 1) >= 0 ?
                     Math.max(this.props.domain.get(0), pointValues[index - 1]+.01)
                     : this.props.domain.get(0);
-            max = (index + 1) < pointValues.length ?  
-                    Math.min(this.props.domain.get(1), pointValues[index + 1]-.01) 
+            max = (index + 1) < pointValues.length ?
+                    Math.min(this.props.domain.get(1), pointValues[index + 1]-.01)
                     : this.props.domain.get(1);
           }
           scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
@@ -201,18 +201,18 @@ class TransformCardChart extends PureClasss<Props>
       }
       return scorePoint;
     });
-    
+
     let isConcrete = this.state.moveSeed !== this.state.movedSeed;
     this.setState({
       movedSeed: this.state.moveSeed,
     });
     this.updatePoints(points.toList(), isConcrete);
   }
-  
+
   onPointRelease()
   {
   }
-  
+
   onLineClick(x, y)
   {
     this.setState({
@@ -221,23 +221,23 @@ class TransformCardChart extends PureClasss<Props>
       initialPoints: this.props.points,
     })
   }
-  
+
   onLineMove(x, y)
   {
     var scoreDiff = y - this.state.initialLineY;
-    
+
     this.updatePoints(this.state.initialPoints.map(
       point => point.set('score', Util.valueMinMax(point.score + scoreDiff, 0, 1))
     ).toList());
   }
-  
+
   onDelete(pointId)
   {
     this.updatePoints(this.props.points.filterNot(
       point => point.id === pointId || this.state.selectedPointIds.get(point.id)
     ).toList(), true);
   }
-  
+
   onCreate(value, score)
   {
     let {points} = this.props;
@@ -254,22 +254,22 @@ class TransformCardChart extends PureClasss<Props>
       })
     ).toList(), true);
   }
-  
+
   componentDidUpdate()
   {
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState());
   }
-  
+
   getChartState(overrideState?: any) {
     overrideState = overrideState || {};
-    
+
     var points = (overrideState.points || this.props.points).map((scorePoint) => ({
       x: scorePoint.value,
       y: scorePoint.score,
       id: scorePoint.id,
       selected: !! this.state.selectedPointIds.get(scorePoint.id),
     }));
-    
+
     var chartState = {
       barsData: (overrideState.bars || this.props.bars).toJS(),
       pointsData: points.toJS(),
@@ -291,10 +291,10 @@ class TransformCardChart extends PureClasss<Props>
       canEdit: this.props.canEdit,
       inputKey: overrideState.inputKey || this.props.inputKey,
     };
-    
+
     return chartState;
   }
-  
+
   componentWillUnmount() {
     var el = ReactDOM.findDOMNode(this);
     TransformChart.destroy(el);
@@ -305,6 +305,5 @@ class TransformCardChart extends PureClasss<Props>
       <div />
 		);
 	}
-};
-
+}
 export default TransformCardChart;

@@ -65,43 +65,43 @@ class Classs<T> extends React.Component<T, any>
   constructor(props: T)
   {
     super(props);
-    
+
     Util.bindAll(this, Classs);
-    
+
     let unmountFn = this['componentWillUnmount'];
     this['componentWillUnmount'] = () =>
     {
       this._unmounted = true; // antipattern
       this._unsubscribe();
       unmountFn && unmountFn();
-    }
-    
+    };
+
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
   }
-  
+
   _unmounted = false;
-  
+
   _unsubscribe()
   {
     this.subscriptions.map(cancelSubscription => cancelSubscription());
   }
-  
+
   // subscribes to a Redux store
   _subscribe(
     store: Store,
     config: Config
   )
   {
-    let update = () => 
+    let update = () =>
     {
-      this._update(store, config);  
-    }
-    
-    let subscribe = () => 
+      this._update(store, config);
+    };
+
+    let subscribe = () =>
       this.subscriptions.push(
         store.subscribe(update)
       );
-    
+
     if(config.isMounted)
     {
       subscribe();
@@ -124,7 +124,7 @@ class Classs<T> extends React.Component<T, any>
     {
       return;
     }
-    
+
     if(config.updater)
     {
       config.updater(store.getState());
@@ -134,9 +134,9 @@ class Classs<T> extends React.Component<T, any>
         return;
       }
     }
-      
+
     let stateKey = config.stateKey;
-    
+
     if(config.storeKeyPath)
     {
       let keyPath = typeof config.storeKeyPath === 'function' ? (config.storeKeyPath as (() => string[]))() : config.storeKeyPath;
@@ -145,9 +145,9 @@ class Classs<T> extends React.Component<T, any>
     } else {
       var value = store.getState();
     }
-    
+
     stateKey = stateKey || 'state';
-    
+
     if(this.state[stateKey] !== value)
     {
       this.setState({
@@ -155,9 +155,9 @@ class Classs<T> extends React.Component<T, any>
       });
     }
   }
-  
+
   // for the construction of keyPaths for Redux actions,
-  //  this function accepts arguments from which to 
+  //  this function accepts arguments from which to
   //  construct an array keyPath, and memoizes that array
   //  so as to allow for pure rendering
   _keyPaths: {[key: string]: (string | number)[]} = {};
@@ -170,9 +170,9 @@ class Classs<T> extends React.Component<T, any>
     }
     return this._keyPaths[key];
   }
-  
+
   _ikeyPaths: {
-    [key: string]: 
+    [key: string]:
     {
       seed: Immutable.List<string | number>,
       keyPath: Immutable.List<string | number>,
@@ -184,7 +184,7 @@ class Classs<T> extends React.Component<T, any>
     {
       keys = keys[0] as any as (string | number)[];
     }
-    
+
     let str = seed.toArray().concat(keys as (string | number)[]).join("");
     if(!this._ikeyPaths[str] || this._ikeyPaths[str].seed !== seed)
     {
@@ -193,10 +193,10 @@ class Classs<T> extends React.Component<T, any>
         keyPath: seed.concat(keys) as Immutable.List<string | number>,
       }
     }
-    
+
     return this._ikeyPaths[str].keyPath;
   }
-  
+
   _fns: {
     [name: string]: {
       args: any[],
@@ -216,7 +216,7 @@ class Classs<T> extends React.Component<T, any>
       }];
       return fn;
     }
-    
+
     for(var obj of fns)
     {
       if(obj.args.length === args.length && obj.args.every((e, i) => args[i] === e))
@@ -224,12 +224,12 @@ class Classs<T> extends React.Component<T, any>
         return obj.fn;
       }
     }
-    
+
     let fn = this.__getFn(instanceFn, args);
     this._fns[fnName].push({ args, fn });
     return fn;
   }
-  
+
   __getFn(instanceFn: (...args:any[]) => any, args: any[]): (...args:any[]) => any
   {
     switch(args.length)
@@ -248,7 +248,7 @@ class Classs<T> extends React.Component<T, any>
         return instanceFn.bind(this, args);
     }
   }
-  
+
   _togMap: {[stateKey:string]: () => void} = {};
   _toggle(stateKey: string): (() => void)
   {

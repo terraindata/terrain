@@ -86,8 +86,8 @@ enum COLUMNS {
   TQL,
   Inputs,
   Schema,
-};
-  // Manual,
+}
+// Manual,
 var NUM_COLUMNS = 5;
 
 var menuIcons = [
@@ -103,7 +103,7 @@ var menuIcons = [
 //   title: string;
 //   children?: any;
 //   className?: string;
-  
+
 //   // Options not yet supported
 //   menuOptions?: {
 //     text: string;
@@ -114,7 +114,7 @@ var menuIcons = [
 var BuilderColumn = React.createClass<any, any>(
 {
   mixins: [PanelMixin],
-  
+
   propTypes:
   {
     query: React.PropTypes.object.isRequired,
@@ -137,7 +137,7 @@ var BuilderColumn = React.createClass<any, any>(
     cantEditReason: React.PropTypes.string,
     onNavigationException: React.PropTypes.func,
   },
-  
+
   getInitialState()
   {
     let colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
@@ -161,12 +161,12 @@ var BuilderColumn = React.createClass<any, any>(
       this.props.switchToManualCol(this.props.index);
     }
   },
-  
+
   shouldComponentUpdate(nextProps, nextState)
   {
     return shallowCompare(this, nextProps, nextState);
   },
-  
+
   componentWillMount()
   {
     // TODO fix
@@ -174,13 +174,13 @@ var BuilderColumn = React.createClass<any, any>(
     this.unsubUser = UserStore.subscribe(rejigger);
     this.unsubRoles = RolesStore.subscribe(rejigger);
   },
-  
+
   componentWillUnmount()
   {
-    this.unsubUser && this.unsubUser();  
-    this.unsubRoles && this.unsubRoles();  
+    this.unsubUser && this.unsubUser();
+    this.unsubRoles && this.unsubRoles();
   },
-  
+
   getDefaultProps()
   {
     return {
@@ -190,7 +190,7 @@ var BuilderColumn = React.createClass<any, any>(
       handleRef: 'handle',
     };
   },
-  
+
   renderContent()
   {
     if(!this.props.query)
@@ -203,14 +203,14 @@ var BuilderColumn = React.createClass<any, any>(
         </div>
       );
     }
-    
+
     let query: BuilderTypes.Query = this.props.query;
     const {canEdit} = this.props;
     switch(this.state.column)
     {
       case COLUMNS.Builder:
-        return <CardsColumn 
-          cards={query.cards} 
+        return <CardsColumn
+          cards={query.cards}
           deckOpen={query.deckOpen}
           canEdit={canEdit}
           addColumn={this.props.onAddManualColumn}
@@ -218,15 +218,15 @@ var BuilderColumn = React.createClass<any, any>(
           tqlCardsInSync={query.tqlCardsInSync}
           parseTreeError={query.parseTreeError}
         />;
-        
+
       case COLUMNS.Inputs:
         return <InputsArea
           inputs={query.inputs}
           canEdit={canEdit}
         />;
-      
+
       case COLUMNS.Results:
-        return <ResultsArea 
+        return <ResultsArea
           query={query}
           canEdit={canEdit}
           db={this.props.variant.db}
@@ -244,21 +244,21 @@ var BuilderColumn = React.createClass<any, any>(
           variant={this.props.variant}
           resultsState={this.props.resultsState}
         />;
-        
+
       case COLUMNS.Schema:
         return <SchemaView
           fullPage={false}
           showSearch={true}
         />;
       // case COLUMNS.Manual:
-      //   return <Manual 
+      //   return <Manual
       //     selectedKey={this.props.selectedCardName}
       //     changeCardName={this.props.changeSelectedCardName}
       //   />;
     }
     return <div>No column content.</div>;
   },
-  
+
   switchView(index)
   {
     if(index === 4)
@@ -269,16 +269,16 @@ var BuilderColumn = React.createClass<any, any>(
     {
       this.props.switchToManualCol(-1);
     }
-    
+
     this.setState({
       column: index,
     });
-    
+
     var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
     colKeyTypes[this.props.colKey] = index;
     localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
   },
-  
+
   getMenuOptions(): List<MenuOption> //TODO
   {
     var options: List<MenuOption> = Immutable.List(_.range(0, NUM_COLUMNS).map(index => ({
@@ -288,32 +288,32 @@ var BuilderColumn = React.createClass<any, any>(
       icon: menuIcons[index].icon,
       iconColor: menuIcons[index].color
     })));
-    
+
     return options;
   },
-  
+
   handleAddColumn()
   {
     this.props.onAddColumn(this.props.index);
   },
-  
+
   handleCloseColumn()
   {
     this.props.onCloseColumn(this.props.index);
-    
+
     var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
     delete colKeyTypes[this.props.colKey];
     localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
   },
-  
-  render() 
+
+  render()
   {
     let {query, canEdit, cantEditReason} = this.props;
-    
+
     return this.renderPanel((
       <div className={'builder-column builder-column-' + this.props.index}>
         <div className='builder-title-bar'>
-          { 
+          {
             this.props.index === 0 ? null : (
               <div className='builder-resize-handle' ref='resize-handle'>
                 <div className='builder-resize-handle-line'></div>
@@ -323,12 +323,12 @@ var BuilderColumn = React.createClass<any, any>(
           }
           <div className='builder-title-bar-title'>
             <span ref='handle'>
-              { 
+              {
                 COLUMNS[this.state.column]
               }
               {
                 !canEdit &&
-                  <LockedIcon 
+                  <LockedIcon
                     data-tip={cantEditReason}
                   />
               }
@@ -336,7 +336,7 @@ var BuilderColumn = React.createClass<any, any>(
           </div>
           <div className='builder-title-bar-options'>
             {
-              this.props.canCloseColumn && 
+              this.props.canCloseColumn &&
                 <CloseIcon
                   onClick={this.handleCloseColumn}
                   className='close close-builder-title-bar'
@@ -344,14 +344,14 @@ var BuilderColumn = React.createClass<any, any>(
                 />
             }
             {
-              this.props.canAddColumn && 
+              this.props.canAddColumn &&
                 <SplitScreenIcon
                   onClick={this.handleAddColumn}
                   className='bc-options-svg builder-split-screen'
                   data-tip="Add Column"
                 />
             }
-            <Menu 
+            <Menu
               options={this.getMenuOptions()}
             />
           </div>
@@ -360,12 +360,12 @@ var BuilderColumn = React.createClass<any, any>(
           className={classNames({
             'builder-column-content': true,
             // 'builder-column-manual': this.state.column === COLUMNS.Manual,
-            'builder-column-content-scroll': 
+            'builder-column-content-scroll':
               this.state.column === COLUMNS.Builder ||
                 this.state.column === COLUMNS.Inputs,
           })
         }>
-          { 
+          {
             this.renderContent(canEdit)
           }
         </div>

@@ -47,18 +47,18 @@ import ActionTypes from './RolesActionTypes';
 import Store from './RolesStore';
 import RoleTypes from './../RoleTypes';
 
-var $ = (type: string, payload: any) => Store.dispatch({type, payload})
+var $ = (type: string, payload: any) => Store.dispatch({type, payload});
 
 var RolesActions =
 {
   fetch:
     () =>
       $(ActionTypes.fetch, { }),
-  
+
   setRoles:
     (roles:RoleTypes.RoleMap) =>
       $(ActionTypes.setRoles, { roles }),
-  
+
   change:
     (role:RoleTypes.Role) =>
       $(ActionTypes.change, { role }),

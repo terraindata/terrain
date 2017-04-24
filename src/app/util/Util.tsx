@@ -60,14 +60,14 @@ var keyPathForId = (node: any, id: string): ((string | number)[] | boolean) =>
     {
       return true;
     }
-    
+
     return node.reduce((keyPath, value, key) =>
     {
       if(keyPath)
       {
         return keyPath;
       }
-      
+
       if(Immutable.Iterable.isIterable(value))
       {
         var kp = keyPathForId(value, id);
@@ -77,12 +77,12 @@ var keyPathForId = (node: any, id: string): ((string | number)[] | boolean) =>
         }
       }
     }, false);
-  }
+  };
 
 var Util = {
 	// Return a random integer [min, max)
 	// assumes min of 0 if not passed.
-	randInt(...args: number[]): number 
+	randInt(...args: number[]): number
 	{
 		var min:number = arguments[0], max:number = arguments[1];
 		if(arguments.length === 1) {
@@ -92,12 +92,12 @@ var Util = {
 
 		return Math.floor(Math.random() * (max - min)) + min;
 	},
-  
+
   moment(str:string)
   {
     return moment(new Date(str));
   },
-  
+
   asJS(obj:any)
   {
     if(obj && typeof obj.toJS === 'function')
@@ -106,7 +106,7 @@ var Util = {
     }
     return obj;
   },
-  
+
   addBeforeLeaveHandler(handler: () => void)
   {
     if(!window['beforeLeaveHandlers'])
@@ -115,15 +115,15 @@ var Util = {
     }
     window['beforeLeaveHandlers'].push(handler);
   },
-  
+
   executeBeforeLeaveHandlers()
   {
-    window['beforeLeaveHandlers'] && 
+    window['beforeLeaveHandlers'] &&
       window['beforeLeaveHandlers'].map(
         fn => fn && fn()
       );
   },
-  
+
   haveRole(groupId: ID, role: string, UserStore, RolesStore)
   {
     let me = UserStore.getState().get('currentUser');
@@ -131,10 +131,10 @@ var Util = {
     {
       return false;
     }
-    
+
     return !! RolesStore.getState().getIn([groupId, me.username, role]);
   },
-  
+
   canEdit(item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group, UserStore, RolesStore)
   {
     let me = UserStore.getState().get('currentUser');
@@ -146,21 +146,21 @@ var Util = {
     {
       return true;
     }
-    
+
     let groupId = item.type === 'group' ? item.id : item['groupId'];
     if(Util.haveRole(groupId, 'admin', UserStore, RolesStore))
     {
       return true;
     }
-    
+
     if(item.type !== 'group')
     {
       return Util.haveRole(groupId, 'builder', UserStore, RolesStore)
     }
-    
+
     return false;
   },
-  
+
   mapEnum(_enum: any, fn: (e: string) => any)
   {
     let ans = [];
@@ -178,26 +178,26 @@ var Util = {
     let then = moment(date);
     let now = moment();
     let hour = ' at ' + then.format('h:mma');
-    
+
     if(then.format('MMMM Do YYYY') === now.format('MMMM Do YYYY'))
     {
       // it was today
       return 'Today at' + hour;
     }
-    
+
     if(then.format('YYYY') === now.format('YYYY'))
     {
       // same year
       return then.format('MM/DD/YY') + hour
     }
-    
+
     return then.format('MM/DD/YY') + hour;
   },
-  
+
   roundNumber(num, decimalPoints) {
     return Math.round(num * Math.pow(10, decimalPoints)) / Math.pow(10, decimalPoints);
   },
-  
+
   exportToCSV(data: (string | number)[][], fileName: string)
   {
     // from http://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
@@ -206,7 +206,7 @@ var Util = {
        let dataString = infoArray.join(",");
        csvContent += index < data.length ? dataString+ "\n" : dataString;
     });
-    
+
     let encodedUri = encodeURI(csvContent);
     let link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -215,10 +215,10 @@ var Util = {
     link.click();
     link.remove();
   },
-  
+
   assertKeysArePresent(first, second, errorMsg: string, oneWay?: boolean)
   {
-    _.map(first, 
+    _.map(first,
       (v, key: string) =>
       {
         if(!second[key])
@@ -228,37 +228,37 @@ var Util = {
         }
       }
     );
-    
+
     if(!oneWay)
     {
       Util.assertKeysArePresent(second, first, errorMsg, true);
     }
   },
-  
+
   // for SQL
   formatInputDate(date:Date):string
   {
     return moment(date).format('YYYY-MM-DD HH:mm:ss');
   },
-  
+
   formatNumber(n: number): string
   {
     const precision: number = 3;
-    
+
     if(!n)
     {
       return n + "";
     }
-    
+
     let sign = n < 0 ? '-' : '';
     n = Math.abs(n);
-    
+
     if(n >= 0.001 && n < 1000000000000) // 10^12
     {
       let pwr = Math.floor(Math['log10'](n));
       let str = n.toPrecision(precision);
       let suffix = '';
-      
+
       if(pwr > 0)
       {
         suffix = suffixes[Math.floor(pwr / 3)];
@@ -277,8 +277,8 @@ var Util = {
           );
         }
       }
-      
-      while(str.length > 1 && 
+
+      while(str.length > 1 &&
         str.indexOf('.') > 0 &&
         (str.charAt(str.length - 1) === '0' || str.charAt(str.length - 1) === '.')
       )
@@ -286,20 +286,20 @@ var Util = {
         // if there are extra 0's after the decimal point, trim them (and the point if necessary)
         str = str.substr(0, str.length - 1);
       }
-      
+
       return sign + str + suffix;
     }
-    
+
     return sign + n.toExponential(precision);
   },
-  
+
   getId(): ID
   {
     // TODO have this fetch a list of IDs from server,
     // give IDs from that list
     return _.range(0, 5).map(i => chars[Util.randInt(chars.length)]).join("");
   },
-  
+
   extendId(obj: Object): Object
   {
     if(obj['id'])
@@ -308,12 +308,12 @@ var Util = {
     }
     return _.extend({}, { id: Util.getId() }, _.omit(obj, value => value === undefined));
   },
-  
+
   moveIndexOffset(index: number, newIndex: number): number
   {
     return index < newIndex ? -1 : 0;
   },
-  
+
   setValuesToKeys(obj: any, prefix: string)
   {
     prefix = prefix + (prefix.length > 0 ? '.' : '');
@@ -334,17 +334,17 @@ var Util = {
       }
     }
   },
-  
+
   rel(target): string
   {
     return Util.attr(target, 'rel');
   },
-  
+
   attr(target, key: string): string
   {
     return ReactDOM.findDOMNode(target).getAttribute(key);
   },
-  
+
   // corrects a given index so that it is appropriate
   //  to pass into a `splice` call
   spliceIndex(index: number, array: any[]): number
@@ -357,20 +357,20 @@ var Util = {
       }
       return array.length;
     }
-    
+
     return index;
   },
-  
+
   // still needed?
   immutableMove: (arr: any, id: any, index: number) => {
-    var curIndex = arr.findIndex((obj) => 
+    var curIndex = arr.findIndex((obj) =>
       (typeof obj.get === 'function' && (obj.get('id') === id))
       || (obj.id === id));
     var obj = arr.get(curIndex);
     arr = arr.delete(curIndex);
     return arr.splice(index, 0, obj);
   },
-  
+
   keyPathForId: keyPathForId,
 
 	isInt(num): boolean
@@ -387,12 +387,12 @@ var Util = {
 	{
 		return ReactDOM.findDOMNode(reactNode).parentNode;
 	},
-  
+
   siblings(reactNode): NodeList
   {
     return Util.parentNode(reactNode).childNodes;
   },
-  
+
   selectText(field, start, end) {
     if( field.createTextRange ) {
       var selRange = field.createTextRange();
@@ -415,19 +415,19 @@ var Util = {
 	{
 		return Math.min(Math.max(value, min), max);
 	},
-  
+
   deeperCloneArr(obj): any
   {
     return _.map(obj, _.clone);
   },
-  
+
   deeperCloneObj(obj): any
   {
-    var ans = {}
+    var ans = {};
     _.map(obj, (val, key) => ans[key] = _.clone(val));
     return ans;
   },
-  
+
   animateToHeight(node, height: number, onComplete?): void
   {
     var el = $(node);
@@ -435,10 +435,10 @@ var Util = {
 
     el.css('overflow', 'hidden');
     el.height(curHeight).animate({ height: height }, 250, () => {
-      onComplete && onComplete(); 
-    }); 
+      onComplete && onComplete();
+    });
   },
-  
+
   animateToAutoHeight(node, onComplete?, duration?): void
   {
     var el = $(node);
@@ -446,12 +446,12 @@ var Util = {
     var autoHeight = el.css('height', 'auto').height();
 
     el.height(curHeight).animate({ height: autoHeight }, duration || 250, function() {
-      el.css('height', 'auto'); 
+      el.css('height', 'auto');
       el.css('overflow-y', 'visible');
       onComplete && onComplete();
     });
   },
-  
+
   bindAll(instance, Clss?: { prototype: any })
   {
     for(var m in instance)
@@ -462,9 +462,9 @@ var Util = {
         instance[m] = instance[m].bind(instance);
       }
     }
-    
+
   },
-  
+
   bind(component: React.Component<any, any>, ...args: any[])
   {
     var fields: any[] = args;
@@ -472,10 +472,10 @@ var Util = {
     {
       fields = fields[0];
     }
-    
+
     fields.map((field) => component[field] = component[field].bind(component));
   },
-  
+
   throttle(component: React.Component<any, any>, fields: string[], rate)
   {
     // For throttling methods on a react component
@@ -507,8 +507,8 @@ var Util = {
 				return classNameArray;
 			}, []).join(" ");
 	},
-  
-   
+
+
   cardIndex: (cards, action) =>
   {
     return cards.findIndex(card => card.get('id') === action.payload.card.id);
@@ -519,7 +519,7 @@ var Util = {
     transformCard.range = transformCard.range || [0,100];
     transformCard.bars = transformCard.bars || [];
     transformCard.scorePoints = transformCard.scorePoints || [];
-    
+
     if(transformCard.scorePoints.length === 0)
     {
       for(var i:any = 0; i < 5; i ++)
@@ -533,18 +533,18 @@ var Util = {
       }
     }
   },
-  
+
   getIEVersion() {
     // from https://jsfiddle.net/jquerybyexample/gk7xA/
     var sAgent = window.navigator.userAgent;
     var Idx = sAgent.indexOf("MSIE");
 
     // If IE, return version number.
-    if (Idx > 0) 
+    if (Idx > 0)
       return parseInt(sAgent.substring(Idx+ 5, sAgent.indexOf(".", Idx)));
 
     // If IE 11 then look for Updated user agent string.
-    else if (!!navigator.userAgent.match(/Trident\/7\./)) 
+    else if (!!navigator.userAgent.match(/Trident\/7\./))
       return 11;
 
     else

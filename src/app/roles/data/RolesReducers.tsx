@@ -68,11 +68,11 @@ RolesReducer[ActionTypes.fetch] =
         role.builder = !! role.builder;
         roles = roles.setIn([groupId, username], new RoleTypes.Role(role));
       });
-      
+
       Actions.setRoles(roles);
     });
     return state.set('loading', true);
-  }
+  };
 
 RolesReducer[ActionTypes.setRoles] =
   (state, action) =>
@@ -84,13 +84,13 @@ RolesReducer[ActionTypes.change] =
   (state, action) =>
   {
     let role:RoleTypes.Role = action.payload.role;
-    
+
     Ajax.saveRole(role);
     if(!state.get(role.groupId))
     {
       state = state.set(role.groupId, Immutable.Map({}));
     }
     return state.setIn([role.groupId, role.username], role);
-  }
+  };
 
 export default RolesReducer;

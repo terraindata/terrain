@@ -61,7 +61,7 @@ export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
 export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>, 'like'];
 
-import {Display, DisplayType, valueDisplay, letVarDisplay, getCardStringDisplay, firstSecondDisplay, wrapperDisplay, wrapperSingleChildDisplay, stringValueDisplay} from './BuilderDisplays';  
+import {Display, DisplayType, valueDisplay, letVarDisplay, getCardStringDisplay, firstSecondDisplay, wrapperDisplay, wrapperSingleChildDisplay, stringValueDisplay} from './BuilderDisplays';
 var ManualConfig = require('./../manual/ManualConfig.json');
 
 export module BuilderTypes
@@ -77,7 +77,7 @@ export module BuilderTypes
     NIN,
     LIKE,
   }
-  
+
   export const OperatorTQL = {
     [Operator.EQ]: '=',
     [Operator.NE]: '!=',
@@ -88,48 +88,48 @@ export module BuilderTypes
     [Operator.IN]: 'IN',
     [Operator.NIN]: 'NOT IN',
     [Operator.LIKE]: 'LIKE',
-  }
+  };
 
   export enum Direction {
     ASC,
     DESC
   }
-  
+
   export const DirectionTQL = {
     [Direction.ASC]: 'ASC',
     [Direction.DESC]: 'DESC',
-  }
+  };
 
   export enum Combinator {
     AND,
     OR
   }
-  
+
   export const CombinatorTQL = {
     [Combinator.AND]: 'AND',
     [Combinator.OR]: 'OR',
-  }
-    
+  };
+
   export enum InputType
   {
     TEXT,
     DATE,
     NUMBER,
   }
-  
+
   // A query can be viewed and edited in the Builder
   // currently, only Variants have Queries, 1:1, but that may change
   class QueryC
   {
     id: ID = "";
     variantId: ID = "";
-    
+
     cards: ICards = List([]);
     inputs: List<any> = List([]);
     resultsConfig: IResultsConfig = null;
     tql: string = "";
     deckOpen: boolean = true;
-    
+
     tqlCardsInSync: boolean = false;
     parseTreeError: string = null;
   }
@@ -137,12 +137,12 @@ export module BuilderTypes
   export interface Query extends QueryC, IRecord<Query> {}
   export const _Query = (config?: Object) => {
     config = Util.extendId(config || {});
-    config['cards'] = BuilderTypes.recordFromJS(config['cards'] || [])
-    config['inputs'] = BuilderTypes.recordFromJS(config['inputs'] || [])
+    config['cards'] = BuilderTypes.recordFromJS(config['cards'] || []);
+    config['inputs'] = BuilderTypes.recordFromJS(config['inputs'] || []);
     config['resultsConfig'] = _IResultsConfig(config['resultsConfig']);
-    
+
     let query = new Query_Record(config) as any as Query;
-    
+
     switch(config['mode'])
     {
       case 'tql':
@@ -157,10 +157,10 @@ export module BuilderTypes
           .set('tqlCardsInSync', true);
         break;
     }
-    
+
     return query;
-  }
-  
+  };
+
   export function queryForSave(query: Query): Object
   {
     query = query
@@ -168,7 +168,7 @@ export module BuilderTypes
       .set('resultsConfig', query.resultsConfig.toJS());
     return query.toJS();
   }
-  
+
   export interface IInput extends IRecord<IInput>
   {
     type: string;
@@ -186,39 +186,39 @@ export module BuilderTypes
     syntax: string;
     text: any[];
   }
-    
+
 
 
   // BUILDING BLOCKS
   // The following large section defines every card
   //  and every piece of every card.
-  
+
   // IBlock is a card or a distinct piece / group of card pieces
   export interface IBlock extends IRecord<IBlock>
   {
     id: string;
     type: string;
     _isBlock: boolean;
-    
+
     // fields not saved on server
     static: {
       tql: (string | ((block:IBlock) => string));
       tqlGlue?: string;
       topTql?: string;
       accepts?: List<string>;
-      
+
       // remove this block if it contains a card and the card is removed
       //  will not remove field if it is the last in its parents' list
       removeOnCardRemove?: boolean;
-      
+
       metaFields: string[];
-      
+
       [field:string]: any;
     }
-    
+
     [field:string]: any;
   }
-  
+
   export interface ICard extends IRecord<ICard>
   {
     id: string;
@@ -226,15 +226,15 @@ export module BuilderTypes
     _isCard: boolean;
     _isBlock: boolean;
     closed: boolean;
-    
-    // the following fields are excluded from the server save    
+
+    // the following fields are excluded from the server save
     static: {
       colors: string[];
       title: string;
       display: Display | Display[];
-      
+
       isAggregate: boolean;
-      
+
       // the format string used for generating tql
       // - insert the value of a card member by prepending the field's name with $, e.g. "$expression" or "$filters"
       // - arrays/Lists are joined with "," by default
@@ -245,20 +245,20 @@ export module BuilderTypes
       tql: string | ((block:IBlock) => string);
       tqlGlue?: string;
       topTql?: string;
-      
+
       anythingAccepts?: boolean;
-      
+
       // returns an object with default values for a new card
       init?: () => {
         [k:string]: any;
       };
-      
+
       // given a card, return the "terms" it generates for autocomplete
       getChildTerms?: (card: ICard) => List<string>;
       getNeighborTerms?: (card: ICard) => List<string>;
       getParentTerms?: (card: ICard) => List<string>;
         // returns terms for its parent and its neighbors (but not its parent's neighbors)
-      
+
       preview: string | ((c:ICard) => string);
       // The BuilderTypes.getPreview function constructs
       // a preview from a card object based on this string.
@@ -266,15 +266,15 @@ export module BuilderTypes
       // If an array of objects, you can specify: [arrayKey.objectKey]
       // and it will map through and join the values with ", ";
       manualEntry: IManualEntry;
-      
+
       // a list of which fields on this card are just metadata, e.g. 'closed'
       metaFields: string[];
     };
   }
-  
+
   export type ICards = List<ICard>;
   export type CardString = string | ICard;
-  
+
   interface IBlockConfig
   {
     static: {
@@ -284,12 +284,12 @@ export module BuilderTypes
       removeOnCardRemove?: boolean;
       metaFields?: string[];
     }
-    
+
     [field:string]:any;
   }
-  
+
   const allBlocksMetaFields = ['id'];
-  
+
   // helper function to populate common fields for an IBlock
   const _block = (config: IBlockConfig): IBlock =>
   {
@@ -298,7 +298,7 @@ export module BuilderTypes
       type: "",
       _isBlock: true,
     }, config);
-    
+
     if(blockConfig.static.metaFields)
     {
       blockConfig.static.metaFields = blockConfig.static.metaFields.concat(allBlocksMetaFields);
@@ -307,17 +307,17 @@ export module BuilderTypes
     {
       blockConfig.static.metaFields = allBlocksMetaFields;
     }
-    
+
     return blockConfig;
-  }
-    
-  type TQLFn = string | ((block:IBlock) => string);  
-    
+  };
+
+  type TQLFn = string | ((block:IBlock) => string);
+
   // Every Card definition must follow this interface
   interface ICardConfig
   {
     [field:string]: any;
-    
+
     static: {
       colors: string[];
       title: string;
@@ -330,21 +330,21 @@ export module BuilderTypes
       topTql?: string | ((block:IBlock) => string);
       accepts?: List<string>;
       anythingAccepts?: boolean; // if any card accepts this card
-      
+
       getChildTerms?: (card: ICard) => List<string>;
       getNeighborTerms?: (card: ICard) => List<string>;
       getParentTerms?: (card: ICard) => List<string>;
-      
+
       metaFields?: string[];
-      
+
       init?: () => {
         [k:string]: any;
       };
     }
   }
-  
+
   const allCardsMetaFields = allBlocksMetaFields.concat(['closed']);
-  
+
   // helper function to populate random card fields
   const _card = (config:ICardConfig) =>
   {
@@ -354,7 +354,7 @@ export module BuilderTypes
       _isBlock: true,
       closed: false,
     });
-    
+
     if(config.static.metaFields)
     {
       config.static.metaFields = config.static.metaFields.concat(allCardsMetaFields);
@@ -363,16 +363,16 @@ export module BuilderTypes
     {
       config.static.metaFields = allCardsMetaFields;
     }
-    
+
     return config;
-  }
-  
+  };
+
   // a card that contains other cards
   export interface IWrapperCard extends ICard
   {
     cards: ICards;
   }
-  
+
   // config to define such a card
   interface IWrapperCardConfig
   {
@@ -388,12 +388,12 @@ export module BuilderTypes
     singleChild?: boolean;
     isAggregate?: boolean;
   }
-  
+
   const _wrapperCard = (config:IWrapperCardConfig) =>
   {
     return _card({
       cards: L(),
-      
+
       static: {
         title: config.title,
         colors: config.colors,
@@ -403,7 +403,7 @@ export module BuilderTypes
 
         getChildTerms: config.getChildTerms,
         getNeighborTerms: config.getNeighborTerms,
-        
+
         preview: (c:IWrapperCard) => {
           // var prefix = config.title + ': ';
           // if(c.type === 'parentheses')
@@ -417,17 +417,17 @@ export module BuilderTypes
           }
           return "Nothing";
         },
-        
+
         display: config.display || (
           config.singleChild ? wrapperSingleChildDisplay : wrapperDisplay
         ),
-        
+
         tql: config.tql,
         tqlGlue: config.tqlGlue,
       }
     })
-  }
-  
+  };
+
   const _aggregateCard = (config: {
     colors: string[];
     title: string;
@@ -436,7 +436,7 @@ export module BuilderTypes
     defaultValue?: string;
   }) => _card({
     value: "",
-    
+
     static: {
       title: config.title,
       colors: config.colors,
@@ -444,11 +444,11 @@ export module BuilderTypes
       preview: "[value]",
       tql: config.tql,
       isAggregate: true,
-      
-      display: 
+
+      display:
         config.defaultValue === undefined
           ? stringValueDisplay
-          : _.extend({}, 
+          : _.extend({},
               stringValueDisplay,
               {
                 defaultValue: config.defaultValue,
@@ -457,7 +457,7 @@ export module BuilderTypes
       ,
     }
   });
-  
+
   const _aggregateNestedCard = (config: {
     colors: string[],
     title: string,
@@ -467,7 +467,7 @@ export module BuilderTypes
     init?: () => any,
   }) => _card({
     value: "",
-    
+
     static: {
       title: config.title,
       colors: config.colors,
@@ -476,16 +476,16 @@ export module BuilderTypes
       tql: config.tql,
       init: config.init,
       isAggregate: true,
-      
+
       display: getCardStringDisplay({
         accepts: config.accepts,
       }),
     }
   });
-  
+
   const _andOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, colors: string[], manualEntry: any }) => _card({
       clauses: L(),
-      
+
       static: {
         title: config.title,
         preview: '[clauses.length] ' + config.english + ' clauses',
@@ -493,14 +493,14 @@ export module BuilderTypes
         tql: "(\n$clauses\n)",
         tqlGlue: config.tqlGlue,
         manualEntry: config.manualEntry,
-        
+
         init: () => ({
           clauses: List([
             make(Blocks[config.factoryType]),
             make(Blocks[config.factoryType]),
           ]),
         }),
-        
+
         display: {
           displayType: DisplayType.ROWS,
           key: 'clauses',
@@ -513,31 +513,31 @@ export module BuilderTypes
           //   }
           //   return '';
           // },
-          
+
           row: {
             below:
             {
               displayType: DisplayType.CARDSFORTEXT,
               key: 'clause',
             },
-            
-            inner: 
+
+            inner:
             {
               displayType: DisplayType.CARDTEXT,
               key: 'clause',
               top: false,
             },
-            
+
             hideToolsWhenNotString: true,
           }
         },
       },
     });
-  
+
   const _valueCard = (config:{ title: string, colors: string[], manualEntry: IManualEntry, tql: string, defaultValue: number, }) => (
     _card({
       value: config.defaultValue,
-      
+
       static: {
         title: config.title,
         colors: config.colors,
@@ -548,7 +548,7 @@ export module BuilderTypes
       }
     })
   );
-  
+
   const _acceptsMath = (list: List<string>) =>
     list.concat(
       List([
@@ -558,7 +558,7 @@ export module BuilderTypes
         'multiply',
       ])
     ).toList();
-  
+
   const mathsAccept = _acceptsMath(
     List([
       'select',
@@ -567,7 +567,7 @@ export module BuilderTypes
       'transform',
     ])
   );
-  
+
   const acceptsAggregates = _acceptsMath(
     List([
       'count',
@@ -584,10 +584,10 @@ export module BuilderTypes
       'add',
     ])
   );
-  
-  const transformScoreInputTypes = 
+
+  const transformScoreInputTypes =
     List(['score', 'transform', 'sfw']).concat(acceptsAggregates).toList();
-    
+
   const _mathCard = (config: {
     title: string;
     tqlGlue: string;
@@ -595,28 +595,28 @@ export module BuilderTypes
   }) =>
     _card({
       fields: L(),
-      
+
       static:
       {
         manualEntry: null,
         colors: config.colors,
         title: config.title,
-        preview: 
+        preview:
           (card) =>
             card['fields'].map(
               field =>
                 typeof field.field !== 'object' ? field.field : getPreview(field.field)
             ).join(config.tqlGlue),
-            
+
         tql: "($fields )",
         tqlGlue: config.tqlGlue,
-        
+
         init: () => ({
-          fields: List([ 
+          fields: List([
             make(Blocks.field, { field: '' })
           ]),
         }),
-        
+
         display: [
           {
             displayType: DisplayType.ROWS,
@@ -645,10 +645,10 @@ export module BuilderTypes
         ],
       },
     });
-  
+
   // The BuildingBlocks
   export const Blocks =
-  { 
+  {
     sortBlock: _block(
     {
       property: "",
@@ -658,26 +658,26 @@ export module BuilderTypes
         removeOnCardRemove: true,
       }
     }),
-    
+
     comparisonBlock: _block(
     {
       first: "",
       second: "",
       operator: Operator.EQ,
-      
+
       static: {
         tql: "\n $first $OPERATOR $second",
-        
+
         accepts: _acceptsMath(List(['score', 'transform', 'from', 'exists', 'not'])),
       }
     }),
-    
+
     table: _block(
     {
       table: "",
       alias: "",
       aliasWasSuggested: false,
-      
+
       static: {
         tql: (tableBlock: IBlock) =>
         {
@@ -690,23 +690,23 @@ export module BuilderTypes
         }
       }
     }),
-    
+
     field: _block(
     {
       field: "",
-      
+
       static: {
         tql: "$field",
         accepts: _acceptsMath(List(['min', 'max', 'avg', 'sum', 'count', 'distinct'])),
         removeOnCardRemove: true,
       },
     }),
-    
+
     sfw: _card(
     {
       fields: L(),
       cards: L(),
-      
+
       static: {
         manualEntry: ManualConfig.cards['sfw'],
         colors: ["#559dcf", "#b4dbf6"],
@@ -714,16 +714,16 @@ export module BuilderTypes
         preview: "[fields.field]",
         topTql: "SELECT\n$fields\n$cards",
         tql: "(\n SELECT\n $fields\n$cards )",
-        
+
         init: () => ({
-          fields: List([ 
+          fields: List([
             make(Blocks.field, { field: '*' })
           ]),
           cards: List([
             make(Blocks.from)
           ]),
         }),
-        
+
         accepts: List([
           'from',
           'where',
@@ -733,7 +733,7 @@ export module BuilderTypes
           'groupBy',
           'having',
         ]),
-        
+
         getChildTerms:
           (card: ICard) =>
             card['fields'].reduce(
@@ -748,7 +748,7 @@ export module BuilderTypes
                 return list;
               }, List([])
             ),
-          
+
         display: [
           {
             displayType: DisplayType.ROWS,
@@ -775,7 +775,7 @@ export module BuilderTypes
               noDataPadding: true,
             },
           },
-          
+
           {
             displayType: DisplayType.CARDS,
             key: 'cards',
@@ -787,25 +787,25 @@ export module BuilderTypes
 
     from: _card({
       tables: L(),
-      
+
       static: {
         manualEntry: ManualConfig.cards['sfw'],
         colors: ["#3a7dcf", "#94b9f6"],
         title: "From",
         preview: "[tables.table]",
         tql: "FROM\n$tables",
-        
+
         init: () => ({
           tables: List([ make(Blocks.table )]),
         }),
-        
+
         getParentTerms:
           (card: ICard) =>
             card['tables'].reduce(
               (list:List<string>, tableBlock: {table: string, alias: string}): List<string> =>
               {
                 let dbName = Store.getState().db;
-                let columnNames = SchemaStore.getState().columnNamesByDb.getIn([dbName, dbName + '.' + tableBlock.table]) 
+                let columnNames = SchemaStore.getState().columnNamesByDb.getIn([dbName, dbName + '.' + tableBlock.table])
                   || Immutable.List([]);
                 columnNames = columnNames.map(
                   columnName => tableBlock.alias + '.' + columnName
@@ -814,16 +814,16 @@ export module BuilderTypes
               },
               List([])
             ),
-        
+
         display:
         {
           displayType: DisplayType.ROWS,
           key: 'tables',
           english: 'table',
           factoryType: 'table',
-          row: 
+          row:
           {
-            below: 
+            below:
             {
               displayType: DisplayType.CARDSFORTEXT,
               key: 'table',
@@ -831,14 +831,14 @@ export module BuilderTypes
             },
             noDataPadding: true,
             inner:
-            [  
+            [
               {
                 displayType: DisplayType.CARDTEXT,
                 key: 'table',
                 help: ManualConfig.help["table"],
                 accepts: List(['sfw']),
                 showWhenCards: true,
-                getAutoTerms: (comp:React.Component<any, any>) => 
+                getAutoTerms: (comp:React.Component<any, any>) =>
                 {
                   let db = Store.getState().db;
                   let tableNames = SchemaStore.getState().tableNamesByDb.get(db);
@@ -855,7 +855,7 @@ export module BuilderTypes
                   }
                   return tableNames;
                 },
-                
+
                 onFocus: (comp:React.Component<any, any>, value:string) =>
                 {
                   comp.setState({
@@ -866,7 +866,7 @@ export module BuilderTypes
                 {
                   let initialTable = comp.state.initialTable;
                   let newTable = value;
-                  
+
                   if(initialTable !== newTable)
                   {
                     let suggestAlias = (table:string) =>
@@ -876,14 +876,14 @@ export module BuilderTypes
                         return table.substr(0, table.length - 1);
                       }
                       return table;
-                    }
-                    
+                    };
+
                     let keyPath: KeyPath = comp.props.keyPath;
                     let aliasKeyPath = keyPath.set(keyPath.size - 1, 'alias');
                     let aliasWasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
                     let initialAlias: string = Store.getState().getIn(aliasKeyPath);
-                    
-                    if(!initialTable || initialTable === '' 
+
+                    if(!initialTable || initialTable === ''
                       || initialAlias === '' || initialAlias === suggestAlias(initialTable))
                     {
                       // alias or table was blank or was the suggested one, so let's suggest an alias
@@ -903,7 +903,7 @@ export module BuilderTypes
                 help: ManualConfig.help["alias"],
                 key: 'alias',
                 autoDisabled: true,
-                
+
                 onFocus: (comp:React.Component<any, any>, value:string, event:React.FocusEvent) =>
                 {
                   let keyPath: KeyPath = comp.props.keyPath;
@@ -920,14 +920,14 @@ export module BuilderTypes
         },
       }
     }),
-    
+
     where: _wrapperCard({
       title: "Where",
       colors: ["#86a860", "#d3e5be"],
       tql: "WHERE\n$cards",
       manualEntry: ManualConfig.cards.where,
       singleChild: true,
-      
+
       accepts: List([
         'and',
         'or',
@@ -936,7 +936,7 @@ export module BuilderTypes
         'comparison',
       ]),
     }),
-    
+
     and: _wrapperCard({
       title: "And",
       tql: '(\n$cards\n)',
@@ -945,7 +945,7 @@ export module BuilderTypes
       colors: ["#824ba1", "#ecc9ff"],
       accepts: List(['or', 'comparison', 'exists', 'not']),
     }),
-    
+
     or: _wrapperCard({
       title: "Or",
       tql: '(\n$cards\n)',
@@ -954,13 +954,13 @@ export module BuilderTypes
       colors: ["#b161bc", "#f8cefe"],
       accepts: List(['and', 'comparison', 'exists', 'not']),
     }),
-   
+
     comparison: _card(
     {
       first: "",
       second: "",
       operator: Operator.EQ,
-      
+
       static: {
         title: "Compare",
         colors: ["#476aa3", "#a5c6fc"],
@@ -975,11 +975,11 @@ export module BuilderTypes
           {
             second = getPreview(second);
           }
-          
+
           return `${first} ${OperatorTQL[c['operator']]} ${second}`
         },
         tql: "$first $OPERATOR $second",
-        
+
         display: firstSecondDisplay(
           {
             displayType: DisplayType.DROPDOWN,
@@ -987,7 +987,7 @@ export module BuilderTypes
             options: Immutable.List(Operators),
             help: ManualConfig.help["operator"],
             centerDropdown: true,
-          }, 
+          },
           _acceptsMath(
             List(['sfw', 'exists', 'not'])
           )
@@ -995,12 +995,12 @@ export module BuilderTypes
         manualEntry: ManualConfig.cards['filter'],
       },
     }),
-     
+
     sort: _card(
     {
       sorts: List([]),
-      
-      static: 
+
+      static:
       {
         title: "Order By",
         preview: (c:any) =>
@@ -1019,8 +1019,8 @@ export module BuilderTypes
         },
         colors: ["#39918b", "#99e4df"],
         manualEntry: ManualConfig.cards['sort'],
-        tql: "ORDER BY $sorts",        
-        
+        tql: "ORDER BY $sorts",
+
         init: () =>
         {
           return {
@@ -1029,13 +1029,13 @@ export module BuilderTypes
             ])
           };
         },
-        
+
         display: {
           displayType: DisplayType.ROWS,
           key: 'sorts',
           english: 'sort',
           factoryType: 'sortBlock',
-          
+
           row:
           {
             inner:
@@ -1066,12 +1066,12 @@ export module BuilderTypes
         },
       },
     }),
-    
+
     // let: _card(
     // {
     //   field: "",
     //   expression: "",
-      
+
     //   static: {
     //     title: "Let",
     //     preview: "[field]",
@@ -1087,7 +1087,7 @@ export module BuilderTypes
     // {
     //   field: "",
     //   expression: "",
-      
+
     //   static: {
     //     title: "Var",
     //     preview: "[field]",
@@ -1102,7 +1102,7 @@ export module BuilderTypes
     as: _card({
       value: "",
       alias: "",
-      
+
       static: {
         title: "As",
         colors: ["#d24f42", "#f9cba8"],
@@ -1113,7 +1113,7 @@ export module BuilderTypes
         {
           displayType: DisplayType.FLEX,
           key: null,
-          
+
           flex:
           [
             {
@@ -1133,9 +1133,9 @@ export module BuilderTypes
               key: 'alias',
               autoDisabled: true,
             },
-          ], 
-          
-          below: 
+          ],
+
+          below:
           {
             displayType: DisplayType.CARDSFORTEXT,
             key: 'value',
@@ -1144,7 +1144,7 @@ export module BuilderTypes
         }
       }
     }),
-    
+
     count: _aggregateNestedCard(
     {
       title: "Count",
@@ -1154,7 +1154,7 @@ export module BuilderTypes
       accepts: List(['distinct']),
       init: () => ({ value: '*' }),
     }),
-    
+
     avg: _aggregateCard(
     {
       title: "Average",
@@ -1170,7 +1170,7 @@ export module BuilderTypes
       manualEntry: ManualConfig.cards['min'],
       tql: "MIN($value)",
     }),
-    
+
     max: _aggregateCard(
     {
       title: "Max",
@@ -1178,7 +1178,7 @@ export module BuilderTypes
       manualEntry: ManualConfig.cards['max'],
       tql: "MAX($value)",
     }),
-    
+
     sum: _aggregateCard(
     {
       title: "Sum",
@@ -1232,7 +1232,7 @@ export module BuilderTypes
       tql: "\n(\n$cards)",
       accepts: List(['and', 'or', 'exists', 'tql', 'not']),
     }),
-    
+
     weight: _block(
     {
       key: "",
@@ -1247,7 +1247,7 @@ export module BuilderTypes
     {
       weights: List([]),
       method: "",
-      
+
       static: {
         title: "Score",
         colors: ["#3a91a6", "#a1eafb"],
@@ -1303,8 +1303,8 @@ export module BuilderTypes
         },
       }
     }),
-    
-    
+
+
     bar: _block(
     {
       count: 0,
@@ -1313,30 +1313,30 @@ export module BuilderTypes
         min: 0,
         max: 0,
       },
-      
+
       static: {
         tql: null, // N/A
       }
     }),
-    
+
     scorePoint: _block(
     {
       value: 0,
       score: 0,
-      
+
       static: {
         tql: "$score, $value",
       }
     }),
-    
+
     transform: _card(
     {
       input: "",
       scorePoints: List([]),
-      
+
       domain: List([0,100]),
       hasCustomDomain: false, // has the user set a custom domain
-      
+
       static: {
         manualEntry: ManualConfig.cards['transform'],
         colors: ["#4b979a", "#aef3f6"],
@@ -1370,7 +1370,7 @@ export module BuilderTypes
             help: ManualConfig.help["scorePoints"],
           },
         ],
-        
+
         init: () => (
           {
             scorePoints:
@@ -1393,11 +1393,11 @@ export module BuilderTypes
               ]),
           }
         ),
-        
+
         metaFields: ['domain', 'hasCustomDomain'],
       }
     }),
-    
+
     take: _valueCard(
     {
       colors: ["#2e8c9a", "#8adeea"],
@@ -1406,7 +1406,7 @@ export module BuilderTypes
       tql: "LIMIT $value",
       defaultValue: 25,
     }),
-    
+
     skip: _valueCard(
     {
       colors: ["#2588aa", "#a2e5fc"],
@@ -1415,22 +1415,22 @@ export module BuilderTypes
       tql: "OFFSET $value",
       defaultValue: 25,
     }),
-    
+
     groupBy: _card(
     {
       fields: L(),
-      
+
       static: {
         manualEntry: ManualConfig.cards['sfw'], // TODO
         colors: ["#659f72", "#c4e1ca"],
         title: "Group By",
         preview: "[fields.field]",
         tql: "GROUP BY\n$fields",
-        
+
         init: () => ({
           fields: List([ make(Blocks.field)]),
         }),
-        
+
         display:
         {
           displayType: DisplayType.ROWS,
@@ -1449,13 +1449,13 @@ export module BuilderTypes
         },
       },
     }),
-    
+
     having: _wrapperCard({
       title: "Having",
       colors: ["#4b977e", "#c4e1ca"],
       tql: "HAVING\n$cards",
       manualEntry: ManualConfig.cards.where, // TODO
-      
+
       accepts: List([
         'and',
         'or',
@@ -1463,11 +1463,11 @@ export module BuilderTypes
         'comparison',
       ]),
     }),
-    
-    
+
+
     tql: _card({
       clause: "",
-      
+
       static: {
         title: "Expression",
         preview: "[clause]",
@@ -1475,46 +1475,46 @@ export module BuilderTypes
         tql: "$clause",
         manualEntry: ManualConfig.cards.tql,
         anythingAccepts: true,
-        
+
         display: {
           displayType: DisplayType.TEXT,
           key: 'clause',
         }
       }
     }),
-    
+
     add: _mathCard({
       title: '+',
       tqlGlue: ' + ',
       colors: ["#d24f42", "#f9cba8"],
     }),
-    
+
     subtract: _mathCard({
       title: '-',
       tqlGlue: ' - ',
       colors: ["#d65a44", "#fbc1b7"],
     }),
-    
+
     multiply: _mathCard({
       title: '×',
       tqlGlue: ' * ',
       colors: ["#db6746", "#f9bcab"],
     }),
-    
+
     divide: _mathCard({
       title: '/',
       tqlGlue: ' / ',
       colors: ["#dd7547", "#fdcdb8"],
     }),
-    
+
     spotlight: _block(
     {
       static: {
         tql: null, // N/A
       }
-      // TODO some day      
+      // TODO some day
     }),
-    
+
     input: _block(
     {
       key: "",
@@ -1524,7 +1524,7 @@ export module BuilderTypes
         tql: "VAR $key = $value;",
       }
     }),
-    
+
     creating: _card( // a placeholder for when a card is being created
     {
       static: {
@@ -1540,7 +1540,7 @@ export module BuilderTypes
 
   // Set the "type" field for all blocks equal to its key
   _.map(Blocks as ({[card:string]:any}), (v, i) => Blocks[i].type = i);
-  
+
   export const CardsDeckOrdering =
   [
     [
@@ -1585,24 +1585,24 @@ export module BuilderTypes
       Blocks.tql,
     ],
   ];
-  
+
   // This creates a new instance of a card / block
   // Usage: BuilderTypes.make(BuilderTypes.Blocks.sort)
   export const make = (block:IBlock, extraConfig?:{[key:string]:any}) =>
   {
     let {type} = block;
-    
+
     block = _.extend({}, block); // shallow clone
-    
+
     if(Blocks[type].static.init)
     {
       block = _.extend({}, block, Blocks[type].static.init());
     }
-    
+
     if(extraConfig)
     {
       block = _.extend(block, extraConfig);
-      
+
       if(block.type === 'sfw' && block['tables'] && block['tables'].size && block['tables'].get(0).table !== 'none')
       {
         // convert old format, where tables were included, to new format with separate from card
@@ -1614,20 +1614,20 @@ export module BuilderTypes
         );
       }
     }
-    
+
     if(block.static)
     {
       delete block.static;
     }
-    
+
     if(!block.id || !block.id.length)
     {
       block.id = "block-" + Math.random();
     }
-    
+
     return typeToRecord[type](block);
-  }
-  
+  };
+
   // array of different card types
   export const CardTypes = _.compact(_.map(Blocks, (block, k: string) => block._isCard && k ));
 
@@ -1641,19 +1641,19 @@ export module BuilderTypes
     }
   }
   export const cardList = cards;
-  
+
 
   // private, maps a type (string) to the backing Immutable Record
-  let typeToRecord = _.reduce(Blocks as ({[card:string]:any}), 
+  let typeToRecord = _.reduce(Blocks as ({[card:string]:any}),
     (memo, v, i) => {
-      memo[i] = Immutable.Record(v)
+      memo[i] = Immutable.Record(v);
       return memo;
     }
   , {});
 
 
 
-  // Given a plain JS object, construct the Record for it and its children  
+  // Given a plain JS object, construct the Record for it and its children
   export const recordFromJS = (value: any) =>
   {
     if(value && value.static && Immutable.Iterable.isIterable(value))
@@ -1662,7 +1662,7 @@ export module BuilderTypes
       // TODO change to a better way of checking
       return value;
     }
-    
+
     if(Array.isArray(value) || typeof value === 'object')
     {
       if(Immutable.Iterable.isIterable(value))
@@ -1677,7 +1677,7 @@ export module BuilderTypes
           return memo;
         }, Array.isArray(value) ? [] : {});
       }
-      
+
       // conversion, remove when appropriate
       // if(value.type === 'multiand' || value.type === 'multior')
       // {
@@ -1692,7 +1692,7 @@ export module BuilderTypes
       //     return clause;
       //   });
       // }
-      
+
       let type = value.type || (typeof value.get === 'function' && value.get('type'));
       if(type && Blocks[type])
       {
@@ -1703,10 +1703,10 @@ export module BuilderTypes
         value = Immutable.fromJS(value);
       }
     }
-    
+
     return value;
-  }
-  
+  };
+
   // Prepare cards/records for save, trimming static values
   export const cardsForServer = (value: any) =>
   {
@@ -1714,12 +1714,12 @@ export module BuilderTypes
     {
       value = value.toJS();
     }
-    
+
     if(value && value.static)
     {
       delete value.static;
     }
-    
+
     if(Array.isArray(value))
     {
       value.map(cardsForServer);
@@ -1731,9 +1731,9 @@ export module BuilderTypes
         cardsForServer(v);
       }
     }
-    
+
     return value;
-  }
+  };
 
   // returns preview for a given card
   export function getPreview(card:ICard):string
@@ -1742,21 +1742,21 @@ export module BuilderTypes
     {
       return;
     }
-    
+
     if(!card.static)
     {
       if(typeof card === 'string' || typeof card === 'number')
       {
         return card + "";
       }
-      
+
       try {
         return JSON.stringify(card);
       } catch(e) {
         return 'No preview';
       }
     }
-    
+
     let {preview} = card.static;
     if(typeof preview === 'string')
     {
@@ -1778,7 +1778,7 @@ export module BuilderTypes
           return card[keys[0]].size;
         }
         return card[keys[0]].toArray().map(
-          v => 
+          v =>
             getPreview(v[keys[1]])
         ).join(", ");
       });
@@ -1788,12 +1788,12 @@ export module BuilderTypes
       return preview(card);
     }
     return 'No preview';
-  }  
-  
+  }
+
   export function getChildIds(_block:IBlock):Map<ID, boolean>
   {
     var map: Map<ID, boolean> = Map({});
-    
+
     if(Immutable.Iterable.isIterable(_block))
     {
       let block = _block.toMap();
@@ -1803,12 +1803,12 @@ export module BuilderTypes
       }
       block.map(value => map = map.merge(getChildIds(value)));
     }
-    
+
     return map;
   }
-  
+
   export function forAllCards(
-    block:IBlock | List<IBlock>, 
+    block:IBlock | List<IBlock>,
     fn: (card:ICard, keyPath: KeyPath) => void
   ) {
     forAllBlocks(
@@ -1822,14 +1822,14 @@ export module BuilderTypes
       }
     );
   }
-  
+
   export function forAllBlocks(
-    block: IBlock | List<IBlock>, 
-    fn: (block: IBlock, keyPath: KeyPath) => void, 
-    keyPath: KeyPath = List([]), 
-    stopAtFirstBlock?: boolean, 
+    block: IBlock | List<IBlock>,
+    fn: (block: IBlock, keyPath: KeyPath) => void,
+    keyPath: KeyPath = List([]),
+    stopAtFirstBlock?: boolean,
     excludeWrappedCards?: boolean
-  ) 
+  )
   {
     if(block)
     {
@@ -1848,10 +1848,10 @@ export module BuilderTypes
             if(!excludeWrappedCards || key !== 'cards')
             {
               forAllBlocks(
-                b as IBlock, 
-                fn, 
-                keyPath.push(key), 
-                stopAtFirstBlock, 
+                b as IBlock,
+                fn,
+                keyPath.push(key),
+                stopAtFirstBlock,
                 excludeWrappedCards
               );
             }
@@ -1860,7 +1860,7 @@ export module BuilderTypes
       }
     }
   }
-   
+
   export function transformAlias(transformCard:ICard):string
   {
     return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, "");

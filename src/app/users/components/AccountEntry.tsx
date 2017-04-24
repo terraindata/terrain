@@ -63,7 +63,7 @@ interface Props
 
 class AccountEntry extends Classs<Props>
 {
-  constructor(props: Props) 
+  constructor(props: Props)
   {
     super(props);
     this.state =
@@ -76,12 +76,12 @@ class AccountEntry extends Classs<Props>
   {
     this.setState({
       expanded: !this.state.expanded
-    }); 
+    });
   }
 
   renderContent()
   {
-    if (this.state.expanded) 
+    if (this.state.expanded)
     {
       return this.props.content;
     }
@@ -109,15 +109,15 @@ class AccountEntry extends Classs<Props>
     if (this.props.buttonText)
     {
       return (
-        <div> 
-          {this.props.buttonText} 
+        <div>
+          {this.props.buttonText}
         </div>
       );
     }
     return this.renderDefaultButton();
   }
 
-  renderLine() 
+  renderLine()
   {
     if(!this.props.lastEntry)
     {
@@ -128,14 +128,14 @@ class AccountEntry extends Classs<Props>
 
   render() {
     return (
-      <div className='account-entry'> 
-      <div className='account-entry-top-bar'> 
+      <div className='account-entry'>
+      <div className='account-entry-top-bar'>
         <div className='account-entry-title'>
-          {this.props.title}   
-        </div> 
+          {this.props.title}
+        </div>
         <div className='account-entry-white-space' />
         {this.renderButton()}
-      </div> 
+      </div>
       {this.renderDescription()}
       <div className='account-entry-expanded-info'>
         {this.renderContent()}
@@ -144,6 +144,5 @@ class AccountEntry extends Classs<Props>
     </div>
     );
   }
-};
-
+}
 export default AccountEntry;
