@@ -62,21 +62,21 @@ class LibraryItemCategory extends Classs<Props>
 {
   state = {
     open: true,
-  }
-  
+  };
+
   constructor(props:Props)
   {
     super(props);
     this.state.open = this.props.status !== 'Archive';
   }
-  
+
   toggleOpen()
   {
     this.setState({
       open: !this.state.open,
     });
   }
-  
+
   render()
   { 
     return this.props.connectDropTarget(
@@ -85,7 +85,7 @@ class LibraryItemCategory extends Classs<Props>
           <div className='library-category-title' onClick={this.toggleOpen}>
             <div className='library-category-title-symbol' />
             <div className='library-category-title-text'>
-              { 
+              {
                 this.props.status
               }
             </div>
@@ -106,13 +106,13 @@ let canDrop = (props, monitor) =>
   {
     return false;
   }
-  
+
   return !props.dropDisabled;
 };
-const target = 
+const target =
 {
   canDrop,
-  
+
   hover(props, monitor, component)
   {
     if(canDrop(props, monitor))
@@ -121,7 +121,7 @@ const target =
       props.onHover(props.status, item.id);
     }
   },
-}
+};
 
 const dropCollect = (connect, monitor) =>
 ({

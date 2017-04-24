@@ -49,7 +49,7 @@ import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 
 const ReactModal = require('react-modal');
-const InfoIcon = require('./../../../images/icon_info.svg')
+const InfoIcon = require('./../../../images/icon_info.svg');
 const CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
 
 interface Props
@@ -61,7 +61,7 @@ interface Props
   fill?: boolean;
   confirm?: boolean;
   confirmButtonText?: string;
-  onConfirm?: () => void; 
+  onConfirm?: () => void;
   onClose: () => void;
   children?: any;
   thirdButtonText?: string;
@@ -69,42 +69,42 @@ interface Props
   pre?: boolean;
 }
 
-class Modal extends PureClasss<Props>   
+class Modal extends PureClasss<Props>
 {
-  closeModalSuccess() 
+  closeModalSuccess()
   {
     this.props.onClose();
     this.props.onConfirm ? this.props.onConfirm() : null;
   }
 
-  render() 
+  render()
   {
-    var defaultTitle = this.props.error ? 'Alert' : 'Please Confirm'
-      
+    var defaultTitle = this.props.error ? 'Alert' : 'Please Confirm';
+
     let msgTag = this.props.pre ? <pre /> : <div />;
-    
+
     return (
       <div>
-        <ReactModal 
+        <ReactModal
           contentLabel={''}
-        	isOpen={this.props.open} 
-        	overlayClassName='modal-overlay' 
+        	isOpen={this.props.open}
+        	overlayClassName='modal-overlay'
         	className={classNames({
             'modal-content': true,
             'modal-content-fill': this.props.fill,
           })}
         >
-          <div className ='modal-dialog'> 
+          <div className ='modal-dialog'>
           	<div className={classNames({
               'modal-title': true,
               'modal-title-error': this.props.error,
             })}>
                 {
-                  this.props.error ? 
-                    <div className='modal-info-icon'> 
-                      <InfoIcon /> 
+                  this.props.error ?
+                    <div className='modal-info-icon'>
+                      <InfoIcon />
                     </div>
-                    : 
+                    :
                     null
                 }
                 <div
@@ -150,10 +150,10 @@ class Modal extends PureClasss<Props>
                         {
                           this.props.thirdButtonText
                         }
-                      </div>   
+                      </div>
                   }
               		{
-             				this.props.confirm ? 
+             				this.props.confirm ?
              					<div
                          className='button modal-confirm-button'
                          onClick={this.closeModalSuccess}
@@ -161,8 +161,8 @@ class Modal extends PureClasss<Props>
              						{
                            this.props.confirmButtonText ? this.props.confirmButtonText : 'Continue'
                         }
-             					</div> 
-             					: 
+             					</div>
+             					:
              					<div />
              			}
                   <div

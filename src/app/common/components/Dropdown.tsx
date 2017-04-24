@@ -68,14 +68,14 @@ class Dropdown extends PureClasss<Props>
 {
   constructor(props: Props) {
     super(props);
-    
+
     this.state =
     {
       up: false,
       open: false,
     };
   }
-  
+
   _clickHandlers: {[index: number]: () => void} = {};
   clickHandler(index)
   {
@@ -96,10 +96,10 @@ class Dropdown extends PureClasss<Props>
         }
       }
     }
-    
+
     return this._clickHandlers[index];
   }
-  
+
   renderOption(option, index)
   {
     return (
@@ -108,55 +108,55 @@ class Dropdown extends PureClasss<Props>
           "dropdown-option": true,
           "dropdown-option-selected": index === this.props.selectedIndex,
         })}
-        key={index} 
+        key={index}
         onClick={this.clickHandler(index)}
       >
         <div className="dropdown-option-inner">
-          { 
+          {
             option
           }
         </div>
       </div>
     );
   }
-  
+
   close()
   {
     this.setState({
       open: false,
-    })
+    });
     $(document).off('click', this.close);
   }
-  
+
   toggleOpen()
   {
     if(!this.props.canEdit)
     {
       return;
     }
-    
+
     if(!this.state.open)
     {
       $(document).on('click', this.close);
     }
-    
+
     var cr = this.refs['value']['getBoundingClientRect']();
     var windowBottom = window.innerHeight;
-    
+
     this.setState({
       open: !this.state.open,
       up: cr.bottom > windowBottom / 2,
     });
   }
-  
+
   render()
   {
     // Element with options, rendered at the top or bottom of the dropdown
-    
+
     let optionsEl: El = null;
     if(this.state.open)
     {
-      optionsEl = 
+      optionsEl =
         <div className="dropdown-options-wrapper">
           {
             this.props.options ?
@@ -166,7 +166,7 @@ class Dropdown extends PureClasss<Props>
           }
         </div>
     }
-    
+
     return (
       <div
         onClick={this.toggleOpen}
@@ -179,8 +179,8 @@ class Dropdown extends PureClasss<Props>
           [this.props.className]: !!this.props.className,
         })}
       >
-        { 
-          this.state.up && this.state.open 
+        {
+          this.state.up && this.state.open
             && optionsEl
         }
         <div
@@ -190,7 +190,7 @@ class Dropdown extends PureClasss<Props>
           {
             // map through all of the options so that the dropdown takes the width of the longest one
             //  CSS hides all but the selected option
-            this.props.options && this.props.options.map((option, index) => 
+            this.props.options && this.props.options.map((option, index) =>
               <div
                 key={index}
                 className={classNames({
@@ -198,20 +198,19 @@ class Dropdown extends PureClasss<Props>
                   "dropdown-option-value-selected": index === this.props.selectedIndex,
                 })}
               >
-                { 
+                {
                   option
                 }
               </div>
             )
           }
         </div>
-        { 
-          !this.state.up && this.state.open 
-            && optionsEl 
+        {
+          !this.state.up && this.state.open
+            && optionsEl
         }
       </div>
     );
   }
-};
-
+}
 export default Dropdown;

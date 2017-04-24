@@ -70,36 +70,36 @@ var CodeMirror = React.createClass({
 		turnSyntaxPopupOff: React.PropTypes.func,
 		hideTermDefinition: React.PropTypes.func,
     highlightedLine: React.PropTypes.number,
-    
+
     isDiff: React.PropTypes.bool,
     diff: React.PropTypes.string,
-    
+
     containerHeight: React.PropTypes.number,
 	},
 	foldClass: {
 		open: "CodeMirror-foldgutter-open",
 		folded: "CodeMirror-foldgutter-folded",
 	},
-  
-	getCodeMirrorInstance() 
+
+	getCodeMirrorInstance()
 	{
 		return this.props.codeMirrorInstance || (
       this.props.isDiff ? CM.MergeView : require('codemirror')
     );
 	},
-  
-	getInitialState() 
+
+	getInitialState()
 	{
 		return {
 			isFocused: false,
 		};
 	},
-  
-	componentDidMount() 
+
+	componentDidMount()
 	{
 		var textareaNode = this.refs.textarea;
 		var codeMirrorInstance = this.getCodeMirrorInstance();
-    
+
     // different treatement used in CodeMirror for diffs vs. regular editor
     if(this.props.isDiff)
     {
@@ -126,13 +126,13 @@ var CodeMirror = React.createClass({
 
 	componentWillUnmount()
 	{
-		if(this.codeMirror && this.codeMirror.toTextArea) 
+		if(this.codeMirror && this.codeMirror.toTextArea)
 		{
 			this.codeMirror.toTextArea();
 		}
     this.codeMirror && this.codeMirror.wrap && this.codeMirror.wrap.remove();
 	},
-  
+
 	handleRightClick(self, event)
 	{
 		event.preventDefault();
@@ -143,9 +143,9 @@ var CodeMirror = React.createClass({
 		}
 	},
 
-	updateHighlightedLine: function updateHighlightedLine(lineToHighlight) 
+	updateHighlightedLine: function updateHighlightedLine(lineToHighlight)
 	{
-		if(lineToHighlight !== null) 
+		if(lineToHighlight !== null)
 		{
 			this.codeMirror.addLineClass(lineToHighlight, 'wrap', 'cm-error');
 		}
@@ -159,24 +159,24 @@ var CodeMirror = React.createClass({
 		text.className = 'CodeMirror-error-text';
 		var self = this;
 		var codeMirrorInstance = this.getCodeMirrorInstance();
-		var line = this.codeMirror.getLine(lineToHighlight)
+		var line = this.codeMirror.getLine(lineToHighlight);
 		codeMirrorInstance.on(widget, "mousedown", function(e) {
       		self.props.toggleSyntaxPopup(e, line);
    		});
 		this.codeMirror.setGutterMarker(lineToHighlight, "CodeMirror-lint-markers", widget);
 	},
-	undoHighlightedLine: function undoHighlightedLine(line) 
+	undoHighlightedLine: function undoHighlightedLine(line)
 	{
-		if(line !== null) 
+		if(line !== null)
 		{
 			this.codeMirror.removeLineClass(line, 'wrap', 'cm-error');
 			this.codeMirror.clearGutter('CodeMirror-lint-markers');
 		}
 	},
-	addOpenBrace: function addOpenBrace(i, ch, arr) 
+	addOpenBrace: function addOpenBrace(i, ch, arr)
 	{
 		//Increment the counters for all unmatched braces
-		for(var entry = 0; entry < arr.length; entry++) 
+		for(var entry = 0; entry < arr.length; entry++)
 			{
 			if(!arr[entry].closingPos)
 			{
@@ -186,23 +186,23 @@ var CodeMirror = React.createClass({
 		//Note: ch is + 1 because the opening ( should not be included in the collapsable range
 		//Add a new entry for the open brace found at line i, position ch
 		var pos = {
-			openingPos: this.getCodeMirrorInstance().Pos(i, ch+1), 
+			openingPos: this.getCodeMirrorInstance().Pos(i, ch+1),
 			closingPos: null,
 			counter: 1
 		};
 		arr.push(pos);
 		return arr;
 	},
-	addCloseBrace: function addCloseBrace(i, ch, arr) 
+	addCloseBrace: function addCloseBrace(i, ch, arr)
 	{
-		//Decrement the counters for all unmatched braces 
+		//Decrement the counters for all unmatched braces
 		//The counter at 0 is the one that the added closing brace belongs with
-		for(var entry = 0; entry < arr.length; entry++) 
+		for(var entry = 0; entry < arr.length; entry++)
 		{
 			if(!arr[entry].closingPos)
 			{
 				arr[entry].counter -= 1;
-				if(arr[entry].counter === 0) 
+				if(arr[entry].counter === 0)
 				{
 					arr[entry].closingPos = this.getCodeMirrorInstance().Pos(i, ch);
 				}
@@ -210,29 +210,29 @@ var CodeMirror = React.createClass({
 		}
 		return arr;
 	},
-	findCodeToFold: function findCodeToFold() 
+	findCodeToFold: function findCodeToFold()
 	{
 		var paranthesesPositions = [];
 		var bracketPositions 	 = [];
 		//Find positions of sets of () and {}
-		for(var i = 0; i < this.codeMirror.lineCount(); i++) 
+		for(var i = 0; i < this.codeMirror.lineCount(); i++)
 		{
 			var line = this.codeMirror.getLine(i);
-			for(var ch = 0; ch < line.length; ch++) 
+			for(var ch = 0; ch < line.length; ch++)
 			{
 				if(line[ch] === '(')
 				{
 					paranthesesPositions = this.addOpenBrace(i, ch, paranthesesPositions);
-				} 
+				}
 				else if(line[ch] === ')')
-				{	
+				{
 					paranthesesPositions = this.addCloseBrace(i, ch, paranthesesPositions);
 				}
 				else if(line[ch] === '{')
 				{
 					bracketPositions = this.addOpenBrace(i, ch, bracketPositions);
 				}
-				else if(line[ch] === '}') 
+				else if(line[ch] === '}')
 				{
 					bracketPositions = this.addCloseBrace(i, ch, bracketPositions);
 				}
@@ -246,8 +246,8 @@ var CodeMirror = React.createClass({
 		var self = this;
 		var codeMirrorInstance = this.getCodeMirrorInstance();
 		this.codeMirror.clearGutter('CodeMirror-foldgutter');
-		
-		for(var i = 0; i < codeFoldingPositions.length; i++) 
+
+		for(var i = 0; i < codeFoldingPositions.length; i++)
 		{
 			let openingPos = codeFoldingPositions[i].openingPos;
 			let closingPos = codeFoldingPositions[i].closingPos;
@@ -264,17 +264,17 @@ var CodeMirror = React.createClass({
 		      		if(gutterWidget.className === self.foldClass.folded)
 		      		{
 		      			var marks = self.codeMirror.findMarksAt(openingPos);
-		      			for(var i = 0; i < marks.length; i++) 
+		      			for(var i = 0; i < marks.length; i++)
 		      			{
-		      				if(marks[i].__isFold) 
+		      				if(marks[i].__isFold)
 		      				{
 		      					marks[i].clear();
 		      				}
 		      			}
 		      			gutterWidget.className = self.foldClass.open;
-		      		} 
+		      		}
 		      		//if the section is open, collapse it
-		      		else 
+		      		else
 		      		{
 		      			gutterWidget.className = self.foldClass.folded;
 		      			self.collapseCode(openingPos, closingPos, gutterWidget);
@@ -287,7 +287,7 @@ var CodeMirror = React.createClass({
 	},
 	//Collapses code and replaces the code with a widget that can re-open the code segment
 	collapseCode: function collapseCode(openingPos, closingPos, gutterWidget)
-	{					
+	{
 		var codeMirrorInstance = this.getCodeMirrorInstance();
 		var widget = this.makeWidget('...');
 		var self = this;
@@ -303,8 +303,8 @@ var CodeMirror = React.createClass({
       		__isFold: true
     	});
 	},
-	//Makes the codemirror widget 
-	makeWidget: function makeWidget(text) 
+	//Makes the codemirror widget
+	makeWidget: function makeWidget(text)
 	{
 		var widget = document.createElement("span");
 		var content = document.createTextNode(text);
@@ -318,7 +318,7 @@ var CodeMirror = React.createClass({
   	{
   		var classname = this.foldClass.open;
   		var marks = this.codeMirror.findMarks(openingPos, closingPos);
-  		if(marks) 
+  		if(marks)
   		{
   			for (var i = 0; i < marks.length; i++)
   			{
@@ -333,7 +333,7 @@ var CodeMirror = React.createClass({
   		return widget;
   	},
 	 
-  
+
   componentDidUpdate()
   {
     if(this.state.shouldMount)
@@ -344,7 +344,7 @@ var CodeMirror = React.createClass({
       this.componentDidMount();
     }
   },
-  
+
 	componentWillReceiveProps: function componentWillReceiveProps(nextProps)
 	{
     if(this.props.isDiff !== nextProps.isDiff)
@@ -355,27 +355,27 @@ var CodeMirror = React.createClass({
       });
       return;
     }
-    
+
     if(nextProps.containerHeight !== this.props.containerHeight)
     {
       this.codeMirror && this.codeMirror.wrap && (this.codeMirror.wrap.style.height = nextProps.containerHeight + 'px');
     }
-    
-		if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getValue() != nextProps.value) 
+
+		if (this.codeMirror && nextProps.value !== undefined && this.codeMirror.getValue() != nextProps.value)
 		{
 			this.codeMirror.setValue(nextProps.value);
 		}
-		if (typeof nextProps.options === 'object' && this.codeMirror.setOption) 
+		if (typeof nextProps.options === 'object' && this.codeMirror.setOption)
 		{
-			for (var optionName in nextProps.options) 
+			for (var optionName in nextProps.options)
 			{
-				if (nextProps.options.hasOwnProperty(optionName)) 
+				if (nextProps.options.hasOwnProperty(optionName))
 				{
 					this.codeMirror.setOption(optionName, nextProps.options[optionName]);
 				}
 			}
 		}
-    
+
     if(nextProps.highlightedLine !== this.props.highlightedLine)
     {
       if(typeof this.props.highlightedLine === 'number')
@@ -388,18 +388,18 @@ var CodeMirror = React.createClass({
       }
     }
 	},
-	getCodeMirror: function getCodeMirror() 
+	getCodeMirror: function getCodeMirror()
 	{
 		return this.codeMirror;
 	},
 	focus: function focus()
 	 {
-	 if (this.codeMirror) 
+	 if (this.codeMirror)
 		{
 			this.codeMirror.focus();
 		}
 	},
-	focusChanged: function focusChanged(focused) 
+	focusChanged: function focusChanged(focused)
 	{
 		if(window.location.pathname.indexOf('builder') >= 0)
 		{
@@ -409,17 +409,17 @@ var CodeMirror = React.createClass({
 			this.props.onFocusChange && this.props.onFocusChange(focused);
 		}
 	},
-	codemirrorValueChanged: function codemirrorValueChanged(doc, change) 
+	codemirrorValueChanged: function codemirrorValueChanged(doc, change)
 	{
-		if (this.props.onChange && change.origin != 'setValue') 
+		if (this.props.onChange && change.origin != 'setValue')
 		{
 			this.props.onChange(doc.getValue());
 		}
 	},
-	render: function render() 
+	render: function render()
 	{
 		var editorClassName = className('ReactCodeMirror', this.state.isFocused ? 'ReactCodeMirror--focused' : null, this.props.className);
-    
+
     if(this.props.isDiff)
     {
       return React.createElement(
@@ -429,7 +429,7 @@ var CodeMirror = React.createClass({
           ref: 'div',
         });
     }
-    
+
 		return React.createElement(
 			'div',
 			{

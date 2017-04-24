@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./CreateCardTool.less')
+require('./CreateCardTool.less');
 import * as _ from 'underscore';
 import * as React from 'react';
 import Actions from "../../data/BuilderActions";
@@ -51,7 +51,7 @@ import BuilderTypes from './../../BuilderTypes';
 import PureClasss from '../../../common/components/PureClasss';
 import CardDropArea from './CardDropArea';
 
-const cardsOrdering: string[] = 
+const cardsOrdering: string[] =
   _.flatten(BuilderTypes.CardsDeckOrdering)
     .map(
       cardConfig => cardConfig.type
@@ -66,7 +66,7 @@ interface Props
   index: number;
   keyPath: KeyPath;
   canEdit: boolean;
-  
+
   open?: boolean;
   dy?: number;
   className?: string;
@@ -87,14 +87,14 @@ class CreateCardTool extends PureClasss<Props>
     closed: !this.props.open,
     opening: false,
   };
-  
+
   createCard(event)
   {
     if(this.props.open && this.props.onMinimize)
     {
       this.props.onMinimize();
     }
-    
+
     var type = Util.rel(event.target);
     if(this.props.index === null)
     {
@@ -104,10 +104,10 @@ class CreateCardTool extends PureClasss<Props>
     {
       Actions.create(this.props.keyPath, this.props.index, type);
     }
-    
+
     this.props.onToggle && this.props.onToggle();
   }
-  
+
   componentWillReceiveProps(newProps)
   {
     if(newProps.open !== this.props.open)
@@ -135,7 +135,7 @@ class CreateCardTool extends PureClasss<Props>
       }
     }
   }
-  
+
   componentDidUpdate(prevProps, prevState)
   {
     if(!prevState.opening && this.state.opening)
@@ -143,25 +143,25 @@ class CreateCardTool extends PureClasss<Props>
       Util.animateToAutoHeight(this.refs['selector']);
     }
   }
-  
+
   renderCardSelector()
   {
     if(this.state.closed)
     {
       return null;
     }
-    
+
     return (
      <div className='create-card-selector' ref='selector'>
        <div className='create-card-selector-inner'>
          {
-           cardsOrdering.map((type:string) => 
+           cardsOrdering.map((type:string) =>
            {
              if(this.props.accepts && this.props.accepts.indexOf(type) === -1)
              {
                return null;
              }
-             
+
              let card = BuilderTypes.make(BuilderTypes.Blocks[type]);
                  // data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
              return (
@@ -175,8 +175,8 @@ class CreateCardTool extends PureClasss<Props>
                  }}
                >
                  <div className="create-card-button-inner" rel={type}>
-                   { 
-                     card.static.title 
+                   {
+                     card.static.title
                    }
                  </div>
                </a>
@@ -199,7 +199,7 @@ class CreateCardTool extends PureClasss<Props>
      </div>
     );
   }
-  
+
   handleCloseClick()
   {
     if(this.props.onClose)
@@ -211,14 +211,14 @@ class CreateCardTool extends PureClasss<Props>
       this.props.onToggle();
     }
   }
-  
+
   renderPlaceholder()
   {
     if(this.props.hidePlaceholder || this.props.open)
     {
       return null;
     }
-    
+
     return (
       <div
         onClick={this.props.onToggle}
@@ -228,14 +228,14 @@ class CreateCardTool extends PureClasss<Props>
       </div>
     );
   }
-  
+
   render()
   {
     if(!this.props.canEdit)
     {
       return null;
     }
-    
+
     var classes = Util.objToClassname({
       "create-card-wrapper": true,
       "create-card-open": this.props.open,
@@ -243,16 +243,16 @@ class CreateCardTool extends PureClasss<Props>
       "create-card-opening": this.state.opening,
     });
     classes += ' ' + this.props.className;
-    
+
     if(this.props.dy)
     {
-      var style = 
+      var style =
       {
         position: 'relative',
         top: this.props.dy + 'px',
       }
     }
-    
+
     return (
       <div className={classes} style={style}>
         { this.renderPlaceholder() }
@@ -266,24 +266,23 @@ class CreateCardTool extends PureClasss<Props>
      </div>
    );
   }
-};
-
+}
 export default CreateCardTool;
 
-// const cardTarget = 
+// const cardTarget =
 // {
 //   canDrop(props, monitor)
 //   {
 //     return true;
 //   },
-  
+
 //   drop(props, monitor, component)
 //   {
 //     const item = monitor.getItem();
 //     if(monitor.isOver({ shallow: true}))
 //     {
 //       props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
-      
+
 //       setTimeout(() =>
 //       {
 //         // Actions.cards.move(item, props.index || 0, props.parentId); // TODO

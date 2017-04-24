@@ -74,25 +74,25 @@ interface Props
   canEdit: boolean;
   canDrag: boolean;
   canCreate: boolean;
-  
+
   onHover: (index: number, type: string, id: ID) => void;
   // ^ called on target
   onDropped: (id: ID, targetType: string, targetItem: any, shiftKey: boolean) => void;
   // ^ called on dragged element
-  
+
   draggingItemIndex: number;
   draggingOverIndex: number;
-  
+
   // partially-optional. need to be provided if available.
   groupId?: ID;
   algorithmId?: ID;
   variantId?: ID;
-  
+
   // optional
   className?: string;
   onDoubleClick?: (id:ID) => void;
   isStarred?: boolean;
-  
+
   // populated by DnD code
   connectDropTarget?: (html: any) => JSX.Element;
   connectDragSource?: (html: any) => JSX.Element;
@@ -109,12 +109,12 @@ class LibraryItem extends Classs<Props>
     focusField: false,
     mounted: false,
     timeout: null,
-  }
-  
+  };
+
   menuOptions =
   {
     none: List([]),
-    duplicate: 
+    duplicate:
     List([
       {
         text: 'Duplicate',
@@ -141,26 +141,26 @@ class LibraryItem extends Classs<Props>
         onClick: this.handleArchive,
       },
     ]),
-  }
-  
+  };
+
   componentDidMount()
   {
     this.setState({
-      timeout: 
+      timeout:
         setTimeout(() =>
         {
           this.setState({
             mounted: true,
           })
         }, this.props.rendered ? 0 : Math.min(this.props.fadeIndex * 100, 1000)), // re-add this when we get real indexes
-    })
-    
+    });
+
     if(!this.props.name.length)
     {
       this.showTextfield();
     }
   }
-  
+
   componentWillUnmount()
   {
     if(this.state.timeout)
@@ -168,17 +168,17 @@ class LibraryItem extends Classs<Props>
       clearTimeout(this.state.timeout);
     }
   }
-  
+
   handleDuplicate()
   {
     this.props.onDuplicate(this.props.id);
   }
-  
+
   handleArchive()
   {
     this.props.onArchive(this.props.id);
   }
-  
+
   handleKeyDown(event)
   {
     if(event.keyCode === 13)
@@ -186,14 +186,14 @@ class LibraryItem extends Classs<Props>
       event.target.blur();
     }
   }
-  
+
   showTextfield(event?)
   {
     if(!this.props.canEdit)
     {
       return;
     }
-    
+
     this.setState({
       nameEditing: true,
       focusField: true,
@@ -201,7 +201,7 @@ class LibraryItem extends Classs<Props>
     event && event.preventDefault();
     event && event.stopPropagation();
   }
-  
+
   componentDidUpdate()
   {
     if(this.state.focusField)
@@ -212,7 +212,7 @@ class LibraryItem extends Classs<Props>
       });
     }
   }
-  
+
   hideTextfield(event)
   {
     this.props.onNameChange(this.props.id, event.target.value);
@@ -220,7 +220,7 @@ class LibraryItem extends Classs<Props>
       nameEditing: false,
     })
   }
-  
+
   handleDoubleClick(event)
   {
     event.preventDefault();
@@ -231,17 +231,17 @@ class LibraryItem extends Classs<Props>
     }
     this.props.onDoubleClick && this.props.onDoubleClick(this.props.id);
   }
-  
+
   handleFocus(event)
   {
     event.target.select();
   }
-  
+
   render()
   {
     let { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging } = this.props;
     let draggingOver = isOver && dragItemType !== this.props.type;
-    
+
     let {canArchive, canDuplicate} = this.props;
     let menuOptions =
       (canArchive && canDuplicate) ? this.menuOptions.duplicateArchive :
@@ -251,7 +251,7 @@ class LibraryItem extends Classs<Props>
           canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
         )
       );
-    
+
     if(this.props.draggingOverIndex !== -1)
     {
       // could be shifted
@@ -264,7 +264,7 @@ class LibraryItem extends Classs<Props>
         var shiftedDown = true;
       }
     }
-    
+
     return connectDropTarget((
       <div
         className={classNames({
@@ -274,7 +274,7 @@ class LibraryItem extends Classs<Props>
           'library-item-dragging-hidden': this.props.isDragging && this.props.draggingOverIndex !== this.props.index,
         })}
       >
-        <Link 
+        <Link
           to={this.props.to}
           className='library-item-link'
           activeClassName='library-item-active'
@@ -308,7 +308,7 @@ class LibraryItem extends Classs<Props>
                   <div
                     className='library-item-icon'
                   >
-                    { 
+                    {
                       this.props.icon
                     }
                   </div>
@@ -316,8 +316,8 @@ class LibraryItem extends Classs<Props>
                     className='library-item-name'
                     onDoubleClick={this.showTextfield}
                   >
-                    { 
-                      this.props.name.length ? this.props.name : <em>Untitled</em> 
+                    {
+                      this.props.name.length ? this.props.name : <em>Untitled</em>
                     }
                   </div>
                   <input
@@ -342,7 +342,7 @@ class LibraryItem extends Classs<Props>
                   />
                 </div>
                 <div className='library-item-content'>
-                  { 
+                  {
                     this.props['children']
                   }
                 </div>
@@ -362,13 +362,13 @@ var shifted = false;
 $(document).on('dragover dragend', function(e){shifted = e.shiftKey; return true;} );
 // http://stackoverflow.com/questions/3781142/jquery-or-javascript-how-determine-if-shift-key-being-pressed-while-clicking-an
 
-const source = 
+const source =
 {
   canDrag(props, monitor)
   {
-    return props.canDrag;  
+    return props.canDrag;
   },
-  
+
   beginDrag(props)
   {
     const item = {
@@ -378,7 +378,7 @@ const source =
     };
     return item;
   },
-  
+
   endDrag(props, monitor, component)
   {
     if(!monitor.didDrop())
@@ -389,7 +389,7 @@ const source =
     const { type, targetItem } = monitor.getDropResult();
     props.onDropped(item.id, type, targetItem, shifted);
   }
-}
+};
 
 const dragCollect = (connect, monitor) =>
 ({
@@ -406,7 +406,7 @@ let canDrop = (props, monitor) =>
   {
     return false;
   }
-  
+
   let itemType = monitor.getItem().type;
   let targetType = props.type;
   switch(itemType)
@@ -420,10 +420,10 @@ let canDrop = (props, monitor) =>
   }
   return false;
 };
-const target = 
+const target =
 {
   canDrop,
-  
+
   hover(props, monitor, component)
   {
     if(canDrop(props, monitor))
@@ -432,7 +432,7 @@ const target =
       props.onHover(props.index, item.type, item.id);
     }
   },
-  
+
   drop(props, monitor, component)
   {
     if(monitor.isOver({ shallow: true}))
@@ -443,7 +443,7 @@ const target =
       };
     }
   }
-}
+};
 
 const dropCollect = (connect, monitor) =>
 ({

@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Loading.less')
+require('./Loading.less');
 import * as $ from 'jquery';
 import * as classNames from 'classnames';
 import * as React from 'react';
@@ -60,7 +60,7 @@ interface Props {
   onLoadedEnd: () => void;
   width: number;
   height: number;
-  
+
   center?: boolean;
 }
 
@@ -72,13 +72,13 @@ class Loading extends PureClasss<Props>
   state = {
     stage: 0,
   };
-  
+
   // Stages:
   // 0: initial appear (Freeze here if not loading)
   // 1: loading appear
   // 2: loading, loop
   // 3: loaded, phase out (freeze after the end)
-  
+
   stageParams: IStage[] = [
     {
       loop: false,
@@ -104,19 +104,19 @@ class Loading extends PureClasss<Props>
       onStageEnd: this.handleEnd,
     },
   ];
-  
+
   imgLooper: ImgLooper;
-  
+
   componentDidMount()
   {
     this.imgLooper = new ImgLooper(ReactDOM.findDOMNode(this.refs['sprites']) as any, this.props.width, this.stageParams);
   }
-  
+
   componentWillUnmount()
   {
     this.imgLooper && this.imgLooper.dispose();
   }
-  
+
   componentWillReceiveProps(nextProps: Props)
   {
     let stage = -1;
@@ -126,19 +126,19 @@ class Loading extends PureClasss<Props>
     }
     else if(!this.props.loaded && nextProps.loaded)
     {
-      stage = 3;  
+      stage = 3;
     }
     else if(this.props.loading && !nextProps.loading)
     {
       stage = 0;
     }
-    
+
     if(stage !== -1)
     {
       this.setStage(stage);
     }
   }
-  
+
   setStage(stage: number)
   {
     this.imgLooper.setStage(stage);
@@ -146,7 +146,7 @@ class Loading extends PureClasss<Props>
       stage,
     });
   }
-  
+
   handleFirstEnd()
   {
     if(this.props.loaded)
@@ -167,7 +167,7 @@ class Loading extends PureClasss<Props>
   render()
   {
     let {width} = this.props;
-    
+
     return (
       <div
         className={classNames({
@@ -190,9 +190,7 @@ class Loading extends PureClasss<Props>
       </div>
     );
    }
-};
-
-
+}
 const fps = 35;
 
 interface IStage
@@ -211,21 +209,21 @@ class ImgLooper
   stage: number;
   frame: number;
   width: number;
-  
+
   interval: any;
-  
+
   constructor(_el: HTMLElement, _width: number, _stages: IStage[], _stage = 0)
   {
     Util.bind(this as any, 'setStage', 'dispose', 'nextFrame', 'showFrame', 'clearInterval');
     // this.nextFrame = this.nextFrame.bind(this);
-    
+
     this.el = _el;
     this.stages = _stages;
     this.width = _width;
     this.setStage(_stage, true);
-    
+
   }
-  
+
   setStage(_stage: number, showFrame: boolean = false)
   {
     let stageParams = this.stages[_stage];
@@ -233,21 +231,21 @@ class ImgLooper
     {
       this.showFrame(stageParams.startFrame)
     }
-    
+
     this.stage = _stage;
-    
+
     if(!this.interval)
     {
       this.interval = setInterval(this.nextFrame, 1000 / fps);
     }
   }
-  
+
   dispose()
   {
     this.clearInterval();
   }
-  
-  
+
+
   // only called by the interval
   private nextFrame()
   {
@@ -267,7 +265,7 @@ class ImgLooper
       {
         this.clearInterval();
       }
-      
+
       onStageEnd && onStageEnd();
     }
     else
@@ -275,14 +273,14 @@ class ImgLooper
       this.showFrame(this.frame + 1);
     }
   }
-  
+
   private showFrame(_frame:number)
   {
     let m = -1 * this.width * _frame;
     this.el.style.marginLeft = m + 'px';
     this.frame = _frame;
   }
-  
+
   private clearInterval()
   {
     this.interval && clearInterval(this.interval);

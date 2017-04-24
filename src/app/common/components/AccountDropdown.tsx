@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./AccountDropdown.less')
+require('./AccountDropdown.less');
 import * as $ from 'jquery';
 import * as React from 'react';
 import Actions from "../../builder/data/BuilderActions";
@@ -74,9 +74,9 @@ class AccountDropdown extends PureClasss<Props>
     commitLogOpen?: boolean,
   } = {
   };
-  
+
   unsubscribe = null;
-  
+
   constructor(props:Props)
   {
     super(props);
@@ -88,12 +88,12 @@ class AccountDropdown extends PureClasss<Props>
       }
     );
   }
-  
+
   componentWillUnmount()
   {
-    $("body").unbind('click', this.close); 
+    $("body").unbind('click', this.close);
   }
-  
+
   close(event)
   {
     this.setState({
@@ -102,7 +102,7 @@ class AccountDropdown extends PureClasss<Props>
     $("body").unbind('click', this.close);
     event.stopPropagation();
   }
-  
+
   open(event)
   {
     this.setState({
@@ -111,22 +111,22 @@ class AccountDropdown extends PureClasss<Props>
     $("body").click(this.close);
     event.stopPropagation();
   }
-  
-  editProfile() 
+
+  editProfile()
   {
     this.go('/account/profile/edit');
   }
-  
+
   goTeamGoTeamGo()
   {
     this.go('/account/team');
   }
-  
+
   go(url:string)
   {
     browserHistory.push(url);
   }
-  
+
   handleLogout()
   {
     this.go('/logout');
@@ -138,7 +138,7 @@ class AccountDropdown extends PureClasss<Props>
     {
       return null;
     }
-  
+
     return (
       <div className="account-dropdown-content">
         <div className="account-dropdown-row" onMouseDown={this.editProfile}>
@@ -147,7 +147,7 @@ class AccountDropdown extends PureClasss<Props>
           </div>
           <div className='account-dropdown-link'>
              Edit Profile
-          </div>        
+          </div>
         </div>
         <div className="account-dropdown-row" onMouseDown={this.goTeamGoTeamGo}>
           <div className='account-dropdown-icon account-dropdown-icon-blue'>
@@ -155,7 +155,7 @@ class AccountDropdown extends PureClasss<Props>
           </div>
           <div className='account-dropdown-link'>
              My Team
-          </div>        
+          </div>
         </div>
         {
           this.state.user && this.state.user.isAdmin &&
@@ -165,7 +165,7 @@ class AccountDropdown extends PureClasss<Props>
               </div>
               <div className='account-dropdown-link'>
                  Commit Log
-              </div>        
+              </div>
             </div>
         }
         <div className="account-dropdown-row" onMouseDown={this.handleLogout}>
@@ -177,7 +177,7 @@ class AccountDropdown extends PureClasss<Props>
       </div>
     );
   }
-  
+
   renderTopBar()
   {
     return (
@@ -191,23 +191,23 @@ class AccountDropdown extends PureClasss<Props>
       </div>
     );
   }
-  
+
   render()
   {
     var classes = Util.objToClassname({
       "account-dropdown-wrapper": true,
       "account-dropdown-open": this.state.open,
     });
-    
+
     return (
       <div className={classes}>
-        { 
-          this.renderTopBar() 
+        {
+          this.renderTopBar()
         }
-        { 
-          this.renderDropdown() 
+        {
+          this.renderDropdown()
         }
-        
+
         <Modal
           message={CommitLog}
           open={this.state.commitLogOpen}
@@ -218,6 +218,5 @@ class AccountDropdown extends PureClasss<Props>
       </div>
    );
   }
-};
-
+}
 export default AccountDropdown;

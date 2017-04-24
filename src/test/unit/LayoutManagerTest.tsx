@@ -63,11 +63,11 @@ var createFrame = (width, height) => {
   frame.style.height = height + 'px';
   document.body.appendChild(frame);
   return frame;
-}
+};
 
 var cleanupFrame = (frame) => {
   document.body.removeChild(frame);
-}
+};
 
 test('LayoutManager renders columns', function (t) {
   var layout = {
@@ -88,8 +88,8 @@ test('LayoutManager renders columns', function (t) {
         content: <div className='test-col' style={{height: '100%'}}>4</div>,
       }
     ]
-  }
-  
+  };
+
   var width = 1000;
   var height = 500;
   var colOffset = 20;
@@ -98,32 +98,32 @@ test('LayoutManager renders columns', function (t) {
   var numColsFactor = 4;
   var frame = createFrame(width, height);
   ReactDOM.render(<LayoutManager layout={layout} />, frame);
-  
+
   var divs = frame.querySelectorAll('.test-col');
   t.equal(divs.length, 4, 'renders all columns');
-  
-  _.map(divs, (div, index) => {    
+
+  _.map(divs, (div, index) => {
     t.equal(div.textContent, (index + 1) + "", 'correct content');
     t.equal(div.getBoundingClientRect().height, height, 'full height');
     if(colLeftFactor[index] === -1)
     {
       // offset column
-      t.equal(div.getBoundingClientRect().left, 
+      t.equal(div.getBoundingClientRect().left,
         0, 'correct left');
       t.equal(div.getBoundingClientRect().width,
         colOffset, 'correct width');
     }
     else
     {
-      t.equal(div.getBoundingClientRect().left, 
+      t.equal(div.getBoundingClientRect().left,
         colOffset + (width - colOffset) / numColsFactor * colLeftFactor[index], 'correct left');
       t.equal(div.getBoundingClientRect().width,
         (width - colOffset) / numColsFactor * colWidthFactor[index], 'correct width');
     }
   });
-  
+
   cleanupFrame(frame);
-  
+
   t.end();
 });
 
@@ -141,8 +141,8 @@ test('LayoutManager renders rows', function (t) {
         content: <div className='test-row' style={{height: '20px'}}>3</div>,
       },
     ]
-  }
-  
+  };
+
   var width = 1000;
   var height = 500;
   var rowHeight = 20;
@@ -151,22 +151,22 @@ test('LayoutManager renders rows', function (t) {
   var numRowsFactor = 4;
   var frame = createFrame(width, height);
   ReactDOM.render(<LayoutManager layout={layout} />, frame);
-  
+
   var divs = frame.querySelectorAll('.test-row');
   t.equal(divs.length, 3, 'renders all rows');
-  
-  _.map(divs, (div, index) => {    
+
+  _.map(divs, (div, index) => {
     t.equal(div.textContent, (index + 1) + "", 'correct content');
     t.equal(div.getBoundingClientRect().left, 0, 'correct left');
     t.equal(div.getBoundingClientRect().width, width, 'correct width');
-    t.equal(div.getBoundingClientRect().top, 
+    t.equal(div.getBoundingClientRect().top,
       rowHeight * rowTopFactor[index], 'correct top');
     t.equal(div.getBoundingClientRect().height,
       rowHeight * rowHeightFactor[index], 'correct height');
   });
-  
+
   cleanupFrame(frame);
-  
+
   t.end();
 });
 

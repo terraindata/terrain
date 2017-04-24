@@ -68,24 +68,24 @@ class BuilderTextboxCards extends React.Component<Props, any>
   constructor(props: Props) {
     super(props);
   }
-  
+
   isText()
   {
     return typeof this.props.value !== 'object';
   }
-  
+
   isCreating()
   {
     return false; // TODO
     // return this.props.value && this.props.value['type'] === 'creating';
   }
-  
+
   render() {
     if(this.isText() || this.isCreating() || this.props.value['closed'])
     {
       return null;
     }
-    
+
     // We're in card mode
     return (
       <div className={classNames({
@@ -102,6 +102,5 @@ class BuilderTextboxCards extends React.Component<Props, any>
       </div>
     );
   }
-};
-
+}
 export default BuilderTextboxCards;

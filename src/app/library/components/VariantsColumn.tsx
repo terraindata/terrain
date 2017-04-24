@@ -92,8 +92,8 @@ class VariantsColumn extends Classs<Props>
     roles: null,
     draggingItemIndex: -1,
     draggingOverIndex: -1,
-  }
-  
+  };
+
   componentWillMount()
   {
     this._subscribe(UserStore, {
@@ -102,14 +102,14 @@ class VariantsColumn extends Classs<Props>
       isMounted: true,
     });
     this._subscribe(RolesStore, {
-      stateKey: 'roles', 
+      stateKey: 'roles',
       isMounted: true
     });
     this.setState({
       rendered: true,
     })
   }
-  
+
   componentDidUpdate()
   {
     if(!this.state.rendered)
@@ -119,7 +119,7 @@ class VariantsColumn extends Classs<Props>
       });
     }
   }
-  
+
   componentWillReceiveProps(nextProps)
   {
     if(nextProps.algorithmId !== this.props.algorithmId)
@@ -129,7 +129,7 @@ class VariantsColumn extends Classs<Props>
       });
     }
   }
-  
+
   handleDuplicate(id: ID)
   {
     Actions.variants.duplicate(
@@ -137,7 +137,7 @@ class VariantsColumn extends Classs<Props>
       this.props.variantsOrder.findIndex(iid => iid === id)
     );
   }
-  
+
   handleArchive(id: ID)
   {
     Actions.variants.change(
@@ -145,17 +145,17 @@ class VariantsColumn extends Classs<Props>
         .set('status', LibraryTypes.EVariantStatus.Archive) as Variant
     );
   }
-  
+
   handleCreate()
   {
     Actions.variants.create(this.props.groupId, this.props.algorithmId);
   }
-  
+
   handleNameChange(id: ID, name: string)
   {
     if(this.props.variants.get(id).name !== name)
     {
-      var oldName = this.props.variants.get(id).name || 'Untitled'; 
+      var oldName = this.props.variants.get(id).name || 'Untitled';
       notificationManager.addNotification(
         'Renamed',
         '"' + oldName + '" is now "' + name + '"',
@@ -169,7 +169,7 @@ class VariantsColumn extends Classs<Props>
         .set('name', name) as Variant
     );
   }
-    
+
   handleHover(index: number, type: string, id: ID)
   {
     var itemIndex = this.props.variantsOrder.findIndex(v => v === id);
@@ -181,7 +181,7 @@ class VariantsColumn extends Classs<Props>
         draggingItemIndex: itemIndex,
         draggingOverIndex: index,
       });
-      
+
       // var target = this.props.variants.get(this.props.variantsOrder.get(index));
       // Actions.variants.move(this.props.variants.get(id).set('status', target.status) as Variant,
       //   index, this.props.groupId, this.props.algorithmId);
@@ -216,20 +216,20 @@ class VariantsColumn extends Classs<Props>
         break;
       case "variant":
         Actions.variants.move(
-          this.props.variants.get(id), 
+          this.props.variants.get(id),
           this.props.variantsOrder.indexOf(targetItem.id),
           this.props.groupId,
           this.props.algorithmId
         );
         break;
     }
-    
+
     this.setState({
       draggingItemIndex: -1,
       draggingOverIndex: -1,
     });
   }
-  
+
   handleDoubleClick(id:ID)
   {
     browserHistory.push(`/builder/?o=${id}`);
@@ -244,15 +244,15 @@ class VariantsColumn extends Classs<Props>
     {
       var canEdit = roles.getIn([this.props.groupId, me.username, 'builder'])
         || roles.getIn([this.props.groupId, me.username, 'admin']);
-      var canDrag = canEdit && 
-        (variant.status !== LibraryTypes.EVariantStatus.Live || 
+      var canDrag = canEdit &&
+        (variant.status !== LibraryTypes.EVariantStatus.Live ||
           roles.getIn([this.props.groupId, me.username, 'admin']));
     }
-    
+
     var role = "Viewer";
-    if (roles && roles.getIn([this.props.groupId, variant.lastUsername])) 
+    if (roles && roles.getIn([this.props.groupId, variant.lastUsername]))
     {
-      if (roles && roles.getIn([this.props.groupId, variant.lastUsername]).admin) 
+      if (roles && roles.getIn([this.props.groupId, variant.lastUsername]).admin)
       {
         role = "Admin";
       }
@@ -261,7 +261,7 @@ class VariantsColumn extends Classs<Props>
         role = "Builder";
       }
     }
-    
+
     return (
       <LibraryItem
         index={index}
@@ -293,13 +293,13 @@ class VariantsColumn extends Classs<Props>
       >
         <div className='flex-container'>
           <UserThumbnail username={variant.lastUsername} medium={true} extra = {role}/>
-          
+
           <div className='flex-grow'>
             <StatusDropdown
               variant={variant}
               noBorder={true}
             />
-            <div 
+            <div
               className='library-item-line'
             >
               {
@@ -311,22 +311,22 @@ class VariantsColumn extends Classs<Props>
       </LibraryItem>
     );
   }
-  
+
   handleVariantStatusHover(statusString: string, id: ID)
   {
     let v = this.props.variants.get(id);
     let status = LibraryTypes.EVariantStatus[statusString];
     if(v.status !== status)
     {
-      Actions.variants.change(v.set('status', status) as Variant);  
+      Actions.variants.change(v.set('status', status) as Variant);
     }
   }
-  
+
   hasStatus(id: ID, status: LibraryTypes.EVariantStatus)
   {
     return this.props.variants.getIn([id, 'status']) === status;
   }
-  
+
   renderVariants(archived?: boolean)
   {
     let {me, roles} = this.state;
@@ -336,9 +336,9 @@ class VariantsColumn extends Classs<Props>
     //  || (
     //   me && roles && roles.getIn([this.props.groupId, me.username, 'builder'])
     // );
-    
+
     let fadeIndex = 0;
-    
+
     return (
       <LibraryItemCategory
         status={archived ? 'Archive' : 'Build'}
@@ -369,7 +369,7 @@ class VariantsColumn extends Classs<Props>
       </LibraryItemCategory>
     );
   }
-  
+
   render()
   {
     return (
@@ -377,7 +377,7 @@ class VariantsColumn extends Classs<Props>
         index={3}
         title='Variants'
       >
-        { 
+        {
           this.props.variantsOrder ?
             (
               this.props.variantsOrder.size ?

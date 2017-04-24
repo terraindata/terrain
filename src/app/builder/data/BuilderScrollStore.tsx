@@ -59,14 +59,14 @@ export interface BuilderScrollState extends BuilderScrollStateClass, IMap<Builde
 let BuilderScrollState_Record = Immutable.Record(new BuilderScrollStateClass());
 let _BuilderScrollState = (config?:any) => {
   return new BuilderScrollState_Record(config || {}) as any as BuilderScrollState;
-}
+};
 
 var DefaultState = _BuilderScrollState();
 
 interface BuilderScrollAction
 {
   type: string;
-  payload: 
+  payload:
   {
     columnTop: number;
     columnHeight: number;
@@ -77,13 +77,13 @@ interface BuilderScrollAction
 
 export const BuilderScrollStore: IStore<BuilderScrollState> = Redux.createStore(
   ReduxActions.handleActions({
-    scroll: 
+    scroll:
       (state: BuilderScrollState, action: BuilderScrollAction) =>
       {
         let {columnTop, columnHeight, columnScroll, totalHeight} = action.payload;
-        
+
         if(
-          columnTop !== state.columnTop || columnHeight !== state.columnHeight 
+          columnTop !== state.columnTop || columnHeight !== state.columnHeight
           || columnScroll !== state.columnScroll || totalHeight !== state.totalHeight
         )
         {
@@ -93,10 +93,10 @@ export const BuilderScrollStore: IStore<BuilderScrollState> = Redux.createStore(
             .set('columnScroll', columnScroll)
             .set('totalHeight', totalHeight);
         }
-        
+
         return state;
       }
-  }), 
+  }),
 DefaultState);
 
 export function scrollAction(columnTop: number, columnHeight: number, columnScroll: number, totalHeight: number)

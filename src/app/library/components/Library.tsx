@@ -71,20 +71,20 @@ interface Props
 class Library extends PureClasss<Props>
 {
   cancelSubscription = null;
-  
+
   state: {
     libraryState: LibraryState;
   } = {
     libraryState: null,
   };
-  
+
   constructor(props)
   {
     super(props);
-    
+
     this.state.libraryState = Store.getState();
   }
-  
+
   componentWillMount()
   {
     if(!this.props.params.groupId)
@@ -97,48 +97,48 @@ class Library extends PureClasss<Props>
       }
     }
   }
-  
+
   componentDidMount()
   {
     this._subscribe(Store, {
       stateKey: 'libraryState',
       isMounted: true,
-    })
-    
+    });
+
     RolesActions.fetch();
     UserActions.fetch();
   }
-  
+
   render()
   {
     const {libraryState} = this.state;
-    
+
     const { groups, algorithms, variants, groupsOrder } = libraryState;
     const { groupId, algorithmId, variantId } = this.props.params;
-    
+
     if(groupId)
     {
       var group = libraryState.getIn(['groups', groupId]) as LibraryTypes.Group;
-      
+
       if(group)
       {
         var { algorithmsOrder } = group;
-        
+
         if(algorithmId)
         {
           var algorithm = algorithms.get(algorithmId);
-          
+
           if(algorithm)
           {
             var { variantsOrder } = algorithm;
-            
+
             if(variantId)
             {
               var variant = variants.get(variantId);
-              
+
               if(!variant)
               {
-                browserHistory.replace(`/library/${groupId}/${algorithmId}`);    
+                browserHistory.replace(`/library/${groupId}/${algorithmId}`);
               }
             }
           } else {
@@ -151,9 +151,9 @@ class Library extends PureClasss<Props>
         browserHistory.replace('/library');
       }
     }
-    
+
     localStorage.setItem('lastLibraryPath', this.props.location.pathname);
-    
+
     return (
       <div className='library'>
         <GroupsColumn

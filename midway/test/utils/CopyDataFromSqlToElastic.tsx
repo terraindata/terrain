@@ -45,31 +45,33 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as mysql from 'mysql';
 import * as winston from 'winston';
-import ElasticExecutor from '../../tasty/ElasticExecutor';
-import ElasticConfig from '../../tasty/ElasticExecutor';
-import MySQLExecutor from '../../tasty/MySQLExecutor';
-import {Backend, Table, Tasty} from '../../tasty/Tasty';
-import {TastyQuery} from '../../tasty/TastyQuery';
+import ElasticExecutor from '../../src/tasty/ElasticExecutor';
+import ElasticConfig from '../../src/tasty/ElasticExecutor';
+import MySQLExecutor from '../../src/tasty/MySQLExecutor';
+import { Backend, Table, Tasty } from '../../src/tasty/Tasty';
+import { TastyQuery } from '../../src/tasty/TastyQuery';
 
 // run this test `./node_modules/.bin/ts-node --harmony ./midway/test/utils/CopyDataFromSqlToElastic.tsx`
 
 const td1MySQLConfig: mysql.IPoolConfig = {
-    connectionLimit: 20,
-    database: 'moviesdb',
-    host: 'localhost',
-    password: 'r3curs1v3$',
-    user: 't3rr41n-demo',
+  connectionLimit: 20,
+  database: 'moviesdb',
+  host: 'localhost',
+  password: 'r3curs1v3$',
+  user: 't3rr41n-demo',
 };
 
 let mysqlConnection;
 let elasticSearch;
 
-try {
-    mysqlConnection = new MySQLExecutor(td1MySQLConfig);
-    elasticSearch = new ElasticExecutor();
-} catch (err) {
-    winston.info('Error: ', err.message);
-    process.exit(1);
+try
+{
+  mysqlConnection = new MySQLExecutor(td1MySQLConfig);
+  elasticSearch = new ElasticExecutor();
+} catch (err)
+{
+  winston.info('Error: ', err.message);
+  process.exit(1);
 }
 
 // let elements = results as Array<object>;
@@ -83,37 +85,45 @@ try {
 
 async function syncSqlQuery(qstr: string, mysql: MySQLExecutor)
 {
-  try {
+  try
+  {
     const results = await mysql.query(qstr);
     const elements = results as object[];
 
     return elements;
-  } catch (err) {
+  } catch (err)
+  {
     winston.info('Error: ', err.message);
     process.exit(1);
   }
 }
 
-async function syncCheckElasticHealth(elastic: ElasticExecutor) {
-    try {
-        const h = await elastic.health();
-        winston.info('Health state: ' + h);
-    } catch (e) {
-        winston.info('Error: ', e.message);
-        process.exit(1);
-    }
+async function syncCheckElasticHealth(elastic: ElasticExecutor)
+{
+  try
+  {
+    const h = await elastic.health();
+    winston.info('Health state: ' + h);
+  } catch (e)
+  {
+    winston.info('Error: ', e.message);
+    process.exit(1);
+  }
 }
 
-async function readTable(table, mysql: MySQLExecutor) {
+async function readTable(table, mysql: MySQLExecutor)
+{
   const query = new TastyQuery(table);
-  try {
+  try
+  {
     const sqlStr = Tasty.generate(Backend.MySQL, query);
     winston.info(sqlStr);
     const elements = await syncSqlQuery(sqlStr, mysql);
     winston.info('read ' + (elements as object[]).length + ' elements');
 
     return elements;
-  } catch (e) {
+  } catch (e)
+  {
     winston.info('Error: ', e.message);
     process.exit(1);
   }
@@ -121,11 +131,13 @@ async function readTable(table, mysql: MySQLExecutor) {
 
 async function copyTable(table, mysql: MySQLExecutor, elastic: ElasticExecutor)
 {
-  try {
+  try
+  {
     const elements = await readTable(table, mysql);
     winston.info('Copy ' + (elements as object[]).length + ' elements');
     elastic.upsertObjects(table, elements);
-  } catch (e) {
+  } catch (e)
+  {
     winston.info('Error: ', e.message);
     process.exit(1);
   }
@@ -133,9 +145,10 @@ async function copyTable(table, mysql: MySQLExecutor, elastic: ElasticExecutor)
 
 syncCheckElasticHealth(elasticSearch);
 const DBMovies = new Table('movies', ['movieid'], ['title', 'releasedate']);
-(async () => {
-    await copyTable(DBMovies, mysqlConnection, elasticSearch);
-    const elements = await readTable(DBMovies, mysqlConnection);
-    //await elasticSearch.deleteDocumentsByID(DBMovies, elements);
-    winston.info('Copied the table movies.');
+(async () =>
+{
+  await copyTable(DBMovies, mysqlConnection, elasticSearch);
+  const elements = await readTable(DBMovies, mysqlConnection);
+  // await elasticSearch.deleteDocumentsByID(DBMovies, elements);
+  winston.info('Copied the table movies.');
 })();

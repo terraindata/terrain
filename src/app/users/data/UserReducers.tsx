@@ -57,7 +57,7 @@ var Immutable = require('immutable');
 var UserReducers = {};
 
 UserReducers[ActionTypes.change] =
-  (state, action) => 
+  (state, action) =>
     state.setIn(['users', action.payload.user.username], action.payload.user);
 
 UserReducers[ActionTypes.fetch] =
@@ -80,11 +80,11 @@ UserReducers[ActionTypes.fetch] =
             isDisabled,
           })
         ));
-      })
+      });
       Actions.setUsers(users);
-    })
+    });
     return state.set('loading', true);
-  }
+  };
 
 UserReducers[ActionTypes.setUsers] =
   (state, action) =>
@@ -95,7 +95,7 @@ UserReducers[ActionTypes.setUsers] =
 
 UserReducers[ActionTypes.updateCurrentUser] =
   (state, action) =>
-    state.set('currentUser', 
+    state.set('currentUser',
       state.getIn(['users', AuthStore.getState().get('username')]));
 
 export default UserReducers;

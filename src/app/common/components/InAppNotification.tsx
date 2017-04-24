@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 /*
 How to use Notifications:
-In App.tsx: 
+In App.tsx:
 import {InAppNotification} from './common/components/InAppNotification'
 render()
   ...
@@ -80,20 +80,20 @@ interface Props
 
 var notificationManager = {
   system: null,
-  
+
   addNotification:function(title: string, message:string, level:string, timeOut?:number)
   {
-    if(this.system) { 
+    if(this.system) {
       this.system.addNotification({
         title,
         message,
         level,
-        autoDismiss: timeOut || 5000, 
+        autoDismiss: timeOut || 5000,
         dismissible: true
       });
-    }  
+    }
   }
-}
+};
 
 class InAppNotification extends Classs<Props>
 {

@@ -66,8 +66,8 @@ var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon"
 
 var Tab = React.createClass<any, any>({
   mixins: [PanelMixin],
-  
-  propTypes: 
+
+  propTypes:
   {
     id: React.PropTypes.string.isRequired,
     name: React.PropTypes.string.isRequired,
@@ -104,7 +104,7 @@ var Tab = React.createClass<any, any>({
       onClick: this.handleClick,
     }
   },
-    
+
   // Returns z-index so that tabs are layered in a nice fashion
   zIndexStyle(): ({zIndex?: number})
   {
@@ -114,7 +114,7 @@ var Tab = React.createClass<any, any>({
         zIndex: this.props.index,
       };
     }
-    
+
     return {};
   },
 
@@ -125,20 +125,20 @@ var Tab = React.createClass<any, any>({
       this.props.onClick(this.props.id);
     }
   },
-  
+
   close(event)
   {
     event.stopPropagation();
     this.props.onClose(this.props.id);
   },
-  
+
   renderClose()
   {
     if(this.props.fixed)
     {
       return null;
     }
-    
+
     return (
       <div
         className='tabs-close'
@@ -155,7 +155,7 @@ var Tab = React.createClass<any, any>({
     if(this.state.zoom < 0.8)
     {
       topStyle = '-15px';
-    } 
+    }
     if(this.state.zoom < 0.7)
     {
       topStyle = '-13px';
@@ -166,7 +166,7 @@ var Tab = React.createClass<any, any>({
     }
 
     return this.renderPanel(
-      <div 
+      <div
         className={classNames({
           'tabs-tab': true,
           'tabs-tab-selected': this.props.selected,
@@ -182,14 +182,14 @@ var Tab = React.createClass<any, any>({
                 className='tab-icon tab-icon-left'
               />
           }
-          <div 
+          <div
             className='tab-inner'
             style={{top: topStyle}}
           >
             {
               this.props.name
             }
-            { 
+            {
               this.renderClose()
             }
           </div>
@@ -223,9 +223,9 @@ export class Tabs extends PureClasss<TabsProps> {
   state = {
     variants: LibraryStore.getState().variants,
     tabs: null,
-  }
+  };
   cancel = null;
-  
+
   componentDidMount()
   {
     this._subscribe(LibraryStore, {
@@ -239,12 +239,12 @@ export class Tabs extends PureClasss<TabsProps> {
     });
     this.computeTabs(this.props.config);
   }
-  
+
   componentWillUnmount()
   {
     this.cancel && this.cancel();
   }
-  
+
   componentWillReceiveProps(nextProps)
   {
     if(nextProps.config !== this.props.config)
@@ -252,7 +252,7 @@ export class Tabs extends PureClasss<TabsProps> {
       this.computeTabs(nextProps.config);
     }
   }
-  
+
   computeTabs(config)
   {
     let {variants} = this.state;
@@ -279,35 +279,35 @@ export class Tabs extends PureClasss<TabsProps> {
         selected: this.isSelected(vId),
       };
     });
-    
+
     this.setState({
       tabs,
     });
   }
-  
+
   // shouldComponentUpdate(nextProps, nextState)
   // {
   //   return !_.isEqual(nextState.tabs, this.state.tabs);
   // }
-  
+
   moveTabs(index: number, destination: number)
   {
     var newTabs = JSON.parse(JSON.stringify(this.state.tabs));
     var tab = newTabs.splice(index, 1)[0];
     newTabs.splice(destination, 0, tab);
-    browserHistory.push('/builder/' + 
+    browserHistory.push('/builder/' +
       newTabs.map(
         tab => (tab.selected ? '!' : '') + tab.id
       ).join(',')
     );
   }
-  
+
   renderActions()
   {
     return (
       <div className='tabs-actions'>
         {
-          this.props.actions.map((action, index) => 
+          this.props.actions.map((action, index) =>
             <a
               className={classNames({
                 'tabs-action': true,
@@ -334,65 +334,65 @@ export class Tabs extends PureClasss<TabsProps> {
       </div>
     );
   }
-  
+
   getId(idStr:string):string
   {
     if(idStr.substr(0, 1) === '!')
     {
       return idStr.substr(1);
-    }   
+    }
     return idStr;
   }
-  
+
   isSelected(idStr:string):boolean
   {
     return idStr.substr(0, 1) === '!';
   }
-  
+
   handleClick(id:ID)
   {
     browserHistory.push(this.getTo(id));
   }
-  
+
   handleClose(id:ID)
   {
     browserHistory.push(this.getCloseTo(id));
   }
-  
+
   getTo(id)
   {
     return '/builder/' + this.state.tabs.map(
       tab => (tab.id === id ? "!" : "") + tab.id
     ).join(",");
   }
-  
+
   getCloseTo(id)
   {
     let {tabs} = this.state;
     let tab = this.state.tabs.find(tab => tab.id === id);
     let newConfig = (tab.selected && tabs.length > 1 ? '!' : '')
-      + tabs.map(tab => 
-        tab.id === id ? null : 
+      + tabs.map(tab =>
+        tab.id === id ? null :
           (tab.selected ? "!" : "") + tab.id
     ).filter(s => s)
      .join(",");
-     
+
     localStorage.setItem('config', newConfig); // need to set for closing the last tab to work
     return '/builder/' + newConfig;
   }
-  
+
 	render()
   {
     let { tabs } = this.state;
-    
+
     var tabsLayout =
     {
       compact: true,
       columns: tabs ? tabs.map((tab, index) => (
       {
-        key: tab.id, 
+        key: tab.id,
         content:
-          <Tab 
+          <Tab
             name={tab.name}
             selected={tab.selected}
             id={tab.id}
@@ -404,7 +404,7 @@ export class Tabs extends PureClasss<TabsProps> {
       }))
       : []
     };
-    
+
     return (
       <div className='tabs-container'>
         <div className='tabs-row-wrapper'>
@@ -421,6 +421,5 @@ export class Tabs extends PureClasss<TabsProps> {
       </div>
      );
 	}
-};
-
+}
 export default Tabs;
