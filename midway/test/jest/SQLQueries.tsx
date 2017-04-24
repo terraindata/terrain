@@ -44,76 +44,43 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as sqlite3 from 'sqlite3';
-import * as winston from 'winston';
-import TastyExecutor from './TastyExecutor';
-import TastySchema from './TastySchema';
-import { makePromiseCallback, makePromiseCallback0 } from './Utils';
+const SQLQueries: Array<[string, string]> = [
+['simple query (select all)',
+  `SELECT * \n  FROM movies\n  LIMIT 10;`],
 
-export interface ISQLiteConfig
-{
-  filename: string;
-}
+['simple query (select columns)',
+  `SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n  LIMIT 10;`],
 
-export type Config = ISQLiteConfig;
+['simple query (filter equals)',
+  `SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`],
 
-export const defaultConfig: Config =
-{
-  filename: 'nodeway.db',
-};
+['simple query (filter doesNotEqual)',
+  `SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)'\n  LIMIT 10;`],
 
-export class SQLiteExecutor implements TastyExecutor
-{
-  private config: Config;
-  private db: sqlite3.Database;
+['simple query (sort asc)',
+  `SELECT * \n  FROM movies\n  ORDER BY movies.title ASC\n  LIMIT 10;`],
 
-  constructor(config?: any)
-  {
-    if (config === undefined)
-    {
-      config = defaultConfig;
-    }
+['simple query (sort desc)',
+  `SELECT * \n  FROM movies\n  ORDER BY movies.title DESC\n  LIMIT 10;`],
 
-    this.config = config;
-    this.db = new sqlite3.Database(config.filename);
-  }
+['simple query (take)',
+  `SELECT * \n  FROM movies\n  LIMIT 10;`],
 
-  public async schema(): Promise<TastySchema>
-  {
-    const results = {};
-    results[this.config.filename] = {};
+['simple query (skip)',
+  `SELECT * \n  FROM movies\n  LIMIT 10 OFFSET 20;`],
 
-    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
-    for (const table of tableListResult)
-    {
-      results[this.config.filename][table.name] = {};
-      const colResult: any = await this.query(`pragma table_info(${table.name});`);
-      for (const col of colResult)
-      {
-        results[this.config.filename][table.name][col.name] =
-          {
-            type: col.type,
-          };
-      }
-    }
-    return new TastySchema(results);
-  }
+['simple query (upsert)',
+  `REPLACE \n  INTO movies (movieid, releasedate, title) VALUES (13371337, '2017-01-01', 'My New Movie');`],
 
-  public async query(queryStr: string): Promise<object[]>
-  {
-    return new Promise<object[]>((resolve, reject) =>
-    {
-      this.db.all(queryStr, makePromiseCallback(resolve, reject));
-    });
-  }
+['simple query (delete)',
+  `DELETE \n  FROM movies\n  WHERE movies.movieid = 13371337;`],
 
-  public async destroy(): Promise<void>
-  {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.db.close(makePromiseCallback0(resolve, reject));
-    });
-  }
-}
+['complex query (MySQL)',
+  `SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies
+  WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'
+     AND movies.releasedate < '2017-03-24'
+  ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC
+  LIMIT 10 OFFSET 20;`],
+];
 
-export default SQLiteExecutor;
+export default SQLQueries;

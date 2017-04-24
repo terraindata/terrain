@@ -51,7 +51,7 @@ export class TastyColumn extends TastyNode
 {
   constructor(table: TastyTable, name: any)
   {
-    super('.', [new TastyNode('reference', table.getTableName()), new TastyNode('reference', name)]);
+    super('.', [new TastyNode('reference', table.tastyTableName), new TastyNode('reference', name)]);
   }
 }
 

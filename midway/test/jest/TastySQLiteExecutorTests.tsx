@@ -44,76 +44,75 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as sqlite3 from 'sqlite3';
-import * as winston from 'winston';
-import TastyExecutor from './TastyExecutor';
-import TastySchema from './TastySchema';
-import { makePromiseCallback, makePromiseCallback0 } from './Utils';
+import * as hash from 'object-hash';
 
-export interface ISQLiteConfig
+import SQLiteExecutor from '../../tasty/SQLiteExecutor';
+import Tasty from '../../tasty/Tasty';
+import SQLQueries from './SQLQueries';
+
+const resultHash: string[] = [
+  '25947fb6a68505be72373babb0499bd51b5e44fb',
+  '3da7fb2ac116d0ceb112a1f7593b94dd4c4b3112',
+  '289dbad322d227eee7385af01e964dbcecb0b4a2',
+  '2699d0b1d7879de7fcfc34b921e43404f552b39e',
+  '3bbef0194391e54c7642693a0a5357e8d16611b8',
+  'f93adfaaa1986dc5d1dedc54e73eee59faab3985',
+  '25947fb6a68505be72373babb0499bd51b5e44fb',
+  '5b95dc900d820ee93091e4861e2aeea16e7ead43',
+  '989db2448f309bfdd99b513f37c84b8f5794d2b5',
+  '989db2448f309bfdd99b513f37c84b8f5794d2b5',
+  'c95266c7ea79135e06bf67a60e78204a3491a2f2',
+];
+
+let sqlite;
+
+async function runQuery(qstr: string)
 {
-  filename: string;
+  const results = await sqlite.query(qstr);
+  return hash(results);
 }
 
-export type Config = ISQLiteConfig;
-
-export const defaultConfig: Config =
+function runTest(index: number)
 {
-  filename: 'nodeway.db',
-};
-
-export class SQLiteExecutor implements TastyExecutor
-{
-  private config: Config;
-  private db: sqlite3.Database;
-
-  constructor(config?: any)
+  test('SQLite: execute ' + SQLQueries[index][0], async (done) =>
   {
-    if (config === undefined)
+    try
     {
-      config = defaultConfig;
+      const h = await runQuery(SQLQueries[index][1]);
+      expect(h).toBe(resultHash[index]);
+    } catch (e)
+    {
+      fail(e);
     }
-
-    this.config = config;
-    this.db = new sqlite3.Database(config.filename);
-  }
-
-  public async schema(): Promise<TastySchema>
-  {
-    const results = {};
-    results[this.config.filename] = {};
-
-    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
-    for (const table of tableListResult)
-    {
-      results[this.config.filename][table.name] = {};
-      const colResult: any = await this.query(`pragma table_info(${table.name});`);
-      for (const col of colResult)
-      {
-        results[this.config.filename][table.name][col.name] =
-          {
-            type: col.type,
-          };
-      }
-    }
-    return new TastySchema(results);
-  }
-
-  public async query(queryStr: string): Promise<object[]>
-  {
-    return new Promise<object[]>((resolve, reject) =>
-    {
-      this.db.all(queryStr, makePromiseCallback(resolve, reject));
-    });
-  }
-
-  public async destroy(): Promise<void>
-  {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.db.close(makePromiseCallback0(resolve, reject));
-    });
-  }
+    done();
+  });
 }
 
-export default SQLiteExecutor;
+test('pool connect', async (done) =>
+{
+  try
+  {
+    sqlite = new SQLiteExecutor({filename: 'moviesdb.db'});
+  } catch (e)
+  {
+    fail(e);
+  }
+  done();
+});
+
+for (let i = 0; i < SQLQueries.length; i++)
+{
+  runTest(i);
+}
+
+test('pool destroy', async (done) =>
+{
+  try
+  {
+    await sqlite.destroy();
+  } catch (e)
+  {
+    fail(e);
+  }
+  done();
+});

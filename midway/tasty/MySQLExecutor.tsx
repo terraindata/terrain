@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as mysql from 'mysql';
 import * as winston from 'winston';
 import TastyExecutor from './TastyExecutor';
+import TastySchema from './TastySchema';
 import { makePromiseCallback } from './Utils';
 
 export type Config = mysql.IPoolConfig;
@@ -81,6 +82,14 @@ export class MySQLExecutor implements TastyExecutor
     {
       winston.info('Connection %d released', connection.threadId);
     });
+  }
+
+  public async schema(): Promise<TastySchema>
+  {
+    const result = await this.query('SELECT table_schema, table_name, column_name, data_type ' +
+      'FROM information_schema.columns ' +
+      'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'mysql\', \'sys\');');
+    return TastySchema.fromMySQLResultSet(result);
   }
 
   public async query(queryStr: string): Promise<object[]>

@@ -47,7 +47,6 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as hash from 'object-hash';
 import * as request from 'supertest';
-import * as test from 'tape-async';
 import * as winston from 'winston';
 
 import App from '../../App';
@@ -58,91 +57,74 @@ let elasticSearch;
 
 const DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
 
-test('GET /midway/v1/schema', (t) =>
+test('GET /midway/v1/schema', (done) =>
 {
   request(App)
-      .get('/midway/v1/schema')
-      .then((response) => {
-        // TODO @david check against expected value for schema, not just non-emptiness
-        if (response.text !== '')
-        {
-          t.pass();
-        } else
-        {
-          t.skip('GET /schema request returned empty response body');
-        }
-      });
-  t.end();
+    .get('/midway/v1/schema')
+    .then((response) =>
+    {
+      // TODO @david check against expected value for schema, not just non-emptiness
+      if (response.text === '')
+      {
+        fail('GET /schema request returned empty response body');
+      }
+    });
+  done();
 });
 
-test('connection establish', async (t) =>
+test('connection establish', async (done) =>
 {
   try
   {
     elasticSearch = new ElasticExecutor();
-    t.pass();
   }
   catch (e)
   {
-    t.skip(e);
+    fail(e);
   }
-  t.end();
+  done();
 });
 
-test('elastic health', async (t) =>
+test('elastic health', async (done) =>
 {
   try
   {
     const h = await elasticSearch.health();
     winston.info(h);
-    t.pass();
   }
   catch (e)
   {
-    t.skip(e);
+    fail(e);
   }
-  t.end();
+  done();
 });
 
-test('basic query', async (t) =>
+test('basic query', async (done) =>
 {
   try
   {
     const h = await elasticSearch.fullQuery(
       {
         index: 'movies',
-        query: {
-          aggregations: {
-            count_by_type: {
-              terms: {
-                field: '_type',
-                size:  1000,
-              },
-            },
-            fields:        {
-              terms: {
-                field: '_field_names',
-                size:  1000,
-              },
-            },
-          },
+        type:  'data',
+        body:  {
+          query: {},
         },
-        size:  0,
+        size:  1,
       },
     );
-    winston.info(JSON.stringify(h, null, 2));
-    t.pass();
+    // winston.info(JSON.stringify(h, null, 2));
     // console.log(h.hits.hits.forEach(
     //     (result) => {console.log(JSON.stringify(result, null, 2));}));
   }
   catch (e)
   {
-    t.skip(e);
+    fail(e);
   }
-  t.end();
+  done();
 });
 
-test('store terrain_PWLScore script', async (t) =>
+test('store terrain_PWLScore script', async (done) =>
 {
   try
   {
@@ -219,12 +201,12 @@ return total;`,
   }
   catch (e)
   {
-    t.skip(e);
+    fail(e);
   }
-  t.end();
+  done();
 });
 
-test('stored PWL transform sort query', async (t) =>
+test('stored PWL transform sort query', async (done) =>
 {
   try
   {
@@ -303,166 +285,156 @@ test('stored PWL transform sort query', async (t) =>
     // console.log(JSON.stringify(results, null, 2));
     const expected = [
       {
-        _index:  'movies',
-        _type:   'data',
-        _id:     'AVtLODwPFGpkkkhizu3Q',
-        _score:  null,
-        _source: {
-          'overview':     'Based on the real life story of legendary cryptanalyst Alan Turing, the film portrays the nail-biting race against time by Turing and his brilliant team of code-breakers at Britain\'s top-secret Government Code and Cypher School at Bletchley Park, during the darkest days of World War II.',
-          'votecount':    3268,
-          'posterpath':   '/noUp0XOqIcmgefRnRZa1nhtRvWO.jpg',
-          'runtime':      113,
-          'movieid':      116797,
-          'language':     'en',
-          'releasedate':  '2014-11-14T00:00:00.000Z',
-          'voteaverage':  8,
-          'title':        'The Imitation Game (2014)',
-          'revenue':      233555708,
-          '@timestamp':   '2017-04-08T01:40:28.297Z',
+        '_id':     'AVtpT5jiECWm4N1o7kE8',
+        '_index':  'movies',
+        '_score':  null,
+        '_source': {
+          '@timestamp':   '2017-04-13T21:54:35.819Z',
+          '@version':     '1',
           'backdroppath': '/qcb6z1HpokTOKdjqDTsnjJk0Xvg.jpg',
-          'genres':       'Drama|Thriller',
-          'popularity':   9.532139778137207,
-          '@version':     '1',
-          'tagline':      'The true enigma was the man who cracked the code.',
-          'status':       'Released',
           'budget':       14000000,
+          'genres':       'Drama|Thriller',
           'homepage':     'http://theimitationgamemovie.com/',
-        },
-        sort:    [
-          0.7044360129081163,
-        ],
-      },
-      {
-        _index:  'movies',
-        _type:   'data',
-        _id:     'AVtLODj7FGpkkkhizuiv',
-        _score:  null,
-        _source: {
-          'overview':     'A woman, accidentally caught in a dark deal, turns the tables on her captors and transforms into a merciless warrior evolved beyond human logic.',
-          'votecount':    3554,
-          'posterpath':   '/rwn876MeqienhOVSSjtUPnwxn0Z.jpg',
-          'runtime':      89,
-          'movieid':      111360,
           'language':     'en',
-          'releasedate':  '2014-07-14T00:00:00.000Z',
-          'voteaverage':  6.300000190734863,
-          'title':        'Lucy (2014)',
-          'revenue':      463360063,
-          '@timestamp':   '2017-04-08T01:40:27.507Z',
-          'backdroppath': '/eCgIoGvfNXrbSiQGqQHccuHjQHm.jpg',
-          'genres':       'Action|Sci-Fi',
-          'popularity':   7.560890197753906,
-          '@version':     '1',
-          'tagline':      'The average person uses 10% of their brain capacity. Imagine what she could do with 100%.',
+          'movieid':      116797,
+          'overview':     'Based on the real life story of legendary cryptanalyst Alan Turing, the film portrays the nail-biting race against time by Turing and his brilliant team of code-breakers at Britain\'s top-secret Government Code and Cypher School at Bletchley Park, during the darkest days of World War II.',
+          'popularity':   9.532139778137207,
+          'posterpath':   '/noUp0XOqIcmgefRnRZa1nhtRvWO.jpg',
+          'releasedate':  '2014-11-14T00:00:00.000Z',
+          'revenue':      233555708,
+          'runtime':      113,
           'status':       'Released',
-          'budget':       40000000,
-          'homepage':     'http://lucymovie.com/',
-        },
-        sort:    [
-          0.6807745937088925,
-        ],
-      },
-      {
-        _index:  'movies',
-        _type:   'data',
-        _id:     'AVtLN-tXFGpkkkhizo5d',
-        _score:  null,
-        _source: {
-          'overview':     'Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire.',
-          'votecount':    4206,
-          'posterpath':   '/tvSlBzAdRE29bZe5yYWrJ2ds137.jpg',
-          'runtime':      121,
-          'movieid':      260,
-          'language':     'en',
-          'releasedate':  '1977-03-20T00:00:00.000Z',
-          'voteaverage':  7.900000095367432,
-          'title':        'Star Wars: Episode IV - A New Hope (1977)',
-          'revenue':      775398007,
-          '@timestamp':   '2017-04-08T01:40:07.552Z',
-          'backdroppath': '/4iJfYYoQzZcONB9hNzg0J0wWyPH.jpg',
-          'genres':       'Action|Adventure|Sci-Fi',
-          'popularity':   7.078539848327637,
-          '@version':     '1',
-          'tagline':      'A long time ago in a galaxy far, far away...',
-          'status':       'Released',
-          'budget':       11000000,
-          'homepage':     'http://www.starwars.com/films/star-wars-episode-iv-a-new-hope',
-        },
-        sort:    [
-          0.6749814962066102,
-        ],
-      },
-      {
-        _index:  'movies',
-        _type:   'data',
-        _id:     'AVtLN-tXFGpkkkhizo6B',
-        _score:  null,
-        _source: {
-          'overview':     'A burger-loving hit man, his philosophical partner, a drug-addled gangster\'s moll and a washed-up boxer converge in this sprawling, comedic crime caper. Their adventures unfurl in three stories that ingeniously trip back and forth in time.',
-          'votecount':    5096,
-          'posterpath':   '/dM2w364MScsjFf8pfMbaWUcWrR.jpg',
-          'runtime':      154,
-          'movieid':      296,
-          'language':     'en',
-          'releasedate':  '1994-10-14T00:00:00.000Z',
+          'tagline':      'The true enigma was the man who cracked the code.',
+          'title':        'The Imitation Game (2014)',
           'voteaverage':  8,
-          'title':        'Pulp Fiction (1994)',
-          'revenue':      213928762,
-          '@timestamp':   '2017-04-08T01:40:07.567Z',
-          'backdroppath': '/mte63qJaVnoxkkXbHkdFujBnBgd.jpg',
-          'genres':       'Comedy|Crime|Drama|Thriller',
-          'popularity':   5.996039867401123,
-          '@version':     '1',
-          'tagline':      'Just because you are a character doesn\'t mean you have character.',
-          'status':       'Released',
-          'budget':       8000000,
-          'homepage':     '',
+          'votecount':    3268,
         },
-        sort:    [
-          0.6619847933324328,
-        ],
+        '_type':   'data',
+        'sort':    [0.7044360129081163],
       },
       {
-        _index:  'movies',
-        _type:   'data',
-        _id:     'AVtLN_cnFGpkkkhizpiK',
-        _score:  null,
-        _source: {
-          'overview':     'In the film that launched the James Bond saga, Agent 007 (Sean Connery) battles mysterious Dr. No, a scientific genius bent on destroying the U.S. space program. As the countdown to disaster begins, Bond must go to Jamaica, where he encounters beautiful Honey Ryder (Ursula Andress), to confront a megalomaniacal villain in his massive island headquarters.',
-          'votecount':    532,
-          'posterpath':   '/c3zP1U1P2OpD0504izo2KhyJfLU.jpg',
-          'runtime':      110,
-          'movieid':      2949,
-          'language':     'en',
-          'releasedate':  '1962-10-04T00:00:00.000Z',
-          'voteaverage':  6.599999904632568,
-          'title':        'Dr. No (1962)',
-          'revenue':      59600000,
-          '@timestamp':   '2017-04-08T01:40:10.641Z',
-          'backdroppath': '/bplDiT5JhaXf9S5arO8g5QsFtDi.jpg',
-          'genres':       'Action|Adventure|Thriller',
-          'popularity':   5.804810047149658,
+        '_id':     'AVtpT5fNECWm4N1o7jue',
+        '_index':  'movies',
+        '_score':  null,
+        '_source': {
+          '@timestamp':   '2017-04-13T21:54:35.569Z',
           '@version':     '1',
-          'tagline':      'NOW meet the most extraordinary gentleman spy in all fiction!',
+          'backdroppath': '/eCgIoGvfNXrbSiQGqQHccuHjQHm.jpg',
+          'budget':       40000000,
+          'genres':       'Action|Sci-Fi',
+          'homepage':     'http://lucymovie.com/',
+          'language':     'en',
+          'movieid':      111360,
+          'overview':     'A woman, accidentally caught in a dark deal, turns the tables on her captors and transforms into a merciless warrior evolved beyond human logic.',
+          'popularity':   7.560890197753906,
+          'posterpath':   '/rwn876MeqienhOVSSjtUPnwxn0Z.jpg',
+          'releasedate':  '2014-07-14T00:00:00.000Z',
+          'revenue':      463360063,
+          'runtime':      89,
           'status':       'Released',
-          'budget':       1100000,
-          'homepage':     'http://www.mgm.com/view/movie/566/Dr.-No/',
+          'tagline':      'The average person uses 10% of their brain capacity. Imagine what she could do with 100%.',
+          'title':        'Lucy (2014)',
+          'voteaverage':  6.300000190734863,
+          'votecount':    3554,
         },
-        sort:    [
-          0.6599492334800453,
-        ],
+        '_type':   'data',
+        'sort':    [0.6807745937088925],
+      },
+      {
+        '_id':     'AVtpT4NUECWm4N1o7eG-',
+        '_index':  'movies',
+        '_score':  null,
+        '_source': {
+          '@timestamp':   '2017-04-13T21:54:30.260Z',
+          '@version':     '1',
+          'backdroppath': '/4iJfYYoQzZcONB9hNzg0J0wWyPH.jpg',
+          'budget':       11000000,
+          'genres':       'Action|Adventure|Sci-Fi',
+          'homepage':     'http://www.starwars.com/films/star-wars-episode-iv-a-new-hope',
+          'language':     'en',
+          'movieid':      260,
+          'overview':     'Princess Leia is captured and held hostage by the evil Imperial forces in their effort to take over the galactic Empire. Venturesome Luke Skywalker and dashing captain Han Solo team together with the loveable robot duo R2-D2 and C-3PO to rescue the beautiful princess and restore peace and justice in the Empire.',
+          'popularity':   7.078539848327637,
+          'posterpath':   '/tvSlBzAdRE29bZe5yYWrJ2ds137.jpg',
+          'releasedate':  '1977-03-20T00:00:00.000Z',
+          'revenue':      775398007,
+          'runtime':      121,
+          'status':       'Released',
+          'tagline':      'A long time ago in a galaxy far, far away...',
+          'title':        'Star Wars: Episode IV - A New Hope (1977)',
+          'voteaverage':  7.900000095367432,
+          'votecount':    4206,
+        },
+        '_type':   'data',
+        'sort':    [0.6749814962066102],
+      },
+      {
+        '_id':     'AVtpT4NfECWm4N1o7eHi',
+        '_index':  'movies',
+        '_score':  null,
+        '_source': {
+          '@timestamp':   '2017-04-13T21:54:30.277Z',
+          '@version':     '1',
+          'backdroppath': '/mte63qJaVnoxkkXbHkdFujBnBgd.jpg',
+          'budget':       8000000,
+          'genres':       'Comedy|Crime|Drama|Thriller',
+          'homepage':     '',
+          'language':     'en',
+          'movieid':      296,
+          'overview':     'A burger-loving hit man, his philosophical partner, a drug-addled gangster\'s moll and a washed-up boxer converge in this sprawling, comedic crime caper. Their adventures unfurl in three stories that ingeniously trip back and forth in time.',
+          'popularity':   5.996039867401123,
+          'posterpath':   '/dM2w364MScsjFf8pfMbaWUcWrR.jpg',
+          'releasedate':  '1994-10-14T00:00:00.000Z',
+          'revenue':      213928762,
+          'runtime':      154,
+          'status':       'Released',
+          'tagline':      'Just because you are a character doesn\'t mean you have character.',
+          'title':        'Pulp Fiction (1994)',
+          'voteaverage':  8,
+          'votecount':    5096,
+        },
+        '_type':   'data',
+        'sort':    [0.6619847933324328],
+      },
+      {
+        '_id':     'AVtpT4ZMECWm4N1o7ev2',
+        '_index':  'movies',
+        '_score':  null,
+        '_source': {
+          '@timestamp':   '2017-04-13T21:54:31.090Z',
+          '@version':     '1',
+          'backdroppath': '/bplDiT5JhaXf9S5arO8g5QsFtDi.jpg',
+          'budget':       1100000,
+          'genres':       'Action|Adventure|Thriller',
+          'homepage':     'http://www.mgm.com/view/movie/566/Dr.-No/',
+          'language':     'en',
+          'movieid':      2949,
+          'overview':     'In the film that launched the James Bond saga, Agent 007 (Sean Connery) battles mysterious Dr. No, a scientific genius bent on destroying the U.S. space program. As the countdown to disaster begins, Bond must go to Jamaica, where he encounters beautiful Honey Ryder (Ursula Andress), to confront a megalomaniacal villain in his massive island headquarters.',
+          'popularity':   5.804810047149658,
+          'posterpath':   '/c3zP1U1P2OpD0504izo2KhyJfLU.jpg',
+          'releasedate':  '1962-10-04T00:00:00.000Z',
+          'revenue':      59600000,
+          'runtime':      110,
+          'status':       'Released',
+          'tagline':      'NOW meet the most extraordinary gentleman spy in all fiction!',
+          'title':        'Dr. No (1962)',
+          'voteaverage':  6.599999904632568,
+          'votecount':    532,
+        },
+        '_type':   'data',
+        'sort':    [0.6599492334800453],
       },
     ];
-    t.deepEqual(results, expected);
+    expect(results).toEqual(expected);
   }
   catch (e)
   {
-    t.skip(e);
+    fail(e);
   }
-  t.end();
+  done();
 });
 
-test('stored PWL transform sort query using function_score', async (t) =>
+test('stored PWL transform sort query using function_score', async (done) =>
 {
   try
   {
@@ -547,79 +519,78 @@ test('stored PWL transform sort query using function_score', async (t) =>
     winston.info(JSON.stringify(results, null, 2));
     const expected = [
       {
-        _index:  'movies',
-        _type:   'data',
-        _id:     'AVtLOAYGFGpkkkhizqnN',
-        _score:  -11.855362,
-        _source: {
-          'overview':     'Star studded comedy about a early 20th century air race from Britain to France.',
-          'votecount':    18,
-          'posterpath':   '/xB4tZIOGfyL41MHGUUEBsy5fQ5y.jpg',
-          'runtime':      138,
-          'movieid':      7394,
-          'language':     'en',
-          'releasedate':  '1965-06-03T00:00:00.000Z',
-          'voteaverage':  6.599999904632568,
-          'title':        'Those Magnificent Men in Their Flying Machines (1965)',
-          'revenue':      29950000,
-          '@timestamp':   '2017-04-08T01:40:14.451Z',
-          'backdroppath': '/57XgSBngTXnvEwqVSlKB3vmmPVd.jpg',
-          'genres':       'Action|Adventure|Comedy',
-          'popularity':   0.8980460166931152,
+        '_id':     'AVtpT40bECWm4N1o7f05',
+        '_index':  'movies',
+        '_score':  -11.855619,
+        '_source': {
+          '@timestamp':   '2017-04-13T21:54:32.810Z',
           '@version':     '1',
-          'tagline':      'or How I Flew from London to Paris in 25 hours 11 minutes',
-          'status':       'Released',
+          'backdroppath': '/57XgSBngTXnvEwqVSlKB3vmmPVd.jpg',
           'budget':       5600000,
+          'genres':       'Action|Adventure|Comedy',
           'homepage':     '',
+          'language':     'en',
+          'movieid':      7394,
+          'overview':     'Star studded comedy about a early 20th century air race from Britain to France.',
+          'popularity':   0.8980460166931152,
+          'posterpath':   '/xB4tZIOGfyL41MHGUUEBsy5fQ5y.jpg',
+          'releasedate':  '1965-06-03T00:00:00.000Z',
+          'revenue':      29950000,
+          'runtime':      138,
+          'status':       'Released',
+          'tagline':      'or How I Flew from London to Paris in 25 hours 11 minutes',
+          'title':        'Those Magnificent Men in Their Flying Machines (1965)',
+          'voteaverage':  6.599999904632568,
+          'votecount':    18,
         },
+        '_type':   'data',
       },
       {
-        _index:  'movies',
-        _type:   'data',
-        _id:     'AVtLN_YpFGpkkkhizpbf',
-        _score:  -12.032226,
-        _source: {
-          'overview':     '"Something hit us...the crew is dead...help us, please, please help us!" With these terrifying words, 22 of Hollywood\'s greatest stars find themselves aboard a pilotless jumbo jet headed on a collision course with destruction in the nerve chilling sequel to the greatest disaster movie ever made.',
-          'votecount':    30,
-          'posterpath':   '/53M89n1LDl20ZCAhqEadjTVc0Ml.jpg',
-          'runtime':      107,
-          'movieid':      2521,
-          'language':     'en',
-          'releasedate':  '1974-10-18T00:00:00.000Z',
-          'voteaverage':  6.099999904632568,
-          'title':        'Airport 1975 (1974)',
-          'revenue':      47000000,
-          '@timestamp':   '2017-04-08T01:40:10.388Z',
-          'backdroppath': '/e5MP0pHZdcF48PAGtJTgss4qsV8.jpg',
-          'genres':       'Action|Drama|Thriller',
-          'popularity':   0.7732750177383423,
+        '_id':     'AVtpT4YpECWm4N1o7elR',
+        '_index':  'movies',
+        '_score':  -12.032712,
+        '_source': {
+          '@timestamp':   '2017-04-13T21:54:31.006Z',
           '@version':     '1',
-          'tagline':      'Something hit us... The crew is dead... Help us, please, please help us!',
-          'status':       'Released',
+          'backdroppath': '/e5MP0pHZdcF48PAGtJTgss4qsV8.jpg',
           'budget':       3000000,
+          'genres':       'Action|Drama|Thriller',
           'homepage':     '',
+          'language':     'en',
+          'movieid':      2521,
+          'overview':     '"Something hit us...the crew is dead...help us, please, please help us!" With these terrifying words, 22 of Hollywood\'s greatest stars find themselves aboard a pilotless jumbo jet headed on a collision course with destruction in the nerve chilling sequel to the greatest disaster movie ever made.',
+          'popularity':   0.7732750177383423,
+          'posterpath':   '/53M89n1LDl20ZCAhqEadjTVc0Ml.jpg',
+          'releasedate':  '1974-10-18T00:00:00.000Z',
+          'revenue':      47000000,
+          'runtime':      107,
+          'status':       'Released',
+          'tagline':      'Something hit us... The crew is dead... Help us, please, please help us!',
+          'title':        'Airport 1975 (1974)',
+          'voteaverage':  6.099999904632568,
+          'votecount':    30,
         },
+        '_type':   'data',
       },
     ];
-    t.deepEqual(results, expected);
+    expect(results).toEqual(expected);
   }
   catch (e)
   {
-    t.skip(e);
+    fail(e);
   }
-  t.end();
+  done();
 });
 
-test('connection destroy', async (t) =>
+test('connection destroy', async (done) =>
 {
   try
   {
     await elasticSearch.destroy();
-    t.pass();
   }
   catch (e)
   {
-    t.skip(e);
+    fail(e);
   }
-  t.end();
+  done();
 });
