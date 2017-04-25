@@ -44,9 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// require individual test files.
+import * as request from 'supertest';
+import App from '../../src/App';
+import * as Tasty from '../../src/tasty/Tasty';
 
-import './unit/TastyElasticExecutor';
-import './unit/TastyGeneratorTests';
-import './unit/TastyMySQLExecutor';
-import './unit/TastySQLiteExecutor';
+test('GET /midway/v1/schema', (done) =>
+{
+  request(App)
+    .get('/midway/v1/schema')
+    .then((response) =>
+    {
+      // TODO @david check against expected value for schema, not just non-emptiness
+      if (response.text === '')
+      {
+        fail('GET /schema request returned empty response body');
+      }
+    });
+  done();
+});
