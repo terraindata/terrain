@@ -69,21 +69,21 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 * For Mac:
   * Install Homebrew `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
   * Install Node `brew install node`
-  * Install npm. `brew install npm`
+  * Install yarn. `brew install yarn`
 * For Linux:
-  * Install nodejs, npm, and n `curl -L https://git.io/n-install | bash`
+  * Install nodejs, yarn, and n `curl -L https://git.io/n-install | bash`
   * Reinit your bash environment `source ~/.bashrc`
   * Install the latest LTS node version (6.10.2): `n lts`
-* `npm install`
-* `npm install -g webpack-dev-server`
-* `npm start` - starts the Midway server, now running at localhost:3000
-* `npm run start-koa` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the
+* `yarn`
+* `yarn global add webpack-dev-server`
+* `yarn start` - starts the Midway server, now running at localhost:3000
+* `yarn run start-koa` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the
                         dev front-end server on start (and kill it on end)
 * Default user login: `luser` / `secret`
 * Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans] - helps things go faster because
   your browser won't have to fetch Open Sans on each load
 
-Whenever new packages are installed by other devs / on other branches, run `npm install` to get the new package locally.
+Whenever new packages are installed by other devs / on other branches, run `yarn add` to get the new package locally.
 
 ### Configuring Webstorm IDE
 
@@ -92,10 +92,10 @@ To setup a node project using typescript for debugging inside webstorm:
   [https://www.jetbrains.com/webstorm/download/#section=linux]
 * Run Webstorm and select 'Open existing project...'
   * Select the root directory of the Search repo, for example ~/terrain/Search/
-* To run one of the configured scripts via npm:
+* To run one of the configured scripts via yarn:
   * From the 'Run' menu, select 'Run/Debug Configurations'
   * Click '+' to add a configuration
-  * Select 'npm' from the list of configuration types
+  * Select 'yarn' from the list of configuration types
   * Put a name in for this configuration
   * Set the command to 'run'
   * Set the script to one of the options listed in package.json, like 'test-back'
@@ -144,7 +144,7 @@ Links are to relevant overviews and tutorials.
 
 - Node
 - Koa
-- Tape, Sinon, and Chai for testing
+- Jest (for testing)
 
 
 ## Coding Standards
