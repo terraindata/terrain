@@ -51,7 +51,7 @@ import MySQLExecutor from '../../src/tasty/MySQLExecutor';
 import { Backend, Table, Tasty } from '../../src/tasty/Tasty';
 import { TastyQuery } from '../../src/tasty/TastyQuery';
 
-// run this test `./node_modules/.bin/ts-node --harmony ./midway/test/utils/CopyDataFromSqlToElastic.tsx`
+// run this test `./node_modules/.bin/ts-node --harmony ./midway/test/utils/CopyDataFromSqlToElastic.ts`
 
 const td1MySQLConfig: mysql.IPoolConfig = {
   connectionLimit: 20,
