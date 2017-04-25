@@ -54,6 +54,7 @@ import TastyColumn from './TastyColumn';
 import TastyExecutor from './TastyExecutor';
 import TastyNode from './TastyNode';
 import TastyQuery from './TastyQuery';
+import TastySchema from './TastySchema';
 import TastyTable from './TastyTable';
 import { makePromiseCallback } from './Utils';
 
@@ -326,6 +327,11 @@ export class Tasty
       }
     });
     return node;
+  }
+
+  public async schema(): Promise<TastySchema>
+  {
+    return this.executor.schema();
   }
 }
 

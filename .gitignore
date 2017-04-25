@@ -19,4 +19,4 @@ midway/**/*.jsx
 yarn.lock
 nodeway.db
 moviesdb.db
-
+*.swp
