@@ -48,7 +48,7 @@ import * as request from 'supertest';
 import App from '../../src/App';
 import * as Tasty from '../../src/tasty/Tasty';
 
-test('GET /midway/v1/schema', (done) =>
+test('GET /midway/v1/schema', async (done) =>
 {
   request(App)
     .get('/midway/v1/schema')
