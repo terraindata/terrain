@@ -68,7 +68,7 @@ export interface Props
   };
 }
 
-class Library extends PureClasss<Props>
+class Library extends PureClasss<any>
 {
   cancelSubscription = null;
   

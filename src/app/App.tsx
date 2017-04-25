@@ -375,7 +375,7 @@ class App extends PureClasss<Props>
 
 var router = (
   <Router history={browserHistory}>
-    <Route path="/" component={App}>
+    <Route path="/" component={App}>rsv E`
       <IndexRoute component={Redirect} />
     
       <Route path="/builder" component={Builder} />

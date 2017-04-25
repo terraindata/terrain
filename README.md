@@ -22,7 +22,7 @@ One last note: a team has one or more "System Admins" (aka sysadmins) who can cr
 
 Terraformer is built in Javascript. It runs on the user's browser. The user's browser downloads all of the code for Terraformer when they first navigate to Terraformer's URL. Though the URL in the browser will change as they use the app, they are not actually navigating to a different webpage; Terraformer is modifying the URL via Javascript to reflect where the user is in the app.
 
-The back-end for Terraformer is called "midway." Midway stores and serves all of Terraformer's data (user accounts, groups, algorithms, variants, etc.), authenticates users when they log in, and passes queries from Terraformer to TerrainDB and returns the results. Midway is built in Go and has a CRUD-like API.
+The back-end for Terraformer is called "midway." Midway stores and serves all of Terraformer's data (user accounts, groups, algorithms, variants, etc.), authenticates users when they log in, and passes queries from Terraformer to TerrainDB and returns the results. Midway is built in Node and has a CRUD-like API.
 
 ## README Purpose
 
@@ -44,8 +44,8 @@ General coding standards for Javascript are located in the TechDocs repo, not in
   * Install the latest LTS node version (6.10.2): `n lts`
 * `npm install`
 * `npm install -g webpack-dev-server`
-* `npm start` - starts the Midway server, now running at localhost:3000
-* `npm run start-koa` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the dev front-end server on start (and kill it on end)
+* `npm start` - starts the Node Midway server, now running at localhost:3000
+* `npm run start-koa` - starts the front-end in a Node-Midway compatible way.
 * Default user login: `luser` / `secret`
 * Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans] - helps things go faster because your browser won't have to fetch Open Sans on each load
 
@@ -107,7 +107,7 @@ Links are to relevant overviews and tutorials.
 
 - Node
 - Koa
-- Tape, Sinon, and Chai for testing
+- Jest, Sinon, and Chai for testing
 
 
 ## Coding Standards
@@ -149,28 +149,29 @@ This will install the package and also add a reference to it in your `package.js
 
 If you forget to add `--save`, no line will be added to `package.json`
 
-You will then need to try to install any Typescript types that are available for the package: `npm install @types/[package-name] --save`. If this succeeds, Typescript types are available and you can import this package with the `import * as Package from 'package-name';` syntax. If this does not succeed, then there are no publicly available types, and you have to use `const Package = require('package');`
+You will then need to try to install any Typescript types that are available for the package: `npm install @types/[package-name] --save-dev` (`--save-dev` marks that this is a development dependency, not a production one). If this succeeds, Typescript types are available and you can import this package with the `import * as Package from 'package-name';` syntax. If this does not succeed, then there are no publicly available types, and you have to use `const Package = require('package');`
 
 You can also combine these two installs into one line. You can also use `npm i` as a shortcut for `npm install`
 
 For example, to add `truffle-oil` to my app, I would:
 * `cd ~/git/Search`
-* `npm install truffle-oil @types/truffle-oil --save`
+* `npm install truffle-oil --save`
+* `npm i @types/truffle-oil --save-dev`
 * `git add package.json`
 * Commit the changes
 
 
 ### Importing / requiring files
 
-To include another `.tsx` file from within the Terraformer codebase (`/src`), use `import [ClassName] from '[relative path]'`, e.g.
-`import DotComponent from './DotComponent.tsx';`
-`import NapoleonDynamite from '../../movies/NapoleonDynamite.tsx';`
+To include another `.tsx` file from within the Terraformer codebase (`/src`), use `import [ClassName] from '[relative path]'`, e.g.  
+`import DarAdalComponent from './DarAdalComponent';` (do not forget the `./` if it is in the same directory.)  
+`import NapoleonDynamite from '../../movies/NapoleonDynamite';`.  
 
 To include any file that's not a `.tsx` from within the Terraformer codebase, use `const [ClassName] = require('[relative path]')` 
-e.g.  
+e.g.   
 `require('./Pay.less');`  
 `const FreddyAnd = require('../../data/FreddyAnd.json');`  
-`const CarrieMathison = require('./CarrieMathison.js');`
+`const CarrieMathison = require('./CarrieMathison.js');` (again, don't forget `./`)  
 
 To include a package install from `npm`, use `import * as [ClassName] from '[package_name]';` if there are typings available, and `const [ClassName] = require('[package_name]');` if not. e.g.
 `import * as TheForce from 'the-force';`  
@@ -182,9 +183,7 @@ To include a package install from `npm`, use `import * as [ClassName] from '[pac
 
 Included in the `midway/test` folder.
 
-Run the `npm run test-back` command to run the back-end tests.
-
-TODO: Integrate with Karma and Tap to get continuous testing and code coverage reports.
+Run the `npm run jest-test` command to run the back-end tests.
 
 ### Front-end
 
@@ -198,7 +197,7 @@ Sometimes your tests may trigger errors that cause your test browser to crash, a
 `No captured browser.`
 When this happens, you need to quit Karma (Ctrl + C) and restart it.
 
-Note: when adding new tests, make sure to include `t.end()` at the end of every test (or `t.plan(x)` at the beginning), or else the test suite will hang.
+Note: when adding new tests with tape, make sure to include `t.end()` at the end of every test (or `t.plan(x)` at the beginning), or else the test suite will hang.
 
 ## Useful Tutorials and Articles
 
@@ -246,7 +245,7 @@ A list of common programming gotchas in this codebase
   console.log(catchphrase); // ERROR: cannot find name catchphrase
   ```
 - Subscribe to Redux stores within the `componentDidMount` method. Do not subscribe in the constructor, or else you will likely see many React `setState` warnings
-- Do not call `fetch` from within a constructor or you may see similar warnings (React thinks that state changes are happening from a higher component's `render` method)
+- Do not call any methods that fetch data from the server and then update a redux store (e.g. `Actions.fetch()`) from within a constructor or you may see similar warnings (React thinks that state changes are happening from a higher component's `render` method). You can put these in `componentDidMount`
 - Inline functions in ES6 don't like comments if you don't include `{...}`:
   ```
   let works = () =>
@@ -264,4 +263,4 @@ A list of common programming gotchas in this codebase
 
 * Don't panic.
 * Node or npm errors: `npm install` - you may be missing packages.
-* Test suite doesn't run all tests: make sure you have added correct `t.plan(x)` or `t.end()` statements to every test, otherwise the test suite will hang.
+* Tape Test suite doesn't run all tests: make sure you have added correct `t.plan(x)` or `t.end()` statements to every test, otherwise the test suite will hang.
