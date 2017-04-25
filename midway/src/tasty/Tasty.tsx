@@ -307,6 +307,11 @@ export class Tasty
     return await this.executor.query(queryString);
   }
 
+  public async schema(): Promise<TastySchema>
+  {
+    return this.executor.schema();
+  }
+
   private filterColumns(table: TastyTable, obj: object): TastyNode
   {
     let node: TastyNode = null;
@@ -327,11 +332,6 @@ export class Tasty
       }
     });
     return node;
-  }
-
-  public async schema(): Promise<TastySchema>
-  {
-    return this.executor.schema();
   }
 }
 
