@@ -126,6 +126,7 @@ export class Tasty
   // The backend executor and generator
   private executor: TastyExecutor;
   private generator: any;
+  private _backend: Backend;
 
   /**
    * Creates an instance of Tasty.
@@ -154,11 +155,17 @@ export class Tasty
         this.executor = new SQLiteExecutor.SQLiteExecutor(config);
         this.generator = MySQLGenerator;
       }
+      this._backend = backend;
     }
     catch (error)
     {
       throw Error('Failed to initialize backend ' + Backend[backend] + ':' + error);
     }
+  }
+
+  public get backend(): Backend
+  {
+    return this._backend;
   }
 
   public async generate(query: TastyQuery): Promise<string>
