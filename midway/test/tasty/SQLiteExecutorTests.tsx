@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as hash from 'object-hash';
+import * as winston from 'winston';
 
 import SQLiteExecutor from '../../src/tasty/SQLiteExecutor';
 import * as Tasty from '../../src/tasty/Tasty';
@@ -115,7 +116,52 @@ test('tasty select', async (done) =>
 {
   const movieid = 123;
   const results = await tasty.select(DBMovies, [], { movieid: 123 });
-  expect(results[0]).toEqual({ movieid: 123, releasedate: '1994-07-14 00:00:00', title: 'Chungking Express (Chung Hing sam lam) (1994)' });
+  expect(results[0])
+    .toEqual({
+      movieid: 123,
+      releasedate: '1994-07-14 00:00:00',
+      title: 'Chungking Express (Chung Hing sam lam) (1994)',
+    });
+  done();
+});
+
+test('SQLite: schema', async (done) =>
+{
+  try
+  {
+    const result = await tasty.schema();
+    winston.info(JSON.stringify(result));
+
+    const expected = {
+      tree: {
+        'moviesdb.db': {
+          movies: {
+            movieid: { type: 'int(11)' },
+            title: { type: 'varchar(255)' },
+            genres: { type: 'varchar(255)' },
+            backdroppath: { type: 'varchar(255)' },
+            overview: { type: 'varchar(1000)' },
+            posterpath: { type: 'varchar(255)' },
+            status: { type: 'varchar(255)' },
+            tagline: { type: 'varchar(255)' },
+            releasedate: { type: 'datetime' },
+            budget: { type: 'int(11)' },
+            revenue: { type: 'int(11)' },
+            votecount: { type: 'int(11)' },
+            popularity: { type: 'float' },
+            voteaverage: { type: 'float' },
+            homepage: { type: 'varchar(255)' },
+            language: { type: 'varchar(255)' },
+            runtime: { type: 'int(11)' },
+          },
+        },
+      },
+    };
+    expect(result).toEqual(expected);
+  } catch (e)
+  {
+    fail(e);
+  }
   done();
 });
 

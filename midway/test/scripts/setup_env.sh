@@ -78,12 +78,21 @@ fi
 
 ${DIR}/teardown_env.sh --mysql-port=$mysql_port --elastic-port=$elastic_port
 
-docker pull $mysql_image
-docker run -d -p $mysql_port:3306 $mysql_image
+# Pull images in parallel in order to minimize latency...
+docker pull $sqlite_image &
+docker pull $mysql_image &
+docker pull $elastic_image &
+wait
 
-docker pull $elastic_image
-docker run -d -p $elastic_port:9200 $elastic_image
-
-docker pull $sqlite_image
 docker run -v${sqlite_path}:/data/ -u$(id -u):$(id -g) $sqlite_image
+
+docker run -d -p $mysql_port:$mysql_port $mysql_image
+
+docker run -d -p $elastic_port:$elastic_port $elastic_image
+
+echo "Waiting on services to be ready..."
+
+while ! mysqladmin ping -h127.0.0.1 -uroot --port=$mysql_port --silent; do sleep 0.1; done
+while [ $(curl -s "http://127.0.0.1:$elastic_port" 2>&1 > /dev/null; echo $?) != 0 ]; do sleep 0.1; done
+# assume sqlite is up and running by this point...
 
