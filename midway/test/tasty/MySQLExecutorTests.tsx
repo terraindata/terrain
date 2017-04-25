@@ -83,13 +83,13 @@ function runTest(index: number)
       expect(h).toBe(resultHash[index]);
     } catch (e)
     {
-      // fail(e);
+      fail(e);
     }
     done();
   });
 }
 
-test('pool connect', async (done) =>
+beforeAll(async () =>
 {
   const config: Tasty.MySQLConfig =
     {
@@ -105,9 +105,8 @@ test('pool connect', async (done) =>
     tasty = new Tasty.Tasty(Tasty.MySQL, config);
   } catch (e)
   {
-    // fail(e);
+    fail(e);
   }
-  done();
 });
 
 for (let i = 0; i < SQLQueries.length; i++)
@@ -155,14 +154,13 @@ test('MySQL: schema', async (done) =>
   done();
 });
 
-test('pool destroy', async (done) =>
+afterAll(async () =>
 {
   try
   {
     await tasty.destroy();
   } catch (e)
   {
-    // fail(e);
+    fail(e);
   }
-  done();
 });
