@@ -67,7 +67,7 @@ export class ElasticExecutor implements TastyExecutor
     indexName: 'moviesdb',
   };
 
-  constructor(config?: ElasticExecutorConfig)
+  constructor(config?: Config)
   {
     if (config === undefined)
     {

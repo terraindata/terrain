@@ -142,7 +142,7 @@ export class Tasty
     {
       if (backend === Backend.ElasticSearch)
       {
-        this.executor = new ElasticExecutor.ElasticExecutor(config);
+        this.executor = new ElasticExecutor.ElasticExecutor(config as ElasticSearchConfig);
         this.generator = ElasticGenerator;
       }
       else if (backend === Backend.MySQL)
@@ -152,7 +152,7 @@ export class Tasty
       }
       else if (backend === Backend.SQLite)
       {
-        this.executor = new SQLiteExecutor.SQLiteExecutor(config);
+        this.executor = new SQLiteExecutor.SQLiteExecutor(config as SQLiteConfig);
         this.generator = MySQLGenerator;
       }
       this._backend = backend;

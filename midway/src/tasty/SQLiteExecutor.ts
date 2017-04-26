@@ -67,7 +67,7 @@ export class SQLiteExecutor implements TastyExecutor
   private config: Config;
   private db: sqlite3.Database;
 
-  constructor(config?: any)
+  constructor(config?: Config)
   {
     if (config === undefined)
     {
