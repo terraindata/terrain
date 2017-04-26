@@ -120,13 +120,13 @@ export const Items =
       }
     },
 
-    find: async (id) =>
+    find: async (id): Promise<ItemConfig[]> =>
     {
       if (!id)
       {
-        return null;
+        return Util.getRejectPromise<ItemConfig[]>();
       }
-      return await DB.select(Item, [], { id });
+      return await (DB.select(Item, [], { id }) as Promise<ItemConfig[]>);
     },
 
     getAll: async () =>

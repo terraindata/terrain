@@ -85,6 +85,10 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 
 Whenever new packages are installed by other devs / on other branches, run `yarn add` to get the new package locally.
 
+### Auto Styling
+
+To apply the auto styling / formatting, use `yarn run fix`
+
 ### Configuring Webstorm IDE
 
 To setup a node project using typescript for debugging inside webstorm:
