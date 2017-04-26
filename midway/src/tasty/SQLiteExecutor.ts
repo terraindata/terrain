@@ -50,6 +50,8 @@ import TastyExecutor from './TastyExecutor';
 import TastySchema from './TastySchema';
 import { makePromiseCallback, makePromiseCallback0 } from './Utils';
 
+export type Config = SQLiteConfig;
+
 export class SQLiteExecutor implements TastyExecutor
 {
   private db: SQLiteInterface;

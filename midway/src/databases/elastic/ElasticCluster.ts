@@ -73,7 +73,7 @@ class ElasticCluster
 
   private log(methodName: string, info: any)
   {
-    this.controller.log('ElasticCluster.' + methodName, info);
+    this.log('ElasticCluster.' + methodName, info);
   }
 }
 

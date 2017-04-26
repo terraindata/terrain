@@ -59,7 +59,6 @@ class ElasticInterface
 {
   private static defaultConfig: ElasticConfig = {
     hosts: ['http://localhost:9200'],
-    indexName: 'moviesdb',
   };
 
   public cluster: ElasticCluster;
@@ -122,7 +121,7 @@ class ElasticInterface
 
   private log(methodName: string, info: any)
   {
-    this.controller.log('ElasticInterface.' + methodName, info);
+    this.log('ElasticInterface.' + methodName, info);
   }
 
 }

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { IndicesGetMappingParams } from 'elasticsearch';
+import { IndicesDeleteParams, IndicesGetMappingParams } from 'elasticsearch';
 import ElasticController from './ElasticController';
 
 /**
@@ -61,7 +61,7 @@ class ElasticIndices
   }
 
   /**
-   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-cat-health
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-getmapping
    * @param params
    * @param callback
    */
@@ -71,9 +71,19 @@ class ElasticIndices
     return this.controller.client.indices.getMapping(params, callback);
   }
 
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-delete
+   * @param params
+   * @param callback
+   */
+  public delete(params: IndicesDeleteParams, callback: (errror: any, response: any, status: any) => void): void
+  {
+    return this.controller.client.indices.delete(params, callback);
+  }
+
   private log(methodName: string, info: any)
   {
-    this.controller.log('ElasticIndices.' + methodName, info);
+    this.log('ElasticIndices.' + methodName, info);
   }
 }
 
