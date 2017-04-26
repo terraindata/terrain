@@ -44,53 +44,34 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as sqlite3 from 'sqlite3';
-import * as winston from 'winston';
+import SQLiteConfig from '../databases/sqlite/SQLiteConfig';
+import SQLiteInterface from '../databases/sqlite/SQLiteInterface';
 import TastyExecutor from './TastyExecutor';
 import TastySchema from './TastySchema';
 import { makePromiseCallback, makePromiseCallback0 } from './Utils';
 
-export interface SQLiteConfig
-{
-  filename: string;
-}
-
-export type Config = SQLiteConfig;
-
-export const defaultConfig: Config =
-  {
-    filename: 'nodeway.db',
-  };
-
 export class SQLiteExecutor implements TastyExecutor
 {
-  private config: Config;
-  private db: sqlite3.Database;
+  private db: SQLiteInterface;
 
-  constructor(config?: Config)
+  constructor(config?: SQLiteConfig)
   {
-    if (config === undefined)
-    {
-      config = defaultConfig;
-    }
-
-    this.config = config;
-    this.db = new sqlite3.Database(config.filename);
+    this.db = new SQLiteInterface(config);
   }
 
   public async schema(): Promise<TastySchema>
   {
     const results = {};
-    results[this.config.filename] = {};
+    results[this.db.getFilename()] = {};
 
     const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
     for (const table of tableListResult)
     {
-      results[this.config.filename][table.name] = {};
+      results[this.db.getFilename()][table.name] = {};
       const colResult: any = await this.query(`pragma table_info(${table.name});`);
       for (const col of colResult)
       {
-        results[this.config.filename][table.name][col.name] =
+        results[this.db.getFilename()][table.name][col.name] =
           {
             type: col.type,
           };

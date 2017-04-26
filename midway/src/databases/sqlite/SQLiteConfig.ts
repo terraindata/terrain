@@ -44,37 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { ClusterHealthParams } from 'elasticsearch';
-import ElasticController from './ElasticController';
-
-/**
- * An interface which acts as a selective isomorphic wrapper around
- * the elastic.js cluster API.
- */
-class ElasticCluster
+export interface SQLiteConfig
 {
-  private controller: ElasticController;
-
-  constructor(controller: ElasticController)
-  {
-    this.controller = controller;
-  }
-
-  /**
-   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-cat-health
-   * @param params
-   * @param callback
-   */
-  public health(params: ClusterHealthParams, callback: (error: any, response: any) => void): void
-  {
-    this.log('health', params);
-    return this.controller.client.cluster.health(params, callback);
-  }
-
-  private log(methodName: string, info: any)
-  {
-    this.controller.log('ElasticCluster.' + methodName, info);
-  }
+  filename: string;
 }
 
-export default ElasticCluster;
+export default SQLiteConfig;
