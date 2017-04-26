@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as fs from 'fs';
-import * as hash from 'object-hash';
 import * as winston from 'winston';
 
 import ElasticExecutor from '../../src/tasty/ElasticExecutor';
