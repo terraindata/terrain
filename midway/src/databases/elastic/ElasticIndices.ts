@@ -49,7 +49,7 @@ import ElasticController from './ElasticController';
 
 /**
  * An interface which acts as a selective isomorphic wrapper around
- * the elastic.js cluster API.
+ * the elastic.js indices API.
  */
 class ElasticIndices
 {
@@ -67,7 +67,13 @@ class ElasticIndices
    */
   public getMapping(params: IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void
   {
+    this.log('getMapping', params);
     return this.controller.client.indices.getMapping(params, callback);
+  }
+
+  private log(methodName: string, info: any)
+  {
+    this.controller.log('ElasticIndices', methodName, info);
   }
 }
 

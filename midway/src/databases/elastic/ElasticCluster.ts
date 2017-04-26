@@ -67,7 +67,13 @@ class ElasticCluster
    */
   public health(params: ClusterHealthParams, callback: (error: any, response: any) => void): void
   {
+    this.log('health', params);
     return this.controller.client.cluster.health(params, callback);
+  }
+
+  private log(methodName: string, info: any)
+  {
+    this.controller.log('ElasticCluster', methodName, info);
   }
 }
 

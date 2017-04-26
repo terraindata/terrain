@@ -90,19 +90,21 @@ test('basic query', async (done) =>
 {
   try
   {
-    const h = await elasticSearch.fullQuery(
+    const result = await elasticSearch.fullQuery(
       {
         index: 'movies',
         type: 'data',
         body: {
           query: {},
+          sort: [{ revenue: 'desc' }, { movieid: 'asc' }],
         },
         size: 1,
       },
     );
-    // winston.info(JSON.stringify(h, null, 2));
+    // winston.info(JSON.stringify(result, null, 2));
     // console.log(h.hits.hits.forEach(
     //     (result) => {console.log(JSON.stringify(result, null, 2));}));
+    await Utils.checkResults(getExpectedFile(), 'basic query', result.hits);
   }
   catch (e)
   {
@@ -182,7 +184,7 @@ test('stored PWL transform sort query', async (done) =>
 {
   try
   {
-    const results = await elasticSearch.query(
+    const result = await elasticSearch.query(
       {
         index: 'movies',
         type: 'data',
@@ -254,7 +256,7 @@ test('stored PWL transform sort query', async (done) =>
         },
       });
 
-    await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query', results);
+    await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query', result);
   }
   catch (e)
   {
@@ -267,7 +269,7 @@ test('stored PWL transform sort query using function_score', async (done) =>
 {
   try
   {
-    const results = await elasticSearch.query(
+    const result = await elasticSearch.query(
       {
         index: 'movies',
         type: 'data',
@@ -345,7 +347,7 @@ test('stored PWL transform sort query using function_score', async (done) =>
         },
       });
 
-      await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query using function_score', results);
+    await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query using function_score', result);
   }
   catch (e)
   {

@@ -49,6 +49,7 @@ import * as Elastic from 'elasticsearch';
 import ElasticCluster from './ElasticCluster';
 import ElasticConfig from './ElasticConfig';
 import ElasticController from './ElasticController';
+import ElasticIndices from './ElasticIndices';
 
 /**
  * An interface which acts as a selective isomorphic wrapper around
@@ -62,12 +63,14 @@ class ElasticInterface
   };
 
   public cluster: ElasticCluster;
+  public indices: ElasticIndices;
   private controller: ElasticController;
 
   constructor(config: ElasticConfig = ElasticInterface.defaultConfig)
   {
     this.controller = new ElasticController(config);
     this.cluster = new ElasticCluster(this.controller);
+    this.indices = new ElasticIndices(this.controller);
   }
 
   /**
@@ -75,6 +78,7 @@ class ElasticInterface
    */
   public bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void
   {
+    this.log('bulk', params);
     return this.controller.client.bulk(params, callback);
   }
 
@@ -84,6 +88,7 @@ class ElasticInterface
   public delete(params: Elastic.DeleteDocumentParams,
     callback: (error: any, response: Elastic.DeleteDocumentResponse) => void): void
   {
+    this.log('delete', params);
     return this.controller.client.delete(params, callback);
   }
 
@@ -92,6 +97,7 @@ class ElasticInterface
    */
   public index<T>(params: Elastic.IndexDocumentParams<T>, callback: (error: any, response: any) => void): void
   {
+    this.log('index', params);
     return this.controller.client.index(params, callback);
   }
 
@@ -100,6 +106,7 @@ class ElasticInterface
    */
   public putScript(params: Elastic.PutScriptParams, callback: (err: any, response: any, status: any) => void): void
   {
+    this.log('putScript', params);
     return this.controller.client.putScript(params, callback);
   }
 
@@ -109,7 +116,13 @@ class ElasticInterface
   public search<T>(params: Elastic.SearchParams,
     callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
   {
+    this.log('search', params);
     return this.controller.client.search(params, callback);
+  }
+
+  private log(methodName: string, info: any)
+  {
+    this.controller.log('ElasticInterface', methodName, info);
   }
 
 }

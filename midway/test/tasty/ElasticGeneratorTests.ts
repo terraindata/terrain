@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import {ElasticExecutor} from '../../src/tasty/ElasticExecutor';
+import { ElasticExecutor } from '../../src/tasty/ElasticExecutor';
 import * as Tasty from '../../src/tasty/Tasty';
-import {TastyTable} from '../../src/tasty/TastyTable';
+import { TastyTable } from '../../src/tasty/TastyTable';
 
 let DBMovies: TastyTable;
 

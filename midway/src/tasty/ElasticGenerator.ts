@@ -50,7 +50,8 @@ import TastyNode from './TastyNode';
 import TastyNodeTypes from './TastyNodeTypes';
 import TastyQuery from './TastyQuery';
 
-export interface ElasticTastyQuery {
+export interface ElasticTastyQuery
+{
   index: string;
   table: string;
   op: string;
@@ -124,7 +125,7 @@ export default class ElasticGenerator
       queryParam['size'] = query.numTaken;
     }
 
-    //start the body
+    // start the body
     const bodyFields = this.getSubclauseObject(queryParam, 'body');
 
     // stored_fields clause
@@ -149,7 +150,7 @@ export default class ElasticGenerator
     // filter clause
     if (query.filters.length > 0)
     {
-      //const filterClause = this.getSubclauseObject(queryFields, 'bool', 'filter');
+      // const filterClause = this.getSubclauseObject(queryFields, 'bool', 'filter');
       for (let i = 0; i < query.filters.length; ++i)
       {
         const filter = query.filters[i];

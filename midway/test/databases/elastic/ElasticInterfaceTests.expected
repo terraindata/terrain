@@ -1,5 +1,5 @@
 {
-  "basic query" : {
+  "search" : {
     "total" : 27278,
     "max_score" : null,
     "hits" : [
@@ -35,7 +35,131 @@
       }
     ]
   },
-  "put script" : {
+  "indices.getMapping" : {
+    "movies" : {
+      "mappings" : {
+        "data" : {
+          "properties" : {
+            "@version" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            },
+            "backdroppath" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            },
+            "budget" : {
+              "type" : "long"
+            },
+            "genres" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            },
+            "homepage" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            },
+            "language" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            },
+            "movieid" : {
+              "type" : "long"
+            },
+            "overview" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            },
+            "popularity" : {
+              "type" : "float"
+            },
+            "posterpath" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            },
+            "releasedate" : {
+              "type" : "date"
+            },
+            "revenue" : {
+              "type" : "long"
+            },
+            "runtime" : {
+              "type" : "long"
+            },
+            "status" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            },
+            "tagline" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            },
+            "title" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            },
+            "voteaverage" : {
+              "type" : "float"
+            },
+            "votecount" : {
+              "type" : "long"
+            }
+          }
+        }
+      }
+    }
+  },
+  "putScript" : {
     "total" : 27278,
     "max_score" : null,
     "hits" : [
