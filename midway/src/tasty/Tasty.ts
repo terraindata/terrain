@@ -126,6 +126,7 @@ export class Tasty
 // The backend executor and generator
   private executor: TastyExecutor;
   private generator: any;
+  private _backend: Backend;
 
   /**
    * Creates an instance of Tasty.
@@ -141,24 +142,30 @@ export class Tasty
     {
       if (backend === Backend.ElasticSearch)
       {
-        this.executor = new ElasticExecutor.ElasticExecutor(config);
+        this.executor = new ElasticExecutor.ElasticExecutor(config as ElasticSearchConfig);
         this.generator = ElasticGenerator;
       }
       else if (backend === Backend.MySQL)
       {
-        this.executor = new MySQLExecutor.MySQLExecutor(config);
+        this.executor = new MySQLExecutor.MySQLExecutor(config as MySQLConfig);
         this.generator = MySQLGenerator;
       }
       else if (backend === Backend.SQLite)
       {
-        this.executor = new SQLiteExecutor.SQLiteExecutor(config);
+        this.executor = new SQLiteExecutor.SQLiteExecutor(config as SQLiteConfig);
         this.generator = MySQLGenerator;
       }
+      this._backend = backend;
     }
     catch (error)
     {
       throw Error('Failed to initialize backend ' + Backend[backend] + ':' + error);
     }
+  }
+
+  public get backend(): Backend
+  {
+    return this._backend;
   }
 
   public async generate(query: TastyQuery): Promise<string>
