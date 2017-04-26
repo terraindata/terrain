@@ -49,4 +49,3 @@ import { ConfigOptions } from 'elasticsearch';
 export type ElasticConfig = ConfigOptions;
 
 export default ElasticConfig;
-
