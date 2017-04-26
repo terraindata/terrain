@@ -147,7 +147,7 @@ export class Tasty
       }
       else if (backend === Backend.MySQL)
       {
-        this.executor = new MySQLExecutor.MySQLExecutor(config);
+        this.executor = new MySQLExecutor.MySQLExecutor(config as MySQLConfig);
         this.generator = MySQLGenerator;
       }
       else if (backend === Backend.SQLite)
