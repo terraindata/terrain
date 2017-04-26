@@ -64,9 +64,9 @@ export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => 
 export async function checkResults(fileName: string, testName: string, results: any)
 {
   const contents: any = await new Promise((resolve, reject) =>
-    {
-      fs.readFile(fileName, makePromiseCallback(resolve, reject));
-    });
+  {
+    fs.readFile(fileName, makePromiseCallback(resolve, reject));
+  });
 
   const expected = JSON.parse(contents);
   expect(results).toEqual(expected[testName]);

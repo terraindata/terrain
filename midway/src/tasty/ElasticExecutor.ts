@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { Client, ConfigOptions, SearchParams } from 'elasticsearch';
-import {ElasticTastyQuery} from './ElasticGenerator';
+import { ElasticTastyQuery } from './ElasticGenerator';
 import TastyExecutor from './TastyExecutor';
 import TastySchema from './TastySchema';
 import TastyTable from './TastyTable';
@@ -230,14 +230,6 @@ export class ElasticExecutor implements TastyExecutor
   private async executeElasticTastySelectQuery(query: ElasticTastyQuery)
   {
     return await this.query(query.param as SearchParams);
-  }
-
-  private async executeElasticTastyUpsertQuery(query)
-  {
-  }
-
-  private async executeElasticTastyDeleteQuery(query)
-  {
   }
 
   private async bulkUpsert(table: TastyTable, elements: object[]): Promise<any>
