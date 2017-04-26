@@ -46,6 +46,9 @@ THE SOFTWARE.
 
 import DatabaseMap from './DatabaseMap';
 
-const Databases = new DatabaseMap();
+/**
+ * The global database map of all databases being managed.
+ */
+let Databases = new DatabaseMap();
 
 export default Databases;

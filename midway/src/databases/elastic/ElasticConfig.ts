@@ -46,9 +46,7 @@ THE SOFTWARE.
 
 import { ConfigOptions } from 'elasticsearch';
 
-export interface ElasticConfig extends ConfigOptions
-{
-  indexName: string;
-}
+export type ElasticConfig = ConfigOptions;
 
 export default ElasticConfig;
+

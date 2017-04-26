@@ -44,6 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+/**
+ * This is where we store connections to databases being managed.
+ */
 class DatabaseMap
 {
   private map: Map<string, object>;
