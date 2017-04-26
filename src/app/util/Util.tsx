@@ -453,18 +453,24 @@ var Util = {
     });
   },
 
-  bindAll(instance, Clss?: { prototype: any })
-  {
-    for(var m in instance)
-    {
-      // auto-bind child methods to this
-      if((!Clss || !Clss.prototype[m]) && typeof instance[m] === 'function')
-      {
-        instance[m] = instance[m].bind(instance);
-      }
-    }
+  // bindAll(instance, Clss?: { prototype: any })
+  // {
+  //   console.log('========')
+  //   console.log(instance);
+  //   console.log(instance['handleEnd']);
+  //   console.log(instance.prototype);
+  //   for(var m in instance)
+  //   {
+  //     console.log(m);
+  //     // auto-bind child methods to this
+  //     if((!Clss || !Clss.prototype[m]) && typeof instance[m] === 'function')
+  //     {
+  //       console.log('bind');
+  //       instance[m] = instance[m].bind(instance);
+  //     }
+  //   }
 
-  },
+  // },
 
   bind(component: React.Component<any, any>, ...args: any[])
   {

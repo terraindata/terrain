@@ -106,7 +106,7 @@ class Loading extends PureClasss<Props>
   ];
 
   imgLooper: ImgLooper;
-
+  
   componentDidMount()
   {
     this.imgLooper = new ImgLooper(ReactDOM.findDOMNode(this.refs['sprites']) as any, this.props.width, this.stageParams);

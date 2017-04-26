@@ -66,7 +66,16 @@ class Classs<T> extends React.Component<T, any>
   {
     super(props);
 
-    Util.bindAll(this, Classs);
+    // copied from https://github.com/sindresorhus/auto-bind
+    let self = this;
+    for (const key of Object.getOwnPropertyNames(self.constructor.prototype)) 
+    {
+      const val = self[key];
+
+      if (key !== 'constructor' && typeof val === 'function') {
+        self[key] = val.bind(self);
+      }
+    }
 
     let unmountFn = this['componentWillUnmount'];
     this['componentWillUnmount'] = () =>
