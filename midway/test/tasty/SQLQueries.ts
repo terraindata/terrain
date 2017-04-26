@@ -75,7 +75,7 @@ const SQLQueries: Array<[string, string]> = [
   ['simple query (delete)',
     `DELETE \n  FROM movies\n  WHERE movies.movieid = 13371337;`],
 
-  ['complex query (MySQL)',
+  ['complex query',
     `SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies
   WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'
      AND movies.releasedate < '2017-03-24'
