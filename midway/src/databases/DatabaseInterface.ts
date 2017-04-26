@@ -44,37 +44,40 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { ClusterHealthParams } from 'elasticsearch';
-import ElasticController from './ElasticController';
+import * as winston from 'winston';
 
 /**
  * An interface which acts as a selective isomorphic wrapper around
- * the elastic.js cluster API.
+ * the sqlite3 API
  */
-class ElasticCluster
+class DatabaseInterface
 {
-  private controller: ElasticController;
+  private static count: number = 0; // interface count for generating ids
 
-  constructor(controller: ElasticController)
+  private id: string; // unique id
+  private lsn: number; // log sequence number
+  private type: string; // connection type
+  private name: string; // connection name
+  private header: string; // log entry header
+
+  constructor(type: string, name: string = 'unnamed')
   {
-    this.controller = controller;
+    this.id = (DatabaseInterface.count++).toString();
+    this.lsn = -1;
+    this.type = type;
+    this.name = name;
+    this.header = this.type + ':' + this.name + ':' + this.id + ':';
   }
 
-  /**
-   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-cat-health
-   * @param params
-   * @param callback
-   */
-  public health(params: ClusterHealthParams, callback: (error: any, response: any) => void): void
+  protected log(methodName: string, info?: any)
   {
-    this.log('health', params);
-    return this.controller.client.cluster.health(params, callback);
-  }
-
-  private log(methodName: string, info: any)
-  {
-    this.controller.log('ElasticCluster.' + methodName, info);
+    const header = this.header + (++this.lsn).toString() + ':' + methodName;
+    winston.info(header);
+    if (info !== 'undefined')
+    {
+      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
+    }
   }
 }
 
-export default ElasticCluster;
+export default DatabaseInterface;

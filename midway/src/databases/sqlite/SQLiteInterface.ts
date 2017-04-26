@@ -44,37 +44,48 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { ClusterHealthParams } from 'elasticsearch';
-import ElasticController from './ElasticController';
+import * as sqlite3 from 'sqlite3';
+import DatabaseInterface from '../DatabaseInterface';
+import SQLiteConfig from './SQLiteConfig';
 
 /**
  * An interface which acts as a selective isomorphic wrapper around
- * the elastic.js cluster API.
+ * the sqlite3 API
  */
-class ElasticCluster
+class SQLiteInterface extends DatabaseInterface
 {
-  private controller: ElasticController;
-
-  constructor(controller: ElasticController)
+  private static defaultConfig: SQLiteConfig =
   {
-    this.controller = controller;
+    filename: 'nodeway.db',
+  };
+
+  private config: SQLiteConfig;
+  private db: sqlite3.Database;
+
+  constructor(config: SQLiteConfig = SQLiteInterface.defaultConfig, name?: string)
+  {
+    super('SQLiteInterface', name);
+
+    this.config = config;
+    this.db = new sqlite3.Database(config.filename);
   }
 
-  /**
-   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-cat-health
-   * @param params
-   * @param callback
-   */
-  public health(params: ClusterHealthParams, callback: (error: any, response: any) => void): void
+  public getFilename(): string
   {
-    this.log('health', params);
-    return this.controller.client.cluster.health(params, callback);
+    return this.config.filename;
   }
 
-  private log(methodName: string, info: any)
+  public all(sql: string, callback?: (err: Error, rows: any[]) => void): sqlite3.Database
   {
-    this.controller.log('ElasticCluster.' + methodName, info);
+    this.log('all', sql);
+    return this.db.all(sql, callback);
+  }
+
+  public close(callback?: (err: Error) => void): void
+  {
+    this.log('close');
+    return this.db.close(callback);
   }
 }
 
-export default ElasticCluster;
+export default SQLiteInterface;
