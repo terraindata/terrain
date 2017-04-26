@@ -53,6 +53,8 @@ import TastySchema from './TastySchema';
 import TastyTable from './TastyTable';
 import { makePromiseCallback } from './Utils';
 
+export type Config = ElasticConfig;
+
 export class ElasticExecutor implements TastyExecutor
 {
   private client: ElasticInterface;

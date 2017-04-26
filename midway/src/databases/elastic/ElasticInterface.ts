@@ -59,7 +59,6 @@ class ElasticInterface
 {
   private static defaultConfig: ElasticConfig = {
     hosts: ['http://localhost:9200'],
-    indexName: 'moviesdb',
   };
 
   public cluster: ElasticCluster;

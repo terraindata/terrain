@@ -69,7 +69,7 @@ class DatabaseInterface
     this.header = this.type + ':' + this.name + ':' + this.id + ':';
   }
 
-  protected log(methodName: string, info?: any)
+  public log(methodName: string, info?: any)
   {
     const header = this.header + (++this.lsn).toString() + ':' + methodName;
     winston.info(header);
