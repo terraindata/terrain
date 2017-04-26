@@ -49,6 +49,7 @@ import * as Elastic from 'elasticsearch';
 import ElasticCluster from './ElasticCluster';
 import ElasticConfig from './ElasticConfig';
 import ElasticController from './ElasticController';
+import ElasticIndices from './ElasticIndices';
 
 /**
  * An interface which acts as a selective isomorphic wrapper around
@@ -63,11 +64,13 @@ class ElasticInterface
 
   public cluster: ElasticCluster;
   private controller: ElasticController;
+  private indices: ElasticIndices;
 
   constructor(config: ElasticConfig = ElasticInterface.defaultConfig)
   {
     this.controller = new ElasticController(config);
     this.cluster = new ElasticCluster(this.controller);
+    this.indices = new ElasticIndices(this.controller);
   }
 
   /**

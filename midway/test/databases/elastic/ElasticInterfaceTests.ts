@@ -76,7 +76,7 @@ test('elastic health', async (done) =>
   done();
 });
 
-test('basic query', async (done) =>
+test('search', async (done) =>
 {
   try
   {
@@ -95,7 +95,7 @@ test('basic query', async (done) =>
         makePromiseCallback(resolve, reject));
     });
     winston.info(JSON.stringify(result, null, 2));
-    await Utils.checkResults(getExpectedFile(), 'basic query', result.hits);
+    await Utils.checkResults(getExpectedFile(), 'search', result.hits);
   }
   catch (e)
   {
@@ -105,7 +105,28 @@ test('basic query', async (done) =>
   done();
 });
 
-test('put script', async (done) =>
+test('indices.getMapping', async (done) =>
+{
+  try
+  {
+    const result = await new Promise((resolve, reject) =>
+    {
+      elasticInterface.indices.getMapping(
+        {},
+        makePromiseCallback(resolve, reject));
+    });
+    winston.info(JSON.stringify(result, null, 2));
+    await Utils.checkResults(getExpectedFile(), 'indices.getMapping', result);
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+
+  done();
+});
+
+test('putScript', async (done) =>
 {
   try
   {
@@ -146,7 +167,7 @@ test('put script', async (done) =>
         makePromiseCallback(resolve, reject));
     });
     winston.info(JSON.stringify(result, null, 2));
-    await Utils.checkResults(getExpectedFile(), 'put script', result.hits);
+    await Utils.checkResults(getExpectedFile(), 'putScript', result.hits);
   }
   catch (e)
   {
