@@ -44,8 +44,25 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DatabaseMap from './DatabaseMap';
+import { Client } from 'elasticsearch';
+import ElasticConfig from './ElasticConfig';
 
-const Databases = new DatabaseMap();
+/**
+ * Contains the elastic client and config.
+ * The central controller for the Elastic isomporphic wrapper.
+ */
+class ElasticController
+{
+  public config: ElasticConfig;
+  public client: Client;
 
-export default Databases;
+  constructor(config: ElasticConfig)
+  {
+    // Do not reuse objects to configure the elasticsearch Client class:
+    // https://github.com/elasticsearch/elasticsearch-js/issues/33
+    this.config = JSON.parse(JSON.stringify(config));
+    this.client = new Client(this.config);
+  }
+}
+
+export default ElasticController;

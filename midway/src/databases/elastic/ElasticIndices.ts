@@ -44,8 +44,31 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DatabaseMap from './DatabaseMap';
+import { IndicesGetMappingParams } from 'elasticsearch';
+import ElasticController from './ElasticController';
 
-const Databases = new DatabaseMap();
+/**
+ * An interface which acts as a selective isomorphic wrapper around
+ * the elastic.js cluster API.
+ */
+class ElasticIndices
+{
+  private controller: ElasticController;
 
-export default Databases;
+  constructor(controller: ElasticController)
+  {
+    this.controller = controller;
+  }
+
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-cat-health
+   * @param params
+   * @param callback
+   */
+  public getMapping(params: IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void
+  {
+    return this.controller.client.indices.getMapping(params, callback);
+  }
+}
+
+export default ElasticIndices;

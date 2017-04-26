@@ -44,8 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DatabaseMap from './DatabaseMap';
+import { ConfigOptions } from 'elasticsearch';
 
-const Databases = new DatabaseMap();
+export interface ElasticConfig extends ConfigOptions
+{
+  indexName: string;
+}
 
-export default Databases;
+export default ElasticConfig;
