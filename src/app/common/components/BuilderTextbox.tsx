@@ -103,8 +103,8 @@ export interface Props
   showWhenCards?: boolean;
   display?: Display;
   
-  onFocus?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent) => void;
-  onBlur?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent) => void;
+  onFocus?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent<any>) => void;
+  onBlur?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent<any>) => void;
 }
 
 class BuilderTextbox extends PureClasss<Props>
@@ -219,13 +219,13 @@ class BuilderTextbox extends PureClasss<Props>
     
   }
   
-  handleFocus(event:React.FocusEvent)
+  handleFocus(event:React.FocusEvent<any>)
   {
     this.props.onFocus && this.props.onFocus(this, event.target['value'], event);
     this.computeOptions(); // need to lazily compute autocomplete options when needed
   }
 
-  handleBlur(event:React.FocusEvent, value: string)
+  handleBlur(event:React.FocusEvent<any>, value: string)
   {
     this.props.onBlur && this.props.onBlur(this, value, event);
   }

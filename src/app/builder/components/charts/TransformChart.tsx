@@ -44,7 +44,9 @@ THE SOFTWARE.
 
 require('./TransformChart.less');
 
-import * as d3 from 'd3';
+// consider upgrading to v4 which has types
+const d3 = require('d3');
+// import * as d3 from 'd3';
 import * as _ from 'underscore';
 import * as $ from 'jquery';
 import Util from '../../../util/Util';

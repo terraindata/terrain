@@ -52,7 +52,7 @@ import {BaseClass, New} from '../../Classes';
 
 class SpotlightStateC extends BaseClass
 {
-  spotlights: Map<string, any> = Map({});
+  spotlights: IMMap<string, any> = Map({});
 }
 export type SpotlightState = SpotlightStateC & IRecord<SpotlightStateC>;
 export const _SpotlightState = (config?: {[key:string]: any}) => 
@@ -102,7 +102,7 @@ export const SpotlightStore: IStore<SpotlightState> = Redux.createStore(
       {
         return state.set('spotlights', Map({}));
       },
-  }), 
+  }, DefaultState), 
 DefaultState);
 
 export function spotlightAction(id: string, result: any)

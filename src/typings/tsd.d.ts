@@ -43,13 +43,14 @@ THE SOFTWARE.
 */
 
 
-/// <reference path="./react/react.d.ts" />
+// used to  <reference path="./react/react.d.ts" />
 /// <reference path="../../node_modules/immutable/dist/immutable.d.ts" />
+/// <reference path="../../node_modules/moment/moment.d.ts" />
 
-/// <reference path="redux-actions/redux-actions.d.ts" />
-/// <reference path="react/react-dom.d.ts" />
+// used to <reference path="redux-actions/redux-actions.d.ts" />
+// used to <reference path="react/react-dom.d.ts" />
 
-import React = __React;
+// import React = __React;
 
 interface Array<T> {
   find(predicate: (search: T) => boolean) : T;
@@ -64,7 +65,7 @@ interface Action<T> {
 declare type List<T> = Immutable.List<T>;
 declare type IMMap<K, T> = Immutable.Map<K, T>;
 declare type KeyPath = List<string | number>;
-declare type IMSet<T> = (f: string, v: any) => T & IRecord<T>;
+declare type SetFn<T> = (f: string, v: any) => T & IRecord<T>;
 declare type SetIn<T> = (f: (string | number)[] | KeyPath, v: any) => T & IRecord<T>;
 declare type Get = (f: string | number) => any;
 declare type GetIn = (f: (string | number)[] | KeyPath) => any;
@@ -82,7 +83,7 @@ declare interface IStore<T>
 
 declare interface IMap<T>
 {
-  set: Set<T>;
+  set: SetFn<T>;
   setIn: SetIn<T>;
   get: Get;
   getIn: GetIn;
@@ -106,7 +107,7 @@ declare interface IRecord<T> extends IMap<T>
 declare type El = JSX.Element;
 declare type Ref = React.Component<any, any> | Element;
 
-declare type MEvent = React.MouseEvent;
+declare type MEvent = React.MouseEvent<any>;
 
 declare type ID = string;
 declare interface IId

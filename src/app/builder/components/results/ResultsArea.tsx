@@ -48,7 +48,8 @@ const {Map,List} = Immutable;
 import * as _ from 'underscore';
 import * as React from 'react';
 import * as classNames from 'classnames';
-import * as moment from 'moment';
+// import * as moment from 'moment';
+const moment = require('moment');
 
 import Util from '../../../util/Util';
 import Ajax from '../../../util/Ajax';

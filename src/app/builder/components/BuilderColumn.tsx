@@ -58,7 +58,6 @@ import RolesStore from '../../roles/data/RolesStore';
 import LibraryTypes from '../../library/LibraryTypes';
 import InfoArea from '../../common/components/InfoArea';
 const shallowCompare = require('react-addons-shallow-compare');
-import * as moment from 'moment';
 import Ajax from "./../../util/Ajax";
 import BuilderTypes from '../BuilderTypes';
 type Query = BuilderTypes.Query;

@@ -395,5 +395,6 @@ const dropCollect = (connect, monitor) =>
   item: monitor.getItem(),
 });
 
+const CDA = DropTarget<Props>('CARD', cardTarget, dropCollect)(CardDropArea) as any;
 
-export default DropTarget('CARD', cardTarget, dropCollect)(CardDropArea);
+export default CDA;

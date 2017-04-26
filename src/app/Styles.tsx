@@ -80,39 +80,39 @@ export const Styles =
 	font:
 	{
 		title: {
-		  fontWeight: 'bold',
+		  fontWeight: 1000,
 		  fontSize: '16px',
 		},
 		semiBoldBig: {
-		  fontWeight: '600',
+		  fontWeight: 600,
 		  fontSize: '14px',
 		},
 		big: {
-		  fontWeight: '400',
+		  fontWeight: 400,
 		  fontSize: '14px',
 		},
 		boldNormal: {
-		  fontWeight: 'bold',
+		  fontWeight: 1000,
 		  fontSize: '12px',
 		},
 		semiBoldNormal: {
-		  fontWeight: '500',
+		  fontWeight: 500,
 		  fontSize: '12px',
 		},
 		normal: {
-		  fontWeight: '400',
+		  fontWeight: 400,
 		  fontSize: '12px',
 		},
 		smallBold: {
-		  fontWeight: 'bold',
+		  fontWeight: 1000,
 		  fontSize: '10px',
 		},
 		small: {
-		  fontWeight: '400',
+		  fontWeight: 400,
 		  fontSize: '10px',
 		},
 		smallest: {
-		  fontWeight: '400',
+		  fontWeight: 400,
 		  fontSize: '9px',
 		},
 	},

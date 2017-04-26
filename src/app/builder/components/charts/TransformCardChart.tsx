@@ -80,7 +80,7 @@ export interface Props
 class TransformCardChart extends PureClasss<Props>
 {
   state: {
-    selectedPointIds: Map<string, boolean>;
+    selectedPointIds: IMMap<string, boolean>;
     lastSelectedPointId?: string;
     initialScore?: number;
     initialValue?: number;
@@ -90,7 +90,7 @@ class TransformCardChart extends PureClasss<Props>
     moveSeed: number;
     movedSeed: number;
   } = {
-    selectedPointIds: Map({}),
+    selectedPointIds: Map<string, boolean>({}),
     moveSeed: 0,
     movedSeed: -1,
   };
@@ -131,7 +131,7 @@ class TransformCardChart extends PureClasss<Props>
     }
     else
     {
-      selectedPointIds = Map({});
+      selectedPointIds = Map<string, boolean>({});
     }
     // else, a click to unselect things
     

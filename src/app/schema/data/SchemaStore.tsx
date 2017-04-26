@@ -58,7 +58,7 @@ type Column = SchemaTypes.Column;
 type Index = SchemaTypes.Index;
 
 export const SchemaStore: IStore<SchemaState> = 
-	Redux.createStore(ReduxActions.handleActions(
+	Redux.createStore(ReduxActions.handleActions<SchemaState, any>(
 		{
 			[SchemaActionTypes.fetch]:
 				(state: SchemaState) =>
@@ -133,7 +133,8 @@ export const SchemaStore: IStore<SchemaState> =
 				}>) =>
 					state.set('highlightedId', action.payload.id)
 						.set('highlightedInSearchResults', action.payload.inSearchResults),
-		}
+		},
+		DEV ? ExampleSchemaData : SchemaTypes._SchemaState()
 	), DEV ? ExampleSchemaData : SchemaTypes._SchemaState());
 
 

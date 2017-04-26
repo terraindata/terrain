@@ -53,7 +53,7 @@ import {BuilderState} from './BuilderStore';
 import Util from '../../util/Util';
 import LibraryStore from '../../library/data/LibraryStore';
 
-const BuidlerReducers: ReduxActions.ReducerMap<BuilderState> =
+const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 {
   
 [ActionTypes.fetchQuery]:

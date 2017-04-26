@@ -102,8 +102,8 @@ export interface Display
   getAutoTerms?: (comp?:React.Component<any, any>) => List<string>; // overrides standard terms
   autoDisabled?: boolean;
   showWhenCards?: boolean;
-  onFocus?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent) => void;
-  onBlur?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent) => void;
+  onFocus?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent<any>) => void;
+  onBlur?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent<any>) => void;
   
   // for rows and FLEX, content to display above/below,   
   above?: Display;

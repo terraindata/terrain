@@ -60,6 +60,13 @@ export interface Props
 
 class SchemaPage extends PureClasss<Props>
 {
+  state: {
+    on: boolean;
+    name?: string;
+  } = {
+    on: false,
+  };
+  
   render()
   {
     return (
@@ -71,4 +78,7 @@ class SchemaPage extends PureClasss<Props>
   }
 }
 
-export default DragDropContext(HTML5Backend)(SchemaPage);
+// ReactRouter does not like the output of DragDropContext, hence the `any` cast
+const SchemaExport = DragDropContext(HTML5Backend)(SchemaPage) as any;
+
+export default SchemaExport;

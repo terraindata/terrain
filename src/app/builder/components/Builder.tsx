@@ -50,7 +50,6 @@ import * as $ from 'jquery';
 import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
 import * as Immutable from 'immutable';
-import * as moment from 'moment';
 var HTML5Backend = require('react-dnd-html5-backend');
 const {browserHistory} = require('react-router');
 const { withRouter } = require('react-router');
@@ -102,7 +101,7 @@ class Builder extends PureClasss<Props>
 {
   state: {
     builderState: BuilderState,
-    variants: Map<ID, Variant>,
+    variants: IMMap<ID, Variant>,
     
     colKeys: List<number>;
     noColumnAnimation: boolean;
@@ -732,7 +731,8 @@ class Builder extends PureClasss<Props>
 
     if(variant && variant.version)
     {
-      var lastEdited = moment(variant.lastEdited).format("h:mma on M/D/YY")
+      let lastEdited = Util.formatDate(variant.lastEdited);
+      
       return (
         <div className='builder-revert-toolbar'> 
           <div className='builder-revert-time-message'>

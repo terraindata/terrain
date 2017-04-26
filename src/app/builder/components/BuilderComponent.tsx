@@ -94,7 +94,7 @@ class BuilderComponent extends PureClasss<Props>
   renderDisplay(
     displayArg: Display | Display[],
     parentKeyPath: KeyPath,
-    data: Map<any, any>, 
+    data: IMMap<any, any>, 
     options?: {
       className: string;
     }
@@ -344,7 +344,9 @@ class BuilderComponent extends PureClasss<Props>
       break;
       default:
         content = (
-          <div key={key}>Data type {DisplayType[d.displayType]} not implemented.</div>
+          <div key={key}>
+            Data type {d.displayType} not implemented.
+          </div>
         );
     }
     

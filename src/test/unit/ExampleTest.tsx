@@ -45,7 +45,8 @@ THE SOFTWARE.
 /// <reference path="../../typings/tsd.d.ts" />
 
 import * as test from 'tape';
-import * as TestUtils from 'react-addons-test-utils';
+// import * as TestUtils from 'react-addons-test-utils';
+const TestUtils = require('react-addons-test-utils');
 import * as ReactDom from 'react-dom';
 import * as React from 'react';
 

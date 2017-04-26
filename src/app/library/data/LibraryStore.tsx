@@ -66,14 +66,14 @@ class LibraryStateC
   loading = true;
   dbs: List<string> = Immutable.List([]);
   
-  groups: Map<ID, Group> = null;
-  algorithms: Map<ID, Algorithm> = null;
-  variants: Map<ID, Variant> = null;
+  groups: IMMap<ID, Group> = null;
+  algorithms: IMMap<ID, Algorithm> = null;
+  variants: IMMap<ID, Variant> = null;
   
   // these are set these on initial load
-  prevGroups: Map<ID, Group> = null;
-  prevAlgorithms: Map<ID, Algorithm> = null;
-  prevVariants: Map<ID, Variant> = null;
+  prevGroups: IMMap<ID, Group> = null;
+  prevAlgorithms: IMMap<ID, Algorithm> = null;
+  prevVariants: IMMap<ID, Variant> = null;
   
   groupsOrder: List<ID> = Immutable.List([]);
   
@@ -92,7 +92,7 @@ var DefaultState = _LibraryState();
 
 import LibraryReducers from './LibraryReducers';
 
-function saveStateOf(current: Map<ID, any>, previous: Map<ID, any>)
+function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
 {
   if(current !== previous)
   {

@@ -52,21 +52,21 @@ import PureClasss from '../../common/components/PureClasss';
 var ExpandIcon = require("./../../../images/icon_expand_12x12.svg?name=ExpandIcon");
 var linkHeight = 36; // Coordinate with Sidebar.less
 
-interface Link {
+export interface ILink {
   icon: any;
   text: string;
   route: string;
 }
 
 export interface Props {
-  links: Link[];
+  links: ILink[];
   selectedIndex: number;
   expandable?: boolean;
   expanded?: boolean;
   onExpand?: () => void;
 }
 
-class Sidebar extends PureClasss<Props>
+export class Sidebar extends PureClasss<Props>
 {
 	render() 
   {

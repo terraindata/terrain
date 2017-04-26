@@ -63,9 +63,9 @@ export module SchemaParser
 		});
 		let databaseId = database.id;
 		
-		let tables: Map<ID, Table> = Map<ID, Table>({});
-		let columns: Map<ID, Column> =  Map<ID, Column>({});
-		let indexes: Map<ID, Index> =  Map<ID, Index>({});
+		let tables: IMMap<ID, Table> = Map<ID, Table>({});
+		let columns: IMMap<ID, Column> =  Map<ID, Column>({});
+		let indexes: IMMap<ID, Index> =  Map<ID, Index>({});
 		
 		let tableNames = List<string>([]);
 		let columnNamesByTable = Map<string, List<string>>([]);

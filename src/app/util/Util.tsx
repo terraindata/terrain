@@ -43,7 +43,8 @@ THE SOFTWARE.
 */
 
 import * as $ from 'jquery';
-import * as moment from 'moment';
+// import * as moment from 'moment';
+const moment = require('moment');
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
 import * as Immutable from "immutable";

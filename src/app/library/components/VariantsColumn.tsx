@@ -44,7 +44,9 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import * as _ from 'underscore';
-import * as moment from 'moment';
+// import * as moment from 'moment';
+const moment = require('moment');
+
 import Classs from './../../common/components/Classs';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';

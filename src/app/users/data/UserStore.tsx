@@ -56,7 +56,7 @@ import UserReducers from './UserReducers';
 
 let UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   UserReducers,
-{})), new UserTypes.UserState({}));
+{}), new UserTypes.UserState({})), new UserTypes.UserState({}));
 
 UserStore.subscribe(() =>
 {

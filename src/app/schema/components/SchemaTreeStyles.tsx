@@ -130,7 +130,6 @@ const SchemaTreeStyles =
 	name: {
 		marginRight: Styles.margin * 3,
 		marginLeft: Styles.margin,
-		// fontWeight: 'bold',
 		fontSize: 16,
 	},
 	
@@ -169,11 +168,11 @@ const SchemaTreeStyles =
 	},
 	
 	infoPieceNumber: {
-		fontWeight: 'bold',
+		fontWeight: 1000,
 	},
 	
 	searchTextEmphasis: {
-		fontWeight: 'bold',
+		fontWeight: 1000,
 		color: Styles.colors.active,
 	},
 	

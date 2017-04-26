@@ -128,4 +128,6 @@ const dropCollect = (connect, monitor) =>
   connectDropTarget: connect.dropTarget(),
 });
 
-export default DropTarget('BROWSER', target, dropCollect)(LibraryItemCategory);
+const LIC = DropTarget('BROWSER', target, dropCollect)(LibraryItemCategory) as any;
+
+export default LIC;

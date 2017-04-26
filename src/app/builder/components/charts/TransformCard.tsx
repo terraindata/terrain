@@ -91,7 +91,7 @@ class TransformCard extends PureClasss<Props>
     domain: List<number>;
     range: List<number>;
     bars: Bars;
-    spotlights: Map<string, any>;
+    spotlights: IMMap<string, any>;
     queryXhr?: XMLHttpRequest;
     queryId?: string;
     error?: boolean;

@@ -44,7 +44,8 @@ THE SOFTWARE.
 
 require('./DatePicker.less')
 import * as React from 'react';
-import * as moment from 'moment';
+// import * as moment from 'moment';
+const moment = require('moment');
 import * as Immutable from 'immutable';
 var ReactDayPicker = require('react-day-picker').default;
 var DateUtils = require('react-day-picker').DateUtils;

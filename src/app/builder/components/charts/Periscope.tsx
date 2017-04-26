@@ -44,7 +44,9 @@ THE SOFTWARE.
 
 require('./Periscope.less');
 
-import * as d3 from 'd3';
+// consider upgrading d3 to v4, which has available types
+// import * as d3 from 'd3';
+const d3 = require('d3');
 import Util from '../../../util/Util';
 
 var xMargin = 45;

@@ -53,7 +53,7 @@ require("./App.less");
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
-import * as Perf from 'react-addons-perf';
+const Perf = require('react-addons-perf');
 import { Router, Route, IndexRoute } from 'react-router';
 const {browserHistory} = require('react-router');
 require('velocity-animate');

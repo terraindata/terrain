@@ -134,7 +134,8 @@ export module BuilderTypes
     parseTreeError: string = null;
   }
   const Query_Record = Immutable.Record(new QueryC());
-  export interface Query extends QueryC, IRecord<Query> {}
+  export interface Query extends QueryC, IRecord<Query> {};
+  
   export const _Query = (config?: Object) => {
     config = Util.extendId(config || {});
     config['cards'] = BuilderTypes.recordFromJS(config['cards'] || [])
@@ -177,7 +178,7 @@ export module BuilderTypes
     inputType: InputType;
   }
 
-  interface IManualEntry
+  export interface IManualEntry
   {
     name: string;
     snippet: string;
@@ -788,7 +789,8 @@ export module BuilderTypes
     from: _card({
       tables: L(),
       
-      static: {
+      static: 
+      {
         manualEntry: ManualConfig.cards['sfw'],
         colors: ["#3a7dcf", "#94b9f6"],
         title: "From",
@@ -805,8 +807,9 @@ export module BuilderTypes
               (list:List<string>, tableBlock: {table: string, alias: string}): List<string> =>
               {
                 let dbName = Store.getState().db;
-                let columnNames = SchemaStore.getState().columnNamesByDb.getIn([dbName, dbName + '.' + tableBlock.table]) 
-                  || Immutable.List([]);
+                let columnNames = SchemaStore.getState().columnNamesByDb.getIn(
+                  [dbName, dbName + '.' + tableBlock.table]
+                ) || Immutable.List([]);
                 columnNames = columnNames.map(
                   columnName => tableBlock.alias + '.' + columnName
                 );
@@ -904,7 +907,7 @@ export module BuilderTypes
                 key: 'alias',
                 autoDisabled: true,
                 
-                onFocus: (comp:React.Component<any, any>, value:string, event:React.FocusEvent) =>
+                onFocus: (comp:React.Component<any, any>, value:string, event:React.FocusEvent<any>) =>
                 {
                   let keyPath: KeyPath = comp.props.keyPath;
                   let wasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
@@ -1629,7 +1632,7 @@ export module BuilderTypes
   }
   
   // array of different card types
-  export const CardTypes = _.compact(_.map(Blocks, (block, k: string) => block._isCard && k ));
+  export const CardTypes = _.compact(_.map(Blocks, (block, k: string) => block['_isCard'] && k ));
 
   // TODO remove
   var cards = {};

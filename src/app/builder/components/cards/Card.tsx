@@ -63,6 +63,7 @@ import Store from "./../../data/BuilderStore";
 import {BuilderScrollState, BuilderScrollStore} from "./../../data/BuilderScrollStore";
 import PureClasss from './../../../common/components/PureClasss';
 import CardDropArea from './CardDropArea';
+const CDA = CardDropArea as any;
 import CreateCardTool from './CreateCardTool';
 import BuilderComponent from '../BuilderComponent';
 
@@ -503,7 +504,7 @@ class _Card extends PureClasss<Props>
         id={id}
         onMouseMove={this.handleMouseMove}
       >
-        <CardDropArea
+        <CDA
           half={true}
           keyPath={this.props.keyPath}
           index={this.props.index}
@@ -569,7 +570,7 @@ class _Card extends PureClasss<Props>
               </div>
           }
         </div>
-        <CardDropArea
+        <CDA
           half={true}
           lower={true}
           keyPath={this.props.keyPath}
@@ -588,7 +589,7 @@ class _Card extends PureClasss<Props>
 export interface CardItem
 {
   props?: Props;
-  childIds?: Map<ID, boolean>;
+  childIds?: IMMap<ID, boolean>;
   new?: boolean;
   type?: string;
 }

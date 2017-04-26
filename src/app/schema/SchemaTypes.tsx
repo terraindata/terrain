@@ -76,7 +76,7 @@ export module SchemaTypes
 		
 		// for the builder, a list of names for each db
 		tableNamesByDb: TableNamesByDb = Map<string, List<string>>({});
-		columnNamesByDb: ColumnNamesByDb = Map<string, Map<string, List<string>>>({});
+		columnNamesByDb: ColumnNamesByDb = Map<string, IMMap<string, List<string>>>({});
 	}
 	export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
 	export const _SchemaState = (config?: {[key:string]: any}) => 
@@ -105,7 +105,7 @@ export module SchemaTypes
 		  config.id = databaseId(config.name);
 		  return New<Database>(new DatabaseC(config), config);
 		}  
-	export type DatabaseMap = Map<ID, Database>;
+	export type DatabaseMap = IMMap<ID, Database>;
 	
 	
 	export function tableId(databaseName: string, tableName: string)
@@ -131,7 +131,7 @@ export module SchemaTypes
 	  config.id = tableId(config.databaseId, config.name);
 	  return New<Table>(new TableC(config), config);
 	}  
-	export type TableMap = Map<ID, Table>;
+	export type TableMap = IMMap<ID, Table>;
 	
 	
 	
@@ -169,7 +169,7 @@ export module SchemaTypes
 	  config.id = columnId(config.tableId, config.name);
 	  return New<Column>(new ColumnC(config), config);
 	}  
-	export type ColumnMap = Map<ID, Column>;
+	export type ColumnMap = IMMap<ID, Column>;
 	
 	
 	export function indexId(databaseName: string, tableName: string, indexName: string)
@@ -199,7 +199,7 @@ export module SchemaTypes
 	  config.id = indexId(config.databaseId, config.tableId, config.tableId);
 	  return New<Index>(new IndexC(config), config);
 	}
-	export type IndexMap = Map<ID, Index>;
+	export type IndexMap = IMMap<ID, Index>;
 	
 	
 	export const typeToStoreKey =
@@ -231,15 +231,15 @@ export module SchemaTypes
 	];
 	
 	
-	export type TableNamesByDb = Map<string, List<string>>;
-	export type ColumnNamesByDb = Map<string, Map<string, List<string>>>;
+	export type TableNamesByDb = IMMap<string, List<string>>;
+	export type ColumnNamesByDb = IMMap<string, IMMap<string, List<string>>>;
 	export interface SetDbActionPayload
 	{
 		database: Database;
-		tables: Map<ID, Table>;
-		columns: Map<ID, Column>;
-		indexes: Map<ID, Index>;
-		columnNames: Map<string, List<string>>;
+		tables: IMMap<ID, Table>;
+		columns: IMMap<ID, Column>;
+		indexes: IMMap<ID, Index>;
+		columnNames: IMMap<string, List<string>>;
 		tableNames: List<string>;
 	};
 

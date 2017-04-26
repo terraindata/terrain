@@ -60,11 +60,11 @@ export interface Props
 	search: string;
 }
 
-let INIT_SHOWING_COUNT: Map<string, number> = Immutable.Map<string, number>({});
-let INIT_ITEMS: Map<string, List<SchemaBaseClass>> = 
+let INIT_SHOWING_COUNT: IMMap<string, number> = Immutable.Map<string, number>({});
+let INIT_ITEMS: IMMap<string, List<SchemaBaseClass>> = 
 	Immutable.Map<string, List<SchemaBaseClass>>({});
-let INIT_PREV_ITEMS: Map<string, Map<string, SchemaBaseClass>> = 
-	Immutable.Map<string, Map<string, SchemaBaseClass>>({});
+let INIT_PREV_ITEMS: IMMap<string, IMMap<string, SchemaBaseClass>> = 
+	Immutable.Map<string, IMMap<string, SchemaBaseClass>>({});
 
 _.map(SchemaTypes.typeToStoreKey as any,
 	(storeKey: string, type) => 
@@ -82,11 +82,11 @@ class SchemaSearchResults extends PureClasss<Props>
 	state: {
 		// since search results are rendered as a list, we want
 		//  to store them in a list, instead of the Map stored in the SchemaState
-		items: Map<string, List<SchemaBaseClass>>,
+		items: IMMap<string, List<SchemaBaseClass>>,
 		// but we need to memoize the Map reference so that we can avoid unnecessarily
 		//  generating the lists
-		prevItems: Map<string, Map<string, SchemaBaseClass>>,
-		showingCount: Map<string, number>;
+		prevItems: IMMap<string, IMMap<string, SchemaBaseClass>>,
+		showingCount: IMMap<string, number>;
 	} = {
 		showingCount: INIT_SHOWING_COUNT,
 		items: INIT_ITEMS,

@@ -74,7 +74,12 @@ module.exports =
                 test: /\.tsx$/, 
                 exclude: /midway/,
                 loader: 
-                    'babel?presets[]=react&presets[]=latest!ts-loader' 
+                    'babel?presets[]=react&presets[]=latest!ts-loader?'
+                    + JSON.stringify({
+                        compilerOptions: {
+                            
+                        }
+                    }) 
             },
             { test: /\.css$/, exclude: /midway/, loader: "style!css" },
             { test: /\.less$/, exclude: /midway/, loader: "style!css!less?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
@@ -103,7 +108,7 @@ module.exports =
         'TDB_HOST': "'//" + process.env.TDB_HOST + ":7344'",
         'DEV': "true"
         }),
-
+        
         // new CircularDependencyPlugin({
         //   // exclude detection of files based on a RegExp 
         //   exclude: /node_modules/,

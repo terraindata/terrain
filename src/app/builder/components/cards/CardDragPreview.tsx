@@ -220,5 +220,6 @@ const cardPreviewCollect = (connect, monitor) =>
   // item: monitor.getItem(),
 });
 
+const CDP = DropTarget('CARD', cardPreviewTarget, cardPreviewCollect)(CardDragPreview) as any;
 
-export default DropTarget('CARD', cardPreviewTarget, cardPreviewCollect)(CardDragPreview);
+export default CDP;

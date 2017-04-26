@@ -63,9 +63,13 @@ const {browserHistory} = require('react-router');
 export interface Props
 {
   params?: any;
-  location?: {
-    pathname: string;
-  };
+  location?: any;
+  router?: any;
+  route?: any;
+  // params?: any;
+  // location?: {
+  //   pathname: string;
+  // };
 }
 
 class Library extends PureClasss<any>
@@ -190,4 +194,7 @@ class Library extends PureClasss<any>
   }
 }
 
-export default DragDropContext(HTML5Backend)(Library);
+// ReactRouter does not like the output of DragDropContext, hence the `any` cast
+const ExportLibrary = DragDropContext(HTML5Backend)(Library) as any;
+
+export default ExportLibrary;

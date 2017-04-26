@@ -84,7 +84,7 @@ export class IResultsConfig
   score: string = "";
   fields: List<string> = List([]);
   enabled: boolean = false;
-  formats: Map<string, Format> = Map<string, Format>({});
+  formats: IMMap<string, Format> = Map<string, Format>({});
   primaryKeys: List<string> = List([]);
   
   set: (f: string, v: any) => IResultsConfig;
@@ -95,7 +95,7 @@ const IResultsConfig_Record = Immutable.Record(new IResultsConfig());
 export const _IResultsConfig = (config?:any) => {
   var conf = new IResultsConfig_Record(config || {}) as any as IResultsConfig;
   
-  conf = conf.set('formats', Map(conf.formats));
+  conf = conf.set('formats', Map<string, Format>(conf.formats));
   conf = conf
     .set('formats', conf.formats.map(format => _Format(format)))
     .set('fields', List(conf.fields))

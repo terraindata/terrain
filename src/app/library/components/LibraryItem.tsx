@@ -452,4 +452,6 @@ const dropCollect = (connect, monitor) =>
   dragItemType: monitor.getItem() && monitor.getItem().type,
 });
 
-export default DropTarget('BROWSER', target, dropCollect)(DragSource('BROWSER', source, dragCollect)(LibraryItem));
+const LI = DropTarget('BROWSER', target, dropCollect)(DragSource('BROWSER', source, dragCollect)(LibraryItem)) as any;
+
+export default LI;

@@ -63,8 +63,8 @@ export interface Props
   className?: string;
   disabled?: boolean;
   
-  onFocus?: (event:React.FocusEvent) => void;
-  onBlur?: (event:React.FocusEvent, value: string) => void;
+  onFocus?: (event:React.FocusEvent<any>) => void;
+  onBlur?: (event:React.FocusEvent<any>, value: string) => void;
 }
 
 class Autocomplete extends PureClasss<Props>
@@ -113,7 +113,7 @@ class Autocomplete extends PureClasss<Props>
     });
   }
   
-  handleFocus(event:React.FocusEvent)
+  handleFocus(event:React.FocusEvent<any>)
   {
     this.setState({
       open: true,
@@ -124,7 +124,7 @@ class Autocomplete extends PureClasss<Props>
   }
   
   blurValue: string = '';
-  handleBlur(event:React.FocusEvent)
+  handleBlur(event:React.FocusEvent<any>)
   {
     this.setState({
       open: false,

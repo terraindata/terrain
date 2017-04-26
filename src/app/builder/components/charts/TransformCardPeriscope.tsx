@@ -74,7 +74,7 @@ class TransformCardPeriscope extends PureClasss<Props>
 {
   state: {
     initialDomain: List<number>,
-    chartState: Map<string, any>,
+    chartState: IMMap<string, any>,
     initialVal: number,
     bars: Bars,
   } = {
@@ -193,9 +193,9 @@ class TransformCardPeriscope extends PureClasss<Props>
     Actions.change(this._ikeyPath(this.props.keyPath, 'hasCustomDomain'), true);
   }
   
-  getChartState(overrideState = {}): Map<string, any>
+  getChartState(overrideState = {}): IMMap<string, any>
   {
-    var chartState = Map({
+    var chartState = Map<string, any>({
       barsData: (overrideState['bars'] || this.state.bars).toJS(),
       maxDomain: (overrideState['maxDomain'] || this.props.maxDomain).toJS(),
       domain: {

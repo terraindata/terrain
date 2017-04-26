@@ -96,7 +96,7 @@ export const BuilderScrollStore: IStore<BuilderScrollState> = Redux.createStore(
         
         return state;
       }
-  }), 
+  }, DefaultState), 
 DefaultState);
 
 export function scrollAction(columnTop: number, columnHeight: number, columnScroll: number, totalHeight: number)

@@ -60,12 +60,12 @@ export const MAX_RESULTS = 200;
 class ResultClass extends BaseClass
 {
   // all available fields for display
-  fields: Map<string, string> = Map<string, string>({});
+  fields: IMMap<string, string> = Map<string, string>({});
   
   spotlight: any;
   
-  rawFields: Map<string, string> = Map<string, string>({});
-  transformFields: Map<string, string> = Map<string, string>({});
+  rawFields: IMMap<string, string> = Map<string, string>({});
+  transformFields: IMMap<string, string> = Map<string, string>({});
 }
 export type Result = ResultClass & IRecord<ResultClass>;
 let _Result = (config: Object = {}) => 
@@ -80,7 +80,7 @@ class ResultsStateC extends BaseClass
   count: number = 0;
   rawResult: string = "";
   
-  primaryKeyToIndex: Map<string, number> = Map<string, number>({});
+  primaryKeyToIndex: IMMap<string, number> = Map<string, number>({});
   
   hasError: boolean = false;
   errorMessage: string = '';

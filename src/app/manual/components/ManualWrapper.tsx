@@ -76,4 +76,7 @@ class ManualWrapper extends Classs<Props>
 	}
 }
 
-export default DragDropContext(HTML5Backend)(ManualWrapper);
+// ReactRouter does not like the output of DragDropContext, hence the `any` cast
+const ManualExport = DragDropContext(HTML5Backend)(ManualWrapper);
+
+export default ManualWrapper;

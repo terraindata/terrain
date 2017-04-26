@@ -46,7 +46,8 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import * as test from 'tape';
-import * as TestUtils from 'react-addons-test-utils';
+// import * as TestUtils from 'react-addons-test-utils';
+const TestUtils = require('react-addons-test-utils');
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
 import LayoutManager from '../../app/builder/components/layout/LayoutManager.tsx';

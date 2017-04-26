@@ -138,9 +138,9 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
       }
     }
     
-    if(BuilderReducers[action.type])
+    if(typeof BuilderReducers[action.type] === 'function')
     {
-      state = BuilderReducers[action.type](state, action);
+      state = (BuilderReducers[action.type] as any)(state, action);
     }
     
     if(BuilderCardActionTypes[action.type])

@@ -52,6 +52,6 @@ import AuthReducers from './AuthReducers';
 
 let AuthStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   AuthReducers,
-{})), Immutable.Map({}));
+{}), Immutable.Map({})), Immutable.Map({}));
 
 export default AuthStore;
