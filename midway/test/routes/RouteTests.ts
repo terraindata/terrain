@@ -115,7 +115,7 @@ describe('Schema route tests', () =>
       {
         // TODO @david check against expected value for schema, not just non-emptiness
         if (response.text === '')
-        { 
+        {
           fail('GET /schema request returned empty response body');
         }
       });

@@ -92,7 +92,6 @@ const args = cmdLineArgs(optDefs,
 
 if (args.dbtype.length > 0 && args.dbfile.length > 0)
 {
-  console.log('wot');
   DB.loadSystemDB({ filename: args.dbfile }, args.dbtype);
 }
 
