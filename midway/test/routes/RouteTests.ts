@@ -45,20 +45,80 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as request from 'supertest';
-import App from '../../src/App';
-import * as Tasty from '../../src/tasty/Tasty';
+import DB from '../../src/DB';
 
-test('GET /midway/v1/schema', async (done) =>
+beforeAll(() =>
 {
-  request(App)
-    .get('/midway/v1/schema')
-    .then((response) =>
-    {
-      // TODO @david check against expected value for schema, not just non-emptiness
-      if (response.text === '')
+  DB.loadSystemDB({ filename: 'nodewaytest.db' }, 'SQLite');
+});
+
+import App from '../../src/App';
+
+describe('Item route tests', () =>
+{
+  test('GET /midway/v1/items/', (done) =>
+  {
+    const bodyContent =
       {
-        fail('GET /schema request returned empty response body');
-      }
-    });
-  done();
+        id: 1,
+        accessToken: 'AccessToken',
+      };
+    request(App)
+      .get('/midway/v1/items/')
+      .query(bodyContent)
+      .then((response) =>
+      {
+        // TODO @david check against expected value for schema, not just non-emptiness
+        if (response.text !== '')
+        {
+          expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+        } else
+        {
+          fail('GET /midway/v1/items/ request returned empty response body');
+        }
+      });
+    done();
+  });
+
+  test('GET /midway/v1/items/:id', (done) =>
+  {
+    const bodyContent =
+      {
+        id: 1,
+        accessToken: 'AccessToken',
+      };
+    request(App)
+      .get('/midway/v1/items/1')
+      .query(bodyContent)
+      .then((response) =>
+      {
+        // TODO @david check against expected value for schema, not just non-emptiness
+        if (response.text !== '')
+        {
+          expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+        } else
+        {
+          fail('GET /midway/v1/items/ request returned empty response body');
+        }
+      });
+    done();
+  });
+});
+
+describe('Schema route tests', () =>
+{
+  test('GET /midway/v1/schema', async (done) =>
+  {
+    request(App)
+      .get('/midway/v1/schema')
+      .then((response) =>
+      {
+        // TODO @david check against expected value for schema, not just non-emptiness
+        if (response.text === '')
+        { 
+          fail('GET /schema request returned empty response body');
+        }
+      });
+    done();
+  });
 });
