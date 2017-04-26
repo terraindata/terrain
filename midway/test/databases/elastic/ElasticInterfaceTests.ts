@@ -48,10 +48,16 @@ import * as fs from 'fs';
 import * as hash from 'object-hash';
 import * as winston from 'winston';
 import { makePromiseCallback } from '../../../src/tasty/Utils';
+import * as Utils from '../../Utils';
 
 import ElasticInterface from '../../../src/databases/elastic/ElasticInterface';
 
 let elasticInterface;
+
+function getExpectedFile(): string
+{
+  return __filename.split('.')[0] + '.expected';
+}
 
 beforeAll(() =>
 {
@@ -89,42 +95,7 @@ test('basic query', async (done) =>
         makePromiseCallback(resolve, reject));
     });
     winston.info(JSON.stringify(result, null, 2));
-    expect(result.hits).toEqual({
-      total: 27278,
-      max_score: null,
-      hits: [
-        {
-          _index: 'movies',
-          _type: 'data',
-          _id: '72998',
-          _score: null,
-          _source: {
-            'overview': 'In the 22nd century, a paraplegic Marine is dispatched to the moon Pandora on a unique mission, but becomes torn between following orders and protecting an alien civilization.',
-            'votecount': 8218,
-            'posterpath': '/tcqb9NHdw9SWs2a88KCDD4V8sVR.jpg',
-            'runtime': 162,
-            'movieid': 72998,
-            'language': 'en',
-            'releasedate': '2009-12-10T00:00:00.000Z',
-            'voteaverage': 7.099999904632568,
-            'title': 'Avatar (2009)',
-            'revenue': 2100000000,
-            'backdroppath': '/5XPPB44RQGfkBrbJxmtdndKz05n.jpg',
-            'genres': 'Action|Adventure|Sci-Fi|IMAX',
-            'popularity': 8.273819923400879,
-            '@version': '1',
-            'tagline': 'Enter the World of Pandora.',
-            'status': 'Released',
-            'budget': 237000000,
-            'homepage': 'http://www.avatarmovie.com/',
-          },
-          sort: [
-            2100000000,
-            72998,
-          ],
-        },
-      ],
-    });
+    await Utils.checkResults(getExpectedFile(), 'basic query', result.hits);
   }
   catch (e)
   {
@@ -175,41 +146,7 @@ test('put script', async (done) =>
         makePromiseCallback(resolve, reject));
     });
     winston.info(JSON.stringify(result, null, 2));
-    expect(result.hits).toEqual({
-      total: 27278,
-      max_score: null,
-      hits: [
-        {
-          _index: 'movies',
-          _type: 'data',
-          _id: '72998',
-          _score: null,
-          _source: {
-            'overview': 'In the 22nd century, a paraplegic Marine is dispatched to the moon Pandora on a unique mission, but becomes torn between following orders and protecting an alien civilization.',
-            'votecount': 8218,
-            'posterpath': '/tcqb9NHdw9SWs2a88KCDD4V8sVR.jpg',
-            'runtime': 162,
-            'movieid': 72998,
-            'language': 'en',
-            'releasedate': '2009-12-10T00:00:00.000Z',
-            'voteaverage': 7.099999904632568,
-            'title': 'Avatar (2009)',
-            'revenue': 2100000000,
-            'backdroppath': '/5XPPB44RQGfkBrbJxmtdndKz05n.jpg',
-            'genres': 'Action|Adventure|Sci-Fi|IMAX',
-            'popularity': 8.273819923400879,
-            '@version': '1',
-            'tagline': 'Enter the World of Pandora.',
-            'status': 'Released',
-            'budget': 237000000,
-            'homepage': 'http://www.avatarmovie.com/',
-          },
-          sort: [
-            1863000000,
-          ],
-        },
-      ],
-    });
+    await Utils.checkResults(getExpectedFile(), 'put script', result.hits);
   }
   catch (e)
   {
