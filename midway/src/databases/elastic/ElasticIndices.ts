@@ -83,7 +83,7 @@ class ElasticIndices
 
   private log(methodName: string, info: any)
   {
-    this.log('ElasticIndices.' + methodName, info);
+    this.controller.log('ElasticIndices.' + methodName, info);
   }
 }
 

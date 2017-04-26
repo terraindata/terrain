@@ -121,7 +121,7 @@ class ElasticInterface
 
   private log(methodName: string, info: any)
   {
-    this.log('ElasticInterface.' + methodName, info);
+    this.controller.log('ElasticInterface.' + methodName, info);
   }
 
 }
