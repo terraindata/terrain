@@ -251,7 +251,7 @@ export default class MySQLGenerator
     }
 
     this.indent();
-    for (let i = 0; ;)
+    for (let i = 0; ; )
     {
       onEach(elements[i]);
 

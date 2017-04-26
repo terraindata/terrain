@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as koaBodyParser from 'koa-bodyparser';
-import * as koaCompress from 'koa-compress';
 import * as koaFavicon from 'koa-favicon';
 import * as koaLogger from 'koa-logger-winston';
 import * as koaPassport from 'koa-passport';
@@ -54,7 +53,6 @@ import koaResponseTime = require('koa-response-time');
 const Middleware =
   {
     bodyParser: koaBodyParser,
-    compress: koaCompress,
     favicon: koaFavicon,
     logger: koaLogger,
     passport: koaPassport,

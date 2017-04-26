@@ -95,6 +95,14 @@ export const Util =
         });
       });
     },
+    
+    getRejectPromise<T>()
+    {
+      return new Promise<T>(async (resolve, reject) =>
+        {
+          reject(null);
+        });
+    },
   };
 
 export default Util;

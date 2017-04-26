@@ -44,43 +44,30 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as hash from 'object-hash';
 import * as winston from 'winston';
 
 import SQLiteExecutor from '../../src/tasty/SQLiteExecutor';
 import * as Tasty from '../../src/tasty/Tasty';
+import * as Utils from '../Utils';
 import SQLQueries from './SQLQueries';
 
-const resultHash: string[] = [
-  '25947fb6a68505be72373babb0499bd51b5e44fb',
-  '3da7fb2ac116d0ceb112a1f7593b94dd4c4b3112',
-  '289dbad322d227eee7385af01e964dbcecb0b4a2',
-  '2699d0b1d7879de7fcfc34b921e43404f552b39e',
-  '3bbef0194391e54c7642693a0a5357e8d16611b8',
-  'f93adfaaa1986dc5d1dedc54e73eee59faab3985',
-  '25947fb6a68505be72373babb0499bd51b5e44fb',
-  '5b95dc900d820ee93091e4861e2aeea16e7ead43',
-  '989db2448f309bfdd99b513f37c84b8f5794d2b5',
-  '989db2448f309bfdd99b513f37c84b8f5794d2b5',
-  'c95266c7ea79135e06bf67a60e78204a3491a2f2',
-];
+function getExpectedFile(): string
+{
+  return __filename.split('.')[0] + '.expected';
+}
 
 let tasty: Tasty.Tasty;
 
-async function runQuery(qstr: string)
-{
-  const results = await tasty.execute(qstr);
-  return hash(results);
-}
-
 function runTest(index: number)
 {
-  test('SQLite: execute ' + SQLQueries[index][0], async (done) =>
+  const testName: string = 'SQLite: execute ' + SQLQueries[index][0];
+  test(testName, async (done) =>
   {
     try
     {
-      const h = await runQuery(SQLQueries[index][1]);
-      expect(h).toBe(resultHash[index]);
+      const results = await tasty.execute(SQLQueries[index][1]);
+      await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
+
     } catch (e)
     {
       fail(e);
@@ -130,8 +117,6 @@ test('SQLite: schema', async (done) =>
   try
   {
     const result = await tasty.schema();
-    winston.info(JSON.stringify(result));
-
     const expected = {
       tree: {
         'moviesdb.db': {
