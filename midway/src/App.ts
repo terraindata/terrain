@@ -105,7 +105,6 @@ app.use(Middleware.bodyParser());
 app.use(Middleware.favicon('../src/app/favicon.ico'));
 app.use(Middleware.logger(winston));
 app.use(Middleware.responseTime());
-app.use(Middleware.compress());
 app.use(Middleware.passport.initialize());
 app.use(Middleware.passport.session());
 

@@ -44,76 +44,114 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as sqlite3 from 'sqlite3';
+import * as fs from 'fs';
+import * as hash from 'object-hash';
 import * as winston from 'winston';
-import TastyExecutor from './TastyExecutor';
-import TastySchema from './TastySchema';
-import { makePromiseCallback, makePromiseCallback0 } from './Utils';
+import { makePromiseCallback } from '../../../src/tasty/Utils';
+import * as Utils from '../../Utils';
 
-export interface SQLiteConfig
+import ElasticInterface from '../../../src/databases/elastic/ElasticInterface';
+
+let elasticInterface;
+
+function getExpectedFile(): string
 {
-  filename: string;
+  return __filename.split('.')[0] + '.expected';
 }
 
-export type Config = SQLiteConfig;
-
-export const defaultConfig: Config =
-  {
-    filename: 'nodeway.db',
-  };
-
-export class SQLiteExecutor implements TastyExecutor
+beforeAll(() =>
 {
-  private config: Config;
-  private db: sqlite3.Database;
+  elasticInterface = new ElasticInterface();
+});
 
-  constructor(config?: Config)
+test('elastic health', async (done) =>
+{
+  const result = await new Promise((resolve, reject) =>
   {
-    if (config === undefined)
-    {
-      config = defaultConfig;
-    }
+    elasticInterface.cluster.health(
+      {},
+      makePromiseCallback(resolve, reject));
+  });
+  winston.info(result);
+  done();
+});
 
-    this.config = config;
-    this.db = new sqlite3.Database(config.filename);
-  }
-
-  public async schema(): Promise<TastySchema>
+test('basic query', async (done) =>
+{
+  try
   {
-    const results = {};
-    results[this.config.filename] = {};
-
-    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
-    for (const table of tableListResult)
+    const result = await new Promise((resolve, reject) =>
     {
-      results[this.config.filename][table.name] = {};
-      const colResult: any = await this.query(`pragma table_info(${table.name});`);
-      for (const col of colResult)
-      {
-        results[this.config.filename][table.name][col.name] =
-          {
-            type: col.type,
-          };
-      }
-    }
-    return new TastySchema(results);
-  }
-
-  public async query(queryStr: string): Promise<object[]>
-  {
-    return new Promise<object[]>((resolve, reject) =>
-    {
-      this.db.all(queryStr, makePromiseCallback(resolve, reject));
+      elasticInterface.search(
+        {
+          index: 'movies',
+          type: 'data',
+          body: {
+            query: {},
+            sort: [{ revenue: 'desc' }, { movieid: 'asc' }],
+          },
+          size: 1,
+        },
+        makePromiseCallback(resolve, reject));
     });
+    winston.info(JSON.stringify(result, null, 2));
+    await Utils.checkResults(getExpectedFile(), 'basic query', result.hits);
   }
-
-  public async destroy(): Promise<void>
+  catch (e)
   {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.db.close(makePromiseCallback0(resolve, reject));
-    });
+    fail(e);
   }
-}
 
-export default SQLiteExecutor;
+  done();
+});
+
+test('put script', async (done) =>
+{
+  try
+  {
+    await new Promise((resolve, reject) =>
+    {
+      elasticInterface.putScript(
+        {
+          id: 'terrain_test_movie_profit',
+          lang: 'painless',
+          body: {
+            script: `return doc['revenue'].value - doc['budget'].value;`,
+          },
+        },
+        makePromiseCallback(resolve, reject));
+    });
+
+    const result = await new Promise((resolve, reject) =>
+    {
+      elasticInterface.search(
+        {
+          index: 'movies',
+          type: 'data',
+          body: {
+            query: {},
+            sort: {
+              _script: {
+                type: 'number',
+                order: 'desc',
+                script: {
+                  stored: 'terrain_test_movie_profit',
+                  params: {},
+                },
+              },
+            },
+          },
+          size: 1,
+        },
+        makePromiseCallback(resolve, reject));
+    });
+    winston.info(JSON.stringify(result, null, 2));
+    await Utils.checkResults(getExpectedFile(), 'put script', result.hits);
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+
+  done();
+});
