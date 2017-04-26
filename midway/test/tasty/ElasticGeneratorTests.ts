@@ -44,131 +44,72 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import {ElasticExecutor} from '../../src/tasty/ElasticExecutor';
 import * as Tasty from '../../src/tasty/Tasty';
-import TastyNodeTypes from '../../src/tasty/TastyNodeTypes';
-import SQLQueries from './SQLQueries';
+import {TastyTable} from '../../src/tasty/TastyTable';
 
-function testName(index: number)
-{
-  return 'generate ' + SQLQueries[index][0];
-}
-
-function testQuery(index: number)
-{
-  return SQLQueries[index][1];
-}
-
-let DBMovies: any;
+let DBMovies: TastyTable;
 
 beforeAll(() =>
 {
-  DBMovies = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate'], 'movies');
+  DBMovies = new Tasty.Table('data', ['movieid'], ['title', 'releasedate'], 'movies');
 });
 
-test('node type: skip', (done) =>
-{
-  expect(TastyNodeTypes[TastyNodeTypes.skip]).toEqual('skip');
-  expect(TastyNodeTypes.skip).toEqual(11);
-  done();
-});
-
-test(testName(0), (done) =>
+test('t1', (done) =>
 {
   const query = new Tasty.Query(DBMovies).take(10);
-  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
-  expect(qstr).toEqual(testQuery(0));
+  const qstr = Tasty.Tasty.generate(Tasty.ElasticSearch, query);
+  const elasticSearch = new ElasticExecutor();
+  expect(qstr).toEqual('{\"index\":\"movies\",\"table\":\"data\",\"op\":\"select\",\"param\":{\"index\":\"movies\",\"type\":\"data\",\"size\":10,\"body\":{\"query\":{}}}}');
   done();
 });
 
-test(testName(1), (done) =>
+test('t2', (done) =>
 {
   const query = new Tasty.Query(DBMovies);
   query.select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).take(10);
-  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
-  expect(qstr).toEqual(testQuery(1));
+  const qstr = Tasty.Tasty.generate(Tasty.ElasticSearch, query);
+  expect(qstr).toEqual('{\"index\":\"movies\",\"table\":\"data\",\"op\":\"select\",\"param\":{\"index\":\"movies\",\"type\":\"data\",\"size\":10,\"body\":{\"_source\":[\"movieid\",\"title\",\"releasedate\"],\"query\":{}}}}');
   done();
 });
 
-test(testName(2), (done) =>
+test('t3', (done) =>
 {
   const query = new Tasty.Query(DBMovies);
   query.filter(DBMovies['movieid'].equals(123));
-  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
-  expect(qstr).toEqual(testQuery(2));
+  const qstr = Tasty.Tasty.generate(Tasty.ElasticSearch, query);
+  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","body":{"query":{"bool":{"must":[{"term":{"movieid":123}}]}}}}}');
   done();
 });
 
-test(testName(3), (done) =>
+test('t4', (done) =>
 {
   const query = new Tasty.Query(DBMovies);
   query.filter(DBMovies['title'].doesNotEqual('Toy Story (1995)')).take(10);
-  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
-  expect(qstr).toEqual(testQuery(3));
+  const qstr = Tasty.Tasty.generate(Tasty.ElasticSearch, query);
+  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","size":10,"body":{"query":{"bool":{"must_not":[{"term":{"title":"Toy Story (1995)"}}]}}}}}');
   done();
 });
 
-test(testName(4), (done) =>
+test('t5', (done) =>
 {
   const query = new Tasty.Query(DBMovies);
   query.sort(DBMovies['title'], 'asc').take(10);
-  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
-  expect(qstr).toEqual(testQuery(4));
+  const qstr = Tasty.Tasty.generate(Tasty.ElasticSearch, query);
+  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","size":10,"body":{"query":{},"sort":[{"title":"asc"}]}}}');
   done();
 });
 
-test(testName(5), (done) =>
+test('t6', (done) =>
 {
   const query = new Tasty.Query(DBMovies);
   query.sort(DBMovies['title'], 'desc').take(10);
-  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
-  expect(qstr).toEqual(testQuery(5));
+  const qstr = Tasty.Tasty.generate(Tasty.ElasticSearch, query);
+  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","size":10,"body":{"query":{},"sort":[{"title":"desc"}]}}}');
   done();
 });
 
-test(testName(6), (done) =>
-{
-  const query = new Tasty.Query(DBMovies);
-  query.take(10);
-  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
-  expect(qstr).toEqual(testQuery(6));
-  done();
-});
-
-test(testName(7), (done) =>
-{
-  const query = new Tasty.Query(DBMovies);
-  query.take(10);
-  query.skip(20);
-  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
-  expect(qstr).toEqual(testQuery(7));
-  done();
-});
-
-test(testName(8), (done) =>
-{
-  const movie = {
-    movieid: 13371337,
-    releasedate: new Date('01/01/17').toISOString().substring(0, 10),
-    title: 'My New Movie',
-  };
-  const query = new Tasty.Query(DBMovies).upsert(movie);
-  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
-  expect(qstr).toEqual(testQuery(8));
-  done();
-});
-
-test(testName(9), (done) =>
-{
-  const query = new Tasty.Query(DBMovies).delete();
-  const qstr1 = Tasty.Tasty.generate(Tasty.MySQL, query);
-  expect(qstr1).toEqual(`DELETE \n  FROM movies;`);
-  query.filter(DBMovies['movieid'].equals(13371337));
-  const qstr2 = Tasty.Tasty.generate(Tasty.MySQL, query);
-  expect(qstr2).toEqual(testQuery(9));
-  done();
-});
-
-test(testName(10), (done) =>
+test('t7', (done) =>
 {
   const query = new Tasty.Query(DBMovies);
   query.select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).filter(DBMovies['movieid'].neq(2134));
@@ -176,8 +117,9 @@ test(testName(10), (done) =>
   query.sort(DBMovies['title'], 'asc').sort(DBMovies['movieid'], 'desc').sort(DBMovies['releasedate'], 'asc');
   query.take(10).skip(20);
 
-  const qstr = Tasty.Tasty.generate(Tasty.MySQL, query);
+  const qstr = Tasty.Tasty.generate(Tasty.ElasticSearch, query);
   /* tslint:disable-next-line:max-line-length */
-  expect(qstr).toEqual(testQuery(10));
+  expect(qstr)
+    .toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","from":20,"size":10,"body":{"_source":["movieid","title","releasedate"],"query":{"bool":{"must_not":[{"term":{"movieid":2134}}]},"range":{"releasedate":{"gte":"2007-03-24","lt":"2017-03-24"}}},"sort":[{"title":"asc"},{"movieid":"desc"},{"releasedate":"asc"}]}}}');
   done();
 });

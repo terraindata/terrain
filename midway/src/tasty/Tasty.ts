@@ -111,7 +111,7 @@ export class Tasty
   {
     if (backend === Backend.ElasticSearch)
     {
-      return ElasticGenerator.generate(query);
+      return JSON.stringify(ElasticGenerator.generate(query));
     }
     else if (backend === Backend.MySQL)
     {
@@ -123,7 +123,7 @@ export class Tasty
     }
   }
 
-  // The backend executor and generator
+// The backend executor and generator
   private executor: TastyExecutor;
   private generator: any;
   private _backend: Backend;

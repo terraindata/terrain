@@ -45,39 +45,35 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { Client, ConfigOptions, SearchParams } from 'elasticsearch';
+import {ElasticTastyQuery} from './ElasticGenerator';
 import TastyExecutor from './TastyExecutor';
 import TastySchema from './TastySchema';
 import TastyTable from './TastyTable';
 import { makePromiseCallback } from './Utils';
 
-export interface ElasticExecutorConfig extends ConfigOptions
-{
-  indexName: string;
-}
-
-export type Config = ElasticExecutorConfig;
+export type Config = ConfigOptions;
 
 export class ElasticExecutor implements TastyExecutor
 {
-
-  private config: ElasticExecutorConfig;
+  private config: ConfigOptions;
   private client: Client;
-  private defaultElasticConfig: ElasticExecutorConfig = {
+  private defaultElasticConfig: ConfigOptions = {
     hosts: ['http://localhost:9200'],
-    indexName: 'moviesdb',
   };
 
   constructor(config?: Config)
   {
     if (config === undefined)
     {
-      config = this.defaultElasticConfig;
+      this.config = this.defaultElasticConfig;
+    } else
+    {
+      this.config = config;
     }
 
     // Do not reuse objects to configure the elasticsearch Client class:
     // https://github.com/elasticsearch/elasticsearch-js/issues/33
-    this.config = config;
-    this.client = new Client(JSON.parse(JSON.stringify(config)));
+    this.client = new Client(JSON.parse(JSON.stringify(this.config)));
   }
 
   /**
@@ -163,7 +159,7 @@ export class ElasticExecutor implements TastyExecutor
           const query = {
             body: element,
             id: this.makeID(table, element),
-            index: table.getTableName(),
+            index: table.getDatabaseName(),
             type: table.getTableName(),
           };
 
@@ -179,12 +175,12 @@ export class ElasticExecutor implements TastyExecutor
   /*
    * Deletes the given objects based on their primary key
    */
-  public async deleteIndex()
+  public async deleteIndex(indexName)
   {
     return new Promise((resolve, reject) =>
     {
       const params = {
-        index: this.config.indexName,
+        index: indexName,
       };
 
       this.client.indices.delete(
@@ -207,7 +203,7 @@ export class ElasticExecutor implements TastyExecutor
           const params =
             {
               id: this.makeID(table, element),
-              index: table.getTableName(),
+              index: table.getDatabaseName(),
               type: table.getTableName(),
             };
 
@@ -217,6 +213,31 @@ export class ElasticExecutor implements TastyExecutor
         }));
     }
     await Promise.all(promises);
+  }
+
+  public async executeElasticTastyQuery(query: ElasticTastyQuery)
+  {
+    switch (query.op)
+    {
+      case 'select':
+        return await this.executeElasticTastySelectQuery(query);
+      default:
+        throw new Error('Unknown query command ' + query);
+    }
+
+  }
+
+  private async executeElasticTastySelectQuery(query: ElasticTastyQuery)
+  {
+    return await this.query(query.param as SearchParams);
+  }
+
+  private async executeElasticTastyUpsertQuery(query)
+  {
+  }
+
+  private async executeElasticTastyDeleteQuery(query)
+  {
   }
 
   private async bulkUpsert(table: TastyTable, elements: object[]): Promise<any>
@@ -229,7 +250,7 @@ export class ElasticExecutor implements TastyExecutor
         {
           index: {
             _id: this.makeID(table, element),
-            _index: table.getTableName(),
+            _index: table.getDatabaseName(),
             _type: table.getTableName(),
           },
         };

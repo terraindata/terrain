@@ -44,49 +44,98 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { Client, ConfigOptions, SearchParams } from 'elasticsearch';
 import * as SQLGenerator from './SQLGenerator';
 import TastyNode from './TastyNode';
+import TastyNodeTypes from './TastyNodeTypes';
 import TastyQuery from './TastyQuery';
+
+export interface ElasticTastyQuery {
+  index: string;
+  table: string;
+  op: string;
+  param: object;
+}
 
 export default class ElasticGenerator
 {
   public static generate(query: TastyQuery)
   {
-    return new ElasticGenerator(query).queryObject;
+    return new ElasticGenerator(query).esQuery;
   }
 
-  private queryObject: any;
-  private tableName: string;
+  private esQuery: ElasticTastyQuery;
 
   constructor(query: TastyQuery)
   {
-    this.queryObject = {};
-    this.tableName = query.table.getTableName();
+    this.esQuery = {} as ElasticTastyQuery;
+    const esQuery = this.esQuery;
+
+    esQuery.index = query.table.getDatabaseName();
+    esQuery.table = query.table.getTableName();
+
+    switch (query.command.tastyType)
+    {
+      case (TastyNodeTypes.select):
+        esQuery.op = 'select';
+        esQuery.param = this.constructSelectQuery(query);
+        break;
+      case (TastyNodeTypes.upsert):
+        esQuery.op = 'upsert';
+        esQuery.param = this.constructUpsertQuery(query);
+        break;
+      case (TastyNodeTypes.delete):
+        esQuery.op = 'delete';
+        esQuery.param = this.constructDeleteQuery(query);
+        break;
+      default:
+        throw new Error('Unknown command in the query:' + query);
+    }
+  }
+
+  private constructDeleteQuery(query: TastyQuery): object
+  {
+    return this.constructSelectQuery(query);
+  }
+
+  private constructUpsertQuery(query: TastyQuery): object
+  {
+    return query.upserts;
+  }
+
+  private constructSelectQuery(query: TastyQuery): object
+  {
+
+    const queryParam: SearchParams = {} as SearchParams;
 
     // set table (index) name
-    this.queryObject.index = this.tableName;
+    queryParam.index = query.table.getDatabaseName();
+    queryParam.type = query.table.getTableName();
 
     // from clause
     if (query.numSkipped !== 0)
     {
-      this.queryObject['from'] = query.numSkipped;
+      queryParam['from'] = query.numSkipped;
     }
 
     // size clause
     if (query.numTaken !== 0)
     {
-      this.queryObject['size'] = query.numTaken;
+      queryParam['size'] = query.numTaken;
     }
+
+    //start the body
+    const bodyFields = this.getSubclauseObject(queryParam, 'body');
 
     // stored_fields clause
     if (!query.isSelectingAll())
     {
-      const storedFields = this.getSubclauseList(this.queryObject, 'stored_fields');
+      const sourceFields = this.getSubclauseList(bodyFields, '_source');
       for (let i = 0; i < query.selected.length; ++i)
       {
         const column = query.selected[i];
         const columnName = this.getColumnName(column);
-        storedFields.push(columnName);
+        sourceFields.push(columnName);
       }
     }
 
@@ -95,21 +144,23 @@ export default class ElasticGenerator
       throw new Error('Aliases are not yet supported by ElasticGenerator.');
     }
 
+    // query fields
+    const queryFields = this.getSubclauseObject(bodyFields, 'query');
     // filter clause
     if (query.filters.length > 0)
     {
-      const filterClause = this.getNestedSubclauseObject(this.queryObject, 'query', 'filter');
+      //const filterClause = this.getSubclauseObject(queryFields, 'bool', 'filter');
       for (let i = 0; i < query.filters.length; ++i)
       {
         const filter = query.filters[i];
-        this.accumulateFilters(filterClause, filter);
+        this.accumulateFilters(queryFields, filter);
       }
     }
 
     // sort clause
     if (query.sorts.length > 0)
     {
-      const sortClause = this.getSubclauseList(this.queryObject, 'sort');
+      const sortClause = this.getSubclauseList(bodyFields, 'sort');
 
       for (let i = 0; i < query.sorts.length; ++i)
       {
@@ -122,6 +173,8 @@ export default class ElasticGenerator
         sortClause.push(clause);
       }
     }
+
+    return queryParam;
   }
 
   private accumulateFilters(filterClause: object, expression: TastyNode)
@@ -249,7 +302,7 @@ export default class ElasticGenerator
     {
       throw new Error('Could not find table name in expression "' + JSON.stringify(expression) + '".');
     }
-    if (table.value !== this.tableName)
+    if (table.value !== this.esQuery.table)
     {
       throw new Error('Filter expression filters on something other than the queried table "' +
         JSON.stringify(expression) + '".');
@@ -262,4 +315,5 @@ export default class ElasticGenerator
 
     return column.value;
   }
+
 }
