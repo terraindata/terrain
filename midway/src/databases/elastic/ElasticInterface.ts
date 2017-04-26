@@ -63,8 +63,8 @@ class ElasticInterface
   };
 
   public cluster: ElasticCluster;
+  public indices: ElasticIndices;
   private controller: ElasticController;
-  private indices: ElasticIndices;
 
   constructor(config: ElasticConfig = ElasticInterface.defaultConfig)
   {

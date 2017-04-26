@@ -49,7 +49,7 @@ import ElasticController from './ElasticController';
 
 /**
  * An interface which acts as a selective isomorphic wrapper around
- * the elastic.js cluster API.
+ * the elastic.js indices API.
  */
 class ElasticIndices
 {
