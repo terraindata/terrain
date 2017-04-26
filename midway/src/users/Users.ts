@@ -205,11 +205,11 @@ export const Users =
       return emptyObj;
     },
 
-    loginWithAccessToken: async (id: number, accessToken: string) =>
+    loginWithAccessToken: async (id: number, accessToken: string): Promise<UserConfig> =>
     {
-      const results = await DB.getDB().select(User, [], { id, accessToken });
-      return new Promise(async (resolve, reject) =>
+      return new Promise<UserConfig>(async (resolve, reject) =>
       {
+        const results: UserConfig[] = await DB.getDB().select(User, [], { id, accessToken }) as UserConfig[];
         if (results.length > 0)
         {
           resolve(results[0]);
