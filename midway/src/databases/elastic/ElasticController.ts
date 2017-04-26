@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { Client } from 'elasticsearch';
+import * as winston from 'winston';
 import ElasticConfig from './ElasticConfig';
 
 /**
@@ -62,6 +63,12 @@ class ElasticController
     // https://github.com/elasticsearch/elasticsearch-js/issues/33
     this.config = JSON.parse(JSON.stringify(config));
     this.client = new Client(this.config);
+  }
+
+  public log(className: string, methodName: string, info: any)
+  {
+    winston.info(className + '.' + methodName);
+    winston.debug(className + '.' + methodName + ': ' + JSON.stringify(info, null, 1));
   }
 }
 
