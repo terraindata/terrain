@@ -68,7 +68,7 @@ class ResultClass extends BaseClass
   transformFields: IMMap<string, string> = Map<string, string>({});
 }
 export type Result = ResultClass & IRecord<ResultClass>;
-let _Result = (config: Object = {}) => 
+let _Result = (config: Object = {}) =>
   New<Result>(new ResultClass(config), config);
 
 export type Results = List<Result>;
@@ -89,18 +89,18 @@ class ResultsStateC extends BaseClass
   mainErrorMessage: string = '';
   subErrorMessage: string = '';
   errorLine: number = -1;
-  
+
   valid: boolean = false; // are these results still valid for the given query?
-  
+
   loading: boolean = false; // if we're still loading any fields, besides for the count
-  
+
   hasLoadedResults: boolean = false;
-  hasLoadedAllFields: boolean = false; 
+  hasLoadedAllFields: boolean = false;
   hasLoadedCount: boolean = false;
   hasLoadedTransform: boolean = false;
 }
 export type ResultsState = ResultsStateC & IRecord<ResultsStateC>;
-export let _ResultsState = (config: Object = {}) => 
+export let _ResultsState = (config: Object = {}) =>
   New<ResultsState>(new ResultsStateC(config), config);
 
 
@@ -124,7 +124,7 @@ interface ResultsQuery
 interface State
 {
   queriedTql?: string;
-  
+
   query?: ResultsQuery;
   allQuery?: ResultsQuery;
   countQuery?: ResultsQuery;
@@ -136,27 +136,27 @@ const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
 export class ResultsManager extends PureClasss<Props>
 {
   state: State = {};
-  
+
   // apply a function to all active queries
   mapQueries(fn: (query: ResultsQuery, stateKey: string) => void)
   {
     stateQueries.map(
       stateKey =>
-        this && this.state && this.state[stateKey] && 
+        this && this.state && this.state[stateKey] &&
           fn(this.state[stateKey], stateKey)
     );
   }
-  
+
   componentWillMount()
   {
     Util.addBeforeLeaveHandler(this.killQueries);
     this.queryResults(this.props.query, this.props.db);
   }
-  
+
   componentWillUnmount()
   {
     this.killQueries();
-    
+
     this.mapQueries(
       (query, stateKey) =>
         this.setState({
@@ -164,19 +164,19 @@ export class ResultsManager extends PureClasss<Props>
         })
     );
   }
-  
+
   queryResults(query: BuilderTypes.Query, db: string)
   {
     if(!query || !db)
     {
       return;
     }
-    
+
     var tql = TQLConverter.toTQL(query, {
       limit: MAX_RESULTS,
       replaceInputs: true,
     });
-    
+
     if(tql !== this.state.queriedTql)
     {
       this.killQueries();
@@ -184,27 +184,27 @@ export class ResultsManager extends PureClasss<Props>
         queriedTql: tql,
         query:
           Ajax.query(
-            tql, 
-            db, 
-            this.handleResultsResponse, 
+            tql,
+            db,
+            this.handleResultsResponse,
             this.handleError
           )
       });
-      
+
       let selectCard = query.cards.get(0);
       if(
         !this.props.noExtraFields
-        && selectCard 
+        && selectCard
         && !selectCard['cards'].some(
             card => card.type === 'groupBy'
-          ) 
+          )
         && !selectCard['fields'].some(
             field => field.field.static && field.field.static.isAggregate
           )
       )
       {
         // temporary, don't dispatch select * if query has group by
-        
+
         this.setState({
           allQuery: Ajax.query(
             TQLConverter.toTQL(query, {
@@ -212,28 +212,28 @@ export class ResultsManager extends PureClasss<Props>
               transformAliases: true,
               limit: MAX_RESULTS,
               replaceInputs: true,
-            }), 
+            }),
             db,
             this.handleAllFieldsResponse,
             this.handleAllFieldsError
           )
         });
       }
-      
+
       // temporarily disable count
       // this.setState({
-      //   countXhr: 
+      //   countXhr:
       //     Ajax.query(
       //       TQLConverter.toTQL(query, {
       //         count: true,
       //         replaceInputs: true,
-      //       }), 
+      //       }),
       //       db,
       //       this.handleCountResponse,
       //       this.handleCountError
       //     ),
       // });
-      
+
       this.changeResults({
         loading: true,
         hasLoadedResults: false,
@@ -243,7 +243,7 @@ export class ResultsManager extends PureClasss<Props>
       });
     }
   }
-  
+
   killQueries()
   {
     this.mapQueries(
@@ -254,21 +254,21 @@ export class ResultsManager extends PureClasss<Props>
       }
     );
   }
-  
+
   componentWillReceiveProps(nextProps: Props)
   {
     if(
       nextProps.query &&
       (
         (!this.props.query && !nextProps.resultsState.loading)
-        || nextProps.query.cards !== this.props.query.cards 
+        || nextProps.query.cards !== this.props.query.cards
         || nextProps.query.inputs !== this.props.query.inputs
         || nextProps.db !== this.props.db
       )
     )
     {
       this.queryResults(nextProps.query, nextProps.db);
-      
+
       if(!this.props.query || nextProps.query.id !== this.props.query.id)
       {
         this.changeResults({
@@ -276,7 +276,7 @@ export class ResultsManager extends PureClasss<Props>
         });
       }
     }
-    
+
     // if(nextProps.resultsState.results !== this.props.resultsState.results)
     // {
     //   // update spotlights
@@ -298,10 +298,10 @@ export class ResultsManager extends PureClasss<Props>
     //           nextState.results.get(resultIndex).toJS()
     //         ));
     //         // TODO something more like this
-    //         // spotlightAction(id, 
+    //         // spotlightAction(id,
     //         //   {
     //         //     color: spotlight.color,
-    //         //     name: spotlight.name,  
+    //         //     name: spotlight.name,
     //         //     result: nextState.results.get(resultIndex),
     //         //   }
     //         // );
@@ -309,57 +309,57 @@ export class ResultsManager extends PureClasss<Props>
     //       else
     //       {
     //         spotlightAction(id, null);
-    //       } 
+    //       }
     //     }
     //   );
     // }
   }
-  
+
   handleResultsResponse(response:QueryResponse, isAllFields?: boolean)
   {
     let queryKey = isAllFields ? 'allQuery' : 'query';
     this.setState({
       [queryKey]: null,
     });
-    
+
     let {resultsState} = this.props;
-    
-    
+
+
     if(!response || response.errorMessage)
     {
       this.handleError(response, isAllFields);
       return;
     }
-      
+
     let resultsData = response.results;
     let resultsCount = resultsData.length;
     if(resultsData.length > MAX_RESULTS)
     {
       resultsData.splice(MAX_RESULTS, resultsData.length - MAX_RESULTS);
     }
-    
-    let results: Results = 
+
+    let results: Results =
       (resultsState.hasLoadedResults || resultsState.hasLoadedAllFields)
         ? resultsState.results : List([]);
-    
+
     resultsData.map(
       (resultData, index) =>
       {
         let result: Result = results.get(index) || _Result();
         result = result.set(
-          'fields', 
+          'fields',
           result.fields.merge(resultData)
         );
-        
+
         if(!isAllFields)
         {
           result = result.set('rawFields', Map(resultData));
         }
-        
+
         results = results.set(index, result);
       }
-    )
-    
+    );
+
     let fields = List<string>([]);
     if(results.get(0))
     {
@@ -376,26 +376,26 @@ export class ResultsManager extends PureClasss<Props>
       mainErrorMessage: null,
       subErrorMessage: null,
     };
-    
+
     if(!resultsState.hasLoadedCount)
     {
       changes['count'] = results.size;
     }
-    
+
     this.changeResults(changes);
   }
-  
+
   handleAllFieldsResponse(response:QueryResponse)
   {
     this.handleResultsResponse(response, true);
   }
-  
+
   handleCountResponse(response:QueryResponse)
   {
     this.setState({
       countQuery: null,
     });
-    
+
     // let results = response.results;
     // if(results)
     // {
@@ -421,7 +421,7 @@ export class ResultsManager extends PureClasss<Props>
     //   this.handleCountError();
     // }
   }
-  
+
   handleCountError()
   {
     this.setState({
@@ -433,13 +433,13 @@ export class ResultsManager extends PureClasss<Props>
     //     .set('resultsLongCount', 0)
     // );
   }
-  
+
   handleError(response: QueryResponse, isAllFields?: boolean)
-  {  
+  {
     let {errorMessage} = response || { errorMessage: '' };
     errorMessage = errorMessage || 'There was no response from the server.';
     let {resultsState} = this.props;
-    
+
     if(typeof errorMessage === 'string')
     {
       if(errorMessage.charAt(errorMessage.length - 1) === '^')
@@ -447,39 +447,39 @@ export class ResultsManager extends PureClasss<Props>
         errorMessage = errorMessage.substr(0, errorMessage.length - 1);
       }
       errorMessage = errorMessage.replace(/MySQL/g, 'TerrainDB');
-      
+
       if(!isAllFields)
       {
         let matches = errorMessage.match(/([0-9]+)\:[0-9]+/);
         let line = matches && matches.length >= 2 && parseInt(matches[1]);
         let mainErrorMessage = errorMessage;
         let subErrorMessage: string = null;
-        
+
         if(line !== NaN && line !== null && line !== undefined)
         {
           mainErrorMessage = 'Error on line ' + line + ': ';
           subErrorMessage = errorMessage;
         }
-        
+
         resultsState = resultsState
           .set('mainErrorMessage', mainErrorMessage)
           .set('subErrorMessage', subErrorMessage)
           .set('errorLine', line);
       }
     }
-    
+
     this.setState({
       [isAllFields ? 'query' : 'allQuery']: null,
     });
-    
+
     this.props.onResultsStateChange(
       resultsState
         .set(
-          isAllFields ? 'hasAllFieldsError' : 'hasError', 
+          isAllFields ? 'hasAllFieldsError' : 'hasError',
           true
         )
         .set(
-          isAllFields ? 'allFieldsErrorMessage' : 'errorMessage', 
+          isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
           errorMessage
         )
         .set(
@@ -492,23 +492,23 @@ export class ResultsManager extends PureClasss<Props>
         )
     );
   }
-  
+
   handleAllFieldsError(response: QueryResponse)
   {
     this.handleError(response, true);
   }
-  
+
   changeResults(changes: { [key: string]: any })
   {
     let {resultsState} = this.props;
-    _.map(changes, 
-      (value: any, key: string) =>  
+    _.map(changes,
+      (value: any, key: string) =>
         resultsState = resultsState.set(key, value)
     );
-    
+
     this.props.onResultsStateChange(resultsState);
   }
-  
+
 	render()
   {
     return (
@@ -525,9 +525,9 @@ export function getPrimaryKeyFor(result:any, config:IResultsConfig): string
       field => result[field]
     ).join("and");
   }
-  
+
   return "result-" + Math.floor(Math.random() * 100000000);
 }
-  
+
 
 export default ResultsManager;

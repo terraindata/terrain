@@ -86,7 +86,7 @@ export interface Props
   addColumn?: (number, string?) => void;
   columnIndex?: number;
   helpOn?: boolean;
-  
+
   isDragging?: boolean;
   connectDragPreview?: (a?:any) => void;
   connectDragSource?: (el: El) => El;
@@ -102,24 +102,24 @@ class _Card extends PureClasss<Props>
     closing: boolean;
     opening: boolean;
     menuOptions: List<MenuOption>;
-    
+
     scrollState: BuilderScrollState;
   };
-  
+
   refs: {
     [k: string]: Ref;
     card: Ref;
     cardInner: Ref;
     cardBody: Ref;
-  }
-  
+  };
+
   // _debugUpdates = true;
   _debugName = "Card";
-  
+
   constructor(props:Props)
   {
     super(props);
-    
+
     this.state = {
       selected: false,
       hovering: false,
@@ -140,12 +140,12 @@ class _Card extends PureClasss<Props>
             onClick: this.handleDelete,
           },
         ]),
-     
+
      scrollState: BuilderScrollStore.getState(),
     };
-    
+
   }
-  
+
   componentWillMount()
   {
     // TODO
@@ -153,7 +153,7 @@ class _Card extends PureClasss<Props>
     //   stateKey: 'selected',
     //   storeKeyPath: ['selectedCardIds', props.card.id],
     // });
-    
+
     this._subscribe(Store, {
       updater: (state) =>
       {
@@ -172,30 +172,30 @@ class _Card extends PureClasss<Props>
       },
       isMounted: true,
     });
-    
+
     this._subscribe(BuilderScrollStore, {
       stateKey: 'scrollState',
       isMounted: true,
     })
   }
-  
+
   getCardTerms(card:BuilderTypes.ICard): List<string>
   {
     var terms: List<string> = Immutable.List([]);
-    
+
     if(card.static.getChildTerms)
     {
       terms = card.static.getChildTerms(card);
     }
-    
+
     if(card.static.getNeighborTerms)
     {
       terms = terms.concat(card.static.getNeighborTerms(card)).toList();
     }
-    
+
     return terms;
   }
-  
+
   componentWillReceiveProps(nextProps:Props)
   {
     if(nextProps.card.closed !== this.props.card.closed)
@@ -215,7 +215,7 @@ class _Card extends PureClasss<Props>
       }
     }
   }
-  
+
   dragPreview: any;
   componentDidMount()
   {
@@ -223,7 +223,7 @@ class _Card extends PureClasss<Props>
     {
       return;
     }
-    
+
     this.dragPreview = createDragPreview(
       this.props.card.static.title + ' (' + BuilderTypes.getPreview(this.props.card) + ')',
     {
@@ -238,32 +238,32 @@ class _Card extends PureClasss<Props>
       paddingLeft: 12,
       borderRadius: 10
     });
-    
+
     this.props.connectDragPreview(this.dragPreview);
   }
-  
+
 	toggleClose(event)
 	{
     if(this.state.closing || this.state.opening)
     {
       return; // I just don't want to deal
     }
-    
+
     if(!this.props.card.closed)
     {
       this.setState({
         closing: true,
       });
-      
+
       // animate just the body for normal cards,
       //  the entire card for cards inside textboxes
       let ref = this.props.singleCard ? this.refs.card : this.refs.cardBody;
-      
+
       Util.animateToHeight(ref, 0, () =>
       {
         // do this after the animation so the rest of the app picks up on it
         Actions.change(
-          this.getKeyPath().push('closed'), 
+          this.getKeyPath().push('closed'),
           true
         )
       });
@@ -273,9 +273,9 @@ class _Card extends PureClasss<Props>
       this.setState({
         opening: true,
       });
-      
+
       // need to set a timeout so that the Card's render first
-      //  executes (from the opening:true setState) and adds in the 
+      //  executes (from the opening:true setState) and adds in the
       //  card body, for us to animate to.
       // If you know a better way, please oh please implement it
       setTimeout(() =>
@@ -283,18 +283,18 @@ class _Card extends PureClasss<Props>
         {
           // do this after the animation so the rest of the app picks up on it
           Actions.change(
-            this.getKeyPath().push('closed'), 
+            this.getKeyPath().push('closed'),
             false
           )
         }),
         250
       );
     }
-    
+
     event && event.preventDefault();
     event && event.stopPropagation();
 	}
-  
+
   handleTitleClick(event)
   {
     // TODO decide how selection mechanics work.
@@ -303,12 +303,12 @@ class _Card extends PureClasss<Props>
     // {
     //   return;
     // }
-    
+
     // event.stopPropagation();
     // event.preventDefault();
     // Actions.selectCard(this.props.card.id, event.shiftKey, event.altKey);
   }
-  
+
   handleDelete()
   {
     Util.animateToHeight(this.refs.cardInner, 0);
@@ -316,11 +316,11 @@ class _Card extends PureClasss<Props>
       Actions.remove(this.props.keyPath, this.props.index)
     , 250);
   }
-  
+
   handleCopy()
   {
   }
-  
+
   handleDuplicate()
   {
     if(this.props.singleCard || this.props.singleChild)
@@ -328,7 +328,7 @@ class _Card extends PureClasss<Props>
       alert("Can't duplicate this card because it is not in a position where it can have neighborhing cards. Try moving it to another spot on the Builder and duplicating it there.");
       return;
     }
-    
+
     let removeId = (block) => {
       if(Immutable.Iterable.isIterable(block))
       {
@@ -344,16 +344,16 @@ class _Card extends PureClasss<Props>
         }
         return b;
       }
-      
+
       return block;
     };
-    
+
     let card = BuilderTypes.recordFromJS(BuilderTypes.cardsForServer(removeId(this.props.card)).toJS());
-    
+
     Actions.create(this.props.keyPath, this.props.index + 1, card.type, card);
-    
+
   }
-  
+
   handleMouseMove(event)
   {
     event.stopPropagation();
@@ -362,14 +362,14 @@ class _Card extends PureClasss<Props>
       Actions.hoverCard(this.props.card.id);
     }
   }
-  
+
   getKeyPath()
   {
     return this.props.singleCard
         ? this.props.keyPath
         : this._ikeyPath(this.props.keyPath, this.props.index);
   }
-  
+
   handleCardToolClose()
   {
     if(this.props.index === null)
@@ -381,7 +381,7 @@ class _Card extends PureClasss<Props>
       Actions.remove(this.props.keyPath, this.props.index);
     }
   }
-  
+
   componentWillUnmount()
   {
     this.renderTimeout && clearTimeout(this.renderTimeout);
@@ -389,7 +389,7 @@ class _Card extends PureClasss<Props>
 
   cardEl: HTMLElement;
   renderTimeout: any;
-  
+
 	render()
   {
     let {id} = this.props.card;
@@ -399,14 +399,14 @@ class _Card extends PureClasss<Props>
       let {columnTop, columnHeight, columnScroll} = this.state.scrollState;
       let visibleStart = columnScroll - CARD_OVERSCAN;
       let visibleEnd = columnScroll + columnHeight + CARD_OVERSCAN;
-      
+
       let cardStart = 0;
       let el = this.cardEl;
       do {
-        cardStart += el.offsetTop; 
+        cardStart += el.offsetTop;
         el = el.offsetParent as any;
       } while(el && el.id !== 'cards-column');
-      
+
       if(el)
       {
         // if cards are nested inside position:relative/absolute components, you will
@@ -415,7 +415,7 @@ class _Card extends PureClasss<Props>
         let cardEnd = cardStart + cardHeight;
 
         CARD_HEIGHT_MAP[id] = cardHeight;
-        
+
         if(cardEnd < visibleStart || cardStart > visibleEnd)
         {
           return (
@@ -427,7 +427,7 @@ class _Card extends PureClasss<Props>
               }}
             />
           );
-        } 
+        }
       }
     }
     else
@@ -435,7 +435,7 @@ class _Card extends PureClasss<Props>
       this.renderTimeout = setTimeout(() => {
         this.setState({random: Math.random()});
       }, 15);
-      
+
       return (
         <div
           className='card card-placeholder'
@@ -446,7 +446,7 @@ class _Card extends PureClasss<Props>
         />
       );
     }
-    
+
     if(this.props.card.type === 'creating')
     {
       // not a card at all, in fact. a create card marker
@@ -465,7 +465,7 @@ class _Card extends PureClasss<Props>
         </div>
       );
     }
-    
+
     var content = <BuilderComponent
       canEdit={this.props.canEdit}
       data={this.props.card}
@@ -478,16 +478,16 @@ class _Card extends PureClasss<Props>
     let {card} = this.props;
 		let {title} = card.static;
     const { isDragging, connectDragSource } = this.props;
-    
+
     // TODO
-    // <ManualPopup 
-    //                 cardName={card.static.title} 
+    // <ManualPopup
+    //                 cardName={card.static.title}
     //                 rightAlign={!this.props.canEdit}
     //                 addColumn={this.props.addColumn}
     //                 columnIndex={this.props.columnIndex}
     //               />
-    
-    return ( 
+
+    return (
       <div
         className={classNames({
           'card': true,
@@ -540,9 +540,9 @@ class _Card extends PureClasss<Props>
                 <div className='card-title-inner'>
                   { title }
                 </div>
-                
+
                 {
-                  !this.props.card.closed ? null : 
+                  !this.props.card.closed ? null :
                     <div className={classNames({
                       'card-preview': true,
                       'card-preview-hidden': this.state.opening,
@@ -551,14 +551,14 @@ class _Card extends PureClasss<Props>
                     </div>
                 }
                 {
-                  this.props.canEdit && 
+                  this.props.canEdit &&
                   this.state.hovering &&
                     <Menu options={this.state.menuOptions} />
                 }
               </div>
             )
           }
-          
+
           {
             (!this.props.card.closed || this.state.opening) &&
               <div className='card-body-wrapper' ref='cardBody'>
@@ -594,10 +594,10 @@ export interface CardItem
   type?: string;
 }
 
-const cardSource = 
+const cardSource =
 {
   canDrag: (props) => props.canEdit,
-  
+
   beginDrag: (props: Props): CardItem =>
   {
     // TODO
@@ -608,20 +608,20 @@ const cardSource =
         .remove(props.card.id),
       type: props.card.type,
     };
-    
+
     Actions.dragCard(item);
-    
+
     return item;
   },
   // select card?
-  
+
   endDrag: () =>
   {
     $('body').removeClass('body-card-is-dragging');
-    
+
     Actions.dragCard(false);
   }
-}
+};
 
 const dragCollect = (connect, monitor) =>
 ({

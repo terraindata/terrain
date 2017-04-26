@@ -72,8 +72,7 @@ export interface RowDisplay
   below?: Display | Display[];
   hideToolsWhenNotString?: boolean;
   noDataPadding?: boolean; // don't add extra padding to first row when data
-};
-
+}
 let {TEXT, NUM, ROWS, CARDS, CARDTEXT, CARDSFORTEXT, DROPDOWN, LABEL, FLEX, COMPONENT} = DisplayType;
 
 export interface Display
@@ -81,19 +80,19 @@ export interface Display
   displayType: DisplayType;
   key: string;
   // key can be null for FLEX but nothing else
-  
+
   //Manual information
   help?: string | string[];
 
   className?: string | ((data: any) => string);
-  
+
   // for dropdown
   options?: List<(string | El)>;
   centerDropdown?: boolean;
-  
+
   // for labels
   label?: string;
-  
+
   // for textboxes
   placeholder?: string;
   defaultValue?: string;
@@ -108,22 +107,22 @@ export interface Display
   // for rows and FLEX, content to display above/below,   
   above?: Display;
   below?: Display;
-  
+
   // for rows:
   english?: string; // English term defining each row
   factoryType?: string; // string referencing which BLOCK to create
   row?: RowDisplay;
-  
+
   // for FLEX, its content
   flex?: Display | Display[];
-  
+
   // for components
   component?: (typeof PureClasss);
-  
+
   // for cards areas
   singleChild?: boolean;
   accepts?: List<string>;
-  
+
   provideParentData?: boolean;
   // if true, it passes the parent data down
   // this will cause unnecessary re-rendering, so avoid if possible
@@ -137,7 +136,7 @@ export const valueDisplay: Display =
   help: ManualConfig.help["value"],
   key: 'value',
   placeholder: 'value',
-}
+};
 
 export const stringValueDisplay: Display =
   {
@@ -167,7 +166,7 @@ export const firstSecondDisplay = (middle:Display, accepts:List<string>): Displa
 ({
   displayType: FLEX,
   key: null,
-  
+
   above:
   {
     displayType: CARDSFORTEXT,
@@ -175,14 +174,14 @@ export const firstSecondDisplay = (middle:Display, accepts:List<string>): Displa
     className: 'card-double-first',
     accepts,
   },
-  
+
   below:
   {
     displayType: CARDSFORTEXT,
     key: 'second',
     accepts,
   },
-  
+
   flex:
   [
     {
@@ -193,9 +192,9 @@ export const firstSecondDisplay = (middle:Display, accepts:List<string>): Displa
       help: ManualConfig.help["first"],
       accepts,
     },
-    
+
     middle,
-    
+
     {
       displayType: CARDTEXT,
       key: 'second',

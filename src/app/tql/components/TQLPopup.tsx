@@ -70,27 +70,26 @@ class TQLPopup extends Classs<Props>
     this.props.addColumn(this.props.columnIndex, this.props.cardName);
   }
 
-  render() 
+  render()
   {
     return (
-      <div 
+      <div
         className='tql-editor-popup'
         style={this.props.style}
       >
-        {this.props.text}      
-        <div 
+        {this.props.text}
+        <div
           className='manual-popup-link'
           onClick={this.openManual}
         >
             See full description in Manual
-          <OpenIcon 
-            className='manual-popup-open-icon' 
+          <OpenIcon
+            className='manual-popup-open-icon'
             onClick={this.openManual}
           />
-        </div>  
-      </div>     
+        </div>
+      </div>
     );
   }
-};
-
+}
 export default TQLPopup;

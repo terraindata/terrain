@@ -76,7 +76,7 @@ class LibraryStateC
   prevVariants: IMMap<ID, Variant> = null;
   
   groupsOrder: List<ID> = Immutable.List([]);
-  
+
   changingStatus: boolean = false;
   changingStatusOf: LibraryTypes.Variant = null;
   changingStatusTo: LibraryTypes.EVariantStatus = 0;
@@ -86,7 +86,7 @@ const LibraryState_Record = Immutable.Record(new LibraryStateC());
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> {}
 export const _LibraryState = (config?:any) => {
   return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
-}
+};
 
 var DefaultState = _LibraryState();
 
@@ -115,7 +115,7 @@ export const LibraryStore: IStore<LibraryState> = Redux.createStore(
     {
       state = LibraryReducers[action.type](state, action);
     }
-    
+
     if(CleanLibraryActionTypes.indexOf(action.type) === -1)
     {
       // save the new state
@@ -123,12 +123,12 @@ export const LibraryStore: IStore<LibraryState> = Redux.createStore(
       saveStateOf(state.algorithms, state.prevAlgorithms);
       saveStateOf(state.variants, state.prevVariants);
     }
-    
+
     state = state
       .set('prevGroups', state.groups)
       .set('prevAlgorithms', state.algorithms)
       .set('prevVariants', state.variants);
-    
+
     return state;
   }
 , DefaultState);

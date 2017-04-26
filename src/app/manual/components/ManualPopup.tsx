@@ -70,75 +70,75 @@ class ManualPopup extends Classs<Props>
       open: false,
     }
   }
-  
+
   shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
-  
+
   close()
   {
     this.setState({
       open: false,
-    })
+    });
     $(document).off('click', this.close);
   }
-  
+
   componentWillUnmount()
   {
     $(document).off('click', this.close);
   }
-  
+
   toggleOpen()
   {
     this.setState({
       open: !this.state.open,
     });
-    
+
     if(!this.state.open)
     {
       $(document).on('click', this.close);
     }
   }
-  
+
   openManual()
   {
     this.props.addColumn(this.props.columnIndex, this.props.cardName);
   }
 
-  render() 
+  render()
   {
 
-    var manualEntry = BuilderTypes.cardList[this.props.cardName] 
+    var manualEntry = BuilderTypes.cardList[this.props.cardName]
         && BuilderTypes.Blocks[BuilderTypes.cardList[this.props.cardName]].static.manualEntry;
     var content = manualEntry ? manualEntry.snippet : 'No description available';
     return (
-    <div 
+    <div
       className={classNames({
         "manual-popup-wrapper": true,
         "manual-popup-open": this.state.open,
         "manual-popup-wrapper-right-align": this.props.rightAlign
       })}
     >
-      <div 
+      <div
         className="manual-popup-icon-wrapper"
         onClick={this.toggleOpen}
       >
         <InfoIcon className="manual-popup-icon" />
        </div>
         { !this.state.open ? null :
-          <div 
+          <div
             className="manual-popup-content-wrapper"
             onClick={this.toggleOpen}
           >
             {content}
-            <div 
+            <div
               className='manual-popup-link'
               onClick={this.openManual}
             >
               See full description in Manual
-              <OpenIcon 
-                className='manual-popup-open-icon' 
+              <OpenIcon
+                className='manual-popup-open-icon'
                 onClick={this.openManual}
               />
             </div>
@@ -147,6 +147,5 @@ class ManualPopup extends Classs<Props>
       </div>
     );
   }
-};
-
+}
 export default ManualPopup;

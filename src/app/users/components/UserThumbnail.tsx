@@ -70,21 +70,21 @@ export interface Props
 
 class UserThumbnail extends Classs<Props>
 {
-  state: { 
-    user?: User 
+  state: {
+    user?: User
   } = {
-  }
-  
+  };
+
   constructor(props:Props)
   {
     super(props);
   }
-  
+
   componentDidMount()
   {
     this.subscribeUser();
   }
-  
+
   subscribeUser(nextProps?: Props)
   {
     this._unsubscribe();
@@ -94,31 +94,31 @@ class UserThumbnail extends Classs<Props>
       isMounted: true,
     });
   }
-  
+
   getStoreKeyPath(props?:Props)
   {
     return ['users', (props || this.props).username];
   }
-  
+
   componentWillReceiveProps(nextProps)
   {
     if(nextProps.username !== this.props.username)
     {
       this.subscribeUser(nextProps);
-    }  
+    }
   }
-  
+
   shouldComponentUpdate(nextProps, nextState)
   {
     return nextState.user !== this.state.user;
   }
-  
+
   render()
   {
     let { user } = this.state;
     let name: string = user ? user.name() : 'Loading...';
     let src: string = UserTypes.profileUrlFor(user);
-    let tip = this.props.showName ? null : 
+    let tip = this.props.showName ? null :
       '<div class="user-thumbnail-tip-name">' + name + '</div>' +
       '<div class="user-thumbnail-tip-details">' + this.props.extra + '</div>';
     let text: string = this.props.showName ? name : null;
@@ -134,7 +134,7 @@ class UserThumbnail extends Classs<Props>
           'user-thumbnail-square': this.props.square,
           'user-thumbnail-admin': user && user.isAdmin && !this.props.hideAdmin,
         })}
-        data-tip={tip} 
+        data-tip={tip}
         data-html={true}
       >
         <div
@@ -143,7 +143,7 @@ class UserThumbnail extends Classs<Props>
             backgroundImage: `url(${src})`,
           }}
         />
-        { 
+        {
           text &&
             <div className='user-thumbnail-text'>
               {
@@ -153,7 +153,7 @@ class UserThumbnail extends Classs<Props>
         }
       </div>
     );
-    
+
     if(this.props.link && user)
     {
       return (
@@ -162,7 +162,7 @@ class UserThumbnail extends Classs<Props>
         </Link>
       );
     }
-    
+
     return thumbnail;
   }
 }

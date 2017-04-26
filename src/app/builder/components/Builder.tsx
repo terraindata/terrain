@@ -108,40 +108,40 @@ class Builder extends PureClasss<Props>
     columnType: number;
     selectedCardName: string;
     manualIndex: number;
-    
+
     leaving: boolean;
     nextLocation: any;
     tabActions: List<TabAction>;
-    
+
     nonexistentVariantIds: List<ID>;
-    
+
     navigationException: boolean; // does Builder need to allow navigation w/o confirm dialog?
   } = {
     builderState: BuilderStore.getState(),
     variants: LibraryStore.getState().variants,
-    
+
     colKeys: null,
     noColumnAnimation: false,
     columnType: null,
     selectedCardName: '',
     manualIndex: -1,
-    
+
     leaving: false,
     nextLocation: null,
     tabActions: this.getTabActions(BuilderStore.getState()),
-    
+
     nonexistentVariantIds: List([]),
-    
+
     navigationException: false,
   };
-  
+
   initialColSizes: any;
 
   constructor(props:Props)
   {
     super(props);
-    
-    
+
+
     this._subscribe(BuilderStore, {
       stateKey: 'builderState',
       updater: (builderState:BuilderState) =>
@@ -163,7 +163,7 @@ class Builder extends PureClasss<Props>
       stateKey: 'variants',
       storeKeyPath: ['variants'],
     });
-    
+
     if(localStorage.getItem('colKeys'))
     {
       var colKeys = List(JSON.parse(localStorage.getItem('colKeys'))) as List<number>;
@@ -173,7 +173,7 @@ class Builder extends PureClasss<Props>
       var colKeys = List([Math.random(), Math.random()]);
       localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
     }
-    
+
     if(localStorage.getItem('selectedCardName'))
     {
       this.state.selectedCardName = localStorage.getItem('selectedCardName');
@@ -182,27 +182,27 @@ class Builder extends PureClasss<Props>
     this.state.colKeys = colKeys;
 
     this.addManualColumn = _.debounce(this.addManualColumn, 1);
-    
+
     let colSizes = JSON.parse(localStorage.getItem('colSizes') || '[]');
-    
+
     if(!Array.isArray(colSizes) || _.reduce(colSizes, (sum, size) => sum + size['x'], 0) !== 0)
     {
       colSizes = [];
     }
     this.initialColSizes = colSizes;
   }
-  
+
   componentWillMount()
   {
     this.checkConfig(this.props);
   }
-  
+
   componentDidMount()
   {
-    window.onbeforeunload = (e) => 
+    window.onbeforeunload = (e) =>
     {
       Util.executeBeforeLeaveHandlers();
-      
+
       if(this.state.navigationException)
       {
         this.setState({
@@ -210,23 +210,23 @@ class Builder extends PureClasss<Props>
         });
         return;
       }
-      
+
       if(this.shouldSave())
       {
         let msg = 'You have unsaved changes to this Variant. If you leave, they will be lost. Are you sure you want to leave?';
         e && (e.returnValue = msg);
         return msg;
       }
-    }
-    
+    };
+
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
-  
+
   componentWillUnmount()
   {
     window.onbeforeunload = null;
   }
-  
+
   routerWillLeave(nextLocation): boolean
   {
     if(this.confirmedLeave)
@@ -234,13 +234,13 @@ class Builder extends PureClasss<Props>
       this.confirmedLeave = false;
       return true;
     }
-    
+
     if(this.shouldSave(BuilderStore.getState()))
     {
       // ^ need to pass in the most recent state, because when you've navigated away
       // in a dirty state, saved on the navigation prompt, and then returned,
       // Builder's copy of the state gets out of date at this point
-      
+
       let path = nextLocation.pathname;
       let pieces = path.split('/');
       if(pieces[1] === 'builder' && pieces[2])
@@ -255,22 +255,22 @@ class Builder extends PureClasss<Props>
           //  but when we redo how the stores work, then that shouldn't happen.
         }
       }
-      
+
       this.setState({
         leaving: true,
         nextLocation,
       });
       return false;
     }
-    
+
     return true;
   }
-  
+
   componentWillReceiveProps(nextProps: Props)
   {
     let currentOpen = this.props.location.query && this.props.location.query.o;
     let nextOpen = nextProps.location.query && nextProps.location.query.o;
-    
+
     if(
       nextProps.params.config !== this.props.params.config
       || currentOpen !== nextOpen
@@ -284,20 +284,20 @@ class Builder extends PureClasss<Props>
       this.checkConfig(nextProps);
     }
   }
-  
+
   checkConfig(props:Props)
   {
     let storedConfig = localStorage.getItem('config') || '';
     let open = props.location.query && props.location.query.o;
     let originalConfig = props.params.config || storedConfig;
     let newConfig = originalConfig;
-    
+
     if(open)
     {
       if(!storedConfig || storedConfig === 'undefined' || storedConfig === '')
       {
         // no stored config, just load the open tab.
-        newConfig = '!' + open;     
+        newConfig = '!' + open;
       }
       else
       {
@@ -309,27 +309,27 @@ class Builder extends PureClasss<Props>
           i = configArr.length;
         }
         configArr[i] = '!' + open;
-        
+
         newConfig = configArr.join(',');
       }
     }
-    
+
     if(newConfig && newConfig.length && !newConfig.split(',').some(c => c.substr(0,1) === '!'))
     {
       newConfig = '!' + newConfig;
     }
-    if(newConfig !== props.params.config 
+    if(newConfig !== props.params.config
       && (props.params.config !== undefined || newConfig.length)
       )
     {
       browserHistory.replace(`/builder/${newConfig}`);
     }
     localStorage.setItem('config', newConfig || '');
-    
+
     const pieces = newConfig.split(',');
     let variantId = pieces.find(
       piece => piece.indexOf('!') === 0
-    )
+    );
     if(variantId)
     {
       variantId = variantId.substr(1); // trim '!'
@@ -340,14 +340,14 @@ class Builder extends PureClasss<Props>
       Actions.fetchQuery(variantId, this.handleNoVariant);
     }
   }
-  
+
   handleNoVariant(variantId: ID)
   {
     if(this.props.params.config && this.state.nonexistentVariantIds.indexOf(variantId) === -1)
     {
       this.setState({
         nonexistentVariantIds: this.state.nonexistentVariantIds.push(variantId),
-      })
+      });
       let newConfigArr = localStorage['config']
         .split(',')
         .filter(id => id !== variantId && id !== '!' + variantId);
@@ -355,39 +355,39 @@ class Builder extends PureClasss<Props>
       {
         newConfigArr[0] = '!' + newConfigArr[0];
       }
-      
+
       let newConfig = newConfigArr.join(',');
       localStorage.setItem('config', newConfig); // so that empty configs don't cause a freak out
       browserHistory.replace(`/builder/${newConfig}`);
     }
   }
-  
+
   getSelectedId(props?:Props)
   {
     props = props || this.props;
     var selected = props.params.config && props.params.config.split(',').find(id => id.indexOf('!') === 0);
     return selected && selected.substr(1);
   }
-  
+
   // loadingQuery = Types._Query({
   //   loading: true,
   //   name: 'Loading',
   // });
-  
+
   getQuery(props?:Props): Query
   {
     return this.state.builderState.query; // || this.loadingQuery;
   }
-  
+
   getVariant(props?:Props): LibraryTypes.Variant
   {
     if(!this.state)
     {
       return null;
     }
-    
+
     let variantId = this.getSelectedId(props);
-    let variant = this.state.variants && 
+    let variant = this.state.variants &&
       this.state.variants.get(variantId);
     if(variantId && !variant)
     {
@@ -399,7 +399,7 @@ class Builder extends PureClasss<Props>
     }
     return variant; // || this.loadingVariant;
   }
-  
+
   getTabActions(builderState:BuilderState): List<TabAction>
   {
     return Immutable.List([
@@ -433,39 +433,39 @@ class Builder extends PureClasss<Props>
   //   },
     ]);
   }
-  
+
   handleUndo()
   {
     Actions.undo();
   }
-  
+
   handleRedo()
   {
     Actions.redo();
   }
-  
-  
+
+
   onSave()
   {
-    if(this.getVariant().version) 
+    if(this.getVariant().version)
     {
-      if(!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?')) 
+      if(!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?'))
       {
         return;
       }
     }
     this.save()
   }
-  
+
   onSaveSuccess(variant: Variant)
   {
     notificationManager.addNotification(
       'Saved',
       variant.name,
-      'info', 
+      'info',
       4
     );
-    
+
     //TODO remove if queries/variants model changes
     LibraryActions.variants.change(variant);
   }
@@ -475,12 +475,12 @@ class Builder extends PureClasss<Props>
     Actions.save(false);
     notificationManager.addNotification(
       'Error Saving',
-      '"' + variant.name + '" failed to save.', 
-      'error', 
+      '"' + variant.name + '" failed to save.',
+      'error',
       0
     );
   }
-  
+
   // called by a child if needing to navigate without save dialog
   handleNavigationException()
   {
@@ -488,7 +488,7 @@ class Builder extends PureClasss<Props>
       navigationException: true,
     });
   }
-  
+
   shouldSave(overrideState?:BuilderState): boolean
   {
     let variant = this.getVariant();
@@ -506,10 +506,10 @@ class Builder extends PureClasss<Props>
         return false;
       }
     }
-    
+
     return !!(overrideState || this.state.builderState).isDirty;
   }
-  
+
   save()
   {
     let variant = LibraryTypes.touchVariant(this.getVariant());
@@ -520,7 +520,7 @@ class Builder extends PureClasss<Props>
       this.onSaveError.bind(this, variant)
     );
     Actions.save();
-    
+
     var configArr = window.location.pathname.split('/')[2].split(',');
     var currentVariant;
     configArr = configArr.map(function(tab)
@@ -546,7 +546,7 @@ class Builder extends PureClasss<Props>
       browserHistory.replace(`/builder/${newConfig}`);
     }
   }
-  
+
   getLayout()
   {
     return {
@@ -555,24 +555,24 @@ class Builder extends PureClasss<Props>
       onColSizeChange: this.handleColSizeChange,
       minColWidth: 316,
       columns:
-        _.range(0, this.state.colKeys.size).map(index => 
+        _.range(0, this.state.colKeys.size).map(index =>
           this.getColumn(index)
         )
     };
   }
-  
+
   handleColSizeChange(adjustments)
   {
     localStorage.setItem('colSizes', JSON.stringify(adjustments));
   }
-  
+
   canEdit(): boolean
   {
     let variant = this.getVariant();
     return variant && (variant.status === LibraryTypes.EVariantStatus.Build
       && Util.canEdit(variant, UserStore, RolesStore))
   }
-  
+
   cantEditReason(): string
   {
     let variant = this.getVariant();
@@ -583,17 +583,17 @@ class Builder extends PureClasss<Props>
     if(variant.status !== LibraryTypes.EVariantStatus.Build)
     {
       return 'This Variant is not in Build status';
-    } 
+    }
     return 'You are not authorized to edit this Variant';
   }
-  
+
   getColumn(index)
   {
     let key = this.state.colKeys.get(index);
     let query = this.getQuery();
     let variant = this.getVariant();
- 
-    
+
+
     return {
       minWidth: 316,
       resizeable: true,
@@ -647,14 +647,14 @@ class Builder extends PureClasss<Props>
       columnType: 4,
       selectedCardName,
       manualIndex: index
-    }); 
+    });
     localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
     if(localStorage.getItem('colKeyTypes'))
     {
       var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes'));
       colKeyTypes[newKey] = 4;
       localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
-    } 
+    }
   }
 
   handleAddManualColumn(index, selectedCardName?)
@@ -665,7 +665,7 @@ class Builder extends PureClasss<Props>
         selectedCardName
       });
     }
-    else 
+    else
     {
       if(this.state.colKeys.size === 3)
       {
@@ -682,10 +682,10 @@ class Builder extends PureClasss<Props>
     let colKeys = this.state.colKeys.splice(index, 0, Math.random());
     this.setState({
       colKeys,
-    }); 
+    });
     localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
   }
-  
+
   handleCloseColumn(index)
   {
     let oldKey = this.state.colKeys[index];
@@ -694,7 +694,7 @@ class Builder extends PureClasss<Props>
       colKeys: colKeys,
       manualIndex: (index === this.state.manualIndex) ? -1 : this.state.manualIndex,
       columnType: 0
-    }); 
+    });
     localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
     if(localStorage.getItem('colKeyTypes'))
     {
@@ -702,7 +702,7 @@ class Builder extends PureClasss<Props>
       delete colKeyTypes[oldKey];
     }
   }
-  
+
   moveColumn(curIndex, newIndex)
   {
     var tmp = this.state.colKeys.get(curIndex);
@@ -710,16 +710,16 @@ class Builder extends PureClasss<Props>
     this.setState({
       colKeys,
       noColumnAnimation: true,
-    })
+    });
     localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
     setTimeout(() => this.setState({
       noColumnAnimation: false,
     }), 250);
   }
-  
+
   revertVersion()
   {
-    if(confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.')) 
+    if(confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.'))
     {
       this.save();
     }
@@ -734,15 +734,15 @@ class Builder extends PureClasss<Props>
       let lastEdited = Util.formatDate(variant.lastEdited);
       
       return (
-        <div className='builder-revert-toolbar'> 
+        <div className='builder-revert-toolbar'>
           <div className='builder-revert-time-message'>
             Version from {lastEdited}
           </div>
           <div className='builder-white-space'/>
           {
             this.canEdit() &&
-              <div 
-                className='button builder-revert-button' 
+              <div
+                className='button builder-revert-button'
                 onClick={this.revertVersion}
                 data-tip="Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history."
               >
@@ -754,19 +754,19 @@ class Builder extends PureClasss<Props>
     }
     return null;
   }
-  
+
   goToLibrary()
   {
     browserHistory.push('/library');
   }
-  
+
   handleModalCancel()
   {
     this.setState({
       leaving: false,
     });
   }
-  
+
   confirmedLeave: boolean = false;
   handleModalDontSave()
   {
@@ -776,7 +776,7 @@ class Builder extends PureClasss<Props>
     });
     browserHistory.push(this.state.nextLocation);
   }
-  
+
   handleModalSave()
   {
     this.save();
@@ -786,20 +786,20 @@ class Builder extends PureClasss<Props>
     });
     browserHistory.push(this.state.nextLocation);
   }
-  
+
 	render()
   {
     let config = this.props.params.config;
     let variant = this.getVariant();
     let query = this.getQuery();
-    
+
     return (
       <div className={classNames({
         'builder': true,
         'builder-no-column-animation': this.state.noColumnAnimation,
       })}>
         {
-          !config || !config.length ? 
+          !config || !config.length ?
             <InfoArea
               large='No variants open'
               small='You can open one in the Library'
@@ -833,7 +833,7 @@ class Builder extends PureClasss<Props>
           thirdButtonText="Don't Save"
           onThirdButton={this.handleModalDontSave}
         />
-        
+
         <ResultsManager
           query={query}
           resultsState={this.state.builderState.resultsState}
@@ -843,6 +843,5 @@ class Builder extends PureClasss<Props>
       </div>
     );
 	}
-};
-
+}
 export default withRouter(DragDropContext(HTML5Backend)(Builder));

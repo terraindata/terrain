@@ -57,16 +57,16 @@ import TransformCardChart from './TransformCardChart';
 import TQLConverter from '../../../tql/TQLConverter';
 const Dimensions = require('react-dimensions');
 
-const NUM_BARS = 1000; 
+const NUM_BARS = 1000;
 
 export interface Props
 {
   keyPath: KeyPath;
   data: any; // transform card
-  
+
   canEdit?: boolean;
-  spotlights?: any;  
-  
+  spotlights?: any;
+
   containerWidth?: number;
 }
 
@@ -96,7 +96,7 @@ class TransformCard extends PureClasss<Props>
     queryId?: string;
     error?: boolean;
   };
-  
+
   constructor(props:Props)
   {
     super(props);
@@ -107,7 +107,7 @@ class TransformCard extends PureClasss<Props>
       spotlights: null,
     };
   }
-  
+
   componentDidMount()
   {
     this.computeBars(this.props.data.input);
@@ -117,20 +117,20 @@ class TransformCard extends PureClasss<Props>
       stateKey: 'spotlights',
     });
   }
-    
+
   componentWillReceiveProps(nextProps:Props)
   {
     if(nextProps.data.input !== this.props.data.input)
     {
       this.computeBars(nextProps.data.input);
     }
-    
+
     if(!nextProps.data.domain.equals(this.props.data.domain))
     {
       this.setState({
         domain: this.trimDomain(this.state.domain, nextProps.data.domain)
       });
-      
+
       if(nextProps.data.input === this.props.data.input)
       {
         // input didn't change but still need to compute bars to get the set within this domain
@@ -138,19 +138,19 @@ class TransformCard extends PureClasss<Props>
       }
     }
   }
-  
+
   trimDomain(curStateDomain: List<number>, maxDomain: List<number>): List<number>
   {
     let low = maxDomain.get(0);
     let high = maxDomain.get(1);
     var buffer = (high - low) * 0.02;
-    
+
     return List([
       Util.valueMinMax(curStateDomain.get(0), low, high - buffer),
       Util.valueMinMax(curStateDomain.get(1), low + buffer, high),
     ]);
   }
-  
+
   findTableForAlias(data:BuilderTypes.IBlock | List<BuilderTypes.IBlock>, alias:string): string
   {
     if(Immutable.List.isList(data))
@@ -166,12 +166,12 @@ class TransformCard extends PureClasss<Props>
       }
       return null;
     }
-    
+
     if(data['type'] === 'table' && data['alias'] === alias)
     {
       return data['table'];
     }
-    
+
     if(Immutable.Iterable.isIterable(data))
     {
       let keys = data.keys();
@@ -192,14 +192,14 @@ class TransformCard extends PureClasss<Props>
     }
     return null;
   }
-  
+
   computeBars(input: BuilderTypes.CardString)
   {
     // TODO consider putting the query in context
     let builderState = BuilderStore.getState();
     let {cards} = builderState.query;
     let {db} = builderState;
-    
+
     if(typeof input === 'string')
     {
       // TODO: cache somewhere
@@ -208,9 +208,9 @@ class TransformCard extends PureClasss<Props>
       {
         let alias = parts[0];
         let field = parts[1];
-        
+
         let table = this.findTableForAlias(cards, alias);
-        
+
         if(table)
         {
           this.setState(
@@ -240,7 +240,7 @@ class TransformCard extends PureClasss<Props>
           {
             return; // already broke
           }
-          
+
           let key = weight.get('key');
           if(typeof key === 'string')
           {
@@ -266,10 +266,10 @@ class TransformCard extends PureClasss<Props>
               }
             }
           }
-          
+
           finalTable = null; // Not good, abort!
         });
-        
+
         if(finalTable)
         {
           // convert the score to TQL, do the query
@@ -284,33 +284,33 @@ class TransformCard extends PureClasss<Props>
           return;
         }
       }
-      
+
       // TODO, or something
     }
     this.setState({
       bars: List([]), // no can do get bars sadly, need to figure it out one day
     });
   }
-  
+
   componentWillUnmount()
   {
     this.state.queryXhr && this.state.queryXhr.abort();
     this.killQuery();
   }
-  
+
   killQuery()
   {
-    this && this.state && this.state.queryId && 
+    this && this.state && this.state.queryId &&
       Ajax.killQuery(this.state.queryId);
   }
-  
+
   handleQueryResponse(response: QueryResponse)
   {
     this.setState({
       queryXhr: null,
       queryId: null,
     });
-    
+
     let results = response.results;
     if(results && results.length)
     {
@@ -328,13 +328,13 @@ class TransformCard extends PureClasss<Props>
           min = val;
         }
       });
-      
+
       if(this.props.data.hasCustomDomain)
       {
         min = Math.max(min, this.props.data.domain.get(0));
         max = Math.min(max, this.props.data.domain.get(1));
       }
-      
+
       let bars: Bar[] = [];
       for(let j = 0; j < NUM_BARS; j ++)
       {
@@ -348,7 +348,7 @@ class TransformCard extends PureClasss<Props>
           }
         });
       }
-      
+
       results.map(v =>
       {
         let val = +v.value;
@@ -362,15 +362,15 @@ class TransformCard extends PureClasss<Props>
           // out of bounds for our custom domain
           return;
         }
-        
+
         bars[i].count ++;
         bars[i].percentage += 1 / results.length;
       });
-      
+
       this.setState({
         bars: List(bars),
       });
-      
+
       if(!this.props.data.hasCustomDomain)
       {
         let domain = List([min, max]);
@@ -381,7 +381,7 @@ class TransformCard extends PureClasss<Props>
       }
     }
   }
-  
+
   handleQueryError(error: any)
   {
     this.setState({
@@ -391,28 +391,28 @@ class TransformCard extends PureClasss<Props>
       queryId: null,
     })
   }
-  
+
   handleDomainChange(domain: List<number>)
   {
     this.setState({
       domain,
     });
   }
-  
+
   handleUpdatePoints(points, isConcrete?: boolean)
   {
     Actions.change(this._ikeyPath(this.props.keyPath, 'scorePoints'), points, !isConcrete);
-    // we pass !isConcrete as the value for "isDirty" in order to tell the Store when to 
+    // we pass !isConcrete as the value for "isDirty" in order to tell the Store when to
     //  set an Undo checkpoint. Moving the same point in the same movement should not result
     //  in more than one state on the Undo stack.
   }
-  
+
   render()
   {
     let spotlights = this.state.spotlights;
     let {data} = this.props;
     let width = this.props.containerWidth ? this.props.containerWidth + 110 : 300;
-    
+
     return (
       <div
         className='transform-card-inner'
@@ -441,8 +441,7 @@ class TransformCard extends PureClasss<Props>
       </div>
     );
   }
-};
-
+}
 export default Dimensions({
   elementResize: true,
   containerStyle: {

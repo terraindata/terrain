@@ -70,14 +70,14 @@ interface Adjustment
 }
 
 var LayoutManager = React.createClass<any, any>({
-	propTypes: 
+	propTypes:
 	{
 		layout: React.PropTypes.object.isRequired, // TODO move to TS, describe different keys allowed
     moveTo: React.PropTypes.func,
     containerWidth: React.PropTypes.number.isRequired,
     containerHeight: React.PropTypes.number.isRequired,
 	},
-  
+
   shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(this.props.layout, nextProps.layout)
@@ -94,12 +94,12 @@ var LayoutManager = React.createClass<any, any>({
       sizeAdjustments: this.getAdjustments(this.props.layout.initialColSizes, this.props.containerWidth),
 		};
 	},
-  
+
   componentWillMount()
   {
     // this.onPanelDrag = _.throttle(this.onPanelDrag, 500);
   },
-  
+
   getAdjustments(adjustments, containerWidth: number)
   {
     if(adjustments)
@@ -109,11 +109,11 @@ var LayoutManager = React.createClass<any, any>({
       if(columns && minColWidth)
       {
         let numColumns = columns.length;
-        
+
         // Code that could potentially help but doesn't fully work
         //  because after one pass a column at the end can take width from
-        //  one before it 
-        
+        //  one before it
+
         let colWidth = containerWidth / numColumns;
         let adjustmentsChanged = false;
         let newAdjustments = JSON.parse(JSON.stringify(adjustments));
@@ -128,40 +128,40 @@ var LayoutManager = React.createClass<any, any>({
             {
               adjustmentsChanged = true;
               let difference = minWidth - colSize;
-              
+
               // get magnitude of all adjustments
-              let totalAdjustment = _.reduce(newAdjustments, 
-                (sum, adjustment) => 
+              let totalAdjustment = _.reduce(newAdjustments,
+                (sum, adjustment) =>
                 {
                   return sum + Math.max(adjustment.x, 0);
                 }
                 , 0);
-              
+
               if(difference >= totalAdjustment)
               {
                 // not enough space in the window, reset all
                 _.map(newAdjustments, adjustment => adjustment.x = 0);
               }
-              else 
+              else
               {
                 adjustment.x += difference;
                 // ratio by which to reduce adjustments
                 let ratio = (totalAdjustment - difference) / totalAdjustment;
-                _.map(newAdjustments, 
+                _.map(newAdjustments,
                   adjustment => adjustment.x > 0 && (adjustment.x *= ratio)
                 );
               }
             }
           }
         });
-        
+
         if(adjustmentsChanged)
         {
           return newAdjustments;
         }
       }
     }
-    
+
     return adjustments || [];
   },
 
@@ -184,13 +184,13 @@ var LayoutManager = React.createClass<any, any>({
   {
     window.removeEventListener("resize", this.updateDimensions);
   },
-  
+
   componentWillReceiveProps(newProps)
   {
     let {sizeAdjustments} = this.state;
     let sizeAdjustmentsChanged = false;
     let windowResized = false;
-    
+
     if(newProps.layout.columns && this.props.layout.columns)
     {
       // if using hidden:
@@ -206,21 +206,21 @@ var LayoutManager = React.createClass<any, any>({
         sizeAdjustmentsChanged = true;
       }
     }
-    
+
     if(newProps.containerWidth !== this.props.containerWidth)
     {
       sizeAdjustments = this.getAdjustments(sizeAdjustments, newProps.containerWidth);
       sizeAdjustmentsChanged = true;
       windowResized = true;
     }
-    
+
     if(sizeAdjustmentsChanged)
     {
       this.setState({
         sizeAdjustments,
         windowResized,
       });
-      
+
       this.props.layout.onColSizeChange &&
         this.props.layout.onColSizeChange(sizeAdjustments);
     }
@@ -259,7 +259,7 @@ var LayoutManager = React.createClass<any, any>({
 		if(this.props.layout.rows)
 		{
 			// dragged up
-			if(coords.dy < 0) 
+			if(coords.dy < 0)
 			{
 				var curY = clientRect.top + coords.dy;
 				var compareIndices = (refIndex) => refIndex < index;
@@ -270,7 +270,7 @@ var LayoutManager = React.createClass<any, any>({
 			}
 
 			// dragged down
-			if(coords.dy > 0) 
+			if(coords.dy > 0)
 			{
 				var curY = clientRect.bottom + coords.dy;
 				var compareIndices = (refIndex) => refIndex > index;
@@ -279,12 +279,12 @@ var LayoutManager = React.createClass<any, any>({
 				var heightAmplifier = -1;
 				var widthAmplifier = 0;
 			}
-		}	
+		}
 
 		if(this.props.layout.columns)
 		{
 			// dragged left
-			if(coords.dx < 0) 
+			if(coords.dx < 0)
 			{
 				var curX = clientRect.left + coords.dx;
 				var compareIndices = (refIndex) => refIndex < index;
@@ -294,7 +294,7 @@ var LayoutManager = React.createClass<any, any>({
 				var widthAmplifier = 1;
 			}
 			// dragged down
-			if(coords.dx > 0) 
+			if(coords.dx > 0)
 			{
 				var curX = clientRect.right + coords.dx;
 				var compareIndices = (refIndex) => refIndex > index;
@@ -302,10 +302,10 @@ var LayoutManager = React.createClass<any, any>({
 				var compareRefMidpointX = (refMidpointX) => curX > refMidpointX;
 				var heightAmplifier = 0;
 				var widthAmplifier = -1;
-			}	
+			}
 		}
 
-		$.each(this.refs, (refIndex, refObj) => 
+		$.each(this.refs, (refIndex, refObj) =>
 		{
 			if(compareIndices(refIndex))
 			{
@@ -361,7 +361,7 @@ var LayoutManager = React.createClass<any, any>({
 		{
 			return this.computeShiftedIndicesSingleAxis(index, coords);
 		}
-		
+
 		if(this.props.layout.cells)
 		{
 			return this.computeShiftedIndicesCells(index, coords, originalCoords);
@@ -405,7 +405,7 @@ var LayoutManager = React.createClass<any, any>({
       widthAmplifier = 1;
       heightAmplifier = 1;
     }
-    
+
     var lcr = this.refs.layoutManagerDiv.getBoundingClientRect();
     var y = coords.y;
     if(coords.y >= lcr.top && coords.y <= lcr.bottom)
@@ -421,7 +421,7 @@ var LayoutManager = React.createClass<any, any>({
       draggingOutside: ! draggingInside,
 		});
 	},
-  
+
   panelIsOutside(coords, originalCoords)
   {
     var cr = this.refs.layoutManagerDiv.getBoundingClientRect();
@@ -432,10 +432,10 @@ var LayoutManager = React.createClass<any, any>({
       // TOOD may want to adapt boundaries above
       return true;
     }
-    
+
     return false;
   },
-  
+
   getKeyForIndex(index)
   {
     var arr = this.props.layout.rows || this.props.layout.columns || this.props.layout.cells;
@@ -448,14 +448,14 @@ var LayoutManager = React.createClass<any, any>({
       draggingIndex: -1,
       dragging: false
     });
-    
+
 		var shiftedIndices = this.computeShiftedIndices(index, coords, originalCoords);
-		
+
 		if(shiftedIndices.length === 0)
 			return;
 
 		var fn = Math.max;
-			
+
 		if(shiftedIndices.length && shiftedIndices[0] < index)
 		{
 			fn = Math.min;
@@ -466,7 +466,7 @@ var LayoutManager = React.createClass<any, any>({
 		if(indexToMoveTo !== null && this.props.moveTo)
 		{
 			this.props.moveTo(index, indexToMoveTo);
-      
+
       if(this.state.sizeAdjustments)
       {
         let adjustments = JSON.parse(JSON.stringify(this.state.sizeAdjustments));
@@ -477,7 +477,7 @@ var LayoutManager = React.createClass<any, any>({
         this.setState({
           sizeAdjustments: adjustments,
         });
-        
+
         this.props.layout.onColSizeChange &&
           this.props.layout.onColSizeChange(this.state.sizeAdjustments);
       }
@@ -491,28 +491,28 @@ var LayoutManager = React.createClass<any, any>({
       draggingOutside: 0,
 		});
 	},
-  
+
   onResize(index, event)
   {
     var prevIndex = index - 1;
-    
+
     var startX = event.pageX;
     var startSAX = this.state.sizeAdjustments[index].x;
     var startPrevSAX = this.state.sizeAdjustments[prevIndex].x;
     this.setState({
       resizingIndex: index,
     });
-    
+
     var arr = this.props.layout.rows || this.props.layout.columns || this.props.layout.cells;
     var minWidth = arr[index].minWidth || 0;
     var startWidth = this.refs[index].getBoundingClientRect().width;
-    
+
     var minPrevWidth = arr[index - 1] ? arr[index - 1].minWidth || 0 : 0;
     var startPrevWidth = arr[index - 1] ? this.refs[index - 1].getBoundingClientRect().width : null;
     $('body').addClass('resizing');
     var target = event.target;
     $(target).addClass('active');
-    
+
     var move = function(event)
     {
       var diffX = startX - event.pageX;
@@ -521,23 +521,23 @@ var LayoutManager = React.createClass<any, any>({
       {
         diffX += minWidth - newWidth;
       }
-      
+
       var newPrevWidth = startPrevWidth - diffX;
       if(minPrevWidth !== null && newPrevWidth < minPrevWidth)
       {
         diffX -= minPrevWidth - newPrevWidth;
       }
-      
+
       var sa = JSON.parse(JSON.stringify(this.state.sizeAdjustments));
       sa[index].x = startSAX + diffX;
       sa[prevIndex].x = startPrevSAX - diffX;
-      
+
       this.setState({
         sizeAdjustments: sa,
       });
     }.bind(this);
-    
-    var endMove = () => 
+
+    var endMove = () =>
     {
       this.setState({
         resizingIndex: null,
@@ -547,25 +547,25 @@ var LayoutManager = React.createClass<any, any>({
       $(document).off('mousemove', move);
       $(document).off('touchmove', move);
       $(document).off('mouseup', endMove);
-      $(document).off('touchend', endMove);  
-      
+      $(document).off('touchend', endMove);
+
       this.props.layout.onColSizeChange &&
         this.props.layout.onColSizeChange(this.state.sizeAdjustments);
-    }
-    
+    };
+
     $(document).on('mousemove', move);
     $(document).on('touchmove', move);
     $(document).on('mouseup', endMove);
     $(document).on('touchend', endMove);
   },
 
-	renderObj(obj, className, index, style) 
+	renderObj(obj, className, index, style)
 	{
     if(!this.state.sizeAdjustments[index])
     {
       this.state.sizeAdjustments[index] = {x: 0, y: 0};
     }
-    
+
 		if(obj.content)
 		{
 			// if obj.content is null or undef, then React.cloneElement will error and cause the whole app to break
@@ -576,7 +576,7 @@ var LayoutManager = React.createClass<any, any>({
       }
       else
       {
-        props = { 
+        props = {
           index: index,
           onPanelDrag: this.onPanelDrag,
           onPanelDrop: this.onPanelDrop,
@@ -622,7 +622,7 @@ var LayoutManager = React.createClass<any, any>({
             }
           }
         }
-        
+
         if(obj.resizeable)
         {
           props.mouseDownRef = obj.resizeHandleRef;
@@ -639,7 +639,7 @@ var LayoutManager = React.createClass<any, any>({
 		{
 			content = <LayoutManager layout={obj} ref={index} moveTo={obj.moveTo} />
 		}
-    
+
     className += this.state.resizingIndex ? ' no-transition' : '';
 		return (
 			<div className={className} style={style} key={obj.key !== undefined ? obj.key : index} ref={index}>
@@ -647,7 +647,7 @@ var LayoutManager = React.createClass<any, any>({
 			</div>);
 	},
 
-	renderRow(row, index) 
+	renderRow(row, index)
 	{
 		var style: React.CSSProperties = {};
 		return this.renderObj(row, rowClass, index, style);
@@ -682,10 +682,10 @@ var LayoutManager = React.createClass<any, any>({
       {
         return sum;
       }
-      
+
       sum += (index === -1 || i <= index ? (column.width || 0) : 0);
   	  sum += (this.props.layout.colPadding && i !== 0 ? this.props.layout.colPadding : 0);
-		
+
       return sum;
     }, 0);
 	},
@@ -704,11 +704,11 @@ var LayoutManager = React.createClass<any, any>({
         offset: 0,
       };
     }
-    
+
 		var colPadding = this.paddingForColAtIndex(index);
     var widthAdjustment = 0;
     var values;
-    
+
     if(this.state.sizeAdjustments[index])
     {
       widthAdjustment += this.state.sizeAdjustments[index].x;
@@ -734,7 +734,7 @@ var LayoutManager = React.createClass<any, any>({
     		offset: portionOfSetWidth * -1 + widthAdjustment,
     	};
     }
-    
+
     return values;
 	},
 
@@ -745,10 +745,10 @@ var LayoutManager = React.createClass<any, any>({
 		return finalWidth;
 	},
 
-	renderColumn(column, index) 
+	renderColumn(column, index)
 	{
 		var classToPass = colClass;
-    
+
     if(this.props.layout.compact)
     {
        var style: React.CSSProperties =
@@ -767,11 +767,11 @@ var LayoutManager = React.createClass<any, any>({
         width: this.calcColumnWidth(column, index),
       };
     }
-    
+
 		return this.renderObj(column, classToPass, index, style);
 	},
 
-	renderCell(cell, index) 
+	renderCell(cell, index)
 	{
 		// todo consider moving this to somehwere not in a loop
 		var height = this.props.layout.cellHeight;
@@ -781,11 +781,11 @@ var LayoutManager = React.createClass<any, any>({
 		var style = {
 			height: height,
 			minWidth: this.props.layout.minCellWidth,
-		}
+		};
 
 		return this.renderObj(cell, cellClass, index, style);
 	},
-  
+
   renderBlankCell(cell, index)
   {
     return <div
@@ -794,7 +794,7 @@ var LayoutManager = React.createClass<any, any>({
       className={cellClass}
     />;
   },
-  
+
   getNumCellsInRow()
   {
     // TODO change how cell drag and drop works, and remove this crap
@@ -809,10 +809,10 @@ var LayoutManager = React.createClass<any, any>({
       }
       return count;
     }
-    
+
     return 1;
   },
-  
+
   componentDidUpdate()
   {
     if(this.state.windowResized)
@@ -823,7 +823,7 @@ var LayoutManager = React.createClass<any, any>({
     }
   },
 
-	render() 
+	render()
 	{
 		var layoutSum = (this.props.layout.rows ? 1 : 0) + (this.props.layout.columns ? 1 : 0) + (this.props.layout.cells ? 1 : 0);
 		if(layoutSum !== 1) {

@@ -68,36 +68,36 @@ export interface Props {
 
 export class Sidebar extends PureClasss<Props>
 {
-	render() 
+	render()
   {
 		return (
-      <div 
+      <div
         className={classNames({
           'sidebar-container': true,
           'sidebar-container-expanded': this.props.expanded,
         })}
       >
-      <div 
-        className="sidebar-selected-square" 
+      <div
+        className="sidebar-selected-square"
         style={{
           top: (this.props.selectedIndex * linkHeight) + 'px',
         }}
       />
       {
-        this.props.links.map((link, index) => 
+        this.props.links.map((link, index) =>
           <Link
             to={link.route}
             key={index}
           >
-            <div 
+            <div
               className={Util.objToClassname({
                 'sidebar-link': true,
                 'sidebar-link-selected': index === this.props.selectedIndex,
                 })}
             >
               <div className="sidebar-link-inner">
-                { 
-                  link.icon 
+                {
+                  link.icon
                 }
                 <div className="sidebar-link-text">
                   {
@@ -123,6 +123,5 @@ export class Sidebar extends PureClasss<Props>
 	  </div>
 		);
 	}
-};
-
+}
 export default Sidebar;

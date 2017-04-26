@@ -72,7 +72,7 @@ class SchemaView extends PureClasss<Props>
 	state: {
 		highlightedIndex: number;
 		search: string;
-		
+
 		// from Store
 		databases?: SchemaTypes.DatabaseMap;
 		highlightedId?: ID;
@@ -80,22 +80,22 @@ class SchemaView extends PureClasss<Props>
 		highlightedIndex: -1,
 		search: "",
 	};
-	
+
 	constructor(props:Props)
 	{
 		super(props);
-		
+
 		this._subscribe(SchemaStore, {
 			stateKey: 'databases',
 			storeKeyPath: ['databases'],
 		});
-		
+
 		this._subscribe(SchemaStore, {
 			stateKey: 'highlightedId',
 			storeKeyPath: ['highlightedId'],
 		});
 	}
-	
+
 	handleSearchChange(event)
 	{
 		let search = event.target.value as string;
@@ -105,12 +105,12 @@ class SchemaView extends PureClasss<Props>
 		});
 		SchemaActions.highlightId(null, false);
 	}
-	
+
 	handleSearchKeyDown(event)
 	{
 		let {highlightedIndex} = this.state;
 		let offset: number = 0;
-		
+
 		switch(event.keyCode)
     {
       case 38:
@@ -124,24 +124,24 @@ class SchemaView extends PureClasss<Props>
         let el = $(items[index]);
         let id = el.attr('data-id');
         let inSearchResults = !!el.attr('data-search');
-        
+
         this.setState({
         	highlightedIndex: index,
         });
-        
+
         SchemaActions.highlightId(id, inSearchResults);
-        
+
         break;
-        
+
       case 13:
       case 9:
         // enter or tab
-      	
+
       	if(this.state.highlightedId)
       	{
       		SchemaActions.selectId(this.state.highlightedId);
       	}
-      	
+
         // var value = visibleOptions.get(this.state.selectedIndex);
         // if(!value || this.state.selectedIndex === -1)
         // {
@@ -162,12 +162,12 @@ class SchemaView extends PureClasss<Props>
         break;
     }
 	}
-	
+
   render()
   {
   	let search = this.props.search || this.state.search;
   	let {showSearch} = this.props;
-  	
+
     return (
       <div
       	style={Styles.schemaView}
@@ -215,7 +215,7 @@ class SchemaView extends PureClasss<Props>
 			      		Visible Results
 			      	</div>
       			</FadeInOut>
-      			
+
 		      	<SchemaTreeList
 		      		itemType='database'
 		      		itemIds={this.state.databases && this.state.databases.keySeq().toList()}
@@ -223,13 +223,13 @@ class SchemaView extends PureClasss<Props>
 		      		topLevel={true}
 		      		search={search}
 		      	/>
-		      	
+
 			      <SchemaSearchResults
 			      	search={this.state.search}
 			      />
 		      </div>
 	      </div>
-	      
+
 	      <div
 	      	style={[
       			SECTION_STYLE,
@@ -248,7 +248,7 @@ class SchemaView extends PureClasss<Props>
 const SECTION_STYLE = {
 	position: 'absolute',
 	boxSizing: 'border-box',
-}
+};
 
 const SCHEMA_STYLE_FULL_PAGE = {
 	left: 0,

@@ -75,7 +75,7 @@ export interface Props
   value: BuilderTypes.CardString | number;
   keyPath: KeyPath; // keypath of value
   onChange?: (value: string | number) => void;
-  
+
   id?: string; // TODO remove
 
   canEdit?: boolean;
@@ -90,16 +90,16 @@ export interface Props
   acceptsCards?: boolean;
   top?: boolean;
   parentId?: string;
-  
+
   autoDisabled?: boolean;
   autoTerms?: List<string>;
-  
+
   isOverCurrent?: boolean;
   connectDropTarget?: (Element) => JSX.Element;
 
   isNumber?: boolean;
   typeErrorMessage?: string;
-  
+
   showWhenCards?: boolean;
   display?: Display;
   
@@ -112,7 +112,7 @@ class BuilderTextbox extends PureClasss<Props>
   constructor(props: Props)
   {
     super(props);
-    
+
     // TODO?
     // this.executeChange = _.debounce(this.executeChange, 750);
 
@@ -125,7 +125,7 @@ class BuilderTextbox extends PureClasss<Props>
       options: Immutable.List([]),
     };
   }
-  
+
   state: {
     wrongType: boolean;
     isSwitching: boolean;
@@ -133,12 +133,12 @@ class BuilderTextbox extends PureClasss<Props>
     backupString: CardString;
     options: List<string>;
   };
-  
+
   // TODO
   componentWillReceiveProps(newProps)
   {
     var value: any = newProps.value;
-    
+
     // If you want two-way backups, use this line
       // (value && this.props.value === '' && value['type'] === 'creating') ||
     if(
@@ -155,7 +155,7 @@ class BuilderTextbox extends PureClasss<Props>
       });
       return;
     }
-    
+
     this.setState ({
       wrongType: newProps.isNumber ? isNaN(value) : false,
     });
@@ -168,7 +168,7 @@ class BuilderTextbox extends PureClasss<Props>
       }
     }
   }
-  
+
   // throttled event handler
   executeChange(value)
   {
@@ -176,21 +176,21 @@ class BuilderTextbox extends PureClasss<Props>
     // {
     //   value = +value;
     // }
-    
+
     Actions.change(this.props.keyPath, value);
     this.props.onChange && this.props.onChange(value);
   }
-  
+
   handleCardDrop(item)
   {
     this.props.onChange && this.props.onChange(item);
   }
-  
+
   handleTextareaChange(event)
   {
     this.executeChange(event.target.value);
   }
-  
+
   handleAutocompleteChange(value)
   {
     this.executeChange(value);
@@ -201,13 +201,13 @@ class BuilderTextbox extends PureClasss<Props>
       });
     }
   }
-  
+
   isText()
   {
     // TODO better approach?
     return typeof this.props.value === 'string' || typeof this.props.value === 'number' || !this.props.value;
   }
-  
+
   handleSwitch()
   {
     let value = this.isText() ? BuilderTypes.make(BuilderTypes.Blocks.creating) : '';
@@ -216,7 +216,7 @@ class BuilderTextbox extends PureClasss<Props>
       backupString: typeof this.props.value === 'string' ? this.props.value : null,
     });
     this.executeChange(value);
-    
+
   }
   
   handleFocus(event:React.FocusEvent<any>)
@@ -229,7 +229,7 @@ class BuilderTextbox extends PureClasss<Props>
   {
     this.props.onBlur && this.props.onBlur(this, value, event);
   }
-  
+
   handleCardToolClose()
   {
     this.executeChange('');
@@ -237,14 +237,14 @@ class BuilderTextbox extends PureClasss<Props>
       value: '',
     });
   }
-  
+
   renderSwitch()
   {
     if(!this.props.canEdit)
     {
       return null;
     }
-    
+
     return (
       <a
         className={classNames({
@@ -260,21 +260,21 @@ class BuilderTextbox extends PureClasss<Props>
       </a>
     );
   }
-  
+
   toggleClosed()
   {
     Actions.change(this.props.keyPath.push('closed'), !this.props.value['closed']);
   }
-  
+
   computeOptions()
   {
     if(this.props.autoTerms || this.props.autoDisabled)
     {
       return;
     }
-    
+
     let options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
-    
+
     if(!options.equals(this.state.options))
     {
       this.setState({
@@ -282,13 +282,13 @@ class BuilderTextbox extends PureClasss<Props>
       });
     }
   }
-  
+
   render()
   {
     if(this.isText())
     {
       const { isOverCurrent, connectDropTarget, placeholder } = this.props;
-      
+
       let {options} = this.state;
       if(this.props.autoTerms)
       {
@@ -298,9 +298,9 @@ class BuilderTextbox extends PureClasss<Props>
       {
         options = null;
       }
-      
+
       return (
-        <div 
+        <div
           className={classNames({
             'builder-tb': true,
             'builder-tb-drag-over': isOverCurrent,
@@ -347,14 +347,14 @@ class BuilderTextbox extends PureClasss<Props>
         </div>
       );
     }
-    
+
     // We're in card mode
-    
+
     if(!this.props.showWhenCards)
     {
       return null;
     }
-    
+
     var card: BuilderTypes.ICard = this.props.value as BuilderTypes.ICard;
     // var cards = this.props.value['cards'];
     // if(cards.size)
@@ -369,8 +369,8 @@ class BuilderTextbox extends PureClasss<Props>
     //   var color = "#aaa";
     //   var title = "Add a Card";
     // }
-    
-    var chipStyle = 
+
+    var chipStyle =
     {
       background: color,
     };
@@ -378,11 +378,11 @@ class BuilderTextbox extends PureClasss<Props>
     {
       borderColor: color,
     };
-    var arrowHeadStyle = 
+    var arrowHeadStyle =
     {
       borderLeftColor: color,
-    }
-    
+    };
+
     return (
       <div className={classNames({
         'builder-tb': true,
@@ -415,17 +415,16 @@ class BuilderTextbox extends PureClasss<Props>
       </div>
     );
   }
-};
-
-// const btbTarget = 
+}
+// const btbTarget =
 // {
 //   canDrop(props, monitor)
 //   {
-//     console.log(props.acceptsCards && props.display 
+//     console.log(props.acceptsCards && props.display
 //       && props.display.accepts.indexOf(monitor.getItem().type) !== -1);
-//     return props.acceptsCards && props.display 
+//     return props.acceptsCards && props.display
 //       && props.display.accepts.indexOf(monitor.getItem().type) !== -1;
 //   },
- 
+
 
 export default BuilderTextbox;

@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Login.less')
+require('./Login.less');
 import * as $ from 'jquery';
 import * as classNames from 'classnames';
 import * as React from 'react';
@@ -74,11 +74,11 @@ class Login extends PureClasss<Props>
     opened: false,
     loggingIn: false,
   };
-  
+
   componentDidMount()
   {
     $('body').on('keydown', this.handleBodyKeyDown);
-    
+
     setTimeout(() =>
       this.setState({
         showingLogo: true,
@@ -92,12 +92,12 @@ class Login extends PureClasss<Props>
       1250
     );
   }
-  
+
   componentWillUnmount()
   {
     $('body').off('keydown', this.handleBodyKeyDown);
   }
-  
+
   handleBodyKeyDown(event)
   {
     // delay it, because for some reason, the page does
@@ -105,7 +105,7 @@ class Login extends PureClasss<Props>
     //  field until after the enter key is pressed
     setTimeout(() => this.handleKeyDown(event), 100);
   }
-  
+
   handleKeyDown(event)
   {
     if(event.keyCode === 13)
@@ -113,14 +113,14 @@ class Login extends PureClasss<Props>
       this.handleLogin();
     }
   }
-  
+
   handleUsernameChange(ev:any)
   {
     let {value} = ev.target;
-    this.setState({ 
+    this.setState({
       username: value
     });
-    
+
     if(value.length)
     {
       this.setState({
@@ -128,14 +128,14 @@ class Login extends PureClasss<Props>
       })
     }
   }
-  
+
   handlePasswordChange(ev:any)
   {
     let {value} = ev.target;
-    this.setState({ 
+    this.setState({
       password: value
     });
-    
+
     if(value.length)
     {
       this.setState({
@@ -143,14 +143,14 @@ class Login extends PureClasss<Props>
       })
     }
   }
-  
+
   handleFocus()
   {
     this.setState({
       shifted: true,
     });
   }
-  
+
   handleBlur()
   {
     if(!this.state.username && !this.state.password)
@@ -160,12 +160,12 @@ class Login extends PureClasss<Props>
       });
     }
   }
-  
+
   handleAnimationEnded()
   {
     this.props.onLoadComplete();
   }
-  
+
   xhr: XMLHttpRequest;
   handleLogin()
   {
@@ -174,7 +174,7 @@ class Login extends PureClasss<Props>
       // already logging in
       return;
     }
-    
+
     this.setState({
       loggingIn: true,
     });
@@ -182,7 +182,7 @@ class Login extends PureClasss<Props>
     let login = (token: string) => {
       Actions.login(token, username);
     };
-    
+
     this.xhr && this.xhr.abort();
     this.xhr = new XMLHttpRequest();
     this.xhr.onerror = (ev:Event) => {
@@ -192,7 +192,7 @@ class Login extends PureClasss<Props>
       });
       this.toggleErrorModal();
       this.xhr = null;
-    }
+    };
     this.xhr.onload = (ev:Event) => {
       if(this.xhr.status != 200) {
         this.setState({
@@ -205,14 +205,14 @@ class Login extends PureClasss<Props>
       let token = this.xhr.responseText;
       this.xhr = null;
       login(token);
-    }
+    };
     // NOTE: MIDWAY_HOST will be replaced by the build process.
     this.xhr.open("POST", MIDWAY_HOST + "/auth", true);
     this.xhr.send(JSON.stringify({
       username,
       password: this.state.password,
     }));
-  }  
+  }
 
   handleForgotPassword()
   {
@@ -245,7 +245,7 @@ class Login extends PureClasss<Props>
           'login-wrapper-shifted': this.state.shifted,
           'login-wrapper-open': this.state.opened && !this.state.loggingIn && !this.props.loggedIn,
         })}
-        onKeyDown={this.handleKeyDown} 
+        onKeyDown={this.handleKeyDown}
       >
         <div className='login-logo-container'>
         {
@@ -282,13 +282,13 @@ class Login extends PureClasss<Props>
               </label>
             </div>
             <div className='login-row'>
-              <input 
-                className='login-input-field' 
-                type='password' 
+              <input
+                className='login-input-field'
+                type='password'
                 id='login-password'
-                placeholder='' 
-                onKeyDown={this.handleKeyDown} 
-                onChange={this.handlePasswordChange} 
+                placeholder=''
+                onKeyDown={this.handleKeyDown}
+                onChange={this.handlePasswordChange}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
               />
@@ -305,27 +305,27 @@ class Login extends PureClasss<Props>
               Login
             </div>
           </div>
-          <Modal 
+          <Modal
             message={this.state.errorModalMessage}
-            onClose={this.toggleErrorModal} 
-            open={this.state.loginErrorModalOpen} 
+            onClose={this.toggleErrorModal}
+            open={this.state.loginErrorModalOpen}
             error={true}
-          /> 
+          />
         </div>
       </div>
     );
    }
-};
-        // <div className='login-bottom-toolbar'>
-        //   <div 
+}
+// <div className='login-bottom-toolbar'>
+        //   <div
         //     className='login-forgot-password'
         //     onClick={this.handleForgotPassword}
         //   >
-        //     Forgot Password? 
+        //     Forgot Password?
         //   </div>
         //   <div className='login-no-account'>
-        //     Don't have an account yet? &nbsp; 
-        //       <span 
+        //     Don't have an account yet? &nbsp;
+        //       <span
         //         className='login-green'
         //         onClick={this.registerNewUser}
         //       >

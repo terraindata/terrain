@@ -67,28 +67,28 @@ const SchemaTreeStyles =
 		height: '100%',
 		overflow: 'auto',
 	},
-	
+
 	schemaHeading: [
 		Styles.font.big,
 	],
-	
+
 	label: Styles.font.semiBoldNormal,
-	
+
 	none: {
-		
+
 	},
-	
-	
+
+
 	treeItem: [
 		Styles.transition,
 	],
-	
+
 	arrow: _.extend(
 		arrowSvgStyles,
 		Styles.rotate90,
 		Styles.transition
 	),
-	
+
 	arrowOpen: _.extend(
 		{},
 		arrowSvgStyles,
@@ -99,21 +99,21 @@ const SchemaTreeStyles =
 		Styles.rotate180,
 		Styles.transition
 	),
-	
+
 	treeItemHeader: [{
 			display: 'flex',
 			cursor: 'pointer',
 			height: itemHeaderHeight,
-			
+
 			borderRadius: 4,
-			
+
 			':hover': {
 				background: headerHighlightedColor,
 			}
 		},
 		Styles.transition,
 	],
-	
+
 	treeItemHeaderSelected:
 	{
 		background: headerSelectedColor,
@@ -121,22 +121,22 @@ const SchemaTreeStyles =
 			background: headerSelectedColor,
 		}
 	},
-	
+
 	treeItemHeaderHighlighted:
 	{
 		background: headerHighlightedColor,
 	},
-	
+
 	name: {
 		marginRight: Styles.margin * 3,
 		marginLeft: Styles.margin,
 		fontSize: 16,
 	},
-	
+
 	itemInfoRow: {
 		'flexGrow': '1',
 	},
-	
+
 	childrenWrapper: {
 		normal: [
 			{
@@ -148,36 +148,36 @@ const SchemaTreeStyles =
 			},
 			Styles.transition
 		],
-		
+
 		search: Styles.transition,
 	},
-	
+
 	childSection: {
-		
+
 	},
-	
-	
+
+
 	// SchemaTreeInfo
 	infoPieces: {
 		display: 'flex',
 		paddingTop: '2px',
 	},
-	
+
 	infoPiece: {
 		marginRight: Styles.margin * 2,
 	},
-	
+
 	infoPieceNumber: {
 		fontWeight: 1000,
 	},
-	
+
 	searchTextEmphasis: {
 		fontWeight: 1000,
 		color: Styles.colors.active,
 	},
-	
-	
+
+
 	margin: Styles.margin,
-}
+};
 
 export default SchemaTreeStyles;

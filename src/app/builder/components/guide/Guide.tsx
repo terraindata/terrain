@@ -78,8 +78,8 @@ export enum EScreen
   VAR,
   TRANSFORM,
   SCORE,
-  
-  
+
+
   ALL,
 }
 
@@ -93,13 +93,13 @@ export enum EExpressionType
 {
   STRING,
   NUMBER,
-  
+
   MAX,
   MIN,
   COUNT,
   SUM,
   EXISTS,
-  
+
   QUERY,
 }
 
@@ -129,9 +129,9 @@ class QueryClass
     table: string;
     alias: string;
   }[] = [];
-  
+
   fields: string[] = [];
-  
+
   where: IConditions = {
     conditions: [],
     combinator: BuilderTypes.Combinator.AND,
@@ -141,7 +141,7 @@ export interface IQuery extends QueryClass, IRecord<IQuery> {}
 const Query_Record = Immutable.Record(new QueryClass());
 export const _Query = (config?:any) => {
   return new Query_Record(config || {}) as any as IQuery;
-}
+};
 
 class Guide extends PureClasss<Props>
 {
@@ -149,16 +149,16 @@ class Guide extends PureClasss<Props>
     screen: EScreen.FROM,
     query: _Query(),
   };
-  
+
   constructor(props:Props)
   {
     super(props);
   }
-  
+
   render()
   {
     let {screen, query} = this.state;
-    
+
     return (
       <div
         className='guide'
@@ -178,7 +178,7 @@ class Guide extends PureClasss<Props>
   }
 }
         // {
-        //   !topLevel ? null : 
+        //   !topLevel ? null :
         //     <CardDropArea
         //       half={true}
         //       index={0}
@@ -186,7 +186,7 @@ class Guide extends PureClasss<Props>
         //     />
         // }
         // {
-        //   !topLevel ? null : 
+        //   !topLevel ? null :
         //     <CardDropArea
         //       half={true}
         //       lower={true}

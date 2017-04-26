@@ -1,11 +1,8 @@
 .directory
-web/sftp-config.json
 *DS_Store
 *~
-admin/
-__pycache__
+coverage/
 node_modules
-*.psd
 bundle.js
 bundle.prod.js
 bundle.demo.js
@@ -19,5 +16,7 @@ src/**/*.jsx
 midway/**/*.jsx
 .idea
 .vscode
+yarn.lock
 nodeway.db
 moviesdb.db
+*.swp

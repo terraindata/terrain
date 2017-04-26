@@ -57,11 +57,11 @@ var scaleMin = (scale) => scale.range()[0];
 var scaleMax = (scale) => scale.range()[scale.range().length - 1];
 
 var Periscope = {
-  
+
   create(el, state)
   {
     d3.select(el).attr('class', 'periscope-wrapper');
-    
+
     var svg = d3
       .select(el)
       .append('svg')
@@ -70,28 +70,28 @@ var Periscope = {
       .attr('height', state.height)
       .attr('viewBox', '0 0 ' + state.width + ' ' + state.height)
       ;
-    
+
     svg.append('rect')
       .attr('class', 'bg');
     svg.append('g')
       .attr('class', 'bottomAxis');
-    
+
     var innerSvg = svg.append('svg')
       .attr('class', 'inner-svg')
       .attr('x', xMargin)
       .attr('y', 0);
-        
+
     innerSvg.append('g')
       .attr('class', 'bars');
-    
+
     svg.append('rect')
       .attr('class', 'line');
     svg.append('g')
       .attr('class', 'handles');
-    
+
     this.update(el, state);
   },
-  
+
   update(el, state)
   {
     d3.select(el)
@@ -100,20 +100,20 @@ var Periscope = {
       .attr('height', state.height)
       .attr('viewBox', '0 0 ' + state.width + ' ' + state.height)
       ;
-    
+
     state.numBars = 10;
     var scales = this._scales(el, state.maxDomain, state.domain, state.barsData, state.width, state.height);
     this._draw(el, scales, state.domain, state.barsData, state.onDomainChange, state.onDomainChangeStart);
   },
-  
+
   destroy(el)
   {
     // cleanup here
   },
-  
-  
+
+
   // "private" stuff
-  
+
   _drawBg(el, scales)
   {
     d3.select(el).select('.bg')
@@ -123,7 +123,7 @@ var Periscope = {
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY))
       .attr('fill', '#f0f8e8');
   },
-  
+
   _drawAxes(el, scales)
   {
     var bottomAxis = d3.svg.axis()
@@ -136,45 +136,45 @@ var Periscope = {
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
       .call(bottomAxis);
   },
-  
-  
+
+
   _drawBars(el, scales, barsData)
   {
     var g = d3.select(el).selectAll('.bars');
-    
+
     var bar = g.selectAll('.bar')
       .data(barsData, (d) => d['id']);
-    
+
     var xPadding = 0;
-    
+
     var barWidth = (d) => {
-      var width = scales.realX(d['range']['max']) - scales.realX(d['range']['min']) - 2 * xPadding
+      var width = scales.realX(d['range']['max']) - scales.realX(d['range']['min']) - 2 * xPadding;
       if(width < 1)
       {
         width = 1
       }
       return width;
-    }
-    
+    };
+
     bar.enter()
       .append('rect')
       .attr('class', 'bar');
-    
+
     bar
       .attr('x', (d) => scales.realX(d['range']['min']) + xPadding)
       .attr('width', barWidth)
       .attr('y', (d) => scales.realBarY(d['percentage']))
       .attr('height', (d) => scaleMin(scales.realBarY) - scales.realBarY(d['percentage']));
-    
+
     bar.exit().remove();
   },
-  
+
   _drawLine(el, scales, domain)
   {
     var lineFunction = d3.svg.line()
       .x((d) => scales.x(d))
       .y((d) => scaleMin(scales.barY));
-    
+
     var height = 4;
     d3.select(el).select('.line')
       .attr("x", scales.x(domain.x[0]))
@@ -182,7 +182,7 @@ var Periscope = {
       .attr('y', scaleMin(scales.barY)) // - height / 2) // don't center, actually, so that it doesn't cover up the histogram
       .attr('height', height);
   },
-  
+
   // needs to be "function" for d3.mouse(this)
   _mousedownFactory: (el, onMove, scale, domain, onMoveStart) => function(event) {
     var del = d3.select(el);
@@ -190,38 +190,38 @@ var Periscope = {
     var startX = scale.invert(d3.mouse(this)[0]);
     onMoveStart(startX);
     var t = this;
-    
+
     var initialClasses = handle.attr('class');
     handle.attr('class', initialClasses + ' handle-active');
-    
+
     var move = function(event) {
       onMove(handle.attr('_id'), scale.invert(d3.mouse(t)[0]));
-    }
-    
+    };
+
     var bd = d3.select('body');
     bd.on('mousemove', move);
     bd.on('touchmove', move);
-    
+
     var offFn = () => {
-      bd.on('mousemove', null)
-      bd.on('touchmove', null)
+      bd.on('mousemove', null);
+      bd.on('touchmove', null);
       handle.attr('class', initialClasses);
     };
     bd.on('mouseup', offFn);
     bd.on('touchend', offFn);
     bd.on('mouseleave', offFn);
   },
-  
+
   _drawHandles(el, scales, domain, onDomainChange, onMoveStart)
   {
     var g = d3.select(el).selectAll('.handles');
     var handle = g.selectAll('.handle')
       .data(domain.x, (d, i) => "" + i);
-    
+
     handle.enter()
       .append('circle')
       .attr('class', 'handle');
-    
+
     handle
       .attr('cx', (d) => scales.x(d))
       .attr('cy', scaleMin(scales.barY))
@@ -229,29 +229,29 @@ var Periscope = {
       .attr('stroke', "#f00")
       .attr('stroke-width', '3px')
       .attr('r',  10);
-    
+
     handle
       .attr('_id', (d, i) => i);
-      
+
     handle.on('mousedown', this._mousedownFactory(el, onDomainChange, scales.x, domain, onMoveStart));
     handle.on('touchstart', this._mousedownFactory(el, onDomainChange, scales.x, domain, onMoveStart));
-    
+
     handle.exit().remove();
   },
-  
+
   _draw(el, scales, domain, barsData, onDomainChange, onDomainChangeStart)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
       .attr('height', scaleMin(scales.realBarY));
-      
+
     this._drawBg(el, scales);
     this._drawAxes(el, scales);
     this._drawBars(el, scales, barsData);
     this._drawLine(el, scales, domain);
     this._drawHandles(el, scales, domain, onDomainChange, onDomainChangeStart);
   },
-  
+
   _scales(el, maxDomain, domainAndRange, barsData, stateWidth, stateHeight)
   {
     if(!domainAndRange)
@@ -260,31 +260,31 @@ var Periscope = {
     }
     var width = stateWidth - xMargin;
     var height = stateHeight - yMargin;
-    
+
     var x = d3.scale.linear()
       .range([xMargin, width])
       .domain(maxDomain);
-    
+
     var realX = d3.scale.linear()
       .range([0, width - xMargin])
       .domain(maxDomain);
-    
+
     var pointY = d3.scale.linear()
       .range([height - yMargin, 0])
       .domain(domainAndRange.y);
-    
+
     var realPointY = d3.scale.linear()
       .range([height - yMargin, 0])
       .domain(domainAndRange.y);
-    
+
     var barsMax = barsData.reduce((max, bar) =>
       (max === false || bar.percentage > max ? bar.percentage : max)
       , false);
-    
+
     var barY = d3.scale.linear()
       .range([height - yMargin, 0])
       .domain([0, barsMax]);
-   
+
     var realBarY = d3.scale.linear()
       .range([height - yMargin, 0])
       .domain([0, barsMax]);
@@ -296,9 +296,9 @@ var Periscope = {
       realX,
       realPointY,
       realBarY,
-    }; 
+    };
   },
-  
+
 };
 
 export default Periscope;

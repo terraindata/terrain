@@ -66,7 +66,7 @@ export module LibraryTypes
   class VariantC
   {
     type = "variant";
-    
+
     id = "";
     name = "";
     lastEdited = "";
@@ -77,14 +77,14 @@ export module LibraryTypes
     version = false;
     db = 'urbansitter';
     isDefault = false;
-    
+
     // don't use this!
     // TODO remove when variants can be saved without queries
     query: BuilderTypes.Query = null;
-    
+
     // for DB storage, hopefully uneeded soon
     dbFields = ['groupId', 'algorithmId', 'status'];
-    dataFields = ['name', 'lastEdited', 'lastUsername', 'query', 'db', 'isDefault', 'modelVersion'];    
+    dataFields = ['name', 'lastEdited', 'lastUsername', 'query', 'db', 'isDefault', 'modelVersion'];
     modelVersion = 1;
     static getDb: (v:Variant) => string;
   }
@@ -105,18 +105,18 @@ export module LibraryTypes
         variantId: config.id,
       };
     }
-    
+
     config = Util.extendId(config || {});
     config.query = BuilderTypes._Query(config.query);
-    
+
     let v = new Variant_Record(config) as any as Variant;
     if(!config || !config.lastUsername || !config.lastEdited)
     {
       v = touchVariant(v);
     }
     return v;
-  }
-  
+  };
+
   export function touchVariant(v: Variant): Variant
   {
     return v
@@ -124,16 +124,16 @@ export module LibraryTypes
       .set('lastUsername', localStorage['username'])
     ;
   }
-  
+
   export function variantForSave(v: Variant): Variant
   {
     return v.set('query', BuilderTypes.queryForSave(v.query));
   }
-  
+
   export enum EAlgorithmStatus
   {
     // This order must be consistent with Midway
-    Archive,  
+    Archive,
     Live,
   }
 
@@ -147,7 +147,7 @@ export module LibraryTypes
     variantsOrder = List([]);
     status = EAlgorithmStatus.Live;
     db = 'urbansitter';
-    
+
     // for DB storage
     type = "algorithm";
     dbFields = ['groupId', 'status'];
@@ -159,7 +159,7 @@ export module LibraryTypes
     config = Util.extendId(config || {});
     config.variantsOrder = List(config.variantsOrder || []);
     return new Algorithm_Record(config) as any as Algorithm;
-  }
+  };
 
   export const groupColors =
   [
@@ -181,7 +181,7 @@ export module LibraryTypes
     Archive,
     Live,
   }
-  
+
   class GroupC
   {
     id = "";
@@ -192,7 +192,7 @@ export module LibraryTypes
     algorithmsOrder = List([]);
     status = EGroupStatus.Live;
     db = 'urbansitter';
-    
+
     // for DB storage
     type = "group";
     dbFields = ['status'];
@@ -205,8 +205,8 @@ export module LibraryTypes
     config.usernames = List(config.usernames || []);
     config.algorithmsOrder = List(config.algorithmsOrder || []);
     return new Group_Record(config) as any as Group;
-  }
-  
+  };
+
   export function nameForStatus(status:EVariantStatus | string): string
   {
     switch(status)
@@ -220,12 +220,12 @@ export module LibraryTypes
       case EVariantStatus.Live:
         return 'Live';
       case 'Default':
-        return 'Default'
+        return 'Default';
       default:
         return 'None';
     }
   }
-  
+
   export function colorForStatus(status:EVariantStatus | string): string
   {
     switch(status)
@@ -239,19 +239,19 @@ export module LibraryTypes
       case EVariantStatus.Live:
         return '#48b14b';
       case 'Default':
-        return '#957048'
+        return '#957048';
       default:
         return '#000';
     }
   }
-  
+
   export function getDbFor(item: Variant | Algorithm | Group | BuilderTypes.Query): string
   {
     // TODO change when DB is at algorithm level
     switch(item && item.type)
     {
       case 'query':
-        // const variantId = (item as BuilderTypes.Query).variantId;        
+        // const variantId = (item as BuilderTypes.Query).variantId;
         return null;
       case 'variant':
         return (item as Variant).db;

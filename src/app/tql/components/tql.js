@@ -42,13 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Adapted from javascript syntax codemirror file  
+// Adapted from javascript syntax codemirror file
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 var TqlConfig = require('../TQLConfig.json');
 
-(function(mod) 
+(function(mod)
 {
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../../../node_modules/codemirror/lib/codemirror"));
@@ -56,11 +56,11 @@ var TqlConfig = require('../TQLConfig.json');
     define(["../../../../node_modules/codemirror/lib/codemirror"], mod);
   else // Plain browser env
     mod(CodeMirror);
-})(function(CodeMirror) 
+})(function(CodeMirror)
 {
 "use strict";
 
-CodeMirror.defineMode("tql", function(config, parserConfig) 
+CodeMirror.defineMode("tql", function(config, parserConfig)
 {
   var jsonldMode = parserConfig.jsonld;
   var jsonMode = parserConfig.json || jsonldMode;
@@ -76,42 +76,42 @@ CodeMirror.defineMode("tql", function(config, parserConfig)
 
     var tqlKeywords = {};
     for (var index = 0; index < TqlConfig[0].keywords.length; index++)
-    { 
+    {
       var key = TqlConfig[0].keywords[index];
       var keyCap = key.toUpperCase();
       tqlKeywords[key] = kw(key);
       tqlKeywords[keyCap] = kw(keyCap);
     }
     for (var index = 0; index < TqlConfig[0].keywords2.length; index++)
-    { 
+    {
       var key = TqlConfig[0].keywords2[index];
       tqlKeywords[key] = kw(key);
     }
     for (var index = 0; index < TqlConfig[0].operators.length; index++)
-    { 
+    {
       var key = TqlConfig[0].operators[index];
       tqlKeywords[key] = kw("operator");
     }
     for (var index = 0; index < TqlConfig[0].atom.length; index++)
-    { 
+    {
       var key = TqlConfig[0].atom[index];
       tqlKeywords[key] = atom;
     }
     for (var index = 0; index < TqlConfig[0].var.length; index++)
-    { 
+    {
       var key = TqlConfig[0].var[index];
       tqlKeywords[key] = kw("var");
     }
 
-    if (isTS) 
+    if (isTS)
     {
       var type = {type: "variable", style: "variable-3"};
-      var tsKeywords = 
+      var tsKeywords =
       {
         "string": type, "number": type, "boolean": type, "any": type
       };
 
-      for (var attr in tsKeywords) 
+      for (var attr in tsKeywords)
       {
         tqlKeywords[attr] = tsKeywords[attr];
       }
@@ -151,30 +151,30 @@ CodeMirror.defineMode("tql", function(config, parserConfig)
     } else if (/\d/.test(ch)) {
       stream.match(/^\d*(?:\.\d*)?(?:[eE][+\-]?\d+)?/);
       return ret("number", "number");
-    } else if (ch == "/") 
+    } else if (ch == "/")
       {
-        if (stream.eat("*")) 
+        if (stream.eat("*"))
         {
           state.tokenize = tokenComment;
           return tokenComment(stream, state);
-        } 
-        else if (stream.eat("/")) 
+        }
+        else if (stream.eat("/"))
         {
           stream.skipToEnd();
           return ret("comment", "comment");
-        } 
-        else 
+        }
+        else
         {
           stream.eatWhile(isOperatorChar);
           return ret("operator", "operator", stream.current());
         }
-      } 
-      else if (isOperatorChar.test(ch)) 
+      }
+      else if (isOperatorChar.test(ch))
       {
         var word = stream.current(), known = keywords.propertyIsEnumerable(word) && keywords[word];
         return (known && state.lastType != ".") ? ret(known.type, known.style, word) :
                      ret("operator", "operator", word);
-      } 
+      }
       else if (ch == "&")
       {
         if (stream.eat("&"))
@@ -193,7 +193,7 @@ CodeMirror.defineMode("tql", function(config, parserConfig)
                      ret("variable", "variable", word);
         }
       }
-      else if (wordRE.test(ch)) 
+      else if (wordRE.test(ch))
       {
         stream.eatWhile(wordRE);
         var word = stream.current(), known = keywords.propertyIsEnumerable(word) && keywords[word];
@@ -213,7 +213,7 @@ CodeMirror.defineMode("tql", function(config, parserConfig)
       return ret("string", "string");
     };
   }
- 
+
   function tokenComment(stream, state) {
     var maybeEnd = false, ch;
     while (ch = stream.next()) {
@@ -363,7 +363,7 @@ CodeMirror.defineMode("tql", function(config, parserConfig)
       if (/\+\+|--/.test(value)) return cont(me);
       if (value == "?") return cont(expression, expr);
       return cont(expr);
-    }   
+    }
     if (type == ";") return;
     if (type == "(") return contCommasep(expressionNoComma, ")", "call", me);
     if (type == ".") return cont(property, me);
@@ -414,7 +414,7 @@ CodeMirror.defineMode("tql", function(config, parserConfig)
     if (type == "variable") {cx.marked = "variable-3"; return cont(afterType);}
   }
   function afterType(type, value) {
-    if (value == "<") return cont(commasep(typeexpr, ">"), afterType)
+    if (value == "<") return cont(commasep(typeexpr, ">"), afterType);
     if (type == "[") return cont(afterType)
   }
   function vardef() {

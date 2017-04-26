@@ -104,37 +104,37 @@ class LibraryInfoColumn extends Classs<Props>
     roles: null,
     me: null,
     dbs: List([]),
-  }
-  
+  };
+
   constructor(props:Props)
   {
     super(props);
-    
+
     this._subscribe(UserStore, {
-      stateKey: 'users', 
+      stateKey: 'users',
       storeKeyPath: ['users'],
     });
     this._subscribe(UserStore, {
-      stateKey: 'me', 
+      stateKey: 'me',
       storeKeyPath: ['currentUser'],
     });
     this._subscribe(RolesStore, {
-      stateKey: 'roles', 
+      stateKey: 'roles',
     });
-    
+
     this._subscribe(LibraryStore, {
       stateKey: 'dbs',
       storeKeyPath: ['dbs'],
     });
-    
-    Ajax.getDbs((dbs:string[]) => 
+
+    Ajax.getDbs((dbs:string[]) =>
     {
       LibraryActions.setDbs(
         List(dbs)
       );
     });
   }
-  
+
   renderVariant(isAdmin, isBuilder)
   {
     return (
@@ -146,20 +146,20 @@ class LibraryInfoColumn extends Classs<Props>
       />
     );
   }
-  
+
   handleAlgorithmDbChange(dbIndex:number)
   {
     Actions.algorithms.change(this.props.algorithm.set('db', this.state.dbs.get(dbIndex)) as Algorithm);
   }
-  
-  
+
+
   renderAlgorithm(isAdmin, isBuilder)
   {
     if(! this.props.algorithm || this.props.variant)
     {
       return null;
     }
-    
+
     return (
       <div>
         <div className='library-info-line'>
@@ -177,7 +177,7 @@ class LibraryInfoColumn extends Classs<Props>
       </div>
     );
   }
-  
+
   renderUser(user: User): JSX.Element
   {
     let {roles} = this.state;
@@ -186,7 +186,7 @@ class LibraryInfoColumn extends Classs<Props>
     {
       return null;
     }
-    return <LibraryInfoUser 
+    return <LibraryInfoUser
       user={user}
       groupRoles={groupRoles}
       me={this.state.me}
@@ -194,7 +194,7 @@ class LibraryInfoColumn extends Classs<Props>
       key={user.username}
     />;
   }
-  
+
   renderGroupRoles(): JSX.Element | JSX.Element[]
   {
     let { me, users, roles } = this.state;
@@ -203,7 +203,7 @@ class LibraryInfoColumn extends Classs<Props>
     {
       return null;
     }
-    
+
     return groupRoles.toArray().map((role: Role) =>
       {
         if(role.username === me.username)
@@ -213,7 +213,7 @@ class LibraryInfoColumn extends Classs<Props>
         return this.renderUser(users.get(role.username));
       });
   }
-  
+
   renderRemainingUsers()
   {
     let { me, roles, users } = this.state;
@@ -222,7 +222,7 @@ class LibraryInfoColumn extends Classs<Props>
     {
       return null;
     }
-    
+
     return users.toArray().map((user: User) =>
       {
         if(user.username === me.username || (groupRoles && groupRoles.get(user.username)))
@@ -232,12 +232,12 @@ class LibraryInfoColumn extends Classs<Props>
         return this.renderUser(user);
       });
   }
-  
+
   handleGroupDbChange(dbIndex:number)
   {
     Actions.groups.change(this.props.group.set('db', this.state.dbs.get(dbIndex)) as Group);
   }
-  
+
   renderGroup(isAdmin, isBuilder)
   {
     let { group } = this.props;
@@ -245,13 +245,13 @@ class LibraryInfoColumn extends Classs<Props>
     {
       return null;
     }
-    
+
     // let users: UserTypes.UserMap = UserStore.getState().get('users');
     // let me: UserTypes.User = UserStore.getState().get('currentUser');
     // let groupRoles: GroupRoleMap = RolesStore.getState().getIn(['roles', group.id]);
-    
+
     let isSysAdmin = this.state.me && this.state.me.isAdmin;
-    
+
     return (
       <div>
         <div className='library-info-line'>
@@ -274,12 +274,12 @@ class LibraryInfoColumn extends Classs<Props>
       </div>
     );
   }
-  
+
   render()
   {
-    let item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group = 
+    let item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group =
       this.props.variant || this.props.algorithm || this.props.group;
-    
+
     switch(item && item.type)
     {
       case 'group':
@@ -298,10 +298,10 @@ class LibraryInfoColumn extends Classs<Props>
         var icon = <VariantIcon />;
         break;
     }
-    
+
     let isAdmin = Util.haveRole(groupId, 'admin', UserStore, RolesStore);
     let isBuilder = Util.haveRole(groupId, 'builder', UserStore, RolesStore);
-    
+
     return (
       <LibraryColumn
         index={4}
@@ -318,28 +318,28 @@ class LibraryInfoColumn extends Classs<Props>
                     fill: ' + ColorManager.colorForKey(groupId) + ' !important; \
                   }'}}
                 />
-                { 
-                  icon 
+                {
+                  icon
                 }
               </div>
               <div className='library-info-name'>
-                { 
-                  item.name 
+                {
+                  item.name
                 }
               </div>
               <div className='library-info-type'>
-                { 
-                  item.type 
+                {
+                  item.type
                 }
               </div>
-              { 
-                this.renderVariant(isAdmin, isBuilder) 
+              {
+                this.renderVariant(isAdmin, isBuilder)
               }
-              { 
-                this.renderAlgorithm(isAdmin, isBuilder) 
+              {
+                this.renderAlgorithm(isAdmin, isBuilder)
               }
-              { 
-                this.renderGroup(isAdmin, isBuilder) 
+              {
+                this.renderGroup(isAdmin, isBuilder)
               }
             </div>
           :
@@ -348,7 +348,7 @@ class LibraryInfoColumn extends Classs<Props>
                 large='Select a Group'
               />
             </div>
-            
+
         }
       </LibraryColumn>
     );
@@ -374,12 +374,12 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
     {
       role = new RoleTypes.Role({ groupId: this.props.groupId, username: user.username });
     }
-    
+
     RolesActions.change(
       role.set('builder', newRole === 'Builder').set('admin', newRole === 'Admin') as RoleTypes.Role
     );
   }
-  
+
   changeToAdmin()
   {
     this.changeRole('Admin');
@@ -394,7 +394,7 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
   {
     this.changeRole('Viewer');
   }
-  
+
   render()
   {
     let { me, user, groupRoles } = this.props;
@@ -402,17 +402,17 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
     {
       return null;
     }
-    
+
     let gr = groupRoles && groupRoles.get(user.username);
     let isAdmin = gr && gr.admin;
     let isBuilder = gr && gr.builder && !isAdmin;
     let isViewer = !isAdmin && !isBuilder;
     let roleText = isAdmin ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
-    
+
     let imSysAdmin = me.isAdmin;
     let imGroupAdmin = groupRoles && groupRoles.get(me.username) && groupRoles.get(me.username).admin;
     // TODO
-    let menuOptions = 
+    let menuOptions =
     Immutable.List([
       {
         text: 'Viewer',
@@ -430,7 +430,7 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
         disabled: isAdmin
       }
     ]);
-    
+
     return (
       <div key={user.username} className='library-info-user'>
         <UserThumbnail

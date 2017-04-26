@@ -64,27 +64,27 @@ interface CDPProps
   index: number;
   beforeDrop?: (item:CardItem, targetProps:CDPProps) => void;
   accepts?: List<string>;
-  
+
   // if set, wrapper cards which can wrap this type of card can be dropped to wrap it
   wrapType?: string;
   wrapUp?: boolean; // wrap placeholder should extend up
-  
+
   connectDropTarget?: (el: El) => El;
   singleChild?: boolean; // can't have neighbors, but could still drop a wrapper card
 }
 
 class CardDragPreview extends PureClasss<CDPProps>
-{  
+{
   noCardColors: string[] = ['#aaa', '#aaa'];
-  
+
   state: {
     justDropped: boolean;
   } = {
     justDropped: null,
-  }
-  
+  };
+
   timeout: any;
-  
+
   componentWillReceiveProps(nextProps:CDPProps)
   {
     if(this.props.cardItem && !nextProps.cardItem)
@@ -96,21 +96,21 @@ class CardDragPreview extends PureClasss<CDPProps>
       this.timeout = setTimeout(() => this.setState({ justDropped: false }), 200);
     }
   }
-  
+
   componentWillUnmount()
   {
     this.timeout && clearTimeout(this.timeout);
   }
-  
+
   render()
   {
     const item = this.props.cardItem;
-    
+
     if(!item)
     {
       return <div />;
     }
-    
+
     if(item)
     {
       var {type} = item;
@@ -131,10 +131,10 @@ class CardDragPreview extends PureClasss<CDPProps>
       var preview = "None";
       var title = "None";
     }
-    
+
     let {visible, cardItem} = this.props;
 
-    if(visible && cardItem.props 
+    if(visible && cardItem.props
       && cardItem.props.keyPath === this.props.keyPath)
     {
       if(cardItem.props.index === this.props.index || cardItem.props.index === this.props.index - 1)
@@ -142,10 +142,10 @@ class CardDragPreview extends PureClasss<CDPProps>
         visible = false;
       }
     }
-    
-    let willWrap = this.props.cardItem 
+
+    let willWrap = this.props.cardItem
             && cardWillWrap(this.props, this.props.cardItem.type);
-    
+
     return this.props.connectDropTarget(
       <div
         className={classNames({
@@ -156,7 +156,7 @@ class CardDragPreview extends PureClasss<CDPProps>
           'card-drag-preview-wrap': willWrap,
           'card-drag-preview-wrap-up': willWrap && this.props.wrapUp,
         })}
-        
+
         style={{
           background: '#fff',
           borderColor: colors[0],
@@ -199,18 +199,18 @@ class CardDragPreview extends PureClasss<CDPProps>
   }
 }
 
-const cardPreviewTarget = 
+const cardPreviewTarget =
 {
   canDrop(targetProps:CDPProps, monitor)
   {
     return true;
   },
-  
+
   drop: (targetProps:CDPProps, monitor, component) =>
   {
     onCardDrop(targetProps, monitor, component);
   },
-}
+};
 
 const cardPreviewCollect = (connect, monitor) =>
 ({

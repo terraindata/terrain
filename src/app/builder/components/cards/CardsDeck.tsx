@@ -74,7 +74,7 @@ class CardsDeck extends PureClasss<Props>
   } = {
     search: "",
   };
-  
+
   componentWillReceiveProps(nextProps:Props)
   {
     if(!this.props.open && nextProps.open)
@@ -82,14 +82,14 @@ class CardsDeck extends PureClasss<Props>
       this.refs['search']['focus']();
     }
   }
-  
+
   handleSearchChange(evt)
   {
     this.setState({
       search: evt.target.value,
     });
   }
-  
+
   render()
   {
     return (
@@ -99,10 +99,10 @@ class CardsDeck extends PureClasss<Props>
         <div
           className='cards-deck-search-wrapper'
         >
-          <input 
-            type='text' 
-            ref='search' 
-            className='cards-deck-search' 
+          <input
+            type='text'
+            ref='search'
+            className='cards-deck-search'
             placeholder='Filter Cards'
             value={this.state.search}
             onChange={this.handleSearchChange}
@@ -140,7 +140,7 @@ interface CardProps
   card: ICard;
   search: string;
   key: string;
-  
+
   isDragging?: boolean;
   connectDragPreview?: (a?:any) => void;
   connectDragSource?: (el: El) => El;
@@ -153,12 +153,12 @@ class _CardDeckCard extends PureClasss<CardProps>
     let {card} = this.props;
     let data = card.static;
     let search = this.props.search.toLowerCase();
-    
+
     if(data.title.toLowerCase().indexOf(search) !== 0)
     {
       var hidden = true;
     }
-    
+
     return this.props.connectDragSource(
       <div
         className={classNames({
@@ -185,31 +185,31 @@ export interface CardItem
   new: boolean;
 }
 
-const cardSource = 
+const cardSource =
 {
   canDrag: (props) => true,
-  
+
   beginDrag: (props: CardProps): CardItem =>
   {
     setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
     // TODO unselect cards?
-    
+
     let item: CardItem = {
       type: props.card.type,
       new: true,
     };
-    
+
     Actions.dragCard(item);
-    
+
     return item;
   },
-  
+
   endDrag: () =>
   {
     $('body').removeClass('body-card-is-dragging');
     Actions.dragCard(false);
   }
-}
+};
 
 const dragCollect = (connect, monitor) =>
 ({

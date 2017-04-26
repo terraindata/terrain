@@ -55,7 +55,7 @@ AuthReducer[ActionTypes.login] =
     localStorage['authenticationToken'] = token;
     localStorage['username'] = username;
     return state.set("authenticationToken", token).set('username', username);
-  }
+  };
 
 AuthReducer[ActionTypes.logout] =
   (state, action) =>
@@ -63,6 +63,6 @@ AuthReducer[ActionTypes.logout] =
     delete localStorage['authenticationToken'];
     delete localStorage['username'];
     return state.set("authenticationToken", null).set('username', null);
-  }
+  };
 
 export default AuthReducer;

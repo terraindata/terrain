@@ -72,7 +72,7 @@ let addItem = (state:LibraryState, item, parentKeyPath: (string | ID)[], type: s
     .updateIn(parentKeyPath.concat([type + 'sOrder']),
       order => order.splice(index === undefined ? order.size : index, 0, item.id));
   return state;
-}
+};
 
 // assumes the objec'ts `groupId` and `algorithmId` keys are set
 let addVariant = (state:LibraryState, variant, index?: number) =>
@@ -116,7 +116,7 @@ LibraryReducers[ActionTypes.groups.move] =
 //       .setIn(['groups', id], group
 //         .set('id', id)
 //         .set('name', 'Copy of ' + group.name)
-//         .update('algorithmsOrder', order => 
+//         .update('algorithmsOrder', order =>
 //           order.map(oldId => idMap[oldId]))
 //       )
 //       .updateIn(['groupsOrder'],
@@ -130,9 +130,9 @@ LibraryReducers[ActionTypes.algorithms.create] =
     let db = state.groups.get(action.payload.groupId).db || undefined;
     return addVariant(
       addAlgorithm(
-        state, 
+        state,
         LibraryTypes._Algorithm({
-          groupId: action.payload.groupId, 
+          groupId: action.payload.groupId,
           id: algId,
           db,
         })
@@ -143,7 +143,7 @@ LibraryReducers[ActionTypes.algorithms.create] =
         db,
       })
     );
-  }
+  };
 
 LibraryReducers[ActionTypes.algorithms.change] =
   (state, action) =>
@@ -158,9 +158,9 @@ LibraryReducers[ActionTypes.algorithms.move] =
     let {algorithm, groupId} = action.payload;
     if(groupId !== algorithm.groupId)
     {
-      state = state.update('variants', 
+      state = state.update('variants',
         variants => variants.map(
-          (variant: LibraryTypes.Variant) => 
+          (variant: LibraryTypes.Variant) =>
           {
             if(variant.algorithmId === algorithm.id)
             {
@@ -171,13 +171,13 @@ LibraryReducers[ActionTypes.algorithms.move] =
         )
       );
     }
-    
+
     return addAlgorithm(
-        removeAlgorithm(state, algorithm), 
+        removeAlgorithm(state, algorithm),
         algorithm.set('groupId', groupId),
         action.payload.index
     );
-  }
+  };
 
 let duplicateAlgorithm = (algorithm, id, groupId, variantIdMap) =>
 {
@@ -185,11 +185,11 @@ let duplicateAlgorithm = (algorithm, id, groupId, variantIdMap) =>
     .set('id', id)
     .set('name', 'Copy of ' + algorithm.name)
     .set('groupId', groupId || algorithm.groupId)
-    .update('variantsOrder', 
-      order => 
+    .update('variantsOrder',
+      order =>
         order.map(oldId => variantIdMap[oldId])
     )
-}
+};
 
 LibraryReducers[ActionTypes.algorithms.duplicate] =
   (state, action) =>
@@ -198,10 +198,10 @@ LibraryReducers[ActionTypes.algorithms.duplicate] =
     groupId = groupId || algorithm.groupId;
     var variantIdMap = {};
     const newAlgorithmId = Util.getId();
-    
+
     state = state.update(
-      'variants', 
-      variants => 
+      'variants',
+      variants =>
         variants.reduce(
           (variantsMemo, variant, variantId) =>
           {
@@ -223,25 +223,25 @@ LibraryReducers[ActionTypes.algorithms.duplicate] =
           },
           Immutable.Map({})
         )
-    )
+    );
     return addAlgorithm(
       state,
       duplicateAlgorithm(
-        algorithm, 
-        newAlgorithmId, 
+        algorithm,
+        newAlgorithmId,
         groupId,
         variantIdMap
       ),
       index
     );
-  }
+  };
 
 LibraryReducers[ActionTypes.variants.create] =
   (state, action) =>
-    addVariant(state, 
+    addVariant(state,
       LibraryTypes._Variant({
-        algorithmId: action.payload.algorithmId, 
-        groupId: action.payload.groupId, 
+        algorithmId: action.payload.algorithmId,
+        groupId: action.payload.groupId,
         db: state.algorithms.get(action.payload.algorithmId).db || undefined,
       })
     );
@@ -258,12 +258,12 @@ LibraryReducers[ActionTypes.variants.status] =
   {
     let {variant, status, confirmed, isDefault} = action.payload;
     isDefault = !! isDefault;
-    
+
     if(variant === null)
     {
       return state.set('changingStatus', false);
     }
-    
+
     if(
       !confirmed &&
       (status === EVariantStatus.Live || variant.status === EVariantStatus.Live)
@@ -276,7 +276,7 @@ LibraryReducers[ActionTypes.variants.status] =
         .set('changingStatusDefault', isDefault)
         ;
     }
-    
+
     if(isDefault)
     {
       // remove any currently default variants
@@ -284,7 +284,7 @@ LibraryReducers[ActionTypes.variants.status] =
         ['variants'],
         (variants) =>
           variants.map(
-            (v:LibraryTypes.Variant) => 
+            (v:LibraryTypes.Variant) =>
               v.algorithmId === variant.algorithmId ?
                 v.set('isDefault', false)
               :
@@ -292,7 +292,7 @@ LibraryReducers[ActionTypes.variants.status] =
           )
         );
     }
-    
+
     return state
       .updateIn(
         ['variants', variant.id,],
@@ -300,7 +300,7 @@ LibraryReducers[ActionTypes.variants.status] =
                 .set('isDefault', isDefault)
       )
       .set('changingStatus', false);
-  }
+  };
 
 LibraryReducers[ActionTypes.variants.move] =
   (state, action) =>
@@ -319,18 +319,18 @@ let duplicateVariant = (variant, id, groupId?, algorithmId?) =>
     .set('status', LibraryTypes.EVariantStatus.Build)
     .set('isDefault', false)
     ;
-}
+};
 
 LibraryReducers[ActionTypes.variants.duplicate] =
   (state, action) =>
-    addVariant(state, 
+    addVariant(state,
       duplicateVariant(
-        LibraryTypes.touchVariant(action.payload.variant), 
+        LibraryTypes.touchVariant(action.payload.variant),
         Util.getId(), action.payload.groupId, action.payload.algorithmId),
       action.payload.index);
 
 LibraryReducers[ActionTypes.loadState] =
-  (state, action) => 
+  (state, action) =>
     action.payload.state
       .set('loaded', true)
       .set('loading', false)
@@ -345,7 +345,7 @@ LibraryReducers[ActionTypes.setDbs] =
 
 LibraryReducers[ActionTypes.variants.loadVersion] =
   (
-    state: LibraryState, 
+    state: LibraryState,
     action: Action<{
       variantId: string,
       variantVersion: LibraryTypes.Variant,

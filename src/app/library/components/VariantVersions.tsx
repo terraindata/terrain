@@ -77,30 +77,30 @@ class VariantVersions extends PureClasss<Props>
   } = {
     users: null,
     versions: null,
-    roles: null, 
-  }
-  
+    roles: null,
+  };
+
   constructor(props:Props)
   {
     super(props);
-    
-    this._subscribe(UserStore, 
+
+    this._subscribe(UserStore,
     {
-      stateKey: 'users', 
+      stateKey: 'users',
       storeKeyPath: ['users'],
     });
-    this._subscribe(RolesStore, 
+    this._subscribe(RolesStore,
     {
-      stateKey: 'roles', 
+      stateKey: 'roles',
     });
   }
 
   xhr: XMLHttpRequest = null;
-  fetchVariants(props) 
+  fetchVariants(props)
   {
     this.xhr = Ajax.getVariantVersions(props.variant.id, (versions) =>
     {
-      if(versions) 
+      if(versions)
       {
         versions.reverse();
         this.setState({
@@ -110,11 +110,11 @@ class VariantVersions extends PureClasss<Props>
     });
   }
 
-  componentWillMount() 
+  componentWillMount()
   {
     this.fetchVariants(this.props);
   }
-  
+
   componentWillUnmount()
   {
     this.xhr && this.xhr.abort();
@@ -126,35 +126,35 @@ class VariantVersions extends PureClasss<Props>
     this.fetchVariants(nextProps);
   }
 
-  showVersion(versionID, i) 
+  showVersion(versionID, i)
   {
     var url = '/builder/?o=' + this.props.variant.id;
-    if(i !== 0) 
+    if(i !== 0)
     {
       url += '@' + versionID;
     }
     browserHistory.push(url);
   }
 
-  renderVersion(version, i) 
+  renderVersion(version, i)
   {
     let {roles} = this.state;
     let groupId = this.props.variant.groupId;
     var role = "Viewer";
-    if (roles && roles.getIn([groupId, version.username])) 
+    if (roles && roles.getIn([groupId, version.username]))
     {
-      if (roles && roles.getIn([groupId, version.username]).admin) 
+      if (roles && roles.getIn([groupId, version.username]).admin)
       {
         role = "Admin";
       }
-      else if (roles && roles.getIn([groupId, version.username]).builder) 
+      else if (roles && roles.getIn([groupId, version.username]).builder)
       {
         role = "Builder";
       }
     }
 
     return (
-      <div 
+      <div
         className={classNames({
           "versions-table-row": true,
           "versions-table-row-current": i === 0,
@@ -165,14 +165,14 @@ class VariantVersions extends PureClasss<Props>
         }
       >
         <div className="versions-table-element">
-          <UserThumbnail 
-            username={version.username} 
+          <UserThumbnail
+            username={version.username}
             small={true}
             showName={true}
             extra={role}
           />
         </div>
-        <div 
+        <div
           className="versions-table-element"
         >
           {
@@ -182,7 +182,7 @@ class VariantVersions extends PureClasss<Props>
       </div>
     );
   }
-  
+
   render()
   {
     return(
@@ -194,7 +194,7 @@ class VariantVersions extends PureClasss<Props>
           Current Version
         </div>
         {
-          this.state.versions === null ? 
+          this.state.versions === null ?
             <div className='loading'>
               Loading...
             </div>

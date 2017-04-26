@@ -60,12 +60,11 @@ class Logout extends PureClasss<Props>
     AuthActions.logout();
     browserHistory.replace('/');
   }
-  
+
   render() {
     return (
        <InfoArea large="Logging out..." />
      );
   }
-};
-
+}
 export default Logout;

@@ -50,7 +50,7 @@ import Util from '../../util/Util';
 import * as classNames from 'classnames';
 import Classs from './../../common/components/Classs';
 
-const meterSectionValues = [0, 1, 2, 3, 4, 5]
+const meterSectionValues = [0, 1, 2, 3, 4, 5];
 
 export interface Props {
 	value: number,
@@ -58,10 +58,10 @@ export interface Props {
 
 class PasswordMeter extends Classs<Props>
 {
-	renderMeterSection(value) 
+	renderMeterSection(value)
 	{
 		return (
-			<div 
+			<div
 				className={classNames(
 					{
 					'meter-section': true,
@@ -72,7 +72,7 @@ class PasswordMeter extends Classs<Props>
 					'light-green': 	this.props.value === 4,
 					'green': 				this.props.value === 5,
 					'filled': 			this.props.value >= value
-				})}	
+				})}
 				key={value}
 			></div>
 		);

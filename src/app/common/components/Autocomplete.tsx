@@ -56,7 +56,7 @@ export interface Props
   value: string;
   onChange: (value: string) => void;
   options: List<string>;
-  
+
   placeholder?: string;
   help?: string;
   ref?: string;
@@ -70,13 +70,13 @@ export interface Props
 class Autocomplete extends PureClasss<Props>
 {
   value: string;
-  
+
   state: {
     value: string;
     open: boolean;
     selectedIndex: number;
   };
-  
+
   constructor(props: Props)
   {
     super(props);
@@ -88,7 +88,7 @@ class Autocomplete extends PureClasss<Props>
       selectedIndex: -1,
     };
   }
-  
+
   componentWillReceiveProps(nextProps)
   {
     this.value = nextProps.value;
@@ -96,7 +96,7 @@ class Autocomplete extends PureClasss<Props>
       value: nextProps.value,
     });
   }
-  
+
   handleChange(event)
   {
     var {target} = event;
@@ -104,7 +104,7 @@ class Autocomplete extends PureClasss<Props>
     {
       target = target.parentNode;
     }
-    
+
     var {value} = target;
     this.value = value;
     this.props.onChange(value);
@@ -112,17 +112,22 @@ class Autocomplete extends PureClasss<Props>
       value,
     });
   }
+<<<<<<< HEAD
   
   handleFocus(event:React.FocusEvent<any>)
+=======
+
+  handleFocus(event:React.FocusEvent)
+>>>>>>> master
   {
     this.setState({
       open: true,
       selectedIndex: -1,
     });
-    
+
     this.props.onFocus && this.props.onFocus(event);
   }
-  
+
   blurValue: string = '';
   handleBlur(event:React.FocusEvent<any>)
   {
@@ -133,7 +138,7 @@ class Autocomplete extends PureClasss<Props>
     this.props.onBlur && this.props.onBlur(event, this.blurValue || this.state.value);
     this.blurValue = '';
   }
-  
+
   handleSelect(value)
   {
     this.props.onChange(value);
@@ -143,7 +148,7 @@ class Autocomplete extends PureClasss<Props>
       selectedIndex: -1,
     });
   }
-  
+
   selectIndex(index: number)
   {
     // scroll option into view if necessary
@@ -155,7 +160,7 @@ class Autocomplete extends PureClasss<Props>
       let acMax = ac.scrollTop +  ac.clientHeight;
       let oMin = opt['offsetTop'];
       let oMax = opt['offsetTop'] + opt.clientHeight;
-      
+
       if(oMin < acMin)
       {
         ac.scrollTop = oMin;
@@ -165,12 +170,12 @@ class Autocomplete extends PureClasss<Props>
         ac.scrollTop += (oMax - acMax);
       }
     }
-    
+
     this.setState({
       selectedIndex: index,
     });
   }
-  
+
   handleKeydown(event)
   {
     if(!this.props.options)
@@ -216,27 +221,27 @@ class Autocomplete extends PureClasss<Props>
         // })
     }
   }
-  
+
   showOption(option: string): boolean
   {
     if(!option)
     {
       return false;
     }
-    
+
     if(!this.state.value)
     {
       return true;
     }
-    
+
     let haystack = option.toLowerCase();
     let needle = typeof this.state.value === 'string' ? this.state.value.toLowerCase() : '';
-    
+
     return haystack.indexOf(needle) === 0
       || haystack.indexOf(" " + needle) !== -1
       || haystack.indexOf("." + needle) !== -1;
   }
-  
+
   renderOption(option: string, index: number)
   {
     var first = option, second = "", third = "";
@@ -247,7 +252,7 @@ class Autocomplete extends PureClasss<Props>
       var second = option.substr(i, this.state.value.length);
       var third = option.substr(this.state.value.length + i);
     }
-    
+
     return (
       <div
         className={classNames({
@@ -263,7 +268,7 @@ class Autocomplete extends PureClasss<Props>
       </div>
     );
   }
-  
+
   render()
   {
     var options = this.props.options && this.props.options.filter(this.showOption);
@@ -292,7 +297,7 @@ class Autocomplete extends PureClasss<Props>
             })}
             ref='ac'
           >
-            { 
+            {
               options.map(this.renderOption)
             }
             {
@@ -307,6 +312,5 @@ class Autocomplete extends PureClasss<Props>
             //   !options.size ? null :
             //     this.renderOption("", -1)
             // }
-};
-
+}
 export default Autocomplete;

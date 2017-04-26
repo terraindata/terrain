@@ -55,10 +55,10 @@ import Util from '../../util/Util';
 import {Menu, MenuOption} from '../../common/components/Menu';
 const Dimensions = require('react-dimensions');
 
-const LEFT_COLOR_FROM = hexToRgb('#a2af93')
-const LEFT_COLOR_TO = hexToRgb('#828c76')
-const TOP_COLOR_FROM = hexToRgb('#565d4e')
-const TOP_COLOR_TO = hexToRgb('#3e3c3c')
+const LEFT_COLOR_FROM = hexToRgb('#a2af93');
+const LEFT_COLOR_TO = hexToRgb('#828c76');
+const TOP_COLOR_FROM = hexToRgb('#565d4e');
+const TOP_COLOR_TO = hexToRgb('#3e3c3c');
 
 export interface IColumn
 {
@@ -79,7 +79,7 @@ export interface Props
   menuOptions?: List<MenuOption>;
   rowKey: string;
   rowHeight?: number;
-  
+
   containerWidth?: number;
   containerHeight?: number;
 }
@@ -93,12 +93,12 @@ class _Table extends PureClasss<Props>
   state: {
   } = {
   };
-  
+
   constructor(props:Props)
   {
     super(props);
   }
-  
+
   render()
   {
     console.log(this.props.containerHeight);
@@ -121,7 +121,7 @@ export const Table = Dimensions({
 })(_Table);
 
 function hexToRgb (hex) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? {
     r: parseInt(result[1], 16),
     g: parseInt(result[2], 16),
@@ -134,12 +134,12 @@ function hexToRgb (hex) {
  * https://github.com/sass/libsass/blob/0e6b4a2850092356aa3ece07c6b249f0221caced/functions.cpp#L209
  */
 function mixColors (color1, color2, amount) {
-  const weight1 = amount
-  const weight2 = 1 - amount
+  const weight1 = amount;
+  const weight2 = 1 - amount;
 
-  const r = Math.round(weight1 * color1.r + weight2 * color2.r)
-  const g = Math.round(weight1 * color1.g + weight2 * color2.g)
-  const b = Math.round(weight1 * color1.b + weight2 * color2.b)
+  const r = Math.round(weight1 * color1.r + weight2 * color2.r);
+  const g = Math.round(weight1 * color1.g + weight2 * color2.g);
+  const b = Math.round(weight1 * color1.b + weight2 * color2.b);
 
   return { r, g, b }
 }

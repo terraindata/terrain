@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./Settings.less')
+require('./Settings.less');
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 import * as React from 'react';
@@ -80,10 +80,10 @@ class PasswordStrengthInput extends Classs<Props>
 		var result = zxcvbn(password);
 		var crack_time = result.crack_times_seconds.online_no_throttling_10_per_second;
 		var score;
-		if(crack_time <= Math.pow(10,2)) 
+		if(crack_time <= Math.pow(10,2))
 		{
 			score = 0;
-		} 
+		}
 		else if(crack_time <= Math.pow(10,4)) {
 			score = 1;
 		}
@@ -110,9 +110,9 @@ class PasswordStrengthInput extends Classs<Props>
 	{
 		return(
 			<div>
-				<input 
-					type={this.props.type} 
-					value={this.props.value} 
+				<input
+					type={this.props.type}
+					value={this.props.value}
 					onChange={this.props.onChange}
 					onInput={this.handleInput}
 					className='settings-input password-input'

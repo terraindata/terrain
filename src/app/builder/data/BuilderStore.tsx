@@ -60,43 +60,43 @@ export class BuilderStateClass
 {
   variantId: ID = "";
   query: BuilderTypes.Query = null;
-  
+
   // for undo/redo
   pastQueries: List<BuilderTypes.Query> = Immutable.List([]);
   nextQueries: List<BuilderTypes.Query> = Immutable.List([]);
   lastActionType: string = '';
   lastActionKeyPath: KeyPath = null;
   lastActionTime: number = 0;
-  
+
   loading: boolean = false;
   loadingXhr: XMLHttpRequest = null;
   loadingVariantId: ID = '';
-  
+
   hoveringCardId: ID = "";
-  
+
   selectedCardIds = Map<ID, boolean>({});
-  
+
   db: string = "";
 
-  // TODO move  
+  // TODO move
   manual = Map<ID, BuilderTypes.ICards>({});
   // Card examples used in the manual are stored here.
-  
+
   draggingCardItem: CardItem = false;
   draggingOverKeyPath: KeyPath = Immutable.List([]);
   draggingOverIndex: number = -1;
-  
+
   isDirty: boolean = false;
-  
+
   parseTreeReq: XMLHttpRequest = null;
-  
+
   resultsState: ResultsState = _ResultsState();
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> {}
 let BuilderState_Record = Immutable.Record(new BuilderStateClass());
 let _BuilderState = (config?:any) => {
   return new BuilderState_Record(config || {}) as any as BuilderState;
-}
+};
 
 var DefaultState = _BuilderState();
 
@@ -104,7 +104,7 @@ import BuilderReducers from './BuilderReducers';
 
 export const BuilderStore: IStore<BuilderState> = Redux.createStore(
   (
-    state: BuilderState = DefaultState, 
+    state: BuilderState = DefaultState,
     action: Action<{
       keyPath: KeyPath;
       notDirty: boolean;
@@ -115,7 +115,7 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
     {
       state = state
         .set('isDirty', true);
-      
+
       // back up for undo, check time to prevent overloading the undo stack
       let time = (new Date()).getTime();
       if(
@@ -131,7 +131,7 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
           .set('lastActionKeyPath', action.payload.keyPath)
           .set('pastQueries', state.pastQueries.unshift(state.query));
       }
-        
+
       if(state.nextQueries.size)
       {
         state = state.set('nextQueries', Immutable.List([]));
@@ -142,18 +142,18 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
     {
       state = (BuilderReducers[action.type] as any)(state, action);
     }
-    
+
     if(BuilderCardActionTypes[action.type])
     {
       // a card changed and we need to re-translate the tql
       //  needs to be after the card change has affected the state
       state = state
-        .setIn(['query', 'tql'], 
+        .setIn(['query', 'tql'],
           TQLConverter.toTQL(state.query)
         )
         .setIn(['query', 'tqlCardsInSync'], true);
     }
-    
+
     return state;
   }
 , DefaultState);

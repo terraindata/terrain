@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-require('./CreateLine.less')
+require('./CreateLine.less');
 import * as React from 'react';
 import Util from '../../util/Util';
 import PureClasss from '../../common/components/PureClasss';
@@ -67,6 +67,5 @@ class CreateLine extends PureClasss<Props>
      </div>
      );
   }
-};
-
+}
 export default CreateLine;

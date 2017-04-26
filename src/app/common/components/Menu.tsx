@@ -59,7 +59,7 @@ export interface MenuOption {
   disabled?: boolean;
   icon?: any;
   iconColor?: string;
-};
+}
 
 export interface Props
 {
@@ -73,8 +73,8 @@ export class Menu extends PureClasss<Props>
 {
   state: {
     open: boolean;
-  }
-  
+  };
+
   constructor(props: Props) {
     super(props);
     this.state =
@@ -82,14 +82,14 @@ export class Menu extends PureClasss<Props>
       open: false,
     }
   }
-  
+
   renderOption(option, index)
   {
     if(option.spacer)
     {
       return <div className='menu-option menu-option-spacer' key={index} />;
     }
-    
+
     if(!option.disabled)
     {
       // TODO
@@ -105,14 +105,14 @@ export class Menu extends PureClasss<Props>
         key={index}
         onClick={onClick}
       >
-        <div 
-          className="menu-option-icon" 
+        <div
+          className="menu-option-icon"
           style={{
             fill: option.iconColor || 'black',
           }}>
           {option.icon}
         </div>
-        <div 
+        <div
           className={option.icon ? "menu-text-padding" : "menu-text-padding-no-icon"}
         >
           { option.text }
@@ -120,26 +120,26 @@ export class Menu extends PureClasss<Props>
       </div>
     );
   }
-  
+
   close()
   {
     this.setState({
       open: false,
-    })
+    });
     $(document).off('click', this.close);
   }
-  
+
   componentWillUnmount()
   {
     $(document).off('click', this.close);
   }
-  
+
   toggleOpen()
   {
     this.setState({
       open: !this.state.open,
     });
-    
+
     if(!this.state.open)
     {
       $(document).on('click', this.close);
@@ -153,22 +153,22 @@ export class Menu extends PureClasss<Props>
     {
       return null;
     }
-    
+
     var multiplier = 10;
-    if(options.get(0).icon) 
+    if(options.get(0).icon)
     {
       multiplier = 14;
-    } 
-    var width = multiplier * options.reduce((max, option) => 
-        option.text && (option.text.length > max) ? option.text.length : max, 1)
+    }
+    var width = multiplier * options.reduce((max, option) =>
+        option.text && (option.text.length > max) ? option.text.length : max, 1);
 
     var style = {
       width: width,
       height: options.size * optionHeight,
     };
-    
+
     return (
-    <div 
+    <div
       className={classNames({
         "menu-wrapper": true,
         "menu-wrapper-small": this.props.small,
@@ -176,17 +176,17 @@ export class Menu extends PureClasss<Props>
       })}
       style={this.props.style ? this.props.style : null}
     >
-      <div 
+      <div
         className="menu-icon-wrapper"
         onClick={this.toggleOpen}
       >
         <MoreIcon className="menu-icon" />
        </div>
-        { 
+        {
           this.state.open &&
-            <div 
+            <div
               className="menu-options-wrapper"
-              style={style} 
+              style={style}
               onClick={this.toggleOpen}
             >
               {
@@ -197,6 +197,5 @@ export class Menu extends PureClasss<Props>
       </div>
     );
   }
-};
-
+}
 export default Menu;

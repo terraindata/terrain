@@ -54,7 +54,7 @@ import AuthStore from './../../auth/data/AuthStore';
 import Ajax from './../../util/Ajax';
 import Modal from './../../common/components/Modal';
 var CameraIcon = require('./../../../images/icon_camera.svg');
-var CloseIcon = require('./../../../images/icon_close_8x8_gray.svg')
+var CloseIcon = require('./../../../images/icon_close_8x8_gray.svg');
 const {browserHistory} = require('react-router');
 
 export interface Props
@@ -114,7 +114,7 @@ class Profile extends Classs<Props>
     },
   ];
 
-  constructor(props: Props) 
+  constructor(props: Props)
   {
     super(props);
 
@@ -124,7 +124,7 @@ class Profile extends Classs<Props>
       AuthStore.subscribe(() => this.updateUser(this.props));
   }
 
-  updateUser(props: Props) 
+  updateUser(props: Props)
   {
     let userState: UserTypes.UserState = UserStore.getState();
     let authState = AuthStore.getState();
@@ -134,20 +134,20 @@ class Profile extends Classs<Props>
     })
   }
 
-  componentWillMount() 
+  componentWillMount()
   {
     Actions.fetch();
     this.updateUser(this.props);
   }
 
-  componentWillUnmount() 
+  componentWillUnmount()
   {
     this.userUnsubscribe && this.userUnsubscribe();
     this.authUnsubscribe && this.authUnsubscribe();
     this.state.savingReq && this.state.savingReq.abort();
   }
 
-  handleSave() 
+  handleSave()
   {
     var newUser = this.state.user;
     this.infoKeys.map(infoKey => {
@@ -162,7 +162,7 @@ class Profile extends Classs<Props>
     });
   }
 
-  onSave() 
+  onSave()
   {
     this.setState({
       saving: false,
@@ -171,7 +171,7 @@ class Profile extends Classs<Props>
     browserHistory.push('/account/profile');
   }
 
-  onSaveError(response) 
+  onSaveError(response)
   {
     this.setState({
       errorModalMessage: 'Error saving: ' + JSON.stringify(response),
@@ -184,7 +184,7 @@ class Profile extends Classs<Props>
     });
   }
 
-  renderInfoItem(infoKey: { key: string, label: string, subText: string }) 
+  renderInfoItem(infoKey: { key: string, label: string, subText: string })
   {
     return (
       <div className='profile-info-item-edit' key={infoKey.key}>
@@ -205,14 +205,14 @@ class Profile extends Classs<Props>
     );
   }
 
-  handleProfilePicClick(event) 
+  handleProfilePicClick(event)
   {
     this.setState({
       showDropDown: !this.state.showDropDown,
     })
   }
 
-  handleUploadImage(event) 
+  handleUploadImage(event)
   {
     this.refs['imageInput']['click']();
   }
@@ -236,9 +236,9 @@ class Profile extends Classs<Props>
         user: this.state.user.set('imgSrc', reader.result)
       });
     }, false);
-    
+
     let file = event.target.files[0];
-    
+
     if(file) {
       if(file.size > 3000000)
       {
@@ -248,14 +248,14 @@ class Profile extends Classs<Props>
         this.toggleErrorModal();
         return;
       }
-      
+
       reader.readAsDataURL(file);
     }
   }
-  
-  hidePictureMenu() 
+
+  hidePictureMenu()
   {
-    if (this.state.showDropDown) 
+    if (this.state.showDropDown)
     {
       this.setState({
         showDropDown: false,
@@ -321,12 +321,12 @@ class Profile extends Classs<Props>
     {
       return <InfoArea large='Loading...' />
     }
-    
+
     if(!this.state.user)
     {
       return <InfoArea large='No such user found.' />
     }
-    
+
     return (
       <div className='profile profile-edit' onClick={this.hidePictureMenu}>
         <div className='profile-save-row'>
@@ -339,7 +339,7 @@ class Profile extends Classs<Props>
         </div>
         <div className='profile-edit-container'>
           <div className='profile-info'>
-            { 
+            {
               this.infoKeys.map(this.renderInfoItem)
             }
           </div>
@@ -348,16 +348,16 @@ class Profile extends Classs<Props>
             {this.renderProfilePicture()}
           </div>
         </div>
-        <Modal 
+        <Modal
           message={this.state.errorModalMessage}
-          onClose={this.toggleErrorModal} 
-          open={this.state.errorModalOpen} 
+          onClose={this.toggleErrorModal}
+          open={this.state.errorModalOpen}
           error={true}
-        /> 
+        />
       </div>
     );
 
-    
+
   }
 }
 

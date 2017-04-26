@@ -62,17 +62,17 @@ export interface Props
 
 class ManualInfo extends Classs<Props>
 {
-  constructor(props: Props) 
+  constructor(props: Props)
   {
     super(props);
   }
 
-  render() 
+  render()
   {
     return (
       <div className={'manual-info-wrapper ' + this.props.className} >
         <div className='manual-info-indicator'></div>
-        <div 
+        <div
           className={classNames({
             'manual-info-content': true,
             'manual-info-content-wide': this.props.wide,
@@ -80,11 +80,10 @@ class ManualInfo extends Classs<Props>
             'manual-info-content-left': this.props.leftSide
           })}
         >
-          {this.props.information}  
+          {this.props.information}
         </div>
       </div>
     );
   }
-};
-
+}
 export default ManualInfo;

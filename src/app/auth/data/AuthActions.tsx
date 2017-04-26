@@ -46,7 +46,7 @@ var _ = require('underscore');
 import ActionTypes from './AuthActionTypes';
 import Store from './AuthStore';
 
-var $ = (type: string, payload: any) => Store.dispatch({type, payload})
+var $ = (type: string, payload: any) => Store.dispatch({type, payload});
 
 var AuthActions =
 {

@@ -83,18 +83,18 @@ class TransformCardPeriscope extends PureClasss<Props>
     initialVal: 0,
     bars: null,
   };
-  
+
   refs: {
     [k: string]: Ref;
     chart: Ref;
-  }
-  
+  };
+
   constructor(props:Props)
   {
     super(props);
     this.state.bars = this.formatBars(props.barsData);
   }
-  
+
   formatBars(bars:Bars):Bars
   {
     if(bars.size > MAX_BARS)
@@ -102,8 +102,8 @@ class TransformCardPeriscope extends PureClasss<Props>
       var newBars: Bars = List([]);
       var min = bars.first().range.min;
       var max = bars.last().range.max;
-      
-      bars.map((bar:Bar) => 
+
+      bars.map((bar:Bar) =>
       {
         let b = Math.floor((bar.range.min - min) / (max - min) * MAX_BARS);
         let newBar: Bar = newBars.get(b);
@@ -123,18 +123,18 @@ class TransformCardPeriscope extends PureClasss<Props>
     }
     return bars;
   }
-  
+
   componentDidMount()
   {
     var el = ReactDOM.findDOMNode(this.refs.chart);
     let chartState = this.getChartState();
-    
+
     this.setState({
       chartState,
     });
     Periscope.create(el, chartState.toJS());
   }
-  
+
   componentWillReceiveProps(nextProps:Props)
   {
     if(this.shouldComponentUpdate(nextProps, this.state))
@@ -150,13 +150,13 @@ class TransformCardPeriscope extends PureClasss<Props>
       this.update(_.extend({}, nextProps, { bars }));
     }
   }
-  
+
   update(overrideState?)
   {
     var el = ReactDOM.findDOMNode(this.refs.chart);
-    Periscope.update(el, this.getChartState(overrideState).toJS()); 
+    Periscope.update(el, this.getChartState(overrideState).toJS());
   }
-  
+
   handleDomainChangeStart(initialVal)
   {
     this.setState({
@@ -164,22 +164,22 @@ class TransformCardPeriscope extends PureClasss<Props>
       initialVal,
     })
   }
-  
+
   handleDomainChange(handleIndex, newVal)
   {
-    var domain = 
-      this.state.initialDomain.set(handleIndex, 
+    var domain =
+      this.state.initialDomain.set(handleIndex,
         this.state.initialDomain.get(handleIndex) + newVal - this.state.initialVal
       );
-      
+
     let {maxDomain} = this.props;
     var buffer = (maxDomain.get(1) - maxDomain.get(0)) * 0.01;
-    domain = domain.set(0, 
+    domain = domain.set(0,
         Util.valueMinMax(domain.get(0), maxDomain.get(0), this.state.initialDomain.get(1) - buffer)
       );
-    domain = domain.set(1, 
-      Util.valueMinMax(domain.get(1), 
-        this.state.initialDomain.get(0) + buffer, 
+    domain = domain.set(1,
+      Util.valueMinMax(domain.get(1),
+        this.state.initialDomain.get(0) + buffer,
         maxDomain.get(1))
       );
     this.props.onDomainChange(domain);
@@ -187,7 +187,7 @@ class TransformCardPeriscope extends PureClasss<Props>
       domain,
     });
   }
-  
+
   handleDomainTextChange()
   {
     Actions.change(this._ikeyPath(this.props.keyPath, 'hasCustomDomain'), true);
@@ -207,10 +207,10 @@ class TransformCardPeriscope extends PureClasss<Props>
       width: (overrideState && overrideState['width']) || this.props.width,
       height: 40,
     });
-    
+
     return chartState;
   }
-  
+
   componentWillUnmount()
   {
     var el = ReactDOM.findDOMNode(this.refs.chart);
@@ -222,7 +222,7 @@ class TransformCardPeriscope extends PureClasss<Props>
     return (
       <div className='transform-periscope-wrapper'>
         <div ref='chart' />
-        
+
         <div className='tp-text-wrapper'>
           <BuilderTextbox
             value={this.props.maxDomain.get(0)}
@@ -243,10 +243,9 @@ class TransformCardPeriscope extends PureClasss<Props>
             autoDisabled={true}
           />
         </div>
-        
+
       </div>
     );
   }
-};
-
+}
 export default TransformCardPeriscope;

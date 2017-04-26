@@ -67,7 +67,7 @@ export interface Props
   onAdd: (index: number) => void;
   onRemove: (index: number) => void;
   onMove: (index: number, newIndex: number) => void;
-  
+
   isSingle?: boolean;
   isFirstRow?: boolean;
   isOnlyRow?: boolean;
@@ -76,7 +76,7 @@ export interface Props
   keyPath: KeyPath;
   data: any; // record
   canEdit: boolean;
-  
+
   parentData?: any;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
@@ -104,49 +104,49 @@ const DefaultMoveState: IMoveState =
 {
   moving: false,
   movedTo: null,
-}
+};
 
   const shallowCompare = require('react-addons-shallow-compare');
 // TODO consider adding state to the template
 class CardField extends PureClasss<Props>
 {
   state: IMoveState = DefaultMoveState;
-  
+
   ss(state: IMoveState)
   {
     this.setState(state);
   }
-  
+
 	removeField(event)
 	{
     Util.animateToHeight(this.refs['all'], 0, () =>
 		  this.props.onRemove(this.props.index));
 	}
-  
+
   addField(event)
   {
     this.props.onAdd(this.props.index + 1);
   }
-  
+
   addFieldTop(event)
   {
     this.props.onAdd(0);
   }
-  
+
   handleHandleMousedown(event:MEvent)
   {
     $('body').on('mousemove', this.handleMouseMove);
     $('body').on('mouseup', this.handleMouseUp);
     $('body').on('mouseleave', this.handleMouseUp);
-    
+
     let parent = Util.parentNode(this.refs['all']);
-    
+
     let cr = this.refs['all']['getBoundingClientRect']();
     let parentCr = parent['getBoundingClientRect']();
-    
+
     let minDY = parentCr.top - cr.top;
     let maxDY = parentCr.bottom - cr.bottom;
-    
+
     let siblings = Util.siblings(this.refs['all']);
     let midpoints = [];
     let tops = [];
@@ -156,7 +156,7 @@ class CardField extends PureClasss<Props>
       midpoints.push((sibCr.top + sibCr.bottom) / 2); // - (i > this.props.index ? cr.height /**/ : 0));
       tops.push(sibCr.top);
     });
-    
+
     this.setState({
       moving: true,
       originalMouseY: event.pageY,
@@ -170,12 +170,12 @@ class CardField extends PureClasss<Props>
       tops,
     } as IMoveState);
   }
-  
+
   shiftSiblings(evt, shiftSelf:boolean): ({ dY: number, index: number })
   {
     let dY = Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY);
-  
-    // TODO search from the bottom up if dragging downwards  
+
+    // TODO search from the bottom up if dragging downwards
     if(dY < 0)
     {
       // if dragged up, search from top down
@@ -195,7 +195,7 @@ class CardField extends PureClasss<Props>
         index --
       );
     }
-  
+
     let sibs = Util.siblings(this.refs['all']);
     _.range(0, sibs.length).map(i =>
     {
@@ -205,7 +205,7 @@ class CardField extends PureClasss<Props>
         $(el).removeClass('card-field-wrapper-moving');
         return;
       }
-      
+
       var shift = 0;
       if(index < this.props.index)
       {
@@ -223,14 +223,14 @@ class CardField extends PureClasss<Props>
           shift = -1;
         }
       }
-      
+
       el['style'].top = shift * this.state.elHeight;
       $(el).addClass('card-field-wrapper-moving');
     });
-    
+
     return { dY, index };
   }
-  
+
   handleMouseMove(evt)
   {
     this.setState({
@@ -239,7 +239,7 @@ class CardField extends PureClasss<Props>
     evt.preventDefault();
     evt.stopPropagation();
   }
-  
+
   move()
   {
     if(this.props.index !== this.state.movedTo)
@@ -253,10 +253,10 @@ class CardField extends PureClasss<Props>
         moving: false,
       });
     }
-    
+
     $('.card-field-wrapper-moving').removeClass('card-field-wrapper-moving');
   }
-  
+
   componentWillReceiveProps(nextProps: Props)
   {
     if(nextProps.index !== this.props.index)
@@ -271,22 +271,22 @@ class CardField extends PureClasss<Props>
       );
     }
   }
-  
+
   handleMouseUp(evt)
   {
     $('body').off('mousemove', this.handleMouseMove);
     $('body').off('mouseup', this.handleMouseUp);
     $('body').off('mouseleave', this.handleMouseUp);
-    
+
     let {index} = this.shiftSiblings(evt, true);
-    
+
     setTimeout(this.move, 150);
-    
+
     this.setState({
       movedTo: index,
     });
   }
-  
+
   beforeTopAddDrop(item:CardItem, targetProps)
   {
     this.props.onAdd(0);
@@ -308,12 +308,12 @@ class CardField extends PureClasss<Props>
         zIndex: 99999,
       };
     }
-    
+
     let {row} = this.props;
-    
+
     let isData = typeof this.props.data[this.props.row.inner['key']] !== 'string';
     let renderTools = ! row.hideToolsWhenNotString || ! isData;
-    
+
     return (
       <div
         ref='all'
@@ -375,7 +375,7 @@ class CardField extends PureClasss<Props>
                   </div>
                   {
                       this.props.helpOn ?
-                      <ManualInfo 
+                      <ManualInfo
                         information="Can move fields around within the current card by dragging and dropping"
                         className='card-field-manual-info'
                         leftSide={true}
@@ -408,10 +408,10 @@ class CardField extends PureClasss<Props>
                       data-tip={'Add another'}
                     >
                       <AddIcon />
-                    </div> 
+                    </div>
                     {
                       this.props.helpOn ?
-                      <ManualInfo 
+                      <ManualInfo
                         information="Can add field using the plus button or remove fields using the x button"
                         rightSide={true}
                         className='card-field-manual-info'

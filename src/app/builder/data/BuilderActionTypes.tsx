@@ -52,11 +52,11 @@ var Immutable = require('immutable');
 //  of this file sets all of the values equal to the keys.
 // So you end up with ActionTypes.cards.move === 'cards.move'
 
-export var BuilderActionTypes = 
+export var BuilderActionTypes =
 {
   fetchQuery: '', // triggers server xhr
   queryLoaded: '', // when the call to the server returns
-  
+
   // these apply to the state's query
   create: '',
   change: '',
@@ -66,24 +66,24 @@ export var BuilderActionTypes =
   dragCard: '',
   dragCardOver: '',
   dropCard: '',
-  
+
   hoverCard: '',
-  
+
   selectCard: '',
-  
-  
+
+
   // Change the hand-writen TQL
   changeTQL: '',
   parseTreeLoaded: '',
   parseTreeError: '',
-  
+
   toggleDeck: '',
-  
+
   changeResultsConfig: '',
   results: '',
-  
+
   save: '', // just tells the store that something was saved
-  
+
   undo: '',
   redo: '',
   checkpoint: '', // inserts an undo checkpoint
@@ -114,7 +114,7 @@ var setValuesToKeys = (obj: any, prefix: string) =>
       throw "Value found in ActionTypes that is neither string or object of strings: key: " + key + ", value: " + obj[key];
     }
   }
-}
+};
 
 setValuesToKeys(BuilderActionTypes, '');
 

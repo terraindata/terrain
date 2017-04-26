@@ -69,7 +69,7 @@ export const SchemaStore: IStore<SchemaState> =
 							SchemaActions.dbCount(dbs.length);
 							dbs.map(
 								db =>
-									Ajax.schema(db, 
+									Ajax.schema(db,
 										(colsData, error) =>
 										{
 											if(!error)
@@ -88,11 +88,11 @@ export const SchemaStore: IStore<SchemaState> =
 							SchemaActions.error(JSON.stringify(dbError));
 						}
 					);
-					
+
 					return state
 						.set('loading', true);
 				},
-			
+
 			[SchemaActionTypes.dbCount]:
 				(
 					state: SchemaState,
@@ -101,10 +101,10 @@ export const SchemaStore: IStore<SchemaState> =
 					}>
 				) =>
 					state.set('dbCount', action.payload.dbCount),
-			
+
 			[SchemaActionTypes.setDatabase]:
 				(
-					state: SchemaState, 
+					state: SchemaState,
 					action: Action<SchemaTypes.SetDbActionPayload>
 				) => {
 					let {database, tables, columns, indexes, tableNames, columnNames} = action.payload;
@@ -112,7 +112,7 @@ export const SchemaStore: IStore<SchemaState> =
 					{
 						state = state.set('loading', false).set('loaded', true);
 					}
-					
+
 					return state
 						.setIn(['databases', database.id], database)
 						.set('tables', state.tables.merge(tables))
@@ -121,15 +121,15 @@ export const SchemaStore: IStore<SchemaState> =
 						.set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
 						.set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
 				},
-			
+
 			[SchemaActionTypes.selectId]:
 				(state: SchemaState, action: Action<{ id: ID }>) =>
 					state.set('selectedId', action.payload.id),
-					
+
 			[SchemaActionTypes.highlightId]:
-				(state: SchemaState, action: Action<{ 
-					id: ID, 
-					inSearchResults: boolean 
+				(state: SchemaState, action: Action<{
+					id: ID,
+					inSearchResults: boolean
 				}>) =>
 					state.set('highlightedId', action.payload.id)
 						.set('highlightedInSearchResults', action.payload.inSearchResults),
@@ -138,42 +138,42 @@ export const SchemaStore: IStore<SchemaState> =
 	), DEV ? ExampleSchemaData : SchemaTypes._SchemaState());
 
 
-const $ = (type: string, payload: any) => SchemaStore.dispatch({type, payload})
+const $ = (type: string, payload: any) => SchemaStore.dispatch({type, payload});
 
 export const SchemaActions =
 {
   fetch:
     () =>
       $(SchemaActionTypes.fetch, {} ),
-  
+
   dbCount:
   	(dbCount: number) =>
   		$(SchemaActionTypes.dbCount, { dbCount }),
-  
+
   error:
   	(error: string) =>
   		$(SchemaActionTypes.error, { error }),
-  
+
   setDatabase:
     (
       payload: SchemaTypes.SetDbActionPayload
     ) =>
       $(SchemaActionTypes.setDatabase, payload),
-  
+
  	highlightId:
  		(id: ID, inSearchResults: boolean) =>
  			$(SchemaActionTypes.highlightId, {
  				id,
  				inSearchResults,
  			}),
- 			
+
   selectId:
   	(id: ID) =>
   		$(SchemaActionTypes.selectId, {
   			id
   		}),
- 	
-}
+
+};
 
 
 export default SchemaStore;
