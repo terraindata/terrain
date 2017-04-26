@@ -67,7 +67,7 @@ export class ElasticExecutor implements TastyExecutor
     indexName: 'moviesdb',
   };
 
-  constructor(config?: any)
+  constructor(config?: ElasticExecutorConfig)
   {
     if (config === undefined)
     {
@@ -76,8 +76,8 @@ export class ElasticExecutor implements TastyExecutor
 
     // Do not reuse objects to configure the elasticsearch Client class:
     // https://github.com/elasticsearch/elasticsearch-js/issues/33
-    config = new Client(JSON.parse(JSON.stringify(config)));
-    this.client = new Client(this.config);
+    this.config = config;
+    this.client = new Client(JSON.parse(JSON.stringify(config)));
   }
 
   /**
