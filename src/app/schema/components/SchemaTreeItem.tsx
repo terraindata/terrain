@@ -318,7 +318,7 @@ class SchemaTreeItem extends PureClasss<Props>
 							name.substr(0, searchStartIndex)
 						}
 						<span
-							style={Styles.searchTextEmphasis}
+							style={Styles.searchTextEmphasis as any}
 						>
 							{
 								name.substring(searchStartIndex, searchEndIndex)

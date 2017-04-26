@@ -127,7 +127,7 @@ class DatePicker extends PureClasss<Props>
     return (
       <div className='date-time-time'>
         <Dropdown
-          {...this.props}
+          canEdit={this.props.canEdit}
           options={HOUR_OPTIONS}
           selectedIndex={this.dateToHourIndex(this.getDate())}
           onChange={this.handleHourChange}

@@ -112,13 +112,8 @@ class Autocomplete extends PureClasss<Props>
       value,
     });
   }
-<<<<<<< HEAD
   
   handleFocus(event:React.FocusEvent<any>)
-=======
-
-  handleFocus(event:React.FocusEvent)
->>>>>>> master
   {
     this.setState({
       open: true,

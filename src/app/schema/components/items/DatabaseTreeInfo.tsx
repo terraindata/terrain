@@ -74,7 +74,7 @@ export class DatabaseTreeInfo extends PureClasss<Props>
       		style={Styles.infoPiece}
       	>
       		<span
-      			style={Styles.infoPieceNumber}
+      			style={Styles.infoPieceNumber as any}
       		>
       			{ database.tableIds.size } 
       		</span> tables

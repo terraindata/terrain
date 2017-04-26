@@ -170,7 +170,7 @@ class SchemaView extends PureClasss<Props>
 
     return (
       <div
-      	style={Styles.schemaView}
+      	style={Styles.schemaView as any}
       >
       	<div
       		style={[
@@ -178,8 +178,8 @@ class SchemaView extends PureClasss<Props>
       			this.props.fullPage ? SCHEMA_STYLE_FULL_PAGE : SCHEMA_STYLE_COLUMN,
       			{
       				padding: Styles.margin,
-							overflow: 'auto',
-      			},
+							overflow: "auto",
+      			} as any,
       		]}
       	>
       		{

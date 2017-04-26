@@ -169,7 +169,7 @@ class SchemaSearchResults extends PureClasss<Props>
 					}}
 				>
 					<div
-						style={Styles.font.semiBoldNormal}
+						style={Styles.font.semiBoldNormal as any}
 					>
 						{
 							label

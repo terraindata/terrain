@@ -68,15 +68,15 @@ export class ColumnTreeInfo extends PureClasss<Props>
   	
     return (
       <div
-      	style={Styles.infoPieces}
+      	style={Styles.infoPieces as any}
       >
         {
           column.isPrimaryKey &&
             <div
-              style={Styles.infoPiece}
+              style={Styles.infoPiece as any}
             >
               <span
-                style={Styles.infoPieceNumber}
+                style={Styles.infoPieceNumber as any}
               >
                 Primary key
               </span>
@@ -84,10 +84,10 @@ export class ColumnTreeInfo extends PureClasss<Props>
         }
         
       	<div
-          style={Styles.infoPiece}
+          style={Styles.infoPiece as any}
         >
           <span
-            style={Styles.infoPieceNumber}
+            style={Styles.infoPieceNumber as any}
           >
             { column.datatype } 
           </span>
@@ -98,7 +98,7 @@ export class ColumnTreeInfo extends PureClasss<Props>
         >
           default: "
           <span
-            style={Styles.infoPieceNumber}
+            style={Styles.infoPieceNumber as any}
           >
             { column.defaultValue } 
           </span>
@@ -109,7 +109,7 @@ export class ColumnTreeInfo extends PureClasss<Props>
           style={Styles.infoPiece}
         >
           <span
-            style={Styles.infoPieceNumber}
+            style={Styles.infoPieceNumber as any}
           >
             { column.isNullable ? 'nullable' : 'not nullable' } 
           </span>

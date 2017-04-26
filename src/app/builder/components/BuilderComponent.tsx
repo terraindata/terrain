@@ -300,21 +300,26 @@ class BuilderComponent extends PureClasss<Props>
         );
         break;
       case DisplayType.COMPONENT:
-        let Comp = d.component;
+        let Comp = d.component as any;
         var isTransformCard = d.key === 'scorePoints';
         content = (
           <div 
             key={key} 
             className='builder-component-wrapper builder-component-wrapper-wide'
           >
-            {React.cloneElement(<Comp />, {
-              keyPath,
-              data,
-              parentData: this.props.parentData,
-              canEdit: this.props.canEdit,
-              helpOn: this.props.helpOn,
-              className,
-            })}
+            {
+              React.cloneElement(
+                <Comp />, 
+                {
+                  keyPath,
+                  data,
+                  parentData: this.props.parentData,
+                  canEdit: this.props.canEdit,
+                  helpOn: this.props.helpOn,
+                  className,
+                }
+              )
+            }
             { this.props.helpOn && d.help ?
               (
                 isTransformCard ?

@@ -114,7 +114,7 @@ class CardField extends PureClasss<Props>
 
   ss(state: IMoveState)
   {
-    this.setState(state);
+    this.setState(state as any);
   }
 
 	removeField(event)
@@ -168,7 +168,7 @@ class CardField extends PureClasss<Props>
       maxDY,
       midpoints,
       tops,
-    } as IMoveState);
+    });
   }
 
   shiftSiblings(evt, shiftSelf:boolean): ({ dY: number, index: number })

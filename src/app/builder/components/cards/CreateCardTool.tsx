@@ -249,14 +249,21 @@ class CreateCardTool extends PureClasss<Props>
       var style =
       {
         position: 'relative',
-        top: this.props.dy + 'px',
-      }
+        top: this.props.dy,
+      } as any;
     }
 
     return (
-      <div className={classes} style={style}>
-        { this.renderPlaceholder() }
-        { this.renderCardSelector() }
+      <div 
+        className={classes} 
+        style={style}
+      >
+        { 
+          this.renderPlaceholder() 
+        }
+        { 
+          this.renderCardSelector() 
+        }
         <CardDropArea
           index={this.props.index}
           keyPath={this.props.keyPath}

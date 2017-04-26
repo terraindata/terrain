@@ -18,7 +18,7 @@
     },
     "exclude": [
         "node_modules",
-        "midway",
+        "src",
         "build"
     ]
 }

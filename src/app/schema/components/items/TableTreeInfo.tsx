@@ -68,25 +68,27 @@ export class TableTreeInfo extends PureClasss<Props>
   	
     return (
       <div
-      	style={Styles.infoPieces}
+      	style={Styles.infoPieces as any}
       >
       	<div
-          style={Styles.infoPiece}
+          style={Styles.infoPiece as any}
         >
           <span
-            style={Styles.infoPieceNumber}
+            style={Styles.infoPieceNumber as any}
           >
             { table.columnIds.size } 
           </span> columns
         </div>
         
         <div
-          style={Styles.infoPiece}
+          style={Styles.infoPiece as any}
         >
           <span
-            style={Styles.infoPieceNumber}
+            style={Styles.infoPieceNumber as any}
           >
-            { table.indexIds.size } 
+            { 
+              table.indexIds.size 
+            } 
           </span> indexes
         </div>
       </div>

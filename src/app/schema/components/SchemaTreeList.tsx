@@ -150,7 +150,7 @@ class SchemaTreeList extends PureClasss<Props>
             >
   		      	<div
   		      		style={
-  		      			SchemaTreeStyles.label
+  		      			SchemaTreeStyles.label as any
   		      		}
   		      	>
   		      		{

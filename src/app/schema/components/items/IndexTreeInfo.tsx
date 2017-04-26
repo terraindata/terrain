@@ -74,7 +74,7 @@ export class IndexTreeInfo extends PureClasss<Props>
       		style={Styles.infoPiece}
       	>
       		<span
-      			style={Styles.infoPieceNumber}
+      			style={Styles.infoPieceNumber as any}
       		>
       			{ index.indexType } 
       		</span>
@@ -84,7 +84,7 @@ export class IndexTreeInfo extends PureClasss<Props>
       		style={Styles.infoPiece}
       	>
       		<span
-      			style={Styles.infoPieceNumber}
+      			style={Styles.infoPieceNumber as any}
       		>
       			{ index.columnIds.size } 
       		</span>
