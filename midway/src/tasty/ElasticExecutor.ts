@@ -45,35 +45,23 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { Client, ConfigOptions, SearchParams } from 'elasticsearch';
-import {ElasticTastyQuery} from './ElasticGenerator';
+import ElasticConfig from '../databases/elastic/ElasticConfig';
+import ElasticInterface from '../databases/elastic/ElasticInterface';
+import { ElasticTastyQuery } from './ElasticGenerator';
 import TastyExecutor from './TastyExecutor';
 import TastySchema from './TastySchema';
 import TastyTable from './TastyTable';
 import { makePromiseCallback } from './Utils';
 
-export type Config = ConfigOptions;
+export type Config = ElasticConfig;
 
 export class ElasticExecutor implements TastyExecutor
 {
-  private config: ConfigOptions;
-  private client: Client;
-  private defaultElasticConfig: ConfigOptions = {
-    hosts: ['http://localhost:9200'],
-  };
+  private client: ElasticInterface;
 
-  constructor(config?: Config)
+  constructor(config?: ElasticConfig)
   {
-    if (config === undefined)
-    {
-      this.config = this.defaultElasticConfig;
-    } else
-    {
-      this.config = config;
-    }
-
-    // Do not reuse objects to configure the elasticsearch Client class:
-    // https://github.com/elasticsearch/elasticsearch-js/issues/33
-    this.client = new Client(JSON.parse(JSON.stringify(this.config)));
+    this.client = new ElasticInterface(config);
   }
 
   /**
@@ -230,14 +218,6 @@ export class ElasticExecutor implements TastyExecutor
   private async executeElasticTastySelectQuery(query: ElasticTastyQuery)
   {
     return await this.query(query.param as SearchParams);
-  }
-
-  private async executeElasticTastyUpsertQuery(query)
-  {
-  }
-
-  private async executeElasticTastyDeleteQuery(query)
-  {
   }
 
   private async bulkUpsert(table: TastyTable, elements: object[]): Promise<any>

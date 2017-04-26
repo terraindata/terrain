@@ -44,59 +44,47 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import SQLiteConfig from '../databases/sqlite/SQLiteConfig';
-import SQLiteInterface from '../databases/sqlite/SQLiteInterface';
-import TastyExecutor from './TastyExecutor';
-import TastySchema from './TastySchema';
-import { makePromiseCallback, makePromiseCallback0 } from './Utils';
+import { IndicesDeleteParams, IndicesGetMappingParams } from 'elasticsearch';
+import ElasticController from './ElasticController';
 
-export type Config = SQLiteConfig;
-
-export class SQLiteExecutor implements TastyExecutor
+/**
+ * An interface which acts as a selective isomorphic wrapper around
+ * the elastic.js indices API.
+ */
+class ElasticIndices
 {
-  private db: SQLiteInterface;
+  private controller: ElasticController;
 
-  constructor(config?: SQLiteConfig)
+  constructor(controller: ElasticController)
   {
-    this.db = new SQLiteInterface(config);
+    this.controller = controller;
   }
 
-  public async schema(): Promise<TastySchema>
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-getmapping
+   * @param params
+   * @param callback
+   */
+  public getMapping(params: IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void
   {
-    const results = {};
-    results[this.db.getFilename()] = {};
-
-    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
-    for (const table of tableListResult)
-    {
-      results[this.db.getFilename()][table.name] = {};
-      const colResult: any = await this.query(`pragma table_info(${table.name});`);
-      for (const col of colResult)
-      {
-        results[this.db.getFilename()][table.name][col.name] =
-          {
-            type: col.type,
-          };
-      }
-    }
-    return new TastySchema(results);
+    this.log('getMapping', params);
+    return this.controller.client.indices.getMapping(params, callback);
   }
 
-  public async query(queryStr: string): Promise<object[]>
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-delete
+   * @param params
+   * @param callback
+   */
+  public delete(params: IndicesDeleteParams, callback: (errror: any, response: any, status: any) => void): void
   {
-    return new Promise<object[]>((resolve, reject) =>
-    {
-      this.db.all(queryStr, makePromiseCallback(resolve, reject));
-    });
+    return this.controller.client.indices.delete(params, callback);
   }
 
-  public async destroy(): Promise<void>
+  private log(methodName: string, info: any)
   {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.db.close(makePromiseCallback0(resolve, reject));
-    });
+    this.controller.log('ElasticIndices.' + methodName, info);
   }
 }
 
-export default SQLiteExecutor;
+export default ElasticIndices;

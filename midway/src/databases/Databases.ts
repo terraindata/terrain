@@ -44,21 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as request from 'supertest';
-import App from '../../src/App';
-import * as Tasty from '../../src/tasty/Tasty';
+import DatabaseMap from './DatabaseMap';
 
-test('GET /midway/v1/schema', async (done) =>
-{
-  request(App)
-    .get('/midway/v1/schema')
-    .then((response) =>
-    {
-      // TODO @david check against expected value for schema, not just non-emptiness
-      if (response.text === '')
-      {
-        fail('GET /schema request returned empty response body');
-      }
-    });
-  done();
-});
+/**
+ * The global database map of all databases being managed.
+ */
+const Databases = new DatabaseMap();
+
+export default Databases;

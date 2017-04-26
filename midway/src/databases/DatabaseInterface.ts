@@ -44,59 +44,40 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import SQLiteConfig from '../databases/sqlite/SQLiteConfig';
-import SQLiteInterface from '../databases/sqlite/SQLiteInterface';
-import TastyExecutor from './TastyExecutor';
-import TastySchema from './TastySchema';
-import { makePromiseCallback, makePromiseCallback0 } from './Utils';
+import * as winston from 'winston';
 
-export type Config = SQLiteConfig;
-
-export class SQLiteExecutor implements TastyExecutor
+/**
+ * An interface which acts as a selective isomorphic wrapper around
+ * the sqlite3 API
+ */
+class DatabaseInterface
 {
-  private db: SQLiteInterface;
+  private static count: number = 0; // interface count for generating ids
 
-  constructor(config?: SQLiteConfig)
+  private id: string; // unique id
+  private lsn: number; // log sequence number
+  private type: string; // connection type
+  private name: string; // connection name
+  private header: string; // log entry header
+
+  constructor(type: string, name: string = 'unnamed')
   {
-    this.db = new SQLiteInterface(config);
+    this.id = (DatabaseInterface.count++).toString();
+    this.lsn = -1;
+    this.type = type;
+    this.name = name;
+    this.header = this.type + ':' + this.name + ':' + this.id + ':';
   }
 
-  public async schema(): Promise<TastySchema>
+  public log(methodName: string, info?: any)
   {
-    const results = {};
-    results[this.db.getFilename()] = {};
-
-    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
-    for (const table of tableListResult)
+    const header = this.header + (++this.lsn).toString() + ':' + methodName;
+    winston.info(header);
+    if (info !== 'undefined')
     {
-      results[this.db.getFilename()][table.name] = {};
-      const colResult: any = await this.query(`pragma table_info(${table.name});`);
-      for (const col of colResult)
-      {
-        results[this.db.getFilename()][table.name][col.name] =
-          {
-            type: col.type,
-          };
-      }
+      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
     }
-    return new TastySchema(results);
-  }
-
-  public async query(queryStr: string): Promise<object[]>
-  {
-    return new Promise<object[]>((resolve, reject) =>
-    {
-      this.db.all(queryStr, makePromiseCallback(resolve, reject));
-    });
-  }
-
-  public async destroy(): Promise<void>
-  {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.db.close(makePromiseCallback0(resolve, reject));
-    });
   }
 }
 
-export default SQLiteExecutor;
+export default DatabaseInterface;

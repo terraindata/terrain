@@ -44,59 +44,48 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import SQLiteConfig from '../databases/sqlite/SQLiteConfig';
-import SQLiteInterface from '../databases/sqlite/SQLiteInterface';
-import TastyExecutor from './TastyExecutor';
-import TastySchema from './TastySchema';
-import { makePromiseCallback, makePromiseCallback0 } from './Utils';
+import * as sqlite3 from 'sqlite3';
+import DatabaseInterface from '../DatabaseInterface';
+import SQLiteConfig from './SQLiteConfig';
 
-export type Config = SQLiteConfig;
-
-export class SQLiteExecutor implements TastyExecutor
+/**
+ * An interface which acts as a selective isomorphic wrapper around
+ * the sqlite3 API
+ */
+class SQLiteInterface extends DatabaseInterface
 {
-  private db: SQLiteInterface;
-
-  constructor(config?: SQLiteConfig)
+  private static defaultConfig: SQLiteConfig =
   {
-    this.db = new SQLiteInterface(config);
+    filename: 'nodeway.db',
+  };
+
+  private config: SQLiteConfig;
+  private db: sqlite3.Database;
+
+  constructor(config: SQLiteConfig = SQLiteInterface.defaultConfig, name?: string)
+  {
+    super('SQLiteInterface', name);
+
+    this.config = config;
+    this.db = new sqlite3.Database(config.filename);
   }
 
-  public async schema(): Promise<TastySchema>
+  public getFilename(): string
   {
-    const results = {};
-    results[this.db.getFilename()] = {};
-
-    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
-    for (const table of tableListResult)
-    {
-      results[this.db.getFilename()][table.name] = {};
-      const colResult: any = await this.query(`pragma table_info(${table.name});`);
-      for (const col of colResult)
-      {
-        results[this.db.getFilename()][table.name][col.name] =
-          {
-            type: col.type,
-          };
-      }
-    }
-    return new TastySchema(results);
+    return this.config.filename;
   }
 
-  public async query(queryStr: string): Promise<object[]>
+  public all(sql: string, callback?: (err: Error, rows: any[]) => void): sqlite3.Database
   {
-    return new Promise<object[]>((resolve, reject) =>
-    {
-      this.db.all(queryStr, makePromiseCallback(resolve, reject));
-    });
+    this.log('all', sql);
+    return this.db.all(sql, callback);
   }
 
-  public async destroy(): Promise<void>
+  public close(callback?: (err: Error) => void): void
   {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.db.close(makePromiseCallback0(resolve, reject));
-    });
+    this.log('close');
+    return this.db.close(callback);
   }
 }
 
-export default SQLiteExecutor;
+export default SQLiteInterface;

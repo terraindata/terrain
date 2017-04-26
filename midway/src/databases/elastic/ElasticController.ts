@@ -44,59 +44,28 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import SQLiteConfig from '../databases/sqlite/SQLiteConfig';
-import SQLiteInterface from '../databases/sqlite/SQLiteInterface';
-import TastyExecutor from './TastyExecutor';
-import TastySchema from './TastySchema';
-import { makePromiseCallback, makePromiseCallback0 } from './Utils';
+import { Client } from 'elasticsearch';
+import DatabaseInterface from '../DatabaseInterface';
+import ElasticConfig from './ElasticConfig';
 
-export type Config = SQLiteConfig;
-
-export class SQLiteExecutor implements TastyExecutor
+/**
+ * Contains the elastic client and config.
+ * The central controller for the Elastic isomporphic wrapper.
+ */
+class ElasticController extends DatabaseInterface
 {
-  private db: SQLiteInterface;
+  public config: ElasticConfig;
+  public client: Client;
 
-  constructor(config?: SQLiteConfig)
+  constructor(config: ElasticConfig, name?: string)
   {
-    this.db = new SQLiteInterface(config);
-  }
+    super('ElasticController', name);
 
-  public async schema(): Promise<TastySchema>
-  {
-    const results = {};
-    results[this.db.getFilename()] = {};
-
-    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
-    for (const table of tableListResult)
-    {
-      results[this.db.getFilename()][table.name] = {};
-      const colResult: any = await this.query(`pragma table_info(${table.name});`);
-      for (const col of colResult)
-      {
-        results[this.db.getFilename()][table.name][col.name] =
-          {
-            type: col.type,
-          };
-      }
-    }
-    return new TastySchema(results);
-  }
-
-  public async query(queryStr: string): Promise<object[]>
-  {
-    return new Promise<object[]>((resolve, reject) =>
-    {
-      this.db.all(queryStr, makePromiseCallback(resolve, reject));
-    });
-  }
-
-  public async destroy(): Promise<void>
-  {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.db.close(makePromiseCallback0(resolve, reject));
-    });
+    // Do not reuse objects to configure the elasticsearch Client class:
+    // https://github.com/elasticsearch/elasticsearch-js/issues/33
+    this.config = JSON.parse(JSON.stringify(config));
+    this.client = new Client(this.config);
   }
 }
 
-export default SQLiteExecutor;
+export default ElasticController;

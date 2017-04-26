@@ -44,59 +44,32 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import SQLiteConfig from '../databases/sqlite/SQLiteConfig';
-import SQLiteInterface from '../databases/sqlite/SQLiteInterface';
-import TastyExecutor from './TastyExecutor';
-import TastySchema from './TastySchema';
-import { makePromiseCallback, makePromiseCallback0 } from './Utils';
-
-export type Config = SQLiteConfig;
-
-export class SQLiteExecutor implements TastyExecutor
+/**
+ * This is where we store connections to databases being managed.
+ */
+class DatabaseMap
 {
-  private db: SQLiteInterface;
+  private map: Map<string, object>;
 
-  constructor(config?: SQLiteConfig)
+  public get(name: string): object | undefined
   {
-    this.db = new SQLiteInterface(config);
+    return this.map.get(name);
   }
 
-  public async schema(): Promise<TastySchema>
+  public set(name: string, database: object)
   {
-    const results = {};
-    results[this.db.getFilename()] = {};
-
-    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
-    for (const table of tableListResult)
-    {
-      results[this.db.getFilename()][table.name] = {};
-      const colResult: any = await this.query(`pragma table_info(${table.name});`);
-      for (const col of colResult)
-      {
-        results[this.db.getFilename()][table.name][col.name] =
-          {
-            type: col.type,
-          };
-      }
-    }
-    return new TastySchema(results);
+    this.map.set(name, database);
   }
 
-  public async query(queryStr: string): Promise<object[]>
+  public remove(name: string): boolean
   {
-    return new Promise<object[]>((resolve, reject) =>
-    {
-      this.db.all(queryStr, makePromiseCallback(resolve, reject));
-    });
+    return this.map.delete(name);
   }
 
-  public async destroy(): Promise<void>
+  public getAll(): Iterator<[string, object]>
   {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.db.close(makePromiseCallback0(resolve, reject));
-    });
+    return this.map.entries();
   }
 }
 
-export default SQLiteExecutor;
+export default DatabaseMap;

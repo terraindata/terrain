@@ -51,6 +51,39 @@ const config: Tasty.SQLiteConfig =
     filename: 'nodeway.db',
   };
 
-const DB = new Tasty.Tasty(Tasty.SQLite, config);
+let systemDB;
+
+export const DB =
+  {
+    getDB()
+    {
+      if (!systemDB)
+      {
+        systemDB = new Tasty.Tasty(Tasty.SQLite, config);
+      }
+      return systemDB;
+    },
+
+    loadSystemDB: async (newConfig: Tasty.TastyConfig, configType: string) =>
+    {
+      if (configType === 'ElasticSearch')
+      {
+        systemDB = new Tasty.Tasty(Tasty.ElasticSearch, newConfig);
+      }
+      else if (configType === 'MySQL')
+      {
+        systemDB = new Tasty.Tasty(Tasty.MySQL, newConfig);
+      }
+      else if (configType === 'SQLite')
+      {
+        systemDB = new Tasty.Tasty(Tasty.SQLite, newConfig);
+      }
+      else
+      {
+        return -1; // not of the right type
+      }
+      return 0;
+    },
+  };
 
 export default DB;

@@ -44,59 +44,81 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import SQLiteConfig from '../databases/sqlite/SQLiteConfig';
-import SQLiteInterface from '../databases/sqlite/SQLiteInterface';
-import TastyExecutor from './TastyExecutor';
-import TastySchema from './TastySchema';
-import { makePromiseCallback, makePromiseCallback0 } from './Utils';
+import * as request from 'supertest';
+import DB from '../../src/DB';
 
-export type Config = SQLiteConfig;
-
-export class SQLiteExecutor implements TastyExecutor
+beforeAll(() =>
 {
-  private db: SQLiteInterface;
+  DB.loadSystemDB({ filename: 'nodewaytest.db' }, 'SQLite');
+});
 
-  constructor(config?: SQLiteConfig)
+import App from '../../src/App';
+
+describe('Item route tests', () =>
+{
+  test('GET /midway/v1/items/', (done) =>
   {
-    this.db = new SQLiteInterface(config);
-  }
-
-  public async schema(): Promise<TastySchema>
-  {
-    const results = {};
-    results[this.db.getFilename()] = {};
-
-    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
-    for (const table of tableListResult)
-    {
-      results[this.db.getFilename()][table.name] = {};
-      const colResult: any = await this.query(`pragma table_info(${table.name});`);
-      for (const col of colResult)
+    const bodyContent =
       {
-        results[this.db.getFilename()][table.name][col.name] =
-          {
-            type: col.type,
-          };
-      }
-    }
-    return new TastySchema(results);
-  }
+        id: 1,
+        accessToken: 'AccessToken',
+      };
+    request(App)
+      .get('/midway/v1/items/')
+      .query(bodyContent)
+      .then((response) =>
+      {
+        // TODO @david check against expected value for schema, not just non-emptiness
+        if (response.text !== '')
+        {
+          expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+        } else
+        {
+          fail('GET /midway/v1/items/ request returned empty response body');
+        }
+      });
+    done();
+  });
 
-  public async query(queryStr: string): Promise<object[]>
+  test('GET /midway/v1/items/:id', (done) =>
   {
-    return new Promise<object[]>((resolve, reject) =>
-    {
-      this.db.all(queryStr, makePromiseCallback(resolve, reject));
-    });
-  }
+    const bodyContent =
+      {
+        id: 1,
+        accessToken: 'AccessToken',
+      };
+    request(App)
+      .get('/midway/v1/items/1')
+      .query(bodyContent)
+      .then((response) =>
+      {
+        // TODO @david check against expected value for schema, not just non-emptiness
+        if (response.text !== '')
+        {
+          expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+        } else
+        {
+          fail('GET /midway/v1/items/ request returned empty response body');
+        }
+      });
+    done();
+  });
+});
 
-  public async destroy(): Promise<void>
+describe('Schema route tests', () =>
+{
+  test('GET /midway/v1/schema', async (done) =>
   {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.db.close(makePromiseCallback0(resolve, reject));
-    });
-  }
-}
-
-export default SQLiteExecutor;
+    request(App)
+      .get('/midway/v1/schema')
+      .then((response) =>
+      {
+        // TODO @david check against expected value for schema, not just non-emptiness
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+      });
+    done();
+  });
+});

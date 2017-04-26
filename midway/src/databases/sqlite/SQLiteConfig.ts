@@ -44,59 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import SQLiteConfig from '../databases/sqlite/SQLiteConfig';
-import SQLiteInterface from '../databases/sqlite/SQLiteInterface';
-import TastyExecutor from './TastyExecutor';
-import TastySchema from './TastySchema';
-import { makePromiseCallback, makePromiseCallback0 } from './Utils';
-
-export type Config = SQLiteConfig;
-
-export class SQLiteExecutor implements TastyExecutor
+export interface SQLiteConfig
 {
-  private db: SQLiteInterface;
-
-  constructor(config?: SQLiteConfig)
-  {
-    this.db = new SQLiteInterface(config);
-  }
-
-  public async schema(): Promise<TastySchema>
-  {
-    const results = {};
-    results[this.db.getFilename()] = {};
-
-    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
-    for (const table of tableListResult)
-    {
-      results[this.db.getFilename()][table.name] = {};
-      const colResult: any = await this.query(`pragma table_info(${table.name});`);
-      for (const col of colResult)
-      {
-        results[this.db.getFilename()][table.name][col.name] =
-          {
-            type: col.type,
-          };
-      }
-    }
-    return new TastySchema(results);
-  }
-
-  public async query(queryStr: string): Promise<object[]>
-  {
-    return new Promise<object[]>((resolve, reject) =>
-    {
-      this.db.all(queryStr, makePromiseCallback(resolve, reject));
-    });
-  }
-
-  public async destroy(): Promise<void>
-  {
-    return new Promise<void>((resolve, reject) =>
-    {
-      this.db.close(makePromiseCallback0(resolve, reject));
-    });
-  }
+  filename: string;
 }
 
-export default SQLiteExecutor;
+export default SQLiteConfig;
