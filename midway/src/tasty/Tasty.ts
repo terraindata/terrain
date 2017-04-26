@@ -123,7 +123,7 @@ export class Tasty
     }
   }
 
-// The backend executor and generator
+  // The backend executor and generator
   private executor: TastyExecutor;
   private generator: any;
   private _backend: Backend;

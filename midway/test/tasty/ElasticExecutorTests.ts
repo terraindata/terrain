@@ -345,7 +345,7 @@ test('stored PWL transform sort query using function_score', async (done) =>
         },
       });
 
-      await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query using function_score', results);
+    await Utils.checkResults(getExpectedFile(), 'stored PWL transform sort query using function_score', results);
   }
   catch (e)
   {
