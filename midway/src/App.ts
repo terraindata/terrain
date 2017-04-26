@@ -55,6 +55,7 @@ import passportLocal = require('passport-local');
 import reqText = require('require-text');
 import session = require('koa-generic-session');
 
+import DB from './DB';
 import Middleware from './Middleware';
 import Router from './Router';
 import Users from './users/Users';
@@ -71,9 +72,15 @@ const optDefs = [
     type: Number,
   },
   {
-    alias: 'r',
-    defaultValue: 'mysql',
-    name: 'db',
+    alias: 'd',
+    defaultValue: '',
+    name: 'dbtype',
+    type: String,
+  },
+  {
+    alias: 'f',
+    defaultValue: '',
+    name: 'dbfile',
     type: String,
   },
 ];
@@ -82,6 +89,13 @@ const args = cmdLineArgs(optDefs,
   {
     partial: true,
   });
+
+if (args.dbtype.length > 0 && args.dbfile.length > 0)
+{
+  console.log('wot');
+  DB.loadSystemDB({ filename: args.dbfile }, args.dbtype);
+}
+
 const index = reqText('../../src/app/index.html', require);
 
 Router.get('/bundle.js', async (ctx, next) =>

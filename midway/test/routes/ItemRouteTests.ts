@@ -44,46 +44,62 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Tasty from './tasty/Tasty';
+import * as fs from 'fs';
+import * as request from 'supertest';
 
-const config: Tasty.SQLiteConfig =
-  {
-    filename: 'nodeway.db',
-  };
+import App from '../../src/App';
+import DB from '../../src/DB';
+import * as Tasty from '../../src/tasty/Tasty';
 
-let systemDB;
+beforeAll(() =>
+{
+  DB.loadSystemDB({ filename: 'nodewaytest.db' }, 'SQLite');
+});
 
-export const DB =
-  {
-    getDB()
+test('GET /midway/v1/items/', (done) =>
+{
+  const bodyContent =
     {
-      if (!systemDB)
-      {
-        systemDB = new Tasty.Tasty(Tasty.SQLite, config);
-      }
-      return systemDB;
-    },
-
-    loadSystemDB: async (newConfig: Tasty.TastyConfig, configType: string) =>
+      id: 1,
+      accessToken: 'AccessToken',
+    };
+  request(App)
+    .get('/midway/v1/items/')
+    .query(bodyContent)
+    .then((response) =>
     {
-      if (configType === 'ElasticSearch')
+      // TODO @david check against expected value for schema, not just non-emptiness
+      if (response.text !== '')
       {
-        systemDB = new Tasty.Tasty(Tasty.ElasticSearch, newConfig);
-      }
-      else if (configType === 'MySQL')
+        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+      } else
       {
-        systemDB = new Tasty.Tasty(Tasty.MySQL, newConfig);
+        fail('GET /midway/v1/items/ request returned empty response body');
       }
-      else if (configType === 'SQLite')
-      {
-        systemDB = new Tasty.Tasty(Tasty.SQLite, newConfig);
-      }
-      else
-      {
-        return -1; // not of the right type
-      }
-      return 0;
-    },
-  };
+    });
+  done();
+});
 
-export default DB;
+test('GET /midway/v1/items/:id', (done) =>
+{
+  const bodyContent =
+    {
+      id: 1,
+      accessToken: 'AccessToken',
+    };
+  request(App)
+    .get('/midway/v1/items/1')
+    .query(bodyContent)
+    .then((response) =>
+    {
+      // TODO @david check against expected value for schema, not just non-emptiness
+      if (response.text !== '')
+      {
+        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+      } else
+      {
+        fail('GET /midway/v1/items/ request returned empty response body');
+      }
+    });
+  done();
+});

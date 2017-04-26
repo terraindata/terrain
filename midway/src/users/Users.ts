@@ -189,7 +189,7 @@ export const Users =
 
     find: async (id: number) =>
     {
-      return await DB.select(User, [], { id });
+      return await DB.getDB().select(User, [], { id });
     },
 
     getTemplate: async () =>
@@ -207,7 +207,7 @@ export const Users =
 
     loginWithAccessToken: async (id: number, accessToken: string) =>
     {
-      const results = await DB.select(User, [], { id, accessToken });
+      const results = await DB.getDB().select(User, [], { id, accessToken });
       return new Promise(async (resolve, reject) =>
       {
         if (results.length > 0)
@@ -223,7 +223,7 @@ export const Users =
 
     loginWithEmail: async (email: string, password: string) =>
     {
-      const results = await DB.select(User, [], { email });
+      const results = await DB.getDB().select(User, [], { email });
       if (results && results.length === 0)
       {
         return new Promise(async (resolve, reject) =>
@@ -246,7 +246,7 @@ export const Users =
                   {
                     length: 256,
                   });
-                await DB.upsert(User, user);
+                await DB.getDB().upsert(User, user);
               }
               resolve(user);
             }
@@ -261,14 +261,14 @@ export const Users =
 
     logout: async (id: number, accessToken: string) =>
     {
-      const results = await DB.select(User, [], { id, accessToken });
+      const results = await DB.getDB().select(User, [], { id, accessToken });
       if (results && results.length === 0)
       {
         return null;
       }
       const user = results[0];
       user['accessToken'] = '';
-      return await DB.upsert(User, user);
+      return await DB.getDB().upsert(User, user);
     },
 
     replace: async (user, id?) =>
@@ -277,12 +277,12 @@ export const Users =
       {
         user['id'] = id;
       }
-      return await DB.upsert(User, user);
+      return await DB.getDB().upsert(User, user);
     },
 
     upsert: async (newUser) =>
     {
-      return await DB.upsert(User, newUser);
+      return await DB.getDB().upsert(User, newUser);
     },
   };
 

@@ -126,12 +126,12 @@ export const Items =
       {
         return Util.getRejectPromise<ItemConfig[]>();
       }
-      return await (DB.select(Item, [], { id }) as Promise<ItemConfig[]>);
+      return await (DB.getDB().select(Item, [], { id }) as Promise<ItemConfig[]>);
     },
 
     getAll: async () =>
     {
-      return await DB.select(Item, [], {});
+      return await DB.getDB().select(Item, [], {});
     },
 
     getTemplate: async () =>
@@ -153,7 +153,7 @@ export const Items =
       {
         item['id'] = id;
       }
-      return await DB.upsert(Item, item);
+      return await DB.getDB().upsert(Item, item);
     },
   };
 
