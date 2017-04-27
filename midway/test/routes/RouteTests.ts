@@ -56,52 +56,42 @@ import App from '../../src/App';
 
 describe('Item route tests', () =>
 {
-  test('GET /midway/v1/items/', (done) =>
+  test('GET /midway/v1/items/', () =>
   {
-    const bodyContent =
-      {
+    return request(App)
+      .get('/midway/v1/items/')
+      .query({
         id: 1,
         accessToken: 'AccessToken',
-      };
-    request(App)
-      .get('/midway/v1/items/')
-      .query(bodyContent)
+      })
+      .expect(200)
       .then((response) =>
       {
-        // TODO @david check against expected value for schema, not just non-emptiness
-        if (response.text !== '')
-        {
-          expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
-        } else
-        {
-          fail('GET /midway/v1/items/ request returned empty response body');
-        }
+        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/items/ request returned an error: ' + error);
       });
-    done();
   });
 
-  test('GET /midway/v1/items/:id', (done) =>
+  test('GET /midway/v1/items/:id', () =>
   {
-    const bodyContent =
-      {
+    return request(App)
+      .get('/midway/v1/items/1')
+      .query({
         id: 1,
         accessToken: 'AccessToken',
-      };
-    request(App)
-      .get('/midway/v1/items/1')
-      .query(bodyContent)
+      })
+      .expect(200)
       .then((response) =>
       {
-        // TODO @david check against expected value for schema, not just non-emptiness
-        if (response.text !== '')
-        {
-          expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
-        } else
-        {
-          fail('GET /midway/v1/items/ request returned empty response body');
-        }
+        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/items/ request returned an error: ' + error);
       });
-    done();
   });
 });
 
@@ -111,6 +101,7 @@ describe('Schema route tests', () =>
   {
     request(App)
       .get('/midway/v1/schema')
+      .expect(200)
       .then((response) =>
       {
         // TODO @david check against expected value for schema, not just non-emptiness
