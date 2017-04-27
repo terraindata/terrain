@@ -115,7 +115,7 @@ describe('Item route tests', () =>
       {
         fail('GET /midway/v1/items/ request returned an error: ' + error);
       });
-    });
+  });
 
   test('Update item: POST /midway/v1/items/', () =>
   {
