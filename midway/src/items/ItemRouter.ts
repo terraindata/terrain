@@ -49,42 +49,27 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import Util from '../Util';
-import { ItemConfig, Items } from './Items';
+import { Items } from './Items';
 
 const Router = new KoaRouter();
+const items = new Items();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all items');
-  ctx.body = await Items.getAll();
+  ctx.body = await items.get();
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting item ID ' + ctx.params.id);
-  const items = await Items.find(ctx.params.id);
-  if (items.length === 0)
-  {
-    ctx.body = '';
-  }
-  else
-  {
-    ctx.body = items;
-  }
+  ctx.body = await items.get(ctx.params.id);
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('create/modify items');
-  try
-  {
-    console.log(ctx.state);
-    ctx.body = await Items.createOrUpdateItem(ctx.state.user, ctx.req);
-  }
-  catch (e)
-  {
-    ctx.body = e;
-  }
+  ctx.body = await items.upsert(ctx.state.user, ctx.request.body.body);
 });
 
 export default Router;

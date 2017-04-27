@@ -45,13 +45,11 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import DB from '../DB';
-import SQLiteExecutor from '../tasty/SQLiteExecutor';
 import * as Tasty from '../tasty/Tasty';
-import Util from '../Util';
+import { UserConfig } from '../users/Users';
 
-// CREATE TABLE items (id integer PRIMARY KEY, meta text NOT NULL, name text NOT NULL, \
-// parentItemId integer NOT NULL, status text NOT NULL, type text NOT NULL);
-const Item = new Tasty.Table('items', ['id'], ['meta', 'name', 'parentItemId', 'status', 'type']);
+// CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, \
+// parentItemId integer NOT NULL, status text, type text);
 
 export interface ItemConfig
 {
@@ -63,65 +61,69 @@ export interface ItemConfig
   type?: string;
 }
 
-export const Items =
+export class Items
+{
+  private itemTable: Tasty.Table;
+
+  constructor()
   {
-    createOrUpdateItem: async (user, req): Promise<string> =>
+    this.itemTable = new Tasty.Table('items', ['id'], ['meta', 'name', 'parentItemId', 'status', 'type']);
+  }
+
+  public async upsert(user: UserConfig, item: ItemConfig): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
     {
-      return new Promise<string>(async (resolve, reject) =>
+      // both regular and superusers can create items
+      // only superusers can change existing items that are not BUILD status
+      // both regular and superusers can change items that are not LIVE or DEFAULT status
+
+      // check if all the required parameters are passed
+      if (item === undefined || (item && (item.parentItemId === undefined || item.name === undefined)))
       {
-        // both regular and superusers can create items
-        // only superusers can change existing items that are not BUILD status
-        // both regular and superusers can change items thar are not LIVE or DEFAULT status
-        if (!req['body'])
-        {
-          reject('Insufficient parameters passed');
-        }
-        const reqBody = req['body'];
-        const items = await Items.find(reqBody.id);
-        if (items.length === 0 && reqBody.id !== undefined)
+        reject('Insufficient parameters passed');
+      }
+
+      let status: string = item.status ? item.status : '';
+
+      // item id specified but item not found
+      if (item.id !== undefined)
+      {
+        const items = await this.get(item.id);
+        if (items.length === 0)
         {
           reject('Invalid item id passed');
         }
-        if (!user.isSuperUser)
-        {
-          if (reqBody.status === 'LIVE' || reqBody.status === 'DEFAULT')
-          {
-            reject('Unauthorized');
-          }
-          if (items.length > 0 && (items[0].status === 'LIVE' || items[0].status === 'DEFAULT'))
-          {
-            reject('Unauthorized');
-          }
-        }
-        if (reqBody.parentItemId === undefined || reqBody.name === undefined)
-        {
-          reject('Insufficient parameters passed');
-        }
-        const results = await DB.getDB().upsert(Item, reqBody);
-        if (results instanceof Array)
-        {
-          resolve('Success');
-        }
-        else
-        {
-          reject(results);
-        }
-      });
-    },
 
-    find: async (id: number): Promise<ItemConfig[]> =>
-    {
-      if (!id)
-      {
-        return Promise.reject([]);
+        status = items[0].status ? items[0].status : status;
       }
-      return DB.getDB().select(Item, [], { id });
-    },
 
-    getAll: async (): Promise<ItemConfig[]> =>
+      // check privileges
+      if (!user.isSuperUser && (status === 'LIVE' || status === 'DEFAULT'))
+      {
+        reject('Unauthorized');
+      }
+
+      try
+      {
+        await DB.getDB().upsert(this.itemTable, item);
+        resolve('Success');
+      }
+      catch (e)
+      {
+        reject(e);
+      }
+    });
+  }
+
+  public async get(id?: number): Promise<ItemConfig[]>
+  {
+    if (id !== undefined)
     {
-      return DB.getDB().select(Item, [], {});
-    },
-  };
+      return DB.getDB().select(this.itemTable, [], { id });
+    }
+    return DB.getDB().select(this.itemTable, [], {});
+  }
+}
 
 export default Items;

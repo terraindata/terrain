@@ -60,8 +60,7 @@ Middleware.passport.use('access-token-local', new passportLocal.Strategy(
   async (req: any, id: string, accessToken: string, done) =>
   {
     const user = await Users.loginWithAccessToken(Number(id), accessToken);
-    const options: any = { body: req.body.body };
-    done(null, user, options);
+    done(null, user);
   }));
 
 // authenticate with email and password
@@ -70,11 +69,10 @@ Middleware.passport.use('local', new passportLocal.Strategy(
     passReqToCallback: true,
     usernameField: 'email',
   },
-  async (req, email, password, done) =>
+  async (req: any, email: string, password: string, done) =>
   {
     const user = await Users.loginWithEmail(email, password);
-    const options: any = { body: req.body.body };
-    done(null, user, options);
+    done(null, user);
   }));
 
 Middleware.passport.serializeUser((user, done) =>
@@ -85,7 +83,16 @@ Middleware.passport.serializeUser((user, done) =>
   }
 });
 
-Middleware.passport.deserializeUser((id, done) =>
+Middleware.passport.deserializeUser(async (id, done) =>
 {
-  done(null, Users.find(id));
+  try
+  {
+    const user = await Users.find(id);
+    done(null, user);
+  }
+  catch (e)
+  {
+    done(e, null);
+  }
+
 });

@@ -192,19 +192,6 @@ export const Users =
       return await DB.getDB().select(User, [], { id });
     },
 
-    getTemplate: async () =>
-    {
-      const emptyObj: UserConfig =
-        {
-          accessToken: '',
-          email: '',
-          name: '',
-          password: '',
-          timezone: '',
-        };
-      return emptyObj;
-    },
-
     loginWithAccessToken: async (id: number, accessToken: string): Promise<UserConfig> =>
     {
       return new Promise<UserConfig>(async (resolve, reject) =>
@@ -226,10 +213,7 @@ export const Users =
       const results = await DB.getDB().select(User, [], { email });
       if (results && results.length === 0)
       {
-        return new Promise(async (resolve, reject) =>
-        {
-          resolve(null);
-        });
+        return Promise.resolve(null);
       }
       else
       {
@@ -246,7 +230,7 @@ export const Users =
                   {
                     length: 256,
                   });
-                await DB.getDB().upsert(User, user);
+                await Users.upsert(user);
               }
               resolve(user);
             }
@@ -268,7 +252,7 @@ export const Users =
       }
       const user = results[0];
       user['accessToken'] = '';
-      return await DB.getDB().upsert(User, user);
+      return await Users.upsert(user);
     },
 
     replace: async (user, id?) =>
