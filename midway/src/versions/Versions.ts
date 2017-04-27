@@ -45,94 +45,71 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import DB from '../DB';
+import SQLiteExecutor from '../tasty/SQLiteExecutor';
 import * as Tasty from '../tasty/Tasty';
-import { UserConfig } from '../users/Users';
-import { Versions } from '../versions/Versions';
+import Util from '../Util';
 
-const versions = new Versions();
+// CREATE TABLE versions (id integer PRIMARY KEY, \
+// objectType text NOT NULL, objectId integer NOT NULL, \
+// object text NOT NULL, createdAt datetime NOT NULL, createdByUserId integer NOT NULL);
 
-// CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, \
-// parentItemId integer NOT NULL, status text, type text);
-
-export interface ItemConfig
+export interface VersionConfig
 {
+  createdAt: string;
+  createdByUserId: number;
   id?: number;
-  meta?: string;
-  name: string;
-  parentItemId: number;
-  status?: string;
-  type?: string;
+  object: string;
+  objectId: number;
+  objectType: string;
 }
 
-export class Items
+export class Versions
 {
-  private itemTable: Tasty.Table;
+  private Version = new Tasty.Table('versions', ['id'], ['createdAt', 'createdByUserId', 'object', 'objectId', 'objectType']);
 
-  constructor()
-  {
-    this.itemTable = new Tasty.Table('items', ['id'], ['meta', 'name', 'parentItemId', 'status', 'type']);
-  }
-
-  public async upsert(user: UserConfig, item: ItemConfig): Promise<string>
+  public async create(user, oldTastyType: string, oldTastyObj): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      // both regular and superusers can create items
-      // only superusers can change existing items that are not BUILD status
-      // both regular and superusers can change items that are not LIVE or DEFAULT status
-
-      // check if all the required parameters are passed
-      if (item === undefined || (item && (item.parentItemId === undefined || item.name === undefined)))
+      // can only insert
+      const currTime = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+      const newVersionObj: VersionConfig =
       {
-        reject('Insufficient parameters passed');
-      }
-
-      let status: string = item.status ? item.status : '';
-
-      // item id specified but item not found
-      if (item.id !== undefined)
+        createdAt: currTime,
+        createdByUserId: user.state.id,
+        object: oldTastyObj.toString(),
+        objectId: oldTastyObj.id,
+        objectType: oldTastyType,
+      };
+      const results = await DB.getDB().upsert(this.Version, oldTastyObj);
+      if (results instanceof Array)
       {
-        const items = await this.get(item.id);
-        if (items.length === 0)
-        {
-          reject('Invalid item id passed');
-        }
-
-        status = items[0].status ? items[0].status : status;
-      }
-
-      // check privileges
-      if (!user.isSuperUser && (status === 'LIVE' || status === 'DEFAULT'))
-      {
-        reject('Unauthorized');
-      }
-
-      // update versions table if changing an item
-      if (item.id !== undefined)
-      {
-        await versions.create(user, 'items', item);
-      }
-
-      try
-      {
-        await DB.getDB().upsert(this.itemTable, item);
         resolve('Success');
       }
-      catch (e)
+      else
       {
-        reject(e);
+        reject(results);
       }
     });
   }
 
-  public async get(id?: number): Promise<ItemConfig[]>
+  public async find(id: number): Promise<VersionConfig[]>
   {
-    if (id !== undefined)
+    return DB.getDB().select(this.Version, [], { id });
+  }
+
+  public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
+  {
+    if (objectId !== undefined && objectType !== undefined)
     {
-      return DB.getDB().select(this.itemTable, [], { id });
+      return DB.getDB().select(this.Version, [], { objectType, objectId });
     }
-    return DB.getDB().select(this.itemTable, [], {});
+    else if (objectId !== undefined)
+    {
+      return DB.getDB().select(this.Version, [], { objectType });
+    }
+    return DB.getDB().select(this.Version, [], {});
   }
 }
 
-export default Items;
+export default Versions;
