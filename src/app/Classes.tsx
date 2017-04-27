@@ -42,14 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 import Util from './util/Util';
 
 export class BaseClass
 {
-  id = "";
-  
+  id = '';
+
   constructor(config: {id?: string} = {})
   {
     this.id = Util.extendId(config)['id'];
@@ -60,24 +60,23 @@ export class BaseClass
 // class TestClassC extends BaseClass
 // { ... }
 // export type TestClass = TestClassC & IRecord<TestClassC>;
-// export const _TestClass = (config?: {[key:string]: any}) => 
+// export const _TestClass = (config?: {[key:string]: any}) =>
 //   New<TestClass>(new TestClassC(config), config);
-  
 
-let records: {[class_name: string]: Immutable.Record.Class} = {};
+const records: {[class_name: string]: Immutable.Record.Class} = {};
 
 export function New<T>(instance, config: {[field: string]: any} = {}): T & IRecord<T>
 {
-  let class_name = instance.__proto__.constructor.name;
-  if(!records[class_name])
+  const class_name = instance.__proto__.constructor.name;
+  if (!records[class_name])
   {
     records[class_name] = Immutable.Record(new instance.__proto__.constructor({}));
   }
-  
-  _.map(config, 
+
+  _.map(config,
     (value, key) =>
-      instance[key] = value
+      instance[key] = value,
   );
-  
+
   return new records[class_name](instance) as any;
 }

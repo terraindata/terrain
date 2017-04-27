@@ -43,15 +43,15 @@ THE SOFTWARE.
 */
 
 require('./ManualPopup.less');
-import * as $ from 'jquery';
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../util/Util';
 import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as React from 'react';
+import { DragDropContext } from 'react-dnd';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
 import Manual from './Manual';
-import { DragDropContext } from 'react-dnd';
-var HTML5Backend = require('react-dnd-html5-backend');
+const HTML5Backend = require('react-dnd-html5-backend');
 
 export interface Props
 {
@@ -68,8 +68,8 @@ class ManualWrapper extends Classs<Props>
 
 	render()
 	{
-		var selected = this.props.params['term'] || '';
-		return <Manual 
+		const selected = this.props.params['term'] || '';
+		return <Manual
 			selectedKey={selected}
 			manualTab={true}
 		/>;

@@ -42,18 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-var Immutable = require('immutable');
+const _ = require('underscore');
+const Immutable = require('immutable');
 import Util from './../../util/Util';
 
-var create = '';
-var change = '';
+const create = '';
+const change = '';
 
-var UserActionTypes = 
+const UserActionTypes =
 {
   create,
-  change, 
-  
+  change,
+
   fetch: '',
   setUsers: '',
   updateCurrentUser: '',

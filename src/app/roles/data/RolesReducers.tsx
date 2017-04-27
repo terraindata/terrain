@@ -44,23 +44,23 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import Ajax from './../../util/Ajax';
-import ActionTypes from './RolesActionTypes';
-import Actions from './RolesActions';
 import RoleTypes from './../RoleTypes';
-var Immutable = require('immutable');
+import Actions from './RolesActions';
+import ActionTypes from './RolesActionTypes';
+const Immutable = require('immutable');
 
-let RolesReducer = {};
+const RolesReducer = {};
 
 RolesReducer[ActionTypes.fetch] =
   (state, action) =>
   {
     Ajax.getRoles((rolesData: any[]) =>
     {
-      var roles = Immutable.Map({});
-      rolesData.map(role =>
+      let roles = Immutable.Map({});
+      rolesData.map((role) =>
       {
-        let { groupId, username } = role;
-        if(!roles.get(groupId))
+        const { groupId, username } = role;
+        if (!roles.get(groupId))
         {
           roles = roles.set(groupId, Immutable.Map({}));
         }
@@ -83,10 +83,10 @@ RolesReducer[ActionTypes.setRoles] =
 RolesReducer[ActionTypes.change] =
   (state, action) =>
   {
-    let role:RoleTypes.Role = action.payload.role;
+    const role: RoleTypes.Role = action.payload.role;
 
     Ajax.saveRole(role);
-    if(!state.get(role.groupId))
+    if (!state.get(role.groupId))
     {
       state = state.set(role.groupId, Immutable.Map({}));
     }

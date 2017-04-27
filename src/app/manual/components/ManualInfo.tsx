@@ -43,22 +43,21 @@ THE SOFTWARE.
 */
 
 require('./ManualInfo.less');
-import * as $ from 'jquery';
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../util/Util';
 import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as React from 'react';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
 
 export interface Props
 {
-  information: string,
-  wide?: boolean,
+  information: string;
+  wide?: boolean;
   rightSide?: boolean;
-  leftSide?: boolean
+  leftSide?: boolean;
   className?: string;
 }
-
 
 class ManualInfo extends Classs<Props>
 {
@@ -71,13 +70,13 @@ class ManualInfo extends Classs<Props>
   {
     return (
       <div className={'manual-info-wrapper ' + this.props.className} >
-        <div className='manual-info-indicator'></div>
+        <div className="manual-info-indicator"></div>
         <div
           className={classNames({
             'manual-info-content': true,
             'manual-info-content-wide': this.props.wide,
             'manual-info-content-right': this.props.rightSide,
-            'manual-info-content-left': this.props.leftSide
+            'manual-info-content-left': this.props.leftSide,
           })}
         >
           {this.props.information}

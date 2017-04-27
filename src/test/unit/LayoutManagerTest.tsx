@@ -44,19 +44,19 @@ THE SOFTWARE.
 
 /// <reference path="../../typings/tsd.d.ts" />
 
-import * as _ from 'underscore';
 import * as test from 'tape';
+import * as _ from 'underscore';
 // import * as TestUtils from 'react-addons-test-utils';
 const TestUtils = require('react-addons-test-utils');
-import * as ReactDOM from 'react-dom';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import LayoutManager from '../../app/builder/components/layout/LayoutManager.tsx';
 
 // Because some of these tests will test size and positioning,
 //  we need to render them into a real document, because the
 //  React Test Utils does not render elements with size and position
-var createFrame = (width, height) => {
-  var frame = document.createElement('div');
+const createFrame = (width, height) => {
+  const frame = document.createElement('div');
   frame.style.position = 'absolute';
   frame.style.top = '0';
   frame.style.left = '0';
@@ -66,47 +66,47 @@ var createFrame = (width, height) => {
   return frame;
 };
 
-var cleanupFrame = (frame) => {
+const cleanupFrame = (frame) => {
   document.body.removeChild(frame);
 };
 
-test('LayoutManager renders columns', function (t) {
-  var layout = {
+test('LayoutManager renders columns', function(t) {
+  const layout = {
     fullHeight: true,
     columns: [
       {
-        content: <div className='test-col' style={{height: '100%'}}>1</div>,
+        content: <div className="test-col" style={{height: '100%'}}>1</div>,
         width: 20,
       },
       {
-        content: <div className='test-col' style={{height: '100%'}}>2</div>,
+        content: <div className="test-col" style={{height: '100%'}}>2</div>,
       },
       {
-        content: <div className='test-col' style={{height: '100%'}}>3</div>,
+        content: <div className="test-col" style={{height: '100%'}}>3</div>,
         colSpan: 2,
       },
       {
-        content: <div className='test-col' style={{height: '100%'}}>4</div>,
-      }
-    ]
+        content: <div className="test-col" style={{height: '100%'}}>4</div>,
+      },
+    ],
   };
 
-  var width = 1000;
-  var height = 500;
-  var colOffset = 20;
-  var colLeftFactor = [-1, 0,1,3];
-  var colWidthFactor = [-1, 1,2,1];
-  var numColsFactor = 4;
-  var frame = createFrame(width, height);
+  const width = 1000;
+  const height = 500;
+  const colOffset = 20;
+  const colLeftFactor = [-1, 0, 1, 3];
+  const colWidthFactor = [-1, 1, 2, 1];
+  const numColsFactor = 4;
+  const frame = createFrame(width, height);
   ReactDOM.render(<LayoutManager layout={layout} />, frame);
 
-  var divs = frame.querySelectorAll('.test-col');
+  const divs = frame.querySelectorAll('.test-col');
   t.equal(divs.length, 4, 'renders all columns');
 
   _.map(divs, (div, index) => {
-    t.equal(div.textContent, (index + 1) + "", 'correct content');
+    t.equal(div.textContent, (index + 1) + '', 'correct content');
     t.equal(div.getBoundingClientRect().height, height, 'full height');
-    if(colLeftFactor[index] === -1)
+    if (colLeftFactor[index] === -1)
     {
       // offset column
       t.equal(div.getBoundingClientRect().left,
@@ -128,36 +128,36 @@ test('LayoutManager renders columns', function (t) {
   t.end();
 });
 
-test('LayoutManager renders rows', function (t) {
-  var layout = {
+test('LayoutManager renders rows', function(t) {
+  const layout = {
     rows: [
       {
-        content: <div className='test-row' style={{height: '20px'}}>1</div>,
+        content: <div className="test-row" style={{height: '20px'}}>1</div>,
       },
       {
-        content: <div className='test-row' style={{height: '40px'}}>2</div>,
+        content: <div className="test-row" style={{height: '40px'}}>2</div>,
         rowSpan: 2,
       },
       {
-        content: <div className='test-row' style={{height: '20px'}}>3</div>,
+        content: <div className="test-row" style={{height: '20px'}}>3</div>,
       },
-    ]
+    ],
   };
 
-  var width = 1000;
-  var height = 500;
-  var rowHeight = 20;
-  var rowTopFactor = [0,1,3];
-  var rowHeightFactor = [1,2,1];
-  var numRowsFactor = 4;
-  var frame = createFrame(width, height);
+  const width = 1000;
+  const height = 500;
+  const rowHeight = 20;
+  const rowTopFactor = [0, 1, 3];
+  const rowHeightFactor = [1, 2, 1];
+  const numRowsFactor = 4;
+  const frame = createFrame(width, height);
   ReactDOM.render(<LayoutManager layout={layout} />, frame);
 
-  var divs = frame.querySelectorAll('.test-row');
+  const divs = frame.querySelectorAll('.test-row');
   t.equal(divs.length, 3, 'renders all rows');
 
   _.map(divs, (div, index) => {
-    t.equal(div.textContent, (index + 1) + "", 'correct content');
+    t.equal(div.textContent, (index + 1) + '', 'correct content');
     t.equal(div.getBoundingClientRect().left, 0, 'correct left');
     t.equal(div.getBoundingClientRect().width, width, 'correct width');
     t.equal(div.getBoundingClientRect().top,
@@ -170,4 +170,3 @@ test('LayoutManager renders rows', function (t) {
 
   t.end();
 });
-

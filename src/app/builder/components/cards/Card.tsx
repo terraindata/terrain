@@ -44,33 +44,33 @@ THE SOFTWARE.
 
 require('./Card.less');
 
-import * as $ from 'jquery';
-import * as _ from 'underscore';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
+import * as React from 'react';
 import { DragSource } from 'react-dnd';
-var { createDragPreview } = require('react-dnd-text-dragpreview');
-import Util from '../../../util/Util';
-import LayoutManager from "../layout/LayoutManager";
-import ManualPopup from './../../../manual/components/ManualPopup';
+import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
+const { createDragPreview } = require('react-dnd-text-dragpreview');
 import { Menu, MenuOption } from '../../../common/components/Menu';
-import Actions from "../../data/BuilderActions";
-import BuilderTypes from './../../BuilderTypes';
-import { Display } from './../../BuilderDisplays';
-import Store from "./../../data/BuilderStore";
-import {BuilderScrollState, BuilderScrollStore} from "./../../data/BuilderScrollStore";
+import Util from '../../../util/Util';
+import Actions from '../../data/BuilderActions';
+import LayoutManager from '../layout/LayoutManager';
 import PureClasss from './../../../common/components/PureClasss';
+import ManualPopup from './../../../manual/components/ManualPopup';
+import { Display } from './../../BuilderDisplays';
+import BuilderTypes from './../../BuilderTypes';
+import {BuilderScrollState, BuilderScrollStore} from './../../data/BuilderScrollStore';
+import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
 const CDA = CardDropArea as any;
-import CreateCardTool from './CreateCardTool';
 import BuilderComponent from '../BuilderComponent';
+import CreateCardTool from './CreateCardTool';
 
-var ArrowIcon = require("./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
+const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
 const CARD_OVERSCAN = 200;
-const CARD_HEIGHT_MAP: {[id:string]:number} = {};
+const CARD_HEIGHT_MAP: {[id: string]: number} = {};
 
 export interface Props
 {
@@ -88,7 +88,7 @@ export interface Props
   helpOn?: boolean;
 
   isDragging?: boolean;
-  connectDragPreview?: (a?:any) => void;
+  connectDragPreview?: (a?: any) => void;
   connectDragSource?: (el: El) => El;
 
   display?: Display;
@@ -114,9 +114,9 @@ class _Card extends PureClasss<Props>
   };
 
   // _debugUpdates = true;
-  _debugName = "Card";
+  _debugName = 'Card';
 
-  constructor(props:Props)
+  constructor(props: Props)
   {
     super(props);
 
@@ -157,13 +157,13 @@ class _Card extends PureClasss<Props>
     this._subscribe(Store, {
       updater: (state) =>
       {
-        if(state.hoveringCardId === this.props.card.id && !this.state.hovering)
+        if (state.hoveringCardId === this.props.card.id && !this.state.hovering)
         {
           this.setState({
             hovering: true,
           });
         }
-        else if(this.state.hovering)
+        else if (this.state.hovering)
         {
           this.setState({
             hovering: false,
@@ -176,19 +176,19 @@ class _Card extends PureClasss<Props>
     this._subscribe(BuilderScrollStore, {
       stateKey: 'scrollState',
       isMounted: true,
-    })
+    });
   }
 
-  getCardTerms(card:BuilderTypes.ICard): List<string>
+  getCardTerms(card: BuilderTypes.ICard): List<string>
   {
-    var terms: List<string> = Immutable.List([]);
+    let terms: List<string> = Immutable.List([]);
 
-    if(card.static.getChildTerms)
+    if (card.static.getChildTerms)
     {
       terms = card.static.getChildTerms(card);
     }
 
-    if(card.static.getNeighborTerms)
+    if (card.static.getNeighborTerms)
     {
       terms = terms.concat(card.static.getNeighborTerms(card)).toList();
     }
@@ -196,11 +196,11 @@ class _Card extends PureClasss<Props>
     return terms;
   }
 
-  componentWillReceiveProps(nextProps:Props)
+  componentWillReceiveProps(nextProps: Props)
   {
-    if(nextProps.card.closed !== this.props.card.closed)
+    if (nextProps.card.closed !== this.props.card.closed)
     {
-      if(this.state.closing || this.state.opening)
+      if (this.state.closing || this.state.opening)
       {
         // completed closing / opening
         this.setState({
@@ -219,7 +219,7 @@ class _Card extends PureClasss<Props>
   dragPreview: any;
   componentDidMount()
   {
-    if(this.props.card.type === 'creating')
+    if (this.props.card.type === 'creating')
     {
       return;
     }
@@ -236,7 +236,7 @@ class _Card extends PureClasss<Props>
       paddingRight: 12,
       paddingBottom: 9,
       paddingLeft: 12,
-      borderRadius: 10
+      borderRadius: 10,
     });
 
     this.props.connectDragPreview(this.dragPreview);
@@ -244,12 +244,12 @@ class _Card extends PureClasss<Props>
 
 	toggleClose(event)
 	{
-    if(this.state.closing || this.state.opening)
+    if (this.state.closing || this.state.opening)
     {
       return; // I just don't want to deal
     }
 
-    if(!this.props.card.closed)
+    if (!this.props.card.closed)
     {
       this.setState({
         closing: true,
@@ -257,15 +257,15 @@ class _Card extends PureClasss<Props>
 
       // animate just the body for normal cards,
       //  the entire card for cards inside textboxes
-      let ref = this.props.singleCard ? this.refs.card : this.refs.cardBody;
+      const ref = this.props.singleCard ? this.refs.card : this.refs.cardBody;
 
       Util.animateToHeight(ref, 0, () =>
       {
         // do this after the animation so the rest of the app picks up on it
         Actions.change(
           this.getKeyPath().push('closed'),
-          true
-        )
+          true,
+        );
       });
     }
     else
@@ -284,10 +284,10 @@ class _Card extends PureClasss<Props>
           // do this after the animation so the rest of the app picks up on it
           Actions.change(
             this.getKeyPath().push('closed'),
-            false
-          )
+            false,
+          );
         }),
-        250
+        250,
       );
     }
 
@@ -323,21 +323,21 @@ class _Card extends PureClasss<Props>
 
   handleDuplicate()
   {
-    if(this.props.singleCard || this.props.singleChild)
+    if (this.props.singleCard || this.props.singleChild)
     {
       alert("Can't duplicate this card because it is not in a position where it can have neighborhing cards. Try moving it to another spot on the Builder and duplicating it there.");
       return;
     }
 
-    let removeId = (block) => {
-      if(Immutable.Iterable.isIterable(block))
+    const removeId = (block) => {
+      if (Immutable.Iterable.isIterable(block))
       {
-        if(block.get('id'))
+        if (block.get('id'))
         {
           block = block.set('id', '');
         }
         let b = block.map(removeId);
-        if(!b)
+        if (!b)
         {
           //records don't have a map fn
           b = block.toMap().map(removeId);
@@ -348,7 +348,7 @@ class _Card extends PureClasss<Props>
       return block;
     };
 
-    let card = BuilderTypes.recordFromJS(BuilderTypes.cardsForServer(removeId(this.props.card)).toJS());
+    const card = BuilderTypes.recordFromJS(BuilderTypes.cardsForServer(removeId(this.props.card)).toJS());
 
     Actions.create(this.props.keyPath, this.props.index + 1, card.type, card);
 
@@ -357,7 +357,7 @@ class _Card extends PureClasss<Props>
   handleMouseMove(event)
   {
     event.stopPropagation();
-    if(!this.state.hovering)
+    if (!this.state.hovering)
     {
       Actions.hoverCard(this.props.card.id);
     }
@@ -372,7 +372,7 @@ class _Card extends PureClasss<Props>
 
   handleCardToolClose()
   {
-    if(this.props.index === null)
+    if (this.props.index === null)
     {
       Actions.change(this.props.keyPath, '');
     }
@@ -392,35 +392,35 @@ class _Card extends PureClasss<Props>
 
 	render()
   {
-    let {id} = this.props.card;
+    const {id} = this.props.card;
     this.cardEl = document.getElementById(this.props.card.id); // memoize?
-    if(this.cardEl)
+    if (this.cardEl)
     {
-      let {columnTop, columnHeight, columnScroll} = this.state.scrollState;
-      let visibleStart = columnScroll - CARD_OVERSCAN;
-      let visibleEnd = columnScroll + columnHeight + CARD_OVERSCAN;
+      const {columnTop, columnHeight, columnScroll} = this.state.scrollState;
+      const visibleStart = columnScroll - CARD_OVERSCAN;
+      const visibleEnd = columnScroll + columnHeight + CARD_OVERSCAN;
 
       let cardStart = 0;
       let el = this.cardEl;
       do {
         cardStart += el.offsetTop;
         el = el.offsetParent as any;
-      } while(el && el.id !== 'cards-column');
+      } while (el && el.id !== 'cards-column');
 
-      if(el)
+      if (el)
       {
         // if cards are nested inside position:relative/absolute components, you will
         //  need to loop through offsetParent until you reach the column, summing offsetTop
-        let cardHeight = this.cardEl.clientHeight;
-        let cardEnd = cardStart + cardHeight;
+        const cardHeight = this.cardEl.clientHeight;
+        const cardEnd = cardStart + cardHeight;
 
         CARD_HEIGHT_MAP[id] = cardHeight;
 
-        if(cardEnd < visibleStart || cardStart > visibleEnd)
+        if (cardEnd < visibleStart || cardStart > visibleEnd)
         {
           return (
             <div
-              className='card card-placeholder'
+              className="card card-placeholder"
               id={id}
               style={{
                 height: cardHeight,
@@ -438,7 +438,7 @@ class _Card extends PureClasss<Props>
 
       return (
         <div
-          className='card card-placeholder'
+          className="card card-placeholder"
           id={id}
           style={{
             minHeight: CARD_HEIGHT_MAP[id] || 50,
@@ -447,7 +447,7 @@ class _Card extends PureClasss<Props>
       );
     }
 
-    if(this.props.card.type === 'creating')
+    if (this.props.card.type === 'creating')
     {
       // not a card at all, in fact. a create card marker
       return (
@@ -466,7 +466,7 @@ class _Card extends PureClasss<Props>
       );
     }
 
-    var content = <BuilderComponent
+    const content = <BuilderComponent
       canEdit={this.props.canEdit}
       data={this.props.card}
       helpOn={this.props.helpOn}
@@ -475,8 +475,8 @@ class _Card extends PureClasss<Props>
       keyPath={this.getKeyPath()}
     />;
 
-    let {card} = this.props;
-		let {title} = card.static;
+    const {card} = this.props;
+		const {title} = card.static;
     const { isDragging, connectDragSource } = this.props;
 
     // TODO
@@ -500,7 +500,7 @@ class _Card extends PureClasss<Props>
           'card-opening': this.state.opening,
           [card.type + '-card']: true,
         })}
-        ref='card'
+        ref="card"
         id={id}
         onMouseMove={this.handleMouseMove}
       >
@@ -518,7 +518,7 @@ class _Card extends PureClasss<Props>
             background: card.static.colors[1],
             borderColor: card.static.colors[0],
           }}
-          ref='cardInner'
+          ref="cardInner"
         >
           {
             connectDragSource(
@@ -537,7 +537,7 @@ class _Card extends PureClasss<Props>
                   this.state.hovering &&
                     <ArrowIcon className="card-arrow-icon" onClick={this.toggleClose} />
                 }
-                <div className='card-title-inner'>
+                <div className="card-title-inner">
                   { title }
                 </div>
 
@@ -555,14 +555,14 @@ class _Card extends PureClasss<Props>
                   this.state.hovering &&
                     <Menu options={this.state.menuOptions} />
                 }
-              </div>
+              </div>,
             )
           }
 
           {
             (!this.props.card.closed || this.state.opening) &&
-              <div className='card-body-wrapper' ref='cardBody'>
-                <div className='card-body'>
+              <div className="card-body-wrapper" ref="cardBody">
+                <div className="card-body">
                   {
                     content
                   }
@@ -602,7 +602,7 @@ const cardSource =
   {
     // TODO
     setTimeout(() => $('body').addClass('body-card-is-dragging'), 100);
-    let item:CardItem = {
+    const item: CardItem = {
       props,
       childIds: BuilderTypes.getChildIds(props.card)
         .remove(props.card.id),
@@ -620,14 +620,14 @@ const cardSource =
     $('body').removeClass('body-card-is-dragging');
 
     Actions.dragCard(false);
-  }
+  },
 };
 
 const dragCollect = (connect, monitor) =>
 ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging(),
-  connectDragPreview: connect.dragPreview()
+  connectDragPreview: connect.dragPreview(),
 });
 
 export const Card = DragSource('CARD', cardSource, dragCollect)(_Card);

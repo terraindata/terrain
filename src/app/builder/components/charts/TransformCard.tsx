@@ -43,18 +43,18 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
-let {Map, List} = Immutable;
-import * as _ from 'underscore';
+const {Map, List} = Immutable;
 import * as React from 'react';
-import Actions from "../../data/BuilderActions";
-import BuilderStore from "../../data/BuilderStore";
-import SpotlightStore from '../../data/SpotlightStore';
-import Util from '../../../util/Util';
-import { Ajax, QueryResponse } from '../../../util/Ajax';
-import { BuilderTypes } from './../../BuilderTypes';
-import PureClasss from './../../../common/components/PureClasss';
-import TransformCardChart from './TransformCardChart';
+import * as _ from 'underscore';
 import TQLConverter from '../../../tql/TQLConverter';
+import { Ajax, QueryResponse } from '../../../util/Ajax';
+import Util from '../../../util/Util';
+import Actions from '../../data/BuilderActions';
+import BuilderStore from '../../data/BuilderStore';
+import SpotlightStore from '../../data/SpotlightStore';
+import PureClasss from './../../../common/components/PureClasss';
+import { BuilderTypes } from './../../BuilderTypes';
+import TransformCardChart from './TransformCardChart';
 const Dimensions = require('react-dimensions');
 
 const NUM_BARS = 1000;
@@ -79,7 +79,7 @@ export interface Bar
   {
     min: number;
     max: number;
-  }
+  };
 }
 export type Bars = List<Bar>;
 
@@ -97,12 +97,12 @@ class TransformCard extends PureClasss<Props>
     error?: boolean;
   };
 
-  constructor(props:Props)
+  constructor(props: Props)
   {
     super(props);
     this.state = {
       domain: List(props.data.domain as number[]),
-      range: List([0,1]),
+      range: List([0, 1]),
       bars: List([]),
       spotlights: null,
     };
@@ -118,20 +118,20 @@ class TransformCard extends PureClasss<Props>
     });
   }
 
-  componentWillReceiveProps(nextProps:Props)
+  componentWillReceiveProps(nextProps: Props)
   {
-    if(nextProps.data.input !== this.props.data.input)
+    if (nextProps.data.input !== this.props.data.input)
     {
       this.computeBars(nextProps.data.input);
     }
 
-    if(!nextProps.data.domain.equals(this.props.data.domain))
+    if (!nextProps.data.domain.equals(this.props.data.domain))
     {
       this.setState({
-        domain: this.trimDomain(this.state.domain, nextProps.data.domain)
+        domain: this.trimDomain(this.state.domain, nextProps.data.domain),
       });
 
-      if(nextProps.data.input === this.props.data.input)
+      if (nextProps.data.input === this.props.data.input)
       {
         // input didn't change but still need to compute bars to get the set within this domain
         this.computeBars(this.props.data.input);
@@ -141,9 +141,9 @@ class TransformCard extends PureClasss<Props>
 
   trimDomain(curStateDomain: List<number>, maxDomain: List<number>): List<number>
   {
-    let low = maxDomain.get(0);
-    let high = maxDomain.get(1);
-    var buffer = (high - low) * 0.02;
+    const low = maxDomain.get(0);
+    const high = maxDomain.get(1);
+    const buffer = (high - low) * 0.02;
 
     return List([
       Util.valueMinMax(curStateDomain.get(0), low, high - buffer),
@@ -151,15 +151,15 @@ class TransformCard extends PureClasss<Props>
     ]);
   }
 
-  findTableForAlias(data:BuilderTypes.IBlock | List<BuilderTypes.IBlock>, alias:string): string
+  findTableForAlias(data: BuilderTypes.IBlock | List<BuilderTypes.IBlock>, alias: string): string
   {
-    if(Immutable.List.isList(data))
+    if (Immutable.List.isList(data))
     {
-      let list = data as List<BuilderTypes.IBlock>;
-      for(let i = 0; i < list.size; i ++)
+      const list = data as List<BuilderTypes.IBlock>;
+      for (let i = 0; i < list.size; i ++)
       {
-        let table = this.findTableForAlias(list.get(i), alias);
-        if(table)
+        const table = this.findTableForAlias(list.get(i), alias);
+        if (table)
         {
           return table;
         }
@@ -167,22 +167,22 @@ class TransformCard extends PureClasss<Props>
       return null;
     }
 
-    if(data['type'] === 'table' && data['alias'] === alias)
+    if (data['type'] === 'table' && data['alias'] === alias)
     {
       return data['table'];
     }
 
-    if(Immutable.Iterable.isIterable(data))
+    if (Immutable.Iterable.isIterable(data))
     {
-      let keys = data.keys();
+      const keys = data.keys();
       let i = keys.next();
-      while(!i.done)
+      while (!i.done)
       {
-        let value = data[i.value];
-        if(Immutable.Iterable.isIterable(value))
+        const value = data[i.value];
+        if (Immutable.Iterable.isIterable(value))
         {
-          let table = this.findTableForAlias(value, alias);
-          if(table)
+          const table = this.findTableForAlias(value, alias);
+          if (table)
           {
             return table;
           }
@@ -196,39 +196,39 @@ class TransformCard extends PureClasss<Props>
   computeBars(input: BuilderTypes.CardString)
   {
     // TODO consider putting the query in context
-    let builderState = BuilderStore.getState();
-    let {cards} = builderState.query;
-    let {db} = builderState;
+    const builderState = BuilderStore.getState();
+    const {cards} = builderState.query;
+    const {db} = builderState;
 
-    if(typeof input === 'string')
+    if (typeof input === 'string')
     {
       // TODO: cache somewhere
-      let parts = input.split('.');
-      if(parts.length === 2)
+      const parts = input.split('.');
+      if (parts.length === 2)
       {
-        let alias = parts[0];
-        let field = parts[1];
+        const alias = parts[0];
+        const field = parts[1];
 
-        let table = this.findTableForAlias(cards, alias);
+        const table = this.findTableForAlias(cards, alias);
 
-        if(table)
+        if (table)
         {
           this.setState(
             Ajax.query(
               `SELECT ${field} as value FROM ${table};`, // alias select as 'value' to catch any weird renaming
               db,
               this.handleQueryResponse,
-              this.handleQueryError
-            )
+              this.handleQueryError,
+            ),
           );
           return;
         }
       }
     }
-    else if(input && input._isCard)
+    else if (input && input._isCard)
     {
-      let card = input as BuilderTypes.ICard;
-      if(card.type === 'score' && card['weights'].size)
+      const card = input as BuilderTypes.ICard;
+      if (card.type === 'score' && card['weights'].size)
       {
         // only case we know how to handle so far is a score card with a bunch of fields
         //  that all come from the same table
@@ -236,30 +236,30 @@ class TransformCard extends PureClasss<Props>
         let finalAlias: string = '';
         card['weights'].map((weight) =>
         {
-          if(finalTable === null)
+          if (finalTable === null)
           {
             return; // already broke
           }
 
-          let key = weight.get('key');
-          if(typeof key === 'string')
+          const key = weight.get('key');
+          if (typeof key === 'string')
           {
-            let parts = key.split('.');
-            if(parts.length === 2)
+            const parts = key.split('.');
+            if (parts.length === 2)
             {
-              let alias = parts[0];
-              if(finalAlias === '')
+              const alias = parts[0];
+              if (finalAlias === '')
               {
                 finalAlias = alias;
               }
-              if(alias === finalAlias)
+              if (alias === finalAlias)
               {
-                let table = this.findTableForAlias(cards, alias);
-                if(!finalTable.length)
+                const table = this.findTableForAlias(cards, alias);
+                if (!finalTable.length)
                 {
                   finalTable = table;
                 }
-                if(finalTable === table)
+                if (finalTable === table)
                 {
                   return; // so far so good, continue
                 }
@@ -270,7 +270,7 @@ class TransformCard extends PureClasss<Props>
           finalTable = null; // Not good, abort!
         });
 
-        if(finalTable)
+        if (finalTable)
         {
           // convert the score to TQL, do the query
           this.setState(
@@ -278,8 +278,8 @@ class TransformCard extends PureClasss<Props>
               `SELECT ${TQLConverter._parse(card)} as value FROM ${finalTable} as ${finalAlias};`,
               db,
               this.handleQueryResponse,
-              this.handleQueryError
-            )
+              this.handleQueryError,
+            ),
           );
           return;
         }
@@ -311,53 +311,53 @@ class TransformCard extends PureClasss<Props>
       queryId: null,
     });
 
-    let results = response.results;
-    if(results && results.length)
+    const results = response.results;
+    if (results && results.length)
     {
       let max = +results[0].value;
       let min = +results[0].value;
-      results.map(v =>
+      results.map((v) =>
       {
-        let val = +v.value;
-        if(val > max)
+        const val = +v.value;
+        if (val > max)
         {
           max = val;
         }
-        if(val < min)
+        if (val < min)
         {
           min = val;
         }
       });
 
-      if(this.props.data.hasCustomDomain)
+      if (this.props.data.hasCustomDomain)
       {
         min = Math.max(min, this.props.data.domain.get(0));
         max = Math.min(max, this.props.data.domain.get(1));
       }
 
-      let bars: Bar[] = [];
-      for(let j = 0; j < NUM_BARS; j ++)
+      const bars: Bar[] = [];
+      for (let j = 0; j < NUM_BARS; j ++)
       {
         bars.push({
-          id: "" + j,
+          id: '' + j,
           count: 0,
           percentage: 0,
           range: {
             min: min + (max - min) * j / NUM_BARS,
             max: min + (max - min) * (j + 1) / NUM_BARS,
-          }
+          },
         });
       }
 
-      results.map(v =>
+      results.map((v) =>
       {
-        let val = +v.value;
+        const val = +v.value;
         let i = Math.floor((val - min) / (max - min) * NUM_BARS);
-        if(i === NUM_BARS)
+        if (i === NUM_BARS)
         {
           i = NUM_BARS - 1;
         }
-        if(i < 0 || i >= bars.length)
+        if (i < 0 || i >= bars.length)
         {
           // out of bounds for our custom domain
           return;
@@ -371,9 +371,9 @@ class TransformCard extends PureClasss<Props>
         bars: List(bars),
       });
 
-      if(!this.props.data.hasCustomDomain)
+      if (!this.props.data.hasCustomDomain)
       {
-        let domain = List([min, max]);
+        const domain = List([min, max]);
         this.setState({
           domain: this.trimDomain(this.state.domain, domain),
         });
@@ -389,7 +389,7 @@ class TransformCard extends PureClasss<Props>
       error: true,
       queryXhr: null,
       queryId: null,
-    })
+    });
   }
 
   handleDomainChange(domain: List<number>)
@@ -409,13 +409,13 @@ class TransformCard extends PureClasss<Props>
 
   render()
   {
-    let spotlights = this.state.spotlights;
-    let {data} = this.props;
-    let width = this.props.containerWidth ? this.props.containerWidth + 110 : 300;
+    const spotlights = this.state.spotlights;
+    const {data} = this.props;
+    const width = this.props.containerWidth ? this.props.containerWidth + 110 : 300;
 
     return (
       <div
-        className='transform-card-inner'
+        className="transform-card-inner"
       >
         <TransformCardChart
           canEdit={this.props.canEdit}

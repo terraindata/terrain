@@ -44,28 +44,28 @@ THE SOFTWARE.
 
 require('./panel.less');
 import * as React from 'react';
-var _ = require('underscore');
-var shallowCompare = require('react-addons-shallow-compare');
-import * as ReactDOM from "react-dom";
+const _ = require('underscore');
+const shallowCompare = require('react-addons-shallow-compare');
+import * as ReactDOM from 'react-dom';
 import Util from '../../../util/Util';
-var $ = require('jquery');
+const $ = require('jquery');
 
-var Panel = {
+const Panel = {
   // shouldComponentUpdate(nextProps, nextState) {
   //   return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   // },
-  
-	propTypes: 
+
+	propTypes:
 	{
     index: React.PropTypes.number,
-    
+
 		drag_x: React.PropTypes.bool,
 		drag_y: React.PropTypes.bool,
 		drag_xy: React.PropTypes.bool,
 		dragInsideOnly: React.PropTypes.bool,
 
 		onPanelDrop: React.PropTypes.func,
-    
+
     onMouseDown: React.PropTypes.func,
     mouseDownRef: React.PropTypes.string,
 
@@ -81,7 +81,7 @@ var Panel = {
 		return {
 			dragging: false,
 			moved: false,
-		}
+		};
 	},
 
 	isPanel()
@@ -92,44 +92,44 @@ var Panel = {
 	// Returns true if this is draggable in the 'x', 'y', or (default) either directions
 	canDrag()
   {
-		if(arguments.length) {
-			if(arguments[0] === 'x')
+		if (arguments.length) {
+			if (arguments[0] === 'x')
 				return this.props.drag_x || this.props.drag_xy;
-			if(arguments[0] === 'y')
+			if (arguments[0] === 'y')
 				return this.props.drag_y || this.props.drag_xy;
 		}
 		return this.props.drag_x || this.props.drag_y || this.props.drag_xy;
-	},                     
+	},
 
-	startDrag(x, y) 
+	startDrag(x, y)
 	{
-		if(this.canDrag()) 
+		if (this.canDrag())
 		{
-      var cr = ReactDOM.findDOMNode(this).getBoundingClientRect();
-      
+      const cr = ReactDOM.findDOMNode(this).getBoundingClientRect();
+
 			this.setState({
-				ox: x, 
-				oy: y, 
-				dx: 0, 
+				ox: x,
+				oy: y,
+				dx: 0,
 				dy: 0,
 				ocr: cr,
 			});
-      
-      if(this.props.dragHandleRef)
+
+      if (this.props.dragHandleRef)
       {
-        var dragHandle = this.refs[this.props.dragHandleRef];
+        const dragHandle = this.refs[this.props.dragHandleRef];
         dragHandle.style.left = (x - cr.left - dragHandle.getBoundingClientRect().width / 2) + 'px';
         dragHandle.style.top = (y - cr.top - dragHandle.getBoundingClientRect().height / 2) + 'px';
       }
-			
+
 			return true;
 		}
 		return false;
 	},
 
-	dragTo(x, y) 
+	dragTo(x, y)
 	{
-		var draggedTo:any = { x: 0, y: 0 };
+		const draggedTo: any = { x: 0, y: 0 };
 
 		$('input').blur();
 
@@ -146,16 +146,16 @@ var Panel = {
 		// 	x = Util.valueMinMax(x,minX, maxX);
 		// }
 
-		if(this.canDrag('x')) 
+		if (this.canDrag('x'))
 		{
 			this.setState({
-				dx: x - this.state.ox
+				dx: x - this.state.ox,
 			});
 			draggedTo.x = x;
 			draggedTo.dx = this.state.dx;
 		}
 
-		if(this.canDrag('y')) 
+		if (this.canDrag('y'))
 		{
 			this.setState({
 				dy: y - this.state.oy,
@@ -164,17 +164,17 @@ var Panel = {
 			draggedTo.dy = this.state.dy;
 		}
 
-		if(this.props.onPanelDrag) 
+		if (this.props.onPanelDrag)
 		{
-			this.props.onPanelDrag(this.props.index, draggedTo, { 
+			this.props.onPanelDrag(this.props.index, draggedTo, {
 				x: this.state.ox,
 				y: this.state.oy,
 			});
 		}
-    
+
     this.setState({
-      draggedTo: draggedTo,
-      dragging: true, 
+      draggedTo,
+      dragging: true,
       // ^ this is here, and not in the startDrag method, so that we don't see
       //    the dragging styles until we've actually moved the thing
     });
@@ -183,52 +183,51 @@ var Panel = {
 	stopDrag(x, y)
   {
     this.setState({
-      dragging: false
+      dragging: false,
     });
-    
-    if(this.props.onPanelDrop)
+
+    if (this.props.onPanelDrop)
     {
       this.props.onPanelDrop(this.props.index, {
         dx: x - this.state.ox,
         dy: y - this.state.oy,
-      }, { 
+      }, {
         x: this.state.ox,
         y: this.state.oy,
       });
     }
-    
-     if(this.props.dragHandleRef)
+
+     if (this.props.dragHandleRef)
     {
-      var dragHandle = this.refs[this.props.dragHandleRef];
+      const dragHandle = this.refs[this.props.dragHandleRef];
       dragHandle.style.left = '0px';
       dragHandle.style.top = '0px';
     }
-    
-	},
 
+	},
 
 	// Section: Mouse Events
 
-	down(event) 
+	down(event)
 	{
-    if(this.props.onMouseDown)
+    if (this.props.onMouseDown)
     {
-      if(!this.props.mouseDownRef || event.target == this.refs[this.props.mouseDownRef])
+      if (!this.props.mouseDownRef || event.target == this.refs[this.props.mouseDownRef])
       {
         this.props.onMouseDown(this.props.index, event);
       }
     }
-    
-		if(this.props.handleRef)
+
+		if (this.props.handleRef)
 		{
-			if(event.target != this.refs[this.props.handleRef])
+			if (event.target != this.refs[this.props.handleRef])
 			{
 				// a handleRef is set, so only respond to mouse events on our handle
 				return;
 			}
 		}
 
-		if(this.startDrag(event.pageX, event.pageY)) {
+		if (this.startDrag(event.pageX, event.pageY)) {
 			// event.stopPropagation();
 			$(document).on('mousemove', this.move);
 			$(document).on('touchmove', this.move);
@@ -246,7 +245,7 @@ var Panel = {
 		});
 	},
 
-	move(event) 
+	move(event)
 	{
 		this.dragTo(event.pageX, event.pageY);
 		event.preventDefault();
@@ -255,7 +254,7 @@ var Panel = {
 		});
 	},
 
-	up(event) 
+	up(event)
 	{
     $(document).off('mousemove', this.move);
     $(document).off('touchmove', this.move);
@@ -264,48 +263,47 @@ var Panel = {
     this.stopDrag(event.pageX, event.pageY);
 	},
 
-
 	renderPanel(content, className) {
 		// Coordinate these classNames with panel.css/less
-		var panelClass = 'panel ' + (className || '');
+		let panelClass = 'panel ' + (className || '');
 
-		var style:React.CSSProperties = {};
+		const style: React.CSSProperties = {};
 
-		if(this.props.dx && this.canDrag())
+		if (this.props.dx && this.canDrag())
 		{
 			style.left = this.props.dx + 'px';
 		}
 
-		if(this.props.dy && this.canDrag()) 
+		if (this.props.dy && this.canDrag())
 		{
 			style.top = this.props.dy + 'px';
 		}
 
-		if(this.state.dragging) 
+		if (this.state.dragging)
 		{
   	  panelClass += ' panel-dragging';
-      
+
       style.left = this.state.dx + 'px';
     style.top = this.state.dy + 'px';
     }
-    
-		if(this.props.neighborDragging)
+
+		if (this.props.neighborDragging)
 		{
 			panelClass += ' neighbor-dragging';
 		}
 
-		if(this.props.fill) 
+		if (this.props.fill)
 		{
 			style.width = '100%';
 			style.height = '100%';
 		}
-    
+
     return (
-        <div 
-          className={panelClass} 
-          style={style} 
-          onMouseDown={this.down} 
-          ref='panel'
+        <div
+          className={panelClass}
+          style={style}
+          onMouseDown={this.down}
+          ref="panel"
           onTouchStart={this.down}>
           {content}
         </div>

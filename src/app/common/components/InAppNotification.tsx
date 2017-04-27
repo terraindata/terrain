@@ -63,11 +63,11 @@ render()
   ...
 */
 
-import Classs from './../../common/components/Classs';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-var NotificationSystem = require('./notification-system/NotificationSystem');
-var styles = require('./notification-system/styles.js');
+import Classs from './../../common/components/Classs';
+const NotificationSystem = require('./notification-system/NotificationSystem');
+const styles = require('./notification-system/styles.js');
 
 export interface Props
 {
@@ -78,33 +78,32 @@ export interface Props
   };
 }
 
-var notificationManager = {
+const notificationManager = {
   system: null,
 
-  addNotification:function(title: string, message:string, level:string, timeOut?:number)
+  addNotification: function(title: string, message: string, level: string, timeOut?: number)
   {
-    if(this.system) {
+    if (this.system) {
       this.system.addNotification({
         title,
         message,
         level,
         autoDismiss: timeOut || 5000,
-        dismissible: true
+        dismissible: true,
       });
     }
-  }
+  },
 };
 
 class InAppNotification extends Classs<Props>
 {
 
-
   constructor(props)
   {
     super(props);
     this.state = {
-      notificationManager: null
-    }
+      notificationManager: null,
+    };
   }
 
   componentDidMount() {
@@ -118,7 +117,7 @@ class InAppNotification extends Classs<Props>
   {
     return (
       <div>
-        <NotificationSystem allowHTML={true} style={styles} ref='notificationSystem'/>
+        <NotificationSystem allowHTML={true} style={styles} ref="notificationSystem"/>
       </div>
     );
   }

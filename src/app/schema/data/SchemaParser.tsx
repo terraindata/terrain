@@ -42,9 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import SchemaTypes from '../SchemaTypes';
 import * as Immutable from 'immutable';
-let {Map, List} = Immutable;
+import SchemaTypes from '../SchemaTypes';
+const {Map, List} = Immutable;
 
 type Database = SchemaTypes.Database;
 type Table = SchemaTypes.Table;
@@ -54,25 +54,25 @@ type Index = SchemaTypes.Index;
 export module SchemaParser
 {
 	export function parseDb(
-		db: string, 
-		colsData: any[], 
-		setDbAction: (payload: SchemaTypes.SetDbActionPayload) => void
+		db: string,
+		colsData: any[],
+		setDbAction: (payload: SchemaTypes.SetDbActionPayload) => void,
 	) {
 		let database = SchemaTypes._Database({
 			name: db,
 		});
-		let databaseId = database.id;
-		
+		const databaseId = database.id;
+
 		let tables: IMMap<ID, Table> = Map<ID, Table>({});
 		let columns: IMMap<ID, Column> =  Map<ID, Column>({});
-		let indexes: IMMap<ID, Index> =  Map<ID, Index>({});
-		
+		const indexes: IMMap<ID, Index> =  Map<ID, Index>({});
+
 		let tableNames = List<string>([]);
 		let columnNamesByTable = Map<string, List<string>>([]);
-		
+
     colsData.map(
     (
-      col: { 
+      col: {
       	TABLE_CATALOG: string,
 	      TABLE_SCHEMA: string,
 	      TABLE_NAME: string,
@@ -93,14 +93,14 @@ export module SchemaParser
 	      EXTRA: string,
 	      PRIVILEGES: string,
 	      COLUMN_COMMENT: string,
-	      GENERATION_EXPRESSION: string
-      }
+	      GENERATION_EXPRESSION: string,
+      },
     ) =>
     {
-    	let tableId = SchemaTypes.tableId(db, col.TABLE_NAME);
+    	const tableId = SchemaTypes.tableId(db, col.TABLE_NAME);
     	let table = tables.get(tableId);
-    	
-    	if(!table)
+
+    	if (!table)
     	{
     		table = SchemaTypes._Table({
     			name: col.TABLE_NAME,
@@ -109,11 +109,11 @@ export module SchemaParser
     		tables = tables.set(tableId, table);
     		tableNames = tableNames.push(table.name);
     		database = database.set(
-    			'tableIds', database.tableIds.push(tableId)
+    			'tableIds', database.tableIds.push(tableId),
     		);
     	}
-    	
-    	let column = SchemaTypes._Column({
+
+    	const column = SchemaTypes._Column({
     		name: col.COLUMN_NAME,
     		databaseId,
     		tableId,
@@ -122,29 +122,29 @@ export module SchemaParser
     		isNullable: col.IS_NULLABLE === 'YES',
     		isPrimaryKey: col.COLUMN_KEY === 'PRI',
     	});
-       
+
       columns = columns.set(column.id, column);
-      
-      if(!columnNamesByTable.get(table.id))
+
+      if (!columnNamesByTable.get(table.id))
       {
       	columnNamesByTable = columnNamesByTable.set(table.id, List([]));
       }
       columnNamesByTable = columnNamesByTable.update(table.id,
-      	list => list.push(column.name)
+      	(list) => list.push(column.name),
       );
-      
+
       tables = tables.setIn(
       	[tableId, 'columnIds'],
-      	table.columnIds.push(column.id)
+      	table.columnIds.push(column.id),
       );
     });
-    
+
     setDbAction({
-    	database, 
-    	tables, 
-    	columns, 
-    	indexes, 
-    	tableNames, 
+    	database,
+    	tables,
+    	columns,
+    	indexes,
+    	tableNames,
     	columnNames: columnNamesByTable,
     });
 	}

@@ -43,17 +43,17 @@ THE SOFTWARE.
 */
 
 require('./TQLResultsBar.less');
-import * as _ from 'underscore';
-import * as React from 'react';
 import * as classNames from 'classnames';
-import Util from '../../util/Util';
-import {Ajax, QueryResponse} from '../../util/Ajax';
-import Actions from "../../builder/data/BuilderActions";
-import TQLConverter from "../../tql/TQLConverter";
-import PureClasss from './../../common/components/PureClasss';
+import * as React from 'react';
+import * as _ from 'underscore';
 import BuilderTypes from '../../builder/BuilderTypes';
 import {ResultsState} from '../../builder/components/results/ResultsManager';
-export interface Props 
+import Actions from '../../builder/data/BuilderActions';
+import TQLConverter from '../../tql/TQLConverter';
+import {Ajax, QueryResponse} from '../../util/Ajax';
+import Util from '../../util/Util';
+import PureClasss from './../../common/components/PureClasss';
+export interface Props
 {
   resultsState: ResultsState;
   onError: (lineNumber: number) => void;
@@ -67,14 +67,14 @@ class TQLResultsBar extends PureClasss<Props>
 
   renderResults()
   {
-    let {resultsState} = this.props;
-    
-    if(!resultsState.hasLoadedResults)
+    const {resultsState} = this.props;
+
+    if (!resultsState.hasLoadedResults)
     {
-      return <div>Querying results...</div>
+      return <div>Querying results...</div>;
     }
 
-    if(resultsState.hasError)
+    if (resultsState.hasError)
     {
       return (
         <div>
@@ -84,12 +84,12 @@ class TQLResultsBar extends PureClasss<Props>
             }
           </span>
           <span className="error-title">
-            { 
+            {
               resultsState.mainErrorMessage
             }
           </span>
           <span className="error-message">
-            { 
+            {
               resultsState.subErrorMessage
             }
           </span>
@@ -97,16 +97,16 @@ class TQLResultsBar extends PureClasss<Props>
       );
     }
 
-    let {results} = resultsState;
+    const {results} = resultsState;
 
-    if(!results) 
+    if (!results)
     {
-      return <div>Compose a query to view results here.</div>
+      return <div>Compose a query to view results here.</div>;
     }
-    
-    if(typeof results === 'string')
+
+    if (typeof results === 'string')
     {
-      if(!results['length'])
+      if (!results['length'])
       {
         return <em> "" (empty string)</em>;
       }
@@ -118,12 +118,12 @@ class TQLResultsBar extends PureClasss<Props>
         </div>
       );
     }
-    
-    if(!results.size)
+
+    if (!results.size)
     {
       return <div>There are no results for your query.</div>;
     }
-    
+
     return (
       <div>
         {
@@ -132,14 +132,13 @@ class TQLResultsBar extends PureClasss<Props>
               {
                 JSON.stringify(result.rawFields.toJS())
               }
-            </div>
+            </div>,
           )
         }
       </div>
     );
   }
 
-  
 	render()
   {
     return (
@@ -150,7 +149,7 @@ class TQLResultsBar extends PureClasss<Props>
         })}
         onClick={this.props.onToggle}
       >
-        <div className='tql-results-bar-inner'>
+        <div className="tql-results-bar-inner">
           {
             this.renderResults()
           }

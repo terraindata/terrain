@@ -42,50 +42,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as React from 'react';
-import Classs from './Classs';
+import * as _ from 'underscore';
 import BuilderTypes from '../../builder/BuilderTypes';
+import Classs from './Classs';
 const shallowCompare = require('react-addons-shallow-compare');
 
 class PureClasss<T> extends Classs<T>
 {
   props: T;
   _debugUpdates = false;
-  _debugName = "Not set";
-  
+  _debugName = 'Not set';
+
   shouldComponentUpdate(nextProps: T, nextState: any)
   {
-    let shouldUpdate = shallowCompare(this, nextProps, nextState);
-    
-    if(this._debugUpdates && shouldUpdate)
+    const shouldUpdate = shallowCompare(this, nextProps, nextState);
+
+    if (this._debugUpdates && shouldUpdate)
     {
       this._compareSets(this.props, nextProps, 'props');
       this._compareSets(this.state, nextState, 'state');
     }
-    
+
     return shouldUpdate;
   }
-  
+
   _compareSets(first: any, second: any, setName: string)
   {
-    let firstKeys = _.keys(first);
-    for(var key of firstKeys)
+    const firstKeys = _.keys(first);
+    for (const key of firstKeys)
     {
-      if(first[key] !== second[key])
+      if (first[key] !== second[key])
       {
         console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
       }
     }
-    for(var key in second)
+    for (const key in second)
     {
-      if(firstKeys.indexOf(key) === -1)
+      if (firstKeys.indexOf(key) === -1)
       {
         console.log('Update', this._debugName, setName, 'Key: ', key, 'First: ', first[key], 'Second: ', second[key]);
       }
     }
   }
-  
+
   // TODO
   // _myKeyPath(el: BuilderTypes.KeyPathClass)
   // {

@@ -42,13 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
+const _ = require('underscore');
+import '../../util/Ajax';
+import BuilderTypes from './../../builder/BuilderTypes';
+import LibraryTypes from './../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
 import Store from './LibraryStore';
-import {LibraryState, LibraryStore, _LibraryState} from './LibraryStore';
-import LibraryTypes from './../LibraryTypes';
-import BuilderTypes from './../../builder/BuilderTypes';
-import '../../util/Ajax';
+import {_LibraryState, LibraryState, LibraryStore} from './LibraryStore';
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
@@ -56,7 +56,7 @@ import * as Immutable from 'immutable';
 
 import Ajax from './../../util/Ajax';
 
-var $ = (type: string, payload: any) => Store.dispatch({type, payload});
+const $ = (type: string, payload: any) => Store.dispatch({type, payload});
 
 const Actions =
 {
@@ -125,7 +125,7 @@ const Actions =
       {
         Ajax.getVariantVersion(variantId, (variantVersion: LibraryTypes.Variant) =>
         {
-          if(!variantVersion)
+          if (!variantVersion)
           {
             onNoVersion(variantId);
           }
@@ -157,26 +157,26 @@ const Actions =
       Ajax.getItems((groupsData, algorithmsData, variantsData, groupsOrder) =>
       {
         let variants = Immutable.Map({});
-        _.map(variantsData, variantData => {
+        _.map(variantsData, (variantData) => {
           variants = variants.set(
             variantData.id,
-            LibraryTypes._Variant(variantData)
+            LibraryTypes._Variant(variantData),
           );
         });
 
         let algorithms = Immutable.Map({});
-        _.map(algorithmsData, algorithmData => {
+        _.map(algorithmsData, (algorithmData) => {
           algorithms = algorithms.set(
             algorithmData.id,
-            LibraryTypes._Algorithm(algorithmData)
+            LibraryTypes._Algorithm(algorithmData),
           );
         });
 
         let groups = Immutable.Map({});
-        _.map(groupsData, groupData => {
+        _.map(groupsData, (groupData) => {
           groups = groups.set(
             groupData.id,
-            LibraryTypes._Group(groupData)
+            LibraryTypes._Group(groupData),
           );
         });
 
@@ -187,7 +187,7 @@ const Actions =
           groupsOrder: Immutable.List(groupsOrder),
           loading: false,
         }));
-      })
+      });
     },
 };
 

@@ -45,11 +45,11 @@ THE SOFTWARE.
 require('./InfoArea.less');
 import * as classNames from 'classnames';
 import * as React from 'react';
-import Util from '../../util/Util';
 import PureClasss from '../../common/components/PureClasss';
+import Util from '../../util/Util';
 
-var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
-var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
+const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');
+const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
 
 export interface Props {
   large?: string;
@@ -68,13 +68,13 @@ class InfoArea extends PureClasss<Props>
   }
 
   renderThing(thing: string, onClick?: boolean) {
-    if(!this.props[thing])
+    if (!this.props[thing])
     {
       return null;
     }
 
     return (
-      <div className={"info-area-"+thing} onClick={onClick ? this.props.onClick : null}>
+      <div className={'info-area-' + thing} onClick={onClick ? this.props.onClick : null}>
         { this.props[thing] }
       </div>
     );
@@ -83,8 +83,8 @@ class InfoArea extends PureClasss<Props>
   render() {
     return (
      <div className={classNames({
-       "info-area": true,
-       "info-area-inline": this.props.inline,
+       'info-area': true,
+       'info-area-inline': this.props.inline,
      })}>
        { this.renderThing('large') }
        { this.renderThing('small') }

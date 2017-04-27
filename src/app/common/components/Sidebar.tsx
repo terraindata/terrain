@@ -43,14 +43,14 @@ THE SOFTWARE.
 */
 
 require('./Sidebar.less');
-import * as React from 'react';
-import Util from '../../util/Util';
 import * as classNames from 'classnames';
+import * as React from 'react';
 import { Link } from 'react-router';
 import PureClasss from '../../common/components/PureClasss';
+import Util from '../../util/Util';
 
-var ExpandIcon = require("./../../../images/icon_expand_12x12.svg?name=ExpandIcon");
-var linkHeight = 36; // Coordinate with Sidebar.less
+const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
+const linkHeight = 36; // Coordinate with Sidebar.less
 
 export interface ILink {
   icon: any;
@@ -106,13 +106,13 @@ export class Sidebar extends PureClasss<Props>
                 </div>
               </div>
             </div>
-          </Link>
+          </Link>,
           )
       }
       {
         this.props.expandable ?
           (
-            <div className='sidebar-expand' onClick={this.props.onExpand}>
+            <div className="sidebar-expand" onClick={this.props.onExpand}>
               <div className="dead-center">
                 <ExpandIcon />
               </div>

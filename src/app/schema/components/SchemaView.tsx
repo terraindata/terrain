@@ -43,17 +43,17 @@ THE SOFTWARE.
 */
 
 const Radium = require('radium');
-import SchemaTypes from '../SchemaTypes';
-import {SchemaStore, SchemaActions} from '../data/SchemaStore';
-import * as React from 'react';
 import * as $ from 'jquery';
+import * as React from 'react';
+import FadeInOut from '../../common/components/FadeInOut';
+import Util from '../../util/Util';
+import {SchemaActions, SchemaStore} from '../data/SchemaStore';
+import SchemaTypes from '../SchemaTypes';
 import PureClasss from './../../common/components/PureClasss';
+import SchemaResults from './SchemaResults';
+import SchemaSearchResults from './SchemaSearchResults';
 import SchemaTreeList from './SchemaTreeList';
 import Styles from './SchemaTreeStyles';
-import FadeInOut from '../../common/components/FadeInOut';
-import SchemaSearchResults from './SchemaSearchResults';
-import Util from '../../util/Util';
-import SchemaResults from './SchemaResults';
 
 export interface Props
 {
@@ -78,10 +78,10 @@ class SchemaView extends PureClasss<Props>
 		highlightedId?: ID;
 	} = {
 		highlightedIndex: -1,
-		search: "",
+		search: '',
 	};
 
-	constructor(props:Props)
+	constructor(props: Props)
 	{
 		super(props);
 
@@ -98,7 +98,7 @@ class SchemaView extends PureClasss<Props>
 
 	handleSearchChange(event)
 	{
-		let search = event.target.value as string;
+		const search = event.target.value as string;
 		this.setState({
 			search,
 			highlightedIndex: -1,
@@ -108,10 +108,10 @@ class SchemaView extends PureClasss<Props>
 
 	handleSearchKeyDown(event)
 	{
-		let {highlightedIndex} = this.state;
+		const {highlightedIndex} = this.state;
 		let offset: number = 0;
 
-		switch(event.keyCode)
+		switch (event.keyCode)
     {
       case 38:
         // up
@@ -119,11 +119,11 @@ class SchemaView extends PureClasss<Props>
       case 40:
         // down
         offset = offset || 1;
-				let items = $("[data-rel='schema-item']");
-        let index = Util.valueMinMax(highlightedIndex + offset, 0, items.length);
-        let el = $(items[index]);
-        let id = el.attr('data-id');
-        let inSearchResults = !!el.attr('data-search');
+				const items = $("[data-rel='schema-item']");
+        const index = Util.valueMinMax(highlightedIndex + offset, 0, items.length);
+        const el = $(items[index]);
+        const id = el.attr('data-id');
+        const inSearchResults = !!el.attr('data-search');
 
         this.setState({
         	highlightedIndex: index,
@@ -137,7 +137,7 @@ class SchemaView extends PureClasss<Props>
       case 9:
         // enter or tab
 
-      	if(this.state.highlightedId)
+      	if (this.state.highlightedId)
       	{
       		SchemaActions.selectId(this.state.highlightedId);
       	}
@@ -165,8 +165,8 @@ class SchemaView extends PureClasss<Props>
 
   render()
   {
-  	let search = this.props.search || this.state.search;
-  	let {showSearch} = this.props;
+  	const search = this.props.search || this.state.search;
+  	const {showSearch} = this.props;
 
     return (
       <div
@@ -178,7 +178,7 @@ class SchemaView extends PureClasss<Props>
       			this.props.fullPage ? SCHEMA_STYLE_FULL_PAGE : SCHEMA_STYLE_COLUMN,
       			{
       				padding: Styles.margin,
-							overflow: "auto",
+							overflow: 'auto',
       			} as any,
       		]}
       	>
@@ -190,8 +190,8 @@ class SchemaView extends PureClasss<Props>
 		      			}}
 		      		>
 		      			<input
-		      				type='text'
-		      				placeholder='Search schema'
+		      				type="text"
+		      				placeholder="Search schema"
 		      				value={search}
 		      				onChange={this.handleSearchChange}
 		      				onKeyDown={this.handleSearchKeyDown}
@@ -217,7 +217,7 @@ class SchemaView extends PureClasss<Props>
       			</FadeInOut>
 
 		      	<SchemaTreeList
-		      		itemType='database'
+		      		itemType="database"
 		      		itemIds={this.state.databases && this.state.databases.keySeq().toList()}
 		      		label={'Databases'}
 		      		topLevel={true}
@@ -233,7 +233,7 @@ class SchemaView extends PureClasss<Props>
 	      <div
 	      	style={[
       			SECTION_STYLE,
-      			this.props.fullPage ? RESULTS_STYLE_FULL_PAGE : RESULTS_STYLE_COLUMN
+      			this.props.fullPage ? RESULTS_STYLE_FULL_PAGE : RESULTS_STYLE_COLUMN,
       		]}
 	      >
 	      	<SchemaResults
@@ -277,6 +277,5 @@ const RESULTS_STYLE_COLUMN = {
 	width: '100%',
 	height: (100 - verticalDivide) + '%',
 };
-
 
 export default SchemaView;

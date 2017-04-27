@@ -43,8 +43,8 @@ THE SOFTWARE.
 */
 
 require('./Switch.less');
-import * as React from 'react';
 import * as classNames from 'classnames';
+import * as React from 'react';
 import Classs from './../../common/components/Classs';
 
 export interface Props
@@ -52,7 +52,7 @@ export interface Props
   first: string;
   second: string;
   selected: number;
-  onChange: (selected:number) => void;
+  onChange: (selected: number) => void;
   small?: boolean;
   medium?: boolean;
 }
@@ -65,21 +65,21 @@ class Switch extends Classs<Props>
   }
 
   render() {
-    var classes = classNames({
-      "switch": true,
-      "switch-on-first": this.props.selected === 1,
-      "switch-on-second": this.props.selected !== 1,
+    const classes = classNames({
+      'switch': true,
+      'switch-on-first': this.props.selected === 1,
+      'switch-on-second': this.props.selected !== 1,
       'switch-small': this.props.small,
       'switch-medium': this.props.medium,
     });
 
     return (
       <div className={classes} onClick={this.handleSwitch}>
-        <div className='switch-on' />
-        <div className='switch-first'>
+        <div className="switch-on" />
+        <div className="switch-first">
           { this.props.first }
         </div>
-        <div className='switch-second'>
+        <div className="switch-second">
           { this.props.second }
         </div>
       </div>

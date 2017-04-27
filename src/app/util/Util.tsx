@@ -45,34 +45,34 @@ THE SOFTWARE.
 import * as $ from 'jquery';
 // import * as moment from 'moment';
 const moment = require('moment');
+import * as Immutable from 'immutable';
 import * as React from 'react';
-import * as ReactDOM from "react-dom";
-import * as Immutable from "immutable";
+import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 
 import LibraryTypes from './../library/LibraryTypes';
 
-const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 const suffixes = ['', ' k', ' M', ' B'];
 
-var keyPathForId = (node: any, id: string): ((string | number)[] | boolean) =>
+const keyPathForId = (node: any, id: string): (Array<string | number> | boolean) =>
   {
-    if(node.get('id') === id)
+    if (node.get('id') === id)
     {
       return true;
     }
 
     return node.reduce((keyPath, value, key) =>
     {
-      if(keyPath)
+      if (keyPath)
       {
         return keyPath;
       }
 
-      if(Immutable.Iterable.isIterable(value))
+      if (Immutable.Iterable.isIterable(value))
       {
-        var kp = keyPathForId(value, id);
-        if(kp)
+        const kp = keyPathForId(value, id);
+        if (kp)
         {
           return ([key]).concat(kp === true ? [] : kp);
         }
@@ -80,13 +80,13 @@ var keyPathForId = (node: any, id: string): ((string | number)[] | boolean) =>
     }, false);
   };
 
-var Util = {
+const Util = {
 	// Return a random integer [min, max)
 	// assumes min of 0 if not passed.
 	randInt(...args: number[]): number
 	{
-		var min:number = arguments[0], max:number = arguments[1];
-		if(arguments.length === 1) {
+		let min: number = arguments[0], max: number = arguments[1];
+		if (arguments.length === 1) {
 			min = 0;
 			max = arguments[0];
 		}
@@ -94,14 +94,14 @@ var Util = {
 		return Math.floor(Math.random() * (max - min)) + min;
 	},
 
-  moment(str:string)
+  moment(str: string)
   {
     return moment(new Date(str));
   },
 
-  asJS(obj:any)
+  asJS(obj: any)
   {
-    if(obj && typeof obj.toJS === 'function')
+    if (obj && typeof obj.toJS === 'function')
     {
       return obj.toJS();
     }
@@ -110,7 +110,7 @@ var Util = {
 
   addBeforeLeaveHandler(handler: () => void)
   {
-    if(!window['beforeLeaveHandlers'])
+    if (!window['beforeLeaveHandlers'])
     {
       window['beforeLeaveHandlers'] = [];
     }
@@ -121,14 +121,14 @@ var Util = {
   {
     window['beforeLeaveHandlers'] &&
       window['beforeLeaveHandlers'].map(
-        fn => fn && fn()
+        (fn) => fn && fn(),
       );
   },
 
   haveRole(groupId: ID, role: string, UserStore, RolesStore)
   {
-    let me = UserStore.getState().get('currentUser');
-    if(!me)
+    const me = UserStore.getState().get('currentUser');
+    if (!me)
     {
       return false;
     }
@@ -138,25 +138,25 @@ var Util = {
 
   canEdit(item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group, UserStore, RolesStore)
   {
-    let me = UserStore.getState().get('currentUser');
-    if(!me)
+    const me = UserStore.getState().get('currentUser');
+    if (!me)
     {
       return false;
     }
-    if(item.type === 'group' && me.isAdmin)
+    if (item.type === 'group' && me.isAdmin)
     {
       return true;
     }
 
-    let groupId = item.type === 'group' ? item.id : item['groupId'];
-    if(Util.haveRole(groupId, 'admin', UserStore, RolesStore))
+    const groupId = item.type === 'group' ? item.id : item['groupId'];
+    if (Util.haveRole(groupId, 'admin', UserStore, RolesStore))
     {
       return true;
     }
 
-    if(item.type !== 'group')
+    if (item.type !== 'group')
     {
-      return Util.haveRole(groupId, 'builder', UserStore, RolesStore)
+      return Util.haveRole(groupId, 'builder', UserStore, RolesStore);
     }
 
     return false;
@@ -164,8 +164,8 @@ var Util = {
 
   mapEnum(_enum: any, fn: (e: string) => any)
   {
-    let ans = [];
-    for (var item in _enum) {
+    const ans = [];
+    for (const item in _enum) {
       if (_enum.hasOwnProperty(item) && /^\d+$/.test(item)) {
         ans.push(fn(item));
       }
@@ -174,22 +174,22 @@ var Util = {
   },
 
   // for displaying in the app
-  formatDate(date:string):string
+  formatDate(date: string): string
   {
-    let then = moment(date);
-    let now = moment();
-    let hour = ' at ' + then.format('h:mma');
+    const then = moment(date);
+    const now = moment();
+    const hour = ' at ' + then.format('h:mma');
 
-    if(then.format('MMMM Do YYYY') === now.format('MMMM Do YYYY'))
+    if (then.format('MMMM Do YYYY') === now.format('MMMM Do YYYY'))
     {
       // it was today
       return 'Today at' + hour;
     }
 
-    if(then.format('YYYY') === now.format('YYYY'))
+    if (then.format('YYYY') === now.format('YYYY'))
     {
       // same year
-      return then.format('MM/DD/YY') + hour
+      return then.format('MM/DD/YY') + hour;
     }
 
     return then.format('MM/DD/YY') + hour;
@@ -199,19 +199,19 @@ var Util = {
     return Math.round(num * Math.pow(10, decimalPoints)) / Math.pow(10, decimalPoints);
   },
 
-  exportToCSV(data: (string | number)[][], fileName: string)
+  exportToCSV(data: Array<Array<string | number>>, fileName: string)
   {
     // from http://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
-    let csvContent = "data:text/csv;charset=utf-8,";
+    let csvContent = 'data:text/csv;charset=utf-8,';
     data.forEach((infoArray, index) => {
-       let dataString = infoArray.join(",");
-       csvContent += index < data.length ? dataString+ "\n" : dataString;
+       const dataString = infoArray.join(',');
+       csvContent += index < data.length ? dataString + '\n' : dataString;
     });
 
-    let encodedUri = encodeURI(csvContent);
-    let link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", fileName + ".csv");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', fileName + '.csv');
     document.body.appendChild(link); // Required for FF
     link.click();
     link.remove();
@@ -222,22 +222,22 @@ var Util = {
     _.map(first,
       (v, key: string) =>
       {
-        if(!second[key])
+        if (!second[key])
         {
           alert(errorMsg + key);
           throw new Error(errorMsg + key);
         }
-      }
+      },
     );
 
-    if(!oneWay)
+    if (!oneWay)
     {
       Util.assertKeysArePresent(second, first, errorMsg, true);
     }
   },
 
   // for SQL
-  formatInputDate(date:Date):string
+  formatInputDate(date: Date): string
   {
     return moment(date).format('YYYY-MM-DD HH:mm:ss');
   },
@@ -246,40 +246,40 @@ var Util = {
   {
     const precision: number = 3;
 
-    if(!n)
+    if (!n)
     {
-      return n + "";
+      return n + '';
     }
 
-    let sign = n < 0 ? '-' : '';
+    const sign = n < 0 ? '-' : '';
     n = Math.abs(n);
 
-    if(n >= 0.001 && n < 1000000000000) // 10^12
+    if (n >= 0.001 && n < 1000000000000) // 10^12
     {
-      let pwr = Math.floor(Math['log10'](n));
+      const pwr = Math.floor(Math['log10'](n));
       let str = n.toPrecision(precision);
       let suffix = '';
 
-      if(pwr > 0)
+      if (pwr > 0)
       {
         suffix = suffixes[Math.floor(pwr / 3)];
-        let decimalIndex = pwr % 3 + 1;
-        str = n + "";
+        const decimalIndex = pwr % 3 + 1;
+        str = n + '';
         str = str.substr(0, precision);
-        if(decimalIndex < str.length)
+        if (decimalIndex < str.length)
         {
           str = str.slice(0, decimalIndex) + '.' + str.slice(decimalIndex);
         }
-        else if(decimalIndex > str.length)
+        else if (decimalIndex > str.length)
         {
           // need to add extra 0's
           _.range(0, decimalIndex - str.length).map(
-            i => str = str + '0'
+            (i) => str = str + '0',
           );
         }
       }
 
-      while(str.length > 1 &&
+      while (str.length > 1 &&
         str.indexOf('.') > 0 &&
         (str.charAt(str.length - 1) === '0' || str.charAt(str.length - 1) === '.')
       )
@@ -298,16 +298,16 @@ var Util = {
   {
     // TODO have this fetch a list of IDs from server,
     // give IDs from that list
-    return _.range(0, 5).map(i => chars[Util.randInt(chars.length)]).join("");
+    return _.range(0, 5).map((i) => chars[Util.randInt(chars.length)]).join('');
   },
 
   extendId(obj: Object): Object
   {
-    if(obj['id'])
+    if (obj['id'])
     {
       return obj;
     }
-    return _.extend({}, { id: Util.getId() }, _.omit(obj, value => value === undefined));
+    return _.extend({}, { id: Util.getId() }, _.omit(obj, (value) => value === undefined));
   },
 
   moveIndexOffset(index: number, newIndex: number): number
@@ -318,20 +318,20 @@ var Util = {
   setValuesToKeys(obj: any, prefix: string)
   {
     prefix = prefix + (prefix.length > 0 ? '.' : '');
-    for(var key in obj)
+    for (const key in obj)
     {
-      var value = prefix + key;
-      if(typeof obj[key] === 'string')
+      const value = prefix + key;
+      if (typeof obj[key] === 'string')
       {
         obj[key] = value;
       }
-      else if(typeof obj[key] === 'object')
+      else if (typeof obj[key] === 'object')
       {
         Util.setValuesToKeys(obj[key], value);
       }
       else
       {
-        throw "Value found in ActionTypes that is neither string or object of strings: key: " + key + ", value: " + obj[key];
+        throw new Error('Value found in ActionTypes that is neither string or object of strings: key: ' + key + ', value: ' + obj[key]);
       }
     }
   },
@@ -350,9 +350,9 @@ var Util = {
   //  to pass into a `splice` call
   spliceIndex(index: number, array: any[]): number
   {
-    if(index === undefined || index === null || index === -1)
+    if (index === undefined || index === null || index === -1)
     {
-      if(Immutable.Iterable.isIterable(array))
+      if (Immutable.Iterable.isIterable(array))
       {
         return array['size'];
       }
@@ -364,15 +364,15 @@ var Util = {
 
   // still needed?
   immutableMove: (arr: any, id: any, index: number) => {
-    var curIndex = arr.findIndex((obj) =>
+    const curIndex = arr.findIndex((obj) =>
       (typeof obj.get === 'function' && (obj.get('id') === id))
       || (obj.id === id));
-    var obj = arr.get(curIndex);
+    const obj = arr.get(curIndex);
     arr = arr.delete(curIndex);
     return arr.splice(index, 0, obj);
   },
 
-  keyPathForId: keyPathForId,
+  keyPathForId,
 
 	isInt(num): boolean
 	{
@@ -395,17 +395,17 @@ var Util = {
   },
 
   selectText(field, start, end) {
-    if( field.createTextRange ) {
-      var selRange = field.createTextRange();
+    if ( field.createTextRange ) {
+      const selRange = field.createTextRange();
       selRange.collapse(true);
       selRange.moveStart('character', start);
       selRange.moveEnd('character', end);
       selRange.select();
       field.focus();
-    } else if( field.setSelectionRange ) {
+    } else if ( field.setSelectionRange ) {
       field.focus();
       field.setSelectionRange(start, end);
-    } else if( typeof field.selectionStart != 'undefined' ) {
+    } else if ( typeof field.selectionStart != 'undefined' ) {
       field.selectionStart = start;
       field.selectionEnd = end;
       field.focus();
@@ -424,27 +424,27 @@ var Util = {
 
   deeperCloneObj(obj): any
   {
-    var ans = {};
+    const ans = {};
     _.map(obj, (val, key) => ans[key] = _.clone(val));
     return ans;
   },
 
   animateToHeight(node, height: number, onComplete?): void
   {
-    var el = $(node);
-    var curHeight = el.height();
+    const el = $(node);
+    const curHeight = el.height();
 
     el.css('overflow', 'hidden');
-    el.height(curHeight).animate({ height: height }, 250, () => {
+    el.height(curHeight).animate({ height }, 250, () => {
       onComplete && onComplete();
     });
   },
 
   animateToAutoHeight(node, onComplete?, duration?): void
   {
-    var el = $(node);
-    var curHeight = el.height();
-    var autoHeight = el.css('height', 'auto').height();
+    const el = $(node);
+    const curHeight = el.height();
+    const autoHeight = el.css('height', 'auto').height();
 
     el.height(curHeight).animate({ height: autoHeight }, duration || 250, function() {
       el.css('height', 'auto');
@@ -474,8 +474,8 @@ var Util = {
 
   bind(component: React.Component<any, any>, ...args: any[])
   {
-    var fields: any[] = args;
-    if(typeof fields[0] === 'object')
+    let fields: any[] = args;
+    if (typeof fields[0] === 'object')
     {
       fields = fields[0];
     }
@@ -490,52 +490,50 @@ var Util = {
     fields.map((field) => {
       component['_throttled_' + field] = _.throttle(component[field], 1000);
       component[field] = (event) => {
-        if(event && typeof event.persist === 'function')
+        if (event && typeof event.persist === 'function')
         {
           // must call persist to keep the event around
           // see: http://stackoverflow.com/questions/23123138/perform-debounce-in-react-js/24679479#24679479
           event.persist();
         }
         component['_throttled_' + field](event);
-      }
+      };
     });
   },
-
 
   // REMOVE
 	// accepts object of key/vals like this: { 'className': include? }
 	objToClassname(obj: { [className: string]: boolean }): string
 	{
 		return _.reduce(obj, (classNameArray: string[], include: boolean, className: string) => {
-				if(include)
+				if (include)
 				{
 					classNameArray.unshift(className);
 				}
 				return classNameArray;
-			}, []).join(" ");
+			}, []).join(' ');
 	},
-
 
   cardIndex: (cards, action) =>
   {
-    return cards.findIndex(card => card.get('id') === action.payload.card.id);
+    return cards.findIndex((card) => card.get('id') === action.payload.card.id);
   },
 
   populateTransformDummyData(transformCard)
   {
-    transformCard.range = transformCard.range || [0,100];
+    transformCard.range = transformCard.range || [0, 100];
     transformCard.bars = transformCard.bars || [];
     transformCard.scorePoints = transformCard.scorePoints || [];
 
-    if(transformCard.scorePoints.length === 0)
+    if (transformCard.scorePoints.length === 0)
     {
-      for(var i:any = 0; i < 5; i ++)
+      for (let i: any = 0; i < 5; i ++)
       {
         transformCard.scorePoints.push(
         {
           value: transformCard.range[0] + (transformCard.range[1] - transformCard.range[0]) / 4 * i,
           score: 0.5,
-          id: "p" + i,
+          id: 'p' + i,
         });
       }
     }
@@ -543,12 +541,12 @@ var Util = {
 
   getIEVersion() {
     // from https://jsfiddle.net/jquerybyexample/gk7xA/
-    var sAgent = window.navigator.userAgent;
-    var Idx = sAgent.indexOf("MSIE");
+    const sAgent = window.navigator.userAgent;
+    const Idx = sAgent.indexOf('MSIE');
 
     // If IE, return version number.
     if (Idx > 0)
-      return parseInt(sAgent.substring(Idx+ 5, sAgent.indexOf(".", Idx)));
+      return parseInt(sAgent.substring(Idx + 5, sAgent.indexOf('.', Idx)));
 
     // If IE 11 then look for Updated user agent string.
     else if (!!navigator.userAgent.match(/Trident\/7\./))
@@ -556,7 +554,7 @@ var Util = {
 
     else
       return 0; //It is not IE
-  }
+  },
 };
 
 export default Util;

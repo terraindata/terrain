@@ -45,11 +45,10 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import PureClasss from './../common/components/PureClasss';
-import {Operators, Combinators} from './BuilderTypes';
-var ManualConfig = require('./../manual/ManualConfig.json');
+import {Combinators, Operators} from './BuilderTypes';
+let ManualConfig = require('./../manual/ManualConfig.json');
 
-var ManualConfig = require('./../manual/ManualConfig.json');
-
+const ManualConfig = require('./../manual/ManualConfig.json');
 
 export enum DisplayType
 {
@@ -73,7 +72,7 @@ export interface RowDisplay
   hideToolsWhenNotString?: boolean;
   noDataPadding?: boolean; // don't add extra padding to first row when data
 }
-let {TEXT, NUM, ROWS, CARDS, CARDTEXT, CARDSFORTEXT, DROPDOWN, LABEL, FLEX, COMPONENT} = DisplayType;
+const {TEXT, NUM, ROWS, CARDS, CARDTEXT, CARDSFORTEXT, DROPDOWN, LABEL, FLEX, COMPONENT} = DisplayType;
 
 export interface Display
 {
@@ -98,13 +97,13 @@ export interface Display
   defaultValue?: string;
   // for textboxes with cards
   top?: boolean;
-  getAutoTerms?: (comp?:React.Component<any, any>) => List<string>; // overrides standard terms
+  getAutoTerms?: (comp?: React.Component<any, any>) => List<string>; // overrides standard terms
   autoDisabled?: boolean;
   showWhenCards?: boolean;
-  onFocus?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent<any>) => void;
-  onBlur?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent<any>) => void;
-  
-  // for rows and FLEX, content to display above/below,   
+  onFocus?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
+  onBlur?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
+
+  // for rows and FLEX, content to display above/below,
   above?: Display;
   below?: Display;
 
@@ -133,7 +132,7 @@ export interface Display
 export const valueDisplay: Display =
 {
   displayType: NUM,
-  help: ManualConfig.help["value"],
+  help: ManualConfig.help['value'],
   key: 'value',
   placeholder: 'value',
 };
@@ -146,7 +145,7 @@ export const stringValueDisplay: Display =
   };
 
 export const getCardStringDisplay =
-  (config: { accepts?: List<string>, defaultValue?: string, } = {}): Display[] =>
+  (config: { accepts?: List<string>, defaultValue?: string } = {}): Display[] =>
 [
   {
     displayType: CARDSFORTEXT,
@@ -162,7 +161,7 @@ export const getCardStringDisplay =
   },
 ];
 
-export const firstSecondDisplay = (middle:Display, accepts:List<string>): Display =>
+export const firstSecondDisplay = (middle: Display, accepts: List<string>): Display =>
 ({
   displayType: FLEX,
   key: null,
@@ -189,7 +188,7 @@ export const firstSecondDisplay = (middle:Display, accepts:List<string>): Displa
       key: 'first',
       top: true,
       showWhenCards: true,
-      help: ManualConfig.help["first"],
+      help: ManualConfig.help['first'],
       accepts,
     },
 
@@ -199,7 +198,7 @@ export const firstSecondDisplay = (middle:Display, accepts:List<string>): Displa
       displayType: CARDTEXT,
       key: 'second',
       showWhenCards: true,
-      help: ManualConfig.help["second"],
+      help: ManualConfig.help['second'],
       accepts,
     },
   ],
@@ -228,7 +227,7 @@ export const letVarDisplay =
   [
     {
       displayType: TEXT,
-      help: ManualConfig.help["let-var-field"],
+      help: ManualConfig.help['let-var-field'],
       key: 'field',
     },
     {
@@ -238,7 +237,7 @@ export const letVarDisplay =
     },
     {
       displayType: CARDTEXT,
-      help: ManualConfig.help["expression"],
+      help: ManualConfig.help['expression'],
       key: 'expression',
     },
   ],

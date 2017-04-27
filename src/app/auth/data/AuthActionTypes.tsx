@@ -42,11 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-var Immutable = require('immutable');
+const _ = require('underscore');
+const Immutable = require('immutable');
 import Util from './../../util/Util';
 
-var AuthActionTypes = 
+const AuthActionTypes =
 {
   login: '',
   logout: '',

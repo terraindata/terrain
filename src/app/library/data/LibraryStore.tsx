@@ -42,21 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
-var Redux = require('redux');
+import * as _ from 'underscore';
+const Redux = require('redux');
 
 import AuthStore from './../../auth/data/AuthStore';
-import UserStore from './../../users/data/UserStore';
 import RoleStore from './../../roles/data/RolesStore';
-import Actions from "./LibraryActions";
-import {LibraryActionTypes, CleanLibraryActionTypes} from './LibraryActionTypes';
+import UserStore from './../../users/data/UserStore';
 import LibraryTypes from './../LibraryTypes';
+import Actions from './LibraryActions';
+import {CleanLibraryActionTypes, LibraryActionTypes} from './LibraryActionTypes';
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
-import Util from './../../util/Util';
 import BuilderActions from '../../builder/data/BuilderActions';
+import Util from './../../util/Util';
 
 import Ajax from './../../util/Ajax';
 
@@ -65,16 +65,16 @@ class LibraryStateC
   loaded = false;
   loading = true;
   dbs: List<string> = Immutable.List([]);
-  
+
   groups: IMMap<ID, Group> = null;
   algorithms: IMMap<ID, Algorithm> = null;
   variants: IMMap<ID, Variant> = null;
-  
+
   // these are set these on initial load
   prevGroups: IMMap<ID, Group> = null;
   prevAlgorithms: IMMap<ID, Algorithm> = null;
   prevVariants: IMMap<ID, Variant> = null;
-  
+
   groupsOrder: List<ID> = Immutable.List([]);
 
   changingStatus: boolean = false;
@@ -84,22 +84,22 @@ class LibraryStateC
 }
 const LibraryState_Record = Immutable.Record(new LibraryStateC());
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> {}
-export const _LibraryState = (config?:any) => {
+export const _LibraryState = (config?: any) => {
   return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
 };
 
-var DefaultState = _LibraryState();
+const DefaultState = _LibraryState();
 
 import LibraryReducers from './LibraryReducers';
 
 function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
 {
-  if(current !== previous)
+  if (current !== previous)
   {
     current && previous && current.map((curItem: any, curId: ID) =>
     {
-      let prevItem = previous.get(curId);
-      if(curItem !== prevItem)
+      const prevItem = previous.get(curId);
+      if (curItem !== prevItem)
       {
         // should save
         Ajax.saveItem(curItem);
@@ -111,12 +111,12 @@ function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
 export const LibraryStore: IStore<LibraryState> = Redux.createStore(
   (state: LibraryState = DefaultState, action) =>
   {
-    if(LibraryReducers[action.type])
+    if (LibraryReducers[action.type])
     {
       state = LibraryReducers[action.type](state, action);
     }
 
-    if(CleanLibraryActionTypes.indexOf(action.type) === -1)
+    if (CleanLibraryActionTypes.indexOf(action.type) === -1)
     {
       // save the new state
       saveStateOf(state.groups, state.prevGroups);
@@ -132,6 +132,5 @@ export const LibraryStore: IStore<LibraryState> = Redux.createStore(
     return state;
   }
 , DefaultState);
-
 
 export default LibraryStore;

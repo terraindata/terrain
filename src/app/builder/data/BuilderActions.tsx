@@ -43,12 +43,12 @@ THE SOFTWARE.
 */
 
 const _ = require('underscore');
-import ActionTypes from './BuilderActionTypes';
-import Store from './BuilderStore';
+import * as Immutable from 'immutable';
+import LibraryTypes from '../../library/LibraryTypes';
 import { CardItem } from '../components/cards/Card';
 import { BuilderTypes } from './../BuilderTypes';
-import LibraryTypes from '../../library/LibraryTypes';
-import * as Immutable from 'immutable';
+import ActionTypes from './BuilderActionTypes';
+import Store from './BuilderStore';
 import List = Immutable.List;
 import Map = Immutable.Map;
 
@@ -106,7 +106,7 @@ const BuilderActions =
 
   // fetches the query from the server
   fetchQuery:
-    (variantId: ID, handleNoVariant: (variantId:ID) => void) =>
+    (variantId: ID, handleNoVariant: (variantId: ID) => void) =>
       $(ActionTypes.fetchQuery, { variantId, handleNoVariant }),
 
   // load query from server into state
@@ -158,12 +158,12 @@ const BuilderActions =
 _.map(ActionTypes,
   (type: string) =>
   {
-    if(!BuilderActions[type])
+    if (!BuilderActions[type])
     {
-      let error = 'Missing Builder Action for Builder Action Type ' + type;
+      const error = 'Missing Builder Action for Builder Action Type ' + type;
       throw new Error(error);
     }
-  }
+  },
 );
 
 export default BuilderActions;

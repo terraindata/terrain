@@ -43,13 +43,13 @@ THE SOFTWARE.
 */
 
 require('./UserThumbnail.less');
-import * as React from 'react';
-import Classs from './../../common/components/Classs';
-import { Link } from 'react-router';
 import * as classNames from 'classnames';
-import UserTypes from './../UserTypes';
-import UserStore from './../data/UserStore';
+import * as React from 'react';
+import { Link } from 'react-router';
+import Classs from './../../common/components/Classs';
 import ColorManager from './../../util/ColorManager';
+import UserStore from './../data/UserStore';
+import UserTypes from './../UserTypes';
 
 type User = UserTypes.User;
 
@@ -71,11 +71,11 @@ export interface Props
 class UserThumbnail extends Classs<Props>
 {
   state: {
-    user?: User
+    user?: User,
   } = {
   };
 
-  constructor(props:Props)
+  constructor(props: Props)
   {
     super(props);
   }
@@ -95,14 +95,14 @@ class UserThumbnail extends Classs<Props>
     });
   }
 
-  getStoreKeyPath(props?:Props)
+  getStoreKeyPath(props?: Props)
   {
     return ['users', (props || this.props).username];
   }
 
   componentWillReceiveProps(nextProps)
   {
-    if(nextProps.username !== this.props.username)
+    if (nextProps.username !== this.props.username)
     {
       this.subscribeUser(nextProps);
     }
@@ -115,14 +115,14 @@ class UserThumbnail extends Classs<Props>
 
   render()
   {
-    let { user } = this.state;
-    let name: string = user ? user.name() : 'Loading...';
-    let src: string = UserTypes.profileUrlFor(user);
-    let tip = this.props.showName ? null :
+    const { user } = this.state;
+    const name: string = user ? user.name() : 'Loading...';
+    const src: string = UserTypes.profileUrlFor(user);
+    const tip = this.props.showName ? null :
       '<div class="user-thumbnail-tip-name">' + name + '</div>' +
       '<div class="user-thumbnail-tip-details">' + this.props.extra + '</div>';
-    let text: string = this.props.showName ? name : null;
-    let thumbnail = (
+    const text: string = this.props.showName ? name : null;
+    const thumbnail = (
       <div
         className={classNames({
           'user-thumbnail': true,
@@ -138,14 +138,14 @@ class UserThumbnail extends Classs<Props>
         data-html={true}
       >
         <div
-          className='user-thumbnail-image'
+          className="user-thumbnail-image"
           style={{
             backgroundImage: `url(${src})`,
           }}
         />
         {
           text &&
-            <div className='user-thumbnail-text'>
+            <div className="user-thumbnail-text">
               {
                 text
               }
@@ -154,7 +154,7 @@ class UserThumbnail extends Classs<Props>
       </div>
     );
 
-    if(this.props.link && user)
+    if (this.props.link && user)
     {
       return (
         <Link to={`/users/${user.username}`}>

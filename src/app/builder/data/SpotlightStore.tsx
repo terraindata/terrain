@@ -42,20 +42,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
-import { Map, List } from 'immutable';
+import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';
-var Redux = require('redux');
+import * as _ from 'underscore';
+const Redux = require('redux');
 import {BaseClass, New} from '../../Classes';
-
 
 class SpotlightStateC extends BaseClass
 {
   spotlights: IMMap<string, any> = Map({});
 }
 export type SpotlightState = SpotlightStateC & IRecord<SpotlightStateC>;
-export const _SpotlightState = (config?: {[key:string]: any}) => 
+export const _SpotlightState = (config?: {[key: string]: any}) =>
   New<SpotlightState>(new SpotlightStateC(config), config);
 
 const DefaultState = _SpotlightState();
@@ -65,44 +64,42 @@ const DefaultState = _SpotlightState();
 // {
 //   name: string;
 //   color: string;
-  
+
 // }
 // export type Spotlight = SpotlightC & IRecord<Spotlight>;
-// export const _Spotlight = (config?: {[key:string]: any}) => 
+// export const _Spotlight = (config?: {[key:string]: any}) =>
 //   New<Spotlight>(new SpotlightC(config), config);
-
-
 
 interface SpotlightAction
 {
   type: string;
-  payload: 
+  payload:
   {
     result: any;
     id: string;
-  }
+  };
 }
 
 export const SpotlightStore: IStore<SpotlightState> = Redux.createStore(
   ReduxActions.handleActions({
-    spotlight: 
+    spotlight:
       (state: SpotlightState, action: SpotlightAction) =>
       {
-        let {result, id} = action.payload;
-        if(!result)
+        const {result, id} = action.payload;
+        if (!result)
         {
           return state.removeIn(['spotlights', id]);
         }
-        
+
         return state.setIn(['spotlights', id], _.extend({ id }, result));
       },
-    
+
     clearSpotlights:
       (state: SpotlightState) =>
       {
         return state.set('spotlights', Map({}));
       },
-  }, DefaultState), 
+  }, DefaultState),
 DefaultState);
 
 export function spotlightAction(id: string, result: any)
@@ -113,8 +110,8 @@ export function spotlightAction(id: string, result: any)
     {
       id,
       result,
-    }
-  })
+    },
+  });
 }
 
 export function clearSpotlightsAction()
@@ -123,8 +120,8 @@ export function clearSpotlightsAction()
     type: 'clearSpotlights',
     payload:
     {
-    }
-  })
+    },
+  });
 }
 
 export default SpotlightStore;

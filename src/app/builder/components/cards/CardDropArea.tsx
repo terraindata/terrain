@@ -46,29 +46,29 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 require('./CardDropArea.less');
 import * as React from 'react';
-import PureClasss from '../../../common/components/PureClasss';
 import { DropTarget } from 'react-dnd';
+import PureClasss from '../../../common/components/PureClasss';
 const classNames = require('classnames');
-import { CardItem } from './Card';
-import Actions from "../../data/BuilderActions";
 import BuilderTypes from '../../BuilderTypes';
+import Actions from '../../data/BuilderActions';
 import Store from '../../data/BuilderStore';
+import { CardItem } from './Card';
 
-export const cardWillWrap = (targetProps:Props, cardType:string) =>
+export const cardWillWrap = (targetProps: Props, cardType: string) =>
 {
   return cardCanWrap(targetProps, cardType) && targetProps.singleChild;
 };
 
-export const onCardDrop = (targetProps:Props, monitor, component) =>
+export const onCardDrop = (targetProps: Props, monitor, component) =>
 {
-  if(monitor.isOver({ shallow: true})) // shouldn't need this: && cardTarget.canDrop(targetProps, monitor))
+  if (monitor.isOver({ shallow: true})) // shouldn't need this: && cardTarget.canDrop(targetProps, monitor))
   {
     Actions.dropCard();
 
-    let item = monitor.getItem();
-    let {type} = item;
+    const item = monitor.getItem();
+    const {type} = item;
 
-    if(
+    if (
       item.props
       && item.props.keyPath.equals(targetProps.keyPath)
       && targetProps.index === item.props.index
@@ -78,29 +78,29 @@ export const onCardDrop = (targetProps:Props, monitor, component) =>
       return;
     }
 
-    if(targetProps.beforeDrop)
+    if (targetProps.beforeDrop)
     {
       targetProps.beforeDrop(item, targetProps);
     }
 
-    var targetIndex = targetProps.index;
-    if(targetProps.half && targetProps.lower)
+    let targetIndex = targetProps.index;
+    if (targetProps.half && targetProps.lower)
     {
       // dropping above target props
       targetIndex ++;
     }
 
-    let isWrapping = cardWillWrap(targetProps, type);
+    const isWrapping = cardWillWrap(targetProps, type);
 
-    if(isWrapping)
+    if (isWrapping)
     {
       targetIndex = targetProps.index;
-      var wrappingCardData = Store.getState().getIn(targetProps.keyPath).get(0);
-      var wrappingKeyPath = targetProps.keyPath.push(targetIndex);
+      const wrappingCardData = Store.getState().getIn(targetProps.keyPath).get(0);
+      const wrappingKeyPath = targetProps.keyPath.push(targetIndex);
       Actions.remove(targetProps.keyPath, targetIndex);
     }
 
-    if(item['new'])
+    if (item['new'])
     {
       // is a new card
       Actions.create(targetProps.keyPath, targetIndex, type);
@@ -108,12 +108,12 @@ export const onCardDrop = (targetProps:Props, monitor, component) =>
     else
     {
       // dragging an existing card
-      let cardProps = item.props;
-      var indexOffset = 0;
+      const cardProps = item.props;
+      const indexOffset = 0;
       Actions.nestedMove(cardProps.keyPath, cardProps.index, targetProps.keyPath, targetIndex);
     }
 
-    if(isWrapping)
+    if (isWrapping)
     {
       Actions.create(wrappingKeyPath.push('cards'), 0, null, wrappingCardData);
     }
@@ -142,8 +142,8 @@ export interface Props
   height?: number;
   heightOffset?: number; // height will be 100% - heightOffset
 
-  beforeDrop?: (item:CardItem, targetProps:Props) => void;
-  afterDrop?: (item:CardItem, targetProps:Props) => void;
+  beforeDrop?: (item: CardItem, targetProps: Props) => void;
+  afterDrop?: (item: CardItem, targetProps: Props) => void;
   accepts?: List<string>;
 
   // if set, wrapper cards which can wrap this type of card can be dropped to wrap it
@@ -181,7 +181,7 @@ class CardDropArea extends PureClasss<Props>
 
   renderCardPreview()
   {
-    if(this.selfDragging() || !this.props.renderPreview)
+    if (this.selfDragging() || !this.props.renderPreview)
     {
       return null;
     }
@@ -199,14 +199,14 @@ class CardDropArea extends PureClasss<Props>
   {
 
     let color = 'rgba(0,0,0,0)';
-    if(this.state.draggingCardItem)
+    if (this.state.draggingCardItem)
     {
       color = BuilderTypes.Blocks[this.state.draggingCardItem.type].static.colors[0];
     }
 
     return (
       <div
-        className='card-drop-area-could-drop-marker'
+        className="card-drop-area-could-drop-marker"
         style={{
           background: color,
           borderColor: color,
@@ -217,19 +217,19 @@ class CardDropArea extends PureClasss<Props>
 
 	render()
   {
-    if(!this.state.draggingCardItem)
+    if (!this.state.draggingCardItem)
     {
       return null;
     }
 
-    var style = null;
-    if(this.props.height)
+    let style = null;
+    if (this.props.height)
     {
       style = {
         height: this.props.height,
       };
     }
-    if(this.props.heightOffset)
+    if (this.props.heightOffset)
     {
       style = {
         heightOffset: `100% - ${this.props.heightOffset}`,
@@ -253,7 +253,7 @@ class CardDropArea extends PureClasss<Props>
         style={style}
       >
         <div
-          className='card-drop-area-inner'
+          className="card-drop-area-inner"
           style={{
             zIndex: 99999999 + this.props.keyPath.size,
           }}
@@ -265,23 +265,23 @@ class CardDropArea extends PureClasss<Props>
         {
           this.renderCardPreview()
         }
-      </div>
+      </div>,
 	  );
 	}
 }
 
-const cardCanWrap = (targetProps:Props, cardType:string) =>
+const cardCanWrap = (targetProps: Props, cardType: string) =>
 {
-  if(targetProps.wrapType)
+  if (targetProps.wrapType)
   {
-    if(!targetProps.accepts || targetProps.accepts.indexOf(cardType) === -1)
+    if (!targetProps.accepts || targetProps.accepts.indexOf(cardType) === -1)
     {
       // this card doesn't fit in this area
       return false;
     }
 
-    let {accepts} = BuilderTypes.Blocks[cardType].static;
-    if(accepts && accepts.indexOf(targetProps.wrapType) !== -1)
+    const {accepts} = BuilderTypes.Blocks[cardType].static;
+    if (accepts && accepts.indexOf(targetProps.wrapType) !== -1)
     {
       return true;
     }
@@ -290,34 +290,34 @@ const cardCanWrap = (targetProps:Props, cardType:string) =>
 };
 
 // as neighbor
-const cardCanAccept = (targetProps:Props, cardType:string) =>
+const cardCanAccept = (targetProps: Props, cardType: string) =>
 {
   return (targetProps.accepts && targetProps.accepts.indexOf(cardType) !== -1)
     || BuilderTypes.Blocks[cardType].static.anythingAccepts;
 };
 
-const cardCouldWrap = (targetProps:Props, item:CardItem) =>
+const cardCouldWrap = (targetProps: Props, item: CardItem) =>
 {
   const {type} = item;
 
-  let isNew = item['new'];
-  if(!isNew)
+  const isNew = item['new'];
+  if (!isNew)
   {
-    let itemKeyPath = item.props.keyPath;
-    let targetKeyPath = targetProps.keyPath;
+    const itemKeyPath = item.props.keyPath;
+    const targetKeyPath = targetProps.keyPath;
 
-    if(itemKeyPath.equals(targetKeyPath))
+    if (itemKeyPath.equals(targetKeyPath))
     {
       // can drop on itself
       return true;
     }
 
-    let itemChildKeyPath = itemKeyPath.push(item.props.index);
-    if(targetKeyPath.size >= itemChildKeyPath.size)
+    const itemChildKeyPath = itemKeyPath.push(item.props.index);
+    if (targetKeyPath.size >= itemChildKeyPath.size)
     {
       // can't drag a card into a card that is within itself
       // so make sure that the itemKeyPath is not a prefix for the targetKeyPath
-      if(
+      if (
         targetKeyPath.splice(itemChildKeyPath.size, targetKeyPath.size - itemChildKeyPath.size)
         .equals(itemChildKeyPath)
       ){
@@ -327,17 +327,17 @@ const cardCouldWrap = (targetProps:Props, item:CardItem) =>
     }
   }
 
-  if(cardWillWrap(targetProps, type))
+  if (cardWillWrap(targetProps, type))
   {
     return true;
   }
 
-  if(targetProps.singleChild)
+  if (targetProps.singleChild)
   {
     return false;
   }
 
-  if(!cardCanAccept(targetProps, type))
+  if (!cardCanAccept(targetProps, type))
   {
     return false;
   }
@@ -347,33 +347,33 @@ const cardCouldWrap = (targetProps:Props, item:CardItem) =>
 
 const cardTarget =
 {
-  canDrop(targetProps:Props, monitor)
+  canDrop(targetProps: Props, monitor)
   {
-    let item = monitor.getItem() as CardItem;
+    const item = monitor.getItem() as CardItem;
     return cardCouldWrap(targetProps, item);
   },
 
-  hover(targetProps:Props, monitor)
+  hover(targetProps: Props, monitor)
   {
-    if(monitor.isOver({ shallow: true}))
+    if (monitor.isOver({ shallow: true}))
     {
-      let state = Store.getState();
-      var keyPath: KeyPath = null;
-      var index: number = null;
+      const state = Store.getState();
+      let keyPath: KeyPath = null;
+      let index: number = null;
 
-      if(monitor.canDrop())
+      if (monitor.canDrop())
       {
         keyPath = targetProps.keyPath;
         index = targetProps.index;
-        let {type} = monitor.getItem();
+        const {type} = monitor.getItem();
 
-        if(targetProps.lower)
+        if (targetProps.lower)
         {
           index ++;
         }
       }
 
-      if(keyPath !== state.draggingOverKeyPath || index !== state.draggingOverIndex)
+      if (keyPath !== state.draggingOverKeyPath || index !== state.draggingOverIndex)
       {
         Actions.dragCardOver(keyPath, index);
       }
@@ -381,7 +381,7 @@ const cardTarget =
 
   },
 
-  drop: (targetProps:Props, monitor, component) =>
+  drop: (targetProps: Props, monitor, component) =>
   {
     onCardDrop(targetProps, monitor, component);
   },

@@ -44,17 +44,17 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 import ActionTypes from './AuthActionTypes';
-var Immutable = require('immutable');
+const Immutable = require('immutable');
 
-let AuthReducer = {};
+const AuthReducer = {};
 
 AuthReducer[ActionTypes.login] =
   (state, action) =>
   {
-    let { token, username } = action.payload;
+    const { token, username } = action.payload;
     localStorage['authenticationToken'] = token;
     localStorage['username'] = username;
-    return state.set("authenticationToken", token).set('username', username);
+    return state.set('authenticationToken', token).set('username', username);
   };
 
 AuthReducer[ActionTypes.logout] =
@@ -62,7 +62,7 @@ AuthReducer[ActionTypes.logout] =
   {
     delete localStorage['authenticationToken'];
     delete localStorage['username'];
-    return state.set("authenticationToken", null).set('username', null);
+    return state.set('authenticationToken', null).set('username', null);
   };
 
 export default AuthReducer;

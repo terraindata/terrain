@@ -43,19 +43,19 @@ THE SOFTWARE.
 */
 
 require('./StatusDropdown.less');
-import * as React from 'react';
 import * as Immutable from 'immutable';
+import * as React from 'react';
 const {List} = Immutable;
-import PureClasss from './../../common/components/PureClasss';
-import Dropdown from './../../common/components/Dropdown';
 import * as classNames from 'classnames';
-import LibraryTypes from '../LibraryTypes';
 import LibraryActions from '../data/LibraryActions';
+import LibraryTypes from '../LibraryTypes';
+import Dropdown from './../../common/components/Dropdown';
+import PureClasss from './../../common/components/PureClasss';
 type Status = LibraryTypes.EVariantStatus;
 const Status = LibraryTypes.EVariantStatus;
-import Util from '../../util/Util';
 import RolesStore from '../../roles/data/RolesStore';
 import UserStore from '../../users/data/UserStore';
+import Util from '../../util/Util';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
@@ -71,15 +71,15 @@ class StatusDropdown extends PureClasss<Props>
     isAdmin: false,
     isBuilder: false,
   };
-  
+
   componentDidMount()
   {
     this._subscribe(RolesStore, {
       updater: () =>
       {
-        let isAdmin = Util.haveRole(this.props.variant.groupId, 'admin', UserStore, RolesStore);
-        let isBuilder = Util.haveRole(this.props.variant.groupId, 'builder', UserStore, RolesStore);
-        if(isAdmin !== this.state.isAdmin || isBuilder !== this.state.isBuilder)
+        const isAdmin = Util.haveRole(this.props.variant.groupId, 'admin', UserStore, RolesStore);
+        const isBuilder = Util.haveRole(this.props.variant.groupId, 'builder', UserStore, RolesStore);
+        if (isAdmin !== this.state.isAdmin || isBuilder !== this.state.isBuilder)
         {
           this.setState({
             isAdmin,
@@ -90,94 +90,94 @@ class StatusDropdown extends PureClasss<Props>
       isMounted: true,
     });
   }
-  
-  handleChange(index:number)
+
+  handleChange(index: number)
   {
     let status = this.getOrder()[index];
     let isDefault = false;
-    if(status === DEFAULT)
+    if (status === DEFAULT)
     {
       status = Status.Live;
       isDefault = true;
     }
     LibraryActions.variants.status(this.props.variant, status as Status, false, isDefault);
   }
-  
-  canEdit():boolean
+
+  canEdit(): boolean
   {
-    let {variant} = this.props;
-    return this.state.isAdmin || 
+    const {variant} = this.props;
+    return this.state.isAdmin ||
       (this.state.isBuilder && variant.status !== Status.Live);
   }
-  
+
   getOptions(): List<El>
   {
-    let {variant} = this.props;
-    
-    if(!this.canEdit())
+    const {variant} = this.props;
+
+    if (!this.canEdit())
     {
-      if(variant.isDefault)
+      if (variant.isDefault)
       {
         return LockedOptionDefault;
       }
-      
+
       return LockedOptions[variant.status];
     }
-    
-    if(this.state.isBuilder)
+
+    if (this.state.isBuilder)
     {
       return BuilderOptions;
     }
-    
+
     return AdminOptions;
   }
-  
-  getOrder(): (Status | string)[]
+
+  getOrder(): Array<Status | string>
   {
-    if(this.state.isBuilder)
+    if (this.state.isBuilder)
     {
       return BuilderOptionsOrder;
     }
-    
+
     return AdminOptionsOrder;
   }
-  
+
   getSelectedIndex(): number
   {
-    if(!this.canEdit())
+    if (!this.canEdit())
     {
       return 0;
     }
-    
-    let {status, isDefault} = this.props.variant;
-    
-    if(isDefault)
+
+    const {status, isDefault} = this.props.variant;
+
+    if (isDefault)
     {
       return this.getOrder().indexOf(DEFAULT);
     }
-    
+
     return this.getOrder().indexOf(status);
   }
-  
+
   render()
   {
-    let {variant} = this.props;
-    
-    let tooltip = "";
-    if(!this.canEdit())
+    const {variant} = this.props;
+
+    let tooltip = '';
+    if (!this.canEdit())
     {
-      if(!this.state.isBuilder)
+      if (!this.state.isBuilder)
       {
         tooltip = "You aren't a Builder in this group,<br />so you can't edit this Variant's status.";
       }
-      else if(!this.state.isAdmin)
+      else if (!this.state.isAdmin)
       {
         tooltip = "This Variant is Live and you aren't<br />an Admin in this Group, so you<br />can't edit its status.";
       }
     }
-    
+
     return (
-      <div className='status-dropdown-wrapper'>
+      <div className="status-dropdown-wrapper">
         <div
           className={classNames({
             'status-dropdown': true,
@@ -187,7 +187,7 @@ class StatusDropdown extends PureClasss<Props>
           data-tip={tooltip}
           data-html={true}
         >
-          <Dropdown 
+          <Dropdown
             options={this.getOptions()}
             selectedIndex={this.getSelectedIndex()}
             onChange={this.handleChange}
@@ -199,31 +199,31 @@ class StatusDropdown extends PureClasss<Props>
   }
 }
 
-function getOption(status:Status | string)
+function getOption(status: Status | string)
 {
   return (
     <div
-      className='status-dropdown-option'
+      className="status-dropdown-option"
       style={{
-        color: LibraryTypes.colorForStatus(status)
+        color: LibraryTypes.colorForStatus(status),
       }}
     >
       {
         status === DEFAULT
         ?
           <StarIcon
-            className='status-dropdown-option-star'
+            className="status-dropdown-option-star"
           />
         :
           <div
-            className='status-dropdown-option-marker'
+            className="status-dropdown-option-marker"
             style={{
-              background: LibraryTypes.colorForStatus(status)
+              background: LibraryTypes.colorForStatus(status),
             }}
           />
       }
       <div
-        className='status-dropdown-option-text'
+        className="status-dropdown-option-text"
       >
         {
           LibraryTypes.nameForStatus(status)
@@ -252,14 +252,13 @@ const BuilderOptionsOrder =
   Status.Archive,
 ];
 const BuilderOptions = List(BuilderOptionsOrder.map(getOption));
-  
-const LockedOptions = Util.mapEnum(Status, status =>
+
+const LockedOptions = Util.mapEnum(Status, (status) =>
 {
   return List([getOption(+status as any)]);
 });
 const LockedOptionDefault = List([
-  getOption(DEFAULT)
+  getOption(DEFAULT),
 ]);
-
 
 export default StatusDropdown;

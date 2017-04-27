@@ -44,11 +44,11 @@ THE SOFTWARE.
 
 require('./Autocomplete.less');
 
-import * as _ from 'underscore';
+import * as classNames from 'classnames';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
 import Util from '../../util/Util';
-import * as classNames from 'classnames';
 import PureClasss from './../../common/components/PureClasss';
 
 export interface Props
@@ -62,9 +62,9 @@ export interface Props
   ref?: string;
   className?: string;
   disabled?: boolean;
-  
-  onFocus?: (event:React.FocusEvent<any>) => void;
-  onBlur?: (event:React.FocusEvent<any>, value: string) => void;
+
+  onFocus?: (event: React.FocusEvent<any>) => void;
+  onBlur?: (event: React.FocusEvent<any>, value: string) => void;
 }
 
 class Autocomplete extends PureClasss<Props>
@@ -99,21 +99,21 @@ class Autocomplete extends PureClasss<Props>
 
   handleChange(event)
   {
-    var {target} = event;
-    while(target && target.value === undefined)
+    let {target} = event;
+    while (target && target.value === undefined)
     {
       target = target.parentNode;
     }
 
-    var {value} = target;
+    const {value} = target;
     this.value = value;
     this.props.onChange(value);
     this.setState({
       value,
     });
   }
-  
-  handleFocus(event:React.FocusEvent<any>)
+
+  handleFocus(event: React.FocusEvent<any>)
   {
     this.setState({
       open: true,
@@ -124,7 +124,7 @@ class Autocomplete extends PureClasss<Props>
   }
 
   blurValue: string = '';
-  handleBlur(event:React.FocusEvent<any>)
+  handleBlur(event: React.FocusEvent<any>)
   {
     this.setState({
       open: false,
@@ -147,20 +147,20 @@ class Autocomplete extends PureClasss<Props>
   selectIndex(index: number)
   {
     // scroll option into view if necessary
-    let ac = ReactDOM.findDOMNode(this.refs['ac']);
-    let opt = ReactDOM.findDOMNode(this.refs['opt' + index]);
-    if(ac && opt)
+    const ac = ReactDOM.findDOMNode(this.refs['ac']);
+    const opt = ReactDOM.findDOMNode(this.refs['opt' + index]);
+    if (ac && opt)
     {
-      let acMin = ac.scrollTop;
-      let acMax = ac.scrollTop +  ac.clientHeight;
-      let oMin = opt['offsetTop'];
-      let oMax = opt['offsetTop'] + opt.clientHeight;
+      const acMin = ac.scrollTop;
+      const acMax = ac.scrollTop +  ac.clientHeight;
+      const oMin = opt['offsetTop'];
+      const oMax = opt['offsetTop'] + opt.clientHeight;
 
-      if(oMin < acMin)
+      if (oMin < acMin)
       {
         ac.scrollTop = oMin;
       }
-      if(oMax > acMax)
+      if (oMax > acMax)
       {
         ac.scrollTop += (oMax - acMax);
       }
@@ -173,12 +173,12 @@ class Autocomplete extends PureClasss<Props>
 
   handleKeydown(event)
   {
-    if(!this.props.options)
+    if (!this.props.options)
     {
       return;
     }
-    var visibleOptions = this.props.options && this.props.options.filter(this.showOption);
-    switch(event.keyCode)
+    const visibleOptions = this.props.options && this.props.options.filter(this.showOption);
+    switch (event.keyCode)
     {
       case 38:
         // up
@@ -191,8 +191,8 @@ class Autocomplete extends PureClasss<Props>
       case 13:
       case 9:
         // enter or tab
-        var value = visibleOptions.get(this.state.selectedIndex);
-        if(!value || this.state.selectedIndex === -1)
+        let value = visibleOptions.get(this.state.selectedIndex);
+        if (!value || this.state.selectedIndex === -1)
         {
           value = event.target.value;
         }
@@ -219,33 +219,33 @@ class Autocomplete extends PureClasss<Props>
 
   showOption(option: string): boolean
   {
-    if(!option)
+    if (!option)
     {
       return false;
     }
 
-    if(!this.state.value)
+    if (!this.state.value)
     {
       return true;
     }
 
-    let haystack = option.toLowerCase();
-    let needle = typeof this.state.value === 'string' ? this.state.value.toLowerCase() : '';
+    const haystack = option.toLowerCase();
+    const needle = typeof this.state.value === 'string' ? this.state.value.toLowerCase() : '';
 
     return haystack.indexOf(needle) === 0
-      || haystack.indexOf(" " + needle) !== -1
-      || haystack.indexOf("." + needle) !== -1;
+      || haystack.indexOf(' ' + needle) !== -1
+      || haystack.indexOf('.' + needle) !== -1;
   }
 
   renderOption(option: string, index: number)
   {
-    var first = option, second = "", third = "";
-    if(this.state.value && this.state.value.length)
+    const first = option, second = '', third = '';
+    if (this.state.value && this.state.value.length)
     {
       const i = option.toLowerCase().indexOf(this.state.value.toLowerCase());
-      var first = option.substr(0, i);
-      var second = option.substr(i, this.state.value.length);
-      var third = option.substr(this.state.value.length + i);
+      const first = option.substr(0, i);
+      const second = option.substr(i, this.state.value.length);
+      const third = option.substr(this.state.value.length + i);
     }
 
     return (
@@ -266,13 +266,13 @@ class Autocomplete extends PureClasss<Props>
 
   render()
   {
-    var options = this.props.options && this.props.options.filter(this.showOption);
-    var inputClassName = 'ac-input ' + (this.props.className || '');
+    const options = this.props.options && this.props.options.filter(this.showOption);
+    const inputClassName = 'ac-input ' + (this.props.className || '');
     return (
-      <div className='autocomplete'>
+      <div className="autocomplete">
         <input
-          ref='input'
-          type='text'
+          ref="input"
+          type="text"
           className={inputClassName}
           value={this.state.value}
           onChange={this.handleChange}
@@ -290,13 +290,13 @@ class Autocomplete extends PureClasss<Props>
               'ac-options': true,
               'ac-options-open': this.state.open,
             })}
-            ref='ac'
+            ref="ac"
           >
             {
               options.map(this.renderOption)
             }
             {
-              options.size ? null : null && <div className='ac-no-options'>No matches</div>
+              options.size ? null : null && <div className="ac-no-options">No matches</div>
             }
           </div>
         }

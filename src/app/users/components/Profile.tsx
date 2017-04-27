@@ -43,19 +43,17 @@ THE SOFTWARE.
 */
 
 require('./Profile.less');
+import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
-import Classs from './../../common/components/Classs';
-import UserStore from './../data/UserStore';
-import Actions from './../data/UserActions';
-import LibraryTypes from './../UserTypes';
-import InfoArea from './../../common/components/InfoArea';
-import UserTypes from './../UserTypes';
 import AuthStore from './../../auth/data/AuthStore';
+import Classs from './../../common/components/Classs';
+import InfoArea from './../../common/components/InfoArea';
 import Ajax from './../../util/Ajax';
-import * as classNames from 'classnames';
-
-
+import Actions from './../data/UserActions';
+import UserStore from './../data/UserStore';
+import UserTypes from './../UserTypes';
+import LibraryTypes from './../UserTypes';
 
 export interface Props
 {
@@ -68,7 +66,7 @@ class Profile extends Classs<Props>
 {
   userUnsubscribe = null;
   authUnsubscribe = null;
-  
+
   state: {
     user: UserTypes.User,
     me: UserTypes.User,
@@ -82,82 +80,82 @@ class Profile extends Classs<Props>
     isLoggedInUser: false,
     routeIsDirect: false,
   };
-  
+
   infoKeys = [
     'username',
     'whatIDo',
     'phone',
     'skype',
   ];
-  
-  constructor(props:Props)
+
+  constructor(props: Props)
   {
     super(props);
-    
+
     this._subscribe(UserStore, {
       stateKey: 'me',
       storeKeyPath: ['currentUser'],
     });
   }
-  
-  updateUser(props:Props)
+
+  updateUser(props: Props)
   {
-    let userState:UserTypes.UserState = UserStore.getState();
-    let authState = AuthStore.getState();
-    var username = authState.get('username');
-    let routeUsername = this.props.params.username;
-    var isLoggedInUser = true;
-    var routeIsDirect = false;
-    
-    if(routeUsername && routeUsername.length)
+    const userState: UserTypes.UserState = UserStore.getState();
+    const authState = AuthStore.getState();
+    let username = authState.get('username');
+    const routeUsername = this.props.params.username;
+    let isLoggedInUser = true;
+    let routeIsDirect = false;
+
+    if (routeUsername && routeUsername.length)
     {
       isLoggedInUser = routeUsername === username;
       username = routeUsername;
       routeIsDirect = true;
     }
-    
+
     this.setState({
       user: userState.getIn(['users', username]),
       loading: userState.get('loading'),
       isLoggedInUser,
       routeIsDirect,
-    })
+    });
   }
-  
+
   componentDidMount()
   {
     Actions.fetch();
     this.updateUser(this.props);
-    
-    this.userUnsubscribe = 
+
+    this.userUnsubscribe =
       UserStore.subscribe(() => this.updateUser(this.props));
-    this.authUnsubscribe = 
+    this.authUnsubscribe =
       AuthStore.subscribe(() => this.updateUser(this.props));
   }
-  
+
   componentWillUnmount()
   {
     this.userUnsubscribe && this.userUnsubscribe();
     this.authUnsubscribe && this.authUnsubscribe();
   }
-  
-  renderInfoItem(key:string)
+
+  renderInfoItem(key: string)
   {
     return (
-      <div className='profile-info-item' key={key}>
-        <div className='profile-info-item-name'>
-          { key.replace(/([A-Z])/g, (v) => " " + v) }
+      <div className="profile-info-item" key={key}>
+        <div className="profile-info-item-name">
+          { key.replace(/([A-Z])/g, (v) => ' ' + v) }
         </div>
-        <div className='profile-info-item-value'>
+        <div className="profile-info-item-value">
           { this.state.user[key] }
         </div>
       </div>
     );
   }
-  
+
   toggleAdmin()
   {
-    if(window.confirm(
+    if (window.confirm(
       this.state.user.isAdmin ?
         'Are you sure you want to revoke this user\'s administrative privileges?'
       :
@@ -168,15 +166,15 @@ any existing system administrator privileges, including your own. \
 (You can revoke their administator privileges later, as long as you \
 are still a system administrator yourself.)'))
     {
-      let user = this.state.user.set('isAdmin', !this.state.user.isAdmin) as UserTypes.User;
+      const user = this.state.user.set('isAdmin', !this.state.user.isAdmin) as UserTypes.User;
       Actions.change(user);
       Ajax.adminSaveUser(user);
-    } 
+    }
   }
-  
+
   toggleDisabled()
   {
-    if(window.confirm(this.state.user.isDisabled ?
+    if (window.confirm(this.state.user.isDisabled ?
       'Are you sure you want to re-enable this user? They will be able to log in to Terraformer again.'
       :
       'Are you sure you want to disable this user? \
@@ -185,22 +183,22 @@ be able to view any information or make any changes. They will \
 immediately be logged out of any existing sessions. \
 (You can re-enable this user later, if needed.)'))
     {
-      let user = this.state.user.set('isDisabled', !this.state.user.isDisabled) as UserTypes.User;
+      const user = this.state.user.set('isDisabled', !this.state.user.isDisabled) as UserTypes.User;
       Actions.change(user);
       Ajax.adminSaveUser(user);
     }
   }
-  
+
   renderAdminTools()
   {
-    let {me, user} = this.state;
-    if(!me || !me.isAdmin || me.username === user.username)
+    const {me, user} = this.state;
+    if (!me || !me.isAdmin || me.username === user.username)
     {
       return null;
     }
-    
+
     return (
-      <div className='profile-admin-tools'>
+      <div className="profile-admin-tools">
         <div
           className={classNames({
             'profile-admin-button': true,
@@ -222,53 +220,53 @@ immediately be logged out of any existing sessions. \
       </div>
     );
   }
-  
+
   render()
   {
-    if(this.state.loading)
+    if (this.state.loading)
     {
-      return <InfoArea large='Loading...' />
+      return <InfoArea large="Loading..." />;
     }
-    
-    if(!this.state.user)
+
+    if (!this.state.user)
     {
-      return <InfoArea large='No such user found.' />
+      return <InfoArea large="No such user found." />;
     }
-    
+
     return (
       <div className={classNames({
         'profile': true,
         'profile-wrapper': this.state.routeIsDirect,
       })}>
         <div
-          className='profile-pic'
+          className="profile-pic"
         >
           <img
-            className='profile-pic-image'
+            className="profile-pic-image"
             src={UserTypes.profileUrlFor(this.state.user)}
-            ref='profilePicImg'
+            ref="profilePicImg"
           />
         </div>
-        <div className='profile-name'>
+        <div className="profile-name">
           { this.state.user.name() }
           { this.state.user.isDisabled ? <b><br />Disabled</b> : null }
         </div>
         {
-          this.state.isLoggedInUser ? 
-            <div className='profile-edit-row'>
-              <Link to='/account/profile/edit' className='button'>
+          this.state.isLoggedInUser ?
+            <div className="profile-edit-row">
+              <Link to="/account/profile/edit" className="button">
                 Edit
               </Link>
             </div>
           : null
         }
-        <div className='profile-info'>
-          { 
+        <div className="profile-info">
+          {
             this.infoKeys.map(this.renderInfoItem)
           }
         </div>
         { this.renderAdminTools() }
-        <Link to='/account/team' className='profile-team-button'>
+        <Link to="/account/team" className="profile-team-button">
           Team Directory
         </Link>
       </div>

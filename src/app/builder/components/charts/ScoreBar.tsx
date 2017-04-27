@@ -43,21 +43,21 @@ THE SOFTWARE.
 */
 
 require('./ScoreBar.less');
-import * as React from 'react';
 import * as Immutable from 'immutable';
+import * as React from 'react';
 import BuilderTypes from '../../BuilderTypes';
 import PureClasss from './../../../common/components/PureClasss';
 
-var BORDER_RADIUS = '5px';
-var SCORE_COLORS =
+const BORDER_RADIUS = '5px';
+const SCORE_COLORS =
 {
-  POSITIVE: ["#DFDE52", "#AFD364", "#9DCF66", "#88C33E"],
-  NEGATIVE: ["#F8B14A", "#FF735B", "#DD333C", "#A50808"],
+  POSITIVE: ['#DFDE52', '#AFD364', '#9DCF66', '#88C33E'],
+  NEGATIVE: ['#F8B14A', '#FF735B', '#DD333C', '#A50808'],
 };
 
 class ScoreBar extends PureClasss<{
   parentData: {
-    weights: {weight: number}[];
+    weights: Array<{weight: number}>;
   };
   data: {
     weight: number;
@@ -69,30 +69,30 @@ class ScoreBar extends PureClasss<{
 {
   render()
   {
-    let weights = this.props.parentData.weights;
-    let weight = this.props.data;
+    const weights = this.props.parentData.weights;
+    const weight = this.props.data;
 
-    var max = 0;
-    weights.map(w => {
-      if(Math.abs(w.weight) > max)
+    let max = 0;
+    weights.map((w) => {
+      if (Math.abs(w.weight) > max)
       {
         max = Math.abs(w.weight);
       }
     });
 
-    var perc = Math.abs(weight.weight) / max * 100;
-    var style:React.CSSProperties = {
+    const perc = Math.abs(weight.weight) / max * 100;
+    const style: React.CSSProperties = {
       width: perc / 2 + '%',
     };
 
-    if(weight.weight > 0)
+    if (weight.weight > 0)
     {
       style.left = '50%';
       style['background'] = SCORE_COLORS.POSITIVE[Math.floor((perc - 1) / 25)];
       style.borderTopRightRadius = BORDER_RADIUS;
       style.borderBottomRightRadius = BORDER_RADIUS;
     }
-    else if(weight.weight < 0)
+    else if (weight.weight < 0)
     {
       style.right = '50%';
       style['background'] = SCORE_COLORS.NEGATIVE[Math.floor((perc - 1) / 25)];
@@ -101,11 +101,11 @@ class ScoreBar extends PureClasss<{
     }
 
     return (
-      <div className='weight-graph'>
-        <div className='weight-graph-inner'>
-          <div className='weight-graph-bar' style={style} />
+      <div className="weight-graph">
+        <div className="weight-graph-inner">
+          <div className="weight-graph-bar" style={style} />
         </div>
-        <div className='weight-graph-line' />
+        <div className="weight-graph-line" />
       </div>
     );
   }

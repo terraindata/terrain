@@ -42,17 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
 const Radium = require('radium');
-import SchemaTypes from '../SchemaTypes';
-import SchemaStore from '../data/SchemaStore';
 import * as React from 'react';
-import PureClasss from './../../common/components/PureClasss';
-import SchemaTreeStyles from './SchemaTreeStyles';
-import Styles from '../../Styles';
 import FadeInOut from '../../common/components/FadeInOut';
+import Styles from '../../Styles';
+import SchemaStore from '../data/SchemaStore';
+import SchemaTypes from '../SchemaTypes';
+import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeItem from './SchemaTreeItem';
+import SchemaTreeStyles from './SchemaTreeStyles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 
 export interface Props
@@ -61,18 +61,18 @@ export interface Props
 }
 
 let INIT_SHOWING_COUNT: IMMap<string, number> = Immutable.Map<string, number>({});
-let INIT_ITEMS: IMMap<string, List<SchemaBaseClass>> = 
+let INIT_ITEMS: IMMap<string, List<SchemaBaseClass>> =
 	Immutable.Map<string, List<SchemaBaseClass>>({});
-let INIT_PREV_ITEMS: IMMap<string, IMMap<string, SchemaBaseClass>> = 
+let INIT_PREV_ITEMS: IMMap<string, IMMap<string, SchemaBaseClass>> =
 	Immutable.Map<string, IMMap<string, SchemaBaseClass>>({});
 
 _.map(SchemaTypes.typeToStoreKey as any,
-	(storeKey: string, type) => 
+	(storeKey: string, type) =>
 	{
 		INIT_SHOWING_COUNT = INIT_SHOWING_COUNT.set(storeKey, 15);
 		INIT_ITEMS = INIT_ITEMS.set(storeKey, Immutable.List([]));
 		INIT_PREV_ITEMS = INIT_PREV_ITEMS.set(storeKey, Immutable.Map<any, any>({}));
-	}
+	},
 );
 const SHOW_MORE_INCREMENT = 50;
 
@@ -92,59 +92,59 @@ class SchemaSearchResults extends PureClasss<Props>
 		items: INIT_ITEMS,
 		prevItems: INIT_PREV_ITEMS,
 	};
-	
-	constructor(props:Props)
+
+	constructor(props: Props)
 	{
 		super(props);
-		
+
 		this._subscribe(SchemaStore, {
-			updater: (storeState:SchemaTypes.SchemaState) =>
+			updater: (storeState: SchemaTypes.SchemaState) =>
 			{
 				let {items, prevItems} = this.state;
 				items.map((v, storeKey) =>
 				{
-					let storeValue = storeState.get(storeKey);
-					if(prevItems.get(storeKey) !== storeValue)
+					const storeValue = storeState.get(storeKey);
+					if (prevItems.get(storeKey) !== storeValue)
 					{
 						// reference changed
 						items = items.set(storeKey, storeValue.valueSeq().toList());
 						prevItems = prevItems.set(storeKey, storeValue);
 					}
 				});
-				
+
 				this.setState({
 					items,
 					prevItems,
 				});
-			}
+			},
 		});
 	}
-	
+
 	componentWillReceiveProps(nextProps: Props)
 	{
-		if(nextProps.search !== this.props.search)
+		if (nextProps.search !== this.props.search)
 		{
 			this.setState({
 				showingCount: INIT_SHOWING_COUNT,
 			});
 		}
 	}
-	
+
 	renderSection(stateKey: string, type: string, label: string)
 	{
 		let index = 0;
-		let max = this.state.showingCount.get(stateKey);
-		let items = this.state.items.get(stateKey);
-		let renderItems: SchemaBaseClass[] = [];
+		const max = this.state.showingCount.get(stateKey);
+		const items = this.state.items.get(stateKey);
+		const renderItems: SchemaBaseClass[] = [];
 		let couldShowMore = false; // are there additional entries to show?
-		
-		while(renderItems.length <= max && index < items.size && !couldShowMore)
+
+		while (renderItems.length <= max && index < items.size && !couldShowMore)
 		{
-			let item = items.get(index);
-			
-			if(SchemaTypes.searchIncludes(item, this.props.search))
+			const item = items.get(index);
+
+			if (SchemaTypes.searchIncludes(item, this.props.search))
 			{
-				if(renderItems.length < max)
+				if (renderItems.length < max)
 				{
 					renderItems.push(item);
 				}
@@ -155,9 +155,9 @@ class SchemaSearchResults extends PureClasss<Props>
 			}
 			index ++;
 		}
-		
-		let showSection = !!renderItems.length;
-		
+
+		const showSection = !!renderItems.length;
+
 		return (
 			<FadeInOut
 				open={showSection}
@@ -175,20 +175,20 @@ class SchemaSearchResults extends PureClasss<Props>
 							label
 						}
 					</div>
-					
+
 					{
 						renderItems.map(
 							(item, index) =>
 								<SchemaTreeItem
 									id={item.id}
 									type={type}
-									search={this.props.search || "!@#$%^&*&%$!%!$#%!@"}
+									search={this.props.search || '!@#$%^&*&%$!%!$#%!@'}
 									key={item.id}
 									inSearchResults={true}
-								/>
+								/>,
 						)
 					}
-					
+
 					<FadeInOut
 						open={couldShowMore}
 					>
@@ -204,7 +204,7 @@ class SchemaSearchResults extends PureClasss<Props>
 			</FadeInOut>
 		);
 	}
-	
+
 	handleShowMore(stateKey: string)
 	{
 		let {showingCount} = this.state;
@@ -213,18 +213,18 @@ class SchemaSearchResults extends PureClasss<Props>
 			showingCount,
 		});
 	}
-	
+
   render()
   {
-  	let {search} = this.props;
-  	
+  	const {search} = this.props;
+
     return (
     	<div
     		style={[
     			Styles.transition,
     			{
     				opacity: search ? 1 : 0,
-    			}
+    			},
     		]}
     	>
 		      <div
@@ -237,19 +237,19 @@ class SchemaSearchResults extends PureClasss<Props>
 		      	>
 		      		All Results
 		      	</div>
-		      	
+
 		      	{
 		      		this.renderSection('databases', 'database', 'Databases')
 		      	}
-		      	
+
 		      	{
 		      		this.renderSection('tables', 'table', 'Tables')
 		      	}
-		      	
+
 		      	{
 		      		this.renderSection('columns', 'column', 'Columns')
 		      	}
-		      	
+
 		      	{
 		      		this.renderSection('indexes', 'index', 'Indexes')
 		      	}

@@ -42,10 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import SchemaTypes from '../../SchemaTypes';
 import * as React from 'react';
-import PureClasss from './../../../common/components/PureClasss';
+import SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
+import PureClasss from './../../../common/components/PureClasss';
 const Radium = require('radium');
 
 export interface Props
@@ -61,11 +61,11 @@ class State
 export class IndexTreeInfo extends PureClasss<Props>
 {
 	state: State = new State();
-	
+
   render()
   {
-  	let index = this.props.item;
-  	
+  	const index = this.props.item;
+
     return (
       <div
       	style={Styles.infoPieces}
@@ -76,17 +76,17 @@ export class IndexTreeInfo extends PureClasss<Props>
       		<span
       			style={Styles.infoPieceNumber as any}
       		>
-      			{ index.indexType } 
+      			{ index.indexType }
       		</span>
       	</div>
-      	
+
       	<div
       		style={Styles.infoPiece}
       	>
       		<span
       			style={Styles.infoPieceNumber as any}
       		>
-      			{ index.columnIds.size } 
+      			{ index.columnIds.size }
       		</span>
       		 columns
       	</div>
@@ -95,14 +95,12 @@ export class IndexTreeInfo extends PureClasss<Props>
   }
 }
 
-
 export const indexChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
 [
   {
     label: 'Columns',
     type: 'column',
-  }
+  },
 ];
-
 
 export default IndexTreeInfo;

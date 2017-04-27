@@ -44,10 +44,9 @@ THE SOFTWARE.
 
 require('./X.less');
 import * as React from 'react';
+import { Link } from 'react-router';
 import * as _ from 'underscore';
 import Classs from './../../common/components/Classs';
-import { Link } from 'react-router';
-
 
 const xes =
 {
@@ -73,29 +72,29 @@ class X extends Classs<Props>
   {
     super(props);
   }
-  
+
   render()
   {
-    let { x } = this.props.params;
-    
-    if(x && xes[x])
+    const { x } = this.props.params;
+
+    if (x && xes[x])
     {
-      let C =  xes[x].component;
+      const C =  xes[x].component;
       return <C {...this.props} />;
     }
-    
+
     return (
-      <div className='x-area'>
-        <div className='x-title'>
+      <div className="x-area">
+        <div className="x-title">
           Experiments
         </div>
         {
-          _.keys(xes).map(indX =>
+          _.keys(xes).map((indX) =>
             <Link to={`/x/${indX}`} key={indX}>
-              <div className='x-x'>
+              <div className="x-x">
                 { xes[indX].name }
               </div>
-            </Link>
+            </Link>,
           )
         }
       </div>

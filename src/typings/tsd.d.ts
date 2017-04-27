@@ -66,19 +66,19 @@ declare type List<T> = Immutable.List<T>;
 declare type IMMap<K, T> = Immutable.Map<K, T>;
 declare type KeyPath = List<string | number>;
 declare type SetFn<T> = (f: string, v: any) => T & IRecord<T>;
-declare type SetIn<T> = (f: (string | number)[] | KeyPath, v: any) => T & IRecord<T>;
+declare type SetIn<T> = (f: Array<string | number> | KeyPath, v: any) => T & IRecord<T>;
 declare type Get = (f: string | number) => any;
-declare type GetIn = (f: (string | number)[] | KeyPath) => any;
+declare type GetIn = (f: Array<string | number> | KeyPath) => any;
 declare type Delete<T> = (f: string) => T & IRecord<T>;
-declare type DeleteIn<T> = (f: (string | number)[] | KeyPath) => T & IRecord<T>;
+declare type DeleteIn<T> = (f: Array<string | number> | KeyPath) => T & IRecord<T>;
 declare type Update<T> = (f: string, updater: (n: any) => any) => T & IRecord<T>;
-declare type UpdateIn<T> = (f: (string | number)[] | KeyPath, updater: (n: any) => any) => T & IRecord<T>;
+declare type UpdateIn<T> = (f: Array<string | number> | KeyPath, updater: (n: any) => any) => T & IRecord<T>;
 
 declare interface IStore<T>
 {
   getState: () => T;
   subscribe: (updater: (() => void)) => (() => void);
-  dispatch: (action: { type: string, payload: {[k:string]: any} }) => void;
+  dispatch: (action: { type: string, payload: {[k: string]: any} }) => void;
 }
 
 declare interface IMap<T>
@@ -123,5 +123,5 @@ declare interface IName
 declare var DEV: boolean;
 declare var MIDWAY_HOST: string;
 
-declare const escape: (s:string) => string;
-declare const unescape: (s:string) => string;
+declare const escape: (s: string) => string;
+declare const unescape: (s: string) => string;

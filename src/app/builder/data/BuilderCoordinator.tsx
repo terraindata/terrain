@@ -56,12 +56,12 @@ THE SOFTWARE.
 // export class BuilderCoordinator
 // {
 //   req: XMLHttpRequest = null;
-  
+
 //   constructor()
 //   {
 //     Util.bindAll(this);
 //   }
-  
+
 //   handleTQLChange(tql: string)
 //   {
 //     if(this.req)
@@ -69,13 +69,13 @@ THE SOFTWARE.
 //       this.req.abort();
 //     }
 //     this.req = Ajax.parseTree(
-//       tql, 
+//       tql,
 //       BuilderStore.getState().db,
 //       this.handleParseTreeLoad,
 //       this.handleParseTreeError
 //     );
 //   }
-  
+
 //   handleParseTreeLoad(response)
 //   {
 //     this.req = null;
@@ -83,7 +83,7 @@ THE SOFTWARE.
 //     console.log(cards);
 //     Actions.change(Immutable.List(['query', 'cards']), cards);
 //   }
-  
+
 //   handleParseTreeError(error)
 //   {
 //     console.log('error', error);

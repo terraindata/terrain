@@ -47,18 +47,18 @@ THE SOFTWARE.
 import * as test from 'tape';
 // import * as TestUtils from 'react-addons-test-utils';
 const TestUtils = require('react-addons-test-utils');
-import * as ReactDom from 'react-dom';
 import * as React from 'react';
+import * as ReactDom from 'react-dom';
 
-var CardField = React.createClass({
+const CardField = React.createClass({
   render() {
     return <div>test</div>;
   },
 });
 
-test('Is a test', function (t) {
-  var AppElement = TestUtils.renderIntoDocument(<CardField/>);
-  var divs = TestUtils.scryRenderedDOMComponentsWithTag(AppElement, 'div');
+test('Is a test', function(t) {
+  const AppElement = TestUtils.renderIntoDocument(<CardField/>);
+  const divs = TestUtils.scryRenderedDOMComponentsWithTag(AppElement, 'div');
   t.equal(divs.length, 1, 'only has one');
   console.log(divs[0]);
   t.equal(divs[0].textContent, 'test', 'renders inner content');
@@ -66,7 +66,7 @@ test('Is a test', function (t) {
 });
 
 test('Uses types', function(t) {
-  var a: number = 1.0;
+  const a: number = 1.0;
   t.equal(a, 1.0);
   t.end();
 });

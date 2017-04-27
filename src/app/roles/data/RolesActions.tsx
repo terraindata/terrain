@@ -43,24 +43,24 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
+import RoleTypes from './../RoleTypes';
 import ActionTypes from './RolesActionTypes';
 import Store from './RolesStore';
-import RoleTypes from './../RoleTypes';
 
-var $ = (type: string, payload: any) => Store.dispatch({type, payload});
+const $ = (type: string, payload: any) => Store.dispatch({type, payload});
 
-var RolesActions =
+const RolesActions =
 {
   fetch:
     () =>
       $(ActionTypes.fetch, { }),
 
   setRoles:
-    (roles:RoleTypes.RoleMap) =>
+    (roles: RoleTypes.RoleMap) =>
       $(ActionTypes.setRoles, { roles }),
 
   change:
-    (role:RoleTypes.Role) =>
+    (role: RoleTypes.Role) =>
       $(ActionTypes.change, { role }),
 };
 

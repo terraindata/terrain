@@ -42,10 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
 import * as ReduxActions from 'redux-actions';
-var Redux = require('redux');
+import * as _ from 'underscore';
+const Redux = require('redux');
 
 import AuthStore from './../../auth/data/AuthStore';
 import Util from './../../util/Util';
@@ -54,17 +54,17 @@ import UserTypes from './../UserTypes';
 import UserActions from './UserActions';
 import UserReducers from './UserReducers';
 
-let UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
+const UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   UserReducers,
 {}), new UserTypes.UserState({})), new UserTypes.UserState({}));
 
 UserStore.subscribe(() =>
 {
-  let state = UserStore.getState();
-  if(state.getIn(['users', AuthStore.getState().get('username')]) !== state.get('currentUser'))
+  const state = UserStore.getState();
+  if (state.getIn(['users', AuthStore.getState().get('username')]) !== state.get('currentUser'))
   {
     // currentUser object changed
-    UserActions.updateCurrentUser();    
+    UserActions.updateCurrentUser();
   }
 });
 

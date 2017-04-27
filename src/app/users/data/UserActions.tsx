@@ -42,15 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
+const _ = require('underscore');
+import * as Immutable from 'immutable';
+import UserTypes from './../UserTypes';
 import ActionTypes from './UserActionTypes';
 import Store from './UserStore';
-import UserTypes from './../UserTypes';
-import * as Immutable from 'immutable';
 
 import Ajax from './../../util/Ajax';
 
-var $ = (type: string, payload: any) => Store.dispatch({type, payload});
+const $ = (type: string, payload: any) => Store.dispatch({type, payload});
 
 const Actions =
 {

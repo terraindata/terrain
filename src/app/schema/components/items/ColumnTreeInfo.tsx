@@ -42,10 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import SchemaTypes from '../../SchemaTypes';
 import * as React from 'react';
-import PureClasss from './../../../common/components/PureClasss';
+import SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
+import PureClasss from './../../../common/components/PureClasss';
 const Radium = require('radium');
 
 export interface Props
@@ -61,11 +61,11 @@ class State
 export class ColumnTreeInfo extends PureClasss<Props>
 {
 	state: State = new State();
-	
+
   render()
   {
-  	let column = this.props.item;
-  	
+  	const column = this.props.item;
+
     return (
       <div
       	style={Styles.infoPieces as any}
@@ -82,17 +82,17 @@ export class ColumnTreeInfo extends PureClasss<Props>
               </span>
             </div>
         }
-        
+
       	<div
           style={Styles.infoPiece as any}
         >
           <span
             style={Styles.infoPieceNumber as any}
           >
-            { column.datatype } 
+            { column.datatype }
           </span>
         </div>
-        
+
         <div
           style={Styles.infoPiece}
         >
@@ -100,21 +100,21 @@ export class ColumnTreeInfo extends PureClasss<Props>
           <span
             style={Styles.infoPieceNumber as any}
           >
-            { column.defaultValue } 
+            { column.defaultValue }
           </span>
           "
         </div>
-        
+
         <div
           style={Styles.infoPiece}
         >
           <span
             style={Styles.infoPieceNumber as any}
           >
-            { column.isNullable ? 'nullable' : 'not nullable' } 
+            { column.isNullable ? 'nullable' : 'not nullable' }
           </span>
         </div>
-        
+
       </div>
     );
   }
@@ -125,7 +125,7 @@ export const columnChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
   {
     label: 'Indexes',
     type: 'index',
-  }
+  },
 ];
 
 export default ColumnTreeInfo;

@@ -43,8 +43,8 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import InfoArea from './InfoArea';
 import PureClasss from '../../common/components/PureClasss';
+import InfoArea from './InfoArea';
 
 class Placeholder extends PureClasss<any>
 {

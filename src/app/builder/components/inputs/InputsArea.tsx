@@ -42,18 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
-import * as React from 'react';
 import * as Immutable from 'immutable';
-import Util from '../../../util/Util';
-import PanelMixin from '../layout/PanelMixin';
-import Actions from "../../data/BuilderActions";
-import Input from "../inputs/Input";
-import LayoutManager from "../layout/LayoutManager";
+import * as React from 'react';
+import * as _ from 'underscore';
 import CreateLine from '../../../common/components/CreateLine';
 import InfoArea from '../../../common/components/InfoArea';
 import PureClasss from '../../../common/components/PureClasss';
+import Util from '../../../util/Util';
 import BuilderTypes from '../../BuilderTypes';
+import Actions from '../../data/BuilderActions';
+import Input from '../inputs/Input';
+import LayoutManager from '../layout/LayoutManager';
+import PanelMixin from '../layout/PanelMixin';
 type IInput = BuilderTypes.IInput;
 
 export interface Props
@@ -68,31 +68,31 @@ class InputsArea extends PureClasss<Props>
   {
     Actions.create(Immutable.List(['query', 'inputs']), -1, 'input');
   }
-  
+
   renderNoInputs()
   {
-    var large = ""; // "No inputs have been added, yet."
-    var button =  this.props.canEdit ? "Add an Input" : null;
-    var onClick = this.createInput;
-    
+    const large = ''; // "No inputs have been added, yet."
+    const button =  this.props.canEdit ? 'Add an Input' : null;
+    const onClick = this.createInput;
+
     return (
-      <InfoArea 
-        large={large} 
-        button={button} 
-        onClick={onClick} 
+      <InfoArea
+        large={large}
+        button={button}
+        onClick={onClick}
       />
     );
   }
-  
+
   render()
   {
-    if(this.props.inputs.size === 0)
+    if (this.props.inputs.size === 0)
     {
       return this.renderNoInputs();
     }
-    
+
     return (
-      <div className='inputs-area'>
+      <div className="inputs-area">
         {
           this.props.inputs.map((input, index) =>
             <Input
@@ -100,15 +100,15 @@ class InputsArea extends PureClasss<Props>
               index={index}
               canEdit={this.props.canEdit}
               key={input.id}
-            />
+            />,
           )
         }
-        
-        <div className='standard-margin'>
+
+        <div className="standard-margin">
           {
             this.props.canEdit &&
-              <CreateLine 
-                open={false} 
+              <CreateLine
+                open={false}
                 onClick={this.createInput}
               />
           }

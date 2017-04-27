@@ -43,14 +43,14 @@ THE SOFTWARE.
 */
 
 require('./TQLPopup.less');
-import * as $ from 'jquery';
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../util/Util';
 import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as React from 'react';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
 
-var OpenIcon = require('./../../../images/icon_open.svg');
+const OpenIcon = require('./../../../images/icon_open.svg');
 
 export interface Props
 {
@@ -74,17 +74,17 @@ class TQLPopup extends Classs<Props>
   {
     return (
       <div
-        className='tql-editor-popup'
+        className="tql-editor-popup"
         style={this.props.style}
       >
         {this.props.text}
         <div
-          className='manual-popup-link'
+          className="manual-popup-link"
           onClick={this.openManual}
         >
             See full description in Manual
           <OpenIcon
-            className='manual-popup-open-icon'
+            className="manual-popup-open-icon"
             onClick={this.openManual}
           />
         </div>

@@ -47,23 +47,23 @@ import * as React from 'react';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as Immutable from 'immutable';
-var ReactDayPicker = require('react-day-picker').default;
-var DateUtils = require('react-day-picker').DateUtils;
-import Util from '../../util/Util';
-import Dropdown from './Dropdown';
-import LayoutManager from './../../builder/components/layout/LayoutManager';
+const ReactDayPicker = require('react-day-picker').default;
+const DateUtils = require('react-day-picker').DateUtils;
 import PureClasss from '../../common/components/PureClasss';
+import Util from '../../util/Util';
+import LayoutManager from './../../builder/components/layout/LayoutManager';
+import Dropdown from './Dropdown';
 
-var MINUTE_INTERVAL = 30;
-var MINUTE_RATIO = (60 / MINUTE_INTERVAL);
+const MINUTE_INTERVAL = 30;
+const MINUTE_RATIO = (60 / MINUTE_INTERVAL);
 
-var _hours = [];
-for(var h = 0; h < 24; h ++)
+const _hours = [];
+for (let h = 0; h < 24; h ++)
 {
-  for(var m = 0; m < 60; m += MINUTE_INTERVAL) {
-    var hour = (h - 1) % 12 + 1;
-    if(h === 0) hour = 12;
-    _hours.push(hour + ":" + (m < 10 ? "0" : "") + m + (h < 12 ? 'am' : 'pm'));
+  for (let m = 0; m < 60; m += MINUTE_INTERVAL) {
+    let hour = (h - 1) % 12 + 1;
+    if (h === 0) hour = 12;
+    _hours.push(hour + ':' + (m < 10 ? '0' : '') + m + (h < 12 ? 'am' : 'pm'));
   }
 }
 
@@ -87,8 +87,8 @@ class DatePicker extends PureClasss<Props>
 
   getDate(): Date
   {
-    var date = new Date(this.props.date);
-    if(isNaN(date.getTime()))
+    let date = new Date(this.props.date);
+    if (isNaN(date.getTime()))
     {
       // not a valid date
       date = new Date();
@@ -100,7 +100,7 @@ class DatePicker extends PureClasss<Props>
 
   handleDayClick(e, day: Date, modifiers)
   {
-    var date = this.getDate();
+    const date = this.getDate();
     date.setDate(day.getDate());
     date.setMonth(day.getMonth());
     date.setFullYear(day.getFullYear());
@@ -109,7 +109,7 @@ class DatePicker extends PureClasss<Props>
 
   handleHourChange(hourIndex)
   {
-    var date = this.getDate();
+    const date = this.getDate();
     date.setHours(Math.floor(hourIndex / MINUTE_RATIO));
     date.setMinutes((hourIndex % MINUTE_RATIO) * MINUTE_INTERVAL);
     this.props.onChange(Util.formatInputDate(date));
@@ -122,10 +122,10 @@ class DatePicker extends PureClasss<Props>
 
   renderTimePicker()
   {
-    var date = this.getDate();
+    const date = this.getDate();
 
     return (
-      <div className='date-time-time'>
+      <div className="date-time-time">
         <Dropdown
           canEdit={this.props.canEdit}
           options={HOUR_OPTIONS}
@@ -136,14 +136,14 @@ class DatePicker extends PureClasss<Props>
   }
 
   render() {
-    var date = this.getDate();
+    const date = this.getDate();
     const modifiers =
     {
-      selected: day => DateUtils.isSameDay(day, date),
+      selected: (day) => DateUtils.isSameDay(day, date),
     };
 
     return (
-      <div className='date-picker'>
+      <div className="date-picker">
         <ReactDayPicker
           modifiers={modifiers}
           onDayClick={this.handleDayClick}

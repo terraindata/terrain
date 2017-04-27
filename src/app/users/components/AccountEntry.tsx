@@ -43,13 +43,13 @@ THE SOFTWARE.
 */
 
 require('./AccountEntry.less');
-import * as $ from 'jquery';
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../util/Util';
 import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as React from 'react';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
-var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
+const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
 
 export interface Props
 {
@@ -60,7 +60,6 @@ export interface Props
   lastEntry?: boolean;
 }
 
-
 class AccountEntry extends Classs<Props>
 {
   constructor(props: Props)
@@ -69,13 +68,13 @@ class AccountEntry extends Classs<Props>
     this.state =
       {
         expanded: false,
-      }
+      };
   }
 
   expand()
   {
     this.setState({
-      expanded: !this.state.expanded
+      expanded: !this.state.expanded,
     });
   }
 
@@ -91,14 +90,14 @@ class AccountEntry extends Classs<Props>
   {
     if (this.props.description)
      {
-      return <div className='account-entry-description'>{this.props.description}</div>;
+      return <div className="account-entry-description">{this.props.description}</div>;
     }
   }
 
   renderDefaultButton()
   {
     return (
-        <div className='account-entry-expand-button button' onClick={this.expand}>
+        <div className="account-entry-expand-button button" onClick={this.expand}>
             {this.state.expanded ? 'Collapse' : 'Expand'}
         </div>
       );
@@ -119,25 +118,25 @@ class AccountEntry extends Classs<Props>
 
   renderLine()
   {
-    if(!this.props.lastEntry)
+    if (!this.props.lastEntry)
     {
-      return (<hr className ='account-entry-line'/>);
+      return (<hr className ="account-entry-line"/>);
     }
-    return <hr className ='account-entry-line settings-line-hidden'/>;
+    return <hr className ="account-entry-line settings-line-hidden"/>;
   }
 
   render() {
     return (
-      <div className='account-entry'>
-      <div className='account-entry-top-bar'>
-        <div className='account-entry-title'>
+      <div className="account-entry">
+      <div className="account-entry-top-bar">
+        <div className="account-entry-title">
           {this.props.title}
         </div>
-        <div className='account-entry-white-space' />
+        <div className="account-entry-white-space" />
         {this.renderButton()}
       </div>
       {this.renderDescription()}
-      <div className='account-entry-expanded-info'>
+      <div className="account-entry-expanded-info">
         {this.renderContent()}
       </div>
       {this.renderLine()}

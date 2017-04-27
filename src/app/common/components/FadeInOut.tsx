@@ -46,7 +46,6 @@ import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
 const {VelocityTransitionGroup, VelocityComponent} = require('velocity-react');
 
-
 export interface Props
 {
 	open: boolean;
@@ -58,20 +57,20 @@ class FadeInOut extends PureClasss<Props>
   render()
   {
     return (
-    	<VelocityComponent 
-    		animation={{ 
+    	<VelocityComponent
+    		animation={{
     			opacity: this.props.open ? 1 : 0,
     			translateY: this.props.open ? 0 : 20,
     		}}
     		duration={250}
     	>
     		<div>
-	      	<VelocityTransitionGroup 
+	      	<VelocityTransitionGroup
 	      		enter={
-	      			{animation: "slideDown", duration: 250, easing: 'easeOut' }
-	      		} 
+	      			{animation: 'slideDown', duration: 250, easing: 'easeOut' }
+	      		}
 	      		leave={
-	      			{animation: "slideUp", duration: 250, easing: 'easeOut' }
+	      			{animation: 'slideUp', duration: 250, easing: 'easeOut' }
 	      		}
 	      	>
 		      	{

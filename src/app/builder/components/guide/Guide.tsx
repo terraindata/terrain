@@ -48,21 +48,20 @@ THE SOFTWARE.
 ***
 ******/
 
-
 require('./Guide.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
 import Util from '../../../util/Util';
-import Actions from "../../data/BuilderActions";
-import Card from "../cards/Card";
-import PureClasss from './../../../common/components/PureClasss';
 import BuilderTypes from '../../BuilderTypes';
-let L = Immutable.List;
-let M = Immutable.Map;
+import Actions from '../../data/BuilderActions';
+import Card from '../cards/Card';
+import PureClasss from './../../../common/components/PureClasss';
+const L = Immutable.List;
+const M = Immutable.Map;
 
 export interface Props
 {
@@ -78,7 +77,6 @@ export enum EScreen
   VAR,
   TRANSFORM,
   SCORE,
-
 
   ALL,
 }
@@ -113,33 +111,33 @@ export interface ICondition
 {
   first: IExpression;
   second: IExpression;
-  operator: BuilderTypes.Operator
+  operator: BuilderTypes.Operator;
 }
 
 export interface IConditions
 {
-  conditions: (ICondition | IConditions)[];
+  conditions: Array<ICondition | IConditions>;
   combinator: BuilderTypes.Combinator;
 }
 
 // DIFFERENT FROM BROWSERTYPES
 class QueryClass
 {
-  tables: {
+  tables: Array<{
     table: string;
     alias: string;
-  }[] = [];
+  }> = [];
 
   fields: string[] = [];
 
   where: IConditions = {
     conditions: [],
     combinator: BuilderTypes.Combinator.AND,
-  }
+  };
 }
 export interface IQuery extends QueryClass, IRecord<IQuery> {}
 const Query_Record = Immutable.Record(new QueryClass());
-export const _Query = (config?:any) => {
+export const _Query = (config?: any) => {
   return new Query_Record(config || {}) as any as IQuery;
 };
 
@@ -150,26 +148,26 @@ class Guide extends PureClasss<Props>
     query: _Query(),
   };
 
-  constructor(props:Props)
+  constructor(props: Props)
   {
     super(props);
   }
 
   render()
   {
-    let {screen, query} = this.state;
+    const {screen, query} = this.state;
 
     return (
       <div
-        className='guide'
+        className="guide"
       >
-        <div className='guide-left'>
-          <div className='guide-title'>
+        <div className="guide-left">
+          <div className="guide-title">
             Guide
           </div>
         </div>
-        <div className='guide-right'>
-          <div className='guide-title'>
+        <div className="guide-right">
+          <div className="guide-title">
             Your Query
           </div>
         </div>

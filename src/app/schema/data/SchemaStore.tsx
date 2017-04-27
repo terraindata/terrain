@@ -48,16 +48,16 @@ import * as ReduxActions from 'redux-actions';
 import SchemaTypes from '../SchemaTypes';
 type SchemaState = SchemaTypes.SchemaState;
 import Ajax from './../../util/Ajax';
+import ExampleSchemaData from './ExampleSchemaData';
 import SchemaActionTypes from './SchemaActionTypes';
 import SchemaParser from './SchemaParser';
-import ExampleSchemaData from './ExampleSchemaData';
 
 type Database = SchemaTypes.Database;
 type Table = SchemaTypes.Table;
 type Column = SchemaTypes.Column;
 type Index = SchemaTypes.Index;
 
-export const SchemaStore: IStore<SchemaState> = 
+export const SchemaStore: IStore<SchemaState> =
 	Redux.createStore(ReduxActions.handleActions<SchemaState, any>(
 		{
 			[SchemaActionTypes.fetch]:
@@ -68,11 +68,11 @@ export const SchemaStore: IStore<SchemaState> =
 						{
 							SchemaActions.dbCount(dbs.length);
 							dbs.map(
-								db =>
+								(db) =>
 									Ajax.schema(db,
 										(colsData, error) =>
 										{
-											if(!error)
+											if (!error)
 											{
 												SchemaParser.parseDb(db, colsData, SchemaActions.setDatabase);
 											}
@@ -80,13 +80,13 @@ export const SchemaStore: IStore<SchemaState> =
 										(error) =>
 										{
 											// TODO consider handling individual DB errors
-										})
+										}),
 							);
 						},
 						(dbError) =>
 						{
 							SchemaActions.error(JSON.stringify(dbError));
-						}
+						},
 					);
 
 					return state
@@ -98,17 +98,17 @@ export const SchemaStore: IStore<SchemaState> =
 					state: SchemaState,
 					action: Action<{
 						dbCount: number,
-					}>
+					}>,
 				) =>
 					state.set('dbCount', action.payload.dbCount),
 
 			[SchemaActionTypes.setDatabase]:
 				(
 					state: SchemaState,
-					action: Action<SchemaTypes.SetDbActionPayload>
+					action: Action<SchemaTypes.SetDbActionPayload>,
 				) => {
-					let {database, tables, columns, indexes, tableNames, columnNames} = action.payload;
-					if(state.databases.size === state.dbCount - 1)
+					const {database, tables, columns, indexes, tableNames, columnNames} = action.payload;
+					if (state.databases.size === state.dbCount - 1)
 					{
 						state = state.set('loading', false).set('loaded', true);
 					}
@@ -129,14 +129,13 @@ export const SchemaStore: IStore<SchemaState> =
 			[SchemaActionTypes.highlightId]:
 				(state: SchemaState, action: Action<{
 					id: ID,
-					inSearchResults: boolean
+					inSearchResults: boolean,
 				}>) =>
 					state.set('highlightedId', action.payload.id)
 						.set('highlightedInSearchResults', action.payload.inSearchResults),
 		},
-		DEV ? ExampleSchemaData : SchemaTypes._SchemaState()
+		DEV ? ExampleSchemaData : SchemaTypes._SchemaState(),
 	), DEV ? ExampleSchemaData : SchemaTypes._SchemaState());
-
 
 const $ = (type: string, payload: any) => SchemaStore.dispatch({type, payload});
 
@@ -156,7 +155,7 @@ export const SchemaActions =
 
   setDatabase:
     (
-      payload: SchemaTypes.SetDbActionPayload
+      payload: SchemaTypes.SetDbActionPayload,
     ) =>
       $(SchemaActionTypes.setDatabase, payload),
 
@@ -170,10 +169,9 @@ export const SchemaActions =
   selectId:
   	(id: ID) =>
   		$(SchemaActionTypes.selectId, {
-  			id
+  			id,
   		}),
 
 };
-
 
 export default SchemaStore;

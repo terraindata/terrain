@@ -42,8 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-var Immutable = require('immutable');
+const _ = require('underscore');
+const Immutable = require('immutable');
 
 // Defining our object like this gives us compile-time TypeScript support for ActionTypes
 //  and prevents us from defining duplicate action types.
@@ -52,7 +52,7 @@ var Immutable = require('immutable');
 //  of this file sets all of the values equal to the keys.
 // So you end up with ActionTypes.cards.move === 'cards.move'
 
-export var BuilderActionTypes =
+export let BuilderActionTypes =
 {
   fetchQuery: '', // triggers server xhr
   queryLoaded: '', // when the call to the server returns
@@ -70,7 +70,6 @@ export var BuilderActionTypes =
   hoverCard: '',
 
   selectCard: '',
-
 
   // Change the hand-writen TQL
   changeTQL: '',
@@ -95,23 +94,23 @@ export var BuilderActionTypes =
 // Reference: http://stackoverflow.com/questions/22077023/why-cant-i-indirectly-return-an-object-literal-to-satisfy-an-index-signature-re
 // type ObjectOfStrings = { [s: string]: ObjectOfStrings | string };
 
-var setValuesToKeys = (obj: any, prefix: string) =>
+const setValuesToKeys = (obj: any, prefix: string) =>
 {
   prefix = prefix + (prefix.length > 0 ? '.' : '');
-  for(var key in obj)
+  for (const key in obj)
   {
-    var value = prefix + key;
-    if(typeof obj[key] === 'string')
+    const value = prefix + key;
+    if (typeof obj[key] === 'string')
     {
       obj[key] = value;
     }
-    else if(typeof obj[key] === 'object')
+    else if (typeof obj[key] === 'object')
     {
       setValuesToKeys(obj[key], value);
     }
     else
     {
-      throw "Value found in ActionTypes that is neither string or object of strings: key: " + key + ", value: " + obj[key];
+      throw new Error('Value found in ActionTypes that is neither string or object of strings: key: ' + key + ', value: ' + obj[key]);
     }
   }
 };
@@ -131,7 +130,7 @@ export let BuilderDirtyActionTypes = {};
   BuilderActionTypes.toggleDeck,
   BuilderActionTypes.checkpoint,
   BuilderActionTypes.changeResultsConfig,
-].map(type => BuilderDirtyActionTypes[type] = true);
+].map((type) => BuilderDirtyActionTypes[type] = true);
 
 // which actions modify cards?
 export let BuilderCardActionTypes = {};
@@ -142,6 +141,6 @@ export let BuilderCardActionTypes = {};
   BuilderActionTypes.nestedMove,
   BuilderActionTypes.remove,
   BuilderActionTypes.dropCard,
-].map(type => BuilderCardActionTypes[type] = true);
+].map((type) => BuilderCardActionTypes[type] = true);
 
 export default BuilderActionTypes;

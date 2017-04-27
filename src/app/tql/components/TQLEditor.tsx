@@ -43,62 +43,61 @@ THE SOFTWARE.
 */
 
 require('./TQLEditor.less');
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 const {List} = Immutable;
 import * as _ from 'underscore';
 import PureClasss from './../../common/components/PureClasss';
 const CodeMirror = require('./Codemirror.js');
 
-
 // Style sheets and addons for CodeMirror
 
 require('./tql.js');
-import './codemirror.less';
-import './monokai.less';
-import './cobalt.less';
-import './neo.less';
-import 'codemirror/addon/edit/matchbrackets.js';
-import 'codemirror/addon/edit/closebrackets.js';
 import 'codemirror/addon/display/placeholder.js';
+import 'codemirror/addon/edit/closebrackets.js';
+import 'codemirror/addon/edit/matchbrackets.js';
 import 'codemirror/addon/fold/foldgutter.css';
 import 'codemirror/addon/lint/lint.js';
+import './cobalt.less';
+import './codemirror.less';
+import './monokai.less';
+import './neo.less';
 
 import 'codemirror/addon/dialog/dialog.js';
-import './dialog.less';
-import 'codemirror/addon/search/searchcursor.js';
-import 'codemirror/addon/search/search.js';
 import 'codemirror/addon/scroll/annotatescrollbar.js';
-import 'codemirror/addon/search/matchesonscrollbar.js';
 import 'codemirror/addon/search/jump-to-line.js';
 import 'codemirror/addon/search/matchesonscrollbar.css';
+import 'codemirror/addon/search/matchesonscrollbar.js';
+import 'codemirror/addon/search/search.js';
+import 'codemirror/addon/search/searchcursor.js';
+import './dialog.less';
 
 export interface Props
 {
   tql: string;
   canEdit: boolean;
-  
+
   onChange?(tql: string);
   onFocusChange?(focused: boolean);
-  
+
   toggleSyntaxPopup?(event, line);
   defineTerm?(value, event);
   turnSyntaxPopupOff?();
   hideTermDefinition?();
   theme?: string;
   highlightedLine?: number;
-  
+
   isDiff?: boolean;
   diffTql?: string;
 }
 
 class TQLEditor extends PureClasss<Props>
 {
-  render() 
+  render()
   {
-    let options =
+    const options =
     {
       readOnly: !this.props.canEdit,
       lineNumbers: true,
@@ -110,35 +109,35 @@ class TQLEditor extends PureClasss<Props>
       foldGutter: true,
       lint: true,
       gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
-      
+
       revertButtons: false,
       connect: 'align',
-      
+
       origLeft: this.props.diffTql,
     };
-    
-    if(this.props.isDiff)
+
+    if (this.props.isDiff)
     {
       options['value'] = this.props.tql || '';
       return (
         <CodeMirror
           ref="cm2"
-          className='codemirror-text'
+          className="codemirror-text"
           options={options}
-          
+
           isDiff={true}
           diff={this.props.diffTql}
         />
       );
     }
-    
+
     return (
       <CodeMirror
         ref="cm"
-        className='codemirror-text'
+        className="codemirror-text"
         value={this.props.tql || ''}
         options={options}
-        
+
         highlightedLine={this.props.highlightedLine}
         onChange={this.props.onChange}
         toggleSyntaxPopup={this.props.toggleSyntaxPopup}

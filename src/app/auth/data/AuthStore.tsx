@@ -42,15 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-var Immutable = require('immutable');
-var Redux = require('redux');
+const _ = require('underscore');
+const Immutable = require('immutable');
+const Redux = require('redux');
 import * as ReduxActions from 'redux-actions';
 import ActionTypes from './AuthActionTypes';
 
 import AuthReducers from './AuthReducers';
 
-let AuthStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
+const AuthStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   AuthReducers,
 {}), Immutable.Map({})), Immutable.Map({}));
 

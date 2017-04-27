@@ -44,28 +44,28 @@ THE SOFTWARE.
 
 require('./BuilderComponent.less');
 
-import * as React from 'react';
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import {Display, DisplayType} from './../BuilderDisplays';
-import PureClasss from '../../common/components/PureClasss';
+import * as React from 'react';
 import BuilderTextbox from '../../common/components/BuilderTextbox';
+import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
+import Dropdown from '../../common/components/Dropdown';
+import PureClasss from '../../common/components/PureClasss';
+import ManualInfo from '../../manual/components/ManualInfo';
 import BuilderTypes from '../BuilderTypes';
 import BuilderActions from '../data/BuilderActions';
+import {Display, DisplayType} from './../BuilderDisplays';
 import CardField from './cards/CardField';
-import Dropdown from '../../common/components/Dropdown';
 import CardsArea from './cards/CardsArea';
-import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
-import ManualInfo from '../../manual/components/ManualInfo';
-import * as classNames from 'classnames';
 
 export interface Props
 {
   keyPath: KeyPath;
   data: any; // record
   display?: Display | Display[];
-  
+
   canEdit: boolean;
-  
+
   parentData?: any;
 
   helpOn?: boolean;
@@ -88,22 +88,22 @@ class BuilderComponent extends PureClasss<Props>
   }
   moveRow(keyPath: KeyPath, index: number, newIndex: number)
   {
-    BuilderActions.move(keyPath, index, newIndex)
+    BuilderActions.move(keyPath, index, newIndex);
   }
-  
+
   renderDisplay(
     displayArg: Display | Display[],
     parentKeyPath: KeyPath,
-    data: IMMap<any, any>, 
+    data: IMMap<any, any>,
     options?: {
       className: string;
-    }
+    },
   ): (El | El[])
   {
-    let keySeed = parentKeyPath.join(",");
-    if(Array.isArray(displayArg))
+    const keySeed = parentKeyPath.join(',');
+    if (Array.isArray(displayArg))
     {
-      return displayArg.map(di => 
+      return displayArg.map((di) =>
           <BuilderComponent
             display={di}
             keyPath={parentKeyPath}
@@ -113,66 +113,66 @@ class BuilderComponent extends PureClasss<Props>
             helpOn={this.props.helpOn}
             addColumn={this.props.addColumn}
             columnIndex={this.props.columnIndex}
-          />
+          />,
         ) as El[];
       // return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
     }
-    
+
     const d = displayArg as Display;
-    var className = '';
-    if(d.className)
+    let className = '';
+    if (d.className)
     {
-      if(typeof d.className === 'function')
+      if (typeof d.className === 'function')
       {
-        className = (d.className as (d:any)=>string)(data);
+        className = (d.className as (d: any) => string)(data);
       }
       else
       {
         className = d.className as string;
       }
     }
-    
-    if(options && options.className)
+
+    if (options && options.className)
     {
       className += ' ' + options.className;
     }
-    
-    if(d.displayType === DisplayType.LABEL)
+
+    if (d.displayType === DisplayType.LABEL)
     {
       // special type that is unrealted to the data
-      return <div 
-        className='builder-label'
+      return <div
+        className="builder-label"
         key={keySeed + '-label'}
         >
           {d.label}
         </div>
       ;
     }
-    
-    let keyPath = d.key !== null ? this._ikeyPath(parentKeyPath, d.key) : parentKeyPath;
-    let value = data.get(d.key);
-    var isNumber = false, typeErrorMessage = null;
-    var isTextbox = false;
-    var acceptsCards = false;
-    let key = data.get('id') + ',' + d.key;
-    
-    var content;
-    switch(d.displayType)
+
+    const keyPath = d.key !== null ? this._ikeyPath(parentKeyPath, d.key) : parentKeyPath;
+    const value = data.get(d.key);
+    let isNumber = false, typeErrorMessage = null;
+    let isTextbox = false;
+    let acceptsCards = false;
+    const key = data.get('id') + ',' + d.key;
+
+    let content;
+    switch (d.displayType)
     {
       case DisplayType.NUM:
         isNumber = true;
-        typeErrorMessage = "Must be a number";
+        typeErrorMessage = 'Must be a number';
         isTextbox = true;
         break;
       case DisplayType.TEXT:
         isTextbox = true;
         break;
       case DisplayType.CARDS:
-        var st = data.get('static');
-        content = <CardsArea 
+        const st = data.get('static');
+        content = <CardsArea
           canEdit={this.props.canEdit}
           key={key}
-          cards={value} 
+          cards={value}
           keyPath={keyPath}
           className={className}
           helpOn={this.props.helpOn}
@@ -201,9 +201,9 @@ class BuilderComponent extends PureClasss<Props>
       break;
       case DisplayType.DROPDOWN:
         content = (
-          <div key={key} className='builder-component-wrapper'>
+          <div key={key} className="builder-component-wrapper">
             <Dropdown
-              canEdit={this.props.canEdit}  
+              canEdit={this.props.canEdit}
               className={className}
               keyPath={keyPath}
               options={d.options}
@@ -213,10 +213,10 @@ class BuilderComponent extends PureClasss<Props>
             { this.props.helpOn && d.help ?
               <ManualInfo
                 information={d.help as string}
-                className='builder-component-help-right'
+                className="builder-component-help-right"
               />
               : null
-            }  
+            }
           </div>
         );
       break;
@@ -225,7 +225,7 @@ class BuilderComponent extends PureClasss<Props>
           <div
             key={key}
           >
-            { !d.above ? null : 
+            { !d.above ? null :
               <BuilderComponent
                 display={d.above}
                 keyPath={this.props.keyPath}
@@ -235,7 +235,7 @@ class BuilderComponent extends PureClasss<Props>
               />
             }
             <div
-              className='card-flex'
+              className="card-flex"
             >
               <BuilderComponent
                 display={d.flex}
@@ -248,9 +248,9 @@ class BuilderComponent extends PureClasss<Props>
                 columnIndex={this.props.columnIndex}
               />
             </div>
-            { !d.below ? null : 
+            { !d.below ? null :
               <div
-                className='card-flex-below'
+                className="card-flex-below"
               >
                 <BuilderComponent
                   display={d.below}
@@ -282,7 +282,7 @@ class BuilderComponent extends PureClasss<Props>
                   onMove={this._fn(this.moveRow, keyPath)}
                   key={key + ',' + v.get('id')}
                   isSingle={value.size === 1}
-                  
+
                   row={d.row}
                   keyPath={this._ikeyPath(keyPath, i)}
                   data={v}
@@ -300,16 +300,16 @@ class BuilderComponent extends PureClasss<Props>
         );
         break;
       case DisplayType.COMPONENT:
-        let Comp = d.component as any;
-        var isTransformCard = d.key === 'scorePoints';
+        const Comp = d.component as any;
+        const isTransformCard = d.key === 'scorePoints';
         content = (
-          <div 
-            key={key} 
-            className='builder-component-wrapper builder-component-wrapper-wide'
+          <div
+            key={key}
+            className="builder-component-wrapper builder-component-wrapper-wide"
           >
             {
               React.cloneElement(
-                <Comp />, 
+                <Comp />,
                 {
                   keyPath,
                   data,
@@ -317,30 +317,30 @@ class BuilderComponent extends PureClasss<Props>
                   canEdit: this.props.canEdit,
                   helpOn: this.props.helpOn,
                   className,
-                }
+                },
               )
             }
             { this.props.helpOn && d.help ?
               (
                 isTransformCard ?
                 (d.help as string[]).map((info, index) => {
-                  return <ManualInfo 
+                  return <ManualInfo
                     information={info as string}
                     wide={index === 0}
                     key={'info' + index}
-                    leftSide={index===2}
+                    leftSide={index === 2}
                     className={classNames({
                       'builder-component-help-transform-center': index === 0,
                       'builder-component-help-transform-left': index === 1,
-                      'builder-component-help-transform-bottom': index === 2 
+                      'builder-component-help-transform-bottom': index === 2,
                     })}
-                  /> 
+                  />;
                 })
                 :
-                <ManualInfo 
+                <ManualInfo
                   information={d.help as string}
-                  className='builder-component-help-right'
-                /> 
+                  className="builder-component-help-right"
+                />
               )
               : null
             }
@@ -354,13 +354,13 @@ class BuilderComponent extends PureClasss<Props>
           </div>
         );
     }
-    
-    if(isTextbox)
+
+    if (isTextbox)
     {
       content = (
-        <div 
-          key={key} 
-          className='builder-component-wrapper builder-component-wrapper-wide'
+        <div
+          key={key}
+          className="builder-component-wrapper builder-component-wrapper-wide"
         >
         <BuilderTextbox
           canEdit={this.props.canEdit}
@@ -383,37 +383,37 @@ class BuilderComponent extends PureClasss<Props>
         />
         {
           this.props.helpOn && d.help ?
-          <ManualInfo 
+          <ManualInfo
             information={d.help as string}
-            className='builder-component-help-right'
+            className="builder-component-help-right"
           />
           : null
         }
         </div>
       );
     }
-    
+
     return content;
   }
-  
+
   render()
   {
-    var {data, display} = this.props;
-    if(!display)
+    let {data, display} = this.props;
+    if (!display)
     {
-      if(!data.static || !data.static.display)
+      if (!data.static || !data.static.display)
       {
-        throw new Error("Insufficient props supplied to BuilderComponent");
+        throw new Error('Insufficient props supplied to BuilderComponent');
       }
-      
+
       display = data.static.display;
     }
-    
-    if(Array.isArray(display))
+
+    if (Array.isArray(display))
     {
       return (
         <div
-          className='builder-comp-list'
+          className="builder-comp-list"
         >
           {
             display.map((d, i) => this.renderDisplay(
@@ -422,8 +422,8 @@ class BuilderComponent extends PureClasss<Props>
               this.props.data,
               {
                 className: 'builder-comp-list-item',
-              }
-              )
+              },
+              ),
             )
           }
         </div>
@@ -434,7 +434,7 @@ class BuilderComponent extends PureClasss<Props>
       return this.renderDisplay(
         display,
         this.props.keyPath,
-        this.props.data
+        this.props.data,
       ) as El;
     }
   }

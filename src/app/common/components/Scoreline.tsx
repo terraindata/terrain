@@ -48,12 +48,12 @@ import Classs from './../../common/components/Classs';
 
 export interface Props
 {
-  scores: {
+  scores: Array<{
     color: string,
     score: number,
     name?: string,
-  }[];
-  
+  }>;
+
   hideZeroes: boolean;
 }
 
@@ -61,40 +61,40 @@ class Scoreline extends Classs<Props>
 {
   renderScore(score: { color: string, score: number, name?: string }, index: number)
   {
-    if(score.score === 0 && this.props.hideZeroes)
+    if (score.score === 0 && this.props.hideZeroes)
     {
       return null;
-    }  
-    
+    }
+
     return (
       <div
-        className='scoreline-score'
+        className="scoreline-score"
         key={index}
         data-tip={score.name}
       >
         <div
-          className='scoreline-score-icon'
-          style={{ backgroundColor: score.color, }}
+          className="scoreline-score-icon"
+          style={{ backgroundColor: score.color }}
         />
         <div
-          className='scoreline-score-score'
-          style={{ color: score.color, }}
+          className="scoreline-score-score"
+          style={{ color: score.color }}
         >
           { score.score }
         </div>
       </div>
     );
   }
-  
+
   render()
   {
-    if(this.props.hideZeroes && this.props.scores.every(score => score.score === 0))
+    if (this.props.hideZeroes && this.props.scores.every((score) => score.score === 0))
     {
-      var none = <div className='scoreline-none'>None</div>
+      const none = <div className="scoreline-none">None</div>;
     }
-    
+
     return (
-      <div className='scoreline'>
+      <div className="scoreline">
         { this.props.scores.map(this.renderScore) }
         { none }
       </div>

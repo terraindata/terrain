@@ -43,17 +43,16 @@ THE SOFTWARE.
 */
 
 require('./Account.less');
-import * as React from 'react';
-import Classs from './../../common/components/Classs';
-import Store from './../data/UserStore';
-import Actions from './../data/UserActions';
-import LibraryTypes from './../UserTypes';
-import InfoArea from './../../common/components/InfoArea';
-import { Link } from 'react-router';
 import * as classNames from 'classnames';
+import * as React from 'react';
+import { Link } from 'react-router';
+import Classs from './../../common/components/Classs';
+import InfoArea from './../../common/components/InfoArea';
+import Actions from './../data/UserActions';
+import Store from './../data/UserStore';
+import LibraryTypes from './../UserTypes';
 
-var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
-
+const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
 
 export interface Props
 {
@@ -66,38 +65,38 @@ class Account extends Classs<Props>
   render()
   {
 
-    var title = "Account";
-    var selected = '298px';
-    var linkWidth = -144;
+    let title = 'Account';
+    let selected = '298px';
+    const linkWidth = -144;
 
-    switch(this.props.location.pathname)
+    switch (this.props.location.pathname)
     {
-      case "/account/profile":
-        var profileActive = true;
-        title = "Profile";
+      case '/account/profile':
+        const profileActive = true;
+        title = 'Profile';
         // selected = '298px'; // use this when we add notifications back in
         selected = '154px';
         break;
-      case "/account/notifications":
-        var notificationsActive = true;
-        title = "Notifications";
+      case '/account/notifications':
+        const notificationsActive = true;
+        title = 'Notifications';
         selected = '154px';
         break;
-      case "/account/team":
-        var teamActive = true;
-        title = "Team";
+      case '/account/team':
+        const teamActive = true;
+        title = 'Team';
         selected = 'calc(100% - 10px - 144px)';
         break;
-      case "/account/settings":
-        var settingsActive = true;
-        title = "Settings";
+      case '/account/settings':
+        const settingsActive = true;
+        title = 'Settings';
         selected = '10px';
-        break;    
+        break;
     }
-    
+
       // add this back in when ready
-            // <Link 
-            //   to={'/account/notifications'} 
+            // <Link
+            //   to={'/account/notifications'}
             //   className={classNames({
             //     'account-link': true,
             //     'active': notificationsActive,
@@ -105,40 +104,40 @@ class Account extends Classs<Props>
             //   Notifications
             // </Link>
     return (
-      <div className='account'>
-        <div className='account-wrapper'>
-          <div className='account-title'>
+      <div className="account">
+        <div className="account-wrapper">
+          <div className="account-title">
             <HomeIcon />
-            { 
+            {
               title
             }
           </div>
-          <div className='account-links'>
-            <div 
-              className="selected-link-marker" 
+          <div className="account-links">
+            <div
+              className="selected-link-marker"
               style={{
                 left: selected,
               }}
             />
-            <Link 
-              to={'/account/settings'} 
+            <Link
+              to={'/account/settings'}
               className={classNames({
                 'account-link': true,
                 'active': settingsActive,
-              })}  
+              })}
             >
               Settings
             </Link>
-            <Link 
-              to={'/account/profile'} 
+            <Link
+              to={'/account/profile'}
               className={classNames({
                 'account-link': true,
                 'active': profileActive,
               })}  >
               Profile
             </Link>
-            <Link 
-              to={'/account/team'} 
+            <Link
+              to={'/account/team'}
               className={classNames({
                 'account-link': true,
                 'active': teamActive,
@@ -146,9 +145,9 @@ class Account extends Classs<Props>
               Team
             </Link>
           </div>
-          <div className='account-inner'>
-            { 
-              this.props.children 
+          <div className="account-inner">
+            {
+              this.props.children
             }
           </div>
         </div>

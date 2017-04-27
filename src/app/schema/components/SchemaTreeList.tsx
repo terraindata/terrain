@@ -42,15 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import SchemaTypes from '../SchemaTypes';
-import SchemaStore from '../data/SchemaStore';
 import * as React from 'react';
+import SchemaStore from '../data/SchemaStore';
+import SchemaTypes from '../SchemaTypes';
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeItem from './SchemaTreeItem';
 const Radium = require('radium');
+import FadeInOut from '../../common/components/FadeInOut';
 import Styles from '../../Styles';
 import SchemaTreeStyles from './SchemaTreeStyles';
-import FadeInOut from '../../common/components/FadeInOut';
 
 export interface Props
 {
@@ -64,7 +64,7 @@ export interface Props
 class State
 {
   renderCount: number = 30;
-  intervalId: number = -1; 
+  intervalId: number = -1;
 }
 
 const NORMAL_STYLE = {
@@ -85,35 +85,35 @@ const SEARCH_STYLE = {
 class SchemaTreeList extends PureClasss<Props>
 {
   state = new State();
-  
+
   componentDidMount()
   {
-    if(this.props.itemIds && this.props.itemIds.size > this.state.renderCount)
+    if (this.props.itemIds && this.props.itemIds.size > this.state.renderCount)
     {
       this.setState({
         intervalId: setInterval(this.increaseRenderCount, 50),
-      })
+      });
     }
   }
-  
+
   componentWillReceiveProps(nextProps: Props)
   {
-    if(this.props.itemIds && this.props.itemIds.size > this.state.renderCount && this.state.intervalId === -1)
+    if (this.props.itemIds && this.props.itemIds.size > this.state.renderCount && this.state.intervalId === -1)
     {
       this.setState({
         intervalId: setInterval(this.increaseRenderCount),
-      })
+      });
     }
   }
 
   increaseRenderCount()
   {
-    let renderCount = this.state.renderCount + 10;
+    const renderCount = this.state.renderCount + 10;
     this.setState({
       renderCount,
     });
-    
-    if(this.props.itemIds.size < renderCount)
+
+    if (this.props.itemIds.size < renderCount)
     {
       clearInterval(this.state.intervalId);
       this.setState({
@@ -121,20 +121,20 @@ class SchemaTreeList extends PureClasss<Props>
       });
     }
   }
-  
+
   render()
   {
-  	if(!this.props.itemIds)
+  	if (!this.props.itemIds)
   	{
   		return (
   			<div
-          className='loading-text'
+          className="loading-text"
         />
   		);
   	}
-  	
-    let {itemIds, itemType, search, label, topLevel} = this.props;
-    
+
+    const {itemIds, itemType, search, label, topLevel} = this.props;
+
     return (
       <div
       	style={[
@@ -157,7 +157,7 @@ class SchemaTreeList extends PureClasss<Props>
   		      			label
   		      		}
   		      	</div>
-              
+
             	{
             		!itemIds.size &&
             			<div
@@ -168,7 +168,7 @@ class SchemaTreeList extends PureClasss<Props>
             	}
             </FadeInOut>
         }
-      	
+
       	{
       		itemIds.map(
       			(id, index) =>
@@ -178,7 +178,7 @@ class SchemaTreeList extends PureClasss<Props>
         					type={itemType}
         					key={id}
                   search={search}
-        				/>
+        				/>,
       		)
       	}
       </div>

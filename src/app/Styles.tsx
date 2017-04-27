@@ -43,40 +43,40 @@ THE SOFTWARE.
 */
 
 const color = require('color');
-let active = '#00A7F7';
-let lighterActive = color(active).lighten(0.25).string();
+const active = '#00A7F7';
+const lighterActive = color(active).lighten(0.25).string();
 
 export const Styles =
 {
 	margin: 6,
-	
-	colors: 
+
+	colors:
 	{
 		text:
 		{
 			light: '#aaa',
 			white: '#fff',
 			black: 'rgba(0,0,0,0.8)',
-			
+
 			loading: '#aaa',
 		},
-		
+
 		active,
-		
+
 		transBlack: 'rgba(0,0,0,0.75)',
 	},
-	
+
 	link:
 	{
-		color: active,
-		cursor: 'pointer',
-		
+		'color': active,
+		'cursor': 'pointer',
+
 		':hover':
 		{
 			color: lighterActive,
-		}
+		},
 	},
-	
+
 	font:
 	{
 		title: {
@@ -116,38 +116,37 @@ export const Styles =
 		  fontSize: '9px',
 		},
 	},
-	
-	
+
 	rotate90neg:
 	{
-	  'MozTransform': 'rotate(-90deg)',
-	  'WebkitTransform': 'rotate(-90deg)',
-	  'OTransform': 'rotate(-90deg)',
-	  'msTransform': 'rotate(-90deg)',
-	  'transform': 'rotate(-90deg)',
+	  MozTransform: 'rotate(-90deg)',
+	  WebkitTransform: 'rotate(-90deg)',
+	  OTransform: 'rotate(-90deg)',
+	  msTransform: 'rotate(-90deg)',
+	  transform: 'rotate(-90deg)',
 	},
-	
+
 	rotate90:
 	{
-	  'MozTransform': 'rotate(90deg)',
-	  'WebkitTransform': 'rotate(90deg)',
-	  'OTransform': 'rotate(90deg)',
-	  'msTransform': 'rotate(90deg)',
-	  'transform': 'rotate(90deg)',
+	  MozTransform: 'rotate(90deg)',
+	  WebkitTransform: 'rotate(90deg)',
+	  OTransform: 'rotate(90deg)',
+	  msTransform: 'rotate(90deg)',
+	  transform: 'rotate(90deg)',
 	},
-	
+
 	rotate180: {
-	  'MozTransform': 'rotate(180deg)',
-	  'WebkitTransform': 'rotate(180deg)',
-	  'OTransform': 'rotate(180deg)',
-	  'msTransform': 'rotate(180deg)',
-	  'transform': 'rotate(180deg)',
+	  MozTransform: 'rotate(180deg)',
+	  WebkitTransform: 'rotate(180deg)',
+	  OTransform: 'rotate(180deg)',
+	  msTransform: 'rotate(180deg)',
+	  transform: 'rotate(180deg)',
 	},
-	
+
 	transition:
 	{
-	  'WebkitTransition': 'all 0.15s',
-	  'transition': 'all 0.15s',
+	  WebkitTransition: 'all 0.15s',
+	  transition: 'all 0.15s',
 	},
 };
 

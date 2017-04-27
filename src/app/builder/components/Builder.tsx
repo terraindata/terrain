@@ -43,51 +43,51 @@ THE SOFTWARE.
 */
 
 // Libraries
-import * as React from 'react';
-import * as ReactDOM from "react-dom";
-import * as _ from "underscore";
-import * as $ from 'jquery';
 import * as classNames from 'classnames';
-import { DragDropContext } from 'react-dnd';
 import * as Immutable from 'immutable';
-var HTML5Backend = require('react-dnd-html5-backend');
+import * as $ from 'jquery';
+import * as React from 'react';
+import { DragDropContext } from 'react-dnd';
+import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
+const HTML5Backend = require('react-dnd-html5-backend');
 const {browserHistory} = require('react-router');
 const { withRouter } = require('react-router');
 
 // Data
-import { BuilderStore, BuilderState } from "./../data/BuilderStore";
-import Actions from "./../data/BuilderActions";
-import Util from "./../../util/Util";
+import LibraryActions from '../../library/data/LibraryActions';
+import { LibraryState, LibraryStore } from '../../library/data/LibraryStore';
+import LibraryTypes from '../../library/LibraryTypes';
+import RolesActions from '../../roles/data/RolesActions';
+import RolesStore from '../../roles/data/RolesStore';
 import UserActions from '../../users/data/UserActions';
 import UserStore from '../../users/data/UserStore';
-import RolesStore from '../../roles/data/RolesStore';
-import RolesActions from '../../roles/data/RolesActions';
-import LibraryTypes from '../../library/LibraryTypes';
-import { LibraryStore, LibraryState } from '../../library/data/LibraryStore';
-import LibraryActions from '../../library/data/LibraryActions';
 import Types from '../BuilderTypes';
+import Util from './../../util/Util';
+import Actions from './../data/BuilderActions';
+import { BuilderState, BuilderStore } from './../data/BuilderStore';
 type Query = Types.Query;
 type Variant = LibraryTypes.Variant;
 
 // Components
 
-import PureClasss from './../../common/components/PureClasss';
-import BuilderColumn from "./BuilderColumn";
-import {Tabs, TabAction} from "./layout/Tabs";
-import LayoutManager from "./layout/LayoutManager";
-import Card from "./cards/Card";
-import ResultsManager from './results/ResultsManager';
-import Ajax from "./../../util/Ajax";
 import InfoArea from '../../common/components/InfoArea';
-import {notificationManager} from './../../common/components/InAppNotification'
 import Modal from '../../common/components/Modal';
+import {notificationManager} from './../../common/components/InAppNotification';
+import PureClasss from './../../common/components/PureClasss';
+import Ajax from './../../util/Ajax';
+import BuilderColumn from './BuilderColumn';
+import Card from './cards/Card';
+import LayoutManager from './layout/LayoutManager';
+import {TabAction, Tabs} from './layout/Tabs';
+import ResultsManager from './results/ResultsManager';
 
-var NewIcon = require("./../../../images/icon_new_21x17.svg?name=NewIcon");
-var OpenIcon = require("./../../../images/icon_open_11x10.svg?name=OpenIcon");
-var DuplicateIcon = require("./../../../images/icon_duplicate_11x12.svg?name=DuplicateIcon");
-var SaveIcon = require("./../../../images/icon_save_10x10.svg?name=SaveIcon");
+const NewIcon = require('./../../../images/icon_new_21x17.svg?name=NewIcon');
+const OpenIcon = require('./../../../images/icon_open_11x10.svg?name=OpenIcon');
+const DuplicateIcon = require('./../../../images/icon_duplicate_11x12.svg?name=DuplicateIcon');
+const SaveIcon = require('./../../../images/icon_save_10x10.svg?name=SaveIcon');
 
-let { Map, List } = Immutable;
+const { Map, List } = Immutable;
 
 export interface Props
 {
@@ -102,7 +102,7 @@ class Builder extends PureClasss<Props>
   state: {
     builderState: BuilderState,
     variants: IMMap<ID, Variant>,
-    
+
     colKeys: List<number>;
     noColumnAnimation: boolean;
     columnType: number;
@@ -137,16 +137,15 @@ class Builder extends PureClasss<Props>
 
   initialColSizes: any;
 
-  constructor(props:Props)
+  constructor(props: Props)
   {
     super(props);
 
-
     this._subscribe(BuilderStore, {
       stateKey: 'builderState',
-      updater: (builderState:BuilderState) =>
+      updater: (builderState: BuilderState) =>
       {
-        if(
+        if (
             builderState.query !== this.state.builderState.query
             || builderState.pastQueries !== this.state.builderState.pastQueries
             || builderState.nextQueries !== this.state.builderState.nextQueries
@@ -157,24 +156,24 @@ class Builder extends PureClasss<Props>
             tabActions: this.getTabActions(builderState),
           });
         }
-      }
+      },
     });
     this._subscribe(LibraryStore, {
       stateKey: 'variants',
       storeKeyPath: ['variants'],
     });
 
-    if(localStorage.getItem('colKeys'))
+    if (localStorage.getItem('colKeys'))
     {
-      var colKeys = List(JSON.parse(localStorage.getItem('colKeys'))) as List<number>;
+      const colKeys = List(JSON.parse(localStorage.getItem('colKeys'))) as List<number>;
     }
     else
     {
-      var colKeys = List([Math.random(), Math.random()]);
+      const colKeys = List([Math.random(), Math.random()]);
       localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
     }
 
-    if(localStorage.getItem('selectedCardName'))
+    if (localStorage.getItem('selectedCardName'))
     {
       this.state.selectedCardName = localStorage.getItem('selectedCardName');
     }
@@ -185,7 +184,7 @@ class Builder extends PureClasss<Props>
 
     let colSizes = JSON.parse(localStorage.getItem('colSizes') || '[]');
 
-    if(!Array.isArray(colSizes) || _.reduce(colSizes, (sum, size) => sum + size['x'], 0) !== 0)
+    if (!Array.isArray(colSizes) || _.reduce(colSizes, (sum, size) => sum + size['x'], 0) !== 0)
     {
       colSizes = [];
     }
@@ -203,7 +202,7 @@ class Builder extends PureClasss<Props>
     {
       Util.executeBeforeLeaveHandlers();
 
-      if(this.state.navigationException)
+      if (this.state.navigationException)
       {
         this.setState({
           navigationException: false,
@@ -211,9 +210,9 @@ class Builder extends PureClasss<Props>
         return;
       }
 
-      if(this.shouldSave())
+      if (this.shouldSave())
       {
-        let msg = 'You have unsaved changes to this Variant. If you leave, they will be lost. Are you sure you want to leave?';
+        const msg = 'You have unsaved changes to this Variant. If you leave, they will be lost. Are you sure you want to leave?';
         e && (e.returnValue = msg);
         return msg;
       }
@@ -229,24 +228,24 @@ class Builder extends PureClasss<Props>
 
   routerWillLeave(nextLocation): boolean
   {
-    if(this.confirmedLeave)
+    if (this.confirmedLeave)
     {
       this.confirmedLeave = false;
       return true;
     }
 
-    if(this.shouldSave(BuilderStore.getState()))
+    if (this.shouldSave(BuilderStore.getState()))
     {
       // ^ need to pass in the most recent state, because when you've navigated away
       // in a dirty state, saved on the navigation prompt, and then returned,
       // Builder's copy of the state gets out of date at this point
 
-      let path = nextLocation.pathname;
-      let pieces = path.split('/');
-      if(pieces[1] === 'builder' && pieces[2])
+      const path = nextLocation.pathname;
+      const pieces = path.split('/');
+      if (pieces[1] === 'builder' && pieces[2])
       {
-        let config = pieces[2].split(',');
-        if(config.indexOf('!' + this.getSelectedId()) !== -1)
+        const config = pieces[2].split(',');
+        if (config.indexOf('!' + this.getSelectedId()) !== -1)
         {
           // current opened variant is still open, move along.
           // TODO
@@ -268,16 +267,16 @@ class Builder extends PureClasss<Props>
 
   componentWillReceiveProps(nextProps: Props)
   {
-    let currentOpen = this.props.location.query && this.props.location.query.o;
-    let nextOpen = nextProps.location.query && nextProps.location.query.o;
+    const currentOpen = this.props.location.query && this.props.location.query.o;
+    const nextOpen = nextProps.location.query && nextProps.location.query.o;
 
-    if(
+    if (
       nextProps.params.config !== this.props.params.config
       || currentOpen !== nextOpen
     )
     {
       this.confirmedLeave = false;
-      if(!nextProps.location.query || !nextProps.location.query.o)
+      if (!nextProps.location.query || !nextProps.location.query.o)
       {
         this.props.router.setRouteLeaveHook(nextProps.route, this.routerWillLeave);
       }
@@ -285,16 +284,16 @@ class Builder extends PureClasss<Props>
     }
   }
 
-  checkConfig(props:Props)
+  checkConfig(props: Props)
   {
-    let storedConfig = localStorage.getItem('config') || '';
-    let open = props.location.query && props.location.query.o;
-    let originalConfig = props.params.config || storedConfig;
+    const storedConfig = localStorage.getItem('config') || '';
+    const open = props.location.query && props.location.query.o;
+    const originalConfig = props.params.config || storedConfig;
     let newConfig = originalConfig;
 
-    if(open)
+    if (open)
     {
-      if(!storedConfig || storedConfig === 'undefined' || storedConfig === '')
+      if (!storedConfig || storedConfig === 'undefined' || storedConfig === '')
       {
         // no stored config, just load the open tab.
         newConfig = '!' + open;
@@ -302,9 +301,9 @@ class Builder extends PureClasss<Props>
       else
       {
         // append or update the open id to the stored config list
-        var configArr = storedConfig.split(',').map(id => id.indexOf('!') === 0 ? id.substr(1) : id);
-        var i = configArr.indexOf(open);
-        if(i === -1)
+        const configArr = storedConfig.split(',').map((id) => id.indexOf('!') === 0 ? id.substr(1) : id);
+        let i = configArr.indexOf(open);
+        if (i === -1)
         {
           i = configArr.length;
         }
@@ -314,11 +313,11 @@ class Builder extends PureClasss<Props>
       }
     }
 
-    if(newConfig && newConfig.length && !newConfig.split(',').some(c => c.substr(0,1) === '!'))
+    if (newConfig && newConfig.length && !newConfig.split(',').some((c) => c.substr(0, 1) === '!'))
     {
       newConfig = '!' + newConfig;
     }
-    if(newConfig !== props.params.config
+    if (newConfig !== props.params.config
       && (props.params.config !== undefined || newConfig.length)
       )
     {
@@ -328,13 +327,13 @@ class Builder extends PureClasss<Props>
 
     const pieces = newConfig.split(',');
     let variantId = pieces.find(
-      piece => piece.indexOf('!') === 0
+      (piece) => piece.indexOf('!') === 0,
     );
-    if(variantId)
+    if (variantId)
     {
       variantId = variantId.substr(1); // trim '!'
     }
-    if(newConfig && (props === this.props || variantId !== this.getSelectedId(this.props)))
+    if (newConfig && (props === this.props || variantId !== this.getSelectedId(this.props)))
     {
       // need to fetch data for new query
       Actions.fetchQuery(variantId, this.handleNoVariant);
@@ -343,29 +342,29 @@ class Builder extends PureClasss<Props>
 
   handleNoVariant(variantId: ID)
   {
-    if(this.props.params.config && this.state.nonexistentVariantIds.indexOf(variantId) === -1)
+    if (this.props.params.config && this.state.nonexistentVariantIds.indexOf(variantId) === -1)
     {
       this.setState({
         nonexistentVariantIds: this.state.nonexistentVariantIds.push(variantId),
       });
-      let newConfigArr = localStorage['config']
+      const newConfigArr = localStorage['config']
         .split(',')
-        .filter(id => id !== variantId && id !== '!' + variantId);
-      if(newConfigArr.length && !newConfigArr.some(c => c.substr(0,1) === '!'))
+        .filter((id) => id !== variantId && id !== '!' + variantId);
+      if (newConfigArr.length && !newConfigArr.some((c) => c.substr(0, 1) === '!'))
       {
         newConfigArr[0] = '!' + newConfigArr[0];
       }
 
-      let newConfig = newConfigArr.join(',');
+      const newConfig = newConfigArr.join(',');
       localStorage.setItem('config', newConfig); // so that empty configs don't cause a freak out
       browserHistory.replace(`/builder/${newConfig}`);
     }
   }
 
-  getSelectedId(props?:Props)
+  getSelectedId(props?: Props)
   {
     props = props || this.props;
-    var selected = props.params.config && props.params.config.split(',').find(id => id.indexOf('!') === 0);
+    const selected = props.params.config && props.params.config.split(',').find((id) => id.indexOf('!') === 0);
     return selected && selected.substr(1);
   }
 
@@ -374,22 +373,22 @@ class Builder extends PureClasss<Props>
   //   name: 'Loading',
   // });
 
-  getQuery(props?:Props): Query
+  getQuery(props?: Props): Query
   {
     return this.state.builderState.query; // || this.loadingQuery;
   }
 
-  getVariant(props?:Props): LibraryTypes.Variant
+  getVariant(props?: Props): LibraryTypes.Variant
   {
-    if(!this.state)
+    if (!this.state)
     {
       return null;
     }
 
-    let variantId = this.getSelectedId(props);
-    let variant = this.state.variants &&
+    const variantId = this.getSelectedId(props);
+    const variant = this.state.variants &&
       this.state.variants.get(variantId);
-    if(variantId && !variant)
+    if (variantId && !variant)
     {
       LibraryActions.variants.fetchVersion(variantId, () =>
       {
@@ -400,7 +399,7 @@ class Builder extends PureClasss<Props>
     return variant; // || this.loadingVariant;
   }
 
-  getTabActions(builderState:BuilderState): List<TabAction>
+  getTabActions(builderState: BuilderState): List<TabAction>
   {
     return Immutable.List([
       {
@@ -444,17 +443,16 @@ class Builder extends PureClasss<Props>
     Actions.redo();
   }
 
-
   onSave()
   {
-    if(this.getVariant().version)
+    if (this.getVariant().version)
     {
-      if(!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?'))
+      if (!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?'))
       {
         return;
       }
     }
-    this.save()
+    this.save();
   }
 
   onSaveSuccess(variant: Variant)
@@ -463,7 +461,7 @@ class Builder extends PureClasss<Props>
       'Saved',
       variant.name,
       'info',
-      4
+      4,
     );
 
     //TODO remove if queries/variants model changes
@@ -477,7 +475,7 @@ class Builder extends PureClasss<Props>
       'Error Saving',
       '"' + variant.name + '" failed to save.',
       'error',
-      0
+      0,
     );
   }
 
@@ -489,16 +487,16 @@ class Builder extends PureClasss<Props>
     });
   }
 
-  shouldSave(overrideState?:BuilderState): boolean
+  shouldSave(overrideState?: BuilderState): boolean
   {
-    let variant = this.getVariant();
-    if(variant)
+    const variant = this.getVariant();
+    if (variant)
     {
-      if(variant.status === LibraryTypes.EVariantStatus.Live)
+      if (variant.status === LibraryTypes.EVariantStatus.Live)
       {
         return false;
       }
-      if(
+      if (
         !Util.haveRole(variant.groupId, 'builder', UserStore, RolesStore)
         && !Util.haveRole(variant.groupId, 'admin', UserStore, RolesStore)
       ) {
@@ -517,31 +515,31 @@ class Builder extends PureClasss<Props>
     Ajax.saveItem(
       LibraryTypes.variantForSave(variant),
       this.onSaveSuccess.bind(this, variant),
-      this.onSaveError.bind(this, variant)
+      this.onSaveError.bind(this, variant),
     );
     Actions.save();
 
-    var configArr = window.location.pathname.split('/')[2].split(',');
-    var currentVariant;
+    let configArr = window.location.pathname.split('/')[2].split(',');
+    let currentVariant;
     configArr = configArr.map(function(tab)
       {
-        if(tab.substr(0,1) === '!')
+        if (tab.substr(0, 1) === '!')
         {
           currentVariant = tab.substr(1).split('@')[0];
           return '!' + currentVariant;
         }
         return tab;
-      }
+      },
     );
-    for(let i = 0; i < configArr.length; i++)
+    for (let i = 0; i < configArr.length; i++)
     {
-      if(configArr[i] === currentVariant)
+      if (configArr[i] === currentVariant)
       {
         configArr.splice(i, 1);
       }
     }
-    var newConfig = configArr.join(',');
-    if(newConfig !== this.props.params.config)
+    const newConfig = configArr.join(',');
+    if (newConfig !== this.props.params.config)
     {
       browserHistory.replace(`/builder/${newConfig}`);
     }
@@ -555,9 +553,9 @@ class Builder extends PureClasss<Props>
       onColSizeChange: this.handleColSizeChange,
       minColWidth: 316,
       columns:
-        _.range(0, this.state.colKeys.size).map(index =>
-          this.getColumn(index)
-        )
+        _.range(0, this.state.colKeys.size).map((index) =>
+          this.getColumn(index),
+        ),
     };
   }
 
@@ -568,19 +566,19 @@ class Builder extends PureClasss<Props>
 
   canEdit(): boolean
   {
-    let variant = this.getVariant();
+    const variant = this.getVariant();
     return variant && (variant.status === LibraryTypes.EVariantStatus.Build
-      && Util.canEdit(variant, UserStore, RolesStore))
+      && Util.canEdit(variant, UserStore, RolesStore));
   }
 
   cantEditReason(): string
   {
-    let variant = this.getVariant();
-    if(!variant || this.canEdit())
+    const variant = this.getVariant();
+    if (!variant || this.canEdit())
     {
       return '';
     }
-    if(variant.status !== LibraryTypes.EVariantStatus.Build)
+    if (variant.status !== LibraryTypes.EVariantStatus.Build)
     {
       return 'This Variant is not in Build status';
     }
@@ -589,10 +587,9 @@ class Builder extends PureClasss<Props>
 
   getColumn(index)
   {
-    let key = this.state.colKeys.get(index);
-    let query = this.getQuery();
-    let variant = this.getVariant();
-
+    const key = this.state.colKeys.get(index);
+    const query = this.getQuery();
+    const variant = this.getVariant();
 
     return {
       minWidth: 316,
@@ -625,14 +622,14 @@ class Builder extends PureClasss<Props>
   switchToManualCol(index)
   {
     this.setState({
-      manualIndex: index
+      manualIndex: index,
     });
   }
 
   changeSelectedCardName(selectedCardName)
   {
     this.setState({
-      selectedCardName
+      selectedCardName,
     });
     localStorage.setItem('selectedCardName', selectedCardName);
   }
@@ -640,18 +637,18 @@ class Builder extends PureClasss<Props>
   addManualColumn(index, selectedCardName?)
   {
     index = index + 1;
-    var newKey = Math.random();
-    let colKeys = this.state.colKeys.splice(index, 0, newKey);
+    const newKey = Math.random();
+    const colKeys = this.state.colKeys.splice(index, 0, newKey);
     this.setState({
       colKeys,
       columnType: 4,
       selectedCardName,
-      manualIndex: index
+      manualIndex: index,
     });
     localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
-    if(localStorage.getItem('colKeyTypes'))
+    if (localStorage.getItem('colKeyTypes'))
     {
-      var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes'));
+      const colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes'));
       colKeyTypes[newKey] = 4;
       localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
     }
@@ -659,17 +656,17 @@ class Builder extends PureClasss<Props>
 
   handleAddManualColumn(index, selectedCardName?)
   {
-    if(this.state.manualIndex !== -1) // Manual column already open
+    if (this.state.manualIndex !== -1) // Manual column already open
     {
       this.setState({
-        selectedCardName
+        selectedCardName,
       });
     }
     else
     {
-      if(this.state.colKeys.size === 3)
+      if (this.state.colKeys.size === 3)
       {
-        var closeIndex = index < 2 ? 2 : 1;
+        const closeIndex = index < 2 ? 2 : 1;
         this.handleCloseColumn(closeIndex);
       }
         this.addManualColumn(index, selectedCardName);
@@ -679,7 +676,7 @@ class Builder extends PureClasss<Props>
   handleAddColumn(index)
   {
     index = index + 1;
-    let colKeys = this.state.colKeys.splice(index, 0, Math.random());
+    const colKeys = this.state.colKeys.splice(index, 0, Math.random());
     this.setState({
       colKeys,
     });
@@ -688,25 +685,25 @@ class Builder extends PureClasss<Props>
 
   handleCloseColumn(index)
   {
-    let oldKey = this.state.colKeys[index];
-    let colKeys = this.state.colKeys.splice(index, 1);
+    const oldKey = this.state.colKeys[index];
+    const colKeys = this.state.colKeys.splice(index, 1);
     this.setState({
-      colKeys: colKeys,
+      colKeys,
       manualIndex: (index === this.state.manualIndex) ? -1 : this.state.manualIndex,
-      columnType: 0
+      columnType: 0,
     });
     localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
-    if(localStorage.getItem('colKeyTypes'))
+    if (localStorage.getItem('colKeyTypes'))
     {
-      var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes'));
+      const colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes'));
       delete colKeyTypes[oldKey];
     }
   }
 
   moveColumn(curIndex, newIndex)
   {
-    var tmp = this.state.colKeys.get(curIndex);
-    var colKeys = this.state.colKeys.splice(curIndex, 1).splice(newIndex, 0, tmp);
+    const tmp = this.state.colKeys.get(curIndex);
+    const colKeys = this.state.colKeys.splice(curIndex, 1).splice(newIndex, 0, tmp);
     this.setState({
       colKeys,
       noColumnAnimation: true,
@@ -719,7 +716,7 @@ class Builder extends PureClasss<Props>
 
   revertVersion()
   {
-    if(confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.'))
+    if (confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.'))
     {
       this.save();
     }
@@ -727,22 +724,22 @@ class Builder extends PureClasss<Props>
 
   renderVersionToolbar()
   {
-    let variant = this.getVariant();
+    const variant = this.getVariant();
 
-    if(variant && variant.version)
+    if (variant && variant.version)
     {
-      let lastEdited = Util.formatDate(variant.lastEdited);
-      
+      const lastEdited = Util.formatDate(variant.lastEdited);
+
       return (
-        <div className='builder-revert-toolbar'>
-          <div className='builder-revert-time-message'>
+        <div className="builder-revert-toolbar">
+          <div className="builder-revert-time-message">
             Version from {lastEdited}
           </div>
-          <div className='builder-white-space'/>
+          <div className="builder-white-space"/>
           {
             this.canEdit() &&
               <div
-                className='button builder-revert-button'
+                className="button builder-revert-button"
                 onClick={this.revertVersion}
                 data-tip="Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history."
               >
@@ -789,9 +786,9 @@ class Builder extends PureClasss<Props>
 
 	render()
   {
-    let config = this.props.params.config;
-    let variant = this.getVariant();
-    let query = this.getQuery();
+    const config = this.props.params.config;
+    const variant = this.getVariant();
+    const query = this.getQuery();
 
     return (
       <div className={classNames({
@@ -801,9 +798,9 @@ class Builder extends PureClasss<Props>
         {
           !config || !config.length ?
             <InfoArea
-              large='No variants open'
-              small='You can open one in the Library'
-              button='Go to the Library'
+              large="No variants open"
+              small="You can open one in the Library"
+              button="Go to the Library"
               onClick={this.goToLibrary}
             />
           :
@@ -811,10 +808,10 @@ class Builder extends PureClasss<Props>
               <Tabs
                 actions={this.state.tabActions}
                 config={config}
-                ref='tabs'
+                ref="tabs"
                 onNoVariant={this.handleNoVariant}
               />
-              <div className='tabs-content'>
+              <div className="tabs-content">
                 {
                   this.renderVersionToolbar()
                 }
@@ -825,8 +822,8 @@ class Builder extends PureClasss<Props>
         <Modal
           open={this.state.leaving}
           message={'Save changes' + (variant ? ' to ' + variant.name : '') + ' before leaving?'}
-          title='Unsaved Changes'
-          confirmButtonText='Save'
+          title="Unsaved Changes"
+          confirmButtonText="Save"
           confirm={true}
           onClose={this.handleModalCancel}
           onConfirm={this.handleModalSave}

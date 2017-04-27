@@ -43,19 +43,19 @@ THE SOFTWARE.
 */
 
 require('./RadioButtons.less');
-import * as $ from 'jquery';
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../util/Util';
 import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as React from 'react';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
 
 export interface Props {
 	selected?: string;
-	options: {
+	options: Array<{
 			value: string;
 			onClick: () => void
-		}[];
+		}>;
 }
 
 class RadioButtons extends Classs<Props>
@@ -64,13 +64,13 @@ class RadioButtons extends Classs<Props>
 	renderOption(option)
 	{
 		return (
-			<div key={option.value} className='radio-button-option'>
-				<div 
+			<div key={option.value} className="radio-button-option">
+				<div
 					onClick={option.onClick}
 					className={classNames({
   					'radio-button': true,
   					'radio-button-selected': option.value === this.props.selected,
-					})}							
+					})}
 				>
 				</div>
 				{option.value}
@@ -79,14 +79,14 @@ class RadioButtons extends Classs<Props>
 		);
 	}
 
-	render() 
+	render()
 	{
 		return (
 			<div>
 				{this.props.options.map(this.renderOption)}
 			</div>
 		);
-	};
+	}
 }
 
 export default RadioButtons;

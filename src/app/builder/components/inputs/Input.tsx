@@ -43,29 +43,29 @@ THE SOFTWARE.
 */
 
 require('./Input.less');
-var _ = require('underscore');
-import * as React from 'react';
+const _ = require('underscore');
 import * as Immutable from 'immutable';
+import * as React from 'react';
 const {List} = Immutable;
-import Util from '../../../util/Util';
-import Actions from "../../data/BuilderActions";
-import PanelMixin from '../layout/PanelMixin';
-import BuilderTextbox from "../../../common/components/BuilderTextbox";
-import Menu from '../../../common/components/Menu';
+import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import CreateLine from '../../../common/components/CreateLine';
 import DatePicker from '../../../common/components/DatePicker';
+import Menu from '../../../common/components/Menu';
+import Util from '../../../util/Util';
+import Actions from '../../data/BuilderActions';
+import PanelMixin from '../layout/PanelMixin';
 import { BuilderTypes } from './../../BuilderTypes';
 const shallowCompare = require('react-addons-shallow-compare');
 
-var TextIcon = require("./../../../../images/icon_textDropdown.svg");
-var DateIcon = require("./../../../../images/icon_dateDropdown.svg");
-var NumberIcon = require("./../../../../images/icon_numberDropdown.svg");
-var CloseIcon = require("./../../../../images/icon_close_8x8.svg");
+const TextIcon = require('./../../../../images/icon_textDropdown.svg');
+const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
+const NumberIcon = require('./../../../../images/icon_numberDropdown.svg');
+const CloseIcon = require('./../../../../images/icon_close_8x8.svg');
 
 type IInput = BuilderTypes.IInput;
-let InputType = BuilderTypes.InputType;
+const InputType = BuilderTypes.InputType;
 
-var Input = React.createClass<any, any>({
+const Input = React.createClass<any, any>({
 	mixins: [PanelMixin],
 
 	propTypes:
@@ -77,23 +77,23 @@ var Input = React.createClass<any, any>({
     //  rather than caching. This is fine since inputs aren't nested, there would be no
     //  benefit to caching keyPaths anyways.
 	},
-  
+
   getKeyPath(type?: string)
   {
-    let keyPath = Immutable.List(['query', 'inputs']);
-    if(type)
+    const keyPath = Immutable.List(['query', 'inputs']);
+    if (type)
     {
       return keyPath.push(this.props.index).push(type);
     }
     return keyPath;
   },
-  
+
   shouldComponentUpdate(nextProps, nextState)
   {
     return shallowCompare(this, nextProps, nextState);
   },
 
-	getDefaultProps() 
+	getDefaultProps()
 	{
 		return {
 			drag_x: false,
@@ -101,24 +101,24 @@ var Input = React.createClass<any, any>({
 			reorderOnDrag: true,
 		};
 	},
-  
+
   convertToDate()
   {
     let date = new Date(this.props.input.value);
-    if(date.toString() === 'Invalid Date')
+    if (date.toString() === 'Invalid Date')
     {
       date = new Date();
     }
-    let value = Util.formatInputDate(date);
+    const value = Util.formatInputDate(date);
     Actions.change(this.getKeyPath('value'), value);
     Actions.change(this.getKeyPath('inputType'), InputType.DATE);
   },
-  
+
   convertToText()
   {
     Actions.change(this.getKeyPath('inputType'), InputType.TEXT);
   },
-  
+
   convertToNumber()
   {
     Actions.change(this.getKeyPath('inputType'), InputType.NUMBER);
@@ -128,10 +128,10 @@ var Input = React.createClass<any, any>({
   {
     Util.animateToHeight(this.refs.input, 0);
     setTimeout(() => {
-      Actions.remove(this.getKeyPath(), this.props.index)
+      Actions.remove(this.getKeyPath(), this.props.index);
     }, 250);
   },
-  
+
   createInput()
   {
     Actions.create(this.getKeyPath(), this.props.index, 'input');
@@ -144,34 +144,34 @@ var Input = React.createClass<any, any>({
         text: 'Number',
         onClick: this.convertToNumber,
         disabled: this.props.input.inputType === InputType.NUMBER,
-        icon: <NumberIcon />, 
+        icon: <NumberIcon />,
         iconColor: '#805DA8',
       },
       {
         text: 'Text',
         onClick: this.convertToText,
         disabled: this.props.input.inputType === InputType.TEXT,
-        icon: <TextIcon />, 
+        icon: <TextIcon />,
         iconColor: '#31B2BC',
       },
       {
         text: 'Date',
         onClick: this.convertToDate,
         disabled: this.props.input.inputType === InputType.DATE,
-        icon: <DateIcon />, 
+        icon: <DateIcon />,
         iconColor: '#FF735B',
       },
     ]);
   },
-  
+
   changeValue(value)
   {
     Actions.change(this.getKeyPath('value'), value);
   },
-  
+
   renderInputValue()
   {
-    if(this.props.input.inputType === BuilderTypes.InputType.DATE)
+    if (this.props.input.inputType === BuilderTypes.InputType.DATE)
     {
       return (
         <div>
@@ -183,7 +183,6 @@ var Input = React.createClass<any, any>({
         </div>
       );
     }
-    
 
     return (
       <BuilderTextbox
@@ -193,48 +192,48 @@ var Input = React.createClass<any, any>({
         keyPath={this.getKeyPath('value')}
         isNumber={this.props.input.inputType === BuilderTypes.InputType.NUMBER}
         typeErrorMessage="This input is in number mode\nthis should be a number."
-        placeholder='Sample value'
+        placeholder="Sample value"
         autoDisabled={true}
       />
     );
   },
-  
+
   componentDidMount()
   {
     Util.animateToAutoHeight(this.refs.input);
   },
 
-	render() 
+	render()
   {
 		return (
-			<div className='input' ref='input'>
+			<div className="input" ref="input">
         {
           this.props.canEdit ?
-            <CreateLine 
-              open={false} 
-              onClick={this.createInput} 
+            <CreateLine
+              open={false}
+              onClick={this.createInput}
             />
           :
-            <div className='input-spacing' />
+            <div className="input-spacing" />
         }
-        <div className='input-inner'>
-          <div className='input-top-row'>
+        <div className="input-inner">
+          <div className="input-top-row">
             <BuilderTextbox
               canEdit={this.props.canEdit}
               value={this.props.input.key}
               className="input-text input-text-first input-borderless"
               keyPath={this.getKeyPath('key')}
-              placeholder='Input name'
+              placeholder="Input name"
               autoDisabled={true}
             />
-            <Menu 
+            <Menu
               options={this.getMenuOptions()}
             />
-            <div className='input-close' onClick={this.closeInput}> 
-              <CloseIcon /> 
+            <div className="input-close" onClick={this.closeInput}>
+              <CloseIcon />
             </div>
           </div>
-          <div className='input-bottom-row'>
+          <div className="input-bottom-row">
           {
             this.renderInputValue()
           }

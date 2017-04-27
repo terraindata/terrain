@@ -45,19 +45,19 @@ THE SOFTWARE.
 require('./Guide.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
 import Util from '../../../util/Util';
-import Actions from "../../data/BuilderActions";
-import Card from "../cards/Card";
-import PureClasss from './../../../common/components/PureClasss';
 import BuilderTypes from '../../BuilderTypes';
-import {IQuery, ICondition, IExpression, EExpressionType, EScreen} from './Guide';
+import Actions from '../../data/BuilderActions';
+import Card from '../cards/Card';
+import PureClasss from './../../../common/components/PureClasss';
+import {EExpressionType, EScreen, ICondition, IExpression, IQuery} from './Guide';
 import SelectScreen from './SelectScreen';
-let L = Immutable.List;
-let M = Immutable.Map;
+const L = Immutable.List;
+const M = Immutable.Map;
 
 export interface Props
 {
@@ -68,34 +68,34 @@ export interface Props
 
 interface State
 {
-  
+
 }
 
 class Screen extends PureClasss<Props>
 {
   state: State = {
   };
-  
-  constructor(props:Props)
+
+  constructor(props: Props)
   {
     super(props);
   }
-  
+
   render()
   {
-    let {screen, query} = this.props;
-    
+    const {screen, query} = this.props;
+
     return (
       <div
-        className='guide'
+        className="guide"
       >
-        <div className='guide-left'>
-          <div className='guide-title'>
+        <div className="guide-left">
+          <div className="guide-title">
             Guide
           </div>
         </div>
-        <div className='guide-right'>
-          <div className='guide-title'>
+        <div className="guide-right">
+          <div className="guide-title">
             Your Query
           </div>
         </div>

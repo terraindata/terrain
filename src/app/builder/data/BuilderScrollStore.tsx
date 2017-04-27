@@ -42,11 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
+const _ = require('underscore');
 import * as Immutable from 'immutable';
-import { Map, List } from 'immutable';
+import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';
-var Redux = require('redux');
+const Redux = require('redux');
 
 export class BuilderScrollStateClass
 {
@@ -56,12 +56,12 @@ export class BuilderScrollStateClass
   totalHeight: number = 0;
 }
 export interface BuilderScrollState extends BuilderScrollStateClass, IMap<BuilderScrollState> {}
-let BuilderScrollState_Record = Immutable.Record(new BuilderScrollStateClass());
-let _BuilderScrollState = (config?:any) => {
+const BuilderScrollState_Record = Immutable.Record(new BuilderScrollStateClass());
+const _BuilderScrollState = (config?: any) => {
   return new BuilderScrollState_Record(config || {}) as any as BuilderScrollState;
 };
 
-var DefaultState = _BuilderScrollState();
+const DefaultState = _BuilderScrollState();
 
 interface BuilderScrollAction
 {
@@ -72,7 +72,7 @@ interface BuilderScrollAction
     columnHeight: number;
     columnScroll: number;
     totalHeight: number;
-  }
+  };
 }
 
 export const BuilderScrollStore: IStore<BuilderScrollState> = Redux.createStore(
@@ -80,9 +80,9 @@ export const BuilderScrollStore: IStore<BuilderScrollState> = Redux.createStore(
     scroll:
       (state: BuilderScrollState, action: BuilderScrollAction) =>
       {
-        let {columnTop, columnHeight, columnScroll, totalHeight} = action.payload;
+        const {columnTop, columnHeight, columnScroll, totalHeight} = action.payload;
 
-        if(
+        if (
           columnTop !== state.columnTop || columnHeight !== state.columnHeight
           || columnScroll !== state.columnScroll || totalHeight !== state.totalHeight
         )
@@ -95,8 +95,8 @@ export const BuilderScrollStore: IStore<BuilderScrollState> = Redux.createStore(
         }
 
         return state;
-      }
-  }, DefaultState), 
+      },
+  }, DefaultState),
 DefaultState);
 
 export function scrollAction(columnTop: number, columnHeight: number, columnScroll: number, totalHeight: number)
@@ -109,8 +109,8 @@ export function scrollAction(columnTop: number, columnHeight: number, columnScro
       columnHeight,
       columnScroll,
       totalHeight,
-    }
-  })
+    },
+  });
 }
 
 export default BuilderScrollStore;

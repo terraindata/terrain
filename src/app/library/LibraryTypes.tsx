@@ -42,15 +42,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
-import Util from './../util/Util';
-import UserTypes from './../users/UserTypes';
-import RoleTypes from './../roles/RoleTypes';
-import BuilderTypes from './../builder/BuilderTypes';
-import {IResultsConfig} from '../builder/components/results/ResultsConfig';
 import * as Immutable from 'immutable';
+import * as _ from 'underscore';
+import {IResultsConfig} from '../builder/components/results/ResultsConfig';
+import BuilderTypes from './../builder/BuilderTypes';
+import RoleTypes from './../roles/RoleTypes';
+import UserTypes from './../users/UserTypes';
+import Util from './../util/Util';
 const {List, Map} = Immutable;
-import {New, BaseClass} from '../Classes';
+import {BaseClass, New} from '../Classes';
 
 export module LibraryTypes
 {
@@ -65,14 +65,14 @@ export module LibraryTypes
 
   class VariantC
   {
-    type = "variant";
+    type = 'variant';
 
-    id = "";
-    name = "";
-    lastEdited = "";
-    lastUsername = "";
-    algorithmId = "";
-    groupId = "";
+    id = '';
+    name = '';
+    lastEdited = '';
+    lastUsername = '';
+    algorithmId = '';
+    groupId = '';
     status = EVariantStatus.Build;
     version = false;
     db = 'urbansitter';
@@ -86,13 +86,13 @@ export module LibraryTypes
     dbFields = ['groupId', 'algorithmId', 'status'];
     dataFields = ['name', 'lastEdited', 'lastUsername', 'query', 'db', 'isDefault', 'modelVersion'];
     modelVersion = 1;
-    static getDb: (v:Variant) => string;
+    static getDb: (v: Variant) => string;
   }
-  VariantC.getDb = (v:Variant) => v.db;
+  VariantC.getDb = (v: Variant) => v.db;
   export interface Variant extends VariantC, IRecord<Variant> {}
   const Variant_Record = Immutable.Record(new VariantC());
-  export const _Variant = (config?:any) => {
-    if(config && !config.modelVersion)
+  export const _Variant = (config?: any) => {
+    if (config && !config.modelVersion)
     {
       // from modelVersion 0 to 1
       config.modelVersion = 1;
@@ -110,7 +110,7 @@ export module LibraryTypes
     config.query = BuilderTypes._Query(config.query);
 
     let v = new Variant_Record(config) as any as Variant;
-    if(!config || !config.lastUsername || !config.lastEdited)
+    if (!config || !config.lastUsername || !config.lastEdited)
     {
       v = touchVariant(v);
     }
@@ -139,23 +139,23 @@ export module LibraryTypes
 
   class AlgorithmC
   {
-    id = "";
-    name = "";
-    lastEdited = "";
-    lastUsername = "";
-    groupId = "";
+    id = '';
+    name = '';
+    lastEdited = '';
+    lastUsername = '';
+    groupId = '';
     variantsOrder = List([]);
     status = EAlgorithmStatus.Live;
     db = 'urbansitter';
 
     // for DB storage
-    type = "algorithm";
+    type = 'algorithm';
     dbFields = ['groupId', 'status'];
     dataFields = ['name', 'lastEdited', 'lastUsername', 'variantsOrder', 'db'];
   }
   const Algorithm_Record = Immutable.Record(new AlgorithmC());
   export interface Algorithm extends AlgorithmC, IRecord<Algorithm> {}
-  export const _Algorithm = (config?:any) => {
+  export const _Algorithm = (config?: any) => {
     config = Util.extendId(config || {});
     config.variantsOrder = List(config.variantsOrder || []);
     return new Algorithm_Record(config) as any as Algorithm;
@@ -184,32 +184,32 @@ export module LibraryTypes
 
   class GroupC
   {
-    id = "";
-    name = "";
-    lastEdited = "";
-    lastUsername = "";
+    id = '';
+    name = '';
+    lastEdited = '';
+    lastUsername = '';
     usernames = List([]);
     algorithmsOrder = List([]);
     status = EGroupStatus.Live;
     db = 'urbansitter';
 
     // for DB storage
-    type = "group";
+    type = 'group';
     dbFields = ['status'];
     dataFields = ['name', 'lastEdited', 'lastUsername', 'algorithmsOrder', 'db'];
   }
   const Group_Record = Immutable.Record(new GroupC());
   export interface Group extends GroupC, IRecord<Group> {}
-  export const _Group = (config?:any) => {
+  export const _Group = (config?: any) => {
     config = Util.extendId(config || {});
     config.usernames = List(config.usernames || []);
     config.algorithmsOrder = List(config.algorithmsOrder || []);
     return new Group_Record(config) as any as Group;
   };
 
-  export function nameForStatus(status:EVariantStatus | string): string
+  export function nameForStatus(status: EVariantStatus | string): string
   {
-    switch(status)
+    switch (status)
     {
       case EVariantStatus.Approve:
         return 'Approve';
@@ -226,9 +226,9 @@ export module LibraryTypes
     }
   }
 
-  export function colorForStatus(status:EVariantStatus | string): string
+  export function colorForStatus(status: EVariantStatus | string): string
   {
-    switch(status)
+    switch (status)
     {
       case EVariantStatus.Approve:
         return '#bf5bff';
@@ -248,7 +248,7 @@ export module LibraryTypes
   export function getDbFor(item: Variant | Algorithm | Group | BuilderTypes.Query): string
   {
     // TODO change when DB is at algorithm level
-    switch(item && item.type)
+    switch (item && item.type)
     {
       case 'query':
         // const variantId = (item as BuilderTypes.Query).variantId;

@@ -42,74 +42,74 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import BuilderTypes from './BuilderTypes';
 import * as Immutable from 'immutable';
-import {BuilderStore, BuilderState} from './data/BuilderStore';
+import BuilderTypes from './BuilderTypes';
+import {BuilderState, BuilderStore} from './data/BuilderStore';
 
 export module BuilderHelpers
 {
-  export function getTermsForKeyPath(keyPath:KeyPath): List<string>
+  export function getTermsForKeyPath(keyPath: KeyPath): List<string>
   {
-    let state = BuilderStore.getState();
-    
-    let terms = getTermsForKeyPathHelper(keyPath, state);
-    
+    const state = BuilderStore.getState();
+
+    const terms = getTermsForKeyPathHelper(keyPath, state);
+
     // TODO migrate inputs reduction to the Query class if we get a query class
-    let inputs = state.query && state.query.inputs;
-    if(inputs && inputs.size)
+    const inputs = state.query && state.query.inputs;
+    if (inputs && inputs.size)
     {
-      let inputTerms = inputs.map(
-        (input:BuilderTypes.IInput) => 'input.' + input.key
+      const inputTerms = inputs.map(
+        (input: BuilderTypes.IInput) => 'input.' + input.key,
       ).toList();
-      if(terms)
+      if (terms)
       {
         return inputTerms.concat(terms).toList();
       }
       return inputTerms;
     }
-    
+
     return terms;
   }
-  
-  function getTermsForKeyPathHelper(keyPath:KeyPath, state:BuilderState): List<string>
+
+  function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState): List<string>
   {
-    if(!keyPath.size)
+    if (!keyPath.size)
     {
       return Immutable.List([]);
     }
-    
+
     let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state);
 
-    let block = BuilderStore.getState().getIn(keyPath);
-    
-    if(block._isCard)
+    const block = BuilderStore.getState().getIn(keyPath);
+
+    if (block._isCard)
     {
-      let card = block as BuilderTypes.ICard;
-      
-      if(card.static.getChildTerms)
+      const card = block as BuilderTypes.ICard;
+
+      if (card.static.getChildTerms)
       {
         terms = terms.concat(card.static.getChildTerms(card)).toList();
       }
-      
-      if(card.static.getNeighborTerms)
+
+      if (card.static.getNeighborTerms)
       {
-        terms = terms.concat(card.static.getNeighborTerms(card)).toList(); 
+        terms = terms.concat(card.static.getNeighborTerms(card)).toList();
       }
-      
-      if(card['cards'])
+
+      if (card['cards'])
       {
         card['cards'].map(
           (childCard: BuilderTypes.ICard) =>
           {
-            if(childCard.static.getParentTerms)
+            if (childCard.static.getParentTerms)
             {
               terms = terms.concat(childCard.static.getParentTerms(childCard)).toList();
             }
-          }
+          },
         );
       }
     }
-    
+
     return terms;
   }
 }

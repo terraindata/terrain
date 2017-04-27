@@ -57,7 +57,7 @@ class ColorManager
     '#FF9900',
     '#5F7D8C',
   ];
-  
+
   private static DARKER_COLORS =
   [
     '#00809a',
@@ -71,7 +71,7 @@ class ColorManager
     '#b27500',
     '#426057',
   ];
-  
+
   private static ALT_COLORS =
   [
     '#00A7F7',
@@ -85,30 +85,30 @@ class ColorManager
     '#FFC200',
     '#5F7D8C',
   ];
-  
+
   private static keyToIndex: { [s: string]: number; } = {};
-  
+
   private static secondaryKeyToKey: { [s: string]: string; } = {};
-  
+
   private static keyToSecondaryKey: { [s: string]: string; } = {};
-  
+
   private static currentIndex: number = 0;
-  
+
   private static readIndexForKey(key: string): number
   {
-    if(this.keyToIndex[key] !== undefined)
+    if (this.keyToIndex[key] !== undefined)
     {
       return this.keyToIndex[key];
     }
-    
-    if(this.secondaryKeyToKey[key])
+
+    if (this.secondaryKeyToKey[key])
     {
       return this.keyToIndex[this.secondaryKeyToKey[key]];
     }
-    
+
     return null;
   }
-  
+
   // Returns the color for the given key
   //  if no color has been assigned to that key yet,
   //  it will assign a color to that key, and also map
@@ -116,74 +116,73 @@ class ColorManager
   // Limit of one secondaryKey per Key
   private static indexForKey(key: string, secondaryKey?: string): number
   {
-    if(this.keyToIndex[key] !== undefined)
+    if (this.keyToIndex[key] !== undefined)
     {
-      if(secondaryKey && this.keyToSecondaryKey[key] !== secondaryKey)
+      if (secondaryKey && this.keyToSecondaryKey[key] !== secondaryKey)
       {
-        if(this.keyToSecondaryKey[key])
+        if (this.keyToSecondaryKey[key])
         {
           // have to remove the old copy
           delete this.secondaryKeyToKey[this.keyToSecondaryKey[key]];
         }
-        
+
         this.keyToSecondaryKey[key] = secondaryKey;
         this.secondaryKeyToKey[secondaryKey] = key;
       }
-      
+
       return this.keyToIndex[key];
     }
-    
+
     // Insert
     this.keyToIndex[key] = (this.currentIndex ++) % this.COLORS.length;
-    if(secondaryKey)
+    if (secondaryKey)
     {
       this.keyToSecondaryKey[key] = secondaryKey;
       this.secondaryKeyToKey[secondaryKey] = key;
     }
-    
+
     return this.keyToIndex[key];
   }
-  
-  
+
   // Public
-  
+
   static colorForKey(key: string, secondaryKey?: string): string
   {
     return this.COLORS[this.indexForKey(key, secondaryKey)];
   }
-  
+
   static altColorForKey(key: string, secondaryKey?: string): string
   {
     return this.ALT_COLORS[this.indexForKey(key, secondaryKey)];
   }
-  
+
   static darkerColorForKey(key: string, secondaryKey?: string): string
   {
     return this.DARKER_COLORS[this.indexForKey(key)];
   }
-  
+
   static readColorForKey(key: string)
   {
-    var index = this.readIndexForKey(key);
-    if(index === null)
+    const index = this.readIndexForKey(key);
+    if (index === null)
     {
       return null;
     }
-    
+
     return this.COLORS[index];
   }
-  
+
   static readDarkerColorForKey(key: string)
   {
-    var index = this.readIndexForKey(key);
-    if(index === null)
+    const index = this.readIndexForKey(key);
+    if (index === null)
     {
       return null;
     }
-    
+
     return this.COLORS[index];
   }
-  
+
 }
 
 export default ColorManager;

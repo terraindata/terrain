@@ -44,12 +44,12 @@ THE SOFTWARE.
 
 
 require('./Dropdown.less');
+import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as classNames from 'classnames';
+import Actions from '../../builder/data/BuilderActions';
 import Util from '../../util/Util';
-import Actions from "../../builder/data/BuilderActions";
 import PureClasss from './../../common/components/PureClasss';
 
 export interface Props
@@ -79,22 +79,22 @@ class Dropdown extends PureClasss<Props>
   _clickHandlers: {[index: number]: () => void} = {};
   clickHandler(index)
   {
-    if(!this._clickHandlers[index])
+    if (!this._clickHandlers[index])
     {
       this._clickHandlers[index] = () =>
       {
-        var pr = this.props;
-        if(pr.keyPath)
+        const pr = this.props;
+        if (pr.keyPath)
         {
           Actions.change(pr.keyPath, pr.values ? pr.values[index] : index);
         }
-        if(pr.onChange)
+        if (pr.onChange)
         {
           pr.onChange(index, {
-            target: ReactDOM.findDOMNode(this)
+            target: ReactDOM.findDOMNode(this),
           });
         }
-      }
+      };
     }
 
     return this._clickHandlers[index];
@@ -105,8 +105,8 @@ class Dropdown extends PureClasss<Props>
     return (
       <div
         className={classNames({
-          "dropdown-option": true,
-          "dropdown-option-selected": index === this.props.selectedIndex,
+          'dropdown-option': true,
+          'dropdown-option-selected': index === this.props.selectedIndex,
         })}
         key={index}
         onClick={this.clickHandler(index)}
@@ -130,18 +130,18 @@ class Dropdown extends PureClasss<Props>
 
   toggleOpen()
   {
-    if(!this.props.canEdit)
+    if (!this.props.canEdit)
     {
       return;
     }
 
-    if(!this.state.open)
+    if (!this.state.open)
     {
       $(document).on('click', this.close);
     }
 
-    var cr = this.refs['value']['getBoundingClientRect']();
-    var windowBottom = window.innerHeight;
+    const cr = this.refs['value']['getBoundingClientRect']();
+    const windowBottom = window.innerHeight;
 
     this.setState({
       open: !this.state.open,
@@ -154,7 +154,7 @@ class Dropdown extends PureClasss<Props>
     // Element with options, rendered at the top or bottom of the dropdown
 
     let optionsEl: El = null;
-    if(this.state.open)
+    if (this.state.open)
     {
       optionsEl =
         <div className="dropdown-options-wrapper">
@@ -164,18 +164,18 @@ class Dropdown extends PureClasss<Props>
             :
               'No options available'
           }
-        </div>
+        </div>;
     }
 
     return (
       <div
         onClick={this.toggleOpen}
         className={classNames({
-          "dropdown-wrapper": true,
-          "dropdown-up": this.state.up,
-          "dropdown-open": this.state.open,
-          "dropdown-disabled": !this.props.canEdit,
-          "dropdown-center": this.props.centerAlign,
+          'dropdown-wrapper': true,
+          'dropdown-up': this.state.up,
+          'dropdown-open': this.state.open,
+          'dropdown-disabled': !this.props.canEdit,
+          'dropdown-center': this.props.centerAlign,
           [this.props.className]: !!this.props.className,
         })}
       >
@@ -194,14 +194,14 @@ class Dropdown extends PureClasss<Props>
               <div
                 key={index}
                 className={classNames({
-                  "dropdown-option-inner": true,
-                  "dropdown-option-value-selected": index === this.props.selectedIndex,
+                  'dropdown-option-inner': true,
+                  'dropdown-option-value-selected': index === this.props.selectedIndex,
                 })}
               >
                 {
                   option
                 }
-              </div>
+              </div>,
             )
           }
         </div>
