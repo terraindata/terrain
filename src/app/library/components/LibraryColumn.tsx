@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 require('./LibraryColumn.less');
 
+import * as classNames from 'classnames';
 import * as React from 'react';
 import Classs from './../../common/components/Classs';
-import * as classNames from 'classnames';
 
 export interface Props
 {
@@ -62,9 +62,9 @@ class LibraryColumn extends Classs<Props>
       <div
         className={'library-column library-column-' + this.props.index}
       >
-        { 
-          this.props.title ? 
-            <div className='library-column-title'>
+        {
+          this.props.title ?
+            <div className="library-column-title">
               { this.props.title }
             </div>
           : null
@@ -73,11 +73,11 @@ class LibraryColumn extends Classs<Props>
           'library-column-content': true,
           'library-column-content-no-title': !this.props.title,
         })}>
-          { 
+          {
             this.props['children']
           }
         </div>
-        <div className='library-column-border' />
+        <div className="library-column-border" />
       </div>
     );
   }

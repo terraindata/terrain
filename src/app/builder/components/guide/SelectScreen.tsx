@@ -42,55 +42,54 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import GuideConfig from './GuideConfig';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
 import Util from '../../../util/Util';
-import Actions from "../../data/BuilderActions";
-import Card from "../cards/Card";
-import PureClasss from './../../../common/components/PureClasss';
 import BuilderTypes from '../../BuilderTypes';
-import {IQuery, ICondition, IExpression, EExpressionType, EScreen} from './Guide';
-let L = Immutable.List;
-let M = Immutable.Map;
+import Actions from '../../data/BuilderActions';
+import Card from '../cards/Card';
+import PureClasss from './../../../common/components/PureClasss';
+import {EExpressionType, EScreen, ICondition, IExpression, IQuery} from './Guide';
+import GuideConfig from './GuideConfig';
+const L = Immutable.List;
+const M = Immutable.Map;
 
 export interface Props
 {
   screen: EScreen;
   query: IQuery;
-  onQueryChange: (query:IQuery) => void;
+  onQueryChange: (query: IQuery) => void;
 }
 
 interface State
 {
-  
+
 }
 
 class SelectScreen extends PureClasss<Props>
 {
   state: State = {
   };
-  
-  constructor(props:Props)
+
+  constructor(props: Props)
   {
     super(props);
   }
-  
+
   render()
   {
-    let {query} = this.props;
-    let screen = GuideConfig.screens[this.props.screen];
-    
+    const {query} = this.props;
+    const screen = GuideConfig.screens[this.props.screen];
+
     return (
       <div
-        className='screen'
+        className="screen"
       >
-        
-        
+
       </div>
     );
   }

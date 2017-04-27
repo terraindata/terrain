@@ -43,14 +43,13 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
-import {EScreen, EExpressionType} from './Guide';
-
+import {EExpressionType, EScreen} from './Guide';
 
 export enum EScreenType
 {
   // given a list of items, choose the applicable one(s)
   LIST,
-  
+
   // add items to a set of items
   ADD,
 }
@@ -62,40 +61,40 @@ interface IScreenConfig
   next: EScreen;
   back: EScreen;
   type: EScreenType;
-  
+
   listOptions?: List<string>; // for lists
-  listMulti?: boolean;// multiple options can be chosen
+  listMulti?: boolean; // multiple options can be chosen
 }
 
 const GuideConfig: {
-  screens: {[screen:number]:IScreenConfig},
+  screens: {[screen: number]: IScreenConfig},
 } = {
-  screens: 
+  screens:
   {
     [EScreen.FROM]:
     {
-      title: "Tables",
-      prompt: "Which tables do you need for your query?",
+      title: 'Tables',
+      prompt: 'Which tables do you need for your query?',
       next: EScreen.WHERE,
       back: null,
       type: EScreenType.LIST,
       listOptions: Immutable.List(['sitters', 'bookings', 'reviews', 'bookmarks', 'reports']),
       listMulti: true,
     },
-    
+
     [EScreen.WHERE]:
     {
       title: 'Where',
-      prompt: "Would you like to filter a specific set of results?",
+      prompt: 'Would you like to filter a specific set of results?',
       next: EScreen.SELECT,
       back: EScreen.FROM,
       type: EScreenType.ADD,
     },
-    
+
     [EScreen.SELECT]:
     {
       title: 'Select',
-      prompt: "Which fields do you need?",
+      prompt: 'Which fields do you need?',
       next: EScreen.ALL,
       back: EScreen.WHERE,
       type: EScreenType.LIST,

@@ -45,12 +45,12 @@ THE SOFTWARE.
 import * as $ from 'jquery';
 import * as _ from 'underscore';
 
-import AuthStore from './../auth/data/AuthStore';
 import Actions from './../auth/data/AuthActions';
-import UserTypes from './../users/UserTypes';
-import RoleTypes from './../roles/RoleTypes';
-import LibraryTypes from './../library/LibraryTypes';
+import AuthStore from './../auth/data/AuthStore';
 import BuilderTypes from './../builder/BuilderTypes';
+import LibraryTypes from './../library/LibraryTypes';
+import RoleTypes from './../roles/RoleTypes';
+import UserTypes from './../users/UserTypes';
 import Util from './../util/Util';
 
 export interface QueryResponse
@@ -72,30 +72,30 @@ export const Ajax = {
       noToken?: boolean;
       download?: boolean;
       downloadFilename?: string;
-    } = {}
+    } = {},
   )
   {
-    let host = config.host || MIDWAY_HOST;
-    let fullUrl = host + url;
-    let token = AuthStore.getState().get('authenticationToken');
+    const host = config.host || MIDWAY_HOST;
+    const fullUrl = host + url;
+    const token = AuthStore.getState().get('authenticationToken');
 
-    if(config.download)
+    if (config.download)
     {
-      let form = document.createElement("form");
-      form.setAttribute("action", fullUrl);
-      form.setAttribute("method", "post");
+      const form = document.createElement('form');
+      form.setAttribute('action', fullUrl);
+      form.setAttribute('method', 'post');
 
-      let dataObj: _.Dictionary<string> = {
+      const dataObj: _.Dictionary<string> = {
         data,
         token,
         filename: config.downloadFilename,
       };
       _.map(dataObj, (value, key) =>
       {
-        let input = document.createElement("input");
-        input.setAttribute("type", "hidden");
-        input.setAttribute("name", key + "");
-        input.setAttribute("value", value);
+        const input = document.createElement('input');
+        input.setAttribute('type', 'hidden');
+        input.setAttribute('name', key + '');
+        input.setAttribute('value', value);
         form.appendChild(input);
       });
 
@@ -105,9 +105,9 @@ export const Ajax = {
       return;
     }
 
-    let xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.onerror = config && config.onError;
-    xhr.onload = (ev:Event) =>
+    xhr.onload = (ev: Event) =>
     {
       if (xhr.status === 401)
       {
@@ -118,7 +118,7 @@ export const Ajax = {
       if (xhr.status != 200)
       {
         config && config.onError && config.onError({
-          error: xhr.responseText
+          error: xhr.responseText,
         });
         return;
       }
@@ -129,44 +129,44 @@ export const Ajax = {
     // NOTE: MIDWAY_HOST will be replaced by the build process.
     xhr.open(method, fullUrl, true);
 
-    if(!config.noToken)
+    if (!config.noToken)
     {
       xhr.setRequestHeader('token', token);
     }
 
-    if(config.crossDomain)
+    if (config.crossDomain)
     {
       xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
-      xhr.setRequestHeader('Access-Control-Allow-Headers','Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Origin');
+      xhr.setRequestHeader('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Origin');
     }
 
     xhr.send(data);
     return xhr;
   },
 
-  _post(url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void)
+  _post(url: string, data: any, onLoad: (response: any) => void, onError?: (ev: Event) => void)
   {
-    return Ajax._req("POST", url, data, onLoad, {onError});
+    return Ajax._req('POST', url, data, onLoad, {onError});
   },
 
-  _get(url: string, data: any, onLoad: (response: any) => void, onError?: (ev:Event) => void)
+  _get(url: string, data: any, onLoad: (response: any) => void, onError?: (ev: Event) => void)
   {
-    return Ajax._req("GET", url, data, onLoad, {onError});
+    return Ajax._req('GET', url, data, onLoad, {onError});
   },
 
   _r(
-    url:string,
-    reqFields: {[f:string]:any},
-    onLoad: (resp:string) => void,
-    onError?: (ev:Event) => void,
+    url: string,
+    reqFields: {[f: string]: any},
+    onLoad: (resp: string) => void,
+    onError?: (ev: Event) => void,
     options: {
       download?: boolean;
       downloadFilename?: string;
       useMidway?: boolean;
-    } = {}
+    } = {},
   ): { xhr: XMLHttpRequest, queryId: string }
   {
-    let unique_id = "" + Math.random();
+    const unique_id = '' + Math.random();
     return {
       xhr:
         Ajax._req('POST', url, JSON.stringify(_.extend(
@@ -184,39 +184,39 @@ export const Ajax = {
             // crossDomain: ! options.useMidway,
             download: options.download,
             downloadFilename: options.downloadFilename,
-          }
+          },
         ),
       queryId: unique_id,
     };
   },
 
-  saveRole: (role:RoleTypes.Role) =>
+  saveRole: (role: RoleTypes.Role) =>
     Ajax._post(
       `/roles/${role.groupId}/${role.username}/${role.admin ? '1' : '0'}/${role.builder ? '1' : '0'}`,
-      "",
+      '',
       _.noop),
 
   getRoles: (onLoad: (roles: any[]) => void) =>
-    Ajax._get("/roles/", "", (response: any) => {
+    Ajax._get('/roles/', '', (response: any) => {
       onLoad(JSON.parse(response));
     })
   ,
 
   getUsers(onLoad: (users: {[id: string]: any}) => void)
   {
-    return Ajax._get("/users/", "", (response: any) =>
+    return Ajax._get('/users/', '', (response: any) =>
       {
-        let usersArr = JSON.parse(response);
-        var usersObj = {};
-        usersArr.map(user => usersObj[user.username] = user);
+        const usersArr = JSON.parse(response);
+        const usersObj = {};
+        usersArr.map((user) => usersObj[user.username] = user);
         onLoad(usersObj);
       });
   },
 
   saveUser(user: UserTypes.User, onSave: (response: any) => void, onError: (response: any) => void)
   {
-    var data = user.toJS();
-    user.excludeFields.map(field => delete data[field]);
+    const data = user.toJS();
+    user.excludeFields.map((field) => delete data[field]);
     return Ajax._post(`/users/${user.username}`, JSON.stringify({
       data: JSON.stringify(data),
     }), onSave, onError);
@@ -247,48 +247,48 @@ export const Ajax = {
 
   getItems(
     onLoad: (groups: {[id: string]: any}, algorithms: {[id: string]: any}, variants: {[id: string]: any}, groupsOrder: ID[]) => void,
-    onError?: (ev:Event) => void
+    onError?: (ev: Event) => void,
   )
   {
-    return Ajax._get("/items/", "", (response: any) =>
+    return Ajax._get('/items/', '', (response: any) =>
     {
-      let items = JSON.parse(response);
+      const items = JSON.parse(response);
 
-      var mapping =
+      const mapping =
       {
         variants: {},
         algorithms: {},
         groups: {},
         groupsOrder: [],
       };
-      let keys = ['groups', 'algorithms', 'variants'];
-      keys.map(key =>
-        items[key].map(item =>
+      const keys = ['groups', 'algorithms', 'variants'];
+      keys.map((key) =>
+        items[key].map((item) =>
         {
-          let data = item.data && item.data.length ? item.data : "{}";
+          const data = item.data && item.data.length ? item.data : '{}';
           item = _.extend({}, JSON.parse(item.data), item);
           delete item.data;
           mapping[key][item.id] = item;
-          if(key === 'groups')
+          if (key === 'groups')
           {
             mapping.groupsOrder.push(item.id);
           }
-        })
+        }),
       );
 
       onLoad(mapping.groups, mapping.algorithms, mapping.variants, mapping.groupsOrder);
     }, onError);
   },
 
-  getItem(type: string, id: ID, onLoad: (item: any) => void, onError?: (ev:Event) => void)
+  getItem(type: string, id: ID, onLoad: (item: any) => void, onError?: (ev: Event) => void)
   {
-    return Ajax._get(`/items/${id}`, "", (response: any) =>
+    return Ajax._get(`/items/${id}`, '', (response: any) =>
     {
       // TODO change if the middle tier format changes
-      let r = JSON.parse(response);
-      let all = r && r[type + 's'];
-      var item = all && all.find(i => i.id === id);
-      if(item)
+      const r = JSON.parse(response);
+      const all = r && r[type + 's'];
+      const item = all && all.find((i) => i.id === id);
+      if (item)
       {
         _.extend(item, JSON.parse(item.data));
         delete item.data;
@@ -299,7 +299,7 @@ export const Ajax = {
 
   getVariant(variantId: ID, onLoad: (variant: LibraryTypes.Variant) => void)
   {
-    if(variantId.indexOf('@') === -1)
+    if (variantId.indexOf('@') === -1)
     {
       return Ajax.getItem(
         'variant',
@@ -307,31 +307,31 @@ export const Ajax = {
         (variantData: Object) =>
         {
           onLoad(LibraryTypes._Variant(variantData));
-        }
+        },
       );
     }
     else
     {
       return Ajax.getVariantVersion(
         variantId,
-        onLoad
+        onLoad,
       );
     }
   },
 
   getVariantVersions(variantId: ID, onLoad: (variantVersions: any) => void)
   {
-    var url = '/variant_versions/' + variantId;
-    return Ajax._get(url, "", (response: any) =>
+    const url = '/variant_versions/' + variantId;
+    return Ajax._get(url, '', (response: any) =>
     {
-      let variantVersions = JSON.parse(response);
+      const variantVersions = JSON.parse(response);
       onLoad(variantVersions);
     });
   },
 
   getVariantVersion(variantId: ID, onLoad: (variantVersion: any) => void)
   {
-    if(!variantId || variantId.indexOf('@') === -1)
+    if (!variantId || variantId.indexOf('@') === -1)
     {
       onLoad(null);
       return null;
@@ -342,19 +342,19 @@ export const Ajax = {
     const originalVariantId = pieces[0];
     const versionId = pieces[1];
 
-    var url = '/variant_versions/' + originalVariantId;
+    const url = '/variant_versions/' + originalVariantId;
     return Ajax._get(
       url,
-      "",
+      '',
       (response: any) =>
       {
-        let version = JSON.parse(response).find(version => version.id === versionId);
-        if(version)
+        const version = JSON.parse(response).find((version) => version.id === versionId);
+        if (version)
         {
-          let data = JSON.parse(version.data);
+          const data = JSON.parse(version.data);
           Ajax.getVariant(originalVariantId, (v: LibraryTypes.Variant) =>
           {
-            if(v)
+            if (v)
             {
               data['id'] = v.id;
               data['groupId'] = v.groupId;
@@ -368,23 +368,23 @@ export const Ajax = {
             {
               onLoad(null);
             }
-          })
+          });
         }
         else
         {
           onLoad(null);
         }
       },
-      () => onLoad(null)
+      () => onLoad(null),
     );
   },
 
   getQuery(
     variantId: ID,
-    onLoad: (query: BuilderTypes.Query, variant: LibraryTypes.Variant) => void
+    onLoad: (query: BuilderTypes.Query, variant: LibraryTypes.Variant) => void,
   )
   {
-    if(!variantId)
+    if (!variantId)
     {
       return;
     }
@@ -392,7 +392,7 @@ export const Ajax = {
     // TODO change if we store queries separate from variants
     const load = (v: LibraryTypes.Variant) =>
     {
-      if(!v || !v.query)
+      if (!v || !v.query)
       {
         onLoad(null, v);
       }
@@ -401,26 +401,26 @@ export const Ajax = {
 
     return Ajax.getVariant(
       variantId,
-      load
+      load,
     );
   },
 
-  saveItem(item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group, onLoad?: (resp: any) => void, onError?: (ev:Event) => void)
+  saveItem(item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group, onLoad?: (resp: any) => void, onError?: (ev: Event) => void)
   {
-    let id = item.get('id');
-    let type = item.get('type');
-    var obj = {
+    const id = item.get('id');
+    const type = item.get('type');
+    const obj = {
       data: {},
     };
-    item.get('dbFields').map(field =>
-      obj[field] = Util.asJS(item.get(field))
+    item.get('dbFields').map((field) =>
+      obj[field] = Util.asJS(item.get(field)),
     );
-    item.get('dataFields').map(field =>
-        obj.data[field] = Util.asJS(item.get(field))
+    item.get('dataFields').map((field) =>
+        obj.data[field] = Util.asJS(item.get(field)),
     );
     obj.data = JSON.stringify(obj.data);
     onLoad = onLoad || _.noop;
-    return Ajax._req("POST", `/${type}s/${id}`, JSON.stringify(obj), onLoad, onError);
+    return Ajax._req('POST', `/${type}s/${id}`, JSON.stringify(obj), onLoad, onError);
   },
 
   // run query, consider renaming
@@ -428,40 +428,40 @@ export const Ajax = {
     tql: string,
     db: string,
     onLoad: (response: QueryResponse) => void,
-    onError?: (ev:Event) => void,
+    onError?: (ev: Event) => void,
     sqlQuery?: boolean,
     options: {
       csv?: boolean,
       csvName?: string,
-    } = {}
+    } = {},
   )
   {
     // kill queries running under the same id
     // Ajax.killQueries(); // TODO add id
 
     let dest = '/query';
-    if(options.csv)
+    if (options.csv)
     {
-      dest = '/query_csv'
+      dest = '/query_csv';
     }
-    else if(sqlQuery)
+    else if (sqlQuery)
     {
-      dest = '/sql_query'
+      dest = '/sql_query';
     }
 
     return Ajax._r(dest, {
-        "query_string": encode_utf8(tql),
-        "db": db,
-        "format": options.csv ? 'csv' : undefined,
+        query_string: encode_utf8(tql),
+        db,
+        format: options.csv ? 'csv' : undefined,
       },
 
       (resp) =>
       {
-        var respData = null;
+        let respData = null;
         try {
           resp = resp.replace(/\t/g, ' ').replace(/\n/g, ' ');
           respData = JSON.parse(resp);
-        } catch(e) {
+        } catch (e) {
           onError && onError(resp as any);
           return;
         }
@@ -474,29 +474,29 @@ export const Ajax = {
         download: options.csv,
         downloadFilename: options.csvName || 'Results.csv',
         useMidway: options.csv,
-      }
+      },
     );
   },
 
-  parseTree(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev:Event) => void)
+  parseTree(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev: Event) => void)
   {
-    return Ajax._r("/get_tql_tree", {
-        "query_string": encode_utf8(tql),
-        "db": db,
+    return Ajax._r('/get_tql_tree', {
+        query_string: encode_utf8(tql),
+        db,
       },
 
       (resp) =>
       {
-        var respData = null;
+        let respData = null;
         try {
           resp = resp.replace(/\t/g, ''); // tabs cause the JSON parser to error out
           respData = JSON.parse(resp);
-        } catch(e) {
+        } catch (e) {
           onError && onError(resp as any);
           return;
         }
 
-        if(respData.errorMessage)
+        if (respData.errorMessage)
         {
           onError(respData);
           return;
@@ -505,21 +505,21 @@ export const Ajax = {
         onLoad(respData);
       },
 
-      onError
+      onError,
     );
   },
 
-  schema(db: string, onLoad: (columns: any[], error?: any) => void, onError?: (ev:Event) => void)
+  schema(db: string, onLoad: (columns: any[], error?: any) => void, onError?: (ev: Event) => void)
   {
-    return Ajax._r("/get_schema", {
+    return Ajax._r('/get_schema', {
         db,
       },
-      (resp:string) =>
+      (resp: string) =>
       {
-        let cols: any = null;
+        const cols: any = null;
         try
         {
-          let cols = JSON.parse(resp).results;
+          const cols = JSON.parse(resp).results;
           // var tables: {[name:string]: {name: string; columns: any[];}} = {};
 
           // cols.map(
@@ -545,21 +545,21 @@ export const Ajax = {
           // onLoad(_.toArray(tables) as any);
           onLoad(cols);
         }
-        catch(e)
+        catch (e)
         {
           onError && onError(resp as any);
         }
 
-        if(cols)
+        if (cols)
         {
           onLoad(cols as any);
         }
       },
-      onError
+      onError,
       );
   },
 
-  getDbs(onLoad: (dbs: string[]) => void, onError?: (ev:Event) => void)
+  getDbs(onLoad: (dbs: string[]) => void, onError?: (ev: Event) => void)
   {
     Ajax._r('/get_databases', {
       db: 'information_schema',
@@ -567,25 +567,25 @@ export const Ajax = {
     {
       try
       {
-        var list = JSON.parse(resp);
-        onLoad(list.results.map(obj => obj.schema_name));
+        const list = JSON.parse(resp);
+        onLoad(list.results.map((obj) => obj.schema_name));
       }
-      catch(e)
+      catch (e)
       {
         onError && onError(e as any);
       }
-    }, onError)
+    }, onError);
   },
 
   killQuery(id: string)
   {
-    return Ajax._r("/kill_query_by_id", {
-        "query_id": id,
+    return Ajax._r('/kill_query_by_id', {
+        query_id: id,
       },
 
       (resp) =>
       {
-      }
+      },
     );
   },
 
@@ -596,7 +596,7 @@ export const Ajax = {
     // change_conf_dict_mysql[btoa("password")] = btoa(encode_utf8("terrain_webscalesql42"));
     // change_conf_dict_mysql[btoa("db")] = btoa(encode_utf8("BookDB"));
     // change_conf_dict[btoa("mysqlconfig")] = change_conf_dict_mysql;
-  }
+  },
 };
 
 function encode_utf8(s) {
@@ -606,7 +606,5 @@ function encode_utf8(s) {
 function decode_utf8(s) {
   return decodeURIComponent(escape(s));
 }
-
-
 
 export default Ajax;

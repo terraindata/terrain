@@ -42,36 +42,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import RoleTypes from './../roles/RoleTypes';
 import * as Immutable from 'immutable';
+import RoleTypes from './../roles/RoleTypes';
 
 export module UserTypes
 {
-  let _User = Immutable.Record({
+  const _User = Immutable.Record({
     // db-level fields
-    username: "",
+    username: '',
     isAdmin: false,
     isDisabled: false,
 
     // metadata fields
-    firstName: "",
-    lastName: "",
-    whatIDo: "",
-    email: "",
-    skype: "",
+    firstName: '',
+    lastName: '',
+    whatIDo: '',
+    email: '',
+    skype: '',
     timeZone: 158,
-    phone: "",
-    imgSrc: "",
+    phone: '',
+    imgSrc: '',
 
     //notifications fields
-    sound: "chime",
-    emailNotificationType: "Activities of any kind",
-    emailNotificationTiming: "Once every 15 minutes",
-    desktopNotificationType: "Activities of any kind",
+    sound: 'chime',
+    emailNotificationType: 'Activities of any kind',
+    emailNotificationTiming: 'Once every 15 minutes',
+    desktopNotificationType: 'Activities of any kind',
     emailNews: 'on',
 
     // exlcude the db-level fields from the meta-data save
-    excludeFields: ["isAdmin", "username", "disabled"],
+    excludeFields: ['isAdmin', 'username', 'disabled'],
 
     // groupRoles: Immutable.Map({}),
   });
@@ -102,7 +102,7 @@ export module UserTypes
 
     name(): string
     {
-      if(!this.firstName.length && !this.lastName.length)
+      if (!this.firstName.length && !this.lastName.length)
       {
         return this.username.substr(0, 1).toUpperCase() + this.username.substr(1);
       }
@@ -115,7 +115,7 @@ export module UserTypes
 
   export type UserMap = Immutable.Map<ID, UserTypes.User>;
 
-  let _UserState = Immutable.Record({
+  const _UserState = Immutable.Record({
     loading: false,
     loaded: false,
     users: Immutable.Map<ID, User>({}),
@@ -128,15 +128,15 @@ export module UserTypes
     currentUser: User;
   }
 
-  export function profileUrlFor(user:User): string
+  export function profileUrlFor(user: User): string
   {
-    if(user && user.imgSrc)
+    if (user && user.imgSrc)
     {
       return user.imgSrc;
     }
 
-    let code = (user ? user.username : 'a').charCodeAt(0);
-    let index = (code % numProfileImages) + 1;
+    const code = (user ? user.username : 'a').charCodeAt(0);
+    const index = (code % numProfileImages) + 1;
     return '/dist/profiles/profile' + index + '.jpg';
   }
 }

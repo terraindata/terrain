@@ -44,13 +44,13 @@ THE SOFTWARE.
 
 require('./Account.less');
 import * as React from 'react';
-import Classs from './../../common/components/Classs';
-import Store from './../data/UserStore';
-import Actions from './../data/UserActions';
-import LibraryTypes from './../UserTypes';
-import InfoArea from './../../common/components/InfoArea';
 import { Link } from 'react-router';
-var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
+import Classs from './../../common/components/Classs';
+import InfoArea from './../../common/components/InfoArea';
+import Actions from './../data/UserActions';
+import Store from './../data/UserStore';
+import LibraryTypes from './../UserTypes';
+const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
 
 export interface Props
 {
@@ -61,39 +61,39 @@ export interface Props
 class User extends Classs<Props>
 {
   cancelSubscription = null;
-  
+
   constructor(props)
   {
     super(props);
-    
+
     this.state = {
-      istate: Store.getState()
+      istate: Store.getState(),
     };
-    
-    this.cancelSubscription = 
+
+    this.cancelSubscription =
       Store.subscribe(() => this.setState({
-        istate: Store.getState()
-      }))
+        istate: Store.getState(),
+      }));
   }
-  
+
   componentWillMount()
   {
     // Actions.fetch();
   }
-  
+
   componentWillUnmount()
   {
     this.cancelSubscription && this.cancelSubscription();
   }
-  
+
   render()
   {
     const state = this.state.istate;
 
     return (
-      <div className='account'>
-        <div className='account-wrapper'>
-          <div className='account-title'>
+      <div className="account">
+        <div className="account-wrapper">
+          <div className="account-title">
             <HomeIcon />
             User!
           </div>

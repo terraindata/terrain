@@ -43,19 +43,19 @@ THE SOFTWARE.
 */
 
 require('./EasterEggs.less');
-import PureClasss from './../../common/components/PureClasss';
-import * as $ from 'jquery';
-import * as _ from 'underscore';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
 import Util from '../../util/Util';
+import PureClasss from './../../common/components/PureClasss';
 const r = 3;
 export interface Props {
 }
 
-class EasterEggs extends PureClasss<Props>   
+class EasterEggs extends PureClasss<Props>
 {
   state: {
     christmas: boolean;
@@ -70,75 +70,75 @@ class EasterEggs extends PureClasss<Props>
     w: 0,
     h: 0,
   };
-  
+
   componentDidMount()
   {
     // setTimeout(this.startChristmas, 200);
-    let keys = [];
+    const keys = [];
     $('body').keydown((evt) =>
     {
       keys.unshift(evt.keyCode);
-      if(keys[0] === 39 && keys[1] === 37 && keys[2] === 39 && keys[3] === 37 && keys[4] === 40
+      if (keys[0] === 39 && keys[1] === 37 && keys[2] === 39 && keys[3] === 37 && keys[4] === 40
         && keys[5] === 40 && keys[6] === 38 && keys[7] === 38)
       {
         this.startChristmas();
         $('body').keydown(null);
       }
-    })
+    });
   }
-  
+
   dropSnow()
   {
     let {buckets, snow, w, h} = this.state;
-    if(!buckets || !snow) return;
-    
+    if (!buckets || !snow) return;
+
     // new snow
-    let c = Util.randInt(4);
-    _.range(0, c).map(q =>
+    const c = Util.randInt(4);
+    _.range(0, c).map((q) =>
     {
-      let y = Math.floor(h / r);
-      let x = Util.randInt(w / r);
-      
+      const y = Math.floor(h / r);
+      const x = Util.randInt(w / r);
+
       snow = snow.push({ x, y, moving: true });
     });
-    
-    snow = snow.map(s =>
+
+    snow = snow.map((s) =>
     {
-      if(!s.moving)
+      if (!s.moving)
       {
         return s;
       }
-      
+
       let {x, y} = s;
-      if(buckets.get(x) >= y)
+      if (buckets.get(x) >= y)
       {
         buckets = buckets.set(x, buckets.get(x) + 1);
         return {
-          x, y, moving: false
+          x, y, moving: false,
         };
       }
-      
+
       y --;
-      let newx = Util.valueMinMax(x + Util.randInt(3) - 1, 0, Math.floor(w / r));
-      if(buckets.get(newx) < y)
+      const newx = Util.valueMinMax(x + Util.randInt(3) - 1, 0, Math.floor(w / r));
+      if (buckets.get(newx) < y)
       {
         x = newx;
       }
-      
+
       return { x, y, moving: true };
     }).toList();
-    
+
     this.setState({
-      snow, buckets
-    })
+      snow, buckets,
+    });
   }
-  
+
   startChristmas()
   {
-    let w = $('body').width();
-    let h = $('body').height();
-    let buckets = Immutable.List(_.range(0, w / r).map(i => 0));
-    let snow = Immutable.List([]);
+    const w = $('body').width();
+    const h = $('body').height();
+    const buckets = Immutable.List(_.range(0, w / r).map((i) => 0));
+    const snow = Immutable.List([]);
     this.setState({
       buckets,
       snow,
@@ -146,34 +146,34 @@ class EasterEggs extends PureClasss<Props>
       h,
       christmas: true,
     });
-    
+
     setInterval(this.dropSnow, 100);
   }
-  
-  render() 
+
+  render()
   {
-    if(this.state.christmas)
+    if (this.state.christmas)
     {
       return (
-        <div className='snow-egg'>
+        <div className="snow-egg">
           {
-            this.state.snow && this.state.snow.map(s =>
+            this.state.snow && this.state.snow.map((s) =>
               <div
-                className='snow'
+                className="snow"
                 style={{
                   width: r,
                   height: r,
                   left: s.x * r,
                   bottom: s.y * r,
                 }}
-              />
+              />,
             )
           }
           <iframe className="youtube-player" type="text/html" src="http://www.youtube.com/embed/6b9BKK27HuQ?wmode=opaque&autohide=1&autoplay=1">&lt;br /&gt;</iframe>
         </div>
       );
     }
-    
+
     return null;
   }
 }

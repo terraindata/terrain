@@ -42,8 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as React from 'react';
+import * as _ from 'underscore';
 import Classs from './../../common/components/Classs';
 
 const SCROLL_SENSITIVITY = 500;
@@ -52,14 +52,14 @@ export interface Props
 {
   onRequestMoreItems:
     (
-      onItemsLoaded: (unchanged?: boolean) => void
+      onItemsLoaded: (unchanged?: boolean) => void,
       // parent calls this when items are loaded
       //  if there is no change in the items, parent can pass 'true'
       //  to prevent InfinteScroll from making infinite requests.
       //  If the data later change, the parent can simply call the handler again
       //  without 'true'
     ) => void;
-  
+
   className?: string;
   children?: any;
 }
@@ -71,12 +71,12 @@ class Library extends Classs<Props>
   } = {
     unchanged: false,
   };
-  
+
   componentDidMount()
   {
     this.check();
   }
-  
+
   unmounted = false;
   componentWillUnmount()
   {
@@ -84,15 +84,15 @@ class Library extends Classs<Props>
     //  ResultsArea sometimes calls onItemsLoaded after this component has been unmounted
     this.unmounted = true;
   }
-  
+
   handleScroll()
   {
     this.check();
   }
-  
+
   onItemsLoaded(unchanged?: boolean)
   {
-    if(!this.unmounted)
+    if (!this.unmounted)
     {
       this.setState({
         unchanged,
@@ -100,42 +100,42 @@ class Library extends Classs<Props>
       this.check(unchanged);
     }
   }
-  
+
   check(unchanged?: boolean)
   {
-    if(unchanged === undefined)
+    if (unchanged === undefined)
     {
       unchanged = this.state.unchanged;
     }
-    
-    if(unchanged)
+
+    if (unchanged)
     {
       // no change in item state, don't fire a request to parent
       return;
     }
-    
-    let el: any = this.refs['is'];
-    if(!el)
+
+    const el: any = this.refs['is'];
+    if (!el)
     {
       return;
     }
-    
-    let {height} = el.getBoundingClientRect();
-    let {scrollHeight, scrollTop} = el;
-    
-    if(height + scrollTop + SCROLL_SENSITIVITY > scrollHeight)
+
+    const {height} = el.getBoundingClientRect();
+    const {scrollHeight, scrollTop} = el;
+
+    if (height + scrollTop + SCROLL_SENSITIVITY > scrollHeight)
     {
       this.props.onRequestMoreItems(this.onItemsLoaded);
     }
   }
-  
+
   render()
   {
     return (
       <div
         className={this.props.className}
         onScroll={this.handleScroll}
-        ref='is'
+        ref="is"
       >
         { this.props.children }
       </div>

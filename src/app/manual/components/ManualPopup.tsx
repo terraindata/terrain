@@ -43,15 +43,15 @@ THE SOFTWARE.
 */
 
 require('./ManualPopup.less');
-import * as $ from 'jquery';
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../util/Util';
 import * as classNames from 'classnames';
-import Classs from './../../common/components/Classs';
+import * as $ from 'jquery';
+import * as React from 'react';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
 import BuilderTypes from './../../builder/BuilderTypes';
-var InfoIcon = require('./../../../images/icon_info.svg');
-var OpenIcon = require('./../../../images/icon_open.svg');
+import Classs from './../../common/components/Classs';
+const InfoIcon = require('./../../../images/icon_info.svg');
+const OpenIcon = require('./../../../images/icon_open.svg');
 
 export interface Props
 {
@@ -68,7 +68,7 @@ class ManualPopup extends Classs<Props>
     this.state =
     {
       open: false,
-    }
+    };
   }
 
   shouldComponentUpdate(nextProps, nextState)
@@ -95,7 +95,7 @@ class ManualPopup extends Classs<Props>
       open: !this.state.open,
     });
 
-    if(!this.state.open)
+    if (!this.state.open)
     {
       $(document).on('click', this.close);
     }
@@ -109,15 +109,15 @@ class ManualPopup extends Classs<Props>
   render()
   {
 
-    var manualEntry = BuilderTypes.cardList[this.props.cardName]
+    const manualEntry = BuilderTypes.cardList[this.props.cardName]
         && BuilderTypes.Blocks[BuilderTypes.cardList[this.props.cardName]].static.manualEntry;
-    var content = manualEntry ? manualEntry.snippet : 'No description available';
+    const content = manualEntry ? manualEntry.snippet : 'No description available';
     return (
     <div
       className={classNames({
-        "manual-popup-wrapper": true,
-        "manual-popup-open": this.state.open,
-        "manual-popup-wrapper-right-align": this.props.rightAlign
+        'manual-popup-wrapper': true,
+        'manual-popup-open': this.state.open,
+        'manual-popup-wrapper-right-align': this.props.rightAlign,
       })}
     >
       <div
@@ -133,12 +133,12 @@ class ManualPopup extends Classs<Props>
           >
             {content}
             <div
-              className='manual-popup-link'
+              className="manual-popup-link"
               onClick={this.openManual}
             >
               See full description in Manual
               <OpenIcon
-                className='manual-popup-open-icon'
+                className="manual-popup-open-icon"
                 onClick={this.openManual}
               />
             </div>

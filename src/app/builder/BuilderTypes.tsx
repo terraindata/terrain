@@ -42,27 +42,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
-import * as React from 'react';
 import * as Immutable from 'immutable';
-let List = Immutable.List;
-let L = () => List([]);
-let Map = Immutable.Map;
+import * as React from 'react';
+import * as _ from 'underscore';
+const List = Immutable.List;
+const L = () => List([]);
+const Map = Immutable.Map;
 
-import TransformCardComponent from './components/charts/TransformCard';
-import ScoreBar from './components/charts/ScoreBar';
-import Store from './data/BuilderStore';
 import SchemaStore from '../schema/data/SchemaStore';
 import Util from '../util/Util';
+import ScoreBar from './components/charts/ScoreBar';
+import TransformCardComponent from './components/charts/TransformCard';
+import Store from './data/BuilderStore';
 
 // These have to be above the BuilderDisplays import
 //  since the import itself imports them
 export const Directions: string[] = ['ascending', 'descending'];
 export const Combinators: string[] = ['&', 'or'];
-export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className='strike'>in</span>, 'like'];
+export const Operators = ['=', '≠', '≥', '>', '≤', '<', 'in', <span className="strike">in</span>, 'like'];
 
-import {Display, DisplayType, valueDisplay, letVarDisplay, getCardStringDisplay, firstSecondDisplay, wrapperDisplay, wrapperSingleChildDisplay, stringValueDisplay} from './BuilderDisplays';
-var ManualConfig = require('./../manual/ManualConfig.json');
+import {Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay} from './BuilderDisplays';
+const ManualConfig = require('./../manual/ManualConfig.json');
 
 export module BuilderTypes
 {
@@ -92,7 +92,7 @@ export module BuilderTypes
 
   export enum Direction {
     ASC,
-    DESC
+    DESC,
   }
 
   export const DirectionTQL = {
@@ -102,7 +102,7 @@ export module BuilderTypes
 
   export enum Combinator {
     AND,
-    OR
+    OR,
   }
 
   export const CombinatorTQL = {
@@ -121,21 +121,21 @@ export module BuilderTypes
   // currently, only Variants have Queries, 1:1, but that may change
   class QueryC
   {
-    id: ID = "";
-    variantId: ID = "";
+    id: ID = '';
+    variantId: ID = '';
 
     cards: ICards = List([]);
     inputs: List<any> = List([]);
     resultsConfig: IResultsConfig = null;
-    tql: string = "";
+    tql: string = '';
     deckOpen: boolean = true;
 
     tqlCardsInSync: boolean = false;
     parseTreeError: string = null;
   }
   const Query_Record = Immutable.Record(new QueryC());
-  export interface Query extends QueryC, IRecord<Query> {};
-  
+  export interface Query extends QueryC, IRecord<Query> {}
+
   export const _Query = (config?: Object) => {
     config = Util.extendId(config || {});
     config['cards'] = BuilderTypes.recordFromJS(config['cards'] || []);
@@ -144,7 +144,7 @@ export module BuilderTypes
 
     let query = new Query_Record(config) as any as Query;
 
-    switch(config['mode'])
+    switch (config['mode'])
     {
       case 'tql':
         // since tql to cards conversion is async and we don't know where this
@@ -188,8 +188,6 @@ export module BuilderTypes
     text: any[];
   }
 
-
-
   // BUILDING BLOCKS
   // The following large section defines every card
   //  and every piece of every card.
@@ -203,7 +201,7 @@ export module BuilderTypes
 
     // fields not saved on server
     static: {
-      tql: (string | ((block:IBlock) => string));
+      tql: (string | ((block: IBlock) => string));
       tqlGlue?: string;
       topTql?: string;
       accepts?: List<string>;
@@ -214,10 +212,10 @@ export module BuilderTypes
 
       metaFields: string[];
 
-      [field:string]: any;
-    }
+      [field: string]: any;
+    };
 
-    [field:string]: any;
+    [field: string]: any;
   }
 
   export interface ICard extends IRecord<ICard>
@@ -243,7 +241,7 @@ export module BuilderTypes
       // - to map a value to another string, write the field name in all caps. the value will be passed into "[FieldName]TQL" map
       //    e.g. "$DIRECTION" will look up "DirectionTQL" in BuilderTypes and pass the value into it
       // - topTql is the tql to use if this card is at the top level of a query
-      tql: string | ((block:IBlock) => string);
+      tql: string | ((block: IBlock) => string);
       tqlGlue?: string;
       topTql?: string;
 
@@ -251,7 +249,7 @@ export module BuilderTypes
 
       // returns an object with default values for a new card
       init?: () => {
-        [k:string]: any;
+        [k: string]: any;
       };
 
       // given a card, return the "terms" it generates for autocomplete
@@ -260,7 +258,7 @@ export module BuilderTypes
       getParentTerms?: (card: ICard) => List<string>;
         // returns terms for its parent and its neighbors (but not its parent's neighbors)
 
-      preview: string | ((c:ICard) => string);
+      preview: string | ((c: ICard) => string);
       // The BuilderTypes.getPreview function constructs
       // a preview from a card object based on this string.
       // It replaces anything within [] with the value for that key.
@@ -284,9 +282,9 @@ export module BuilderTypes
       accepts?: List<string>;
       removeOnCardRemove?: boolean;
       metaFields?: string[];
-    }
+    };
 
-    [field:string]:any;
+    [field: string]: any;
   }
 
   const allBlocksMetaFields = ['id'];
@@ -294,13 +292,13 @@ export module BuilderTypes
   // helper function to populate common fields for an IBlock
   const _block = (config: IBlockConfig): IBlock =>
   {
-    let blockConfig: IBlock = _.extend({
-      id: "",
-      type: "",
+    const blockConfig: IBlock = _.extend({
+      id: '',
+      type: '',
       _isBlock: true,
     }, config);
 
-    if(blockConfig.static.metaFields)
+    if (blockConfig.static.metaFields)
     {
       blockConfig.static.metaFields = blockConfig.static.metaFields.concat(allBlocksMetaFields);
     }
@@ -312,23 +310,23 @@ export module BuilderTypes
     return blockConfig;
   };
 
-  type TQLFn = string | ((block:IBlock) => string);
+  type TQLFn = string | ((block: IBlock) => string);
 
   // Every Card definition must follow this interface
   interface ICardConfig
   {
-    [field:string]: any;
+    [field: string]: any;
 
     static: {
       colors: string[];
       title: string;
-      preview: string | ((c:ICard) => string);
+      preview: string | ((c: ICard) => string);
       display: Display | Display[];
       isAggregate?: boolean;
       manualEntry: IManualEntry;
       tql: TQLFn;
       tqlGlue?: string;
-      topTql?: string | ((block:IBlock) => string);
+      topTql?: string | ((block: IBlock) => string);
       accepts?: List<string>;
       anythingAccepts?: boolean; // if any card accepts this card
 
@@ -339,24 +337,24 @@ export module BuilderTypes
       metaFields?: string[];
 
       init?: () => {
-        [k:string]: any;
+        [k: string]: any;
       };
-    }
+    };
   }
 
   const allCardsMetaFields = allBlocksMetaFields.concat(['closed']);
 
   // helper function to populate random card fields
-  const _card = (config:ICardConfig) =>
+  const _card = (config: ICardConfig) =>
   {
     config = _.extend(config, {
-      id: "",
+      id: '',
       _isCard: true,
       _isBlock: true,
       closed: false,
     });
 
-    if(config.static.metaFields)
+    if (config.static.metaFields)
     {
       config.static.metaFields = config.static.metaFields.concat(allCardsMetaFields);
     }
@@ -390,7 +388,7 @@ export module BuilderTypes
     isAggregate?: boolean;
   }
 
-  const _wrapperCard = (config:IWrapperCardConfig) =>
+  const _wrapperCard = (config: IWrapperCardConfig) =>
   {
     return _card({
       cards: L(),
@@ -405,18 +403,18 @@ export module BuilderTypes
         getChildTerms: config.getChildTerms,
         getNeighborTerms: config.getNeighborTerms,
 
-        preview: (c:IWrapperCard) => {
+        preview: (c: IWrapperCard) => {
           // var prefix = config.title + ': ';
           // if(c.type === 'parentheses')
           // {
           //   prefix = '';
           // }
-          if(c.cards.size)
+          if (c.cards.size)
           {
-            let card = c.cards.get(0);
+            const card = c.cards.get(0);
             return getPreview(card);
           }
-          return "Nothing";
+          return 'Nothing';
         },
 
         display: config.display || (
@@ -425,8 +423,8 @@ export module BuilderTypes
 
         tql: config.tql,
         tqlGlue: config.tqlGlue,
-      }
-    })
+      },
+    });
   };
 
   const _aggregateCard = (config: {
@@ -436,13 +434,13 @@ export module BuilderTypes
     tql: string;
     defaultValue?: string;
   }) => _card({
-    value: "",
+    value: '',
 
     static: {
       title: config.title,
       colors: config.colors,
       manualEntry: config.manualEntry,
-      preview: "[value]",
+      preview: '[value]',
       tql: config.tql,
       isAggregate: true,
 
@@ -453,10 +451,10 @@ export module BuilderTypes
               stringValueDisplay,
               {
                 defaultValue: config.defaultValue,
-              }
+              },
             )
       ,
-    }
+    },
   });
 
   const _aggregateNestedCard = (config: {
@@ -467,13 +465,13 @@ export module BuilderTypes
     accepts: List<string>,
     init?: () => any,
   }) => _card({
-    value: "",
+    value: '',
 
     static: {
       title: config.title,
       colors: config.colors,
       manualEntry: config.manualEntry,
-      preview: "[value]",
+      preview: '[value]',
       tql: config.tql,
       init: config.init,
       isAggregate: true,
@@ -481,7 +479,7 @@ export module BuilderTypes
       display: getCardStringDisplay({
         accepts: config.accepts,
       }),
-    }
+    },
   });
 
   const _andOrCard = (config: { title: string, english: string, factoryType: string, tqlGlue: string, colors: string[], manualEntry: any }) => _card({
@@ -491,7 +489,7 @@ export module BuilderTypes
         title: config.title,
         preview: '[clauses.length] ' + config.english + ' clauses',
         colors: config.colors,
-        tql: "(\n$clauses\n)",
+        tql: '(\n$clauses\n)',
         tqlGlue: config.tqlGlue,
         manualEntry: config.manualEntry,
 
@@ -530,23 +528,23 @@ export module BuilderTypes
             },
 
             hideToolsWhenNotString: true,
-          }
+          },
         },
       },
     });
 
-  const _valueCard = (config:{ title: string, colors: string[], manualEntry: IManualEntry, tql: string, defaultValue: number, }) => (
+  const _valueCard = (config: { title: string, colors: string[], manualEntry: IManualEntry, tql: string, defaultValue: number }) => (
     _card({
       value: config.defaultValue,
 
       static: {
         title: config.title,
         colors: config.colors,
-        preview: "[value]",
+        preview: '[value]',
         display: valueDisplay,
         manualEntry: config.manualEntry,
         tql: config.tql,
-      }
+      },
     })
   );
 
@@ -557,7 +555,7 @@ export module BuilderTypes
         'subtract',
         'divide',
         'multiply',
-      ])
+      ]),
     ).toList();
 
   const mathsAccept = _acceptsMath(
@@ -566,7 +564,7 @@ export module BuilderTypes
       'comparison',
       'score',
       'transform',
-    ])
+    ]),
   );
 
   const acceptsAggregates = _acceptsMath(
@@ -583,7 +581,7 @@ export module BuilderTypes
       'exists',
       'not',
       'add',
-    ])
+    ]),
   );
 
   const transformScoreInputTypes =
@@ -605,16 +603,16 @@ export module BuilderTypes
         preview:
           (card) =>
             card['fields'].map(
-              field =>
-                typeof field.field !== 'object' ? field.field : getPreview(field.field)
+              (field) =>
+                typeof field.field !== 'object' ? field.field : getPreview(field.field),
             ).join(config.tqlGlue),
 
-        tql: "($fields )",
+        tql: '($fields )',
         tqlGlue: config.tqlGlue,
 
         init: () => ({
           fields: List([
-            make(Blocks.field, { field: '' })
+            make(Blocks.field, { field: '' }),
           ]),
         }),
 
@@ -652,52 +650,52 @@ export module BuilderTypes
   {
     sortBlock: _block(
     {
-      property: "",
+      property: '',
       direction: Direction.DESC,
       static: {
-        tql: "\n $property $DIRECTION",
+        tql: '\n $property $DIRECTION',
         removeOnCardRemove: true,
-      }
+      },
     }),
 
     comparisonBlock: _block(
     {
-      first: "",
-      second: "",
+      first: '',
+      second: '',
       operator: Operator.EQ,
 
       static: {
-        tql: "\n $first $OPERATOR $second",
+        tql: '\n $first $OPERATOR $second',
 
         accepts: _acceptsMath(List(['score', 'transform', 'from', 'exists', 'not'])),
-      }
+      },
     }),
 
     table: _block(
     {
-      table: "",
-      alias: "",
+      table: '',
+      alias: '',
       aliasWasSuggested: false,
 
       static: {
         tql: (tableBlock: IBlock) =>
         {
-          let suffix = "";
-          if(tableBlock['alias'])
+          let suffix = '';
+          if (tableBlock['alias'])
           {
-            suffix = " as $alias";
+            suffix = ' as $alias';
           }
-          return "\n $table" + suffix;
-        }
-      }
+          return '\n $table' + suffix;
+        },
+      },
     }),
 
     field: _block(
     {
-      field: "",
+      field: '',
 
       static: {
-        tql: "$field",
+        tql: '$field',
         accepts: _acceptsMath(List(['min', 'max', 'avg', 'sum', 'count', 'distinct'])),
         removeOnCardRemove: true,
       },
@@ -710,18 +708,18 @@ export module BuilderTypes
 
       static: {
         manualEntry: ManualConfig.cards['sfw'],
-        colors: ["#559dcf", "#b4dbf6"],
-        title: "Select",
-        preview: "[fields.field]",
-        topTql: "SELECT\n$fields\n$cards",
-        tql: "(\n SELECT\n $fields\n$cards )",
+        colors: ['#559dcf', '#b4dbf6'],
+        title: 'Select',
+        preview: '[fields.field]',
+        topTql: 'SELECT\n$fields\n$cards',
+        tql: '(\n SELECT\n $fields\n$cards )',
 
         init: () => ({
           fields: List([
-            make(Blocks.field, { field: '*' })
+            make(Blocks.field, { field: '*' }),
           ]),
           cards: List([
-            make(Blocks.from)
+            make(Blocks.from),
           ]),
         }),
 
@@ -738,16 +736,16 @@ export module BuilderTypes
         getChildTerms:
           (card: ICard) =>
             card['fields'].reduce(
-              (list:List<string>, fieldBlock: {field: CardString}): List<string> =>
+              (list: List<string>, fieldBlock: {field: CardString}): List<string> =>
               {
                  /* TODO make this better */
-                if(fieldBlock.field['type'] === 'as')
+                if (fieldBlock.field['type'] === 'as')
                 {
                   // an as card
                   return list.push(fieldBlock.field['alias']);
                 }
                 return list;
-              }, List([])
+              }, List([]),
             ),
 
         display: [
@@ -761,7 +759,7 @@ export module BuilderTypes
               inner:
               {
                 displayType: DisplayType.CARDTEXT,
-                help: ManualConfig.help["select-field"],
+                help: ManualConfig.help['select-field'],
                 key: 'field',
                 accepts: acceptsAggregates.push('as'),
                 showWhenCards: true,
@@ -788,14 +786,14 @@ export module BuilderTypes
 
     from: _card({
       tables: L(),
-      
-      static: 
+
+      static:
       {
         manualEntry: ManualConfig.cards['sfw'],
-        colors: ["#3a7dcf", "#94b9f6"],
-        title: "From",
-        preview: "[tables.table]",
-        tql: "FROM\n$tables",
+        colors: ['#3a7dcf', '#94b9f6'],
+        title: 'From',
+        preview: '[tables.table]',
+        tql: 'FROM\n$tables',
 
         init: () => ({
           tables: List([ make(Blocks.table )]),
@@ -804,18 +802,18 @@ export module BuilderTypes
         getParentTerms:
           (card: ICard) =>
             card['tables'].reduce(
-              (list:List<string>, tableBlock: {table: string, alias: string}): List<string> =>
+              (list: List<string>, tableBlock: {table: string, alias: string}): List<string> =>
               {
-                let dbName = Store.getState().db;
+                const dbName = Store.getState().db;
                 let columnNames = SchemaStore.getState().columnNamesByDb.getIn(
-                  [dbName, dbName + '.' + tableBlock.table]
+                  [dbName, dbName + '.' + tableBlock.table],
                 ) || Immutable.List([]);
                 columnNames = columnNames.map(
-                  columnName => tableBlock.alias + '.' + columnName
+                  (columnName) => tableBlock.alias + '.' + columnName,
                 );
                 return list.concat(columnNames).toList();
               },
-              List([])
+              List([]),
             ),
 
         display:
@@ -838,18 +836,18 @@ export module BuilderTypes
               {
                 displayType: DisplayType.CARDTEXT,
                 key: 'table',
-                help: ManualConfig.help["table"],
+                help: ManualConfig.help['table'],
                 accepts: List(['sfw']),
                 showWhenCards: true,
-                getAutoTerms: (comp:React.Component<any, any>) =>
+                getAutoTerms: (comp: React.Component<any, any>) =>
                 {
-                  let db = Store.getState().db;
-                  let tableNames = SchemaStore.getState().tableNamesByDb.get(db);
-                  if(!tableNames)
+                  const db = Store.getState().db;
+                  const tableNames = SchemaStore.getState().tableNamesByDb.get(db);
+                  if (!tableNames)
                   {
-                    var unsubscribe = SchemaStore.subscribe(() =>
+                    const unsubscribe = SchemaStore.subscribe(() =>
                     {
-                      if(SchemaStore.getState().tableNamesByDb.get(db))
+                      if (SchemaStore.getState().tableNamesByDb.get(db))
                       {
                         unsubscribe();
                         comp.forceUpdate();
@@ -859,34 +857,34 @@ export module BuilderTypes
                   return tableNames;
                 },
 
-                onFocus: (comp:React.Component<any, any>, value:string) =>
+                onFocus: (comp: React.Component<any, any>, value: string) =>
                 {
                   comp.setState({
                     initialTable: value,
                   });
                 },
-                onBlur: (comp:React.Component<any, any>, value:string) =>
+                onBlur: (comp: React.Component<any, any>, value: string) =>
                 {
-                  let initialTable = comp.state.initialTable;
-                  let newTable = value;
+                  const initialTable = comp.state.initialTable;
+                  const newTable = value;
 
-                  if(initialTable !== newTable)
+                  if (initialTable !== newTable)
                   {
-                    let suggestAlias = (table:string) =>
+                    const suggestAlias = (table: string) =>
                     {
-                      if(table.charAt(table.length - 1).toLowerCase() === 's')
+                      if (table.charAt(table.length - 1).toLowerCase() === 's')
                       {
                         return table.substr(0, table.length - 1);
                       }
                       return table;
                     };
 
-                    let keyPath: KeyPath = comp.props.keyPath;
-                    let aliasKeyPath = keyPath.set(keyPath.size - 1, 'alias');
-                    let aliasWasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
-                    let initialAlias: string = Store.getState().getIn(aliasKeyPath);
+                    const keyPath: KeyPath = comp.props.keyPath;
+                    const aliasKeyPath = keyPath.set(keyPath.size - 1, 'alias');
+                    const aliasWasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
+                    const initialAlias: string = Store.getState().getIn(aliasKeyPath);
 
-                    if(!initialTable || initialTable === ''
+                    if (!initialTable || initialTable === ''
                       || initialAlias === '' || initialAlias === suggestAlias(initialTable))
                     {
                       // alias or table was blank or was the suggested one, so let's suggest an alias
@@ -903,15 +901,15 @@ export module BuilderTypes
               },
               {
                 displayType: DisplayType.TEXT,
-                help: ManualConfig.help["alias"],
+                help: ManualConfig.help['alias'],
                 key: 'alias',
                 autoDisabled: true,
-                
-                onFocus: (comp:React.Component<any, any>, value:string, event:React.FocusEvent<any>) =>
+
+                onFocus: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) =>
                 {
-                  let keyPath: KeyPath = comp.props.keyPath;
-                  let wasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
-                  if(Store.getState().getIn(wasSuggestedKeyPath))
+                  const keyPath: KeyPath = comp.props.keyPath;
+                  const wasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
+                  if (Store.getState().getIn(wasSuggestedKeyPath))
                   {
                     Util.selectText(event.target, 0, event.target['value'].length);
                     Actions.change(wasSuggestedKeyPath, false);
@@ -921,13 +919,13 @@ export module BuilderTypes
             ],
           },
         },
-      }
+      },
     }),
 
     where: _wrapperCard({
-      title: "Where",
-      colors: ["#86a860", "#d3e5be"],
-      tql: "WHERE\n$cards",
+      title: 'Where',
+      colors: ['#86a860', '#d3e5be'],
+      tql: 'WHERE\n$cards',
       manualEntry: ManualConfig.cards.where,
       singleChild: true,
 
@@ -941,59 +939,59 @@ export module BuilderTypes
     }),
 
     and: _wrapperCard({
-      title: "And",
+      title: 'And',
       tql: '(\n$cards\n)',
       tqlGlue: '\nAND\n',
       manualEntry: ManualConfig.cards.and,
-      colors: ["#824ba1", "#ecc9ff"],
+      colors: ['#824ba1', '#ecc9ff'],
       accepts: List(['or', 'comparison', 'exists', 'not']),
     }),
 
     or: _wrapperCard({
-      title: "Or",
+      title: 'Or',
       tql: '(\n$cards\n)',
       tqlGlue: '\nOR\n',
       manualEntry: ManualConfig.cards.or,
-      colors: ["#b161bc", "#f8cefe"],
+      colors: ['#b161bc', '#f8cefe'],
       accepts: List(['and', 'comparison', 'exists', 'not']),
     }),
 
     comparison: _card(
     {
-      first: "",
-      second: "",
+      first: '',
+      second: '',
       operator: Operator.EQ,
 
       static: {
-        title: "Compare",
-        colors: ["#476aa3", "#a5c6fc"],
-        preview: (c:ICard) => {
-          var first = c['first'];
-          var second = c['second'];
-          if(first._isCard)
+        title: 'Compare',
+        colors: ['#476aa3', '#a5c6fc'],
+        preview: (c: ICard) => {
+          let first = c['first'];
+          let second = c['second'];
+          if (first._isCard)
           {
             first = getPreview(first);
           }
-          if(second._isCard)
+          if (second._isCard)
           {
             second = getPreview(second);
           }
 
-          return `${first} ${OperatorTQL[c['operator']]} ${second}`
+          return `${first} ${OperatorTQL[c['operator']]} ${second}`;
         },
-        tql: "$first $OPERATOR $second",
+        tql: '$first $OPERATOR $second',
 
         display: firstSecondDisplay(
           {
             displayType: DisplayType.DROPDOWN,
             key: 'operator',
             options: Immutable.List(Operators),
-            help: ManualConfig.help["operator"],
+            help: ManualConfig.help['operator'],
             centerDropdown: true,
           },
           _acceptsMath(
-            List(['sfw', 'exists', 'not'])
-          )
+            List(['sfw', 'exists', 'not']),
+          ),
         ),
         manualEntry: ManualConfig.cards['filter'],
       },
@@ -1005,14 +1003,14 @@ export module BuilderTypes
 
       static:
       {
-        title: "Order By",
-        preview: (c:any) =>
+        title: 'Order By',
+        preview: (c: any) =>
         {
-          let {sorts} = c;
-          if(sorts.size === 1)
+          const {sorts} = c;
+          if (sorts.size === 1)
           {
-            let {property} = sorts.get(0);
-            if(typeof property === 'string')
+            const {property} = sorts.get(0);
+            if (typeof property === 'string')
             {
               return property;
             }
@@ -1020,16 +1018,16 @@ export module BuilderTypes
           }
           return sorts.size + ' Factors';
         },
-        colors: ["#39918b", "#99e4df"],
+        colors: ['#39918b', '#99e4df'],
         manualEntry: ManualConfig.cards['sort'],
-        tql: "ORDER BY $sorts",
+        tql: 'ORDER BY $sorts',
 
         init: () =>
         {
           return {
             sorts: List([
-              make(Blocks.sortBlock)
-            ])
+              make(Blocks.sortBlock),
+            ]),
           };
         },
 
@@ -1045,7 +1043,7 @@ export module BuilderTypes
             [
               {
                 displayType: DisplayType.CARDTEXT,
-                help: ManualConfig.help["property"],
+                help: ManualConfig.help['property'],
                 key: 'property',
                 accepts: _acceptsMath(List(['score', 'transform'])),
                 showWhenCards: true,
@@ -1054,7 +1052,7 @@ export module BuilderTypes
                 displayType: DisplayType.DROPDOWN,
                 key: 'direction',
                 options: Immutable.List(Directions),
-                help: ManualConfig.help["direction"],
+                help: ManualConfig.help['direction'],
               },
             ],
             below:
@@ -1103,14 +1101,14 @@ export module BuilderTypes
     // }),
 
     as: _card({
-      value: "",
-      alias: "",
+      value: '',
+      alias: '',
 
       static: {
-        title: "As",
-        colors: ["#d24f42", "#f9cba8"],
+        title: 'As',
+        colors: ['#d24f42', '#f9cba8'],
         preview: '[alias]',
-        tql: "$value AS $alias",
+        tql: '$value AS $alias',
         manualEntry: ManualConfig.cards.where,
         display:
         {
@@ -1143,80 +1141,79 @@ export module BuilderTypes
             displayType: DisplayType.CARDSFORTEXT,
             key: 'value',
             accepts: acceptsAggregates,
-          }
-        }
-      }
+          },
+        },
+      },
     }),
 
     count: _aggregateNestedCard(
     {
-      title: "Count",
-      colors: ["#d65a44", "#fbc1b7"],
+      title: 'Count',
+      colors: ['#d65a44', '#fbc1b7'],
       manualEntry: ManualConfig.cards['count'],
-      tql: "COUNT($value)",
+      tql: 'COUNT($value)',
       accepts: List(['distinct']),
       init: () => ({ value: '*' }),
     }),
 
     avg: _aggregateCard(
     {
-      title: "Average",
-      colors: ["#db6746", "#f9bcab"],
+      title: 'Average',
+      colors: ['#db6746', '#f9bcab'],
       manualEntry: ManualConfig.cards['avg'],
-      tql: "AVG($value)",
+      tql: 'AVG($value)',
     }),
 
     min: _aggregateCard(
     {
-      title: "Min",
-      colors: ["#dd7547", "#fdcdb8"],
+      title: 'Min',
+      colors: ['#dd7547', '#fdcdb8'],
       manualEntry: ManualConfig.cards['min'],
-      tql: "MIN($value)",
+      tql: 'MIN($value)',
     }),
 
     max: _aggregateCard(
     {
-      title: "Max",
-      colors: ["#dd8846", "#f9cba8"],
+      title: 'Max',
+      colors: ['#dd8846', '#f9cba8'],
       manualEntry: ManualConfig.cards['max'],
-      tql: "MAX($value)",
+      tql: 'MAX($value)',
     }),
 
     sum: _aggregateCard(
     {
-      title: "Sum",
-      colors: ["#dba043", "#eedebe"],
+      title: 'Sum',
+      colors: ['#dba043', '#eedebe'],
       manualEntry: ManualConfig.cards['sum'],
-      tql: "SUM($value)",
+      tql: 'SUM($value)',
     }),
 
     distinct: _aggregateCard(
     {
-      title: "Distinct",
-      colors: ["#d9b540", "#f8e8b3"],
+      title: 'Distinct',
+      colors: ['#d9b540', '#f8e8b3'],
       manualEntry: ManualConfig.cards['count'], // TODO
-      tql: "DISTINCT $value",
+      tql: 'DISTINCT $value',
     }),
-
 
     exists: _wrapperCard(
     {
-      colors: ["#319aa9", "#bbdddc"],
-      title: "Exists",
+      colors: ['#319aa9', '#bbdddc'],
+      title: 'Exists',
       manualEntry: ManualConfig.cards['exists'],
-      tql: "EXISTS\n$cards",
+      tql: 'EXISTS\n$cards',
       accepts: List(['sfw']),
     }),
 
     not: _wrapperCard(
     {
-      colors: ["#21aab9", "#abedec"],
-      title: "Not",
+      colors: ['#21aab9', '#abedec'],
+      title: 'Not',
       manualEntry: ManualConfig.cards['exists'],
       tql: (notCard) =>
       {
-        let cards = notCard['cards'];
-        if(cards && cards.size && cards.get(0).type === 'exists')
+        const cards = notCard['cards'];
+        if (cards && cards.size && cards.get(0).type === 'exists')
         {
           return 'NOT$cards';
         }
@@ -1225,38 +1222,37 @@ export module BuilderTypes
       accepts: List(['exists', 'compare', 'and', 'or']),
     }),
 
-
     // remove
     parentheses: _wrapperCard(
     {
-      colors: ["#6775aa", "#d2c9e4"],
-      title: "( )",
+      colors: ['#6775aa', '#d2c9e4'],
+      title: '( )',
       manualEntry: ManualConfig.cards['parentheses'],
-      tql: "\n(\n$cards)",
+      tql: '\n(\n$cards)',
       accepts: List(['and', 'or', 'exists', 'tql', 'not']),
     }),
 
     weight: _block(
     {
-      key: "",
+      key: '',
       weight: 1,
       static: {
-        tql: "$weight, $key",
+        tql: '$weight, $key',
         removeOnCardRemove: true,
-      }
+      },
     }),
 
     score: _card(
     {
       weights: List([]),
-      method: "",
+      method: '',
 
       static: {
-        title: "Score",
-        colors: ["#3a91a6", "#a1eafb"],
-        preview: "[weights.length] Weights",
+        title: 'Score',
+        colors: ['#3a91a6', '#a1eafb'],
+        preview: '[weights.length] Weights',
         manualEntry: ManualConfig.cards['score'],
-        tql: "linear_score($weights)",
+        tql: 'linear_score($weights)',
         init: () => ({
           weights: List([
             make(Blocks.weight),
@@ -1277,14 +1273,14 @@ export module BuilderTypes
               {
                 displayType: DisplayType.CARDTEXT,
                 key: 'key',
-                help: ManualConfig.help["key"],
+                help: ManualConfig.help['key'],
                 placeholder: 'Field',
                 accepts: transformScoreInputTypes,
                 showWhenCards: true,
               },
               {
                 displayType: DisplayType.NUM,
-                help: ManualConfig.help["weight"],
+                help: ManualConfig.help['weight'],
                 key: 'weight',
                 placeholder: 'Weight',
                 // autoDisabled: true,
@@ -1293,7 +1289,7 @@ export module BuilderTypes
                 displayType: DisplayType.COMPONENT,
                 component: ScoreBar,
                 key: 'score',
-                help: ManualConfig.help["score"],
+                help: ManualConfig.help['score'],
               },
             ],
             below:
@@ -1301,12 +1297,11 @@ export module BuilderTypes
               displayType: DisplayType.CARDSFORTEXT,
               key: 'key',
               accepts: transformScoreInputTypes,
-            }
+            },
           },
         },
-      }
+      },
     }),
-
 
     bar: _block(
     {
@@ -1319,7 +1314,7 @@ export module BuilderTypes
 
       static: {
         tql: null, // N/A
-      }
+      },
     }),
 
     scorePoint: _block(
@@ -1328,34 +1323,34 @@ export module BuilderTypes
       score: 0,
 
       static: {
-        tql: "$score, $value",
-      }
+        tql: '$score, $value',
+      },
     }),
 
     transform: _card(
     {
-      input: "",
+      input: '',
       scorePoints: List([]),
 
-      domain: List([0,100]),
+      domain: List([0, 100]),
       hasCustomDomain: false, // has the user set a custom domain
 
       static: {
         manualEntry: ManualConfig.cards['transform'],
-        colors: ["#4b979a", "#aef3f6"],
-        title: "Transform",
-        preview: (card:any) => {
-          if(card.input._isCard)
+        colors: ['#4b979a', '#aef3f6'],
+        title: 'Transform',
+        preview: (card: any) => {
+          if (card.input._isCard)
           {
             return '' + getPreview(card.input);
           }
           return '' + card.input;
         },
-        tql: "linear_transform($input, $scorePoints)",
+        tql: 'linear_transform($input, $scorePoints)',
         display: [
           {
             displayType: DisplayType.CARDTEXT,
-            help: ManualConfig.help["input"],
+            help: ManualConfig.help['input'],
             key: 'input',
             placeholder: 'Input field',
             accepts: transformScoreInputTypes,
@@ -1370,7 +1365,7 @@ export module BuilderTypes
             displayType: DisplayType.COMPONENT,
             component: TransformCardComponent,
             key: null,
-            help: ManualConfig.help["scorePoints"],
+            help: ManualConfig.help['scorePoints'],
           },
         ],
 
@@ -1379,17 +1374,17 @@ export module BuilderTypes
             scorePoints:
               List([
                 make(Blocks.scorePoint, {
-                  id: "a",
+                  id: 'a',
                   value: 0,
                   score: 0.0,
                 }),
                 make(Blocks.scorePoint, {
-                id: "b",
+                id: 'b',
                   value: 50,
                   score: 0.5,
                 }),
                 make(Blocks.scorePoint, {
-                  id: "c",
+                  id: 'c',
                   value: 100,
                   score: 1.0,
                 }),
@@ -1398,24 +1393,24 @@ export module BuilderTypes
         ),
 
         metaFields: ['domain', 'hasCustomDomain'],
-      }
+      },
     }),
 
     take: _valueCard(
     {
-      colors: ["#2e8c9a", "#8adeea"],
-      title: "Limit",
+      colors: ['#2e8c9a', '#8adeea'],
+      title: 'Limit',
       manualEntry: ManualConfig.cards['take'],
-      tql: "LIMIT $value",
+      tql: 'LIMIT $value',
       defaultValue: 25,
     }),
 
     skip: _valueCard(
     {
-      colors: ["#2588aa", "#a2e5fc"],
-      title: "Offset",
+      colors: ['#2588aa', '#a2e5fc'],
+      title: 'Offset',
       manualEntry: ManualConfig.cards['skip'],
-      tql: "OFFSET $value",
+      tql: 'OFFSET $value',
       defaultValue: 25,
     }),
 
@@ -1425,10 +1420,10 @@ export module BuilderTypes
 
       static: {
         manualEntry: ManualConfig.cards['sfw'], // TODO
-        colors: ["#659f72", "#c4e1ca"],
-        title: "Group By",
-        preview: "[fields.field]",
-        tql: "GROUP BY\n$fields",
+        colors: ['#659f72', '#c4e1ca'],
+        title: 'Group By',
+        preview: '[fields.field]',
+        tql: 'GROUP BY\n$fields',
 
         init: () => ({
           fields: List([ make(Blocks.field)]),
@@ -1445,7 +1440,7 @@ export module BuilderTypes
             inner:
             {
               displayType: DisplayType.TEXT,
-              help: ManualConfig.help["select-field"],
+              help: ManualConfig.help['select-field'],
               key: 'field',
             },
           },
@@ -1454,9 +1449,9 @@ export module BuilderTypes
     }),
 
     having: _wrapperCard({
-      title: "Having",
-      colors: ["#4b977e", "#c4e1ca"],
-      tql: "HAVING\n$cards",
+      title: 'Having',
+      colors: ['#4b977e', '#c4e1ca'],
+      tql: 'HAVING\n$cards',
       manualEntry: ManualConfig.cards.where, // TODO
 
       accepts: List([
@@ -1467,71 +1462,70 @@ export module BuilderTypes
       ]),
     }),
 
-
     tql: _card({
-      clause: "",
+      clause: '',
 
       static: {
-        title: "Expression",
-        preview: "[clause]",
-        colors: ["#278172", "#aefcef"],
-        tql: "$clause",
+        title: 'Expression',
+        preview: '[clause]',
+        colors: ['#278172', '#aefcef'],
+        tql: '$clause',
         manualEntry: ManualConfig.cards.tql,
         anythingAccepts: true,
 
         display: {
           displayType: DisplayType.TEXT,
           key: 'clause',
-        }
-      }
+        },
+      },
     }),
 
     add: _mathCard({
       title: '+',
       tqlGlue: ' + ',
-      colors: ["#d24f42", "#f9cba8"],
+      colors: ['#d24f42', '#f9cba8'],
     }),
 
     subtract: _mathCard({
       title: '-',
       tqlGlue: ' - ',
-      colors: ["#d65a44", "#fbc1b7"],
+      colors: ['#d65a44', '#fbc1b7'],
     }),
 
     multiply: _mathCard({
       title: '×',
       tqlGlue: ' * ',
-      colors: ["#db6746", "#f9bcab"],
+      colors: ['#db6746', '#f9bcab'],
     }),
 
     divide: _mathCard({
       title: '/',
       tqlGlue: ' / ',
-      colors: ["#dd7547", "#fdcdb8"],
+      colors: ['#dd7547', '#fdcdb8'],
     }),
 
     spotlight: _block(
     {
       static: {
         tql: null, // N/A
-      }
+      },
       // TODO some day
     }),
 
     input: _block(
     {
-      key: "",
-      value: "",
+      key: '',
+      value: '',
       inputType: InputType.NUMBER,
       static: {
-        tql: "VAR $key = $value;",
-      }
+        tql: 'VAR $key = $value;',
+      },
     }),
 
     creating: _card( // a placeholder for when a card is being created
     {
       static: {
-        tql: "",
+        tql: '',
         title: 'New Card',
         colors: ['#777', '#777'],
         preview: '',
@@ -1542,7 +1536,7 @@ export module BuilderTypes
   };
 
   // Set the "type" field for all blocks equal to its key
-  _.map(Blocks as ({[card:string]:any}), (v, i) => Blocks[i].type = i);
+  _.map(Blocks as ({[card: string]: any}), (v, i) => Blocks[i].type = i);
 
   export const CardsDeckOrdering =
   [
@@ -1591,41 +1585,41 @@ export module BuilderTypes
 
   // This creates a new instance of a card / block
   // Usage: BuilderTypes.make(BuilderTypes.Blocks.sort)
-  export const make = (block:IBlock, extraConfig?:{[key:string]:any}) =>
+  export const make = (block: IBlock, extraConfig?: {[key: string]: any}) =>
   {
-    let {type} = block;
+    const {type} = block;
 
     block = _.extend({}, block); // shallow clone
 
-    if(Blocks[type].static.init)
+    if (Blocks[type].static.init)
     {
       block = _.extend({}, block, Blocks[type].static.init());
     }
 
-    if(extraConfig)
+    if (extraConfig)
     {
       block = _.extend(block, extraConfig);
 
-      if(block.type === 'sfw' && block['tables'] && block['tables'].size && block['tables'].get(0).table !== 'none')
+      if (block.type === 'sfw' && block['tables'] && block['tables'].size && block['tables'].get(0).table !== 'none')
       {
         // convert old format, where tables were included, to new format with separate from card
         // TODO remove once sufficiently antiquated
         block['cards'] = block['cards'].unshift(
           make(Blocks.from, {
-            tables: block['tables']
-          })
+            tables: block['tables'],
+          }),
         );
       }
     }
 
-    if(block.static)
+    if (block.static)
     {
       delete block.static;
     }
 
-    if(!block.id || !block.id.length)
+    if (!block.id || !block.id.length)
     {
-      block.id = "block-" + Math.random();
+      block.id = 'block-' + Math.random();
     }
 
     return typeToRecord[type](block);
@@ -1635,42 +1629,39 @@ export module BuilderTypes
   export const CardTypes = _.compact(_.map(Blocks, (block, k: string) => block['_isCard'] && k ));
 
   // TODO remove
-  var cards = {};
-  for(var key in Blocks)
+  const cards = {};
+  for (const key in Blocks)
   {
-    if(Blocks[key]._isCard && Blocks[key].static.manualEntry)
+    if (Blocks[key]._isCard && Blocks[key].static.manualEntry)
     {
       cards[Blocks[key].static.manualEntry.name] = key;
     }
   }
   export const cardList = cards;
 
-
   // private, maps a type (string) to the backing Immutable Record
-  let typeToRecord = _.reduce(Blocks as ({[card:string]:any}),
+  const typeToRecord = _.reduce(Blocks as ({[card: string]: any}),
     (memo, v, i) => {
       memo[i] = Immutable.Record(v);
       return memo;
     }
   , {});
 
-
-
   // Given a plain JS object, construct the Record for it and its children
   export const recordFromJS = (value: any) =>
   {
-    if(value && value.static && Immutable.Iterable.isIterable(value))
+    if (value && value.static && Immutable.Iterable.isIterable(value))
     {
       // already a block / record
       // TODO change to a better way of checking
       return value;
     }
 
-    if(Array.isArray(value) || typeof value === 'object')
+    if (Array.isArray(value) || typeof value === 'object')
     {
-      if(Immutable.Iterable.isIterable(value))
+      if (Immutable.Iterable.isIterable(value))
       {
-        value = value.map(v => recordFromJS(v));
+        value = value.map((v) => recordFromJS(v));
       }
       else
       {
@@ -1696,8 +1687,8 @@ export module BuilderTypes
       //   });
       // }
 
-      let type = value.type || (typeof value.get === 'function' && value.get('type'));
-      if(type && Blocks[type])
+      const type = value.type || (typeof value.get === 'function' && value.get('type'));
+      if (type && Blocks[type])
       {
         value = make(Blocks[type], value);
       }
@@ -1713,23 +1704,23 @@ export module BuilderTypes
   // Prepare cards/records for save, trimming static values
   export const cardsForServer = (value: any) =>
   {
-    if(Immutable.Iterable.isIterable(value))
+    if (Immutable.Iterable.isIterable(value))
     {
       value = value.toJS();
     }
 
-    if(value && value.static)
+    if (value && value.static)
     {
       delete value.static;
     }
 
-    if(Array.isArray(value))
+    if (Array.isArray(value))
     {
       value.map(cardsForServer);
     }
-    else if(typeof value === 'object')
+    else if (typeof value === 'object')
     {
-      for(var v of value)
+      for (const v of value)
       {
         cardsForServer(v);
       }
@@ -1739,90 +1730,90 @@ export module BuilderTypes
   };
 
   // returns preview for a given card
-  export function getPreview(card:ICard):string
+  export function getPreview(card: ICard): string
   {
-    if(!card)
+    if (!card)
     {
       return;
     }
 
-    if(!card.static)
+    if (!card.static)
     {
-      if(typeof card === 'string' || typeof card === 'number')
+      if (typeof card === 'string' || typeof card === 'number')
       {
-        return card + "";
+        return card + '';
       }
 
       try {
         return JSON.stringify(card);
-      } catch(e) {
+      } catch (e) {
         return 'No preview';
       }
     }
 
-    let {preview} = card.static;
-    if(typeof preview === 'string')
+    const {preview} = card.static;
+    if (typeof preview === 'string')
     {
-      return preview.replace(/\[[a-z\.]*\]/g, str =>
+      return preview.replace(/\[[a-z\.]*\]/g, (str) =>
       {
-        let pattern = str.substr(1, str.length - 2);
-        let keys = pattern.split(".");
-        if(keys.length === 1)
+        const pattern = str.substr(1, str.length - 2);
+        const keys = pattern.split('.');
+        if (keys.length === 1)
         {
-          let value = card[keys[0]];
-          if(value['_isCard'])
+          const value = card[keys[0]];
+          if (value['_isCard'])
           {
             return getPreview(value);
           }
           return value;
         }
-        if(keys[1] === 'length' || keys[1] === 'size')
+        if (keys[1] === 'length' || keys[1] === 'size')
         {
           return card[keys[0]].size;
         }
         return card[keys[0]].toArray().map(
-          v =>
-            getPreview(v[keys[1]])
-        ).join(", ");
+          (v) =>
+            getPreview(v[keys[1]]),
+        ).join(', ');
       });
     }
-    else if(typeof preview === 'function')
+    else if (typeof preview === 'function')
     {
       return preview(card);
     }
     return 'No preview';
-  }  
-  
-  export function getChildIds(_block:IBlock):IMMap<ID, boolean>
+  }
+
+  export function getChildIds(_block: IBlock): IMMap<ID, boolean>
   {
-    var map = Map<ID, boolean>({});
-    
-    if(Immutable.Iterable.isIterable(_block))
+    let map = Map<ID, boolean>({});
+
+    if (Immutable.Iterable.isIterable(_block))
     {
-      let block = _block.toMap();
-      if(block.get('id'))
+      const block = _block.toMap();
+      if (block.get('id'))
       {
         map = map.set(block.get('id'), true);
       }
-      block.map(value => map = map.merge(getChildIds(value)));
+      block.map((value) => map = map.merge(getChildIds(value)));
     }
 
     return map;
   }
 
   export function forAllCards(
-    block:IBlock | List<IBlock>,
-    fn: (card:ICard, keyPath: KeyPath) => void
+    block: IBlock | List<IBlock>,
+    fn: (card: ICard, keyPath: KeyPath) => void,
   ) {
     forAllBlocks(
       block,
       (block: IBlock, keyPath: KeyPath) =>
       {
-        if(block['_isCard'])
+        if (block['_isCard'])
         {
           fn(block as any, keyPath);
         }
-      }
+      },
     );
   }
 
@@ -1831,16 +1822,16 @@ export module BuilderTypes
     fn: (block: IBlock, keyPath: KeyPath) => void,
     keyPath: KeyPath = List([]),
     stopAtFirstBlock?: boolean,
-    excludeWrappedCards?: boolean
+    excludeWrappedCards?: boolean,
   )
   {
-    if(block)
+    if (block)
     {
-      if(block['_isBlock'])
+      if (block['_isBlock'])
       {
         fn(block as IBlock, keyPath);
       }
-      if(
+      if (
         Immutable.Iterable.isIterable(block)
         && (!stopAtFirstBlock || !block['_isBlock'] || !keyPath.size)
       )
@@ -1848,32 +1839,32 @@ export module BuilderTypes
         (block.toMap() as any).map(
           (b, key) =>
           {
-            if(!excludeWrappedCards || key !== 'cards')
+            if (!excludeWrappedCards || key !== 'cards')
             {
               forAllBlocks(
                 b as IBlock,
                 fn,
                 keyPath.push(key),
                 stopAtFirstBlock,
-                excludeWrappedCards
+                excludeWrappedCards,
               );
             }
-          }
+          },
         );
       }
     }
   }
 
-  export function transformAlias(transformCard:ICard):string
+  export function transformAlias(transformCard: ICard): string
   {
-    return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, "");
+    return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, '');
   }
 }
 
+import {_IResultsConfig, IResultsConfig} from './components/results/ResultsConfig';
 import Actions from './data/BuilderActions';
-import {IResultsConfig, _IResultsConfig} from "./components/results/ResultsConfig";
 
 export default BuilderTypes;
 
-import TQLToCards from '../tql/TQLToCards';
 import TQLConverter from '../tql/TQLConverter';
+import TQLToCards from '../tql/TQLToCards';

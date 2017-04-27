@@ -44,12 +44,12 @@ THE SOFTWARE.
 
 /// <reference path="../../typings/tsd.d.ts" />
 
-import * as _ from 'underscore';
 import * as test from 'tape';
+import * as _ from 'underscore';
 import Actions from '../../app/builder/data/BuilderActions.tsx';
 import ActionTypes from '../../app/builder/data/BuilderActionTypes.tsx';
 
-var onlyContainsType = (obj, type: string) => {
+const onlyContainsType = (obj, type: string) => {
   return _.every(obj, (val) => {
     return typeof val === type || (typeof val === 'object' && onlyContainsType(val, type));
   });
@@ -61,9 +61,9 @@ test('ActionTypes', (t) => {
 });
 
 test('Actions', (t) => {
-  var containSameKeys = (first, second) => {
+  const containSameKeys = (first, second) => {
     return _.every(first, (val, key) => {
-      if(typeof first[key] === 'object' && typeof second[key] === 'object')
+      if (typeof first[key] === 'object' && typeof second[key] === 'object')
       {
         return containSameKeys(first[key], second[key]);
       }

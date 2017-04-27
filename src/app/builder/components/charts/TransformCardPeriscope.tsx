@@ -44,26 +44,26 @@ THE SOFTWARE.
 
 require('./TransformCardPeriscope.less');
 import * as Immutable from 'immutable';
-let {Map, List} = Immutable;
-import * as _ from 'underscore';
+const {Map, List} = Immutable;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import Actions from "../../data/BuilderActions";
-import Util from '../../../util/Util';
+import * as _ from 'underscore';
+import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import PureClasss from '../../../common/components/PureClasss';
+import Util from '../../../util/Util';
+import Actions from '../../data/BuilderActions';
 import { BuilderTypes } from './../../BuilderTypes';
 import Periscope from './Periscope';
 import {Bar, Bars} from './TransformCard';
-import BuilderTextbox from '../../../common/components/BuilderTextbox';
 
-export interface Props 
+export interface Props
 {
   barsData: Bars;
   maxDomain: List<number>;
   domain: List<number>;
   range: List<number>;
   onDomainChange: (domain: List<number>) => void;
-  keyPath:KeyPath;
+  keyPath: KeyPath;
   canEdit: boolean;
   width: number;
 }
@@ -89,25 +89,25 @@ class TransformCardPeriscope extends PureClasss<Props>
     chart: Ref;
   };
 
-  constructor(props:Props)
+  constructor(props: Props)
   {
     super(props);
     this.state.bars = this.formatBars(props.barsData);
   }
 
-  formatBars(bars:Bars):Bars
+  formatBars(bars: Bars): Bars
   {
-    if(bars.size > MAX_BARS)
+    if (bars.size > MAX_BARS)
     {
-      var newBars: Bars = List([]);
-      var min = bars.first().range.min;
-      var max = bars.last().range.max;
+      let newBars: Bars = List([]);
+      const min = bars.first().range.min;
+      const max = bars.last().range.max;
 
-      bars.map((bar:Bar) =>
+      bars.map((bar: Bar) =>
       {
-        let b = Math.floor((bar.range.min - min) / (max - min) * MAX_BARS);
-        let newBar: Bar = newBars.get(b);
-        if(!newBar)
+        const b = Math.floor((bar.range.min - min) / (max - min) * MAX_BARS);
+        const newBar: Bar = newBars.get(b);
+        if (!newBar)
         {
           newBars = newBars.push(JSON.parse(JSON.stringify(bar)));
         }
@@ -126,8 +126,8 @@ class TransformCardPeriscope extends PureClasss<Props>
 
   componentDidMount()
   {
-    var el = ReactDOM.findDOMNode(this.refs.chart);
-    let chartState = this.getChartState();
+    const el = ReactDOM.findDOMNode(this.refs.chart);
+    const chartState = this.getChartState();
 
     this.setState({
       chartState,
@@ -135,12 +135,12 @@ class TransformCardPeriscope extends PureClasss<Props>
     Periscope.create(el, chartState.toJS());
   }
 
-  componentWillReceiveProps(nextProps:Props)
+  componentWillReceiveProps(nextProps: Props)
   {
-    if(this.shouldComponentUpdate(nextProps, this.state))
+    if (this.shouldComponentUpdate(nextProps, this.state))
     {
-      var bars = this.state.bars;
-      if(nextProps.barsData !== this.props.barsData)
+      let bars = this.state.bars;
+      if (nextProps.barsData !== this.props.barsData)
       {
         bars = this.formatBars(nextProps.barsData);
         this.setState({
@@ -153,7 +153,7 @@ class TransformCardPeriscope extends PureClasss<Props>
 
   update(overrideState?)
   {
-    var el = ReactDOM.findDOMNode(this.refs.chart);
+    const el = ReactDOM.findDOMNode(this.refs.chart);
     Periscope.update(el, this.getChartState(overrideState).toJS());
   }
 
@@ -162,25 +162,25 @@ class TransformCardPeriscope extends PureClasss<Props>
     this.setState({
       initialDomain: this.props.domain,
       initialVal,
-    })
+    });
   }
 
   handleDomainChange(handleIndex, newVal)
   {
-    var domain =
+    let domain =
       this.state.initialDomain.set(handleIndex,
-        this.state.initialDomain.get(handleIndex) + newVal - this.state.initialVal
+        this.state.initialDomain.get(handleIndex) + newVal - this.state.initialVal,
       );
 
-    let {maxDomain} = this.props;
-    var buffer = (maxDomain.get(1) - maxDomain.get(0)) * 0.01;
+    const {maxDomain} = this.props;
+    const buffer = (maxDomain.get(1) - maxDomain.get(0)) * 0.01;
     domain = domain.set(0,
-        Util.valueMinMax(domain.get(0), maxDomain.get(0), this.state.initialDomain.get(1) - buffer)
+        Util.valueMinMax(domain.get(0), maxDomain.get(0), this.state.initialDomain.get(1) - buffer),
       );
     domain = domain.set(1,
       Util.valueMinMax(domain.get(1),
         this.state.initialDomain.get(0) + buffer,
-        maxDomain.get(1))
+        maxDomain.get(1)),
       );
     this.props.onDomainChange(domain);
     this.update({
@@ -192,10 +192,10 @@ class TransformCardPeriscope extends PureClasss<Props>
   {
     Actions.change(this._ikeyPath(this.props.keyPath, 'hasCustomDomain'), true);
   }
-  
+
   getChartState(overrideState = {}): IMMap<string, any>
   {
-    var chartState = Map<string, any>({
+    const chartState = Map<string, any>({
       barsData: (overrideState['bars'] || this.state.bars).toJS(),
       maxDomain: (overrideState['maxDomain'] || this.props.maxDomain).toJS(),
       domain: {
@@ -213,22 +213,22 @@ class TransformCardPeriscope extends PureClasss<Props>
 
   componentWillUnmount()
   {
-    var el = ReactDOM.findDOMNode(this.refs.chart);
+    const el = ReactDOM.findDOMNode(this.refs.chart);
     Periscope.destroy(el);
   }
 
   render()
   {
     return (
-      <div className='transform-periscope-wrapper'>
-        <div ref='chart' />
+      <div className="transform-periscope-wrapper">
+        <div ref="chart" />
 
-        <div className='tp-text-wrapper'>
+        <div className="tp-text-wrapper">
           <BuilderTextbox
             value={this.props.maxDomain.get(0)}
             keyPath={this._ikeyPath(this.props.keyPath, 'domain', 0)}
             isNumber={true}
-            className='tp-tb-left'
+            className="tp-tb-left"
             canEdit={this.props.canEdit}
             onChange={this.handleDomainTextChange}
             autoDisabled={true}
@@ -237,7 +237,7 @@ class TransformCardPeriscope extends PureClasss<Props>
             value={this.props.maxDomain.get(1)}
             keyPath={this._ikeyPath(this.props.keyPath, 'domain', 1)}
             isNumber={true}
-            className='tp-tb-right'
+            className="tp-tb-right"
             canEdit={this.props.canEdit}
             onChange={this.handleDomainTextChange}
             autoDisabled={true}

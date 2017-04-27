@@ -44,27 +44,27 @@ THE SOFTWARE.
 
 require('./ResultsArea.less');
 import * as Immutable from 'immutable';
-const {Map,List} = Immutable;
-import * as _ from 'underscore';
-import * as React from 'react';
+const {Map, List} = Immutable;
 import * as classNames from 'classnames';
+import * as React from 'react';
+import * as _ from 'underscore';
 // import * as moment from 'moment';
 const moment = require('moment');
 
-import Util from '../../../util/Util';
-import Ajax from '../../../util/Ajax';
-import Actions from "../../data/BuilderActions";
-import Result from "../results/Result";
-import ResultsTable from "../results/ResultsTable";
-import {IResultsConfig, ResultsConfig} from "../results/ResultsConfig";
 import InfoArea from '../../../common/components/InfoArea';
-import PureClasss from './../../../common/components/PureClasss';
-import InfiniteScroll from './../../../common/components/InfiniteScroll';
-import Switch from './../../../common/components/Switch';
-import BuilderTypes from '../../BuilderTypes';
-import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore';
-import {ResultsState, MAX_RESULTS, getPrimaryKeyFor} from './ResultsManager';
 import TQLConverter from '../../../tql/TQLConverter';
+import Ajax from '../../../util/Ajax';
+import Util from '../../../util/Util';
+import BuilderTypes from '../../BuilderTypes';
+import Actions from '../../data/BuilderActions';
+import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
+import Result from '../results/Result';
+import {IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
+import ResultsTable from '../results/ResultsTable';
+import InfiniteScroll from './../../../common/components/InfiniteScroll';
+import PureClasss from './../../../common/components/PureClasss';
+import Switch from './../../../common/components/Switch';
+import {getPrimaryKeyFor, MAX_RESULTS, ResultsState} from './ResultsManager';
 
 const RESULTS_PAGE_SIZE = 20;
 
@@ -75,7 +75,7 @@ export interface Props
   query: BuilderTypes.Query;
   canEdit: boolean;
   variantName: string;
-  
+
   onNavigationException: () => void;
 }
 
@@ -83,10 +83,10 @@ interface State
 {
   resultFormat: string;
   showingConfig?: boolean;
-  
+
   expanded?: boolean;
   expandedResultIndex?: number;
-  
+
   resultsPages: number;
   onResultsLoaded?: (unchanged?: boolean) => void;
 }
@@ -100,20 +100,20 @@ class ResultsArea extends PureClasss<Props>
     resultsPages: 1,
     resultFormat: 'icon',
   };
-  
+
   componentWillReceiveProps(nextProps)
   {
-    if(nextProps.query.cards !== this.props.query 
+    if (nextProps.query.cards !== this.props.query
       || nextProps.query.inputs !== this.props.query.inputs)
     {
-      if(this.state.onResultsLoaded)
+      if (this.state.onResultsLoaded)
       {
         // reset infinite scroll
         this.state.onResultsLoaded(false);
       }
     }
   }
-  
+
   handleCollapse()
   {
     this.setState({
@@ -128,27 +128,27 @@ class ResultsArea extends PureClasss<Props>
       expandedResultIndex: resultIndex,
     });
   }
-  
+
   renderExpandedResult()
   {
-    let {expandedResultIndex} = this.state;
-    let {results} = this.props.resultsState;
-    let {resultsConfig} = this.props.query;
-    
-    if(results)
+    const {expandedResultIndex} = this.state;
+    const {results} = this.props.resultsState;
+    const {resultsConfig} = this.props.query;
+
+    if (results)
     {
-      var result = results.get(expandedResultIndex);
+      const result = results.get(expandedResultIndex);
     }
-    
-    if(!result)
+
+    if (!result)
     {
       return null;
     }
-    
+
     return (
       <div className={'result-expanded-wrapper' + (this.state.expanded ? '' : ' result-collapsed-wrapper')}>
-        <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
-        <Result 
+        <div className="result-expanded-bg" onClick={this.handleCollapse}></div>
+        <Result
           result={result}
           resultsConfig={resultsConfig}
           onExpand={this.handleCollapse}
@@ -159,12 +159,12 @@ class ResultsArea extends PureClasss<Props>
       </div>
     );
   }
-  
+
   handleRequestMoreResults(onResultsLoaded: (unchanged?: boolean) => void)
   {
-    let {resultsPages} = this.state;
-    
-    if(resultsPages * RESULTS_PAGE_SIZE < MAX_RESULTS)
+    const {resultsPages} = this.state;
+
+    if (resultsPages * RESULTS_PAGE_SIZE < MAX_RESULTS)
     {
       this.setState({
         resultsPages: resultsPages + 1,
@@ -176,10 +176,10 @@ class ResultsArea extends PureClasss<Props>
       onResultsLoaded(true);
     }
   }
-  
+
   componentDidUpdate()
   {
-    if(this.state.onResultsLoaded)
+    if (this.state.onResultsLoaded)
     {
       this.setState({
         onResultsLoaded: null,
@@ -187,73 +187,73 @@ class ResultsArea extends PureClasss<Props>
       this.state.onResultsLoaded(false);
     }
   }
-  
+
   isQueryEmpty(): boolean
   {
-    let {query} = this.props;
+    const {query} = this.props;
     return !query || (!query.tql && !query.cards.size);
   }
-  
+
   resultsFodderRange = _.range(0, 25);
-  
+
   renderResults()
   {
-    if(this.isQueryEmpty())
+    if (this.isQueryEmpty())
     {
       return <InfoArea
         large="Results will display here as you build your query."
-      />
+      />;
     }
-    
-    let {resultsState} = this.props;
-    
-    if(resultsState.hasError)
+
+    const {resultsState} = this.props;
+
+    if (resultsState.hasError)
     {
       return <InfoArea
         large="There was an error with your query."
         small={resultsState.errorMessage}
       />;
     }
-    
-    if(!resultsState.results)
+
+    if (!resultsState.results)
     {
-      if(resultsState.rawResult)
+      if (resultsState.rawResult)
       {
         return (
-          <div className='result-text'>
+          <div className="result-text">
             {
               resultsState.rawResult
             }
           </div>
         );
       }
-      
-      if(resultsState.loading)
+
+      if (resultsState.loading)
       {
         return <InfoArea
           large="Querying results..."
         />;
       }
-      
+
       return <InfoArea
         large="Compose a query to view results here."
-      />
+      />;
     }
-    
-    let {results} = resultsState;
-    
-    if(!results.size)
+
+    const {results} = resultsState;
+
+    if (!results.size)
     {
       return <InfoArea
         large="There are no results for your query."
         small="The query was successful, but there were no matches."
       />;
     }
-    
-    if(this.state.resultFormat === 'table')
+
+    if (this.state.resultFormat === 'table')
     {
       return (
-        <div className='results-table-wrapper'>
+        <div className="results-table-wrapper">
           <ResultsTable
             results={results}
             resultsConfig={this.props.query.resultsConfig}
@@ -263,22 +263,22 @@ class ResultsArea extends PureClasss<Props>
         </div>
       );
     }
-    
-    let {resultsConfig} = this.props.query;
-    
+
+    const {resultsConfig} = this.props.query;
+
     return (
       <InfiniteScroll
-        className='results-area-results'
+        className="results-area-results"
         onRequestMoreItems={this.handleRequestMoreResults}
       >
         {
-          results.map((result, index) => 
+          results.map((result, index) =>
           {
-            if(index > this.state.resultsPages * RESULTS_PAGE_SIZE)
+            if (index > this.state.resultsPages * RESULTS_PAGE_SIZE)
             {
               return null;
             }
-            
+
             return (
               <Result
                 result={result}
@@ -293,8 +293,8 @@ class ResultsArea extends PureClasss<Props>
         }
         {
           this.resultsFodderRange.map(
-            i => 
-              <div className='results-area-fodder' key={i} />
+            (i) =>
+              <div className="results-area-fodder" key={i} />,
           )
         }
       </InfiniteScroll>
@@ -304,30 +304,30 @@ class ResultsArea extends PureClasss<Props>
   handleExport()
   {
     this.props.onNavigationException();
-    
-    let {xhr, queryId} = Ajax.query(
+
+    const {xhr, queryId} = Ajax.query(
       TQLConverter.toTQL(
         this.props.query,
         {
           replaceInputs: true,
-        }
+        },
       ),
-      this.props.db, 
+      this.props.db,
       _.noop,
       _.noop,
       false,
       {
         csv: true,
         csvName: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.csv',
-      }
+      },
     );
-    
+
     // TODO kill this on unmount
     this.setState({
       csvXhr: xhr,
       csvQueryId: queryId,
     });
-    
+
     alert('Your data are being prepared for export, and will automatically download when ready.\n\
 Note: this exports the results of your query, which may be different from the results in the Results \
 column if you have set a custom results view.');
@@ -337,60 +337,60 @@ column if you have set a custom results view.');
   {
     this.setState({
       resultFormat: this.state.resultFormat === 'icon' ? 'table' : 'icon',
-    })
+    });
   }
-  
+
   renderTopbar()
   {
-    let {resultsState} = this.props;
-    var text: any = '';
-    if(resultsState.loading)
+    const {resultsState} = this.props;
+    let text: any = '';
+    if (resultsState.loading)
     {
-      text = <span className='loading-text' />;
+      text = <span className="loading-text" />;
     }
-    else if(this.isQueryEmpty())
+    else if (this.isQueryEmpty())
     {
       text = 'Empty query';
     }
-    else if(resultsState.hasError)
+    else if (resultsState.hasError)
     {
       text = 'Error with query';
     }
-    else if(resultsState.results)
+    else if (resultsState.results)
     {
-      let {count} = resultsState;
+      const {count} = resultsState;
       text = `${count || 'No'}${count === MAX_RESULTS ? '+' : ''} result${count === 1 ? '' : 's'}`;
     }
     else
     {
       text = 'Text result';
     }
-    
+
     return (
-      <div className='results-top'>
-        <div className='results-top-summary'>
+      <div className="results-top">
+        <div className="results-top-summary">
           {
             text
           }
         </div>
-        
+
         <div
-          className='results-top-config'
+          className="results-top-config"
           onClick={this.handleExport}
         >
           Export
         </div>
-        
+
         <div
-          className='results-top-config'
+          className="results-top-config"
           onClick={this.showConfig}
         >
           Customize view
         </div>
-        
+
         <Switch
-          first='Icons'
-          second='Table'
+          first="Icons"
+          second="Table"
           onChange={this.toggleView}
           selected={this.state.resultFormat === 'icon' ? 1 : 2}
           small={true}
@@ -398,24 +398,24 @@ column if you have set a custom results view.');
       </div>
     );
   }
-  
+
   showConfig()
   {
     this.setState({
       showingConfig: true,
     });
   }
-  
+
   hideConfig()
   {
     this.setState({
       showingConfig: false,
     });
   }
-  
+
   renderConfig()
   {
-    if(this.state.showingConfig)
+    if (this.state.showingConfig)
     {
       return <ResultsConfig
         config={this.props.query.resultsConfig}
@@ -425,8 +425,8 @@ column if you have set a custom results view.');
       />;
     }
   }
-  
-  handleConfigChange(config:IResultsConfig)
+
+  handleConfigChange(config: IResultsConfig)
   {
     Actions.changeResultsConfig(config);
   }

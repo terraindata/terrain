@@ -43,14 +43,13 @@ THE SOFTWARE.
 */
 
 require('./CheckBox.less');
-import * as $ from 'jquery';
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../util/Util';
 import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as React from 'react';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
-var CheckMark = require("./../../../images/icon_checkMark.svg");
-
+const CheckMark = require('./../../../images/icon_checkMark.svg');
 
 export interface Props {
 	checked: boolean;
@@ -61,17 +60,17 @@ class CheckBox extends Classs<Props>
 {
 	render() {
 		return (
-			<div 
+			<div
 				className={classNames({
 					'checkbox': true,
   					'checkbox-checked': this.props.checked,
-				})} 
+				})}
 				onClick={this.props.onChange}
 			>
-			{this.props.checked ? <CheckMark className ='check-mark-icon'/> : 'O'}
+			{this.props.checked ? <CheckMark className ="check-mark-icon"/> : 'O'}
 			</div>
 		);
-	};
+	}
 }
 
 export default CheckBox;

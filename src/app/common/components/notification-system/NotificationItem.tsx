@@ -42,25 +42,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import Util from '../../../util/Util';
-import Classs from './../../../common/components/Classs';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import Util from '../../../util/Util';
+import Classs from './../../../common/components/Classs';
 
-var Constants = require('./constants');
-var Helpers = require('./helpers');
-var merge = require('object-assign');
-var CloseIcon = require('./../../../../images/icon_close.svg');
-var TerrainLogo = require('./../../../../images/logo_terrainCircle.svg');
+const Constants = require('./constants');
+const Helpers = require('./helpers');
+const merge = require('object-assign');
+const CloseIcon = require('./../../../../images/icon_close.svg');
+const TerrainLogo = require('./../../../../images/logo_terrainCircle.svg');
 /* From Modernizr */
-var whichTransitionEvent = function() {
-  var t;
-  var el = document.createElement('fakeelement');
-  var transitions = {
-    'transition': 'transitionend',
-    'OTransition': 'oTransitionEnd',
-    'MozTransition': 'transitionend',
-    'WebkitTransition': 'webkitTransitionEnd'
+const whichTransitionEvent = function() {
+  let t;
+  const el = document.createElement('fakeelement');
+  const transitions = {
+    transition: 'transitionend',
+    OTransition: 'oTransitionEnd',
+    MozTransition: 'transitionend',
+    WebkitTransition: 'webkitTransitionEnd',
   };
 
   for (t in transitions) {
@@ -91,13 +91,13 @@ class NotificationItem extends Classs<Props> {
     super(props);
     this.state = {
       visible: false,
-      removed: false
+      removed: false,
     };
   }
 
   componentWillMount() {
-    var getStyles = this.props.getStyles;
-    var level = this.props.notification.level;
+    const getStyles = this.props.getStyles;
+    const level = this.props.notification.level;
     this._noAnimation = this.props.noAnimation;
     this._styles = {
       notification: getStyles.byElement('notification')(level),
@@ -113,15 +113,15 @@ class NotificationItem extends Classs<Props> {
   }
 
   _getCssPropertyByPosition() {
-    var position = this.props.notification.position;
-    var css = {};
+    const position = this.props.notification.position;
+    let css = {};
 
     switch (position) {
     case Constants.positions.tl:
     case Constants.positions.bl:
       css = {
         property: 'left',
-        value: -200
+        value: -200,
       };
       break;
 
@@ -129,21 +129,21 @@ class NotificationItem extends Classs<Props> {
     case Constants.positions.br:
       css = {
         property: 'right',
-        value: -200
+        value: -200,
       };
       break;
 
     case Constants.positions.tc:
       css = {
         property: 'top',
-        value: -100
+        value: -100,
       };
       break;
 
     case Constants.positions.bc:
       css = {
         property: 'bottom',
-        value: -100
+        value: -100,
       };
       break;
 
@@ -153,7 +153,7 @@ class NotificationItem extends Classs<Props> {
   }
 
   _defaultAction(event) {
-    var notification = this.props.notification;
+    const notification = this.props.notification;
 
     event.preventDefault();
     this._hideNotification();
@@ -170,7 +170,7 @@ class NotificationItem extends Classs<Props> {
       Util.animateToHeight(this.refs['item'], 0);
       this.setState({
         visible: false,
-        removed: true
+        removed: true,
       });
     }
 
@@ -192,11 +192,11 @@ class NotificationItem extends Classs<Props> {
   }
 
   _showNotification() {
-    var self = this;
+    const self = this;
     setTimeout(function() {
       if (self._isMounted) {
         self.setState({
-          visible: true
+          visible: true,
         });
       }
     }, 50);
@@ -211,10 +211,10 @@ class NotificationItem extends Classs<Props> {
   }
 
   componentDidMount() {
-    var self = this;
-    var transitionEvent = whichTransitionEvent();
-    var notification = this.props.notification;
-    var element: any = ReactDOM.findDOMNode(this);
+    const self = this;
+    const transitionEvent = whichTransitionEvent();
+    const notification = this.props.notification;
+    const element: any = ReactDOM.findDOMNode(this);
 
     this._height = element.offsetHeight;
 
@@ -229,7 +229,6 @@ class NotificationItem extends Classs<Props> {
       }
     }
 
-
     if (notification.autoDismiss) {
       this._notificationTimer = new Helpers.Timer(function() {
         self._hideNotification();
@@ -240,22 +239,22 @@ class NotificationItem extends Classs<Props> {
   }
 
   _handleMouseEnter() {
-    var notification = this.props.notification;
+    const notification = this.props.notification;
     if (notification.autoDismiss) {
       this._notificationTimer.pause();
     }
   }
 
   _handleMouseLeave() {
-    var notification = this.props.notification;
+    const notification = this.props.notification;
     if (notification.autoDismiss) {
       this._notificationTimer.resume();
     }
   }
 
   componentWillUnmount() {
-    var element = ReactDOM.findDOMNode(this);
-    var transitionEvent = whichTransitionEvent();
+    const element = ReactDOM.findDOMNode(this);
+    const transitionEvent = whichTransitionEvent();
     element.removeEventListener(transitionEvent, this._onTransitionEnd);
     this._isMounted = false;
   }
@@ -278,10 +277,10 @@ class NotificationItem extends Classs<Props> {
 
   renderTitle()
   {
-    var notification = this.props.notification;
+    const notification = this.props.notification;
     if (notification.title) {
       return (
-        <h4 className='notification-title' style={this._styles.title}>
+        <h4 className="notification-title" style={this._styles.title}>
          {notification.title}
         </h4>
       );
@@ -292,10 +291,10 @@ class NotificationItem extends Classs<Props> {
 
   renderMessage()
   {
-    var notification = this.props.notification;
+    const notification = this.props.notification;
     if (notification.message) {
       return (
-        <div className='notification-message' style={this._styles.messageWrapper}>
+        <div className="notification-message" style={this._styles.messageWrapper}>
           {notification.message}
         </div>
       );
@@ -307,11 +306,11 @@ class NotificationItem extends Classs<Props> {
   {
     if (this.props.notification.dismissible) {
       return (
-        <span className='notification-dismiss close' style={this._styles.dismiss}>
+        <span className="notification-dismiss close" style={this._styles.dismiss}>
            <CloseIcon style={{
              position: 'relative',
              width: '8px',
-             top: '2px'
+             top: '2px',
             }}/>
         </span>
       );
@@ -320,11 +319,11 @@ class NotificationItem extends Classs<Props> {
 
   renderActionButton()
   {
-    var notification = this.props.notification;
+    const notification = this.props.notification;
     if (notification.action) {
       return (
-        <div className='notification-action-wrapper' style={this._styles.actionWrapper}>
-          <div className='notification-action-button' onClick={this._defaultAction} style={this._styles.action}>
+        <div className="notification-action-wrapper" style={this._styles.actionWrapper}>
+          <div className="notification-action-button" onClick={this._defaultAction} style={this._styles.action}>
             {notification.action.label}
           </div>
         </div>
@@ -334,10 +333,10 @@ class NotificationItem extends Classs<Props> {
 
   render()
   {
-    var notification = this.props.notification;
-    var notificationClassName = 'notification notification-' + notification.level;
-    var notificationStyle = merge({}, this._styles.notification);
-    var cssByPos:any = this._getCssPropertyByPosition();
+    const notification = this.props.notification;
+    let notificationClassName = 'notification notification-' + notification.level;
+    const notificationStyle = merge({}, this._styles.notification);
+    const cssByPos: any = this._getCssPropertyByPosition();
 
     if (this.state.visible) {
       notificationClassName += ' notification-visible';
@@ -376,7 +375,7 @@ class NotificationItem extends Classs<Props> {
           onMouseEnter={this._handleMouseEnter}
           onMouseLeave={this._handleMouseLeave}
           style={notificationStyle}
-          ref='item'
+          ref="item"
         >
           {this.renderDismiss()}
           <div

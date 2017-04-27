@@ -43,17 +43,17 @@ THE SOFTWARE.
 */
 
 require('./Login.less');
-import * as $ from 'jquery';
 import * as classNames from 'classnames';
+import * as $ from 'jquery';
 import * as React from 'react';
 import * as _ from 'underscore';
-import Util from '../../util/Util';
-import Actions from "../data/AuthActions";
 import PureClasss from '../../common/components/PureClasss';
-import Modal from './../../common/components/Modal';
+import Util from '../../util/Util';
+import Actions from '../data/AuthActions';
 import Loading from './../../common/components/Loading';
+import Modal from './../../common/components/Modal';
 
-var TerrainIcon = require("./../../../images/logo_mountainCircle.svg?name=TerrainIcon");
+const TerrainIcon = require('./../../../images/logo_mountainCircle.svg?name=TerrainIcon');
 
 export interface Props {
   appStateLoaded: boolean;
@@ -83,13 +83,13 @@ class Login extends PureClasss<Props>
       this.setState({
         showingLogo: true,
       }),
-      250
+      250,
     );
     setTimeout(() =>
       this.setState({
         opened: true,
       }),
-      1250
+      1250,
     );
   }
 
@@ -108,39 +108,39 @@ class Login extends PureClasss<Props>
 
   handleKeyDown(event)
   {
-    if(event.keyCode === 13)
+    if (event.keyCode === 13)
     {
       this.handleLogin();
     }
   }
 
-  handleUsernameChange(ev:any)
+  handleUsernameChange(ev: any)
   {
-    let {value} = ev.target;
+    const {value} = ev.target;
     this.setState({
-      username: value
+      username: value,
     });
 
-    if(value.length)
+    if (value.length)
     {
       this.setState({
         shifted: true,
-      })
+      });
     }
   }
 
-  handlePasswordChange(ev:any)
+  handlePasswordChange(ev: any)
   {
-    let {value} = ev.target;
+    const {value} = ev.target;
     this.setState({
-      password: value
+      password: value,
     });
 
-    if(value.length)
+    if (value.length)
     {
       this.setState({
         shifted: true,
-      })
+      });
     }
   }
 
@@ -153,7 +153,7 @@ class Login extends PureClasss<Props>
 
   handleBlur()
   {
-    if(!this.state.username && !this.state.password)
+    if (!this.state.username && !this.state.password)
     {
       this.setState({
         shifted: false,
@@ -169,7 +169,7 @@ class Login extends PureClasss<Props>
   xhr: XMLHttpRequest;
   handleLogin()
   {
-    if(this.state.loggingIn)
+    if (this.state.loggingIn)
     {
       // already logging in
       return;
@@ -178,14 +178,14 @@ class Login extends PureClasss<Props>
     this.setState({
       loggingIn: true,
     });
-    let { username } = this.state;
-    let login = (token: string) => {
+    const { username } = this.state;
+    const login = (token: string) => {
       Actions.login(token, username);
     };
 
     this.xhr && this.xhr.abort();
     this.xhr = new XMLHttpRequest();
-    this.xhr.onerror = (ev:Event) => {
+    this.xhr.onerror = (ev: Event) => {
       this.setState({
         errorModalMessage: 'Error logging in:' + ev,
         loggingIn: false,
@@ -193,8 +193,8 @@ class Login extends PureClasss<Props>
       this.toggleErrorModal();
       this.xhr = null;
     };
-    this.xhr.onload = (ev:Event) => {
-      if(this.xhr.status != 200) {
+    this.xhr.onload = (ev: Event) => {
+      if (this.xhr.status != 200) {
         this.setState({
           loggingIn: false,
           errorModalMessage: 'Failed to log in: ' + this.xhr.responseText,
@@ -202,12 +202,12 @@ class Login extends PureClasss<Props>
         this.toggleErrorModal();
         return;
       }
-      let token = this.xhr.responseText;
+      const token = this.xhr.responseText;
       this.xhr = null;
       login(token);
     };
     // NOTE: MIDWAY_HOST will be replaced by the build process.
-    this.xhr.open("POST", MIDWAY_HOST + "/auth", true);
+    this.xhr.open('POST', MIDWAY_HOST + '/auth', true);
     this.xhr.send(JSON.stringify({
       username,
       password: this.state.password,
@@ -221,7 +221,7 @@ class Login extends PureClasss<Props>
 
   registerNewUser()
   {
-    alert("Signing up for Terraformer has not been implemented yet");
+    alert('Signing up for Terraformer has not been implemented yet');
   }
 
   toggleErrorModal()
@@ -236,7 +236,7 @@ class Login extends PureClasss<Props>
   {
     // show loading if you are logging in, or if you are already logged in
     //  but the app state is still loading
-    let loading = (this.state.loggingIn && !this.props.loggedIn) ||
+    const loading = (this.state.loggingIn && !this.props.loggedIn) ||
       (this.props.loggedIn && !this.props.appStateLoaded);
     return (
       <div
@@ -247,7 +247,7 @@ class Login extends PureClasss<Props>
         })}
         onKeyDown={this.handleKeyDown}
       >
-        <div className='login-logo-container'>
+        <div className="login-logo-container">
         {
           this.state.showingLogo &&
             <Loading
@@ -260,48 +260,48 @@ class Login extends PureClasss<Props>
         }
         </div>
         <div
-          className='login-container'
-          ref='container'
+          className="login-container"
+          ref="container"
         >
-          <div className='login-info'>
-            <div className='login-row'>
+          <div className="login-info">
+            <div className="login-row">
               <input
-                id='login-email'
-                type='text'
+                id="login-email"
+                type="text"
                 onChange={this.handleUsernameChange}
-                className='login-input-field'
-                placeholder=''
+                className="login-input-field"
+                placeholder=""
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
               />
               <label
-                htmlFor='login-email'
-                className='login-label'
+                htmlFor="login-email"
+                className="login-label"
               >
                 Email
               </label>
             </div>
-            <div className='login-row'>
+            <div className="login-row">
               <input
-                className='login-input-field'
-                type='password'
-                id='login-password'
-                placeholder=''
+                className="login-input-field"
+                type="password"
+                id="login-password"
+                placeholder=""
                 onKeyDown={this.handleKeyDown}
                 onChange={this.handlePasswordChange}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
               />
               <label
-                className='login-label'
-                htmlFor='login-password'
+                className="login-label"
+                htmlFor="login-password"
               >
                 Password
               </label>
             </div>
           </div>
-          <div className='login-submit-button-wrapper' >
-            <div className='login-submit-button button' onClick={this.handleLogin}>
+          <div className="login-submit-button-wrapper" >
+            <div className="login-submit-button button" onClick={this.handleLogin}>
               Login
             </div>
           </div>

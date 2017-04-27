@@ -47,71 +47,70 @@ THE SOFTWARE.
 require('babel-polyfill');
 
 // Style
-require("./App.less");
+require('./App.less');
 
 // Libraries
 import * as $ from 'jquery';
 import * as React from 'react';
-import * as ReactDOM from "react-dom";
+import * as ReactDOM from 'react-dom';
 const Perf = require('react-addons-perf');
-import { Router, Route, IndexRoute } from 'react-router';
+import { IndexRoute, Route, Router } from 'react-router';
 const {browserHistory} = require('react-router');
 require('velocity-animate');
 require('velocity-animate/velocity.ui');
 window['PerfStart'] = Perf.start;
 window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); };
 
-
 // Components
+import Login from './auth/components/Login';
+import Builder from './builder/components/Builder';
+import LayoutManager from './builder/components/layout/LayoutManager';
+import AccountDropdown from './common/components/AccountDropdown';
+import InfoArea from './common/components/InfoArea';
+import Logout from './common/components/Logout';
+import Placeholder from './common/components/Placeholder';
 import PureClasss from './common/components/PureClasss';
-import LayoutManager from "./builder/components/layout/LayoutManager";
-import Builder from "./builder/components/Builder";
+import Redirect from './common/components/Redirect';
+import Sidebar from './common/components/Sidebar';
 import Library from './library/components/Library';
-import SchemaPage from "./schema/components/SchemaPage";
-import X from './x/components/X';
+import ManualWrapper from './manual/components/ManualWrapper';
+import SchemaPage from './schema/components/SchemaPage';
 import Account from './users/components/Account';
-import Settings from './users/components/Settings';
+import EditProfile from './users/components/EditProfile';
 import Notifications from './users/components/Notifications';
 import Profile from './users/components/Profile';
-import EditProfile from './users/components/EditProfile';
+import Settings from './users/components/Settings';
 import Team from './users/components/Team';
-import Sidebar from "./common/components/Sidebar";
-import AccountDropdown from "./common/components/AccountDropdown";
-import Login from "./auth/components/Login";
-import InfoArea from "./common/components/InfoArea";
-import Placeholder from "./common/components/Placeholder";
-import Redirect from "./common/components/Redirect";
-import Logout from "./common/components/Logout";
-import ManualWrapper from "./manual/components/ManualWrapper";
-var ReactTooltip = require("./common/components/tooltip/react-tooltip.js");
+import X from './x/components/X';
+const ReactTooltip = require('./common/components/tooltip/react-tooltip.js');
 import { InAppNotification } from './common/components/InAppNotification';
 import DeployModal from './deploy/components/DeployModal';
-import EasterEggs from './x/components/EasterEggs';
 import Ajax from './util/Ajax';
 import Util from './util/Util';
+import EasterEggs from './x/components/EasterEggs';
 
+import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 import BuilderStore from './builder/data/BuilderStore'; // for error reporting
-import BuilderActions from "./builder/data/BuilderActions"; // for card hovering
 
 // data that needs to be loaded
-import LibraryStore from './library/data/LibraryStore';
+import AuthActions from './auth/data/AuthActions';
+import AuthStore from './auth/data/AuthStore';
 import LibraryActions from './library/data/LibraryActions';
-import UserStore from './users/data/UserStore';
-import UserActions from "./users/data/UserActions";
+import LibraryStore from './library/data/LibraryStore';
+import RolesActions from './roles/data/RolesActions';
 import RolesStore from './roles/data/RolesStore';
-import RolesActions from "./roles/data/RolesActions";
-import AuthStore from "./auth/data/AuthStore";
-import AuthActions from "./auth/data/AuthActions";
-import {SchemaStore, SchemaActions} from './schema/data/SchemaStore';
+import {SchemaActions, SchemaStore} from './schema/data/SchemaStore';
+import UserActions from './users/data/UserActions';
+import UserStore from './users/data/UserStore';
 
 // Icons
-var TerrainIcon = require("./../images/icon_terrain_108x17.svg?name=TerrainIcon");
-var HomeIcon = require("./../images/icon_profile_16x16.svg?name=HomeIcon");
-var LibraryIcon = require("./../images/icon_library_20x16.svg?name=LibraryIcon");
-var BuilderIcon = require("./../images/icon_reporting_18x18.svg?name=BuilderIcon");
-var ReportingIcon = require("./../images/icon_builder_18x18.svg?name=ReportingIcon");
-var TQLIcon = require("./../images/icon_tql_17x14.svg?name=TQLIcon");
-var ManualIcon = require ("./../images/icon_info.svg");
+const TerrainIcon = require('./../images/icon_terrain_108x17.svg?name=TerrainIcon');
+const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
+const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
+const BuilderIcon = require('./../images/icon_reporting_18x18.svg?name=BuilderIcon');
+const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
+const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
+const ManualIcon = require ('./../images/icon_info.svg');
 
 const links =
 [
@@ -170,20 +169,20 @@ class App extends PureClasss<Props>
     noLocalStorage: false,
   };
 
-  constructor(props:Props)
+  constructor(props: Props)
   {
     super(props);
 
     try {
       // check to see if we can use localStorage
       localStorage['test'] = 'test';
-    } catch(e)
+    } catch (e)
     {
       this.state.noLocalStorage = true;
       return;
     }
 
-    if(Util.getIEVersion())
+    if (Util.getIEVersion())
     {
       alert('Terraformer is not meant to work in Internet Explorer. Please try another browser.');
     }
@@ -191,20 +190,20 @@ class App extends PureClasss<Props>
     // Respond to authentication state changes.
     this._subscribe(AuthStore, {
       updater: (state) => {
-        let token = AuthStore.getState().get('authenticationToken');
-        let loggedIn = token !== null;
-        let loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
+        const token = AuthStore.getState().get('authenticationToken');
+        const loggedIn = token !== null;
+        const loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
 
         this.setState({
           loggedIn,
           loggedInAndLoaded,
         });
 
-        if(token !== null)
+        if (token !== null)
         {
           this.fetchData();
         }
-      }
+      },
     });
 
     this._subscribe(LibraryStore, {
@@ -228,8 +227,8 @@ class App extends PureClasss<Props>
     });
 
     // Retrieve logged-in state from persistent storage.
-    let token = localStorage['authenticationToken'];
-    let username = localStorage['username'];
+    const token = localStorage['authenticationToken'];
+    const username = localStorage['username'];
     if (token !== undefined && token !== null) {
       AuthActions.login(token, username);
     }
@@ -247,7 +246,7 @@ class App extends PureClasss<Props>
   {
     this.setState({
       sidebarExpanded: !this.state.sidebarExpanded,
-    })
+    });
   }
 
   handleLoginLoadComplete()
@@ -266,7 +265,7 @@ class App extends PureClasss<Props>
 
   renderApp()
   {
-    if(!this.state.loggedInAndLoaded)
+    if (!this.state.loggedInAndLoaded)
     {
       return (
         <Login
@@ -277,10 +276,10 @@ class App extends PureClasss<Props>
       );
     }
 
-    var sidebarWidth = this.state.sidebarExpanded ? 130 : 36;
-    var selectedIndex = links.findIndex(link => this.props.location.pathname.indexOf(link.route) === 0 );
+    const sidebarWidth = this.state.sidebarExpanded ? 130 : 36;
+    const selectedIndex = links.findIndex((link) => this.props.location.pathname.indexOf(link.route) === 0 );
 
-    var layout =
+    const layout =
       {
         fullHeight: true,
         columns:
@@ -293,34 +292,34 @@ class App extends PureClasss<Props>
               expandable={true}
               expanded={this.state.sidebarExpanded}
               onExpand={this.toggleSidebar}
-            />
+            />,
           },
           {
             noProps: true,
             content:
               <div
-                className='app-inner'
+                className="app-inner"
               >
                 {
                   this.props.children
                 }
               </div>
             ,
-          }
+          },
         ],
       };
 
     return <LayoutManager layout={layout} />;
   }
 
-  handleMouseMove(e:MEvent)
+  handleMouseMove(e: MEvent)
   {
     BuilderActions.hoverCard(null);
   }
 
   render()
   {
-    if(this.state.noLocalStorage)
+    if (this.state.noLocalStorage)
     {
       return (
         <InfoArea
@@ -331,22 +330,22 @@ class App extends PureClasss<Props>
 
     return (
       <div
-        className='app'
+        className="app"
         onMouseMove={this.handleMouseMove}
       >
         {
           this.state.loggedInAndLoaded &&
             <div
-              className='app-top-bar'
+              className="app-top-bar"
             >
               <TerrainIcon
-                className='app-top-bar-icon'
+                className="app-top-bar-icon"
               />
                <AccountDropdown />
             </div>
         }
         <div
-          className='app-wrapper'
+          className="app-wrapper"
         >
           {
             this.renderApp()
@@ -370,8 +369,7 @@ class App extends PureClasss<Props>
   }
 }
 
-
-var router = (
+const router = (
   <Router history={browserHistory}>
     <Route path="/" component={App}>rsv E`
       <IndexRoute component={Redirect} />
@@ -414,43 +412,43 @@ var router = (
       <Route path="/x" component={X} />
       <Route path="/x/:x" component={X} />
 
-      <Route path='/browser' component={Redirect} />
-      <Route path='/browser/:a' component={Redirect} />
-      <Route path='/browser/:a/:b' component={Redirect} />
-      <Route path='/browser/:a/:b/:c' component={Redirect} />
+      <Route path="/browser" component={Redirect} />
+      <Route path="/browser/:a" component={Redirect} />
+      <Route path="/browser/:a/:b" component={Redirect} />
+      <Route path="/browser/:a/:b/:c" component={Redirect} />
 
-      <Route path='/schema' component={SchemaPage} />
+      <Route path="/schema" component={SchemaPage} />
     </Route>
   </Router>
 );
 
-if(!DEV)
+if (!DEV)
 {
   // report uncaught errors in production
   window.onerror = (errorMsg, url, lineNo, columnNo, error) => {
 
-    let user = UserStore.getState().get('currentUser');
-    let username = user && user.username;
-    let libraryState = JSON.stringify(LibraryStore.getState().toJS());
-    let builderState = JSON.stringify(BuilderStore.getState().toJS());
-    let location = JSON.stringify(window.location);
+    const user = UserStore.getState().get('currentUser');
+    const username = user && user.username;
+    const libraryState = JSON.stringify(LibraryStore.getState().toJS());
+    const builderState = JSON.stringify(BuilderStore.getState().toJS());
+    const location = JSON.stringify(window.location);
 
-    let msg = `${errorMsg} by ${username}
+    const msg = `${errorMsg} by ${username}
       Location:
       ${location}
-      
+
       Library State:
       ${libraryState}
-      
+
       Builder State:
       ${builderState}
-      
+
       Error Stack:
       ${error && error.stack}
     `;
 
     $.post('http://lukeknepper.com/email.php', {
-        msg: msg,
+        msg,
         secret: '11235813',
     });
 

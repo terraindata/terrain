@@ -78,7 +78,6 @@ const SchemaTreeStyles =
 
 	},
 
-
 	treeItem: [
 		Styles.transition,
 	],
@@ -86,7 +85,7 @@ const SchemaTreeStyles =
 	arrow: _.extend(
 		arrowSvgStyles,
 		Styles.rotate90,
-		Styles.transition
+		Styles.transition,
 	),
 
 	arrowOpen: _.extend(
@@ -97,29 +96,29 @@ const SchemaTreeStyles =
 			// stroke: Styles.colors.active,
 		},
 		Styles.rotate180,
-		Styles.transition
+		Styles.transition,
 	),
 
 	treeItemHeader: [{
-			display: 'flex',
-			cursor: 'pointer',
-			height: itemHeaderHeight,
+			'display': 'flex',
+			'cursor': 'pointer',
+			'height': itemHeaderHeight,
 
-			borderRadius: 4,
+			'borderRadius': 4,
 
 			':hover': {
 				background: headerHighlightedColor,
-			}
+			},
 		},
 		Styles.transition,
 	],
 
 	treeItemHeaderSelected:
 	{
-		background: headerSelectedColor,
+		'background': headerSelectedColor,
 		':hover': {
 			background: headerSelectedColor,
-		}
+		},
 	},
 
 	treeItemHeaderHighlighted:
@@ -134,7 +133,7 @@ const SchemaTreeStyles =
 	},
 
 	itemInfoRow: {
-		'flexGrow': '1',
+		flexGrow: '1',
 	},
 
 	childrenWrapper: {
@@ -146,7 +145,7 @@ const SchemaTreeStyles =
 				// borderBottom: '0.5px solid rgba(0,0,0,0.1)',
 				// margin: '0px 6px',
 			},
-			Styles.transition
+			Styles.transition,
 		],
 
 		search: Styles.transition,
@@ -155,7 +154,6 @@ const SchemaTreeStyles =
 	childSection: {
 
 	},
-
 
 	// SchemaTreeInfo
 	infoPieces: {
@@ -175,7 +173,6 @@ const SchemaTreeStyles =
 		fontWeight: 1000,
 		color: Styles.colors.active,
 	},
-
 
 	margin: Styles.margin,
 };

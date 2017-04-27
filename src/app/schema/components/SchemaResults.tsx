@@ -42,20 +42,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
 import * as Immutable from 'immutable';
-let {List, Map} = Immutable;
+import * as _ from 'underscore';
+const {List, Map} = Immutable;
 const Radium = require('radium');
-import SchemaTypes from '../SchemaTypes';
-import SchemaStore from '../data/SchemaStore';
 import * as React from 'react';
+import Styles from '../../Styles';
+import SchemaStore from '../data/SchemaStore';
+import SchemaTypes from '../SchemaTypes';
 import PureClasss from './../../common/components/PureClasss';
 import SchemaTreeStyles from './SchemaTreeStyles';
-import Styles from '../../Styles';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
-import ResultsTable from '../../builder/components/results/ResultsTable';
-import {ResultsManager, ResultsState, _ResultsState} from '../../builder/components/results/ResultsManager';
 import BuilderTypes from '../../builder/BuilderTypes';
+import {_ResultsState, ResultsManager, ResultsState} from '../../builder/components/results/ResultsManager';
+import ResultsTable from '../../builder/components/results/ResultsTable';
 import InfoArea from '../../common/components/InfoArea';
 
 const NUM_ROWS = 200;
@@ -71,53 +71,53 @@ class SchemaResults extends PureClasss<Props>
 	state: {
 		selectedId?: ID,
 		selectedItem?: SchemaBaseClass,
-		
+
 		resultsState?: ResultsState;
 		resultsQuery?: BuilderTypes.Query;
 		resultsDb?: string;
 	} = {
 		resultsState: _ResultsState(),
 	};
-	
-	constructor(props:Props)
+
+	constructor(props: Props)
 	{
 		super(props);
-		
+
 		this._subscribe(SchemaStore, {
-			updater: (storeState:SchemaTypes.SchemaState) =>
+			updater: (storeState: SchemaTypes.SchemaState) =>
 			{
-				let {selectedId} = storeState;
+				const {selectedId} = storeState;
 				// TODO change if store changes
-				let selectedItem = 
-					storeState.getIn(['databases', selectedId]) || 
-					storeState.getIn(['tables', selectedId]) || 
+				const selectedItem =
+					storeState.getIn(['databases', selectedId]) ||
+					storeState.getIn(['tables', selectedId]) ||
 					storeState.getIn(['columns', selectedId]) ||
 					storeState.getIn(['indexes', selectedId]);
-				
-				if(selectedItem !== this.state.selectedItem)
+
+				if (selectedItem !== this.state.selectedItem)
 				{
 					this.setState({
 						selectedId,
 						selectedItem,
 					});
 
-					if(this.showsResults(selectedItem))
+					if (this.showsResults(selectedItem))
 					{
-						let resultsDb = 
+						const resultsDb =
 							selectedItem.type === 'database' ? selectedItem.name :
-								this.props.databases 
+								this.props.databases
 									&& this.props.databases.get(selectedItem['databaseId']).name;
-						
+
 						let field: string, table: string, where: string;
-						
-						switch(selectedItem.type)
+
+						switch (selectedItem.type)
 						{
 							case 'database':
 								field = 'TABLE_NAME, TABLE_ROWS, AVG_ROW_LENGTH, DATA_LENGTH';
 								table = 'INFORMATION_SCHEMA.TABLES';
 								where = `TABLE_SCHEMA = '${selectedItem.name}'`;
 								break;
-							case 'table':	
+							case 'table':
 								field = '*';
 								table = selectedItem.name;
 								break;
@@ -129,9 +129,9 @@ class SchemaResults extends PureClasss<Props>
 								//TODO
 								break;
 						}
-						
-						let resultsQuery = this.getQuery(field, table, where);
-						
+
+						const resultsQuery = this.getQuery(field, table, where);
+
 						this.setState({
 							resultsQuery,
 							resultsDb,
@@ -143,15 +143,15 @@ class SchemaResults extends PureClasss<Props>
 						this.handleResultsStateChange(_ResultsState());
 					}
 				}
-			}
+			},
 		});
 	}
-	
-	getQuery(field: string, table: string, where: string = "1"): BuilderTypes.Query
+
+	getQuery(field: string, table: string, where: string = '1'): BuilderTypes.Query
 	{
-		let tql = "SELECT " + field + " FROM " + table + " " + where + " LIMIT " + NUM_ROWS + ";";
-		
-		let inputs = [
+		const tql = 'SELECT ' + field + ' FROM ' + table + ' ' + where + ' LIMIT ' + NUM_ROWS + ';';
+
+		const inputs = [
 			{
 				key: 'table',
 				value: table,
@@ -165,16 +165,16 @@ class SchemaResults extends PureClasss<Props>
 				value: NUM_ROWS,
 			},
 		].map(
-			inputConfig =>
+			(inputConfig) =>
 				BuilderTypes.make(
 					BuilderTypes.Blocks.input,
-					inputConfig
-				)
+					inputConfig,
+				),
 		);
-		
+
 		return BuilderTypes._Query({
 			inputs: List(inputs),
-			
+
 			cards: List([
 				BuilderTypes.make(
 					BuilderTypes.Blocks.sfw,
@@ -184,10 +184,10 @@ class SchemaResults extends PureClasss<Props>
 								BuilderTypes.Blocks.field,
 								{
 									field: 'input.field',
-								}
+								},
 							),
 						]),
-						
+
 						cards: List([
 							BuilderTypes.make(
 								BuilderTypes.Blocks.from,
@@ -197,12 +197,12 @@ class SchemaResults extends PureClasss<Props>
 											BuilderTypes.Blocks.table,
 											{
 												table: 'input.table',
-											}
+											},
 										),
 									]),
-								}
+								},
 							),
-							
+
 							BuilderTypes.make(
 								BuilderTypes.Blocks.where,
 								{
@@ -211,37 +211,37 @@ class SchemaResults extends PureClasss<Props>
 											BuilderTypes.Blocks.tql,
 											{
 												clause: where,
-											}
+											},
 										),
 									]),
-								}
+								},
 							),
-							
+
 							BuilderTypes.make(
 								BuilderTypes.Blocks.take,
 								{
 									value: 'input.numRows',
-								}
+								},
 							),
 						]),
-					}
+					},
 				),
 			]),
 		});
 	}
-	
+
 	showsResults(selectedItem: SchemaBaseClass): boolean
 	{
 		return selectedItem && selectedItem.type !== 'index';
 	}
-	
+
 	handleResultsStateChange(resultsState: ResultsState)
 	{
 		this.setState({
 			resultsState,
 		});
 	}
-	
+
   render()
   {
     return (
@@ -261,10 +261,10 @@ class SchemaResults extends PureClasss<Props>
 		    		/>
 		    	:
     				<InfoArea
-    					large='Select an item to see its contents here.'
+    					large="Select an item to see its contents here."
     				/>
     		}
-    		
+
     		<ResultsManager
     			db={this.state.resultsDb}
     			onResultsStateChange={this.handleResultsStateChange}

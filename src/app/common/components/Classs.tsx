@@ -51,7 +51,7 @@ interface Config
   stateKey?: string;
   storeKeyPath?: string[] | (() => string[]);
   isMounted?: boolean;
-  updater?: (storeState:any) => void;
+  updater?: (storeState: any) => void;
 }
 
 interface Store
@@ -67,8 +67,8 @@ class Classs<T> extends React.Component<T, any>
     super(props);
 
     // copied from https://github.com/sindresorhus/auto-bind
-    let self = this;
-    for (const key of Object.getOwnPropertyNames(self.constructor.prototype)) 
+    const self = this;
+    for (const key of Object.getOwnPropertyNames(self.constructor.prototype))
     {
       const val = self[key];
 
@@ -77,7 +77,7 @@ class Classs<T> extends React.Component<T, any>
       }
     }
 
-    let unmountFn = this['componentWillUnmount'];
+    const unmountFn = this['componentWillUnmount'];
     this['componentWillUnmount'] = () =>
     {
       this._unmounted = true; // antipattern
@@ -92,52 +92,52 @@ class Classs<T> extends React.Component<T, any>
 
   _unsubscribe()
   {
-    this.subscriptions.map(cancelSubscription => cancelSubscription());
+    this.subscriptions.map((cancelSubscription) => cancelSubscription());
   }
 
   // subscribes to a Redux store
   _subscribe(
     store: Store,
-    config: Config
+    config: Config,
   )
   {
-    let update = () =>
+    const update = () =>
     {
       this._update(store, config);
     };
 
-    let subscribe = () =>
+    const subscribe = () =>
       this.subscriptions.push(
-        store.subscribe(update)
+        store.subscribe(update),
       );
 
-    if(config.isMounted)
+    if (config.isMounted)
     {
       subscribe();
       update();
     } else {
-      let mountFn = this['componentDidMount'];
+      const mountFn = this['componentDidMount'];
       this['componentDidMount'] = () =>
       {
         subscribe();
         update();
         mountFn && mountFn();
-      }
+      };
     }
   }
-  subscriptions: (() => void)[] = [];
+  subscriptions: Array<() => void> = [];
 
   _update(store: Store, config: Config)
   {
-    if(this._unmounted)
+    if (this._unmounted)
     {
       return;
     }
 
-    if(config.updater)
+    if (config.updater)
     {
       config.updater(store.getState());
-      if(!config.stateKey)
+      if (!config.stateKey)
       {
         // only using the updater
         return;
@@ -146,18 +146,18 @@ class Classs<T> extends React.Component<T, any>
 
     let stateKey = config.stateKey;
 
-    if(config.storeKeyPath)
+    if (config.storeKeyPath)
     {
-      let keyPath = typeof config.storeKeyPath === 'function' ? (config.storeKeyPath as (() => string[]))() : config.storeKeyPath;
-      var value = store.getState().getIn(keyPath);
+      const keyPath = typeof config.storeKeyPath === 'function' ? (config.storeKeyPath as (() => string[]))() : config.storeKeyPath;
+      const value = store.getState().getIn(keyPath);
       stateKey = stateKey || keyPath[keyPath.length - 1];
     } else {
-      var value = store.getState();
+      const value = store.getState();
     }
 
     stateKey = stateKey || 'state';
 
-    if(this.state[stateKey] !== value)
+    if (this.state[stateKey] !== value)
     {
       this.setState({
         [stateKey]: value,
@@ -169,11 +169,11 @@ class Classs<T> extends React.Component<T, any>
   //  this function accepts arguments from which to
   //  construct an array keyPath, and memoizes that array
   //  so as to allow for pure rendering
-  _keyPaths: {[key: string]: (string | number)[]} = {};
-  _keyPath(...keys: (string | number)[])
+  _keyPaths: {[key: string]: Array<string | number>} = {};
+  _keyPath(...keys: Array<string | number>)
   {
-    var key = keys.join(".");
-    if(this._keyPaths[key] === undefined)
+    const key = keys.join('.');
+    if (this._keyPaths[key] === undefined)
     {
       this._keyPaths[key] = keys;
     }
@@ -185,40 +185,40 @@ class Classs<T> extends React.Component<T, any>
     {
       seed: Immutable.List<string | number>,
       keyPath: Immutable.List<string | number>,
-    }
+    },
   } = {};
-  _ikeyPath(seed: Immutable.List<string | number>, ...keys: (string | number | (string | number)[])[])
+  _ikeyPath(seed: Immutable.List<string | number>, ...keys: Array<string | number | Array<string | number>>)
   {
-    if(Array.isArray(keys[0]))
+    if (Array.isArray(keys[0]))
     {
-      keys = keys[0] as any as (string | number)[];
+      keys = keys[0] as any as Array<string | number>;
     }
 
-    let str = seed.toArray().concat(keys as (string | number)[]).join("");
-    if(!this._ikeyPaths[str] || this._ikeyPaths[str].seed !== seed)
+    const str = seed.toArray().concat(keys as Array<string | number>).join('');
+    if (!this._ikeyPaths[str] || this._ikeyPaths[str].seed !== seed)
     {
       this._ikeyPaths[str] = {
-        seed: seed,
+        seed,
         keyPath: seed.concat(keys) as Immutable.List<string | number>,
-      }
+      };
     }
 
     return this._ikeyPaths[str].keyPath;
   }
 
   _fns: {
-    [name: string]: {
+    [name: string]: Array<{
       args: any[],
       fn: () => void,
-    }[],
+    }>,
   } = {};
-  _fn(instanceFn: (...args:any[]) => any, ...args: any[]): (...args:any[]) => any
+  _fn(instanceFn: (...args: any[]) => any, ...args: any[]): (...args: any[]) => any
   {
-    let fnName = instanceFn['name'];
-    var fns = this._fns[fnName];
-    if(!fns)
+    const fnName = instanceFn['name'];
+    const fns = this._fns[fnName];
+    if (!fns)
     {
-      let fn = this.__getFn(instanceFn, args);
+      const fn = this.__getFn(instanceFn, args);
       this._fns[fnName] = [{
         args,
         fn,
@@ -226,22 +226,22 @@ class Classs<T> extends React.Component<T, any>
       return fn;
     }
 
-    for(var obj of fns)
+    for (const obj of fns)
     {
-      if(obj.args.length === args.length && obj.args.every((e, i) => args[i] === e))
+      if (obj.args.length === args.length && obj.args.every((e, i) => args[i] === e))
       {
         return obj.fn;
       }
     }
 
-    let fn = this.__getFn(instanceFn, args);
+    const fn = this.__getFn(instanceFn, args);
     this._fns[fnName].push({ args, fn });
     return fn;
   }
 
-  __getFn(instanceFn: (...args:any[]) => any, args: any[]): (...args:any[]) => any
+  __getFn(instanceFn: (...args: any[]) => any, args: any[]): (...args: any[]) => any
   {
-    switch(args.length)
+    switch (args.length)
     {
       case 0:
         return instanceFn.bind(this);
@@ -258,7 +258,7 @@ class Classs<T> extends React.Component<T, any>
     }
   }
 
-  _togMap: {[stateKey:string]: () => void} = {};
+  _togMap: {[stateKey: string]: () => void} = {};
   _toggle(stateKey: string): (() => void)
   {
     return this._togMap[stateKey] || (

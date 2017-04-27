@@ -42,23 +42,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
+const _ = require('underscore');
 import * as Immutable from 'immutable';
-import { Map, List } from 'immutable';
+import { List, Map } from 'immutable';
 import * as ReduxActions from 'redux-actions';
 import {CardItem} from '../components/cards/Card';
-var Redux = require('redux');
-import {BuilderActionTypes, BuilderDirtyActionTypes, BuilderCardActionTypes} from './BuilderActionTypes';
-import Util from '../../util/Util';
+const Redux = require('redux');
 import TQLConverter from '../../tql/TQLConverter';
-import {ResultsState, _ResultsState} from '../components/results/ResultsManager';
+import Util from '../../util/Util';
+import {_ResultsState, ResultsState} from '../components/results/ResultsManager';
+import {BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes} from './BuilderActionTypes';
 
-import BuilderTypes from './../BuilderTypes';
 import LibraryTypes from './../../library/LibraryTypes';
+import BuilderTypes from './../BuilderTypes';
 
 export class BuilderStateClass
 {
-  variantId: ID = "";
+  variantId: ID = '';
   query: BuilderTypes.Query = null;
 
   // for undo/redo
@@ -72,11 +72,11 @@ export class BuilderStateClass
   loadingXhr: XMLHttpRequest = null;
   loadingVariantId: ID = '';
 
-  hoveringCardId: ID = "";
+  hoveringCardId: ID = '';
 
   selectedCardIds = Map<ID, boolean>({});
 
-  db: string = "";
+  db: string = '';
 
   // TODO move
   manual = Map<ID, BuilderTypes.ICards>({});
@@ -93,12 +93,12 @@ export class BuilderStateClass
   resultsState: ResultsState = _ResultsState();
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> {}
-let BuilderState_Record = Immutable.Record(new BuilderStateClass());
-let _BuilderState = (config?:any) => {
+const BuilderState_Record = Immutable.Record(new BuilderStateClass());
+const _BuilderState = (config?: any) => {
   return new BuilderState_Record(config || {}) as any as BuilderState;
 };
 
-var DefaultState = _BuilderState();
+const DefaultState = _BuilderState();
 
 import BuilderReducers from './BuilderReducers';
 
@@ -108,17 +108,17 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
     action: Action<{
       keyPath: KeyPath;
       notDirty: boolean;
-    }>
+    }>,
   ) =>
   {
-    if(BuilderDirtyActionTypes[action.type] && !action.payload.notDirty)
+    if (BuilderDirtyActionTypes[action.type] && !action.payload.notDirty)
     {
       state = state
         .set('isDirty', true);
 
       // back up for undo, check time to prevent overloading the undo stack
-      let time = (new Date()).getTime();
-      if(
+      const time = (new Date()).getTime();
+      if (
         action.type !== BuilderActionTypes.change
         || action.type !== state.lastActionType
         || action.payload.keyPath !== state.lastActionKeyPath
@@ -132,24 +132,24 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
           .set('pastQueries', state.pastQueries.unshift(state.query));
       }
 
-      if(state.nextQueries.size)
+      if (state.nextQueries.size)
       {
         state = state.set('nextQueries', Immutable.List([]));
       }
     }
-    
-    if(typeof BuilderReducers[action.type] === 'function')
+
+    if (typeof BuilderReducers[action.type] === 'function')
     {
       state = (BuilderReducers[action.type] as any)(state, action);
     }
 
-    if(BuilderCardActionTypes[action.type])
+    if (BuilderCardActionTypes[action.type])
     {
       // a card changed and we need to re-translate the tql
       //  needs to be after the card change has affected the state
       state = state
         .setIn(['query', 'tql'],
-          TQLConverter.toTQL(state.query)
+          TQLConverter.toTQL(state.query),
         )
         .setIn(['query', 'tqlCardsInSync'], true);
     }

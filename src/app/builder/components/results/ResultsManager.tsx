@@ -43,16 +43,16 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
-const {Map,List} = Immutable;
-import * as _ from 'underscore';
+const {Map, List} = Immutable;
 import * as React from 'react';
-import Util from '../../../util/Util';
-import {Ajax, QueryResponse} from '../../../util/Ajax';
-import {IResultsConfig, DefaultIResultsConfig, ResultsConfig} from "../results/ResultsConfig";
-import TQLConverter from "../../../tql/TQLConverter";
-import BuilderTypes from '../../BuilderTypes';
-import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore';
+import * as _ from 'underscore';
 import {BaseClass, New} from '../../../Classes';
+import TQLConverter from '../../../tql/TQLConverter';
+import {Ajax, QueryResponse} from '../../../util/Ajax';
+import Util from '../../../util/Util';
+import BuilderTypes from '../../BuilderTypes';
+import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
+import {DefaultIResultsConfig, IResultsConfig, ResultsConfig} from '../results/ResultsConfig';
 import PureClasss from './../../../common/components/PureClasss';
 
 export const MAX_RESULTS = 200;
@@ -61,14 +61,14 @@ class ResultClass extends BaseClass
 {
   // all available fields for display
   fields: IMMap<string, string> = Map<string, string>({});
-  
+
   spotlight: any;
-  
+
   rawFields: IMMap<string, string> = Map<string, string>({});
   transformFields: IMMap<string, string> = Map<string, string>({});
 }
 export type Result = ResultClass & IRecord<ResultClass>;
-let _Result = (config: Object = {}) =>
+const _Result = (config: Object = {}) =>
   New<Result>(new ResultClass(config), config);
 
 export type Results = List<Result>;
@@ -78,10 +78,10 @@ class ResultsStateC extends BaseClass
   results: Results = List([]);
   fields: List<string> = List([]);
   count: number = 0;
-  rawResult: string = "";
-  
+  rawResult: string = '';
+
   primaryKeyToIndex: IMMap<string, number> = Map<string, number>({});
-  
+
   hasError: boolean = false;
   errorMessage: string = '';
   hasAllFieldsError: boolean = false;
@@ -103,8 +103,6 @@ export type ResultsState = ResultsStateC & IRecord<ResultsStateC>;
 export let _ResultsState = (config: Object = {}) =>
   New<ResultsState>(new ResultsStateC(config), config);
 
-
-
 export interface Props
 {
   query: BuilderTypes.Query;
@@ -113,7 +111,6 @@ export interface Props
   onResultsStateChange: (resultsState: ResultsState) => void;
   noExtraFields?: boolean;
 }
-
 
 interface ResultsQuery
 {
@@ -141,9 +138,9 @@ export class ResultsManager extends PureClasss<Props>
   mapQueries(fn: (query: ResultsQuery, stateKey: string) => void)
   {
     stateQueries.map(
-      stateKey =>
+      (stateKey) =>
         this && this.state && this.state[stateKey] &&
-          fn(this.state[stateKey], stateKey)
+          fn(this.state[stateKey], stateKey),
     );
   }
 
@@ -161,23 +158,23 @@ export class ResultsManager extends PureClasss<Props>
       (query, stateKey) =>
         this.setState({
           [stateKey]: null,
-        })
+        }),
     );
   }
 
   queryResults(query: BuilderTypes.Query, db: string)
   {
-    if(!query || !db)
+    if (!query || !db)
     {
       return;
     }
 
-    var tql = TQLConverter.toTQL(query, {
+    const tql = TQLConverter.toTQL(query, {
       limit: MAX_RESULTS,
       replaceInputs: true,
     });
 
-    if(tql !== this.state.queriedTql)
+    if (tql !== this.state.queriedTql)
     {
       this.killQueries();
       this.setState({
@@ -187,19 +184,19 @@ export class ResultsManager extends PureClasss<Props>
             tql,
             db,
             this.handleResultsResponse,
-            this.handleError
-          )
+            this.handleError,
+          ),
       });
 
-      let selectCard = query.cards.get(0);
-      if(
+      const selectCard = query.cards.get(0);
+      if (
         !this.props.noExtraFields
         && selectCard
         && !selectCard['cards'].some(
-            card => card.type === 'groupBy'
+            (card) => card.type === 'groupBy',
           )
         && !selectCard['fields'].some(
-            field => field.field.static && field.field.static.isAggregate
+            (field) => field.field.static && field.field.static.isAggregate,
           )
       )
       {
@@ -215,8 +212,8 @@ export class ResultsManager extends PureClasss<Props>
             }),
             db,
             this.handleAllFieldsResponse,
-            this.handleAllFieldsError
-          )
+            this.handleAllFieldsError,
+          ),
         });
       }
 
@@ -251,13 +248,13 @@ export class ResultsManager extends PureClasss<Props>
       {
         Ajax.killQuery(query.queryId);
         query.xhr.abort();
-      }
+      },
     );
   }
 
   componentWillReceiveProps(nextProps: Props)
   {
-    if(
+    if (
       nextProps.query &&
       (
         (!this.props.query && !nextProps.resultsState.loading)
@@ -269,7 +266,7 @@ export class ResultsManager extends PureClasss<Props>
     {
       this.queryResults(nextProps.query, nextProps.db);
 
-      if(!this.props.query || nextProps.query.id !== this.props.query.id)
+      if (!this.props.query || nextProps.query.id !== this.props.query.id)
       {
         this.changeResults({
           results: List([]),
@@ -315,25 +312,24 @@ export class ResultsManager extends PureClasss<Props>
     // }
   }
 
-  handleResultsResponse(response:QueryResponse, isAllFields?: boolean)
+  handleResultsResponse(response: QueryResponse, isAllFields?: boolean)
   {
-    let queryKey = isAllFields ? 'allQuery' : 'query';
+    const queryKey = isAllFields ? 'allQuery' : 'query';
     this.setState({
       [queryKey]: null,
     });
 
-    let {resultsState} = this.props;
+    const {resultsState} = this.props;
 
-
-    if(!response || response.errorMessage)
+    if (!response || response.errorMessage)
     {
       this.handleError(response, isAllFields);
       return;
     }
 
-    let resultsData = response.results;
-    let resultsCount = resultsData.length;
-    if(resultsData.length > MAX_RESULTS)
+    const resultsData = response.results;
+    const resultsCount = resultsData.length;
+    if (resultsData.length > MAX_RESULTS)
     {
       resultsData.splice(MAX_RESULTS, resultsData.length - MAX_RESULTS);
     }
@@ -348,25 +344,25 @@ export class ResultsManager extends PureClasss<Props>
         let result: Result = results.get(index) || _Result();
         result = result.set(
           'fields',
-          result.fields.merge(resultData)
+          result.fields.merge(resultData),
         );
 
-        if(!isAllFields)
+        if (!isAllFields)
         {
           result = result.set('rawFields', Map(resultData));
         }
 
         results = results.set(index, result);
-      }
+      },
     );
 
     let fields = List<string>([]);
-    if(results.get(0))
+    if (results.get(0))
     {
       fields = results.get(0).fields.keySeq().toList();
     }
 
-    let changes: any = {
+    const changes: any = {
       results,
       fields,
       hasError: false,
@@ -377,7 +373,7 @@ export class ResultsManager extends PureClasss<Props>
       subErrorMessage: null,
     };
 
-    if(!resultsState.hasLoadedCount)
+    if (!resultsState.hasLoadedCount)
     {
       changes['count'] = results.size;
     }
@@ -385,12 +381,12 @@ export class ResultsManager extends PureClasss<Props>
     this.changeResults(changes);
   }
 
-  handleAllFieldsResponse(response:QueryResponse)
+  handleAllFieldsResponse(response: QueryResponse)
   {
     this.handleResultsResponse(response, true);
   }
 
-  handleCountResponse(response:QueryResponse)
+  handleCountResponse(response: QueryResponse)
   {
     this.setState({
       countQuery: null,
@@ -440,22 +436,22 @@ export class ResultsManager extends PureClasss<Props>
     errorMessage = errorMessage || 'There was no response from the server.';
     let {resultsState} = this.props;
 
-    if(typeof errorMessage === 'string')
+    if (typeof errorMessage === 'string')
     {
-      if(errorMessage.charAt(errorMessage.length - 1) === '^')
+      if (errorMessage.charAt(errorMessage.length - 1) === '^')
       {
         errorMessage = errorMessage.substr(0, errorMessage.length - 1);
       }
       errorMessage = errorMessage.replace(/MySQL/g, 'TerrainDB');
 
-      if(!isAllFields)
+      if (!isAllFields)
       {
-        let matches = errorMessage.match(/([0-9]+)\:[0-9]+/);
-        let line = matches && matches.length >= 2 && parseInt(matches[1]);
+        const matches = errorMessage.match(/([0-9]+)\:[0-9]+/);
+        const line = matches && matches.length >= 2 && parseInt(matches[1]);
         let mainErrorMessage = errorMessage;
         let subErrorMessage: string = null;
 
-        if(line !== NaN && line !== null && line !== undefined)
+        if (line !== NaN && line !== null && line !== undefined)
         {
           mainErrorMessage = 'Error on line ' + line + ': ';
           subErrorMessage = errorMessage;
@@ -476,20 +472,20 @@ export class ResultsManager extends PureClasss<Props>
       resultsState
         .set(
           isAllFields ? 'hasAllFieldsError' : 'hasError',
-          true
+          true,
         )
         .set(
           isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
-          errorMessage
+          errorMessage,
         )
         .set(
           isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
-          true
+          true,
         )
         .set(
           'loading',
-          false
-        )
+          false,
+        ),
     );
   }
 
@@ -503,7 +499,7 @@ export class ResultsManager extends PureClasss<Props>
     let {resultsState} = this.props;
     _.map(changes,
       (value: any, key: string) =>
-        resultsState = resultsState.set(key, value)
+        resultsState = resultsState.set(key, value),
     );
 
     this.props.onResultsStateChange(resultsState);
@@ -517,17 +513,16 @@ export class ResultsManager extends PureClasss<Props>
 	}
 }
 
-export function getPrimaryKeyFor(result:any, config:IResultsConfig): string
+export function getPrimaryKeyFor(result: any, config: IResultsConfig): string
 {
-  if(config && config.primaryKeys.size)
+  if (config && config.primaryKeys.size)
   {
     return config.primaryKeys.map(
-      field => result[field]
-    ).join("and");
+      (field) => result[field],
+    ).join('and');
   }
 
-  return "result-" + Math.floor(Math.random() * 100000000);
+  return 'result-' + Math.floor(Math.random() * 100000000);
 }
-
 
 export default ResultsManager;

@@ -43,23 +43,23 @@ THE SOFTWARE.
 */
 
 require('./CreateCardTool.less');
-import * as _ from 'underscore';
 import * as React from 'react';
-import Actions from "../../data/BuilderActions";
-import Util from '../../../util/Util';
-import BuilderTypes from './../../BuilderTypes';
+import * as _ from 'underscore';
 import PureClasss from '../../../common/components/PureClasss';
+import Util from '../../../util/Util';
+import Actions from '../../data/BuilderActions';
+import BuilderTypes from './../../BuilderTypes';
 import CardDropArea from './CardDropArea';
 
 const cardsOrdering: string[] =
   _.flatten(BuilderTypes.CardsDeckOrdering)
     .map(
-      cardConfig => cardConfig.type
+      (cardConfig) => cardConfig.type,
     );
 
-var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
-var CloseIcon = require("./../../../../images/icon_close_8x8.svg?name=CloseIcon");
-var AddCardIcon = require("./../../../../images/icon_addCard_22x17.svg?name=AddCardIcon");
+const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
+const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
+const AddCardIcon = require('./../../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
 
 export interface Props
 {
@@ -90,13 +90,13 @@ class CreateCardTool extends PureClasss<Props>
 
   createCard(event)
   {
-    if(this.props.open && this.props.onMinimize)
+    if (this.props.open && this.props.onMinimize)
     {
       this.props.onMinimize();
     }
 
-    var type = Util.rel(event.target);
-    if(this.props.index === null)
+    const type = Util.rel(event.target);
+    if (this.props.index === null)
     {
       Actions.change(this.props.keyPath, BuilderTypes.make(BuilderTypes.Blocks[type]));
     }
@@ -110,9 +110,9 @@ class CreateCardTool extends PureClasss<Props>
 
   componentWillReceiveProps(newProps)
   {
-    if(newProps.open !== this.props.open)
+    if (newProps.open !== this.props.open)
     {
-      if(newProps.open)
+      if (newProps.open)
       {
         // first set state as not closed, so that the element renders
         // after render, animate element
@@ -130,15 +130,15 @@ class CreateCardTool extends PureClasss<Props>
           this.setState({
             closed: true,
             opening: false,
-          })
-        )
+          }),
+        );
       }
     }
   }
 
   componentDidUpdate(prevProps, prevState)
   {
-    if(!prevState.opening && this.state.opening)
+    if (!prevState.opening && this.state.opening)
     {
       Util.animateToAutoHeight(this.refs['selector']);
     }
@@ -146,23 +146,23 @@ class CreateCardTool extends PureClasss<Props>
 
   renderCardSelector()
   {
-    if(this.state.closed)
+    if (this.state.closed)
     {
       return null;
     }
 
     return (
-     <div className='create-card-selector' ref='selector'>
-       <div className='create-card-selector-inner'>
+     <div className="create-card-selector" ref="selector">
+       <div className="create-card-selector-inner">
          {
-           cardsOrdering.map((type:string) =>
+           cardsOrdering.map((type: string) =>
            {
-             if(this.props.accepts && this.props.accepts.indexOf(type) === -1)
+             if (this.props.accepts && this.props.accepts.indexOf(type) === -1)
              {
                return null;
              }
 
-             let card = BuilderTypes.make(BuilderTypes.Blocks[type]);
+             const card = BuilderTypes.make(BuilderTypes.Blocks[type]);
                  // data-tip={card.static.manualEntry && card.static.manualEntry.snippet}
              return (
                <a
@@ -184,13 +184,13 @@ class CreateCardTool extends PureClasss<Props>
            })
          }
          {
-           _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
+           _.map(_.range(0, 10), (i) => <div className="create-card-button-fodder" key={i} />)
          }
        </div>
        {
          !this.props.cannotClose &&
            <div
-             className='close create-card-close'
+             className="close create-card-close"
              onClick={this.handleCloseClick}
            >
              <CloseIcon />
@@ -202,7 +202,7 @@ class CreateCardTool extends PureClasss<Props>
 
   handleCloseClick()
   {
-    if(this.props.onClose)
+    if (this.props.onClose)
     {
       this.props.onClose();
     }
@@ -214,7 +214,7 @@ class CreateCardTool extends PureClasss<Props>
 
   renderPlaceholder()
   {
-    if(this.props.hidePlaceholder || this.props.open)
+    if (this.props.hidePlaceholder || this.props.open)
     {
       return null;
     }
@@ -222,7 +222,7 @@ class CreateCardTool extends PureClasss<Props>
     return (
       <div
         onClick={this.props.onToggle}
-        className='create-card-placeholder'
+        className="create-card-placeholder"
       >
         <AddIcon />
       </div>
@@ -231,22 +231,22 @@ class CreateCardTool extends PureClasss<Props>
 
   render()
   {
-    if(!this.props.canEdit)
+    if (!this.props.canEdit)
     {
       return null;
     }
 
-    var classes = Util.objToClassname({
-      "create-card-wrapper": true,
-      "create-card-open": this.props.open,
-      "create-card-closed": !this.props.open,
-      "create-card-opening": this.state.opening,
+    let classes = Util.objToClassname({
+      'create-card-wrapper': true,
+      'create-card-open': this.props.open,
+      'create-card-closed': !this.props.open,
+      'create-card-opening': this.state.opening,
     });
     classes += ' ' + this.props.className;
 
-    if(this.props.dy)
+    if (this.props.dy)
     {
-      var style =
+      const style =
       {
         position: 'relative',
         top: this.props.dy,
@@ -254,15 +254,15 @@ class CreateCardTool extends PureClasss<Props>
     }
 
     return (
-      <div 
-        className={classes} 
+      <div
+        className={classes}
         style={style}
       >
-        { 
-          this.renderPlaceholder() 
+        {
+          this.renderPlaceholder()
         }
-        { 
-          this.renderCardSelector() 
+        {
+          this.renderCardSelector()
         }
         <CardDropArea
           index={this.props.index}

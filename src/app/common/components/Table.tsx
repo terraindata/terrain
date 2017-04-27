@@ -50,9 +50,9 @@ const ReactDataGrid = require('react-data-grid');
 require('./Table.less');
 
 import * as classNames from 'classnames';
-import PureClasss from './PureClasss';
-import Util from '../../util/Util';
 import {Menu, MenuOption} from '../../common/components/Menu';
+import Util from '../../util/Util';
+import PureClasss from './PureClasss';
 const Dimensions = require('react-dimensions');
 
 const LEFT_COLOR_FROM = hexToRgb('#a2af93');
@@ -94,7 +94,7 @@ class _Table extends PureClasss<Props>
   } = {
   };
 
-  constructor(props:Props)
+  constructor(props: Props)
   {
     super(props);
   }
@@ -120,20 +120,20 @@ export const Table = Dimensions({
   },
 })(_Table);
 
-function hexToRgb (hex) {
+function hexToRgb(hex) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? {
     r: parseInt(result[1], 16),
     g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : null
+    b: parseInt(result[3], 16),
+  } : null;
 }
 
 /**
  * Ported from sass implementation in C
  * https://github.com/sass/libsass/blob/0e6b4a2850092356aa3ece07c6b249f0221caced/functions.cpp#L209
  */
-function mixColors (color1, color2, amount) {
+function mixColors(color1, color2, amount) {
   const weight1 = amount;
   const weight2 = 1 - amount;
 
@@ -141,7 +141,7 @@ function mixColors (color1, color2, amount) {
   const g = Math.round(weight1 * color1.g + weight2 * color2.g);
   const b = Math.round(weight1 * color1.b + weight2 * color2.b);
 
-  return { r, g, b }
+  return { r, g, b };
 }
 
 export default Table;

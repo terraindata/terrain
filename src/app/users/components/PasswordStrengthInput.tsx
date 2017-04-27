@@ -43,19 +43,19 @@ THE SOFTWARE.
 */
 
 require('./Settings.less');
-import * as $ from 'jquery';
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../util/Util';
 import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as React from 'react';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
 import PasswordMeter from './PasswordMeter';
-var zxcvbn = require('zxcvbn');
+const zxcvbn = require('zxcvbn');
 
 export interface Props {
-	onChange: (ev: any) => void,
-	value: string,
-	type: string,
+	onChange: (ev: any) => void;
+	value: string;
+	type: string;
 }
 
 class PasswordStrengthInput extends Classs<Props>
@@ -64,36 +64,36 @@ class PasswordStrengthInput extends Classs<Props>
 		super(Props);
 		this.state = {
 			score: -1,
-		}
+		};
 	}
 
 	handleInput(event) {
 		event.preventDefault();
-		var password = event.target.value;
-		if(password.length === 0)
+		const password = event.target.value;
+		if (password.length === 0)
 		{
 			this.setState({
 				score: -1,
 			});
 			return;
 		}
-		var result = zxcvbn(password);
-		var crack_time = result.crack_times_seconds.online_no_throttling_10_per_second;
-		var score;
-		if(crack_time <= Math.pow(10,2))
+		const result = zxcvbn(password);
+		const crack_time = result.crack_times_seconds.online_no_throttling_10_per_second;
+		let score;
+		if (crack_time <= Math.pow(10, 2))
 		{
 			score = 0;
 		}
-		else if(crack_time <= Math.pow(10,4)) {
+		else if (crack_time <= Math.pow(10, 4)) {
 			score = 1;
 		}
-		else if(crack_time <= Math.pow(10,6)) {
+		else if (crack_time <= Math.pow(10, 6)) {
 			score = 2;
 		}
-		else if(crack_time <= Math.pow(10,8)) {
+		else if (crack_time <= Math.pow(10, 8)) {
 			score = 3;
 		}
-		else if(crack_time <= Math.pow(10,10)) {
+		else if (crack_time <= Math.pow(10, 10)) {
 			score = 4;
 		}
 		else
@@ -102,8 +102,8 @@ class PasswordStrengthInput extends Classs<Props>
 		}
 
 		this.setState({
-			score: score,
-		})
+			score,
+		});
 	}
 
 	render()
@@ -115,7 +115,7 @@ class PasswordStrengthInput extends Classs<Props>
 					value={this.props.value}
 					onChange={this.props.onChange}
 					onInput={this.handleInput}
-					className='settings-input password-input'
+					className="settings-input password-input"
 				/>
 				<PasswordMeter value={this.state.score}/>
 			</div>

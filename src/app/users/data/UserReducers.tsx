@@ -43,18 +43,18 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
-import ActionTypes from './UserActionTypes';
-import Actions from './UserActions';
-import Util from './../../util/Util';
 import Ajax from './../../util/Ajax';
+import Util from './../../util/Util';
 import UserTypes from './../UserTypes';
+import Actions from './UserActions';
+import ActionTypes from './UserActionTypes';
 
 import AuthStore from './../../auth/data/AuthStore';
 AuthStore.subscribe(Actions.updateCurrentUser);
 
-var Immutable = require('immutable');
+const Immutable = require('immutable');
 
-var UserReducers = {};
+const UserReducers = {};
 
 UserReducers[ActionTypes.change] =
   (state, action) =>
@@ -65,20 +65,20 @@ UserReducers[ActionTypes.fetch] =
   {
     Ajax.getUsers((usersObj) =>
     {
-      var users:UserTypes.UserMap = Immutable.Map({});
+      let users: UserTypes.UserMap = Immutable.Map({});
       _.map(usersObj, (userObj, username) =>
       {
-        let data = userObj.data && userObj.data.length ? JSON.parse(userObj.data) : {};
-        let isAdmin = userObj.admin === 1;
-        let isBuilder = userObj.builder === 1;
-        let isDisabled = userObj.disabled === 1;
+        const data = userObj.data && userObj.data.length ? JSON.parse(userObj.data) : {};
+        const isAdmin = userObj.admin === 1;
+        const isBuilder = userObj.builder === 1;
+        const isDisabled = userObj.disabled === 1;
         users = users.set(username, new UserTypes.User(
           _.extend(data, {
             username,
             isAdmin,
             isBuilder,
             isDisabled,
-          })
+          }),
         ));
       });
       Actions.setUsers(users);

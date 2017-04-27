@@ -45,21 +45,21 @@ THE SOFTWARE.
 require('./Notifications.less');
 require('./Select.less');
 import * as React from 'react';
-import Classs from './../../common/components/Classs';
-import Store from './../data/UserStore';
-import Actions from './../data/UserActions';
-import LibraryTypes from './../UserTypes';
-import InfoArea from './../../common/components/InfoArea';
 import { Link } from 'react-router';
-import AccountEntry from './AccountEntry';
+import UserTypes from '../UserTypes';
 import CheckBox from './../../common/components/CheckBox';
+import Classs from './../../common/components/Classs';
+import InfoArea from './../../common/components/InfoArea';
+import Modal from './../../common/components/Modal';
 import RadioButtons from './../../common/components/RadioButtons';
 import Ajax from './../../util/Ajax';
-import UserTypes from '../UserTypes';
-import Modal from './../../common/components/Modal';
+import Actions from './../data/UserActions';
+import Store from './../data/UserStore';
+import LibraryTypes from './../UserTypes';
+import AccountEntry from './AccountEntry';
 
-var Select = require('react-select');
-var SoundIcon = require("./../../../images/icon_audio.svg");
+const Select = require('react-select');
+const SoundIcon = require('./../../../images/icon_audio.svg');
 
 export interface Props
 {
@@ -71,35 +71,35 @@ export interface Props
 class Notifications extends Classs<Props>
 {
   cancelSubscription = null;
-  
+
   emailNotificationOptions = [
     {
-      value: 'Once every 15 minutes', 
-      onClick: this.changeEmailNotifications_15Min
+      value: 'Once every 15 minutes',
+      onClick: this.changeEmailNotifications_15Min,
     },
     {
       value: 'Once an hour at most',
-      onClick: this.changeEmailNotifications_Hour
+      onClick: this.changeEmailNotifications_Hour,
     },
     {
       value: 'Never',
-      onClick: this.changeEmailNotifications_Never
-    }
+      onClick: this.changeEmailNotifications_Never,
+    },
   ];
 
   notificationTypes = [
     {
       value: 'Activities of any kind',
-      label: 'Activities of any kind'
+      label: 'Activities of any kind',
     },
     {
       value: 'Certain activities',
-      label: 'Certain activities'
+      label: 'Certain activities',
     },
     {
       value: 'None',
-      label: 'None'
-    }
+      label: 'None',
+    },
   ];
 
   desktopNotificationSounds = [
@@ -113,51 +113,51 @@ class Notifications extends Classs<Props>
     },
     {
       value: 'whistle',
-      label: 'whistle',  
+      label: 'whistle',
     },
     {
       value: 'none',
       label: 'none',
-    }
+    },
   ];
 
   sounds = {
     chime: 'http://lukeknepper.com/upload/chime.wav',
     doorbell: 'http://lukeknepper.com/upload/doorbell_x.wav',
-    whistle: 'http://lukeknepper.com/upload/slide_whistle_up.wav'
+    whistle: 'http://lukeknepper.com/upload/slide_whistle_up.wav',
   };
 
   constructor(props)
   {
     super(props);
-    
+
     this.state = {
       istate: Store.getState(),
       saving: false,
-      savingReq: null, 
+      savingReq: null,
       errorModalOpen: false,
-      errorModalMessage: ''
+      errorModalMessage: '',
     };
-    
-    this.cancelSubscription = 
+
+    this.cancelSubscription =
       Store.subscribe(() => this.setState({
-        istate: Store.getState()
-      }))
+        istate: Store.getState(),
+      }));
   }
-  
+
   componentWillMount()
   {
     Actions.fetch();
   }
-  
+
   componentWillUnmount()
   {
     this.cancelSubscription && this.cancelSubscription();
   }
 
-  changeUserField(field:string, value:string)
+  changeUserField(field: string, value: string)
   {
-     var newUser = this.state.istate.currentUser;
+     let newUser = this.state.istate.currentUser;
      newUser = newUser.set(field, value);
      Actions.change(newUser as UserTypes.User);
 
@@ -167,14 +167,13 @@ class Notifications extends Classs<Props>
      });
   }
 
-
-  onDesktopNotificationChange(val) 
+  onDesktopNotificationChange(val)
   {
-    let {value} = val;
+    const {value} = val;
     this.changeUserField('desktopNotificationType', value);
   }
 
-  onSave() 
+  onSave()
   {
     this.setState({
       saving: false,
@@ -182,7 +181,7 @@ class Notifications extends Classs<Props>
     });
   }
 
-  onSaveError(response) 
+  onSaveError(response)
   {
     this.setState({
       errorModalMessage: 'Error saving: ' + JSON.stringify(response),
@@ -191,19 +190,19 @@ class Notifications extends Classs<Props>
 
   }
 
-  onDesktopNotificationsSoundChange(val) 
+  onDesktopNotificationsSoundChange(val)
   {
-    let {value} = val;
+    const {value} = val;
     this.changeUserField('sound', value);
   }
 
-  playSound() 
+  playSound()
   {
-    if(this.state.istate.currentUser) {
-      var soundName = this.state.istate.currentUser.sound;
-      if(soundName !== 'none') 
+    if (this.state.istate.currentUser) {
+      const soundName = this.state.istate.currentUser.sound;
+      if (soundName !== 'none')
       {
-        var sound = new Audio();
+        const sound = new Audio();
         sound.src = this.sounds[soundName];
         sound.load();
         sound.play();
@@ -213,47 +212,47 @@ class Notifications extends Classs<Props>
 
   renderDesktopNotificationsContent()
   {
-   if(this.state.istate.currentUser)
+   if (this.state.istate.currentUser)
    {
-      var desktopNotification = this.state.istate.currentUser.desktopNotificationType;
-      var sound = this.state.istate.currentUser.sound;
+      const desktopNotification = this.state.istate.currentUser.desktopNotificationType;
+      const sound = this.state.istate.currentUser.sound;
    }
 
    return (
-     <div className='notification-expansion'>
-       <div className='notification-subtitle'>
+     <div className="notification-expansion">
+       <div className="notification-subtitle">
          Send me desktop notifications for:
        </div>
        <Select
          clearable={false}
-         name='desktop-notification'
+         name="desktop-notification"
          value={desktopNotification}
          options={this.notificationTypes}
          onChange={this.onDesktopNotificationChange}
-         className='notifications-select'
+         className="notifications-select"
          searchable={false}
        />
-       <div className='notification-subtitle'>
+       <div className="notification-subtitle">
          Desktop notifications use this sound:
        </div>
        <div className="notification-row">
          <Select
-            name='desktop-notification-sound'
+            name="desktop-notification-sound"
             value={sound}
             clearable={false}
             options={this.desktopNotificationSounds}
             onChange={this.onDesktopNotificationsSoundChange}
-            className='notifications-select'
+            className="notifications-select"
             searchable={false}
          />
-         <div 
+         <div
            className={sound === 'none' ? 'disabled' : 'preview-button'}
            onClick={sound === 'none' ? null : this.playSound}
          >
-          <div className='notification-sound-icon'>
+          <div className="notification-sound-icon">
             <SoundIcon/>
           </div>
-          <div className='notification-preview-button-text'>
+          <div className="notification-preview-button-text">
             Preview
           </div>
         </div>
@@ -264,52 +263,52 @@ class Notifications extends Classs<Props>
 
   changeEmailNotifications_15Min()
   {
-    this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[0].value)
+    this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[0].value);
   }
 
   changeEmailNotifications_Hour()
   {
-    this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[1].value)
+    this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[1].value);
   }
-  
+
   changeEmailNotifications_Never()
   {
-    this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[2].value)
+    this.changeUserField('emailNotificationTiming', this.emailNotificationOptions[2].value);
   }
 
   onEmailNotificationTypeChange(val)
   {
-    let {value} = val;
+    const {value} = val;
     this.changeUserField('emailNotificationType', value);
   }
 
-  renderEmailNotificationsContent() 
+  renderEmailNotificationsContent()
   {
-   if(this.state.istate.currentUser)
+   if (this.state.istate.currentUser)
    {
-     var emailNotification = this.state.istate.currentUser.emailNotificationType;
-     var emailTiming = this.state.istate.currentUser.emailNotificationTiming;
+     const emailNotification = this.state.istate.currentUser.emailNotificationType;
+     const emailTiming = this.state.istate.currentUser.emailNotificationTiming;
    }
     return (
-      <div className='notification-expansion'>
+      <div className="notification-expansion">
         <div>Send me email notifications:</div>
         <br/>
-        <div className='expanded-section-indent'>
+        <div className="expanded-section-indent">
           <RadioButtons
             selected={emailTiming}
             options={this.emailNotificationOptions}
           />
         </div>
-        <div className='notification-subtitle-small'>
+        <div className="notification-subtitle-small">
          Send me email notifications for:
        </div>
        <Select
          clearable={false}
-         name='email-notification'
+         name="email-notification"
          value={emailNotification}
          options={this.notificationTypes}
          onChange={this.onEmailNotificationTypeChange}
-         className='notifications-select'
+         className="notifications-select"
          searchable={false}
        />
         {this.renderEmail()}
@@ -317,26 +316,26 @@ class Notifications extends Classs<Props>
     );
   }
 
-  toggleEmailNews() 
+  toggleEmailNews()
   {
-    var emailNewsSetting = (this.state.istate.currentUser.emailNews) === 'on';
-    var newEmailNewsSetting = emailNewsSetting ? 'off' : 'on';
+    const emailNewsSetting = (this.state.istate.currentUser.emailNews) === 'on';
+    const newEmailNewsSetting = emailNewsSetting ? 'off' : 'on';
     this.changeUserField('emailNews', newEmailNewsSetting);
   }
 
-  renderEmailNewsContent() 
+  renderEmailNewsContent()
   {
-    if(this.state.istate.currentUser)
+    if (this.state.istate.currentUser)
     {
-      var emailNewsOn = this.state.istate.currentUser.emailNews === 'on';
+      const emailNewsOn = this.state.istate.currentUser.emailNews === 'on';
     }
     return (
-      <div className='notification-expansion'>
+      <div className="notification-expansion">
         <div>You can choose which of these updates you'd like to receive:</div>
         <br/>
-        <span className='expanded-section-indent'>
-          <CheckBox 
-            checked={emailNewsOn} 
+        <span className="expanded-section-indent">
+          <CheckBox
+            checked={emailNewsOn}
             onChange={this.toggleEmailNews}
           />
           Send me emails with Terrain news and tips <br/><br/>
@@ -349,64 +348,64 @@ class Notifications extends Classs<Props>
       );
   }
 
-  renderEmail() 
+  renderEmail()
   {
-    if(this.state.istate.currentUser && this.state.istate.currentUser.email) 
+    if (this.state.istate.currentUser && this.state.istate.currentUser.email)
     {
       return(
         <div>
         Your email is currently set to
-        <span className='notification-email-blue'>
+        <span className="notification-email-blue">
         {this.state.istate.currentUser.email}
         </span>
         .
         </div>
       );
-    } 
-    return <div>Your email adddress has not been set yet.</div>
+    }
+    return <div>Your email adddress has not been set yet.</div>;
   }
 
-  renderDesktopDescription() 
+  renderDesktopDescription()
   {
-   if(this.state.istate.currentUser)
+   if (this.state.istate.currentUser)
    {
-      var desktopNotification = this.state.istate.currentUser.desktopNotificationType;    
+      const desktopNotification = this.state.istate.currentUser.desktopNotificationType;
    }
     return(
       <div>
-        Terrain can send push notifications to your desktop when someone 
-        updates an algorithm. You are currently recieving updates for 
+        Terrain can send push notifications to your desktop when someone
+        updates an algorithm. You are currently recieving updates for
         <span><b>{' ' + desktopNotification}.</b></span>
-      </div>  
+      </div>
     );
 
   }
 
   renderEmailDescription()
   {
-    if(this.state.istate.currentUser) 
+    if (this.state.istate.currentUser)
     {
-      var emailTiming = this.state.istate.currentUser.emailNotificationTiming;
+      const emailTiming = this.state.istate.currentUser.emailNotificationTiming;
     }
     return(
       <div>
-        When you're busy or not online, Terrain can send you 
-        emails so you don't miss a beat.You are currently receiving emails 
+        When you're busy or not online, Terrain can send you
+        emails so you don't miss a beat.You are currently receiving emails
         <span><b>{' ' + emailTiming}.</b></span>
       </div>
     );
   }
 
-  renderEmailNewsDescription() 
+  renderEmailNewsDescription()
   {
-    if(this.state.istate.currentUser)
+    if (this.state.istate.currentUser)
     {
-      var emailNewsOn = (this.state.istate.currentUser.emailNews) === 'on';
+      const emailNewsOn = (this.state.istate.currentUser.emailNews) === 'on';
     }
     return(
       <div>
-        From time to time we'd like to send you emails with interesting 
-        news from the Terrain team. You are set up to 
+        From time to time we'd like to send you emails with interesting
+        news from the Terrain team. You are set up to
         <span><b>{emailNewsOn ? ' ' : ' not '}</b></span>
         recieve emails with Terrain news and tips.
       </div>
@@ -416,7 +415,7 @@ class Notifications extends Classs<Props>
   toggleErrorModal()
   {
     this.setState ({
-      errorModalOpen: !this.state.errorModalOpen
+      errorModalOpen: !this.state.errorModalOpen,
     });
   }
 
@@ -424,29 +423,29 @@ class Notifications extends Classs<Props>
   {
     return (
       <div>
-      <div className='notifications-page-title'>Update your notifications</div>
+      <div className="notifications-page-title">Update your notifications</div>
       <AccountEntry
-        title='Desktop Notifications'
+        title="Desktop Notifications"
         description={this.renderDesktopDescription()}
         content={this.renderDesktopNotificationsContent()}
       />
       <AccountEntry
-        title='Email Notifications'
+        title="Email Notifications"
         description={this.renderEmailDescription()}
         content={this.renderEmailNotificationsContent()}
       />
       <AccountEntry
-        title='Email News & Updates'
+        title="Email News & Updates"
         description={this.renderEmailNewsDescription()}
         content={this.renderEmailNewsContent()}
         lastEntry={true}
       />
-      <Modal 
+      <Modal
           message={this.state.errorModalMessage}
-          onClose={this.toggleErrorModal} 
-          open={this.state.errorModalOpen} 
+          onClose={this.toggleErrorModal}
+          open={this.state.errorModalOpen}
           error={true}
-      /> 
+      />
       </div>
     );
   }

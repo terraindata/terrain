@@ -46,22 +46,21 @@ require('./VariantVersions.less');
 const classNames = require('classnames');
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
-import LibraryTypes from './../LibraryTypes';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import UserTypes from './../../users/UserTypes';
 import UserStore from './../../users/data/UserStore';
+import UserTypes from './../../users/UserTypes';
 import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
+import LibraryTypes from './../LibraryTypes';
 // import * as moment from 'moment';
 const moment = require('moment');
-import RoleTypes from '../../roles/RoleTypes';
 import RolesStore from '../../roles/data/RolesStore';
+import RoleTypes from '../../roles/RoleTypes';
 const {browserHistory} = require('react-router');
 
 type Variant = LibraryTypes.Variant;
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
-
 
 export interface Props
 {
@@ -80,7 +79,7 @@ class VariantVersions extends PureClasss<Props>
     roles: null,
   };
 
-  constructor(props:Props)
+  constructor(props: Props)
   {
     super(props);
 
@@ -100,12 +99,12 @@ class VariantVersions extends PureClasss<Props>
   {
     this.xhr = Ajax.getVariantVersions(props.variant.id, (versions) =>
     {
-      if(versions)
+      if (versions)
       {
         versions.reverse();
         this.setState({
-          versions: versions,
-        })
+          versions,
+        });
       }
     });
   }
@@ -128,8 +127,8 @@ class VariantVersions extends PureClasss<Props>
 
   showVersion(versionID, i)
   {
-    var url = '/builder/?o=' + this.props.variant.id;
-    if(i !== 0)
+    let url = '/builder/?o=' + this.props.variant.id;
+    if (i !== 0)
     {
       url += '@' + versionID;
     }
@@ -138,26 +137,26 @@ class VariantVersions extends PureClasss<Props>
 
   renderVersion(version, i)
   {
-    let {roles} = this.state;
-    let groupId = this.props.variant.groupId;
-    var role = "Viewer";
+    const {roles} = this.state;
+    const groupId = this.props.variant.groupId;
+    let role = 'Viewer';
     if (roles && roles.getIn([groupId, version.username]))
     {
       if (roles && roles.getIn([groupId, version.username]).admin)
       {
-        role = "Admin";
+        role = 'Admin';
       }
       else if (roles && roles.getIn([groupId, version.username]).builder)
       {
-        role = "Builder";
+        role = 'Builder';
       }
     }
 
     return (
       <div
         className={classNames({
-          "versions-table-row": true,
-          "versions-table-row-current": i === 0,
+          'versions-table-row': true,
+          'versions-table-row-current': i === 0,
         })}
         key={version.id}
         onClick={
@@ -195,7 +194,7 @@ class VariantVersions extends PureClasss<Props>
         </div>
         {
           this.state.versions === null ?
-            <div className='loading'>
+            <div className="loading">
               Loading...
             </div>
           :

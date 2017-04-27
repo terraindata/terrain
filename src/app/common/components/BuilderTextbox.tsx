@@ -44,31 +44,30 @@ THE SOFTWARE.
 
 require('./BuilderTextbox.less');
 
-import * as _ from 'underscore';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as Immutable from 'immutable';
-import CardDropArea from "../../builder/components/cards/CardDropArea";
-import Actions from "../../builder/data/BuilderActions";
-import Util from '../../util/Util';
-import PureClasss from '../../common/components/PureClasss';
-import { Display } from '../../builder/BuilderDisplays';
-import { BuilderTypes } from '../../builder/BuilderTypes';
-import BuilderHelpers from '../../builder/BuilderHelpers';
-import Card from '../../builder/components/cards/Card';
-import CreateCardTool from '../../builder/components/cards/CreateCardTool';
-import { DragSource, DropTarget } from 'react-dnd';
 import * as classNames from 'classnames';
-import Autocomplete from './Autocomplete';
+import * as Immutable from 'immutable';
+import * as React from 'react';
+import { DragSource, DropTarget } from 'react-dnd';
+import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
+import { Display } from '../../builder/BuilderDisplays';
+import BuilderHelpers from '../../builder/BuilderHelpers';
+import { BuilderTypes } from '../../builder/BuilderTypes';
+import Card from '../../builder/components/cards/Card';
+import CardDropArea from '../../builder/components/cards/CardDropArea';
+import CreateCardTool from '../../builder/components/cards/CreateCardTool';
+import Actions from '../../builder/data/BuilderActions';
+import PureClasss from '../../common/components/PureClasss';
 import ManualInfo from '../../manual/components/ManualInfo';
+import Util from '../../util/Util';
+import Autocomplete from './Autocomplete';
 
 type CardString = BuilderTypes.CardString;
 
-var AddCardIcon = require("./../../../images/icon_addCard_22x17.svg?name=AddCardIcon");
-var TextIcon = require("./../../../images/icon_text_12x18.svg?name=TextIcon");
-var CloseIcon = require("./../../../images/icon_close.svg");
-var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
-
+const AddCardIcon = require('./../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
+const TextIcon = require('./../../../images/icon_text_12x18.svg?name=TextIcon');
+const CloseIcon = require('./../../../images/icon_close.svg');
+const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
 export interface Props
 {
@@ -102,9 +101,9 @@ export interface Props
 
   showWhenCards?: boolean;
   display?: Display;
-  
-  onFocus?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent<any>) => void;
-  onBlur?: (comp:React.Component<any, any>, value:string, event:React.FocusEvent<any>) => void;
+
+  onFocus?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
+  onBlur?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
 }
 
 class BuilderTextbox extends PureClasss<Props>
@@ -116,7 +115,7 @@ class BuilderTextbox extends PureClasss<Props>
     // TODO?
     // this.executeChange = _.debounce(this.executeChange, 750);
 
-    var value: any = this.props.value;
+    const value: any = this.props.value;
     this.state = {
       wrongType: this.props.isNumber ? isNaN(value) : false,
       isSwitching: false,
@@ -137,15 +136,15 @@ class BuilderTextbox extends PureClasss<Props>
   // TODO
   componentWillReceiveProps(newProps)
   {
-    var value: any = newProps.value;
+    const value: any = newProps.value;
 
     // If you want two-way backups, use this line
       // (value && this.props.value === '' && value['type'] === 'creating') ||
-    if(
+    if (
       (this.props.value && this.props.value['type'] === 'creating' && value === '')
     )
     {
-      if(this.state.backupString)
+      if (this.state.backupString)
       {
         // was creating, now switched back
         this.executeChange(this.state.backupString);
@@ -159,9 +158,9 @@ class BuilderTextbox extends PureClasss<Props>
     this.setState ({
       wrongType: newProps.isNumber ? isNaN(value) : false,
     });
-    if(this.refs['input'])
+    if (this.refs['input'])
     {
-      if(this.refs['input'] !== document.activeElement)
+      if (this.refs['input'] !== document.activeElement)
       {
         // if not focused, then update the value
         this.refs['input']['value'] = newProps.value;
@@ -194,7 +193,7 @@ class BuilderTextbox extends PureClasss<Props>
   handleAutocompleteChange(value)
   {
     this.executeChange(value);
-    if(this.props.isNumber)
+    if (this.props.isNumber)
     {
       this.setState({
         wrongType: isNaN(value),
@@ -210,7 +209,7 @@ class BuilderTextbox extends PureClasss<Props>
 
   handleSwitch()
   {
-    let value = this.isText() ? BuilderTypes.make(BuilderTypes.Blocks.creating) : '';
+    const value = this.isText() ? BuilderTypes.make(BuilderTypes.Blocks.creating) : '';
     this.setState({
       value,
       backupString: typeof this.props.value === 'string' ? this.props.value : null,
@@ -218,14 +217,14 @@ class BuilderTextbox extends PureClasss<Props>
     this.executeChange(value);
 
   }
-  
-  handleFocus(event:React.FocusEvent<any>)
+
+  handleFocus(event: React.FocusEvent<any>)
   {
     this.props.onFocus && this.props.onFocus(this, event.target['value'], event);
     this.computeOptions(); // need to lazily compute autocomplete options when needed
   }
 
-  handleBlur(event:React.FocusEvent<any>, value: string)
+  handleBlur(event: React.FocusEvent<any>, value: string)
   {
     this.props.onBlur && this.props.onBlur(this, value, event);
   }
@@ -240,7 +239,7 @@ class BuilderTextbox extends PureClasss<Props>
 
   renderSwitch()
   {
-    if(!this.props.canEdit)
+    if (!this.props.canEdit)
     {
       return null;
     }
@@ -268,14 +267,14 @@ class BuilderTextbox extends PureClasss<Props>
 
   computeOptions()
   {
-    if(this.props.autoTerms || this.props.autoDisabled)
+    if (this.props.autoTerms || this.props.autoDisabled)
     {
       return;
     }
 
-    let options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
+    const options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
 
-    if(!options.equals(this.state.options))
+    if (!options.equals(this.state.options))
     {
       this.setState({
         options,
@@ -285,16 +284,16 @@ class BuilderTextbox extends PureClasss<Props>
 
   render()
   {
-    if(this.isText())
+    if (this.isText())
     {
       const { isOverCurrent, connectDropTarget, placeholder } = this.props;
 
       let {options} = this.state;
-      if(this.props.autoTerms)
+      if (this.props.autoTerms)
       {
         options = this.props.autoTerms;
       }
-      if(this.props.autoDisabled)
+      if (this.props.autoDisabled)
       {
         options = null;
       }
@@ -312,7 +311,7 @@ class BuilderTextbox extends PureClasss<Props>
           {
             this.props.textarea ?
               <textarea
-                ref='input'
+                ref="input"
                 disabled={!this.props.canEdit}
                 defaultValue={this.props.value as string}
                 onChange={this.handleTextareaChange}
@@ -322,7 +321,7 @@ class BuilderTextbox extends PureClasss<Props>
               />
             :
               <Autocomplete
-                ref='input'
+                ref="input"
                 disabled={!this.props.canEdit}
                 value={this.props.value as string}
                 options={options}
@@ -350,19 +349,19 @@ class BuilderTextbox extends PureClasss<Props>
 
     // We're in card mode
 
-    if(!this.props.showWhenCards)
+    if (!this.props.showWhenCards)
     {
       return null;
     }
 
-    var card: BuilderTypes.ICard = this.props.value as BuilderTypes.ICard;
+    const card: BuilderTypes.ICard = this.props.value as BuilderTypes.ICard;
     // var cards = this.props.value['cards'];
     // if(cards.size)
     // {
       // var card = cards.get(0);
-      var color = card.static.colors[0] as string;
-      var title: string = card.closed ? card.static.title : '';
-      var preview = BuilderTypes.getPreview(card);
+      const color = card.static.colors[0] as string;
+      const title: string = card.closed ? card.static.title : '';
+      const preview = BuilderTypes.getPreview(card);
     // }
     // else
     // {
@@ -370,15 +369,15 @@ class BuilderTextbox extends PureClasss<Props>
     //   var title = "Add a Card";
     // }
 
-    var chipStyle =
+    const chipStyle =
     {
       background: color,
     };
-    var arrowLineStyle =
+    const arrowLineStyle =
     {
       borderColor: color,
     };
-    var arrowHeadStyle =
+    const arrowHeadStyle =
     {
       borderLeftColor: color,
     };
@@ -389,27 +388,27 @@ class BuilderTextbox extends PureClasss<Props>
         'builder-tb-cards': true,
         'builder-tb-cards-top': this.props.top,
         'builder-tb-cards-closed': card.closed,
-      })} ref='cards'>
-        <div className='builder-tb-cards-input'>
-          <div className='builder-tb-cards-input-value' style={chipStyle}>
+      })} ref="cards">
+        <div className="builder-tb-cards-input">
+          <div className="builder-tb-cards-input-value" style={chipStyle}>
             <div
-              className='builder-tb-cards-toggle'
+              className="builder-tb-cards-toggle"
               onClick={this.toggleClosed}
             >
               <ArrowIcon />
             </div>
-            <div className='builder-tb-cards-input-value-text'>
+            <div className="builder-tb-cards-input-value-text">
               { title }
             </div>
             { !preview ? null :
-              <div className='card-preview'>
+              <div className="card-preview">
                 { preview }
               </div>
             }
             { this.renderSwitch() }
           </div>
-          <div className='builder-tb-cards-arrow' style={arrowLineStyle}>
-            <div className='builder-tb-cards-arrow-inner' style={arrowHeadStyle} />
+          <div className="builder-tb-cards-arrow" style={arrowLineStyle}>
+            <div className="builder-tb-cards-arrow-inner" style={arrowHeadStyle} />
           </div>
         </div>
       </div>
@@ -425,6 +424,5 @@ class BuilderTextbox extends PureClasss<Props>
 //     return props.acceptsCards && props.display
 //       && props.display.accepts.indexOf(monitor.getItem().type) !== -1;
 //   },
-
 
 export default BuilderTextbox;

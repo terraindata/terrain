@@ -42,24 +42,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import * as _ from 'underscore';
-import * as React from 'react';
 import * as Immutable from 'immutable';
-import PureClasss from '../../../common/components/PureClasss';
-import {Table, IColumn} from '../../../common/components/Table';
+import * as React from 'react';
+import * as _ from 'underscore';
 import InfoArea from '../../../common/components/InfoArea';
-import {IResultsConfig, _IResultsConfig} from "../results/ResultsConfig";
-import {getResultName, getResultFields, getResultValue} from './Result';
-import {spotlightAction, SpotlightStore, SpotlightState} from '../../data/SpotlightStore';
-import ColorManager from '../../../util/ColorManager';
 import {MenuOption} from '../../../common/components/Menu';
-import {Results, MAX_RESULTS, getPrimaryKeyFor} from './ResultsManager';
+import PureClasss from '../../../common/components/PureClasss';
+import {IColumn, Table} from '../../../common/components/Table';
+import ColorManager from '../../../util/ColorManager';
+import {spotlightAction, SpotlightState, SpotlightStore} from '../../data/SpotlightStore';
+import {_IResultsConfig, IResultsConfig} from '../results/ResultsConfig';
+import {getResultFields, getResultName, getResultValue} from './Result';
+import {getPrimaryKeyFor, MAX_RESULTS, Results} from './ResultsManager';
 
 export interface Props
 {
   results: Results;
   resultsConfig?: IResultsConfig;
-  onExpand: (index:number) => void;
+  onExpand: (index: number) => void;
   resultsLoading: boolean;
 }
 
@@ -74,17 +74,17 @@ export default class ResultsTable extends PureClasss<Props>
     spotlightState: null,
     columns: this.getColumns(this.props),
   };
-  
+
   menuOptions: List<MenuOption> = Immutable.List([
     {
       text: 'Spotlight',
       onClick: this.spotlight,
-    }
+    },
   ]);
-  
-  componentWillReceiveProps(nextProps:Props)
+
+  componentWillReceiveProps(nextProps: Props)
   {
-    if(nextProps.results !== this.props.results || nextProps.resultsConfig !== this.props.resultsConfig)
+    if (nextProps.results !== this.props.results || nextProps.resultsConfig !== this.props.resultsConfig)
     {
       // force the table to update
       this.setState({
@@ -93,16 +93,16 @@ export default class ResultsTable extends PureClasss<Props>
       });
     }
   }
-  
-  getColumns(props:Props): List<IColumn>
+
+  getColumns(props: Props): List<IColumn>
   {
-    let {resultsConfig} = props;
+    const {resultsConfig} = props;
     let cols: IColumn[] = [];
-  
-    if(resultsConfig)
+
+    if (resultsConfig)
     {
-      
-      if(resultsConfig.name)
+
+      if (resultsConfig.name)
       {
         cols.push({
           key: resultsConfig.name,
@@ -110,7 +110,7 @@ export default class ResultsTable extends PureClasss<Props>
           resizable: true,
         });
       }
-      if(resultsConfig.score)
+      if (resultsConfig.score)
       {
         cols.push({
           key: resultsConfig.score,
@@ -118,34 +118,34 @@ export default class ResultsTable extends PureClasss<Props>
           resizable: true,
         });
       }
-      
+
       resultsConfig.fields.map(
-        field =>
+        (field) =>
           cols.push({
             key: field,
             name: field,
             resizable: true,
-          })
+          }),
       );
-      
+
     }
     else
     {
-      let resultFields = props.results.size ? props.results.get(0).fields : Immutable.Map({});
+      const resultFields = props.results.size ? props.results.get(0).fields : Immutable.Map({});
       resultFields.map(
         (value, field) =>
           cols.push({
             key: field,
             name: field,
             resizable: true,
-          })
+          }),
       );
     }
-    
+
     // NOTE: Passing any empty cols array will cause our table library to crashhhh
-    if(cols.length === 0)
+    if (cols.length === 0)
     {
-      if(this.props.resultsLoading)
+      if (this.props.resultsLoading)
       {
         cols = [
           {
@@ -160,28 +160,28 @@ export default class ResultsTable extends PureClasss<Props>
           {
             key: 'none',
             name: 'No results',
-          }
+          },
         ];
       }
     }
-    
+
     return Immutable.List(cols);
   }
-  
+
   componentDidMount()
   {
     this._subscribe(SpotlightStore, {
       isMounted: true,
       stateKey: 'spotlightState',
-    })
+    });
   }
-  
+
   // getKey(col: number): string
   // {
   //   let config = this.state.resultsConfig;
   //   let hasName = this.hasName();
   //   let hasScore = this.hasScore();
-    
+
   //   if(col === 0 && hasName)
   //   {
   //     return config.name;
@@ -194,12 +194,12 @@ export default class ResultsTable extends PureClasss<Props>
   //   {
   //     return config.score;
   //   }
-    
+
   //   let offset = (hasName ? 1 : 0) + (hasScore ? 1 : 0);
   //   let fieldIndex = col - offset;
   //   return config.fields.get(fieldIndex);
   // }
-  
+
   getRow(i: number): Object
   {
     // TODO
@@ -209,7 +209,7 @@ export default class ResultsTable extends PureClasss<Props>
     // let {resultsConfig} = this.state;
     // let primaryKey = getPrimaryKeyFor(results && results.get(i), resultsConfig);
     // let spotlight = col === 0
-    //   && this.state.spotlightState 
+    //   && this.state.spotlightState
     //   && this.state.spotlightState.getIn(['spotlights', primaryKey]);
 
     // return (
@@ -229,48 +229,48 @@ export default class ResultsTable extends PureClasss<Props>
     //   </div>
     // );
   }
-  
+
   // hasScore(): boolean
   // {
   //   return this.state.resultsConfig.score !== "";
   // }
-  
+
   // hasName(): boolean
   // {
   //   return this.state.resultsConfig.name !== "";
   // }
-  
+
   handleCellClick(r: number, c: number)
   {
     this.props.onExpand(r);
   }
-  
+
   spotlight(menuIndex: number, rc: string)
   {
     // TODO
-    let row = rc.split('-')[0];
-    let col = rc.split('-')[1];
-    let result = this.props.results && this.props.results.get(+row);
-    let id = getPrimaryKeyFor(result, this.props.resultsConfig);
-    let spotlightColor = ColorManager.colorForKey(id);
-    
-    let spotlightData = _.extend({}, result);
+    const row = rc.split('-')[0];
+    const col = rc.split('-')[1];
+    const result = this.props.results && this.props.results.get(+row);
+    const id = getPrimaryKeyFor(result, this.props.resultsConfig);
+    const spotlightColor = ColorManager.colorForKey(id);
+
+    const spotlightData = _.extend({}, result);
     spotlightData['name'] = getResultName(result, this.props.resultsConfig);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightAction(id, spotlightData);
   }
-  
+
   render()
   {
-    if(!this.props.results)
+    if (!this.props.results)
     {
-      return <InfoArea large='Loading...' />;
+      return <InfoArea large="Loading..." />;
     }
-    
+
     // let pinnedCols = (this.hasName() ? 1 : 0) + (this.hasScore() ? 1 : 0);
     // let fieldCount = this.state.resultsConfig.fields.size + pinnedCols;
-    
+
     // if(!fieldCount && this.props.results.size)
     // {
     //   fieldCount = this.props.results.get(0).fields.size;

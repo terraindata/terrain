@@ -45,22 +45,22 @@ THE SOFTWARE.
 require('./AccountDropdown.less');
 import * as $ from 'jquery';
 import * as React from 'react';
-import Actions from "../../builder/data/BuilderActions";
-import Util from '../../util/Util';
+import { Link } from 'react-router';
+import Actions from '../../builder/data/BuilderActions';
 import PureClasss from '../../common/components/PureClasss';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import UserStore from '../../users/data/UserStore';
 import UserTypes from '../../users/UserTypes';
-import { Link } from 'react-router';
+import Util from '../../util/Util';
 const {browserHistory} = require('react-router');
 import Modal from './Modal';
 const CommitLog = require('../../../commitlog.txt');
 
-var ArrowIcon = require("./../../../images/icon_arrow_8x5.svg?name=ArrowIcon");
+const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
-var LogoutIcon = require("./../../../images/icon_logout.svg");
-var EditIcon = require("./../../../images/icon_edit.svg");
-var HomeIcon = require("./../../../images/icon_profile_16x16.svg?name=HomeIcon");
+const LogoutIcon = require('./../../../images/icon_logout.svg');
+const EditIcon = require('./../../../images/icon_edit.svg');
+const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
 const InfoIcon = require('../../../images/icon_info.svg?name=InfoIcon');
 
 export interface Props {
@@ -77,7 +77,7 @@ class AccountDropdown extends PureClasss<Props>
 
   unsubscribe = null;
 
-  constructor(props:Props)
+  constructor(props: Props)
   {
     super(props);
     this._subscribe(
@@ -85,13 +85,13 @@ class AccountDropdown extends PureClasss<Props>
       {
         storeKeyPath: ['currentUser'],
         stateKey: 'user',
-      }
+      },
     );
   }
 
   componentWillUnmount()
   {
-    $("body").unbind('click', this.close);
+    $('body').unbind('click', this.close);
   }
 
   close(event)
@@ -99,7 +99,7 @@ class AccountDropdown extends PureClasss<Props>
     this.setState({
       open: false,
     });
-    $("body").unbind('click', this.close);
+    $('body').unbind('click', this.close);
     event.stopPropagation();
   }
 
@@ -108,7 +108,7 @@ class AccountDropdown extends PureClasss<Props>
     this.setState({
       open: true,
     });
-    $("body").click(this.close);
+    $('body').click(this.close);
     event.stopPropagation();
   }
 
@@ -122,7 +122,7 @@ class AccountDropdown extends PureClasss<Props>
     this.go('/account/team');
   }
 
-  go(url:string)
+  go(url: string)
   {
     browserHistory.push(url);
   }
@@ -134,7 +134,7 @@ class AccountDropdown extends PureClasss<Props>
 
   renderDropdown()
   {
-    if(!this.state.open)
+    if (!this.state.open)
     {
       return null;
     }
@@ -142,34 +142,34 @@ class AccountDropdown extends PureClasss<Props>
     return (
       <div className="account-dropdown-content">
         <div className="account-dropdown-row" onMouseDown={this.editProfile}>
-          <div className='account-dropdown-icon account-dropdown-icon-red'>
+          <div className="account-dropdown-icon account-dropdown-icon-red">
             <EditIcon/>
           </div>
-          <div className='account-dropdown-link'>
+          <div className="account-dropdown-link">
              Edit Profile
           </div>
         </div>
         <div className="account-dropdown-row" onMouseDown={this.goTeamGoTeamGo}>
-          <div className='account-dropdown-icon account-dropdown-icon-blue'>
+          <div className="account-dropdown-icon account-dropdown-icon-blue">
             <HomeIcon/>
           </div>
-          <div className='account-dropdown-link'>
+          <div className="account-dropdown-link">
              My Team
           </div>
         </div>
         {
           this.state.user && this.state.user.isAdmin &&
             <div className="account-dropdown-row" onMouseDown={this._toggle('commitLogOpen')}>
-              <div className='account-dropdown-icon account-dropdown-icon-blue'>
+              <div className="account-dropdown-icon account-dropdown-icon-blue">
                 <InfoIcon />
               </div>
-              <div className='account-dropdown-link'>
+              <div className="account-dropdown-link">
                  Commit Log
               </div>
             </div>
         }
         <div className="account-dropdown-row" onMouseDown={this.handleLogout}>
-          <div className='account-dropdown-icon account-dropdown-icon-blue'>
+          <div className="account-dropdown-icon account-dropdown-icon-blue">
             <LogoutIcon/>
           </div>
           Logout
@@ -181,7 +181,7 @@ class AccountDropdown extends PureClasss<Props>
   renderTopBar()
   {
     return (
-      <div className="account-dropdown-top-bar" onClick={this.open} ref='accountDropdownButton'>
+      <div className="account-dropdown-top-bar" onClick={this.open} ref="accountDropdownButton">
         <UserThumbnail
           showName={true}
           username={this.state.user && this.state.user.username}
@@ -194,9 +194,9 @@ class AccountDropdown extends PureClasss<Props>
 
   render()
   {
-    var classes = Util.objToClassname({
-      "account-dropdown-wrapper": true,
-      "account-dropdown-open": this.state.open,
+    const classes = Util.objToClassname({
+      'account-dropdown-wrapper': true,
+      'account-dropdown-open': this.state.open,
     });
 
     return (

@@ -43,16 +43,15 @@ THE SOFTWARE.
 */
 
 require('./Loading.less');
-import * as $ from 'jquery';
 import * as classNames from 'classnames';
+import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import PureClasss from '../../common/components/PureClasss';
 import Util from '../../util/Util';
 
-const Sprites = require("./../../../images/spritesheet_terrainLoading.png");
-
+const Sprites = require('./../../../images/spritesheet_terrainLoading.png');
 
 export interface Props {
   loading: boolean;
@@ -106,7 +105,7 @@ class Loading extends PureClasss<Props>
   ];
 
   imgLooper: ImgLooper;
-  
+
   componentDidMount()
   {
     this.imgLooper = new ImgLooper(ReactDOM.findDOMNode(this.refs['sprites']) as any, this.props.width, this.stageParams);
@@ -120,20 +119,20 @@ class Loading extends PureClasss<Props>
   componentWillReceiveProps(nextProps: Props)
   {
     let stage = -1;
-    if(!this.props.loading && nextProps.loading)
+    if (!this.props.loading && nextProps.loading)
     {
       stage = 1;
     }
-    else if(!this.props.loaded && nextProps.loaded)
+    else if (!this.props.loaded && nextProps.loaded)
     {
       stage = 3;
     }
-    else if(this.props.loading && !nextProps.loading)
+    else if (this.props.loading && !nextProps.loading)
     {
       stage = 0;
     }
 
-    if(stage !== -1)
+    if (stage !== -1)
     {
       this.setStage(stage);
     }
@@ -149,11 +148,11 @@ class Loading extends PureClasss<Props>
 
   handleFirstEnd()
   {
-    if(this.props.loaded)
+    if (this.props.loaded)
     {
       this.setStage(3);
     }
-    else if(this.props.loading)
+    else if (this.props.loading)
     {
       this.setStage(1);
     }
@@ -166,7 +165,7 @@ class Loading extends PureClasss<Props>
 
   render()
   {
-    let {width} = this.props;
+    const {width} = this.props;
 
     return (
       <div
@@ -181,11 +180,11 @@ class Loading extends PureClasss<Props>
       >
         <img
           src={Sprites}
-          className='moutain-loading-img'
+          className="moutain-loading-img"
           style={{
             height: this.props.height,
           }}
-          ref='sprites'
+          ref="sprites"
         />
       </div>
     );
@@ -226,15 +225,15 @@ class ImgLooper
 
   setStage(_stage: number, showFrame: boolean = false)
   {
-    let stageParams = this.stages[_stage];
-    if(this.stage === -1 || showFrame || stageParams.endFrame < this.frame)
+    const stageParams = this.stages[_stage];
+    if (this.stage === -1 || showFrame || stageParams.endFrame < this.frame)
     {
-      this.showFrame(stageParams.startFrame)
+      this.showFrame(stageParams.startFrame);
     }
 
     this.stage = _stage;
 
-    if(!this.interval)
+    if (!this.interval)
     {
       this.interval = setInterval(this.nextFrame, 1000 / fps);
     }
@@ -245,19 +244,18 @@ class ImgLooper
     this.clearInterval();
   }
 
-
   // only called by the interval
   private nextFrame()
   {
-    let {loop, startFrame, endFrame, followThrough, onStageEnd} = this.stages[this.stage];
+    const {loop, startFrame, endFrame, followThrough, onStageEnd} = this.stages[this.stage];
 
-    if(this.frame === endFrame)
+    if (this.frame === endFrame)
     {
-      if(followThrough)
+      if (followThrough)
       {
         this.setStage(this.stage + 1);
       }
-      else if(loop)
+      else if (loop)
       {
         this.showFrame(startFrame);
       }
@@ -274,9 +272,9 @@ class ImgLooper
     }
   }
 
-  private showFrame(_frame:number)
+  private showFrame(_frame: number)
   {
-    let m = -1 * this.width * _frame;
+    const m = -1 * this.width * _frame;
     this.el.style.marginLeft = m + 'px';
     this.frame = _frame;
   }

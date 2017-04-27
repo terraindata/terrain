@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import InfoArea from './InfoArea';
 import PureClasss from '../../common/components/PureClasss';
+import InfoArea from './InfoArea';
 const {browserHistory} = require('react-router');
-import AuthActions from "../../auth/data/AuthActions";
+import AuthActions from '../../auth/data/AuthActions';
 
 export interface Props
 {

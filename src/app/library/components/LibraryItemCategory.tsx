@@ -45,8 +45,8 @@ THE SOFTWARE.
 require('./LibraryItemCategory.less');
 
 import * as React from 'react';
-import Classs from './../../common/components/Classs';
 import { DragSource, DropTarget } from 'react-dnd';
+import Classs from './../../common/components/Classs';
 
 export interface Props
 {
@@ -64,7 +64,7 @@ class LibraryItemCategory extends Classs<Props>
     open: true,
   };
 
-  constructor(props:Props)
+  constructor(props: Props)
   {
     super(props);
     this.state.open = this.props.status !== 'Archive';
@@ -78,31 +78,31 @@ class LibraryItemCategory extends Classs<Props>
   }
 
   render()
-  { 
+  {
     return this.props.connectDropTarget(
       <div className={`library-category library-category-${this.props.status} library-category-${this.state.open ? 'open' : 'closed'}`}>
         { ! this.props.titleHidden &&
-          <div className='library-category-title' onClick={this.toggleOpen}>
-            <div className='library-category-title-symbol' />
-            <div className='library-category-title-text'>
+          <div className="library-category-title" onClick={this.toggleOpen}>
+            <div className="library-category-title-symbol" />
+            <div className="library-category-title-text">
               {
                 this.props.status
               }
             </div>
           </div>
         }
-        <div className='library-category-content'>
+        <div className="library-category-content">
           { this.props['children'] }
         </div>
-      </div>
+      </div>,
     );
   }
 }
 
-let canDrop = (props, monitor) =>
+const canDrop = (props, monitor) =>
 {
-  let itemType = monitor.getItem().type;
-  if(itemType !== props.type)
+  const itemType = monitor.getItem().type;
+  if (itemType !== props.type)
   {
     return false;
   }
@@ -115,9 +115,9 @@ const target =
 
   hover(props, monitor, component)
   {
-    if(canDrop(props, monitor))
+    if (canDrop(props, monitor))
     {
-      let item = monitor.getItem();
+      const item = monitor.getItem();
       props.onHover(props.status, item.id);
     }
   },

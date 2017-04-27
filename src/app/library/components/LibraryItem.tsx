@@ -43,15 +43,15 @@ THE SOFTWARE.
 */
 
 require('./LibraryItem.less');
-import * as React from 'react';
-import * as $ from 'jquery';
 import * as Immutable from 'immutable';
+import * as $ from 'jquery';
+import * as React from 'react';
 const {List} = Immutable;
-import Classs from './../../common/components/Classs';
-import Menu from './../../common/components/Menu';
-import { Link } from 'react-router';
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
+import { Link } from 'react-router';
+import Classs from './../../common/components/Classs';
+import Menu from './../../common/components/Menu';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
@@ -90,7 +90,7 @@ export interface Props
 
   // optional
   className?: string;
-  onDoubleClick?: (id:ID) => void;
+  onDoubleClick?: (id: ID) => void;
   isStarred?: boolean;
 
   // populated by DnD code
@@ -151,11 +151,11 @@ class LibraryItem extends Classs<Props>
         {
           this.setState({
             mounted: true,
-          })
+          });
         }, this.props.rendered ? 0 : Math.min(this.props.fadeIndex * 100, 1000)), // re-add this when we get real indexes
     });
 
-    if(!this.props.name.length)
+    if (!this.props.name.length)
     {
       this.showTextfield();
     }
@@ -163,7 +163,7 @@ class LibraryItem extends Classs<Props>
 
   componentWillUnmount()
   {
-    if(this.state.timeout)
+    if (this.state.timeout)
     {
       clearTimeout(this.state.timeout);
     }
@@ -181,7 +181,7 @@ class LibraryItem extends Classs<Props>
 
   handleKeyDown(event)
   {
-    if(event.keyCode === 13)
+    if (event.keyCode === 13)
     {
       event.target.blur();
     }
@@ -189,7 +189,7 @@ class LibraryItem extends Classs<Props>
 
   showTextfield(event?)
   {
-    if(!this.props.canEdit)
+    if (!this.props.canEdit)
     {
       return;
     }
@@ -204,7 +204,7 @@ class LibraryItem extends Classs<Props>
 
   componentDidUpdate()
   {
-    if(this.state.focusField)
+    if (this.state.focusField)
     {
       this.refs['input']['focus']();
       this.setState({
@@ -218,14 +218,14 @@ class LibraryItem extends Classs<Props>
     this.props.onNameChange(this.props.id, event.target.value);
     this.setState({
       nameEditing: false,
-    })
+    });
   }
 
   handleDoubleClick(event)
   {
     event.preventDefault();
     event.stopPropagation();
-    if(this.state.nameEditing)
+    if (this.state.nameEditing)
     {
       this.props.onNameChange(this.props.id, this.refs['input']['value']);
     }
@@ -239,11 +239,11 @@ class LibraryItem extends Classs<Props>
 
   render()
   {
-    let { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging } = this.props;
-    let draggingOver = isOver && dragItemType !== this.props.type;
+    const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging } = this.props;
+    const draggingOver = isOver && dragItemType !== this.props.type;
 
-    let {canArchive, canDuplicate} = this.props;
-    let menuOptions =
+    const {canArchive, canDuplicate} = this.props;
+    const menuOptions =
       (canArchive && canDuplicate) ? this.menuOptions.duplicateArchive :
       (
         canArchive ? this.menuOptions.archive :
@@ -252,16 +252,16 @@ class LibraryItem extends Classs<Props>
         )
       );
 
-    if(this.props.draggingOverIndex !== -1)
+    if (this.props.draggingOverIndex !== -1)
     {
       // could be shifted
-      if(this.props.index > this.props.draggingItemIndex && this.props.index == this.props.draggingOverIndex)
+      if (this.props.index > this.props.draggingItemIndex && this.props.index == this.props.draggingOverIndex)
       {
-        var shiftedUp = true;
+        const shiftedUp = true;
       }
-      if(this.props.index < this.props.draggingItemIndex && this.props.index == this.props.draggingOverIndex)
+      if (this.props.index < this.props.draggingItemIndex && this.props.index == this.props.draggingOverIndex)
       {
-        var shiftedDown = true;
+        const shiftedDown = true;
       }
     }
 
@@ -276,8 +276,8 @@ class LibraryItem extends Classs<Props>
       >
         <Link
           to={this.props.to}
-          className='library-item-link'
-          activeClassName='library-item-active'
+          className="library-item-link"
+          activeClassName="library-item-active"
           onDoubleClick={this.handleDoubleClick}
         >
           <div
@@ -289,14 +289,14 @@ class LibraryItem extends Classs<Props>
               'library-item-wrapper-drag-over': draggingOver,
             })}
             style={{
-              borderColor:this.props.color
+              borderColor: this.props.color,
             }}
           >
             { connectDragSource(
               <div
                 className={'library-item ' + this.props.className}
                 style={{
-                  background:this.props.color
+                  background: this.props.color,
                 }}
               >
                 <div
@@ -306,14 +306,14 @@ class LibraryItem extends Classs<Props>
                   })}
                 >
                   <div
-                    className='library-item-icon'
+                    className="library-item-icon"
                   >
                     {
                       this.props.icon
                     }
                   </div>
                   <div
-                    className='library-item-name'
+                    className="library-item-name"
                     onDoubleClick={this.showTextfield}
                   >
                     {
@@ -321,18 +321,18 @@ class LibraryItem extends Classs<Props>
                     }
                   </div>
                   <input
-                    className='library-item-name-input'
+                    className="library-item-name-input"
                     defaultValue={ this.props.name }
                     placeholder={this.props.type.substr(0, 1).toUpperCase() + this.props.type.substr(1) + ' name'}
                     onBlur={ this.hideTextfield }
                     onFocus={this.handleFocus}
                     onKeyDown={ this.handleKeyDown }
-                    ref='input'
+                    ref="input"
                   />
                   {
                     this.props.isStarred &&
                       <div
-                        className='library-item-star'
+                        className="library-item-star"
                       >
                         <StarIcon />
                       </div>
@@ -341,12 +341,12 @@ class LibraryItem extends Classs<Props>
                     options={menuOptions}
                   />
                 </div>
-                <div className='library-item-content'>
+                <div className="library-item-content">
                   {
                     this.props['children']
                   }
                 </div>
-              </div>
+              </div>,
             )}
           </div>
         </Link>
@@ -355,11 +355,10 @@ class LibraryItem extends Classs<Props>
   }
 }
 
-
 // DnD stuff
 
-var shifted = false;
-$(document).on('dragover dragend', function(e){shifted = e.shiftKey; return true;} );
+let shifted = false;
+$(document).on('dragover dragend', function(e){shifted = e.shiftKey; return true; } );
 // http://stackoverflow.com/questions/3781142/jquery-or-javascript-how-determine-if-shift-key-being-pressed-while-clicking-an
 
 const source =
@@ -381,14 +380,14 @@ const source =
 
   endDrag(props, monitor, component)
   {
-    if(!monitor.didDrop())
+    if (!monitor.didDrop())
     {
       return;
     }
     const item = monitor.getItem();
     const { type, targetItem } = monitor.getDropResult();
     props.onDropped(item.id, type, targetItem, shifted);
-  }
+  },
 };
 
 const dragCollect = (connect, monitor) =>
@@ -399,17 +398,16 @@ const dragCollect = (connect, monitor) =>
   // built-in `isDragging` unreliable if the component is being inserted into other parts of the app during drag
 });
 
-
-let canDrop = (props, monitor) =>
+const canDrop = (props, monitor) =>
 {
-  if(!props.canCreate)
+  if (!props.canCreate)
   {
     return false;
   }
 
-  let itemType = monitor.getItem().type;
-  let targetType = props.type;
-  switch(itemType)
+  const itemType = monitor.getItem().type;
+  const targetType = props.type;
+  switch (itemType)
   {
     case 'variant':
       return targetType === 'variant' || targetType === 'algorithm';
@@ -426,23 +424,23 @@ const target =
 
   hover(props, monitor, component)
   {
-    if(canDrop(props, monitor))
+    if (canDrop(props, monitor))
     {
-      let item = monitor.getItem();
+      const item = monitor.getItem();
       props.onHover(props.index, item.type, item.id);
     }
   },
 
   drop(props, monitor, component)
   {
-    if(monitor.isOver({ shallow: true}))
+    if (monitor.isOver({ shallow: true}))
     {
       return {
         targetItem: props.item,
         type: props.type,
       };
     }
-  }
+  },
 };
 
 const dropCollect = (connect, monitor) =>

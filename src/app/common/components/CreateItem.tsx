@@ -45,7 +45,7 @@ THE SOFTWARE.
 require('./CreateItem.less');
 import * as React from 'react';
 import Classs from './../../common/components/Classs';
-var AddIcon = require("./../../../images/icon_add_7x7.svg?name=AddIcon");
+const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');
 
 export interface Props
 {
@@ -58,8 +58,8 @@ class CreateItem extends Classs<Props>
   render()
   {
     return (
-      <div className='create-item' onClick={this.props.onCreate} data-tip={'Create ' + this.props.name}>
-        <AddIcon />        
+      <div className="create-item" onClick={this.props.onCreate} data-tip={'Create ' + this.props.name}>
+        <AddIcon />
       </div>
     );
   }

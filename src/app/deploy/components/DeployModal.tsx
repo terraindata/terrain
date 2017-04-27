@@ -43,27 +43,27 @@ THE SOFTWARE.
 */
 
 require('./DeployModal.less');
-import PureClasss from './../../common/components/PureClasss';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import PureClasss from './../../common/components/PureClasss';
 
+import BuilderTypes from '../../builder/BuilderTypes';
 import Modal from '../../common/components/Modal';
+import LibraryActions from '../../library/data/LibraryActions';
+import LibraryStore from '../../library/data/LibraryStore';
+import LibraryTypes from '../../library/LibraryTypes';
 import TQLEditor from '../../tql/components/TQLEditor';
 import TQLConverter from '../../tql/TQLConverter';
-import LibraryStore from '../../library/data/LibraryStore';
-import LibraryActions from '../../library/data/LibraryActions';
-import BuilderTypes from '../../builder/BuilderTypes';
-import LibraryTypes from '../../library/LibraryTypes';
 import DeployModalColumn from './DeployModalColumn';
 
-let {EVariantStatus} = LibraryTypes;
+const {EVariantStatus} = LibraryTypes;
 
 export interface Props {
 }
 
-class DeployModal extends PureClasss<Props>   
+class DeployModal extends PureClasss<Props>
 {
   state: {
     changingStatus: boolean;
@@ -76,14 +76,14 @@ class DeployModal extends PureClasss<Props>
     changingStatusTo: null,
     defaultChecked: false,
   };
-  
+
   componentDidMount()
   {
     this._subscribe(LibraryStore, {
       updater: (state) =>
       {
-        let {changingStatus, changingStatusOf, changingStatusTo, changingStatusDefault} = state;
-        if(
+        const {changingStatus, changingStatusOf, changingStatusTo, changingStatusDefault} = state;
+        if (
           changingStatus !== this.state.changingStatus ||
           changingStatusOf !== this.state.changingStatusOf ||
           changingStatusTo !== this.state.changingStatusTo
@@ -96,32 +96,32 @@ class DeployModal extends PureClasss<Props>
           });
         }
       },
-      isMounted: true,  
+      isMounted: true,
     });
   }
-  
+
   handleClose()
   {
     LibraryActions.variants.status(null, null);
   }
-  
+
   handleDeploy()
   {
     LibraryActions.variants.status(
-      this.state.changingStatusOf, this.state.changingStatusTo, true, this.state.defaultChecked
+      this.state.changingStatusOf, this.state.changingStatusTo, true, this.state.defaultChecked,
     );
   }
-  
-  renderTQLColumn(defaultVariant:LibraryTypes.Variant)
+
+  renderTQLColumn(defaultVariant: LibraryTypes.Variant)
   {
-    let variant = this.state.changingStatusOf;
-    let defaultTql = 
+    const variant = this.state.changingStatusOf;
+    const defaultTql =
       (this.state.defaultChecked && defaultVariant) ? defaultVariant.query.tql : null;
-    let tql = variant ? variant.query.tql : '';
-    
+    const tql = variant ? variant.query.tql : '';
+
     return (
-      <div className='deploy-modal-tql'>
-        <div className='deploy-modal-tql-wrapper'>
+      <div className="deploy-modal-tql">
+        <div className="deploy-modal-tql-wrapper">
           <TQLEditor
             canEdit={false}
             tql={tql}
@@ -132,41 +132,41 @@ class DeployModal extends PureClasss<Props>
       </div>
     );
   }
-  
+
   handleDefaultCheckedChange(defaultChecked: boolean)
   {
     this.setState({
       defaultChecked,
     });
   }
-  
-  render() 
+
+  render()
   {
-    if(!this.state.changingStatus)
+    if (!this.state.changingStatus)
     {
       return null;
     }
-    
-    let {changingStatus, changingStatusOf, changingStatusTo} = this.state;
-    let name = (changingStatusOf && changingStatusOf.name);
-    
+
+    const {changingStatus, changingStatusOf, changingStatusTo} = this.state;
+    const name = (changingStatusOf && changingStatusOf.name);
+
     let title = 'Deploy "' + name + '" to Live';
-    if(changingStatusTo !== EVariantStatus.Live)
+    if (changingStatusTo !== EVariantStatus.Live)
     {
       title = 'Remove "' + name + '" from Live';
     }
-    
-    if(this.state.defaultChecked)
+
+    if (this.state.defaultChecked)
     {
-      let libraryState = LibraryStore.getState();
-      var defaultVariant = libraryState.variants.find(
-        v => v.algorithmId === changingStatusOf.algorithmId && v.isDefault
+      const libraryState = LibraryStore.getState();
+      const defaultVariant = libraryState.variants.find(
+        (v) => v.algorithmId === changingStatusOf.algorithmId && v.isDefault,
       );
     }
-    
+
     return (
       <Modal
-        open={this.state.changingStatus} 
+        open={this.state.changingStatus}
         message={null}
         onClose={this.handleClose}
         title={title}

@@ -44,40 +44,40 @@ THE SOFTWARE.
 
 import * as _ from 'underscore';
 require('./BuilderColumn.less');
+import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as Immutable from 'immutable';
-import * as classNames from 'classnames';
 const {List} = Immutable;
-import Util from '../../util/Util';
+import InfoArea from '../../common/components/InfoArea';
 import Menu from '../../common/components/Menu';
 import { MenuOption } from '../../common/components/Menu';
-import PanelMixin from './layout/PanelMixin';
-import UserStore from '../../users/data/UserStore';
-import RolesStore from '../../roles/data/RolesStore';
 import LibraryTypes from '../../library/LibraryTypes';
-import InfoArea from '../../common/components/InfoArea';
+import RolesStore from '../../roles/data/RolesStore';
+import UserStore from '../../users/data/UserStore';
+import Util from '../../util/Util';
+import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
-import Ajax from "./../../util/Ajax";
 import BuilderTypes from '../BuilderTypes';
+import Ajax from './../../util/Ajax';
 type Query = BuilderTypes.Query;
 
-import InputsArea from "./inputs/InputsArea";
-import CardsColumn from "./cards/CardsColumn";
-import ResultsArea from "./results/ResultsArea";
+import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import Manual from './../../manual/components/Manual';
-import SchemaView from '../../schema/components/SchemaView';
+import CardsColumn from './cards/CardsColumn';
+import InputsArea from './inputs/InputsArea';
+import ResultsArea from './results/ResultsArea';
 
-var SplitScreenIcon = require("./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon");
-var CloseIcon = require("./../../../images/icon_close_8x8.svg?name=CloseIcon");
-var LockedIcon = require("./../../../images/icon_lock.svg?name=LockedIcon");
+const SplitScreenIcon = require('./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon');
+const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
+const LockedIcon = require('./../../../images/icon_lock.svg?name=LockedIcon');
 
-var BuilderIcon = require("./../../../images/icon_builder.svg");
-var ResultsIcon = require("./../../../images/icon_resultsDropdown.svg");
-var TQLIcon = require("./../../../images/icon_tql.svg");
-var InputsIcon = require("./../../../images/icon_input.svg");
-var ManualIcon = require('./../../../images/icon_info.svg');
+const BuilderIcon = require('./../../../images/icon_builder.svg');
+const ResultsIcon = require('./../../../images/icon_resultsDropdown.svg');
+const TQLIcon = require('./../../../images/icon_tql.svg');
+const InputsIcon = require('./../../../images/icon_input.svg');
+const ManualIcon = require('./../../../images/icon_info.svg');
 
 enum COLUMNS {
   Builder,
@@ -87,14 +87,14 @@ enum COLUMNS {
   Schema,
 }
 // Manual,
-var NUM_COLUMNS = 5;
+const NUM_COLUMNS = 5;
 
-var menuIcons = [
+const menuIcons = [
     {icon: <BuilderIcon />, color: '#76a2c1'},
     {icon: <ResultsIcon />, color: '#71bca2'},
     {icon: <TQLIcon />, color: '#d47884'},
     {icon: <InputsIcon />, color: '#c2b694'},
-    {icon: <ManualIcon />, color: "#a98abf"},
+    {icon: <ManualIcon />, color: '#a98abf'},
 ]; // TODO add schema icon above
 
 // interface Props
@@ -110,7 +110,7 @@ var menuIcons = [
 //   }[];
 // }
 
-var BuilderColumn = React.createClass<any, any>(
+const BuilderColumn = React.createClass<any, any>(
 {
   mixins: [PanelMixin],
 
@@ -139,9 +139,9 @@ var BuilderColumn = React.createClass<any, any>(
 
   getInitialState()
   {
-    let colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
-    var column = colKeyTypes[this.props.colKey];
-    if(column === undefined)
+    const colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
+    let column = colKeyTypes[this.props.colKey];
+    if (column === undefined)
     {
       column = this.props.index;
       colKeyTypes[this.props.colKey] = this.props.index;
@@ -150,12 +150,12 @@ var BuilderColumn = React.createClass<any, any>(
 
     return {
       column: this.props.columnType ? this.props.columnType : column,
-    }
+    };
   },
 
   componentDidMount()
   {
-    if(this.state.column === 4)
+    if (this.state.column === 4)
     {
       this.props.switchToManualCol(this.props.index);
     }
@@ -169,7 +169,7 @@ var BuilderColumn = React.createClass<any, any>(
   componentWillMount()
   {
     // TODO fix
-    let rejigger = () => this.setState({ rand: Math.random() });
+    const rejigger = () => this.setState({ rand: Math.random() });
     this.unsubUser = UserStore.subscribe(rejigger);
     this.unsubRoles = RolesStore.subscribe(rejigger);
   },
@@ -192,20 +192,20 @@ var BuilderColumn = React.createClass<any, any>(
 
   renderContent()
   {
-    if(!this.props.query)
+    if (!this.props.query)
     {
       return (
         <div
-          className='builder-column-loading'
+          className="builder-column-loading"
         >
           Loading...
         </div>
       );
     }
 
-    let query: BuilderTypes.Query = this.props.query;
+    const query: BuilderTypes.Query = this.props.query;
     const {canEdit} = this.props;
-    switch(this.state.column)
+    switch (this.state.column)
     {
       case COLUMNS.Builder:
         return <CardsColumn
@@ -260,11 +260,11 @@ var BuilderColumn = React.createClass<any, any>(
 
   switchView(index)
   {
-    if(index === 4)
+    if (index === 4)
     {
       this.props.switchToManualCol(this.props.index);
     }
-    else if(this.state.column === 4)
+    else if (this.state.column === 4)
     {
       this.props.switchToManualCol(-1);
     }
@@ -273,19 +273,19 @@ var BuilderColumn = React.createClass<any, any>(
       column: index,
     });
 
-    var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
+    const colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
     colKeyTypes[this.props.colKey] = index;
     localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
   },
 
   getMenuOptions(): List<MenuOption> //TODO
   {
-    var options: List<MenuOption> = Immutable.List(_.range(0, NUM_COLUMNS).map(index => ({
+    const options: List<MenuOption> = Immutable.List(_.range(0, NUM_COLUMNS).map((index) => ({
       text: COLUMNS[index],
       onClick: this.switchView,
       disabled: index === this.state.column,
       icon: menuIcons[index].icon,
-      iconColor: menuIcons[index].color
+      iconColor: menuIcons[index].color,
     })));
 
     return options;
@@ -300,28 +300,28 @@ var BuilderColumn = React.createClass<any, any>(
   {
     this.props.onCloseColumn(this.props.index);
 
-    var colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
+    const colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
     delete colKeyTypes[this.props.colKey];
     localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
   },
 
   render()
   {
-    let {query, canEdit, cantEditReason} = this.props;
+    const {query, canEdit, cantEditReason} = this.props;
 
     return this.renderPanel((
       <div className={'builder-column builder-column-' + this.props.index}>
-        <div className='builder-title-bar'>
+        <div className="builder-title-bar">
           {
             this.props.index === 0 ? null : (
-              <div className='builder-resize-handle' ref='resize-handle'>
-                <div className='builder-resize-handle-line'></div>
-                <div className='builder-resize-handle-line'></div>
+              <div className="builder-resize-handle" ref="resize-handle">
+                <div className="builder-resize-handle-line"></div>
+                <div className="builder-resize-handle-line"></div>
               </div>
             )
           }
-          <div className='builder-title-bar-title'>
-            <span ref='handle'>
+          <div className="builder-title-bar-title">
+            <span ref="handle">
               {
                 COLUMNS[this.state.column]
               }
@@ -333,12 +333,12 @@ var BuilderColumn = React.createClass<any, any>(
               }
             </span>
           </div>
-          <div className='builder-title-bar-options'>
+          <div className="builder-title-bar-options">
             {
               this.props.canCloseColumn &&
                 <CloseIcon
                   onClick={this.handleCloseColumn}
-                  className='close close-builder-title-bar'
+                  className="close close-builder-title-bar"
                   data-tip="Close Column"
                 />
             }
@@ -346,7 +346,7 @@ var BuilderColumn = React.createClass<any, any>(
               this.props.canAddColumn &&
                 <SplitScreenIcon
                   onClick={this.handleAddColumn}
-                  className='bc-options-svg builder-split-screen'
+                  className="bc-options-svg builder-split-screen"
                   data-tip="Add Column"
                 />
             }
@@ -370,8 +370,8 @@ var BuilderColumn = React.createClass<any, any>(
         </div>
       </div>
     ));
-  }
-}
+  },
+},
 );
 
 export default BuilderColumn;

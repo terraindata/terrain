@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const {List, Map} = Immutable;
-import {New, BaseClass} from '../Classes';
+import {BaseClass, New} from '../Classes';
 import Util from '../util/Util';
 
 type IDList = ID[] | List<ID>;
@@ -53,8 +53,8 @@ export module SchemaTypes
 {
 	export class SchemaBaseClass extends BaseClass
 	{
-		type = "";
-		name = "";
+		type = '';
+		name = '';
 	}
 
 	class SchemaStateC
@@ -79,10 +79,8 @@ export module SchemaTypes
 		columnNamesByDb: ColumnNamesByDb = Map<string, IMMap<string, List<string>>>({});
 	}
 	export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
-	export const _SchemaState = (config?: {[key:string]: any}) =>
+	export const _SchemaState = (config?: {[key: string]: any}) =>
 	  New<SchemaState>(new SchemaStateC(), config);
-
-
 
 	export function databaseId(databaseName: string)
 	{
@@ -91,8 +89,8 @@ export module SchemaTypes
 
 	class DatabaseC extends SchemaBaseClass
 	{
-		type = "database";
-		name = "";
+		type = 'database';
+		name = '';
 
 		tableIds: List<ID> = List([]);
 	}
@@ -100,14 +98,13 @@ export module SchemaTypes
 	export const _Database =
 		(config: {
 			name: string,
-			id?: ID
+			id?: ID,
 		}) => {
 		  config.id = databaseId(config.name);
 		  return New<Database>(new DatabaseC(config), config);
 		};
 	export type DatabaseMap = IMMap<ID, Database>;
-	
-	
+
 	export function tableId(databaseName: string, tableName: string)
 	{
 		return databaseName + '.' + tableName;
@@ -115,9 +112,9 @@ export module SchemaTypes
 
 	class TableC extends SchemaBaseClass
 	{
-		type = "table";
-		name = "";
-		databaseId: ID = "";
+		type = 'table';
+		name = '';
+		databaseId: ID = '';
 
 		columnIds: List<ID> = List([]);
 		indexIds: List<ID> = List([]);
@@ -126,15 +123,13 @@ export module SchemaTypes
 	export const _Table = (config: {
 		name: string,
 		databaseId: ID,
-		id?: ID
+		id?: ID,
 	}) => {
 	  config.id = tableId(config.databaseId, config.name);
 	  return New<Table>(new TableC(config), config);
 	};
 	export type TableMap = IMMap<ID, Table>;
-	
-	
-	
+
 	export function columnId(tableId: string, columnName: string)
 	{
 		return tableId + '.c.' + columnName;
@@ -142,14 +137,14 @@ export module SchemaTypes
 
 	class ColumnC extends SchemaBaseClass
 	{
-		type = "column";
-		name = "";
-		databaseId: ID = "";
-		tableId: ID = "";
+		type = 'column';
+		name = '';
+		databaseId: ID = '';
+		tableId: ID = '';
 
 		indexIds: List<ID> = List([]);
-		datatype = "";
-		defaultValue = "";
+		datatype = '';
+		defaultValue = '';
 		isNullable = false;
 		isPrimaryKey = false;
 	}
@@ -164,14 +159,13 @@ export module SchemaTypes
 		isNullable: boolean,
 		isPrimaryKey: boolean,
 
-		id?: ID
+		id?: ID,
 	}) => {
 	  config.id = columnId(config.tableId, config.name);
 	  return New<Column>(new ColumnC(config), config);
 	};
 	export type ColumnMap = IMMap<ID, Column>;
-	
-	
+
 	export function indexId(databaseName: string, tableName: string, indexName: string)
 	{
 		return databaseName + '.' + tableName + '.i.' + indexName;
@@ -179,12 +173,12 @@ export module SchemaTypes
 
 	class IndexC extends SchemaBaseClass
 	{
-		type = "index";
-		name = "";
-		databaseId: ID = "";
-		tableId: ID = "";
+		type = 'index';
+		name = '';
+		databaseId: ID = '';
+		tableId: ID = '';
 
-		indexType = "";
+		indexType = '';
 		columnIds: List<ID> = List([]);
 	}
 	export type Index = IndexC & IRecord<IndexC>;
@@ -194,13 +188,12 @@ export module SchemaTypes
 		tableId: ID,
 
 		indexType: string,
-		id?: ID
+		id?: ID,
 	}) => {
 	  config.id = indexId(config.databaseId, config.tableId, config.tableId);
 	  return New<Index>(new IndexC(config), config);
 	};
 	export type IndexMap = IMMap<ID, Index>;
-
 
 	export const typeToStoreKey =
 	{
@@ -210,17 +203,16 @@ export module SchemaTypes
 		index: 'indexes',
 	};
 
-	export function searchIncludes(item: SchemaBaseClass, search:string): boolean
+	export function searchIncludes(item: SchemaBaseClass, search: string): boolean
 	{
 		return !search ||
   		(
   			item && typeof item.name === 'string' &&
 	  			item.name.toLowerCase().indexOf(
-	  				search.toLowerCase()
+	  				search.toLowerCase(),
 	  			) !== -1
   		);
 	}
-
 
 	// used to define how to render tree item children in tree list
 	export type ISchemaTreeChildrenConfig = [
@@ -229,8 +221,7 @@ export module SchemaTypes
 			type: string;
 		}
 	];
-	
-	
+
 	export type TableNamesByDb = IMMap<string, List<string>>;
 	export type ColumnNamesByDb = IMMap<string, IMMap<string, List<string>>>;
 	export interface SetDbActionPayload

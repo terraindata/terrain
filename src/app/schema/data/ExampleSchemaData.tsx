@@ -42,49 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import SchemaTypes from '../SchemaTypes';
 import * as Immutable from 'immutable';
+import SchemaTypes from '../SchemaTypes';
 
 let databases = Immutable.Map({});
 let tables = Immutable.Map({});
 let columns = Immutable.Map({});
 
 ['movieDB', 'baseballDB'].map(
-	name =>
+	(name) =>
 	{
 		let db = SchemaTypes._Database({ name });
-		
+
 		['movies', 'actors', 'reviews', 'characters', 'users'].map(
-			tableName =>
+			(tableName) =>
 			{
 				let table = SchemaTypes._Table({ name: tableName, databaseId: db.id });
 				db = db.set('tableIds', db.tableIds.push(table.id));
-				
+
 				['first', 'second', 'third', 'fourth', 'fifth'].map(
-					colName =>
+					(colName) =>
 					{
-						let column = SchemaTypes._Column({ 
-							name: colName, 
-							tableId: table.id, 
+						const column = SchemaTypes._Column({
+							name: colName,
+							tableId: table.id,
 							databaseId: db.id,
 							datatype: 'VARCHAR',
 							isNullable: true,
 							defaultValue: '',
 							isPrimaryKey: false,
 						});
-						
+
 						columns = columns.set(column.id, column);
-						
+
 						table = table.set('columnIds', table.columnIds.push(column.id));
-					}
+					},
 				);
-				
+
 				tables = tables.set(table.id, table);
-			}
+			},
 		);
-		
+
 		databases = databases.set(db.id, db);
-	}
+	},
 );
 
 const ExampleSchemaData =

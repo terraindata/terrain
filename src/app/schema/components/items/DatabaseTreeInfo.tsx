@@ -42,10 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import SchemaTypes from '../../SchemaTypes';
 import * as React from 'react';
-import PureClasss from './../../../common/components/PureClasss';
+import SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
+import PureClasss from './../../../common/components/PureClasss';
 const Radium = require('radium');
 
 export interface Props
@@ -61,11 +61,11 @@ class State
 export class DatabaseTreeInfo extends PureClasss<Props>
 {
 	state: State = new State();
-	
+
   render()
   {
-  	let database = this.props.item;
-  	
+  	const database = this.props.item;
+
     return (
       <div
       	style={Styles.infoPieces}
@@ -76,7 +76,7 @@ export class DatabaseTreeInfo extends PureClasss<Props>
       		<span
       			style={Styles.infoPieceNumber as any}
       		>
-      			{ database.tableIds.size } 
+      			{ database.tableIds.size }
       		</span> tables
       	</div>
       </div>
@@ -89,7 +89,7 @@ export const databaseChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
   {
     label: 'Tables',
     type: 'table',
-  }
+  },
 ];
 
 export default DatabaseTreeInfo;

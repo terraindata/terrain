@@ -44,13 +44,13 @@ THE SOFTWARE.
 
 import Util from './../../util/Util';
 
-export let SchemaActionTypes = 
+export let SchemaActionTypes =
 {
   fetch: '',
   setDatabase: '', // sets the schema for a database
   error: '',
   dbCount: '',
-  
+
   highlightId: '',
   selectId: '',
 };

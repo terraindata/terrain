@@ -43,18 +43,18 @@ THE SOFTWARE.
 */
 
 import * as React from 'react';
-import Classs from './../../common/components/Classs';
-import UserStore from './../data/UserStore';
-import Actions from './../data/UserActions';
-import LibraryTypes from './../UserTypes';
-import InfoArea from './../../common/components/InfoArea';
 import { Link } from 'react-router';
-import UserTypes from './../UserTypes';
 import AuthStore from './../../auth/data/AuthStore';
-import Ajax from './../../util/Ajax';
+import Classs from './../../common/components/Classs';
+import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
-var CameraIcon = require('./../../../images/icon_camera.svg');
-var CloseIcon = require('./../../../images/icon_close_8x8_gray.svg');
+import Ajax from './../../util/Ajax';
+import Actions from './../data/UserActions';
+import UserStore from './../data/UserStore';
+import LibraryTypes from './../UserTypes';
+import UserTypes from './../UserTypes';
+const CameraIcon = require('./../../../images/icon_camera.svg');
+const CloseIcon = require('./../../../images/icon_close_8x8_gray.svg');
 const {browserHistory} = require('react-router');
 
 export interface Props
@@ -83,7 +83,7 @@ class Profile extends Classs<Props>
     savingReq: null,
     showDropDown: false,
     errorModalOpen: false,
-    errorModalMessage: ''
+    errorModalMessage: '',
   };
 
   infoKeys = [
@@ -126,12 +126,12 @@ class Profile extends Classs<Props>
 
   updateUser(props: Props)
   {
-    let userState: UserTypes.UserState = UserStore.getState();
-    let authState = AuthStore.getState();
+    const userState: UserTypes.UserState = UserStore.getState();
+    const authState = AuthStore.getState();
     this.setState({
       user: userState.getIn(['users', authState.get('username')]),
       loading: userState.get('loading'),
-    })
+    });
   }
 
   componentWillMount()
@@ -149,8 +149,8 @@ class Profile extends Classs<Props>
 
   handleSave()
   {
-    var newUser = this.state.user;
-    this.infoKeys.map(infoKey => {
+    let newUser = this.state.user;
+    this.infoKeys.map((infoKey) => {
       newUser = newUser.set(infoKey.key, this.refs[infoKey.key]['value']) as UserTypes.User;
     });
 
@@ -187,18 +187,18 @@ class Profile extends Classs<Props>
   renderInfoItem(infoKey: { key: string, label: string, subText: string })
   {
     return (
-      <div className='profile-info-item-edit' key={infoKey.key}>
-        <div className='profile-info-item-name'>
+      <div className="profile-info-item-edit" key={infoKey.key}>
+        <div className="profile-info-item-name">
           { infoKey.label }
         </div>
-        <div className='profile-info-item-value'>
+        <div className="profile-info-item-value">
           <input
-            type='text'
+            type="text"
             defaultValue={this.state.user[infoKey.key]}
             ref={infoKey.key}
             />
         </div>
-        <div className='profile-info-item-subtext'>
+        <div className="profile-info-item-subtext">
           { infoKey.subText }
         </div>
       </div>
@@ -209,7 +209,7 @@ class Profile extends Classs<Props>
   {
     this.setState({
       showDropDown: !this.state.showDropDown,
-    })
+    });
   }
 
   handleUploadImage(event)
@@ -219,7 +219,7 @@ class Profile extends Classs<Props>
 
   removeProfilePicture()
   {
-    let user = this.state.user.set('imgSrc', null) as UserTypes.User;
+    const user = this.state.user.set('imgSrc', null) as UserTypes.User;
     this.setState({
       user,
     });
@@ -228,19 +228,19 @@ class Profile extends Classs<Props>
 
   handleProfilePicChange(event)
   {
-    var reader  = new FileReader();
+    const reader  = new FileReader();
 
-    reader.addEventListener("load", () => {
+    reader.addEventListener('load', () => {
       this.refs['profilePicImg']['src'] = reader.result;
       this.setState({
-        user: this.state.user.set('imgSrc', reader.result)
+        user: this.state.user.set('imgSrc', reader.result),
       });
     }, false);
 
-    let file = event.target.files[0];
+    const file = event.target.files[0];
 
-    if(file) {
-      if(file.size > 3000000)
+    if (file) {
+      if (file.size > 3000000)
       {
         this.setState({
           errorModalMessage: 'Maximum allowed file size is 3MB',
@@ -259,7 +259,7 @@ class Profile extends Classs<Props>
     {
       this.setState({
         showDropDown: false,
-      })
+      });
     }
   }
 
@@ -267,42 +267,42 @@ class Profile extends Classs<Props>
   {
     return(
       <div
-        className='edit-profile-pic'
+        className="edit-profile-pic"
         onClick={this.handleProfilePicClick}
       >
         <div className={this.state.showDropDown ? 'dropdown' : 'dropdown-hidden'}>
           <div
             onClick={this.handleUploadImage}
-            className='menu-item'
+            className="menu-item"
           >
             Upload an image
           </div>
           <div
             onClick={this.removeProfilePicture}
-            className='menu-item'
+            className="menu-item"
           >
             Remove photo
           </div>
         </div>
         <img
-          className='profile-pic-image'
+          className="profile-pic-image"
           src={UserTypes.profileUrlFor(this.state.user)}
-          ref='profilePicImg'
+          ref="profilePicImg"
         />
-        <div className='profile-pic-overlay'>
-          <div className='profile-pic-overlay-message'>
-            <div className='camera-icon'>
+        <div className="profile-pic-overlay">
+          <div className="profile-pic-overlay-message">
+            <div className="camera-icon">
               <CameraIcon />
             </div>
             Change your profile picture
           </div>
         </div>
         <input
-          ref='imageInput'
-          type='file'
-          className='profile-pic-upload'
+          ref="imageInput"
+          type="file"
+          className="profile-pic-upload"
           onChange={this.handleProfilePicChange}
-          id='profile-image-input'
+          id="profile-image-input"
         />
       </div>
     );
@@ -311,40 +311,40 @@ class Profile extends Classs<Props>
   toggleErrorModal()
   {
     this.setState ({
-      errorModalOpen: !this.state.errorModalOpen
+      errorModalOpen: !this.state.errorModalOpen,
     });
   }
 
   render()
   {
-    if(this.state.loading)
+    if (this.state.loading)
     {
-      return <InfoArea large='Loading...' />
+      return <InfoArea large="Loading..." />;
     }
 
-    if(!this.state.user)
+    if (!this.state.user)
     {
-      return <InfoArea large='No such user found.' />
+      return <InfoArea large="No such user found." />;
     }
 
     return (
-      <div className='profile profile-edit' onClick={this.hidePictureMenu}>
-        <div className='profile-save-row'>
-          <div className='edit-profile-title'>
+      <div className="profile profile-edit" onClick={this.hidePictureMenu}>
+        <div className="profile-save-row">
+          <div className="edit-profile-title">
             Edit your profile
           </div>
-          <div className='edit-profile-close-icon' onClick={this.handleSave}>
+          <div className="edit-profile-close-icon" onClick={this.handleSave}>
             <CloseIcon />
           </div>
         </div>
-        <div className='profile-edit-container'>
-          <div className='profile-info'>
+        <div className="profile-edit-container">
+          <div className="profile-info">
             {
               this.infoKeys.map(this.renderInfoItem)
             }
           </div>
-          <div className='profile-pic-column'>
-            <div className='profile-pic-name'> Profile Picture </div>
+          <div className="profile-pic-column">
+            <div className="profile-pic-name"> Profile Picture </div>
             {this.renderProfilePicture()}
           </div>
         </div>
@@ -356,7 +356,6 @@ class Profile extends Classs<Props>
         />
       </div>
     );
-
 
   }
 }

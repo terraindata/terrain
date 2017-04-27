@@ -44,20 +44,20 @@ THE SOFTWARE.
 
 require('./Library.less');
 import * as React from 'react';
-import PureClasss from './../../common/components/PureClasss';
-import Store from './../data/LibraryStore';
-import {LibraryState} from './../data/LibraryStore';
-import Actions from './../data/LibraryActions';
-import RolesActions from './../../roles/data/RolesActions';
-import UserActions from './../../users/data/UserActions';
-import LibraryTypes from './../LibraryTypes';
-import GroupsColumn from './GroupsColumn';
-import AlgorithmsColumn from './AlgorithmsColumn';
-import VariantsColumn from './VariantsColumn';
-import LibraryInfoColumn from './LibraryInfoColumn';
 import { DragDropContext } from 'react-dnd';
 import InfoArea from './../../common/components/InfoArea';
-var HTML5Backend = require('react-dnd-html5-backend');
+import PureClasss from './../../common/components/PureClasss';
+import RolesActions from './../../roles/data/RolesActions';
+import UserActions from './../../users/data/UserActions';
+import Actions from './../data/LibraryActions';
+import {LibraryState} from './../data/LibraryStore';
+import Store from './../data/LibraryStore';
+import LibraryTypes from './../LibraryTypes';
+import AlgorithmsColumn from './AlgorithmsColumn';
+import GroupsColumn from './GroupsColumn';
+import LibraryInfoColumn from './LibraryInfoColumn';
+import VariantsColumn from './VariantsColumn';
+const HTML5Backend = require('react-dnd-html5-backend');
 const {browserHistory} = require('react-router');
 
 export interface Props
@@ -91,11 +91,11 @@ class Library extends PureClasss<any>
 
   componentWillMount()
   {
-    if(!this.props.params.groupId)
+    if (!this.props.params.groupId)
     {
       // no path given, redirect to last library path
-      let path = localStorage.getItem('lastLibraryPath');
-      if(path)
+      const path = localStorage.getItem('lastLibraryPath');
+      if (path)
       {
         browserHistory.replace(path);
       }
@@ -120,27 +120,27 @@ class Library extends PureClasss<any>
     const { groups, algorithms, variants, groupsOrder } = libraryState;
     const { groupId, algorithmId, variantId } = this.props.params;
 
-    if(groupId)
+    if (groupId)
     {
-      var group = libraryState.getIn(['groups', groupId]) as LibraryTypes.Group;
+      const group = libraryState.getIn(['groups', groupId]) as LibraryTypes.Group;
 
-      if(group)
+      if (group)
       {
-        var { algorithmsOrder } = group;
+        const { algorithmsOrder } = group;
 
-        if(algorithmId)
+        if (algorithmId)
         {
-          var algorithm = algorithms.get(algorithmId);
+          const algorithm = algorithms.get(algorithmId);
 
-          if(algorithm)
+          if (algorithm)
           {
-            var { variantsOrder } = algorithm;
+            const { variantsOrder } = algorithm;
 
-            if(variantId)
+            if (variantId)
             {
-              var variant = variants.get(variantId);
+              const variant = variants.get(variantId);
 
-              if(!variant)
+              if (!variant)
               {
                 browserHistory.replace(`/library/${groupId}/${algorithmId}`);
               }
@@ -159,7 +159,7 @@ class Library extends PureClasss<any>
     localStorage.setItem('lastLibraryPath', this.props.location.pathname);
 
     return (
-      <div className='library'>
+      <div className="library">
         <GroupsColumn
           {...{
             groups,
@@ -171,7 +171,7 @@ class Library extends PureClasss<any>
             algorithms,
             variants,
             algorithmsOrder,
-            groupId
+            groupId,
           }}
         />
         <VariantsColumn

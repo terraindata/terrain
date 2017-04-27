@@ -43,37 +43,37 @@ THE SOFTWARE.
 */
 
 require('./LibraryInfoColumn.less');
-import * as React from 'react';
 import * as Immutable from 'immutable';
+import * as React from 'react';
 const {List} = Immutable;
-import Ajax from './../../util/Ajax';
+import CreateItem from '../../common/components/CreateItem';
+import BuilderStore from './../../builder/data/BuilderStore';
 import Classs from './../../common/components/Classs';
+import Dropdown from './../../common/components/Dropdown';
+import InfoArea from './../../common/components/InfoArea';
+import Menu from './../../common/components/Menu';
+import RolesActions from './../../roles/data/RolesActions';
+import RolesStore from './../../roles/data/RolesStore';
+import RoleTypes from './../../roles/RoleTypes';
+import UserThumbnail from './../../users/components/UserThumbnail';
+import UserActions from './../../users/data/UserActions';
+import UserStore from './../../users/data/UserStore';
+import UserTypes from './../../users/UserTypes';
+import Ajax from './../../util/Ajax';
+import ColorManager from './../../util/ColorManager';
+import Util from './../../util/Util';
+import LibraryActions from './../data/LibraryActions';
+import Actions from './../data/LibraryActions';
+import LibraryStore from './../data/LibraryStore';
+import LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
-import CreateItem from '../../common/components/CreateItem';
-import UserTypes from './../../users/UserTypes';
-import RoleTypes from './../../roles/RoleTypes';
-import LibraryTypes from './../LibraryTypes';
-import ColorManager from './../../util/ColorManager';
-import InfoArea from './../../common/components/InfoArea';
-import Menu from './../../common/components/Menu';
-import Actions from './../data/LibraryActions';
-import UserThumbnail from './../../users/components/UserThumbnail';
-import BuilderStore from './../../builder/data/BuilderStore';
-import UserStore from './../../users/data/UserStore';
-import RolesStore from './../../roles/data/RolesStore';
-import UserActions from './../../users/data/UserActions';
-import RolesActions from './../../roles/data/RolesActions';
 import LibraryVariantInfo from './LibraryVariantInfo';
-import LibraryActions from './../data/LibraryActions';
-import LibraryStore from './../data/LibraryStore';
-import Util from './../../util/Util';
-import Dropdown from './../../common/components/Dropdown';
 
-var GroupIcon = require('./../../../images/icon_badgeGroup.svg');
-var AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
-var VariantIcon = require('./../../../images/icon_badgeVariant.svg');
+const GroupIcon = require('./../../../images/icon_badgeGroup.svg');
+const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
+const VariantIcon = require('./../../../images/icon_badgeVariant.svg');
 
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
@@ -106,7 +106,7 @@ class LibraryInfoColumn extends Classs<Props>
     dbs: List([]),
   };
 
-  constructor(props:Props)
+  constructor(props: Props)
   {
     super(props);
 
@@ -127,10 +127,10 @@ class LibraryInfoColumn extends Classs<Props>
       storeKeyPath: ['dbs'],
     });
 
-    Ajax.getDbs((dbs:string[]) =>
+    Ajax.getDbs((dbs: string[]) =>
     {
       LibraryActions.setDbs(
-        List(dbs)
+        List(dbs),
       );
     });
   }
@@ -147,22 +147,21 @@ class LibraryInfoColumn extends Classs<Props>
     );
   }
 
-  handleAlgorithmDbChange(dbIndex:number)
+  handleAlgorithmDbChange(dbIndex: number)
   {
     Actions.algorithms.change(this.props.algorithm.set('db', this.state.dbs.get(dbIndex)) as Algorithm);
   }
 
-
   renderAlgorithm(isAdmin, isBuilder)
   {
-    if(! this.props.algorithm || this.props.variant)
+    if (! this.props.algorithm || this.props.variant)
     {
       return null;
     }
 
     return (
       <div>
-        <div className='library-info-line'>
+        <div className="library-info-line">
           <div>
           Default Database
           </div>
@@ -171,7 +170,7 @@ class LibraryInfoColumn extends Classs<Props>
             options={this.state.dbs}
             onChange={this.handleAlgorithmDbChange}
             canEdit={isBuilder || isAdmin}
-            className='bic-db-dropdown'
+            className="bic-db-dropdown"
           />
         </div>
       </div>
@@ -180,9 +179,9 @@ class LibraryInfoColumn extends Classs<Props>
 
   renderUser(user: User): JSX.Element
   {
-    let {roles} = this.state;
-    let groupRoles = roles && roles.get(this.props.group.id);
-    if(!user || user.isDisabled)
+    const {roles} = this.state;
+    const groupRoles = roles && roles.get(this.props.group.id);
+    if (!user || user.isDisabled)
     {
       return null;
     }
@@ -197,16 +196,16 @@ class LibraryInfoColumn extends Classs<Props>
 
   renderGroupRoles(): JSX.Element | JSX.Element[]
   {
-    let { me, users, roles } = this.state;
-    let groupRoles = roles && roles.get(this.props.group.id);
-    if(!me || !groupRoles || !users)
+    const { me, users, roles } = this.state;
+    const groupRoles = roles && roles.get(this.props.group.id);
+    if (!me || !groupRoles || !users)
     {
       return null;
     }
 
     return groupRoles.toArray().map((role: Role) =>
       {
-        if(role.username === me.username)
+        if (role.username === me.username)
         {
           return null; // current user is always rendered at top
         }
@@ -216,16 +215,16 @@ class LibraryInfoColumn extends Classs<Props>
 
   renderRemainingUsers()
   {
-    let { me, roles, users } = this.state;
-    let groupRoles = roles && roles.get(this.props.group.id);
-    if(!me || !users)
+    const { me, roles, users } = this.state;
+    const groupRoles = roles && roles.get(this.props.group.id);
+    if (!me || !users)
     {
       return null;
     }
 
     return users.toArray().map((user: User) =>
       {
-        if(user.username === me.username || (groupRoles && groupRoles.get(user.username)))
+        if (user.username === me.username || (groupRoles && groupRoles.get(user.username)))
         {
           return null; // current user and existing roles are rendered at top
         }
@@ -233,15 +232,15 @@ class LibraryInfoColumn extends Classs<Props>
       });
   }
 
-  handleGroupDbChange(dbIndex:number)
+  handleGroupDbChange(dbIndex: number)
   {
     Actions.groups.change(this.props.group.set('db', this.state.dbs.get(dbIndex)) as Group);
   }
 
   renderGroup(isAdmin, isBuilder)
   {
-    let { group } = this.props;
-    if(!group || this.props.algorithm || this.props.variant)
+    const { group } = this.props;
+    if (!group || this.props.algorithm || this.props.variant)
     {
       return null;
     }
@@ -250,11 +249,11 @@ class LibraryInfoColumn extends Classs<Props>
     // let me: UserTypes.User = UserStore.getState().get('currentUser');
     // let groupRoles: GroupRoleMap = RolesStore.getState().getIn(['roles', group.id]);
 
-    let isSysAdmin = this.state.me && this.state.me.isAdmin;
+    const isSysAdmin = this.state.me && this.state.me.isAdmin;
 
     return (
       <div>
-        <div className='library-info-line'>
+        <div className="library-info-line">
           <div>
             Default Database
           </div>
@@ -263,10 +262,10 @@ class LibraryInfoColumn extends Classs<Props>
             options={this.state.dbs}
             onChange={this.handleGroupDbChange}
             canEdit={isBuilder || isAdmin}
-            className='bic-db-dropdown'
+            className="bic-db-dropdown"
           />
         </div>
-        <div className='library-info-users'>
+        <div className="library-info-users">
           { this.renderUser(this.state.me) }
           { this.renderGroupRoles() }
           { this.renderRemainingUsers() }
@@ -277,30 +276,30 @@ class LibraryInfoColumn extends Classs<Props>
 
   render()
   {
-    let item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group =
+    const item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group =
       this.props.variant || this.props.algorithm || this.props.group;
 
-    switch(item && item.type)
+    switch (item && item.type)
     {
       case 'group':
-        var groupId: any = item.id;
-        var opacity = 1;
-        var icon = <GroupIcon />;
+        let groupId: any = item.id;
+        let opacity = 1;
+        let icon = <GroupIcon />;
         break;
       case 'algorithm':
-        var groupId: any = item['groupId'];
-        var opacity = 0.75;
-        var icon = <AlgorithmIcon />;
+        let groupId: any = item['groupId'];
+        let opacity = 0.75;
+        let icon = <AlgorithmIcon />;
         break;
       case 'variant':
-        var groupId: any = item['groupId'];
-        var opacity = 0.5;
-        var icon = <VariantIcon />;
+        const groupId: any = item['groupId'];
+        const opacity = 0.5;
+        const icon = <VariantIcon />;
         break;
     }
 
-    let isAdmin = Util.haveRole(groupId, 'admin', UserStore, RolesStore);
-    let isBuilder = Util.haveRole(groupId, 'builder', UserStore, RolesStore);
+    const isAdmin = Util.haveRole(groupId, 'admin', UserStore, RolesStore);
+    const isBuilder = Util.haveRole(groupId, 'builder', UserStore, RolesStore);
 
     return (
       <LibraryColumn
@@ -309,9 +308,9 @@ class LibraryInfoColumn extends Classs<Props>
       >
         {
           item ?
-            <div className='library-info'>
+            <div className="library-info">
               <div
-                className='library-info-image'
+                className="library-info-image"
               >
                 <style
                   dangerouslySetInnerHTML={{ __html: '.library-info-image #Color { \
@@ -322,12 +321,12 @@ class LibraryInfoColumn extends Classs<Props>
                   icon
                 }
               </div>
-              <div className='library-info-name'>
+              <div className="library-info-name">
                 {
                   item.name
                 }
               </div>
-              <div className='library-info-type'>
+              <div className="library-info-type">
                 {
                   item.type
                 }
@@ -343,9 +342,9 @@ class LibraryInfoColumn extends Classs<Props>
               }
             </div>
           :
-            <div className='library-info'>
+            <div className="library-info">
               <InfoArea
-                large='Select a Group'
+                large="Select a Group"
               />
             </div>
 
@@ -354,7 +353,6 @@ class LibraryInfoColumn extends Classs<Props>
     );
   }
 }
-
 
 interface LibraryInfoUserProps
 {
@@ -366,17 +364,17 @@ interface LibraryInfoUserProps
 
 class LibraryInfoUser extends Classs<LibraryInfoUserProps>
 {
-  changeRole(newRole:string)
+  changeRole(newRole: string)
   {
-    let { user, groupRoles } = this.props;
-    var role = groupRoles && groupRoles.get(user.username);
-    if(!role)
+    const { user, groupRoles } = this.props;
+    let role = groupRoles && groupRoles.get(user.username);
+    if (!role)
     {
       role = new RoleTypes.Role({ groupId: this.props.groupId, username: user.username });
     }
 
     RolesActions.change(
-      role.set('builder', newRole === 'Builder').set('admin', newRole === 'Admin') as RoleTypes.Role
+      role.set('builder', newRole === 'Builder').set('admin', newRole === 'Admin') as RoleTypes.Role,
     );
   }
 
@@ -397,48 +395,48 @@ class LibraryInfoUser extends Classs<LibraryInfoUserProps>
 
   render()
   {
-    let { me, user, groupRoles } = this.props;
-    if(!user)
+    const { me, user, groupRoles } = this.props;
+    if (!user)
     {
       return null;
     }
 
-    let gr = groupRoles && groupRoles.get(user.username);
-    let isAdmin = gr && gr.admin;
-    let isBuilder = gr && gr.builder && !isAdmin;
-    let isViewer = !isAdmin && !isBuilder;
-    let roleText = isAdmin ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
+    const gr = groupRoles && groupRoles.get(user.username);
+    const isAdmin = gr && gr.admin;
+    const isBuilder = gr && gr.builder && !isAdmin;
+    const isViewer = !isAdmin && !isBuilder;
+    const roleText = isAdmin ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
 
-    let imSysAdmin = me.isAdmin;
-    let imGroupAdmin = groupRoles && groupRoles.get(me.username) && groupRoles.get(me.username).admin;
+    const imSysAdmin = me.isAdmin;
+    const imGroupAdmin = groupRoles && groupRoles.get(me.username) && groupRoles.get(me.username).admin;
     // TODO
-    let menuOptions =
+    const menuOptions =
     Immutable.List([
       {
         text: 'Viewer',
         onClick: this.changeToViewer,
-        disabled: isViewer
+        disabled: isViewer,
       },
       {
         text: 'Builder',
         onClick: this.changeToBuilder,
-        disabled: isBuilder
+        disabled: isBuilder,
       },
       {
         text: 'Admin',
         onClick: this.changeToAdmin,
-        disabled: isAdmin
-      }
+        disabled: isAdmin,
+      },
     ]);
 
     return (
-      <div key={user.username} className='library-info-user'>
+      <div key={user.username} className="library-info-user">
         <UserThumbnail
           username={user.username}
           showName={true}
           link={true}
         />
-        <div className='library-info-user-roles'>
+        <div className="library-info-user-roles">
           {
             roleText
           }

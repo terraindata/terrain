@@ -42,28 +42,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
-var Immutable = require('immutable');
+const _ = require('underscore');
+const Immutable = require('immutable');
 import Util from './../../util/Util';
 
-var create = '';
-var change = '';
-var move = '';
-var duplicate = '';
+const create = '';
+const change = '';
+const move = '';
+const duplicate = '';
 
-export var LibraryActionTypes = 
+export let LibraryActionTypes =
 {
-  groups: 
-  { 
-    create, change, move, 
+  groups:
+  {
+    create, change, move,
     // duplicate,
   },
-  
-  algorithms: 
+
+  algorithms:
   {
     create, change, move, duplicate,
   },
-  
+
   variants:
   {
     create, change, move, duplicate,
@@ -71,7 +71,7 @@ export var LibraryActionTypes =
     fetchVersion: '',
     loadVersion: '',
   },
-  
+
   loadState: '',
   setDbs: '',
 };

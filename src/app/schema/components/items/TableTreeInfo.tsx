@@ -42,10 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-import SchemaTypes from '../../SchemaTypes';
 import * as React from 'react';
-import PureClasss from './../../../common/components/PureClasss';
+import SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
+import PureClasss from './../../../common/components/PureClasss';
 const Radium = require('radium');
 
 export interface Props
@@ -61,11 +61,11 @@ class State
 export class TableTreeInfo extends PureClasss<Props>
 {
 	state: State = new State();
-	
+
   render()
   {
-  	let table = this.props.item;
-  	
+  	const table = this.props.item;
+
     return (
       <div
       	style={Styles.infoPieces as any}
@@ -76,26 +76,25 @@ export class TableTreeInfo extends PureClasss<Props>
           <span
             style={Styles.infoPieceNumber as any}
           >
-            { table.columnIds.size } 
+            { table.columnIds.size }
           </span> columns
         </div>
-        
+
         <div
           style={Styles.infoPiece as any}
         >
           <span
             style={Styles.infoPieceNumber as any}
           >
-            { 
-              table.indexIds.size 
-            } 
+            {
+              table.indexIds.size
+            }
           </span> indexes
         </div>
       </div>
     );
   }
 }
-
 
 export const tableChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
 [
@@ -106,8 +105,7 @@ export const tableChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
   {
     label: 'Indexes',
     type: 'index',
-  }
+  },
 ];
-
 
 export default TableTreeInfo;

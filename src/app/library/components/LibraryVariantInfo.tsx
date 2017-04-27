@@ -43,22 +43,22 @@ THE SOFTWARE.
 */
 
 require('./LibraryVariantInfo.less');
-import * as React from 'react';
 import * as Immutable from 'immutable';
+import * as React from 'react';
 const {List} = Immutable;
-import Ajax from './../../util/Ajax';
-import PureClasss from './../../common/components/PureClasss';
-import VariantVersions from './VariantVersions';
-import LibraryTypes from './../LibraryTypes';
-import Menu from './../../common/components/Menu';
 import Dropdown from './../../common/components/Dropdown';
-import Actions from './../data/LibraryActions';
+import Menu from './../../common/components/Menu';
+import PureClasss from './../../common/components/PureClasss';
+import RolesStore from './../../roles/data/RolesStore';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import UserStore from './../../users/data/UserStore';
-import RolesStore from './../../roles/data/RolesStore';
-import LibraryActions from './../data/LibraryActions';
+import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
+import Actions from './../data/LibraryActions';
+import LibraryActions from './../data/LibraryActions';
+import LibraryTypes from './../LibraryTypes';
 import StatusDropdown from './StatusDropdown';
+import VariantVersions from './VariantVersions';
 
 type Variant = LibraryTypes.Variant;
 
@@ -72,68 +72,68 @@ export interface Props
 
 class LibraryInfoColumn extends PureClasss<Props>
 {
-  handleDbChange(dbIndex:number)
+  handleDbChange(dbIndex: number)
   {
     Actions.variants.change(this.props.variant.set('db', this.props.dbs.get(dbIndex)) as Variant);
   }
-  
+
   render()
   {
-    if(!this.props.variant)
+    if (!this.props.variant)
     {
       return null;
     }
-    
-    let {isBuilder, isAdmin} = this.props;
-    let {variant} = this.props;
-    
+
+    const {isBuilder, isAdmin} = this.props;
+    const {variant} = this.props;
+
     return (
       <div
-        className='library-info-variant'
+        className="library-info-variant"
       >
-        <div className='biv-table-wrapper'>
+        <div className="biv-table-wrapper">
           <div
-            className='biv-table'
+            className="biv-table"
           >
-            <div className='biv-row'>
-              <div className='biv-cell-first'>
+            <div className="biv-row">
+              <div className="biv-cell-first">
                 Status
               </div>
-              <div className='biv-cell-second'>
+              <div className="biv-cell-second">
                 <StatusDropdown
                   variant={this.props.variant}
                 />
               </div>
             </div>
-            <div className='biv-row'>
-              <div className='biv-cell-first'>
+            <div className="biv-row">
+              <div className="biv-cell-first">
                 Database
               </div>
-              <div className='biv-cell-second'>
+              <div className="biv-cell-second">
                 <Dropdown
                   selectedIndex={this.props.dbs && this.props.dbs.indexOf(this.props.variant.db)}
                   options={this.props.dbs}
                   onChange={this.handleDbChange}
                   canEdit={isBuilder || isAdmin}
-                  className='bic-db-dropdown'
+                  className="bic-db-dropdown"
                 />
               </div>
             </div>
-            <div className='biv-row'>
-              <div className='biv-cell-first'>
+            <div className="biv-row">
+              <div className="biv-cell-first">
                 Updated At
               </div>
-              <div className='biv-cell-second'>
+              <div className="biv-cell-second">
                 {
                   Util.formatDate(variant.lastEdited)
                 }
               </div>
             </div>
-            <div className='biv-row'>
-              <div className='biv-cell-first'>
+            <div className="biv-row">
+              <div className="biv-cell-first">
                 Updated By
               </div>
-              <div className='biv-cell-second'>
+              <div className="biv-cell-second">
                 <UserThumbnail
                   username={variant.lastUsername}
                   smallest={true}
@@ -144,14 +144,13 @@ class LibraryInfoColumn extends PureClasss<Props>
             </div>
           </div>
         </div>
-        
-        <VariantVersions 
-          variant={this.props.variant} 
+
+        <VariantVersions
+          variant={this.props.variant}
         />
       </div>
     );
   }
 }
-
 
 export default LibraryInfoColumn;

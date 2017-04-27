@@ -44,34 +44,34 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
 import Util from '../../../util/Util';
-import Actions from "../../data/BuilderActions";
-import {BuilderStore, BuilderState} from "../../data/BuilderStore";
-import {Card, CardItem} from "../cards/Card";
-import CreateCardTool from "./CreateCardTool";
-import PureClasss from './../../../common/components/PureClasss';
 import BuilderTypes from '../../BuilderTypes';
+import Actions from '../../data/BuilderActions';
+import {BuilderState, BuilderStore} from '../../data/BuilderStore';
+import {Card, CardItem} from '../cards/Card';
+import PureClasss from './../../../common/components/PureClasss';
+import CreateCardTool from './CreateCardTool';
 type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
-let {List} = Immutable;
-import CardDropArea from './CardDropArea';
+const {List} = Immutable;
 import CardDragPreview from './CardDragPreview';
-var AddIcon = require("./../../../../images/icon_add_7x7.svg?name=AddIcon");
+import CardDropArea from './CardDropArea';
+const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
 
 export interface Props
 {
   cards: ICards;
   canEdit: boolean;
   keyPath: KeyPath;
-  
+
   addColumn?: (number, string?) => void;
   columnIndex?: number;
   className?: string;
-  connectDropTarget?: (el:JSX.Element) => JSX.Element;
+  connectDropTarget?: (el: JSX.Element) => JSX.Element;
   helpOn?: boolean;
   accepts?: List<string>;
   noCardTool?: boolean;
@@ -101,18 +101,18 @@ class CardsArea extends PureClasss<Props>
     draggingCardItem: null,
   };
 
-  constructor(props:Props)
+  constructor(props: Props)
   {
     super(props);
     this.state.cardToolOpen = props.cards.size === 0;
-    
+
     this._subscribe(BuilderStore, {
       updater: (state: BuilderState) =>
       {
-        if(state.draggingCardItem && state.draggingOverKeyPath === this.props.keyPath)
+        if (state.draggingCardItem && state.draggingOverKeyPath === this.props.keyPath)
         {
           // dragging over
-          if(state.draggingOverIndex !== this.state.draggingOverIndex)
+          if (state.draggingOverIndex !== this.state.draggingOverIndex)
           {
             this.setState({
               isDraggingCardOver: true,
@@ -124,42 +124,42 @@ class CardsArea extends PureClasss<Props>
         else
         {
           // not dragging over
-          if(this.state.isDraggingCardOver)
+          if (this.state.isDraggingCardOver)
           {
             this.setState({
               isDraggingCardOver: false,
               draggingOverIndex: -1,
               draggingCardItem: null,
-            })
+            });
           }
         }
-      }
+      },
     });
   }
-  
-  componentWillReceiveProps(nextProps:Props)
+
+  componentWillReceiveProps(nextProps: Props)
   {
     this.setState({
       cardToolOpen: nextProps.cards.size === 0,
     });
   }
-  
+
   copy() {}
-  
+
   clear() {}
-  
+
   createFromCard()
   {
     Actions.create(this.props.keyPath, 0, 'sfw');
   }
-  
+
   toggleView()
   {
     this.setState({
       learningMode: !this.state.learningMode,
-    })
+    });
   }
-  
+
   toggleCardTool()
   {
     this.setState({
@@ -169,15 +169,15 @@ class CardsArea extends PureClasss<Props>
 
   render()
   {
-    let {props} = this;
-    let {cards, canEdit} = props;
-    var renderCardTool = !this.props.noCardTool && (!this.props.singleChild || cards.size === 0);
-    
-    let {isDraggingCardOver, draggingCardItem, draggingOverIndex} = this.state;
-    let {keyPath} = this.props;
-    
+    const {props} = this;
+    const {cards, canEdit} = props;
+    const renderCardTool = !this.props.noCardTool && (!this.props.singleChild || cards.size === 0);
+
+    const {isDraggingCardOver, draggingCardItem, draggingOverIndex} = this.state;
+    const {keyPath} = this.props;
+
     return (
-      <div> 
+      <div>
         <div
           className={classNames({
             'cards-area': true,
@@ -185,7 +185,7 @@ class CardsArea extends PureClasss<Props>
           })}
         >
           {
-            cards.map((card:ICard, index:number) =>
+            cards.map((card: ICard, index: number) =>
               <div
                 key={card.id}
               >
@@ -207,15 +207,15 @@ class CardsArea extends PureClasss<Props>
                   keyPath={this.props.keyPath}
                   accepts={this.props.accepts}
                   singleChild={this.props.singleChild}
-                  
+
                   addColumn={this.props.addColumn}
                   columnIndex={this.props.columnIndex}
                   helpOn={this.state.learningMode || this.props.helpOn}
                 />
-              </div>
+              </div>,
             )
           }
-          
+
           <CardDragPreview
             cardItem={draggingCardItem}
             isInList={true}
@@ -227,7 +227,7 @@ class CardsArea extends PureClasss<Props>
             wrapType={this.props.singleChild && cards && cards.size === 1 && cards.get(0).type}
             wrapUp={true}
           />
-          
+
           {
             renderCardTool &&
               <CreateCardTool
@@ -235,14 +235,14 @@ class CardsArea extends PureClasss<Props>
                 keyPath={this.props.keyPath}
                 index={props.cards.size}
                 open={this.state.cardToolOpen}
-                className='nested-create-card-tool-wrapper'
+                className="nested-create-card-tool-wrapper"
                 accepts={this.props.accepts}
                 onToggle={this._toggle('cardToolOpen')}
                 hidePlaceholder={this.props.singleChild || cards.size === 0}
                 cannotClose={cards.size === 0}
               />
           }
-          
+
         </div>
       </div>
     );

@@ -44,18 +44,18 @@ THE SOFTWARE.
 
 require('./Team.less');
 import * as React from 'react';
-import Classs from './../../common/components/Classs';
-import Store from './../data/UserStore';
-import AuthStore from './../../auth/data/AuthStore';
-import Actions from './../data/UserActions';
-import LibraryTypes from './../UserTypes';
-import InfoArea from './../../common/components/InfoArea';
 import { Link } from 'react-router';
-import UserTypes from '../UserTypes';
-import UserThumbnail from './UserThumbnail';
 import CreateItem from '../../common/components/CreateItem';
 import Ajax from '../../util/Ajax';
+import UserTypes from '../UserTypes';
+import AuthStore from './../../auth/data/AuthStore';
+import Classs from './../../common/components/Classs';
+import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
+import Actions from './../data/UserActions';
+import Store from './../data/UserStore';
+import LibraryTypes from './../UserTypes';
+import UserThumbnail from './UserThumbnail';
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
 
@@ -69,7 +69,7 @@ export interface Props
 class Team extends Classs<Props>
 {
   unsub = null;
-  
+
   state: {
     loading: boolean,
     users: UserMap,
@@ -85,24 +85,24 @@ class Team extends Classs<Props>
     errorModalOpen: false,
     errorModalMessage: '',
   };
-  
+
   constructor(props)
   {
     super(props);
   }
-  
+
   componentWillMount()
   {
     Actions.fetch();
     this.updateState();
     this.unsub = Store.subscribe(this.updateState);
   }
-  
+
   componentWillUnmount()
   {
     this.unsub && this.unsub();
   }
-  
+
   updateState()
   {
     this.setState({
@@ -110,17 +110,17 @@ class Team extends Classs<Props>
       loading: Store.getState().get('loading'),
     });
   }
-  
-  renderUser(user:User)
+
+  renderUser(user: User)
   {
-    if(user.isDisabled && !this.state.showDisabledUsers)
+    if (user.isDisabled && !this.state.showDisabledUsers)
     {
       return null;
     }
-    
+
     return (
-      <Link to={`/users/${user.username}`} className='team-link' key={user.username}>
-        <div className='team-row'>
+      <Link to={`/users/${user.username}`} className="team-link" key={user.username}>
+        <div className="team-row">
           <div>
             <UserThumbnail
               large={true}
@@ -128,57 +128,57 @@ class Team extends Classs<Props>
               square={true}
             />
           </div>
-          <div className='team-item-names'>
-            <div className='team-name'>
-              { 
-                user.name() 
+          <div className="team-item-names">
+            <div className="team-name">
+              {
+                user.name()
               }
             </div>
-            <div className='team-role'>
-              { 
-                user.isDisabled ? <b>Disabled</b> : user.whatIDo 
+            <div className="team-role">
+              {
+                user.isDisabled ? <b>Disabled</b> : user.whatIDo
               }
             </div>
-            <div className='team-username'>
+            <div className="team-username">
               @{ user.username }
             </div>
           </div>
-          <div className='team-item-info'>
+          <div className="team-item-info">
             {
               !!user.phone &&
-                <div className='team-item-info-row'>
-                  <div className='team-item-info-label'>
+                <div className="team-item-info-row">
+                  <div className="team-item-info-label">
                     Phone Number
                   </div>
-                  <div className='team-item-info-value'>
-                    { 
-                      user.phone 
+                  <div className="team-item-info-value">
+                    {
+                      user.phone
                     }
                   </div>
                 </div>
             }
             {
               !!user.email &&
-                <div className='team-item-info-row'>
-                  <div className='team-item-info-label'>
+                <div className="team-item-info-row">
+                  <div className="team-item-info-label">
                     Email
                   </div>
-                  <div className='team-item-info-value'>
-                    { 
-                      user.email 
+                  <div className="team-item-info-value">
+                    {
+                      user.email
                     }
                   </div>
                 </div>
             }
             {
               !!user.skype &&
-                <div className='team-item-info-row'>
-                  <div className='team-item-info-label'>
+                <div className="team-item-info-row">
+                  <div className="team-item-info-label">
                     Skype
                   </div>
-                  <div className='team-item-info-value'>
-                    { 
-                      user.skype 
+                  <div className="team-item-info-value">
+                    {
+                      user.skype
                     }
                   </div>
                 </div>
@@ -188,44 +188,44 @@ class Team extends Classs<Props>
       </Link>
     );
   }
-  
+
   toggleAddingUser()
   {
     this.setState({
       addingUser: !this.state.addingUser,
-    })
+    });
   }
-  
+
   toggleShowDisabledUsers()
   {
     this.setState({
       showDisabledUsers: !this.state.showDisabledUsers,
-    })
+    });
   }
-  
+
   renderShowDisabledUsers()
   {
-    if(!this.state.users.some(user => user.isDisabled))
+    if (!this.state.users.some((user) => user.isDisabled))
     {
       // no disabled users
       return null;
     }
-    
+
     return (
-      <div className='team-show-disabled' onClick={this.toggleShowDisabledUsers}>
+      <div className="team-show-disabled" onClick={this.toggleShowDisabledUsers}>
         { this.state.showDisabledUsers ? 'Hide Disabled Users' : 'Show Disabled Users' }
       </div>
     );
   }
-  
+
   createNewUser()
   {
-    let username:string = this.refs['newUsername']['value'];
-    let password:string = this.refs['newPassword']['value'];
-    let confirmPassword:string = this.refs['confirmPassword']['value'];
-    
-    let usernameCheck = username.replace(/[a-zA-Z]/g, "");
-    if(usernameCheck.length)
+    const username: string = this.refs['newUsername']['value'];
+    const password: string = this.refs['newPassword']['value'];
+    const confirmPassword: string = this.refs['confirmPassword']['value'];
+
+    const usernameCheck = username.replace(/[a-zA-Z]/g, '');
+    if (usernameCheck.length)
     {
       this.setState({
         errorModalMessage: 'Only letters are allowed in the username',
@@ -233,8 +233,8 @@ class Team extends Classs<Props>
       this.toggleErrorModal();
       return;
     }
-    
-    if(this.state.users.get(username))
+
+    if (this.state.users.get(username))
     {
       this.setState({
         errorModalMessage: 'That username is already taken',
@@ -242,8 +242,8 @@ class Team extends Classs<Props>
       this.toggleErrorModal();
       return;
     }
-    
-    if(password.length < 6)
+
+    if (password.length < 6)
     {
       this.setState({
         errorModalMessage: 'Passwords should be at least six characters long',
@@ -251,8 +251,8 @@ class Team extends Classs<Props>
       this.toggleErrorModal();
       return;
     }
-    
-    if(password !== confirmPassword)
+
+    if (password !== confirmPassword)
     {
       this.setState({
         errorModalMessage: 'Passwords do not match',
@@ -260,14 +260,14 @@ class Team extends Classs<Props>
       this.toggleErrorModal();
       return;
     }
-    
+
     this.refs['newUsername']['value'] = '';
     this.refs['newPassword']['value'] = '';
     this.refs['confirmPassword']['value'] = '';
     this.setState({
       addingUser: false,
     });
-    
+
     Ajax.createUser(username, password, () => {
       Actions.fetch();
     }, (error) => {
@@ -277,91 +277,91 @@ class Team extends Classs<Props>
       this.toggleErrorModal();
     });
   }
-  
+
   renderAddUser()
   {
-    let username = AuthStore.getState().get('username');
-    let user = Store.getState().getIn(['users', username]) as User;
-    
-    if(user && user.isAdmin)
+    const username = AuthStore.getState().get('username');
+    const user = Store.getState().getIn(['users', username]) as User;
+
+    if (user && user.isAdmin)
     {
-      if(this.state.addingUser)
+      if (this.state.addingUser)
       {
         return (
-          <div className='create-user'>
-            <div className='create-user-cancel' onClick={this.toggleAddingUser} data-tip='Cancel'>
+          <div className="create-user">
+            <div className="create-user-cancel" onClick={this.toggleAddingUser} data-tip="Cancel">
               x
             </div>
             <h3>Create a new user</h3>
-            
-            <div className='flex-container'>
-              <div className='flex-grow'>
+
+            <div className="flex-container">
+              <div className="flex-grow">
                 <b>Username</b> (this cannot be changed)
                 <div>
-                  <input ref='newUsername' placeholder='Username' />
+                  <input ref="newUsername" placeholder="Username" />
                 </div>
               </div>
-              <div className='flex-grow'>
+              <div className="flex-grow">
                 <b>Temporary Password</b>
                 <div>
-                  <input ref='newPassword' placeholder='Password' type='password' />
+                  <input ref="newPassword" placeholder="Password" type="password" />
                 </div>
               </div>
-              <div className='flex-grow'>
+              <div className="flex-grow">
                 <b>Confirm Password</b>
                 <div>
-                  <input ref='confirmPassword' placeholder='Confirm password' type='password' />
+                  <input ref="confirmPassword" placeholder="Confirm password" type="password" />
                 </div>
               </div>
             </div>
-            <div className='button' onClick={this.createNewUser}>
+            <div className="button" onClick={this.createNewUser}>
               Create
             </div>
           </div>
         );
       }
-      
+
       return (
         <CreateItem
-          name='New User'
+          name="New User"
           onCreate={this.toggleAddingUser}
         />
       );
     }
     return null;
   }
-  
+
   toggleErrorModal()
   {
     this.setState ({
-      errorModalOpen: !this.state.errorModalOpen
+      errorModalOpen: !this.state.errorModalOpen,
     });
   }
 
   render()
   {
-    let { users, loading } = this.state;
+    const { users, loading } = this.state;
 
     return (
       <div>
-      <div className='team'>
-        <div className='team-page-title'> 
+      <div className="team">
+        <div className="team-page-title">
           Team Directory
         </div>
         {
           loading &&
-            <InfoArea large='Loading...' />
+            <InfoArea large="Loading..." />
         }
         { users && users.toArray().map(this.renderUser) }
         { this.renderAddUser() }
         { this.renderShowDisabledUsers() }
       </div>
-      <Modal 
+      <Modal
           message={this.state.errorModalMessage}
-          onClose={this.toggleErrorModal} 
-          open={this.state.errorModalOpen} 
+          onClose={this.toggleErrorModal}
+          open={this.state.errorModalOpen}
           error={true}
-        /> 
+        />
         </div>
     );
   }

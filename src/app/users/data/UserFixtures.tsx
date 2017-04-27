@@ -46,76 +46,76 @@ import RoleTypes from './../../roles/RoleTypes';
 import UserTypes from './../UserTypes';
 
 export const patty = new UserTypes.User({
-  id: "patty",
-  name: "Patty Hewes",
-  imgUrl: "http://lukeknepper.com/uploads/u0.jpg",
+  id: 'patty',
+  name: 'Patty Hewes',
+  imgUrl: 'http://lukeknepper.com/uploads/u0.jpg',
   // groupRoles: [],
 });
 
 export const ellen = new UserTypes.User({
-  id: "ellen",
-  name: "Ellen Parsons",
-  imgUrl: "http://lukeknepper.com/uploads/u1.jpg",
-  username: "ellen",
-  timezone: "Eastern / New York",
-  email: "ellen@hewes.com",
-  skype: "ellenparsons",
-  phone: "(555) 867-5309",
+  id: 'ellen',
+  name: 'Ellen Parsons',
+  imgUrl: 'http://lukeknepper.com/uploads/u1.jpg',
+  username: 'ellen',
+  timezone: 'Eastern / New York',
+  email: 'ellen@hewes.com',
+  skype: 'ellenparsons',
+  phone: '(555) 867-5309',
   // groupRoles: [],
 });
 
 export const U2 = new UserTypes.User({
-  id: "U2",
-  name: "Paul Hewson",
-  imgUrl: "http://lukeknepper.com/uploads/U2.jpg",
+  id: 'U2',
+  name: 'Paul Hewson',
+  imgUrl: 'http://lukeknepper.com/uploads/U2.jpg',
   // groupRoles: [],
 });
 
 export const u3 = new UserTypes.User({
-  id: "u3",
-  name: "Wes Krulik",
-  imgUrl: "http://lukeknepper.com/uploads/u3.jpg",
+  id: 'u3',
+  name: 'Wes Krulik',
+  imgUrl: 'http://lukeknepper.com/uploads/u3.jpg',
   // groupRoles: [],
 });
 
 export const u4 = new UserTypes.User({
-  id: "u4",
-  name: "Tom Shayes",
-  imgUrl: "http://lukeknepper.com/uploads/u4.jpg",
+  id: 'u4',
+  name: 'Tom Shayes',
+  imgUrl: 'http://lukeknepper.com/uploads/u4.jpg',
   // groupRoles: [],
 });
 
 export const u5 = new UserTypes.User({
-  id: "u5",
-  name: "Arthur Frobisher",
-  imgUrl: "http://lukeknepper.com/uploads/u5.jpg",
+  id: 'u5',
+  name: 'Arthur Frobisher',
+  imgUrl: 'http://lukeknepper.com/uploads/u5.jpg',
   // groupRoles: [],
 });
 
 export const u6 = new UserTypes.User({
-  id: "u6",
-  name: "ASDFKLJ WEIOXOQ",
-  imgUrl: "http://lukeknepper.com/uploads/u6.jpg",
+  id: 'u6',
+  name: 'ASDFKLJ WEIOXOQ',
+  imgUrl: 'http://lukeknepper.com/uploads/u6.jpg',
   // groupRoles: [],
 });
 
 export const u7 = new UserTypes.User({
-  id: "u7",
-  name: "PPRO ,TRKGP",
-  imgUrl: "http://lukeknepper.com/uploads/u7.jpg",
+  id: 'u7',
+  name: 'PPRO ,TRKGP',
+  imgUrl: 'http://lukeknepper.com/uploads/u7.jpg',
   // groupRoles: [],
 });
 
 export const u8 = new UserTypes.User({
-  id: "u8",
-  name: "Ray Fiske",
-  imgUrl: "http://lukeknepper.com/uploads/u8.jpg",
+  id: 'u8',
+  name: 'Ray Fiske',
+  imgUrl: 'http://lukeknepper.com/uploads/u8.jpg',
   // groupRoles: [],
 });
 
 export const u9 = new UserTypes.User({
-  id: "u9",
-  name: "David Connor",
-  imgUrl: "http://lukeknepper.com/uploads/u9.jpg",
+  id: 'u9',
+  name: 'David Connor',
+  imgUrl: 'http://lukeknepper.com/uploads/u9.jpg',
   // groupRoles: [],
 });

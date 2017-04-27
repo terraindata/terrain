@@ -22,7 +22,7 @@
     "build-gcloud": "yarn run commit-log && webpack --config webpack.config.gcloud.js --output-filename bundle.js",
     "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node -P tsconfig.midway.json --harmony -- ./midway/src/App.ts",
     "lint": "./node_modules/.bin/tslint -c tslint.json --fix 'midway/**/*.ts{,x}'",
-    "style": "./node_modules/.bin/tsfmt -r `find midway -type f \\( -iname \\*.tsx -o -iname \\*.ts \\)`",
+    "style": "./node_modules/.bin/tsfmt -r `find . -type f \\( -iname \\*.tsx -o -iname \\*.ts \\)`",
     "fix": "yarn run lint; yarn run style;"
   },
   "repository": {

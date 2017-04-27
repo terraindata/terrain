@@ -44,22 +44,22 @@ THE SOFTWARE.
 
 
 import * as React from 'react';
+import CreateItem from '../../common/components/CreateItem';
+import RolesStore from '../../roles/data/RolesStore';
+import RoleTypes from '../../roles/RoleTypes';
+import UserStore from '../../users/data/UserStore';
+import UserTypes from '../../users/UserTypes';
 import Classs from './../../common/components/Classs';
+import InfoArea from './../../common/components/InfoArea';
+import UserThumbnail from './../../users/components/UserThumbnail';
+import ColorManager from './../../util/ColorManager';
+import Actions from './../data/LibraryActions';
+import LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
-import CreateItem from '../../common/components/CreateItem';
-import LibraryTypes from './../LibraryTypes';
-import ColorManager from './../../util/ColorManager';
-import InfoArea from './../../common/components/InfoArea';
-import Actions from './../data/LibraryActions';
-import UserThumbnail from './../../users/components/UserThumbnail';
-import UserTypes from '../../users/UserTypes';
-import UserStore from '../../users/data/UserStore';
-import RoleTypes from '../../roles/RoleTypes';
-import RolesStore from '../../roles/data/RolesStore';
 
-var GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
+const GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
 
 type Group = LibraryTypes.Group;
 
@@ -95,7 +95,7 @@ class GroupsColumn extends Classs<Props>
     });
     this._subscribe(RolesStore, {
       stateKey: 'roles',
-      isMounted: true
+      isMounted: true,
     });
   }
 
@@ -107,7 +107,7 @@ class GroupsColumn extends Classs<Props>
 
   handleArchive(id: ID)
   {
-    Actions.groups.change(this.props.groups.find(g => g.id === id)
+    Actions.groups.change(this.props.groups.find((g) => g.id === id)
       .set('status', LibraryTypes.EGroupStatus.Archive) as Group);
   }
 
@@ -115,7 +115,7 @@ class GroupsColumn extends Classs<Props>
   {
     Actions.groups.change(
       this.props.groups.get(id)
-        .set('name', name) as Group
+        .set('name', name) as Group,
     );
   }
 
@@ -126,14 +126,14 @@ class GroupsColumn extends Classs<Props>
 
   handleHover(index: number, type: string, id: ID)
   {
-    var itemIndex = this.props.groupsOrder.findIndex(v => v === id);
-    if(type === 'group' && itemIndex !== index
+    const itemIndex = this.props.groupsOrder.findIndex((v) => v === id);
+    if (type === 'group' && itemIndex !== index
       && this.state.lastMoved !== index + ' ' + itemIndex)
     {
       this.setState({
         lastMoved: index + ' ' + itemIndex,
       });
-      var target = this.props.groups.get(this.props.groupsOrder.get(index));
+      const target = this.props.groups.get(this.props.groupsOrder.get(index));
       Actions.groups.move(this.props.groups.get(id).set('status', target.status) as Group, index);
     }
   }
@@ -146,11 +146,11 @@ class GroupsColumn extends Classs<Props>
   renderGroup(id: ID, index: number)
   {
     const group = this.props.groups.get(id);
-    let {me, roles} = this.state;
-    let groupRoles = roles && roles.get(id);
-    let canCreate = (me && groupRoles && groupRoles.getIn([me.username, 'admin']));
-    let canEdit = canCreate || (me && me.isAdmin);
-    let canDrag = false;
+    const {me, roles} = this.state;
+    const groupRoles = roles && roles.get(id);
+    const canCreate = (me && groupRoles && groupRoles.getIn([me.username, 'admin']));
+    const canEdit = canCreate || (me && me.isAdmin);
+    const canDrag = false;
 
         // onDuplicate={this.handleDuplicate}
     return (
@@ -165,7 +165,7 @@ class GroupsColumn extends Classs<Props>
         key={group.id}
         to={'/library/' + group.id}
         onNameChange={this.handleNameChange}
-        type='group'
+        type="group"
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
@@ -176,7 +176,7 @@ class GroupsColumn extends Classs<Props>
         canDuplicate={false}
         canCreate={canCreate}
       >
-        <div className='group-library-info-wrapper'>
+        <div className="group-library-info-wrapper">
           {
             groupRoles && me && (groupRoles.getIn([me.username, 'builder']) || groupRoles.getIn([me.username, 'admin'])) &&
               <UserThumbnail
@@ -190,7 +190,7 @@ class GroupsColumn extends Classs<Props>
           }
           {
             groupRoles && groupRoles.toArray()
-            .filter(role => role.builder || role.admin)
+            .filter((role) => role.builder || role.admin)
             .map(
               (role, index) =>
                 index > 8 || (me && role.username === me.username) ? null :
@@ -202,7 +202,7 @@ class GroupsColumn extends Classs<Props>
                       groupRoles.getIn([role.username, 'admin']) ? 'Admin' :
                         (groupRoles.getIn([role.username, 'builder']) ? 'Builder' : 'Viewer')
                     }
-                  />
+                  />,
             )
           }
         </div>
@@ -212,9 +212,9 @@ class GroupsColumn extends Classs<Props>
 
   handleCategoryHover(statusString: string, id: ID)
   {
-    let g = this.props.groups.get(id);
-    let status = LibraryTypes.EGroupStatus[statusString];
-    if(g.status !== status)
+    const g = this.props.groups.get(id);
+    const status = LibraryTypes.EGroupStatus[statusString];
+    if (g.status !== status)
     {
       Actions.groups.change(g.set('status', status) as Group);
     }
@@ -222,27 +222,27 @@ class GroupsColumn extends Classs<Props>
 
   renderCategory(status: LibraryTypes.EGroupStatus)
   {
-    var ids = this.props.groupsOrder.filter(id => this.props.groups.get(id).status === status);
-    let canCreate = this.state.me && this.state.me.isAdmin;
+    const ids = this.props.groupsOrder.filter((id) => this.props.groups.get(id).status === status);
+    const canCreate = this.state.me && this.state.me.isAdmin;
 
     return (
       <LibraryItemCategory
         status={LibraryTypes.EGroupStatus[status]}
         key={status}
         onHover={this.handleCategoryHover}
-        type='group'
+        type="group"
         titleHidden={status === LibraryTypes.EGroupStatus.Live}
       >
         {
           ids.map(this.renderGroup)
         }
         {
-          ids.size === 0 && <div className='library-category-none'>None</div>
+          ids.size === 0 && <div className="library-category-none">None</div>
         }
         {
           status === LibraryTypes.EGroupStatus.Live && canCreate &&
             <CreateItem
-              name='group'
+              name="group"
               onCreate={this.handleCreate}
             />
         }
@@ -255,7 +255,7 @@ class GroupsColumn extends Classs<Props>
     return (
       <LibraryColumn
         index={1}
-        title='Groups'
+        title="Groups"
       >
         {
           this.props.groups.size ?
@@ -267,8 +267,8 @@ class GroupsColumn extends Classs<Props>
             )
             :
             <InfoArea
-              large='No groups created, yet.'
-              button='Create a group'
+              large="No groups created, yet."
+              button="Create a group"
               onClick={this.handleCreate}
             />
         }

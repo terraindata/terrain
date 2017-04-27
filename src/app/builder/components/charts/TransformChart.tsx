@@ -47,25 +47,25 @@ require('./TransformChart.less');
 // consider upgrading to v4 which has types
 const d3 = require('d3');
 // import * as d3 from 'd3';
-import * as _ from 'underscore';
 import * as $ from 'jquery';
+import * as _ from 'underscore';
 import Util from '../../../util/Util';
 
-var xMargin = 45;
-var yMargin = 10;
+const xMargin = 45;
+const yMargin = 10;
 
-var scaleMin = (scale) => scale.range()[0];
-var scaleMax = (scale) => scale.range()[scale.range().length - 1];
-var scaleDomainMin = (scale) => scale.domain()[0];
-var scaleDomainMax = (scale) => scale.domain()[scale.domain().length - 1];
+const scaleMin = (scale) => scale.range()[0];
+const scaleMax = (scale) => scale.range()[scale.range().length - 1];
+const scaleDomainMin = (scale) => scale.domain()[0];
+const scaleDomainMax = (scale) => scale.domain()[scale.domain().length - 1];
 
-var TransformChart = {
+const TransformChart = {
 
   create(el, state)
   {
     d3.select(el).attr('class', 'transform-chart-wrapper');
 
-    var svg = d3
+    const svg = d3
       .select(el)
       .append('svg')
       .attr('class', 'transform-chart')
@@ -84,7 +84,7 @@ var TransformChart = {
     svg.append('g')
       .attr('class', 'bottomAxis');
 
-    var innerSvg = svg.append('svg')
+    const innerSvg = svg.append('svg')
       .attr('class', 'inner-svg')
       .attr('x', xMargin)
       .attr('y', yMargin);
@@ -126,29 +126,29 @@ var TransformChart = {
       .attr('height', state.height)
       .attr('viewBox', '0 0 ' + state.width + ' ' + state.height);
 
-    if(!state._cache)
+    if (!state._cache)
     {
       state._cache = {};
     }
-    if(state._cache.domain !== state.domain
+    if (state._cache.domain !== state.domain
       || state._cache.barsData !== state.barsData)
     {
       // compute barsData and cache
-      var computedBarsData = this._precomputeBarsData(state.barsData, state.domain);
+      const computedBarsData = this._precomputeBarsData(state.barsData, state.domain);
       state._cache.domain = state.domain;
       state._cache.barsData = state.barsData;
       state._cache.computedBarsData = computedBarsData;
     }
 
-    var barsData = state._cache.computedBarsData;
-    var scales = this._scales(el, state.domain, barsData, state.width, state.height);
+    const barsData = state._cache.computedBarsData;
+    const scales = this._scales(el, state.domain, barsData, state.width, state.height);
     this._draw(el, scales, barsData, state.pointsData, state.onMove, state.onRelease,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
       state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height,
       state.canEdit);
 
     d3.select(el).select('.inner-svg').on('mousedown', () => {
-      if(!d3.event['shiftKey'] &&
+      if (!d3.event['shiftKey'] &&
          !d3.event['altKey'] &&
           d3.event['target'].tagName !== 'LABEL' &&
           d3.event['target'].tagName !== 'DIV' &&
@@ -162,28 +162,28 @@ var TransformChart = {
       d3.select(el).selectAll('.transform-tooltip').remove();
     });
 
-    var drawMenu = this._drawMenu;
-    var drawCrossHairs = this._drawCrossHairs;
-    if(state.canEdit)
+    const drawMenu = this._drawMenu;
+    const drawCrossHairs = this._drawCrossHairs;
+    if (state.canEdit)
     {
       //Keep track of what element is in focus (for key events)
-      var currentObject = this;
-      d3.select(el).select('.transform-card').on('mouseover', function() {currentObject=this});
-      d3.select(el).select('.transform-card').on('mouseout', function() {currentObject=null});
+      let currentObject = this;
+      d3.select(el).select('.transform-card').on('mouseover', function() {currentObject = this; });
+      d3.select(el).select('.transform-card').on('mouseout', function() {currentObject = null; });
 
       //Draw Point + menu on double click
       d3.select(el).select('.inner-svg').on('dblclick', function() {
-          var isvg = d3.select(el).select('.inner-svg');
+          const isvg = d3.select(el).select('.inner-svg');
           state.onCreate(
             scales.x.invert(d3.mouse(this)[0] + parseInt(isvg.attr('x'), 10)),
-            scales.realPointY.invert(d3.mouse(this)[1] + parseInt(isvg.attr('y'), 10))
+            scales.realPointY.invert(d3.mouse(this)[1] + parseInt(isvg.attr('y'), 10)),
           );
         return false;
       });
 
       //Draw crosshairs when shift/ctrl is pressed
       d3.select(el).select('.inner-svg').on('mousemove', function() {
-        if(d3.event['ctrlKey'] || d3.event['shiftKey'])
+        if (d3.event['ctrlKey'] || d3.event['shiftKey'])
         {
           drawCrossHairs(el, d3.mouse(this), scales, d3.mouse(this)[0]);
         }
@@ -192,9 +192,9 @@ var TransformChart = {
 
       d3.select('body').on('keyup', function() {
         //CTRL: 17, SHIFT: 16, ALT: 18, WIN/CMD: 91
-         if(currentObject && (d3.event['keyCode'] === 17 || d3.event['keyCode'] === 16))
+         if (currentObject && (d3.event['keyCode'] === 17 || d3.event['keyCode'] === 16))
          {
-           d3.select(el).selectAll('.crosshairs').remove()
+           d3.select(el).selectAll('.crosshairs').remove();
          }
       });
 
@@ -204,12 +204,12 @@ var TransformChart = {
       });
 
       //Delete selected points on del/backspace key press
-      var deletePoints = this._deletePoints;
+      const deletePoints = this._deletePoints;
       d3.select('body').on('keydown', function() {
-        if(
+        if (
           currentObject &&
           (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) //delete/backspace key
-          && !$("input").is(":focus")
+          && !$('input').is(':focus')
         )
         {
           d3.event['preventDefault']();
@@ -230,26 +230,26 @@ var TransformChart = {
 
   _precomputeBarsData(oBarsData, domain)
   {
-    var maxBars = 15;
-    var minBars = 8;
+    const maxBars = 15;
+    const minBars = 8;
 
-    if(oBarsData.length < maxBars)
+    if (oBarsData.length < maxBars)
     {
       return oBarsData;
     }
 
-    var domainWidth = domain.x[1] - domain.x[0];
-    var stepSize = parseFloat(d3.format('.1g')(Math.log(domainWidth / minBars)));
-    var stepSize = domainWidth / 12;
+    const domainWidth = domain.x[1] - domain.x[0];
+    let stepSize = parseFloat(d3.format('.1g')(Math.log(domainWidth / minBars)));
+    const stepSize = domainWidth / 12;
 
-    var newBars = oBarsData.reduce((newBars, bar) => {
-      if(newBars.length === 0)
+    const newBars = oBarsData.reduce((newBars, bar) => {
+      if (newBars.length === 0)
       {
         return [bar];
       }
 
-      var lastBar = newBars[newBars.length - 1];
-      if(bar.range.min < lastBar.range.min + stepSize)
+      const lastBar = newBars[newBars.length - 1];
+      if (bar.range.min < lastBar.range.min + stepSize)
       {
         newBars[newBars.length - 1] =
         {
@@ -261,7 +261,7 @@ var TransformChart = {
             min: lastBar.range.min,
             max: bar.range.max,
           },
-        }
+        };
 
       }
       else
@@ -286,45 +286,45 @@ var TransformChart = {
 
   _drawAxes(el, scales, width, height)
   {
-    var yLeftAxis = d3.svg.axis()
+    const yLeftAxis = d3.svg.axis()
       .scale(scales.pointY)
       .ticks(height > 200 ? 10 : 5)
       .tickSize(scaleMin(scales.x) - scaleMax(scales.x), scaleMin(scales.x) - scaleMax(scales.x))
       .tickFormat(Util.formatNumber)
-      .orient("left");
+      .orient('left');
     d3.select(el).select('.yLeftAxis')
       .attr('transform', 'translate(' + xMargin + ',0)')
       .call(yLeftAxis);
 
-    var yRightAxis = d3.svg.axis()
+    const yRightAxis = d3.svg.axis()
       .scale(scales.barY)
       .ticks(height > 200 ? 10 : 5)
       .tickSize(0, 0)
       .tickFormat(Util.formatNumber) // try '%' if more precision is needed
       // .tickFormat(d3.format(" <-.2p")) // try '%' if more precision is needed
-      .orient("right");
+      .orient('right');
     d3.select(el).select('.yRightAxis')
       .attr('transform', 'translate(' + (scaleMax(scales.x)) + ',0)')
       .call(yRightAxis);
 
     // var bottomAxisTickFn: any = (tick, index: number): string => index == 0 || index == 10 ? "" : tick;
-    var bottomAxis = d3.svg.axis()
+    const bottomAxis = d3.svg.axis()
       .scale(scales.x)
       .ticks(width > 500 ? 6 : 4)
       .tickSize(-1 * scaleMin(scales.pointY) + scaleMax(scales.pointY), -1 * scaleMin(scales.pointY) + scaleMax(scales.pointY))
       .tickFormat(Util.formatNumber)
       // .tickFormat(d3.format(".3g"))
-      .orient("bottom");
+      .orient('bottom');
     d3.select(el).select('.bottomAxis')
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
       .call(bottomAxis)
     .selectAll('text')
       .style('text-anchor', (d) => {
-        if(d === scales.x.domain()[0])
+        if (d === scales.x.domain()[0])
         {
           return 'start';
         }
-        if(d === scales.x.domain()[1])
+        if (d === scales.x.domain()[1])
         {
           return 'end';
         }
@@ -332,21 +332,20 @@ var TransformChart = {
       });
   },
 
-
   _drawBars(el, scales, barsData)
   {
-    var g = d3.select(el).selectAll('.bars');
+    const g = d3.select(el).selectAll('.bars');
 
-    var bar = g.selectAll('.bar')
+    const bar = g.selectAll('.bar')
       .data(barsData, (d) => d['id']);
 
-    var xPadding = 5;
+    const xPadding = 5;
 
-    var barWidth = (d) => {
-      var width = scales.realX(d['range']['max']) - scales.realX(d['range']['min']) - 2 * xPadding;
-      if(width < 1)
+    const barWidth = (d) => {
+      let width = scales.realX(d['range']['max']) - scales.realX(d['range']['min']) - 2 * xPadding;
+      if (width < 1)
       {
-        width = 1
+        width = 1;
       }
       return width;
     };
@@ -364,18 +363,17 @@ var TransformChart = {
     bar.exit().remove();
   },
 
-
   _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData)
   {
-    var g = d3.select(el).selectAll('.spotlights');
+    const g = d3.select(el).selectAll('.spotlights');
 
-    var spotlight = g.selectAll('.spotlight')
+    const spotlight = g.selectAll('.spotlight')
       .data(
-        spotlights.filter(d => d[inputKey] !== undefined),
-        d => d['id']
+        spotlights.filter((d) => d[inputKey] !== undefined),
+        (d) => d['id'],
       );
 
-    var spotlightEnter = spotlight.enter()
+    const spotlightEnter = spotlight.enter()
       .append('g')
       .attr('class', 'spotlight')
       .attr('_id', (d) => d['id']);
@@ -383,37 +381,37 @@ var TransformChart = {
     spotlightEnter.append('rect');
     spotlightEnter.append('text');
 
-    let minX = scaleDomainMin(scales.realX);
-    let maxX = scaleDomainMax(scales.realX);
-    let getSpotlightX = d => Util.valueMinMax(d[inputKey], minX, maxX);
+    const minX = scaleDomainMin(scales.realX);
+    const maxX = scaleDomainMax(scales.realX);
+    const getSpotlightX = (d) => Util.valueMinMax(d[inputKey], minX, maxX);
 
-    let SPOTLIGHT_SIZE = 12;
-    let SPOTLIGHT_PADDING = 6;
-    let INITIAL_OFFSET = 27;
-    let OFFSET = SPOTLIGHT_SIZE + SPOTLIGHT_PADDING;
-    let TOOLTIP_BG_PADDING = 6;
+    const SPOTLIGHT_SIZE = 12;
+    const SPOTLIGHT_PADDING = 6;
+    const INITIAL_OFFSET = 27;
+    const OFFSET = SPOTLIGHT_SIZE + SPOTLIGHT_PADDING;
+    const TOOLTIP_BG_PADDING = 6;
 
-    let SPOTLIGHT_SPACING = SPOTLIGHT_SIZE + SPOTLIGHT_PADDING * 2;
+    const SPOTLIGHT_SPACING = SPOTLIGHT_SIZE + SPOTLIGHT_PADDING * 2;
 
-    var ys: _.Dictionary<{y: number, offset: number, x: number}> = {};
-    var idToY = {};
-    let xToBucket = {};
-    let getBucket = d =>
+    const ys: _.Dictionary<{y: number, offset: number, x: number}> = {};
+    const idToY = {};
+    const xToBucket = {};
+    const getBucket = (d) =>
     {
-      let x = getSpotlightX(d);
-      if(xToBucket[x] === undefined)
+      const x = getSpotlightX(d);
+      if (xToBucket[x] === undefined)
       {
-        let rx = scales.realX(getSpotlightX(d));
+        const rx = scales.realX(getSpotlightX(d));
         let bucket = null;
         _.map(ys, (g, b) =>
         {
-          if(Math.abs(scales.realX(g.x) - rx) < SPOTLIGHT_SPACING)
+          if (Math.abs(scales.realX(g.x) - rx) < SPOTLIGHT_SPACING)
           {
             bucket = b;
           }
         });
 
-        if(bucket !== null)
+        if (bucket !== null)
         {
           xToBucket[x] = bucket;
         }
@@ -425,29 +423,29 @@ var TransformChart = {
       return xToBucket[x];
     };
 
-    var getSpotlightY = (d) => {
-      var x = getSpotlightX(d);
-      let bucket = getBucket(d);
+    const getSpotlightY = (d) => {
+      const x = getSpotlightX(d);
+      const bucket = getBucket(d);
 
-      if(ys[bucket])
+      if (ys[bucket])
       {
         ys[bucket].offset += OFFSET;
       }
       else
       {
         // Consider using Binary Search to speed this up
-        var i = 1;
-        while(pointsData[i] && pointsData[i]['x'] < x)
+        let i = 1;
+        while (pointsData[i] && pointsData[i]['x'] < x)
         {
           i ++;
         }
 
-        var yVal = 0;
-        var first = pointsData[i - 1];
-        var second = pointsData[i];
-        if(first && second)
+        let yVal = 0;
+        const first = pointsData[i - 1];
+        const second = pointsData[i];
+        if (first && second)
         {
-          var distanceRatio = (x - first['x']) / (second['x'] - first['x']);
+          const distanceRatio = (x - first['x']) / (second['x'] - first['x']);
           yVal = first['y'] * (1 - distanceRatio) + second['y'] * distanceRatio;
         }
         else
@@ -455,28 +453,28 @@ var TransformChart = {
           yVal = (first || second)['y'];
         }
 
-        var y = scales.realPointY(yVal);
+        const y = scales.realPointY(yVal);
         ys[bucket] =
         {
           y,
           offset: INITIAL_OFFSET,
           x,
-        }
+        };
       }
 
-      var finalY = ys[bucket].y - ys[bucket].offset;
+      const finalY = ys[bucket].y - ys[bucket].offset;
       idToY[d['id']] = finalY;
       return finalY;
     };
 
-    var isvg = d3.select(el).select('.inner-svg');
+    const isvg = d3.select(el).select('.inner-svg');
 
-    let getFinalX = d => scales.realX(ys[getBucket(d)].x);
+    const getFinalX = (d) => scales.realX(ys[getBucket(d)].x);
 
     spotlight
       .select('circle')
-      .attr('cy', d => getSpotlightY(d))
-      .attr('cx', d => getFinalX(d))
+      .attr('cy', (d) => getSpotlightY(d))
+      .attr('cx', (d) => getFinalX(d))
       .attr('fill', (d) => d['color'])
       .attr('r',  (d) => SPOTLIGHT_SIZE / 2)
       ;
@@ -502,15 +500,15 @@ var TransformChart = {
       .attr('ry', 6)
       ;
 
-    var g2 = d3.select(el).selectAll('.spotlight-bgs');
+    const g2 = d3.select(el).selectAll('.spotlight-bgs');
 
-    var bgData = _.map(ys, (y, k) => {
+    const bgData = _.map(ys, (y, k) => {
       y['key'] = k;
       return y;
     });
 
-    var spotlightBg = g2.selectAll('.spotlight-bg')
-      .data(bgData, (d) => { return d['key'] });
+    const spotlightBg = g2.selectAll('.spotlight-bg')
+      .data(bgData, (d) => d['key']);
 
     spotlightBg.enter()
       .append('path')
@@ -522,37 +520,37 @@ var TransformChart = {
       .attr('stroke', '#ccc')
       .attr('stroke-width', '1px')
       .attr('d', (d) => {
-        var x = scales.realX(d['x']);
-        var y = d['y'];
-        var offset = d['offset'];
-        var radius = SPOTLIGHT_SIZE / 2 + SPOTLIGHT_PADDING;
-        var straightHeight = offset - radius * 2 - 2;
-        if(straightHeight < 0) straightHeight = 0;
-        var pinR = 5;
+        const x = scales.realX(d['x']);
+        const y = d['y'];
+        const offset = d['offset'];
+        const radius = SPOTLIGHT_SIZE / 2 + SPOTLIGHT_PADDING;
+        let straightHeight = offset - radius * 2 - 2;
+        if (straightHeight < 0) straightHeight = 0;
+        const pinR = 5;
 
-        var str = "Mx y l -p -15 " +
-        "a r r 0 0 1 -"+(radius - pinR)+" -r " +
-        "l 0 -h " +
-        "a r r 0 0 1 r -r " +
-        "a r r 0 0 1 r r " +
-        "l 0 h " +
-        "a r r 0 0 1 -"+(radius - pinR)+" r " +
-        "l -p 15";
+        let str = 'Mx y l -p -15 ' +
+        'a r r 0 0 1 -' + (radius - pinR) + ' -r ' +
+        'l 0 -h ' +
+        'a r r 0 0 1 r -r ' +
+        'a r r 0 0 1 r r ' +
+        'l 0 h ' +
+        'a r r 0 0 1 -' + (radius - pinR) + ' r ' +
+        'l -p 15';
 
-        str = str.replace(/x/g, x + "");
-        str = str.replace(/y/g, y + "");
-        str = str.replace(/h/g, straightHeight + "");
-        str = str.replace(/r/g, radius + "");
-        str = str.replace(/p/g, pinR + "");
+        str = str.replace(/x/g, x + '');
+        str = str.replace(/y/g, y + '');
+        str = str.replace(/h/g, straightHeight + '');
+        str = str.replace(/r/g, radius + '');
+        str = str.replace(/p/g, pinR + '');
 
         return str;
       })
       .attr('transform', (d) => {
-        var x = scales.realX(d['x']);
-        var y = d['y'];
-        var offset = d['offset'];
-        if(y - offset < 10) {
-          return 'rotate(180,' + x + ',' + y +')';
+        const x = scales.realX(d['x']);
+        const y = d['y'];
+        const offset = d['offset'];
+        if (y - offset < 10) {
+          return 'rotate(180,' + x + ',' + y + ')';
         }
         return '';
       })
@@ -560,34 +558,34 @@ var TransformChart = {
 
     spotlight
       .attr('transform', (d) => {
-        var bg = ys[getBucket(d)];
-        var x = scales.realX(bg['x']);
-        var y = bg['y'];
-        var offset = bg['offset'];
-        if(y - offset < 10) {
-          return 'rotate(180,' + x + ',' + y +')';
+        const bg = ys[getBucket(d)];
+        const x = scales.realX(bg['x']);
+        const y = bg['y'];
+        const offset = bg['offset'];
+        if (y - offset < 10) {
+          return 'rotate(180,' + x + ',' + y + ')';
         }
         return '';
       });
 
     spotlight.selectAll('text, rect')
       .attr('transform', (d) => {
-        var rotate = '0';
-        var translateY = 0;
-        var translateX = 0;
+        let rotate = '0';
+        let translateY = 0;
+        let translateX = 0;
 
-        var bg = ys[getBucket(d)];
-        var x = scales.realX(bg['x']);
-        var y = bg['y'];
-        var offset = bg['offset'];
+        const bg = ys[getBucket(d)];
+        const x = scales.realX(bg['x']);
+        const y = bg['y'];
+        const offset = bg['offset'];
 
-        if(y - offset < 10) {
+        if (y - offset < 10) {
           translateY = 2 * (y - idToY[d['id']]);
           rotate = '180,' + x + ',' + y;
         }
 
-        var width = g.select('.spotlight-tooltip-bg-' + d['id'])['node']()['getBBox']()['width'];
-        if(x + width > parseInt(isvg.attr('width'), 10))
+        const width = g.select('.spotlight-tooltip-bg-' + d['id'])['node']()['getBBox']()['width'];
+        if (x + width > parseInt(isvg.attr('width'), 10))
         {
           translateX = -1 * width - SPOTLIGHT_SIZE - 2 * SPOTLIGHT_PADDING;
         }
@@ -602,25 +600,25 @@ var TransformChart = {
   // needs to be "function" for d3.mouse(this)
   _lineMousedownFactory: (el, onClick, scales, onMove, onRelease) => function(event)
   {
-    var m = d3.mouse(this);
-    var x = scales.realX.invert(m[0]);
-    var y = scales.realPointY.invert(m[1]);
-    onClick(x,y);
+    const m = d3.mouse(this);
+    const x = scales.realX.invert(m[0]);
+    const y = scales.realPointY.invert(m[1]);
+    onClick(x, y);
 
-    var line = d3.select(this);
-    var initialClasses = line.attr('class');
+    const line = d3.select(this);
+    const initialClasses = line.attr('class');
     line.attr('class', initialClasses + ' line-active');
 
-    var t = this;
-    var del = d3.select(el);
+    const t = this;
+    const del = d3.select(el);
 
-    var move = function(event) {
+    const move = function(event) {
       onMove(x, scales.realPointY.invert(d3.mouse(t)[1]));
     };
-    del.on("mousemove", move);
+    del.on('mousemove', move);
     del.on('touchmove', move);
 
-    var offFn = () => {
+    const offFn = () => {
       del.on('mousemove', null);
       del.on('touchmove', null);
       del.on('mouseup', null);
@@ -637,17 +635,17 @@ var TransformChart = {
 
   _getLinesData(pointsData, scales, isFill)
   {
-    var linesPointsData = _.clone(pointsData);
-    if(linesPointsData.length)
+    const linesPointsData = _.clone(pointsData);
+    if (linesPointsData.length)
     {
-      var range = (scaleMax(scales.x) - scaleMin(scales.x));
+      const range = (scaleMax(scales.x) - scaleMin(scales.x));
       linesPointsData.unshift({
         x: scaleMin(scales.x) - range,
         y: linesPointsData[0].y,
         id: '*%*-first',
         dontScale: true,
       });
-      if(isFill)
+      if (isFill)
       {
         linesPointsData.unshift({
           x: scaleMin(scales.x) - range,
@@ -663,7 +661,7 @@ var TransformChart = {
         id: '*%*-last',
         dontScale: true,
       });
-      if(isFill)
+      if (isFill)
       {
         linesPointsData.push({
           x: scaleMax(scales.x) + range,
@@ -678,27 +676,27 @@ var TransformChart = {
 
   _drawLines(el, scales, pointsData, onClick, onMove, onRelease, canEdit)
   {
-    var lineFunction = d3.svg.line()
+    const lineFunction = d3.svg.line()
       .x((d) => d['dontScale'] ? d['x'] : scales.realX(d['x']))
       .y((d) => scales.realPointY(d['y']));
 
-    var lines = d3.select(el).select('.lines')
-      .attr("d", lineFunction(this._getLinesData(pointsData, scales)))
+    const lines = d3.select(el).select('.lines')
+      .attr('d', lineFunction(this._getLinesData(pointsData, scales)))
       .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
 
-    if(canEdit)
+    if (canEdit)
     {
-      lines.on("mousedown", this._lineMousedownFactory(el, onClick, scales, onMove, onRelease));
+      lines.on('mousedown', this._lineMousedownFactory(el, onClick, scales, onMove, onRelease));
     }
 
     d3.select(el).select('.lines-bg')
-      .attr("d", lineFunction(this._getLinesData(pointsData, scales, true)));
+      .attr('d', lineFunction(this._getLinesData(pointsData, scales, true)));
   },
 
   _deletePoints(el, onDelete)
   {
     d3.select('.point-edit-menu').remove();
-    var selectedIds = d3.select(el).selectAll('.point-selected')[0].map(function(point:any){
+    const selectedIds = d3.select(el).selectAll('.point-selected')[0].map(function(point: any){
       return point.getAttribute('_id');
     });
     selectedIds.map(function(id) {
@@ -709,30 +707,30 @@ var TransformChart = {
   // needs to be "function" for d3.mouse(this)
   _mousedownFactory: (el, onMove, onRelease, scales, onSelect, onPointMoveStart, drawCrossHairs, point) => function(d) {
 
-    if(d3.event['shiftKey'] || d3.event['altKey'])
+    if (d3.event['shiftKey'] || d3.event['altKey'])
     {
       onSelect(d.id, d3.event['shiftKey']);
     }
-    else if(!d.selected)
+    else if (!d.selected)
     {
       onSelect(null);
       onSelect(d.id);
     }
     d3.event['stopPropagation']();
-    var del = d3.select(el);
-    var point = d3.select(this);
-    var startY = scales.realPointY.invert(parseFloat(point.attr('cy')));
-    var startX = scales.realX.invert(parseFloat(point.attr('cx')));
+    const del = d3.select(el);
+    const point = d3.select(this);
+    const startY = scales.realPointY.invert(parseFloat(point.attr('cy')));
+    const startX = scales.realX.invert(parseFloat(point.attr('cx')));
     onPointMoveStart(startY, startX);
-    var t = this;
+    const t = this;
 
     point.attr('active', '1');
-    var move = function(event) {
-      var newY = scales.realPointY.invert(d3.mouse(t)[1]);
+    const move = function(event) {
+      let newY = scales.realPointY.invert(d3.mouse(t)[1]);
       newY = Util.valueMinMax(newY, 0, 1);
-      var newX = scales.realX.invert(d3.mouse(t)[0]);
-      var cx = scales.realX.invert(parseFloat(point.attr('cx')));
-      var pointValues = d3.select(el).selectAll('.point')[0].map(function(point:any) {
+      const newX = scales.realX.invert(d3.mouse(t)[0]);
+      const cx = scales.realX.invert(parseFloat(point.attr('cx')));
+      const pointValues = d3.select(el).selectAll('.point')[0].map(function(point: any) {
         return scales.realX.invert(parseFloat(point.getAttribute('cx')));
       });
       onMove(point.attr('_id'), newY, newX, pointValues, cx, d3.event['altKey']);
@@ -742,7 +740,7 @@ var TransformChart = {
     del.on('mousemove', move);
     del.on('touchmove', move);
 
-    var offFn = () => {
+    const offFn = () => {
       d3.select(el).selectAll('.crosshairs').remove();
       del.on('mousemove', null);
       del.on('touchmove', null);
@@ -759,7 +757,7 @@ var TransformChart = {
 
   _drawCrossHairs(el, mouse, scales, x, newY)
   {
-    if(!x)
+    if (!x)
     {
       return;
     }
@@ -767,18 +765,18 @@ var TransformChart = {
     d3.select(el).select('.transform-tooltip').remove();
     d3.select(el).select('.point-edit-menu').remove();
 
-    var y = newY || scales.realPointY.invert(mouse[1]);
-    var pos_y = scales.realPointY(y);
-    var text_x = 'X:  ' + Util.formatNumber(scales.realX.invert(x));
-    var text_y = 'Y:  ' + Util.formatNumber(y);
-    var w = 75;
-    var h = 35;
-    var containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
-    var containerHeight = parseInt(d3.select(el).select('.inner-svg').attr('height'));
-    var menuX = (x + w ) > containerWidth ? x - w - 5 : x + 5;
-    var menuY = (pos_y + h) > containerHeight ? pos_y - h -14 : pos_y + 14;
+    const y = newY || scales.realPointY.invert(mouse[1]);
+    const pos_y = scales.realPointY(y);
+    const text_x = 'X:  ' + Util.formatNumber(scales.realX.invert(x));
+    const text_y = 'Y:  ' + Util.formatNumber(y);
+    const w = 75;
+    const h = 35;
+    const containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
+    const containerHeight = parseInt(d3.select(el).select('.inner-svg').attr('height'));
+    const menuX = (x + w ) > containerWidth ? x - w - 5 : x + 5;
+    const menuY = (pos_y + h) > containerHeight ? pos_y - h - 14 : pos_y + 14;
 
-    var crosshairs = d3.select(el).select('.inner-svg').append('g')
+    const crosshairs = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'crosshairs');
     crosshairs.append('rect')
       .attr('x', menuX)
@@ -800,8 +798,7 @@ var TransformChart = {
       .attr('text-anchor', 'start')
       .text(text_y);
 
-
-    var crosshairLines = d3.select(el).select('.inner-svg').insert('g', '.points').attr('class', 'crosshairs');
+    const crosshairLines = d3.select(el).select('.inner-svg').insert('g', '.points').attr('class', 'crosshairs');
 
     crosshairLines.append('line')
       .attr('class', 'crosshairs-line')
@@ -831,18 +828,18 @@ var TransformChart = {
     d3.select(el).selectAll('.transform-tooltip').remove();
 
     // var f = d3.format(".2f")
-    let xVal = scales.realX.invert(point.cx.baseVal.value);
-    let yVal = scales.realPointY.invert(point.cy.baseVal.value);
-    var text_x = 'X: ' + Util.formatNumber(xVal);
-    var text_y = 'Y: ' + Util.formatNumber(yVal);
-    var containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
-    var containerHeight = parseInt(d3.select(el).select('.inner-svg').attr('height'));
-    var w = 75;
-    var h = 35;
-    var x = (mouse[0] + w) > containerWidth ? mouse[0] - w - 5 : mouse[0] + 5;
-    var y = (mouse[1] + h) > containerHeight ? mouse[1] - h - 14 : mouse[1] + 14;
+    const xVal = scales.realX.invert(point.cx.baseVal.value);
+    const yVal = scales.realPointY.invert(point.cy.baseVal.value);
+    const text_x = 'X: ' + Util.formatNumber(xVal);
+    const text_y = 'Y: ' + Util.formatNumber(yVal);
+    const containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
+    const containerHeight = parseInt(d3.select(el).select('.inner-svg').attr('height'));
+    const w = 75;
+    const h = 35;
+    const x = (mouse[0] + w) > containerWidth ? mouse[0] - w - 5 : mouse[0] + 5;
+    const y = (mouse[1] + h) > containerHeight ? mouse[1] - h - 14 : mouse[1] + 14;
 
-    var tooltip = d3.select(el).select('.inner-svg').append('g')
+    const tooltip = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'transform-tooltip');
 
     tooltip.append('rect')
@@ -869,30 +866,30 @@ var TransformChart = {
 
   _editPointPosition(el, scales, onMove, onRelease, containerInfo)
   {
-    var point = d3.select(el).select('.point-selected');
-    if(!point[0][0])
+    const point = d3.select(el).select('.point-selected');
+    if (!point[0][0])
     {
       return;
     }
-    var inputX = d3.select('#xVal');
-    var inputY = d3.select('#yVal');
+    const inputX = d3.select('#xVal');
+    const inputY = d3.select('#yVal');
 
-    var pointValues = d3.select(el).selectAll('.point')[0].map(function(p:any) {
+    const pointValues = d3.select(el).selectAll('.point')[0].map(function(p: any) {
       return scales.realX.invert(parseFloat(p.getAttribute('cx')));
     });
-    var xValueNode:any = inputX.node();
-    var yValueNode:any = inputY.node();
-    var x = parseFloat(xValueNode.value) || 0;
-    var y = parseFloat(yValueNode.value) || 0;
-    var x_raw = parseFloat(inputX.attr('raw_value')) + (x - parseFloat(inputX.attr('value')));
-    var y_raw = parseFloat(inputY.attr('raw_value')) + (y - parseFloat(inputY.attr('value')));
+    const xValueNode: any = inputX.node();
+    const yValueNode: any = inputY.node();
+    const x = parseFloat(xValueNode.value) || 0;
+    const y = parseFloat(yValueNode.value) || 0;
+    const x_raw = parseFloat(inputX.attr('raw_value')) + (x - parseFloat(inputX.attr('value')));
+    const y_raw = parseFloat(inputY.attr('raw_value')) + (y - parseFloat(inputY.attr('value')));
     onMove(
       point.attr('_id'),
       y_raw,
       x_raw,
       pointValues,
       scales.realX.invert(parseFloat(point.attr('cx'))),
-      d3.event['altKey']
+      d3.event['altKey'],
     );
     onRelease && onRelease();
     TransformChart._movePointEditMenu(el);
@@ -900,48 +897,48 @@ var TransformChart = {
 
   _drawPointEditMenu(el, scales, onMove, onRelease)
   {
-    var point = d3.select(el).select('.point-selected');
-    if(!point[0][0] || d3.select(el).selectAll('.point-selected')[0].length > 1)
+    const point = d3.select(el).select('.point-selected');
+    if (!point[0][0] || d3.select(el).selectAll('.point-selected')[0].length > 1)
     {
       return;
     }
     d3.select(el).selectAll('.transform-tooltip').remove();
 
-    var cCr = d3.select(el)[0][0]['getBoundingClientRect']();
-    var cr = point[0][0]['getBoundingClientRect']();
+    const cCr = d3.select(el)[0][0]['getBoundingClientRect']();
+    const cr = point[0][0]['getBoundingClientRect']();
 
-    var containerWidth = parseFloat(d3.select(el).select('.inner-svg').attr('width'));
-    var containerHeight = parseFloat(d3.select(el).select('.inner-svg').attr('height'));
-    var w = 70;
-    var h = 38;
-    var cx = parseFloat(point.attr('cx'));
-    var cy = parseFloat(point.attr('cy'));
-    var f = d3.format(".2f");
-    var value = scales.realX.invert(cx);
-    var score = scales.realPointY.invert(cy);
+    const containerWidth = parseFloat(d3.select(el).select('.inner-svg').attr('width'));
+    const containerHeight = parseFloat(d3.select(el).select('.inner-svg').attr('height'));
+    const w = 70;
+    const h = 38;
+    const cx = parseFloat(point.attr('cx'));
+    const cy = parseFloat(point.attr('cy'));
+    const f = d3.format('.2f');
+    const value = scales.realX.invert(cx);
+    const score = scales.realPointY.invert(cy);
 
     //Get the max and min X values for the point
-    var pointValues = d3.select(el).selectAll('.point')[0].map(function(p:any) {
+    const pointValues = d3.select(el).selectAll('.point')[0].map(function(p: any) {
       return scales.realX.invert(parseFloat(p.getAttribute('cx')));
-    }).sort((a, b) => {return a-b});
-    var index = pointValues.indexOf(scales.realX.invert(cx));
-    if(index < 0)
+    }).sort((a, b) => a - b);
+    const index = pointValues.indexOf(scales.realX.invert(cx));
+    if (index < 0)
     {
-      var max = 100;
-      var min = 0;
+      const max = 100;
+      const min = 0;
     }
     else
     {
        min = (index - 1) >= 0 ?  Math.max(0, pointValues[index - 1]) : 0;
        max = (index + 1) < pointValues.length ? Math.min(100, pointValues[index + 1]) : 100;
     }
-    var menu = d3.select(el)
+    const menu = d3.select(el)
       .append('div')
       .attr('width', w)
       .attr('height', h)
       .attr('class', 'point-edit-menu')
       .on('keydown', function() {
-        if(d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) //delete/backspace key
+        if (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) //delete/backspace key
         {
           d3.event['stopPropagation']();
         }
@@ -951,9 +948,9 @@ var TransformChart = {
           d3.event['stopPropagation']();
       });
 
-    var div1 = menu.append('div')
+    const div1 = menu.append('div')
       .attr('style', 'display: inline-flex');
-    var div2 = menu.append('div')
+    const div2 = menu.append('div')
       .attr('style', 'display: inline-flex');
 
     div1.append('label')
@@ -974,11 +971,11 @@ var TransformChart = {
          this._editPointPosition(el, scales, onMove, onRelease, {containerWidth, containerHeight, w, h});
       })
       .on('keydown', function() {
-        var xNode: any = d3.select(el).select('#xVal').node();
-        var val = String(xNode.value).match(/\d/g);
-        var len = (val && val.length) || 0;
-        var keyCode = d3.event['keyCode'];
-        if(len >= 5 && [46, 8, 37, 39].indexOf(keyCode) < 0)
+        const xNode: any = d3.select(el).select('#xVal').node();
+        const val = String(xNode.value).match(/\d/g);
+        const len = (val && val.length) || 0;
+        const keyCode = d3.event['keyCode'];
+        if (len >= 5 && [46, 8, 37, 39].indexOf(keyCode) < 0)
         {
           d3.event['stopPropagation']();
         }
@@ -1002,10 +999,10 @@ var TransformChart = {
          this._editPointPosition(el, scales, onMove, onRelease, {containerWidth, containerHeight, w, h});
       })
       .on('keydown', function() {
-        var yNode: any = d3.select(el).select('#yVal').node();
-        var val = String(yNode.value).match(/\d/g);
-        var len = (val && val.length) || 0;
-        if(len >= 5 && [46, 8, 37, 38, 39, 40].indexOf(d3.event['keyCode']) < 0)
+        const yNode: any = d3.select(el).select('#yVal').node();
+        const val = String(yNode.value).match(/\d/g);
+        const len = (val && val.length) || 0;
+        if (len >= 5 && [46, 8, 37, 38, 39, 40].indexOf(d3.event['keyCode']) < 0)
         {
           d3.event['preventDefault']();
         }
@@ -1016,16 +1013,16 @@ var TransformChart = {
 
   _movePointEditMenu(el)
   {
-    if(d3.select(el).select('.point-edit-menu')[0][0])
+    if (d3.select(el).select('.point-edit-menu')[0][0])
     {
-      var point = d3.select(el).select('.point-selected');
-      if(point[0][0])
+      const point = d3.select(el).select('.point-selected');
+      if (point[0][0])
       {
-        let cCr = d3.select(el)[0][0]['getBoundingClientRect']();
-        let cr = point[0][0]['getBoundingClientRect']();
+        const cCr = d3.select(el)[0][0]['getBoundingClientRect']();
+        const cr = point[0][0]['getBoundingClientRect']();
         let left = (cr.left - cCr.left) + 20;
-        let top = Util.valueMinMax((cr.top - cCr.top) - 15, 15, cCr.height - 60);
-        if(left + 85 > cCr.width - xMargin)
+        const top = Util.valueMinMax((cr.top - cCr.top) - 15, 15, cCr.height - 60);
+        if (left + 85 > cCr.width - xMargin)
         {
           left -= 90 + 20;
         }
@@ -1040,18 +1037,18 @@ var TransformChart = {
   {
     d3.select(el).select('.right-menu').remove();
 
-    var menu = d3.select(el).select('.inner-svg').append('g')
+    const menu = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'right-menu');
 
-    var containerWidth = parseFloat(d3.select(el).select('.inner-svg').attr('width'));
-    var w = 85;
-    var h = 20;
+    const containerWidth = parseFloat(d3.select(el).select('.inner-svg').attr('width'));
+    const w = 85;
+    const h = 20;
 
-    var x = ((mouse[0] + w) > containerWidth) ? mouse[0] - w + 10 : mouse[0] - 10;
+    const x = ((mouse[0] + w) > containerWidth) ? mouse[0] - w + 10 : mouse[0] - 10;
 
     menu.append('rect')
       .attr('x', x)
-      .attr('y', mouse[1]-10)
+      .attr('y', mouse[1] - 10)
       .attr('rx', 5)
       .attr('ry', 5)
       .attr('width', 0)
@@ -1079,13 +1076,13 @@ var TransformChart = {
       .transition()
       .duration(50);
 
-    var isvg = d3.select(el).select('.inner-svg');
+    const isvg = d3.select(el).select('.inner-svg');
     menu.on('mousedown', () => {
       fn (
         scales.x.invert(mouse[0] + parseInt(isvg.attr('x'), 10)),
-        scales.realPointY.invert(mouse[1] + parseInt(isvg.attr('y'), 10))
+        scales.realPointY.invert(mouse[1] + parseInt(isvg.attr('y'), 10)),
       );
-      if(text === 'Delete')
+      if (text === 'Delete')
       {
         d3.select('.transform-tooltip').remove();
       }
@@ -1106,7 +1103,7 @@ var TransformChart = {
 
   _mouseClickFactory: (el, scales, onMove, onRelease, drawPointEditMenu) => function(point)
   {
-    if(!d3.event['shiftKey'] && !d3.event['altKey'])
+    if (!d3.event['shiftKey'] && !d3.event['altKey'])
     {
       drawPointEditMenu(el, scales, onMove, onRelease);
     }
@@ -1125,9 +1122,9 @@ var TransformChart = {
 
   _drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit)
   {
-    var g = d3.select(el).selectAll('.points');
+    const g = d3.select(el).selectAll('.points');
 
-    var point = g.selectAll('circle')
+    const point = g.selectAll('circle')
       .data(pointsData, (d) => d['id']);
 
     point.enter()
@@ -1144,7 +1141,7 @@ var TransformChart = {
     point
       .attr('_id', (d) => d['id']);
 
-    if(canEdit)
+    if (canEdit)
     {
       point.on('mousedown',   this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point));
       point.on('touchstart',  this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point));
@@ -1175,30 +1172,30 @@ var TransformChart = {
 
   _scales(el, domain, barsData, stateWidth, stateHeight)
   {
-    if(!domain)
+    if (!domain)
     {
       return null;
     }
-    var width = stateWidth - xMargin;
-    var height = stateHeight - 2 * yMargin;
+    const width = stateWidth - xMargin;
+    const height = stateHeight - 2 * yMargin;
 
-    var x = d3.scale.linear()
+    const x = d3.scale.linear()
       .range([xMargin, width])
       .domain(domain.x);
 
-    var realX = d3.scale.linear()
+    const realX = d3.scale.linear()
       .range([0, width - xMargin])
       .domain(domain.x);
 
-    var pointY = d3.scale.linear()
+    const pointY = d3.scale.linear()
       .range([height, yMargin])
       .domain(domain.y);
 
-    var realPointY = d3.scale.linear()
+    const realPointY = d3.scale.linear()
       .range([height - yMargin, 0])
       .domain(domain.y);
 
-    var barsMax = barsData.reduce((max, bar) =>
+    let barsMax = barsData.reduce((max, bar) =>
       (
         (max === false || bar.percentage > max) && (bar.range.max >= domain.x[0] && bar.range.min <= domain.x[1])
         ? bar.percentage : max
@@ -1206,11 +1203,11 @@ var TransformChart = {
       , false);
     barsMax = barsMax * 1.1;
 
-    var barY = d3.scale.linear()
+    const barY = d3.scale.linear()
       .range([height, yMargin])
       .domain([0, barsMax]);
 
-    var realBarY = d3.scale.linear()
+    const realBarY = d3.scale.linear()
       .range([height - yMargin, 0])
       .domain([0, barsMax]);
 

@@ -43,17 +43,17 @@ THE SOFTWARE.
 */
 
 require('./PasswordMeter.less');
-import * as $ from 'jquery';
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../util/Util';
 import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as React from 'react';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
 import Classs from './../../common/components/Classs';
 
 const meterSectionValues = [0, 1, 2, 3, 4, 5];
 
 export interface Props {
-	value: number,
+	value: number;
 }
 
 class PasswordMeter extends Classs<Props>
@@ -71,7 +71,7 @@ class PasswordMeter extends Classs<Props>
 					'yellow': 			this.props.value === 3,
 					'light-green': 	this.props.value === 4,
 					'green': 				this.props.value === 5,
-					'filled': 			this.props.value >= value
+					'filled': 			this.props.value >= value,
 				})}
 				key={value}
 			></div>
@@ -80,11 +80,11 @@ class PasswordMeter extends Classs<Props>
 
 	render() {
 		return (
-			<div className='password-meter'>
+			<div className="password-meter">
 				{meterSectionValues.map(this.renderMeterSection)}
 			</div>
 		);
-	};
+	}
 }
 
 export default PasswordMeter;

@@ -42,13 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-var _ = require('underscore');
+const _ = require('underscore');
 import ActionTypes from './AuthActionTypes';
 import Store from './AuthStore';
 
-var $ = (type: string, payload: any) => Store.dispatch({type, payload});
+const $ = (type: string, payload: any) => Store.dispatch({type, payload});
 
-var AuthActions =
+const AuthActions =
 {
   login:
     (token: string, username: string) =>

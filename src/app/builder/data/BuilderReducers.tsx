@@ -43,94 +43,94 @@ THE SOFTWARE.
 */
 
 import * as Immutable from 'immutable';
-import LibraryTypes from './../../library/LibraryTypes';
-import {BuilderTypes} from './../BuilderTypes';
-import Ajax from './../../util/Ajax';
-import ActionTypes from './BuilderActionTypes';
-import Actions from './BuilderActions';
 import * as _ from 'underscore';
-import {BuilderState} from './BuilderStore';
-import Util from '../../util/Util';
 import LibraryStore from '../../library/data/LibraryStore';
+import Util from '../../util/Util';
+import LibraryTypes from './../../library/LibraryTypes';
+import Ajax from './../../util/Ajax';
+import {BuilderTypes} from './../BuilderTypes';
+import Actions from './BuilderActions';
+import ActionTypes from './BuilderActionTypes';
+import {BuilderState} from './BuilderStore';
 
 const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 {
-  
+
 [ActionTypes.fetchQuery]:
   (
-    state: BuilderState, 
-    action: { 
-      payload?: { 
-        variantId: ID, 
-        handleNoVariant: (id:ID) => void 
-      }
-    }
-  ) => 
+    state: BuilderState,
+    action: {
+      payload?: {
+        variantId: ID,
+        handleNoVariant: (id: ID) => void,
+      },
+    },
+  ) =>
   {
     const {variantId, handleNoVariant} = action.payload;
-    
-    if(state.loadingXhr)
+
+    if (state.loadingXhr)
     {
-      if(variantId === state.loadingVariantId)
+      if (variantId === state.loadingVariantId)
       {
         // still loading the same variant
         return state;
       }
-      
+
       // abort the previous request
       state.loadingXhr.abort();
     }
-    
-    let xhr: XMLHttpRequest = Ajax.getQuery(
-      variantId, 
+
+    const xhr: XMLHttpRequest = Ajax.getQuery(
+      variantId,
       (query: BuilderTypes.Query, variant: LibraryTypes.Variant) =>
       {
-        if(query)
+        if (query)
         {
           Actions.queryLoaded(query, xhr);
         }
         else
         {
-          handleNoVariant && 
+          handleNoVariant &&
             handleNoVariant(variantId);
         }
-      }
+      },
     );
-    
+
     return state
       .set('loading', true)
       .set('loadingXhr', xhr)
       .set('loadingVariantId', variantId)
     ;
   },
-  
+
 [ActionTypes.queryLoaded]:
   (
-    state: BuilderState, 
-    action: Action<{ 
+    state: BuilderState,
+    action: Action<{
       query: BuilderTypes.Query,
       xhr: XMLHttpRequest,
-    }>
+    }>,
   ) =>
   {
-    if(state.loadingXhr !== action.payload.xhr)
+    if (state.loadingXhr !== action.payload.xhr)
     {
       // wrong XHR
       return state;
     }
-    
-    if(!action.payload.query.tqlCardsInSync)
+
+    if (!action.payload.query.tqlCardsInSync)
     {
-      if(action.payload.query.tql)
+      if (action.payload.query.tql)
       {
         state = state
-          .set('parseTreeReq', 
+          .set('parseTreeReq',
             Ajax.parseTree(
               action.payload.query.tql,
               state.db,
               Actions.parseTreeLoaded,
-              Actions.parseTreeError
-            ).xhr
+              Actions.parseTreeError,
+            ).xhr,
           );
       }
       else
@@ -140,7 +140,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
           .set('tqlCardsInSync', true);
       }
     }
-    
+
     return state
       .set('query', action.payload.query)
       .set('loading', false)
@@ -150,104 +150,104 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       .set('pastQueries', Immutable.List([]))
       .set('nextQueries', Immutable.List([]))
       .set('db', LibraryStore.getState().getIn(
-        ['variants', state.loadingVariantId, 'db']
+        ['variants', state.loadingVariantId, 'db'],
       ))
     ;
   },
 
-[ActionTypes.change]:  
+[ActionTypes.change]:
   (
-    state: BuilderState, 
+    state: BuilderState,
     action: {
       payload?: {
         keyPath: KeyPath,
         value: any,
-      }
-    }
+      },
+    },
   ) =>
     state.setIn(
       action.payload.keyPath,
-      action.payload.value
+      action.payload.value,
     ),
-  
-[ActionTypes.create]:  
+
+[ActionTypes.create]:
   (
-    state: BuilderState, 
+    state: BuilderState,
     action: {
-      payload?: { 
-        keyPath: KeyPath, 
-        index: number, 
-        factoryType: string, 
-        data: any 
-      }
-    }
+      payload?: {
+        keyPath: KeyPath,
+        index: number,
+        factoryType: string,
+        data: any,
+      },
+    },
   ) =>
     state.updateIn(
-      action.payload.keyPath, 
+      action.payload.keyPath,
       (arr) =>
       {
-        let item = action.payload.data ? action.payload.data :
+        const item = action.payload.data ? action.payload.data :
             BuilderTypes.make(BuilderTypes.Blocks[action.payload.factoryType]);
-            
-        if(action.payload.index === null)
+
+        if (action.payload.index === null)
         {
           return item; // creating at that spot
         }
-        
+
         return arr.splice
         (
           action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index,
-          0, 
-          item
-        )
-      }
+          0,
+          item,
+        );
+      },
     )
   ,
-    
-[ActionTypes.move]:  
+
+[ActionTypes.move]:
   (
-    state: BuilderState, 
+    state: BuilderState,
     action: {
-      payload?: { 
-        keyPath: KeyPath, 
-        index: number, 
-        newIndex; number 
-      }
-    }
+      payload?: {
+        keyPath: KeyPath,
+        index: number,
+        newIndex; number
+      },
+    },
   ) =>
     state.updateIn(
-      action.payload.keyPath, 
+      action.payload.keyPath,
       (arr) =>
       {
-        let {index, newIndex} = action.payload;
-        let el = arr.get(index);
+        const {index, newIndex} = action.payload;
+        const el = arr.get(index);
         arr = arr.splice(index, 1);
         arr = arr.splice(newIndex, 0, el); // TODO potentially correct index
         return arr;
-      }
+      },
     ),
 
      // first check original keypath
 [ActionTypes.nestedMove]: // a deep move
   (state: BuilderState, action: {
-    payload?: { itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number }
+    payload?: { itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number },
   }) =>
   {
-    let { itemKeyPath, itemIndex, newKeyPath, newIndex } = action.payload;
-    
-    if(itemKeyPath.equals(newKeyPath))
+    const { itemKeyPath, itemIndex, newKeyPath, newIndex } = action.payload;
+
+    if (itemKeyPath.equals(newKeyPath))
     {
-      if(itemIndex === newIndex)
+      if (itemIndex === newIndex)
       {
         return state;
       }
-      
+
       // moving within same list
-      return state.updateIn(itemKeyPath, arr =>
+      return state.updateIn(itemKeyPath, (arr) =>
       {
-        let item = arr.get(itemIndex);
-        var indexOffset = 0;
-        if(itemIndex < newIndex)
+        const item = arr.get(itemIndex);
+        let indexOffset = 0;
+        if (itemIndex < newIndex)
         {
           // dragging down
           indexOffset = -1;
@@ -255,21 +255,21 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         return arr.splice(itemIndex, 1).splice(newIndex + indexOffset, 0, item);
       });
     }
-    
-    let itemReferenceKeyPath = itemIndex === null ? itemKeyPath : itemKeyPath.push(itemIndex);
-    let item = state.getIn(itemReferenceKeyPath);
-    let tempId = '' + Math.random(); // mark with a temporary ID so we know where to delete
+
+    const itemReferenceKeyPath = itemIndex === null ? itemKeyPath : itemKeyPath.push(itemIndex);
+    const item = state.getIn(itemReferenceKeyPath);
+    const tempId = '' + Math.random(); // mark with a temporary ID so we know where to delete
     state = state.setIn(itemReferenceKeyPath.push('id'), tempId);
-    
-    state = state.updateIn(newKeyPath, obj => {
-      if(Immutable.List.isList(obj))
+
+    state = state.updateIn(newKeyPath, (obj) => {
+      if (Immutable.List.isList(obj))
       {
         return obj.splice(newIndex, 0, item);
       }
       return item;
     });
-    
-    if(state.getIn(itemReferenceKeyPath.push('id')) === tempId)
+
+    if (state.getIn(itemReferenceKeyPath.push('id')) === tempId)
     {
       // location remained same, optimized delete
       state = state.deleteIn(itemReferenceKeyPath);
@@ -278,29 +278,29 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     {
       // search and destroy
       // NOTE: if in the future the same card is open in multiple places, this will break
-      state = state.deleteIn(Util.keyPathForId(state, tempId) as (string | number)[]);
+      state = state.deleteIn(Util.keyPathForId(state, tempId) as Array<string | number>);
       // Consider an optimized search if performance becomes an issue.
     }
-    
+
     state = trimParent(state, itemKeyPath);
-    
+
     return state;
   },
 
-[ActionTypes.remove]:  
+[ActionTypes.remove]:
   (state: BuilderState, action: {
-    payload?: { keyPath: KeyPath, index: number }
+    payload?: { keyPath: KeyPath, index: number },
   }) =>
   {
     let {keyPath, index} = action.payload;
-    if(index !== null)
+    if (index !== null)
     {
       keyPath = keyPath.push(index);
     }
-    
+
     state = state.removeIn(keyPath);
     state = trimParent(state, keyPath);
-    
+
     return state;
   },
 
@@ -310,24 +310,24 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     state: BuilderState,
     action: Action<{
       tql: string,
-    }>
+    }>,
   ) =>
   {
     state.parseTreeReq && state.parseTreeReq.abort();
     return state
-      .update('query', query =>
+      .update('query', (query) =>
         query
           .set('tql', action.payload.tql)
           .set('tqlCardsInSync', false)
-          .set('parseTreeError', null)
+          .set('parseTreeError', null),
       )
-      .set('parseTreeReq', 
+      .set('parseTreeReq',
         Ajax.parseTree(
-          action.payload.tql, 
+          action.payload.tql,
           state.db,
           Actions.parseTreeLoaded,
-          Actions.parseTreeError
-        ).xhr
+          Actions.parseTreeError,
+        ).xhr,
       );
   },
 
@@ -338,27 +338,27 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       response: {
         result?: any,
         error?: string,
-      }
-    }>
+      },
+    }>,
   ) =>
   {
-    let {error, result} = action.payload.response;
-    if(error)
+    const {error, result} = action.payload.response;
+    if (error)
     {
       return state
         .setIn(['query', 'parseTreeError'], error)
         .set('parseTreeReq', null)
-        .setIn(['query', 'tqlCardsInSync'], false);     
+        .setIn(['query', 'tqlCardsInSync'], false);
     }
-    
+
     return state
       .update('query',
-        query =>
+        (query) =>
           query
-            .set('cards', 
-              TQLToCards.convert(result, state.query.cards)
+            .set('cards',
+              TQLToCards.convert(result, state.query.cards),
             )
-            .set('tqlCardsInSync', true)
+            .set('tqlCardsInSync', true),
       )
       .set('parseTreeReq', null);
   },
@@ -368,7 +368,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     state: BuilderState,
     action: Action<{
       errorMessage: string,
-    }>
+    }>,
   ) =>
     state
       .setIn(['query', 'parseTreeError'], action.payload.errorMessage || true)
@@ -384,17 +384,17 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 
 [ActionTypes.selectCard]:
   (state: BuilderState, action: Action<{
-    cardId: ID, 
-    shiftKey: boolean, 
+    cardId: ID,
+    shiftKey: boolean,
     ctrlKey: boolean,
   }>) =>
   {
-    let {cardId, shiftKey, ctrlKey} = action.payload;
-    if(!shiftKey && !ctrlKey)
+    const {cardId, shiftKey, ctrlKey} = action.payload;
+    if (!shiftKey && !ctrlKey)
     {
       state = state.set('selectedCardIds', Immutable.Map({}));
     }
-    if(ctrlKey)
+    if (ctrlKey)
     {
       return state.setIn(['selectedCardIds', cardId],
         !state.getIn(['selectedCardIds', cardId]));
@@ -407,42 +407,42 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       state: BuilderState,
       action: Action<{
         cardItem: any,
-      }>
+      }>,
     ) =>
       state.set('draggingCardItem', action.payload.cardItem),
-  
+
   [ActionTypes.dragCardOver]:
     (state: BuilderState, action: {
-      payload?: { keyPath: KeyPath, index: number }
+      payload?: { keyPath: KeyPath, index: number },
     }) =>
     {
-      let {keyPath, index} = action.payload;
+      const {keyPath, index} = action.payload;
       return state
         .set('draggingOverKeyPath', keyPath)
         .set('draggingOverIndex', index);
     },
-  
+
   [ActionTypes.dropCard]:
     (state) => state
       .set('draggingOverKeyPath', null)
       .set('draggingOverIndex', null)
       .set('draggingCardItem', null),
-  
+
   [ActionTypes.toggleDeck]:
     (state: BuilderState, action) => state
       .setIn(['query', 'deckOpen'], action.payload.open),
-  
+
   [ActionTypes.changeResultsConfig]:
     (
       state: BuilderState,
       action: Action<{
-        resultsConfig: any
-      }>
+        resultsConfig: any,
+      }>,
     ) =>
       state
         .update('query',
-          query =>
-            query.set('resultsConfig', action.payload.resultsConfig)
+          (query) =>
+            query.set('resultsConfig', action.payload.resultsConfig),
         ),
 
   [ActionTypes.save]:
@@ -450,22 +450,22 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       state: BuilderState,
       action: Action<{
         failed?: boolean,
-      }>
+      }>,
     ) =>
       state
         .set('isDirty', action.payload && action.payload.failed),
-  
+
   [ActionTypes.undo]:
     (
       state: BuilderState,
-      action: Action<{}>
+      action: Action<{}>,
     ) =>
     {
-      if(state.pastQueries.size)
+      if (state.pastQueries.size)
       {
-        let pastQuery = state.pastQueries.get(0);
-        let pastQueries = state.pastQueries.shift();
-        let nextQueries = state.nextQueries.unshift(state.query);
+        const pastQuery = state.pastQueries.get(0);
+        const pastQueries = state.pastQueries.shift();
+        const nextQueries = state.nextQueries.unshift(state.query);
         return state
           .set('pastQueries', pastQueries)
           .set('query', pastQuery)
@@ -473,18 +473,18 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       }
       return state;
     },
-    
+
   [ActionTypes.redo]:
     (
       state: BuilderState,
-      action: Action<{}>
+      action: Action<{}>,
     ) =>
     {
-      if(state.nextQueries.size)
+      if (state.nextQueries.size)
       {
-        let nextQuery = state.nextQueries.get(0);
-        let nextQueries = state.nextQueries.shift();
-        let pastQueries = state.pastQueries.unshift(state.query);
+        const nextQuery = state.nextQueries.get(0);
+        const nextQueries = state.nextQueries.shift();
+        const pastQueries = state.pastQueries.unshift(state.query);
         return state
           .set('pastQueries', pastQueries)
           .set('query', nextQuery)
@@ -492,31 +492,31 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       }
       return state;
     },
-    
+
   [ActionTypes.checkpoint]:
-    (state:BuilderState, action: Action<{}>) => state,
-  
+    (state: BuilderState, action: Action<{}>) => state,
+
   [ActionTypes.results]:
     (
       state: BuilderState,
-      action: Action<{ resultsState }>
+      action: Action<{ resultsState }>,
     ) =>
       state.set('resultsState', action.payload.resultsState),
 };
 
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
 {
-  let parentKeyPath = keyPath.splice(keyPath.size - 1, 1).toList();
-  let parentListKeyPath = parentKeyPath.splice(parentKeyPath.size - 1, 1).toList();
-  let st = state.getIn(parentKeyPath.push('static'));
-  
-  if( st && st.removeOnCardRemove
+  const parentKeyPath = keyPath.splice(keyPath.size - 1, 1).toList();
+  const parentListKeyPath = parentKeyPath.splice(parentKeyPath.size - 1, 1).toList();
+  const st = state.getIn(parentKeyPath.push('static'));
+
+  if ( st && st.removeOnCardRemove
       && state.getIn(parentListKeyPath).size > 1 // only remove if there are multiple items
     )
   {
     return state.removeIn(parentKeyPath);
   }
-  
+
   return state;
 }
 

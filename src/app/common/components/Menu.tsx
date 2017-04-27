@@ -43,19 +43,19 @@ THE SOFTWARE.
 */
 
 require('./Menu.less');
-import * as $ from 'jquery';
-import * as _ from 'underscore';
-import * as React from 'react';
-import Util from '../../util/Util';
 import * as classNames from 'classnames';
+import * as $ from 'jquery';
+import * as React from 'react';
+import * as _ from 'underscore';
+import Util from '../../util/Util';
 import PureClasss from './../../common/components/PureClasss';
-var MoreIcon = require("./../../../images/icon_more_12x3.svg?name=MoreIcon");
+const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
 
-var optionHeight = 30; // coordinate with Menu.less
+const optionHeight = 30; // coordinate with Menu.less
 
 export interface MenuOption {
   text: string;
-  onClick: (index:number, id: string) => void;
+  onClick: (index: number, id: string) => void;
   disabled?: boolean;
   icon?: any;
   iconColor?: string;
@@ -80,20 +80,20 @@ export class Menu extends PureClasss<Props>
     this.state =
     {
       open: false,
-    }
+    };
   }
 
   renderOption(option, index)
   {
-    if(option.spacer)
+    if (option.spacer)
     {
-      return <div className='menu-option menu-option-spacer' key={index} />;
+      return <div className="menu-option menu-option-spacer" key={index} />;
     }
 
-    if(!option.disabled)
+    if (!option.disabled)
     {
       // TODO
-      var onClick = (event) => {
+      const onClick = (event) => {
         event.preventDefault();
         event.stopPropagation();
         option.onClick(index, this.props.id);
@@ -101,7 +101,7 @@ export class Menu extends PureClasss<Props>
     }
     return (
       <div
-        className={"menu-option" + (option.disabled ? " menu-option-disabled" : "")}
+        className={'menu-option' + (option.disabled ? ' menu-option-disabled' : '')}
         key={index}
         onClick={onClick}
       >
@@ -113,7 +113,7 @@ export class Menu extends PureClasss<Props>
           {option.icon}
         </div>
         <div
-          className={option.icon ? "menu-text-padding" : "menu-text-padding-no-icon"}
+          className={option.icon ? 'menu-text-padding' : 'menu-text-padding-no-icon'}
         >
           { option.text }
         </div>
@@ -140,7 +140,7 @@ export class Menu extends PureClasss<Props>
       open: !this.state.open,
     });
 
-    if(!this.state.open)
+    if (!this.state.open)
     {
       $(document).on('click', this.close);
     }
@@ -148,31 +148,31 @@ export class Menu extends PureClasss<Props>
 
   render()
   {
-    let {options} = this.props;
-    if(!options || !options.size)
+    const {options} = this.props;
+    if (!options || !options.size)
     {
       return null;
     }
 
-    var multiplier = 10;
-    if(options.get(0).icon)
+    let multiplier = 10;
+    if (options.get(0).icon)
     {
       multiplier = 14;
     }
-    var width = multiplier * options.reduce((max, option) =>
+    const width = multiplier * options.reduce((max, option) =>
         option.text && (option.text.length > max) ? option.text.length : max, 1);
 
-    var style = {
-      width: width,
+    const style = {
+      width,
       height: options.size * optionHeight,
     };
 
     return (
     <div
       className={classNames({
-        "menu-wrapper": true,
-        "menu-wrapper-small": this.props.small,
-        "menu-open": this.state.open,
+        'menu-wrapper': true,
+        'menu-wrapper-small': this.props.small,
+        'menu-open': this.state.open,
       })}
       style={this.props.style ? this.props.style : null}
     >

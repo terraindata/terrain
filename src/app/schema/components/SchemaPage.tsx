@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import PureClasss from './../../common/components/PureClasss';
-var HTML5Backend = require('react-dnd-html5-backend');
+const HTML5Backend = require('react-dnd-html5-backend');
 import { DragDropContext } from 'react-dnd';
 const {browserHistory} = require('react-router');
 
@@ -66,7 +66,7 @@ class SchemaPage extends PureClasss<Props>
   } = {
     on: false,
   };
-  
+
   render()
   {
     return (

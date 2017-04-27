@@ -46,10 +46,10 @@ import * as Immutable from 'immutable';
 
 export module RoleTypes
 {
-  let _Role = Immutable.Record(
+  const _Role = Immutable.Record(
   {
-    groupId: "",
-    username: "",
+    groupId: '',
+    username: '',
     admin: false,
     builder: false,
   });
@@ -61,10 +61,10 @@ export module RoleTypes
     builder: boolean;
   }
   // { { username: Role }
-  export type GroupRoleMap = Immutable.Map<ID, Role>
+  export type GroupRoleMap = Immutable.Map<ID, Role>;
   // { groupId: { username: Role }}
-  export type RoleMap = Immutable.Map<ID, GroupRoleMap>
-  
+  export type RoleMap = Immutable.Map<ID, GroupRoleMap>;
+
   // if
   // roles.getIn([groupId, username])
 }

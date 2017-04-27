@@ -43,27 +43,27 @@ THE SOFTWARE.
 */
 
 require('./CardsColumn.less');
-import * as $ from 'jquery';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as $ from 'jquery';
 import * as React from 'react';
-import Util from '../../../util/Util';
-import Actions from "../../data/BuilderActions";
-import PureClasss from './../../../common/components/PureClasss';
-import BuilderTypes from '../../BuilderTypes';
-import Switch from './../../../common/components/Switch';
-import CardsArea from './CardsArea';
-import CardDropArea from './CardDropArea';
+import * as _ from 'underscore';
 import InfoArea from '../../../common/components/InfoArea';
-import CardsDeck from './CardsDeck';
+import Util from '../../../util/Util';
+import BuilderTypes from '../../BuilderTypes';
+import Actions from '../../data/BuilderActions';
 import {scrollAction} from '../../data/BuilderScrollStore';
+import PureClasss from './../../../common/components/PureClasss';
+import Switch from './../../../common/components/Switch';
+import CardDropArea from './CardDropArea';
+import CardsArea from './CardsArea';
+import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 
 type ICard = BuilderTypes.ICard;
 type ICards = BuilderTypes.ICards;
-let {List, Map} = Immutable;
-let ExpandIcon = require("./../../../../images/icon_expand_12x12.svg?name=ExpandIcon");
+const {List, Map} = Immutable;
+const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
 export interface Props
 {
@@ -75,7 +75,7 @@ export interface Props
   columnIndex: number;
   tqlCardsInSync: boolean;
   parseTreeError: string;
-  
+
   containerWidth?: number;
   containerHeight?: number;
 }
@@ -91,53 +91,53 @@ class CardsColumn extends PureClasss<Props>
     keyPath: this.computeKeyPath(this.props),
     learningMode: false,
   };
-  
+
   componentDidMount()
   {
     this.handleScroll();
   }
-  
-  computeKeyPath(props:Props):KeyPath
+
+  computeKeyPath(props: Props): KeyPath
   {
     return List(this._keyPath('query', 'cards'));
   }
-  
-  componentWillReceiveProps(nextProps:Props)
+
+  componentWillReceiveProps(nextProps: Props)
   {
-    if(nextProps.queryId !== this.props.queryId)
+    if (nextProps.queryId !== this.props.queryId)
     {
       this.setState({
         keyPath: this.computeKeyPath(nextProps),
       });
     }
-    
-    if(nextProps.containerHeight !== this.props.containerHeight
+
+    if (nextProps.containerHeight !== this.props.containerHeight
       || nextProps.containerWidth !== this.props.containerWidth)
     {
       this.handleScroll();
     }
   }
-  
+
   createFromCard()
   {
     Actions.create(this.state.keyPath, 0, 'sfw');
   }
-  
+
   toggleLearningMode()
   {
     this.setState({
       learningMode: !this.state.learningMode,
-    })
+    });
   }
 
   renderTopbar()
   {
     return (
-      <div className='cards-area-top-bar'>
-        <div className = 'cards-area-white-space' />
+      <div className="cards-area-top-bar">
+        <div className = "cards-area-white-space" />
         <Switch
-          first='Standard'
-          second='Learning'
+          first="Standard"
+          second="Learning"
           onChange={this.toggleLearningMode}
           selected={this.state.learningMode ? 2 : 1}
           small={true}
@@ -145,30 +145,30 @@ class CardsColumn extends PureClasss<Props>
       </div>
     );
   }
-  
+
   toggleDeck()
   {
     Actions.toggleDeck(! this.props.deckOpen);
   }
-  
+
   handleScroll()
   {
     // TODO improve make faster
-    let el = $('#cards-column');
-    let start = el.offset().top;
-    let totalHeight = document.getElementById('cards-column-inner').clientHeight;
+    const el = $('#cards-column');
+    const start = el.offset().top;
+    const totalHeight = document.getElementById('cards-column-inner').clientHeight;
     scrollAction(start, el.height(), el.scrollTop(), totalHeight);
   }
-  
+
   componentWillUpdate()
   {
-    let inner = document.getElementById('cards-column-inner');
-    if(inner)
+    const inner = document.getElementById('cards-column-inner');
+    if (inner)
     {
-      let height = inner.clientHeight;
-      if(height !== this.innerHeight)
+      const height = inner.clientHeight;
+      if (height !== this.innerHeight)
       {
-        if(this.innerHeight !== -1)
+        if (this.innerHeight !== -1)
         {
           this.handleScroll();
         }
@@ -176,15 +176,15 @@ class CardsColumn extends PureClasss<Props>
       }
     }
   }
-  
+
   innerHeight: number = -1;
   render()
   {
-    let {props} = this;
-    let {cards, canEdit} = props;
-    let {keyPath} = this.state;
-    let canHaveDeck = canEdit;
-    
+    const {props} = this;
+    const {cards, canEdit} = props;
+    const {keyPath} = this.state;
+    const canHaveDeck = canEdit;
+
     return (
       <div
         className={classNames({
@@ -205,10 +205,10 @@ class CardsColumn extends PureClasss<Props>
             'cards-column-cards-area-faded': !this.props.tqlCardsInSync,
           })}
           onScroll={this.handleScroll}
-          id='cards-column'
+          id="cards-column"
         >
           <div
-            id='cards-column-inner'
+            id="cards-column-inner"
           >
             <CardDropArea
               half={true}
@@ -218,7 +218,7 @@ class CardsColumn extends PureClasss<Props>
               heightOffset={12}
               accepts={_topLevelAccepts}
             />
-            <CardsArea 
+            <CardsArea
               cards={cards}
               keyPath={keyPath}
               canEdit={canEdit}
@@ -230,8 +230,8 @@ class CardsColumn extends PureClasss<Props>
             {
               !cards.size ? /* "Create your first card." */
                 <InfoArea
-                  large={"There aren't any cards in this query."} 
-                  button={canEdit && "Create a Select Card"}
+                  large={"There aren't any cards in this query."}
+                  button={canEdit && 'Create a Select Card'}
                   onClick={this.createFromCard}
                   inline={false}
                 />
@@ -242,23 +242,23 @@ class CardsColumn extends PureClasss<Props>
         {
           canHaveDeck &&
             <div
-              className='cards-deck-knob'
+              className="cards-deck-knob"
               onClick={this.toggleDeck}
             >
               <ExpandIcon
-                className='cards-deck-knob-icon'
+                className="cards-deck-knob-icon"
               />
-              <div className='cards-deck-knob-text'>
+              <div className="cards-deck-knob-text">
                   Card Deck
               </div>
             </div>
         }
-        
+
         <div
-          className='cards-column-tql-parse-error'
+          className="cards-column-tql-parse-error"
         >
           {
-            "There is a parsing error with your TQL." || "All good!" 
+            'There is a parsing error with your TQL.' || 'All good!'
           }
         </div>
       </div>
@@ -273,14 +273,13 @@ class CardsColumn extends PureClasss<Props>
             //   accepts={_topLevelAccepts}
             // />
 
-
 // wasn't able to get this to work but will leave it around in case some
 //  bright eyed dev comes along and find the solution
 
 // interface InnerProps
 // {
 //   onChange: () => void;
-  
+
 //   children?: any;
 //   containerWidth?: number;
 //   containerHeight?: number;
@@ -297,7 +296,7 @@ class CardsColumn extends PureClasss<Props>
 //     }
 //     console.log('gpp', nextProps.containerHeight);
 //   }
-  
+
 //   render()
 //   {
 //     console.log('mdc', this.props.containerHeight);
@@ -314,6 +313,5 @@ class CardsColumn extends PureClasss<Props>
 // }
 
 // const CardsColumnInner = Dimensions()(_CardsColumnInner);
-
 
 export default Dimensions()(CardsColumn);

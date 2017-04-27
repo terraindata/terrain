@@ -45,18 +45,18 @@ THE SOFTWARE.
 require('./Guide.less');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as _ from 'underscore';
 import Util from '../../../util/Util';
-import Actions from "../../data/BuilderActions";
-import Card from "../cards/Card";
-import PureClasss from './../../../common/components/PureClasss';
 import BuilderTypes from '../../BuilderTypes';
-import {IQuery, ICondition, IExpression, EExpressionType, EScreen} from './Guide';
-let L = Immutable.List;
-let M = Immutable.Map;
+import Actions from '../../data/BuilderActions';
+import Card from '../cards/Card';
+import PureClasss from './../../../common/components/PureClasss';
+import {EExpressionType, EScreen, ICondition, IExpression, IQuery} from './Guide';
+const L = Immutable.List;
+const M = Immutable.Map;
 
 export interface Props
 {
@@ -65,24 +65,24 @@ export interface Props
 
 interface State
 {
-  
+
 }
 
 class Query extends PureClasss<Props>
 {
   state: State = {
-    
+
   };
-  
+
   render()
   {
-    let {query} = this.props;
-    
+    const {query} = this.props;
+
     return (
       <div
-        className='query'
+        className="query"
       >
-        
+
       </div>
     );
   }
