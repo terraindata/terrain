@@ -88,8 +88,13 @@ export type TastyConfig = ElasticSearchConfig | MySQLConfig | SQLiteConfig;
  * Tasty Query components.
  */
 export const Column = TastyColumn;
+export type Column = TastyColumn;
+
 export const Query = TastyQuery;
+export type Query = TastyQuery;
+
 export const Table = TastyTable;
+export type Table = TastyTable;
 
 /**
  * The core Tasty executor interface.
