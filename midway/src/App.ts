@@ -54,6 +54,7 @@ import dateFormat = require('date-format');
 import reqText = require('require-text');
 import session = require('koa-generic-session');
 
+import './auth/Passport.ts';
 import DB from './DB';
 import Middleware from './Middleware';
 import Router from './Router';
