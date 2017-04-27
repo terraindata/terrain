@@ -5,10 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "yarn run build-midway:live",
-    "start-old": "MIDWAY_HOST=pa-terraformer01.terrain.int webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback",
-    "start2": "MIDWAY_HOST=pa-terraformer02.terrain.int webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback",
-    "start-koa": "MIDWAY_HOST=localhost:3000 webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback",
-    "start-local": "MIDWAY_HOST=localhost webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback",
+    "start-front": "MIDWAY_HOST=localhost:3000 webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback",
+    "start-front-m1": "MIDWAY_HOST=localhost webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback",
     "test": "karma start karma.conf.js",
     "test-front": "only=front karma start karma.conf.js ",
     "test-back-setup": "./midway/test/scripts/setup_env.sh",
