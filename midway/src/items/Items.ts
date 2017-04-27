@@ -65,95 +65,62 @@ export interface ItemConfig
 
 export const Items =
   {
-    createOrUpdateItem: async (user, req) =>
+    createOrUpdateItem: async (user, req): Promise<string> =>
     {
-      // both regular and superusers can create items
-      // only superusers can change existing items that are not BUILD status
-      // both regular and superusers can change items thar are not LIVE or DEFAULT status
-      if (!req['body'])
+      return new Promise<string>(async (resolve, reject) =>
       {
-        return 'Insufficient parameters passed';
-      }
-      const reqBody = req['body'];
-      const returnStatus = 'Incorrect parameters';
-      const items = await Items.find(reqBody.id);
-      const itemExists: boolean = !!items && items.length !== 0;
-      if (!itemExists && reqBody.id !== undefined)
-      {
-        return new Promise(async (resolve, reject) =>
+        // both regular and superusers can create items
+        // only superusers can change existing items that are not BUILD status
+        // both regular and superusers can change items thar are not LIVE or DEFAULT status
+        if (!req['body'])
         {
-          resolve('Invalid item id passed');
-        });
-      }
-      if (!user.isSuperUser)
-      {
-        if (reqBody.status === 'LIVE' || reqBody.status === 'DEFAULT')
-        {
-          return new Promise(async (resolve, reject) =>
-          {
-            resolve('Unauthorized');
-          });
+          reject('Insufficient parameters passed');
         }
-        if (itemExists && (items[0].status === 'LIVE' || items[0].status === 'DEFAULT'))
+        const reqBody = req['body'];
+        const items = await Items.find(reqBody.id);
+        if (items.length === 0 && reqBody.id !== undefined)
         {
-          return new Promise(async (resolve, reject) =>
-          {
-            resolve('Unauthorized');
-          });
+          reject('Invalid item id passed');
         }
-      }
-      if (reqBody.parentItemId === undefined || reqBody.name === undefined)
-      {
-        return new Promise(async (resolve, reject) =>
+        if (!user.isSuperUser)
         {
-          resolve('Insufficient parameters passed');
-        });
-      }
-      const results = await Util.createOrUpdate(Items, reqBody);
-      if (results instanceof Array)
-      {
-        return 'Success';
-      }
-      else
-      {
-        return results;
-      }
+          if (reqBody.status === 'LIVE' || reqBody.status === 'DEFAULT')
+          {
+            reject('Unauthorized');
+          }
+          if (items.length > 0 && (items[0].status === 'LIVE' || items[0].status === 'DEFAULT'))
+          {
+            reject('Unauthorized');
+          }
+        }
+        if (reqBody.parentItemId === undefined || reqBody.name === undefined)
+        {
+          reject('Insufficient parameters passed');
+        }
+        const results = await DB.getDB().upsert(Item, reqBody);
+        if (results instanceof Array)
+        {
+          resolve('Success');
+        }
+        else
+        {
+          reject(results);
+        }
+      });
     },
 
-    find: async (id): Promise<ItemConfig[]> =>
+    find: async (id: number): Promise<ItemConfig[]> =>
     {
       if (!id)
       {
-        return Util.getRejectPromise<ItemConfig[]>();
+        return Promise.reject([]);
       }
-      return await (DB.getDB().select(Item, [], { id }) as Promise<ItemConfig[]>);
+      return DB.getDB().select(Item, [], { id });
     },
 
-    getAll: async () =>
+    getAll: async (): Promise<ItemConfig[]> =>
     {
-      return await DB.getDB().select(Item, [], {});
-    },
-
-    getTemplate: async () =>
-    {
-      const emptyObj: ItemConfig =
-        {
-          meta: '',
-          name: '',
-          parentItemId: 0,
-          status: '',
-          type: '',
-        };
-      return emptyObj;
-    },
-
-    replace: async (item, id?) =>
-    {
-      if (id)
-      {
-        item['id'] = id;
-      }
-      return await DB.getDB().upsert(Item, item);
+      return DB.getDB().select(Item, [], {});
     },
   };
 

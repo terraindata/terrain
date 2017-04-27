@@ -51,15 +51,17 @@ import BabelRegister = require('babel-register');
 import cmdLineArgs = require('command-line-args');
 import convert = require('koa-convert');
 import dateFormat = require('date-format');
+import passportLocal = require('passport-local');
 import reqText = require('require-text');
 import session = require('koa-generic-session');
 
-import './auth/Passport.ts';
 import DB from './DB';
 import Middleware from './Middleware';
 import Router from './Router';
 import Users from './users/Users';
 import Util from './Util';
+
+const LocalStrategy = passportLocal.Strategy;
 
 // process command-line arguments
 const optDefs = [
@@ -118,6 +120,42 @@ app.use(Middleware.logger(winston));
 app.use(Middleware.responseTime());
 app.use(Middleware.passport.initialize());
 app.use(Middleware.passport.session());
+
+// authenticate with id and accessToken
+Middleware.passport.use('access-token-local', new LocalStrategy(
+  {
+    passReqToCallback: true,
+    passwordField: 'accessToken',
+    usernameField: 'id',
+  },
+  async (req, id, accessToken, done) =>
+  {
+    done(null, await Users.loginWithAccessToken(Number(id), accessToken), { body: req.body.body });
+  }));
+
+// authenticate with email and password
+Middleware.passport.use('local', new LocalStrategy(
+  {
+    passReqToCallback: true,
+    usernameField: 'email',
+  },
+  async (req, email, password, done) =>
+  {
+    done(null, await Users.loginWithEmail(email, password), { body: req.body.body });
+  }));
+
+Middleware.passport.serializeUser((user, done) =>
+{
+  if (user)
+  {
+    done(null, user.id);
+  }
+});
+
+Middleware.passport.deserializeUser((id, done) =>
+{
+  done(null, Users.find(id));
+});
 
 app.use(Router.routes());
 

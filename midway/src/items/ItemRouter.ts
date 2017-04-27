@@ -63,13 +63,28 @@ Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next
 {
   winston.info('getting item ID ' + ctx.params.id);
   const items = await Items.find(ctx.params.id);
-  ctx.body = items;
+  if (items.length === 0)
+  {
+    ctx.body = '';
+  }
+  else
+  {
+    ctx.body = items;
+  }
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('create/modify items');
-  ctx.body = await Items.createOrUpdateItem(ctx.state.user, ctx.state.authInfo);
+  try
+  {
+    console.log(ctx.state);
+    ctx.body = await Items.createOrUpdateItem(ctx.state.user, ctx.req);
+  }
+  catch (e)
+  {
+    ctx.body = e;
+  }
 });
 
 export default Router;

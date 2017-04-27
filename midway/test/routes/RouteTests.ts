@@ -56,6 +56,29 @@ import App from '../../src/App';
 
 describe('Item route tests', () =>
 {
+  test('POST /midway/v1/items/', () =>
+  {
+    return request(App)
+      .post('/midway/v1/items/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          name: 'Test Item',
+          parentItemId: 0,
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe('Success');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
+      });
+  });
+
   test('GET /midway/v1/items/', () =>
   {
     return request(App)
