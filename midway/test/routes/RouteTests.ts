@@ -75,25 +75,6 @@ describe('Item route tests', () =>
       });
   });
 
-  test('Get item: GET /midway/v1/items/:id', () =>
-  {
-    return request(App)
-      .get('/midway/v1/items/1')
-      .query({
-        id: 1,
-        accessToken: 'AccessToken',
-      })
-      .expect(200)
-      .then((response) =>
-      {
-        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
-      })
-      .catch((error) =>
-      {
-        fail('GET /midway/v1/items/ request returned an error: ' + error);
-      });
-  });
-
   test('Create item: POST /midway/v1/items/', () =>
   {
     return request(App)
@@ -114,6 +95,73 @@ describe('Item route tests', () =>
       .catch((error) =>
       {
         fail('POST /midway/v1/items/ request returned an error: ' + error);
+      });
+  });
+
+  test('Get item: GET /midway/v1/items/:id', () =>
+  {
+    return request(App)
+      .get('/midway/v1/items/1')
+      .query({
+        id: 1,
+        accessToken: 'AccessToken',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/items/ request returned an error: ' + error);
+      });
+    });
+
+  test('Update item: POST /midway/v1/items/', () =>
+  {
+    return request(App)
+      .post('/midway/v1/items/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          id: 2,
+          name: 'Updated Item',
+          parentItemId: 1,
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe('Success');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
+      });
+  });
+
+  test('Invalid update: POST /midway/v1/items/', (done) =>
+  {
+    return request(App)
+      .post('/midway/v1/items/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          id: 314159265359,
+          name: 'Test Item',
+          parentItemId: 1,
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        fail('POST /midway/v1/items/ request returned success!');
+      })
+      .catch((error) =>
+      {
+        done();
       });
   });
 });
