@@ -117,7 +117,7 @@ export class Items
         reject('Insufficient parameters passed');
       }
 
-      let status: string = item.status ? item.status : '';
+      let status: string = item.status || '';
 
       // item id specified but item not found
       if (item.id !== undefined)
@@ -128,7 +128,7 @@ export class Items
           reject('Invalid item id passed');
         }
 
-        status = items[0].status ? items[0].status : status;
+        status = items[0].status || status;
       }
 
       // check privileges
