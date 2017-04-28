@@ -80,7 +80,7 @@ class CardDragPreview extends PureClasss<CDPProps>
   state: {
     justDropped: boolean;
   } = {
-    justDropped: null,
+    justDropped: false,
   };
 
   timeout: any;
@@ -105,6 +105,7 @@ class CardDragPreview extends PureClasss<CDPProps>
   render()
   {
     const item = this.props.cardItem;
+    let colors: string[], title: string, preview: string;
 
     if (!item)
     {
@@ -116,9 +117,9 @@ class CardDragPreview extends PureClasss<CDPProps>
       const {type} = item;
       if (BuilderTypes.Blocks[type])
       {
-        const colors: string[] = BuilderTypes.Blocks[type].static.colors;
-        const title: string = BuilderTypes.Blocks[type].static.title;
-        let preview = 'New';
+        colors = BuilderTypes.Blocks[type].static.colors;
+        title = BuilderTypes.Blocks[type].static.title;
+        preview = 'New';
         if (!item['new'])
         {
           preview = BuilderTypes.getPreview(item.props.card);
@@ -127,9 +128,9 @@ class CardDragPreview extends PureClasss<CDPProps>
     }
     else
     {
-      const colors = this.noCardColors;
-      const preview = 'None';
-      const title = 'None';
+      colors = this.noCardColors;
+      preview = 'None';
+      title = 'None';
     }
 
     let {visible, cardItem} = this.props;

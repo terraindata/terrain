@@ -145,14 +145,15 @@ class Classs<T> extends React.Component<T, any>
     }
 
     let stateKey = config.stateKey;
+    let keyPath: KeyPath | string[], value: any;
 
     if (config.storeKeyPath)
     {
-      const keyPath = typeof config.storeKeyPath === 'function' ? (config.storeKeyPath as (() => string[]))() : config.storeKeyPath;
-      const value = store.getState().getIn(keyPath);
+      keyPath = typeof config.storeKeyPath === 'function' ? (config.storeKeyPath as (() => string[]))() : config.storeKeyPath;
+      value = store.getState().getIn(keyPath);
       stateKey = stateKey || keyPath[keyPath.length - 1];
     } else {
-      const value = store.getState();
+      value = store.getState();
     }
 
     stateKey = stateKey || 'state';

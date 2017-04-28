@@ -49,7 +49,6 @@ import Classs from './../../common/components/Classs';
 import InfoArea from './../../common/components/InfoArea';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
-import LibraryTypes from './../UserTypes';
 const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
 
 export interface Props

@@ -66,6 +66,7 @@ import CardDropArea from './CardDropArea';
 const CDA = CardDropArea as any;
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
+import SchemaStore from '../../../schema/data/SchemaStore';
 
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -185,12 +186,12 @@ class _Card extends PureClasss<Props>
 
     if (card.static.getChildTerms)
     {
-      terms = card.static.getChildTerms(card);
+      terms = card.static.getChildTerms(card, SchemaStore.getState());
     }
 
     if (card.static.getNeighborTerms)
     {
-      terms = terms.concat(card.static.getNeighborTerms(card)).toList();
+      terms = terms.concat(card.static.getNeighborTerms(card, SchemaStore.getState())).toList();
     }
 
     return terms;

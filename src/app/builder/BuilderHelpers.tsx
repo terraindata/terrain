@@ -45,6 +45,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import BuilderTypes from './BuilderTypes';
 import {BuilderState, BuilderStore} from './data/BuilderStore';
+import SchemaStore from '../schema/data/SchemaStore';
 
 export module BuilderHelpers
 {
@@ -88,12 +89,12 @@ export module BuilderHelpers
 
       if (card.static.getChildTerms)
       {
-        terms = terms.concat(card.static.getChildTerms(card)).toList();
+        terms = terms.concat(card.static.getChildTerms(card, SchemaStore.getState())).toList();
       }
 
       if (card.static.getNeighborTerms)
       {
-        terms = terms.concat(card.static.getNeighborTerms(card)).toList();
+        terms = terms.concat(card.static.getNeighborTerms(card, SchemaStore.getState())).toList();
       }
 
       if (card['cards'])
@@ -103,7 +104,7 @@ export module BuilderHelpers
           {
             if (childCard.static.getParentTerms)
             {
-              terms = terms.concat(childCard.static.getParentTerms(childCard)).toList();
+              terms = terms.concat(childCard.static.getParentTerms(childCard, SchemaStore.getState())).toList();
             }
           },
         );

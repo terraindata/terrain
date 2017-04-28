@@ -46,8 +46,8 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import PureClasss from './../common/components/PureClasss';
 import {Combinators, Operators} from './BuilderTypes';
-let ManualConfig = require('./../manual/ManualConfig.json');
 
+import SchemaTypes from '../schema/SchemaTypes';
 const ManualConfig = require('./../manual/ManualConfig.json');
 
 export enum DisplayType
@@ -97,7 +97,7 @@ export interface Display
   defaultValue?: string;
   // for textboxes with cards
   top?: boolean;
-  getAutoTerms?: (comp?: React.Component<any, any>) => List<string>; // overrides standard terms
+  getAutoTerms?: (comp: React.Component<any, any>, schemaState: SchemaTypes.SchemaState) => List<string>; // overrides standard terms
   autoDisabled?: boolean;
   showWhenCards?: boolean;
   onFocus?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
@@ -125,6 +125,11 @@ export interface Display
   provideParentData?: boolean;
   // if true, it passes the parent data down
   // this will cause unnecessary re-rendering, so avoid if possible
+  
+  // the transform card currently requires the full builder state
+  //  let's change that in the future by having the histogram bars be
+  //  computed at a higher level
+  requiresBuilderState?: boolean;
 }
 
 // Section: Re-useable displays

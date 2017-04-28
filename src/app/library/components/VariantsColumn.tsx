@@ -242,11 +242,13 @@ class VariantsColumn extends Classs<Props>
     const variant = this.props.variants.get(id);
     const index = this.props.variantsOrder.indexOf(id);
     const {me, roles} = this.state;
+    let canEdit: boolean, canDrag: boolean;
+    
     if (me && roles)
     {
-      const canEdit = roles.getIn([this.props.groupId, me.username, 'builder'])
+      canEdit = roles.getIn([this.props.groupId, me.username, 'builder'])
         || roles.getIn([this.props.groupId, me.username, 'admin']);
-      const canDrag = canEdit &&
+      canDrag = canEdit &&
         (variant.status !== LibraryTypes.EVariantStatus.Live ||
           roles.getIn([this.props.groupId, me.username, 'admin']));
     }

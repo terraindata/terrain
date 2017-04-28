@@ -49,8 +49,6 @@ import * as _ from 'underscore';
 import TQLConverter from '../../../tql/TQLConverter';
 import { Ajax, QueryResponse } from '../../../util/Ajax';
 import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
-import BuilderStore from '../../data/BuilderStore';
 import SpotlightStore from '../../data/SpotlightStore';
 import PureClasss from './../../../common/components/PureClasss';
 import { BuilderTypes } from './../../BuilderTypes';
@@ -63,6 +61,8 @@ export interface Props
 {
   keyPath: KeyPath;
   data: any; // transform card
+  onChange: (keyPath: KeyPath, value: any, isDirty?: boolean) => void;
+  builderState: any;
 
   canEdit?: boolean;
   spotlights?: any;
@@ -193,10 +193,11 @@ class TransformCard extends PureClasss<Props>
     return null;
   }
 
+  // TODO move the bars computation to a higher level
   computeBars(input: BuilderTypes.CardString)
   {
     // TODO consider putting the query in context
-    const builderState = BuilderStore.getState();
+    const {builderState} = this.props;
     const {cards} = builderState.query;
     const {db} = builderState;
 
@@ -377,7 +378,7 @@ class TransformCard extends PureClasss<Props>
         this.setState({
           domain: this.trimDomain(this.state.domain, domain),
         });
-        Actions.change(this._ikeyPath(this.props.keyPath, 'domain'), domain, true);
+        this.props.onChange(this._ikeyPath(this.props.keyPath, 'domain'), domain, true);
       }
     }
   }
@@ -401,7 +402,7 @@ class TransformCard extends PureClasss<Props>
 
   handleUpdatePoints(points, isConcrete?: boolean)
   {
-    Actions.change(this._ikeyPath(this.props.keyPath, 'scorePoints'), points, !isConcrete);
+    this.props.onChange(this._ikeyPath(this.props.keyPath, 'scorePoints'), points, !isConcrete);
     // we pass !isConcrete as the value for "isDirty" in order to tell the Store when to
     //  set an Undo checkpoint. Moving the same point in the same movement should not result
     //  in more than one state on the Undo stack.

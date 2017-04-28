@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 const _ = require('underscore');
 import * as Immutable from 'immutable';
-import LibraryTypes from '../../library/LibraryTypes';
 import { CardItem } from '../components/cards/Card';
 import { BuilderTypes } from './../BuilderTypes';
 import ActionTypes from './BuilderActionTypes';
@@ -106,13 +105,13 @@ const BuilderActions =
 
   // fetches the query from the server
   fetchQuery:
-    (variantId: ID, handleNoVariant: (variantId: ID) => void) =>
-      $(ActionTypes.fetchQuery, { variantId, handleNoVariant }),
+    (variantId: ID, handleNoVariant: (variantId: ID) => void, db: string) =>
+      $(ActionTypes.fetchQuery, { variantId, handleNoVariant, db }),
 
   // load query from server into state
   queryLoaded:
-    (query: BuilderTypes.Query, xhr: XMLHttpRequest) =>
-      $(ActionTypes.queryLoaded, { query, xhr }),
+    (query: BuilderTypes.Query, xhr: XMLHttpRequest, db: string) =>
+      $(ActionTypes.queryLoaded, { query, xhr, db }),
 
   save:
     (failed?: boolean) =>

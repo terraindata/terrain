@@ -88,15 +88,20 @@ class Scoreline extends Classs<Props>
 
   render()
   {
+    let none: any;
     if (this.props.hideZeroes && this.props.scores.every((score) => score.score === 0))
     {
-      const none = <div className="scoreline-none">None</div>;
+      none = <div className="scoreline-none">None</div>;
     }
 
     return (
       <div className="scoreline">
-        { this.props.scores.map(this.renderScore) }
-        { none }
+        { 
+          this.props.scores.map(this.renderScore) 
+        }
+        { 
+          none 
+        }
       </div>
     );
   }

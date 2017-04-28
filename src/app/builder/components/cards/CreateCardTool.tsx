@@ -243,14 +243,16 @@ class CreateCardTool extends PureClasss<Props>
       'create-card-opening': this.state.opening,
     });
     classes += ' ' + this.props.className;
+    
+    let style: React.CSSProperties;
 
     if (this.props.dy)
     {
-      const style =
+      style =
       {
         position: 'relative',
         top: this.props.dy,
-      } as any;
+      };
     }
 
     return (

@@ -60,7 +60,7 @@ const Actions =
 
   fetch:
     () =>
-      $(ActionTypes.fetch, {}),
+      $(ActionTypes.fetch, { setUsers: Actions.setUsers }),
 
   setUsers:
     (users: UserTypes.UserMap) =>
@@ -70,5 +70,8 @@ const Actions =
     () =>
       $(ActionTypes.updateCurrentUser, {}),
 };
+
+import AuthStore from './../../auth/data/AuthStore';
+AuthStore.subscribe(Actions.updateCurrentUser);
 
 export default Actions;

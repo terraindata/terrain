@@ -279,22 +279,24 @@ class LibraryInfoColumn extends Classs<Props>
     const item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group =
       this.props.variant || this.props.algorithm || this.props.group;
 
+    let groupId: ID, opacity: number, icon: any;
+    
     switch (item && item.type)
     {
       case 'group':
-        let groupId: any = item.id;
-        let opacity = 1;
-        let icon = <GroupIcon />;
+        groupId = item.id;
+        opacity = 1;
+        icon = <GroupIcon />;
         break;
       case 'algorithm':
-        let groupId: any = item['groupId'];
-        let opacity = 0.75;
-        let icon = <AlgorithmIcon />;
+        groupId = item['groupId'];
+        opacity = 0.75;
+        icon = <AlgorithmIcon />;
         break;
       case 'variant':
-        const groupId: any = item['groupId'];
-        const opacity = 0.5;
-        const icon = <VariantIcon />;
+        groupId = item['groupId'];
+        opacity = 0.5;
+        icon = <VariantIcon />;
         break;
     }
 

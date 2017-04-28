@@ -48,11 +48,8 @@ import Util from './../../util/Util';
 import UserTypes from './../UserTypes';
 import Actions from './UserActions';
 import ActionTypes from './UserActionTypes';
-
 import AuthStore from './../../auth/data/AuthStore';
-AuthStore.subscribe(Actions.updateCurrentUser);
-
-const Immutable = require('immutable');
+import * as Immutable from 'immutable';
 
 const UserReducers = {};
 
@@ -65,7 +62,7 @@ UserReducers[ActionTypes.fetch] =
   {
     Ajax.getUsers((usersObj) =>
     {
-      let users: UserTypes.UserMap = Immutable.Map({});
+      let users: UserTypes.UserMap = Immutable.Map<any, UserTypes.User>({});
       _.map(usersObj, (userObj, username) =>
       {
         const data = userObj.data && userObj.data.length ? JSON.parse(userObj.data) : {};
@@ -81,7 +78,7 @@ UserReducers[ActionTypes.fetch] =
           }),
         ));
       });
-      Actions.setUsers(users);
+      action.payload.setUsers(users);
     });
     return state.set('loading', true);
   };

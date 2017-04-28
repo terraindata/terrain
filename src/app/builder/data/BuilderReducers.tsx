@@ -44,9 +44,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'underscore';
-import LibraryStore from '../../library/data/LibraryStore';
 import Util from '../../util/Util';
-import LibraryTypes from './../../library/LibraryTypes';
 import Ajax from './../../util/Ajax';
 import {BuilderTypes} from './../BuilderTypes';
 import Actions from './BuilderActions';
@@ -63,6 +61,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       payload?: {
         variantId: ID,
         handleNoVariant: (id: ID) => void,
+        db: string,
       },
     },
   ) =>
@@ -83,11 +82,11 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 
     const xhr: XMLHttpRequest = Ajax.getQuery(
       variantId,
-      (query: BuilderTypes.Query, variant: LibraryTypes.Variant) =>
+      (query: BuilderTypes.Query) =>
       {
         if (query)
         {
-          Actions.queryLoaded(query, xhr);
+          Actions.queryLoaded(query, xhr, action.payload.db);
         }
         else
         {
@@ -110,6 +109,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     action: Action<{
       query: BuilderTypes.Query,
       xhr: XMLHttpRequest,
+      db: string,
     }>,
   ) =>
   {
@@ -149,9 +149,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       .set('isDirty', false)
       .set('pastQueries', Immutable.List([]))
       .set('nextQueries', Immutable.List([]))
-      .set('db', LibraryStore.getState().getIn(
-        ['variants', state.loadingVariantId, 'db'],
-      ))
+      .set('db', action.payload.db)
     ;
   },
 

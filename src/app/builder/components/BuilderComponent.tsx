@@ -54,9 +54,11 @@ import PureClasss from '../../common/components/PureClasss';
 import ManualInfo from '../../manual/components/ManualInfo';
 import BuilderTypes from '../BuilderTypes';
 import BuilderActions from '../data/BuilderActions';
+import BuilderStore from '../data/BuilderStore';
 import {Display, DisplayType} from './../BuilderDisplays';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
+import SchemaStore from '../../schema/data/SchemaStore';
 
 export interface Props
 {
@@ -317,6 +319,8 @@ class BuilderComponent extends PureClasss<Props>
                   canEdit: this.props.canEdit,
                   helpOn: this.props.helpOn,
                   className,
+                  onChange: BuilderActions.change,
+                  builderState: d.requiresBuilderState && BuilderStore.getState(),
                 },
               )
             }
@@ -371,7 +375,7 @@ class BuilderComponent extends PureClasss<Props>
           onBlur={d.onBlur}
           display={d}
           autoDisabled={d.autoDisabled}
-          autoTerms={d.getAutoTerms && d.getAutoTerms(this)}
+          autoTerms={d.getAutoTerms && d.getAutoTerms(this, SchemaStore.getState())}
           {...{
             keyPath,
             value,
