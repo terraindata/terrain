@@ -56,45 +56,45 @@ const config: Tasty.SQLiteConfig =
 export const Util =
   {
     createOrUpdate: async (tastyTable, newObject: object, primaryKey?: string) =>
-    {
-      let id;
-      let obj = await tastyTable.getTemplate();
-      if (!primaryKey)
-      {
-        primaryKey = 'id';
-      }
-      const findObj = await tastyTable.find(newObject[primaryKey]);
-      if (findObj && findObj.length !== 0)
-      {
-        obj = findObj[0];
-        id = newObject[primaryKey];
-      }
-      // if there are special permissions
-      _.mapObject(newObject, (val, key) =>
-      {
-        // TODO create field permission checking
-        obj[key] = val;
-      });
-      return await tastyTable.replace(obj, id);
-    },
+                    {
+                      let id;
+                      let obj = await tastyTable.getTemplate();
+                      if (!primaryKey)
+                      {
+                        primaryKey = 'id';
+                      }
+                      const findObj = await tastyTable.find(newObject[primaryKey]);
+                      if (findObj && findObj.length !== 0)
+                      {
+                        obj = findObj[0];
+                        id = newObject[primaryKey];
+                      }
+                      // if there are special permissions
+                      _.mapObject(newObject, (val, key) =>
+                      {
+                        // TODO create field permission checking
+                        obj[key] = val;
+                      });
+                      return await tastyTable.replace(obj, id);
+                    },
 
     getRequest: (url) =>
-    {
-      return new Promise((resolve, reject) =>
-      {
-        request(url, (error, res, body) =>
-        {
-          if (!error && res.statusCode === 200)
-          {
-            resolve(body);
-          }
-          else
-          {
-            reject(error);
-          }
-        });
-      });
-    },
+                {
+                  return new Promise((resolve, reject) =>
+                  {
+                    request(url, (error, res, body) =>
+                    {
+                      if (!error && res.statusCode === 200)
+                      {
+                        resolve(body);
+                      }
+                      else
+                      {
+                        reject(error);
+                      }
+                    });
+                  });
+                },
 
     getRejectPromise<T>()
     {
@@ -103,6 +103,23 @@ export const Util =
         reject(null);
       });
     },
-  };
+
+    verifyThatParametersExist(parameters: any, required: string[]): void
+    {
+      if (!parameters)
+      {
+        throw Error('No parameters found.');
+      }
+
+      for (const key in required)
+      {
+        if (!parameters.hasOwnProperty(key))
+        {
+          throw new Error('Parameter "' + key + '" not found in request object.');
+        }
+      }
+    },
+  }
+;
 
 export default Util;
