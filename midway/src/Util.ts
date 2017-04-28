@@ -55,56 +55,24 @@ const config: Tasty.SQLiteConfig =
 
 export const Util =
   {
-    createOrUpdate: async (tastyTable, newObject: object, primaryKey?: string) =>
-                    {
-                      let id;
-                      let obj = await tastyTable.getTemplate();
-                      if (!primaryKey)
-                      {
-                        primaryKey = 'id';
-                      }
-                      const findObj = await tastyTable.find(newObject[primaryKey]);
-                      if (findObj && findObj.length !== 0)
-                      {
-                        obj = findObj[0];
-                        id = newObject[primaryKey];
-                      }
-                      // if there are special permissions
-                      _.mapObject(newObject, (val, key) =>
-                      {
-                        // TODO create field permission checking
-                        obj[key] = val;
-                      });
-                      return await tastyTable.replace(obj, id);
-                    },
-
     getRequest: (url) =>
-                {
-                  return new Promise((resolve, reject) =>
-                  {
-                    request(url, (error, res, body) =>
-                    {
-                      if (!error && res.statusCode === 200)
-                      {
-                        resolve(body);
-                      }
-                      else
-                      {
-                        reject(error);
-                      }
-                    });
-                  });
-                },
-
-    getRejectPromise<T>()
     {
-      return new Promise<T>(async (resolve, reject) =>
+      return new Promise((resolve, reject) =>
       {
-        reject(null);
+        request(url, (error, res, body) =>
+        {
+          if (!error && res.statusCode === 200)
+          {
+            resolve(body);
+          }
+          else
+          {
+            reject(error);
+          }
+        });
       });
     },
-
-    verifyThatParametersExist(parameters: any, required: string[]): void
+    verifyThatParametersExist: (parameters: any, required: string[]): void =>
     {
       if (!parameters)
       {
@@ -119,7 +87,6 @@ export const Util =
         }
       }
     },
-  }
-;
+  };
 
 export default Util;

@@ -70,7 +70,7 @@ Router.post('/:id/update', passport.authenticate('access-token-local'), async (c
   // update user, must be super user or authenticated user updating own info
   winston.info('user update');
   let returnStatus: any = 'Incorrect parameters';
-  const req = ctx.state.authInfo;
+  const req = ctx.request.body;
   if (!req['body'])
   {
     ctx.body = 'Fields required';
@@ -80,7 +80,7 @@ Router.post('/:id/update', passport.authenticate('access-token-local'), async (c
     req['body']['id'] = ctx.params.id;
     req['callingUser'] = ctx.state.user;
     // if superuser or id to be updated is current user
-    if (ctx.state.user.isSuperUser || ctx.state.authInfo.id === req['body']['id'])
+    if (ctx.state.user.isSuperUser || req.id === ctx.params.id)
     {
       returnStatus = await Users.createOrUpdate(req);
     }
@@ -100,7 +100,7 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
 {
   // create a user, must be admin
   winston.info('create user');
-  const req = ctx.state.authInfo;
+  const req = ctx.request.body;
   let returnStatus: any = 'Incorrect parameters';
   if (!req.body)
   {

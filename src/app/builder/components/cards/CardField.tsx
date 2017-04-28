@@ -175,13 +175,15 @@ class CardField extends PureClasss<Props>
   {
     const dY = Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY);
 
+    let index: number;
+    
     // TODO search from the bottom up if dragging downwards
     if (dY < 0)
     {
       // if dragged up, search from top down
       for
       (
-        let index = 0;
+        index = 0;
         this.state.midpoints[index] < this.state.originalElTop + dY;
         index ++
       );
@@ -190,7 +192,7 @@ class CardField extends PureClasss<Props>
     {
       for
       (
-        let index = this.state.midpoints.length - 1;
+        index = this.state.midpoints.length - 1;
         this.state.midpoints[index] > this.state.originalElBottom + dY;
         index --
       );
@@ -228,7 +230,10 @@ class CardField extends PureClasss<Props>
       $(el).addClass('card-field-wrapper-moving');
     });
 
-    return { dY, index };
+    return { 
+      dY,
+      index,
+    };
   }
 
   handleMouseMove(evt)

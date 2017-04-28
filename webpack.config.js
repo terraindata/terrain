@@ -114,7 +114,7 @@ module.exports =
         //   exclude: /node_modules/,
         //   // add errors to webpack instead of warnings 
         //   failOnError: true
-        // })
+        // }),
     ],
     
     historyApiFallback: 

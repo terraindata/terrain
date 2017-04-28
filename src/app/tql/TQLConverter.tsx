@@ -267,12 +267,12 @@ class TQLConverter
       str = strFn(block);
     }
 
-    let index = str.indexOf('$');
-    while (index !== -1)
+    let repIndex = str.indexOf('$');
+    while (repIndex !== -1)
     {
       const f = str.match('\\$[a-zA-Z]+')[0].substr(1);
       str = str.replace('\$' + f, this._value(f, block));
-      index = str.indexOf('$');
+      repIndex = str.indexOf('$');
     }
     return str;
   }

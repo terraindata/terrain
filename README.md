@@ -70,6 +70,7 @@ General coding standards for Javascript are located in the TechDocs repo, not in
   * Install Homebrew `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
   * Install Node `brew install node`
   * Install yarn. `brew install yarn`
+  * Install parallel for back-end tests. `brew install parallel`
 * For Linux:
   * Install nodejs, yarn, and n `curl -L https://git.io/n-install | bash`
   * Reinit your bash environment `source ~/.bashrc`
@@ -321,6 +322,30 @@ or else the test suite will hang.
 * Please post any other debugging tips here.
 
 
+## ES6 Tips
+
+### && and || Evaluation and Short Circuiting
+
+The actual result of a logical `&&` or `||` operation is going to be the last value that the comparator examined. So, `3 && 4 === 4` (not simply `true`, but rather, a truthy value) and `false || 4 === 4` (again, not simply `true`).
+
+Javascript also uses “short circuiting,” meaning that it stops looking at parameters once a final truthy/falsy value is certain. So, `&&` will stop and “return” the first falsy value (or the last truthy value, if all are truth), and `||` will stop and “return” the first truthy value (or the last fasly value, if all are falsy)
+
+This means that `3 || 4 === 3` and `0 && 4 === 0`.
+
+It also means you can write `item.name = name || "";` instead of `item.name = name ? name : "";` (fewer characters)
+and can write `func && func()` instead of `if (func) { func() }`
+
+You’ll commonly see in the code things like `item && item.fetch && item.fetch()` (if `fetch` doesn't exist, stop trying to make `fetch` happen) or `item.name = name || defaultName || "Gretchen Weiners";` (basically, multiple defaults / failsafes)
+
+This can also cause problems when getting falsy values: `null && false === null !== false`. If you are passing the result of one of these expressions into `if`, your best bet is to leave out the `=== / !==` comparators, and simply write something like `if (null && false)`.
+
+Another example of this problem is: `if ("monica" && "chandler" == true) { log('true'); }` will not log anything (`"monica" && "chandler" == "chandler" != true`).
+
+### Falsy Empty String
+
+The empty string (`""`) is falsy, so `if ("")` will not run the `if`, and `if (!"")` will.
+
+This is important to remember if you are checking for the presence of a string where the empty string is actually allowed. You'll want to write something like `if (str || str === "")` or `if (str !== null && str !== undefined)` or `if (typeof str === 'string')`.
 
 ## Gotchas
 
@@ -357,5 +382,9 @@ A list of common programming gotchas in this codebase
 ## Troubleshooting
 
 * Don't panic.
-* Node or npm errors: `npm install` - you may be missing packages.
-* Tape Test suite doesn't run all tests: make sure you have added correct `t.plan(x)` or `t.end()` statements to every test, otherwise the test suite will hang.
+* Node or npm errors: `yarn` - you may be missing packages.
+* Importing something and it comes up as `undefined`?
+  - Check to make sure you don't have a circular dependency (importing something that imports itself)
+  - Make sure you are `export`ing and `export default`ing from the file
+* Tape Test suite doesn't run all tests?
+  - make sure you have added correct `t.plan(x)` or `t.end()` statements to every test, otherwise the test suite will hang.

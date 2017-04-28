@@ -22,7 +22,7 @@
     "build-gcloud": "yarn run commit-log && webpack --config webpack.config.gcloud.js --output-filename bundle.js",
     "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node -P tsconfig.midway.json --harmony -- ./midway/src/App.ts",
     "lint": "./node_modules/.bin/tslint -c tslint.json --fix 'midway/**/*.ts{,x}'",
-    "style": "./node_modules/.bin/tsfmt -r `find . -type f \\( -iname \\*.tsx -o -iname \\*.ts \\)`",
+    "style": "find midway -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\;",
     "fix": "yarn run lint; yarn run style;"
   },
   "repository": {
@@ -60,6 +60,7 @@
   },
   "private": true,
   "dependencies": {
+    "@types/passport-local": "^1.0.30",
     "babel-cli": "^6.24.0",
     "babel-core": "^6.7.7",
     "babel-loader": "6.2.4",
@@ -133,7 +134,7 @@
     "text": "github:requirejs/text",
     "ts-jest": "^19.0.10",
     "ts-loader": "2.0.3",
-    "typescript": "^2.2.2",
+    "typescript": "^2.3.1",
     "underscore": "^1.8.3",
     "url-loader": "^0.5.6",
     "velocity-animate": "^1.5.0",

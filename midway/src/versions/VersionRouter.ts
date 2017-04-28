@@ -46,21 +46,22 @@ THE SOFTWARE.
 
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
+import { Versions } from './Versions';
 
 const Router = new KoaRouter();
+const versions = new Versions();
 
 Router.get('/', async (ctx, next) =>
 {
   // return all versions
-  ctx.body = '';
-  winston.info('version root');
+  winston.info('get all versions');
+  ctx.body = await versions.get();
 });
 
-Router.post('/', async (ctx, next) =>
+Router.get('/:objtype/:id', async (ctx, next) =>
 {
-  // not allowed
-  ctx.body = '';
-  winston.info('version post');
+  winston.info('get versions by object type and id');
+  ctx.body = await versions.get(ctx.params.objtype, ctx.params.id);
 });
 
 export default Router;

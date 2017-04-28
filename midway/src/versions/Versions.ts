@@ -42,36 +42,60 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const _ = require('underscore');
-import * as Immutable from 'immutable';
-import UserTypes from './../UserTypes';
-import ActionTypes from './UserActionTypes';
-import Store from './UserStore';
+// Copyright 2017 Terrain Data, Inc.
 
-import Ajax from './../../util/Ajax';
+import DB from '../DB';
+import * as Tasty from '../tasty/Tasty';
+import { UserConfig } from '../users/Users';
+import Util from '../Util';
 
-const $ = (type: string, payload: any) => Store.dispatch({type, payload});
+// CREATE TABLE versions (id integer PRIMARY KEY, \
+// objectType text NOT NULL, objectId integer NOT NULL, \
+// object text NOT NULL, createdAt datetime DEFAULT CURRENT_TIMESTAMP, createdByUserId integer NOT NULL);
 
-const Actions =
+export interface VersionConfig
 {
-  change:
-    (user: UserTypes.User) =>
-      $(ActionTypes.change, { user }),
+  createdByUserId: number;
+  id?: number;
+  object: string;
+  objectId: number;
+  objectType: string;
+}
 
-  fetch:
-    () =>
-      $(ActionTypes.fetch, { setUsers: Actions.setUsers }),
+export class Versions
+{
+  private Version = new Tasty.Table('versions', ['id'], ['createdAt', 'createdByUserId', 'object', 'objectId', 'objectType']);
 
-  setUsers:
-    (users: UserTypes.UserMap) =>
-      $(ActionTypes.setUsers, { users }),
+  public async create(user: UserConfig, type: string, id: number, obj: object): Promise<string>
+  {
+    // can only insert
+    const newVersion: VersionConfig =
+      {
+        createdByUserId: user.id,
+        object: obj.toString(),
+        objectId: id,
+        objectType: type,
+      };
+    return DB.getDB().upsert(this.Version, newVersion);
+  }
 
-  updateCurrentUser:
-    () =>
-      $(ActionTypes.updateCurrentUser, {}),
-};
+  public async find(id: number): Promise<VersionConfig[]>
+  {
+    return DB.getDB().select(this.Version, [], { id });
+  }
 
-import AuthStore from './../../auth/data/AuthStore';
-AuthStore.subscribe(Actions.updateCurrentUser);
+  public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
+  {
+    if (objectId !== undefined && objectType !== undefined)
+    {
+      return DB.getDB().select(this.Version, [], { objectType, objectId });
+    }
+    else if (objectId !== undefined)
+    {
+      return DB.getDB().select(this.Version, [], { objectType });
+    }
+    return DB.getDB().select(this.Version, [], {});
+  }
+}
 
-export default Actions;
+export default Versions;

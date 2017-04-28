@@ -51,8 +51,8 @@ import AuthStore from './../../auth/data/AuthStore';
 import Util from './../../util/Util';
 
 import UserTypes from './../UserTypes';
-import UserActions from './UserActions';
 import UserReducers from './UserReducers';
+import ActionTypes from './UserActionTypes';
 
 const UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   UserReducers,
@@ -64,7 +64,10 @@ UserStore.subscribe(() =>
   if (state.getIn(['users', AuthStore.getState().get('username')]) !== state.get('currentUser'))
   {
     // currentUser object changed
-    UserActions.updateCurrentUser();
+    UserStore.dispatch({
+    	type: ActionTypes.updateCurrentUser,
+    	payload: {},
+    });
   }
 });
 

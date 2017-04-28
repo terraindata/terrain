@@ -175,6 +175,8 @@ class TransformCardChart extends PureClasss<Props>
     const valueDiff = this.state.initialValue - newValue;
     pointValues.sort(this.sortNumber);
     const pointIndex = this.props.points.findIndex((scorePoint) => scorePoint.id === pointId);
+    let min: number, max: number;
+    
     const points = this.state.initialPoints.map((scorePoint) => {
       if (scorePoint.id === pointId || this.state.selectedPointIds.get(scorePoint.id))
       {
@@ -184,8 +186,8 @@ class TransformCardChart extends PureClasss<Props>
           const index = pointValues.indexOf(cx);
           if (index < 0)
           {
-            const min = scorePoint.value - valueDiff;
-            const max = scorePoint.value - valueDiff;
+            min = scorePoint.value - valueDiff;
+            max = scorePoint.value - valueDiff;
           }
           else
           {

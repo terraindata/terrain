@@ -64,7 +64,7 @@ import ResultsTable from '../results/ResultsTable';
 import InfiniteScroll from './../../../common/components/InfiniteScroll';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
-import {getPrimaryKeyFor, MAX_RESULTS, ResultsState} from './ResultsManager';
+import {getPrimaryKeyFor, MAX_RESULTS, ResultsState, Result as ResultClass} from './ResultsManager';
 
 const RESULTS_PAGE_SIZE = 20;
 
@@ -135,6 +135,8 @@ class ResultsArea extends PureClasss<Props>
     const {results} = this.props.resultsState;
     const {resultsConfig} = this.props.query;
 
+    let result: ResultClass;
+    
     if (results)
     {
       const result = results.get(expandedResultIndex);

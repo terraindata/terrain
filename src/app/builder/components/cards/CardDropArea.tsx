@@ -91,14 +91,17 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
     }
 
     const isWrapping = cardWillWrap(targetProps, type);
+    let wrappingCardData: any, wrappingKeyPath: KeyPath;
 
     if (isWrapping)
     {
       targetIndex = targetProps.index;
-      const wrappingCardData = Store.getState().getIn(targetProps.keyPath).get(0);
-      const wrappingKeyPath = targetProps.keyPath.push(targetIndex);
+      wrappingCardData = Store.getState().getIn(targetProps.keyPath).get(0);
+      wrappingKeyPath = targetProps.keyPath.push(targetIndex);
       Actions.remove(targetProps.keyPath, targetIndex);
     }
+    
+    let cardProps: any, indexOffset: number;
 
     if (item['new'])
     {
@@ -108,8 +111,8 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
     else
     {
       // dragging an existing card
-      const cardProps = item.props;
-      const indexOffset = 0;
+      cardProps = item.props;
+      indexOffset = 0;
       Actions.nestedMove(cardProps.keyPath, cardProps.index, targetProps.keyPath, targetIndex);
     }
 
@@ -157,7 +160,7 @@ class CardDropArea extends PureClasss<Props>
   state: {
     draggingCardItem: CardItem;
   } = {
-    draggingCardItem: false,
+    draggingCardItem: null,
   };
 
   constructor(props)

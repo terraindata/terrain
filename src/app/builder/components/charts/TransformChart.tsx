@@ -239,7 +239,7 @@ const TransformChart = {
     }
 
     const domainWidth = domain.x[1] - domain.x[0];
-    let stepSize = parseFloat(d3.format('.1g')(Math.log(domainWidth / minBars)));
+    // let stepSize = parseFloat(d3.format('.1g')(Math.log(domainWidth / minBars)));
     const stepSize = domainWidth / 12;
 
     const newBars = oBarsData.reduce((newBars, bar) => {
@@ -922,10 +922,12 @@ const TransformChart = {
       return scales.realX.invert(parseFloat(p.getAttribute('cx')));
     }).sort((a, b) => a - b);
     const index = pointValues.indexOf(scales.realX.invert(cx));
+    let min: number, max: number;
+    
     if (index < 0)
     {
-      const max = 100;
-      const min = 0;
+      max = 100;
+      min = 0;
     }
     else
     {

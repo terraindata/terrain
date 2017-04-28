@@ -73,15 +73,9 @@ export class Menu extends PureClasss<Props>
 {
   state: {
     open: boolean;
+  } = {
+    open: false,
   };
-
-  constructor(props: Props) {
-    super(props);
-    this.state =
-    {
-      open: false,
-    };
-  }
 
   renderOption(option, index)
   {
@@ -90,15 +84,18 @@ export class Menu extends PureClasss<Props>
       return <div className="menu-option menu-option-spacer" key={index} />;
     }
 
+    let onClick: any = _.noop;
+    
     if (!option.disabled)
     {
       // TODO
-      const onClick = (event) => {
+      onClick = (event) => {
         event.preventDefault();
         event.stopPropagation();
         option.onClick(index, this.props.id);
       };
     }
+    
     return (
       <div
         className={'menu-option' + (option.disabled ? ' menu-option-disabled' : '')}
@@ -110,12 +107,16 @@ export class Menu extends PureClasss<Props>
           style={{
             fill: option.iconColor || 'black',
           }}>
-          {option.icon}
+          {
+            option.icon
+          }
         </div>
         <div
           className={option.icon ? 'menu-text-padding' : 'menu-text-padding-no-icon'}
         >
-          { option.text }
+          { 
+            option.text 
+          }
         </div>
       </div>
     );

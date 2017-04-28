@@ -54,54 +54,137 @@ beforeAll(() =>
 
 import App from '../../src/App';
 
+describe('Version route tests', () =>
+{
+  test('Get all versions: GET /midway/v1/versions', () =>
+  {
+    return request(App)
+      .get('/midway/v1/versions')
+      .query({
+        id: 1,
+        accessToken: 'AccessToken',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe('[{"id":1,"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/versions/items/1 request returned an error: ' + error);
+      });
+  });
+});
+
 describe('Item route tests', () =>
 {
-  test('GET /midway/v1/items/', (done) =>
+  test('Get all items: GET /midway/v1/items/', () =>
   {
-    const bodyContent =
-      {
+    return request(App)
+      .get('/midway/v1/items/')
+      .query({
         id: 1,
         accessToken: 'AccessToken',
-      };
-    request(App)
-      .get('/midway/v1/items/')
-      .query(bodyContent)
+      })
+      .expect(200)
       .then((response) =>
       {
-        // TODO @david check against expected value for schema, not just non-emptiness
-        if (response.text !== '')
-        {
-          expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
-        } else
-        {
-          fail('GET /midway/v1/items/ request returned empty response body');
-        }
+        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/items/ request returned an error: ' + error);
       });
-    done();
   });
 
-  test('GET /midway/v1/items/:id', (done) =>
+  test('Create item: POST /midway/v1/items/', () =>
   {
-    const bodyContent =
-      {
+    return request(App)
+      .post('/midway/v1/items/')
+      .send({
         id: 1,
         accessToken: 'AccessToken',
-      };
-    request(App)
-      .get('/midway/v1/items/1')
-      .query(bodyContent)
+        body: {
+          name: 'Test Item',
+          parentItemId: 0,
+        },
+      })
+      .expect(200)
       .then((response) =>
       {
-        // TODO @david check against expected value for schema, not just non-emptiness
-        if (response.text !== '')
-        {
-          expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
-        } else
-        {
-          fail('GET /midway/v1/items/ request returned empty response body');
-        }
+        expect(response.text).toBe('Success');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
       });
-    done();
+  });
+
+  test('Get item: GET /midway/v1/items/:id', () =>
+  {
+    return request(App)
+      .get('/midway/v1/items/1')
+      .query({
+        id: 1,
+        accessToken: 'AccessToken',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/items/ request returned an error: ' + error);
+      });
+  });
+
+  test('Update item: POST /midway/v1/items/', () =>
+  {
+    return request(App)
+      .post('/midway/v1/items/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          id: 2,
+          name: 'Updated Item',
+          parentItemId: 1,
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe('Success');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
+      });
+  });
+
+  test('Invalid update: POST /midway/v1/items/', (done) =>
+  {
+    return request(App)
+      .post('/midway/v1/items/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          id: 314159265359,
+          name: 'Test Item',
+          parentItemId: 1,
+        },
+      })
+      .expect(500)
+      .then((response) =>
+      {
+        done();
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
+      });
   });
 });
 
@@ -111,6 +194,7 @@ describe('Schema route tests', () =>
   {
     request(App)
       .get('/midway/v1/schema')
+      .expect(200)
       .then((response) =>
       {
         // TODO @david check against expected value for schema, not just non-emptiness
