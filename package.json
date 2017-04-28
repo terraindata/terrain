@@ -134,7 +134,7 @@
     "text": "github:requirejs/text",
     "ts-jest": "^19.0.10",
     "ts-loader": "2.0.3",
-    "typescript": "^2.2.2",
+    "typescript": "^2.3.1",
     "underscore": "^1.8.3",
     "url-loader": "^0.5.6",
     "velocity-animate": "^1.5.0",
