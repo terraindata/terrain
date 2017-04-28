@@ -59,7 +59,67 @@ export interface QueryResponse
   errorMessage?: string;
 }
 
-export const Ajax = {
+export const Ajax = 
+{
+  _reqMidway2(
+    method: "post" | "get",
+    url: string,
+    data: string,
+    onLoad: (response: any) => void,
+    config: {
+      onError?: (response: any) => void,
+      // crossDomain?: boolean;
+      noToken?: boolean;
+      download?: boolean;
+      downloadFilename?: string;
+    } = {}
+  )
+  {
+    return Ajax._req(
+      method,
+      "/midway/v1/" + url,
+      data,
+      onLoad,
+      _.extend({
+        host: 'http://localhost:3000',
+      }, config)
+    );
+  },
+  
+  midwayStatus(
+    success: () => void,
+    failure: () => void
+  )
+  {
+    return Ajax._reqMidway2(
+      "get",
+      "status",
+      '',
+      (respStr: string) =>
+      {
+        try 
+        {
+          const resp = JSON.parse(respStr);
+          if(resp && resp.status === 'ok')
+          {
+            success();
+          }
+          else
+          {
+            failure();
+          }
+        }
+        catch(e)
+        {
+          failure();
+        }
+      },
+      {
+        onError: failure,
+      }
+    );
+  },
+  
   _req(
     method: string,
     url: string,
@@ -72,7 +132,7 @@ export const Ajax = {
       noToken?: boolean;
       download?: boolean;
       downloadFilename?: string;
-    } = {},
+    } = {}
   )
   {
     const host = config.host || MIDWAY_HOST;
@@ -154,7 +214,7 @@ export const Ajax = {
     return Ajax._req('GET', url, data, onLoad, {onError});
   },
 
-  _r(
+  _postMidway1(
     url: string,
     reqFields: {[f: string]: any},
     onLoad: (resp: string) => void,
@@ -449,7 +509,7 @@ export const Ajax = {
       dest = '/sql_query';
     }
 
-    return Ajax._r(dest, {
+    return Ajax._postMidway1(dest, {
         query_string: encode_utf8(tql),
         db,
         format: options.csv ? 'csv' : undefined,
@@ -480,7 +540,7 @@ export const Ajax = {
 
   parseTree(tql: string, db: string, onLoad: (response: QueryResponse) => void, onError?: (ev: Event) => void)
   {
-    return Ajax._r('/get_tql_tree', {
+    return Ajax._postMidway1('/get_tql_tree', {
         query_string: encode_utf8(tql),
         db,
       },
@@ -511,7 +571,7 @@ export const Ajax = {
 
   schema(db: string, onLoad: (columns: any[], error?: any) => void, onError?: (ev: Event) => void)
   {
-    return Ajax._r('/get_schema', {
+    return Ajax._postMidway1('/get_schema', {
         db,
       },
       (resp: string) =>
@@ -561,7 +621,7 @@ export const Ajax = {
 
   getDbs(onLoad: (dbs: string[]) => void, onError?: (ev: Event) => void)
   {
-    Ajax._r('/get_databases', {
+    Ajax._postMidway1('/get_databases', {
       db: 'information_schema',
     }, (resp) =>
     {
@@ -579,7 +639,7 @@ export const Ajax = {
 
   killQuery(id: string)
   {
-    return Ajax._r('/kill_query_by_id', {
+    return Ajax._postMidway1('/kill_query_by_id', {
         query_id: id,
       },
 
