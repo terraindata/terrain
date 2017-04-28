@@ -71,6 +71,9 @@ General coding standards for Javascript are located in the TechDocs repo, not in
   * Install Node `brew install node`
   * Install yarn. `brew install yarn`
   * Install parallel for back-end tests. `brew install parallel`
+  * `brew install mysql`
+  * [Download and install](https://docs.docker.com/docker-for-mac/install/) docker for Mac
+  * `docker login` (ask for access on dockerhub)
 * For Linux:
   * Install nodejs, yarn, and n `curl -L https://git.io/n-install | bash`
   * Reinit your bash environment `source ~/.bashrc`

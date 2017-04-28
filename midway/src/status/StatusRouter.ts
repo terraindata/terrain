@@ -46,45 +46,16 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import AuthRouter from './auth/AuthRouter';
-import ItemRouter from './items/ItemRouter';
-import SchemaRouter from './schema/SchemaRouter';
-import StatusRouter from './status/StatusRouter';
-import UserRouter from './users/UserRouter';
-import VersionRouter from './versions/VersionRouter';
+import * as winston from 'winston';
 
-const AppRouter = new KoaRouter();
+const Router = new KoaRouter();
 
-AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
-AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
-AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
-AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
-AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
-AppRouter.use('/status', StatusRouter.routes(), StatusRouter.allowedMethods());
-// Add future routes here.
-
-// Prefix all routes with /midway
-//  This is so that we can allow the front-end to use all other routes.
-//  Any route not prefixed with /midway will just serve the front-end.
-
-AppRouter.get('/', async (ctx, next) =>
+Router.get('/', async (ctx, next) =>
 {
-  if (ctx.state.user)
-  {
-    ctx.body = 'authenticated as ' + ctx.state.user.username;
-  }
-  else
-  {
-    ctx.body = 'not authenticated';
-  }
+  ctx.body = JSON.stringify({
+    status: 'ok',
+  });
+  winston.info('status root');
 });
 
-AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  ctx.body = 'authenticated as ' + ctx.state.user.username;
-});
-
-const MidwayRouter = new KoaRouter();
-MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
-
-export default MidwayRouter;
+export default Router;
