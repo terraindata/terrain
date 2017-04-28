@@ -154,14 +154,36 @@ describe('Item route tests', () =>
           parentItemId: 1,
         },
       })
-      .expect(200)
+      .expect(500)
       .then((response) =>
       {
-        fail('POST /midway/v1/items/ request returned success!');
+        done();
       })
       .catch((error) =>
       {
-        done();
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
+      });
+  });
+});
+
+describe('Version route tests', () =>
+{
+  test('Get all versions: GET /midway/v1/versions/', () =>
+  {
+    return request(App)
+      .get('/midway/v1/versions/')
+      .query({
+        id: 1,
+        accessToken: 'AccessToken',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toEqual('[{"id":1,"createdAt":"2017-04-25 17:00:00","createdByUserId":1,"object":"Item row here","objectId":1,"objectType":"Items"}]');
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/versions/ request returned an error: ' + error);
       });
   });
 });
