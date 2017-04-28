@@ -44,34 +44,55 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as request from 'request';
-import * as _ from 'underscore';
-import * as Tasty from './tasty/Tasty';
+import * as passport from 'koa-passport';
+import passportLocal = require('passport-local');
 
-const config: Tasty.SQLiteConfig =
+import Middleware from '../Middleware';
+import { Users } from '../users/Users';
+
+// authenticate with id and accessToken
+Middleware.passport.use('access-token-local', new passportLocal.Strategy(
   {
-    filename: 'nodeway.db',
-  };
-
-export const Util =
+    passReqToCallback: true,
+    passwordField: 'accessToken',
+    usernameField: 'id',
+  },
+  async (req: any, id: string, accessToken: string, done) =>
   {
-    getRequest: (url) =>
-    {
-      return new Promise((resolve, reject) =>
-      {
-        request(url, (error, res, body) =>
-        {
-          if (!error && res.statusCode === 200)
-          {
-            resolve(body);
-          }
-          else
-          {
-            reject(error);
-          }
-        });
-      });
-    },
-  };
+    const user = await Users.loginWithAccessToken(Number(id), accessToken);
+    done(null, user);
+  }));
 
-export default Util;
+// authenticate with email and password
+Middleware.passport.use('local', new passportLocal.Strategy(
+  {
+    passReqToCallback: true,
+    usernameField: 'email',
+  },
+  async (req: any, email: string, password: string, done) =>
+  {
+    const user = await Users.loginWithEmail(email, password);
+    done(null, user);
+  }));
+
+Middleware.passport.serializeUser((user, done) =>
+{
+  if (user)
+  {
+    done(null, user.id);
+  }
+});
+
+Middleware.passport.deserializeUser(async (id, done) =>
+{
+  try
+  {
+    const user = await Users.find(id);
+    done(null, user);
+  }
+  catch (e)
+  {
+    done(e, null);
+  }
+
+});
