@@ -97,7 +97,7 @@ const menuIcons = [
     {icon: <ManualIcon />, color: '#a98abf'},
 ]; // TODO add schema icon above
 
-// interface Props
+// client Props
 // {
 //   title: string;
 //   children?: any;

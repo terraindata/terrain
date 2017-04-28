@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as mysql from 'mysql';
 import * as winston from 'winston';
-import ElasticExecutor from '../../src/tasty/ElasticExecutor';
-import ElasticConfig from '../../src/tasty/ElasticExecutor';
-import MySQLExecutor from '../../src/tasty/MySQLExecutor';
+import ElasticExecutor from '../../src/database/elastic/tasty/ElasticExecutor';
+import ElasticConfig from '../../src/database/elastic/tasty/ElasticExecutor';
+import MySQLExecutor from '../../src/database/mysql/tasty/MySQLExecutor';
 import { Backend, Table, Tasty } from '../../src/tasty/Tasty';
 import { TastyQuery } from '../../src/tasty/TastyQuery';
 

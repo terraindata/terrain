@@ -44,25 +44,87 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
+import MySQLController from '../../../../src/database/mysql/MySQLController';
+import MySQLExecutor from '../../../../src/database/mysql/tasty/MySQLExecutor';
 
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
+import * as Tasty from '../../../../src/tasty/Tasty';
+import SQLQueries from '../../../tasty/SQLQueries';
+import * as Utils from '../../../Utils';
 
-const Executor = new ElasticExecutor();
-
-const Router = new KoaRouter();
-
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
+function getExpectedFile(): string
 {
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
+  return __filename.split('.')[0] + '.expected';
+}
+
+let tasty: Tasty.Tasty;
+let mysqlController: MySQLController;
+
+beforeAll(async () =>
+{
+  const config: Tasty.MySQLConfig =
+    {
+      connectionLimit: 20,
+      database: 'moviesdb',
+      host: 'localhost',
+      password: 'r3curs1v3$',
+      user: 't3rr41n-demo',
+      dateStrings: true,
+    };
+
+  try
+  {
+    mysqlController = new MySQLController(config);
+    tasty = mysqlController.getTasty();
+  } catch (e)
+  {
+    fail(e);
+  }
 });
 
-export default Router;
+function runTest(index: number)
+{
+  const testName: string = 'MySQL: execute ' + SQLQueries[index][0];
+  test(testName, async (done) =>
+  {
+    try
+    {
+      const results = await tasty.execute(SQLQueries[index][1]);
+      await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
+    } catch (e)
+    {
+      fail(e);
+    }
+    done();
+  });
+}
+
+for (let i = 0; i < SQLQueries.length; i++)
+{
+  runTest(i);
+}
+
+test('MySQL: schema', async (done) =>
+{
+  try
+  {
+    const result = await tasty.schema();
+    await Utils.checkResults(getExpectedFile(), 'MySQL: schema', result);
+  } catch (e)
+  {
+    // fail(e);
+  }
+  done();
+});
+
+afterAll(async () =>
+{
+  try
+  {
+    await tasty.destroy();
+  } catch (e)
+  {
+    fail(e);
+  }
+});

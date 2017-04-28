@@ -48,6 +48,7 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import Databases from '../databaseRegistry/Databases';
 import Util from '../Util';
 
 const QueryRouter = new KoaRouter();
@@ -60,6 +61,12 @@ QueryRouter.post(
     const request = ctx.request.body.body;
 
     Util.verifyThatParametersExist(request, ['database', 'type', 'query']);
+
+    const database = Databases.get(request.database);
+    if (database === undefined)
+    {
+      throw Error('Database "' + request.database + '" not found.');
+    }
 
   });
 

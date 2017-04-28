@@ -44,25 +44,43 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import * as sqlite3 from 'sqlite3';
+import SQLiteConfig from '../SQLiteConfig';
+import SQLiteController from '../SQLiteController';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
-
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
-
-const Executor = new ElasticExecutor();
-
-const Router = new KoaRouter();
-
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
+/**
+ * An client which acts as a selective isomorphic wrapper around
+ * the sqlite3 API
+ */
+class SQLiteClient
 {
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
-});
+  private controller: SQLiteController;
+  private config: SQLiteConfig;
+  private delegate: sqlite3.Database;
 
-export default Router;
+  constructor(controller: SQLiteController, config: SQLiteConfig)
+  {
+    this.controller = controller;
+    this.config = config;
+    this.delegate = new sqlite3.Database(config.filename);
+  }
+
+  public getFilename(): string
+  {
+    return this.config.filename;
+  }
+
+  public all(sql: string, callback?: (err: Error, rows: any[]) => void): sqlite3.Database
+  {
+    this.controller.log('all', sql);
+    return this.delegate.all(sql, callback);
+  }
+
+  public close(callback?: (err: Error) => void): void
+  {
+    this.controller.log('close');
+    return this.delegate.close(callback);
+  }
+}
+
+export default SQLiteClient;

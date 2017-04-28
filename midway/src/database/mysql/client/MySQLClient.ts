@@ -44,25 +44,54 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import * as mysql from 'mysql';
+import MySQLController from '../MySQLController';
+import MySQLConfig from './MySQLConfig';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
-
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
-
-const Executor = new ElasticExecutor();
-
-const Router = new KoaRouter();
-
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
+/**
+ * An client which acts as a selective isomorphic wrapper around
+ * the mysql js API
+ */
+class MySQLClient
 {
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
-});
+  private controller: MySQLController;
+  private config: MySQLConfig;
+  private delegate: mysql.IPool;
 
-export default Router;
+  constructor(controller: MySQLController, config: MySQLConfig)
+  {
+    this.controller = controller;
+    this.config = config;
+    this.delegate = mysql.createPool(config);
+
+    this.delegate.on('acquire', (connection) =>
+    {
+      this.controller.log('MySQLClient', 'Connection %d acquired ' + connection.threadId);
+    });
+
+    this.delegate.on('release', (connection) =>
+    {
+      this.controller.log('MySQLClient', 'Connection %d released ' + connection.threadId);
+    });
+  }
+
+  public query(queryString: string, callback: any): mysql.IQuery
+  {
+    this.controller.log('MySQLClient.query', queryString);
+    return this.delegate.query(queryString, callback);
+  }
+
+  public end(callback: (err: mysql.IError, ...args: any[]) => void): void
+  {
+    this.controller.log('MySQLClient.end');
+    return this.delegate.end(callback);
+  }
+
+  public getConnection(callback: (err: mysql.IError, connection: mysql.IConnection) => void): void
+  {
+    this.controller.log('MySQLClient.getConnection');
+    return this.delegate.getConnection(callback);
+  }
+}
+
+export default MySQLClient;
