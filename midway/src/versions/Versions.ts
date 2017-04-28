@@ -55,7 +55,7 @@ import Util from '../Util';
 
 export interface VersionConfig
 {
-  createdAt: string;
+  createdAt: Date;
   createdByUserId: number;
   id?: number;
   object: string;
@@ -72,15 +72,14 @@ export class Versions
     return new Promise<string>(async (resolve, reject) =>
     {
       // can only insert
-      const currTime = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
       const newVersionObj: VersionConfig =
-      {
-        createdAt: currTime,
-        createdByUserId: user.state.id,
-        object: oldTastyObj.toString(),
-        objectId: oldTastyObj.id,
-        objectType: oldTastyType,
-      };
+        {
+          createdAt: new Date(),
+          createdByUserId: user.state.id,
+          object: oldTastyObj.toString(),
+          objectId: oldTastyObj.id,
+          objectType: oldTastyType,
+        };
       const results = await DB.getDB().upsert(this.Version, oldTastyObj);
       if (results instanceof Array)
       {

@@ -80,6 +80,7 @@ export class Items
       if (id === undefined)
       {
         reject('id must be present');
+        return;
       }
       const items = await this.get(id);
       if (items.length > 0)
@@ -115,32 +116,36 @@ export class Items
       if (item === undefined || (item && (item.parentItemId === undefined || item.name === undefined)))
       {
         reject('Insufficient parameters passed');
+        return;
       }
 
       let status: string = item.status || '';
+      let oldItem;
 
       // item id specified but item not found
       if (item.id !== undefined)
       {
-        const items = await this.get(item.id);
+        const items: ItemConfig[] = await this.get(item.id);
         if (items.length === 0)
         {
           reject('Invalid item id passed');
+          return;
         }
 
         status = items[0].status || status;
+        oldItem = items[0];
       }
 
       // check privileges
       if (!user.isSuperUser && (status === 'LIVE' || status === 'DEFAULT'))
       {
         reject('Unauthorized');
+        return;
       }
 
-      // update versions table if changing an item
       if (item.id !== undefined)
       {
-        await versions.create(user, 'items', item);
+        await versions.create(user, 'items', oldItem);
       }
 
       try
