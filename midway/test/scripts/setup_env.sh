@@ -93,6 +93,6 @@ docker run -d -p $elastic_port:$elastic_port $elastic_image
 echo "Waiting on services to be ready..."
 
 while ! mysqladmin ping -h127.0.0.1 -uroot --port=$mysql_port --silent; do sleep 0.1; done
-while [ $(curl -v --silent "http://127.0.0.1:$elastic_port"/_cluster/health 2>&1 | grep "\"status\":\"green\"" | wc -l) != 0 ]; do sleep 0.1; done
+while [ $(curl -v --silent "http://127.0.0.1:$elastic_port"/_cluster/health 2>&1 | grep "\"status\":\"green\"" | wc -l) == 0 ]; do sleep 0.1; done
 # assume sqlite is up and running by this point...
 
