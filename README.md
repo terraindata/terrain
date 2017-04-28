@@ -70,6 +70,7 @@ General coding standards for Javascript are located in the TechDocs repo, not in
   * Install Homebrew `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
   * Install Node `brew install node`
   * Install yarn. `brew install yarn`
+  * Install parallel for back-end tests. `brew install parallel`
 * For Linux:
   * Install nodejs, yarn, and n `curl -L https://git.io/n-install | bash`
   * Reinit your bash environment `source ~/.bashrc`
