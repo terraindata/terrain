@@ -311,7 +311,7 @@ export module BuilderTypes
 
   type TQLFn = string | ((block: IBlock) => string);
 
-  // Every Card definition must follow this client
+  // Every Card definition must follow this interface
   interface ICardConfig
   {
     [field: string]: any;

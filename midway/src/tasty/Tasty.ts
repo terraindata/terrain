@@ -66,7 +66,7 @@ export const Table = TastyTable;
 export type Table = TastyTable;
 
 /**
- * The core Tasty executor client.
+ * The core Tasty executor interface.
  *
  * @export
  * @class Tasty

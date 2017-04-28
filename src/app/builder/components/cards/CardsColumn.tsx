@@ -276,7 +276,7 @@ class CardsColumn extends PureClasss<Props>
 // wasn't able to get this to work but will leave it around in case some
 //  bright eyed dev comes along and find the solution
 
-// client InnerProps
+// interface InnerProps
 // {
 //   onChange: () => void;
 
