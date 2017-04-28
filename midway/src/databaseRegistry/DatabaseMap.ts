@@ -44,25 +44,34 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import DatabaseController from '../database/DatabaseController';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
-
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
-
-const Executor = new ElasticExecutor();
-
-const Router = new KoaRouter();
-
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
+/**
+ * This is where we store connections to databaseRegistry being managed.
+ */
+class DatabaseMap
 {
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
-});
+  private map: Map<number, DatabaseController>;
 
-export default Router;
+  public get(id: number): DatabaseController | undefined
+  {
+    return this.map.get(id);
+  }
+
+  public set(id: number, database: DatabaseController)
+  {
+    this.map.set(id, database);
+  }
+
+  public remove(id: number): boolean
+  {
+    return this.map.delete(id);
+  }
+
+  public getAll(): Iterator<[string, DatabaseController]>
+  {
+    return this.map.entries();
+  }
+}
+
+export default DatabaseMap;

@@ -44,25 +44,43 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
+import * as Tasty from '../tasty/Tasty';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
-
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
-
-const Executor = new ElasticExecutor();
-
-const Router = new KoaRouter();
-
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
+/**
+ * An client which acts as a selective isomorphic wrapper around
+ * the sqlite3 API
+ */
+abstract class DatabaseController
 {
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
-});
+  private id: number; // unique id
+  private lsn: number; // log sequence number
+  private type: string; // connection type
+  private name: string; // connection name
+  private header: string; // log entry header
 
-export default Router;
+  constructor(type: string, id: number, name: string)
+  {
+    this.id = id;
+    this.lsn = -1;
+    this.type = type;
+    this.name = name;
+    this.header = 'DB:' + this.id + ':' + this.name + ':' + this.type + ':';
+  }
+
+  public log(methodName: string, info?: any)
+  {
+    const header = this.header + (++this.lsn).toString() + ':' + methodName;
+    winston.info(header);
+    if (info !== 'undefined')
+    {
+      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
+    }
+  }
+
+  public abstract getClient(): object;
+
+  public abstract getTasty(): Tasty.Tasty;
+}
+
+export default DatabaseController;

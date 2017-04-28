@@ -44,25 +44,41 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import * as Tasty from '../../tasty/Tasty';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
+import DatabaseController from '../DatabaseController';
+import SQLiteGenerator from '../sqlite/tasty/SQLiteGenerator';
+import MySQLClient from './client/MySQLClient';
+import MySQLConfig from './MySQLConfig';
+import MySQLExecutor from './tasty/MySQLExecutor';
 
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
-
-const Executor = new ElasticExecutor();
-
-const Router = new KoaRouter();
-
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
+/**
+ * The central controller for communicating with MySQL.
+ */
+class MySQLController extends DatabaseController
 {
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
-});
+  private client: MySQLClient;
+  private tasty: Tasty.Tasty;
 
-export default Router;
+  constructor(config?: MySQLConfig, id?: number, name?: string)
+  {
+    super('MySQLController', id, name);
+    this.client = new MySQLClient(this, config);
+    this.tasty = new Tasty.Tasty(
+      this,
+      new MySQLExecutor(this.client),
+      new SQLiteGenerator()); // currently shares SQLite's generator
+  }
+
+  public getClient(): MySQLClient
+  {
+    return this.client;
+  }
+
+  public getTasty(): Tasty.Tasty
+  {
+    return this.tasty;
+  }
+}
+
+export default MySQLController;

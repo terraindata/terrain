@@ -44,25 +44,39 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import * as Elastic from 'elasticsearch';
+import ElasticController from '../ElasticController';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
-
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
-
-const Executor = new ElasticExecutor();
-
-const Router = new KoaRouter();
-
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
+/**
+ * An client which acts as a selective isomorphic wrapper around
+ * the elastic.js cluster API.
+ */
+class ElasticCluster
 {
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
-});
+  private controller: ElasticController;
+  private delegate: Elastic.Client;
 
-export default Router;
+  constructor(controller: ElasticController, delegate: Elastic.Client)
+  {
+    this.controller = controller;
+    this.delegate = delegate;
+  }
+
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-cat-health
+   * @param params
+   * @param callback
+   */
+  public health(params: Elastic.ClusterHealthParams, callback: (error: any, response: any) => void): void
+  {
+    this.log('health', params);
+    return this.delegate.cluster.health(params, callback);
+  }
+
+  private log(methodName: string, info: any)
+  {
+    this.controller.log('ElasticCluster.' + methodName, info);
+  }
+}
+
+export default ElasticCluster;

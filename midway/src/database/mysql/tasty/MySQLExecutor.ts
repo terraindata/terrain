@@ -44,25 +44,52 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import * as mysql from 'mysql';
+import TastyExecutor from '../../../tasty/TastyExecutor';
+import TastySchema from '../../../tasty/TastySchema';
+import { makePromiseCallback } from '../../../tasty/Utils';
+import MySQLClient from '../client/MySQLClient';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
-
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
-
-const Executor = new ElasticExecutor();
-
-const Router = new KoaRouter();
-
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
+export class MySQLExecutor implements TastyExecutor
 {
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
-});
+  private client: MySQLClient;
 
-export default Router;
+  constructor(client: MySQLClient)
+  {
+    this.client = client;
+  }
+
+  public async schema(): Promise<TastySchema>
+  {
+    const result = await this.query('SELECT table_schema, table_name, column_name, data_type ' +
+      'FROM information_schema.columns ' +
+      'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'mysql\', \'sys\');');
+    return TastySchema.fromMySQLResultSet(result);
+  }
+
+  public async query(queryStr: string): Promise<object[]>
+  {
+    return new Promise<object[]>((resolve, reject) =>
+    {
+      this.client.query(queryStr, makePromiseCallback(resolve, reject));
+    });
+  }
+
+  public async destroy(): Promise<void>
+  {
+    return new Promise<void>((resolve, reject) =>
+    {
+      this.client.end(makePromiseCallback(resolve, reject));
+    });
+  }
+
+  private async getConnection(): Promise<mysql.IConnection>
+  {
+    return new Promise<mysql.IConnection>((resolve, reject) =>
+    {
+      this.client.getConnection(makePromiseCallback(resolve, reject));
+    });
+  }
+}
+
+export default MySQLExecutor;

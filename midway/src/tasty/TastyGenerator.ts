@@ -44,25 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import TastyQuery from './TastyQuery';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
-
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
-
-const Executor = new ElasticExecutor();
-
-const Router = new KoaRouter();
-
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
+/**
+ * Abstract generator class for making queries from TastyQuery objects.
+ */
+export abstract class TastyGenerator
 {
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
-});
+  /**
+   * makes a database specific query from a TastyQuery
+   */
+  public abstract generate(query: TastyQuery): any;
 
-export default Router;
+  /**
+   * makes the generated query into a string
+   */
+  public abstract generateString(query: TastyQuery): string;
+}
+
+export default TastyGenerator;
