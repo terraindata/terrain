@@ -75,7 +75,7 @@ beforeAll(async () =>
 
   try
   {
-    sqliteController = new SQLiteController(config);
+    sqliteController = new SQLiteController(config, 0, 'SQLiteGeneratorTests');
     sqliteGenerator = sqliteController.getTasty().getGenerator();
   } catch (e)
   {

@@ -44,32 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import DatabaseMap from './DatabaseMap';
+
 /**
- * This is where we store connections to databaseRegistry being managed.
+ * The global database map of all databaseRegistry being managed.
  */
-class DatabaseRegistry
-{
-  private map: Map<string, object>;
-
-  public get(name: string): object | undefined
-  {
-    return this.map.get(name);
-  }
-
-  public set(name: string, database: object)
-  {
-    this.map.set(name, database);
-  }
-
-  public remove(name: string): boolean
-  {
-    return this.map.delete(name);
-  }
-
-  public getAll(): Iterator<[string, object]>
-  {
-    return this.map.entries();
-  }
-}
+const DatabaseRegistry = new DatabaseMap();
 
 export default DatabaseRegistry;

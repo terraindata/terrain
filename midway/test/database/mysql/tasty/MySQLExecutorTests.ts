@@ -75,7 +75,7 @@ beforeAll(async () =>
 
   try
   {
-    mysqlController = new MySQLController(config);
+    mysqlController = new MySQLController(config, 0, 'MySQLExecutorTests');
     tasty = mysqlController.getTasty();
   } catch (e)
   {

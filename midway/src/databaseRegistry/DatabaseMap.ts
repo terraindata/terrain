@@ -44,11 +44,34 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DatabaseRegistry from './DatabaseRegistry';
+import DatabaseController from '../database/DatabaseController';
 
 /**
- * The global database map of all databaseRegistry being managed.
+ * This is where we store connections to databaseRegistry being managed.
  */
-const Databases = new DatabaseRegistry();
+class DatabaseMap
+{
+  private map: Map<number, DatabaseController>;
 
-export default Databases;
+  public get(id: number): DatabaseController | undefined
+  {
+    return this.map.get(id);
+  }
+
+  public set(id: number, database: DatabaseController)
+  {
+    this.map.set(id, database);
+  }
+
+  public remove(id: number): boolean
+  {
+    return this.map.delete(id);
+  }
+
+  public getAll(): Iterator<[string, DatabaseController]>
+  {
+    return this.map.entries();
+  }
+}
+
+export default DatabaseMap;
