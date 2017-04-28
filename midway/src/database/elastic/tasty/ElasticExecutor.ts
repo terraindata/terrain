@@ -50,7 +50,7 @@ import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticClient from '../client/ElasticClient';
-import { ElasticTastyQuery } from './ElasticGenerator';
+import ElasticQuery from './ElasticQuery';
 
 export class ElasticExecutor implements TastyExecutor
 {
@@ -200,7 +200,7 @@ export class ElasticExecutor implements TastyExecutor
     await Promise.all(promises);
   }
 
-  public async executeElasticTastyQuery(query: ElasticTastyQuery)
+  public async executeElasticTastyQuery(query: ElasticQuery)
   {
     switch (query.op)
     {
@@ -212,7 +212,7 @@ export class ElasticExecutor implements TastyExecutor
 
   }
 
-  private async executeElasticTastySelectQuery(query: ElasticTastyQuery)
+  private async executeElasticTastySelectQuery(query: ElasticQuery)
   {
     return await this.query(query.param as Elastic.SearchParams);
   }

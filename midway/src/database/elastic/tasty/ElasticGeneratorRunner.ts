@@ -48,7 +48,7 @@ import * as Elastic from 'elasticsearch';
 import TastyNode from '../../../tasty/TastyNode';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
-import ElasticTastyQuery from './ElasticTastyQuery';
+import ElasticQuery from './ElasticQuery';
 
 /**
  * Generates elastic queries from TastyQuery objects.
@@ -56,11 +56,11 @@ import ElasticTastyQuery from './ElasticTastyQuery';
  */
 export default class ElasticGeneratorRunner
 {
-  public esQuery: ElasticTastyQuery;
+  public esQuery: ElasticQuery;
 
   constructor(query: TastyQuery)
   {
-    this.esQuery = {} as ElasticTastyQuery;
+    this.esQuery = {} as ElasticQuery;
     const esQuery = this.esQuery;
 
     esQuery.index = query.table.getDatabaseName();

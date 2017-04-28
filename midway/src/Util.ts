@@ -72,7 +72,7 @@ export const Util =
         });
       });
     },
-    verifyThatParametersExist: (parameters: any, required: string[]): void =>
+    verifyParameters: (parameters: any, required: string[]): void =>
     {
       if (!parameters)
       {

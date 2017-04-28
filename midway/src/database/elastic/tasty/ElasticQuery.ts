@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export interface ElasticTastyQuery
+export interface ElasticQuery
 {
   index: string;
   table: string;
@@ -52,4 +52,4 @@ export interface ElasticTastyQuery
   param: object;
 }
 
-export default ElasticTastyQuery;
+export default ElasticQuery;

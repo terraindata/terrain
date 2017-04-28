@@ -61,7 +61,7 @@ QueryRouter.post(
     winston.info('query post');
     const request = ctx.request.body.body;
 
-    Util.verifyThatParametersExist(request, ['database', 'type', 'query']);
+    Util.verifyParameters(request, ['database', 'type', 'query']);
 
     const database: DatabaseController = DatabaseRegistry.get(request.database);
     if (database === undefined)
