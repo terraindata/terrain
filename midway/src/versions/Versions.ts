@@ -45,17 +45,16 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import DB from '../DB';
-import SQLiteExecutor from '../tasty/SQLiteExecutor';
 import * as Tasty from '../tasty/Tasty';
+import { UserConfig } from '../users/Users';
 import Util from '../Util';
 
 // CREATE TABLE versions (id integer PRIMARY KEY, \
 // objectType text NOT NULL, objectId integer NOT NULL, \
-// object text NOT NULL, createdAt datetime NOT NULL, createdByUserId integer NOT NULL);
+// object text NOT NULL, createdAt datetime DEFAULT CURRENT_TIMESTAMP, createdByUserId integer NOT NULL);
 
 export interface VersionConfig
 {
-  createdAt: Date;
   createdByUserId: number;
   id?: number;
   object: string;
@@ -67,29 +66,17 @@ export class Versions
 {
   private Version = new Tasty.Table('versions', ['id'], ['createdAt', 'createdByUserId', 'object', 'objectId', 'objectType']);
 
-  public async create(user, oldTastyType: string, oldTastyObj): Promise<string>
+  public async create(user: UserConfig, type: string, id: number, obj: object): Promise<string>
   {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      // can only insert
-      const newVersionObj: VersionConfig =
-        {
-          createdAt: new Date(),
-          createdByUserId: user.state.id,
-          object: oldTastyObj.toString(),
-          objectId: oldTastyObj.id,
-          objectType: oldTastyType,
-        };
-      const results = await DB.getDB().upsert(this.Version, oldTastyObj);
-      if (results instanceof Array)
+    // can only insert
+    const newVersion: VersionConfig =
       {
-        resolve('Success');
-      }
-      else
-      {
-        reject(results);
-      }
-    });
+        createdByUserId: user.id,
+        object: obj.toString(),
+        objectId: id,
+        objectType: type,
+      };
+    return DB.getDB().upsert(this.Version, newVersion);
   }
 
   public async find(id: number): Promise<VersionConfig[]>

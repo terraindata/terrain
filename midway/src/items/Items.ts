@@ -75,24 +75,7 @@ export class Items
 
   public async delete(id: number): Promise<string>
   {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      if (id === undefined)
-      {
-        reject('id must be present');
-        return;
-      }
-      const items = await this.get(id);
-      if (items.length > 0)
-      {
-        await DB.getDB().delete(items);
-        resolve('Success');
-      }
-      else
-      {
-        reject('item with that id not found');
-      }
-    });
+    return DB.getDB().delete(this.itemTable, { id });
   }
 
   public async get(id?: number): Promise<ItemConfig[]>
@@ -115,8 +98,7 @@ export class Items
       // check if all the required parameters are passed
       if (item === undefined || (item && (item.parentItemId === undefined || item.name === undefined)))
       {
-        reject('Insufficient parameters passed');
-        return;
+        return reject('Insufficient parameters passed');
       }
 
       let status: string = item.status || '';
@@ -128,8 +110,7 @@ export class Items
         const items: ItemConfig[] = await this.get(item.id);
         if (items.length === 0)
         {
-          reject('Invalid item id passed');
-          return;
+          return reject('Invalid item id passed');
         }
 
         status = items[0].status || status;
@@ -139,17 +120,16 @@ export class Items
       // check privileges
       if (!user.isSuperUser && (status === 'LIVE' || status === 'DEFAULT'))
       {
-        reject('Unauthorized');
-        return;
-      }
-
-      if (item.id !== undefined)
-      {
-        await versions.create(user, 'items', oldItem);
+        return reject('Unauthorized');
       }
 
       try
       {
+        if (item.id !== undefined)
+        {
+          await versions.create(user, 'items', oldItem.id, oldItem);
+        }
+
         await DB.getDB().upsert(this.itemTable, item);
         resolve('Success');
       }
