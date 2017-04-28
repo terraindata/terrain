@@ -54,6 +54,28 @@ beforeAll(() =>
 
 import App from '../../src/App';
 
+describe('Version route tests', () =>
+{
+  test('Get all versions: GET /midway/v1/versions', () =>
+  {
+    return request(App)
+      .get('/midway/v1/versions')
+      .query({
+        id: 1,
+        accessToken: 'AccessToken',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe('[{"id":1,"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/versions/items/1 request returned an error: ' + error);
+      });
+  });
+});
+
 describe('Item route tests', () =>
 {
   test('Get all items: GET /midway/v1/items/', () =>
@@ -154,14 +176,14 @@ describe('Item route tests', () =>
           parentItemId: 1,
         },
       })
-      .expect(200)
+      .expect(500)
       .then((response) =>
       {
-        fail('POST /midway/v1/items/ request returned success!');
+        done();
       })
       .catch((error) =>
       {
-        done();
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
       });
   });
 });
