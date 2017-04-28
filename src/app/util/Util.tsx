@@ -50,8 +50,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as _ from 'underscore';
 
-import LibraryTypes from './../library/LibraryTypes';
-
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 const suffixes = ['', ' k', ' M', ' B'];
 
@@ -136,7 +134,7 @@ const Util = {
     return !! RolesStore.getState().getIn([groupId, me.username, role]);
   },
 
-  canEdit(item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group, UserStore, RolesStore)
+  canEdit(item: { type: string, id: string }, UserStore, RolesStore)
   {
     const me = UserStore.getState().get('currentUser');
     if (!me)

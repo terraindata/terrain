@@ -408,9 +408,11 @@ const LayoutManager = React.createClass<any, any>({
 
     const lcr = this.refs.layoutManagerDiv.getBoundingClientRect();
     const y = coords.y;
+    let draggingInside: boolean;
+    
     if (coords.y >= lcr.top && coords.y <= lcr.bottom)
     {
-      const draggingInside = true;
+      draggingInside = true;
     }
 
 		this.setState({
@@ -565,6 +567,8 @@ const LayoutManager = React.createClass<any, any>({
     {
       this.state.sizeAdjustments[index] = {x: 0, y: 0};
     }
+    
+    let content: any;
 
 		if (obj.content)
 		{
@@ -630,7 +634,7 @@ const LayoutManager = React.createClass<any, any>({
         }
       }
 
-			const content: any = React.cloneElement(obj.content, props);
+			content = React.cloneElement(obj.content, props);
 		}
 
 		// check for a nested layout
@@ -642,7 +646,9 @@ const LayoutManager = React.createClass<any, any>({
     className += this.state.resizingIndex ? ' no-transition' : '';
 		return (
 			<div className={className} style={style} key={obj.key !== undefined ? obj.key : index} ref={index}>
-				{content}
+				{
+          content
+        }
 			</div>);
 	},
 
@@ -747,10 +753,11 @@ const LayoutManager = React.createClass<any, any>({
 	renderColumn(column, index)
 	{
 		const classToPass = colClass;
+    let style: React.CSSProperties
 
     if (this.props.layout.compact)
     {
-       const style: React.CSSProperties =
+       style =
        {
          display: 'inline-block',
          position: 'relative',
@@ -760,7 +767,7 @@ const LayoutManager = React.createClass<any, any>({
     }
     else
     {
-      const style: React.CSSProperties =
+      style =
       {
         left: this.calcColumnLeft(column, index),
         width: this.calcColumnWidth(column, index),

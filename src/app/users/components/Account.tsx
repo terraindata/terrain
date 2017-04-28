@@ -50,7 +50,6 @@ import Classs from './../../common/components/Classs';
 import InfoArea from './../../common/components/InfoArea';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
-import LibraryTypes from './../UserTypes';
 
 const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
 
@@ -68,27 +67,28 @@ class Account extends Classs<Props>
     let title = 'Account';
     let selected = '298px';
     const linkWidth = -144;
+    let profileActive: boolean, notificationsActive: boolean, teamActive: boolean, settingsActive: boolean;
 
     switch (this.props.location.pathname)
     {
       case '/account/profile':
-        const profileActive = true;
+        profileActive = true;
         title = 'Profile';
         // selected = '298px'; // use this when we add notifications back in
         selected = '154px';
         break;
       case '/account/notifications':
-        const notificationsActive = true;
+        notificationsActive = true;
         title = 'Notifications';
         selected = '154px';
         break;
       case '/account/team':
-        const teamActive = true;
+        teamActive = true;
         title = 'Team';
         selected = 'calc(100% - 10px - 144px)';
         break;
       case '/account/settings':
-        const settingsActive = true;
+        settingsActive = true;
         title = 'Settings';
         selected = '10px';
         break;

@@ -49,11 +49,10 @@ const List = Immutable.List;
 const L = () => List([]);
 const Map = Immutable.Map;
 
-import SchemaStore from '../schema/data/SchemaStore';
 import Util from '../util/Util';
 import ScoreBar from './components/charts/ScoreBar';
-import TransformCardComponent from './components/charts/TransformCard';
-import Store from './data/BuilderStore';
+// import TransformCardComponent from './components/charts/TransformCard';
+import SchemaTypes from '../schema/SchemaTypes';
 
 // These have to be above the BuilderDisplays import
 //  since the import itself imports them
@@ -253,9 +252,9 @@ export module BuilderTypes
       };
 
       // given a card, return the "terms" it generates for autocomplete
-      getChildTerms?: (card: ICard) => List<string>;
-      getNeighborTerms?: (card: ICard) => List<string>;
-      getParentTerms?: (card: ICard) => List<string>;
+      getChildTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
+      getNeighborTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
+      getParentTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
         // returns terms for its parent and its neighbors (but not its parent's neighbors)
 
       preview: string | ((c: ICard) => string);
@@ -330,9 +329,9 @@ export module BuilderTypes
       accepts?: List<string>;
       anythingAccepts?: boolean; // if any card accepts this card
 
-      getChildTerms?: (card: ICard) => List<string>;
-      getNeighborTerms?: (card: ICard) => List<string>;
-      getParentTerms?: (card: ICard) => List<string>;
+      getChildTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
+      getNeighborTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
+      getParentTerms?: (card: ICard, schemaState: SchemaTypes.SchemaState) => List<string>;
 
       metaFields?: string[];
 
@@ -800,12 +799,12 @@ export module BuilderTypes
         }),
 
         getParentTerms:
-          (card: ICard) =>
+          (card: ICard, schemaState: SchemaTypes.SchemaState) =>
             card['tables'].reduce(
               (list: List<string>, tableBlock: {table: string, alias: string}): List<string> =>
               {
                 const dbName = Store.getState().db;
-                let columnNames = SchemaStore.getState().columnNamesByDb.getIn(
+                let columnNames = schemaState.columnNamesByDb.getIn(
                   [dbName, dbName + '.' + tableBlock.table],
                 ) || Immutable.List([]);
                 columnNames = columnNames.map(
@@ -839,21 +838,21 @@ export module BuilderTypes
                 help: ManualConfig.help['table'],
                 accepts: List(['sfw']),
                 showWhenCards: true,
-                getAutoTerms: (comp: React.Component<any, any>) =>
+                getAutoTerms: (comp: React.Component<any, any>, schemaState: SchemaTypes.SchemaState) =>
                 {
                   const db = Store.getState().db;
-                  const tableNames = SchemaStore.getState().tableNamesByDb.get(db);
-                  if (!tableNames)
-                  {
-                    const unsubscribe = SchemaStore.subscribe(() =>
-                    {
-                      if (SchemaStore.getState().tableNamesByDb.get(db))
-                      {
-                        unsubscribe();
-                        comp.forceUpdate();
-                      }
-                    });
-                  }
+                  const tableNames = schemaState.tableNamesByDb.get(db);
+                  // if (!tableNames)
+                  // {
+                  //   const unsubscribe = SchemaStore.subscribe(() =>
+                  //   {
+                  //     if (SchemaStore.getState().tableNamesByDb.get(db))
+                  //     {
+                  //       unsubscribe();
+                  //       comp.forceUpdate();
+                  //     }
+                  //   });
+                  // }
                   return tableNames;
                 },
 
@@ -1363,7 +1362,8 @@ export module BuilderTypes
           },
           {
             displayType: DisplayType.COMPONENT,
-            component: TransformCardComponent,
+            component: require('./components/charts/TransformCard'), //TransformCardComponent,
+            requiresBuilderState: true,
             key: null,
             help: ManualConfig.help['scorePoints'],
           },
@@ -1863,8 +1863,8 @@ export module BuilderTypes
 
 import {_IResultsConfig, IResultsConfig} from './components/results/ResultsConfig';
 import Actions from './data/BuilderActions';
+import Store from './data/BuilderStore';
 
 export default BuilderTypes;
 
 import TQLConverter from '../tql/TQLConverter';
-import TQLToCards from '../tql/TQLToCards';

@@ -156,10 +156,11 @@ class DeployModal extends PureClasss<Props>
       title = 'Remove "' + name + '" from Live';
     }
 
+    let defaultVariant: LibraryTypes.Variant;
     if (this.state.defaultChecked)
     {
       const libraryState = LibraryStore.getState();
-      const defaultVariant = libraryState.variants.find(
+      defaultVariant = libraryState.variants.find(
         (v) => v.algorithmId === changingStatusOf.algorithmId && v.isDefault,
       );
     }

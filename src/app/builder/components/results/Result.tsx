@@ -204,11 +204,12 @@ class ResultComponent extends Classs<Props> {
       'result-dragging': isDragging,
       'result-drag-over': isOver,
     });
+    
+    let scoreArea: any;
 
     if (resultsConfig && resultsConfig.score && resultsConfig.enabled)
     {
-          // <ScoreIcon className='result-score-icon' />
-      const scoreArea = (
+      scoreArea = (
         <div className="result-score">
           {
             this.renderField(resultsConfig.score)
@@ -220,19 +221,22 @@ class ResultComponent extends Classs<Props> {
     const name = getResultName(result, resultsConfig);
     const fields = getResultFields(result, resultsConfig);
     const configHasFields = resultsConfigHasFields(resultsConfig);
+    
+    let bottomContent: any;
 
     if (!configHasFields && fields.length > 4 && !this.props.expanded)
     {
-      const bottom = (
+      bottomContent = (
         <div className="result-bottom" onClick={this.expand}>
           { fields.length - MAX_DEFAULT_FIELDS } more field{ fields.length - 4 === 1 ? '' : 's' }
         </div>
       );
     }
 
+    let expandedContent: any;
     if (this.props.expanded)
     {
-      const expanded = (
+      expandedContent = (
         <div className="result-expanded-fields">
           <div className="result-expanded-fields-title">
             All Fields
@@ -282,10 +286,10 @@ class ResultComponent extends Classs<Props> {
                 _.map(fields, this.renderField)
             }
             {
-              bottom
+              bottomContent
             }
             {
-              expanded
+              expandedContent
             }
           </div>
         </div>
@@ -310,13 +314,15 @@ export function resultsConfigHasFields(config: IResultsConfig): boolean
 
 export function getResultFields(result: Result, config: IResultsConfig): string[]
 {
+  let fields: string[];
+  
   if (resultsConfigHasFields(config))
   {
-    const fields = config.fields.toArray();
+    fields = config.fields.toArray();
   }
   else
   {
-    const fields = result.fields.keySeq().toArray();
+    fields = result.fields.keySeq().toArray();
   }
 
   return fields;
@@ -324,13 +330,15 @@ export function getResultFields(result: Result, config: IResultsConfig): string[
 
 export function getResultName(result: Result, config: IResultsConfig)
 {
+  let nameField: string;
+  
   if (config && config.name && config.enabled)
   {
-    const nameField = config.name;
+    nameField = config.name;
   }
   else
   {
-    const nameField = _.first(getResultFields(result, config));
+    nameField = _.first(getResultFields(result, config));
   }
 
   return getResultValue(result, nameField, config);

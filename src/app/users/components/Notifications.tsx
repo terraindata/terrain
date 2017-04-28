@@ -55,7 +55,6 @@ import RadioButtons from './../../common/components/RadioButtons';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
-import LibraryTypes from './../UserTypes';
 import AccountEntry from './AccountEntry';
 
 const Select = require('react-select');
@@ -186,7 +185,7 @@ class Notifications extends Classs<Props>
     this.setState({
       errorModalMessage: 'Error saving: ' + JSON.stringify(response),
     });
-    this.toggleErrorModal();
+    this._toggle('errorModalOpen')();
 
   }
 
@@ -212,10 +211,12 @@ class Notifications extends Classs<Props>
 
   renderDesktopNotificationsContent()
   {
+   let desktopNotification: any, sound: any;
+   
    if (this.state.istate.currentUser)
    {
-      const desktopNotification = this.state.istate.currentUser.desktopNotificationType;
-      const sound = this.state.istate.currentUser.sound;
+      desktopNotification = this.state.istate.currentUser.desktopNotificationType;
+      sound = this.state.istate.currentUser.sound;
    }
 
    return (
@@ -284,11 +285,14 @@ class Notifications extends Classs<Props>
 
   renderEmailNotificationsContent()
   {
-   if (this.state.istate.currentUser)
-   {
-     const emailNotification = this.state.istate.currentUser.emailNotificationType;
-     const emailTiming = this.state.istate.currentUser.emailNotificationTiming;
-   }
+    let emailNotification: any, emailTiming: any;
+
+    if (this.state.istate.currentUser)
+    {
+      emailNotification = this.state.istate.currentUser.emailNotificationType;
+      emailTiming = this.state.istate.currentUser.emailNotificationTiming;
+    }
+   
     return (
       <div className="notification-expansion">
         <div>Send me email notifications:</div>
@@ -325,10 +329,13 @@ class Notifications extends Classs<Props>
 
   renderEmailNewsContent()
   {
+    let emailNewsOn: boolean;
+    
     if (this.state.istate.currentUser)
     {
-      const emailNewsOn = this.state.istate.currentUser.emailNews === 'on';
+      emailNewsOn = this.state.istate.currentUser.emailNews === 'on';
     }
+    
     return (
       <div className="notification-expansion">
         <div>You can choose which of these updates you'd like to receive:</div>
@@ -343,7 +350,9 @@ class Notifications extends Classs<Props>
         <div>If you opt out of the above, note that we we'll still send you important
         adminstrative emails, such as password resets. <br/>
         </div>
-        {this.renderEmail()}
+        {
+          this.renderEmail()
+        }
       </div>
       );
   }
@@ -367,10 +376,13 @@ class Notifications extends Classs<Props>
 
   renderDesktopDescription()
   {
-   if (this.state.istate.currentUser)
-   {
-      const desktopNotification = this.state.istate.currentUser.desktopNotificationType;
-   }
+    let desktopNotification: any;
+    
+    if (this.state.istate.currentUser)
+    {
+      desktopNotification = this.state.istate.currentUser.desktopNotificationType;
+    }
+    
     return(
       <div>
         Terrain can send push notifications to your desktop when someone
@@ -383,14 +395,17 @@ class Notifications extends Classs<Props>
 
   renderEmailDescription()
   {
+    let emailTiming: string;
+    
     if (this.state.istate.currentUser)
     {
-      const emailTiming = this.state.istate.currentUser.emailNotificationTiming;
+      emailTiming = this.state.istate.currentUser.emailNotificationTiming;
     }
+    
     return(
       <div>
         When you're busy or not online, Terrain can send you
-        emails so you don't miss a beat.You are currently receiving emails
+        emails so you don't miss a beat. You are currently receiving emails
         <span><b>{' ' + emailTiming}.</b></span>
       </div>
     );
@@ -398,10 +413,13 @@ class Notifications extends Classs<Props>
 
   renderEmailNewsDescription()
   {
+    let emailNewsOn: boolean;
+    
     if (this.state.istate.currentUser)
     {
-      const emailNewsOn = (this.state.istate.currentUser.emailNews) === 'on';
+      emailNewsOn = (this.state.istate.currentUser.emailNews) === 'on';
     }
+    
     return(
       <div>
         From time to time we'd like to send you emails with interesting
@@ -412,40 +430,33 @@ class Notifications extends Classs<Props>
     );
   }
 
-  toggleErrorModal()
-  {
-    this.setState ({
-      errorModalOpen: !this.state.errorModalOpen,
-    });
-  }
-
   render()
   {
     return (
       <div>
-      <div className="notifications-page-title">Update your notifications</div>
-      <AccountEntry
-        title="Desktop Notifications"
-        description={this.renderDesktopDescription()}
-        content={this.renderDesktopNotificationsContent()}
-      />
-      <AccountEntry
-        title="Email Notifications"
-        description={this.renderEmailDescription()}
-        content={this.renderEmailNotificationsContent()}
-      />
-      <AccountEntry
-        title="Email News & Updates"
-        description={this.renderEmailNewsDescription()}
-        content={this.renderEmailNewsContent()}
-        lastEntry={true}
-      />
-      <Modal
-          message={this.state.errorModalMessage}
-          onClose={this.toggleErrorModal}
-          open={this.state.errorModalOpen}
-          error={true}
-      />
+        <div className="notifications-page-title">Update your notifications</div>
+        <AccountEntry
+          title="Desktop Notifications"
+          description={this.renderDesktopDescription()}
+          content={this.renderDesktopNotificationsContent()}
+        />
+        <AccountEntry
+          title="Email Notifications"
+          description={this.renderEmailDescription()}
+          content={this.renderEmailNotificationsContent()}
+        />
+        <AccountEntry
+          title="Email News & Updates"
+          description={this.renderEmailNewsDescription()}
+          content={this.renderEmailNewsContent()}
+          lastEntry={true}
+        />
+        <Modal
+            message={this.state.errorModalMessage}
+            onClose={this._toggle('errorModalOpen')}
+            open={this.state.errorModalOpen}
+            error={true}
+        />
       </div>
     );
   }

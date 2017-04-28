@@ -54,7 +54,6 @@ import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
-import LibraryTypes from './../UserTypes';
 import UserThumbnail from './UserThumbnail';
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;

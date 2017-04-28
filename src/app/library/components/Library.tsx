@@ -119,26 +119,29 @@ class Library extends PureClasss<any>
 
     const { groups, algorithms, variants, groupsOrder } = libraryState;
     const { groupId, algorithmId, variantId } = this.props.params;
+    
+    let group: LibraryTypes.Group, algorithm: LibraryTypes.Algorithm, variant: LibraryTypes.Variant;
+    let algorithmsOrder: List<ID>, variantsOrder: List<ID>;
 
     if (groupId)
     {
-      const group = libraryState.getIn(['groups', groupId]) as LibraryTypes.Group;
+      group = libraryState.getIn(['groups', groupId]);
 
       if (group)
       {
-        const { algorithmsOrder } = group;
+        algorithmsOrder = group.algorithmsOrder;
 
         if (algorithmId)
         {
-          const algorithm = algorithms.get(algorithmId);
+          algorithm = algorithms.get(algorithmId);
 
           if (algorithm)
           {
-            const { variantsOrder } = algorithm;
+            variantsOrder = algorithm.variantsOrder;
 
             if (variantId)
             {
-              const variant = variants.get(variantId);
+              variant = variants.get(variantId);
 
               if (!variant)
               {
@@ -150,7 +153,9 @@ class Library extends PureClasss<any>
             browserHistory.replace(`/library/${groupId}`);
           }
         }
-      } else {
+      } 
+      else 
+      {
         // !group
         browserHistory.replace('/library');
       }

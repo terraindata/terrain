@@ -55,7 +55,6 @@ import UserStore from './../../users/data/UserStore';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
-import LibraryTypes from './../UserTypes';
 import AccountEntry from './AccountEntry';
 type User = UserTypes.User;
 import Modal from './../../common/components/Modal';
@@ -399,9 +398,11 @@ class Settings extends Classs<Props>
 
   renderTimeZoneDescription()
   {
+    let timeZone: number;
+    
     if (this.state.istate.currentUser)
     {
-      const timeZone = this.state.istate.currentUser.timeZone || 158;
+      timeZone = this.state.istate.currentUser.timeZone || 158;
     }
     else {
       timeZone = 158;
@@ -437,25 +438,26 @@ class Settings extends Classs<Props>
   renderTimeZoneContent()
   {
     const timeZonesList = this.getTimeZonesList();
+    let timeZone: number;
 
     if (this.state.istate.currentUser)
     {
-      const timeZone = this.state.istate.currentUser.timeZone || 158;
+      timeZone = this.state.istate.currentUser.timeZone || 158;
     }
     else
     {
-       timeZone = 158;
+      timeZone = 158;
     }
 
     return (
       <div className="settings-row">
         <Select
-           clearable={false}
-           value={timeZone}
-           options={timeZonesList}
-           onChange={this.changeTimeZone}
-           className="settings-timezone-dropdown"
-           searchable={false}
+          clearable={false}
+          value={timeZone}
+          options={timeZonesList}
+          onChange={this.changeTimeZone}
+          className="settings-timezone-dropdown"
+          searchable={false}
        />
        </div>
     );

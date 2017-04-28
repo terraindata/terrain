@@ -43,11 +43,11 @@ THE SOFTWARE.
 */
 
 import * as _ from 'underscore';
-import Ajax from '../../util/Ajax';
 import Util from './../../util/Util';
 import LibraryTypes from './../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
 import {LibraryState} from './LibraryStore';
+console.log(LibraryTypes, ActionTypes, Util);
 const {EVariantStatus} = LibraryTypes;
 
 const Immutable = require('immutable');

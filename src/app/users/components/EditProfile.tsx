@@ -51,7 +51,6 @@ import Modal from './../../common/components/Modal';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import UserStore from './../data/UserStore';
-import LibraryTypes from './../UserTypes';
 import UserTypes from './../UserTypes';
 const CameraIcon = require('./../../../images/icon_camera.svg');
 const CloseIcon = require('./../../../images/icon_close_8x8_gray.svg');

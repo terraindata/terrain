@@ -252,16 +252,18 @@ class LibraryItem extends Classs<Props>
         )
       );
 
+    let shiftedUp: boolean, shiftedDown: boolean;
+    
     if (this.props.draggingOverIndex !== -1)
     {
       // could be shifted
       if (this.props.index > this.props.draggingItemIndex && this.props.index == this.props.draggingOverIndex)
       {
-        const shiftedUp = true;
+        shiftedUp = true;
       }
       if (this.props.index < this.props.draggingItemIndex && this.props.index == this.props.draggingOverIndex)
       {
-        const shiftedDown = true;
+        shiftedDown = true;
       }
     }
 

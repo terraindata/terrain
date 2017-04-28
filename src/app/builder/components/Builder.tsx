@@ -163,13 +163,15 @@ class Builder extends PureClasss<Props>
       storeKeyPath: ['variants'],
     });
 
+    let colKeys: List<number>;
+    
     if (localStorage.getItem('colKeys'))
     {
-      const colKeys = List(JSON.parse(localStorage.getItem('colKeys'))) as List<number>;
+      colKeys = List(JSON.parse(localStorage.getItem('colKeys'))) as List<number>;
     }
     else
     {
-      const colKeys = List([Math.random(), Math.random()]);
+      colKeys = List([Math.random(), Math.random()]);
       localStorage.setItem('colKeys', JSON.stringify(colKeys.toJS()));
     }
 
@@ -336,7 +338,7 @@ class Builder extends PureClasss<Props>
     if (newConfig && (props === this.props || variantId !== this.getSelectedId(this.props)))
     {
       // need to fetch data for new query
-      Actions.fetchQuery(variantId, this.handleNoVariant);
+      Actions.fetchQuery(variantId, this.handleNoVariant, this.state.variants.get(variantId).db);
     }
   }
 

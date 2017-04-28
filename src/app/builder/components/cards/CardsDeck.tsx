@@ -153,11 +153,7 @@ class _CardDeckCard extends PureClasss<CardProps>
     const {card} = this.props;
     const data = card.static;
     const search = this.props.search.toLowerCase();
-
-    if (data.title.toLowerCase().indexOf(search) !== 0)
-    {
-      const hidden = true;
-    }
+    let hidden: boolean = data.title.toLowerCase().indexOf(search) !== 0;
 
     return this.props.connectDragSource(
       <div

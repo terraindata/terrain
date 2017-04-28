@@ -53,7 +53,6 @@ import Util from '../../util/Util';
 import {_ResultsState, ResultsState} from '../components/results/ResultsManager';
 import {BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes} from './BuilderActionTypes';
 
-import LibraryTypes from './../../library/LibraryTypes';
 import BuilderTypes from './../BuilderTypes';
 
 export class BuilderStateClass
