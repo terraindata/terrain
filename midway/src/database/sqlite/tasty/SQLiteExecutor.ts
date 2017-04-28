@@ -44,25 +44,59 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import TastyExecutor from '../../../tasty/TastyExecutor';
+import TastySchema from '../../../tasty/TastySchema';
+import { makePromiseCallback, makePromiseCallback0 } from '../../../tasty/Utils';
+import SQLiteClient from '../client/SQLiteClient';
+import SQLiteConfig from '../SQLiteConfig';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
+export type Config = SQLiteConfig;
 
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
-
-const Executor = new ElasticExecutor();
-
-const Router = new KoaRouter();
-
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
+export class SQLiteExecutor implements TastyExecutor
 {
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
-});
+  private client: SQLiteClient;
 
-export default Router;
+  constructor(client: SQLiteClient)
+  {
+    this.client = client;
+  }
+
+  public async schema(): Promise<TastySchema>
+  {
+    const results = {};
+    results[this.client.getFilename()] = {};
+
+    const tableListResult: any[] = await this.query('SELECT name FROM sqlite_master WHERE Type=\'table\';');
+    for (const table of tableListResult)
+    {
+      results[this.client.getFilename()][table.name] = {};
+      const colResult: any = await this.query(`pragma table_info(${table.name});`);
+      for (const col of colResult)
+      {
+        results[this.client.getFilename()][table.name][col.name] =
+          {
+            type: col.type,
+          };
+      }
+    }
+    return new TastySchema(results);
+  }
+
+  public async query(queryStr: string): Promise<object[]>
+  {
+    return new Promise<object[]>((resolve, reject) =>
+    {
+      this.client.all(queryStr, makePromiseCallback(resolve, reject));
+    });
+  }
+
+  public async destroy(): Promise<void>
+  {
+    return new Promise<void>((resolve, reject) =>
+    {
+      this.client.close(makePromiseCallback0(resolve, reject));
+    });
+  }
+}
+
+export default SQLiteExecutor;

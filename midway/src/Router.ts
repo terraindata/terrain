@@ -48,7 +48,9 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import AuthRouter from './auth/AuthRouter';
 import ItemRouter from './items/ItemRouter';
+import QueryRouter from './query/QueryRouter';
 import SchemaRouter from './schema/SchemaRouter';
+import StatusRouter from './status/StatusRouter';
 import UserRouter from './users/UserRouter';
 import VersionRouter from './versions/VersionRouter';
 
@@ -59,6 +61,8 @@ AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
 AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
 AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
 AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
+AppRouter.use('/status', StatusRouter.routes(), StatusRouter.allowedMethods());
+AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
 // Add future routes here.
 
 // Prefix all routes with /midway

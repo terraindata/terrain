@@ -172,6 +172,11 @@ class App extends PureClasss<Props>
   constructor(props: Props)
   {
     super(props);
+    
+    Ajax.midwayStatus(
+      () => console.log('Midway is running'),
+      () => alert('Midway 2 is not running.')
+    );
 
     try {
       // check to see if we can use localStorage

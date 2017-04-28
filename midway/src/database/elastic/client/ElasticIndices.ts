@@ -44,25 +44,49 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import * as Elastic from 'elasticsearch';
+import ElasticController from '../ElasticController';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
-
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
-
-const Executor = new ElasticExecutor();
-
-const Router = new KoaRouter();
-
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
+/**
+ * An client which acts as a selective isomorphic wrapper around
+ * the elastic.js indices API.
+ */
+class ElasticIndices
 {
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
-});
+  private controller: ElasticController;
+  private delegate: Elastic.Client;
 
-export default Router;
+  constructor(controller: ElasticController, delegate: Elastic.Client)
+  {
+    this.controller = controller;
+    this.delegate = delegate;
+  }
+
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-getmapping
+   * @param params
+   * @param callback
+   */
+  public getMapping(params: Elastic.IndicesGetMappingParams, callback: (error: any, response: any, status: any) => void): void
+  {
+    this.log('getMapping', params);
+    return this.delegate.indices.getMapping(params, callback);
+  }
+
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-delete
+   * @param params
+   * @param callback
+   */
+  public delete(params: Elastic.IndicesDeleteParams, callback: (errror: any, response: any, status: any) => void): void
+  {
+    return this.delegate.indices.delete(params, callback);
+  }
+
+  private log(methodName: string, info: any)
+  {
+    this.controller.log('ElasticIndices.' + methodName, info);
+  }
+}
+
+export default ElasticIndices;

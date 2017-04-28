@@ -48,21 +48,26 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
+import DatabaseController from '../database/DatabaseController';
+import DatabaseRegistry from '../databaseRegistry/DatabaseRegistry';
+import Util from '../Util';
 
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
+const QueryRouter = new KoaRouter();
 
-const Executor = new ElasticExecutor();
+QueryRouter.post(
+  '/',
+  async (ctx, next) =>
+  {
+    winston.info('query post');
+    const request = ctx.request.body.body;
 
-const Router = new KoaRouter();
+    Util.verifyParameters(request, ['database', 'type', 'query']);
 
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
-{
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
-});
+    const database: DatabaseController = DatabaseRegistry.get(request.database);
+    if (database === undefined)
+    {
+      throw Error('Database "' + request.database + '" not found.');
+    }
+  });
 
-export default Router;
+export default QueryRouter;

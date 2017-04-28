@@ -48,21 +48,14 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
-
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
-
-const Executor = new ElasticExecutor();
-
 const Router = new KoaRouter();
 
-// TODO @jason / @david add passport.authenticate('access-token-local') below
 Router.get('/', async (ctx, next) =>
 {
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
+  ctx.body = JSON.stringify({
+    status: 'ok',
+  });
+  winston.info('status root');
 });
 
 export default Router;

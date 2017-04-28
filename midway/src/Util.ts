@@ -72,6 +72,21 @@ export const Util =
         });
       });
     },
+    verifyParameters: (parameters: any, required: string[]): void =>
+    {
+      if (!parameters)
+      {
+        throw Error('No parameters found.');
+      }
+
+      for (const key in required)
+      {
+        if (!parameters.hasOwnProperty(key))
+        {
+          throw new Error('Parameter "' + key + '" not found in request object.');
+        }
+      }
+    },
   };
 
 export default Util;

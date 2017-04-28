@@ -53,8 +53,9 @@ import convert = require('koa-convert');
 import dateFormat = require('date-format');
 import reqText = require('require-text');
 import session = require('koa-generic-session');
+import cors = require('kcors');
 
-import './auth/Passport.ts';
+import './auth/Passport';
 import DB from './DB';
 import Middleware from './Middleware';
 import Router from './Router';
@@ -110,6 +111,7 @@ Router.get('/', async (ctx, next) =>
 const app = new Koa();
 app.proxy = true;
 app.keys = ['your-session-secret'];
+app.use(cors());
 app.use(convert(session()));
 
 app.use(Middleware.bodyParser());

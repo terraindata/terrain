@@ -44,45 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as ElasticExecutor from './ElasticExecutor';
-import ElasticGenerator from './ElasticGenerator';
-import * as MySQLExecutor from './MySQLExecutor';
-import MySQLGenerator from './MySQLGenerator';
-import * as SQLiteExecutor from './SQLiteExecutor';
-
+import DatabaseController from '../database/DatabaseController';
 import TastyColumn from './TastyColumn';
 import TastyExecutor from './TastyExecutor';
+import TastyGenerator from './TastyGenerator';
 import TastyNode from './TastyNode';
 import TastyQuery from './TastyQuery';
 import TastySchema from './TastySchema';
 import TastyTable from './TastyTable';
-import { makePromiseCallback } from './Utils';
-
-/**
- * The available tasty backends: ElasticSearch, MySQL, SQLite.
- *
- * @export
- * @enum {number}
- */
-export enum Backend
-{
-  ElasticSearch,
-  MySQL,
-  SQLite,
-}
-
-export const MySQL = Backend.MySQL;
-export const ElasticSearch = Backend.ElasticSearch;
-export const SQLite = Backend.SQLite;
-
-/**
- * Backend-specific configuration.
- */
-export type ElasticSearchConfig = ElasticExecutor.Config;
-export type MySQLConfig = MySQLExecutor.Config;
-export type SQLiteConfig = SQLiteExecutor.Config;
-
-export type TastyConfig = ElasticSearchConfig | MySQLConfig | SQLiteConfig;
 
 /**
  * Tasty Query components.
@@ -104,78 +73,30 @@ export type Table = TastyTable;
  */
 export class Tasty
 {
-  /**
-   * Generate a query string from the Tasty query object.
-   *
-   * @param {TastyQuery} query A Tasty query object.
-   * @returns {string} A query string for the chosen backend.
-   *
-   * @memberOf Tasty
-   */
-  public static generate(backend: Backend, query: TastyQuery): string
-  {
-    if (backend === Backend.ElasticSearch)
-    {
-      return JSON.stringify(ElasticGenerator.generate(query));
-    }
-    else if (backend === Backend.MySQL)
-    {
-      return MySQLGenerator.generate(query);
-    }
-    else if (backend === Backend.SQLite)
-    {
-      return MySQLGenerator.generate(query);
-    }
-  }
-
-  // The backend executor and generator
+  private controller: DatabaseController;
+  private generator: TastyGenerator;
   private executor: TastyExecutor;
-  private generator: any;
-  private _backend: Backend;
 
   /**
    * Creates an instance of Tasty.
-   * @param {Backend} backend The tasty backend to use. (Available options are Tasty.MySQL, Tasty.ElasticSearch
-   *                          and Tasty.SQLite.)
-   * @param {TastyConfig} [config] The backend-specific configuration to use.
-   *
-   * @memberOf Tasty
    */
-  public constructor(backend: Backend, config?: TastyConfig)
+  public constructor(controller: DatabaseController,
+    executor: TastyExecutor,
+    generator: TastyGenerator)
   {
-    try
-    {
-      if (backend === Backend.ElasticSearch)
-      {
-        this.executor = new ElasticExecutor.ElasticExecutor(config as ElasticSearchConfig);
-        this.generator = ElasticGenerator;
-      }
-      else if (backend === Backend.MySQL)
-      {
-        this.executor = new MySQLExecutor.MySQLExecutor(config as MySQLConfig);
-        this.generator = MySQLGenerator;
-      }
-      else if (backend === Backend.SQLite)
-      {
-        this.executor = new SQLiteExecutor.SQLiteExecutor(config as SQLiteConfig);
-        this.generator = MySQLGenerator;
-      }
-      this._backend = backend;
-    }
-    catch (error)
-    {
-      throw Error('Failed to initialize backend ' + Backend[backend] + ':' + error);
-    }
+    this.controller = controller;
+    this.executor = executor;
+    this.generator = generator;
   }
 
-  public get backend(): Backend
+  public getGenerator(): TastyGenerator
   {
-    return this._backend;
+    return this.generator;
   }
 
-  public async generate(query: TastyQuery): Promise<string>
+  public getExecutor(): TastyExecutor
   {
-    return this.generator.generate(query);
+    return this.executor;
   }
 
   /**
