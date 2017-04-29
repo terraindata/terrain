@@ -21,7 +21,7 @@ cache:
   - node_modules/
 
 before_script:
-  - apt --assume-yes install parallel
+  - apt-get update && apt --assume-yes install parallel
   - yarn install
 
 lint:
