@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "command-line-usage": "^4.0.0"
+  }
+}
