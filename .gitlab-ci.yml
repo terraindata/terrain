@@ -20,6 +20,13 @@ cache:
   paths:
   - node_modules/
 
+before_script:
+  - yarn install
+
+lint:
+  script:
+    - npm run lint
+
 test_backends:
   script:
    - npm install
