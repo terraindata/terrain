@@ -44,90 +44,28 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Koa from 'koa';
 import * as winston from 'winston';
+import dateFormat = require('date-format');
 
-import BabelRegister = require('babel-register');
-import cmdLineArgs = require('command-line-args');
-import convert = require('koa-convert');
-import reqText = require('require-text');
-import session = require('koa-generic-session');
-import cors = require('kcors');
-
-import './auth/Passport';
-import DB from './DB';
-import './Logging';
-import Middleware from './Middleware';
-import Router from './Router';
-import Users from './users/Users';
-import Util from './Util';
-
-// process command-line arguments
-const optDefs = [
+winston.configure(
   {
-    alias: 'p',
-    defaultValue: 3000,
-    name: 'port',
-    type: Number,
-  },
-  {
-    alias: 'd',
-    defaultValue: '',
-    name: 'dbtype',
-    type: String,
-  },
-  {
-    alias: 'f',
-    defaultValue: '',
-    name: 'dbfile',
-    type: String,
-  },
-];
-
-const args = cmdLineArgs(optDefs,
-  {
-    partial: true,
+    transports:
+    [
+      new (winston.transports.Console)(
+        {
+          formatter: (options) =>
+          {
+            const message = options.message || '';
+            const level = winston.config.colorize(options.level);
+            const meta = options.meta && Object.keys(options.meta).length ? '\n\t' + JSON.stringify(options.meta)
+              : '';
+            return `${options.timestamp()} [${process.pid}] ${level}: ${message} ${meta}`;
+          },
+          timestamp: () =>
+          {
+            return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
+          },
+        },
+      ),
+    ],
   });
-
-if (args.dbtype.length > 0 && args.dbfile.length > 0)
-{
-  DB.loadSystemDB({ filename: args.dbfile }, args.dbtype);
-}
-
-const index = reqText('../../src/app/index.html', require);
-
-Router.get('/bundle.js', async (ctx, next) =>
-{
-  // TODO render this if DEV, otherwise render compiled bundle.js
-  ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
-});
-
-Router.get('/', async (ctx, next) =>
-{
-  await next();
-  ctx.body = index.toString();
-});
-
-const app = new Koa();
-app.proxy = true;
-app.keys = ['your-session-secret'];
-app.use(cors());
-app.use(convert(session()));
-
-app.use(Middleware.bodyParser());
-app.use(Middleware.favicon('../src/app/favicon.ico'));
-app.use(Middleware.logger(winston));
-app.use(Middleware.responseTime());
-app.use(Middleware.passport.initialize());
-app.use(Middleware.passport.session());
-
-app.use(Router.routes());
-
-const request = app.listen(args.port);
-
-export default request;
-
-// TODO list
-// - import HTML rather than writing directly inline
-// - kick off webpack dev server when in DEV mode (and kill it when server stops)
-// - difference between prod and dev mode: prod references bundle.js static file
