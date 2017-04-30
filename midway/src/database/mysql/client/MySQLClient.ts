@@ -45,8 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as mysql from 'mysql';
+import MySQLConfig from '../MySQLConfig';
 import MySQLController from '../MySQLController';
-import MySQLConfig from './MySQLConfig';
 
 /**
  * An client which acts as a selective isomorphic wrapper around
