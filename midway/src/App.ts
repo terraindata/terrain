@@ -49,7 +49,6 @@ import * as winston from 'winston';
 
 import BabelRegister = require('babel-register');
 import convert = require('koa-convert');
-import reqText = require('require-text');
 import session = require('koa-generic-session');
 import cors = require('kcors');
 
@@ -63,20 +62,6 @@ import Users from './users/Users';
 import Util from './Util';
 
 DB.loadSystemDB({ filename: CmdLineArgs.dbfile }, CmdLineArgs.dbtype);
-
-const index = reqText('../../src/app/index.html', require);
-
-Router.get('/bundle.js', async (ctx, next) =>
-{
-  // TODO render this if DEV, otherwise render compiled bundle.js
-  ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
-});
-
-Router.get('/', async (ctx, next) =>
-{
-  await next();
-  ctx.body = index.toString();
-});
 
 const app = new Koa();
 app.proxy = true;
