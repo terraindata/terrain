@@ -48,51 +48,21 @@ import * as Koa from 'koa';
 import * as winston from 'winston';
 
 import BabelRegister = require('babel-register');
-import cmdLineArgs = require('command-line-args');
 import convert = require('koa-convert');
-import dateFormat = require('date-format');
 import reqText = require('require-text');
 import session = require('koa-generic-session');
 import cors = require('kcors');
 
 import './auth/Passport';
+import CmdLineArgs from './CmdLineArgs';
 import DB from './DB';
+import './Logging';
 import Middleware from './Middleware';
 import Router from './Router';
 import Users from './users/Users';
 import Util from './Util';
 
-// process command-line arguments
-const optDefs = [
-  {
-    alias: 'p',
-    defaultValue: 3000,
-    name: 'port',
-    type: Number,
-  },
-  {
-    alias: 'd',
-    defaultValue: '',
-    name: 'dbtype',
-    type: String,
-  },
-  {
-    alias: 'f',
-    defaultValue: '',
-    name: 'dbfile',
-    type: String,
-  },
-];
-
-const args = cmdLineArgs(optDefs,
-  {
-    partial: true,
-  });
-
-if (args.dbtype.length > 0 && args.dbfile.length > 0)
-{
-  DB.loadSystemDB({ filename: args.dbfile }, args.dbtype);
-}
+DB.loadSystemDB({ filename: CmdLineArgs.dbfile }, CmdLineArgs.dbtype);
 
 const index = reqText('../../src/app/index.html', require);
 
@@ -123,30 +93,7 @@ app.use(Middleware.passport.session());
 
 app.use(Router.routes());
 
-winston.configure(
-  {
-    transports:
-    [
-      new (winston.transports.Console)(
-        {
-          formatter: (options) =>
-          {
-            const message = options.message || '';
-            const level = winston.config.colorize(options.level);
-            const meta = options.meta && Object.keys(options.meta).length ? '\n\t' + JSON.stringify(options.meta)
-              : '';
-            return `${options.timestamp()} [${process.pid}] ${level}: ${message} ${meta}`;
-          },
-          timestamp: () =>
-          {
-            return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
-          },
-        },
-      ),
-    ],
-  });
-
-const request = app.listen(args.port);
+const request = app.listen(CmdLineArgs.port);
 
 export default request;
 

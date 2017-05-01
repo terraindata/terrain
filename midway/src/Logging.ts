@@ -44,17 +44,28 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
+import dateFormat = require('date-format');
 
-const Router = new KoaRouter();
-
-Router.get('/', async (ctx, next) =>
-{
-  ctx.body = JSON.stringify({
-    status: 'ok',
+winston.configure(
+  {
+    transports:
+    [
+      new (winston.transports.Console)(
+        {
+          formatter: (options) =>
+          {
+            const message = options.message || '';
+            const level = winston.config.colorize(options.level);
+            const meta = options.meta && Object.keys(options.meta).length ? '\n\t' + JSON.stringify(options.meta)
+              : '';
+            return `${options.timestamp()} [${process.pid}] ${level}: ${message} ${meta}`;
+          },
+          timestamp: () =>
+          {
+            return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
+          },
+        },
+      ),
+    ],
   });
-  winston.info('status root');
-});
-
-export default Router;
