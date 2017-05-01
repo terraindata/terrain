@@ -44,46 +44,32 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Tasty from './tasty/Tasty';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-const config: Tasty.SQLiteConfig =
+import DatabaseController from '../../database/DatabaseController';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import Util from '../Util';
+
+const QueryRouter = new KoaRouter();
+
+QueryRouter.post(
+  '/',
+  async (ctx, next) =>
   {
-    filename: 'nodeway.db',
-  };
+    winston.info('query post');
+    const request = ctx.request.body.body;
 
-let systemDB;
+    Util.verifyParameters(request, ['database', 'type', 'query']);
 
-export const DB =
-  {
-    getDB()
+    const database: DatabaseController = DatabaseRegistry.get(request.database);
+    if (database === undefined)
     {
-      if (!systemDB)
-      {
-        systemDB = new Tasty.Tasty(Tasty.SQLite, config);
-      }
-      return systemDB;
-    },
+      throw Error('Database "' + request.database + '" not found.');
+    }
 
-    loadSystemDB: async (newConfig: Tasty.TastyConfig, configType: string) =>
-    {
-      if (configType === 'ElasticSearch')
-      {
-        systemDB = new Tasty.Tasty(Tasty.ElasticSearch, newConfig);
-      }
-      else if (configType === 'MySQL')
-      {
-        systemDB = new Tasty.Tasty(Tasty.MySQL, newConfig);
-      }
-      else if (configType === 'SQLite')
-      {
-        systemDB = new Tasty.Tasty(Tasty.SQLite, newConfig);
-      }
-      else
-      {
-        return -1; // not of the right type
-      }
-      return 0;
-    },
-  };
+    database.getQueryHandler().query(request, ctx.body);
+  });
 
-export default DB;
+export default QueryRouter;

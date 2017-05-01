@@ -44,49 +44,29 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as request from 'request';
-import * as _ from 'underscore';
-import * as Tasty from './tasty/Tasty';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-const config: Tasty.SQLiteConfig =
-  {
-    filename: 'nodeway.db',
-  };
+import DatabaseController from '../../database/DatabaseController';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import TastyExecutor from '../../tasty/TastyExecutor';
 
-export const Util =
-  {
-    getRequest: (url) =>
-    {
-      return new Promise((resolve, reject) =>
-      {
-        request(url, (error, res, body) =>
-        {
-          if (!error && res.statusCode === 200)
-          {
-            resolve(body);
-          }
-          else
-          {
-            reject(error);
-          }
-        });
-      });
-    },
-    verifyParameters: (parameters: any, required: string[]): void =>
-    {
-      if (!parameters)
-      {
-        throw Error('No parameters found.');
-      }
+import Util from '../Util';
 
-      for (const key in required)
-      {
-        if (!parameters.hasOwnProperty(key))
-        {
-          throw new Error('Parameter "' + key + '" not found in request object.');
-        }
-      }
-    },
-  };
+const Router = new KoaRouter();
 
-export default Util;
+// TODO @jason / @david add passport.authenticate('access-token-local') below
+Router.get('/', async (ctx, next) =>
+{
+  winston.info('schema root');
+  const request = ctx.request.body.body;
+  Util.verifyParameters(request, ['database']);
+
+  const database: DatabaseController = DatabaseRegistry.get(request.database);
+  const executor: TastyExecutor = database.getTasty().getExecutor();
+  const result = await executor.schema();
+  ctx.body = result.toString();
+});
+
+export default Router;

@@ -68,7 +68,7 @@ class DatabaseMap
     return this.map.delete(id);
   }
 
-  public getAll(): Iterator<[string, DatabaseController]>
+  public getAll(): Iterator<[number, DatabaseController]>
   {
     return this.map.entries();
   }

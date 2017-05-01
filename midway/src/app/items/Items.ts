@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DB from '../DB';
-import * as Tasty from '../tasty/Tasty';
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
 import { UserConfig } from '../users/Users';
 import { Versions } from '../versions/Versions';
 
@@ -73,18 +73,18 @@ export class Items
     this.itemTable = new Tasty.Table('items', ['id'], ['meta', 'name', 'parentItemId', 'status', 'type']);
   }
 
-  public async delete(id: number): Promise<string>
+  public async delete(id: number): Promise<object[]>
   {
-    return DB.getDB().delete(this.itemTable, { id });
+    return App.DB.delete(this.itemTable, { id } as ItemConfig);
   }
 
   public async get(id?: number): Promise<ItemConfig[]>
   {
     if (id !== undefined)
     {
-      return DB.getDB().select(this.itemTable, [], { id });
+      return App.DB.select(this.itemTable, [], { id }) as any;
     }
-    return DB.getDB().select(this.itemTable, [], {});
+    return App.DB.select(this.itemTable, [], {}) as any;
   }
 
   public async upsert(user: UserConfig, item: ItemConfig): Promise<string>
@@ -130,7 +130,7 @@ export class Items
           await versions.create(user, 'items', oldItem.id, oldItem);
         }
 
-        await DB.getDB().upsert(this.itemTable, item);
+        await App.DB.upsert(this.itemTable, item);
         resolve('Success');
       }
       catch (e)

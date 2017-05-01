@@ -44,25 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import App from './app/App';
+import CmdLineArgs from './app/CmdLineArgs';
 
-// TODO @adk9 / @david this needs to be made to generically use MySQL or Elastic (or SQLite)
-//      (depending on current Tasty config? e.g. Tasty.Executor?)
+const app = new App(CmdLineArgs);
+const server = app.listen();
 
-import ElasticExecutor from '../database/elastic/tasty/ElasticExecutor';
-
-const Executor = new ElasticExecutor();
-
-const Router = new KoaRouter();
-
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
-{
-  const result = await Executor.schema();
-  ctx.body = result.toString();
-  winston.info('schema root');
-});
-
-export default Router;
+export default server;

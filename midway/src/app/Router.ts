@@ -44,58 +44,63 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DB from '../DB';
-import * as Tasty from '../tasty/Tasty';
-import { UserConfig } from '../users/Users';
-import Util from '../Util';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import reqText = require('require-text');
+import AuthRouter from './auth/AuthRouter';
+import ItemRouter from './items/ItemRouter';
+import QueryRouter from './query/QueryRouter';
+import SchemaRouter from './schema/SchemaRouter';
+import StatusRouter from './status/StatusRouter';
+import UserRouter from './users/UserRouter';
+import Util from './Util';
+import VersionRouter from './versions/VersionRouter';
 
-// CREATE TABLE versions (id integer PRIMARY KEY, \
-// objectType text NOT NULL, objectId integer NOT NULL, \
-// object text NOT NULL, createdAt datetime DEFAULT CURRENT_TIMESTAMP, createdByUserId integer NOT NULL);
+const AppRouter = new KoaRouter();
 
-export interface VersionConfig
+AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
+AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
+AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
+AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
+AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
+AppRouter.use('/status', StatusRouter.routes(), StatusRouter.allowedMethods());
+AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
+// Add future routes here.
+
+// Prefix all routes with /midway
+//  This is so that we can allow the front-end to use all other routes.
+//  Any route not prefixed with /midway will just serve the front-end.
+
+AppRouter.get('/', async (ctx, next) =>
 {
-  createdByUserId: number;
-  id?: number;
-  object: string;
-  objectId: number;
-  objectType: string;
-}
+  if (ctx.state.user)
+  {
+    ctx.body = 'authenticated as ' + ctx.state.user.username;
+  }
+  else
+  {
+    ctx.body = 'not authenticated';
+  }
+});
 
-export class Versions
+AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  private Version = new Tasty.Table('versions', ['id'], ['createdAt', 'createdByUserId', 'object', 'objectId', 'objectType']);
+  ctx.body = 'authenticated as ' + ctx.state.user.username;
+});
 
-  public async create(user: UserConfig, type: string, id: number, obj: object): Promise<string>
-  {
-    // can only insert
-    const newVersion: VersionConfig =
-      {
-        createdByUserId: user.id,
-        object: obj.toString(),
-        objectId: id,
-        objectType: type,
-      };
-    return DB.getDB().upsert(this.Version, newVersion);
-  }
+const MidwayRouter = new KoaRouter();
+MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
 
-  public async find(id: number): Promise<VersionConfig[]>
-  {
-    return DB.getDB().select(this.Version, [], { id });
-  }
+MidwayRouter.get('/', async (ctx, next) =>
+{
+  const index = reqText('../../src/app/index.html', require);
+  ctx.body = index.toString();
+});
 
-  public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
-  {
-    if (objectId !== undefined && objectType !== undefined)
-    {
-      return DB.getDB().select(this.Version, [], { objectType, objectId });
-    }
-    else if (objectId !== undefined)
-    {
-      return DB.getDB().select(this.Version, [], { objectType });
-    }
-    return DB.getDB().select(this.Version, [], {});
-  }
-}
+MidwayRouter.get('/bundle.js', async (ctx, next) =>
+{
+  // TODO render this if DEV, otherwise render compiled bundle.js
+  ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
+});
 
-export default Versions;
+export default MidwayRouter;

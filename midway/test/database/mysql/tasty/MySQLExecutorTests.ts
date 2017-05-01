@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as winston from 'winston';
 
+import MySQLConfig from '../../../../src/database/mysql/MySQLConfig';
 import MySQLController from '../../../../src/database/mysql/MySQLController';
 import MySQLExecutor from '../../../../src/database/mysql/tasty/MySQLExecutor';
 
@@ -63,7 +64,7 @@ let mysqlController: MySQLController;
 
 beforeAll(async () =>
 {
-  const config: Tasty.MySQLConfig =
+  const config: MySQLConfig =
     {
       connectionLimit: 20,
       database: 'moviesdb',

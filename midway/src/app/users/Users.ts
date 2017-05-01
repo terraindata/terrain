@@ -48,8 +48,8 @@ import * as bcrypt from 'bcrypt';
 import * as winston from 'winston';
 
 import srs = require('secure-random-string');
-import DB from '../DB';
-import * as Tasty from '../tasty/Tasty';
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
 
 const saltRounds = 10;
 // CREATE TABLE users (id integer PRIMARY KEY, accessToken text NOT NULL, email text NOT NULL, isDisabled bool NOT NULL
@@ -189,14 +189,14 @@ export const Users =
 
     find: async (id: number) =>
     {
-      return await DB.getDB().select(User, [], { id });
+      return await App.DB.select(User, [], { id });
     },
 
     loginWithAccessToken: async (id: number, accessToken: string): Promise<UserConfig> =>
     {
       return new Promise<UserConfig>(async (resolve, reject) =>
       {
-        const results: UserConfig[] = await DB.getDB().select(User, [], { id, accessToken }) as UserConfig[];
+        const results: UserConfig[] = await App.DB.select(User, [], { id, accessToken }) as UserConfig[];
         if (results.length > 0)
         {
           resolve(results[0]);
@@ -210,7 +210,7 @@ export const Users =
 
     loginWithEmail: async (email: string, password: string) =>
     {
-      const results = await DB.getDB().select(User, [], { email });
+      const results = await App.DB.select(User, [], { email });
       if (results && results.length === 0)
       {
         return Promise.resolve(null);
@@ -245,7 +245,7 @@ export const Users =
 
     logout: async (id: number, accessToken: string) =>
     {
-      const results = await DB.getDB().select(User, [], { id, accessToken });
+      const results = await App.DB.select(User, [], { id, accessToken });
       if (results && results.length === 0)
       {
         return null;
@@ -261,12 +261,12 @@ export const Users =
       {
         user['id'] = id;
       }
-      return await DB.getDB().upsert(User, user);
+      return await App.DB.upsert(User, user);
     },
 
     upsert: async (newUser) =>
     {
-      return await DB.getDB().upsert(User, newUser);
+      return await App.DB.upsert(User, newUser);
     },
   };
 
