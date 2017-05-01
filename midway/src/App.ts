@@ -51,6 +51,7 @@ import babelRegister = require('babel-register');
 import convert = require('koa-convert');
 import session = require('koa-generic-session');
 import cors = require('kcors');
+import srs = require('secure-random-string');
 
 import ElasticConfig from '../src/database/elastic/ElasticConfig';
 import ElasticController from '../src/database/elastic/ElasticController';
@@ -82,7 +83,7 @@ class App
 
     this.app = new Koa();
     this.app.proxy = true;
-    this.app.keys = ['your-session-secret'];
+    this.app.keys = [srs({ length: 256 })];
     this.app.use(cors());
     this.app.use(convert(session()));
 

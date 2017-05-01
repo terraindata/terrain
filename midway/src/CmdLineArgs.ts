@@ -115,7 +115,7 @@ const sections = [
   },
 ];
 
-if (CmdLineArgs.help === true)
+if (CmdLineArgs.help)
 {
   // tslint:disable-next-line
   console.log(cmdLineUsage(sections));
