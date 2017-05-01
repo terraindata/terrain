@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import * as request from 'request';
 import * as _ from 'underscore';
-import * as Tasty from './tasty/Tasty';
+import * as Tasty from '../tasty/Tasty';
 
 export const Util =
   {
