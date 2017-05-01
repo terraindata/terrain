@@ -49,6 +49,7 @@ import TastyNode from '../../../tasty/TastyNode';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
 import ElasticQuery from './ElasticQuery';
+import bodybuilder = require('bodybuilder');
 
 /**
  * Generates elastic queries from TastyQuery objects.
@@ -97,7 +98,6 @@ export default class ElasticGeneratorRunner
 
   private constructSelectQuery(query: TastyQuery): object
   {
-
     const queryParam: Elastic.SearchParams = {} as Elastic.SearchParams;
 
     // set table (index) name
@@ -117,18 +117,19 @@ export default class ElasticGeneratorRunner
     }
 
     // start the body
-    const bodyFields = this.getSubclauseObject(queryParam, 'body');
+    const body = bodybuilder();
 
     // stored_fields clause
     if (!query.isSelectingAll())
     {
-      const sourceFields = this.getSubclauseList(bodyFields, '_source');
+      const sourceFields = [];
       for (let i = 0; i < query.selected.length; ++i)
       {
         const column = query.selected[i];
         const columnName = this.getColumnName(column);
         sourceFields.push(columnName);
       }
+      body.rawOption('_source', sourceFields);
     }
 
     if (query.aliases.length !== 0)
@@ -136,40 +137,31 @@ export default class ElasticGeneratorRunner
       throw new Error('Aliases are not yet supported by ElasticGenerator.');
     }
 
-    // query fields
-    const queryFields = this.getSubclauseObject(bodyFields, 'query');
-    // filter clause
     if (query.filters.length > 0)
     {
-      // const filterClause = this.getSubclauseObject(queryFields, 'bool', 'filter');
       for (let i = 0; i < query.filters.length; ++i)
       {
         const filter = query.filters[i];
-        this.accumulateFilters(queryFields, filter);
+        this.accumulateFilters(body, filter);
       }
     }
 
     // sort clause
     if (query.sorts.length > 0)
     {
-      const sortClause = this.getSubclauseList(bodyFields, 'sort');
-
       for (let i = 0; i < query.sorts.length; ++i)
       {
         const sort = query.sorts[i];
-
-        const clause = new Object();
         const column = this.getColumnName(sort.node);
-        clause[column] = (sort.order === 'asc' ? 'asc' : 'desc');
-
-        sortClause.push(clause);
+        const order = (sort.order === 'asc' ? 'asc' : 'desc');
+        body.sort(column, order);
       }
     }
-
+    queryParam['body'] = body.build();
     return queryParam;
   }
 
-  private accumulateFilters(filterClause: object, expression: TastyNode)
+  private accumulateFilters(body: bodybuilder, expression: TastyNode)
   {
     // https://www.elastic.co/guide/en/elasticsearch/guide/current/combining-filters.html#bool-filter
     // currently only supports the basic operators, with the column on the lhs, as well as && and ||
@@ -185,99 +177,50 @@ export default class ElasticGeneratorRunner
 
     if (expression.type === '==')
     {
-      this.addFilterTerm(filterClause, 'bool', 'must', columnName, value);
+      body.filter('match', columnName, value);
     }
     else if (expression.type === '!=')
     {
-      this.addFilterTerm(filterClause, 'bool', 'must_not', columnName, value);
+      body.notQuery('match', columnName, value);
     }
     else if (expression.type === '<')
     {
-      this.setRangeClauseIfLesser(filterClause, columnName, 'lt', value);
+      body.filter('range', columnName, {lt: value});
     }
     else if (expression.type === '<=')
     {
-      this.setRangeClauseIfLesser(filterClause, columnName, 'lte', value);
+      body.filter('range', columnName, {lte: value});
     }
     else if (expression.type === '>')
     {
-      this.setRangeClauseIfGreater(filterClause, columnName, 'gt', value);
+      body.filter('range', columnName, {gt: value});
     }
     else if (expression.type === '>=')
     {
-      this.setRangeClauseIfGreater(filterClause, columnName, 'gte', value);
+      body.filter('range', columnName, {gte: value});
     }
     else if (expression.type === '&&')
     {
-      this.accumulateFilters(filterClause, expression.lhs);
-      this.accumulateFilters(filterClause, expression.rhs);
+      const leftQuery = bodybuilder();
+      this.accumulateFilters(leftQuery, expression.lhs);
+      const rightQuery = bodybuilder();
+      this.accumulateFilters(rightQuery, expression.rhs);
+      body.andFilter(leftQuery);
+      body.andFilter(rightQuery);
     }
     else if (expression.type === '||')
     {
-      const shouldClause = this.getSubclauseList(filterClause, 'should');
-      this.accumulateFilters(shouldClause, expression.lhs);
-      this.accumulateFilters(shouldClause, expression.rhs);
+      const leftQuery = bodybuilder();
+      this.accumulateFilters(leftQuery, expression.lhs);
+      const rightQuery = bodybuilder();
+      this.accumulateFilters(rightQuery, expression.rhs);
+      body.orFilter(leftQuery);
+      body.orFilter(rightQuery);
     }
     else
     {
       throw new Error('Filtering on unsupported expression "' + JSON.stringify(expression) + '".');
     }
-  }
-
-  private getSubclauseList(parentClause: {}, clauseName: string)
-  {
-    if (!(clauseName in parentClause))
-    {
-      parentClause[clauseName] = [];
-    }
-    return parentClause[clauseName];
-  }
-
-  private getSubclauseObject(parentClause: {}, clauseName: string)
-  {
-    if (!(clauseName in parentClause))
-    {
-      parentClause[clauseName] = {};
-    }
-    return parentClause[clauseName];
-  }
-
-  private getNestedSubclauseObject(parentClause: object, clauseName: string, subclauseName: string)
-  {
-    const clause = this.getSubclauseObject(parentClause, clauseName);
-    return this.getSubclauseObject(clause, subclauseName);
-  }
-
-  private getNestedSubclauseList(parentClause: object, clauseName: string, subclauseName: string)
-  {
-    const clause = this.getSubclauseObject(parentClause, clauseName);
-    return this.getSubclauseList(clause, subclauseName);
-  }
-
-  private setRangeClauseIfLesser(filterClause: object, columnName: string, filterOperator: string, value: any)
-  {
-    const columnClause = this.getNestedSubclauseObject(filterClause, 'range', columnName);
-    if (!(filterOperator in columnClause) || value < columnClause[filterOperator])
-    {
-      columnClause[filterOperator] = value;
-    }
-  }
-
-  private setRangeClauseIfGreater(filterClause: object, columnName: string, filterOperator: string, value: any)
-  {
-    const columnClause = this.getNestedSubclauseObject(filterClause, 'range', columnName);
-    if (!(filterOperator in columnClause) || value > columnClause[filterOperator])
-    {
-      columnClause[filterOperator] = value;
-    }
-  }
-
-  private addFilterTerm(filterClause: object, clause: string, subclause: string, columnName: string, value: any)
-  {
-    const sc = this.getNestedSubclauseList(filterClause, clause, subclause);
-    const termKVP = new Object();
-    termKVP[columnName] = value;
-    sc.push({ term: termKVP });
   }
 
   private getColumnName(expression: TastyNode)
@@ -307,5 +250,4 @@ export default class ElasticGeneratorRunner
 
     return column.value;
   }
-
 }
