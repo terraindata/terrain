@@ -48,9 +48,9 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-import DatabaseController from '../database/DatabaseController';
-import DatabaseRegistry from '../databaseRegistry/DatabaseRegistry';
-import TastyExecutor from '../tasty/TastyExecutor';
+import DatabaseController from '../../database/DatabaseController';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import TastyExecutor from '../../tasty/TastyExecutor';
 
 import Util from '../Util';
 

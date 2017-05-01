@@ -44,58 +44,101 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import * as Tasty from '../tasty/Tasty';
 import { UserConfig } from '../users/Users';
-import Util from '../Util';
+import { Versions } from '../versions/Versions';
 
-// CREATE TABLE versions (id integer PRIMARY KEY, \
-// objectType text NOT NULL, objectId integer NOT NULL, \
-// object text NOT NULL, createdAt datetime DEFAULT CURRENT_TIMESTAMP, createdByUserId integer NOT NULL);
+const versions = new Versions();
 
-export interface VersionConfig
+// CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, \
+// parentItemId integer NOT NULL, status text, type text);
+
+export interface ItemConfig
 {
-  createdByUserId: number;
   id?: number;
-  object: string;
-  objectId: number;
-  objectType: string;
+  meta?: string;
+  name: string;
+  parentItemId: number;
+  status?: string;
+  type?: string;
 }
 
-export class Versions
+export class Items
 {
-  private Version = new Tasty.Table('versions', ['id'], ['createdAt', 'createdByUserId', 'object', 'objectId', 'objectType']);
+  private itemTable: Tasty.Table;
 
-  public async create(user: UserConfig, type: string, id: number, obj: object): Promise<VersionConfig[]>
+  constructor()
   {
-    // can only insert
-    const newVersion: VersionConfig =
+    this.itemTable = new Tasty.Table('items', ['id'], ['meta', 'name', 'parentItemId', 'status', 'type']);
+  }
+
+  public async delete(id: number): Promise<object[]>
+  {
+    return App.DB.delete(this.itemTable, { id } as ItemConfig);
+  }
+
+  public async get(id?: number): Promise<ItemConfig[]>
+  {
+    if (id !== undefined)
+    {
+      return App.DB.select(this.itemTable, [], { id }) as any;
+    }
+    return App.DB.select(this.itemTable, [], {}) as any;
+  }
+
+  public async upsert(user: UserConfig, item: ItemConfig): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      // both regular and superusers can create items
+      // only superusers can change existing items that are not BUILD status
+      // both regular and superusers can change items that are not LIVE or DEFAULT status
+
+      // check if all the required parameters are passed
+      if (item === undefined || (item && (item.parentItemId === undefined || item.name === undefined)))
       {
-        createdByUserId: user.id,
-        object: obj.toString(),
-        objectId: id,
-        objectType: type,
-      };
-    return App.DB.upsert(this.Version, newVersion) as any;
-  }
+        return reject('Insufficient parameters passed');
+      }
 
-  public async find(id: number): Promise<VersionConfig[]>
-  {
-    return App.DB.select(this.Version, [], { id }) as any;
-  }
+      let status: string = item.status || '';
+      let oldItem;
 
-  public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
-  {
-    if (objectId !== undefined && objectType !== undefined)
-    {
-      return App.DB.select(this.Version, [], { objectType, objectId }) as any;
-    }
-    else if (objectId !== undefined)
-    {
-      return App.DB.select(this.Version, [], { objectType }) as any;
-    }
-    return App.DB.select(this.Version, [], {}) as any;
+      // item id specified but item not found
+      if (item.id !== undefined)
+      {
+        const items: ItemConfig[] = await this.get(item.id);
+        if (items.length === 0)
+        {
+          return reject('Invalid item id passed');
+        }
+
+        status = items[0].status || status;
+        oldItem = items[0];
+      }
+
+      // check privileges
+      if (!user.isSuperUser && (status === 'LIVE' || status === 'DEFAULT'))
+      {
+        return reject('Unauthorized');
+      }
+
+      try
+      {
+        if (item.id !== undefined)
+        {
+          await versions.create(user, 'items', oldItem.id, oldItem);
+        }
+
+        await App.DB.upsert(this.itemTable, item);
+        resolve('Success');
+      }
+      catch (e)
+      {
+        reject(e);
+      }
+    });
   }
 }
 
-export default Versions;
+export default Items;
