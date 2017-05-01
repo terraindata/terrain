@@ -175,7 +175,7 @@ class App extends PureClasss<Props>
     
     Ajax.midwayStatus(
       () => console.log('Midway is running'),
-      () => alert('Midway 2 is not running.')
+      () => console.log('Midway 2 is not running.')
     );
 
     try {
