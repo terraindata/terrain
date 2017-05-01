@@ -185,19 +185,19 @@ export default class ElasticGeneratorRunner
     }
     else if (expression.type === '<')
     {
-      body.filter('range', columnName, {lt: value});
+      body.filter('range', columnName, { lt: value });
     }
     else if (expression.type === '<=')
     {
-      body.filter('range', columnName, {lte: value});
+      body.filter('range', columnName, { lte: value });
     }
     else if (expression.type === '>')
     {
-      body.filter('range', columnName, {gt: value});
+      body.filter('range', columnName, { gt: value });
     }
     else if (expression.type === '>=')
     {
-      body.filter('range', columnName, {gte: value});
+      body.filter('range', columnName, { gte: value });
     }
     else if (expression.type === '&&')
     {
