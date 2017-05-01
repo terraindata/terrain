@@ -45,20 +45,22 @@ THE SOFTWARE.
 import * as _ from 'underscore';
 import ActionTypes from './AuthActionTypes';
 const Immutable = require('immutable');
+import AuthTypes from '../AuthTypes';
 
 const AuthReducer = {};
 
 AuthReducer[ActionTypes.login] =
-  (state, action) =>
+  (state: AuthTypes.AuthState, action) =>
   {
     const { token, username } = action.payload;
+    // store these values in localStorage so that the user is auto-logged in next time they visit
     localStorage['authenticationToken'] = token;
     localStorage['username'] = username;
     return state.set('authenticationToken', token).set('username', username);
   };
 
 AuthReducer[ActionTypes.logout] =
-  (state, action) =>
+  (state: AuthTypes.AuthState, action) =>
   {
     delete localStorage['authenticationToken'];
     delete localStorage['username'];
