@@ -69,7 +69,7 @@ UserReducers[ActionTypes.fetch] =
         const isAdmin = userObj.admin === 1;
         const isBuilder = userObj.builder === 1;
         const isDisabled = userObj.disabled === 1;
-        users = users.set(username, new UserTypes.User(
+        users = users.set(username, UserTypes._User(
           _.extend(data, {
             username,
             isAdmin,
