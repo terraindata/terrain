@@ -47,7 +47,7 @@ THE SOFTWARE.
 import App from './App';
 import CmdLineArgs from './CmdLineArgs';
 
-const app = new App();
-app.listen(CmdLineArgs.port);
+const app = new App(CmdLineArgs);
+const server = app.listen();
 
-// DB.loadSystemDB({ filename: CmdLineArgs.dbfile }, CmdLineArgs.dbtype);
+export default server;

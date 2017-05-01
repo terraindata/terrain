@@ -52,19 +52,33 @@ import convert = require('koa-convert');
 import session = require('koa-generic-session');
 import cors = require('kcors');
 
+import ElasticConfig from '../src/database/elastic/ElasticConfig';
+import ElasticController from '../src/database/elastic/ElasticController';
+
+import MySQLConfig from '../src/database/mysql/MySQLConfig';
+import MySQLController from '../src/database/mysql/MySQLController';
+
+import SQLiteConfig from '../src/database/sqlite/SQLiteConfig';
+import SQLiteController from '../src/database/sqlite/SQLiteController';
+
 import './auth/Passport';
+import CmdLineArgs from './CmdLineArgs';
 import './Logging';
 import Middleware from './Middleware';
 import Router from './Router';
 import * as Tasty from './tasty/Tasty';
 
+export let DB: Tasty.Tasty;
+
 class App
 {
-  private app: Koa;
   private DB: Tasty.Tasty;
+  private app: Koa;
 
-  constructor()
+  constructor(config: any = CmdLineArgs)
   {
+    this.DB = this.initializeDB(config.db.toLowerCase(), config.dsn.toLowerCase());
+    DB = this.DB;
 
     this.app = new Koa();
     this.app.proxy = true;
@@ -82,14 +96,59 @@ class App
     this.app.use(Router.routes());
   }
 
-  public listen(port: number)
+  public listen(port: number = CmdLineArgs.port)
   {
     return this.app.listen(port);
   }
 
-  private initializeDB(type: string, config: object)
+  private dsnToConfig(type: string, dsn: string): SQLiteConfig | MySQLConfig | ElasticConfig
   {
+    if (type === 'sqlite')
+    {
+      const config: SQLiteConfig = {
+        filename: dsn,
+      };
+      return config;
+    }
+    else if (type === 'mysql')
+    {
+      // TODO: Convert DSN to a MySQLConfig object.
+    }
+    else if (type === 'elasticsearch' || type === 'elastic')
+    {
+      // TODO: Convert DSN to a ElasticConfig object.
+    }
+    else
+    {
+      throw Error('Error parsing database connection parameters.');
+    }
+  }
 
+  private initializeDB(type: string, dsn: string): Tasty.Tasty
+  {
+    winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
+    if (type === 'sqlite')
+    {
+      const config = this.dsnToConfig(type, dsn) as SQLiteConfig;
+      const controller = new SQLiteController(config, 0, 'NodewaySQLite');
+      return controller.getTasty();
+    }
+    else if (type === 'mysql')
+    {
+      const config = this.dsnToConfig(type, dsn) as MySQLConfig;
+      const controller = new MySQLController(config, 0, 'NodewayMySQL');
+      return controller.getTasty();
+    }
+    else if (type === 'elasticsearch' || type === 'elastic')
+    {
+      const config = this.dsnToConfig(type, dsn) as ElasticConfig;
+      const controller = new ElasticController(config, 0, 'NodewayElastic');
+      return controller.getTasty();
+    }
+    else
+    {
+      throw Error('Error initializing Nodeway system database.');
+    }
   }
 }
 
