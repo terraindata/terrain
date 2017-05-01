@@ -44,81 +44,63 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import cmdLineArgs = require('command-line-args');
-import cmdLineUsage = require('command-line-usage');
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import reqText = require('require-text');
+import AuthRouter from './auth/AuthRouter';
+import ItemRouter from './items/ItemRouter';
+import QueryRouter from './query/QueryRouter';
+import SchemaRouter from './schema/SchemaRouter';
+import StatusRouter from './status/StatusRouter';
+import UserRouter from './users/UserRouter';
+import Util from './Util';
+import VersionRouter from './versions/VersionRouter';
 
-// process command-line arguments
-const optionList = [
-  {
-    alias: 'c',
-    defaultValue: 'config.json',
-    name: 'config',
-    type: Boolean,
-    typeLabel: 'file',
-    description: 'Configuration file to use.',
-  },
-  {
-    alias: 'p',
-    defaultValue: 3000,
-    name: 'port',
-    type: Number,
-    typeLabel: 'number',
-    description: 'Port to listen on.',
-  },
-  {
-    alias: 'd',
-    defaultValue: 'sqlite',
-    name: 'db',
-    type: String,
-    typeLabel: 'type',
-    description: 'System database backend to use.',
-  },
-  {
-    alias: 'n',
-    defaultValue: 'nodeway.db',
-    name: 'dsn',
-    type: String,
-    description: 'Backend-specific connection parameters. (e.g. file, dsn, host)',
+const AppRouter = new KoaRouter();
 
-  },
-  {
-    name: 'debug',
-    type: Boolean,
-    description: 'Turn on debug mode.',
-  },
-  {
-    name: 'help',
-    type: Boolean,
-    description: 'Show help and usage information.',
-  },
-  {
-    alias: 'v',
-    name: 'verbose',
-    type: Boolean,
-    description: 'Print verbose information.',
-  },
-];
+AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
+AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
+AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
+AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
+AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
+AppRouter.use('/status', StatusRouter.routes(), StatusRouter.allowedMethods());
+AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
+// Add future routes here.
 
-const CmdLineArgs = cmdLineArgs(optionList,
-  {
-    partial: true,
-  });
+// Prefix all routes with /midway
+//  This is so that we can allow the front-end to use all other routes.
+//  Any route not prefixed with /midway will just serve the front-end.
 
-const sections = [
-  {
-    header: 'Nodeway',
-    content: 'Refreshingly good.',
-  },
-  {
-    header: 'Options',
-    optionList,
-  },
-];
-
-if (cmdLineArgs.help === true)
+AppRouter.get('/', async (ctx, next) =>
 {
-  // tslint:disable-next-line
-  console.log(cmdLineUsage(sections));
-}
+  if (ctx.state.user)
+  {
+    ctx.body = 'authenticated as ' + ctx.state.user.username;
+  }
+  else
+  {
+    ctx.body = 'not authenticated';
+  }
+});
 
-export default CmdLineArgs;
+AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = 'authenticated as ' + ctx.state.user.username;
+});
+
+const MidwayRouter = new KoaRouter();
+MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
+
+MidwayRouter.get('/', async (ctx, next) =>
+{
+  const index = reqText('../../src/app/index.html', require);
+  ctx.body = index.toString();
+});
+
+MidwayRouter.get('/bundle.js', async (ctx, next) =>
+{
+  // TODO render this if DEV, otherwise render compiled bundle.js
+  ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
+});
+
+export default MidwayRouter;

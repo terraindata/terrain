@@ -44,58 +44,29 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DB from '../DB';
-import * as Tasty from '../tasty/Tasty';
-import { UserConfig } from '../users/Users';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
+
+import DatabaseController from '../../database/DatabaseController';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import TastyExecutor from '../../tasty/TastyExecutor';
+
 import Util from '../Util';
 
-// CREATE TABLE versions (id integer PRIMARY KEY, \
-// objectType text NOT NULL, objectId integer NOT NULL, \
-// object text NOT NULL, createdAt datetime DEFAULT CURRENT_TIMESTAMP, createdByUserId integer NOT NULL);
+const Router = new KoaRouter();
 
-export interface VersionConfig
+// TODO @jason / @david add passport.authenticate('access-token-local') below
+Router.get('/', async (ctx, next) =>
 {
-  createdByUserId: number;
-  id?: number;
-  object: string;
-  objectId: number;
-  objectType: string;
-}
+  winston.info('schema root');
+  const request = ctx.request.body.body;
+  Util.verifyParameters(request, ['database']);
 
-export class Versions
-{
-  private Version = new Tasty.Table('versions', ['id'], ['createdAt', 'createdByUserId', 'object', 'objectId', 'objectType']);
+  const database: DatabaseController = DatabaseRegistry.get(request.database);
+  const executor: TastyExecutor = database.getTasty().getExecutor();
+  const result = await executor.schema();
+  ctx.body = result.toString();
+});
 
-  public async create(user: UserConfig, type: string, id: number, obj: object): Promise<string>
-  {
-    // can only insert
-    const newVersion: VersionConfig =
-      {
-        createdByUserId: user.id,
-        object: obj.toString(),
-        objectId: id,
-        objectType: type,
-      };
-    return DB.getDB().upsert(this.Version, newVersion);
-  }
-
-  public async find(id: number): Promise<VersionConfig[]>
-  {
-    return DB.getDB().select(this.Version, [], { id });
-  }
-
-  public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
-  {
-    if (objectId !== undefined && objectType !== undefined)
-    {
-      return DB.getDB().select(this.Version, [], { objectType, objectId });
-    }
-    else if (objectId !== undefined)
-    {
-      return DB.getDB().select(this.Version, [], { objectType });
-    }
-    return DB.getDB().select(this.Version, [], {});
-  }
-}
-
-export default Versions;
+export default Router;

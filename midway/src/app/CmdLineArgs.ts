@@ -44,60 +44,88 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Koa from 'koa';
-import * as winston from 'winston';
+import * as fs from 'fs';
+import cmdLineArgs = require('command-line-args');
+import cmdLineUsage = require('command-line-usage');
 
-import BabelRegister = require('babel-register');
-import convert = require('koa-convert');
-import reqText = require('require-text');
-import session = require('koa-generic-session');
-import cors = require('kcors');
+// process command-line arguments
+const optionList = [
+  {
+    alias: 'c',
+    defaultValue: 'config.json',
+    name: 'config',
+    type: Boolean,
+    typeLabel: 'file',
+    description: 'Configuration file to use.',
+  },
+  {
+    alias: 'p',
+    defaultValue: 3000,
+    name: 'port',
+    type: Number,
+    typeLabel: 'number',
+    description: 'Port to listen on.',
+  },
+  {
+    alias: 'd',
+    defaultValue: 'sqlite',
+    name: 'db',
+    type: String,
+    typeLabel: 'type',
+    description: 'System database backend to use.',
+  },
+  {
+    alias: 'n',
+    defaultValue: 'nodeway.db',
+    name: 'dsn',
+    type: String,
+    description: 'Backend-specific connection parameters. (e.g. file, dsn, host)',
+  },
+  {
+    name: 'debug',
+    type: Boolean,
+    description: 'Turn on debug mode.',
+  },
+  {
+    name: 'help',
+    type: Boolean,
+    description: 'Show help and usage information.',
+  },
+  {
+    alias: 'v',
+    name: 'verbose',
+    type: Boolean,
+    description: 'Print verbose information.',
+  },
+];
 
-import './auth/Passport';
-import CmdLineArgs from './CmdLineArgs';
-import DB from './DB';
-import './Logging';
-import Middleware from './Middleware';
-import Router from './Router';
-import Users from './users/Users';
-import Util from './Util';
+let CmdLineArgs = cmdLineArgs(optionList,
+  {
+    partial: true,
+  });
 
-DB.loadSystemDB({ filename: CmdLineArgs.dbfile }, CmdLineArgs.dbtype);
+const sections = [
+  {
+    header: 'Nodeway',
+    content: 'Refreshingly good.',
+  },
+  {
+    header: 'Options',
+    optionList,
+  },
+];
 
-const index = reqText('../../src/app/index.html', require);
-
-Router.get('/bundle.js', async (ctx, next) =>
+if (CmdLineArgs.help)
 {
-  // TODO render this if DEV, otherwise render compiled bundle.js
-  ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
-});
+  // tslint:disable-next-line
+  console.log(cmdLineUsage(sections));
+}
 
-Router.get('/', async (ctx, next) =>
+// load options from a configuration file, if specified.
+if (cmdLineArgs.config)
 {
-  await next();
-  ctx.body = index.toString();
-});
+  const data = fs.readFileSync(CmdLineArgs.config, 'utf8');
+  CmdLineArgs = JSON.parse(data);
+}
 
-const app = new Koa();
-app.proxy = true;
-app.keys = ['your-session-secret'];
-app.use(cors());
-app.use(convert(session()));
-
-app.use(Middleware.bodyParser());
-app.use(Middleware.favicon('../src/app/favicon.ico'));
-app.use(Middleware.logger(winston));
-app.use(Middleware.responseTime());
-app.use(Middleware.passport.initialize());
-app.use(Middleware.passport.session());
-
-app.use(Router.routes());
-
-const request = app.listen(CmdLineArgs.port);
-
-export default request;
-
-// TODO list
-// - import HTML rather than writing directly inline
-// - kick off webpack dev server when in DEV mode (and kill it when server stops)
-// - difference between prod and dev mode: prod references bundle.js static file
+export default CmdLineArgs;

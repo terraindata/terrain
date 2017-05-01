@@ -44,49 +44,30 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as request from 'request';
-import * as _ from 'underscore';
-import * as Tasty from './tasty/Tasty';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-const config: Tasty.SQLiteConfig =
+import DatabaseController from '../../database/DatabaseController';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import Util from '../Util';
+
+const QueryRouter = new KoaRouter();
+
+QueryRouter.post(
+  '/',
+  async (ctx, next) =>
   {
-    filename: 'nodeway.db',
-  };
+    winston.info('query post');
+    const request = ctx.request.body.body;
 
-export const Util =
-  {
-    getRequest: (url) =>
+    Util.verifyParameters(request, ['database', 'type', 'query']);
+
+    const database: DatabaseController = DatabaseRegistry.get(request.database);
+    if (database === undefined)
     {
-      return new Promise((resolve, reject) =>
-      {
-        request(url, (error, res, body) =>
-        {
-          if (!error && res.statusCode === 200)
-          {
-            resolve(body);
-          }
-          else
-          {
-            reject(error);
-          }
-        });
-      });
-    },
-    verifyParameters: (parameters: any, required: string[]): void =>
-    {
-      if (!parameters)
-      {
-        throw Error('No parameters found.');
-      }
+      throw Error('Database "' + request.database + '" not found.');
+    }
+  });
 
-      for (const key in required)
-      {
-        if (!parameters.hasOwnProperty(key))
-        {
-          throw new Error('Parameter "' + key + '" not found in request object.');
-        }
-      }
-    },
-  };
-
-export default Util;
+export default QueryRouter;

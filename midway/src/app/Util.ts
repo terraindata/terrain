@@ -44,46 +44,44 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Tasty from './tasty/Tasty';
+import * as request from 'request';
+import * as _ from 'underscore';
+import * as Tasty from '../tasty/Tasty';
 
-const config: Tasty.SQLiteConfig =
+export const Util =
   {
-    filename: 'nodeway.db',
-  };
-
-let systemDB;
-
-export const DB =
-  {
-    getDB()
+    getRequest: (url) =>
     {
-      if (!systemDB)
+      return new Promise((resolve, reject) =>
       {
-        systemDB = new Tasty.Tasty(Tasty.SQLite, config);
-      }
-      return systemDB;
+        request(url, (error, res, body) =>
+        {
+          if (!error && res.statusCode === 200)
+          {
+            resolve(body);
+          }
+          else
+          {
+            reject(error);
+          }
+        });
+      });
     },
-
-    loadSystemDB: async (newConfig: Tasty.TastyConfig, configType: string) =>
+    verifyParameters: (parameters: any, required: string[]): void =>
     {
-      if (configType === 'ElasticSearch')
+      if (!parameters)
       {
-        systemDB = new Tasty.Tasty(Tasty.ElasticSearch, newConfig);
+        throw Error('No parameters found.');
       }
-      else if (configType === 'MySQL')
+
+      for (const key in required)
       {
-        systemDB = new Tasty.Tasty(Tasty.MySQL, newConfig);
+        if (!parameters.hasOwnProperty(key))
+        {
+          throw new Error('Parameter "' + key + '" not found in request object.');
+        }
       }
-      else if (configType === 'SQLite')
-      {
-        systemDB = new Tasty.Tasty(Tasty.SQLite, newConfig);
-      }
-      else
-      {
-        return -1; // not of the right type
-      }
-      return 0;
     },
   };
 
-export default DB;
+export default Util;

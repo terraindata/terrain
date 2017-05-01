@@ -45,20 +45,28 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as request from 'supertest';
-import DB from '../../src/DB';
+import App from '../../src/app/App';
 
-beforeAll(() =>
+let server;
+
+beforeAll(async () =>
 {
-  DB.loadSystemDB({ filename: 'nodewaytest.db' }, 'SQLite');
-});
+  const options =
+    {
+      db: 'sqlite',
+      dsn: 'nodewaytest.db',
+      port: 3000,
+    };
 
-import App from '../../src/App';
+  const app = new App(options);
+  server = app.listen();
+});
 
 describe('Version route tests', () =>
 {
   test('Get all versions: GET /midway/v1/versions', () =>
   {
-    return request(App)
+    return request(server)
       .get('/midway/v1/versions')
       .query({
         id: 1,
@@ -80,7 +88,7 @@ describe('Item route tests', () =>
 {
   test('Get all items: GET /midway/v1/items/', () =>
   {
-    return request(App)
+    return request(server)
       .get('/midway/v1/items/')
       .query({
         id: 1,
@@ -99,7 +107,7 @@ describe('Item route tests', () =>
 
   test('Create item: POST /midway/v1/items/', () =>
   {
-    return request(App)
+    return request(server)
       .post('/midway/v1/items/')
       .send({
         id: 1,
@@ -122,7 +130,7 @@ describe('Item route tests', () =>
 
   test('Get item: GET /midway/v1/items/:id', () =>
   {
-    return request(App)
+    return request(server)
       .get('/midway/v1/items/1')
       .query({
         id: 1,
@@ -141,7 +149,7 @@ describe('Item route tests', () =>
 
   test('Update item: POST /midway/v1/items/', () =>
   {
-    return request(App)
+    return request(server)
       .post('/midway/v1/items/')
       .send({
         id: 1,
@@ -165,7 +173,7 @@ describe('Item route tests', () =>
 
   test('Invalid update: POST /midway/v1/items/', (done) =>
   {
-    return request(App)
+    return request(server)
       .post('/midway/v1/items/')
       .send({
         id: 1,
@@ -192,7 +200,7 @@ describe('Schema route tests', () =>
 {
   test('GET /midway/v1/schema', async (done) =>
   {
-    request(App)
+    request(server)
       .get('/midway/v1/schema')
       .expect(200)
       .then((response) =>

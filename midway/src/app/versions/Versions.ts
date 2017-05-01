@@ -44,30 +44,58 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
-
-import DatabaseController from '../database/DatabaseController';
-import DatabaseRegistry from '../databaseRegistry/DatabaseRegistry';
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import { UserConfig } from '../users/Users';
 import Util from '../Util';
 
-const QueryRouter = new KoaRouter();
+// CREATE TABLE versions (id integer PRIMARY KEY, \
+// objectType text NOT NULL, objectId integer NOT NULL, \
+// object text NOT NULL, createdAt datetime DEFAULT CURRENT_TIMESTAMP, createdByUserId integer NOT NULL);
 
-QueryRouter.post(
-  '/',
-  async (ctx, next) =>
+export interface VersionConfig
+{
+  createdByUserId: number;
+  id?: number;
+  object: string;
+  objectId: number;
+  objectType: string;
+}
+
+export class Versions
+{
+  private Version = new Tasty.Table('versions', ['id'], ['createdAt', 'createdByUserId', 'object', 'objectId', 'objectType']);
+
+  public async create(user: UserConfig, type: string, id: number, obj: object): Promise<VersionConfig[]>
   {
-    winston.info('query post');
-    const request = ctx.request.body.body;
+    // can only insert
+    const newVersion: VersionConfig =
+      {
+        createdByUserId: user.id,
+        object: obj.toString(),
+        objectId: id,
+        objectType: type,
+      };
+    return App.DB.upsert(this.Version, newVersion) as any;
+  }
 
-    Util.verifyParameters(request, ['database', 'type', 'query']);
+  public async find(id: number): Promise<VersionConfig[]>
+  {
+    return App.DB.select(this.Version, [], { id }) as any;
+  }
 
-    const database: DatabaseController = DatabaseRegistry.get(request.database);
-    if (database === undefined)
+  public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
+  {
+    if (objectId !== undefined && objectType !== undefined)
     {
-      throw Error('Database "' + request.database + '" not found.');
+      return App.DB.select(this.Version, [], { objectType, objectId }) as any;
     }
-  });
+    else if (objectId !== undefined)
+    {
+      return App.DB.select(this.Version, [], { objectType }) as any;
+    }
+    return App.DB.select(this.Version, [], {}) as any;
+  }
+}
 
-export default QueryRouter;
+export default Versions;

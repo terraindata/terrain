@@ -20,7 +20,7 @@
     "build-prod": "yarn run commit-log && MIDWAY_HOST=pa-terraformer01.terrain.int webpack --config webpack.config.prod.js --output-filename bundle.js",
     "build-demo": "yarn run commit-log && MIDWAY_HOST=localhost webpack --config webpack.config.prod.js --output-filename bundle.demo.js",
     "build-gcloud": "yarn run commit-log && webpack --config webpack.config.gcloud.js --output-filename bundle.js",
-    "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node -P tsconfig.midway.json --harmony -- ./midway/src/App.ts",
+    "build-midway:live": "nodemon --exec ./node_modules/.bin/ts-node -P midway --harmony -- ./midway/src/Nodeway.ts",
     "lint": "./node_modules/.bin/tslint -c tslint.json --fix 'midway/**/*.ts{,x}'",
     "style": "find midway -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\;",
     "fix": "yarn run lint; yarn run style;"
@@ -72,6 +72,7 @@
     "babel-preset-stage-2": "^6.5.0",
     "babel-register": "^6.24.0",
     "babel-runtime": "^6.6.1",
+    "bodybuilder": "^2.1.0",
     "bcrypt": "^1.0.2",
     "classnames": "^2.2.5",
     "codemirror": "^5.16.0",

@@ -44,10 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export interface MySQLConfig
-{
-  connectionLimit: number;
-  host: string;
-}
+import * as mysql from 'mysql';
+
+export type MySQLConfig = mysql.IPoolConfig;
 
 export default MySQLConfig;
