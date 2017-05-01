@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DB from '../DB';
+import * as App from '../App';
 import * as Tasty from '../tasty/Tasty';
 import { UserConfig } from '../users/Users';
 import Util from '../Util';
@@ -66,7 +66,7 @@ export class Versions
 {
   private Version = new Tasty.Table('versions', ['id'], ['createdAt', 'createdByUserId', 'object', 'objectId', 'objectType']);
 
-  public async create(user: UserConfig, type: string, id: number, obj: object): Promise<string>
+  public async create(user: UserConfig, type: string, id: number, obj: object): Promise<VersionConfig[]>
   {
     // can only insert
     const newVersion: VersionConfig =
@@ -76,25 +76,25 @@ export class Versions
         objectId: id,
         objectType: type,
       };
-    return DB.getDB().upsert(this.Version, newVersion);
+    return App.DB.upsert(this.Version, newVersion) as any;
   }
 
   public async find(id: number): Promise<VersionConfig[]>
   {
-    return DB.getDB().select(this.Version, [], { id });
+    return App.DB.select(this.Version, [], { id }) as any;
   }
 
   public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
   {
     if (objectId !== undefined && objectType !== undefined)
     {
-      return DB.getDB().select(this.Version, [], { objectType, objectId });
+      return App.DB.select(this.Version, [], { objectType, objectId }) as any;
     }
     else if (objectId !== undefined)
     {
-      return DB.getDB().select(this.Version, [], { objectType });
+      return App.DB.select(this.Version, [], { objectType }) as any;
     }
-    return DB.getDB().select(this.Version, [], {});
+    return App.DB.select(this.Version, [], {}) as any;
   }
 }
 

@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as fs from 'fs';
 import cmdLineArgs = require('command-line-args');
 import cmdLineUsage = require('command-line-usage');
 
@@ -79,7 +80,6 @@ const optionList = [
     name: 'dsn',
     type: String,
     description: 'Backend-specific connection parameters. (e.g. file, dsn, host)',
-
   },
   {
     name: 'debug',
@@ -99,7 +99,7 @@ const optionList = [
   },
 ];
 
-const CmdLineArgs = cmdLineArgs(optionList,
+let CmdLineArgs = cmdLineArgs(optionList,
   {
     partial: true,
   });
@@ -115,10 +115,17 @@ const sections = [
   },
 ];
 
-if (cmdLineArgs.help === true)
+if (CmdLineArgs.help)
 {
   // tslint:disable-next-line
   console.log(cmdLineUsage(sections));
+}
+
+// load options from a configuration file, if specified.
+if (cmdLineArgs.config)
+{
+  const data = fs.readFileSync(CmdLineArgs.config, 'utf8');
+  CmdLineArgs = JSON.parse(data);
 }
 
 export default CmdLineArgs;

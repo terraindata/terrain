@@ -47,55 +47,113 @@ THE SOFTWARE.
 import * as Koa from 'koa';
 import * as winston from 'winston';
 
-import BabelRegister = require('babel-register');
+import babelRegister = require('babel-register');
 import convert = require('koa-convert');
-import reqText = require('require-text');
 import session = require('koa-generic-session');
 import cors = require('kcors');
+import srs = require('secure-random-string');
+
+import ElasticConfig from '../src/database/elastic/ElasticConfig';
+import ElasticController from '../src/database/elastic/ElasticController';
+
+import MySQLConfig from '../src/database/mysql/MySQLConfig';
+import MySQLController from '../src/database/mysql/MySQLController';
+
+import SQLiteConfig from '../src/database/sqlite/SQLiteConfig';
+import SQLiteController from '../src/database/sqlite/SQLiteController';
 
 import './auth/Passport';
 import CmdLineArgs from './CmdLineArgs';
-import DB from './DB';
 import './Logging';
 import Middleware from './Middleware';
 import Router from './Router';
-import Users from './users/Users';
-import Util from './Util';
+import * as Tasty from './tasty/Tasty';
 
-DB.loadSystemDB({ filename: CmdLineArgs.dbfile }, CmdLineArgs.dbtype);
+export let DB: Tasty.Tasty;
 
-const index = reqText('../../src/app/index.html', require);
-
-Router.get('/bundle.js', async (ctx, next) =>
+class App
 {
-  // TODO render this if DEV, otherwise render compiled bundle.js
-  ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
-});
+  private DB: Tasty.Tasty;
+  private app: Koa;
 
-Router.get('/', async (ctx, next) =>
-{
-  await next();
-  ctx.body = index.toString();
-});
+  constructor(config: any = CmdLineArgs)
+  {
+    this.DB = this.initializeDB(config.db.toLowerCase(), config.dsn.toLowerCase());
+    DB = this.DB;
 
-const app = new Koa();
-app.proxy = true;
-app.keys = ['your-session-secret'];
-app.use(cors());
-app.use(convert(session()));
+    this.app = new Koa();
+    this.app.proxy = true;
+    this.app.keys = [srs({ length: 256 })];
+    this.app.use(cors());
+    this.app.use(convert(session()));
 
-app.use(Middleware.bodyParser());
-app.use(Middleware.favicon('../src/app/favicon.ico'));
-app.use(Middleware.logger(winston));
-app.use(Middleware.responseTime());
-app.use(Middleware.passport.initialize());
-app.use(Middleware.passport.session());
+    this.app.use(Middleware.bodyParser());
+    this.app.use(Middleware.favicon('../src/app/favicon.ico'));
+    this.app.use(Middleware.logger(winston));
+    this.app.use(Middleware.responseTime());
+    this.app.use(Middleware.passport.initialize());
+    this.app.use(Middleware.passport.session());
 
-app.use(Router.routes());
+    this.app.use(Router.routes());
+  }
 
-const request = app.listen(CmdLineArgs.port);
+  public listen(port: number = CmdLineArgs.port)
+  {
+    return this.app.listen(port);
+  }
 
-export default request;
+  private dsnToConfig(type: string, dsn: string): SQLiteConfig | MySQLConfig | ElasticConfig
+  {
+    if (type === 'sqlite')
+    {
+      const config: SQLiteConfig = {
+        filename: dsn,
+      };
+      return config;
+    }
+    else if (type === 'mysql')
+    {
+      // TODO: Convert DSN to a MySQLConfig object.
+    }
+    else if (type === 'elasticsearch' || type === 'elastic')
+    {
+      // TODO: Convert DSN to a ElasticConfig object.
+    }
+    else
+    {
+      throw Error('Error parsing database connection parameters.');
+    }
+  }
+
+  private initializeDB(type: string, dsn: string): Tasty.Tasty
+  {
+    winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
+    if (type === 'sqlite')
+    {
+      const config = this.dsnToConfig(type, dsn) as SQLiteConfig;
+      const controller = new SQLiteController(config, 0, 'NodewaySQLite');
+      return controller.getTasty();
+    }
+    else if (type === 'mysql')
+    {
+      const config = this.dsnToConfig(type, dsn) as MySQLConfig;
+      const controller = new MySQLController(config, 0, 'NodewayMySQL');
+      return controller.getTasty();
+    }
+    else if (type === 'elasticsearch' || type === 'elastic')
+    {
+      const config = this.dsnToConfig(type, dsn) as ElasticConfig;
+      const controller = new ElasticController(config, 0, 'NodewayElastic');
+      return controller.getTasty();
+    }
+    else
+    {
+      throw Error('Error initializing Nodeway system database.');
+    }
+  }
+}
+
+export default App;
 
 // TODO list
 // - import HTML rather than writing directly inline
