@@ -44,46 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Tasty from './tasty/Tasty';
+import App from './App';
+import CmdLineArgs from './CmdLineArgs';
 
-const config: Tasty.SQLiteConfig =
-  {
-    filename: 'nodeway.db',
-  };
+const app = new App();
+app.listen(CmdLineArgs.port);
 
-let systemDB;
-
-export const DB =
-  {
-    getDB()
-    {
-      if (!systemDB)
-      {
-        systemDB = new Tasty.Tasty(Tasty.SQLite, config);
-      }
-      return systemDB;
-    },
-
-    loadSystemDB: async (newConfig: Tasty.TastyConfig, configType: string) =>
-    {
-      if (configType === 'ElasticSearch')
-      {
-        systemDB = new Tasty.Tasty(Tasty.ElasticSearch, newConfig);
-      }
-      else if (configType === 'MySQL')
-      {
-        systemDB = new Tasty.Tasty(Tasty.MySQL, newConfig);
-      }
-      else if (configType === 'SQLite')
-      {
-        systemDB = new Tasty.Tasty(Tasty.SQLite, newConfig);
-      }
-      else
-      {
-        return -1; // not of the right type
-      }
-      return 0;
-    },
-  };
-
-export default DB;
+// DB.loadSystemDB({ filename: CmdLineArgs.dbfile }, CmdLineArgs.dbtype);

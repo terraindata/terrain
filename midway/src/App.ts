@@ -47,40 +47,53 @@ THE SOFTWARE.
 import * as Koa from 'koa';
 import * as winston from 'winston';
 
-import BabelRegister = require('babel-register');
+import babelRegister = require('babel-register');
 import convert = require('koa-convert');
 import session = require('koa-generic-session');
 import cors = require('kcors');
 
 import './auth/Passport';
-import CmdLineArgs from './CmdLineArgs';
-import DB from './DB';
 import './Logging';
 import Middleware from './Middleware';
 import Router from './Router';
-import Users from './users/Users';
-import Util from './Util';
+import * as Tasty from './tasty/Tasty';
 
-DB.loadSystemDB({ filename: CmdLineArgs.dbfile }, CmdLineArgs.dbtype);
+class App
+{
+  private app: Koa;
+  private DB: Tasty.Tasty;
 
-const app = new Koa();
-app.proxy = true;
-app.keys = ['your-session-secret'];
-app.use(cors());
-app.use(convert(session()));
+  constructor()
+  {
 
-app.use(Middleware.bodyParser());
-app.use(Middleware.favicon('../src/app/favicon.ico'));
-app.use(Middleware.logger(winston));
-app.use(Middleware.responseTime());
-app.use(Middleware.passport.initialize());
-app.use(Middleware.passport.session());
+    this.app = new Koa();
+    this.app.proxy = true;
+    this.app.keys = ['your-session-secret'];
+    this.app.use(cors());
+    this.app.use(convert(session()));
 
-app.use(Router.routes());
+    this.app.use(Middleware.bodyParser());
+    this.app.use(Middleware.favicon('../src/app/favicon.ico'));
+    this.app.use(Middleware.logger(winston));
+    this.app.use(Middleware.responseTime());
+    this.app.use(Middleware.passport.initialize());
+    this.app.use(Middleware.passport.session());
 
-const request = app.listen(CmdLineArgs.port);
+    this.app.use(Router.routes());
+  }
 
-export default request;
+  public listen(port: number)
+  {
+    return this.app.listen(port);
+  }
+
+  private initializeDB(type: string, config: object)
+  {
+
+  }
+}
+
+export default App;
 
 // TODO list
 // - import HTML rather than writing directly inline

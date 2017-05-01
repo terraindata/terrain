@@ -48,11 +48,6 @@ import * as request from 'request';
 import * as _ from 'underscore';
 import * as Tasty from './tasty/Tasty';
 
-const config: Tasty.SQLiteConfig =
-  {
-    filename: 'nodeway.db',
-  };
-
 export const Util =
   {
     getRequest: (url) =>
