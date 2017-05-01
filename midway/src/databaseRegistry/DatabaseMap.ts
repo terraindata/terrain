@@ -53,6 +53,11 @@ class DatabaseMap
 {
   private map: Map<number, DatabaseController>;
 
+  constructor()
+  {
+    this.map = new Map();
+  }
+
   public get(id: number): DatabaseController | undefined
   {
     return this.map.get(id);

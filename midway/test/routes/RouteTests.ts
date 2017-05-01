@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as request from 'supertest';
+import * as winston from 'winston';
 import App from '../../src/app/App';
 
 let server;
@@ -75,7 +76,9 @@ describe('Version route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('[{"id":1,"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
+        expect(response.text)
+          .toBe(
+          '[{"id":1,"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
       })
       .catch((error) =>
       {
@@ -97,7 +100,8 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+        expect(response.text)
+          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
       })
       .catch((error) =>
       {
@@ -139,7 +143,8 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+        expect(response.text)
+          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
       })
       .catch((error) =>
       {
@@ -212,5 +217,32 @@ describe('Schema route tests', () =>
         }
       });
     done();
+  });
+});
+
+describe('Query route tests', () =>
+{
+  test('GET /midway/v1/query', async (done) =>
+  {
+    return request(server)
+      .post('/midway/v1/query/')
+      .send({
+        database: 0,
+        type: 'search',
+        body: {
+          from: 0, size: 0,
+          query: {},
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        winston.info(JSON.stringify(response));
+        done();
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
+      });
   });
 });

@@ -67,7 +67,7 @@ export default class ElasticQueryHandler extends QueryHandler
   public async handleQuery(request: object, context: object): void
   {
     const type = request.type;
-    const body = request.query;
+    const body = request.body;
 
     if (type === 'search')
     {

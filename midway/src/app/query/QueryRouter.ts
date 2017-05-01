@@ -58,10 +58,10 @@ QueryRouter.post(
   '/',
   async (ctx, next) =>
   {
-    winston.info('query post');
-    const request = ctx.request.body.body;
+    winston.info('query post' + JSON.stringify(ctx.request.body, null, 2));
+    const request = ctx.request.body;
 
-    Util.verifyParameters(request, ['database', 'type', 'query']);
+    Util.verifyParameters(request, ['database', 'type', 'body']);
 
     const database: DatabaseController = DatabaseRegistry.get(request.database);
     if (database === undefined)
