@@ -48,8 +48,8 @@ import * as bcrypt from 'bcrypt';
 import * as winston from 'winston';
 
 import srs = require('secure-random-string');
+import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import * as Tasty from '../tasty/Tasty';
 
 const saltRounds = 10;
 // CREATE TABLE users (id integer PRIMARY KEY, accessToken text NOT NULL, email text NOT NULL, isDisabled bool NOT NULL

@@ -53,21 +53,21 @@ import session = require('koa-generic-session');
 import cors = require('kcors');
 import srs = require('secure-random-string');
 
-import ElasticConfig from '../src/database/elastic/ElasticConfig';
-import ElasticController from '../src/database/elastic/ElasticController';
+import ElasticConfig from '../database/elastic/ElasticConfig';
+import ElasticController from '../database/elastic/ElasticController';
 
-import MySQLConfig from '../src/database/mysql/MySQLConfig';
-import MySQLController from '../src/database/mysql/MySQLController';
+import MySQLConfig from '../database/mysql/MySQLConfig';
+import MySQLController from '../database/mysql/MySQLController';
 
-import SQLiteConfig from '../src/database/sqlite/SQLiteConfig';
-import SQLiteController from '../src/database/sqlite/SQLiteController';
+import SQLiteConfig from '../database/sqlite/SQLiteConfig';
+import SQLiteController from '../database/sqlite/SQLiteController';
 
+import * as Tasty from '../tasty/Tasty';
 import './auth/Passport';
 import CmdLineArgs from './CmdLineArgs';
 import './Logging';
 import Middleware from './Middleware';
 import Router from './Router';
-import * as Tasty from './tasty/Tasty';
 
 export let DB: Tasty.Tasty;
 

@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import App from './App';
-import CmdLineArgs from './CmdLineArgs';
+import App from './app/App';
+import CmdLineArgs from './app/CmdLineArgs';
 
 const app = new App(CmdLineArgs);
 const server = app.listen();

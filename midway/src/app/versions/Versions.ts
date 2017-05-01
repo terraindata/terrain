@@ -44,101 +44,58 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import * as Tasty from '../tasty/Tasty';
 import { UserConfig } from '../users/Users';
-import { Versions } from '../versions/Versions';
+import Util from '../Util';
 
-const versions = new Versions();
+// CREATE TABLE versions (id integer PRIMARY KEY, \
+// objectType text NOT NULL, objectId integer NOT NULL, \
+// object text NOT NULL, createdAt datetime DEFAULT CURRENT_TIMESTAMP, createdByUserId integer NOT NULL);
 
-// CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, \
-// parentItemId integer NOT NULL, status text, type text);
-
-export interface ItemConfig
+export interface VersionConfig
 {
+  createdByUserId: number;
   id?: number;
-  meta?: string;
-  name: string;
-  parentItemId: number;
-  status?: string;
-  type?: string;
+  object: string;
+  objectId: number;
+  objectType: string;
 }
 
-export class Items
+export class Versions
 {
-  private itemTable: Tasty.Table;
+  private Version = new Tasty.Table('versions', ['id'], ['createdAt', 'createdByUserId', 'object', 'objectId', 'objectType']);
 
-  constructor()
+  public async create(user: UserConfig, type: string, id: number, obj: object): Promise<VersionConfig[]>
   {
-    this.itemTable = new Tasty.Table('items', ['id'], ['meta', 'name', 'parentItemId', 'status', 'type']);
+    // can only insert
+    const newVersion: VersionConfig =
+      {
+        createdByUserId: user.id,
+        object: obj.toString(),
+        objectId: id,
+        objectType: type,
+      };
+    return App.DB.upsert(this.Version, newVersion) as any;
   }
 
-  public async delete(id: number): Promise<object[]>
+  public async find(id: number): Promise<VersionConfig[]>
   {
-    return App.DB.delete(this.itemTable, { id } as ItemConfig);
+    return App.DB.select(this.Version, [], { id }) as any;
   }
 
-  public async get(id?: number): Promise<ItemConfig[]>
+  public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
   {
-    if (id !== undefined)
+    if (objectId !== undefined && objectType !== undefined)
     {
-      return App.DB.select(this.itemTable, [], { id }) as any;
+      return App.DB.select(this.Version, [], { objectType, objectId }) as any;
     }
-    return App.DB.select(this.itemTable, [], {}) as any;
-  }
-
-  public async upsert(user: UserConfig, item: ItemConfig): Promise<string>
-  {
-    return new Promise<string>(async (resolve, reject) =>
+    else if (objectId !== undefined)
     {
-      // both regular and superusers can create items
-      // only superusers can change existing items that are not BUILD status
-      // both regular and superusers can change items that are not LIVE or DEFAULT status
-
-      // check if all the required parameters are passed
-      if (item === undefined || (item && (item.parentItemId === undefined || item.name === undefined)))
-      {
-        return reject('Insufficient parameters passed');
-      }
-
-      let status: string = item.status || '';
-      let oldItem;
-
-      // item id specified but item not found
-      if (item.id !== undefined)
-      {
-        const items: ItemConfig[] = await this.get(item.id);
-        if (items.length === 0)
-        {
-          return reject('Invalid item id passed');
-        }
-
-        status = items[0].status || status;
-        oldItem = items[0];
-      }
-
-      // check privileges
-      if (!user.isSuperUser && (status === 'LIVE' || status === 'DEFAULT'))
-      {
-        return reject('Unauthorized');
-      }
-
-      try
-      {
-        if (item.id !== undefined)
-        {
-          await versions.create(user, 'items', oldItem.id, oldItem);
-        }
-
-        await App.DB.upsert(this.itemTable, item);
-        resolve('Success');
-      }
-      catch (e)
-      {
-        reject(e);
-      }
-    });
+      return App.DB.select(this.Version, [], { objectType }) as any;
+    }
+    return App.DB.select(this.Version, [], {}) as any;
   }
 }
 
-export default Items;
+export default Versions;

@@ -48,8 +48,8 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-import DatabaseController from '../database/DatabaseController';
-import DatabaseRegistry from '../databaseRegistry/DatabaseRegistry';
+import DatabaseController from '../../database/DatabaseController';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import Util from '../Util';
 
 const QueryRouter = new KoaRouter();
