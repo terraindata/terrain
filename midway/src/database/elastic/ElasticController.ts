@@ -49,9 +49,9 @@ import * as Tasty from '../../tasty/Tasty';
 import DatabaseController from '../DatabaseController';
 import ElasticClient from './client/ElasticClient';
 import ElasticConfig from './ElasticConfig';
+import ElasticQueryHandler from './query/ElasticQueryHandler';
 import ElasticExecutor from './tasty/ElasticExecutor';
 import ElasticGenerator from './tasty/ElasticGenerator';
-import ElasticQueryHandler from './tasty/ElasticQueryHandler';
 
 /**
  * The central controller for communicating with ElasticSearch.

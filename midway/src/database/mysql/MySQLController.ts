@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import * as Tasty from '../../tasty/Tasty';
 
-import QueryHandler from '../../query/QueryHandler';
+import QueryHandler from '../../app/query/QueryHandler';
 import DatabaseController from '../DatabaseController';
 import SQLiteGenerator from '../sqlite/tasty/SQLiteGenerator';
 import MySQLClient from './client/MySQLClient';

@@ -45,10 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // import ElasticConfig from '../ElasticConfig';
-import { makePromiseCallback } from '../../../tasty/Utils';
 // import ElasticCluster from '../client/ElasticCluster';
 // import ElasticIndices from '../client/ElasticIndices';
-import QueryHandler from '../../QueryHandler';
+import QueryHandler from '../../../app/query/QueryHandler';
+import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
 
 /**

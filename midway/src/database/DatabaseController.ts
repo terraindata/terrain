@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as winston from 'winston';
-import QueryHandler from '../query/QueryHandler';
+import QueryHandler from '../app/query/QueryHandler';
 import * as Tasty from '../tasty/Tasty';
 
 /**
