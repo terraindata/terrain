@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as Tasty from '../../tasty/Tasty';
 
+import QueryHandler from '../../query/QueryHandler';
 import DatabaseController from '../DatabaseController';
 import SQLiteGenerator from '../sqlite/tasty/SQLiteGenerator';
 import MySQLClient from './client/MySQLClient';
@@ -78,6 +79,11 @@ class MySQLController extends DatabaseController
   public getTasty(): Tasty.Tasty
   {
     return this.tasty;
+  }
+
+  public getQueryHandler(): QueryHandler
+  {
+    throw new Error('No QueryHandler is currently implemented for MySQL.');
   }
 }
 

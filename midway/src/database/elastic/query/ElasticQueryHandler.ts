@@ -44,32 +44,44 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+// import ElasticConfig from '../ElasticConfig';
+import { makePromiseCallback } from '../../../tasty/Utils';
+// import ElasticCluster from '../client/ElasticCluster';
+// import ElasticIndices from '../client/ElasticIndices';
+import QueryHandler from '../../QueryHandler';
+import ElasticController from '../ElasticController';
 
-import DatabaseController from '../database/DatabaseController';
-import DatabaseRegistry from '../databaseRegistry/DatabaseRegistry';
-import Util from '../Util';
+/**
+ * Implements the QueryHandler interface for ElasticSearch
+ */
+export default class ElasticQueryHandler extends QueryHandler
+{
+  private controller: ElasticController;
 
-const QueryRouter = new KoaRouter();
-
-QueryRouter.post(
-  '/',
-  async (ctx, next) =>
+  constructor(controller: ElasticController)
   {
-    winston.info('query post');
-    const request = ctx.request.body.body;
+    super();
+    this.controller = controller;
+  }
 
-    Util.verifyParameters(request, ['database', 'type', 'query']);
+  public async handleQuery(request: object, context: object): void
+  {
+    const type = request.type;
+    const body = request.query;
 
-    const database: DatabaseController = DatabaseRegistry.get(request.database);
-    if (database === undefined)
+    if (type === 'search')
     {
-      throw Error('Database "' + request.database + '" not found.');
+      const result = await new Promise((resolve, reject) =>
+      {
+        this.controller.getClient().search(body, makePromiseCallback(resolve, reject));
+      });
+
+      // NB: streaming not yet implemented
+      context.body = result;
+      return;
     }
 
-    database.getQueryHandler().query(request, ctx.body);
-  });
+    throw new Error('Query type "' + type + '" is not currently supported.');
+  }
 
-export default QueryRouter;
+}

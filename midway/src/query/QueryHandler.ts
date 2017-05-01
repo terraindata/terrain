@@ -44,32 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+abstract class QueryHandler
+{
+  public abstract handleQuery(request: object, context: object): void;
+}
 
-import DatabaseController from '../database/DatabaseController';
-import DatabaseRegistry from '../databaseRegistry/DatabaseRegistry';
-import Util from '../Util';
-
-const QueryRouter = new KoaRouter();
-
-QueryRouter.post(
-  '/',
-  async (ctx, next) =>
-  {
-    winston.info('query post');
-    const request = ctx.request.body.body;
-
-    Util.verifyParameters(request, ['database', 'type', 'query']);
-
-    const database: DatabaseController = DatabaseRegistry.get(request.database);
-    if (database === undefined)
-    {
-      throw Error('Database "' + request.database + '" not found.');
-    }
-
-    database.getQueryHandler().query(request, ctx.body);
-  });
-
-export default QueryRouter;
+export default QueryHandler;

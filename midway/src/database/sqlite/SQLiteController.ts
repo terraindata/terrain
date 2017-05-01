@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as Tasty from '../../tasty/Tasty';
 
+import QueryHandler from '../../query/QueryHandler';
 import DatabaseController from '../DatabaseController';
 import SQLiteClient from './client/SQLiteClient';
 import SQLiteConfig from './SQLiteConfig';
@@ -78,6 +79,11 @@ class SQLiteController extends DatabaseController
   public getTasty(): Tasty.Tasty
   {
     return this.tasty;
+  }
+
+  public getQueryHandler(): QueryHandler
+  {
+    throw new Error('No QueryHandler is currently implemented for SQLite.');
   }
 }
 

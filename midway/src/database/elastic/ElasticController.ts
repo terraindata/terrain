@@ -51,6 +51,7 @@ import ElasticClient from './client/ElasticClient';
 import ElasticConfig from './ElasticConfig';
 import ElasticExecutor from './tasty/ElasticExecutor';
 import ElasticGenerator from './tasty/ElasticGenerator';
+import ElasticQueryHandler from './tasty/ElasticQueryHandler';
 
 /**
  * The central controller for communicating with ElasticSearch.
@@ -59,15 +60,20 @@ class ElasticController extends DatabaseController
 {
   private client: ElasticClient;
   private tasty: Tasty.Tasty;
+  private queryHandler: ElasticQueryHandler;
 
   constructor(config: ElasticConfig, id: number, name: string)
   {
     super('ElasticController', id, name);
+
     this.client = new ElasticClient(this, config);
+
     this.tasty = new Tasty.Tasty(
       this,
       new ElasticExecutor(this.client),
       new ElasticGenerator());
+
+    this.queryHandler = new ElasticQueryHandler(this);
   }
 
   public getClient(): ElasticClient
@@ -78,6 +84,11 @@ class ElasticController extends DatabaseController
   public getTasty(): Tasty.Tasty
   {
     return this.tasty;
+  }
+
+  public getQueryHandler(): ElasticQueryHandler
+  {
+    return this.queryHandler;
   }
 }
 
