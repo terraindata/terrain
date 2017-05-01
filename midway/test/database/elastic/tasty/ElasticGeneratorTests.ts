@@ -70,7 +70,7 @@ test('t1', (done) =>
 {
   const query = new Tasty.Query(DBMovies).take(10);
   const qstr = elasticGenerator.generateString(query);
-  expect(qstr).toEqual('{\"index\":\"movies\",\"table\":\"data\",\"op\":\"select\",\"param\":{\"index\":\"movies\",\"type\":\"data\",\"size\":10,\"body\":{\"query\":{}}}}');
+  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","size":10,"body":{}}}');
   done();
 });
 
@@ -79,7 +79,7 @@ test('t2', (done) =>
   const query = new Tasty.Query(DBMovies);
   query.select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).take(10);
   const qstr = elasticGenerator.generateString(query);
-  expect(qstr).toEqual('{\"index\":\"movies\",\"table\":\"data\",\"op\":\"select\",\"param\":{\"index\":\"movies\",\"type\":\"data\",\"size\":10,\"body\":{\"_source\":[\"movieid\",\"title\",\"releasedate\"],\"query\":{}}}}');
+  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","size":10,"body":{"_source":["movieid","title","releasedate"]}}}');
   done();
 });
 
@@ -88,7 +88,7 @@ test('t3', (done) =>
   const query = new Tasty.Query(DBMovies);
   query.filter(DBMovies['movieid'].equals(123));
   const qstr = elasticGenerator.generateString(query);
-  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","body":{"query":{"bool":{"must":[{"term":{"movieid":123}}]}}}}}');
+  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","body":{"query":{"bool":{"filter":{"match":{"movieid":123}}}}}}}');
   done();
 });
 
@@ -97,25 +97,25 @@ test('t4', (done) =>
   const query = new Tasty.Query(DBMovies);
   query.filter(DBMovies['title'].doesNotEqual('Toy Story (1995)')).take(10);
   const qstr = elasticGenerator.generateString(query);
-  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","size":10,"body":{"query":{"bool":{"must_not":[{"term":{"title":"Toy Story (1995)"}}]}}}}}');
+  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","size":10,"body":{"query":{"bool":{"must_not":[{"match":{"title":"Toy Story (1995)"}}]}}}}}');
   done();
 });
 
 test('t5', (done) =>
 {
   const query = new Tasty.Query(DBMovies);
-  query.sort(DBMovies['title'], 'asc').take(10);
+  query.sort(DBMovies['movieid'], 'asc').take(10);
   const qstr = elasticGenerator.generateString(query);
-  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","size":10,"body":{"query":{},"sort":[{"title":"asc"}]}}}');
+  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","size":10,"body":{"sort":[{"movieid":{"order":"asc"}}]}}}');
   done();
 });
 
 test('t6', (done) =>
 {
   const query = new Tasty.Query(DBMovies);
-  query.sort(DBMovies['title'], 'desc').take(10);
+  query.sort(DBMovies['movieid'], 'desc').take(10);
   const qstr = elasticGenerator.generateString(query);
-  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","size":10,"body":{"query":{},"sort":[{"title":"desc"}]}}}');
+  expect(qstr).toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","size":10,"body":{"sort":[{"movieid":{"order":"desc"}}]}}}');
   done();
 });
 
@@ -124,12 +124,12 @@ test('t7', (done) =>
   const query = new Tasty.Query(DBMovies);
   query.select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).filter(DBMovies['movieid'].neq(2134));
   query.filter(DBMovies['releasedate'].gte('2007-03-24')).filter(DBMovies['releasedate'].lt('2017-03-24'));
-  query.sort(DBMovies['title'], 'asc').sort(DBMovies['movieid'], 'desc').sort(DBMovies['releasedate'], 'asc');
+  query.sort(DBMovies['movieid'], 'desc').sort(DBMovies['releasedate'], 'asc');
   query.take(10).skip(20);
 
   const qstr = elasticGenerator.generateString(query);
   /* tslint:disable-next-line:max-line-length */
   expect(qstr)
-    .toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","from":20,"size":10,"body":{"_source":["movieid","title","releasedate"],"query":{"bool":{"must_not":[{"term":{"movieid":2134}}]},"range":{"releasedate":{"gte":"2007-03-24","lt":"2017-03-24"}}},"sort":[{"title":"asc"},{"movieid":"desc"},{"releasedate":"asc"}]}}}');
+    .toEqual('{"index":"movies","table":"data","op":"select","param":{"index":"movies","type":"data","from":20,"size":10,"body":{"_source":["movieid","title","releasedate"],"sort":[{"movieid":{"order":"desc"}},{"releasedate":{"order":"asc"}}],"query":{"bool":{"filter":{"bool":{"must":[{"range":{"releasedate":{"gte":"2007-03-24"}}},{"range":{"releasedate":{"lt":"2017-03-24"}}}]}},"must_not":[{"match":{"movieid":2134}}]}}}}}');
   done();
 });
