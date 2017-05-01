@@ -44,17 +44,81 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import cmdLineArgs = require('command-line-args');
+import cmdLineUsage = require('command-line-usage');
 
-const Router = new KoaRouter();
+// process command-line arguments
+const optionList = [
+  {
+    alias: 'c',
+    defaultValue: 'config.json',
+    name: 'config',
+    type: Boolean,
+    typeLabel: 'file',
+    description: 'Configuration file to use.',
+  },
+  {
+    alias: 'p',
+    defaultValue: 3000,
+    name: 'port',
+    type: Number,
+    typeLabel: 'number',
+    description: 'Port to listen on.',
+  },
+  {
+    alias: 'd',
+    defaultValue: 'sqlite',
+    name: 'db',
+    type: String,
+    typeLabel: 'type',
+    description: 'System database backend to use.',
+  },
+  {
+    alias: 'n',
+    defaultValue: 'nodeway.db',
+    name: 'dsn',
+    type: String,
+    description: 'Backend-specific connection parameters. (e.g. file, dsn, host)',
 
-Router.get('/', async (ctx, next) =>
-{
-  ctx.body = JSON.stringify({
-    status: 'ok',
+  },
+  {
+    name: 'debug',
+    type: Boolean,
+    description: 'Turn on debug mode.',
+  },
+  {
+    name: 'help',
+    type: Boolean,
+    description: 'Show help and usage information.',
+  },
+  {
+    alias: 'v',
+    name: 'verbose',
+    type: Boolean,
+    description: 'Print verbose information.',
+  },
+];
+
+const CmdLineArgs = cmdLineArgs(optionList,
+  {
+    partial: true,
   });
-  winston.info('status root');
-});
 
-export default Router;
+const sections = [
+  {
+    header: 'Nodeway',
+    content: 'Refreshingly good.',
+  },
+  {
+    header: 'Options',
+    optionList,
+  },
+];
+
+if (cmdLineArgs.help === true)
+{
+  // tslint:disable-next-line
+  console.log(cmdLineUsage(sections));
+}
+
+export default CmdLineArgs;
