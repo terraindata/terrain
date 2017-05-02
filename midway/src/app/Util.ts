@@ -76,9 +76,9 @@ export const Util =
 
       for (const key of required)
       {
-        if (!parameters.hasOwnProperty(required[key]))
+        if (!parameters.hasOwnProperty(key))
         {
-          throw new Error('Parameter "' + required[key] + '" not found in request object.');
+          throw new Error('Parameter "' + key + '" not found in request object.');
         }
       }
     },
