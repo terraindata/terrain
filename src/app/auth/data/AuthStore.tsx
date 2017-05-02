@@ -47,10 +47,11 @@ const Immutable = require('immutable');
 const Redux = require('redux');
 import * as ReduxActions from 'redux-actions';
 import ActionTypes from './AuthActionTypes';
+import AuthTypes from '../AuthTypes';
 
 import AuthReducers from './AuthReducers';
 
-const AuthStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
+const AuthStore: IStore<AuthTypes.AuthState> = Redux.createStore(ReduxActions.handleActions(_.extend({},
   AuthReducers,
 {}), Immutable.Map({})), Immutable.Map({}));
 
