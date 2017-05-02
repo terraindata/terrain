@@ -277,6 +277,7 @@ export const Ajax =
   {
     const data = user.toJS();
     user.excludeFields.map((field) => delete data[field]);
+    user.dbFields.map((field) => delete data[field]);
     return Ajax._post(`/users/${user.username}`, JSON.stringify({
       data: JSON.stringify(data),
     }), onSave, onError);

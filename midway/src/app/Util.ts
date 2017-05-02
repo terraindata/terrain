@@ -74,7 +74,7 @@ export const Util =
         throw Error('No parameters found.');
       }
 
-      for (const key in required)
+      for (const key of required)
       {
         if (!parameters.hasOwnProperty(required[key]))
         {

@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as winston from 'winston';
+import QueryHandler from '../app/query/QueryHandler';
 import * as Tasty from '../tasty/Tasty';
 
 /**
@@ -81,6 +82,8 @@ abstract class DatabaseController
   public abstract getClient(): object;
 
   public abstract getTasty(): Tasty.Tasty;
+
+  public abstract getQueryHandler(): QueryHandler;
 }
 
 export default DatabaseController;

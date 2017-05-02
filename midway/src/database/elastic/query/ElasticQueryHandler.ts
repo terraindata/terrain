@@ -44,37 +44,45 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
+// import ElasticConfig from '../ElasticConfig';
+// import ElasticCluster from '../client/ElasticCluster';
+// import ElasticIndices from '../client/ElasticIndices';
 import * as winston from 'winston';
+import QueryHandler from '../../../app/query/QueryHandler';
+import { makePromiseCallback } from '../../../tasty/Utils';
+import ElasticController from '../ElasticController';
 
-import DatabaseController from '../../database/DatabaseController';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import Util from '../Util';
+/**
+ * Implements the QueryHandler interface for ElasticSearch
+ */
+export default class ElasticQueryHandler extends QueryHandler
+{
+  private controller: ElasticController;
 
-const QueryRouter = new KoaRouter();
-
-QueryRouter.post(
-  '/',
-  passport.authenticate('access-token-local'),
-  async (ctx, next) =>
+  constructor(controller: ElasticController)
   {
-    const request = ctx.request.body;
+    super();
+    this.controller = controller;
+  }
 
-    Util.verifyParameters(request, ['database', 'type', 'body']);
+  public async handleQuery(request: object, context: object): void
+  {
+    const type = request.type;
+    const body = request.body;
 
-    winston.info('query database: ' + request.database, +' type "' + request.type + '"');
-    winston.debug('query database debug: ' + request.database, +' type "' + request.type + '"' +
-      'body: ' + JSON.stringify(request.body));
-
-    const database: DatabaseController = DatabaseRegistry.get(request.database);
-    if (database === undefined)
+    if (type === 'search')
     {
-      throw Error('Database "' + request.database + '" not found.');
+      const result = await new Promise((resolve, reject) =>
+      {
+        this.controller.getClient().search(body, makePromiseCallback(resolve, reject));
+      });
+
+      // NB: streaming not yet implemented
+      context.body = result;
+      return;
     }
 
-    const qh = database.getQueryHandler();
-    await qh.handleQuery(request, ctx);
-  });
+    throw new Error('Query type "' + type + '" is not currently supported.');
+  }
 
-export default QueryRouter;
+}
