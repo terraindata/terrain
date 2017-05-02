@@ -374,33 +374,45 @@ This is important to remember if you are checking for the presence of a string w
 
 A list of common programming gotchas in this codebase
 
-- `let` scope is different than `var` (thankfully) but can cause unexpected errors. For example:  
-  ```if(isJoey)
-  {
-    var catchphrase = "How you doin'?";
-  }
-  console.log(catchphrase); // either the string or undefined```  
-  Versus:  
-  ```if(isPhoebe)
-  {
-    let catchphrase = "Oh no.";
-  }
-  console.log(catchphrase); // ERROR: cannot find name catchphrase
-  ```
+#### Scope for let and var
+
+`let` scope is different than `var` (thankfully) but can cause unexpected errors. If you're not used to it. For example:
+```javascript
+if(isJoey)
+{
+  var catchphrase = "How you doin'?";
+}
+console.log(catchphrase); // either the string or undefined```  
+
+Versus:  
+
+if(isPhoebe)
+{
+  let catchphrase = "Oh no.";
+}
+console.log(catchphrase); // ERROR: cannot find name catchphrase
+```
+
+#### Redux and React gotchas
+
 - Subscribe to Redux stores within the `componentDidMount` method. Do not subscribe in the constructor, or else you will likely see many React `setState` warnings
 - Do not call any methods that fetch data from the server and then update a redux store (e.g. `Actions.fetch()`) from within a constructor or you may see similar warnings (React thinks that state changes are happening from a higher component's `render` method). You can put these in `componentDidMount`
-- Inline functions in ES6 don't like comments if you don't include `{...}`:
-  ```
-  let works = () =>
-     console.log('success');
-     // log something
-  works(); // logs 'success';
 
-  let doesntWork = () =>
-     // log something
-     console.log('success'); // executed and logged at runtime
-  doesntWork(); // nothing is logged
-  ```
+#### ES6 gotchas
+
+Inline functions in ES6 don't like comments if you don't include `{...}`:
+
+```javascript
+let works = () =>
+  console.log('success');
+  // log something
+works(); // logs 'success';
+
+let doesntWork = () =>
+  // log something
+  console.log('success'); // executed and logged at runtime
+doesntWork(); // nothing is logged
+```
 
 ## Troubleshooting
 
