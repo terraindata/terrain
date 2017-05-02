@@ -59,22 +59,22 @@ QueryRouter.post(
   passport.authenticate('access-token-local'),
   async (ctx, next) =>
   {
-    const request = ctx.request.body;
+    const query = ctx.request.body;
 
-    Util.verifyParameters(request, ['database', 'type', 'body']);
+    Util.verifyParameters(query, ['database', 'type', 'body']);
 
-    winston.info('query database: ' + request.database, +' type "' + request.type + '"');
-    winston.debug('query database debug: ' + request.database, +' type "' + request.type + '"' +
-      'body: ' + JSON.stringify(request.body));
+    winston.info('query database: ' + query.database, +' type "' + query.type + '"');
+    winston.debug('query database debug: ' + query.database, +' type "' + query.type + '"' +
+      'body: ' + JSON.stringify(query.body));
 
-    const database: DatabaseController = DatabaseRegistry.get(request.database);
+    const database: DatabaseController = DatabaseRegistry.get(query.database);
     if (database === undefined)
     {
-      throw Error('Database "' + request.database + '" not found.');
+      throw Error('Database "' + query.database + '" not found.');
     }
 
     const qh = database.getQueryHandler();
-    await qh.handleQuery(request, ctx);
+    ctx.body = await qh.handleQuery(query);
   });
 
 export default QueryRouter;
