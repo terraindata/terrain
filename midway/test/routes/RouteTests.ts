@@ -236,6 +236,8 @@ describe('Query route tests', () =>
     return request(server)
       .post('/midway/v1/query/')
       .send({
+        id: 1,
+        accessToken: 'AccessToken',
         database: 0,
         type: 'search',
         body: {

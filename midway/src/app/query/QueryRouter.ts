@@ -56,6 +56,7 @@ const QueryRouter = new KoaRouter();
 
 QueryRouter.post(
   '/',
+  passport.authenticate('access-token-local'),
   async (ctx, next) =>
   {
     const request = ctx.request.body;
