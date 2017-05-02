@@ -86,7 +86,7 @@ export const Users =
         // update
         if (reqBody.id)
         {
-          user = await Users.find(reqBody.id);
+          user = await Users.get(reqBody.id);
           const userExists: boolean = !!user && user.length !== 0;
           if (!userExists)
           {
@@ -187,9 +187,13 @@ export const Users =
       });
     },
 
-    find: async (id: number) =>
+    get: async (id?: number): Promise<UserConfig[]> =>
     {
-      return await App.DB.select(User, [], { id });
+      if (id !== undefined)
+      {
+        return App.DB.select(User, [], { id }) as any;
+      }
+      return App.DB.select(User, [], {}) as any;
     },
 
     loginWithAccessToken: async (id: number, accessToken: string): Promise<UserConfig> =>
@@ -252,21 +256,12 @@ export const Users =
       }
       const user = results[0];
       user['accessToken'] = '';
-      return await Users.upsert(user);
-    },
-
-    replace: async (user, id?) =>
-    {
-      if (id)
-      {
-        user['id'] = id;
-      }
-      return await App.DB.upsert(User, user);
+      return Users.upsert(user);
     },
 
     upsert: async (newUser) =>
     {
-      return await App.DB.upsert(User, newUser);
+      return App.DB.upsert(User, newUser);
     },
   };
 

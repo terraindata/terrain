@@ -68,8 +68,35 @@ Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('create/modify items');
-  ctx.body = await items.upsert(ctx.state.user, ctx.request.body.body);
+  winston.info('create items');
+  const item = ctx.request.body.body;
+  Util.verifyParameters(item, ['name']);
+  if (item.id)
+  {
+    throw Error('Invalid parameter item ID');
+  }
+
+  ctx.body = await items.upsert(ctx.state.user, item);
+});
+
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('modify items');
+  const item = ctx.request.body.body;
+  Util.verifyParameters(item, ['name']);
+  if (!item.id)
+  {
+    item.id = ctx.params.id;
+  }
+  else
+  {
+    if (item.id !== Number(ctx.params.id))
+    {
+      throw Error('Item ID does not match the supplied id in the URL');
+    }
+  }
+
+  ctx.body = await items.upsert(ctx.state.user, item);
 });
 
 export default Router;
