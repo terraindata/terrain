@@ -250,17 +250,14 @@ export default class SQLiteGeneratorRunner
     }
 
     this.indent();
-    for (let i = 0; ;)
+    for (let i = 0; i < elements.length; ++i)
     {
       onEach(elements[i]);
 
-      ++i;
-      if (i >= elements.length)
+      if (i < elements.length - 1)
       {
-        break;
+        onSeparator();
       }
-
-      onSeparator();
     }
     this.unindent();
   }
