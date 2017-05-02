@@ -109,7 +109,7 @@ describe('Item route tests', () =>
       .then((response) =>
       {
         expect(response.text)
-          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parent":0,"status":"Alive","type":"Singer"}]');
       })
       .catch((error) =>
       {
@@ -126,7 +126,6 @@ describe('Item route tests', () =>
         accessToken: 'AccessToken',
         body: {
           name: 'Test Item',
-          parentItemId: 0,
         },
       })
       .expect(200)
@@ -152,7 +151,7 @@ describe('Item route tests', () =>
       .then((response) =>
       {
         expect(response.text)
-          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parent":0,"status":"Alive","type":"Singer"}]');
       })
       .catch((error) =>
       {
@@ -163,14 +162,13 @@ describe('Item route tests', () =>
   test('Update item: POST /midway/v1/items/', () =>
   {
     return request(server)
-      .post('/midway/v1/items/')
+      .post('/midway/v1/items/2')
       .send({
         id: 1,
         accessToken: 'AccessToken',
         body: {
           id: 2,
           name: 'Updated Item',
-          parentItemId: 1,
         },
       })
       .expect(200)
@@ -187,14 +185,13 @@ describe('Item route tests', () =>
   test('Invalid update: POST /midway/v1/items/', (done) =>
   {
     return request(server)
-      .post('/midway/v1/items/')
+      .post('/midway/v1/items/314159265359')
       .send({
         id: 1,
         accessToken: 'AccessToken',
         body: {
           id: 314159265359,
           name: 'Test Item',
-          parentItemId: 1,
         },
       })
       .expect(500)

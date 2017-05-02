@@ -50,23 +50,41 @@ import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import TastyExecutor from '../../tasty/TastyExecutor';
+import * as Tasty from '../../tasty/Tasty';
 
 import Util from '../Util';
 
 const Router = new KoaRouter();
 
-// TODO @jason / @david add passport.authenticate('access-token-local') below
-Router.get('/', async (ctx, next) =>
+async function getSchema(databaseID: number): Promise<string>
 {
-  winston.info('schema root');
-  const request = ctx.request.body.body;
-  Util.verifyParameters(request, ['database']);
+  const database: DatabaseController = DatabaseRegistry.get(databaseID);
+  const schema: Tasty.Schema = await database.getTasty().schema();
+  return schema.toString();
+}
 
-  const database: DatabaseController = DatabaseRegistry.get(request.database);
-  const executor: TastyExecutor = database.getTasty().getExecutor();
-  const result = await executor.schema();
-  ctx.body = result.toString();
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting all schema');
+  const request = ctx.request.body.body;
+  if (request.database)
+  {
+    ctx.body = await getSchema(request.database);
+  }
+  else
+  {
+    for (const [id, database] of DatabaseRegistry.getAll())
+    {
+      ctx.body += await getSchema(id);
+    }
+  }
+});
+
+Router.get('/:database', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('get schema');
+  const request = ctx.request.body.body;
+  ctx.body = await getSchema(ctx.params.database);
 });
 
 export default Router;

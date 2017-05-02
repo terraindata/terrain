@@ -87,7 +87,7 @@ Middleware.passport.deserializeUser(async (id, done) =>
 {
   try
   {
-    const user = await Users.find(id);
+    const user = await Users.get(id);
     done(null, user);
   }
   catch (e)
