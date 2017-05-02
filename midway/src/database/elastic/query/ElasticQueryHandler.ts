@@ -65,7 +65,7 @@ export default class ElasticQueryHandler extends QueryHandler
     this.controller = controller;
   }
 
-  public async handleQuery(request: object, context: object): void
+  public async handleQuery(request: any, context: any): Promise<void>
   {
     const type = request.type;
     const body = request.body;

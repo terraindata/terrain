@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 abstract class QueryHandler
 {
-  public abstract handleQuery(request: object, context: object): void;
+  public abstract handleQuery(request: any, context: any): Promise<void>;
 }
 
 export default QueryHandler;
