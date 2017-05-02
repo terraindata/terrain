@@ -44,9 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-abstract class QueryHandler
+export interface Query
 {
-  public abstract handleQuery(request: object, context: object): void;
+  database: number;
+  type: string;
+  body: object | string;
+}
+
+export abstract class QueryHandler
+{
+  public async abstract handleQuery(request: Query): Promise<string>;
 }
 
 export default QueryHandler;
