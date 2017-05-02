@@ -22,16 +22,16 @@ cache:
 
 before_script:
   - apt-get update && apt --assume-yes install parallel
-  - npm install -g webpack
-  - npm install -g webpack-dev-server
+  - yarn install -g webpack
+  - yarn install -g webpack-dev-server
   - yarn install
 
 lint:
   script:
-    - npm run lint
+    - yarn run lint
 
 test_backends:
   script:
-   - npm install
-   - npm run fix
-   - npm run test-back
+   - yarn install
+   - yarn run fix
+   - yarn run test-back-all
