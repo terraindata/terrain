@@ -22,8 +22,8 @@ cache:
 
 before_script:
   - apt-get update && apt --assume-yes install parallel
-  - yarn install -g webpack
-  - yarn install -g webpack-dev-server
+  - yarn global add webpack
+  - yarn global add webpack-dev-server
   - yarn install
 
 lint:
