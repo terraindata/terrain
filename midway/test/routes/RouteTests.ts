@@ -48,8 +48,9 @@ import * as request from 'supertest';
 import App from '../../src/app/App';
 
 let server;
+let testUserAccessToken: string;
 
-beforeAll(async () =>
+beforeAll(() =>
 {
   const options =
     {
@@ -60,6 +61,132 @@ beforeAll(async () =>
 
   const app = new App(options);
   server = app.listen();
+
+  return request(server)
+    .post('/midway/v1/users/create')
+    .send({
+      id: 1,
+      accessToken: 'AccessToken',
+      body: {
+        email: 'test@terraindata.com',
+        name: 'Test Person',
+        password: 'Flash Flash Hundred Yard Dash',
+        isAdmin: false,
+        isDisabled: false,
+        timezone: 'UTC',
+      },
+    })
+    .expect(200)
+    .then((response) =>
+    {
+      expect(response.text).toEqual('[]');
+
+      request(server)
+        .post('/midway/v1/auth/api_login')
+        .send({
+          email: 'test@terraindata.com',
+          password: 'Flash Flash Hundred Yard Dash',
+        })
+        // .expect(200)
+        .then((resp) =>
+        {
+          // expect(response.text).not.toBe('Unauthorized');
+          testUserAccessToken = JSON.parse(resp.text).accessToken;
+          console.log(testUserAccessToken);
+        })
+        .catch((error) =>
+        {
+          fail('POST /midway/v1/auth/api_login request returned an error: ' + error);
+          testUserAccessToken = 'failed';
+        });
+    })
+    .catch((error) =>
+    {
+      fail('POST /midway/v1/users/ request returned an error: ' + error);
+      testUserAccessToken = 'failed';
+    });
+
+});
+
+describe('User and auth route tests', () =>
+{
+  test('http login route: GET /midway/v1/auth/login', () =>
+  {
+    return request(server)
+      .get('/midway/v1/auth/login')
+      .query({
+        email: 'test@terraindata.com',
+        password: 'Flash Flash Hundred Yard Dash',
+      })
+      .expect(302)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/auth/login request returned an error: ' + error);
+      });
+  });
+
+  test('logout: POST /midway/v1/auth/api_logout', () =>
+  {
+    console.log('testuseraccesstoken is '+testUserAccessToken);
+    return request(server)
+      .post('/midway/v1/auth/api_logout')
+      .send({
+        id: '2',
+        accessToken: testUserAccessToken,
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe('Success');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_logout request returned an error: ' + error);
+      });
+  });
+
+  test('access API route with bad accessToken: POST /midway/v1/auth/api_logout', () =>
+  {
+    return request(server)
+      .post('/midway/v1/auth/api_logout')
+      .send({
+        id: '2',
+        accessToken: testUserAccessToken,
+      })
+      .expect(500)
+      .then((response) =>
+      {
+        expect(response.text).toBe('Unauthorized');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_logout request returned an error: ' + error);
+      });
+  });
+
+  test('get new accessToken : POST /midway/v1/auth/api_login', () =>
+  {
+    return request(server)
+      .post('/midway/v1/auth/api_login')
+      .send({
+        email: 'test@terraindata.com',
+        password: 'Flash Flash Hundred Yard Dash',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        testUserAccessToken = response.text.accessToken;
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_login request returned an error: ' + error);
+      });
+  });
 });
 
 describe('Version route tests', () =>
@@ -171,7 +298,7 @@ describe('Item route tests', () =>
       });
   });
 
-  test('Invalid update: POST /midway/v1/items/', (done) =>
+  test('Invalid update id: POST /midway/v1/items/', (done) =>
   {
     return request(server)
       .post('/midway/v1/items/')
@@ -194,23 +321,72 @@ describe('Item route tests', () =>
         fail('POST /midway/v1/items/ request returned an error: ' + error);
       });
   });
-});
 
-describe('Schema route tests', () =>
-{
-  test('GET /midway/v1/schema', async (done) =>
+  test('Create LIVE item: POST /midway/v1/items/', (done) =>
   {
-    request(server)
-      .get('/midway/v1/schema')
+    return request(server)
+      .post('/midway/v1/items/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        body: {
+          name: 'Test Item 3',
+          parentItemId: 0,
+          status: 'LIVE',
+        },
+      })
       .expect(200)
       .then((response) =>
       {
-        // TODO @david check against expected value for schema, not just non-emptiness
-        if (response.text === '')
-        {
-          fail('GET /schema request returned empty response body');
-        }
+        done();
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
       });
-    done();
+  });
+
+  test('Invalid update (invalid status): POST /midway/v1/items/', (done) =>
+  {
+    return request(server)
+      .post('/midway/v1/items/')
+      .send({
+        id: 2,
+        accessToken: testUserAccessToken,
+        body: {
+          id: 3,
+          name: 'Test Item',
+          parentItemId: 0,
+          status: 'BUILD',
+        },
+      })
+      .expect(500)
+      .then((response) =>
+      {
+        done();
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
+      });
   });
 });
+
+// describe('Schema route tests', () =>
+// {
+//   test('GET /midway/v1/schema', async (done) =>
+//   {
+//     request(server)
+//       .get('/midway/v1/schema')
+//       .expect(200)
+//       .then((response) =>
+//       {
+//         // TODO @david check against expected value for schema, not just non-emptiness
+//         if (response.text === '')
+//         {
+//           fail('GET /schema request returned empty response body');
+//         }
+//       });
+//     done();
+//   });
+// });

@@ -115,6 +115,7 @@ export const Users =
         }
         else // create
         {
+          requirePassword = true;
           if (!reqBody.email || !reqBody.password)
           {
             resolve('Require both email and password for user creation');
@@ -167,6 +168,7 @@ export const Users =
             if (res)
             {
               resolve(Users.upsert(newUser));
+              return;
             }
             else
             {
@@ -183,6 +185,7 @@ export const Users =
         else
         {
           resolve(Users.upsert(newUser)); // anything else
+          return;
         }
       });
     },
