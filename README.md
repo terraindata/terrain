@@ -67,17 +67,20 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 
 
 * For Mac:
-  * Install Homebrew `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
-  * Install Node `brew install node`
-  * Install yarn. `brew install yarn`
-  * Install parallel for back-end tests. `brew install parallel`
+  * Install Homebrew: `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
+  * Install Node: `brew install node`
+  * Install yarn: `brew install yarn`
+  * Install parallel: `brew install parallel`
   * `brew install mysql`
   * [Download and install](https://docs.docker.com/docker-for-mac/install/) docker for Mac
   * `docker login` (ask for access on dockerhub)
 * For Linux:
-  * Install nodejs, yarn, and n `curl -L https://git.io/n-install | bash`
-  * Reinit your bash environment `source ~/.bashrc`
-  * Install the latest LTS node version (6.10.2): `n lts`
+  * Make sure package lists are up to date: `sudo apt-get update`
+  * Install parallel, bash, curl: `sudo apt-get install -y parallel bash curl`
+  * Install nodejs v7  repo: `sudo curl -sL https://deb.nodesource.com/setup_7.x | bash -`
+  * Update package lists again: `sudo apt-get update`
+  * Install nodejs: `sudo apt-get install -y nodejs`
+  * Install yarn: `sudo npm -g install yarn`
 * `yarn`
 * `yarn global add webpack-dev-server`
 * `yarn start` - starts the Midway server, now running at localhost:3000
@@ -108,22 +111,11 @@ To setup a node project using typescript for debugging inside webstorm:
   * Put a name in for this configuration
   * Set the command to 'run'
   * Set the script to one of the options listed in package.json, like 'test-back'
-  * Make sure the node intepreter is set correctly (on linux with above config, it should be ~/n/bin/node)
+  * Make sure the node intepreter is set correctly
   * Set any other args or options you like
   * Now you can run the script inside Webstorm!
-  * It isn't yet known how to get webstorm to debug via npm launched scripts
-* To run a project on node and be able to debug it inside webstorm:
-  * From the 'Run' menu, select 'Run/Debug Configurations'
-  * Click '+' to add a configuration
-  * Select 'Node.js' from the list of configuration types
-  * Put a name in for this configuration
-  * Make sure the node interpreter is set correctly (on linux with above config, it should be ~/n/bin/node)
-  * Fill out any node parameters (typically '--harmony')
-  * Set the working directory (typically the root Search repo dir, like /home/charles/terrain/Search)
-  * Choose the entry point js file, such as 'midwway/test/TestSuite.js'. If the file is a typescript file, choose the
-    transpiled js version.
-  * Fill out any additional settings you like
-  * You can now run and debug your node code inside webstorm!
+  * To debug an npm script add `$NODE_DEBUG_OPTION` to the command line: http://pavelpolyakov.com/2016/05/01/webstorm-npm-tasks-debug/
+  * To run & debug jest tests with teh integrated jest runner, add a run/debug configuration of type `jest` in the root source directory
 
 
 ## Major Dependencies
@@ -135,25 +127,28 @@ Links are to relevant overviews and tutorials.
 
 ### Full Stack
 
-- [JSX / ES6 - the newest version of Javascript](http://ccoenraets.github.io/es6-tutorial/)
+- [JSX / ES6](http://ccoenraets.github.io/es6-tutorial/), the newest version of Javascript
 - [Typescript](https://www.typescriptlang.org/docs/tutorial.html)
 - [Immutable](https://facebook.github.io/immutable-js/)
-- npm
-- [Tape, for testing](https://github.com/substack/tape)
+- [yarn](https://yarnpkg.com/en/), for package managment (primary)
+- [npm](https://www.npmjs.com/), for package managment (secondary)
+- [Tape](https://github.com/substack/tape), for testing
 
 ### Front-End
 
-- React
-- Redux
-- LESS
-- ReactRouter
-- Webpack
+- [React](https://facebook.github.io/react/)
+- [Redux](http://redux.js.org/)
+- [LESS](http://lesscss.org/)
+- [ReactRouter](https://github.com/ReactTraining/react-router)
+- [Webpack](https://webpack.github.io/)
 
 ### Back-End
 
-- Node
-- Koa
-- Jest, Sinon, and Chai for testing
+- [Node](https://nodejs.org/en/), for running
+- [Koa](http://koajs.com/), for routing
+- [Jest](https://facebook.github.io/jest/), for testing (primary)
+- [Sinon](http://sinonjs.org/), for testing
+- [Chai](http://chaijs.com/), for testing (deprecated)
 
 
 ## Coding Standards
@@ -187,6 +182,31 @@ Contains Actions and Stores for Redux.
 - `[SmallerApp]Store.tsx`: the Store that defines that app's default state and its reducers
 - `[SmallerApp || CategoryOfFunctions]Reducers.tsx`: defines reducers relating to a common function in that smaller app.
     If the smaller app doesn't have many different actions, there may be just one reducers file.
+
+### midway
+
+Contains the code for midway, which acts as Terraformer's middlewear.
+
+### midway/src
+
+Contains the source code for midway
+
+### midway/src/app
+
+Contains App.ts, Router.ts, route handlers and other app-related sources. Each route handler is in its own directory.
+
+### midway/src/database
+
+Contains database-specific implementations of various interfaces, such as the TastyORM and the /query route handler.
+
+### midway/src/tasty
+
+Contains the TastyORM, a simple ORM used to abstract database queries from the specific database beign queried. Used to store and retrieve terraformer state data.
+
+### midway/test
+
+Contains unit tests for Midway. test's directory structure mirrors that of midway/src. Unit tests for a particular file in midway/src will be found in the same location in midway/test. Test files must be suffixed with 'Tests' in order to be run by jest. 
+
 
 ## Packages and Imports
 
