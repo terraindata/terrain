@@ -47,6 +47,8 @@ THE SOFTWARE.
 import * as request from 'supertest';
 import * as winston from 'winston';
 import App from '../../src/app/App';
+import ElasticController from '../../src/database/elastic/ElasticController';
+import DatabaseRegistry from '../../src/databaseRegistry/DatabaseRegistry';
 
 let server;
 
@@ -61,6 +63,12 @@ beforeAll(async () =>
 
   const app = new App(options);
   server = app.listen();
+
+  DatabaseRegistry.set(
+    0,
+    new ElasticController({
+      hosts: ['http://localhost:9200'],
+    }, 0, 'RouteTests'));
 });
 
 describe('Version route tests', () =>
@@ -192,6 +200,7 @@ describe('Item route tests', () =>
       .expect(500)
       .then((response) =>
       {
+        winston.info('response: "' + response + '"');
         done();
       })
       .catch((error) =>
@@ -230,14 +239,20 @@ describe('Query route tests', () =>
         database: 0,
         type: 'search',
         body: {
-          from: 0, size: 0,
-          query: {},
+          index: 'movies',
+          type: 'data',
+          from: 0,
+          size: 0,
+          body: {
+            query: {},
+          },
         },
       })
       .expect(200)
       .then((response) =>
       {
-        winston.info(JSON.stringify(response));
+        // winston.info(JSON.stringify(response));
+        expect(JSON.parse(response.text).hits).toEqual({ total: 27278, max_score: 0, hits: [] });
         done();
       })
       .catch((error) =>

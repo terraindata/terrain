@@ -47,6 +47,7 @@ THE SOFTWARE.
 // import ElasticConfig from '../ElasticConfig';
 // import ElasticCluster from '../client/ElasticCluster';
 // import ElasticIndices from '../client/ElasticIndices';
+import * as winston from 'winston';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';

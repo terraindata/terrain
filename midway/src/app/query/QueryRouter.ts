@@ -58,10 +58,13 @@ QueryRouter.post(
   '/',
   async (ctx, next) =>
   {
-    winston.info('query post' + JSON.stringify(ctx.request.body, null, 2));
     const request = ctx.request.body;
 
     Util.verifyParameters(request, ['database', 'type', 'body']);
+
+    winston.info('query database: ' + request.database, +' type "' + request.type + '"');
+    winston.debug('query database debug: ' + request.database, +' type "' + request.type + '"' +
+      'body: ' + JSON.stringify(request.body));
 
     const database: DatabaseController = DatabaseRegistry.get(request.database);
     if (database === undefined)
@@ -69,7 +72,8 @@ QueryRouter.post(
       throw Error('Database "' + request.database + '" not found.');
     }
 
-    database.getQueryHandler().query(request, ctx.body);
+    const qh = database.getQueryHandler();
+    await qh.handleQuery(request, ctx);
   });
 
 export default QueryRouter;
