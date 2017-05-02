@@ -45,7 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as request from 'supertest';
+import * as winston from 'winston';
 import App from '../../src/app/App';
+import ElasticController from '../../src/database/elastic/ElasticController';
+import DatabaseRegistry from '../../src/databaseRegistry/DatabaseRegistry';
 
 let server;
 
@@ -60,6 +63,12 @@ beforeAll(async () =>
 
   const app = new App(options);
   server = app.listen();
+
+  DatabaseRegistry.set(
+    0,
+    new ElasticController({
+      hosts: ['http://localhost:9200'],
+    }, 0, 'RouteTests'));
 });
 
 describe('Version route tests', () =>
@@ -75,7 +84,9 @@ describe('Version route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('[{"id":1,"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
+        expect(response.text)
+          .toBe(
+          '[{"id":1,"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
       })
       .catch((error) =>
       {
@@ -97,7 +108,8 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+        expect(response.text)
+          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
       })
       .catch((error) =>
       {
@@ -139,7 +151,8 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+        expect(response.text)
+          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
       })
       .catch((error) =>
       {
@@ -187,6 +200,7 @@ describe('Item route tests', () =>
       .expect(500)
       .then((response) =>
       {
+        winston.info('response: "' + response + '"');
         done();
       })
       .catch((error) =>
@@ -212,5 +226,40 @@ describe('Schema route tests', () =>
         }
       });
     done();
+  });
+});
+
+describe('Query route tests', () =>
+{
+  test('GET /midway/v1/query', async (done) =>
+  {
+    return request(server)
+      .post('/midway/v1/query/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        database: 0,
+        type: 'search',
+        body: {
+          index: 'movies',
+          type: 'data',
+          from: 0,
+          size: 0,
+          body: {
+            query: {},
+          },
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        // winston.info(JSON.stringify(response));
+        expect(JSON.parse(response.text).hits).toEqual({ total: 27278, max_score: 0, hits: [] });
+        done();
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
+      });
   });
 });

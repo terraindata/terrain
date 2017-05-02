@@ -44,44 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as request from 'request';
-import * as _ from 'underscore';
-import * as Tasty from '../tasty/Tasty';
+abstract class QueryHandler
+{
+  public abstract handleQuery(request: object, context: object): void;
+}
 
-export const Util =
-  {
-    getRequest: (url) =>
-    {
-      return new Promise((resolve, reject) =>
-      {
-        request(url, (error, res, body) =>
-        {
-          if (!error && res.statusCode === 200)
-          {
-            resolve(body);
-          }
-          else
-          {
-            reject(error);
-          }
-        });
-      });
-    },
-    verifyParameters: (parameters: any, required: string[]): void =>
-    {
-      if (!parameters)
-      {
-        throw Error('No parameters found.');
-      }
-
-      for (const key of required)
-      {
-        if (!parameters.hasOwnProperty(key))
-        {
-          throw new Error('Parameter "' + key + '" not found in request object.');
-        }
-      }
-    },
-  };
-
-export default Util;
+export default QueryHandler;

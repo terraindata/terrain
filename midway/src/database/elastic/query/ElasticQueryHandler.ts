@@ -44,44 +44,45 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as request from 'request';
-import * as _ from 'underscore';
-import * as Tasty from '../tasty/Tasty';
+// import ElasticConfig from '../ElasticConfig';
+// import ElasticCluster from '../client/ElasticCluster';
+// import ElasticIndices from '../client/ElasticIndices';
+import * as winston from 'winston';
+import QueryHandler from '../../../app/query/QueryHandler';
+import { makePromiseCallback } from '../../../tasty/Utils';
+import ElasticController from '../ElasticController';
 
-export const Util =
+/**
+ * Implements the QueryHandler interface for ElasticSearch
+ */
+export default class ElasticQueryHandler extends QueryHandler
+{
+  private controller: ElasticController;
+
+  constructor(controller: ElasticController)
   {
-    getRequest: (url) =>
+    super();
+    this.controller = controller;
+  }
+
+  public async handleQuery(request: object, context: object): void
+  {
+    const type = request.type;
+    const body = request.body;
+
+    if (type === 'search')
     {
-      return new Promise((resolve, reject) =>
+      const result = await new Promise((resolve, reject) =>
       {
-        request(url, (error, res, body) =>
-        {
-          if (!error && res.statusCode === 200)
-          {
-            resolve(body);
-          }
-          else
-          {
-            reject(error);
-          }
-        });
+        this.controller.getClient().search(body, makePromiseCallback(resolve, reject));
       });
-    },
-    verifyParameters: (parameters: any, required: string[]): void =>
-    {
-      if (!parameters)
-      {
-        throw Error('No parameters found.');
-      }
 
-      for (const key of required)
-      {
-        if (!parameters.hasOwnProperty(key))
-        {
-          throw new Error('Parameter "' + key + '" not found in request object.');
-        }
-      }
-    },
-  };
+      // NB: streaming not yet implemented
+      context.body = result;
+      return;
+    }
 
-export default Util;
+    throw new Error('Query type "' + type + '" is not currently supported.');
+  }
+
+}
