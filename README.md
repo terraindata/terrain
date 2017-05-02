@@ -274,7 +274,7 @@ checking their results from within our unit test files.  The reason `supertest` 
 is that `supertest` ensures that midway is running (or it starts it temporarily on its own) before running the test.
 
 Here is an example of how to perform an API test for midway from inside a midway unit test:
-```ecmascript 6
+```javascript
 test('GET /midway/v1/schema', (t) =>
 {
   request(App)
