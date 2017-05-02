@@ -55,7 +55,7 @@ import Util from '../../../util/Util';
 import Result from '../results/Result';
 import PureClasss from './../../../common/components/PureClasss';
 import Switch from './../../../common/components/Switch';
-import {MAX_RESULTS, Results} from './ResultsManager.tsx';
+import {MAX_RESULTS, Results} from './ResultsManager';
 
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 const GearIcon = require('./../../../../images/icon_gear.svg?name=GearIcon');
