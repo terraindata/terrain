@@ -90,9 +90,31 @@ UserReducers[ActionTypes.setUsers] =
       .set('loading', false)
       .set('loaded', true);
 
+// This currentUser reference is hacky, and we should change it.
 UserReducers[ActionTypes.updateCurrentUser] =
   (state, action) =>
     state.set('currentUser',
       state.getIn(['users', AuthStore.getState().get('username')]));
+
+UserReducers[ActionTypes.completeTutorial] =
+  (
+    state: UserTypes.UserState, 
+    action: Action<{
+      stepId: string,
+      complete: boolean,
+    }>
+  ) =>
+  {
+    state = state.setIn(
+      ['users', state.currentUser.username, 'tutorialStepsCompleted', action.payload.stepId], 
+      action.payload.complete
+    );
+    
+    const user = state.users.get(state.currentUser.username);
+    Ajax.saveUser(user, () => {}, () => {});
+    
+    state = state.set('currentUser', user); // update the version of the current user reference
+    return state;
+  };
 
 export default UserReducers;

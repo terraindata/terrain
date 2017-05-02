@@ -69,9 +69,16 @@ const Actions =
   updateCurrentUser:
     () =>
       $(ActionTypes.updateCurrentUser, {}),
+  
+  copmleteTutorial:
+    (stepId: string, complete: boolean = true) =>
+      $(ActionTypes.completeTutorial, { stepId, complete }),
 };
 
 import AuthStore from './../../auth/data/AuthStore';
 AuthStore.subscribe(Actions.updateCurrentUser);
+
+// TODO remove when no longer needed
+window['completeTutorial'] = Actions.copmleteTutorial;
 
 export default Actions;

@@ -64,6 +64,7 @@ export module UserTypes
     timeZone = 158;
     phone = '';
     imgSrc = '';
+    tutorialStepsCompleted: IMMap<string, boolean> = Immutable.Map<string, boolean>({});
 
     //notifications fields
     sound = 'chime';
@@ -72,8 +73,10 @@ export module UserTypes
     desktopNotificationType = 'Activities of any kind';
     emailNews = 'on';
 
-    // exlcude the db-level fields from the meta-data save
-    excludeFields = ['isAdmin', 'username', 'disabled'];
+    // DB level fields
+    dbFields = ['isAdmin', 'username', 'disabled'];
+    // "static" fields to exclude
+    excludeFields = ['name, dbFields', 'excludeFields'];
 
     name: () => string = () =>
     {
@@ -87,8 +90,11 @@ export module UserTypes
     // groupRoles: Immutable.Map({}),
   }
   export type User = UserC & IRecord<UserC>;
-  export const _User = (config?: {[key:string]: any}) => 
-    New<User>(new UserC(config), config);
+  export const _User = (config: {[key:string]: any} = {}) => 
+  {
+    config.tutorialStepsCompleted = Immutable.Map(config.tutorialStepsCompleted);
+    return New<User>(new UserC(config), config);
+  };
 
   export type UserMap = Immutable.Map<ID, UserTypes.User>;
 
