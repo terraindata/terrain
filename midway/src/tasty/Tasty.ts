@@ -65,6 +65,9 @@ export type Query = TastyQuery;
 export const Table = TastyTable;
 export type Table = TastyTable;
 
+export const Schema = TastySchema;
+export type Schema = TastySchema;
+
 /**
  * The core Tasty executor interface.
  *
