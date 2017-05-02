@@ -34,4 +34,4 @@ test_backends:
   script:
    - yarn install
    - yarn run fix
-   - yarn run test-back-all
+   - yarn run test-back
