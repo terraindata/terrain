@@ -69,9 +69,9 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 {
   // update user, must be super user or authenticated user updating own info
   winston.info('user update');
-  const user = ctx.request.body.body;
-  Util.verifyParameters(user, ['email', 'password']);
-  user.id = ctx.params.id;
+  const user = ctx.request.body;
+  Util.verifyParameters(user.body, ['email', 'password']);
+  user.body.id = ctx.params.id;
   user.callingUser = ctx.state.user;
   // if superuser or id to be updated is current user
   if (ctx.state.user.isSuperUser || ctx.request.body.id === ctx.params.id)
@@ -84,9 +84,9 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 {
   // create a user, must be admin
   winston.info('create user');
-  const user = ctx.request.body.body;
-  Util.verifyParameters(user, ['email', 'password']);
-  if (user.id)
+  const user = ctx.request.body;
+  Util.verifyParameters(user.body, ['email', 'password']);
+  if (user.body.id)
   {
     throw Error('Invalid parameter user ID');
   }
