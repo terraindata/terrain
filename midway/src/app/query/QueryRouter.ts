@@ -56,18 +56,25 @@ const QueryRouter = new KoaRouter();
 
 QueryRouter.post(
   '/',
+  passport.authenticate('access-token-local'),
   async (ctx, next) =>
   {
-    winston.info('query post');
-    const request = ctx.request.body.body;
+    const query = ctx.request.body;
 
-    Util.verifyParameters(request, ['database', 'type', 'query']);
+    Util.verifyParameters(query, ['database', 'type', 'body']);
 
-    const database: DatabaseController = DatabaseRegistry.get(request.database);
+    winston.info('query database: ' + query.database, +' type "' + query.type + '"');
+    winston.debug('query database debug: ' + query.database, +' type "' + query.type + '"' +
+      'body: ' + JSON.stringify(query.body));
+
+    const database: DatabaseController = DatabaseRegistry.get(query.database);
     if (database === undefined)
     {
-      throw Error('Database "' + request.database + '" not found.');
+      throw Error('Database "' + query.database + '" not found.');
     }
+
+    const qh = database.getQueryHandler();
+    ctx.body = await qh.handleQuery(query);
   });
 
 export default QueryRouter;

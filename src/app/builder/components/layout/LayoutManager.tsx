@@ -240,44 +240,48 @@ const LayoutManager = React.createClass<any, any>({
 		}
 		return sum;
 	},
+  
+  lessThanComp: (refIndex: number, index: number) => refIndex < index,
+  greaterThanComp: (refIndex: number, index: number) => refIndex > index,
+  noComp: (refIndex: number, index: number) => false,
 
 	computeShiftedIndicesSingleAxis(index, coords)
 	{
 		const clientRect = this.refs[index].getBoundingClientRect();
 		const indicesToShift = [];
 
-		const curY: any = 0; // current Y position to compare, either the top edge (if dragged up) or bottom (if dragged down)
-		const curX: any = 0; // current X position to compare, either the left edge (if dragged left) or the right (if dragged right)
-		const compareIndices = (refIndex) => false; // is the given neighbor index applicable?
-		const getRefMidpointY: any = (refClientRect) => 0; // MidpointY of the neighbor to compare
-		const getRefMidpointX: any = (refClientRect) => 0; // MidpointX of the neighbor to compare
-		const compareRefMidpointY = (refMidpointY) => false; // given an applicable neighbor's MidpointY, should we shift?
-		const compareRefMidpointX = (refMidpointX) => false; // given an applicable neighbor's MidpointX, should we shift?
-		const heightAmplifier = 0; // shift our neighbor by heightAmplifier * our height
-		const widthAmplifier = 0; // ditto, for width
+		let curY: any = 0; // current Y position to compare, either the top edge (if dragged up) or bottom (if dragged down)
+		let curX: any = 0; // current X position to compare, either the left edge (if dragged left) or the right (if dragged right)
+		let compareIndices = this.noComp; // is the given neighbor index applicable?
+		let getRefMidpointY = (refClientRect) => 0; // MidpointY of the neighbor to compare
+		let getRefMidpointX = (refClientRect) => 0; // MidpointX of the neighbor to compare
+		let compareRefMidpointY = (refMidpointY) => false; // given an applicable neighbor's MidpointY, should we shift?
+		let compareRefMidpointX = (refMidpointX) => false; // given an applicable neighbor's MidpointX, should we shift?
+		let heightAmplifier = 0; // shift our neighbor by heightAmplifier * our height
+		let widthAmplifier = 0; // ditto, for width
 
 		if (this.props.layout.rows)
 		{
 			// dragged up
 			if (coords.dy < 0)
 			{
-				const curY = clientRect.top + coords.dy;
-				const compareIndices = (refIndex) => refIndex < index;
-				const getRefMidpointY: any = (refClientRect) => refClientRect.bottom - refClientRect.height / 2;
-				const compareRefMidpointY = (refMidpointY) => curY < refMidpointY;
-				const heightAmplifier = 1;
-				const widthAmplifier = 0;
+				curY = clientRect.top + coords.dy;
+				compareIndices = this.lessThanComp;
+				getRefMidpointY = (refClientRect) => refClientRect.bottom - refClientRect.height / 2;
+				compareRefMidpointY = (refMidpointY) => curY < refMidpointY;
+				heightAmplifier = 1;
+				widthAmplifier = 0;
 			}
 
 			// dragged down
 			if (coords.dy > 0)
 			{
-				const curY = clientRect.bottom + coords.dy;
-				const compareIndices = (refIndex) => refIndex > index;
-				const getRefMidpointY: any = (refClientRect) => refClientRect.top + refClientRect.height / 2;
-				const compareRefMidpointY = (refMidpointY) => curY > refMidpointY;
-				const heightAmplifier = -1;
-				const widthAmplifier = 0;
+				curY = clientRect.bottom + coords.dy;
+				compareIndices = this.greaterThanComp;
+				getRefMidpointY = (refClientRect) => refClientRect.top + refClientRect.height / 2;
+				compareRefMidpointY = (refMidpointY) => curY > refMidpointY;
+				heightAmplifier = -1;
+				widthAmplifier = 0;
 			}
 		}
 
@@ -286,28 +290,28 @@ const LayoutManager = React.createClass<any, any>({
 			// dragged left
 			if (coords.dx < 0)
 			{
-				const curX = clientRect.left + coords.dx;
-				const compareIndices = (refIndex) => refIndex < index;
-				const getRefMidpointX: any = (refClientRect) => refClientRect.right - refClientRect.width / 2;
-				const compareRefMidpointX = (refMidpointX) => curX < refMidpointX;
-				const heightAmplifier = 0;
-				const widthAmplifier = 1;
+				curX = clientRect.left + coords.dx;
+				compareIndices = this.lessThanComp;
+				getRefMidpointX = (refClientRect) => refClientRect.right - refClientRect.width / 2;
+				compareRefMidpointX = (refMidpointX) => curX < refMidpointX;
+				heightAmplifier = 0;
+				widthAmplifier = 1;
 			}
 			// dragged down
 			if (coords.dx > 0)
 			{
-				const curX = clientRect.right + coords.dx;
-				const compareIndices = (refIndex) => refIndex > index;
-				const getRefMidpointX: any = (refClientRect) => refClientRect.left + refClientRect.width / 2;
-				const compareRefMidpointX = (refMidpointX) => curX > refMidpointX;
-				const heightAmplifier = 0;
-				const widthAmplifier = -1;
+				curX = clientRect.right + coords.dx;
+				compareIndices = this.greaterThanComp;
+				getRefMidpointX = (refClientRect) => refClientRect.left + refClientRect.width / 2;
+				compareRefMidpointX = (refMidpointX) => curX > refMidpointX;
+				heightAmplifier = 0;
+				widthAmplifier = -1;
 			}
 		}
 
 		$.each(this.refs, (refIndex, refObj) =>
 		{
-			if (compareIndices(refIndex))
+			if (compareIndices(+refIndex, +index))
 			{
 				const refClientRect = refObj.getBoundingClientRect();
 				const refMidpointY = getRefMidpointY(refClientRect);
@@ -379,7 +383,7 @@ const LayoutManager = React.createClass<any, any>({
 
     const clientRect = this.refs[index].getBoundingClientRect();
     const indicesToShift = this.computeShiftedIndices(index, coords, originalCoords);
-
+    
     let heightAmplifier = 0;
     let widthAmplifier = 0;
 

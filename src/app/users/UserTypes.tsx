@@ -44,63 +44,41 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import RoleTypes from './../roles/RoleTypes';
+import {BaseClass, New} from '../Classes';
 
 export module UserTypes
 {
-  const _User = Immutable.Record({
+  class UserC extends BaseClass
+  {
     // db-level fields
-    username: '',
-    isAdmin: false,
-    isDisabled: false,
+    username = '';
+    isAdmin = false;
+    isDisabled = false;
 
     // metadata fields
-    firstName: '',
-    lastName: '',
-    whatIDo: '',
-    email: '',
-    skype: '',
-    timeZone: 158,
-    phone: '',
-    imgSrc: '',
+    firstName = '';
+    lastName = '';
+    whatIDo = '';
+    email = '';
+    skype = '';
+    timeZone = 158;
+    phone = '';
+    imgSrc = '';
+    tutorialStepsCompleted: IMMap<string, boolean> = Immutable.Map<string, boolean>({});
 
     //notifications fields
-    sound: 'chime',
-    emailNotificationType: 'Activities of any kind',
-    emailNotificationTiming: 'Once every 15 minutes',
-    desktopNotificationType: 'Activities of any kind',
-    emailNews: 'on',
+    sound = 'chime';
+    emailNotificationType = 'Activities of any kind';
+    emailNotificationTiming = 'Once every 15 minutes';
+    desktopNotificationType = 'Activities of any kind';
+    emailNews = 'on';
 
-    // exlcude the db-level fields from the meta-data save
-    excludeFields: ['isAdmin', 'username', 'disabled'],
+    // DB level fields
+    dbFields = ['isAdmin', 'username', 'disabled'];
+    // "static" fields to exclude
+    excludeFields = ['name, dbFields', 'excludeFields'];
 
-    // groupRoles: Immutable.Map({}),
-  });
-  export class User extends _User
-  {
-    username: string;
-
-    // data fields
-    firstName: string;
-    lastName: string;
-    whatIDo: string;
-    email: string;
-    skype: string;
-    timeZone: number;
-    phone: string;
-    imgSrc: string;
-
-    sound: string;
-    emailNotificationType: string;
-    emailNotificationTiming: string;
-    desktopNotificationType: string;
-    emailNews: string;
-
-    isAdmin: boolean;
-    isDisabled: boolean;
-
-    excludeFields: string[];
-
-    name(): string
+    name: () => string = () =>
     {
       if (!this.firstName.length && !this.lastName.length)
       {
@@ -109,24 +87,27 @@ export module UserTypes
 
       return `${this.firstName} ${this.lastName}`;
     }
-
-    // groupRoles: {[groupId: string]: RoleTypes.GroupUserRole;}
+    // groupRoles: Immutable.Map({}),
   }
+  export type User = UserC & IRecord<UserC>;
+  export const _User = (config: {[key:string]: any} = {}) => 
+  {
+    config.tutorialStepsCompleted = Immutable.Map(config.tutorialStepsCompleted);
+    return New<User>(new UserC(config), config);
+  };
 
   export type UserMap = Immutable.Map<ID, UserTypes.User>;
 
-  const _UserState = Immutable.Record({
-    loading: false,
-    loaded: false,
-    users: Immutable.Map<ID, User>({}),
-    currentUser: null,
-  });
-  export class UserState extends _UserState {
-    loading: boolean;
-    loaded: boolean;
-    users: UserMap;
-    currentUser: User;
+  class UserStateC extends BaseClass
+  {
+    loading = false;
+    loaded = false;
+    users = Immutable.Map<ID, User>({});
+    currentUser: UserTypes.User = null;
   }
+  export type UserState = UserStateC & IRecord<UserStateC>;
+  export const _UserState = (config?: {[key:string]: any}) => 
+    New<UserState>(new UserStateC(config), config);
 
   export function profileUrlFor(user: User): string
   {
