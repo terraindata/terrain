@@ -130,7 +130,6 @@ const Panel = {
 	dragTo(x, y)
 	{
 		const draggedTo: any = { x: 0, y: 0 };
-
 		$('input').blur();
 
 		// if(this.props.dragInsideOnly)
