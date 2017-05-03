@@ -52,14 +52,14 @@ import { Versions } from '../versions/Versions';
 const versions = new Versions();
 
 // CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, \
-// parentItemId integer NOT NULL, status text, type text);
+// parent integer, status text, type text);
 
 export interface ItemConfig
 {
   id?: number;
   meta?: string;
   name: string;
-  parentItemId: number;
+  parent?: number;
   status?: string;
   type?: string;
 }
@@ -70,7 +70,7 @@ export class Items
 
   constructor()
   {
-    this.itemTable = new Tasty.Table('items', ['id'], ['meta', 'name', 'parentItemId', 'status', 'type']);
+    this.itemTable = new Tasty.Table('items', ['id'], ['meta', 'name', 'parent', 'status', 'type']);
   }
 
   public async delete(id: number): Promise<object[]>
@@ -87,20 +87,13 @@ export class Items
     return App.DB.select(this.itemTable, [], {}) as any;
   }
 
+  // both regular and superusers can create items
+  // only superusers can change existing items that are not BUILD status
+  // both regular and superusers can change items that are not LIVE or DEFAULT status
   public async upsert(user: UserConfig, item: ItemConfig): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      // both regular and superusers can create items
-      // only superusers can change existing items that are not BUILD status
-      // both regular and superusers can change items that are not LIVE or DEFAULT status
-
-      // check if all the required parameters are passed
-      if (item === undefined || (item && (item.parentItemId === undefined || item.name === undefined)))
-      {
-        return reject('Insufficient parameters passed');
-      }
-
       let status: string = item.status || '';
       let oldItem;
 
@@ -125,7 +118,7 @@ export class Items
 
       try
       {
-        if (item.id !== undefined)
+        if (item.id && oldItem)
         {
           await versions.create(user, 'items', oldItem.id, oldItem);
         }

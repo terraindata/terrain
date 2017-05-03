@@ -48,6 +48,7 @@ THE SOFTWARE.
 // import ElasticCluster from '../client/ElasticCluster';
 // import ElasticIndices from '../client/ElasticIndices';
 import * as winston from 'winston';
+import Query from '../../../app/query/Query';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
@@ -65,7 +66,7 @@ export default class ElasticQueryHandler extends QueryHandler
     this.controller = controller;
   }
 
-  public async handleQuery(request: any, context: any): Promise<void>
+  public async handleQuery(request: Query, context: any): Promise<void>
   {
     const type = request.type;
     const body = request.body;
