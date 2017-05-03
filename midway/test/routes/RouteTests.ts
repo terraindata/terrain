@@ -65,6 +65,12 @@ beforeAll((done) =>
   const app = new App(options);
   server = app.listen();
 
+  DatabaseRegistry.set(
+    0,
+    new ElasticController({
+      hosts: ['http://localhost:9200'],
+    }, 0, 'RouteTests'));
+
   request(server)
     .post('/midway/v1/users/')
     .send({
@@ -173,11 +179,6 @@ describe('User and auth route tests', () =>
         fail('POST /midway/v1/auth/api_login request returned an error: ' + error);
       });
   });
-  DatabaseRegistry.set(
-    0,
-    new ElasticController({
-      hosts: ['http://localhost:9200'],
-    }, 0, 'RouteTests'));
 });
 
 describe('Version route tests', () =>
@@ -291,7 +292,7 @@ describe('Item route tests', () =>
       });
   });
 
-  test('Invalid update: POST /midway/v1/items/', (done) =>
+  test('Invalid update: POST /midway/v1/items/', () =>
   {
     return request(server)
       .post('/midway/v1/items/314159265359')
@@ -307,7 +308,6 @@ describe('Item route tests', () =>
       .then((response) =>
       {
         winston.info('response: "' + response + '"');
-        done();
       })
       .catch((error) =>
       {
@@ -318,26 +318,29 @@ describe('Item route tests', () =>
 
 describe('Schema route tests', () =>
 {
-  test('GET /midway/v1/schema', async (done) =>
+  test('GET /midway/v1/schema/', () =>
   {
     return request(server)
-      .get('/midway/v1/schema')
+      .get('/midway/v1/schema/')
+      .query({
+        id: 1,
+        accessToken: 'AccessToken',
+      })
       .expect(200)
       .then((response) =>
       {
-        // TODO @david check against expected value for schema, not just non-emptiness
+        expect(response.text).not.toBe('');
         if (response.text === '')
         {
           fail('GET /schema request returned empty response body');
         }
       });
-    done();
   });
 });
 
 describe('Query route tests', () =>
 {
-  test('GET /midway/v1/query', async (done) =>
+  test('POST /midway/v1/query', () =>
   {
     return request(server)
       .post('/midway/v1/query/')
@@ -361,7 +364,6 @@ describe('Query route tests', () =>
       {
         // winston.info(JSON.stringify(response));
         expect(JSON.parse(response.text).hits).toEqual({ total: 27278, max_score: 0, hits: [] });
-        done();
       })
       .catch((error) =>
       {

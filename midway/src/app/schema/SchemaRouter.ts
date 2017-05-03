@@ -67,12 +67,13 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
 {
   winston.info('getting all schema');
   const request = ctx.request.body.body;
-  if (request.database)
+  if (request && request.database)
   {
     ctx.body = await getSchema(request.database);
   }
   else
   {
+    ctx.body = '';
     for (const [id, database] of DatabaseRegistry.getAll())
     {
       ctx.body += await getSchema(id);
