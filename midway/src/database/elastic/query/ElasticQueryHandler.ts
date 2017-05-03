@@ -48,7 +48,8 @@ THE SOFTWARE.
 // import ElasticCluster from '../client/ElasticCluster';
 // import ElasticIndices from '../client/ElasticIndices';
 import * as winston from 'winston';
-import { Query, QueryHandler } from '../../../app/query/QueryHandler';
+import Query from '../../../app/query/Query';
+import QueryHandler from '../../../app/query/QueryHandler';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
 
@@ -65,19 +66,21 @@ export default class ElasticQueryHandler extends QueryHandler
     this.controller = controller;
   }
 
-  public async handleQuery(request: Query): Promise<string>
+  public async handleQuery(request: Query, context: any): Promise<void>
   {
     const type = request.type;
     const body = request.body;
 
     if (type === 'search')
     {
-      return new Promise<string>((resolve, reject) =>
+      const result = await new Promise((resolve, reject) =>
       {
         this.controller.getClient().search(body, makePromiseCallback(resolve, reject));
       });
 
       // NB: streaming not yet implemented
+      context.body = result;
+      return;
     }
 
     throw new Error('Query type "' + type + '" is not currently supported.');
