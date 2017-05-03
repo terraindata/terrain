@@ -50,7 +50,7 @@ import App from '../../src/app/App';
 let server;
 let testUserAccessToken: string;
 
-beforeAll(() =>
+beforeAll((done) =>
 {
   const options =
     {
@@ -62,7 +62,7 @@ beforeAll(() =>
   const app = new App(options);
   server = app.listen();
 
-  return request(server)
+  request(server)
     .post('/midway/v1/users/create')
     .send({
       id: 1,
@@ -76,36 +76,20 @@ beforeAll(() =>
         timezone: 'UTC',
       },
     })
-    .expect(200)
-    .then((response) =>
+    .end(() =>
     {
-      expect(response.text).toEqual('[]');
-
       request(server)
         .post('/midway/v1/auth/api_login')
         .send({
           email: 'test@terraindata.com',
           password: 'Flash Flash Hundred Yard Dash',
         })
-        // .expect(200)
-        .then((resp) =>
+        .end((err, res) =>
         {
-          // expect(response.text).not.toBe('Unauthorized');
-          testUserAccessToken = JSON.parse(resp.text).accessToken;
-          console.log(testUserAccessToken);
-        })
-        .catch((error) =>
-        {
-          fail('POST /midway/v1/auth/api_login request returned an error: ' + error);
-          testUserAccessToken = 'failed';
+          testUserAccessToken = res.body.accessToken;
+          done();
         });
-    })
-    .catch((error) =>
-    {
-      fail('POST /midway/v1/users/ request returned an error: ' + error);
-      testUserAccessToken = 'failed';
     });
-
 });
 
 describe('User and auth route tests', () =>
@@ -131,7 +115,6 @@ describe('User and auth route tests', () =>
 
   test('logout: POST /midway/v1/auth/api_logout', () =>
   {
-    console.log('testuseraccesstoken is '+testUserAccessToken);
     return request(server)
       .post('/midway/v1/auth/api_logout')
       .send({
@@ -157,7 +140,7 @@ describe('User and auth route tests', () =>
         id: '2',
         accessToken: testUserAccessToken,
       })
-      .expect(500)
+      .expect(401)
       .then((response) =>
       {
         expect(response.text).toBe('Unauthorized');
@@ -180,7 +163,7 @@ describe('User and auth route tests', () =>
       .then((response) =>
       {
         expect(response.text).not.toBe('Unauthorized');
-        testUserAccessToken = response.text.accessToken;
+        testUserAccessToken = JSON.parse(response.text).accessToken;
       })
       .catch((error) =>
       {
@@ -333,6 +316,7 @@ describe('Item route tests', () =>
           name: 'Test Item 3',
           parentItemId: 0,
           status: 'LIVE',
+          meta: 'New Meta',
         },
       })
       .expect(200)

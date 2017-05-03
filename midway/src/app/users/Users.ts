@@ -249,13 +249,14 @@ export const Users =
     logout: async (id: number, accessToken: string) =>
     {
       const results = await App.DB.select(User, [], { id, accessToken });
-      if (results && results.length === 0)
+      if ((results && results.length === 0) || !results)
       {
         return null;
       }
       const user = results[0];
       user['accessToken'] = '';
-      return await Users.upsert(user);
+      await Users.upsert(user);
+      return [];
     },
 
     replace: async (user, id?) =>
