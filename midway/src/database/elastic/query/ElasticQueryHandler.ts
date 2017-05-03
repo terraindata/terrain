@@ -44,47 +44,43 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
+// import ElasticConfig from '../ElasticConfig';
+// import ElasticCluster from '../client/ElasticCluster';
+// import ElasticIndices from '../client/ElasticIndices';
 import * as winston from 'winston';
+import { Query, QueryHandler } from '../../../app/query/QueryHandler';
+import { makePromiseCallback } from '../../../tasty/Utils';
+import ElasticController from '../ElasticController';
 
-import DatabaseController from '../../database/DatabaseController';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Tasty from '../../tasty/Tasty';
-
-import Util from '../Util';
-
-const Router = new KoaRouter();
-
-async function getSchema(databaseID: number): Promise<string>
+/**
+ * Implements the QueryHandler interface for ElasticSearch
+ */
+export default class ElasticQueryHandler extends QueryHandler
 {
-  const database: DatabaseController = DatabaseRegistry.get(databaseID);
-  const schema: Tasty.Schema = await database.getTasty().schema();
-  return schema.toString();
-}
+  private controller: ElasticController;
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('getting all schema');
-  const request = ctx.request.body.body;
-  if (request.database)
+  constructor(controller: ElasticController)
   {
-    ctx.body = await getSchema(request.database);
+    super();
+    this.controller = controller;
   }
-  else
+
+  public async handleQuery(request: Query): Promise<string>
   {
-    for (const [id, database] of DatabaseRegistry.getAll())
+    const type = request.type;
+    const body = request.body;
+
+    if (type === 'search')
     {
-      ctx.body += await getSchema(id);
+      return new Promise<string>((resolve, reject) =>
+      {
+        this.controller.getClient().search(body, makePromiseCallback(resolve, reject));
+      });
+
+      // NB: streaming not yet implemented
     }
+
+    throw new Error('Query type "' + type + '" is not currently supported.');
   }
-});
 
-Router.get('/:database', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('get schema');
-  const request = ctx.request.body.body;
-  ctx.body = await getSchema(ctx.params.database);
-});
-
-export default Router;
+}

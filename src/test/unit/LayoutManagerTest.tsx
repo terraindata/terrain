@@ -50,7 +50,7 @@ import * as _ from 'underscore';
 const TestUtils = require('react-addons-test-utils');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import LayoutManager from '../../app/builder/components/layout/LayoutManager.tsx';
+import LayoutManager from '../../app/builder/components/layout/LayoutManager';
 
 // Because some of these tests will test size and positioning,
 //  we need to render them into a real document, because the

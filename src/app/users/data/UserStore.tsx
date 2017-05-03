@@ -56,7 +56,7 @@ import ActionTypes from './UserActionTypes';
 
 const UserStore = Redux.createStore(ReduxActions.handleActions(_.extend({},
   UserReducers,
-{}), new UserTypes.UserState({})), new UserTypes.UserState({}));
+{}), UserTypes._UserState({})), UserTypes._UserState({}));
 
 UserStore.subscribe(() =>
 {

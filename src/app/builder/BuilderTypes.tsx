@@ -1362,7 +1362,7 @@ export module BuilderTypes
           },
           {
             displayType: DisplayType.COMPONENT,
-            component: require('./components/charts/TransformCard'), //TransformCardComponent,
+            component: require('./components/charts/TransformCard').default, //TransformCardComponent,
             requiresBuilderState: true,
             key: null,
             help: ManualConfig.help['scorePoints'],

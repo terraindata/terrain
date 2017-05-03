@@ -57,6 +57,8 @@ const UserActionTypes =
   fetch: '',
   setUsers: '',
   updateCurrentUser: '',
+  
+  completeTutorial: '',
 };
 
 Util.setValuesToKeys(UserActionTypes, '');

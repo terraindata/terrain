@@ -45,7 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as request from 'supertest';
+import * as winston from 'winston';
 import App from '../../src/app/App';
+import ElasticController from '../../src/database/elastic/ElasticController';
+import DatabaseRegistry from '../../src/databaseRegistry/DatabaseRegistry';
 
 let server;
 let testUserAccessToken: string;
@@ -63,7 +66,7 @@ beforeAll((done) =>
   server = app.listen();
 
   request(server)
-    .post('/midway/v1/users/create')
+    .post('/midway/v1/users/')
     .send({
       id: 1,
       accessToken: 'AccessToken',
@@ -170,6 +173,11 @@ describe('User and auth route tests', () =>
         fail('POST /midway/v1/auth/api_login request returned an error: ' + error);
       });
   });
+  DatabaseRegistry.set(
+    0,
+    new ElasticController({
+      hosts: ['http://localhost:9200'],
+    }, 0, 'RouteTests'));
 });
 
 describe('Version route tests', () =>
@@ -185,7 +193,9 @@ describe('Version route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('[{"id":1,"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
+        expect(response.text)
+          .toBe(
+          '[{"id":1,"createdAt":"2017-04-28 03:32:25","createdByUserId":1,"object":"[object Object]","objectId":2,"objectType":"items"}]');
       })
       .catch((error) =>
       {
@@ -207,7 +217,8 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+        expect(response.text)
+          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parent":0,"status":"Alive","type":"Singer"}]');
       })
       .catch((error) =>
       {
@@ -224,7 +235,6 @@ describe('Item route tests', () =>
         accessToken: 'AccessToken',
         body: {
           name: 'Test Item',
-          parentItemId: 0,
         },
       })
       .expect(200)
@@ -249,7 +259,8 @@ describe('Item route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parentItemId":0,"status":"Alive","type":"Singer"}]');
+        expect(response.text)
+          .toEqual('[{"id":1,"meta":"Meta","name":"Bob Dylan","parent":0,"status":"Alive","type":"Singer"}]');
       })
       .catch((error) =>
       {
@@ -260,14 +271,13 @@ describe('Item route tests', () =>
   test('Update item: POST /midway/v1/items/', () =>
   {
     return request(server)
-      .post('/midway/v1/items/')
+      .post('/midway/v1/items/2')
       .send({
         id: 1,
         accessToken: 'AccessToken',
         body: {
           id: 2,
           name: 'Updated Item',
-          parentItemId: 1,
         },
       })
       .expect(200)
@@ -281,72 +291,22 @@ describe('Item route tests', () =>
       });
   });
 
-  test('Invalid update id: POST /midway/v1/items/', (done) =>
+  test('Invalid update: POST /midway/v1/items/', (done) =>
   {
     return request(server)
-      .post('/midway/v1/items/')
+      .post('/midway/v1/items/314159265359')
       .send({
         id: 1,
         accessToken: 'AccessToken',
         body: {
           id: 314159265359,
           name: 'Test Item',
-          parentItemId: 1,
         },
       })
       .expect(500)
       .then((response) =>
       {
-        done();
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
-      });
-  });
-
-  test('Create LIVE item: POST /midway/v1/items/', (done) =>
-  {
-    return request(server)
-      .post('/midway/v1/items/')
-      .send({
-        id: 1,
-        accessToken: 'AccessToken',
-        body: {
-          name: 'Test Item 3',
-          parentItemId: 0,
-          status: 'LIVE',
-          meta: 'New Meta',
-        },
-      })
-      .expect(200)
-      .then((response) =>
-      {
-        done();
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/items/ request returned an error: ' + error);
-      });
-  });
-
-  test('Invalid update (invalid status): POST /midway/v1/items/', (done) =>
-  {
-    return request(server)
-      .post('/midway/v1/items/')
-      .send({
-        id: 2,
-        accessToken: testUserAccessToken,
-        body: {
-          id: 3,
-          name: 'Test Item',
-          parentItemId: 0,
-          status: 'BUILD',
-        },
-      })
-      .expect(500)
-      .then((response) =>
-      {
+        winston.info('response: "' + response + '"');
         done();
       })
       .catch((error) =>
@@ -356,21 +316,56 @@ describe('Item route tests', () =>
   });
 });
 
-// describe('Schema route tests', () =>
-// {
-//   test('GET /midway/v1/schema', async (done) =>
-//   {
-//     request(server)
-//       .get('/midway/v1/schema')
-//       .expect(200)
-//       .then((response) =>
-//       {
-//         // TODO @david check against expected value for schema, not just non-emptiness
-//         if (response.text === '')
-//         {
-//           fail('GET /schema request returned empty response body');
-//         }
-//       });
-//     done();
-//   });
-// });
+describe('Schema route tests', () =>
+{
+  test('GET /midway/v1/schema', async (done) =>
+  {
+    return request(server)
+      .get('/midway/v1/schema')
+      .expect(200)
+      .then((response) =>
+      {
+        // TODO @david check against expected value for schema, not just non-emptiness
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+      });
+    done();
+  });
+});
+
+describe('Query route tests', () =>
+{
+  test('GET /midway/v1/query', async (done) =>
+  {
+    return request(server)
+      .post('/midway/v1/query/')
+      .send({
+        id: 1,
+        accessToken: 'AccessToken',
+        database: 0,
+        type: 'search',
+        body: {
+          index: 'movies',
+          type: 'data',
+          from: 0,
+          size: 0,
+          body: {
+            query: {},
+          },
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        // winston.info(JSON.stringify(response));
+        expect(JSON.parse(response.text).hits).toEqual({ total: 27278, max_score: 0, hits: [] });
+        done();
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
+      });
+  });
+});

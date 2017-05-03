@@ -53,79 +53,47 @@ import { UserConfig, Users } from './Users';
 
 const Router = new KoaRouter();
 
-Router.get('/', async (ctx, next) =>
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = '';
-  winston.info('user root');
+  winston.info('getting all users');
+  ctx.body = await Users.get();
 });
 
-Router.post('/', async (ctx, next) =>
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = '';
-  winston.info('user post');
+  winston.info('getting user ID ' + ctx.params.id);
+  ctx.body = await Users.get(ctx.params.id);
 });
 
-Router.post('/:id/update', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   // update user, must be super user or authenticated user updating own info
   winston.info('user update');
-  let returnStatus: any = 'Incorrect parameters';
-  const req = ctx.request.body;
-  if (!req['body'])
+  const user = ctx.request.body;
+  Util.verifyParameters(user.body, ['email', 'password']);
+  user.body.id = ctx.params.id;
+  user.callingUser = ctx.state.user;
+  // if superuser or id to be updated is current user
+  if (ctx.state.user.isSuperUser || ctx.request.body.id === ctx.params.id)
   {
-    ctx.body = 'Fields required';
-  }
-  else
-  {
-    req['body']['id'] = ctx.params.id;
-    req['callingUser'] = ctx.state.user;
-    // if superuser or id to be updated is current user
-    if (ctx.state.user.isSuperUser || req.id === ctx.params.id)
-    {
-      returnStatus = await Users.createOrUpdate(req);
-    }
-    // TODO revise this once error handling is implemented in Tasty
-    if (returnStatus instanceof Array)
-    {
-      ctx.body = 'Success';
-    }
-    else
-    {
-      ctx.body = returnStatus;
-    }
+    ctx.body = await Users.createOrUpdate(user);
   }
 });
 
-Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   // create a user, must be admin
   winston.info('create user');
-  const req = ctx.request.body;
-  let returnStatus: any = 'Incorrect parameters';
-  if (!req.body)
+  const user = ctx.request.body;
+  Util.verifyParameters(user.body, ['email', 'password']);
+  if (user.body.id)
   {
-    ctx.body = 'Fields required';
+    throw Error('Invalid parameter user ID');
   }
-  else
+
+  if (ctx.state.user.isSuperUser)
   {
-    if (req.body && req.body['id'])
-    {
-      delete req.body['id'];
-    }
-    if (ctx.state.user.isSuperUser)
-    {
-      // define which other parameters need to be present for create/update
-      returnStatus = await Users.createOrUpdate(req);
-    }
-    // TODO revise this once error handling is implemented in Tasty
-    if (returnStatus instanceof Array)
-    {
-      ctx.body = 'Success';
-    }
-    else
-    {
-      ctx.body = returnStatus;
-    }
+    ctx.body = await Users.createOrUpdate(user);
   }
 });
 

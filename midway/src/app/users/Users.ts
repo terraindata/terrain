@@ -86,11 +86,11 @@ export const Users =
         // update
         if (reqBody.id)
         {
-          user = await Users.find(reqBody.id);
+          user = await Users.get(reqBody.id);
           const userExists: boolean = !!user && user.length !== 0;
           if (!userExists)
           {
-            resolve('User with that id not found');
+            reject('User with that id not found');
             return;
           }
           if (reqBody.email !== user[0].email || reqBody.password)
@@ -98,7 +98,7 @@ export const Users =
             requirePassword = true;
             if (!reqBody.password)
             {
-              resolve('Must provide password if updating email');
+              reject('Must provide password if updating email');
               return;
             }
           }
@@ -115,15 +115,15 @@ export const Users =
         }
         else // create
         {
-          requirePassword = true;
+          // requirePassword = true;
           if (!reqBody.email || !reqBody.password)
           {
-            resolve('Require both email and password for user creation');
+            reject('Require both email and password for user creation');
             return;
           }
           if (reqBody.oldPassword)
           {
-            resolve('No existing password for non-existent user');
+            reject('No existing password for non-existent user');
             return;
           }
           newUser['accessToken'] = '';
@@ -138,6 +138,7 @@ export const Users =
             resolve(Users.upsert(newUser));
             return;
           });
+          return;
         }
 
         // update passwords, if necessary
@@ -156,7 +157,7 @@ export const Users =
             }
             else
             {
-              resolve('Invalid password');
+              reject('Invalid password');
               return;
             }
           });
@@ -172,14 +173,14 @@ export const Users =
             }
             else
             {
-              resolve('Invalid password');
+              reject('Invalid password');
               return;
             }
           });
         }
         else if (requirePassword && !reqBody.password) // if password isn't provided
         {
-          resolve('Password required');
+          reject('Password required');
           return;
         }
         else
@@ -190,9 +191,13 @@ export const Users =
       });
     },
 
-    find: async (id: number) =>
+    get: async (id?: number): Promise<UserConfig[]> =>
     {
-      return await App.DB.select(User, [], { id });
+      if (id !== undefined)
+      {
+        return App.DB.select(User, [], { id }) as any;
+      }
+      return App.DB.select(User, [], {}) as any;
     },
 
     loginWithAccessToken: async (id: number, accessToken: string): Promise<UserConfig> =>
@@ -259,18 +264,9 @@ export const Users =
       return [];
     },
 
-    replace: async (user, id?) =>
-    {
-      if (id)
-      {
-        user['id'] = id;
-      }
-      return await App.DB.upsert(User, user);
-    },
-
     upsert: async (newUser) =>
     {
-      return await App.DB.upsert(User, newUser);
+      return App.DB.upsert(User, newUser);
     },
   };
 

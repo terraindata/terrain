@@ -44,47 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
-
-import DatabaseController from '../../database/DatabaseController';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Tasty from '../../tasty/Tasty';
-
-import Util from '../Util';
-
-const Router = new KoaRouter();
-
-async function getSchema(databaseID: number): Promise<string>
+export interface Query
 {
-  const database: DatabaseController = DatabaseRegistry.get(databaseID);
-  const schema: Tasty.Schema = await database.getTasty().schema();
-  return schema.toString();
+  database: number;
+  type: string;
+  body: object | string;
 }
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+export abstract class QueryHandler
 {
-  winston.info('getting all schema');
-  const request = ctx.request.body.body;
-  if (request.database)
-  {
-    ctx.body = await getSchema(request.database);
-  }
-  else
-  {
-    for (const [id, database] of DatabaseRegistry.getAll())
-    {
-      ctx.body += await getSchema(id);
-    }
-  }
-});
+  public async abstract handleQuery(request: Query): Promise<string>;
+}
 
-Router.get('/:database', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('get schema');
-  const request = ctx.request.body.body;
-  ctx.body = await getSchema(ctx.params.database);
-});
-
-export default Router;
+export default QueryHandler;
