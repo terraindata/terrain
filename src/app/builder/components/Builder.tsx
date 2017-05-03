@@ -337,8 +337,9 @@ class Builder extends PureClasss<Props>
     }
     if (newConfig && (props === this.props || variantId !== this.getSelectedId(this.props)))
     {
+      let variant = this.state.variants.get(variantId);
       // need to fetch data for new query
-      Actions.fetchQuery(variantId, this.handleNoVariant, this.state.variants.get(variantId).db);
+      Actions.fetchQuery(variantId, this.handleNoVariant, variant && variant.db);
     }
   }
 
