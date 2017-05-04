@@ -66,21 +66,18 @@ export default class ElasticQueryHandler extends QueryHandler
     this.controller = controller;
   }
 
-  public async handleQuery(request: Query, context: any): Promise<void>
+  public async handleQuery(request: Query): Promise<string | object>
   {
     const type = request.type;
     const body = request.body;
 
     if (type === 'search')
     {
-      const result = await new Promise((resolve, reject) =>
+      // NB: streaming not yet implemented
+      return new Promise((resolve, reject) =>
       {
         this.controller.getClient().search(body, makePromiseCallback(resolve, reject));
       });
-
-      // NB: streaming not yet implemented
-      context.body = result;
-      return;
     }
 
     throw new Error('Query type "' + type + '" is not currently supported.');

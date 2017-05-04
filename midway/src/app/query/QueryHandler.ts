@@ -48,7 +48,7 @@ import Query from './Query';
 
 export abstract class QueryHandler
 {
-  public async abstract handleQuery(request: Query): Promise<void>;
+  public async abstract handleQuery(request: Query): Promise<string | object>;
 }
 
 export default QueryHandler;
