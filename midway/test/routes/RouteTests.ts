@@ -236,6 +236,7 @@ describe('Item route tests', () =>
         accessToken: 'AccessToken',
         body: {
           name: 'Test Item',
+          status: 'LIVE',
         },
       })
       .expect(200)
@@ -302,6 +303,30 @@ describe('Item route tests', () =>
         body: {
           id: 314159265359,
           name: 'Test Item',
+        },
+      })
+      .expect(500)
+      .then((response) =>
+      {
+        winston.info('response: "' + response + '"');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + error);
+      });
+  });
+
+  test('Update with invalid status: POST /midway/v1/items/', () =>
+  {
+    return request(server)
+      .post('/midway/v1/items/2')
+      .send({
+        id: 2,
+        accessToken: testUserAccessToken,
+        body: {
+          id: 2,
+          name: 'Test Item',
+          status: 'BUILD',
         },
       })
       .expect(500)

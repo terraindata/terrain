@@ -94,34 +94,41 @@ export class Items
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      let status: string = item.status || '';
-      let oldItem;
+      // check privileges
+      if (!user.isSuperUser && item.status)
+      {
+        if (item.id !== undefined)
+        {
+          return reject('Only superuser can change item status');
+        }
+        else
+        {
+          if (item.status === 'LIVE' || item.status === 'DEFAULT')
+          {
+            return reject('Cannot set item status as LIVE or DEFAULT as non-superuser');
+          }
+        }
+      }
 
-      // item id specified but item not found
       if (item.id !== undefined)
       {
+        // item id specified but item not found
         const items: ItemConfig[] = await this.get(item.id);
         if (items.length === 0)
         {
           return reject('Invalid item id passed');
         }
+        if (!user.isSuperUser && items[0].status
+              && (items[0].status === 'LIVE' || items[0].status === 'DEFAULT'))
+        {
+          return reject('Cannot update LIVE or DEFAULT item as non-superuser');
+        }
 
-        status = items[0].status || status;
-        oldItem = items[0];
-      }
-      // check privileges
-      if (!user.isSuperUser && (status === 'LIVE' || status === 'DEFAULT'))
-      {
-        return reject('Cannot change status of LIVE or DEFAULT item as non-superuser');
+        await versions.create(user, 'items', items[0].id, items[0]);
       }
 
       try
       {
-        if (item.id && oldItem)
-        {
-          await versions.create(user, 'items', oldItem.id, oldItem);
-        }
-
         await App.DB.upsert(this.itemTable, item);
         resolve('Success');
       }
