@@ -44,43 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+export interface Query
+{
+  database: number;
+  type: string;
+  body: object | string;
+}
 
-import Query from '../../app/query/Query';
-import DatabaseController from '../../database/DatabaseController';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Util from '../Util';
-import { QueryHandler } from './QueryHandler';
-
-const QueryRouter = new KoaRouter();
-
-QueryRouter.post(
-  '/',
-  passport.authenticate('access-token-local'),
-  async (ctx, next) =>
-  {
-    const query: Query = ctx.request.body as Query;
-
-    Util.verifyParameters(query, ['database', 'type', 'body']);
-
-    winston.info('query database: ' + query.database, +' type "' + query.type + '"');
-    winston.debug('query database debug: ' + query.database, +' type "' + query.type + '"' +
-      'body: ' + JSON.stringify(query.body));
-
-    const database: DatabaseController = DatabaseRegistry.get(query.database);
-    if (database === undefined)
-    {
-      throw Error('Database "' + query.database + '" not found.');
-    }
-
-    const qh: QueryHandler = database.getQueryHandler();
-    const result: string | object = await qh.handleQuery(query);
-    ctx.body = {
-      result,
-      status: 'ok',
-    };
-  });
-
-export default QueryRouter;
+export default Query;
