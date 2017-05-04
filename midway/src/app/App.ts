@@ -67,7 +67,8 @@ import './auth/Passport';
 import CmdLineArgs from './CmdLineArgs';
 import './Logging';
 import Middleware from './Middleware';
-import Router from './Router';
+import RouteError from './RouteError';
+import MidwayRouter from './Router';
 
 export let DB: Tasty.Tasty;
 
@@ -97,7 +98,9 @@ class App
     this.app.use(Middleware.passport.initialize());
     this.app.use(Middleware.passport.session());
 
-    this.app.use(Router.routes());
+    // make sure we insert the RouteErrorHandler first
+    this.app.use(RouteError.RouteErrorHandler);
+    this.app.use(MidwayRouter.routes());
   }
 
   public listen(port: number = CmdLineArgs.port)

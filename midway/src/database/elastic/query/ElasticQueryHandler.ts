@@ -49,6 +49,7 @@ THE SOFTWARE.
 // import ElasticIndices from '../client/ElasticIndices';
 import * as winston from 'winston';
 import { Query, QueryHandler } from '../../../app/query/QueryHandler';
+import QueryError from '../../../app/QueryError';
 import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticController from '../ElasticController';
 
@@ -83,4 +84,23 @@ export default class ElasticQueryHandler extends QueryHandler
     throw new Error('Query type "' + type + '" is not currently supported.');
   }
 
+  private makeQueryCallback<T>(resolve: (T) => void, reject: (Error) => void)
+  {
+    return (error: Error, response: T) =>
+    {
+      if (error)
+      {
+        if (QueryError.isElasticQueryError(error))
+        {
+          resolve(QueryError.composeFromElasticError(error));
+        } else
+        {
+          reject(error);
+        }
+      } else
+      {
+        resolve(response);
+      }
+    };
+  }
 }

@@ -43,66 +43,28 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import MidwayError from './MidwayError';
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
-
-import reqText = require('require-text');
-import AuthRouter from './auth/AuthRouter';
-import ItemRouter from './items/ItemRouter';
-import QueryRouter from './query/QueryRouter';
-import SchemaRouter from './schema/SchemaRouter';
-import StatusRouter from './status/StatusRouter';
-import UserRouter from './users/UserRouter';
-import Util from './Util';
-import VersionRouter from './versions/VersionRouter';
-
-const AppRouter = new KoaRouter();
-
-AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
-AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
-AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
-AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
-AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
-AppRouter.use('/status', StatusRouter.routes(), StatusRouter.allowedMethods());
-AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
-// Add future routes here.
-
-// Prefix all routes with /midway
-//  This is so that we can allow the front-end to use all other routes.
-//  Any route not prefixed with /midway will just serve the front-end.
-
-AppRouter.get('/', async (ctx, next) =>
+class QueryError extends MidwayError
 {
-  if (ctx.state.user)
+  public static isElasticQueryError(err: object): boolean
   {
-    ctx.body = 'authenticated as ' + ctx.state.user.username;
+    return err['response'] ? true : false;
   }
-  else
+
+  public static composeFromElasticError(err: object): QueryError
   {
-    ctx.body = 'not authenticated';
+    const status = err['statusCode'] || 400;
+    const title = err['message'] || 'The Elastic query has an error.';
+    const detail = err['response'] || JSON.stringify(err);
+    const source = err;
+    return new QueryError(status, title, detail, source);
   }
-});
 
-AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  ctx.body = 'authenticated as ' + ctx.state.user.username;
-});
+  public constructor(status, title, detail, source)
+  {
+    super(status, title, detail, source);
+  }
+}
 
-const MidwayRouter = new KoaRouter();
-MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
-
-MidwayRouter.get('/', async (ctx, next) =>
-{
-  const index = reqText('../../src/app/index.html', require);
-  ctx.body = index.toString();
-});
-
-MidwayRouter.get('/bundle.js', async (ctx, next) =>
-{
-  // TODO render this if DEV, otherwise render compiled bundle.js
-  ctx.body = await Util.getRequest('http://localhost:8080/bundle.js');
-});
-
-export default MidwayRouter;
+export default QueryError;
