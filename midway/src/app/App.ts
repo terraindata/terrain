@@ -78,6 +78,9 @@ class App
 
   constructor(config: any = CmdLineArgs)
   {
+    process.on('uncaughtException', this.uncaughtExceptionHandler);
+    process.on('unhandledRejection', this.unhandledRejectionHandler);
+
     this.DB = this.initializeDB(config.db.toLowerCase(), config.dsn.toLowerCase());
     DB = this.DB;
 
@@ -150,6 +153,18 @@ class App
     {
       throw Error('Error initializing Nodeway system database.');
     }
+  }
+
+  private uncaughtExceptionHandler(err: any): void
+  {
+    winston.error('Uncaught Exception: ' + err);
+    // this is a good palce to clean tangle resources
+    process.abort();
+  }
+
+  private unhandledRejectionHandler(res: any): void
+  {
+    winston.error('Unhandled Promise Rejection: ' + res);
   }
 }
 
