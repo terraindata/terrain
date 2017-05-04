@@ -48,7 +48,7 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-import Util from '../Util';
+import * as Util from '../Util';
 import { Items } from './Items';
 
 const Router = new KoaRouter();

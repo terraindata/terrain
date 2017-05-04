@@ -45,43 +45,37 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as request from 'request';
-import * as _ from 'underscore';
-import * as Tasty from '../tasty/Tasty';
 
-export const Util =
+export function getRequest(url)
+{
+  return new Promise((resolve, reject) =>
   {
-    getRequest: (url) =>
+    request(url, (error, res, body) =>
     {
-      return new Promise((resolve, reject) =>
+      if (!error && res.statusCode === 200)
       {
-        request(url, (error, res, body) =>
-        {
-          if (!error && res.statusCode === 200)
-          {
-            resolve(body);
-          }
-          else
-          {
-            reject(error);
-          }
-        });
-      });
-    },
-    verifyParameters: (parameters: any, required: string[]): void =>
+        resolve(body);
+      }
+      else
+      {
+        reject(error);
+      }
+    });
+  });
+}
+
+export function verifyParameters(parameters: any, required: string[]): void
+{
+  if (!parameters)
+  {
+    throw Error('No parameters found.');
+  }
+
+  for (const key of required)
+  {
+    if (!parameters.hasOwnProperty(key))
     {
-      if (!parameters)
-      {
-        throw Error('No parameters found.');
-      }
-
-      for (const key of required)
-      {
-        if (!parameters.hasOwnProperty(key))
-        {
-          throw new Error('Parameter "' + key + '" not found in request object.');
-        }
-      }
-    },
-  };
-
-export default Util;
+      throw new Error('Parameter "' + key + '" not found in request object.');
+    }
+  }
+}
