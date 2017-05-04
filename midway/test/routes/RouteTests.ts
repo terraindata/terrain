@@ -340,7 +340,7 @@ describe('Schema route tests', () =>
 
 describe('Query route tests', () =>
 {
-  test('POST /midway/v1/query', () =>
+  test('Elastic Search Query: POST /midway/v1/query', () =>
   {
     return request(server)
       .post('/midway/v1/query/')
@@ -363,7 +363,8 @@ describe('Query route tests', () =>
       .then((response) =>
       {
         // winston.info(JSON.stringify(response));
-        expect(JSON.parse(response.text).hits).toEqual({ total: 27278, max_score: 0, hits: [] });
+        expect(JSON.parse(response.text).result.hits).toEqual({ total: 27278, max_score: 0, hits: [] });
+        expect(JSON.parse(response.text).status).toEqual('ok');
       })
       .catch((error) =>
       {

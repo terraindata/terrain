@@ -52,6 +52,7 @@ import Query from '../../app/query/Query';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import Util from '../Util';
+import { QueryHandler } from './QueryHandler';
 
 const QueryRouter = new KoaRouter();
 
@@ -74,8 +75,12 @@ QueryRouter.post(
       throw Error('Database "' + query.database + '" not found.');
     }
 
-    const qh = database.getQueryHandler();
-    ctx.body = await qh.handleQuery(query);
+    const qh: QueryHandler = database.getQueryHandler();
+    const result: string | object = await qh.handleQuery(query);
+    ctx.body = {
+      result,
+      status: 'ok',
+    };
   });
 
 export default QueryRouter;
