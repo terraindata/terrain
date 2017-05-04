@@ -80,9 +80,9 @@ export function verifyParameters(parameters: any, required: string[]): void
   }
 }
 
-export function updateObject<T>(obj: T, oldObj: T): T
+export function updateObject<T>(obj: T, newObj: T): T
 {
-  for (const key in oldObj)
+  for (const key in newObj)
   {
     if (newObj.hasOwnProperty(key) && obj.hasOwnProperty(key))
     {
