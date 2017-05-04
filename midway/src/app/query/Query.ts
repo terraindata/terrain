@@ -44,43 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// import ElasticConfig from '../ElasticConfig';
-// import ElasticCluster from '../client/ElasticCluster';
-// import ElasticIndices from '../client/ElasticIndices';
-import * as winston from 'winston';
-import Query from '../../../app/query/Query';
-import QueryHandler from '../../../app/query/QueryHandler';
-import { makePromiseCallback } from '../../../tasty/Utils';
-import ElasticController from '../ElasticController';
-
-/**
- * Implements the QueryHandler interface for ElasticSearch
- */
-export default class ElasticQueryHandler extends QueryHandler
+export interface Query
 {
-  private controller: ElasticController;
-
-  constructor(controller: ElasticController)
-  {
-    super();
-    this.controller = controller;
-  }
-
-  public async handleQuery(request: Query): Promise<string | object>
-  {
-    const type = request.type;
-    const body = request.body;
-
-    if (type === 'search')
-    {
-      // NB: streaming not yet implemented
-      return new Promise((resolve, reject) =>
-      {
-        this.controller.getClient().search(body, makePromiseCallback(resolve, reject));
-      });
-    }
-
-    throw new Error('Query type "' + type + '" is not currently supported.');
-  }
-
+  database: number;
+  type: string;
+  body: object | string;
 }
+
+export default Query;

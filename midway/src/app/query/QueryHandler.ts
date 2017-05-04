@@ -44,16 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export interface Query
-{
-  database: number;
-  type: string;
-  body: object | string;
-}
+import Query from './Query';
 
 export abstract class QueryHandler
 {
-  public async abstract handleQuery(request: Query): Promise<string>;
+  public async abstract handleQuery(request: Query): Promise<string | object>;
 }
 
 export default QueryHandler;
