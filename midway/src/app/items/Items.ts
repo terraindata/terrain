@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { UserConfig } from '../users/Users';
+import * as Util from '../Util';
 import { Versions } from '../versions/Versions';
 
 const versions = new Versions();
@@ -125,6 +126,7 @@ export class Items
         }
 
         await versions.create(user, 'items', items[0].id, items[0]);
+        item = Util.updateObject(items[0], item);
       }
 
       try
