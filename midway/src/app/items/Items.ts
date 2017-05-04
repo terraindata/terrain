@@ -109,11 +109,10 @@ export class Items
         status = items[0].status || status;
         oldItem = items[0];
       }
-
       // check privileges
       if (!user.isSuperUser && (status === 'LIVE' || status === 'DEFAULT'))
       {
-        return reject('Unauthorized');
+        return reject('Cannot change status of LIVE or DEFAULT item as non-superuser');
       }
 
       try

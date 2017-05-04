@@ -51,8 +51,9 @@ import ElasticController from '../../src/database/elastic/ElasticController';
 import DatabaseRegistry from '../../src/databaseRegistry/DatabaseRegistry';
 
 let server;
+let testUserAccessToken: string;
 
-beforeAll(async () =>
+beforeAll((done) =>
 {
   const options =
     {
@@ -69,6 +70,115 @@ beforeAll(async () =>
     new ElasticController({
       hosts: ['http://localhost:9200'],
     }, 0, 'RouteTests'));
+
+  request(server)
+    .post('/midway/v1/users/')
+    .send({
+      id: 1,
+      accessToken: 'AccessToken',
+      body: {
+        email: 'test@terraindata.com',
+        name: 'Test Person',
+        password: 'Flash Flash Hundred Yard Dash',
+        isAdmin: false,
+        isDisabled: false,
+        timezone: 'UTC',
+      },
+    })
+    .end(() =>
+    {
+      request(server)
+        .post('/midway/v1/auth/api_login')
+        .send({
+          email: 'test@terraindata.com',
+          password: 'Flash Flash Hundred Yard Dash',
+        })
+        .end((err, res) =>
+        {
+          testUserAccessToken = res.body.accessToken;
+          done();
+        });
+    });
+});
+
+describe('User and auth route tests', () =>
+{
+  test('http login route: GET /midway/v1/auth/login', () =>
+  {
+    return request(server)
+      .get('/midway/v1/auth/login')
+      .query({
+        email: 'test@terraindata.com',
+        password: 'Flash Flash Hundred Yard Dash',
+      })
+      .expect(302)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/auth/login request returned an error: ' + error);
+      });
+  });
+
+  test('logout: POST /midway/v1/auth/api_logout', () =>
+  {
+    return request(server)
+      .post('/midway/v1/auth/api_logout')
+      .send({
+        id: '2',
+        accessToken: testUserAccessToken,
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe('Success');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_logout request returned an error: ' + error);
+      });
+  });
+
+  test('access API route with bad accessToken: POST /midway/v1/auth/api_logout', () =>
+  {
+    return request(server)
+      .post('/midway/v1/auth/api_logout')
+      .send({
+        id: '2',
+        accessToken: testUserAccessToken,
+      })
+      .expect(401)
+      .then((response) =>
+      {
+        expect(response.text).toBe('Unauthorized');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_logout request returned an error: ' + error);
+      });
+  });
+
+  test('get new accessToken : POST /midway/v1/auth/api_login', () =>
+  {
+    return request(server)
+      .post('/midway/v1/auth/api_login')
+      .send({
+        email: 'test@terraindata.com',
+        password: 'Flash Flash Hundred Yard Dash',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        testUserAccessToken = JSON.parse(response.text).accessToken;
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/auth/api_login request returned an error: ' + error);
+      });
+  });
 });
 
 describe('Version route tests', () =>
@@ -182,7 +292,7 @@ describe('Item route tests', () =>
       });
   });
 
-  test('Invalid update: POST /midway/v1/items/', (done) =>
+  test('Invalid update: POST /midway/v1/items/', () =>
   {
     return request(server)
       .post('/midway/v1/items/314159265359')
@@ -198,7 +308,6 @@ describe('Item route tests', () =>
       .then((response) =>
       {
         winston.info('response: "' + response + '"');
-        done();
       })
       .catch((error) =>
       {
@@ -209,26 +318,29 @@ describe('Item route tests', () =>
 
 describe('Schema route tests', () =>
 {
-  test('GET /midway/v1/schema', async (done) =>
+  test('GET /midway/v1/schema/', () =>
   {
-    request(server)
-      .get('/midway/v1/schema')
+    return request(server)
+      .get('/midway/v1/schema/')
+      .query({
+        id: 1,
+        accessToken: 'AccessToken',
+      })
       .expect(200)
       .then((response) =>
       {
-        // TODO @david check against expected value for schema, not just non-emptiness
+        expect(response.text).not.toBe('');
         if (response.text === '')
         {
           fail('GET /schema request returned empty response body');
         }
       });
-    done();
   });
 });
 
 describe('Query route tests', () =>
 {
-  test('GET /midway/v1/query', async (done) =>
+  test('POST /midway/v1/query', () =>
   {
     return request(server)
       .post('/midway/v1/query/')
@@ -252,7 +364,6 @@ describe('Query route tests', () =>
       {
         // winston.info(JSON.stringify(response));
         expect(JSON.parse(response.text).hits).toEqual({ total: 27278, max_score: 0, hits: [] });
-        done();
       })
       .catch((error) =>
       {
