@@ -39,6 +39,6 @@ lint:
 
 test_backends:
   script:
-   - sudo yarn install
+   - yarn install
    - yarn run fix
    - yarn run test-back
