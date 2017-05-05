@@ -55,7 +55,7 @@ const UserReducers = {};
 
 UserReducers[ActionTypes.change] =
   (state, action) =>
-    state.setIn(['users', action.payload.user.username], action.payload.user);
+    state.setIn(['users', action.payload.user.userId], action.payload.user);
 
 UserReducers[ActionTypes.fetch] =
   (state, action) =>
@@ -63,18 +63,21 @@ UserReducers[ActionTypes.fetch] =
     Ajax.getUsers((usersObj) =>
     {
       let users: UserTypes.UserMap = Immutable.Map<any, UserTypes.User>({});
-      _.map(usersObj, (userObj, username) =>
+      _.map(usersObj, (userObj, userId) =>
       {
+        // TODO switch "data" this to "meta?"
         const data = userObj.data && userObj.data.length ? JSON.parse(userObj.data) : {};
         const isAdmin = userObj.admin === 1;
         const isBuilder = userObj.builder === 1;
         const isDisabled = userObj.disabled === 1;
-        users = users.set(username, UserTypes._User(
+        const email = userObj.email;
+        users = users.set(userId, UserTypes._User(
           _.extend(data, {
-            username,
+            userId,
             isAdmin,
             isBuilder,
             isDisabled,
+            email,
           }),
         ));
       });
@@ -86,7 +89,7 @@ UserReducers[ActionTypes.fetch] =
 UserReducers[ActionTypes.setUsers] =
   (state, action) =>
     state.set('users', action.payload.users)
-      .set('currentUser', action.payload.users.get(AuthStore.getState().get('username')))
+      .set('currentUser', action.payload.users.get(AuthStore.getState().get('userId')))
       .set('loading', false)
       .set('loaded', true);
 
@@ -94,7 +97,7 @@ UserReducers[ActionTypes.setUsers] =
 UserReducers[ActionTypes.updateCurrentUser] =
   (state, action) =>
     state.set('currentUser',
-      state.getIn(['users', AuthStore.getState().get('username')]));
+      state.getIn(['users', AuthStore.getState().get('userId')]));
 
 UserReducers[ActionTypes.completeTutorial] =
   (
@@ -106,11 +109,11 @@ UserReducers[ActionTypes.completeTutorial] =
   ) =>
   {
     state = state.setIn(
-      ['users', state.currentUser.username, 'tutorialStepsCompleted', action.payload.stepId], 
+      ['users', state.currentUser.userId, 'tutorialStepsCompleted', action.payload.stepId], 
       action.payload.complete
     );
     
-    const user = state.users.get(state.currentUser.username);
+    const user = state.users.get(state.currentUser.userId);
     Ajax.saveUser(user, () => {}, () => {});
     
     state = state.set('currentUser', user); // update the version of the current user reference

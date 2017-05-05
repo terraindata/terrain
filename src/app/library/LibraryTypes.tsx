@@ -70,7 +70,7 @@ export module LibraryTypes
     id = '';
     name = '';
     lastEdited = '';
-    lastUsername = '';
+    lastUserId = '';
     algorithmId = '';
     groupId = '';
     status = EVariantStatus.Build;
@@ -84,7 +84,7 @@ export module LibraryTypes
 
     // for DB storage, hopefully uneeded soon
     dbFields = ['groupId', 'algorithmId', 'status'];
-    dataFields = ['name', 'lastEdited', 'lastUsername', 'query', 'db', 'isDefault', 'modelVersion'];
+    dataFields = ['name', 'lastEdited', 'lastUserId', 'query', 'db', 'isDefault', 'modelVersion'];
     modelVersion = 1;
     static getDb: (v: Variant) => string;
   }
@@ -110,7 +110,7 @@ export module LibraryTypes
     config.query = BuilderTypes._Query(config.query);
 
     let v = new Variant_Record(config) as any as Variant;
-    if (!config || !config.lastUsername || !config.lastEdited)
+    if (!config || !config.lastUserId || !config.lastEdited)
     {
       v = touchVariant(v);
     }
@@ -121,7 +121,7 @@ export module LibraryTypes
   {
     return v
       .set('lastEdited', new Date())
-      .set('lastUsername', localStorage['username'])
+      .set('lastUserId', localStorage['userId'])
     ;
   }
 
@@ -142,7 +142,7 @@ export module LibraryTypes
     id = '';
     name = '';
     lastEdited = '';
-    lastUsername = '';
+    lastUserId = '';
     groupId = '';
     variantsOrder = List([]);
     status = EAlgorithmStatus.Live;
@@ -151,7 +151,7 @@ export module LibraryTypes
     // for DB storage
     type = 'algorithm';
     dbFields = ['groupId', 'status'];
-    dataFields = ['name', 'lastEdited', 'lastUsername', 'variantsOrder', 'db'];
+    dataFields = ['name', 'lastEdited', 'lastUserId', 'variantsOrder', 'db'];
   }
   const Algorithm_Record = Immutable.Record(new AlgorithmC());
   export interface Algorithm extends AlgorithmC, IRecord<Algorithm> {}
@@ -187,8 +187,8 @@ export module LibraryTypes
     id = '';
     name = '';
     lastEdited = '';
-    lastUsername = '';
-    usernames = List([]);
+    lastUserId = '';
+    userIds = List([]);
     algorithmsOrder = List([]);
     status = EGroupStatus.Live;
     db = 'urbansitter';
@@ -196,13 +196,13 @@ export module LibraryTypes
     // for DB storage
     type = 'group';
     dbFields = ['status'];
-    dataFields = ['name', 'lastEdited', 'lastUsername', 'algorithmsOrder', 'db'];
+    dataFields = ['name', 'lastEdited', 'lastUserId', 'algorithmsOrder', 'db'];
   }
   const Group_Record = Immutable.Record(new GroupC());
   export interface Group extends GroupC, IRecord<Group> {}
   export const _Group = (config?: any) => {
     config = Util.extendId(config || {});
-    config.usernames = List(config.usernames || []);
+    config.userIds = List(config.userIds || []);
     config.algorithmsOrder = List(config.algorithmsOrder || []);
     return new Group_Record(config) as any as Group;
   };

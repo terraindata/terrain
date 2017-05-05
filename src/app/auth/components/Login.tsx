@@ -65,7 +65,7 @@ class Login extends PureClasss<Props>
 {
   state = {
     shifted: false,
-    username: '',
+    email: '',
     password: '',
     token: '',
     loginErrorModalOpen: false,
@@ -114,11 +114,11 @@ class Login extends PureClasss<Props>
     }
   }
 
-  handleUsernameChange(ev: any)
+  handleEmailChange(ev: any)
   {
     const {value} = ev.target;
     this.setState({
-      username: value,
+      email: value,
     });
 
     if (value.length)
@@ -153,7 +153,7 @@ class Login extends PureClasss<Props>
 
   handleBlur()
   {
-    if (!this.state.username && !this.state.password)
+    if (!this.state.email && !this.state.password)
     {
       this.setState({
         shifted: false,
@@ -178,9 +178,9 @@ class Login extends PureClasss<Props>
     this.setState({
       loggingIn: true,
     });
-    const { username } = this.state;
+    const { email } = this.state;
     const login = (token: string) => {
-      Actions.login(token, username);
+      Actions.login(token, email);
     };
 
     this.xhr && this.xhr.abort();
@@ -209,7 +209,7 @@ class Login extends PureClasss<Props>
     // NOTE: MIDWAY_HOST will be replaced by the build process.
     this.xhr.open('POST', MIDWAY_HOST + '/auth', true);
     this.xhr.send(JSON.stringify({
-      username,
+      email,
       password: this.state.password,
     }));
   }
@@ -268,7 +268,7 @@ class Login extends PureClasss<Props>
               <input
                 id="login-email"
                 type="text"
-                onChange={this.handleUsernameChange}
+                onChange={this.handleEmailChange}
                 className="login-input-field"
                 placeholder=""
                 onFocus={this.handleFocus}
