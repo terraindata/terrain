@@ -62,24 +62,17 @@ Router.post('/', async (ctx, next) =>
   ctx.body = '';
 });
 
-Router.get('/login', passport.authenticate('local'), async (ctx, next) =>
-{
-  ctx.body = ctx.state.user.accessToken;
-  winston.info('User is successfully authenticated as ' + ctx.state.user.email);
-  ctx.redirect('/midway/v1/');
-});
-
-Router.post('/api_login', passport.authenticate('local'), async (ctx, next) =>
+Router.post('/login', passport.authenticate('local'), async (ctx, next) =>
 {
   winston.info('User has successfully authenticated as ' + ctx.state.user.email);
   ctx.body =
     {
       accessToken: ctx.state.user.accessToken,
-      username: ctx.state.user.username,
+      userId: ctx.state.user.userId,
     };
 });
 
-Router.post('/api_logout', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/logout', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const returnStatus: any = await Users.logout(ctx.state.authInfo.id, ctx.state.authInfo.accessToken);
   // TODO revise this once error handling is implemented in Tasty

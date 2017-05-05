@@ -179,8 +179,9 @@ class Login extends PureClasss<Props>
       loggingIn: true,
     });
     const { email } = this.state;
-    const login = (token: string) => {
-      Actions.login(token, email);
+    const login = (userData: { accessToken, userId }) => {
+      // TODO confirm with Jason / Midway that this works
+      Actions.login(userData.accessToken, userData.userId);
     };
 
     this.xhr && this.xhr.abort();
