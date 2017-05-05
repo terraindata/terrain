@@ -47,6 +47,9 @@ THE SOFTWARE.
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 import { Versions } from './Versions';
+export * from './Versions';
+
+export const versions: Versions = new Versions();
 
 const Router = new KoaRouter();
 export const versions = new Versions();
